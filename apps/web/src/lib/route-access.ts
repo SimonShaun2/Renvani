@@ -4,7 +4,7 @@ export type UserRole = (typeof USER_ROLES)[number];
 
 type DefaultRouteMap = Record<UserRole, string>;
 
-const EXACT_PUBLIC_ROUTES = new Set(["/", "/login", "/signup"]);
+const EXACT_PUBLIC_ROUTES = new Set(["/", "/login", "/signup", "/product-tour", "/pricing", "/industries/hvac"]);
 
 const ROLE_ALLOWED_PREFIXES: Record<UserRole, string[]> = {
   owner: [

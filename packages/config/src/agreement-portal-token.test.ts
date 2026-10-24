@@ -23,3 +23,15 @@ describe("agreement-portal-token", () => {
     expect(verifyAgreementPortalToken(`${token}x`)).toBeNull();
   });
 });
+
+describe("agreement portal token expiry", () => {
+  it("rejects expired and legacy (no-exp) tokens", async () => {
+    const mod = await import("./agreement-portal-token.js");
+    const fresh = mod.signAgreementPortalToken("c1", "a1");
+    expect(mod.verifyAgreementPortalToken(fresh)).toEqual({ companyId: "c1", agreementId: "a1" });
+    const expired = mod.signAgreementPortalToken("c1", "a1", -10);
+    expect(mod.verifyAgreementPortalToken(expired)).toBeNull();
+    const [payload, sig] = fresh.split(".");
+    expect(mod.verifyAgreementPortalToken(`${payload!.split(":").slice(0, 2).join(":")}.${sig}`)).toBeNull();
+  });
+});

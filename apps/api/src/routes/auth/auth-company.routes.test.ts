@@ -47,6 +47,8 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
+  const { resetPublicBookingRateLimitStateForTests } = await import("../../lib/public-booking-rate-limit.js");
+  resetPublicBookingRateLimitStateForTests();
   fakeDb.resetTestState();
   notificationsQueueAddMock.mockReset();
   app = await buildAppModule.buildApp();

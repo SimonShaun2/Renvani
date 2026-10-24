@@ -21,3 +21,12 @@ describe("vip-membership-portal-token", () => {
     );
   });
 });
+
+describe("vip join token expiry", () => {
+  it("rejects expired tokens", async () => {
+    const mod = await import("./vip-membership-portal-token.js");
+    const fresh = mod.signVipMembershipJoinToken("c1", "u1", "t1");
+    expect(mod.verifyVipMembershipJoinToken(fresh)).toEqual({ companyId: "c1", customerId: "u1", vipTierId: "t1" });
+    expect(mod.verifyVipMembershipJoinToken(mod.signVipMembershipJoinToken("c1", "u1", "t1", -10))).toBeNull();
+  });
+});

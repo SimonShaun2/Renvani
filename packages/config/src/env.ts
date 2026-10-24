@@ -70,6 +70,10 @@ const envSchema = z.object({
     .default("00000000-0000-4000-8000-000000000053"),
   /** STACK-02 — Clerk secret; empty disables Clerk verify path */
   CLERK_SECRET_KEY: z.string().default(""),
+  /** Clerk webhook signing secret (whsec_…) for POST /api/v1/webhooks/clerk (svix). */
+  CLERK_WEBHOOK_SECRET: z.string().default(""),
+  /** Comma-separated web origins allowed as Clerk `azp` and for CORS (e.g. https://staging.renvani.com). */
+  CLERK_AUTHORIZED_PARTIES: z.string().default(""),
   /** STACK-04 / FS-133 — optional Sentry DSN for QBO sync issue alerts */
   SENTRY_DSN: z.string().default(""),
   /** FS-133 — Intuit sandbox OAuth (optional until QBO sync is configured). */

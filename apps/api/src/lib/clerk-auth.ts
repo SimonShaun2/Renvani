@@ -1,12 +1,30 @@
 import { verifyToken } from "@clerk/backend";
 
 import { featureFlags } from "@fsm/config/feature-flags";
-import { AppError, ErrorCode } from "@fsm/types";
+import { AppError, ErrorCode, type UserRole } from "@fsm/types";
+
+/** Custom session-token claim carrying the Renvani staff role (set via Clerk session token template). */
+export const CLERK_ROLE_CLAIM = "renvani_role";
+
+const USER_ROLES: readonly UserRole[] = ["owner", "admin", "dispatcher", "office", "technician"];
 
 export interface ClerkVerifiedSession {
   clerkUserId: string;
   clerkOrganizationId: string;
   email: string | null;
+  role: UserRole | null;
+}
+
+export function parseClerkAuthorizedParties(raw: string | undefined = process.env.CLERK_AUTHORIZED_PARTIES): string[] {
+  return (raw ?? "")
+    .split(",")
+    .map((entry) => entry.trim().replace(/\/$/, ""))
+    .filter((entry) => entry.length > 0);
+}
+
+export function extractClerkRoleClaim(payload: Record<string, unknown>): UserRole | null {
+  const raw = payload[CLERK_ROLE_CLAIM];
+  return typeof raw === "string" && (USER_ROLES as readonly string[]).includes(raw) ? (raw as UserRole) : null;
 }
 
 function readClerkSecretKey(): string | null {
@@ -46,7 +64,11 @@ export async function verifyClerkBearerToken(accessToken: string): Promise<Clerk
 
   let payload: Record<string, unknown>;
   try {
-    payload = (await verifyToken(accessToken, { secretKey })) as Record<string, unknown>;
+    const authorizedParties = parseClerkAuthorizedParties();
+    payload = (await verifyToken(accessToken, {
+      secretKey,
+      ...(authorizedParties.length > 0 ? { authorizedParties } : {})
+    })) as Record<string, unknown>;
   } catch {
     throw new AppError(ErrorCode.UNAUTHORIZED, "Invalid Clerk session token");
   }
@@ -67,6 +89,7 @@ export async function verifyClerkBearerToken(accessToken: string): Promise<Clerk
   return {
     clerkUserId,
     clerkOrganizationId,
-    email
+    email,
+    role: extractClerkRoleClaim(payload)
   };
 }

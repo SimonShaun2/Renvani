@@ -20,7 +20,7 @@ export type VisualCard = {
   detail: string;
   chip: ChipKind;
   /** Card A on Revenue / Command Center carries the Approve button. */
-  actionLabel?: string;
+  actionLabel?: string | undefined;
 };
 
 export type VisualCounter = {
@@ -34,7 +34,7 @@ export type ProductVisualContent = {
   eyebrow: string;
   heading: string;
   body: string;
-  panelTitle?: string;
+  panelTitle?: string | undefined;
   rows: [VisualRow, VisualRow, VisualRow];
   cardA: VisualCard;
   cardB: VisualCard;
@@ -42,7 +42,8 @@ export type ProductVisualContent = {
   /** Revenue and Command Center play the Approve click-through. */
   clickThrough: boolean;
   /** Optional CMS image; when absent the coded visual is shown. */
-  imageUrl?: string;
+  imageUrl?: string | undefined;
+  imageAlt?: string | undefined;
 };
 
 export type PricingPlan = {
@@ -202,9 +203,99 @@ export const PLACEHOLDER_CONTENT: MarketingContent = {
   pricing: { heading: "Simple pricing. Everything included.", annualNote: "Annual billing: 2 months free" }
 };
 
-/** Later: fetch from the Renvani Webflow CMS and map fields here. */
-export async function getMarketingContent(): Promise<MarketingContent> {
-  return PLACEHOLDER_CONTENT;
+const CHIP_BY_LABEL: Record<string, ChipKind> = {
+  "handled by agent": "agent",
+  "completed by team": "team",
+  "awaiting owner approval": "owner"
+};
+
+function chipFrom(label: unknown, fallback: ChipKind): ChipKind {
+  return (typeof label === "string" && CHIP_BY_LABEL[label.trim().toLowerCase()]) || fallback;
+}
+
+type WebflowItem = { isArchived?: boolean; fieldData: Record<string, unknown> };
+
+/** Maps one Webflow "Product Visuals" item onto the placeholder for its slug. */
+export function mapWebflowItem(item: WebflowItem): ProductVisualContent | null {
+  const f = item.fieldData ?? {};
+  const base = PLACEHOLDER_CONTENT.visuals.find((v) => v.slug === f.slug);
+  if (!base || item.isArchived) return null;
+  const str = (k: string, fb: string) => (typeof f[k] === "string" && (f[k] as string).trim() ? (f[k] as string).trim() : fb);
+  const rawRows = typeof f["panel-rows"] === "string" ? (f["panel-rows"] as string).split(" | ") : [];
+  const rows = base.rows.map((row, i) => {
+    const [title, meta] = (rawRows[i] ?? "").split(" — ");
+    return { ...row, title: title?.trim() || row.title, meta: meta?.trim() || row.meta };
+  }) as ProductVisualContent["rows"];
+  const target = Number(f["counter-target"]);
+  const clickThrough = typeof f["cursor-click-through"] === "boolean" ? (f["cursor-click-through"] as boolean) : base.clickThrough;
+  const image = f["desktop-image"] as { url?: string } | undefined;
+  return {
+    ...base,
+    panelTitle: str("panel-title", base.panelTitle ?? "") || undefined,
+    rows,
+    cardA: {
+      title: str("card-a-title", base.cardA.title),
+      detail: str("card-a-caption", base.cardA.detail),
+      chip: chipFrom(f["card-a-chip"] ?? f["chip-before"], base.cardA.chip),
+      actionLabel: clickThrough ? base.cardA.actionLabel ?? "Approve" : undefined
+    },
+    cardB: {
+      title: str("card-b-title", base.cardB.title),
+      detail: str("card-b-caption", base.cardB.detail),
+      chip: chipFrom(f["card-b-chip"], base.cardB.chip)
+    },
+    counter: {
+      value: Number.isFinite(target) && target >= 0 ? target : base.counter.value,
+      format: f["counter-prefix"] === "$" ? "currency" : f["counter-prefix"] == null ? "integer" : base.counter.format,
+      label: str("counter-label", base.counter.label)
+    },
+    clickThrough,
+    imageUrl: image?.url,
+    imageAlt: str("image-alt", "")
+  };
+}
+
+export type MarketingEnv = {
+  WEBFLOW_API_TOKEN?: string;
+  WEBFLOW_SITE_ID?: string;
+  WEBFLOW_PRODUCT_VISUALS_COLLECTION_ID?: string;
+};
+
+/**
+ * Server-side fetch of the Webflow "Product Visuals" collection (Data API v2,
+ * staged items endpoint, which includes drafts). Falls back to the
+ * Figma-matched placeholders when env is missing or the fetch fails.
+ */
+export async function getMarketingContent(
+  env: MarketingEnv = process.env as MarketingEnv,
+  fetchImpl: typeof fetch = fetch
+): Promise<MarketingContent> {
+  const token = env.WEBFLOW_API_TOKEN;
+  const collectionId = env.WEBFLOW_PRODUCT_VISUALS_COLLECTION_ID;
+  if (!token || !collectionId || !env.WEBFLOW_SITE_ID) return PLACEHOLDER_CONTENT;
+  try {
+    const res = await fetchImpl(`https://api.webflow.com/v2/collections/${encodeURIComponent(collectionId)}/items?limit=100`, {
+      headers: { Authorization: `Bearer ${token}`, accept: "application/json" },
+      next: { revalidate: 300 }
+    } as RequestInit);
+    if (!res.ok) return PLACEHOLDER_CONTENT;
+    const body = (await res.json()) as { items?: WebflowItem[] };
+    const sorted = [...(body.items ?? [])].sort(
+      (a, b) => Number(a.fieldData?.["sort-order"] ?? 99) - Number(b.fieldData?.["sort-order"] ?? 99)
+    );
+    const fromCms = new Map<string, ProductVisualContent>();
+    for (const item of sorted) {
+      const mapped = mapWebflowItem(item);
+      if (mapped) fromCms.set(mapped.slug, mapped);
+    }
+    if (fromCms.size === 0) return PLACEHOLDER_CONTENT;
+    return {
+      ...PLACEHOLDER_CONTENT,
+      visuals: PLACEHOLDER_CONTENT.visuals.map((v) => fromCms.get(v.slug) ?? v)
+    };
+  } catch {
+    return PLACEHOLDER_CONTENT;
+  }
 }
 
 export function getVisual(content: MarketingContent, slug: ProductVisualContent["slug"]): ProductVisualContent {

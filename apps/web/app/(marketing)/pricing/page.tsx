@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import { PricingSection } from "@/src/components/marketing/visuals/PricingSection";
 import { getMarketingContent } from "@/src/content/marketing-content";
 
+export const revalidate = 300;
+
 export const metadata: Metadata = { title: "Pricing · Renvani" };
 
 export default async function PricingPage() {

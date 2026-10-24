@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import { VisualSection } from "@/src/components/marketing/visuals/VisualSection";
 import { getMarketingContent } from "@/src/content/marketing-content";
 
+export const revalidate = 300;
+
 export const metadata: Metadata = { title: "Product · Renvani" };
 
 const ORDER = ["home", "growth", "revenue", "operations", "retention", "command-center"] as const;

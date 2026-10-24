@@ -33,7 +33,7 @@ const fields: Array<{ name: keyof SignupFormValues; label: string; type: string;
   { name: "password", label: "Password", type: "password", autoComplete: "new-password" }
 ];
 
-export default function SignupPage() {
+export function LegacySignupForm() {
   const router = useRouter();
   const setAuth = useAuthStore((state) => state.setAuth);
   const [formError, setFormError] = useState<string | null>(null);

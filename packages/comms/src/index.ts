@@ -15,3 +15,4 @@ export {
   type EmailTemplateId,
   type RenderedTransactionalEmail
 } from "./email-templates.js";
+export { escapeHtml, htmlToText, renderRenvaniLayout, RENVANI_EMAIL_BRAND, type RenvaniLayoutInput } from "./email-layout.js";

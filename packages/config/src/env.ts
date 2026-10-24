@@ -42,6 +42,10 @@ const envSchema = z.object({
   /** MVP email-first (Resend); optional until STACK-08 wires transactional sends */
   RESEND_API_KEY: z.string().default(""),
   RESEND_FROM_EMAIL: z.string().default(""),
+  /** Sender for transactional email (Resend). */
+  EMAIL_FROM: z.string().default("Renvani <hello@mail.getrenvani.com>"),
+  /** Optional absolute https URL of the Renvani logo image for emails; empty renders the HTML text mark. */
+  EMAIL_LOGO_URL: z.string().default(""),
   R2_ACCOUNT_ID: z.string().min(1, "R2_ACCOUNT_ID is required"),
   R2_ACCESS_KEY_ID: z.string().min(1, "R2_ACCESS_KEY_ID is required"),
   R2_SECRET_ACCESS_KEY: z.string().min(1, "R2_SECRET_ACCESS_KEY is required"),

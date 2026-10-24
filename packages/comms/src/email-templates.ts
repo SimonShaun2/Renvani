@@ -1,7 +1,11 @@
-/** Channel-agnostic transactional email templates (render to subject + html). */
+/** Channel-agnostic transactional email templates (render to subject + html + text, in the Renvani layout). */
+
+import { htmlToText, renderRenvaniLayout } from "./email-layout.js";
 
 export const EMAIL_TEMPLATE_IDS = {
   passwordReset: "auth.password_reset",
+  verifyEmail: "auth.verify_email",
+  signupAttempt: "auth.signup_attempt",
   estimateSent: "estimate.sent",
   invoiceSent: "invoice.sent",
   invoiceReminder: "invoice.reminder",
@@ -22,20 +26,19 @@ export type RenderedTransactionalEmail = {
   templateId: EmailTemplateId;
   subject: string;
   html: string;
+  text: string;
 };
 
+type RenderedBody = Omit<RenderedTransactionalEmail, "text">;
+
 function emailShell(bodyHtml: string): string {
-  return `
-    <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #111827;">
-      ${bodyHtml}
-    </div>
-  `.trim();
+  return bodyHtml.trim();
 }
 
 function button(href: string, label: string): string {
   return `
     <p>
-      <a href="${href}" style="display: inline-block; padding: 12px 18px; background: #111827; color: #ffffff; text-decoration: none; border-radius: 6px;">
+      <a href="${href}" style="display: inline-block; padding: 12px 18px; background: #257afa; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600;">
         ${label}
       </a>
     </p>
@@ -48,14 +51,52 @@ function greetingName(firstName: string): string {
 
 export function renderTransactionalEmail(
   templateId: EmailTemplateId,
-  variables: Record<string, string>
+  variables: Record<string, string>,
+  options: { logoUrl?: string } = {}
 ): RenderedTransactionalEmail {
+  const body = renderTemplateBody(templateId, variables);
+  const layout = renderRenvaniLayout({
+    bodyHtml: body.html,
+    bodyText: htmlToText(body.html),
+    preheader: body.subject,
+    ...(options.logoUrl ? { logoUrl: options.logoUrl } : {})
+  });
+  return { templateId: body.templateId, subject: body.subject, html: layout.html, text: layout.text };
+}
+
+function renderTemplateBody(templateId: EmailTemplateId, variables: Record<string, string>): RenderedBody {
   switch (templateId) {
+    case EMAIL_TEMPLATE_IDS.verifyEmail: {
+      const name = greetingName(variables.firstName ?? "");
+      return {
+        templateId,
+        subject: "Verify your email for Renvani",
+        html: emailShell(`
+          <p>Hi ${name},</p>
+          <p>Welcome to Renvani. Confirm your email address to finish setting up your account.</p>
+          ${button(variables.verifyUrl ?? "#", "Verify your email")}
+          <p>This link works once and expires in 24 hours. If you didn't sign up, you can ignore this email.</p>
+        `)
+      };
+    }
+    case EMAIL_TEMPLATE_IDS.signupAttempt: {
+      const name = greetingName(variables.firstName ?? "");
+      return {
+        templateId,
+        subject: "Someone tried to sign up with your email",
+        html: emailShell(`
+          <p>Hi ${name},</p>
+          <p>Someone just tried to create a new Renvani account using this email address. You already have an account, so nothing was changed.</p>
+          ${button(variables.loginUrl ?? "#", "Log in")}
+          <p>If this was you, just log in. If you've forgotten your password, you can <a href="${variables.resetUrl ?? "#"}">reset it here</a>. If it wasn't you, no action is needed.</p>
+        `)
+      };
+    }
     case EMAIL_TEMPLATE_IDS.passwordReset: {
       const name = greetingName(variables.firstName ?? "");
       return {
         templateId,
-        subject: "Reset your FSM password",
+        subject: "Reset your Renvani password",
         html: emailShell(`
           <p>Hi ${name},</p>
           <p>We received a request to reset your password.</p>

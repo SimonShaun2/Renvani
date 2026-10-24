@@ -260,6 +260,13 @@
       "when": 1777710000000,
       "tag": "0036_fs133_qbo_entity_mappings",
       "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "7",
+      "when": 1777711000000,
+      "tag": "0037_user_email_verification",
+      "breakpoints": true
     }
   ]
 }

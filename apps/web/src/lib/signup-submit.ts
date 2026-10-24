@@ -1,4 +1,4 @@
-export const SIGNUP_CHECK_EMAIL_MESSAGE = "Check your email, then sign in.";
+export const SIGNUP_CHECK_EMAIL_MESSAGE = "Thanks! If this is a new account, you can sign in now.";
 export const SIGNUP_GENERIC_ERROR =
   "We couldn't create your account. Check your details and try again, or sign in if you already have an account.";
 

@@ -2,6 +2,7 @@ import { publicEnv } from "@fsm/config";
 import type { ErrorCode } from "@fsm/types";
 
 import { clearBrowserAuthSession, getAuthToken } from "./auth";
+import { getClerkSessionToken } from "./clerk/token-bridge";
 
 const API_BASE = publicEnv.NEXT_PUBLIC_API_URL;
 
@@ -36,7 +37,8 @@ async function parseError(response: Response): Promise<ApiErrorPayload> {
 }
 
 async function apiFetch<TResponse>(path: string, options: RequestInit = {}): Promise<TResponse> {
-  const token = getAuthToken();
+  // Prefer the Clerk session token when signed in with Clerk; fall back to the legacy in-repo JWT.
+  const token = (await getClerkSessionToken()) ?? getAuthToken();
   const headers = new Headers(options.headers);
 
   if (!headers.has("Content-Type") && options.body) {

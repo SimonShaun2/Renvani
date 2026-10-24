@@ -137,18 +137,16 @@ export const resetPasswordValidation = withZodValidation({ body: ResetPasswordSc
 export const registerRouteSchema = {
   tags: ["auth"],
   response: {
-    201: {
+    202: {
       type: "object",
       additionalProperties: false,
-      required: ["user", "company", "tokens"],
+      required: ["message"],
       properties: {
-        user: registeredUserResponseSchema,
-        company: registeredCompanyResponseSchema,
-        tokens: tokenPairResponseSchema
+        message: { type: "string" }
       }
     },
     400: errorResponseSchema,
-    409: errorResponseSchema
+    429: errorResponseSchema
   }
 } as const;
 

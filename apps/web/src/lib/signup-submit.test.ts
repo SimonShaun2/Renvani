@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { submitSignup } from "./signup-submit";
+import { SIGNUP_CHECK_EMAIL_MESSAGE, submitSignup } from "./signup-submit";
 
 describe("submitSignup", () => {
   it("treats a 202 Check-your-email response as check-email and sends the payload", async () => {
@@ -12,5 +12,9 @@ describe("submitSignup", () => {
   it("maps any failure to the generic error", async () => {
     const post = vi.fn().mockRejectedValue(Object.assign(new Error("x"), { status: 409 }));
     await expect(submitSignup(post, {})).resolves.toEqual({ status: "error" });
+  });
+
+  it("uses the neutral success copy", () => {
+    expect(SIGNUP_CHECK_EMAIL_MESSAGE).toBe("Thanks! If this is a new account, you can sign in now.");
   });
 });

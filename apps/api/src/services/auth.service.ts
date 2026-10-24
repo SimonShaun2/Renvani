@@ -214,6 +214,8 @@ export async function register(
     // No account enumeration: caller returns the same 202 as a new sign-up.
     // TODO: notify the existing account owner ("someone tried to sign up with your email") once an
     // email template for it exists in lib/email.ts (no matching template is wired up today).
+    // Dummy hash at the same cost so response timing matches the new-email path.
+    await hashPassword(input.password, 12);
     return { status: "existing" };
   }
 

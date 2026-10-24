@@ -1,89 +1,61 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
-const sgSendMock = vi.hoisted(() => vi.fn());
-
-vi.mock("@sendgrid/mail", () => ({
-  default: {
-    setApiKey: vi.fn(),
-    send: sgSendMock
-  }
-}));
+const resendSend = vi.hoisted(() => vi.fn());
 
 vi.mock("@fsm/config", () => ({
-  env: {
-    RESEND_API_KEY: "",
-    RESEND_FROM_EMAIL: "",
-    SENDGRID_API_KEY: "sg_key",
-    SENDGRID_FROM_EMAIL: "legacy@sendgrid.test"
-  }
-}));
-
-vi.mock("@fsm/config/feature-flags", () => ({
-  featureFlags: {
-    resendEmailEnabled: false
-  }
+  env: { RESEND_API_KEY: "", EMAIL_FROM: "", EMAIL_LOGO_URL: "" }
 }));
 
 describe("deliverTransactionalEmail", () => {
-  beforeEach(() => {
-    sgSendMock.mockReset();
-    sgSendMock.mockResolvedValue(undefined);
-    vi.unstubAllGlobals();
-  });
-
   afterEach(() => {
-    vi.unstubAllGlobals();
+    vi.resetModules();
+    resendSend.mockReset();
   });
 
-  it("uses SendGrid when resend flag is off", async () => {
-    const { deliverTransactionalEmail } = await import("./outbound-email.js");
-
-    await deliverTransactionalEmail({
-      to: "user@example.com",
-      subject: "Test",
-      html: "<p>Test</p>"
+  it("no-ops (and does not throw) when RESEND_API_KEY is missing", async () => {
+    const mod = await import("./outbound-email.js");
+    mod.setEmailChannelForTests(null);
+    await expect(mod.deliverTransactionalEmail({ to: "u@example.com", subject: "s", html: "h" })).resolves.toEqual({
+      providerMessageId: null
     });
+    expect(resendSend).not.toHaveBeenCalled();
+    expect(mod.getTransactionalEmailFromAddress()).toBe("Renvani <hello@mail.getrenvani.com>");
+  });
 
-    expect(sgSendMock).toHaveBeenCalledWith(
+  it("sends via the Resend SDK with EMAIL_FROM and a plain-text fallback", async () => {
+    vi.doMock("@fsm/config", () => ({
+      env: { RESEND_API_KEY: "re_test", EMAIL_FROM: "Renvani <hello@mail.getrenvani.com>", EMAIL_LOGO_URL: "" }
+    }));
+    resendSend.mockResolvedValue({ data: { id: "msg_1" }, error: null });
+    const mod = await import("./outbound-email.js");
+    const { createResendEmailChannel } = await import("@fsm/comms");
+    // Mocked Resend client injected into the real adapter.
+    mod.setEmailChannelForTests(
+      createResendEmailChannel(
+        { apiKey: "re_test", defaultFrom: mod.getTransactionalEmailFromAddress() },
+        { emails: { send: resendSend } } as never
+      )
+    );
+
+    await mod.sendRenderedTemplateEmail("u@example.com", "auth.verify_email", { firstName: "Ava", verifyUrl: "https://x/v" });
+
+    expect(resendSend).toHaveBeenCalledWith(
       expect.objectContaining({
-        to: "user@example.com",
-        from: "legacy@sendgrid.test"
+        from: "Renvani <hello@mail.getrenvani.com>",
+        to: ["u@example.com"],
+        subject: "Verify your email for Renvani",
+        text: expect.stringContaining("https://x/v")
       })
     );
   });
 
-  it("uses Resend when resend flag is on and credentials are set", async () => {
-    vi.resetModules();
-    vi.doMock("@fsm/config", () => ({
-      env: {
-        RESEND_API_KEY: "re_live",
-        RESEND_FROM_EMAIL: "hello@renvani.test",
-        SENDGRID_API_KEY: "sg_key",
-        SENDGRID_FROM_EMAIL: "legacy@sendgrid.test"
-      }
-    }));
-    vi.doMock("@fsm/config/feature-flags", () => ({
-      featureFlags: {
-        resendEmailEnabled: true
-      }
-    }));
-
-    const fetchMock = vi.fn(async () => ({
-      ok: true,
-      json: async () => ({ id: "msg_resend" })
-    }));
-    vi.stubGlobal("fetch", fetchMock);
-
-    const { deliverTransactionalEmail } = await import("./outbound-email.js");
-
-    const result = await deliverTransactionalEmail({
-      to: "user@example.com",
-      subject: "Test",
-      html: "<p>Test</p>"
+  it("sendEmailInBackground logs errors instead of throwing", async () => {
+    const mod = await import("./outbound-email.js");
+    const task = vi.fn(async () => {
+      throw new Error("boom");
     });
-
-    expect(result.providerMessageId).toBe("msg_resend");
-    expect(fetchMock).toHaveBeenCalled();
-    expect(sgSendMock).not.toHaveBeenCalled();
+    expect(() => mod.sendEmailInBackground(task, "test")).not.toThrow();
+    await new Promise((resolve) => setImmediate(resolve));
+    expect(task).toHaveBeenCalled();
   });
 });

@@ -1,4 +1,4 @@
-import { randomBytes } from "node:crypto";
+import { createHash, randomBytes } from "node:crypto";
 
 import { compare as comparePassword, hash as hashPassword } from "bcryptjs";
 import { and, desc, eq, gt, isNull } from "drizzle-orm";
@@ -23,6 +23,14 @@ import {
   verifyRefreshToken,
   verifyResetToken
 } from "../lib/tokens.js";
+import { sendSignupAttemptEmail, sendVerifyEmailEmail } from "../lib/email.js";
+import { sendEmailInBackground } from "../lib/outbound-email.js";
+
+const EMAIL_VERIFICATION_TTL_MS = 24 * 60 * 60 * 1000;
+
+function hashEmailVerificationToken(token: string): string {
+  return createHash("sha256").update(token).digest("hex");
+}
 
 type CompanyRecord = typeof companies.$inferSelect;
 type UserRecord = typeof users.$inferSelect;
@@ -201,7 +209,7 @@ async function issueTokenPair(executor: InsertExecutor, user: UserRecord): Promi
 
 export async function register(
   input: RegisterInput
-): Promise<{ company: CompanyRecord; user: UserRecord; tokens: TokenPair }> {
+): Promise<{ status: "created"; company: CompanyRecord; user: UserRecord } | { status: "existing" }> {
   const normalizedEmail = normalizeEmail(input.email);
   const normalizedCompanyName = input.companyName.trim();
   const normalizedFirstName = input.firstName.trim();
@@ -211,16 +219,29 @@ export async function register(
   const existingUser = await findUserByEmail(normalizedEmail);
 
   if (existingUser) {
-    throw new AppError(ErrorCode.CONFLICT, "An account with this email already exists", {
-      email: "Email is already in use"
-    });
+    // No account enumeration: caller returns the same 202 as a new sign-up.
+    // Notify the real owner out-of-band (fire-and-forget, after the response).
+    const owner = existingUser;
+    sendEmailInBackground(
+      () =>
+        sendSignupAttemptEmail(owner.email, {
+          firstName: owner.firstName,
+          loginUrl: `${env.APP_URL}/login`,
+          resetUrl: `${env.APP_URL}/forgot-password`
+        }),
+      "auth.signup_attempt"
+    );
+    // Dummy hash at the same cost so response timing matches the new-email path.
+    await hashPassword(input.password, 12);
+    return { status: "existing" };
   }
 
   const companySlug = await generateUniqueCompanySlug(normalizedCompanyName);
   const passwordHashValue = await hashPassword(input.password, 12);
   const now = new Date();
+  const verificationToken = randomBytes(32).toString("base64url");
 
-  return db.transaction(async (tx) => {
+  const result = await db.transaction(async (tx) => {
     const insertedCompanies = await tx
       .insert(companies)
       .values({
@@ -244,12 +265,14 @@ export async function register(
         lastName: normalizedLastName,
         phone: normalizedPhone ?? null,
         role: "owner",
-        lastLoginAt: now
+        lastLoginAt: now,
+        emailVerificationTokenHash: hashEmailVerificationToken(verificationToken),
+        emailVerificationExpiresAt: new Date(now.getTime() + EMAIL_VERIFICATION_TTL_MS)
       })
       .returning();
     const user = requireResult(insertedUsers[0], "Failed to create user during registration");
 
-    const tokens = await issueTokenPair(tx, user);
+    // Tokens are issued at login; register returns a generic 202 (no enumeration).
     const actorName = buildActorName(user.firstName, user.lastName);
 
     await emitEventWithExecutor(tx, {
@@ -272,7 +295,64 @@ export async function register(
       summary: `${actorName} registered the owner account`
     });
 
-    return { company, user, tokens };
+    return { status: "created" as const, company, user };
+  });
+
+  const verifyUrl = `${env.APP_URL}/verify-email?token=${encodeURIComponent(verificationToken)}`;
+  sendEmailInBackground(
+    () => sendVerifyEmailEmail(result.user.email, verifyUrl, result.user.firstName),
+    "auth.verify_email"
+  );
+
+  return result;
+}
+
+/** Consumes a single-use verify-email token and logs the user in (same token shape as login). */
+export async function verifyEmail(token: string): Promise<{ user: UserRecord; tokens: TokenPair }> {
+  const invalidTokenError = new AppError(ErrorCode.UNAUTHORIZED, "Invalid or expired verification link");
+  const trimmed = token.trim();
+  if (!trimmed) {
+    throw invalidTokenError;
+  }
+  const tokenHash = hashEmailVerificationToken(trimmed);
+
+  return db.transaction(async (tx) => {
+    const now = new Date();
+    // Conditional update = atomic single-use consume.
+    const updatedUsers = await tx
+      .update(users)
+      .set({
+        emailVerifiedAt: now,
+        emailVerificationTokenHash: null,
+        emailVerificationExpiresAt: null,
+        lastLoginAt: now,
+        updatedAt: now
+      })
+      .where(
+        and(
+          eq(users.emailVerificationTokenHash, tokenHash),
+          gt(users.emailVerificationExpiresAt, now),
+          eq(users.isActive, true)
+        )
+      )
+      .returning();
+    const user = updatedUsers[0];
+    if (!user) {
+      throw invalidTokenError;
+    }
+    const tokens = await issueTokenPair(tx, user);
+
+    await emitEventWithExecutor(tx, {
+      companyId: user.companyId,
+      eventType: "user.login",
+      actorId: user.id,
+      actorName: buildActorName(user.firstName, user.lastName),
+      entityType: "user",
+      entityId: user.id,
+      summary: `${user.firstName} ${user.lastName} verified their email`
+    });
+
+    return { user, tokens };
   });
 }
 

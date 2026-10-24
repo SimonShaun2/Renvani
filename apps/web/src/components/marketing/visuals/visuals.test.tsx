@@ -18,7 +18,7 @@ function mockMedia(matching: string[]) {
 
 beforeEach(() => {
   // Never intersects: proves reduced motion does not depend on scroll.
-  (globalThis as any).IntersectionObserver = class {
+  (globalThis as unknown as { IntersectionObserver: unknown }).IntersectionObserver = class {
     observe() {}
     disconnect() {}
   };
@@ -65,10 +65,10 @@ describe("ProductVisual with prefers-reduced-motion", () => {
   it("skips the cursor glide on touch but still swaps the chip", () => {
     vi.useFakeTimers();
     mockMedia(["pointer: coarse"]);
-    (globalThis as any).IntersectionObserver = class {
+    (globalThis as unknown as { IntersectionObserver: unknown }).IntersectionObserver = class {
       cb: IntersectionObserverCallback;
       constructor(cb: IntersectionObserverCallback) { this.cb = cb; }
-      observe() { this.cb([{ isIntersecting: true } as IntersectionObserverEntry], this as any); }
+      observe() { this.cb([{ isIntersecting: true } as IntersectionObserverEntry], this as unknown as IntersectionObserver); }
       disconnect() {}
     };
     render(<ProductVisual content={getVisual(PLACEHOLDER_CONTENT, "revenue")} />);

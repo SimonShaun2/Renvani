@@ -56,20 +56,20 @@ describe("Webflow CMS fetch", () => {
 
   it("falls back to placeholders without env", async () => {
     const fetchImpl = vi.fn();
-    expect(await getMarketingContent({}, fetchImpl as any)).toBe(PLACEHOLDER_CONTENT);
+    expect(await getMarketingContent({}, fetchImpl as unknown as typeof fetch)).toBe(PLACEHOLDER_CONTENT);
     expect(fetchImpl).not.toHaveBeenCalled();
   });
 
   it("falls back to placeholders when the fetch fails", async () => {
     const failing = vi.fn().mockRejectedValue(new Error("down"));
-    expect(await getMarketingContent(env, failing as any)).toBe(PLACEHOLDER_CONTENT);
+    expect(await getMarketingContent(env, failing as unknown as typeof fetch)).toBe(PLACEHOLDER_CONTENT);
     const notOk = vi.fn().mockResolvedValue({ ok: false });
-    expect(await getMarketingContent(env, notOk as any)).toBe(PLACEHOLDER_CONTENT);
+    expect(await getMarketingContent(env, notOk as unknown as typeof fetch)).toBe(PLACEHOLDER_CONTENT);
   });
 
   it("calls the staged items endpoint with a bearer token and maps fields", async () => {
     const fetchImpl = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ items: [item] }) });
-    const content = await getMarketingContent(env, fetchImpl as any);
+    const content = await getMarketingContent(env, fetchImpl as unknown as typeof fetch);
     const [url, init] = fetchImpl.mock.calls[0]!;
     expect(url).toBe("https://api.webflow.com/v2/collections/col/items?limit=100");
     expect(init.headers.Authorization).toBe("Bearer test");

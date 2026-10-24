@@ -74,6 +74,7 @@ describe("clerk-tenant.service", () => {
     const resolved = await clerkTenantService.resolveStaffUserForClerkSession(company.id, {
       clerkUserId: "user_clerk",
       clerkOrganizationId: "org_acme",
+      role: null,
       email: "dispatcher@acme.com"
     });
 
@@ -111,6 +112,7 @@ describe("clerk-tenant.service", () => {
       clerkTenantService.resolveStaffUserForClerkSession(company.id, {
         clerkUserId: "user_clerk",
         clerkOrganizationId: "org_acme",
+      role: null,
         email: "inactive@acme.com"
       })
     ).rejects.toMatchObject({ code: ErrorCode.UNAUTHORIZED });

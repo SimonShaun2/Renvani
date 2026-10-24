@@ -1,4 +1,9 @@
 import { hash as hashPassword } from "bcryptjs";
+
+vi.mock("bcryptjs", async () => {
+  const actual = await vi.importActual<typeof import("bcryptjs")>("bcryptjs");
+  return { ...actual, hash: vi.fn(actual.hash) };
+});
 import jwt from "jsonwebtoken";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -86,6 +91,7 @@ describe("auth.service", () => {
   });
 
   it("returns existing (no error) for a duplicate register email", async () => {
+    vi.mocked(hashPassword).mockClear();
     const company = fakeDb.seedCompany({ name: "Acme", slug: "acme" });
     fakeDb.seedUser({
       companyId: company.id,
@@ -104,6 +110,7 @@ describe("auth.service", () => {
         timezone: "America/Chicago"
       })
     ).resolves.toEqual({ status: "existing" });
+    expect(vi.mocked(hashPassword)).toHaveBeenCalledWith("password123", 12);
   });
 
   it("register normalizes email casing", async () => {

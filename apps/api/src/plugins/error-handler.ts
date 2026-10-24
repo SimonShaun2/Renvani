@@ -2,6 +2,7 @@ import type { FastifyError } from "fastify";
 import fp from "fastify-plugin";
 import { ZodError } from "zod";
 
+import { captureNodeException } from "@fsm/observability";
 import { AppError, ErrorCode, getHttpStatusForErrorCode } from "@fsm/types";
 
 import { abortImportUploadRequest } from "../routes/imports/upload-guards.js";
@@ -73,6 +74,11 @@ const errorHandlerPlugin = fp(async (fastify) => {
       },
       "Unhandled request error"
     );
+
+    captureNodeException(error, {
+      requestId: request.id,
+      companyId: request.company?.id ?? null
+    });
 
     return reply.status(500).send({
       error: ErrorCode.INTERNAL_ERROR,

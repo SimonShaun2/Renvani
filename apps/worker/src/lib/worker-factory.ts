@@ -3,6 +3,12 @@ import { Worker } from "bullmq";
 import pino from "pino";
 
 import { buildDefaultWorkerOptions, handleWorkerJobFailed } from "@fsm/jobs";
+import {
+  applyNodeObservabilityTags,
+  captureNodeException,
+  extractJobObservabilityContext,
+  runWithObservabilityContext
+} from "@fsm/observability";
 
 const workerLogger = pino({
   name: "fsm-worker"
@@ -19,31 +25,45 @@ export function createWorker<TData extends Record<string, unknown>>(
   const worker = new Worker<TData, void, string>(
     queueName,
     async (job) => {
-      logger.info(
-        {
-          jobId: job.id
-        },
-        "Worker job started"
+      const observabilityContext = extractJobObservabilityContext(
+        job.data as Record<string, unknown>,
+        job.id
       );
 
-      try {
-        await processor(job);
+      return runWithObservabilityContext(observabilityContext, async () => {
+        applyNodeObservabilityTags(observabilityContext);
+
         logger.info(
           {
-            jobId: job.id
+            jobId: job.id,
+            companyId: observabilityContext.companyId,
+            importSessionId: observabilityContext.importSessionId
           },
-          "Worker job completed"
+          "Worker job started"
         );
-      } catch (error) {
-        logger.error(
-          {
-            err: error,
-            jobId: job.id
-          },
-          "Worker job failed"
-        );
-        throw error;
-      }
+
+        try {
+          await processor(job);
+          logger.info(
+            {
+              jobId: job.id
+            },
+            "Worker job completed"
+          );
+        } catch (error) {
+          captureNodeException(error, observabilityContext);
+          logger.error(
+            {
+              err: error,
+              jobId: job.id,
+              companyId: observabilityContext.companyId,
+              importSessionId: observabilityContext.importSessionId
+            },
+            "Worker job failed"
+          );
+          throw error;
+        }
+      });
     },
     buildDefaultWorkerOptions()
   );

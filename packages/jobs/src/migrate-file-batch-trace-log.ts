@@ -1,3 +1,4 @@
+import { observeMigrateFileBatchTrace } from "@fsm/observability/migrate-trace";
 import pino from "pino";
 
 import {
@@ -29,5 +30,6 @@ export function logMigrateFileBatchTrace(
 ): FsMigrateFileBatchTraceLogFields {
   const fields = buildMigrateFileBatchTraceLogFields(input);
   logger.info(fields, message);
+  observeMigrateFileBatchTrace(fields, message);
   return fields;
 }

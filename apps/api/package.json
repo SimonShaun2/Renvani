@@ -27,6 +27,7 @@
     "@fsm/import-engine": "workspace:*",
     "@fsm/import-normalize": "workspace:*",
     "@fsm/jobs": "workspace:*",
+    "@fsm/observability": "workspace:*",
     "@fsm/types": "workspace:*",
     "@sendgrid/mail": "^8.1.5",
     "bcryptjs": "^3.0.2",

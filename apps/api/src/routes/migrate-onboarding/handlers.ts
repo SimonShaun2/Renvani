@@ -134,6 +134,15 @@ export async function getMigrateRelationalPreviewHandler(
   return reply.send(preview);
 }
 
+export async function getMigrateOnboardingIngestStatusHandler(
+  request: FastifyRequest,
+  reply: FastifyReply
+): Promise<FastifyReply> {
+  const { bundleId } = request.params as { bundleId: string };
+  const status = await getMigrateOnboardingIngestStatus(request.company.id, bundleId);
+  return reply.send(status);
+}
+
 export async function applyMigrateDedupeDecisionsHandler(
   request: FastifyRequest,
   reply: FastifyReply

@@ -8,6 +8,7 @@ import { redactAccessTokenInUrl } from "./lib/request-log-path.js";
 import authenticatePlugin from "./plugins/authenticate.js";
 import companyScopedWritePlugin from "./plugins/company-scoped-write.js";
 import errorHandlerPlugin from "./plugins/error-handler.js";
+import observabilityPlugin from "./plugins/observability.js";
 import requestLoggerPlugin from "./plugins/request-logger.js";
 import activityEventRoutes from "./routes/activity-events/index.js";
 import agentActionRoutes from "./routes/agent-actions/index.js";
@@ -79,6 +80,7 @@ export async function buildApp() {
     origin: new URL(env.APP_URL).origin,
     credentials: true
   });
+  await app.register(observabilityPlugin);
   await app.register(requestLoggerPlugin);
   await app.register(errorHandlerPlugin);
   await app.register(stripePlatformSyncPlugin);

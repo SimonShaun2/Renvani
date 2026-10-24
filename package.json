@@ -6,8 +6,8 @@
     "node": "22.16.0"
   },
   "scripts": {
-    "dev": "corepack pnpm -r --filter @fsm/import-normalize --filter @fsm/import-engine --filter @fsm/config --filter @fsm/types --filter @fsm/comms --filter @fsm/db --filter @fsm/jobs --filter @fsm/ai build && corepack pnpm -r --parallel --filter @fsm/api --filter @fsm/worker --filter @fsm/webhook --filter @fsm/web dev",
-    "build": "corepack pnpm -r --filter @fsm/import-normalize --filter @fsm/types --filter @fsm/comms build && corepack pnpm -r --filter @fsm/import-engine --filter @fsm/config --filter @fsm/db --filter @fsm/jobs --filter @fsm/ai --filter @fsm/api --filter @fsm/worker --filter @fsm/webhook --filter @fsm/web build",
+    "dev": "corepack pnpm -r --filter @fsm/import-normalize --filter @fsm/import-engine --filter @fsm/config --filter @fsm/types --filter @fsm/comms --filter @fsm/db --filter @fsm/observability --filter @fsm/jobs --filter @fsm/ai build && corepack pnpm -r --parallel --filter @fsm/api --filter @fsm/worker --filter @fsm/webhook --filter @fsm/web dev",
+    "build": "corepack pnpm -r --filter @fsm/import-normalize --filter @fsm/types --filter @fsm/comms build && corepack pnpm -r --filter @fsm/import-engine --filter @fsm/config --filter @fsm/db --filter @fsm/observability --filter @fsm/jobs --filter @fsm/ai --filter @fsm/api --filter @fsm/worker --filter @fsm/webhook --filter @fsm/web build",
     "lint": "corepack pnpm -r lint",
     "test": "corepack pnpm -r test",
     "test:fs-migrate-import-contracts": "corepack pnpm --filter @fsm/config --filter @fsm/import-normalize --filter @fsm/types build && corepack pnpm --filter @fsm/import-normalize test:import-contracts && corepack pnpm --filter @fsm/types test:import-contracts && corepack pnpm --filter @fsm/jobs test:import-contracts && corepack pnpm --filter @fsm/api exec vitest run src/routes/migrate-onboarding/migrate-onboarding.wizard-api.contract.test.ts",

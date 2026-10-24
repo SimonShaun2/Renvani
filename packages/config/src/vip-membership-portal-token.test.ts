@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import {
   buildVipMembershipJoinUrl,
@@ -28,5 +28,26 @@ describe("vip join token expiry", () => {
     const fresh = mod.signVipMembershipJoinToken("c1", "u1", "t1");
     expect(mod.verifyVipMembershipJoinToken(fresh)).toEqual({ companyId: "c1", customerId: "u1", vipTierId: "t1" });
     expect(mod.verifyVipMembershipJoinToken(mod.signVipMembershipJoinToken("c1", "u1", "t1", -10))).toBeNull();
+  });
+});
+
+describe("vip-membership-portal-token legacy grace period", () => {
+  it("accepts no-exp legacy tokens before LEGACY_TOKEN_CUTOFF and rejects them after", async () => {
+    const { createHmac } = await import("node:crypto");
+    const { env } = await import("./env.js");
+    const mod = await import("./vip-membership-portal-token.js");
+    const payload = "c1:u1:t1";
+    const legacy = `${payload}.${createHmac("sha256", env.JWT_SECRET).update(payload).digest("base64url")}`;
+    const cutoff = mod.LEGACY_TOKEN_CUTOFF.getTime();
+    try {
+      vi.useFakeTimers();
+      vi.setSystemTime(cutoff - 1000);
+      expect(mod.verifyVipMembershipJoinToken(legacy)).toEqual({ companyId: "c1", customerId: "u1", vipTierId: "t1" });
+      expect(mod.verifyVipMembershipJoinToken(`${payload}.badsig`)).toBeNull();
+      vi.setSystemTime(cutoff + 1000);
+      expect(mod.verifyVipMembershipJoinToken(legacy)).toBeNull();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

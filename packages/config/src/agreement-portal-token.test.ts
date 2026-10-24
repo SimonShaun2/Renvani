@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { signAgreementPortalToken, verifyAgreementPortalToken } from "./agreement-portal-token.js";
 
@@ -31,7 +31,26 @@ describe("agreement portal token expiry", () => {
     expect(mod.verifyAgreementPortalToken(fresh)).toEqual({ companyId: "c1", agreementId: "a1" });
     const expired = mod.signAgreementPortalToken("c1", "a1", -10);
     expect(mod.verifyAgreementPortalToken(expired)).toBeNull();
-    const [payload, sig] = fresh.split(".");
-    expect(mod.verifyAgreementPortalToken(`${payload!.split(":").slice(0, 2).join(":")}.${sig}`)).toBeNull();
+  });
+});
+
+describe("agreement-portal-token legacy grace period", () => {
+  it("accepts no-exp legacy tokens before LEGACY_TOKEN_CUTOFF and rejects them after", async () => {
+    const { createHmac } = await import("node:crypto");
+    const { env } = await import("./env.js");
+    const mod = await import("./agreement-portal-token.js");
+    const payload = "c1:a1";
+    const legacy = `${payload}.${createHmac("sha256", env.JWT_SECRET).update(payload).digest("base64url")}`;
+    const cutoff = mod.LEGACY_TOKEN_CUTOFF.getTime();
+    try {
+      vi.useFakeTimers();
+      vi.setSystemTime(cutoff - 1000);
+      expect(mod.verifyAgreementPortalToken(legacy)).toEqual({ companyId: "c1", agreementId: "a1" });
+      expect(mod.verifyAgreementPortalToken(`${payload}.badsig`)).toBeNull();
+      vi.setSystemTime(cutoff + 1000);
+      expect(mod.verifyAgreementPortalToken(legacy)).toBeNull();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

@@ -1,13 +1,11 @@
 import type { Metadata } from "next";
 
-import { PricingSection } from "@/src/components/marketing/visuals/PricingSection";
-import { getMarketingContent } from "@/src/content/marketing-content";
+import { MarketingPage } from "@/src/components/marketing/visuals/MarketingPage";
 
 export const revalidate = 300;
 
 export const metadata: Metadata = { title: "Pricing · Renvani" };
 
-export default async function PricingPage() {
-  const content = await getMarketingContent();
-  return <PricingSection plans={content.plans} pricing={content.pricing} />;
+export default function PricingPage() {
+  return <MarketingPage page="pricing" />;
 }

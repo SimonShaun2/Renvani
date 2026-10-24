@@ -1,13 +1,11 @@
 import type { Metadata } from "next";
 
-import { VisualSection } from "@/src/components/marketing/visuals/VisualSection";
-import { getMarketingContent, getVisual } from "@/src/content/marketing-content";
+import { MarketingPage } from "@/src/components/marketing/visuals/MarketingPage";
 
 export const revalidate = 300;
 
 export const metadata: Metadata = { title: "HVAC · Renvani" };
 
-export default async function HvacPage() {
-  const content = await getMarketingContent();
-  return <VisualSection content={getVisual(content, "hvac")} as="h1" />;
+export default function HvacPage() {
+  return <MarketingPage page="industries/hvac" visual="hvac" />;
 }

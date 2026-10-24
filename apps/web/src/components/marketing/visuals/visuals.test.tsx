@@ -3,9 +3,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { PLACEHOLDER_CONTENT, getVisual } from "@/src/content/marketing-content";
 
+import { FALLBACK_HOME_PRICING, STATIC_PRODUCT_SECTIONS, mapSection, pricingFromSection } from "@/src/content/page-sections";
+
 import { layerStyle } from "./motion";
 import { PricingSection } from "./PricingSection";
 import { ProductVisual } from "./ProductVisual";
+import { SectionBlock } from "./SectionBlock";
 
 function mockMedia(matching: string[]) {
   window.matchMedia = ((query: string) => ({
@@ -21,6 +24,7 @@ beforeEach(() => {
   (globalThis as unknown as { IntersectionObserver: unknown }).IntersectionObserver = class {
     observe() {}
     disconnect() {}
+    unobserve() {}
   };
 });
 afterEach(() => cleanup());
@@ -84,7 +88,8 @@ describe("ProductVisual with prefers-reduced-motion", () => {
 
 describe("PricingSection", () => {
   it("defaults to annual and toggles to monthly", () => {
-    render(<PricingSection plans={PLACEHOLDER_CONTENT.plans} pricing={PLACEHOLDER_CONTENT.pricing} />);
+    const pricing = pricingFromSection(FALLBACK_HOME_PRICING.find((s) => s.page === "pricing" && s.sectionKey === "plans"))!;
+    render(<PricingSection pricing={pricing} />);
     expect(screen.getByTestId("price-flex").textContent).toBe("$3,990/yr");
     expect(screen.getByTestId("price-flat").textContent).toBe("$9,990/yr");
     expect(screen.getByTestId("price-founding").textContent).toBe("$1,990/yr");
@@ -94,5 +99,47 @@ describe("PricingSection", () => {
     expect(screen.getByTestId("price-flat").textContent).toBe("$999/mo");
     expect(screen.getByTestId("price-founding").textContent).toBe("$199/mo");
     expect(screen.getByTestId("price-startup").textContent).toBe("$99/mo");
+  });
+});
+
+describe("booking fee", () => {
+  it("shows the $1.99 online-booking checkout fee on pricing", () => {
+    const pricing = pricingFromSection(FALLBACK_HOME_PRICING.find((s) => s.page === "pricing" && s.sectionKey === "plans"))!;
+    render(<PricingSection pricing={pricing} />);
+    expect(screen.getByTestId("booking-fee").textContent).toMatch(/\$1\.99 booking fee on online bookings, paid at checkout/);
+  });
+
+  it("falls back to the default $1.99 booking fee when the CMS omits it", () => {
+    const pricing = pricingFromSection(FALLBACK_HOME_PRICING.find((s) => s.page === "home" && s.sectionKey === "pricing"))!;
+    render(<PricingSection pricing={{ ...pricing, bookingFee: undefined }} />);
+    expect(screen.getByTestId("booking-fee").textContent).toContain("$1.99");
+  });
+});
+
+describe("SectionBlock", () => {
+  it("never renders review-notes and flags [Copy: …] with a TODO", () => {
+    const section = mapSection({
+      fieldData: {
+        page: "industries/hvac", "section-key": "hero", headline: "[Copy: HVAC headline]",
+        subhead: "Platform fee (5%) on agreements", "review-notes": "SECRET EDITOR NOTE",
+        items: "Tune-ups — Emailed [Copy: value]"
+      }
+    })!;
+    const { container } = render(<SectionBlock section={section} />);
+    expect(container.textContent).not.toContain("SECRET EDITOR NOTE");
+    expect(container.textContent).toContain("Service Fee (2%, paid by customer)");
+    expect(container.textContent).not.toContain("Platform fee");
+    expect(container.querySelectorAll('[data-todo="copy"]').length).toBeGreaterThanOrEqual(2);
+    expect(container.textContent).toContain("TODO");
+  });
+
+  it("renders no review-notes text for any bundled section", () => {
+    for (const section of [...FALLBACK_HOME_PRICING, ...STATIC_PRODUCT_SECTIONS]) {
+      const { container, unmount } = render(<SectionBlock section={section} />);
+      expect(container.textContent).not.toMatch(/Items = remaining Figma text/);
+      expect(container.textContent).not.toMatch(/Platform fee \(5%/);
+      expect(container.textContent).not.toMatch(/service fusion|servicetitan|housecall/i);
+      unmount();
+    }
   });
 });

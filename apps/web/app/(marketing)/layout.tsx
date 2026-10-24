@@ -9,6 +9,7 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
         </Link>
         <nav className="flex gap-5 text-sm" style={{ color: "var(--color-mkt-muted)" }}>
           <Link href="/product-tour">Product</Link>
+          <Link href="/product/growth">Growth</Link>
           <Link href="/industries/hvac">HVAC</Link>
           <Link href="/pricing">Pricing</Link>
           <Link href="/login">Sign in</Link>

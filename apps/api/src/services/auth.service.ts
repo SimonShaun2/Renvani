@@ -201,7 +201,7 @@ async function issueTokenPair(executor: InsertExecutor, user: UserRecord): Promi
 
 export async function register(
   input: RegisterInput
-): Promise<{ company: CompanyRecord; user: UserRecord; tokens: TokenPair }> {
+): Promise<{ status: "created"; company: CompanyRecord; user: UserRecord } | { status: "existing" }> {
   const normalizedEmail = normalizeEmail(input.email);
   const normalizedCompanyName = input.companyName.trim();
   const normalizedFirstName = input.firstName.trim();
@@ -211,9 +211,10 @@ export async function register(
   const existingUser = await findUserByEmail(normalizedEmail);
 
   if (existingUser) {
-    throw new AppError(ErrorCode.CONFLICT, "An account with this email already exists", {
-      email: "Email is already in use"
-    });
+    // No account enumeration: caller returns the same 202 as a new sign-up.
+    // TODO: notify the existing account owner ("someone tried to sign up with your email") once an
+    // email template for it exists in lib/email.ts (no matching template is wired up today).
+    return { status: "existing" };
   }
 
   const companySlug = await generateUniqueCompanySlug(normalizedCompanyName);
@@ -249,7 +250,7 @@ export async function register(
       .returning();
     const user = requireResult(insertedUsers[0], "Failed to create user during registration");
 
-    const tokens = await issueTokenPair(tx, user);
+    // Tokens are issued at login; register returns a generic 202 (no enumeration).
     const actorName = buildActorName(user.firstName, user.lastName);
 
     await emitEventWithExecutor(tx, {
@@ -272,7 +273,7 @@ export async function register(
       summary: `${actorName} registered the owner account`
     });
 
-    return { company, user, tokens };
+    return { status: "created" as const, company, user };
   });
 }
 

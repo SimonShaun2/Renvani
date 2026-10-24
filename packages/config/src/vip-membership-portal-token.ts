@@ -2,6 +2,13 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 
 import { env } from "./env.js";
 
+/**
+ * Legacy grace period: tokens issued before expiry was added carry no exp segment.
+ * They are accepted until this fixed cutoff (deploy date 2026-10-24 + 30 days), then rejected.
+ * Remove the legacy branch after this date.
+ */
+export const LEGACY_TOKEN_CUTOFF = new Date("2026-11-23T00:00:00Z");
+
 function signingSecret(): string {
   return env.JWT_SECRET;
 }
@@ -47,8 +54,16 @@ export function verifyVipMembershipJoinToken(
   }
 
   const [companyId, customerId, vipTierId, expiresAtRaw, ...rest] = payload.split(":");
+  if (!companyId || !customerId || !vipTierId || rest.length > 0) {
+    return null;
+  }
+
+  if (expiresAtRaw === undefined) {
+    return Date.now() < LEGACY_TOKEN_CUTOFF.getTime() ? { companyId, customerId, vipTierId } : null;
+  }
+
   const expiresAt = Number(expiresAtRaw);
-  if (!companyId || !customerId || !vipTierId || rest.length > 0 || !Number.isInteger(expiresAt)) {
+  if (!Number.isInteger(expiresAt)) {
     return null;
   }
 

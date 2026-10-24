@@ -2,6 +2,7 @@ import type { FastifyPluginAsync, FastifyReply, FastifyRequest } from "fastify";
 
 import {
   checkAuthForgotPasswordIpRateLimit,
+  checkAuthLoginIpRateLimit,
   checkAuthLoginRateLimit,
   checkAuthRefreshIpRateLimit,
   checkAuthRegisterIpRateLimit
@@ -47,7 +48,7 @@ async function registerRateLimit(request: FastifyRequest, reply: FastifyReply): 
 async function loginRateLimit(request: FastifyRequest, reply: FastifyReply): Promise<void> {
   const body = request.body as { email?: unknown } | undefined;
   const email = typeof body?.email === "string" ? body.email : "";
-  if (!(await checkAuthLoginRateLimit(request.ip, email))) {
+  if (!(await checkAuthLoginIpRateLimit(request.ip)) || !(await checkAuthLoginRateLimit(request.ip, email))) {
     await sendRateLimited(request, reply);
   }
 }

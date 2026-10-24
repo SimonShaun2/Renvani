@@ -7,6 +7,7 @@ const bookingRequestTimesByIp = new Map<string, number[]>();
 const slotHoldTimesByReference = new Map<string, number[]>();
 const authRegisterTimesByIp = new Map<string, number[]>();
 const authLoginTimesByIpEmail = new Map<string, number[]>();
+const authLoginTimesByIp = new Map<string, number[]>();
 const authRefreshTimesByIp = new Map<string, number[]>();
 const authForgotPasswordTimesByIp = new Map<string, number[]>();
 
@@ -14,6 +15,7 @@ export const PUBLIC_BOOKING_IP_RATE_LIMIT = 10;
 export const PUBLIC_SLOT_HOLD_REF_RATE_LIMIT = 15;
 export const AUTH_REGISTER_IP_RATE_LIMIT = 5;
 export const AUTH_LOGIN_RATE_LIMIT = 10;
+export const AUTH_LOGIN_IP_RATE_LIMIT = 30;
 export const AUTH_LOGIN_WINDOW_MS = 15 * 60 * 1000;
 export const AUTH_REFRESH_IP_RATE_LIMIT = 60;
 export const AUTH_FORGOT_PASSWORD_IP_RATE_LIMIT = 5;
@@ -120,6 +122,10 @@ export async function checkAuthLoginRateLimit(ipAddress: string, email: string):
   return recordAttempt(authLoginTimesByIpEmail, "fsm:auth-login:rate:ip-email", key, AUTH_LOGIN_RATE_LIMIT, AUTH_LOGIN_WINDOW_MS);
 }
 
+export async function checkAuthLoginIpRateLimit(ipAddress: string): Promise<boolean> {
+  return recordAttempt(authLoginTimesByIp, "fsm:auth-login:rate:ip", normalizeIp(ipAddress), AUTH_LOGIN_IP_RATE_LIMIT, AUTH_LOGIN_WINDOW_MS);
+}
+
 export async function checkAuthRefreshIpRateLimit(ipAddress: string): Promise<boolean> {
   return recordAttempt(authRefreshTimesByIp, "fsm:auth-refresh:rate:ip", normalizeIp(ipAddress), AUTH_REFRESH_IP_RATE_LIMIT);
 }
@@ -136,6 +142,7 @@ export async function checkAuthForgotPasswordIpRateLimit(ipAddress: string): Pro
 export function resetPublicBookingRateLimitStateForTests(): void {
   authRegisterTimesByIp.clear();
   authLoginTimesByIpEmail.clear();
+  authLoginTimesByIp.clear();
   authRefreshTimesByIp.clear();
   authForgotPasswordTimesByIp.clear();
   bookingRequestTimesByIp.clear();

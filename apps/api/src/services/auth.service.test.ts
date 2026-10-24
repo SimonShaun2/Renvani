@@ -73,20 +73,19 @@ describe("auth.service", () => {
     });
 
     const state = fakeDb.getTestState();
-    const storedRefreshToken = requireValue(state.refreshTokens[0], "Expected a stored refresh token");
+    if (result.status !== "created") throw new Error("expected created");
 
     expect(result.company.slug).toBe("tulsa-hvac-pro");
     expect(result.user.role).toBe("owner");
     expect(result.user.passwordHash).not.toBe("password123");
-    expect(state.refreshTokens).toHaveLength(1);
-    expect(await tokens.compareToken(result.tokens.refreshToken, storedRefreshToken.tokenHash)).toBe(true);
+    expect(state.refreshTokens).toHaveLength(0);
     expect(state.activityEvents.map((event) => event.eventType)).toEqual([
       "company.created",
       "user.registered"
     ]);
   });
 
-  it("rejects duplicate register email", async () => {
+  it("returns existing (no error) for a duplicate register email", async () => {
     const company = fakeDb.seedCompany({ name: "Acme", slug: "acme" });
     fakeDb.seedUser({
       companyId: company.id,
@@ -104,10 +103,7 @@ describe("auth.service", () => {
         password: "password123",
         timezone: "America/Chicago"
       })
-    ).rejects.toMatchObject({
-      code: ErrorCode.CONFLICT,
-      message: "An account with this email already exists"
-    });
+    ).resolves.toEqual({ status: "existing" });
   });
 
   it("register normalizes email casing", async () => {
@@ -120,6 +116,7 @@ describe("auth.service", () => {
       timezone: "America/Chicago"
     });
 
+    if (result.status !== "created") throw new Error("expected created");
     expect(result.user.email).toBe("sam@example.com");
   });
 

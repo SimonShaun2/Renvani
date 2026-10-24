@@ -65,3 +65,16 @@ describe("auth login/refresh/forgot-password rate limits", () => {
     mod.resetPublicBookingRateLimitStateForTests();
   });
 });
+
+describe("auth login per-IP cap", () => {
+  it("blocks an IP after 30 logins across different emails", async () => {
+    const mod = await import("./public-booking-rate-limit.js");
+    mod.resetPublicBookingRateLimitStateForTests();
+    for (let i = 0; i < mod.AUTH_LOGIN_IP_RATE_LIMIT; i += 1) {
+      await expect(mod.checkAuthLoginIpRateLimit("198.51.100.11")).resolves.toBe(true);
+    }
+    await expect(mod.checkAuthLoginIpRateLimit("198.51.100.11")).resolves.toBe(false);
+    await expect(mod.checkAuthLoginIpRateLimit("198.51.100.12")).resolves.toBe(true);
+    mod.resetPublicBookingRateLimitStateForTests();
+  });
+});

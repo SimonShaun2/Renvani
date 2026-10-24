@@ -38,17 +38,10 @@ export async function registerHandler(
   request: FastifyRequest,
   reply: FastifyReply
 ): Promise<FastifyReply> {
-  const result = await register(request.body as RegisterInput);
+  await register(request.body as RegisterInput);
 
-  return reply.status(201).send({
-    user: toUserResponse(result.user),
-    company: {
-      id: result.company.id,
-      name: result.company.name,
-      slug: result.company.slug
-    },
-    tokens: result.tokens
-  });
+  // Identical response for new and existing emails (no account enumeration).
+  return reply.status(202).send({ message: "Check your email" });
 }
 
 export async function loginHandler(

@@ -8,7 +8,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { BrandMark } from "@/src/components/layout/BrandMark";
-import { api, ApiError } from "@/src/lib/api";
+import { api } from "@/src/lib/api";
 import { getLoginRedirectPath, setBrowserAuthSession, type AuthResponse } from "@/src/lib/auth";
 import { useAuthStore } from "@/src/stores/auth.store";
 
@@ -52,13 +52,9 @@ export default function SignupPage() {
       const session = setBrowserAuthSession(response);
       setAuth(session.user, session.company, response.tokens.accessToken);
       router.replace(getLoginRedirectPath(session.role));
-    } catch (error) {
-      if (error instanceof ApiError && error.status === 409) {
-        setFormError("An account with this email already exists. Sign in instead.");
-        return;
-      }
-
-      setFormError("We could not create your account right now. Please try again.");
+    } catch {
+      // Same message for every failure so the form never reveals whether an email is registered.
+      setFormError("We couldn't create your account. Check your details and try again, or sign in if you already have an account.");
     }
   }
 

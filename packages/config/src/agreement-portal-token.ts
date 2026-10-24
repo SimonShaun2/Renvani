@@ -6,12 +6,19 @@ function signingSecret(): string {
   return env.JWT_SECRET;
 }
 
-function encodePayload(companyId: string, agreementId: string): string {
-  return `${companyId}:${agreementId}`;
+export const AGREEMENT_PORTAL_TOKEN_TTL_SECONDS = 30 * 24 * 60 * 60;
+
+function encodePayload(companyId: string, agreementId: string, expiresAt: number): string {
+  return `${companyId}:${agreementId}:${expiresAt}`;
 }
 
-export function signAgreementPortalToken(companyId: string, agreementId: string): string {
-  const payload = encodePayload(companyId, agreementId);
+export function signAgreementPortalToken(
+  companyId: string,
+  agreementId: string,
+  ttlSeconds: number = AGREEMENT_PORTAL_TOKEN_TTL_SECONDS
+): string {
+  const expiresAt = Math.floor(Date.now() / 1000) + ttlSeconds;
+  const payload = encodePayload(companyId, agreementId, expiresAt);
   const signature = createHmac("sha256", signingSecret()).update(payload).digest("base64url");
   return `${payload}.${signature}`;
 }
@@ -39,8 +46,13 @@ export function verifyAgreementPortalToken(
     return null;
   }
 
-  const [companyId, agreementId] = payload.split(":");
-  if (!companyId || !agreementId) {
+  const [companyId, agreementId, expiresAtRaw, ...rest] = payload.split(":");
+  const expiresAt = Number(expiresAtRaw);
+  if (!companyId || !agreementId || rest.length > 0 || !Number.isInteger(expiresAt)) {
+    return null;
+  }
+
+  if (expiresAt <= Math.floor(Date.now() / 1000)) {
     return null;
   }
 

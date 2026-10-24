@@ -6,7 +6,6 @@ export const RENVANI_EMAIL_BRAND = {
   siteUrl: "https://getrenvani.com",
   termsUrl: "https://getrenvani.com/terms",
   privacyUrl: "https://getrenvani.com/privacy",
-  legalLine: "Renvani is a brand of TrayLoop Technologies LLC.",
   /** apps/web/src/styles/tokens.css */
   colors: {
     primary: "#102163",
@@ -74,7 +73,6 @@ ${input.bodyHtml}
 &nbsp;·&nbsp;<a href="${b.siteUrl}" style="color:${b.colors.muted};">getrenvani.com</a>
 &nbsp;·&nbsp;<a href="${b.termsUrl}" style="color:${b.colors.muted};">Terms</a>
 &nbsp;·&nbsp;<a href="${b.privacyUrl}" style="color:${b.colors.muted};">Privacy</a>
-<div style="font-size:11px;color:${b.colors.muted};padding-top:6px;">${b.legalLine}</div>
 </td></tr>
 </table>
 </td></tr>
@@ -88,7 +86,6 @@ ${input.bodyHtml}
 Renvani · ${b.siteUrl}
 Terms: ${b.termsUrl}
 Privacy: ${b.privacyUrl}
-${b.legalLine}
 `;
 
   return { html, text };

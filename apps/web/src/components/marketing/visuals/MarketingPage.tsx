@@ -1,5 +1,5 @@
 import { getMarketingContent, getVisual, type ProductVisualContent } from "@/src/content/marketing-content";
-import { getPageSections, pricingFromSection } from "@/src/content/page-sections";
+import { getPageSections, hasVisibleContent, pricingFromSection } from "@/src/content/page-sections";
 
 import { PricingSection } from "./PricingSection";
 import { ProductVisual } from "./ProductVisual";
@@ -7,7 +7,8 @@ import { SectionBlock } from "./SectionBlock";
 
 /** Renders a page's CMS sections, with the product visual after the hero. */
 export async function MarketingPage({ page, visual }: { page: string; visual?: ProductVisualContent["slug"] }) {
-  const [sections, content] = await Promise.all([getPageSections(page), getMarketingContent()]);
+  const [allSections, content] = await Promise.all([getPageSections(page), getMarketingContent()]);
+  const sections = allSections.filter(hasVisibleContent);
   return (
     <>
       {sections.map((section, i) => {

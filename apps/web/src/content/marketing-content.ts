@@ -1,3 +1,4 @@
+import { webflowItemsUrl } from "./webflow-url";
 /**
  * Marketing content module.
  *
@@ -213,7 +214,7 @@ function chipFrom(label: unknown, fallback: ChipKind): ChipKind {
   return (typeof label === "string" && CHIP_BY_LABEL[label.trim().toLowerCase()]) || fallback;
 }
 
-type WebflowItem = { isArchived?: boolean; fieldData: Record<string, unknown> };
+type WebflowItem = { isArchived?: boolean; isDraft?: boolean; fieldData: Record<string, unknown> };
 
 /** Maps one Webflow "Product Visuals" item onto the placeholder for its slug. */
 export function mapWebflowItem(item: WebflowItem): ProductVisualContent | null {
@@ -259,11 +260,12 @@ export type MarketingEnv = {
   WEBFLOW_API_TOKEN?: string;
   WEBFLOW_SITE_ID?: string;
   WEBFLOW_PRODUCT_VISUALS_COLLECTION_ID?: string;
+  VERCEL_ENV?: string | undefined;
 };
 
 /**
  * Server-side fetch of the Webflow "Product Visuals" collection (Data API v2,
- * staged items endpoint, which includes drafts). Falls back to the
+ * staged items incl. drafts on Vercel preview, live items elsewhere). Falls back to the
  * Figma-matched placeholders when env is missing or the fetch fails.
  */
 export async function getMarketingContent(
@@ -274,13 +276,14 @@ export async function getMarketingContent(
   const collectionId = env.WEBFLOW_PRODUCT_VISUALS_COLLECTION_ID;
   if (!token || !collectionId || !env.WEBFLOW_SITE_ID) return PLACEHOLDER_CONTENT;
   try {
-    const res = await fetchImpl(`https://api.webflow.com/v2/collections/${encodeURIComponent(collectionId)}/items?limit=100`, {
+    const res = await fetchImpl(webflowItemsUrl(collectionId, env), {
       headers: { Authorization: `Bearer ${token}`, accept: "application/json" },
       next: { revalidate: 300 }
     } as RequestInit);
     if (!res.ok) return PLACEHOLDER_CONTENT;
     const body = (await res.json()) as { items?: WebflowItem[] };
-    const sorted = [...(body.items ?? [])].sort(
+    const visible = (body.items ?? []).filter((i) => env.VERCEL_ENV === "preview" || i.isDraft !== true);
+    const sorted = [...visible].sort(
       (a, b) => Number(a.fieldData?.["sort-order"] ?? 99) - Number(b.fieldData?.["sort-order"] ?? 99)
     );
     const fromCms = new Map<string, ProductVisualContent>();

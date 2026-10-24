@@ -117,20 +117,43 @@ describe("booking fee", () => {
 });
 
 describe("SectionBlock", () => {
-  it("never renders review-notes and flags [Copy: …] with a TODO", () => {
+  it("never renders review-notes or [Copy: …] placeholders / TODO badges", () => {
     const section = mapSection({
       fieldData: {
         page: "industries/hvac", "section-key": "hero", headline: "[Copy: HVAC headline]",
-        subhead: "Platform fee (5%) on agreements", "review-notes": "SECRET EDITOR NOTE",
-        items: "Tune-ups — Emailed [Copy: value]"
+        eyebrow: "HVAC", subhead: "Platform fee (5%) on agreements", "review-notes": "SECRET EDITOR NOTE",
+        items: "Tune-ups — Emailed [Copy: value]\nAgreements — Offered after the visit"
       }
     })!;
     const { container } = render(<SectionBlock section={section} />);
     expect(container.textContent).not.toContain("SECRET EDITOR NOTE");
     expect(container.textContent).toContain("Service Fee (2%, paid by customer)");
     expect(container.textContent).not.toContain("Platform fee");
-    expect(container.querySelectorAll('[data-todo="copy"]').length).toBeGreaterThanOrEqual(2);
-    expect(container.textContent).toContain("TODO");
+    expect(container.textContent).not.toMatch(/\[Copy:|TODO/);
+    expect(container.querySelector("[data-todo]")).toBeNull();
+    expect(container.textContent).toContain("Agreements — Offered after the visit");
+  });
+
+  it("renders no [Copy: …] text for any bundled HVAC section", () => {
+    for (const section of STATIC_PRODUCT_SECTIONS.filter((s) => s.page === "industries/hvac")) {
+      const { container, unmount } = render(<SectionBlock section={section} />);
+      expect(container.textContent).not.toMatch(/\[Copy:|TODO/);
+      unmount();
+    }
+  });
+
+  it("sanitizes ctaHref on the CTA button", () => {
+    const base = { page: "home", sectionKey: "x", items: [], sortOrder: 0, ctaLabel: "Go" };
+    const hrefOf = (ctaHref: string) => {
+      const { container, unmount } = render(<SectionBlock section={{ ...base, ctaHref }} />);
+      const h = container.querySelector("a")!.getAttribute("href");
+      unmount();
+      return h;
+    };
+    expect(hrefOf("javascript:alert(1)")).toBe("/demo");
+    expect(hrefOf("//evil.example")).toBe("/demo");
+    expect(hrefOf("/founding-partners")).toBe("/founding-partners");
+    expect(hrefOf("https://renvani.com/x")).toBe("https://renvani.com/x");
   });
 
   it("renders no review-notes text for any bundled section", () => {

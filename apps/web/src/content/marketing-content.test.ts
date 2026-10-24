@@ -41,6 +41,7 @@ describe("marketing content module", () => {
 });
 
 describe("Webflow CMS fetch", () => {
+
   const env = { WEBFLOW_API_TOKEN: "test", WEBFLOW_SITE_ID: "site", WEBFLOW_PRODUCT_VISUALS_COLLECTION_ID: "col" };
   const item = {
     isDraft: true,
@@ -53,6 +54,13 @@ describe("Webflow CMS fetch", () => {
       "desktop-image": { url: "https://cdn.example/x.png" }, "image-alt": "alt"
     }
   };
+
+  it("outside preview uses the live endpoint and ignores drafts", async () => {
+    const fetchImpl = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ items: [item] }) });
+    const content = await getMarketingContent({ ...env, VERCEL_ENV: "production" }, fetchImpl as unknown as typeof fetch);
+    expect(fetchImpl.mock.calls[0]![0]).toBe("https://api.webflow.com/v2/collections/col/items/live?limit=100");
+    expect(content).toBe(PLACEHOLDER_CONTENT);
+  });
 
   it("falls back to placeholders without env", async () => {
     const fetchImpl = vi.fn();
@@ -67,9 +75,9 @@ describe("Webflow CMS fetch", () => {
     expect(await getMarketingContent(env, notOk as unknown as typeof fetch)).toBe(PLACEHOLDER_CONTENT);
   });
 
-  it("calls the staged items endpoint with a bearer token and maps fields", async () => {
+  it("on preview calls the staged items endpoint with a bearer token and maps fields", async () => {
     const fetchImpl = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ items: [item] }) });
-    const content = await getMarketingContent(env, fetchImpl as unknown as typeof fetch);
+    const content = await getMarketingContent({ ...env, VERCEL_ENV: "preview" }, fetchImpl as unknown as typeof fetch);
     const [url, init] = fetchImpl.mock.calls[0]!;
     expect(url).toBe("https://api.webflow.com/v2/collections/col/items?limit=100");
     expect(init.headers.Authorization).toBe("Bearer test");

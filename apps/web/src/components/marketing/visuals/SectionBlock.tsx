@@ -1,16 +1,7 @@
 import Link from "next/link";
 
-import { COMPETITORS, hasCopyPlaceholder, type PageSection } from "@/src/content/page-sections";
+import { COMPETITORS, hasCopyPlaceholder, safeHref, type PageSection } from "@/src/content/page-sections";
 
-export function TodoText({ text }: { text: string }) {
-  if (!hasCopyPlaceholder(text)) return <>{text}</>;
-  return (
-    <span data-todo="copy" className="rounded bg-yellow-200 px-1 outline outline-2 outline-dashed outline-red-500">
-      <strong className="mr-1 text-red-600">TODO</strong>
-      {text}
-    </span>
-  );
-}
 
 type Faq = { faq?: [string, string][] };
 type Table = { columns?: string[]; rows?: [string, string][] };
@@ -58,38 +49,38 @@ function Extra({ section }: { section: PageSection }) {
   return null;
 }
 
-/** Renders one CMS section. `review-notes` never reaches this component. */
+/** Renders one CMS section. "[Copy: …]" placeholders are hidden (see TODO(copy) in page-sections.ts). `review-notes` never reaches this component. */
 export function SectionBlock({ section, as: Heading = "h2" }: { section: PageSection; as?: "h1" | "h2" }) {
   // Only structured "Title — detail" lines render; raw mock-UI text dumps are skipped.
-  const listItems = section.items.filter((line) => line.includes(" — ") || hasCopyPlaceholder(line));
+  const listItems = section.items.filter((line) => line.includes(" — ") && !hasCopyPlaceholder(line));
   return (
     <section data-section={`${section.page}:${section.sectionKey}`} className="py-12 md:py-16">
       <div className="mx-auto max-w-6xl px-4">
         {section.eyebrow ? (
           <p className="text-sm font-semibold uppercase tracking-wide" style={{ color: "var(--color-mkt-muted)" }}>
-            <TodoText text={section.eyebrow} />
+            {section.eyebrow}
           </p>
         ) : null}
         {section.headline ? (
           <Heading className="mt-2 text-3xl font-semibold md:text-4xl" style={{ color: "var(--color-mkt-ink)" }}>
-            <TodoText text={section.headline} />
+            {section.headline}
           </Heading>
         ) : null}
         {section.subhead ? (
           <p className="mt-4 max-w-2xl text-base md:text-lg" style={{ color: "var(--color-mkt-muted)" }}>
-            <TodoText text={section.subhead} />
+            {section.subhead}
           </p>
         ) : null}
         {section.callout ? (
           <p className="mt-4 font-semibold" style={{ color: "var(--color-mkt-ink)" }}>
-            <TodoText text={section.callout} />
+            {section.callout}
           </p>
         ) : null}
         {listItems.length ? (
           <ul className="mt-6 grid gap-3 sm:grid-cols-2">
             {listItems.map((line, i) => (
               <li key={`${i}-${line}`} className="rounded-xl border bg-white p-4 text-sm" style={{ borderColor: "var(--color-mkt-line)" }}>
-                <TodoText text={line} />
+                {line}
               </li>
             ))}
           </ul>
@@ -97,7 +88,7 @@ export function SectionBlock({ section, as: Heading = "h2" }: { section: PageSec
         <Extra section={section} />
         {section.ctaLabel && section.ctaHref ? (
           <Link
-            href={section.ctaHref}
+            href={safeHref(section.ctaHref) ?? "/demo"}
             className="mt-6 inline-flex min-h-[44px] items-center rounded-full px-5 text-[15px] font-medium"
             style={{ background: "var(--color-mkt-amber)", color: "var(--color-mkt-ink)" }}
           >

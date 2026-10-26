@@ -89,13 +89,13 @@ function relinkCall(userId: string, authorization: string | null, body: Record<s
 }
 
 describe("POST /api/v1/users/:id/clerk-relink (FS-165)", () => {
-  it("owner and admin can relink: sets clerk id, clears tombstone, reactivates, writes an ids-only audit", async () => {
+  it("owner and admin can relink a lower role: sets clerk id, clears tombstone, reactivates on request, ids-only audit", async () => {
     const company = seedCompany();
     const info = vi.spyOn(relink.relinkAuditLogger, "info");
     for (const role of ["owner", "admin"] as const) {
       const { user: actorUser, authorization } = actor(company.id, role);
       const target = tombstoned(company.id);
-      const res = await relinkCall(target.id, authorization, { clerkUserId: `user_${role}A1` });
+      const res = await relinkCall(target.id, authorization, { clerkUserId: `user_${role}A1`, reactivate: true });
       expect(res.status).toBe(200);
       expect(res.body).toEqual({ status: "relinked", overwrotePreviousClerkId: false });
       expect(row(target.id).clerkUserId).toBe(`user_${role}A1`);
@@ -183,6 +183,7 @@ describe("POST /api/v1/users/:id/clerk-relink (FS-165)", () => {
     const company = seedCompany();
     const { authorization } = actor(company.id, "owner");
     const target = tombstoned(company.id, { clerkUserId: "user_Old1", clerkUnlinkedAt: null, isActive: true });
+    fakeDb.seedRefreshToken({ companyId: company.id, userId: target.id, tokenHash: "h1", expiresAt: new Date(Date.now() + 86_400_000) });
 
     const refused = await relinkCall(target.id, authorization, { clerkUserId: "user_New1" });
     expect(refused.status).toBe(409);
@@ -197,8 +198,11 @@ describe("POST /api/v1/users/:id/clerk-relink (FS-165)", () => {
       audit: "clerk_user_relinked",
       overwrotePreviousClerkId: true,
       previousClerkUserId: "user_Old1",
-      newClerkUserId: "user_New1"
+      newClerkUserId: "user_New1",
+      refreshTokensRevoked: true
     });
+    const tokensLeft = fakeDb.getTestState().refreshTokens.filter((t) => t.userId === target.id && !t.revokedAt);
+    expect(tokensLeft).toHaveLength(0);
   });
 
   it("repeat with the same id is idempotent (unchanged)", async () => {
@@ -221,5 +225,79 @@ describe("POST /api/v1/users/:id/clerk-relink (FS-165)", () => {
     }
     expect((await relinkCall("not-a-uuid", authorization, { clerkUserId: "user_A1" })).status).toBe(400);
     expect(row(target.id).clerkUserId).toBeNull();
+  });
+  it("relinking a tombstoned user without reactivate leaves it inactive (no token revoke when not overwriting)", async () => {
+    const company = seedCompany();
+    const { authorization } = actor(company.id, "owner");
+    const target = tombstoned(company.id);
+    fakeDb.seedRefreshToken({ companyId: company.id, userId: target.id, tokenHash: "h2", expiresAt: new Date(Date.now() + 86_400_000) });
+    const res = await relinkCall(target.id, authorization, { clerkUserId: "user_NoReact1" });
+    expect(res.status).toBe(200);
+    expect(row(target.id).clerkUserId).toBe("user_NoReact1");
+    expect(row(target.id).clerkUnlinkedAt).toBeNull();
+    expect(row(target.id).isActive).toBe(false);
+    expect(fakeDb.getTestState().refreshTokens.filter((t) => t.userId === target.id && !t.revokedAt)).toHaveLength(1);
+
+    const again = await relinkCall(target.id, authorization, { clerkUserId: "user_NoReact1", reactivate: true });
+    expect(again.status).toBe(200);
+    expect(again.body.status).toBe("relinked");
+    expect(row(target.id).isActive).toBe(true);
+  });
+
+  it("an admin cannot relink an owner or another admin (403); an owner can relink an admin", async () => {
+    const company = seedCompany();
+    const { authorization: adminAuth } = actor(company.id, "admin");
+    const { authorization: ownerAuth } = actor(company.id, "owner");
+    for (const role of ["owner", "admin"] as const) {
+      const target = tombstoned(company.id, { role });
+      const res = await relinkCall(target.id, adminAuth, { clerkUserId: `user_Esc${role}1` });
+      expect(res.status).toBe(403);
+      expect(row(target.id).clerkUserId).toBeNull();
+      expect(row(target.id).clerkUnlinkedAt).not.toBeNull();
+    }
+    const adminTarget = tombstoned(company.id, { role: "admin" });
+    const ok = await relinkCall(adminTarget.id, ownerAuth, { clerkUserId: "user_AdminOk1" });
+    expect(ok.status).toBe(200);
+    expect(row(adminTarget.id).clerkUserId).toBe("user_AdminOk1");
+  });
+
+  it("self-relink is refused with 403 (owner and admin)", async () => {
+    const company = seedCompany();
+    for (const role of ["owner", "admin"] as const) {
+      const { user: self, authorization } = actor(company.id, role);
+      const res = await relinkCall(self.id, authorization, { clerkUserId: "user_Self1" });
+      expect(res.status).toBe(403);
+      expect(row(self.id).clerkUserId).toBeNull();
+    }
+  });
+
+  it("a concurrent clerk id change between read and UPDATE (0 rows) returns 409 and changes nothing", async () => {
+    const company = seedCompany();
+    const { authorization } = actor(company.id, "owner");
+    const target = tombstoned(company.id);
+    const dbModule = (await import("@fsm/db")) as unknown as {
+      db: { transaction: (cb: (tx: unknown) => Promise<unknown>) => Promise<unknown> };
+    };
+    const realTransaction = dbModule.db.transaction.bind(dbModule.db);
+    vi.spyOn(dbModule.db, "transaction").mockImplementationOnce((cb) =>
+      realTransaction((tx) => {
+        const raced = new Proxy(tx as Record<string | symbol, unknown>, {
+          get(targetTx, key) {
+            if (key === "update") {
+              return (...args: unknown[]) => {
+                row(target.id).clerkUserId = "user_Concurrent1";
+                return (targetTx.update as (...a: unknown[]) => unknown)(...args);
+              };
+            }
+            return targetTx[key];
+          }
+        });
+        return cb(raced);
+      })
+    );
+    const res = await relinkCall(target.id, authorization, { clerkUserId: "user_Late1", reactivate: true });
+    expect(res.status).toBe(409);
+    expect(row(target.id).clerkUserId).not.toBe("user_Late1");
+    expect(row(target.id).isActive).toBe(false);
   });
 });

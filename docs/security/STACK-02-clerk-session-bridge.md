@@ -133,16 +133,17 @@ POST /api/v1/users/:id/clerk-relink
 Authorization: Bearer <owner/admin session>
 Content-Type: application/json
 
-{ "clerkUserId": "user_...", "confirmOverwrite": false }
+{ "clerkUserId": "user_...", "confirmOverwrite": false, "reactivate": false }
 ```
 
-- The company comes from the auth context only. A target in another company, soft-deleted, or missing → **404**. Other roles → **403**.
-- It sets `clerk_user_id`, clears `clerk_unlinked_at`, and sets `is_active = true` in one transaction. It revokes nothing.
-- If another user (any company) holds the Clerk id, or a 23505 race fires → **409**, nothing changes.
-- If the target is already linked to a **different** Clerk id → **409** unless `confirmOverwrite: true`; the overwrite is then logged at warn with old → new ids.
-- Repeating with the same id on an active, untombstoned user returns `{"status": "unchanged"}`.
+- The company comes from the auth context only. A target in another company, soft-deleted, or missing → **404**.
+- **Role rules:** only owners and admins can call it (others → **403**). Only an **owner** may relink an owner or admin target; an admin may relink only lower roles (dispatcher, office, technician). Relinking **yourself** is refused → **403**.
+- It sets `clerk_user_id` and clears `clerk_unlinked_at` in one tenant-aware transaction. **Active status is unchanged** unless the body sends `"reactivate": true`, which is the only way this route reactivates a user.
+- If another user (any company) holds the Clerk id, or a 23505 race fires → **409**, nothing changes. The UPDATE also requires `clerk_user_id` to still equal the value read in the transaction (null-safe); a concurrent change → **409**.
+- If the target is already linked to a **different** Clerk id → **409** unless `confirmOverwrite: true`. The overwrite then **revokes the user's refresh tokens** and is logged at warn with old → new ids. A plain tombstone relink revokes nothing.
+- Repeating with the same id on an untombstoned user (and no reactivation needed) returns `{"status": "unchanged"}`.
 - `clerkUserId` must match `^user_[A-Za-z0-9]+$` (max 255).
-- Audit: a structured log line `audit: "clerk_user_relinked"` with `companyId`, `actorUserId`, `targetUserId`, `newClerkUserId` (plus `previousClerkUserId` on overwrite), `tombstoneCleared`, `reactivated`. Ids only, no emails.
+- Audit: a structured log line `audit: "clerk_user_relinked"` with `companyId`, `actorUserId`, `targetUserId`, `newClerkUserId` (plus `previousClerkUserId` on overwrite), `tombstoneCleared`, `reactivated`, plus `refreshTokensRevoked` on overwrite. Ids only, no emails. The manual SQL below must follow the same role rules: the requester must be an owner for owner/admin targets, and must not be the target.
 
 **Fallback: manual SQL** (only if the route is unavailable):
 
@@ -170,11 +171,12 @@ SELECT id, company_id, is_active, clerk_user_id, clerk_unlinked_at, deleted_at
 FROM users WHERE id = :'user_id' AND company_id = :'company_id'
 FOR UPDATE;
 
--- 3. Relink, clear the tombstone, reactivate.
+-- 3. Relink and clear the tombstone. Active status stays unchanged. Uncomment the is_active
+--    line ONLY if reactivation is intended (the user should regain access).
 UPDATE users
 SET clerk_user_id = :'clerk_user_id',
     clerk_unlinked_at = NULL,
-    is_active = true,
+    -- is_active = true,
     updated_at = now()
 WHERE id = :'user_id'
   AND company_id = :'company_id'

@@ -15,7 +15,8 @@ export const ClerkRelinkBodySchema = z
       .trim()
       .max(255)
       .regex(/^user_[A-Za-z0-9]+$/, "clerkUserId must be a Clerk user id (user_...)"),
-    confirmOverwrite: z.boolean().optional().default(false)
+    confirmOverwrite: z.boolean().optional().default(false),
+    reactivate: z.boolean().optional().default(false)
   })
   .strict();
 
@@ -55,6 +56,7 @@ const clerkRelinkRouteSchema = {
 
 const userRoutes: FastifyPluginAsync = async (fastify) => {
   // FS-165: owner/admin relink of a (tombstoned) staff user to a Clerk user id, same company only.
+  // Owner/admin targets need an owner actor; self-relink is refused (service).
   fastify.post(
     "/:id/clerk-relink",
     {
@@ -68,9 +70,11 @@ const userRoutes: FastifyPluginAsync = async (fastify) => {
       const result = await adminRelinkClerkUser({
         companyId: request.company.id,
         actorUserId: request.user.id,
+        actorRole: request.user.role,
         targetUserId: params.id,
         clerkUserId: body.clerkUserId,
-        confirmOverwrite: body.confirmOverwrite
+        confirmOverwrite: body.confirmOverwrite,
+        reactivate: body.reactivate
       });
       return reply.send(result);
     }

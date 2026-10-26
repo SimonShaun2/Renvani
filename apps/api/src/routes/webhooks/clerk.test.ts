@@ -8,6 +8,20 @@ vi.mock("../../services/clerk-provisioning.service.js", () => ({
   provisionClerkOrganization,
   provisionClerkMembership
 }));
+const syncClerkUserUpdated = vi.fn();
+const deactivateClerkUser = vi.fn();
+const deactivateClerkMembership = vi.fn();
+vi.mock("../../services/clerk-user-sync.service.js", async () => {
+  const actual = await vi.importActual<typeof import("../../services/clerk-user-sync.service.js")>(
+    "../../services/clerk-user-sync.service.js"
+  );
+  return {
+    readVerifiedPrimaryEmail: actual.readVerifiedPrimaryEmail,
+    syncClerkUserUpdated,
+    deactivateClerkUser,
+    deactivateClerkMembership
+  };
+});
 vi.mock("@fsm/config", () => ({ env: { CLERK_WEBHOOK_SECRET: "", NODE_ENV: "test" } }));
 
 const SECRET = `whsec_${Buffer.from("test-secret-0123456789").toString("base64")}`;
@@ -45,6 +59,9 @@ describe("Clerk webhook", () => {
     process.env.CLERK_WEBHOOK_SECRET = SECRET;
     provisionClerkOrganization.mockReset().mockResolvedValue({ id: "co_1" });
     provisionClerkMembership.mockReset().mockResolvedValue({ status: "created", companyId: "co_1" });
+    syncClerkUserUpdated.mockReset().mockResolvedValue({ status: "updated" });
+    deactivateClerkUser.mockReset().mockResolvedValue({ status: "deactivated" });
+    deactivateClerkMembership.mockReset().mockResolvedValue({ status: "deactivated" });
   });
 
   it("FS-158: a failed delivery releases the claim and the retry is processed", async () => {
@@ -143,5 +160,72 @@ describe("Clerk webhook", () => {
     process.env.CLERK_WEBHOOK_SECRET = "";
     const res = await send({ type: "user.created" });
     expect(res.statusCode).toBe(503);
+  });
+
+  const userUpdated = (status: string) => ({
+    type: "user.updated",
+    data: {
+      id: "user_ava",
+      primary_email_address_id: "idn_1",
+      email_addresses: [
+        { id: "idn_0", email_address: "old@acme.com", verification: { status: "verified" } },
+        { id: "idn_1", email_address: "New@Acme.com", verification: { status } }
+      ]
+    }
+  });
+
+  it("FS-160: user.updated passes only a verified primary email", async () => {
+    const ok = await send(userUpdated("verified"));
+    expect(ok.statusCode).toBe(200);
+    expect(syncClerkUserUpdated).toHaveBeenLastCalledWith({ clerkUserId: "user_ava", verifiedPrimaryEmail: "new@acme.com" });
+    const unverified = await send(userUpdated("unverified"));
+    expect(unverified.statusCode).toBe(200);
+    expect(syncClerkUserUpdated).toHaveBeenLastCalledWith({ clerkUserId: "user_ava", verifiedPrimaryEmail: null });
+  });
+
+  it("FS-160: user.deleted deactivates; redelivery of the same svix-id is a duplicate", async () => {
+    const body = { type: "user.deleted", data: { id: "user_ava", deleted: true } };
+    const res = await send(body, { id: "msg_del" });
+    expect(res.json()).toMatchObject({ received: true, status: "deactivated" });
+    const again = await send(body, { id: "msg_del" });
+    expect(again.json()).toMatchObject({ duplicate: true });
+    expect(deactivateClerkUser).toHaveBeenCalledTimes(1);
+    expect(deactivateClerkUser).toHaveBeenCalledWith("user_ava");
+  });
+
+  it("FS-160: a failed user.deleted releases the claim so the retry runs", async () => {
+    const body = { type: "user.deleted", data: { id: "user_x" } };
+    deactivateClerkUser.mockRejectedValueOnce(new Error("boom"));
+    expect((await send(body, { id: "msg_del_fail" })).statusCode).toBe(500);
+    expect((await send(body, { id: "msg_del_fail" })).json()).toMatchObject({ status: "deactivated" });
+    expect(deactivateClerkUser).toHaveBeenCalledTimes(2);
+  });
+
+  it("FS-160: concurrent user.updated with the same svix-id gets 409 while processing", async () => {
+    let finish!: () => void;
+    syncClerkUserUpdated.mockImplementationOnce(
+      () => new Promise((resolve) => (finish = () => resolve({ status: "updated" })))
+    );
+    const first = send(userUpdated("verified"), { id: "msg_upd_overlap" });
+    await vi.waitFor(() => expect(syncClerkUserUpdated).toHaveBeenCalledTimes(1));
+    const second = await send(userUpdated("verified"), { id: "msg_upd_overlap" });
+    expect(second.statusCode).toBe(409);
+    finish();
+    expect((await first).statusCode).toBe(200);
+  });
+
+  it("FS-160: user.deleted with a bad signature is rejected and not processed", async () => {
+    const res = await send({ type: "user.deleted", data: { id: "user_ava" } }, { secret: `whsec_${Buffer.from("wrong-secret-0123456789").toString("base64")}` });
+    expect(res.statusCode).toBe(400);
+    expect(deactivateClerkUser).not.toHaveBeenCalled();
+  });
+
+  it("FS-160: organizationMembership.deleted deactivates within that org only", async () => {
+    const res = await send({
+      type: "organizationMembership.deleted",
+      data: { organization: { id: "org_1" }, public_user_data: { user_id: "user_ava" } }
+    });
+    expect(res.statusCode).toBe(200);
+    expect(deactivateClerkMembership).toHaveBeenCalledWith("org_1", "user_ava");
   });
 });

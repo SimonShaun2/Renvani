@@ -1,6 +1,6 @@
 # Clerk alert runbook (FS-163)
 
-Alert-worthy Clerk conditions in the API. Each one emits a structured pino log line with a top-level `alert` field. No alert rule exists in the repo, because no observability vendor or log sink has been chosen yet (`docs/infrastructure/staging/service-inventory.md`, "Unknown until FS-93"). This doc is the contract that the alert rule should be built against once a sink exists.
+Alert-worthy Clerk conditions in the API. Each one emits a structured pino log line with a top-level `alert` field. No alert rule exists in the repo, because no observability vendor or log sink has been chosen yet. `docs/infrastructure/staging/service-inventory.md` lists physical hosts as "TBD until FS-93 ADR" and "Observability vendor and log sinks" under "Unknown until FS-93". This doc is the contract that the alert rule should be built against once a sink exists.
 
 ## Log format
 
@@ -48,16 +48,29 @@ More than one non-deleted company shares the Clerk org id. Impact: that org is l
 
 ### `clerk_last_owner_deactivated`
 
-A Clerk webhook (membership removal or user deletion) deactivated the last active owner/admin of `companyId`.
+A Clerk webhook deactivated the last active, non-deleted owner/admin of `companyId`:
+- **`organizationMembership.deleted`** sets `is_active = false` and keeps `clerk_user_id`.
+- **`user.deleted`** sets `is_active = false`, sets `clerk_user_id = NULL`, and sets the `clerk_unlinked_at` tombstone.
 
-1. Check whether the company still has an active owner/admin:
+1. Check what remains. This uses the same predicate as `alertIfLastOwnerDeactivated` in `clerk-user-sync.service.ts`: same company, `is_active = true`, `deleted_at IS NULL`, role owner/admin. `users.deleted_at` is the soft-delete column (shared `timestamps`, migration 0000); soft-deleted users never count.
    ```sql
-   SELECT id, role, is_active, clerk_user_id IS NOT NULL AS linked, clerk_unlinked_at
+   SELECT id, role, is_active, deleted_at, clerk_user_id IS NOT NULL AS linked, clerk_unlinked_at
    FROM users
-   WHERE company_id = '<companyId>' AND role IN ('owner','admin');
+   WHERE company_id = '<companyId>' AND role IN ('owner','admin')
+   ORDER BY (is_active AND deleted_at IS NULL) DESC, role;
    ```
+   A remaining owner/admin is a row with `is_active = true AND deleted_at IS NULL`. If one exists, the alert is informational.
 2. If this was intended (the company is offboarding), record it and close the alert.
-3. Otherwise, contact the company and restore an owner. If the person has a new Clerk account, use the admin relink route `POST /api/v1/users/:id/clerk-relink` (FS-165) or the manual SQL. Both are in `docs/security/STACK-02-clerk-session-bridge.md`, runbook **(a) Relink a tombstoned user**. If no other owner/admin is active to call the route, use the manual SQL path in that section.
+3. Otherwise, confirm with the company who should be owner, then **relink and reactivate** them. A relink alone does not reactivate: the user stays `is_active = false` unless reactivation is explicit.
+   - **Route** (`POST /api/v1/users/:id/clerk-relink`, FS-165), called by another active owner of the same company, with `{"clerkUserId": "...", "reactivate": true}`:
+     - If they were only removed from the org (Clerk user not deleted), pass the **same** Clerk id (no `confirmOverwrite` needed). The response is `relinked` with `reactivated: true`. Without `reactivate` the same call returns `unchanged` and the user stays inactive.
+     - If their Clerk user was deleted, pass their new Clerk id. This clears the tombstone and reactivates.
+   - **Role rules (route and manual SQL alike):**
+     - Only an **owner** may relink or reactivate an owner/admin target. An admin caller gets **403**.
+     - Relinking yourself returns **403**.
+     - The target must belong to the caller's company and must not be soft-deleted (otherwise **404**).
+   - **If no active owner is left** (the deactivated user was the last one, and an admin cannot act on owner/admin targets), the route cannot be used. The **manual SQL** in `docs/security/STACK-02-clerk-session-bridge.md`, runbook **(a) Relink a tombstoned user**, is the only path. Uncomment its `is_active = true` line to reactivate, and keep the `deleted_at IS NULL` guard. Apply the same rules: get written confirmation from the company's verified owner (an existing admin cannot authorize an owner/admin restore), never let the person being restored approve their own change, and record who approved it in the ticket.
+4. Re-run the query in step 1 and confirm one row now has `is_active = true AND deleted_at IS NULL`. Then close the alert.
 
 ## Not done in repo (needs Shaun / credentials / vendor decision)
 

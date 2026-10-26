@@ -1,58 +1,9 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useRef, useState } from "react";
+import { Suspense } from "react";
 
+import { VerifyEmailContent } from "@/src/components/auth/VerifyEmailContent";
 import { BrandMark } from "@/src/components/layout/BrandMark";
-import { api } from "@/src/lib/api";
-import type { AuthResponse } from "@/src/lib/auth";
-import {
-  VERIFY_EMAIL_INVALID_MESSAGE,
-  verifyEmailAndSignIn,
-} from "@/src/lib/verify-email";
-import { useAuthStore } from "@/src/stores/auth.store";
-
-function VerifyEmailContent() {
-  const router = useRouter();
-  const token = useSearchParams().get("token");
-  const setAuth = useAuthStore((state) => state.setAuth);
-  const [status, setStatus] = useState<"verifying" | "invalid">("verifying");
-  const started = useRef(false);
-
-  useEffect(() => {
-    if (started.current) return;
-    started.current = true;
-    void verifyEmailAndSignIn(token, {
-      post: (path, body) => api.post<AuthResponse>(path, body),
-      setAuth,
-      redirect: (path) => router.replace(path),
-    }).then((result) => {
-      if (result.status === "invalid") setStatus("invalid");
-    });
-  }, [token, setAuth, router]);
-
-  return status === "invalid" ? (
-    <div className="space-y-6">
-      <div
-        role="alert"
-        className="rounded-2xl border border-error/15 bg-error-light px-4 py-3 text-sm text-error"
-      >
-        {VERIFY_EMAIL_INVALID_MESSAGE}
-      </div>
-      <Link
-        href="/login"
-        className="font-semibold text-brand-accent hover:text-brand-primary"
-      >
-        Go to sign in →
-      </Link>
-    </div>
-  ) : (
-    <p role="status" className="text-base text-neutral-500">
-      Verifying your email…
-    </p>
-  );
-}
 
 export default function VerifyEmailPage() {
   return (
@@ -85,7 +36,7 @@ export default function VerifyEmailPage() {
           <Suspense
             fallback={
               <p className="text-base text-neutral-500">
-                Verifying your email…
+                Loading…
               </p>
             }
           >

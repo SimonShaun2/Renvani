@@ -117,4 +117,33 @@ describe("clerk-tenant.service", () => {
       })
     ).rejects.toMatchObject({ code: ErrorCode.UNAUTHORIZED });
   });
+
+  it("resolveStaffUserForClerkSession fails closed when the verified email is missing (no first-user fallback)", async () => {
+    const company = fakeDb.seedCompany({ name: "Acme", slug: "acme-noemail" });
+    fakeDb.seedUser({ companyId: company.id, email: "owner@acme.com", firstName: "O", lastName: "W", role: "owner" });
+    fakeDb.seedUser({ companyId: company.id, email: "tech@acme.com", firstName: "T", lastName: "C", role: "technician" });
+    await expect(
+      clerkTenantService.resolveStaffUserForClerkSession(company.id, {
+        clerkUserId: "user_clerk",
+        clerkOrganizationId: "org_acme",
+        role: null,
+        email: null
+      })
+    ).rejects.toMatchObject({ code: ErrorCode.UNAUTHORIZED });
+  });
+
+  it("resolveStaffUserForClerkSession fails closed when the email matches no staff user in the company", async () => {
+    const company = fakeDb.seedCompany({ name: "Acme", slug: "acme-unmatched" });
+    fakeDb.seedUser({ companyId: company.id, email: "owner@acme.com", firstName: "O", lastName: "W", role: "owner" });
+    const other = fakeDb.seedCompany({ name: "Other", slug: "other-unmatched" });
+    fakeDb.seedUser({ companyId: other.id, email: "stranger@acme.com", firstName: "S", lastName: "X", role: "owner" });
+    await expect(
+      clerkTenantService.resolveStaffUserForClerkSession(company.id, {
+        clerkUserId: "user_clerk",
+        clerkOrganizationId: "org_acme",
+        role: null,
+        email: "stranger@acme.com"
+      })
+    ).rejects.toMatchObject({ code: ErrorCode.UNAUTHORIZED });
+  });
 });

@@ -20,9 +20,11 @@ describe("clerk-auth config", () => {
   });
 
   it("reads only valid role claims", () => {
-    expect(CLERK_ROLE_CLAIM).toBe("renvani_role");
-    expect(extractClerkRoleClaim({ renvani_role: "dispatcher" })).toBe("dispatcher");
-    expect(extractClerkRoleClaim({ renvani_role: "superuser" })).toBeNull();
+    expect(CLERK_ROLE_CLAIM).toBe("metadata.role");
+    expect(extractClerkRoleClaim({ metadata: { role: "dispatcher" } })).toBe("dispatcher");
+    expect(extractClerkRoleClaim({ metadata: { role: "superuser" } })).toBeNull();
+    expect(extractClerkRoleClaim({ renvani_role: "owner" })).toBeNull();
+    expect(extractClerkRoleClaim({ unsafe_metadata: { role: "owner" } })).toBeNull();
     expect(extractClerkRoleClaim({})).toBeNull();
   });
 });

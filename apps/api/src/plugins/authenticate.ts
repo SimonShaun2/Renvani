@@ -35,7 +35,7 @@ declare module "fastify" {
     user: AuthenticatedRequestUser;
     company: AuthenticatedRequestCompany;
     authProvider?: "jwt" | "clerk";
-    /** Role claim from the Clerk session token (`renvani_role`); null for legacy JWT or when absent. */
+    /** Role claim from the Clerk session token (`metadata.role`); null for legacy JWT or when absent. */
     sessionRole: UserRole | null;
   }
 }

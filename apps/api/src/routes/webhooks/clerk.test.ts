@@ -8,7 +8,7 @@ vi.mock("../../services/clerk-provisioning.service.js", () => ({
   provisionClerkOrganization,
   provisionClerkMembership
 }));
-vi.mock("@fsm/config", () => ({ env: { CLERK_WEBHOOK_SECRET: "" } }));
+vi.mock("@fsm/config", () => ({ env: { CLERK_WEBHOOK_SECRET: "", NODE_ENV: "test" } }));
 
 const SECRET = `whsec_${Buffer.from("test-secret-0123456789").toString("base64")}`;
 
@@ -20,16 +20,20 @@ async function buildApp() {
   return app;
 }
 
-async function send(body: unknown, opts: { secret?: string; timestamp?: number } = {}) {
+let msgCounter = 0;
+
+async function send(body: unknown, opts: { secret?: string; timestamp?: number; id?: string } = {}) {
+  msgCounter += 1;
+  const id = opts.id ?? `msg_${msgCounter}`;
   const { signSvixPayload } = await import("../../lib/svix-verify.js");
   const payload = JSON.stringify(body);
   const ts = String(opts.timestamp ?? Math.floor(Date.now() / 1000));
-  const sig = signSvixPayload(opts.secret ?? SECRET, "msg_1", ts, payload);
+  const sig = signSvixPayload(opts.secret ?? SECRET, id, ts, payload);
   const app = await buildApp();
   const res = await app.inject({
     method: "POST",
     url: "/api/v1/webhooks/clerk",
-    headers: { "content-type": "application/json", "svix-id": "msg_1", "svix-timestamp": ts, "svix-signature": `v1,${sig}` },
+    headers: { "content-type": "application/json", "svix-id": id, "svix-timestamp": ts, "svix-signature": `v1,${sig}` },
     payload
   });
   await app.close();
@@ -41,6 +45,16 @@ describe("Clerk webhook", () => {
     process.env.CLERK_WEBHOOK_SECRET = SECRET;
     provisionClerkOrganization.mockReset().mockResolvedValue({ id: "co_1" });
     provisionClerkMembership.mockReset().mockResolvedValue({ status: "created", companyId: "co_1" });
+  });
+
+  it("dedupes replays of the same svix-id", async () => {
+    const body = { type: "organization.created", data: { id: "org_r", name: "Acme" } };
+    const first = await send(body, { id: "msg_replay" });
+    const second = await send(body, { id: "msg_replay" });
+    expect(first.statusCode).toBe(200);
+    expect(second.statusCode).toBe(200);
+    expect(second.json()).toMatchObject({ duplicate: true });
+    expect(provisionClerkOrganization).toHaveBeenCalledTimes(1);
   });
 
   it("rejects a bad signature", async () => {

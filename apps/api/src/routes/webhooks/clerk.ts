@@ -1,8 +1,9 @@
-import type { FastifyPluginAsync } from "fastify";
+import type { FastifyPluginAsync, FastifyReply } from "fastify";
 
 import { env } from "@fsm/config";
 
 import { verifySvixSignature } from "../../lib/svix-verify.js";
+import { claimWebhookMessageId, releaseWebhookMessageId } from "../../lib/webhook-dedupe.js";
 import {
   provisionClerkMembership,
   provisionClerkOrganization
@@ -51,34 +52,47 @@ const clerkWebhookRoutes: FastifyPluginAsync = async (fastify) => {
       return reply.status(400).send({ error: "INVALID_PAYLOAD", message: "Invalid JSON" });
     }
 
-    const data = event.data ?? {};
-
-    if (event.type === "organization.created") {
-      const company = await provisionClerkOrganization({ organizationId: str(data.id), name: str(data.name) });
-      return reply.send({ received: true, companyId: company.id });
+    const svixId = header("svix-id") ?? "";
+    if (!(await claimWebhookMessageId("clerk", svixId))) {
+      return reply.send({ received: true, duplicate: true });
     }
-
-    if (event.type === "organizationMembership.created") {
-      const organization = (data.organization ?? {}) as Record<string, unknown>;
-      const member = (data.public_user_data ?? {}) as Record<string, unknown>;
-      const email = str(member.identifier);
-      if (!str(organization.id) || !email) {
-        return reply.status(400).send({ error: "INVALID_PAYLOAD", message: "Missing organization or email" });
-      }
-      const result = await provisionClerkMembership({
-        organizationId: str(organization.id),
-        name: str(organization.name),
-        email,
-        firstName: str(member.first_name),
-        lastName: str(member.last_name),
-        clerkOrgRole: str(data.role) || null
-      });
-      return reply.send({ received: true, ...result });
+    try {
+      return await handleEvent(event, reply);
+    } catch (error) {
+      await releaseWebhookMessageId("clerk", svixId);
+      throw error;
     }
-
-    // user.created carries no organization; the owner is provisioned on organizationMembership.created.
-    return reply.send({ received: true, ignored: event.type ?? "unknown" });
   });
 };
+
+async function handleEvent(event: ClerkWebhookEvent, reply: FastifyReply) {
+  const data = event.data ?? {};
+
+  if (event.type === "organization.created") {
+    const company = await provisionClerkOrganization({ organizationId: str(data.id), name: str(data.name) });
+    return reply.send({ received: true, companyId: company.id });
+  }
+
+  if (event.type === "organizationMembership.created") {
+    const organization = (data.organization ?? {}) as Record<string, unknown>;
+    const member = (data.public_user_data ?? {}) as Record<string, unknown>;
+    const email = str(member.identifier);
+    if (!str(organization.id) || !email) {
+      return reply.status(400).send({ error: "INVALID_PAYLOAD", message: "Missing organization or email" });
+    }
+    const result = await provisionClerkMembership({
+      organizationId: str(organization.id),
+      name: str(organization.name),
+      email,
+      firstName: str(member.first_name),
+      lastName: str(member.last_name),
+      clerkOrgRole: str(data.role) || null
+    });
+    return reply.send({ received: true, ...result });
+  }
+
+  // user.created carries no organization; the owner is provisioned on organizationMembership.created.
+  return reply.send({ received: true, ignored: event.type ?? "unknown" });
+}
 
 export default clerkWebhookRoutes;

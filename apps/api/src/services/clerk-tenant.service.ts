@@ -103,6 +103,11 @@ export async function resolveStaffUserForClerkSession(
   if (!user || !user.isActive || (user.clerkUserId != null && user.clerkUserId !== clerkUserId)) {
     rejectClerkSession();
   }
+  if (user.clerkUnlinkedAt) {
+    // FS-160b: unlinked by Clerk user.deleted; only an explicit admin relink may attach a Clerk identity again.
+    logger.warn({ userId: user.id, companyId }, "Clerk session email matches a tombstoned user; not auto-linking");
+    rejectClerkSession();
+  }
 
   // Conditional backfill: only claims an unlinked row (a concurrent link to another id wins and we reject).
   let updated: NonNullable<UserRow> | undefined;
@@ -110,7 +115,14 @@ export async function resolveStaffUserForClerkSession(
     [updated] = await db
       .update(users)
       .set({ clerkUserId, updatedAt: new Date() })
-      .where(and(eq(users.id, user.id), eq(users.companyId, companyId), isNull(users.clerkUserId)))
+      .where(
+        and(
+          eq(users.id, user.id),
+          eq(users.companyId, companyId),
+          isNull(users.clerkUserId),
+          isNull(users.clerkUnlinkedAt)
+        )
+      )
       .returning();
   } catch {
     // e.g. unique violation: this Clerk id was concurrently linked to another user.

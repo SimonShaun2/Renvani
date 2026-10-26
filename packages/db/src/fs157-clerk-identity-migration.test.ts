@@ -14,9 +14,9 @@ describe("FS-157 clerk identity migration", () => {
     const journal = JSON.parse(readFileSync(join(packageRoot, "migrations", "meta", "_journal.json"), "utf8")) as {
       entries: Array<{ idx: number; tag: string }>;
     };
-    const last = journal.entries.at(-1);
-    expect(last).toMatchObject({ idx: 38, tag: TAG });
-    expect(journal.entries.at(-2)?.tag).toBe("0037_user_email_verification");
+    const entry = journal.entries.find((e) => e.tag === TAG);
+    expect(entry).toMatchObject({ idx: 38, tag: TAG });
+    expect(journal.entries[journal.entries.indexOf(entry!) - 1]?.tag).toBe("0037_user_email_verification");
     expect(validateRepoMigrationBundle(packageRoot).ok).toBe(true);
   });
 

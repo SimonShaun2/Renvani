@@ -42,6 +42,31 @@ export function readVerifiedPrimaryEmail(data: Record<string, unknown>): string 
   return email || null;
 }
 
+const ADMIN_ROLES = ["owner", "admin"] as const;
+
+/**
+ * FS-160b: after deactivating `user`, alert (never block) if no other active, non-deleted owner/admin remains.
+ */
+async function alertIfLastOwnerDeactivated(tx: Tx, user: { id: string; companyId: string; role: string }): Promise<void> {
+  if (!(ADMIN_ROLES as readonly string[]).includes(user.role)) return;
+  const other = await tx.query.users.findFirst({
+    where: (t, o) =>
+      o.and(
+        o.eq(t.companyId, user.companyId),
+        o.ne(t.id, user.id),
+        o.eq(t.isActive, true),
+        o.isNull(t.deletedAt),
+        o.inArray(t.role, [...ADMIN_ROLES])
+      )
+  });
+  if (!other) {
+    logger.error(
+      { alert: "clerk_last_owner_deactivated", companyId: user.companyId, userId: user.id },
+      "Clerk webhook deactivated the last active owner/admin of a company"
+    );
+  }
+}
+
 async function revokeRefreshTokens(tx: Tx, userId: string): Promise<void> {
   await tx
     .update(refreshTokens)
@@ -87,6 +112,10 @@ export async function syncClerkUserUpdated(input: ClerkUserUpdatedInput): Promis
       // Verified-email linking (restores the path FS-162 disabled for membership payloads).
       const candidate = await tx.query.users.findFirst({ where: (t, o) => o.eq(t.email, email) });
       if (!candidate) return { status: "not_found" as const };
+      if (candidate.clerkUnlinkedAt) {
+        logger.warn({ userId: candidate.id }, "Clerk verified email matches a tombstoned user; not auto-linking");
+        return { status: "skipped" as const };
+      }
       if (candidate.deletedAt || !candidate.isActive || candidate.clerkUserId) {
         logger.warn({ userId: candidate.id }, "Clerk verified email matches a user that cannot be linked; skipped");
         return { status: "skipped" as const };
@@ -95,7 +124,13 @@ export async function syncClerkUserUpdated(input: ClerkUserUpdatedInput): Promis
         .update(users)
         .set({ clerkUserId, updatedAt: new Date() })
         .where(
-          and(eq(users.id, candidate.id), isNull(users.clerkUserId), isNull(users.deletedAt), eq(users.isActive, true))
+          and(
+            eq(users.id, candidate.id),
+            isNull(users.clerkUserId),
+            isNull(users.deletedAt),
+            eq(users.isActive, true),
+            isNull(users.clerkUnlinkedAt)
+          )
         );
       const reread = await tx.query.users.findFirst({ where: (t, o) => o.eq(t.id, candidate.id) });
       if (reread?.clerkUserId !== clerkUserId) {
@@ -124,9 +159,10 @@ export async function deactivateClerkUser(clerkUserId: string): Promise<{ status
     if (!linked) return { status: "not_found" as const };
     await tx
       .update(users)
-      .set({ isActive: false, clerkUserId: null, updatedAt: new Date() })
+      .set({ isActive: false, clerkUserId: null, clerkUnlinkedAt: new Date(), updatedAt: new Date() })
       .where(and(eq(users.id, linked.id), eq(users.clerkUserId, id)));
     await revokeRefreshTokens(tx, linked.id);
+    await alertIfLastOwnerDeactivated(tx, linked);
     logger.info({ userId: linked.id }, "Clerk user deleted; staff user deactivated and unlinked");
     return { status: "deactivated" as const };
   });
@@ -155,11 +191,50 @@ export async function deactivateClerkMembership(
         .set({ isActive: false, updatedAt: new Date() })
         .where(and(eq(users.id, linked.id), eq(users.companyId, company.id)));
       await revokeRefreshTokens(tx, linked.id);
+      await alertIfLastOwnerDeactivated(tx, linked);
       logger.info({ userId: linked.id, companyId: company.id }, "Clerk membership deleted; staff user deactivated");
       return { status: "deactivated" as const };
     });
   } catch (error) {
     if (error instanceof ClerkOrganizationAmbiguousError) return { status: "skipped" };
+    throw error;
+  }
+}
+
+export type AdminRelinkStatus = "relinked" | "not_found" | "conflict";
+
+/**
+ * FS-160b: the ONLY path that re-attaches a Clerk identity to a tombstoned user. Explicit admin action
+ * (no route yet — callers must enforce owner/admin authorization). Same company only; clears the tombstone,
+ * sets clerk_user_id and reactivates. A Clerk id held by another user -> conflict (no change).
+ */
+export async function adminRelinkClerkUser(input: {
+  companyId: string;
+  userId: string;
+  clerkUserId: string;
+}): Promise<{ status: AdminRelinkStatus }> {
+  const clerkUserId = input.clerkUserId.trim();
+  if (!clerkUserId) return { status: "conflict" };
+  try {
+    return await db.transaction(async (tx) => {
+      const target = await tx.query.users.findFirst({
+        where: (t, o) => o.and(o.eq(t.id, input.userId), o.eq(t.companyId, input.companyId), o.isNull(t.deletedAt))
+      });
+      if (!target) return { status: "not_found" as const };
+      const holder = await tx.query.users.findFirst({ where: (t, o) => o.eq(t.clerkUserId, clerkUserId) });
+      if (holder && holder.id !== target.id) {
+        logger.warn({ userId: target.id, companyId: input.companyId }, "Admin relink: Clerk id already linked to another user");
+        return { status: "conflict" as const };
+      }
+      await tx
+        .update(users)
+        .set({ clerkUserId, clerkUnlinkedAt: null, isActive: true, updatedAt: new Date() })
+        .where(and(eq(users.id, target.id), eq(users.companyId, input.companyId), isNull(users.deletedAt)));
+      logger.info({ userId: target.id, companyId: input.companyId }, "Admin relinked Clerk identity; tombstone cleared");
+      return { status: "relinked" as const };
+    });
+  } catch (error) {
+    if (isUniqueViolation(error)) return { status: "conflict" };
     throw error;
   }
 }

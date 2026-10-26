@@ -77,7 +77,7 @@ export async function syncClerkUserUpdated(input: ClerkUserUpdatedInput): Promis
         }
         await tx
           .update(users)
-          .set({ email, emailVerifiedAt: new Date(), updatedAt: new Date() })
+          .set({ email, updatedAt: new Date() })
           .where(and(eq(users.id, linked.id), eq(users.clerkUserId, clerkUserId), isNull(users.deletedAt)));
         return { status: "updated" as const };
       }

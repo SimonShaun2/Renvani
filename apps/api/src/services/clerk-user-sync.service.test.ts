@@ -106,6 +106,8 @@ describe("syncClerkUserUpdated", () => {
     state.users.push(user({ id: "u1", clerkUserId: "ck_1" }));
     expect(await svc.syncClerkUserUpdated({ clerkUserId: "ck_1", verifiedPrimaryEmail: "new@x.com" })).toEqual({ status: "updated" });
     expect(state.users[0]?.email).toBe("new@x.com");
+    // email_verified_at belongs to our own verify-email token flow; Clerk sync must not set it.
+    expect(state.users[0]?.emailVerifiedAt).toBeUndefined();
   });
 
   it("does not change the email when Clerk does not mark it verified", async () => {

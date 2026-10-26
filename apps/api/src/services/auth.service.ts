@@ -136,7 +136,7 @@ async function findCompanyBySlug(slug: string): Promise<CompanyRecord | null> {
   return company ?? null;
 }
 
-async function generateUniqueCompanySlug(companyName: string): Promise<string> {
+export async function generateUniqueCompanySlug(companyName: string): Promise<string> {
   const baseSlug = slugifyCompanyName(companyName);
   let candidate = baseSlug;
 

@@ -1,6 +1,13 @@
 import { describe, expect, it } from "vitest";
 
-import { EMAIL_TEMPLATE_IDS, renderTransactionalEmail, resolveOutboundEmailFromAddress, safeHref } from "./email-templates.js";
+import { escapeHtml } from "./email-layout.js";
+import {
+  EMAIL_TEMPLATE_IDS,
+  type EmailTemplateId,
+  renderTransactionalEmail,
+  resolveOutboundEmailFromAddress,
+  safeHref
+} from "./email-templates.js";
 
 describe("renderTransactionalEmail", () => {
   it("renders booking confirmation with stable template id", () => {
@@ -86,5 +93,61 @@ describe("email template HTML injection", () => {
     expect(html).not.toContain('"onmouseover="');
     expect(safeHref("data:text/html,hi")).toBe("#");
     expect(safeHref("https://app.getrenvani.com/v?token=a&b=1")).toBe("https://app.getrenvani.com/v?token=a&amp;b=1");
+  });
+});
+
+describe("FS-155: every interpolated field is HTML-escaped", () => {
+  const PAYLOADS = ["<script>alert(1)</script>", '"><img src=x onerror=alert(1)>', "Tom & Jerry <b>"];
+  const T = EMAIL_TEMPLATE_IDS;
+  const FIELDS: Array<[EmailTemplateId, string[]]> = [
+    [T.verifyEmail, ["firstName"]],
+    [T.signupAttempt, ["firstName"]],
+    [T.passwordReset, ["firstName"]],
+    [T.estimateSent, ["firstName", "companyName", "estimateNumber", "title", "expiresAtLabel", "total"]],
+    [T.invoiceSent, ["firstName", "companyName", "invoiceNumber", "dueAtLabel", "total"]],
+    [T.invoiceReminder, ["firstName", "invoiceNumber", "total", "balanceDue", "dueAtLabel"]],
+    [T.invoiceReminderOwnerAlert, ["ownerFirstName", "customerName", "invoiceNumber", "balanceDue", "companyName"]],
+    [T.serviceAgreementRenewal, ["firstName", "planName", "nextServiceDateLabel", "companyName"]],
+    [T.serviceAgreementPaymentFailed, ["ownerFirstName", "customerName", "planName", "amount", "companyName"]],
+    [T.campaignMessage, ["firstName", "body", "companyName"]],
+    [T.bookingConfirmation, ["firstName", "companyName", "referenceNumber", "scheduledLabel"]],
+    [T.bookingDecline, ["firstName", "companyName", "referenceNumber", "reason"]],
+    [T.vipMembershipWelcome, ["firstName", "planName", "companyName"]],
+    [T.vipMembershipRenewal, ["firstName", "planName", "companyName", "renewalDateLabel", "amount"]],
+    [T.vipMembershipPaymentFailed, ["firstName", "planName", "companyName", "amount", "graceEndsAtLabel", "nextRetryAtLabel"]]
+  ];
+
+  for (const [templateId, fields] of FIELDS) {
+    for (const field of fields) {
+      it(`${templateId}.${field}`, () => {
+        for (const payload of PAYLOADS) {
+          const { html, text } = renderTransactionalEmail(templateId, { [field]: payload, dunningStepIndex: "0" });
+          expect(html).not.toContain(payload);
+          expect(html).toContain(escapeHtml(payload));
+          expect(html).not.toMatch(/<script|<img src=x/i);
+          expect(text).toContain(payload);
+        }
+      });
+    }
+  }
+
+  it("campaign body keeps line breaks as <br /> after escaping", () => {
+    const { html } = renderTransactionalEmail(T.campaignMessage, { body: "Line 1 <b>\nLine 2" });
+    expect(html).toContain("Line 1 &lt;b&gt;<br />Line 2");
+  });
+
+  it("URL fields go through the http(s) allow-list", () => {
+    const urls: Array<[EmailTemplateId, string]> = [
+      [T.estimateSent, "approvalUrl"],
+      [T.invoiceSent, "paymentLinkUrl"],
+      [T.serviceAgreementPaymentFailed, "manageUrl"],
+      [T.vipMembershipWelcome, "portalUrl"],
+      [T.vipMembershipPaymentFailed, "paymentUrl"]
+    ];
+    for (const [templateId, field] of urls) {
+      const { html } = renderTransactionalEmail(templateId, { [field]: 'javascript:alert(1)//"><script>' });
+      expect(html).not.toContain("javascript:");
+      expect(html).not.toContain("<script>");
+    }
   });
 });

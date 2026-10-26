@@ -104,7 +104,7 @@ export async function resolveStaffUserForClerkSession(
     rejectClerkSession();
   }
   if (user.clerkUnlinkedAt) {
-    // FS-160b: unlinked by Clerk user.deleted; only an explicit admin relink may attach a Clerk identity again.
+    // FS-160b: unlinked by Clerk user.deleted; re-attaching is a manual DB step until FS-165 (admin relink route).
     logger.warn({ userId: user.id, companyId }, "Clerk session email matches a tombstoned user; not auto-linking");
     rejectClerkSession();
   }

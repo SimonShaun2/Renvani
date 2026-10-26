@@ -1,4 +1,4 @@
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, isNull, sql } from "drizzle-orm";
 import pino from "pino";
 
 import { db, refreshTokens, users } from "@fsm/db";
@@ -157,12 +157,20 @@ export async function deactivateClerkUser(clerkUserId: string): Promise<{ status
   return db.transaction(async (tx) => {
     const linked = await tx.query.users.findFirst({ where: (t, o) => o.eq(t.clerkUserId, id) });
     if (!linked) return { status: "not_found" as const };
+    const wasActive = linked.isActive;
     await tx
       .update(users)
-      .set({ isActive: false, clerkUserId: null, clerkUnlinkedAt: new Date(), updatedAt: new Date() })
+      // Tombstone keeps the first unlink time if one is already recorded.
+      .set({
+        isActive: false,
+        clerkUserId: null,
+        clerkUnlinkedAt: sql`coalesce(${users.clerkUnlinkedAt}, now())`,
+        updatedAt: new Date()
+      })
       .where(and(eq(users.id, linked.id), eq(users.clerkUserId, id)));
     await revokeRefreshTokens(tx, linked.id);
-    await alertIfLastOwnerDeactivated(tx, linked);
+    // Same as the membership path: only alert when this event actually deactivated an active user.
+    if (wasActive) await alertIfLastOwnerDeactivated(tx, linked);
     logger.info({ userId: linked.id }, "Clerk user deleted; staff user deactivated and unlinked");
     return { status: "deactivated" as const };
   });
@@ -197,44 +205,6 @@ export async function deactivateClerkMembership(
     });
   } catch (error) {
     if (error instanceof ClerkOrganizationAmbiguousError) return { status: "skipped" };
-    throw error;
-  }
-}
-
-export type AdminRelinkStatus = "relinked" | "not_found" | "conflict";
-
-/**
- * FS-160b: the ONLY path that re-attaches a Clerk identity to a tombstoned user. Explicit admin action
- * (no route yet — callers must enforce owner/admin authorization). Same company only; clears the tombstone,
- * sets clerk_user_id and reactivates. A Clerk id held by another user -> conflict (no change).
- */
-export async function adminRelinkClerkUser(input: {
-  companyId: string;
-  userId: string;
-  clerkUserId: string;
-}): Promise<{ status: AdminRelinkStatus }> {
-  const clerkUserId = input.clerkUserId.trim();
-  if (!clerkUserId) return { status: "conflict" };
-  try {
-    return await db.transaction(async (tx) => {
-      const target = await tx.query.users.findFirst({
-        where: (t, o) => o.and(o.eq(t.id, input.userId), o.eq(t.companyId, input.companyId), o.isNull(t.deletedAt))
-      });
-      if (!target) return { status: "not_found" as const };
-      const holder = await tx.query.users.findFirst({ where: (t, o) => o.eq(t.clerkUserId, clerkUserId) });
-      if (holder && holder.id !== target.id) {
-        logger.warn({ userId: target.id, companyId: input.companyId }, "Admin relink: Clerk id already linked to another user");
-        return { status: "conflict" as const };
-      }
-      await tx
-        .update(users)
-        .set({ clerkUserId, clerkUnlinkedAt: null, isActive: true, updatedAt: new Date() })
-        .where(and(eq(users.id, target.id), eq(users.companyId, input.companyId), isNull(users.deletedAt)));
-      logger.info({ userId: target.id, companyId: input.companyId }, "Admin relinked Clerk identity; tombstone cleared");
-      return { status: "relinked" as const };
-    });
-  } catch (error) {
-    if (isUniqueViolation(error)) return { status: "conflict" };
     throw error;
   }
 }

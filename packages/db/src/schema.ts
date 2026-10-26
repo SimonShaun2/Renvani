@@ -538,7 +538,7 @@ export const users = pgTable("users", {
   // FS-157: stable Clerk user id (`sub`); logins map by this first. Nullable until linked/backfilled.
   clerkUserId: varchar("clerk_user_id", { length: 255 }),
   // FS-160b: tombstone set by Clerk user.deleted. A tombstoned user is never auto-linked (verified email /
-  // membership webhook / first-login fallback); only an explicit admin relink clears it.
+  // membership webhook / first-login fallback); clearing it is a manual DB step until FS-165.
   clerkUnlinkedAt: timestamp("clerk_unlinked_at", { withTimezone: true }),
   // If this user is also a technician
   technicianId: uuid("technician_id"),

@@ -28,6 +28,7 @@ function matches(row: Row, c: Cond): boolean {
 }
 
 vi.mock("drizzle-orm", () => ({
+  sql: () => ({ op: "coalesceNow" }),
   eq: (field: string, value: unknown) => ({ op: "eq", field, value }),
   isNull: (field: string) => ({ op: "isNull", field }),
   and: (...parts: unknown[]) => ({ op: "and", parts })
@@ -68,7 +69,11 @@ vi.mock("@fsm/db", () => {
           if (table.__name === "users" && state.raceOnLink && "clerkUserId" in values) {
             for (const r of rows.filter((row) => matches(row, cond))) r.clerkUserId = state.raceOnLink;
           }
-          for (const r of rows.filter((row) => matches(row, cond))) Object.assign(r, values);
+          for (const r of rows.filter((row) => matches(row, cond))) {
+            for (const [k, v] of Object.entries(values)) {
+              r[k] = v && typeof v === "object" && (v as { op?: string }).op === "coalesceNow" ? (r[k] ?? new Date()) : v;
+            }
+          }
         }
       })
     }),
@@ -232,23 +237,23 @@ describe("FS-160b tombstone", () => {
     expect(JSON.stringify(log.warn.mock.calls)).not.toContain("u1@x.com");
   });
 
-  it("adminRelinkClerkUser is the explicit path: clears the tombstone, relinks and reactivates (same company only)", async () => {
-    state.users.push(user({ id: "u1", clerkUserId: "ck_1" }));
-    await svc.deactivateClerkUser("ck_1");
-    expect(await svc.adminRelinkClerkUser({ companyId: "co_2", userId: "u1", clerkUserId: "ck_new" })).toEqual({ status: "not_found" });
-    expect(await svc.adminRelinkClerkUser({ companyId: "co_1", userId: "u1", clerkUserId: "ck_new" })).toEqual({ status: "relinked" });
-    expect(state.users[0]).toMatchObject({ clerkUserId: "ck_new", clerkUnlinkedAt: null, isActive: true });
-    expect(await svc.adminRelinkClerkUser({ companyId: "co_1", userId: "u1", clerkUserId: "ck_new" })).toEqual({ status: "relinked" });
-  });
-
-  it("adminRelinkClerkUser refuses a Clerk id held by another user", async () => {
-    state.users.push(user({ id: "u1", clerkUnlinkedAt: new Date() }), user({ id: "u2", clerkUserId: "ck_taken" }));
-    expect(await svc.adminRelinkClerkUser({ companyId: "co_1", userId: "u1", clerkUserId: "ck_taken" })).toEqual({ status: "conflict" });
-    expect(state.users[0]?.clerkUnlinkedAt).toBeInstanceOf(Date);
-  });
 });
 
 describe("FS-160b last-owner alert", () => {
+  it("user.deleted of an already-inactive last owner does not alert (matches membership path)", async () => {
+    state.users.push(user({ id: "u1", clerkUserId: "ck_1", role: "owner", isActive: false }));
+    expect(await svc.deactivateClerkUser("ck_1")).toEqual({ status: "deactivated" });
+    expect(state.users[0]).toMatchObject({ clerkUserId: null, isActive: false });
+    expect(lastOwnerAlerts()).toHaveLength(0);
+  });
+
+  it("user.deleted preserves an existing tombstone timestamp (coalesce)", async () => {
+    const earlier = new Date("2026-01-01T00:00:00Z");
+    state.users.push(user({ id: "u1", clerkUserId: "ck_1", clerkUnlinkedAt: earlier }));
+    await svc.deactivateClerkUser("ck_1");
+    expect(state.users[0]?.clerkUnlinkedAt).toBe(earlier);
+  });
+
   it("user.deleted alerts when the last active owner is deactivated (ids only) and still deactivates", async () => {
     state.users.push(user({ id: "u1", clerkUserId: "ck_1", role: "owner" }), user({ id: "u2", role: "office" }));
     expect(await svc.deactivateClerkUser("ck_1")).toEqual({ status: "deactivated" });

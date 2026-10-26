@@ -103,6 +103,26 @@ async function apiFetch<TResponse>(path: string, options: RequestInit = {}): Pro
   return (await response.json()) as TResponse;
 }
 
+/**
+ * POST for unauthenticated, token-in-body endpoints (e.g. /auth/verify-email).
+ * Sends NO bearer token (neither Clerk nor legacy) and does NOT run the 401 session handler,
+ * so an invalid/expired link surfaces as an ApiError instead of logging the user out.
+ */
+export async function publicPost<TResponse>(path: string, body: unknown): Promise<TResponse> {
+  const response = await fetch(`${API_BASE}${path}`, {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body)
+  });
+
+  if (!response.ok) {
+    throw new ApiError(response.status, await parseError(response));
+  }
+
+  return (await response.json()) as TResponse;
+}
+
 export const api = {
   get: <TResponse>(path: string) => apiFetch<TResponse>(path),
   post: <TResponse>(path: string, body: unknown) =>

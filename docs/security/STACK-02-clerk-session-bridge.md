@@ -113,12 +113,12 @@ Endpoint: `POST /api/v1/webhooks/clerk` (Svix-signed with `CLERK_WEBHOOK_SECRET`
 | --- | --- |
 | `user.created` | Acknowledged and ignored (no organization yet; the owner is provisioned on membership). |
 | `user.updated` | `syncClerkUserUpdated`: syncs the verified primary email to the user linked by `clerk_user_id`. If no user is linked, it links an active, unlinked, non-deleted user whose email equals the verified primary email. Tombstoned users (`clerk_unlinked_at` set) are skipped with a warning. |
-| `user.deleted` | `deactivateClerkUser`: `is_active = false`, `clerk_user_id = NULL`, tombstone `clerk_unlinked_at = COALESCE(clerk_unlinked_at, now())`. Logs `clerk_last_owner_deactivated` only if the user was active before the event and no other active, non-deleted owner/admin remains in the company. |
+| `user.deleted` | `deactivateClerkUser`: `is_active = false`, `clerk_user_id = NULL`, tombstone `clerk_unlinked_at = COALESCE(clerk_unlinked_at, now())`, and revokes the user's refresh tokens. Logs `clerk_last_owner_deactivated` only if the user was active before the event and no other active, non-deleted owner/admin remains in the company. |
 | `organization.created` | `provisionClerkOrganization`: creates the company. |
 | `organization.updated`, `organization.deleted` | Currently acknowledged and ignored; subscribe so future handlers need no Clerk change. |
 | `organizationMembership.created` | `provisionClerkMembership`: creates or links the staff user (never links by email, since the payload has no verification proof). |
 | `organizationMembership.updated` | Currently acknowledged and ignored. |
-| `organizationMembership.deleted` | `deactivateClerkMembership`: deactivates the member in that company. |
+| `organizationMembership.deleted` | `deactivateClerkMembership`: for the linked, non-deleted user in that org's company, sets `is_active = false` (keeps `clerk_user_id`, no tombstone) and revokes refresh tokens. Logs `clerk_last_owner_deactivated` under the same rule as `user.deleted`. If the org is ambiguous, returns `skipped`. To restore access, see runbook (c). |
 
 ## Runbook
 
@@ -141,11 +141,11 @@ Content-Type: application/json
 - It sets `clerk_user_id` and clears `clerk_unlinked_at` in one tenant-aware transaction. **Active status is unchanged** unless the body sends `"reactivate": true`, which is the only way this route reactivates a user.
 - If another user (any company) holds the Clerk id, or a 23505 race fires → **409**, nothing changes. The UPDATE also requires `clerk_user_id` to still equal the value read in the transaction (null-safe); a concurrent change → **409**.
 - If the target is already linked to a **different** Clerk id → **409** unless `confirmOverwrite: true`. The overwrite then **revokes the user's refresh tokens** and is logged at warn with old → new ids. A plain tombstone relink revokes nothing.
-- Repeating with the same id on an untombstoned user (and no reactivation needed) returns `{"status": "unchanged"}`.
+- Repeating with the same id on an untombstoned user (and no reactivation needed) returns `200 {"status": "unchanged", "overwrotePreviousClerkId": false}`. Any change returns `200 {"status": "relinked", "overwrotePreviousClerkId": <bool>}`. The response has only these two fields: whether the user was reactivated or the tombstone was cleared shows only in the audit log line.
 - `clerkUserId` must match `^user_[A-Za-z0-9]+$` (max 255).
-- Audit: a structured log line `audit: "clerk_user_relinked"` with `companyId`, `actorUserId`, `targetUserId`, `newClerkUserId` (plus `previousClerkUserId` on overwrite), `tombstoneCleared`, `reactivated`, plus `refreshTokensRevoked` on overwrite. Ids only, no emails. The manual SQL below must follow the same role rules: the requester must be an owner for owner/admin targets, and must not be the target.
+- Audit: a structured log line `audit: "clerk_user_relinked"` with `companyId`, `actorUserId`, `targetUserId`, `newClerkUserId`, `tombstoneCleared`, `reactivated`, `overwrotePreviousClerkId`, plus `previousClerkUserId` and `refreshTokensRevoked: true` on overwrite (logged at warn; otherwise info). No line is written for `unchanged`. Ids only, no emails. The manual SQL below must follow the same role rules: the requester must be an owner for owner/admin targets, and must not be the target.
 
-**Fallback: manual SQL** (only if the route is unavailable):
+**Fallback: manual SQL** (only if the route is unavailable, e.g. no active owner is left to call it for an owner/admin target). This UPDATE matches only tombstoned rows (`clerk_unlinked_at IS NOT NULL`). For a user deactivated by `organizationMembership.deleted` (no tombstone, `clerk_user_id` kept), use (c).
 
 Run it in an interactive `psql` session, passing the ids as variables (do not paste them into shared logs):
 
@@ -212,10 +212,54 @@ The migration does not exclude empty-string org ids. As a diagnostic only, add `
 - Webhook provisioning and membership sync for that org return `skipped`.
 - Other orgs are unaffected.
 
-Alert on `clerk_org_ambiguous` (FS-163).
+Alert on `clerk_org_ambiguous` (FS-163). For the rule spec and response, see [`docs/runbooks/clerk-alerts.md`](../runbooks/clerk-alerts.md).
 
 After resolving duplicates, re-run (verbatim from 0038):
 
 ```sql
 CREATE UNIQUE INDEX IF NOT EXISTS "companies_clerk_organization_id_idx" ON "companies" USING btree (("settings" -> 'clerk' ->> 'organizationId')) WHERE "deleted_at" IS NULL AND ("settings" -> 'clerk' ->> 'organizationId') IS NOT NULL;
 ```
+
+### (c) Reactivate a deactivated, untombstoned user (manual)
+
+Use this for a user deactivated by `organizationMembership.deleted`: `is_active = false`, `clerk_user_id` still set, `clerk_unlinked_at IS NULL`. Section (a)'s UPDATE updates 0 rows for this user.
+
+**Preferred:** the relink route with the user's existing Clerk id and `"reactivate": true` (see (a)).
+
+Use this manual path only when the route can't be used, for example when the last owner was deactivated (`clerk_last_owner_deactivated`) and no other owner can call the route. The rules are the same as the route:
+- Get written confirmation from the company's verified owner. An admin cannot authorize restoring an owner/admin.
+- The person being restored must not approve their own change.
+- Record the approver, who ran it, the target user, and the company on the ticket and in the ops log. The manual path writes no audit line.
+
+Make sure the person is a member of the Clerk org again first. Otherwise they still can't sign in.
+
+```bash
+psql "$DATABASE_URL" \
+  -v ON_ERROR_STOP=1 \
+  -v user_id='<users.id>' \
+  -v company_id='<companies.id>'
+```
+
+```sql
+BEGIN;
+
+-- 1. Inspect the target (expect 1 row: is_active = false, clerk_user_id NOT NULL,
+--    clerk_unlinked_at NULL, deleted_at NULL). A tombstoned row -> ROLLBACK and use (a).
+SELECT id, company_id, role, is_active, clerk_user_id, clerk_unlinked_at, deleted_at
+FROM users WHERE id = :'user_id' AND company_id = :'company_id'
+FOR UPDATE;
+
+-- 2. Reactivate only. clerk_user_id and clerk_unlinked_at are not touched.
+UPDATE users
+SET is_active = true,
+    updated_at = now()
+WHERE id = :'user_id'
+  AND company_id = :'company_id'
+  AND deleted_at IS NULL
+  AND is_active = false;
+-- Expect UPDATE 1.
+```
+
+Finish the transaction **by hand**:
+- Run `COMMIT;` only if step 1 returned exactly 1 row matching the expectation and step 2 reported `UPDATE 1`.
+- Otherwise run `ROLLBACK;`. This includes `UPDATE 0`, or any error, after which the transaction is aborted.

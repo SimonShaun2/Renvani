@@ -1,4 +1,5 @@
 import { and, eq, isNull, sql } from "drizzle-orm";
+import pino from "pino";
 
 import { companies, db, users, type Database } from "@fsm/db";
 import { AppError, ErrorCode } from "@fsm/types";
@@ -8,16 +9,33 @@ import { readClerkOrganizationIdFromSettings } from "../lib/clerk-company-settin
 
 export { readClerkOrganizationIdFromSettings };
 
+const logger = pino({ name: "clerk-tenant" });
+
+/**
+ * More than one live company carries the same Clerk org id (possible when migration 0038 skipped
+ * companies_clerk_organization_id_idx because of pre-existing duplicates). Surfaces to clients as a generic 401.
+ */
+export class ClerkOrganizationAmbiguousError extends AppError {
+  public constructor() {
+    super(ErrorCode.UNAUTHORIZED, "Clerk organization is not linked to a company");
+    this.name = "ClerkOrganizationAmbiguousError";
+  }
+}
+
 type SelectExecutor = Pick<Database, "select">;
 
 type CompanyRow = typeof companies.$inferSelect;
 type UserRow = Awaited<ReturnType<typeof db.query.users.findFirst>>;
 
+/**
+ * Resolve the single live company for a Clerk org id. Fails closed (FS-157 follow-up): if more than one
+ * non-deleted company matches, never pick one arbitrarily — log an alert and throw a generic 401.
+ */
 export async function findCompanyByClerkOrganizationId(
   clerkOrganizationId: string,
   executor: SelectExecutor = db
 ): Promise<CompanyRow | null> {
-  const [company] = await executor
+  const matches = await executor
     .select()
     .from(companies)
     .where(
@@ -26,9 +44,17 @@ export async function findCompanyByClerkOrganizationId(
         sql`${companies.settings} -> 'clerk' ->> 'organizationId' = ${clerkOrganizationId}`
       )
     )
-    .limit(1);
+    .limit(2);
 
-  return company ?? null;
+  if (matches.length > 1) {
+    logger.error(
+      { alert: "clerk_org_ambiguous", clerkOrganizationId, companyIds: matches.map((company) => company.id) },
+      "Multiple live companies share a Clerk organization id; failing closed (resolve duplicates, then create companies_clerk_organization_id_idx)"
+    );
+    throw new ClerkOrganizationAmbiguousError();
+  }
+
+  return matches[0] ?? null;
 }
 
 function rejectClerkSession(): never {

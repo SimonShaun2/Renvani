@@ -1,13 +1,16 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 type Company = { id: string; settings: { clerk: { organizationId: string } } };
-type User = { id?: string; companyId: string; email: string; role: string; clerkUserId?: string | null };
+type User = { id?: string; companyId: string; email: string; role: string; clerkUserId?: string | null; deletedAt?: Date | null };
 
 const state = vi.hoisted(() => ({
   companies: [] as Company[],
   users: [] as User[],
   lockCalls: 0,
-  lockTail: Promise.resolve() as Promise<void>
+  lockTail: Promise.resolve() as Promise<void>,
+  ambiguous: false,
+  failInsertUnique: false,
+  raceOnUpdate: null as string | null
 }));
 
 type Cond = { op: "eq"; field: keyof User; value: unknown } | { op: "isNull"; field: keyof User } | { op: "and"; parts: Cond[] };
@@ -25,16 +28,21 @@ function matches(u: User, c: Cond): boolean {
 
 vi.mock("./auth.service.js", () => ({ generateUniqueCompanySlug: vi.fn(async (name: string) => name.toLowerCase()) }));
 
-vi.mock("./clerk-tenant.service.js", () => ({
-  findCompanyByClerkOrganizationId: vi.fn(async (orgId: string) => {
-    await new Promise((resolve) => setImmediate(resolve)); // widen the race window
-    return state.companies.find((c) => c.settings.clerk.organizationId === orgId) ?? null;
-  })
-}));
+vi.mock("./clerk-tenant.service.js", () => {
+  class ClerkOrganizationAmbiguousError extends Error {}
+  return {
+    ClerkOrganizationAmbiguousError,
+    findCompanyByClerkOrganizationId: vi.fn(async (orgId: string) => {
+      await new Promise((resolve) => setImmediate(resolve)); // widen the race window
+      if (state.ambiguous) throw new ClerkOrganizationAmbiguousError("ambiguous");
+      return state.companies.find((c) => c.settings.clerk.organizationId === orgId) ?? null;
+    })
+  };
+});
 
 vi.mock("@fsm/db", () => {
   const companiesTable = { name: "companies" };
-  const usersTable = { name: "users", id: "id", clerkUserId: "clerkUserId", email: "email", companyId: "companyId" };
+  const usersTable = { name: "users", id: "id", clerkUserId: "clerkUserId", email: "email", companyId: "companyId", deletedAt: "deletedAt" };
   const makeTx = (onLock: (release: Promise<void>) => void, release: Promise<void>) => ({
     execute: vi.fn(async () => {
       state.lockCalls += 1;
@@ -47,6 +55,9 @@ vi.mock("@fsm/db", () => {
           state.companies.push(company);
           return { returning: async () => [company] };
         }
+        if (state.failInsertUnique) {
+          return Promise.reject(Object.assign(new Error("duplicate key"), { cause: { code: "23505" } }));
+        }
         state.users.push({ id: `u_${state.users.length + 1}`, clerkUserId: null, ...(values as object) } as User);
         return Promise.resolve();
       }
@@ -54,23 +65,26 @@ vi.mock("@fsm/db", () => {
     update: (_table: unknown) => ({
       set: (values: Partial<User>) => ({
         where: async (cond: Cond) => {
+          if (state.raceOnUpdate) {
+            // A concurrent writer links the row to another Clerk user just before our conditional update.
+            for (const u of state.users.filter((row) => matches(row, cond))) u.clerkUserId = state.raceOnUpdate;
+          }
           for (const u of state.users.filter((row) => matches(row, cond))) Object.assign(u, values);
         }
       })
     }),
     query: {
       users: {
-        findFirst: vi.fn(async (opts: { where: (t: unknown, o: unknown) => unknown }) => {
-          let predicate: (u: User) => boolean = () => false;
-          opts.where(
-            { email: "email", companyId: "companyId", clerkUserId: "clerkUserId" },
+        findFirst: vi.fn(async (opts: { where: (t: unknown, o: unknown) => Cond }) => {
+          const cond = opts.where(
+            { id: "id", email: "email", companyId: "companyId", clerkUserId: "clerkUserId", deletedAt: "deletedAt" },
             {
-              eq: (field: keyof User, value: string) => {
-                predicate = (u) => u[field] === value;
-              }
+              eq: (field: keyof User, value: unknown) => ({ op: "eq", field, value }),
+              isNull: (field: keyof User) => ({ op: "isNull", field }),
+              and: (...parts: Cond[]) => ({ op: "and", parts })
             }
           );
-          return state.users.find(predicate) ?? undefined;
+          return state.users.find((u) => matches(u, cond)) ?? undefined;
         })
       }
     }
@@ -108,15 +122,18 @@ describe("clerk-provisioning race safety", () => {
     state.users = [];
     state.lockCalls = 0;
     state.lockTail = Promise.resolve();
+    state.ambiguous = false;
+    state.failInsertUnique = false;
+    state.raceOnUpdate = null;
   });
 
   it("concurrent organization.created + membership.created create one company and one owner", async () => {
     const { provisionClerkMembership, provisionClerkOrganization } = await import("./clerk-provisioning.service.js");
     await Promise.all([
       provisionClerkOrganization({ organizationId: "org_1", name: "Acme" }),
-      provisionClerkMembership({ organizationId: "org_1", name: "Acme", email: "A@x.com", firstName: "A", lastName: "", clerkOrgRole: "org:admin", clerkUserId: null }),
-      provisionClerkMembership({ organizationId: "org_1", name: "Acme", email: "b@x.com", firstName: "B", lastName: "", clerkOrgRole: "org:admin", clerkUserId: null }),
-      provisionClerkMembership({ organizationId: "org_1", name: "Acme", email: "c@x.com", firstName: "C", lastName: "", clerkOrgRole: "org:member", clerkUserId: null })
+      provisionClerkMembership({ organizationId: "org_1", name: "Acme", email: "A@x.com", firstName: "A", lastName: "", clerkOrgRole: "org:admin", clerkUserId: null, emailVerified: true }),
+      provisionClerkMembership({ organizationId: "org_1", name: "Acme", email: "b@x.com", firstName: "B", lastName: "", clerkOrgRole: "org:admin", clerkUserId: null, emailVerified: true }),
+      provisionClerkMembership({ organizationId: "org_1", name: "Acme", email: "c@x.com", firstName: "C", lastName: "", clerkOrgRole: "org:member", clerkUserId: null, emailVerified: true })
     ]);
     expect(state.companies).toHaveLength(1);
     expect(state.users.filter((u) => u.role === "owner")).toHaveLength(1);
@@ -131,8 +148,11 @@ describe("FS-157 clerk_user_id provisioning", () => {
     state.users = [];
     state.lockCalls = 0;
     state.lockTail = Promise.resolve();
+    state.ambiguous = false;
+    state.failInsertUnique = false;
+    state.raceOnUpdate = null;
   });
-  const base = { organizationId: "org_1", name: "Acme", firstName: "A", lastName: "", clerkOrgRole: "org:admin" };
+  const base = { organizationId: "org_1", name: "Acme", firstName: "A", lastName: "", clerkOrgRole: "org:admin", emailVerified: true };
 
   it("stores clerk_user_id on create and is idempotent on redelivery", async () => {
     const { provisionClerkMembership } = await import("./clerk-provisioning.service.js");
@@ -146,7 +166,7 @@ describe("FS-157 clerk_user_id provisioning", () => {
 
   it("backfills clerk_user_id on an existing same-company user with a null id", async () => {
     const { provisionClerkMembership } = await import("./clerk-provisioning.service.js");
-    await provisionClerkMembership({ ...base, email: "a@x.com", clerkUserId: null });
+    await provisionClerkMembership({ ...base, email: "a@x.com", clerkUserId: null, emailVerified: true });
     expect(state.users[0]?.clerkUserId).toBeNull();
     const res = await provisionClerkMembership({ ...base, email: "a@x.com", clerkUserId: "user_a" });
     expect(res.status).toBe("linked");
@@ -177,5 +197,56 @@ describe("FS-157 clerk_user_id provisioning", () => {
     expect(call?.[0]).toBe("Slug Co");
     expect(call?.[1]).toBeDefined();
     expect(typeof (call?.[1] as { execute?: unknown }).execute).toBe("function");
+  });
+
+  it("does not link an existing user by email when verification is not proven", async () => {
+    const { provisionClerkMembership } = await import("./clerk-provisioning.service.js");
+    await provisionClerkMembership({ ...base, email: "a@x.com", clerkUserId: null });
+    const res = await provisionClerkMembership({ ...base, email: "a@x.com", clerkUserId: "user_a", emailVerified: false });
+    expect(res.status).toBe("skipped");
+    expect(state.users).toHaveLength(1);
+    expect(state.users[0]?.clerkUserId).toBeNull();
+  });
+
+  it("never links or matches a soft-deleted user", async () => {
+    const { provisionClerkMembership } = await import("./clerk-provisioning.service.js");
+    await provisionClerkMembership({ ...base, email: "a@x.com", clerkUserId: null });
+    state.users[0]!.deletedAt = new Date();
+    const res = await provisionClerkMembership({ ...base, email: "a@x.com", clerkUserId: "user_a" });
+    expect(res.status).toBe("skipped");
+    expect(state.users[0]?.clerkUserId).toBeNull();
+
+    state.users[0]!.clerkUserId = "user_gone";
+    const byId = await provisionClerkMembership({ ...base, email: "a@x.com", clerkUserId: "user_gone" });
+    expect(byId.status).not.toBe("exists");
+  });
+
+  it("does not report linked when the link race is lost", async () => {
+    const { provisionClerkMembership } = await import("./clerk-provisioning.service.js");
+    await provisionClerkMembership({ ...base, email: "a@x.com", clerkUserId: null });
+    state.raceOnUpdate = "user_other";
+    const res = await provisionClerkMembership({ ...base, email: "a@x.com", clerkUserId: "user_a" });
+    expect(res.status).toBe("skipped");
+    expect(state.users[0]?.clerkUserId).toBe("user_other");
+  });
+
+  it("returns skipped (no throw) on a unique-constraint violation", async () => {
+    const { provisionClerkMembership } = await import("./clerk-provisioning.service.js");
+    state.failInsertUnique = true;
+    await expect(provisionClerkMembership({ ...base, email: "a@x.com", clerkUserId: "user_a" })).resolves.toEqual({
+      status: "skipped",
+      companyId: null
+    });
+  });
+
+  it("skips (no throw) when the Clerk org id matches more than one company", async () => {
+    const { provisionClerkMembership, provisionClerkOrganization } = await import("./clerk-provisioning.service.js");
+    state.ambiguous = true;
+    await expect(provisionClerkMembership({ ...base, email: "a@x.com", clerkUserId: "user_a" })).resolves.toEqual({
+      status: "skipped",
+      companyId: null
+    });
+    await expect(provisionClerkOrganization({ organizationId: "org_1", name: "Acme" })).resolves.toBeNull();
+    expect(state.users).toHaveLength(0);
   });
 });

@@ -25,6 +25,7 @@ import {
 } from "../lib/tokens.js";
 import { sendSignupAttemptEmail, sendVerifyEmailEmail } from "../lib/email.js";
 import { sendEmailInBackground } from "../lib/outbound-email.js";
+import { checkSignupAttemptNoticeCooldown } from "../lib/public-booking-rate-limit.js";
 
 const EMAIL_VERIFICATION_TTL_MS = 24 * 60 * 60 * 1000;
 
@@ -222,15 +223,17 @@ export async function register(
     // No account enumeration: caller returns the same 202 as a new sign-up.
     // Notify the real owner out-of-band (fire-and-forget, after the response).
     const owner = existingUser;
-    sendEmailInBackground(
-      () =>
-        sendSignupAttemptEmail(owner.email, {
-          firstName: owner.firstName,
-          loginUrl: `${env.APP_URL}/login`,
-          resetUrl: `${env.APP_URL}/forgot-password`
-        }),
-      "auth.signup_attempt"
-    );
+    // Per-recipient cooldown is checked inside the background task so response timing is unaffected.
+    sendEmailInBackground(async () => {
+      if (!(await checkSignupAttemptNoticeCooldown(owner.email))) {
+        return;
+      }
+      await sendSignupAttemptEmail(owner.email, {
+        firstName: owner.firstName,
+        loginUrl: `${env.APP_URL}/login`,
+        resetUrl: `${env.APP_URL}/forgot-password`
+      });
+    }, "auth.signup_attempt");
     // Dummy hash at the same cost so response timing matches the new-email path.
     await hashPassword(input.password, 12);
     return { status: "existing" };

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { EMAIL_TEMPLATE_IDS, renderTransactionalEmail, resolveOutboundEmailFromAddress } from "./email-templates.js";
+import { EMAIL_TEMPLATE_IDS, renderTransactionalEmail, resolveOutboundEmailFromAddress, safeHref } from "./email-templates.js";
 
 describe("renderTransactionalEmail", () => {
   it("renders booking confirmation with stable template id", () => {
@@ -56,5 +56,35 @@ describe("renderTransactionalEmail", () => {
         sendgridFromEmail: "legacy@sendgrid.test"
       })
     ).toBe("hello@renvani.test");
+  });
+});
+
+describe("email template HTML injection", () => {
+  it("escapes attacker-controlled firstName in verify and signup-attempt emails", () => {
+    for (const firstName of ["<script>alert(1)</script>", '"><img src=x onerror=alert(1)>']) {
+      for (const id of [EMAIL_TEMPLATE_IDS.verifyEmail, EMAIL_TEMPLATE_IDS.signupAttempt]) {
+        const { html } = renderTransactionalEmail(id, {
+          firstName,
+          verifyUrl: "https://app.getrenvani.com/verify-email?token=abc",
+          loginUrl: "https://app.getrenvani.com/login",
+          resetUrl: "https://app.getrenvani.com/forgot-password"
+        });
+        expect(html).not.toContain("<script>");
+        expect(html).not.toContain("<img src=x");
+        expect(html).toContain("&lt;");
+      }
+    }
+  });
+
+  it("neutralises non-http(s) hrefs and escapes href attributes", () => {
+    const { html } = renderTransactionalEmail(EMAIL_TEMPLATE_IDS.signupAttempt, {
+      firstName: "Ava",
+      loginUrl: "javascript:alert(1)",
+      resetUrl: 'https://x.test/a"onmouseover="alert(1)'
+    });
+    expect(html).not.toContain("javascript:");
+    expect(html).not.toContain('"onmouseover="');
+    expect(safeHref("data:text/html,hi")).toBe("#");
+    expect(safeHref("https://app.getrenvani.com/v?token=a&b=1")).toBe("https://app.getrenvani.com/v?token=a&amp;b=1");
   });
 });

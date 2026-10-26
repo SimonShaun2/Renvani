@@ -10,6 +10,7 @@ const authLoginTimesByIpEmail = new Map<string, number[]>();
 const authLoginTimesByIp = new Map<string, number[]>();
 const authRefreshTimesByIp = new Map<string, number[]>();
 const authForgotPasswordTimesByIp = new Map<string, number[]>();
+const signupAttemptNoticeTimesByEmail = new Map<string, number[]>();
 
 export const PUBLIC_BOOKING_IP_RATE_LIMIT = 10;
 export const PUBLIC_SLOT_HOLD_REF_RATE_LIMIT = 15;
@@ -19,6 +20,9 @@ export const AUTH_LOGIN_IP_RATE_LIMIT = 30;
 export const AUTH_LOGIN_WINDOW_MS = 15 * 60 * 1000;
 export const AUTH_REFRESH_IP_RATE_LIMIT = 60;
 export const AUTH_FORGOT_PASSWORD_IP_RATE_LIMIT = 5;
+/** At most one "someone tried to sign up with your email" notice per recipient per window. */
+export const AUTH_SIGNUP_ATTEMPT_NOTICE_LIMIT = 1;
+export const AUTH_SIGNUP_ATTEMPT_NOTICE_WINDOW_MS = 60 * 60 * 1000;
 
 function useInMemoryRateLimitStore(): boolean {
   return env.NODE_ENV === "test";
@@ -139,7 +143,19 @@ export async function checkAuthForgotPasswordIpRateLimit(ipAddress: string): Pro
   );
 }
 
+/** Per-recipient cooldown so an attacker cannot flood a victim with signup-attempt notices. */
+export async function checkSignupAttemptNoticeCooldown(email: string): Promise<boolean> {
+  return recordAttempt(
+    signupAttemptNoticeTimesByEmail,
+    "fsm:auth-signup-attempt-notice:rate:email",
+    email.trim().toLowerCase(),
+    AUTH_SIGNUP_ATTEMPT_NOTICE_LIMIT,
+    AUTH_SIGNUP_ATTEMPT_NOTICE_WINDOW_MS
+  );
+}
+
 export function resetPublicBookingRateLimitStateForTests(): void {
+  signupAttemptNoticeTimesByEmail.clear();
   authRegisterTimesByIp.clear();
   authLoginTimesByIpEmail.clear();
   authLoginTimesByIp.clear();

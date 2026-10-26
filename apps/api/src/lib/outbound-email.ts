@@ -1,3 +1,4 @@
+import sgMail from "@sendgrid/mail";
 import pino from "pino";
 
 import {
@@ -16,38 +17,96 @@ const logger = pino({
 export const DEFAULT_EMAIL_FROM = "Renvani <hello@mail.getrenvani.com>";
 
 let cachedChannel: OutboundEmailChannel | null = null;
-let missingKeyLogged = false;
+let fallbackLogged = false;
+let missingProviderLogged = false;
+
+export type EmailProvider = "resend" | "sendgrid" | "none";
+
+export class EmailProviderNotConfiguredError extends Error {
+  constructor() {
+    super("EMAIL_PROVIDER_NOT_CONFIGURED");
+    this.name = "EmailProviderNotConfiguredError";
+  }
+}
+
+/** Resend (RESEND_API_KEY) wins; SendGrid is the fallback; tests never hit a live provider. */
+export function resolveEmailProvider(): EmailProvider {
+  if ((env.RESEND_API_KEY ?? "").trim()) {
+    return "resend";
+  }
+  if (env.NODE_ENV !== "test" && (env.SENDGRID_API_KEY ?? "").trim()) {
+    return "sendgrid";
+  }
+  return "none";
+}
 
 export function getTransactionalEmailFromAddress(): string {
-  const from = (env.EMAIL_FROM ?? "").trim();
+  if (resolveEmailProvider() === "sendgrid") {
+    return env.SENDGRID_FROM_EMAIL;
+  }
+  const from = (env.RESEND_FROM_EMAIL ?? "").trim() || (env.EMAIL_FROM ?? "").trim();
   return from.length > 0 ? from : DEFAULT_EMAIL_FROM;
 }
 
-/** Provider-independent seam: returns the configured email channel, or null when no provider key is set. */
-export function getEmailChannel(): OutboundEmailChannel | null {
-  const apiKey = (env.RESEND_API_KEY ?? "").trim();
-  if (!apiKey) {
-    if (!missingKeyLogged) {
-      missingKeyLogged = true;
-      logger.warn("RESEND_API_KEY is not set; transactional email is disabled (no-op)");
+function createSendGridEmailChannel(): OutboundEmailChannel {
+  sgMail.setApiKey(env.SENDGRID_API_KEY);
+  return {
+    async sendTransactionalEmail(payload: OutboundEmailPayload) {
+      const [response] = await sgMail.send({
+        to: payload.to,
+        from: env.SENDGRID_FROM_EMAIL,
+        subject: payload.subject,
+        html: payload.html,
+        ...(payload.text ? { text: payload.text } : {})
+      });
+      const messageId = response?.headers?.["x-message-id"];
+      return { providerMessageId: typeof messageId === "string" ? messageId : "" };
     }
-    return null;
+  };
+}
+
+/** Provider-independent seam: the configured channel, or null when no provider is configured. */
+export function getEmailChannel(): OutboundEmailChannel | null {
+  if (cachedChannel) {
+    return cachedChannel;
   }
-  cachedChannel ??= createResendEmailChannel({ apiKey, defaultFrom: getTransactionalEmailFromAddress() });
+  const provider = resolveEmailProvider();
+  if (provider === "resend") {
+    cachedChannel = createResendEmailChannel({
+      apiKey: env.RESEND_API_KEY.trim(),
+      defaultFrom: getTransactionalEmailFromAddress()
+    });
+  } else if (provider === "sendgrid") {
+    if (!fallbackLogged) {
+      fallbackLogged = true;
+      logger.warn("RESEND_API_KEY is not set; falling back to SendGrid for transactional email");
+    }
+    cachedChannel = createSendGridEmailChannel();
+  }
   return cachedChannel;
 }
 
 /** Test hook: inject a channel (or reset to env-driven with null). */
 export function setEmailChannelForTests(channel: OutboundEmailChannel | null): void {
   cachedChannel = channel;
-  missingKeyLogged = false;
+  fallbackLogged = false;
+  missingProviderLogged = false;
 }
 
 export async function deliverTransactionalEmail(
   payload: OutboundEmailPayload
 ): Promise<{ providerMessageId: string | null }> {
-  const channel = cachedChannel ?? getEmailChannel();
+  const channel = getEmailChannel();
   if (!channel) {
+    if (env.NODE_ENV === "production") {
+      // Fail loudly: never silently drop password resets etc. in production.
+      logger.error("No email provider configured (RESEND_API_KEY and SENDGRID_API_KEY empty); email not sent");
+      throw new EmailProviderNotConfiguredError();
+    }
+    if (!missingProviderLogged) {
+      missingProviderLogged = true;
+      logger.warn("No email provider configured; transactional email disabled outside production (no-op)");
+    }
     return { providerMessageId: null };
   }
   const result = await channel.sendTransactionalEmail(payload);

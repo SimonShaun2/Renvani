@@ -8,6 +8,12 @@ import {
   provisionClerkMembership,
   provisionClerkOrganization
 } from "../../services/clerk-provisioning.service.js";
+import {
+  deactivateClerkMembership,
+  deactivateClerkUser,
+  readVerifiedPrimaryEmail,
+  syncClerkUserUpdated
+} from "../../services/clerk-user-sync.service.js";
 
 interface ClerkWebhookEvent {
   type?: string;
@@ -102,6 +108,34 @@ async function handleEvent(event: ClerkWebhookEvent, reply: FastifyReply) {
       // organizationMembership payloads carry no email-verification proof: never link existing users by email here.
       emailVerified: false
     });
+    return reply.send({ received: true, ...result });
+  }
+
+  if (event.type === "user.updated") {
+    const clerkUserId = str(data.id);
+    if (!clerkUserId) {
+      return reply.status(400).send({ error: "INVALID_PAYLOAD", message: "Missing user id" });
+    }
+    const result = await syncClerkUserUpdated({ clerkUserId, verifiedPrimaryEmail: readVerifiedPrimaryEmail(data) });
+    return reply.send({ received: true, ...result });
+  }
+
+  if (event.type === "user.deleted") {
+    const clerkUserId = str(data.id);
+    if (!clerkUserId) {
+      return reply.status(400).send({ error: "INVALID_PAYLOAD", message: "Missing user id" });
+    }
+    const result = await deactivateClerkUser(clerkUserId);
+    return reply.send({ received: true, ...result });
+  }
+
+  if (event.type === "organizationMembership.deleted") {
+    const organization = (data.organization ?? {}) as Record<string, unknown>;
+    const member = (data.public_user_data ?? {}) as Record<string, unknown>;
+    if (!str(organization.id) || !str(member.user_id)) {
+      return reply.status(400).send({ error: "INVALID_PAYLOAD", message: "Missing organization or user id" });
+    }
+    const result = await deactivateClerkMembership(str(organization.id), str(member.user_id));
     return reply.send({ received: true, ...result });
   }
 

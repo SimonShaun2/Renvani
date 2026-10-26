@@ -328,16 +328,25 @@ async function signAttachmentMediaReference(
   }
 }
 
-async function withSignedMediaUrls(companyId: string, attachment: FileAttachment): Promise<FileAttachment> {
+async function withSignedMediaUrls(
+  companyId: string,
+  attachment: FileAttachment
+): Promise<FileAttachment | null> {
   const [fileUrl, thumbnailUrl] = await Promise.all([
     signAttachmentMediaReference(companyId, attachment.fileUrl),
     signAttachmentMediaReference(companyId, attachment.thumbnailUrl)
   ]);
 
+  // Fail closed: never return the raw stored reference when signing fails
+  // (including keys outside the tenant prefix). Unsignable rows are omitted.
+  if (!fileUrl) {
+    return null;
+  }
+
   return {
     ...attachment,
-    fileUrl: fileUrl ?? attachment.fileUrl,
-    thumbnailUrl: thumbnailUrl ?? attachment.thumbnailUrl
+    fileUrl,
+    thumbnailUrl
   };
 }
 
@@ -365,7 +374,9 @@ export async function listAttachments(
   const totalPages = total === 0 ? 1 : Math.ceil(total / limit);
   const startIndex = (page - 1) * limit;
   const pageRows = sortedRows.slice(startIndex, startIndex + limit).map((row) => toFileAttachment(row));
-  const data = await Promise.all(pageRows.map((attachment) => withSignedMediaUrls(companyId, attachment)));
+  const data = (
+    await Promise.all(pageRows.map((attachment) => withSignedMediaUrls(companyId, attachment)))
+  ).filter((attachment): attachment is FileAttachment => attachment !== null);
 
   return {
     data,

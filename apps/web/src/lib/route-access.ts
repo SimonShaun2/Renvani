@@ -4,7 +4,9 @@ export type UserRole = (typeof USER_ROLES)[number];
 
 type DefaultRouteMap = Record<UserRole, string>;
 
-const EXACT_PUBLIC_ROUTES = new Set(["/", "/login", "/signup"]);
+const EXACT_PUBLIC_ROUTES = new Set(["/", "/login", "/signup", "/product-tour", "/pricing", "/industries/hvac"]);
+
+const MARKETING_PRODUCT_PAGES = new Set(["growth", "revenue", "operations", "retention", "command-center"]);
 
 const ROLE_ALLOWED_PREFIXES: Record<UserRole, string[]> = {
   owner: [
@@ -91,6 +93,10 @@ export function isPublicRoute(pathname: string): boolean {
   }
 
   const segments = pathname.split("/").filter(Boolean);
+
+  if (segments[0] === "product" && segments.length === 2 && MARKETING_PRODUCT_PAGES.has(segments[1] ?? "")) {
+    return true;
+  }
 
   if (segments[0] === "book" && segments.length >= 2) {
     return true;

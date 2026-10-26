@@ -40,6 +40,12 @@ describe("resolveClerkRouteDecision", () => {
     expect(resolveClerkRouteDecision("/pay/tok_1/receipt", "user_1", "technician")).toEqual({ action: "next" });
   });
 
+  it("keeps /verify-email public for signed-out and signed-in Clerk users", () => {
+    expect(resolveClerkRouteDecision("/verify-email", null)).toEqual({ action: "next" });
+    expect(resolveClerkRouteDecision("/verify-email", "user_1")).toEqual({ action: "next" });
+    expect(resolveClerkRouteDecision("/verify-email", "user_1", "technician")).toEqual({ action: "next" });
+  });
+
   it("denies staff pages to a Clerk session with no role", () => {
     expect(resolveClerkRouteDecision("/dashboard", "user_1")).toEqual({ action: "redirect", to: "/no-access" });
     expect(resolveClerkRouteDecision("/login", "user_1")).toEqual({ action: "redirect", to: "/no-access" });

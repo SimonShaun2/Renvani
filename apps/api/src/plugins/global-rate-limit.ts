@@ -25,9 +25,8 @@ export function isGlobalRateLimitExcluded(request: Pick<FastifyRequest, "method"
 }
 
 export function resolveGlobalRateLimitConfig(): Required<GlobalRateLimitOptions> {
-  const flag = env.GLOBAL_RATE_LIMIT_ENABLED;
   return {
-    enabled: flag === undefined ? env.NODE_ENV !== "test" : flag === "true",
+    enabled: env.GLOBAL_RATE_LIMIT_ENABLED === "true",
     max: env.GLOBAL_RATE_LIMIT_MAX,
     windowMs: env.GLOBAL_RATE_LIMIT_WINDOW_SECONDS * 1000
   };

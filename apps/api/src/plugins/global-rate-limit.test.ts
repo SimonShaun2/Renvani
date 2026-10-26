@@ -1,3 +1,4 @@
+import { resetEnvCacheForTests } from "@fsm/config";
 import Fastify from "fastify";
 import { afterEach, describe, expect, it } from "vitest";
 
@@ -73,8 +74,16 @@ describe("FS-66 global rate limit plugin", () => {
     await app.close();
   });
 
-  it("is a no-op when disabled, and disabled by default under NODE_ENV=test", async () => {
+  it("is off by default, on only when GLOBAL_RATE_LIMIT_ENABLED=true, and a no-op when disabled", async () => {
     expect(resolveGlobalRateLimitConfig()).toMatchObject({ enabled: false, max: 600, windowMs: 60_000 });
+    process.env.GLOBAL_RATE_LIMIT_ENABLED = "true";
+    resetEnvCacheForTests();
+    expect(resolveGlobalRateLimitConfig().enabled).toBe(true);
+    process.env.GLOBAL_RATE_LIMIT_ENABLED = "false";
+    resetEnvCacheForTests();
+    expect(resolveGlobalRateLimitConfig().enabled).toBe(false);
+    delete process.env.GLOBAL_RATE_LIMIT_ENABLED;
+    resetEnvCacheForTests();
     const app = Fastify();
     await app.register(globalRateLimitPlugin, { enabled: false, max: 1 });
     app.get("/x", async () => ({ ok: true }));

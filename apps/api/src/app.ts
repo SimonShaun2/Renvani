@@ -59,6 +59,11 @@ import technicianExtensionRoutes from "./routes/technician-extensions/index.js";
 import technicianRoutes from "./routes/technicians/index.js";
 import timeRoutes from "./routes/time/index.js";
 
+/** FS-66 — TRUST_PROXY_HOPS → Fastify trustProxy (0 = false; N = trust N hops of X-Forwarded-For). */
+export function resolveTrustProxySetting(hops: number): false | number {
+  return Number.isInteger(hops) && hops > 0 ? hops : false;
+}
+
 export async function buildApp() {
   const logger = pino({
     level: env.NODE_ENV === "production" ? "info" : "debug",
@@ -76,7 +81,8 @@ export async function buildApp() {
   });
 
   const app = Fastify({
-    loggerInstance: logger
+    loggerInstance: logger,
+    trustProxy: resolveTrustProxySetting(env.TRUST_PROXY_HOPS)
   });
 
   await app.register(fastifyCors, {

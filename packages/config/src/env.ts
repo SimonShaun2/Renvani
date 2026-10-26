@@ -85,7 +85,15 @@ const envSchema = z.object({
   QUICKBOOKS_CLIENT_SECRET: z.string().default(""),
   QUICKBOOKS_REDIRECT_URI: z.string().default(""),
   QUICKBOOKS_ENVIRONMENT: z.enum(["sandbox"]).default("sandbox"),
-  QUICKBOOKS_TOKEN_ENCRYPTION_KEY: z.string().default("")
+  QUICKBOOKS_TOKEN_ENCRYPTION_KEY: z.string().default(""),
+  /** FS-66 — global per-IP API rate limit. Unset = enabled outside NODE_ENV=test. */
+  GLOBAL_RATE_LIMIT_ENABLED: z.enum(["true", "false"]).optional(),
+  GLOBAL_RATE_LIMIT_MAX: z.coerce.number().int().positive().default(600),
+  GLOBAL_RATE_LIMIT_WINDOW_SECONDS: z.coerce.number().int().positive().default(60),
+  /** FS-66 — public slot-hold/confirm limits (fixed window). */
+  PUBLIC_SLOT_HOLD_IP_RATE_LIMIT_MAX: z.coerce.number().int().positive().default(6),
+  PUBLIC_SLOT_HOLD_COMPANY_RATE_LIMIT_MAX: z.coerce.number().int().positive().default(120),
+  PUBLIC_SLOT_HOLD_RATE_LIMIT_WINDOW_SECONDS: z.coerce.number().int().positive().default(600)
 });
 
 export type Env = z.infer<typeof envSchema>;

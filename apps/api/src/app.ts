@@ -26,6 +26,7 @@ import customerRoutes from "./routes/customers/index.js";
 import dispatchRoutes from "./routes/dispatch/index.js";
 import fieldWorkRoutes from "./routes/field-work/index.js";
 import healthRoutes from "./routes/health/index.js";
+import globalRateLimitPlugin from "./plugins/global-rate-limit.js";
 import growthCheckIntakeRoutes from "./routes/growth-checks/index.js";
 import estimateRoutes from "./routes/estimates/index.js";
 import growthCheckScanRoutes from "./routes/growth-check/index.js";
@@ -84,6 +85,7 @@ export async function buildApp() {
     allowedHeaders: ["Authorization", "Content-Type", "Idempotency-Key", "X-Request-Id"]
   });
   await app.register(requestLoggerPlugin);
+  await app.register(globalRateLimitPlugin);
   await app.register(errorHandlerPlugin);
   await app.register(stripePlatformSyncPlugin);
   await app.register(healthRoutes);

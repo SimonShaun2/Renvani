@@ -48,3 +48,16 @@
     background-size: 40px 40px;
   }
 }
+
+@keyframes mkt-cursor-glide {
+  from { transform: translate(-140px, 120px); opacity: 0; }
+  to { transform: translate(0, 0); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-testid^="visual-"] *,
+  [data-reveal] {
+    transform: none !important;
+    animation: none !important;
+  }
+}

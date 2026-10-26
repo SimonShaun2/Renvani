@@ -12,6 +12,10 @@ import { AppError, ErrorCode } from "@fsm/types";
 import { setupTestEnv } from "../test-support/env-setup.js";
 
 const notificationsQueueAddMock = vi.hoisted(() => vi.fn());
+const emailMocks = vi.hoisted(() => ({
+  sendVerifyEmailEmail: vi.fn(async () => undefined),
+  sendSignupAttemptEmail: vi.fn(async () => undefined)
+}));
 const TEST_JWT_SECRET = "jwt_secret";
 const TEST_JWT_REFRESH_SECRET = "jwt_refresh_secret";
 
@@ -33,6 +37,13 @@ vi.mock("@fsm/jobs", () => ({
   }
 }));
 
+vi.mock("../lib/email.js", () => emailMocks);
+
+async function flushBackground(): Promise<void> {
+  await new Promise((resolve) => setImmediate(resolve));
+  await new Promise((resolve) => setImmediate(resolve));
+}
+
 type AuthServiceModule = typeof import("./auth.service.js");
 type CompanyServiceModule = typeof import("./company.service.js");
 type FakeDbModule = typeof import("../test-support/fake-db.js");
@@ -49,11 +60,17 @@ beforeAll(async () => {
   companyService = await import("./company.service.js");
   fakeDb = await import("../test-support/fake-db.js");
   tokens = await import("../lib/tokens.js");
+  rateLimit = await import("../lib/public-booking-rate-limit.js");
 });
+
+let rateLimit: typeof import("../lib/public-booking-rate-limit.js");
 
 beforeEach(() => {
   fakeDb.resetTestState();
   notificationsQueueAddMock.mockReset();
+  emailMocks.sendVerifyEmailEmail.mockClear();
+  emailMocks.sendSignupAttemptEmail.mockClear();
+  rateLimit.resetPublicBookingRateLimitStateForTests();
   vi.useRealTimers();
 });
 
@@ -66,6 +83,102 @@ function requireValue<T>(value: T | undefined, message: string): T {
 }
 
 describe("auth.service", () => {
+  it("register sends a verify email (fire-and-forget) and stores only the token hash", async () => {
+    const result = await authService.register({
+      companyName: "Verify Co",
+      firstName: "Ava",
+      lastName: "Stone",
+      email: "verify@example.com",
+      password: "password123",
+      timezone: "America/Chicago"
+    });
+    if (result.status !== "created") throw new Error("expected created");
+    expect(emailMocks.sendVerifyEmailEmail).not.toHaveBeenCalled();
+    await flushBackground();
+    expect(emailMocks.sendVerifyEmailEmail).toHaveBeenCalledTimes(1);
+    const [to, url, firstName] = emailMocks.sendVerifyEmailEmail.mock.calls[0] as unknown as [string, string, string];
+    expect(to).toBe("verify@example.com");
+    expect(firstName).toBe("Ava");
+    const token = decodeURIComponent(new URL(url).searchParams.get("token") ?? "");
+    expect(url).toContain("/verify-email?token=");
+
+    const stored = fakeDb.getTestState().users.find((u) => u.id === result.user.id);
+    expect(stored?.emailVerificationTokenHash).toMatch(/^[0-9a-f]{64}$/);
+    expect(stored?.emailVerificationTokenHash).not.toContain(token);
+    const ttl = (stored?.emailVerificationExpiresAt?.getTime() ?? 0) - Date.now();
+    expect(ttl).toBeGreaterThan(23.9 * 3600 * 1000);
+    expect(ttl).toBeLessThanOrEqual(24 * 3600 * 1000);
+
+    const verified = await authService.verifyEmail(token);
+    expect(verified.user.id).toBe(result.user.id);
+    expect(verified.user.emailVerifiedAt).toBeInstanceOf(Date);
+    expect(verified.tokens.accessToken).toEqual(expect.any(String));
+    expect(verified.tokens.refreshToken).toEqual(expect.any(String));
+
+    // single use
+    await expect(authService.verifyEmail(token)).rejects.toMatchObject({ code: ErrorCode.UNAUTHORIZED });
+  });
+
+  it("verifyEmail rejects unknown and expired tokens", async () => {
+    await expect(authService.verifyEmail("nope")).rejects.toBeInstanceOf(AppError);
+    const result = await authService.register({
+      companyName: "Expired Co",
+      firstName: "Ava",
+      lastName: "Stone",
+      email: "expired@example.com",
+      password: "password123",
+      timezone: "America/Chicago"
+    });
+    if (result.status !== "created") throw new Error("expected created");
+    await flushBackground();
+    const url = (emailMocks.sendVerifyEmailEmail.mock.calls[0] as unknown as [string, string])[1];
+    const token = decodeURIComponent(new URL(url).searchParams.get("token") ?? "");
+    const stored = fakeDb.getTestState().users.find((u) => u.id === result.user.id);
+    if (!stored) throw new Error("missing user");
+    stored.emailVerificationExpiresAt = new Date(Date.now() - 1000);
+    await expect(authService.verifyEmail(token)).rejects.toMatchObject({ code: ErrorCode.UNAUTHORIZED });
+  });
+
+  it("register with an existing email notifies the owner (fire-and-forget)", async () => {
+    const company = fakeDb.seedCompany({ name: "Acme2", slug: "acme2" });
+    fakeDb.seedUser({ companyId: company.id, email: "taken@example.com", firstName: "Pat", lastName: "Lee" });
+    await expect(
+      authService.register({
+        companyName: "Other",
+        firstName: "Sam",
+        lastName: "Hill",
+        email: "Taken@example.com",
+        password: "password123",
+        timezone: "America/Chicago"
+      })
+    ).resolves.toEqual({ status: "existing" });
+    await flushBackground();
+    expect(emailMocks.sendSignupAttemptEmail).toHaveBeenCalledWith(
+      "taken@example.com",
+      expect.objectContaining({ firstName: "Pat", loginUrl: expect.stringContaining("/login") })
+    );
+    expect(emailMocks.sendVerifyEmailEmail).not.toHaveBeenCalled();
+  });
+
+  it("sends at most one signup-attempt notice per recipient per cooldown window", async () => {
+    const company = fakeDb.seedCompany({ name: "Acme3", slug: "acme3" });
+    fakeDb.seedUser({ companyId: company.id, email: "victim@example.com", firstName: "Vic", lastName: "Tim" });
+    for (let i = 0; i < 3; i += 1) {
+      await expect(
+        authService.register({
+          companyName: "Spam",
+          firstName: "A",
+          lastName: "B",
+          email: "Victim@example.com",
+          password: "password123",
+          timezone: "America/Chicago"
+        })
+      ).resolves.toEqual({ status: "existing" });
+      await flushBackground();
+    }
+    expect(emailMocks.sendSignupAttemptEmail).toHaveBeenCalledTimes(1);
+  });
+
   it("registers a company, owner, and hashed refresh token", async () => {
     const result = await authService.register({
       companyName: "Tulsa HVAC Pro",

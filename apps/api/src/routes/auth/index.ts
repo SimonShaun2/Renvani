@@ -14,7 +14,8 @@ import {
   logoutHandler,
   refreshHandler,
   registerHandler,
-  resetPasswordHandler
+  resetPasswordHandler,
+  verifyEmailHandler
 } from "./handlers.js";
 import {
   forgotPasswordRouteSchema,
@@ -28,7 +29,9 @@ import {
   registerRouteSchema,
   registerValidation,
   resetPasswordRouteSchema,
-  resetPasswordValidation
+  resetPasswordValidation,
+  verifyEmailRouteSchema,
+  verifyEmailValidation
 } from "./schemas.js";
 
 async function sendRateLimited(request: FastifyRequest, reply: FastifyReply): Promise<void> {
@@ -65,6 +68,12 @@ async function forgotPasswordRateLimit(request: FastifyRequest, reply: FastifyRe
   }
 }
 
+async function verifyEmailRateLimit(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+  if (!(await checkAuthLoginIpRateLimit(request.ip))) {
+    await sendRateLimited(request, reply);
+  }
+}
+
 const authRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.post("/register", { onRequest: [registerRateLimit], preValidation: [registerValidation], schema: registerRouteSchema }, registerHandler);
   fastify.post("/login", { preValidation: [loginRateLimit, loginValidation], schema: loginRouteSchema }, loginHandler);
@@ -74,6 +83,11 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
     "/forgot-password",
     { onRequest: [forgotPasswordRateLimit], preValidation: [forgotPasswordValidation], schema: forgotPasswordRouteSchema },
     forgotPasswordHandler
+  );
+  fastify.post(
+    "/verify-email",
+    { onRequest: [verifyEmailRateLimit], preValidation: [verifyEmailValidation], schema: verifyEmailRouteSchema },
+    verifyEmailHandler
   );
   fastify.post(
     "/reset-password",

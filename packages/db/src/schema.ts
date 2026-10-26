@@ -527,6 +527,10 @@ export const users = pgTable("users", {
   avatarUrl: text("avatar_url"),
   isActive: boolean("is_active").notNull().default(true),
   lastLoginAt: timestamp("last_login_at"),
+  emailVerifiedAt: timestamp("email_verified_at"),
+  // sha256 of the single-use verify-email token (raw token is never stored)
+  emailVerificationTokenHash: text("email_verification_token_hash"),
+  emailVerificationExpiresAt: timestamp("email_verification_expires_at"),
   // If this user is also a technician
   technicianId: uuid("technician_id"),
   ...timestamps,
@@ -534,6 +538,7 @@ export const users = pgTable("users", {
   emailIdx: uniqueIndex("users_email_idx").on(t.email),
   emailCompanyIdx: uniqueIndex("users_email_company_idx").on(t.email, t.companyId),
   companyIdx: index("users_company_idx").on(t.companyId),
+  emailVerificationTokenIdx: index("users_email_verification_token_idx").on(t.emailVerificationTokenHash),
 }));
 
 export const refreshTokens = pgTable("refresh_tokens", {

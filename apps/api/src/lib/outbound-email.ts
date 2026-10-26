@@ -1,61 +1,117 @@
-import pino from "pino";
 import sgMail from "@sendgrid/mail";
+import pino from "pino";
 
 import {
   createResendEmailChannel,
   type EmailTemplateId,
+  type OutboundEmailChannel,
   type OutboundEmailPayload,
   renderTransactionalEmail
 } from "@fsm/comms";
 import { env } from "@fsm/config";
-import { featureFlags } from "@fsm/config/feature-flags";
 
 const logger = pino({
   name: "outbound-email"
 });
 
-export function getTransactionalEmailFromAddress(): string {
-  // FEATURE FLAG: resend-email-enabled
-  if (featureFlags.resendEmailEnabled && env.RESEND_FROM_EMAIL.length > 0) {
-    return env.RESEND_FROM_EMAIL;
-  }
+export const DEFAULT_EMAIL_FROM = "Renvani <hello@mail.getrenvani.com>";
 
-  return env.SENDGRID_FROM_EMAIL;
+let cachedChannel: OutboundEmailChannel | null = null;
+let fallbackLogged = false;
+let missingProviderLogged = false;
+
+export type EmailProvider = "resend" | "sendgrid" | "none";
+
+export class EmailProviderNotConfiguredError extends Error {
+  constructor() {
+    super("EMAIL_PROVIDER_NOT_CONFIGURED");
+    this.name = "EmailProviderNotConfiguredError";
+  }
+}
+
+/** Resend (RESEND_API_KEY) wins; SendGrid is the fallback; tests never hit a live provider. */
+export function resolveEmailProvider(): EmailProvider {
+  if ((env.RESEND_API_KEY ?? "").trim()) {
+    return "resend";
+  }
+  if (env.NODE_ENV !== "test" && (env.SENDGRID_API_KEY ?? "").trim()) {
+    return "sendgrid";
+  }
+  return "none";
+}
+
+export function getTransactionalEmailFromAddress(): string {
+  if (resolveEmailProvider() === "sendgrid") {
+    return env.SENDGRID_FROM_EMAIL;
+  }
+  const from = (env.RESEND_FROM_EMAIL ?? "").trim() || (env.EMAIL_FROM ?? "").trim();
+  return from.length > 0 ? from : DEFAULT_EMAIL_FROM;
+}
+
+function createSendGridEmailChannel(): OutboundEmailChannel {
+  sgMail.setApiKey(env.SENDGRID_API_KEY);
+  return {
+    async sendTransactionalEmail(payload: OutboundEmailPayload) {
+      const [response] = await sgMail.send({
+        to: payload.to,
+        from: env.SENDGRID_FROM_EMAIL,
+        subject: payload.subject,
+        html: payload.html,
+        ...(payload.text ? { text: payload.text } : {})
+      });
+      const messageId = response?.headers?.["x-message-id"];
+      return { providerMessageId: typeof messageId === "string" ? messageId : "" };
+    }
+  };
+}
+
+/** Provider-independent seam: the configured channel, or null when no provider is configured. */
+export function getEmailChannel(): OutboundEmailChannel | null {
+  if (cachedChannel) {
+    return cachedChannel;
+  }
+  const provider = resolveEmailProvider();
+  if (provider === "resend") {
+    cachedChannel = createResendEmailChannel({
+      apiKey: env.RESEND_API_KEY.trim(),
+      defaultFrom: getTransactionalEmailFromAddress()
+    });
+  } else if (provider === "sendgrid") {
+    if (!fallbackLogged) {
+      fallbackLogged = true;
+      logger.warn("RESEND_API_KEY is not set; falling back to SendGrid for transactional email");
+    }
+    cachedChannel = createSendGridEmailChannel();
+  }
+  return cachedChannel;
+}
+
+/** Test hook: inject a channel (or reset to env-driven with null). */
+export function setEmailChannelForTests(channel: OutboundEmailChannel | null): void {
+  cachedChannel = channel;
+  fallbackLogged = false;
+  missingProviderLogged = false;
 }
 
 export async function deliverTransactionalEmail(
   payload: OutboundEmailPayload
 ): Promise<{ providerMessageId: string | null }> {
-  // FEATURE FLAG: resend-email-enabled
-  if (featureFlags.resendEmailEnabled) {
-    if (!env.RESEND_API_KEY || !env.RESEND_FROM_EMAIL) {
-      throw new Error("RESEND_NOT_CONFIGURED");
+  const channel = getEmailChannel();
+  if (!channel) {
+    if (env.NODE_ENV === "production") {
+      // Fail loudly: never silently drop password resets etc. in production.
+      logger.error("No email provider configured (RESEND_API_KEY and SENDGRID_API_KEY empty); email not sent");
+      throw new EmailProviderNotConfiguredError();
     }
-
-    const channel = createResendEmailChannel({
-      apiKey: env.RESEND_API_KEY,
-      defaultFrom: env.RESEND_FROM_EMAIL
-    });
-    const result = await channel.sendTransactionalEmail(payload);
-    logger.debug({ providerMessageId: result.providerMessageId }, "Transactional email sent via Resend");
-    return { providerMessageId: result.providerMessageId };
-  }
-
-  sgMail.setApiKey(env.SENDGRID_API_KEY);
-
-  try {
-    await sgMail.send({
-      to: payload.to,
-      from: env.SENDGRID_FROM_EMAIL,
-      subject: payload.subject,
-      html: payload.html
-    });
-    logger.debug({ recipient: "[redacted]" }, "Transactional email sent via SendGrid");
+    if (!missingProviderLogged) {
+      missingProviderLogged = true;
+      logger.warn("No email provider configured; transactional email disabled outside production (no-op)");
+    }
     return { providerMessageId: null };
-  } catch (error) {
-    logger.debug({ err: error, recipient: "[redacted]" }, "Transactional email failed");
-    throw error;
   }
+  const result = await channel.sendTransactionalEmail(payload);
+  logger.debug({ providerMessageId: result.providerMessageId }, "Transactional email sent");
+  return { providerMessageId: result.providerMessageId };
 }
 
 export async function sendRenderedTemplateEmail(
@@ -64,11 +120,13 @@ export async function sendRenderedTemplateEmail(
   variables: Record<string, string>,
   tags?: string[]
 ): Promise<void> {
-  const rendered = renderTransactionalEmail(templateId, variables);
+  const logoUrl = (env.EMAIL_LOGO_URL ?? "").trim();
+  const rendered = renderTransactionalEmail(templateId, variables, logoUrl ? { logoUrl } : {});
   const payload: OutboundEmailPayload = {
     to,
     subject: rendered.subject,
-    html: rendered.html
+    html: rendered.html,
+    text: rendered.text
   };
 
   if (tags) {
@@ -76,4 +134,13 @@ export async function sendRenderedTemplateEmail(
   }
 
   await deliverTransactionalEmail(payload);
+}
+
+/** Fire-and-forget: schedule after the current response cycle; errors are logged, never thrown. */
+export function sendEmailInBackground(task: () => Promise<void>, context: string): void {
+  setImmediate(() => {
+    task().catch((error: unknown) => {
+      logger.error({ err: error, context }, "Background email send failed");
+    });
+  });
 }

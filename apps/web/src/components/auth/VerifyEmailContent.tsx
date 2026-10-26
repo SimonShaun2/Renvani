@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 
 import {
   VERIFY_EMAIL_INVALID_MESSAGE,
+  VERIFY_EMAIL_RETRY_MESSAGE,
   stripTokenFromUrl,
   verifyEmailAndSignIn,
 } from "@/src/lib/verify-email";
@@ -15,13 +16,16 @@ export function VerifyEmailContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const setAuth = useAuthStore((state) => state.setAuth);
-  const [status, setStatus] = useState<"ready" | "verifying" | "invalid">("ready");
   // Token lives only in this ref after load; it is stripped from the URL right away.
   const tokenRef = useRef<string | null>(null);
+  if (tokenRef.current === null) tokenRef.current = searchParams.get("token");
+  // No token in the link: show the invalid-link state, not the Confirm button.
+  const [status, setStatus] = useState<"ready" | "verifying" | "invalid" | "error">(() =>
+    tokenRef.current?.trim() ? "ready" : "invalid",
+  );
   const started = useRef(false);
 
   useEffect(() => {
-    if (tokenRef.current === null) tokenRef.current = searchParams.get("token");
     stripTokenFromUrl();
   }, [searchParams]);
 
@@ -35,7 +39,10 @@ export function VerifyEmailContent() {
       setAuth,
       redirect: (path) => router.replace(path),
     }).then((result) => {
-      if (result.status === "invalid") setStatus("invalid");
+      if (result.status === "ok") return;
+      setStatus(result.status);
+      // Transient failure (network/429/5xx): allow another attempt from the page.
+      if (result.status === "error") started.current = false;
     });
   };
 
@@ -60,6 +67,14 @@ export function VerifyEmailContent() {
 
   return (
     <div className="space-y-4">
+      {status === "error" ? (
+        <div
+          role="alert"
+          className="rounded-2xl border border-error/15 bg-error-light px-4 py-3 text-sm text-error"
+        >
+          {VERIFY_EMAIL_RETRY_MESSAGE}
+        </div>
+      ) : null}
       <p className="text-base text-neutral-500">
         Click below to confirm your email and sign in.
       </p>
@@ -69,7 +84,7 @@ export function VerifyEmailContent() {
         disabled={status === "verifying"}
         className="min-h-[44px] w-full rounded-full bg-brand-primary px-5 font-semibold text-white disabled:opacity-60"
       >
-        {status === "verifying" ? "Confirming…" : "Confirm email"}
+        {status === "verifying" ? "Confirming…" : status === "error" ? "Try again" : "Confirm email"}
       </button>
     </div>
   );

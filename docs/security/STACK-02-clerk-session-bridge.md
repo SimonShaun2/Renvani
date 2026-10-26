@@ -212,7 +212,7 @@ The migration does not exclude empty-string org ids. As a diagnostic only, add `
 - Webhook provisioning and membership sync for that org return `skipped`.
 - Other orgs are unaffected.
 
-Alert on `clerk_org_ambiguous` (FS-163).
+Alert on `clerk_org_ambiguous` (FS-163). For the rule spec and response, see [`docs/runbooks/clerk-alerts.md`](../runbooks/clerk-alerts.md).
 
 After resolving duplicates, re-run (verbatim from 0038):
 

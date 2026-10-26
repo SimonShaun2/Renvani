@@ -56,6 +56,7 @@ export const relationalPreviewRouteSchema: FastifySchema = {};
 export const ingestStatusRouteSchema: FastifySchema = {};
 export const dedupeDecisionsRouteSchema: FastifySchema = {};
 export const commitBundleRouteSchema: FastifySchema = {};
+export const ingestStatusRouteSchema: FastifySchema = {};
 
 export const confirmImportFileLinkDecisionsValidation = withZodValidation({
   params: migrateOnboardingBundleIdParamsSchema,

@@ -29,3 +29,17 @@
   --sidebar-width: 220px;
   --header-height: 64px;
 }
+
+/* Marketing palette (Figma jiGHTNUJNltWbHA4Il3hk7, page 09 Product Visuals) */
+:root {
+  --color-mkt-cream: #fbf6ef;
+  --color-mkt-ink: #0f1530;
+  --color-mkt-amber: #f6b400;
+  --color-mkt-amber-soft: #fff4d6;
+  --color-mkt-muted: #5e6684;
+  --color-mkt-green: #2f7d4f;
+  --color-mkt-green-soft: #e4f1e8;
+  --color-mkt-blue: #2b4acb;
+  --color-mkt-blue-soft: #e5eafb;
+  --color-mkt-line: #e6dccb;
+}

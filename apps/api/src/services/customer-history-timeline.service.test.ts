@@ -1,7 +1,7 @@
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { GOLDEN_IMPORT_BUNDLE_MANIFESTS } from "@fsm/config/import-golden-bundles";
-import { AppError } from "@fsm/types";
+import { AppError, ErrorCode } from "@fsm/types";
 
 import { setupTestEnv } from "../test-support/env-setup.js";
 
@@ -129,6 +129,77 @@ describe("customer-history-timeline.service", () => {
         (item) => item.occurredAt <= (firstPage.items[firstPage.items.length - 1]?.occurredAt ?? "")
       )
     ).toBe(true);
+  });
+
+  it("rejects an unknown types value with a validation (400) error", async () => {
+    const company = fakeDb.seedCompany({ name: "Types Co", slug: "types-co" });
+    const customer = fakeDb.seedCustomer({
+      companyId: company.id,
+      firstName: "Types",
+      lastName: "Customer"
+    });
+
+    const error = await listCustomerHistoryTimeline(company.id, customer.id, {
+      limit: 10,
+      types: "job,bogus"
+    }).catch((caught: unknown) => caught);
+    expect(error).toBeInstanceOf(AppError);
+    expect((error as AppError).code).toBe(ErrorCode.VALIDATION_ERROR);
+  });
+
+  it("pages newest-first through every row across sources with same-timestamp ties", async () => {
+    const company = fakeDb.seedCompany({ name: "Big Co", slug: "big-co" });
+    const customer = fakeDb.seedCustomer({
+      companyId: company.id,
+      firstName: "Big",
+      lastName: "History"
+    });
+    const expectedIds = new Set<string>();
+    const shared = new Date("2023-03-03T03:03:03.003Z");
+    // Seed in scrambled order so insertion order cannot mask missing ORDER BY.
+    for (const index of [7, 2, 11, 0, 5, 9, 3, 10, 1, 8, 4, 6]) {
+      const job = fakeDb.seedJob({
+        companyId: company.id,
+        customerId: customer.id,
+        title: `Job ${index}`,
+        actualEnd: index % 4 === 0 ? shared : new Date(Date.UTC(2015 + index, 0, 1))
+      });
+      expectedIds.add(job.id);
+      const estimate = fakeDb.seedEstimate({
+        companyId: company.id,
+        customerId: customer.id,
+        title: `Estimate ${index}`,
+        approvedAt: index % 3 === 0 ? shared : new Date(Date.UTC(2014 + index, 6, 1))
+      });
+      expectedIds.add(estimate.id);
+    }
+
+    const firstPage = await listCustomerHistoryTimeline(company.id, customer.id, { limit: 5, types: "job,estimate" });
+    expect(firstPage.items[0]?.occurredAt).toBe(new Date(Date.UTC(2026, 0, 1)).toISOString());
+
+    const seen: Array<{ occurredAt: string; type: string; id: string }> = [...firstPage.items];
+    let cursor = firstPage.nextCursor;
+    let guard = 0;
+    while (cursor && guard < 20) {
+      const page = await listCustomerHistoryTimeline(company.id, customer.id, {
+        limit: 5,
+        types: "job,estimate",
+        cursor
+      });
+      expect(page.items.length).toBeLessThanOrEqual(5);
+      seen.push(...page.items);
+      cursor = page.nextCursor;
+      guard += 1;
+    }
+
+    expect(seen).toHaveLength(expectedIds.size);
+    expect(new Set(seen.map((item) => item.id))).toEqual(expectedIds);
+    for (let index = 1; index < seen.length; index += 1) {
+      const previous = seen[index - 1]!;
+      const current = seen[index]!;
+      const key = (item: typeof current) => `${item.occurredAt}|${item.type}|${item.id}`;
+      expect(key(previous) > key(current)).toBe(true);
+    }
   });
 
   it("golden import bundles declare multi-year job history depth", () => {

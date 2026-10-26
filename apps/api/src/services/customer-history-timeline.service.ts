@@ -1,4 +1,5 @@
-import { and, eq, isNull } from "drizzle-orm";
+import { and, desc, eq, isNull, lt, lte, or, sql, type SQL } from "drizzle-orm";
+import type { AnyPgColumn } from "drizzle-orm/pg-core";
 
 import {
   customerNotes,
@@ -8,7 +9,7 @@ import {
   invoices,
   jobs,
   messageLogs,
-  payments
+  payments,
 } from "@fsm/db";
 import {
   AppError,
@@ -17,10 +18,8 @@ import {
   type CustomerHistoryTimelineItem,
   type CustomerHistoryTimelineItemType,
   type CustomerHistoryTimelineResponse,
-  type ListCustomerHistoryTimelineQuery
+  type ListCustomerHistoryTimelineQuery,
 } from "@fsm/types";
-
-const MAX_ROWS_PER_SOURCE = 500;
 
 type TimelineCursor = {
   occurredAt: string;
@@ -28,7 +27,9 @@ type TimelineCursor = {
   id: string;
 };
 
-function lineageFromImportSession(importSessionId: string | null): "native" | "imported" {
+function lineageFromImportSession(
+  importSessionId: string | null,
+): "native" | "imported" {
   return importSessionId ? "imported" : "native";
 }
 
@@ -38,7 +39,9 @@ function encodeCursor(cursor: TimelineCursor): string {
 
 function decodeCursor(value: string): TimelineCursor {
   try {
-    const parsed = JSON.parse(Buffer.from(value, "base64url").toString("utf8")) as TimelineCursor;
+    const parsed = JSON.parse(
+      Buffer.from(value, "base64url").toString("utf8"),
+    ) as TimelineCursor;
     if (
       typeof parsed.occurredAt !== "string" ||
       typeof parsed.type !== "string" ||
@@ -49,40 +52,35 @@ function decodeCursor(value: string): TimelineCursor {
     customerHistoryTimelineItemTypeSchema.parse(parsed.type);
     return parsed;
   } catch {
-    throw new AppError(ErrorCode.VALIDATION_ERROR, "Invalid history timeline cursor");
+    throw new AppError(
+      ErrorCode.VALIDATION_ERROR,
+      "Invalid history timeline cursor",
+    );
   }
 }
 
-function compareItemsDesc(left: CustomerHistoryTimelineItem, right: CustomerHistoryTimelineItem): number {
-  const timeCompare = right.occurredAt.localeCompare(left.occurredAt);
+function compareText(left: string, right: string): number {
+  return left < right ? -1 : left > right ? 1 : 0;
+}
+
+function compareItemsDesc(
+  left: CustomerHistoryTimelineItem,
+  right: CustomerHistoryTimelineItem,
+): number {
+  const timeCompare = compareText(right.occurredAt, left.occurredAt);
   if (timeCompare !== 0) {
     return timeCompare;
   }
-  const typeCompare = right.type.localeCompare(left.type);
+  const typeCompare = compareText(right.type, left.type);
   if (typeCompare !== 0) {
     return typeCompare;
   }
-  return right.id.localeCompare(left.id);
+  return compareText(right.id, left.id);
 }
 
-function isBeforeCursor(item: CustomerHistoryTimelineItem, cursor: TimelineCursor): boolean {
-  return compareItemsDesc(item, {
-    id: cursor.id,
-    type: cursor.type,
-    occurredAt: cursor.occurredAt,
-    title: "",
-    subtitle: null,
-    status: null,
-    amount: null,
-    lineage: "native",
-    sourceSystem: null,
-    sourceId: null,
-    importSessionId: null,
-    href: null
-  }) > 0;
-}
-
-function parseTypeFilter(types: string | undefined): Set<CustomerHistoryTimelineItemType> | null {
+function parseTypeFilter(
+  types: string | undefined,
+): Set<CustomerHistoryTimelineItemType> | null {
   if (!types) {
     return null;
   }
@@ -91,7 +89,16 @@ function parseTypeFilter(types: string | undefined): Set<CustomerHistoryTimeline
     .split(",")
     .map((entry) => entry.trim())
     .filter((entry) => entry.length > 0)
-    .map((entry) => customerHistoryTimelineItemTypeSchema.parse(entry));
+    .map((entry) => {
+      const result = customerHistoryTimelineItemTypeSchema.safeParse(entry);
+      if (!result.success) {
+        throw new AppError(
+          ErrorCode.VALIDATION_ERROR,
+          `Invalid history timeline type: ${entry}`,
+        );
+      }
+      return result.data;
+    });
 
   return new Set(parsed);
 }
@@ -120,12 +127,52 @@ function invoiceOccurredAt(invoice: {
   return invoice.paidAt ?? invoice.issuedAt ?? invoice.createdAt;
 }
 
-async function assertCustomerInTenant(companyId: string, customerId: string): Promise<void> {
+/** Millisecond-truncated COALESCE so SQL ordering/cursor matches the ISO cursor value. */
+function occurredAtExpr(first: AnyPgColumn, second: AnyPgColumn, third?: AnyPgColumn): SQL {
+  return third
+    ? sql`date_trunc('milliseconds', coalesce(${first}, ${second}, ${third}))`
+    : sql`date_trunc('milliseconds', coalesce(${first}, ${second}))`;
+}
+
+/**
+ * Keyset predicate for one source: rows strictly after the cursor in
+ * (occurredAt DESC, type DESC, id DESC) order. Type is constant per source.
+ */
+function cursorPredicate(
+  type: CustomerHistoryTimelineItemType,
+  occurredAt: SQL,
+  idColumn: AnyPgColumn,
+  cursor: TimelineCursor | null,
+): SQL | undefined {
+  if (!cursor) {
+    return undefined;
+  }
+  const at = sql`${cursor.occurredAt}::timestamptz`;
+  if (type < cursor.type) {
+    return lte(occurredAt, at);
+  }
+  if (type > cursor.type) {
+    return lt(occurredAt, at);
+  }
+  return or(
+    lt(occurredAt, at),
+    and(eq(occurredAt, at), lt(idColumn, cursor.id)),
+  );
+}
+
+async function assertCustomerInTenant(
+  companyId: string,
+  customerId: string,
+): Promise<void> {
   const [customer] = await db
     .select({ id: customers.id })
     .from(customers)
     .where(
-      and(eq(customers.companyId, companyId), eq(customers.id, customerId), isNull(customers.deletedAt))
+      and(
+        eq(customers.companyId, companyId),
+        eq(customers.id, customerId),
+        isNull(customers.deletedAt),
+      ),
     )
     .limit(1);
 
@@ -137,7 +184,7 @@ async function assertCustomerInTenant(companyId: string, customerId: string): Pr
 export async function listCustomerHistoryTimeline(
   companyId: string,
   customerId: string,
-  query: ListCustomerHistoryTimelineQuery
+  query: ListCustomerHistoryTimelineQuery,
 ): Promise<CustomerHistoryTimelineResponse> {
   await assertCustomerInTenant(companyId, customerId);
 
@@ -145,16 +192,29 @@ export async function listCustomerHistoryTimeline(
   const limit = query.limit;
   const cursor = query.cursor ? decodeCursor(query.cursor) : null;
 
+  // Each source fetches at most limit + 1 rows past the cursor, in timeline order.
+  const perSource = limit + 1;
   const items: CustomerHistoryTimelineItem[] = [];
 
   if (!typeFilter || typeFilter.has("job")) {
+    const occurredAt = occurredAtExpr(
+      jobs.actualEnd,
+      jobs.scheduledStart,
+      jobs.createdAt,
+    );
     const jobRows = await db
       .select()
       .from(jobs)
       .where(
-        and(eq(jobs.companyId, companyId), eq(jobs.customerId, customerId), isNull(jobs.deletedAt))
+        and(
+          eq(jobs.companyId, companyId),
+          eq(jobs.customerId, customerId),
+          isNull(jobs.deletedAt),
+          cursorPredicate("job", occurredAt, jobs.id, cursor),
+        ),
       )
-      .limit(MAX_ROWS_PER_SOURCE);
+      .orderBy(desc(occurredAt), desc(jobs.id))
+      .limit(perSource);
 
     for (const job of jobRows) {
       items.push({
@@ -169,12 +229,17 @@ export async function listCustomerHistoryTimeline(
         sourceSystem: job.sourceSystem,
         sourceId: job.sourceId,
         importSessionId: job.importSessionId,
-        href: `/jobs/${job.id}`
+        href: `/jobs/${job.id}`,
       });
     }
   }
 
   if (!typeFilter || typeFilter.has("estimate")) {
+    const occurredAt = occurredAtExpr(
+      estimates.approvedAt,
+      estimates.sentAt,
+      estimates.createdAt,
+    );
     const estimateRows = await db
       .select()
       .from(estimates)
@@ -182,10 +247,12 @@ export async function listCustomerHistoryTimeline(
         and(
           eq(estimates.companyId, companyId),
           eq(estimates.customerId, customerId),
-          isNull(estimates.deletedAt)
-        )
+          isNull(estimates.deletedAt),
+          cursorPredicate("estimate", occurredAt, estimates.id, cursor),
+        ),
       )
-      .limit(MAX_ROWS_PER_SOURCE);
+      .orderBy(desc(occurredAt), desc(estimates.id))
+      .limit(perSource);
 
     for (const estimate of estimateRows) {
       items.push({
@@ -202,12 +269,17 @@ export async function listCustomerHistoryTimeline(
         sourceSystem: estimate.sourceSystem,
         sourceId: estimate.sourceId,
         importSessionId: estimate.importSessionId,
-        href: `/estimates/${estimate.id}`
+        href: `/estimates/${estimate.id}`,
       });
     }
   }
 
   if (!typeFilter || typeFilter.has("invoice")) {
+    const occurredAt = occurredAtExpr(
+      invoices.paidAt,
+      invoices.issuedAt,
+      invoices.createdAt,
+    );
     const invoiceRows = await db
       .select()
       .from(invoices)
@@ -215,10 +287,12 @@ export async function listCustomerHistoryTimeline(
         and(
           eq(invoices.companyId, companyId),
           eq(invoices.customerId, customerId),
-          isNull(invoices.deletedAt)
-        )
+          isNull(invoices.deletedAt),
+          cursorPredicate("invoice", occurredAt, invoices.id, cursor),
+        ),
       )
-      .limit(MAX_ROWS_PER_SOURCE);
+      .orderBy(desc(occurredAt), desc(invoices.id))
+      .limit(perSource);
 
     for (const invoice of invoiceRows) {
       items.push({
@@ -235,12 +309,13 @@ export async function listCustomerHistoryTimeline(
         sourceSystem: invoice.sourceSystem,
         sourceId: invoice.sourceId,
         importSessionId: invoice.importSessionId,
-        href: `/invoices/${invoice.id}`
+        href: `/invoices/${invoice.id}`,
       });
     }
   }
 
   if (!typeFilter || typeFilter.has("payment")) {
+    const occurredAt = occurredAtExpr(payments.paidAt, payments.createdAt);
     const paymentRows = await db
       .select()
       .from(payments)
@@ -248,10 +323,12 @@ export async function listCustomerHistoryTimeline(
         and(
           eq(payments.companyId, companyId),
           eq(payments.customerId, customerId),
-          isNull(payments.deletedAt)
-        )
+          isNull(payments.deletedAt),
+          cursorPredicate("payment", occurredAt, payments.id, cursor),
+        ),
       )
-      .limit(MAX_ROWS_PER_SOURCE);
+      .orderBy(desc(occurredAt), desc(payments.id))
+      .limit(perSource);
 
     for (const payment of paymentRows) {
       items.push({
@@ -266,12 +343,16 @@ export async function listCustomerHistoryTimeline(
         sourceSystem: payment.sourceSystem,
         sourceId: payment.sourceId,
         importSessionId: payment.importSessionId,
-        href: payment.invoiceId ? `/invoices/${payment.invoiceId}` : null
+        href: payment.invoiceId ? `/invoices/${payment.invoiceId}` : null,
       });
     }
   }
 
   if (!typeFilter || typeFilter.has("note")) {
+    const occurredAt = occurredAtExpr(
+      customerNotes.notedAt,
+      customerNotes.createdAt,
+    );
     const noteRows = await db
       .select()
       .from(customerNotes)
@@ -279,14 +360,18 @@ export async function listCustomerHistoryTimeline(
         and(
           eq(customerNotes.companyId, companyId),
           eq(customerNotes.customerId, customerId),
-          isNull(customerNotes.deletedAt)
-        )
+          isNull(customerNotes.deletedAt),
+          cursorPredicate("note", occurredAt, customerNotes.id, cursor),
+        ),
       )
-      .limit(MAX_ROWS_PER_SOURCE);
+      .orderBy(desc(occurredAt), desc(customerNotes.id))
+      .limit(perSource);
 
     for (const note of noteRows) {
       const preview =
-        note.content.length > 120 ? `${note.content.slice(0, 117)}...` : note.content;
+        note.content.length > 120
+          ? `${note.content.slice(0, 117)}...`
+          : note.content;
       items.push({
         id: note.id,
         type: "note",
@@ -299,12 +384,16 @@ export async function listCustomerHistoryTimeline(
         sourceSystem: note.sourceSystem,
         sourceId: note.sourceId,
         importSessionId: note.importSessionId,
-        href: null
+        href: null,
       });
     }
   }
 
   if (!typeFilter || typeFilter.has("communication")) {
+    const occurredAt = occurredAtExpr(
+      messageLogs.sentAt,
+      messageLogs.createdAt,
+    );
     const messageRows = await db
       .select()
       .from(messageLogs)
@@ -312,19 +401,24 @@ export async function listCustomerHistoryTimeline(
         and(
           eq(messageLogs.companyId, companyId),
           eq(messageLogs.customerId, customerId),
-          isNull(messageLogs.deletedAt)
-        )
+          isNull(messageLogs.deletedAt),
+          cursorPredicate("communication", occurredAt, messageLogs.id, cursor),
+        ),
       )
-      .limit(MAX_ROWS_PER_SOURCE);
+      .orderBy(desc(occurredAt), desc(messageLogs.id))
+      .limit(perSource);
 
     for (const message of messageRows) {
       const preview =
-        message.body.length > 120 ? `${message.body.slice(0, 117)}...` : message.body;
+        message.body.length > 120
+          ? `${message.body.slice(0, 117)}...`
+          : message.body;
       items.push({
         id: message.id,
         type: "communication",
         occurredAt: (message.sentAt ?? message.createdAt).toISOString(),
-        title: message.subject?.trim() || `${message.channel} ${message.direction}`,
+        title:
+          message.subject?.trim() || `${message.channel} ${message.direction}`,
         subtitle: preview,
         status: message.providerStatus,
         amount: null,
@@ -332,28 +426,27 @@ export async function listCustomerHistoryTimeline(
         sourceSystem: message.sourceSystem,
         sourceId: message.sourceId,
         importSessionId: message.importSessionId,
-        href: message.jobId ? `/jobs/${message.jobId}` : null
+        href: message.jobId ? `/jobs/${message.jobId}` : null,
       });
     }
   }
 
   const sorted = items.sort(compareItemsDesc);
-  const filtered = cursor ? sorted.filter((item) => isBeforeCursor(item, cursor)) : sorted;
-  const page = filtered.slice(0, limit);
-  const hasMore = filtered.length > limit;
+  const page = sorted.slice(0, limit);
+  const hasMore = sorted.length > limit;
   const lastItem = page.at(-1);
   const nextCursor =
     hasMore && lastItem
       ? encodeCursor({
           occurredAt: lastItem.occurredAt,
           type: lastItem.type,
-          id: lastItem.id
+          id: lastItem.id,
         })
       : null;
 
   return {
     customerId,
     items: page,
-    nextCursor
+    nextCursor,
   };
 }

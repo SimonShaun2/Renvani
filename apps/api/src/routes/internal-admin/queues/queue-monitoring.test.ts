@@ -42,7 +42,8 @@ vi.mock("@fsm/jobs", () => ({
 vi.mock("../../../services/queue-monitoring.service.js", () => ({
   fetchPlatformQueueMonitoringSnapshot: vi.fn(),
   fetchPlatformDeadLetterJobs: vi.fn(),
-  fetchPlatformFailedJobsWithReplayMetadata: vi.fn()
+  fetchPlatformFailedJobsWithReplayMetadata: vi.fn(),
+  recoverPlatformDeadLetterJob: vi.fn()
 }));
 
 type BuildAppModule = typeof import("../../../app.js");
@@ -224,6 +225,22 @@ describe("GET /api/v1/internal/admin/queues/monitoring (STACK-05)", () => {
     const response = await request(app.server).get("/api/v1/internal/admin/queues/monitoring");
 
     expect(response.statusCode).toBe(401);
+  });
+});
+
+describe("POST /api/v1/internal/admin/queues/:queueName/dead-letter/:deadLetterJobId/recover (FS-MIGRATE)", () => {
+  it("re-enqueues a DLQ job for internal admins", async () => {
+    const internalAdmin = createInternalAdminContext("admin");
+    vi.mocked(queueMonitoringService.recoverPlatformDeadLetterJob).mockResolvedValue({
+      recoveredQueueJobId: "recovered-1"
+    });
+
+    const response = await request(app.server)
+      .post("/api/v1/internal/admin/queues/imports/dead-letter/dlq-1/recover")
+      .set("Authorization", internalAdmin.authorization);
+
+    expect(response.statusCode).toBe(202);
+    expect(response.body.recoveredQueueJobId).toBe("recovered-1");
   });
 });
 

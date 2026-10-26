@@ -11,9 +11,13 @@ import {
   getMigrateDedupePreviewHandler,
   getMigrateRelationalPreviewHandler,
   getMigrateOnboardingBundleHandler,
+  getMigrateOnboardingIngestStatusHandler,
   linkMigrateOnboardingFilesHandler,
   listMigrateOnboardingSourcesHandler,
-  setMigrateOnboardingSourceHandler
+  setMigrateOnboardingSourceHandler,
+  runMigrateImportFileLinkHandler,
+  getMigrateImportFileLinkPreviewHandler,
+  confirmMigrateImportFileLinkHandler
 } from "./handlers.js";
 import {
   acknowledgePreviewRouteSchema,
@@ -27,12 +31,17 @@ import {
   relationalPreviewRouteSchema,
   getActiveSessionRouteSchema,
   getBundleRouteSchema,
+  ingestStatusRouteSchema,
   linkFilesRouteSchema,
   linkMigrateOnboardingFilesValidation,
   listSourcesRouteSchema,
   migrateOnboardingBundleIdValidation,
   setMigrateOnboardingSourceValidation,
-  setSourceRouteSchema
+  setSourceRouteSchema,
+  confirmImportFileLinkDecisionsValidation,
+  fileLinkPreviewRouteSchema,
+  runFileLinkRouteSchema,
+  confirmFileLinkRouteSchema
 } from "./schemas.js";
 
 const migrateOnboardingRoutes: FastifyPluginAsync = async (fastify) => {
@@ -85,6 +94,24 @@ const migrateOnboardingRoutes: FastifyPluginAsync = async (fastify) => {
     schema: acknowledgePreviewRouteSchema
   }, acknowledgeMigrateOnboardingPreviewHandler);
 
+  fastify.post("/migrate/onboarding/sessions/:bundleId/file-link/run", {
+    preHandler: [authenticate, requireOwnerOrAdmin],
+    preValidation: migrateOnboardingBundleIdValidation,
+    schema: runFileLinkRouteSchema
+  }, runMigrateImportFileLinkHandler);
+
+  fastify.get("/migrate/onboarding/sessions/:bundleId/file-link/preview", {
+    preHandler: [authenticate, requireOwnerOrAdmin],
+    preValidation: migrateOnboardingBundleIdValidation,
+    schema: fileLinkPreviewRouteSchema
+  }, getMigrateImportFileLinkPreviewHandler);
+
+  fastify.patch("/migrate/onboarding/sessions/:bundleId/file-link/decisions", {
+    preHandler: [authenticate, requireOwnerOrAdmin],
+    preValidation: confirmImportFileLinkDecisionsValidation,
+    schema: confirmFileLinkRouteSchema
+  }, confirmMigrateImportFileLinkHandler);
+
   fastify.get("/migrate/onboarding/sessions/:bundleId/dedupe-preview", {
     preHandler: [authenticate, requireOwnerOrAdmin],
     preValidation: migrateOnboardingBundleIdValidation,
@@ -96,6 +123,12 @@ const migrateOnboardingRoutes: FastifyPluginAsync = async (fastify) => {
     preValidation: migrateOnboardingBundleIdValidation,
     schema: relationalPreviewRouteSchema
   }, getMigrateRelationalPreviewHandler);
+
+  fastify.get("/migrate/onboarding/sessions/:bundleId/ingest-status", {
+    preHandler: [authenticate, requireOwnerOrAdmin],
+    preValidation: migrateOnboardingBundleIdValidation,
+    schema: ingestStatusRouteSchema
+  }, getMigrateOnboardingIngestStatusHandler);
 
   fastify.patch("/migrate/onboarding/sessions/:bundleId/dedupe-decisions", {
     preHandler: [authenticate, requireOwnerOrAdmin],

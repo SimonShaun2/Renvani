@@ -262,7 +262,12 @@ export async function recalculateTotals(
   }
 
   const taxRate = new Decimal(invoice.taxRate ?? "0");
-  const discountAmount = new Decimal(invoice.discountAmount ?? "0");
+  const vipDiscount = await import("./vip-membership-discount.service.js").then((mod) =>
+    mod.computeVipMembershipDiscountAmount(invoice.companyId, invoice.customerId, subtotal, tx)
+  );
+  const discountAmount = vipDiscount.greaterThan(0)
+    ? vipDiscount
+    : new Decimal(invoice.discountAmount ?? "0");
   const amountPaid = new Decimal(invoice.amountPaid ?? "0");
   const taxAmount = taxableSubtotal.mul(taxRate);
   const total = subtotal.add(taxAmount).sub(discountAmount);

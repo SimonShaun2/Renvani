@@ -8,8 +8,10 @@ import { setupTestEnv } from "../../test-support/env-setup.js";
 
 setupTestEnv();
 
-const { addImportsQueueJob, downloadFileMock } = vi.hoisted(() => ({
+const { addImportsQueueJob, addAiQueueJob, enqueueImportFileLinkJobMock, downloadFileMock } = vi.hoisted(() => ({
   addImportsQueueJob: vi.fn(),
+  addAiQueueJob: vi.fn(),
+  enqueueImportFileLinkJobMock: vi.fn(),
   downloadFileMock: vi.fn()
 }));
 
@@ -25,7 +27,8 @@ vi.mock("@fsm/db", async () => {
 
 vi.mock("@fsm/jobs", () => ({
   agreementsQueue: { add: vi.fn() },
-  aiQueue: { add: vi.fn() },
+  aiQueue: { add: addAiQueueJob },
+  enqueueImportFileLinkJob: enqueueImportFileLinkJobMock,
   importsQueue: { add: addImportsQueueJob },
   invoicesQueue: { add: vi.fn() },
   notificationsQueue: { add: vi.fn() }
@@ -59,6 +62,8 @@ beforeAll(async () => {
 beforeEach(async () => {
   fakeDb.resetTestState();
   addImportsQueueJob.mockReset();
+  addAiQueueJob.mockReset();
+  enqueueImportFileLinkJobMock.mockReset();
   downloadFileMock.mockReset();
   downloadFileMock.mockResolvedValue(Buffer.from(SAMPLE_CSV, "utf8"));
   app = await buildAppModule.buildApp();
@@ -388,6 +393,95 @@ describe("migrate onboarding wizard API", () => {
 
     expect(response.body.id).toBe(bundle.id);
     expect(response.body.wizardStep).toBe(2);
+  });
+
+  it("exposes QuickBooks OAuth founder gate on source catalog", async () => {
+    const { authorization } = createAuthContext("owner");
+
+    const response = await request(app.server)
+      .get("/api/v1/migrate/onboarding/sources")
+      .set("Authorization", authorization)
+      .expect(200);
+
+    const qbo = response.body.sources.find((entry: { id: string }) => entry.id === "qbo");
+    expect(qbo?.oauth?.enabled).toBe(false);
+    expect(qbo?.oauth?.founderGate).toBe(true);
+  });
+
+  it("requires file-link confirmation before acknowledging preview when bundle media exists", async () => {
+    const { company, authorization } = createAuthContext("owner");
+    const importBundleId = "f1111111-1111-4111-8111-111111111111";
+
+    const bundle = fakeDb.seedImportBundle({
+      id: importBundleId,
+      companyId: company.id,
+      wizardStep: 4,
+      stepState: {
+        sourceSystem: "qbo",
+        files: [],
+        mappingsConfirmedAt: new Date().toISOString()
+      }
+    });
+
+    downloadFileMock.mockResolvedValue(Buffer.from(SAMPLE_CSV, "utf8"));
+
+    const importSession = fakeDb.seedImportSession({
+      companyId: company.id,
+      importBundleId: bundle.id,
+      fileName: "customers.csv",
+      fileUrl: "https://r2.test/imports/customers.csv",
+      status: "preview",
+      entityType: "customers",
+      columnMappings: {
+        firstName: "firstName",
+        lastName: "lastName",
+        email: "email",
+        phone: "phone"
+      },
+      aiInferences: {
+        migrateFileBatchManifest: {
+          importBundleId: bundle.id,
+          sourceSystem: "qbo",
+          batches: [
+            {
+              batchIndex: 0,
+              batchesTotal: 1,
+              objects: [{ vendorFileId: "photo-1", relativePath: "Customers/Jane_Doe/photo.jpg" }]
+            }
+          ]
+        }
+      }
+    });
+
+    const bundleRow = fakeDb.getTestState().importBundles.find((row) => row.id === bundle.id);
+    if (!bundleRow) {
+      throw new Error("expected seeded import bundle");
+    }
+    bundleRow.stepState = {
+      sourceSystem: "qbo",
+      mappingsConfirmedAt: new Date().toISOString(),
+      files: [
+        {
+          importSessionId: importSession.id,
+          entityType: "customers",
+          fileName: "customers.csv"
+        }
+      ]
+    };
+
+    await request(app.server)
+      .post(`/api/v1/migrate/onboarding/sessions/${bundle.id}/acknowledge-preview`)
+      .set("Authorization", authorization)
+      .send({})
+      .expect(409);
+
+    await request(app.server)
+      .post(`/api/v1/migrate/onboarding/sessions/${bundle.id}/file-link/run`)
+      .set("Authorization", authorization)
+      .send({})
+      .expect(202);
+
+    expect(enqueueImportFileLinkJobMock).toHaveBeenCalled();
   });
 
   it("rejects cross-tenant bundle access", async () => {

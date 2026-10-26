@@ -7,9 +7,13 @@ import {
   syncLoyaltyReminderDryRunRecommendations
 } from "@fsm/db";
 import {
+  EvaluateLoyaltyReminderCandidatesJobDataSchema,
   LOYALTY_AGREEMENTS_JOB_NAMES,
+  assertPostJobLoyaltyReminderIdempotencyKey,
   type EvaluateLoyaltyReminderCandidatesJobData
 } from "@fsm/types";
+
+import { emitLoyaltyReminderEvaluationReceipt } from "../lib/loyalty-reminder-evaluation-receipt.js";
 
 const logger = pino({
   name: "loyalty-reminder-candidates-processor"
@@ -29,11 +33,20 @@ export async function processEvaluateLoyaltyReminderCandidates(
   job: Job<EvaluateLoyaltyReminderCandidatesJobData>,
   dependencies: LoyaltyReminderCandidatesDependencies = defaultDependencies
 ): Promise<void> {
-  const companyId = job.data.companyId;
-
-  if (!companyId) {
-    logger.warn({ jobId: job.id ?? null }, "evaluate-loyalty-reminder-candidates missing companyId");
+  const parsed = EvaluateLoyaltyReminderCandidatesJobDataSchema.safeParse(job.data);
+  if (!parsed.success) {
+    logger.warn(
+      { jobId: job.id ?? null, issues: parsed.error.issues },
+      "evaluate-loyalty-reminder-candidates payload failed validation"
+    );
     return;
+  }
+
+  const payload = parsed.data;
+  const companyId = payload.companyId;
+
+  if (payload.triggerJobId) {
+    assertPostJobLoyaltyReminderIdempotencyKey(companyId, payload.triggerJobId, payload.idempotencyKey);
   }
 
   // FEATURE FLAG: loyalty-reminders-enabled — FS-72 dry-run evaluation (no customer sends)
@@ -42,24 +55,42 @@ export async function processEvaluateLoyaltyReminderCandidates(
     return;
   }
 
-  const dryRun = job.data.dryRun ?? featureFlags.loyaltyRemindersDryRun;
-  const horizonDays = job.data.horizonDays ?? 14;
-  const importSessionId = job.data.importSessionId ?? null;
+  const dryRun = payload.dryRun ?? featureFlags.loyaltyRemindersDryRun;
+  const horizonDays = payload.horizonDays ?? 14;
+  const importSessionId = payload.importSessionId ?? null;
+  const trigger: "post_job_completed" | "import_session" | "manual" = payload.triggerJobId
+    ? "post_job_completed"
+    : importSessionId
+      ? "import_session"
+      : "manual";
 
-  const candidates = await dependencies.evaluateCandidates(companyId, {
-    horizonDays,
-    importSessionId,
-    ...(job.data.lapsedDays !== undefined ? { lapsedDays: job.data.lapsedDays } : {}),
-    dryRun
-  });
+  try {
+    const candidates = await dependencies.evaluateCandidates(companyId, {
+      horizonDays,
+      importSessionId,
+      customerId: payload.customerId ?? null,
+      ...(payload.lapsedDays !== undefined ? { lapsedDays: payload.lapsedDays } : {}),
+      dryRun
+    });
 
-  const syncResult = dryRun
-    ? await dependencies.syncDryRunRecommendations(companyId, candidates)
-    : { createdCount: 0, skippedExistingCount: 0 };
+    const syncResult = dryRun
+      ? await dependencies.syncDryRunRecommendations(companyId, candidates)
+      : { createdCount: 0, skippedExistingCount: 0 };
 
-  await job.updateProgress(100);
+    await job.updateProgress(100);
 
-  logger.info(
+    await emitLoyaltyReminderEvaluationReceipt({
+      companyId,
+      idempotencyKey: payload.idempotencyKey,
+      trigger,
+      state: "completed",
+      ...(payload.customerId !== undefined ? { customerId: payload.customerId } : {}),
+      ...(payload.triggerJobId !== undefined ? { triggerJobId: payload.triggerJobId } : {}),
+      candidateCount: candidates.length,
+      createdRecommendations: syncResult.createdCount
+    });
+
+    logger.info(
     {
       companyId,
       dryRun,
@@ -70,7 +101,18 @@ export async function processEvaluateLoyaltyReminderCandidates(
       jobId: job.id ?? null
     },
     "evaluate-loyalty-reminder-candidates completed"
-  );
+    );
+  } catch (error: unknown) {
+    await emitLoyaltyReminderEvaluationReceipt({
+      companyId,
+      idempotencyKey: payload.idempotencyKey,
+      trigger,
+      state: "failed",
+      ...(payload.customerId !== undefined ? { customerId: payload.customerId } : {}),
+      ...(payload.triggerJobId !== undefined ? { triggerJobId: payload.triggerJobId } : {})
+    });
+    throw error;
+  }
 }
 
 export function createLoyaltyReminderCandidatesProcessor(

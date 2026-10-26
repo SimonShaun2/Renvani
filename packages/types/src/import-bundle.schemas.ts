@@ -65,3 +65,25 @@ export const ImportSessionChunkProgressSchema = z.object({
     .optional(),
   lastIdempotencyKey: z.string().min(1).optional()
 });
+
+export const ImportSessionIngestProgressResponseSchema = z.object({
+  importSessionId: z.string().uuid(),
+  status: z.string().min(1),
+  entityType: z.string().min(1),
+  fileName: z.string().min(1),
+  chunk: ImportSessionChunkProgressSchema.nullable()
+});
+
+export const MigrateOnboardingIngestProgressSessionSchema = z.object({
+  importSessionId: z.string().uuid(),
+  entityType: z.string().min(1),
+  status: z.string().min(1),
+  fileName: z.string().min(1),
+  chunk: ImportSessionChunkProgressSchema.nullable()
+});
+
+export const MigrateOnboardingIngestProgressResponseSchema = z.object({
+  bundleId: z.string().uuid(),
+  progress: ImportBundleProgressSchema,
+  sessions: z.array(MigrateOnboardingIngestProgressSessionSchema)
+});

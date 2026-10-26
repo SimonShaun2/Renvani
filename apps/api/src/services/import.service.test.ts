@@ -106,14 +106,20 @@ describe("import.service", () => {
       "map-csv-columns",
       {
         companyId: company.id,
-        importSessionId: importSession.id
+        importSessionId: importSession.id,
+        idempotencyKey: `${importSession.id}:map-csv-columns`,
       },
       expect.objectContaining({
         jobId: `map-csv-columns-${importSession.id}`
       })
     );
     expect(importSession.status).toBe("uploaded");
-    expect(fakeDb.getTestState().activityEvents.at(-1)?.eventType).toBe("import.started");
+    const events = fakeDb.getTestState().activityEvents.filter((event) => event.eventType === "import.started");
+    expect(events.length).toBeGreaterThanOrEqual(2);
+    expect(events.at(-1)?.payload).toMatchObject({
+      stepKind: "map-csv-columns",
+      state: "scheduled",
+    });
   });
 
   it("rollbackImport soft-deletes tagged records in a transaction", async () => {

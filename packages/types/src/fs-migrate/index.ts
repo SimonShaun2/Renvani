@@ -6,4 +6,8 @@ export * from "./import-pipeline.contract.js";
 export * from "./import-workflow-runtime.js";
 export * from "./m8-job-history-chunk.read.js";
 export * from "./migrate-file-batch-progress.js";
+export * from "./migrate-file-batch-operator.js";
 export * from "./migrate-file-batch-trace.js";
+export * from "./import-file-link.js";
+export * from "./migrate-photo-link-preview.js";
+export * from "./qbd-desktop-import.contract.js";

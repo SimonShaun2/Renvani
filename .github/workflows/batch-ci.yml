@@ -3,7 +3,8 @@ name: Batch CI (approved)
 
 on:
   pull_request:
-    types: [labeled, synchronize]
+    types: [labeled, synchronize, reopened]
+  workflow_dispatch:
 
 concurrency:
   group: batch-ci-${{ github.event.pull_request.number }}
@@ -11,7 +12,7 @@ concurrency:
 
 jobs:
   batch:
-    if: contains(github.event.pull_request.labels.*.name, 'batch-ci')
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.pull_request.labels.*.name, 'batch-ci')
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
@@ -29,6 +30,8 @@ jobs:
         run: pnpm build
       - name: Lint
         run: pnpm lint
+      - name: Cross-tenant matrix (STACK-03)
+        run: pnpm test:cross-tenant
       - name: Test
         run: pnpm test
       - name: FS-128 FS-MIGRATE import pipeline contracts
@@ -36,7 +39,7 @@ jobs:
 
   neon-per-pr-staging:
     name: Neon per-PR (staging RLS)
-    if: contains(github.event.pull_request.labels.*.name, 'batch-ci')
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.pull_request.labels.*.name, 'batch-ci')
     runs-on: ubuntu-latest
     timeout-minutes: 20
     needs: batch
@@ -52,7 +55,7 @@ jobs:
       - name: Install
         run: corepack enable && pnpm install --frozen-lockfile
       - name: Build packages for CI scripts
-        run: pnpm --filter @fsm/import-normalize build && pnpm --filter @fsm/types build && pnpm --filter "@fsm/config..." --filter "@fsm/db..." build
+        run: pnpm --filter @fsm/import-normalize build && pnpm --filter @fsm/types build && pnpm --filter @fsm/import-engine build && pnpm --filter "@fsm/config..." --filter "@fsm/db..." build
       - name: Neon per-PR branch gate (STACK-10)
         env:
           NEON_CI_DATABASE_URL: ${{ secrets.NEON_CI_STAGING_DATABASE_URL }}

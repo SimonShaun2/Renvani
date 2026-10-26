@@ -3,6 +3,7 @@
 import { CircleDot } from "lucide-react";
 
 import { useCustomerActivity } from "@/src/hooks/customers.hooks";
+import { ImportedHistoryTimeline } from "./ImportedHistoryTimeline";
 import { TimeAgo } from "../ui/TimeAgo";
 import { EmptyState } from "../ui/EmptyState";
 import { SkeletonCard } from "../ui/SkeletonCard";
@@ -14,6 +15,7 @@ export function ActivityTimeline({ customerId }: { customerId: string }) {
   return (
     <section className="surface-card px-5 py-5">
       <h2 className="text-base font-semibold text-neutral-900">Activity Timeline</h2>
+      <ImportedHistoryTimeline customerId={customerId} />
       <div className="mt-4 max-h-[420px] overflow-y-auto pr-1">
         {activityQuery.isLoading ? (
           <div className="space-y-3">

@@ -37,6 +37,12 @@ export interface CompanyStripePlatformBillingSettings {
   planTier?: "flex" | "flat" | null;
 }
 
+/** FS-132 — configurable pause / dunning policy (defaults in @fsm/config) */
+export interface CompanyVipMembershipSettings {
+  maxPauseMonths?: number | null;
+  pastDueGraceDays?: number | null;
+}
+
 export interface CompanySettings {
   tradingName?: string | null;
   currency?: string | null;
@@ -45,4 +51,5 @@ export interface CompanySettings {
   /** STACK-02 — maps Clerk org to tenant company */
   clerk?: CompanyClerkSettings | null;
   stripePlatformBilling?: CompanyStripePlatformBillingSettings | null;
+  vipMembership?: CompanyVipMembershipSettings | null;
 }

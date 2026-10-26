@@ -4,7 +4,8 @@ import { requireRenaviInternalAdmin } from "../../../lib/require-renavi-internal
 import {
   getPlatformQueueMonitoringHandler,
   listPlatformDeadLetterJobsHandler,
-  listPlatformFailedJobsHandler
+  listPlatformFailedJobsHandler,
+  recoverPlatformDeadLetterJobHandler
 } from "./handlers.js";
 
 const internalAdminQueueRoutes: FastifyPluginAsync = async (fastify) => {
@@ -19,6 +20,10 @@ const internalAdminQueueRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.get("/internal/admin/queues/:queueName/failed", {
     preHandler: [fastify.authenticate, ...requireRenaviInternalAdmin]
   }, listPlatformFailedJobsHandler);
+
+  fastify.post("/internal/admin/queues/:queueName/dead-letter/:deadLetterJobId/recover", {
+    preHandler: [fastify.authenticate, ...requireRenaviInternalAdmin]
+  }, recoverPlatformDeadLetterJobHandler);
 };
 
 export default internalAdminQueueRoutes;

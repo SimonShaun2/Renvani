@@ -2,7 +2,6 @@ import { randomUUID } from "node:crypto";
 
 import { and, eq, isNull } from "drizzle-orm";
 import type { Job } from "bullmq";
-import Papa from "papaparse";
 import pino from "pino";
 
 import { downloadFile, getFileKeyFromUrl } from "@fsm/config/storage";
@@ -16,11 +15,7 @@ import {
   importChunkRuns,
   importSessions,
 } from "@fsm/db";
-import {
-  isXlsxImportFileName,
-  parseXlsxBufferToSheetRows,
-  sheetRowsToRecordRows,
-} from "@fsm/import-engine";
+import { parseTabularImportFile } from "@fsm/import-engine";
 import {
   IMPORT_CHUNK_COMMIT_JOB_NAME,
   ImportChunkCommitPayloadSchema,
@@ -28,11 +23,15 @@ import {
   type ImportChunkCommitPayload,
 } from "@fsm/jobs";
 import {
+  IMPORT_QUEUE_JOB_NAMES,
   ImportEstimateCommitRowSchema,
   ImportJobCommitRowSchema,
+  buildImportChunkCommitJobId,
   sanitizeSpreadsheetCell,
   type ColumnMapping,
 } from "@fsm/types";
+
+import { emitImportWorkflowStepReceipt } from "../lib/import-workflow-step-receipt.js";
 
 import {
   mergeImportChunkSessionProgress,
@@ -95,45 +94,7 @@ function normalizeTextValue(value: string | null | undefined): string | null {
 }
 
 function parseTabularRows(buffer: Buffer, fileName: string): ParsedCsvRow[] {
-  if (isXlsxImportFileName(fileName)) {
-    const sheet = parseXlsxBufferToSheetRows(buffer);
-    const recordRows = sheetRowsToRecordRows(sheet.headers, sheet.rows);
-
-    return recordRows.map((values, index) => ({
-      rowNumber: index + 2,
-      values,
-    }));
-  }
-
-  return parseCsv(buffer);
-}
-
-function parseCsv(buffer: Buffer): ParsedCsvRow[] {
-  const csvText = buffer.toString("utf8").replace(/^\uFEFF/u, "");
-  const result = Papa.parse<Record<string, string>>(csvText, {
-    header: true,
-    skipEmptyLines: true,
-  });
-  const headers = (result.meta.fields ?? []).map((header) => header.trim());
-  const rows: ParsedCsvRow[] = [];
-
-  for (let index = 0; index < result.data.length; index += 1) {
-    const sourceRow = result.data[index];
-    const normalizedRow: Record<string, string> = {};
-
-    for (const header of headers) {
-      const rawValue = sourceRow?.[header];
-      normalizedRow[header] =
-        typeof rawValue === "string" ? sanitizeSpreadsheetCell(rawValue.trim()) : "";
-    }
-
-    rows.push({
-      rowNumber: index + 2,
-      values: normalizedRow,
-    });
-  }
-
-  return rows;
+  return parseTabularImportFile(buffer, fileName).rows;
 }
 
 function resolveRowWindow(
@@ -642,6 +603,17 @@ export async function handleImportChunkCommit(job: Job<Record<string, unknown>>)
         { idempotencyKey: payload.idempotencyKey, importSessionId: payload.importSessionId },
         "import-chunk-commit skipped; chunk already completed",
       );
+      await emitImportWorkflowStepReceipt({
+        companyId: payload.companyId,
+        importSessionId: payload.importSessionId,
+        ...(payload.importBundleId !== undefined ? { importBundleId: payload.importBundleId } : {}),
+        stepKind: IMPORT_QUEUE_JOB_NAMES.importChunkCommit,
+        idempotencyKey: payload.idempotencyKey,
+        state: "deduped_completed",
+        chunkIndex: payload.chunkIndex,
+        jobId: buildImportChunkCommitJobId(payload.importSessionId, payload.chunkIndex),
+        summary: `Import chunk ${payload.chunkIndex} deduped (already completed)`,
+      });
       return;
     }
 
@@ -649,6 +621,18 @@ export async function handleImportChunkCommit(job: Job<Record<string, unknown>>)
 
     const chunkResult = await commitChunkForEntity(payload, importSession);
     await finalizeChunkRun(payload, importSession, chunkResult, true);
+
+    await emitImportWorkflowStepReceipt({
+      companyId: payload.companyId,
+      importSessionId: payload.importSessionId,
+      ...(payload.importBundleId !== undefined ? { importBundleId: payload.importBundleId } : {}),
+      stepKind: IMPORT_QUEUE_JOB_NAMES.importChunkCommit,
+      idempotencyKey: payload.idempotencyKey,
+      state: "completed",
+      chunkIndex: payload.chunkIndex,
+      jobId: buildImportChunkCommitJobId(payload.importSessionId, payload.chunkIndex),
+      summary: `Import chunk ${payload.chunkIndex} completed`,
+    });
 
     const progressPercent =
       payload.chunksTotal === 0
@@ -658,6 +642,17 @@ export async function handleImportChunkCommit(job: Job<Record<string, unknown>>)
   } catch (error: unknown) {
     if (parsed.success) {
       await markChunkRunFailed(parsed.data, error);
+      await emitImportWorkflowStepReceipt({
+        companyId: parsed.data.companyId,
+        importSessionId: parsed.data.importSessionId,
+        ...(parsed.data.importBundleId !== undefined ? { importBundleId: parsed.data.importBundleId } : {}),
+        stepKind: IMPORT_QUEUE_JOB_NAMES.importChunkCommit,
+        idempotencyKey: parsed.data.idempotencyKey,
+        state: "failed",
+        chunkIndex: parsed.data.chunkIndex,
+        jobId: buildImportChunkCommitJobId(parsed.data.importSessionId, parsed.data.chunkIndex),
+        summary: `Import chunk ${parsed.data.chunkIndex} failed`,
+      });
     }
 
     logger.error(

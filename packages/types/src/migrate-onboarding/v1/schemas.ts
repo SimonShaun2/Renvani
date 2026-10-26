@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { importFileLinkProposalSchema } from "../../fs-migrate/import-file-link.js";
 import { importEntityTypeSchema } from "../import-entity-bridge.js";
 
 export const MIGRATE_ONBOARDING_CONTRACT_ID = "fsm.migrate-onboarding.v1";
@@ -53,6 +54,10 @@ export const migrateOnboardingStepStateSchema = z.object({
   sourceSystem: migrateSourceSystemIdSchema.optional(),
   files: z.array(migrateOnboardingFileRefSchema).default([]),
   mappingsConfirmedAt: z.string().datetime().optional(),
+  fileLinkStatus: z.enum(["idle", "processing", "ready", "failed"]).optional(),
+  fileLinkProposals: z.array(importFileLinkProposalSchema).optional(),
+  fileLinkLastRunAt: z.string().datetime().optional(),
+  fileLinkConfirmedAt: z.string().datetime().optional(),
   previewReviewedAt: z.string().datetime().optional(),
   commitStartedAt: z.string().datetime().optional(),
   commitCompletedAt: z.string().datetime().optional()
@@ -237,11 +242,21 @@ export const migrateOnboardingCommitResponseSchema = z.object({
 
 export type MigrateOnboardingCommitResponse = z.infer<typeof migrateOnboardingCommitResponseSchema>;
 
+export const migrateOnboardingOAuthGateSchema = z.object({
+  enabled: z.boolean(),
+  founderGate: z.boolean().optional(),
+  message: z.string().optional()
+});
+
 export const migrateOnboardingSourceCatalogEntrySchema = z.object({
   id: migrateSourceSystemIdSchema,
   label: z.string(),
   description: z.string(),
-  recommendedExports: z.array(z.string())
+  recommendedExports: z.array(z.string()),
+  catalogTier: z.enum(["primary", "export_tips"]).default("export_tips"),
+  importPath: z.enum(["generic_ai_guided", "quickbooks_file_export"]).default("generic_ai_guided"),
+  presetAliasFor: migrateSourceSystemIdSchema.optional(),
+  oauth: migrateOnboardingOAuthGateSchema.optional()
 });
 
 export type MigrateOnboardingSourceCatalogEntry = z.infer<typeof migrateOnboardingSourceCatalogEntrySchema>;

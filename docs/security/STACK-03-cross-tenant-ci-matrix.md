@@ -8,7 +8,7 @@
 
 1. Wrong-tenant access returns **`NOT_FOUND`** (or **`FORBIDDEN`** where contract specifies) — never another tenant’s payload.
 2. Tests use **synthetic fixtures only** (`synthetic-tenant-fixtures.ts`).
-3. **Clerk** cases are added behind the auth feature flag when STACK-02 lands; JWT matrix remains until cutover.
+3. **Clerk** cases run behind `clerkAuthParallelJwt` (STACK-02 parallel JWT) in `stack03-cross-tenant-ci.test.ts`.
 4. Future **RLS** (STACK-10): same cases must pass with session `company_id` set on DB pool.
 
 ## Matrix (JWT v1 — current)
@@ -32,6 +32,8 @@
 
 | File | Coverage |
 | --- | --- |
-| `apps/api/src/routes/security/fs-92-tenant-isolation.test.ts` | Core entity routes |
-| `apps/api/src/routes/imports/imports.test.ts` | **STACK03-JWT-02/03** |
-| Future: attachment / export routes | FS-85, FS-89 |
+| `apps/api/src/routes/security/stack03-cross-tenant-ci.test.ts` | **STACK03-JWT-01..05**, **STACK03-CLK-01..06** |
+| `apps/api/src/routes/security/fs-92-tenant-isolation.test.ts` | Extended FS-92 entity routes (full suite) |
+| `apps/api/src/routes/imports/imports.test.ts` | **STACK03-JWT-02/03** (import rollback suite) |
+
+**CI:** `pnpm test:cross-tenant` (also runs in `batch-ci` before the full test suite).

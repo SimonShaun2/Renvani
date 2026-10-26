@@ -61,5 +61,20 @@ export const SERVICE_TITAN_PRESETS: ImportSourcePreset[] = [
       tag: "tags",
       tags: "tags"
     }
+  },
+  {
+    id: "service_titan_invoices",
+    entity: "invoices",
+    label: "ServiceTitan (invoices)",
+    headerAliases: {
+      "invoice number": "invoiceNumber",
+      "customer id": "customerSourceId",
+      "invoice date": "invoiceDate",
+      total: "total",
+      balance: "balanceDue",
+      "balance due": "balanceDue",
+      subtotal: "subtotal",
+      tax: "tax"
+    }
   }
 ];

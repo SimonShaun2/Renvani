@@ -2,12 +2,18 @@ import type { FastifyReply, FastifyRequest } from "fastify";
 
 import type {
   ApplyMigrateDedupeDecisionsBody,
+  ConfirmImportFileLinkDecisionsBody,
   CreateMigrateOnboardingSessionBody,
   LinkMigrateOnboardingFilesBody,
   MigrateSourceSystemId,
   SetMigrateOnboardingSourceBody
 } from "@fsm/types";
 
+import {
+  confirmMigrateImportFileLinkDecisions,
+  getMigrateImportFileLinkPreview,
+  runMigrateImportFileLink
+} from "../../services/migrate-import-file-link.service.js";
 import {
   acknowledgeMigrateOnboardingPreview,
   applyMigrateDedupeDecisions,
@@ -22,6 +28,7 @@ import {
   listMigrateOnboardingSources,
   setMigrateOnboardingSource
 } from "../../services/migrate-onboarding.service.js";
+import { getMigrateOnboardingIngestStatus } from "../../services/migrate-onboarding-ingest-status.service.js";
 
 export async function listMigrateOnboardingSourcesHandler(
   _request: FastifyRequest,
@@ -135,6 +142,48 @@ export async function applyMigrateDedupeDecisionsHandler(
   const body = request.body as ApplyMigrateDedupeDecisionsBody;
   const bundle = await applyMigrateDedupeDecisions(request.company.id, request.user.id, bundleId, body);
   return reply.send(bundle);
+}
+
+export async function runMigrateImportFileLinkHandler(
+  request: FastifyRequest,
+  reply: FastifyReply
+): Promise<FastifyReply> {
+  const { bundleId } = request.params as { bundleId: string };
+  const preview = await runMigrateImportFileLink(request.company.id, request.user.id, bundleId);
+  return reply.code(202).send(preview);
+}
+
+export async function getMigrateImportFileLinkPreviewHandler(
+  request: FastifyRequest,
+  reply: FastifyReply
+): Promise<FastifyReply> {
+  const { bundleId } = request.params as { bundleId: string };
+  const preview = await getMigrateImportFileLinkPreview(request.company.id, bundleId);
+  return reply.send(preview);
+}
+
+export async function confirmMigrateImportFileLinkHandler(
+  request: FastifyRequest,
+  reply: FastifyReply
+): Promise<FastifyReply> {
+  const { bundleId } = request.params as { bundleId: string };
+  const body = request.body as ConfirmImportFileLinkDecisionsBody;
+  const preview = await confirmMigrateImportFileLinkDecisions(
+    request.company.id,
+    request.user.id,
+    bundleId,
+    body
+  );
+  return reply.send(preview);
+}
+
+export async function getMigrateOnboardingIngestStatusHandler(
+  request: FastifyRequest,
+  reply: FastifyReply
+): Promise<FastifyReply> {
+  const { bundleId } = request.params as { bundleId: string };
+  const status = await getMigrateOnboardingIngestStatus(request.company.id, bundleId);
+  return reply.send(status);
 }
 
 export async function commitMigrateOnboardingBundleHandler(

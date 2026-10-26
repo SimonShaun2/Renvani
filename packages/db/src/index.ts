@@ -55,6 +55,13 @@ export {
 } from "./loyalty-reminder-dry-run-sync.js";
 export * from "./schema.js";
 export {
+  listOpenQboSyncIssues,
+  recordQboSyncIssue,
+  resolveQboSyncIssueRecord
+} from "./qbo-sync-issue.js";
+export { resolveQboAccessTokenForCompany } from "./qbo-connection-runtime.js";
+export { runQboSyncPullJob, runQboSyncPushJob } from "./qbo-sync-engine.js";
+export {
   commitPriceBookRows,
   mapPriceBookRow,
   resolveInvoiceLineCatalogId,

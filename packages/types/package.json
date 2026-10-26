@@ -13,6 +13,10 @@
     "./fs-migrate/import-workflow-runtime-fingerprint.node": {
       "types": "./dist/fs-migrate/import-workflow-runtime-fingerprint.node.d.ts",
       "import": "./dist/fs-migrate/import-workflow-runtime-fingerprint.node.js"
+    },
+    "./vip-membership": {
+      "types": "./dist/vip-membership/index.d.ts",
+      "import": "./dist/vip-membership/index.js"
     }
   },
   "dependencies": {
@@ -22,7 +26,7 @@
     "build": "tsc -p tsconfig.json",
     "lint": "tsc --noEmit",
     "test": "vitest run",
-    "test:import-contracts": "vitest run src/fs-migrate/import-pipeline.contract.test.ts"
+    "test:import-contracts": "vitest run src/fs-migrate/import-pipeline.contract.test.ts src/migrate-onboarding/v1/wizard-api.contract.test.ts src/migrate-onboarding/wizard-import-entity.contract.test.ts"
   },
   "devDependencies": {
     "@fsm/config": "workspace:*",

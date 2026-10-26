@@ -42,6 +42,10 @@
       "types": "./dist/import-bundle-storage.d.ts",
       "import": "./dist/import-bundle-storage.js"
     },
+    "./quickbooks-oauth-gate": {
+      "types": "./dist/quickbooks-oauth-gate.d.ts",
+      "import": "./dist/quickbooks-oauth-gate.js"
+    },
     "./import-golden-bundles": {
       "types": "./dist/import-golden-bundles/index.d.ts",
       "import": "./dist/import-golden-bundles/index.js"
@@ -77,6 +81,30 @@
     "./langfuse-env": {
       "types": "./dist/langfuse-env.d.ts",
       "import": "./dist/langfuse-env.js"
+    },
+    "./qbo-env": {
+      "types": "./dist/qbo-env.d.ts",
+      "import": "./dist/qbo-env.js"
+    },
+    "./token-cipher": {
+      "types": "./dist/token-cipher.d.ts",
+      "import": "./dist/token-cipher.js"
+    },
+    "./quickbooks/intuit-oauth": {
+      "types": "./dist/quickbooks/intuit-oauth.d.ts",
+      "import": "./dist/quickbooks/intuit-oauth.js"
+    },
+    "./quickbooks/qbo-api-client": {
+      "types": "./dist/quickbooks/qbo-api-client.d.ts",
+      "import": "./dist/quickbooks/qbo-api-client.js"
+    },
+    "./vip-membership-policy": {
+      "types": "./dist/vip-membership-policy.d.ts",
+      "import": "./dist/vip-membership-policy.js"
+    },
+    "./vip-membership-portal-token": {
+      "types": "./dist/vip-membership-portal-token.d.ts",
+      "import": "./dist/vip-membership-portal-token.js"
     }
   },
   "scripts": {
@@ -85,6 +113,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@fsm/import-engine": "workspace:*",
     "@fsm/import-normalize": "workspace:*",
     "@fsm/types": "workspace:*",
     "@aws-sdk/client-s3": "^3.931.0",

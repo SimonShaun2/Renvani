@@ -12,17 +12,28 @@ import {
   rollbackImport,
   startImport
 } from "../../services/import.service.js";
+import { getImportSessionIngestStatus } from "../../services/import-session-ingest-status.service.js";
+import { getImportSessionIngestProgress } from "../../services/import-ingest-progress.service.js";
+import {
+  getMigrateFileBatchOperatorStatus,
+  retryMigrateFileBatchFailedObjects
+} from "../../services/import-migrate-file-batch-operator.service.js";
 import { abortImportUploadRequest } from "./upload-guards.js";
 import {
   CSV_IMPORT_MAX_FILES,
   CSV_IMPORT_TOO_MANY_FILES_MESSAGE,
   csvImportMultipartParserOptions
 } from "./upload-limits.js";
-import type {
-  ConfirmMappingBody,
-  ImportSessionIdParams,
-  StartImportBody
+import type { z } from "zod";
+
+import {
+  type ConfirmMappingBody,
+  ImportFileBatchParamsSchema,
+  type ImportSessionIdParams,
+  type StartImportBody
 } from "./schemas.js";
+
+type ImportFileBatchParams = z.infer<typeof ImportFileBatchParamsSchema>;
 
 function toImportSessionResponse(importSession: Awaited<ReturnType<typeof getImportSession>>) {
   return {
@@ -52,6 +63,7 @@ export async function createImportHandler(
   let mimeType: string | undefined;
   let fileBuffer: Buffer | undefined;
   let fileCount = 0;
+  let entityType: import("@fsm/types").ImportEntityType | undefined;
 
   try {
     for await (const part of request.parts(csvImportMultipartParserOptions)) {
@@ -69,7 +81,21 @@ export async function createImportHandler(
         continue;
       }
 
-      await part.value;
+      if (part.fieldname === "entityType" && part.type === "field") {
+        const value = String(part.value).trim();
+        if (
+          value === "customers" ||
+          value === "jobs" ||
+          value === "estimates" ||
+          value === "price_book" ||
+          value === "notes" ||
+          value === "communications"
+        ) {
+          entityType = value;
+        }
+      } else {
+        await part.value;
+      }
     }
   } catch (error: unknown) {
     const fastifyError = error as FastifyError;
@@ -98,7 +124,7 @@ export async function createImportHandler(
     fileBuffer,
     {
       mimeType: mimeType ?? "text/csv",
-      entityType: "customers"
+      entityType: entityType ?? "customers"
     }
   );
 
@@ -128,10 +154,21 @@ export async function getImportHandler(
 ): Promise<FastifyReply> {
   const params = request.params as ImportSessionIdParams;
   const importSession = await getImportSession(request.company.id, params.id);
+  const ingest = await getImportSessionIngestStatus(request.company.id, params.id);
 
   return reply.send({
-    importSession: toImportSessionResponse(importSession)
+    importSession: toImportSessionResponse(importSession),
+    ingest
   });
+}
+
+export async function getImportIngestStatusHandler(
+  request: FastifyRequest,
+  reply: FastifyReply
+): Promise<FastifyReply> {
+  const params = request.params as ImportSessionIdParams;
+  const ingest = await getImportSessionIngestStatus(request.company.id, params.id);
+  return reply.send(ingest);
 }
 
 export async function confirmMappingHandler(
@@ -192,4 +229,41 @@ export async function getImportErrorsHandler(
   return reply.send({
     errors
   });
+}
+
+export async function getImportIngestProgressHandler(
+  request: FastifyRequest,
+  reply: FastifyReply
+): Promise<FastifyReply> {
+  const params = request.params as ImportSessionIdParams;
+  const progress = await getImportSessionIngestProgress(request.company.id, params.id);
+  return reply.send(progress);
+}
+
+export async function getMigrateFileBatchStatusHandler(
+  request: FastifyRequest,
+  reply: FastifyReply
+): Promise<FastifyReply> {
+  const params = request.params as ImportFileBatchParams;
+  const status = await getMigrateFileBatchOperatorStatus(
+    request.company.id,
+    params.id,
+    params.batchIndex
+  );
+
+  return reply.send({ fileBatch: status });
+}
+
+export async function retryMigrateFileBatchHandler(
+  request: FastifyRequest,
+  reply: FastifyReply
+): Promise<FastifyReply> {
+  const params = request.params as ImportFileBatchParams;
+  const result = await retryMigrateFileBatchFailedObjects(
+    request.company.id,
+    params.id,
+    params.batchIndex
+  );
+
+  return reply.send({ fileBatchRetry: result });
 }

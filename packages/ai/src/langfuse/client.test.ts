@@ -5,6 +5,7 @@ import {
   createNoopLangfuseTraceSink,
   getLangfuseTraceSink,
   recordAgentAuditObservation,
+  recordImportAiObservation,
   resetLangfuseTraceSinkForTests
 } from "./client.js";
 import { buildAgentActivityAuditPayloadV1 } from "@fsm/types";
@@ -87,5 +88,31 @@ describe("langfuse client stub", () => {
       "X-Langfuse-Public-Key": "pk-lf-test",
       "X-Langfuse-Secret-Key": "sk-lf-test"
     });
+  });
+
+  it("posts import AI trace with importSessionId metadata", async () => {
+    const fetchMock = vi.fn<typeof fetch>(async () => new Response("", { status: 200 }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    process.env.LANGFUSE_PUBLIC_KEY = "pk-lf-test";
+    process.env.LANGFUSE_SECRET_KEY = "sk-lf-test";
+    process.env.LANGFUSE_BASE_URL = "https://langfuse.example.com";
+
+    await recordImportAiObservation({
+      companyId: "00000000-0000-4000-8000-000000000010",
+      importSessionId: "00000000-0000-4000-8000-000000000020",
+      entityType: "customers",
+      outcome: "succeeded",
+      headerCount: 4,
+      mappedColumnCount: 3,
+      occurredAt: "2026-10-23T00:00:00.000Z"
+    });
+
+    expect(fetchMock).toHaveBeenCalledOnce();
+    const body = JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body)) as {
+      batch: Array<{ body: { name: string; metadata: Record<string, unknown> } }>;
+    };
+    expect(body.batch[0]?.body.name).toBe("import.ai_column_mapping");
+    expect(body.batch[0]?.body.metadata.importSessionId).toBe("00000000-0000-4000-8000-000000000020");
   });
 });

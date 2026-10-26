@@ -27,18 +27,29 @@ export interface BookingFlowStore {
   smsConsent: boolean;
   smsConsentMarketing: boolean;
   referenceNumber: string | null;
+  holdToken: string | null;
+  selectedTechnicianId: string | null;
+  selectedScheduledStart: string | null;
+  selectedScheduledEnd: string | null;
   servedTechCount: number;
   setStep: (step: number) => void;
   hydrateFromRoute: (slug: string, source?: string) => void;
   updateFields: (patch: Partial<BookingFlowSnapshot>) => void;
   setZipCoverage: (covered: boolean, techCount: number) => void;
   setReferenceNumber: (referenceNumber: string | null) => void;
+  setHoldToken: (holdToken: string | null) => void;
   reset: (slug?: string, source?: string) => void;
 }
 
 type BookingFlowSnapshot = Omit<
   BookingFlowStore,
-  "setStep" | "hydrateFromRoute" | "updateFields" | "setZipCoverage" | "setReferenceNumber" | "reset"
+  | "setStep"
+  | "hydrateFromRoute"
+  | "updateFields"
+  | "setZipCoverage"
+  | "setReferenceNumber"
+  | "setHoldToken"
+  | "reset"
 >;
 
 const initialBookingState: BookingFlowSnapshot = {
@@ -65,6 +76,10 @@ const initialBookingState: BookingFlowSnapshot = {
   smsConsent: false,
   smsConsentMarketing: false,
   referenceNumber: null,
+  holdToken: null,
+  selectedTechnicianId: null,
+  selectedScheduledStart: null,
+  selectedScheduledEnd: null,
   servedTechCount: 0
 };
 
@@ -96,6 +111,7 @@ export const useBookingFlowStore = create<BookingFlowStore>()(
           servedTechCount
         }),
       setReferenceNumber: (referenceNumber) => set({ referenceNumber }),
+      setHoldToken: (holdToken) => set({ holdToken }),
       reset: (slug, source) =>
         set({
           ...initialBookingState,
@@ -129,6 +145,10 @@ export const useBookingFlowStore = create<BookingFlowStore>()(
         smsConsent: state.smsConsent,
         smsConsentMarketing: state.smsConsentMarketing,
         referenceNumber: state.referenceNumber,
+        holdToken: state.holdToken,
+        selectedTechnicianId: state.selectedTechnicianId,
+        selectedScheduledStart: state.selectedScheduledStart,
+        selectedScheduledEnd: state.selectedScheduledEnd,
         servedTechCount: state.servedTechCount
       })
     }

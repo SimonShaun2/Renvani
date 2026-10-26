@@ -29,6 +29,9 @@ import {
   type RevenueSummaryCacheEntry
 } from "@fsm/db";
 import { aiQueue, redisConnection } from "@fsm/jobs";
+import { AI_QUEUE_JOB_NAMES, type ImportFileLinkJobData } from "@fsm/types";
+
+import { handleImportFileLink } from "./import-file-link.processor.js";
 
 const logger = pino({
   name: "ai-revenue-processor"
@@ -1374,6 +1377,9 @@ export function createAiRevenueProcessor(
         return;
       case "dormant-customer-scan":
         await handleDormantCustomerScan(job, dependencies);
+        return;
+      case AI_QUEUE_JOB_NAMES.importFileLink:
+        await handleImportFileLink(job as Job<ImportFileLinkJobData>);
         return;
       default:
         logger.warn({ jobId: job.id ?? null, jobName: job.name }, "Unknown AI revenue job received");

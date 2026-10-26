@@ -17,6 +17,10 @@ vi.mock("./migrate-file-batch-object.js", () => ({
   processMigrateFileBatchObject: vi.fn()
 }));
 
+vi.mock("../lib/import-workflow-step-receipt.js", () => ({
+  emitImportWorkflowStepReceipt: vi.fn().mockResolvedValue(undefined)
+}));
+
 import { processMigrateFileBatchObject } from "./migrate-file-batch-object.js";
 
 function createJob(
@@ -55,6 +59,14 @@ describe("migrate-file-batch processor", () => {
       { vendorFileId: "v-2", relativePath: "media/v-2.png" }
     ]
   };
+
+  it("dedupes when batch progress is already stub_complete", async () => {
+    const job = createJob(basePayload, buildMigrateFileBatchJobProgress(basePayload, ["v-1"], [], "stub_complete"));
+
+    await handleMigrateFileBatch(job);
+
+    expect(processMigrateFileBatchObject).not.toHaveBeenCalled();
+  });
 
   it("records stub progress when all objects succeed", async () => {
     vi.mocked(processMigrateFileBatchObject).mockResolvedValue(undefined);

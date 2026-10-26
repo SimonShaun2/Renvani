@@ -10,10 +10,12 @@
     "build": "corepack pnpm -r --filter @fsm/import-normalize --filter @fsm/types --filter @fsm/comms build && corepack pnpm -r --filter @fsm/import-engine --filter @fsm/config --filter @fsm/db --filter @fsm/jobs --filter @fsm/ai --filter @fsm/api --filter @fsm/worker --filter @fsm/webhook --filter @fsm/web build",
     "lint": "corepack pnpm -r lint",
     "test": "corepack pnpm -r test",
-    "test:fs-migrate-import-contracts": "corepack pnpm --filter @fsm/config --filter @fsm/import-normalize --filter @fsm/types build && corepack pnpm --filter @fsm/import-normalize test:import-contracts && corepack pnpm --filter @fsm/types test:import-contracts && corepack pnpm --filter @fsm/jobs test:import-contracts",
+    "test:fs-migrate-import-contracts": "corepack pnpm --filter @fsm/config --filter @fsm/import-normalize --filter @fsm/types build && corepack pnpm --filter @fsm/import-normalize test:import-contracts && corepack pnpm --filter @fsm/types test:import-contracts && corepack pnpm --filter @fsm/jobs test:import-contracts && corepack pnpm --filter @fsm/api exec vitest run src/routes/migrate-onboarding/migrate-onboarding.wizard-api.contract.test.ts",
     "qa:branded-site": "bash scripts/qa-branded-site-local.sh",
     "check:env-docs": "node scripts/check-env-documentation.mjs",
-    "test:neon-ci-wiring": "node --test scripts/ci/neon-per-pr-branch.test.mjs"
+    "test:neon-ci": "corepack pnpm --filter \"@fsm/config...\" --filter \"@fsm/db...\" build && node scripts/ci/neon-per-pr-branch.mjs",
+    "test:neon-ci-wiring": "node --test scripts/ci/neon-per-pr-branch.test.mjs",
+    "test:cross-tenant": "corepack pnpm --filter @fsm/config exec vitest run src/import-bundle-storage.test.ts src/object-storage/import-bundle-object-storage.test.ts && corepack pnpm --filter @fsm/api test:cross-tenant"
   },
   "devDependencies": {
     "@types/node": "^24.3.0",

@@ -49,6 +49,7 @@ function createJob(name: string, data: Record<string, unknown>): Job<Record<stri
 function createDependencies(): notificationsProcessor.NotificationsDependencies {
   return {
     email: {
+      sendPasswordResetEmail: vi.fn(async () => undefined),
       sendEstimateEmail: vi.fn(async () => undefined),
       sendCampaignEmail: vi.fn(async () => undefined),
       sendInvoiceEmail: vi.fn(async () => undefined),
@@ -57,7 +58,10 @@ function createDependencies(): notificationsProcessor.NotificationsDependencies 
       sendServiceAgreementRenewalReminderEmail: vi.fn(async () => undefined),
       sendServiceAgreementPaymentFailedEmail: vi.fn(async () => undefined),
       sendBookingConfirmationEmail: vi.fn(async () => undefined),
-      sendBookingDeclineEmail: vi.fn(async () => undefined)
+      sendBookingDeclineEmail: vi.fn(async () => undefined),
+      sendVipMembershipWelcomeEmail: vi.fn(async () => undefined),
+      sendVipMembershipRenewalEmail: vi.fn(async () => undefined),
+      sendVipMembershipPaymentFailedEmail: vi.fn(async () => undefined)
     },
     sms: {
       sendSms: vi.fn(async () => "SM123")
@@ -650,5 +654,23 @@ describe("notifications.processor", () => {
       scheduledLabel: "Apr 30 at 8:00 AM"
     });
     expect(dependencies.sms.sendSms).not.toHaveBeenCalled();
+  });
+
+  it("send-password-reset-email sends via email module", async () => {
+    await notificationsProcessor.handleSendPasswordResetEmail(
+      createJob("send-password-reset-email", {
+        companyId: "company-1",
+        toEmail: "owner@example.com",
+        firstName: "Pat",
+        resetUrl: "http://localhost:3000/reset-password?token=abc"
+      }),
+      dependencies
+    );
+
+    expect(dependencies.email.sendPasswordResetEmail).toHaveBeenCalledWith(
+      "owner@example.com",
+      "http://localhost:3000/reset-password?token=abc",
+      "Pat"
+    );
   });
 });

@@ -63,3 +63,11 @@ export function buildMigrateFileBatchIdempotencyKey(importSessionId: string, bat
 export function buildMigrateFileBatchJobId(importSessionId: string, batchIndex: number): string {
   return `migrate-file-batch-${importSessionId}-${batchIndex}`;
 }
+
+export function buildMapCsvColumnsIdempotencyKey(importSessionId: string): string {
+  return `${importSessionId}:map-csv-columns`;
+}
+
+export function buildMapCsvColumnsJobId(importSessionId: string): string {
+  return `map-csv-columns-${importSessionId}`;
+}

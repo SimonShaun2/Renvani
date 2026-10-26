@@ -54,6 +54,26 @@ export interface BookingConfirmationRecord {
   scheduledEnd: string | null;
 }
 
+export interface PublicRecurringScheduleRecord {
+  linked: boolean;
+  scheduleKind: "vip" | "maintenance" | "none";
+  maintenancePlanId: string | null;
+  maintenanceVisitId: string | null;
+}
+
+export interface PublicSlotHoldInput {
+  holdToken: string;
+  technicianId: string;
+  scheduledStart: string;
+  scheduledEnd: string;
+}
+
+export interface PublicConfirmBookingInput {
+  technicianId: string;
+  scheduledStart: string;
+  scheduledEnd: string;
+}
+
 export interface BookingSettingsRecord {
   id: string;
   companyId: string;
@@ -115,6 +135,32 @@ interface SubmitBookingResponse {
     status: string;
   };
   confirmation: BookingConfirmationRecord;
+  holdToken?: string | null;
+}
+
+interface PublicSlotHoldResponse {
+  bookingRequest: {
+    id: string;
+    referenceNumber: string | null;
+    status: string;
+    assignedTechnicianId: string | null;
+  };
+  hold: {
+    technicianId: string;
+    scheduledStart: string;
+    scheduledEnd: string;
+  };
+}
+
+export interface PublicConfirmBookingResponse {
+  bookingRequest: {
+    id: string;
+    referenceNumber: string | null;
+    status: string;
+    jobId: string;
+  };
+  jobId: string;
+  recurringSchedule: PublicRecurringScheduleRecord;
 }
 
 interface ConfirmationResponse {
@@ -207,6 +253,33 @@ export function useSubmitBookingRequest(slug: string) {
         body,
         idempotencyKey ? { headers: { "Idempotency-Key": idempotencyKey } } : undefined
       )
+  });
+}
+
+export function usePublicSlotHold(slug: string, referenceNumber: string) {
+  return useMutation({
+    mutationFn: (input: PublicSlotHoldInput) =>
+      publicApi.post<PublicSlotHoldResponse>(
+        `/api/v1/public/booking/${slug}/requests/${encodeURIComponent(referenceNumber)}/slot-hold`,
+        input
+      )
+  });
+}
+
+export function usePublicConfirmBooking(slug: string, referenceNumber: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (input: PublicConfirmBookingInput) =>
+      publicApi.post<PublicConfirmBookingResponse>(
+        `/api/v1/public/booking/${slug}/requests/${encodeURIComponent(referenceNumber)}/confirm`,
+        input
+      ),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: bookingKeys.confirmation(slug, referenceNumber)
+      });
+    }
   });
 }
 

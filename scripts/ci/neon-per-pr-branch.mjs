@@ -45,9 +45,12 @@ const childEnv = {
   RENVANI_DEPLOYMENT_TIER: process.env.RENVANI_DEPLOYMENT_TIER ?? "staging"
 };
 
-console.log("[neon-per-pr-ci] RUN: migration safety + @fsm/db tests against staging Neon per-PR branch");
+console.log(
+  "[neon-per-pr-ci] RUN: migration safety + migrate + @fsm/db tests (RLS matrix) against staging Neon per-PR branch"
+);
 
 run("corepack", ["pnpm", "--filter", "@fsm/db", "run", "db:check-migrations"], childEnv);
+run("corepack", ["pnpm", "--filter", "@fsm/db", "run", "db:migrate"], childEnv);
 run("corepack", ["pnpm", "--filter", "@fsm/db", "test"], childEnv);
 
 console.log("[neon-per-pr-ci] OK");

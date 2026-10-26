@@ -15,6 +15,7 @@ const importSessionStatusSchema = z.enum([
 const importEntityTypeSchema = z.enum([
   "customers",
   "jobs",
+  "estimates",
   "price_book",
   "notes",
   "communications"
@@ -104,6 +105,13 @@ export const ImportSessionIdParamsSchema = z
   })
   .strict();
 
+export const ImportFileBatchParamsSchema = z
+  .object({
+    id: uuidSchema,
+    batchIndex: z.coerce.number().int().nonnegative()
+  })
+  .strict();
+
 export const ConfirmMappingSchema = z
   .object({
     mappingOverrides: z.record(z.string(), z.string().trim().min(1).nullable()).optional().default({})
@@ -141,6 +149,9 @@ export const confirmMappingValidation = withZodValidation({
 });
 export const importSessionIdValidation = withZodValidation({
   params: ImportSessionIdParamsSchema
+});
+export const importFileBatchValidation = withZodValidation({
+  params: ImportFileBatchParamsSchema
 });
 export const startImportValidation = withZodValidation({
   params: ImportSessionIdParamsSchema,
@@ -192,16 +203,102 @@ export const listImportsRouteSchema = {
   }
 } as const;
 
+const importIngestStatusSchema = {
+  type: "object",
+  additionalProperties: false,
+  required: [
+    "importSessionId",
+    "entityType",
+    "fileName",
+    "status",
+    "chunkProgress",
+    "priceBookLineSeeds",
+    "importedRows"
+  ],
+  properties: {
+    importSessionId: { type: "string" },
+    entityType: { type: "string" },
+    fileName: { type: "string" },
+    status: { type: "string" },
+    chunkProgress: {
+      anyOf: [
+        {
+          type: "object",
+          additionalProperties: true
+        },
+        { type: "null" }
+      ]
+    },
+    priceBookLineSeeds: {
+      anyOf: [{ type: "integer" }, { type: "null" }]
+    },
+    importedRows: {
+      anyOf: [{ type: "integer" }, { type: "null" }]
+    }
+  }
+} as const;
+
+const importSessionDetailResponseSchema = {
+  type: "object",
+  additionalProperties: false,
+  required: ["importSession", "ingest"],
+  properties: {
+    importSession: importSessionSchema,
+    ingest: importIngestStatusSchema
+  }
+} as const;
+
 export const getImportRouteSchema = {
+  tags: ["imports"],
+  response: {
+    200: importSessionDetailResponseSchema,
+    400: errorResponseSchema,
+    401: errorResponseSchema,
+    403: errorResponseSchema,
+    404: errorResponseSchema
+  }
+} as const;
+
+const importMutationResponseSchema = {
+  type: "object",
+  additionalProperties: false,
+  required: ["importSession"],
+  properties: {
+    importSession: importSessionSchema
+  }
+} as const;
+
+export const confirmMappingRouteSchema = {
+  tags: ["imports"],
+  response: {
+    200: importMutationResponseSchema,
+    400: errorResponseSchema,
+    401: errorResponseSchema,
+    403: errorResponseSchema,
+    404: errorResponseSchema
+  }
+} as const;
+
+export const startImportRouteSchema = confirmMappingRouteSchema;
+export const rollbackImportRouteSchema = confirmMappingRouteSchema;
+
+export const getImportIngestStatusRouteSchema = {
+  tags: ["imports"],
+  response: {
+    200: importIngestStatusSchema,
+    400: errorResponseSchema,
+    401: errorResponseSchema,
+    403: errorResponseSchema,
+    404: errorResponseSchema
+  }
+} as const;
+
+export const migrateFileBatchStatusRouteSchema = {
   tags: ["imports"],
   response: {
     200: {
       type: "object",
-      additionalProperties: false,
-      required: ["importSession"],
-      properties: {
-        importSession: importSessionSchema
-      }
+      additionalProperties: true
     },
     400: errorResponseSchema,
     401: errorResponseSchema,
@@ -210,9 +307,20 @@ export const getImportRouteSchema = {
   }
 } as const;
 
-export const confirmMappingRouteSchema = getImportRouteSchema;
-export const startImportRouteSchema = getImportRouteSchema;
-export const rollbackImportRouteSchema = getImportRouteSchema;
+export const migrateFileBatchRetryRouteSchema = {
+  tags: ["imports"],
+  response: {
+    200: {
+      type: "object",
+      additionalProperties: true
+    },
+    400: errorResponseSchema,
+    401: errorResponseSchema,
+    403: errorResponseSchema,
+    404: errorResponseSchema,
+    409: errorResponseSchema
+  }
+} as const;
 
 export const importErrorsRouteSchema = {
   tags: ["imports"],
@@ -229,6 +337,19 @@ export const importErrorsRouteSchema = {
       }
     },
     400: errorResponseSchema,
+    401: errorResponseSchema,
+    403: errorResponseSchema,
+    404: errorResponseSchema
+  }
+} as const;
+
+export const importIngestProgressRouteSchema = {
+  tags: ["imports"],
+  response: {
+    200: {
+      type: "object",
+      additionalProperties: true
+    },
     401: errorResponseSchema,
     403: errorResponseSchema,
     404: errorResponseSchema

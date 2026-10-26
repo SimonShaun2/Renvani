@@ -239,6 +239,48 @@
       "when": 1777705000000,
       "tag": "0033_fs_migrate_notes_import",
       "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1777706000000,
+      "tag": "0034_vip_membership_foundation",
+      "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "7",
+      "when": 1777707000000,
+      "tag": "0035_fs133_qbo_ongoing_sync",
+      "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1777710000000,
+      "tag": "0036_fs133_qbo_entity_mappings",
+      "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "7",
+      "when": 1777711000000,
+      "tag": "0037_user_email_verification",
+      "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "7",
+      "when": 1777712000000,
+      "tag": "0038_fs157_clerk_identity",
+      "breakpoints": true
+    },
+    {
+      "idx": 39,
+      "version": "7",
+      "when": 1777713000000,
+      "tag": "0039_fs160b_clerk_unlink_tombstone",
+      "breakpoints": true
     }
   ]
 }

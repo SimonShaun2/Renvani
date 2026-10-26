@@ -7,6 +7,11 @@ import {
 } from "./import-workflow-runtime.js";
 import { hashImportWorkflowStepFingerprint } from "./import-workflow-runtime-fingerprint.node.js";
 import { buildImportChunkIdempotencyKey } from "./import-chunk-commit.js";
+import {
+  assertMapCsvColumnsIdempotencyKey,
+  assertMigrateFileBatchIdempotencyKey,
+} from "./import-workflow-runtime.js";
+import { buildMapCsvColumnsIdempotencyKey, buildMigrateFileBatchIdempotencyKey } from "./import-queue-jobs.js";
 
 describe("import workflow runtime (FS-MIGRATE agent parity)", () => {
   const companyId = "11111111-1111-4111-8111-111111111111";
@@ -39,6 +44,16 @@ describe("import workflow runtime (FS-MIGRATE agent parity)", () => {
     expect(audit.contractVersion).toBe("1.0.0");
     expect(audit.policyVersion).toBe(IMPORT_POLICY_V1);
     expect(audit.state).toBe("scheduled");
+  });
+
+  it("validates map-csv-columns and migrate-file-batch idempotency keys", () => {
+    const batchKey = buildMigrateFileBatchIdempotencyKey(importSessionId, 2);
+    assertMigrateFileBatchIdempotencyKey(importSessionId, 2, batchKey);
+    expect(() => assertMigrateFileBatchIdempotencyKey(importSessionId, 2, "wrong")).toThrow();
+
+    const mapKey = buildMapCsvColumnsIdempotencyKey(importSessionId);
+    assertMapCsvColumnsIdempotencyKey(importSessionId, mapKey);
+    expect(() => assertMapCsvColumnsIdempotencyKey(importSessionId, "bad")).toThrow();
   });
 
   it("hashes step payloads deterministically", () => {

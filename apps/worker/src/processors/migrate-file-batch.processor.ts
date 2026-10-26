@@ -9,6 +9,7 @@ import { logMigrateFileBatchTrace } from "@fsm/jobs";
 import {
   IMPORT_QUEUE_JOB_NAMES,
   MigrateFileBatchJobDataSchema,
+  assertMigrateFileBatchIdempotencyKey,
   buildMigrateFileBatchJobId,
   buildMigrateFileBatchJobProgress,
   buildMigrateFileBatchTraceObjects,
@@ -17,6 +18,7 @@ import {
   type MigrateFileBatchJobData
 } from "@fsm/types";
 
+import { emitImportWorkflowStepReceipt } from "../lib/import-workflow-step-receipt.js";
 import { processMigrateFileBatchObject } from "./migrate-file-batch-object.js";
 
 const logger = pino({
@@ -35,10 +37,57 @@ export class MigrateFileBatchPartialFailureError extends Error {
 
 export async function handleMigrateFileBatch(job: Job<MigrateFileBatchJobData>): Promise<void> {
   const payload = MigrateFileBatchJobDataSchema.parse(job.data);
-  const bullJobId = job.id ?? buildMigrateFileBatchJobId(payload.importSessionId, payload.batchIndex);
+  assertMigrateFileBatchIdempotencyKey(
+    payload.importSessionId,
+    payload.batchIndex,
+    payload.idempotencyKey,
+  );
+  const bullJobId = String(job.id ?? buildMigrateFileBatchJobId(payload.importSessionId, payload.batchIndex));
+
+  try {
+    await runMigrateFileBatch(job, payload, bullJobId);
+  } catch (error: unknown) {
+    if (error instanceof MigrateFileBatchPartialFailureError) {
+      await emitImportWorkflowStepReceipt({
+        companyId: payload.companyId,
+        importSessionId: payload.importSessionId,
+        importBundleId: payload.importBundleId,
+        stepKind: IMPORT_QUEUE_JOB_NAMES.migrateFileBatch,
+        idempotencyKey: payload.idempotencyKey,
+        state: "failed",
+        batchIndex: payload.batchIndex,
+      jobId: bullJobId,
+      summary: `migrate-file-batch ${payload.batchIndex} failed (${error.failures.length} object(s))`,
+      });
+    }
+    throw error;
+  }
+}
+
+async function runMigrateFileBatch(
+  job: Job<MigrateFileBatchJobData>,
+  payload: MigrateFileBatchJobData,
+  bullJobId: string,
+): Promise<void> {
   const resolveR2Key = (relativePath: string) =>
     buildImportBundleObjectKey(payload.companyId, payload.importBundleId, relativePath);
   const traceObjects = buildMigrateFileBatchTraceObjects(payload.objects, resolveR2Key);
+
+  const previousProgress = parseMigrateFileBatchJobProgress(job.progress);
+  if (previousProgress?.status === "stub_complete") {
+    await emitImportWorkflowStepReceipt({
+      companyId: payload.companyId,
+      importSessionId: payload.importSessionId,
+      importBundleId: payload.importBundleId,
+      stepKind: IMPORT_QUEUE_JOB_NAMES.migrateFileBatch,
+      idempotencyKey: payload.idempotencyKey,
+      state: "deduped_completed",
+      batchIndex: payload.batchIndex,
+      jobId: bullJobId,
+      summary: `migrate-file-batch ${payload.batchIndex} deduped (already complete)`,
+    });
+    return;
+  }
 
   for (const object of traceObjects) {
     assertImportBundleObjectKeyBelongsToTenant(object.r2Key, payload.companyId, payload.importBundleId);
@@ -59,7 +108,6 @@ export async function handleMigrateFileBatch(job: Job<MigrateFileBatchJobData>):
     "FS-MIGRATE migrate-file-batch worker started"
   );
 
-  const previousProgress = parseMigrateFileBatchJobProgress(job.progress);
   const succeeded = new Set(previousProgress?.objectsSucceeded ?? []);
   const failuresByVendorId = new Map<string, MigrateFileBatchFailedObject>();
 
@@ -121,6 +169,18 @@ export async function handleMigrateFileBatch(job: Job<MigrateFileBatchJobData>):
     },
     "FS-MIGRATE migrate-file-batch worker completed (checkpoint reserved for Diego ingest)"
   );
+
+  await emitImportWorkflowStepReceipt({
+    companyId: payload.companyId,
+    importSessionId: payload.importSessionId,
+    importBundleId: payload.importBundleId,
+    stepKind: IMPORT_QUEUE_JOB_NAMES.migrateFileBatch,
+    idempotencyKey: payload.idempotencyKey,
+    state: "completed",
+    batchIndex: payload.batchIndex,
+    jobId: bullJobId,
+    summary: `migrate-file-batch ${payload.batchIndex} completed`,
+  });
 
   logger.info(
     {

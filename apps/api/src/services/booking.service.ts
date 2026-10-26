@@ -16,6 +16,7 @@ import {
   technicians,
   users
 } from "@fsm/db";
+import { normalizeImportBusinessDate, normalizeImportPhone } from "@fsm/import-normalize";
 import { notificationsQueue } from "@fsm/jobs";
 import {
   AppError,
@@ -45,6 +46,7 @@ import {
   verifyAndClaimBookingHoldToken
 } from "../lib/booking-hold-token.js";
 import { generateJobNumber } from "../lib/job-number.js";
+import { attachConfirmedBookingToRecurringSchedules } from "./booking-recurring-schedule.service.js";
 import { assertNonTerminalBookingRequest } from "./booking-request-guards.js";
 import { invalidateDispatchCache } from "./dispatch.service.js";
 
@@ -124,7 +126,8 @@ function normalizeBookingSlug(value: string): string {
 }
 
 function normalizePhone(value: string): string {
-  return value.trim();
+  const normalizedDigits = normalizeImportPhone(value);
+  return normalizedDigits ?? value.trim();
 }
 
 /** Phone used only for matching/creating customers — not placeholder inbox values. */
@@ -210,11 +213,13 @@ function parseDateOnly(value: string | undefined): string | null {
     return null;
   }
 
-  if (!/^\d{4}-\d{2}-\d{2}$/u.test(value)) {
-    throw new AppError(ErrorCode.VALIDATION_ERROR, "preferredDate must be in YYYY-MM-DD format");
+  const normalized = normalizeImportBusinessDate(value);
+
+  if (!normalized) {
+    throw new AppError(ErrorCode.VALIDATION_ERROR, "preferredDate must be a valid date");
   }
 
-  return value;
+  return normalized;
 }
 
 function minutesBetween(start: Date, end: Date): number {
@@ -957,6 +962,48 @@ function buildBookingSlotHoldNote(bookingRequestId: string): string {
   return `${BOOKING_SLOT_HOLD_NOTE_PREFIX}${bookingRequestId}`;
 }
 
+async function assertActiveHoldMatchesSelection(
+  companyId: string,
+  bookingRequestId: string,
+  input: ConfirmBookingRequestInput,
+  executor: TransactionExecutor
+): Promise<void> {
+  const holdNote = buildBookingSlotHoldNote(bookingRequestId);
+  const holds = await executor
+    .select()
+    .from(scheduleSlots)
+    .where(
+      and(
+        eq(scheduleSlots.companyId, companyId),
+        eq(scheduleSlots.notes, holdNote),
+        isNull(scheduleSlots.deletedAt)
+      )
+    );
+
+  const activeHold = holds.find((slot) => !slot.isConfirmed);
+
+  if (!activeHold) {
+    throw new AppError(
+      ErrorCode.CONFLICT,
+      "Booking confirmation requires an active in-platform slot hold before commitment"
+    );
+  }
+
+  const scheduledStart = parseIsoDateTime(input.scheduledStart, "scheduledStart");
+  const scheduledEnd = parseIsoDateTime(input.scheduledEnd, "scheduledEnd");
+
+  if (
+    activeHold.technicianId !== input.technicianId ||
+    activeHold.startTime.getTime() !== scheduledStart.getTime() ||
+    activeHold.endTime.getTime() !== scheduledEnd.getTime()
+  ) {
+    throw new AppError(
+      ErrorCode.CONFLICT,
+      "Confirmation must match the active slot hold"
+    );
+  }
+}
+
 async function clearBookingSlotHolds(
   companyId: string,
   bookingRequestId: string,
@@ -1179,6 +1226,52 @@ export async function holdPublicBookingSlot(
     await finalizeBookingHoldTokenClaim(claims, error);
     throw error;
   }
+}
+
+export async function confirmPublicBookingSlot(
+  slug: string,
+  referenceNumber: string,
+  input: ConfirmBookingRequestInput
+): Promise<{ bookingRequest: BookingRequest; jobId: string; recurringSchedule: Awaited<ReturnType<typeof attachConfirmedBookingToRecurringSchedules>> }> {
+  const normalizedRef = referenceNumber.trim();
+  const { settings } = await getCompanyByBookingSlug(slug, db);
+  const bookingRows = await db
+    .select()
+    .from(bookingRequests)
+    .where(
+      and(
+        eq(bookingRequests.companyId, settings.companyId),
+        eq(bookingRequests.referenceNumber, normalizedRef),
+        isNull(bookingRequests.deletedAt)
+      )
+    )
+    .limit(1);
+  const bookingRow = bookingRows[0];
+
+  if (!bookingRow) {
+    throw new AppError(ErrorCode.NOT_FOUND, "Booking request not found");
+  }
+
+  const actor: BookingActor = {
+    id: null,
+    type: "customer",
+    name: `${bookingRow.firstName} ${bookingRow.lastName}`.trim()
+  };
+
+  const confirmed = await confirmBookingWithActor(settings.companyId, bookingRow.id, input, actor, {
+    confirmedById: null,
+    requireActiveHold: true
+  });
+
+  if (!confirmed.jobId) {
+    throw new AppError(ErrorCode.INTERNAL_ERROR, "Confirmed booking is missing job linkage");
+  }
+
+  return {
+    bookingRequest: confirmed.bookingRequest,
+    jobId: confirmed.jobId,
+    recurringSchedule: confirmed.recurringSchedule
+  };
 }
 
 export async function holdBookingSlotForOperator(
@@ -1511,12 +1604,19 @@ export async function submitBookingRequest(
   };
 }
 
-export async function confirmBookingRequest(
+async function confirmBookingWithActor(
   companyId: string,
-  actorId: string,
   bookingRequestId: string,
-  input: ConfirmBookingRequestInput
-): Promise<BookingRequest> {
+  input: ConfirmBookingRequestInput,
+  actor: BookingActor,
+  options: { confirmedById: string | null; requireActiveHold?: boolean }
+): Promise<{
+  bookingRequest: BookingRequest;
+  jobId: string;
+  companyName: string;
+  scheduledStart: Date;
+  recurringSchedule: Awaited<ReturnType<typeof attachConfirmedBookingToRecurringSchedules>>;
+}> {
   const scheduledStart = parseIsoDateTime(input.scheduledStart, "scheduledStart");
   const scheduledEnd = parseIsoDateTime(input.scheduledEnd, "scheduledEnd");
 
@@ -1525,15 +1625,13 @@ export async function confirmBookingRequest(
   }
 
   const result = await db.transaction(async (tx) => {
-    const actorUser = await getActor(companyId, actorId, tx);
-    const actor: BookingActor = {
-      id: actorUser.id,
-      type: "user",
-      name: buildActorName(actorUser.firstName, actorUser.lastName)
-    };
     const bookingRequest = await getBookingRequestRecord(companyId, bookingRequestId, tx);
 
     assertNonTerminalBookingRequest(bookingRequest.status as BookingRequestStatus, "confirmed");
+
+    if (options.requireActiveHold) {
+      await assertActiveHoldMatchesSelection(companyId, bookingRequestId, input, tx);
+    }
 
     await assertTechnicianScheduleSlotAvailable(
       companyId,
@@ -1588,6 +1686,14 @@ export async function confirmBookingRequest(
       tx,
       actor
     );
+    const recurringSchedule = await attachConfirmedBookingToRecurringSchedules(
+      companyId,
+      bookingRequest,
+      customer.id,
+      job,
+      tx,
+      actor
+    );
     const updatedRows = await tx
       .update(bookingRequests)
       .set({
@@ -1596,7 +1702,7 @@ export async function confirmBookingRequest(
         assignedTechnicianId: input.technicianId,
         status: "confirmed",
         confirmedAt: new Date(),
-        confirmedById: actorId,
+        confirmedById: options.confirmedById,
         confirmationSentAt: new Date(),
         updatedAt: new Date()
       })
@@ -1613,8 +1719,8 @@ export async function confirmBookingRequest(
     await emitEventWithExecutor(tx, {
       companyId,
       eventType: "booking.confirmed",
-      actorId,
-      actorType: "user",
+      actorId: actor.id ?? undefined,
+      actorType: actor.type,
       actorName: actor.name,
       entityType: "booking_request",
       entityId: updatedRequest.id,
@@ -1623,15 +1729,18 @@ export async function confirmBookingRequest(
       payload: {
         technicianId: input.technicianId,
         scheduledStart: scheduledStart.toISOString(),
-        scheduledEnd: scheduledEnd.toISOString()
+        scheduledEnd: scheduledEnd.toISOString(),
+        recurringSchedule
       },
       summary: `Booking ${updatedRequest.referenceNumber ?? updatedRequest.id} confirmed`
     });
 
     return {
       bookingRequest: toBookingRequest(updatedRequest),
+      jobId: job.id,
       companyName: company.name,
-      scheduledStart
+      scheduledStart,
+      recurringSchedule
     };
   });
 
@@ -1651,6 +1760,26 @@ export async function confirmBookingRequest(
     })
   );
   await invalidateDispatchCache(companyId, formatDateOnly(result.scheduledStart));
+  return result;
+}
+
+export async function confirmBookingRequest(
+  companyId: string,
+  actorId: string,
+  bookingRequestId: string,
+  input: ConfirmBookingRequestInput
+): Promise<BookingRequest> {
+  const actorUser = await getActor(companyId, actorId, db);
+  const actor: BookingActor = {
+    id: actorUser.id,
+    type: "user",
+    name: buildActorName(actorUser.firstName, actorUser.lastName)
+  };
+
+  const result = await confirmBookingWithActor(companyId, bookingRequestId, input, actor, {
+    confirmedById: actorId
+  });
+
   return result.bookingRequest;
 }
 

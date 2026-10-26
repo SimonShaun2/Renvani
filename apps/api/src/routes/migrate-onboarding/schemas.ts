@@ -3,6 +3,7 @@ import { z } from "zod";
 
 import {
   applyMigrateDedupeDecisionsBodySchema,
+  confirmImportFileLinkDecisionsBodySchema,
   createMigrateOnboardingSessionBodySchema,
   linkMigrateOnboardingFilesBodySchema,
   migrateOnboardingBundleIdParamsSchema,
@@ -54,3 +55,13 @@ export const dedupePreviewRouteSchema: FastifySchema = {};
 export const relationalPreviewRouteSchema: FastifySchema = {};
 export const dedupeDecisionsRouteSchema: FastifySchema = {};
 export const commitBundleRouteSchema: FastifySchema = {};
+export const ingestStatusRouteSchema: FastifySchema = {};
+
+export const confirmImportFileLinkDecisionsValidation = withZodValidation({
+  params: migrateOnboardingBundleIdParamsSchema,
+  body: confirmImportFileLinkDecisionsBodySchema
+});
+
+export const fileLinkPreviewRouteSchema: FastifySchema = {};
+export const runFileLinkRouteSchema: FastifySchema = {};
+export const confirmFileLinkRouteSchema: FastifySchema = {};

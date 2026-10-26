@@ -5,6 +5,7 @@ import type {
   CreateAssetInput,
   CreateCustomerInput,
   CreatePropertyInput,
+  CustomerImportedHistoryResponse,
   UpdateAssetInput,
   UpdateCustomerInput
 } from "@fsm/types";
@@ -328,6 +329,7 @@ const customerKeys = {
   payments: (customerId: string) => ["customers", "payments", customerId] as const,
   agreements: (customerId: string) => ["customers", "agreements", customerId] as const,
   activity: (customerId: string) => ["customers", "activity", customerId] as const,
+  importedHistory: (customerId: string) => ["customers", "imported-history", customerId] as const,
   messages: (customerId: string) => ["customers", "messages", customerId] as const
 };
 
@@ -580,6 +582,15 @@ export function useCustomerActivity(customerId: string | null) {
   return useQuery({
     queryKey: customerId ? customerKeys.activity(customerId) : customerKeys.activity("pending"),
     queryFn: () => api.get<ActivityResponse>(`/api/v1/activity-events?${queryString}`),
+    enabled: Boolean(customerId)
+  });
+}
+
+export function useCustomerImportedHistory(customerId: string | null) {
+  return useQuery({
+    queryKey: customerId ? customerKeys.importedHistory(customerId) : customerKeys.importedHistory("pending"),
+    queryFn: () =>
+      api.get<CustomerImportedHistoryResponse>(`/api/v1/customers/${customerId}/imported-history`),
     enabled: Boolean(customerId)
   });
 }

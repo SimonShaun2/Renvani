@@ -19,10 +19,16 @@ type NotificationChannelPreferenceInput = {
 type CompanyNotificationSettingsInput = {
   [K in keyof CompanyNotificationSettings]?: NotificationChannelPreferenceInput | null | undefined;
 };
+type CompanyVipMembershipSettingsInput = {
+  maxPauseMonths?: number | null | undefined;
+  pastDueGraceDays?: number | null | undefined;
+};
+
 type CompanySettingsInput = {
   tradingName?: string | null | undefined;
   currency?: string | null | undefined;
   notifications?: CompanyNotificationSettingsInput | undefined;
+  vipMembership?: CompanyVipMembershipSettingsInput | undefined;
 };
 
 interface UpdateCompanyInput {
@@ -162,6 +168,19 @@ function buildCompanySettingsUpdate(
 
   if (input.notifications !== undefined) {
     nextSettings.notifications = normalizeNotificationSettings(nextSettings.notifications, input.notifications) ?? null;
+  }
+
+  if (input.vipMembership !== undefined) {
+    const current = nextSettings.vipMembership ?? {};
+    nextSettings.vipMembership = {
+      ...current,
+      ...(input.vipMembership.maxPauseMonths !== undefined
+        ? { maxPauseMonths: input.vipMembership.maxPauseMonths }
+        : {}),
+      ...(input.vipMembership.pastDueGraceDays !== undefined
+        ? { pastDueGraceDays: input.vipMembership.pastDueGraceDays }
+        : {})
+    };
   }
 
   return nextSettings;

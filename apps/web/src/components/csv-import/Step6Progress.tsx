@@ -1,25 +1,34 @@
 "use client";
 
+import type { ImportSessionChunkProgress } from "@fsm/types";
 import { Clock3, DatabaseZap, LoaderCircle, ShieldCheck } from "lucide-react";
+
+import { ImportChunkProgressPanel } from "./ImportChunkProgressPanel";
 
 interface Step6ProgressProps {
   fileName: string | null;
+  entityType: string | null;
   totalRows: number;
   processedRows: number;
   importedRows: number;
   skippedRows: number;
   duplicateRows: number;
   estimatedTimeRemaining: string | null;
+  chunkProgress: ImportSessionChunkProgress | null;
+  priceBookLineSeeds: number | null;
 }
 
 export function Step6Progress({
   fileName,
+  entityType,
   totalRows,
   processedRows,
   importedRows,
   skippedRows,
   duplicateRows,
-  estimatedTimeRemaining
+  estimatedTimeRemaining,
+  chunkProgress,
+  priceBookLineSeeds
 }: Step6ProgressProps) {
   const progressPercent =
     totalRows > 0 ? Math.max(0, Math.min(100, Math.round((processedRows / totalRows) * 100))) : 0;
@@ -63,6 +72,21 @@ export function Step6Progress({
             />
           </div>
         </div>
+
+        {chunkProgress && entityType ? (
+          <ImportChunkProgressPanel
+            entityType={entityType}
+            chunkProgress={chunkProgress}
+            priceBookLineSeeds={priceBookLineSeeds}
+          />
+        ) : null}
+
+        {priceBookLineSeeds !== null && !chunkProgress ? (
+          <div className="mt-6 rounded-[24px] border border-neutral-200 bg-neutral-50 px-4 py-4 text-sm text-neutral-700">
+            <span className="font-semibold">{priceBookLineSeeds}</span> price-book line seeds loaded —
+            invoice lines from history imports will resolve against this catalog.
+          </div>
+        ) : null}
 
         <div className="mt-6 grid gap-4 md:grid-cols-3">
           <div className="rounded-[24px] border border-neutral-200 bg-white px-4 py-4">

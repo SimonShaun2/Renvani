@@ -47,6 +47,12 @@ export const PublicHoldBookingSlotSchema = z.object({
   scheduledEnd: z.string().datetime({ offset: true })
 }).strict();
 
+export const PublicConfirmBookingSlotSchema = z.object({
+  technicianId: uuidSchema,
+  scheduledStart: z.string().datetime({ offset: true }),
+  scheduledEnd: z.string().datetime({ offset: true })
+}).strict();
+
 export const PublicInspectHoldTokenSchema = z
   .object({
     holdToken: z.string().trim().min(1)
@@ -126,6 +132,11 @@ export const submitBookingValidation = withZodValidation({
 export const publicHoldBookingSlotValidation = withZodValidation({
   params: BookingConfirmationParamsSchema,
   body: PublicHoldBookingSlotSchema
+});
+
+export const publicConfirmBookingSlotValidation = withZodValidation({
+  params: BookingConfirmationParamsSchema,
+  body: PublicConfirmBookingSlotSchema
 });
 
 export const publicInspectHoldTokenValidation = withZodValidation({
@@ -339,6 +350,46 @@ export const publicInspectHoldTokenRouteSchema = {
     },
     400: errorResponseSchema,
     404: errorResponseSchema,
+    429: errorResponseSchema
+  }
+} as const;
+
+export const publicConfirmBookingSlotRouteSchema = {
+  tags: ["public-booking"],
+  response: {
+    200: {
+      type: "object",
+      additionalProperties: false,
+      required: ["bookingRequest", "jobId", "recurringSchedule"],
+      properties: {
+        bookingRequest: {
+          type: "object",
+          additionalProperties: false,
+          required: ["id", "referenceNumber", "status", "jobId"],
+          properties: {
+            id: { type: "string" },
+            referenceNumber: nullableStringSchema,
+            status: { type: "string" },
+            jobId: { type: "string" }
+          }
+        },
+        jobId: { type: "string" },
+        recurringSchedule: {
+          type: "object",
+          additionalProperties: false,
+          required: ["linked", "scheduleKind", "maintenancePlanId", "maintenanceVisitId"],
+          properties: {
+            linked: { type: "boolean" },
+            scheduleKind: { type: "string", enum: ["vip", "maintenance", "none"] },
+            maintenancePlanId: { anyOf: [{ type: "string", format: "uuid" }, { type: "null" }] },
+            maintenanceVisitId: { anyOf: [{ type: "string", format: "uuid" }, { type: "null" }] }
+          }
+        }
+      }
+    },
+    400: errorResponseSchema,
+    404: errorResponseSchema,
+    409: errorResponseSchema,
     429: errorResponseSchema
   }
 } as const;

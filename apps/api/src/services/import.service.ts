@@ -5,6 +5,7 @@ import {
   assets,
   customers,
   db,
+  emitEvent,
   emitEventWithExecutor,
   importSessions,
   jobs,
@@ -17,6 +18,10 @@ import { importsQueue } from "@fsm/jobs";
 import {
   AppError,
   ErrorCode,
+  IMPORT_QUEUE_JOB_NAMES,
+  buildImportWorkflowAuditPayloadV1,
+  buildMapCsvColumnsIdempotencyKey,
+  buildMapCsvColumnsJobId,
   sanitizeSpreadsheetCell,
   type ColumnMapping,
   type ImportCustomerUpdateSnapshotV1,
@@ -315,11 +320,15 @@ export async function createImportSession(
   });
 
   try {
+    const mapJobId = buildMapCsvColumnsJobId(importSession.id);
+    const mapIdempotencyKey = buildMapCsvColumnsIdempotencyKey(importSession.id);
+
     await importsQueue.add(
-      "map-csv-columns",
+      IMPORT_QUEUE_JOB_NAMES.mapCsvColumns,
       {
         companyId,
-        importSessionId: importSession.id
+        importSessionId: importSession.id,
+        idempotencyKey: mapIdempotencyKey,
       },
       {
         attempts: 3,
@@ -327,9 +336,26 @@ export async function createImportSession(
           type: "exponential",
           delay: 5000
         },
-        jobId: `map-csv-columns-${importSession.id}`
+        jobId: mapJobId
       }
     );
+
+    await emitEvent({
+      companyId,
+      actorId,
+      actorType: "system",
+      eventType: "import.started",
+      entityType: "import_session",
+      entityId: importSession.id,
+      payload: buildImportWorkflowAuditPayloadV1({
+        stepKind: IMPORT_QUEUE_JOB_NAMES.mapCsvColumns,
+        idempotencyKey: mapIdempotencyKey,
+        state: "scheduled",
+        importSessionId: importSession.id,
+        jobId: mapJobId,
+      }),
+      summary: `CSV column mapping scheduled for ${fileName}`,
+    });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Failed to enqueue column mapping job";
     await markImportSessionFailed(companyId, importSession.id, message);

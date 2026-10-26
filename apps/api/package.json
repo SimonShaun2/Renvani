@@ -10,6 +10,7 @@
     "build": "tsc -p tsconfig.json",
     "lint": "tsc --noEmit",
     "test": "vitest run",
+    "test:cross-tenant": "vitest run src/routes/security/stack03-cross-tenant-ci.test.ts src/routes/security/stack03-fs-migrate-tenant-matrix.test.ts src/routes/imports/imports.test.ts -t \"STACK03|STACK03-JWT-02/03\" src/services/clerk-tenant.service.test.ts",
     "start": "node dist/server.js"
   },
   "dependencies": {
@@ -23,6 +24,8 @@
     "@fsm/comms": "workspace:*",
     "@fsm/config": "workspace:*",
     "@fsm/db": "workspace:*",
+    "@fsm/import-engine": "workspace:*",
+    "@fsm/import-normalize": "workspace:*",
     "@fsm/jobs": "workspace:*",
     "@fsm/types": "workspace:*",
     "@sendgrid/mail": "^8.1.5",

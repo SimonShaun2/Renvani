@@ -2,9 +2,8 @@ import { and, eq, isNull } from "drizzle-orm";
 import type { Job, Processor } from "bullmq";
 import pino from "pino";
 
-import { resolveOutboundEmailFromAddress } from "@fsm/comms";
+import { resolveTransactionalEmailFromAddress } from "@fsm/comms";
 import { env } from "@fsm/config";
-import { featureFlags } from "@fsm/config/feature-flags";
 import {
   automationRules,
   campaignRecipients,
@@ -31,6 +30,7 @@ type AutomationRuleType = (typeof automationRules.$inferSelect)["ruleType"];
 type AgreementEmailType = "renewal_reminder" | "payment_failed";
 
 interface EmailModule {
+  sendPasswordResetEmail(to: string, resetUrl: string, firstName: string): Promise<void>;
   sendEstimateEmail(
     to: string,
     params: {
@@ -123,6 +123,38 @@ interface EmailModule {
       companyName: string;
       referenceNumber: string;
       reason: string | null;
+    }
+  ): Promise<void>;
+  sendVipMembershipWelcomeEmail(
+    to: string,
+    params: {
+      firstName: string;
+      companyName: string;
+      planName: string;
+      portalUrl: string | null;
+    }
+  ): Promise<void>;
+  sendVipMembershipRenewalEmail(
+    to: string,
+    params: {
+      firstName: string;
+      companyName: string;
+      planName: string;
+      amount: string;
+      renewalDateLabel: string | null;
+    }
+  ): Promise<void>;
+  sendVipMembershipPaymentFailedEmail(
+    to: string,
+    params: {
+      firstName: string;
+      companyName: string;
+      planName: string;
+      amount: string;
+      paymentUrl: string | null;
+      graceEndsAtLabel: string | null;
+      nextRetryAtLabel: string | null;
+      dunningStepIndex: number;
     }
   ): Promise<void>;
 }
@@ -285,10 +317,36 @@ function getAgreementEmailType(data: Record<string, unknown>): AgreementEmailTyp
   return value === "renewal_reminder" || value === "payment_failed" ? value : null;
 }
 
-function getOutboundEmailFromAddress(): string {
-  return resolveOutboundEmailFromAddress({
-    resendEmailEnabled: featureFlags.resendEmailEnabled,
+type VipMembershipEmailKind = "welcome" | "renewal_receipt" | "payment_failed_dunning";
+
+function getVipMembershipEmailKind(data: Record<string, unknown>): VipMembershipEmailKind | null {
+  const value = data.emailKind;
+  return value === "welcome" || value === "renewal_receipt" || value === "payment_failed_dunning"
+    ? value
+    : null;
+}
+
+function formatVipLabelFromIso(iso: string | null): string | null {
+  if (!iso) {
+    return null;
+  }
+
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+
+  return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+}
+
+/** Same key-based selection as the API sender (apps/api/src/lib/outbound-email.ts), via @fsm/comms. */
+export function getOutboundEmailFromAddress(): string {
+  return resolveTransactionalEmailFromAddress({
+    resendApiKey: env.RESEND_API_KEY,
+    sendgridApiKey: env.SENDGRID_API_KEY,
+    nodeEnv: env.NODE_ENV,
     resendFromEmail: env.RESEND_FROM_EMAIL,
+    emailFrom: env.EMAIL_FROM,
     sendgridFromEmail: env.SENDGRID_FROM_EMAIL
   });
 }
@@ -1139,6 +1197,111 @@ export async function handleSendReviewRequest(
   });
 }
 
+export async function handleSendVipMembershipEmail(
+  job: Job<Record<string, unknown>>,
+  dependencies: NotificationsDependencies
+): Promise<void> {
+  const companyId = getJobString(job.data, "companyId");
+  const customerId = getJobString(job.data, "customerId");
+  const emailKind = getVipMembershipEmailKind(job.data);
+  const planName = getJobString(job.data, "planName") ?? "VIP Plus";
+
+  if (!companyId || !customerId || !emailKind) {
+    logger.warn({ jobId: job.id ?? null }, "VIP membership email job missing required identifiers");
+    return;
+  }
+
+  const [customerRow, companyRow] = await Promise.all([
+    db
+      .select()
+      .from(customers)
+      .where(and(eq(customers.companyId, companyId), eq(customers.id, customerId), isNull(customers.deletedAt)))
+      .limit(1),
+    db
+      .select()
+      .from(companies)
+      .where(and(eq(companies.id, companyId), isNull(companies.deletedAt)))
+      .limit(1)
+  ]);
+
+  const customer = customerRow[0];
+  const company = companyRow[0];
+
+  if (!customer || !company) {
+    logger.warn({ companyId, customerId, emailKind }, "VIP membership email job skipped because context was not found");
+    return;
+  }
+
+  if (!customer.email) {
+    logger.warn({ companyId, customerId, emailKind }, "VIP membership email job skipped because customer email is missing");
+    return;
+  }
+
+  if (emailKind === "welcome") {
+    await dependencies.email.sendVipMembershipWelcomeEmail(customer.email, {
+      firstName: customer.firstName,
+      companyName: company.name,
+      planName,
+      portalUrl: null
+    });
+    logger.info({ companyId, customerId, emailKind }, "VIP membership welcome email sent");
+    return;
+  }
+
+  if (emailKind === "renewal_receipt") {
+    const amount = getJobString(job.data, "amount") ?? "0.00";
+    await dependencies.email.sendVipMembershipRenewalEmail(customer.email, {
+      firstName: customer.firstName,
+      companyName: company.name,
+      planName,
+      amount,
+      renewalDateLabel: formatVipLabelFromIso(new Date().toISOString())
+    });
+    logger.info({ companyId, customerId, emailKind }, "VIP membership renewal email sent");
+    return;
+  }
+
+  const amount = getJobString(job.data, "amount") ?? "0.00";
+  const paymentUrl = getJobString(job.data, "paymentUrl");
+  const graceEndsAtLabel = formatVipLabelFromIso(getJobString(job.data, "graceEndsAtIso"));
+  const nextRetryAtLabel = formatVipLabelFromIso(getJobString(job.data, "nextRetryAtIso"));
+  const dunningStepIndex =
+    typeof job.data.dunningStepIndex === "number" && Number.isInteger(job.data.dunningStepIndex)
+      ? job.data.dunningStepIndex
+      : 0;
+
+  await dependencies.email.sendVipMembershipPaymentFailedEmail(customer.email, {
+    firstName: customer.firstName,
+    companyName: company.name,
+    planName,
+    amount,
+    paymentUrl,
+    graceEndsAtLabel,
+    nextRetryAtLabel,
+    dunningStepIndex
+  });
+
+  logger.info({ companyId, customerId, emailKind, dunningStepIndex }, "VIP membership dunning email sent");
+}
+
+export async function handleSendPasswordResetEmail(
+  job: Job<Record<string, unknown>>,
+  dependencies: NotificationsDependencies
+): Promise<void> {
+  const companyId = getJobString(job.data, "companyId");
+  const toEmail = getJobString(job.data, "toEmail");
+  const firstName = getJobString(job.data, "firstName") ?? "there";
+  const resetUrl = getJobString(job.data, "resetUrl");
+
+  if (!companyId || !toEmail || !resetUrl) {
+    logger.warn({ jobId: job.id ?? null, jobName: job.name }, "Password reset email job missing required data");
+    return;
+  }
+
+  await dependencies.email.sendPasswordResetEmail(toEmail, resetUrl, firstName);
+  logger.info({ companyId, jobName: job.name }, "Password reset email sent");
+}
+
 export async function handleSendBookingNotification(
   job: Job<Record<string, unknown>>,
   dependencies: NotificationsDependencies
@@ -1232,6 +1395,12 @@ export function createNotificationsProcessor(
       case "send-booking-confirmation":
       case "send-booking-decline":
         await handleSendBookingNotification(job, dependencies);
+        return;
+      case "send-password-reset-email":
+        await handleSendPasswordResetEmail(job, dependencies);
+        return;
+      case "send-vip-membership-email":
+        await handleSendVipMembershipEmail(job, dependencies);
         return;
       default:
         logger.warn({ jobId: job.id ?? null, jobName: job.name }, "Unknown notifications job received");

@@ -663,3 +663,81 @@ export async function createStripePlatformCustomer(input: {
 
   return { id: customer.id };
 }
+
+export interface CreateVipMembershipCheckoutSessionInput {
+  companyId: string;
+  companyName: string;
+  companyStripeAccountId: string;
+  customerId: string;
+  customerEmail: string | null;
+  stripeCustomerId: string;
+  vipTierId: string;
+  tierName: string;
+  planId: string;
+  stripeTierPriceId: string;
+  stripePlatformFeePriceId?: string | null;
+  connectApplicationFeeFraction: number;
+  joinToken: string;
+}
+
+export interface VipMembershipCheckoutSessionResult {
+  sessionId: string;
+  url: string;
+}
+
+export async function createVipMembershipCheckoutSession(
+  input: CreateVipMembershipCheckoutSessionInput
+): Promise<VipMembershipCheckoutSessionResult> {
+  const appBaseUrl = env.APP_URL.replace(/\/$/, "");
+  const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [
+    { price: input.stripeTierPriceId, quantity: 1 }
+  ];
+
+  if (input.stripePlatformFeePriceId) {
+    lineItems.push({ price: input.stripePlatformFeePriceId, quantity: 1 });
+  }
+
+  const session = await stripe.checkout.sessions.create({
+    mode: "subscription",
+    customer: input.stripeCustomerId,
+    line_items: lineItems,
+    success_url: `${appBaseUrl}/vip/join/${input.joinToken}?status=success`,
+    cancel_url: `${appBaseUrl}/vip/join/${input.joinToken}?status=cancel`,
+    metadata: {
+      companyId: input.companyId,
+      customerId: input.customerId,
+      vipTierId: input.vipTierId,
+      planId: input.planId,
+      billingKind: "vip_membership"
+    },
+    subscription_data: {
+      transfer_data: {
+        destination: input.companyStripeAccountId
+      },
+      metadata: {
+        companyId: input.companyId,
+        customerId: input.customerId,
+        vipTierId: input.vipTierId,
+        planId: input.planId,
+        billingKind: "vip_membership",
+        ...(input.stripePlatformFeePriceId
+          ? { platformFeePriceId: input.stripePlatformFeePriceId }
+          : {})
+      }
+    },
+    custom_text: {
+      submit: {
+        message: `${RENVANI_STRIPE_BRAND.platformName} membership — ${input.tierName} at ${input.companyName}. Receipts and billing notices come from Renvani.`
+      }
+    }
+  });
+
+  if (!session.url) {
+    throw new Error("Stripe VIP checkout session missing url");
+  }
+
+  return {
+    sessionId: session.id,
+    url: session.url
+  };
+}

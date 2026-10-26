@@ -23,6 +23,11 @@ import {
 } from "./import-dedupe-preview.service.js";
 import { buildRelationalPreviewForBundle } from "./import-relational-preview-bundle.service.js";
 import { startImport } from "./import.service.js";
+import {
+  applyQuickBooksOAuthGateToCatalog,
+  bundleRequiresFileLinkConfirmation,
+  collectBundleMediaObjects
+} from "./migrate-import-file-link.service.js";
 
 type ImportBundleRow = typeof importBundles.$inferSelect;
 
@@ -122,7 +127,7 @@ async function abandonActiveBundles(companyId: string, actorId: string): Promise
 }
 
 export function listMigrateOnboardingSources() {
-  return MIGRATE_ONBOARDING_SOURCE_CATALOG;
+  return applyQuickBooksOAuthGateToCatalog(MIGRATE_ONBOARDING_SOURCE_CATALOG);
 }
 
 export async function getActiveMigrateOnboardingBundle(companyId: string): Promise<MigrateOnboardingBundle | null> {
@@ -371,6 +376,23 @@ export async function acknowledgeMigrateOnboardingPreview(
   }
 
   const stepState = parseStepState(bundle.stepState);
+  const sessionIds = stepState.files.map((file) => file.importSessionId);
+  const mediaObjects = await collectBundleMediaObjects(companyId, bundleId, sessionIds);
+
+  if (bundleRequiresFileLinkConfirmation(mediaObjects, stepState)) {
+    if (stepState.fileLinkStatus !== "ready") {
+      throw new AppError(
+        ErrorCode.CONFLICT,
+        "Run import media file-link analysis and confirm proposals before continuing"
+      );
+    }
+
+    throw new AppError(
+      ErrorCode.CONFLICT,
+      "Confirm all import media file-link proposals before acknowledging preview"
+    );
+  }
+
   stepState.previewReviewedAt = new Date().toISOString();
 
   return advanceWizardStep(companyId, actorId, bundleId, 5, stepState);

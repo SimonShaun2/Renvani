@@ -37,12 +37,30 @@ export const HOUSECALL_PRO_PRESETS: ImportSourcePreset[] = [
       "scheduled date": "scheduledAt",
       "job status": "status",
       status: "status",
+      "completed date": "completedAt",
       "job type": "jobType",
+      "job title": "jobType",
       street: "addressLine1",
       city: "city",
       state: "state",
       zip: "zip",
       "total amount": "total"
+    }
+  },
+  {
+    id: "housecall_pro_invoices",
+    entity: "invoices",
+    label: "Housecall Pro (invoices)",
+    headerAliases: {
+      "invoice id": "invoiceNumber",
+      "customer id": "customerSourceId",
+      "customer uuid": "customerSourceId",
+      "invoice date": "issuedAt",
+      date: "issuedAt",
+      total: "total",
+      "total amount": "total",
+      balance: "balanceDue",
+      "amount due": "balanceDue"
     }
   }
 ];

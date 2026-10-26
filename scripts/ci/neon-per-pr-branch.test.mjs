@@ -10,6 +10,7 @@ test("neon-per-pr-branch script documents staging-only policy", () => {
   const script = readFileSync(join(repoRoot, "scripts/ci/neon-per-pr-branch.mjs"), "utf8");
   assert.match(script, /staging-only/i);
   assert.match(script, /validateNeonCiDatabaseUrl/);
+  assert.match(script, /db:migrate/, "Neon gate must apply migrations before RLS integration tests");
 });
 
 test("batch-ci workflow includes neon per-PR matrix job", () => {

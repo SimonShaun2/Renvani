@@ -26,6 +26,7 @@ import customerRoutes from "./routes/customers/index.js";
 import dispatchRoutes from "./routes/dispatch/index.js";
 import fieldWorkRoutes from "./routes/field-work/index.js";
 import healthRoutes from "./routes/health/index.js";
+import globalRateLimitPlugin from "./plugins/global-rate-limit.js";
 import growthCheckIntakeRoutes from "./routes/growth-checks/index.js";
 import estimateRoutes from "./routes/estimates/index.js";
 import growthCheckScanRoutes from "./routes/growth-check/index.js";
@@ -58,6 +59,11 @@ import technicianExtensionRoutes from "./routes/technician-extensions/index.js";
 import technicianRoutes from "./routes/technicians/index.js";
 import timeRoutes from "./routes/time/index.js";
 
+/** FS-66 — TRUST_PROXY_HOPS → Fastify trustProxy (0 = false; N = trust N hops of X-Forwarded-For). */
+export function resolveTrustProxySetting(hops: number): false | number {
+  return Number.isInteger(hops) && hops > 0 ? hops : false;
+}
+
 export async function buildApp() {
   const logger = pino({
     level: env.NODE_ENV === "production" ? "info" : "debug",
@@ -75,7 +81,8 @@ export async function buildApp() {
   });
 
   const app = Fastify({
-    loggerInstance: logger
+    loggerInstance: logger,
+    trustProxy: resolveTrustProxySetting(env.TRUST_PROXY_HOPS)
   });
 
   await app.register(fastifyCors, {
@@ -84,6 +91,7 @@ export async function buildApp() {
     allowedHeaders: ["Authorization", "Content-Type", "Idempotency-Key", "X-Request-Id"]
   });
   await app.register(requestLoggerPlugin);
+  await app.register(globalRateLimitPlugin);
   await app.register(errorHandlerPlugin);
   await app.register(stripePlatformSyncPlugin);
   await app.register(healthRoutes);

@@ -85,7 +85,20 @@ const envSchema = z.object({
   QUICKBOOKS_CLIENT_SECRET: z.string().default(""),
   QUICKBOOKS_REDIRECT_URI: z.string().default(""),
   QUICKBOOKS_ENVIRONMENT: z.enum(["sandbox"]).default("sandbox"),
-  QUICKBOOKS_TOKEN_ENCRYPTION_KEY: z.string().default("")
+  QUICKBOOKS_TOKEN_ENCRYPTION_KEY: z.string().default(""),
+  /**
+   * FS-66 — number of trusted reverse-proxy hops in front of the API (Fastify `trustProxy`).
+   * 0 (default) = trust none; max 10; request.ip is the socket peer. N > 0 = take the client IP N hops back via X-Forwarded-For.
+   */
+  TRUST_PROXY_HOPS: z.coerce.number().int().min(0).max(10).default(0),
+  /** FS-66 — global per-IP API rate limit. Off unless explicitly "true" (enable after TRUST_PROXY_HOPS is verified). */
+  GLOBAL_RATE_LIMIT_ENABLED: z.enum(["true", "false"]).optional(),
+  GLOBAL_RATE_LIMIT_MAX: z.coerce.number().int().positive().default(600),
+  GLOBAL_RATE_LIMIT_WINDOW_SECONDS: z.coerce.number().int().positive().default(60),
+  /** FS-66 — public slot-hold/confirm limits (fixed window). */
+  PUBLIC_SLOT_HOLD_IP_RATE_LIMIT_MAX: z.coerce.number().int().positive().default(6),
+  PUBLIC_SLOT_HOLD_COMPANY_RATE_LIMIT_MAX: z.coerce.number().int().positive().default(120),
+  PUBLIC_SLOT_HOLD_RATE_LIMIT_WINDOW_SECONDS: z.coerce.number().int().positive().default(600)
 });
 
 export type Env = z.infer<typeof envSchema>;

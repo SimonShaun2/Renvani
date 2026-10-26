@@ -1,5 +1,7 @@
 import { env } from "@fsm/config";
 
+import { hitFixedWindowRateLimit, normalizeRateLimitIp, resetFixedWindowRateLimitStateForTests } from "./fixed-window-rate-limit.js";
+
 const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000;
 const RATE_LIMIT_WINDOW_SECONDS = Math.ceil(RATE_LIMIT_WINDOW_MS / 1000);
 
@@ -163,8 +165,37 @@ export function resetPublicBookingRateLimitStateForTests(): void {
   authForgotPasswordTimesByIp.clear();
   bookingRequestTimesByIp.clear();
   slotHoldTimesByReference.clear();
+  resetFixedWindowRateLimitStateForTests();
 }
 
 export function getRateLimitWindowMs(): number {
   return RATE_LIMIT_WINDOW_MS;
+}
+
+/**
+ * FS-66 — dedicated public slot-hold/confirm limits (atomic fixed window, Redis + memory fallback).
+ * Per client IP and per company booking slug; values are env-configurable.
+ */
+export async function checkPublicSlotHoldIpAndCompanyRateLimit(
+  ipAddress: string,
+  slug: string
+): Promise<{ allowed: true } | { allowed: false; scope: "ip" | "company"; retryAfterSeconds: number }> {
+  const windowMs = env.PUBLIC_SLOT_HOLD_RATE_LIMIT_WINDOW_SECONDS * 1000;
+  const ip = await hitFixedWindowRateLimit({
+    key: `fsm:public-booking:rate:slot-hold-ip:${normalizeRateLimitIp(ipAddress)}`,
+    limit: env.PUBLIC_SLOT_HOLD_IP_RATE_LIMIT_MAX,
+    windowMs
+  });
+  if (!ip.allowed) {
+    return { allowed: false, scope: "ip", retryAfterSeconds: ip.retryAfterSeconds };
+  }
+  const company = await hitFixedWindowRateLimit({
+    key: `fsm:public-booking:rate:slot-hold-company:${slug.trim().toLowerCase()}`,
+    limit: env.PUBLIC_SLOT_HOLD_COMPANY_RATE_LIMIT_MAX,
+    windowMs
+  });
+  if (!company.allowed) {
+    return { allowed: false, scope: "company", retryAfterSeconds: company.retryAfterSeconds };
+  }
+  return { allowed: true };
 }

@@ -47,10 +47,12 @@ describe("resolveClerkRouteDecision", () => {
     expect(resolveClerkRouteDecision("/pay/tok_1/receipt", "user_1")).toEqual({ action: "next" });
   });
 
-  it("resolves the role only from known claim shapes", () => {
+  it("resolves the role only from the metadata.role claim (matches the API)", () => {
     expect(resolveClerkRole({ metadata: { role: "admin" } })).toBe("admin");
-    expect(resolveClerkRole({ public_metadata: { role: "office" } })).toBe("office");
-    expect(resolveClerkRole({ role: "dispatcher" })).toBe("dispatcher");
+    expect(resolveClerkRole({ metadata: { role: "office" } })).toBe("office");
+    expect(resolveClerkRole({ public_metadata: { role: "office" } })).toBeNull();
+    expect(resolveClerkRole({ publicMetadata: { role: "office" } })).toBeNull();
+    expect(resolveClerkRole({ role: "dispatcher" })).toBeNull();
     expect(resolveClerkRole({ metadata: { role: "superuser" } })).toBeNull();
     expect(resolveClerkRole({ org_role: "org:admin" })).toBeNull();
     expect(resolveClerkRole(null)).toBeNull();

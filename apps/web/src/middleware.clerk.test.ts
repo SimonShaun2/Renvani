@@ -60,9 +60,15 @@ describe("middleware with Clerk enabled", () => {
     expect(await loc("/dashboard")).toBe("http://localhost:3000/mobile/jobs");
     expect(await loc("/settings")).toBe("http://localhost:3000/mobile/jobs");
     expect(await loc("/mobile/jobs")).toBeNull();
-    mockClaims = { role: "dispatcher" };
+    mockClaims = { metadata: { role: "dispatcher" } };
     expect(await loc("/reporting")).toBe("http://localhost:3000/dispatch");
     expect(await loc("/dispatch")).toBeNull();
+  });
+
+  it("ignores a top-level role claim (metadata.role only)", async () => {
+    mockUserId = "user_1";
+    mockClaims = { role: "owner" };
+    expect(await loc("/dashboard")).toBe("http://localhost:3000/no-access");
   });
 
   it("sends a Clerk session with no role to /no-access, not into the app", async () => {

@@ -6,16 +6,16 @@ export type ClerkRouteDecision = { action: "next" } | { action: "redirect"; to: 
 export const CLERK_NO_ACCESS_ROUTE = "/no-access";
 
 /**
- * Resolves the staff role for a Clerk session from its session claims.
- * The role must be put into the session token (Clerk session-token template), e.g.
- * `{ "metadata": { "role": "{{user.public_metadata.role}}" } }` or a top-level `role` claim.
- * Anything that is not a known Renvani role resolves to null (no access to staff pages).
+ * Resolves the staff role for a Clerk session. Matches the API: the role is read ONLY from
+ * the `metadata.role` session claim (Clerk session-token template, e.g.
+ * `{ "metadata": { "role": "{{user.public_metadata.role}}" } }`). No other fallbacks
+ * (no top-level `role`, no org roles). Anything that is not a known Renvani role is null.
  */
 export function resolveClerkRole(sessionClaims: unknown): UserRole | null {
   if (!sessionClaims || typeof sessionClaims !== "object") return null;
-  const claims = sessionClaims as Record<string, unknown>;
-  const metadata = (claims.metadata ?? claims.public_metadata ?? claims.publicMetadata) as Record<string, unknown> | undefined;
-  return normalizeUserRole(claims.role) ?? normalizeUserRole(metadata && typeof metadata === "object" ? metadata.role : undefined);
+  const metadata = (sessionClaims as Record<string, unknown>).metadata;
+  if (!metadata || typeof metadata !== "object") return null;
+  return normalizeUserRole((metadata as Record<string, unknown>).role);
 }
 
 function isAuthPage(pathname: string): boolean {

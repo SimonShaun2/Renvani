@@ -37,6 +37,8 @@ Route handlers should prefer `await request.runCompanyScopedTransaction(async (t
 | Variable | Required | Notes |
 | --- | --- | --- |
 | `CLERK_SECRET_KEY` | When `clerkAuthParallelJwt` on | Empty disables Clerk verify path |
+| `CLERK_AUTHORIZED_PARTIES` | When `isClerkAzpRequired()` is true | Comma-separated frontend origins allowed as the token `azp`; see below |
+| `CLERK_WEBHOOK_SECRET` | For `POST /api/v1/webhooks/clerk` | Svix signing secret of the Clerk webhook endpoint |
 
 ## Feature flags
 
@@ -63,3 +65,109 @@ pnpm exec vitest run \
 1. Enable `clerkAuthParallelJwt` in staging with Clerk dev instance and company `settings.clerk.organizationId` populated.
 2. Enable `tenantSessionScopedWrites` when STACK-10 RLS policies are on Neon staging.
 3. Keep JWT parallel until Clerk org provisioning and user mapping are complete; then flip default auth in a follow-up ADR addendum.
+
+## Clerk session-token template (FS-159)
+
+Configure in Clerk Dashboard → **Sessions → Customize session token**. Copy-paste exactly:
+
+```json
+{
+  "email": "{{user.primary_email_address}}",
+  "email_verified": "{{user.primary_email_address.verified}}",
+  "metadata": "{{user.public_metadata}}"
+}
+```
+
+Rules:
+
+- Map only `public_metadata` (server-controlled). **Never** map `unsafe_metadata`; the API never reads it.
+- Do **not** add a top-level `role` claim. Web (#184) also accepts a top-level `role`, but the API reads only `metadata.role`.
+- `sub`, `azp`, and `org_id` (or nested `o.id`) are Clerk default claims; do not override them.
+- The staff role lives in the Clerk user's public metadata as `{"role": "owner" | "admin" | "dispatcher" | "office" | "technician"}`.
+
+### How the API uses the claims (`apps/api/src/lib/clerk-auth.ts`)
+
+| Claim | Used for |
+| --- | --- |
+| `sub` | Clerk user id; mapped to `users.clerk_user_id` first (`resolveStaffUserForClerkSession`). Missing → 401. |
+| `org_id` / `o.id` | Mapped to `companies.settings.clerk.organizationId`. Missing → 401. |
+| `email` + `email_verified` | Verified-email linking. The email is used only when `email_verified` is `true` (boolean or the string `"true"`); it is trimmed and lowercased. An unlinked, active same-company user with `clerk_user_id IS NULL` and no tombstone (`clerk_unlinked_at IS NULL`) is linked once by a conditional update. Otherwise the email is null and an unlinked session is rejected (401). |
+| `metadata.role` | `extractClerkRoleClaim` → `CLERK_ROLE_CLAIM` (`"metadata.role"`). Only the five known roles are accepted; anything else is `null`. |
+| `azp` | Authorized-party check (below). |
+
+### `CLERK_AUTHORIZED_PARTIES` (azp check)
+
+- Parsed by `parseClerkAuthorizedParties`: comma-separated, trimmed, trailing `/` stripped. Example: `https://app.example.com,https://staging.example.com`.
+- When the list is non-empty it is passed to `verifyToken({ authorizedParties })`, and the API also requires `payload.azp` (trailing `/` stripped) to be in the list. Missing or unlisted `azp` → 401.
+- `isClerkAzpRequired()` is true when the `clerkAuthParallelJwt` flag is on, the deployment tier is `staging` (`isClerkAuthParallelJwtEnabled`), or `NODE_ENV=production`. In that case an **empty** list fails closed: every Clerk token is rejected with 401.
+- The parsed origins are also added to the API CORS allow-list (`app.ts`).
+
+### Webhook events to subscribe
+
+Endpoint: `POST /api/v1/webhooks/clerk` (Svix-signed with `CLERK_WEBHOOK_SECRET`). Subscribe to:
+
+| Event | API behavior |
+| --- | --- |
+| `user.created` | Acknowledged and ignored (no organization yet; the owner is provisioned on membership). |
+| `user.updated` | `syncClerkUserUpdated`: syncs the verified primary email. |
+| `user.deleted` | `deactivateClerkUser`: `is_active = false`, `clerk_user_id = NULL`, tombstone `clerk_unlinked_at = COALESCE(clerk_unlinked_at, now())`. Logs `clerk_last_owner_deactivated` if it removes the last active owner/admin. |
+| `organization.created` | `provisionClerkOrganization`: creates the company. |
+| `organization.updated`, `organization.deleted` | Currently acknowledged and ignored; subscribe so future handlers need no Clerk change. |
+| `organizationMembership.created` | `provisionClerkMembership`: creates or links the staff user (never links by email, since the payload has no verification proof). |
+| `organizationMembership.updated` | Currently acknowledged and ignored. |
+| `organizationMembership.deleted` | `deactivateClerkMembership`: deactivates the member in that company. |
+
+## Runbook
+
+### (a) Relink a tombstoned user (manual DB step until FS-165)
+
+After `user.deleted`, the user has `clerk_unlinked_at` set and `clerk_user_id = NULL`, and every auto-link path (session email fallback, membership webhook) skips them. Until FS-165 ships the admin relink route, an operator relinks manually. Confirm the target user, company, and the new Clerk user id with the company owner first.
+
+```sql
+BEGIN;
+
+-- 1. The Clerk id must not belong to any other user (expect 0 rows).
+SELECT id, company_id FROM users
+WHERE clerk_user_id = :'clerk_user_id' AND id <> :'user_id';
+
+-- 2. Inspect the target (expect 1 row, clerk_unlinked_at NOT NULL).
+SELECT id, company_id, is_active, clerk_user_id, clerk_unlinked_at, deleted_at
+FROM users WHERE id = :'user_id' AND company_id = :'company_id'
+FOR UPDATE;
+
+-- 3. Relink, clear the tombstone, reactivate.
+UPDATE users
+SET clerk_user_id = :'clerk_user_id',
+    clerk_unlinked_at = NULL,
+    is_active = true,
+    updated_at = now()
+WHERE id = :'user_id'
+  AND company_id = :'company_id'
+  AND deleted_at IS NULL
+  AND clerk_unlinked_at IS NOT NULL;
+-- Expect UPDATE 1. Anything else (or a 23505 unique violation) → ROLLBACK.
+
+COMMIT;
+```
+
+If step 1 returns a row, stop and `ROLLBACK`: resolve which user owns the Clerk id first. Record who ran it, the target user, and the company in the ops log (FS-165 will write this audit entry automatically).
+
+### (b) Duplicate Clerk org pre-deploy check (migration 0038)
+
+Run on staging/prod before deploying 0038. This uses the exact predicate from migration 0038 (from PR #194); any rows mean the `companies_clerk_organization_id_idx` index will be skipped with a WARNING:
+
+```sql
+SELECT ("settings" -> 'clerk' ->> 'organizationId') AS org_id, count(*), array_agg("id") AS company_ids
+FROM "companies"
+WHERE "deleted_at" IS NULL AND ("settings" -> 'clerk' ->> 'organizationId') IS NOT NULL
+GROUP BY ("settings" -> 'clerk' ->> 'organizationId')
+HAVING count(*) > 1;
+```
+
+The migration does not exclude empty-string org ids. As a diagnostic only, add `AND ("settings" -> 'clerk' ->> 'organizationId') <> ''`.
+
+After resolving duplicates, re-run (verbatim from 0038):
+
+```sql
+CREATE UNIQUE INDEX IF NOT EXISTS "companies_clerk_organization_id_idx" ON "companies" USING btree (("settings" -> 'clerk' ->> 'organizationId')) WHERE "deleted_at" IS NULL AND ("settings" -> 'clerk' ->> 'organizationId') IS NOT NULL;
+```

@@ -9,7 +9,7 @@
 1. API `authenticate` tries **in-repo JWT** first (unchanged default).
 2. When JWT verify fails and `clerkAuthParallelJwt` is **true** with `CLERK_SECRET_KEY` set, API verifies a **Clerk session token** (`@clerk/backend`). Tests mock `@clerk/backend`; do not use live Clerk keys in CI.
 3. Clerk `org_id` (or nested `o.id`) maps to `companies.settings.clerk.organizationId` (`CompanySettings.clerk` in `@fsm/types`).
-4. Staff user resolved by email within the company (fallback: first active user — staging only).
+4. Staff user resolved by stored `users.clerk_user_id` (= `sub`), else linked once by Clerk-**verified** email to an active, unlinked, non-tombstoned user in the company (`resolveStaffUserForClerkSession`). There is **no** first-user fallback: anything else is 401.
 5. **Tenant session on writes (flag-gated):** when `tenantSessionScopedWrites` is **true**, critical service writes run through `runTenantAwareTransaction`, which sets `SET LOCAL app.current_company_id` via `runCompanyScopedTransaction` / `runTransactionWithTenantSession`. When **false** (default), behavior matches legacy `runTransactionWithRetry` / `db.transaction`.
 
 ## API surfaces
@@ -104,13 +104,16 @@ Rules:
 
 ### Webhook events to subscribe
 
-Endpoint: `POST /api/v1/webhooks/clerk` (Svix-signed with `CLERK_WEBHOOK_SECRET`). Subscribe to:
+Endpoint: `POST /api/v1/webhooks/clerk` (Svix-signed with `CLERK_WEBHOOK_SECRET`). Subscribe to the events below.
+
+**Dedupe (#195, `lib/webhook-dedupe.ts`, keyed on `svix-id`):** a delivery first claims the message with a 5-minute processing lease (`PROCESSING_TTL_SECONDS`). On success the claim becomes a `done` marker kept for 24h (`DONE_TTL_SECONDS`). On handler failure the claim is released so Svix's retry can process it. A repeat of a completed message returns `200 {"received": true, "duplicate": true}`. A delivery that overlaps one still processing returns `409 IN_PROGRESS`, so Svix retries later.
+
 
 | Event | API behavior |
 | --- | --- |
 | `user.created` | Acknowledged and ignored (no organization yet; the owner is provisioned on membership). |
-| `user.updated` | `syncClerkUserUpdated`: syncs the verified primary email. |
-| `user.deleted` | `deactivateClerkUser`: `is_active = false`, `clerk_user_id = NULL`, tombstone `clerk_unlinked_at = COALESCE(clerk_unlinked_at, now())`. Logs `clerk_last_owner_deactivated` if it removes the last active owner/admin. |
+| `user.updated` | `syncClerkUserUpdated`: syncs the verified primary email to the user linked by `clerk_user_id`. If no user is linked, it links an active, unlinked, non-deleted user whose email equals the verified primary email. Tombstoned users (`clerk_unlinked_at` set) are skipped with a warning. |
+| `user.deleted` | `deactivateClerkUser`: `is_active = false`, `clerk_user_id = NULL`, tombstone `clerk_unlinked_at = COALESCE(clerk_unlinked_at, now())`. Logs `clerk_last_owner_deactivated` only if the user was active before the event and no other active, non-deleted owner/admin remains in the company. |
 | `organization.created` | `provisionClerkOrganization`: creates the company. |
 | `organization.updated`, `organization.deleted` | Currently acknowledged and ignored; subscribe so future handlers need no Clerk change. |
 | `organizationMembership.created` | `provisionClerkMembership`: creates or links the staff user (never links by email, since the payload has no verification proof). |
@@ -121,7 +124,19 @@ Endpoint: `POST /api/v1/webhooks/clerk` (Svix-signed with `CLERK_WEBHOOK_SECRET`
 
 ### (a) Relink a tombstoned user (manual DB step until FS-165)
 
-After `user.deleted`, the user has `clerk_unlinked_at` set and `clerk_user_id = NULL`, and every auto-link path (session email fallback, membership webhook) skips them. Until FS-165 ships the admin relink route, an operator relinks manually. Confirm the target user, company, and the new Clerk user id with the company owner first.
+After `user.deleted`, the user has `clerk_unlinked_at` set and `clerk_user_id = NULL`, and every auto-link path skips them: the session verified-email fallback, the `user.updated` verified-email link, and the `organizationMembership.created` webhook. Until FS-165 ships the admin relink route, an operator relinks manually. Confirm the target user, company, and the new Clerk user id with the company owner first.
+
+Run it in an interactive `psql` session, passing the ids as variables (do not paste them into shared logs):
+
+```bash
+psql "$DATABASE_URL" \
+  -v ON_ERROR_STOP=1 \
+  -v user_id='<users.id>' \
+  -v company_id='<companies.id>' \
+  -v clerk_user_id='<Clerk user id, user_...>'
+```
+
+Then run the following, reading each result before continuing:
 
 ```sql
 BEGIN;
@@ -145,10 +160,13 @@ WHERE id = :'user_id'
   AND company_id = :'company_id'
   AND deleted_at IS NULL
   AND clerk_unlinked_at IS NOT NULL;
--- Expect UPDATE 1. Anything else (or a 23505 unique violation) → ROLLBACK.
-
-COMMIT;
+-- Expect UPDATE 1.
 ```
+
+Finish the transaction **by hand**. There is deliberately no `COMMIT` in the block above:
+
+- Run `COMMIT;` only if step 1 returned 0 rows, step 2 returned exactly 1 row with `clerk_unlinked_at` set, and step 3 reported `UPDATE 1`.
+- Otherwise run `ROLLBACK;`. This includes step 3 reporting `UPDATE 0` or failing with a 23505 unique violation (after an error the transaction is already aborted, so `ROLLBACK;` is the only option).
 
 If step 1 returns a row, stop and `ROLLBACK`: resolve which user owns the Clerk id first. Record who ran it, the target user, and the company in the ops log (FS-165 will write this audit entry automatically).
 
@@ -165,6 +183,14 @@ HAVING count(*) > 1;
 ```
 
 The migration does not exclude empty-string org ids. As a diagnostic only, add `AND ("settings" -> 'clerk' ->> 'organizationId') <> ''`.
+
+**Runtime behavior while duplicates exist (#196, fail closed):** `findCompanyByClerkOrganizationId` in `clerk-tenant.service.ts` logs `logger.error({ alert: "clerk_org_ambiguous", clerkOrganizationId, companyIds })` and throws `ClerkOrganizationAmbiguousError`. As a result:
+
+- Clerk sessions for that org get a generic **401**.
+- Webhook provisioning and membership sync for that org return `skipped`.
+- Other orgs are unaffected.
+
+Alert on `clerk_org_ambiguous` (FS-163).
 
 After resolving duplicates, re-run (verbatim from 0038):
 

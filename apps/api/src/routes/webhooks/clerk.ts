@@ -3,7 +3,7 @@ import type { FastifyPluginAsync, FastifyReply } from "fastify";
 import { env } from "@fsm/config";
 
 import { verifySvixSignature } from "../../lib/svix-verify.js";
-import { claimWebhookMessageId, releaseWebhookMessageId } from "../../lib/webhook-dedupe.js";
+import { claimWebhookMessage, completeWebhookMessage, releaseWebhookMessage } from "../../lib/webhook-dedupe.js";
 import {
   provisionClerkMembership,
   provisionClerkOrganization
@@ -53,13 +53,21 @@ const clerkWebhookRoutes: FastifyPluginAsync = async (fastify) => {
     }
 
     const svixId = header("svix-id") ?? "";
-    if (!(await claimWebhookMessageId("clerk", svixId))) {
+    const claim = await claimWebhookMessage("clerk", svixId);
+    if (claim.status === "duplicate") {
       return reply.send({ received: true, duplicate: true });
     }
+    if (claim.status === "in_progress" || !claim.token) {
+      // Another delivery of this message is still processing: non-2xx so the sender retries later.
+      return reply.status(409).send({ error: "IN_PROGRESS", message: "Webhook message is already being processed" });
+    }
+    const token = claim.token;
     try {
-      return await handleEvent(event, reply);
+      const result = await handleEvent(event, reply);
+      await completeWebhookMessage("clerk", svixId, token);
+      return result;
     } catch (error) {
-      await releaseWebhookMessageId("clerk", svixId);
+      await releaseWebhookMessage("clerk", svixId, token);
       throw error;
     }
   });

@@ -47,6 +47,42 @@ describe("Clerk webhook", () => {
     provisionClerkMembership.mockReset().mockResolvedValue({ status: "created", companyId: "co_1" });
   });
 
+  it("FS-158: a failed delivery releases the claim and the retry is processed", async () => {
+    const body = { type: "organization.created", data: { id: "org_f", name: "Acme" } };
+    provisionClerkOrganization.mockRejectedValueOnce(new Error("boom"));
+    const first = await send(body, { id: "msg_fail" });
+    expect(first.statusCode).toBe(500);
+    const retry = await send(body, { id: "msg_fail" });
+    expect(retry.statusCode).toBe(200);
+    expect(retry.json()).not.toMatchObject({ duplicate: true });
+    expect(provisionClerkOrganization).toHaveBeenCalledTimes(2);
+    const third = await send(body, { id: "msg_fail" });
+    expect(third.json()).toMatchObject({ duplicate: true });
+    expect(provisionClerkOrganization).toHaveBeenCalledTimes(2);
+  });
+
+  it("FS-158: a concurrent duplicate while processing gets 409 (sender retries), handler runs once", async () => {
+    let finish!: () => void;
+    provisionClerkOrganization.mockImplementationOnce(
+      () => new Promise((resolve) => (finish = () => resolve({ id: "co_1" })))
+    );
+    const body = { type: "organization.created", data: { id: "org_c", name: "Acme" } };
+    const firstP = send(body, { id: "msg_conc" });
+    await vi.waitFor(() => expect(provisionClerkOrganization).toHaveBeenCalledTimes(1));
+    const second = await send(body, { id: "msg_conc" });
+    expect(second.statusCode).toBe(409);
+    finish();
+    expect((await firstP).statusCode).toBe(200);
+    expect(provisionClerkOrganization).toHaveBeenCalledTimes(1);
+  });
+
+  it("FS-158: distinct svix-ids are processed independently", async () => {
+    const body = { type: "organization.created", data: { id: "org_d", name: "Acme" } };
+    await send(body, { id: "msg_d1" });
+    await send(body, { id: "msg_d2" });
+    expect(provisionClerkOrganization).toHaveBeenCalledTimes(2);
+  });
+
   it("dedupes replays of the same svix-id", async () => {
     const body = { type: "organization.created", data: { id: "org_r", name: "Acme" } };
     const first = await send(body, { id: "msg_replay" });

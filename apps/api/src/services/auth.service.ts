@@ -126,8 +126,10 @@ async function findUserById(userId: string): Promise<UserRecord | null> {
   return user ?? null;
 }
 
-async function findCompanyBySlug(slug: string): Promise<CompanyRecord | null> {
-  const [company] = await db
+type SlugLookupExecutor = Pick<typeof db, "select">;
+
+async function findCompanyBySlug(slug: string, executor: SlugLookupExecutor = db): Promise<CompanyRecord | null> {
+  const [company] = await executor
     .select()
     .from(companies)
     .where(and(eq(companies.slug, slug), isNull(companies.deletedAt)))
@@ -136,12 +138,16 @@ async function findCompanyBySlug(slug: string): Promise<CompanyRecord | null> {
   return company ?? null;
 }
 
-export async function generateUniqueCompanySlug(companyName: string): Promise<string> {
+/** `executor` lets callers (e.g. Clerk provisioning) run the lookup inside their transaction. */
+export async function generateUniqueCompanySlug(
+  companyName: string,
+  executor: SlugLookupExecutor = db
+): Promise<string> {
   const baseSlug = slugifyCompanyName(companyName);
   let candidate = baseSlug;
 
   for (let attempt = 0; attempt < 5; attempt += 1) {
-    const existingCompany = await findCompanyBySlug(candidate);
+    const existingCompany = await findCompanyBySlug(candidate, executor);
 
     if (!existingCompany) {
       return candidate;

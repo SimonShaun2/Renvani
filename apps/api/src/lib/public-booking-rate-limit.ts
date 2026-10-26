@@ -1,6 +1,12 @@
 import { env } from "@fsm/config";
 
-import { hitFixedWindowRateLimit, normalizeRateLimitIp, resetFixedWindowRateLimitStateForTests } from "./fixed-window-rate-limit.js";
+import {
+  evalRateLimitScript,
+  hitFixedWindowRateLimit,
+  normalizeRateLimitIp,
+  resetFixedWindowRateLimitStateForTests,
+  resolveRateLimitRedisClient
+} from "./fixed-window-rate-limit.js";
 
 const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000;
 const RATE_LIMIT_WINDOW_SECONDS = Math.ceil(RATE_LIMIT_WINDOW_MS / 1000);
@@ -26,10 +32,6 @@ export const AUTH_FORGOT_PASSWORD_IP_RATE_LIMIT = 5;
 export const AUTH_SIGNUP_ATTEMPT_NOTICE_LIMIT = 1;
 export const AUTH_SIGNUP_ATTEMPT_NOTICE_WINDOW_MS = 60 * 60 * 1000;
 
-function useInMemoryRateLimitStore(): boolean {
-  return env.NODE_ENV === "test";
-}
-
 function recordInMemoryAttempt(
   map: Map<string, number[]>,
   key: string,
@@ -50,27 +52,19 @@ function recordInMemoryAttempt(
   return true;
 }
 
-async function recordRedisAttempt(
-  redisKey: string,
-  limit: number,
-  now: number,
-  windowMs: number = RATE_LIMIT_WINDOW_MS
-): Promise<boolean> {
-  const cutoff = now - windowMs;
-  const member = `${now}:${Math.random().toString(36).slice(2, 10)}`;
-  const { redisConnection } = await import("@fsm/jobs");
-
-  await redisConnection.zremrangebyscore(redisKey, 0, cutoff);
-  const count = await redisConnection.zcard(redisKey);
-
-  if (count >= limit) {
-    return false;
-  }
-
-  await redisConnection.zadd(redisKey, now, member);
-  await redisConnection.expire(redisKey, Math.ceil(windowMs / 1000) + 60);
-  return true;
-}
+/**
+ * FS-155 follow-up: sliding-window check-and-add as ONE Lua script, so concurrent requests can't all pass
+ * a zcard-then-zadd race. ARGV: cutoff, now, limit, member, ttlMs. Returns 1 if recorded (allowed), else 0.
+ */
+export const SLIDING_WINDOW_LUA = `
+redis.call('ZREMRANGEBYSCORE', KEYS[1], 0, ARGV[1])
+if redis.call('ZCARD', KEYS[1]) >= tonumber(ARGV[3]) then
+  return 0
+end
+redis.call('ZADD', KEYS[1], ARGV[2], ARGV[4])
+redis.call('PEXPIRE', KEYS[1], ARGV[5])
+return 1
+`;
 
 async function recordAttempt(
   map: Map<string, number[]>,
@@ -80,18 +74,30 @@ async function recordAttempt(
   windowMs: number = RATE_LIMIT_WINDOW_MS
 ): Promise<boolean> {
   const now = Date.now();
-
-  if (useInMemoryRateLimitStore()) {
-    return recordInMemoryAttempt(map, identifier, limit, now, windowMs);
+  // Same resolution as the #193 fixed-window limiter: null under NODE_ENV=test unless a test injects a client.
+  const client = await resolveRateLimitRedisClient().catch(() => null);
+  if (client) {
+    const member = `${now}:${Math.random().toString(36).slice(2, 10)}`;
+    const ttlMs = (Math.ceil(windowMs / 1000) + 60) * 1000;
+    try {
+      const reply = await evalRateLimitScript(
+        client,
+        SLIDING_WINDOW_LUA,
+        `${redisKeyPrefix}:${identifier}`,
+        now - windowMs,
+        now,
+        limit,
+        member,
+        ttlMs
+      );
+      if (reply === 1 || reply === "1") return true;
+      if (reply === 0 || reply === "0") return false;
+      throw new Error("unexpected rate-limit redis reply");
+    } catch {
+      // Redis down/slow (250 ms) or bad reply: fall through to the per-process in-memory window.
+    }
   }
-
-  const redisKey = `${redisKeyPrefix}:${identifier}`;
-
-  try {
-    return await recordRedisAttempt(redisKey, limit, now, windowMs);
-  } catch {
-    return recordInMemoryAttempt(map, identifier, limit, now, windowMs);
-  }
+  return recordInMemoryAttempt(map, identifier, limit, now, windowMs);
 }
 
 export async function checkPublicBookingIpRateLimit(ipAddress: string): Promise<boolean> {

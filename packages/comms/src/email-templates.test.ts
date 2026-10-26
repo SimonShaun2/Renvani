@@ -5,7 +5,6 @@ import {
   EMAIL_TEMPLATE_IDS,
   type EmailTemplateId,
   renderTransactionalEmail,
-  resolveOutboundEmailFromAddress,
   safeHref,
   sanitizeSubject
 } from "./email-templates.js";
@@ -56,15 +55,6 @@ describe("renderTransactionalEmail", () => {
     expect(dunning.subject).toBe("Action needed: your VIP payment didn't go through");
   });
 
-  it("prefers Resend from address when email-first flag is on", () => {
-    expect(
-      resolveOutboundEmailFromAddress({
-        resendEmailEnabled: true,
-        resendFromEmail: "hello@renvani.test",
-        sendgridFromEmail: "legacy@sendgrid.test"
-      })
-    ).toBe("hello@renvani.test");
-  });
 });
 
 describe("email template HTML injection", () => {

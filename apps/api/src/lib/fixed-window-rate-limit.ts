@@ -88,20 +88,35 @@ function hitMemory(input: FixedWindowRateLimitInput, now: number): FixedWindowRa
   };
 }
 
-async function resolveRedis(): Promise<RateLimitRedisClient | null> {
+/** Redis client for rate limiting: test override, else null under NODE_ENV=test, else the shared connection. */
+export async function resolveRateLimitRedisClient(): Promise<RateLimitRedisClient | null> {
   if (redisOverride !== undefined) return redisOverride;
   if (env.NODE_ENV === "test") return null;
   const { redisConnection } = await import("@fsm/jobs");
   return redisConnection as unknown as RateLimitRedisClient;
 }
 
-async function hitRedis(client: RateLimitRedisClient, input: FixedWindowRateLimitInput): Promise<FixedWindowRateLimitResult> {
+/** Run a single-key rate-limit Lua script with the shared 250 ms timeout (rejects on timeout or error). */
+export async function evalRateLimitScript(
+  client: RateLimitRedisClient,
+  script: string,
+  key: string,
+  ...args: Array<string | number>
+): Promise<unknown> {
   let timer: NodeJS.Timeout | undefined;
   const timeout = new Promise<never>((_, reject) => {
     timer = setTimeout(() => reject(new Error("rate-limit redis timeout")), REDIS_TIMEOUT_MS);
   });
   try {
-    const raw = await Promise.race([client.eval(FIXED_WINDOW_LUA, 1, input.key, input.windowMs), timeout]);
+    return await Promise.race([client.eval(script, 1, key, ...args), timeout]);
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+}
+
+async function hitRedis(client: RateLimitRedisClient, input: FixedWindowRateLimitInput): Promise<FixedWindowRateLimitResult> {
+  {
+    const raw = await evalRateLimitScript(client, FIXED_WINDOW_LUA, input.key, input.windowMs);
     if (!Array.isArray(raw) || raw.length < 2) throw new Error("unexpected rate-limit redis reply");
     const count = Number(raw[0]);
     const ttlMs = Number(raw[1]);
@@ -113,14 +128,12 @@ async function hitRedis(client: RateLimitRedisClient, input: FixedWindowRateLimi
       retryAfterSeconds: Math.max(1, Math.ceil(ttlMs / 1000)),
       store: "redis"
     };
-  } finally {
-    if (timer) clearTimeout(timer);
   }
 }
 
 export async function hitFixedWindowRateLimit(input: FixedWindowRateLimitInput): Promise<FixedWindowRateLimitResult> {
   const now = Date.now();
-  const client = await resolveRedis().catch(() => null);
+  const client = await resolveRateLimitRedisClient().catch(() => null);
   if (client) {
     try {
       return await hitRedis(client, input);

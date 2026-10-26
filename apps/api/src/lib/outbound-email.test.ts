@@ -16,6 +16,29 @@ const baseEnv = {
 };
 vi.mock("@fsm/config", () => ({ env: { ...baseEnv } }));
 
+/** FS-155 follow-up: same table as packages/comms/src/email-provider.test.ts and the worker parity test. */
+const CASES = [
+  { name: "Resend key + RESEND_FROM_EMAIL", env: { NODE_ENV: "production", RESEND_API_KEY: "re_x", SENDGRID_API_KEY: "sg_x", RESEND_FROM_EMAIL: "R <r@mail.test>", EMAIL_FROM: "E <e@mail.test>" }, provider: "resend", from: "R <r@mail.test>" },
+  { name: "Resend key, EMAIL_FROM only", env: { NODE_ENV: "production", RESEND_API_KEY: "re_x", SENDGRID_API_KEY: "", RESEND_FROM_EMAIL: "", EMAIL_FROM: "E <e@mail.test>" }, provider: "resend", from: "E <e@mail.test>" },
+  { name: "Resend key, no from configured", env: { NODE_ENV: "production", RESEND_API_KEY: " re_x ", SENDGRID_API_KEY: "", RESEND_FROM_EMAIL: " ", EMAIL_FROM: "" }, provider: "resend", from: "Renvani <hello@mail.getrenvani.com>" },
+  { name: "SendGrid fallback outside tests", env: { NODE_ENV: "production", RESEND_API_KEY: "", SENDGRID_API_KEY: "sg_x", RESEND_FROM_EMAIL: "R <r@mail.test>", EMAIL_FROM: "E <e@mail.test>" }, provider: "sendgrid", from: "noreply@sendgrid.test" },
+  { name: "SendGrid key ignored under NODE_ENV=test", env: { NODE_ENV: "test", RESEND_API_KEY: "", SENDGRID_API_KEY: "sg_x", RESEND_FROM_EMAIL: "", EMAIL_FROM: "" }, provider: "none", from: "Renvani <hello@mail.getrenvani.com>" },
+  { name: "no keys", env: { NODE_ENV: "production", RESEND_API_KEY: "", SENDGRID_API_KEY: "", RESEND_FROM_EMAIL: "R <r@mail.test>", EMAIL_FROM: "" }, provider: "none", from: "R <r@mail.test>" }
+] as const;
+
+describe("API provider/from selection matches the shared @fsm/comms helper (worker parity)", () => {
+  afterEach(() => {
+    vi.resetModules();
+  });
+
+  it.each(CASES)("$name", async ({ env, provider, from }) => {
+    vi.doMock("@fsm/config", () => ({ env: { ...baseEnv, ...env, SENDGRID_FROM_EMAIL: "noreply@sendgrid.test" } }));
+    const mod = await import("./outbound-email.js");
+    expect(mod.resolveEmailProvider()).toBe(provider);
+    expect(mod.getTransactionalEmailFromAddress()).toBe(from);
+  });
+});
+
 describe("deliverTransactionalEmail", () => {
   afterEach(() => {
     vi.resetModules();

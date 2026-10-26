@@ -3,10 +3,14 @@ import pino from "pino";
 
 import {
   createResendEmailChannel,
+  DEFAULT_TRANSACTIONAL_EMAIL_FROM,
   type EmailTemplateId,
   type OutboundEmailChannel,
   type OutboundEmailPayload,
-  renderTransactionalEmail
+  renderTransactionalEmail,
+  resolveTransactionalEmailFromAddress,
+  selectTransactionalEmailProvider,
+  type TransactionalEmailProvider
 } from "@fsm/comms";
 import { env } from "@fsm/config";
 
@@ -14,13 +18,13 @@ const logger = pino({
   name: "outbound-email"
 });
 
-export const DEFAULT_EMAIL_FROM = "Renvani <hello@mail.getrenvani.com>";
+export const DEFAULT_EMAIL_FROM = DEFAULT_TRANSACTIONAL_EMAIL_FROM;
 
 let cachedChannel: OutboundEmailChannel | null = null;
 let fallbackLogged = false;
 let missingProviderLogged = false;
 
-export type EmailProvider = "resend" | "sendgrid" | "none";
+export type EmailProvider = TransactionalEmailProvider;
 
 export class EmailProviderNotConfiguredError extends Error {
   constructor() {
@@ -29,23 +33,24 @@ export class EmailProviderNotConfiguredError extends Error {
   }
 }
 
-/** Resend (RESEND_API_KEY) wins; SendGrid is the fallback; tests never hit a live provider. */
+/** Resend (RESEND_API_KEY) wins; SendGrid is the fallback; tests never hit a live provider. Shared with the worker. */
 export function resolveEmailProvider(): EmailProvider {
-  if ((env.RESEND_API_KEY ?? "").trim()) {
-    return "resend";
-  }
-  if (env.NODE_ENV !== "test" && (env.SENDGRID_API_KEY ?? "").trim()) {
-    return "sendgrid";
-  }
-  return "none";
+  return selectTransactionalEmailProvider({
+    resendApiKey: env.RESEND_API_KEY,
+    sendgridApiKey: env.SENDGRID_API_KEY,
+    nodeEnv: env.NODE_ENV
+  });
 }
 
 export function getTransactionalEmailFromAddress(): string {
-  if (resolveEmailProvider() === "sendgrid") {
-    return env.SENDGRID_FROM_EMAIL;
-  }
-  const from = (env.RESEND_FROM_EMAIL ?? "").trim() || (env.EMAIL_FROM ?? "").trim();
-  return from.length > 0 ? from : DEFAULT_EMAIL_FROM;
+  return resolveTransactionalEmailFromAddress({
+    resendApiKey: env.RESEND_API_KEY,
+    sendgridApiKey: env.SENDGRID_API_KEY,
+    nodeEnv: env.NODE_ENV,
+    resendFromEmail: env.RESEND_FROM_EMAIL,
+    emailFrom: env.EMAIL_FROM,
+    sendgridFromEmail: env.SENDGRID_FROM_EMAIL
+  });
 }
 
 function createSendGridEmailChannel(): OutboundEmailChannel {

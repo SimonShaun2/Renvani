@@ -358,15 +358,3 @@ function renderTemplateBody(templateId: EmailTemplateId, variables: Record<strin
       throw new Error(`UNKNOWN_EMAIL_TEMPLATE:${templateId}`);
   }
 }
-
-export function resolveOutboundEmailFromAddress(input: {
-  resendEmailEnabled: boolean;
-  resendFromEmail: string;
-  sendgridFromEmail: string;
-}): string {
-  if (input.resendEmailEnabled && input.resendFromEmail.length > 0) {
-    return input.resendFromEmail;
-  }
-
-  return input.sendgridFromEmail;
-}

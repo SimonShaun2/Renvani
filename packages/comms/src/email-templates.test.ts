@@ -6,7 +6,8 @@ import {
   type EmailTemplateId,
   renderTransactionalEmail,
   resolveOutboundEmailFromAddress,
-  safeHref
+  safeHref,
+  sanitizeSubject
 } from "./email-templates.js";
 
 describe("renderTransactionalEmail", () => {
@@ -149,5 +150,29 @@ describe("FS-155: every interpolated field is HTML-escaped", () => {
       expect(html).not.toContain("javascript:");
       expect(html).not.toContain("<script>");
     }
+  });
+});
+
+describe("email subject CR/LF sanitization", () => {
+  const PAYLOADS = ["Hi\r\nBcc: evil@x.com", "Hi\nBcc: evil@x.com", "Hi\rBcc: evil@x.com", "Hi\u2028Bcc:\u2029evil@x.com\t\u0000"];
+  const SUBJECT_FIELDS = ["subject", "estimateNumber", "invoiceNumber", "companyName", "planName", "referenceNumber"];
+  for (const templateId of Object.values(EMAIL_TEMPLATE_IDS)) {
+    it(`${templateId} subject has no CR/LF or control chars`, () => {
+      for (const payload of PAYLOADS) {
+        const vars = Object.fromEntries(SUBJECT_FIELDS.map((f) => [f, payload]));
+        const { subject } = renderTransactionalEmail(templateId, vars);
+        // eslint-disable-next-line no-control-regex
+        expect(subject).not.toMatch(/[\u0000-\u001F\u007F-\u009F\u2028\u2029]/);
+        expect(subject).toBe(subject.trim());
+      }
+    });
+  }
+
+  it("collapses runs of line breaks into one space and trims", () => {
+    expect(sanitizeSubject("  Hi\r\n\r\nBcc: evil@x.com\n")).toBe("Hi Bcc: evil@x.com");
+    expect(renderTransactionalEmail(EMAIL_TEMPLATE_IDS.campaignMessage, { subject: "Sale\r\nBcc: evil@x.com" }).subject).toBe(
+      "Sale Bcc: evil@x.com"
+    );
+    expect(sanitizeSubject("Booking confirmed — ABC")).toBe("Booking confirmed — ABC");
   });
 });

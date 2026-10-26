@@ -68,7 +68,8 @@ export function renderTransactionalEmail(
   variables: Record<string, string>,
   options: { logoUrl?: string } = {}
 ): RenderedTransactionalEmail {
-  const body = renderTemplateBody(templateId, variables);
+  const rendered = renderTemplateBody(templateId, variables);
+  const body = { ...rendered, subject: sanitizeSubject(rendered.subject) };
   const layout = renderRenvaniLayout({
     bodyHtml: body.html,
     bodyText: htmlToText(body.html),
@@ -76,6 +77,15 @@ export function renderTransactionalEmail(
     ...(options.logoUrl ? { logoUrl: options.logoUrl } : {})
   });
   return { templateId: body.templateId, subject: body.subject, html: layout.html, text: layout.text };
+}
+
+/**
+ * Email header-injection guard: collapse CR/LF, Unicode line/paragraph separators and other
+ * control characters into a single space, then trim. Applied to every template subject.
+ */
+export function sanitizeSubject(subject: string): string {
+  // eslint-disable-next-line no-control-regex
+  return subject.replace(/[\u0000-\u001F\u007F-\u009F\u2028\u2029]+/g, " ").replace(/ {2,}/g, " ").trim();
 }
 
 /** HTML-escaped copy of template variables (FS-155). */

@@ -14,7 +14,7 @@ vi.mock("./auth", async (orig) => {
 });
 
 import { registerClerkSignOut, registerClerkTokenGetter } from "./clerk/token-bridge";
-import { stripTokenFromUrl, verifyEmailAndSignIn } from "./verify-email";
+import { classifyVerifyEmailError, stripTokenFromUrl, verifyEmailAndSignIn } from "./verify-email";
 
 describe("verify-email through the real fetch client", () => {
   const assign = vi.fn();
@@ -55,6 +55,51 @@ describe("verify-email through the real fetch client", () => {
     expect(assign).not.toHaveBeenCalled();
     expect(deps.redirect).not.toHaveBeenCalled();
     expect(deps.setAuth).not.toHaveBeenCalled();
+  });
+});
+
+describe("verify-email transient failures through the real fetch client", () => {
+  const assign = vi.fn();
+  const signOut = vi.fn();
+
+  beforeEach(() => {
+    auth.cleared = 0;
+    assign.mockReset();
+    signOut.mockReset();
+    vi.stubGlobal("window", { location: { assign, href: "http://localhost/verify-email" } });
+    registerClerkTokenGetter(async () => "clerk.jwt");
+    registerClerkSignOut(signOut);
+  });
+
+  afterEach(() => {
+    registerClerkTokenGetter(null);
+    registerClerkSignOut(null);
+    vi.unstubAllGlobals();
+  });
+
+  it.each([
+    ["network error", () => Promise.reject(new TypeError("Failed to fetch"))],
+    ["429", () => Promise.resolve(new Response("{}", { status: 429 }))],
+    ["500", () => Promise.resolve(new Response("{}", { status: 500 }))],
+    ["503", () => Promise.resolve(new Response("bad gateway", { status: 503 }))],
+  ])("%s returns error (retryable), not invalid, with no logout", async (_l, impl) => {
+    const fetchMock = vi.fn().mockImplementation(impl);
+    vi.stubGlobal("fetch", fetchMock);
+    const deps = { setAuth: vi.fn(), redirect: vi.fn() };
+    await expect(verifyEmailAndSignIn("tok", deps)).resolves.toEqual({ status: "error" });
+    expect(new Headers(fetchMock.mock.calls[0]![1].headers).has("Authorization")).toBe(false);
+    expect(auth.cleared).toBe(0);
+    expect(signOut).not.toHaveBeenCalled();
+    expect(assign).not.toHaveBeenCalled();
+    expect(deps.redirect).not.toHaveBeenCalled();
+  });
+
+  it("classifies statuses", () => {
+    expect(classifyVerifyEmailError({ status: 400 })).toBe("invalid");
+    expect(classifyVerifyEmailError({ status: 401 })).toBe("invalid");
+    expect(classifyVerifyEmailError({ status: 429 })).toBe("error");
+    expect(classifyVerifyEmailError({ status: 502 })).toBe("error");
+    expect(classifyVerifyEmailError(new TypeError("x"))).toBe("error");
   });
 });
 

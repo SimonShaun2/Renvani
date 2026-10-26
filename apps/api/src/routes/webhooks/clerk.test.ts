@@ -81,7 +81,7 @@ describe("Clerk webhook", () => {
       data: {
         role: "org:admin",
         organization: { id: "org_1", name: "Acme" },
-        public_user_data: { identifier: "owner@acme.com", first_name: "Ava", last_name: "Stone" }
+        public_user_data: { identifier: "owner@acme.com", first_name: "Ava", last_name: "Stone", user_id: "user_ava" }
       }
     });
     expect(res.statusCode).toBe(200);
@@ -91,7 +91,8 @@ describe("Clerk webhook", () => {
       email: "owner@acme.com",
       firstName: "Ava",
       lastName: "Stone",
-      clerkOrgRole: "org:admin"
+      clerkOrgRole: "org:admin",
+      clerkUserId: "user_ava"
     });
   });
 

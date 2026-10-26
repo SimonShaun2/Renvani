@@ -267,6 +267,13 @@
       "when": 1777711000000,
       "tag": "0037_user_email_verification",
       "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "7",
+      "when": 1777712000000,
+      "tag": "0038_fs157_clerk_identity",
+      "breakpoints": true
     }
   ]
 }

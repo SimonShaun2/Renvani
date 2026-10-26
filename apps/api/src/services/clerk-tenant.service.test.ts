@@ -146,4 +146,79 @@ describe("clerk-tenant.service", () => {
       })
     ).rejects.toMatchObject({ code: ErrorCode.UNAUTHORIZED });
   });
+
+  describe("FS-157 clerk_user_id mapping", () => {
+    const session = (clerkUserId: string, email: string | null) => ({
+      clerkUserId,
+      clerkOrganizationId: "org_acme",
+      role: null,
+      email
+    });
+
+    it("maps by stored clerk_user_id first, even when the email claim differs or is missing", async () => {
+      const company = fakeDb.seedCompany({ name: "Acme", slug: "acme-cid" });
+      const user = fakeDb.seedUser({ companyId: company.id, email: "a@acme.com", firstName: "A", lastName: "B", clerkUserId: "user_a" });
+      fakeDb.seedUser({ companyId: company.id, email: "other@acme.com", firstName: "O", lastName: "B" });
+      expect((await clerkTenantService.resolveStaffUserForClerkSession(company.id, session("user_a", null))).id).toBe(user.id);
+      expect((await clerkTenantService.resolveStaffUserForClerkSession(company.id, session("user_a", "other@acme.com"))).id).toBe(user.id);
+    });
+
+    it("links by verified email on first login and backfills clerk_user_id", async () => {
+      const company = fakeDb.seedCompany({ name: "Acme", slug: "acme-backfill" });
+      const user = fakeDb.seedUser({ companyId: company.id, email: "a@acme.com", firstName: "A", lastName: "B" });
+      const resolved = await clerkTenantService.resolveStaffUserForClerkSession(company.id, session("user_new", "a@acme.com"));
+      expect(resolved.id).toBe(user.id);
+      expect(user.clerkUserId).toBe("user_new");
+      // Next login maps by id with no email claim at all.
+      expect((await clerkTenantService.resolveStaffUserForClerkSession(company.id, session("user_new", null))).id).toBe(user.id);
+    });
+
+    it("rejects an email match when the user is already linked to a different Clerk id", async () => {
+      const company = fakeDb.seedCompany({ name: "Acme", slug: "acme-relink" });
+      const user = fakeDb.seedUser({ companyId: company.id, email: "a@acme.com", firstName: "A", lastName: "B", clerkUserId: "user_a" });
+      await expect(
+        clerkTenantService.resolveStaffUserForClerkSession(company.id, session("user_attacker", "a@acme.com"))
+      ).rejects.toMatchObject({ code: ErrorCode.UNAUTHORIZED });
+      expect(user.clerkUserId).toBe("user_a");
+    });
+
+    it("rejects unverified/missing email for an unlinked Clerk user (no first-user fallback)", async () => {
+      const company = fakeDb.seedCompany({ name: "Acme", slug: "acme-unverified" });
+      const owner = fakeDb.seedUser({ companyId: company.id, email: "a@acme.com", firstName: "A", lastName: "B", role: "owner" });
+      await expect(
+        clerkTenantService.resolveStaffUserForClerkSession(company.id, session("user_x", null))
+      ).rejects.toMatchObject({ code: ErrorCode.UNAUTHORIZED });
+      expect(owner.clerkUserId).toBeNull();
+    });
+
+    it("rejects an empty Clerk user id", async () => {
+      const company = fakeDb.seedCompany({ name: "Acme", slug: "acme-empty" });
+      fakeDb.seedUser({ companyId: company.id, email: "a@acme.com", firstName: "A", lastName: "B" });
+      await expect(
+        clerkTenantService.resolveStaffUserForClerkSession(company.id, session("", "a@acme.com"))
+      ).rejects.toMatchObject({ code: ErrorCode.UNAUTHORIZED });
+    });
+
+    it("cross-company: a clerk_user_id linked in company A never resolves in company B", async () => {
+      const a = fakeDb.seedCompany({ name: "A", slug: "a-xco" });
+      const b = fakeDb.seedCompany({ name: "B", slug: "b-xco" });
+      fakeDb.seedUser({ companyId: a.id, email: "a@a.com", firstName: "A", lastName: "A", clerkUserId: "user_a" });
+      const bUser = fakeDb.seedUser({ companyId: b.id, email: "b@b.com", firstName: "B", lastName: "B" });
+      await expect(
+        clerkTenantService.resolveStaffUserForClerkSession(b.id, session("user_a", "b@b.com"))
+      ).rejects.toMatchObject({ code: ErrorCode.UNAUTHORIZED });
+      expect(bUser.clerkUserId).toBeNull();
+    });
+
+    it("rejects a linked user that is inactive or soft-deleted", async () => {
+      const company = fakeDb.seedCompany({ name: "Acme", slug: "acme-linked-inactive" });
+      fakeDb.seedUser({ companyId: company.id, email: "i@acme.com", firstName: "I", lastName: "B", clerkUserId: "user_i", isActive: false });
+      fakeDb.seedUser({ companyId: company.id, email: "d@acme.com", firstName: "D", lastName: "B", clerkUserId: "user_d", deletedAt: new Date() });
+      for (const id of ["user_i", "user_d"]) {
+        await expect(
+          clerkTenantService.resolveStaffUserForClerkSession(company.id, session(id, null))
+        ).rejects.toMatchObject({ code: ErrorCode.UNAUTHORIZED });
+      }
+    });
+  });
 });

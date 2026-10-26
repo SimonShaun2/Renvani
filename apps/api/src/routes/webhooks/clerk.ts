@@ -86,7 +86,8 @@ async function handleEvent(event: ClerkWebhookEvent, reply: FastifyReply) {
       email,
       firstName: str(member.first_name),
       lastName: str(member.last_name),
-      clerkOrgRole: str(data.role) || null
+      clerkOrgRole: str(data.role) || null,
+      clerkUserId: str(member.user_id) || null
     });
     return reply.send({ received: true, ...result });
   }

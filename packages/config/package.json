@@ -78,6 +78,10 @@
       "types": "./dist/langfuse-env.d.ts",
       "import": "./dist/langfuse-env.js"
     },
+    "./observability-env": {
+      "types": "./dist/observability-env.d.ts",
+      "import": "./dist/observability-env.js"
+    },
     "./qbo-env": {
       "types": "./dist/qbo-env.d.ts",
       "import": "./dist/qbo-env.js"

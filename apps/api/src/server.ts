@@ -1,6 +1,9 @@
 import { env, resolveApiListenPort } from "@fsm/config";
+import { initNodeObservability, shutdownNodeObservability } from "@fsm/observability";
 
 import { buildApp } from "./app.js";
+
+initNodeObservability("api");
 
 const app = await buildApp();
 
@@ -17,6 +20,7 @@ async function shutdown(signal: string): Promise<void> {
 
   try {
     await app.close();
+    await shutdownNodeObservability();
     app.log.info("API graceful shutdown complete");
     process.exit(0);
   } catch (error) {

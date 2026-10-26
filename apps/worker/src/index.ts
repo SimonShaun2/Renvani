@@ -1,7 +1,10 @@
 import type { Worker } from "bullmq";
 import pino from "pino";
 
+import { initNodeObservability, shutdownNodeObservability } from "@fsm/observability";
 import { QUEUE_NAMES, aiQueue } from "@fsm/jobs";
+
+initNodeObservability("worker");
 
 import { createWorker } from "./lib/worker-factory.js";
 import { processAgreements } from "./processors/agreements.processor.js";
@@ -65,6 +68,7 @@ logger.info(
 async function shutdown(signal: NodeJS.Signals): Promise<void> {
   logger.info({ signal }, "Worker shutdown requested");
   await Promise.all(workers.map(async (worker) => worker.close()));
+  await shutdownNodeObservability();
   process.exit(0);
 }
 

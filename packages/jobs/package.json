@@ -31,6 +31,7 @@
   },
   "dependencies": {
     "@fsm/config": "workspace:*",
+    "@fsm/observability": "workspace:*",
     "@fsm/types": "workspace:*",
     "bullmq": "^5.0.0",
     "pino": "^9.4.0",

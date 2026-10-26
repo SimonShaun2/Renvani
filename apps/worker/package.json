@@ -22,6 +22,7 @@
     "@fsm/db": "workspace:*",
     "@fsm/import-engine": "workspace:*",
     "@fsm/jobs": "workspace:*",
+    "@fsm/observability": "workspace:*",
     "@fsm/types": "workspace:*",
     "bullmq": "^5.0.0",
     "decimal.js": "^10.5.0",

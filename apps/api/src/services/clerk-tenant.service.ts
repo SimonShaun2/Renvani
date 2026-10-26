@@ -35,24 +35,20 @@ export async function resolveStaffUserForClerkSession(
   companyId: string,
   session: ClerkVerifiedSession
 ): Promise<NonNullable<UserRow>> {
-  const user =
-    (session.email
-      ? await db.query.users.findFirst({
-          where: (userTable, operators) =>
-            operators.and(
-              operators.eq(userTable.companyId, companyId),
-              operators.eq(userTable.email, session.email ?? ""),
-              operators.isNull(userTable.deletedAt)
-            )
-        })
-      : null) ??
-    (await db.query.users.findFirst({
-      where: (userTable, operators) =>
-        operators.and(
-          operators.eq(userTable.companyId, companyId),
-          operators.isNull(userTable.deletedAt)
-        )
-    }));
+  // Fail closed: map only by the Clerk-verified email within this company. No fallback to another user.
+  // (A stored clerk_user_id column would be preferable but needs a migration.)
+  if (!session.email) {
+    throw new AppError(ErrorCode.UNAUTHORIZED, "No active staff user for Clerk organization");
+  }
+  const email = session.email;
+  const user = await db.query.users.findFirst({
+    where: (userTable, operators) =>
+      operators.and(
+        operators.eq(userTable.companyId, companyId),
+        operators.eq(userTable.email, email),
+        operators.isNull(userTable.deletedAt)
+      )
+  });
 
   if (!user || !user.isActive) {
     throw new AppError(ErrorCode.UNAUTHORIZED, "No active staff user for Clerk organization");

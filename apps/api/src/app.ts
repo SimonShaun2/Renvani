@@ -1,4 +1,7 @@
 import fastifyCors from "@fastify/cors";
+
+import { parseClerkAuthorizedParties } from "./lib/clerk-auth.js";
+import clerkWebhookRoutes from "./routes/webhooks/clerk.js";
 import Fastify from "fastify";
 import pino from "pino";
 
@@ -76,8 +79,9 @@ export async function buildApp() {
   });
 
   await app.register(fastifyCors, {
-    origin: new URL(env.APP_URL).origin,
-    credentials: true
+    origin: [...new Set([new URL(env.APP_URL).origin, ...parseClerkAuthorizedParties(env.CLERK_AUTHORIZED_PARTIES)])],
+    credentials: true,
+    allowedHeaders: ["Authorization", "Content-Type", "Idempotency-Key", "X-Request-Id"]
   });
   await app.register(requestLoggerPlugin);
   await app.register(errorHandlerPlugin);
@@ -129,6 +133,7 @@ export async function buildApp() {
   await app.register(loyaltyRoutes, { prefix: "/api/v1" });
   await app.register(qboSyncRoutes, { prefix: "/api/v1" });
   await app.register(publicRoutes, { prefix: "/api/v1/public" });
+  await app.register(clerkWebhookRoutes, { prefix: "/api/v1/webhooks" });
 
   return app;
 }

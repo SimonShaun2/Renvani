@@ -1,12 +1,38 @@
 import { verifyToken } from "@clerk/backend";
 
 import { featureFlags } from "@fsm/config/feature-flags";
-import { AppError, ErrorCode } from "@fsm/types";
+import { AppError, ErrorCode, type UserRole } from "@fsm/types";
+
+/**
+ * Session-token claim carrying the Renvani staff role, shared with web (#184): `metadata.role`.
+ * The Clerk session token template must map `"metadata": "{{user.public_metadata}}"` (server-controlled).
+ * unsafe_metadata is never read.
+ */
+export const CLERK_ROLE_CLAIM = "metadata.role";
+
+const USER_ROLES: readonly UserRole[] = ["owner", "admin", "dispatcher", "office", "technician"];
 
 export interface ClerkVerifiedSession {
   clerkUserId: string;
   clerkOrganizationId: string;
   email: string | null;
+  role: UserRole | null;
+}
+
+export function parseClerkAuthorizedParties(raw: string | undefined = process.env.CLERK_AUTHORIZED_PARTIES): string[] {
+  return (raw ?? "")
+    .split(",")
+    .map((entry) => entry.trim().replace(/\/$/, ""))
+    .filter((entry) => entry.length > 0);
+}
+
+export function extractClerkRoleClaim(payload: Record<string, unknown>): UserRole | null {
+  const metadata = payload.metadata;
+  const raw =
+    metadata && typeof metadata === "object" && !Array.isArray(metadata)
+      ? (metadata as { role?: unknown }).role
+      : undefined;
+  return typeof raw === "string" && (USER_ROLES as readonly string[]).includes(raw) ? (raw as UserRole) : null;
 }
 
 function readClerkSecretKey(): string | null {
@@ -44,9 +70,18 @@ export async function verifyClerkBearerToken(accessToken: string): Promise<Clerk
     throw new AppError(ErrorCode.INTERNAL_ERROR, "Clerk secret is not configured");
   }
 
+  const authorizedParties = parseClerkAuthorizedParties();
+  if (authorizedParties.length === 0 && process.env.NODE_ENV === "production") {
+    // Fail closed: without an azp allow-list any Clerk frontend for this instance could mint usable tokens.
+    throw new AppError(ErrorCode.UNAUTHORIZED, "Invalid Clerk session token");
+  }
+
   let payload: Record<string, unknown>;
   try {
-    payload = (await verifyToken(accessToken, { secretKey })) as Record<string, unknown>;
+    payload = (await verifyToken(accessToken, {
+      secretKey,
+      ...(authorizedParties.length > 0 ? { authorizedParties } : {})
+    })) as Record<string, unknown>;
   } catch {
     throw new AppError(ErrorCode.UNAUTHORIZED, "Invalid Clerk session token");
   }
@@ -61,12 +96,18 @@ export async function verifyClerkBearerToken(accessToken: string): Promise<Clerk
     throw new AppError(ErrorCode.UNAUTHORIZED, "Clerk session missing organization");
   }
 
+  // Only a Clerk-verified primary email is usable for user mapping (template: email + email_verified).
   const emailClaim = payload.email;
-  const email = typeof emailClaim === "string" ? emailClaim : null;
+  const emailVerified = payload.email_verified === true || payload.email_verified === "true";
+  const email =
+    emailVerified && typeof emailClaim === "string" && emailClaim.trim().length > 0
+      ? emailClaim.trim().toLowerCase()
+      : null;
 
   return {
     clerkUserId,
     clerkOrganizationId,
-    email
+    email,
+    role: extractClerkRoleClaim(payload)
   };
 }

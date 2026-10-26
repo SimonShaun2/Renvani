@@ -4,6 +4,8 @@ type Row = Record<string, unknown> & { id: string };
 type Cond =
   | { op: "eq"; field: string; value: unknown }
   | { op: "isNull"; field: string }
+  | { op: "ne"; field: string; value: unknown }
+  | { op: "inArray"; field: string; values: unknown[] }
   | { op: "and"; parts: Cond[] };
 
 const state = vi.hoisted(() => ({
@@ -14,13 +16,19 @@ const state = vi.hoisted(() => ({
   raceOnLink: null as string | null
 }));
 
+const log = vi.hoisted(() => ({ error: vi.fn(), warn: vi.fn(), info: vi.fn(), debug: vi.fn() }));
+vi.mock("pino", () => ({ default: () => log }));
+
 function matches(row: Row, c: Cond): boolean {
   if (c.op === "and") return c.parts.every((p) => matches(row, p));
   if (c.op === "isNull") return row[c.field] == null;
+  if (c.op === "ne") return row[c.field] !== c.value;
+  if (c.op === "inArray") return c.values.includes(row[c.field]);
   return row[c.field] === c.value;
 }
 
 vi.mock("drizzle-orm", () => ({
+  sql: () => ({ op: "coalesceNow" }),
   eq: (field: string, value: unknown) => ({ op: "eq", field, value }),
   isNull: (field: string) => ({ op: "isNull", field }),
   and: (...parts: unknown[]) => ({ op: "and", parts })
@@ -39,14 +47,16 @@ vi.mock("./clerk-tenant.service.js", () => {
 });
 
 vi.mock("@fsm/db", () => {
-  const cols = ["id", "email", "companyId", "clerkUserId", "deletedAt", "isActive", "userId", "revokedAt"];
+  const cols = ["id", "email", "companyId", "clerkUserId", "deletedAt", "isActive", "userId", "revokedAt", "clerkUnlinkedAt", "role"];
   const t = Object.fromEntries(cols.map((c) => [c, c]));
   const users = { ...t, __name: "users" };
   const refreshTokens = { ...t, __name: "refresh_tokens" };
   const ops = {
     eq: (field: string, value: unknown) => ({ op: "eq", field, value }),
     isNull: (field: string) => ({ op: "isNull", field }),
-    and: (...parts: Cond[]) => ({ op: "and", parts })
+    and: (...parts: Cond[]) => ({ op: "and", parts }),
+    ne: (field: string, value: unknown) => ({ op: "ne", field, value }),
+    inArray: (field: string, values: unknown[]) => ({ op: "inArray", field, values })
   };
   const tx = {
     update: (table: { __name: string }) => ({
@@ -59,7 +69,11 @@ vi.mock("@fsm/db", () => {
           if (table.__name === "users" && state.raceOnLink && "clerkUserId" in values) {
             for (const r of rows.filter((row) => matches(row, cond))) r.clerkUserId = state.raceOnLink;
           }
-          for (const r of rows.filter((row) => matches(row, cond))) Object.assign(r, values);
+          for (const r of rows.filter((row) => matches(row, cond))) {
+            for (const [k, v] of Object.entries(values)) {
+              r[k] = v && typeof v === "object" && (v as { op?: string }).op === "coalesceNow" ? (r[k] ?? new Date()) : v;
+            }
+          }
         }
       })
     }),
@@ -78,7 +92,16 @@ vi.mock("@fsm/db", () => {
 const svc = await import("./clerk-user-sync.service.js");
 
 function user(over: Partial<Row> & { id: string }): Row {
-  return { email: `${over.id}@x.com`, companyId: "co_1", clerkUserId: null, deletedAt: null, isActive: true, ...over };
+  return {
+    email: `${over.id}@x.com`,
+    companyId: "co_1",
+    clerkUserId: null,
+    deletedAt: null,
+    isActive: true,
+    clerkUnlinkedAt: null,
+    role: "office",
+    ...over
+  };
 }
 
 beforeEach(() => {
@@ -87,6 +110,8 @@ beforeEach(() => {
   state.companies = { org_1: "co_1", org_2: "co_2" };
   state.failUpdateUnique = false;
   state.raceOnLink = null;
+  log.error.mockClear();
+  log.warn.mockClear();
 });
 
 describe("readVerifiedPrimaryEmail", () => {
@@ -188,5 +213,81 @@ describe("deactivateClerkMembership", () => {
   it("skips an ambiguous org without throwing", async () => {
     state.companies.org_1 = "AMBIGUOUS";
     await expect(svc.deactivateClerkMembership("org_1", "ck_1")).resolves.toEqual({ status: "skipped" });
+  });
+});
+
+const lastOwnerAlerts = () => log.error.mock.calls.filter(([f]) => (f as { alert?: string }).alert === "clerk_last_owner_deactivated");
+
+describe("FS-160b tombstone", () => {
+  it("user.deleted sets the tombstone; redelivery is idempotent", async () => {
+    state.users.push(user({ id: "u1", clerkUserId: "ck_1" }));
+    await svc.deactivateClerkUser("ck_1");
+    const stamped = state.users[0]?.clerkUnlinkedAt;
+    expect(stamped).toBeInstanceOf(Date);
+    expect(await svc.deactivateClerkUser("ck_1")).toEqual({ status: "not_found" });
+    expect(state.users[0]?.clerkUnlinkedAt).toBe(stamped);
+  });
+
+  it("user.updated verified-email relink skips a tombstoned user, even after reactivation", async () => {
+    state.users.push(user({ id: "u1", clerkUserId: "ck_1" }));
+    await svc.deactivateClerkUser("ck_1");
+    state.users[0]!.isActive = true; // admin reactivated without relinking
+    expect(await svc.syncClerkUserUpdated({ clerkUserId: "ck_new", verifiedPrimaryEmail: "u1@x.com" })).toEqual({ status: "skipped" });
+    expect(state.users[0]?.clerkUserId).toBeNull();
+    expect(JSON.stringify(log.warn.mock.calls)).not.toContain("u1@x.com");
+  });
+
+});
+
+describe("FS-160b last-owner alert", () => {
+  it("user.deleted of an already-inactive last owner does not alert (matches membership path)", async () => {
+    state.users.push(user({ id: "u1", clerkUserId: "ck_1", role: "owner", isActive: false }));
+    expect(await svc.deactivateClerkUser("ck_1")).toEqual({ status: "deactivated" });
+    expect(state.users[0]).toMatchObject({ clerkUserId: null, isActive: false });
+    expect(lastOwnerAlerts()).toHaveLength(0);
+  });
+
+  it("user.deleted preserves an existing tombstone timestamp (coalesce)", async () => {
+    const earlier = new Date("2026-01-01T00:00:00Z");
+    state.users.push(user({ id: "u1", clerkUserId: "ck_1", clerkUnlinkedAt: earlier }));
+    await svc.deactivateClerkUser("ck_1");
+    expect(state.users[0]?.clerkUnlinkedAt).toBe(earlier);
+  });
+
+  it("user.deleted alerts when the last active owner is deactivated (ids only) and still deactivates", async () => {
+    state.users.push(user({ id: "u1", clerkUserId: "ck_1", role: "owner" }), user({ id: "u2", role: "office" }));
+    expect(await svc.deactivateClerkUser("ck_1")).toEqual({ status: "deactivated" });
+    expect(state.users[0]?.isActive).toBe(false);
+    expect(lastOwnerAlerts()).toHaveLength(1);
+    expect(lastOwnerAlerts()[0]?.[0]).toEqual({ alert: "clerk_last_owner_deactivated", companyId: "co_1", userId: "u1" });
+  });
+
+  it("user.deleted does not alert when another active admin remains", async () => {
+    state.users.push(user({ id: "u1", clerkUserId: "ck_1", role: "owner" }), user({ id: "u2", role: "admin" }));
+    await svc.deactivateClerkUser("ck_1");
+    expect(lastOwnerAlerts()).toHaveLength(0);
+  });
+
+  it("user.deleted ignores inactive, soft-deleted and other-company admins when deciding", async () => {
+    state.users.push(
+      user({ id: "u1", clerkUserId: "ck_1", role: "admin" }),
+      user({ id: "u2", role: "owner", isActive: false }),
+      user({ id: "u3", role: "owner", deletedAt: new Date() }),
+      user({ id: "u4", role: "owner", companyId: "co_2" })
+    );
+    await svc.deactivateClerkUser("ck_1");
+    expect(lastOwnerAlerts()).toHaveLength(1);
+  });
+
+  it("organizationMembership.deleted alerts on the last owner; no alert when another owner exists or for non-admins", async () => {
+    state.users.push(user({ id: "u1", clerkUserId: "ck_1", role: "owner" }));
+    await svc.deactivateClerkMembership("org_1", "ck_1");
+    expect(lastOwnerAlerts()).toHaveLength(1);
+
+    log.error.mockClear();
+    state.users = [user({ id: "a", clerkUserId: "ck_a", role: "owner" }), user({ id: "b", role: "owner" }), user({ id: "c", clerkUserId: "ck_c" })];
+    await svc.deactivateClerkMembership("org_1", "ck_a");
+    await svc.deactivateClerkMembership("org_1", "ck_c");
+    expect(lastOwnerAlerts()).toHaveLength(0);
   });
 });

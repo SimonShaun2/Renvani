@@ -156,6 +156,10 @@ export async function provisionClerkMembership(
           logger.warn({ companyId: company.id }, "Staff user already linked to another Clerk user; skipped");
           return { status: "skipped" as const, companyId: company.id };
         }
+        if (sameEmail.clerkUnlinkedAt) {
+          logger.warn({ companyId: company.id, userId: sameEmail.id }, "Clerk membership matches a tombstoned user; not auto-linking");
+          return { status: "skipped" as const, companyId: company.id };
+        }
         if (!input.emailVerified) {
           logger.warn(
             { companyId: company.id },
@@ -166,7 +170,14 @@ export async function provisionClerkMembership(
         await tx
           .update(users)
           .set({ clerkUserId, updatedAt: new Date() })
-          .where(and(eq(users.id, sameEmail.id), isNull(users.clerkUserId), isNull(users.deletedAt)));
+          .where(
+            and(
+              eq(users.id, sameEmail.id),
+              isNull(users.clerkUserId),
+              isNull(users.deletedAt),
+              isNull(users.clerkUnlinkedAt)
+            )
+          );
         const reread = await tx.query.users.findFirst({
           where: (userTable, operators) => operators.eq(userTable.id, sameEmail.id)
         });

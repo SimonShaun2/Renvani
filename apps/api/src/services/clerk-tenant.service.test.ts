@@ -127,6 +127,29 @@ describe("clerk-tenant.service", () => {
     expect(resolved?.id).not.toBe(companyA.id);
   });
 
+  it("FS-160b resolveStaffUserForClerkSession never auto-links a tombstoned user by verified email", async () => {
+    const company = fakeDb.seedCompany({ name: "Acme", slug: "acme-tomb" });
+    const user = fakeDb.seedUser({
+      companyId: company.id,
+      email: "gone@acme.com",
+      firstName: "G",
+      lastName: "U",
+      role: "owner",
+      clerkUnlinkedAt: new Date()
+    });
+    logSpy.warn.mockClear();
+    await expect(
+      clerkTenantService.resolveStaffUserForClerkSession(company.id, {
+        clerkUserId: "user_recreated",
+        clerkOrganizationId: "org_acme",
+        role: null,
+        email: "gone@acme.com"
+      })
+    ).rejects.toMatchObject({ code: ErrorCode.UNAUTHORIZED });
+    expect(fakeDb.getTestState().users.find((u) => u.id === user.id)?.clerkUserId ?? null).toBeNull();
+    expect(JSON.stringify(logSpy.warn.mock.calls)).not.toContain("gone@acme.com");
+  });
+
   it("resolveStaffUserForClerkSession rejects inactive users", async () => {
     const company = fakeDb.seedCompany({ name: "Acme", slug: "acme-inactive" });
     fakeDb.seedUser({

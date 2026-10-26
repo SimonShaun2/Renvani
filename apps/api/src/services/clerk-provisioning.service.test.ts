@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 type Company = { id: string; settings: { clerk: { organizationId: string } } };
-type User = { id?: string; companyId: string; email: string; role: string; clerkUserId?: string | null; deletedAt?: Date | null };
+type User = { id?: string; companyId: string; email: string; role: string; clerkUserId?: string | null; deletedAt?: Date | null; clerkUnlinkedAt?: Date | null };
 
 const state = vi.hoisted(() => ({
   companies: [] as Company[],
@@ -42,7 +42,7 @@ vi.mock("./clerk-tenant.service.js", () => {
 
 vi.mock("@fsm/db", () => {
   const companiesTable = { name: "companies" };
-  const usersTable = { name: "users", id: "id", clerkUserId: "clerkUserId", email: "email", companyId: "companyId", deletedAt: "deletedAt" };
+  const usersTable = { name: "users", id: "id", clerkUserId: "clerkUserId", email: "email", companyId: "companyId", deletedAt: "deletedAt", clerkUnlinkedAt: "clerkUnlinkedAt" };
   const makeTx = (onLock: (release: Promise<void>) => void, release: Promise<void>) => ({
     execute: vi.fn(async () => {
       state.lockCalls += 1;
@@ -77,7 +77,7 @@ vi.mock("@fsm/db", () => {
       users: {
         findFirst: vi.fn(async (opts: { where: (t: unknown, o: unknown) => Cond }) => {
           const cond = opts.where(
-            { id: "id", email: "email", companyId: "companyId", clerkUserId: "clerkUserId", deletedAt: "deletedAt" },
+            { id: "id", email: "email", companyId: "companyId", clerkUserId: "clerkUserId", deletedAt: "deletedAt", clerkUnlinkedAt: "clerkUnlinkedAt" },
             {
               eq: (field: keyof User, value: unknown) => ({ op: "eq", field, value }),
               isNull: (field: keyof User) => ({ op: "isNull", field }),
@@ -248,5 +248,15 @@ describe("FS-157 clerk_user_id provisioning", () => {
     });
     await expect(provisionClerkOrganization({ organizationId: "org_1", name: "Acme" })).resolves.toBeNull();
     expect(state.users).toHaveLength(0);
+  });
+
+  it("FS-160b never auto-links a tombstoned user via the membership webhook", async () => {
+    const { provisionClerkMembership } = await import("./clerk-provisioning.service.js");
+    await provisionClerkMembership({ ...base, email: "a@x.com", clerkUserId: null });
+    state.users[0]!.clerkUnlinkedAt = new Date();
+    const res = await provisionClerkMembership({ ...base, email: "a@x.com", clerkUserId: "user_new" });
+    expect(res.status).toBe("skipped");
+    expect(state.users).toHaveLength(1);
+    expect(state.users[0]?.clerkUserId).toBeNull();
   });
 });

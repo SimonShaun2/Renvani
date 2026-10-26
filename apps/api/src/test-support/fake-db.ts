@@ -189,6 +189,7 @@ export interface TestUserRecord {
   emailVerificationTokenHash?: string | null;
   emailVerificationExpiresAt?: Date | null;
   clerkUserId?: string | null;
+  clerkUnlinkedAt?: Date | null;
   technicianId: string | null;
   createdAt: Date;
   updatedAt: Date;
@@ -1118,6 +1119,7 @@ export interface TestUserRecord {
   emailVerificationTokenHash?: string | null;
   emailVerificationExpiresAt?: Date | null;
   clerkUserId?: string | null;
+  clerkUnlinkedAt?: Date | null;
   technicianId: string | null;
   createdAt: Date;
   updatedAt: Date;
@@ -2164,6 +2166,7 @@ const usersTable = {
   __name: "users",
   id: "id",
   clerkUserId: "clerkUserId",
+  clerkUnlinkedAt: "clerkUnlinkedAt",
   companyId: "companyId",
   email: "email",
   passwordHash: "passwordHash",
@@ -3476,6 +3479,7 @@ function createUserRecord(
     emailVerificationTokenHash: values.emailVerificationTokenHash ?? null,
     emailVerificationExpiresAt: values.emailVerificationExpiresAt ?? null,
     clerkUserId: values.clerkUserId ?? null,
+    clerkUnlinkedAt: values.clerkUnlinkedAt ?? null,
     technicianId: values.technicianId ?? null,
     createdAt: values.createdAt ?? now,
     updatedAt: values.updatedAt ?? now,

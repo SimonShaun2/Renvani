@@ -1,4 +1,4 @@
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, isNull, sql } from "drizzle-orm";
 import pino from "pino";
 
 import { db, refreshTokens, users } from "@fsm/db";
@@ -40,6 +40,31 @@ export function readVerifiedPrimaryEmail(data: Record<string, unknown>): string 
   if (verification.status !== "verified") return null;
   const email = primary.email_address.trim().toLowerCase();
   return email || null;
+}
+
+const ADMIN_ROLES = ["owner", "admin"] as const;
+
+/**
+ * FS-160b: after deactivating `user`, alert (never block) if no other active, non-deleted owner/admin remains.
+ */
+async function alertIfLastOwnerDeactivated(tx: Tx, user: { id: string; companyId: string; role: string }): Promise<void> {
+  if (!(ADMIN_ROLES as readonly string[]).includes(user.role)) return;
+  const other = await tx.query.users.findFirst({
+    where: (t, o) =>
+      o.and(
+        o.eq(t.companyId, user.companyId),
+        o.ne(t.id, user.id),
+        o.eq(t.isActive, true),
+        o.isNull(t.deletedAt),
+        o.inArray(t.role, [...ADMIN_ROLES])
+      )
+  });
+  if (!other) {
+    logger.error(
+      { alert: "clerk_last_owner_deactivated", companyId: user.companyId, userId: user.id },
+      "Clerk webhook deactivated the last active owner/admin of a company"
+    );
+  }
 }
 
 async function revokeRefreshTokens(tx: Tx, userId: string): Promise<void> {
@@ -87,6 +112,10 @@ export async function syncClerkUserUpdated(input: ClerkUserUpdatedInput): Promis
       // Verified-email linking (restores the path FS-162 disabled for membership payloads).
       const candidate = await tx.query.users.findFirst({ where: (t, o) => o.eq(t.email, email) });
       if (!candidate) return { status: "not_found" as const };
+      if (candidate.clerkUnlinkedAt) {
+        logger.warn({ userId: candidate.id }, "Clerk verified email matches a tombstoned user; not auto-linking");
+        return { status: "skipped" as const };
+      }
       if (candidate.deletedAt || !candidate.isActive || candidate.clerkUserId) {
         logger.warn({ userId: candidate.id }, "Clerk verified email matches a user that cannot be linked; skipped");
         return { status: "skipped" as const };
@@ -95,7 +124,13 @@ export async function syncClerkUserUpdated(input: ClerkUserUpdatedInput): Promis
         .update(users)
         .set({ clerkUserId, updatedAt: new Date() })
         .where(
-          and(eq(users.id, candidate.id), isNull(users.clerkUserId), isNull(users.deletedAt), eq(users.isActive, true))
+          and(
+            eq(users.id, candidate.id),
+            isNull(users.clerkUserId),
+            isNull(users.deletedAt),
+            eq(users.isActive, true),
+            isNull(users.clerkUnlinkedAt)
+          )
         );
       const reread = await tx.query.users.findFirst({ where: (t, o) => o.eq(t.id, candidate.id) });
       if (reread?.clerkUserId !== clerkUserId) {
@@ -122,11 +157,20 @@ export async function deactivateClerkUser(clerkUserId: string): Promise<{ status
   return db.transaction(async (tx) => {
     const linked = await tx.query.users.findFirst({ where: (t, o) => o.eq(t.clerkUserId, id) });
     if (!linked) return { status: "not_found" as const };
+    const wasActive = linked.isActive;
     await tx
       .update(users)
-      .set({ isActive: false, clerkUserId: null, updatedAt: new Date() })
+      // Tombstone keeps the first unlink time if one is already recorded.
+      .set({
+        isActive: false,
+        clerkUserId: null,
+        clerkUnlinkedAt: sql`coalesce(${users.clerkUnlinkedAt}, now())`,
+        updatedAt: new Date()
+      })
       .where(and(eq(users.id, linked.id), eq(users.clerkUserId, id)));
     await revokeRefreshTokens(tx, linked.id);
+    // Same as the membership path: only alert when this event actually deactivated an active user.
+    if (wasActive) await alertIfLastOwnerDeactivated(tx, linked);
     logger.info({ userId: linked.id }, "Clerk user deleted; staff user deactivated and unlinked");
     return { status: "deactivated" as const };
   });
@@ -155,6 +199,7 @@ export async function deactivateClerkMembership(
         .set({ isActive: false, updatedAt: new Date() })
         .where(and(eq(users.id, linked.id), eq(users.companyId, company.id)));
       await revokeRefreshTokens(tx, linked.id);
+      await alertIfLastOwnerDeactivated(tx, linked);
       logger.info({ userId: linked.id, companyId: company.id }, "Clerk membership deleted; staff user deactivated");
       return { status: "deactivated" as const };
     });

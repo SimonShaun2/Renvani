@@ -2,7 +2,8 @@ import { publicEnv } from "@fsm/config";
 import type { ErrorCode } from "@fsm/types";
 
 import { clearBrowserAuthSession, getAuthToken } from "./auth";
-import { getClerkSessionToken } from "./clerk/token-bridge";
+import { CLERK_NO_ACCESS_ROUTE } from "./clerk/route-decision";
+import { getClerkSessionToken, signOutClerkSession } from "./clerk/token-bridge";
 
 const API_BASE = publicEnv.NEXT_PUBLIC_API_URL;
 
@@ -36,9 +37,41 @@ async function parseError(response: Response): Promise<ApiErrorPayload> {
   }
 }
 
+/**
+ * Bearer token precedence (explicit): a live Clerk session token wins over the legacy in-repo JWT.
+ * Clerk is only registered when NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY is set and the user signed in
+ * with Clerk; otherwise the legacy JWT is used. Never both at once.
+ */
+export async function resolveBearerToken(): Promise<{ token: string | null; source: "clerk" | "legacy" | null }> {
+  const clerk = await getClerkSessionToken();
+  if (clerk) return { token: clerk, source: "clerk" };
+  const legacy = getAuthToken();
+  return legacy ? { token: legacy, source: "legacy" } : { token: null, source: null };
+}
+
+/** Login URL used after an API 401. Exported for tests. */
+export const UNAUTHORIZED_REDIRECT = "/login";
+
+/**
+ * On API 401: clear the legacy session and, for Clerk sessions, sign out of Clerk too.
+ * Otherwise middleware would see the Clerk user on /login, send it back to the app,
+ * and the same 401 would repeat forever.
+ */
+export async function handleUnauthorized(source: "clerk" | "legacy" | null): Promise<void> {
+  clearBrowserAuthSession();
+  if (source === "clerk") {
+    if (await signOutClerkSession(UNAUTHORIZED_REDIRECT)) return;
+    // signOut failed: the Clerk session still exists, so /login would bounce back. Use the no-access page.
+    if (typeof window !== "undefined") window.location.assign(CLERK_NO_ACCESS_ROUTE);
+    return;
+  }
+  if (typeof window !== "undefined") {
+    window.location.assign(UNAUTHORIZED_REDIRECT);
+  }
+}
+
 async function apiFetch<TResponse>(path: string, options: RequestInit = {}): Promise<TResponse> {
-  // Prefer the Clerk session token when signed in with Clerk; fall back to the legacy in-repo JWT.
-  const token = (await getClerkSessionToken()) ?? getAuthToken();
+  const { token, source } = await resolveBearerToken();
   const headers = new Headers(options.headers);
 
   if (!headers.has("Content-Type") && options.body) {
@@ -56,11 +89,7 @@ async function apiFetch<TResponse>(path: string, options: RequestInit = {}): Pro
   });
 
   if (response.status === 401) {
-    clearBrowserAuthSession();
-
-    if (typeof window !== "undefined") {
-      window.location.assign("/login");
-    }
+    await handleUnauthorized(source);
   }
 
   if (!response.ok) {

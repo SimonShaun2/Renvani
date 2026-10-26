@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { getClerkPublishableKey, isClerkEnabled } from "./config";
-import { resolveClerkRouteDecision } from "./route-decision";
+import { resolveClerkRole, resolveClerkRouteDecision } from "./route-decision";
 
 const PUBLIC_TOKEN_ROUTES = [
   "/",
@@ -32,10 +32,28 @@ describe("resolveClerkRouteDecision", () => {
     expect(resolveClerkRouteDecision("/portal", null)).toEqual({ action: "redirect", to: "/login" });
   });
 
-  it("sends signed-in users away from auth pages and lets them reach the app", () => {
-    expect(resolveClerkRouteDecision("/login", "user_1")).toEqual({ action: "redirect", to: "/dashboard" });
-    expect(resolveClerkRouteDecision("/dashboard", "user_1")).toEqual({ action: "next" });
+  it("sends signed-in users to their role default route and gates staff pages by role", () => {
+    expect(resolveClerkRouteDecision("/login", "user_1", "owner")).toEqual({ action: "redirect", to: "/dashboard" });
+    expect(resolveClerkRouteDecision("/login", "user_1", "technician")).toEqual({ action: "redirect", to: "/mobile/jobs" });
+    expect(resolveClerkRouteDecision("/dashboard", "user_1", "owner")).toEqual({ action: "next" });
+    expect(resolveClerkRouteDecision("/dashboard", "user_1", "office")).toEqual({ action: "redirect", to: "/dispatch" });
+    expect(resolveClerkRouteDecision("/pay/tok_1/receipt", "user_1", "technician")).toEqual({ action: "next" });
+  });
+
+  it("denies staff pages to a Clerk session with no role", () => {
+    expect(resolveClerkRouteDecision("/dashboard", "user_1")).toEqual({ action: "redirect", to: "/no-access" });
+    expect(resolveClerkRouteDecision("/login", "user_1")).toEqual({ action: "redirect", to: "/no-access" });
+    expect(resolveClerkRouteDecision("/no-access", "user_1")).toEqual({ action: "next" });
     expect(resolveClerkRouteDecision("/pay/tok_1/receipt", "user_1")).toEqual({ action: "next" });
+  });
+
+  it("resolves the role only from known claim shapes", () => {
+    expect(resolveClerkRole({ metadata: { role: "admin" } })).toBe("admin");
+    expect(resolveClerkRole({ public_metadata: { role: "office" } })).toBe("office");
+    expect(resolveClerkRole({ role: "dispatcher" })).toBe("dispatcher");
+    expect(resolveClerkRole({ metadata: { role: "superuser" } })).toBeNull();
+    expect(resolveClerkRole({ org_role: "org:admin" })).toBeNull();
+    expect(resolveClerkRole(null)).toBeNull();
   });
 });
 

@@ -10,8 +10,8 @@ import {
   isPublicApiProxyPath
 } from "@/src/lib/public-api-path-security";
 import { isClerkEnabled } from "@/src/lib/clerk/config";
-import { resolveClerkRouteDecision } from "@/src/lib/clerk/route-decision";
-import { canRoleAccessPath, getDefaultRouteForRole, isPublicRoute, normalizeUserRole } from "@/src/lib/route-access";
+import { resolveClerkRole, resolveClerkRouteDecision } from "@/src/lib/clerk/route-decision";
+import { canRoleAccessPath, getDefaultRouteForRole, isPublicRoute, normalizeUserRole, type UserRole } from "@/src/lib/route-access";
 
 interface TokenPayload {
   role?: string;
@@ -53,7 +53,7 @@ function isLegacyEstimateRecoveryMethod(method: string): boolean {
   return method === "GET" || method === "HEAD";
 }
 
-export async function legacyMiddleware(request: NextRequest, clerkUserId: string | null = null) {
+export async function legacyMiddleware(request: NextRequest, clerkUserId: string | null = null, clerkRole: UserRole | null = null) {
   const { pathname } = request.nextUrl;
 
   if (isLegacyEstimateRecoveryMethod(request.method)) {
@@ -88,7 +88,7 @@ export async function legacyMiddleware(request: NextRequest, clerkUserId: string
   const isRoutePublic = isPublicRoute(pathname);
 
   if (!token && isClerkEnabled()) {
-    const decision = resolveClerkRouteDecision(pathname, clerkUserId);
+    const decision = resolveClerkRouteDecision(pathname, clerkUserId, clerkRole);
     return decision.action === "next"
       ? NextResponse.next()
       : NextResponse.redirect(new URL(decision.to, request.url));
@@ -128,8 +128,8 @@ export async function legacyMiddleware(request: NextRequest, clerkUserId: string
 }
 
 const clerkHandler = clerkMiddleware(async (auth, request) => {
-  const { userId } = await auth();
-  return legacyMiddleware(request, userId);
+  const { userId, sessionClaims } = await auth();
+  return legacyMiddleware(request, userId, userId ? resolveClerkRole(sessionClaims) : null);
 });
 
 export async function middleware(request: NextRequest, event?: NextFetchEvent): Promise<Response> {

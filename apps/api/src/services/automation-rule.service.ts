@@ -134,7 +134,7 @@ export async function updateAutomationRule(
     const existingRule = await getAutomationRuleRecord(companyId, ruleId, tx);
 
     if (input.isEnabled === true && !existingRule.isEnabled) {
-      await enforceAutomationEnablePlanLimit(companyId);
+      await enforceAutomationEnablePlanLimit(companyId, tx);
     }
 
     const updatedRows = await tx

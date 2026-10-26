@@ -1,4 +1,4 @@
-import { and, eq, isNull } from "drizzle-orm";
+import { and, count, eq, isNull } from "drizzle-orm";
 
 import {
   getPlanUsageEntitlements,
@@ -30,7 +30,7 @@ function assertWithinLimit(
   if (currentCount >= limit) {
     throw new AppError(
       ErrorCode.FORBIDDEN,
-      `Your plan does not allow additional ${resourceLabel}. Remove a cap in plan entitlements or upgrade billing configuration.`
+      `Your plan limit for ${resourceLabel} has been reached. Upgrade your plan to add more.`
     );
   }
 }
@@ -51,8 +51,13 @@ export function assertPlanAllowsAutomationEnable(
   assertWithinLimit("automations", entitlements.maxAutomations, enabledAutomationCount);
 }
 
-async function getCompanyForPlanCheck(companyId: string): Promise<{ settings: unknown }> {
-  const [company] = await db
+type SelectExecutor = Pick<typeof db, "select">;
+
+async function getCompanyForPlanCheck(
+  companyId: string,
+  executor: SelectExecutor
+): Promise<{ settings: unknown }> {
+  const [company] = await executor
     .select({ settings: companies.settings })
     .from(companies)
     .where(and(eq(companies.id, companyId), isNull(companies.deletedAt)))
@@ -65,18 +70,18 @@ async function getCompanyForPlanCheck(companyId: string): Promise<{ settings: un
   return company;
 }
 
-async function countActiveJobs(companyId: string): Promise<number> {
-  const rows = await db
-    .select({ id: jobs.id })
+async function countActiveJobs(companyId: string, executor: SelectExecutor): Promise<number> {
+  const [row] = await executor
+    .select({ value: count() })
     .from(jobs)
     .where(and(eq(jobs.companyId, companyId), isNull(jobs.deletedAt)));
 
-  return rows.length;
+  return Number(row?.value ?? 0);
 }
 
-async function countEnabledAutomations(companyId: string): Promise<number> {
-  const rows = await db
-    .select({ id: automationRules.id })
+async function countEnabledAutomations(companyId: string, executor: SelectExecutor): Promise<number> {
+  const [row] = await executor
+    .select({ value: count() })
     .from(automationRules)
     .where(
       and(
@@ -86,21 +91,39 @@ async function countEnabledAutomations(companyId: string): Promise<number> {
       )
     );
 
-  return rows.length;
+  return Number(row?.value ?? 0);
 }
 
-/** Enforces plan caps before creating a job (no-op while entitlements are unlimited). */
-export async function enforceJobCreationPlanLimit(companyId: string): Promise<void> {
-  const company = await getCompanyForPlanCheck(companyId);
+/**
+ * Enforces plan caps before creating a job. Must be called with the tenant-scoped
+ * transaction so counts respect RLS. Skips the count entirely when the limit is unlimited.
+ */
+export async function enforceJobCreationPlanLimit(
+  companyId: string,
+  executor: SelectExecutor
+): Promise<void> {
+  const company = await getCompanyForPlanCheck(companyId, executor);
   const plan = readRenvaniSubscriptionPlan(company);
-  const activeJobCount = await countActiveJobs(companyId);
+  if (resolveUsageEntitlementsForSubscription(plan).maxJobs === null) {
+    return;
+  }
+  const activeJobCount = await countActiveJobs(companyId, executor);
   assertPlanAllowsJobCreation(plan, activeJobCount);
 }
 
-/** Enforces plan caps before enabling an automation rule (no-op while entitlements are unlimited). */
-export async function enforceAutomationEnablePlanLimit(companyId: string): Promise<void> {
-  const company = await getCompanyForPlanCheck(companyId);
+/**
+ * Enforces plan caps before enabling an automation rule, inside the caller's transaction.
+ * Skips the count entirely when the limit is unlimited.
+ */
+export async function enforceAutomationEnablePlanLimit(
+  companyId: string,
+  executor: SelectExecutor
+): Promise<void> {
+  const company = await getCompanyForPlanCheck(companyId, executor);
   const plan = readRenvaniSubscriptionPlan(company);
-  const enabledCount = await countEnabledAutomations(companyId);
+  if (resolveUsageEntitlementsForSubscription(plan).maxAutomations === null) {
+    return;
+  }
+  const enabledCount = await countEnabledAutomations(companyId, executor);
   assertPlanAllowsAutomationEnable(plan, enabledCount);
 }

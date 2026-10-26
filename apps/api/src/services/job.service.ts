@@ -829,9 +829,8 @@ export async function createJob(
 ): Promise<Job> {
   const normalizedInput = normalizeCreateJobInput(input);
 
-  await enforceJobCreationPlanLimit(companyId);
-
   const createdJob = await runTenantAwareTransaction(companyId, async (tx) => {
+    await enforceJobCreationPlanLimit(companyId, tx);
     const actor = await getActor(companyId, actorId, tx);
     const customer = await getCustomerRecord(companyId, normalizedInput.customerId, tx);
     const property =

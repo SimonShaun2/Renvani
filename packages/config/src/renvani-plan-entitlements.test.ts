@@ -32,10 +32,11 @@ describe("renvani-plan-entitlements (FS-136)", () => {
 
   it("fails the guard when a finite limit is introduced", () => {
     const original = RENVANI_PLAN_USAGE_ENTITLEMENTS.flex.maxJobs;
-    RENVANI_PLAN_USAGE_ENTITLEMENTS.flex.maxJobs = 100;
-
-    expect(() => assertUnlimitedJobsAndAutomationsOnAllPlans()).toThrow(/FS-136/);
-
-    RENVANI_PLAN_USAGE_ENTITLEMENTS.flex.maxJobs = original;
+    try {
+      RENVANI_PLAN_USAGE_ENTITLEMENTS.flex.maxJobs = 100;
+      expect(() => assertUnlimitedJobsAndAutomationsOnAllPlans()).toThrow(/FS-136/);
+    } finally {
+      RENVANI_PLAN_USAGE_ENTITLEMENTS.flex.maxJobs = original;
+    }
   });
 });

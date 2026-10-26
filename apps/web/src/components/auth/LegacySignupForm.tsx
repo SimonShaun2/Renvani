@@ -68,7 +68,7 @@ const fields: Array<{
   },
 ];
 
-export default function SignupPage() {
+export function LegacySignupForm() {
   const [submitted, setSubmitted] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const {

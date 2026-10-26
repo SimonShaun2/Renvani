@@ -112,6 +112,13 @@ Worker does not need public `PORT` for HTTP; API and webhook do.
 
 ## FS-66 — trust proxy and global rate limit
 
+> **⚠️ URGENT — shared per-IP buckets on Render until `TRUST_PROXY_HOPS` is set.**
+> With `TRUST_PROXY_HOPS=0` (the default) on Render, `request.ip` is Render's proxy address, not the client. That means **every per-IP bucket is shared by ALL customers**: the slot-hold/confirm IP limit (6 per 10 min) and the pre-existing public booking limit (10/hr per IP) already behave this way in production, so a few users (or one attacker) can exhaust the limit for everyone. Verify the hop count in staging (steps below) and set `TRUST_PROXY_HOPS` as a priority.
+>
+> **Redis-down caveat:** limits are enforced in Redis across instances. If Redis is down or slow (>250 ms), the limiter falls back to an in-memory window, so limits become **per instance** (effective limit ≈ limit × instance count) until Redis recovers. The memory store is capped (50k keys) and evicts expired, then oldest, windows; it never clears all limits.
+>
+> **Bucketing:** IPv4 is used as-is; IPv4-mapped IPv6 (`::ffff:a.b.c.d`) is unmapped to IPv4; other IPv6 is bucketed by /64; unparseable values share one `invalid` bucket. `TRUST_PROXY_HOPS` is bounded to 0–10.
+
 The API reads the client IP from `request.ip`. With `TRUST_PROXY_HOPS=0` (default), that is the socket peer, which on Render is a proxy rather than the client. The global limiter (`GLOBAL_RATE_LIMIT_ENABLED`) ships **off**. Slot-hold limits are on regardless.
 
 The hop count is **not verified** for our services. Render's article ([How Render handles DDoS attacks](https://render.com/articles/how-render-handles-ddos-attacks)) says traffic passes through Cloudflare and Render's load balancers, and its Express example uses `trust proxy` 1. Third-party live tests on `onrender.com` ([Render community thread](https://community.render.com/t/what-number-of-proxies-sit-in-front-of-an-express-app-deployed-on-render/35981), [WebDecoy Render notes](https://docs.webdecoy.com/installation/render/)) report that 3 hops were needed. They also report that Render appends to any client-supplied `X-Forwarded-For` rather than replacing it.

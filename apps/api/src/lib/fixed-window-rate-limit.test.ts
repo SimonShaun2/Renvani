@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { setupTestEnv } from "../test-support/env-setup.js";
 
@@ -73,5 +73,79 @@ describe("FS-66 fixed-window rate limiter", () => {
     expect((await hitFixedWindowRateLimit(input)).allowed).toBe(false);
     await new Promise((r) => setTimeout(r, 30));
     expect((await hitFixedWindowRateLimit(input)).allowed).toBe(true);
+  });
+});
+
+describe("FS-66 normalizeRateLimitIp", () => {
+  const n = mod.normalizeRateLimitIp;
+  it("keeps IPv4 as-is and maps empty to unknown", () => {
+    expect(n("203.0.113.7")).toBe("203.0.113.7");
+    expect(n(" 203.0.113.7 ")).toBe("203.0.113.7");
+    expect(n(undefined)).toBe("unknown");
+    expect(n("  ")).toBe("unknown");
+  });
+  it("unmaps IPv4-mapped IPv6 (dotted and hex) to the IPv4 bucket", () => {
+    expect(n("::ffff:203.0.113.7")).toBe("203.0.113.7");
+    expect(n("::FFFF:cb00:7107")).toBe("203.0.113.7");
+    expect(n("0:0:0:0:0:ffff:203.0.113.7")).toBe("203.0.113.7");
+  });
+  it("lowercases, expands and buckets IPv6 by /64 in compressed form", () => {
+    expect(n("2001:DB8:0:0:1:2:3:4")).toBe("2001:db8::/64");
+    expect(n("2001:0db8:00aa:0001:ffff:ffff:ffff:ffff")).toBe("2001:db8:aa:1::/64");
+    expect(n("::1")).toBe("::/64");
+  });
+  it("same /64 shares a bucket; different /64 does not", () => {
+    expect(n("2001:db8:1:2::1")).toBe(n("2001:db8:1:2:dead:beef:0:9"));
+    expect(n("2001:db8:1:2::1")).not.toBe(n("2001:db8:1:3::1"));
+  });
+  it("strips brackets, ports and zone ids", () => {
+    expect(n("[2001:db8:1:2::5]")).toBe("2001:db8:1:2::/64");
+    expect(n("[2001:db8:1:2::5]:8443")).toBe("2001:db8:1:2::/64");
+    expect(n("fe80::1%eth0")).toBe("fe80::/64");
+  });
+  it.each(["not-an-ip", "1.2.3", "2001:db8::g", "1:2:3:4:5:6:7:8:9", "x".repeat(500), "[::1"])(
+    "maps invalid input %s to the fallback bucket",
+    (v) => {
+      expect(n(v)).toBe("invalid");
+    }
+  );
+});
+
+describe("FS-66 memory store eviction", () => {
+  afterEach(() => mod.resetFixedWindowRateLimitStateForTests());
+  it("keeps active limits when the store fills (evicts oldest only, never clears all)", async () => {
+    mod.setRateLimitRedisClientForTests(null);
+    mod.setRateLimitMemoryMaxKeysForTests(5);
+    const hit = (key: string) => mod.hitFixedWindowRateLimit({ key, limit: 2, windowMs: 60_000 });
+    // Victim exhausts its limit.
+    await hit("victim");
+    await hit("victim");
+    expect((await hit("victim")).allowed).toBe(false);
+    for (let i = 0; i < 4; i += 1) await hit(`k${i}`);
+    // Store is full; flooding new keys evicts only the oldest (the victim first) one at a time.
+    await hit("flood-1");
+    await hit("k1");
+    // k1..k3 + flood-1 survive (k0 or victim evicted, not everything).
+    expect((await hit("k1")).count).toBe(3);
+    expect((await hit("k3")).count).toBe(2);
+  });
+  it("evicts expired windows before active ones", async () => {
+    vi.useFakeTimers();
+    try {
+      mod.setRateLimitRedisClientForTests(null);
+      mod.setRateLimitMemoryMaxKeysForTests(3);
+      const hit = (key: string, windowMs: number) => mod.hitFixedWindowRateLimit({ key, limit: 1, windowMs });
+      await hit("active-old", 60_000);
+      await hit("short-a", 1_000);
+      await hit("short-b", 1_000);
+      vi.advanceTimersByTime(2_000);
+      await hit("new", 60_000);
+      // The oldest active entry survived because the expired ones were evicted instead.
+      const r = await hit("active-old", 60_000);
+      expect(r.count).toBe(2);
+      expect(r.allowed).toBe(false);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

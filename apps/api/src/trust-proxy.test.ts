@@ -45,7 +45,13 @@ describe("FS-66 TRUST_PROXY_HOPS", () => {
     expect(resolveTrustProxySetting(3)).toBe(3);
   });
 
-  it.each(["-1", "1.5", "abc"])("rejects invalid value %s", (value) => {
+  it("accepts the upper bound 10", () => {
+    process.env.TRUST_PROXY_HOPS = "10";
+    resetEnvCacheForTests();
+    expect(env.TRUST_PROXY_HOPS).toBe(10);
+  });
+
+  it.each(["-1", "1.5", "abc", "11", "1000000"])("rejects invalid value %s", (value) => {
     process.env.TRUST_PROXY_HOPS = value;
     resetEnvCacheForTests();
     expect(() => env.TRUST_PROXY_HOPS).toThrow();

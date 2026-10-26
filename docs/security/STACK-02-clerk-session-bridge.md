@@ -122,9 +122,29 @@ Endpoint: `POST /api/v1/webhooks/clerk` (Svix-signed with `CLERK_WEBHOOK_SECRET`
 
 ## Runbook
 
-### (a) Relink a tombstoned user (manual DB step until FS-165)
+### (a) Relink a tombstoned user
 
-After `user.deleted`, the user has `clerk_unlinked_at` set and `clerk_user_id = NULL`, and every auto-link path skips them: the session verified-email fallback, the `user.updated` verified-email link, and the `organizationMembership.created` webhook. Until FS-165 ships the admin relink route, an operator relinks manually. Confirm the target user, company, and the new Clerk user id with the company owner first.
+After `user.deleted`, the user has `clerk_unlinked_at` set and `clerk_user_id = NULL`, and every auto-link path skips them: the session verified-email fallback, the `user.updated` verified-email link, and the `organizationMembership.created` webhook. Confirm the target user, company, and the new Clerk user id with the company owner first.
+
+**Preferred: the admin relink route (FS-165).** An active owner/admin of the target's company calls:
+
+```http
+POST /api/v1/users/:id/clerk-relink
+Authorization: Bearer <owner/admin session>
+Content-Type: application/json
+
+{ "clerkUserId": "user_...", "confirmOverwrite": false }
+```
+
+- The company comes from the auth context only. A target in another company, soft-deleted, or missing → **404**. Other roles → **403**.
+- It sets `clerk_user_id`, clears `clerk_unlinked_at`, and sets `is_active = true` in one transaction. It revokes nothing.
+- If another user (any company) holds the Clerk id, or a 23505 race fires → **409**, nothing changes.
+- If the target is already linked to a **different** Clerk id → **409** unless `confirmOverwrite: true`; the overwrite is then logged at warn with old → new ids.
+- Repeating with the same id on an active, untombstoned user returns `{"status": "unchanged"}`.
+- `clerkUserId` must match `^user_[A-Za-z0-9]+$` (max 255).
+- Audit: a structured log line `audit: "clerk_user_relinked"` with `companyId`, `actorUserId`, `targetUserId`, `newClerkUserId` (plus `previousClerkUserId` on overwrite), `tombstoneCleared`, `reactivated`. Ids only, no emails.
+
+**Fallback: manual SQL** (only if the route is unavailable):
 
 Run it in an interactive `psql` session, passing the ids as variables (do not paste them into shared logs):
 
@@ -168,7 +188,7 @@ Finish the transaction **by hand**. There is deliberately no `COMMIT` in the blo
 - Run `COMMIT;` only if step 1 returned 0 rows, step 2 returned exactly 1 row with `clerk_unlinked_at` set, and step 3 reported `UPDATE 1`.
 - Otherwise run `ROLLBACK;`. This includes step 3 reporting `UPDATE 0` or failing with a 23505 unique violation (after an error the transaction is already aborted, so `ROLLBACK;` is the only option).
 
-If step 1 returns a row, stop and `ROLLBACK`: resolve which user owns the Clerk id first. Record who ran it, the target user, and the company in the ops log (FS-165 will write this audit entry automatically).
+If step 1 returns a row, stop and `ROLLBACK`: resolve which user owns the Clerk id first. Record who ran it, the target user, and the company in the ops log (the manual path writes no audit line).
 
 ### (b) Duplicate Clerk org pre-deploy check (migration 0038)
 

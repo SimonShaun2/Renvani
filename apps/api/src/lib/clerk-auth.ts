@@ -1,6 +1,6 @@
 import { verifyToken } from "@clerk/backend";
 
-import { featureFlags } from "@fsm/config/feature-flags";
+import { featureFlags, isClerkAuthParallelJwtEnabled } from "@fsm/config/feature-flags";
 import { AppError, ErrorCode, type UserRole } from "@fsm/types";
 
 /**
@@ -60,6 +60,19 @@ export function extractClerkOrganizationId(payload: Record<string, unknown>): st
   return null;
 }
 
+/**
+ * FS-156: azp (CLERK_AUTHORIZED_PARTIES) is mandatory whenever Clerk login can be used:
+ * deployment tier "staging" (where Clerk login is on) or NODE_ENV=production, or the Clerk flag is on.
+ */
+export function isClerkAzpRequired(source: Record<string, string | undefined> = process.env): boolean {
+  // FEATURE FLAG: clerk-auth-parallel-jwt
+  return (
+    featureFlags.clerkAuthParallelJwt ||
+    isClerkAuthParallelJwtEnabled(source) ||
+    source.NODE_ENV === "production"
+  );
+}
+
 export async function verifyClerkBearerToken(accessToken: string): Promise<ClerkVerifiedSession> {
   if (!isClerkParallelAuthAvailable()) {
     throw new AppError(ErrorCode.FORBIDDEN, "Clerk authentication is not enabled");
@@ -71,7 +84,7 @@ export async function verifyClerkBearerToken(accessToken: string): Promise<Clerk
   }
 
   const authorizedParties = parseClerkAuthorizedParties();
-  if (authorizedParties.length === 0 && process.env.NODE_ENV === "production") {
+  if (authorizedParties.length === 0 && isClerkAzpRequired()) {
     // Fail closed: without an azp allow-list any Clerk frontend for this instance could mint usable tokens.
     throw new AppError(ErrorCode.UNAUTHORIZED, "Invalid Clerk session token");
   }
@@ -84,6 +97,14 @@ export async function verifyClerkBearerToken(accessToken: string): Promise<Clerk
     })) as Record<string, unknown>;
   } catch {
     throw new AppError(ErrorCode.UNAUTHORIZED, "Invalid Clerk session token");
+  }
+
+  // Defense in depth on top of the SDK check: azp must be present and allow-listed.
+  if (authorizedParties.length > 0) {
+    const azp = typeof payload.azp === "string" ? payload.azp.replace(/\/$/, "") : "";
+    if (!authorizedParties.includes(azp)) {
+      throw new AppError(ErrorCode.UNAUTHORIZED, "Invalid Clerk session token");
+    }
   }
 
   const clerkUserId = payload.sub;

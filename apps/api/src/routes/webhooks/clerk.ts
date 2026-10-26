@@ -70,6 +70,9 @@ async function handleEvent(event: ClerkWebhookEvent, reply: FastifyReply) {
 
   if (event.type === "organization.created") {
     const company = await provisionClerkOrganization({ organizationId: str(data.id), name: str(data.name) });
+    if (!company) {
+      return reply.send({ received: true, skipped: true });
+    }
     return reply.send({ received: true, companyId: company.id });
   }
 
@@ -87,7 +90,9 @@ async function handleEvent(event: ClerkWebhookEvent, reply: FastifyReply) {
       firstName: str(member.first_name),
       lastName: str(member.last_name),
       clerkOrgRole: str(data.role) || null,
-      clerkUserId: str(member.user_id) || null
+      clerkUserId: str(member.user_id) || null,
+      // organizationMembership payloads carry no email-verification proof: never link existing users by email here.
+      emailVerified: false
     });
     return reply.send({ received: true, ...result });
   }

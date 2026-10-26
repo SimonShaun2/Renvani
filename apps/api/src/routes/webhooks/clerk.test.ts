@@ -92,7 +92,8 @@ describe("Clerk webhook", () => {
       firstName: "Ava",
       lastName: "Stone",
       clerkOrgRole: "org:admin",
-      clerkUserId: "user_ava"
+      clerkUserId: "user_ava",
+      emailVerified: false
     });
   });
 

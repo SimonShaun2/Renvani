@@ -6,6 +6,9 @@ import { setupTestEnv } from "../test-support/env-setup.js";
 
 setupTestEnv();
 
+const logSpy = vi.hoisted(() => ({ error: vi.fn(), warn: vi.fn(), info: vi.fn(), debug: vi.fn() }));
+vi.mock("pino", () => ({ default: () => logSpy }));
+
 vi.mock("drizzle-orm", async () => {
   const helper = await import("../test-support/fake-db.js");
   return helper.createDrizzleModuleMock();
@@ -46,6 +49,33 @@ describe("clerk-tenant.service", () => {
 
     const found = await clerkTenantService.findCompanyByClerkOrganizationId("org_linked");
     expect(found?.id).toBe(linked.id);
+  });
+
+  it("findCompanyByClerkOrganizationId fails closed with a generic 401 and an alert log when duplicated", async () => {
+    const a = fakeDb.seedCompany({ name: "Dup A", slug: "dup-a", settings: { clerk: { organizationId: "org_dup" } } });
+    const b = fakeDb.seedCompany({ name: "Dup B", slug: "dup-b", settings: { clerk: { organizationId: "org_dup" } } });
+    logSpy.error.mockClear();
+
+    await expect(clerkTenantService.findCompanyByClerkOrganizationId("org_dup")).rejects.toMatchObject({
+      code: ErrorCode.UNAUTHORIZED,
+      message: "Clerk organization is not linked to a company"
+    });
+    expect(logSpy.error).toHaveBeenCalledTimes(1);
+    const [fields] = logSpy.error.mock.calls[0] as [Record<string, unknown>];
+    expect(fields).toMatchObject({ alert: "clerk_org_ambiguous", clerkOrganizationId: "org_dup" });
+    expect((fields.companyIds as string[]).sort()).toEqual([a.id, b.id].sort());
+  });
+
+  it("findCompanyByClerkOrganizationId ignores a soft-deleted duplicate", async () => {
+    const live = fakeDb.seedCompany({ name: "Live", slug: "live", settings: { clerk: { organizationId: "org_one" } } });
+    fakeDb.seedCompany({
+      name: "Gone",
+      slug: "gone",
+      settings: { clerk: { organizationId: "org_one" } },
+      deletedAt: new Date()
+    });
+    const found = await clerkTenantService.findCompanyByClerkOrganizationId("org_one");
+    expect(found?.id).toBe(live.id);
   });
 
   it("findCompanyByClerkOrganizationId returns null when unmapped", async () => {

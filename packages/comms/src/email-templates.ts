@@ -1,6 +1,6 @@
 /** Channel-agnostic transactional email templates (render to subject + html + text, in the Renvani layout). */
 
-import { htmlToText, renderRenvaniLayout } from "./email-layout.js";
+import { escapeHtml, htmlToText, renderRenvaniLayout } from "./email-layout.js";
 
 export const EMAIL_TEMPLATE_IDS = {
   passwordReset: "auth.password_reset",
@@ -35,18 +35,32 @@ function emailShell(bodyHtml: string): string {
   return bodyHtml.trim();
 }
 
+/** Only absolute http(s) URLs are allowed in links; anything else (javascript:, data:, etc.) becomes "#". */
+export function safeHref(href: string | undefined): string {
+  const raw = (href ?? "").trim();
+  try {
+    const url = new URL(raw);
+    if (url.protocol === "http:" || url.protocol === "https:") {
+      return escapeHtml(url.toString());
+    }
+  } catch {
+    // fall through
+  }
+  return "#";
+}
+
 function button(href: string, label: string): string {
   return `
     <p>
-      <a href="${href}" style="display: inline-block; padding: 12px 18px; background: #257afa; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600;">
-        ${label}
+      <a href="${safeHref(href)}" style="display: inline-block; padding: 12px 18px; background: #257afa; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600;">
+        ${escapeHtml(label)}
       </a>
     </p>
   `.trim();
 }
 
 function greetingName(firstName: string): string {
-  return firstName.trim().length > 0 ? firstName.trim() : "there";
+  return firstName.trim().length > 0 ? escapeHtml(firstName.trim()) : "there";
 }
 
 export function renderTransactionalEmail(
@@ -88,7 +102,7 @@ function renderTemplateBody(templateId: EmailTemplateId, variables: Record<strin
           <p>Hi ${name},</p>
           <p>Someone just tried to create a new Renvani account using this email address. You already have an account, so nothing was changed.</p>
           ${button(variables.loginUrl ?? "#", "Log in")}
-          <p>If this was you, just log in. If you've forgotten your password, you can <a href="${variables.resetUrl ?? "#"}">reset it here</a>. If it wasn't you, no action is needed.</p>
+          <p>If this was you, just log in. If you've forgotten your password, you can <a href="${safeHref(variables.resetUrl)}">reset it here</a>. If it wasn't you, no action is needed.</p>
         `)
       };
     }

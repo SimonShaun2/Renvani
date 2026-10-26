@@ -41,6 +41,7 @@ vi.mock("../lib/email.js", () => emailMocks);
 
 async function flushBackground(): Promise<void> {
   await new Promise((resolve) => setImmediate(resolve));
+  await new Promise((resolve) => setImmediate(resolve));
 }
 
 type AuthServiceModule = typeof import("./auth.service.js");
@@ -59,13 +60,17 @@ beforeAll(async () => {
   companyService = await import("./company.service.js");
   fakeDb = await import("../test-support/fake-db.js");
   tokens = await import("../lib/tokens.js");
+  rateLimit = await import("../lib/public-booking-rate-limit.js");
 });
+
+let rateLimit: typeof import("../lib/public-booking-rate-limit.js");
 
 beforeEach(() => {
   fakeDb.resetTestState();
   notificationsQueueAddMock.mockReset();
   emailMocks.sendVerifyEmailEmail.mockClear();
   emailMocks.sendSignupAttemptEmail.mockClear();
+  rateLimit.resetPublicBookingRateLimitStateForTests();
   vi.useRealTimers();
 });
 
@@ -153,6 +158,25 @@ describe("auth.service", () => {
       expect.objectContaining({ firstName: "Pat", loginUrl: expect.stringContaining("/login") })
     );
     expect(emailMocks.sendVerifyEmailEmail).not.toHaveBeenCalled();
+  });
+
+  it("sends at most one signup-attempt notice per recipient per cooldown window", async () => {
+    const company = fakeDb.seedCompany({ name: "Acme3", slug: "acme3" });
+    fakeDb.seedUser({ companyId: company.id, email: "victim@example.com", firstName: "Vic", lastName: "Tim" });
+    for (let i = 0; i < 3; i += 1) {
+      await expect(
+        authService.register({
+          companyName: "Spam",
+          firstName: "A",
+          lastName: "B",
+          email: "Victim@example.com",
+          password: "password123",
+          timezone: "America/Chicago"
+        })
+      ).resolves.toEqual({ status: "existing" });
+      await flushBackground();
+    }
+    expect(emailMocks.sendSignupAttemptEmail).toHaveBeenCalledTimes(1);
   });
 
   it("registers a company, owner, and hashed refresh token", async () => {

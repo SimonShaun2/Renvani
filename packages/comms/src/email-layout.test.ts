@@ -14,15 +14,14 @@ describe("Renvani email layout", () => {
     expect(out.text).toMatchSnapshot();
   });
 
-  it("every template gets branded html, a plain-text fallback, and only the one TrayLoop legal line", () => {
+  it("every template gets branded html, a plain-text fallback, and zero TrayLoop mentions", () => {
     for (const id of Object.values(EMAIL_TEMPLATE_IDS)) {
       const r = renderTransactionalEmail(id, { firstName: "Ava", verifyUrl: "https://app/v", resetUrl: "https://app/r", loginUrl: "https://app/l" });
       expect(r.html).toContain("Renvani");
       expect(r.text.length).toBeGreaterThan(20);
       expect(r.text).toContain("https://getrenvani.com/privacy");
       for (const body of [r.html, r.text, r.subject]) {
-        expect(body.match(/TrayLoop/g)?.length ?? 0).toBe(body === r.subject ? 0 : 1);
-        expect(body).toContain(body === r.subject ? "" : "Renvani is a brand of TrayLoop Technologies LLC.");
+        expect(body).not.toMatch(/trayloop/i);
       }
     }
   });

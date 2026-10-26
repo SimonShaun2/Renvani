@@ -23,7 +23,6 @@ exports[`Renvani email layout > matches the layout snapshot (html + text) 1`] = 
 &nbsp;·&nbsp;<a href="https://getrenvani.com" style="color:#7f8897;">getrenvani.com</a>
 &nbsp;·&nbsp;<a href="https://getrenvani.com/terms" style="color:#7f8897;">Terms</a>
 &nbsp;·&nbsp;<a href="https://getrenvani.com/privacy" style="color:#7f8897;">Privacy</a>
-<div style="font-size:11px;color:#7f8897;padding-top:6px;">Renvani is a brand of TrayLoop Technologies LLC.</div>
 </td></tr>
 </table>
 </td></tr>
@@ -41,6 +40,5 @@ Body
 Renvani · https://getrenvani.com
 Terms: https://getrenvani.com/terms
 Privacy: https://getrenvani.com/privacy
-Renvani is a brand of TrayLoop Technologies LLC.
 "
 `;

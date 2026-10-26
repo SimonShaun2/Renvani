@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { MarketingLandingPage } from "@/src/components/marketing/MarketingLandingPage";
+import { MarketingPage } from "@/src/components/marketing/visuals/MarketingPage";
 import { MARKETING_META } from "@/src/components/marketing/marketing-copy";
 import { getDefaultRouteForRole } from "@/src/lib/route-access";
 import { readServerAuthSession } from "@/src/lib/auth";
@@ -27,5 +27,5 @@ export default async function HomePage() {
     redirect(getDefaultRouteForRole(session.role));
   }
 
-  return <MarketingLandingPage />;
+  return <MarketingPage page="home" visual="home" />;
 }

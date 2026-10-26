@@ -326,11 +326,20 @@ export async function getPublicVipJoinPreview(joinToken: string): Promise<{
   const parsed = verifyVipMembershipJoinToken(joinToken);
 
   if (!parsed) {
-    throw new AppError(ErrorCode.NOT_FOUND, "Invalid membership link");
+    throw new AppError(ErrorCode.NOT_FOUND, "Link not found");
   }
 
-  const company = await getCompany(parsed.companyId);
-  const tier = await getTier(parsed.companyId, parsed.vipTierId);
+  let company: Awaited<ReturnType<typeof getCompany>>;
+  let tier: Awaited<ReturnType<typeof getTier>>;
+  try {
+    company = await getCompany(parsed.companyId);
+    tier = await getTier(parsed.companyId, parsed.vipTierId);
+  } catch (error) {
+    if (error instanceof AppError && error.code === ErrorCode.NOT_FOUND) {
+      throw new AppError(ErrorCode.NOT_FOUND, "Link not found");
+    }
+    throw error;
+  }
 
   const fraction = resolveCompanyConnectApplicationFeeFraction(company);
   const fee =
@@ -358,7 +367,7 @@ export async function startPublicVipCheckout(
   const parsed = verifyVipMembershipJoinToken(joinToken);
 
   if (!parsed) {
-    throw new AppError(ErrorCode.NOT_FOUND, "Invalid membership link");
+    throw new AppError(ErrorCode.NOT_FOUND, "Link not found");
   }
 
   const result = await createVipMembershipCheckout(

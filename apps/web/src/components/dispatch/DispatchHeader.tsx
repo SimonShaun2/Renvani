@@ -16,6 +16,7 @@ export interface DispatchUnassignedJob {
 export interface DispatchBannerSuggestion {
   technicianName: string;
   rangeLabel: string;
+  jobMeta?: string;
 }
 
 interface DispatchHeaderProps {
@@ -93,7 +94,9 @@ export function DispatchHeader({
             <img src="/dispatch/status-unassigned-dot.svg" alt="" width={6} height={6} />
             {unassignedJob.statusLabel ?? "Unassigned"}
           </span>
-          <p className="min-w-0 flex-1 truncate text-sm font-semibold text-[#0f1530]">{unassignedJob.label}</p>
+          <p className="min-w-0 flex-1 truncate text-sm font-semibold text-[#0f1530]">{unassignedJob.label}
+            {suggestion?.jobMeta ? ` · ${suggestion.jobMeta}` : ""}
+          </p>
           <p className="text-[13px] text-[#2a3360]">
             {suggestion
               ? `Scheduling Agent suggests ${suggestion.technicianName} (fits ${suggestion.rangeLabel})`

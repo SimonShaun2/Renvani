@@ -44,7 +44,9 @@ import { formatDispatchSummary, summarizeDispatch } from "@/src/lib/dispatch-act
 import type { DispatchDragJobData, DispatchDropSlot, DispatchDropTargetData } from "./dispatch.utils";
 import {
   formatDispatchDateLabel,
-  formatDispatchRange,
+  formatFrameDuration,
+  formatFrameRange,
+  formatFrameTime,
   matchesSearch
 } from "./dispatch.utils";
 
@@ -58,6 +60,16 @@ type AutoFitOverlayState = {
 
 function jobLabel(title: string, customer: { firstName: string; lastName: string }): string {
   return [title, `${customer.firstName} ${customer.lastName}`.trim()].filter(Boolean).join(" · ");
+}
+
+function findCustomerLastName(
+  jobId: string,
+  unscheduled: Array<{ id: string; customer: { lastName: string } }>,
+  technicians: Array<{ jobs: Array<{ id: string; customer: { lastName: string } }> }>
+): string | null {
+  const job = unscheduled.find((item) => item.id === jobId)
+    ?? technicians.flatMap((technician) => technician.jobs).find((item) => item.id === jobId);
+  return job?.customer.lastName.trim() || null;
 }
 
 function findJobLabel(
@@ -452,6 +464,9 @@ export function DispatchBoardClient() {
 
   // Figma 10:478 shows the agent proposal inline (banner 10:553 + dashed block 10:590), not as a modal.
   const topSuggestion = autoFitOverlay && !autoFitOverlay.isLoading ? autoFitOverlay.suggestions[0] ?? null : null;
+  const proposalCustomerLastName = autoFitOverlay
+    ? findCustomerLastName(autoFitOverlay.jobId, unscheduledJobs, technicians)
+    : null;
   const proposalJobLabel = autoFitOverlay ? findJobLabel(autoFitOverlay.jobId, unscheduledJobs, technicians) : null;
   const bannerJob = autoFitOverlay && proposalJobLabel
     ? {
@@ -465,7 +480,7 @@ export function DispatchBoardClient() {
   const timelineSuggestion = topSuggestion && autoFitOverlay
     ? {
         technicianId: topSuggestion.technicianId,
-        label: proposalJobLabel?.split(" · ").pop() ?? "Visit",
+        label: proposalCustomerLastName ?? "Visit",
         scheduledStart: topSuggestion.scheduledStart,
         scheduledEnd: topSuggestion.scheduledEnd
       }
@@ -481,7 +496,8 @@ export function DispatchBoardClient() {
           topSuggestion && bannerJob?.id === autoFitOverlay?.jobId
             ? {
                 technicianName: topSuggestion.technicianName,
-                rangeLabel: formatDispatchRange(topSuggestion.scheduledStart, topSuggestion.scheduledEnd)
+                rangeLabel: formatFrameRange(topSuggestion.scheduledStart, topSuggestion.scheduledEnd),
+                jobMeta: `${formatFrameDuration(topSuggestion.scheduledStart, topSuggestion.scheduledEnd)} · ${formatFrameTime(topSuggestion.scheduledStart)}`
               }
             : null
         }

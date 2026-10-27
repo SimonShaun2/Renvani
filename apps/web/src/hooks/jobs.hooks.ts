@@ -542,7 +542,8 @@ export function useJobAttachments(jobId: string | null) {
     queryKey: jobId ? jobKeys.attachments(jobId) : jobKeys.attachments("pending"),
     queryFn: () =>
       api.get<AttachmentListResponse>(`/api/v1/attachments?entityType=job&entityId=${jobId}&page=1&limit=100`),
-    enabled: Boolean(jobId)
+    enabled: Boolean(jobId),
+    staleTime: 4 * 60 * 1000
   });
 }
 

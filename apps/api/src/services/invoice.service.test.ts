@@ -147,6 +147,21 @@ function seedInvoiceGraph(companyId: string) {
   return { customer, job, estimate };
 }
 
+
+function linkBookingRequest(companyId: string, jobId: string) {
+  return fakeDb.seedBookingRequest({
+    companyId,
+    jobId,
+    firstName: "Online",
+    lastName: "Booker",
+    phone: "555-0199",
+    addressLine1: "1 Booking Way",
+    city: "Austin",
+    state: "TX",
+    zip: "78701"
+  });
+}
+
 describe("invoice.service", () => {
   it("listInvoices paginates and filters by status, customer, and invoice number search", async () => {
     const { company } = createAdminContext();
@@ -675,9 +690,9 @@ describe("invoice.service", () => {
       companyId: company.id,
       customerId: customer.id,
       title: "Online booked",
-      status: "completed",
-      tags: ["online_booking"]
+      status: "completed"
     });
+    linkBookingRequest(company.id, job.id);
     const invoice = fakeDb.seedInvoice({
       companyId: company.id,
       customerId: customer.id,
@@ -708,9 +723,9 @@ describe("invoice.service", () => {
         companyId: company.id,
         customerId: customer.id,
         title: "Online booked",
-        status: "completed",
-        tags: ["online_booking"]
+        status: "completed"
       });
+      linkBookingRequest(company.id, job.id);
       const token = `tok_${planTier}`;
       fakeDb.seedInvoice({
         companyId: company.id,
@@ -736,6 +751,84 @@ describe("invoice.service", () => {
         ...expected[planTier]
       });
     }
+  });
+
+  it("booking origin is persisted server state: a staff-set online_booking tag or another tenant's booking request cannot set it", async () => {
+    const { company, actor } = createAdminContext();
+    company.stripeAccountId = "acct_123";
+    const { customer } = seedInvoiceGraph(company.id);
+    const job = fakeDb.seedJob({
+      companyId: company.id,
+      customerId: customer.id,
+      title: "Phone booking",
+      status: "completed",
+      tags: ["online_booking"]
+    });
+    const otherCompany = fakeDb.seedCompany({ name: "Other", slug: "other-bf", timezone: "America/Chicago" });
+    linkBookingRequest(otherCompany.id, job.id);
+    const invoice = fakeDb.seedInvoice({
+      companyId: company.id,
+      customerId: customer.id,
+      jobId: job.id,
+      status: "draft",
+      total: "100.00",
+      subtotal: "100.00",
+      balanceDue: "100.00",
+      paymentToken: "tok_not_booked"
+    });
+
+    await invoiceService.sendInvoice(company.id, actor.id, invoice.id);
+
+    expect(createInvoiceCheckoutSessionMock).toHaveBeenCalledWith(expect.objectContaining({ isOnlineBooking: false }));
+    const stored = fakeDb.getTestState().invoices.find((row) => row.id === invoice.id)!;
+    stored.stripePaymentLinkId = "cs_test_nb";
+    stored.stripePaymentLinkUrl = "https://app.test/pay/tok_not_booked";
+    const link = await invoiceService.getPublicInvoicePaymentLink("tok_not_booked");
+    expect(link).toMatchObject({ bookingFeeAmount: "0.00", bookingFeeCents: 0 });
+  });
+
+  it("booking fee is recorded only when the checkout is paid; failed checkouts and webhook replays don't charge it twice", async () => {
+    const { company } = createAdminContext();
+    company.settings = { stripePlatformBilling: { planTier: "flat" } } as typeof company.settings;
+    const { customer } = seedInvoiceGraph(company.id);
+    const job = fakeDb.seedJob({ companyId: company.id, customerId: customer.id, title: "Online booked", status: "completed" });
+    linkBookingRequest(company.id, job.id);
+    const invoice = fakeDb.seedInvoice({
+      companyId: company.id,
+      customerId: customer.id,
+      jobId: job.id,
+      status: "sent",
+      total: "100.00",
+      balanceDue: "100.00"
+    });
+
+    await invoiceService.handleStripePaymentFailed({
+      data: { object: { id: "pi_fail_bf", metadata: { invoiceId: invoice.id }, last_payment_error: { message: "declined" } } }
+    } as unknown as Stripe.PaymentIntentPaymentFailedEvent);
+    let stored = fakeDb.getTestState().invoices.find((row) => row.id === invoice.id)!;
+    expect(stored.bookingFeeAmount).toBe("0.00");
+    expect(fakeDb.getTestState().payments.filter((row) => row.invoiceId === invoice.id)).toHaveLength(0);
+
+    const succeeded = {
+      data: {
+        object: {
+          id: "pi_paid_bf",
+          amount: 10_199,
+          amount_received: 10_199,
+          latest_charge: "ch_bf",
+          payment_method_types: ["card"],
+          metadata: { invoiceId: invoice.id, invoiceAmountCents: "10000", serviceFeeCents: "0", bookingFeeCents: "199" }
+        }
+      }
+    } as unknown as Stripe.PaymentIntentSucceededEvent;
+    await invoiceService.handleStripePaymentSuccess(succeeded);
+    await invoiceService.handleStripePaymentSuccess(succeeded);
+
+    stored = fakeDb.getTestState().invoices.find((row) => row.id === invoice.id)!;
+    const paid = fakeDb.getTestState().payments.filter((row) => row.invoiceId === invoice.id);
+    expect(paid).toHaveLength(1);
+    expect(paid[0]).toMatchObject({ amount: "100.00", serviceFeeAmount: "0.00", bookingFeeAmount: "1.99" });
+    expect(stored).toMatchObject({ status: "paid", balanceDue: "0.00", bookingFeeAmount: "1.99", serviceFeeAmount: "0.00" });
   });
 
   it("handleStripePaymentFailed emits a payment.failed event without changing invoice status", async () => {

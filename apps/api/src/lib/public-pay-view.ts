@@ -11,6 +11,7 @@ import {
 import { companies, customers, db, invoiceItems, invoices, jobs, payments, properties } from "@fsm/db";
 import { AppError, ErrorCode, type PublicPayReceiptFees, type PublicPayViewFields } from "@fsm/types";
 
+import { isJobFromOnlineBooking } from "./online-booking-origin.js";
 import { readRenvaniSubscriptionPlan, type RenvaniSubscriptionPlan } from "./company-renvani-plan.js";
 
 type SelectExecutor = Pick<typeof db, "select">;
@@ -94,7 +95,7 @@ export async function loadPublicPayContext(
     items,
     latestPayment,
     plan: readRenvaniSubscriptionPlan(company),
-    isOnlineBooking: Array.isArray(job?.tags) && job.tags.includes("online_booking")
+    isOnlineBooking: await isJobFromOnlineBooking(companyId, job?.id ?? null, executor)
   };
 }
 

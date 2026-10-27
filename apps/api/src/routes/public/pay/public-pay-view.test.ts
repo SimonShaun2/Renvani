@@ -91,8 +91,21 @@ function seedGraph(opts: { plan: "flex" | "flat"; onlineBooking: boolean; paid: 
     status: "completed",
     techNotes: "SECRET-TECH",
     scheduledStart: new Date("2026-10-20T15:00:00Z"),
-    tags: opts.onlineBooking ? ["online_booking"] : []
+    tags: []
   } as Parameters<typeof fakeDb.seedJob>[0]);
+  if (opts.onlineBooking) {
+    fakeDb.seedBookingRequest({
+      companyId: company.id,
+      jobId: job.id,
+      firstName: "Dana",
+      lastName: "Ruiz",
+      phone: "555-0101",
+      addressLine1: "12 Oak St",
+      city: "Austin",
+      state: "TX",
+      zip: "78701"
+    });
+  }
   const invoice = fakeDb.seedInvoice({
     companyId: company.id,
     customerId: customer.id,
@@ -247,9 +260,9 @@ describe("public pay view fields", () => {
     const spy = vi.spyOn(dbModule.db, "select");
     const response = await request(app.server).get(`/api/v1/public/pay/${TOKEN}`);
     expect(response.status).toBe(200);
-    // invoice + (company, customer, job, items, latest payment) + property
+    // invoice + (company, customer, job, items, latest payment) + property + booking-origin lookup
     expect(spy.mock.calls.length).toBeGreaterThanOrEqual(6);
-    expect(spy.mock.calls.length).toBeLessThanOrEqual(7);
+    expect(spy.mock.calls.length).toBeLessThanOrEqual(8);
     spy.mockRestore();
   });
 

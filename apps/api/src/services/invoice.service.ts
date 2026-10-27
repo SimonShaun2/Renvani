@@ -1,6 +1,7 @@
 import { randomBytes } from "node:crypto";
 
 import { and, eq, isNull } from "drizzle-orm";
+import { isJobFromOnlineBooking } from "../lib/online-booking-origin.js";
 import { Decimal } from "decimal.js";
 import pino from "pino";
 import type Stripe from "stripe";
@@ -1455,17 +1456,12 @@ export async function markOverdue(companyId: string, invoiceId: string): Promise
   return toInvoice(overdueInvoice);
 }
 
-/** Online-booked invoices: the invoice's job was created by public online booking. */
+/** Online-booked invoices: the invoice's job is linked from a persisted booking request. */
 async function isInvoiceFromOnlineBooking(
   invoice: Pick<InvoiceRow, "companyId" | "jobId">,
   executor: SelectExecutor
 ): Promise<boolean> {
-  if (!invoice.jobId) {
-    return false;
-  }
-
-  const job = await getJobRecord(invoice.companyId, invoice.jobId, executor);
-  return Array.isArray(job.tags) && job.tags.includes("online_booking");
+  return isJobFromOnlineBooking(invoice.companyId, invoice.jobId, executor);
 }
 
 function readNonNegativeIntMetadata(value: string | undefined): number | null {

@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 
-import { and, desc, eq, isNotNull, isNull } from "drizzle-orm";
+import { and, desc, eq, inArray, isNotNull, isNull, not, sql } from "drizzle-orm";
 
 import {
   type AdapterOperationKindV1,
@@ -8,8 +8,10 @@ import {
   type AttributionV1,
   type IntegrationOutboxAuditEventType,
   type IntegrationOutboxRetryReceipt,
+  INTEGRATION_OUTBOX_MAX_ATTEMPTS,
   IntegrationOutboxRetryReceiptSchema,
-  buildIntegrationOutboxRetryReceiptKey
+  buildIntegrationOutboxRetryReceiptKey,
+  integrationOutboxBackoffMs
 } from "@fsm/types";
 
 import { runTransactionWithTenantSession } from "./run-with-tenant-session.js";
@@ -120,12 +122,8 @@ export async function createOrGetIntegrationOutboxOperation(
       )
     });
 
+    // Duplicates are reported via created=false (caller logs); no audit row per duplicate.
     if (existing) {
-      await appendAuditEvent(tx, companyId, existing.id, "duplicate_suppressed", {
-        schemaVersion: 1,
-        idempotencyKey: input.idempotencyKey,
-        correlationId: input.correlationId
-      });
       return { operation: mapOperation(existing), created: false };
     }
 
@@ -155,7 +153,7 @@ export async function createOrGetIntegrationOutboxOperation(
       .returning();
 
     if (!inserted) {
-      // Lost a concurrent insert race: return the winner and record the suppression.
+      // Lost a concurrent insert race: return the winner (no audit row for duplicates).
       const winner = await tx.query.integrationOutboxOperations.findFirst({
         where: and(
           eq(integrationOutboxOperations.companyId, companyId),
@@ -167,11 +165,6 @@ export async function createOrGetIntegrationOutboxOperation(
       if (!winner) {
         throw new Error("INTEGRATION_OUTBOX_INSERT_FAILED");
       }
-      await appendAuditEvent(tx, companyId, winner.id, "duplicate_suppressed", {
-        schemaVersion: 1,
-        idempotencyKey: input.idempotencyKey,
-        correlationId: input.correlationId
-      });
       return { operation: mapOperation(winner), created: false };
     }
 
@@ -195,6 +188,7 @@ export async function recordIntegrationOutboxRetryReceipt(
   return runTransactionWithTenantSession(companyId, async (tx) => {
     const receipt = IntegrationOutboxRetryReceiptSchema.parse(receiptInput);
     const retryReceiptKey = buildIntegrationOutboxRetryReceiptKey(
+      outboxOperationId,
       receipt.correlationId,
       receipt.attemptNumber
     );
@@ -211,6 +205,10 @@ export async function recordIntegrationOutboxRetryReceipt(
       throw new Error("INTEGRATION_OUTBOX_NOT_FOUND");
     }
 
+    if (operation.correlationId !== receipt.correlationId) {
+      throw new Error("INTEGRATION_OUTBOX_CORRELATION_MISMATCH");
+    }
+
     const existingReceipt = await tx.query.integrationOutboxAuditEvents.findFirst({
       where: and(
         eq(integrationOutboxAuditEvents.companyId, companyId),
@@ -222,23 +220,36 @@ export async function recordIntegrationOutboxRetryReceipt(
       return { auditEvent: mapAudit(existingReceipt), deduplicated: true };
     }
 
+    // Terminal ops never reopen; attemptCount only moves forward; the capped attempt dead-letters.
+    const reachedCap = receipt.attemptNumber >= INTEGRATION_OUTBOX_MAX_ATTEMPTS;
     const [updated] = await tx
       .update(integrationOutboxOperations)
       .set({
-        status: "processing",
-        attemptCount: receipt.attemptNumber,
+        status: reachedCap ? "dead" : "processing",
+        attemptCount: sql`GREATEST(${integrationOutboxOperations.attemptCount}, ${receipt.attemptNumber})`,
+        ...(reachedCap ? { lastError: "max_attempts_reached" } : {}),
         updatedAt: new Date()
       })
       .where(
         and(
           eq(integrationOutboxOperations.id, outboxOperationId),
-          eq(integrationOutboxOperations.companyId, companyId)
+          eq(integrationOutboxOperations.companyId, companyId),
+          not(inArray(integrationOutboxOperations.status, ["succeeded", "dead"]))
         )
       )
       .returning();
 
     if (!updated) {
-      throw new Error("INTEGRATION_OUTBOX_UPDATE_FAILED");
+      throw new Error("INTEGRATION_OUTBOX_TERMINAL");
+    }
+
+    if (reachedCap) {
+      await appendAuditEvent(tx, companyId, outboxOperationId, "dead", {
+        schemaVersion: 1,
+        reason: "max_attempts_reached",
+        attemptNumber: receipt.attemptNumber,
+        maxAttempts: INTEGRATION_OUTBOX_MAX_ATTEMPTS
+      });
     }
 
     try {
@@ -247,7 +258,10 @@ export async function recordIntegrationOutboxRetryReceipt(
         companyId,
         outboxOperationId,
         "retry_receipt",
-        receipt,
+        {
+          ...receipt,
+          ...(reachedCap ? {} : { nextRetryAfterMs: integrationOutboxBackoffMs(receipt.attemptNumber) })
+        },
         retryReceiptKey
       );
       return { auditEvent: mapAudit(auditRow), deduplicated: false };

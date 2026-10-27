@@ -309,6 +309,13 @@
       "when": 1792716506138,
       "tag": "0043_payments_service_fee_booking_fee",
       "breakpoints": true
+    },
+    {
+      "idx": 44,
+      "version": "7",
+      "when": 1792716506139,
+      "tag": "0044_fs170_inventory",
+      "breakpoints": true
     }
   ]
 }

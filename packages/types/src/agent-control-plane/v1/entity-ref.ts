@@ -11,7 +11,9 @@ export const CANONICAL_ENTITY_TYPES_V1 = [
   "booking_request",
   "time_entry",
   "timesheet",
-  "technician_pay_rate"
+  "technician_pay_rate",
+  "stock_location",
+  "stock_level"
 ] as const;
 
 export type CanonicalEntityTypeV1 = (typeof CANONICAL_ENTITY_TYPES_V1)[number];

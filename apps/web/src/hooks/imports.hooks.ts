@@ -161,6 +161,19 @@ export function useImportErrors(importSessionId: string | null, enabled = true) 
   });
 }
 
+export interface ImportSessionListResponse {
+  data: ImportSessionRecord[];
+  total?: number;
+}
+
+export function useImportSessions(limit = 20, enabled = true) {
+  return useQuery({
+    queryKey: [...importKeys.all, "list", limit] as const,
+    enabled,
+    queryFn: () => api.get<ImportSessionListResponse>(`/api/v1/imports?page=1&limit=${limit}`)
+  });
+}
+
 export function useImportReconciliation(importSessionId: string | null, enabled = true) {
   return useQuery<ImportSessionReconciliationResponse>({
     queryKey: importSessionId

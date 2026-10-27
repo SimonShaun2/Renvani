@@ -13,6 +13,7 @@ type TableName =
   | "jobs"
   | "importSessions"
   | "importBundles"
+  | "savedCardMigrations"
   | "importChunkRuns"
   | "dataExportSessions"
   | "estimates"
@@ -21,6 +22,7 @@ type TableName =
   | "invoiceItems"
   | "payments"
   | "jobNotes"
+  | "customerNotes"
   | "jobPhotos"
   | "serviceAgreementTemplates"
   | "maintenancePlans"
@@ -32,6 +34,9 @@ type TableName =
   | "campaignRecipients"
   | "messageLogs"
   | "productCatalog"
+  | "stockLocations"
+  | "stockLevels"
+  | "stockMovements"
   | "technicians"
   | "jobTasks"
   | "jobProducts"
@@ -439,6 +444,7 @@ export interface TestEstimateItemRecord {
   id: string;
   estimateId: string;
   companyId: string;
+  productCatalogId: string | null;
   name: string;
   description: string | null;
   itemType: EstimateItemType;
@@ -468,6 +474,8 @@ export interface TestInvoiceRecord {
   total: string;
   amountPaid: string | null;
   balanceDue: string;
+  serviceFeeAmount: string;
+  bookingFeeAmount: string;
   issuedAt: Date | null;
   dueAt: Date | null;
   sentAt: Date | null;
@@ -494,6 +502,7 @@ export interface TestInvoiceItemRecord {
   id: string;
   invoiceId: string;
   companyId: string;
+  productCatalogId: string | null;
   name: string;
   description: string | null;
   itemType: InvoiceItemType;
@@ -514,6 +523,10 @@ export interface TestPaymentRecord {
   customerId: string;
   collectedById: string | null;
   amount: string;
+  serviceFeeAmount: string;
+  bookingFeeAmount: string;
+  feeRefundable: boolean;
+  amountRefunded: string;
   method: PaymentMethod;
   status: PaymentStatus;
   stripePaymentIntentId: string | null;
@@ -537,6 +550,22 @@ export interface TestJobNoteRecord {
   authorId: string | null;
   content: string;
   isInternal: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date | null;
+}
+
+export interface TestCustomerNoteRecord {
+  id: string;
+  companyId: string;
+  customerId: string;
+  authorId: string | null;
+  content: string;
+  isInternal: boolean;
+  notedAt: Date | null;
+  sourceSystem: string | null;
+  sourceId: string | null;
+  importSessionId: string | null;
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;
@@ -1355,6 +1384,7 @@ export interface TestEstimateItemRecord {
   id: string;
   estimateId: string;
   companyId: string;
+  productCatalogId: string | null;
   name: string;
   description: string | null;
   itemType: EstimateItemType;
@@ -1384,6 +1414,8 @@ export interface TestInvoiceRecord {
   total: string;
   amountPaid: string | null;
   balanceDue: string;
+  serviceFeeAmount: string;
+  bookingFeeAmount: string;
   issuedAt: Date | null;
   dueAt: Date | null;
   sentAt: Date | null;
@@ -1410,6 +1442,7 @@ export interface TestInvoiceItemRecord {
   id: string;
   invoiceId: string;
   companyId: string;
+  productCatalogId: string | null;
   name: string;
   description: string | null;
   itemType: InvoiceItemType;
@@ -2000,6 +2033,9 @@ type AnyTestRecord =
   | TestTimesheetRecord
   | TestTimesheetAuditEventRecord
   | TestTechnicianPayRateRecord
+  | TestStockLocationRecord
+  | TestStockLevelRecord
+  | TestStockMovementRecord
   | TestCompanyRecord
   | TestUserRecord
   | TestRefreshTokenRecord
@@ -2016,6 +2052,7 @@ type AnyTestRecord =
   | TestInvoiceItemRecord
   | TestPaymentRecord
   | TestJobNoteRecord
+  | TestCustomerNoteRecord
   | TestJobPhotoRecord
   | TestServiceAgreementTemplateRecord
   | TestMaintenancePlanRecord
@@ -2064,6 +2101,7 @@ type MockTable =
   | typeof invoiceItemsTable
   | typeof paymentsTable
   | typeof jobNotesTable
+  | typeof customerNotesTable
   | typeof jobPhotosTable
   | typeof serviceAgreementTemplatesTable
   | typeof maintenancePlansTable
@@ -2075,6 +2113,9 @@ type MockTable =
   | typeof campaignRecipientsTable
   | typeof messageLogsTable
   | typeof productCatalogTable
+  | typeof stockLocationsTable
+  | typeof stockLevelsTable
+  | typeof stockMovementsTable
   | typeof techniciansTable
   | typeof jobTasksTable
   | typeof jobProductsTable
@@ -2108,6 +2149,7 @@ interface TestState {
   jobs: TestJobRecord[];
   importSessions: TestImportSessionRecord[];
   importBundles: Array<Record<string, unknown> & { id: string; companyId: string }>;
+  savedCardMigrations: Array<Record<string, unknown> & { id: string; companyId: string }>;
   importChunkRuns: TestImportChunkRunRecord[];
   dataExportSessions: TestDataExportSessionRecord[];
   estimates: TestEstimateRecord[];
@@ -2116,6 +2158,7 @@ interface TestState {
   invoiceItems: TestInvoiceItemRecord[];
   payments: TestPaymentRecord[];
   jobNotes: TestJobNoteRecord[];
+  customerNotes: TestCustomerNoteRecord[];
   jobPhotos: TestJobPhotoRecord[];
   serviceAgreementTemplates: TestServiceAgreementTemplateRecord[];
   maintenancePlans: TestMaintenancePlanRecord[];
@@ -2127,6 +2170,9 @@ interface TestState {
   campaignRecipients: TestCampaignRecipientRecord[];
   messageLogs: TestMessageLogRecord[];
   productCatalog: TestProductCatalogRecord[];
+  stockLocations: TestStockLocationRecord[];
+  stockLevels: TestStockLevelRecord[];
+  stockMovements: TestStockMovementRecord[];
   technicians: TestTechnicianRecord[];
   jobTasks: TestJobTaskRecord[];
   jobProducts: TestJobProductRecord[];
@@ -2359,6 +2405,30 @@ const importChunkRunsTable = {
   deletedAt: "deletedAt"
 } as const;
 
+const savedCardMigrationsTable = {
+  __name: "savedCardMigrations",
+  id: "id",
+  companyId: "companyId",
+  importBundleId: "importBundleId",
+  createdById: "createdById",
+  status: "status",
+  priorProcessorName: "priorProcessorName",
+  stripeImportReference: "stripeImportReference",
+  mappingSummary: "mappingSummary",
+  customerMappings: "customerMappings",
+  lastError: "lastError",
+  fallbackEmailSentAt: "fallbackEmailSentAt",
+  fallbackEmailCustomerIds: "fallbackEmailCustomerIds",
+  offSessionConsentAcknowledgedAt: "offSessionConsentAcknowledgedAt",
+  offSessionConsentAcknowledgedById: "offSessionConsentAcknowledgedById",
+  offSessionConsentTextVersion: "offSessionConsentTextVersion",
+  offSessionConsentBatchId: "offSessionConsentBatchId",
+  completedAt: "completedAt",
+  createdAt: "createdAt",
+  updatedAt: "updatedAt",
+  deletedAt: "deletedAt"
+} as const;
+
 const importBundlesTable = {
   __name: "importBundles",
   id: "id",
@@ -2469,6 +2539,7 @@ const estimateItemsTable = {
   id: "id",
   estimateId: "estimateId",
   companyId: "companyId",
+  productCatalogId: "productCatalogId",
   name: "name",
   description: "description",
   itemType: "itemType",
@@ -2499,6 +2570,8 @@ const invoicesTable = {
   total: "total",
   amountPaid: "amountPaid",
   balanceDue: "balanceDue",
+  serviceFeeAmount: "serviceFeeAmount",
+  bookingFeeAmount: "bookingFeeAmount",
   issuedAt: "issuedAt",
   dueAt: "dueAt",
   sentAt: "sentAt",
@@ -2526,6 +2599,7 @@ const invoiceItemsTable = {
   id: "id",
   invoiceId: "invoiceId",
   companyId: "companyId",
+  productCatalogId: "productCatalogId",
   name: "name",
   description: "description",
   itemType: "itemType",
@@ -2547,6 +2621,10 @@ const paymentsTable = {
   customerId: "customerId",
   collectedById: "collectedById",
   amount: "amount",
+  serviceFeeAmount: "serviceFeeAmount",
+  bookingFeeAmount: "bookingFeeAmount",
+  feeRefundable: "feeRefundable",
+  amountRefunded: "amountRefunded",
   method: "method",
   status: "status",
   stripePaymentIntentId: "stripePaymentIntentId",
@@ -2571,6 +2649,23 @@ const jobNotesTable = {
   authorId: "authorId",
   content: "content",
   isInternal: "isInternal",
+  createdAt: "createdAt",
+  updatedAt: "updatedAt",
+  deletedAt: "deletedAt"
+} as const;
+
+const customerNotesTable = {
+  __name: "customerNotes",
+  id: "id",
+  companyId: "companyId",
+  customerId: "customerId",
+  authorId: "authorId",
+  content: "content",
+  isInternal: "isInternal",
+  notedAt: "notedAt",
+  sourceSystem: "sourceSystem",
+  sourceId: "sourceId",
+  importSessionId: "importSessionId",
   createdAt: "createdAt",
   updatedAt: "updatedAt",
   deletedAt: "deletedAt"
@@ -2792,6 +2887,121 @@ const messageLogsTable = {
   updatedAt: "updatedAt",
   deletedAt: "deletedAt"
 } as const;
+
+// FS-170 inventory tables.
+export interface TestStockLocationRecord {
+  id: string;
+  companyId: string;
+  name: string;
+  kind: "warehouse" | "van";
+  technicianId: string | null;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date | null;
+}
+
+export interface TestStockLevelRecord {
+  id: string;
+  companyId: string;
+  locationId: string;
+  productId: string;
+  quantity: number;
+  lowStockThreshold: number | null;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date | null;
+}
+
+export interface TestStockMovementRecord {
+  id: string;
+  companyId: string;
+  locationId: string;
+  productId: string;
+  kind: "adjustment" | "transfer_out" | "transfer_in" | "job_usage";
+  quantityDelta: number;
+  quantityAfter: number;
+  reason: string | null;
+  jobId: string | null;
+  transferGroupId: string | null;
+  allowNegative: boolean;
+  actorUserId: string | null;
+  createdAt: Date;
+}
+
+const stockLocationsTable = {
+  __name: "stockLocations",
+  id: "id", companyId: "companyId", name: "name", kind: "kind", technicianId: "technicianId",
+  isActive: "isActive", createdAt: "createdAt", updatedAt: "updatedAt", deletedAt: "deletedAt"
+} as const;
+
+const stockLevelsTable = {
+  __name: "stockLevels",
+  id: "id", companyId: "companyId", locationId: "locationId", productId: "productId", quantity: "quantity",
+  lowStockThreshold: "lowStockThreshold", createdAt: "createdAt", updatedAt: "updatedAt", deletedAt: "deletedAt"
+} as const;
+
+const stockMovementsTable = {
+  __name: "stockMovements",
+  id: "id", companyId: "companyId", locationId: "locationId", productId: "productId", kind: "kind",
+  quantityDelta: "quantityDelta", quantityAfter: "quantityAfter", reason: "reason", jobId: "jobId",
+  transferGroupId: "transferGroupId", allowNegative: "allowNegative", actorUserId: "actorUserId", createdAt: "createdAt"
+} as const;
+
+function createStockLocationRecord(
+  values: Partial<TestStockLocationRecord> & Pick<TestStockLocationRecord, "companyId" | "name" | "kind">
+): TestStockLocationRecord {
+  const now = new Date();
+  return {
+    id: values.id ?? nextId(), companyId: values.companyId, name: values.name, kind: values.kind,
+    technicianId: values.technicianId ?? null, isActive: values.isActive ?? true,
+    createdAt: values.createdAt ?? now, updatedAt: values.updatedAt ?? now, deletedAt: values.deletedAt ?? null
+  };
+}
+
+function createStockLevelRecord(
+  values: Partial<TestStockLevelRecord> & Pick<TestStockLevelRecord, "companyId" | "locationId" | "productId">
+): TestStockLevelRecord {
+  const now = new Date();
+  return {
+    id: values.id ?? nextId(), companyId: values.companyId, locationId: values.locationId, productId: values.productId,
+    quantity: values.quantity ?? 0, lowStockThreshold: values.lowStockThreshold ?? null,
+    createdAt: values.createdAt ?? now, updatedAt: values.updatedAt ?? now, deletedAt: values.deletedAt ?? null
+  };
+}
+
+function createStockMovementRecord(
+  values: Partial<TestStockMovementRecord> &
+    Pick<TestStockMovementRecord, "companyId" | "locationId" | "productId" | "kind" | "quantityDelta" | "quantityAfter">
+): TestStockMovementRecord {
+  return {
+    id: values.id ?? nextId(), companyId: values.companyId, locationId: values.locationId, productId: values.productId,
+    kind: values.kind, quantityDelta: values.quantityDelta, quantityAfter: values.quantityAfter,
+    reason: values.reason ?? null, jobId: values.jobId ?? null, transferGroupId: values.transferGroupId ?? null,
+    allowNegative: values.allowNegative ?? false, actorUserId: values.actorUserId ?? null,
+    createdAt: values.createdAt ?? new Date()
+  };
+}
+
+export function seedStockLocation(
+  values: Partial<TestStockLocationRecord> & Pick<TestStockLocationRecord, "companyId" | "name" | "kind">
+): TestStockLocationRecord {
+  const record = createStockLocationRecord(values);
+  state.stockLocations.push(record);
+  return record;
+}
+
+export function seedStockLevel(
+  values: Partial<TestStockLevelRecord> & Pick<TestStockLevelRecord, "companyId" | "locationId" | "productId">
+): TestStockLevelRecord {
+  const record = createStockLevelRecord(values);
+  state.stockLevels.push(record);
+  return record;
+}
+
+export function getStockMovements(): TestStockMovementRecord[] {
+  return state.stockMovements;
+}
 
 const productCatalogTable = {
   __name: "productCatalog",
@@ -3348,6 +3558,7 @@ const state: TestState = {
   jobs: [],
   importSessions: [],
   importBundles: [],
+  savedCardMigrations: [],
   importChunkRuns: [],
   dataExportSessions: [],
   estimates: [],
@@ -3356,6 +3567,7 @@ const state: TestState = {
   invoiceItems: [],
   payments: [],
   jobNotes: [],
+  customerNotes: [],
   jobPhotos: [],
   serviceAgreementTemplates: [],
   maintenancePlans: [],
@@ -3367,6 +3579,9 @@ const state: TestState = {
   campaignRecipients: [],
   messageLogs: [],
   productCatalog: [],
+  stockLocations: [],
+  stockLevels: [],
+  stockMovements: [],
   technicians: [],
   jobTasks: [],
   jobProducts: [],
@@ -3416,6 +3631,7 @@ function restoreState(snapshot: TestState): void {
   state.invoiceItems.splice(0, state.invoiceItems.length, ...snapshot.invoiceItems);
   state.payments.splice(0, state.payments.length, ...snapshot.payments);
   state.jobNotes.splice(0, state.jobNotes.length, ...snapshot.jobNotes);
+  state.customerNotes.splice(0, state.customerNotes.length, ...snapshot.customerNotes);
   state.jobPhotos.splice(0, state.jobPhotos.length, ...snapshot.jobPhotos);
   state.serviceAgreementTemplates.splice(0, state.serviceAgreementTemplates.length, ...snapshot.serviceAgreementTemplates);
   state.maintenancePlans.splice(0, state.maintenancePlans.length, ...snapshot.maintenancePlans);
@@ -3426,6 +3642,9 @@ function restoreState(snapshot: TestState): void {
   state.campaignRecipients.splice(0, state.campaignRecipients.length, ...snapshot.campaignRecipients);
   state.messageLogs.splice(0, state.messageLogs.length, ...snapshot.messageLogs);
   state.productCatalog.splice(0, state.productCatalog.length, ...snapshot.productCatalog);
+  state.stockLocations.splice(0, state.stockLocations.length, ...snapshot.stockLocations);
+  state.stockLevels.splice(0, state.stockLevels.length, ...snapshot.stockLevels);
+  state.stockMovements.splice(0, state.stockMovements.length, ...snapshot.stockMovements);
   state.technicians.splice(0, state.technicians.length, ...snapshot.technicians);
   state.jobTasks.splice(0, state.jobTasks.length, ...snapshot.jobTasks);
   state.jobProducts.splice(0, state.jobProducts.length, ...snapshot.jobProducts);
@@ -3482,6 +3701,8 @@ function getRows(tableName: TableName): AnyTestRecord[] {
       return state.importSessions;
     case "importBundles":
       return state.importBundles as unknown as AnyTestRecord[];
+    case "savedCardMigrations":
+      return state.savedCardMigrations as unknown as AnyTestRecord[];
     case "importChunkRuns":
       return state.importChunkRuns;
     case "dataExportSessions":
@@ -3498,6 +3719,8 @@ function getRows(tableName: TableName): AnyTestRecord[] {
       return state.payments;
     case "jobNotes":
       return state.jobNotes;
+    case "customerNotes":
+      return state.customerNotes;
     case "jobPhotos":
       return state.jobPhotos;
     case "serviceAgreementTemplates":
@@ -3520,6 +3743,12 @@ function getRows(tableName: TableName): AnyTestRecord[] {
       return state.messageLogs;
     case "productCatalog":
       return state.productCatalog;
+    case "stockLocations":
+      return state.stockLocations;
+    case "stockLevels":
+      return state.stockLevels;
+    case "stockMovements":
+      return state.stockMovements;
     case "technicians":
       return state.technicians;
     case "jobTasks":
@@ -3987,6 +4216,7 @@ function createEstimateItemRecord(
     id: values.id ?? nextId(),
     estimateId: values.estimateId,
     companyId: values.companyId,
+    productCatalogId: values.productCatalogId ?? null,
     name: values.name,
     description: values.description ?? null,
     itemType: values.itemType ?? "service",
@@ -4023,6 +4253,8 @@ function createInvoiceRecord(
     total: values.total ?? "0.00",
     amountPaid: values.amountPaid ?? "0.00",
     balanceDue: values.balanceDue ?? values.total ?? "0.00",
+    serviceFeeAmount: values.serviceFeeAmount ?? "0.00",
+    bookingFeeAmount: values.bookingFeeAmount ?? "0.00",
     issuedAt: values.issuedAt ?? null,
     dueAt: values.dueAt ?? null,
     sentAt: values.sentAt ?? null,
@@ -4056,6 +4288,7 @@ function createInvoiceItemRecord(
     id: values.id ?? nextId(),
     invoiceId: values.invoiceId,
     companyId: values.companyId,
+    productCatalogId: values.productCatalogId ?? null,
     name: values.name,
     description: values.description ?? null,
     itemType: values.itemType ?? "service",
@@ -4083,6 +4316,10 @@ function createPaymentRecord(
     customerId: values.customerId,
     collectedById: values.collectedById ?? null,
     amount: values.amount,
+    serviceFeeAmount: values.serviceFeeAmount ?? "0.00",
+    bookingFeeAmount: values.bookingFeeAmount ?? "0.00",
+    feeRefundable: values.feeRefundable ?? false,
+    amountRefunded: values.amountRefunded ?? "0.00",
     method: values.method ?? "card",
     status: values.status ?? "pending",
     stripePaymentIntentId: values.stripePaymentIntentId ?? null,
@@ -4113,6 +4350,29 @@ function createJobNoteRecord(
     authorId: values.authorId ?? null,
     content: values.content,
     isInternal: values.isInternal ?? true,
+    createdAt: values.createdAt ?? now,
+    updatedAt: values.updatedAt ?? now,
+    deletedAt: values.deletedAt ?? null
+  };
+}
+
+function createCustomerNoteRecord(
+  values: Partial<TestCustomerNoteRecord> &
+    Pick<TestCustomerNoteRecord, "companyId" | "customerId" | "content">
+): TestCustomerNoteRecord {
+  const now = new Date();
+
+  return {
+    id: values.id ?? nextId(),
+    companyId: values.companyId,
+    customerId: values.customerId,
+    authorId: values.authorId ?? null,
+    content: values.content,
+    isInternal: values.isInternal ?? true,
+    notedAt: values.notedAt ?? null,
+    sourceSystem: values.sourceSystem ?? null,
+    sourceId: values.sourceId ?? null,
+    importSessionId: values.importSessionId ?? null,
     createdAt: values.createdAt ?? now,
     updatedAt: values.updatedAt ?? now,
     deletedAt: values.deletedAt ?? null
@@ -4979,6 +5239,11 @@ function createRow(tableName: TableName, values: Record<string, unknown>): AnyTe
         values as Partial<Parameters<typeof seedImportBundle>[0]> &
           Pick<Parameters<typeof seedImportBundle>[0], "companyId">
       ) as unknown as AnyTestRecord;
+    case "savedCardMigrations":
+      return seedSavedCardMigration(
+        values as Partial<Parameters<typeof seedSavedCardMigration>[0]> &
+          Pick<Parameters<typeof seedSavedCardMigration>[0], "companyId" | "priorProcessorName">
+      ) as unknown as AnyTestRecord;
     case "importChunkRuns":
       return createImportChunkRunRecord(
         values as Partial<TestImportChunkRunRecord> &
@@ -5022,6 +5287,11 @@ function createRow(tableName: TableName, values: Record<string, unknown>): AnyTe
     case "jobNotes":
       return createJobNoteRecord(
         values as Partial<TestJobNoteRecord> & Pick<TestJobNoteRecord, "companyId" | "jobId" | "content">
+      );
+    case "customerNotes":
+      return createCustomerNoteRecord(
+        values as Partial<TestCustomerNoteRecord> &
+          Pick<TestCustomerNoteRecord, "companyId" | "customerId" | "content">
       );
     case "jobPhotos":
       return createJobPhotoRecord(
@@ -5085,6 +5355,12 @@ function createRow(tableName: TableName, values: Record<string, unknown>): AnyTe
         values as Partial<TestMessageLogRecord> &
           Pick<TestMessageLogRecord, "companyId" | "channel" | "direction" | "toAddress" | "body">
       );
+    case "stockLocations":
+      return createStockLocationRecord(values as Partial<TestStockLocationRecord> & Pick<TestStockLocationRecord, "companyId" | "name" | "kind">);
+    case "stockLevels":
+      return createStockLevelRecord(values as Partial<TestStockLevelRecord> & Pick<TestStockLevelRecord, "companyId" | "locationId" | "productId">);
+    case "stockMovements":
+      return createStockMovementRecord(values as Partial<TestStockMovementRecord> & Pick<TestStockMovementRecord, "companyId" | "locationId" | "productId" | "kind" | "quantityDelta" | "quantityAfter">);
     case "productCatalog":
       return createProductCatalogRecord(
         values as Partial<TestProductCatalogRecord> &
@@ -5490,6 +5766,7 @@ export const assets = assetsTable;
 export const jobs = jobsTable;
 export const importSessions = importSessionsTable;
 export const importBundles = importBundlesTable;
+export const savedCardMigrations = savedCardMigrationsTable;
 export const importChunkRuns = importChunkRunsTable;
 export const dataExportSessions = dataExportSessionsTable;
 export const estimates = estimatesTable;
@@ -5498,6 +5775,7 @@ export const invoices = invoicesTable;
 export const invoiceItems = invoiceItemsTable;
 export const payments = paymentsTable;
 export const jobNotes = jobNotesTable;
+export const customerNotes = customerNotesTable;
 export const jobPhotos = jobPhotosTable;
 export const serviceAgreementTemplates = serviceAgreementTemplatesTable;
 export const maintenancePlans = maintenancePlansTable;
@@ -5509,6 +5787,9 @@ export const campaigns = campaignsTable;
 export const campaignRecipients = campaignRecipientsTable;
 export const messageLogs = messageLogsTable;
 export const productCatalog = productCatalogTable;
+export const stockLocations = stockLocationsTable;
+export const stockLevels = stockLevelsTable;
+export const stockMovements = stockMovementsTable;
 export const technicians = techniciansTable;
 export const jobTasks = jobTasksTable;
 export const jobProducts = jobProductsTable;
@@ -5931,6 +6212,7 @@ export function createDbModuleMock() {
     jobs,
     importSessions,
     importBundles,
+    savedCardMigrations,
     importChunkRuns,
     dataExportSessions,
     estimates,
@@ -5939,6 +6221,7 @@ export function createDbModuleMock() {
     invoiceItems,
     payments,
     jobNotes,
+    customerNotes,
     jobPhotos,
     serviceAgreementTemplates,
     maintenancePlans,
@@ -5950,6 +6233,9 @@ export function createDbModuleMock() {
     campaignRecipients,
     messageLogs,
     productCatalog,
+    stockLocations,
+    stockLevels,
+    stockMovements,
     technicians,
     jobTasks,
     jobProducts,
@@ -5992,6 +6278,7 @@ export function resetTestState(): void {
   state.jobs.length = 0;
   state.importSessions.length = 0;
   state.importBundles.length = 0;
+  state.savedCardMigrations.length = 0;
   state.importChunkRuns.length = 0;
   state.dataExportSessions.length = 0;
   state.estimates.length = 0;
@@ -6000,6 +6287,7 @@ export function resetTestState(): void {
   state.invoiceItems.length = 0;
   state.payments.length = 0;
   state.jobNotes.length = 0;
+  state.customerNotes.length = 0;
   state.jobPhotos.length = 0;
   state.serviceAgreementTemplates.length = 0;
   state.maintenancePlans.length = 0;
@@ -6011,6 +6299,9 @@ export function resetTestState(): void {
   state.campaignRecipients.length = 0;
   state.messageLogs.length = 0;
   state.productCatalog.length = 0;
+  state.stockLocations.length = 0;
+  state.stockLevels.length = 0;
+  state.stockMovements.length = 0;
   state.technicians.length = 0;
   state.jobTasks.length = 0;
   state.jobProducts.length = 0;
@@ -6166,6 +6457,15 @@ export function seedJobNote(
 ): TestJobNoteRecord {
   const record = createJobNoteRecord(values);
   state.jobNotes.push(record);
+  return record;
+}
+
+export function seedCustomerNote(
+  values: Partial<TestCustomerNoteRecord> &
+    Pick<TestCustomerNoteRecord, "companyId" | "customerId" | "content">
+): TestCustomerNoteRecord {
+  const record = createCustomerNoteRecord(values);
+  state.customerNotes.push(record);
   return record;
 }
 
@@ -6390,6 +6690,55 @@ export function seedAgentAction(
     ...values
   });
   state.agentActions.push(record);
+  return record;
+}
+
+export function seedSavedCardMigration(
+  values: Partial<{
+    id: string;
+    companyId: string;
+    importBundleId: string | null;
+    createdById: string | null;
+    status: string;
+    priorProcessorName: string;
+    stripeImportReference: string | null;
+    mappingSummary: Record<string, unknown>;
+    customerMappings: unknown[];
+    lastError: string | null;
+    fallbackEmailSentAt: Date | null;
+    fallbackEmailCustomerIds: string[];
+    offSessionConsentAcknowledgedAt: Date | null;
+    offSessionConsentAcknowledgedById: string | null;
+    offSessionConsentTextVersion: string | null;
+    offSessionConsentBatchId: string | null;
+    completedAt: Date | null;
+  }> &
+    Pick<{ companyId: string; priorProcessorName: string }, "companyId" | "priorProcessorName">
+) {
+  const now = new Date();
+  const record = {
+    id: values.id ?? randomUUID(),
+    companyId: values.companyId,
+    importBundleId: values.importBundleId ?? null,
+    createdById: values.createdById ?? null,
+    status: values.status ?? "requested",
+    priorProcessorName: values.priorProcessorName,
+    stripeImportReference: values.stripeImportReference ?? null,
+    mappingSummary: values.mappingSummary ?? { matched: 0, unmatched: 0, failed: 0, total: 0 },
+    customerMappings: values.customerMappings ?? [],
+    lastError: values.lastError ?? null,
+    fallbackEmailSentAt: values.fallbackEmailSentAt ?? null,
+    fallbackEmailCustomerIds: values.fallbackEmailCustomerIds ?? [],
+    offSessionConsentAcknowledgedAt: values.offSessionConsentAcknowledgedAt ?? null,
+    offSessionConsentAcknowledgedById: values.offSessionConsentAcknowledgedById ?? null,
+    offSessionConsentTextVersion: values.offSessionConsentTextVersion ?? null,
+    offSessionConsentBatchId: values.offSessionConsentBatchId ?? null,
+    completedAt: values.completedAt ?? null,
+    createdAt: now,
+    updatedAt: now,
+    deletedAt: null
+  };
+  state.savedCardMigrations.push(record);
   return record;
 }
 

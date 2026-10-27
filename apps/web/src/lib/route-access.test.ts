@@ -42,7 +42,7 @@ describe("isPublicRoute", () => {
     expect(isPublicRoute("/portal/agreements/tok_abc")).toBe(true);
     expect(isPublicRoute("/vip")).toBe(false);
     expect(isPublicRoute("/vip/join")).toBe(false);
-    expect(isPublicRoute("/portal")).toBe(false);
+    expect(isPublicRoute("/portal")).toBe(true); // FS-179 customer portal (token in URL fragment)
     expect(isPublicRoute("/portal/agreements")).toBe(false);
     expect(isPublicRoute("/portal/settings/x")).toBe(false);
   });

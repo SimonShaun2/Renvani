@@ -384,6 +384,12 @@ export const activityEventTypeEnum = pgEnum("activity_event_type", [
   "revenue.inquiry_qualified",
   "revenue.inquiry_received",
   "revenue.inquiry_escalated",
+  // Saved card migration (FS-138)
+  "payment_method_migration.requested",
+  "payment_method_migration.mappings_applied",
+  "payment_method_migration.stripe_import_confirmed",
+  "payment_method_migration.completed",
+  "payment_method_migration.fallback_sent",
 ]);
 
 export const aiRecommendationTypeEnum = pgEnum("ai_recommendation_type", [
@@ -921,6 +927,7 @@ export const estimateItems = pgTable("estimate_items", {
   id: id(),
   estimateId: uuid("estimate_id").notNull().references(() => estimates.id, { onDelete: "cascade" }),
   companyId: companyId(),
+  productCatalogId: uuid("product_catalog_id").references(() => productCatalog.id, { onDelete: "set null" }),
   // Item
   name: varchar("name", { length: 255 }).notNull(),
   description: text("description"),
@@ -954,6 +961,9 @@ export const invoices = pgTable("invoices", {
   total: decimal("total", { precision: 10, scale: 2 }).notNull().default("0"),
   amountPaid: decimal("amount_paid", { precision: 10, scale: 2 }).default("0"),
   balanceDue: decimal("balance_due", { precision: 10, scale: 2 }).notNull().default("0"),
+  // Customer-paid checkout fees collected (separate lines; never part of total/tax/balance). 0043.
+  serviceFeeAmount: decimal("service_fee_amount", { precision: 10, scale: 2 }).notNull().default("0"),
+  bookingFeeAmount: decimal("booking_fee_amount", { precision: 10, scale: 2 }).notNull().default("0"),
   // Dates
   issuedAt: timestamp("issued_at"),
   dueAt: timestamp("due_at"),
@@ -1013,6 +1023,12 @@ export const payments = pgTable("payments", {
   collectedById: uuid("collected_by_id").references(() => users.id),
   // Amounts
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  // Customer-paid fees on top of `amount` (checkout only). Non-refundable. 0043.
+  serviceFeeAmount: decimal("service_fee_amount", { precision: 10, scale: 2 }).notNull().default("0"),
+  bookingFeeAmount: decimal("booking_fee_amount", { precision: 10, scale: 2 }).notNull().default("0"),
+  feeRefundable: boolean("fee_refundable").notNull().default(false),
+  /** Refunded portion of `amount` only; fees are never refunded. */
+  amountRefunded: decimal("amount_refunded", { precision: 10, scale: 2 }).notNull().default("0"),
   method: paymentMethodEnum("method").notNull(),
   status: paymentStatusEnum("status").notNull().default("pending"),
   // Stripe
@@ -1420,6 +1436,48 @@ export const importBundles = pgTable("import_bundles", {
   companyIdx: index("import_bundles_company_idx").on(t.companyId),
 }));
 
+export const savedCardMigrationStatusEnum = pgEnum("saved_card_migration_status", [
+  "requested",
+  "awaiting_stripe_import",
+  "mapping",
+  "completed",
+  "failed",
+  "fallback_required"
+]);
+
+/** Stripe PAN import orchestration (FS-138); no raw card data stored. */
+export const savedCardMigrations = pgTable("saved_card_migrations", {
+  id: id(),
+  companyId: companyId(),
+  importBundleId: uuid("import_bundle_id").references(() => importBundles.id),
+  createdById: uuid("created_by_id").references(() => users.id),
+  status: savedCardMigrationStatusEnum("status").notNull().default("requested"),
+  priorProcessorName: varchar("prior_processor_name", { length: 120 }).notNull(),
+  /** Stripe-side import reference (job/file id); never PAN or full card numbers. */
+  stripeImportReference: varchar("stripe_import_reference", { length: 255 }),
+  mappingSummary: jsonb("mapping_summary")
+    .notNull()
+    .default({ matched: 0, unmatched: 0, failed: 0, total: 0 }),
+  customerMappings: jsonb("customer_mappings").notNull().default([]),
+  lastError: text("last_error"),
+  fallbackEmailSentAt: timestamp("fallback_email_sent_at"),
+  /** Renvani customer ids already sent the re-enter-card fallback email (per-customer dedupe). */
+  fallbackEmailCustomerIds: jsonb("fallback_email_customer_ids").notNull().default([]),
+  /** Owner acknowledgment that customers consented to off-session charges (required before apply-mappings). */
+  offSessionConsentAcknowledgedAt: timestamp("off_session_consent_acknowledged_at"),
+  offSessionConsentAcknowledgedById: uuid("off_session_consent_acknowledged_by_id").references(() => users.id),
+  /** Version of SAVED_CARD_OFF_SESSION_CONSENT_ACK_TEXT the owner acknowledged. */
+  offSessionConsentTextVersion: varchar("off_session_consent_text_version", { length: 64 }),
+  /** Mapping batch (apply-mappings request) the acknowledgment was recorded for. */
+  offSessionConsentBatchId: uuid("off_session_consent_batch_id"),
+  completedAt: timestamp("completed_at"),
+  ...timestamps,
+}, (t) => ({
+  companyIdx: index("saved_card_migrations_company_idx").on(t.companyId),
+  bundleIdx: index("saved_card_migrations_bundle_idx").on(t.importBundleId),
+  statusIdx: index("saved_card_migrations_status_idx").on(t.status),
+}));
+
 // Tracks a single CSV import session from upload through completion
 // Supports rollback: all records created by an import are tagged with import_session_id
 export const importSessions = pgTable("import_sessions", {
@@ -1686,6 +1744,65 @@ export const jobProducts = pgTable("job_products", {
 }, (t) => ({
   companyIdx: index("job_products_company_idx").on(t.companyId),
   jobIdx: index("job_products_job_idx").on(t.jobId),
+}));
+
+// FS-170 inventory: stock locations, per-location levels, append-only movements.
+export const stockLocationKindEnum = pgEnum("stock_location_kind", ["warehouse", "van"]);
+export const stockMovementKindEnum = pgEnum("stock_movement_kind", [
+  "adjustment",
+  "transfer_out",
+  "transfer_in",
+  "job_usage",
+]);
+
+export const stockLocations = pgTable("stock_locations", {
+  id: id(),
+  companyId: companyId(),
+  name: varchar("name", { length: 255 }).notNull(),
+  kind: stockLocationKindEnum("kind").notNull(),
+  technicianId: uuid("technician_id").references(() => technicians.id, { onDelete: "set null" }),
+  isActive: boolean("is_active").notNull().default(true),
+  ...timestamps,
+}, (t) => ({
+  companyIdx: index("stock_locations_company_idx").on(t.companyId),
+}));
+
+export const stockLevels = pgTable("stock_levels", {
+  id: id(),
+  companyId: companyId(),
+  locationId: uuid("location_id").notNull().references(() => stockLocations.id, { onDelete: "cascade" }),
+  productId: uuid("product_id").notNull().references(() => productCatalog.id, { onDelete: "cascade" }),
+  quantity: integer("quantity").notNull().default(0),
+  lowStockThreshold: integer("low_stock_threshold"),
+  ...timestamps,
+}, (t) => ({
+  companyIdx: index("stock_levels_company_idx").on(t.companyId),
+  locationProductIdx: uniqueIndex("stock_levels_company_location_product_idx").on(
+    t.companyId,
+    t.locationId,
+    t.productId
+  ),
+}));
+
+/** Append-only audit trail; UPDATE/DELETE are rejected by a trigger (migration 0044). */
+export const stockMovements = pgTable("stock_movements", {
+  id: id(),
+  companyId: companyId(),
+  locationId: uuid("location_id").notNull().references(() => stockLocations.id, { onDelete: "cascade" }),
+  productId: uuid("product_id").notNull().references(() => productCatalog.id, { onDelete: "cascade" }),
+  kind: stockMovementKindEnum("kind").notNull(),
+  quantityDelta: integer("quantity_delta").notNull(),
+  quantityAfter: integer("quantity_after").notNull(),
+  reason: text("reason"),
+  jobId: uuid("job_id").references(() => jobs.id, { onDelete: "set null" }),
+  transferGroupId: uuid("transfer_group_id"),
+  allowNegative: boolean("allow_negative").notNull().default(false),
+  actorUserId: uuid("actor_user_id").references(() => users.id, { onDelete: "set null" }),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+}, (t) => ({
+  companyIdx: index("stock_movements_company_idx").on(t.companyId),
+  locationProductIdx: index("stock_movements_location_product_idx").on(t.locationId, t.productId),
+  jobIdx: index("stock_movements_job_idx").on(t.jobId),
 }));
 
 export const timeEntries = pgTable("time_entries", {

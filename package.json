@@ -14,6 +14,8 @@
     "qa:branded-site": "bash scripts/qa-branded-site-local.sh",
     "check:env-docs": "node scripts/check-env-documentation.mjs",
     "test:neon-ci": "corepack pnpm --filter \"@fsm/config...\" --filter \"@fsm/db...\" build && node scripts/ci/neon-per-pr-branch.mjs",
+    "test:golden-import-e2e": "node scripts/ci/golden-import-e2e.mjs",
+    "test:golden-import-e2e-wiring": "node --test scripts/ci/golden-import-e2e.test.mjs",
     "test:neon-ci-wiring": "node --test scripts/ci/neon-per-pr-branch.test.mjs",
     "test:cross-tenant": "corepack pnpm --filter @fsm/config exec vitest run src/import-bundle-storage.test.ts src/object-storage/import-bundle-object-storage.test.ts && corepack pnpm --filter @fsm/api test:cross-tenant"
   },

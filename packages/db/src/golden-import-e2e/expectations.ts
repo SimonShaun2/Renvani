@@ -77,3 +77,20 @@ export const GOLDEN_IMPORT_E2E_EXPECTATIONS: Record<
     }
   ]
 };
+
+/** Expected invoice money after invoices + itemized payments import (payments replace the aggregate placeholder). */
+export interface GoldenImportE2eInvoiceBalanceExpectation {
+  sourceId: string;
+  total: string;
+  amountPaid: string;
+  balanceDue: string;
+}
+
+export const GOLDEN_IMPORT_E2E_INVOICE_BALANCES: Partial<
+  Record<GoldenImportE2eSourceSystem, readonly GoldenImportE2eInvoiceBalanceExpectation[]>
+> = {
+  qbd: [
+    { sourceId: "QBD-INV-001", total: "220.00", amountPaid: "220.00", balanceDue: "0.00" },
+    { sourceId: "QBD-INV-002", total: "410.00", amountPaid: "360.00", balanceDue: "50.00" }
+  ]
+};

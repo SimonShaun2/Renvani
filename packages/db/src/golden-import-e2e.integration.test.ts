@@ -4,6 +4,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import {
   GOLDEN_IMPORT_E2E_EXPECTATIONS,
+  GOLDEN_IMPORT_E2E_INVOICE_BALANCES,
   GOLDEN_IMPORT_E2E_SOURCE_SYSTEMS
 } from "./golden-import-e2e/expectations.js";
 
@@ -11,7 +12,11 @@ const neonCiUrl = process.env.NEON_CI_DATABASE_URL?.trim();
 const postgresIntegrationEnabled =
   typeof neonCiUrl === "string" && neonCiUrl.startsWith("postgres");
 
-describe.runIf(postgresIntegrationEnabled)("FS-152 golden import e2e (Neon CI)", () => {
+/** Remote Neon round-trips make each golden bundle take well over vitest's 5s default. */
+const GOLDEN_E2E_TEST_TIMEOUT_MS = 120_000;
+const GOLDEN_E2E_HOOK_TIMEOUT_MS = 60_000;
+
+describe.runIf(postgresIntegrationEnabled)("FS-152 golden import e2e (Neon CI)", { timeout: GOLDEN_E2E_TEST_TIMEOUT_MS }, () => {
   /** Companies seeded by this file; deleted in afterAll (tenant rows cascade) so the shared staging DB stays clean. */
   const seededCompanyIds: string[] = [];
 
@@ -27,7 +32,7 @@ describe.runIf(postgresIntegrationEnabled)("FS-152 golden import e2e (Neon CI)",
     process.env.DATABASE_URL = neonCiUrl;
     process.env.BOOKING_HOLD_TOKEN_SECRET =
       process.env.BOOKING_HOLD_TOKEN_SECRET ?? "booking_hold_test_secret";
-  });
+  }, GOLDEN_E2E_HOOK_TIMEOUT_MS);
 
   /**
    * Non-owner, NOBYPASSRLS role used only for the cross-tenant read. The CI/app connection role
@@ -56,7 +61,7 @@ $$`)
   afterAll(async () => {
     const { deleteGoldenE2eCompanies } = await import("./golden-import-e2e/pipeline.js");
     await deleteGoldenE2eCompanies(seededCompanyIds);
-  });
+  }, GOLDEN_E2E_HOOK_TIMEOUT_MS);
 
   for (const sourceSystem of GOLDEN_IMPORT_E2E_SOURCE_SYSTEMS) {
     it(`runs ${sourceSystem} golden bundle parse → map → commit with lineage`, async () => {
@@ -75,6 +80,38 @@ $$`)
         for (const sourceId of entity.sampleSourceIds) {
           const rowId = await findLineageRowId(companyId, sourceSystem, entity.table, sourceId);
           expect(rowId).toBeTruthy();
+        }
+      }
+
+      const balances = GOLDEN_IMPORT_E2E_INVOICE_BALANCES[sourceSystem] ?? [];
+      if (balances.length > 0) {
+        const { and, eq, inArray } = await import("drizzle-orm");
+        const { db } = await import("./client.js");
+        const { invoices } = await import("./schema.js");
+        const rows = await db
+          .select({
+            sourceId: invoices.sourceId,
+            total: invoices.total,
+            amountPaid: invoices.amountPaid,
+            balanceDue: invoices.balanceDue
+          })
+          .from(invoices)
+          .where(
+            and(
+              eq(invoices.companyId, companyId),
+              inArray(
+                invoices.sourceId,
+                balances.map((entry) => entry.sourceId)
+              )
+            )
+          );
+        const bySourceId = new Map(rows.map((row) => [row.sourceId, row]));
+        for (const expected of balances) {
+          const actual = bySourceId.get(expected.sourceId);
+          expect(actual).toBeTruthy();
+          expect(Number(actual?.total)).toBe(Number(expected.total));
+          expect(Number(actual?.amountPaid)).toBe(Number(expected.amountPaid));
+          expect(Number(actual?.balanceDue)).toBe(Number(expected.balanceDue));
         }
       }
     });

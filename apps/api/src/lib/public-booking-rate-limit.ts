@@ -20,6 +20,12 @@ const authLoginTimesByIp = new Map<string, number[]>();
 const authRefreshTimesByIp = new Map<string, number[]>();
 const authForgotPasswordTimesByIp = new Map<string, number[]>();
 const signupAttemptNoticeTimesByEmail = new Map<string, number[]>();
+const savedCardApplyTimesByCompany = new Map<string, number[]>();
+const savedCardFallbackTimesByCompany = new Map<string, number[]>();
+
+/** FS-138: per-company limits on saved-card migration writes (per hour). */
+export const SAVED_CARD_APPLY_MAPPINGS_RATE_LIMIT = 30;
+export const SAVED_CARD_FALLBACK_EMAIL_RATE_LIMIT = 100;
 
 export const PUBLIC_BOOKING_IP_RATE_LIMIT = 10;
 export const PUBLIC_SLOT_HOLD_REF_RATE_LIMIT = 15;
@@ -174,7 +180,27 @@ export async function checkSignupAttemptNoticeCooldown(email: string): Promise<b
   );
 }
 
+export async function checkSavedCardApplyMappingsRateLimit(companyId: string): Promise<boolean> {
+  return recordAttempt(
+    savedCardApplyTimesByCompany,
+    "fsm:saved-card-migration:rate:apply",
+    companyId,
+    SAVED_CARD_APPLY_MAPPINGS_RATE_LIMIT
+  );
+}
+
+export async function checkSavedCardFallbackEmailRateLimit(companyId: string): Promise<boolean> {
+  return recordAttempt(
+    savedCardFallbackTimesByCompany,
+    "fsm:saved-card-migration:rate:fallback-email",
+    companyId,
+    SAVED_CARD_FALLBACK_EMAIL_RATE_LIMIT
+  );
+}
+
 export function resetPublicBookingRateLimitStateForTests(): void {
+  savedCardApplyTimesByCompany.clear();
+  savedCardFallbackTimesByCompany.clear();
   signupAttemptNoticeTimesByEmail.clear();
   authRegisterTimesByIp.clear();
   authLoginTimesByIpEmail.clear();

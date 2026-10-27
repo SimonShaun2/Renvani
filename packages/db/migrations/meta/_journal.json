@@ -309,6 +309,27 @@
       "when": 1792716506138,
       "tag": "0043_payments_service_fee_booking_fee",
       "breakpoints": true
+    },
+    {
+      "idx": 44,
+      "version": "7",
+      "when": 1792716506139,
+      "tag": "0044_fs170_inventory",
+      "breakpoints": true
+    },
+    {
+      "idx": 45,
+      "version": "7",
+      "when": 1792716506140,
+      "tag": "0045_fs171_timesheets_payroll",
+      "breakpoints": true
+    },
+    {
+      "idx": 46,
+      "version": "7",
+      "when": 1792716506141,
+      "tag": "0046_fs171_open_time_entry_unique",
+      "breakpoints": true
     }
   ]
 }

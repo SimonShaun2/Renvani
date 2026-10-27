@@ -47,6 +47,7 @@ import loyaltyRoutes from "./routes/loyalty/index.js";
 import messageLogRoutes from "./routes/message-logs/index.js";
 import operatorRoutes from "./routes/operator/index.js";
 import publicRoutes from "./routes/public/index.js";
+import inventoryRoutes from "./routes/inventory/index.js";
 import priceBookRoutes from "./routes/price-book/index.js";
 import productRoutes from "./routes/products/index.js";
 import qboSyncRoutes from "./routes/qbo-sync/index.js";
@@ -63,6 +64,7 @@ import technicianExtensionRoutes from "./routes/technician-extensions/index.js";
 import technicianRoutes from "./routes/technicians/index.js";
 import userRoutes from "./routes/users/index.js";
 import timeRoutes from "./routes/time/index.js";
+import timesheetRoutes from "./routes/timesheets/index.js";
 
 /** FS-66 — TRUST_PROXY_HOPS → Fastify trustProxy (0 = false; N = trust N hops of X-Forwarded-For). */
 export function resolveTrustProxySetting(hops: number): false | number {
@@ -131,11 +133,13 @@ export async function buildApp() {
   await app.register(jobEngagementRoutes, { prefix: "/api/v1/jobs" });
   await app.register(messageLogRoutes, { prefix: "/api/v1" });
   await app.register(productRoutes, { prefix: "/api/v1" });
+  await app.register(inventoryRoutes, { prefix: "/api/v1" });
   await app.register(priceBookRoutes, { prefix: "/api/v1" });
   await app.register(technicianRoutes, { prefix: "/api/v1/technicians" });
   await app.register(userRoutes, { prefix: "/api/v1/users" });
   await app.register(technicianExtensionRoutes, { prefix: "/api/v1/technicians" });
   await app.register(timeRoutes, { prefix: "/api/v1/time" });
+  await app.register(timesheetRoutes, { prefix: "/api/v1" });
   await app.register(stripeRoutes, { prefix: "/api/v1/stripe" });
   await app.register(billingRoutes, { prefix: "/api/v1/billing" });
   await app.register(estimateRoutes, { prefix: "/api/v1/estimates" });

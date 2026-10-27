@@ -34,12 +34,18 @@ type TableName =
   | "campaignRecipients"
   | "messageLogs"
   | "productCatalog"
+  | "stockLocations"
+  | "stockLevels"
+  | "stockMovements"
   | "technicians"
   | "jobTasks"
   | "jobProducts"
   | "scheduleSlots"
   | "activityEvents"
   | "timeEntries"
+  | "timesheets"
+  | "timesheetAuditEvents"
+  | "technicianPayRates"
   | "reviewRequests"
   | "fileAttachments"
   | "onTheWayNotifications"
@@ -2024,6 +2030,12 @@ export interface TestBookingSettingsRecord {
 }
 
 type AnyTestRecord =
+  | TestTimesheetRecord
+  | TestTimesheetAuditEventRecord
+  | TestTechnicianPayRateRecord
+  | TestStockLocationRecord
+  | TestStockLevelRecord
+  | TestStockMovementRecord
   | TestCompanyRecord
   | TestUserRecord
   | TestRefreshTokenRecord
@@ -2101,12 +2113,18 @@ type MockTable =
   | typeof campaignRecipientsTable
   | typeof messageLogsTable
   | typeof productCatalogTable
+  | typeof stockLocationsTable
+  | typeof stockLevelsTable
+  | typeof stockMovementsTable
   | typeof techniciansTable
   | typeof jobTasksTable
   | typeof jobProductsTable
   | typeof scheduleSlotsTable
   | typeof activityEventsTable
   | typeof timeEntriesTable
+  | typeof timesheetsTable
+  | typeof timesheetAuditEventsTable
+  | typeof technicianPayRatesTable
   | typeof reviewRequestsTable
   | typeof fileAttachmentsTable
   | typeof onTheWayNotificationsTable
@@ -2152,12 +2170,18 @@ interface TestState {
   campaignRecipients: TestCampaignRecipientRecord[];
   messageLogs: TestMessageLogRecord[];
   productCatalog: TestProductCatalogRecord[];
+  stockLocations: TestStockLocationRecord[];
+  stockLevels: TestStockLevelRecord[];
+  stockMovements: TestStockMovementRecord[];
   technicians: TestTechnicianRecord[];
   jobTasks: TestJobTaskRecord[];
   jobProducts: TestJobProductRecord[];
   scheduleSlots: TestScheduleSlotRecord[];
   activityEvents: TestActivityEventRecord[];
   timeEntries: TestTimeEntryRecord[];
+  timesheets: TestTimesheetRecord[];
+  timesheetAuditEvents: TestTimesheetAuditEventRecord[];
+  technicianPayRates: TestTechnicianPayRateRecord[];
   reviewRequests: TestReviewRequestRecord[];
   fileAttachments: TestFileAttachmentRecord[];
   onTheWayNotifications: TestOnTheWayNotificationRecord[];
@@ -2864,6 +2888,121 @@ const messageLogsTable = {
   deletedAt: "deletedAt"
 } as const;
 
+// FS-170 inventory tables.
+export interface TestStockLocationRecord {
+  id: string;
+  companyId: string;
+  name: string;
+  kind: "warehouse" | "van";
+  technicianId: string | null;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date | null;
+}
+
+export interface TestStockLevelRecord {
+  id: string;
+  companyId: string;
+  locationId: string;
+  productId: string;
+  quantity: number;
+  lowStockThreshold: number | null;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date | null;
+}
+
+export interface TestStockMovementRecord {
+  id: string;
+  companyId: string;
+  locationId: string;
+  productId: string;
+  kind: "adjustment" | "transfer_out" | "transfer_in" | "job_usage";
+  quantityDelta: number;
+  quantityAfter: number;
+  reason: string | null;
+  jobId: string | null;
+  transferGroupId: string | null;
+  allowNegative: boolean;
+  actorUserId: string | null;
+  createdAt: Date;
+}
+
+const stockLocationsTable = {
+  __name: "stockLocations",
+  id: "id", companyId: "companyId", name: "name", kind: "kind", technicianId: "technicianId",
+  isActive: "isActive", createdAt: "createdAt", updatedAt: "updatedAt", deletedAt: "deletedAt"
+} as const;
+
+const stockLevelsTable = {
+  __name: "stockLevels",
+  id: "id", companyId: "companyId", locationId: "locationId", productId: "productId", quantity: "quantity",
+  lowStockThreshold: "lowStockThreshold", createdAt: "createdAt", updatedAt: "updatedAt", deletedAt: "deletedAt"
+} as const;
+
+const stockMovementsTable = {
+  __name: "stockMovements",
+  id: "id", companyId: "companyId", locationId: "locationId", productId: "productId", kind: "kind",
+  quantityDelta: "quantityDelta", quantityAfter: "quantityAfter", reason: "reason", jobId: "jobId",
+  transferGroupId: "transferGroupId", allowNegative: "allowNegative", actorUserId: "actorUserId", createdAt: "createdAt"
+} as const;
+
+function createStockLocationRecord(
+  values: Partial<TestStockLocationRecord> & Pick<TestStockLocationRecord, "companyId" | "name" | "kind">
+): TestStockLocationRecord {
+  const now = new Date();
+  return {
+    id: values.id ?? nextId(), companyId: values.companyId, name: values.name, kind: values.kind,
+    technicianId: values.technicianId ?? null, isActive: values.isActive ?? true,
+    createdAt: values.createdAt ?? now, updatedAt: values.updatedAt ?? now, deletedAt: values.deletedAt ?? null
+  };
+}
+
+function createStockLevelRecord(
+  values: Partial<TestStockLevelRecord> & Pick<TestStockLevelRecord, "companyId" | "locationId" | "productId">
+): TestStockLevelRecord {
+  const now = new Date();
+  return {
+    id: values.id ?? nextId(), companyId: values.companyId, locationId: values.locationId, productId: values.productId,
+    quantity: values.quantity ?? 0, lowStockThreshold: values.lowStockThreshold ?? null,
+    createdAt: values.createdAt ?? now, updatedAt: values.updatedAt ?? now, deletedAt: values.deletedAt ?? null
+  };
+}
+
+function createStockMovementRecord(
+  values: Partial<TestStockMovementRecord> &
+    Pick<TestStockMovementRecord, "companyId" | "locationId" | "productId" | "kind" | "quantityDelta" | "quantityAfter">
+): TestStockMovementRecord {
+  return {
+    id: values.id ?? nextId(), companyId: values.companyId, locationId: values.locationId, productId: values.productId,
+    kind: values.kind, quantityDelta: values.quantityDelta, quantityAfter: values.quantityAfter,
+    reason: values.reason ?? null, jobId: values.jobId ?? null, transferGroupId: values.transferGroupId ?? null,
+    allowNegative: values.allowNegative ?? false, actorUserId: values.actorUserId ?? null,
+    createdAt: values.createdAt ?? new Date()
+  };
+}
+
+export function seedStockLocation(
+  values: Partial<TestStockLocationRecord> & Pick<TestStockLocationRecord, "companyId" | "name" | "kind">
+): TestStockLocationRecord {
+  const record = createStockLocationRecord(values);
+  state.stockLocations.push(record);
+  return record;
+}
+
+export function seedStockLevel(
+  values: Partial<TestStockLevelRecord> & Pick<TestStockLevelRecord, "companyId" | "locationId" | "productId">
+): TestStockLevelRecord {
+  const record = createStockLevelRecord(values);
+  state.stockLevels.push(record);
+  return record;
+}
+
+export function getStockMovements(): TestStockMovementRecord[] {
+  return state.stockMovements;
+}
+
 const productCatalogTable = {
   __name: "productCatalog",
   id: "id",
@@ -3007,6 +3146,135 @@ const timeEntriesTable = {
   updatedAt: "updatedAt",
   deletedAt: "deletedAt"
 } as const;
+
+
+// FS-171 timesheets / payroll tables.
+export interface TestTimesheetRecord {
+  id: string;
+  companyId: string;
+  technicianId: string;
+  periodStart: string;
+  periodEnd: string;
+  status: string;
+  submittedAt: Date | null;
+  submittedById: string | null;
+  approvedAt: Date | null;
+  approvedById: string | null;
+  rejectedAt: Date | null;
+  rejectedById: string | null;
+  rejectionReason: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date | null;
+}
+
+export interface TestTimesheetAuditEventRecord {
+  id: string;
+  companyId: string;
+  timesheetId: string | null;
+  timeEntryId: string | null;
+  action: string;
+  actorUserId: string | null;
+  reason: string | null;
+  before: unknown;
+  after: unknown;
+  createdAt: Date;
+}
+
+export interface TestTechnicianPayRateRecord {
+  id: string;
+  companyId: string;
+  technicianId: string;
+  hourlyRateCents: number;
+  effectiveFrom: string;
+  createdById: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date | null;
+}
+
+const timesheetsTable = {
+  __name: "timesheets",
+  id: "id", companyId: "companyId", technicianId: "technicianId", periodStart: "periodStart", periodEnd: "periodEnd",
+  status: "status", submittedAt: "submittedAt", submittedById: "submittedById", approvedAt: "approvedAt",
+  approvedById: "approvedById", rejectedAt: "rejectedAt", rejectedById: "rejectedById", rejectionReason: "rejectionReason",
+  createdAt: "createdAt", updatedAt: "updatedAt", deletedAt: "deletedAt"
+} as const;
+
+const timesheetAuditEventsTable = {
+  __name: "timesheetAuditEvents",
+  id: "id", companyId: "companyId", timesheetId: "timesheetId", timeEntryId: "timeEntryId", action: "action",
+  actorUserId: "actorUserId", reason: "reason", before: "before", after: "after", createdAt: "createdAt"
+} as const;
+
+const technicianPayRatesTable = {
+  __name: "technicianPayRates",
+  id: "id", companyId: "companyId", technicianId: "technicianId", hourlyRateCents: "hourlyRateCents",
+  effectiveFrom: "effectiveFrom", createdById: "createdById", createdAt: "createdAt", updatedAt: "updatedAt", deletedAt: "deletedAt"
+} as const;
+
+function createTimesheetRecord(
+  values: Partial<TestTimesheetRecord> & Pick<TestTimesheetRecord, "companyId" | "technicianId" | "periodStart" | "periodEnd">
+): TestTimesheetRecord {
+  const now = new Date();
+  return {
+    id: values.id ?? nextId(), companyId: values.companyId, technicianId: values.technicianId,
+    periodStart: values.periodStart, periodEnd: values.periodEnd, status: values.status ?? "open",
+    submittedAt: values.submittedAt ?? null, submittedById: values.submittedById ?? null,
+    approvedAt: values.approvedAt ?? null, approvedById: values.approvedById ?? null,
+    rejectedAt: values.rejectedAt ?? null, rejectedById: values.rejectedById ?? null,
+    rejectionReason: values.rejectionReason ?? null,
+    createdAt: values.createdAt ?? now, updatedAt: values.updatedAt ?? now, deletedAt: values.deletedAt ?? null
+  };
+}
+
+function createTimesheetAuditEventRecord(
+  values: Partial<TestTimesheetAuditEventRecord> & Pick<TestTimesheetAuditEventRecord, "companyId" | "action">
+): TestTimesheetAuditEventRecord {
+  return {
+    id: values.id ?? nextId(), companyId: values.companyId, timesheetId: values.timesheetId ?? null,
+    timeEntryId: values.timeEntryId ?? null, action: values.action, actorUserId: values.actorUserId ?? null,
+    reason: values.reason ?? null, before: values.before ?? null, after: values.after ?? null,
+    createdAt: values.createdAt ?? new Date()
+  };
+}
+
+function createTechnicianPayRateRecord(
+  values: Partial<TestTechnicianPayRateRecord> &
+    Pick<TestTechnicianPayRateRecord, "companyId" | "technicianId" | "hourlyRateCents" | "effectiveFrom">
+): TestTechnicianPayRateRecord {
+  const now = new Date();
+  return {
+    id: values.id ?? nextId(), companyId: values.companyId, technicianId: values.technicianId,
+    hourlyRateCents: values.hourlyRateCents, effectiveFrom: values.effectiveFrom, createdById: values.createdById ?? null,
+    createdAt: values.createdAt ?? now, updatedAt: values.updatedAt ?? now, deletedAt: values.deletedAt ?? null
+  };
+}
+
+export function seedTimesheet(
+  values: Partial<TestTimesheetRecord> & Pick<TestTimesheetRecord, "companyId" | "technicianId" | "periodStart" | "periodEnd">
+): TestTimesheetRecord {
+  const record = createTimesheetRecord(values);
+  state.timesheets.push(record);
+  return record;
+}
+
+export function seedTechnicianPayRate(
+  values: Partial<TestTechnicianPayRateRecord> &
+    Pick<TestTechnicianPayRateRecord, "companyId" | "technicianId" | "hourlyRateCents" | "effectiveFrom">
+): TestTechnicianPayRateRecord {
+  const record = createTechnicianPayRateRecord(values);
+  state.technicianPayRates.push(record);
+  return record;
+}
+
+export function getTimesheetAuditEvents(): TestTimesheetAuditEventRecord[] {
+  return state.timesheetAuditEvents;
+}
+
+export function getTimeEntries(): TestTimeEntryRecord[] {
+  return state.timeEntries;
+}
 
 const reviewRequestsTable = {
   __name: "reviewRequests",
@@ -3311,12 +3579,18 @@ const state: TestState = {
   campaignRecipients: [],
   messageLogs: [],
   productCatalog: [],
+  stockLocations: [],
+  stockLevels: [],
+  stockMovements: [],
   technicians: [],
   jobTasks: [],
   jobProducts: [],
   scheduleSlots: [],
   activityEvents: [],
   timeEntries: [],
+  timesheets: [],
+  timesheetAuditEvents: [],
+  technicianPayRates: [],
   reviewRequests: [],
   fileAttachments: [],
   onTheWayNotifications: [],
@@ -3368,12 +3642,18 @@ function restoreState(snapshot: TestState): void {
   state.campaignRecipients.splice(0, state.campaignRecipients.length, ...snapshot.campaignRecipients);
   state.messageLogs.splice(0, state.messageLogs.length, ...snapshot.messageLogs);
   state.productCatalog.splice(0, state.productCatalog.length, ...snapshot.productCatalog);
+  state.stockLocations.splice(0, state.stockLocations.length, ...snapshot.stockLocations);
+  state.stockLevels.splice(0, state.stockLevels.length, ...snapshot.stockLevels);
+  state.stockMovements.splice(0, state.stockMovements.length, ...snapshot.stockMovements);
   state.technicians.splice(0, state.technicians.length, ...snapshot.technicians);
   state.jobTasks.splice(0, state.jobTasks.length, ...snapshot.jobTasks);
   state.jobProducts.splice(0, state.jobProducts.length, ...snapshot.jobProducts);
   state.scheduleSlots.splice(0, state.scheduleSlots.length, ...snapshot.scheduleSlots);
   state.activityEvents.splice(0, state.activityEvents.length, ...snapshot.activityEvents);
   state.timeEntries.splice(0, state.timeEntries.length, ...snapshot.timeEntries);
+  state.timesheets.splice(0, state.timesheets.length, ...snapshot.timesheets);
+  state.timesheetAuditEvents.splice(0, state.timesheetAuditEvents.length, ...snapshot.timesheetAuditEvents);
+  state.technicianPayRates.splice(0, state.technicianPayRates.length, ...snapshot.technicianPayRates);
   state.reviewRequests.splice(0, state.reviewRequests.length, ...snapshot.reviewRequests);
   state.fileAttachments.splice(0, state.fileAttachments.length, ...snapshot.fileAttachments);
   state.onTheWayNotifications.splice(
@@ -3463,6 +3743,12 @@ function getRows(tableName: TableName): AnyTestRecord[] {
       return state.messageLogs;
     case "productCatalog":
       return state.productCatalog;
+    case "stockLocations":
+      return state.stockLocations;
+    case "stockLevels":
+      return state.stockLevels;
+    case "stockMovements":
+      return state.stockMovements;
     case "technicians":
       return state.technicians;
     case "jobTasks":
@@ -3475,6 +3761,12 @@ function getRows(tableName: TableName): AnyTestRecord[] {
       return state.activityEvents;
     case "timeEntries":
       return state.timeEntries;
+    case "timesheets":
+      return state.timesheets;
+    case "timesheetAuditEvents":
+      return state.timesheetAuditEvents;
+    case "technicianPayRates":
+      return state.technicianPayRates;
     case "reviewRequests":
       return state.reviewRequests;
     case "fileAttachments":
@@ -5063,6 +5355,12 @@ function createRow(tableName: TableName, values: Record<string, unknown>): AnyTe
         values as Partial<TestMessageLogRecord> &
           Pick<TestMessageLogRecord, "companyId" | "channel" | "direction" | "toAddress" | "body">
       );
+    case "stockLocations":
+      return createStockLocationRecord(values as Partial<TestStockLocationRecord> & Pick<TestStockLocationRecord, "companyId" | "name" | "kind">);
+    case "stockLevels":
+      return createStockLevelRecord(values as Partial<TestStockLevelRecord> & Pick<TestStockLevelRecord, "companyId" | "locationId" | "productId">);
+    case "stockMovements":
+      return createStockMovementRecord(values as Partial<TestStockMovementRecord> & Pick<TestStockMovementRecord, "companyId" | "locationId" | "productId" | "kind" | "quantityDelta" | "quantityAfter">);
     case "productCatalog":
       return createProductCatalogRecord(
         values as Partial<TestProductCatalogRecord> &
@@ -5093,6 +5391,12 @@ function createRow(tableName: TableName, values: Record<string, unknown>): AnyTe
         values as Partial<TestActivityEventRecord> &
           Pick<TestActivityEventRecord, "companyId" | "eventType" | "entityType" | "entityId" | "summary">
       );
+    case "timesheets":
+      return createTimesheetRecord(values as Partial<TestTimesheetRecord> & Pick<TestTimesheetRecord, "companyId" | "technicianId" | "periodStart" | "periodEnd">);
+    case "timesheetAuditEvents":
+      return createTimesheetAuditEventRecord(values as Partial<TestTimesheetAuditEventRecord> & Pick<TestTimesheetAuditEventRecord, "companyId" | "action">);
+    case "technicianPayRates":
+      return createTechnicianPayRateRecord(values as Partial<TestTechnicianPayRateRecord> & Pick<TestTechnicianPayRateRecord, "companyId" | "technicianId" | "hourlyRateCents" | "effectiveFrom">);
     case "timeEntries":
       return createTimeEntryRecord(
         values as Partial<TestTimeEntryRecord> &
@@ -5207,7 +5511,9 @@ function createSelectChain<T extends Record<string, unknown>>(rows: T[]) {
       return chain;
     },
     limit(limitCount: number) {
-      return Promise.resolve(filteredRows.slice(0, limitCount));
+      return Object.assign(Promise.resolve(filteredRows.slice(0, limitCount)), {
+        offset: (offsetCount: number) => Promise.resolve(filteredRows.slice(offsetCount, offsetCount + limitCount))
+      });
     },
     for(_lockStrength: string) {
       return chain;
@@ -5223,11 +5529,32 @@ function createSelectChain<T extends Record<string, unknown>>(rows: T[]) {
   return chain;
 }
 
+/** Emulates the partial unique index time_entries_open_technician_idx (migration 0046). */
+function assertOpenTimeEntryUnique(existingRows: AnyTestRecord[], incomingRows: AnyTestRecord[]): void {
+  const existing = existingRows as unknown as Array<Record<string, unknown>>;
+  const incoming = incomingRows as unknown as Array<Record<string, unknown>>;
+  const isOpen = (row: Record<string, unknown>) => (row.endedAt === null || row.endedAt === undefined) && row.deletedAt == null;
+  const keyOf = (row: Record<string, unknown>) => `${String(row.companyId)}:${String(row.technicianId)}`;
+  const seen = new Set(existing.filter(isOpen).map(keyOf));
+  for (const row of incoming) {
+    if (!isOpen(row)) continue;
+    const key = keyOf(row);
+    if (seen.has(key)) {
+      throw Object.assign(new Error('duplicate key value violates unique constraint "time_entries_open_technician_idx"'), {
+        code: "23505",
+        constraint: "time_entries_open_technician_idx"
+      });
+    }
+    seen.add(key);
+  }
+}
+
 function createInsertChain(tableName: TableName) {
   return {
     values(values: Record<string, unknown> | Array<Record<string, unknown>>) {
       const records = (Array.isArray(values) ? values : [values]).map((value) => createRow(tableName, value));
       const targetRows = getRows(tableName);
+      if (tableName === "timeEntries") assertOpenTimeEntryUnique(targetRows, records);
       targetRows.push(...records);
 
       return {
@@ -5287,7 +5614,10 @@ function wrapSelectChainWithProjection<T extends Record<string, unknown>>(
       return wrapped;
     },
     limit(limitCount: number) {
-      return chain.limit(limitCount).then((rows) => mapRows(rows));
+      const limited = chain.limit(limitCount);
+      return Object.assign(limited.then((rows) => mapRows(rows)), {
+        offset: (offsetCount: number) => limited.offset(offsetCount).then((rows) => mapRows(rows))
+      });
     },
     for(_lockStrength: string) {
       chain.for(_lockStrength);
@@ -5483,12 +5813,18 @@ export const campaigns = campaignsTable;
 export const campaignRecipients = campaignRecipientsTable;
 export const messageLogs = messageLogsTable;
 export const productCatalog = productCatalogTable;
+export const stockLocations = stockLocationsTable;
+export const stockLevels = stockLevelsTable;
+export const stockMovements = stockMovementsTable;
 export const technicians = techniciansTable;
 export const jobTasks = jobTasksTable;
 export const jobProducts = jobProductsTable;
 export const scheduleSlots = scheduleSlotsTable;
 export const activityEvents = activityEventsTable;
 export const timeEntries = timeEntriesTable;
+export const timesheets = timesheetsTable;
+export const timesheetAuditEvents = timesheetAuditEventsTable;
+export const technicianPayRates = technicianPayRatesTable;
 export const reviewRequests = reviewRequestsTable;
 export const fileAttachments = fileAttachmentsTable;
 export const onTheWayNotifications = onTheWayNotificationsTable;
@@ -5923,12 +6259,18 @@ export function createDbModuleMock() {
     campaignRecipients,
     messageLogs,
     productCatalog,
+    stockLocations,
+    stockLevels,
+    stockMovements,
     technicians,
     jobTasks,
     jobProducts,
     scheduleSlots,
     activityEvents,
     timeEntries,
+    timesheets,
+    timesheetAuditEvents,
+    technicianPayRates,
     reviewRequests,
     fileAttachments,
     onTheWayNotifications,
@@ -5983,12 +6325,18 @@ export function resetTestState(): void {
   state.campaignRecipients.length = 0;
   state.messageLogs.length = 0;
   state.productCatalog.length = 0;
+  state.stockLocations.length = 0;
+  state.stockLevels.length = 0;
+  state.stockMovements.length = 0;
   state.technicians.length = 0;
   state.jobTasks.length = 0;
   state.jobProducts.length = 0;
   state.scheduleSlots.length = 0;
   state.activityEvents.length = 0;
   state.timeEntries.length = 0;
+  state.timesheets.length = 0;
+  state.timesheetAuditEvents.length = 0;
+  state.technicianPayRates.length = 0;
   state.reviewRequests.length = 0;
   state.fileAttachments.length = 0;
   state.onTheWayNotifications.length = 0;

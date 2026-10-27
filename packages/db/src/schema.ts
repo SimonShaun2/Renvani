@@ -1746,6 +1746,65 @@ export const jobProducts = pgTable("job_products", {
   jobIdx: index("job_products_job_idx").on(t.jobId),
 }));
 
+// FS-170 inventory: stock locations, per-location levels, append-only movements.
+export const stockLocationKindEnum = pgEnum("stock_location_kind", ["warehouse", "van"]);
+export const stockMovementKindEnum = pgEnum("stock_movement_kind", [
+  "adjustment",
+  "transfer_out",
+  "transfer_in",
+  "job_usage",
+]);
+
+export const stockLocations = pgTable("stock_locations", {
+  id: id(),
+  companyId: companyId(),
+  name: varchar("name", { length: 255 }).notNull(),
+  kind: stockLocationKindEnum("kind").notNull(),
+  technicianId: uuid("technician_id").references(() => technicians.id, { onDelete: "set null" }),
+  isActive: boolean("is_active").notNull().default(true),
+  ...timestamps,
+}, (t) => ({
+  companyIdx: index("stock_locations_company_idx").on(t.companyId),
+}));
+
+export const stockLevels = pgTable("stock_levels", {
+  id: id(),
+  companyId: companyId(),
+  locationId: uuid("location_id").notNull().references(() => stockLocations.id, { onDelete: "cascade" }),
+  productId: uuid("product_id").notNull().references(() => productCatalog.id, { onDelete: "cascade" }),
+  quantity: integer("quantity").notNull().default(0),
+  lowStockThreshold: integer("low_stock_threshold"),
+  ...timestamps,
+}, (t) => ({
+  companyIdx: index("stock_levels_company_idx").on(t.companyId),
+  locationProductIdx: uniqueIndex("stock_levels_company_location_product_idx").on(
+    t.companyId,
+    t.locationId,
+    t.productId
+  ),
+}));
+
+/** Append-only audit trail; UPDATE/DELETE are rejected by a trigger (migration 0044). */
+export const stockMovements = pgTable("stock_movements", {
+  id: id(),
+  companyId: companyId(),
+  locationId: uuid("location_id").notNull().references(() => stockLocations.id, { onDelete: "cascade" }),
+  productId: uuid("product_id").notNull().references(() => productCatalog.id, { onDelete: "cascade" }),
+  kind: stockMovementKindEnum("kind").notNull(),
+  quantityDelta: integer("quantity_delta").notNull(),
+  quantityAfter: integer("quantity_after").notNull(),
+  reason: text("reason"),
+  jobId: uuid("job_id").references(() => jobs.id, { onDelete: "set null" }),
+  transferGroupId: uuid("transfer_group_id"),
+  allowNegative: boolean("allow_negative").notNull().default(false),
+  actorUserId: uuid("actor_user_id").references(() => users.id, { onDelete: "set null" }),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+}, (t) => ({
+  companyIdx: index("stock_movements_company_idx").on(t.companyId),
+  locationProductIdx: index("stock_movements_location_product_idx").on(t.locationId, t.productId),
+  jobIdx: index("stock_movements_job_idx").on(t.jobId),
+}));
+
 export const timeEntries = pgTable("time_entries", {
   id: id(),
   companyId: companyId(),
@@ -1762,6 +1821,60 @@ export const timeEntries = pgTable("time_entries", {
   companyIdx: index("time_entries_company_idx").on(t.companyId),
   jobIdx: index("time_entries_job_idx").on(t.jobId),
   technicianIdx: index("time_entries_technician_idx").on(t.technicianId),
+  // FS-171 (migration 0046): one open entry per technician.
+  openTechnicianIdx: uniqueIndex("time_entries_open_technician_idx")
+    .on(t.companyId, t.technicianId)
+    .where(sql`${t.endedAt} IS NULL AND ${t.deletedAt} IS NULL`),
+}));
+
+// FS-171: pay-period timesheets, audit trail and technician pay rates (migration 0045).
+export const timesheets = pgTable("timesheets", {
+  id: id(),
+  companyId: companyId(),
+  technicianId: uuid("technician_id").notNull().references(() => technicians.id, { onDelete: "cascade" }),
+  periodStart: date("period_start", { mode: "string" }).notNull(),
+  periodEnd: date("period_end", { mode: "string" }).notNull(),
+  status: varchar("status", { length: 20 }).notNull().default("open"),
+  submittedAt: timestamp("submitted_at"),
+  submittedById: uuid("submitted_by_id").references(() => users.id, { onDelete: "set null" }),
+  approvedAt: timestamp("approved_at"),
+  approvedById: uuid("approved_by_id").references(() => users.id, { onDelete: "set null" }),
+  rejectedAt: timestamp("rejected_at"),
+  rejectedById: uuid("rejected_by_id").references(() => users.id, { onDelete: "set null" }),
+  rejectionReason: text("rejection_reason"),
+  ...timestamps,
+}, (t) => ({
+  companyIdx: index("timesheets_company_idx").on(t.companyId),
+  companyTechnicianPeriodIdx: uniqueIndex("timesheets_company_technician_period_idx").on(t.companyId, t.technicianId, t.periodStart),
+}));
+
+export const timesheetAuditEvents = pgTable("timesheet_audit_events", {
+  id: id(),
+  companyId: companyId(),
+  timesheetId: uuid("timesheet_id").references(() => timesheets.id, { onDelete: "cascade" }),
+  timeEntryId: uuid("time_entry_id").references(() => timeEntries.id, { onDelete: "cascade" }),
+  action: varchar("action", { length: 40 }).notNull(),
+  actorUserId: uuid("actor_user_id").references(() => users.id, { onDelete: "set null" }),
+  reason: text("reason"),
+  before: jsonb("before"),
+  after: jsonb("after"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+}, (t) => ({
+  companyIdx: index("timesheet_audit_events_company_idx").on(t.companyId),
+  timesheetIdx: index("timesheet_audit_events_timesheet_idx").on(t.timesheetId),
+}));
+
+export const technicianPayRates = pgTable("technician_pay_rates", {
+  id: id(),
+  companyId: companyId(),
+  technicianId: uuid("technician_id").notNull().references(() => technicians.id, { onDelete: "cascade" }),
+  hourlyRateCents: integer("hourly_rate_cents").notNull(),
+  effectiveFrom: date("effective_from", { mode: "string" }).notNull(),
+  createdById: uuid("created_by_id").references(() => users.id, { onDelete: "set null" }),
+  ...timestamps,
+}, (t) => ({
+  companyIdx: index("technician_pay_rates_company_idx").on(t.companyId),
+  companyTechnicianEffectiveIdx: uniqueIndex("technician_pay_rates_company_technician_effective_idx").on(t.companyId, t.technicianId, t.effectiveFrom),
 }));
 
 export const reviewRequests = pgTable("review_requests", {

@@ -50,10 +50,9 @@ export function getTimelineStyle(start: string | Date, end: string | Date) {
   };
 }
 
+/** Figma 10:561–10:570 hour labels: "8" … "12", "1" … "5" (no a/p suffix). */
 export function formatTimelineHour(hour: number): string {
-  const normalizedHour = hour > 12 ? hour - 12 : hour;
-  const suffix = hour >= 12 ? "p" : "a";
-  return `${normalizedHour}${suffix}`;
+  return String(hour > 12 ? hour - 12 : hour);
 }
 
 export function formatDispatchDateLabel(value: string): string {
@@ -205,4 +204,33 @@ export function findAutoFitSlot(
   }
 
   return null;
+}
+
+function frameClock(date: Date, withMinutes: boolean): { time: string; meridiem: string } {
+  const hours = date.getHours();
+  const minutes = date.getMinutes();
+  const hour12 = hours % 12 === 0 ? 12 : hours % 12;
+  const time = withMinutes || minutes !== 0 ? `${hour12}:${String(minutes).padStart(2, "0")}` : `${hour12}`;
+  return { time, meridiem: hours < 12 ? "a.m." : "p.m." };
+}
+
+/** Figma 10:552 style, e.g. "1:00 p.m.". */
+export function formatFrameTime(value: string | Date): string {
+  const { time, meridiem } = frameClock(new Date(value), true);
+  return `${time} ${meridiem}`;
+}
+
+/** Figma 10:555 style, e.g. "1–4 p.m." or "11 a.m.–1 p.m.". */
+export function formatFrameRange(start: string | Date, end: string | Date): string {
+  const a = frameClock(new Date(start), false);
+  const b = frameClock(new Date(end), false);
+  return a.meridiem === b.meridiem
+    ? `${a.time}–${b.time} ${b.meridiem}`
+    : `${a.time} ${a.meridiem}–${b.time} ${b.meridiem}`;
+}
+
+/** Figma 10:552 duration, e.g. "3 h" or "1.5 h". */
+export function formatFrameDuration(start: string | Date, end: string | Date): string {
+  const hours = (new Date(end).getTime() - new Date(start).getTime()) / 3_600_000;
+  return `${Number.isInteger(hours) ? hours : Math.round(hours * 10) / 10} h`;
 }

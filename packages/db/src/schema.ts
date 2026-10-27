@@ -219,6 +219,7 @@ export const importEntityTypeEnum = pgEnum("import_entity_type", [
   "payments",
   "notes",
   "communications",
+  "service_agreements",
 ]);
 
 export const importBundleStatusEnum = pgEnum("import_bundle_status", [
@@ -1122,6 +1123,9 @@ export const maintenancePlans = pgTable("maintenance_plans", {
   // Assets covered under this plan
   assetIds: uuid("asset_ids").array().default([]),
   notes: text("notes"),
+  sourceSystem: varchar("source_system", { length: 64 }),
+  sourceId: varchar("source_id", { length: 256 }),
+  importSessionId: uuid("import_session_id").references(() => importSessions.id),
   ...timestamps,
 }, (t) => ({
   companyIdx: index("maintenance_plans_company_idx").on(t.companyId),
@@ -1129,6 +1133,11 @@ export const maintenancePlans = pgTable("maintenance_plans", {
   nextServiceIdx: index("maintenance_plans_next_service_idx").on(t.nextServiceDate),
   statusIdx: index("maintenance_plans_status_idx").on(t.status),
   stripeSubIdx: index("maintenance_plans_stripe_sub_idx").on(t.stripeSubscriptionId),
+  importLineageIdx: uniqueIndex("maintenance_plans_import_lineage_idx").on(
+    t.companyId,
+    t.sourceSystem,
+    t.sourceId,
+  ),
 }));
 
 export const maintenanceVisits = pgTable("maintenance_visits", {

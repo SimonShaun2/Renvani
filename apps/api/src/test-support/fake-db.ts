@@ -618,6 +618,9 @@ export interface TestMaintenancePlanRecord {
   nextServiceDate: string | null;
   lastServiceDate: string | null;
   notes: string | null;
+  sourceSystem: string | null;
+  sourceId: string | null;
+  importSessionId: string | null;
   deletedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
@@ -1533,6 +1536,9 @@ export interface TestMaintenancePlanRecord {
   nextServiceDate: string | null;
   lastServiceDate: string | null;
   notes: string | null;
+  sourceSystem: string | null;
+  sourceId: string | null;
+  importSessionId: string | null;
   deletedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
@@ -2628,6 +2634,9 @@ const maintenancePlansTable = {
   nextServiceDate: "nextServiceDate",
   lastServiceDate: "lastServiceDate",
   notes: "notes",
+  sourceSystem: "sourceSystem",
+  sourceId: "sourceId",
+  importSessionId: "importSessionId",
   deletedAt: "deletedAt",
   createdAt: "createdAt",
   updatedAt: "updatedAt"
@@ -4046,6 +4055,9 @@ function createMaintenancePlanRecord(
     nextServiceDate: values.nextServiceDate ?? null,
     lastServiceDate: values.lastServiceDate ?? null,
     notes: values.notes ?? null,
+    sourceSystem: values.sourceSystem ?? null,
+    sourceId: values.sourceId ?? null,
+    importSessionId: values.importSessionId ?? null,
     deletedAt: values.deletedAt ?? null,
     createdAt: values.createdAt ?? now,
     updatedAt: values.updatedAt ?? now

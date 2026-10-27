@@ -140,6 +140,7 @@ describe("saved card migration (FS-138)", () => {
       .post(`/api/v1/migrate/onboarding/sessions/${bundle.id}/saved-card-migration/apply-mappings`)
       .set("Authorization", authorization)
       .send({
+        ownerOffSessionConsentAcknowledged: true,
         rows: [
           {
             stripeCustomerId: "cus_test_1",
@@ -176,6 +177,7 @@ describe("saved card migration (FS-138)", () => {
       lastName: "Card",
       email: "nocard@example.com"
     });
+    attachImportedPaymentMethodMock.mockRejectedValueOnce(new Error("raw stripe failure"));
 
     await request(app.server)
       .post(`/api/v1/migrate/onboarding/sessions/${bundle.id}/saved-card-migration`)
@@ -191,11 +193,12 @@ describe("saved card migration (FS-138)", () => {
       .post(`/api/v1/migrate/onboarding/sessions/${bundle.id}/saved-card-migration/apply-mappings`)
       .set("Authorization", authorization)
       .send({
+        ownerOffSessionConsentAcknowledged: true,
         rows: [
           {
             stripeCustomerId: "cus_orphan",
             stripePaymentMethodId: "pm_orphan",
-            email: "unknown@example.com"
+            renvaniCustomerId: customer.id
           }
         ]
       });
@@ -208,6 +211,16 @@ describe("saved card migration (FS-138)", () => {
     expect(fallback.status).toBe(200);
     expect(sendRenderedTemplateEmailMock).toHaveBeenCalled();
     expect(fallback.body.fallbackEmailSentAt).toBeTruthy();
+    const emailArgs = sendRenderedTemplateEmailMock.mock.calls[0]?.[2] as { paymentPortalUrl: string };
+    expect(emailArgs.paymentPortalUrl).toMatch(/\/site\/card-migrate-/);
+    expect(emailArgs.paymentPortalUrl).not.toMatch(/\/pay$/);
+
+    const duplicate = await request(app.server)
+      .post(`/api/v1/migrate/onboarding/sessions/${bundle.id}/saved-card-migration/send-fallback-email`)
+      .set("Authorization", authorization)
+      .send({ renvaniCustomerId: customer.id });
+    expect(duplicate.status).toBe(409);
+    expect(sendRenderedTemplateEmailMock).toHaveBeenCalledTimes(1);
   });
 
   it("lists migrations for internal admin", async () => {
@@ -238,5 +251,155 @@ describe("saved card migration (FS-138)", () => {
 
     expect(response.status).toBe(403);
     expect(response.body.error).toBe(ErrorCode.FORBIDDEN);
+  });
+
+  async function startAndConfirm(authorization: string, bundleId: string) {
+    await request(app.server)
+      .post(`/api/v1/migrate/onboarding/sessions/${bundleId}/saved-card-migration`)
+      .set("Authorization", authorization)
+      .send({ priorProcessorName: "Legacy Processor" });
+    return request(app.server)
+      .post(`/api/v1/migrate/onboarding/sessions/${bundleId}/saved-card-migration/confirm-stripe-import`)
+      .set("Authorization", authorization)
+      .send({ stripeImportReference: "stripe_import_job_x" });
+  }
+
+  function applyMappings(authorization: string, bundleId: string, body: Record<string, unknown>) {
+    return request(app.server)
+      .post(`/api/v1/migrate/onboarding/sessions/${bundleId}/saved-card-migration/apply-mappings`)
+      .set("Authorization", authorization)
+      .send(body);
+  }
+
+  it("rejects fallback email for a customer that is not unmatched or failed", async () => {
+    const { company, authorization } = createAuthContext("owner");
+    const bundle = fakeDb.seedImportBundle({ companyId: company.id });
+    const customer = fakeDb.seedCustomer({ companyId: company.id, firstName: "A", lastName: "B", email: "ok@example.com" });
+    await startAndConfirm(authorization, bundle.id);
+    await applyMappings(authorization, bundle.id, {
+      ownerOffSessionConsentAcknowledged: true,
+      rows: [{ stripeCustomerId: "cus_ok", stripePaymentMethodId: "pm_ok", renvaniCustomerId: customer.id }]
+    });
+    const response = await request(app.server)
+      .post(`/api/v1/migrate/onboarding/sessions/${bundle.id}/saved-card-migration/send-fallback-email`)
+      .set("Authorization", authorization)
+      .send({ renvaniCustomerId: customer.id });
+    expect(response.status).toBe(400);
+    expect(sendRenderedTemplateEmailMock).not.toHaveBeenCalled();
+  });
+
+  it("rate limits send-fallback-email and apply-mappings per company", async () => {
+    const rateLimit = await import("../../lib/public-booking-rate-limit.js");
+    const { company, authorization } = createAuthContext("owner");
+    const bundle = fakeDb.seedImportBundle({ companyId: company.id });
+    for (let i = 0; i < rateLimit.SAVED_CARD_FALLBACK_EMAIL_RATE_LIMIT; i += 1) {
+      await rateLimit.checkSavedCardFallbackEmailRateLimit(company.id);
+    }
+    for (let i = 0; i < rateLimit.SAVED_CARD_APPLY_MAPPINGS_RATE_LIMIT; i += 1) {
+      await rateLimit.checkSavedCardApplyMappingsRateLimit(company.id);
+    }
+    const fallback = await request(app.server)
+      .post(`/api/v1/migrate/onboarding/sessions/${bundle.id}/saved-card-migration/send-fallback-email`)
+      .set("Authorization", authorization)
+      .send({ renvaniCustomerId: "00000000-0000-4000-8000-000000000001" });
+    expect(fallback.status).toBe(429);
+    const apply = await applyMappings(authorization, bundle.id, {
+      ownerOffSessionConsentAcknowledged: true,
+      rows: [{ stripeCustomerId: "cus_1", stripePaymentMethodId: "pm_1" }]
+    });
+    expect(apply.status).toBe(429);
+    rateLimit.resetPublicBookingRateLimitStateForTests();
+  });
+
+  it("caps apply-mappings at 200 rows and requires the owner consent acknowledgment", async () => {
+    const { company, authorization } = createAuthContext("owner");
+    const bundle = fakeDb.seedImportBundle({ companyId: company.id });
+    await startAndConfirm(authorization, bundle.id);
+    const rows = Array.from({ length: 201 }, (_, i) => ({ stripeCustomerId: `cus_${i}`, stripePaymentMethodId: `pm_${i}` }));
+    const tooMany = await applyMappings(authorization, bundle.id, { ownerOffSessionConsentAcknowledged: true, rows });
+    expect(tooMany.status).toBe(400);
+    const noAck = await applyMappings(authorization, bundle.id, { rows: rows.slice(0, 1) });
+    expect(noAck.status).toBe(400);
+    const falseAck = await applyMappings(authorization, bundle.id, { ownerOffSessionConsentAcknowledged: false, rows: rows.slice(0, 1) });
+    expect(falseAck.status).toBe(400);
+    expect(attachImportedPaymentMethodMock).not.toHaveBeenCalled();
+  });
+
+  it("records the consent acknowledgment and skips already-applied rows on retry", async () => {
+    const { company, user, authorization } = createAuthContext("owner");
+    const bundle = fakeDb.seedImportBundle({ companyId: company.id });
+    const customer = fakeDb.seedCustomer({ companyId: company.id, firstName: "I", lastName: "D", email: "idem@example.com" });
+    await startAndConfirm(authorization, bundle.id);
+    const body = {
+      ownerOffSessionConsentAcknowledged: true,
+      rows: [
+        { stripeCustomerId: "cus_idem", stripePaymentMethodId: "pm_idem", renvaniCustomerId: customer.id },
+        { stripeCustomerId: "cus_none", stripePaymentMethodId: "pm_none", email: "nobody@example.com" }
+      ]
+    };
+    const first = await applyMappings(authorization, bundle.id, body);
+    expect(first.status).toBe(200);
+    expect(first.body.status).toBe("fallback_required");
+    const second = await applyMappings(authorization, bundle.id, body);
+    expect(second.status).toBe(200);
+    expect(attachImportedPaymentMethodMock).toHaveBeenCalledTimes(1);
+    expect(second.body.mappingSummary).toMatchObject({ matched: 1, unmatched: 1, total: 2 });
+    const row = fakeDb.getTestState().savedCardMigrations.find((r) => r.companyId === company.id);
+    expect(row?.offSessionConsentAcknowledgedAt).toBeInstanceOf(Date);
+    expect(row?.offSessionConsentAcknowledgedById).toBe(user.id);
+  });
+
+  it("rejects confirm-stripe-import once completed and emits stripe_import_confirmed", async () => {
+    const { company, authorization } = createAuthContext("owner");
+    const bundle = fakeDb.seedImportBundle({ companyId: company.id });
+    const confirm = await startAndConfirm(authorization, bundle.id);
+    expect(confirm.status).toBe(200);
+    const events = fakeDb.getTestState().activityEvents.filter((e) => e.companyId === company.id);
+    expect(events.map((e) => e.eventType)).toContain("payment_method_migration.stripe_import_confirmed");
+    expect(events.map((e) => e.eventType)).not.toContain("payment_method_migration.mappings_applied");
+
+    const migration = fakeDb.getTestState().savedCardMigrations.find((r) => r.companyId === company.id);
+    if (migration) migration.status = "completed";
+    const again = await request(app.server)
+      .post(`/api/v1/migrate/onboarding/sessions/${bundle.id}/saved-card-migration/confirm-stripe-import`)
+      .set("Authorization", authorization)
+      .send({ stripeImportReference: "stripe_import_job_y" });
+    expect(again.status).toBe(409);
+  });
+
+  it("never overwrites an existing customers.stripe_customer_id", async () => {
+    const { company, authorization } = createAuthContext("owner");
+    const bundle = fakeDb.seedImportBundle({ companyId: company.id });
+    const customer = fakeDb.seedCustomer({ companyId: company.id, firstName: "E", lastName: "X", email: "ex@example.com" });
+    const stored = fakeDb.getTestState().customers.find((c) => c.id === customer.id) as unknown as Record<string, unknown>;
+    stored.stripeCustomerId = "cus_existing";
+    await startAndConfirm(authorization, bundle.id);
+    const apply = await applyMappings(authorization, bundle.id, {
+      ownerOffSessionConsentAcknowledged: true,
+      rows: [{ stripeCustomerId: "cus_attacker", stripePaymentMethodId: "pm_x", renvaniCustomerId: customer.id }]
+    });
+    expect(apply.status).toBe(200);
+    expect(apply.body.customerMappings[0]).toMatchObject({ status: "failed", errorMessage: "stripe_customer_conflict" });
+    expect(stored.stripeCustomerId).toBe("cus_existing");
+    expect(attachImportedPaymentMethodMock).not.toHaveBeenCalled();
+  });
+
+  it("maps raw Stripe errors to safe codes", async () => {
+    const { company, authorization } = createAuthContext("owner");
+    const bundle = fakeDb.seedImportBundle({ companyId: company.id });
+    const customer = fakeDb.seedCustomer({ companyId: company.id, firstName: "S", lastName: "E", email: "se@example.com" });
+    attachImportedPaymentMethodMock.mockRejectedValueOnce(
+      Object.assign(new Error("No such payment_method: 'pm_secret_detail' for acct_123"), {
+        type: "StripeInvalidRequestError",
+        code: "resource_missing"
+      })
+    );
+    await startAndConfirm(authorization, bundle.id);
+    const apply = await applyMappings(authorization, bundle.id, {
+      ownerOffSessionConsentAcknowledged: true,
+      rows: [{ stripeCustomerId: "cus_se", stripePaymentMethodId: "pm_se", renvaniCustomerId: customer.id }]
+    });
+    expect(apply.body.customerMappings[0].errorMessage).toBe("stripe_resource_missing");
+    expect(JSON.stringify(apply.body)).not.toContain("pm_secret_detail");
   });
 });

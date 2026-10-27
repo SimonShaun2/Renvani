@@ -76,7 +76,21 @@ export const confirmStripeImportBodySchema = z.object({
 
 export type ConfirmStripeImportBody = z.infer<typeof confirmStripeImportBodySchema>;
 
+/** FS-138: max rows per apply-mappings request (no background job for MVP). */
+export const SAVED_CARD_MIGRATION_APPLY_MAX_ROWS = 200;
+
+/**
+ * FS-138 PLACEHOLDER consent wording, pending Renvani Legal & Compliance review.
+ * The owner must acknowledge this before saved cards are attached for off-session charging.
+ */
+export const SAVED_CARD_OFF_SESSION_CONSENT_ACK_TEXT =
+  "I confirm that the customers in this import agreed to let my business keep their card on file and charge it for future services without them being present.";
+
 export const applySavedCardMigrationMappingsBodySchema = z.object({
+  /** Owner acknowledgment of SAVED_CARD_OFF_SESSION_CONSENT_ACK_TEXT; required (must be true). */
+  ownerOffSessionConsentAcknowledged: z.literal(true, {
+    errorMap: () => ({ message: "Owner must acknowledge customer consent to off-session charges" })
+  }),
   rows: z
     .array(
       z.object({
@@ -87,7 +101,7 @@ export const applySavedCardMigrationMappingsBodySchema = z.object({
       })
     )
     .min(1)
-    .max(5000)
+    .max(SAVED_CARD_MIGRATION_APPLY_MAX_ROWS)
 });
 
 export type ApplySavedCardMigrationMappingsBody = z.infer<typeof applySavedCardMigrationMappingsBodySchema>;

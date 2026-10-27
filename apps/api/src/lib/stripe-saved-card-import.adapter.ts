@@ -24,6 +24,8 @@ export interface AttachImportedPaymentMethodInput {
   stripePaymentMethodId: string;
   renvaniCustomerId: string;
   companyId: string;
+  /** Owner acknowledgment (FS-138) that customers consented to off-session charges; required. */
+  offSessionConsentAcknowledgedAt: Date | null;
 }
 
 export interface AttachImportedPaymentMethodResult {
@@ -42,6 +44,12 @@ export async function attachImportedPaymentMethodToCustomer(
   input: AttachImportedPaymentMethodInput
 ): Promise<AttachImportedPaymentMethodResult> {
   assertStripeTestModeForCardMigration();
+  if (!input.offSessionConsentAcknowledgedAt) {
+    throw new AppError(
+      ErrorCode.VALIDATION_ERROR,
+      "Owner acknowledgment of off-session charge consent is required"
+    );
+  }
 
   const paymentMethod = await stripe.paymentMethods.retrieve(
     input.stripePaymentMethodId,

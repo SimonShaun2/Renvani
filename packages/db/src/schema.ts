@@ -386,6 +386,7 @@ export const activityEventTypeEnum = pgEnum("activity_event_type", [
   // Saved card migration (FS-138)
   "payment_method_migration.requested",
   "payment_method_migration.mappings_applied",
+  "payment_method_migration.stripe_import_confirmed",
   "payment_method_migration.completed",
   "payment_method_migration.fallback_sent",
 ]);
@@ -1441,6 +1442,11 @@ export const savedCardMigrations = pgTable("saved_card_migrations", {
   customerMappings: jsonb("customer_mappings").notNull().default([]),
   lastError: text("last_error"),
   fallbackEmailSentAt: timestamp("fallback_email_sent_at"),
+  /** Renvani customer ids already sent the re-enter-card fallback email (per-customer dedupe). */
+  fallbackEmailCustomerIds: jsonb("fallback_email_customer_ids").notNull().default([]),
+  /** Owner acknowledgment that customers consented to off-session charges (required before apply-mappings). */
+  offSessionConsentAcknowledgedAt: timestamp("off_session_consent_acknowledged_at"),
+  offSessionConsentAcknowledgedById: uuid("off_session_consent_acknowledged_by_id").references(() => users.id),
   completedAt: timestamp("completed_at"),
   ...timestamps,
 }, (t) => ({

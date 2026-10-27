@@ -34,6 +34,32 @@ import {
 
 type MigrationRow = typeof savedCardMigrations.$inferSelect;
 
+/** FS-138: safe, stable error codes stored/returned instead of raw Stripe messages. */
+export type SavedCardAttachErrorCode =
+  | "payment_method_attached_elsewhere"
+  | "stripe_customer_conflict"
+  | "stripe_resource_missing"
+  | "card_declined"
+  | "stripe_permission_error"
+  | "stripe_attach_failed";
+
+export function mapSavedCardAttachError(error: unknown): SavedCardAttachErrorCode {
+  if (error instanceof AppError && error.code === ErrorCode.CONFLICT) {
+    return "payment_method_attached_elsewhere";
+  }
+  const candidate = error as { type?: unknown; code?: unknown } | null;
+  const code = typeof candidate?.code === "string" ? candidate.code : "";
+  const type = typeof candidate?.type === "string" ? candidate.type : "";
+  if (code === "resource_missing") return "stripe_resource_missing";
+  if (code === "card_declined" || type === "StripeCardError") return "card_declined";
+  if (type === "StripePermissionError") return "stripe_permission_error";
+  return "stripe_attach_failed";
+}
+
+function parseCustomerIdList(value: unknown): string[] {
+  return Array.isArray(value) ? value.filter((entry): entry is string => typeof entry === "string") : [];
+}
+
 function requireMigrationRow(row: MigrationRow | undefined, message: string): MigrationRow {
   if (!row) {
     throw new AppError(ErrorCode.INTERNAL_ERROR, message);
@@ -235,6 +261,14 @@ export async function confirmStripeImportForBundle(
   if (!migration) {
     throw new AppError(ErrorCode.NOT_FOUND, "No saved card migration for this bundle");
   }
+  if (migration.status !== "awaiting_stripe_import" && migration.status !== "mapping") {
+    throw new AppError(
+      ErrorCode.CONFLICT,
+      migration.status === "completed"
+        ? "Saved card migration is already completed"
+        : "Saved card migration is not awaiting a Stripe import"
+    );
+  }
 
   const now = new Date();
   const [updatedRow] = await db
@@ -252,7 +286,7 @@ export async function confirmStripeImportForBundle(
   await syncWizardRef(companyId, bundleId, updated.id, "mapping");
 
   await emitEvent({
-    eventType: "payment_method_migration.mappings_applied",
+    eventType: "payment_method_migration.stripe_import_confirmed",
     companyId,
     actorId,
     actorType: "user",
@@ -322,17 +356,35 @@ export async function applySavedCardMigrationMappingsForBundle(
     throw new AppError(ErrorCode.CONFLICT, "Migration is not in a mappable state");
   }
 
+  if (input.ownerOffSessionConsentAcknowledged !== true) {
+    throw new AppError(
+      ErrorCode.VALIDATION_ERROR,
+      "Owner must acknowledge customer consent to off-session charges"
+    );
+  }
+
   const stripeConnectAccountId = await requireCompanyStripeConnect(companyId);
-  const mappings: SavedCardMigrationCustomerMapping[] = [];
-  let matched = 0;
-  let unmatched = 0;
-  let failed = 0;
+  const existingRow = await getScopedMigration(companyId, existing.id);
+  const consentAcknowledgedAt = existingRow.offSessionConsentAcknowledgedAt ?? new Date();
+  const consentAcknowledgedById = existingRow.offSessionConsentAcknowledgedById ?? actorId;
+
+  // Idempotent: rows whose payment method is already attached are skipped; other prior entries
+  // for the same payment method are replaced by this request's result.
+  const priorMappings = parseCustomerMappings(existingRow.customerMappings);
+  const byPaymentMethod = new Map<string, SavedCardMigrationCustomerMapping>();
+  for (const prior of priorMappings) {
+    byPaymentMethod.set(prior.stripePaymentMethodId, prior);
+  }
 
   for (const row of input.rows) {
+    const prior = byPaymentMethod.get(row.stripePaymentMethodId);
+    if (prior?.status === "attached") {
+      continue;
+    }
+
     const customer = await resolveRenvaniCustomer(companyId, row.renvaniCustomerId, row.email);
     if (!customer) {
-      unmatched += 1;
-      mappings.push({
+      byPaymentMethod.set(row.stripePaymentMethodId, {
         renvaniCustomerId: row.renvaniCustomerId ?? null,
         email: row.email ?? null,
         stripeCustomerId: row.stripeCustomerId,
@@ -344,6 +396,23 @@ export async function applySavedCardMigrationMappingsForBundle(
     }
 
     const matchMethod = row.renvaniCustomerId ? "renvani_customer_id" : "email";
+    const base = {
+      renvaniCustomerId: customer.id,
+      email: customer.email,
+      stripeCustomerId: row.stripeCustomerId,
+      stripePaymentMethodId: row.stripePaymentMethodId,
+      matchMethod
+    } as const;
+
+    // Never overwrite an existing customers.stripe_customer_id with a client-supplied id.
+    if (customer.stripeCustomerId && customer.stripeCustomerId !== row.stripeCustomerId) {
+      byPaymentMethod.set(row.stripePaymentMethodId, {
+        ...base,
+        status: "failed",
+        errorMessage: "stripe_customer_conflict"
+      });
+      continue;
+    }
 
     try {
       const attachResult = await attachImportedPaymentMethodToCustomer({
@@ -351,50 +420,56 @@ export async function applySavedCardMigrationMappingsForBundle(
         stripeCustomerId: row.stripeCustomerId,
         stripePaymentMethodId: row.stripePaymentMethodId,
         renvaniCustomerId: customer.id,
-        companyId
+        companyId,
+        offSessionConsentAcknowledgedAt: consentAcknowledgedAt
       });
 
-      if (customer.stripeCustomerId !== row.stripeCustomerId) {
-        await db
+      if (!customer.stripeCustomerId) {
+        const claimed = await db
           .update(customers)
           .set({ stripeCustomerId: row.stripeCustomerId, updatedAt: new Date() })
-          .where(and(eq(customers.id, customer.id), eq(customers.companyId, companyId)));
+          .where(
+            and(
+              eq(customers.id, customer.id),
+              eq(customers.companyId, companyId),
+              isNull(customers.stripeCustomerId)
+            )
+          )
+          .returning({ id: customers.id });
+        if (claimed.length === 0) {
+          byPaymentMethod.set(row.stripePaymentMethodId, {
+            ...base,
+            status: "failed",
+            errorMessage: "stripe_customer_conflict"
+          });
+          continue;
+        }
       }
 
-      matched += 1;
-      mappings.push({
-        renvaniCustomerId: customer.id,
-        email: customer.email,
-        stripeCustomerId: row.stripeCustomerId,
-        stripePaymentMethodId: row.stripePaymentMethodId,
-        matchMethod,
+      byPaymentMethod.set(row.stripePaymentMethodId, {
+        ...base,
         status: "attached",
         paymentMethodLabel: attachResult.paymentMethodLabel
       });
     } catch (error) {
-      failed += 1;
-      const message = error instanceof Error ? error.message : "Attach failed";
-      mappings.push({
-        renvaniCustomerId: customer.id,
-        email: customer.email,
-        stripeCustomerId: row.stripeCustomerId,
-        stripePaymentMethodId: row.stripePaymentMethodId,
-        matchMethod,
+      byPaymentMethod.set(row.stripePaymentMethodId, {
+        ...base,
         status: "failed",
-        errorMessage: message
+        errorMessage: mapSavedCardAttachError(error)
       });
     }
   }
 
+  const mappings = [...byPaymentMethod.values()];
   const summary: SavedCardMigrationMappingSummary = {
-    matched,
-    unmatched,
-    failed,
-    total: input.rows.length
+    matched: mappings.filter((m) => m.status === "attached").length,
+    unmatched: mappings.filter((m) => m.status === "fallback_required").length,
+    failed: mappings.filter((m) => m.status === "failed").length,
+    total: mappings.length
   };
 
   const nextStatus: SavedCardMigrationStatus =
-    unmatched > 0 || failed > 0 ? "fallback_required" : "completed";
+    summary.unmatched > 0 || summary.failed > 0 ? "fallback_required" : "completed";
 
   const now = new Date();
   const [updatedRow] = await db
@@ -403,6 +478,8 @@ export async function applySavedCardMigrationMappingsForBundle(
       status: nextStatus,
       mappingSummary: summary,
       customerMappings: mappings,
+      offSessionConsentAcknowledgedAt: consentAcknowledgedAt,
+      offSessionConsentAcknowledgedById: consentAcknowledgedById,
       completedAt: nextStatus === "completed" ? now : null,
       updatedAt: now
     })
@@ -455,13 +532,34 @@ export async function sendSavedCardMigrationFallbackEmail(
     throw new AppError(ErrorCode.VALIDATION_ERROR, "Customer email is required to send fallback message");
   }
 
+  const customerEmail = customer.email.trim().toLowerCase();
+  const needsFallback = migration.customerMappings.some(
+    (mapping) =>
+      (mapping.status === "fallback_required" || mapping.status === "failed") &&
+      (mapping.renvaniCustomerId === customer.id ||
+        (mapping.renvaniCustomerId === null && (mapping.email ?? "").trim().toLowerCase() === customerEmail))
+  );
+  if (!needsFallback) {
+    throw new AppError(
+      ErrorCode.VALIDATION_ERROR,
+      "Customer is not unmatched or failed in this saved card migration"
+    );
+  }
+
+  const migrationRow = await getScopedMigration(companyId, migration.id);
+  const alreadySent = parseCustomerIdList(migrationRow.fallbackEmailCustomerIds);
+  if (alreadySent.includes(customer.id)) {
+    throw new AppError(ErrorCode.CONFLICT, "Fallback email was already sent to this customer");
+  }
+
   const [company] = await db
-    .select({ name: companies.name })
+    .select({ name: companies.name, slug: companies.slug })
     .from(companies)
     .where(eq(companies.id, companyId))
     .limit(1);
 
-  const paymentPortalUrl = `${env.APP_URL}/pay`;
+  // No generic card-update page exists yet; link to the company's real public site page.
+  const paymentPortalUrl = `${env.APP_URL}/site/${encodeURIComponent(company?.slug ?? "")}`;
 
   await sendRenderedTemplateEmail(
     customer.email,
@@ -477,7 +575,11 @@ export async function sendSavedCardMigrationFallbackEmail(
   const now = new Date();
   const [updatedRow] = await db
     .update(savedCardMigrations)
-    .set({ fallbackEmailSentAt: now, updatedAt: now })
+    .set({
+      fallbackEmailSentAt: now,
+      fallbackEmailCustomerIds: [...alreadySent, customer.id],
+      updatedAt: now
+    })
     .where(and(eq(savedCardMigrations.id, migration.id), eq(savedCardMigrations.companyId, companyId)))
     .returning();
 

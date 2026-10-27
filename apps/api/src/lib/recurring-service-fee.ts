@@ -28,7 +28,6 @@ export interface RecurringServiceFee {
 /**
  * Service Fee for service-agreement and VIP membership checkouts (recurring).
  * Same rules as invoice checkout (computeCheckoutFees): 2% on Flex/Founding/Startup, Flat = 0.
- * The $1.99 online-booking fee never applies here (not an online-booked invoice checkout).
  */
 export function computeRecurringServiceFee(
   company: CompanySettingsCarrier,
@@ -36,8 +35,6 @@ export function computeRecurringServiceFee(
 ): RecurringServiceFee {
   const fees = computeCheckoutFees({
     chargeCents: moneyStringToCents(price),
-    isOnlineBooking: false,
-    paysInvoiceInFull: false,
     plan: readRenvaniSubscriptionPlan(company)
   });
 

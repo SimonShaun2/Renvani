@@ -793,14 +793,8 @@ export async function loadPublicInvoicePayment(
   }
 
   const context = await loadPublicPayContext(invoice, db);
-  const { isOnlineBooking, plan } = context;
-  const fees = computeCheckoutFees({
-    chargeCents: moneyStringToCents(invoice.balanceDue),
-    isOnlineBooking,
-    paysInvoiceInFull: true,
-    plan
-  });
-  const totalFeeCents = fees.serviceFeeCents + fees.bookingFeeCents;
+  const fees = computeCheckoutFees({ chargeCents: moneyStringToCents(invoice.balanceDue), plan: context.plan });
+  const totalFeeCents = fees.serviceFeeCents;
 
   const disclosure = customerPlatformFeeDisclosure();
   const paymentLinkUrl =
@@ -821,10 +815,10 @@ export async function loadPublicInvoicePayment(
     platformFeeAmount: centsToMoneyString(totalFeeCents),
     totalDue: centsToMoneyString(fees.totalCents),
     serviceFeeAmount: centsToMoneyString(fees.serviceFeeCents),
-    bookingFeeAmount: centsToMoneyString(fees.bookingFeeCents),
+    bookingFeeAmount: "0.00",
     invoiceAmountCents: fees.chargeCents,
     serviceFeeCents: fees.serviceFeeCents,
-    bookingFeeCents: fees.bookingFeeCents,
+    bookingFeeCents: 0,
     totalDueCents: fees.totalCents,
     feeRefundable: false,
     platformFeePercent: fees.serviceFeeCents > 0 ? fees.serviceFeeRateBps / 100 : null,
@@ -1086,7 +1080,6 @@ export async function sendInvoice(
       invoiceNumber: existingInvoice.invoiceNumber,
       total: existingInvoice.balanceDue,
       paymentToken,
-      isOnlineBooking: await isInvoiceFromOnlineBooking(existingInvoice, db),
       renvaniPlan: readRenvaniSubscriptionPlan(company),
       items: items.map((item) => ({
         name: item.name,
@@ -1455,19 +1448,6 @@ export async function markOverdue(companyId: string, invoiceId: string): Promise
   return toInvoice(overdueInvoice);
 }
 
-/** Online-booked invoices: the invoice's job was created by public online booking. */
-async function isInvoiceFromOnlineBooking(
-  invoice: Pick<InvoiceRow, "companyId" | "jobId">,
-  executor: SelectExecutor
-): Promise<boolean> {
-  if (!invoice.jobId) {
-    return false;
-  }
-
-  const job = await getJobRecord(invoice.companyId, invoice.jobId, executor);
-  return Array.isArray(job.tags) && job.tags.includes("online_booking");
-}
-
 function readNonNegativeIntMetadata(value: string | undefined): number | null {
   if (value === undefined || !/^\d+$/.test(value)) {
     return null;
@@ -1487,7 +1467,9 @@ export function readCheckoutFeesFromIntent(paymentIntent: {
   const received = paymentIntent.amount_received || paymentIntent.amount;
   const metadata = paymentIntent.metadata ?? {};
   const serviceFeeCents = readNonNegativeIntMetadata(metadata.serviceFeeCents);
-  const bookingFeeCents = readNonNegativeIntMetadata(metadata.bookingFeeCents);
+  // Legacy: intents created before the online-booking fee was removed (2026-10-27) may still carry it.
+  const bookingFeeCents =
+    metadata.bookingFeeCents === undefined ? 0 : readNonNegativeIntMetadata(metadata.bookingFeeCents);
 
   if (serviceFeeCents === null || bookingFeeCents === null) {
     return { invoiceAmountCents: received, serviceFeeCents: 0, bookingFeeCents: 0 };

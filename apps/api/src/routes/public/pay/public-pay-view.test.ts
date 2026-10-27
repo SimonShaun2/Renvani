@@ -201,7 +201,7 @@ describe("public pay view fields", () => {
     assertPayerSafe(response.body, ids);
   });
 
-  it("receipt: Flex paid online-booked shows Service Fee + $1.99 booking fee split; no card fields", async () => {
+  it("receipt: legacy payment with a recorded $1.99 booking fee (pre-removal) still renders safely; no card fields", async () => {
     const { ids } = seedGraph({ plan: "flex", onlineBooking: true, paid: true });
     const response = await request(app.server).get(`/api/v1/public/pay/${TOKEN}/receipt`);
 
@@ -223,6 +223,28 @@ describe("public pay view fields", () => {
     expect(Object.keys(response.body)).toEqual(expect.arrayContaining([
       "invoiceNumber", "totalDue", "invoiceAmount", "platformFeeAmount", "receiptPortalUrl", "pdfDownloadUrl", "brandName"
     ]));
+  });
+
+  it("GET /:token: online-booked unpaid invoice is charged invoice + 2% Service Fee only (booking fee removed)", async () => {
+    seedGraph({ plan: "flex", onlineBooking: true, paid: false });
+    const response = await request(app.server).get(`/api/v1/public/pay/${TOKEN}`);
+    expect(response.status).toBe(200);
+    expect(response.body).toMatchObject({
+      invoiceAmount: "100.00",
+      serviceFeeAmount: "2.00",
+      bookingFeeAmount: "0.00",
+      bookingFeeCents: 0,
+      totalDue: "102.00",
+      totalDueCents: 10_200,
+      platformFeeAmount: "2.00"
+    });
+  });
+
+  it("GET /:token: Flat online-booked unpaid invoice total = invoice only", async () => {
+    seedGraph({ plan: "flat", onlineBooking: true, paid: false });
+    const response = await request(app.server).get(`/api/v1/public/pay/${TOKEN}`);
+    expect(response.status).toBe(200);
+    expect(response.body).toMatchObject({ totalDue: "100.00", serviceFeeAmount: "0.00", bookingFeeAmount: "0.00", bookingFeeCents: 0 });
   });
 
   it("receipt: Flat has no Service Fee; no booking fee when not online-booked; no card fields", async () => {

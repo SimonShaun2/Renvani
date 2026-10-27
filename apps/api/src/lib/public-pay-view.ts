@@ -35,7 +35,6 @@ export interface PublicPayContext {
   items: InvoiceItemRow[];
   latestPayment: PaymentRow | null;
   plan: RenvaniSubscriptionPlan | null;
-  isOnlineBooking: boolean;
 }
 
 async function first<T>(rows: Promise<T[]>): Promise<T | null> {
@@ -93,8 +92,7 @@ export async function loadPublicPayContext(
     property,
     items,
     latestPayment,
-    plan: readRenvaniSubscriptionPlan(company),
-    isOnlineBooking: Array.isArray(job?.tags) && job.tags.includes("online_booking")
+    plan: readRenvaniSubscriptionPlan(company)
   };
 }
 
@@ -140,9 +138,9 @@ function isSucceeded(payment: PaymentRow | null): payment is PaymentRow {
 }
 
 /**
- * Receipt Service Fee vs booking fee split. A succeeded payment uses the fees recorded at checkout;
- * otherwise computeCheckoutFees previews it (Flat -> no Service Fee; booking fee only when an
- * online-booked invoice is paid in full at checkout). Label from SERVICE_FEE_RATE_BPS via plan.
+ * Receipt fee split. A succeeded payment uses the fees recorded at checkout (including a legacy
+ * online-booking fee recorded before it was removed on 2026-10-27); otherwise computeCheckoutFees
+ * previews the Service Fee only (Flat -> none). Label from SERVICE_FEE_RATE_BPS via plan.
  */
 export function buildPublicPayReceiptFees(ctx: PublicPayContext): PublicPayReceiptFees {
   const payment = ctx.latestPayment;
@@ -151,12 +149,11 @@ export function buildPublicPayReceiptFees(ctx: PublicPayContext): PublicPayRecei
         serviceFeeCents: moneyStringToCents(payment.serviceFeeAmount),
         bookingFeeCents: moneyStringToCents(payment.bookingFeeAmount)
       }
-    : computeCheckoutFees({
-        chargeCents: moneyStringToCents(ctx.invoice.balanceDue),
-        isOnlineBooking: ctx.isOnlineBooking,
-        paysInvoiceInFull: true,
-        plan: ctx.plan
-      });
+    : {
+        serviceFeeCents: computeCheckoutFees({ chargeCents: moneyStringToCents(ctx.invoice.balanceDue), plan: ctx.plan })
+          .serviceFeeCents,
+        bookingFeeCents: 0
+      };
 
   return {
     serviceFeeLabel: fees.serviceFeeCents > 0 ? formatServiceFeeLineItemName(serviceFeeRateBpsForPlan(ctx.plan)) : null,

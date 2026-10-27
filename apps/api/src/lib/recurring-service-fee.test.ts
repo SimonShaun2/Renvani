@@ -30,7 +30,7 @@ describe("computeRecurringServiceFee (service agreements + VIP)", () => {
     expect(fee.applicationFeePercent).toBeNull();
   });
 
-  it("never applies the $1.99 booking fee; application fee recovers the Service Fee", () => {
+  it("application fee recovers the Service Fee", () => {
     const fee = computeRecurringServiceFee(companyOn("flex"), "50.00");
     expect(fee.serviceFeeCents).toBe(100);
     const total = fee.chargeCents + fee.serviceFeeCents;

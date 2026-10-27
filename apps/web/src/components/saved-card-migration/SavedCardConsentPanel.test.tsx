@@ -96,11 +96,21 @@ describe("SavedCardConsentPanel", () => {
 
   it("local legal draft copy matches the API contract text", () => {
     expect(SAVED_CARD_CONSENT_LEGAL_DRAFT_TEXT).toBe(SAVED_CARD_OFF_SESSION_CONSENT_ACK_TEXT);
+  });
+
+  // The Legal draft file only exists on the dev box. Only a missing file (ENOENT) skips;
+  // any other read error or a failed assertion fails the test.
+  it("Legal draft saved-card-ack.md contains the consent text (skips only if the file is missing: ENOENT)", (ctx) => {
+    let md: string;
     try {
-      const md = readFileSync("/workspace/legal/saved-card-ack.md", "utf8");
-      expect(md).toContain(SAVED_CARD_CONSENT_LEGAL_DRAFT_TEXT);
-    } catch {
-      // legal file only exists on the dev box
+      md = readFileSync("/workspace/legal/saved-card-ack.md", "utf8");
+    } catch (err) {
+      if ((err as NodeJS.ErrnoException).code === "ENOENT") {
+        ctx.skip("ENOENT: /workspace/legal/saved-card-ack.md not present; legal file check skipped");
+        return;
+      }
+      throw err;
     }
+    expect(md).toContain(SAVED_CARD_CONSENT_LEGAL_DRAFT_TEXT);
   });
 });

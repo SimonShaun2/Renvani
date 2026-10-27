@@ -264,6 +264,8 @@ export interface TestPropertyRecord {
   notes: string | null;
   isPrimary: boolean;
   isActive: boolean;
+  sourceSystem?: string | null;
+  sourceId?: string | null;
   importSessionId: string | null;
   createdAt: Date;
   updatedAt: Date;
@@ -2356,6 +2358,8 @@ const propertiesTable = {
   notes: "notes",
   isPrimary: "isPrimary",
   isActive: "isActive",
+  sourceSystem: "sourceSystem",
+  sourceId: "sourceId",
   importSessionId: "importSessionId",
   createdAt: "createdAt",
   updatedAt: "updatedAt",
@@ -4071,6 +4075,8 @@ function createPropertyRecord(
     notes: values.notes ?? null,
     isPrimary: values.isPrimary ?? false,
     isActive: values.isActive ?? true,
+    ...(values.sourceSystem !== undefined ? { sourceSystem: values.sourceSystem } : {}),
+    ...(values.sourceId !== undefined ? { sourceId: values.sourceId } : {}),
     importSessionId: values.importSessionId ?? null,
     createdAt: values.createdAt ?? now,
     updatedAt: values.updatedAt ?? now,

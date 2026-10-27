@@ -11,6 +11,7 @@
     "lint": "corepack pnpm -r lint",
     "test": "corepack pnpm -r test",
     "test:fs-migrate-import-contracts": "corepack pnpm --filter @fsm/config --filter @fsm/import-normalize --filter @fsm/types build && corepack pnpm --filter @fsm/import-normalize test:import-contracts && corepack pnpm --filter @fsm/types test:import-contracts && corepack pnpm --filter @fsm/jobs test:import-contracts && corepack pnpm --filter @fsm/api exec vitest run src/routes/migrate-onboarding/migrate-onboarding.wizard-api.contract.test.ts",
+    "test:agent-eval": "corepack pnpm --filter @fsm/types build && corepack pnpm --filter @fsm/types exec vitest run src/agent-control-plane/v1/eval/agent-eval.harness.test.ts",
     "qa:branded-site": "bash scripts/qa-branded-site-local.sh",
     "check:env-docs": "node scripts/check-env-documentation.mjs",
     "test:neon-ci": "corepack pnpm --filter \"@fsm/config...\" --filter \"@fsm/db...\" build && node scripts/ci/neon-per-pr-branch.mjs",

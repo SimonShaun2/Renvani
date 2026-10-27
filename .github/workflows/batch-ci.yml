@@ -36,6 +36,8 @@ jobs:
         run: pnpm test
       - name: FS-128 FS-MIGRATE import pipeline contracts
         run: pnpm test:fs-migrate-import-contracts
+      - name: FS-16 Agent evaluation harness
+        run: pnpm test:agent-eval
 
   neon-per-pr-staging:
     name: Neon per-PR (staging RLS)

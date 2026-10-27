@@ -52,6 +52,7 @@ export interface InvoiceItem {
   id: string;
   invoiceId: string;
   companyId: string;
+  priceBookItemId: string | null;
   name: string;
   description: string | null;
   itemType: InvoiceItemType;
@@ -193,6 +194,7 @@ export interface AddInvoiceItemInput {
   unitPrice: number;
   isTaxable?: boolean;
   sortOrder?: number;
+  priceBookItemId?: string;
 }
 
 export interface UpdateInvoiceItemInput {
@@ -203,6 +205,7 @@ export interface UpdateInvoiceItemInput {
   unitPrice?: number;
   isTaxable?: boolean;
   sortOrder?: number;
+  priceBookItemId?: string | null;
 }
 
 export interface RecordPaymentInput {

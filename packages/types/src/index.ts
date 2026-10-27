@@ -49,6 +49,7 @@ export * from "./growth-check/index.js";
 export * from "./booking-settings.types.js";
 export * from "./scheduling-agent.types.js";
 export * from "./product.types.js";
+export * from "./price-book.types.js";
 export * from "./review-request.types.js";
 export * from "./service-agreement.types.js";
 export * from "./vip-membership.types.js";

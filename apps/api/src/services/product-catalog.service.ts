@@ -453,7 +453,7 @@ export async function searchProducts(companyId: string, q: string): Promise<Prod
         return false;
       }
 
-      const searchTarget = `${row.name} ${row.sku ?? ""}`.toLowerCase();
+      const searchTarget = `${row.name} ${row.sku ?? ""} ${row.description ?? ""}`.toLowerCase();
       return searchTarget.includes(normalizedQuery);
     })
     .sort((left, right) => {

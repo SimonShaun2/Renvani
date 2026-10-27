@@ -2,12 +2,10 @@
 
 import { useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
-import type { Product } from "@fsm/types";
+import type { PriceBookItemPickerSeed } from "@fsm/types";
 
 import { ProductCatalogPicker } from "@/src/components/jobs/ProductCatalogPicker";
 import { Sheet } from "@/src/components/ui/Sheet";
-import { api } from "@/src/lib/api";
-
 import {
   createLineItemDraft,
   formatMoneyInput,
@@ -15,10 +13,6 @@ import {
   parseMoneyValue,
   type RevenueLineItemDraft
 } from "./estimates.utils";
-
-interface ProductResponse {
-  product: Product;
-}
 
 interface EditableLineItemsTableProps {
   title: string;
@@ -83,27 +77,20 @@ export function EditableLineItemsTable({
     );
   }
 
-  async function handleAddProduct(productId: string) {
-    setPendingProductId(productId);
+  async function handleAddPriceBookItem(seed: PriceBookItemPickerSeed) {
+    setPendingProductId(seed.priceBookItemId);
 
     try {
-      const response = await api.get<ProductResponse>(`/api/v1/products/${productId}`);
-      const product = response.product;
-
       onChange([
         ...items,
         createLineItemDraft({
-          name: product.name,
-          description: product.description ?? "",
-          itemType:
-            product.category === "labor" ||
-            product.category === "material" ||
-            product.category === "fee"
-              ? product.category
-              : "service",
+          priceBookItemId: seed.priceBookItemId,
+          name: seed.name,
+          description: seed.description ?? "",
+          itemType: seed.itemType,
           quantity: "1",
-          unitPrice: formatMoneyInput(product.unitPrice),
-          isTaxable: product.isTaxable ?? true,
+          unitPrice: formatMoneyInput(seed.unitPrice),
+          isTaxable: seed.isTaxable,
           sortOrder: items.length
         })
       ]);
@@ -298,7 +285,7 @@ export function EditableLineItemsTable({
       <ProductCatalogPicker
         open={catalogOpen}
         onClose={() => setCatalogOpen(false)}
-        onAddProduct={handleAddProduct}
+        onAddPriceBookItem={handleAddPriceBookItem}
         pendingProductId={pendingProductId}
       />
 

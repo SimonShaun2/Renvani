@@ -436,6 +436,7 @@ export interface TestEstimateItemRecord {
   id: string;
   estimateId: string;
   companyId: string;
+  productCatalogId: string | null;
   name: string;
   description: string | null;
   itemType: EstimateItemType;
@@ -491,6 +492,7 @@ export interface TestInvoiceItemRecord {
   id: string;
   invoiceId: string;
   companyId: string;
+  productCatalogId: string | null;
   name: string;
   description: string | null;
   itemType: InvoiceItemType;
@@ -1352,6 +1354,7 @@ export interface TestEstimateItemRecord {
   id: string;
   estimateId: string;
   companyId: string;
+  productCatalogId: string | null;
   name: string;
   description: string | null;
   itemType: EstimateItemType;
@@ -1407,6 +1410,7 @@ export interface TestInvoiceItemRecord {
   id: string;
   invoiceId: string;
   companyId: string;
+  productCatalogId: string | null;
   name: string;
   description: string | null;
   itemType: InvoiceItemType;
@@ -2457,6 +2461,7 @@ const estimateItemsTable = {
   id: "id",
   estimateId: "estimateId",
   companyId: "companyId",
+  productCatalogId: "productCatalogId",
   name: "name",
   description: "description",
   itemType: "itemType",
@@ -2514,6 +2519,7 @@ const invoiceItemsTable = {
   id: "id",
   invoiceId: "invoiceId",
   companyId: "companyId",
+  productCatalogId: "productCatalogId",
   name: "name",
   description: "description",
   itemType: "itemType",
@@ -3834,6 +3840,7 @@ function createEstimateItemRecord(
     id: values.id ?? nextId(),
     estimateId: values.estimateId,
     companyId: values.companyId,
+    productCatalogId: values.productCatalogId ?? null,
     name: values.name,
     description: values.description ?? null,
     itemType: values.itemType ?? "service",
@@ -3903,6 +3910,7 @@ function createInvoiceItemRecord(
     id: values.id ?? nextId(),
     invoiceId: values.invoiceId,
     companyId: values.companyId,
+    productCatalogId: values.productCatalogId ?? null,
     name: values.name,
     description: values.description ?? null,
     itemType: values.itemType ?? "service",

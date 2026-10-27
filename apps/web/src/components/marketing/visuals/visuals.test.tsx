@@ -102,17 +102,20 @@ describe("PricingSection", () => {
   });
 });
 
-describe("booking fee", () => {
-  it("shows the $1.99 online-booking checkout fee on pricing", () => {
-    const pricing = pricingFromSection(FALLBACK_HOME_PRICING.find((s) => s.page === "pricing" && s.sectionKey === "plans"))!;
-    render(<PricingSection pricing={pricing} />);
-    expect(screen.getByTestId("booking-fee").textContent).toMatch(/\$1\.99 booking fee on online bookings, paid at checkout/);
+describe("no booking fee", () => {
+  it("pricing shows plan Service Fee copy only, never a $1.99 booking fee", () => {
+    for (const key of [["pricing", "plans"], ["home", "pricing"]] as const) {
+      const pricing = pricingFromSection(FALLBACK_HOME_PRICING.find((s) => s.page === key[0] && s.sectionKey === key[1]))!;
+      const { container, unmount } = render(<PricingSection pricing={pricing} />);
+      expect(container.textContent).not.toMatch(/1\.99|booking fee/i);
+      expect(screen.queryByTestId("booking-fee")).toBeNull();
+      expect(container.textContent).toContain("No Service Fee");
+      unmount();
+    }
   });
 
-  it("falls back to the default $1.99 booking fee when the CMS omits it", () => {
-    const pricing = pricingFromSection(FALLBACK_HOME_PRICING.find((s) => s.page === "home" && s.sectionKey === "pricing"))!;
-    render(<PricingSection pricing={{ ...pricing, bookingFee: undefined }} />);
-    expect(screen.getByTestId("booking-fee").textContent).toContain("$1.99");
+  it("CMS snapshot has no booking fee mention", () => {
+    expect(JSON.stringify(FALLBACK_HOME_PRICING)).not.toMatch(/1\.99|booking fee/i);
   });
 });
 

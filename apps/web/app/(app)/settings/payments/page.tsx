@@ -174,7 +174,7 @@ export default function SettingsPaymentsPage() {
                   {status.platformFeePercent != null && status.platformFeePercent > 0
                     ? "Paid by your customer at checkout and non-refundable. You receive the full invoice amount."
                     : status.renvaniPlanTier === "flat"
-                      ? "Flat plan: no Service Fee. Only the $1.99 booking fee applies to paid online-booked checkouts."
+                      ? "Flat plan: no Service Fee. Your customers pay the invoice amount only."
                       : "No billing plan set yet. Your Service Fee will show here once a plan is chosen."}
                 </p>
               </div>

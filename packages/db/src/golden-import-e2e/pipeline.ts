@@ -94,6 +94,11 @@ function inferPresetId(
     return "service_fusion_price_book";
   }
 
+  // Equipment has no vendor preset; the equipment commit reads vendor columns directly.
+  if (file.entityType === "equipment") {
+    return "generic";
+  }
+
   if (manifest.sourceSystem === "qbd") {
     const slot = file.entityType === "payments" ? "payments" : file.entityType;
     const contractPreset = {
@@ -451,7 +456,9 @@ async function commitGoldenFile(
       const resolver = await buildLineageEquipmentResolver(companyId, sourceSystem);
       const equipmentRows = rows.map((row) => {
         const mapped = mapRowValues(row.values, columnMapping);
-        const sourceId = pickVendorSourceId(file, row.values, mapped);
+        // Equipment rows also carry Customer ID; the asset's own id must win.
+        const sourceId =
+          normalizeText(row.values["Equipment ID"]) ?? pickVendorSourceId(file, row.values, mapped);
         return ImportEquipmentCommitRowSchema.parse({
           rowNumber: row.rowNumber,
           sourceId,

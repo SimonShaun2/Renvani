@@ -29,8 +29,9 @@ export function resolveCompanyConnectApplicationFeeFraction(company: CompanySett
 const SERVICE_FEE_PLAN_IDS: ReadonlySet<string> = new Set<RenvaniPlanId>(["flex", "flat", "founding", "startup"]);
 
 /**
- * Customer-paid Service Fee percent shown in Connect status, derived from SERVICE_FEE_RATE_BPS
- * (not STRIPE_PLATFORM_FEE_PERCENT). Flex/Founding/Startup -> 2; Flat or no/unknown plan -> 0.
+ * Customer-paid Service Fee percent shown in Connect status. Derived from serviceFeeRateBpsForPlan
+ * (same as checkout; not STRIPE_PLATFORM_FEE_PERCENT): Flat -> 0; every other plan, including
+ * unset/unknown, -> SERVICE_FEE_RATE_BPS / 100 (2).
  */
 export function resolveCompanyServiceFeePercent(company: CompanySettingsCarrier): number {
   const settings = company.settings;
@@ -38,6 +39,6 @@ export function resolveCompanyServiceFeePercent(company: CompanySettingsCarrier)
     settings && typeof settings === "object" && !Array.isArray(settings)
       ? (settings as { stripePlatformBilling?: { planTier?: unknown } }).stripePlatformBilling?.planTier
       : undefined;
-  if (typeof raw !== "string" || !SERVICE_FEE_PLAN_IDS.has(raw)) return 0;
-  return serviceFeeRateBpsForPlan(raw as RenvaniPlanId) / 100;
+  const plan = typeof raw === "string" && SERVICE_FEE_PLAN_IDS.has(raw) ? (raw as RenvaniPlanId) : null;
+  return serviceFeeRateBpsForPlan(plan) / 100;
 }

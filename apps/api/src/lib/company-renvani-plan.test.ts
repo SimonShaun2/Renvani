@@ -59,8 +59,8 @@ describe("company-renvani-plan", () => {
       ["no plan", { settings: {} }],
       ["null plan", withPlan(null)],
       ["unknown plan", withPlan("enterprise")]
-    ])("%s -> 0", (_label, company) => {
-      expect(resolveCompanyServiceFeePercent(company)).toBe(0);
+    ])("%s -> 2 (matches checkout default)", (_label, company) => {
+      expect(resolveCompanyServiceFeePercent(company)).toBe(feePercent);
     });
 
     it("ignores STRIPE_PLATFORM_FEE_PERCENT", () => {

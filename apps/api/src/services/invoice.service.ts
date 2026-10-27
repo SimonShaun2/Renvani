@@ -47,12 +47,18 @@ import {
   type PaymentMethod,
   type PaymentStatus,
   type PublicInvoicePaymentLink,
+  type PublicInvoicePaymentLinkView,
   type RecordPaymentInput,
   type UpdateInvoiceInput
 } from "@fsm/types";
 
 import { readRenvaniSubscriptionPlan } from "../lib/company-renvani-plan.js";
 import { generateInvoiceNumber } from "../lib/invoice-number.js";
+import {
+  buildPublicPayViewFields,
+  loadPublicPayContext,
+  type PublicPayContext
+} from "../lib/public-pay-view.js";
 import { featureFlags } from "@fsm/config/feature-flags";
 import {
   createInvoiceCheckoutSession,
@@ -771,22 +777,28 @@ function buildPublicPaymentPageUrl(paymentToken: string): string {
   return `${appBaseUrl}/pay/${paymentToken}`;
 }
 
-export async function getPublicInvoicePaymentLink(token: string): Promise<PublicInvoicePaymentLink> {
+export async function getPublicInvoicePaymentLink(token: string): Promise<PublicInvoicePaymentLinkView> {
+  const { link, context } = await loadPublicInvoicePayment(token);
+  return { ...link, ...buildPublicPayViewFields(context) };
+}
+
+/** Public pay link (legacy keys) plus the preloaded context used to build `fields`. */
+export async function loadPublicInvoicePayment(
+  token: string
+): Promise<{ link: PublicInvoicePaymentLink; context: PublicPayContext }> {
   const invoice = await getInvoiceByPaymentToken(token, db);
 
   if (!invoice.stripePaymentLinkId && !invoice.stripePaymentLinkUrl) {
     throw new AppError(ErrorCode.CONFLICT, "Invoice payment link is unavailable");
   }
 
-  const [isOnlineBooking, company] = await Promise.all([
-    isInvoiceFromOnlineBooking(invoice, db),
-    getCompanyRecord(invoice.companyId, db)
-  ]);
+  const context = await loadPublicPayContext(invoice, db);
+  const { isOnlineBooking, plan } = context;
   const fees = computeCheckoutFees({
     chargeCents: moneyStringToCents(invoice.balanceDue),
     isOnlineBooking,
     paysInvoiceInFull: true,
-    plan: readRenvaniSubscriptionPlan(company)
+    plan
   });
   const totalFeeCents = fees.serviceFeeCents + fees.bookingFeeCents;
 
@@ -801,7 +813,7 @@ export async function getPublicInvoicePaymentLink(token: string): Promise<Public
     checkoutClientSecret = await retrieveInvoiceCheckoutClientSecret(invoice.stripePaymentLinkId);
   }
 
-  return {
+  const link: PublicInvoicePaymentLink = {
     invoiceNumber: invoice.invoiceNumber,
     paymentLinkUrl,
     checkoutClientSecret,
@@ -819,6 +831,8 @@ export async function getPublicInvoicePaymentLink(token: string): Promise<Public
     platformFeePaidByCustomer: totalFeeCents > 0,
     platformFeeDisclosure: disclosure.length > 0 ? disclosure : null
   };
+
+  return { link, context };
 }
 
 export async function createInvoice(

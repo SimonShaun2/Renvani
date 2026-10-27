@@ -1236,7 +1236,8 @@ export async function scheduleJob(
   try {
     await enqueueServiceJobBriefAfterSchedule({
       companyId,
-      jobId: updatedJob.id
+      jobId: updatedJob.id,
+      resourceVersion: updatedJob.updatedAt.toISOString()
     });
   } catch (error) {
     logger.warn(

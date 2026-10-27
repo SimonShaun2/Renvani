@@ -1,6 +1,6 @@
 import { formatServiceFeeLineItemName, SERVICE_FEE_RATE_BPS } from "@fsm/config/stripe-pricing";
 
-import type { PublicPaymentLinkResponse } from "@/src/hooks/invoices.hooks";
+import type { PublicPaymentLinkResponse } from "@fsm/types";
 
 /** Figma 53:3–53:465 (Customer / 07 Pay invoice): Flex · Flat · Failed · Paid. */
 export type PayInvoiceState = "flex" | "flat" | "failed" | "paid";
@@ -19,7 +19,38 @@ export interface PayInvoiceSummary {
   totalDue: string;
 }
 
-const FAILED_STATUSES = new Set(["failed", "canceled", "cancelled", "declined"]);
+const DECLINED_STATUSES = new Set(["failed", "declined"]);
+const CANCELED_STATUSES = new Set(["canceled", "cancelled"]);
+
+export interface PayNotice {
+  tone: "error" | "neutral";
+  title: string;
+  body: string;
+}
+
+/** Banner for a Stripe return: declined (53:143 / 53:390) vs a neutral canceled notice. */
+export function resolvePayNotice(status: string | null): PayNotice | null {
+  const value = status?.toLowerCase() ?? "";
+  if (DECLINED_STATUSES.has(value)) {
+    return { tone: "error", title: "Your card was declined", body: "No charge was made. Try another card or pay by bank account." };
+  }
+  if (CANCELED_STATUSES.has(value)) {
+    return { tone: "neutral", title: "Payment canceled", body: "No charge was made. You can pay whenever you're ready." };
+  }
+  return null;
+}
+
+const DATE_ONLY = /^(\d{4})-(\d{2})-(\d{2})$/;
+
+/** "Oct 30". Date-only "YYYY-MM-DD" is read as local date parts (no UTC shift); timestamps use Date. */
+export function formatShortDate(value: string | null | undefined, options: Intl.DateTimeFormatOptions = { month: "short", day: "numeric" }): string | null {
+  if (!value) {
+    return null;
+  }
+  const parts = DATE_ONLY.exec(value);
+  const date = parts ? new Date(Number(parts[1]), Number(parts[2]) - 1, Number(parts[3])) : new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date.toLocaleDateString("en-US", options);
+}
 
 function centsToUsd(cents: number): string {
   return (cents / 100).toFixed(2);
@@ -75,12 +106,12 @@ export function buildPayInvoiceSummary(payment: PublicPaymentLinkResponse): PayI
   };
 }
 
-/** `?status=success` is Stripe's return URL; failed/canceled returns show the declined banner (53:143 / 53:390). */
+/** `?status=success` is Stripe's return URL; failed/declined/canceled returns show a notice (see resolvePayNotice). */
 export function resolvePayInvoiceState(payment: PublicPaymentLinkResponse, status: string | null): PayInvoiceState {
   if (status === "success" || payment.invoiceStatus === "paid") {
     return "paid";
   }
-  if (status && FAILED_STATUSES.has(status.toLowerCase())) {
+  if (resolvePayNotice(status)) {
     return "failed";
   }
   return buildPayInvoiceSummary(payment).feeLines.some((line) => line.key === "service") ? "flex" : "flat";
@@ -93,4 +124,26 @@ export function formatUsd(amount: string): string {
   }
 
   return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(value);
+}
+
+export interface PaidDetailRow {
+  label: string;
+  value: string;
+}
+
+/**
+ * Paid panel rows (53:219 / 53:465) from API fields, shown only when present.
+ * "Paid with Visa ••4242" is omitted: the public API does not return card brand/last4.
+ */
+export function buildPaidDetails(view: {
+  paidAt?: string | null;
+  statementDescriptor?: string | null;
+  receiptEmail?: string | null;
+}): PaidDetailRow[] {
+  const rows: PaidDetailRow[] = [];
+  const date = formatShortDate(view.paidAt, { month: "short", day: "numeric", year: "numeric" });
+  if (date) rows.push({ label: "Date", value: date });
+  if (view.statementDescriptor) rows.push({ label: "Statement shows", value: view.statementDescriptor });
+  if (view.receiptEmail) rows.push({ label: "Receipt sent to", value: view.receiptEmail });
+  return rows;
 }

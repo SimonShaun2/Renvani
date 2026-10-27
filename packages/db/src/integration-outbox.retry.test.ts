@@ -45,7 +45,7 @@ import { recordIntegrationOutboxRetryReceipt } from "./integration-outbox.servic
 const companyId = "cccccccc-cccc-4ccc-8ccc-cccccccccccc";
 const operationId = "dddddddd-dddd-4ddd-8ddd-dddddddddddd";
 const correlationId = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
-const retryReceiptKeyForAttempt = (attempt: number) => `${correlationId}:retry:${attempt}`;
+const retryReceiptKeyForAttempt = (attempt: number) => `${operationId}:${correlationId}:retry:${attempt}`;
 
 describe("recordIntegrationOutboxRetryReceipt idempotency", () => {
   beforeEach(() => {
@@ -130,5 +130,32 @@ describe("recordIntegrationOutboxRetryReceipt idempotency", () => {
 
     expect(second.deduplicated).toBe(true);
     expect(second.auditEvent.id).toBe("existing-audit");
+  });
+
+  it("rejects a receipt whose correlationId does not match the operation", async () => {
+    await expect(
+      recordIntegrationOutboxRetryReceipt(companyId, operationId, {
+        schemaVersion: 1,
+        correlationId: "ffffffff-ffff-4fff-8fff-ffffffffffff",
+        attemptNumber: 1,
+        idempotencyKey: "notifications_v1:msg-1",
+        source: "worker"
+      })
+    ).rejects.toThrow("INTEGRATION_OUTBOX_CORRELATION_MISMATCH");
+    expect(mocks.updateOperation).not.toHaveBeenCalled();
+  });
+
+  it("does not reopen a terminal operation (guarded update matches no row)", async () => {
+    mocks.updateOperation.mockResolvedValueOnce([]);
+    await expect(
+      recordIntegrationOutboxRetryReceipt(companyId, operationId, {
+        schemaVersion: 1,
+        correlationId,
+        attemptNumber: 2,
+        idempotencyKey: "notifications_v1:msg-1",
+        source: "worker"
+      })
+    ).rejects.toThrow("INTEGRATION_OUTBOX_TERMINAL");
+    expect(mocks.insertAudit).not.toHaveBeenCalled();
   });
 });

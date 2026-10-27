@@ -296,3 +296,65 @@ export interface PublicInvoicePaymentLink {
   /** Optional disclosure from `CUSTOMER_PLATFORM_FEE_DISCLOSURE` (empty = omit). */
   platformFeeDisclosure: string | null;
 }
+
+/** Public pay link response: legacy keys plus additive payer-safe display keys. */
+export type PublicInvoicePaymentLinkView = PublicInvoicePaymentLink & PublicPayViewFields;
+
+/** Payer-safe line item on the public pay page (no internal ids). */
+export interface PublicPayLineItem {
+  description: string;
+  quantity: string;
+  /** Unit price, 2-decimal money string. */
+  unit: string;
+  total: string;
+}
+
+/**
+ * Additive, payer-safe top-level keys on GET /public/pay/:token and /receipt (Figma 53:3–53:465).
+ * Never carries tenant ids, row ids, Stripe ids or internal notes. Extend by adding a key here,
+ * a builder in apps/api/src/lib/public-pay-view.ts and the key in the route response allowlist.
+ */
+export interface PublicPayViewFields {
+  shopName: string | null;
+  shopLogoUrl: string | null;
+  shopUrl: string | null;
+  statementDescriptor: string | null;
+  /** First + last (or display) name, as the frame header shows. */
+  customerName: string | null;
+  /** Street line only (frame: "1840 Grape St · Service on Oct 20"). */
+  serviceAddress: string | null;
+  serviceDate: string | null;
+  dueAt: string | null;
+  lineItems: PublicPayLineItem[];
+  invoiceStatus: string;
+  paymentStatus: string | null;
+  paidAmount: string | null;
+  paidAt: string | null;
+  /** Masked (first character of the local part kept). */
+  receiptEmail: string | null;
+  plan: "flex" | "flat" | null;
+}
+
+/** Receipt-only Service Fee vs booking fee split. Fees are never refundable. */
+export interface PublicPayReceiptFees {
+  serviceFeeLabel: string | null;
+  serviceFeeAmount: string;
+  serviceFeeCents: number;
+  bookingFeeAmount: string;
+  bookingFeeCents: number;
+  feeRefundable: false;
+}
+
+/** Web client name for the GET /public/pay/:token response (apps/api routes/public/pay/schemas.ts). */
+export type PublicPaymentLinkResponse = PublicInvoicePaymentLinkView;
+
+/** GET /public/pay/:token/receipt response: legacy receipt keys + view keys + fee split. */
+export interface PublicInvoiceReceiptResponse extends PublicPayViewFields, PublicPayReceiptFees {
+  invoiceNumber: string;
+  totalDue: string;
+  invoiceAmount: string;
+  platformFeeAmount: string;
+  receiptPortalUrl: string;
+  pdfDownloadUrl: string;
+  brandName: string;
+}

@@ -20,6 +20,8 @@ import {
 
 const integrationOutboxRoutes: FastifyPluginAsync = async (fastify) => {
   const officeRoles = [fastify.authenticate, requireRole(["owner", "admin", "office", "dispatcher"])];
+  // Writes (enqueue, retry receipts) are owner/admin only; reads stay office-visible.
+  const adminRoles = [fastify.authenticate, requireRole(["owner", "admin"])];
 
   fastify.get("/integration-outbox/operations", {
     preValidation: [listIntegrationOutboxOperationsValidation],
@@ -35,13 +37,13 @@ const integrationOutboxRoutes: FastifyPluginAsync = async (fastify) => {
 
   fastify.post("/integration-outbox/operations", {
     preValidation: [createIntegrationOutboxOperationValidation],
-    preHandler: officeRoles,
+    preHandler: adminRoles,
     schema: createIntegrationOutboxOperationRouteSchema
   }, createIntegrationOutboxOperationHandler);
 
   fastify.post("/integration-outbox/operations/:operationId/retry-receipts", {
     preValidation: [recordIntegrationOutboxRetryValidation],
-    preHandler: officeRoles,
+    preHandler: adminRoles,
     schema: recordIntegrationOutboxRetryRouteSchema
   }, recordIntegrationOutboxRetryHandler);
 };

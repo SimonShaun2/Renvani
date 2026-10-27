@@ -2,16 +2,28 @@ import { describe, expect, it } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import { SERVICE_FEE_RATE_BPS } from "@fsm/config/stripe-pricing";
 
-import type { PublicPaymentLinkResponse } from "@/src/hooks/invoices.hooks";
+import type { PublicPaymentLinkResponse } from "@fsm/types";
 import { PayInvoiceCheckoutBody, PayInvoicePaidCard } from "./PayInvoiceView";
-import { buildPayInvoiceSummary, formatServiceFeeNote, resolvePayInvoiceState, resolveServiceFeeRateBps } from "./pay-invoice.utils";
+import {
+  buildPaidDetails,
+  buildPayInvoiceSummary,
+  formatServiceFeeNote,
+  formatShortDate,
+  resolvePayInvoiceState,
+  resolvePayNotice,
+  resolveServiceFeeRateBps
+} from "./pay-invoice.utils";
 
 function payment(partial: Partial<PublicPaymentLinkResponse> = {}): PublicPaymentLinkResponse {
   return {
     invoiceNumber: "INV-1042", paymentLinkUrl: "https://checkout.stripe.com/c/pay/cs_test_x", checkoutClientSecret: null,
     invoiceAmount: "240.00", platformFeeAmount: "6.79", totalDue: "246.79", platformFeePercent: 2,
     platformFeePaidByCustomer: true, platformFeeDisclosure: null, serviceFeeCents: 480, bookingFeeCents: 199,
-    invoiceAmountCents: 24000, totalDueCents: 24679, ...partial
+    invoiceAmountCents: 24000, totalDueCents: 24679, serviceFeeAmount: "4.80", bookingFeeAmount: "1.99", feeRefundable: false,
+    shopName: "Summit Heating & Air", shopLogoUrl: null, shopUrl: null, statementDescriptor: "SUMMIT HEATING",
+    customerName: "Dana Whitfield", serviceAddress: "1840 Grape St", serviceDate: "2026-10-20", dueAt: "2026-10-30",
+    lineItems: [], invoiceStatus: "sent", paymentStatus: null, paidAmount: null, paidAt: null, receiptEmail: null, plan: "flex",
+    ...partial
   };
 }
 
@@ -39,10 +51,10 @@ describe("pay invoice fee lines", () => {
   });
 
   it("falls back to the config rate and combined fee for payloads without split cents", () => {
-    const legacy = payment({ platformFeeAmount: "4.80" });
+    const legacy: Partial<PublicPaymentLinkResponse> = payment({ platformFeeAmount: "4.80" });
     delete legacy.serviceFeeCents;
     delete legacy.bookingFeeCents;
-    expect(buildPayInvoiceSummary(legacy).feeLines).toEqual([{ key: "service", label: "Service Fee (2%)", amount: "4.80" }]);
+    expect(buildPayInvoiceSummary(legacy as PublicPaymentLinkResponse).feeLines).toEqual([{ key: "service", label: "Service Fee (2%)", amount: "4.80" }]);
     expect(resolveServiceFeeRateBps(null)).toBe(SERVICE_FEE_RATE_BPS);
     expect(formatServiceFeeNote(150)).toContain("1.5% Service Fee");
   });
@@ -98,5 +110,50 @@ describe("pay invoice states", () => {
     expect(renderToStaticMarkup(<PayInvoicePaidCard amount={null} invoiceNumber="INV-1" details={[]} receiptHref={null} />)).toContain(
       "Your service provider has your payment for INV-1."
     );
+  });
+});
+
+describe("pay notices and dates", () => {
+  it("canceled shows neutral copy, not the declined banner", () => {
+    expect(resolvePayNotice("canceled")).toMatchObject({ tone: "neutral", title: "Payment canceled" });
+    expect(resolvePayNotice("cancelled")?.tone).toBe("neutral");
+    expect(resolvePayNotice("declined")).toMatchObject({ tone: "error", title: "Your card was declined" });
+    expect(resolvePayNotice(null)).toBeNull();
+    const html = renderToStaticMarkup(
+      <PayInvoiceCheckoutBody payment={payment()} state="failed" notice={resolvePayNotice("canceled")} checkout={null} />
+    );
+    expect(html).toContain("Payment canceled");
+    expect(html).not.toContain("Your card was declined");
+  });
+
+  it("formatShortDate reads YYYY-MM-DD as local date parts (no UTC shift)", () => {
+    expect(formatShortDate("2026-10-30")).toBe("Oct 30");
+    expect(formatShortDate("2026-01-01")).toBe("Jan 1");
+    expect(formatShortDate("not-a-date")).toBeNull();
+    expect(formatShortDate(null)).toBeNull();
+  });
+
+  it("renders the figma fields: customer, address/service date, due pill, line items", () => {
+    const html = renderToStaticMarkup(
+      <PayInvoiceCheckoutBody
+        payment={payment({ lineItems: [{ description: "Furnace tune-up", quantity: "1", unit: "220.00", total: "220.00" }] })}
+        state="flex"
+        checkout={null}
+      />
+    );
+    expect(html).toContain("Dana Whitfield");
+    expect(html).toContain("1840 Grape St · Service on Oct 20");
+    expect(html).toContain("Due Oct 30");
+    expect(html).toContain("Furnace tune-up");
+    expect(html).toContain("Shows as SUMMIT HEATING on your statement.");
+  });
+
+  it("paid details omit the card row (not returned by the API)", () => {
+    const rows = buildPaidDetails({ paidAt: "2026-10-22", statementDescriptor: "SUMMIT HEATING", receiptEmail: "d•••@example.com" });
+    expect(rows).toEqual([
+      { label: "Date", value: "Oct 22, 2026" },
+      { label: "Statement shows", value: "SUMMIT HEATING" },
+      { label: "Receipt sent to", value: "d•••@example.com" }
+    ]);
   });
 });

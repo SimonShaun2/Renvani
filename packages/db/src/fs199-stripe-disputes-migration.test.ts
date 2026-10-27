@@ -7,7 +7,7 @@ import { validateRepoMigrationBundle } from "./migration-safety.js";
 import { TENANT_SESSION_GUC } from "./tenant-session.js";
 
 const packageRoot = join(import.meta.dirname, "..");
-const TAG = "0051_fs199_stripe_disputes";
+const TAG = "0052_fs199_stripe_disputes";
 const sqlText = readFileSync(join(packageRoot, "migrations", `${TAG}.sql`), "utf8");
 const schemaText = readFileSync(join(packageRoot, "src", "schema.ts"), "utf8");
 
@@ -18,7 +18,7 @@ describe("FS-199 stripe_disputes migration", () => {
     };
     const entry = journal.entries.find((e) => e.tag === TAG)!;
     const prior = journal.entries.find((e) => e.idx === entry.idx - 1)!;
-    expect(entry.idx).toBe(51);
+    expect(entry.idx).toBe(52);
     expect(entry.when).toBe(1792722000000);
     expect(entry.when).toBeGreaterThan(prior.when);
     expect(validateRepoMigrationBundle(packageRoot).ok).toBe(true);

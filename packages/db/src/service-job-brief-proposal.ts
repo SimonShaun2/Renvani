@@ -54,7 +54,11 @@ export async function createServiceJobBriefAgentProposal(input: {
   const parameters = buildServiceJobBriefProposalParameters(brief);
   ServiceJobBriefProposeParamsV1Schema.parse(parameters);
 
-  const idempotencyKey = buildServiceJobBriefIdempotencyKey(input.companyId, input.jobId);
+  const idempotencyKey = buildServiceJobBriefIdempotencyKey(
+    input.companyId,
+    input.jobId,
+    brief.resourceVersion
+  );
   const target = {
     entityType: "job" as const,
     entityId: input.jobId,

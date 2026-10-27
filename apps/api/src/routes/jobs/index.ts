@@ -1,5 +1,7 @@
 import type { FastifyPluginAsync } from "fastify";
 
+import { requireRole } from "../../lib/authorize.js";
+
 import {
   addJobProductHandler,
   addNoteHandler,
@@ -82,6 +84,11 @@ import {
 
 const jobRoutes: FastifyPluginAsync = async (fastify) => {
   const authenticate = [fastify.authenticate];
+  // FS-25: field-prep reads are for staff (incl. technicians in the field), explicit per route.
+  const jobPrepReaders = [
+    fastify.authenticate,
+    requireRole(["owner", "admin", "dispatcher", "office", "technician"])
+  ];
 
   fastify.get("/", {
     preHandler: authenticate,
@@ -120,13 +127,13 @@ const jobRoutes: FastifyPluginAsync = async (fastify) => {
   }, completeJobHandler);
 
   fastify.get("/:id/service-brief", {
-    preHandler: authenticate,
+    preHandler: jobPrepReaders,
     preValidation: jobIdValidation,
     schema: getJobServiceBriefRouteSchema
   }, getJobServiceBriefHandler);
 
   fastify.get("/:id/preparation-status", {
-    preHandler: authenticate,
+    preHandler: jobPrepReaders,
     preValidation: jobIdValidation,
     schema: getJobPreparationStatusRouteSchema
   }, getJobPreparationStatusHandler);

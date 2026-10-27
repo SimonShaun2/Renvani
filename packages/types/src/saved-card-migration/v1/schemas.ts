@@ -79,12 +79,16 @@ export type ConfirmStripeImportBody = z.infer<typeof confirmStripeImportBodySche
 /** FS-138: max rows per apply-mappings request (no background job for MVP). */
 export const SAVED_CARD_MIGRATION_APPLY_MAX_ROWS = 200;
 
+// DRAFT, pending lawyer review. Source: Renvani Legal & Compliance draft (saved-card-ack.md).
+/** Version label stored with each owner acknowledgment (bump whenever the text changes). */
+export const SAVED_CARD_OFF_SESSION_CONSENT_ACK_VERSION = "v1-draft";
+
 /**
- * FS-138 PLACEHOLDER consent wording, pending Renvani Legal & Compliance review.
- * The owner must acknowledge this before saved cards are attached for off-session charging.
+ * FS-138 owner acknowledgment shown before applying migrated Stripe customer mappings.
+ * DRAFT, pending lawyer review.
  */
 export const SAVED_CARD_OFF_SESSION_CONSENT_ACK_TEXT =
-  "I confirm that the customers in this import agreed to let my business keep their card on file and charge it for future services without them being present.";
+  "By applying these mappings, you confirm that you are authorized to act for your business and that your customers gave you permission to charge the cards they saved with your previous payment processor, for the kinds of payments and on the terms they agreed to with you. You authorize TrayLoop Technologies LLC, doing business as Renvani, to process those saved cards through Stripe for charges you create or approve in Renvani, including when the customer is not present. You are responsible for those charges and for honoring your customers' agreements, cancellations, and refund and dispute requests, and you will stop using any card if a customer withdraws permission. Do not apply mappings for any customer whose permission you cannot show.";
 
 export const applySavedCardMigrationMappingsBodySchema = z.object({
   /** Owner acknowledgment of SAVED_CARD_OFF_SESSION_CONSENT_ACK_TEXT; required (must be true). */

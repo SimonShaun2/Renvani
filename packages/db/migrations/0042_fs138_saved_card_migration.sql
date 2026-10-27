@@ -14,6 +14,8 @@ CREATE TABLE IF NOT EXISTS "saved_card_migrations" (
 	"fallback_email_customer_ids" jsonb DEFAULT '[]'::jsonb NOT NULL,
 	"off_session_consent_acknowledged_at" timestamp,
 	"off_session_consent_acknowledged_by_id" uuid,
+	"off_session_consent_text_version" varchar(64),
+	"off_session_consent_batch_id" uuid,
 	"completed_at" timestamp,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,

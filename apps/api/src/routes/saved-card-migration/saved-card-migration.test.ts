@@ -1,7 +1,11 @@
 import request from "supertest";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { ErrorCode } from "@fsm/types";
+import {
+  ErrorCode,
+  SAVED_CARD_OFF_SESSION_CONSENT_ACK_TEXT,
+  SAVED_CARD_OFF_SESSION_CONSENT_ACK_VERSION
+} from "@fsm/types";
 
 import { closeTestApp } from "../../test-support/close-test-app.js";
 import { setupTestEnv } from "../../test-support/env-setup.js";
@@ -347,6 +351,68 @@ describe("saved card migration (FS-138)", () => {
     const row = fakeDb.getTestState().savedCardMigrations.find((r) => r.companyId === company.id);
     expect(row?.offSessionConsentAcknowledgedAt).toBeInstanceOf(Date);
     expect(row?.offSessionConsentAcknowledgedById).toBe(user.id);
+    expect(row?.offSessionConsentTextVersion).toBe(SAVED_CARD_OFF_SESSION_CONSENT_ACK_VERSION);
+    expect(typeof row?.offSessionConsentBatchId).toBe("string");
+  });
+
+  it("persists the consent record before attaching, even if attach crashes mid-loop", async () => {
+    const { company, user, authorization } = createAuthContext("owner");
+    const bundle = fakeDb.seedImportBundle({ companyId: company.id });
+    const a = fakeDb.seedCustomer({ companyId: company.id, firstName: "A", lastName: "A", email: "a@example.com" });
+    const b = fakeDb.seedCustomer({ companyId: company.id, firstName: "B", lastName: "B", email: "b@example.com" });
+    await startAndConfirm(authorization, bundle.id);
+    const state = fakeDb.getTestState();
+    const seen: unknown[] = [];
+    attachImportedPaymentMethodMock.mockImplementation(async () => {
+      const row = state.savedCardMigrations.find((r) => r.companyId === company.id);
+      seen.push({ ...row });
+      if (seen.length === 2) {
+        // Simulate a process crash (not a Stripe error) on the second attach.
+        throw Object.assign(new Error("crash"), { simulateCrash: true });
+      }
+      return { paymentMethodLabel: "VISA ending in 4242" };
+    });
+    await applyMappings(authorization, bundle.id, {
+      ownerOffSessionConsentAcknowledged: true,
+      rows: [
+        { stripeCustomerId: "cus_a", stripePaymentMethodId: "pm_a", renvaniCustomerId: a.id },
+        { stripeCustomerId: "cus_b", stripePaymentMethodId: "pm_b", renvaniCustomerId: b.id }
+      ]
+    });
+    expect(seen.length).toBe(2);
+    for (const snapshot of seen as Array<Record<string, unknown>>) {
+      expect(snapshot.offSessionConsentAcknowledgedAt).toBeInstanceOf(Date);
+      expect(snapshot.offSessionConsentAcknowledgedById).toBe(user.id);
+      expect(snapshot.offSessionConsentTextVersion).toBe(SAVED_CARD_OFF_SESSION_CONSENT_ACK_VERSION);
+      expect(typeof snapshot.offSessionConsentBatchId).toBe("string");
+    }
+  });
+
+  it("falls back to APP_URL in the fallback email when the company has no slug", async () => {
+    const { company, authorization } = createAuthContext("owner");
+    const bundle = fakeDb.seedImportBundle({ companyId: company.id });
+    const customer = fakeDb.seedCustomer({ companyId: company.id, firstName: "N", lastName: "S", email: "noslug@example.com" });
+    attachImportedPaymentMethodMock.mockRejectedValueOnce(new Error("raw stripe failure"));
+    await startAndConfirm(authorization, bundle.id);
+    await applyMappings(authorization, bundle.id, {
+      ownerOffSessionConsentAcknowledged: true,
+      rows: [{ stripeCustomerId: "cus_ns", stripePaymentMethodId: "pm_ns", renvaniCustomerId: customer.id }]
+    });
+    const companyRow = fakeDb.getTestState().companies.find((c) => c.id === company.id) as unknown as Record<string, unknown>;
+    companyRow.slug = null;
+    const res = await request(app.server)
+      .post(`/api/v1/migrate/onboarding/sessions/${bundle.id}/saved-card-migration/send-fallback-email`)
+      .set("Authorization", authorization)
+      .send({ renvaniCustomerId: customer.id });
+    expect(res.status).toBe(200);
+    const emailArgs = sendRenderedTemplateEmailMock.mock.calls[0]?.[2] as { paymentPortalUrl: string };
+    expect(emailArgs.paymentPortalUrl).not.toContain("/site/");
+    expect(emailArgs.paymentPortalUrl).toBe(process.env.APP_URL?.replace(/\/$/, "") ?? emailArgs.paymentPortalUrl);
+  });
+
+  it("uses Legal's draft consent text with a version label", () => {
+    expect(SAVED_CARD_OFF_SESSION_CONSENT_ACK_TEXT).toMatch(/^By applying these mappings, you confirm/);
+    expect(SAVED_CARD_OFF_SESSION_CONSENT_ACK_VERSION).toBe("v1-draft");
   });
 
   it("rejects confirm-stripe-import once completed and emits stripe_import_confirmed", async () => {

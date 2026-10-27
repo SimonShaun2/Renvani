@@ -2359,6 +2359,8 @@ const savedCardMigrationsTable = {
   fallbackEmailCustomerIds: "fallbackEmailCustomerIds",
   offSessionConsentAcknowledgedAt: "offSessionConsentAcknowledgedAt",
   offSessionConsentAcknowledgedById: "offSessionConsentAcknowledgedById",
+  offSessionConsentTextVersion: "offSessionConsentTextVersion",
+  offSessionConsentBatchId: "offSessionConsentBatchId",
   completedAt: "completedAt",
   createdAt: "createdAt",
   updatedAt: "updatedAt",
@@ -6264,6 +6266,8 @@ export function seedSavedCardMigration(
     fallbackEmailCustomerIds: string[];
     offSessionConsentAcknowledgedAt: Date | null;
     offSessionConsentAcknowledgedById: string | null;
+    offSessionConsentTextVersion: string | null;
+    offSessionConsentBatchId: string | null;
     completedAt: Date | null;
   }> &
     Pick<{ companyId: string; priorProcessorName: string }, "companyId" | "priorProcessorName">
@@ -6284,6 +6288,8 @@ export function seedSavedCardMigration(
     fallbackEmailCustomerIds: values.fallbackEmailCustomerIds ?? [],
     offSessionConsentAcknowledgedAt: values.offSessionConsentAcknowledgedAt ?? null,
     offSessionConsentAcknowledgedById: values.offSessionConsentAcknowledgedById ?? null,
+    offSessionConsentTextVersion: values.offSessionConsentTextVersion ?? null,
+    offSessionConsentBatchId: values.offSessionConsentBatchId ?? null,
     completedAt: values.completedAt ?? null,
     createdAt: now,
     updatedAt: now,

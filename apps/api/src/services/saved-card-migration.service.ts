@@ -1,3 +1,5 @@
+import { randomUUID } from "node:crypto";
+
 import { and, desc, eq, isNull } from "drizzle-orm";
 
 import { EMAIL_TEMPLATE_IDS } from "@fsm/comms";
@@ -13,6 +15,7 @@ import {
 import {
   AppError,
   ErrorCode,
+  SAVED_CARD_OFF_SESSION_CONSENT_ACK_VERSION,
   type ApplySavedCardMigrationMappingsBody,
   type ConfirmStripeImportBody,
   type InternalAdminListSavedCardMigrationsQuery,
@@ -365,8 +368,21 @@ export async function applySavedCardMigrationMappingsForBundle(
 
   const stripeConnectAccountId = await requireCompanyStripeConnect(companyId);
   const existingRow = await getScopedMigration(companyId, existing.id);
-  const consentAcknowledgedAt = existingRow.offSessionConsentAcknowledgedAt ?? new Date();
-  const consentAcknowledgedById = existingRow.offSessionConsentAcknowledgedById ?? actorId;
+
+  // Persist the consent record (version, user, timestamp, batch id) BEFORE attaching any card,
+  // so a crash mid-loop never leaves default cards without a consent record.
+  const consentBatchId = randomUUID();
+  const consentAcknowledgedAt = new Date();
+  await db
+    .update(savedCardMigrations)
+    .set({
+      offSessionConsentAcknowledgedAt: consentAcknowledgedAt,
+      offSessionConsentAcknowledgedById: actorId,
+      offSessionConsentTextVersion: SAVED_CARD_OFF_SESSION_CONSENT_ACK_VERSION,
+      offSessionConsentBatchId: consentBatchId,
+      updatedAt: consentAcknowledgedAt
+    })
+    .where(and(eq(savedCardMigrations.id, existing.id), eq(savedCardMigrations.companyId, companyId)));
 
   // Idempotent: rows whose payment method is already attached are skipped; other prior entries
   // for the same payment method are replaced by this request's result.
@@ -478,8 +494,6 @@ export async function applySavedCardMigrationMappingsForBundle(
       status: nextStatus,
       mappingSummary: summary,
       customerMappings: mappings,
-      offSessionConsentAcknowledgedAt: consentAcknowledgedAt,
-      offSessionConsentAcknowledgedById: consentAcknowledgedById,
       completedAt: nextStatus === "completed" ? now : null,
       updatedAt: now
     })
@@ -558,8 +572,11 @@ export async function sendSavedCardMigrationFallbackEmail(
     .where(eq(companies.id, companyId))
     .limit(1);
 
-  // No generic card-update page exists yet; link to the company's real public site page.
-  const paymentPortalUrl = `${env.APP_URL}/site/${encodeURIComponent(company?.slug ?? "")}`;
+  // No generic card-update page exists yet; link to the company's real public site page,
+  // or the app root when the company has no slug.
+  const paymentPortalUrl = company?.slug
+    ? `${env.APP_URL}/site/${encodeURIComponent(company.slug)}`
+    : env.APP_URL;
 
   await sendRenderedTemplateEmail(
     customer.email,

@@ -1447,6 +1447,10 @@ export const savedCardMigrations = pgTable("saved_card_migrations", {
   /** Owner acknowledgment that customers consented to off-session charges (required before apply-mappings). */
   offSessionConsentAcknowledgedAt: timestamp("off_session_consent_acknowledged_at"),
   offSessionConsentAcknowledgedById: uuid("off_session_consent_acknowledged_by_id").references(() => users.id),
+  /** Version of SAVED_CARD_OFF_SESSION_CONSENT_ACK_TEXT the owner acknowledged. */
+  offSessionConsentTextVersion: varchar("off_session_consent_text_version", { length: 64 }),
+  /** Mapping batch (apply-mappings request) the acknowledgment was recorded for. */
+  offSessionConsentBatchId: uuid("off_session_consent_batch_id"),
   completedAt: timestamp("completed_at"),
   ...timestamps,
 }, (t) => ({

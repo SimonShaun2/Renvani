@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 import { validateRepoMigrationBundle } from "./migration-safety.js";
 
 const packageRoot = join(import.meta.dirname, "..");
-const TAG = "0043_fs138_saved_card_migration";
+const TAG = "0042_fs138_saved_card_migration";
 const sqlText = readFileSync(join(packageRoot, "migrations", `${TAG}.sql`), "utf8");
 
 describe("FS-138 saved card migration table", () => {

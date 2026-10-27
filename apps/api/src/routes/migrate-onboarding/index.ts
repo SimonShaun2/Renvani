@@ -11,6 +11,7 @@ import {
   getMigrateDedupePreviewHandler,
   getMigrateRelationalPreviewHandler,
   getMigrateOnboardingBundleHandler,
+  getMigrateOnboardingIngestStatusHandler,
   linkMigrateOnboardingFilesHandler,
   listMigrateOnboardingSourcesHandler,
   setMigrateOnboardingSourceHandler,

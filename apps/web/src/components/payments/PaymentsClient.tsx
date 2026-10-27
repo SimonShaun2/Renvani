@@ -1,5 +1,6 @@
 "use client";
 
+import "./payments-motion.css";
 import { useState } from "react";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, CreditCard, ExternalLink, ShieldAlert } from "lucide-react";

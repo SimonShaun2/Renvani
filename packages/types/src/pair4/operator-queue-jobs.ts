@@ -5,8 +5,16 @@ export const OPERATOR_QUEUE_JOB_NAMES = {
   retentionGatesAfterCompletionConfirm: "retention-gates.after-completion-confirm",
   retentionGatesWinBackEvaluate: "retention-gates.win-back-evaluate",
   qboSyncPush: "qbo.sync.push",
-  qboSyncPull: "qbo.sync.pull"
+  qboSyncPull: "qbo.sync.pull",
+  serviceBuildJobBrief: "service.build-job-brief"
 } as const;
+
+export interface ServiceBuildJobBriefJobData {
+  companyId: string;
+  jobId: string;
+  idempotencyKey: string;
+  sourceEventIds: string[];
+}
 
 export type OperatorQueueJobName =
   (typeof OPERATOR_QUEUE_JOB_NAMES)[keyof typeof OPERATOR_QUEUE_JOB_NAMES];

@@ -274,6 +274,8 @@ export const activityEventTypeEnum = pgEnum("activity_event_type", [
   "job.time_started",
   "job.time_stopped",
   "job.task_completed",
+  "job.service_brief.proposed",
+  "job.service_brief.approved",
   "job.product_added",
   "job.product_removed",
   "job.upsell_approved",
@@ -829,6 +831,8 @@ export const customerNotes = pgTable("customer_notes", {
   ),
 }));
 
+export const jobNoteKindEnum = pgEnum("job_note_kind", ["internal", "field"]);
+
 export const jobNotes = pgTable("job_notes", {
   id: id(),
   companyId: companyId(),
@@ -836,6 +840,7 @@ export const jobNotes = pgTable("job_notes", {
   authorId: uuid("author_id").references(() => users.id),
   // null authorId = system/AI note
   content: text("content").notNull(),
+  noteKind: jobNoteKindEnum("note_kind").notNull().default("internal"),
   isInternal: boolean("is_internal").notNull().default(true),
   notedAt: timestamp("noted_at"),
   sourceSystem: varchar("source_system", { length: 64 }),
@@ -849,6 +854,27 @@ export const jobNotes = pgTable("job_notes", {
     t.sourceId,
   ),
 }));
+
+export const jobServiceBriefs = pgTable(
+  "job_service_briefs",
+  {
+    id: id(),
+    companyId: companyId(),
+    jobId: uuid("job_id")
+      .notNull()
+      .references(() => jobs.id, { onDelete: "cascade" }),
+    sections: jsonb("sections").notNull().default([]),
+    checklistSummary: jsonb("checklist_summary").notNull().default({}),
+    resourceVersion: varchar("resource_version", { length: 128 }).notNull(),
+    approvedAgentActionId: uuid("approved_agent_action_id"),
+    approvedById: uuid("approved_by_id").references(() => users.id),
+    approvedAt: timestamp("approved_at"),
+    ...timestamps
+  },
+  (t) => ({
+    companyJobUnique: uniqueIndex("job_service_briefs_company_job_idx").on(t.companyId, t.jobId).where(sql`"deleted_at" IS NULL`)
+  })
+);
 
 export const jobPhotos = pgTable("job_photos", {
   id: id(),

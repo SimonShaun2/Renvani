@@ -40,6 +40,13 @@ describe("agent-action.policy", () => {
     expect(requiresHumanApproval("loyalty.reminder.propose")).toBe(true);
   });
 
+  it("allows system service job brief proposals", () => {
+    expect(() =>
+      assertActionAllowedForProduct("service", "service.job_brief.propose", "system")
+    ).not.toThrow();
+    expect(requiresHumanApproval("service.job_brief.propose")).toBe(true);
+  });
+
   it("parses loyalty.reminder.propose FS-12 parameters", () => {
     const parsed = LoyaltyReminderProposeParamsV1Schema.parse({
       customerId: "11111111-1111-4111-8111-111111111111",

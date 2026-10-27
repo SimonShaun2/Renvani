@@ -3,6 +3,7 @@ import type { FastifyPluginAsync, FastifyReply, FastifyRequest } from "fastify";
 import {
   checkPublicBookingIpRateLimit,
   checkPublicBookingManageTokenRateLimit,
+  checkPublicSlotHoldIpAndCompanyRateLimit,
   checkPublicSlotHoldReferenceRateLimit
 } from "../../../lib/public-booking-rate-limit.js";
 import {
@@ -109,6 +110,32 @@ async function bookingSlotHoldReferenceRateLimit(
   }
 }
 
+/** FS-66 — per-IP and per-company limits on slot-hold/confirm, with Retry-After. */
+async function bookingSlotHoldIpCompanyRateLimit(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+  if (request.method !== "POST") {
+    return;
+  }
+
+  const params = request.params as { slug?: string };
+  const slug = params.slug?.trim() ?? "";
+
+  if (slug.length === 0) {
+    return;
+  }
+
+  const result = await checkPublicSlotHoldIpAndCompanyRateLimit(request.ip, slug);
+
+  if (!result.allowed) {
+    reply.header("Retry-After", String(result.retryAfterSeconds));
+    await reply.status(429).send({
+      error: "RATE_LIMITED",
+      message: "Too many slot hold attempts. Please try again later.",
+      requestId: request.id
+    });
+    return;
+  }
+}
+
 const publicBookingRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.get("/:slug", {
     preValidation: [bookingSlugValidation],
@@ -141,12 +168,12 @@ const publicBookingRoutes: FastifyPluginAsync = async (fastify) => {
   }, getBookingConfirmationHandler);
 
   fastify.post("/:slug/requests/:ref/slot-hold", {
-    preValidation: [bookingRateLimit, bookingSlotHoldReferenceRateLimit, publicHoldBookingSlotValidation],
+    preValidation: [bookingRateLimit, bookingSlotHoldIpCompanyRateLimit, bookingSlotHoldReferenceRateLimit, publicHoldBookingSlotValidation],
     schema: publicSlotHoldRouteSchema
   }, holdPublicBookingSlotHandler);
 
   fastify.post("/:slug/requests/:ref/confirm", {
-    preValidation: [bookingRateLimit, bookingSlotHoldReferenceRateLimit, publicConfirmBookingSlotValidation],
+    preValidation: [bookingRateLimit, bookingSlotHoldIpCompanyRateLimit, bookingSlotHoldReferenceRateLimit, publicConfirmBookingSlotValidation],
     schema: publicConfirmBookingSlotRouteSchema
   }, confirmPublicBookingSlotHandler);
 

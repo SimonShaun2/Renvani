@@ -19,6 +19,7 @@ import {
 } from "@/src/components/estimates/estimates.utils";
 import { CurrencyDisplay } from "@/src/components/ui/CurrencyDisplay";
 import { EmptyState } from "@/src/components/ui/EmptyState";
+import { ConfirmDialog } from "@/src/components/ui/ConfirmDialog";
 import { Sheet } from "@/src/components/ui/Sheet";
 import { SkeletonCard } from "@/src/components/ui/SkeletonCard";
 import { StatBadge } from "@/src/components/ui/StatBadge";
@@ -84,6 +85,7 @@ export function InvoiceDetailClient({ invoiceId }: InvoiceDetailClientProps) {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [recordPaymentOpen, setRecordPaymentOpen] = useState(false);
   const [voidOpen, setVoidOpen] = useState(false);
+  const [confirmAction, setConfirmAction] = useState<"send" | "remind" | null>(null);
   const [voidForm, setVoidForm] = useState<VoidFormState>(defaultVoidState);
 
   const invoice = invoiceQuery.data?.invoice;
@@ -414,11 +416,7 @@ export function InvoiceDetailClient({ invoiceId }: InvoiceDetailClientProps) {
                     <button
                       type="button"
                       disabled={sendInvoice.isPending}
-                      onClick={() => {
-                        void sendInvoice.mutateAsync().then(() => invoiceQuery.refetch()).catch((error: unknown) => {
-                          setErrorMessage(error instanceof Error ? error.message : "Invoice could not be sent.");
-                        });
-                      }}
+                      onClick={() => setConfirmAction("send")}
                       className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-neutral-200 px-5 py-3 text-sm font-semibold text-neutral-700 transition hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-70"
                     >
                       <Send className="h-4 w-4" />
@@ -430,11 +428,7 @@ export function InvoiceDetailClient({ invoiceId }: InvoiceDetailClientProps) {
                     <button
                       type="button"
                       disabled={sendInvoice.isPending}
-                      onClick={() => {
-                        void sendInvoice.mutateAsync().then(() => invoiceQuery.refetch()).catch((error: unknown) => {
-                          setErrorMessage(error instanceof Error ? error.message : "Payment link could not be sent.");
-                        });
-                      }}
+                      onClick={() => setConfirmAction("send")}
                       className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-brand-accent px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-primary disabled:cursor-not-allowed disabled:opacity-70"
                     >
                       <Send className="h-4 w-4" />
@@ -453,11 +447,7 @@ export function InvoiceDetailClient({ invoiceId }: InvoiceDetailClientProps) {
                       <button
                         type="button"
                         disabled={resendReminder.isPending}
-                        onClick={() => {
-                          void resendReminder.mutateAsync().then(() => invoiceQuery.refetch()).catch((error: unknown) => {
-                            setErrorMessage(error instanceof Error ? error.message : "Reminder could not be sent.");
-                          });
-                        }}
+                        onClick={() => setConfirmAction("remind")}
                         className="w-full rounded-full border border-error/25 px-5 py-3 text-sm font-semibold text-error transition hover:bg-error-light disabled:cursor-not-allowed disabled:opacity-70"
                       >
                         {resendReminder.isPending ? "Sending..." : "Send Reminder"}
@@ -541,6 +531,32 @@ export function InvoiceDetailClient({ invoiceId }: InvoiceDetailClientProps) {
           } catch (error) {
             setErrorMessage(error instanceof Error ? error.message : "Payment could not be recorded.");
           }
+        }}
+      />
+
+      <ConfirmDialog
+        open={confirmAction !== null}
+        title={confirmAction === "remind" ? "Send payment reminder?" : "Send payment link?"}
+        description={
+          confirmAction === "remind"
+            ? "The customer gets a reminder with their payment link."
+            : "The customer gets this invoice and a secure payment link."
+        }
+        confirmLabel={confirmAction === "remind" ? "Send reminder" : "Send invoice"}
+        isPending={sendInvoice.isPending || resendReminder.isPending}
+        onCancel={() => setConfirmAction(null)}
+        onConfirm={() => {
+          const action = confirmAction;
+          const mutation = action === "remind" ? resendReminder : sendInvoice;
+          void mutation
+            .mutateAsync()
+            .then(() => invoiceQuery.refetch())
+            .catch((error: unknown) => {
+              setErrorMessage(
+                error instanceof Error ? error.message : action === "remind" ? "Reminder could not be sent." : "Invoice could not be sent."
+              );
+            })
+            .finally(() => setConfirmAction(null));
         }}
       />
 

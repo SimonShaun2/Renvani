@@ -3,6 +3,7 @@ import {
   BriefcaseBusiness,
   CalendarDays,
   CreditCard,
+  Wallet,
   Crown,
   FileText,
   Gauge,
@@ -40,6 +41,7 @@ const ownerAdminNavigation: RoleNavigation = {
     { label: "Jobs", href: "/jobs", icon: BriefcaseBusiness },
     { label: "Estimates", href: "/estimates", icon: FileText },
     { label: "Invoices", href: "/invoices", icon: CreditCard },
+    { label: "Payments", href: "/payments", icon: Wallet },
     { label: "Service Agreements", href: "/service-agreements", icon: ShieldCheck },
     { label: "AI Revenue Center", href: "/ai-revenue-center", icon: Sparkles },
     { label: "Command Center", href: "/command-center", icon: Inbox }

@@ -149,6 +149,7 @@ export async function confirmPublicBookingSlotHandler(
       jobId: result.jobId
     },
     jobId: result.jobId,
-    recurringSchedule: result.recurringSchedule
+    recurringSchedule: result.recurringSchedule,
+    manageToken: result.manageToken
   });
 }

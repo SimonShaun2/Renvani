@@ -73,7 +73,12 @@ vi.mock("@fsm/jobs", () => ({
 }));
 
 vi.mock("../lib/storage.js", () => ({
-  uploadFile: uploadFileMock
+  uploadFile: uploadFileMock,
+  getFileKeyFromUrl: (reference: string) => reference.replace(/^https:\/\/files\.example\//, ""),
+  createSignedDownloadUrl: async (objectKey: string) => ({
+    url: `https://signed.example/${objectKey}?expires=1`
+  }),
+  getMediaSignedUrlTtlSeconds: () => 900
 }));
 
 type BuildAppModule = typeof import("../app.js");
@@ -101,7 +106,7 @@ beforeEach(async () => {
   redisSetMock.mockClear();
   resetRedisStore();
   uploadFileMock.mockReset();
-  uploadFileMock.mockResolvedValue({ url: "https://files.example/uploaded" });
+  uploadFileMock.mockImplementation(async (key: string) => ({ url: `https://files.example/${key}` }));
   vi.useFakeTimers();
   vi.setSystemTime(new Date("2026-04-28T14:00:00.000Z"));
   app = await buildAppModule.buildApp();

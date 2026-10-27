@@ -107,17 +107,17 @@ export const QUICKBOOKS_PRESETS: ImportSourcePreset[] = [
     headerAliases: {
       "invoice #": "invoiceNumber",
       "invoice no": "invoiceNumber",
+      "invoice id": "invoiceNumber",
       num: "invoiceNumber",
       customer: "customerName",
       name: "customerName",
       date: "issuedAt",
+      "invoice date": "issuedAt",
       "due date": "dueAt",
       amount: "total",
+      total: "total",
       "open balance": "balanceDue",
-      balance: "balanceDue",
-      "invoice id": "invoiceNumber",
-      "invoice date": "issuedAt",
-      total: "total"
+      balance: "balanceDue"
     }
   },
   {

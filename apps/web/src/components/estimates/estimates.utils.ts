@@ -343,3 +343,17 @@ export function buildInvoicePublicPath(token: string | null | undefined): string
 
   return `/pay/${token}`;
 }
+
+export type EstimateFilter = "all" | "draft" | "sent" | "approved" | "declined" | "expired" | "revised" | "converted";
+
+export function matchesEstimateFilter(status: string, filter: EstimateFilter): boolean {
+  if (filter === "all") {
+    return true;
+  }
+
+  if (filter === "sent") {
+    return status === "sent" || status === "viewed";
+  }
+
+  return status === filter;
+}

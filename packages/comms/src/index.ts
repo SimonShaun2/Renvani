@@ -14,6 +14,12 @@ export {
   type EmailTemplateId,
   type RenderedTransactionalEmail
 } from "./email-templates.js";
+export {
+  isMvpResendTransactionalTemplate,
+  MVP_RESEND_TRANSACTIONAL_TEMPLATE_IDS,
+  resendTagsForTransactionalTemplate,
+  type MvpResendTransactionalTemplateId
+} from "./transactional-template-catalog.js";
 export { escapeHtml, htmlToText, renderRenvaniLayout, RENVANI_EMAIL_BRAND, type RenvaniLayoutInput } from "./email-layout.js";
 export {
   DEFAULT_TRANSACTIONAL_EMAIL_FROM,

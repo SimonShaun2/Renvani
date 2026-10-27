@@ -1,12 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import type { SubmitFieldWorkSyncBatchBody, SubmitFieldWorkSyncBatchResponse } from "@fsm/types";
 
 import "./mobile-field-work-motion.css";
 import { api } from "@/src/lib/api";
-import { enqueueNote, flushQueue, readQueue } from "@/src/lib/field-work-queue";
+import { enqueueNote, flushQueue, readQueue, type QueueOwner } from "@/src/lib/field-work-queue";
+import { useAuthStore } from "@/src/stores/auth.store";
 
 function postBatch(body: SubmitFieldWorkSyncBatchBody) {
   return api.post<SubmitFieldWorkSyncBatchResponse>("/api/v1/field-work/sync/batches", body);
@@ -18,13 +19,19 @@ export function MobileJobNoteComposer({ jobId }: { jobId: string }) {
   const [pending, setPending] = useState(0);
   const [message, setMessage] = useState<string | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
+  const userId = useAuthStore((state) => state.user?.id ?? null);
+  const companyId = useAuthStore((state) => state.company?.id ?? null);
+  const owner: QueueOwner | null = useMemo(
+    () => (userId && companyId ? { userId, companyId } : null),
+    [userId, companyId]
+  );
 
   const refreshPending = useCallback(() => {
-    setPending(readQueue().filter((operation) => operation.jobId === jobId).length);
-  }, [jobId]);
+    setPending(owner ? readQueue(owner).filter((operation) => operation.jobId === jobId).length : 0);
+  }, [jobId, owner]);
 
   const sync = useCallback(async () => {
-    if (readQueue().length === 0) {
+    if (!owner || readQueue(owner).length === 0) {
       refreshPending();
       return;
     }
@@ -34,7 +41,7 @@ export function MobileJobNoteComposer({ jobId }: { jobId: string }) {
     }
     setIsSyncing(true);
     try {
-      const result = await flushQueue(postBatch);
+      const result = await flushQueue(owner, postBatch);
       if (result.rejected.length > 0) {
         setMessage(`${result.rejected.length} note${result.rejected.length === 1 ? "" : "s"} could not be saved.`);
       } else if (result.applied > 0) {
@@ -42,12 +49,13 @@ export function MobileJobNoteComposer({ jobId }: { jobId: string }) {
       }
       await queryClient.invalidateQueries({ queryKey: ["jobs"] });
     } catch {
-      setMessage("Offline. Notes are saved on this phone and will sync when you reconnect.");
+      // flushQueue only throws for retryable failures (network, timeout, 5xx); permanent 4xx ops are dropped and reported above.
+      setMessage("Can't reach the server. Notes are saved on this phone and will sync when you reconnect.");
     } finally {
       setIsSyncing(false);
       refreshPending();
     }
-  }, [queryClient, refreshPending]);
+  }, [owner, queryClient, refreshPending]);
 
   useEffect(() => {
     void sync();
@@ -59,10 +67,10 @@ export function MobileJobNoteComposer({ jobId }: { jobId: string }) {
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const content = draft.trim();
-    if (!content) {
+    if (!content || !owner) {
       return;
     }
-    enqueueNote(jobId, content);
+    enqueueNote(owner, jobId, content);
     setDraft("");
     setMessage(null);
     void sync();
@@ -85,7 +93,7 @@ export function MobileJobNoteComposer({ jobId }: { jobId: string }) {
       <div className="flex items-center justify-between gap-3">
         <button
           type="submit"
-          disabled={!draft.trim()}
+          disabled={!draft.trim() || !owner}
           className="rounded-full bg-neutral-950 px-4 py-2 text-sm font-semibold text-white disabled:opacity-40"
         >
           Save note

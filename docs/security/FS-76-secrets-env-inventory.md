@@ -43,7 +43,7 @@ Templates: `docs/env/templates/`. Least-privilege target matrix: § below.
 | `STRIPE_SECRET_KEY` | secret | — | `apps/api/src/lib/stripe.ts`; webhook Stripe middleware |
 | `STRIPE_WEBHOOK_SECRET` | secret | — | `apps/webhook/src/middleware/stripe-verify.ts` |
 | `STRIPE_CONNECT_CLIENT_ID` | secret | — | Schema + test fixtures; no app read site yet |
-| `STRIPE_PLATFORM_FEE_PERCENT` | config | — | `stripe.ts`, `stripe-connect.service.ts` |
+| `STRIPE_PLATFORM_FEE_PERCENT` | config | — | Legacy, required by `env.ts`; read only by `resolveConnectApplicationFeeFraction` (no customer-facing use; Service Fee = `SERVICE_FEE_RATE_BPS`) |
 | `OPENAI_API_KEY` | secret | — | `packages/ai`; worker `csv-import`, `ai-revenue` |
 | `TWILIO_ACCOUNT_SID` | secret | — | `apps/api/src/lib/sms.ts`; worker via API dist SMS |
 | `TWILIO_AUTH_TOKEN` | secret | — | `sms.ts`, `twilio-verify.ts` |

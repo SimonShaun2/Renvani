@@ -146,7 +146,7 @@ describe("stripe-connect.service", () => {
       payoutSchedule: "Daily",
       lastPayoutAmount: "4800.00",
       lastPayoutAt: "2026-04-29T15:00:00.000Z",
-      platformFeePercent: expect.any(Number),
+      platformFeePercent: 0,
       renvaniPlanTier: null
     });
     expect(persistedCompany?.settings).toEqual({
@@ -199,7 +199,7 @@ describe("stripe-connect.service", () => {
       payoutSchedule: "Daily",
       lastPayoutAmount: "4800.00",
       lastPayoutAt: "2026-04-29T15:00:00.000Z",
-      platformFeePercent: expect.any(Number),
+      platformFeePercent: 0,
       renvaniPlanTier: null
     });
   });

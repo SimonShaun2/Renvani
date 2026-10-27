@@ -3,7 +3,7 @@ import { and, eq, isNull } from "drizzle-orm";
 import { companies, db, emitEventWithExecutor } from "@fsm/db";
 import { AppError, ErrorCode, type StripeConnectStatus } from "@fsm/types";
 
-import { readRenvaniSubscriptionPlan, resolveCompanyConnectApplicationFeeFraction } from "../lib/company-renvani-plan.js";
+import { readRenvaniSubscriptionPlan, resolveCompanyServiceFeePercent } from "../lib/company-renvani-plan.js";
 
 import { featureFlags } from "@fsm/config/feature-flags";
 
@@ -73,7 +73,7 @@ function buildStripeConnectStatus(
       payoutSchedule: snapshot.payoutSchedule,
       lastPayoutAmount: snapshot.lastPayoutAmount,
       lastPayoutAt: snapshot.lastPayoutAt,
-      platformFeePercent: resolveCompanyConnectApplicationFeeFraction(company) * 100,
+      platformFeePercent: resolveCompanyServiceFeePercent(company),
       renvaniPlanTier: readRenvaniSubscriptionPlan(company)
     };
   }
@@ -86,7 +86,7 @@ function buildStripeConnectStatus(
     payoutsEnabled: storedSettings.payoutsEnabled ?? false,
     detailsSubmitted: storedSettings.detailsSubmitted ?? false,
     stripeAccountId: company.stripeAccountId,
-    platformFeePercent: resolveCompanyConnectApplicationFeeFraction(company) * 100,
+    platformFeePercent: resolveCompanyServiceFeePercent(company),
     renvaniPlanTier: readRenvaniSubscriptionPlan(company)
   };
 }

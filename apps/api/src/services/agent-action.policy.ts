@@ -14,6 +14,7 @@ const REVENUE_ALLOWED_ACTION_TYPES = new Set([
 const LOYALTY_ALLOWED_ACTION_TYPES = new Set(["loyalty.reminder.propose"]);
 
 const SERVICE_ALLOWED_ACTION_TYPES = new Set(["service.job_brief.propose"]);
+const SCHEDULING_ALLOWED_ACTION_TYPES = new Set(["scheduling.booking.self_service"]);
 
 const AUTO_APPROVED_ACTION_TYPES = new Set(["context.resolve", "message.draft"]);
 
@@ -82,6 +83,18 @@ export function assertActionAllowedForProduct(
     );
   }
 
+  if (agentProduct === "scheduling") {
+    if (!SCHEDULING_ALLOWED_ACTION_TYPES.has(actionType)) {
+      throw new AppError(ErrorCode.POLICY_DENIED, "Action type is not allowed for scheduling agent");
+    }
+
+    if (actorType === "system" || actorType === "user") {
+      return;
+    }
+
+    throw new AppError(ErrorCode.POLICY_DENIED, "Scheduling self-service notices require a system actor");
+  }
+
   throw new AppError(ErrorCode.POLICY_DENIED, "Agent product is not enabled");
 }
 
@@ -89,7 +102,8 @@ export function requiresHumanApproval(actionType: string): boolean {
   if (
     actionType === "message.send_proposed" ||
     actionType === "loyalty.reminder.propose" ||
-    actionType === "service.job_brief.propose"
+    actionType === "service.job_brief.propose" ||
+    actionType === "scheduling.booking.self_service"
   ) {
     return true;
   }

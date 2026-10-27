@@ -29,6 +29,10 @@ export interface Invoice {
   total: string;
   amountPaid: string | null;
   balanceDue: string;
+  /** Customer-paid 2% Service Fee collected at checkout (separate line; not in total/tax/balance). */
+  serviceFeeAmount: string;
+  /** $1.99 online-booking fee collected at checkout (separate line; not in total/tax/balance). */
+  bookingFeeAmount: string;
   issuedAt: Date | null;
   dueAt: Date | null;
   sentAt: Date | null;
@@ -52,6 +56,7 @@ export interface InvoiceItem {
   id: string;
   invoiceId: string;
   companyId: string;
+  priceBookItemId: string | null;
   name: string;
   description: string | null;
   itemType: InvoiceItemType;
@@ -71,7 +76,18 @@ export interface Payment {
   invoiceId: string;
   customerId: string;
   collectedById: string | null;
+  /** Invoice portion applied to the balance (excludes fees). */
   amount: string;
+  /** Customer-paid 2% Service Fee on this payment ("0.00" for manual/non-checkout payments). */
+  serviceFeeAmount: string;
+  /** $1.99 online-booking fee on this payment ("0.00" unless it paid an online-booked invoice at checkout). */
+  bookingFeeAmount: string;
+  /** Always false: Service Fee and booking fee are non-refundable. */
+  feeRefundable: boolean;
+  /** Refunded portion of `amount` (fees are never refunded). */
+  amountRefunded: string;
+  /** Max still refundable = amount - amountRefunded (fees excluded). */
+  refundableAmount: string;
   method: PaymentMethod;
   status: PaymentStatus;
   stripePaymentIntentId: string | null;
@@ -107,6 +123,9 @@ export interface InvoiceListItem {
   total: string;
   amountPaid: string;
   balanceDue: string;
+  /** Customer-paid fees collected at checkout (separate from total). */
+  serviceFeeAmount?: string;
+  bookingFeeAmount?: string;
   dueAt: Date | null;
   paidAt: Date | null;
   customer: {
@@ -124,6 +143,9 @@ export interface InvoicePaymentSummary {
   status: PaymentStatus;
   paidAt: Date | null;
   stripePaymentIntentId: string | null;
+  serviceFeeAmount: string;
+  bookingFeeAmount: string;
+  feeRefundable: boolean;
 }
 
 export interface InvoiceDetail {
@@ -138,6 +160,8 @@ export interface InvoiceDetail {
   total: string;
   amountPaid: string;
   balanceDue: string;
+  serviceFeeAmount?: string;
+  bookingFeeAmount?: string;
   issuedAt: Date | null;
   sentAt: Date | null;
   dueAt: Date | null;
@@ -193,6 +217,7 @@ export interface AddInvoiceItemInput {
   unitPrice: number;
   isTaxable?: boolean;
   sortOrder?: number;
+  priceBookItemId?: string;
 }
 
 export interface UpdateInvoiceItemInput {
@@ -203,6 +228,7 @@ export interface UpdateInvoiceItemInput {
   unitPrice?: number;
   isTaxable?: boolean;
   sortOrder?: number;
+  priceBookItemId?: string | null;
 }
 
 export interface RecordPaymentInput {
@@ -250,9 +276,21 @@ export interface PublicInvoicePaymentLink {
   /** Present when invoice Checkout uses embedded UI on the pay page. */
   checkoutClientSecret: string | null;
   invoiceAmount: string;
+  /** Legacy alias: total customer-paid fees (serviceFeeAmount + bookingFeeAmount). */
   platformFeeAmount: string;
+  /** invoiceAmount + serviceFeeAmount + bookingFeeAmount. */
   totalDue: string;
-  /** Set for Flex tenants when a customer-paid fee applies. */
+  /** 2% Service Fee, separate line, non-refundable. */
+  serviceFeeAmount: string;
+  /** $1.99 online-booking fee when the invoice came from online booking; else "0.00". */
+  bookingFeeAmount: string;
+  invoiceAmountCents: number;
+  serviceFeeCents: number;
+  bookingFeeCents: number;
+  totalDueCents: number;
+  /** Always false. */
+  feeRefundable: boolean;
+  /** Service Fee percent (2); kept for back-compat with the old Flex-only fee. */
   platformFeePercent: number | null;
   platformFeePaidByCustomer: boolean;
   /** Optional disclosure from `CUSTOMER_PLATFORM_FEE_DISCLOSURE` (empty = omit). */

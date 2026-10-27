@@ -7,6 +7,7 @@ import { setupTestEnv } from "../test-support/env-setup.js";
 setupTestEnv();
 
 const uploadFileMock = vi.hoisted(() => vi.fn());
+const createSignedDownloadUrlMock = vi.hoisted(() => vi.fn());
 
 vi.mock("drizzle-orm", async () => {
   const helper = await import("../test-support/fake-db.js");
@@ -19,7 +20,21 @@ vi.mock("@fsm/db", async () => {
 });
 
 vi.mock("../lib/storage.js", () => ({
-  uploadFile: uploadFileMock
+  uploadFile: uploadFileMock,
+  createSignedDownloadUrl: createSignedDownloadUrlMock,
+  getFileKeyFromUrl: (reference: string) => {
+    if (reference.startsWith("memory-object://")) {
+      return reference.slice("memory-object://".length);
+    }
+
+    const filesExamplePrefix = "https://files.example/";
+    if (reference.startsWith(filesExamplePrefix)) {
+      return reference.slice(filesExamplePrefix.length);
+    }
+
+    return reference;
+  },
+  getMediaSignedUrlTtlSeconds: () => 900
 }));
 
 vi.mock("sharp", () => ({
@@ -46,9 +61,15 @@ beforeAll(async () => {
 beforeEach(() => {
   fakeDb.resetTestState();
   uploadFileMock.mockReset();
+  createSignedDownloadUrlMock.mockReset();
   uploadFileMock.mockImplementation(async (key: string) => ({
     url: `https://files.example/${key}`,
     key
+  }));
+  createSignedDownloadUrlMock.mockImplementation(async (objectKey: string) => ({
+    url: `https://signed.example/${objectKey}?expires=1`,
+    expiresAt: new Date(Date.now() + 900_000),
+    objectKey
   }));
 });
 
@@ -164,5 +185,104 @@ describe("FS-85 attachment.service tenant access", () => {
     expect(listed.data.every((row) => row.customerId === customerB.id || row.customerId === null)).toBe(
       true
     );
+    expect(listed.data[0]?.fileUrl).toContain("https://signed.example/");
+  });
+
+  it("signs import-bundle object keys when listing customer attachments", async () => {
+    const { companyB, customerB } = seedTenantPair();
+    const importObjectKey = `${companyB.id}/imports/bundle-1/photos/job-photo.jpg`;
+    fakeDb.seedFileAttachment({
+      companyId: companyB.id,
+      entityType: "customer",
+      entityId: customerB.id,
+      customerId: customerB.id,
+      fileName: "job-photo.jpg",
+      fileUrl: `memory-object://${importObjectKey}`,
+      mimeType: "image/jpeg",
+      fileType: "photo"
+    });
+
+    const listed = await attachmentService.listAttachments(companyB.id, {
+      entityType: "customer",
+      entityId: customerB.id
+    });
+
+    expect(listed.data).toHaveLength(1);
+    expect(listed.data[0]?.fileUrl).toBe(`https://signed.example/${importObjectKey}?expires=1`);
+    expect(createSignedDownloadUrlMock).toHaveBeenCalledWith(importObjectKey, 900);
+  });
+
+  it("fails closed (omits row, never leaks raw URL) when a stored key belongs to another tenant", async () => {
+    const { companyA, companyB, customerB } = seedTenantPair();
+    const foreignKey = `${companyA.id}/imports/bundle-x/photos/leak.jpg`;
+    fakeDb.seedFileAttachment({
+      companyId: companyB.id,
+      entityType: "customer",
+      entityId: customerB.id,
+      customerId: customerB.id,
+      fileName: "leak.jpg",
+      fileUrl: `memory-object://${foreignKey}`,
+      thumbnailUrl: `https://files.example/${foreignKey}`,
+      mimeType: "image/jpeg",
+      fileType: "photo"
+    });
+
+    const listed = await attachmentService.listAttachments(companyB.id, {
+      entityType: "customer",
+      entityId: customerB.id
+    });
+
+    expect(listed.data).toHaveLength(0);
+    expect(JSON.stringify(listed)).not.toContain(foreignKey);
+    expect(createSignedDownloadUrlMock).not.toHaveBeenCalledWith(foreignKey, expect.anything());
+  });
+
+  it("fails closed when signing throws", async () => {
+    const { companyB, customerB } = seedTenantPair();
+    const key = `${companyB.id}/imports/bundle-1/photos/ok.jpg`;
+    fakeDb.seedFileAttachment({
+      companyId: companyB.id,
+      entityType: "customer",
+      entityId: customerB.id,
+      customerId: customerB.id,
+      fileName: "ok.jpg",
+      fileUrl: `memory-object://${key}`,
+      mimeType: "image/jpeg",
+      fileType: "photo"
+    });
+    createSignedDownloadUrlMock.mockRejectedValueOnce(new Error("signer down"));
+
+    const listed = await attachmentService.listAttachments(companyB.id, {
+      entityType: "customer",
+      entityId: customerB.id
+    });
+
+    expect(listed.data).toHaveLength(0);
+    expect(JSON.stringify(listed)).not.toContain("memory-object://");
+  });
+
+  it("nulls an unsignable thumbnail while keeping a signable file", async () => {
+    const { companyA, companyB, customerB } = seedTenantPair();
+    const key = `${companyB.id}/imports/bundle-1/photos/ok.jpg`;
+    const foreignThumb = `${companyA.id}/thumbs/leak.jpg`;
+    fakeDb.seedFileAttachment({
+      companyId: companyB.id,
+      entityType: "customer",
+      entityId: customerB.id,
+      customerId: customerB.id,
+      fileName: "ok.jpg",
+      fileUrl: `memory-object://${key}`,
+      thumbnailUrl: `memory-object://${foreignThumb}`,
+      mimeType: "image/jpeg",
+      fileType: "photo"
+    });
+
+    const listed = await attachmentService.listAttachments(companyB.id, {
+      entityType: "customer",
+      entityId: customerB.id
+    });
+
+    expect(listed.data[0]?.fileUrl).toBe(`https://signed.example/${key}?expires=1`);
+    expect(listed.data[0]?.thumbnailUrl).toBeNull();
   });
 });

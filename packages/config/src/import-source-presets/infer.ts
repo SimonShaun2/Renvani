@@ -2,13 +2,17 @@ import { IMPORT_SOURCE_PRESETS } from "./catalog.js";
 import { normalizeHeader } from "./normalize.js";
 import type { ImportPresetEntityHint, ImportSourcePresetId } from "./types.js";
 
-function entityHintFromImportEntityType(entityType: string): ImportPresetEntityHint {
+export function entityHintFromImportEntityType(entityType: string): ImportPresetEntityHint {
   if (entityType === "invoices" || entityType === "payments") {
     return "invoices";
   }
 
   if (entityType === "notes") {
     return "notes";
+  }
+
+  if (entityType === "service_agreements" || entityType === "maintenance_plans") {
+    return "service_agreements";
   }
 
   if (entityType === "products" || entityType === "price_book" || entityType === "price_book_item") {
@@ -39,7 +43,19 @@ export function inferImportSourcePresetFromHeaders(
     }
 
     const aliasKeys = Object.keys(preset.headerAliases).map(normalizeHeader);
-    const score = aliasKeys.filter((key) => normalizedHeaders.has(key)).length;
+    let score = aliasKeys.filter((key) => normalizedHeaders.has(key)).length;
+
+    if (preset.id === "jobber_invoices" && !normalizedHeaders.has("client id")) {
+      continue;
+    }
+
+    // Properties export: one Property ID (sourceId) plus its parent Client ID (customerSourceId).
+    if (
+      preset.id === "jobber_properties" &&
+      (!normalizedHeaders.has("property id") || !normalizedHeaders.has("client id"))
+    ) {
+      continue;
+    }
 
     if (score < 3) {
       continue;

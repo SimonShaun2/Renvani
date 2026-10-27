@@ -26,7 +26,7 @@
     "build": "tsc -p tsconfig.json",
     "lint": "tsc --noEmit",
     "test": "vitest run",
-    "test:import-contracts": "vitest run src/fs-migrate/import-pipeline.contract.test.ts src/migrate-onboarding/v1/wizard-api.contract.test.ts src/migrate-onboarding/wizard-import-entity.contract.test.ts"
+    "test:import-contracts": "vitest run src/fs-migrate/import-pipeline.contract.test.ts src/fs-migrate/jobber-golden-bundle.contract.test.ts src/migrate-onboarding/v1/wizard-api.contract.test.ts src/migrate-onboarding/wizard-import-entity.contract.test.ts"
   },
   "devDependencies": {
     "@fsm/config": "workspace:*",

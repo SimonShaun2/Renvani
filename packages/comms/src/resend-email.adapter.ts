@@ -1,3 +1,5 @@
+import { Resend } from "resend";
+
 import type { OutboundEmailChannel, OutboundEmailPayload } from "./channels.js";
 
 export type ResendEmailAdapterConfig = {
@@ -5,36 +7,33 @@ export type ResendEmailAdapterConfig = {
   defaultFrom: string;
 };
 
+type ResendClient = Pick<Resend, "emails">;
+
 /**
- * Resend transactional email adapter (official MVP email provider).
+ * Resend transactional email adapter (official MVP email provider), using the Resend SDK.
+ * `client` is injectable for tests.
  */
-export function createResendEmailChannel(config: ResendEmailAdapterConfig): OutboundEmailChannel {
+export function createResendEmailChannel(
+  config: ResendEmailAdapterConfig,
+  client: ResendClient = new Resend(config.apiKey)
+): OutboundEmailChannel {
   return {
     async sendTransactionalEmail(payload: OutboundEmailPayload): Promise<{ providerMessageId: string }> {
-      const response = await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${config.apiKey}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          from: config.defaultFrom,
-          to: [payload.to],
-          subject: payload.subject,
-          html: payload.html,
-          text: payload.text,
-          reply_to: payload.replyTo,
-          tags: payload.tags?.map((name) => ({ name, value: "true" }))
-        })
+      const { data, error } = await client.emails.send({
+        from: config.defaultFrom,
+        to: [payload.to],
+        subject: payload.subject,
+        html: payload.html,
+        ...(payload.text ? { text: payload.text } : {}),
+        ...(payload.replyTo ? { replyTo: payload.replyTo } : {}),
+        ...(payload.tags ? { tags: payload.tags.map((name) => ({ name: name.replace(/[^A-Za-z0-9_-]/g, "_"), value: "true" })) } : {})
       });
 
-      if (!response.ok) {
-        const detail = await response.text();
-        throw new Error(`Resend send failed (${response.status}): ${detail}`);
+      if (error) {
+        throw new Error(`Resend send failed (${error.name}): ${error.message}`);
       }
 
-      const body = (await response.json()) as { id?: string };
-      return { providerMessageId: body.id ?? "resend_unknown" };
+      return { providerMessageId: data?.id ?? "resend_unknown" };
     }
   };
 }

@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 
-import { eq } from "drizzle-orm";
-import { beforeAll, describe, expect, it } from "vitest";
+import { eq, inArray, sql } from "drizzle-orm";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { FS_MIGRATE_RLS_POLICY_CATALOG } from "./rls-policy-catalog.js";
 
@@ -20,23 +20,99 @@ describe("STACK-10 RLS Neon CI matrix (catalog coverage)", () => {
 });
 
 describe.runIf(postgresIntegrationEnabled)("STACK-10 RLS policies (Postgres / Neon CI)", () => {
-  beforeAll(() => {
+  // The staging Neon branch is shared by every PR run, so each test creates its own
+  // uniquely-id'd companies (customers/import_sessions/jobs FK to companies) and
+  // afterAll removes them even when assertions fail. Tenant rows are written inside
+  // runTransactionWithTenantSession (SET LOCAL via set_config(..., true) on one
+  // transaction/connection), so FORCE RLS WITH CHECK passes and pooled connections
+  // never carry tenant state between statements.
+  // Neon branch owner roles have BYPASSRLS (that is why the old setup reached the FK
+  // check instead of the RLS check), so reads assert under a NOBYPASSRLS probe role
+  // via SET LOCAL ROLE. Idempotent and safe to race across concurrent PR runs.
+  const RLS_PROBE_ROLE = "fs_rls_matrix_probe";
+  const createdCompanyIds: string[] = [];
+  let useProbeRole = false;
+
+  beforeAll(async () => {
     process.env.DATABASE_URL = neonCiUrl;
     process.env.BOOKING_HOLD_TOKEN_SECRET =
       process.env.BOOKING_HOLD_TOKEN_SECRET ?? "booking_hold_test_secret";
+    const { db } = await import("./client.js");
+    const [self] = (await db.execute(
+      sql`select rolbypassrls from pg_roles where rolname = current_user`
+    )) as unknown as { rolbypassrls: boolean }[];
+    useProbeRole = self?.rolbypassrls === true;
+    if (!useProbeRole) return;
+    await db.execute(
+      sql.raw(`DO $$ BEGIN
+        CREATE ROLE ${RLS_PROBE_ROLE} NOLOGIN NOSUPERUSER NOBYPASSRLS;
+      EXCEPTION WHEN duplicate_object OR unique_violation THEN NULL; END $$`)
+    );
+    await db.execute(sql.raw(`GRANT ${RLS_PROBE_ROLE} TO CURRENT_USER`));
+    await db.execute(sql.raw(`GRANT USAGE ON SCHEMA public TO ${RLS_PROBE_ROLE}`));
+    await db.execute(
+      sql.raw(`GRANT SELECT ON customers, import_sessions, jobs TO ${RLS_PROBE_ROLE}`)
+    );
+  });
+
+  async function readAsTenant<T>(
+    companyId: string,
+    read: Parameters<typeof import("./run-with-tenant-session.js")["runTransactionWithTenantSession"]>[1]
+  ): Promise<T> {
+    const { runTransactionWithTenantSession } = await import("./run-with-tenant-session.js");
+    return runTransactionWithTenantSession(companyId, async (tx) => {
+      if (useProbeRole) await tx.execute(sql.raw(`SET LOCAL ROLE ${RLS_PROBE_ROLE}`));
+      return read(tx);
+    }) as Promise<T>;
+  }
+
+  async function createTestCompanies(): Promise<[string, string]> {
+    const { db } = await import("./client.js");
+    const { companies } = await import("./schema.js");
+    const ids: [string, string] = [randomUUID(), randomUUID()];
+    createdCompanyIds.push(...ids);
+    await db.insert(companies).values(
+      ids.map((id) => ({ id, name: `RLS matrix ${id.slice(0, 8)}`, slug: `rls-matrix-${id}` }))
+    );
+    return ids;
+  }
+
+  async function insertAsOwningTenant<TRow extends { companyId: string }>(
+    table: Parameters<typeof import("./client.js")["db"]["insert"]>[0],
+    rows: TRow[]
+  ): Promise<void> {
+    const { runTransactionWithTenantSession } = await import("./run-with-tenant-session.js");
+    for (const row of rows) {
+      await runTransactionWithTenantSession(row.companyId, async (tx) => {
+        await tx.insert(table).values(row as never);
+      });
+    }
+  }
+
+  afterAll(async () => {
+    if (createdCompanyIds.length === 0) return;
+    const { db } = await import("./client.js");
+    const { companies, customers, importSessions, jobs } = await import("./schema.js");
+    const { runTransactionWithTenantSession } = await import("./run-with-tenant-session.js");
+    for (const companyId of createdCompanyIds) {
+      await runTransactionWithTenantSession(companyId, async (tx) => {
+        await tx.delete(jobs).where(eq(jobs.companyId, companyId));
+        await tx.delete(customers).where(eq(customers.companyId, companyId));
+        await tx.delete(importSessions).where(eq(importSessions.companyId, companyId));
+      });
+    }
+    await db.delete(companies).where(inArray(companies.id, createdCompanyIds));
   });
 
   it("denies cross-tenant reads on customers when session GUC is set", async () => {
-    const { db } = await import("./client.js");
     const { customers } = await import("./schema.js");
     const { runTransactionWithTenantSession } = await import("./run-with-tenant-session.js");
 
-    const companyA = randomUUID();
-    const companyB = randomUUID();
+    const [companyA, companyB] = await createTestCompanies();
     const customerA = randomUUID();
     const customerB = randomUUID();
 
-    await db.insert(customers).values([
+    await insertAsOwningTenant(customers, [
       {
         id: customerA,
         companyId: companyA,
@@ -53,9 +129,9 @@ describe.runIf(postgresIntegrationEnabled)("STACK-10 RLS policies (Postgres / Ne
       }
     ]);
 
-    const visibleForA = await runTransactionWithTenantSession(companyA, async (tx) => {
-      return tx.select({ id: customers.id }).from(customers);
-    });
+    const visibleForA = await readAsTenant<{ id: string }[]>(companyA, async (tx) =>
+      tx.select({ id: customers.id }).from(customers)
+    );
 
     const idsForA = visibleForA.map((row) => row.id);
     expect(idsForA).toContain(customerA);
@@ -70,16 +146,14 @@ describe.runIf(postgresIntegrationEnabled)("STACK-10 RLS policies (Postgres / Ne
   });
 
   it("denies cross-tenant reads on import_sessions when session GUC is set", async () => {
-    const { db } = await import("./client.js");
     const { importSessions } = await import("./schema.js");
     const { runTransactionWithTenantSession } = await import("./run-with-tenant-session.js");
 
-    const companyA = randomUUID();
-    const companyB = randomUUID();
+    const [companyA, companyB] = await createTestCompanies();
     const sessionA = randomUUID();
     const sessionB = randomUUID();
 
-    await db.insert(importSessions).values([
+    await insertAsOwningTenant(importSessions, [
       {
         id: sessionA,
         companyId: companyA,
@@ -96,9 +170,9 @@ describe.runIf(postgresIntegrationEnabled)("STACK-10 RLS policies (Postgres / Ne
       }
     ]);
 
-    const visibleForA = await runTransactionWithTenantSession(companyA, async (tx) => {
-      return tx.select({ id: importSessions.id }).from(importSessions);
-    });
+    const visibleForA = await readAsTenant<{ id: string }[]>(companyA, async (tx) =>
+      tx.select({ id: importSessions.id }).from(importSessions)
+    );
 
     const idsForA = visibleForA.map((row) => row.id);
     expect(idsForA).toContain(sessionA);
@@ -113,18 +187,16 @@ describe.runIf(postgresIntegrationEnabled)("STACK-10 RLS policies (Postgres / Ne
   });
 
   it("denies cross-tenant reads on jobs when session GUC is set", async () => {
-    const { db } = await import("./client.js");
     const { customers, jobs } = await import("./schema.js");
     const { runTransactionWithTenantSession } = await import("./run-with-tenant-session.js");
 
-    const companyA = randomUUID();
-    const companyB = randomUUID();
+    const [companyA, companyB] = await createTestCompanies();
     const customerA = randomUUID();
     const customerB = randomUUID();
     const jobA = randomUUID();
     const jobB = randomUUID();
 
-    await db.insert(customers).values([
+    await insertAsOwningTenant(customers, [
       {
         id: customerA,
         companyId: companyA,
@@ -141,7 +213,7 @@ describe.runIf(postgresIntegrationEnabled)("STACK-10 RLS policies (Postgres / Ne
       }
     ]);
 
-    await db.insert(jobs).values([
+    await insertAsOwningTenant(jobs, [
       {
         id: jobA,
         companyId: companyA,
@@ -158,9 +230,9 @@ describe.runIf(postgresIntegrationEnabled)("STACK-10 RLS policies (Postgres / Ne
       }
     ]);
 
-    const visibleForA = await runTransactionWithTenantSession(companyA, async (tx) => {
-      return tx.select({ id: jobs.id }).from(jobs);
-    });
+    const visibleForA = await readAsTenant<{ id: string }[]>(companyA, async (tx) =>
+      tx.select({ id: jobs.id }).from(jobs)
+    );
 
     const idsForA = visibleForA.map((row) => row.id);
     expect(idsForA).toContain(jobA);

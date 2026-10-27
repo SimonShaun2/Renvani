@@ -1,4 +1,5 @@
-import type { NextRequest } from "next/server";
+import { clerkMiddleware } from "@clerk/nextjs/server";
+import type { NextFetchEvent, NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 import { AUTH_TOKEN_COOKIE_NAME } from "@/src/lib/auth";
@@ -8,7 +9,9 @@ import {
   isAllowedPublicApiProxyMethod,
   isPublicApiProxyPath
 } from "@/src/lib/public-api-path-security";
-import { canRoleAccessPath, getDefaultRouteForRole, isPublicRoute, normalizeUserRole } from "@/src/lib/route-access";
+import { isClerkEnabled } from "@/src/lib/clerk/config";
+import { resolveClerkRole, resolveClerkRouteDecision } from "@/src/lib/clerk/route-decision";
+import { canRoleAccessPath, getDefaultRouteForRole, isPublicRoute, normalizeUserRole, type UserRole } from "@/src/lib/route-access";
 
 interface TokenPayload {
   role?: string;
@@ -50,7 +53,7 @@ function isLegacyEstimateRecoveryMethod(method: string): boolean {
   return method === "GET" || method === "HEAD";
 }
 
-export async function middleware(request: NextRequest) {
+export async function legacyMiddleware(request: NextRequest, clerkUserId: string | null = null, clerkRole: UserRole | null = null) {
   const { pathname } = request.nextUrl;
 
   if (isLegacyEstimateRecoveryMethod(request.method)) {
@@ -84,6 +87,13 @@ export async function middleware(request: NextRequest) {
   const token = request.cookies.get(AUTH_TOKEN_COOKIE_NAME)?.value;
   const isRoutePublic = isPublicRoute(pathname);
 
+  if (!token && isClerkEnabled()) {
+    const decision = resolveClerkRouteDecision(pathname, clerkUserId, clerkRole);
+    return decision.action === "next"
+      ? NextResponse.next()
+      : NextResponse.redirect(new URL(decision.to, request.url));
+  }
+
   if (!token) {
     if (isRoutePublic) {
       return NextResponse.next();
@@ -115,6 +125,20 @@ export async function middleware(request: NextRequest) {
   }
 
   return NextResponse.next();
+}
+
+const clerkHandler = clerkMiddleware(async (auth, request) => {
+  const { userId, sessionClaims } = await auth();
+  return legacyMiddleware(request, userId, userId ? resolveClerkRole(sessionClaims) : null);
+});
+
+export async function middleware(request: NextRequest, event?: NextFetchEvent): Promise<Response> {
+  if (!isClerkEnabled()) {
+    return legacyMiddleware(request);
+  }
+
+  const response = await clerkHandler(request, event as NextFetchEvent);
+  return response ?? NextResponse.next();
 }
 
 export const config = {

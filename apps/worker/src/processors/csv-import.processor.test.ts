@@ -9,12 +9,14 @@ const {
   addAiQueueJob,
   downloadFileMock,
   getFileKeyFromUrlMock,
+  uploadFileMock,
   mapCsvColumnsMock,
   recordImportAiObservationMock
 } = vi.hoisted(() => ({
   addAiQueueJob: vi.fn(),
   downloadFileMock: vi.fn(),
   getFileKeyFromUrlMock: vi.fn(),
+  uploadFileMock: vi.fn(async (key: string) => ({ key, url: `https://r2.test/${key}` })),
   mapCsvColumnsMock: vi.fn(),
   recordImportAiObservationMock: vi.fn(async () => undefined)
 }));
@@ -40,7 +42,8 @@ vi.mock("@fsm/jobs", () => ({
 
 vi.mock("@fsm/config/storage", () => ({
   downloadFile: downloadFileMock,
-  getFileKeyFromUrl: getFileKeyFromUrlMock
+  getFileKeyFromUrl: getFileKeyFromUrlMock,
+  uploadFile: uploadFileMock
 }));
 
 vi.mock("@fsm/ai", () => ({

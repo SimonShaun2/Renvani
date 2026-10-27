@@ -13,6 +13,7 @@ import {
   useConfirmImportMapping,
   useCreateImportSession,
   useImportErrors,
+  useImportReconciliation,
   useImportMatchCustomers,
   useImportSession,
   useStartImport
@@ -122,6 +123,10 @@ export function CSVImportWizardClient({ presentation = "onboarding" }: CSVImport
   const importSessionData = importSessionQuery.data as ImportSessionResponse | undefined;
   const importSession = importSessionData?.importSession ?? null;
   const importErrorsQuery = useImportErrors(uploadId, currentStep === 7 && Boolean(uploadId));
+  const importReconciliationQuery = useImportReconciliation(
+    uploadId,
+    currentStep === 7 && Boolean(uploadId) && importSession?.status === "completed"
+  );
   const importErrorsData = importErrorsQuery.data as ImportErrorsResponse | undefined;
   const confirmMapping = useConfirmImportMapping(uploadId);
   const startImport = useStartImport(uploadId);
@@ -523,6 +528,8 @@ export function CSVImportWizardClient({ presentation = "onboarding" }: CSVImport
           <Step7Results
             results={results}
             errorRecords={importErrorsData?.errors ?? []}
+            reconciliationReport={importReconciliationQuery.data?.report ?? null}
+            skippedRowsDownloadUrl={importReconciliationQuery.data?.skippedRowsDownloadUrl ?? null}
             onDownloadErrorReport={handleDownloadErrorReport}
             onImportAnother={handleImportAnother}
           />

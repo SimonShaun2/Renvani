@@ -208,6 +208,43 @@ function assertPresetForFile(
   }
 }
 
+/** Jobber: multi-export bundle with source-specific preset ids (lineage `source_system=jobber`). */
+function validateJobberPresetInference(
+  manifest: GoldenImportBundleManifest,
+  issues: GoldenBundleValidationIssue[]
+): void {
+  if (manifest.sourceSystem !== "jobber") {
+    return;
+  }
+
+  const expectedPresetByRelativePath: Record<
+    string,
+    { presetId: string; entityHint: "customers" | "products" | "invoices" }
+  > = {
+    "clients.csv": { presetId: "jobber", entityHint: "customers" },
+    "properties.csv": { presetId: "jobber_properties", entityHint: "customers" },
+    "jobs.csv": { presetId: "jobber_jobs", entityHint: "customers" },
+    "invoices.csv": { presetId: "jobber_invoices", entityHint: "invoices" },
+    "payments.csv": { presetId: "jobber_payments", entityHint: "invoices" },
+    "price_book.csv": { presetId: "jobber_price_book", entityHint: "products" }
+  };
+
+  for (const file of manifest.files) {
+    const expected = expectedPresetByRelativePath[file.relativePath];
+    if (!expected) {
+      continue;
+    }
+
+    assertPresetForFile(
+      manifest,
+      file,
+      expected.presetId,
+      expected.entityHint,
+      issues
+    );
+  }
+}
+
 /** Housecall Pro: assert golden fixture headers infer HCP presets (not QB/ST). */
 function validateHousecallProPresetInference(
   manifest: GoldenImportBundleManifest,
@@ -489,6 +526,7 @@ export function validateGoldenImportBundleManifest(
     validateChunkedJobHistory(parsed.data, parsed.data.chunkedJobHistory, issues);
   }
   validateGenericImportColumnMapping(parsed.data, issues);
+  validateJobberPresetInference(parsed.data, issues);
   validateHousecallProPresetInference(parsed.data, issues);
   validateQuickBooksPresetInference(parsed.data, issues);
   validateServiceTitanPresetInference(parsed.data, issues);

@@ -10,7 +10,7 @@ import {
   useSensor,
   useSensors
 } from "@dnd-kit/core";
-import { addDays, format, parseISO, subDays } from "date-fns";
+import { addDays, addHours, format, parseISO, subDays } from "date-fns";
 import { AlertTriangle, ChevronLeft, ChevronRight, Search, Sparkles } from "lucide-react";
 import type { AutoFitSuggestion, JobDetail } from "@fsm/types";
 
@@ -39,10 +39,14 @@ import {
 import { DispatchDetailPanel } from "./DispatchDetailPanel";
 import { DispatchQueuePanel } from "./DispatchQueuePanel";
 import { DispatchTimeline } from "./DispatchTimeline";
-import { AutoFitOverlay } from "./AutoFitOverlay";
+import { DispatchHeader, DispatchLoadError } from "./DispatchHeader";
+import { formatDispatchSummary, summarizeDispatch } from "@/src/lib/dispatch-actions";
 import type { DispatchDragJobData, DispatchDropSlot, DispatchDropTargetData } from "./dispatch.utils";
 import {
   formatDispatchDateLabel,
+  formatFrameDuration,
+  formatFrameRange,
+  formatFrameTime,
   matchesSearch
 } from "./dispatch.utils";
 
@@ -53,6 +57,34 @@ type AutoFitOverlayState = {
   message: string | null;
   isLoading: boolean;
 };
+
+function jobLabel(title: string, customer: { firstName: string; lastName: string }): string {
+  return [title, `${customer.firstName} ${customer.lastName}`.trim()].filter(Boolean).join(" · ");
+}
+
+function findCustomerLastName(
+  jobId: string,
+  unscheduled: Array<{ id: string; customer: { lastName: string } }>,
+  technicians: Array<{ jobs: Array<{ id: string; customer: { lastName: string } }> }>
+): string | null {
+  const job = unscheduled.find((item) => item.id === jobId)
+    ?? technicians.flatMap((technician) => technician.jobs).find((item) => item.id === jobId);
+  return job?.customer.lastName.trim() || null;
+}
+
+function findJobLabel(
+  jobId: string,
+  unscheduled: Array<{ id: string; title: string; customer: { firstName: string; lastName: string } }>,
+  technicians: Array<{ jobs: Array<{ id: string; title: string; customer: { firstName: string; lastName: string } }> }>
+): string | null {
+  const queued = unscheduled.find((job) => job.id === jobId);
+  if (queued) return jobLabel(queued.title, queued.customer);
+  for (const technician of technicians) {
+    const scheduled = technician.jobs.find((job) => job.id === jobId);
+    if (scheduled) return jobLabel(scheduled.title, scheduled.customer);
+  }
+  return null;
+}
 
 function getErrorMessage(error: unknown): string {
   if (error instanceof ApiError) {
@@ -99,6 +131,7 @@ export function DispatchBoardClient() {
   const setActiveTab = useDispatchStore((state) => state.setActiveTab);
   const setViewMode = useDispatchStore((state) => state.setViewMode);
   const closeDetail = useDispatchStore((state) => state.closeDetail);
+  const streamLive = useDispatchStore((state) => state.streamLive);
 
   const [isNavigating, startTransition] = useTransition();
   const [search, setSearch] = useState("");
@@ -226,6 +259,27 @@ export function DispatchBoardClient() {
       })
       .filter((technician): technician is NonNullable<typeof technician> => technician !== null);
   }, [deferredSearch, statusFilter, technicianFilter, technicians]);
+
+  const unscheduledJobs = unscheduledJobsQuery.data?.jobs ?? [];
+  const firstUnscheduled = unscheduledJobs[0] ?? null;
+  const summaryText = formatDispatchSummary(
+    formatDispatchDateLabel(selectedDate),
+    summarizeDispatch(technicians, unscheduledJobs.length)
+  );
+
+  function openAddVisit() {
+    const technician = technicians[0];
+    if (!technician) return;
+    const start = parseISO(`${selectedDate}T09:00:00`);
+    setQuickCreateSlot({
+      technicianId: technician.id,
+      technicianName: technician.name,
+      scheduledStart: start.toISOString(),
+      scheduledEnd: addHours(start, 2).toISOString()
+    });
+    setCreateQuickJobError(null);
+    setMode("day");
+  }
 
   async function scheduleIntoSlot(jobId: string, slot: DispatchDropSlot) {
     try {
@@ -408,51 +462,58 @@ export function DispatchBoardClient() {
     }
   }
 
-  const autoFitOverlayNode = autoFitOverlay ? (
-    <AutoFitOverlay
-      suggestions={autoFitOverlay.suggestions}
-      currentIndex={autoFitOverlay.currentIndex}
-      isLoading={autoFitOverlay.isLoading}
-      isAccepting={scheduleJobMutation.isPending}
-      message={autoFitOverlay.message}
-      onAccept={(suggestion) => {
-        void handleAcceptAutoFitSuggestion(suggestion);
-      }}
-      onDecline={() => setAutoFitOverlay(null)}
-      onNext={() => {
-        if (autoFitOverlay.suggestions.length <= 1) {
-          return;
-        }
-
-        setAutoFitOverlay((current) =>
-          current
-            ? {
-                ...current,
-                currentIndex: (current.currentIndex + 1) % current.suggestions.length
-              }
-            : current
-        );
-      }}
-      onPrevious={() => {
-        if (autoFitOverlay.suggestions.length <= 1) {
-          return;
-        }
-
-        setAutoFitOverlay((current) =>
-          current
-            ? {
-                ...current,
-                currentIndex:
-                  (current.currentIndex - 1 + current.suggestions.length) % current.suggestions.length
-              }
-            : current
-        );
-      }}
-    />
-  ) : null;
+  // Figma 10:478 shows the agent proposal inline (banner 10:553 + dashed block 10:590), not as a modal.
+  const topSuggestion = autoFitOverlay && !autoFitOverlay.isLoading ? autoFitOverlay.suggestions[0] ?? null : null;
+  const proposalCustomerLastName = autoFitOverlay
+    ? findCustomerLastName(autoFitOverlay.jobId, unscheduledJobs, technicians)
+    : null;
+  const proposalJobLabel = autoFitOverlay ? findJobLabel(autoFitOverlay.jobId, unscheduledJobs, technicians) : null;
+  const bannerJob = autoFitOverlay && proposalJobLabel
+    ? {
+        id: autoFitOverlay.jobId,
+        label: proposalJobLabel,
+        statusLabel: unscheduledJobs.some((job) => job.id === autoFitOverlay.jobId) ? "Unassigned" : "Reschedule"
+      }
+    : firstUnscheduled
+      ? { id: firstUnscheduled.id, label: jobLabel(firstUnscheduled.title, firstUnscheduled.customer) }
+      : null;
+  const timelineSuggestion = topSuggestion && autoFitOverlay
+    ? {
+        technicianId: topSuggestion.technicianId,
+        label: proposalCustomerLastName ?? "Visit",
+        scheduledStart: topSuggestion.scheduledStart,
+        scheduledEnd: topSuggestion.scheduledEnd
+      }
+    : null;
 
   return (
     <div className="-mx-4 -my-6 space-y-5 px-4 py-6 md:-mx-8 md:-my-8 md:px-8 md:py-8">
+      <DispatchHeader
+        summaryText={summaryText}
+        streamLive={streamLive}
+        unassignedJob={bannerJob}
+        suggestion={
+          topSuggestion && bannerJob?.id === autoFitOverlay?.jobId
+            ? {
+                technicianName: topSuggestion.technicianName,
+                rangeLabel: formatFrameRange(topSuggestion.scheduledStart, topSuggestion.scheduledEnd),
+                jobMeta: `${formatFrameDuration(topSuggestion.scheduledStart, topSuggestion.scheduledEnd)} · ${formatFrameTime(topSuggestion.scheduledStart)}`
+              }
+            : null
+        }
+        approvePending={scheduleJobMutation.isPending}
+        onApprove={() => {
+          if (topSuggestion) void handleAcceptAutoFitSuggestion(topSuggestion);
+        }}
+        autoFitPending={autoFittingJobId !== null}
+        canAddVisit={technicians.length > 0}
+        onAutoAssign={(jobId) => {
+          setMode("day");
+          void handleAutoFit(jobId, null, null);
+        }}
+        onAddVisit={openAddVisit}
+      />
+
       <section className="surface-card px-5 py-4">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
           <div className="flex flex-1 flex-col gap-4 lg:flex-row lg:items-center">
@@ -574,6 +635,15 @@ export function DispatchBoardClient() {
         </section>
       ) : null}
 
+      {dispatchQuery.isError ? (
+        <DispatchLoadError
+          message={getErrorMessage(dispatchQuery.error)}
+          onRetry={() => {
+            void dispatchQuery.refetch();
+          }}
+        />
+      ) : null}
+
       <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
         <div className="grid gap-5 xl:grid-cols-[280px_minmax(0,1fr)_340px]">
           <DispatchQueuePanel
@@ -617,7 +687,7 @@ export function DispatchBoardClient() {
               createQuickJobPending={createQuickJobMutation.isPending}
               createQuickJobError={createQuickJobError}
               activeDragJobId={activeDragJob?.jobId ?? null}
-              overlay={autoFitOverlayNode}
+              suggestion={timelineSuggestion}
               onSelectJob={(jobId) => {
                 setSelectedJob(jobId);
                 setBoardMessage(null);

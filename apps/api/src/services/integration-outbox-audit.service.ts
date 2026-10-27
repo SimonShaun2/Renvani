@@ -75,6 +75,12 @@ export async function recordIntegrationOutboxRetry(
     if (error instanceof Error && error.message === "INTEGRATION_OUTBOX_NOT_FOUND") {
       throw new AppError(ErrorCode.NOT_FOUND, "Integration outbox operation not found");
     }
+    if (error instanceof Error && error.message === "INTEGRATION_OUTBOX_CORRELATION_MISMATCH") {
+      throw new AppError(ErrorCode.VALIDATION_ERROR, "Receipt correlationId does not match the operation");
+    }
+    if (error instanceof Error && error.message === "INTEGRATION_OUTBOX_TERMINAL") {
+      throw new AppError(ErrorCode.CONFLICT, "Integration outbox operation is already terminal");
+    }
     throw error;
   }
 }

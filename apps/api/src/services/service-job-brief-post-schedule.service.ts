@@ -4,6 +4,7 @@ import { enqueueBuildJobServiceBriefJob } from "@fsm/jobs";
 export type EnqueueServiceJobBriefAfterScheduleInput = {
   companyId: string;
   jobId: string;
+  resourceVersion: string;
   sourceEventIds?: string[];
 };
 
@@ -17,6 +18,7 @@ export async function enqueueServiceJobBriefAfterSchedule(
   await enqueueBuildJobServiceBriefJob({
     companyId: input.companyId,
     jobId: input.jobId,
+    resourceVersion: input.resourceVersion,
     ...(input.sourceEventIds ? { sourceEventIds: input.sourceEventIds } : {})
   });
 

@@ -34,6 +34,7 @@ import {
   jsonb,
   index,
   uniqueIndex,
+  check,
 } from "drizzle-orm/pg-core";
 import { relations, sql } from "drizzle-orm";
 
@@ -1639,14 +1640,6 @@ export const importChunkRuns = pgTable("import_chunk_runs", {
   idempotencyUnique: uniqueIndex("import_chunk_runs_idempotency_key_idx").on(t.idempotencyKey),
 }));
 
-export const integrationOutboxKindEnum = pgEnum("integration_outbox_kind", [
-  "csv_import",
-  "public_booking",
-  "sms_outbound",
-  "email_outbound",
-  "stripe_connect",
-]);
-
 export const integrationOutboxStatusEnum = pgEnum("integration_outbox_status", [
   "pending",
   "processing",
@@ -1669,7 +1662,8 @@ export const integrationOutboxOperations = pgTable(
   {
     id: id(),
     companyId: companyId(),
-    kind: integrationOutboxKindEnum("kind").notNull(),
+    // varchar + app-level kind registry (@fsm/types registerAdapterOperationKind) since 0051.
+    kind: varchar("kind", { length: 64 }).notNull(),
     adapterId: varchar("adapter_id", { length: 64 }).notNull(),
     idempotencyKey: varchar("idempotency_key", { length: 255 }).notNull(),
     correlationId: uuid("correlation_id").notNull(),
@@ -1688,6 +1682,9 @@ export const integrationOutboxOperations = pgTable(
       t.companyId,
       t.correlationId
     ),
+    // Worker claim query: pending/processing rows ordered by staleness.
+    statusUpdatedIdx: index("integration_outbox_operations_status_updated_idx").on(t.status, t.updatedAt),
+    kindFormatChk: check("integration_outbox_operations_kind_format_chk", sql`"kind" ~ '^[a-z][a-z0-9_]{0,63}$'`),
   })
 );
 

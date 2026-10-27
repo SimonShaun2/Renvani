@@ -42,6 +42,13 @@ export async function createIntegrationOutboxOperationHandler(
 ): Promise<FastifyReply> {
   const body = request.body as CreateIntegrationOutboxOperationBody;
   const result = await enqueueIntegrationOutboxOperation(request.company.id, body);
+  if (!result.created) {
+    // Duplicate suppression is logged only (no audit row); ids only, no payload/PII.
+    request.log.info(
+      { outboxOperationId: result.operation.id, kind: body.kind, adapterId: body.adapterId },
+      "integration_outbox.duplicate_suppressed"
+    );
+  }
   return reply.code(result.created ? 201 : 200).send(result);
 }
 

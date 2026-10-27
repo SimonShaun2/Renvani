@@ -893,8 +893,48 @@ export const getJobServiceBriefRouteSchema = {
   response: {
     200: {
       type: "object",
+      additionalProperties: false,
+      required: ["brief"],
       properties: {
-        brief: { type: ["object", "null"], additionalProperties: true }
+        brief: {
+          anyOf: [
+            { type: "null" },
+            {
+              type: "object",
+              // Unknown keys are dropped by the serializer (no additionalProperties:false inside anyOf, which would fail the branch match instead of stripping).
+              required: ["contractVersion", "jobId", "companyId", "resourceVersion", "sections", "checklistSummary"],
+              properties: {
+                contractVersion: { type: "string" },
+                jobId: { type: "string", format: "uuid" },
+                companyId: { type: "string", format: "uuid" },
+                resourceVersion: { type: "string" },
+                sections: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    required: ["id", "title", "body", "sourceKind"],
+                    properties: {
+                      id: { type: "string" },
+                      title: { type: "string" },
+                      body: { type: "string" },
+                      sourceKind: { type: "string" },
+                      confidence: { type: "number" },
+                      policyRef: { type: "string" }
+                    }
+                  }
+                },
+                checklistSummary: {
+                  type: "object",
+                  required: ["total", "requiredPending"],
+                  properties: {
+                    total: { type: "integer" },
+                    requiredPending: { type: "integer" }
+                  }
+                }
+              }
+            }
+          ]
+        }
       }
     }
   }
@@ -906,8 +946,18 @@ export const getJobPreparationStatusRouteSchema = {
   response: {
     200: {
       type: "object",
+      additionalProperties: false,
+      required: ["preparation"],
       properties: {
-        preparation: { type: "object", additionalProperties: true }
+        preparation: {
+          type: "object",
+          additionalProperties: false,
+          required: ["readyForField", "blockers"],
+          properties: {
+            readyForField: { type: "boolean" },
+            blockers: { type: "array", items: { type: "string" } }
+          }
+        }
       }
     }
   }

@@ -26,11 +26,10 @@ import {
 import {
   assertActionAllowedForProduct,
   assertPolicyVersion,
+  isAgentActionEditable,
   requiresHumanApproval
 } from "./agent-action.policy.js";
-import { assertLoyaltyReminderExecutionAllowed } from "./agent-action.policy.js";
-import { applyApprovedJobServiceBrief } from "./job-service-brief.service.js";
-import { authorizeAgentActionExecution } from "./outbound-policy-engine.service.js";
+import { getAgentActionExecutor } from "./agent-action.executors.js";
 import { resolveEntityRef } from "./tenant-context.service.js";
 import {
   emitAgentActionAuditEvent,
@@ -402,7 +401,7 @@ export async function editAgentActionParameters(
       throw new AppError(ErrorCode.CONFLICT, "Only awaiting-approval actions can be edited");
     }
 
-    if (row.actionType !== "message.send_proposed" && row.actionType !== "message.draft") {
+    if (!isAgentActionEditable(row.actionType)) {
       throw new AppError(ErrorCode.VALIDATION_ERROR, "This action type cannot be edited");
     }
 
@@ -488,37 +487,27 @@ export async function executeAgentAction(companyId: string, actionId: string, ac
         throw agentActionStaleTargetError();
       }
 
-      let authorizationDecision: Awaited<ReturnType<typeof authorizeAgentActionExecution>> | null =
-        null;
-
-      if (row.actionType === "loyalty.reminder.propose") {
-        assertLoyaltyReminderExecutionAllowed();
-      }
-
-      if (row.actionType === "message.send_proposed") {
-        authorizationDecision = await authorizeAgentActionExecution({
-          companyId,
-          actorId,
-          actorType: "user",
-          actionType: row.actionType,
-          parameters: executableParameters,
-          target,
-          requiresApproval: row.requiresApproval,
-          state: row.state as AgentActionState
-        });
-
-        if (!authorizationDecision.allowed) {
-          throw new AppError(
-            authorizationDecision.errorCode ?? ErrorCode.POLICY_DENIED,
-            authorizationDecision.reason
-          );
-        }
-      }
+      const executor = getAgentActionExecutor(row.actionType);
+      const executionContext = {
+        tx,
+        companyId,
+        actionId,
+        actorId,
+        actionType: row.actionType,
+        target,
+        parameters: executableParameters,
+        requiresApproval: row.requiresApproval,
+        state: row.state
+      };
+      const authorizationDecision = (await executor?.beforeExecute?.(executionContext)) ?? null;
 
       await tx
         .update(agentActions)
         .set({ state: "executing", updatedAt: new Date() })
         .where(agentActionScopedWhere(companyId, actionId));
+
+      // Side effects (e.g. FS-25 brief apply) commit atomically with the succeeded state.
+      await executor?.applyInTransaction?.(executionContext);
 
       const receipt = {
         outcome: "succeeded" as const,
@@ -573,17 +562,6 @@ export async function executeAgentAction(companyId: string, actionId: string, ac
 
       return { mapped: mapRow(updated), row: updated, detail };
     });
-
-    if (result.row.actionType === "service.job_brief.propose") {
-      const target = result.row.target as CanonicalEntityRefV1;
-      await applyApprovedJobServiceBrief({
-        companyId,
-        jobId: target.entityId,
-        actorId,
-        agentActionId: actionId,
-        parameters: resolveExecutableParameters(result.row)
-      });
-    }
 
     await mirrorAgentActionAuditToLangfuse({
       companyId,

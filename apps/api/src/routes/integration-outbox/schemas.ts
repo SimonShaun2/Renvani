@@ -11,6 +11,32 @@ import { withZodValidation } from "../shared/validation.js";
 
 const uuidSchema = z.string().uuid();
 
+/**
+ * Size caps for client-supplied JSON (payload/attribution are stored as jsonb on every outbox row
+ * and kept for the outbox audit retention window, so they must stay small; no PII bodies here).
+ */
+export const INTEGRATION_OUTBOX_PAYLOAD_MAX_BYTES = 16 * 1024;
+export const INTEGRATION_OUTBOX_PAYLOAD_MAX_KEYS = 50;
+export const INTEGRATION_OUTBOX_ATTRIBUTION_MAX_BYTES = 8 * 1024;
+
+function jsonByteLength(value: unknown): number {
+  return Buffer.byteLength(JSON.stringify(value ?? null), "utf8");
+}
+
+const boundedPayloadSchema = z
+  .record(z.string(), z.unknown())
+  .refine((value) => Object.keys(value).length <= INTEGRATION_OUTBOX_PAYLOAD_MAX_KEYS, {
+    message: `payload may have at most ${INTEGRATION_OUTBOX_PAYLOAD_MAX_KEYS} keys`
+  })
+  .refine((value) => jsonByteLength(value) <= INTEGRATION_OUTBOX_PAYLOAD_MAX_BYTES, {
+    message: `payload must be at most ${INTEGRATION_OUTBOX_PAYLOAD_MAX_BYTES} bytes`
+  });
+
+const boundedAttributionSchema = AttributionV1Schema.refine(
+  (value) => jsonByteLength(value) <= INTEGRATION_OUTBOX_ATTRIBUTION_MAX_BYTES,
+  { message: `attribution must be at most ${INTEGRATION_OUTBOX_ATTRIBUTION_MAX_BYTES} bytes` }
+);
+
 export const integrationOutboxOperationIdParamsSchema = z.object({
   operationId: uuidSchema
 });
@@ -30,8 +56,8 @@ export const createIntegrationOutboxOperationBodySchema = z
     adapterId: z.string().min(1).max(64),
     idempotencyKey: z.string().min(1).max(255),
     correlationId: uuidSchema,
-    attribution: AttributionV1Schema,
-    payload: z.record(z.string(), z.unknown()).default({})
+    attribution: boundedAttributionSchema,
+    payload: boundedPayloadSchema.default({})
   })
   .strict();
 

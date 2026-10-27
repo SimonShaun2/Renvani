@@ -1,10 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { FileText, Paperclip } from "lucide-react";
+import { useMemo, useRef, useState } from "react";
+import { FileText, Paperclip, Upload } from "lucide-react";
 import type { FileAttachment } from "@fsm/types";
 
 import { useCustomerAttachments } from "@/src/hooks/attachments.hooks";
+import { getAttachmentDownloadUrl, useUploadCustomerAttachment } from "@/src/hooks/customer-crm.hooks";
 import { formatDateTime } from "@/src/components/jobs/jobs.utils";
 import { EmptyState } from "@/src/components/ui/EmptyState";
 import { SkeletonCard } from "@/src/components/ui/SkeletonCard";
@@ -38,6 +39,48 @@ function getPhotoBadgeTone(photoType: FileAttachment["photoType"]): "blue" | "gr
 export function CustomerFilesTab({ customerId }: { customerId: string }) {
   const attachmentsQuery = useCustomerAttachments(customerId);
   const [filter, setFilter] = useState<FilesFilter>("all");
+  const uploadAttachment = useUploadCustomerAttachment(customerId);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [fileError, setFileError] = useState<string | null>(null);
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
+
+  async function openSigned(attachmentId: string) {
+    setFileError(null);
+    // Open synchronously so popup blockers allow it, then point it at the freshly minted URL.
+    const tab = window.open("", "_blank");
+    try {
+      const url = await getAttachmentDownloadUrl(attachmentId);
+      if (tab) {
+        tab.opener = null;
+        tab.location.href = url;
+      } else {
+        window.location.assign(url);
+      }
+    } catch {
+      tab?.close();
+      setFileError("That file couldn't be opened. Try again.");
+    }
+  }
+
+  async function handleUpload(files: FileList | null) {
+    if (!files?.length) {
+      return;
+    }
+    setFileError(null);
+    try {
+      for (const file of Array.from(files)) {
+        setUploadProgress(0);
+        await uploadAttachment.mutateAsync({ file, onProgress: setUploadProgress });
+      }
+    } catch (error) {
+      setFileError(error instanceof Error ? error.message : "Upload failed.");
+    } finally {
+      setUploadProgress(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+  }
 
   const attachments = attachmentsQuery.data?.data ?? [];
   const filteredAttachments = useMemo(() => {
@@ -73,6 +116,23 @@ export function CustomerFilesTab({ customerId }: { customerId: string }) {
           Imported and uploaded files for this customer ({attachments.length})
         </p>
         <div className="flex flex-wrap gap-2">
+          <input
+            ref={fileInputRef}
+            type="file"
+            multiple
+            className="hidden"
+            aria-label="Upload files"
+            onChange={(event) => void handleUpload(event.target.files)}
+          />
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploadProgress !== null}
+            className="inline-flex items-center gap-2 rounded-full bg-[#0f1530] px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+          >
+            <Upload className="h-4 w-4" />
+            {uploadProgress !== null ? `Uploading ${Math.round(uploadProgress)}%` : "Upload"}
+          </button>
           {[
             { key: "all" as const, label: `All (${attachments.length})` },
             {
@@ -100,6 +160,12 @@ export function CustomerFilesTab({ customerId }: { customerId: string }) {
         </div>
       </div>
 
+      {fileError ? (
+        <p role="alert" className="rounded-3xl border border-error/15 bg-error-light px-4 py-3 text-sm text-error">
+          {fileError}
+        </p>
+      ) : null}
+
       {photos.length > 0 ? (
         <div className="grid gap-4 md:grid-cols-3">
           {photos.map((attachment) => (
@@ -122,16 +188,7 @@ export function CustomerFilesTab({ customerId }: { customerId: string }) {
               <div className="px-4 py-3">
                 <p className="text-sm font-medium text-neutral-900">{attachment.caption ?? attachment.fileName}</p>
                 <p className="mt-1 text-xs text-neutral-400">{formatDateTime(attachment.createdAt)}</p>
-                {attachment.fileUrl ? (
-                  <a
-                    href={attachment.fileUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="mt-2 inline-block text-xs font-semibold text-brand-accent"
-                  >
-                    Open full size
-                  </a>
-                ) : null}
+                <button type="button" onClick={() => void openSigned(attachment.id)} className="mt-2 inline-block text-xs font-semibold text-brand-accent">Open full size</button>
               </div>
             </div>
           ))}
@@ -156,16 +213,7 @@ export function CustomerFilesTab({ customerId }: { customerId: string }) {
                   </p>
                 </div>
               </div>
-              {attachment.fileUrl ? (
-                <a
-                  href={attachment.fileUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-sm font-semibold text-brand-accent"
-                >
-                  Download
-                </a>
-              ) : null}
+              <button type="button" onClick={() => void openSigned(attachment.id)} className="text-sm font-semibold text-brand-accent">Download</button>
             </div>
           ))}
         </div>

@@ -9,6 +9,7 @@ import { useCustomer, useCustomerAgreements, useCustomerInvoices, useCustomerJob
 
 import { CustomerAISuggestions } from "./CustomerAISuggestions";
 import { ActivityTimeline } from "./ActivityTimeline";
+import { CustomerNotesPanel } from "./CustomerNotesPanel";
 import { AssetForm } from "./AssetForm";
 import { CustomerForm } from "./CustomerForm";
 import { CustomerHeader } from "./CustomerHeader";
@@ -206,6 +207,7 @@ export function CustomerProfile({ customerId }: { customerId: string }) {
 
         <div className="space-y-6">
           <CustomerAISuggestions customerId={customer.id} />
+          <CustomerNotesPanel customerId={customer.id} />
           <ActivityTimeline customerId={customer.id} />
         </div>
       </div>

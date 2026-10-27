@@ -10,7 +10,7 @@ import {
   useSensor,
   useSensors
 } from "@dnd-kit/core";
-import { addDays, format, parseISO, subDays } from "date-fns";
+import { addDays, addHours, format, parseISO, subDays } from "date-fns";
 import { AlertTriangle, ChevronLeft, ChevronRight, Search, Sparkles } from "lucide-react";
 import type { AutoFitSuggestion, JobDetail } from "@fsm/types";
 
@@ -40,6 +40,8 @@ import { DispatchDetailPanel } from "./DispatchDetailPanel";
 import { DispatchQueuePanel } from "./DispatchQueuePanel";
 import { DispatchTimeline } from "./DispatchTimeline";
 import { AutoFitOverlay } from "./AutoFitOverlay";
+import { DispatchHeader, DispatchLoadError } from "./DispatchHeader";
+import { formatDispatchSummary, summarizeDispatch } from "@/src/lib/dispatch-actions";
 import type { DispatchDragJobData, DispatchDropSlot, DispatchDropTargetData } from "./dispatch.utils";
 import {
   formatDispatchDateLabel,
@@ -99,6 +101,7 @@ export function DispatchBoardClient() {
   const setActiveTab = useDispatchStore((state) => state.setActiveTab);
   const setViewMode = useDispatchStore((state) => state.setViewMode);
   const closeDetail = useDispatchStore((state) => state.closeDetail);
+  const streamLive = useDispatchStore((state) => state.streamLive);
 
   const [isNavigating, startTransition] = useTransition();
   const [search, setSearch] = useState("");
@@ -226,6 +229,27 @@ export function DispatchBoardClient() {
       })
       .filter((technician): technician is NonNullable<typeof technician> => technician !== null);
   }, [deferredSearch, statusFilter, technicianFilter, technicians]);
+
+  const unscheduledJobs = unscheduledJobsQuery.data?.jobs ?? [];
+  const firstUnscheduled = unscheduledJobs[0] ?? null;
+  const summaryText = formatDispatchSummary(
+    formatDispatchDateLabel(selectedDate),
+    summarizeDispatch(technicians, unscheduledJobs.length)
+  );
+
+  function openAddVisit() {
+    const technician = technicians[0];
+    if (!technician) return;
+    const start = parseISO(`${selectedDate}T09:00:00`);
+    setQuickCreateSlot({
+      technicianId: technician.id,
+      technicianName: technician.name,
+      scheduledStart: start.toISOString(),
+      scheduledEnd: addHours(start, 2).toISOString()
+    });
+    setCreateQuickJobError(null);
+    setMode("day");
+  }
 
   async function scheduleIntoSlot(jobId: string, slot: DispatchDropSlot) {
     try {
@@ -453,6 +477,31 @@ export function DispatchBoardClient() {
 
   return (
     <div className="-mx-4 -my-6 space-y-5 px-4 py-6 md:-mx-8 md:-my-8 md:px-8 md:py-8">
+      <DispatchHeader
+        summaryText={summaryText}
+        streamLive={streamLive}
+        unassignedJob={
+          firstUnscheduled
+            ? {
+                id: firstUnscheduled.id,
+                label: [
+                  firstUnscheduled.title,
+                  `${firstUnscheduled.customer.firstName} ${firstUnscheduled.customer.lastName}`.trim()
+                ]
+                  .filter(Boolean)
+                  .join(" · ")
+              }
+            : null
+        }
+        autoFitPending={autoFittingJobId !== null}
+        canAddVisit={technicians.length > 0}
+        onAutoAssign={(jobId) => {
+          setMode("day");
+          void handleAutoFit(jobId, null, null);
+        }}
+        onAddVisit={openAddVisit}
+      />
+
       <section className="surface-card px-5 py-4">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
           <div className="flex flex-1 flex-col gap-4 lg:flex-row lg:items-center">
@@ -572,6 +621,15 @@ export function DispatchBoardClient() {
             <p>{boardMessage}</p>
           </div>
         </section>
+      ) : null}
+
+      {dispatchQuery.isError ? (
+        <DispatchLoadError
+          message={getErrorMessage(dispatchQuery.error)}
+          onRetry={() => {
+            void dispatchQuery.refetch();
+          }}
+        />
       ) : null}
 
       <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>

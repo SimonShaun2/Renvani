@@ -286,6 +286,20 @@
       "idx": 40,
       "version": "7",
       "when": 1777714000000,
+      "tag": "0040_fs_migrate_service_agreements_import",
+      "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "7",
+      "when": 1777715000000,
+      "tag": "0041_fs147_price_book_line_picker",
+      "breakpoints": true
+    },
+    {
+      "idx": 42,
+      "version": "7",
+      "when": 1792716506137,
       "tag": "0042_fs138_saved_card_migration",
       "breakpoints": true
     }

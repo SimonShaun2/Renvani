@@ -43,7 +43,7 @@ export async function updateTimeEntryHandler(
     );
   } catch (error) {
     if (error instanceof TimesheetConflictError) {
-      return reply.code(409).send({ error: "CONFLICT", message: error.message, requestId: request.id });
+      return reply.code(409).send({ error: "CONFLICT", reason: error.reason, message: error.message, current: error.current, requestId: request.id });
     }
     throw error;
   }

@@ -86,6 +86,3 @@ ALTER TABLE "technician_pay_rates" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "technician_pay_rates" FORCE ROW LEVEL SECURITY;
 --> statement-breakpoint
 CREATE POLICY "tenant_isolation_technician_pay_rates" ON "technician_pay_rates" FOR ALL USING (company_id::text = current_setting('app.current_company_id', true));
---> statement-breakpoint
--- FS-171 review: at most one open (not ended, not deleted) entry per technician; blocks concurrent double clock-in.
-CREATE UNIQUE INDEX IF NOT EXISTS "time_entries_open_technician_idx" ON "time_entries" USING btree ("company_id","technician_id") WHERE "ended_at" IS NULL AND "deleted_at" IS NULL;

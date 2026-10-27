@@ -5529,7 +5529,7 @@ function createSelectChain<T extends Record<string, unknown>>(rows: T[]) {
   return chain;
 }
 
-/** Emulates the partial unique index time_entries_open_technician_idx (migration 0045). */
+/** Emulates the partial unique index time_entries_open_technician_idx (migration 0046). */
 function assertOpenTimeEntryUnique(existingRows: AnyTestRecord[], incomingRows: AnyTestRecord[]): void {
   const existing = existingRows as unknown as Array<Record<string, unknown>>;
   const incoming = incomingRows as unknown as Array<Record<string, unknown>>;

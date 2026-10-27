@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 import { validateRepoMigrationBundle } from "./migration-safety.js";
 
 const packageRoot = join(import.meta.dirname, "..");
-// Provisional number pending E.. CoS confirmation; journal idx shifts to 45 after 0041–0044 land.
+// Journal idx 45 (content frozen: CI already applied it; the open-entry index lives in 0046).
 const TAG = "0045_fs171_timesheets_payroll";
 const sqlText = readFileSync(join(packageRoot, "migrations", `${TAG}.sql`), "utf8");
 const TABLES = ["timesheets", "timesheet_audit_events", "technician_pay_rates"];

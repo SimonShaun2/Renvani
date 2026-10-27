@@ -144,7 +144,8 @@ export function isOpenEntryUniqueViolation(error: unknown): boolean {
   return false;
 }
 
-async function guardOpenEntryInsert<T>(work: () => Promise<T>): Promise<T> {
+/** Maps a 23505 on time_entries_open_technician_idx to a clean 409 (open_entry_exists). */
+export async function guardOpenEntryInsert<T>(work: () => Promise<T>): Promise<T> {
   try {
     return await work();
   } catch (error) {

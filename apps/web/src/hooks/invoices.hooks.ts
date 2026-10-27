@@ -111,16 +111,38 @@ interface InvoiceItemResponse {
   item: InvoiceItemRecord;
 }
 
-interface PublicPaymentLinkResponse {
+export interface PublicPaymentLinkResponse {
   invoiceNumber: string;
   paymentLinkUrl: string;
   checkoutClientSecret: string | null;
   invoiceAmount: string;
+  /** Combined customer-paid fees (Service Fee + online booking fee). */
   platformFeeAmount: string;
   totalDue: string;
   platformFeePercent: number | null;
   platformFeePaidByCustomer: boolean;
   platformFeeDisclosure: string | null;
+  /** Split fee fields returned by GET /api/v1/public/pay/:token (optional in the response schema). */
+  serviceFeeAmount?: string;
+  bookingFeeAmount?: string;
+  invoiceAmountCents?: number;
+  serviceFeeCents?: number;
+  bookingFeeCents?: number;
+  totalDueCents?: number;
+  feeRefundable?: boolean;
+  /**
+   * Not returned by the API today (Figma 53:3–53:465 shows them); rendered only when present.
+   * API gap: shop brand, customer, address, service/due dates, line items, payment status, receipt details.
+   */
+  shopName?: string | null;
+  shopUrl?: string | null;
+  statementDescriptor?: string | null;
+  customerName?: string | null;
+  serviceAddress?: string | null;
+  serviceDate?: string | null;
+  dueAt?: string | null;
+  lineItems?: Array<{ description: string; total: string }> | null;
+  invoiceStatus?: string | null;
 }
 
 function buildQueryString(values: Record<string, string | number | undefined>) {

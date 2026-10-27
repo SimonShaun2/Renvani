@@ -19,7 +19,8 @@ vi.mock("./client.js", () => ({
     },
     insert: vi.fn(() => ({
       values: vi.fn(() => ({
-        returning: mocks.insertAudit
+        returning: mocks.insertAudit,
+        onConflictDoNothing: vi.fn(() => ({ returning: mocks.insertAudit }))
       }))
     })),
     update: vi.fn(() => ({
@@ -31,6 +32,13 @@ vi.mock("./client.js", () => ({
     }))
   }
 }));
+
+vi.mock("./run-with-tenant-session.js", async () => {
+  const { db } = await import("./client.js");
+  return {
+    runTransactionWithTenantSession: (_companyId: string, cb: (tx: unknown) => unknown) => cb(db)
+  };
+});
 
 import { recordIntegrationOutboxRetryReceipt } from "./integration-outbox.service.js";
 

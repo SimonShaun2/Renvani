@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 
-import { and, desc, eq, isNull } from "drizzle-orm";
+import { and, desc, eq, isNotNull, isNull } from "drizzle-orm";
 
 import {
   type AdapterOperationKindV1,
@@ -12,8 +12,11 @@ import {
   buildIntegrationOutboxRetryReceiptKey
 } from "@fsm/types";
 
-import { db } from "./client.js";
+import { runTransactionWithTenantSession } from "./run-with-tenant-session.js";
 import { integrationOutboxAuditEvents, integrationOutboxOperations } from "./schema.js";
+import type { TransactionCallback } from "./transactions.js";
+
+type Tx = Parameters<TransactionCallback<unknown>>[0];
 
 export type CreateIntegrationOutboxOperationInput = {
   kind: AdapterOperationKindV1;
@@ -56,6 +59,7 @@ function mapAudit(row: AuditRow) {
 }
 
 async function appendAuditEvent(
+  tx: Tx,
   companyId: string,
   outboxOperationId: string,
   eventType:
@@ -68,7 +72,7 @@ async function appendAuditEvent(
   receipt: Record<string, unknown>,
   retryReceiptKey?: string
 ): Promise<AuditRow> {
-  const [inserted] = await db
+  const [inserted] = await tx
     .insert(integrationOutboxAuditEvents)
     .values({
       companyId,
@@ -77,6 +81,10 @@ async function appendAuditEvent(
       receipt,
       retryReceiptKey: retryReceiptKey ?? null
     })
+    .onConflictDoNothing({
+      target: [integrationOutboxAuditEvents.companyId, integrationOutboxAuditEvents.retryReceiptKey],
+      where: isNotNull(integrationOutboxAuditEvents.retryReceiptKey)
+    })
     .returning();
 
   if (inserted) {
@@ -84,7 +92,7 @@ async function appendAuditEvent(
   }
 
   if (retryReceiptKey) {
-    const existing = await db.query.integrationOutboxAuditEvents.findFirst({
+    const existing = await tx.query.integrationOutboxAuditEvents.findFirst({
       where: and(
         eq(integrationOutboxAuditEvents.companyId, companyId),
         eq(integrationOutboxAuditEvents.retryReceiptKey, retryReceiptKey)
@@ -102,54 +110,81 @@ export async function createOrGetIntegrationOutboxOperation(
   companyId: string,
   input: CreateIntegrationOutboxOperationInput
 ): Promise<{ operation: ReturnType<typeof mapOperation>; created: boolean }> {
-  const existing = await db.query.integrationOutboxOperations.findFirst({
-    where: and(
-      eq(integrationOutboxOperations.companyId, companyId),
-      eq(integrationOutboxOperations.kind, input.kind),
-      eq(integrationOutboxOperations.idempotencyKey, input.idempotencyKey),
-      isNull(integrationOutboxOperations.deletedAt)
-    )
-  });
-
-  if (existing) {
-    await appendAuditEvent(companyId, existing.id, "duplicate_suppressed", {
-      schemaVersion: 1,
-      idempotencyKey: input.idempotencyKey,
-      correlationId: input.correlationId
+  return runTransactionWithTenantSession(companyId, async (tx) => {
+    const existing = await tx.query.integrationOutboxOperations.findFirst({
+      where: and(
+        eq(integrationOutboxOperations.companyId, companyId),
+        eq(integrationOutboxOperations.kind, input.kind),
+        eq(integrationOutboxOperations.idempotencyKey, input.idempotencyKey),
+        isNull(integrationOutboxOperations.deletedAt)
+      )
     });
-    return { operation: mapOperation(existing), created: false };
-  }
 
-  const operationId = randomUUID();
-  const [inserted] = await db
-    .insert(integrationOutboxOperations)
-    .values({
-      id: operationId,
-      companyId,
+    if (existing) {
+      await appendAuditEvent(tx, companyId, existing.id, "duplicate_suppressed", {
+        schemaVersion: 1,
+        idempotencyKey: input.idempotencyKey,
+        correlationId: input.correlationId
+      });
+      return { operation: mapOperation(existing), created: false };
+    }
+
+    const operationId = randomUUID();
+    const [inserted] = await tx
+      .insert(integrationOutboxOperations)
+      .values({
+        id: operationId,
+        companyId,
+        kind: input.kind,
+        adapterId: input.adapterId,
+        idempotencyKey: input.idempotencyKey,
+        correlationId: input.correlationId,
+        attribution: input.attribution,
+        payload: input.payload,
+        status: "pending",
+        attemptCount: 0
+      })
+      .onConflictDoNothing({
+        target: [
+          integrationOutboxOperations.companyId,
+          integrationOutboxOperations.kind,
+          integrationOutboxOperations.idempotencyKey
+        ],
+        where: isNull(integrationOutboxOperations.deletedAt)
+      })
+      .returning();
+
+    if (!inserted) {
+      // Lost a concurrent insert race: return the winner and record the suppression.
+      const winner = await tx.query.integrationOutboxOperations.findFirst({
+        where: and(
+          eq(integrationOutboxOperations.companyId, companyId),
+          eq(integrationOutboxOperations.kind, input.kind),
+          eq(integrationOutboxOperations.idempotencyKey, input.idempotencyKey),
+          isNull(integrationOutboxOperations.deletedAt)
+        )
+      });
+      if (!winner) {
+        throw new Error("INTEGRATION_OUTBOX_INSERT_FAILED");
+      }
+      await appendAuditEvent(tx, companyId, winner.id, "duplicate_suppressed", {
+        schemaVersion: 1,
+        idempotencyKey: input.idempotencyKey,
+        correlationId: input.correlationId
+      });
+      return { operation: mapOperation(winner), created: false };
+    }
+
+    await appendAuditEvent(tx, companyId, inserted.id, "created", {
+      schemaVersion: 1,
       kind: input.kind,
       adapterId: input.adapterId,
       idempotencyKey: input.idempotencyKey,
-      correlationId: input.correlationId,
-      attribution: input.attribution,
-      payload: input.payload,
-      status: "pending",
-      attemptCount: 0
-    })
-    .returning();
+      correlationId: input.correlationId
+    });
 
-  if (!inserted) {
-    throw new Error("INTEGRATION_OUTBOX_INSERT_FAILED");
-  }
-
-  await appendAuditEvent(companyId, inserted.id, "created", {
-    schemaVersion: 1,
-    kind: input.kind,
-    adapterId: input.adapterId,
-    idempotencyKey: input.idempotencyKey,
-    correlationId: input.correlationId
+    return { operation: mapOperation(inserted), created: true };
   });
-
-  return { operation: mapOperation(inserted), created: true };
 }
 
 export async function recordIntegrationOutboxRetryReceipt(
@@ -157,134 +192,143 @@ export async function recordIntegrationOutboxRetryReceipt(
   outboxOperationId: string,
   receiptInput: IntegrationOutboxRetryReceipt
 ): Promise<{ auditEvent: ReturnType<typeof mapAudit>; deduplicated: boolean }> {
-  const receipt = IntegrationOutboxRetryReceiptSchema.parse(receiptInput);
-  const retryReceiptKey = buildIntegrationOutboxRetryReceiptKey(
-    receipt.correlationId,
-    receipt.attemptNumber
-  );
-
-  const operation = await db.query.integrationOutboxOperations.findFirst({
-    where: and(
-      eq(integrationOutboxOperations.id, outboxOperationId),
-      eq(integrationOutboxOperations.companyId, companyId),
-      isNull(integrationOutboxOperations.deletedAt)
-    )
-  });
-
-  if (!operation) {
-    throw new Error("INTEGRATION_OUTBOX_NOT_FOUND");
-  }
-
-  const existingReceipt = await db.query.integrationOutboxAuditEvents.findFirst({
-    where: and(
-      eq(integrationOutboxAuditEvents.companyId, companyId),
-      eq(integrationOutboxAuditEvents.retryReceiptKey, retryReceiptKey)
-    )
-  });
-
-  if (existingReceipt) {
-    return { auditEvent: mapAudit(existingReceipt), deduplicated: true };
-  }
-
-  const [updated] = await db
-    .update(integrationOutboxOperations)
-    .set({
-      status: "processing",
-      attemptCount: receipt.attemptNumber,
-      updatedAt: new Date()
-    })
-    .where(
-      and(
-        eq(integrationOutboxOperations.id, outboxOperationId),
-        eq(integrationOutboxOperations.companyId, companyId)
-      )
-    )
-    .returning();
-
-  if (!updated) {
-    throw new Error("INTEGRATION_OUTBOX_UPDATE_FAILED");
-  }
-
-  try {
-    const auditRow = await appendAuditEvent(
-      companyId,
-      outboxOperationId,
-      "retry_receipt",
-      receipt,
-      retryReceiptKey
+  return runTransactionWithTenantSession(companyId, async (tx) => {
+    const receipt = IntegrationOutboxRetryReceiptSchema.parse(receiptInput);
+    const retryReceiptKey = buildIntegrationOutboxRetryReceiptKey(
+      receipt.correlationId,
+      receipt.attemptNumber
     );
-    return { auditEvent: mapAudit(auditRow), deduplicated: false };
-  } catch (error) {
-    const duplicate = await db.query.integrationOutboxAuditEvents.findFirst({
+
+    const operation = await tx.query.integrationOutboxOperations.findFirst({
+      where: and(
+        eq(integrationOutboxOperations.id, outboxOperationId),
+        eq(integrationOutboxOperations.companyId, companyId),
+        isNull(integrationOutboxOperations.deletedAt)
+      )
+    });
+
+    if (!operation) {
+      throw new Error("INTEGRATION_OUTBOX_NOT_FOUND");
+    }
+
+    const existingReceipt = await tx.query.integrationOutboxAuditEvents.findFirst({
       where: and(
         eq(integrationOutboxAuditEvents.companyId, companyId),
         eq(integrationOutboxAuditEvents.retryReceiptKey, retryReceiptKey)
       )
     });
-    if (duplicate) {
-      return { auditEvent: mapAudit(duplicate), deduplicated: true };
+
+    if (existingReceipt) {
+      return { auditEvent: mapAudit(existingReceipt), deduplicated: true };
     }
-    throw error;
-  }
+
+    const [updated] = await tx
+      .update(integrationOutboxOperations)
+      .set({
+        status: "processing",
+        attemptCount: receipt.attemptNumber,
+        updatedAt: new Date()
+      })
+      .where(
+        and(
+          eq(integrationOutboxOperations.id, outboxOperationId),
+          eq(integrationOutboxOperations.companyId, companyId)
+        )
+      )
+      .returning();
+
+    if (!updated) {
+      throw new Error("INTEGRATION_OUTBOX_UPDATE_FAILED");
+    }
+
+    try {
+      const auditRow = await appendAuditEvent(
+        tx,
+        companyId,
+        outboxOperationId,
+        "retry_receipt",
+        receipt,
+        retryReceiptKey
+      );
+      return { auditEvent: mapAudit(auditRow), deduplicated: false };
+    } catch (error) {
+      const duplicate = await tx.query.integrationOutboxAuditEvents.findFirst({
+        where: and(
+          eq(integrationOutboxAuditEvents.companyId, companyId),
+          eq(integrationOutboxAuditEvents.retryReceiptKey, retryReceiptKey)
+        )
+      });
+      if (duplicate) {
+        return { auditEvent: mapAudit(duplicate), deduplicated: true };
+      }
+      throw error;
+    }
+  });
 }
 
 export async function listIntegrationOutboxAuditEvents(
   companyId: string,
   input: { outboxOperationId: string; limit?: number }
 ): Promise<ReturnType<typeof mapAudit>[]> {
-  const limit = Math.min(Math.max(input.limit ?? 50, 1), 100);
+  return runTransactionWithTenantSession(companyId, async (tx) => {
+    const limit = Math.min(Math.max(input.limit ?? 50, 1), 100);
 
-  const rows = await db
-    .select()
-    .from(integrationOutboxAuditEvents)
-    .where(
-      and(
-        eq(integrationOutboxAuditEvents.companyId, companyId),
-        eq(integrationOutboxAuditEvents.outboxOperationId, input.outboxOperationId)
+    const rows = await tx
+      .select()
+      .from(integrationOutboxAuditEvents)
+      .where(
+        and(
+          eq(integrationOutboxAuditEvents.companyId, companyId),
+          eq(integrationOutboxAuditEvents.outboxOperationId, input.outboxOperationId)
+        )
       )
-    )
-    .orderBy(desc(integrationOutboxAuditEvents.createdAt))
-    .limit(limit);
+      .orderBy(desc(integrationOutboxAuditEvents.createdAt))
+      .limit(limit);
 
-  return rows.map(mapAudit);
+    return rows.map(mapAudit);
+  });
 }
 
 export async function getIntegrationOutboxOperationById(
   companyId: string,
   outboxOperationId: string
 ): Promise<ReturnType<typeof mapOperation> | null> {
-  const row = await db.query.integrationOutboxOperations.findFirst({
-    where: and(
-      eq(integrationOutboxOperations.id, outboxOperationId),
-      eq(integrationOutboxOperations.companyId, companyId),
-      isNull(integrationOutboxOperations.deletedAt)
-    )
-  });
+  return runTransactionWithTenantSession(companyId, async (tx) => {
+    const row = await tx.query.integrationOutboxOperations.findFirst({
+      where: and(
+        eq(integrationOutboxOperations.id, outboxOperationId),
+        eq(integrationOutboxOperations.companyId, companyId),
+        isNull(integrationOutboxOperations.deletedAt)
+      )
+    });
 
-  return row ? mapOperation(row) : null;
+    return row ? mapOperation(row) : null;
+  });
 }
 
 export async function listIntegrationOutboxOperations(
   companyId: string,
   input: { correlationId?: string; limit?: number }
 ): Promise<ReturnType<typeof mapOperation>[]> {
-  const limit = Math.min(Math.max(input.limit ?? 25, 1), 100);
+  return runTransactionWithTenantSession(companyId, async (tx) => {
+    const limit = Math.min(Math.max(input.limit ?? 25, 1), 100);
 
-  const conditions = [
-    eq(integrationOutboxOperations.companyId, companyId),
-    isNull(integrationOutboxOperations.deletedAt)
-  ];
+    const conditions = [
+      eq(integrationOutboxOperations.companyId, companyId),
+      isNull(integrationOutboxOperations.deletedAt)
+    ];
 
-  if (input.correlationId) {
-    conditions.push(eq(integrationOutboxOperations.correlationId, input.correlationId));
-  }
+    if (input.correlationId) {
+      conditions.push(eq(integrationOutboxOperations.correlationId, input.correlationId));
+    }
 
-  const rows = await db
-    .select()
-    .from(integrationOutboxOperations)
-    .where(and(...conditions))
-    .orderBy(desc(integrationOutboxOperations.createdAt))
-    .limit(limit);
+    const rows = await tx
+      .select()
+      .from(integrationOutboxOperations)
+      .where(and(...conditions))
+      .orderBy(desc(integrationOutboxOperations.createdAt))
+      .limit(limit);
 
-  return rows.map(mapOperation);
+    return rows.map(mapOperation);
+  });
 }

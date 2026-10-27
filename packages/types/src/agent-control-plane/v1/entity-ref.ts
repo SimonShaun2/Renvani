@@ -9,6 +9,9 @@ export const CANONICAL_ENTITY_TYPES_V1 = [
   "estimate",
   "invoice",
   "booking_request",
+  "time_entry",
+  "timesheet",
+  "technician_pay_rate",
   "stock_location",
   "stock_level"
 ] as const;

@@ -52,6 +52,13 @@ export {
   recordIntegrationOutboxRetryReceipt,
   type CreateIntegrationOutboxOperationInput
 } from "./integration-outbox.service.js";
+export {
+  getStripeDisputeById,
+  listStripeDisputes,
+  upsertStripeDisputeFromWebhook,
+  type ListStripeDisputesQuery,
+  type StripeDisputeSnapshot
+} from "./stripe-dispute.service.js";
 export { listM8ReactivationSignalsFromImportedJobHistory } from "./m8-job-history-reactivation-read.js";
 export {
   evaluateLoyaltyReminderCandidatesForCompany,

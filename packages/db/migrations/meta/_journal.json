@@ -365,6 +365,13 @@
       "when": 1792721000000,
       "tag": "0051_fs15_outbox_kind_registry",
       "breakpoints": true
+    },
+    {
+      "idx": 52,
+      "version": "7",
+      "when": 1792722000000,
+      "tag": "0052_fs199_stripe_disputes",
+      "breakpoints": true
     }
   ]
 }

@@ -70,4 +70,5 @@ export * from "./qbo-sync/v1/index.js";
 export * from "./vip-membership/index.js";
 export * from "./customer-portal.types.js";
 export * from "./customer-portal-sections.types.js";
+export * from "./payouts-disputes/index.js";
 export * from "./geo/index.js";

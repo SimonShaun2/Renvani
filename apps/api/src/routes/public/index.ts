@@ -1,6 +1,7 @@
 import type { FastifyPluginAsync } from "fastify";
 
 import publicBookingRoutes from "./booking/index.js";
+import publicCustomerPortalRoutes from "./customer-portal/index.js";
 import publicEstimateRoutes from "./estimates/index.js";
 import publicAgreementRoutes from "./agreements/index.js";
 import publicPayRoutes from "./pay/index.js";
@@ -14,6 +15,7 @@ const publicRoutes: FastifyPluginAsync = async (fastify) => {
   await fastify.register(publicAgreementRoutes, { prefix: "/agreements" });
   await fastify.register(publicReviewRoutes, { prefix: "/reviews" });
   await fastify.register(publicVipRoutes, { prefix: "/vip" });
+  await fastify.register(publicCustomerPortalRoutes, { prefix: "/customer-portal" });
 };
 
 export default publicRoutes;

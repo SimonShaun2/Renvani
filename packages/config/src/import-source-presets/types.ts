@@ -4,6 +4,10 @@
 
 export type ImportSourcePresetId =
   | "jobber"
+  | "jobber_properties"
+  | "jobber_jobs"
+  | "jobber_invoices"
+  | "jobber_payments"
   | "jobber_price_book"
   | "housecall_pro"
   | "housecall_pro_jobs"
@@ -24,7 +28,12 @@ export type ImportSourcePresetId =
   | "quickbooks_payments"
   | "generic";
 
-export type ImportPresetEntityHint = "customers" | "products" | "invoices" | "notes";
+export type ImportPresetEntityHint =
+  | "customers"
+  | "products"
+  | "invoices"
+  | "notes"
+  | "service_agreements";
 
 export interface ImportSourcePreset {
   id: ImportSourcePresetId;

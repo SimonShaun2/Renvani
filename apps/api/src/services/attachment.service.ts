@@ -306,6 +306,50 @@ export async function uploadAttachment(
   });
 }
 
+async function signAttachmentMediaReference(
+  companyId: string,
+  reference: string | null
+): Promise<string | null> {
+  if (!reference) {
+    return null;
+  }
+
+  try {
+    const objectKey = getFileKeyFromUrl(reference);
+    assertObjectKeyBelongsToCompany(objectKey, companyId);
+    const signed = await createSignedDownloadUrl(objectKey, getMediaSignedUrlTtlSeconds());
+    return signed.url;
+  } catch (error) {
+    logger.warn(
+      { companyId, err: error instanceof Error ? error.message : "unknown" },
+      "Attachment media reference could not be signed"
+    );
+    return null;
+  }
+}
+
+async function withSignedMediaUrls(
+  companyId: string,
+  attachment: FileAttachment
+): Promise<FileAttachment | null> {
+  const [fileUrl, thumbnailUrl] = await Promise.all([
+    signAttachmentMediaReference(companyId, attachment.fileUrl),
+    signAttachmentMediaReference(companyId, attachment.thumbnailUrl)
+  ]);
+
+  // Fail closed: never return the raw stored reference when signing fails
+  // (including keys outside the tenant prefix). Unsignable rows are omitted.
+  if (!fileUrl) {
+    return null;
+  }
+
+  return {
+    ...attachment,
+    fileUrl,
+    thumbnailUrl
+  };
+}
+
 export async function listAttachments(
   companyId: string,
   query: ListAttachmentsQuery
@@ -329,9 +373,13 @@ export async function listAttachments(
   const total = sortedRows.length;
   const totalPages = total === 0 ? 1 : Math.ceil(total / limit);
   const startIndex = (page - 1) * limit;
+  const pageRows = sortedRows.slice(startIndex, startIndex + limit).map((row) => toFileAttachment(row));
+  const data = (
+    await Promise.all(pageRows.map((attachment) => withSignedMediaUrls(companyId, attachment)))
+  ).filter((attachment): attachment is FileAttachment => attachment !== null);
 
   return {
-    data: sortedRows.slice(startIndex, startIndex + limit).map((row) => toFileAttachment(row)),
+    data,
     total,
     page,
     limit,
@@ -344,8 +392,9 @@ function buildTenantAttachmentObjectKey(companyId: string, sanitizedFileName: st
 }
 
 function assertObjectKeyBelongsToCompany(objectKey: string, companyId: string): void {
-  const expectedPrefix = `attachments/${companyId}/`;
-  if (!objectKey.startsWith(expectedPrefix)) {
+  const attachmentPrefix = `attachments/${companyId}/`;
+  const importBundlePrefix = `${companyId}/imports/`;
+  if (!objectKey.startsWith(attachmentPrefix) && !objectKey.startsWith(importBundlePrefix)) {
     throw new AppError(ErrorCode.FORBIDDEN, "Object key is outside tenant scope");
   }
 }

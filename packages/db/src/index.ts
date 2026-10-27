@@ -87,6 +87,13 @@ export {
   validateNoteImportRows,
   type NotesValidationResult
 } from "./import-notes-commit.js";
+export {
+  commitServiceAgreementImportRows,
+  mapServiceAgreementImportRow,
+  softDeleteServiceAgreementsImport,
+  validateServiceAgreementImportRows,
+  type ServiceAgreementsValidationResult
+} from "./import-service-agreements-commit.js";
 export { normalizeImportedPaymentMethod } from "./import-invoice-balance-commit.logic.js";
 export {
   commitImportedInvoiceRows,
@@ -119,3 +126,5 @@ export {
   commitImportedEquipmentRows,
   type ImportEquipmentEntityResolver,
 } from "./import-equipment-commit.service.js";
+export { assembleJobServiceBriefDraft, buildServiceJobBriefProposalParameters } from "./service-job-brief-assembler.js";
+export { createServiceJobBriefAgentProposal } from "./service-job-brief-proposal.js";

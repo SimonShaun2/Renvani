@@ -22,4 +22,33 @@ describe("isPublicRoute", () => {
     // Legacy public URL shape — must stay private (staff route + login), not redirected in middleware.
     expect(isPublicRoute("/estimates/legacy-approval-token-base64url")).toBe(false);
   });
+
+  it("treats public booking flow paths as public", () => {
+    expect(isPublicRoute("/book/sparkle-co")).toBe(true);
+    expect(isPublicRoute("/book/sparkle-co/schedule")).toBe(true);
+    expect(isPublicRoute("/book/sparkle-co/confirmed")).toBe(true);
+    expect(isPublicRoute("/book")).toBe(false);
+  });
+
+  it("treats pay and pay receipt paths as public", () => {
+    expect(isPublicRoute("/pay/tok_123")).toBe(true);
+    expect(isPublicRoute("/pay/tok_123/receipt")).toBe(true);
+    expect(isPublicRoute("/pay/tok_123/other")).toBe(false);
+    expect(isPublicRoute("/pay")).toBe(false);
+  });
+
+  it("treats VIP join and customer portal agreement paths as public", () => {
+    expect(isPublicRoute("/vip/join/tok_abc")).toBe(true);
+    expect(isPublicRoute("/portal/agreements/tok_abc")).toBe(true);
+    expect(isPublicRoute("/vip")).toBe(false);
+    expect(isPublicRoute("/vip/join")).toBe(false);
+    expect(isPublicRoute("/portal")).toBe(true); // FS-179 customer portal (token in URL fragment)
+    expect(isPublicRoute("/portal/agreements")).toBe(false);
+    expect(isPublicRoute("/portal/settings/x")).toBe(false);
+  });
+
+  it("treats signup and login as public", () => {
+    expect(isPublicRoute("/signup")).toBe(true);
+    expect(isPublicRoute("/login")).toBe(true);
+  });
 });

@@ -37,6 +37,10 @@ import {
   updateTask
 } from "../../services/job-tasks.service.js";
 import {
+  getJobPreparationStatus,
+  getJobServiceBrief
+} from "../../services/job-service-brief.service.js";
+import {
   addNote,
   addPhoto,
   assignTechnician,
@@ -184,6 +188,7 @@ function toJobNoteResponse(note: JobNote) {
     jobId: note.jobId,
     authorId: note.authorId,
     content: note.content,
+    noteKind: note.noteKind,
     isInternal: note.isInternal,
     createdAt: note.createdAt.toISOString(),
     updatedAt: note.updatedAt.toISOString(),
@@ -376,6 +381,26 @@ export async function getNotesHandler(request: FastifyRequest, reply: FastifyRep
   return reply.send({
     notes: notes.map((note) => toJobNoteResponse(note))
   });
+}
+
+export async function getJobServiceBriefHandler(
+  request: FastifyRequest,
+  reply: FastifyReply
+): Promise<FastifyReply> {
+  const params = request.params as JobIdParams;
+  const brief = await getJobServiceBrief(request.company.id, params.id);
+
+  return reply.send({ brief });
+}
+
+export async function getJobPreparationStatusHandler(
+  request: FastifyRequest,
+  reply: FastifyReply
+): Promise<FastifyReply> {
+  const params = request.params as JobIdParams;
+  const status = await getJobPreparationStatus(request.company.id, params.id);
+
+  return reply.send({ preparation: status });
 }
 
 export async function addPhotoHandler(request: FastifyRequest, reply: FastifyReply): Promise<FastifyReply> {

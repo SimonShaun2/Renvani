@@ -10,6 +10,7 @@ import {
   getActiveMigrateOnboardingSessionHandler,
   getMigrateDedupePreviewHandler,
   getMigrateRelationalPreviewHandler,
+  getMigrateOnboardingIngestStatusHandler,
   getMigrateOnboardingBundleHandler,
   linkMigrateOnboardingFilesHandler,
   listMigrateOnboardingSourcesHandler,

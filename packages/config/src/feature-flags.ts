@@ -1,3 +1,12 @@
+import { DEPLOYMENT_TIER_ENV } from "./deployment-environment.js";
+
+/** Clerk parallel auth is on only when RENVANI_DEPLOYMENT_TIER=staging (env-driven). */
+export function isClerkAuthParallelJwtEnabled(
+  source: Record<string, string | undefined> = process.env
+): boolean {
+  return source[DEPLOYMENT_TIER_ENV]?.trim() === "staging";
+}
+
 /**
  * Compile-time feature flags for staged rollout (v1).
  * Toggle without migrations; gate call sites with explicit comments.
@@ -13,8 +22,10 @@ export const featureFlags = {
   loyaltyRemindersEnabled: false,
   // FEATURE FLAG: loyalty-reminders-dry-run — FS-72 blocks customer send until founder gate
   loyaltyRemindersDryRun: true,
+  // FEATURE FLAG: service-job-brief-worker — FS-25 worker-built job brief proposals (no inline API AI)
+  serviceJobBriefWorkerEnabled: false,
   // FEATURE FLAG: clerk-auth-parallel-jwt — STACK-02: accept Clerk session JWT alongside in-repo JWT
-  clerkAuthParallelJwt: false,
+  clerkAuthParallelJwt: isClerkAuthParallelJwtEnabled(),
   // FEATURE FLAG: tenant-session-scoped-writes — STACK-02/10: SET LOCAL app.current_company_id on API writes
   tenantSessionScopedWrites: false,
   // FEATURE FLAG: resend-email-enabled — STACK-08: route outbound email through Resend (@fsm/comms)

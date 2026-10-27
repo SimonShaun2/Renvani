@@ -50,6 +50,7 @@ export interface EstimateItem {
   id: string;
   estimateId: string;
   companyId: string;
+  priceBookItemId: string | null;
   name: string;
   description: string | null;
   itemType: EstimateItemType;
@@ -208,6 +209,7 @@ export interface AddEstimateItemInput {
   unitPrice: number;
   isTaxable?: boolean;
   sortOrder?: number;
+  priceBookItemId?: string;
 }
 
 export interface UpdateEstimateItemInput {
@@ -218,6 +220,7 @@ export interface UpdateEstimateItemInput {
   unitPrice?: number;
   isTaxable?: boolean;
   sortOrder?: number;
+  priceBookItemId?: string | null;
 }
 
 export interface ListEstimatesQuery {

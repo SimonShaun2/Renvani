@@ -48,6 +48,13 @@ export const getPublicPaymentLinkSchema = {
         invoiceAmount: { type: "string" },
         platformFeeAmount: { type: "string" },
         totalDue: { type: "string" },
+        serviceFeeAmount: { type: "string" },
+        bookingFeeAmount: { type: "string" },
+        invoiceAmountCents: { type: "integer" },
+        serviceFeeCents: { type: "integer" },
+        bookingFeeCents: { type: "integer" },
+        totalDueCents: { type: "integer" },
+        feeRefundable: { type: "boolean" },
         platformFeePercent: { type: ["number", "null"] },
         platformFeePaidByCustomer: { type: "boolean" },
         platformFeeDisclosure: { type: ["string", "null"] }

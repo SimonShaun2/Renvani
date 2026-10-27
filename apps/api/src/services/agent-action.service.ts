@@ -29,6 +29,7 @@ import {
   requiresHumanApproval
 } from "./agent-action.policy.js";
 import { assertLoyaltyReminderExecutionAllowed } from "./agent-action.policy.js";
+import { applyApprovedJobServiceBrief } from "./job-service-brief.service.js";
 import { authorizeAgentActionExecution } from "./outbound-policy-engine.service.js";
 import { resolveEntityRef } from "./tenant-context.service.js";
 import {
@@ -572,6 +573,17 @@ export async function executeAgentAction(companyId: string, actionId: string, ac
 
       return { mapped: mapRow(updated), row: updated, detail };
     });
+
+    if (result.row.actionType === "service.job_brief.propose") {
+      const target = result.row.target as CanonicalEntityRefV1;
+      await applyApprovedJobServiceBrief({
+        companyId,
+        jobId: target.entityId,
+        actorId,
+        agentActionId: actionId,
+        parameters: resolveExecutableParameters(result.row)
+      });
+    }
 
     await mirrorAgentActionAuditToLangfuse({
       companyId,

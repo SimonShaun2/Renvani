@@ -6,6 +6,11 @@ vi.mock("@fsm/db", () => ({
   emitEventWithExecutor: vi.fn()
 }));
 
+// FS-25: agent-action.service imports the job brief service, which loads @fsm/jobs queues (env at import).
+vi.mock("./job-service-brief.service.js", () => ({
+  applyApprovedJobServiceBrief: vi.fn()
+}));
+
 import { AppError, ErrorCode, type CanonicalEntityRefV1 } from "@fsm/types";
 
 import { resolveExecutableParameters } from "./agent-action.service.js";

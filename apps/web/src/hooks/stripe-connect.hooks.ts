@@ -17,9 +17,10 @@ const stripeConnectKeys = {
   status: ["stripe-connect", "status"] as const
 };
 
-export function useStripeConnectStatus() {
+export function useStripeConnectStatus(enabled = true) {
   return useQuery({
     queryKey: stripeConnectKeys.status,
+    enabled,
     queryFn: () => api.get<StripeConnectStatus>("/api/v1/stripe/connect/status"),
     staleTime: 60 * 1000
   });

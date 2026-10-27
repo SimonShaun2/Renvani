@@ -99,6 +99,7 @@ const invoiceItemSchema = {
     id: { type: "string" },
     invoiceId: { type: "string" },
     companyId: { type: "string" },
+    priceBookItemId: nullableStringSchema,
     name: { type: "string" },
     description: nullableStringSchema,
     itemType: { type: "string" },
@@ -337,7 +338,8 @@ export const CreateInvoiceItemSchema = z
     quantity: z.number().min(0.001),
     unitPrice: z.number().min(0),
     isTaxable: z.boolean().optional().default(true),
-    sortOrder: z.number().int().optional().default(0)
+    sortOrder: z.number().int().optional().default(0),
+    priceBookItemId: uuidSchema.optional()
   })
   .strict();
 
@@ -348,7 +350,8 @@ export const UpdateInvoiceItemSchema = buildUpdateSchema({
   quantity: z.number().min(0.001).optional(),
   unitPrice: z.number().min(0).optional(),
   isTaxable: z.boolean().optional(),
-  sortOrder: z.number().int().optional()
+  sortOrder: z.number().int().optional(),
+  priceBookItemId: uuidSchema.nullable().optional()
 });
 
 export const CreateInvoiceSchema = z

@@ -21,6 +21,7 @@ export type RevenueLineItemType = EstimateItemType | InvoiceItemType;
 export interface RevenueLineItemDraft {
   id?: string;
   localId: string;
+  priceBookItemId?: string | null;
   name: string;
   description: string;
   itemType: RevenueLineItemType;
@@ -141,6 +142,7 @@ export function createLineItemDraft(partial?: Partial<RevenueLineItemDraft>): Re
 
 export function lineItemFromProduct(product: Product, sortOrder: number): RevenueLineItemDraft {
   return createLineItemDraft({
+    priceBookItemId: product.id,
     name: product.name,
     description: product.description ?? "",
     itemType: product.category === "labor" || product.category === "material" || product.category === "fee" ? product.category : "service",
@@ -154,6 +156,7 @@ export function lineItemFromProduct(product: Product, sortOrder: number): Revenu
 export function lineItemFromEstimateItem(item: EstimateItemRecord): RevenueLineItemDraft {
   return createLineItemDraft({
     id: item.id,
+    priceBookItemId: item.priceBookItemId ?? null,
     name: item.name,
     description: item.description ?? "",
     itemType: item.itemType,
@@ -167,6 +170,7 @@ export function lineItemFromEstimateItem(item: EstimateItemRecord): RevenueLineI
 export function lineItemFromInvoiceItem(item: InvoiceItemRecord): RevenueLineItemDraft {
   return createLineItemDraft({
     id: item.id,
+    priceBookItemId: item.priceBookItemId ?? null,
     name: item.name,
     description: item.description ?? "",
     itemType: item.itemType,

@@ -472,6 +472,18 @@ export const listCustomersValidation = withZodValidation({ query: ListCustomersQ
 export const searchCustomersValidation = withZodValidation({ query: SearchCustomersQuerySchema });
 export const createCustomerValidation = withZodValidation({ body: CreateCustomerSchema });
 export const customerIdValidation = withZodValidation({ params: CustomerIdParamsSchema });
+export const CreateCustomerNoteSchema = z
+  .object({
+    content: z.string().trim().min(1).max(10_000),
+    isInternal: z.boolean().optional(),
+    notedAt: z.string().datetime({ offset: true }).optional()
+  })
+  .strict();
+export type CreateCustomerNoteBody = z.infer<typeof CreateCustomerNoteSchema>;
+export const createCustomerNoteValidation = withZodValidation({
+  params: CustomerIdParamsSchema,
+  body: CreateCustomerNoteSchema
+});
 export const updateCustomerValidation = withZodValidation({
   params: CustomerIdParamsSchema,
   body: UpdateCustomerSchema
@@ -759,6 +771,24 @@ const customerNoteSchema = {
     createdAt: { type: "string", format: "date-time" },
     updatedAt: { type: "string", format: "date-time" },
     deletedAt: nullableDateTimeSchema
+  }
+} as const;
+
+export const createCustomerNoteRouteSchema = {
+  tags: ["customers"],
+  response: {
+    201: {
+      type: "object",
+      additionalProperties: false,
+      required: ["note"],
+      properties: {
+        note: customerNoteSchema
+      }
+    },
+    400: errorResponseSchema,
+    401: errorResponseSchema,
+    403: errorResponseSchema,
+    404: errorResponseSchema
   }
 } as const;
 

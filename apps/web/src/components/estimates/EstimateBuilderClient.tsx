@@ -247,6 +247,19 @@ function getEstimateViewStatus(primaryStatus: EstimateStatus): EstimateStatus {
   return primaryStatus;
 }
 
+function toEstimateLineItemPayload(item: RevenueLineItemDraft, index: number) {
+  return {
+    name: item.name,
+    ...(item.description ? { description: item.description } : {}),
+    itemType: item.itemType,
+    quantity: parseMoneyValue(item.quantity),
+    unitPrice: parseMoneyValue(item.unitPrice),
+    isTaxable: item.isTaxable,
+    sortOrder: index,
+    ...(item.priceBookItemId ? { priceBookItemId: item.priceBookItemId } : {})
+  };
+}
+
 function buildCreateEstimateInput(
   draft: EstimateDraftState,
   tier: EstimateTierDraft,
@@ -264,15 +277,7 @@ function buildCreateEstimateInput(
     financingOffered: draft.financingOffered,
     ...(tier.label ? { tierLabel: tier.label } : {}),
     ...(tierGroupId ? { tierGroupId } : {}),
-    items: normalizeLineItems(tier.items).map((item, index) => ({
-      name: item.name,
-      ...(item.description ? { description: item.description } : {}),
-      itemType: item.itemType,
-      quantity: parseMoneyValue(item.quantity),
-      unitPrice: parseMoneyValue(item.unitPrice),
-      isTaxable: item.isTaxable,
-      sortOrder: index
-    }))
+    items: normalizeLineItems(tier.items).map((item, index) => toEstimateLineItemPayload(item, index))
   };
 }
 
@@ -509,15 +514,7 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
 
             for (const [index, item] of normalizedItems.entries()) {
                 if (!item.id) {
-                  await api.post(`/api/v1/estimates/${singleTier.estimateId}/items`, {
-                    name: item.name,
-                    ...(item.description ? { description: item.description } : {}),
-                    itemType: item.itemType,
-                    quantity: parseMoneyValue(item.quantity),
-                    unitPrice: parseMoneyValue(item.unitPrice),
-                  isTaxable: item.isTaxable,
-                  sortOrder: index
-                });
+                  await api.post(`/api/v1/estimates/${singleTier.estimateId}/items`, toEstimateLineItemPayload(item, index));
                 continue;
               }
 
@@ -534,20 +531,13 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
                 formatQuantityInput(normalizedExisting.quantity) === formatQuantityInput(item.quantity) &&
                 formatMoneyInput(normalizedExisting.unitPrice) === formatMoneyInput(item.unitPrice) &&
                 normalizedExisting.isTaxable === item.isTaxable &&
-                normalizedExisting.sortOrder === item.sortOrder
+                normalizedExisting.sortOrder === item.sortOrder &&
+                (normalizedExisting.priceBookItemId ?? null) === (item.priceBookItemId ?? null)
               ) {
                 continue;
               }
 
-              await api.patch(`/api/v1/estimates/${singleTier.estimateId}/items/${item.id}`, {
-                name: item.name,
-                ...(item.description ? { description: item.description } : {}),
-                itemType: item.itemType,
-                quantity: parseMoneyValue(item.quantity),
-                unitPrice: parseMoneyValue(item.unitPrice),
-                isTaxable: item.isTaxable,
-                sortOrder: index
-              });
+              await api.patch(`/api/v1/estimates/${singleTier.estimateId}/items/${item.id}`, toEstimateLineItemPayload(item, index));
             }
 
             const localIds = new Set(normalizedItems.map((item) => item.id).filter((value): value is string => Boolean(value)));
@@ -601,15 +591,7 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
 
               for (const [index, item] of normalizedItems.entries()) {
                 if (!item.id) {
-                  await api.post(`/api/v1/estimates/${tier.estimateId}/items`, {
-                    name: item.name,
-                    ...(item.description ? { description: item.description } : {}),
-                    itemType: item.itemType,
-                    quantity: parseMoneyValue(item.quantity),
-                    unitPrice: parseMoneyValue(item.unitPrice),
-                    isTaxable: item.isTaxable,
-                    sortOrder: index
-                  });
+                  await api.post(`/api/v1/estimates/${tier.estimateId}/items`, toEstimateLineItemPayload(item, index));
                   continue;
                 }
 
@@ -626,20 +608,13 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
                   formatQuantityInput(normalizedExisting.quantity) === formatQuantityInput(item.quantity) &&
                   formatMoneyInput(normalizedExisting.unitPrice) === formatMoneyInput(item.unitPrice) &&
                   normalizedExisting.isTaxable === item.isTaxable &&
-                  normalizedExisting.sortOrder === item.sortOrder
+                  normalizedExisting.sortOrder === item.sortOrder &&
+                  (normalizedExisting.priceBookItemId ?? null) === (item.priceBookItemId ?? null)
                 ) {
                   continue;
                 }
 
-                await api.patch(`/api/v1/estimates/${tier.estimateId}/items/${item.id}`, {
-                  name: item.name,
-                  ...(item.description ? { description: item.description } : {}),
-                  itemType: item.itemType,
-                  quantity: parseMoneyValue(item.quantity),
-                  unitPrice: parseMoneyValue(item.unitPrice),
-                  isTaxable: item.isTaxable,
-                  sortOrder: index
-                });
+                await api.patch(`/api/v1/estimates/${tier.estimateId}/items/${item.id}`, toEstimateLineItemPayload(item, index));
               }
 
               const localIds = new Set(normalizedItems.map((item) => item.id).filter((value): value is string => Boolean(value)));

@@ -8,6 +8,7 @@ export {
   listGoldenBundleChunkPartRelativePaths
 } from "./chunked-job-history.js";
 export { parseCsvLine, parseCsvTable, columnIndex } from "./csv.js";
+export { parseGoldenBundleTabularTable } from "./tabular.js";
 export {
   resolveGoldenImportBundleRoot,
   resolveGoldenImportBundleDir,

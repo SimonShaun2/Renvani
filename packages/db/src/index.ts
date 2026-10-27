@@ -79,6 +79,13 @@ export {
   validateNoteImportRows,
   type NotesValidationResult
 } from "./import-notes-commit.js";
+export {
+  commitServiceAgreementImportRows,
+  mapServiceAgreementImportRow,
+  softDeleteServiceAgreementsImport,
+  validateServiceAgreementImportRows,
+  type ServiceAgreementsValidationResult
+} from "./import-service-agreements-commit.js";
 export { normalizeImportedPaymentMethod } from "./import-invoice-balance-commit.logic.js";
 export {
   commitImportedInvoiceRows,

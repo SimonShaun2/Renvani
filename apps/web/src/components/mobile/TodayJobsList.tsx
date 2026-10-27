@@ -8,6 +8,7 @@ import { EmptyState } from "@/src/components/ui/EmptyState";
 import { SkeletonCard } from "@/src/components/ui/SkeletonCard";
 import { useCurrentTechnician } from "@/src/hooks/technicians.hooks";
 import { type JobListRecord, useJobsList } from "@/src/hooks/jobs.hooks";
+import { isMobileRouteMissing, orderByToday, useMobileToday } from "@/src/hooks/technician-mobile.hooks";
 import { useBreakpoint } from "@/src/hooks/useBreakpoint";
 import { cn, formatCurrency } from "@/src/lib/utils";
 import { useAuthStore } from "@/src/stores/auth.store";
@@ -80,11 +81,19 @@ export function TodayJobsList() {
     enabled: Boolean(technicianQuery.technician?.id)
   });
 
-  const jobs = sortJobsByTime(
-    (jobsQuery.data?.data ?? []).filter((job) =>
-      job.scheduledStart ? isSameDay(parseISO(job.scheduledStart), new Date()) : true
-    )
-  );
+  // FS-169 (#218): server-resolved day list in route order; falls back to the jobs list when the route is missing.
+  const todayQuery = useMobileToday();
+  const todayMissing = isMobileRouteMissing(todayQuery.error);
+  const listJobs = jobsQuery.data?.data ?? [];
+  const { jobs, unmatched } =
+    todayQuery.data && !todayMissing
+      ? orderByToday(todayQuery.data.jobs, listJobs)
+      : {
+          jobs: sortJobsByTime(
+            listJobs.filter((job) => (job.scheduledStart ? isSameDay(parseISO(job.scheduledStart), new Date()) : true))
+          ),
+          unmatched: 0
+        };
 
   const technicianName =
     technicianQuery.technician
@@ -93,7 +102,7 @@ export function TodayJobsList() {
         ? `${authUser.firstName} ${authUser.lastName}`.trim()
         : "Technician";
 
-  if (technicianQuery.isLoading || jobsQuery.isLoading) {
+  if (technicianQuery.isLoading || jobsQuery.isLoading || (todayQuery.isLoading && !todayMissing)) {
     return (
       <div className="space-y-4 px-4 py-4">
         <SkeletonCard className="h-[140px]" />
@@ -103,7 +112,7 @@ export function TodayJobsList() {
     );
   }
 
-  if (technicianQuery.isError || jobsQuery.isError) {
+  if (technicianQuery.isError || jobsQuery.isError || (todayQuery.isError && !todayMissing)) {
     return (
       <div className="px-4 py-6">
         <EmptyState
@@ -144,6 +153,12 @@ export function TodayJobsList() {
             </div>
           </div>
         </section>
+
+        {unmatched > 0 ? (
+          <p role="status" className="text-sm text-neutral-500">
+            {unmatched} more {unmatched === 1 ? "job is" : "jobs are"} on your route. Open the job list to see them.
+          </p>
+        ) : null}
 
         {jobs.length === 0 ? (
           <EmptyState

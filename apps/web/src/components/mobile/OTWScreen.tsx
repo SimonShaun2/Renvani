@@ -8,6 +8,7 @@ import { ArrowLeft, CarFront, MapPinned, Phone } from "lucide-react";
 import { EmptyState } from "@/src/components/ui/EmptyState";
 import { SkeletonCard } from "@/src/components/ui/SkeletonCard";
 import { useJob, useJobOTW, useSendOTW } from "@/src/hooks/jobs.hooks";
+import { isMobileRouteMissing, isVersionConflict, useMarkOnTheWay, useMobileJob } from "@/src/hooks/technician-mobile.hooks";
 import { showToast } from "@/src/stores/toast.store";
 import { buildOnTheWayMessage, formatDateTime } from "@/src/components/jobs/jobs.utils";
 
@@ -18,6 +19,10 @@ export function OTWScreen() {
   const jobQuery = useJob(params.jobId);
   const otwQuery = useJobOTW(params.jobId);
   const sendOTW = useSendOTW(params.jobId);
+  const mobileJobQuery = useMobileJob(params.jobId);
+  const markOnTheWay = useMarkOnTheWay(params.jobId);
+  const mobileJob = mobileJobQuery.data?.job;
+  const canMarkOnly = !isMobileRouteMissing(mobileJobQuery.error) && !isMobileRouteMissing(markOnTheWay.error);
   const [etaMinutes, setEtaMinutes] = useState(15);
   const [message, setMessage] = useState("");
 
@@ -53,6 +58,25 @@ export function OTWScreen() {
         tone: "error",
         title: "Could not send OTW",
         description: error instanceof Error ? error.message : "Try again in a moment."
+      });
+    }
+  }
+
+  async function handleMarkOnly() {
+    try {
+      await markOnTheWay.mutateAsync({
+        estimatedArrivalMinutes: etaMinutes,
+        ...(mobileJob?.recordVersion ? { recordVersion: mobileJob.recordVersion } : {})
+      });
+      showToast({ tone: "success", title: "Marked on the way", description: "Dispatch can see you are heading over. No text was sent." });
+    } catch (error) {
+      if (isMobileRouteMissing(error)) {
+        return;
+      }
+      showToast({
+        tone: "error",
+        title: isVersionConflict(error) ? "Job changed on another device" : "Could not mark on the way",
+        description: isVersionConflict(error) ? "We refreshed the job. Try again." : error instanceof Error ? error.message : "Try again in a moment."
       });
     }
   }
@@ -148,6 +172,23 @@ export function OTWScreen() {
             {sendOTW.isPending ? "Sending..." : "Send On My Way"}
           </button>
           <p className="text-center text-xs text-neutral-400">Customer will receive a text notification</p>
+          {canMarkOnly ? (
+            <button
+              type="button"
+              disabled={markOnTheWay.isPending}
+              onClick={() => {
+                void handleMarkOnly();
+              }}
+              className="inline-flex min-h-11 w-full items-center justify-center rounded-[22px] border border-neutral-200 bg-white px-4 text-sm font-semibold text-neutral-700 disabled:opacity-60"
+            >
+              {markOnTheWay.isPending ? "Saving..." : "Mark on my way without texting"}
+            </button>
+          ) : null}
+          {mobileJob?.onTheWayAt ? (
+            <p role="status" className="text-center text-xs text-neutral-500">
+              On the way since {formatDateTime(mobileJob.onTheWayAt)}
+            </p>
+          ) : null}
         </section>
 
         <div className="grid grid-cols-2 gap-3">

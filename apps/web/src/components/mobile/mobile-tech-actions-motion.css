@@ -1,0 +1,11 @@
+/* FS-180: 10px slide-in for the report-issue panel; static with reduced motion. */
+@keyframes tech-actions-slide-in {
+  from { transform: translateY(10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-tech-actions-reveal] {
+    animation: tech-actions-slide-in 200ms ease-out both;
+  }
+}

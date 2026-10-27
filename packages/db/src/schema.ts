@@ -1200,7 +1200,11 @@ export const recurringVisitSeries = pgTable(
     ...timestamps
   },
   (t) => ({
-    companyIdx: index("recurring_visit_series_company_idx").on(t.companyId)
+    companyIdx: index("recurring_visit_series_company_idx").on(t.companyId),
+    // FS-59 (0048): at most one active, non-deleted series per maintenance plan.
+    activePlanUid: uniqueIndex("recurring_visit_series_active_plan_uidx")
+      .on(t.companyId, t.maintenancePlanId)
+      .where(sql`"status" = 'active' AND "deleted_at" IS NULL AND "maintenance_plan_id" IS NOT NULL`)
   })
 );
 
@@ -1223,10 +1227,9 @@ export const recurringVisitOccurrences = pgTable(
     ...timestamps
   },
   (t) => ({
-    seriesIndexUid: uniqueIndex("recurring_visit_occurrences_series_index_uidx").on(
-      t.seriesId,
-      t.occurrenceIndex
-    ),
+    seriesIndexUid: uniqueIndex("recurring_visit_occurrences_series_index_uidx")
+      .on(t.seriesId, t.occurrenceIndex)
+      .where(sql`"deleted_at" IS NULL`),
     companySeriesIdx: index("recurring_visit_occurrences_company_series_idx").on(t.companyId, t.seriesId)
   })
 );

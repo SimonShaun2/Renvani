@@ -25,7 +25,7 @@ export function monthsBetweenOccurrences(frequency: MaintenancePlanFrequency): n
   return FREQUENCY_MONTH_STEP[frequency];
 }
 
-/** Calendar-month occurrence local dates from anchor (index 0 = anchor). */
+/** Calendar-month occurrence local dates from anchor (index 0 = anchor), no month-end drift. */
 export function planOccurrenceLocalDates(
   anchorLocalDate: string,
   frequency: MaintenancePlanFrequency,
@@ -37,11 +37,12 @@ export function planOccurrenceLocalDates(
 
   const step = monthsBetweenOccurrences(frequency);
   const dates: string[] = [];
-  let current = Temporal.PlainDate.from(anchorLocalDate);
+  const anchor = Temporal.PlainDate.from(anchorLocalDate);
 
+  // Each occurrence is computed from the anchor (anchor + n*step months), never chained from the
+  // previous one, so a Jan 31 anchor yields Feb 28/29, Mar 31, Apr 30 ... (clamped per target month).
   for (let index = 0; index < count; index++) {
-    dates.push(current.toString());
-    current = current.add({ months: step });
+    dates.push(anchor.add({ months: index * step }, { overflow: "constrain" }).toString());
   }
 
   return dates;
@@ -59,4 +60,9 @@ export function localDateTimeToUtc(
   });
 
   return new Date(zoned.epochMilliseconds);
+}
+
+/** Today's calendar date in the given IANA time zone (YYYY-MM-DD). */
+export function todayLocalDate(timeZone: string, now: Date = new Date()): string {
+  return Temporal.Instant.fromEpochMilliseconds(now.getTime()).toZonedDateTimeISO(timeZone).toPlainDate().toString();
 }

@@ -31,7 +31,7 @@ One SQL migration; no backfill required. New code paths are additive behind seri
 
 ## Security Impact
 
-All queries scoped by `company_id`. Unique constraints prevent cross-tenant collision; RLS inherits existing tenant session patterns on new tables (future STACK hardening if required).
+All queries scoped by `company_id`. Unique constraints prevent cross-tenant collision; both tables have row-level security ENABLEd and FORCEd with a `tenant_isolation_<table>` policy on `company_id::text = current_setting('app.current_company_id', true)` (migration **0048**, same pattern as 0045). RLS is not inherited from other tables; 0047 created the tables without it and 0048 adds it. 0048 also adds `recurring_visit_series_active_plan_uidx` (one active, non-deleted series per maintenance plan); a concurrent-create unique violation (23505) returns the existing series.
 
 ## Decision
 

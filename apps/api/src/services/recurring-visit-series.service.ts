@@ -8,10 +8,12 @@ import {
   recurringVisitOccurrences,
   recurringVisitSeries
 } from "@fsm/db";
+import { AppError, ErrorCode } from "@fsm/types";
 
 import {
   localDateTimeToUtc,
-  planOccurrenceLocalDates
+  planOccurrenceLocalDates,
+  todayLocalDate
 } from "./recurring-visit-occurrence.schedule.js";
 
 type TransactionExecutor = Pick<typeof db, "select" | "insert" | "update">;
@@ -54,50 +56,94 @@ export async function getRecurringVisitSeriesForCompany(
   return series ?? null;
 }
 
-export async function ensureRecurringVisitSeriesForMaintenancePlan(
+type SavepointCapable = TransactionExecutor & {
+  transaction?: <T>(fn: (tx: TransactionExecutor) => Promise<T>) => Promise<T>;
+};
+
+async function withSavepoint<T>(
+  executor: TransactionExecutor,
+  fn: (tx: TransactionExecutor) => Promise<T>
+): Promise<T> {
+  const capable = executor as SavepointCapable;
+  return typeof capable.transaction === "function" ? capable.transaction(fn) : fn(executor);
+}
+
+export function isUniqueViolation(error: unknown): boolean {
+  let current: unknown = error;
+  for (let depth = 0; depth < 3 && current && typeof current === "object"; depth++) {
+    if ((current as { code?: unknown }).code === "23505") {
+      return true;
+    }
+    current = (current as { cause?: unknown }).cause;
+  }
+  return false;
+}
+
+async function findActiveSeriesForPlan(
   companyId: string,
-  plan: MaintenancePlanRow,
-  anchorVisit: MaintenanceVisitRow,
+  planId: string,
   executor: TransactionExecutor
-): Promise<RecurringVisitSeriesRow> {
-  const existing = await executor
+): Promise<RecurringVisitSeriesRow | null> {
+  const [row] = await executor
     .select()
     .from(recurringVisitSeries)
     .where(
       and(
         eq(recurringVisitSeries.companyId, companyId),
-        eq(recurringVisitSeries.maintenancePlanId, plan.id),
+        eq(recurringVisitSeries.maintenancePlanId, planId),
         eq(recurringVisitSeries.status, "active"),
         isNull(recurringVisitSeries.deletedAt)
       )
     )
     .limit(1);
 
-  if (existing[0]) {
-    return existing[0];
+  return row ?? null;
+}
+
+export async function ensureRecurringVisitSeriesForMaintenancePlan(
+  companyId: string,
+  plan: MaintenancePlanRow,
+  anchorVisit: MaintenanceVisitRow,
+  executor: TransactionExecutor
+): Promise<RecurringVisitSeriesRow> {
+  const existing = await findActiveSeriesForPlan(companyId, plan.id, executor);
+  if (existing) {
+    return existing;
   }
 
   const timeZone = await resolveCompanyTimeZone(companyId, executor);
-  const anchorLocalDate =
-    anchorVisit.scheduledDate ??
-    new Date().toISOString().slice(0, 10);
+  // Fallback anchor is "today" in the company's time zone, not UTC.
+  const anchorLocalDate = anchorVisit.scheduledDate ?? todayLocalDate(timeZone);
 
-  const inserted = await executor
-    .insert(recurringVisitSeries)
-    .values({
-      companyId,
-      customerId: plan.customerId,
-      propertyId: plan.propertyId,
-      maintenancePlanId: plan.id,
-      anchorMaintenanceVisitId: anchorVisit.id,
-      timeZone,
-      frequency: plan.frequency,
-      anchorLocalDate,
-      status: "active",
-      externalSchedulerAuthoritative: false,
-      notes: `Series from maintenance plan ${plan.id}`
-    })
-    .returning();
+  const values = {
+    companyId,
+    customerId: plan.customerId,
+    propertyId: plan.propertyId,
+    maintenancePlanId: plan.id,
+    anchorMaintenanceVisitId: anchorVisit.id,
+    timeZone,
+    frequency: plan.frequency,
+    anchorLocalDate,
+    status: "active" as const,
+    externalSchedulerAuthoritative: false,
+    notes: `Series from maintenance plan ${plan.id}`
+  };
+
+  let inserted: RecurringVisitSeriesRow[];
+  try {
+    // Savepoint (when available) so a unique violation does not abort the caller's transaction.
+    inserted = await withSavepoint(executor, (tx) => tx.insert(recurringVisitSeries).values(values).returning());
+  } catch (error) {
+    if (!isUniqueViolation(error)) {
+      throw error;
+    }
+    // Lost the race: recurring_visit_series_active_plan_uidx (0048) — return the winner's series.
+    const winner = await findActiveSeriesForPlan(companyId, plan.id, executor);
+    if (winner) {
+      return winner;
+    }
+    throw new AppError(ErrorCode.CONFLICT, "Active recurring visit series already exists for this plan");
+  }
 
   const series = inserted[0];
   if (!series) {

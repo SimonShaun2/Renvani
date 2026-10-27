@@ -103,4 +103,62 @@ describe("recurring visit series service (FS-59)", () => {
     const crossTenant = await getRecurringVisitSeriesForCompany(companyB.id, series.id, db);
     expect(crossTenant).toBeNull();
   });
+
+  it("returns the winning series when a concurrent create hits the unique index (23505)", async () => {
+    const company = fakeDb.seedCompany({ name: "Acme", slug: "acme-race", timezone: "America/Chicago" });
+    const customer = fakeDb.seedCustomer({ companyId: company.id, firstName: "Sam", lastName: "Lee" });
+    const plan = fakeDb.seedMaintenancePlan({
+      companyId: company.id,
+      customerId: customer.id,
+      status: "active",
+      frequency: "monthly"
+    });
+    const visit = fakeDb.seedMaintenanceVisit({
+      companyId: company.id,
+      maintenancePlanId: plan.id,
+      scheduledDate: "2026-03-01"
+    });
+
+    // Simulate the other booking committing between our existence check and our insert.
+    const racingExecutor = {
+      select: db.select.bind(db),
+      update: db.update.bind(db),
+      insert: (table: Parameters<typeof db.insert>[0]) => ({
+        values: (values: Record<string, unknown>) => ({
+          returning: async () => {
+            await db.insert(table).values({ ...values, notes: "winner" } as never).returning();
+            throw Object.assign(new Error("duplicate key value violates unique constraint"), {
+              code: "23505"
+            });
+          }
+        })
+      })
+    } as unknown as Parameters<typeof ensureRecurringVisitSeriesForMaintenancePlan>[3];
+
+    const series = await ensureRecurringVisitSeriesForMaintenancePlan(company.id, plan, visit, racingExecutor);
+    expect(series.notes).toBe("winner");
+    const active = fakeDb
+      .getTestState()
+      .recurringVisitSeries.filter((row) => row.maintenancePlanId === plan.id && row.deletedAt === null);
+    expect(active).toHaveLength(1);
+  });
+
+  it("falls back to today in the company time zone when the anchor visit has no date", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-03-02T03:30:00Z"));
+    try {
+      const company = fakeDb.seedCompany({ name: "Acme", slug: "acme-tz", timezone: "America/Chicago" });
+      const customer = fakeDb.seedCustomer({ companyId: company.id, firstName: "Sam", lastName: "Lee" });
+      const plan = fakeDb.seedMaintenancePlan({ companyId: company.id, customerId: customer.id, status: "active" });
+      const visit = fakeDb.seedMaintenanceVisit({
+        companyId: company.id,
+        maintenancePlanId: plan.id,
+        scheduledDate: null
+      } as never);
+      const series = await ensureRecurringVisitSeriesForMaintenancePlan(company.id, plan, visit, db);
+      expect(series.anchorLocalDate).toBe("2026-03-01");
+    } finally {
+      vi.useRealTimers();
+    }
+  });
 });

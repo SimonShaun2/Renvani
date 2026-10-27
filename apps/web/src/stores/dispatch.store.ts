@@ -18,6 +18,9 @@ interface DispatchStore {
   setActiveTab: (tab: DispatchTab) => void;
   setViewMode: (viewMode: DispatchViewMode) => void;
   closeDetail: () => void;
+  /** True while the /dispatch/stream EventSource is open; false means the board polls every 30s. */
+  streamLive: boolean;
+  setStreamLive: (live: boolean) => void;
 }
 
 export const useDispatchStore = create<DispatchStore>((set) => ({
@@ -32,5 +35,7 @@ export const useDispatchStore = create<DispatchStore>((set) => ({
     set({ selectedBookingRequestId: bookingRequestId, selectedJobId: null }),
   setActiveTab: (tab) => set({ activeTab: tab }),
   setViewMode: (viewMode) => set({ viewMode }),
-  closeDetail: () => set({ selectedJobId: null, selectedBookingRequestId: null })
+  closeDetail: () => set({ selectedJobId: null, selectedBookingRequestId: null }),
+  streamLive: false,
+  setStreamLive: (live) => set({ streamLive: live })
 }));

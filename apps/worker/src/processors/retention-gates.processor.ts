@@ -174,10 +174,20 @@ export async function processRetentionGatesWinBackEvaluate(
   await dependencies.enqueueProposalCreate(payload);
 }
 
+import { processQboSyncJob } from "./qbo-sync.processor.js";
+
 export function createRetentionGatesProcessor(
   dependencies?: RetentionGatesDependencies
 ): Processor<Record<string, unknown>, void, string> {
   return async (job) => {
+    if (
+      job.name === OPERATOR_QUEUE_JOB_NAMES.qboSyncPush ||
+      job.name === OPERATOR_QUEUE_JOB_NAMES.qboSyncPull
+    ) {
+      await processQboSyncJob(job);
+      return;
+    }
+
     switch (job.name) {
       case OPERATOR_QUEUE_JOB_NAMES.retentionGatesAfterCompletionConfirm:
         await processRetentionGatesAfterCompletionConfirm(

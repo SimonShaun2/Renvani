@@ -13,6 +13,7 @@ import {
   startImport
 } from "../../services/import.service.js";
 import { getImportSessionIngestStatus } from "../../services/import-session-ingest-status.service.js";
+import { getImportSessionIngestProgress } from "../../services/import-ingest-progress.service.js";
 import {
   getMigrateFileBatchOperatorStatus,
   retryMigrateFileBatchFailedObjects
@@ -228,6 +229,15 @@ export async function getImportErrorsHandler(
   return reply.send({
     errors
   });
+}
+
+export async function getImportIngestProgressHandler(
+  request: FastifyRequest,
+  reply: FastifyReply
+): Promise<FastifyReply> {
+  const params = request.params as ImportSessionIdParams;
+  const progress = await getImportSessionIngestProgress(request.company.id, params.id);
+  return reply.send(progress);
 }
 
 export async function getMigrateFileBatchStatusHandler(

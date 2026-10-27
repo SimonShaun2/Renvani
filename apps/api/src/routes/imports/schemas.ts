@@ -342,3 +342,16 @@ export const importErrorsRouteSchema = {
     404: errorResponseSchema
   }
 } as const;
+
+export const importIngestProgressRouteSchema = {
+  tags: ["imports"],
+  response: {
+    200: {
+      type: "object",
+      additionalProperties: true
+    },
+    401: errorResponseSchema,
+    403: errorResponseSchema,
+    404: errorResponseSchema
+  }
+} as const;

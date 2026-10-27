@@ -185,6 +185,11 @@ export interface TestUserRecord {
   avatarUrl: string | null;
   isActive: boolean;
   lastLoginAt: Date | null;
+  emailVerifiedAt?: Date | null;
+  emailVerificationTokenHash?: string | null;
+  emailVerificationExpiresAt?: Date | null;
+  clerkUserId?: string | null;
+  clerkUnlinkedAt?: Date | null;
   technicianId: string | null;
   createdAt: Date;
   updatedAt: Date;
@@ -1110,6 +1115,11 @@ export interface TestUserRecord {
   avatarUrl: string | null;
   isActive: boolean;
   lastLoginAt: Date | null;
+  emailVerifiedAt?: Date | null;
+  emailVerificationTokenHash?: string | null;
+  emailVerificationExpiresAt?: Date | null;
+  clerkUserId?: string | null;
+  clerkUnlinkedAt?: Date | null;
   technicianId: string | null;
   createdAt: Date;
   updatedAt: Date;
@@ -2155,6 +2165,8 @@ const companiesTable = {
 const usersTable = {
   __name: "users",
   id: "id",
+  clerkUserId: "clerkUserId",
+  clerkUnlinkedAt: "clerkUnlinkedAt",
   companyId: "companyId",
   email: "email",
   passwordHash: "passwordHash",
@@ -2166,6 +2178,9 @@ const usersTable = {
   avatarUrl: "avatarUrl",
   isActive: "isActive",
   lastLoginAt: "lastLoginAt",
+  emailVerifiedAt: "emailVerifiedAt",
+  emailVerificationTokenHash: "emailVerificationTokenHash",
+  emailVerificationExpiresAt: "emailVerificationExpiresAt",
   technicianId: "technicianId",
   createdAt: "createdAt",
   updatedAt: "updatedAt",
@@ -3460,6 +3475,11 @@ function createUserRecord(
     avatarUrl: values.avatarUrl ?? null,
     isActive: values.isActive ?? true,
     lastLoginAt: values.lastLoginAt ?? null,
+    emailVerifiedAt: values.emailVerifiedAt ?? null,
+    emailVerificationTokenHash: values.emailVerificationTokenHash ?? null,
+    emailVerificationExpiresAt: values.emailVerificationExpiresAt ?? null,
+    clerkUserId: values.clerkUserId ?? null,
+    clerkUnlinkedAt: values.clerkUnlinkedAt ?? null,
     technicianId: values.technicianId ?? null,
     createdAt: values.createdAt ?? now,
     updatedAt: values.updatedAt ?? now,

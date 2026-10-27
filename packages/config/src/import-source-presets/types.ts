@@ -10,6 +10,7 @@ export type ImportSourcePresetId =
   | "jobber_price_book"
   | "housecall_pro"
   | "housecall_pro_jobs"
+  | "housecall_pro_invoices"
   | "service_titan"
   | "service_titan_locations"
   | "service_titan_jobs"

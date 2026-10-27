@@ -1,20 +1,14 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { Loader2, RefreshCw } from "lucide-react";
-import Link from "next/link";
 
-import type {
-  ImportDuplicateAction,
-  MigrateOnboardingBundle,
-  MigrateOnboardingWizardStep
-} from "@fsm/types";
+import type { ImportDuplicateAction, MigrateOnboardingWizardStep } from "@fsm/types";
 
 import { PageLayout } from "@/src/components/layout/PageLayout";
 import { ApiError } from "@/src/lib/api";
 import { toPlainLanguageImportIssue } from "@/src/lib/migrate-onboarding-plain-language";
 import { formatHistoryDepthSummary } from "@/src/lib/migrate-relational-preview-summary";
-import { isPriyaOnboardingMockEnabled } from "@/src/lib/migrate-onboarding-priya-mock";
 import {
   useAcknowledgeMigratePreview,
   useApplyMigrateDedupeDecisions,
@@ -23,7 +17,6 @@ import {
   useMigrateDedupePreview,
   useMigrateOnboardingBundle,
   useMigrateRelationalPreview,
-  usePriyaOnboardingSteps,
   useResumeMigrateOnboardingSession
 } from "@/src/hooks/migrate-onboarding.hooks";
 import { useImportErrors } from "@/src/hooks/imports.hooks";
@@ -31,6 +24,7 @@ import { useMigrateOnboardingWizardStore } from "@/src/stores/migrate-onboarding
 import { showToast } from "@/src/stores/toast.store";
 
 import { MigrateAiIssuesPanel } from "./MigrateAiIssuesPanel";
+import { MigrateOnboardingStepsOneTwo } from "./MigrateOnboardingStepsOneTwo";
 
 const WIZARD_STEPS: { id: MigrateOnboardingWizardStep; label: string }[] = [
   { id: 1, label: "Source" },
@@ -48,96 +42,6 @@ function formatError(error: unknown): string {
     return error.message;
   }
   return "Something went wrong.";
-}
-
-function PriyaStepsPlaceholder({
-  bundle,
-  onRefresh
-}: {
-  bundle: MigrateOnboardingBundle | null;
-  onRefresh: () => void;
-}) {
-  const bundleId = bundle?.id ?? null;
-  const { createSession, setSource, linkFiles } = usePriyaOnboardingSteps(bundleId);
-  const [importSessionId, setImportSessionId] = useState("");
-
-  return (
-    <div className="rounded-lg border border-dashed border-neutral-300 bg-neutral-50 p-6">
-      <p className="text-sm text-neutral-700">
-        Steps 1–2 use a temporary flow until Priya&apos;s multi-upload wizard merges. Your session is saved when you
-        reach step 3.
-      </p>
-      {isPriyaOnboardingMockEnabled() ? (
-        <p className="mt-2 text-xs text-neutral-500">Mock Priya API is enabled for steps 1–2.</p>
-      ) : null}
-      <div className="mt-4 flex flex-wrap gap-2">
-        {!bundle ? (
-          <button
-            type="button"
-            className="rounded-md bg-brand-primary px-3 py-2 text-sm font-medium text-white"
-            onClick={() => createSession.mutate(undefined, { onSuccess: onRefresh })}
-          >
-            Start migration session
-          </button>
-        ) : null}
-        {bundle && bundle.wizardStep === 1 ? (
-          <button
-            type="button"
-            className="rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm"
-            onClick={() =>
-              setSource.mutate("manual_csv", {
-                onSuccess: onRefresh,
-                onError: (error) =>
-                  showToast({ tone: "error", title: "Could not set source", description: formatError(error) })
-              })
-            }
-          >
-            Use manual CSV export
-          </button>
-        ) : null}
-        {bundle && bundle.wizardStep === 2 ? (
-          <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-end">
-            <label className="flex flex-1 flex-col text-sm">
-              Import session ID (from{" "}
-              <Link href="/settings/import" className="text-brand-primary underline">
-                Data import
-              </Link>
-              )
-              <input
-                className="mt-1 rounded border border-neutral-300 px-2 py-1.5 font-mono text-xs"
-                value={importSessionId}
-                onChange={(event) => setImportSessionId(event.target.value)}
-                placeholder="uuid"
-              />
-            </label>
-            <button
-              type="button"
-              className="rounded-md bg-brand-primary px-3 py-2 text-sm font-medium text-white"
-              disabled={importSessionId.length < 10}
-              onClick={() =>
-                linkFiles.mutate(
-                  [
-                    {
-                      importSessionId,
-                      entityType: "customers",
-                      fileName: "customers.csv"
-                    }
-                  ],
-                  {
-                    onSuccess: onRefresh,
-                    onError: (error) =>
-                      showToast({ tone: "error", title: "Link failed", description: formatError(error) })
-                  }
-                )
-              }
-            >
-              Link file &amp; continue
-            </button>
-          </div>
-        ) : null}
-      </div>
-    </div>
-  );
 }
 
 export function MigrateOnboardingWizardClient() {
@@ -215,7 +119,7 @@ export function MigrateOnboardingWizardClient() {
         <p className="mb-4 font-mono text-xs text-neutral-500">Bundle {bundle.id} · step {bundle.wizardStep}</p>
       ) : null}
 
-      {activeStep < 3 ? <PriyaStepsPlaceholder bundle={bundle} onRefresh={refresh} /> : null}
+      {activeStep < 3 ? <MigrateOnboardingStepsOneTwo bundle={bundle} onRefresh={refresh} /> : null}
 
       {activeStep === 3 && bundle ? (
         <div className="space-y-4">

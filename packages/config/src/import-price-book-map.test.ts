@@ -23,5 +23,6 @@ describe("import-price-book-map", () => {
     expect(importSourceSystemFromPreset("quickbooks_items")).toBe("qbo");
     expect(importSourceSystemFromPreset("service_titan_jobs")).toBe("service_titan");
     expect(importSourceSystemFromPreset("housecall_pro_jobs")).toBe("housecall_pro");
+    expect(importSourceSystemFromPreset("housecall_pro_invoices")).toBe("housecall_pro");
   });
 });

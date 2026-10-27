@@ -24,6 +24,7 @@
     "@fsm/comms": "workspace:*",
     "@fsm/config": "workspace:*",
     "@fsm/db": "workspace:*",
+    "@fsm/import-engine": "workspace:*",
     "@fsm/import-normalize": "workspace:*",
     "@fsm/jobs": "workspace:*",
     "@fsm/types": "workspace:*",

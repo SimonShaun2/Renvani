@@ -7,7 +7,8 @@ import {
   logout,
   refresh,
   register,
-  resetPassword
+  resetPassword,
+  verifyEmail
 } from "../../services/auth.service.js";
 import type {
   ForgotPasswordInput,
@@ -15,7 +16,8 @@ import type {
   LogoutInput,
   RefreshInput,
   RegisterInput,
-  ResetPasswordInput
+  ResetPasswordInput,
+  VerifyEmailInput
 } from "./schemas.js";
 
 function toUserResponse(user: {
@@ -38,17 +40,10 @@ export async function registerHandler(
   request: FastifyRequest,
   reply: FastifyReply
 ): Promise<FastifyReply> {
-  const result = await register(request.body as RegisterInput);
+  await register(request.body as RegisterInput);
 
-  return reply.status(201).send({
-    user: toUserResponse(result.user),
-    company: {
-      id: result.company.id,
-      name: result.company.name,
-      slug: result.company.slug
-    },
-    tokens: result.tokens
-  });
+  // Identical response for new and existing emails (no account enumeration).
+  return reply.status(202).send({ message: "Check your email" });
 }
 
 export async function loginHandler(
@@ -56,6 +51,23 @@ export async function loginHandler(
   reply: FastifyReply
 ): Promise<FastifyReply> {
   const result = await login(request.body as LoginInput);
+  const company = await getCompany(result.user.companyId);
+
+  return reply.send({
+    user: toUserResponse(result.user),
+    company: {
+      id: company.id,
+      name: company.name
+    },
+    tokens: result.tokens
+  });
+}
+
+export async function verifyEmailHandler(
+  request: FastifyRequest,
+  reply: FastifyReply
+): Promise<FastifyReply> {
+  const result = await verifyEmail((request.body as VerifyEmailInput).token);
   const company = await getCompany(result.user.companyId);
 
   return reply.send({

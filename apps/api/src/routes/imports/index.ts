@@ -10,6 +10,7 @@ import {
   getImportErrorsHandler,
   getImportHandler,
   getImportIngestStatusHandler,
+  getImportIngestProgressHandler,
   getMigrateFileBatchStatusHandler,
   listImportsHandler,
   retryMigrateFileBatchHandler,
@@ -24,6 +25,7 @@ import {
   getImportIngestStatusRouteSchema,
   importErrorsRouteSchema,
   importFileBatchValidation,
+  importIngestProgressRouteSchema,
   importSessionIdValidation,
   listImportsRouteSchema,
   listImportsValidation,
@@ -89,6 +91,12 @@ const importRoutes: FastifyPluginAsync = async (fastify) => {
     preValidation: importSessionIdValidation,
     schema: importErrorsRouteSchema
   }, getImportErrorsHandler);
+
+  fastify.get("/imports/:id/ingest-progress", {
+    preHandler: [authenticate, requireOwnerOrAdmin],
+    preValidation: importSessionIdValidation,
+    schema: importIngestProgressRouteSchema
+  }, getImportIngestProgressHandler);
 
   fastify.get("/imports/:id/file-batches/:batchIndex", {
     preHandler: [authenticate, requireOwnerOrAdmin],

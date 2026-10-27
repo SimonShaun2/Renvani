@@ -66,6 +66,7 @@ export function importSourceSystemFromPreset(presetId: ImportVendorPresetId): Im
       return "jobber";
     case "housecall_pro":
     case "housecall_pro_jobs":
+    case "housecall_pro_invoices":
       return "housecall_pro";
     case "service_titan":
     case "service_titan_locations":

@@ -468,6 +468,8 @@ export interface TestInvoiceRecord {
   total: string;
   amountPaid: string | null;
   balanceDue: string;
+  serviceFeeAmount: string;
+  bookingFeeAmount: string;
   issuedAt: Date | null;
   dueAt: Date | null;
   sentAt: Date | null;
@@ -515,6 +517,10 @@ export interface TestPaymentRecord {
   customerId: string;
   collectedById: string | null;
   amount: string;
+  serviceFeeAmount: string;
+  bookingFeeAmount: string;
+  feeRefundable: boolean;
+  amountRefunded: string;
   method: PaymentMethod;
   status: PaymentStatus;
   stripePaymentIntentId: string | null;
@@ -1402,6 +1408,8 @@ export interface TestInvoiceRecord {
   total: string;
   amountPaid: string | null;
   balanceDue: string;
+  serviceFeeAmount: string;
+  bookingFeeAmount: string;
   issuedAt: Date | null;
   dueAt: Date | null;
   sentAt: Date | null;
@@ -2538,6 +2546,8 @@ const invoicesTable = {
   total: "total",
   amountPaid: "amountPaid",
   balanceDue: "balanceDue",
+  serviceFeeAmount: "serviceFeeAmount",
+  bookingFeeAmount: "bookingFeeAmount",
   issuedAt: "issuedAt",
   dueAt: "dueAt",
   sentAt: "sentAt",
@@ -2587,6 +2597,10 @@ const paymentsTable = {
   customerId: "customerId",
   collectedById: "collectedById",
   amount: "amount",
+  serviceFeeAmount: "serviceFeeAmount",
+  bookingFeeAmount: "bookingFeeAmount",
+  feeRefundable: "feeRefundable",
+  amountRefunded: "amountRefunded",
   method: "method",
   status: "status",
   stripePaymentIntentId: "stripePaymentIntentId",
@@ -3947,6 +3961,8 @@ function createInvoiceRecord(
     total: values.total ?? "0.00",
     amountPaid: values.amountPaid ?? "0.00",
     balanceDue: values.balanceDue ?? values.total ?? "0.00",
+    serviceFeeAmount: values.serviceFeeAmount ?? "0.00",
+    bookingFeeAmount: values.bookingFeeAmount ?? "0.00",
     issuedAt: values.issuedAt ?? null,
     dueAt: values.dueAt ?? null,
     sentAt: values.sentAt ?? null,
@@ -4008,6 +4024,10 @@ function createPaymentRecord(
     customerId: values.customerId,
     collectedById: values.collectedById ?? null,
     amount: values.amount,
+    serviceFeeAmount: values.serviceFeeAmount ?? "0.00",
+    bookingFeeAmount: values.bookingFeeAmount ?? "0.00",
+    feeRefundable: values.feeRefundable ?? false,
+    amountRefunded: values.amountRefunded ?? "0.00",
     method: values.method ?? "card",
     status: values.status ?? "pending",
     stripePaymentIntentId: values.stripePaymentIntentId ?? null,

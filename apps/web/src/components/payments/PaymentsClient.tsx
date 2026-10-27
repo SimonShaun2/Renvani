@@ -20,7 +20,6 @@ import {
   formatShortDate,
   paymentChipClass,
   paymentStatusLabel,
-  planLabel,
   serviceFeeColumnLabel,
   serviceFeeLabel
 } from "./payments.utils";
@@ -263,10 +262,9 @@ export function PaymentsClient() {
   const lastPayoutHint = connect?.lastPayoutAt ? formatDateTime(connect.lastPayoutAt) : "No payouts yet";
   const feeColumn = serviceFeeColumnLabel(connect?.platformFeePercent);
   const feeNote =
-    feeColumn && connect?.renvaniPlanTier === "flex"
-      ? `On Flex, the ${connect.platformFeePercent}% Service Fee is paid by your customer and isn't taken from your payout.`
+    feeColumn
+      ? `On Flex, the ${connect?.platformFeePercent}% Service Fee is paid by your customer and isn't taken from your payout.`
       : null;
-  const plan = planLabel(connect?.renvaniPlanTier);
   const UNAVAILABLE = "Not available yet";
 
   return (
@@ -276,7 +274,6 @@ export function PaymentsClient() {
           <h1 className="text-[32px] font-semibold tracking-tight text-[#0f1530]">Payments</h1>
           <p className="mt-1 text-sm text-[#5e6684]">
             {connect?.accountName ?? "Stripe"}
-            {plan ? ` · ${plan}` : ""}
             {connect?.payoutSchedule ? ` · payouts ${connect.payoutSchedule}` : ""}
             {feeLabel ? ` · ${feeLabel}` : ""}
           </p>
@@ -351,7 +348,7 @@ export function PaymentsClient() {
                 <p className="text-sm text-[#5e6684]">No payouts yet.</p>
               )}
               <button type="button" onClick={() => setTab("payouts")} className="text-sm text-[#2d4bd8]">
-                View payouts
+                View all payouts
               </button>
             </section>
             <section className="space-y-3">

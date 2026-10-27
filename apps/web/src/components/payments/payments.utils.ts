@@ -101,9 +101,3 @@ export function serviceFeeColumnLabel(platformFeePercent: number | null | undefi
   if (platformFeePercent === null || platformFeePercent === undefined || platformFeePercent <= 0) return null;
   return `Service Fee (${platformFeePercent}%)`;
 }
-
-export function planLabel(tier: "flex" | "flat" | null | undefined): string | null {
-  if (tier === "flex") return "Flex plan";
-  if (tier === "flat") return "Flat plan";
-  return null;
-}

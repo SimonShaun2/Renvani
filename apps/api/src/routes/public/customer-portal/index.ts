@@ -7,9 +7,16 @@ import {
   listCustomerPortalVisits
 } from "../../../services/customer-portal.service.js";
 import {
+  listCustomerPortalSections,
+  loadCustomerPortalSection
+} from "../../../services/customer-portal-sections.service.js";
+import {
   getCustomerPortalAccountSchema,
   listCustomerPortalEstimatesSchema,
+  getCustomerPortalNamedSectionSchema,
+  getCustomerPortalSectionSchema,
   listCustomerPortalInvoicesSchema,
+  listCustomerPortalSectionsSchema,
   listCustomerPortalVisitsSchema,
   parseCustomerPortalToken
 } from "./schemas.js";
@@ -42,6 +49,26 @@ const publicCustomerPortalRoutes: FastifyPluginAsync = async (fastify) => {
     "/me/invoices",
     { schema: listCustomerPortalInvoicesSchema },
     async (request, reply) => reply.send({ invoices: await listCustomerPortalInvoices(tokenOf(request)) })
+  );
+
+  // Registry-driven portal sections (registerPortalSection): history, invoices, memberships, rebook, ...
+  fastify.get(
+    "/me/sections",
+    { schema: listCustomerPortalSectionsSchema },
+    async (request, reply) => reply.send({ sections: await listCustomerPortalSections(tokenOf(request)) })
+  );
+  fastify.get<{ Params: { key: string } }>(
+    "/me/sections/:key",
+    { schema: getCustomerPortalSectionSchema },
+    async (request, reply) => reply.send(await loadCustomerPortalSection(tokenOf(request), request.params.key))
+  );
+  for (const key of ["history", "memberships", "rebook"]) {
+    fastify.get(`/me/${key}`, { schema: getCustomerPortalNamedSectionSchema }, async (request, reply) =>
+      reply.send(await loadCustomerPortalSection(tokenOf(request), key))
+    );
+  }
+  fastify.get("/me/open-invoices", { schema: getCustomerPortalNamedSectionSchema }, async (request, reply) =>
+    reply.send(await loadCustomerPortalSection(tokenOf(request), "invoices"))
   );
 };
 

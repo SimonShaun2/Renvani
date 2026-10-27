@@ -42,7 +42,8 @@ async function loadScopedCustomer(claims: CustomerPortalTokenPayload) {
   return customer;
 }
 
-async function resolve(token: string) {
+/** Shared portal token verification + fail-closed customer lookup (also used by portal sections). */
+export async function resolveCustomerPortalSession(token: string) {
   const claims = verifyCustomerPortalToken(token);
   const customer = await loadScopedCustomer(claims);
   return { claims, customer };
@@ -69,7 +70,7 @@ export async function issueCustomerPortalLink(companyId: string, customerId: str
 }
 
 export async function getCustomerPortalAccount(token: string): Promise<CustomerPortalAccount> {
-  const { claims, customer } = await resolve(token);
+  const { claims, customer } = await resolveCustomerPortalSession(token);
   const [company] = await db.select().from(companies).where(eq(companies.id, claims.companyId)).limit(1);
 
   return {
@@ -86,7 +87,7 @@ export async function getCustomerPortalAccount(token: string): Promise<CustomerP
 }
 
 export async function listCustomerPortalVisits(token: string, now: Date = new Date()): Promise<CustomerPortalVisits> {
-  const { claims } = await resolve(token);
+  const { claims } = await resolveCustomerPortalSession(token);
   const rows = await db
     .select()
     .from(jobs)
@@ -121,7 +122,7 @@ export async function listCustomerPortalVisits(token: string, now: Date = new Da
 }
 
 export async function listCustomerPortalEstimates(token: string): Promise<CustomerPortalEstimate[]> {
-  const { claims } = await resolve(token);
+  const { claims } = await resolveCustomerPortalSession(token);
   const rows = await db
     .select()
     .from(estimates)
@@ -146,7 +147,7 @@ export async function listCustomerPortalEstimates(token: string): Promise<Custom
 }
 
 export async function listCustomerPortalInvoices(token: string): Promise<CustomerPortalInvoice[]> {
-  const { claims } = await resolve(token);
+  const { claims } = await resolveCustomerPortalSession(token);
   const rows = await db
     .select()
     .from(invoices)

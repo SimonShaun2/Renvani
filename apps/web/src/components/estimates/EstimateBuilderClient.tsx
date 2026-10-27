@@ -11,6 +11,7 @@ import type { CreateEstimateInput, EstimateStatus } from "@fsm/types";
 import { PageLayout } from "@/src/components/layout/PageLayout";
 import { CurrencyDisplay } from "@/src/components/ui/CurrencyDisplay";
 import { EmptyState } from "@/src/components/ui/EmptyState";
+import { ErrorState } from "@/src/components/ui/ErrorState";
 import { Sheet } from "@/src/components/ui/Sheet";
 import { SkeletonCard } from "@/src/components/ui/SkeletonCard";
 import { StatBadge } from "@/src/components/ui/StatBadge";
@@ -32,6 +33,8 @@ import { getCompanyTaxRate } from "@/src/components/jobs/jobs.utils";
 import { CustomerEstimateView } from "./CustomerEstimateView";
 import { EditableLineItemsTable } from "./EditableLineItemsTable";
 import { EstimateSendModal } from "./EstimateSendModal";
+import { EstimateChecksPanel, EstimateFrequencyOptions } from "./EstimateFigmaPanels";
+import { buildEstimateSubtitle } from "./estimate-builder.utils";
 import {
   buildEstimatePublicPath,
   computeRevenueTotals,
@@ -402,6 +405,8 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
   const [declineOpen, setDeclineOpen] = useState(false);
   const [declineForm, setDeclineForm] = useState<DeclineFormState>(emptyDeclineForm);
   const [editingOverride, setEditingOverride] = useState(false);
+  const [saveNow, setSaveNow] = useState(0);
+  const saveNowRef = useRef(false);
 
   const hydratedEstimateIdRef = useRef<string | null>(null);
   const savedSignatureRef = useRef<string>(getDraftSignature(createDefaultDraft()));
@@ -462,7 +467,9 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
       return;
     }
 
+    const delay = saveNowRef.current ? 0 : 2000;
     const timeoutId = window.setTimeout(() => {
+      saveNowRef.current = false;
       void (async () => {
         setSaveState("saving");
         setErrorMessage(null);
@@ -656,7 +663,7 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
           setErrorMessage(error instanceof Error ? error.message : "Estimate draft could not be saved.");
         }
       })();
-    }, 2000);
+    }, delay);
 
     return () => window.clearTimeout(timeoutId);
   }, [
@@ -668,6 +675,7 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
     isExisting,
     queryClient,
     router,
+    saveNow,
     taxRate
   ]);
 
@@ -814,7 +822,17 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
     );
   }
 
-  if (isExisting && (groupQuery.isError || !groupQuery.data)) {
+  if (isExisting && groupQuery.isError) {
+    return (
+      <ErrorState
+        title="Estimate couldn't load"
+        onRetry={() => void groupQuery.refetch()}
+        isRetrying={groupQuery.isFetching}
+      />
+    );
+  }
+
+  if (isExisting && !groupQuery.data) {
     return (
       <EmptyState
         icon={WandSparkles}
@@ -832,8 +850,16 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
   return (
     <>
       <PageLayout
-        title={isExisting ? draft.title || "Estimate Detail" : "New Estimate"}
-        subtitle={isExisting ? `${draft.customerId ? "Saved draft and approval state" : "Build the scope, send it out, and capture approval."}` : "Build a single quote or a Good / Better / Best option set."}
+        title={isExisting ? "Estimate" : "New estimate"}
+        subtitle={
+          (isExisting
+            ? buildEstimateSubtitle({
+                estimateNumber: primaryEstimate?.estimateNumber ?? null,
+                customerName: primaryEstimate ? `${primaryEstimate.customer.firstName} ${primaryEstimate.customer.lastName}` : null,
+                address: primaryEstimate?.property?.addressLine1 ?? null
+              })
+            : null) ?? "Build a single quote or a Good / Better / Best option set."
+        }
         actions={(
           <div className="flex flex-wrap items-center gap-2">
             <Link href="/estimates" className="text-sm font-semibold text-brand-accent">
@@ -841,6 +867,29 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
             </Link>
             {isExisting ? (
               <StatBadge label={formatStatusLabel(currentStatus)} tone={getEstimateStatusTone(currentStatus)} />
+            ) : null}
+            {isEditable ? (
+              <>
+                <button
+                  type="button"
+                  disabled={!draft.customerId || saveState === "saving" || draftSignature === savedSignatureRef.current}
+                  onClick={() => {
+                    saveNowRef.current = true;
+                    setSaveNow((n) => n + 1);
+                  }}
+                  className="rounded-[10px] border border-[#e6dccb] bg-white px-4 py-2 text-sm font-semibold text-[#0f1530] disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {saveState === "saving" ? "Saving…" : "Save draft"}
+                </button>
+                <button
+                  type="button"
+                  disabled={!anchorTier?.estimateId || saveState === "saving"}
+                  onClick={() => setSendModalOpen(true)}
+                  className="rounded-[10px] bg-[#f6b400] px-4 py-2 text-sm font-semibold text-[#0f1530] disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Approve &amp; send
+                </button>
+              </>
             ) : null}
           </div>
         )}
@@ -1069,6 +1118,8 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
                 )}
               </section>
 
+              <EstimateFrequencyOptions />
+
               {errorMessage ? (
                 <section className="rounded-[28px] border border-error/20 bg-error-light px-5 py-4 text-sm text-error">
                   {errorMessage}
@@ -1077,6 +1128,11 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
             </div>
 
             <aside className="space-y-6">
+              <EstimateChecksPanel
+                status={currentStatus}
+                discountAmount={draft.discountAmount}
+                expiresAt={primaryEstimate?.expiresAt ?? null}
+              />
               <section className="surface-card px-5 py-5">
                 <div className="space-y-2">
                   <label className="text-sm font-semibold text-neutral-700">Notes to customer</label>

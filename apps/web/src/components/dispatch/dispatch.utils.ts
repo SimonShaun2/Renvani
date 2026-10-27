@@ -50,10 +50,9 @@ export function getTimelineStyle(start: string | Date, end: string | Date) {
   };
 }
 
+/** Figma 10:561–10:570 hour labels: "8" … "12", "1" … "5" (no a/p suffix). */
 export function formatTimelineHour(hour: number): string {
-  const normalizedHour = hour > 12 ? hour - 12 : hour;
-  const suffix = hour >= 12 ? "p" : "a";
-  return `${normalizedHour}${suffix}`;
+  return String(hour > 12 ? hour - 12 : hour);
 }
 
 export function formatDispatchDateLabel(value: string): string {

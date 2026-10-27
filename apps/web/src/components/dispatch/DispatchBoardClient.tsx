@@ -39,12 +39,12 @@ import {
 import { DispatchDetailPanel } from "./DispatchDetailPanel";
 import { DispatchQueuePanel } from "./DispatchQueuePanel";
 import { DispatchTimeline } from "./DispatchTimeline";
-import { AutoFitOverlay } from "./AutoFitOverlay";
 import { DispatchHeader, DispatchLoadError } from "./DispatchHeader";
 import { formatDispatchSummary, summarizeDispatch } from "@/src/lib/dispatch-actions";
 import type { DispatchDragJobData, DispatchDropSlot, DispatchDropTargetData } from "./dispatch.utils";
 import {
   formatDispatchDateLabel,
+  formatDispatchRange,
   matchesSearch
 } from "./dispatch.utils";
 
@@ -55,6 +55,24 @@ type AutoFitOverlayState = {
   message: string | null;
   isLoading: boolean;
 };
+
+function jobLabel(title: string, customer: { firstName: string; lastName: string }): string {
+  return [title, `${customer.firstName} ${customer.lastName}`.trim()].filter(Boolean).join(" · ");
+}
+
+function findJobLabel(
+  jobId: string,
+  unscheduled: Array<{ id: string; title: string; customer: { firstName: string; lastName: string } }>,
+  technicians: Array<{ jobs: Array<{ id: string; title: string; customer: { firstName: string; lastName: string } }> }>
+): string | null {
+  const queued = unscheduled.find((job) => job.id === jobId);
+  if (queued) return jobLabel(queued.title, queued.customer);
+  for (const technician of technicians) {
+    const scheduled = technician.jobs.find((job) => job.id === jobId);
+    if (scheduled) return jobLabel(scheduled.title, scheduled.customer);
+  }
+  return null;
+}
 
 function getErrorMessage(error: unknown): string {
   if (error instanceof ApiError) {
@@ -432,67 +450,45 @@ export function DispatchBoardClient() {
     }
   }
 
-  const autoFitOverlayNode = autoFitOverlay ? (
-    <AutoFitOverlay
-      suggestions={autoFitOverlay.suggestions}
-      currentIndex={autoFitOverlay.currentIndex}
-      isLoading={autoFitOverlay.isLoading}
-      isAccepting={scheduleJobMutation.isPending}
-      message={autoFitOverlay.message}
-      onAccept={(suggestion) => {
-        void handleAcceptAutoFitSuggestion(suggestion);
-      }}
-      onDecline={() => setAutoFitOverlay(null)}
-      onNext={() => {
-        if (autoFitOverlay.suggestions.length <= 1) {
-          return;
-        }
-
-        setAutoFitOverlay((current) =>
-          current
-            ? {
-                ...current,
-                currentIndex: (current.currentIndex + 1) % current.suggestions.length
-              }
-            : current
-        );
-      }}
-      onPrevious={() => {
-        if (autoFitOverlay.suggestions.length <= 1) {
-          return;
-        }
-
-        setAutoFitOverlay((current) =>
-          current
-            ? {
-                ...current,
-                currentIndex:
-                  (current.currentIndex - 1 + current.suggestions.length) % current.suggestions.length
-              }
-            : current
-        );
-      }}
-    />
-  ) : null;
+  // Figma 10:478 shows the agent proposal inline (banner 10:553 + dashed block 10:590), not as a modal.
+  const topSuggestion = autoFitOverlay && !autoFitOverlay.isLoading ? autoFitOverlay.suggestions[0] ?? null : null;
+  const proposalJobLabel = autoFitOverlay ? findJobLabel(autoFitOverlay.jobId, unscheduledJobs, technicians) : null;
+  const bannerJob = autoFitOverlay && proposalJobLabel
+    ? {
+        id: autoFitOverlay.jobId,
+        label: proposalJobLabel,
+        statusLabel: unscheduledJobs.some((job) => job.id === autoFitOverlay.jobId) ? "Unassigned" : "Reschedule"
+      }
+    : firstUnscheduled
+      ? { id: firstUnscheduled.id, label: jobLabel(firstUnscheduled.title, firstUnscheduled.customer) }
+      : null;
+  const timelineSuggestion = topSuggestion && autoFitOverlay
+    ? {
+        technicianId: topSuggestion.technicianId,
+        label: proposalJobLabel?.split(" · ").pop() ?? "Visit",
+        scheduledStart: topSuggestion.scheduledStart,
+        scheduledEnd: topSuggestion.scheduledEnd
+      }
+    : null;
 
   return (
     <div className="-mx-4 -my-6 space-y-5 px-4 py-6 md:-mx-8 md:-my-8 md:px-8 md:py-8">
       <DispatchHeader
         summaryText={summaryText}
         streamLive={streamLive}
-        unassignedJob={
-          firstUnscheduled
+        unassignedJob={bannerJob}
+        suggestion={
+          topSuggestion && bannerJob?.id === autoFitOverlay?.jobId
             ? {
-                id: firstUnscheduled.id,
-                label: [
-                  firstUnscheduled.title,
-                  `${firstUnscheduled.customer.firstName} ${firstUnscheduled.customer.lastName}`.trim()
-                ]
-                  .filter(Boolean)
-                  .join(" · ")
+                technicianName: topSuggestion.technicianName,
+                rangeLabel: formatDispatchRange(topSuggestion.scheduledStart, topSuggestion.scheduledEnd)
               }
             : null
         }
+        approvePending={scheduleJobMutation.isPending}
+        onApprove={() => {
+          if (topSuggestion) void handleAcceptAutoFitSuggestion(topSuggestion);
+        }}
         autoFitPending={autoFittingJobId !== null}
         canAddVisit={technicians.length > 0}
         onAutoAssign={(jobId) => {
@@ -675,7 +671,7 @@ export function DispatchBoardClient() {
               createQuickJobPending={createQuickJobMutation.isPending}
               createQuickJobError={createQuickJobError}
               activeDragJobId={activeDragJob?.jobId ?? null}
-              overlay={autoFitOverlayNode}
+              suggestion={timelineSuggestion}
               onSelectJob={(jobId) => {
                 setSelectedJob(jobId);
                 setBoardMessage(null);

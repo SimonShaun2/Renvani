@@ -29,7 +29,11 @@ const TEST_ENV_VALUES = {
   RESET_TOKEN_TTL_SECONDS: "3600",
   ESTIMATE_EXPIRY_DAYS: "30",
   INVOICE_DUE_DAYS: "30",
-  NEXT_PUBLIC_API_URL: "http://localhost:3001"
+  NEXT_PUBLIC_API_URL: "http://localhost:3001",
+  QUICKBOOKS_CLIENT_ID: "qbo_test_client",
+  QUICKBOOKS_CLIENT_SECRET: "qbo_test_secret",
+  QUICKBOOKS_REDIRECT_URI: "http://localhost:3001/quickbooks-online/connect/callback",
+  QUICKBOOKS_ENVIRONMENT: "sandbox"
 } as const;
 
 export function setupTestEnv(): void {

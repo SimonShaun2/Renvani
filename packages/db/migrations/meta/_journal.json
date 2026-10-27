@@ -264,8 +264,29 @@
     {
       "idx": 37,
       "version": "7",
-      "when": 1777709000000,
-      "tag": "0037_fs138_saved_card_migration",
+      "when": 1777711000000,
+      "tag": "0037_user_email_verification",
+      "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "7",
+      "when": 1777712000000,
+      "tag": "0038_fs157_clerk_identity",
+      "breakpoints": true
+    },
+    {
+      "idx": 39,
+      "version": "7",
+      "when": 1777713000000,
+      "tag": "0039_fs160b_clerk_unlink_tombstone",
+      "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1777714000000,
+      "tag": "0043_fs138_saved_card_migration",
       "breakpoints": true
     }
   ]

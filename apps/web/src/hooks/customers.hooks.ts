@@ -5,6 +5,8 @@ import type {
   CreateAssetInput,
   CreateCustomerInput,
   CreatePropertyInput,
+  CustomerHistoryTimelineResponse,
+  CustomerImportedHistoryResponse,
   UpdateAssetInput,
   UpdateCustomerInput
 } from "@fsm/types";
@@ -33,6 +35,12 @@ export interface CustomerJobsQuery {
   sortOrder?: "asc" | "desc";
   page?: number;
   limit?: number;
+}
+
+export interface CustomerHistoryTimelineQuery {
+  limit?: number;
+  cursor?: string;
+  types?: string;
 }
 
 export interface CustomerListQuery {
@@ -328,6 +336,9 @@ const customerKeys = {
   payments: (customerId: string) => ["customers", "payments", customerId] as const,
   agreements: (customerId: string) => ["customers", "agreements", customerId] as const,
   activity: (customerId: string) => ["customers", "activity", customerId] as const,
+  importedHistory: (customerId: string) => ["customers", "imported-history", customerId] as const,
+  historyTimeline: (customerId: string, query: CustomerHistoryTimelineQuery) =>
+    ["customers", "history-timeline", customerId, query] as const,
   messages: (customerId: string) => ["customers", "messages", customerId] as const
 };
 
@@ -580,6 +591,37 @@ export function useCustomerActivity(customerId: string | null) {
   return useQuery({
     queryKey: customerId ? customerKeys.activity(customerId) : customerKeys.activity("pending"),
     queryFn: () => api.get<ActivityResponse>(`/api/v1/activity-events?${queryString}`),
+    enabled: Boolean(customerId)
+  });
+}
+
+export function useCustomerImportedHistory(customerId: string | null) {
+  return useQuery({
+    queryKey: customerId ? customerKeys.importedHistory(customerId) : customerKeys.importedHistory("pending"),
+    queryFn: () =>
+      api.get<CustomerImportedHistoryResponse>(`/api/v1/customers/${customerId}/imported-history`),
+    enabled: Boolean(customerId)
+  });
+}
+
+export function useCustomerHistoryTimeline(
+  customerId: string | null,
+  query: CustomerHistoryTimelineQuery = {}
+) {
+  const queryString = buildQueryString({
+    limit: query.limit ?? 25,
+    cursor: query.cursor,
+    types: query.types
+  });
+
+  return useQuery({
+    queryKey: customerId
+      ? customerKeys.historyTimeline(customerId, query)
+      : customerKeys.historyTimeline("pending", query),
+    queryFn: () =>
+      api.get<CustomerHistoryTimelineResponse>(
+        `/api/v1/customers/${customerId}/history-timeline?${queryString}`
+      ),
     enabled: Boolean(customerId)
   });
 }

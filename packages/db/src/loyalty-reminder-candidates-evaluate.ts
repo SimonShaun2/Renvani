@@ -16,6 +16,7 @@ export interface EvaluateLoyaltyReminderCandidatesInput {
   importSessionId?: string | null;
   lapsedDays?: number;
   dryRun: boolean;
+  customerId?: string | null;
 }
 
 export async function evaluateLoyaltyReminderCandidatesForCompany(
@@ -63,20 +64,26 @@ export async function evaluateLoyaltyReminderCandidatesForCompany(
     dryRun: input.dryRun
   });
 
-  if (!input.importSessionId) {
-    return planCadence;
+  let merged = planCadence;
+
+  if (input.importSessionId) {
+    const m8Signals = await listM8ReactivationSignalsFromImportedJobHistory(companyId, {
+      importSessionId: input.importSessionId,
+      lapsedDays
+    });
+
+    const m8Candidates = mapM8ReactivationSignalsToLoyaltyCandidates(
+      m8Signals,
+      customerNameById,
+      input.dryRun
+    );
+
+    merged = mergeLoyaltyReminderCandidates(planCadence, m8Candidates);
   }
 
-  const m8Signals = await listM8ReactivationSignalsFromImportedJobHistory(companyId, {
-    importSessionId: input.importSessionId,
-    lapsedDays
-  });
+  if (input.customerId) {
+    return merged.filter((candidate) => candidate.customerId === input.customerId);
+  }
 
-  const m8Candidates = mapM8ReactivationSignalsToLoyaltyCandidates(
-    m8Signals,
-    customerNameById,
-    input.dryRun
-  );
-
-  return mergeLoyaltyReminderCandidates(planCadence, m8Candidates);
+  return merged;
 }

@@ -37,6 +37,15 @@ vi.mock("@fsm/db", async () => {
   };
 });
 
+const { persistReportMock } = vi.hoisted(() => ({
+  persistReportMock: vi.fn(async () => true),
+}));
+
+vi.mock("../lib/persist-import-session-reconciliation.js", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../lib/persist-import-session-reconciliation.js")>();
+  return { ...actual, persistImportSessionReconciliationReportBestEffort: persistReportMock };
+});
+
 vi.mock("@fsm/config/storage", () => ({
   downloadFile: downloadFileMock,
   getFileKeyFromUrl: getFileKeyFromUrlMock,
@@ -67,6 +76,8 @@ beforeAll(async () => {
 
 beforeEach(() => {
   fakeDb.resetTestState();
+  persistReportMock.mockReset();
+  persistReportMock.mockResolvedValue(true);
   downloadFileMock.mockReset();
   getFileKeyFromUrlMock.mockReset();
   getFileKeyFromUrlMock.mockImplementation((fileUrl: string) => fileUrl);
@@ -360,5 +371,48 @@ describe("import-chunk-commit.processor", () => {
     expect(testState.customers).toHaveLength(1);
     expect(testState.customers[0]?.sourceId).toBe("cust-xlsx");
     expect(testState.customers[0]?.firstName).toBe("Linus");
+  });
+
+  describe("reconciliation report trigger", () => {
+    function chunkPayload(chunkIndex: number, rowWindow: { start: number; end: number }) {
+      return {
+        companyId,
+        importSessionId,
+        sourceSystem: "jobber",
+        entityType: "customers",
+        chunkIndex,
+        chunksTotal: 2,
+        cursor: { rowOffset: rowWindow.start },
+        idempotencyKey: buildImportChunkIdempotencyKey(importSessionId, "customers", chunkIndex),
+        rowWindow,
+      };
+    }
+
+    it("writes the report when the session completes even if the last chunk number finishes first", async () => {
+      seedSession();
+
+      await importChunkCommitProcessor.handleImportChunkCommit(createJob(chunkPayload(1, { start: 1, end: 2 })).job);
+      expect(fakeDb.getTestState().importSessions[0]?.status).not.toBe("completed");
+      expect(persistReportMock).not.toHaveBeenCalled();
+
+      await importChunkCommitProcessor.handleImportChunkCommit(createJob(chunkPayload(0, { start: 0, end: 1 })).job);
+      expect(fakeDb.getTestState().importSessions[0]?.status).toBe("completed");
+      expect(persistReportMock).toHaveBeenCalledTimes(1);
+    });
+
+    it("does not fail the chunk when the report write throws", async () => {
+      seedSession();
+      persistReportMock.mockRejectedValueOnce(new Error("storage down"));
+
+      const payload = { ...chunkPayload(0, { start: 0, end: 2 }), chunksTotal: 1 };
+      await expect(
+        importChunkCommitProcessor.handleImportChunkCommit(createJob(payload).job),
+      ).resolves.toBeUndefined();
+
+      const testState = fakeDb.getTestState();
+      expect(persistReportMock).toHaveBeenCalledTimes(1);
+      expect(testState.importChunkRuns[0]?.status).toBe("completed");
+      expect(testState.importSessions[0]?.status).toBe("completed");
+    });
   });
 });

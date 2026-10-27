@@ -7,7 +7,12 @@ const ROLE_BY_NAME: Record<string, ImportBundleFileRole> = {
   property: "properties",
   locations: "properties",
   jobs: "jobs",
+  estimates: "jobs",
+  estimate: "jobs",
   invoices: "invoices",
+  price_book: "equipment",
+  pricebook: "equipment",
+  products: "equipment",
   equipment: "equipment",
   payments: "payments"
 };

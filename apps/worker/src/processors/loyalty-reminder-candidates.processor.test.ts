@@ -1,6 +1,14 @@
 import type { Job } from "bullmq";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+const { emitReceiptMock } = vi.hoisted(() => ({
+  emitReceiptMock: vi.fn()
+}));
+
+vi.mock("../lib/loyalty-reminder-evaluation-receipt.js", () => ({
+  emitLoyaltyReminderEvaluationReceipt: emitReceiptMock
+}));
+
 vi.mock("@fsm/config/feature-flags", () => ({
   featureFlags: {
     loyaltyRemindersEnabled: true,
@@ -44,13 +52,15 @@ describe("loyalty-reminder-candidates.processor", () => {
   beforeEach(() => {
     evaluateCandidates.mockClear();
     syncDryRunRecommendations.mockClear();
+    emitReceiptMock.mockReset();
   });
 
   it("evaluates candidates and syncs dry-run recommendations", async () => {
     const job = createJob({
-      companyId: "company-1",
-      importSessionId: "sess-1",
-      horizonDays: 21
+      companyId: "11111111-1111-4111-8111-111111111111",
+      importSessionId: "22222222-2222-4222-8222-222222222222",
+      horizonDays: 21,
+      idempotencyKey: "loyalty:manual:company-1:test"
     });
 
     await processEvaluateLoyaltyReminderCandidates(job, {
@@ -58,13 +68,17 @@ describe("loyalty-reminder-candidates.processor", () => {
       syncDryRunRecommendations
     });
 
-    expect(evaluateCandidates).toHaveBeenCalledWith("company-1", {
+    expect(evaluateCandidates).toHaveBeenCalledWith("11111111-1111-4111-8111-111111111111", {
       horizonDays: 21,
-      importSessionId: "sess-1",
+      importSessionId: "22222222-2222-4222-8222-222222222222",
+      customerId: null,
       lapsedDays: undefined,
       dryRun: true
     });
     expect(syncDryRunRecommendations).toHaveBeenCalled();
     expect(job.updateProgress).toHaveBeenCalledWith(100);
+    expect(emitReceiptMock).toHaveBeenCalledWith(
+      expect.objectContaining({ state: "completed", candidateCount: 1 })
+    );
   });
 });

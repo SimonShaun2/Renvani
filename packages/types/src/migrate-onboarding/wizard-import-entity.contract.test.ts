@@ -10,18 +10,22 @@ import {
 } from "./wizard-import-entity.contract.js";
 
 describe(`${WIZARD_V1_IMPORT_ENTITY_CONTRACT_ID}`, () => {
-  it("ships customers, properties, jobs, and estimates on the wizard", () => {
+  it("ships customers, properties, jobs, estimates, and price_book on the wizard", () => {
     expect(WIZARD_V1_IMPORT_ENTITY_TYPES).toEqual([
       "customers",
       "properties",
       "jobs",
-      "estimates"
+      "estimates",
+      "price_book"
     ]);
   });
 
   it("maps every wizard entity into golden bundle entity types", () => {
     for (const entity of WIZARD_V1_IMPORT_ENTITY_TYPES) {
       assertWizardEntitySupportedByGoldenBundle(entity);
+      if (entity === "price_book") {
+        continue;
+      }
       expect(assertRelationalPreviewKindMatchesWizardEntity(entity)).toBe(entity);
     }
   });

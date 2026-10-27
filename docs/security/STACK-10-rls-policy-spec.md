@@ -32,4 +32,4 @@ Implemented in `@fsm/db` as `buildTenantSessionSetLocal()` and `runTransactionWi
 
 - **Unit:** `rls-migration-sql.test.ts` (committed SQL matches catalog)
 - **STACK-03 matrix** — same cross-tenant cases with session GUC set on DB pool (STACK-02 follow-up)
-- **Integration (optional):** post-policy migration tests when a live Postgres URL is available in CI
+- **Neon CI matrix:** `rls-policies.integration.test.ts` — cross-tenant deny for every catalog table when `NEON_CI_DATABASE_URL` is set (`pnpm test:neon-ci` locally)

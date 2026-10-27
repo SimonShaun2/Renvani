@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { CSVImportWizardClient } from "@/src/components/csv-import/CSVImportWizardClient";
+import { MigrateOnboardingWizardClient } from "@/src/components/migrate-onboarding/MigrateOnboardingWizardClient";
 import { readServerAuthSession } from "@/src/lib/auth";
 import { getDefaultRouteForRole } from "@/src/lib/route-access";
 
@@ -17,5 +17,5 @@ export default async function OnboardingImportPage() {
     redirect(getDefaultRouteForRole(session.role));
   }
 
-  return <CSVImportWizardClient />;
+  return <MigrateOnboardingWizardClient />;
 }

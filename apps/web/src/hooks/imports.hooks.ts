@@ -2,7 +2,11 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { publicEnv } from "@fsm/config";
-import type { ColumnMapping } from "@fsm/types";
+import type {
+  ColumnMapping,
+  ImportSessionIngestStatus,
+  ImportSessionReconciliationResponse
+} from "@fsm/types";
 
 import type { CustomerListRecord } from "@/src/hooks/customers.hooks";
 import { clearBrowserAuthSession, getAuthToken } from "@/src/lib/auth";
@@ -11,7 +15,7 @@ import { api, ApiError, type ApiErrorPayload } from "@/src/lib/api";
 export interface ImportSessionRecord {
   id: string;
   status: "uploaded" | "mapping" | "preview" | "importing" | "completed" | "failed" | "rolled_back";
-  entityType: "customers" | "jobs";
+  entityType: "customers" | "jobs" | "estimates" | "price_book" | "notes" | "communications";
   fileName: string;
   totalRows: number | null;
   validRows: number | null;
@@ -35,6 +39,7 @@ export interface ImportErrorRecord {
 
 export interface ImportSessionResponse {
   importSession: ImportSessionRecord;
+  ingest?: ImportSessionIngestStatus;
 }
 
 export interface ImportErrorsResponse {
@@ -115,6 +120,7 @@ const importKeys = {
   all: ["imports"] as const,
   detail: (id: string) => ["imports", "detail", id] as const,
   errors: (id: string) => ["imports", "errors", id] as const,
+  reconciliation: (id: string) => ["imports", "reconciliation", id] as const,
   customers: ["imports", "customers-match"] as const
 };
 
@@ -152,6 +158,18 @@ export function useImportErrors(importSessionId: string | null, enabled = true) 
     queryKey: importSessionId ? importKeys.errors(importSessionId) : importKeys.errors("pending"),
     queryFn: () => api.get<ImportErrorsResponse>(`/api/v1/imports/${importSessionId}/errors`),
     enabled: enabled && Boolean(importSessionId)
+  });
+}
+
+export function useImportReconciliation(importSessionId: string | null, enabled = true) {
+  return useQuery<ImportSessionReconciliationResponse>({
+    queryKey: importSessionId
+      ? importKeys.reconciliation(importSessionId)
+      : importKeys.reconciliation("pending"),
+    queryFn: () =>
+      api.get<ImportSessionReconciliationResponse>(`/api/v1/imports/${importSessionId}/reconciliation`),
+    enabled: enabled && Boolean(importSessionId),
+    retry: false
   });
 }
 

@@ -1,11 +1,21 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { AppError, ErrorCode } from "@fsm/types";
 
 import {
   assertActionAllowedForProduct,
+  assertLoyaltyReminderExecutionAllowed,
   requiresHumanApproval
 } from "./agent-action.policy.js";
+
+const featureFlagsMock = vi.hoisted(() => ({
+  loyaltyRemindersEnabled: true,
+  loyaltyRemindersDryRun: false
+}));
+
+vi.mock("@fsm/config/feature-flags", () => ({
+  featureFlags: featureFlagsMock
+}));
 import { LoyaltyReminderProposeParamsV1Schema } from "@fsm/types";
 
 describe("agent-action.policy", () => {
@@ -38,6 +48,13 @@ describe("agent-action.policy", () => {
       summary: "Quarterly plan visit due"
     });
     expect(parsed.ruleFamily).toBe("plan_cadence");
+  });
+
+  it("blocks loyalty execution while dry-run is enabled", () => {
+    featureFlagsMock.loyaltyRemindersEnabled = true;
+    featureFlagsMock.loyaltyRemindersDryRun = true;
+
+    expect(() => assertLoyaltyReminderExecutionAllowed()).toThrow(AppError);
   });
 
   it("denies unknown revenue tools", () => {

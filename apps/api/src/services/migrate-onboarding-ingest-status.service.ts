@@ -1,6 +1,7 @@
 import { and, eq, inArray, isNull } from "drizzle-orm";
 
 import { db, importSessions } from "@fsm/db";
+import { buildImportSessionIngestStatus } from "../lib/import-ingest-status.js";
 import {
   AppError,
   ErrorCode,
@@ -8,7 +9,6 @@ import {
   migrateOnboardingStepStateSchema
 } from "@fsm/types";
 
-import { buildImportSessionIngestStatus } from "../lib/import-ingest-status.js";
 import { getMigrateOnboardingBundle } from "./migrate-onboarding.service.js";
 
 function parseStepState(value: unknown) {

@@ -19,22 +19,7 @@ const loginSchema = z.object({
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
-const loginStats = [
-  {
-    label: "Avg revenue found per import",
-    value: "$96k"
-  },
-  {
-    label: "Avg increase in conversions",
-    value: "34%"
-  },
-  {
-    label: "Average time to onboard",
-    value: "2 min"
-  }
-];
-
-export default function LoginPage() {
+export function LegacyLoginForm() {
   const router = useRouter();
   const setAuth = useAuthStore((state) => state.setAuth);
   const [formError, setFormError] = useState<string | null>(null);
@@ -73,28 +58,18 @@ export default function LoginPage() {
 
           <div className="mt-14 max-w-xl space-y-6 lg:mt-24">
             <p className="text-sm font-semibold uppercase tracking-[0.28em] text-brand-accent-light">
-              AI-native field service OS
+              Renvani
             </p>
             <div className="space-y-4">
               <h1 className="max-w-md text-5xl font-semibold leading-[1.04] tracking-tight text-white sm:text-6xl">
-                The field service platform that finds your missed revenue.
+                Grow your shop. Renvani runs the rest.
               </h1>
-              <p className="text-4xl font-semibold tracking-tight text-[#B58AFF] sm:text-5xl">Smarter brain.</p>
             </div>
             <p className="max-w-lg text-lg leading-8 text-neutral-300">
-              AI-powered recommendations, automated follow-ups, and real-time revenue intelligence built for HVAC and
-              trade service businesses.
+              AI that books, follows up and brings customers back. Dispatch, invoicing and QuickBooks sync run behind it.
             </p>
           </div>
 
-          <div className="relative mt-auto grid gap-4 border-t border-white/10 pt-8 sm:grid-cols-3">
-            {loginStats.map((stat) => (
-              <div key={stat.label} className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 backdrop-blur">
-                <p className="text-3xl font-semibold tracking-tight text-white">{stat.value}</p>
-                <p className="mt-2 text-sm leading-6 text-neutral-400">{stat.label}</p>
-              </div>
-            ))}
-          </div>
         </div>
       </section>
 
@@ -102,8 +77,8 @@ export default function LoginPage() {
         <div className="w-full max-w-md">
           <div className="space-y-2">
             <p className="text-sm font-semibold uppercase tracking-[0.24em] text-brand-accent">Welcome back</p>
-            <h2 className="text-4xl font-semibold tracking-tight text-neutral-900">Sign in to ServiceRev</h2>
-            <p className="text-base text-neutral-500">Access your revenue dashboard, dispatch board, and field tools.</p>
+            <h2 className="text-4xl font-semibold tracking-tight text-neutral-900">Sign in to Renvani</h2>
+            <p className="text-base text-neutral-500">Access your jobs, dispatch board, and field tools.</p>
           </div>
 
           <form className="mt-10 space-y-5" onSubmit={handleSubmit(onSubmit)}>
@@ -165,10 +140,9 @@ export default function LoginPage() {
             <p>
               Don&apos;t have an account?{" "}
               <Link href="/signup" className="font-semibold text-brand-accent hover:text-brand-primary">
-                Start free trial
+                Create an account
               </Link>
             </p>
-            <p>No credit card required</p>
           </div>
         </div>
       </section>

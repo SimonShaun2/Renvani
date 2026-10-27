@@ -14,7 +14,8 @@ import {
   Sparkles,
   UserRound,
   Upload,
-  Users
+  Users,
+  BookOpenCheck
 } from "lucide-react";
 
 import type { UserRole } from "./route-access";
@@ -78,6 +79,7 @@ export const settingsNavigation: NavItem[] = [
   { label: "Migration wizard", href: "/settings/migrate", icon: Upload },
   { label: "General", href: "/settings/general", icon: Settings },
   { label: "Payments", href: "/settings/payments", icon: CreditCard },
+  { label: "QuickBooks", href: "/settings/quickbooks", icon: BookOpenCheck },
   { label: "VIP memberships", href: "/settings/vip", icon: Crown },
   { label: "Automation Rules", href: "/settings/automation", icon: Sparkles },
   { label: "Notifications", href: "/settings/notifications", icon: MessageSquareText },

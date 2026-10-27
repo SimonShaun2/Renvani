@@ -186,6 +186,11 @@ export interface TestUserRecord {
   avatarUrl: string | null;
   isActive: boolean;
   lastLoginAt: Date | null;
+  emailVerifiedAt?: Date | null;
+  emailVerificationTokenHash?: string | null;
+  emailVerificationExpiresAt?: Date | null;
+  clerkUserId?: string | null;
+  clerkUnlinkedAt?: Date | null;
   technicianId: string | null;
   createdAt: Date;
   updatedAt: Date;
@@ -1111,6 +1116,11 @@ export interface TestUserRecord {
   avatarUrl: string | null;
   isActive: boolean;
   lastLoginAt: Date | null;
+  emailVerifiedAt?: Date | null;
+  emailVerificationTokenHash?: string | null;
+  emailVerificationExpiresAt?: Date | null;
+  clerkUserId?: string | null;
+  clerkUnlinkedAt?: Date | null;
   technicianId: string | null;
   createdAt: Date;
   updatedAt: Date;
@@ -2128,6 +2138,7 @@ interface TestState {
 interface OrderByDefinition {
   direction: "asc" | "desc";
   field: string;
+  expr?: TimelineAtMarker;
 }
 
 const companiesTable = {
@@ -2157,6 +2168,8 @@ const companiesTable = {
 const usersTable = {
   __name: "users",
   id: "id",
+  clerkUserId: "clerkUserId",
+  clerkUnlinkedAt: "clerkUnlinkedAt",
   companyId: "companyId",
   email: "email",
   passwordHash: "passwordHash",
@@ -2168,6 +2181,9 @@ const usersTable = {
   avatarUrl: "avatarUrl",
   isActive: "isActive",
   lastLoginAt: "lastLoginAt",
+  emailVerifiedAt: "emailVerifiedAt",
+  emailVerificationTokenHash: "emailVerificationTokenHash",
+  emailVerificationExpiresAt: "emailVerificationExpiresAt",
   technicianId: "technicianId",
   createdAt: "createdAt",
   updatedAt: "updatedAt",
@@ -3413,10 +3429,38 @@ function getRows(tableName: TableName): AnyTestRecord[] {
   }
 }
 
-function sortRows<T extends Record<string, unknown>>(rows: T[], definition: OrderByDefinition): T[] {
+function sortRows<T extends Record<string, unknown>>(
+  rows: T[],
+  definition: OrderByDefinition,
+  ...rest: OrderByDefinition[]
+): T[] {
+  const definitions = [definition, ...rest];
   return [...rows].sort((left, right) => {
-    const leftValue = left[definition.field] as string | number | Date | null | undefined;
-    const rightValue = right[definition.field] as string | number | Date | null | undefined;
+    for (const current of definitions) {
+      const result = compareByDefinition(left, right, current);
+      if (result !== 0) {
+        return result;
+      }
+    }
+    return 0;
+  });
+}
+
+function readSortValue(row: Record<string, unknown>, definition: OrderByDefinition) {
+  if (definition.expr) {
+    return getTimelineAt(row, definition.expr)?.getTime() ?? null;
+  }
+  return row[definition.field] as string | number | Date | null | undefined;
+}
+
+function compareByDefinition<T extends Record<string, unknown>>(
+  left: T,
+  right: T,
+  definition: OrderByDefinition
+): number {
+  {
+    const leftValue = readSortValue(left, definition);
+    const rightValue = readSortValue(right, definition);
 
     if (leftValue === rightValue) {
       return 0;
@@ -3435,7 +3479,7 @@ function sortRows<T extends Record<string, unknown>>(rows: T[], definition: Orde
     }
 
     return leftValue > rightValue ? -1 : 1;
-  });
+  }
 }
 
 function createCompanyRecord(values: Partial<TestCompanyRecord> & Pick<TestCompanyRecord, "name" | "slug">): TestCompanyRecord {
@@ -3484,6 +3528,11 @@ function createUserRecord(
     avatarUrl: values.avatarUrl ?? null,
     isActive: values.isActive ?? true,
     lastLoginAt: values.lastLoginAt ?? null,
+    emailVerifiedAt: values.emailVerifiedAt ?? null,
+    emailVerificationTokenHash: values.emailVerificationTokenHash ?? null,
+    emailVerificationExpiresAt: values.emailVerificationExpiresAt ?? null,
+    clerkUserId: values.clerkUserId ?? null,
+    clerkUnlinkedAt: values.clerkUnlinkedAt ?? null,
     technicianId: values.technicianId ?? null,
     createdAt: values.createdAt ?? now,
     updatedAt: values.updatedAt ?? now,
@@ -5039,8 +5088,9 @@ function createSelectChain<T extends Record<string, unknown>>(rows: T[]) {
       filteredRows = filteredRows.filter(predicate);
       return chain;
     },
-    orderBy(definition: OrderByDefinition) {
-      return Promise.resolve(sortRows(filteredRows, definition));
+    orderBy(definition: OrderByDefinition, ...rest: OrderByDefinition[]) {
+      filteredRows = sortRows(filteredRows, definition, ...rest);
+      return chain;
     },
     limit(limitCount: number) {
       return Promise.resolve(filteredRows.slice(0, limitCount));
@@ -5118,8 +5168,9 @@ function wrapSelectChainWithProjection<T extends Record<string, unknown>>(
       chain.where(predicate as Predicate<T>);
       return wrapped;
     },
-    orderBy(definition: OrderByDefinition) {
-      return chain.orderBy(definition).then((rows) => mapRows(rows));
+    orderBy(definition: OrderByDefinition, ...rest: OrderByDefinition[]) {
+      chain.orderBy(definition, ...rest);
+      return wrapped;
     },
     limit(limitCount: number) {
       return chain.limit(limitCount).then((rows) => mapRows(rows));
@@ -5566,6 +5617,30 @@ export async function listActiveCompanyIdsForRevenueSummary(
 
 const JOB_ACTIVITY_AT_MARKER = { __jobActivityAt: true as const };
 
+type TimelineAtMarker = { __timelineAt: string[] };
+
+function isTimelineAtMarker(value: unknown): value is TimelineAtMarker {
+  return Boolean(value && typeof value === "object" && "__timelineAt" in value);
+}
+
+function getTimelineAt(row: Record<string, unknown>, marker: TimelineAtMarker): Date | null {
+  for (const field of marker.__timelineAt) {
+    const value = row[field];
+    if (value !== null && value !== undefined) {
+      return value instanceof Date ? value : new Date(String(value));
+    }
+  }
+  return null;
+}
+
+function compareTimelineAt(row: unknown, marker: TimelineAtMarker, value: unknown): number | null {
+  const at = getTimelineAt(row as Record<string, unknown>, marker);
+  if (!at) {
+    return null;
+  }
+  return at.getTime() - new Date(value as Date).getTime();
+}
+
 function isJobActivityMarker(value: unknown): boolean {
   return Boolean(value && typeof value === "object" && "__jobActivityAt" in value);
 }
@@ -5597,6 +5672,14 @@ export function createDrizzleModuleMock() {
   const sqlTag = (strings: TemplateStringsArray, ...values: unknown[]) => {
     const template = strings.join("");
 
+    if (template.includes("date_trunc")) {
+      return { __timelineAt: values.map((value) => resolveFieldKey(value)) } satisfies TimelineAtMarker;
+    }
+
+    if (template.includes("::timestamptz")) {
+      return new Date(String(values[0]));
+    }
+
     if (template.includes("COALESCE")) {
       return JOB_ACTIVITY_AT_MARKER;
     }
@@ -5616,18 +5699,22 @@ export function createDrizzleModuleMock() {
   };
 
   return {
-    and: <T>(...predicates: Array<Predicate<T>>): Predicate<T> => (row: T) =>
-      predicates.every((predicate) => predicate(row)),
-    asc: <T>(field: keyof T): OrderByDefinition => ({
-      direction: "asc",
-      field: String(field)
-    }),
-    desc: <T>(field: keyof T): OrderByDefinition => ({
-      direction: "desc",
-      field: String(field)
-    }),
+    and: <T>(...predicates: Array<Predicate<T> | undefined>): Predicate<T> => (row: T) =>
+      predicates.every((predicate) => !predicate || predicate(row)),
+    or: <T>(...predicates: Array<Predicate<T> | undefined>): Predicate<T> => (row: T) =>
+      predicates.some((predicate) => predicate?.(row) ?? false),
+    asc: <T>(field: keyof T): OrderByDefinition =>
+      isTimelineAtMarker(field)
+        ? { direction: "asc", field: "", expr: field }
+        : { direction: "asc", field: String(field) },
+    desc: <T>(field: keyof T): OrderByDefinition =>
+      isTimelineAtMarker(field)
+        ? { direction: "desc", field: "", expr: field }
+        : { direction: "desc", field: String(field) },
     eq: <T>(field: keyof T, value: T[keyof T]): Predicate<T> => (row: T) =>
-      row[resolveFieldKey(field) as keyof T] === value,
+      isTimelineAtMarker(field)
+        ? compareTimelineAt(row, field, value) === 0
+        : row[resolveFieldKey(field) as keyof T] === value,
     gt: <T>(field: keyof T, value: T[keyof T]): Predicate<T> => (row: T) =>
       (row[resolveFieldKey(field) as keyof T] as string | number | Date) >
       (value as string | number | Date),
@@ -5641,6 +5728,11 @@ export function createDrizzleModuleMock() {
       return (row[key] as string | number | Date) >= (value as string | number | Date);
     },
     lte: <T>(field: unknown, value: T[keyof T]): Predicate<T> => (row: T) => {
+      if (isTimelineAtMarker(field)) {
+        const diff = compareTimelineAt(row, field, value);
+        return diff !== null && diff <= 0;
+      }
+
       if (isJobActivityMarker(field)) {
         const activity = getJobActivityAt(row as Record<string, unknown>);
         return activity !== null && activity.getTime() <= new Date(value as Date).getTime();
@@ -5650,6 +5742,11 @@ export function createDrizzleModuleMock() {
       return (row[key] as string | number | Date) <= (value as string | number | Date);
     },
     lt: <T>(field: unknown, value: T[keyof T]): Predicate<T> => (row: T) => {
+      if (isTimelineAtMarker(field)) {
+        const diff = compareTimelineAt(row, field, value);
+        return diff !== null && diff < 0;
+      }
+
       if (isJobActivityMarker(field)) {
         const activity = getJobActivityAt(row as Record<string, unknown>);
         return activity !== null && activity.getTime() < new Date(value as Date).getTime();

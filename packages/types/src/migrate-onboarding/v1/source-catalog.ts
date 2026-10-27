@@ -26,7 +26,8 @@ export const MIGRATE_ONBOARDING_SOURCE_CATALOG: MigrateOnboardingSourceCatalogEn
   {
     id: "qbd",
     label: "QuickBooks Desktop",
-    description: "Desktop export variants (CSV/IIF). Same generic AI import path with QuickBooks column presets.",
+    description:
+      "QuickBooks Desktop file exports: IIF customer lists plus CSV/Excel reports for items, invoices, and payments (AI importer + desktop presets).",
     recommendedExports: ["customers", "items", "invoices"],
     catalogTier: "primary",
     importPath: "quickbooks_file_export"

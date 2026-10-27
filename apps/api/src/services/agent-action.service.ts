@@ -28,6 +28,7 @@ import {
   assertPolicyVersion,
   requiresHumanApproval
 } from "./agent-action.policy.js";
+import { assertLoyaltyReminderExecutionAllowed } from "./agent-action.policy.js";
 import { authorizeAgentActionExecution } from "./outbound-policy-engine.service.js";
 import { resolveEntityRef } from "./tenant-context.service.js";
 import {
@@ -488,6 +489,10 @@ export async function executeAgentAction(companyId: string, actionId: string, ac
 
       let authorizationDecision: Awaited<ReturnType<typeof authorizeAgentActionExecution>> | null =
         null;
+
+      if (row.actionType === "loyalty.reminder.propose") {
+        assertLoyaltyReminderExecutionAllowed();
+      }
 
       if (row.actionType === "message.send_proposed") {
         authorizationDecision = await authorizeAgentActionExecution({

@@ -13,6 +13,7 @@ import {
   useConfirmImportMapping,
   useCreateImportSession,
   useImportErrors,
+  useImportReconciliation,
   useImportMatchCustomers,
   useImportSession,
   useStartImport
@@ -31,6 +32,7 @@ import {
   mergeServerMappings
 } from "@/src/lib/csv-import";
 import { sanitizeSpreadsheetCell } from "@fsm/types";
+import { coerceImportSessionChunkProgress } from "@/src/lib/import-chunk-progress";
 
 import { ApiError } from "@/src/lib/api";
 import { useCSVImportStore } from "@/src/stores/csv-import.store";
@@ -121,6 +123,10 @@ export function CSVImportWizardClient({ presentation = "onboarding" }: CSVImport
   const importSessionData = importSessionQuery.data as ImportSessionResponse | undefined;
   const importSession = importSessionData?.importSession ?? null;
   const importErrorsQuery = useImportErrors(uploadId, currentStep === 7 && Boolean(uploadId));
+  const importReconciliationQuery = useImportReconciliation(
+    uploadId,
+    currentStep === 7 && Boolean(uploadId) && importSession?.status === "completed"
+  );
   const importErrorsData = importErrorsQuery.data as ImportErrorsResponse | undefined;
   const confirmMapping = useConfirmImportMapping(uploadId);
   const startImport = useStartImport(uploadId);
@@ -129,7 +135,12 @@ export function CSVImportWizardClient({ presentation = "onboarding" }: CSVImport
   const isValidationReady = (importSession?.totalRows ?? 0) > 0;
   const duplicateSkipCount = duplicateMatches.filter((match) => match.action === "skip").length;
   const duplicateUpdateCount = duplicateMatches.filter((match) => match.action === "update_existing").length;
-  const processedRows = (importSession?.importedRows ?? 0) + (importSession?.skippedRows ?? 0);
+  const ingest = importSessionData?.ingest ?? null;
+  const chunkProgress = coerceImportSessionChunkProgress(ingest?.chunkProgress);
+  const processedRows =
+    chunkProgress !== null
+      ? chunkProgress.rowsOk + chunkProgress.rowsFailed
+      : (importSession?.importedRows ?? 0) + (importSession?.skippedRows ?? 0);
   const estimatedTimeRemaining = buildEstimatedTimeRemaining(
     importStartedAt,
     processedRows,
@@ -501,12 +512,15 @@ export function CSVImportWizardClient({ presentation = "onboarding" }: CSVImport
         {currentStep === 6 ? (
           <Step6Progress
             fileName={fileName}
+            entityType={importSession?.entityType ?? null}
             totalRows={importSession?.totalRows ?? rawRows.length}
             processedRows={processedRows}
             importedRows={importSession?.importedRows ?? 0}
             skippedRows={importSession?.skippedRows ?? 0}
             duplicateRows={importSession?.duplicateRows ?? 0}
             estimatedTimeRemaining={estimatedTimeRemaining}
+            chunkProgress={chunkProgress}
+            priceBookLineSeeds={ingest?.priceBookLineSeeds ?? null}
           />
         ) : null}
 
@@ -514,6 +528,8 @@ export function CSVImportWizardClient({ presentation = "onboarding" }: CSVImport
           <Step7Results
             results={results}
             errorRecords={importErrorsData?.errors ?? []}
+            reconciliationReport={importReconciliationQuery.data?.report ?? null}
+            skippedRowsDownloadUrl={importReconciliationQuery.data?.skippedRowsDownloadUrl ?? null}
             onDownloadErrorReport={handleDownloadErrorReport}
             onImportAnother={handleImportAnother}
           />

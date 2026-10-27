@@ -1,7 +1,7 @@
 import {
   ImportSessionChunkProgressSchema,
-  type ImportSessionChunkProgress,
-  type ImportSessionIngestStatus
+  type ImportSessionIngestStatus,
+  type ImportSessionChunkProgress
 } from "@fsm/types";
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {

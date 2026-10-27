@@ -2,7 +2,6 @@ import { randomUUID } from "node:crypto";
 
 import { and, eq, isNull } from "drizzle-orm";
 import type { Job } from "bullmq";
-import Papa from "papaparse";
 import pino from "pino";
 
 import { downloadFile, getFileKeyFromUrl } from "@fsm/config/storage";
@@ -16,11 +15,7 @@ import {
   importChunkRuns,
   importSessions,
 } from "@fsm/db";
-import {
-  isXlsxImportFileName,
-  parseXlsxBufferToSheetRows,
-  sheetRowsToRecordRows,
-} from "@fsm/import-engine";
+import { parseTabularImportFile } from "@fsm/import-engine";
 import {
   IMPORT_CHUNK_COMMIT_JOB_NAME,
   ImportChunkCommitPayloadSchema,
@@ -37,6 +32,10 @@ import {
 } from "@fsm/types";
 
 import { emitImportWorkflowStepReceipt } from "../lib/import-workflow-step-receipt.js";
+import {
+  normalizeImportValidationErrors,
+  persistImportSessionReconciliationReportBestEffort
+} from "../lib/persist-import-session-reconciliation.js";
 
 import {
   mergeImportChunkSessionProgress,
@@ -99,45 +98,7 @@ function normalizeTextValue(value: string | null | undefined): string | null {
 }
 
 function parseTabularRows(buffer: Buffer, fileName: string): ParsedCsvRow[] {
-  if (isXlsxImportFileName(fileName)) {
-    const sheet = parseXlsxBufferToSheetRows(buffer);
-    const recordRows = sheetRowsToRecordRows(sheet.headers, sheet.rows);
-
-    return recordRows.map((values, index) => ({
-      rowNumber: index + 2,
-      values,
-    }));
-  }
-
-  return parseCsv(buffer);
-}
-
-function parseCsv(buffer: Buffer): ParsedCsvRow[] {
-  const csvText = buffer.toString("utf8").replace(/^\uFEFF/u, "");
-  const result = Papa.parse<Record<string, string>>(csvText, {
-    header: true,
-    skipEmptyLines: true,
-  });
-  const headers = (result.meta.fields ?? []).map((header) => header.trim());
-  const rows: ParsedCsvRow[] = [];
-
-  for (let index = 0; index < result.data.length; index += 1) {
-    const sourceRow = result.data[index];
-    const normalizedRow: Record<string, string> = {};
-
-    for (const header of headers) {
-      const rawValue = sourceRow?.[header];
-      normalizedRow[header] =
-        typeof rawValue === "string" ? sanitizeSpreadsheetCell(rawValue.trim()) : "";
-    }
-
-    rows.push({
-      rowNumber: index + 2,
-      values: normalizedRow,
-    });
-  }
-
-  return rows;
+  return parseTabularImportFile(buffer, fileName).rows;
 }
 
 function resolveRowWindow(
@@ -664,6 +625,28 @@ export async function handleImportChunkCommit(job: Job<Record<string, unknown>>)
 
     const chunkResult = await commitChunkForEntity(payload, importSession);
     await finalizeChunkRun(payload, importSession, chunkResult, true);
+
+    // Chunks can finish out of order, so trigger on the session actually reaching
+    // "completed" (all chunks done), not on the last chunk number. Best-effort.
+    try {
+      const refreshedSession = await getImportSessionOrNull(payload.companyId, payload.importSessionId);
+      if (refreshedSession?.status === "completed") {
+        await persistImportSessionReconciliationReportBestEffort(
+          payload.companyId,
+          refreshedSession,
+          normalizeImportValidationErrors(refreshedSession.validationErrors)
+        );
+      }
+    } catch (error: unknown) {
+      logger.warn(
+        {
+          companyId: payload.companyId,
+          importSessionId: payload.importSessionId,
+          err: error instanceof Error ? error.message : String(error)
+        },
+        "Failed to write import reconciliation report (best-effort; chunk unaffected)"
+      );
+    }
 
     await emitImportWorkflowStepReceipt({
       companyId: payload.companyId,

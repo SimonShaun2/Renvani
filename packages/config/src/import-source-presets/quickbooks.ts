@@ -43,6 +43,8 @@ export const QUICKBOOKS_PRESETS: ImportSourcePreset[] = [
       email: "email",
       phone: "phone",
       "main phone": "phone",
+      phone1: "phone",
+      baddr1: "addressLine1",
       "bill to 1": "addressLine1",
       "bill to line 1": "addressLine1",
       "bill to city": "city",
@@ -85,6 +87,7 @@ export const QUICKBOOKS_PRESETS: ImportSourcePreset[] = [
     entity: "invoices",
     label: "QuickBooks Online (invoices)",
     headerAliases: {
+      "invoice id": "sourceId",
       "invoice no": "invoiceNumber",
       "invoice number": "invoiceNumber",
       "customer name": "customerName",
@@ -111,7 +114,28 @@ export const QUICKBOOKS_PRESETS: ImportSourcePreset[] = [
       "due date": "dueAt",
       amount: "total",
       "open balance": "balanceDue",
-      balance: "balanceDue"
+      balance: "balanceDue",
+      "invoice id": "invoiceNumber",
+      "invoice date": "issuedAt",
+      total: "total"
+    }
+  },
+  {
+    id: "quickbooks_desktop_payments",
+    entity: "invoices",
+    label: "QuickBooks Desktop (payments)",
+    headerAliases: {
+      "payment id": "reference",
+      customer: "customerName",
+      "customer name": "customerName",
+      date: "paidAt",
+      "payment date": "paidAt",
+      amount: "amount",
+      "invoice id": "invoiceNumber",
+      "invoice no": "invoiceNumber",
+      "invoice #": "invoiceNumber",
+      "payment method": "paymentMethod",
+      method: "paymentMethod"
     }
   },
   {

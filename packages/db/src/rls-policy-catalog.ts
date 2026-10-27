@@ -1,5 +1,5 @@
 /**
- * STACK-10 — RLS policy catalog (design). Policies applied in a future migration after Neon staging.
+ * STACK-10 — RLS policy catalog. Applied in migration `0027_stack10_tenant_rls_policies`.
  * Session variable: {@link TENANT_SESSION_GUC} from tenant-session.ts
  */
 import { TENANT_SESSION_GUC } from "./tenant-session.js";

@@ -20,7 +20,7 @@ import {
   maintenancePlans,
   vipMembershipTiers
 } from "@fsm/db";
-import { AppError, ErrorCode } from "@fsm/types";
+import { AppError, ErrorCode, type ServiceAgreementStripeStatus } from "@fsm/types";
 
 import { resolveCompanyConnectApplicationFeeFraction } from "../lib/company-renvani-plan.js";
 import {
@@ -29,6 +29,7 @@ import {
   createStripeCustomer,
   createVipMembershipCheckoutSession,
   pauseServiceAgreementSubscription,
+  retrieveServiceAgreementSubscriptionSnapshot,
   updateServiceAgreementSubscriptionCancelAtPeriodEnd
 } from "../lib/stripe.js";
 import { loadVipMembershipPolicy } from "./vip-membership-policy.service.js";
@@ -114,15 +115,61 @@ async function getVipPlan(companyId: string, planId: string): Promise<PlanRow> {
   return plan;
 }
 
+const STRIPE_STATUS_VALUES: ServiceAgreementStripeStatus[] = [
+  "active",
+  "canceled",
+  "incomplete",
+  "incomplete_expired",
+  "past_due",
+  "paused",
+  "trialing",
+  "unpaid"
+];
+
+function toStripeStatus(value: string | null | undefined): ServiceAgreementStripeStatus | null {
+  if (!value) {
+    return null;
+  }
+
+  return STRIPE_STATUS_VALUES.includes(value as ServiceAgreementStripeStatus)
+    ? (value as ServiceAgreementStripeStatus)
+    : null;
+}
+
+async function loadVipMembershipStripeStatus(plan: PlanRow): Promise<ServiceAgreementStripeStatus | null> {
+  if (!plan.stripeSubscriptionId) {
+    return null;
+  }
+
+  try {
+    const snapshot = await retrieveServiceAgreementSubscriptionSnapshot(plan.stripeSubscriptionId, {
+      companyId: plan.companyId,
+      agreementId: plan.id
+    });
+
+    return toStripeStatus(snapshot.status);
+  } catch {
+    return null;
+  }
+}
+
 export interface VipMembershipListItem {
   id: string;
   customerId: string;
+  customer: {
+    id: string;
+    firstName: string;
+    lastName: string;
+  };
   vipTierId: string | null;
   tierName: string;
   status: PlanRow["status"];
   monthlyPrice: string | null;
   discountPercent: string;
   stripeSubscriptionId: string | null;
+  stripeStatus: ServiceAgreementStripeStatus | null;
+  stripeCancelAtPeriodEnd: boolean;
+  stripeCurrentPeriodEnd: string | null;
   startDate: string;
 }
 
@@ -130,24 +177,45 @@ export async function listVipMemberships(companyId: string): Promise<VipMembersh
   const rows = await db
     .select({
       plan: maintenancePlans,
-      tier: vipMembershipTiers
+      tier: vipMembershipTiers,
+      customer: customers
     })
     .from(maintenancePlans)
     .innerJoin(vipMembershipTiers, eq(vipMembershipTiers.id, maintenancePlans.vipTierId))
+    .innerJoin(
+      customers,
+      and(eq(customers.id, maintenancePlans.customerId), eq(customers.companyId, companyId))
+    )
     .where(and(eq(maintenancePlans.companyId, companyId), isNull(maintenancePlans.deletedAt)))
     .orderBy(desc(maintenancePlans.createdAt));
 
-  return rows.map(({ plan, tier }) => ({
-    id: plan.id,
-    customerId: plan.customerId,
-    vipTierId: plan.vipTierId,
-    tierName: tier.name,
-    status: plan.status,
-    monthlyPrice: plan.price,
-    discountPercent: tier.discountPercent,
-    stripeSubscriptionId: plan.stripeSubscriptionId,
-    startDate: plan.startDate
-  }));
+  return Promise.all(
+    rows.map(async ({ plan, tier, customer }) => {
+      const stripeStatus = await loadVipMembershipStripeStatus(plan);
+
+      return {
+        id: plan.id,
+        customerId: plan.customerId,
+        customer: {
+          id: customer.id,
+          firstName: customer.firstName,
+          lastName: customer.lastName
+        },
+        vipTierId: plan.vipTierId,
+        tierName: tier.name,
+        status: plan.status,
+        monthlyPrice: plan.price,
+        discountPercent: tier.discountPercent,
+        stripeSubscriptionId: plan.stripeSubscriptionId,
+        stripeStatus,
+        stripeCancelAtPeriodEnd: plan.stripeCancelAtPeriodEnd ?? false,
+        stripeCurrentPeriodEnd: plan.stripeCurrentPeriodEnd
+          ? plan.stripeCurrentPeriodEnd.toISOString()
+          : null,
+        startDate: plan.startDate
+      };
+    })
+  );
 }
 
 export async function createVipMembershipJoinLink(
@@ -258,11 +326,20 @@ export async function getPublicVipJoinPreview(joinToken: string): Promise<{
   const parsed = verifyVipMembershipJoinToken(joinToken);
 
   if (!parsed) {
-    throw new AppError(ErrorCode.NOT_FOUND, "Invalid membership link");
+    throw new AppError(ErrorCode.NOT_FOUND, "Link not found");
   }
 
-  const company = await getCompany(parsed.companyId);
-  const tier = await getTier(parsed.companyId, parsed.vipTierId);
+  let company: Awaited<ReturnType<typeof getCompany>>;
+  let tier: Awaited<ReturnType<typeof getTier>>;
+  try {
+    company = await getCompany(parsed.companyId);
+    tier = await getTier(parsed.companyId, parsed.vipTierId);
+  } catch (error) {
+    if (error instanceof AppError && error.code === ErrorCode.NOT_FOUND) {
+      throw new AppError(ErrorCode.NOT_FOUND, "Link not found");
+    }
+    throw error;
+  }
 
   const fraction = resolveCompanyConnectApplicationFeeFraction(company);
   const fee =
@@ -290,7 +367,7 @@ export async function startPublicVipCheckout(
   const parsed = verifyVipMembershipJoinToken(joinToken);
 
   if (!parsed) {
-    throw new AppError(ErrorCode.NOT_FOUND, "Invalid membership link");
+    throw new AppError(ErrorCode.NOT_FOUND, "Link not found");
   }
 
   const result = await createVipMembershipCheckout(

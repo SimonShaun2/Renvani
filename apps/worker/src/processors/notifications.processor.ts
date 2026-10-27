@@ -2,9 +2,8 @@ import { and, eq, isNull } from "drizzle-orm";
 import type { Job, Processor } from "bullmq";
 import pino from "pino";
 
-import { resolveOutboundEmailFromAddress } from "@fsm/comms";
+import { resolveTransactionalEmailFromAddress } from "@fsm/comms";
 import { env } from "@fsm/config";
-import { featureFlags } from "@fsm/config/feature-flags";
 import {
   automationRules,
   campaignRecipients,
@@ -340,10 +339,14 @@ function formatVipLabelFromIso(iso: string | null): string | null {
   return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 }
 
-function getOutboundEmailFromAddress(): string {
-  return resolveOutboundEmailFromAddress({
-    resendEmailEnabled: featureFlags.resendEmailEnabled,
+/** Same key-based selection as the API sender (apps/api/src/lib/outbound-email.ts), via @fsm/comms. */
+export function getOutboundEmailFromAddress(): string {
+  return resolveTransactionalEmailFromAddress({
+    resendApiKey: env.RESEND_API_KEY,
+    sendgridApiKey: env.SENDGRID_API_KEY,
+    nodeEnv: env.NODE_ENV,
     resendFromEmail: env.RESEND_FROM_EMAIL,
+    emailFrom: env.EMAIL_FROM,
     sendgridFromEmail: env.SENDGRID_FROM_EMAIL
   });
 }

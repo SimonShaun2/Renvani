@@ -184,7 +184,7 @@ export const GOLDEN_IMPORT_BUNDLE_MANIFESTS: GoldenImportBundleManifest[] = [
     fixtureId: `housecall_pro-${versionSuffix}`,
     sourceSystem: "housecall_pro",
     label: "Housecall Pro golden bundle",
-    description: "Customer-centric exports with jobs and invoices.",
+    description: "Customer-centric HCP CSV exports with jobs and invoices (≥2y history).",
     requiredHistorySpanYears: 2,
     mediaRelativePaths: [],
     files: [
@@ -199,7 +199,7 @@ export const GOLDEN_IMPORT_BUNDLE_MANIFESTS: GoldenImportBundleManifest[] = [
         presetEntityHint: "customers",
         joinLink: {
           parentFile: "customers.csv",
-          localColumn: "Customer ID",
+          localColumn: "Customer UUID",
           parentColumn: "Customer ID"
         },
         businessDateColumn: "Completed Date"
@@ -253,12 +253,12 @@ export const GOLDEN_IMPORT_BUNDLE_MANIFESTS: GoldenImportBundleManifest[] = [
     fixtureId: `qbd-${versionSuffix}`,
     sourceSystem: "qbd",
     label: "QuickBooks Desktop golden bundle",
-    description: "Desktop customer and item export column variants.",
+    description: "Desktop IIF customer list plus CSV report exports (items, invoices, payments).",
     requiredHistorySpanYears: 2,
     mediaRelativePaths: [],
     files: [
       {
-        relativePath: "customers.csv",
+        relativePath: "customers.iif",
         entityType: "customers",
         presetEntityHint: "customers"
       },
@@ -272,6 +272,12 @@ export const GOLDEN_IMPORT_BUNDLE_MANIFESTS: GoldenImportBundleManifest[] = [
         entityType: "invoices",
         presetEntityHint: "invoices",
         businessDateColumn: "Invoice Date"
+      },
+      {
+        relativePath: "payments.csv",
+        entityType: "payments",
+        presetEntityHint: "invoices",
+        businessDateColumn: "Payment Date"
       }
     ]
   },

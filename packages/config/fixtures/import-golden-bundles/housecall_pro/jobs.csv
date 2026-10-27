@@ -1,3 +1,4 @@
-Job ID,Customer ID,Completed Date,Job Title,Status
+Job ID,Customer UUID,Completed Date,Job Title,Job Status
 HCP-J-001,HCP-C-001,2024-01-08,Duct cleaning,Completed
-HCP-J-002,HCP-C-002,2026-05-30,Mini-split service,Completed
+HCP-J-002,HCP-C-001,2025-06-15,Filter replacement,Completed
+HCP-J-003,HCP-C-002,2026-05-30,Mini-split service,Completed

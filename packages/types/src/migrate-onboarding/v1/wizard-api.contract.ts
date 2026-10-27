@@ -16,6 +16,7 @@ import { migrateOnboardingIngestStatusResponseSchema } from "./ingest-status.sch
 import {
   applySavedCardMigrationMappingsBodySchema,
   confirmStripeImportBodySchema,
+  getSavedCardMigrationResponseSchema,
   savedCardMigrationSchema,
   sendSavedCardFallbackEmailBodySchema,
   startSavedCardMigrationBodySchema
@@ -174,7 +175,5 @@ export const migrateOnboardingWizardResponseSchemas = {
   migrateOnboardingCommitResponse: migrateOnboardingCommitResponseSchema,
   migrateOnboardingIngestStatusResponse: migrateOnboardingIngestStatusResponseSchema,
   savedCardMigration: savedCardMigrationSchema,
-  savedCardMigrationStatus: z.object({
-    migration: savedCardMigrationSchema.nullable()
-  })
+  savedCardMigrationStatus: getSavedCardMigrationResponseSchema
 } as const;

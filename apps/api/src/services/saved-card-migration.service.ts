@@ -479,6 +479,12 @@ export async function applySavedCardMigrationMappingsForBundle(
         offSessionConsentAcknowledgedAt: consentAcknowledgedAt.toISOString(),
         offSessionConsentAcknowledgedById: actorId
       });
+      // Persist the per-card stamp right after the attach succeeds, so a crash later in the loop
+      // never leaves a default card at Stripe without its consent stamp in the DB.
+      await db
+        .update(savedCardMigrations)
+        .set({ customerMappings: [...byPaymentMethod.values()], updatedAt: new Date() })
+        .where(and(eq(savedCardMigrations.id, existing.id), eq(savedCardMigrations.companyId, companyId)));
     } catch (error) {
       byPaymentMethod.set(row.stripePaymentMethodId, {
         ...base,

@@ -388,6 +388,40 @@ describe("saved card migration (FS-138)", () => {
     }
   });
 
+  it("persists each attached card's consent stamp to the DB before the next attach runs", async () => {
+    const { company, authorization } = createAuthContext("owner");
+    const bundle = fakeDb.seedImportBundle({ companyId: company.id });
+    const a = fakeDb.seedCustomer({ companyId: company.id, firstName: "A", lastName: "A", email: "a@example.com" });
+    const b = fakeDb.seedCustomer({ companyId: company.id, firstName: "B", lastName: "B", email: "b@example.com" });
+    await startAndConfirm(authorization, bundle.id);
+    const state = fakeDb.getTestState();
+    let dbMappingsAtSecondAttach: Array<Record<string, unknown>> | null = null;
+    let calls = 0;
+    attachImportedPaymentMethodMock.mockImplementation(async () => {
+      calls += 1;
+      if (calls === 2) {
+        const row = state.savedCardMigrations.find((r) => r.companyId === company.id);
+        dbMappingsAtSecondAttach = structuredClone((row?.customerMappings ?? []) as Array<Record<string, unknown>>);
+        throw new Error("crash");
+      }
+      return { paymentMethodLabel: "VISA ending in 4242" };
+    });
+    await applyMappings(authorization, bundle.id, {
+      ownerOffSessionConsentAcknowledged: true, ownerOffSessionConsentVersion: SAVED_CARD_OFF_SESSION_CONSENT_ACK_VERSION,
+      rows: [
+        { stripeCustomerId: "cus_a", stripePaymentMethodId: "pm_a", renvaniCustomerId: a.id },
+        { stripeCustomerId: "cus_b", stripePaymentMethodId: "pm_b", renvaniCustomerId: b.id }
+      ]
+    });
+    expect(calls).toBe(2);
+    const persistedA = dbMappingsAtSecondAttach!.find((m) => m.stripePaymentMethodId === "pm_a");
+    expect(persistedA).toMatchObject({
+      status: "attached",
+      offSessionConsentVersion: SAVED_CARD_OFF_SESSION_CONSENT_ACK_VERSION
+    });
+    expect(typeof persistedA!.offSessionConsentBatchId).toBe("string");
+  });
+
   it("falls back to APP_URL in the fallback email when the company has no slug", async () => {
     const { company, authorization } = createAuthContext("owner");
     const bundle = fakeDb.seedImportBundle({ companyId: company.id });

@@ -1,4 +1,4 @@
-import { AppError, ErrorCode } from "@fsm/types";
+import { AppError, ErrorCode, type OperatorInboxRiskLevel } from "@fsm/types";
 
 /**
  * Agent-action type registry (FS-25 follow-up). New action types and agent products are added by
@@ -17,6 +17,12 @@ export interface AgentActionTypeDefinition {
   aiMayPropose?: boolean;
   /** Operators may edit parameters while awaiting approval. */
   editable?: boolean;
+  /** Operator inbox risk badge (default "low"). */
+  risk?: OperatorInboxRiskLevel;
+  /** Operator inbox consequence lines (default: generic policy line). */
+  consequences?: string[];
+  /** ai_recommendations.type this kind is proposed from (Revenue Agent proposals). */
+  fromRecommendationType?: string;
 }
 
 export interface AgentProductDefinition {
@@ -86,12 +92,36 @@ registerAgentProduct({
 
 for (const definition of [
   { actionType: "context.resolve", agentProduct: "revenue", autoApproved: true },
-  { actionType: "message.draft", agentProduct: "revenue", autoApproved: true, editable: true },
-  { actionType: "message.send_proposed", agentProduct: "revenue", aiMayPropose: true, editable: true },
-  { actionType: "revenue.inquiry.qualify", agentProduct: "revenue", aiMayPropose: true },
-  { actionType: "loyalty.reminder.propose", agentProduct: "loyalty", aiMayPropose: true },
+  {
+    actionType: "message.draft",
+    agentProduct: "revenue",
+    autoApproved: true,
+    editable: true,
+    risk: "medium",
+    consequences: ["Saves a draft proposal for later review; nothing is sent to the customer."]
+  },
+  {
+    actionType: "message.send_proposed",
+    agentProduct: "revenue",
+    aiMayPropose: true,
+    editable: true,
+    risk: "high",
+    consequences: [
+      "Records an execution receipt in the audit trail (no live provider send in this slice).",
+      "Uses the operator-approved message body only at execute time.",
+      "Customer consent and policy checks remain enforced by the control plane."
+    ]
+  },
+  {
+    actionType: "revenue.inquiry.qualify",
+    agentProduct: "revenue",
+    aiMayPropose: true,
+    risk: "medium",
+    consequences: ["Updates inquiry qualification metadata for revenue workflows."]
+  },
+  { actionType: "loyalty.reminder.propose", agentProduct: "loyalty", aiMayPropose: true, risk: "medium" },
   { actionType: "service.job_brief.propose", agentProduct: "service", aiMayPropose: true },
-  { actionType: "scheduling.booking.self_service", agentProduct: "scheduling" }
+  { actionType: "scheduling.booking.self_service", agentProduct: "scheduling", risk: "medium" }
 ] satisfies AgentActionTypeDefinition[]) {
   registerAgentActionType(definition);
 }

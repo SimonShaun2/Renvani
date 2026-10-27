@@ -29,6 +29,36 @@ export interface AgentActionExecutionContext {
 export interface AgentActionExecutor {
   beforeExecute?: (ctx: AgentActionExecutionContext) => Promise<AuthorizationDecision | void> | void;
   applyInTransaction?: (ctx: AgentActionExecutionContext) => Promise<void>;
+  /** Optional side effect when an operator rejects the proposal (runs inside the reject transaction). */
+  onRejectInTransaction?: (ctx: AgentActionRejectContext) => Promise<void>;
+}
+
+export interface AgentActionRejectContext {
+  tx: ExecuteTx;
+  companyId: string;
+  actionId: string;
+  actorId: string;
+  actionType: string;
+  target: CanonicalEntityRefV1;
+  parameters: Record<string, unknown>;
+}
+
+/** Shared outbound consent/policy gate for executors that would contact a customer. */
+export async function authorizeOutboundAgentActionExecution(ctx: AgentActionExecutionContext) {
+  const decision = await authorizeAgentActionExecution({
+    companyId: ctx.companyId,
+    actorId: ctx.actorId,
+    actorType: "user",
+    actionType: ctx.actionType,
+    parameters: ctx.parameters,
+    target: ctx.target,
+    requiresApproval: ctx.requiresApproval,
+    state: ctx.state as Parameters<typeof authorizeAgentActionExecution>[0]["state"]
+  });
+  if (!decision.allowed) {
+    throw new AppError(decision.errorCode ?? ErrorCode.POLICY_DENIED, decision.reason);
+  }
+  return decision;
 }
 
 const executors = new Map<string, AgentActionExecutor>();
@@ -48,22 +78,7 @@ registerAgentActionExecutor("loyalty.reminder.propose", {
 });
 
 registerAgentActionExecutor("message.send_proposed", {
-  beforeExecute: async (ctx) => {
-    const decision = await authorizeAgentActionExecution({
-      companyId: ctx.companyId,
-      actorId: ctx.actorId,
-      actorType: "user",
-      actionType: ctx.actionType,
-      parameters: ctx.parameters,
-      target: ctx.target,
-      requiresApproval: ctx.requiresApproval,
-      state: ctx.state as Parameters<typeof authorizeAgentActionExecution>[0]["state"]
-    });
-    if (!decision.allowed) {
-      throw new AppError(decision.errorCode ?? ErrorCode.POLICY_DENIED, decision.reason);
-    }
-    return decision;
-  }
+  beforeExecute: authorizeOutboundAgentActionExecution
 });
 
 registerAgentActionExecutor("service.job_brief.propose", {

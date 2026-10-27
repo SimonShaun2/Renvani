@@ -351,6 +351,13 @@
       "when": 1792719000000,
       "tag": "0049_fs25_service_agent_job_brief",
       "breakpoints": true
+    },
+    {
+      "idx": 50,
+      "version": "7",
+      "when": 1792720000000,
+      "tag": "0050_fs15_integration_outbox_audit",
+      "breakpoints": true
     }
   ]
 }

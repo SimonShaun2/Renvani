@@ -1639,6 +1639,84 @@ export const importChunkRuns = pgTable("import_chunk_runs", {
   idempotencyUnique: uniqueIndex("import_chunk_runs_idempotency_key_idx").on(t.idempotencyKey),
 }));
 
+export const integrationOutboxKindEnum = pgEnum("integration_outbox_kind", [
+  "csv_import",
+  "public_booking",
+  "sms_outbound",
+  "email_outbound",
+  "stripe_connect",
+]);
+
+export const integrationOutboxStatusEnum = pgEnum("integration_outbox_status", [
+  "pending",
+  "processing",
+  "succeeded",
+  "dead",
+]);
+
+export const integrationOutboxAuditEventTypeEnum = pgEnum("integration_outbox_audit_event_type", [
+  "created",
+  "processing",
+  "retry_receipt",
+  "succeeded",
+  "dead",
+  "duplicate_suppressed",
+]);
+
+/** FS-40 / FS-15 — durable internal outbox row (no live vendor sends in this slice). */
+export const integrationOutboxOperations = pgTable(
+  "integration_outbox_operations",
+  {
+    id: id(),
+    companyId: companyId(),
+    kind: integrationOutboxKindEnum("kind").notNull(),
+    adapterId: varchar("adapter_id", { length: 64 }).notNull(),
+    idempotencyKey: varchar("idempotency_key", { length: 255 }).notNull(),
+    correlationId: uuid("correlation_id").notNull(),
+    attribution: jsonb("attribution").notNull(),
+    payload: jsonb("payload").notNull().default({}),
+    status: integrationOutboxStatusEnum("status").notNull().default("pending"),
+    attemptCount: integer("attempt_count").notNull().default(0),
+    lastError: text("last_error"),
+    ...timestamps,
+  },
+  (t) => ({
+    companyKindIdempotencyIdx: uniqueIndex("integration_outbox_operations_company_kind_idempotency_idx")
+      .on(t.companyId, t.kind, t.idempotencyKey)
+      .where(sql`"deleted_at" IS NULL`),
+    companyCorrelationIdx: index("integration_outbox_operations_company_correlation_idx").on(
+      t.companyId,
+      t.correlationId
+    ),
+  })
+);
+
+/** Append-only comms / outbox audit trail with idempotent retry receipts. */
+export const integrationOutboxAuditEvents = pgTable(
+  "integration_outbox_audit_events",
+  {
+    id: id(),
+    companyId: companyId(),
+    outboxOperationId: uuid("outbox_operation_id")
+      .notNull()
+      .references(() => integrationOutboxOperations.id, { onDelete: "cascade" }),
+    eventType: integrationOutboxAuditEventTypeEnum("event_type").notNull(),
+    retryReceiptKey: varchar("retry_receipt_key", { length: 255 }),
+    receipt: jsonb("receipt").notNull().default({}),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+  },
+  (t) => ({
+    companyOperationIdx: index("integration_outbox_audit_events_company_operation_idx").on(
+      t.companyId,
+      t.outboxOperationId,
+      t.createdAt
+    ),
+    retryReceiptKeyIdx: uniqueIndex("integration_outbox_audit_events_retry_receipt_key_idx")
+      .on(t.companyId, t.retryReceiptKey)
+      .where(sql`"retry_receipt_key" IS NOT NULL`),
+  })
+);
+
 export const qboConnectionStatusEnum = pgEnum("qbo_connection_status", [
   "pending",
   "connected",

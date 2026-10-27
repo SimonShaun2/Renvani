@@ -37,6 +37,7 @@ import internalAdminQueueRoutes from "./routes/internal-admin/queues/index.js";
 import internalAdminQboSyncRoutes from "./routes/internal-admin/qbo-sync/index.js";
 import quickbooksOnlineRoutes from "./routes/quickbooks-online/index.js";
 import migrateOnboardingRoutes from "./routes/migrate-onboarding/index.js";
+import integrationOutboxRoutes from "./routes/integration-outbox/index.js";
 import migratePhotoLinkRoutes from "./routes/migrate-photo-link/index.js";
 import internalAdminSavedCardMigrationRoutes from "./routes/internal-admin/saved-card-migrations/index.js";
 import savedCardMigrationRoutes from "./routes/saved-card-migration/index.js";
@@ -147,6 +148,7 @@ export async function buildApp() {
   await app.register(importRoutes, { prefix: "/api/v1" });
   await app.register(importReconciliationRoutes, { prefix: "/api/v1" });
   await app.register(migrateOnboardingRoutes, { prefix: "/api/v1" });
+  await app.register(integrationOutboxRoutes, { prefix: "/api/v1" });
   await app.register(migratePhotoLinkRoutes, { prefix: "/api/v1" });
   await app.register(savedCardMigrationRoutes, { prefix: "/api/v1" });
   await app.register(dataExportRoutes, { prefix: "/api/v1" });

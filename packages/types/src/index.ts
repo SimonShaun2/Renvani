@@ -13,6 +13,7 @@ export * from "./customer-imported-history.schemas.js";
 export * from "./customer-history-timeline.schemas.js";
 export * from "./dispatch.types.js";
 export * from "./field-work-sync/v1/index.js";
+export * from "./technician-mobile/v1/index.js";
 export * from "./estimate.types.js";
 export * from "./file-attachment.types.js";
 export * from "./import.types.js";

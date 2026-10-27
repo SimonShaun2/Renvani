@@ -43,6 +43,7 @@ import internalAdminSavedCardMigrationRoutes from "./routes/internal-admin/saved
 import savedCardMigrationRoutes from "./routes/saved-card-migration/index.js";
 import dataExportRoutes from "./routes/data-exports/index.js";
 import jobEngagementRoutes from "./routes/job-engagement/index.js";
+import jobEtaRoutes from "./routes/job-eta/index.js";
 import jobRoutes from "./routes/jobs/index.js";
 import loyaltyRoutes from "./routes/loyalty/index.js";
 import messageLogRoutes from "./routes/message-logs/index.js";
@@ -132,6 +133,7 @@ export async function buildApp() {
   await app.register(reviewRequestRoutes, { prefix: "/api/v1" });
   await app.register(jobRoutes, { prefix: "/api/v1/jobs" });
   await app.register(jobEngagementRoutes, { prefix: "/api/v1/jobs" });
+  await app.register(jobEtaRoutes, { prefix: "/api/v1/jobs" });
   await app.register(messageLogRoutes, { prefix: "/api/v1" });
   await app.register(productRoutes, { prefix: "/api/v1" });
   await app.register(inventoryRoutes, { prefix: "/api/v1" });

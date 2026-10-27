@@ -340,6 +340,16 @@ export async function rejectAgentAction(companyId: string, actionId: string, rev
 
     assertAgentActionRejectable(toLifecycleSlice(row));
 
+    await getAgentActionExecutor(row.actionType)?.onRejectInTransaction?.({
+      tx,
+      companyId,
+      actionId,
+      actorId: reviewerId,
+      actionType: row.actionType,
+      target: row.target as CanonicalEntityRefV1,
+      parameters: (row.parameters as Record<string, unknown>) ?? {}
+    });
+
     const updatedRows = await tx
       .update(agentActions)
       .set({ state: "cancelled", reviewerId, updatedAt: new Date() })

@@ -1,5 +1,6 @@
 "use client";
 
+import "./crm-motion.css";
 import { StickyNote } from "lucide-react";
 
 import { useCustomerNotes } from "@/src/hooks/customer-crm.hooks";

@@ -21,6 +21,7 @@ type TableName =
   | "invoiceItems"
   | "payments"
   | "jobNotes"
+  | "customerNotes"
   | "jobPhotos"
   | "serviceAgreementTemplates"
   | "maintenancePlans"
@@ -534,6 +535,22 @@ export interface TestJobNoteRecord {
   authorId: string | null;
   content: string;
   isInternal: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date | null;
+}
+
+export interface TestCustomerNoteRecord {
+  id: string;
+  companyId: string;
+  customerId: string;
+  authorId: string | null;
+  content: string;
+  isInternal: boolean;
+  notedAt: Date | null;
+  sourceSystem: string | null;
+  sourceId: string | null;
+  importSessionId: string | null;
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;
@@ -2004,6 +2021,7 @@ type AnyTestRecord =
   | TestInvoiceItemRecord
   | TestPaymentRecord
   | TestJobNoteRecord
+  | TestCustomerNoteRecord
   | TestJobPhotoRecord
   | TestServiceAgreementTemplateRecord
   | TestMaintenancePlanRecord
@@ -2052,6 +2070,7 @@ type MockTable =
   | typeof invoiceItemsTable
   | typeof paymentsTable
   | typeof jobNotesTable
+  | typeof customerNotesTable
   | typeof jobPhotosTable
   | typeof serviceAgreementTemplatesTable
   | typeof maintenancePlansTable
@@ -2101,6 +2120,7 @@ interface TestState {
   invoiceItems: TestInvoiceItemRecord[];
   payments: TestPaymentRecord[];
   jobNotes: TestJobNoteRecord[];
+  customerNotes: TestCustomerNoteRecord[];
   jobPhotos: TestJobPhotoRecord[];
   serviceAgreementTemplates: TestServiceAgreementTemplateRecord[];
   maintenancePlans: TestMaintenancePlanRecord[];
@@ -2553,6 +2573,23 @@ const jobNotesTable = {
   authorId: "authorId",
   content: "content",
   isInternal: "isInternal",
+  createdAt: "createdAt",
+  updatedAt: "updatedAt",
+  deletedAt: "deletedAt"
+} as const;
+
+const customerNotesTable = {
+  __name: "customerNotes",
+  id: "id",
+  companyId: "companyId",
+  customerId: "customerId",
+  authorId: "authorId",
+  content: "content",
+  isInternal: "isInternal",
+  notedAt: "notedAt",
+  sourceSystem: "sourceSystem",
+  sourceId: "sourceId",
+  importSessionId: "importSessionId",
   createdAt: "createdAt",
   updatedAt: "updatedAt",
   deletedAt: "deletedAt"
@@ -3206,6 +3243,7 @@ const state: TestState = {
   invoiceItems: [],
   payments: [],
   jobNotes: [],
+  customerNotes: [],
   jobPhotos: [],
   serviceAgreementTemplates: [],
   maintenancePlans: [],
@@ -3263,6 +3301,7 @@ function restoreState(snapshot: TestState): void {
   state.invoiceItems.splice(0, state.invoiceItems.length, ...snapshot.invoiceItems);
   state.payments.splice(0, state.payments.length, ...snapshot.payments);
   state.jobNotes.splice(0, state.jobNotes.length, ...snapshot.jobNotes);
+  state.customerNotes.splice(0, state.customerNotes.length, ...snapshot.customerNotes);
   state.jobPhotos.splice(0, state.jobPhotos.length, ...snapshot.jobPhotos);
   state.serviceAgreementTemplates.splice(0, state.serviceAgreementTemplates.length, ...snapshot.serviceAgreementTemplates);
   state.maintenancePlans.splice(0, state.maintenancePlans.length, ...snapshot.maintenancePlans);
@@ -3342,6 +3381,8 @@ function getRows(tableName: TableName): AnyTestRecord[] {
       return state.payments;
     case "jobNotes":
       return state.jobNotes;
+    case "customerNotes":
+      return state.customerNotes;
     case "jobPhotos":
       return state.jobPhotos;
     case "serviceAgreementTemplates":
@@ -3951,6 +3992,29 @@ function createJobNoteRecord(
     authorId: values.authorId ?? null,
     content: values.content,
     isInternal: values.isInternal ?? true,
+    createdAt: values.createdAt ?? now,
+    updatedAt: values.updatedAt ?? now,
+    deletedAt: values.deletedAt ?? null
+  };
+}
+
+function createCustomerNoteRecord(
+  values: Partial<TestCustomerNoteRecord> &
+    Pick<TestCustomerNoteRecord, "companyId" | "customerId" | "content">
+): TestCustomerNoteRecord {
+  const now = new Date();
+
+  return {
+    id: values.id ?? nextId(),
+    companyId: values.companyId,
+    customerId: values.customerId,
+    authorId: values.authorId ?? null,
+    content: values.content,
+    isInternal: values.isInternal ?? true,
+    notedAt: values.notedAt ?? null,
+    sourceSystem: values.sourceSystem ?? null,
+    sourceId: values.sourceId ?? null,
+    importSessionId: values.importSessionId ?? null,
     createdAt: values.createdAt ?? now,
     updatedAt: values.updatedAt ?? now,
     deletedAt: values.deletedAt ?? null
@@ -4858,6 +4922,11 @@ function createRow(tableName: TableName, values: Record<string, unknown>): AnyTe
       return createJobNoteRecord(
         values as Partial<TestJobNoteRecord> & Pick<TestJobNoteRecord, "companyId" | "jobId" | "content">
       );
+    case "customerNotes":
+      return createCustomerNoteRecord(
+        values as Partial<TestCustomerNoteRecord> &
+          Pick<TestCustomerNoteRecord, "companyId" | "customerId" | "content">
+      );
     case "jobPhotos":
       return createJobPhotoRecord(
         values as Partial<TestJobPhotoRecord> & Pick<TestJobPhotoRecord, "companyId" | "jobId" | "url">
@@ -5327,6 +5396,7 @@ export const invoices = invoicesTable;
 export const invoiceItems = invoiceItemsTable;
 export const payments = paymentsTable;
 export const jobNotes = jobNotesTable;
+export const customerNotes = customerNotesTable;
 export const jobPhotos = jobPhotosTable;
 export const serviceAgreementTemplates = serviceAgreementTemplatesTable;
 export const maintenancePlans = maintenancePlansTable;
@@ -5765,6 +5835,7 @@ export function createDbModuleMock() {
     invoiceItems,
     payments,
     jobNotes,
+    customerNotes,
     jobPhotos,
     serviceAgreementTemplates,
     maintenancePlans,
@@ -5823,6 +5894,7 @@ export function resetTestState(): void {
   state.invoiceItems.length = 0;
   state.payments.length = 0;
   state.jobNotes.length = 0;
+  state.customerNotes.length = 0;
   state.jobPhotos.length = 0;
   state.serviceAgreementTemplates.length = 0;
   state.maintenancePlans.length = 0;
@@ -5986,6 +6058,15 @@ export function seedJobNote(
 ): TestJobNoteRecord {
   const record = createJobNoteRecord(values);
   state.jobNotes.push(record);
+  return record;
+}
+
+export function seedCustomerNote(
+  values: Partial<TestCustomerNoteRecord> &
+    Pick<TestCustomerNoteRecord, "companyId" | "customerId" | "content">
+): TestCustomerNoteRecord {
+  const record = createCustomerNoteRecord(values);
+  state.customerNotes.push(record);
   return record;
 }
 

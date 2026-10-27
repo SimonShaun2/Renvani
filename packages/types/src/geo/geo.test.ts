@@ -5,6 +5,7 @@ import {
   ETA_SPEED_MPH_MAX,
   ETA_SPEED_MPH_MIN,
   clampEtaSpeedMph,
+  estimateStraightLine,
   estimateStraightLineMinutes,
   haversineMiles,
   toGeoPoint
@@ -36,5 +37,14 @@ describe("geo primitives", () => {
     expect(toGeoPoint("91", "0")).toBeNull();
     expect(toGeoPoint("", "")).toBeNull();
     expect(toGeoPoint("41.5000000", "-87.2500000")).toEqual({ lat: 41.5, lng: -87.25 });
+  });
+
+  it("estimateStraightLine is the single shared helper (road factor + clamp + rounding)", () => {
+    const loop = { lat: 41.8781, lng: -87.6298 };
+    const ohare = { lat: 41.9742, lng: -87.9073 };
+    expect(estimateStraightLine(loop, ohare, 30)).toEqual({ minutes: 41, distanceMiles: 15.73 });
+    expect(estimateStraightLine(loop, ohare, 500)).toEqual({ minutes: 16, distanceMiles: 15.73 });
+    expect(estimateStraightLine(loop, ohare)).toEqual(estimateStraightLine(loop, ohare, ETA_SPEED_MPH_DEFAULT));
+    expect(estimateStraightLine(loop, loop, 30)).toEqual({ minutes: 1, distanceMiles: 0 });
   });
 });

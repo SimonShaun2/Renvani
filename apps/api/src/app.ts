@@ -46,6 +46,7 @@ import savedCardMigrationRoutes from "./routes/saved-card-migration/index.js";
 import dataExportRoutes from "./routes/data-exports/index.js";
 import jobEngagementRoutes from "./routes/job-engagement/index.js";
 import jobEtaRoutes from "./routes/job-eta/index.js";
+import { assertGeoProviderConfigured } from "./services/geo/geo-provider.registry.js";
 import jobRoutes from "./routes/jobs/index.js";
 import loyaltyRoutes from "./routes/loyalty/index.js";
 import messageLogRoutes from "./routes/message-logs/index.js";
@@ -164,6 +165,9 @@ export async function buildApp() {
   await app.register(qboSyncRoutes, { prefix: "/api/v1" });
   await app.register(publicRoutes, { prefix: "/api/v1/public" });
   await app.register(clerkWebhookRoutes, { prefix: "/api/v1/webhooks" });
+
+  // FS-198 follow-up: all geo providers are registered by now; fail fast on a bad GEO_PROVIDER.
+  assertGeoProviderConfigured(env.GEO_PROVIDER);
 
   return app;
 }

@@ -1,7 +1,7 @@
 import {
-  clampEtaSpeedMph,
-  estimateStraightLineMinutes,
-  haversineMiles,
+  AppError,
+  ErrorCode,
+  estimateStraightLine,
   type EtaConfidence,
   type EtaMethod,
   type GeoPoint
@@ -48,8 +48,24 @@ export function registerGeoProvider(provider: GeoProvider): void {
 
 export function getGeoProvider(id: string): GeoProvider {
   const provider = providers.get(id);
-  if (!provider) throw new Error(`GEO_PROVIDER_UNKNOWN:${id}`);
+  if (!provider) {
+    // Handled AppError (not a bare Error) so a misconfiguration never surfaces as an unhandled 500.
+    throw new AppError(ErrorCode.INTERNAL_ERROR, `GEO_PROVIDER_UNKNOWN: geo provider "${id}" is not registered`);
+  }
   return provider;
+}
+
+/**
+ * Boot-time check: fail fast when GEO_PROVIDER names an unregistered provider. Call after all
+ * plugins that may `registerGeoProvider` have loaded (buildApp does this after route registration).
+ */
+export function assertGeoProviderConfigured(providerId: string): void {
+  if (!providers.has(providerId)) {
+    throw new Error(
+      `GEO_PROVIDER="${providerId}" is not a registered geo provider (registered: ${listGeoProviderIds().join(", ") || "none"}). ` +
+        "Register it with registerGeoProvider() before startup or unset GEO_PROVIDER to use straight_line."
+    );
+  }
 }
 
 export function listGeoProviderIds(): string[] {
@@ -64,10 +80,8 @@ export const straightLineGeoProvider: GeoProvider = {
       : { status: "unavailable", reason: "missing_coordinates" };
   },
   async estimateTravel(origin, destination, options) {
-    const distanceMiles = haversineMiles(origin, destination);
     return {
-      minutes: estimateStraightLineMinutes(distanceMiles, clampEtaSpeedMph(options.assumedSpeedMph)),
-      distanceMiles: Math.round(distanceMiles * 100) / 100,
+      ...estimateStraightLine(origin, destination, options.assumedSpeedMph),
       method: "straight_line_estimate",
       confidence: "low"
     };

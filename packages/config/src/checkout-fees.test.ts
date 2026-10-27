@@ -4,10 +4,13 @@ import {
   computeCheckoutFees,
   computeRefundableCents,
   computeServiceFeeCents,
+  formatServiceFeeLineItemName,
   moneyStringToCents,
   ONLINE_BOOKING_FEE_CENTS,
   RENVANI_PLAN_MONTHLY_PRICE_CENTS,
-  renvaniPlanAnnualPriceCents
+  renvaniPlanAnnualPriceCents,
+  SERVICE_FEE_RATE_BPS,
+  serviceFeeRateBpsForPlan
 } from "./stripe-pricing.js";
 
 describe("checkout fees", () => {
@@ -62,5 +65,44 @@ describe("checkout fees", () => {
     expect(moneyStringToCents("150.00")).toBe(15_000);
     expect(moneyStringToCents("0.29")).toBe(29);
     expect(moneyStringToCents("1.005")).toBe(101);
+  });
+
+  describe("per plan (Flat pays no Service Fee; booking fee on every plan)", () => {
+    const cases = [
+      { plan: "flex", rate: 200, service: 247 },
+      { plan: "founding", rate: 200, service: 247 },
+      { plan: "startup", rate: 200, service: 247 },
+      { plan: "flat", rate: 0, service: 0 },
+      { plan: null, rate: 200, service: 247 },
+      { plan: undefined, rate: 200, service: 247 }
+    ] as const;
+
+    for (const c of cases) {
+      it(`${String(c.plan)}: rate ${c.rate} bps, service ${c.service}c, booking 199c`, () => {
+        expect(serviceFeeRateBpsForPlan(c.plan)).toBe(c.rate);
+        const online = computeCheckoutFees({ chargeCents: 12_325, isOnlineBooking: true, paysInvoiceInFull: true, plan: c.plan });
+        expect(online).toEqual({
+          chargeCents: 12_325,
+          serviceFeeCents: c.service,
+          bookingFeeCents: 199,
+          totalCents: 12_325 + c.service + 199,
+          serviceFeeRateBps: c.rate,
+          feeRefundable: false
+        });
+        const partial = computeCheckoutFees({ chargeCents: 12_325, isOnlineBooking: true, paysInvoiceInFull: false, plan: c.plan });
+        expect(partial.bookingFeeCents).toBe(0);
+        expect(partial.serviceFeeCents).toBe(c.service);
+        // rounding half up: 25c -> 0.5c -> 1c on fee plans, 0 on Flat
+        expect(computeCheckoutFees({ chargeCents: 25, isOnlineBooking: false, paysInvoiceInFull: true, plan: c.plan }).serviceFeeCents)
+          .toBe(c.rate > 0 ? 1 : 0);
+        expect(computeCheckoutFees({ chargeCents: 0, isOnlineBooking: true, paysInvoiceInFull: true, plan: c.plan }).totalCents).toBe(0);
+      });
+    }
+  });
+
+  it("Service Fee label derives from the rate", () => {
+    expect(formatServiceFeeLineItemName()).toBe("Service Fee (2%)");
+    expect(formatServiceFeeLineItemName(SERVICE_FEE_RATE_BPS)).toBe("Service Fee (2%)");
+    expect(formatServiceFeeLineItemName(250)).toBe("Service Fee (2.5%)");
   });
 });

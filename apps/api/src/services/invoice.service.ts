@@ -11,8 +11,7 @@ import {
   computeCheckoutFees,
   computeRefundableCents,
   customerPlatformFeeDisclosure,
-  moneyStringToCents,
-  SERVICE_FEE_RATE_BPS
+  moneyStringToCents
 } from "@fsm/config/stripe-pricing";
 import {
   activityEvents,
@@ -52,6 +51,7 @@ import {
   type UpdateInvoiceInput
 } from "@fsm/types";
 
+import { readRenvaniSubscriptionPlan } from "../lib/company-renvani-plan.js";
 import { generateInvoiceNumber } from "../lib/invoice-number.js";
 import { featureFlags } from "@fsm/config/feature-flags";
 import {
@@ -776,11 +776,15 @@ export async function getPublicInvoicePaymentLink(token: string): Promise<Public
     throw new AppError(ErrorCode.CONFLICT, "Invoice payment link is unavailable");
   }
 
-  const isOnlineBooking = await isInvoiceFromOnlineBooking(invoice, db);
+  const [isOnlineBooking, company] = await Promise.all([
+    isInvoiceFromOnlineBooking(invoice, db),
+    getCompanyRecord(invoice.companyId, db)
+  ]);
   const fees = computeCheckoutFees({
     chargeCents: moneyStringToCents(invoice.balanceDue),
     isOnlineBooking,
-    paysInvoiceInFull: true
+    paysInvoiceInFull: true,
+    plan: readRenvaniSubscriptionPlan(company)
   });
   const totalFeeCents = fees.serviceFeeCents + fees.bookingFeeCents;
 
@@ -809,7 +813,7 @@ export async function getPublicInvoicePaymentLink(token: string): Promise<Public
     bookingFeeCents: fees.bookingFeeCents,
     totalDueCents: fees.totalCents,
     feeRefundable: false,
-    platformFeePercent: totalFeeCents > 0 ? SERVICE_FEE_RATE_BPS / 100 : null,
+    platformFeePercent: fees.serviceFeeCents > 0 ? fees.serviceFeeRateBps / 100 : null,
     platformFeePaidByCustomer: totalFeeCents > 0,
     platformFeeDisclosure: disclosure.length > 0 ? disclosure : null
   };
@@ -1042,6 +1046,7 @@ export async function sendInvoice(
       total: existingInvoice.balanceDue,
       paymentToken,
       isOnlineBooking: await isInvoiceFromOnlineBooking(existingInvoice, db),
+      renvaniPlan: readRenvaniSubscriptionPlan(company),
       items: items.map((item) => ({
         name: item.name,
         description: item.description,

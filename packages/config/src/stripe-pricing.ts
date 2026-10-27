@@ -130,8 +130,25 @@ export function renvaniPlanAnnualPriceCents(plan: RenvaniPlanId): number {
   return RENVANI_PLAN_MONTHLY_PRICE_CENTS[plan] * 10;
 }
 
-/** Customer-paid Service Fee rate in basis points (200 bps = 2%). Applies on every plan. */
+/** Customer-paid Service Fee rate in basis points (200 bps = 2%). Applies on Flex, Founding, Startup (not Flat). */
 export const SERVICE_FEE_RATE_BPS = 200;
+
+/** Plans whose customers pay NO Service Fee (published pricing: Flat is fee-free; booking fee still applies). */
+export const SERVICE_FEE_EXEMPT_PLANS: ReadonlySet<RenvaniPlanId> = new Set<RenvaniPlanId>(["flat"]);
+
+/**
+ * Service Fee rate (bps) for a tenant's plan. Flat -> 0. Flex/Founding/Startup -> SERVICE_FEE_RATE_BPS.
+ * Unknown/missing plan defaults to SERVICE_FEE_RATE_BPS (fail closed on revenue, matches pre-plan behavior).
+ */
+export function serviceFeeRateBpsForPlan(plan: RenvaniPlanId | null | undefined): number {
+  return plan && SERVICE_FEE_EXEMPT_PLANS.has(plan) ? 0 : SERVICE_FEE_RATE_BPS;
+}
+
+/** Customer-facing Service Fee line label derived from the rate, e.g. 200 -> "Service Fee (2%)". */
+export function formatServiceFeeLineItemName(rateBps: number = SERVICE_FEE_RATE_BPS): string {
+  const pct = Number((rateBps / 100).toFixed(2));
+  return `Service Fee (${pct}%)`;
+}
 
 /** Flat online-booking fee in cents; charged on every plan (Flat included). */
 export const ONLINE_BOOKING_FEE_CENTS = 199;
@@ -151,12 +168,13 @@ export function computeServiceFeeCents(chargeCents: number, rateBps: number = SE
 export interface CheckoutFeeBreakdown {
   /** Amount applied to the invoice (shop revenue); never includes fees. */
   chargeCents: number;
-  /** 2% customer-paid Service Fee, separate line, non-refundable. */
+  /** 2% customer-paid Service Fee (0 on Flat), separate line, non-refundable. */
   serviceFeeCents: number;
   /** $1.99 online-booking fee; non-zero only when this checkout pays an online-booked invoice in full. */
   bookingFeeCents: number;
   /** chargeCents + serviceFeeCents + bookingFeeCents. */
   totalCents: number;
+  /** Effective Service Fee rate for this checkout's plan (0 on Flat). */
   serviceFeeRateBps: number;
   /** Fees are never refunded; refunds are capped at chargeCents. */
   feeRefundable: false;
@@ -168,12 +186,15 @@ export interface CheckoutFeeInput {
   isOnlineBooking: boolean;
   /** This checkout settles the invoice's full remaining balance (invoice ends PAID). */
   paysInvoiceInFull: boolean;
+  /** Tenant's Renvani plan. Flat pays no Service Fee; unknown/null is charged the standard rate. */
+  plan?: RenvaniPlanId | null;
 }
 
 /** Fees for a customer checkout. Only call for customer checkout (not manual record-payment). */
 export function computeCheckoutFees(input: CheckoutFeeInput): CheckoutFeeBreakdown {
   const chargeCents = Number.isInteger(input.chargeCents) && input.chargeCents > 0 ? input.chargeCents : 0;
-  const serviceFeeCents = computeServiceFeeCents(chargeCents);
+  const serviceFeeRateBps = serviceFeeRateBpsForPlan(input.plan);
+  const serviceFeeCents = computeServiceFeeCents(chargeCents, serviceFeeRateBps);
   const bookingFeeCents =
     chargeCents > 0 && input.isOnlineBooking && input.paysInvoiceInFull ? ONLINE_BOOKING_FEE_CENTS : 0;
 
@@ -182,7 +203,7 @@ export function computeCheckoutFees(input: CheckoutFeeInput): CheckoutFeeBreakdo
     serviceFeeCents,
     bookingFeeCents,
     totalCents: chargeCents + serviceFeeCents + bookingFeeCents,
-    serviceFeeRateBps: SERVICE_FEE_RATE_BPS,
+    serviceFeeRateBps,
     feeRefundable: false
   };
 }

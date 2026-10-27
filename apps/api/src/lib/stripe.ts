@@ -14,7 +14,10 @@ import {
   RENVANI_STRIPE_BRAND
 } from "@fsm/config/stripe-branding";
 import {
-  computeCheckoutFees
+  computeCheckoutFees,
+  formatServiceFeeLineItemName,
+  type RenvaniPlanId,
+  SERVICE_FEE_RATE_BPS
 } from "@fsm/config/stripe-pricing";
 
 const stripe = new Stripe(env.STRIPE_SECRET_KEY);
@@ -26,7 +29,7 @@ export interface InvoiceCheckoutLineItem {
   total: string;
 }
 
-export const SERVICE_FEE_LINE_ITEM_NAME = "Service Fee (2%)";
+export const SERVICE_FEE_LINE_ITEM_NAME = formatServiceFeeLineItemName(SERVICE_FEE_RATE_BPS);
 export const ONLINE_BOOKING_FEE_LINE_ITEM_NAME = "Online booking fee";
 
 export interface CreateInvoiceCheckoutSessionInput {
@@ -43,6 +46,8 @@ export interface CreateInvoiceCheckoutSessionInput {
   paymentToken: string;
   /** Invoice's job came from public online booking ($1.99 booking fee applies when paid at checkout). */
   isOnlineBooking: boolean;
+  /** Tenant's Renvani plan; Flat pays no Service Fee (no Service Fee line is sent to Stripe). */
+  renvaniPlan: RenvaniPlanId | null;
 }
 
 export interface InvoiceCheckoutSessionResult {
@@ -187,7 +192,8 @@ export async function createInvoiceCheckoutSession(
   const fees = computeCheckoutFees({
     chargeCents: toCents(input.total),
     isOnlineBooking: input.isOnlineBooking,
-    paysInvoiceInFull: true
+    paysInvoiceInFull: true,
+    plan: input.renvaniPlan
   });
   const applicationFeeAmount = fees.serviceFeeCents + fees.bookingFeeCents;
   const appBaseUrl = env.APP_URL.replace(/\/$/, "");
@@ -235,8 +241,8 @@ export async function createInvoiceCheckoutSession(
         currency: "usd",
         unit_amount: fees.serviceFeeCents,
         product_data: {
-          name: SERVICE_FEE_LINE_ITEM_NAME,
-          description: "2% Service Fee (non-refundable). Your service provider receives the full invoice amount."
+          name: formatServiceFeeLineItemName(fees.serviceFeeRateBps),
+          description: `${fees.serviceFeeRateBps / 100}% Service Fee (non-refundable). Your service provider receives the full invoice amount.`
         }
       }
     });

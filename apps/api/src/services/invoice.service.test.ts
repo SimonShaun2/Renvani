@@ -691,11 +691,15 @@ describe("invoice.service", () => {
     await invoiceService.sendInvoice(company.id, actor.id, invoice.id);
 
     expect(createInvoiceCheckoutSessionMock).toHaveBeenCalledWith(
-      expect.objectContaining({ isOnlineBooking: true, total: "100.00" })
+      expect.objectContaining({ isOnlineBooking: true, total: "100.00", renvaniPlan: "flat" })
     );
   });
 
-  it("getPublicInvoicePaymentLink returns the fee breakdown (2% Service Fee + $1.99 booking fee) on every plan", async () => {
+  it("getPublicInvoicePaymentLink: Flex pays 2% Service Fee + $1.99 booking fee; Flat pays only the booking fee (fields stay, 0)", async () => {
+    const expected = {
+      flex: { serviceFeeAmount: "2.47", platformFeeAmount: "4.46", totalDue: "127.71", serviceFeeCents: 247, totalDueCents: 12_771, platformFeePercent: 2 },
+      flat: { serviceFeeAmount: "0.00", platformFeeAmount: "1.99", totalDue: "125.24", serviceFeeCents: 0, totalDueCents: 12_524, platformFeePercent: null }
+    } as const;
     for (const planTier of ["flat", "flex"] as const) {
       const { company } = createAdminContext();
       company.settings = { stripePlatformBilling: { planTier } } as typeof company.settings;
@@ -724,15 +728,12 @@ describe("invoice.service", () => {
 
       expect(link).toMatchObject({
         invoiceAmount: "123.25",
-        serviceFeeAmount: "2.47",
         bookingFeeAmount: "1.99",
-        platformFeeAmount: "4.46",
-        totalDue: "127.71",
         invoiceAmountCents: 12_325,
-        serviceFeeCents: 247,
         bookingFeeCents: 199,
-        totalDueCents: 12_771,
-        feeRefundable: false
+        feeRefundable: false,
+        platformFeePaidByCustomer: true,
+        ...expected[planTier]
       });
     }
   });

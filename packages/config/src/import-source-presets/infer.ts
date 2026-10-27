@@ -45,6 +45,14 @@ export function inferImportSourcePresetFromHeaders(
       continue;
     }
 
+    // Properties export: one Property ID (sourceId) plus its parent Client ID (customerSourceId).
+    if (
+      preset.id === "jobber_properties" &&
+      (!normalizedHeaders.has("property id") || !normalizedHeaders.has("client id"))
+    ) {
+      continue;
+    }
+
     if (score < 3) {
       continue;
     }

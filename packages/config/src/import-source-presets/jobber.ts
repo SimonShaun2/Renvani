@@ -12,7 +12,20 @@ export const JOBBER_PRESETS: ImportSourcePreset[] = [
       email: "email",
       phone: "phone",
       "mobile phone": "phone",
+      street: "addressLine1",
+      city: "city",
+      state: "state",
+      zip: "zip",
+      "postal code": "zip"
+    }
+  },
+  {
+    id: "jobber_properties",
+    entity: "customers",
+    label: "Jobber (properties)",
+    headerAliases: {
       "property id": "sourceId",
+      "client id": "customerSourceId",
       "property name": "addressLine1",
       street: "addressLine1",
       city: "city",

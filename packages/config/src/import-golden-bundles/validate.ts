@@ -222,7 +222,7 @@ function validateJobberPresetInference(
     { presetId: string; entityHint: "customers" | "products" | "invoices" }
   > = {
     "clients.csv": { presetId: "jobber", entityHint: "customers" },
-    "properties.csv": { presetId: "jobber", entityHint: "customers" },
+    "properties.csv": { presetId: "jobber_properties", entityHint: "customers" },
     "jobs.csv": { presetId: "jobber_jobs", entityHint: "customers" },
     "invoices.csv": { presetId: "jobber_invoices", entityHint: "invoices" },
     "payments.csv": { presetId: "jobber_payments", entityHint: "invoices" },

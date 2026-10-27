@@ -4,6 +4,7 @@
 
 export type ImportSourcePresetId =
   | "jobber"
+  | "jobber_properties"
   | "jobber_jobs"
   | "jobber_invoices"
   | "jobber_payments"

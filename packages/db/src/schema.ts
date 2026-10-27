@@ -1688,6 +1688,65 @@ export const jobProducts = pgTable("job_products", {
   jobIdx: index("job_products_job_idx").on(t.jobId),
 }));
 
+// FS-170 inventory: stock locations, per-location levels, append-only movements.
+export const stockLocationKindEnum = pgEnum("stock_location_kind", ["warehouse", "van"]);
+export const stockMovementKindEnum = pgEnum("stock_movement_kind", [
+  "adjustment",
+  "transfer_out",
+  "transfer_in",
+  "job_usage",
+]);
+
+export const stockLocations = pgTable("stock_locations", {
+  id: id(),
+  companyId: companyId(),
+  name: varchar("name", { length: 255 }).notNull(),
+  kind: stockLocationKindEnum("kind").notNull(),
+  technicianId: uuid("technician_id").references(() => technicians.id, { onDelete: "set null" }),
+  isActive: boolean("is_active").notNull().default(true),
+  ...timestamps,
+}, (t) => ({
+  companyIdx: index("stock_locations_company_idx").on(t.companyId),
+}));
+
+export const stockLevels = pgTable("stock_levels", {
+  id: id(),
+  companyId: companyId(),
+  locationId: uuid("location_id").notNull().references(() => stockLocations.id, { onDelete: "cascade" }),
+  productId: uuid("product_id").notNull().references(() => productCatalog.id, { onDelete: "cascade" }),
+  quantity: integer("quantity").notNull().default(0),
+  lowStockThreshold: integer("low_stock_threshold"),
+  ...timestamps,
+}, (t) => ({
+  companyIdx: index("stock_levels_company_idx").on(t.companyId),
+  locationProductIdx: uniqueIndex("stock_levels_company_location_product_idx").on(
+    t.companyId,
+    t.locationId,
+    t.productId
+  ),
+}));
+
+/** Append-only audit trail; UPDATE/DELETE are rejected by a trigger (migration 0044). */
+export const stockMovements = pgTable("stock_movements", {
+  id: id(),
+  companyId: companyId(),
+  locationId: uuid("location_id").notNull().references(() => stockLocations.id, { onDelete: "cascade" }),
+  productId: uuid("product_id").notNull().references(() => productCatalog.id, { onDelete: "cascade" }),
+  kind: stockMovementKindEnum("kind").notNull(),
+  quantityDelta: integer("quantity_delta").notNull(),
+  quantityAfter: integer("quantity_after").notNull(),
+  reason: text("reason"),
+  jobId: uuid("job_id").references(() => jobs.id, { onDelete: "set null" }),
+  transferGroupId: uuid("transfer_group_id"),
+  allowNegative: boolean("allow_negative").notNull().default(false),
+  actorUserId: uuid("actor_user_id").references(() => users.id, { onDelete: "set null" }),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+}, (t) => ({
+  companyIdx: index("stock_movements_company_idx").on(t.companyId),
+  locationProductIdx: index("stock_movements_location_product_idx").on(t.locationId, t.productId),
+  jobIdx: index("stock_movements_job_idx").on(t.jobId),
+}));
+
 export const timeEntries = pgTable("time_entries", {
   id: id(),
   companyId: companyId(),

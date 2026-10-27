@@ -32,6 +32,9 @@ type TableName =
   | "campaignRecipients"
   | "messageLogs"
   | "productCatalog"
+  | "stockLocations"
+  | "stockLevels"
+  | "stockMovements"
   | "technicians"
   | "jobTasks"
   | "jobProducts"
@@ -1994,6 +1997,9 @@ export interface TestBookingSettingsRecord {
 }
 
 type AnyTestRecord =
+  | TestStockLocationRecord
+  | TestStockLevelRecord
+  | TestStockMovementRecord
   | TestCompanyRecord
   | TestUserRecord
   | TestRefreshTokenRecord
@@ -2069,6 +2075,9 @@ type MockTable =
   | typeof campaignRecipientsTable
   | typeof messageLogsTable
   | typeof productCatalogTable
+  | typeof stockLocationsTable
+  | typeof stockLevelsTable
+  | typeof stockMovementsTable
   | typeof techniciansTable
   | typeof jobTasksTable
   | typeof jobProductsTable
@@ -2118,6 +2127,9 @@ interface TestState {
   campaignRecipients: TestCampaignRecipientRecord[];
   messageLogs: TestMessageLogRecord[];
   productCatalog: TestProductCatalogRecord[];
+  stockLocations: TestStockLocationRecord[];
+  stockLevels: TestStockLevelRecord[];
+  stockMovements: TestStockMovementRecord[];
   technicians: TestTechnicianRecord[];
   jobTasks: TestJobTaskRecord[];
   jobProducts: TestJobProductRecord[];
@@ -2781,6 +2793,121 @@ const messageLogsTable = {
   deletedAt: "deletedAt"
 } as const;
 
+// FS-170 inventory tables.
+export interface TestStockLocationRecord {
+  id: string;
+  companyId: string;
+  name: string;
+  kind: "warehouse" | "van";
+  technicianId: string | null;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date | null;
+}
+
+export interface TestStockLevelRecord {
+  id: string;
+  companyId: string;
+  locationId: string;
+  productId: string;
+  quantity: number;
+  lowStockThreshold: number | null;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date | null;
+}
+
+export interface TestStockMovementRecord {
+  id: string;
+  companyId: string;
+  locationId: string;
+  productId: string;
+  kind: "adjustment" | "transfer_out" | "transfer_in" | "job_usage";
+  quantityDelta: number;
+  quantityAfter: number;
+  reason: string | null;
+  jobId: string | null;
+  transferGroupId: string | null;
+  allowNegative: boolean;
+  actorUserId: string | null;
+  createdAt: Date;
+}
+
+const stockLocationsTable = {
+  __name: "stockLocations",
+  id: "id", companyId: "companyId", name: "name", kind: "kind", technicianId: "technicianId",
+  isActive: "isActive", createdAt: "createdAt", updatedAt: "updatedAt", deletedAt: "deletedAt"
+} as const;
+
+const stockLevelsTable = {
+  __name: "stockLevels",
+  id: "id", companyId: "companyId", locationId: "locationId", productId: "productId", quantity: "quantity",
+  lowStockThreshold: "lowStockThreshold", createdAt: "createdAt", updatedAt: "updatedAt", deletedAt: "deletedAt"
+} as const;
+
+const stockMovementsTable = {
+  __name: "stockMovements",
+  id: "id", companyId: "companyId", locationId: "locationId", productId: "productId", kind: "kind",
+  quantityDelta: "quantityDelta", quantityAfter: "quantityAfter", reason: "reason", jobId: "jobId",
+  transferGroupId: "transferGroupId", allowNegative: "allowNegative", actorUserId: "actorUserId", createdAt: "createdAt"
+} as const;
+
+function createStockLocationRecord(
+  values: Partial<TestStockLocationRecord> & Pick<TestStockLocationRecord, "companyId" | "name" | "kind">
+): TestStockLocationRecord {
+  const now = new Date();
+  return {
+    id: values.id ?? nextId(), companyId: values.companyId, name: values.name, kind: values.kind,
+    technicianId: values.technicianId ?? null, isActive: values.isActive ?? true,
+    createdAt: values.createdAt ?? now, updatedAt: values.updatedAt ?? now, deletedAt: values.deletedAt ?? null
+  };
+}
+
+function createStockLevelRecord(
+  values: Partial<TestStockLevelRecord> & Pick<TestStockLevelRecord, "companyId" | "locationId" | "productId">
+): TestStockLevelRecord {
+  const now = new Date();
+  return {
+    id: values.id ?? nextId(), companyId: values.companyId, locationId: values.locationId, productId: values.productId,
+    quantity: values.quantity ?? 0, lowStockThreshold: values.lowStockThreshold ?? null,
+    createdAt: values.createdAt ?? now, updatedAt: values.updatedAt ?? now, deletedAt: values.deletedAt ?? null
+  };
+}
+
+function createStockMovementRecord(
+  values: Partial<TestStockMovementRecord> &
+    Pick<TestStockMovementRecord, "companyId" | "locationId" | "productId" | "kind" | "quantityDelta" | "quantityAfter">
+): TestStockMovementRecord {
+  return {
+    id: values.id ?? nextId(), companyId: values.companyId, locationId: values.locationId, productId: values.productId,
+    kind: values.kind, quantityDelta: values.quantityDelta, quantityAfter: values.quantityAfter,
+    reason: values.reason ?? null, jobId: values.jobId ?? null, transferGroupId: values.transferGroupId ?? null,
+    allowNegative: values.allowNegative ?? false, actorUserId: values.actorUserId ?? null,
+    createdAt: values.createdAt ?? new Date()
+  };
+}
+
+export function seedStockLocation(
+  values: Partial<TestStockLocationRecord> & Pick<TestStockLocationRecord, "companyId" | "name" | "kind">
+): TestStockLocationRecord {
+  const record = createStockLocationRecord(values);
+  state.stockLocations.push(record);
+  return record;
+}
+
+export function seedStockLevel(
+  values: Partial<TestStockLevelRecord> & Pick<TestStockLevelRecord, "companyId" | "locationId" | "productId">
+): TestStockLevelRecord {
+  const record = createStockLevelRecord(values);
+  state.stockLevels.push(record);
+  return record;
+}
+
+export function getStockMovements(): TestStockMovementRecord[] {
+  return state.stockMovements;
+}
+
 const productCatalogTable = {
   __name: "productCatalog",
   id: "id",
@@ -3226,6 +3353,9 @@ const state: TestState = {
   campaignRecipients: [],
   messageLogs: [],
   productCatalog: [],
+  stockLocations: [],
+  stockLevels: [],
+  stockMovements: [],
   technicians: [],
   jobTasks: [],
   jobProducts: [],
@@ -3282,6 +3412,9 @@ function restoreState(snapshot: TestState): void {
   state.campaignRecipients.splice(0, state.campaignRecipients.length, ...snapshot.campaignRecipients);
   state.messageLogs.splice(0, state.messageLogs.length, ...snapshot.messageLogs);
   state.productCatalog.splice(0, state.productCatalog.length, ...snapshot.productCatalog);
+  state.stockLocations.splice(0, state.stockLocations.length, ...snapshot.stockLocations);
+  state.stockLevels.splice(0, state.stockLevels.length, ...snapshot.stockLevels);
+  state.stockMovements.splice(0, state.stockMovements.length, ...snapshot.stockMovements);
   state.technicians.splice(0, state.technicians.length, ...snapshot.technicians);
   state.jobTasks.splice(0, state.jobTasks.length, ...snapshot.jobTasks);
   state.jobProducts.splice(0, state.jobProducts.length, ...snapshot.jobProducts);
@@ -3373,6 +3506,12 @@ function getRows(tableName: TableName): AnyTestRecord[] {
       return state.messageLogs;
     case "productCatalog":
       return state.productCatalog;
+    case "stockLocations":
+      return state.stockLocations;
+    case "stockLevels":
+      return state.stockLevels;
+    case "stockMovements":
+      return state.stockMovements;
     case "technicians":
       return state.technicians;
     case "jobTasks":
@@ -4932,6 +5071,12 @@ function createRow(tableName: TableName, values: Record<string, unknown>): AnyTe
         values as Partial<TestMessageLogRecord> &
           Pick<TestMessageLogRecord, "companyId" | "channel" | "direction" | "toAddress" | "body">
       );
+    case "stockLocations":
+      return createStockLocationRecord(values as Partial<TestStockLocationRecord> & Pick<TestStockLocationRecord, "companyId" | "name" | "kind">);
+    case "stockLevels":
+      return createStockLevelRecord(values as Partial<TestStockLevelRecord> & Pick<TestStockLevelRecord, "companyId" | "locationId" | "productId">);
+    case "stockMovements":
+      return createStockMovementRecord(values as Partial<TestStockMovementRecord> & Pick<TestStockMovementRecord, "companyId" | "locationId" | "productId" | "kind" | "quantityDelta" | "quantityAfter">);
     case "productCatalog":
       return createProductCatalogRecord(
         values as Partial<TestProductCatalogRecord> &
@@ -5350,6 +5495,9 @@ export const campaigns = campaignsTable;
 export const campaignRecipients = campaignRecipientsTable;
 export const messageLogs = messageLogsTable;
 export const productCatalog = productCatalogTable;
+export const stockLocations = stockLocationsTable;
+export const stockLevels = stockLevelsTable;
+export const stockMovements = stockMovementsTable;
 export const technicians = techniciansTable;
 export const jobTasks = jobTasksTable;
 export const jobProducts = jobProductsTable;
@@ -5788,6 +5936,9 @@ export function createDbModuleMock() {
     campaignRecipients,
     messageLogs,
     productCatalog,
+    stockLocations,
+    stockLevels,
+    stockMovements,
     technicians,
     jobTasks,
     jobProducts,
@@ -5846,6 +5997,9 @@ export function resetTestState(): void {
   state.campaignRecipients.length = 0;
   state.messageLogs.length = 0;
   state.productCatalog.length = 0;
+  state.stockLocations.length = 0;
+  state.stockLevels.length = 0;
+  state.stockMovements.length = 0;
   state.technicians.length = 0;
   state.jobTasks.length = 0;
   state.jobProducts.length = 0;

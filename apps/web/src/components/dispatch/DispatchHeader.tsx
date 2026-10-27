@@ -1,5 +1,6 @@
 "use client";
 
+import "./dispatch-motion.css";
 import { AlertTriangle, RefreshCw } from "lucide-react";
 
 import { cn } from "@/src/lib/utils";

@@ -13,8 +13,16 @@ import { useAuthStore } from "@/src/stores/auth.store";
 import { formatDateTime, formatStatusLabel } from "../jobs/jobs.utils";
 import { EmptyState } from "../ui/EmptyState";
 import { SkeletonCard } from "../ui/SkeletonCard";
-import { StatBadge } from "../ui/StatBadge";
-import { PAYMENT_METHODS, PAYMENT_STATUSES, formatMoney, paymentStatusTone, serviceFeeLabel } from "./payments.utils";
+import {
+  PAYMENT_METHODS,
+  STATUS_CHIPS,
+  formatMoney,
+  formatShortDate,
+  paymentChipClass,
+  paymentStatusLabel,
+  serviceFeeColumnLabel,
+  serviceFeeLabel
+} from "./payments.utils";
 
 type Tab = "overview" | "payouts" | "transactions" | "disputes";
 const TABS: { key: Tab; label: string }[] = [
@@ -24,15 +32,15 @@ const TABS: { key: Tab; label: string }[] = [
   { key: "disputes", label: "Disputes" }
 ];
 
-const card = "rounded-2xl border border-[#e6dccb] bg-white p-5";
+const card = "rounded-[14px] border border-[#e6dccb] bg-white p-5";
 const input = "h-10 rounded-xl border border-[#e6dccb] bg-white px-3 text-sm text-[#0f1530] outline-none focus:border-[#f6b400]";
 
-function StatCard({ label, value, hint, loading }: { label: string; value: string; hint?: string; loading?: boolean }) {
+function StatCard({ label, value, hint, loading, hintTone }: { label: string; value: string; hint?: string; loading?: boolean; hintTone?: "danger" | undefined }) {
   return (
     <div className={card}>
-      <p className="text-[11px] font-medium uppercase tracking-wider text-[#5e6684]">{label}</p>
+      <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-[#5e6684]">{label}</p>
       <p className="mt-2 text-[28px] font-semibold tracking-tight text-[#0f1530]">{loading ? "…" : value}</p>
-      {hint ? <p className="mt-1 text-xs text-[#5e6684]">{hint}</p> : null}
+      {hint ? <p className={hintTone === "danger" ? "mt-1 text-xs text-[#b3261e]" : "mt-1 text-xs text-[#5e6684]"}>{hint}</p> : null}
     </div>
   );
 }
@@ -77,32 +85,46 @@ function DashboardButton({ label = "Open Stripe dashboard" }: { label?: string }
   );
 }
 
-function TransactionsTable({ rows }: { rows: PaymentListRecord[] }) {
+export function StatusChip({ status }: { status: string }) {
   return (
-    <div className="overflow-x-auto rounded-2xl border border-[#e6dccb] bg-white">
+    <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${paymentChipClass(status)}`}>
+      {paymentStatusLabel(status)}
+    </span>
+  );
+}
+
+function TransactionsTable({ rows, feeColumn }: { rows: PaymentListRecord[]; feeColumn: string | null }) {
+  return (
+    <div className="overflow-x-auto rounded-[14px] border border-[#e6dccb] bg-white">
       <table className="w-full text-left text-sm">
-        <thead className="bg-[#faf6ee] text-xs uppercase tracking-wide text-[#5e6684]">
+        <thead className="bg-[#f3eadb] font-mono text-[10px] uppercase tracking-[0.12em] text-[#5e6684]">
           <tr>
             <th className="px-4 py-3 font-medium">Date</th>
             <th className="px-4 py-3 font-medium">Invoice</th>
             <th className="px-4 py-3 font-medium">Method</th>
             <th className="px-4 py-3 font-medium">Amount</th>
+            {feeColumn ? <th className="px-4 py-3 font-medium">{feeColumn}</th> : null}
             <th className="px-4 py-3 font-medium">Status</th>
           </tr>
         </thead>
         <tbody>
           {rows.map((payment) => (
             <tr key={payment.id} className="border-t border-[#e6dccb]">
-              <td className="px-4 py-3 text-[#2a3360]">{formatDateTime(payment.paidAt ?? payment.createdAt)}</td>
+              <td className="px-4 py-3 text-[#0f1530]">{formatShortDate(payment.paidAt ?? payment.createdAt)}</td>
               <td className="px-4 py-3">
-                <Link href={`/invoices/${payment.invoiceId}`} className="font-medium text-[#0f1530] hover:underline">
+                <Link href={`/invoices/${payment.invoiceId}`} className="text-[#0f1530] hover:underline">
                   View invoice
                 </Link>
               </td>
-              <td className="px-4 py-3 text-[#2a3360]">{formatStatusLabel(payment.method)}</td>
-              <td className="px-4 py-3 font-semibold text-[#0f1530]">{formatMoney(payment.amount)}</td>
+              <td className="px-4 py-3 text-[#0f1530]">{formatStatusLabel(payment.method)}</td>
+              <td className="px-4 py-3 text-[#0f1530]">{formatMoney(payment.amount)}</td>
+              {feeColumn ? (
+                <td className="px-4 py-3 text-[#0f1530]">
+                  {payment.serviceFeeAmount !== undefined ? formatMoney(payment.serviceFeeAmount) : "—"}
+                </td>
+              ) : null}
               <td className="px-4 py-3">
-                <StatBadge label={formatStatusLabel(payment.status)} tone={paymentStatusTone(payment.status)} />
+                <StatusChip status={payment.status} />
               </td>
             </tr>
           ))}
@@ -143,7 +165,7 @@ function ListState({
   return <>{children(rows)}</>;
 }
 
-function TransactionsTab() {
+function TransactionsTab({ feeColumn, feeNote }: { feeColumn: string | null; feeNote: string | null }) {
   const [status, setStatus] = useState("all");
   const [method, setMethod] = useState("all");
   const [from, setFrom] = useState("");
@@ -158,16 +180,24 @@ function TransactionsTab() {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-end gap-3 rounded-2xl border border-[#e6dccb] bg-white p-4">
-        <label className="flex flex-col gap-1 text-xs font-medium text-[#5e6684]">
-          Status
-          <select aria-label="Status" className={input} value={status} onChange={(e) => reset(setStatus)(e.target.value)}>
-            <option value="all">All statuses</option>
-            {PAYMENT_STATUSES.map((s) => (
-              <option key={s} value={s}>{formatStatusLabel(s)}</option>
-            ))}
-          </select>
-        </label>
+      <div className="flex flex-wrap gap-2" role="group" aria-label="Status">
+        {STATUS_CHIPS.map((chip) => (
+          <button
+            key={chip.value}
+            type="button"
+            aria-pressed={status === chip.value}
+            onClick={() => reset(setStatus)(chip.value)}
+            className={
+              status === chip.value
+                ? "rounded-full bg-[#0f1530] px-3 py-1 text-xs font-semibold text-white"
+                : "rounded-full border border-[#e6dccb] bg-white px-3 py-1 text-xs font-medium text-[#2a3360]"
+            }
+          >
+            {chip.label}
+          </button>
+        ))}
+      </div>
+      <div className="flex flex-wrap items-end gap-3 rounded-[14px] border border-[#e6dccb] bg-white p-4">
         <label className="flex flex-col gap-1 text-xs font-medium text-[#5e6684]">
           Method
           <select aria-label="Method" className={input} value={method} onChange={(e) => reset(setMethod)(e.target.value)}>
@@ -189,7 +219,8 @@ function TransactionsTab() {
       <ListState query={query} emptyTitle="No transactions" emptySubtitle="Payments matching these filters will show here.">
         {(rows) => (
           <>
-            <TransactionsTable rows={rows} />
+            <TransactionsTable rows={rows} feeColumn={feeColumn} />
+            {feeNote ? <p className="text-xs text-[#5e6684]">{feeNote}</p> : null}
             <div className="flex items-center justify-between text-sm text-[#5e6684]">
               <span>{query.data?.total ?? 0} transactions · page {page} of {totalPages}</span>
               <div className="flex gap-2">
@@ -217,8 +248,6 @@ export function PaymentsClient() {
 
   const status = useStripeConnectStatus(canManagePayments);
   const recent = usePaymentsList({ page: 1 }, 5, canManagePayments);
-  const succeeded = usePaymentsList({ status: "succeeded" }, 1, canManagePayments);
-  const pending = usePaymentsList({ status: "pending" }, 1, canManagePayments);
   const disputes = usePaymentsList({ status: "disputed" }, 25, canManagePayments);
 
   if (!canManagePayments) {
@@ -231,6 +260,12 @@ export function PaymentsClient() {
   const feeLabel = serviceFeeLabel(connect?.platformFeePercent);
   const lastPayout = connect?.lastPayoutAmount ? formatMoney(connect.lastPayoutAmount) : "—";
   const lastPayoutHint = connect?.lastPayoutAt ? formatDateTime(connect.lastPayoutAt) : "No payouts yet";
+  const feeColumn = serviceFeeColumnLabel(connect?.platformFeePercent);
+  const feeNote =
+    feeColumn
+      ? `On Flex, the ${connect?.platformFeePercent}% Service Fee is paid by your customer and isn't taken from your payout.`
+      : null;
+  const UNAVAILABLE = "Not available yet";
 
   return (
     <div className="space-y-6" data-payments-reveal>
@@ -283,31 +318,66 @@ export function PaymentsClient() {
       {tab === "overview" ? (
         <>
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            <StatCard label="Succeeded" value={String(succeeded.data?.total ?? 0)} hint="Payments collected" loading={succeeded.isLoading} />
-            <StatCard label="Pending" value={String(pending.data?.total ?? 0)} hint="Waiting to clear" loading={pending.isLoading} />
-            <StatCard label="Last payout" value={lastPayout} hint={lastPayoutHint} loading={status.isLoading} />
-            <StatCard label="Open disputes" value={String(disputes.data?.total ?? 0)} hint="Respond in Stripe" loading={disputes.isLoading} />
+            <StatCard label="Available" value="—" hint={UNAVAILABLE} />
+            <StatCard label="Pending" value="—" hint={UNAVAILABLE} />
+            <StatCard label="Next payout" value="—" hint={UNAVAILABLE} />
+            <StatCard
+              label="Open disputes"
+              value={String(disputes.data?.total ?? 0)}
+              hint={(disputes.data?.total ?? 0) > 0 ? "Respond in Stripe" : "None open"}
+              hintTone={(disputes.data?.total ?? 0) > 0 ? "danger" : undefined}
+              loading={disputes.isLoading}
+            />
           </div>
-          <section className="space-y-3">
-            <h2 className="text-base font-semibold text-[#0f1530]">Recent transactions</h2>
-            <ListState query={recent} emptyTitle="No payments yet" emptySubtitle="Card, ACH and recorded payments will appear here.">
-              {(rows) => <TransactionsTable rows={rows} />}
-            </ListState>
-          </section>
+          <div className="grid gap-5 xl:grid-cols-[280px_1fr]">
+            <section className={`${card} space-y-3 self-start`} aria-label="Payouts">
+              <div className="flex items-center justify-between gap-2">
+                <h2 className="text-[15px] font-semibold text-[#0f1530]">Payouts</h2>
+                {connect?.payoutSchedule ? (
+                  <span className="rounded-full bg-[#eef0f6] px-2.5 py-1 text-xs text-[#2a3360]">{connect.payoutSchedule}</span>
+                ) : null}
+              </div>
+              {connect?.lastPayoutAmount ? (
+                <div className="flex items-center justify-between gap-2 border-b border-[#e6dccb] pb-3">
+                  <div>
+                    <p className="text-[15px] font-semibold text-[#0f1530]">{lastPayout}</p>
+                    <p className="text-xs text-[#5e6684]">{lastPayoutHint} · last payout</p>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-sm text-[#5e6684]">No payouts yet.</p>
+              )}
+              <button type="button" onClick={() => setTab("payouts")} className="text-sm text-[#2d4bd8]">
+                View all payouts
+              </button>
+            </section>
+            <section className="space-y-3">
+              <h2 className="text-[15px] font-semibold text-[#0f1530]">Recent transactions</h2>
+              <ListState query={recent} emptyTitle="No payments yet" emptySubtitle="Card, ACH and recorded payments will appear here.">
+                {(rows) => <TransactionsTable rows={rows} feeColumn={feeColumn} />}
+              </ListState>
+            </section>
+          </div>
         </>
       ) : null}
 
-      {tab === "transactions" ? <TransactionsTab /> : null}
+      {tab === "transactions" ? <TransactionsTab feeColumn={feeColumn} feeNote={feeNote} /> : null}
 
       {tab === "payouts" ? (
-        <div className={`${card} space-y-3`}>
-          <h2 className="text-base font-semibold text-[#0f1530]">Payouts</h2>
-          <p className="text-sm text-[#2a3360]">
-            Last payout: <strong>{lastPayout}</strong> ({lastPayoutHint})
-            {connect?.payoutSchedule ? ` · schedule ${connect.payoutSchedule}` : ""}
-          </p>
-          <p className="text-sm text-[#5e6684]">Payout history and bank details live in your Stripe dashboard.</p>
-          {isOwner ? <DashboardButton label="View payouts in Stripe" /> : <OwnerOnlyNote />}
+        <div className="space-y-5">
+          <section className={`${card} space-y-3`} aria-label="Payout schedule">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h2 className="text-[15px] font-semibold text-[#0f1530]">Payout schedule</h2>
+              {isOwner ? <DashboardButton label="View payouts in Stripe" /> : <OwnerOnlyNote />}
+            </div>
+            <dl className="space-y-2 text-sm">
+              <div className="flex justify-between gap-3"><dt className="text-[#2a3360]">Schedule</dt><dd className="text-[#0f1530]">{connect?.payoutSchedule ?? "—"}</dd></div>
+              <div className="flex justify-between gap-3"><dt className="text-[#2a3360]">Bank account</dt><dd className="text-[#5e6684]">— · {UNAVAILABLE}</dd></div>
+              <div className="flex justify-between gap-3"><dt className="text-[#2a3360]">Next payout</dt><dd className="text-[#5e6684]">— · {UNAVAILABLE}</dd></div>
+              <div className="flex justify-between gap-3"><dt className="text-[#2a3360]">Last payout</dt><dd className="text-[#0f1530]">{lastPayout} · {lastPayoutHint}</dd></div>
+            </dl>
+          </section>
+          <p className="text-sm text-[#5e6684]">Full payout history and bank details are in your Stripe dashboard.</p>
         </div>
       ) : null}
 
@@ -318,7 +388,7 @@ export function PaymentsClient() {
             {isOwner ? <DashboardButton label="Respond in Stripe" /> : <OwnerOnlyNote />}
           </div>
           <ListState query={disputes} emptyTitle="No disputes" emptySubtitle="Disputed payments will show here.">
-            {(rows) => <TransactionsTable rows={rows} />}
+            {(rows) => <TransactionsTable rows={rows} feeColumn={feeColumn} />}
           </ListState>
         </div>
       ) : null}

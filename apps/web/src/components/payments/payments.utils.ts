@@ -60,5 +60,44 @@ export function serviceFeeLabel(platformFeePercent: number | null | undefined): 
   if (platformFeePercent === null || platformFeePercent === undefined || platformFeePercent <= 0) {
     return null;
   }
-  return `Service Fee ${platformFeePercent}% · paid by customer at checkout`;
+  return `Service Fee (${platformFeePercent}%) · paid by customer at checkout`;
+}
+
+/** Frame 52:469 status chip copy: Stripe "pending" reads as "Processing". */
+export function paymentStatusLabel(status: string): string {
+  if (status === "pending") return "Processing";
+  return status.charAt(0).toUpperCase() + status.slice(1).replace(/_/g, " ");
+}
+
+/** Status chip filters from frame 52:469, mapped to ListPaymentsQuerySchema statuses. */
+export const STATUS_CHIPS: Array<{ value: string; label: string }> = [
+  { value: "all", label: "All" },
+  { value: "succeeded", label: "Succeeded" },
+  { value: "pending", label: "Processing" },
+  { value: "refunded", label: "Refunded" },
+  { value: "disputed", label: "Disputed" },
+  { value: "failed", label: "Failed" }
+];
+
+const CHIP_TONES: Record<string, string> = {
+  succeeded: "bg-[#e5f4ea] text-[#1f6b3a]",
+  pending: "bg-[#fff4d6] text-[#7a5600]",
+  refunded: "bg-[#eef0f6] text-[#5e6684]",
+  disputed: "bg-[#fde4df] text-[#a3261a]",
+  failed: "bg-[#fde4df] text-[#a3261a]"
+};
+
+export function paymentChipClass(status: string): string {
+  return CHIP_TONES[status] ?? "bg-[#eef0f6] text-[#5e6684]";
+}
+
+/** "Oct 22" like the frame's Date column. */
+export function formatShortDate(value: string): string {
+  return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(new Date(value));
+}
+
+/** Column header "Service Fee (2%)"; null hides the column (Flat plan or no fee from the API). */
+export function serviceFeeColumnLabel(platformFeePercent: number | null | undefined): string | null {
+  if (platformFeePercent === null || platformFeePercent === undefined || platformFeePercent <= 0) return null;
+  return `Service Fee (${platformFeePercent}%)`;
 }

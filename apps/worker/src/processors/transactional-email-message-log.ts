@@ -1,5 +1,8 @@
 import type { EmailTemplateId } from "@fsm/comms";
 import { db, messageLogs } from "@fsm/db";
+import pino from "pino";
+
+const logger = pino({ name: "transactional-email-message-log" });
 
 export type TransactionalEmailDeliveryRecord = {
   templateId: EmailTemplateId;
@@ -18,7 +21,12 @@ export async function recordTransactionalEmailMessageLog(input: {
 }): Promise<void> {
   const now = new Date();
 
-  await db.insert(messageLogs).values({
+  // Logging happens after the email is sent: it must never fail the job (a retry would resend the email).
+  // Subject and providerMessageId are recorded; delivered time is left for delivery webhooks.
+  try {
+    await db
+      .insert(messageLogs)
+      .values({
     companyId: input.companyId,
     customerId: input.customerId,
     channel: "email",
@@ -30,8 +38,14 @@ export async function recordTransactionalEmailMessageLog(input: {
     providerMessageId: input.delivery.providerMessageId,
     providerStatus: "sent",
     sentAt: now,
-    deliveredAt: now,
     sourceSystem: input.sourceSystem,
     sourceId: input.sourceId
-  });
+      })
+      .onConflictDoNothing();
+  } catch (error) {
+    logger.warn(
+      { err: error, companyId: input.companyId, sourceSystem: input.sourceSystem, sourceId: input.sourceId },
+      "Failed to record transactional email message log; continuing"
+    );
+  }
 }

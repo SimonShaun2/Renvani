@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { and, eq, isNull } from "drizzle-orm";
 import type { Job, Processor } from "bullmq";
 import pino from "pino";
@@ -1244,8 +1245,11 @@ export async function handleSendVipMembershipEmail(
     return;
   }
 
-  const stripeSubscriptionId = getJobString(job.data, "stripeSubscriptionId") ?? "unknown";
-  const stripeInvoiceId = getJobString(job.data, "stripeInvoiceId") ?? "unknown";
+  // Fall back to the (stable across retries) BullMQ job id so emails missing Stripe ids never collide
+  // on the message_logs (company, source, source id) unique key.
+  const fallbackSourceKey = `job-${job.id ?? randomUUID()}`;
+  const stripeSubscriptionId = getJobString(job.data, "stripeSubscriptionId") ?? fallbackSourceKey;
+  const stripeInvoiceId = getJobString(job.data, "stripeInvoiceId") ?? fallbackSourceKey;
   const fromAddress = getOutboundEmailFromAddress();
 
   if (emailKind === "welcome") {

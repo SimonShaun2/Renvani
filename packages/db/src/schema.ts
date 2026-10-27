@@ -34,6 +34,7 @@ import {
   jsonb,
   index,
   uniqueIndex,
+  type AnyPgColumn,
 } from "drizzle-orm/pg-core";
 import { relations, sql } from "drizzle-orm";
 
@@ -759,6 +760,8 @@ export const jobs = pgTable("jobs", {
   propertyId: uuid("property_id").references(() => properties.id),
   assetId: uuid("asset_id").references(() => assets.id), // primary asset
   technicianId: uuid("technician_id").references(() => technicians.id),
+  /** FS-195 — optional crew assignment (dispatch lanes stay keyed by technicianId). */
+  crewId: uuid("crew_id").references((): AnyPgColumn => crews.id),
   assignedById: uuid("assigned_by_id").references(() => users.id),
   // Classification
   type: jobTypeEnum("type").notNull().default("service_call"),
@@ -799,6 +802,7 @@ export const jobs = pgTable("jobs", {
   companyIdx: index("jobs_company_idx").on(t.companyId),
   customerIdx: index("jobs_customer_idx").on(t.customerId),
   technicianIdx: index("jobs_technician_idx").on(t.technicianId),
+  crewIdx: index("jobs_crew_idx").on(t.crewId),
   statusIdx: index("jobs_status_idx").on(t.status),
   scheduledStartIdx: index("jobs_scheduled_start_idx").on(t.scheduledStart),
   jobNumberIdx: uniqueIndex("jobs_job_number_company_idx").on(t.jobNumber, t.companyId),
@@ -2742,4 +2746,35 @@ export const jobProductsRelations = relations(jobProducts, ({ one }) => ({
     references: [productCatalog.id],
   }),
   addedBy: one(users, { fields: [jobProducts.addedById], references: [users.id] }),
+}));
+
+// ─────────────────────────────────────────────
+// FS-195 — Crews / teams (role is text + app-level registry, no pgEnum)
+// ─────────────────────────────────────────────
+
+export const crews = pgTable("crews", {
+  id: id(),
+  companyId: companyId(),
+  name: varchar("name", { length: 100 }).notNull(),
+  color: varchar("color", { length: 16 }),
+  isActive: boolean("is_active").notNull().default(true),
+  /** Optimistic-concurrency version; bumped on every crew or membership change. */
+  version: integer("version").notNull().default(1),
+  ...timestamps,
+}, (t) => ({
+  companyIdx: index("crews_company_idx").on(t.companyId),
+  companyNameIdx: uniqueIndex("crews_company_name_idx").on(t.companyId, t.name).where(sql`"deleted_at" IS NULL`),
+}));
+
+export const crewMembers = pgTable("crew_members", {
+  id: id(),
+  companyId: companyId(),
+  crewId: uuid("crew_id").notNull().references(() => crews.id, { onDelete: "cascade" }),
+  technicianId: uuid("technician_id").notNull().references(() => technicians.id),
+  role: varchar("role", { length: 32 }).notNull().default("member"),
+  ...timestamps,
+}, (t) => ({
+  companyIdx: index("crew_members_company_idx").on(t.companyId),
+  technicianIdx: index("crew_members_technician_idx").on(t.technicianId),
+  crewTechnicianIdx: uniqueIndex("crew_members_crew_technician_idx").on(t.crewId, t.technicianId).where(sql`"deleted_at" IS NULL`),
 }));

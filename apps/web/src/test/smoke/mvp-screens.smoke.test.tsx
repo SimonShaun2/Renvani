@@ -18,7 +18,9 @@ vi.mock("next/navigation", () => ({
 // happy-dom cancels framer-motion WAAPI animations on unmount; render motion.* as plain elements.
 vi.mock("framer-motion", async () => {
   const React = await import("react");
-  const strip = ({ initial: _i, animate: _a, exit: _e, transition: _t, layout: _l, whileHover: _h, whileTap: _w, variants: _v, ...rest }: Record<string, unknown>) => rest;
+  const MOTION_PROPS = ["initial", "animate", "exit", "transition", "layout", "whileHover", "whileTap", "variants"];
+  const strip = (props: Record<string, unknown>) =>
+    Object.fromEntries(Object.entries(props).filter(([key]) => !MOTION_PROPS.includes(key)));
   const motion = new Proxy({}, { get: (_t, tag: string) => React.forwardRef((props: Record<string, unknown>, ref) => React.createElement(tag, { ...strip(props), ref })) });
   return { motion, AnimatePresence: ({ children }: { children: unknown }) => children, useReducedMotion: () => true };
 });

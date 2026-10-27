@@ -23,7 +23,6 @@ export function PayInvoiceShell({
       <header className="flex items-center justify-between gap-4 px-5 py-5 md:border-b md:border-[#e6dccb] md:bg-white md:px-12">
         <div className="flex min-w-0 items-center gap-2.5">
           {shopLogoUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element -- tenant logo on an arbitrary host
             <img src={shopLogoUrl} alt="" className="h-7 w-7 shrink-0 rounded-lg object-cover" />
           ) : (
             <span aria-hidden className="h-7 w-7 shrink-0 rounded-lg bg-[#2f7d4f]" />

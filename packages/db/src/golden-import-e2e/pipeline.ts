@@ -19,7 +19,7 @@ import {
   sanitizeSpreadsheetCell,
   type ColumnMapping
 } from "@fsm/types";
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, inArray, isNull } from "drizzle-orm";
 
 import { db } from "../client.js";
 import { buildLineageEquipmentResolver, commitImportedEquipmentRows } from "../import-equipment-commit.service.js";
@@ -33,6 +33,10 @@ import { commitPriceBookRows } from "../import-price-book-commit.js";
 import {
   assets,
   customers,
+  companies,
+  dataExportSessions,
+  importInvoiceLineSeeds,
+  qboEntityMappings,
   importSessions,
   invoices,
   jobs,
@@ -476,6 +480,30 @@ export interface GoldenImportE2eRunResult {
   importSessionId: string;
   importBundleId: string;
   sourceSystem: GoldenImportE2eSourceSystem;
+}
+
+/**
+ * Seeds the FK parent for a golden e2e tenant. Every tenant table references companies.id with
+ * ON DELETE CASCADE except the three below, which deleteGoldenE2eCompanies clears first.
+ */
+export async function seedGoldenE2eCompany(companyId: string): Promise<void> {
+  await db.insert(companies).values({
+    id: companyId,
+    name: `Golden import e2e ${companyId.slice(0, 8)}`,
+    slug: `golden-e2e-${companyId}`
+  });
+}
+
+export async function deleteGoldenE2eCompanies(companyIds: readonly string[]): Promise<void> {
+  if (companyIds.length === 0) {
+    return;
+  }
+  const ids = [...companyIds];
+  // FKs to companies without ON DELETE CASCADE (NO ACTION) must be cleared explicitly.
+  await db.delete(importInvoiceLineSeeds).where(inArray(importInvoiceLineSeeds.companyId, ids));
+  await db.delete(qboEntityMappings).where(inArray(qboEntityMappings.companyId, ids));
+  await db.delete(dataExportSessions).where(inArray(dataExportSessions.companyId, ids));
+  await db.delete(companies).where(inArray(companies.id, ids));
 }
 
 export async function runGoldenImportBundleE2e(

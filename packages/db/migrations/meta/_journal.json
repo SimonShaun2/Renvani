@@ -281,6 +281,20 @@
       "when": 1777713000000,
       "tag": "0039_fs160b_clerk_unlink_tombstone",
       "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1777714000000,
+      "tag": "0040_fs_migrate_service_agreements_import",
+      "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "7",
+      "when": 1777715000000,
+      "tag": "0041_fs147_price_book_line_picker",
+      "breakpoints": true
     }
   ]
 }

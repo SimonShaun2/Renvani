@@ -437,6 +437,7 @@ export interface TestEstimateItemRecord {
   id: string;
   estimateId: string;
   companyId: string;
+  productCatalogId: string | null;
   name: string;
   description: string | null;
   itemType: EstimateItemType;
@@ -492,6 +493,7 @@ export interface TestInvoiceItemRecord {
   id: string;
   invoiceId: string;
   companyId: string;
+  productCatalogId: string | null;
   name: string;
   description: string | null;
   itemType: InvoiceItemType;
@@ -633,6 +635,9 @@ export interface TestMaintenancePlanRecord {
   nextServiceDate: string | null;
   lastServiceDate: string | null;
   notes: string | null;
+  sourceSystem: string | null;
+  sourceId: string | null;
+  importSessionId: string | null;
   deletedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
@@ -1366,6 +1371,7 @@ export interface TestEstimateItemRecord {
   id: string;
   estimateId: string;
   companyId: string;
+  productCatalogId: string | null;
   name: string;
   description: string | null;
   itemType: EstimateItemType;
@@ -1421,6 +1427,7 @@ export interface TestInvoiceItemRecord {
   id: string;
   invoiceId: string;
   companyId: string;
+  productCatalogId: string | null;
   name: string;
   description: string | null;
   itemType: InvoiceItemType;
@@ -1546,6 +1553,9 @@ export interface TestMaintenancePlanRecord {
   nextServiceDate: string | null;
   lastServiceDate: string | null;
   notes: string | null;
+  sourceSystem: string | null;
+  sourceId: string | null;
+  importSessionId: string | null;
   deletedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
@@ -2471,6 +2481,7 @@ const estimateItemsTable = {
   id: "id",
   estimateId: "estimateId",
   companyId: "companyId",
+  productCatalogId: "productCatalogId",
   name: "name",
   description: "description",
   itemType: "itemType",
@@ -2528,6 +2539,7 @@ const invoiceItemsTable = {
   id: "id",
   invoiceId: "invoiceId",
   companyId: "companyId",
+  productCatalogId: "productCatalogId",
   name: "name",
   description: "description",
   itemType: "itemType",
@@ -2659,6 +2671,9 @@ const maintenancePlansTable = {
   nextServiceDate: "nextServiceDate",
   lastServiceDate: "lastServiceDate",
   notes: "notes",
+  sourceSystem: "sourceSystem",
+  sourceId: "sourceId",
+  importSessionId: "importSessionId",
   deletedAt: "deletedAt",
   createdAt: "createdAt",
   updatedAt: "updatedAt"
@@ -3866,6 +3881,7 @@ function createEstimateItemRecord(
     id: values.id ?? nextId(),
     estimateId: values.estimateId,
     companyId: values.companyId,
+    productCatalogId: values.productCatalogId ?? null,
     name: values.name,
     description: values.description ?? null,
     itemType: values.itemType ?? "service",
@@ -3935,6 +3951,7 @@ function createInvoiceItemRecord(
     id: values.id ?? nextId(),
     invoiceId: values.invoiceId,
     companyId: values.companyId,
+    productCatalogId: values.productCatalogId ?? null,
     name: values.name,
     description: values.description ?? null,
     itemType: values.itemType ?? "service",
@@ -4102,6 +4119,9 @@ function createMaintenancePlanRecord(
     nextServiceDate: values.nextServiceDate ?? null,
     lastServiceDate: values.lastServiceDate ?? null,
     notes: values.notes ?? null,
+    sourceSystem: values.sourceSystem ?? null,
+    sourceId: values.sourceId ?? null,
+    importSessionId: values.importSessionId ?? null,
     deletedAt: values.deletedAt ?? null,
     createdAt: values.createdAt ?? now,
     updatedAt: values.updatedAt ?? now

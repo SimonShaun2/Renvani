@@ -36,6 +36,8 @@ jobs:
         run: pnpm test
       - name: FS-128 FS-MIGRATE import pipeline contracts
         run: pnpm test:fs-migrate-import-contracts
+      - name: FS-152 golden import e2e wiring
+        run: pnpm test:golden-import-e2e-wiring
 
   neon-per-pr-staging:
     name: Neon per-PR (staging RLS)
@@ -61,5 +63,10 @@ jobs:
           NEON_CI_DATABASE_URL: ${{ secrets.NEON_CI_STAGING_DATABASE_URL }}
           RENVANI_DEPLOYMENT_TIER: staging
         run: node scripts/ci/neon-per-pr-branch.mjs
+      - name: FS-152 golden import e2e (QBD + Service Fusion)
+        env:
+          NEON_CI_DATABASE_URL: ${{ secrets.NEON_CI_STAGING_DATABASE_URL }}
+          RENVANI_DEPLOYMENT_TIER: staging
+        run: node scripts/ci/golden-import-e2e.mjs
       - name: Neon CI wiring contract test
         run: node --test scripts/ci/neon-per-pr-branch.test.mjs

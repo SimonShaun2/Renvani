@@ -57,6 +57,7 @@ import {
   retrieveInvoiceCheckoutClientSecret
 } from "../lib/stripe.js";
 import { listItems, recalculateTotals } from "./invoice-items.service.js";
+import { assertPriceBookItemsInCompany, findLivePriceBookItemIds } from "./price-book-item-scope.js";
 
 type CompanyRow = typeof companies.$inferSelect;
 type CustomerRow = typeof customers.$inferSelect;
@@ -140,6 +141,7 @@ function toInvoice(row: InvoiceRow): Invoice {
 function toInvoiceItem(row: InvoiceItemRow): InvoiceItem {
   return {
     ...row,
+    priceBookItemId: row.productCatalogId,
     itemType: normalizeInvoiceItemType(row.itemType)
   };
 }
@@ -829,11 +831,33 @@ export async function createInvoice(
           quantity: item.quantity,
           unitPrice: item.unitPrice,
           isTaxable: item.isTaxable ?? true,
-          sortOrder: item.sortOrder ?? 0
+          sortOrder: item.sortOrder ?? 0,
+          priceBookItemId: item.productCatalogId
         }))
       : normalizedInput.items;
 
     if (sourceItems.length > 0) {
+      if (estimateRows.length > 0) {
+        // Lines copied from the caller's own estimate: a catalog item soft-deleted since the
+        // estimate was written must not block invoicing — drop the stale link instead.
+        const liveIds = await findLivePriceBookItemIds(
+          tx,
+          companyId,
+          sourceItems.map((item) => ("priceBookItemId" in item ? item.priceBookItemId : null))
+        );
+        for (const item of sourceItems) {
+          if ("priceBookItemId" in item && item.priceBookItemId && !liveIds.has(item.priceBookItemId)) {
+            item.priceBookItemId = null;
+          }
+        }
+      } else {
+        // Client-supplied ids must belong to the caller's company (404 otherwise).
+        await assertPriceBookItemsInCompany(
+          tx,
+          companyId,
+          sourceItems.map((item) => ("priceBookItemId" in item ? item.priceBookItemId : null))
+        );
+      }
       await tx
         .insert(invoiceItems)
         .values(
@@ -851,7 +875,10 @@ export async function createInvoice(
               )
             ),
             isTaxable: item.isTaxable ?? true,
-            sortOrder: item.sortOrder ?? index
+            sortOrder: item.sortOrder ?? index,
+            ...("priceBookItemId" in item && item.priceBookItemId
+              ? { productCatalogId: item.priceBookItemId }
+              : {})
           }))
         )
         .returning();

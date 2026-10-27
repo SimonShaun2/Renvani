@@ -89,7 +89,8 @@ export async function createImportHandler(
           value === "estimates" ||
           value === "price_book" ||
           value === "notes" ||
-          value === "communications"
+          value === "communications" ||
+          value === "service_agreements"
         ) {
           entityType = value;
         }

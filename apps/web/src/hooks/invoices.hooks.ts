@@ -26,6 +26,7 @@ export interface InvoiceItemRecord {
   id: string;
   invoiceId: string;
   companyId: string;
+  priceBookItemId: string | null;
   name: string;
   description: string | null;
   itemType: "service" | "labor" | "material" | "fee";

@@ -14,13 +14,7 @@ import { clearBrowserAuthSession, getAuthToken } from "@/src/lib/auth";
 import { ApiError, type ApiErrorPayload } from "@/src/lib/api";
 import type { ImportSessionResponse } from "@/src/hooks/imports.hooks";
 import { migrateOnboardingRealClient } from "@/src/lib/migrate-onboarding-client";
-import {
-  isPriyaOnboardingMockEnabled,
-  migrateOnboardingPriyaMockClient
-} from "@/src/lib/migrate-onboarding-priya-mock";
 import { useMigrateOnboardingWizardStore } from "@/src/stores/migrate-onboarding-wizard.store";
-
-const priyaClient = migrateOnboardingPriyaMockClient;
 
 const migrateKeys = {
   all: ["migrate-onboarding"] as const,
@@ -173,13 +167,6 @@ export function useResumeMigrateOnboardingSession() {
           // expected when no in-progress bundle
         } else if (!(error instanceof Error)) {
           throw error;
-        }
-        if (isPriyaOnboardingMockEnabled()) {
-          const mockActive = await priyaClient.getActiveSession();
-          if (mockActive) {
-            setBundle(mockActive.id, mockActive.wizardStep);
-            return mockActive;
-          }
         }
         return null;
       }

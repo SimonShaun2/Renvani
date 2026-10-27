@@ -29,7 +29,7 @@ describe("resolveClerkRouteDecision", () => {
 
   it("redirects signed-out visitors on staff routes to /login", () => {
     expect(resolveClerkRouteDecision("/dashboard", null)).toEqual({ action: "redirect", to: "/login" });
-    expect(resolveClerkRouteDecision("/portal", null)).toEqual({ action: "redirect", to: "/login" });
+    expect(resolveClerkRouteDecision("/portal/settings/x", null)).toEqual({ action: "redirect", to: "/login" });
   });
 
   it("sends signed-in users to their role default route and gates staff pages by role", () => {

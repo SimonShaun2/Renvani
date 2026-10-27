@@ -7,8 +7,7 @@ import { env } from "@fsm/config";
 import { AppError, ErrorCode } from "@fsm/types";
 
 import {
-  isBookingManageTokenConsumed,
-  markBookingManageTokenConsumed
+  isBookingManageTokenConsumed
 } from "./booking-manage-token-store.js";
 
 /** Customer self-service link validity (reschedule/cancel). */
@@ -21,13 +20,14 @@ const bookingManageTokenPayloadSchema = z.object({
   bookingSlug: z.string().min(1),
   referenceNumber: z.string().min(8),
   jti: z.string().uuid(),
-  tokenType: z.literal("booking_manage")
+  tokenType: z.literal("booking_manage"),
+  exp: z.number().int().positive()
 });
 
 export type BookingManageTokenPayload = z.infer<typeof bookingManageTokenPayloadSchema>;
 
 export function generateBookingManageToken(
-  payload: Omit<BookingManageTokenPayload, "tokenType" | "jti">
+  payload: Omit<BookingManageTokenPayload, "tokenType" | "jti" | "exp">
 ): string {
   return jwt.sign(
     {
@@ -53,10 +53,6 @@ export async function assertBookingManageTokenActive(claims: BookingManageTokenP
   if (await isBookingManageTokenConsumed(claims.jti)) {
     throw new AppError(ErrorCode.CONFLICT, "This manage link has already been used");
   }
-}
-
-export async function consumeBookingManageToken(claims: BookingManageTokenPayload): Promise<void> {
-  await markBookingManageTokenConsumed(claims.jti, BOOKING_MANAGE_TOKEN_TTL_SECONDS);
 }
 
 export function isEligibleForCustomerSelfService(recurring: { linked: boolean }): boolean {

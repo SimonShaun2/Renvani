@@ -22,13 +22,15 @@ import {
 
 import {
   assertBookingManageTokenActive,
-  consumeBookingManageToken,
+  BOOKING_MANAGE_TOKEN_TTL_SECONDS,
   verifyBookingManageToken,
   type BookingManageTokenPayload
 } from "../lib/booking-manage-token.js";
 import {
   claimBookingManageTokenHoldLock,
-  releaseBookingManageTokenHoldLock
+  claimBookingManageTokenUse,
+  releaseBookingManageTokenHoldLock,
+  releaseBookingManageTokenUse
 } from "../lib/booking-manage-token-store.js";
 import { getBookingAvailability, getPublicBookingSettingsBySlug } from "./booking.service.js";
 import { invalidateDispatchCache } from "./dispatch.service.js";
@@ -79,9 +81,22 @@ async function assertHoldSlotMatchesPublishedAvailability(
   }
 }
 
-function resolveCutoffHours(settingsRow: { customerSelfServiceCutoffHours: number | null }): number {
-  const hours = settingsRow.customerSelfServiceCutoffHours ?? 24;
-  return hours > 0 ? hours : 24;
+/**
+ * MVP: the self-service cutoff is fixed at 24 hours. There is no settings write path;
+ * the customer_self_service_cutoff_hours column keeps its default of 24 and is not read.
+ */
+export const BOOKING_SELF_SERVICE_CUTOFF_HOURS = 24;
+
+function resolveCutoffHours(_settingsRow: { customerSelfServiceCutoffHours: number | null }): number {
+  return BOOKING_SELF_SERVICE_CUTOFF_HOURS;
+}
+
+async function claimManageLinkOrThrow(claims: BookingManageTokenPayload): Promise<void> {
+  const claimed = await claimBookingManageTokenUse(claims.jti, BOOKING_MANAGE_TOKEN_TTL_SECONDS);
+
+  if (!claimed) {
+    throw new AppError(ErrorCode.CONFLICT, "This manage link has already been used");
+  }
 }
 
 function assertWithinCutoff(scheduledStart: Date | null, cutoffHours: number): void {
@@ -187,7 +202,7 @@ export async function getBookingSelfServiceView(manageToken: string): Promise<Bo
     withinCutoff = false;
   }
 
-  const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+  const expiresAt = new Date(claims.exp * 1000).toISOString();
 
   return {
     bookingSlug: claims.bookingSlug,
@@ -412,7 +427,11 @@ export async function rescheduleBookingSelfService(
   const scheduledStart = parseIsoDateTime(input.scheduledStart, "scheduledStart");
   const scheduledEnd = parseIsoDateTime(input.scheduledEnd, "scheduledEnd");
 
-  const result = await db.transaction(async (tx) => {
+  await claimManageLinkOrThrow(claims);
+
+  let result: JobRow;
+  try {
+  result = await db.transaction(async (tx) => {
     await assertActiveHoldMatchesSelection(claims.companyId, bookingRequest.id, input, tx);
 
     await assertTechnicianScheduleSlotAvailableForReschedule(
@@ -473,14 +492,19 @@ export async function rescheduleBookingSelfService(
       isConfirmed: true
     });
 
-    await tx
+    const claimedRequests = await tx
       .update(bookingRequests)
       .set({
         assignedTechnicianId: input.technicianId,
         preferredDate: formatDateOnly(scheduledStart),
         updatedAt: now
       })
-      .where(eq(bookingRequests.id, bookingRequest.id));
+      .where(and(eq(bookingRequests.id, bookingRequest.id), eq(bookingRequests.status, "confirmed")))
+      .returning();
+
+    if (claimedRequests.length === 0) {
+      throw new AppError(ErrorCode.CONFLICT, "This appointment can no longer be changed online");
+    }
 
     await emitEventWithExecutor(tx, {
       companyId: claims.companyId,
@@ -503,8 +527,11 @@ export async function rescheduleBookingSelfService(
 
     return updatedJob;
   });
+  } catch (error) {
+    await releaseBookingManageTokenUse(claims.jti);
+    throw error;
+  }
 
-  await consumeBookingManageToken(claims);
   await releaseBookingManageTokenHoldLock(claims.jti);
 
   const summary = `${companyName}: customer rescheduled booking ${claims.referenceNumber} to ${scheduledStart.toLocaleString("en-US")}.`;
@@ -535,8 +562,26 @@ export async function cancelBookingSelfService(manageToken: string): Promise<Boo
   const cutoffHours = resolveCutoffHours(settings);
   assertWithinCutoff(job.scheduledStart, cutoffHours);
 
+  await claimManageLinkOrThrow(claims);
+
+  try {
   await db.transaction(async (tx) => {
     const now = new Date();
+
+    const cancelledRequests = await tx
+      .update(bookingRequests)
+      .set({
+        status: "cancelled",
+        cancelledAt: now,
+        cancellationReason: "Customer self-service cancel",
+        updatedAt: now
+      })
+      .where(and(eq(bookingRequests.id, bookingRequest.id), eq(bookingRequests.status, "confirmed")))
+      .returning();
+
+    if (cancelledRequests.length === 0) {
+      throw new AppError(ErrorCode.CONFLICT, "This appointment can no longer be changed online");
+    }
 
     await tx
       .update(jobs)
@@ -545,16 +590,6 @@ export async function cancelBookingSelfService(manageToken: string): Promise<Boo
         updatedAt: now
       })
       .where(and(eq(jobs.companyId, claims.companyId), eq(jobs.id, job.id), isNull(jobs.deletedAt)));
-
-    await tx
-      .update(bookingRequests)
-      .set({
-        status: "cancelled",
-        cancelledAt: now,
-        cancellationReason: "Customer self-service cancel",
-        updatedAt: now
-      })
-      .where(eq(bookingRequests.id, bookingRequest.id));
 
     await emitEventWithExecutor(tx, {
       companyId: claims.companyId,
@@ -586,8 +621,10 @@ export async function cancelBookingSelfService(manageToken: string): Promise<Boo
       summary: `Job cancelled via customer self-service (${claims.referenceNumber})`
     });
   });
-
-  await consumeBookingManageToken(claims);
+  } catch (error) {
+    await releaseBookingManageTokenUse(claims.jti);
+    throw error;
+  }
 
   const summary = `${companyName}: customer cancelled booking ${claims.referenceNumber}.`;
 

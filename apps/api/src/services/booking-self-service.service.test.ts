@@ -146,4 +146,26 @@ describe("booking-self-service.service (FS-153)", () => {
     expect(result.status).toBe("confirmed");
     expect(result.scheduledStart).toBe(nextSlot!.start);
   });
+
+  it("view expiresAt is the token's real exp, cutoff fixed at 24h", async () => {
+    const { manageToken } = await confirmOneOffBooking("BK-SELF-004");
+    const view = await selfService.getBookingSelfServiceView(manageToken);
+    const payload = JSON.parse(Buffer.from(manageToken.split(".")[1]!, "base64url").toString()) as { exp: number };
+
+    expect(view.expiresAt).toBe(new Date(payload.exp * 1000).toISOString());
+    expect(view.cutoffHours).toBe(selfService.BOOKING_SELF_SERVICE_CUTOFF_HOURS);
+    expect(selfService.BOOKING_SELF_SERVICE_CUTOFF_HOURS).toBe(24);
+  });
+
+  it("concurrent use of one manage link succeeds only once", async () => {
+    const { manageToken } = await confirmOneOffBooking("BK-SELF-005");
+    const results = await Promise.allSettled([
+      selfService.cancelBookingSelfService(manageToken),
+      selfService.cancelBookingSelfService(manageToken)
+    ]);
+
+    expect(results.filter((r) => r.status === "fulfilled")).toHaveLength(1);
+    const rejected = results.find((r) => r.status === "rejected") as PromiseRejectedResult;
+    expect(rejected.reason).toMatchObject({ code: "CONFLICT" });
+  });
 });

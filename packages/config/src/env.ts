@@ -102,7 +102,10 @@ const envSchema = z.object({
   /** FS-66 — public slot-hold/confirm limits (fixed window). */
   PUBLIC_SLOT_HOLD_IP_RATE_LIMIT_MAX: z.coerce.number().int().positive().default(6),
   PUBLIC_SLOT_HOLD_COMPANY_RATE_LIMIT_MAX: z.coerce.number().int().positive().default(120),
-  PUBLIC_SLOT_HOLD_RATE_LIMIT_WINDOW_SECONDS: z.coerce.number().int().positive().default(600)
+  PUBLIC_SLOT_HOLD_RATE_LIMIT_WINDOW_SECONDS: z.coerce.number().int().positive().default(600),
+  /** FS-195 — dispatch drive-time estimator id (registry in apps/api) + assumed speed (mph, clamped 5–80). */
+  DRIVE_TIME_ESTIMATOR: z.string().regex(/^[a-z][a-z0-9_]{0,63}$/).default("straight_line"),
+  DRIVE_TIME_ASSUMED_SPEED_MPH: z.coerce.number().positive().default(30)
 });
 
 export type Env = z.infer<typeof envSchema>;

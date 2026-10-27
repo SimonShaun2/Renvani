@@ -40,6 +40,7 @@ import {
 import { generateEstimateNumber } from "../lib/estimate-number.js";
 import { generateJobNumber } from "../lib/job-number.js";
 import { listItems, recalculateTotals } from "./estimate-items.service.js";
+import { assertPriceBookItemsInCompany } from "./price-book-item-scope.js";
 
 type EstimateRow = typeof estimates.$inferSelect;
 type EstimateItemRow = typeof estimateItems.$inferSelect;
@@ -702,6 +703,11 @@ export async function createEstimate(
     }
 
     if (normalizedInput.items.length > 0) {
+      await assertPriceBookItemsInCompany(
+        tx,
+        companyId,
+        normalizedInput.items.map((item) => item.priceBookItemId)
+      );
       await tx
         .insert(estimateItems)
         .values(

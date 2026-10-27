@@ -12,6 +12,8 @@ import {
   type UpdateEstimateItemInput
 } from "@fsm/types";
 
+import { assertPriceBookItemsInCompany } from "./price-book-item-scope.js";
+
 type EstimateRow = typeof estimates.$inferSelect;
 type EstimateItemRow = typeof estimateItems.$inferSelect;
 type EstimateExecutor = Pick<typeof db, "select" | "insert" | "update">;
@@ -150,6 +152,7 @@ export async function addItem(
     assertDraftEstimate(estimate);
 
     const normalizedInput = normalizeItemInput(input);
+    await assertPriceBookItemsInCompany(tx, companyId, [normalizedInput.productCatalogId]);
     const insertedItems = await tx
       .insert(estimateItems)
       .values({
@@ -194,6 +197,7 @@ export async function updateItem(
 
     const existingItem = await getEstimateItemRecord(companyId, estimateId, itemId, tx);
     const normalizedInput = normalizeItemInput(input);
+    await assertPriceBookItemsInCompany(tx, companyId, [normalizedInput.productCatalogId]);
     const nextQuantity = normalizedInput.quantity ?? existingItem.quantity;
     const nextUnitPrice = normalizedInput.unitPrice ?? existingItem.unitPrice;
     const updatedItems = await tx

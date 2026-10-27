@@ -133,3 +133,129 @@ describe("price-book items search", () => {
     expect(response.status).toBe(400);
   });
 });
+
+describe("price-book line picker tenant scoping (FS-147)", () => {
+  function seedTenantFixtures() {
+    const auth = createAuthContext();
+    const customer = fakeDb.seedCustomer({
+      companyId: auth.company.id,
+      firstName: "Chris",
+      lastName: "Pine",
+      email: "chris@example.com",
+      phone: "555-0100"
+    });
+    const ownItem = fakeDb.seedProductCatalog({
+      companyId: auth.company.id,
+      name: "Own Tune-Up",
+      unitPrice: "129.00"
+    });
+    const otherCompany = fakeDb.seedCompany({ name: "Other Co", slug: "other-co-fs147" });
+    const foreignItem = fakeDb.seedProductCatalog({
+      companyId: otherCompany.id,
+      name: "Foreign Item",
+      unitPrice: "10.00"
+    });
+    return { auth, customer, ownItem, foreignItem };
+  }
+
+  const line = (priceBookItemId?: string) => ({
+    name: "Line",
+    quantity: 1,
+    unitPrice: 10,
+    ...(priceBookItemId ? { priceBookItemId } : {})
+  });
+
+  async function createEstimate(auth: ReturnType<typeof createAuthContext>, customerId: string) {
+    const response = await request(app.server)
+      .post("/api/v1/estimates")
+      .set("Authorization", auth.authorization)
+      .send({ customerId, title: "Scoped", items: [line()] });
+    expect(response.status).toBe(201);
+    return response.body.estimate as { id: string; items: Array<{ id: string }> };
+  }
+
+  async function createInvoice(auth: ReturnType<typeof createAuthContext>, customerId: string) {
+    const response = await request(app.server)
+      .post("/api/v1/invoices")
+      .set("Authorization", auth.authorization)
+      .send({ customerId, items: [line()] });
+    expect(response.status).toBe(201);
+    return response.body.invoice as { id: string; items: Array<{ id: string }> };
+  }
+
+  it("POST /estimates rejects another tenant's priceBookItemId and accepts its own", async () => {
+    const { auth, customer, ownItem, foreignItem } = seedTenantFixtures();
+
+    const rejected = await request(app.server)
+      .post("/api/v1/estimates")
+      .set("Authorization", auth.authorization)
+      .send({ customerId: customer.id, title: "Cross", items: [line(foreignItem.id)] });
+    expect(rejected.status).toBe(404);
+
+    const accepted = await request(app.server)
+      .post("/api/v1/estimates")
+      .set("Authorization", auth.authorization)
+      .send({ customerId: customer.id, title: "Own", items: [line(ownItem.id)] });
+    expect(accepted.status).toBe(201);
+  });
+
+  it("estimate item add/update reject another tenant's priceBookItemId", async () => {
+    const { auth, customer, ownItem, foreignItem } = seedTenantFixtures();
+    const estimate = await createEstimate(auth, customer.id);
+    const itemId = estimate.items[0]?.id;
+    expect(itemId).toBeTruthy();
+
+    const add = await request(app.server)
+      .post(`/api/v1/estimates/${estimate.id}/items`)
+      .set("Authorization", auth.authorization)
+      .send(line(foreignItem.id));
+    expect(add.status).toBe(404);
+
+    const update = await request(app.server)
+      .patch(`/api/v1/estimates/${estimate.id}/items/${itemId}`)
+      .set("Authorization", auth.authorization)
+      .send({ priceBookItemId: foreignItem.id });
+    expect(update.status).toBe(404);
+
+    const ownUpdate = await request(app.server)
+      .patch(`/api/v1/estimates/${estimate.id}/items/${itemId}`)
+      .set("Authorization", auth.authorization)
+      .send({ priceBookItemId: ownItem.id });
+    expect(ownUpdate.status).toBe(200);
+  });
+
+  it("POST /invoices rejects another tenant's priceBookItemId", async () => {
+    const { auth, customer, foreignItem } = seedTenantFixtures();
+
+    const rejected = await request(app.server)
+      .post("/api/v1/invoices")
+      .set("Authorization", auth.authorization)
+      .send({ customerId: customer.id, items: [line(foreignItem.id)] });
+    expect(rejected.status).toBe(404);
+  });
+
+  it("invoice item add/update reject another tenant's priceBookItemId", async () => {
+    const { auth, customer, ownItem, foreignItem } = seedTenantFixtures();
+    const invoice = await createInvoice(auth, customer.id);
+    const itemId = invoice.items[0]?.id;
+    expect(itemId).toBeTruthy();
+
+    const add = await request(app.server)
+      .post(`/api/v1/invoices/${invoice.id}/items`)
+      .set("Authorization", auth.authorization)
+      .send(line(foreignItem.id));
+    expect(add.status).toBe(404);
+
+    const update = await request(app.server)
+      .patch(`/api/v1/invoices/${invoice.id}/items/${itemId}`)
+      .set("Authorization", auth.authorization)
+      .send({ priceBookItemId: foreignItem.id });
+    expect(update.status).toBe(404);
+
+    const ownAdd = await request(app.server)
+      .post(`/api/v1/invoices/${invoice.id}/items`)
+      .set("Authorization", auth.authorization)
+      .send(line(ownItem.id));
+    expect(ownAdd.status).toBe(201);
+  });
+});

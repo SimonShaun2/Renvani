@@ -57,6 +57,7 @@ import {
   retrieveInvoiceCheckoutClientSecret
 } from "../lib/stripe.js";
 import { listItems, recalculateTotals } from "./invoice-items.service.js";
+import { assertPriceBookItemsInCompany } from "./price-book-item-scope.js";
 
 type CompanyRow = typeof companies.$inferSelect;
 type CustomerRow = typeof customers.$inferSelect;
@@ -836,6 +837,11 @@ export async function createInvoice(
       : normalizedInput.items;
 
     if (sourceItems.length > 0) {
+      await assertPriceBookItemsInCompany(
+        tx,
+        companyId,
+        sourceItems.map((item) => ("priceBookItemId" in item ? item.priceBookItemId : null))
+      );
       await tx
         .insert(invoiceItems)
         .values(

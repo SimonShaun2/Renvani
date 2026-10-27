@@ -52,6 +52,13 @@ const STATIC_PAGE_META: Array<{ prefix: string; meta: PageMeta }> = [
     }
   },
   {
+    prefix: "/payments",
+    meta: {
+      title: "Payments",
+      subtitle: "Collections, payouts, and disputes at a glance."
+    }
+  },
+  {
     prefix: "/service-agreements",
     meta: {
       title: "Service Agreements",

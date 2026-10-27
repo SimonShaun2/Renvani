@@ -31,10 +31,12 @@ export const SERVICE_FUSION_PRESETS: ImportSourcePreset[] = [
     label: "Service Fusion (price book)",
     headerAliases: {
       "item name": "name",
+      "service name": "name",
       name: "name",
       description: "description",
       "unit price": "unitPrice",
       price: "unitPrice",
+      rate: "unitPrice",
       category: "type",
       sku: "sku"
     }

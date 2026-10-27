@@ -1,11 +1,5 @@
-import { ScaffoldPage } from "@/src/components/layout/ScaffoldPage";
+import { JobsListClient } from "@/src/components/jobs/JobsListClient";
 
 export default function JobsPage() {
-  return (
-    <ScaffoldPage
-      title="Jobs"
-      subtitle="Lifecycle views, technician execution, and upsell surfaces anchor here next."
-      ticket="018"
-    />
-  );
+  return <JobsListClient />;
 }

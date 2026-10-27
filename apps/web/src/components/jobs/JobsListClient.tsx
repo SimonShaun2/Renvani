@@ -9,13 +9,8 @@ import { useJobsList } from "@/src/hooks/jobs.hooks";
 
 import { EmptyState } from "../ui/EmptyState";
 import { SkeletonCard } from "../ui/SkeletonCard";
-import { CHIP_TONE_CLASS, JOB_COLUMNS, JOB_FILTER_CHIPS, chipFilters, currentWeek, type JobFilterChip } from "./jobsList.config";
+import { CHIP_TONE_CLASS, JOB_COLUMNS, JOB_FILTER_CHIPS, COUNTS_PAGE_LIMIT, chipFilters, currentWeek, deriveWeekCounts, type JobFilterChip } from "./jobsList.config";
 import { buildJobListQuery } from "./jobsList.utils";
-
-/** Live count for a filter (limit 1, reads `total`). Undefined while loading or on error. */
-function useJobCount(filters: { status: string; from: string; to: string }): number | undefined {
-  return useJobsList(buildJobListQuery({ ...filters, search: "", page: 1 }, 1)).data?.total;
-}
 
 function Kpi({ label, value, caption }: { label: string; value: string; caption: string }) {
   return (
@@ -45,14 +40,18 @@ export function JobsListClient() {
     setPage(1);
   }, [chip, debouncedSearch]);
 
-  const counts: Record<JobFilterChip["key"], number | undefined> = {
-    all: useJobCount(chipFilters("all", now)),
-    today: useJobCount(chipFilters("today", now)),
-    unpaid: useJobCount(chipFilters("unpaid", now))
-  };
-  const week = useJobCount({ status: "all", ...currentWeek(now) });
-
+  // One counts request (current week); chip totals come from the list query itself and are remembered per chip.
+  const weekQuery = useJobsList(
+    buildJobListQuery({ status: "all", ...currentWeek(now), search: "", page: 1 }, COUNTS_PAGE_LIMIT)
+  );
+  const { week, today } = deriveWeekCounts(weekQuery.data, now);
   const query = useJobsList(buildJobListQuery({ ...chipFilters(chip, now), search: debouncedSearch, page }));
+  const [seen, setSeen] = useState<Partial<Record<JobFilterChip["key"], number>>>({});
+  const listTotal = query.data?.total;
+  useEffect(() => {
+    if (listTotal !== undefined && !debouncedSearch) setSeen((s) => (s[chip] === listTotal ? s : { ...s, [chip]: listTotal }));
+  }, [chip, debouncedSearch, listTotal]);
+  const counts: Record<JobFilterChip["key"], number | undefined> = { all: seen.all, unpaid: seen.unpaid, today: today ?? seen.today };
   const jobs = query.data?.data ?? [];
   const totalPages = Math.max(1, query.data?.totalPages ?? 1);
   const hasFilters = chip !== "all" || Boolean(debouncedSearch);
@@ -71,7 +70,7 @@ export function JobsListClient() {
 
       <section aria-label="Job stats" className="flex flex-wrap gap-4">
         <Kpi label="Jobs this week" value={count(week)} caption="Scheduled Mon–Sun" />
-        <Kpi label="Scheduled today" value={count(counts.today)} caption="On today's schedule" />
+        <Kpi label="Scheduled today" value={count(today)} caption="On today's schedule" />
         <Kpi label="Unpaid" value="—" caption={counts.unpaid === undefined ? "Not available yet" : `${counts.unpaid} jobs · amount not available yet`} />
         <Kpi label="Avg ticket" value="—" caption="Not available yet" />
       </section>
@@ -97,7 +96,7 @@ export function JobsListClient() {
           <input
             aria-label="Search jobs"
             className="h-10 w-full rounded-[10px] border border-[#e6dccb] bg-white pl-9 pr-3 text-[13px] text-[#0f1530] outline-none focus:border-[#f6b400] focus:ring-2 focus:ring-[#fff4d6]"
-            placeholder="Search jobs, customers..."
+            placeholder="Search jobs, customers…"
             value={search}
             onChange={(event) => setSearch(event.target.value)}
           />

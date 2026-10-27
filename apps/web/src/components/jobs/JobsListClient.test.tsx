@@ -14,7 +14,7 @@ vi.mock("next/link", () => ({
 }));
 
 import { JobsListClient } from "./JobsListClient";
-import { chipFilters, currentWeek, formatWhen, jobStateChip } from "./jobsList.config";
+import { chipFilters, currentWeek, deriveWeekCounts, formatWhen, jobStateChip } from "./jobsList.config";
 
 const job = {
   id: "j1",
@@ -70,6 +70,8 @@ describe("JobsListClient", () => {
     expect(table).not.toMatch(/Total/i);
     expect(screen.getByRole("button", { name: "All · 1" })).toBeTruthy();
     expect(screen.getAllByText("—").length).toBeGreaterThan(0);
+    expect(screen.getByPlaceholderText("Search jobs, customers…")).toBeTruthy();
+    expect(new Set(useJobsList.mock.calls.map((c) => c[0].limit))).toEqual(new Set([100, 25]));
   });
 
   it("unpaid chip filters by invoiced status", () => {
@@ -102,6 +104,9 @@ describe("jobsList.config", () => {
     expect(jobStateChip("dispatched")).toEqual({ label: "On the way", tone: "blue" });
     expect(jobStateChip("invoiced").label).toBe("Unpaid");
     expect(currentWeek(now)).toEqual({ from: "2026-10-26", to: "2026-11-01" });
+    expect(deriveWeekCounts({ data: [{ scheduledStart: new Date(2026, 9, 27, 8).toISOString() }, { scheduledStart: null }], total: 2 }, now)).toEqual({ week: 2, today: 1 });
+    expect(deriveWeekCounts({ data: [], total: 150 }, now)).toEqual({ week: 150, today: undefined });
+    expect(deriveWeekCounts(undefined, now)).toEqual({ week: undefined, today: undefined });
     expect(chipFilters("today", now)).toEqual({ status: "all", from: "2026-10-27", to: "2026-10-27" });
   });
 });

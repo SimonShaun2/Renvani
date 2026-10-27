@@ -1,5 +1,6 @@
 "use client";
 
+import "./jobs-motion.css";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Briefcase, ChevronLeft, ChevronRight, Search } from "lucide-react";

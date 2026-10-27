@@ -8,12 +8,13 @@ import type {
   CustomerPortalVisits
 } from "@fsm/types";
 
-import { customerPortalGet, isPortalLinkExpired } from "@/src/lib/customer-portal-session";
+import { customerPortalGet, customerPortalScope, isPortalLinkExpired } from "@/src/lib/customer-portal-session";
 
 function usePortalQuery<T>(name: string, path: string, token: string | null) {
   return useQuery({
-    // Token deliberately not in the query key (keys can surface in devtools/logs).
-    queryKey: ["customer-portal", name],
+    // Raw token never goes in the key (keys can surface in devtools/logs); a per-credential
+    // random scope id partitions the cache so customers never share cached data.
+    queryKey: ["customer-portal", customerPortalScope(token), name],
     enabled: Boolean(token),
     retry: (count, error) => !isPortalLinkExpired(error) && count < 1,
     queryFn: () => customerPortalGet<T>(path, token as string)

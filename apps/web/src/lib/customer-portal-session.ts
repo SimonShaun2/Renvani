@@ -6,6 +6,27 @@ export const CUSTOMER_PORTAL_TOKEN_HEADER = "x-customer-portal-token";
 const STORAGE_KEY = "renvani.customer-portal.token";
 
 let memoryToken: string | null = null;
+let scopeToken: string | null = null;
+let scopeId = "none";
+
+function newScopeId(): string {
+  return typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+    ? crypto.randomUUID()
+    : `s-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+
+/**
+ * Non-secret cache scope for the current portal credential. A new random id is
+ * minted whenever the token changes, so cached portal data never crosses customers.
+ */
+export function customerPortalScope(token: string | null): string {
+  if (!token) return "none";
+  if (token !== scopeToken) {
+    scopeToken = token;
+    scopeId = newScopeId();
+  }
+  return scopeId;
+}
 
 /** Read `#token=` from the fragment, strip it from the URL, and keep it in memory + sessionStorage. */
 export function captureCustomerPortalToken(): string | null {
@@ -33,6 +54,8 @@ export function captureCustomerPortalToken(): string | null {
 
 export function clearCustomerPortalToken(): void {
   memoryToken = null;
+  scopeToken = null;
+  scopeId = "none";
   try {
     window.sessionStorage.removeItem(STORAGE_KEY);
   } catch {

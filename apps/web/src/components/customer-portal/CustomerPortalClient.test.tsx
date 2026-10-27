@@ -3,7 +3,7 @@ import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/re
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { isPublicRoute } from "@/src/lib/route-access";
-import { CUSTOMER_PORTAL_TOKEN_HEADER } from "@/src/lib/customer-portal-session";
+import { CUSTOMER_PORTAL_TOKEN_HEADER, clearCustomerPortalToken } from "@/src/lib/customer-portal-session";
 
 import { CustomerPortalClient } from "./CustomerPortalClient";
 
@@ -39,6 +39,7 @@ beforeEach(() => {
   seenHeaders.length = 0;
   seenUrls.length = 0;
   window.sessionStorage.clear();
+  clearCustomerPortalToken();
   window.history.replaceState(null, "", "/portal#token=jwt.portal.token");
   vi.stubGlobal(
     "fetch",
@@ -116,5 +117,48 @@ describe("CustomerPortalClient", () => {
     window.history.replaceState(null, "", "/portal");
     renderPortal();
     expect(await screen.findByText("This link has expired")).toBeTruthy();
+  });
+});
+
+describe("customer portal credential changes (Bugbot #222)", () => {
+  it("does not reuse cached data across tokens, even with a long staleTime", async () => {
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false, staleTime: 60_000 } } });
+    const first = render(
+      <QueryClientProvider client={client}>
+        <CustomerPortalClient />
+      </QueryClientProvider>
+    );
+    await screen.findByText("AC tune-up");
+    first.unmount();
+    seenHeaders.length = 0;
+    window.history.replaceState(null, "", "/portal#token=other.customer.token");
+    render(
+      <QueryClientProvider client={client}>
+        <CustomerPortalClient />
+      </QueryClientProvider>
+    );
+    await waitFor(() => expect(seenHeaders.filter((h) => h === "other.customer.token")).toHaveLength(4));
+  });
+
+  it("captures a magic link pasted into an open tab (fragment navigation)", async () => {
+    window.history.replaceState(null, "", "/portal");
+    renderPortal();
+    expect(await screen.findByText(/expired/i)).toBeTruthy();
+    window.history.replaceState(null, "", "/portal#token=pasted.token");
+    window.dispatchEvent(new HashChangeEvent("hashchange"));
+    await screen.findByText("AC tune-up");
+    expect(seenHeaders).toContain("pasted.token");
+    expect(window.location.hash).toBe("");
+  });
+
+  it("switches to a replacement link while viewing the portal", async () => {
+    renderPortal();
+    await screen.findByText("AC tune-up");
+    seenHeaders.length = 0;
+    window.history.replaceState(null, "", "/portal#token=replacement.token");
+    window.dispatchEvent(new HashChangeEvent("hashchange"));
+    await waitFor(() => expect(seenHeaders.filter((h) => h === "replacement.token").length).toBeGreaterThanOrEqual(4));
+    expect(seenHeaders).not.toContain("jwt.portal.token");
+    expect(window.location.hash).toBe("");
   });
 });

@@ -5,7 +5,7 @@ import "./customer-portal-motion.css";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
-import type { UseQueryResult } from "@tanstack/react-query";
+import { useQueryClient, type UseQueryResult } from "@tanstack/react-query";
 import type { CustomerPortalVisit } from "@fsm/types";
 
 import {
@@ -89,10 +89,25 @@ export function CustomerPortalClient() {
   const [token, setToken] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
 
+  const queryClient = useQueryClient();
+
   useEffect(() => {
-    setToken(captureCustomerPortalToken());
+    const capture = () => {
+      const next = captureCustomerPortalToken();
+      setToken((previous) => {
+        if (previous && previous !== next) {
+          // Drop the previous customer's cached portal data.
+          queryClient.removeQueries({ queryKey: ["customer-portal"] });
+        }
+        return next;
+      });
+    };
+    capture();
     setReady(true);
-  }, []);
+    // Pasting a new magic link into the same tab is a fragment navigation, not a remount.
+    window.addEventListener("hashchange", capture);
+    return () => window.removeEventListener("hashchange", capture);
+  }, [queryClient]);
 
   const account = useCustomerPortalAccount(token);
   const visits = useCustomerPortalVisits(token);

@@ -50,5 +50,19 @@ export function estimateStraightLineMinutes(distanceMiles: number, speedMph: num
   return Math.min(ETA_MAX_MINUTES, Math.max(1, Math.ceil(minutes)));
 }
 
+export type StraightLineEstimate = { minutes: number; distanceMiles: number };
+
+/**
+ * Shared straight-line travel estimate (haversine × road factor at a clamped assumed speed).
+ * Single helper for ETA, dispatch drive-time, etc. `distanceMiles` is rounded to 0.01 mi.
+ */
+export function estimateStraightLine(from: GeoPoint, to: GeoPoint, speedMph?: number | null): StraightLineEstimate {
+  const distanceMiles = haversineMiles(from, to);
+  return {
+    minutes: estimateStraightLineMinutes(distanceMiles, clampEtaSpeedMph(speedMph)),
+    distanceMiles: Math.round(distanceMiles * 100) / 100
+  };
+}
+
 export type EtaMethod = "straight_line_estimate" | (string & {});
 export type EtaConfidence = "low" | "medium" | "high";

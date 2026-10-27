@@ -14,7 +14,7 @@ vi.mock("@fsm/db", () => {
   };
 });
 
-import { getGeoProvider, listGeoProviderIds, registerGeoProvider, straightLineGeoProvider, type GeoProvider } from "./geo-provider.registry.js";
+import { assertGeoProviderConfigured, getGeoProvider, listGeoProviderIds, registerGeoProvider, straightLineGeoProvider, type GeoProvider } from "./geo-provider.registry.js";
 import { getJobEta } from "./job-eta.service.js";
 
 const companyId = "cccccccc-cccc-4ccc-8ccc-cccccccccccc";
@@ -31,6 +31,15 @@ describe("geo provider registry", () => {
   it("has straight_line by default and rejects unknown ids", () => {
     expect(listGeoProviderIds()).toContain("straight_line");
     expect(() => getGeoProvider("mapbox")).toThrow(/GEO_PROVIDER_UNKNOWN/);
+    // Runtime unknown provider is a handled AppError, not a bare Error → unhandled 500.
+    expect(() => getGeoProvider("mapbox")).toThrow(expect.objectContaining({ code: "INTERNAL_ERROR" }));
+  });
+
+  it("assertGeoProviderConfigured fails fast for unknown ids and passes for registered ones", () => {
+    expect(() => assertGeoProviderConfigured("nope_geo")).toThrow(/GEO_PROVIDER="nope_geo" is not a registered geo provider/);
+    expect(() => assertGeoProviderConfigured("straight_line")).not.toThrow();
+    registerGeoProvider({ ...straightLineGeoProvider, id: "custom_ok" });
+    expect(() => assertGeoProviderConfigured("custom_ok")).not.toThrow();
   });
 
   it("allows register + override and validates ids", () => {

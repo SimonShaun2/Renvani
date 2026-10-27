@@ -35,6 +35,7 @@ import {
   index,
   uniqueIndex,
   type AnyPgColumn,
+  check,
 } from "drizzle-orm/pg-core";
 import { relations, sql } from "drizzle-orm";
 
@@ -1643,14 +1644,6 @@ export const importChunkRuns = pgTable("import_chunk_runs", {
   idempotencyUnique: uniqueIndex("import_chunk_runs_idempotency_key_idx").on(t.idempotencyKey),
 }));
 
-export const integrationOutboxKindEnum = pgEnum("integration_outbox_kind", [
-  "csv_import",
-  "public_booking",
-  "sms_outbound",
-  "email_outbound",
-  "stripe_connect",
-]);
-
 export const integrationOutboxStatusEnum = pgEnum("integration_outbox_status", [
   "pending",
   "processing",
@@ -1673,7 +1666,8 @@ export const integrationOutboxOperations = pgTable(
   {
     id: id(),
     companyId: companyId(),
-    kind: integrationOutboxKindEnum("kind").notNull(),
+    // varchar + app-level kind registry (@fsm/types registerAdapterOperationKind) since 0051.
+    kind: varchar("kind", { length: 64 }).notNull(),
     adapterId: varchar("adapter_id", { length: 64 }).notNull(),
     idempotencyKey: varchar("idempotency_key", { length: 255 }).notNull(),
     correlationId: uuid("correlation_id").notNull(),
@@ -1692,6 +1686,9 @@ export const integrationOutboxOperations = pgTable(
       t.companyId,
       t.correlationId
     ),
+    // Worker claim query: pending/processing rows ordered by staleness.
+    statusUpdatedIdx: index("integration_outbox_operations_status_updated_idx").on(t.status, t.updatedAt),
+    kindFormatChk: check("integration_outbox_operations_kind_format_chk", sql`"kind" ~ '^[a-z][a-z0-9_]{0,63}$'`),
   })
 );
 
@@ -1718,6 +1715,40 @@ export const integrationOutboxAuditEvents = pgTable(
     retryReceiptKeyIdx: uniqueIndex("integration_outbox_audit_events_retry_receipt_key_idx")
       .on(t.companyId, t.retryReceiptKey)
       .where(sql`"retry_receipt_key" IS NOT NULL`),
+  })
+);
+
+/**
+ * FS-199 — Stripe disputes mirrored from platform `charge.dispute.*` webhooks (destination
+ * charges, so disputes live on the platform account). Read-only for tenants; status/reason are
+ * text validated by the app registry in @fsm/types (no pgEnum). `resource_version` orders
+ * webhook deliveries so replays/out-of-order events never regress state.
+ */
+export const stripeDisputes = pgTable(
+  "stripe_disputes",
+  {
+    id: id(),
+    companyId: companyId(),
+    stripeDisputeId: varchar("stripe_dispute_id", { length: 100 }).notNull(),
+    stripeChargeId: varchar("stripe_charge_id", { length: 100 }),
+    stripePaymentIntentId: varchar("stripe_payment_intent_id", { length: 100 }),
+    paymentId: uuid("payment_id").references(() => payments.id, { onDelete: "set null" }),
+    amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+    currency: varchar("currency", { length: 3 }).notNull(),
+    status: varchar("status", { length: 64 }).notNull(),
+    reason: varchar("reason", { length: 64 }).notNull(),
+    evidenceDueBy: timestamp("evidence_due_by"),
+    disputedAt: timestamp("disputed_at").notNull(),
+    resourceVersion: varchar("resource_version", { length: 128 }).notNull(),
+    ...timestamps,
+  },
+  (t) => ({
+    companyDisputeIdx: uniqueIndex("stripe_disputes_company_dispute_idx")
+      .on(t.companyId, t.stripeDisputeId)
+      .where(sql`"deleted_at" IS NULL`),
+    companyStatusIdx: index("stripe_disputes_company_status_disputed_idx").on(t.companyId, t.status, t.disputedAt),
+    statusFormatChk: check("stripe_disputes_status_format_chk", sql`"status" ~ '^[a-z][a-z0-9_]{0,63}$'`),
+    reasonFormatChk: check("stripe_disputes_reason_format_chk", sql`"reason" ~ '^[a-z][a-z0-9_]{0,63}$'`),
   })
 );
 

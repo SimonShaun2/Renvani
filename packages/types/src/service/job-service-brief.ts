@@ -59,10 +59,24 @@ export const JobNoteKindV1Schema = z.enum(["internal", "field"]);
 
 export type JobNoteKindV1 = z.infer<typeof JobNoteKindV1Schema>;
 
-export function buildServiceJobBriefIdempotencyKey(companyId: string, jobId: string): string {
-  return `service-job-brief:${companyId}:${jobId}`;
+/**
+ * Includes the job resource version so a brief for a changed job is not suppressed as a duplicate
+ * of an earlier proposal (FS-25 follow-up).
+ */
+export function buildServiceJobBriefIdempotencyKey(
+  companyId: string,
+  jobId: string,
+  resourceVersion: string
+): string {
+  return `service-job-brief:${companyId}:${jobId}:${resourceVersion}`;
 }
 
-export function buildServiceJobBriefBuildJobId(companyId: string, jobId: string): string {
-  return `service-build-job-brief-${companyId}-${jobId}`;
+/** BullMQ job ids must not contain ':'; the version is reduced to a safe token. */
+export function buildServiceJobBriefBuildJobId(
+  companyId: string,
+  jobId: string,
+  resourceVersion: string
+): string {
+  const versionToken = resourceVersion.replace(/[^A-Za-z0-9_-]/g, "-");
+  return `service-build-job-brief-${companyId}-${jobId}-${versionToken}`;
 }

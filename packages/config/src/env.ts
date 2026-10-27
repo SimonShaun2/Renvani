@@ -15,6 +15,10 @@ const envSchema = z.object({
   DATABASE_TRANSACTION_MAX_RETRIES: z.coerce.number().int().nonnegative().default(3),
   DATABASE_TRANSACTION_RETRY_BASE_MS: z.coerce.number().int().positive().default(25),
   REDIS_URL: z.string().min(1, "REDIS_URL is required"),
+  /** FS-198 — geo/ETA provider id (registry in apps/api). Default needs no key and makes no calls. */
+  GEO_PROVIDER: z.string().regex(/^[a-z][a-z0-9_]{0,63}$/).default("straight_line"),
+  /** FS-198 — assumed average driving speed for straight-line ETAs (mph); clamped 5–80 at use. */
+  ETA_ASSUMED_SPEED_MPH: z.coerce.number().positive().default(30),
   STRIPE_SECRET_KEY: z.string().min(1, "STRIPE_SECRET_KEY is required"),
   STRIPE_WEBHOOK_SECRET: z.string().min(1, "STRIPE_WEBHOOK_SECRET is required"),
   STRIPE_CONNECT_CLIENT_ID: z.string().min(1, "STRIPE_CONNECT_CLIENT_ID is required"),

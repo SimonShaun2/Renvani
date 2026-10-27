@@ -344,3 +344,17 @@ export interface PublicPayReceiptFees {
   bookingFeeCents: number;
   feeRefundable: false;
 }
+
+/** Web client name for the GET /public/pay/:token response (apps/api routes/public/pay/schemas.ts). */
+export type PublicPaymentLinkResponse = PublicInvoicePaymentLinkView;
+
+/** GET /public/pay/:token/receipt response: legacy receipt keys + view keys + fee split. */
+export interface PublicInvoiceReceiptResponse extends PublicPayViewFields, PublicPayReceiptFees {
+  invoiceNumber: string;
+  totalDue: string;
+  invoiceAmount: string;
+  platformFeeAmount: string;
+  receiptPortalUrl: string;
+  pdfDownloadUrl: string;
+  brandName: string;
+}

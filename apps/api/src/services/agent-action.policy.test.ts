@@ -74,3 +74,58 @@ describe("agent-action.policy", () => {
     }
   });
 });
+
+describe("agent-action registry (FS-25 follow-up)", () => {
+  it("adds a new action type and product by registering, without policy edits", async () => {
+    const { registerAgentActionType, registerAgentProduct } = await import("./agent-action.registry.js");
+    registerAgentProduct({
+      agentProduct: "test_addon",
+      assertActorAllowed: (_definition, actorType) => {
+        if (actorType !== "system") {
+          throw new AppError(ErrorCode.POLICY_DENIED, "system only");
+        }
+      }
+    });
+    registerAgentActionType({ actionType: "test_addon.ping", agentProduct: "test_addon", autoApproved: true });
+
+    expect(() => assertActionAllowedForProduct("test_addon", "test_addon.ping", "system")).not.toThrow();
+    expect(() => assertActionAllowedForProduct("test_addon", "test_addon.ping", "user")).toThrow(AppError);
+    expect(requiresHumanApproval("test_addon.ping")).toBe(false);
+    // Registered type is scoped to its own product.
+    expect(() => assertActionAllowedForProduct("revenue", "test_addon.ping", "user")).toThrow(AppError);
+  });
+
+  it("keeps built-in behavior: approvals, editability, unknown product and AI gating", async () => {
+    const { isAgentActionEditable } = await import("./agent-action.policy.js");
+    for (const type of [
+      "message.send_proposed",
+      "loyalty.reminder.propose",
+      "service.job_brief.propose",
+      "scheduling.booking.self_service",
+      "revenue.inquiry.qualify",
+      "unknown.type"
+    ]) {
+      expect(requiresHumanApproval(type)).toBe(true);
+    }
+    expect(requiresHumanApproval("context.resolve")).toBe(false);
+    expect(isAgentActionEditable("message.draft")).toBe(true);
+    expect(isAgentActionEditable("message.send_proposed")).toBe(true);
+    expect(isAgentActionEditable("service.job_brief.propose")).toBe(false);
+    expect(() => assertActionAllowedForProduct("retention", "context.resolve", "user")).toThrow(
+      "Agent product is not enabled"
+    );
+    expect(() => assertActionAllowedForProduct("revenue", "context.resolve", "ai")).not.toThrow();
+    expect(() => assertActionAllowedForProduct("loyalty", "loyalty.reminder.propose", "user")).toThrow(
+      "Only AI may propose loyalty reminder actions in v1"
+    );
+    expect(() => assertActionAllowedForProduct("service", "service.job_brief.propose", "user")).toThrow(
+      "Only automated service agents may propose job brief actions in v1"
+    );
+    expect(() =>
+      assertActionAllowedForProduct("scheduling", "scheduling.booking.self_service", "ai")
+    ).toThrow("Scheduling self-service notices require a system actor");
+    expect(() => assertActionAllowedForProduct("service", "loyalty.reminder.propose", "ai")).toThrow(
+      "Action type is not allowed for service agent"
+    );
+  });
+});

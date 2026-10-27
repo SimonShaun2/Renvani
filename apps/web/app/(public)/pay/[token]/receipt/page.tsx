@@ -5,24 +5,18 @@ import { Loader2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 
 import { PayInvoicePaidCard, PayInvoiceShell, type PaidDetail } from "@/src/components/pay/PayInvoiceView";
+import type { PublicInvoiceReceiptResponse } from "@fsm/types";
+
+import { buildPaidDetails, formatUsd } from "@/src/components/pay/pay-invoice.utils";
 import { publicApi } from "@/src/lib/public-api";
 
-interface ReceiptView {
-  invoiceNumber: string;
-  totalDue: string;
-  invoiceAmount: string;
-  platformFeeAmount: string;
-  receiptPortalUrl: string;
-  pdfDownloadUrl: string;
-  brandName: string;
-}
 
 /** Receipt view styled as the Paid success card (Figma 53:219 desktop / 53:465 mobile). */
 export default function InvoiceReceiptPage() {
   const params = useParams<{ token: string }>();
   const receiptQuery = useQuery({
     queryKey: ["public-receipt", params.token],
-    queryFn: () => publicApi.get<ReceiptView>(`/api/v1/public/pay/${params.token}/receipt`)
+    queryFn: () => publicApi.get<PublicInvoiceReceiptResponse>(`/api/v1/public/pay/${params.token}/receipt`)
   });
 
   if (receiptQuery.isError) {
@@ -42,18 +36,24 @@ export default function InvoiceReceiptPage() {
   }
 
   const receipt = receiptQuery.data;
-  const details: PaidDetail[] = [{ label: "Service amount", value: `$${receipt.invoiceAmount}` }];
-  if (Number(receipt.platformFeeAmount) > 0) {
-    // Receipt API returns only the combined fee (Service Fee + booking fee); fees are non-refundable.
-    details.push({ label: "Fees (non-refundable)", value: `$${receipt.platformFeeAmount}` });
+  const details: PaidDetail[] = [{ label: "Service amount", value: formatUsd(receipt.invoiceAmount) }];
+  if (receipt.serviceFeeCents > 0 && receipt.serviceFeeLabel) {
+    details.push({ label: `${receipt.serviceFeeLabel} · non-refundable`, value: formatUsd(receipt.serviceFeeAmount) });
   }
-  details.push({ label: "Total", value: `$${receipt.totalDue}` });
+  if (receipt.bookingFeeCents > 0) {
+    details.push({ label: "Online booking fee · non-refundable", value: formatUsd(receipt.bookingFeeAmount) });
+  }
+  details.push(...buildPaidDetails(receipt));
+  const amount = receipt.paidAmount ?? (Number(receipt.totalDue) > 0 ? receipt.totalDue : null);
 
   return (
-    <PayInvoiceShell shopName={null} invoiceNumber={receipt.invoiceNumber}>
+    <PayInvoiceShell shopName={receipt.shopName} shopLogoUrl={receipt.shopLogoUrl} invoiceNumber={receipt.invoiceNumber}>
       <PayInvoicePaidCard
-        amount={Number(receipt.totalDue) > 0 ? receipt.totalDue : null}
+        amount={amount}
         invoiceNumber={receipt.invoiceNumber}
+        customerName={receipt.customerName}
+        shopName={receipt.shopName}
+        shopUrl={receipt.shopUrl}
         details={details}
         receiptHref={receipt.pdfDownloadUrl}
         receiptLabel="Download PDF"

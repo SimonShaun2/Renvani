@@ -31,6 +31,7 @@ import {
   handleVipInvoicePaymentSucceeded,
   handleVipSubscriptionCreated
 } from "./stripe-vip-membership.handler.js";
+import { handleStripeDisputeEvent, isStripeDisputeEventType } from "./stripe-dispute.handler.js";
 import {
   claimEventProcessing,
   clearEventProcessingClaim,
@@ -676,6 +677,10 @@ export async function stripeHandler(
         await handleAccountUpdated(event, request.log);
         break;
       default:
+        if (isStripeDisputeEventType(event.type)) {
+          await handleStripeDisputeEvent(event, request.log);
+          break;
+        }
         request.log.warn(
           {
             eventId: event.id,

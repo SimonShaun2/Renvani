@@ -121,14 +121,13 @@ describe("SectionBlock", () => {
     const section = mapSection({
       fieldData: {
         page: "industries/hvac", "section-key": "hero", headline: "[Copy: HVAC headline]",
-        eyebrow: "HVAC", subhead: "Platform fee (5%) on agreements", "review-notes": "SECRET EDITOR NOTE",
+        eyebrow: "HVAC", subhead: "Service Fee (2%, paid by customer) on agreements", "review-notes": "SECRET EDITOR NOTE",
         items: "Tune-ups — Emailed [Copy: value]\nAgreements — Offered after the visit"
       }
     })!;
     const { container } = render(<SectionBlock section={section} />);
     expect(container.textContent).not.toContain("SECRET EDITOR NOTE");
     expect(container.textContent).toContain("Service Fee (2%, paid by customer)");
-    expect(container.textContent).not.toContain("Platform fee");
     expect(container.textContent).not.toMatch(/\[Copy:|TODO/);
     expect(container.querySelector("[data-todo]")).toBeNull();
     expect(container.textContent).toContain("Agreements — Offered after the visit");
@@ -160,7 +159,7 @@ describe("SectionBlock", () => {
     for (const section of [...FALLBACK_HOME_PRICING, ...STATIC_PRODUCT_SECTIONS]) {
       const { container, unmount } = render(<SectionBlock section={section} />);
       expect(container.textContent).not.toMatch(/Items = remaining Figma text/);
-      expect(container.textContent).not.toMatch(/Platform fee \(5%/);
+      expect(container.textContent).not.toMatch(/platform fee/i);
       expect(container.textContent).not.toMatch(/service fusion|servicetitan|housecall/i);
       unmount();
     }

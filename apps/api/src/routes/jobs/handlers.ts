@@ -1,5 +1,6 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 
+import { withSignedJobSignature } from "../../lib/job-signature-ref.js";
 import type {
   ActivityEvent,
   AddNoteInput,
@@ -295,7 +296,7 @@ export async function createJobHandler(request: FastifyRequest, reply: FastifyRe
   const detail = await getJob(request.company.id, job.id);
 
   return reply.status(201).send({
-    job: toJobDetailResponse(detail)
+    job: toJobDetailResponse(await withSignedJobSignature(detail))
   });
 }
 
@@ -304,7 +305,7 @@ export async function getJobHandler(request: FastifyRequest, reply: FastifyReply
   const job = await getJob(request.company.id, params.id);
 
   return reply.send({
-    job: toJobDetailResponse(job)
+    job: toJobDetailResponse(await withSignedJobSignature(job))
   });
 }
 
@@ -313,7 +314,7 @@ export async function updateJobHandler(request: FastifyRequest, reply: FastifyRe
   const detail = await patchJob(request.company.id, request.user.id, params.id, request.body as UpdateJobInput);
 
   return reply.send({
-    job: toJobDetailResponse(detail)
+    job: toJobDetailResponse(await withSignedJobSignature(detail))
   });
 }
 
@@ -327,7 +328,7 @@ export async function transitionStatusHandler(
   const detail = await getJob(request.company.id, params.id);
 
   return reply.send({
-    job: toJobDetailResponse(detail)
+    job: toJobDetailResponse(await withSignedJobSignature(detail))
   });
 }
 
@@ -341,7 +342,7 @@ export async function assignTechnicianHandler(
   const detail = await getJob(request.company.id, params.id);
 
   return reply.send({
-    job: toJobDetailResponse(detail)
+    job: toJobDetailResponse(await withSignedJobSignature(detail))
   });
 }
 
@@ -351,7 +352,7 @@ export async function scheduleJobHandler(request: FastifyRequest, reply: Fastify
   const detail = await getJob(request.company.id, params.id);
 
   return reply.send({
-    job: toJobDetailResponse(detail)
+    job: toJobDetailResponse(await withSignedJobSignature(detail))
   });
 }
 
@@ -361,7 +362,7 @@ export async function completeJobHandler(request: FastifyRequest, reply: Fastify
   const detail = await getJob(request.company.id, params.id);
 
   return reply.send({
-    job: toJobDetailResponse(detail)
+    job: toJobDetailResponse(await withSignedJobSignature(detail))
   });
 }
 

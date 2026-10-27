@@ -779,3 +779,55 @@ export async function createVipMembershipCheckoutSession(
     url: session.url
   };
 }
+
+/** FS-199: read-only payout views for a tenant's Express (Connect) account. */
+export interface ConnectedAccountPayout {
+  id: string;
+  amount: string;
+  currency: string;
+  status: string;
+  arrivalDate: string | null;
+  createdAt: string;
+  method: string | null;
+  type: string | null;
+  description: string | null;
+  failureCode: string | null;
+}
+
+function mapConnectedAccountPayout(payout: Stripe.Payout): ConnectedAccountPayout {
+  return {
+    id: payout.id,
+    amount: centsToCurrencyString(payout.amount) ?? "0.00",
+    currency: payout.currency,
+    status: payout.status,
+    arrivalDate: payout.arrival_date ? new Date(payout.arrival_date * 1000).toISOString() : null,
+    createdAt: new Date(payout.created * 1000).toISOString(),
+    method: payout.method ?? null,
+    type: payout.type ?? null,
+    description: payout.description ?? null,
+    failureCode: payout.failure_code ?? null
+  };
+}
+
+export async function listConnectedAccountPayouts(
+  accountId: string,
+  query: { limit: number; startingAfter?: string }
+): Promise<{ data: ConnectedAccountPayout[]; hasMore: boolean }> {
+  const page = await stripe.payouts.list(
+    { limit: query.limit, ...(query.startingAfter ? { starting_after: query.startingAfter } : {}) },
+    { stripeAccount: accountId }
+  );
+  return { data: page.data.map(mapConnectedAccountPayout), hasMore: page.has_more };
+}
+
+export async function retrieveConnectedAccountPayout(
+  accountId: string,
+  payoutId: string
+): Promise<ConnectedAccountPayout | null> {
+  try {
+    return mapConnectedAccountPayout(await stripe.payouts.retrieve(payoutId, {}, { stripeAccount: accountId }));
+  } catch (error: unknown) {
+    if ((error as { statusCode?: number }).statusCode === 404) return null;
+    throw error;
+  }
+}

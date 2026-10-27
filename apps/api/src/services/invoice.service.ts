@@ -47,6 +47,7 @@ import {
   type PaymentMethod,
   type PaymentStatus,
   type PublicInvoicePaymentLink,
+  type PublicInvoicePaymentLinkView,
   type RecordPaymentInput,
   type UpdateInvoiceInput
 } from "@fsm/types";
@@ -776,9 +777,9 @@ function buildPublicPaymentPageUrl(paymentToken: string): string {
   return `${appBaseUrl}/pay/${paymentToken}`;
 }
 
-export async function getPublicInvoicePaymentLink(token: string): Promise<PublicInvoicePaymentLink> {
+export async function getPublicInvoicePaymentLink(token: string): Promise<PublicInvoicePaymentLinkView> {
   const { link, context } = await loadPublicInvoicePayment(token);
-  return { ...link, fields: await buildPublicPayViewFields(context) };
+  return { ...link, ...buildPublicPayViewFields(context) };
 }
 
 /** Public pay link (legacy keys) plus the preloaded context used to build `fields`. */

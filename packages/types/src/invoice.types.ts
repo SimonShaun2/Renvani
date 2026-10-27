@@ -295,9 +295,10 @@ export interface PublicInvoicePaymentLink {
   platformFeePaidByCustomer: boolean;
   /** Optional disclosure from `CUSTOMER_PLATFORM_FEE_DISCLOSURE` (empty = omit). */
   platformFeeDisclosure: string | null;
-  /** Additive payer-safe display fields (see PublicPayViewFields). */
-  fields?: PublicPayViewFields;
 }
+
+/** Public pay link response: legacy keys plus additive payer-safe display keys. */
+export type PublicInvoicePaymentLinkView = PublicInvoicePaymentLink & PublicPayViewFields;
 
 /** Payer-safe line item on the public pay page (no internal ids). */
 export interface PublicPayLineItem {
@@ -308,28 +309,19 @@ export interface PublicPayLineItem {
   total: string;
 }
 
-/** Service Fee vs booking fee split for a public receipt. Fees are never refundable. */
-export interface PublicPayFeeBreakdown {
-  invoiceAmount: string;
-  serviceFeeLabel: string | null;
-  serviceFeeAmount: string;
-  serviceFeeRateBps: number;
-  bookingFeeAmount: string;
-  totalPaid: string;
-  feeRefundable: false;
-}
-
 /**
- * Additive, payer-safe display fields for GET /public/pay/:token and /receipt.
- * Never carries tenant ids, row ids, Stripe account ids, or internal notes.
- * Extend by adding a key here and a builder in apps/api/src/lib/public-pay-view.ts.
+ * Additive, payer-safe top-level keys on GET /public/pay/:token and /receipt (Figma 53:3–53:465).
+ * Never carries tenant ids, row ids, Stripe ids or internal notes. Extend by adding a key here,
+ * a builder in apps/api/src/lib/public-pay-view.ts and the key in the route response allowlist.
  */
 export interface PublicPayViewFields {
   shopName: string | null;
   shopLogoUrl: string | null;
   shopUrl: string | null;
   statementDescriptor: string | null;
+  /** First + last (or display) name, as the frame header shows. */
   customerName: string | null;
+  /** Street line only (frame: "1840 Grape St · Service on Oct 20"). */
   serviceAddress: string | null;
   serviceDate: string | null;
   dueAt: string | null;
@@ -338,11 +330,17 @@ export interface PublicPayViewFields {
   paymentStatus: string | null;
   paidAmount: string | null;
   paidAt: string | null;
-  cardBrand: string | null;
-  cardLast4: string | null;
   /** Masked (first character of the local part kept). */
   receiptEmail: string | null;
   plan: "flex" | "flat" | null;
-  /** Receipt only. */
-  feeBreakdown?: PublicPayFeeBreakdown;
+}
+
+/** Receipt-only Service Fee vs booking fee split. Fees are never refundable. */
+export interface PublicPayReceiptFees {
+  serviceFeeLabel: string | null;
+  serviceFeeAmount: string;
+  serviceFeeCents: number;
+  bookingFeeAmount: string;
+  bookingFeeCents: number;
+  feeRefundable: false;
 }

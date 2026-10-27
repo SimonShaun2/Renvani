@@ -9,10 +9,9 @@ import {
   serviceFeeRateBpsForPlan
 } from "@fsm/config/stripe-pricing";
 import { companies, customers, db, invoiceItems, invoices, jobs, payments, properties } from "@fsm/db";
-import { AppError, ErrorCode, type PublicPayFeeBreakdown, type PublicPayViewFields } from "@fsm/types";
+import { AppError, ErrorCode, type PublicPayReceiptFees, type PublicPayViewFields } from "@fsm/types";
 
 import { readRenvaniSubscriptionPlan, type RenvaniSubscriptionPlan } from "./company-renvani-plan.js";
-import { retrievePaymentIntentCardSummary, type PaymentCardSummary } from "./stripe.js";
 
 type SelectExecutor = Pick<typeof db, "select">;
 type InvoiceRow = typeof invoices.$inferSelect;
@@ -120,12 +119,7 @@ function maskEmail(email: string | null | undefined): string | null {
 }
 
 function formatAddress(property: PropertyRow | null): string | null {
-  if (!property) {
-    return null;
-  }
-  const street = [property.addressLine1, property.addressLine2].filter(Boolean).join(" ");
-  const cityLine = [property.city, [property.state, property.zip].filter(Boolean).join(" ")].filter(Boolean).join(", ");
-  return [street, cityLine].filter(Boolean).join(", ") || null;
+  return property?.addressLine1?.trim() || null;
 }
 
 function customerName(customer: CustomerRow | null): string | null {
@@ -146,51 +140,40 @@ function isSucceeded(payment: PaymentRow | null): payment is PaymentRow {
 }
 
 /**
- * Service Fee vs booking fee split. A succeeded payment uses the fees stamped at checkout;
- * otherwise the split is previewed with computeCheckoutFees (Flat -> no Service Fee,
- * booking fee only when an online-booked invoice is paid in full at checkout).
+ * Receipt Service Fee vs booking fee split. A succeeded payment uses the fees recorded at checkout;
+ * otherwise computeCheckoutFees previews it (Flat -> no Service Fee; booking fee only when an
+ * online-booked invoice is paid in full at checkout). Label from SERVICE_FEE_RATE_BPS via plan.
  */
-export function buildPublicPayFeeBreakdown(ctx: PublicPayContext): PublicPayFeeBreakdown {
-  const rateBps = serviceFeeRateBpsForPlan(ctx.plan);
+export function buildPublicPayReceiptFees(ctx: PublicPayContext): PublicPayReceiptFees {
   const payment = ctx.latestPayment;
-  let invoiceCents: number;
-  let serviceFeeCents: number;
-  let bookingFeeCents: number;
-
-  if (isSucceeded(payment)) {
-    invoiceCents = moneyStringToCents(payment.amount);
-    serviceFeeCents = moneyStringToCents(payment.serviceFeeAmount);
-    bookingFeeCents = moneyStringToCents(payment.bookingFeeAmount);
-  } else {
-    const fees = computeCheckoutFees({
-      chargeCents: moneyStringToCents(ctx.invoice.balanceDue),
-      isOnlineBooking: ctx.isOnlineBooking,
-      paysInvoiceInFull: true,
-      plan: ctx.plan
-    });
-    invoiceCents = fees.chargeCents;
-    serviceFeeCents = fees.serviceFeeCents;
-    bookingFeeCents = fees.bookingFeeCents;
-  }
+  const fees = isSucceeded(payment)
+    ? {
+        serviceFeeCents: moneyStringToCents(payment.serviceFeeAmount),
+        bookingFeeCents: moneyStringToCents(payment.bookingFeeAmount)
+      }
+    : computeCheckoutFees({
+        chargeCents: moneyStringToCents(ctx.invoice.balanceDue),
+        isOnlineBooking: ctx.isOnlineBooking,
+        paysInvoiceInFull: true,
+        plan: ctx.plan
+      });
 
   return {
-    invoiceAmount: centsToMoneyString(invoiceCents),
-    serviceFeeLabel: serviceFeeCents > 0 ? formatServiceFeeLineItemName(rateBps) : null,
-    serviceFeeAmount: centsToMoneyString(serviceFeeCents),
-    serviceFeeRateBps: serviceFeeCents > 0 ? rateBps : 0,
-    bookingFeeAmount: centsToMoneyString(bookingFeeCents),
-    totalPaid: centsToMoneyString(invoiceCents + serviceFeeCents + bookingFeeCents),
+    serviceFeeLabel: fees.serviceFeeCents > 0 ? formatServiceFeeLineItemName(serviceFeeRateBpsForPlan(ctx.plan)) : null,
+    serviceFeeAmount: centsToMoneyString(fees.serviceFeeCents),
+    serviceFeeCents: fees.serviceFeeCents,
+    bookingFeeAmount: centsToMoneyString(fees.bookingFeeCents),
+    bookingFeeCents: fees.bookingFeeCents,
     feeRefundable: false
   };
 }
 
-type Builder<K extends keyof PublicPayViewFields> = (ctx: PublicPayContext) => PublicPayViewFields[K];
-
 /**
- * Extension point: one pure builder per field. Add a key to PublicPayViewFields and a builder
- * here; every builder reads only the preloaded context, so new fields add no queries.
+ * Extension point: one pure builder per field over the preloaded context (no extra queries).
+ * Card brand/last4 are intentionally absent: payments has no stored card columns and a live
+ * Stripe read on an unauthenticated GET is not worth the cost/abuse surface.
  */
-const FIELD_BUILDERS: { [K in Exclude<keyof PublicPayViewFields, "cardBrand" | "cardLast4" | "feeBreakdown">]: Builder<K> } = {
+const FIELD_BUILDERS: { [K in keyof PublicPayViewFields]: (ctx: PublicPayContext) => PublicPayViewFields[K] } = {
   shopName: (ctx) => ctx.company.name || null,
   shopLogoUrl: (ctx) => ctx.company.logoUrl ?? null,
   shopUrl: (ctx) => ctx.company.website ?? null,
@@ -213,37 +196,41 @@ const FIELD_BUILDERS: { [K in Exclude<keyof PublicPayViewFields, "cardBrand" | "
   plan: (ctx) => ctx.plan
 };
 
-/** Card brand/last4 only for a succeeded card payment; one Stripe read, fail-soft. */
-async function loadCard(ctx: PublicPayContext): Promise<PaymentCardSummary | null> {
-  const payment = ctx.latestPayment;
-  if (!isSucceeded(payment) || payment.method !== "card" || !payment.stripePaymentIntentId) {
-    return null;
+export function buildPublicPayViewFields(ctx: PublicPayContext): PublicPayViewFields {
+  const out = {} as Record<keyof PublicPayViewFields, unknown>;
+  for (const key of Object.keys(FIELD_BUILDERS) as Array<keyof PublicPayViewFields>) {
+    out[key] = FIELD_BUILDERS[key](ctx);
   }
-  try {
-    return await retrievePaymentIntentCardSummary(payment.stripePaymentIntentId);
-  } catch {
-    return null;
-  }
+  return out as PublicPayViewFields;
 }
 
-export interface BuildPublicPayViewOptions {
-  /** Adds the Service Fee vs booking fee split (receipt). */
-  includeFeeBreakdown?: boolean;
-}
-
-export async function buildPublicPayViewFields(
-  ctx: PublicPayContext,
-  options: BuildPublicPayViewOptions = {}
-): Promise<PublicPayViewFields> {
-  const base = Object.fromEntries(
-    Object.entries(FIELD_BUILDERS).map(([key, build]) => [key, (build as Builder<keyof PublicPayViewFields>)(ctx)])
-  ) as Omit<PublicPayViewFields, "cardBrand" | "cardLast4" | "feeBreakdown">;
-  const card = await loadCard(ctx);
-
-  return {
-    ...base,
-    cardBrand: card?.brand ?? null,
-    cardLast4: card?.last4 ?? null,
-    ...(options.includeFeeBreakdown ? { feeBreakdown: buildPublicPayFeeBreakdown(ctx) } : {})
-  };
-}
+/** Response-schema allowlist for the additive keys (kept next to the builders). */
+export const PUBLIC_PAY_VIEW_FIELD_SCHEMA = {
+  shopName: { type: ["string", "null"] },
+  shopLogoUrl: { type: ["string", "null"] },
+  shopUrl: { type: ["string", "null"] },
+  statementDescriptor: { type: ["string", "null"] },
+  customerName: { type: ["string", "null"] },
+  serviceAddress: { type: ["string", "null"] },
+  serviceDate: { type: ["string", "null"] },
+  dueAt: { type: ["string", "null"] },
+  lineItems: {
+    type: "array",
+    items: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        description: { type: "string" },
+        quantity: { type: "string" },
+        unit: { type: "string" },
+        total: { type: "string" }
+      }
+    }
+  },
+  invoiceStatus: { type: "string" },
+  paymentStatus: { type: ["string", "null"] },
+  paidAmount: { type: ["string", "null"] },
+  paidAt: { type: ["string", "null"] },
+  receiptEmail: { type: ["string", "null"] },
+  plan: { type: ["string", "null"] }
+} as const satisfies Record<keyof PublicPayViewFields, unknown>;

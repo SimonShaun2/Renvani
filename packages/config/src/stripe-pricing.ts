@@ -26,7 +26,10 @@ function roundMoney(value: number): string {
   return (Math.round(value * 100) / 100).toFixed(2);
 }
 
-/** Customer-paid platform fee on top of the service/invoice total (Flex only). */
+/**
+ * Customer-paid platform fee on top of the service/invoice total (Flex only).
+ * @deprecated Legacy STRIPE_PLATFORM_FEE_PERCENT path; customer fees use computeCheckoutFees / SERVICE_FEE_RATE_BPS. Remove in a later cleanup.
+ */
 export function computeCustomerPaidPlatformFee(
   invoiceAmount: string,
   fraction: number
@@ -54,6 +57,7 @@ export function computeCustomerPaidPlatformFee(
   };
 }
 
+/** @deprecated Legacy "Renvani platform fee" label; use formatServiceFeeLineItemName. Remove in a later cleanup. */
 export function formatCustomerPlatformFeeLineItemName(fraction: number): string {
   const percent = Math.round(fraction * 10000) / 100;
   const label = Number.isInteger(percent) ? `${percent}` : `${percent}`;

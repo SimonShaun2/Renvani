@@ -14,7 +14,7 @@
 - `stripePlatformBillingMvp` in `@fsm/config/feature-flags` (default **false**).
 - `STRIPE_PLATFORM_BILLING_PRICE_ID_FLEX` / `STRIPE_PLATFORM_BILLING_PRICE_ID_FLAT` — Flex ($299/mo) and Flat ($799/mo) Stripe Price ids (test mode).
 - `STRIPE_PLATFORM_BILLING_PRICE_ID` — legacy alias for Flex when `_FLEX` unset.
-- `STRIPE_PLATFORM_FEE_PERCENT` — Flex **5%** Connect shop fee (`0.05`); **not** charged on Flat (see STACK-14).
+- `STRIPE_PLATFORM_FEE_PERCENT` — legacy, still required by `env.ts` (use `0.02`) but no longer customer-facing; the customer Service Fee is SERVICE_FEE_RATE_BPS (2%) in @fsm/config/stripe-pricing. Flat: no Service Fee (see STACK-14).
 
 ## State
 

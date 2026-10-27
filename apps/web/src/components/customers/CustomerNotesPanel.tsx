@@ -15,7 +15,8 @@ import { useAuthStore } from "@/src/stores/auth.store";
 
 import { EmptyState } from "../ui/EmptyState";
 import { SkeletonCard } from "../ui/SkeletonCard";
-import { TimeAgo } from "../ui/TimeAgo";
+import { formatMonthDay } from "./profile/customer-profile.utils";
+import { ProfileCard, ProfileMonoLabel, profileButtonClass } from "./profile/ProfileUi";
 
 export function CustomerNotesPanel({ customerId }: { customerId: string }) {
   const notesQuery = useCustomerNotes(customerId);
@@ -24,10 +25,8 @@ export function CustomerNotesPanel({ customerId }: { customerId: string }) {
   const canAuthor = Boolean(role && (CUSTOMER_NOTE_AUTHOR_ROLES as readonly string[]).includes(role));
 
   return (
-    <section className="surface-card px-5 py-5" data-crm-reveal>
-      <h2 className="text-base font-semibold text-neutral-900">Notes</h2>
-      {canAuthor ? <AddCustomerNoteForm customerId={customerId} /> : null}
-      <div className="mt-4">
+    <ProfileCard title="Customer notes" data-crm-reveal>
+      <div>
         {notesQuery.isLoading ? (
           <SkeletonCard className="h-[96px]" />
         ) : notesQuery.isError ? (
@@ -37,20 +36,20 @@ export function CustomerNotesPanel({ customerId }: { customerId: string }) {
         ) : notes.length === 0 ? (
           <EmptyState icon={StickyNote} title="No notes yet" subtitle="Imported and office notes for this customer appear here." compact />
         ) : (
-          <ul className="max-h-[320px] space-y-3 overflow-y-auto pr-1">
+          <ul className="max-h-[320px] overflow-y-auto">
             {notes.map((note) => (
-              <li key={note.id} className="rounded-[22px] border border-neutral-200 bg-neutral-50 px-4 py-3">
-                <p className="whitespace-pre-line text-sm leading-6 text-neutral-700">{note.content}</p>
-                <p className="mt-2 text-xs font-medium text-neutral-400">
-                  {note.isInternal ? "Internal · " : ""}
-                  <TimeAgo value={note.notedAt ?? note.createdAt} />
-                </p>
+              <li key={note.id} className="flex flex-col gap-1 border-t border-[#e6dccb] py-2.5">
+                <ProfileMonoLabel>
+                  {[formatMonthDay(note.notedAt ?? note.createdAt), note.isInternal ? "Internal" : null].filter(Boolean).join(" · ")}
+                </ProfileMonoLabel>
+                <p className="whitespace-pre-line text-[13px] text-[#0f1530]">{note.content}</p>
               </li>
             ))}
           </ul>
         )}
       </div>
-    </section>
+      {canAuthor ? <AddCustomerNoteForm customerId={customerId} /> : null}
+    </ProfileCard>
   );
 }
 
@@ -77,7 +76,7 @@ function AddCustomerNoteForm({ customerId }: { customerId: string }) {
 
   return (
     <form
-      className="mt-4 space-y-2"
+      className="space-y-2 border-t border-[#e6dccb] pt-3"
       aria-label="Add a customer note"
       onSubmit={(event) => {
         event.preventDefault();
@@ -98,7 +97,7 @@ function AddCustomerNoteForm({ customerId }: { customerId: string }) {
         maxLength={CUSTOMER_NOTE_MAX_LENGTH + 1}
         placeholder="Add a note about this customer…"
         aria-invalid={validation ? true : undefined}
-        className="w-full rounded-[20px] border border-neutral-200 bg-neutral-50 px-3 py-3 text-sm text-neutral-800"
+        className="w-full rounded-[10px] border border-[#e6dccb] bg-white px-3 py-2.5 text-[13px] text-[#0f1530]"
       />
       {validation ? (
         <p role="alert" className="text-xs text-error">
@@ -121,7 +120,7 @@ function AddCustomerNoteForm({ customerId }: { customerId: string }) {
         <button
           type="submit"
           disabled={createNote.isPending}
-          className="rounded-full bg-neutral-950 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+          className={profileButtonClass()}
         >
           {createNote.isPending ? "Saving…" : "Add note"}
         </button>

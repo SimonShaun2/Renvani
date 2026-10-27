@@ -4,7 +4,7 @@ import { useParams, useSearchParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
 
 import { PayInvoiceCheckoutBody, PayInvoicePaidCard, PayInvoiceShell } from "@/src/components/pay/PayInvoiceView";
-import { resolvePayInvoiceState } from "@/src/components/pay/pay-invoice.utils";
+import { buildPaidDetails, resolvePayInvoiceState, resolvePayNotice } from "@/src/components/pay/pay-invoice.utils";
 import { StripeEmbeddedInvoiceCheckout } from "@/src/components/stripe/StripeEmbeddedInvoiceCheckout";
 import { EmptyState } from "@/src/components/ui/EmptyState";
 import { usePublicPaymentLink } from "@/src/hooks/invoices.hooks";
@@ -42,22 +42,23 @@ export default function PublicPaymentPage() {
   const state = resolvePayInvoiceState(payment, status);
 
   return (
-    <PayInvoiceShell shopName={payment.shopName} invoiceNumber={payment.invoiceNumber}>
+    <PayInvoiceShell shopName={payment.shopName} shopLogoUrl={payment.shopLogoUrl} invoiceNumber={payment.invoiceNumber}>
       {state === "paid" ? (
         <PayInvoicePaidCard
-          // After Stripe settles the invoice the API recomputes on a zero balance, so only show a non-zero amount.
-          amount={Number(payment.totalDue) > 0 ? payment.totalDue : null}
+          // Settled invoices report paidAmount; before settlement fall back to a non-zero totalDue.
+          amount={payment.paidAmount ?? (Number(payment.totalDue) > 0 ? payment.totalDue : null)}
           invoiceNumber={payment.invoiceNumber}
           customerName={payment.customerName}
           shopName={payment.shopName}
           shopUrl={payment.shopUrl}
-          details={[]}
+          details={buildPaidDetails(payment)}
           receiptHref={`/pay/${params.token}/receipt`}
         />
       ) : (
         <PayInvoiceCheckoutBody
           payment={payment}
           state={state}
+          notice={resolvePayNotice(status)}
           checkout={
             payment.checkoutClientSecret ? <StripeEmbeddedInvoiceCheckout clientSecret={payment.checkoutClientSecret} /> : null
           }

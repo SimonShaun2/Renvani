@@ -1,25 +1,33 @@
 import type { ReactNode } from "react";
 
-import type { PublicPaymentLinkResponse } from "@/src/hooks/invoices.hooks";
-import { buildPayInvoiceSummary, formatUsd, type PayInvoiceState } from "./pay-invoice.utils";
+import type { PublicPaymentLinkResponse } from "@fsm/types";
+
+import { buildPayInvoiceSummary, formatShortDate, formatUsd, resolvePayNotice, type PayInvoiceState, type PayNotice } from "./pay-invoice.utils";
 
 /** Figma tokens (file jiGHTNUJNltWbHA4Il3hk7, Customer 05): cream #fbf6ef, line #e6dccb, ink #0f1530, ink2 #2a3360, muted #5e6684. */
 
-function formatShortDate(value: string | null | undefined): string | null {
-  if (!value) {
-    return null;
-  }
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? null : date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
-}
-
 /** Top bar 53:4 + footer 53:11 around the page body. */
-export function PayInvoiceShell({ shopName, invoiceNumber, children }: { shopName: string | null | undefined; invoiceNumber: string; children: ReactNode }) {
+export function PayInvoiceShell({
+  shopName,
+  shopLogoUrl,
+  invoiceNumber,
+  children
+}: {
+  shopName: string | null | undefined;
+  shopLogoUrl?: string | null | undefined;
+  invoiceNumber: string;
+  children: ReactNode;
+}) {
   return (
     <div className="flex min-h-screen flex-col bg-[#fbf6ef] text-[#0f1530]" data-node-id="53:3">
       <header className="flex items-center justify-between gap-4 px-5 py-5 md:border-b md:border-[#e6dccb] md:bg-white md:px-12">
         <div className="flex min-w-0 items-center gap-2.5">
-          <span aria-hidden className="h-7 w-7 shrink-0 rounded-lg bg-[#2f7d4f]" />
+          {shopLogoUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element -- tenant logo on an arbitrary host
+            <img src={shopLogoUrl} alt="" className="h-7 w-7 shrink-0 rounded-lg object-cover" />
+          ) : (
+            <span aria-hidden className="h-7 w-7 shrink-0 rounded-lg bg-[#2f7d4f]" />
+          )}
           <p className="truncate text-base font-semibold">{shopName ?? "Secure payment"}</p>
         </div>
         <p className="shrink-0 text-[13px] text-[#5e6684]">Invoice {invoiceNumber}</p>
@@ -91,22 +99,27 @@ export function PayInvoiceSummaryCard({ payment }: { payment: PublicPaymentLinkR
 /** Payment form 53:43; Failed (53:143 / 53:390) adds the declined banner and "Try again" label. */
 export function PayInvoicePaymentCard({
   payment,
-  failed,
+  notice,
   checkout
 }: {
   payment: PublicPaymentLinkResponse;
-  failed: boolean;
+  notice: PayNotice | null;
   checkout: ReactNode | null;
 }) {
+  const failed = notice !== null;
   const total = formatUsd(payment.totalDue);
 
   return (
     <section className={`${card} flex flex-col gap-3.5`} aria-label="Pay securely">
       <h2 className="text-xl font-semibold">Pay securely</h2>
-      {failed ? (
-        <div role="alert" className="flex flex-col gap-1 rounded-lg bg-[#fbe3dc] p-3.5 text-[#b42318]">
-          <p className="text-base font-semibold">Your card was declined</p>
-          <p className="text-[13px]">No charge was made. Try another card or pay by bank account.</p>
+      {notice ? (
+        <div
+          role={notice.tone === "error" ? "alert" : "status"}
+          data-notice={notice.tone}
+          className={`flex flex-col gap-1 rounded-lg p-3.5 ${notice.tone === "error" ? "bg-[#fbe3dc] text-[#b42318]" : "bg-[#fbf6ef] text-[#2a3360]"}`}
+        >
+          <p className="text-base font-semibold">{notice.title}</p>
+          <p className="text-[13px]">{notice.body}</p>
         </div>
       ) : null}
       {checkout ?? (
@@ -130,10 +143,12 @@ export function PayInvoicePaymentCard({
 export function PayInvoiceCheckoutBody({
   payment,
   state,
+  notice = null,
   checkout
 }: {
   payment: PublicPaymentLinkResponse;
   state: Exclude<PayInvoiceState, "paid">;
+  notice?: PayNotice | null;
   checkout: ReactNode | null;
 }) {
   return (
@@ -142,7 +157,7 @@ export function PayInvoiceCheckoutBody({
         <PayInvoiceSummaryCard payment={payment} />
       </div>
       <div className="w-full md:w-[420px] md:shrink-0">
-        <PayInvoicePaymentCard payment={payment} failed={state === "failed"} checkout={checkout} />
+        <PayInvoicePaymentCard payment={payment} notice={state === "failed" ? (notice ?? resolvePayNotice("declined")) : null} checkout={checkout} />
       </div>
     </div>
   );

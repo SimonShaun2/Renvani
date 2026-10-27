@@ -24,6 +24,7 @@ export * from "./import-equipment.types.js";
 export * from "./import-equipment-normalize.js";
 export * from "./import-price-book.js";
 export * from "./import-notes.js";
+export * from "./import-service-agreements.js";
 export * from "./fs-migrate/index.js";
 export * from "./import-relational-preview.types.js";
 export * from "./import-bundle.types.js";

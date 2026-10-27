@@ -2,13 +2,17 @@ import { IMPORT_SOURCE_PRESETS } from "./catalog.js";
 import { normalizeHeader } from "./normalize.js";
 import type { ImportPresetEntityHint, ImportSourcePresetId } from "./types.js";
 
-function entityHintFromImportEntityType(entityType: string): ImportPresetEntityHint {
+export function entityHintFromImportEntityType(entityType: string): ImportPresetEntityHint {
   if (entityType === "invoices" || entityType === "payments") {
     return "invoices";
   }
 
   if (entityType === "notes") {
     return "notes";
+  }
+
+  if (entityType === "service_agreements" || entityType === "maintenance_plans") {
+    return "service_agreements";
   }
 
   if (entityType === "products" || entityType === "price_book" || entityType === "price_book_item") {

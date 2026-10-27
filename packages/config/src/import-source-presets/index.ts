@@ -6,6 +6,7 @@
 export { IMPORT_SOURCE_PRESETS } from "./catalog.js";
 export { buildPresetColumnMapping } from "./mapping.js";
 export {
+  entityHintFromImportEntityType,
   inferImportSourcePresetForSession,
   inferImportSourcePresetFromHeaders
 } from "./infer.js";

@@ -65,3 +65,44 @@ export function EstimateFrequencyOptions() {
     </section>
   );
 }
+
+function money(value: number): string {
+  return `$${value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
+
+/**
+ * Figma 10:707 totals card. Only amounts computed exactly from the estimate's lines,
+ * tax rate and discount; no per-visit / first-visit / monthly figures (no recurring API).
+ */
+export function EstimateTotalsCard({
+  label,
+  subtotal,
+  taxAmount,
+  taxRate,
+  discountAmount,
+  total
+}: {
+  label?: string | null;
+  subtotal: number;
+  taxAmount: number;
+  taxRate: number;
+  discountAmount: number;
+  total: number;
+}) {
+  const rows: Array<{ label: string; value: string; strong?: boolean }> = [
+    { label: "Subtotal", value: money(subtotal) },
+    { label: `Tax (${(taxRate * 100).toFixed(2)}%)`, value: money(taxAmount) }
+  ];
+  if (discountAmount > 0) rows.push({ label: "Discount", value: `−${money(discountAmount)}` });
+  rows.push({ label: label ? `Total · ${label}` : "Total", value: money(total), strong: true });
+  return (
+    <section aria-label="Estimate totals" className="space-y-2.5 rounded-[14px] border border-[#e6dccb] bg-white p-5 text-[13px]">
+      {rows.map((row) => (
+        <div key={row.label} className="flex items-center justify-between gap-3">
+          <span className="text-[#5e6684]">{row.label}</span>
+          <span className={row.strong ? "font-semibold text-[#0f1530]" : "font-medium text-[#0f1530]"}>{row.value}</span>
+        </div>
+      ))}
+    </section>
+  );
+}

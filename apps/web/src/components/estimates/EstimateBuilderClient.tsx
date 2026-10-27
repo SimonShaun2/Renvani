@@ -33,7 +33,7 @@ import { getCompanyTaxRate } from "@/src/components/jobs/jobs.utils";
 import { CustomerEstimateView } from "./CustomerEstimateView";
 import { EditableLineItemsTable } from "./EditableLineItemsTable";
 import { EstimateSendModal } from "./EstimateSendModal";
-import { EstimateChecksPanel, EstimateFrequencyOptions } from "./EstimateFigmaPanels";
+import { EstimateChecksPanel, EstimateFrequencyOptions, EstimateTotalsCard } from "./EstimateFigmaPanels";
 import { buildEstimateSubtitle } from "./estimate-builder.utils";
 import {
   buildEstimatePublicPath,
@@ -1048,6 +1048,8 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
                       subtitle="Add products, labor, fees, or materials from the catalog and keep the estimate draft current."
                       items={draft.single.items}
                       readOnly={!isEditable}
+                      variant="frame"
+                      discountAmount={activeTotals.discountAmount}
                       onChange={(items) =>
                         setDraft((current) => ({
                           ...current,
@@ -1095,6 +1097,8 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
                                 subtitle={`Scope and pricing for the ${tier.label?.toLowerCase()} option.`}
                                 items={tier.items}
                                 readOnly={!isEditable}
+                                variant="frame"
+                                discountAmount={tierTotals.discountAmount}
                                 onChange={(items) =>
                                   setDraft((current) => ({
                                     ...current,
@@ -1117,6 +1121,15 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
                   </div>
                 )}
               </section>
+
+              <EstimateTotalsCard
+                label={draft.mode === "tiers" ? activeTier.label : null}
+                subtotal={activeTotals.subtotal}
+                taxAmount={activeTotals.taxAmount}
+                taxRate={taxRate}
+                discountAmount={activeTotals.discountAmount}
+                total={activeTotals.total}
+              />
 
               <EstimateFrequencyOptions />
 
@@ -1194,14 +1207,6 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
                   ) : null}
 
                   <div className="flex items-center justify-between gap-3 text-neutral-500">
-                    <span>Subtotal</span>
-                    <CurrencyDisplay value={activeTotals.subtotal} showCents />
-                  </div>
-                  <div className="mt-2 flex items-center justify-between gap-3 text-neutral-500">
-                    <span>Tax ({(taxRate * 100).toFixed(2)}%)</span>
-                    <CurrencyDisplay value={activeTotals.taxAmount} showCents />
-                  </div>
-                  <div className="mt-2 flex items-center justify-between gap-3 text-neutral-500">
                     <span>Discount</span>
                     {isEditable ? (
                       <input
@@ -1217,13 +1222,6 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
                     ) : (
                       <CurrencyDisplay value={draft.discountAmount} showCents />
                     )}
-                  </div>
-                </div>
-
-                <div className="mt-4 border-t border-neutral-200 pt-4">
-                  <div className="flex items-center justify-between gap-3 text-base font-semibold text-neutral-900">
-                    <span>Total</span>
-                    <CurrencyDisplay value={activeTotals.total} showCents className="text-2xl" />
                   </div>
                 </div>
 

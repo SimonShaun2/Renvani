@@ -108,8 +108,8 @@ export function CustomerProfile({ customerId }: { customerId: string }) {
       </Link>
 
       <header className="flex flex-wrap items-center gap-4">
-        <div className="min-w-0 flex-1">
-          <h1 className="truncate text-[32px] font-semibold text-[#0f1530]">{getCustomerName(customer)}</h1>
+        <div className="min-w-0 basis-full sm:basis-0 sm:flex-1">
+          <h1 className="break-words text-[32px] font-semibold text-[#0f1530]">{getCustomerName(customer)}</h1>
           <p className="mt-1.5 text-sm text-[#5e6684]">{buildProfileSubtitle(customer)}</p>
         </div>
         {customer.email && !customer.doNotContact ? (
@@ -117,6 +117,12 @@ export function CustomerProfile({ customerId }: { customerId: string }) {
             Email customer
           </a>
         ) : null}
+        <Link href={`/jobs?new=1&customerId=${customer.id}`} className={profileButtonClass("dark")}>
+          New job
+        </Link>
+        <Link href={`/service-agreements?enrollCustomerId=${customer.id}`} className={profileButtonClass()}>
+          New agreement
+        </Link>
         <button type="button" onClick={() => setCustomerFormOpen(true)} className={profileButtonClass()}>
           Edit
         </button>

@@ -58,8 +58,8 @@ export function EquipmentCard({ customer }: { customer: CustomerDetailRecord }) 
 export function CustomerJobsTable({ jobs, limit = 5 }: { jobs: CustomerJobRecord[]; limit?: number }) {
   const rows = jobs.slice(0, limit);
   return (
-    <section aria-label="Jobs" className="w-full overflow-hidden rounded-[14px] border border-[#e6dccb] bg-white">
-      <table className="w-full text-left text-[13px] text-[#0f1530]">
+    <section aria-label="Jobs" className="w-full overflow-x-auto rounded-[14px] border border-[#e6dccb] bg-white">
+      <table className="w-full min-w-[480px] text-left text-[13px] text-[#0f1530]">
         <thead className="bg-[#fbf6ef]">
           <tr className="font-mono text-[10px] font-medium uppercase text-[#5e6684]">
             {["Job", "Service", "Date", "Amount", "State"].map((heading) => (

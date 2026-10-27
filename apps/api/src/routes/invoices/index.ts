@@ -1,3 +1,4 @@
+import { requireRole } from "../../lib/authorize.js";
 import type { FastifyPluginAsync } from "fastify";
 
 import {
@@ -123,7 +124,7 @@ const invoiceRoutes: FastifyPluginAsync = async (fastify) => {
   }, listInvoicePaymentsHandler);
 
   fastify.get("/payments", {
-    preHandler: authenticate,
+    preHandler: [authenticate, requireRole(["owner", "admin", "dispatcher", "office"])],
     preValidation: listPaymentsValidation,
     schema: listPaymentsSchema
   }, listPaymentsHandler);

@@ -1,5 +1,10 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 
+import {
+  assertTechnicianAssignedToJob,
+  isTechnicianCaller,
+  resolveCallerTechnicianId
+} from "../../lib/technician-scope.js";
 import { withSignedJobSignature } from "../../lib/job-signature-ref.js";
 import type {
   ActivityEvent,
@@ -280,7 +285,16 @@ function toActivityEventResponse(event: ActivityEvent) {
 }
 
 export async function listJobsHandler(request: FastifyRequest, reply: FastifyReply): Promise<FastifyReply> {
-  const result = await listJobs(request.company.id, request.query as ListJobsQuery);
+  const query = request.query as ListJobsQuery;
+  if (isTechnicianCaller(request)) {
+    // Technicians only ever see their own jobs; any client technicianId is overridden.
+    const ownTechnicianId = await resolveCallerTechnicianId(request);
+    if (!ownTechnicianId) {
+      return reply.send({ data: [], total: 0, page: query.page ?? 1, limit: query.limit ?? 0, totalPages: 0 });
+    }
+    query.technicianId = ownTechnicianId;
+  }
+  const result = await listJobs(request.company.id, query);
 
   return reply.send({
     data: result.data.map((job) => toJobListItemResponse(job)),
@@ -302,6 +316,7 @@ export async function createJobHandler(request: FastifyRequest, reply: FastifyRe
 
 export async function getJobHandler(request: FastifyRequest, reply: FastifyReply): Promise<FastifyReply> {
   const params = request.params as JobIdParams;
+  await assertTechnicianAssignedToJob(request, params.id, { onUnassigned: "not_found" });
   const job = await getJob(request.company.id, params.id);
 
   return reply.send({
@@ -358,6 +373,7 @@ export async function scheduleJobHandler(request: FastifyRequest, reply: Fastify
 
 export async function completeJobHandler(request: FastifyRequest, reply: FastifyReply): Promise<FastifyReply> {
   const params = request.params as JobIdParams;
+  await assertTechnicianAssignedToJob(request, params.id);
   await completeJob(request.company.id, request.user.id, params.id, request.body as CompleteJobInput);
   const detail = await getJob(request.company.id, params.id);
 
@@ -456,6 +472,7 @@ export async function updateTaskHandler(request: FastifyRequest, reply: FastifyR
 
 export async function completeTaskHandler(request: FastifyRequest, reply: FastifyReply): Promise<FastifyReply> {
   const params = request.params as TaskIdParams;
+  await assertTechnicianAssignedToJob(request, params.id);
   const task = await completeTask(request.company.id, params.id, params.taskId, request.user.id);
 
   return reply.send({

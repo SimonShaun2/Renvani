@@ -12,6 +12,8 @@ import {
   createJobHandler,
   deleteTaskHandler,
   getJobHandler,
+  getJobPreparationStatusHandler,
+  getJobServiceBriefHandler,
   listJobProductsHandler,
   getJobTimelineHandler,
   getNotesHandler,
@@ -49,6 +51,8 @@ import {
   deleteTaskValidation,
   getActivitySchema,
   getJobSchema,
+  getJobPreparationStatusRouteSchema,
+  getJobServiceBriefRouteSchema,
   listJobProductsSchema,
   listJobProductsValidation,
   getNotesSchema,
@@ -114,6 +118,18 @@ const jobRoutes: FastifyPluginAsync = async (fastify) => {
     preValidation: completeJobValidation,
     schema: completeJobRouteSchema
   }, completeJobHandler);
+
+  fastify.get("/:id/service-brief", {
+    preHandler: authenticate,
+    preValidation: jobIdValidation,
+    schema: getJobServiceBriefRouteSchema
+  }, getJobServiceBriefHandler);
+
+  fastify.get("/:id/preparation-status", {
+    preHandler: authenticate,
+    preValidation: jobIdValidation,
+    schema: getJobPreparationStatusRouteSchema
+  }, getJobPreparationStatusHandler);
 
   fastify.post("/:id/notes", {
     preHandler: authenticate,

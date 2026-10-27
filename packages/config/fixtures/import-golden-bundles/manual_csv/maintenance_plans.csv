@@ -1,0 +1,2 @@
+agreement_id,customer_id,plan_name,next_due_date,start_date,frequency,status,annual_price
+sa-golden-001,GEN-C-001,Comfort Club HVAC,2026-06-15,2025-06-15,annual,active,249.00

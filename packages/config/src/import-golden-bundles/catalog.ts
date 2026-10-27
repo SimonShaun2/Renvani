@@ -347,6 +347,16 @@ export const GOLDEN_IMPORT_BUNDLE_MANIFESTS: GoldenImportBundleManifest[] = [
           localColumn: "customer_id",
           parentColumn: "customer_id"
         }
+      },
+      {
+        relativePath: "maintenance_plans.csv",
+        entityType: "maintenance_plans",
+        presetEntityHint: "customers",
+        joinLink: {
+          parentFile: "customers.csv",
+          localColumn: "customer_id",
+          parentColumn: "customer_id"
+        }
       }
     ]
   }

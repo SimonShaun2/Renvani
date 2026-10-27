@@ -30,7 +30,12 @@ export const savedCardMigrationCustomerMappingSchema = z.object({
   matchMethod: z.enum(["renvani_customer_id", "email", "unmatched"]),
   status: z.enum(["pending", "attached", "failed", "fallback_required"]),
   paymentMethodLabel: z.string().nullable().optional(),
-  errorMessage: z.string().nullable().optional()
+  errorMessage: z.string().nullable().optional(),
+  /** FS-138: per-card consent stamp (set when this card was attached). */
+  offSessionConsentVersion: z.string().nullable().optional(),
+  offSessionConsentBatchId: z.string().uuid().nullable().optional(),
+  offSessionConsentAcknowledgedAt: z.string().datetime().nullable().optional(),
+  offSessionConsentAcknowledgedById: z.string().uuid().nullable().optional()
 });
 
 export type SavedCardMigrationCustomerMapping = z.infer<typeof savedCardMigrationCustomerMappingSchema>;
@@ -95,6 +100,8 @@ export const applySavedCardMigrationMappingsBodySchema = z.object({
   ownerOffSessionConsentAcknowledged: z.literal(true, {
     errorMap: () => ({ message: "Owner must acknowledge customer consent to off-session charges" })
   }),
+  /** Must equal SAVED_CARD_OFF_SESSION_CONSENT_ACK_VERSION (the text the owner was shown). */
+  ownerOffSessionConsentVersion: z.string().min(1).max(64),
   rows: z
     .array(
       z.object({
@@ -109,6 +116,21 @@ export const applySavedCardMigrationMappingsBodySchema = z.object({
 });
 
 export type ApplySavedCardMigrationMappingsBody = z.infer<typeof applySavedCardMigrationMappingsBodySchema>;
+
+export const savedCardMigrationConsentSchema = z.object({
+  text: z.string().min(1),
+  version: z.string().min(1)
+});
+
+export type SavedCardMigrationConsent = z.infer<typeof savedCardMigrationConsentSchema>;
+
+/** GET saved-card-migration response: migration plus the consent text/version to show the owner. */
+export const getSavedCardMigrationResponseSchema = z.object({
+  migration: savedCardMigrationSchema.nullable(),
+  consent: savedCardMigrationConsentSchema
+});
+
+export type GetSavedCardMigrationResponse = z.infer<typeof getSavedCardMigrationResponseSchema>;
 
 export const sendSavedCardFallbackEmailBodySchema = z.object({
   renvaniCustomerId: z.string().uuid()

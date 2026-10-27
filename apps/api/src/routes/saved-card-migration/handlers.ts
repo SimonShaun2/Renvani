@@ -1,6 +1,9 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 
 import {
+  SAVED_CARD_OFF_SESSION_CONSENT_ACK_TEXT,
+  SAVED_CARD_OFF_SESSION_CONSENT_ACK_VERSION,
+  type GetSavedCardMigrationResponse,
   applySavedCardMigrationMappingsBodySchema,
   confirmStripeImportBodySchema,
   savedCardMigrationBundleParamsSchema,
@@ -31,7 +34,14 @@ export async function startSavedCardMigrationHandler(request: FastifyRequest, re
 export async function getSavedCardMigrationHandler(request: FastifyRequest, reply: FastifyReply) {
   const params = savedCardMigrationBundleParamsSchema.parse(request.params);
   const migration = await getSavedCardMigrationForBundle(request.company.id, params.bundleId);
-  return reply.send({ migration });
+  const response: GetSavedCardMigrationResponse = {
+    migration,
+    consent: {
+      text: SAVED_CARD_OFF_SESSION_CONSENT_ACK_TEXT,
+      version: SAVED_CARD_OFF_SESSION_CONSENT_ACK_VERSION
+    }
+  };
+  return reply.send(response);
 }
 
 export async function confirmStripeImportHandler(request: FastifyRequest, reply: FastifyReply) {

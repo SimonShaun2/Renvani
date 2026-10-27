@@ -366,6 +366,13 @@ export async function applySavedCardMigrationMappingsForBundle(
     );
   }
 
+  if (input.ownerOffSessionConsentVersion !== SAVED_CARD_OFF_SESSION_CONSENT_ACK_VERSION) {
+    throw new AppError(
+      ErrorCode.VALIDATION_ERROR,
+      "Consent version does not match the current saved-card consent text; reload and acknowledge again"
+    );
+  }
+
   const stripeConnectAccountId = await requireCompanyStripeConnect(companyId);
   const existingRow = await getScopedMigration(companyId, existing.id);
 
@@ -465,7 +472,12 @@ export async function applySavedCardMigrationMappingsForBundle(
       byPaymentMethod.set(row.stripePaymentMethodId, {
         ...base,
         status: "attached",
-        paymentMethodLabel: attachResult.paymentMethodLabel
+        paymentMethodLabel: attachResult.paymentMethodLabel,
+        // Per-card consent stamp: survives later batches overwriting the top-level "latest" record.
+        offSessionConsentVersion: SAVED_CARD_OFF_SESSION_CONSENT_ACK_VERSION,
+        offSessionConsentBatchId: consentBatchId,
+        offSessionConsentAcknowledgedAt: consentAcknowledgedAt.toISOString(),
+        offSessionConsentAcknowledgedById: actorId
       });
     } catch (error) {
       byPaymentMethod.set(row.stripePaymentMethodId, {

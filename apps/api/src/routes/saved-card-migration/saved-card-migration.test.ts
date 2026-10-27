@@ -144,7 +144,7 @@ describe("saved card migration (FS-138)", () => {
       .post(`/api/v1/migrate/onboarding/sessions/${bundle.id}/saved-card-migration/apply-mappings`)
       .set("Authorization", authorization)
       .send({
-        ownerOffSessionConsentAcknowledged: true,
+        ownerOffSessionConsentAcknowledged: true, ownerOffSessionConsentVersion: SAVED_CARD_OFF_SESSION_CONSENT_ACK_VERSION,
         rows: [
           {
             stripeCustomerId: "cus_test_1",
@@ -197,7 +197,7 @@ describe("saved card migration (FS-138)", () => {
       .post(`/api/v1/migrate/onboarding/sessions/${bundle.id}/saved-card-migration/apply-mappings`)
       .set("Authorization", authorization)
       .send({
-        ownerOffSessionConsentAcknowledged: true,
+        ownerOffSessionConsentAcknowledged: true, ownerOffSessionConsentVersion: SAVED_CARD_OFF_SESSION_CONSENT_ACK_VERSION,
         rows: [
           {
             stripeCustomerId: "cus_orphan",
@@ -281,7 +281,7 @@ describe("saved card migration (FS-138)", () => {
     const customer = fakeDb.seedCustomer({ companyId: company.id, firstName: "A", lastName: "B", email: "ok@example.com" });
     await startAndConfirm(authorization, bundle.id);
     await applyMappings(authorization, bundle.id, {
-      ownerOffSessionConsentAcknowledged: true,
+      ownerOffSessionConsentAcknowledged: true, ownerOffSessionConsentVersion: SAVED_CARD_OFF_SESSION_CONSENT_ACK_VERSION,
       rows: [{ stripeCustomerId: "cus_ok", stripePaymentMethodId: "pm_ok", renvaniCustomerId: customer.id }]
     });
     const response = await request(app.server)
@@ -308,7 +308,7 @@ describe("saved card migration (FS-138)", () => {
       .send({ renvaniCustomerId: "00000000-0000-4000-8000-000000000001" });
     expect(fallback.status).toBe(429);
     const apply = await applyMappings(authorization, bundle.id, {
-      ownerOffSessionConsentAcknowledged: true,
+      ownerOffSessionConsentAcknowledged: true, ownerOffSessionConsentVersion: SAVED_CARD_OFF_SESSION_CONSENT_ACK_VERSION,
       rows: [{ stripeCustomerId: "cus_1", stripePaymentMethodId: "pm_1" }]
     });
     expect(apply.status).toBe(429);
@@ -320,11 +320,11 @@ describe("saved card migration (FS-138)", () => {
     const bundle = fakeDb.seedImportBundle({ companyId: company.id });
     await startAndConfirm(authorization, bundle.id);
     const rows = Array.from({ length: 201 }, (_, i) => ({ stripeCustomerId: `cus_${i}`, stripePaymentMethodId: `pm_${i}` }));
-    const tooMany = await applyMappings(authorization, bundle.id, { ownerOffSessionConsentAcknowledged: true, rows });
+    const tooMany = await applyMappings(authorization, bundle.id, { ownerOffSessionConsentAcknowledged: true, ownerOffSessionConsentVersion: SAVED_CARD_OFF_SESSION_CONSENT_ACK_VERSION, rows });
     expect(tooMany.status).toBe(400);
     const noAck = await applyMappings(authorization, bundle.id, { rows: rows.slice(0, 1) });
     expect(noAck.status).toBe(400);
-    const falseAck = await applyMappings(authorization, bundle.id, { ownerOffSessionConsentAcknowledged: false, rows: rows.slice(0, 1) });
+    const falseAck = await applyMappings(authorization, bundle.id, { ownerOffSessionConsentAcknowledged: false, ownerOffSessionConsentVersion: SAVED_CARD_OFF_SESSION_CONSENT_ACK_VERSION, rows: rows.slice(0, 1) });
     expect(falseAck.status).toBe(400);
     expect(attachImportedPaymentMethodMock).not.toHaveBeenCalled();
   });
@@ -335,7 +335,7 @@ describe("saved card migration (FS-138)", () => {
     const customer = fakeDb.seedCustomer({ companyId: company.id, firstName: "I", lastName: "D", email: "idem@example.com" });
     await startAndConfirm(authorization, bundle.id);
     const body = {
-      ownerOffSessionConsentAcknowledged: true,
+      ownerOffSessionConsentAcknowledged: true, ownerOffSessionConsentVersion: SAVED_CARD_OFF_SESSION_CONSENT_ACK_VERSION,
       rows: [
         { stripeCustomerId: "cus_idem", stripePaymentMethodId: "pm_idem", renvaniCustomerId: customer.id },
         { stripeCustomerId: "cus_none", stripePaymentMethodId: "pm_none", email: "nobody@example.com" }
@@ -373,7 +373,7 @@ describe("saved card migration (FS-138)", () => {
       return { paymentMethodLabel: "VISA ending in 4242" };
     });
     await applyMappings(authorization, bundle.id, {
-      ownerOffSessionConsentAcknowledged: true,
+      ownerOffSessionConsentAcknowledged: true, ownerOffSessionConsentVersion: SAVED_CARD_OFF_SESSION_CONSENT_ACK_VERSION,
       rows: [
         { stripeCustomerId: "cus_a", stripePaymentMethodId: "pm_a", renvaniCustomerId: a.id },
         { stripeCustomerId: "cus_b", stripePaymentMethodId: "pm_b", renvaniCustomerId: b.id }
@@ -395,7 +395,7 @@ describe("saved card migration (FS-138)", () => {
     attachImportedPaymentMethodMock.mockRejectedValueOnce(new Error("raw stripe failure"));
     await startAndConfirm(authorization, bundle.id);
     await applyMappings(authorization, bundle.id, {
-      ownerOffSessionConsentAcknowledged: true,
+      ownerOffSessionConsentAcknowledged: true, ownerOffSessionConsentVersion: SAVED_CARD_OFF_SESSION_CONSENT_ACK_VERSION,
       rows: [{ stripeCustomerId: "cus_ns", stripePaymentMethodId: "pm_ns", renvaniCustomerId: customer.id }]
     });
     const companyRow = fakeDb.getTestState().companies.find((c) => c.id === company.id) as unknown as Record<string, unknown>;
@@ -441,7 +441,7 @@ describe("saved card migration (FS-138)", () => {
     stored.stripeCustomerId = "cus_existing";
     await startAndConfirm(authorization, bundle.id);
     const apply = await applyMappings(authorization, bundle.id, {
-      ownerOffSessionConsentAcknowledged: true,
+      ownerOffSessionConsentAcknowledged: true, ownerOffSessionConsentVersion: SAVED_CARD_OFF_SESSION_CONSENT_ACK_VERSION,
       rows: [{ stripeCustomerId: "cus_attacker", stripePaymentMethodId: "pm_x", renvaniCustomerId: customer.id }]
     });
     expect(apply.status).toBe(200);
@@ -462,10 +462,85 @@ describe("saved card migration (FS-138)", () => {
     );
     await startAndConfirm(authorization, bundle.id);
     const apply = await applyMappings(authorization, bundle.id, {
-      ownerOffSessionConsentAcknowledged: true,
+      ownerOffSessionConsentAcknowledged: true, ownerOffSessionConsentVersion: SAVED_CARD_OFF_SESSION_CONSENT_ACK_VERSION,
       rows: [{ stripeCustomerId: "cus_se", stripePaymentMethodId: "pm_se", renvaniCustomerId: customer.id }]
     });
     expect(apply.body.customerMappings[0].errorMessage).toBe("stripe_resource_missing");
     expect(JSON.stringify(apply.body)).not.toContain("pm_secret_detail");
+  });
+
+  it("GET returns the consent text and version to show the owner", async () => {
+    const { company, authorization } = createAuthContext("owner");
+    const bundle = fakeDb.seedImportBundle({ companyId: company.id });
+    const res = await request(app.server)
+      .get(`/api/v1/migrate/onboarding/sessions/${bundle.id}/saved-card-migration`)
+      .set("Authorization", authorization);
+    expect(res.status).toBe(200);
+    expect(res.body.migration).toBeNull();
+    expect(res.body.consent).toEqual({
+      text: SAVED_CARD_OFF_SESSION_CONSENT_ACK_TEXT,
+      version: SAVED_CARD_OFF_SESSION_CONSENT_ACK_VERSION
+    });
+  });
+
+  it("rejects apply-mappings with a missing or mismatched consent version", async () => {
+    const { company, authorization } = createAuthContext("owner");
+    const bundle = fakeDb.seedImportBundle({ companyId: company.id });
+    const customer = fakeDb.seedCustomer({ companyId: company.id, firstName: "V", lastName: "R", email: "ver@example.com" });
+    await startAndConfirm(authorization, bundle.id);
+    const rows = [{ stripeCustomerId: "cus_ver", stripePaymentMethodId: "pm_ver", renvaniCustomerId: customer.id }];
+    const missing = await applyMappings(authorization, bundle.id, { ownerOffSessionConsentAcknowledged: true, rows });
+    expect(missing.status).toBe(400);
+    const mismatch = await applyMappings(authorization, bundle.id, {
+      ownerOffSessionConsentAcknowledged: true,
+      ownerOffSessionConsentVersion: "v0-old",
+      rows
+    });
+    expect(mismatch.status).toBe(400);
+    expect(attachImportedPaymentMethodMock).not.toHaveBeenCalled();
+    const ok = await applyMappings(authorization, bundle.id, {
+      ownerOffSessionConsentAcknowledged: true,
+      ownerOffSessionConsentVersion: SAVED_CARD_OFF_SESSION_CONSENT_ACK_VERSION,
+      rows
+    });
+    expect(ok.status).toBe(200);
+    expect(attachImportedPaymentMethodMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("stamps consent per attached card so a second batch keeps the first batch's stamp", async () => {
+    const { company, user, authorization } = createAuthContext("owner");
+    const bundle = fakeDb.seedImportBundle({ companyId: company.id });
+    const a = fakeDb.seedCustomer({ companyId: company.id, firstName: "A", lastName: "A", email: "a@example.com" });
+    const b = fakeDb.seedCustomer({ companyId: company.id, firstName: "B", lastName: "B", email: "b@example.com" });
+    await startAndConfirm(authorization, bundle.id);
+    const ack = { ownerOffSessionConsentAcknowledged: true, ownerOffSessionConsentVersion: SAVED_CARD_OFF_SESSION_CONSENT_ACK_VERSION };
+    const first = await applyMappings(authorization, bundle.id, {
+      ...ack,
+      rows: [
+        { stripeCustomerId: "cus_a", stripePaymentMethodId: "pm_a", renvaniCustomerId: a.id },
+        { stripeCustomerId: "cus_x", stripePaymentMethodId: "pm_x", email: "nobody@example.com" }
+      ]
+    });
+    expect(first.status).toBe(200);
+    const firstA = first.body.customerMappings.find((m: { stripePaymentMethodId: string }) => m.stripePaymentMethodId === "pm_a");
+    expect(firstA.offSessionConsentVersion).toBe(SAVED_CARD_OFF_SESSION_CONSENT_ACK_VERSION);
+    expect(firstA.offSessionConsentAcknowledgedById).toBe(user.id);
+    const firstBatchId = firstA.offSessionConsentBatchId as string;
+    expect(typeof firstBatchId).toBe("string");
+
+    const second = await applyMappings(authorization, bundle.id, {
+      ...ack,
+      rows: [{ stripeCustomerId: "cus_b", stripePaymentMethodId: "pm_b", renvaniCustomerId: b.id }]
+    });
+    expect(second.status).toBe(200);
+    const byPm = new Map(
+      second.body.customerMappings.map((m: { stripePaymentMethodId: string; offSessionConsentBatchId?: string }) => [m.stripePaymentMethodId, m])
+    ) as Map<string, { offSessionConsentBatchId?: string }>;
+    expect(byPm.get("pm_a")?.offSessionConsentBatchId).toBe(firstBatchId);
+    const secondBatchId = byPm.get("pm_b")?.offSessionConsentBatchId;
+    expect(typeof secondBatchId).toBe("string");
+    expect(secondBatchId).not.toBe(firstBatchId);
+    const row = fakeDb.getTestState().savedCardMigrations.find((r) => r.companyId === company.id);
+    expect(row?.offSessionConsentBatchId).toBe(secondBatchId);
   });
 });

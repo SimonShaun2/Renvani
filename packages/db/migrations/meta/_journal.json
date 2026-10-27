@@ -330,6 +330,20 @@
       "when": 1792716506141,
       "tag": "0046_fs171_open_time_entry_unique",
       "breakpoints": true
+    },
+    {
+      "idx": 47,
+      "version": "7",
+      "when": 1792717000000,
+      "tag": "0047_fs59_recurring_visit_series",
+      "breakpoints": true
+    },
+    {
+      "idx": 48,
+      "version": "7",
+      "when": 1792718000000,
+      "tag": "0048_fs59_recurring_visit_rls_unique",
+      "breakpoints": true
     }
   ]
 }

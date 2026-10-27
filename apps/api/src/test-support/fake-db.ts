@@ -28,6 +28,8 @@ type TableName =
   | "maintenancePlans"
   | "vipMembershipTiers"
   | "maintenanceVisits"
+  | "recurringVisitSeries"
+  | "recurringVisitOccurrences"
   | "automationRules"
   | "aiRecommendations"
   | "campaigns"
@@ -664,6 +666,43 @@ export interface TestMaintenanceVisitRecord {
   scheduledDate: string | null;
   completedDate: string | null;
   notes: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date | null;
+}
+
+
+export interface TestRecurringVisitSeriesRecord {
+  id: string;
+  companyId: string;
+  customerId: string;
+  propertyId: string | null;
+  maintenancePlanId: string | null;
+  anchorMaintenanceVisitId: string | null;
+  timeZone: string;
+  frequency: MaintenancePlanFrequency;
+  anchorLocalDate: string;
+  localTime: string;
+  status: "active" | "paused" | "cancelled";
+  externalSchedulerAuthoritative: boolean;
+  notes: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date | null;
+}
+
+export interface TestRecurringVisitOccurrenceRecord {
+  id: string;
+  companyId: string;
+  seriesId: string;
+  occurrenceIndex: number;
+  scheduledLocalDate: string;
+  scheduledAtUtc: Date;
+  status: "scheduled" | "completed" | "cancelled" | "skipped";
+  overrideScheduledLocalDate: string | null;
+  overrideNotes: string | null;
+  maintenanceVisitId: string | null;
+  jobId: string | null;
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;
@@ -2058,6 +2097,8 @@ type AnyTestRecord =
   | TestMaintenancePlanRecord
   | TestVipMembershipTierRecord
   | TestMaintenanceVisitRecord
+  | TestRecurringVisitSeriesRecord
+  | TestRecurringVisitOccurrenceRecord
   | TestAutomationRuleRecord
   | TestAiRecommendationRecord
   | TestCampaignRecord
@@ -2164,6 +2205,8 @@ interface TestState {
   maintenancePlans: TestMaintenancePlanRecord[];
   vipMembershipTiers: TestVipMembershipTierRecord[];
   maintenanceVisits: TestMaintenanceVisitRecord[];
+  recurringVisitSeries: TestRecurringVisitSeriesRecord[];
+  recurringVisitOccurrences: TestRecurringVisitOccurrenceRecord[];
   automationRules: TestAutomationRuleRecord[];
   aiRecommendations: TestAiRecommendationRecord[];
   campaigns: TestCampaignRecord[];
@@ -2769,6 +2812,45 @@ const maintenanceVisitsTable = {
   scheduledDate: "scheduledDate",
   completedDate: "completedDate",
   notes: "notes",
+  createdAt: "createdAt",
+  updatedAt: "updatedAt",
+  deletedAt: "deletedAt"
+} as const;
+
+
+const recurringVisitSeriesTable = {
+  __name: "recurringVisitSeries",
+  id: "id",
+  companyId: "companyId",
+  customerId: "customerId",
+  propertyId: "propertyId",
+  maintenancePlanId: "maintenancePlanId",
+  anchorMaintenanceVisitId: "anchorMaintenanceVisitId",
+  timeZone: "timeZone",
+  frequency: "frequency",
+  anchorLocalDate: "anchorLocalDate",
+  localTime: "localTime",
+  status: "status",
+  externalSchedulerAuthoritative: "externalSchedulerAuthoritative",
+  notes: "notes",
+  createdAt: "createdAt",
+  updatedAt: "updatedAt",
+  deletedAt: "deletedAt"
+} as const;
+
+const recurringVisitOccurrencesTable = {
+  __name: "recurringVisitOccurrences",
+  id: "id",
+  companyId: "companyId",
+  seriesId: "seriesId",
+  occurrenceIndex: "occurrenceIndex",
+  scheduledLocalDate: "scheduledLocalDate",
+  scheduledAtUtc: "scheduledAtUtc",
+  status: "status",
+  overrideScheduledLocalDate: "overrideScheduledLocalDate",
+  overrideNotes: "overrideNotes",
+  maintenanceVisitId: "maintenanceVisitId",
+  jobId: "jobId",
   createdAt: "createdAt",
   updatedAt: "updatedAt",
   deletedAt: "deletedAt"
@@ -3573,6 +3655,8 @@ const state: TestState = {
   maintenancePlans: [],
   vipMembershipTiers: [],
   maintenanceVisits: [],
+  recurringVisitSeries: [],
+  recurringVisitOccurrences: [],
   automationRules: [],
   aiRecommendations: [],
   campaigns: [],
@@ -3731,6 +3815,10 @@ function getRows(tableName: TableName): AnyTestRecord[] {
       return state.vipMembershipTiers;
     case "maintenanceVisits":
       return state.maintenanceVisits;
+    case "recurringVisitSeries":
+      return state.recurringVisitSeries;
+    case "recurringVisitOccurrences":
+      return state.recurringVisitOccurrences;
     case "automationRules":
       return state.automationRules;
     case "aiRecommendations":
@@ -4483,6 +4571,58 @@ function createMaintenanceVisitRecord(
     scheduledDate: values.scheduledDate ?? null,
     completedDate: values.completedDate ?? null,
     notes: values.notes ?? null,
+    createdAt: values.createdAt ?? now,
+    updatedAt: values.updatedAt ?? now,
+    deletedAt: values.deletedAt ?? null
+  };
+}
+
+
+function createRecurringVisitSeriesRecord(
+  values: Partial<TestRecurringVisitSeriesRecord> &
+    Pick<TestRecurringVisitSeriesRecord, "companyId" | "customerId" | "timeZone" | "frequency" | "anchorLocalDate">
+): TestRecurringVisitSeriesRecord {
+  const now = new Date();
+  return {
+    id: values.id ?? nextId(),
+    companyId: values.companyId,
+    customerId: values.customerId,
+    propertyId: values.propertyId ?? null,
+    maintenancePlanId: values.maintenancePlanId ?? null,
+    anchorMaintenanceVisitId: values.anchorMaintenanceVisitId ?? null,
+    timeZone: values.timeZone,
+    frequency: values.frequency,
+    anchorLocalDate: values.anchorLocalDate,
+    localTime: values.localTime ?? "09:00",
+    status: values.status ?? "active",
+    externalSchedulerAuthoritative: values.externalSchedulerAuthoritative ?? false,
+    notes: values.notes ?? null,
+    createdAt: values.createdAt ?? now,
+    updatedAt: values.updatedAt ?? now,
+    deletedAt: values.deletedAt ?? null
+  };
+}
+
+function createRecurringVisitOccurrenceRecord(
+  values: Partial<TestRecurringVisitOccurrenceRecord> &
+    Pick<
+      TestRecurringVisitOccurrenceRecord,
+      "companyId" | "seriesId" | "occurrenceIndex" | "scheduledLocalDate" | "scheduledAtUtc"
+    >
+): TestRecurringVisitOccurrenceRecord {
+  const now = new Date();
+  return {
+    id: values.id ?? nextId(),
+    companyId: values.companyId,
+    seriesId: values.seriesId,
+    occurrenceIndex: values.occurrenceIndex,
+    scheduledLocalDate: values.scheduledLocalDate,
+    scheduledAtUtc: values.scheduledAtUtc,
+    status: values.status ?? "scheduled",
+    overrideScheduledLocalDate: values.overrideScheduledLocalDate ?? null,
+    overrideNotes: values.overrideNotes ?? null,
+    maintenanceVisitId: values.maintenanceVisitId ?? null,
+    jobId: values.jobId ?? null,
     createdAt: values.createdAt ?? now,
     updatedAt: values.updatedAt ?? now,
     deletedAt: values.deletedAt ?? null
@@ -5325,6 +5465,19 @@ function createRow(tableName: TableName, values: Record<string, unknown>): AnyTe
       state.vipMembershipTiers.push(record);
       return record;
     }
+    case "recurringVisitSeries":
+      return createRecurringVisitSeriesRecord(
+        values as Partial<TestRecurringVisitSeriesRecord> &
+          Pick<TestRecurringVisitSeriesRecord, "companyId" | "customerId" | "timeZone" | "frequency" | "anchorLocalDate">
+      );
+    case "recurringVisitOccurrences":
+      return createRecurringVisitOccurrenceRecord(
+        values as Partial<TestRecurringVisitOccurrenceRecord> &
+          Pick<
+            TestRecurringVisitOccurrenceRecord,
+            "companyId" | "seriesId" | "occurrenceIndex" | "scheduledLocalDate" | "scheduledAtUtc"
+          >
+      );
     case "maintenanceVisits":
       return createMaintenanceVisitRecord(
         values as Partial<TestMaintenanceVisitRecord> &
@@ -5807,6 +5960,8 @@ export const serviceAgreementTemplates = serviceAgreementTemplatesTable;
 export const maintenancePlans = maintenancePlansTable;
 export const vipMembershipTiers = vipMembershipTiersTable;
 export const maintenanceVisits = maintenanceVisitsTable;
+export const recurringVisitSeries = recurringVisitSeriesTable;
+export const recurringVisitOccurrences = recurringVisitOccurrencesTable;
 export const automationRules = automationRulesTable;
 export const aiRecommendations = aiRecommendationsTable;
 export const campaigns = campaignsTable;
@@ -6253,6 +6408,8 @@ export function createDbModuleMock() {
     maintenancePlans,
     vipMembershipTiers,
     maintenanceVisits,
+    recurringVisitSeries,
+    recurringVisitOccurrences,
     automationRules,
     aiRecommendations,
     campaigns,
@@ -6319,6 +6476,8 @@ export function resetTestState(): void {
   state.maintenancePlans.length = 0;
   state.vipMembershipTiers.length = 0;
   state.maintenanceVisits.length = 0;
+  state.recurringVisitSeries.length = 0;
+  state.recurringVisitOccurrences.length = 0;
   state.automationRules.length = 0;
   state.aiRecommendations.length = 0;
   state.campaigns.length = 0;

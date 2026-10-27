@@ -1166,6 +1166,74 @@ export const maintenanceVisits = pgTable("maintenance_visits", {
   ...timestamps,
 });
 
+export const recurringVisitSeriesStatusEnum = pgEnum("recurring_visit_series_status", [
+  "active",
+  "paused",
+  "cancelled"
+]);
+
+export const recurringVisitOccurrenceStatusEnum = pgEnum("recurring_visit_occurrence_status", [
+  "scheduled",
+  "completed",
+  "cancelled",
+  "skipped"
+]);
+
+export const recurringVisitSeries = pgTable(
+  "recurring_visit_series",
+  {
+    id: id(),
+    companyId: companyId(),
+    customerId: uuid("customer_id")
+      .notNull()
+      .references(() => customers.id),
+    propertyId: uuid("property_id").references(() => properties.id),
+    maintenancePlanId: uuid("maintenance_plan_id").references(() => maintenancePlans.id),
+    anchorMaintenanceVisitId: uuid("anchor_maintenance_visit_id").references(() => maintenanceVisits.id),
+    timeZone: varchar("time_zone", { length: 64 }).notNull(),
+    frequency: maintenancePlanFrequencyEnum("frequency").notNull(),
+    anchorLocalDate: date("anchor_local_date").notNull(),
+    localTime: varchar("local_time", { length: 8 }).notNull().default("09:00"),
+    status: recurringVisitSeriesStatusEnum("status").notNull().default("active"),
+    externalSchedulerAuthoritative: boolean("external_scheduler_authoritative").notNull().default(false),
+    notes: text("notes"),
+    ...timestamps
+  },
+  (t) => ({
+    companyIdx: index("recurring_visit_series_company_idx").on(t.companyId),
+    // FS-59 (0048): at most one active, non-deleted series per maintenance plan.
+    activePlanUid: uniqueIndex("recurring_visit_series_active_plan_uidx")
+      .on(t.companyId, t.maintenancePlanId)
+      .where(sql`"status" = 'active' AND "deleted_at" IS NULL AND "maintenance_plan_id" IS NOT NULL`)
+  })
+);
+
+export const recurringVisitOccurrences = pgTable(
+  "recurring_visit_occurrences",
+  {
+    id: id(),
+    companyId: companyId(),
+    seriesId: uuid("series_id")
+      .notNull()
+      .references(() => recurringVisitSeries.id, { onDelete: "cascade" }),
+    occurrenceIndex: integer("occurrence_index").notNull(),
+    scheduledLocalDate: date("scheduled_local_date").notNull(),
+    scheduledAtUtc: timestamp("scheduled_at_utc").notNull(),
+    status: recurringVisitOccurrenceStatusEnum("status").notNull().default("scheduled"),
+    overrideScheduledLocalDate: date("override_scheduled_local_date"),
+    overrideNotes: text("override_notes"),
+    maintenanceVisitId: uuid("maintenance_visit_id").references(() => maintenanceVisits.id),
+    jobId: uuid("job_id").references(() => jobs.id),
+    ...timestamps
+  },
+  (t) => ({
+    seriesIndexUid: uniqueIndex("recurring_visit_occurrences_series_index_uidx")
+      .on(t.seriesId, t.occurrenceIndex)
+      .where(sql`"deleted_at" IS NULL`),
+    companySeriesIdx: index("recurring_visit_occurrences_company_series_idx").on(t.companyId, t.seriesId)
+  })
+);
+
 // ─────────────────────────────────────────────
 // 8. SCHEDULING
 // ─────────────────────────────────────────────

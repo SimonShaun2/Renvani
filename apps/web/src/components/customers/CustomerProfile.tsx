@@ -3,29 +3,32 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, UserRound, Wrench } from "lucide-react";
+import { ArrowLeft, UserRound } from "lucide-react";
 
 import { useCustomer, useCustomerAgreements, useCustomerInvoices, useCustomerJobs } from "@/src/hooks/customers.hooks";
 
-import { CustomerAISuggestions } from "./CustomerAISuggestions";
 import { ActivityTimeline } from "./ActivityTimeline";
 import { CustomerNotesPanel } from "./CustomerNotesPanel";
 import { AssetForm } from "./AssetForm";
 import { CustomerForm } from "./CustomerForm";
-import { CustomerHeader } from "./CustomerHeader";
-import { CustomerStats } from "./CustomerStats";
 import { CustomerTabs, type CustomerTabKey } from "./CustomerTabs";
 import { PropertiesSection } from "./PropertiesSection";
 import { PropertyForm } from "./PropertyForm";
-import { getAssetConditionPresentation, getAssetSeverity, getLastJobDate } from "./customers.utils";
+import { getCustomerName } from "./customers.utils";
+import { buildProfileKpis, buildProfileSubtitle } from "./profile/customer-profile.utils";
+import { AgentProposalCard, ContactPropertyCard, CustomerJobsTable, EquipmentCard } from "./profile/ProfileSections";
+import { ProfileKpiCard, profileButtonClass } from "./profile/ProfileUi";
 import { ConfirmDialog } from "../ui/ConfirmDialog";
 import { EmptyState } from "../ui/EmptyState";
 import { SkeletonCard } from "../ui/SkeletonCard";
-import { TimeAgo } from "../ui/TimeAgo";
 import { useDeleteCustomer } from "@/src/hooks/customers.hooks";
 import { ApiError } from "@/src/lib/api";
-import { cn } from "@/src/lib/utils";
 
+/**
+ * Operator / 08 Customer profile (Figma 1:17, main 144:91).
+ * Figma sections first (header 144:92, KPIs 144:100, notes/contact/equipment 144:118, jobs + agent 144:153);
+ * existing operator tools (properties, tabs, activity) follow below as extension slots.
+ */
 export function CustomerProfile({ customerId }: { customerId: string }) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<CustomerTabKey>("jobs");
@@ -86,12 +89,7 @@ export function CustomerProfile({ customerId }: { customerId: string }) {
   const agreements = agreementsQuery.data?.data ?? [];
   const invoices = invoicesQuery.data?.data ?? [];
   const jobs = recentJobsQuery.data?.data ?? [];
-  const keyAssets = customer.properties
-    .flatMap((property) => property.assets ?? [])
-    .slice()
-    .sort((left, right) => getAssetSeverity(right) - getAssetSeverity(left))
-    .slice(0, 4);
-  const lastJobDate = getLastJobDate(jobs);
+  const kpis = buildProfileKpis({ customer, invoices, agreements, jobs });
 
   async function handleDeleteCustomer() {
     try {
@@ -109,21 +107,41 @@ export function CustomerProfile({ customerId }: { customerId: string }) {
         All Customers
       </Link>
 
-      <CustomerHeader
-        customer={customer}
-        agreements={agreements}
-        invoices={invoices}
-        onMessage={() => setActiveTab("communications")}
-        onEdit={() => setCustomerFormOpen(true)}
-        onDelete={() => setDeleteDialogOpen(true)}
-      />
+      <header className="flex flex-wrap items-center gap-4">
+        <div className="min-w-0 flex-1">
+          <h1 className="truncate text-[32px] font-semibold text-[#0f1530]">{getCustomerName(customer)}</h1>
+          <p className="mt-1.5 text-sm text-[#5e6684]">{buildProfileSubtitle(customer)}</p>
+        </div>
+        {customer.email && !customer.doNotContact ? (
+          <a href={`mailto:${customer.email}`} className={profileButtonClass()}>
+            Email customer
+          </a>
+        ) : null}
+        <button type="button" onClick={() => setCustomerFormOpen(true)} className={profileButtonClass()}>
+          Edit
+        </button>
+        <button type="button" onClick={() => setDeleteDialogOpen(true)} className={profileButtonClass()}>
+          Delete
+        </button>
+      </header>
 
-      <CustomerStats
-        customerSince={customer.firstServiceDate ?? customer.createdAt}
-        lifetimeValue={customer.lifetimeValue}
-        totalJobs={customer.totalJobs}
-        lastJobDate={lastJobDate}
-      />
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {kpis.map((kpi) => (
+          <ProfileKpiCard key={kpi.key} kpi={kpi} />
+        ))}
+      </div>
+
+      <div className="grid items-start gap-4 lg:grid-cols-2">
+        <div className="flex flex-col gap-4">
+          <CustomerNotesPanel customerId={customer.id} />
+          <ContactPropertyCard customer={customer} agreements={agreements} />
+          <EquipmentCard customer={customer} />
+        </div>
+        <div className="flex flex-col gap-4">
+          <CustomerJobsTable jobs={jobs} />
+          <AgentProposalCard customerId={customer.id} />
+        </div>
+      </div>
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
         <div className="space-y-6">
@@ -133,83 +151,9 @@ export function CustomerProfile({ customerId }: { customerId: string }) {
             onAddProperty={() => setPropertyFormOpen(true)}
             onAddAsset={(propertyId) => setAssetSheetPropertyId(propertyId)}
           />
-
-          <section className="surface-card px-6 py-6">
-            <div className="flex items-center justify-between gap-3">
-              <h2 className="text-lg font-semibold tracking-tight text-neutral-900">Key Assets ({keyAssets.length})</h2>
-              <Link href={`/customers/${customer.id}/properties/${customer.properties[0]?.id ?? ""}`} className="text-sm font-semibold text-brand-accent">
-                View properties
-              </Link>
-            </div>
-            {keyAssets.length === 0 ? (
-              <div className="mt-5">
-                <EmptyState
-                  icon={Wrench}
-                  title="No assets yet"
-                  subtitle="Assets added to this customer’s properties will surface here automatically."
-                  compact
-                />
-              </div>
-            ) : (
-              <div className="mt-5 space-y-3">
-                {keyAssets.map((asset) => {
-                  const condition = getAssetConditionPresentation(asset);
-
-                  return (
-                    <div key={asset.id} className="flex flex-col gap-3 rounded-[24px] border border-neutral-200 px-4 py-4 md:flex-row md:items-center md:justify-between">
-                      <div>
-                        <p className="text-sm font-semibold text-neutral-900">{asset.name}</p>
-                        <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-neutral-500">
-                          <span>{asset.installDate ? `Installed ${asset.installDate}` : "Install date unknown"}</span>
-                          {asset.lastServiceDate ? (
-                            <>
-                              <span>•</span>
-                              <span>
-                                Last service <TimeAgo value={asset.lastServiceDate} className="inline text-sm text-neutral-500" />
-                              </span>
-                            </>
-                          ) : null}
-                        </div>
-                      </div>
-                      <div className="flex flex-wrap items-center gap-3">
-                        <span
-                          className={cn(
-                            "inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold",
-                            condition.tone === "green" && "bg-success-light text-success",
-                            condition.tone === "orange" && "bg-warning-light text-warning",
-                            condition.tone === "red" && "bg-error-light text-error",
-                            condition.tone === "gray" && "bg-neutral-100 text-neutral-500",
-                            condition.pulse && "animate-pulse"
-                          )}
-                        >
-                          {condition.label}
-                        </span>
-                        <div className="text-right text-sm text-neutral-500">
-                          <p>Condition</p>
-                          <p className="font-semibold text-neutral-900">{asset.conditionScore ?? "—"}</p>
-                        </div>
-                        <Link
-                          href={`/customers/${customer.id}/assets/${asset.id}?propertyId=${asset.propertyId}`}
-                          className="text-sm font-semibold text-brand-accent"
-                        >
-                          View Asset
-                        </Link>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </section>
-
           <CustomerTabs customerId={customer.id} activeTab={activeTab} onActiveTabChange={setActiveTab} />
         </div>
-
-        <div className="space-y-6">
-          <CustomerAISuggestions customerId={customer.id} />
-          <CustomerNotesPanel customerId={customer.id} />
-          <ActivityTimeline customerId={customer.id} />
-        </div>
+        <ActivityTimeline customerId={customer.id} />
       </div>
 
       <CustomerForm

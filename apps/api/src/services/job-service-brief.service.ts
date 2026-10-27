@@ -110,6 +110,8 @@ export async function applyApprovedJobServiceBrief(input: {
       })
       .onConflictDoUpdate({
         target: [jobServiceBriefs.companyId, jobServiceBriefs.jobId],
+        // Matches the partial unique index (deleted_at IS NULL) from 0049.
+        targetWhere: isNull(jobServiceBriefs.deletedAt),
         set: {
           sections: brief.sections,
           checklistSummary: brief.checklistSummary,

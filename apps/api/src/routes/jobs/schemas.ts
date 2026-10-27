@@ -887,8 +887,9 @@ export const addNoteRouteSchema = {
   }
 } as const;
 
+// Params are validated by jobIdValidation (zod); a zod object here is not valid JSON Schema.
 export const getJobServiceBriefRouteSchema = {
-  params: JobIdParamsSchema,
+  tags: ["jobs"],
   response: {
     200: {
       type: "object",
@@ -899,8 +900,9 @@ export const getJobServiceBriefRouteSchema = {
   }
 };
 
+// Params are validated by jobIdValidation (zod); a zod object here is not valid JSON Schema.
 export const getJobPreparationStatusRouteSchema = {
-  params: JobIdParamsSchema,
+  tags: ["jobs"],
   response: {
     200: {
       type: "object",

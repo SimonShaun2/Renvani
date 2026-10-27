@@ -872,7 +872,7 @@ export const jobServiceBriefs = pgTable(
     ...timestamps
   },
   (t) => ({
-    companyJobUnique: uniqueIndex("job_service_briefs_company_job_idx").on(t.companyId, t.jobId)
+    companyJobUnique: uniqueIndex("job_service_briefs_company_job_idx").on(t.companyId, t.jobId).where(sql`"deleted_at" IS NULL`)
   })
 );
 

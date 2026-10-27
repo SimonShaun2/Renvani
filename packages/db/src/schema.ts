@@ -35,7 +35,7 @@ import {
   index,
   uniqueIndex,
 } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 
 // ─────────────────────────────────────────────
 // SHARED HELPERS
@@ -219,6 +219,7 @@ export const importEntityTypeEnum = pgEnum("import_entity_type", [
   "payments",
   "notes",
   "communications",
+  "service_agreements",
 ]);
 
 export const importBundleStatusEnum = pgEnum("import_bundle_status", [
@@ -383,6 +384,12 @@ export const activityEventTypeEnum = pgEnum("activity_event_type", [
   "revenue.inquiry_qualified",
   "revenue.inquiry_received",
   "revenue.inquiry_escalated",
+  // Saved card migration (FS-138)
+  "payment_method_migration.requested",
+  "payment_method_migration.mappings_applied",
+  "payment_method_migration.stripe_import_confirmed",
+  "payment_method_migration.completed",
+  "payment_method_migration.fallback_sent",
 ]);
 
 export const aiRecommendationTypeEnum = pgEnum("ai_recommendation_type", [
@@ -512,6 +519,10 @@ export const companies = pgTable("companies", {
   ...timestamps,
 }, (t) => ({
   slugIdx: uniqueIndex("companies_slug_idx").on(t.slug),
+  // FS-157: at most one live company per Clerk organization (DB-level guarantee behind the advisory lock).
+  clerkOrganizationIdIdx: uniqueIndex("companies_clerk_organization_id_idx")
+    .on(sql`(${t.settings} -> 'clerk' ->> 'organizationId')`)
+    .where(sql`${t.deletedAt} IS NULL AND (${t.settings} -> 'clerk' ->> 'organizationId') IS NOT NULL`),
 }));
 
 export const users = pgTable("users", {
@@ -527,6 +538,15 @@ export const users = pgTable("users", {
   avatarUrl: text("avatar_url"),
   isActive: boolean("is_active").notNull().default(true),
   lastLoginAt: timestamp("last_login_at"),
+  emailVerifiedAt: timestamp("email_verified_at"),
+  // sha256 of the single-use verify-email token (raw token is never stored)
+  emailVerificationTokenHash: text("email_verification_token_hash"),
+  emailVerificationExpiresAt: timestamp("email_verification_expires_at"),
+  // FS-157: stable Clerk user id (`sub`); logins map by this first. Nullable until linked/backfilled.
+  clerkUserId: varchar("clerk_user_id", { length: 255 }),
+  // FS-160b: tombstone set by Clerk user.deleted. A tombstoned user is never auto-linked (verified email /
+  // membership webhook / first-login fallback); clearing it is a manual DB step until FS-165.
+  clerkUnlinkedAt: timestamp("clerk_unlinked_at", { withTimezone: true }),
   // If this user is also a technician
   technicianId: uuid("technician_id"),
   ...timestamps,
@@ -534,6 +554,8 @@ export const users = pgTable("users", {
   emailIdx: uniqueIndex("users_email_idx").on(t.email),
   emailCompanyIdx: uniqueIndex("users_email_company_idx").on(t.email, t.companyId),
   companyIdx: index("users_company_idx").on(t.companyId),
+  emailVerificationTokenIdx: index("users_email_verification_token_idx").on(t.emailVerificationTokenHash),
+  clerkUserIdIdx: uniqueIndex("users_clerk_user_id_idx").on(t.clerkUserId).where(sql`${t.clerkUserId} IS NOT NULL`),
 }));
 
 export const refreshTokens = pgTable("refresh_tokens", {
@@ -905,6 +927,7 @@ export const estimateItems = pgTable("estimate_items", {
   id: id(),
   estimateId: uuid("estimate_id").notNull().references(() => estimates.id, { onDelete: "cascade" }),
   companyId: companyId(),
+  productCatalogId: uuid("product_catalog_id").references(() => productCatalog.id, { onDelete: "set null" }),
   // Item
   name: varchar("name", { length: 255 }).notNull(),
   description: text("description"),
@@ -938,6 +961,9 @@ export const invoices = pgTable("invoices", {
   total: decimal("total", { precision: 10, scale: 2 }).notNull().default("0"),
   amountPaid: decimal("amount_paid", { precision: 10, scale: 2 }).default("0"),
   balanceDue: decimal("balance_due", { precision: 10, scale: 2 }).notNull().default("0"),
+  // Customer-paid checkout fees collected (separate lines; never part of total/tax/balance). 0043.
+  serviceFeeAmount: decimal("service_fee_amount", { precision: 10, scale: 2 }).notNull().default("0"),
+  bookingFeeAmount: decimal("booking_fee_amount", { precision: 10, scale: 2 }).notNull().default("0"),
   // Dates
   issuedAt: timestamp("issued_at"),
   dueAt: timestamp("due_at"),
@@ -997,6 +1023,12 @@ export const payments = pgTable("payments", {
   collectedById: uuid("collected_by_id").references(() => users.id),
   // Amounts
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  // Customer-paid fees on top of `amount` (checkout only). Non-refundable. 0043.
+  serviceFeeAmount: decimal("service_fee_amount", { precision: 10, scale: 2 }).notNull().default("0"),
+  bookingFeeAmount: decimal("booking_fee_amount", { precision: 10, scale: 2 }).notNull().default("0"),
+  feeRefundable: boolean("fee_refundable").notNull().default(false),
+  /** Refunded portion of `amount` only; fees are never refunded. */
+  amountRefunded: decimal("amount_refunded", { precision: 10, scale: 2 }).notNull().default("0"),
   method: paymentMethodEnum("method").notNull(),
   status: paymentStatusEnum("status").notNull().default("pending"),
   // Stripe
@@ -1106,6 +1138,9 @@ export const maintenancePlans = pgTable("maintenance_plans", {
   // Assets covered under this plan
   assetIds: uuid("asset_ids").array().default([]),
   notes: text("notes"),
+  sourceSystem: varchar("source_system", { length: 64 }),
+  sourceId: varchar("source_id", { length: 256 }),
+  importSessionId: uuid("import_session_id").references(() => importSessions.id),
   ...timestamps,
 }, (t) => ({
   companyIdx: index("maintenance_plans_company_idx").on(t.companyId),
@@ -1113,6 +1148,11 @@ export const maintenancePlans = pgTable("maintenance_plans", {
   nextServiceIdx: index("maintenance_plans_next_service_idx").on(t.nextServiceDate),
   statusIdx: index("maintenance_plans_status_idx").on(t.status),
   stripeSubIdx: index("maintenance_plans_stripe_sub_idx").on(t.stripeSubscriptionId),
+  importLineageIdx: uniqueIndex("maintenance_plans_import_lineage_idx").on(
+    t.companyId,
+    t.sourceSystem,
+    t.sourceId,
+  ),
 }));
 
 export const maintenanceVisits = pgTable("maintenance_visits", {
@@ -1461,6 +1501,48 @@ export const importBundles = pgTable("import_bundles", {
   companyIdx: index("import_bundles_company_idx").on(t.companyId),
 }));
 
+export const savedCardMigrationStatusEnum = pgEnum("saved_card_migration_status", [
+  "requested",
+  "awaiting_stripe_import",
+  "mapping",
+  "completed",
+  "failed",
+  "fallback_required"
+]);
+
+/** Stripe PAN import orchestration (FS-138); no raw card data stored. */
+export const savedCardMigrations = pgTable("saved_card_migrations", {
+  id: id(),
+  companyId: companyId(),
+  importBundleId: uuid("import_bundle_id").references(() => importBundles.id),
+  createdById: uuid("created_by_id").references(() => users.id),
+  status: savedCardMigrationStatusEnum("status").notNull().default("requested"),
+  priorProcessorName: varchar("prior_processor_name", { length: 120 }).notNull(),
+  /** Stripe-side import reference (job/file id); never PAN or full card numbers. */
+  stripeImportReference: varchar("stripe_import_reference", { length: 255 }),
+  mappingSummary: jsonb("mapping_summary")
+    .notNull()
+    .default({ matched: 0, unmatched: 0, failed: 0, total: 0 }),
+  customerMappings: jsonb("customer_mappings").notNull().default([]),
+  lastError: text("last_error"),
+  fallbackEmailSentAt: timestamp("fallback_email_sent_at"),
+  /** Renvani customer ids already sent the re-enter-card fallback email (per-customer dedupe). */
+  fallbackEmailCustomerIds: jsonb("fallback_email_customer_ids").notNull().default([]),
+  /** Owner acknowledgment that customers consented to off-session charges (required before apply-mappings). */
+  offSessionConsentAcknowledgedAt: timestamp("off_session_consent_acknowledged_at"),
+  offSessionConsentAcknowledgedById: uuid("off_session_consent_acknowledged_by_id").references(() => users.id),
+  /** Version of SAVED_CARD_OFF_SESSION_CONSENT_ACK_TEXT the owner acknowledged. */
+  offSessionConsentTextVersion: varchar("off_session_consent_text_version", { length: 64 }),
+  /** Mapping batch (apply-mappings request) the acknowledgment was recorded for. */
+  offSessionConsentBatchId: uuid("off_session_consent_batch_id"),
+  completedAt: timestamp("completed_at"),
+  ...timestamps,
+}, (t) => ({
+  companyIdx: index("saved_card_migrations_company_idx").on(t.companyId),
+  bundleIdx: index("saved_card_migrations_bundle_idx").on(t.importBundleId),
+  statusIdx: index("saved_card_migrations_status_idx").on(t.status),
+}));
+
 // Tracks a single CSV import session from upload through completion
 // Supports rollback: all records created by an import are tagged with import_session_id
 export const importSessions = pgTable("import_sessions", {
@@ -1729,6 +1811,65 @@ export const jobProducts = pgTable("job_products", {
   jobIdx: index("job_products_job_idx").on(t.jobId),
 }));
 
+// FS-170 inventory: stock locations, per-location levels, append-only movements.
+export const stockLocationKindEnum = pgEnum("stock_location_kind", ["warehouse", "van"]);
+export const stockMovementKindEnum = pgEnum("stock_movement_kind", [
+  "adjustment",
+  "transfer_out",
+  "transfer_in",
+  "job_usage",
+]);
+
+export const stockLocations = pgTable("stock_locations", {
+  id: id(),
+  companyId: companyId(),
+  name: varchar("name", { length: 255 }).notNull(),
+  kind: stockLocationKindEnum("kind").notNull(),
+  technicianId: uuid("technician_id").references(() => technicians.id, { onDelete: "set null" }),
+  isActive: boolean("is_active").notNull().default(true),
+  ...timestamps,
+}, (t) => ({
+  companyIdx: index("stock_locations_company_idx").on(t.companyId),
+}));
+
+export const stockLevels = pgTable("stock_levels", {
+  id: id(),
+  companyId: companyId(),
+  locationId: uuid("location_id").notNull().references(() => stockLocations.id, { onDelete: "cascade" }),
+  productId: uuid("product_id").notNull().references(() => productCatalog.id, { onDelete: "cascade" }),
+  quantity: integer("quantity").notNull().default(0),
+  lowStockThreshold: integer("low_stock_threshold"),
+  ...timestamps,
+}, (t) => ({
+  companyIdx: index("stock_levels_company_idx").on(t.companyId),
+  locationProductIdx: uniqueIndex("stock_levels_company_location_product_idx").on(
+    t.companyId,
+    t.locationId,
+    t.productId
+  ),
+}));
+
+/** Append-only audit trail; UPDATE/DELETE are rejected by a trigger (migration 0044). */
+export const stockMovements = pgTable("stock_movements", {
+  id: id(),
+  companyId: companyId(),
+  locationId: uuid("location_id").notNull().references(() => stockLocations.id, { onDelete: "cascade" }),
+  productId: uuid("product_id").notNull().references(() => productCatalog.id, { onDelete: "cascade" }),
+  kind: stockMovementKindEnum("kind").notNull(),
+  quantityDelta: integer("quantity_delta").notNull(),
+  quantityAfter: integer("quantity_after").notNull(),
+  reason: text("reason"),
+  jobId: uuid("job_id").references(() => jobs.id, { onDelete: "set null" }),
+  transferGroupId: uuid("transfer_group_id"),
+  allowNegative: boolean("allow_negative").notNull().default(false),
+  actorUserId: uuid("actor_user_id").references(() => users.id, { onDelete: "set null" }),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+}, (t) => ({
+  companyIdx: index("stock_movements_company_idx").on(t.companyId),
+  locationProductIdx: index("stock_movements_location_product_idx").on(t.locationId, t.productId),
+  jobIdx: index("stock_movements_job_idx").on(t.jobId),
+}));
+
 export const timeEntries = pgTable("time_entries", {
   id: id(),
   companyId: companyId(),
@@ -1745,6 +1886,60 @@ export const timeEntries = pgTable("time_entries", {
   companyIdx: index("time_entries_company_idx").on(t.companyId),
   jobIdx: index("time_entries_job_idx").on(t.jobId),
   technicianIdx: index("time_entries_technician_idx").on(t.technicianId),
+  // FS-171 (migration 0046): one open entry per technician.
+  openTechnicianIdx: uniqueIndex("time_entries_open_technician_idx")
+    .on(t.companyId, t.technicianId)
+    .where(sql`${t.endedAt} IS NULL AND ${t.deletedAt} IS NULL`),
+}));
+
+// FS-171: pay-period timesheets, audit trail and technician pay rates (migration 0045).
+export const timesheets = pgTable("timesheets", {
+  id: id(),
+  companyId: companyId(),
+  technicianId: uuid("technician_id").notNull().references(() => technicians.id, { onDelete: "cascade" }),
+  periodStart: date("period_start", { mode: "string" }).notNull(),
+  periodEnd: date("period_end", { mode: "string" }).notNull(),
+  status: varchar("status", { length: 20 }).notNull().default("open"),
+  submittedAt: timestamp("submitted_at"),
+  submittedById: uuid("submitted_by_id").references(() => users.id, { onDelete: "set null" }),
+  approvedAt: timestamp("approved_at"),
+  approvedById: uuid("approved_by_id").references(() => users.id, { onDelete: "set null" }),
+  rejectedAt: timestamp("rejected_at"),
+  rejectedById: uuid("rejected_by_id").references(() => users.id, { onDelete: "set null" }),
+  rejectionReason: text("rejection_reason"),
+  ...timestamps,
+}, (t) => ({
+  companyIdx: index("timesheets_company_idx").on(t.companyId),
+  companyTechnicianPeriodIdx: uniqueIndex("timesheets_company_technician_period_idx").on(t.companyId, t.technicianId, t.periodStart),
+}));
+
+export const timesheetAuditEvents = pgTable("timesheet_audit_events", {
+  id: id(),
+  companyId: companyId(),
+  timesheetId: uuid("timesheet_id").references(() => timesheets.id, { onDelete: "cascade" }),
+  timeEntryId: uuid("time_entry_id").references(() => timeEntries.id, { onDelete: "cascade" }),
+  action: varchar("action", { length: 40 }).notNull(),
+  actorUserId: uuid("actor_user_id").references(() => users.id, { onDelete: "set null" }),
+  reason: text("reason"),
+  before: jsonb("before"),
+  after: jsonb("after"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+}, (t) => ({
+  companyIdx: index("timesheet_audit_events_company_idx").on(t.companyId),
+  timesheetIdx: index("timesheet_audit_events_timesheet_idx").on(t.timesheetId),
+}));
+
+export const technicianPayRates = pgTable("technician_pay_rates", {
+  id: id(),
+  companyId: companyId(),
+  technicianId: uuid("technician_id").notNull().references(() => technicians.id, { onDelete: "cascade" }),
+  hourlyRateCents: integer("hourly_rate_cents").notNull(),
+  effectiveFrom: date("effective_from", { mode: "string" }).notNull(),
+  createdById: uuid("created_by_id").references(() => users.id, { onDelete: "set null" }),
+  ...timestamps,
+}, (t) => ({
+  companyIdx: index("technician_pay_rates_company_idx").on(t.companyId),
+  companyTechnicianEffectiveIdx: uniqueIndex("technician_pay_rates_company_technician_effective_idx").on(t.companyId, t.technicianId, t.effectiveFrom),
 }));
 
 export const reviewRequests = pgTable("review_requests", {

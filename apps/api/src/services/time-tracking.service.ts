@@ -23,6 +23,7 @@ import {
   type UpdateTimeEntryInput
 } from "@fsm/types";
 import { invalidateDispatchCache } from "./dispatch.service.js";
+import { assertTimeEntryDatesNotLocked, guardOpenEntryInsert, TimesheetConflictError } from "./timesheets.service.js";
 
 type CustomerRow = typeof customers.$inferSelect;
 type JobRow = typeof jobs.$inferSelect;
@@ -214,7 +215,9 @@ export async function startTimeEntry(
   jobId: string,
   input: StartTimeEntryInput
 ): Promise<TimeEntry> {
-  const result = await db.transaction(async (tx: TransactionExecutor) => {
+  // FS-171: time_entries_open_technician_idx (0046) is the real guard; a race past the
+  // pre-checks surfaces as 23505 and maps to 409 open_entry_exists.
+  const result = await guardOpenEntryInsert(() => db.transaction(async (tx: TransactionExecutor) => {
     const actor = await getActor(companyId, actorId, tx);
     const technicianId = await resolveTechnicianId(companyId, actor, input.technicianId, tx);
     const [job, technician] = await Promise.all([
@@ -236,6 +239,22 @@ export async function startTimeEntry(
 
     if (existingEntries.some((entry) => entry.endedAt === null)) {
       throw new AppError(ErrorCode.CONFLICT, "This technician already has an open time entry for this job");
+    }
+
+    const otherOpenEntries = await tx
+      .select({ id: timeEntries.id })
+      .from(timeEntries)
+      .where(
+        and(
+          eq(timeEntries.companyId, companyId),
+          eq(timeEntries.technicianId, technicianId),
+          isNull(timeEntries.endedAt),
+          isNull(timeEntries.deletedAt)
+        )
+      );
+
+    if (otherOpenEntries.length > 0) {
+      throw new TimesheetConflictError("open_entry_exists", "Technician is already clocked in on another job", null);
     }
 
     const now = new Date();
@@ -293,7 +312,7 @@ export async function startTimeEntry(
       transitionedFromScheduled,
       scheduledStart: job.scheduledStart
     };
-  });
+  }));
 
   if (result.transitionedFromScheduled && result.scheduledStart) {
     await invalidateDispatchCache(companyId, formatDateOnly(result.scheduledStart));
@@ -376,7 +395,8 @@ export async function updateTimeEntry(
   entryId: string,
   input: UpdateTimeEntryInput
 ): Promise<TimeEntry> {
-  return db.transaction(async (tx: TransactionExecutor) => {
+  // Reopening (endedAt: null) can clash with another open entry: 23505 -> 409.
+  return guardOpenEntryInsert(() => db.transaction(async (tx: TransactionExecutor) => {
     const actor = await getActor(companyId, actorId, tx);
     const entries = await tx
       .select()
@@ -389,6 +409,8 @@ export async function updateTimeEntry(
     }
 
     const startedAt = input.startedAt ? new Date(input.startedAt) : entry.startedAt;
+    // FS-171: approved timesheet periods are locked here too (reopen first).
+    await assertTimeEntryDatesNotLocked(companyId, entry.technicianId, [entry.startedAt, startedAt], tx);
     const endedAt =
       input.endedAt === undefined ? entry.endedAt : input.endedAt === null ? null : new Date(input.endedAt);
     const durationMinutes = endedAt ? calculateDurationMinutes(startedAt, endedAt) : null;
@@ -429,7 +451,7 @@ export async function updateTimeEntry(
     });
 
     return toTimeEntry(updatedEntry);
-  });
+  }));
 }
 
 export async function listTechnicianTime(

@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { listCustomerHistoryTimelineQuerySchema } from "@fsm/types";
+
 import { withZodValidation } from "../shared/validation.js";
 
 const currentYear = new Date().getFullYear();
@@ -470,6 +472,18 @@ export const listCustomersValidation = withZodValidation({ query: ListCustomersQ
 export const searchCustomersValidation = withZodValidation({ query: SearchCustomersQuerySchema });
 export const createCustomerValidation = withZodValidation({ body: CreateCustomerSchema });
 export const customerIdValidation = withZodValidation({ params: CustomerIdParamsSchema });
+export const CreateCustomerNoteSchema = z
+  .object({
+    content: z.string().trim().min(1).max(10_000),
+    isInternal: z.boolean().optional(),
+    notedAt: z.string().datetime({ offset: true }).optional()
+  })
+  .strict();
+export type CreateCustomerNoteBody = z.infer<typeof CreateCustomerNoteSchema>;
+export const createCustomerNoteValidation = withZodValidation({
+  params: CustomerIdParamsSchema,
+  body: CreateCustomerNoteSchema
+});
 export const updateCustomerValidation = withZodValidation({
   params: CustomerIdParamsSchema,
   body: UpdateCustomerSchema
@@ -760,7 +774,43 @@ const customerNoteSchema = {
   }
 } as const;
 
+export const createCustomerNoteRouteSchema = {
+  tags: ["customers"],
+  response: {
+    201: {
+      type: "object",
+      additionalProperties: false,
+      required: ["note"],
+      properties: {
+        note: customerNoteSchema
+      }
+    },
+    400: errorResponseSchema,
+    401: errorResponseSchema,
+    403: errorResponseSchema,
+    404: errorResponseSchema
+  }
+} as const;
+
 export const getCustomerImportedHistoryRouteSchema = {
+  tags: ["customers"],
+  response: {
+    200: {
+      type: "object",
+      additionalProperties: true
+    },
+    400: errorResponseSchema,
+    401: errorResponseSchema,
+    404: errorResponseSchema
+  }
+} as const;
+
+export const listCustomerHistoryTimelineValidation = withZodValidation({
+  params: CustomerIdParamsSchema,
+  query: listCustomerHistoryTimelineQuerySchema
+});
+
+export const getCustomerHistoryTimelineRouteSchema = {
   tags: ["customers"],
   response: {
     200: {

@@ -17,7 +17,7 @@ Service agreements and the booking recurring hook only link a single `maintenanc
 
 ## Proposed Approach
 
-Add tenant-scoped `recurring_visit_series` and `recurring_visit_occurrences` tables (migration **0039**). A dedicated service generates **N** occurrence rows from series anchor date, `maintenance_plan_frequency`, and company IANA timezone using calendar-month steps (`Temporal`). Uniqueness on `(series_id, occurrence_index)` makes regeneration idempotent. Booking confirmation continues to own the first visit link; when linked, it ensures a series exists and generates a small default horizon.
+Add tenant-scoped `recurring_visit_series` and `recurring_visit_occurrences` tables (migration **0047**). A dedicated service generates **N** occurrence rows from series anchor date, `maintenance_plan_frequency`, and company IANA timezone using calendar-month steps (`Temporal`). Uniqueness on `(series_id, occurrence_index)` makes regeneration idempotent. Booking confirmation continues to own the first visit link; when linked, it ensures a series exists and generates a small default horizon.
 
 `maintenance_visits` and external schedulers remain the operational visit record until a later adapter explicitly promotes occurrences to jobs.
 

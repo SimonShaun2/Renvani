@@ -265,7 +265,77 @@
       "idx": 37,
       "version": "7",
       "when": 1777711000000,
-      "tag": "0039_fs59_recurring_visit_series",
+      "tag": "0037_user_email_verification",
+      "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "7",
+      "when": 1777712000000,
+      "tag": "0038_fs157_clerk_identity",
+      "breakpoints": true
+    },
+    {
+      "idx": 39,
+      "version": "7",
+      "when": 1777713000000,
+      "tag": "0039_fs160b_clerk_unlink_tombstone",
+      "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1777714000000,
+      "tag": "0040_fs_migrate_service_agreements_import",
+      "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "7",
+      "when": 1777715000000,
+      "tag": "0041_fs147_price_book_line_picker",
+      "breakpoints": true
+    },
+    {
+      "idx": 42,
+      "version": "7",
+      "when": 1792716506137,
+      "tag": "0042_fs138_saved_card_migration",
+      "breakpoints": true
+    },
+    {
+      "idx": 43,
+      "version": "7",
+      "when": 1792716506138,
+      "tag": "0043_payments_service_fee_booking_fee",
+      "breakpoints": true
+    },
+    {
+      "idx": 44,
+      "version": "7",
+      "when": 1792716506139,
+      "tag": "0044_fs170_inventory",
+      "breakpoints": true
+    },
+    {
+      "idx": 45,
+      "version": "7",
+      "when": 1792716506140,
+      "tag": "0045_fs171_timesheets_payroll",
+      "breakpoints": true
+    },
+    {
+      "idx": 46,
+      "version": "7",
+      "when": 1792716506141,
+      "tag": "0046_fs171_open_time_entry_unique",
+      "breakpoints": true
+    },
+    {
+      "idx": 47,
+      "version": "7",
+      "when": 1792717000000,
+      "tag": "0047_fs59_recurring_visit_series",
       "breakpoints": true
     }
   ]

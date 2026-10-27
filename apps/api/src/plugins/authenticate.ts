@@ -35,6 +35,8 @@ declare module "fastify" {
     user: AuthenticatedRequestUser;
     company: AuthenticatedRequestCompany;
     authProvider?: "jwt" | "clerk";
+    /** Role claim from the Clerk session token (`metadata.role`); null for legacy JWT or when absent. */
+    sessionRole: UserRole | null;
   }
 }
 
@@ -51,6 +53,7 @@ function attachRequestIdentity(
   authProvider: "jwt" | "clerk"
 ): void {
   request.authProvider = authProvider;
+  request.sessionRole = null;
   request.user = {
     id: user.id,
     email: user.email,
@@ -122,12 +125,23 @@ async function authenticateWithClerk(accessToken: string, request: FastifyReques
 
   const user = await resolveStaffUserForClerkSession(company.id, session);
   attachRequestIdentity(request, user, company, "clerk");
+  request.sessionRole = session.role;
+}
+
+/** preHandler factory: gate a staff route on the DB role (authoritative), after authenticate. */
+export function requireStaffRole(...allowed: UserRole[]) {
+  return async (request: FastifyRequest): Promise<void> => {
+    if (!request.user || !allowed.includes(request.user.role)) {
+      throw new AppError(ErrorCode.FORBIDDEN, "Insufficient role");
+    }
+  };
 }
 
 const authenticatePlugin = fp(async (fastify) => {
   fastify.decorateRequest("user", null as unknown as AuthenticatedRequestUser);
   fastify.decorateRequest("company", null as unknown as AuthenticatedRequestCompany);
   fastify.decorateRequest("authProvider", undefined);
+  fastify.decorateRequest("sessionRole", null);
 
   fastify.decorate("authenticate", async (request: FastifyRequest) => {
     const authorizationHeader = request.headers.authorization;

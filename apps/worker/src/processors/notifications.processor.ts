@@ -1,10 +1,11 @@
+import { randomUUID } from "node:crypto";
 import { and, eq, isNull } from "drizzle-orm";
 import type { Job, Processor } from "bullmq";
 import pino from "pino";
 
-import { resolveOutboundEmailFromAddress } from "@fsm/comms";
+import { resolveTransactionalEmailFromAddress, type EmailTemplateId } from "@fsm/comms";
 import { env } from "@fsm/config";
-import { featureFlags } from "@fsm/config/feature-flags";
+import { recordTransactionalEmailMessageLog } from "./transactional-email-message-log.js";
 import {
   automationRules,
   campaignRecipients,
@@ -29,6 +30,12 @@ type ReminderLevel = 1 | 2 | 3;
 type InvoiceStatus = (typeof invoices.$inferSelect)["status"];
 type AutomationRuleType = (typeof automationRules.$inferSelect)["ruleType"];
 type AgreementEmailType = "renewal_reminder" | "payment_failed";
+
+type TransactionalEmailSendResult = {
+  templateId: EmailTemplateId;
+  subject: string;
+  providerMessageId: string | null;
+};
 
 interface EmailModule {
   sendPasswordResetEmail(to: string, resetUrl: string, firstName: string): Promise<void>;
@@ -116,7 +123,7 @@ interface EmailModule {
       referenceNumber: string;
       scheduledLabel: string | null;
     }
-  ): Promise<void>;
+  ): Promise<TransactionalEmailSendResult>;
   sendBookingDeclineEmail(
     to: string,
     params: {
@@ -125,7 +132,7 @@ interface EmailModule {
       referenceNumber: string;
       reason: string | null;
     }
-  ): Promise<void>;
+  ): Promise<TransactionalEmailSendResult>;
   sendVipMembershipWelcomeEmail(
     to: string,
     params: {
@@ -134,7 +141,7 @@ interface EmailModule {
       planName: string;
       portalUrl: string | null;
     }
-  ): Promise<void>;
+  ): Promise<TransactionalEmailSendResult>;
   sendVipMembershipRenewalEmail(
     to: string,
     params: {
@@ -144,7 +151,7 @@ interface EmailModule {
       amount: string;
       renewalDateLabel: string | null;
     }
-  ): Promise<void>;
+  ): Promise<TransactionalEmailSendResult>;
   sendVipMembershipPaymentFailedEmail(
     to: string,
     params: {
@@ -157,7 +164,7 @@ interface EmailModule {
       nextRetryAtLabel: string | null;
       dunningStepIndex: number;
     }
-  ): Promise<void>;
+  ): Promise<TransactionalEmailSendResult>;
 }
 
 interface SmsModule {
@@ -340,10 +347,14 @@ function formatVipLabelFromIso(iso: string | null): string | null {
   return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 }
 
-function getOutboundEmailFromAddress(): string {
-  return resolveOutboundEmailFromAddress({
-    resendEmailEnabled: featureFlags.resendEmailEnabled,
+/** Same key-based selection as the API sender (apps/api/src/lib/outbound-email.ts), via @fsm/comms. */
+export function getOutboundEmailFromAddress(): string {
+  return resolveTransactionalEmailFromAddress({
+    resendApiKey: env.RESEND_API_KEY,
+    sendgridApiKey: env.SENDGRID_API_KEY,
+    nodeEnv: env.NODE_ENV,
     resendFromEmail: env.RESEND_FROM_EMAIL,
+    emailFrom: env.EMAIL_FROM,
     sendgridFromEmail: env.SENDGRID_FROM_EMAIL
   });
 }
@@ -1234,12 +1245,28 @@ export async function handleSendVipMembershipEmail(
     return;
   }
 
+  // Fall back to the (stable across retries) BullMQ job id so emails missing Stripe ids never collide
+  // on the message_logs (company, source, source id) unique key.
+  const fallbackSourceKey = `job-${job.id ?? randomUUID()}`;
+  const stripeSubscriptionId = getJobString(job.data, "stripeSubscriptionId") ?? fallbackSourceKey;
+  const stripeInvoiceId = getJobString(job.data, "stripeInvoiceId") ?? fallbackSourceKey;
+  const fromAddress = getOutboundEmailFromAddress();
+
   if (emailKind === "welcome") {
-    await dependencies.email.sendVipMembershipWelcomeEmail(customer.email, {
+    const delivery = await dependencies.email.sendVipMembershipWelcomeEmail(customer.email, {
       firstName: customer.firstName,
       companyName: company.name,
       planName,
       portalUrl: null
+    });
+    await recordTransactionalEmailMessageLog({
+      companyId,
+      customerId,
+      toAddress: customer.email,
+      fromAddress,
+      delivery,
+      sourceSystem: "vip_membership_email",
+      sourceId: `${stripeSubscriptionId}:welcome`
     });
     logger.info({ companyId, customerId, emailKind }, "VIP membership welcome email sent");
     return;
@@ -1247,12 +1274,21 @@ export async function handleSendVipMembershipEmail(
 
   if (emailKind === "renewal_receipt") {
     const amount = getJobString(job.data, "amount") ?? "0.00";
-    await dependencies.email.sendVipMembershipRenewalEmail(customer.email, {
+    const delivery = await dependencies.email.sendVipMembershipRenewalEmail(customer.email, {
       firstName: customer.firstName,
       companyName: company.name,
       planName,
       amount,
       renewalDateLabel: formatVipLabelFromIso(new Date().toISOString())
+    });
+    await recordTransactionalEmailMessageLog({
+      companyId,
+      customerId,
+      toAddress: customer.email,
+      fromAddress,
+      delivery,
+      sourceSystem: "vip_membership_email",
+      sourceId: `${stripeSubscriptionId}:renewal:${stripeInvoiceId}`
     });
     logger.info({ companyId, customerId, emailKind }, "VIP membership renewal email sent");
     return;
@@ -1267,7 +1303,7 @@ export async function handleSendVipMembershipEmail(
       ? job.data.dunningStepIndex
       : 0;
 
-  await dependencies.email.sendVipMembershipPaymentFailedEmail(customer.email, {
+  const delivery = await dependencies.email.sendVipMembershipPaymentFailedEmail(customer.email, {
     firstName: customer.firstName,
     companyName: company.name,
     planName,
@@ -1276,6 +1312,16 @@ export async function handleSendVipMembershipEmail(
     graceEndsAtLabel,
     nextRetryAtLabel,
     dunningStepIndex
+  });
+
+  await recordTransactionalEmailMessageLog({
+    companyId,
+    customerId,
+    toAddress: customer.email,
+    fromAddress,
+    delivery,
+    sourceSystem: "vip_membership_email",
+    sourceId: `${stripeSubscriptionId}:dunning:${stripeInvoiceId}:step-${dunningStepIndex}`
   });
 
   logger.info({ companyId, customerId, emailKind, dunningStepIndex }, "VIP membership dunning email sent");
@@ -1312,19 +1358,33 @@ export async function handleSendBookingNotification(
   const reason = getJobString(job.data, "reason");
 
   if (toEmail && companyName && referenceNumber) {
-    if (job.name === "send-booking-decline") {
-      await dependencies.email.sendBookingDeclineEmail(toEmail, {
-        firstName,
-        companyName,
-        referenceNumber,
-        reason: reason ?? null
-      });
-    } else {
-      await dependencies.email.sendBookingConfirmationEmail(toEmail, {
-        firstName,
-        companyName,
-        referenceNumber,
-        scheduledLabel: scheduledLabel ?? null
+    const customerId = getJobString(job.data, "customerId");
+    const bookingRequestId = getJobString(job.data, "bookingRequestId");
+    const fromAddress = getOutboundEmailFromAddress();
+    const delivery =
+      job.name === "send-booking-decline"
+        ? await dependencies.email.sendBookingDeclineEmail(toEmail, {
+            firstName,
+            companyName,
+            referenceNumber,
+            reason: reason ?? null
+          })
+        : await dependencies.email.sendBookingConfirmationEmail(toEmail, {
+            firstName,
+            companyName,
+            referenceNumber,
+            scheduledLabel: scheduledLabel ?? null
+          });
+
+    if (companyId && bookingRequestId) {
+      await recordTransactionalEmailMessageLog({
+        companyId,
+        customerId: customerId ?? null,
+        toAddress: toEmail,
+        fromAddress,
+        delivery,
+        sourceSystem: "booking_notification",
+        sourceId: `${bookingRequestId}:${job.name}`
       });
     }
 

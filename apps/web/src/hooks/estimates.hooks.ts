@@ -25,6 +25,7 @@ export interface EstimateItemRecord {
   id: string;
   estimateId: string;
   companyId: string;
+  priceBookItemId: string | null;
   name: string;
   description: string | null;
   itemType: "service" | "labor" | "material" | "fee";

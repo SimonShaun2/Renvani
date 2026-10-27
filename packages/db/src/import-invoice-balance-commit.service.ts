@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, isNull, ne } from "drizzle-orm";
 import { Decimal } from "decimal.js";
 
 import { db } from "./client.js";
@@ -105,6 +105,26 @@ async function upsertImportedAggregatePayment(
   }
 
   const aggregateSourceId = aggregatePaymentSourceId(invoiceSourceId);
+
+  // Itemized payments already imported for this invoice are authoritative; an aggregate
+  // placeholder on top would double-count amount paid.
+  const itemized = await executor
+    .select({ id: payments.id })
+    .from(payments)
+    .where(
+      and(
+        eq(payments.companyId, ctx.companyId),
+        eq(payments.invoiceId, invoiceId),
+        eq(payments.sourceSystem, ctx.sourceSystem),
+        ne(payments.sourceId, aggregateSourceId),
+        isNull(payments.deletedAt),
+      ),
+    )
+    .limit(1);
+  if (itemized.length > 0) {
+    return;
+  }
+
   const existing = await findPaymentByLineage(
     executor,
     ctx.companyId,
@@ -397,6 +417,23 @@ export async function commitImportedPaymentRows(
         createdAt: now,
         ...paymentValues,
       });
+    }
+
+    // The invoice import may have recorded an aggregate placeholder payment (total - balance).
+    // Once itemized payments arrive they replace it, otherwise amount paid is double-counted.
+    if (invoice.sourceId && row.sourceId !== aggregatePaymentSourceId(invoice.sourceId)) {
+      await executor
+        .update(payments)
+        .set({ deletedAt: now, updatedAt: now })
+        .where(
+          and(
+            eq(payments.companyId, ctx.companyId),
+            eq(payments.invoiceId, invoiceId),
+            eq(payments.sourceSystem, ctx.sourceSystem),
+            eq(payments.sourceId, aggregatePaymentSourceId(invoice.sourceId)),
+            isNull(payments.deletedAt),
+          ),
+        );
     }
 
     const paymentRows = await executor

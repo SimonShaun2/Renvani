@@ -26,6 +26,7 @@ export interface InvoiceItemRecord {
   id: string;
   invoiceId: string;
   companyId: string;
+  priceBookItemId: string | null;
   name: string;
   description: string | null;
   itemType: "service" | "labor" | "material" | "fee";
@@ -176,6 +177,23 @@ export function useInvoices(query: ListInvoicesQuery) {
   return useQuery({
     queryKey: invoiceKeys.list(query),
     queryFn: () => api.get<PaginatedResponse<InvoiceListRecord>>(`/api/v1/invoices?${queryString}`)
+  });
+}
+
+export interface PaymentListRecord {
+  id: string;
+  amount: string;
+  status: string;
+  paidAt: string | null;
+  createdAt: string;
+}
+
+/** GET /api/v1/payments — succeeded payments created since `createdAfter` (max 100 per page). */
+export function useSucceededPaymentsSince(createdAfter: string) {
+  const queryString = buildQueryString({ status: "succeeded", createdAfter, page: 1, limit: 100 });
+  return useQuery({
+    queryKey: [...invoiceKeys.all, "payments", "succeeded", createdAfter] as const,
+    queryFn: () => api.get<PaginatedResponse<PaymentListRecord>>(`/api/v1/payments?${queryString}`)
   });
 }
 

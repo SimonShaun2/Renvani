@@ -18,7 +18,8 @@ const importEntityTypeSchema = z.enum([
   "estimates",
   "price_book",
   "notes",
-  "communications"
+  "communications",
+  "service_agreements"
 ]);
 
 const errorResponseSchema = {

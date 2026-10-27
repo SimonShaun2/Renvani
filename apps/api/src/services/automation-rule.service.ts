@@ -9,6 +9,8 @@ import {
   type UpdateAutomationRuleInput
 } from "@fsm/types";
 
+import { enforceAutomationEnablePlanLimit } from "../lib/plan-usage-limits.js";
+
 type AutomationRuleRow = typeof automationRules.$inferSelect;
 type UserRow = typeof users.$inferSelect;
 type SelectExecutor = Pick<typeof db, "select">;
@@ -130,6 +132,11 @@ export async function updateAutomationRule(
     await ensureAutomationRules(companyId, tx);
     const actor = await getActor(companyId, actorId, tx);
     const existingRule = await getAutomationRuleRecord(companyId, ruleId, tx);
+
+    if (input.isEnabled === true && !existingRule.isEnabled) {
+      await enforceAutomationEnablePlanLimit(companyId, tx);
+    }
+
     const updatedRows = await tx
       .update(automationRules)
       .set({

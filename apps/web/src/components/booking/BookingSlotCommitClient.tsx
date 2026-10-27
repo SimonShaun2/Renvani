@@ -134,7 +134,8 @@ export function BookingSlotCommitClient({ slug }: { slug: string }) {
         jobId: result.jobId,
         recurringSchedule: result.recurringSchedule,
         scheduledStart: selectedScheduledStart!,
-        scheduledEnd: selectedScheduledEnd!
+        scheduledEnd: selectedScheduledEnd!,
+        manageToken: result.manageToken
       });
 
       router.push(buildConfirmedHref(slug, source, resolvedRef));

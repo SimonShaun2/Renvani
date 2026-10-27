@@ -117,6 +117,17 @@ export const GOLDEN_IMPORT_BUNDLE_MANIFESTS: GoldenImportBundleManifest[] = [
         businessDateColumn: "Invoice Date"
       },
       {
+        relativePath: "payments.csv",
+        entityType: "payments",
+        presetEntityHint: "invoices",
+        joinLink: {
+          parentFile: "clients.csv",
+          localColumn: "Client ID",
+          parentColumn: "Client ID"
+        },
+        businessDateColumn: "Payment Date"
+      },
+      {
         relativePath: "price_book.csv",
         entityType: "products",
         presetEntityHint: "products"
@@ -330,6 +341,16 @@ export const GOLDEN_IMPORT_BUNDLE_MANIFESTS: GoldenImportBundleManifest[] = [
       {
         relativePath: "vip_memberships.csv",
         entityType: "vip_memberships",
+        presetEntityHint: "customers",
+        joinLink: {
+          parentFile: "customers.csv",
+          localColumn: "customer_id",
+          parentColumn: "customer_id"
+        }
+      },
+      {
+        relativePath: "maintenance_plans.csv",
+        entityType: "maintenance_plans",
         presetEntityHint: "customers",
         joinLink: {
           parentFile: "customers.csv",

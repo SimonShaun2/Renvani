@@ -161,6 +161,18 @@ export interface PublicConfirmBookingResponse {
   };
   jobId: string;
   recurringSchedule: PublicRecurringScheduleRecord;
+  manageToken: string | null;
+}
+
+export interface BookingSelfServiceViewRecord {
+  bookingSlug: string;
+  referenceNumber: string;
+  companyName: string;
+  confirmation: BookingConfirmationRecord;
+  canReschedule: boolean;
+  canCancel: boolean;
+  cutoffHours: number;
+  expiresAt: string;
 }
 
 interface ConfirmationResponse {
@@ -340,5 +352,26 @@ export function useBookingDemandByZip(days = 30) {
     queryKey: bookingKeys.demand(days),
     queryFn: () => api.get<BookingDemandByZipResponse>(`/api/v1/booking-requests/demand-by-zip?days=${days}`),
     staleTime: 60 * 1000
+  });
+}
+
+export function useBookingSelfService(manageToken: string | null) {
+  return useQuery({
+    queryKey: ["booking", "self-service", manageToken],
+    queryFn: () =>
+      publicApi.get<{ selfService: BookingSelfServiceViewRecord }>(
+        `/api/v1/public/booking/manage/${encodeURIComponent(manageToken ?? "")}`
+      ),
+    enabled: Boolean(manageToken)
+  });
+}
+
+export function useBookingSelfServiceCancel(manageToken: string) {
+  return useMutation({
+    mutationFn: () =>
+      publicApi.post<{ result: { status: string } }>(
+        `/api/v1/public/booking/manage/${encodeURIComponent(manageToken)}/cancel`,
+        {}
+      )
   });
 }

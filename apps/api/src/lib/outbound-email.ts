@@ -119,12 +119,18 @@ export async function deliverTransactionalEmail(
   return { providerMessageId: result.providerMessageId };
 }
 
+export type TransactionalEmailSendResult = {
+  templateId: EmailTemplateId;
+  subject: string;
+  providerMessageId: string | null;
+};
+
 export async function sendRenderedTemplateEmail(
   to: string,
   templateId: EmailTemplateId,
   variables: Record<string, string>,
   tags?: string[]
-): Promise<void> {
+): Promise<TransactionalEmailSendResult> {
   const logoUrl = (env.EMAIL_LOGO_URL ?? "").trim();
   const rendered = renderTransactionalEmail(templateId, variables, logoUrl ? { logoUrl } : {});
   const payload: OutboundEmailPayload = {
@@ -138,7 +144,13 @@ export async function sendRenderedTemplateEmail(
     payload.tags = tags;
   }
 
-  await deliverTransactionalEmail(payload);
+  const { providerMessageId } = await deliverTransactionalEmail(payload);
+
+  return {
+    templateId: rendered.templateId,
+    subject: rendered.subject,
+    providerMessageId
+  };
 }
 
 /** Fire-and-forget: schedule after the current response cycle; errors are logged, never thrown. */

@@ -40,6 +40,7 @@ import {
 import { generateEstimateNumber } from "../lib/estimate-number.js";
 import { generateJobNumber } from "../lib/job-number.js";
 import { listItems, recalculateTotals } from "./estimate-items.service.js";
+import { assertPriceBookItemsInCompany } from "./price-book-item-scope.js";
 
 type EstimateRow = typeof estimates.$inferSelect;
 type EstimateItemRow = typeof estimateItems.$inferSelect;
@@ -103,6 +104,7 @@ function toEstimate(row: EstimateRow): Estimate {
 function toEstimateItem(row: EstimateItemRow): EstimateItem {
   return {
     ...row,
+    priceBookItemId: row.productCatalogId,
     itemType: normalizeEstimateItemType(row.itemType)
   };
 }
@@ -701,6 +703,11 @@ export async function createEstimate(
     }
 
     if (normalizedInput.items.length > 0) {
+      await assertPriceBookItemsInCompany(
+        tx,
+        companyId,
+        normalizedInput.items.map((item) => item.priceBookItemId)
+      );
       await tx
         .insert(estimateItems)
         .values(
@@ -714,7 +721,8 @@ export async function createEstimate(
             unitPrice: formatMoney(new Decimal(item.unitPrice)),
             total: formatMoney(new Decimal(item.quantity).mul(item.unitPrice)),
             isTaxable: item.isTaxable ?? true,
-            sortOrder: item.sortOrder ?? index
+            sortOrder: item.sortOrder ?? index,
+            ...(item.priceBookItemId ? { productCatalogId: item.priceBookItemId } : {})
           }))
         )
         .returning();

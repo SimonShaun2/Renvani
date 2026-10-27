@@ -384,6 +384,12 @@ export const activityEventTypeEnum = pgEnum("activity_event_type", [
   "revenue.inquiry_qualified",
   "revenue.inquiry_received",
   "revenue.inquiry_escalated",
+  // Saved card migration (FS-138)
+  "payment_method_migration.requested",
+  "payment_method_migration.mappings_applied",
+  "payment_method_migration.stripe_import_confirmed",
+  "payment_method_migration.completed",
+  "payment_method_migration.fallback_sent",
 ]);
 
 export const aiRecommendationTypeEnum = pgEnum("ai_recommendation_type", [
@@ -921,6 +927,7 @@ export const estimateItems = pgTable("estimate_items", {
   id: id(),
   estimateId: uuid("estimate_id").notNull().references(() => estimates.id, { onDelete: "cascade" }),
   companyId: companyId(),
+  productCatalogId: uuid("product_catalog_id").references(() => productCatalog.id, { onDelete: "set null" }),
   // Item
   name: varchar("name", { length: 255 }).notNull(),
   description: text("description"),
@@ -954,6 +961,9 @@ export const invoices = pgTable("invoices", {
   total: decimal("total", { precision: 10, scale: 2 }).notNull().default("0"),
   amountPaid: decimal("amount_paid", { precision: 10, scale: 2 }).default("0"),
   balanceDue: decimal("balance_due", { precision: 10, scale: 2 }).notNull().default("0"),
+  // Customer-paid checkout fees collected (separate lines; never part of total/tax/balance). 0043.
+  serviceFeeAmount: decimal("service_fee_amount", { precision: 10, scale: 2 }).notNull().default("0"),
+  bookingFeeAmount: decimal("booking_fee_amount", { precision: 10, scale: 2 }).notNull().default("0"),
   // Dates
   issuedAt: timestamp("issued_at"),
   dueAt: timestamp("due_at"),
@@ -1013,6 +1023,12 @@ export const payments = pgTable("payments", {
   collectedById: uuid("collected_by_id").references(() => users.id),
   // Amounts
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  // Customer-paid fees on top of `amount` (checkout only). Non-refundable. 0043.
+  serviceFeeAmount: decimal("service_fee_amount", { precision: 10, scale: 2 }).notNull().default("0"),
+  bookingFeeAmount: decimal("booking_fee_amount", { precision: 10, scale: 2 }).notNull().default("0"),
+  feeRefundable: boolean("fee_refundable").notNull().default(false),
+  /** Refunded portion of `amount` only; fees are never refunded. */
+  amountRefunded: decimal("amount_refunded", { precision: 10, scale: 2 }).notNull().default("0"),
   method: paymentMethodEnum("method").notNull(),
   status: paymentStatusEnum("status").notNull().default("pending"),
   // Stripe
@@ -1418,6 +1434,48 @@ export const importBundles = pgTable("import_bundles", {
   ...timestamps,
 }, (t) => ({
   companyIdx: index("import_bundles_company_idx").on(t.companyId),
+}));
+
+export const savedCardMigrationStatusEnum = pgEnum("saved_card_migration_status", [
+  "requested",
+  "awaiting_stripe_import",
+  "mapping",
+  "completed",
+  "failed",
+  "fallback_required"
+]);
+
+/** Stripe PAN import orchestration (FS-138); no raw card data stored. */
+export const savedCardMigrations = pgTable("saved_card_migrations", {
+  id: id(),
+  companyId: companyId(),
+  importBundleId: uuid("import_bundle_id").references(() => importBundles.id),
+  createdById: uuid("created_by_id").references(() => users.id),
+  status: savedCardMigrationStatusEnum("status").notNull().default("requested"),
+  priorProcessorName: varchar("prior_processor_name", { length: 120 }).notNull(),
+  /** Stripe-side import reference (job/file id); never PAN or full card numbers. */
+  stripeImportReference: varchar("stripe_import_reference", { length: 255 }),
+  mappingSummary: jsonb("mapping_summary")
+    .notNull()
+    .default({ matched: 0, unmatched: 0, failed: 0, total: 0 }),
+  customerMappings: jsonb("customer_mappings").notNull().default([]),
+  lastError: text("last_error"),
+  fallbackEmailSentAt: timestamp("fallback_email_sent_at"),
+  /** Renvani customer ids already sent the re-enter-card fallback email (per-customer dedupe). */
+  fallbackEmailCustomerIds: jsonb("fallback_email_customer_ids").notNull().default([]),
+  /** Owner acknowledgment that customers consented to off-session charges (required before apply-mappings). */
+  offSessionConsentAcknowledgedAt: timestamp("off_session_consent_acknowledged_at"),
+  offSessionConsentAcknowledgedById: uuid("off_session_consent_acknowledged_by_id").references(() => users.id),
+  /** Version of SAVED_CARD_OFF_SESSION_CONSENT_ACK_TEXT the owner acknowledged. */
+  offSessionConsentTextVersion: varchar("off_session_consent_text_version", { length: 64 }),
+  /** Mapping batch (apply-mappings request) the acknowledgment was recorded for. */
+  offSessionConsentBatchId: uuid("off_session_consent_batch_id"),
+  completedAt: timestamp("completed_at"),
+  ...timestamps,
+}, (t) => ({
+  companyIdx: index("saved_card_migrations_company_idx").on(t.companyId),
+  bundleIdx: index("saved_card_migrations_bundle_idx").on(t.importBundleId),
+  statusIdx: index("saved_card_migrations_status_idx").on(t.status),
 }));
 
 // Tracks a single CSV import session from upload through completion

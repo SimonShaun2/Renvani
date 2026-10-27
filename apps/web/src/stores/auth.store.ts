@@ -3,6 +3,7 @@
 import { create } from "zustand";
 
 import type { AuthCompany, AuthUser } from "@/src/lib/auth";
+import { clearFieldWorkQueues } from "@/src/lib/field-work-queue";
 
 interface AuthStore {
   user: AuthUser | null;
@@ -24,6 +25,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
     });
   },
   clearAuth: () => {
+    clearFieldWorkQueues();
     set({
       user: null,
       company: null,

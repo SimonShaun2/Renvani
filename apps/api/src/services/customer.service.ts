@@ -589,6 +589,40 @@ function toCustomerNote(row: CustomerNoteRow): CustomerNote {
   };
 }
 
+export interface CreateCustomerNoteInput {
+  content: string;
+  isInternal?: boolean | undefined;
+  notedAt?: string | undefined;
+}
+
+/** Create a native (non-imported) note on a tenant-owned customer. 404 when the customer is not in this company. */
+export async function createCustomerNote(
+  companyId: string,
+  actorId: string,
+  customerId: string,
+  input: CreateCustomerNoteInput
+): Promise<CustomerNote> {
+  await getCustomerRecord(companyId, customerId, db);
+
+  const [row] = await db
+    .insert(customerNotes)
+    .values({
+      companyId,
+      customerId,
+      authorId: actorId,
+      content: input.content.trim(),
+      isInternal: input.isInternal ?? true,
+      notedAt: input.notedAt ? new Date(input.notedAt) : new Date()
+    })
+    .returning();
+
+  if (!row) {
+    throw new AppError(ErrorCode.INTERNAL_ERROR, "Failed to create customer note");
+  }
+
+  return toCustomerNote(row);
+}
+
 export async function getCustomerNotes(companyId: string, customerId: string): Promise<CustomerNote[]> {
   await getCustomerRecord(companyId, customerId, db);
 

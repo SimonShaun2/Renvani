@@ -38,6 +38,8 @@ import internalAdminQboSyncRoutes from "./routes/internal-admin/qbo-sync/index.j
 import quickbooksOnlineRoutes from "./routes/quickbooks-online/index.js";
 import migrateOnboardingRoutes from "./routes/migrate-onboarding/index.js";
 import migratePhotoLinkRoutes from "./routes/migrate-photo-link/index.js";
+import internalAdminSavedCardMigrationRoutes from "./routes/internal-admin/saved-card-migrations/index.js";
+import savedCardMigrationRoutes from "./routes/saved-card-migration/index.js";
 import dataExportRoutes from "./routes/data-exports/index.js";
 import jobEngagementRoutes from "./routes/job-engagement/index.js";
 import jobRoutes from "./routes/jobs/index.js";
@@ -46,6 +48,7 @@ import messageLogRoutes from "./routes/message-logs/index.js";
 import operatorRoutes from "./routes/operator/index.js";
 import publicRoutes from "./routes/public/index.js";
 import inventoryRoutes from "./routes/inventory/index.js";
+import priceBookRoutes from "./routes/price-book/index.js";
 import productRoutes from "./routes/products/index.js";
 import qboSyncRoutes from "./routes/qbo-sync/index.js";
 import reportingRoutes from "./routes/reporting/index.js";
@@ -91,7 +94,7 @@ export async function buildApp() {
   await app.register(fastifyCors, {
     origin: [...new Set([new URL(env.APP_URL).origin, ...parseClerkAuthorizedParties(env.CLERK_AUTHORIZED_PARTIES)])],
     credentials: true,
-    allowedHeaders: ["Authorization", "Content-Type", "Idempotency-Key", "X-Request-Id"]
+    allowedHeaders: ["Authorization", "Content-Type", "Idempotency-Key", "X-Request-Id", "X-Customer-Portal-Token"]
   });
   await app.register(requestLoggerPlugin);
   await app.register(globalRateLimitPlugin);
@@ -119,6 +122,7 @@ export async function buildApp() {
   await app.register(internalAdminQueueRoutes, { prefix: "/api/v1" });
   await app.register(internalAdminQboSyncRoutes, { prefix: "/api/v1" });
   await app.register(quickbooksOnlineRoutes, { prefix: "/api/v1" });
+  await app.register(internalAdminSavedCardMigrationRoutes, { prefix: "/api/v1" });
   await app.register(growthCheckScanRoutes, { prefix: "/api/v1" });
   await app.register(attachmentRoutes, { prefix: "/api/v1" });
   await app.register(bookingRoutes, { prefix: "/api/v1" });
@@ -129,6 +133,7 @@ export async function buildApp() {
   await app.register(messageLogRoutes, { prefix: "/api/v1" });
   await app.register(productRoutes, { prefix: "/api/v1" });
   await app.register(inventoryRoutes, { prefix: "/api/v1" });
+  await app.register(priceBookRoutes, { prefix: "/api/v1" });
   await app.register(technicianRoutes, { prefix: "/api/v1/technicians" });
   await app.register(userRoutes, { prefix: "/api/v1/users" });
   await app.register(technicianExtensionRoutes, { prefix: "/api/v1/technicians" });
@@ -141,6 +146,7 @@ export async function buildApp() {
   await app.register(importReconciliationRoutes, { prefix: "/api/v1" });
   await app.register(migrateOnboardingRoutes, { prefix: "/api/v1" });
   await app.register(migratePhotoLinkRoutes, { prefix: "/api/v1" });
+  await app.register(savedCardMigrationRoutes, { prefix: "/api/v1" });
   await app.register(dataExportRoutes, { prefix: "/api/v1" });
   await app.register(serviceAgreementRoutes, { prefix: "/api/v1" });
   await app.register(vipMembershipRoutes, { prefix: "/api/v1" });

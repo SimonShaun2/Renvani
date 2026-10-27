@@ -17,7 +17,8 @@ export const EMAIL_TEMPLATE_IDS = {
   bookingDecline: "booking.decline",
   vipMembershipWelcome: "vip_membership.welcome",
   vipMembershipRenewal: "vip_membership.renewal_receipt",
-  vipMembershipPaymentFailed: "vip_membership.payment_failed_dunning"
+  vipMembershipPaymentFailed: "vip_membership.payment_failed_dunning",
+  savedCardMigrationReenterCard: "saved_card_migration.reenter_card"
 } as const;
 
 export type EmailTemplateId = (typeof EMAIL_TEMPLATE_IDS)[keyof typeof EMAIL_TEMPLATE_IDS];
@@ -351,6 +352,20 @@ function renderTemplateBody(templateId: EmailTemplateId, variables: Record<strin
           ${retryBlock}
           ${paymentBlock}
           <p>Questions? Contact ${e.companyName ?? "us"} and we'll help.</p>
+        `)
+      };
+    }
+    case EMAIL_TEMPLATE_IDS.savedCardMigrationReenterCard: {
+      const name = greetingName(variables.firstName ?? "");
+      return {
+        templateId,
+        subject: `Update your card on file — ${variables.companyName ?? "Renvani"}`,
+        html: emailShell(`
+          <p>Hi ${name},</p>
+          <p>${variables.companyName ?? "Your service provider"} is moving billing to a new secure system powered by <strong>Renvani</strong>.</p>
+          <p>We could not automatically move your saved card from your prior processor. Please add your card again the next time you receive an invoice — it only takes a moment.</p>
+          ${button(variables.paymentPortalUrl ?? "#", "Add payment method")}
+          <p>If you have questions, contact ${variables.companyName ?? "our office"}.</p>
         `)
       };
     }

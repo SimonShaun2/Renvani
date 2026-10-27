@@ -73,8 +73,8 @@ function normalizeColumnMappings(value: unknown): ColumnMapping {
   return mapping;
 }
 
-function parseTabularRows(buffer: Buffer, fileName: string): ParsedCsvRow[] {
-  return parseTabularImportFile(buffer, fileName).rows;
+function parseTabularRows(buffer: Buffer, fileName: string, entityType: string): ParsedCsvRow[] {
+  return parseTabularImportFile(buffer, fileName, entityType).rows;
 }
 
 function resolveRowWindow(
@@ -123,7 +123,7 @@ async function loadChunkRows(
   importSession: ImportSessionRow,
 ): Promise<ParsedCsvRow[]> {
   const fileBuffer = await downloadFile(getFileKeyFromUrl(importSession.fileUrl));
-  const parsedRows = parseTabularRows(fileBuffer, importSession.fileName);
+  const parsedRows = parseTabularRows(fileBuffer, importSession.fileName, importSession.entityType);
   const { start, end } = resolveRowWindow(payload, parsedRows.length);
   return parsedRows.slice(start, end);
 }
@@ -262,6 +262,9 @@ async function finalizeChunkRun(
         progress: mergedProgress,
         importedRows: (importSession.importedRows ?? 0) + chunkResult.rowsOk,
         errorRows: (importSession.errorRows ?? 0) + chunkResult.rowsFailed,
+        ...(chunkResult.rowsSkipped
+          ? { skippedRows: (importSession.skippedRows ?? 0) + chunkResult.rowsSkipped }
+          : {}),
         completedAt: allChunksDone ? now : importSession.completedAt,
         updatedAt: now,
       })

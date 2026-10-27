@@ -122,3 +122,29 @@ export async function persistImportSessionReconciliationReport(
     "Persisted import session reconciliation report"
   );
 }
+
+/**
+ * Best-effort wrapper: the reconciliation report is advisory. A failure to upload the
+ * skipped-rows CSV or save the report must never fail (or retry) an import that has
+ * already committed, so errors are logged as warnings and swallowed.
+ */
+export async function persistImportSessionReconciliationReportBestEffort(
+  companyId: string,
+  session: ImportSessionRow,
+  validationErrors: ValidationError[]
+): Promise<boolean> {
+  try {
+    await persistImportSessionReconciliationReport(companyId, session, validationErrors);
+    return true;
+  } catch (error: unknown) {
+    logger.warn(
+      {
+        companyId,
+        importSessionId: session.id,
+        err: error instanceof Error ? error.message : String(error)
+      },
+      "Failed to persist import session reconciliation report (best-effort; import unaffected)"
+    );
+    return false;
+  }
+}

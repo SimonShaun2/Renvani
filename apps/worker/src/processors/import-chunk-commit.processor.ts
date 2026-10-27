@@ -34,7 +34,7 @@ import {
 import { emitImportWorkflowStepReceipt } from "../lib/import-workflow-step-receipt.js";
 import {
   normalizeImportValidationErrors,
-  persistImportSessionReconciliationReport
+  persistImportSessionReconciliationReportBestEffort
 } from "../lib/persist-import-session-reconciliation.js";
 
 import {
@@ -626,15 +626,26 @@ export async function handleImportChunkCommit(job: Job<Record<string, unknown>>)
     const chunkResult = await commitChunkForEntity(payload, importSession);
     await finalizeChunkRun(payload, importSession, chunkResult, true);
 
-    if (payload.chunkIndex + 1 >= payload.chunksTotal) {
+    // Chunks can finish out of order, so trigger on the session actually reaching
+    // "completed" (all chunks done), not on the last chunk number. Best-effort.
+    try {
       const refreshedSession = await getImportSessionOrNull(payload.companyId, payload.importSessionId);
-      if (refreshedSession) {
-        await persistImportSessionReconciliationReport(
+      if (refreshedSession?.status === "completed") {
+        await persistImportSessionReconciliationReportBestEffort(
           payload.companyId,
           refreshedSession,
           normalizeImportValidationErrors(refreshedSession.validationErrors)
         );
       }
+    } catch (error: unknown) {
+      logger.warn(
+        {
+          companyId: payload.companyId,
+          importSessionId: payload.importSessionId,
+          err: error instanceof Error ? error.message : String(error)
+        },
+        "Failed to write import reconciliation report (best-effort; chunk unaffected)"
+      );
     }
 
     await emitImportWorkflowStepReceipt({

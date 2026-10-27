@@ -55,7 +55,7 @@ import {
 } from "@fsm/types";
 
 import { emitImportWorkflowStepReceipt } from "../lib/import-workflow-step-receipt.js";
-import { persistImportSessionReconciliationReport } from "../lib/persist-import-session-reconciliation.js";
+import { persistImportSessionReconciliationReportBestEffort } from "../lib/persist-import-session-reconciliation.js";
 import { handleImportChunkCommit, IMPORT_CHUNK_COMMIT_JOB_NAME } from "./import-chunk-commit.processor.js";
 import {
   handleImportCommunicationsCommit,
@@ -556,12 +556,20 @@ async function writeImportReconciliationReport(
   importSessionId: string,
   validationErrors: ValidationError[]
 ): Promise<void> {
-  const session = await getImportSessionOrNull(companyId, importSessionId);
-  if (!session) {
-    return;
-  }
+  // Best-effort: never let report generation fail or retry an already-committed import.
+  try {
+    const session = await getImportSessionOrNull(companyId, importSessionId);
+    if (!session) {
+      return;
+    }
 
-  await persistImportSessionReconciliationReport(companyId, session, validationErrors);
+    await persistImportSessionReconciliationReportBestEffort(companyId, session, validationErrors);
+  } catch (error: unknown) {
+    logger.warn(
+      { companyId, importSessionId, err: error instanceof Error ? error.message : String(error) },
+      "Failed to load import session for reconciliation report (best-effort; import unaffected)"
+    );
+  }
 }
 
 async function getImportSessionOrNull(companyId: string, importSessionId: string): Promise<ImportSessionRow | null> {

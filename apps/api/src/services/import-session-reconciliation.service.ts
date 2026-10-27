@@ -10,6 +10,23 @@ import {
 
 import { readImportReconciliationReportFromAiInferences } from "../lib/import-reconciliation.js";
 
+/**
+ * Stored CSV object keys must live under this tenant's import prefix. Anything else
+ * (another tenant's key, path traversal, tampered aiInferences) fails closed.
+ */
+export function isTenantImportObjectKey(companyId: string, objectKey: string): boolean {
+  if (!companyId || !objectKey) {
+    return false;
+  }
+
+  const prefix = `imports/${companyId}/`;
+  return (
+    objectKey.startsWith(prefix) &&
+    objectKey.length > prefix.length &&
+    !objectKey.split("/").some((segment) => segment === ".." || segment === ".")
+  );
+}
+
 export async function getImportSessionReconciliation(
   companyId: string,
   importSessionId: string
@@ -41,7 +58,7 @@ export async function getImportSessionReconciliation(
 
   let skippedRowsDownloadUrl: string | null = null;
 
-  if (report.skippedRowsCsvObjectKey) {
+  if (report.skippedRowsCsvObjectKey && isTenantImportObjectKey(companyId, report.skippedRowsCsvObjectKey)) {
     const signed = await createSignedDownloadUrl(report.skippedRowsCsvObjectKey);
     skippedRowsDownloadUrl = signed.url;
   }

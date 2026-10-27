@@ -102,5 +102,16 @@ describe("PaymentsClient", () => {
     wrap();
     expect(screen.getByText("Owners and admins only")).toBeTruthy();
     expect(apiGet).not.toHaveBeenCalledWith(expect.stringContaining("/api/v1/payments"));
+    expect(apiGet).not.toHaveBeenCalledWith(expect.stringContaining("/api/v1/stripe/connect/status"));
+  });
+
+  it("hides Stripe dashboard buttons from admins (owner-only route)", async () => {
+    role = "admin";
+    wrap();
+    fireEvent.click(screen.getByRole("button", { name: "Payouts" }));
+    expect(await screen.findByText(/Only the account owner can open the Stripe dashboard/)).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "View payouts in Stripe" })).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Disputes" }));
+    expect(screen.queryByRole("button", { name: "Respond in Stripe" })).toBeNull();
   });
 });

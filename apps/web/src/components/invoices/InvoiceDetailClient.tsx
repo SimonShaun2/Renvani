@@ -20,6 +20,7 @@ import {
 import { CurrencyDisplay } from "@/src/components/ui/CurrencyDisplay";
 import { EmptyState } from "@/src/components/ui/EmptyState";
 import { ConfirmDialog } from "@/src/components/ui/ConfirmDialog";
+import { invoiceConfirmDescription } from "@/src/components/invoices/invoice-confirm.utils";
 import { Sheet } from "@/src/components/ui/Sheet";
 import { SkeletonCard } from "@/src/components/ui/SkeletonCard";
 import { StatBadge } from "@/src/components/ui/StatBadge";
@@ -537,14 +538,15 @@ export function InvoiceDetailClient({ invoiceId }: InvoiceDetailClientProps) {
       <ConfirmDialog
         open={confirmAction !== null}
         title={confirmAction === "remind" ? "Send payment reminder?" : "Send payment link?"}
-        description={
-          confirmAction === "remind"
-            ? "The customer gets a reminder with their payment link."
-            : "The customer gets this invoice and a secure payment link."
-        }
+        description={invoiceConfirmDescription(confirmAction ?? "send", invoice.customer, invoice.balanceDue)}
         confirmLabel={confirmAction === "remind" ? "Send reminder" : "Send invoice"}
         isPending={sendInvoice.isPending || resendReminder.isPending}
-        onCancel={() => setConfirmAction(null)}
+        onCancel={() => {
+          if (sendInvoice.isPending || resendReminder.isPending) {
+            return;
+          }
+          setConfirmAction(null);
+        }}
         onConfirm={() => {
           const action = confirmAction;
           const mutation = action === "remind" ? resendReminder : sendInvoice;

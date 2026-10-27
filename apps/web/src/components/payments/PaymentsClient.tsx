@@ -36,6 +36,10 @@ function StatCard({ label, value, hint, loading }: { label: string; value: strin
   );
 }
 
+function OwnerOnlyNote() {
+  return <p className="text-xs text-neutral-500">Only the account owner can open the Stripe dashboard.</p>;
+}
+
 function DashboardButton({ label = "Open Stripe dashboard" }: { label?: string }) {
   const dashboardLink = useStripeDashboardLink();
   const [error, setError] = useState<string | null>(null);
@@ -207,9 +211,10 @@ export function PaymentsClient() {
   const authUser = useAuthStore((state) => state.user);
   const role = authUser?.role ?? getStoredSession()?.role ?? null;
   const canManagePayments = role === "owner" || role === "admin";
+  const isOwner = role === "owner";
   const [tab, setTab] = useState<Tab>("overview");
 
-  const status = useStripeConnectStatus();
+  const status = useStripeConnectStatus(canManagePayments);
   const recent = usePaymentsList({ page: 1 }, 5, canManagePayments);
   const succeeded = usePaymentsList({ status: "succeeded" }, 1, canManagePayments);
   const pending = usePaymentsList({ status: "pending" }, 1, canManagePayments);
@@ -301,7 +306,7 @@ export function PaymentsClient() {
             {connect?.payoutSchedule ? ` · schedule ${connect.payoutSchedule}` : ""}
           </p>
           <p className="text-sm text-[#5e6684]">Payout history and bank details live in your Stripe dashboard.</p>
-          <DashboardButton label="View payouts in Stripe" />
+          {isOwner ? <DashboardButton label="View payouts in Stripe" /> : <OwnerOnlyNote />}
         </div>
       ) : null}
 
@@ -309,7 +314,7 @@ export function PaymentsClient() {
         <div className="space-y-4">
           <div className={`${card} flex flex-wrap items-center justify-between gap-3`}>
             <p className="text-sm text-[#2a3360]">Evidence and responses are handled in Stripe. Disputed payments from your records are listed below.</p>
-            <DashboardButton label="Respond in Stripe" />
+            {isOwner ? <DashboardButton label="Respond in Stripe" /> : <OwnerOnlyNote />}
           </div>
           <ListState query={disputes} emptyTitle="No disputes" emptySubtitle="Disputed payments will show here.">
             {(rows) => <TransactionsTable rows={rows} />}

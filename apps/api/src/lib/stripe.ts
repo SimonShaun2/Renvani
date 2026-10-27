@@ -30,7 +30,6 @@ export interface InvoiceCheckoutLineItem {
 }
 
 export const SERVICE_FEE_LINE_ITEM_NAME = formatServiceFeeLineItemName(SERVICE_FEE_RATE_BPS);
-export const ONLINE_BOOKING_FEE_LINE_ITEM_NAME = "Online booking fee";
 
 export interface CreateInvoiceCheckoutSessionInput {
   companyId: string;
@@ -44,8 +43,6 @@ export interface CreateInvoiceCheckoutSessionInput {
   items: InvoiceCheckoutLineItem[];
   /** Public pay token — embedded Checkout return URL stays on Renvani. */
   paymentToken: string;
-  /** Invoice's job came from public online booking ($1.99 booking fee applies when paid at checkout). */
-  isOnlineBooking: boolean;
   /** Tenant's Renvani plan; Flat pays no Service Fee (no Service Fee line is sent to Stripe). */
   renvaniPlan: RenvaniPlanId | null;
 }
@@ -189,14 +186,8 @@ function formatPayoutSchedule(interval: string | null | undefined): string | nul
 export async function createInvoiceCheckoutSession(
   input: CreateInvoiceCheckoutSessionInput
 ): Promise<InvoiceCheckoutSessionResult> {
-  // Checkout always settles the full balance, so the invoice ends PAID -> booking fee applies if online-booked.
-  const fees = computeCheckoutFees({
-    chargeCents: toCents(input.total),
-    isOnlineBooking: input.isOnlineBooking,
-    paysInvoiceInFull: true,
-    plan: input.renvaniPlan
-  });
-  const applicationFeeAmount = fees.serviceFeeCents + fees.bookingFeeCents;
+  const fees = computeCheckoutFees({ chargeCents: toCents(input.total), plan: input.renvaniPlan });
+  const applicationFeeAmount = fees.serviceFeeCents;
   const appBaseUrl = env.APP_URL.replace(/\/$/, "");
   const statementDescriptor = buildCardStatementDescriptor(input.companyName);
   const useEmbeddedCheckout = featureFlags.stripeRenvaniEmbeddedCheckout;
@@ -211,8 +202,7 @@ export async function createInvoiceCheckoutSession(
       customerId: input.customerId,
       renvaniReceiptChannel: "resend",
       invoiceAmountCents: String(fees.chargeCents),
-      serviceFeeCents: String(fees.serviceFeeCents),
-      bookingFeeCents: String(fees.bookingFeeCents)
+      serviceFeeCents: String(fees.serviceFeeCents)
     }
   };
 
@@ -244,20 +234,6 @@ export async function createInvoiceCheckoutSession(
         product_data: {
           name: formatServiceFeeLineItemName(fees.serviceFeeRateBps),
           description: `${fees.serviceFeeRateBps / 100}% Service Fee (non-refundable). Your service provider receives the full invoice amount.`
-        }
-      }
-    });
-  }
-
-  if (fees.bookingFeeCents > 0) {
-    lineItems.push({
-      quantity: 1,
-      price_data: {
-        currency: "usd",
-        unit_amount: fees.bookingFeeCents,
-        product_data: {
-          name: ONLINE_BOOKING_FEE_LINE_ITEM_NAME,
-          description: "Online booking fee (non-refundable)."
         }
       }
     });

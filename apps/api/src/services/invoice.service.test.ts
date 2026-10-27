@@ -588,7 +588,7 @@ describe("invoice.service", () => {
     expect(updatedInvoice?.balanceDue).toBe("0.00");
   });
 
-  it("handleStripePaymentSuccess records Service Fee and booking fee as separate non-refundable lines", async () => {
+  it("handleStripePaymentSuccess: legacy pre-removal intent with booking fee metadata still records it separately (non-refundable)", async () => {
     const { company } = createAdminContext();
     const { customer } = seedInvoiceGraph(company.id);
     const invoice = fakeDb.seedInvoice({
@@ -643,6 +643,16 @@ describe("invoice.service", () => {
     ).toEqual({ invoiceAmountCents: 15_000, serviceFeeCents: 0, bookingFeeCents: 0 });
   });
 
+  it("readCheckoutFeesFromIntent: new intents (no bookingFeeCents metadata) split invoice + Service Fee only", () => {
+    expect(
+      invoiceService.readCheckoutFeesFromIntent({
+        amount: 15_300,
+        amount_received: 15_300,
+        metadata: { invoiceId: "x", invoiceAmountCents: "15000", serviceFeeCents: "300" }
+      })
+    ).toEqual({ invoiceAmountCents: 15_000, serviceFeeCents: 300, bookingFeeCents: 0 });
+  });
+
   it("recordPayment (manual, non-checkout) charges no fees", async () => {
     const { company, actor } = createAdminContext();
     const { customer } = seedInvoiceGraph(company.id);
@@ -666,7 +676,7 @@ describe("invoice.service", () => {
     expect(payment.refundableAmount).toBe("200.00");
   });
 
-  it("sendInvoice flags online-booked invoices for the booking fee (every plan, incl. Flat)", async () => {
+  it("sendInvoice: online-booked invoices get no booking fee flag (fee removed)", async () => {
     const { company, actor } = createAdminContext();
     company.stripeAccountId = "acct_123";
     company.settings = { stripePlatformBilling: { planTier: "flat" } } as typeof company.settings;
@@ -691,14 +701,15 @@ describe("invoice.service", () => {
     await invoiceService.sendInvoice(company.id, actor.id, invoice.id);
 
     expect(createInvoiceCheckoutSessionMock).toHaveBeenCalledWith(
-      expect.objectContaining({ isOnlineBooking: true, total: "100.00", renvaniPlan: "flat" })
+      expect.objectContaining({ total: "100.00", renvaniPlan: "flat" })
     );
+    expect(createInvoiceCheckoutSessionMock.mock.calls.at(-1)?.[0]).not.toHaveProperty("isOnlineBooking");
   });
 
-  it("getPublicInvoicePaymentLink: Flex pays 2% Service Fee + $1.99 booking fee; Flat pays only the booking fee (fields stay, 0)", async () => {
+  it("getPublicInvoicePaymentLink: online-booked Flex = invoice + 2% Service Fee, Flat = invoice only; no booking fee", async () => {
     const expected = {
-      flex: { serviceFeeAmount: "2.47", platformFeeAmount: "4.46", totalDue: "127.71", serviceFeeCents: 247, totalDueCents: 12_771, platformFeePercent: 2 },
-      flat: { serviceFeeAmount: "0.00", platformFeeAmount: "1.99", totalDue: "125.24", serviceFeeCents: 0, totalDueCents: 12_524, platformFeePercent: null }
+      flex: { serviceFeeAmount: "2.47", platformFeeAmount: "2.47", totalDue: "125.72", serviceFeeCents: 247, totalDueCents: 12_572, platformFeePercent: 2, platformFeePaidByCustomer: true },
+      flat: { serviceFeeAmount: "0.00", platformFeeAmount: "0.00", totalDue: "123.25", serviceFeeCents: 0, totalDueCents: 12_325, platformFeePercent: null, platformFeePaidByCustomer: false }
     } as const;
     for (const planTier of ["flat", "flex"] as const) {
       const { company } = createAdminContext();
@@ -728,11 +739,10 @@ describe("invoice.service", () => {
 
       expect(link).toMatchObject({
         invoiceAmount: "123.25",
-        bookingFeeAmount: "1.99",
+        bookingFeeAmount: "0.00",
         invoiceAmountCents: 12_325,
-        bookingFeeCents: 199,
+        bookingFeeCents: 0,
         feeRefundable: false,
-        platformFeePaidByCustomer: true,
         ...expected[planTier]
       });
     }

@@ -6,7 +6,6 @@ import {
   computeServiceFeeCents,
   formatServiceFeeLineItemName,
   moneyStringToCents,
-  ONLINE_BOOKING_FEE_CENTS,
   RENVANI_PLAN_MONTHLY_PRICE_CENTS,
   renvaniPlanAnnualPriceCents,
   SERVICE_FEE_RATE_BPS,
@@ -25,29 +24,20 @@ describe("checkout fees", () => {
   });
 
   it("fees are separate lines on top of the charge and non-refundable", () => {
-    const fees = computeCheckoutFees({ chargeCents: 15_000, isOnlineBooking: false, paysInvoiceInFull: true });
+    const fees = computeCheckoutFees({ chargeCents: 15_000 });
     expect(fees).toEqual({
       chargeCents: 15_000,
       serviceFeeCents: 300,
-      bookingFeeCents: 0,
       totalCents: 15_300,
       serviceFeeRateBps: 200,
       feeRefundable: false
     });
   });
 
-  it("booking fee only when an online-booked invoice is paid in full", () => {
-    expect(
-      computeCheckoutFees({ chargeCents: 10_000, isOnlineBooking: true, paysInvoiceInFull: true }).bookingFeeCents
-    ).toBe(ONLINE_BOOKING_FEE_CENTS);
-    expect(
-      computeCheckoutFees({ chargeCents: 10_000, isOnlineBooking: true, paysInvoiceInFull: false }).bookingFeeCents
-    ).toBe(0);
-    expect(
-      computeCheckoutFees({ chargeCents: 0, isOnlineBooking: true, paysInvoiceInFull: true }).bookingFeeCents
-    ).toBe(0);
-    const paid = computeCheckoutFees({ chargeCents: 10_000, isOnlineBooking: true, paysInvoiceInFull: true });
-    expect(paid.totalCents).toBe(10_000 + 200 + 199);
+  it("no online-booking fee: total = invoice + Service Fee only", () => {
+    const fees = computeCheckoutFees({ chargeCents: 10_000 });
+    expect(fees.totalCents).toBe(10_200);
+    expect(fees).not.toHaveProperty("bookingFeeCents");
   });
 
   it("refunds never include fees", () => {
@@ -67,7 +57,7 @@ describe("checkout fees", () => {
     expect(moneyStringToCents("1.005")).toBe(101);
   });
 
-  describe("per plan (Flat pays no Service Fee; booking fee on every plan)", () => {
+  describe("per plan (Flat pays no Service Fee; no booking fee on any plan)", () => {
     const cases = [
       { plan: "flex", rate: 200, service: 247 },
       { plan: "founding", rate: 200, service: 247 },
@@ -78,24 +68,20 @@ describe("checkout fees", () => {
     ] as const;
 
     for (const c of cases) {
-      it(`${String(c.plan)}: rate ${c.rate} bps, service ${c.service}c, booking 199c`, () => {
+      it(`${String(c.plan)}: rate ${c.rate} bps, service ${c.service}c, no booking fee`, () => {
         expect(serviceFeeRateBpsForPlan(c.plan)).toBe(c.rate);
-        const online = computeCheckoutFees({ chargeCents: 12_325, isOnlineBooking: true, paysInvoiceInFull: true, plan: c.plan });
+        const online = computeCheckoutFees({ chargeCents: 12_325, plan: c.plan });
         expect(online).toEqual({
           chargeCents: 12_325,
           serviceFeeCents: c.service,
-          bookingFeeCents: 199,
-          totalCents: 12_325 + c.service + 199,
+          totalCents: 12_325 + c.service,
           serviceFeeRateBps: c.rate,
           feeRefundable: false
         });
-        const partial = computeCheckoutFees({ chargeCents: 12_325, isOnlineBooking: true, paysInvoiceInFull: false, plan: c.plan });
-        expect(partial.bookingFeeCents).toBe(0);
-        expect(partial.serviceFeeCents).toBe(c.service);
         // rounding half up: 25c -> 0.5c -> 1c on fee plans, 0 on Flat
-        expect(computeCheckoutFees({ chargeCents: 25, isOnlineBooking: false, paysInvoiceInFull: true, plan: c.plan }).serviceFeeCents)
+        expect(computeCheckoutFees({ chargeCents: 25, plan: c.plan }).serviceFeeCents)
           .toBe(c.rate > 0 ? 1 : 0);
-        expect(computeCheckoutFees({ chargeCents: 0, isOnlineBooking: true, paysInvoiceInFull: true, plan: c.plan }).totalCents).toBe(0);
+        expect(computeCheckoutFees({ chargeCents: 0, plan: c.plan }).totalCents).toBe(0);
       });
     }
   });

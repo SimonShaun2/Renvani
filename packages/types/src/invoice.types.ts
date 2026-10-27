@@ -31,7 +31,7 @@ export interface Invoice {
   balanceDue: string;
   /** Customer-paid 2% Service Fee collected at checkout (separate line; not in total/tax/balance). */
   serviceFeeAmount: string;
-  /** $1.99 online-booking fee collected at checkout (separate line; not in total/tax/balance). */
+  /** @deprecated Legacy online-booking fee (removed 2026-10-27). Historical value only; never charged now ("0.00"). */
   bookingFeeAmount: string;
   issuedAt: Date | null;
   dueAt: Date | null;
@@ -80,7 +80,7 @@ export interface Payment {
   amount: string;
   /** Customer-paid 2% Service Fee on this payment ("0.00" for manual/non-checkout payments). */
   serviceFeeAmount: string;
-  /** $1.99 online-booking fee on this payment ("0.00" unless it paid an online-booked invoice at checkout). */
+  /** @deprecated Legacy online-booking fee recorded on this payment before removal (2026-10-27); "0.00" for new payments. */
   bookingFeeAmount: string;
   /** Always false: Service Fee and booking fee are non-refundable. */
   feeRefundable: boolean;
@@ -125,6 +125,7 @@ export interface InvoiceListItem {
   balanceDue: string;
   /** Customer-paid fees collected at checkout (separate from total). */
   serviceFeeAmount?: string;
+  /** @deprecated Legacy online-booking fee (removed 2026-10-27); historical totals only. */
   bookingFeeAmount?: string;
   dueAt: Date | null;
   paidAt: Date | null;
@@ -161,6 +162,7 @@ export interface InvoiceDetail {
   amountPaid: string;
   balanceDue: string;
   serviceFeeAmount?: string;
+  /** @deprecated Legacy online-booking fee (removed 2026-10-27); historical totals only. */
   bookingFeeAmount?: string;
   issuedAt: Date | null;
   sentAt: Date | null;
@@ -276,13 +278,13 @@ export interface PublicInvoicePaymentLink {
   /** Present when invoice Checkout uses embedded UI on the pay page. */
   checkoutClientSecret: string | null;
   invoiceAmount: string;
-  /** Legacy alias: total customer-paid fees (serviceFeeAmount + bookingFeeAmount). */
+  /** Legacy alias: total customer-paid fees (the Service Fee). */
   platformFeeAmount: string;
-  /** invoiceAmount + serviceFeeAmount + bookingFeeAmount. */
+  /** invoiceAmount + serviceFeeAmount. */
   totalDue: string;
   /** 2% Service Fee, separate line, non-refundable. */
   serviceFeeAmount: string;
-  /** $1.99 online-booking fee when the invoice came from online booking; else "0.00". */
+  /** @deprecated Online-booking fee removed 2026-10-27; always "0.00". Kept for payload compatibility. */
   bookingFeeAmount: string;
   invoiceAmountCents: number;
   serviceFeeCents: number;
@@ -335,12 +337,14 @@ export interface PublicPayViewFields {
   plan: "flex" | "flat" | null;
 }
 
-/** Receipt-only Service Fee vs booking fee split. Fees are never refundable. */
+/** Receipt-only fee split (Service Fee + legacy booking fee on old payments). Fees are never refundable. */
 export interface PublicPayReceiptFees {
   serviceFeeLabel: string | null;
   serviceFeeAmount: string;
   serviceFeeCents: number;
+  /** @deprecated Legacy online-booking fee (removed 2026-10-27): non-zero only on payments recorded before removal. */
   bookingFeeAmount: string;
+  /** @deprecated See bookingFeeAmount. */
   bookingFeeCents: number;
   feeRefundable: false;
 }

@@ -136,6 +136,7 @@ export function chipFilters(key: JobFilterChip["key"], now = new Date()): { stat
     const today = toDateInput(now);
     return { status: "all", from: today, to: today };
   }
+  // Unpaid = status `invoiced` only for now. Revisit when paid/unpaid invoice state lands on GET /jobs.
   if (key === "unpaid") return { status: "invoiced", from: "", to: "" };
   return { status: "all", from: "", to: "" };
 }
@@ -147,4 +148,22 @@ export function currentWeek(now = new Date()): { from: string; to: string } {
   const end = new Date(start);
   end.setDate(start.getDate() + 6);
   return { from: toDateInput(start), to: toDateInput(end) };
+}
+
+/** Max page size GET /jobs allows; the single counts request uses it. */
+export const COUNTS_PAGE_LIMIT = 100;
+
+/**
+ * Derives KPI counts from ONE GET /jobs request for the current week (no counts endpoint on dev).
+ * week = exact `total`; today = counted from the rows, only when the page holds every job of the week.
+ */
+export function deriveWeekCounts(
+  res: { data: { scheduledStart: string | null }[]; total: number } | undefined,
+  now = new Date()
+): { week: number | undefined; today: number | undefined } {
+  if (!res) return { week: undefined, today: undefined };
+  if (res.data.length < res.total) return { week: res.total, today: undefined };
+  const today = toDateInput(now);
+  const n = res.data.filter((j) => j.scheduledStart && toDateInput(new Date(j.scheduledStart)) === today).length;
+  return { week: res.total, today: n };
 }

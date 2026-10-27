@@ -38,6 +38,8 @@ import internalAdminQboSyncRoutes from "./routes/internal-admin/qbo-sync/index.j
 import quickbooksOnlineRoutes from "./routes/quickbooks-online/index.js";
 import migrateOnboardingRoutes from "./routes/migrate-onboarding/index.js";
 import migratePhotoLinkRoutes from "./routes/migrate-photo-link/index.js";
+import internalAdminSavedCardMigrationRoutes from "./routes/internal-admin/saved-card-migrations/index.js";
+import savedCardMigrationRoutes from "./routes/saved-card-migration/index.js";
 import dataExportRoutes from "./routes/data-exports/index.js";
 import jobEngagementRoutes from "./routes/job-engagement/index.js";
 import jobRoutes from "./routes/jobs/index.js";
@@ -119,6 +121,7 @@ export async function buildApp() {
   await app.register(internalAdminQueueRoutes, { prefix: "/api/v1" });
   await app.register(internalAdminQboSyncRoutes, { prefix: "/api/v1" });
   await app.register(quickbooksOnlineRoutes, { prefix: "/api/v1" });
+  await app.register(internalAdminSavedCardMigrationRoutes, { prefix: "/api/v1" });
   await app.register(growthCheckScanRoutes, { prefix: "/api/v1" });
   await app.register(attachmentRoutes, { prefix: "/api/v1" });
   await app.register(bookingRoutes, { prefix: "/api/v1" });
@@ -141,6 +144,7 @@ export async function buildApp() {
   await app.register(importReconciliationRoutes, { prefix: "/api/v1" });
   await app.register(migrateOnboardingRoutes, { prefix: "/api/v1" });
   await app.register(migratePhotoLinkRoutes, { prefix: "/api/v1" });
+  await app.register(savedCardMigrationRoutes, { prefix: "/api/v1" });
   await app.register(dataExportRoutes, { prefix: "/api/v1" });
   await app.register(serviceAgreementRoutes, { prefix: "/api/v1" });
   await app.register(vipMembershipRoutes, { prefix: "/api/v1" });

@@ -1,6 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { assignAndScheduleJob, formatDispatchSummary, summarizeDispatch } from "./dispatch-actions";
+import {
+  ASSIGNED_NOT_SCHEDULED_MESSAGE,
+  AssignedNotScheduledError,
+  assignAndScheduleJob, formatDispatchSummary, summarizeDispatch } from "./dispatch-actions";
 
 const input = {
   jobId: "job 1",
@@ -23,6 +26,20 @@ describe("assignAndScheduleJob", () => {
     const post = vi.fn().mockRejectedValueOnce(new Error("Technician not found"));
     await expect(assignAndScheduleJob({ post }, input)).rejects.toThrow("Technician not found");
     expect(post).toHaveBeenCalledTimes(1);
+  });
+
+  it("reports an accurate half-applied error when schedule fails after assign", async () => {
+    const scheduleError = new Error("Slot conflict");
+    const post = vi.fn().mockResolvedValueOnce({ job: { id: "a" } }).mockRejectedValueOnce(scheduleError);
+    const result = assignAndScheduleJob({ post }, input);
+    await expect(result).rejects.toBeInstanceOf(AssignedNotScheduledError);
+    await expect(result).rejects.toMatchObject({
+      message: ASSIGNED_NOT_SCHEDULED_MESSAGE,
+      jobId: "job 1",
+      technicianId: "tech-1",
+      cause: scheduleError
+    });
+    expect(post).toHaveBeenCalledTimes(2);
   });
 });
 

@@ -174,7 +174,8 @@ export function useScheduleJob() {
 
   return useMutation({
     mutationFn: (input: ScheduleBoardJobInput) => assignAndScheduleJob(api, input),
-    onSuccess: async () => {
+    // Refresh on failure too: a half-applied assign must not leave the job looking unassigned.
+    onSettled: async () => {
       await invalidateDispatchQueries(queryClient);
     }
   });

@@ -11,10 +11,29 @@ interface PostClient {
   post: <TResponse>(path: string, body: unknown) => Promise<TResponse>;
 }
 
+export const ASSIGNED_NOT_SCHEDULED_MESSAGE =
+  "The technician was assigned, but the job couldn't be scheduled. It's still on their list without a time. Drop it on a time slot to try again.";
+
+/** Thrown when assign succeeded but schedule failed. There is no unassign route on dev, so this can't be rolled back. */
+export class AssignedNotScheduledError extends Error {
+  readonly jobId: string;
+  readonly technicianId: string;
+  override readonly cause: unknown;
+
+  constructor(jobId: string, technicianId: string, cause: unknown) {
+    super(ASSIGNED_NOT_SCHEDULED_MESSAGE);
+    this.name = "AssignedNotScheduledError";
+    this.jobId = jobId;
+    this.technicianId = technicianId;
+    this.cause = cause;
+  }
+}
+
 /**
  * Places a job on the board with the dedicated dev routes:
  * POST /api/v1/jobs/:id/assign, then POST /api/v1/jobs/:id/schedule.
- * Schedule is not attempted if assign fails, so a rejected technician never leaves a half-placed job.
+ * Schedule is not attempted if assign fails. If schedule fails after a successful assign, an
+ * AssignedNotScheduledError explains the half-applied state (no unassign route exists to roll back).
  */
 export async function assignAndScheduleJob(
   client: PostClient,
@@ -22,7 +41,11 @@ export async function assignAndScheduleJob(
 ): Promise<{ job: JobDetail }> {
   const id = encodeURIComponent(jobId);
   await client.post<{ job: JobDetail }>(`/api/v1/jobs/${id}/assign`, { technicianId });
-  return client.post<{ job: JobDetail }>(`/api/v1/jobs/${id}/schedule`, { scheduledStart, scheduledEnd });
+  try {
+    return await client.post<{ job: JobDetail }>(`/api/v1/jobs/${id}/schedule`, { scheduledStart, scheduledEnd });
+  } catch (error) {
+    throw new AssignedNotScheduledError(jobId, technicianId, error);
+  }
 }
 
 export interface DispatchSummary {

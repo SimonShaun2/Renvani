@@ -760,6 +760,19 @@ const customerNoteSchema = {
   }
 } as const;
 
+export const getCustomerImportedHistoryRouteSchema = {
+  tags: ["customers"],
+  response: {
+    200: {
+      type: "object",
+      additionalProperties: true
+    },
+    400: errorResponseSchema,
+    401: errorResponseSchema,
+    404: errorResponseSchema
+  }
+} as const;
+
 export const getCustomerNotesRouteSchema = {
   tags: ["customers"],
   response: {

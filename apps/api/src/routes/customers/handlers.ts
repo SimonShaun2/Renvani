@@ -25,6 +25,7 @@ import {
   searchCustomers,
   updateCustomer
 } from "../../services/customer.service.js";
+import { getCustomerImportedHistory } from "../../services/customer-imported-history.service.js";
 import {
   createProperty,
   deleteProperty,
@@ -305,6 +306,15 @@ export async function getCustomerHandler(
       properties: customer.properties.map((property) => toPropertyWithAssetsResponse(property))
     }
   });
+}
+
+export async function getCustomerImportedHistoryHandler(
+  request: FastifyRequest,
+  reply: FastifyReply
+): Promise<FastifyReply> {
+  const params = request.params as CustomerIdParams;
+  const history = await getCustomerImportedHistory(request.company.id, params.id);
+  return reply.send(history);
 }
 
 export async function getCustomerNotesHandler(

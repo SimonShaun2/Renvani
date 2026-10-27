@@ -33,7 +33,10 @@ Guard implementation: `@fsm/config/neon-ci` (`validateNeonCiDatabaseUrl`).
 ## What runs on Neon
 
 1. `pnpm --filter @fsm/db db:check-migrations` — journal + destructive SQL safety.
-2. `pnpm --filter @fsm/db test` — includes `rls-migration-sql` sync test and optional `rls-policies.integration.test.ts` when `NEON_CI_DATABASE_URL` is set.
+2. `pnpm --filter @fsm/db db:migrate` — apply pending migrations (including `0027` RLS policies) on the per-PR branch.
+3. `pnpm --filter @fsm/db test` — `rls-migration-sql` sync test plus **RLS matrix** integration (`customers`, `import_sessions`, `jobs`) when `NEON_CI_DATABASE_URL` is set.
+
+Root shortcut: `pnpm test:neon-ci` (builds `@fsm/config` + `@fsm/db`, then runs `scripts/ci/neon-per-pr-branch.mjs`).
 
 ## RLS migration
 

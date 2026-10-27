@@ -1,3 +1,4 @@
-Job ID,Customer ID,Completed On,Job Type,Status
-ST-J-001,ST-C-001,2024-01-15,Maintenance,Completed
-ST-J-002,ST-C-002,2026-06-14,Repair,Completed
+Job ID,Job Number,Customer ID,Location ID,Job Type,Job Status,Completed On,Business Unit,Tags
+ST-J-001,1001,ST-C-001,ST-L-001,Maintenance,Completed,2023-03-10,Residential,HVAC|PM
+ST-J-002,1002,ST-C-001,ST-L-001,Repair,Completed,2024-01-15,Residential,No Cool
+ST-J-003,2001,ST-C-002,ST-L-002,Repair,Completed,2026-06-14,Commercial,Compressor

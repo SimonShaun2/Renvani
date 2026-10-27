@@ -42,6 +42,10 @@ const envSchema = z.object({
   /** MVP email-first (Resend); optional until STACK-08 wires transactional sends */
   RESEND_API_KEY: z.string().default(""),
   RESEND_FROM_EMAIL: z.string().default(""),
+  /** Sender for transactional email (Resend). */
+  EMAIL_FROM: z.string().default("Renvani <hello@mail.getrenvani.com>"),
+  /** Optional absolute https URL of the Renvani logo image for emails; empty renders the HTML text mark. */
+  EMAIL_LOGO_URL: z.string().default(""),
   R2_ACCOUNT_ID: z.string().min(1, "R2_ACCOUNT_ID is required"),
   R2_ACCESS_KEY_ID: z.string().min(1, "R2_ACCESS_KEY_ID is required"),
   R2_SECRET_ACCESS_KEY: z.string().min(1, "R2_SECRET_ACCESS_KEY is required"),
@@ -69,7 +73,32 @@ const envSchema = z.object({
     .uuid("RENAVANI_INTERNAL_COMPANY_ID must be a valid UUID")
     .default("00000000-0000-4000-8000-000000000053"),
   /** STACK-02 — Clerk secret; empty disables Clerk verify path */
-  CLERK_SECRET_KEY: z.string().default("")
+  CLERK_SECRET_KEY: z.string().default(""),
+  /** Clerk webhook signing secret (whsec_…) for POST /api/v1/webhooks/clerk (svix). */
+  CLERK_WEBHOOK_SECRET: z.string().default(""),
+  /** Comma-separated web origins allowed as Clerk `azp` and for CORS (e.g. https://staging.renvani.com). */
+  CLERK_AUTHORIZED_PARTIES: z.string().default(""),
+  /** STACK-04 / FS-133 — optional Sentry DSN for QBO sync issue alerts */
+  SENTRY_DSN: z.string().default(""),
+  /** FS-133 — Intuit sandbox OAuth (optional until QBO sync is configured). */
+  QUICKBOOKS_CLIENT_ID: z.string().default(""),
+  QUICKBOOKS_CLIENT_SECRET: z.string().default(""),
+  QUICKBOOKS_REDIRECT_URI: z.string().default(""),
+  QUICKBOOKS_ENVIRONMENT: z.enum(["sandbox"]).default("sandbox"),
+  QUICKBOOKS_TOKEN_ENCRYPTION_KEY: z.string().default(""),
+  /**
+   * FS-66 — number of trusted reverse-proxy hops in front of the API (Fastify `trustProxy`).
+   * 0 (default) = trust none; max 10; request.ip is the socket peer. N > 0 = take the client IP N hops back via X-Forwarded-For.
+   */
+  TRUST_PROXY_HOPS: z.coerce.number().int().min(0).max(10).default(0),
+  /** FS-66 — global per-IP API rate limit. Off unless explicitly "true" (enable after TRUST_PROXY_HOPS is verified). */
+  GLOBAL_RATE_LIMIT_ENABLED: z.enum(["true", "false"]).optional(),
+  GLOBAL_RATE_LIMIT_MAX: z.coerce.number().int().positive().default(600),
+  GLOBAL_RATE_LIMIT_WINDOW_SECONDS: z.coerce.number().int().positive().default(60),
+  /** FS-66 — public slot-hold/confirm limits (fixed window). */
+  PUBLIC_SLOT_HOLD_IP_RATE_LIMIT_MAX: z.coerce.number().int().positive().default(6),
+  PUBLIC_SLOT_HOLD_COMPANY_RATE_LIMIT_MAX: z.coerce.number().int().positive().default(120),
+  PUBLIC_SLOT_HOLD_RATE_LIMIT_WINDOW_SECONDS: z.coerce.number().int().positive().default(600)
 });
 
 export type Env = z.infer<typeof envSchema>;

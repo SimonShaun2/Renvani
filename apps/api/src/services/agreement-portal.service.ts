@@ -27,7 +27,7 @@ export async function getAgreementPortalView(portalToken: string): Promise<Agree
   const parsed = verifyAgreementPortalToken(portalToken);
 
   if (!parsed) {
-    throw new AppError(ErrorCode.UNAUTHORIZED, "Invalid or expired portal link");
+    throw new AppError(ErrorCode.NOT_FOUND, "Link not found");
   }
 
   const [plan] = await db
@@ -43,7 +43,7 @@ export async function getAgreementPortalView(portalToken: string): Promise<Agree
     .limit(1);
 
   if (!plan) {
-    throw new AppError(ErrorCode.NOT_FOUND, "Service agreement not found");
+    throw new AppError(ErrorCode.NOT_FOUND, "Link not found");
   }
 
   const [company] = await db

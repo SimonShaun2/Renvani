@@ -66,6 +66,10 @@
       "types": "./dist/stripe-pricing.d.ts",
       "import": "./dist/stripe-pricing.js"
     },
+    "./renvani-plan-entitlements": {
+      "types": "./dist/renvani-plan-entitlements.d.ts",
+      "import": "./dist/renvani-plan-entitlements.js"
+    },
     "./stripe-branding": {
       "types": "./dist/stripe-branding.d.ts",
       "import": "./dist/stripe-branding.js"
@@ -77,6 +81,22 @@
     "./langfuse-env": {
       "types": "./dist/langfuse-env.d.ts",
       "import": "./dist/langfuse-env.js"
+    },
+    "./qbo-env": {
+      "types": "./dist/qbo-env.d.ts",
+      "import": "./dist/qbo-env.js"
+    },
+    "./token-cipher": {
+      "types": "./dist/token-cipher.d.ts",
+      "import": "./dist/token-cipher.js"
+    },
+    "./quickbooks/intuit-oauth": {
+      "types": "./dist/quickbooks/intuit-oauth.d.ts",
+      "import": "./dist/quickbooks/intuit-oauth.js"
+    },
+    "./quickbooks/qbo-api-client": {
+      "types": "./dist/quickbooks/qbo-api-client.d.ts",
+      "import": "./dist/quickbooks/qbo-api-client.js"
     },
     "./vip-membership-policy": {
       "types": "./dist/vip-membership-policy.d.ts",
@@ -93,6 +113,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@fsm/import-engine": "workspace:*",
     "@fsm/import-normalize": "workspace:*",
     "@fsm/types": "workspace:*",
     "@aws-sdk/client-s3": "^3.931.0",

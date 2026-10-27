@@ -24,14 +24,33 @@ export function isWizardV1ImportEntityType(value: string): value is WizardV1Impo
   return importEntityTypeSchema.safeParse(value).success;
 }
 
+const WIZARD_TO_GOLDEN_BUNDLE_ENTITY: Record<WizardV1ImportEntityType, z.infer<typeof goldenBundleEntityTypeSchema>> =
+  {
+    customers: "customers",
+    properties: "properties",
+    jobs: "jobs",
+    estimates: "estimates",
+    price_book: "products"
+  };
+
+export function mapWizardEntityToGoldenBundleEntity(
+  entity: WizardV1ImportEntityType
+): z.infer<typeof goldenBundleEntityTypeSchema> {
+  return WIZARD_TO_GOLDEN_BUNDLE_ENTITY[entity];
+}
+
 export function assertWizardEntitySupportedByGoldenBundle(entity: WizardV1ImportEntityType): void {
-  goldenBundleEntityTypeSchema.parse(entity);
+  goldenBundleEntityTypeSchema.parse(mapWizardEntityToGoldenBundleEntity(entity));
 }
 
 export function assertRelationalPreviewKindMatchesWizardEntity(
   entity: WizardV1ImportEntityType
 ): z.infer<typeof relationalPreviewFileKindSchema> {
   return relationalPreviewFileKindSchema.parse(entity);
+}
+
+export function isWizardRelationalPreviewEntity(entity: WizardV1ImportEntityType): boolean {
+  return relationalPreviewFileKindSchema.safeParse(entity).success;
 }
 
 /** Entity types present in golden bundles but not yet linkable in wizard step 2. */

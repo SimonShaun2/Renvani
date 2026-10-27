@@ -23,6 +23,11 @@ import {
   type PublicBookingSettingsRecord
 } from "@/src/hooks/booking.hooks";
 import {
+  buildRecurringScheduleMessage,
+  clearConfirmedBookingSnapshot,
+  readConfirmedBookingSnapshot
+} from "@/src/lib/booking-commit.utils";
+import {
   clearBookingIdempotencyKey,
   getOrCreateBookingIdempotencyKey
 } from "@/src/lib/booking-idempotency";
@@ -88,6 +93,15 @@ function formatWindowLabel(window: string) {
 
 function getSourceLabel(source: string) {
   return sourceLabels[source] ?? "Direct";
+}
+
+function buildCommitHref(slug: string, source: string, referenceNumber: string) {
+  const params = new URLSearchParams();
+  if (source) {
+    params.set("src", source);
+  }
+  params.set("ref", referenceNumber);
+  return `/book/${slug}/commit?${params.toString()}`;
 }
 
 function buildConfirmedHref(slug: string, source: string, referenceNumber: string) {
@@ -292,6 +306,10 @@ export function BookingFlowClient({
     servedTechCount,
     hydrateFromRoute,
     setReferenceNumber,
+    setHoldToken,
+    selectedTechnicianId,
+    selectedScheduledStart,
+    selectedScheduledEnd,
     setStep,
     setZipCoverage,
     updateFields
@@ -403,8 +421,23 @@ export function BookingFlowClient({
       });
 
       clearBookingIdempotencyKey(slug);
-      setReferenceNumber(response.confirmation.referenceNumber);
-      router.push(buildConfirmedHref(slug, source, response.confirmation.referenceNumber));
+      const reference = response.confirmation.referenceNumber;
+      setReferenceNumber(reference);
+      setHoldToken(response.holdToken ?? null);
+
+      const canSecureSlot =
+        Boolean(response.holdToken) &&
+        Boolean(selectedTechnicianId) &&
+        Boolean(selectedScheduledStart) &&
+        Boolean(selectedScheduledEnd) &&
+        Boolean(reference);
+
+      if (canSecureSlot && reference) {
+        router.push(buildCommitHref(slug, source, reference));
+        return;
+      }
+
+      router.push(buildConfirmedHref(slug, source, reference));
     } catch (error) {
       if (error instanceof ApiError && error.status === 409) {
         const reason =
@@ -750,7 +783,10 @@ export function BookingFlowClient({
                       onClick={() =>
                         updateFields({
                           preferredDate: slot.date,
-                          preferredWindow: slot.window
+                          preferredWindow: slot.window,
+                          selectedTechnicianId: slot.technicianIds[0] ?? null,
+                          selectedScheduledStart: slot.start,
+                          selectedScheduledEnd: slot.end
                         })
                       }
                       className={cn(
@@ -914,7 +950,11 @@ export function BookingFlowClient({
             <div className="mt-5 rounded-[24px] border border-neutral-200 bg-neutral-50 px-4 py-4" aria-live="polite">
               <p className="text-sm font-semibold text-neutral-900">What happens next</p>
               <ul className="mt-3 space-y-2 text-sm text-neutral-600">
-                <li>We review your request — this is not a confirmed appointment yet.</li>
+                <li>
+                  {selectedScheduledStart
+                    ? "Next you will secure your calendar slot, then confirm the appointment in-app."
+                    : "We review your request — this is not a confirmed appointment yet."}
+                </li>
                 {smsConsent ? <li>Confirmation SMS within 2 hours if you opted in</li> : null}
                 {smsConsent ? <li>24-hour appointment reminder when scheduled</li> : null}
                 {smsConsent ? <li>On-the-way notification before arrival when scheduled</li> : null}
@@ -932,7 +972,11 @@ export function BookingFlowClient({
               aria-busy={submitMutation.isPending}
               className="mt-5 inline-flex min-h-12 w-full items-center justify-center rounded-[20px] bg-brand-accent px-4 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {submitMutation.isPending ? "Submitting..." : "Submit request"}
+              {submitMutation.isPending
+                ? "Submitting..."
+                : selectedScheduledStart
+                  ? "Continue to secure slot"
+                  : "Submit request"}
             </button>
           </BookingCard>
         ) : null}
@@ -951,21 +995,30 @@ export function BookingConfirmed({
   const { reset, source } = useBookingFlowStore();
   const settingsQuery = usePublicBookingSettings(slug);
   const confirmationQuery = useBookingConfirmation(slug, referenceNumber);
+  const [confirmedSnapshot] = useState(() =>
+    referenceNumber ? readConfirmedBookingSnapshot(slug, referenceNumber) : null
+  );
 
   useEffect(() => {
     if (referenceNumber) {
       reset(slug, source);
+      clearConfirmedBookingSnapshot(slug, referenceNumber);
     }
   }, [referenceNumber, reset, slug, source]);
 
   const confirmation = confirmationQuery.data?.confirmation;
   const booking = settingsQuery.data?.booking;
   const sourceLabel = getSourceLabel(source);
+  const isInPlatformConfirmed =
+    confirmedSnapshot?.status === "confirmed" || confirmation?.status === "confirmed";
+  const scheduledStart = confirmedSnapshot?.scheduledStart ?? confirmation?.scheduledStart ?? null;
+  const scheduledEnd = confirmedSnapshot?.scheduledEnd ?? confirmation?.scheduledEnd ?? null;
+  const recurringMessage = buildRecurringScheduleMessage(confirmedSnapshot?.recurringSchedule);
   const calendarHref = buildCalendarHref(
     confirmation?.companyName ?? booking?.companyName,
     confirmation?.referenceNumber ?? referenceNumber ?? "pending",
-    confirmation?.scheduledStart ?? null,
-    confirmation?.scheduledEnd ?? null
+    scheduledStart,
+    scheduledEnd
   );
 
   return (
@@ -976,7 +1029,9 @@ export function BookingConfirmed({
           <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-success-light text-success">
             <CheckCircle2 className="h-10 w-10" />
           </div>
-          <h1 className="mt-5 text-center text-3xl font-semibold tracking-tight text-neutral-950">Booking requested</h1>
+          <h1 className="mt-5 text-center text-3xl font-semibold tracking-tight text-neutral-950">
+            {isInPlatformConfirmed ? "Appointment confirmed" : "Booking requested"}
+          </h1>
           <p className="mt-2 text-center text-sm leading-6 text-neutral-500">
             Confirmation #{confirmation?.referenceNumber ?? referenceNumber ?? "pending"}
           </p>
@@ -992,11 +1047,15 @@ export function BookingConfirmed({
             <div className="mt-5 rounded-[24px] border border-neutral-200 bg-neutral-50 px-4 py-4">
               <p className="text-sm font-semibold text-neutral-900">{confirmation.companyName}</p>
               <p className="mt-2 text-sm text-neutral-500">
-                {confirmation.scheduledStart ? "Appointment scheduled" : "Pending dispatcher confirmation"}
+                {scheduledStart
+                  ? isInPlatformConfirmed
+                    ? "Your visit is on the schedule"
+                    : "Appointment scheduled"
+                  : "Pending dispatcher confirmation"}
               </p>
-              {confirmation.scheduledStart ? (
+              {scheduledStart ? (
                 <p className="mt-2 text-sm font-semibold text-neutral-900">
-                  {new Date(confirmation.scheduledStart).toLocaleString("en-US", {
+                  {new Date(scheduledStart).toLocaleString("en-US", {
                     month: "short",
                     day: "numeric",
                     weekday: "short",
@@ -1012,23 +1071,45 @@ export function BookingConfirmed({
             </div>
           )}
 
+          {recurringMessage ? (
+            <div className="mt-5 rounded-[24px] border border-brand-accent/20 bg-brand-accent-light/30 px-4 py-4 text-sm text-neutral-700">
+              <p className="font-semibold text-neutral-900">Recurring &amp; VIP schedule</p>
+              <p className="mt-2 leading-6">{recurringMessage}</p>
+            </div>
+          ) : null}
+
           <div className="mt-5 rounded-[24px] border border-neutral-200 bg-white px-4 py-4">
             <p className="text-sm font-semibold text-neutral-900">What happens next</p>
             <ul className="mt-3 space-y-2 text-sm text-neutral-600">
-              <li className="flex items-start gap-2">
-                <ShieldCheck className="mt-0.5 h-4 w-4 text-success" />
-                We review your request — scheduling is not confirmed until our team reaches out.
-              </li>
-              <li className="flex items-start gap-2">
-                <Phone className="mt-0.5 h-4 w-4 text-brand-accent" />
-                We may call or email if we need more details
-              </li>
-              {confirmation?.scheduledStart ? (
-                <li className="flex items-start gap-2">
-                  <MapPin className="mt-0.5 h-4 w-4 text-brand-accent" />
-                  Your proposed time is noted; we will confirm the final appointment window.
-                </li>
-              ) : null}
+              {isInPlatformConfirmed ? (
+                <>
+                  <li className="flex items-start gap-2">
+                    <ShieldCheck className="mt-0.5 h-4 w-4 text-success" />
+                    Your appointment is confirmed on our calendar.
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Phone className="mt-0.5 h-4 w-4 text-brand-accent" />
+                    We will reach out if anything needs to change before the visit.
+                  </li>
+                </>
+              ) : (
+                <>
+                  <li className="flex items-start gap-2">
+                    <ShieldCheck className="mt-0.5 h-4 w-4 text-success" />
+                    We review your request — scheduling is not confirmed until our team reaches out.
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Phone className="mt-0.5 h-4 w-4 text-brand-accent" />
+                    We may call or email if we need more details
+                  </li>
+                  {scheduledStart ? (
+                    <li className="flex items-start gap-2">
+                      <MapPin className="mt-0.5 h-4 w-4 text-brand-accent" />
+                      Your proposed time is noted; we will confirm the final appointment window.
+                    </li>
+                  ) : null}
+                </>
+              )}
             </ul>
           </div>
 

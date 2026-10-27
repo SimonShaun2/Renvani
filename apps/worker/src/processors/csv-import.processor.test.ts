@@ -202,6 +202,61 @@ describe("csv-import.processor", () => {
     expect(updateProgress).toHaveBeenCalledWith(100);
   });
 
+  it("validate-csv-rows parses xlsx uploads and stores chunk commit manifest when sourceId is mapped", async () => {
+    const XLSX = await import("xlsx");
+    const workbook = XLSX.utils.book_new();
+    const sheet = XLSX.utils.aoa_to_sheet([
+      ["Customer ID", "First Name", "Last Name"],
+      ["c1", "Chris", "Pine"],
+      ["c2", "Jamie", "Lee"]
+    ]);
+    XLSX.utils.book_append_sheet(workbook, sheet, "Customers");
+    const buffer = Buffer.from(XLSX.write(workbook, { type: "array", bookType: "xlsx" }) as ArrayBuffer);
+
+    const company = fakeDb.seedCompany({
+      name: "Acme HVAC",
+      slug: "acme-hvac-xlsx"
+    });
+    const importSession = fakeDb.seedImportSession({
+      companyId: company.id,
+      fileName: "customers.xlsx",
+      fileUrl: "imports/company/customers.xlsx",
+      status: "preview",
+      entityType: "customers",
+      aiInferences: { sourceSystem: "jobber" },
+      columnMappings: {
+        "Customer ID": "sourceId",
+        "First Name": "firstName",
+        "Last Name": "lastName"
+      }
+    });
+    downloadFileMock.mockResolvedValue(buffer);
+
+    const { job } = createJob("validate-csv-rows", {
+      companyId: company.id,
+      importSessionId: importSession.id
+    });
+
+    await csvImportProcessor.handleValidateCsvRows(job);
+
+    const storedSession = fakeDb.getTestState().importSessions.find((row) => row.id === importSession.id);
+    const manifest = storedSession?.aiInferences.importChunkCommitManifest as {
+      entityType?: string;
+      chunks?: Array<{ chunksTotal: number }>;
+    };
+
+    expect(storedSession?.totalRows).toBe(2);
+    expect(manifest?.entityType).toBe("customers");
+    expect(manifest?.chunks?.[0]?.chunksTotal).toBe(1);
+    expect(storedSession?.progress).toMatchObject({
+      entityType: "customers",
+      chunksTotal: 1,
+      chunksDone: 0,
+      rowsOk: 0,
+      rowsFailed: 0
+    });
+  });
+
   it("execute-import inserts valid rows with importSessionId, skips duplicates and errors, and enqueues dormant scan", async () => {
     const company = fakeDb.seedCompany({
       name: "Acme HVAC",

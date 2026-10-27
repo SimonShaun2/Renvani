@@ -35,7 +35,7 @@ import {
   index,
   uniqueIndex,
 } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 
 // ─────────────────────────────────────────────
 // SHARED HELPERS
@@ -300,6 +300,10 @@ export const activityEventTypeEnum = pgEnum("activity_event_type", [
   "payment.partial",
   "payment.failed",
   "payment.refunded",
+  "integration.qbo_connected",
+  "integration.qbo_disconnected",
+  "integration.qbo_sync_completed",
+  "integration.qbo_sync_failed",
   // Product catalog
   "product.created",
   "product.updated",
@@ -351,6 +355,9 @@ export const activityEventTypeEnum = pgEnum("activity_event_type", [
   "import.bundle.commit_started",
   "import.bundle.completed",
   "import.bundle.abandoned",
+  // QuickBooks ongoing sync (FS-133)
+  "integration.qbo_mapping_updated",
+  "integration.qbo_sync_retry_requested",
   // Data export (FS-89)
   "export.requested",
   "export.completed",
@@ -505,6 +512,10 @@ export const companies = pgTable("companies", {
   ...timestamps,
 }, (t) => ({
   slugIdx: uniqueIndex("companies_slug_idx").on(t.slug),
+  // FS-157: at most one live company per Clerk organization (DB-level guarantee behind the advisory lock).
+  clerkOrganizationIdIdx: uniqueIndex("companies_clerk_organization_id_idx")
+    .on(sql`(${t.settings} -> 'clerk' ->> 'organizationId')`)
+    .where(sql`${t.deletedAt} IS NULL AND (${t.settings} -> 'clerk' ->> 'organizationId') IS NOT NULL`),
 }));
 
 export const users = pgTable("users", {
@@ -520,6 +531,15 @@ export const users = pgTable("users", {
   avatarUrl: text("avatar_url"),
   isActive: boolean("is_active").notNull().default(true),
   lastLoginAt: timestamp("last_login_at"),
+  emailVerifiedAt: timestamp("email_verified_at"),
+  // sha256 of the single-use verify-email token (raw token is never stored)
+  emailVerificationTokenHash: text("email_verification_token_hash"),
+  emailVerificationExpiresAt: timestamp("email_verification_expires_at"),
+  // FS-157: stable Clerk user id (`sub`); logins map by this first. Nullable until linked/backfilled.
+  clerkUserId: varchar("clerk_user_id", { length: 255 }),
+  // FS-160b: tombstone set by Clerk user.deleted. A tombstoned user is never auto-linked (verified email /
+  // membership webhook / first-login fallback); clearing it is a manual DB step until FS-165.
+  clerkUnlinkedAt: timestamp("clerk_unlinked_at", { withTimezone: true }),
   // If this user is also a technician
   technicianId: uuid("technician_id"),
   ...timestamps,
@@ -527,6 +547,8 @@ export const users = pgTable("users", {
   emailIdx: uniqueIndex("users_email_idx").on(t.email),
   emailCompanyIdx: uniqueIndex("users_email_company_idx").on(t.email, t.companyId),
   companyIdx: index("users_company_idx").on(t.companyId),
+  emailVerificationTokenIdx: index("users_email_verification_token_idx").on(t.emailVerificationTokenHash),
+  clerkUserIdIdx: uniqueIndex("users_clerk_user_id_idx").on(t.clerkUserId).where(sql`${t.clerkUserId} IS NOT NULL`),
 }));
 
 export const refreshTokens = pgTable("refresh_tokens", {
@@ -1456,6 +1478,63 @@ export const importChunkRuns = pgTable("import_chunk_runs", {
   idempotencyUnique: uniqueIndex("import_chunk_runs_idempotency_key_idx").on(t.idempotencyKey),
 }));
 
+export const qboConnectionStatusEnum = pgEnum("qbo_connection_status", [
+  "pending",
+  "connected",
+  "error",
+  "disconnected"
+]);
+
+export const qboSyncIssueKindEnum = pgEnum("qbo_sync_issue_kind", ["conflict", "error"]);
+
+export const qboSyncDirectionEnum = pgEnum("qbo_sync_direction", ["push", "pull"]);
+
+export const qboSyncEntityTypeEnum = pgEnum("qbo_sync_entity_type", [
+  "customer",
+  "invoice",
+  "payment"
+]);
+
+export const qboConnections = pgTable("qbo_connections", {
+  id: id(),
+  companyId: companyId(),
+  realmId: varchar("realm_id", { length: 64 }).notNull(),
+  environment: varchar("environment", { length: 16 }).notNull().default("sandbox"),
+  status: qboConnectionStatusEnum("status").notNull().default("pending"),
+  accessTokenEnc: text("access_token_enc").notNull(),
+  refreshTokenEnc: text("refresh_token_enc").notNull(),
+  accessTokenExpiresAt: timestamp("access_token_expires_at").notNull(),
+  pullCursor: varchar("pull_cursor", { length: 128 }),
+  lastSyncAt: timestamp("last_sync_at"),
+  lastErrorMessage: text("last_error_message"),
+  ...timestamps
+}, (t) => ({
+  companyUnique: uniqueIndex("qbo_connections_company_idx").on(t.companyId),
+  realmIdx: index("qbo_connections_realm_idx").on(t.realmId)
+}));
+
+export const qboSyncIssues = pgTable("qbo_sync_issues", {
+  id: id(),
+  companyId: companyId(),
+  connectionId: uuid("connection_id")
+    .notNull()
+    .references(() => qboConnections.id),
+  direction: qboSyncDirectionEnum("direction").notNull(),
+  entityType: qboSyncEntityTypeEnum("entity_type").notNull(),
+  renvaniEntityId: uuid("renvani_entity_id"),
+  qboEntityId: varchar("qbo_entity_id", { length: 64 }),
+  kind: qboSyncIssueKindEnum("kind").notNull(),
+  code: varchar("code", { length: 64 }).notNull(),
+  message: text("message").notNull(),
+  payload: jsonb("payload").notNull().default({}),
+  resolvedAt: timestamp("resolved_at"),
+  resolvedById: uuid("resolved_by_id").references(() => users.id),
+  ...timestamps
+}, (t) => ({
+  companyIdx: index("qbo_sync_issues_company_idx").on(t.companyId),
+  openIdx: index("qbo_sync_issues_open_idx").on(t.companyId, t.resolvedAt)
+}));
+
 export const dataExportSessions = pgTable("data_export_sessions", {
   id: id(),
   companyId: companyId(),
@@ -2016,6 +2095,29 @@ export const growthIntakeAuditEvents = pgTable(
       t.companyId,
       t.growthIntakeCheckId
     ),
+  })
+);
+
+export const qboMappingKindEnum = pgEnum("qbo_mapping_kind", [
+  "price_book_item",
+  "tax_code",
+  "payment_method",
+]);
+
+export const qboEntityMappings = pgTable(
+  "qbo_entity_mappings",
+  {
+    id: id(),
+    companyId: companyId(),
+    kind: qboMappingKindEnum("kind").notNull(),
+    localKey: varchar("local_key", { length: 128 }).notNull(),
+    qboId: varchar("qbo_id", { length: 64 }),
+    qboName: varchar("qbo_name", { length: 255 }),
+    ...timestamps,
+  },
+  (t) => ({
+    companyIdx: index("qbo_entity_mappings_company_idx").on(t.companyId),
+    lookupIdx: uniqueIndex("qbo_entity_mappings_lookup_idx").on(t.companyId, t.kind, t.localKey),
   })
 );
 

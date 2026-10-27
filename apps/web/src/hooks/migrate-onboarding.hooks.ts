@@ -1,12 +1,18 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { publicEnv } from "@fsm/config";
 import type {
   ApplyMigrateDedupeDecisionsBody,
   LinkMigrateOnboardingFilesBody,
-  MigrateSourceSystemId
+  MigrateSourceSystemId,
+  SetMigrateOnboardingSourceBody,
+  WizardImportEntityType
 } from "@fsm/types";
 
+import { clearBrowserAuthSession, getAuthToken } from "@/src/lib/auth";
+import { ApiError, type ApiErrorPayload } from "@/src/lib/api";
+import type { ImportSessionResponse } from "@/src/hooks/imports.hooks";
 import { migrateOnboardingRealClient } from "@/src/lib/migrate-onboarding-client";
 import {
   isPriyaOnboardingMockEnabled,
@@ -15,6 +21,60 @@ import {
 import { useMigrateOnboardingWizardStore } from "@/src/stores/migrate-onboarding-wizard.store";
 
 const priyaClient = migrateOnboardingPriyaMockClient;
+
+const migrateKeys = {
+  all: ["migrate-onboarding"] as const,
+  sources: ["migrate-onboarding", "sources"] as const,
+  bundle: (id: string) => ["migrate-onboarding", "bundle", id] as const
+};
+
+function parseUploadError(responseText: string): ApiErrorPayload {
+  try {
+    return JSON.parse(responseText) as ApiErrorPayload;
+  } catch {
+    return {
+      error: "NOT_IMPLEMENTED",
+      message: responseText || "Import upload failed"
+    };
+  }
+}
+
+export async function uploadImportFileForMigrate(
+  file: File,
+  entityType: WizardImportEntityType
+): Promise<ImportSessionResponse> {
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("entityType", entityType);
+
+  const token = getAuthToken();
+  const uploadResponse = await fetch(`${publicEnv.NEXT_PUBLIC_API_URL}/api/v1/imports`, {
+    method: "POST",
+    body: formData,
+    credentials: "include",
+    ...(token ? { headers: { Authorization: `Bearer ${token}` } } : {})
+  });
+
+  if (uploadResponse.status === 401) {
+    clearBrowserAuthSession();
+    if (typeof window !== "undefined") {
+      window.location.assign("/login");
+    }
+  }
+
+  if (!uploadResponse.ok) {
+    throw new ApiError(uploadResponse.status, parseUploadError(await uploadResponse.text()));
+  }
+
+  return (await uploadResponse.json()) as ImportSessionResponse;
+}
+
+export function useMigrateOnboardingSources() {
+  return useQuery({
+    queryKey: migrateKeys.sources,
+    queryFn: () => migrateOnboardingRealClient.listSources()
+  });
+}
 
 export function useMigrateOnboardingBundle(bundleId: string | null) {
   const setBundle = useMigrateOnboardingWizardStore((state) => state.setBundle);
@@ -30,6 +90,60 @@ export function useMigrateOnboardingBundle(bundleId: string | null) {
       const bundle = await migrateOnboardingRealClient.getBundle(bundleId);
       setBundle(bundle.id, bundle.wizardStep);
       return bundle;
+    }
+  });
+}
+
+export function useCreateMigrateOnboardingSession() {
+  const queryClient = useQueryClient();
+  const setBundle = useMigrateOnboardingWizardStore((state) => state.setBundle);
+
+  return useMutation({
+    mutationFn: (resumeActive: boolean) =>
+      migrateOnboardingRealClient.createSession({ resumeActive }),
+    onSuccess: async (bundle) => {
+      setBundle(bundle.id, bundle.wizardStep);
+      queryClient.setQueryData(migrateKeys.bundle(bundle.id), bundle);
+      await queryClient.invalidateQueries({ queryKey: migrateKeys.all });
+    }
+  });
+}
+
+export function useSetMigrateOnboardingSource(bundleId: string | null) {
+  const queryClient = useQueryClient();
+  const setBundle = useMigrateOnboardingWizardStore((state) => state.setBundle);
+
+  return useMutation({
+    mutationFn: (sourceSystem: MigrateSourceSystemId) => {
+      if (!bundleId) {
+        throw new Error("Bundle id is required");
+      }
+      const body: SetMigrateOnboardingSourceBody = { sourceSystem };
+      return migrateOnboardingRealClient.setSource(bundleId, body);
+    },
+    onSuccess: async (bundle) => {
+      setBundle(bundle.id, bundle.wizardStep);
+      queryClient.setQueryData(migrateKeys.bundle(bundle.id), bundle);
+      await queryClient.invalidateQueries({ queryKey: migrateKeys.all });
+    }
+  });
+}
+
+export function useLinkMigrateOnboardingFiles(bundleId: string | null) {
+  const queryClient = useQueryClient();
+  const setBundle = useMigrateOnboardingWizardStore((state) => state.setBundle);
+
+  return useMutation({
+    mutationFn: (body: LinkMigrateOnboardingFilesBody) => {
+      if (!bundleId) {
+        throw new Error("Bundle id is required");
+      }
+      return migrateOnboardingRealClient.linkFiles(bundleId, body);
+    },
+    onSuccess: async (bundle) => {
+      setBundle(bundle.id, bundle.wizardStep);
+      queryClient.setQueryData(migrateKeys.bundle(bundle.id), bundle);
+      await queryClient.invalidateQueries({ queryKey: migrateKeys.all });
     }
   });
 }
@@ -155,42 +269,4 @@ export function useCommitMigrateBundle(bundleId: string | null) {
       void queryClient.invalidateQueries({ queryKey: ["migrate-onboarding", "bundle", bundleId] });
     }
   });
-}
-
-export function usePriyaOnboardingSteps(bundleId: string | null) {
-  const queryClient = useQueryClient();
-  const setBundle = useMigrateOnboardingWizardStore((state) => state.setBundle);
-
-  const createSession = useMutation({
-    mutationFn: () => priyaClient.createSession(),
-    onSuccess: (bundle) => setBundle(bundle.id, bundle.wizardStep)
-  });
-
-  const setSource = useMutation({
-    mutationFn: (sourceSystem: MigrateSourceSystemId) => {
-      if (!bundleId) {
-        throw new Error("Create a session first");
-      }
-      return priyaClient.setSource(bundleId, { sourceSystem });
-    },
-    onSuccess: (bundle) => {
-      setBundle(bundle.id, bundle.wizardStep);
-      void queryClient.invalidateQueries({ queryKey: ["migrate-onboarding"] });
-    }
-  });
-
-  const linkFiles = useMutation({
-    mutationFn: (files: LinkMigrateOnboardingFilesBody["files"]) => {
-      if (!bundleId) {
-        throw new Error("Create a session first");
-      }
-      return priyaClient.linkFiles(bundleId, { files });
-    },
-    onSuccess: (bundle) => {
-      setBundle(bundle.id, bundle.wizardStep);
-      void queryClient.invalidateQueries({ queryKey: ["migrate-onboarding"] });
-    }
-  });
-
-  return { createSession, setSource, linkFiles };
 }

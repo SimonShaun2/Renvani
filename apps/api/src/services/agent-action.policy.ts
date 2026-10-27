@@ -1,3 +1,5 @@
+import { featureFlags } from "@fsm/config/feature-flags";
+
 import { AppError, ErrorCode } from "@fsm/types";
 
 export const AGENT_POLICY_V1 = "agent-policy-v1";
@@ -70,4 +72,18 @@ export function requiresHumanApproval(actionType: string): boolean {
     return true;
   }
   return !AUTO_APPROVED_ACTION_TYPES.has(actionType);
+}
+
+/** FS-72 founder gate — blocks customer-visible execution while dry-run / disabled. */
+export function assertLoyaltyReminderExecutionAllowed(): void {
+  if (!featureFlags.loyaltyRemindersEnabled) {
+    throw new AppError(ErrorCode.POLICY_DENIED, "Loyalty reminders are disabled");
+  }
+
+  if (featureFlags.loyaltyRemindersDryRun) {
+    throw new AppError(
+      ErrorCode.POLICY_DENIED,
+      "Loyalty reminder customer sends remain dry-run until founder approval"
+    );
+  }
 }

@@ -2,7 +2,6 @@ import { randomUUID } from "node:crypto";
 
 import { and, eq, isNull } from "drizzle-orm";
 import type { Job } from "bullmq";
-import Papa from "papaparse";
 import pino from "pino";
 
 import { downloadFile, getFileKeyFromUrl } from "@fsm/config/storage";
@@ -16,11 +15,7 @@ import {
   importChunkRuns,
   importSessions,
 } from "@fsm/db";
-import {
-  isXlsxImportFileName,
-  parseXlsxBufferToSheetRows,
-  sheetRowsToRecordRows,
-} from "@fsm/import-engine";
+import { parseTabularImportFile } from "@fsm/import-engine";
 import {
   IMPORT_CHUNK_COMMIT_JOB_NAME,
   ImportChunkCommitPayloadSchema,
@@ -99,45 +94,7 @@ function normalizeTextValue(value: string | null | undefined): string | null {
 }
 
 function parseTabularRows(buffer: Buffer, fileName: string): ParsedCsvRow[] {
-  if (isXlsxImportFileName(fileName)) {
-    const sheet = parseXlsxBufferToSheetRows(buffer);
-    const recordRows = sheetRowsToRecordRows(sheet.headers, sheet.rows);
-
-    return recordRows.map((values, index) => ({
-      rowNumber: index + 2,
-      values,
-    }));
-  }
-
-  return parseCsv(buffer);
-}
-
-function parseCsv(buffer: Buffer): ParsedCsvRow[] {
-  const csvText = buffer.toString("utf8").replace(/^\uFEFF/u, "");
-  const result = Papa.parse<Record<string, string>>(csvText, {
-    header: true,
-    skipEmptyLines: true,
-  });
-  const headers = (result.meta.fields ?? []).map((header) => header.trim());
-  const rows: ParsedCsvRow[] = [];
-
-  for (let index = 0; index < result.data.length; index += 1) {
-    const sourceRow = result.data[index];
-    const normalizedRow: Record<string, string> = {};
-
-    for (const header of headers) {
-      const rawValue = sourceRow?.[header];
-      normalizedRow[header] =
-        typeof rawValue === "string" ? sanitizeSpreadsheetCell(rawValue.trim()) : "";
-    }
-
-    rows.push({
-      rowNumber: index + 2,
-      values: normalizedRow,
-    });
-  }
-
-  return rows;
+  return parseTabularImportFile(buffer, fileName).rows;
 }
 
 function resolveRowWindow(

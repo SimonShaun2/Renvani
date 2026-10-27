@@ -1,0 +1,474 @@
+[
+ {
+  "isDraft": true,
+  "fieldData": {
+   "name": "growth · hero",
+   "slug": "growth-hero",
+   "page": "growth",
+   "section-key": "hero",
+   "eyebrow": "Growth · Get found",
+   "headline": "More jobs, booked direct.",
+   "subhead": "Agents keep your site and search profile current and book jobs from your real openings. You approve prices and new pages.",
+   "items": "Services\nPricing\nAreas we serve\nReviews\nMy account\nBook a visit\nComfort you can count on, all year.\nInstant prices, real crew availability, and booking in under a minute. Licensed technicians, upfront pricing.\nUpfront pricing\nEmail updates\nGet your price\nType of visit\nAC tune-up\nHome\nCentral AC · 3-ton\nZIP\n78704\n$186 / visit\nFirst visit Tue Oct 28\nBook this time\nAC tune-up\nfrom $129\nFurnace repair\nfrom $219\nNew system quote\nfrom $289\nRecurring\nsave 10%\nPowered by Renvani\nExample\nGrowth\nBooked while you slept",
+   "review-notes": "Items = remaining Figma text in order, incl. in-app mock UI copy (example data).",
+   "figma-node": "129:3778",
+   "sort-order": 20
+  }
+ },
+ {
+  "isDraft": true,
+  "fieldData": {
+   "name": "growth · features",
+   "slug": "growth-features",
+   "page": "growth",
+   "section-key": "features",
+   "eyebrow": "What Growth includes",
+   "headline": "Get found. Get booked.",
+   "subhead": "Four tools that turn searches into booked jobs, all included.",
+   "items": "Services\nPricing\nAreas we serve\nReviews\nMy account\nBook a visit\nComfort you can count on, all year.\nInstant prices, real crew availability, and booking in under a minute. Licensed technicians, upfront pricing.\nUpfront pricing\nEmail updates\nGet your price\nType of visit\nAC tune-up\nHome\nCentral AC · 3-ton\nZIP\n78704\n$186 / visit\nFirst visit Tue Oct 28\nBook this time\nAC tune-up\nfrom $129\nFurnace repair\nfrom $219\nNew system quote\nfrom $289\nRecurring\nsave 10%\nPowered by Renvani\nExample\nBranded Website\nYour own site, on your web address, with your services, prices and service areas. Agents keep it current as your offer changes.\nLearn more →\nRenvani\nWorkspace\nCommand Center\nApprovals\n7\nGROW\nMarketing",
+   "review-notes": "Items = remaining Figma text in order, incl. in-app mock UI copy (example data). Contains [confirm] notes from Figma.",
+   "figma-node": "129:3852",
+   "sort-order": 21
+  }
+ },
+ {
+  "isDraft": true,
+  "fieldData": {
+   "name": "growth · how-agents-work",
+   "slug": "growth-how-agents-work",
+   "page": "growth",
+   "section-key": "how-agents-work",
+   "eyebrow": "How the agents work",
+   "headline": "Agents do the work. You approve what matters.",
+   "items": "Handled by agent\nAwaiting owner approval\nCompleted by team\nHandled by agent\nVisitor finds your site\nYour site and profile show current services and prices.\n→\nHandled by agent\nAgent answers by email\nQuestions get a reply drafted from your rules.\n→\nHandled by agent\nBooking slot offered\nOnly openings your crews can actually take.\n→\nAwaiting owner approval\nNew price or service page\nNothing new goes live until you approve it.\n→\nCompleted by team\nJob on the schedule\nBooked, confirmed by email, ready for the crew.\nYou stay in charge\nYou choose what needs approval: prices, new pages, discounts and deposits. Agents stay inside your limits and contact customers by email only.\nYou stay in charge\nNew pr",
+   "review-notes": "Items = remaining Figma text in order, incl. in-app mock UI copy (example data).",
+   "figma-node": "129:4123",
+   "sort-order": 22
+  }
+ },
+ {
+  "isDraft": true,
+  "fieldData": {
+   "name": "growth · outcomes",
+   "slug": "growth-outcomes",
+   "page": "growth",
+   "section-key": "outcomes",
+   "eyebrow": "Outcomes",
+   "headline": "What changes for the shop.",
+   "items": "Outcome\nDirect jobs\nMore work books on your own site, not through a lead marketplace.\nOutcome\nCost per customer\nOutcome\nOwner time saved\nNo more rewriting service pages or answering the same pricing question.\nOutcome\nEvery direct booking becomes a customer record you own and can rebook.\nExample\n+18\nonline bookings a month",
+   "review-notes": "Items = remaining Figma text in order, incl. in-app mock UI copy (example data).",
+   "figma-node": "129:4176",
+   "sort-order": 23
+  }
+ },
+ {
+  "isDraft": true,
+  "fieldData": {
+   "name": "growth · demo-cta",
+   "slug": "growth-demo-cta",
+   "page": "growth",
+   "section-key": "demo-cta",
+   "headline": "See your booking page.",
+   "subhead": "20 minutes on one real job from your shop. We reply by email within one business day. [confirm: one-business-day reply commitment]",
+   "cta-label": "Get a free demo",
+   "cta-href": "/demo",
+   "review-notes": "Items = remaining Figma text in order, incl. in-app mock UI copy (example data). Contains [confirm] notes from Figma.",
+   "figma-node": "129:4198",
+   "sort-order": 24,
+   "items": ""
+  }
+ },
+ {
+  "isDraft": true,
+  "fieldData": {
+   "name": "revenue · hero",
+   "slug": "revenue-hero",
+   "page": "revenue",
+   "section-key": "hero",
+   "eyebrow": "Revenue · Win the job",
+   "headline": "Every inquiry answered.",
+   "items": "Every estimate followed up.\nRenvani\nWorkspace\nCommand Center\nApprovals\n7\nGROW\nMarketing\nRUN\nDispatch\nEstimates\nInvoices\nAgreements\nCustomers\nMANAGE\nOwner evidence\nReliability\nSettings\nMO\nMaya Ortiz\nOwner\nApprovals\nNothing reaches a customer until it passes policy, consent and — where your rules say so — you.\nNeeds approval\n7\nExecuting\n2\nFailed\n1\nExpired\n3\nCompleted\n48\nAll agents ▾\nNeeds approval\nRevenue · Estimate\n$186/visit\nDana Whitfield · AC tune-up, 3-ton system\nEdit\nReject\nNeeds approval\nRevenue · Follow-up\n$340\nTom Becker · System replacement estimate\n“Hi Tom — checking in on the replacement estimate ($340). Thursday or Friday works for our crew.”\nEdit\nReject\nNeeds approval\nRetention ·",
+   "review-notes": "Items = remaining Figma text in order, incl. in-app mock UI copy (example data).",
+   "figma-node": "129:4638",
+   "sort-order": 25
+  }
+ },
+ {
+  "isDraft": true,
+  "fieldData": {
+   "name": "revenue · features",
+   "slug": "revenue-features",
+   "page": "revenue",
+   "section-key": "features",
+   "eyebrow": "What Revenue includes",
+   "headline": "From inquiry to approved estimate.",
+   "subhead": "Three tools that turn questions into booked work.",
+   "items": "9:41\n●●● ▮\nGet your price in about a minute\nReal prices from our price book. No call needed.\nType of visit\nTune-up\nFurnace repair\nRepair\nRecurring\nHome\nCentral AC\nHeat pump\nFurnace\nMini-split\n1 zone\n2 zones\n3+ zones\nNot sure\nZIP code\n78704\nEmail me my estimate and booking updates. Unsubscribe anytime.\nSee my price\nPowered by Renvani\nExample\nInquiry Response\nLearn more →\nRenvani\nWorkspace\nCommand Center\nApprovals\n7\nGROW\nMarketing\nRUN\nDispatch\nEstimates\nInvoices\nAgreements\nCustomers\nMANAGE\nOwner evidence\nReliability\nSettings\nMO\nMaya Ortiz\nOwner\nEstimate\nEST-1043 · Dana Whitfield · 412 Pine St · drafted by Revenue Agent from your price book\nSave draft\nLine item\nDetail\nQty\nPrice\nAC tune-up · sea",
+   "review-notes": "Items = remaining Figma text in order, incl. in-app mock UI copy (example data).",
+   "figma-node": "129:4868",
+   "sort-order": 26
+  }
+ },
+ {
+  "isDraft": true,
+  "fieldData": {
+   "name": "revenue · how-agents-work",
+   "slug": "revenue-how-agents-work",
+   "page": "revenue",
+   "section-key": "how-agents-work",
+   "eyebrow": "How the agents work",
+   "headline": "Agents do the work. You approve what matters.",
+   "items": "Handled by agent\nAwaiting owner approval\nCompleted by team\nHandled by agent\nInquiry arrives by email\nLogged against the customer record right away.\n→\nHandled by agent\n→\nHandled by agent\nEstimate prepared\nPriced from your book, never invented.\n→\nAwaiting owner approval\nOwner approves estimate\nOver your limit? It waits for you.\n→\nCompleted by team\nCustomer accepts, job booked\nAccepted by email and put on the schedule.\nYou stay in charge\nSet approval limits, discount limits and follow-up timing. Agents never quote outside your price book and contact customers by email only.\nOne estimate, start to finish\nDay 0\nInquiry answered\nDay 0\nEstimate sent\nDay 2\nFollow-up email\nDay 3\nApproved",
+   "review-notes": "Items = remaining Figma text in order, incl. in-app mock UI copy (example data).",
+   "figma-node": "129:5132",
+   "sort-order": 27
+  }
+ },
+ {
+  "isDraft": true,
+  "fieldData": {
+   "name": "revenue · outcomes",
+   "slug": "revenue-outcomes",
+   "page": "revenue",
+   "section-key": "outcomes",
+   "eyebrow": "Outcomes",
+   "headline": "What changes for the shop.",
+   "items": "Outcome\nDirect jobs\nFewer leads go cold, so more inquiries become booked work.\nOutcome\nOwner time saved\nOutcome\nCost per customer\nMore of the leads you already pay for turn into jobs.\nOutcome\nFaster responses\nInquiries get a reply drafted the moment they arrive, including after hours.\nExample\n$4,200\nin estimates approved this week",
+   "review-notes": "Items = remaining Figma text in order, incl. in-app mock UI copy (example data).",
+   "figma-node": "129:5185",
+   "sort-order": 28
+  }
+ },
+ {
+  "isDraft": true,
+  "fieldData": {
+   "name": "revenue · demo-cta",
+   "slug": "revenue-demo-cta",
+   "page": "revenue",
+   "section-key": "demo-cta",
+   "headline": "See an estimate built from your prices.",
+   "subhead": "20 minutes on one real job from your shop. We reply by email within one business day. [confirm: one-business-day reply commitment]",
+   "cta-label": "Get a free demo",
+   "cta-href": "/demo",
+   "review-notes": "Items = remaining Figma text in order, incl. in-app mock UI copy (example data). Contains [confirm] notes from Figma.",
+   "figma-node": "129:5207",
+   "sort-order": 29,
+   "items": ""
+  }
+ },
+ {
+  "isDraft": true,
+  "fieldData": {
+   "name": "operations · hero",
+   "slug": "operations-hero",
+   "page": "operations",
+   "section-key": "hero",
+   "eyebrow": "Operations · Do the work",
+   "headline": "A field app crews will use.",
+   "subhead": "Agents build the schedule, brief each crew and email the invoice when the job is done. You approve the changes that matter.",
+   "items": "Renvani\nWorkspace\nCommand Center\nApprovals\n7\nGROW\nMarketing\nRUN\nDispatch\nEstimates\nInvoices\nAgreements\nCustomers\nMANAGE\nOwner evidence\nReliability\nSettings\nMO\nMaya Ortiz\nOwner\nDispatch\nThursday, Oct 22 · 3 crews · 11 visits · 1 unassigned\nAuto-assign (proposal)\nAdd visit\nUnassigned\nRepair · Tom Becker · 2-ton · 3 h · 1:00 p.m.\nScheduling Agent suggests Crew B (fits 1–4 p.m., 9 min drive)\nApprove\nCrew\n8\n9\n10\n11\n12\n1\n2\n3\n4\n5\nCrew A · Andre + Priya\nTune-up · Whitfield\n2.5 h\nFurnace repair · Ali\n3 h\nTune-up · Kim\n2 h\nCrew B · Marcus + Jo\nInstall · Patel\n3 h\nSuggested · Becker\n3 h\nCrew C · Lee + Sam\nAgreement · Grant\n2 h\nAgreement · Moore\n2 h\nDiagnostic · Ortiz\n2.5 h\nExample\nOperations\nThe day ru",
+   "review-notes": "Items = remaining Figma text in order, incl. in-app mock UI copy (example data).",
+   "figma-node": "129:5796",
+   "sort-order": 30
+  }
+ },
+ {
+  "isDraft": true,
+  "fieldData": {
+   "name": "operations · features",
+   "slug": "operations-features",
+   "page": "operations",
+   "section-key": "features",
+   "eyebrow": "What Operations includes",
+   "headline": "Run the day from one place.",
+   "subhead": "Eight tools from schedule to payment, unlimited users on every plan.",
+   "items": "Renvani\nWorkspace\nCommand Center\nApprovals\n7\nGROW\nMarketing\nRUN\nDispatch\nEstimates\nInvoices\nAgreements\nCustomers\nMANAGE\nOwner evidence\nReliability\nSettings\nMO\nMaya Ortiz\nOwner\nDispatch\nThursday, Oct 22 · 3 crews · 11 visits · 1 unassigned\nAuto-assign (proposal)\nAdd visit\nUnassigned\nRepair · Tom Becker · 2-ton · 3 h · 1:00 p.m.\nScheduling Agent suggests Crew B (fits 1–4 p.m., 9 min drive)\nApprove\nCrew\n8\n9\n10\n11\n12\n1\n2\n3\n4\n5\nCrew A · Andre + Priya\nTune-up · Whitfield\n2.5 h\nFurnace repair · Ali\n3 h\nTune-up · Kim\n2 h\nCrew B · Marcus + Jo\nInstall · Patel\n3 h\nSuggested · Becker\n3 h\nCrew C · Lee + Sam\nAgreement · Grant\n2 h\nAgreement · Moore\n2 h\nDiagnostic · Ortiz\n2.5 h\nExample\nAgents propose routes",
+   "review-notes": "Items = remaining Figma text in order, incl. in-app mock UI copy (example data). Contains [confirm] notes from Figma.",
+   "figma-node": "129:5936",
+   "sort-order": 31
+  }
+ },
+ {
+  "isDraft": true,
+  "fieldData": {
+   "name": "operations · how-agents-work",
+   "slug": "operations-how-agents-work",
+   "page": "operations",
+   "section-key": "how-agents-work",
+   "eyebrow": "How the agents work",
+   "headline": "Agents do the work. You approve what matters.",
+   "items": "Handled by agent\nAwaiting owner approval\nCompleted by team\nHandled by agent\nMatched to crew, route and real availability.\n→\nAwaiting owner approval\nSchedule change\nMoves that affect customers wait for your OK.\n→\nCompleted by team\nCrew completes checklist\nTasks, photos and notes saved to the job.\n→\nHandled by agent\nInvoice emailed\nSent when the job is marked done.\n→\nCompleted by team\nPayment received\nPaid in-app and matched to the invoice.\nYou stay in charge\nDecide which schedule changes, refunds and extra charges need your approval. Agents contact customers by email only.\nOne job, done\n1\nBooked\n2\nDispatched\n3\nOn site\n4\nPaid",
+   "review-notes": "Items = remaining Figma text in order, incl. in-app mock UI copy (example data).",
+   "figma-node": "129:6598",
+   "sort-order": 32
+  }
+ },
+ {
+  "isDraft": true,
+  "fieldData": {
+   "name": "operations · outcomes",
+   "slug": "operations-outcomes",
+   "page": "operations",
+   "section-key": "outcomes",
+   "eyebrow": "Outcomes",
+   "headline": "What changes for the shop.",
+   "items": "Outcome\nOwner time saved\nThe schedule builds itself. You handle the exceptions, not the whole board.\nOutcome\nJobs completed on time\nCrews arrive briefed, with the checklist in hand.\nOutcome\nFaster payment\nInvoices go out when the job ends, not at the end of the week.\nOutcome\nCost per customer\nNo per-user fees and no add-ons as your crew grows.\nBefore\nPaper notes and re-typing\n→\nAfter\nJob closed and invoiced on site",
+   "review-notes": "Items = remaining Figma text in order, incl. in-app mock UI copy (example data).",
+   "figma-node": "129:6651",
+   "sort-order": 33
+  }
+ },
+ {
+  "isDraft": true,
+  "fieldData": {
+   "name": "operations · demo-cta",
+   "slug": "operations-demo-cta",
+   "page": "operations",
+   "section-key": "demo-cta",
+   "headline": "Try the field app on your phone.",
+   "subhead": "20 minutes on one real job from your shop. We reply by email within one business day. [confirm: one-business-day reply commitment]",
+   "cta-label": "Get a free demo",
+   "cta-href": "/demo",
+   "review-notes": "Items = remaining Figma text in order, incl. in-app mock UI copy (example data). Contains [confirm] notes from Figma.",
+   "figma-node": "129:6673",
+   "sort-order": 34,
+   "items": ""
+  }
+ },
+ {
+  "isDraft": true,
+  "fieldData": {
+   "name": "retention · hero",
+   "slug": "retention-hero",
+   "page": "retention",
+   "section-key": "hero",
+   "eyebrow": "Retention · Bring them back",
+   "headline": "The next visit, already asked for.",
+   "subhead": "Agents offer memberships, send reminders and ask for reviews after each job. You set the offer and approve the terms.",
+   "items": "Renvani\nWorkspace\nCommand Center\nApprovals\n7\nGROW\nMarketing\nRUN\nDispatch\nEstimates\nInvoices\nPayments\nAgreements\nCustomers\nMANAGE\nOwner evidence\nReliability\nSettings\nMO\nMaya Ortiz\nOwner\nVIP members\nEveryone on a VIP tier, their status and next charge.\nExport CSV\nCopy join link\nEXAMPLE DATA\nAll · 6\nActive · 4\nPaused · 1\nPast due · 1\nMEMBER\nTIER\nSTATUS\nMONTHLY\nVISITS LEFT\nNEXT CHARGE\nMEMBER SINCE\nDana Whitfield\nPlus\nACTIVE\n$159.00\n0 of 1\nNov 23\nOct 23, 2026\nMarcus Lee\nPremier\nACTIVE\n$299.00\n1 of 2\nNov 2\nAug 2, 2026\nPriya Shah\nEssentials\nACTIVE\n$19.00\n—\nNov 14\nSep 14, 2026\nTom Alvarez\nPlus\nPAUSED\n$159.00\n—\nJan 8 (resumes)\nJul 8, 2026\nEllen Cho\nPlus\nPAST DUE\n$159.00\n1 of 1\nRetry Oct 26\nJun 21, 20",
+   "review-notes": "Items = remaining Figma text in order, incl. in-app mock UI copy (example data). Contains $299 mock prices (example membership UI, not Renvani pricing) — review.",
+   "figma-node": "129:7570",
+   "sort-order": 35
+  }
+ },
+ {
+  "isDraft": true,
+  "fieldData": {
+   "name": "retention · features",
+   "slug": "retention-features",
+   "page": "retention",
+   "section-key": "features",
+   "eyebrow": "What Retention includes",
+   "headline": "Customers who come back.",
+   "subhead": "Four tools that turn one job into the next one.",
+   "items": "Renvani\nWorkspace\nCommand Center\nApprovals\n7\nGROW\nMarketing\nRUN\nDispatch\nEstimates\nInvoices\nAgreements\nCustomers\nMANAGE\nOwner evidence\nReliability\nSettings\nMO\nMaya Ortiz\nOwner\nService agreements\nMaintenance agreements: 64 homes on a schedule\nNew plan\nActive plans\n64\n+11 this month\nRecurring revenue / mo\n$21,870\n74% of revenue\nPaused\n5\nAuto-resume set\nChurned · 30 d\n2\nBoth moved away\nCustomer\nPlan\nNext visit\nCrew\nState\nWhitfield\nAnnual · 2 tune-ups · $186\nTue Nov 4 · 9 a.m.\nCrew A\nActive\nGrant family\nAnnual · 2 tune-ups · $162\nTue Nov 4 · 1 p.m.\nCrew C\nActive\nPatel\nAnnual · 2 tune-ups · $168\nThu Oct 23 · 9 a.m.\nCrew B\nActive\nMoore\nAnnual · 3 visits · $199\nPaused to Nov 15\n—\nPaused\nKim\nAnnual ",
+   "review-notes": "Items = remaining Figma text in order, incl. in-app mock UI copy (example data). Contains $299 mock prices (example membership UI, not Renvani pricing) — review.",
+   "figma-node": "129:7788",
+   "sort-order": 36
+  }
+ },
+ {
+  "isDraft": true,
+  "fieldData": {
+   "name": "retention · how-agents-work",
+   "slug": "retention-how-agents-work",
+   "page": "retention",
+   "section-key": "how-agents-work",
+   "eyebrow": "How the agents work",
+   "headline": "Agents do the work. You approve what matters.",
+   "items": "Handled by agent\nAwaiting owner approval\nCompleted by team\nCompleted by team\nJob completed\nThe visit closes and the record updates.\n→\nHandled by agent\nAgent offers VIP or agreement\nAn offer email sent on your timing.\n→\nAwaiting owner approval\nDiscount or plan terms\nNew terms wait for your approval.\n→\nHandled by agent\nDue dates watched; reminders sent by email.\n→\nCompleted by team\nCovered visit delivered\nOn the schedule, with the discount applied.\nYou stay in charge\nSet your offers, discount limits and reminder timing. Agents check consent and contact customers by email only.\nYou stay in charge\nDiscounts wait for your OK",
+   "review-notes": "Items = remaining Figma text in order, incl. in-app mock UI copy (example data).",
+   "figma-node": "129:8176",
+   "sort-order": 37
+  }
+ },
+ {
+  "isDraft": true,
+  "fieldData": {
+   "name": "retention · outcomes",
+   "slug": "retention-outcomes",
+   "page": "retention",
+   "section-key": "outcomes",
+   "eyebrow": "Outcomes",
+   "headline": "What changes for the shop.",
+   "items": "Outcome\nMembers and agreements turn one-off jobs into revenue you can plan around.\nOutcome\nOwner time saved\nNo more reminder lists or chasing renewals by hand.\nOutcome\nCost per customer\nA returning customer costs less to win than a new one.\nOutcome\nDirect jobs\nReferrals and reviews bring new work that books direct.\nExample\n30%\nof jobs from repeat customers",
+   "review-notes": "Items = remaining Figma text in order, incl. in-app mock UI copy (example data).",
+   "figma-node": "129:8229",
+   "sort-order": 38
+  }
+ },
+ {
+  "isDraft": true,
+  "fieldData": {
+   "name": "retention · demo-cta",
+   "slug": "retention-demo-cta",
+   "page": "retention",
+   "section-key": "demo-cta",
+   "headline": "See your first membership plan.",
+   "subhead": "20 minutes on one real job from your shop. We reply by email within one business day. [confirm: one-business-day reply commitment]",
+   "cta-label": "Get a free demo",
+   "cta-href": "/demo",
+   "review-notes": "Items = remaining Figma text in order, incl. in-app mock UI copy (example data). Contains [confirm] notes from Figma.",
+   "figma-node": "129:8251",
+   "sort-order": 39,
+   "items": ""
+  }
+ },
+ {
+  "isDraft": true,
+  "fieldData": {
+   "name": "command-center · hero",
+   "slug": "command-center-hero",
+   "page": "command-center",
+   "section-key": "hero",
+   "eyebrow": "Command Center · Stay in charge",
+   "headline": "Your business, running itself.",
+   "subhead": "Agents handle routine work all day and bring you only the decisions that need you. Every action is logged and reversible.",
+   "items": "Renvani\nWorkspace\nCommand Center\nApprovals\n7\nGROW\nMarketing\nRUN\nDispatch\nEstimates\nInvoices\nAgreements\nCustomers\nMANAGE\nOwner evidence\nReliability\nSettings\nMO\nMaya Ortiz\nOwner\nGood morning,\nMaya.\nWednesday, Oct 21 · 7 approvals waiting · 1 exception\nSearch\nNew inquiry\nDirect inquiries · Oct\n46\n+11 vs Sep\nSource: Your branded site + app\nInquiry → booked\n41%\n19 of 46\nSource: Revenue Agent handoffs\nFirst → agreement\n58%\n11 of 19\nSource: Retention offers accepted\nMarketing revenue\n$4,860\n26 rebookings · 3 campaigns\nSource: Automations + win-back\nNeeds you\nApprovals 7\nExceptions 1\nNeeds approval\nRevenue Agent\nSend estimate · Dana Whitfield · AC tune-up\n$186 / visit · new agreements always need yo",
+   "review-notes": "Items = remaining Figma text in order, incl. in-app mock UI copy (example data).",
+   "figma-node": "129:8952",
+   "sort-order": 40
+  }
+ },
+ {
+  "isDraft": true,
+  "fieldData": {
+   "name": "command-center · features",
+   "slug": "command-center-features",
+   "page": "command-center",
+   "section-key": "features",
+   "eyebrow": "What Command Center includes",
+   "headline": "What happened, and what needs you.",
+   "subhead": "Five tools for running the shop, all on one customer record.",
+   "items": "Renvani\nWorkspace\nCommand Center\nApprovals\n7\nGROW\nMarketing\nRUN\nDispatch\nEstimates\nInvoices\nAgreements\nCustomers\nMANAGE\nOwner evidence\nReliability\nSettings\nMO\nMaya Ortiz\nOwner\nApprovals\nNothing reaches a customer until it passes policy, consent and — where your rules say so — you.\nNeeds approval\n7\nExecuting\n2\nFailed\n1\nExpired\n3\nCompleted\n48\nAll agents ▾\nNeeds approval\nRevenue · Estimate\n$186/visit\nDana Whitfield · AC tune-up, 3-ton system\nEdit\nReject\nNeeds approval\nRevenue · Follow-up\n$340\nTom Becker · System replacement estimate\n“Hi Tom — checking in on the replacement estimate ($340). Thursday or Friday works for our crew.”\nEdit\nReject\nNeeds approval\nRetention · Agreement offer\n$162/visit\n",
+   "review-notes": "Items = remaining Figma text in order, incl. in-app mock UI copy (example data).",
+   "figma-node": "129:9184",
+   "sort-order": 41
+  }
+ },
+ {
+  "isDraft": true,
+  "fieldData": {
+   "name": "command-center · how-agents-work",
+   "slug": "command-center-how-agents-work",
+   "page": "command-center",
+   "section-key": "how-agents-work",
+   "eyebrow": "How the agents work",
+   "headline": "Agents do the work. You approve what matters.",
+   "items": "Handled by agent\nAwaiting owner approval\nCompleted by team\nHandled by agent\nAgents work all day\nBooking, scheduling, invoicing and follow-ups.\n→\nAwaiting owner approval\nDecisions routed to you\nOutside your rules? It comes to you, with the reason.\n→\nCompleted by team\nTeam completes the work\nCrews finish jobs; records update.\n→\nHandled by agent\nResults roll up to reports\nYour four numbers, updated as work closes.\n→\nAwaiting owner approval\nYou adjust the rules\nChange a limit once; agents follow it from then on.\nYou stay in charge\nYou decide what needs approval, plus spending and discount limits. Every action is logged and can be undone. Customers are contacted by email only.\nYour inbox\nApprove ",
+   "review-notes": "Items = remaining Figma text in order, incl. in-app mock UI copy (example data).",
+   "figma-node": "129:9753",
+   "sort-order": 42
+  }
+ },
+ {
+  "isDraft": true,
+  "fieldData": {
+   "name": "command-center · outcomes",
+   "slug": "command-center-outcomes",
+   "page": "command-center",
+   "section-key": "outcomes",
+   "eyebrow": "Outcomes",
+   "headline": "What changes for the shop.",
+   "items": "Outcome\nDirect jobs\nSee which work you booked yourself, and grow it.\nOutcome\nCost per customer\nEvery feature and unlimited users on one bill, with no add-ons.\nOutcome\nMembers, agreements and rebookings, tracked in one place.\nOutcome\nOwner time saved\nYou approve exceptions instead of running every task.\nExample\n12\ntasks handled by agents today",
+   "review-notes": "Items = remaining Figma text in order, incl. in-app mock UI copy (example data).",
+   "figma-node": "129:9806",
+   "sort-order": 43
+  }
+ },
+ {
+  "isDraft": true,
+  "fieldData": {
+   "name": "command-center · demo-cta",
+   "slug": "command-center-demo-cta",
+   "page": "command-center",
+   "section-key": "demo-cta",
+   "headline": "See your week in one screen.",
+   "subhead": "20 minutes on one real job from your shop. We reply by email within one business day. [confirm: one-business-day reply commitment]",
+   "items": "Stage\nProduct\nIndustry step\nValue\nHandled by agent\nTune-up reminders\nEmailed to 120 customers\nHandled by agent\nNo-heat request\nBooked online 6:10 AM\nHandled by agent\nMaintenance visits\n18 completed\nCompleted by team\nExample\nHandled by agent\nNo-heat request booked online\n6:10 AM · Dana, 8:30 AM\nExample\nHandled by agent\nTune-up reminders emailed\n120 Summit Comfort Club members\nExample\n0\nno-heat jobs booked\nRenvani\nProducts\n⌄\nIndustries\n⌄\nHow it works\nPricing",
+   "cta-label": "Get a free demo",
+   "cta-href": "/demo",
+   "review-notes": "Items = remaining Figma text in order, incl. in-app mock UI copy (example data). Contains [confirm] notes from Figma.",
+   "figma-node": "129:9828",
+   "sort-order": 44
+  }
+ },
+ {
+  "isDraft": true,
+  "fieldData": {
+   "name": "industries/hvac · hero",
+   "slug": "industries-hvac-hero",
+   "page": "industries/hvac",
+   "section-key": "hero",
+   "eyebrow": "Industries · HVAC",
+   "headline": "[Copy: HVAC headline, line 1] [Copy: headline, line 2]",
+   "subhead": "[Copy: HVAC subhead: tune-ups, diagnostics, agreements and replacements]",
+   "items": "Renvani\nWorkspace\nCommand Center\nApprovals\n7\nGROW\nMarketing\nRUN\nDispatch\nEstimates\nInvoices\nAgreements\nCustomers\nMANAGE\nOwner evidence\nReliability\nSettings\nMO\nMaya Ortiz\nOwner\nGood morning,\nMaya.\nWednesday, Oct 21 · 7 approvals waiting · 1 exception\nSearch\nNew inquiry\nDirect inquiries · Oct\n46\n+11 vs Sep\nSource: Your branded site + app\nInquiry → booked\n41%\n19 of 46\nSource: Revenue Agent handoffs\nFirst → agreement\n58%\n11 of 19\nSource: Retention offers accepted\nMarketing revenue\n$4,860\n26 rebookings · 3 campaigns\nSource: Automations + win-back\nNeeds you\nApprovals 7\nExceptions 1\nNeeds approval\nRevenue Agent\nSend estimate · Dana Whitfield · AC tune-up\n$186 / visit · new agreements always need yo",
+   "review-notes": "Items = remaining Figma text in order, incl. in-app mock UI copy (example data). Contains [Copy: …] placeholders from Figma.",
+   "figma-node": "129:10725",
+   "sort-order": 45
+  }
+ },
+ {
+  "isDraft": true,
+  "fieldData": {
+   "name": "industries/hvac · journey",
+   "slug": "industries-hvac-journey",
+   "page": "industries/hvac",
+   "section-key": "journey",
+   "eyebrow": "How the five products add value",
+   "headline": "From first booking to a lasting customer.",
+   "items": "Handled by agent\nAwaiting owner approval\nCompleted by team\nStage\nWin the job\nProduct\nRevenue\nIndustry step\nDiagnostic visit and repair estimate\nValue\n[Copy: value]\nAwaiting owner approval\nStage\nDo the work\nProduct\nOperations\nIndustry step\nEquipment record: unit, age, filter size, readings\nValue\n[Copy: value]\nCompleted by team\nStage\nBring them back\nProduct\nRetention\nIndustry step\nMaintenance agreement offered after the tune-up\nValue\n[Copy: value]\nAwaiting owner approval\n1\nBook\n2\nSchedule\n3\nServe\n4\nPaid\n5\nRebook",
+   "review-notes": "Items = remaining Figma text in order, incl. in-app mock UI copy (example data). Contains [Copy: …] placeholders from Figma.",
+   "figma-node": "129:10955",
+   "sort-order": 46
+  }
+ },
+ {
+  "isDraft": true,
+  "fieldData": {
+   "name": "industries/hvac · product-screens",
+   "slug": "industries-hvac-product-screens",
+   "page": "industries/hvac",
+   "section-key": "product-screens",
+   "eyebrow": "See it in an HVAC business",
+   "headline": "Screens for the key moments.",
+   "items": "Renvani\nWorkspace\nCommand Center\nApprovals\n7\nGROW\nMarketing\nRUN\nDispatch\nEstimates\nInvoices\nAgreements\nCustomers\nMANAGE\nOwner evidence\nReliability\nSettings\nMO\nMaya Ortiz\nOwner\nEstimate\nEST-1043 · Dana Whitfield · 412 Pine St · drafted by Revenue Agent from your price book\nSave draft\nLine item\nDetail\nQty\nPrice\nAC tune-up · seasonal\n3-ton system · ~1.5 h\n1\n$187\nFilter replacement\n16x25x1\n1\n$20\nCoil cleaning\nOptional add-on\n1\n$35\nComfort Club discount\nYour rule: −10% members\n—\n−$21\nPer visit (member)\n$186\nFirst visit incl. options\n$221\nEst. yearly\n$372 · 2 tune-ups\nOptions shown to customer\nBasic\n$168 / visit\nStandard\n$186 / visit\nPremium\n$199 / visit\nNeeds approval\nChecks before sending\nServic",
+   "review-notes": "Items = remaining Figma text in order, incl. in-app mock UI copy (example data). Contains [Copy: …] placeholders from Figma.",
+   "figma-node": "129:10976",
+   "sort-order": 47
+  }
+ },
+ {
+  "isDraft": true,
+  "fieldData": {
+   "name": "industries/hvac · other-industries",
+   "slug": "industries-hvac-other-industries",
+   "page": "industries/hvac",
+   "section-key": "other-industries",
+   "eyebrow": "Other industries",
+   "headline": "Explore another trade.",
+   "items": "Plumbing\nEmergency calls, estimates, maintenance plans\nSee how →\nElectrical\nPanel upgrades, safety inspections, EV chargers\nSee how →\nGarage Doors\nRepairs, openers, tune-up plans\nSee how →\nAppliance Repair\nDiagnostics, parts, warranty follow-up\nSee how →\nPlumbing\nElectrical",
+   "review-notes": "Items = remaining Figma text in order, incl. in-app mock UI copy (example data).",
+   "figma-node": "129:11289",
+   "sort-order": 48
+  }
+ },
+ {
+  "isDraft": true,
+  "fieldData": {
+   "name": "industries/hvac · demo-cta",
+   "slug": "industries-hvac-demo-cta",
+   "page": "industries/hvac",
+   "section-key": "demo-cta",
+   "headline": "See it run an HVAC week.",
+   "subhead": "20 minutes on one real job from your shop. We reply by email within one business day. [confirm: one-business-day reply commitment]",
+   "cta-label": "Get a free demo",
+   "cta-href": "/demo",
+   "review-notes": "Items = remaining Figma text in order, incl. in-app mock UI copy (example data). Contains [confirm] notes from Figma.",
+   "figma-node": "129:11311",
+   "sort-order": 49,
+   "items": ""
+  }
+ }
+]

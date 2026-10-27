@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { publicEnv } from "@fsm/config";
-import type { ColumnMapping } from "@fsm/types";
+import type { ColumnMapping, ImportSessionIngestStatus } from "@fsm/types";
 
 import type { CustomerListRecord } from "@/src/hooks/customers.hooks";
 import { clearBrowserAuthSession, getAuthToken } from "@/src/lib/auth";
@@ -11,7 +11,7 @@ import { api, ApiError, type ApiErrorPayload } from "@/src/lib/api";
 export interface ImportSessionRecord {
   id: string;
   status: "uploaded" | "mapping" | "preview" | "importing" | "completed" | "failed" | "rolled_back";
-  entityType: "customers" | "jobs";
+  entityType: "customers" | "jobs" | "estimates" | "price_book" | "notes" | "communications";
   fileName: string;
   totalRows: number | null;
   validRows: number | null;
@@ -35,6 +35,7 @@ export interface ImportErrorRecord {
 
 export interface ImportSessionResponse {
   importSession: ImportSessionRecord;
+  ingest?: ImportSessionIngestStatus;
 }
 
 export interface ImportErrorsResponse {

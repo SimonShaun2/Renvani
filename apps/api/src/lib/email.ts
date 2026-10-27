@@ -117,6 +117,19 @@ function formatEmailDate(value: string | null): string | null {
   return date.toLocaleDateString("en-US");
 }
 
+export async function sendVerifyEmailEmail(to: string, verifyUrl: string, firstName: string): Promise<void> {
+  await sendRenderedTemplateEmail(to, EMAIL_TEMPLATE_IDS.verifyEmail, { firstName, verifyUrl }, ["auth.verify_email"]);
+  logger.debug({ recipient: "[redacted]" }, "Verify email sent");
+}
+
+export async function sendSignupAttemptEmail(
+  to: string,
+  params: { firstName: string; loginUrl: string; resetUrl: string }
+): Promise<void> {
+  await sendRenderedTemplateEmail(to, EMAIL_TEMPLATE_IDS.signupAttempt, params, ["auth.signup_attempt"]);
+  logger.debug({ recipient: "[redacted]" }, "Signup attempt notice sent");
+}
+
 export async function sendPasswordResetEmail(to: string, resetUrl: string, firstName: string): Promise<void> {
   await sendRenderedTemplateEmail(to, EMAIL_TEMPLATE_IDS.passwordReset, {
     firstName,

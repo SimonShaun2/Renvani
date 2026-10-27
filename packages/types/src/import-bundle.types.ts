@@ -56,3 +56,25 @@ export interface ImportBundleContract {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface ImportSessionIngestProgressResponse {
+  importSessionId: string;
+  status: string;
+  entityType: string;
+  fileName: string;
+  chunk: ImportSessionChunkProgress | null;
+}
+
+export interface MigrateOnboardingIngestProgressSession {
+  importSessionId: string;
+  entityType: string;
+  status: string;
+  fileName: string;
+  chunk: ImportSessionChunkProgress | null;
+}
+
+export interface MigrateOnboardingIngestProgressResponse {
+  bundleId: string;
+  progress: ImportBundleProgress;
+  sessions: MigrateOnboardingIngestProgressSession[];
+}

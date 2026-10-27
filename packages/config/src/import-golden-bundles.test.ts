@@ -22,6 +22,22 @@ describe("FS-MIGRATE golden import bundles (CI fixtures)", () => {
     }
   });
 
+  it("validates Housecall Pro golden bundle presets and ≥2y history", () => {
+    const manifest = GOLDEN_IMPORT_BUNDLE_MANIFESTS.find((entry) => entry.sourceSystem === "housecall_pro");
+    expect(manifest).toBeDefined();
+    assertGoldenImportBundleManifest(manifest!);
+    expect(manifest?.requiredHistorySpanYears).toBeGreaterThanOrEqual(2);
+    expect(manifest?.files.some((file) => file.entityType === "jobs")).toBe(true);
+    expect(manifest?.files.some((file) => file.entityType === "invoices")).toBe(true);
+  });
+
+  it("ServiceTitan golden bundle is location-aware with ST preset contract coverage", () => {
+    const manifest = GOLDEN_IMPORT_BUNDLE_MANIFESTS.find((entry) => entry.sourceSystem === "servicetitan");
+    expect(manifest).toBeDefined();
+    expect(manifest?.files.some((file) => file.relativePath === "locations.csv")).toBe(true);
+    assertGoldenImportBundleManifest(manifest!);
+  });
+
   it("requires price book files for Service Fusion and Jobber epic §6 fixtures", () => {
     for (const source of ["service_fusion", "jobber"] as const) {
       const manifest = GOLDEN_IMPORT_BUNDLE_MANIFESTS.find((entry) => entry.sourceSystem === source);

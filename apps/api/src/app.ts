@@ -91,7 +91,7 @@ export async function buildApp() {
   await app.register(fastifyCors, {
     origin: [...new Set([new URL(env.APP_URL).origin, ...parseClerkAuthorizedParties(env.CLERK_AUTHORIZED_PARTIES)])],
     credentials: true,
-    allowedHeaders: ["Authorization", "Content-Type", "Idempotency-Key", "X-Request-Id"]
+    allowedHeaders: ["Authorization", "Content-Type", "Idempotency-Key", "X-Request-Id", "X-Customer-Portal-Token"]
   });
   await app.register(requestLoggerPlugin);
   await app.register(globalRateLimitPlugin);

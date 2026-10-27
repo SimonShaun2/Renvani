@@ -258,4 +258,22 @@ describe("price-book line picker tenant scoping (FS-147)", () => {
       .send(line(ownItem.id));
     expect(ownAdd.status).toBe(201);
   });
+  it("invoicing an estimate whose catalog item was soft-deleted succeeds and drops the link", async () => {
+    const { auth, customer, ownItem } = seedTenantFixtures();
+    const created = await request(app.server)
+      .post("/api/v1/estimates")
+      .set("Authorization", auth.authorization)
+      .send({ customerId: customer.id, title: "Stale link", items: [line(ownItem.id)] });
+    expect(created.status).toBe(201);
+
+    ownItem.deletedAt = new Date();
+
+    const invoiced = await request(app.server)
+      .post("/api/v1/invoices")
+      .set("Authorization", auth.authorization)
+      .send({ customerId: customer.id, fromEstimateId: created.body.estimate.id });
+    expect(invoiced.status).toBe(201);
+    expect(invoiced.body.invoice.items).toHaveLength(1);
+    expect(invoiced.body.invoice.items[0].priceBookItemId ?? null).toBeNull();
+  });
 });

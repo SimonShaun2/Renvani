@@ -57,7 +57,7 @@ import {
   retrieveInvoiceCheckoutClientSecret
 } from "../lib/stripe.js";
 import { listItems, recalculateTotals } from "./invoice-items.service.js";
-import { assertPriceBookItemsInCompany } from "./price-book-item-scope.js";
+import { assertPriceBookItemsInCompany, findLivePriceBookItemIds } from "./price-book-item-scope.js";
 
 type CompanyRow = typeof companies.$inferSelect;
 type CustomerRow = typeof customers.$inferSelect;
@@ -837,11 +837,27 @@ export async function createInvoice(
       : normalizedInput.items;
 
     if (sourceItems.length > 0) {
-      await assertPriceBookItemsInCompany(
-        tx,
-        companyId,
-        sourceItems.map((item) => ("priceBookItemId" in item ? item.priceBookItemId : null))
-      );
+      if (estimateRows.length > 0) {
+        // Lines copied from the caller's own estimate: a catalog item soft-deleted since the
+        // estimate was written must not block invoicing — drop the stale link instead.
+        const liveIds = await findLivePriceBookItemIds(
+          tx,
+          companyId,
+          sourceItems.map((item) => ("priceBookItemId" in item ? item.priceBookItemId : null))
+        );
+        for (const item of sourceItems) {
+          if ("priceBookItemId" in item && item.priceBookItemId && !liveIds.has(item.priceBookItemId)) {
+            item.priceBookItemId = null;
+          }
+        }
+      } else {
+        // Client-supplied ids must belong to the caller's company (404 otherwise).
+        await assertPriceBookItemsInCompany(
+          tx,
+          companyId,
+          sourceItems.map((item) => ("priceBookItemId" in item ? item.priceBookItemId : null))
+        );
+      }
       await tx
         .insert(invoiceItems)
         .values(

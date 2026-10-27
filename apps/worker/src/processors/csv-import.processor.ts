@@ -59,6 +59,7 @@ import {
 } from "@fsm/types";
 
 import { emitImportWorkflowStepReceipt } from "../lib/import-workflow-step-receipt.js";
+import { persistImportSessionReconciliationReportBestEffort } from "../lib/persist-import-session-reconciliation.js";
 import { handleImportChunkCommit, IMPORT_CHUNK_COMMIT_JOB_NAME } from "./import-chunk-commit.processor.js";
 import {
   handleImportCommunicationsCommit,
@@ -568,6 +569,27 @@ function validateCustomerRows(rows: ParsedCsvRow[], columnMapping: ColumnMapping
   };
 }
 
+async function writeImportReconciliationReport(
+  companyId: string,
+  importSessionId: string,
+  validationErrors: ValidationError[]
+): Promise<void> {
+  // Best-effort: never let report generation fail or retry an already-committed import.
+  try {
+    const session = await getImportSessionOrNull(companyId, importSessionId);
+    if (!session) {
+      return;
+    }
+
+    await persistImportSessionReconciliationReportBestEffort(companyId, session, validationErrors);
+  } catch (error: unknown) {
+    logger.warn(
+      { companyId, importSessionId, err: error instanceof Error ? error.message : String(error) },
+      "Failed to load import session for reconciliation report (best-effort; import unaffected)"
+    );
+  }
+}
+
 async function getImportSessionOrNull(companyId: string, importSessionId: string): Promise<ImportSessionRow | null> {
   return (
     await db.query.importSessions.findFirst({
@@ -1021,6 +1043,7 @@ async function executeNotesImport(
     });
   });
 
+  await writeImportReconciliationReport(companyId, importSessionId, validationErrors);
   await job.updateProgress?.(100);
 }
 
@@ -1085,6 +1108,7 @@ async function executeCommunicationsImport(
     });
   });
 
+  await writeImportReconciliationReport(companyId, importSessionId, validationErrors);
   await job.updateProgress?.(100);
 }
 
@@ -1153,6 +1177,7 @@ async function executePriceBookImport(
     });
   });
 
+  await writeImportReconciliationReport(companyId, importSessionId, validationErrors);
   await job.updateProgress?.(100);
 }
 
@@ -1477,6 +1502,8 @@ export async function handleExecuteImport(job: Job<Record<string, unknown>>): Pr
         }
       }
     );
+
+    await writeImportReconciliationReport(companyId, importSessionId, validationErrors);
   } catch (error: unknown) {
     logger.error(
       {

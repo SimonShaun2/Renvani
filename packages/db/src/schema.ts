@@ -35,7 +35,7 @@ import {
   index,
   uniqueIndex,
 } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 
 // ─────────────────────────────────────────────
 // SHARED HELPERS
@@ -513,6 +513,10 @@ export const companies = pgTable("companies", {
   ...timestamps,
 }, (t) => ({
   slugIdx: uniqueIndex("companies_slug_idx").on(t.slug),
+  // FS-157: at most one live company per Clerk organization (DB-level guarantee behind the advisory lock).
+  clerkOrganizationIdIdx: uniqueIndex("companies_clerk_organization_id_idx")
+    .on(sql`(${t.settings} -> 'clerk' ->> 'organizationId')`)
+    .where(sql`${t.deletedAt} IS NULL AND (${t.settings} -> 'clerk' ->> 'organizationId') IS NOT NULL`),
 }));
 
 export const users = pgTable("users", {
@@ -528,6 +532,15 @@ export const users = pgTable("users", {
   avatarUrl: text("avatar_url"),
   isActive: boolean("is_active").notNull().default(true),
   lastLoginAt: timestamp("last_login_at"),
+  emailVerifiedAt: timestamp("email_verified_at"),
+  // sha256 of the single-use verify-email token (raw token is never stored)
+  emailVerificationTokenHash: text("email_verification_token_hash"),
+  emailVerificationExpiresAt: timestamp("email_verification_expires_at"),
+  // FS-157: stable Clerk user id (`sub`); logins map by this first. Nullable until linked/backfilled.
+  clerkUserId: varchar("clerk_user_id", { length: 255 }),
+  // FS-160b: tombstone set by Clerk user.deleted. A tombstoned user is never auto-linked (verified email /
+  // membership webhook / first-login fallback); clearing it is a manual DB step until FS-165.
+  clerkUnlinkedAt: timestamp("clerk_unlinked_at", { withTimezone: true }),
   // If this user is also a technician
   technicianId: uuid("technician_id"),
   ...timestamps,
@@ -535,6 +548,8 @@ export const users = pgTable("users", {
   emailIdx: uniqueIndex("users_email_idx").on(t.email),
   emailCompanyIdx: uniqueIndex("users_email_company_idx").on(t.email, t.companyId),
   companyIdx: index("users_company_idx").on(t.companyId),
+  emailVerificationTokenIdx: index("users_email_verification_token_idx").on(t.emailVerificationTokenHash),
+  clerkUserIdIdx: uniqueIndex("users_clerk_user_id_idx").on(t.clerkUserId).where(sql`${t.clerkUserId} IS NOT NULL`),
 }));
 
 export const refreshTokens = pgTable("refresh_tokens", {

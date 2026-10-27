@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { FileText, Plus, Search } from "lucide-react";
 
 import { PageLayout } from "@/src/components/layout/PageLayout";
-import { CurrencyDisplay } from "@/src/components/ui/CurrencyDisplay";
 import { EmptyState } from "@/src/components/ui/EmptyState";
 import { ErrorState } from "@/src/components/ui/ErrorState";
 import { Sheet } from "@/src/components/ui/Sheet";
@@ -226,7 +225,7 @@ export function InvoiceListClient() {
     <>
       <PageLayout
         title="Invoices"
-        subtitle={`${new Intl.DateTimeFormat("en-US", { month: "long" }).format(now)} · payment state across your invoices`}
+        subtitle={`${new Intl.DateTimeFormat("en-US", { month: "long" }).format(now)} · paid by card on file after each visit`}
         actions={(
           <div className="flex items-center gap-3">
           <button
@@ -316,13 +315,16 @@ export function InvoiceListClient() {
                       <th className="px-5 py-4">Details</th>
                       <th className="px-5 py-4">Amount</th>
                       <th className="px-5 py-4">State</th>
-                      <th className="px-5 py-4 text-right"><span className="sr-only">Action</span></th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-neutral-100">
                     {visibleInvoices.map((invoice) => (
                       <tr key={invoice.id} className="invoice-row-in transition hover:bg-[#fbf6ef]">
-                        <td className="px-5 py-4 font-semibold text-[#0f1530]">{invoice.invoiceNumber}</td>
+                        <td className="px-5 py-4 font-semibold text-[#0f1530]">
+                          <Link href={`/invoices/${invoice.id}`} className="underline-offset-2 hover:underline">
+                            {invoice.invoiceNumber}
+                          </Link>
+                        </td>
                         <td className="px-5 py-4 text-[#0f1530]">
                           {invoice.customer.firstName} {invoice.customer.lastName}
                         </td>
@@ -330,18 +332,10 @@ export function InvoiceListClient() {
                           {formatDate(invoice.createdAt)} · {invoice.title ?? "General invoice"}
                         </td>
                         <td className="px-5 py-4 text-[#0f1530]">
-                          <CurrencyDisplay value={invoice.total} showCents />
+                          {usd.format(parseFloat(invoice.total) || 0)}
                         </td>
                         <td className="px-5 py-4">
                           <InvoiceStatePill state={getInvoiceRowState(invoice, now)} />
-                        </td>
-                        <td className="px-5 py-4 text-right">
-                          <Link
-                            href={`/invoices/${invoice.id}`}
-                            className="inline-flex rounded-full bg-neutral-100 px-4 py-2 text-sm font-semibold text-brand-accent transition hover:bg-brand-accent-light"
-                          >
-                            View →
-                          </Link>
                         </td>
                       </tr>
                     ))}

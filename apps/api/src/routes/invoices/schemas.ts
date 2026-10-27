@@ -146,6 +146,11 @@ const paymentSchema = {
     customerId: { type: "string" },
     collectedById: nullableStringSchema,
     amount: { type: "string" },
+    serviceFeeAmount: { type: "string" },
+    bookingFeeAmount: { type: "string" },
+    feeRefundable: { type: "boolean" },
+    amountRefunded: { type: "string" },
+    refundableAmount: { type: "string" },
     method: { type: "string" },
     status: { type: "string" },
     stripePaymentIntentId: nullableStringSchema,
@@ -170,7 +175,10 @@ const invoicePaymentSummarySchema = {
     method: { type: "string" },
     status: { type: "string" },
     paidAt: nullableDateTimeSchema,
-    stripePaymentIntentId: nullableStringSchema
+    stripePaymentIntentId: nullableStringSchema,
+    serviceFeeAmount: { type: "string" },
+    bookingFeeAmount: { type: "string" },
+    feeRefundable: { type: "boolean" }
   }
 } as const;
 
@@ -198,6 +206,8 @@ const invoiceListItemSchema = {
     total: { type: "string" },
     amountPaid: { type: "string" },
     balanceDue: { type: "string" },
+    serviceFeeAmount: { type: "string" },
+    bookingFeeAmount: { type: "string" },
     dueAt: nullableDateTimeSchema,
     paidAt: nullableDateTimeSchema,
     customer: {
@@ -254,6 +264,8 @@ const invoiceDetailSchema = {
     total: { type: "string" },
     amountPaid: { type: "string" },
     balanceDue: { type: "string" },
+    serviceFeeAmount: { type: "string" },
+    bookingFeeAmount: { type: "string" },
     issuedAt: nullableDateTimeSchema,
     sentAt: nullableDateTimeSchema,
     dueAt: nullableDateTimeSchema,

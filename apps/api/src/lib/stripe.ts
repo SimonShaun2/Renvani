@@ -14,8 +14,7 @@ import {
   RENVANI_STRIPE_BRAND
 } from "@fsm/config/stripe-branding";
 import {
-  computeCustomerPaidPlatformFee,
-  formatCustomerPlatformFeeLineItemName
+  computeCheckoutFees
 } from "@fsm/config/stripe-pricing";
 
 const stripe = new Stripe(env.STRIPE_SECRET_KEY);
@@ -26,6 +25,9 @@ export interface InvoiceCheckoutLineItem {
   quantity: string;
   total: string;
 }
+
+export const SERVICE_FEE_LINE_ITEM_NAME = "Service Fee (2%)";
+export const ONLINE_BOOKING_FEE_LINE_ITEM_NAME = "Online booking fee";
 
 export interface CreateInvoiceCheckoutSessionInput {
   companyId: string;
@@ -39,8 +41,8 @@ export interface CreateInvoiceCheckoutSessionInput {
   items: InvoiceCheckoutLineItem[];
   /** Public pay token — embedded Checkout return URL stays on Renvani. */
   paymentToken: string;
-  /** Decimal fraction (0.05 = 5%). Customer-paid on top of invoice; 0 for Flat. */
-  connectApplicationFeeFraction: number;
+  /** Invoice's job came from public online booking ($1.99 booking fee applies when paid at checkout). */
+  isOnlineBooking: boolean;
 }
 
 export interface InvoiceCheckoutSessionResult {
@@ -181,8 +183,13 @@ function formatPayoutSchedule(interval: string | null | undefined): string | nul
 export async function createInvoiceCheckoutSession(
   input: CreateInvoiceCheckoutSessionInput
 ): Promise<InvoiceCheckoutSessionResult> {
-  const feeBreakdown = computeCustomerPaidPlatformFee(input.total, input.connectApplicationFeeFraction);
-  const applicationFeeAmount = toCents(feeBreakdown.platformFeeAmount);
+  // Checkout always settles the full balance, so the invoice ends PAID -> booking fee applies if online-booked.
+  const fees = computeCheckoutFees({
+    chargeCents: toCents(input.total),
+    isOnlineBooking: input.isOnlineBooking,
+    paysInvoiceInFull: true
+  });
+  const applicationFeeAmount = fees.serviceFeeCents + fees.bookingFeeCents;
   const appBaseUrl = env.APP_URL.replace(/\/$/, "");
   const statementDescriptor = buildCardStatementDescriptor(input.companyName);
   const useEmbeddedCheckout = featureFlags.stripeRenvaniEmbeddedCheckout;
@@ -195,7 +202,10 @@ export async function createInvoiceCheckoutSession(
       companyId: input.companyId,
       invoiceId: input.invoiceId,
       customerId: input.customerId,
-      renvaniReceiptChannel: "resend"
+      renvaniReceiptChannel: "resend",
+      invoiceAmountCents: String(fees.chargeCents),
+      serviceFeeCents: String(fees.serviceFeeCents),
+      bookingFeeCents: String(fees.bookingFeeCents)
     }
   };
 
@@ -218,20 +228,34 @@ export async function createInvoiceCheckoutSession(
 
   const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [...serviceLineItems];
 
-  if (applicationFeeAmount > 0) {
+  if (fees.serviceFeeCents > 0) {
     lineItems.push({
       quantity: 1,
       price_data: {
         currency: "usd",
-        unit_amount: applicationFeeAmount,
+        unit_amount: fees.serviceFeeCents,
         product_data: {
-          name: formatCustomerPlatformFeeLineItemName(input.connectApplicationFeeFraction),
-          description:
-            "Customer-paid platform fee (added to your total). Your service provider receives the full invoice amount."
+          name: SERVICE_FEE_LINE_ITEM_NAME,
+          description: "2% Service Fee (non-refundable). Your service provider receives the full invoice amount."
         }
       }
     });
   }
+
+  if (fees.bookingFeeCents > 0) {
+    lineItems.push({
+      quantity: 1,
+      price_data: {
+        currency: "usd",
+        unit_amount: fees.bookingFeeCents,
+        product_data: {
+          name: ONLINE_BOOKING_FEE_LINE_ITEM_NAME,
+          description: "Online booking fee (non-refundable)."
+        }
+      }
+    });
+  }
+
 
   const sharedMetadata = {
     companyId: input.companyId,

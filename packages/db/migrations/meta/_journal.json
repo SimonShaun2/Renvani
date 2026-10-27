@@ -281,6 +281,13 @@
       "when": 1777713000000,
       "tag": "0039_fs160b_clerk_unlink_tombstone",
       "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1777715000000,
+      "tag": "0043_payments_service_fee_booking_fee",
+      "breakpoints": true
     }
   ]
 }

@@ -7,8 +7,12 @@ import type Stripe from "stripe";
 
 import { env } from "@fsm/config";
 import {
-  computeCustomerPaidPlatformFee,
-  customerPlatformFeeDisclosure
+  centsToMoneyString,
+  computeCheckoutFees,
+  computeRefundableCents,
+  customerPlatformFeeDisclosure,
+  moneyStringToCents,
+  SERVICE_FEE_RATE_BPS
 } from "@fsm/config/stripe-pricing";
 import {
   activityEvents,
@@ -49,7 +53,6 @@ import {
 } from "@fsm/types";
 
 import { generateInvoiceNumber } from "../lib/invoice-number.js";
-import { resolveCompanyConnectApplicationFeeFraction } from "../lib/company-renvani-plan.js";
 import { featureFlags } from "@fsm/config/feature-flags";
 import {
   createInvoiceCheckoutSession,
@@ -144,9 +147,30 @@ function toInvoiceItem(row: InvoiceItemRow): InvoiceItem {
   };
 }
 
+function paymentFeeFields(row: PaymentRow): Pick<
+  Payment,
+  "serviceFeeAmount" | "bookingFeeAmount" | "feeRefundable" | "amountRefunded" | "refundableAmount"
+> {
+  const amountRefunded = row.amountRefunded ?? "0.00";
+  return {
+    serviceFeeAmount: row.serviceFeeAmount ?? "0.00",
+    bookingFeeAmount: row.bookingFeeAmount ?? "0.00",
+    // Fees are non-refundable by policy regardless of stored value.
+    feeRefundable: false,
+    amountRefunded,
+    refundableAmount: centsToMoneyString(
+      computeRefundableCents({
+        amountCents: moneyStringToCents(row.amount),
+        amountRefundedCents: moneyStringToCents(amountRefunded)
+      })
+    )
+  };
+}
+
 function toPayment(row: PaymentRow): Payment {
   return {
     ...row,
+    ...paymentFeeFields(row),
     method: normalizePaymentMethod(row.method),
     status: normalizePaymentStatus(row.status)
   };
@@ -159,7 +183,10 @@ function toInvoicePaymentSummary(row: PaymentRow): InvoicePaymentSummary {
     method: normalizePaymentMethod(row.method),
     status: normalizePaymentStatus(row.status),
     paidAt: row.paidAt,
-    stripePaymentIntentId: row.stripePaymentIntentId
+    stripePaymentIntentId: row.stripePaymentIntentId,
+    serviceFeeAmount: row.serviceFeeAmount ?? "0.00",
+    bookingFeeAmount: row.bookingFeeAmount ?? "0.00",
+    feeRefundable: false
   };
 }
 
@@ -172,6 +199,8 @@ function toInvoiceListItem(row: InvoiceRow, customer: CustomerRow): InvoiceListI
     total: row.total,
     amountPaid: row.amountPaid ?? "0.00",
     balanceDue: row.balanceDue,
+    serviceFeeAmount: row.serviceFeeAmount ?? "0.00",
+    bookingFeeAmount: row.bookingFeeAmount ?? "0.00",
     dueAt: row.dueAt,
     paidAt: row.paidAt,
     customer: {
@@ -202,6 +231,8 @@ function toInvoiceDetail(
     total: row.total,
     amountPaid: row.amountPaid ?? "0.00",
     balanceDue: row.balanceDue,
+    serviceFeeAmount: row.serviceFeeAmount ?? "0.00",
+    bookingFeeAmount: row.bookingFeeAmount ?? "0.00",
     issuedAt: row.issuedAt,
     sentAt: row.sentAt,
     dueAt: row.dueAt,
@@ -745,9 +776,13 @@ export async function getPublicInvoicePaymentLink(token: string): Promise<Public
     throw new AppError(ErrorCode.CONFLICT, "Invoice payment link is unavailable");
   }
 
-  const company = await getCompanyRecord(invoice.companyId, db);
-  const feeFraction = resolveCompanyConnectApplicationFeeFraction(company);
-  const breakdown = computeCustomerPaidPlatformFee(invoice.balanceDue, feeFraction);
+  const isOnlineBooking = await isInvoiceFromOnlineBooking(invoice, db);
+  const fees = computeCheckoutFees({
+    chargeCents: moneyStringToCents(invoice.balanceDue),
+    isOnlineBooking,
+    paysInvoiceInFull: true
+  });
+  const totalFeeCents = fees.serviceFeeCents + fees.bookingFeeCents;
 
   const disclosure = customerPlatformFeeDisclosure();
   const paymentLinkUrl =
@@ -764,11 +799,18 @@ export async function getPublicInvoicePaymentLink(token: string): Promise<Public
     invoiceNumber: invoice.invoiceNumber,
     paymentLinkUrl,
     checkoutClientSecret,
-    invoiceAmount: breakdown.invoiceAmount,
-    platformFeeAmount: breakdown.platformFeeAmount,
-    totalDue: breakdown.totalDue,
-    platformFeePercent: breakdown.platformFeePercent,
-    platformFeePaidByCustomer: feeFraction > 0,
+    invoiceAmount: centsToMoneyString(fees.chargeCents),
+    platformFeeAmount: centsToMoneyString(totalFeeCents),
+    totalDue: centsToMoneyString(fees.totalCents),
+    serviceFeeAmount: centsToMoneyString(fees.serviceFeeCents),
+    bookingFeeAmount: centsToMoneyString(fees.bookingFeeCents),
+    invoiceAmountCents: fees.chargeCents,
+    serviceFeeCents: fees.serviceFeeCents,
+    bookingFeeCents: fees.bookingFeeCents,
+    totalDueCents: fees.totalCents,
+    feeRefundable: false,
+    platformFeePercent: totalFeeCents > 0 ? SERVICE_FEE_RATE_BPS / 100 : null,
+    platformFeePaidByCustomer: totalFeeCents > 0,
     platformFeeDisclosure: disclosure.length > 0 ? disclosure : null
   };
 }
@@ -999,7 +1041,7 @@ export async function sendInvoice(
       invoiceNumber: existingInvoice.invoiceNumber,
       total: existingInvoice.balanceDue,
       paymentToken,
-      connectApplicationFeeFraction: resolveCompanyConnectApplicationFeeFraction(company),
+      isOnlineBooking: await isInvoiceFromOnlineBooking(existingInvoice, db),
       items: items.map((item) => ({
         name: item.name,
         description: item.description,
@@ -1367,6 +1409,51 @@ export async function markOverdue(companyId: string, invoiceId: string): Promise
   return toInvoice(overdueInvoice);
 }
 
+/** Online-booked invoices: the invoice's job was created by public online booking. */
+async function isInvoiceFromOnlineBooking(
+  invoice: Pick<InvoiceRow, "companyId" | "jobId">,
+  executor: SelectExecutor
+): Promise<boolean> {
+  if (!invoice.jobId) {
+    return false;
+  }
+
+  const job = await getJobRecord(invoice.companyId, invoice.jobId, executor);
+  return Array.isArray(job.tags) && job.tags.includes("online_booking");
+}
+
+function readNonNegativeIntMetadata(value: string | undefined): number | null {
+  if (value === undefined || !/^\d+$/.test(value)) {
+    return null;
+  }
+  return Number(value);
+}
+
+/**
+ * Splits a succeeded checkout PaymentIntent into invoice portion + fees using the metadata stamped
+ * at checkout creation. Legacy intents without fee metadata are treated as fee-free (whole amount).
+ */
+export function readCheckoutFeesFromIntent(paymentIntent: {
+  amount: number;
+  amount_received?: number | null;
+  metadata?: Record<string, string> | null;
+}): { invoiceAmountCents: number; serviceFeeCents: number; bookingFeeCents: number } {
+  const received = paymentIntent.amount_received || paymentIntent.amount;
+  const metadata = paymentIntent.metadata ?? {};
+  const serviceFeeCents = readNonNegativeIntMetadata(metadata.serviceFeeCents);
+  const bookingFeeCents = readNonNegativeIntMetadata(metadata.bookingFeeCents);
+
+  if (serviceFeeCents === null || bookingFeeCents === null) {
+    return { invoiceAmountCents: received, serviceFeeCents: 0, bookingFeeCents: 0 };
+  }
+
+  return {
+    invoiceAmountCents: Math.max(0, received - serviceFeeCents - bookingFeeCents),
+    serviceFeeCents,
+    bookingFeeCents
+  };
+}
+
 export async function handleStripePaymentSuccess(
   stripeEvent: Stripe.PaymentIntentSucceededEvent
 ): Promise<void> {
@@ -1384,7 +1471,9 @@ export async function handleStripePaymentSuccess(
   }
 
   const invoice = await getInvoiceById(invoiceId, db);
-  const paymentAmount = new Decimal(paymentIntent.amount_received || paymentIntent.amount).div(100);
+  const fees = readCheckoutFeesFromIntent(paymentIntent);
+  // Only the invoice portion is applied to the balance; fees are recorded on their own columns.
+  const paymentAmount = new Decimal(fees.invoiceAmountCents).div(100);
 
   await db.transaction(async (tx) => {
     const customer = await getCustomerRecord(invoice.companyId, invoice.customerId, tx);
@@ -1395,6 +1484,9 @@ export async function handleStripePaymentSuccess(
         invoiceId: invoice.id,
         customerId: invoice.customerId,
         amount: formatMoney(paymentAmount),
+        serviceFeeAmount: centsToMoneyString(fees.serviceFeeCents),
+        bookingFeeAmount: centsToMoneyString(fees.bookingFeeCents),
+        feeRefundable: false,
         method: resolveStripePaymentMethod(paymentIntent),
         status: "succeeded",
         stripePaymentIntentId: paymentIntent.id,
@@ -1417,6 +1509,8 @@ export async function handleStripePaymentSuccess(
         balanceDue: nextInvoiceValues.balanceDue,
         status: nextInvoiceValues.status,
         paidAt: nextInvoiceValues.paidAt,
+        serviceFeeAmount: addMoneyStrings(invoice.serviceFeeAmount ?? "0.00", centsToMoneyString(fees.serviceFeeCents)),
+        bookingFeeAmount: addMoneyStrings(invoice.bookingFeeAmount ?? "0.00", centsToMoneyString(fees.bookingFeeCents)),
         updatedAt: new Date()
       })
       .where(and(eq(invoices.companyId, invoice.companyId), eq(invoices.id, invoice.id), isNull(invoices.deletedAt)))

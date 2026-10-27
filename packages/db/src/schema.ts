@@ -953,6 +953,9 @@ export const invoices = pgTable("invoices", {
   total: decimal("total", { precision: 10, scale: 2 }).notNull().default("0"),
   amountPaid: decimal("amount_paid", { precision: 10, scale: 2 }).default("0"),
   balanceDue: decimal("balance_due", { precision: 10, scale: 2 }).notNull().default("0"),
+  // Customer-paid checkout fees collected (separate lines; never part of total/tax/balance). 0043.
+  serviceFeeAmount: decimal("service_fee_amount", { precision: 10, scale: 2 }).notNull().default("0"),
+  bookingFeeAmount: decimal("booking_fee_amount", { precision: 10, scale: 2 }).notNull().default("0"),
   // Dates
   issuedAt: timestamp("issued_at"),
   dueAt: timestamp("due_at"),
@@ -1012,6 +1015,12 @@ export const payments = pgTable("payments", {
   collectedById: uuid("collected_by_id").references(() => users.id),
   // Amounts
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  // Customer-paid fees on top of `amount` (checkout only). Non-refundable. 0043.
+  serviceFeeAmount: decimal("service_fee_amount", { precision: 10, scale: 2 }).notNull().default("0"),
+  bookingFeeAmount: decimal("booking_fee_amount", { precision: 10, scale: 2 }).notNull().default("0"),
+  feeRefundable: boolean("fee_refundable").notNull().default(false),
+  /** Refunded portion of `amount` only; fees are never refunded. */
+  amountRefunded: decimal("amount_refunded", { precision: 10, scale: 2 }).notNull().default("0"),
   method: paymentMethodEnum("method").notNull(),
   status: paymentStatusEnum("status").notNull().default("pending"),
   // Stripe

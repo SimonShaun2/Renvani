@@ -84,10 +84,11 @@ export interface CreateServiceAgreementSubscriptionInput {
   customerId: string;
   stripeCustomerId: string;
   stripePriceId: string;
-  /** Recurring customer-paid platform fee price (Flex); omitted on Flat. */
+  /** Recurring customer-paid Service Fee price ("Service Fee (2%)"); omitted on Flat. */
   stripePlatformFeePriceId?: string | null;
   companyStripeAccountId: string;
-  connectApplicationFeeFraction: number;
+  /** Connect application fee % so Renvani keeps the Service Fee line; null when no fee. */
+  applicationFeePercent: number | null;
 }
 
 export interface StripeSubscriptionResult {
@@ -402,6 +403,9 @@ export async function createServiceAgreementSubscription(
     transfer_data: {
       destination: input.companyStripeAccountId
     },
+    ...(input.applicationFeePercent && input.applicationFeePercent > 0
+      ? { application_fee_percent: input.applicationFeePercent }
+      : {}),
     metadata: {
       companyId: input.companyId,
       planId: input.planId,
@@ -706,7 +710,8 @@ export interface CreateVipMembershipCheckoutSessionInput {
   planId: string;
   stripeTierPriceId: string;
   stripePlatformFeePriceId?: string | null;
-  connectApplicationFeeFraction: number;
+  /** Connect application fee % so Renvani keeps the Service Fee line; null when no fee. */
+  applicationFeePercent: number | null;
   joinToken: string;
 }
 
@@ -744,6 +749,9 @@ export async function createVipMembershipCheckoutSession(
       transfer_data: {
         destination: input.companyStripeAccountId
       },
+      ...(input.applicationFeePercent && input.applicationFeePercent > 0
+        ? { application_fee_percent: input.applicationFeePercent }
+        : {}),
       metadata: {
         companyId: input.companyId,
         customerId: input.customerId,

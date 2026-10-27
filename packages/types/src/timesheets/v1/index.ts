@@ -103,11 +103,24 @@ export const DeleteTimeEntryBodySchema = z.object({
 }).strict();
 export type DeleteTimeEntryBody = z.infer<typeof DeleteTimeEntryBodySchema>;
 
+/** List pagination (limit/offset, same convention as saved-card-migration lists). */
+export const TIMESHEETS_LIST_DEFAULT_LIMIT = 50;
+export const TIMESHEETS_LIST_MAX_LIMIT = 200;
+
+export interface TimesheetsPageV1 {
+  limit: number;
+  offset: number;
+  /** True when more rows exist after this page. */
+  hasMore: boolean;
+}
+
 export const ListTimeEntriesQuerySchema = z.object({
   technicianId: z.string().uuid().optional(),
   from: DateOnly.optional(),
   to: DateOnly.optional(),
-  jobId: z.string().uuid().optional()
+  jobId: z.string().uuid().optional(),
+  limit: z.coerce.number().int().min(1).max(TIMESHEETS_LIST_MAX_LIMIT).optional().default(TIMESHEETS_LIST_DEFAULT_LIMIT),
+  offset: z.coerce.number().int().min(0).optional().default(0)
 }).strict();
 export type ListTimeEntriesQuery = z.infer<typeof ListTimeEntriesQuerySchema>;
 
@@ -143,7 +156,9 @@ export const ListTimesheetsQuerySchema = z.object({
   technicianId: z.string().uuid().optional(),
   status: TimesheetStatusSchema.optional(),
   from: DateOnly.optional(),
-  to: DateOnly.optional()
+  to: DateOnly.optional(),
+  limit: z.coerce.number().int().min(1).max(TIMESHEETS_LIST_MAX_LIMIT).optional().default(TIMESHEETS_LIST_DEFAULT_LIMIT),
+  offset: z.coerce.number().int().min(0).optional().default(0)
 }).strict();
 export type ListTimesheetsQuery = z.infer<typeof ListTimesheetsQuerySchema>;
 

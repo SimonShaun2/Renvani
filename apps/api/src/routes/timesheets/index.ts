@@ -85,7 +85,7 @@ const timesheetRoutes: FastifyPluginAsync = async (fastify) => {
 
   // Time entries
   fastify.get("/time/entries", { onRequest: staff, preValidation: [withZodValidation({ query: ListTimeEntriesQuerySchema })] },
-    async (request, reply) => reply.send({ entries: await listTimeEntries(actorOf(request), request.query as ListTimeEntriesQuery) }));
+    async (request, reply) => reply.send(await listTimeEntries(actorOf(request), request.query as ListTimeEntriesQuery)));
 
   fastify.post("/time/clock-in", { onRequest: staff, preValidation: [withZodValidation({ body: ClockInBodySchema })] },
     async (request, reply) => withConflict(reply, async () => ({ entry: await clockIn(actorOf(request), request.body as ClockInBody) }), 201));
@@ -104,7 +104,7 @@ const timesheetRoutes: FastifyPluginAsync = async (fastify) => {
 
   // Timesheets
   fastify.get("/timesheets", { onRequest: staff, preValidation: [withZodValidation({ query: ListTimesheetsQuerySchema })] },
-    async (request, reply) => reply.send({ timesheets: await listTimesheets(actorOf(request), request.query as ListTimesheetsQuery) }));
+    async (request, reply) => reply.send(await listTimesheets(actorOf(request), request.query as ListTimesheetsQuery)));
 
   fastify.post("/timesheets", { onRequest: staff, preValidation: [withZodValidation({ body: CreateTimesheetBodySchema })] },
     async (request, reply) => withConflict(reply, async () => ({ timesheet: await createTimesheet(actorOf(request), request.body as CreateTimesheetBody) }), 201));

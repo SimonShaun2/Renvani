@@ -5511,7 +5511,9 @@ function createSelectChain<T extends Record<string, unknown>>(rows: T[]) {
       return chain;
     },
     limit(limitCount: number) {
-      return Promise.resolve(filteredRows.slice(0, limitCount));
+      return Object.assign(Promise.resolve(filteredRows.slice(0, limitCount)), {
+        offset: (offsetCount: number) => Promise.resolve(filteredRows.slice(offsetCount, offsetCount + limitCount))
+      });
     },
     for(_lockStrength: string) {
       return chain;
@@ -5527,11 +5529,32 @@ function createSelectChain<T extends Record<string, unknown>>(rows: T[]) {
   return chain;
 }
 
+/** Emulates the partial unique index time_entries_open_technician_idx (migration 0045). */
+function assertOpenTimeEntryUnique(existingRows: AnyTestRecord[], incomingRows: AnyTestRecord[]): void {
+  const existing = existingRows as unknown as Array<Record<string, unknown>>;
+  const incoming = incomingRows as unknown as Array<Record<string, unknown>>;
+  const isOpen = (row: Record<string, unknown>) => (row.endedAt === null || row.endedAt === undefined) && row.deletedAt == null;
+  const keyOf = (row: Record<string, unknown>) => `${String(row.companyId)}:${String(row.technicianId)}`;
+  const seen = new Set(existing.filter(isOpen).map(keyOf));
+  for (const row of incoming) {
+    if (!isOpen(row)) continue;
+    const key = keyOf(row);
+    if (seen.has(key)) {
+      throw Object.assign(new Error('duplicate key value violates unique constraint "time_entries_open_technician_idx"'), {
+        code: "23505",
+        constraint: "time_entries_open_technician_idx"
+      });
+    }
+    seen.add(key);
+  }
+}
+
 function createInsertChain(tableName: TableName) {
   return {
     values(values: Record<string, unknown> | Array<Record<string, unknown>>) {
       const records = (Array.isArray(values) ? values : [values]).map((value) => createRow(tableName, value));
       const targetRows = getRows(tableName);
+      if (tableName === "timeEntries") assertOpenTimeEntryUnique(targetRows, records);
       targetRows.push(...records);
 
       return {
@@ -5591,7 +5614,10 @@ function wrapSelectChainWithProjection<T extends Record<string, unknown>>(
       return wrapped;
     },
     limit(limitCount: number) {
-      return chain.limit(limitCount).then((rows) => mapRows(rows));
+      const limited = chain.limit(limitCount);
+      return Object.assign(limited.then((rows) => mapRows(rows)), {
+        offset: (offsetCount: number) => limited.offset(offsetCount).then((rows) => mapRows(rows))
+      });
     },
     for(_lockStrength: string) {
       chain.for(_lockStrength);

@@ -11,7 +11,7 @@
  * - Approved timesheets lock their entries for everyone; owner/admin must reopen (with reason).
  *   Submitted timesheets lock entries for technicians only.
  */
-import { and, eq, isNull } from "drizzle-orm";
+import { and, desc, eq, gte, isNull, lt, lte } from "drizzle-orm";
 
 import {
   companies,
@@ -31,6 +31,9 @@ import {
   DEFAULT_WEEKLY_OVERTIME_THRESHOLD_MINUTES,
   ErrorCode,
   TIMESHEETS_CONTRACT_VERSION,
+  TIMESHEETS_LIST_DEFAULT_LIMIT,
+  TIMESHEETS_LIST_MAX_LIMIT,
+  type TimesheetsPageV1,
   type CanonicalEntityTypeV1,
   type ClockInBody,
   type ClockOutBody,
@@ -100,6 +103,56 @@ function forbidden(message = "You do not have access to this resource"): AppErro
 
 export function localDate(value: Date, timeZone: string): string {
   return new Intl.DateTimeFormat("en-CA", { timeZone, year: "numeric", month: "2-digit", day: "2-digit" }).format(value);
+}
+
+/** UTC instant of local midnight (company timezone) at the start of a YYYY-MM-DD day. */
+export function localMidnightUtc(dateOnly: string, timeZone: string): Date {
+  const [y, m, d] = dateOnly.split("-").map(Number) as [number, number, number];
+  const guess = Date.UTC(y, m - 1, d);
+  const offsetAt = (instant: number) => {
+    const parts = new Intl.DateTimeFormat("en-US", {
+      timeZone, hourCycle: "h23", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit"
+    }).formatToParts(new Date(instant));
+    const get = (type: string) => Number(parts.find((p) => p.type === type)?.value ?? 0);
+    return Date.UTC(get("year"), get("month") - 1, get("day"), get("hour"), get("minute"), get("second")) - instant;
+  };
+  let result = guess - offsetAt(guess);
+  result = guess - offsetAt(result);
+  return new Date(result);
+}
+
+function nextDay(dateOnly: string): string {
+  const day = new Date(`${dateOnly}T00:00:00Z`);
+  day.setUTCDate(day.getUTCDate() + 1);
+  return day.toISOString().slice(0, 10);
+}
+
+const OPEN_ENTRY_INDEX = "time_entries_open_technician_idx";
+
+/** True for a Postgres unique violation (23505) on the one-open-entry-per-technician index. */
+export function isOpenEntryUniqueViolation(error: unknown): boolean {
+  let current: unknown = error;
+  for (let depth = 0; depth < 4 && current && typeof current === "object"; depth += 1) {
+    const candidate = current as { code?: unknown; constraint?: unknown; constraint_name?: unknown; message?: unknown };
+    if (candidate.code === "23505") {
+      const name = candidate.constraint ?? candidate.constraint_name;
+      if (name === OPEN_ENTRY_INDEX) return true;
+      if (name === undefined && typeof candidate.message === "string" && candidate.message.includes(OPEN_ENTRY_INDEX)) return true;
+    }
+    current = (current as { cause?: unknown }).cause;
+  }
+  return false;
+}
+
+async function guardOpenEntryInsert<T>(work: () => Promise<T>): Promise<T> {
+  try {
+    return await work();
+  } catch (error) {
+    if (isOpenEntryUniqueViolation(error)) {
+      throw new TimesheetConflictError("open_entry_exists", "Technician is already clocked in", null);
+    }
+    throw error;
+  }
 }
 
 export function workweekStart(dateOnly: string): string {
@@ -339,8 +392,12 @@ async function companySheets(companyId: string, executor: Pick<typeof db, "selec
   const rows = await executor
     .select()
     .from(timesheets)
-    .where(and(eq(timesheets.companyId, companyId), isNull(timesheets.deletedAt)));
-  return technicianId ? rows.filter((row: SheetRow) => row.technicianId === technicianId) : rows;
+    .where(and(
+      eq(timesheets.companyId, companyId),
+      technicianId ? eq(timesheets.technicianId, technicianId) : undefined,
+      isNull(timesheets.deletedAt)
+    ));
+  return rows as SheetRow[];
 }
 
 async function getEntryForActor(actor: TimesheetActor, entryId: string, executor: Pick<typeof db, "select">): Promise<EntryRow> {
@@ -458,23 +515,45 @@ export async function assertTimeEntryDatesNotLocked(
 
 // ── Time entries ──────────────────────────────
 
-export async function listTimeEntries(actor: TimesheetActor, query: ListTimeEntriesQuery): Promise<TimeEntryV1[]> {
+function pageOf(query: { limit?: number; offset?: number }): { limit: number; offset: number } {
+  const limit = Math.min(Math.max(Math.trunc(query.limit ?? TIMESHEETS_LIST_DEFAULT_LIMIT), 1), TIMESHEETS_LIST_MAX_LIMIT);
+  const offset = Math.max(Math.trunc(query.offset ?? 0), 0);
+  return { limit, offset };
+}
+
+export async function listTimeEntries(
+  actor: TimesheetActor,
+  query: ListTimeEntriesQuery
+): Promise<{ entries: TimeEntryV1[] } & TimesheetsPageV1> {
   let technicianId = query.technicianId;
   if (!isManager(actor)) technicianId = await resolveTargetTechnician(actor, query.technicianId, db);
   else if (technicianId) await assertTechnician(actor.companyId, technicianId, db);
+  const { limit, offset } = pageOf(query);
 
-  const [timeZone, sheets] = await Promise.all([companyTimezone(actor.companyId, db), companySheets(actor.companyId, db)]);
+  const timeZone = await companyTimezone(actor.companyId, db);
+  // workDate is the company-local date of startedAt, so from/to become exact UTC bounds in SQL.
   const rows: EntryRow[] = await db
     .select()
     .from(timeEntries)
-    .where(and(eq(timeEntries.companyId, actor.companyId), isNull(timeEntries.deletedAt)));
-
-  return rows
-    .filter((row) => !technicianId || row.technicianId === technicianId)
-    .filter((row) => !query.jobId || row.jobId === query.jobId)
-    .map((row) => toTimeEntryV1(row, timeZone, sheets))
-    .filter((entry) => (!query.from || entry.workDate >= query.from) && (!query.to || entry.workDate <= query.to))
-    .sort((a, b) => b.startedAt.localeCompare(a.startedAt));
+    .where(and(
+      eq(timeEntries.companyId, actor.companyId),
+      technicianId ? eq(timeEntries.technicianId, technicianId) : undefined,
+      query.jobId ? eq(timeEntries.jobId, query.jobId) : undefined,
+      query.from ? gte(timeEntries.startedAt, localMidnightUtc(query.from, timeZone)) : undefined,
+      query.to ? lt(timeEntries.startedAt, localMidnightUtc(nextDay(query.to), timeZone)) : undefined,
+      isNull(timeEntries.deletedAt)
+    ))
+    .orderBy(desc(timeEntries.startedAt), desc(timeEntries.id))
+    .limit(limit + 1)
+    .offset(offset);
+  const page = rows.slice(0, limit);
+  const sheets = await companySheets(actor.companyId, db, technicianId);
+  return {
+    entries: page.map((row) => toTimeEntryV1(row, timeZone, sheets)),
+    limit,
+    offset,
+    hasMore: rows.length > limit
+  };
 }
 
 export async function clockIn(actor: TimesheetActor, body: ClockInBody): Promise<TimeEntryV1> {
@@ -493,7 +572,8 @@ export async function clockIn(actor: TimesheetActor, body: ClockInBody): Promise
     const now = new Date();
     assertDatesWritable(actor, sheets, technicianId, [localDate(now, timeZone)]);
     assertNoOverlap(entries, null, now, null, timeZone, sheets);
-    const [row] = await tx
+    // The pre-check above is racy; time_entries_open_technician_idx is the real guard (23505 -> 409).
+    const [row] = await guardOpenEntryInsert(() => tx
       .insert(timeEntries)
       .values({
         companyId: actor.companyId,
@@ -503,7 +583,7 @@ export async function clockIn(actor: TimesheetActor, body: ClockInBody): Promise
         entryType: body.entryType ?? "on_site",
         notes: body.notes?.length ? body.notes : null
       })
-      .returning();
+      .returning());
     if (!row) throw new AppError(ErrorCode.INTERNAL_ERROR, "Failed to clock in");
     await writeAudit(tx, { companyId: actor.companyId, action: "time_entry.clock_in", actorUserId: actor.userId, timeEntryId: row.id, after: auditSnapshot(row) });
     return toTimeEntryV1(row, timeZone, sheets);
@@ -590,7 +670,7 @@ export async function updateTimeEntryV1(actor: TimesheetActor, entryId: string, 
     assertDatesWritable(actor, sheets, entry.technicianId, [localDate(entry.startedAt, timeZone), localDate(startedAt, timeZone)]);
     assertNoOverlap(entries, entry.id, startedAt, endedAt, timeZone, sheets);
     const now = new Date();
-    const [row] = await tx
+    const [row] = await guardOpenEntryInsert(() => tx
       .update(timeEntries)
       .set({
         startedAt,
@@ -601,7 +681,7 @@ export async function updateTimeEntryV1(actor: TimesheetActor, entryId: string, 
         updatedAt: now
       })
       .where(and(eq(timeEntries.companyId, actor.companyId), eq(timeEntries.id, entry.id)))
-      .returning();
+      .returning());
     if (!row) throw new AppError(ErrorCode.INTERNAL_ERROR, "Failed to update time entry");
     await writeAudit(tx, { companyId: actor.companyId, action: "time_entry.updated", actorUserId: actor.userId, timeEntryId: row.id, before, after: auditSnapshot(row) });
     return toTimeEntryV1(row, timeZone, sheets);
@@ -661,15 +741,28 @@ function computeTotals(entries: EntryRow[], timeZone: string): TimesheetTotalsV1
   };
 }
 
-export async function listTimesheets(actor: TimesheetActor, query: ListTimesheetsQuery): Promise<TimesheetV1[]> {
+export async function listTimesheets(
+  actor: TimesheetActor,
+  query: ListTimesheetsQuery
+): Promise<{ timesheets: TimesheetV1[] } & TimesheetsPageV1> {
   let technicianId = query.technicianId;
   if (!isManager(actor)) technicianId = await resolveTargetTechnician(actor, query.technicianId, db);
-  const rows = await companySheets(actor.companyId, db, technicianId);
-  return rows
-    .filter((row: SheetRow) => !query.status || row.status === query.status)
-    .filter((row: SheetRow) => (!query.from || row.periodEnd >= query.from) && (!query.to || row.periodStart <= query.to))
-    .sort((a: SheetRow, b: SheetRow) => b.periodStart.localeCompare(a.periodStart))
-    .map(toTimesheetV1);
+  const { limit, offset } = pageOf(query);
+  const rows: SheetRow[] = await db
+    .select()
+    .from(timesheets)
+    .where(and(
+      eq(timesheets.companyId, actor.companyId),
+      technicianId ? eq(timesheets.technicianId, technicianId) : undefined,
+      query.status ? eq(timesheets.status, query.status) : undefined,
+      query.from ? gte(timesheets.periodEnd, query.from) : undefined,
+      query.to ? lte(timesheets.periodStart, query.to) : undefined,
+      isNull(timesheets.deletedAt)
+    ))
+    .orderBy(desc(timesheets.periodStart), desc(timesheets.id))
+    .limit(limit + 1)
+    .offset(offset);
+  return { timesheets: rows.slice(0, limit).map(toTimesheetV1), limit, offset, hasMore: rows.length > limit };
 }
 
 export async function createTimesheet(actor: TimesheetActor, body: CreateTimesheetBody): Promise<TimesheetV1> {

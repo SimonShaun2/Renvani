@@ -281,3 +281,79 @@ describe("FS-171 payroll", () => {
     expect(json.body.summary.totals.grossPayCents).toBe(95000);
   });
 });
+
+describe("FS-171 review fixes", () => {
+  it("concurrent clock-ins: one 201, one 409 open_entry_exists, only one open entry", async () => {
+    const w = seedWorld();
+    const results = await Promise.all([0, 1].map(() =>
+      request(app.server).post("/api/v1/time/clock-in").set("authorization", w.techAuth).send({ jobId: w.job.id })));
+    expect(results.map((r) => r.status).sort()).toEqual([201, 409]);
+    const clash = results.find((r) => r.status === 409)!;
+    expect(clash.body).toMatchObject({ error: "CONFLICT", reason: "open_entry_exists" });
+    const open = fakeDb.getTimeEntries().filter((e) => e.technicianId === w.tech.id && e.endedAt === null && e.deletedAt === null);
+    expect(open).toHaveLength(1);
+  });
+
+  it("unique violation on the open-entry index maps to 409 even when the pre-check misses", async () => {
+    const w = seedWorld();
+    const service = await import("../../services/timesheets.service.js");
+    // Simulate the race: the other clock-in commits between our pre-check and our insert.
+    const db = (await import("@fsm/db")).db as unknown as { insert: (...args: unknown[]) => unknown };
+    const realInsert = db.insert.bind(db);
+    const spy = vi.spyOn(db, "insert").mockImplementationOnce((...args: unknown[]) => {
+      fakeDb.seedTimeEntry({ companyId: w.company.id, jobId: w.job.id, technicianId: w.tech.id, startedAt: new Date(), endedAt: null });
+      return realInsert(...args);
+    });
+    const res = await request(app.server).post("/api/v1/time/clock-in").set("authorization", w.techAuth).send({ jobId: w.job.id }).expect(409);
+    expect(res.body).toMatchObject({ error: "CONFLICT", reason: "open_entry_exists", message: "Technician is already clocked in" });
+    expect(spy).toHaveBeenCalled();
+    spy.mockRestore();
+    // The fake transaction rollback also discards the simulated concurrent row; what matters is that
+    // our insert was rejected and no second open entry exists.
+    expect(fakeDb.getTimeEntries().filter((e) => e.technicianId === w.tech.id && e.endedAt === null).length).toBeLessThanOrEqual(1);
+    expect(service.isOpenEntryUniqueViolation({ code: "23505", constraint: "time_entries_open_technician_idx" })).toBe(true);
+    expect(service.isOpenEntryUniqueViolation({ cause: { code: "23505", constraint: "time_entries_open_technician_idx" } })).toBe(true);
+    expect(service.isOpenEntryUniqueViolation({ code: "23505", constraint: "other_idx" })).toBe(false);
+  });
+
+  it("time entries list is paginated (default 50, max 200) with SQL-side filters", async () => {
+    const w = seedWorld();
+    seedWeek(w, w.tech.id, 8);
+    seedWeek(w, w.peer.id, 8);
+    const all = await request(app.server).get("/api/v1/time/entries").set("authorization", w.ownerAuth).expect(200);
+    expect(all.body).toMatchObject({ limit: 50, offset: 0, hasMore: false });
+    expect(all.body.entries).toHaveLength(10);
+    const p1 = await request(app.server).get(`/api/v1/time/entries?technicianId=${w.tech.id}&limit=2`).set("authorization", w.ownerAuth).expect(200);
+    expect(p1.body).toMatchObject({ limit: 2, offset: 0, hasMore: true });
+    expect(p1.body.entries.map((e: { workDate: string }) => e.workDate)).toEqual(["2026-10-23", "2026-10-22"]);
+    const p3 = await request(app.server).get(`/api/v1/time/entries?technicianId=${w.tech.id}&limit=2&offset=4`).set("authorization", w.ownerAuth).expect(200);
+    expect(p3.body).toMatchObject({ limit: 2, offset: 4, hasMore: false });
+    expect(p3.body.entries.map((e: { workDate: string }) => e.workDate)).toEqual(["2026-10-19"]);
+    const ranged = await request(app.server).get("/api/v1/time/entries?from=2026-10-20&to=2026-10-21").set("authorization", w.ownerAuth).expect(200);
+    expect(ranged.body.entries).toHaveLength(4);
+    await request(app.server).get("/api/v1/time/entries?limit=201").set("authorization", w.ownerAuth).expect(400);
+    await request(app.server).get("/api/v1/time/entries?limit=0").set("authorization", w.ownerAuth).expect(400);
+    await request(app.server).get("/api/v1/time/entries?offset=-1").set("authorization", w.ownerAuth).expect(400);
+    const max = await request(app.server).get("/api/v1/time/entries?limit=200").set("authorization", w.ownerAuth).expect(200);
+    expect(max.body.limit).toBe(200);
+  });
+
+  it("timesheets list is paginated with status/date filters", async () => {
+    const w = seedWorld();
+    for (const start of ["2026-09-28", "2026-10-05", "2026-10-12", "2026-10-19"]) {
+      const end = new Date(`${start}T00:00:00Z`);
+      end.setUTCDate(end.getUTCDate() + 6);
+      await request(app.server).post("/api/v1/timesheets").set("authorization", w.techAuth)
+        .send({ periodStart: start, periodEnd: end.toISOString().slice(0, 10) }).expect(201);
+    }
+    const p1 = await request(app.server).get("/api/v1/timesheets?limit=3").set("authorization", w.ownerAuth).expect(200);
+    expect(p1.body).toMatchObject({ limit: 3, offset: 0, hasMore: true });
+    expect(p1.body.timesheets.map((t: { periodStart: string }) => t.periodStart)).toEqual(["2026-10-19", "2026-10-12", "2026-10-05"]);
+    const p2 = await request(app.server).get("/api/v1/timesheets?limit=3&offset=3").set("authorization", w.ownerAuth).expect(200);
+    expect(p2.body).toMatchObject({ hasMore: false });
+    expect(p2.body.timesheets).toHaveLength(1);
+    const ranged = await request(app.server).get("/api/v1/timesheets?from=2026-10-12&to=2026-10-14&status=open").set("authorization", w.ownerAuth).expect(200);
+    expect(ranged.body.timesheets.map((t: { periodStart: string }) => t.periodStart)).toEqual(["2026-10-12"]);
+    await request(app.server).get("/api/v1/timesheets?limit=500").set("authorization", w.ownerAuth).expect(400);
+  });
+});

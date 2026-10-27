@@ -1821,6 +1821,10 @@ export const timeEntries = pgTable("time_entries", {
   companyIdx: index("time_entries_company_idx").on(t.companyId),
   jobIdx: index("time_entries_job_idx").on(t.jobId),
   technicianIdx: index("time_entries_technician_idx").on(t.technicianId),
+  // FS-171 (migration 0045): one open entry per technician.
+  openTechnicianIdx: uniqueIndex("time_entries_open_technician_idx")
+    .on(t.companyId, t.technicianId)
+    .where(sql`${t.endedAt} IS NULL AND ${t.deletedAt} IS NULL`),
 }));
 
 // FS-171: pay-period timesheets, audit trail and technician pay rates (migration 0045).

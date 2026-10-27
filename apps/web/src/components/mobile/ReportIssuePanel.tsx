@@ -33,11 +33,13 @@ export function ReportIssuePanel({ jobId, onClose }: ReportIssuePanelProps) {
   const [severity, setSeverity] = useState<Severity>("medium");
   const [description, setDescription] = useState("");
   const [putOnHold, setPutOnHold] = useState(false);
+  const [failure, setFailure] = useState<string | null>(null);
 
   const unavailable = isMobileRouteMissing(mobileJob.error) || isMobileRouteMissing(reportIssue.error);
 
   async function handleSubmit() {
     const recordVersion = mobileJob.data?.job.recordVersion;
+    setFailure(null);
     try {
       await reportIssue.mutateAsync({
         category,
@@ -52,15 +54,13 @@ export function ReportIssuePanel({ jobId, onClose }: ReportIssuePanelProps) {
       if (isMobileRouteMissing(error)) {
         return;
       }
-      showToast({
-        tone: "error",
-        title: isVersionConflict(error) ? "Job changed on another device" : "Could not report issue",
-        description: isVersionConflict(error)
-          ? "We refreshed the job. Check it and send the report again."
+      setFailure(
+        isVersionConflict(error)
+          ? "This job changed on another device. We refreshed it, so check it and send again."
           : error instanceof Error
             ? error.message
-            : "Try again in a moment."
-      });
+            : "Could not send the report."
+      );
     }
   }
 
@@ -121,6 +121,21 @@ export function ReportIssuePanel({ jobId, onClose }: ReportIssuePanelProps) {
             <input type="checkbox" checked={putOnHold} onChange={(event) => setPutOnHold(event.target.checked)} />
             Put job on hold
           </label>
+          {failure ? (
+            <div role="alert" className="rounded-2xl bg-neutral-50 px-3 py-2 text-sm text-neutral-700">
+              <p>Could not report issue. {failure}</p>
+              <button
+                type="button"
+                disabled={reportIssue.isPending}
+                onClick={() => {
+                  void handleSubmit();
+                }}
+                className="mt-1 min-h-11 text-sm font-semibold text-brand-accent"
+              >
+                Retry
+              </button>
+            </div>
+          ) : null}
           <button
             type="button"
             disabled={reportIssue.isPending || description.trim().length === 0}

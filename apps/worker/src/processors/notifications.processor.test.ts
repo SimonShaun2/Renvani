@@ -5,12 +5,24 @@ const {
   debugLogMock,
   errorLogMock,
   infoLogMock,
-  warnLogMock
+  warnLogMock,
+  recordTransactionalEmailMessageLogMock
 } = vi.hoisted(() => ({
   debugLogMock: vi.fn(),
   errorLogMock: vi.fn(),
   infoLogMock: vi.fn(),
-  warnLogMock: vi.fn()
+  warnLogMock: vi.fn(),
+  recordTransactionalEmailMessageLogMock: vi.fn(async () => undefined)
+}));
+
+const sampleTransactionalDelivery = {
+  templateId: "booking.confirmation",
+  subject: "Your appointment is confirmed",
+  providerMessageId: "resend-msg-1"
+};
+
+vi.mock("./transactional-email-message-log.js", () => ({
+  recordTransactionalEmailMessageLog: recordTransactionalEmailMessageLogMock
 }));
 
 vi.mock("@fsm/config", () => ({
@@ -57,11 +69,23 @@ function createDependencies(): notificationsProcessor.NotificationsDependencies 
       sendInvoiceReminderOwnerAlertEmail: vi.fn(async () => undefined),
       sendServiceAgreementRenewalReminderEmail: vi.fn(async () => undefined),
       sendServiceAgreementPaymentFailedEmail: vi.fn(async () => undefined),
-      sendBookingConfirmationEmail: vi.fn(async () => undefined),
-      sendBookingDeclineEmail: vi.fn(async () => undefined),
-      sendVipMembershipWelcomeEmail: vi.fn(async () => undefined),
-      sendVipMembershipRenewalEmail: vi.fn(async () => undefined),
-      sendVipMembershipPaymentFailedEmail: vi.fn(async () => undefined)
+      sendBookingConfirmationEmail: vi.fn(async () => sampleTransactionalDelivery),
+      sendBookingDeclineEmail: vi.fn(async () => ({
+        ...sampleTransactionalDelivery,
+        templateId: "booking.decline"
+      })),
+      sendVipMembershipWelcomeEmail: vi.fn(async () => ({
+        ...sampleTransactionalDelivery,
+        templateId: "vip_membership.welcome"
+      })),
+      sendVipMembershipRenewalEmail: vi.fn(async () => ({
+        ...sampleTransactionalDelivery,
+        templateId: "vip_membership.renewal_receipt"
+      })),
+      sendVipMembershipPaymentFailedEmail: vi.fn(async () => ({
+        ...sampleTransactionalDelivery,
+        templateId: "vip_membership.payment_failed_dunning"
+      }))
     },
     sms: {
       sendSms: vi.fn(async () => "SM123")
@@ -87,6 +111,7 @@ describe("notifications.processor", () => {
     errorLogMock.mockReset();
     infoLogMock.mockReset();
     warnLogMock.mockReset();
+    recordTransactionalEmailMessageLogMock.mockClear();
   });
 
   it("send-estimate-email sends the estimate email when the customer can receive it", async () => {
@@ -653,6 +678,14 @@ describe("notifications.processor", () => {
       referenceNumber: "BK-20260428-0001",
       scheduledLabel: "Apr 30 at 8:00 AM"
     });
+    expect(recordTransactionalEmailMessageLogMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        companyId: "company-1",
+        sourceSystem: "booking_notification",
+        sourceId: "booking-1:send-booking-confirmation",
+        delivery: sampleTransactionalDelivery
+      })
+    );
     expect(dependencies.sms.sendSms).not.toHaveBeenCalled();
   });
 

@@ -8,7 +8,7 @@ import { EditableLineItemsTable } from "./EditableLineItemsTable";
 import type { RevenueLineItemDraft } from "./estimates.utils";
 
 import { EstimateChecksPanel, EstimateFrequencyOptions, EstimateTotalsCard } from "./EstimateFigmaPanels";
-import { buildEstimateSubtitle, estimateApprovalPill, formatDiscountCheck, formatValidUntil } from "./estimate-builder.utils";
+import { buildEstimateSubtitle, canSendEstimate, estimateApprovalPill, formatDiscountCheck, formatValidUntil } from "./estimate-builder.utils";
 
 afterEach(() => cleanup());
 
@@ -32,6 +32,19 @@ describe("estimate builder utils (Figma 10:604)", () => {
     expect(formatValidUntil("2026-10-28T17:00:00.000Z")).toBe("Oct 28");
     expect(formatDiscountCheck("0.00")).toBe("None");
     expect(formatDiscountCheck("21")).toBe("$21.00 off");
+  });
+});
+
+describe("send gating (unsaved edits)", () => {
+  it("blocks Approve & send / Send to Customer while the draft is dirty or saving", () => {
+    expect(canSendEstimate({ hasEstimateId: true, isDirty: false, saveState: "idle" })).toBe(true);
+    expect(canSendEstimate({ hasEstimateId: true, isDirty: true, saveState: "idle" })).toBe(false);
+    expect(canSendEstimate({ hasEstimateId: true, isDirty: false, saveState: "saving" })).toBe(false);
+    expect(canSendEstimate({ hasEstimateId: false, isDirty: false, saveState: "saved" })).toBe(false);
+  });
+
+  it("formats date-only valid-until in UTC so it can't shift a day", () => {
+    expect(formatValidUntil("2026-10-28")).toBe("Oct 28");
   });
 });
 

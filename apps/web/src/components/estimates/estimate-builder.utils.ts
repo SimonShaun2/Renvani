@@ -37,11 +37,18 @@ export function formatValidUntil(expiresAt: string | null | undefined): string {
   if (!expiresAt) return "—";
   const date = new Date(expiresAt);
   if (Number.isNaN(date.getTime())) return "—";
-  return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(date);
+  // Date-only values ("2026-10-28") parse as UTC midnight; format them in UTC so they never show a day early.
+  const dateOnly = /^\d{4}-\d{2}-\d{2}$/.test(expiresAt);
+  return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", ...(dateOnly ? { timeZone: "UTC" } : {}) }).format(date);
 }
 
 export function formatDiscountCheck(discountAmount: string | number | null | undefined): string {
   const value = typeof discountAmount === "number" ? discountAmount : Number.parseFloat(discountAmount ?? "0");
   if (!Number.isFinite(value) || value <= 0) return "None";
   return `$${value.toFixed(2)} off`;
+}
+
+/** Send is allowed only when the saved server copy matches the draft (no unsaved edits, no save in flight). */
+export function canSendEstimate(input: { hasEstimateId: boolean; isDirty: boolean; saveState: string }): boolean {
+  return input.hasEstimateId && !input.isDirty && input.saveState !== "saving";
 }

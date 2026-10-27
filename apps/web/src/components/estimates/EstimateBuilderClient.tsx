@@ -34,7 +34,7 @@ import { CustomerEstimateView } from "./CustomerEstimateView";
 import { EditableLineItemsTable } from "./EditableLineItemsTable";
 import { EstimateSendModal } from "./EstimateSendModal";
 import { EstimateChecksPanel, EstimateFrequencyOptions, EstimateTotalsCard } from "./EstimateFigmaPanels";
-import { buildEstimateSubtitle } from "./estimate-builder.utils";
+import { buildEstimateSubtitle, canSendEstimate } from "./estimate-builder.utils";
 import {
   buildEstimatePublicPath,
   computeRevenueTotals,
@@ -411,6 +411,7 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
   const hydratedEstimateIdRef = useRef<string | null>(null);
   const savedSignatureRef = useRef<string>(getDraftSignature(createDefaultDraft()));
   const draftSignature = getDraftSignature(draft);
+  const isDirty = draftSignature !== savedSignatureRef.current;
 
   const selectedCustomerId = draft.customerId || null;
   const customerDetailQuery = useCustomer(selectedCustomerId);
@@ -883,7 +884,7 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
                 </button>
                 <button
                   type="button"
-                  disabled={!anchorTier?.estimateId || saveState === "saving"}
+                  disabled={!canSendEstimate({ hasEstimateId: Boolean(anchorTier?.estimateId), isDirty, saveState })}
                   onClick={() => setSendModalOpen(true)}
                   className="rounded-[10px] bg-[#f6b400] px-4 py-2 text-sm font-semibold text-[#0f1530] disabled:cursor-not-allowed disabled:opacity-50"
                 >
@@ -1143,7 +1144,7 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
             <aside className="space-y-6">
               <EstimateChecksPanel
                 status={currentStatus}
-                discountAmount={draft.discountAmount}
+                discountAmount={activeTotals.discountAmount}
                 expiresAt={primaryEstimate?.expiresAt ?? null}
               />
               <section className="surface-card px-5 py-5">
@@ -1230,7 +1231,7 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
                     <>
                       <button
                         type="button"
-                        disabled={!anchorTier?.estimateId || saveState === "saving"}
+                        disabled={!canSendEstimate({ hasEstimateId: Boolean(anchorTier?.estimateId), isDirty, saveState })}
                         onClick={() => setSendModalOpen(true)}
                         className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-brand-accent px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-primary disabled:cursor-not-allowed disabled:opacity-50"
                       >

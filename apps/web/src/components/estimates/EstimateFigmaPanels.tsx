@@ -28,7 +28,7 @@ export function EstimateChecksPanel({
   expiresAt
 }: {
   status: EstimateStatus;
-  discountAmount: string | null | undefined;
+  discountAmount: number | string | null | undefined;
   expiresAt: string | null | undefined;
 }) {
   const pill = estimateApprovalPill(status);

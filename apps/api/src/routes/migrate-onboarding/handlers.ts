@@ -28,6 +28,7 @@ import {
   listMigrateOnboardingSources,
   setMigrateOnboardingSource
 } from "../../services/migrate-onboarding.service.js";
+import { getMigrateOnboardingIngestStatus } from "../../services/migrate-onboarding-ingest-status.service.js";
 
 export async function listMigrateOnboardingSourcesHandler(
   _request: FastifyRequest,

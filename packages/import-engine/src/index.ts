@@ -17,6 +17,17 @@ export {
   type ImportSessionIngestStatus
 } from "./session-ingest-status.js";
 export {
+  buildImportReconciliationSkippedRowsObjectKey,
+  buildImportSessionReconciliationReport,
+  buildImportSessionReconciliationReasonSummaries,
+  buildSkippedRowRecordsFromValidationErrors,
+  buildSkippedRowsCsvContent,
+  mergeReconciliationReportIntoAiInferences,
+  readImportReconciliationReportFromAiInferences,
+  type ImportSessionReconciliationInput,
+  type SkippedImportRowRecord
+} from "./import-session-reconciliation.js";
+export {
   buildImportChunkIdempotencyKey,
   DEFAULT_IMPORT_ROW_CHUNK_SIZE,
   planImportRowChunks,

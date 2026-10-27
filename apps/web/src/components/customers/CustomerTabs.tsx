@@ -16,6 +16,7 @@ import {
 } from "@/src/hooks/customers.hooks";
 import { formatCurrency, formatDate } from "@/src/lib/utils";
 
+import { CustomerFilesTab } from "./CustomerFilesTab";
 import { groupCampaignLogs, tagsToString } from "./customers.utils";
 import { CurrencyDisplay } from "../ui/CurrencyDisplay";
 import { EmptyState } from "../ui/EmptyState";
@@ -23,7 +24,7 @@ import { SkeletonCard } from "../ui/SkeletonCard";
 import { StatBadge } from "../ui/StatBadge";
 import { TimeAgo } from "../ui/TimeAgo";
 
-export type CustomerTabKey = "jobs" | "financials" | "communications";
+export type CustomerTabKey = "jobs" | "files" | "financials" | "communications";
 
 function TabButton({
   active,
@@ -439,12 +440,14 @@ export function CustomerTabs({ customerId, activeTab, onActiveTabChange }: Custo
     <section className="surface-card px-6 py-6">
       <div className="flex flex-wrap gap-2">
         <TabButton active={activeTab === "jobs"} label="Job History" onClick={() => onActiveTabChange("jobs")} />
+        <TabButton active={activeTab === "files"} label="Files" onClick={() => onActiveTabChange("files")} />
         <TabButton active={activeTab === "financials"} label="Financials" onClick={() => onActiveTabChange("financials")} />
         <TabButton active={activeTab === "communications"} label="Communications" onClick={() => onActiveTabChange("communications")} />
       </div>
 
       <div className="mt-6">
         {activeTab === "jobs" ? <JobHistoryTab customerId={customerId} /> : null}
+        {activeTab === "files" ? <CustomerFilesTab customerId={customerId} /> : null}
         {activeTab === "financials" ? <FinancialsTab customerId={customerId} /> : null}
         {activeTab === "communications" ? <CommunicationsTab customerId={customerId} /> : null}
       </div>

@@ -53,6 +53,7 @@ export function saveConfirmedBookingSnapshot(
     recurringSchedule: PublicRecurringScheduleRecord;
     scheduledStart: string;
     scheduledEnd: string;
+    manageToken?: string | null;
   }
 ): void {
   if (typeof window === "undefined") {
@@ -74,6 +75,7 @@ export function readConfirmedBookingSnapshot(
   recurringSchedule: PublicRecurringScheduleRecord;
   scheduledStart: string;
   scheduledEnd: string;
+  manageToken?: string | null;
 } | null {
   if (typeof window === "undefined") {
     return null;
@@ -92,6 +94,7 @@ export function readConfirmedBookingSnapshot(
       recurringSchedule: PublicRecurringScheduleRecord;
       scheduledStart: string;
       scheduledEnd: string;
+      manageToken?: string | null;
     };
   } catch {
     return null;

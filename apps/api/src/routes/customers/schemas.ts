@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { listCustomerHistoryTimelineQuerySchema } from "@fsm/types";
+
 import { withZodValidation } from "../shared/validation.js";
 
 const currentYear = new Date().getFullYear();
@@ -761,6 +763,24 @@ const customerNoteSchema = {
 } as const;
 
 export const getCustomerImportedHistoryRouteSchema = {
+  tags: ["customers"],
+  response: {
+    200: {
+      type: "object",
+      additionalProperties: true
+    },
+    400: errorResponseSchema,
+    401: errorResponseSchema,
+    404: errorResponseSchema
+  }
+} as const;
+
+export const listCustomerHistoryTimelineValidation = withZodValidation({
+  params: CustomerIdParamsSchema,
+  query: listCustomerHistoryTimelineQuerySchema
+});
+
+export const getCustomerHistoryTimelineRouteSchema = {
   tags: ["customers"],
   response: {
     200: {

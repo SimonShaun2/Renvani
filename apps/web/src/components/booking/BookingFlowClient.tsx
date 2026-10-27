@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
@@ -1076,6 +1077,15 @@ export function BookingConfirmed({
               <p className="font-semibold text-neutral-900">Recurring &amp; VIP schedule</p>
               <p className="mt-2 leading-6">{recurringMessage}</p>
             </div>
+          ) : null}
+
+          {confirmedSnapshot?.manageToken ? (
+            <Link
+              href={`/book/${slug}/manage?token=${encodeURIComponent(confirmedSnapshot.manageToken)}`}
+              className="mt-5 inline-flex min-h-11 w-full items-center justify-center rounded-[20px] border border-neutral-200 bg-white px-4 text-sm font-semibold text-neutral-900"
+            >
+              Reschedule or cancel online
+            </Link>
           ) : null}
 
           <div className="mt-5 rounded-[24px] border border-neutral-200 bg-white px-4 py-4">

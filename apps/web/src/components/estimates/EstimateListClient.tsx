@@ -15,10 +15,10 @@ import { cn, formatDate } from "@/src/lib/utils";
 import {
   formatStatusLabel,
   getEstimateStatusTone,
-  groupEstimateList
+  groupEstimateList,
+  matchesEstimateFilter,
+  type EstimateFilter
 } from "./estimates.utils";
-
-type EstimateFilter = "all" | "draft" | "sent" | "approved" | "declined" | "expired";
 
 const filterOptions: Array<{ value: EstimateFilter; label: string }> = [
   { value: "all", label: "All" },
@@ -26,20 +26,12 @@ const filterOptions: Array<{ value: EstimateFilter; label: string }> = [
   { value: "sent", label: "Sent" },
   { value: "approved", label: "Approved" },
   { value: "declined", label: "Declined" },
-  { value: "expired", label: "Expired" }
+  { value: "expired", label: "Expired" },
+  { value: "revised", label: "Revised" },
+  { value: "converted", label: "Converted" }
 ];
 
-function matchesEstimateFilter(status: string, filter: EstimateFilter): boolean {
-  if (filter === "all") {
-    return true;
-  }
-
-  if (filter === "sent") {
-    return status === "sent" || status === "viewed";
-  }
-
-  return status === filter;
-}
+const LIST_LIMIT = 200;
 
 export function EstimateListClient() {
   const [filter, setFilter] = useState<EstimateFilter>("all");
@@ -49,7 +41,7 @@ export function EstimateListClient() {
 
   const estimatesQuery = useEstimates({
     page: 1,
-    limit: 200,
+    limit: LIST_LIMIT,
     sortBy: "createdAt",
     sortOrder: "desc"
   });
@@ -117,7 +109,12 @@ export function EstimateListClient() {
         </Link>
       )}
     >
-      <section className="surface-card overflow-hidden">
+      {(estimatesQuery.data?.total ?? 0) > LIST_LIMIT ? (
+        <p className="mb-3 text-sm text-neutral-500" role="status">
+          Showing the {LIST_LIMIT} most recent estimates. Use search to find older quotes.
+        </p>
+      ) : null}
+      <section className="surface-card overflow-hidden" data-estimates-reveal>
         <div className="flex flex-col gap-4 border-b border-neutral-200 px-5 py-5 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex flex-wrap items-center gap-2">
             {filterOptions.map((option) => (

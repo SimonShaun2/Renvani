@@ -49,6 +49,7 @@ import { generateJobNumber } from "../lib/job-number.js";
 import { attachConfirmedBookingToRecurringSchedules } from "./booking-recurring-schedule.service.js";
 import { assertNonTerminalBookingRequest } from "./booking-request-guards.js";
 import { invalidateDispatchCache } from "./dispatch.service.js";
+import { issueBookingManageTokenIfEligible } from "../lib/booking-manage-token.js";
 
 type BookingRequestRow = typeof bookingRequests.$inferSelect;
 type BookingSettingsRow = typeof bookingSettings.$inferSelect;
@@ -1232,7 +1233,12 @@ export async function confirmPublicBookingSlot(
   slug: string,
   referenceNumber: string,
   input: ConfirmBookingRequestInput
-): Promise<{ bookingRequest: BookingRequest; jobId: string; recurringSchedule: Awaited<ReturnType<typeof attachConfirmedBookingToRecurringSchedules>> }> {
+): Promise<{
+  bookingRequest: BookingRequest;
+  jobId: string;
+  recurringSchedule: Awaited<ReturnType<typeof attachConfirmedBookingToRecurringSchedules>>;
+  manageToken: string | null;
+}> {
   const normalizedRef = referenceNumber.trim();
   const { settings } = await getCompanyByBookingSlug(slug, db);
   const bookingRows = await db
@@ -1267,10 +1273,22 @@ export async function confirmPublicBookingSlot(
     throw new AppError(ErrorCode.INTERNAL_ERROR, "Confirmed booking is missing job linkage");
   }
 
+  const manageToken = issueBookingManageTokenIfEligible(
+    {
+      companyId: settings.companyId,
+      bookingRequestId: confirmed.bookingRequest.id,
+      jobId: confirmed.jobId,
+      bookingSlug: slug,
+      referenceNumber: normalizedRef
+    },
+    { linked: confirmed.recurringSchedule.linked, scheduleKind: confirmed.recurringSchedule.scheduleKind }
+  );
+
   return {
     bookingRequest: confirmed.bookingRequest,
     jobId: confirmed.jobId,
-    recurringSchedule: confirmed.recurringSchedule
+    recurringSchedule: confirmed.recurringSchedule,
+    manageToken
   };
 }
 

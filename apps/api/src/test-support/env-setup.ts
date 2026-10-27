@@ -16,6 +16,7 @@ const TEST_ENV_VALUES = {
   TWILIO_ACCOUNT_SID: "twilio_sid",
   TWILIO_AUTH_TOKEN: "twilio_token",
   TWILIO_FROM_NUMBER: "+15555555555",
+  RESEND_API_KEY: "",
   SENDGRID_API_KEY: "sendgrid_dummy",
   SENDGRID_FROM_EMAIL: "noreply@example.com",
   R2_ACCOUNT_ID: "r2_account",

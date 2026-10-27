@@ -4,6 +4,7 @@ import type {
   CreateAssetInput,
   CreateCustomerInput,
   CreatePropertyInput,
+  ListCustomerHistoryTimelineQuery,
   ListCustomersQuery,
   UpdateAssetInput,
   UpdateCustomerInput,
@@ -26,6 +27,7 @@ import {
   updateCustomer
 } from "../../services/customer.service.js";
 import { getCustomerImportedHistory } from "../../services/customer-imported-history.service.js";
+import { listCustomerHistoryTimeline } from "../../services/customer-history-timeline.service.js";
 import {
   createProperty,
   deleteProperty,
@@ -315,6 +317,16 @@ export async function getCustomerImportedHistoryHandler(
   const params = request.params as CustomerIdParams;
   const history = await getCustomerImportedHistory(request.company.id, params.id);
   return reply.send(history);
+}
+
+export async function getCustomerHistoryTimelineHandler(
+  request: FastifyRequest,
+  reply: FastifyReply
+): Promise<FastifyReply> {
+  const params = request.params as CustomerIdParams;
+  const query = request.query as ListCustomerHistoryTimelineQuery;
+  const timeline = await listCustomerHistoryTimeline(request.company.id, params.id, query);
+  return reply.send(timeline);
 }
 
 export async function getCustomerNotesHandler(

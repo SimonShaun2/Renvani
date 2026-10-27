@@ -66,6 +66,10 @@
       "types": "./dist/stripe-pricing.d.ts",
       "import": "./dist/stripe-pricing.js"
     },
+    "./renvani-plan-entitlements": {
+      "types": "./dist/renvani-plan-entitlements.d.ts",
+      "import": "./dist/renvani-plan-entitlements.js"
+    },
     "./stripe-branding": {
       "types": "./dist/stripe-branding.d.ts",
       "import": "./dist/stripe-branding.js"

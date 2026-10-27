@@ -2,20 +2,31 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 
 import { env } from "./env.js";
 
+/**
+ * Legacy grace period: tokens issued before expiry was added carry no exp segment.
+ * They are accepted until this fixed cutoff (deploy date 2026-10-24 + 30 days), then rejected.
+ * Remove the legacy branch after this date.
+ */
+export const LEGACY_TOKEN_CUTOFF = new Date("2026-11-23T00:00:00Z");
+
 function signingSecret(): string {
   return env.JWT_SECRET;
 }
 
-function encodePayload(companyId: string, customerId: string, vipTierId: string): string {
-  return `${companyId}:${customerId}:${vipTierId}`;
+export const VIP_MEMBERSHIP_JOIN_TOKEN_TTL_SECONDS = 30 * 24 * 60 * 60;
+
+function encodePayload(companyId: string, customerId: string, vipTierId: string, expiresAt: number): string {
+  return `${companyId}:${customerId}:${vipTierId}:${expiresAt}`;
 }
 
 export function signVipMembershipJoinToken(
   companyId: string,
   customerId: string,
-  vipTierId: string
+  vipTierId: string,
+  ttlSeconds: number = VIP_MEMBERSHIP_JOIN_TOKEN_TTL_SECONDS
 ): string {
-  const payload = encodePayload(companyId, customerId, vipTierId);
+  const expiresAt = Math.floor(Date.now() / 1000) + ttlSeconds;
+  const payload = encodePayload(companyId, customerId, vipTierId, expiresAt);
   const signature = createHmac("sha256", signingSecret()).update(payload).digest("base64url");
   return `${payload}.${signature}`;
 }
@@ -42,8 +53,21 @@ export function verifyVipMembershipJoinToken(
     return null;
   }
 
-  const [companyId, customerId, vipTierId] = payload.split(":");
-  if (!companyId || !customerId || !vipTierId) {
+  const [companyId, customerId, vipTierId, expiresAtRaw, ...rest] = payload.split(":");
+  if (!companyId || !customerId || !vipTierId || rest.length > 0) {
+    return null;
+  }
+
+  if (expiresAtRaw === undefined) {
+    return Date.now() < LEGACY_TOKEN_CUTOFF.getTime() ? { companyId, customerId, vipTierId } : null;
+  }
+
+  const expiresAt = Number(expiresAtRaw);
+  if (!Number.isInteger(expiresAt)) {
+    return null;
+  }
+
+  if (expiresAt <= Math.floor(Date.now() / 1000)) {
     return null;
   }
 

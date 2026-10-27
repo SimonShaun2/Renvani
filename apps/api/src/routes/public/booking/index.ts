@@ -2,6 +2,8 @@ import type { FastifyPluginAsync, FastifyReply, FastifyRequest } from "fastify";
 
 import {
   checkPublicBookingIpRateLimit,
+  checkPublicBookingManageTokenRateLimit,
+  checkPublicSlotHoldIpAndCompanyRateLimit,
   checkPublicSlotHoldReferenceRateLimit
 } from "../../../lib/public-booking-rate-limit.js";
 import {
@@ -15,6 +17,20 @@ import {
   inspectPublicBookingHoldTokenHandler,
   submitBookingRequestHandler
 } from "./handlers.js";
+import {
+  cancelBookingSelfServiceHandler,
+  getBookingSelfServiceAvailabilityHandler,
+  getBookingSelfServiceHandler,
+  holdBookingSelfServiceSlotHandler,
+  rescheduleBookingSelfServiceHandler
+} from "./manage-handlers.js";
+import {
+  bookingManageAvailabilityValidation,
+  bookingManageCancelValidation,
+  bookingManageHoldValidation,
+  bookingManageRescheduleValidation,
+  bookingManageTokenValidation
+} from "./manage-schemas.js";
 import {
   availabilityRouteSchema,
   availabilityValidation,
@@ -53,6 +69,19 @@ async function bookingRateLimit(request: FastifyRequest, reply: FastifyReply): P
   }
 }
 
+async function bookingManageRateLimit(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+  const allowed = await checkPublicBookingManageTokenRateLimit(request.ip);
+
+  if (!allowed) {
+    await reply.status(429).send({
+      error: "RATE_LIMITED",
+      message: "Too many manage-link requests. Please try again later.",
+      requestId: request.id
+    });
+    return;
+  }
+}
+
 async function bookingSlotHoldReferenceRateLimit(
   request: FastifyRequest,
   reply: FastifyReply
@@ -75,6 +104,32 @@ async function bookingSlotHoldReferenceRateLimit(
     await reply.status(429).send({
       error: "RATE_LIMITED",
       message: "Too many slot hold attempts for this booking reference. Please try again later.",
+      requestId: request.id
+    });
+    return;
+  }
+}
+
+/** FS-66 — per-IP and per-company limits on slot-hold/confirm, with Retry-After. */
+async function bookingSlotHoldIpCompanyRateLimit(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+  if (request.method !== "POST") {
+    return;
+  }
+
+  const params = request.params as { slug?: string };
+  const slug = params.slug?.trim() ?? "";
+
+  if (slug.length === 0) {
+    return;
+  }
+
+  const result = await checkPublicSlotHoldIpAndCompanyRateLimit(request.ip, slug);
+
+  if (!result.allowed) {
+    reply.header("Retry-After", String(result.retryAfterSeconds));
+    await reply.status(429).send({
+      error: "RATE_LIMITED",
+      message: "Too many slot hold attempts. Please try again later.",
       requestId: request.id
     });
     return;
@@ -113,12 +168,12 @@ const publicBookingRoutes: FastifyPluginAsync = async (fastify) => {
   }, getBookingConfirmationHandler);
 
   fastify.post("/:slug/requests/:ref/slot-hold", {
-    preValidation: [bookingRateLimit, bookingSlotHoldReferenceRateLimit, publicHoldBookingSlotValidation],
+    preValidation: [bookingRateLimit, bookingSlotHoldIpCompanyRateLimit, bookingSlotHoldReferenceRateLimit, publicHoldBookingSlotValidation],
     schema: publicSlotHoldRouteSchema
   }, holdPublicBookingSlotHandler);
 
   fastify.post("/:slug/requests/:ref/confirm", {
-    preValidation: [bookingRateLimit, bookingSlotHoldReferenceRateLimit, publicConfirmBookingSlotValidation],
+    preValidation: [bookingRateLimit, bookingSlotHoldIpCompanyRateLimit, bookingSlotHoldReferenceRateLimit, publicConfirmBookingSlotValidation],
     schema: publicConfirmBookingSlotRouteSchema
   }, confirmPublicBookingSlotHandler);
 
@@ -126,6 +181,26 @@ const publicBookingRoutes: FastifyPluginAsync = async (fastify) => {
     preValidation: [bookingRateLimit, publicInspectHoldTokenValidation],
     schema: publicInspectHoldTokenRouteSchema
   }, inspectPublicBookingHoldTokenHandler);
+
+  fastify.get("/manage/:token", {
+    preValidation: [bookingManageRateLimit, bookingManageTokenValidation]
+  }, getBookingSelfServiceHandler);
+
+  fastify.get("/manage/:token/availability", {
+    preValidation: [bookingManageRateLimit, bookingManageAvailabilityValidation]
+  }, getBookingSelfServiceAvailabilityHandler);
+
+  fastify.post("/manage/:token/slot-hold", {
+    preValidation: [bookingManageRateLimit, bookingManageHoldValidation]
+  }, holdBookingSelfServiceSlotHandler);
+
+  fastify.post("/manage/:token/reschedule", {
+    preValidation: [bookingManageRateLimit, bookingManageRescheduleValidation]
+  }, rescheduleBookingSelfServiceHandler);
+
+  fastify.post("/manage/:token/cancel", {
+    preValidation: [bookingManageRateLimit, bookingManageCancelValidation]
+  }, cancelBookingSelfServiceHandler);
 };
 
 export default publicBookingRoutes;

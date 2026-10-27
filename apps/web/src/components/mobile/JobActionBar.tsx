@@ -11,9 +11,10 @@ import { showToast } from "@/src/stores/toast.store";
 interface JobActionBarProps {
   jobId: string;
   status: JobStatus;
+  onAddParts?: () => void;
 }
 
-export function JobActionBar({ jobId, status }: JobActionBarProps) {
+export function JobActionBar({ jobId, status, onAddParts }: JobActionBarProps) {
   const router = useRouter();
   const transitionJob = useTransitionJob(jobId);
 
@@ -45,7 +46,7 @@ export function JobActionBar({ jobId, status }: JobActionBarProps) {
               className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-2xl border border-neutral-200 bg-white px-4 text-sm font-semibold text-neutral-700"
             >
               <CarFront className="h-4 w-4" />
-              OTW
+              On the way
             </Link>
             <button
               type="button"
@@ -56,19 +57,30 @@ export function JobActionBar({ jobId, status }: JobActionBarProps) {
               className="inline-flex min-h-11 flex-[1.2] items-center justify-center gap-2 rounded-2xl bg-brand-accent px-4 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
             >
               <Play className="h-4 w-4" />
-              {transitionJob.isPending ? "Starting..." : "Start Job"}
+              {transitionJob.isPending ? "Starting..." : "Start job"}
             </button>
           </>
         ) : null}
 
         {status === "in_progress" ? (
-          <Link
-            href={`/mobile/jobs/${jobId}/complete`}
-            className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl bg-brand-accent px-4 text-sm font-semibold text-white"
-          >
-            <CheckCircle2 className="h-4 w-4" />
-            Complete Job
-          </Link>
+          <>
+            {onAddParts ? (
+              <button
+                type="button"
+                onClick={onAddParts}
+                className="inline-flex min-h-[52px] flex-1 items-center justify-center rounded-[12px] border border-[#e6dccb] bg-white px-4 text-[15px] font-semibold text-[#0f1530]"
+              >
+                Add parts
+              </button>
+            ) : null}
+            <Link
+              href={`/mobile/jobs/${jobId}/complete`}
+              className="inline-flex min-h-[52px] flex-1 items-center justify-center gap-2 rounded-[12px] bg-[#f6b400] px-4 text-[15px] font-semibold text-[#0f1530]"
+            >
+              <CheckCircle2 className="h-4 w-4" />
+              Complete job
+            </Link>
+          </>
         ) : null}
 
         {(status === "completed" || status === "invoiced" || status === "paid") ? (

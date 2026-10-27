@@ -80,6 +80,13 @@ const STATIC_PAGE_META: Array<{ prefix: string; meta: PageMeta }> = [
     }
   },
   {
+    prefix: "/inventory",
+    meta: {
+      title: "Inventory",
+      subtitle: "Stock on hand across warehouses and vans."
+    }
+  },
+  {
     prefix: "/review-requests",
     meta: {
       title: "Review Requests",

@@ -14,3 +14,14 @@ describe("buildEstimatePublicPath", () => {
     expect(buildEstimatePublicPath("")).toBeNull();
   });
 });
+
+describe("matchesEstimateFilter (FS-174)", () => {
+  it("treats viewed as sent and supports revised/converted", async () => {
+    const { matchesEstimateFilter } = await import("./estimates.utils");
+    expect(matchesEstimateFilter("viewed", "sent")).toBe(true);
+    expect(matchesEstimateFilter("converted", "converted")).toBe(true);
+    expect(matchesEstimateFilter("revised", "revised")).toBe(true);
+    expect(matchesEstimateFilter("revised", "draft")).toBe(false);
+    expect(matchesEstimateFilter("declined", "all")).toBe(true);
+  });
+});

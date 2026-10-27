@@ -8,6 +8,7 @@ import { FileText, Plus, Search } from "lucide-react";
 import { PageLayout } from "@/src/components/layout/PageLayout";
 import { CurrencyDisplay } from "@/src/components/ui/CurrencyDisplay";
 import { EmptyState } from "@/src/components/ui/EmptyState";
+import { ErrorState } from "@/src/components/ui/ErrorState";
 import { Sheet } from "@/src/components/ui/Sheet";
 import { SkeletonCard } from "@/src/components/ui/SkeletonCard";
 import { StatBadge } from "@/src/components/ui/StatBadge";
@@ -274,7 +275,15 @@ export function InvoiceListClient() {
               </label>
             </div>
 
-            {visibleInvoices.length === 0 ? (
+            {invoicesQuery.isError ? (
+          <div className="px-5 py-10">
+            <ErrorState
+              title="Invoices could not be loaded"
+              onRetry={() => void invoicesQuery.refetch()}
+              isRetrying={invoicesQuery.isFetching}
+            />
+          </div>
+        ) : visibleInvoices.length === 0 ? (
               <div className="px-5 py-10">
                 <EmptyState
                   icon={FileText}

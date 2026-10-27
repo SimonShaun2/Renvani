@@ -32,6 +32,7 @@ import estimateRoutes from "./routes/estimates/index.js";
 import growthCheckScanRoutes from "./routes/growth-check/index.js";
 import invoiceRoutes from "./routes/invoices/index.js";
 import importRoutes from "./routes/imports/index.js";
+import importReconciliationRoutes from "./routes/import-reconciliation/index.js";
 import internalAdminQueueRoutes from "./routes/internal-admin/queues/index.js";
 import internalAdminQboSyncRoutes from "./routes/internal-admin/qbo-sync/index.js";
 import quickbooksOnlineRoutes from "./routes/quickbooks-online/index.js";
@@ -135,6 +136,7 @@ export async function buildApp() {
   await app.register(estimateRoutes, { prefix: "/api/v1/estimates" });
   await app.register(invoiceRoutes, { prefix: "/api/v1" });
   await app.register(importRoutes, { prefix: "/api/v1" });
+  await app.register(importReconciliationRoutes, { prefix: "/api/v1" });
   await app.register(migrateOnboardingRoutes, { prefix: "/api/v1" });
   await app.register(migratePhotoLinkRoutes, { prefix: "/api/v1" });
   await app.register(dataExportRoutes, { prefix: "/api/v1" });

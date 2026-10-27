@@ -16,6 +16,7 @@ export * from "./field-work-sync/v1/index.js";
 export * from "./estimate.types.js";
 export * from "./file-attachment.types.js";
 export * from "./import.types.js";
+export * from "./import-reconciliation.schemas.js";
 export * from "./import-invoice-balance.types.js";
 export * from "./import-communications.types.js";
 export * from "./import-history-chunk.types.js";

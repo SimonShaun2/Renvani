@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { CarFront, MapPinned, Phone, Sparkles } from "lucide-react";
+import { CarFront, Sparkles } from "lucide-react";
 
 import { EmptyState } from "@/src/components/ui/EmptyState";
 import { SkeletonCard } from "@/src/components/ui/SkeletonCard";
@@ -289,30 +289,6 @@ export function MobileJobDetail({ jobId }: { jobId: string }) {
                     <li>• {job.property.addressLine1}, {job.property.city}, {job.property.state}</li>
                   ) : null}
                 </ul>
-                <div className="mt-4 grid grid-cols-2 gap-2">
-                  <a
-                    href={job.customer.phone ? `tel:${job.customer.phone}` : undefined}
-                    aria-disabled={!job.customer.phone}
-                    className={cn(
-                      "inline-flex min-h-11 items-center justify-center gap-2 rounded-[10px] text-sm font-semibold",
-                      job.customer.phone ? "bg-white/10 text-white" : "bg-white/5 text-white/40"
-                    )}
-                  >
-                    <Phone className="h-4 w-4" />
-                    Call
-                  </a>
-                  <a
-                    href={`https://maps.google.com/?q=${encodeURIComponent(
-                      `${job.property?.addressLine1 ?? ""}, ${job.property?.city ?? ""}, ${job.property?.state ?? ""}`
-                    )}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[10px] bg-white/10 text-sm font-semibold text-white"
-                  >
-                    <MapPinned className="h-4 w-4" />
-                    Map
-                  </a>
-                </div>
               </section>
 
               <CrewChecklist jobId={job.id} tasks={tasks} label="Checklist" emptyText="No checklist items on this job." />
@@ -326,7 +302,7 @@ export function MobileJobDetail({ jobId }: { jobId: string }) {
                   onClick={() => handleTabChange("files")}
                   className="mt-2 inline-flex min-h-11 items-center text-sm font-semibold text-[#2d4bd8]"
                 >
-                  + Add photo
+                  + Add photo or note
                 </button>
               </section>
 

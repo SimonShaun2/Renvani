@@ -93,8 +93,8 @@ export function OTWScreen() {
       <div className="mx-auto w-full max-w-[390px] space-y-4">
         <header className="space-y-3">
           <div className="flex items-center gap-3">
-            <Link href={`/mobile/jobs/${job.id}`} className="inline-flex min-h-11 items-center text-sm text-[#5e6684]">
-              ‹ Job
+            <Link href="/mobile/jobs" className="inline-flex min-h-11 items-center text-sm text-[#5e6684]">
+              ‹ Today
             </Link>
             <span className={cn("inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold", getCrewStatusTone("dispatched"))}>
               <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-current" />
@@ -106,10 +106,6 @@ export function OTWScreen() {
           </h1>
           <p className="text-sm text-[#5e6684]">
             {[job.jobNumber, job.title, job.property?.addressLine1 ?? "Address pending"].join(" · ")}
-          </p>
-          <p className="text-sm text-[#5e6684]">
-            {job.scheduledStart ? formatDateTime(job.scheduledStart) : "Time TBD"}
-            {job.scheduledEnd ? ` - ${formatDateTime(job.scheduledEnd)}` : ""}
           </p>
         </header>
 

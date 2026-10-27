@@ -43,9 +43,25 @@ export async function recordTransactionalEmailMessageLog(input: {
       })
       .onConflictDoNothing();
   } catch (error) {
+    // Never log the error object/message: drizzle errors include the failed SQL and its params (PII).
     logger.warn(
-      { err: error, companyId: input.companyId, sourceSystem: input.sourceSystem, sourceId: input.sourceId },
+      { errorName: safeErrorName(error), errorCode: safeErrorCode(error), companyId: input.companyId, sourceSystem: input.sourceSystem, sourceId: input.sourceId },
       "Failed to record transactional email message log; continuing"
     );
   }
+}
+
+function safeErrorName(error: unknown): string {
+  return error instanceof Error ? error.name : typeof error;
+}
+
+function safeErrorCode(error: unknown): string | undefined {
+  const pick = (value: unknown): string | undefined => {
+    if (value && typeof value === "object" && "code" in value) {
+      const code = (value as { code?: unknown }).code;
+      if (typeof code === "string") return code;
+    }
+    return undefined;
+  };
+  return pick(error) ?? pick(error && typeof error === "object" ? (error as { cause?: unknown }).cause : undefined);
 }

@@ -48,4 +48,22 @@ describe("recordTransactionalEmailMessageLog", () => {
     await expect(recordTransactionalEmailMessageLog(input)).resolves.toBeUndefined();
     expect(warnLogMock).toHaveBeenCalledTimes(1);
   });
+
+  it("logs only the error name and Postgres code, never SQL, params, email or subject", async () => {
+    const cause = Object.assign(new Error("duplicate key"), { code: "23505" });
+    const dbError = Object.assign(
+      new Error('Failed query: insert into "message_logs" params: a@example.com,Confirmed'),
+      { query: 'insert into "message_logs"', params: ["a@example.com", "Confirmed"], cause }
+    );
+    onConflictDoNothingMock.mockRejectedValueOnce(dbError);
+    await recordTransactionalEmailMessageLog(input);
+    const payload = (warnLogMock.mock.calls[0] as unknown[])[0] as Record<string, unknown>;
+    expect(payload.errorName).toBe("Error");
+    expect(payload.errorCode).toBe("23505");
+    expect(payload).not.toHaveProperty("err");
+    const serialized = JSON.stringify(payload);
+    for (const leak of ["a@example.com", "Confirmed", "insert into", "params", "Failed query"]) {
+      expect(serialized).not.toContain(leak);
+    }
+  });
 });

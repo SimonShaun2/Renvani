@@ -33,6 +33,7 @@ import {
 } from "@/src/components/jobs/jobs.utils";
 
 import { JobActionBar } from "./JobActionBar";
+import { MobileJobNoteComposer } from "./MobileJobNoteComposer";
 import { TabletJobDetail } from "./tablet/TabletJobDetail";
 
 type MobileJobTab = "details" | "tasks" | "products" | "files";
@@ -340,12 +341,12 @@ export function MobileJobDetail({ jobId }: { jobId: string }) {
               <section className="rounded-[28px] border border-neutral-200 bg-white px-4 py-4 shadow-sm">
                 <div className="flex items-center justify-between gap-3">
                   <p className="text-sm font-semibold text-neutral-950">Notes</p>
-                  <span className="text-xs font-semibold text-brand-accent">✎ Edit</span>
                 </div>
                 <p className="mt-3 text-sm leading-6 text-neutral-600">
                   {job.description ?? "Customer reported issue and technician notes will show here as the job progresses."}
                 </p>
                 {job.techNotes ? <p className="mt-3 rounded-[20px] bg-neutral-50 px-3 py-3 text-sm text-neutral-500">{job.techNotes}</p> : null}
+                <MobileJobNoteComposer jobId={job.id} />
               </section>
 
               <MobileTimeCard jobId={job.id} technicianId={job.technicianId} />

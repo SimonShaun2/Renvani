@@ -28,3 +28,10 @@ describe("request-log-path", () => {
     );
   });
 });
+
+describe("requestPathForLog manage token", () => {
+  it("redacts manage token in both branches", () => {
+    expect(requestPathForLog("/api/v1/public/booking/manage/tok123")).toBe("/api/v1/public/booking/manage/[REDACTED]");
+    expect(requestPathForLog("/api/v1/public/booking/manage/tok123?a=1")).toBe("/api/v1/public/booking/manage/[REDACTED]");
+  });
+});

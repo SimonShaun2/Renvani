@@ -19,7 +19,6 @@ export interface BookingSettings {
   balanceWorkload: boolean | null;
   notifyOnNewBooking: boolean | null;
   notificationEmail: string | null;
-  customerSelfServiceCutoffHours: number;
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;

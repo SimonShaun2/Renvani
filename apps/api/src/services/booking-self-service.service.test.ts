@@ -55,8 +55,7 @@ async function confirmOneOffBooking(referenceNumber = "BK-SELF-001") {
   fakeDb.seedBookingSettings({
     companyId: company.id,
     bookingSlug: "acme-hvac",
-    isEnabled: true,
-    customerSelfServiceCutoffHours: 24
+    isEnabled: true
   });
   const technician = fakeDb.seedTechnician({
     companyId: company.id,

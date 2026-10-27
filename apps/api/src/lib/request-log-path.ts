@@ -4,10 +4,10 @@
 export function requestPathForLog(rawUrl: string): string {
   const questionIndex = rawUrl.indexOf("?");
   if (questionIndex === -1) {
-    return rawUrl;
+    return redactManageTokenInPath(rawUrl);
   }
 
-  return rawUrl.slice(0, questionIndex);
+  return redactManageTokenInPath(rawUrl.slice(0, questionIndex));
 }
 
 const BOOKING_MANAGE_TOKEN_PATH = /(\/public\/booking\/manage\/)[^/?#]+/g;

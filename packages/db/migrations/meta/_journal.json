@@ -281,13 +281,6 @@
       "when": 1777713000000,
       "tag": "0039_fs160b_clerk_unlink_tombstone",
       "breakpoints": true
-    },
-    {
-      "idx": 40,
-      "version": "7",
-      "when": 1777714000000,
-      "tag": "0042_fs153_booking_self_service_cutoff",
-      "breakpoints": true
     }
   ]
 }

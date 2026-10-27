@@ -2142,7 +2142,6 @@ export const bookingSettings = pgTable("booking_settings", {
   balanceWorkload: boolean("balance_workload").default(true),
   notifyOnNewBooking: boolean("notify_on_new_booking").default(true),
   notificationEmail: varchar("notification_email", { length: 255 }),
-  customerSelfServiceCutoffHours: integer("customer_self_service_cutoff_hours").default(24).notNull(),
   ...timestamps,
 }, (t) => ({
   companyIdx: uniqueIndex("booking_settings_company_idx").on(t.companyId),

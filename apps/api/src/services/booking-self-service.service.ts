@@ -82,12 +82,11 @@ async function assertHoldSlotMatchesPublishedAvailability(
 }
 
 /**
- * MVP: the self-service cutoff is fixed at 24 hours. There is no settings write path;
- * the customer_self_service_cutoff_hours column keeps its default of 24 and is not read.
+ * MVP: the self-service cutoff is fixed at 24 hours (no per-company setting, no column).
  */
 export const BOOKING_SELF_SERVICE_CUTOFF_HOURS = 24;
 
-function resolveCutoffHours(_settingsRow: { customerSelfServiceCutoffHours: number | null }): number {
+function resolveCutoffHours(_settingsRow: unknown): number {
   return BOOKING_SELF_SERVICE_CUTOFF_HOURS;
 }
 

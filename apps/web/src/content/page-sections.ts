@@ -37,17 +37,10 @@ export type PageSection = {
 
 type CmsItem = { isArchived?: boolean; isDraft?: boolean; fieldData: Record<string, unknown> };
 
-const FEE_RULES: Array<[RegExp, string]> = [
-  [/Platform fee \(5%, paid by customer\)/gi, "Service Fee (2%, paid by customer)"],
-  [/Platform fee \(5%\)/gi, "Service Fee (2%, paid by customer)"]
-];
-
 /** Copy rules applied to every rendered CMS/static string. */
 export function applyCopyRules(text: string): string {
-  let out = text;
-  for (const [re, to] of FEE_RULES) out = out.replace(re, to);
   // Editorial "[confirm: …]" notes are never shown publicly.
-  out = out.replace(/\s*\[confirm:[^\]]*\]/gi, "");
+  const out = text.replace(/\s*\[confirm:[^\]]*\]/gi, "");
   return out.trim();
 }
 

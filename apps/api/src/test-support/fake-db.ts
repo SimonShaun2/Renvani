@@ -38,6 +38,9 @@ type TableName =
   | "scheduleSlots"
   | "activityEvents"
   | "timeEntries"
+  | "timesheets"
+  | "timesheetAuditEvents"
+  | "technicianPayRates"
   | "reviewRequests"
   | "fileAttachments"
   | "onTheWayNotifications"
@@ -1994,6 +1997,9 @@ export interface TestBookingSettingsRecord {
 }
 
 type AnyTestRecord =
+  | TestTimesheetRecord
+  | TestTimesheetAuditEventRecord
+  | TestTechnicianPayRateRecord
   | TestCompanyRecord
   | TestUserRecord
   | TestRefreshTokenRecord
@@ -2075,6 +2081,9 @@ type MockTable =
   | typeof scheduleSlotsTable
   | typeof activityEventsTable
   | typeof timeEntriesTable
+  | typeof timesheetsTable
+  | typeof timesheetAuditEventsTable
+  | typeof technicianPayRatesTable
   | typeof reviewRequestsTable
   | typeof fileAttachmentsTable
   | typeof onTheWayNotificationsTable
@@ -2124,6 +2133,9 @@ interface TestState {
   scheduleSlots: TestScheduleSlotRecord[];
   activityEvents: TestActivityEventRecord[];
   timeEntries: TestTimeEntryRecord[];
+  timesheets: TestTimesheetRecord[];
+  timesheetAuditEvents: TestTimesheetAuditEventRecord[];
+  technicianPayRates: TestTechnicianPayRateRecord[];
   reviewRequests: TestReviewRequestRecord[];
   fileAttachments: TestFileAttachmentRecord[];
   onTheWayNotifications: TestOnTheWayNotificationRecord[];
@@ -2925,6 +2937,135 @@ const timeEntriesTable = {
   deletedAt: "deletedAt"
 } as const;
 
+
+// FS-171 timesheets / payroll tables.
+export interface TestTimesheetRecord {
+  id: string;
+  companyId: string;
+  technicianId: string;
+  periodStart: string;
+  periodEnd: string;
+  status: string;
+  submittedAt: Date | null;
+  submittedById: string | null;
+  approvedAt: Date | null;
+  approvedById: string | null;
+  rejectedAt: Date | null;
+  rejectedById: string | null;
+  rejectionReason: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date | null;
+}
+
+export interface TestTimesheetAuditEventRecord {
+  id: string;
+  companyId: string;
+  timesheetId: string | null;
+  timeEntryId: string | null;
+  action: string;
+  actorUserId: string | null;
+  reason: string | null;
+  before: unknown;
+  after: unknown;
+  createdAt: Date;
+}
+
+export interface TestTechnicianPayRateRecord {
+  id: string;
+  companyId: string;
+  technicianId: string;
+  hourlyRateCents: number;
+  effectiveFrom: string;
+  createdById: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date | null;
+}
+
+const timesheetsTable = {
+  __name: "timesheets",
+  id: "id", companyId: "companyId", technicianId: "technicianId", periodStart: "periodStart", periodEnd: "periodEnd",
+  status: "status", submittedAt: "submittedAt", submittedById: "submittedById", approvedAt: "approvedAt",
+  approvedById: "approvedById", rejectedAt: "rejectedAt", rejectedById: "rejectedById", rejectionReason: "rejectionReason",
+  createdAt: "createdAt", updatedAt: "updatedAt", deletedAt: "deletedAt"
+} as const;
+
+const timesheetAuditEventsTable = {
+  __name: "timesheetAuditEvents",
+  id: "id", companyId: "companyId", timesheetId: "timesheetId", timeEntryId: "timeEntryId", action: "action",
+  actorUserId: "actorUserId", reason: "reason", before: "before", after: "after", createdAt: "createdAt"
+} as const;
+
+const technicianPayRatesTable = {
+  __name: "technicianPayRates",
+  id: "id", companyId: "companyId", technicianId: "technicianId", hourlyRateCents: "hourlyRateCents",
+  effectiveFrom: "effectiveFrom", createdById: "createdById", createdAt: "createdAt", updatedAt: "updatedAt", deletedAt: "deletedAt"
+} as const;
+
+function createTimesheetRecord(
+  values: Partial<TestTimesheetRecord> & Pick<TestTimesheetRecord, "companyId" | "technicianId" | "periodStart" | "periodEnd">
+): TestTimesheetRecord {
+  const now = new Date();
+  return {
+    id: values.id ?? nextId(), companyId: values.companyId, technicianId: values.technicianId,
+    periodStart: values.periodStart, periodEnd: values.periodEnd, status: values.status ?? "open",
+    submittedAt: values.submittedAt ?? null, submittedById: values.submittedById ?? null,
+    approvedAt: values.approvedAt ?? null, approvedById: values.approvedById ?? null,
+    rejectedAt: values.rejectedAt ?? null, rejectedById: values.rejectedById ?? null,
+    rejectionReason: values.rejectionReason ?? null,
+    createdAt: values.createdAt ?? now, updatedAt: values.updatedAt ?? now, deletedAt: values.deletedAt ?? null
+  };
+}
+
+function createTimesheetAuditEventRecord(
+  values: Partial<TestTimesheetAuditEventRecord> & Pick<TestTimesheetAuditEventRecord, "companyId" | "action">
+): TestTimesheetAuditEventRecord {
+  return {
+    id: values.id ?? nextId(), companyId: values.companyId, timesheetId: values.timesheetId ?? null,
+    timeEntryId: values.timeEntryId ?? null, action: values.action, actorUserId: values.actorUserId ?? null,
+    reason: values.reason ?? null, before: values.before ?? null, after: values.after ?? null,
+    createdAt: values.createdAt ?? new Date()
+  };
+}
+
+function createTechnicianPayRateRecord(
+  values: Partial<TestTechnicianPayRateRecord> &
+    Pick<TestTechnicianPayRateRecord, "companyId" | "technicianId" | "hourlyRateCents" | "effectiveFrom">
+): TestTechnicianPayRateRecord {
+  const now = new Date();
+  return {
+    id: values.id ?? nextId(), companyId: values.companyId, technicianId: values.technicianId,
+    hourlyRateCents: values.hourlyRateCents, effectiveFrom: values.effectiveFrom, createdById: values.createdById ?? null,
+    createdAt: values.createdAt ?? now, updatedAt: values.updatedAt ?? now, deletedAt: values.deletedAt ?? null
+  };
+}
+
+export function seedTimesheet(
+  values: Partial<TestTimesheetRecord> & Pick<TestTimesheetRecord, "companyId" | "technicianId" | "periodStart" | "periodEnd">
+): TestTimesheetRecord {
+  const record = createTimesheetRecord(values);
+  state.timesheets.push(record);
+  return record;
+}
+
+export function seedTechnicianPayRate(
+  values: Partial<TestTechnicianPayRateRecord> &
+    Pick<TestTechnicianPayRateRecord, "companyId" | "technicianId" | "hourlyRateCents" | "effectiveFrom">
+): TestTechnicianPayRateRecord {
+  const record = createTechnicianPayRateRecord(values);
+  state.technicianPayRates.push(record);
+  return record;
+}
+
+export function getTimesheetAuditEvents(): TestTimesheetAuditEventRecord[] {
+  return state.timesheetAuditEvents;
+}
+
+export function getTimeEntries(): TestTimeEntryRecord[] {
+  return state.timeEntries;
+}
+
 const reviewRequestsTable = {
   __name: "reviewRequests",
   id: "id",
@@ -3232,6 +3373,9 @@ const state: TestState = {
   scheduleSlots: [],
   activityEvents: [],
   timeEntries: [],
+  timesheets: [],
+  timesheetAuditEvents: [],
+  technicianPayRates: [],
   reviewRequests: [],
   fileAttachments: [],
   onTheWayNotifications: [],
@@ -3288,6 +3432,9 @@ function restoreState(snapshot: TestState): void {
   state.scheduleSlots.splice(0, state.scheduleSlots.length, ...snapshot.scheduleSlots);
   state.activityEvents.splice(0, state.activityEvents.length, ...snapshot.activityEvents);
   state.timeEntries.splice(0, state.timeEntries.length, ...snapshot.timeEntries);
+  state.timesheets.splice(0, state.timesheets.length, ...snapshot.timesheets);
+  state.timesheetAuditEvents.splice(0, state.timesheetAuditEvents.length, ...snapshot.timesheetAuditEvents);
+  state.technicianPayRates.splice(0, state.technicianPayRates.length, ...snapshot.technicianPayRates);
   state.reviewRequests.splice(0, state.reviewRequests.length, ...snapshot.reviewRequests);
   state.fileAttachments.splice(0, state.fileAttachments.length, ...snapshot.fileAttachments);
   state.onTheWayNotifications.splice(
@@ -3385,6 +3532,12 @@ function getRows(tableName: TableName): AnyTestRecord[] {
       return state.activityEvents;
     case "timeEntries":
       return state.timeEntries;
+    case "timesheets":
+      return state.timesheets;
+    case "timesheetAuditEvents":
+      return state.timesheetAuditEvents;
+    case "technicianPayRates":
+      return state.technicianPayRates;
     case "reviewRequests":
       return state.reviewRequests;
     case "fileAttachments":
@@ -4962,6 +5115,12 @@ function createRow(tableName: TableName, values: Record<string, unknown>): AnyTe
         values as Partial<TestActivityEventRecord> &
           Pick<TestActivityEventRecord, "companyId" | "eventType" | "entityType" | "entityId" | "summary">
       );
+    case "timesheets":
+      return createTimesheetRecord(values as Partial<TestTimesheetRecord> & Pick<TestTimesheetRecord, "companyId" | "technicianId" | "periodStart" | "periodEnd">);
+    case "timesheetAuditEvents":
+      return createTimesheetAuditEventRecord(values as Partial<TestTimesheetAuditEventRecord> & Pick<TestTimesheetAuditEventRecord, "companyId" | "action">);
+    case "technicianPayRates":
+      return createTechnicianPayRateRecord(values as Partial<TestTechnicianPayRateRecord> & Pick<TestTechnicianPayRateRecord, "companyId" | "technicianId" | "hourlyRateCents" | "effectiveFrom">);
     case "timeEntries":
       return createTimeEntryRecord(
         values as Partial<TestTimeEntryRecord> &
@@ -5356,6 +5515,9 @@ export const jobProducts = jobProductsTable;
 export const scheduleSlots = scheduleSlotsTable;
 export const activityEvents = activityEventsTable;
 export const timeEntries = timeEntriesTable;
+export const timesheets = timesheetsTable;
+export const timesheetAuditEvents = timesheetAuditEventsTable;
+export const technicianPayRates = technicianPayRatesTable;
 export const reviewRequests = reviewRequestsTable;
 export const fileAttachments = fileAttachmentsTable;
 export const onTheWayNotifications = onTheWayNotificationsTable;
@@ -5794,6 +5956,9 @@ export function createDbModuleMock() {
     scheduleSlots,
     activityEvents,
     timeEntries,
+    timesheets,
+    timesheetAuditEvents,
+    technicianPayRates,
     reviewRequests,
     fileAttachments,
     onTheWayNotifications,
@@ -5852,6 +6017,9 @@ export function resetTestState(): void {
   state.scheduleSlots.length = 0;
   state.activityEvents.length = 0;
   state.timeEntries.length = 0;
+  state.timesheets.length = 0;
+  state.timesheetAuditEvents.length = 0;
+  state.technicianPayRates.length = 0;
   state.reviewRequests.length = 0;
   state.fileAttachments.length = 0;
   state.onTheWayNotifications.length = 0;

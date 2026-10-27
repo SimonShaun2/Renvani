@@ -110,6 +110,7 @@ export const updateTimeEntryRouteSchema = {
     400: errorResponseSchema,
     401: errorResponseSchema,
     403: errorResponseSchema,
-    404: errorResponseSchema
+    404: errorResponseSchema,
+    409: errorResponseSchema
   }
 } as const;

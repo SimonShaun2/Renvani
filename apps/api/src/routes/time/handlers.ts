@@ -3,6 +3,7 @@ import type { FastifyReply, FastifyRequest } from "fastify";
 import type { UpdateTimeEntryInput } from "@fsm/types";
 
 import { updateTimeEntry } from "../../services/time-tracking.service.js";
+import { TimesheetConflictError } from "../../services/timesheets.service.js";
 import type { TimeEntryIdParams } from "./schemas.js";
 
 function toIsoString(value: Date | null): string | null {
@@ -32,12 +33,20 @@ export async function updateTimeEntryHandler(
   reply: FastifyReply
 ): Promise<FastifyReply> {
   const params = request.params as TimeEntryIdParams;
-  const entry = await updateTimeEntry(
-    request.company.id,
-    request.user.id,
-    params.entryId,
-    request.body as UpdateTimeEntryInput
-  );
+  let entry: Awaited<ReturnType<typeof updateTimeEntry>>;
+  try {
+    entry = await updateTimeEntry(
+      request.company.id,
+      request.user.id,
+      params.entryId,
+      request.body as UpdateTimeEntryInput
+    );
+  } catch (error) {
+    if (error instanceof TimesheetConflictError) {
+      return reply.code(409).send({ error: "CONFLICT", message: error.message, requestId: request.id });
+    }
+    throw error;
+  }
 
   return reply.send({
     timeEntry: toTimeEntryResponse(entry)

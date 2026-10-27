@@ -1706,6 +1706,56 @@ export const timeEntries = pgTable("time_entries", {
   technicianIdx: index("time_entries_technician_idx").on(t.technicianId),
 }));
 
+// FS-171: pay-period timesheets, audit trail and technician pay rates (migration 0045).
+export const timesheets = pgTable("timesheets", {
+  id: id(),
+  companyId: companyId(),
+  technicianId: uuid("technician_id").notNull().references(() => technicians.id, { onDelete: "cascade" }),
+  periodStart: date("period_start", { mode: "string" }).notNull(),
+  periodEnd: date("period_end", { mode: "string" }).notNull(),
+  status: varchar("status", { length: 20 }).notNull().default("open"),
+  submittedAt: timestamp("submitted_at"),
+  submittedById: uuid("submitted_by_id").references(() => users.id, { onDelete: "set null" }),
+  approvedAt: timestamp("approved_at"),
+  approvedById: uuid("approved_by_id").references(() => users.id, { onDelete: "set null" }),
+  rejectedAt: timestamp("rejected_at"),
+  rejectedById: uuid("rejected_by_id").references(() => users.id, { onDelete: "set null" }),
+  rejectionReason: text("rejection_reason"),
+  ...timestamps,
+}, (t) => ({
+  companyIdx: index("timesheets_company_idx").on(t.companyId),
+  companyTechnicianPeriodIdx: uniqueIndex("timesheets_company_technician_period_idx").on(t.companyId, t.technicianId, t.periodStart),
+}));
+
+export const timesheetAuditEvents = pgTable("timesheet_audit_events", {
+  id: id(),
+  companyId: companyId(),
+  timesheetId: uuid("timesheet_id").references(() => timesheets.id, { onDelete: "cascade" }),
+  timeEntryId: uuid("time_entry_id").references(() => timeEntries.id, { onDelete: "cascade" }),
+  action: varchar("action", { length: 40 }).notNull(),
+  actorUserId: uuid("actor_user_id").references(() => users.id, { onDelete: "set null" }),
+  reason: text("reason"),
+  before: jsonb("before"),
+  after: jsonb("after"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+}, (t) => ({
+  companyIdx: index("timesheet_audit_events_company_idx").on(t.companyId),
+  timesheetIdx: index("timesheet_audit_events_timesheet_idx").on(t.timesheetId),
+}));
+
+export const technicianPayRates = pgTable("technician_pay_rates", {
+  id: id(),
+  companyId: companyId(),
+  technicianId: uuid("technician_id").notNull().references(() => technicians.id, { onDelete: "cascade" }),
+  hourlyRateCents: integer("hourly_rate_cents").notNull(),
+  effectiveFrom: date("effective_from", { mode: "string" }).notNull(),
+  createdById: uuid("created_by_id").references(() => users.id, { onDelete: "set null" }),
+  ...timestamps,
+}, (t) => ({
+  companyIdx: index("technician_pay_rates_company_idx").on(t.companyId),
+  companyTechnicianEffectiveIdx: uniqueIndex("technician_pay_rates_company_technician_effective_idx").on(t.companyId, t.technicianId, t.effectiveFrom),
+}));
+
 export const reviewRequests = pgTable("review_requests", {
   id: id(),
   companyId: companyId(),

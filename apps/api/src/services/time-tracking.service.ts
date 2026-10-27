@@ -23,6 +23,7 @@ import {
   type UpdateTimeEntryInput
 } from "@fsm/types";
 import { invalidateDispatchCache } from "./dispatch.service.js";
+import { assertTimeEntryDatesNotLocked } from "./timesheets.service.js";
 
 type CustomerRow = typeof customers.$inferSelect;
 type JobRow = typeof jobs.$inferSelect;
@@ -389,6 +390,8 @@ export async function updateTimeEntry(
     }
 
     const startedAt = input.startedAt ? new Date(input.startedAt) : entry.startedAt;
+    // FS-171: approved timesheet periods are locked here too (reopen first).
+    await assertTimeEntryDatesNotLocked(companyId, entry.technicianId, [entry.startedAt, startedAt], tx);
     const endedAt =
       input.endedAt === undefined ? entry.endedAt : input.endedAt === null ? null : new Date(input.endedAt);
     const durationMinutes = endedAt ? calculateDurationMinutes(startedAt, endedAt) : null;

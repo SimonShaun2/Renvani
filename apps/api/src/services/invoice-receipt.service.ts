@@ -3,9 +3,10 @@ import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { env } from "@fsm/config";
 import { buildInvoiceReceiptPortalUrl } from "@fsm/config/agreement-portal-token";
 import { RENVANI_STRIPE_BRAND } from "@fsm/config/stripe-branding";
-import { AppError, ErrorCode } from "@fsm/types";
+import { AppError, ErrorCode, type PublicPayViewFields } from "@fsm/types";
 
-import { getPublicInvoicePaymentLink } from "./invoice.service.js";
+import { buildPublicPayViewFields } from "../lib/public-pay-view.js";
+import { loadPublicInvoicePayment } from "./invoice.service.js";
 
 export interface InvoiceReceiptView {
   invoiceNumber: string;
@@ -15,10 +16,12 @@ export interface InvoiceReceiptView {
   receiptPortalUrl: string;
   pdfDownloadUrl: string;
   brandName: string;
+  /** Additive payer-safe fields, incl. Service Fee vs booking fee split (feeBreakdown). */
+  fields: PublicPayViewFields;
 }
 
 export async function getInvoiceReceiptView(paymentToken: string): Promise<InvoiceReceiptView> {
-  const payment = await getPublicInvoicePaymentLink(paymentToken);
+  const { link: payment, context } = await loadPublicInvoicePayment(paymentToken);
   const appBaseUrl = env.APP_URL.replace(/\/$/, "");
   const receiptPortalUrl = buildInvoiceReceiptPortalUrl(appBaseUrl, paymentToken);
 
@@ -29,7 +32,8 @@ export async function getInvoiceReceiptView(paymentToken: string): Promise<Invoi
     platformFeeAmount: payment.platformFeeAmount,
     receiptPortalUrl,
     pdfDownloadUrl: `${appBaseUrl}/api/v1/public/pay/${paymentToken}/receipt.pdf`,
-    brandName: RENVANI_STRIPE_BRAND.platformName
+    brandName: RENVANI_STRIPE_BRAND.platformName,
+    fields: await buildPublicPayViewFields(context, { includeFeeBreakdown: true })
   };
 }
 

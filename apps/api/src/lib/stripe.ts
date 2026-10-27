@@ -779,3 +779,18 @@ export async function createVipMembershipCheckoutSession(
     url: session.url
   };
 }
+
+export interface PaymentCardSummary {
+  brand: string;
+  last4: string;
+}
+
+/** Card brand + last4 for a succeeded PaymentIntent (destination charge on the platform). Null when not a card. */
+export async function retrievePaymentIntentCardSummary(paymentIntentId: string): Promise<PaymentCardSummary | null> {
+  const intent = await stripe.paymentIntents.retrieve(paymentIntentId, { expand: ["payment_method"] });
+  const paymentMethod = typeof intent.payment_method === "object" ? intent.payment_method : null;
+  if (!paymentMethod || paymentMethod.type !== "card" || !paymentMethod.card) {
+    return null;
+  }
+  return { brand: paymentMethod.card.brand, last4: paymentMethod.card.last4 };
+}

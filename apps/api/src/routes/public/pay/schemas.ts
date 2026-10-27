@@ -57,7 +57,9 @@ export const getPublicPaymentLinkSchema = {
         feeRefundable: { type: "boolean" },
         platformFeePercent: { type: ["number", "null"] },
         platformFeePaidByCustomer: { type: "boolean" },
-        platformFeeDisclosure: { type: ["string", "null"] }
+        platformFeeDisclosure: { type: ["string", "null"] },
+        // Additive payer-safe display fields (PublicPayViewFields); shaped in lib/public-pay-view.ts.
+        fields: { type: "object", additionalProperties: true }
       }
     },
     400: errorResponseSchema,

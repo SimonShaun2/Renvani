@@ -295,4 +295,54 @@ export interface PublicInvoicePaymentLink {
   platformFeePaidByCustomer: boolean;
   /** Optional disclosure from `CUSTOMER_PLATFORM_FEE_DISCLOSURE` (empty = omit). */
   platformFeeDisclosure: string | null;
+  /** Additive payer-safe display fields (see PublicPayViewFields). */
+  fields?: PublicPayViewFields;
+}
+
+/** Payer-safe line item on the public pay page (no internal ids). */
+export interface PublicPayLineItem {
+  description: string;
+  quantity: string;
+  /** Unit price, 2-decimal money string. */
+  unit: string;
+  total: string;
+}
+
+/** Service Fee vs booking fee split for a public receipt. Fees are never refundable. */
+export interface PublicPayFeeBreakdown {
+  invoiceAmount: string;
+  serviceFeeLabel: string | null;
+  serviceFeeAmount: string;
+  serviceFeeRateBps: number;
+  bookingFeeAmount: string;
+  totalPaid: string;
+  feeRefundable: false;
+}
+
+/**
+ * Additive, payer-safe display fields for GET /public/pay/:token and /receipt.
+ * Never carries tenant ids, row ids, Stripe account ids, or internal notes.
+ * Extend by adding a key here and a builder in apps/api/src/lib/public-pay-view.ts.
+ */
+export interface PublicPayViewFields {
+  shopName: string | null;
+  shopLogoUrl: string | null;
+  shopUrl: string | null;
+  statementDescriptor: string | null;
+  customerName: string | null;
+  serviceAddress: string | null;
+  serviceDate: string | null;
+  dueAt: string | null;
+  lineItems: PublicPayLineItem[];
+  invoiceStatus: string;
+  paymentStatus: string | null;
+  paidAmount: string | null;
+  paidAt: string | null;
+  cardBrand: string | null;
+  cardLast4: string | null;
+  /** Masked (first character of the local part kept). */
+  receiptEmail: string | null;
+  plan: "flex" | "flat" | null;
+  /** Receipt only. */
+  feeBreakdown?: PublicPayFeeBreakdown;
 }

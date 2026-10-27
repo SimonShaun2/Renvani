@@ -84,7 +84,7 @@ afterEach(async () => {
   await app.close();
 });
 
-function createAuthContext() {
+function createAuthContext(role: "owner" | "admin" | "dispatcher" | "office" | "technician" = "owner") {
   const company = fakeDb.seedCompany({
     name: "Acme HVAC",
     slug: "acme-hvac",
@@ -93,10 +93,10 @@ function createAuthContext() {
   });
   const user = fakeDb.seedUser({
     companyId: company.id,
-    email: "owner@example.com",
+    email: `${role}@example.com`,
     firstName: "Ava",
     lastName: "Stone",
-    role: "owner"
+    role
   });
   const accessToken = tokens.generateAccessToken({
     userId: user.id,
@@ -467,5 +467,32 @@ describe("invoice routes", () => {
     expect(response.status).toBe(200);
     expect(response.body.data).toHaveLength(1);
     expect(response.body.data[0].amount).toBe("100.00");
+  });
+
+  it.each(["owner", "admin", "dispatcher", "office"] as const)(
+    "GET /payments allows %s",
+    async (role) => {
+      const auth = createAuthContext(role);
+      const response = await request(app.server)
+        .get("/api/v1/payments")
+        .set("Authorization", auth.authorization);
+
+      expect(response.status).toBe(200);
+    }
+  );
+
+  it("GET /payments rejects technician with 403", async () => {
+    const auth = createAuthContext("technician");
+    const response = await request(app.server)
+      .get("/api/v1/payments")
+      .set("Authorization", auth.authorization);
+
+    expect(response.status).toBe(403);
+  });
+
+  it("GET /payments rejects unauthenticated with 401", async () => {
+    const response = await request(app.server).get("/api/v1/payments");
+
+    expect(response.status).toBe(401);
   });
 });

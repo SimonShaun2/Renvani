@@ -1,5 +1,7 @@
 import type { FastifyPluginAsync } from "fastify";
 
+import { requireRole } from "../../lib/authorize.js";
+
 import {
   addInvoiceItemHandler,
   createInvoiceHandler,
@@ -40,6 +42,10 @@ import {
   voidInvoiceRouteSchema,
   voidInvoiceValidation
 } from "./schemas.js";
+
+// Company-wide payment ledger: same roles that can open /invoices in the web app
+// (apps/web/src/lib/route-access.ts). Technicians must not see company financials.
+const paymentsListRoles = requireRole(["owner", "admin", "dispatcher", "office"]);
 
 const invoiceRoutes: FastifyPluginAsync = async (fastify) => {
   const authenticate = fastify.authenticate;
@@ -123,7 +129,7 @@ const invoiceRoutes: FastifyPluginAsync = async (fastify) => {
   }, listInvoicePaymentsHandler);
 
   fastify.get("/payments", {
-    preHandler: authenticate,
+    preHandler: [authenticate, paymentsListRoles],
     preValidation: listPaymentsValidation,
     schema: listPaymentsSchema
   }, listPaymentsHandler);

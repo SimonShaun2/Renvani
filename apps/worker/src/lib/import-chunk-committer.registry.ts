@@ -25,6 +25,8 @@ export interface ImportChunkCommitInput {
 export interface ImportChunkCommitResult {
   rowsOk: number;
   rowsFailed: number;
+  /** Rows intentionally not written (e.g. a duplicate the user chose to skip). Optional. */
+  rowsSkipped?: number;
 }
 
 /**

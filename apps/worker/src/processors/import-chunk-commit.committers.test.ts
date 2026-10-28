@@ -299,6 +299,30 @@ describe("import-chunk-commit built-in committers", () => {
       expect(fakeDb.getTestState().importChunkRuns[0]).toMatchObject({ status: "completed", rowsOk: 1 });
     });
 
+    it("reads QuickBooks IIF TRNS records for an invoices session", async () => {
+      fakeDb.getTestState().importSessions.length = 0;
+      fakeDb.seedImportSession({
+        id: sessionId,
+        companyId: companyA,
+        entityType: "invoices" as never,
+        status: "importing",
+        fileName: "qb.iif",
+        fileUrl: "imports/qb.iif",
+        columnMappings: { DOCNUM: "invoiceNumber", NAME: "customerSourceId", AMOUNT: "total" },
+      } as never);
+      downloadFileMock.mockResolvedValue(
+        Buffer.from(
+          ["!CUST\tNAME", "CUST\tAcme Co", "!TRNS\tTRNSTYPE\tDOCNUM\tNAME\tAMOUNT", "TRNS\tINVOICE\t5001\tAcme Co\t99.00"].join("\n"),
+          "utf8",
+        ),
+      );
+
+      await processor.handleImportChunkCommit(job(payload("invoices")));
+
+      const rows = commitImportedInvoiceRowsMock.mock.calls[0]![1];
+      expect(rows[0]).toMatchObject({ invoiceNumber: "5001", customerSourceId: "Acme Co" });
+    });
+
     it("re-runs a failed chunk through the same lineage-keyed commit", async () => {
       await processor.handleImportChunkCommit(job(payload("invoices")));
       resetChunkRunToFailed();
@@ -310,6 +334,180 @@ describe("import-chunk-commit built-in committers", () => {
       expect(secondRows.map((r: { sourceId: string }) => r.sourceId)).toEqual(
         firstRows.map((r: { sourceId: string }) => r.sourceId),
       );
+    });
+  });
+
+  describe("customers (shared dedupe + duplicate choices + primary property)", () => {
+    const customerMapping = {
+      ext_id: "sourceId",
+      first: "firstName",
+      last: "lastName",
+      email: "email",
+      phone: "phone",
+      street: "addressLine1",
+      city: "city",
+      state: "state",
+      zip: "zip",
+    };
+    const header = "ext_id,first,last,email,phone,street,city,state,zip";
+
+    function seedCustomerSession(extra: Record<string, unknown> = {}, fileName = "customers.csv") {
+      fakeDb.seedImportSession({
+        id: sessionId,
+        companyId: companyA,
+        entityType: "customers" as never,
+        status: "importing",
+        fileName,
+        fileUrl: `imports/${fileName}`,
+        columnMappings: customerMapping,
+        ...extra,
+      } as never);
+    }
+
+    function companyACustomers() {
+      return fakeDb.getTestState().customers.filter((c) => c.companyId === companyA);
+    }
+
+    it("inserts new customers with lineage and upserts a primary property from mapped address", async () => {
+      seedCustomerSession();
+      downloadFileMock.mockResolvedValue(
+        csv([header, "c-1,Cal,Cruz,cal@example.com,3125550101,1 Main St,Chicago,IL,60601", "c-2,Dee,Dunn,,,,,,"]),
+      );
+
+      await processor.handleImportChunkCommit(job(payload("customers")));
+
+      const cal = companyACustomers().find((c) => c.sourceId === "c-1");
+      expect(cal).toMatchObject({ firstName: "Cal", sourceSystem: "jobber", importSessionId: sessionId });
+      const props = fakeDb.getTestState().properties.filter((p) => p.customerId === cal?.id);
+      expect(props).toHaveLength(1);
+      expect(props[0]).toMatchObject({
+        companyId: companyA,
+        addressLine1: "1 Main St",
+        isPrimary: true,
+        sourceId: "customer:c-1",
+      });
+      expect(companyACustomers().find((c) => c.sourceId === "c-2")).toBeDefined();
+      expect(fakeDb.getTestState().properties.filter((p) => p.sourceId === "customer:c-2")).toHaveLength(0);
+      expect(fakeDb.getTestState().importChunkRuns[0]).toMatchObject({ status: "completed", rowsOk: 2, rowsFailed: 0 });
+      expect(tenantSessionCalls).toEqual([companyA]);
+    });
+
+    it("is idempotent on (companyId, sourceSystem, sourceId) when a chunk is re-run", async () => {
+      seedCustomerSession();
+      downloadFileMock.mockResolvedValue(csv([header, "c-1,Cal,Cruz,cal@example.com,,1 Main St,Chicago,IL,60601"]));
+
+      await processor.handleImportChunkCommit(job(payload("customers")));
+      resetChunkRunToFailed();
+      await processor.handleImportChunkCommit(job(payload("customers")));
+
+      expect(companyACustomers().filter((c) => c.sourceId === "c-1")).toHaveLength(1);
+      expect(fakeDb.getTestState().properties.filter((p) => p.sourceId === "customer:c-1")).toHaveLength(1);
+    });
+
+    it("skips an email/phone duplicate of an existing customer by default", async () => {
+      fakeDb.seedCustomer({ companyId: companyA, firstName: "Old", lastName: "Email", email: "dup@example.com" });
+      fakeDb.seedCustomer({ companyId: companyA, firstName: "Old", lastName: "Phone", phone: "+13125550199" });
+      seedCustomerSession();
+      downloadFileMock.mockResolvedValue(
+        csv([header, "c-1,New,Email,DUP@example.com,,,,,", "c-2,New,Phone,,(312) 555-0199,,,,"]),
+      );
+
+      await processor.handleImportChunkCommit(job(payload("customers")));
+
+      expect(companyACustomers().filter((c) => c.sourceId)).toHaveLength(0);
+      expect(companyACustomers()).toHaveLength(3);
+      expect(fakeDb.getTestState().importChunkRuns[0]).toMatchObject({ rowsOk: 0, rowsFailed: 0 });
+      expect(fakeDb.getTestState().importSessions[0]?.skippedRows).toBe(2);
+    });
+
+    it("honors the user's duplicate choices (update_existing / import_new)", async () => {
+      const existing = fakeDb.seedCustomer({
+        companyId: companyA,
+        firstName: "Old",
+        lastName: "Name",
+        email: "dup@example.com",
+        phone: null,
+      } as never);
+      seedCustomerSession({ aiInferences: { duplicateActions: { "2": "update_existing", "3": "import_new" } } });
+      downloadFileMock.mockResolvedValue(
+        csv([header, "c-1,Upd,Ated,dup@example.com,3125550142,,,,", "c-2,Brand,New,dup@example.com,,,,,"]),
+      );
+
+      await processor.handleImportChunkCommit(job(payload("customers")));
+
+      const updated = companyACustomers().find((c) => c.id === existing.id);
+      // Same fill-blanks merge as execute-import: existing names kept, empty phone filled.
+      expect(updated).toMatchObject({ firstName: "Old", sourceId: "c-1", sourceSystem: "jobber" });
+      expect(updated?.phone).toBeTruthy();
+      expect(companyACustomers().filter((c) => c.email === "dup@example.com")).toHaveLength(2);
+      expect(companyACustomers().find((c) => c.sourceId === "c-2")?.firstName).toBe("Brand");
+      expect(fakeDb.getTestState().importChunkRuns[0]).toMatchObject({ rowsOk: 2 });
+    });
+
+    it("does not write rows that failed validation", async () => {
+      seedCustomerSession({ validationErrors: [{ row: 2, field: "email", message: "Invalid email", value: "x" }] });
+      downloadFileMock.mockResolvedValue(csv([header, "c-1,Bad,Email,x,,,,,", "c-2,Good,Row,,,,,,"]));
+
+      await processor.handleImportChunkCommit(job(payload("customers")));
+
+      expect(companyACustomers().find((c) => c.sourceId === "c-1")).toBeUndefined();
+      expect(companyACustomers().find((c) => c.sourceId === "c-2")).toBeDefined();
+    });
+
+    it("never matches or updates another company's customer as a duplicate", async () => {
+      fakeDb.seedCustomer({ companyId: companyB, firstName: "Other", lastName: "Tenant", email: "x@example.com" });
+      seedCustomerSession({ aiInferences: { duplicateActions: { "2": "update_existing" } } });
+      downloadFileMock.mockResolvedValue(csv([header, "c-1,Mine,Row,x@example.com,,,,,"]));
+
+      await processor.handleImportChunkCommit(job(payload("customers")));
+
+      expect(fakeDb.getTestState().customers.find((c) => c.companyId === companyB && c.email === "x@example.com"))
+        .toMatchObject({ firstName: "Other", sourceId: null });
+      expect(companyACustomers().find((c) => c.sourceId === "c-1")?.firstName).toBe("Mine");
+    });
+
+    it("commits QuickBooks IIF CUST records through the same customer path", async () => {
+      fakeDb.seedImportSession({
+        id: sessionId,
+        companyId: companyA,
+        entityType: "customers" as never,
+        status: "importing",
+        fileName: "qb-export.iif",
+        fileUrl: "imports/qb-export.iif",
+        columnMappings: { NAME: "sourceId", FIRSTNAME: "firstName", LASTNAME: "lastName", EMAIL: "email", PHONE1: "phone" },
+      } as never);
+      downloadFileMock.mockResolvedValue(
+        Buffer.from(
+          [
+            "!CUST\tNAME\tFIRSTNAME\tLASTNAME\tEMAIL\tPHONE1",
+            "CUST\tAcme Co\tAnn\tAcme\tann@acme.test\t3125550123",
+            "CUST\tBeta LLC\tBo\tBeta\t\t",
+          ].join("\n"),
+          "utf8",
+        ),
+      );
+
+      await processor.handleImportChunkCommit(job(payload("customers")));
+
+      expect(companyACustomers().find((c) => c.sourceId === "Acme Co")).toMatchObject({
+        firstName: "Ann",
+        email: "ann@acme.test",
+      });
+      expect(companyACustomers().find((c) => c.sourceId === "Beta LLC")).toBeDefined();
+      expect(fakeDb.getTestState().importChunkRuns[0]).toMatchObject({ status: "completed", rowsOk: 2 });
+    });
+  });
+
+  describe("properties linked to customers by source id", () => {
+    it("fails (does not insert) a property whose customer source id does not resolve in this company", async () => {
+      seedSession("properties", { loc_id: "sourceId", cust: "customerSourceId", street: "addressLine1", city: "city", state: "state", zip: "zip" });
+      downloadFileMock.mockResolvedValue(csv(["loc_id,cust,street,city,state,zip", "loc-9,c-ada,5 Elm St,Chicago,IL,60601"]));
+
+      await processor.handleImportChunkCommit(job(payload("properties")));
+
+      // Resolver mock only resolves raw customer ids, so an unresolved source id is a failed row, not a stray insert.
+      expect(fakeDb.getTestState().properties.filter((p) => p.sourceId === "loc-9")).toHaveLength(0);
+      expect(fakeDb.getTestState().importChunkRuns[0]).toMatchObject({ rowsOk: 0, rowsFailed: 1 });
     });
   });
 

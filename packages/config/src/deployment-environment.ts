@@ -55,6 +55,24 @@ function isStripeLiveSecretKey(value: string): boolean {
 }
 
 /**
+ * Boot guard (all services that load packages/config env): a Stripe LIVE secret key is only allowed
+ * when the deployment tier is production. Unset/blank tier resolves to "development" and an invalid
+ * tier throws, so ambiguity fails closed. The key itself is never included in the error.
+ */
+export function assertStripeLiveKeyAllowed(env: Record<string, string | undefined> = process.env): void {
+  const stripeSecret = env.STRIPE_SECRET_KEY?.trim();
+  if (!stripeSecret || !isStripeLiveSecretKey(stripeSecret)) {
+    return;
+  }
+  const tier = resolveDeploymentTier(env);
+  if (integrationProfileForTier(tier) !== "live") {
+    throw new Error(
+      `Refusing to start: STRIPE_SECRET_KEY is a live key but ${DEPLOYMENT_TIER_ENV} is "${tier}" (live keys require production).`
+    );
+  }
+}
+
+/**
  * Validates staging/development integration boundaries without contacting vendors.
  * Production tier requires live Stripe keys when STRIPE_SECRET_KEY is set.
  */

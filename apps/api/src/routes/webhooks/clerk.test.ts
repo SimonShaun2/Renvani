@@ -22,7 +22,8 @@ vi.mock("../../services/clerk-user-sync.service.js", async () => {
     deactivateClerkMembership
   };
 });
-vi.mock("@fsm/config", () => ({ env: { CLERK_WEBHOOK_SECRET: "", NODE_ENV: "test" } }));
+const mockEnv = vi.hoisted(() => ({ CLERK_WEBHOOK_SECRET: "", NODE_ENV: "test" }));
+vi.mock("@fsm/config", () => ({ env: mockEnv }));
 
 const SECRET = `whsec_${Buffer.from("test-secret-0123456789").toString("base64")}`;
 
@@ -56,7 +57,7 @@ async function send(body: unknown, opts: { secret?: string; timestamp?: number; 
 
 describe("Clerk webhook", () => {
   beforeEach(() => {
-    process.env.CLERK_WEBHOOK_SECRET = SECRET;
+    mockEnv.CLERK_WEBHOOK_SECRET = SECRET;
     provisionClerkOrganization.mockReset().mockResolvedValue({ id: "co_1" });
     provisionClerkMembership.mockReset().mockResolvedValue({ status: "created", companyId: "co_1" });
     syncClerkUserUpdated.mockReset().mockResolvedValue({ status: "updated" });
@@ -157,9 +158,27 @@ describe("Clerk webhook", () => {
   });
 
   it("returns 503 when the secret is not configured", async () => {
-    process.env.CLERK_WEBHOOK_SECRET = "";
+    mockEnv.CLERK_WEBHOOK_SECRET = "";
     const res = await send({ type: "user.created" });
     expect(res.statusCode).toBe(503);
+    expect(provisionClerkOrganization).not.toHaveBeenCalled();
+  });
+
+  it("ignores process.env and reads only validated config (fail closed)", async () => {
+    mockEnv.CLERK_WEBHOOK_SECRET = "  ";
+    process.env.CLERK_WEBHOOK_SECRET = SECRET;
+    try {
+      const res = await send({ type: "user.created" });
+      expect(res.statusCode).toBe(503);
+    } finally {
+      delete process.env.CLERK_WEBHOOK_SECRET;
+    }
+  });
+
+  it("has no direct process.env reads", async () => {
+    const { readFileSync } = await import("node:fs");
+    const source = readFileSync(new URL("./clerk.ts", import.meta.url), "utf8");
+    expect(source).not.toMatch(/process\.env/);
   });
 
   const userUpdated = (status: string) => ({

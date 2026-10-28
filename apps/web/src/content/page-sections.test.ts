@@ -39,7 +39,7 @@ describe("page sections", () => {
     expect(Object.fromEntries(pricing.plans.map((p) => [p.id, [p.monthly, p.annual]]))).toEqual({
       flex: [399, 3990], flat: [999, 9990], founding: [199, 1990], startup: [99, 990]
     });
-    expect(pricing.bookingFee).toContain("$1.99");
+    expect(JSON.stringify(pricing)).not.toMatch(/1\.99|booking fee/i);
   });
 
   it("falls back to the full snapshot on preview without env", async () => {

@@ -40,7 +40,8 @@ export default function InvoiceReceiptPage() {
   if (receipt.serviceFeeCents > 0 && receipt.serviceFeeLabel) {
     details.push({ label: `${receipt.serviceFeeLabel} · non-refundable`, value: formatUsd(receipt.serviceFeeAmount) });
   }
-  if (receipt.bookingFeeCents > 0) {
+  // Booking fee was removed; keep this row only for legacy receipts that were charged one.
+  if (receipt.bookingFeeCents > 0 && Number(receipt.bookingFeeAmount) > 0) {
     details.push({ label: "Online booking fee · non-refundable", value: formatUsd(receipt.bookingFeeAmount) });
   }
   details.push(...buildPaidDetails(receipt));

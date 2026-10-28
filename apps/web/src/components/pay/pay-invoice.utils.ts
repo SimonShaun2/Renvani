@@ -77,7 +77,7 @@ export function formatServiceFeeNote(rateBps: number = SERVICE_FEE_RATE_BPS): st
 
 /**
  * Builds the invoice summary lines. Flex shows "Service Fee (2%)" (non-refundable, charged at checkout);
- * Flat shows none. The online-booking fee shows only when the API reports one (online-booked invoice paid in full).
+ * Flat shows none. There is no booking fee: total due = invoice + Service Fee (Flex) or invoice only (Flat).
  * Older API payloads without split cents fall back to the combined platform fee as the Service Fee line.
  */
 export function buildPayInvoiceSummary(payment: PublicPaymentLinkResponse): PayInvoiceSummary {
@@ -88,9 +88,6 @@ export function buildPayInvoiceSummary(payment: PublicPaymentLinkResponse): PayI
   if (hasSplit) {
     if (hasCents(payment.serviceFeeCents)) {
       feeLines.push({ key: "service", label: formatServiceFeeLineItemName(rateBps), amount: centsToUsd(payment.serviceFeeCents) });
-    }
-    if (hasCents(payment.bookingFeeCents)) {
-      feeLines.push({ key: "booking", label: "Online booking fee", amount: centsToUsd(payment.bookingFeeCents) });
     }
   } else if (payment.platformFeePaidByCustomer && payment.platformFeePercent != null && Number(payment.platformFeeAmount) > 0) {
     feeLines.push({ key: "service", label: formatServiceFeeLineItemName(rateBps), amount: payment.platformFeeAmount });

@@ -79,6 +79,8 @@ export const TENANT_GUARD_ALLOWLIST: TenantGuardAllowlistEntry[] = [
   { file: "apps/worker/src/processors/import-file-link.processor.ts", pattern: "eq(importBundles.id, payload.importBundleId)", category: "worker-payload", reason: "Bundle id from the scoped API enqueue." },
   { file: "apps/worker/src/processors/growth-check.processor.ts", pattern: ".update(growthCheckFindings)", category: "worker-payload", reason: "Finding row created by this scan run for the payload's company." },
 
+  { file: "apps/api/src/services/plan-reminders/plan-reminder.service.ts", pattern: "automationRules.ruleType, \"service_agreement_renewal\"", category: "admin-global", reason: "#273 cron: enumerates enabled renewal rules across tenants; each rule then runs under its own companyId." },
+
   // pending-pr
   { file: "apps/api/src/services/vip-membership-tier-stripe.service.ts", pattern: "eq(vipMembershipTiers.id, tierId))", category: "pending-pr", reason: "Fixed by #294 (adds eq(companyId)); remove when it merges." },
   { file: "apps/webhook/src/handlers/twilio.handler.ts", pattern: "eq(customers.phone, fromNumber), isNull(customers.deletedAt)", category: "pending-pr", reason: "Today: cross-tenant guess (fixed by #295). After #295: intentional platform-wide STOP lookup (consent withdrawal only)." },

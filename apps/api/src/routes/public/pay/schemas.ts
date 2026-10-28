@@ -97,3 +97,24 @@ export const getPublicInvoiceReceiptSchema = {
     409: errorResponseSchema
   }
 } as const;
+
+/** POST /:token/hosted-checkout — exact allowlist; no Stripe ids, secrets, or amounts beyond what the pay view shows. */
+export const createPublicHostedCheckoutSchema = {
+  tags: ["public-payments"],
+  response: {
+    200: {
+      type: "object",
+      additionalProperties: false,
+      required: ["mode", "checkoutUrl", "expiresAt", "reused"],
+      properties: {
+        mode: { type: "string", enum: ["hosted"] },
+        checkoutUrl: { type: "string" },
+        expiresAt: { type: ["string", "null"] },
+        reused: { type: "boolean" }
+      }
+    },
+    400: errorResponseSchema,
+    404: errorResponseSchema,
+    409: errorResponseSchema
+  }
+} as const;

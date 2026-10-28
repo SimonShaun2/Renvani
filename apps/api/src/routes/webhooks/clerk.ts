@@ -85,7 +85,11 @@ async function handleEvent(event: ClerkWebhookEvent, reply: FastifyReply) {
   const data = event.data ?? {};
 
   if (event.type === "organization.created") {
-    const company = await provisionClerkOrganization({ organizationId: str(data.id), name: str(data.name) });
+    const company = await provisionClerkOrganization({
+      organizationId: str(data.id),
+      name: str(data.name),
+      createdBy: str(data.created_by) || null
+    });
     if (!company) {
       return reply.send({ received: true, skipped: true });
     }

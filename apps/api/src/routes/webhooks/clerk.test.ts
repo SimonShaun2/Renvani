@@ -128,7 +128,7 @@ describe("Clerk webhook", () => {
   it("provisions a company on organization.created", async () => {
     const res = await send({ type: "organization.created", data: { id: "org_1", name: "Acme" } });
     expect(res.statusCode).toBe(200);
-    expect(provisionClerkOrganization).toHaveBeenCalledWith({ organizationId: "org_1", name: "Acme" });
+    expect(provisionClerkOrganization).toHaveBeenCalledWith({ organizationId: "org_1", name: "Acme", createdBy: null });
   });
 
   it("provisions company + user on organizationMembership.created", async () => {
@@ -179,6 +179,12 @@ describe("Clerk webhook", () => {
     expect(res.statusCode).toBe(200);
     expect(syncClerkUserRoleMetadata).not.toHaveBeenCalled();
     expect(res.json()).toMatchObject({ roleSync: "not_needed" });
+  });
+
+  it("passes the org creator (created_by) on organization.created", async () => {
+    const res = await send({ type: "organization.created", data: { id: "org_9", name: "Nine", created_by: "user_c" } });
+    expect(res.statusCode).toBe(200);
+    expect(provisionClerkOrganization).toHaveBeenCalledWith({ organizationId: "org_9", name: "Nine", createdBy: "user_c" });
   });
 
   it("acks user.created without provisioning", async () => {

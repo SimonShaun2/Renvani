@@ -63,4 +63,8 @@ export interface PublicBookingSettings {
   phone: string | null;
   logoUrl: string | null;
   serviceAreaZipCodes: string[];
+  /** Active service_areas.name values (shop-entered labels, typically city names). */
+  serviceAreaNames: string[];
+  /** IANA timezone for availableHoursStart/End + availableDays. */
+  timezone: string;
 }

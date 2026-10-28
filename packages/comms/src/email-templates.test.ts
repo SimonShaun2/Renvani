@@ -106,7 +106,8 @@ describe("FS-155: every interpolated field is HTML-escaped", () => {
     [T.vipMembershipWelcome, ["firstName", "planName", "companyName"]],
     [T.vipMembershipRenewal, ["firstName", "planName", "companyName", "renewalDateLabel", "amount"]],
     [T.vipMembershipPaymentFailed, ["firstName", "planName", "companyName", "amount", "graceEndsAtLabel", "nextRetryAtLabel"]],
-    [T.reviewRequest, ["firstName", "companyName", "technicianName"]]
+    [T.reviewRequest, ["firstName", "companyName", "technicianName"]],
+    [T.planReminder, ["firstName", "companyName", "planName", "dueDateLabel"]]
   ];
 
   for (const [templateId, fields] of FIELDS) {
@@ -122,6 +123,14 @@ describe("FS-155: every interpolated field is HTML-escaped", () => {
       });
     }
   }
+
+  it("plan reminder escapes in both renewal and tune-up variants", () => {
+    for (const reminderKind of ["renewal", "tune_up"]) {
+      const { html } = renderTransactionalEmail(T.planReminder, { reminderKind, planName: "<img src=x onerror=1>", dueDateLabel: "<script>x</script>" });
+      expect(html).not.toMatch(/<script|<img src=x/i);
+      expect(html).toContain("&lt;script&gt;");
+    }
+  });
 
   it("campaign body keeps line breaks as <br /> after escaping", () => {
     const { html } = renderTransactionalEmail(T.campaignMessage, { body: "Line 1 <b>\nLine 2" });

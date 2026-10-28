@@ -1,10 +1,10 @@
 import type { Worker } from "bullmq";
 import pino from "pino";
 
-import { QUEUE_NAMES, aiQueue } from "@fsm/jobs";
+import { QUEUE_NAMES, agreementsQueue, aiQueue } from "@fsm/jobs";
 
 import { createWorker } from "./lib/worker-factory.js";
-import { processAgreements } from "./processors/agreements.processor.js";
+import { PLAN_REMINDER_SCAN_JOB_NAME, processAgreements } from "./processors/agreements.processor.js";
 import { processAiRevenue } from "./processors/ai-revenue.processor.js";
 import { processCsvImport } from "./processors/csv-import.processor.js";
 import { processInvoiceReminder } from "./processors/invoice-reminder.processor.js";
@@ -39,6 +39,18 @@ await aiQueue.add(
       every: revenueSummaryPrewarmEveryMs
     },
     jobId: "compute-revenue-summary-batch-cron"
+  }
+);
+
+// Daily plan renewal + tune-up reminder scan (14:00 UTC = 8-9am US Central). No-op for companies with the rule off.
+await agreementsQueue.add(
+  PLAN_REMINDER_SCAN_JOB_NAME,
+  {},
+  {
+    repeat: {
+      pattern: "0 14 * * *"
+    },
+    jobId: "plan-reminder-scan-cron"
   }
 );
 

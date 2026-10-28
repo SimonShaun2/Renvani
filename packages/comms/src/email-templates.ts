@@ -19,7 +19,8 @@ export const EMAIL_TEMPLATE_IDS = {
   vipMembershipRenewal: "vip_membership.renewal_receipt",
   vipMembershipPaymentFailed: "vip_membership.payment_failed_dunning",
   savedCardMigrationReenterCard: "saved_card_migration.reenter_card",
-  reviewRequest: "review_request.sent"
+  reviewRequest: "review_request.sent",
+  planReminder: "plan_reminder.notice"
 } as const;
 
 export type EmailTemplateId = (typeof EMAIL_TEMPLATE_IDS)[keyof typeof EMAIL_TEMPLATE_IDS];
@@ -381,6 +382,27 @@ function renderTemplateBody(templateId: EmailTemplateId, variables: Record<strin
           <p>Thanks for choosing ${e.companyName ?? "us"}. How was your recent visit${fromTech}?</p>
           <p>It takes about 30 seconds and helps a local business a lot.</p>
           ${button(variables.reviewUrl ?? "#", "Rate your visit")}
+        `)
+      };
+    }
+    case EMAIL_TEMPLATE_IDS.planReminder: {
+      const name = greetingName(variables.firstName ?? "");
+      const isTuneUp = variables.reminderKind === "tune_up";
+      const company = variables.companyName ?? "Renvani";
+      return {
+        templateId,
+        subject: isTuneUp
+          ? `Time for your ${variables.planName ?? "plan"} tune-up — ${company}`
+          : `Your ${variables.planName ?? "plan"} renews soon — ${company}`,
+        html: emailShell(`
+          <p>Hi ${name},</p>
+          ${
+            isTuneUp
+              ? `<p>Your ${e.planName ?? "maintenance plan"} includes a seasonal tune-up, and it's due around <strong>${e.dueDateLabel ?? "soon"}</strong>.</p>
+          <p>Reply to this email or give ${e.companyName ?? "us"} a call to pick a time.</p>`
+              : `<p>Your ${e.planName ?? "maintenance plan"} with ${e.companyName ?? "us"} is up for renewal on <strong>${e.dueDateLabel ?? "soon"}</strong>.</p>
+          <p>Reply to this email or give us a call if you'd like to renew or have questions about your plan.</p>`
+          }
         `)
       };
     }

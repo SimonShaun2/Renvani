@@ -396,3 +396,15 @@ export async function sendReviewRequestEmail(
   logger.debug({ recipient: "[redacted]" }, "Review request email sent");
   return result;
 }
+
+export async function sendPlanReminderEmail(
+  to: string,
+  params: { firstName: string; companyName: string; planName: string; dueDateLabel: string; reminderKind: "renewal" | "tune_up" }
+): Promise<TransactionalEmailSendResult> {
+  const result = await sendRenderedTemplateEmail(to, EMAIL_TEMPLATE_IDS.planReminder, { ...params }, [
+    "plan_reminder",
+    `plan_reminder.${params.reminderKind}`
+  ]);
+  logger.debug({ recipient: "[redacted]", kind: params.reminderKind }, "Plan reminder email sent");
+  return result;
+}

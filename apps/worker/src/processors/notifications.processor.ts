@@ -38,6 +38,10 @@ type TransactionalEmailSendResult = {
 };
 
 interface EmailModule {
+  sendPlanReminderEmail?(
+    to: string,
+    params: { firstName: string; companyName: string; planName: string; dueDateLabel: string; reminderKind: "renewal" | "tune_up" }
+  ): Promise<unknown>;
   sendReviewRequestEmail?(
     to: string,
     params: { firstName: string; companyName: string; technicianName: string | null; reviewUrl: string }
@@ -1187,6 +1191,40 @@ export async function handleSendOnTheWayNotification(
   });
 }
 
+/** Plan renewal / tune-up reminder (queued by the API with a fixed job id). SMS goes through the provider registry. */
+export async function handleSendPlanReminder(
+  job: Job<Record<string, unknown>>,
+  dependencies: NotificationsDependencies
+): Promise<void> {
+  const data = job.data;
+  const kind = getJobString(data, "reminderKind") === "tune_up" ? "tune_up" : "renewal";
+  const log = { jobId: job.id ?? null, companyId: getJobString(data, "companyId"), maintenancePlanId: getJobString(data, "maintenancePlanId"), kind };
+  if (getJobString(data, "channel") === "sms") {
+    const phone = getJobString(data, "customerPhone");
+    const body = getJobString(data, "smsBody");
+    if (!phone || !body) {
+      logger.warn(log, "Plan reminder SMS job missing required data");
+      return;
+    }
+    await dependencies.sms.sendSms(phone, body);
+    logger.info(log, "Plan reminder SMS processed");
+    return;
+  }
+  const to = getJobString(data, "customerEmail");
+  if (!to || !dependencies.email.sendPlanReminderEmail) {
+    logger.warn(log, "Plan reminder email job missing required data");
+    return;
+  }
+  await dependencies.email.sendPlanReminderEmail(to, {
+    firstName: getJobString(data, "firstName") ?? "",
+    companyName: getJobString(data, "companyName") ?? "",
+    planName: getJobString(data, "planName") ?? "maintenance plan",
+    dueDateLabel: getJobString(data, "dueDateLabel") ?? "",
+    reminderKind: kind
+  });
+  logger.info(log, "Plan reminder email sent");
+}
+
 export async function handleSendReviewRequest(
   job: Job<Record<string, unknown>>,
   dependencies: NotificationsDependencies
@@ -1471,6 +1509,9 @@ export function createNotificationsProcessor(
         return;
       case "send-review-request":
         await handleSendReviewRequest(job, dependencies);
+        return;
+      case "send-plan-reminder":
+        await handleSendPlanReminder(job, dependencies);
         return;
       case "send-booking-request-alert":
       case "send-booking-confirmation":

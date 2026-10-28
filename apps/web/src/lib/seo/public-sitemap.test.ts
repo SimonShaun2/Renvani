@@ -1,6 +1,10 @@
+import { readdirSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+
 import { describe, expect, it, vi } from "vitest";
 
-import { buildPublicRobots, buildPublicSitemap, optInSlugs, publicSiteUrl } from "./public-sitemap";
+import { ROBOTS_ALLOW, buildPublicRobots, buildPublicSitemap, optInSlugs, publicSiteUrl } from "./public-sitemap";
 
 const env = (vars: Record<string, string>) => vars as unknown as NodeJS.ProcessEnv;
 
@@ -37,12 +41,40 @@ describe("public sitemap", () => {
 });
 
 describe("robots", () => {
-  it("allows shop pages, blocks tokenized/app paths, links sitemap when configured", () => {
+  const ruleOf = (robots: ReturnType<typeof buildPublicRobots>) => (Array.isArray(robots.rules) ? robots.rules[0] : robots.rules);
+  const list = (v: string | string[] | undefined) => (v === undefined ? [] : Array.isArray(v) ? v : [v]);
+
+  it("is deny-by-default with registry allows and a sitemap when PUBLIC_SITE_URL is set", () => {
     const robots = buildPublicRobots(env({ PUBLIC_SITE_URL: "https://s.example" }));
-    const rule = Array.isArray(robots.rules) ? robots.rules[0] : robots.rules;
-    expect(rule?.allow).toEqual(["/site/", "/book/"]);
-    expect(rule?.disallow).toEqual(expect.arrayContaining(["/pay/", "/book/*/manage", "/api/"]));
+    const rule = ruleOf(robots);
+    expect(list(rule?.disallow)).toEqual(expect.arrayContaining(["/", "/book/*/manage"]));
+    expect(list(rule?.allow)).toEqual(ROBOTS_ALLOW.map((a) => a.prefix));
+    expect(list(rule?.allow)).toEqual(expect.arrayContaining(["/site/", "/book/", "/pricing"]));
     expect(robots.sitemap).toBe("https://s.example/sitemap.xml");
-    expect(buildPublicRobots(env({})).sitemap).toBeUndefined();
+  });
+
+  it("disallows everything and omits the sitemap when PUBLIC_SITE_URL is unset (previews)", () => {
+    const robots = buildPublicRobots(env({}));
+    const rule = ruleOf(robots);
+    expect(list(rule?.disallow)).toEqual(["/"]);
+    expect(list(rule?.allow)).toEqual([]);
+    expect(robots.sitemap).toBeUndefined();
+    expect(robots.host).toBeUndefined();
+  });
+
+  it("keeps every signed-in route segment (app/(app), (auth), (mobile)) disallowed", () => {
+    const appDir = join(dirname(fileURLToPath(import.meta.url)), "../../../app");
+    const segments = ["(app)", "(auth)", "(mobile)"].flatMap((group) =>
+      readdirSync(join(appDir, group), { withFileTypes: true })
+        .filter((d) => d.isDirectory())
+        .map((d) => `/${d.name}`)
+    );
+    expect(segments).toEqual(expect.arrayContaining(["/dashboard", "/command-center", "/settings", "/login"]));
+    const allows = list(ruleOf(buildPublicRobots(env({ PUBLIC_SITE_URL: "https://s.example" })))?.allow);
+    for (const segment of segments) {
+      // Covered by "Disallow: /" only if no allow prefix matches it.
+      const allowed = allows.some((p) => (p.endsWith("$") ? segment === p.slice(0, -1) : `${segment}/`.startsWith(p) || segment.startsWith(p)));
+      expect(allowed, segment).toBe(false);
+    }
   });
 });

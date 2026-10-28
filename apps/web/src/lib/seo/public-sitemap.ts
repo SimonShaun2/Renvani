@@ -13,18 +13,27 @@ export const SHOP_PAGE_TYPES = [
   { key: "book", path: (slug: string) => `/book/${slug}`, priority: 0.7 }
 ] as const;
 
-/** Paths never meant for crawlers: tokenized, authenticated or transactional. */
+/**
+ * Robots is deny-by-default: `Disallow: /` plus explicit allows from this registry. Everything else, including every
+ * signed-in route under app/(app), app/(auth) and app/(mobile), stays disallowed. Add a public surface here to expose it.
+ */
+export const ROBOTS_ALLOW = [
+  { key: "home", prefix: "/$" }, // marketing home (exact)
+  { key: "pricing", prefix: "/pricing" },
+  { key: "product", prefix: "/product/" },
+  { key: "product-tour", prefix: "/product-tour" },
+  { key: "industries", prefix: "/industries" },
+  { key: "shop-site", prefix: "/site/" }, // shop sites + /site/:slug/inquire
+  { key: "public-booking", prefix: "/book/" }
+] as const;
+
+/** Tokenized/transactional paths under allowed prefixes (longer rule wins over the allow). */
 export const ROBOTS_DISALLOW = [
-  "/api/",
+  "/",
   "/book/*/manage",
   "/book/*/confirm",
   "/book/*/confirmed",
-  "/book/*/commit",
-  "/pay/",
-  "/portal",
-  "/review/",
-  "/vip/",
-  "/approve/"
+  "/book/*/commit"
 ] as const;
 
 export function publicSiteUrl(env: NodeJS.ProcessEnv = process.env): string | null {
@@ -72,8 +81,11 @@ export async function buildPublicSitemap(
 
 export function buildPublicRobots(env: NodeJS.ProcessEnv = process.env): MetadataRoute.Robots {
   const base = publicSiteUrl(env);
+  // Previews / unconfigured deploys: block everything and advertise no sitemap.
+  if (!base) return { rules: [{ userAgent: "*", disallow: "/" }] };
   return {
-    rules: [{ userAgent: "*", allow: ["/site/", "/book/"], disallow: [...ROBOTS_DISALLOW] }],
-    ...(base ? { sitemap: `${base}/sitemap.xml`, host: base } : {})
+    rules: [{ userAgent: "*", allow: ROBOTS_ALLOW.map((a) => a.prefix), disallow: [...ROBOTS_DISALLOW] }],
+    sitemap: `${base}/sitemap.xml`,
+    host: base
   };
 }

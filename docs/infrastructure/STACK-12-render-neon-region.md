@@ -30,3 +30,5 @@ When `batch-ci` uses Neon **per-PR branches**, preview Render services (if any) 
 - [FS-93 Render runbook](../platform/FS-93-render-runbook.md)
 - [OFFICIAL-OPERATIONAL-STACK.md](../OFFICIAL-OPERATIONAL-STACK.md)
 - [OFFICIAL-STACK-GAP-ANALYSIS.md](../platform/OFFICIAL-STACK-GAP-ANALYSIS.md)
+
+**Blueprint:** canonical file is `/render.yaml` (identical reference copy: `docs/infrastructure/render-blueprint.render.yaml`). Apply steps: `docs/infrastructure/RENDER-DEPLOY-RUNBOOK.md` (FS-93).

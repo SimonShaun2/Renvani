@@ -45,7 +45,7 @@ async function seedRequest(config: Record<string, unknown> = {}) {
   fakeDb.seedAutomationRule({ companyId: company.id, ruleType: "review_request", isEnabled: true, delayHours: 4, config } as never);
   const customer = fakeDb.seedCustomer({ companyId: company.id, firstName: "Chris", lastName: "Pine", email: "chris@example.com", phone: "555-0100" });
   const job = fakeDb.seedJob({ companyId: company.id, customerId: customer.id });
-  const invoice = fakeDb.seedInvoice({ companyId: company.id, customerId: customer.id, jobId: job.id, status: "paid" });
+  const invoice = fakeDb.seedInvoice({ companyId: company.id, customerId: customer.id, jobId: job.id, status: "paid", total: "250.00" });
   await service.requestReviewForPaidInvoice(company.id, invoice.id);
   const [request] = fakeDb.getTestState().reviewRequests;
   addQueueJob.mockClear();

@@ -81,7 +81,11 @@ export async function legacyMiddleware(request: NextRequest, clerkUserId: string
       return new NextResponse(null, { status: 400 });
     }
 
-    return NextResponse.next();
+    const headers = new Headers(request.headers);
+    headers.delete("x-origin-secret"); // never pass a client-supplied value through
+    const originSecret = process.env.ORIGIN_SECRET;
+    if (originSecret) headers.set("x-origin-secret", originSecret);
+    return NextResponse.next({ request: { headers } });
   }
 
   const token = request.cookies.get(AUTH_TOKEN_COOKIE_NAME)?.value;

@@ -26,6 +26,11 @@ describe("middleware legacy GET /estimates/:token recovery (FS-36)", () => {
     expect(response.headers.get("location")).toBe(`http://localhost:3000/approve/${LEGACY_TOKEN}`);
   });
 
+  it.each(["/robots.txt", "/sitemap.xml"])("legacy auth: %s is not redirected to /login when signed out", async (path) => {
+    const response = await middleware(new NextRequest(`http://localhost:3000${path}`, { method: "GET" }));
+    expect(response.headers.get("location")).toBeNull();
+  });
+
   it("does not call public API for staff UUID paths (auth flow continues)", async () => {
     const fetchMock = vi.fn();
     vi.stubGlobal("fetch", fetchMock);

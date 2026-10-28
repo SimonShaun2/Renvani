@@ -57,6 +57,13 @@ export function optInSlugs(env: NodeJS.ProcessEnv = process.env): string[] {
   return [...new Set(slugs)].slice(0, 500);
 }
 
+export class SitemapPublishCheckError extends Error {
+  constructor(readonly slugs: string[]) {
+    super(`Sitemap publish check failed for ${slugs.length} shop(s): ${slugs.join(", ")}`);
+    this.name = "SitemapPublishCheckError";
+  }
+}
+
 type Fetcher = (slug: string) => Promise<unknown | null>;
 
 export async function buildPublicSitemap(
@@ -65,9 +72,25 @@ export async function buildPublicSitemap(
 ): Promise<MetadataRoute.Sitemap> {
   const base = publicSiteUrl(env);
   if (!base) return [];
+  const failures: { slug: string; error: unknown }[] = [];
   const published = await Promise.all(
-    optInSlugs(env).map(async (slug) => ((await fetchSettings(slug).catch(() => null)) ? slug : null))
+    optInSlugs(env).map(async (slug) => {
+      try {
+        // null = genuinely unpublished (API 404); a throw = outage/bad response, never treated as unpublished.
+        return (await fetchSettings(slug)) ? slug : null;
+      } catch (error) {
+        failures.push({ slug, error });
+        return null;
+      }
+    })
   );
+  if (failures.length > 0) {
+    for (const { slug, error } of failures) {
+      console.error("[sitemap] publish check failed", { slug, error: error instanceof Error ? error.message : String(error) });
+    }
+    // Fail this render visibly: Next keeps serving the last good sitemap instead of caching shops as unpublished.
+    throw new SitemapPublishCheckError(failures.map((f) => f.slug));
+  }
   return published
     .filter((slug): slug is string => slug !== null)
     .flatMap((slug) =>

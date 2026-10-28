@@ -212,6 +212,7 @@ const jobDetailSchema = {
     "deletedAt"
   ],
   properties: {
+    crewId: { type: ["string", "null"] },
     id: { type: "string" },
     companyId: { type: "string" },
     jobNumber: { type: "string" },
@@ -491,8 +492,36 @@ export const JobIdParamsSchema = z
   })
   .strict();
 
+const jobLineItemInputSchema = z
+  .object({
+    productCatalogId: uuidSchema.optional(),
+    name: z.string().trim().min(1).max(255).optional(),
+    description: z.string().trim().optional(),
+    category: productCategorySchema.optional().default("service"),
+    quantity: z.coerce.number().positive().optional().default(1),
+    unitPrice: z.coerce.number().positive().optional(),
+    isTaxable: z.boolean().optional().default(true),
+    isUpsell: z.boolean().optional().default(false)
+  })
+  .strict()
+  .refine((input) => input.productCatalogId !== undefined || (input.name !== undefined && input.unitPrice !== undefined), {
+    message: "name and unitPrice are required when productCatalogId is not provided",
+    path: ["name"]
+  });
+
+const MAX_JOB_LINE_ITEMS_AT_CREATE = 50;
+
+export const JobCreatePreviewSchema = z
+  .object({
+    customerId: uuidSchema.optional(),
+    products: z.array(jobLineItemInputSchema).max(MAX_JOB_LINE_ITEMS_AT_CREATE).optional()
+  })
+  .strict();
+
 export const CreateJobSchema = z
   .object({
+    products: z.array(jobLineItemInputSchema).max(MAX_JOB_LINE_ITEMS_AT_CREATE).optional(),
+    crewId: uuidSchema.optional(),
     customerId: uuidSchema,
     propertyId: uuidSchema.optional(),
     assetId: uuidSchema.optional(),
@@ -655,22 +684,7 @@ export const ReorderTasksSchema = z
   })
   .strict();
 
-export const AddJobProductSchema = z
-  .object({
-    productCatalogId: uuidSchema.optional(),
-    name: z.string().trim().min(1).max(255).optional(),
-    description: z.string().trim().optional(),
-    category: productCategorySchema.optional().default("service"),
-    quantity: z.coerce.number().positive().optional().default(1),
-    unitPrice: z.coerce.number().positive().optional(),
-    isTaxable: z.boolean().optional().default(true),
-    isUpsell: z.boolean().optional().default(false)
-  })
-  .strict()
-  .refine((input) => input.productCatalogId !== undefined || (input.name !== undefined && input.unitPrice !== undefined), {
-    message: "name and unitPrice are required when productCatalogId is not provided",
-    path: ["name"]
-  });
+export const AddJobProductSchema = jobLineItemInputSchema;
 
 export const UpdateJobProductSchema = buildUpdateSchema({
   name: z.string().trim().min(1).max(255).optional(),
@@ -713,6 +727,7 @@ export type ReorderTasksBody = z.infer<typeof ReorderTasksSchema>;
 
 export const listJobsValidation = withZodValidation({ query: ListJobsQuerySchema });
 export const createJobValidation = withZodValidation({ body: CreateJobSchema });
+export const jobCreatePreviewValidation = withZodValidation({ body: JobCreatePreviewSchema });
 export const jobIdValidation = withZodValidation({ params: JobIdParamsSchema });
 export const updateJobValidation = withZodValidation({
   params: JobIdParamsSchema,

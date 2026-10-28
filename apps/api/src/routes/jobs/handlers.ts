@@ -1,3 +1,6 @@
+import type { JobCreatePreviewInput } from "@fsm/types";
+
+import { previewJobCreate } from "../../services/job-create-preview.service.js";
 import type { FastifyReply, FastifyRequest } from "fastify";
 
 import {
@@ -120,6 +123,7 @@ function toJobDetailResponse(job: JobDetail) {
     propertyId: job.propertyId,
     assetId: job.assetId,
     technicianId: job.technicianId,
+    crewId: (job as { crewId?: string | null }).crewId ?? null,
     assignedById: job.assignedById,
     type: job.type,
     priority: job.priority,
@@ -312,6 +316,11 @@ export async function createJobHandler(request: FastifyRequest, reply: FastifyRe
   return reply.status(201).send({
     job: toJobDetailResponse(await withSignedJobSignature(detail))
   });
+}
+
+export async function previewJobCreateHandler(request: FastifyRequest, reply: FastifyReply): Promise<FastifyReply> {
+  const preview = await previewJobCreate(request.company.id, request.body as JobCreatePreviewInput);
+  return reply.send(preview);
 }
 
 export async function getJobHandler(request: FastifyRequest, reply: FastifyReply): Promise<FastifyReply> {

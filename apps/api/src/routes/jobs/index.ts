@@ -13,6 +13,7 @@ import {
   completeTaskHandler,
   createTaskHandler,
   createJobHandler,
+  previewJobCreateHandler,
   deleteTaskHandler,
   getJobHandler,
   getJobPreparationStatusHandler,
@@ -48,6 +49,7 @@ import {
   completeTaskValidation,
   createJobSchema,
   createJobValidation,
+  jobCreatePreviewValidation,
   createTaskRouteSchema,
   createTaskValidation,
   deleteTaskRouteSchema,
@@ -107,6 +109,12 @@ const jobRoutes: FastifyPluginAsync = async (fastify) => {
     preValidation: createJobValidation,
     schema: createJobSchema
   }, createJobHandler);
+
+  // Before "/:id/*" routes. Staff only; read-only (no job number reserved).
+  fastify.post("/preview", {
+    preHandler: staffOnly,
+    preValidation: jobCreatePreviewValidation
+  }, previewJobCreateHandler);
 
   fastify.post("/:id/status", {
     preHandler: ownJobWrite,

@@ -43,6 +43,8 @@ import {
 } from "@fsm/types";
 
 import { generateJobNumber } from "../lib/job-number.js";
+import { assertActiveCrewInTransaction } from "./crews/crews.service.js";
+import { insertJobProductInTransaction } from "./job-products.service.js";
 import { runTenantAwareTransaction } from "../lib/company-scoped-transaction.js";
 import { enforceJobCreationPlanLimit } from "../lib/plan-usage-limits.js";
 import {
@@ -304,7 +306,9 @@ function normalizeCreateJobInput(input: CreateJobInput) {
     tags: normalizeStringArray(input.tags) ?? [],
     scheduledStart,
     scheduledEnd,
-    scheduledDurationMinutes: calculateDurationMinutes(scheduledStart, scheduledEnd)
+    scheduledDurationMinutes: calculateDurationMinutes(scheduledStart, scheduledEnd),
+    products: input.products ?? [],
+    crewId: input.crewId
   };
 }
 
@@ -862,6 +866,10 @@ export async function createJob(
       await getTechnicianRecord(companyId, normalizedInput.technicianId, tx);
     }
 
+    if (normalizedInput.crewId) {
+      await assertActiveCrewInTransaction(tx as never, companyId, normalizedInput.crewId);
+    }
+
     const jobNumber = await generateJobNumber(companyId, tx);
     const insertedJobs = await tx
       .insert(jobs)
@@ -881,6 +889,7 @@ export async function createJob(
         scheduledEnd: normalizedInput.scheduledEnd,
         scheduledDurationMinutes: normalizedInput.scheduledDurationMinutes,
         tags: normalizedInput.tags,
+        crewId: normalizedInput.crewId ?? null,
         jobNumber
       })
       .returning();
@@ -888,6 +897,10 @@ export async function createJob(
 
     if (!createdJob) {
       throw new AppError(ErrorCode.INTERNAL_ERROR, "Failed to create job");
+    }
+
+    for (const product of normalizedInput.products) {
+      await insertJobProductInTransaction(tx as never, companyId, createdJob, actorId, product);
     }
 
     await emitJobEvent(

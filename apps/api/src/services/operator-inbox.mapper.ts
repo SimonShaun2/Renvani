@@ -1,5 +1,8 @@
 import {
+  OPERATOR_INBOX_DETAIL_FIELDS,
   OPERATOR_INBOX_UI_VERSION,
+  type OperatorInboxChecks,
+  type OperatorInboxPricing,
   type OperatorInboxItem,
   type OperatorInboxProposedContent,
   type OperatorInboxProvenanceEvent,
@@ -27,6 +30,12 @@ export interface AgentActionRowView {
   reviewerId: string | null;
   executionReceipt: Record<string, unknown> | null;
   createdAt: string;
+  updatedAt?: string;
+}
+
+export interface OperatorInboxItemExtras {
+  proposalNumber?: string;
+  proposalVersion?: number;
 }
 
 function asRecord(value: unknown): Record<string, unknown> {
@@ -54,6 +63,10 @@ export function resolveOverridePaths(state: AgentActionState, requiresApproval: 
 
   if (state === "awaiting_approval" || state === "policy_evaluated") {
     paths.push("reject", "edit", "approve");
+  }
+
+  if (state === "awaiting_approval" || state === "policy_evaluated" || state === "approved") {
+    paths.push("escalate");
   }
 
   if (state === "approved" || (!requiresApproval && state === "policy_evaluated")) {
@@ -93,9 +106,44 @@ export function extractProposedContent(parameters: Record<string, unknown>): Ope
   };
 }
 
+function readDisplayValue(value: unknown): string | null {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return String(value);
+  }
+  if (typeof value === "boolean") {
+    return value ? "yes" : "no";
+  }
+  return readString(value);
+}
+
+function pickFields<T extends Record<string, readonly string[]>>(
+  parameters: Record<string, unknown>,
+  fields: T
+): { [K in keyof T]: string | null } {
+  const out = {} as { [K in keyof T]: string | null };
+  for (const field of Object.keys(fields) as (keyof T)[]) {
+    out[field] = fields[field]!.map((key) => readDisplayValue(parameters[key])).find((v) => v !== null) ?? null;
+  }
+  return out;
+}
+
+/** Price/check chips from proposal parameters, driven by OPERATOR_INBOX_DETAIL_FIELDS. */
+export function extractPricing(parameters: Record<string, unknown>): OperatorInboxPricing {
+  return pickFields(parameters, OPERATOR_INBOX_DETAIL_FIELDS.pricing);
+}
+
+export function extractChecks(parameters: Record<string, unknown>): OperatorInboxChecks {
+  return pickFields(parameters, OPERATOR_INBOX_DETAIL_FIELDS.checks);
+}
+
+export function formatProposalNumber(sequence: number): string {
+  return `P-${String(sequence).padStart(4, "0")}`;
+}
+
 export function toOperatorInboxItem(
   row: AgentActionRowView,
-  sourceEvents: OperatorInboxProvenanceEvent[]
+  sourceEvents: OperatorInboxProvenanceEvent[],
+  extras: OperatorInboxItemExtras = {}
 ): OperatorInboxItem {
   const activeParameters = row.approvedParameters ?? row.parameters;
 
@@ -121,6 +169,11 @@ export function toOperatorInboxItem(
       policyVersion: row.policyVersion
     },
     executionReceipt: row.executionReceipt,
-    reviewerId: row.reviewerId
+    reviewerId: row.reviewerId,
+    ...(row.updatedAt ? { version: new Date(row.updatedAt).getTime() } : {}),
+    ...(extras.proposalNumber ? { proposalNumber: extras.proposalNumber } : {}),
+    ...(extras.proposalVersion ? { proposalVersion: extras.proposalVersion } : {}),
+    pricing: extractPricing(activeParameters),
+    checks: extractChecks(activeParameters)
   };
 }

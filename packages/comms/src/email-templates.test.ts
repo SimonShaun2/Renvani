@@ -106,7 +106,8 @@ describe("FS-155: every interpolated field is HTML-escaped", () => {
     [T.vipMembershipWelcome, ["firstName", "planName", "companyName"]],
     [T.vipMembershipRenewal, ["firstName", "planName", "companyName", "renewalDateLabel", "amount"]],
     [T.vipMembershipPaymentFailed, ["firstName", "planName", "companyName", "amount", "graceEndsAtLabel", "nextRetryAtLabel"]],
-    [T.ownerAlert, ["headline", "summary", "companyName"]]
+    [T.ownerAlert, ["headline", "summary", "companyName"]],
+    [T.reviewRequest, ["firstName", "companyName", "technicianName"]]
   ];
 
   for (const [templateId, fields] of FIELDS) {
@@ -135,7 +136,8 @@ describe("FS-155: every interpolated field is HTML-escaped", () => {
       [T.serviceAgreementPaymentFailed, "manageUrl"],
       [T.vipMembershipWelcome, "portalUrl"],
       [T.vipMembershipPaymentFailed, "paymentUrl"],
-      [T.ownerAlert, "actionUrl"]
+      [T.ownerAlert, "actionUrl"],
+      [T.reviewRequest, "reviewUrl"]
     ];
     for (const [templateId, field] of urls) {
       const { html } = renderTransactionalEmail(templateId, { [field]: 'javascript:alert(1)//"><script>' });

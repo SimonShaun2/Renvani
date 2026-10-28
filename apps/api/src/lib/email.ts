@@ -386,3 +386,23 @@ export async function sendOwnerAlertEmail(
   await sendRenderedTemplateEmail(to, EMAIL_TEMPLATE_IDS.ownerAlert, variables, ["owner_alert", `owner_alert.${kind}`]);
   logger.debug({ recipient: "[redacted]", kind }, "Owner alert email sent");
 }
+
+export async function sendReviewRequestEmail(
+  to: string,
+  params: { firstName: string; companyName: string; technicianName: string | null; reviewUrl: string }
+): Promise<TransactionalEmailSendResult> {
+  const result = await sendRenderedTemplateEmail(
+    to,
+    EMAIL_TEMPLATE_IDS.reviewRequest,
+    {
+      firstName: params.firstName,
+      companyName: params.companyName,
+      technicianName: params.technicianName ?? "",
+      reviewUrl: params.reviewUrl
+    },
+    ["review_request.sent"]
+  );
+
+  logger.debug({ recipient: "[redacted]" }, "Review request email sent");
+  return result;
+}

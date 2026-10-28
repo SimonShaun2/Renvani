@@ -38,6 +38,10 @@ type TransactionalEmailSendResult = {
 };
 
 interface EmailModule {
+  sendReviewRequestEmail?(
+    to: string,
+    params: { firstName: string; companyName: string; technicianName: string | null; reviewUrl: string }
+  ): Promise<unknown>;
   sendPasswordResetEmail(to: string, resetUrl: string, firstName: string): Promise<void>;
   sendEstimateEmail(
     to: string,
@@ -1224,6 +1228,26 @@ export async function handleSendReviewRequest(
   job: Job<Record<string, unknown>>,
   dependencies: NotificationsDependencies
 ): Promise<void> {
+  if (getJobString(job.data, "channel") === "email") {
+    const to = getJobString(job.data, "customerEmail");
+    const referenceId = getJobString(job.data, "referenceId");
+    if (!to || !referenceId || !dependencies.email.sendReviewRequestEmail) {
+      logger.warn({ jobId: job.id ?? null }, "Review request email job missing required data");
+      return;
+    }
+    await dependencies.email.sendReviewRequestEmail(to, {
+      firstName: getJobString(job.data, "customerFirstName") ?? "",
+      companyName: getJobString(job.data, "companyName") ?? "Renvani",
+      technicianName: getJobString(job.data, "technicianName"),
+      reviewUrl: `${env.APP_URL.replace(/\/$/, "")}/review/${referenceId}`
+    });
+    logger.info(
+      { companyId: getJobString(job.data, "companyId"), reviewRequestId: getJobString(job.data, "reviewRequestId") },
+      "Review request email sent"
+    );
+    return;
+  }
+
   await handleSmsNotificationJob(job, dependencies, {
     jobLabel: "Review request",
     buildBody(data) {

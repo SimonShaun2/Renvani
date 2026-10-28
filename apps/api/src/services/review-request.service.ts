@@ -1,12 +1,15 @@
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, gte, isNull, sql } from "drizzle-orm";
 import pino from "pino";
 
 import {
+  activityEvents,
+  automationRules,
   bookingSettings,
   companies,
   customers,
   db,
   emitEventWithExecutor,
+  invoices,
   jobs,
   reviewRequests,
   technicians,
@@ -26,6 +29,16 @@ import {
   type ReviewRequestListItem,
   type UpdateReviewRequestInput
 } from "@fsm/types";
+
+import { isOutboundSmsLive } from "../lib/sms.js";
+import {
+  customerCooldownDays,
+  decideInvoicePaidReviewRequest,
+  invoiceReviewRequestQueueJobId,
+  routeReviewRating,
+  type InvoicePaidReviewDecision,
+  type ReviewRatingRoute
+} from "./automation/review-request-policy.js";
 
 type BookingSettingsRow = typeof bookingSettings.$inferSelect;
 type CompanyRow = typeof companies.$inferSelect;
@@ -320,6 +333,196 @@ export async function createReviewRequest(
   return result.reviewRequest;
 }
 
+export type PaidInvoiceReviewResult =
+  | { status: "queued"; reviewRequestId: string; channel: "email" | "sms" }
+  | { status: "skipped"; reason: Extract<InvoicePaidReviewDecision, { action: "skip" }>["reason"] | "invoice_not_found" };
+
+/**
+ * invoice.paid automation: reuses the review_requests table, the review_request.sent event and the
+ * send-review-request notification job. Idempotent per invoice (activity_events.invoice_id on the
+ * review_request.sent event + per-invoice advisory lock + BullMQ jobId), consent-aware and rate limited.
+ */
+export async function requestReviewForPaidInvoice(
+  companyId: string,
+  invoiceId: string,
+  now: Date = new Date()
+): Promise<PaidInvoiceReviewResult> {
+  const smsLive = isOutboundSmsLive();
+  const result = await db.transaction(async (tx: TransactionExecutor) => {
+    const lockable = tx as unknown as { execute?: (query: unknown) => Promise<unknown> };
+    if (typeof lockable.execute === "function") {
+      await lockable.execute(sql`select pg_advisory_xact_lock(hashtext(${`review-request:invoice:${invoiceId}`}))`);
+    }
+
+    const [invoice] = await tx
+      .select()
+      .from(invoices)
+      .where(and(eq(invoices.companyId, companyId), eq(invoices.id, invoiceId), isNull(invoices.deletedAt)))
+      .limit(1);
+    if (!invoice) {
+      return { outcome: { status: "skipped", reason: "invoice_not_found" } as PaidInvoiceReviewResult };
+    }
+
+    const [rule] = await tx
+      .select()
+      .from(automationRules)
+      .where(
+        and(
+          eq(automationRules.companyId, companyId),
+          eq(automationRules.ruleType, "review_request"),
+          isNull(automationRules.deletedAt)
+        )
+      )
+      .limit(1);
+    const ruleConfig =
+      rule?.config && typeof rule.config === "object" && !Array.isArray(rule.config)
+        ? (rule.config as Record<string, unknown>)
+        : null;
+    const customer = await getCustomerRecord(companyId, invoice.customerId, tx);
+
+    const priorInvoiceEvents = await tx
+      .select()
+      .from(activityEvents)
+      .where(
+        and(
+          eq(activityEvents.companyId, companyId),
+          eq(activityEvents.eventType, "review_request.sent"),
+          eq(activityEvents.invoiceId, invoice.id)
+        )
+      )
+      .limit(1);
+
+    const jobRequests = invoice.jobId
+      ? await tx
+          .select()
+          .from(reviewRequests)
+          .where(
+            and(
+              eq(reviewRequests.companyId, companyId),
+              eq(reviewRequests.jobId, invoice.jobId),
+              isNull(reviewRequests.deletedAt)
+            )
+          )
+      : [];
+
+    const cooldownStart = new Date(now.getTime() - customerCooldownDays(ruleConfig) * 24 * 60 * 60 * 1000);
+    const customerRecent = await tx
+      .select()
+      .from(reviewRequests)
+      .where(
+        and(
+          eq(reviewRequests.companyId, companyId),
+          eq(reviewRequests.customerId, customer.id),
+          gte(reviewRequests.createdAt, cooldownStart),
+          isNull(reviewRequests.deletedAt)
+        )
+      );
+    const companyRecent = await tx
+      .select()
+      .from(reviewRequests)
+      .where(
+        and(
+          eq(reviewRequests.companyId, companyId),
+          gte(reviewRequests.createdAt, new Date(now.getTime() - 24 * 60 * 60 * 1000)),
+          isNull(reviewRequests.deletedAt)
+        )
+      );
+
+    const decision = decideInvoicePaidReviewRequest({
+      invoiceStatus: invoice.status,
+      rule: rule ? { isEnabled: rule.isEnabled, delayHours: rule.delayHours, config: ruleConfig } : null,
+      customer: {
+        email: customer.email,
+        phone: customer.phone,
+        prefersEmail: customer.prefersEmail,
+        prefersSms: customer.prefersSms,
+        doNotContact: customer.doNotContact
+      },
+      alreadyRequestedForInvoice: priorInvoiceEvents.length > 0,
+      openRequestForJob: jobRequests.some((row) => row.status !== "completed" && row.status !== "declined"),
+      customerRecentRequestCount: customerRecent.length,
+      companyRequestsLast24h: companyRecent.length,
+      smsLive
+    });
+
+    if (decision.action === "skip") {
+      return { outcome: { status: "skipped", reason: decision.reason } as PaidInvoiceReviewResult };
+    }
+
+    const job = invoice.jobId ? await getJobRecord(companyId, invoice.jobId, tx) : null;
+    const [company, technician, settings] = await Promise.all([
+      getCompanyRecord(companyId, tx),
+      job?.technicianId ? getTechnicianRecord(companyId, job.technicianId, tx) : Promise.resolve(null),
+      getBookingSettingsRecord(companyId, tx)
+    ]);
+    const [reviewRequest] = await tx
+      .insert(reviewRequests)
+      .values({
+        companyId,
+        jobId: invoice.jobId,
+        customerId: customer.id,
+        technicianId: job?.technicianId ?? null,
+        status: "sent",
+        channel: decision.channel,
+        reviewUrl: settings?.googleReviewUrl ?? null,
+        sentAt: now
+      })
+      .returning();
+    if (!reviewRequest) {
+      throw new AppError(ErrorCode.INTERNAL_ERROR, "Failed to create review request");
+    }
+
+    await emitEventWithExecutor(tx, {
+      companyId,
+      eventType: "review_request.sent",
+      actorType: "system",
+      actorName: "Review request automation",
+      entityType: "review_request",
+      entityId: reviewRequest.id,
+      customerId: customer.id,
+      invoiceId: invoice.id,
+      ...(invoice.jobId ? { jobId: invoice.jobId } : {}),
+      payload: {
+        reviewRequestId: reviewRequest.id,
+        referenceId: reviewRequest.referenceId,
+        channel: decision.channel,
+        trigger: "invoice.paid",
+        invoiceId: invoice.id
+      },
+      summary: `Review request queued after invoice ${invoice.invoiceNumber} was paid`
+    });
+
+    return {
+      outcome: { status: "queued", reviewRequestId: reviewRequest.id, channel: decision.channel } as PaidInvoiceReviewResult,
+      delayMs: decision.delayMs,
+      queueData: {
+        companyId,
+        reviewRequestId: reviewRequest.id,
+        customerId: customer.id,
+        invoiceId: invoice.id,
+        channel: decision.channel,
+        customerPhone: decision.channel === "sms" ? customer.phone : null,
+        customerEmail: decision.channel === "email" ? customer.email : null,
+        customerFirstName: customer.firstName,
+        referenceId: reviewRequest.referenceId,
+        companyName: company.name,
+        technicianName: technician ? `${technician.firstName} ${technician.lastName}`.trim() : null
+      }
+    };
+  });
+
+  if (result.queueData) {
+    await notificationsQueue.add("send-review-request", result.queueData, {
+      jobId: invoiceReviewRequestQueueJobId(invoiceId),
+      delay: result.delayMs ?? 0
+    });
+    logger.info({ companyId, invoiceId, reviewRequestId: result.queueData.reviewRequestId }, "Queued invoice.paid review request");
+  } else {
+    logger.info({ companyId, invoiceId, outcome: result.outcome }, "invoice.paid review request skipped");
+  }
+  return result.outcome;
+}
+
 export async function resendReviewRequest(
   companyId: string,
   reviewRequestId: string
@@ -583,7 +786,7 @@ export async function getPublicReviewLanding(referenceId: string): Promise<Publi
 export async function completePublicReviewRequest(
   referenceId: string,
   input: CompleteReviewRequestInput
-): Promise<ReviewRequest> {
+): Promise<ReviewRequest & { routing: ReviewRatingRoute }> {
   return db.transaction(async (tx: TransactionExecutor) => {
     const [reviewRequest] = await tx
       .select()
@@ -620,6 +823,9 @@ export async function completePublicReviewRequest(
       throw new AppError(ErrorCode.INTERNAL_ERROR, "Failed to complete review request");
     }
 
+    const settings = await getBookingSettingsRecord(updatedReviewRequest.companyId, tx);
+    const routing = routeReviewRating(input.rating, settings?.googleReviewUrl ?? null);
+
     await emitEventWithExecutor(tx, {
       companyId: updatedReviewRequest.companyId,
       eventType: "review_request.completed",
@@ -629,11 +835,12 @@ export async function completePublicReviewRequest(
       customerId: updatedReviewRequest.customerId,
       jobId: updatedReviewRequest.jobId,
       payload: {
-        rating: updatedReviewRequest.rating
+        rating: updatedReviewRequest.rating,
+        routing: routing.kind
       },
-      summary: "Review request completed"
+      summary: routing.kind === "private_feedback" ? "Private feedback received" : "Review request completed"
     });
 
-    return toReviewRequest(updatedReviewRequest);
+    return { ...toReviewRequest(updatedReviewRequest), routing };
   });
 }

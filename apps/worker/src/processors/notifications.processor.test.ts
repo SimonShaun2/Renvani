@@ -792,3 +792,42 @@ describe("send-review-request send-time re-check (#264 review)", () => {
     expect(ok.sendReviewRequestEmail).toHaveBeenCalledTimes(1);
   });
 });
+
+describe("send-plan-reminder", () => {
+  it("emails the renewal reminder via the Resend template", async () => {
+    const deps = createDependencies();
+    const sendPlanReminderEmail = vi.fn(async () => undefined);
+    (deps.email as unknown as Record<string, unknown>).sendPlanReminderEmail = sendPlanReminderEmail;
+    await notificationsProcessor.handleSendPlanReminder(
+      createJob("send-plan-reminder", {
+        companyId: "company-1",
+        maintenancePlanId: "plan-1",
+        reminderKind: "renewal",
+        channel: "email",
+        customerEmail: "chris@example.com",
+        firstName: "Chris",
+        companyName: "Acme HVAC",
+        planName: "Gold Plan",
+        dueDateLabel: "November 20, 2026"
+      }),
+      deps
+    );
+    expect(sendPlanReminderEmail).toHaveBeenCalledWith("chris@example.com", {
+      firstName: "Chris",
+      companyName: "Acme HVAC",
+      planName: "Gold Plan",
+      dueDateLabel: "November 20, 2026",
+      reminderKind: "renewal"
+    });
+    expect(deps.sms.sendSms).not.toHaveBeenCalled();
+  });
+
+  it("routes SMS jobs through the SMS module (disabled stub in dev)", async () => {
+    const deps = createDependencies();
+    await notificationsProcessor.handleSendPlanReminder(
+      createJob("send-plan-reminder", { channel: "sms", reminderKind: "tune_up", customerPhone: "555-0100", smsBody: "Tune-up due" }),
+      deps
+    );
+    expect(deps.sms.sendSms).toHaveBeenCalledWith("555-0100", "Tune-up due");
+  });
+});

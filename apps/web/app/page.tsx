@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { MarketingPage } from "@/src/components/marketing/visuals/MarketingPage";
 import { MARKETING_META } from "@/src/components/marketing/marketing-copy";
 import { getDefaultRouteForRole } from "@/src/lib/route-access";
-import { readServerAuthSession } from "@/src/lib/auth";
+import { getServerSession } from "@/src/lib/server-session";
 
 export const metadata: Metadata = {
   title: MARKETING_META.title,
@@ -20,11 +19,10 @@ export const metadata: Metadata = {
 };
 
 export default async function HomePage() {
-  const cookieStore = await cookies();
-  const session = readServerAuthSession(cookieStore);
+  const result = await getServerSession();
 
-  if (session?.role) {
-    redirect(getDefaultRouteForRole(session.role));
+  if (result.status === "ok") {
+    redirect(getDefaultRouteForRole(result.session.role));
   }
 
   return <MarketingPage page="home" visual="home" />;

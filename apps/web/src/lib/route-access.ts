@@ -137,3 +137,13 @@ export function canRoleAccessPath(role: UserRole, pathname: string): boolean {
 
   return allowedPrefixes.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
 }
+
+/**
+ * Routes a signed-in Clerk user may reach before any role claim exists (post-sign-up workspace
+ * setup). Clerk middleware path only; the legacy cookie path is unchanged.
+ */
+export const NO_ROLE_SETUP_ROUTES = ["/onboarding/workspace"] as const;
+
+export function isNoRoleSetupRoute(pathname: string): boolean {
+  return (NO_ROLE_SETUP_ROUTES as readonly string[]).includes(pathname);
+}

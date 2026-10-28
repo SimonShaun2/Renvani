@@ -73,3 +73,18 @@ describe("clerk config", () => {
     expect(getClerkPublishableKey({ NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: " pk_test_x " })).toBe("pk_test_x");
   });
 });
+
+describe("post-sign-up workspace step access", () => {
+  it("lets a signed-in user with no role reach /onboarding/workspace", () => {
+    expect(resolveClerkRouteDecision("/onboarding/workspace", "user_1", null)).toEqual({ action: "next" });
+  });
+  it("still bounces no-role users from other onboarding pages", () => {
+    expect(resolveClerkRouteDecision("/onboarding/import", "user_1", null)).toEqual({ action: "redirect", to: "/no-access" });
+  });
+  it("lets an owner continue to /onboarding/import", () => {
+    expect(resolveClerkRouteDecision("/onboarding/import", "user_1", "owner")).toEqual({ action: "next" });
+  });
+  it("sends signed-out users to /login", () => {
+    expect(resolveClerkRouteDecision("/onboarding/workspace", null, null)).toEqual({ action: "redirect", to: "/login" });
+  });
+});

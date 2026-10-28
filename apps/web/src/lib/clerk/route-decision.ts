@@ -1,4 +1,4 @@
-import { canRoleAccessPath, getDefaultRouteForRole, isPublicRoute, normalizeUserRole, type UserRole } from "../route-access";
+import { canRoleAccessPath, isNoRoleSetupRoute, getDefaultRouteForRole, isPublicRoute, normalizeUserRole, type UserRole } from "../route-access";
 
 export type ClerkRouteDecision = { action: "next" } | { action: "redirect"; to: string };
 
@@ -38,7 +38,8 @@ export function resolveClerkRouteDecision(
     const home = role ? getDefaultRouteForRole(role) : CLERK_NO_ACCESS_ROUTE;
     if (isAuthPage(pathname) || pathname === "/") return { action: "redirect", to: home };
     if (isPublicRoute(pathname)) return { action: "next" };
-    if (!role) return { action: "redirect", to: CLERK_NO_ACCESS_ROUTE };
+    if (!role) return isNoRoleSetupRoute(pathname) ? { action: "next" } : { action: "redirect", to: CLERK_NO_ACCESS_ROUTE };
+    if (isNoRoleSetupRoute(pathname)) return { action: "next" };
     return canRoleAccessPath(role, pathname) ? { action: "next" } : { action: "redirect", to: home };
   }
 

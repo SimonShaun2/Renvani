@@ -4,6 +4,8 @@ import { env } from "@fsm/config";
 import { featureFlags, isClerkAuthParallelJwtEnabled } from "@fsm/config/feature-flags";
 import { AppError, ErrorCode, type UserRole } from "@fsm/types";
 
+import { extraAppOrigins } from "./app-origins.js";
+
 /**
  * Session-token claim carrying the Renvani staff role, shared with web (#184): `metadata.role`.
  * The Clerk session token template must map `"metadata": "{{user.public_metadata}}"` (server-controlled).
@@ -85,7 +87,8 @@ export async function verifyClerkBearerToken(accessToken: string): Promise<Clerk
     throw new AppError(ErrorCode.INTERNAL_ERROR, "Clerk secret is not configured");
   }
 
-  const authorizedParties = parseClerkAuthorizedParties();
+  // CLERK_AUTHORIZED_PARTIES plus APP_URL_ALLOWED extras (staging tier only; exact origins).
+  const authorizedParties = [...new Set([...parseClerkAuthorizedParties(), ...extraAppOrigins()])];
   if (authorizedParties.length === 0 && isClerkAzpRequired()) {
     // Fail closed: without an azp allow-list any Clerk frontend for this instance could mint usable tokens.
     throw new AppError(ErrorCode.UNAUTHORIZED, "Invalid Clerk session token");

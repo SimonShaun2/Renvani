@@ -63,6 +63,11 @@ const envSchema = z.object({
     .positive("MEDIA_SIGNED_URL_TTL_SECONDS must be greater than zero")
     .default(900),
   APP_URL: z.string().url("APP_URL must be a valid URL"),
+  /**
+   * Comma-separated extra web origins (exact match, no wildcards). APP_URL stays primary. Extras are honored only when
+   * RENVANI_DEPLOYMENT_TIER=staging (tester tier) for API CORS, Clerk authorized parties and Stripe return URLs.
+   */
+  APP_URL_ALLOWED: z.string().default(""),
   JWT_SECRET: z.string().min(1, "JWT_SECRET is required"),
   JWT_REFRESH_SECRET: z.string().min(1, "JWT_REFRESH_SECRET is required"),
   BOOKING_HOLD_TOKEN_SECRET: z.string().min(1, "BOOKING_HOLD_TOKEN_SECRET is required"),

@@ -20,6 +20,8 @@ import {
   SERVICE_FEE_RATE_BPS
 } from "@fsm/config/stripe-pricing";
 
+import { currentAppBaseUrl } from "./app-origins.js";
+
 const stripe = new Stripe(env.STRIPE_SECRET_KEY);
 
 export interface InvoiceCheckoutLineItem {
@@ -188,7 +190,7 @@ export async function createInvoiceCheckoutSession(
 ): Promise<InvoiceCheckoutSessionResult> {
   const fees = computeCheckoutFees({ chargeCents: toCents(input.total), plan: input.renvaniPlan });
   const applicationFeeAmount = fees.serviceFeeCents;
-  const appBaseUrl = env.APP_URL.replace(/\/$/, "");
+  const appBaseUrl = currentAppBaseUrl();
   const statementDescriptor = buildCardStatementDescriptor(input.companyName);
   const useEmbeddedCheckout = featureFlags.stripeRenvaniEmbeddedCheckout;
   const paymentIntentData: Stripe.Checkout.SessionCreateParams.PaymentIntentData = {
@@ -563,7 +565,7 @@ export async function createConnectAccountSession(
 }
 
 export async function createConnectOnboardingLink(accountId: string): Promise<{ url: string }> {
-  const appBaseUrl = env.APP_URL.replace(/\/$/, "");
+  const appBaseUrl = currentAppBaseUrl();
   const accountLink = await stripe.accountLinks.create({
     account: accountId,
     refresh_url: `${appBaseUrl}/settings/payments/onboard?refresh=true`,

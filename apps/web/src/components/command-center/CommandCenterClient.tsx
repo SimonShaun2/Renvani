@@ -2,8 +2,11 @@
 
 import { useMemo, useState } from "react";
 
+import Link from "next/link";
+
 import type { OperatorInboxItem } from "@fsm/types";
 
+import { isRevenueProposal } from "@/src/components/revenue-agent/proposal.config";
 import { ApiError } from "@/src/lib/api";
 import { cn } from "@/src/lib/utils";
 import {
@@ -225,6 +228,13 @@ export function CommandCenterClient() {
           Operator approval and exception inbox — review provenance, edit proposed content, and execute approved actions
           only.
         </p>
+        {/* Figma 10:104: Revenue Agent item in "Needs you" */}
+        <Link
+          href="/command-center/approvals"
+          className="mt-3 inline-flex rounded-lg border border-neutral-200 bg-white px-3 py-1.5 text-sm font-medium text-neutral-800 hover:border-neutral-300"
+        >
+          Revenue Agent · {inboxQuery.isLoading ? "—" : items.filter((item) => isRevenueProposal(item.provenance.actionType)).length} proposals waiting
+        </Link>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">

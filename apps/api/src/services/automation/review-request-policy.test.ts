@@ -85,3 +85,16 @@ describe("review rating routing", () => {
     expect(routeReviewRating(5, null)).toEqual({ kind: "private_feedback" });
   });
 });
+
+describe("review request consent + refund hardening (#264 review)", () => {
+  it("treats NULL prefersEmail / prefersSms as no consent", () => {
+    const customer = { email: "c@example.com", phone: "+15550100", prefersEmail: null, prefersSms: null, doNotContact: false };
+    expect(pickReviewChannel(customer, true)).toBeNull();
+    expect(decideInvoicePaidReviewRequest(facts({ customer, smsLive: true }))).toEqual({ action: "skip", reason: "no_consented_channel" });
+  });
+
+  it("skips paid invoices whose total is zero", () => {
+    expect(decideInvoicePaidReviewRequest(facts({ invoiceTotal: "0.00" }))).toEqual({ action: "skip", reason: "invoice_not_paid" });
+    expect(decideInvoicePaidReviewRequest(facts({ invoiceTotal: "125.00" })).action).toBe("create");
+  });
+});

@@ -25,6 +25,17 @@ Needs `curl` and `jq`. Env var **names** only; the script never prints values:
 
 Each run creates a new company, customer, job and invoice. Run it only against a staging or test database.
 
+## Write guard (fail closed)
+
+The script runs only read-only checks until the guard passes: `/health/live`, `/health/ready`, and the unsigned-webhook reject probe, which is expected to return 4xx. After those, and before any write step (register, import, create, send, pay), it decides as follows:
+
+1. **Allowed:** `/health/ready` reports `"tier"` (from `RENVANI_DEPLOYMENT_TIER` in `apps/api/src/services/health.service.ts`) as `staging` or `tester`.
+2. **Refused:** the host looks like production, meaning the tier is `production`/`prod`, or the hostname contains none of `staging|stage|tester|test|dev|preview|localhost|127.0.0.1`. The allowlist cannot override this. Set `RENVANI_DEPLOYMENT_TIER=staging` (or `tester`) on that API service instead.
+3. **Allowed:** the exact API hostname is listed in `SMOKE_ALLOWED_HOSTS` (comma-separated) or `ALLOW_HOST`. Example: `ALLOW_HOST=renvani-api-staging.onrender.com`.
+4. **Refused:** anything else.
+
+When the guard refuses, it prints a `FAIL write guard REFUSED ...` line and the summary, then exits with code **2**. `--dry-run` makes no network calls and prints the guard as a `DRY` step.
+
 ## Steps (verified against code)
 
 | Step | Endpoint | Notes |

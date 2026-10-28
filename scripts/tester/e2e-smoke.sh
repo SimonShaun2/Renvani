@@ -17,6 +17,14 @@
 #   SMOKE_IMPORT_FIXTURE  default packages/config/fixtures/import-golden-bundles/qbo/customers.csv
 #   SMOKE_IMPORT_TIMEOUT_SECONDS default 180;  SMOKE_TIMEOUT_SECONDS default 20
 #   SMOKE_WAIT_FOR_PAYMENT=1  poll invoice for "paid" after a human pays the TEST checkout link
+#   SMOKE_ALLOWED_HOSTS  optional comma-separated exact hostnames allowed for write steps (non-production hosts only)
+#   ALLOW_HOST           optional single exact hostname confirmation (same rules as SMOKE_ALLOWED_HOSTS)
+#
+# Write guard (fail closed): before any write call (register/import/create/send/pay) the script requires
+#   /health/ready "tier" (RENVANI_DEPLOYMENT_TIER) == staging|tester, OR the API host listed in
+#   SMOKE_ALLOWED_HOSTS / ALLOW_HOST. Production-looking hosts (tier=production, or no
+#   staging|stage|tester|test|dev|preview|localhost in the hostname) are refused unless the tier says staging/tester.
+#   Refusal exits 2 after the read-only health checks. See docs/infrastructure/TESTER-SMOKE-RUNBOOK.md.
 #
 # Usage: scripts/tester/e2e-smoke.sh [--dry-run]
 #   --dry-run : no network; prints every step and its GAP/SKIP reasons to prove the format.
@@ -61,6 +69,7 @@ if [[ "$DRY" == 1 ]]; then
     out DRY "$s" "would call API_BASE_URL"
   done
   [[ -f "$FIXTURE" ]] && out PASS "fixture present" "${FIXTURE#"$ROOT"/}" || out FAIL "fixture present" "$FIXTURE missing"
+  out DRY "write guard" "would require tier staging|tester from /health/ready, or SMOKE_ALLOWED_HOSTS/ALLOW_HOST"
   out GAP "sign up via Clerk" "needs browser + Clerk hosted UI; see runbook G1"
   out GAP "stripe connect onboarding" "Stripe-hosted Express onboarding needs browser; see runbook G3"
   out GAP "pay invoice (Stripe TEST)" "Checkout is browser-only; paid status needs webhook; see runbook G4"
@@ -72,14 +81,46 @@ need curl; need jq
 [[ -n "$API" ]] || { echo "FAIL  API_BASE_URL not set"; exit 1; }
 echo "== tester e2e smoke against API_BASE_URL (values not printed) =="
 
-# 1. health
+# 1. health (read-only)
+TIER=""
 for p in /health/live /health/ready; do
   http GET "$p"; [[ "$CODE" == 200 ]] && out PASS "health $p" "$CODE" || out FAIL "health $p" "$CODE $(brief)"
+  [[ "$p" == /health/ready ]] && TIER="$(jget '.tier' | tr '[:upper:]' '[:lower:]')"
 done
 if [[ -n "${WEBHOOK_BASE_URL:-}" ]]; then
   c="$(curl -sS -o /dev/null -w '%{http_code}' --max-time "$TIMEOUT" -X POST -H 'content-type: application/json' --data '{}' "$WEBHOOK_BASE_URL/stripe")" || true
   [[ "$c" =~ ^4 ]] && out PASS "webhook rejects unsigned stripe" "$c" || out FAIL "webhook rejects unsigned stripe" "$c"
 else out SKIP "webhook rejects unsigned stripe" "WEBHOOK_BASE_URL unset"; fi
+
+# Write guard: fail closed before ANY write call (register/import/create/send/pay).
+api_host() { local h="${1#*://}"; h="${h%%/*}"; h="${h##*@}"; h="${h%%:*}"; printf '%s' "$h" | tr '[:upper:]' '[:lower:]'; }
+HOST="$(api_host "$API")"
+host_allowed() {
+  local entry list="${SMOKE_ALLOWED_HOSTS:-}"
+  [[ -n "${ALLOW_HOST:-}" && "$(printf '%s' "$ALLOW_HOST" | tr '[:upper:]' '[:lower:]')" == "$HOST" ]] && return 0
+  IFS=',' read -ra entries <<< "$list"
+  for entry in "${entries[@]}"; do
+    entry="$(printf '%s' "$entry" | tr -d '[:space:]' | tr '[:upper:]' '[:lower:]')"
+    [[ -n "$entry" && "$entry" == "$HOST" ]] && return 0
+  done
+  return 1
+}
+production_looking() {
+  [[ "$TIER" == production || "$TIER" == prod ]] && return 0
+  [[ "$HOST" =~ (staging|stage|tester|test|dev|preview|localhost|127\.0\.0\.1) ]] && return 1
+  return 0
+}
+if [[ "$TIER" == staging || "$TIER" == tester ]]; then
+  out PASS "write guard" "tier=$TIER"
+elif production_looking; then
+  out FAIL "write guard" "REFUSED: host $HOST looks like production (tier=${TIER:-unknown}); writes need tier staging|tester"
+  echo "summary: pass=$passes fail=$fails gap=$gaps skip=$skips (refused before any write; see runbook 'Write guard')"; exit 2
+elif host_allowed; then
+  out PASS "write guard" "host $HOST explicitly allowed (tier=${TIER:-unknown})"
+else
+  out FAIL "write guard" "REFUSED: tier=${TIER:-unknown} is not staging|tester and $HOST is not in SMOKE_ALLOWED_HOSTS/ALLOW_HOST"
+  echo "summary: pass=$passes fail=$fails gap=$gaps skip=$skips (refused before any write; see runbook 'Write guard')"; exit 2
+fi
 
 # 2. sign up
 out GAP "sign up via Clerk" "browser-only; runbook G1 (legacy JWT path used below)"

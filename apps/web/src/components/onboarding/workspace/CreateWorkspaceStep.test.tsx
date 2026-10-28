@@ -54,9 +54,9 @@ describe("CreateWorkspaceStep", () => {
     wait.fn.mockResolvedValueOnce({ ok: false, reason: "company" }).mockResolvedValueOnce({ ok: true, role: "owner" });
     render(<CreateWorkspaceStep />);
     await submit("Acme");
-    expect(screen.getByRole("alert").textContent).toContain("couldn't finish setting up");
+    expect(screen.getByRole("alert").textContent).toContain("We couldn't set up your workspace. Try again.");
     await act(async () => {
-      fireEvent.click(screen.getByRole("button", { name: "Retry" }));
+      fireEvent.click(screen.getByRole("button", { name: "Try again" }));
     });
     expect(clerk.createOrganization).toHaveBeenCalledTimes(1);
     expect(wait.fn).toHaveBeenCalledTimes(2);
@@ -67,9 +67,21 @@ describe("CreateWorkspaceStep", () => {
     clerk.createOrganization.mockRejectedValue(new Error("not allowed"));
     render(<CreateWorkspaceStep />);
     await submit("Acme");
-    expect(screen.getByRole("alert").textContent).toContain("couldn't create the workspace");
+    expect(screen.getByRole("alert").textContent).toContain("couldn't be created");
     expect(screen.getByLabelText("Company name")).toBeTruthy();
     expect(wait.fn).not.toHaveBeenCalled();
+  });
+
+  it("shows the frame copy and a disabled progress button while waiting", async () => {
+    wait.fn.mockReturnValue(new Promise(() => {}));
+    render(<CreateWorkspaceStep />);
+    expect(screen.getByText("STEP 1 OF 2")).toBeTruthy();
+    expect(screen.getByText("Name your workspace")).toBeTruthy();
+    expect(screen.getByText("You can change this later in Settings.")).toBeTruthy();
+    await submit("Acme");
+    const button = screen.getByRole("button", { name: /Setting up your workspace/ }) as HTMLButtonElement;
+    expect(button.disabled).toBe(true);
+    expect(screen.getByRole("progressbar")).toBeTruthy();
   });
 
   it("skips creation when an org is already active", async () => {

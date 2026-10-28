@@ -10,27 +10,30 @@ export const WORKSPACE_POLL_TIMEOUT_MS = 30_000;
 export const WORKSPACE_POLL_INTERVAL_MS = 1_500;
 export const WORKSPACE_NAME_MAX_LENGTH = 80;
 
-export type WorkspaceStepKey = "name" | "create" | "provision" | "role";
-
-export interface WorkspaceStep {
-  key: WorkspaceStepKey;
-  label: string;
-}
-
-export const WORKSPACE_STEPS: readonly WorkspaceStep[] = [
-  { key: "name", label: "Name your company" },
-  { key: "create", label: "Create workspace" },
-  { key: "provision", label: "Set up your company" },
-  { key: "role", label: "Grant owner access" }
+/** Onboarding steps registry; the eyebrow ("STEP 1 OF 2") is derived from it. */
+export const ONBOARDING_STEPS = [
+  { key: "workspace", route: WORKSPACE_SETUP_ROUTE },
+  { key: "import", route: WORKSPACE_SETUP_NEXT_ROUTE }
 ] as const;
 
+export function onboardingStepLabel(key: (typeof ONBOARDING_STEPS)[number]["key"]): string {
+  const index = ONBOARDING_STEPS.findIndex((step) => step.key === key);
+  return `STEP ${index + 1} OF ${ONBOARDING_STEPS.length}`;
+}
+
+/** Copy from Figma frame 158:4946 "Onboarding / 00 Create your workspace". */
 export const WORKSPACE_COPY = {
-  title: "Create your workspace",
-  intro: "Add your company name. You'll be the owner and can invite your team later.",
+  eyebrow: onboardingStepLabel("workspace"),
+  title: "Name your workspace",
+  intro: "You can change this later in Settings.",
   nameLabel: "Company name",
   submit: "Create workspace",
-  retry: "Retry",
-  timeoutCompany: "We couldn't finish setting up your company. This can take a moment. Try again.",
-  timeoutRole: "Your workspace exists, but owner access hasn't reached your session yet. Try again.",
-  createFailed: "We couldn't create the workspace. Check the name and try again."
+  progress: "Setting up your workspace…",
+  error: "We couldn't set up your workspace. Try again.",
+  retry: "Try again",
+  continue: "Continue",
+  /** Secondary detail under the frame's error banner (not in the frame). */
+  detailCompany: "Your company is still being set up on our side.",
+  detailRole: "Your workspace exists, but owner access hasn't reached your session yet.",
+  detailCreate: "The workspace couldn't be created. Check the name."
 } as const;

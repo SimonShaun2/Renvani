@@ -96,6 +96,7 @@ describe("FS-155: every interpolated field is HTML-escaped", () => {
     [T.passwordReset, ["firstName"]],
     [T.estimateSent, ["firstName", "companyName", "estimateNumber", "title", "expiresAtLabel", "total"]],
     [T.invoiceSent, ["firstName", "companyName", "invoiceNumber", "dueAtLabel", "total"]],
+    [T.invoicePaymentReceipt, ["firstName", "companyName", "invoiceNumber", "amount", "paidAtLabel", "balanceDue"]],
     [T.invoiceReminder, ["firstName", "invoiceNumber", "total", "balanceDue", "dueAtLabel"]],
     [T.invoiceReminderOwnerAlert, ["ownerFirstName", "customerName", "invoiceNumber", "balanceDue", "companyName"]],
     [T.serviceAgreementRenewal, ["firstName", "planName", "nextServiceDateLabel", "companyName"]],
@@ -131,6 +132,7 @@ describe("FS-155: every interpolated field is HTML-escaped", () => {
     const urls: Array<[EmailTemplateId, string]> = [
       [T.estimateSent, "approvalUrl"],
       [T.invoiceSent, "paymentLinkUrl"],
+      [T.invoicePaymentReceipt, "receiptUrl"],
       [T.serviceAgreementPaymentFailed, "manageUrl"],
       [T.vipMembershipWelcome, "portalUrl"],
       [T.vipMembershipPaymentFailed, "paymentUrl"]

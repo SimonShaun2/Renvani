@@ -9,6 +9,7 @@ export const EMAIL_TEMPLATE_IDS = {
   estimateSent: "estimate.sent",
   invoiceSent: "invoice.sent",
   invoiceReminder: "invoice.reminder",
+  invoicePaymentReceipt: "invoice.payment_receipt",
   invoiceReminderOwnerAlert: "invoice.reminder_owner_alert",
   serviceAgreementRenewal: "service_agreement.renewal_reminder",
   serviceAgreementPaymentFailed: "service_agreement.payment_failed",
@@ -174,6 +175,25 @@ function renderTemplateBody(templateId: EmailTemplateId, variables: Record<strin
           ${dueBlock}
           ${button(variables.paymentLinkUrl ?? "#", "Pay invoice")}
           <p>If you've already paid, you can ignore this message.</p>
+        `)
+      };
+    }
+    case EMAIL_TEMPLATE_IDS.invoicePaymentReceipt: {
+      const name = greetingName(variables.firstName ?? "");
+      const paidBlock = e.paidAtLabel ? `<p><strong>Paid on:</strong> ${e.paidAtLabel}</p>` : "";
+      const balanceBlock = e.balanceDue && e.balanceDue !== "0.00" ? `<p><strong>Remaining balance:</strong> $${e.balanceDue}</p>` : "";
+      const receiptLink = variables.receiptUrl ? button(variables.receiptUrl, "View receipt") : "";
+      return {
+        templateId,
+        subject: `Receipt for invoice ${variables.invoiceNumber ?? ""} from ${variables.companyName ?? ""}`,
+        html: emailShell(`
+          <p>Hi ${name},</p>
+          <p>Thanks for your payment to ${e.companyName ?? ""}.</p>
+          <p><strong>Invoice:</strong> ${e.invoiceNumber ?? ""}</p>
+          <p><strong>Amount paid:</strong> $${e.amount ?? "0.00"}</p>
+          ${paidBlock}
+          ${balanceBlock}
+          ${receiptLink}
         `)
       };
     }

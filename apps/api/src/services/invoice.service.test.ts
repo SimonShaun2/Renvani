@@ -748,6 +748,90 @@ describe("invoice.service", () => {
     }
   });
 
+  describe("payment receipt (Resend)", () => {
+    function seedPayable(customerOverrides: Record<string, unknown> = {}) {
+      const { company } = createAdminContext();
+      const { customer } = seedInvoiceGraph(company.id);
+      Object.assign(customer, customerOverrides);
+      const invoice = fakeDb.seedInvoice({
+        companyId: company.id,
+        customerId: customer.id,
+        invoiceNumber: "INV-0R1",
+        status: "sent",
+        total: "150.00",
+        amountPaid: "0.00",
+        balanceDue: "150.00"
+      });
+      const event = {
+        data: {
+          object: {
+            id: `pi_${randomUUID()}`,
+            amount: 15000,
+            amount_received: 15000,
+            latest_charge: "ch_r1",
+            metadata: { invoiceId: invoice.id },
+            payment_method_types: ["card"]
+          }
+        }
+      } as unknown as Stripe.PaymentIntentSucceededEvent;
+      return { company, customer, invoice, event };
+    }
+
+    const receiptCalls = () => addNotificationQueueJob.mock.calls.filter((call) => call[0] === "send-invoice-receipt");
+
+    it("enqueues exactly one tenant-scoped receipt per payment, even on webhook redelivery", async () => {
+      const { company, customer, invoice, event } = seedPayable();
+
+      await invoiceService.handleStripePaymentSuccess(event);
+      await invoiceService.handleStripePaymentSuccess(event);
+
+      const [payment] = fakeDb.getTestState().payments.filter((row) => row.invoiceId === invoice.id);
+      expect(receiptCalls()).toHaveLength(1);
+      expect(receiptCalls()[0]).toEqual([
+        "send-invoice-receipt",
+        expect.objectContaining({
+          companyId: company.id,
+          invoiceId: invoice.id,
+          customerId: customer.id,
+          paymentId: payment?.id,
+          amount: "150.00"
+        }),
+        expect.objectContaining({ jobId: `invoice-receipt-${payment?.id}` })
+      ]);
+    });
+
+    it.each([
+      ["doNotContact", { doNotContact: true }],
+      ["prefersEmail=false", { prefersEmail: false }],
+      ["no email", { email: null }]
+    ])("does not enqueue when %s (payment still recorded)", async (_label, overrides) => {
+      const { invoice, event } = seedPayable(overrides);
+      await invoiceService.handleStripePaymentSuccess(event);
+      expect(receiptCalls()).toHaveLength(0);
+      expect(fakeDb.getTestState().payments.filter((row) => row.invoiceId === invoice.id)).toHaveLength(1);
+    });
+
+    it("an enqueue failure never fails the webhook (payment already committed)", async () => {
+      addNotificationQueueJob.mockRejectedValueOnce(new Error("redis down"));
+      const { invoice, event } = seedPayable();
+      await expect(invoiceService.handleStripePaymentSuccess(event)).resolves.toBeUndefined();
+      expect(fakeDb.getTestState().invoices.find((row) => row.id === invoice.id)?.status).toBe("paid");
+    });
+  });
+
+  it("sendInvoice passes receiptEmail for opted-in customers and null for opted-out", async () => {
+    const { company, actor } = createAdminContext();
+    const { customer } = seedInvoiceGraph(company.id);
+    const optedIn = fakeDb.seedInvoice({ companyId: company.id, customerId: customer.id, status: "draft", total: "10.00", subtotal: "10.00", balanceDue: "10.00" });
+    await invoiceService.sendInvoice(company.id, actor.id, optedIn.id);
+    expect(createInvoiceCheckoutSessionMock.mock.calls.at(-1)?.[0]).toMatchObject({ receiptEmail: "chris@example.com" });
+
+    customer.doNotContact = true;
+    const optedOut = fakeDb.seedInvoice({ companyId: company.id, customerId: customer.id, status: "draft", total: "10.00", subtotal: "10.00", balanceDue: "10.00" });
+    await invoiceService.sendInvoice(company.id, actor.id, optedOut.id);
+    expect(createInvoiceCheckoutSessionMock.mock.calls.at(-1)?.[0]).toMatchObject({ receiptEmail: null });
+  });
+
   it("handleStripePaymentFailed emits a payment.failed event without changing invoice status", async () => {
     const { company } = createAdminContext();
     const { customer } = seedInvoiceGraph(company.id);

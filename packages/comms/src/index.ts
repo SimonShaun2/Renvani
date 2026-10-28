@@ -29,3 +29,4 @@ export {
   type TransactionalEmailProvider,
   type TransactionalEmailProviderConfig
 } from "./email-provider.js";
+export { isReceiptEmailAllowed, type ReceiptRecipient } from "./receipt-consent.js";

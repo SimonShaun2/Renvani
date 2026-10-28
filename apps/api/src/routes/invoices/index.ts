@@ -6,6 +6,7 @@ import {
   addInvoiceItemHandler,
   createInvoiceHandler,
   deleteInvoiceItemHandler,
+  getInvoiceChargePreviewHandler,
   getInvoiceHandler,
   listInvoicePaymentsHandler,
   listInvoicesHandler,
@@ -63,6 +64,11 @@ const invoiceRoutes: FastifyPluginAsync = async (fastify) => {
     preValidation: invoiceIdValidation,
     schema: getInvoiceSchema
   }, getInvoiceHandler);
+
+  fastify.get("/invoices/:id/charge-preview", {
+    preHandler: authenticate,
+    preValidation: invoiceIdValidation
+  }, getInvoiceChargePreviewHandler);
 
   fastify.patch("/invoices/:id", {
     preHandler: authenticate,

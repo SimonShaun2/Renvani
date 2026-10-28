@@ -43,6 +43,12 @@ export interface CompanyVipMembershipSettings {
   pastDueGraceDays?: number | null;
 }
 
+/** Invoice defaults applied at create when the caller omits them. */
+export interface CompanyInvoicingSettings {
+  /** Net days: dueAt = created + N days when no dueAt is supplied. Null/absent = no default. */
+  defaultPaymentTermsDays?: number | null;
+}
+
 export interface CompanySettings {
   tradingName?: string | null;
   currency?: string | null;
@@ -52,4 +58,5 @@ export interface CompanySettings {
   clerk?: CompanyClerkSettings | null;
   stripePlatformBilling?: CompanyStripePlatformBillingSettings | null;
   vipMembership?: CompanyVipMembershipSettings | null;
+  invoicing?: CompanyInvoicingSettings | null;
 }

@@ -6,13 +6,16 @@ import {
   createDashboardLinkHandler,
   createOnboardingLinkHandler,
   getConnectStatusHandler,
-  handleOnboardingReturnHandler
+  handleOnboardingReturnHandler,
+  provisionTestConnectAccountHandler,
+  requireConnectTestProvisionEnabled
 } from "./handlers.js";
 import {
   stripeConnectAccountSessionSchema,
   stripeConnectOnboardSchema,
   stripeConnectReturnSchema,
   stripeConnectStatusRouteSchema,
+  stripeConnectTestProvisionSchema,
   stripeDashboardLinkSchema
 } from "./schemas.js";
 
@@ -43,6 +46,11 @@ const stripeRoutes: FastifyPluginAsync = async (fastify) => {
     preHandler: [authenticate, requireRole(["owner"])],
     schema: stripeConnectAccountSessionSchema
   }, createConnectAccountSessionHandler);
+
+  fastify.post("/connect/test-provision", {
+    preHandler: [requireConnectTestProvisionEnabled, authenticate, requireRole(["owner"])],
+    schema: stripeConnectTestProvisionSchema
+  }, provisionTestConnectAccountHandler);
 };
 
 export default stripeRoutes;

@@ -129,3 +129,21 @@ export const stripeConnectAccountSessionSchema = {
     409: errorResponseSchema
   }
 } as const;
+
+export const stripeConnectTestProvisionSchema = {
+  tags: ["stripe"],
+  response: {
+    200: {
+      type: "object",
+      additionalProperties: false,
+      required: ["stripeAccountId", "status"],
+      properties: {
+        stripeAccountId: { type: "string" },
+        status: { type: "string", enum: ["active", "pending"] }
+      }
+    },
+    401: errorResponseSchema,
+    403: errorResponseSchema,
+    404: errorResponseSchema
+  }
+} as const;

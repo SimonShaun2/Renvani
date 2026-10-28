@@ -35,6 +35,12 @@ vi.mock("./handlers.js", () => {
   return out;
 });
 
+// Technician job scoping is covered end-to-end in technician-authz-followup.test.ts.
+vi.mock("../../lib/technician-scope.js", () => ({
+  technicianOwnJob: () => async () => undefined,
+  denyTechnician: async () => undefined
+}));
+
 import jobRoutes from "./index.js";
 
 let app: ReturnType<typeof Fastify>;

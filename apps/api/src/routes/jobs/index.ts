@@ -1,6 +1,7 @@
 import type { FastifyPluginAsync } from "fastify";
 
 import { requireRole } from "../../lib/authorize.js";
+import { denyTechnician, technicianOwnJob } from "../../lib/technician-scope.js";
 
 import {
   addJobProductHandler,
@@ -87,8 +88,13 @@ const jobRoutes: FastifyPluginAsync = async (fastify) => {
   // FS-25: field-prep reads are for staff (incl. technicians in the field), explicit per route.
   const jobPrepReaders = [
     fastify.authenticate,
-    requireRole(["owner", "admin", "dispatcher", "office", "technician"])
+    requireRole(["owner", "admin", "dispatcher", "office", "technician"]),
+    technicianOwnJob("not_found")
   ];
+  // Technician scoping (no-op for other roles): own assigned jobs only.
+  const ownJobWrite = [fastify.authenticate, technicianOwnJob("forbidden")];
+  const ownJobRead = [fastify.authenticate, technicianOwnJob("not_found")];
+  const staffOnly = [fastify.authenticate, denyTechnician];
 
   fastify.get("/", {
     preHandler: authenticate,
@@ -103,19 +109,19 @@ const jobRoutes: FastifyPluginAsync = async (fastify) => {
   }, createJobHandler);
 
   fastify.post("/:id/status", {
-    preHandler: authenticate,
+    preHandler: ownJobWrite,
     preValidation: transitionStatusValidation,
     schema: transitionStatusRouteSchema
   }, transitionStatusHandler);
 
   fastify.post("/:id/assign", {
-    preHandler: authenticate,
+    preHandler: staffOnly,
     preValidation: assignTechnicianValidation,
     schema: assignTechnicianRouteSchema
   }, assignTechnicianHandler);
 
   fastify.post("/:id/schedule", {
-    preHandler: authenticate,
+    preHandler: staffOnly,
     preValidation: scheduleJobValidation,
     schema: scheduleJobRouteSchema
   }, scheduleJobHandler);
@@ -139,49 +145,49 @@ const jobRoutes: FastifyPluginAsync = async (fastify) => {
   }, getJobPreparationStatusHandler);
 
   fastify.post("/:id/notes", {
-    preHandler: authenticate,
+    preHandler: ownJobWrite,
     preValidation: addNoteValidation,
     schema: addNoteRouteSchema
   }, addNoteHandler);
 
   fastify.get("/:id/notes", {
-    preHandler: authenticate,
+    preHandler: ownJobRead,
     preValidation: notesQueryValidation,
     schema: getNotesSchema
   }, getNotesHandler);
 
   fastify.post("/:id/photos", {
-    preHandler: authenticate,
+    preHandler: ownJobWrite,
     preValidation: addPhotoValidation,
     schema: addPhotoRouteSchema
   }, addPhotoHandler);
 
   fastify.get("/:id/photos", {
-    preHandler: authenticate,
+    preHandler: ownJobRead,
     preValidation: photosQueryValidation,
     schema: getPhotosSchema
   }, getPhotosHandler);
 
   fastify.get("/:id/tasks", {
-    preHandler: authenticate,
+    preHandler: ownJobRead,
     preValidation: listTasksValidation,
     schema: listTasksSchema
   }, listTasksHandler);
 
   fastify.post("/:id/tasks", {
-    preHandler: authenticate,
+    preHandler: ownJobWrite,
     preValidation: createTaskValidation,
     schema: createTaskRouteSchema
   }, createTaskHandler);
 
   fastify.post("/:id/tasks/reorder", {
-    preHandler: authenticate,
+    preHandler: ownJobWrite,
     preValidation: reorderTasksValidation,
     schema: reorderTasksRouteSchema
   }, reorderTasksHandler);
 
   fastify.patch("/:id/tasks/:taskId", {
-    preHandler: authenticate,
+    preHandler: ownJobWrite,
     preValidation: updateTaskValidation,
     schema: updateTaskRouteSchema
   }, updateTaskHandler);
@@ -193,43 +199,43 @@ const jobRoutes: FastifyPluginAsync = async (fastify) => {
   }, completeTaskHandler);
 
   fastify.delete("/:id/tasks/:taskId", {
-    preHandler: authenticate,
+    preHandler: ownJobWrite,
     preValidation: deleteTaskValidation,
     schema: deleteTaskRouteSchema
   }, deleteTaskHandler);
 
   fastify.get("/:id/products", {
-    preHandler: authenticate,
+    preHandler: ownJobRead,
     preValidation: listJobProductsValidation,
     schema: listJobProductsSchema
   }, listJobProductsHandler);
 
   fastify.post("/:id/products", {
-    preHandler: authenticate,
+    preHandler: ownJobWrite,
     preValidation: addJobProductValidation,
     schema: addJobProductRouteSchema
   }, addJobProductHandler);
 
   fastify.patch("/:id/products/:productId", {
-    preHandler: authenticate,
+    preHandler: ownJobWrite,
     preValidation: updateJobProductValidation,
     schema: updateJobProductRouteSchema
   }, updateJobProductHandler);
 
   fastify.post("/:id/products/:productId/approve-upsell", {
-    preHandler: authenticate,
+    preHandler: ownJobWrite,
     preValidation: approveUpsellValidation,
     schema: approveUpsellRouteSchema
   }, approveUpsellHandler);
 
   fastify.delete("/:id/products/:productId", {
-    preHandler: authenticate,
+    preHandler: ownJobWrite,
     preValidation: removeJobProductValidation,
     schema: removeJobProductRouteSchema
   }, removeJobProductHandler);
 
   fastify.get("/:id/activity", {
-    preHandler: authenticate,
+    preHandler: ownJobRead,
     preValidation: activityQueryValidation,
     schema: getActivitySchema
   }, getJobTimelineHandler);
@@ -241,7 +247,7 @@ const jobRoutes: FastifyPluginAsync = async (fastify) => {
   }, getJobHandler);
 
   fastify.patch("/:id", {
-    preHandler: authenticate,
+    preHandler: ownJobWrite,
     preValidation: updateJobValidation,
     schema: updateJobSchema
   }, updateJobHandler);

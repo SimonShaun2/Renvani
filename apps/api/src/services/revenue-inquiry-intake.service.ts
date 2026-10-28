@@ -1,6 +1,6 @@
 import { and, eq, gte, isNull } from "drizzle-orm";
 
-import { bookingRequests, db, emitEvent, inquirySubmitIdempotency } from "@fsm/db";
+import { bookingRequests, bookingSettings, db, emitEvent, inquirySubmitIdempotency } from "@fsm/db";
 import {
   AppError,
   ErrorCode,
@@ -28,6 +28,7 @@ import {
   resolveAmbiguityEscalation,
   type IntakeBuildContext
 } from "./revenue-inquiry-intake.logic.js";
+import { queueOwnerAlert, shortCustomerName } from "./owner-alerts/owner-alert.service.js";
 
 export {
   buildInquiryDedupeKey,
@@ -151,6 +152,37 @@ async function emitInquiryLifecycleEvents(
       summary: `Revenue inquiry escalated: ${inquiry.escalationReason ?? "ambiguous"}`
     });
   }
+
+  if (actor.type === "customer") {
+    await alertOwnerOfPublicInquiry(inquiry);
+  }
+}
+
+/**
+ * Owner alert for a new PUBLIC inquiry (booking form, service pages). Setting: booking_settings.notify_on_new_booking
+ * (existing owner-notification switch, default on). The booking form already texts dispatchers, so SMS here is only
+ * for other public surfaces. Summary is inbox-level only (short name, ZIP, source) - never the message/phone/email.
+ */
+export async function alertOwnerOfPublicInquiry(inquiry: InquiryIntakeV1): Promise<void> {
+  const [settings] = await db
+    .select()
+    .from(bookingSettings)
+    .where(and(eq(bookingSettings.companyId, inquiry.companyId), isNull(bookingSettings.deletedAt)))
+    .limit(1);
+  const who = shortCustomerName(inquiry.contact.firstName, inquiry.contact.lastName);
+  const zip = inquiry.property?.zip && inquiry.property.zip !== "00000" ? ` · ZIP ${inquiry.property.zip}` : "";
+  const source = inquiry.sourceAttribution ? ` · via ${inquiry.sourceAttribution.replace(/_/gu, " ")}` : "";
+  await queueOwnerAlert({
+    companyId: inquiry.companyId,
+    kind: "new_inquiry",
+    entityId: inquiry.linkedBookingRequestId ?? inquiry.id,
+    enabled: settings?.notifyOnNewBooking ?? true,
+    headline: "New inquiry",
+    summary: `${who}${zip}${source}. Open your inbox to reply.`,
+    actionPath: "/dispatch/bookings",
+    actionLabel: "Open inbox",
+    sms: inquiry.consent.captureSurface !== "book/confirm"
+  });
 }
 
 async function buildInquiryFromRow(

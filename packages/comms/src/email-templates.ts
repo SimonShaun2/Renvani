@@ -18,7 +18,8 @@ export const EMAIL_TEMPLATE_IDS = {
   vipMembershipWelcome: "vip_membership.welcome",
   vipMembershipRenewal: "vip_membership.renewal_receipt",
   vipMembershipPaymentFailed: "vip_membership.payment_failed_dunning",
-  savedCardMigrationReenterCard: "saved_card_migration.reenter_card"
+  savedCardMigrationReenterCard: "saved_card_migration.reenter_card",
+  ownerAlert: "owner_alert.notice"
 } as const;
 
 export type EmailTemplateId = (typeof EMAIL_TEMPLATE_IDS)[keyof typeof EMAIL_TEMPLATE_IDS];
@@ -113,6 +114,19 @@ function renderTemplateBody(templateId: EmailTemplateId, variables: Record<strin
           <p>Welcome to Renvani. Confirm your email address to finish setting up your account.</p>
           ${button(variables.verifyUrl ?? "#", "Verify your email")}
           <p>This link works once and expires in 24 hours. If you didn't sign up, you can ignore this email.</p>
+        `)
+      };
+    }
+    case EMAIL_TEMPLATE_IDS.ownerAlert: {
+      // Owner-facing alert: short summary only; full details stay in the app (inbox / reviews).
+      return {
+        templateId,
+        subject: `${variables.headline ?? "New activity"} — ${variables.companyName ?? "Renvani"}`,
+        html: emailShell(`
+          <p><strong>${e.headline ?? "New activity"}</strong></p>
+          <p>${e.summary ?? ""}</p>
+          ${button(variables.actionUrl ?? "#", variables.actionLabel ?? "Open Renvani")}
+          <p>You get this because owner alerts are on for ${e.companyName ?? "your shop"}. You can turn them off in settings.</p>
         `)
       };
     }

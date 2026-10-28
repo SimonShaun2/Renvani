@@ -430,6 +430,7 @@ export async function requestReviewForPaidInvoice(
 
     const decision = decideInvoicePaidReviewRequest({
       invoiceStatus: invoice.status,
+      invoiceTotal: invoice.total,
       rule: rule ? { isEnabled: rule.isEnabled, delayHours: rule.delayHours, config: ruleConfig } : null,
       customer: {
         email: customer.email,

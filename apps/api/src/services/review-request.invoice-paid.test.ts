@@ -69,7 +69,7 @@ function seed(options: { ruleEnabled?: boolean; customer?: Record<string, unknow
     ...options.customer
   });
   const job = fakeDb.seedJob({ companyId: company.id, customerId: customer.id });
-  const invoice = fakeDb.seedInvoice({ companyId: company.id, customerId: customer.id, jobId: job.id, status: "paid" });
+  const invoice = fakeDb.seedInvoice({ companyId: company.id, customerId: customer.id, jobId: job.id, status: "paid", total: "250.00" });
   return { company, customer, job, invoice };
 }
 
@@ -126,7 +126,7 @@ describe("invoice.paid -> review request automation", () => {
   it("rate limits the same customer across invoices", async () => {
     const { company, customer, invoice } = seed();
     await service.requestReviewForPaidInvoice(company.id, invoice.id);
-    const second = fakeDb.seedInvoice({ companyId: company.id, customerId: customer.id, status: "paid" });
+    const second = fakeDb.seedInvoice({ companyId: company.id, customerId: customer.id, status: "paid", total: "250.00" });
     await expect(service.requestReviewForPaidInvoice(company.id, second.id)).resolves.toEqual({
       status: "skipped",
       reason: "customer_rate_limited"
@@ -149,5 +149,15 @@ describe("invoice.paid -> review request automation", () => {
     await expect(
       registry.dispatchEventAutomation({ eventType: "invoice.paid", companyId: "missing", invoiceId: "missing" })
     ).resolves.toBeUndefined();
+  });
+});
+
+describe("invoice.paid review request hardening (#264 review)", () => {
+  it("skips a paid invoice with a zero total", async () => {
+    const company = fakeDb.seedCompany({ name: "Acme HVAC", slug: "acme-zero", timezone: "America/Chicago" });
+    fakeDb.seedAutomationRule({ companyId: company.id, ruleType: "review_request", isEnabled: true, delayHours: 4 });
+    const customer = fakeDb.seedCustomer({ companyId: company.id, firstName: "Z", lastName: "Z", email: "z@example.com" });
+    const invoice = fakeDb.seedInvoice({ companyId: company.id, customerId: customer.id, status: "paid", total: "0.00" });
+    await expect(service.requestReviewForPaidInvoice(company.id, invoice.id)).resolves.toEqual({ status: "skipped", reason: "invoice_not_paid" });
   });
 });

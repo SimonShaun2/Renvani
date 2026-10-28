@@ -12,6 +12,8 @@ export type ReviewAutomationChannel = "email" | "sms";
 
 export interface InvoicePaidReviewFacts {
   invoiceStatus: string;
+  /** Invoice total (decimal string or number). Zero/negative (fully refunded/void-like) never asks for a review. */
+  invoiceTotal?: string | number | null;
   rule: { isEnabled: boolean; delayHours: number | null; config: Record<string, unknown> | null } | null;
   customer: {
     email: string | null;
@@ -69,10 +71,11 @@ export function pickReviewChannel(
   customer: InvoicePaidReviewFacts["customer"],
   smsLive: boolean
 ): ReviewAutomationChannel | null {
-  if (customer.prefersEmail !== false && customer.email) {
+  // NULL preference is not consent: only an explicit true opts the customer in.
+  if (customer.prefersEmail === true && customer.email) {
     return "email";
   }
-  if (smsLive && customer.prefersSms !== false && customer.phone) {
+  if (smsLive && customer.prefersSms === true && customer.phone) {
     return "sms";
   }
   return null;
@@ -80,6 +83,9 @@ export function pickReviewChannel(
 
 export function decideInvoicePaidReviewRequest(facts: InvoicePaidReviewFacts): InvoicePaidReviewDecision {
   if (facts.invoiceStatus !== "paid") {
+    return { action: "skip", reason: "invoice_not_paid" };
+  }
+  if (facts.invoiceTotal !== undefined && !(Number(facts.invoiceTotal ?? 0) > 0)) {
     return { action: "skip", reason: "invoice_not_paid" };
   }
   if (!facts.rule?.isEnabled) {

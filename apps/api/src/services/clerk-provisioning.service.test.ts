@@ -164,6 +164,16 @@ describe("FS-157 clerk_user_id provisioning", () => {
     expect(state.users[0]?.clerkUserId).toBe("user_a");
   });
 
+  it("returns the DB role so the webhook can publish it to Clerk (first member = owner, even before organization.created)", async () => {
+    const { provisionClerkMembership } = await import("./clerk-provisioning.service.js");
+    const first = await provisionClerkMembership({ ...base, email: "a@x.com", clerkUserId: "user_a" });
+    const second = await provisionClerkMembership({ ...base, email: "b@x.com", clerkUserId: "user_b" });
+    const replay = await provisionClerkMembership({ ...base, email: "a@x.com", clerkUserId: "user_a" });
+    expect(first).toMatchObject({ status: "created", role: "owner" });
+    expect(second).toMatchObject({ status: "created", role: "admin" });
+    expect(replay).toMatchObject({ status: "exists", role: "owner" });
+  });
+
   it("backfills clerk_user_id on an existing same-company user with a null id", async () => {
     const { provisionClerkMembership } = await import("./clerk-provisioning.service.js");
     await provisionClerkMembership({ ...base, email: "a@x.com", clerkUserId: null, emailVerified: true });

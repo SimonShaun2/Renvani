@@ -8,6 +8,8 @@ vi.mock("../../services/clerk-provisioning.service.js", () => ({
   provisionClerkOrganization,
   provisionClerkMembership
 }));
+const syncClerkUserRoleMetadata = vi.hoisted(() => vi.fn(async () => "synced"));
+vi.mock("../../lib/clerk-role-metadata.js", () => ({ syncClerkUserRoleMetadata }));
 const syncClerkUserUpdated = vi.fn();
 const deactivateClerkUser = vi.fn();
 const deactivateClerkMembership = vi.fn();
@@ -149,6 +151,34 @@ describe("Clerk webhook", () => {
       clerkUserId: "user_ava",
       emailVerified: false
     });
+  });
+
+  it("publishes the provisioned DB role to Clerk public_metadata (fixes /no-access for new owners)", async () => {
+    syncClerkUserRoleMetadata.mockClear();
+    provisionClerkMembership.mockResolvedValueOnce({ status: "created", companyId: "c1", role: "owner" });
+    const res = await send({
+      type: "organizationMembership.created",
+      data: {
+        role: "org:admin",
+        organization: { id: "org_1", name: "Acme" },
+        public_user_data: { identifier: "owner@acme.com", user_id: "user_ava" }
+      }
+    });
+    expect(res.statusCode).toBe(200);
+    expect(syncClerkUserRoleMetadata).toHaveBeenCalledWith("user_ava", "owner");
+    expect(res.json()).toMatchObject({ status: "created", role: "owner", roleSync: "synced" });
+  });
+
+  it("does not touch Clerk metadata when provisioning was skipped (tenant mismatch)", async () => {
+    syncClerkUserRoleMetadata.mockClear();
+    provisionClerkMembership.mockResolvedValueOnce({ status: "skipped", companyId: "c1" });
+    const res = await send({
+      type: "organizationMembership.created",
+      data: { organization: { id: "org_1" }, public_user_data: { identifier: "x@y.com", user_id: "user_x" } }
+    });
+    expect(res.statusCode).toBe(200);
+    expect(syncClerkUserRoleMetadata).not.toHaveBeenCalled();
+    expect(res.json()).toMatchObject({ roleSync: "not_needed" });
   });
 
   it("acks user.created without provisioning", async () => {

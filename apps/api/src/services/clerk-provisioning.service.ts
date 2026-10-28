@@ -112,7 +112,7 @@ type MembershipStatus = "created" | "exists" | "linked" | "skipped";
  */
 export async function provisionClerkMembership(
   input: ClerkMembershipInput
-): Promise<{ status: MembershipStatus; companyId: string | null }> {
+): Promise<{ status: MembershipStatus; companyId: string | null; role?: UserRole }> {
   const email = input.email.trim().toLowerCase();
   const clerkUserId = input.clerkUserId?.trim() || null;
 
@@ -131,7 +131,7 @@ export async function provisionClerkMembership(
             logger.warn({ companyId: company.id }, "Clerk user id already linked to a different staff user; skipped");
             return { status: "skipped" as const, companyId: company.id };
           }
-          return { status: "exists" as const, companyId: company.id };
+          return { status: "exists" as const, companyId: company.id, role: byClerkId.role };
         }
       }
 
@@ -185,7 +185,7 @@ export async function provisionClerkMembership(
           logger.warn({ companyId: company.id }, "Clerk link lost a race (row linked elsewhere); skipped");
           return { status: "skipped" as const, companyId: company.id };
         }
-        return { status: "linked" as const, companyId: company.id };
+        return { status: "linked" as const, companyId: company.id, role: reread.role };
       }
 
       const anyUser = await tx.query.users.findFirst({
@@ -193,6 +193,7 @@ export async function provisionClerkMembership(
           operators.and(operators.eq(userTable.companyId, company.id), operators.isNull(userTable.deletedAt))
       });
 
+      const role = mapClerkOrgRole(input.clerkOrgRole, !anyUser);
       await tx.insert(users).values({
         companyId: company.id,
         email,
@@ -200,10 +201,10 @@ export async function provisionClerkMembership(
         passwordHash: null,
         firstName: input.firstName.trim() || "Owner",
         lastName: input.lastName.trim() || "",
-        role: mapClerkOrgRole(input.clerkOrgRole, !anyUser)
+        role
       });
 
-      return { status: "created" as const, companyId: company.id };
+      return { status: "created" as const, companyId: company.id, role };
     });
   } catch (error) {
     if (error instanceof ClerkOrganizationAmbiguousError) {

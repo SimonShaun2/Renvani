@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 
 import { describe, expect, it, vi } from "vitest";
 
-import { ROBOTS_ALLOW, buildPublicRobots, buildPublicSitemap, optInSlugs, publicSiteUrl } from "./public-sitemap";
+import { ROBOTS_ALLOW, SitemapPublishCheckError, buildPublicRobots, buildPublicSitemap, optInSlugs, publicSiteUrl } from "./public-sitemap";
 
 const env = (vars: Record<string, string>) => vars as unknown as NodeJS.ProcessEnv;
 
@@ -27,12 +27,21 @@ describe("public sitemap", () => {
     expect(fetcher).not.toHaveBeenCalled();
   });
 
-  it("drops unsafe slugs, dedupes, and treats fetch errors as unpublished", async () => {
+  it("drops unsafe slugs and dedupes", () => {
     expect(optInSlugs(env({ PUBLIC_SITE_SLUGS: "a-1,A-1,../admin,,b%2f" }))).toEqual(["a-1"]);
-    const map = await buildPublicSitemap(env({ PUBLIC_SITE_URL: "https://s.example", PUBLIC_SITE_SLUGS: "a-1" }), async () => {
-      throw new Error("down");
+  });
+
+  it("logs and fails the render on publish-check errors instead of treating shops as unpublished", async () => {
+    const log = vi.spyOn(console, "error").mockImplementation(() => {});
+    const fetcher = vi.fn(async (slug: string) => {
+      if (slug === "down") throw new Error("503");
+      return slug === "ok" ? {} : null;
     });
-    expect(map).toEqual([]);
+    await expect(
+      buildPublicSitemap(env({ PUBLIC_SITE_URL: "https://s.example", PUBLIC_SITE_SLUGS: "ok,down,draft" }), fetcher)
+    ).rejects.toBeInstanceOf(SitemapPublishCheckError);
+    expect(log).toHaveBeenCalledWith("[sitemap] publish check failed", { slug: "down", error: "503" });
+    log.mockRestore();
   });
 
   it("rejects non-http base URLs", () => {

@@ -33,6 +33,7 @@ import {
   type ListBookingRequestsQuery,
   type PublicBookingSettings,
   type SubmitBookingRequestInput,
+  sanitizeLeadAttribution,
   type UpdateBookingSettingsInput,
   type BookingRequestStatus,
   ErrorCode
@@ -664,6 +665,7 @@ async function createJobFromBooking(
       priority: bookingRequest.urgency === "emergency" ? "urgent" : "normal",
       status: "scheduled",
       leadSource: bookingRequest.source,
+      leadAttribution: bookingRequest.leadAttribution ?? null,
       title: buildJobTitle(bookingRequest),
       description: bookingRequest.customerNotes,
       scheduledStart,
@@ -1465,6 +1467,7 @@ export async function submitBookingRequest(
         isPropertyOwner: input.isPropertyOwner ?? false,
         smsConsentAppointments: input.smsConsentAppointments ?? false,
         smsConsentMarketing: input.smsConsentMarketing ?? false,
+        leadAttribution: sanitizeLeadAttribution(input.leadAttribution),
         confirmedAt: settings.autoConfirm ? new Date() : null,
         confirmationSentAt: new Date()
       })

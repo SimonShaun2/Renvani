@@ -31,7 +31,8 @@ const clerkWebhookRoutes: FastifyPluginAsync = async (fastify) => {
   });
 
   fastify.post("/clerk", async (request, reply) => {
-    const secret = (process.env.CLERK_WEBHOOK_SECRET ?? env.CLERK_WEBHOOK_SECRET ?? "").trim();
+    // Validated config only (packages/config); unset/blank fails closed with 503 below.
+    const secret = env.CLERK_WEBHOOK_SECRET.trim();
     const rawBody = typeof request.body === "string" ? request.body : "";
     const header = (name: string): string | undefined => {
       const value = request.headers[name];

@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { assertStripeLiveKeyAllowed } from "./deployment-environment.js";
+
 const envSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   /** Injected by Render (and similar hosts); prefer over service-specific ports when set. */
@@ -140,6 +142,7 @@ function parseEnv(): Env {
   if (!result.success) {
     throw new Error(`Environment validation failed: ${formatValidationErrors(result.error)}`);
   }
+  assertStripeLiveKeyAllowed(process.env);
 
   return result.data;
 }

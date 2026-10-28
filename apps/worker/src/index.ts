@@ -1,6 +1,7 @@
 import type { Worker } from "bullmq";
 import pino from "pino";
 
+import { assertStripeLiveKeyAllowed } from "@fsm/config/deployment-environment";
 import { QUEUE_NAMES, aiQueue } from "@fsm/jobs";
 
 import { createWorker } from "./lib/worker-factory.js";
@@ -16,6 +17,9 @@ import { processRetentionGates } from "./processors/retention-gates.processor.js
 const logger = pino({
   name: "fsm-worker-bootstrap"
 });
+
+// Boot guard: never run with a Stripe live key outside production (also enforced when env parses).
+assertStripeLiveKeyAllowed(process.env);
 
 const dormantCustomerCronPattern = "0 2 * * *";
 const revenueSummaryPrewarmEveryMs = 30 * 60 * 1000;

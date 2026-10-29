@@ -161,4 +161,15 @@ describe("customer portal credential changes (Bugbot #222)", () => {
     expect(seenHeaders).not.toContain("jwt.portal.token");
     expect(window.location.hash).toBe("");
   });
+
+  it.each(["#token=", "#token=%20"])("clears the previous customer's session for an empty link (%s)", async (fragment) => {
+    renderPortal();
+    await screen.findByText("AC tune-up");
+    window.history.replaceState(null, "", `/portal${fragment}`);
+    window.dispatchEvent(new HashChangeEvent("hashchange"));
+    expect(await screen.findByText("This link has expired")).toBeTruthy();
+    expect(screen.queryByText("AC tune-up")).toBeNull();
+    expect(window.location.hash).toBe("");
+    expect(window.sessionStorage.getItem("renvani.customer-portal.token")).toBeNull();
+  });
 });

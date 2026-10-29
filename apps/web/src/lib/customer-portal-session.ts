@@ -32,15 +32,20 @@ export function customerPortalScope(token: string | null): string {
 export function captureCustomerPortalToken(): string | null {
   if (typeof window === "undefined") return memoryToken;
   const hash = window.location.hash.replace(/^#/, "");
-  const fromHash = new URLSearchParams(hash).get("token");
-  if (fromHash) {
+  const hashParams = new URLSearchParams(hash);
+  if (hashParams.has("token")) {
+    const fromHash = hashParams.get("token");
+    window.history.replaceState(window.history.state, "", `${window.location.pathname}${window.location.search}`);
+    if (!fromHash?.trim()) {
+      clearCustomerPortalToken();
+      return null;
+    }
     memoryToken = fromHash;
     try {
       window.sessionStorage.setItem(STORAGE_KEY, fromHash);
     } catch {
       // storage unavailable: memory only
     }
-    window.history.replaceState(window.history.state, "", `${window.location.pathname}${window.location.search}`);
     return fromHash;
   }
   if (memoryToken) return memoryToken;

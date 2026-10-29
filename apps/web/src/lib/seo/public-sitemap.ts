@@ -1,5 +1,7 @@
 import type { MetadataRoute } from "next";
 
+import { listServiceAreaPages, serviceAreaPath } from "@/src/components/growth/service-pages/service-area-pages";
+import type { PublicBookingSettingsRecord } from "@/src/hooks/booking.hooks";
 import { fetchPublicBookingSettingsBySlug } from "@/src/lib/public-booking-server";
 
 /**
@@ -65,11 +67,20 @@ export class SitemapPublishCheckError extends Error {
 }
 
 type Fetcher = (slug: string) => Promise<unknown | null>;
+type PublishedShopSettings = Pick<PublicBookingSettingsRecord, "bookingSlug" | "companyName" | "offeredServices" | "serviceAreaZipCodes">;
 
-function isPublishedBookingSettings(value: unknown, slug: string): boolean {
+function isPublishedBookingSettings(value: unknown, slug: string): value is PublishedShopSettings {
   if (typeof value !== "object" || value === null) return false;
   const settings = value as Record<string, unknown>;
-  return settings.bookingSlug === slug && typeof settings.companyName === "string" && settings.companyName.trim().length > 0;
+  return (
+    settings.bookingSlug === slug &&
+    typeof settings.companyName === "string" &&
+    settings.companyName.trim().length > 0 &&
+    Array.isArray(settings.offeredServices) &&
+    settings.offeredServices.every((service: unknown) => typeof service === "object" && service !== null && !Array.isArray(service)) &&
+    (settings.serviceAreaZipCodes === undefined ||
+      (Array.isArray(settings.serviceAreaZipCodes) && settings.serviceAreaZipCodes.every((zip: unknown) => typeof zip === "string")))
+  );
 }
 
 export async function buildPublicSitemap(
@@ -88,7 +99,7 @@ export async function buildPublicSitemap(
         if (!isPublishedBookingSettings(settings, slug)) {
           throw new Error("Invalid public booking settings response");
         }
-        return slug;
+        return { slug, settings };
       } catch (error) {
         failures.push({ slug, error });
         return null;
@@ -103,14 +114,19 @@ export async function buildPublicSitemap(
     throw new SitemapPublishCheckError(failures.map((f) => f.slug));
   }
   return published
-    .filter((slug): slug is string => slug !== null)
-    .flatMap((slug) =>
-      SHOP_PAGE_TYPES.map((type) => ({
+    .filter((shop): shop is { slug: string; settings: PublishedShopSettings } => shop !== null)
+    .flatMap(({ slug, settings }) => [
+      ...SHOP_PAGE_TYPES.map((type) => ({
         url: `${base}${type.path(encodeURIComponent(slug))}`,
         changeFrequency: "weekly" as const,
         priority: type.priority
+      })),
+      ...listServiceAreaPages(settings).map((ref) => ({
+        url: `${base}${serviceAreaPath(encodeURIComponent(slug), ref)}`,
+        changeFrequency: "weekly" as const,
+        priority: 0.6
       }))
-    );
+    ]);
 }
 
 export function buildPublicRobots(env: NodeJS.ProcessEnv = process.env): MetadataRoute.Robots {

@@ -529,7 +529,27 @@ describe("job.service", () => {
     expect(fakeDb.getTestState().activityEvents.some((event) => event.eventType === "job.completed")).toBe(false);
     expect(addQueueJob).not.toHaveBeenCalled();
 
-    task.status = "completed";
+    const persistedTask = fakeDb.getTestState().jobTasks.find((row) => row.id === task.id);
+    expect(persistedTask).toBeDefined();
+    if (!persistedTask) throw new Error("Expected task after rollback");
+    persistedTask.status = "completed";
+    const completed = await jobService.completeJob(company.id, actor.id, job.id, {});
+    expect(completed.status).toBe("completed");
+  });
+
+  it("completeJob blocks an in-progress required task but permits skipped required and open optional tasks", async () => {
+    const { company, actor } = createAdminContext();
+    const { customer } = seedJobGraph(company.id);
+    const job = fakeDb.seedJob({ companyId: company.id, customerId: customer.id, title: "Mixed Checklist", status: "in_progress" });
+    const required = fakeDb.seedJobTask({ companyId: company.id, jobId: job.id, title: "Active check", isRequired: true, status: "in_progress" });
+    fakeDb.seedJobTask({ companyId: company.id, jobId: job.id, title: "Optional check", isRequired: false, status: "pending" });
+
+    await expect(jobService.completeJob(company.id, actor.id, job.id, {})).rejects.toMatchObject({ code: ErrorCode.CONFLICT });
+    const persistedTask = fakeDb.getTestState().jobTasks.find((row) => row.id === required.id);
+    expect(persistedTask).toBeDefined();
+    if (!persistedTask) throw new Error("Expected task after rollback");
+    persistedTask.status = "skipped";
+
     const completed = await jobService.completeJob(company.id, actor.id, job.id, {});
     expect(completed.status).toBe("completed");
   });

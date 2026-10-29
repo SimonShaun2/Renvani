@@ -116,8 +116,8 @@ describe("technician authz scoping", () => {
 
   it("only the assigned technician can complete a job or a task", async () => {
     const { company, me, myJob, otherJob } = setup();
-    const otherTask = fakeDb.seedJobTask({ companyId: company.id, jobId: otherJob.id, title: "Other step" });
-    const myTask = fakeDb.seedJobTask({ companyId: company.id, jobId: myJob.id, title: "My step" });
+    const otherTask = fakeDb.seedJobTask({ companyId: company.id, jobId: otherJob.id, title: "Other step", isRequired: true });
+    const myTask = fakeDb.seedJobTask({ companyId: company.id, jobId: myJob.id, title: "My step", isRequired: true });
 
     expect((await api().post(`/api/v1/jobs/${otherJob.id}/complete`).set("Authorization", me.authorization).send({})).status).toBe(403);
     expect((await api().post(`/api/v1/jobs/${otherJob.id}/tasks/${otherTask.id}/complete`).set("Authorization", me.authorization).send({})).status).toBe(403);
@@ -154,7 +154,7 @@ describe("technician authz scoping", () => {
     const { me } = setup();
     const b = seedCompanyGraph("beta-authz");
     const bJob = fakeDb.seedJob({ companyId: b.company.id, customerId: b.customer.id, title: "B job", status: "in_progress" });
-    const bTask = fakeDb.seedJobTask({ companyId: b.company.id, jobId: bJob.id, title: "B step" });
+    const bTask = fakeDb.seedJobTask({ companyId: b.company.id, jobId: bJob.id, title: "B step", isRequired: true });
 
     const list = await api().get("/api/v1/jobs").set("Authorization", me.authorization);
     expect(list.body.data.map((job: { id: string }) => job.id)).not.toContain(bJob.id);

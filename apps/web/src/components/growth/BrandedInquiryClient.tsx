@@ -1,11 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import { Loader2 } from "lucide-react";
 
 import {
-  BRANDED_ACQUISITION_SOURCE,
   buildBookPath,
   type BrandedStorefrontViewModel
 } from "@/src/components/growth/branded-storefront.utils";
@@ -22,6 +21,9 @@ interface BrandedInquiryClientProps {
   /** Trade label from `resolveSiteTrade` (#262), sent as `serviceCategory`. */
   serviceCategory?: string;
 }
+
+type InquiryField = "firstName" | "lastName" | "phone" | "email" | "addressLine1" | "city" | "state" | "zip";
+type InquiryFieldErrors = Partial<Record<InquiryField, string>>;
 
 function createIdempotencyKey(): string {
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
@@ -59,14 +61,45 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
   const [smsConsentMarketing, setSmsConsentMarketing] = useState(false);
   const [referenceNumber, setReferenceNumber] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<InquiryFieldErrors>({});
+  const formId = useId();
 
   const idempotencyKey = useMemo(() => createIdempotencyKey(), []);
 
   const bookHref = buildBookPath(model.bookingSlug, acquisitionSource);
+  const isPending = submitMutation.isPending || zipCheckMutation.isPending;
+  const fieldErrorId = (field: InquiryField) => `${formId}-${field}-error`;
+  const clearFieldError = (field: InquiryField) => {
+    setFieldErrors((current) => ({ ...current, [field]: undefined }));
+    setErrorMessage(null);
+  };
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     setErrorMessage(null);
+    const requiredFields = [
+      { key: "firstName", label: "First name", value: firstName },
+      { key: "lastName", label: "Last name", value: lastName },
+      { key: "phone", label: "Mobile phone", value: phone },
+      { key: "addressLine1", label: "Service address", value: addressLine1 },
+      { key: "city", label: "City", value: city },
+      { key: "state", label: "State", value: state },
+      { key: "zip", label: "ZIP code", value: zip }
+    ] as const;
+    const errors: InquiryFieldErrors = {};
+    for (const field of requiredFields) {
+      if (!field.value.trim()) errors[field.key] = `${field.label} is required.`;
+    }
+    if (email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/u.test(email.trim())) {
+      errors.email = "Enter a valid email address.";
+    }
+    setFieldErrors(errors);
+    const firstInvalidField = [...requiredFields.map((field) => field.key), "email"].find((field) => errors[field as InquiryField]);
+    if (firstInvalidField) {
+      setErrorMessage("Please correct the highlighted fields.");
+      event.currentTarget.querySelector<HTMLInputElement>(`[name="${firstInvalidField}"]`)?.focus();
+      return;
+    }
 
     try {
       const gate = await passInquiryGate(model.bookingSlug, honeypot);
@@ -131,31 +164,36 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
 
   return (
     <form className="mx-auto max-w-lg space-y-4" onSubmit={(event) => void handleSubmit(event)} noValidate>
-      <p className="text-sm text-[#5e6684]">
-        Request a quote without leaving {model.companyName}&apos;s Renvani-powered site. This coexists with your existing
-        website — no migration required.
-      </p>
+      <p className="text-sm text-[#5e6684]">Tell {model.companyName} what service you need. An inquiry is not a confirmed appointment.</p>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="block text-sm font-medium text-[#2a3360]">
           First name
           <input
             required
+            name="firstName"
             value={firstName}
-            onChange={(event) => setFirstName(event.target.value)}
+            onChange={(event) => { setFirstName(event.target.value); clearFieldError("firstName"); }}
+            aria-invalid={Boolean(fieldErrors.firstName)}
+            aria-describedby={fieldErrors.firstName ? fieldErrorId("firstName") : undefined}
             className="mt-1.5 w-full rounded-lg border border-[#e6dccb] px-3.5 py-3 text-[15px]"
             autoComplete="given-name"
           />
+          {fieldErrors.firstName ? <span id={fieldErrorId("firstName")} className="mt-1 block text-red-700">{fieldErrors.firstName}</span> : null}
         </label>
         <label className="block text-sm font-medium text-[#2a3360]">
           Last name
           <input
             required
+            name="lastName"
             value={lastName}
-            onChange={(event) => setLastName(event.target.value)}
+            onChange={(event) => { setLastName(event.target.value); clearFieldError("lastName"); }}
+            aria-invalid={Boolean(fieldErrors.lastName)}
+            aria-describedby={fieldErrors.lastName ? fieldErrorId("lastName") : undefined}
             className="mt-1.5 w-full rounded-lg border border-[#e6dccb] px-3.5 py-3 text-[15px]"
             autoComplete="family-name"
           />
+          {fieldErrors.lastName ? <span id={fieldErrorId("lastName")} className="mt-1 block text-red-700">{fieldErrors.lastName}</span> : null}
         </label>
       </div>
 
@@ -164,22 +202,30 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
         <input
           required
           type="tel"
+          name="phone"
           value={phone}
-          onChange={(event) => setPhone(event.target.value)}
+          onChange={(event) => { setPhone(event.target.value); clearFieldError("phone"); }}
+          aria-invalid={Boolean(fieldErrors.phone)}
+          aria-describedby={fieldErrors.phone ? fieldErrorId("phone") : undefined}
           className="mt-1.5 w-full rounded-lg border border-[#e6dccb] px-3.5 py-3 text-[15px]"
           autoComplete="tel"
         />
+        {fieldErrors.phone ? <span id={fieldErrorId("phone")} className="mt-1 block text-red-700">{fieldErrors.phone}</span> : null}
       </label>
 
       <label className="block text-sm font-medium text-[#2a3360]">
         Email (recommended for a reply)
         <input
           type="email"
+          name="email"
           value={email}
-          onChange={(event) => setEmail(event.target.value)}
+          onChange={(event) => { setEmail(event.target.value); clearFieldError("email"); }}
+          aria-invalid={Boolean(fieldErrors.email)}
+          aria-describedby={fieldErrors.email ? fieldErrorId("email") : undefined}
           className="mt-1.5 w-full rounded-lg border border-[#e6dccb] px-3.5 py-3 text-[15px]"
           autoComplete="email"
         />
+        {fieldErrors.email ? <span id={fieldErrorId("email")} className="mt-1 block text-red-700">{fieldErrors.email}</span> : null}
       </label>
 
       <label className="block text-sm font-medium text-[#2a3360]">
@@ -201,11 +247,15 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
         Service address
         <input
           required
+          name="addressLine1"
           value={addressLine1}
-          onChange={(event) => setAddressLine1(event.target.value)}
+          onChange={(event) => { setAddressLine1(event.target.value); clearFieldError("addressLine1"); }}
+          aria-invalid={Boolean(fieldErrors.addressLine1)}
+          aria-describedby={fieldErrors.addressLine1 ? fieldErrorId("addressLine1") : undefined}
           className="mt-1.5 w-full rounded-lg border border-[#e6dccb] px-3.5 py-3 text-[15px]"
           autoComplete="street-address"
         />
+        {fieldErrors.addressLine1 ? <span id={fieldErrorId("addressLine1")} className="mt-1 block text-red-700">{fieldErrors.addressLine1}</span> : null}
       </label>
 
       <div className="grid gap-4 sm:grid-cols-3">
@@ -213,22 +263,30 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
           City
           <input
             required
+            name="city"
             value={city}
-            onChange={(event) => setCity(event.target.value)}
+            onChange={(event) => { setCity(event.target.value); clearFieldError("city"); }}
+            aria-invalid={Boolean(fieldErrors.city)}
+            aria-describedby={fieldErrors.city ? fieldErrorId("city") : undefined}
             className="mt-1.5 w-full rounded-lg border border-[#e6dccb] px-3.5 py-3 text-[15px]"
             autoComplete="address-level2"
           />
+          {fieldErrors.city ? <span id={fieldErrorId("city")} className="mt-1 block text-red-700">{fieldErrors.city}</span> : null}
         </label>
         <label className="block text-sm font-medium text-[#2a3360]">
           State
           <input
             required
             maxLength={2}
+            name="state"
             value={state}
-            onChange={(event) => setState(event.target.value)}
+            onChange={(event) => { setState(event.target.value); clearFieldError("state"); }}
+            aria-invalid={Boolean(fieldErrors.state)}
+            aria-describedby={fieldErrors.state ? fieldErrorId("state") : undefined}
             className="mt-1.5 w-full rounded-lg border border-[#e6dccb] px-3.5 py-3 text-[15px] uppercase"
             autoComplete="address-level1"
           />
+          {fieldErrors.state ? <span id={fieldErrorId("state")} className="mt-1 block text-red-700">{fieldErrors.state}</span> : null}
         </label>
       </div>
 
@@ -237,11 +295,15 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
         <input
           required
           inputMode="numeric"
+          name="zip"
           value={zip}
-          onChange={(event) => setZip(event.target.value)}
+          onChange={(event) => { setZip(event.target.value); clearFieldError("zip"); }}
+          aria-invalid={Boolean(fieldErrors.zip)}
+          aria-describedby={fieldErrors.zip ? fieldErrorId("zip") : undefined}
           className="mt-1.5 w-full rounded-lg border border-[#e6dccb] px-3.5 py-3 text-[15px]"
           autoComplete="postal-code"
         />
+        {fieldErrors.zip ? <span id={fieldErrorId("zip")} className="mt-1 block text-red-700">{fieldErrors.zip}</span> : null}
       </label>
 
       <label className="block text-sm font-medium text-[#2a3360]">
@@ -301,20 +363,17 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
 
       <button
         type="submit"
-        disabled={submitMutation.isPending || zipCheckMutation.isPending}
+        disabled={isPending}
+        aria-busy={isPending}
         className="flex h-[52px] w-full items-center justify-center rounded-[10px] bg-[#2f7d4f] text-sm font-semibold text-white hover:bg-[#286b44] disabled:opacity-60"
       >
-        {submitMutation.isPending || zipCheckMutation.isPending ? (
-          <Loader2 className="h-5 w-5 animate-spin" aria-hidden />
+        {isPending ? (
+          <><Loader2 className="h-5 w-5 animate-spin" aria-hidden /><span className="sr-only">Sending inquiry</span></>
         ) : (
           "Send inquiry"
         )}
       </button>
 
-      <p className="text-center text-xs text-[#5e6684]">
-        Attribution: <span className="font-mono">{acquisitionSource || BRANDED_ACQUISITION_SOURCE}</span> · Handoff to
-        Revenue (FS-17) via booking request
-      </p>
     </form>
   );
 }

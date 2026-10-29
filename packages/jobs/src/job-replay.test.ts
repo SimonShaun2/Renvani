@@ -23,6 +23,8 @@ describe("replayFailedJobById", () => {
       getJob: vi.fn().mockResolvedValue({
         id: "job-1",
         data: { companyId: "22222222-2222-4222-8222-222222222222" },
+        opts: { attempts: 3 },
+        attemptsMade: 1,
         getState: vi.fn().mockResolvedValue("failed"),
         retry
       })
@@ -38,6 +40,48 @@ describe("replayFailedJobById", () => {
       jobId: "job-1",
       queueName: QUEUE_NAMES.notifications
     });
+    expect(retry).toHaveBeenCalledOnce();
+    expect(retry).toHaveBeenCalledWith("failed", {});
+  });
+
+  it("resets the attempt budget when replaying an exhausted job", async () => {
+    const retry = vi.fn().mockResolvedValue(undefined);
+    const queue = {
+      getJob: vi.fn().mockResolvedValue({
+        data: { companyId: "22222222-2222-4222-8222-222222222222" },
+        opts: { attempts: 3 },
+        attemptsMade: 3,
+        getState: vi.fn().mockResolvedValue("failed"),
+        retry
+      })
+    };
+
+    await replayFailedJobById(queue, {
+      queueName: QUEUE_NAMES.notifications,
+      jobId: "exhausted-job",
+      expectedCompanyId: "22222222-2222-4222-8222-222222222222"
+    });
+
+    expect(retry).toHaveBeenCalledWith("failed", { resetAttemptsMade: true });
+  });
+
+  it("does not report success when a competing replay already moved the job", async () => {
+    const retry = vi.fn().mockRejectedValue(new Error("Job is not in the failed state"));
+    const queue = {
+      getJob: vi.fn().mockResolvedValue({
+        data: { companyId: "22222222-2222-4222-8222-222222222222" },
+        opts: { attempts: 2 },
+        attemptsMade: 2,
+        getState: vi.fn().mockResolvedValue("failed"),
+        retry
+      })
+    };
+
+    await expect(replayFailedJobById(queue, {
+      queueName: QUEUE_NAMES.notifications,
+      jobId: "raced-job",
+      expectedCompanyId: "22222222-2222-4222-8222-222222222222"
+    })).rejects.toThrow("Job is not in the failed state");
     expect(retry).toHaveBeenCalledOnce();
   });
 

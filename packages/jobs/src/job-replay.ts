@@ -63,7 +63,12 @@ export async function replayFailedJobById(
     throw new JobReplayError("FORBIDDEN", "Job payload companyId does not match expected tenant scope");
   }
 
-  await job.retry();
+  // A failed job at its attempt limit would fail again immediately after replay.
+  // BullMQ atomically checks the failed state during retry, so competing replays
+  // cannot both move the same job back to waiting.
+  const attemptLimit = job.opts.attempts ?? 0;
+  const exhausted = attemptLimit > 0 && job.attemptsMade >= attemptLimit;
+  await job.retry("failed", exhausted ? { resetAttemptsMade: true } : {});
 
   return {
     jobId,

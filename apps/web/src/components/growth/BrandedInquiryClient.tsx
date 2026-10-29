@@ -365,10 +365,10 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
         type="submit"
         disabled={isPending}
         aria-busy={isPending}
-        className="flex h-[52px] w-full items-center justify-center rounded-[10px] bg-[#2f7d4f] text-sm font-semibold text-white hover:bg-[#286b44] disabled:opacity-60"
+        className="flex h-[52px] w-full items-center justify-center gap-2 rounded-[10px] bg-[#2f7d4f] text-sm font-semibold text-white hover:bg-[#286b44] disabled:opacity-60"
       >
         {isPending ? (
-          <><Loader2 className="h-5 w-5 animate-spin" aria-hidden /><span className="sr-only">Sending inquiry</span></>
+          <><Loader2 className="h-5 w-5 animate-spin" aria-hidden /><span>Sending inquiry</span></>
         ) : (
           "Send inquiry"
         )}

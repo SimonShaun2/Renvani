@@ -96,6 +96,7 @@ describe("BrandedInquiryClient", () => {
     const button = screen.getByRole("button", { name: "Sending inquiry" });
     expect(button.hasAttribute("disabled")).toBe(true);
     expect(button.getAttribute("aria-busy")).toBe("true");
+    expect(screen.getByText("Sending inquiry").classList.contains("sr-only")).toBe(false);
     expect(container.textContent).not.toContain("Renvani-powered");
     expect(container.textContent).not.toContain("no migration required");
     expect(container.textContent).not.toContain("FS-17");

@@ -1,11 +1,59 @@
 import { randomUUID } from "node:crypto";
 
 import { and, eq, inArray, isNull, sql } from "drizzle-orm";
+import { z } from "zod";
 
 import { clerkWorkspaceIntentEvents, clerkWorkspaceIntents, db } from "@fsm/db";
 import { AppError, ErrorCode, type ClerkWorkspaceIntentResponse } from "@fsm/types";
 
 type IntentRow = typeof clerkWorkspaceIntents.$inferSelect;
+
+const deferredWebhookSchema = z.object({
+  kind: z.enum(["organization.created", "organizationMembership.created"]),
+  svixId: z.string().min(1).max(255),
+  organizationId: z.string().min(1).max(255),
+  clerkUserId: z.string().min(1).max(255),
+  name: z.string().max(255).optional(),
+  email: z.string().email().max(255).optional(),
+  firstName: z.string().max(100).optional(),
+  lastName: z.string().max(100).optional(),
+  clerkOrgRole: z.string().max(100).optional()
+});
+
+export type DeferredClerkWorkspaceWebhook = z.infer<typeof deferredWebhookSchema>;
+
+/**
+ * Store an authenticated delivery for a known pre-tenant intent. This is an inbox record,
+ * not evidence to create a company: a later worker must verify the Backend API org,
+ * reconcile the intent, and check creator membership before consuming it. The intent
+ * lock makes a repeated svix id idempotent even across API instances.
+ */
+export async function deferClerkWorkspaceWebhook(input: DeferredClerkWorkspaceWebhook): Promise<boolean> {
+  const delivery = deferredWebhookSchema.parse(input);
+  return db.transaction(async (tx) => {
+    await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${`clerk-workspace-intent:${delivery.clerkUserId}`}))`);
+    const intent = await tx.query.clerkWorkspaceIntents.findFirst({
+      where: (table, operators) => operators.eq(table.clerkUserId, delivery.clerkUserId)
+    });
+    if (!intent || intent.deletedAt) return false;
+    const previous = await tx.query.clerkWorkspaceIntentEvents.findMany({
+      where: (table, operators) => operators.eq(table.intentId, intent.id)
+    });
+    if (previous.some((event) => {
+      const details = event.details;
+      return event.eventType === "workspace.webhook_deferred" &&
+        typeof details === "object" && details !== null &&
+        "svixId" in details && details.svixId === delivery.svixId;
+    })) return true;
+    await tx.insert(clerkWorkspaceIntentEvents).values({
+      intentId: intent.id,
+      clerkUserId: delivery.clerkUserId,
+      eventType: "workspace.webhook_deferred",
+      details: delivery
+    });
+    return true;
+  });
+}
 
 function toResponse(row: IntentRow): ClerkWorkspaceIntentResponse {
   if (row.status !== "pending" && row.status !== "claimed" && row.status !== "uncertain" && row.status !== "reconciled")

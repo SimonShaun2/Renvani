@@ -3,11 +3,13 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const provisionClerkOrganization = vi.fn();
 const provisionClerkMembership = vi.fn();
+const deferClerkWorkspaceWebhook = vi.fn();
 
 vi.mock("../../services/clerk-provisioning.service.js", () => ({
   provisionClerkOrganization,
   provisionClerkMembership
 }));
+vi.mock("../../services/clerk-workspace-intent.service.js", () => ({ deferClerkWorkspaceWebhook }));
 const syncClerkUserRoleMetadata = vi.hoisted(() => vi.fn(async () => "synced"));
 vi.mock("../../lib/clerk-role-metadata.js", () => ({ syncClerkUserRoleMetadata }));
 const syncClerkUserUpdated = vi.fn();
@@ -62,6 +64,7 @@ describe("Clerk webhook", () => {
     mockEnv.CLERK_WEBHOOK_SECRET = SECRET;
     provisionClerkOrganization.mockReset().mockResolvedValue({ id: "co_1" });
     provisionClerkMembership.mockReset().mockResolvedValue({ status: "created", companyId: "co_1" });
+    deferClerkWorkspaceWebhook.mockReset().mockResolvedValue(false);
     syncClerkUserUpdated.mockReset().mockResolvedValue({ status: "updated" });
     deactivateClerkUser.mockReset().mockResolvedValue({ status: "deactivated" });
     deactivateClerkMembership.mockReset().mockResolvedValue({ status: "deactivated" });
@@ -151,6 +154,48 @@ describe("Clerk webhook", () => {
       clerkUserId: "user_ava",
       emailVerified: false
     });
+  });
+
+  it("FS-235: records membership-first and replay for an intent without granting a tenant or owner", async () => {
+    deferClerkWorkspaceWebhook.mockResolvedValue(true);
+    const body = {
+      type: "organizationMembership.created",
+      data: { role: "org:admin", organization: { id: "org_pending", name: "Acme" },
+        public_user_data: { identifier: "owner@acme.com", user_id: "user_creator" } }
+    };
+    const first = await send(body, { id: "msg_fs235_membership" });
+    expect(first.statusCode).toBe(503);
+    expect(first.json()).toMatchObject({ error: "WORKSPACE_INTENT_DEFERRED", deferred: true });
+    expect(deferClerkWorkspaceWebhook).toHaveBeenCalledWith(expect.objectContaining({
+      kind: "organizationMembership.created", svixId: "msg_fs235_membership",
+      organizationId: "org_pending", clerkUserId: "user_creator"
+    }));
+    expect(provisionClerkMembership).not.toHaveBeenCalled();
+    expect(syncClerkUserRoleMetadata).not.toHaveBeenCalled();
+    const replay = await send(body, { id: "msg_fs235_membership" });
+    expect(replay.statusCode).toBe(503);
+    expect(deferClerkWorkspaceWebhook).toHaveBeenCalledTimes(2);
+    expect(provisionClerkMembership).not.toHaveBeenCalled();
+  });
+
+  it("FS-235: records an organization event for an intent without creating a company", async () => {
+    deferClerkWorkspaceWebhook.mockResolvedValue(true);
+    const res = await send({ type: "organization.created", data: {
+      id: "org_pending", name: "Acme", created_by: "user_creator"
+    } });
+    expect(res.statusCode).toBe(503);
+    expect(provisionClerkOrganization).not.toHaveBeenCalled();
+  });
+
+  it("FS-235: a foreign organization membership for an intent user never grants its tenant or owner", async () => {
+    deferClerkWorkspaceWebhook.mockResolvedValue(true);
+    const res = await send({ type: "organizationMembership.created", data: {
+      organization: { id: "org_foreign", name: "Other" },
+      public_user_data: { identifier: "creator@example.com", user_id: "user_creator" }
+    } });
+    expect(res.statusCode).toBe(503);
+    expect(provisionClerkMembership).not.toHaveBeenCalled();
+    expect(syncClerkUserRoleMetadata).not.toHaveBeenCalled();
   });
 
   it("publishes the provisioned DB role to Clerk public_metadata (fixes /no-access for new owners)", async () => {

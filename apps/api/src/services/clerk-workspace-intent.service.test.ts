@@ -23,7 +23,7 @@ function matches(row: Row, condition: Condition): boolean {
 
 const state = vi.hoisted(() => ({
   rows: [] as Row[],
-  events: [] as Array<{ intentId: string; clerkUserId: string; eventType: string }>,
+  events: [] as Array<{ intentId: string; clerkUserId: string; eventType: string; details?: Record<string, unknown> }>,
   lockTail: Promise.resolve() as Promise<void>
 }));
 
@@ -43,11 +43,17 @@ vi.mock("@fsm/db", () => {
     const condition = options.where({ clerkUserId: "clerkUserId" }, { eq: (_field, value) => ({ value }) });
     return state.rows.find((row) => row.clerkUserId === condition.value);
   };
+  const findEvents = async (options: {
+    where: (table: { intentId: string }, operators: { eq: (field: string, value: string) => { value: string } }) => { value: string };
+  }) => {
+    const condition = options.where({ intentId: "intentId" }, { eq: (_field, value) => ({ value }) });
+    return state.events.filter((event) => event.intentId === condition.value);
+  };
   return {
     clerkWorkspaceIntents: intentTable,
     clerkWorkspaceIntentEvents: eventTable,
     db: {
-      query: { clerkWorkspaceIntents: { findFirst } },
+      query: { clerkWorkspaceIntents: { findFirst }, clerkWorkspaceIntentEvents: { findMany: findEvents } },
       transaction: async <T>(run: (tx: unknown) => Promise<T>): Promise<T> => {
         let release!: () => void;
         const finished = new Promise<void>((resolve) => { release = resolve; });
@@ -57,7 +63,7 @@ vi.mock("@fsm/db", () => {
             state.lockTail = previous.then(() => finished);
             await previous;
           },
-          query: { clerkWorkspaceIntents: { findFirst } },
+          query: { clerkWorkspaceIntents: { findFirst }, clerkWorkspaceIntentEvents: { findMany: findEvents } },
           update: (table: unknown) => ({
             set: (values: Partial<Row>) => ({
               where: (condition: Condition) => ({
@@ -100,6 +106,7 @@ vi.mock("@fsm/db", () => {
 
 import {
   claimClerkWorkspaceCreateAttempt,
+  deferClerkWorkspaceWebhook,
   evaluateClerkWorkspaceCreatorProvisioning,
   getClerkWorkspaceIntent,
   markClerkWorkspaceAttemptUncertain,
@@ -281,5 +288,41 @@ describe("FS-235 Clerk workspace intent", () => {
     expect(decide(observed, "org_a", "user_b"))
       .toEqual({ status: "deny", reason: "membership_mismatch" });
     expect(state.events.filter((event) => event.eventType === "workspace.organization_reconciled")).toHaveLength(1);
+  });
+
+  it("durably records out-of-order signed deliveries once per message for a known intent", async () => {
+    const membership = {
+      kind: "organizationMembership.created" as const, svixId: "msg_member", organizationId: "org_a",
+      clerkUserId: "user_a", email: "creator@example.com", name: "Acme", firstName: "Ava",
+      lastName: "Stone", clerkOrgRole: "org:admin"
+    };
+    expect(await deferClerkWorkspaceWebhook(membership)).toBe(false);
+    const intent = await reserveClerkWorkspaceIntent("user_a", "Acme");
+    const [first, replay] = await Promise.all([
+      deferClerkWorkspaceWebhook(membership), deferClerkWorkspaceWebhook(membership)
+    ]);
+    expect([first, replay]).toEqual([true, true]);
+    const organization = {
+      kind: "organization.created" as const, svixId: "msg_org", organizationId: "org_a",
+      clerkUserId: "user_a", name: "Acme"
+    };
+    expect(await deferClerkWorkspaceWebhook(organization)).toBe(true);
+    expect(state.events.filter((event) => event.eventType === "workspace.webhook_deferred"))
+      .toEqual([
+        expect.objectContaining({ intentId: intent.id, details: membership }),
+        expect.objectContaining({ intentId: intent.id, details: organization })
+      ]);
+    expect(state.rows[0]?.status).toBe("pending");
+    expect(state.rows[0]?.clerkOrganizationId).toBeNull();
+  });
+
+  it("quarantines a foreign organization delivery against the user's intent without binding it", async () => {
+    await reserveClerkWorkspaceIntent("user_a", "Acme");
+    expect(await deferClerkWorkspaceWebhook({
+      kind: "organizationMembership.created", svixId: "foreign", organizationId: "org_foreign",
+      clerkUserId: "user_a", email: "creator@example.com"
+    })).toBe(true);
+    expect(state.events.at(-1)?.details).toMatchObject({ organizationId: "org_foreign" });
+    expect(state.rows[0]?.clerkOrganizationId).toBeNull();
   });
 });

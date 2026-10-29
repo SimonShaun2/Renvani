@@ -39,8 +39,22 @@ export function CrewFinishJob({ jobId }: { jobId: string }) {
     );
   }
 
+  if (jobQuery.isError) {
+    return (
+      <div className="min-h-[100svh] bg-[#fbf6ef] px-6 py-6">
+        <div role="alert" className="mx-auto w-full max-w-[390px] rounded-[14px] border border-[#e6dccb] bg-white p-5">
+          <p className="text-[15px] font-semibold text-[#0f1530]">Could not load this job.</p>
+          <p className="mt-2 text-sm text-[#5e6684]">Check your connection and try again.</p>
+          <button type="button" onClick={() => void jobQuery.refetch()} className="mt-4 min-h-11 rounded-[10px] bg-[#0f1530] px-5 text-sm font-semibold text-white">
+            Retry job
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   const job = jobQuery.data?.job;
-  if (jobQuery.isError || !job) {
+  if (!job) {
     return (
       <div className="px-4 py-6">
         <EmptyState
@@ -49,6 +63,20 @@ export function CrewFinishJob({ jobId }: { jobId: string }) {
           subtitle="This job may have been removed or may not belong to the current technician."
           compact
         />
+      </div>
+    );
+  }
+
+  if (tasksQuery.isError) {
+    return (
+      <div className="min-h-[100svh] bg-[#fbf6ef] px-6 py-6">
+        <div role="alert" className="mx-auto w-full max-w-[390px] rounded-[14px] border border-[#e6dccb] bg-white p-5">
+          <p className="text-[15px] font-semibold text-[#0f1530]">Could not load the checklist.</p>
+          <p className="mt-2 text-sm text-[#5e6684]">The checklist must load before you can complete this job.</p>
+          <button type="button" onClick={() => void tasksQuery.refetch()} className="mt-4 min-h-11 rounded-[10px] bg-[#0f1530] px-5 text-sm font-semibold text-white">
+            Retry checklist
+          </button>
+        </div>
       </div>
     );
   }

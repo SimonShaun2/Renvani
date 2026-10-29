@@ -71,9 +71,11 @@ export function CreateWorkspaceStep() {
   }, [orgId, userId]);
 
   const poll = useCallback(async () => {
+    const pollingUserId = userId;
     setStatus("progress");
     setErrorKind(null);
     const result = await waitForWorkspace({ getFreshToken: () => getToken({ skipCache: true }), checkCompany });
+    if (currentUserId.current !== pollingUserId) return;
     if (result.ok) {
       if (userId) sessionStorage.removeItem(pendingOrgStorageKey(userId));
       router.replace(WORKSPACE_SETUP_NEXT_ROUTE);

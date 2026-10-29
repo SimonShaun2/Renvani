@@ -162,6 +162,25 @@ describe("CreateWorkspaceStep", () => {
     expect(clerk.setActive).toHaveBeenNthCalledWith(2, { organization: "org_2" });
   });
 
+  it("ignores a readiness result from the previous account after a user switch", async () => {
+    clerk.orgId = "org_1";
+    let finishPoll: (result: { ok: true; role: "owner" }) => void = () => {};
+    wait.fn.mockReturnValue(new Promise((resolve) => { finishPoll = resolve; }));
+    const view = render(<CreateWorkspaceStep />);
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Continue" }));
+    });
+
+    clerk.userId = "user_2";
+    clerk.orgId = null;
+    view.rerender(<CreateWorkspaceStep />);
+    await act(async () => { finishPoll({ ok: true, role: "owner" }); });
+
+    expect(replace).not.toHaveBeenCalled();
+    expect(screen.queryByRole("alert")).toBeNull();
+    expect(screen.getByLabelText("Company name")).toBeTruthy();
+  });
+
   it("shows the frame copy and a disabled progress button while waiting", async () => {
     wait.fn.mockReturnValue(new Promise(() => {}));
     render(<CreateWorkspaceStep />);

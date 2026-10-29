@@ -1,4 +1,4 @@
-import { and, desc, eq, isNull } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 
 import { bookingRequests, customers, db } from "@fsm/db";
 import {
@@ -73,30 +73,32 @@ async function loadConsentSnapshotForTarget(
       throw new AppError(ErrorCode.NOT_FOUND, "Customer not found for consent evaluation");
     }
 
-    // Customer preferences have no opt-in fields. The latest tenant-owned, contact-matching
-    // inquiry is the only stored affirmative SMS grant; later opt-outs supersede older grants.
-    const [latestInquiry] = await db
+    // Customer preferences have no opt-in fields. Inquiry updatedAt can change for scheduling,
+    // so it cannot order consent decisions. Conflicting records for the current phone deny.
+    // Include soft-deleted inquiries so deleting a decline cannot revive an older grant.
+    const inquiries = await db
       .select()
       .from(bookingRequests)
       .where(
         and(
           eq(bookingRequests.companyId, companyId),
           eq(bookingRequests.customerId, row.id),
-          isNull(bookingRequests.deletedAt)
+          eq(bookingRequests.phone, row.phone ?? "")
         )
-      )
-      .orderBy(desc(bookingRequests.updatedAt))
-      .limit(1);
-    const consentVersion = latestInquiry?.updatedAt.getTime() ?? row.updatedAt.getTime();
-    const capturedAt = latestInquiry?.updatedAt.toISOString() ?? row.updatedAt.toISOString();
-    const matchingSmsGrant = channel === "sms" && !!row.phone && latestInquiry?.phone === row.phone;
+      );
+    const consentVersion = inquiries.reduce(
+      (latest, inquiry) => Math.max(latest, inquiry.updatedAt.getTime()),
+      row.updatedAt.getTime()
+    );
+    const capturedAt = new Date(consentVersion).toISOString();
+    const hasMatchingSmsEvidence = channel === "sms" && !!row.phone && inquiries.length > 0;
     return {
       consentScope,
       capturedAt,
       consentVersion,
       currentConsentVersion: consentVersion,
-      appointmentOptIn: matchingSmsGrant && latestInquiry?.smsConsentAppointments === true,
-      marketingOptIn: matchingSmsGrant && latestInquiry?.smsConsentMarketing === true,
+      appointmentOptIn: hasMatchingSmsEvidence && inquiries.every((inquiry) => inquiry.smsConsentAppointments === true),
+      marketingOptIn: hasMatchingSmsEvidence && inquiries.every((inquiry) => inquiry.smsConsentMarketing === true),
       revokedAt: row.doNotContact ? capturedAt : null
     };
   }

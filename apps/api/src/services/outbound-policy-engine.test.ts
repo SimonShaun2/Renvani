@@ -222,15 +222,24 @@ describe("outbound-policy-engine (FS-13)", () => {
     expect((await marketingAction(company.id, customer.id)).allowed).toBe(false);
   });
 
-  it("uses the latest tenant inquiry and matching current contact, so later opt-out wins", async () => {
+  it("denies conflicting inquiry consent even after the granting inquiry is rescheduled", async () => {
     const company = fakeDb.seedCompany({ name: "Tenant I", slug: "tenant-i" });
     const other = fakeDb.seedCompany({ name: "Tenant J", slug: "tenant-j" });
     const customer = fakeDb.seedCustomer({ companyId: company.id, firstName: "A", lastName: "B", phone: "5551112222" });
     const oldGrant = bookingConsent(company.id, customer.id, customer.phone!, true);
-    oldGrant.updatedAt = new Date("2026-01-01T00:00:00.000Z");
+    oldGrant.smsConsentAppointments = true;
     const revoked = bookingConsent(company.id, customer.id, customer.phone!, false);
     revoked.updatedAt = new Date("2026-02-01T00:00:00.000Z");
+    // A scheduling edit makes the old grant the newest row without changing consent.
+    oldGrant.updatedAt = new Date("2026-03-01T00:00:00.000Z");
     bookingConsent(other.id, customer.id, customer.phone!, true).updatedAt = new Date("2026-03-01T00:00:00.000Z");
+    expect((await marketingAction(company.id, customer.id)).failureCode).toBe("CONSENT_REQUIRED");
+    const appointment = await authorizeAgentActionExecution({ companyId: company.id, actorId: "user-1",
+      actorType: "user", actionType: "revenue.invoice_reminder.propose",
+      parameters: { channel: "sms", consentScope: "appointment" },
+      target: customerTarget(company.id, customer.id), requiresApproval: true, state: "approved" });
+    expect(appointment.failureCode).toBe("CONSENT_REQUIRED");
+    revoked.deletedAt = new Date("2026-04-01T00:00:00.000Z");
     expect((await marketingAction(company.id, customer.id)).failureCode).toBe("CONSENT_REQUIRED");
     revoked.smsConsentMarketing = true;
     customer.phone = "5559998888";

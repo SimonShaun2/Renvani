@@ -25,6 +25,14 @@ describe("service x area pages", () => {
     expect(resolveServiceAreaPage(settings, "roofing", "78704")).toBeNull();
     expect(slugifyService("Move-in / Move-out!")).toBe("move-in-move-out");
   });
+
+  it("does not create SEO pages from storefront fallback cards", () => {
+    for (const offeredServices of [[], [{}], [{ label: "  " }]]) {
+      const shop = { offeredServices, serviceAreaZipCodes: ["78704"] };
+      expect(listServiceAreaPages(shop)).toEqual([]);
+      expect(resolveServiceAreaPage(shop, "standard-clean", "78704")).toBeNull();
+    }
+  });
 });
 
 describe("copy providers", () => {

@@ -24,6 +24,12 @@ export interface ServiceAreaPageRef {
 }
 
 export function listServiceAreaPages(settings: Pick<PublicBookingSettingsRecord, "offeredServices" | "serviceAreaZipCodes">) {
+  // Storefront fallback cards are presentation only; they are not services a shop actually offers.
+  const hasOfferedService = settings.offeredServices.some((service) =>
+    [service.label, service.name, service.category].some((value) => typeof value === "string" && value.trim().length > 0)
+  );
+  if (!hasOfferedService) return [];
+
   const services = buildServiceCards(settings.offeredServices);
   const zips = (settings.serviceAreaZipCodes ?? []).filter((zip) => /^\d{5}$/.test(zip));
   return services.flatMap((service) =>

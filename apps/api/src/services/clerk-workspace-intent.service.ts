@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 
-import { and, eq, isNull, sql } from "drizzle-orm";
+import { and, eq, inArray, isNull, sql } from "drizzle-orm";
 
 import { clerkWorkspaceIntentEvents, clerkWorkspaceIntents, db } from "@fsm/db";
 import { AppError, ErrorCode, type ClerkWorkspaceIntentResponse } from "@fsm/types";
@@ -126,6 +126,77 @@ export async function markClerkWorkspaceAttemptUncertain(
       clerkUserId,
       eventType: "workspace.attempt_uncertain",
       details: { attemptId }
+    });
+    return true;
+  });
+}
+
+/**
+ * A normalized Backend API Organization observation. A future adapter must obtain this
+ * from Clerk's secret-key API, never browser state or unverified request parameters.
+ */
+export interface ObservedClerkWorkspaceOrganization {
+  id: string;
+  createdBy?: string | null;
+  privateMetadata?: Record<string, unknown> | null;
+}
+
+/** Fail closed on missing creator/marker; a matching name or membership is insufficient. */
+export function matchesClerkWorkspaceIntent(
+  intent: Pick<IntentRow, "id" | "clerkUserId" | "attemptId" | "clerkOrganizationId">,
+  observed: ObservedClerkWorkspaceOrganization
+): boolean {
+  return Boolean(
+    observed.id &&
+    intent.attemptId &&
+    observed.createdBy === intent.clerkUserId &&
+    observed.privateMetadata?.renvaniIntentId === intent.id &&
+    observed.privateMetadata?.renvaniAttemptId === intent.attemptId &&
+    (!intent.clerkOrganizationId || intent.clerkOrganizationId === observed.id)
+  );
+}
+
+/**
+ * Reconcile an uncertain or claimed create outcome from a verified Backend API observation.
+ * This binds only the intent to an org. It does not create a company or grant owner access.
+ * Two different matching orgs cannot both bind: the compare-and-set and unique org index
+ * leave the second observation in explicit conflict for operator review.
+ */
+export async function reconcileObservedClerkWorkspaceOrganization(
+  clerkUserId: string,
+  observed: ObservedClerkWorkspaceOrganization
+): Promise<boolean> {
+  return db.transaction(async (tx) => {
+    const intent = await tx.query.clerkWorkspaceIntents.findFirst({
+      where: (table, operators) => operators.eq(table.clerkUserId, clerkUserId)
+    });
+    if (!intent || !intent.attemptId || !matchesClerkWorkspaceIntent(intent, observed)) {
+      throw new AppError(ErrorCode.CONFLICT, "Clerk organization does not match workspace intent");
+    }
+    if (intent.status === "reconciled") return false;
+    const [changed] = await tx.update(clerkWorkspaceIntents)
+      .set({ status: "reconciled", clerkOrganizationId: observed.id, updatedAt: new Date() })
+      .where(and(
+        eq(clerkWorkspaceIntents.id, intent.id),
+        eq(clerkWorkspaceIntents.clerkUserId, clerkUserId),
+        eq(clerkWorkspaceIntents.attemptId, intent.attemptId),
+        inArray(clerkWorkspaceIntents.status, ["claimed", "uncertain"]),
+        isNull(clerkWorkspaceIntents.clerkOrganizationId),
+        isNull(clerkWorkspaceIntents.deletedAt)
+      ))
+      .returning();
+    if (!changed) {
+      const current = await tx.query.clerkWorkspaceIntents.findFirst({
+        where: (table, operators) => operators.eq(table.clerkUserId, clerkUserId)
+      });
+      if (current?.status === "reconciled" && current.clerkOrganizationId === observed.id) return false;
+      throw new AppError(ErrorCode.CONFLICT, "Workspace intent was reconciled differently");
+    }
+    await tx.insert(clerkWorkspaceIntentEvents).values({
+      intentId: changed.id,
+      clerkUserId,
+      eventType: "workspace.organization_reconciled",
+      details: { attemptId: intent.attemptId, clerkOrganizationId: observed.id }
     });
     return true;
   });

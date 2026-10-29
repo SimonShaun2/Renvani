@@ -7,15 +7,17 @@ interface Row {
   clerkUserId: string;
   requestedName: string;
   status: string;
-  attemptId?: string | null;
+  attemptId: string | null;
+  clerkOrganizationId: string | null;
   deletedAt?: Date | null;
   createdAt: Date;
 }
 
-type Condition = { kind: "eq"; field: keyof Row; value: unknown } | { kind: "null"; field: keyof Row } | { kind: "and"; parts: Condition[] };
+type Condition = { kind: "eq"; field: keyof Row; value: unknown } | { kind: "null"; field: keyof Row } | { kind: "in"; field: keyof Row; values: unknown[] } | { kind: "and"; parts: Condition[] };
 function matches(row: Row, condition: Condition): boolean {
   if (condition.kind === "and") return condition.parts.every((part) => matches(row, part));
   if (condition.kind === "null") return row[condition.field] == null;
+  if (condition.kind === "in") return condition.values.includes(row[condition.field]);
   return row[condition.field] === condition.value;
 }
 
@@ -28,11 +30,12 @@ const state = vi.hoisted(() => ({
 vi.mock("drizzle-orm", () => ({
   sql: () => ({}),
   eq: (field: keyof Row, value: unknown) => ({ kind: "eq", field, value }),
+  inArray: (field: keyof Row, values: unknown[]) => ({ kind: "in", field, values }),
   isNull: (field: keyof Row) => ({ kind: "null", field }),
   and: (...parts: Condition[]) => ({ kind: "and", parts })
 }));
 vi.mock("@fsm/db", () => {
-  const intentTable = { table: "intent", clerkUserId: "clerkUserId", status: "status", attemptId: "attemptId", deletedAt: "deletedAt" };
+  const intentTable = { table: "intent", id: "id", clerkUserId: "clerkUserId", status: "status", attemptId: "attemptId", clerkOrganizationId: "clerkOrganizationId", deletedAt: "deletedAt" };
   const eventTable = { table: "event" };
   const findFirst = async (options: {
     where: (table: { clerkUserId: string }, operators: { eq: (field: string, value: string) => { value: string } }) => { value: string };
@@ -80,6 +83,8 @@ vi.mock("@fsm/db", () => {
                 clerkUserId: String(values.clerkUserId),
                 requestedName: String(values.requestedName),
                 status: String(values.status),
+                attemptId: null,
+                clerkOrganizationId: null,
                 createdAt: new Date("2026-10-28T12:00:00.000Z")
               };
               state.rows.push(row);
@@ -97,6 +102,8 @@ import {
   claimClerkWorkspaceCreateAttempt,
   getClerkWorkspaceIntent,
   markClerkWorkspaceAttemptUncertain,
+  matchesClerkWorkspaceIntent,
+  reconcileObservedClerkWorkspaceOrganization,
   reserveClerkWorkspaceIntent
 } from "./clerk-workspace-intent.service.js";
 
@@ -170,5 +177,58 @@ describe("FS-235 Clerk workspace intent", () => {
     await expect(markClerkWorkspaceAttemptUncertain("user_a", "00000000-0000-4000-8000-000000000099"))
       .rejects.toMatchObject({ code: ErrorCode.CONFLICT });
     expect(state.rows[0]?.status).toBe("claimed");
+  });
+
+  it("rejects a missing or mismatched Backend API creator and private marker", async () => {
+    const intent = await reserveClerkWorkspaceIntent("user_a", "Acme Plumbing");
+    const claim = await claimClerkWorkspaceCreateAttempt("user_a");
+    if (!claim.newlyClaimed) throw new Error("Claim expected");
+    const observed = {
+      id: "org_a",
+      createdBy: "user_a",
+      privateMetadata: { renvaniIntentId: intent.id, renvaniAttemptId: claim.attemptId }
+    };
+    expect(matchesClerkWorkspaceIntent(state.rows[0]!, observed)).toBe(true);
+    for (const changed of [
+      { ...observed, createdBy: "user_b" },
+      { ...observed, createdBy: null },
+      { ...observed, privateMetadata: { ...observed.privateMetadata, renvaniAttemptId: "wrong" } },
+      { ...observed, privateMetadata: null }
+    ]) {
+      await expect(reconcileObservedClerkWorkspaceOrganization("user_a", changed))
+        .rejects.toMatchObject({ code: ErrorCode.CONFLICT });
+    }
+    expect(state.rows[0]?.status).toBe("claimed");
+    expect(state.events).toHaveLength(2);
+  });
+
+  it("recovers an uncertain outcome only from matching backend creator and marker", async () => {
+    const intent = await reserveClerkWorkspaceIntent("user_a", "Acme Plumbing");
+    const claim = await claimClerkWorkspaceCreateAttempt("user_a");
+    if (!claim.newlyClaimed) throw new Error("Claim expected");
+    await markClerkWorkspaceAttemptUncertain("user_a", claim.attemptId);
+    const observed = {
+      id: "org_a",
+      createdBy: "user_a",
+      privateMetadata: { renvaniIntentId: intent.id, renvaniAttemptId: claim.attemptId }
+    };
+    expect(await reconcileObservedClerkWorkspaceOrganization("user_a", observed)).toBe(true);
+    expect(await reconcileObservedClerkWorkspaceOrganization("user_a", observed)).toBe(false);
+    expect(await claimClerkWorkspaceCreateAttempt("user_a")).toEqual({ newlyClaimed: false, status: "reconciled" });
+    expect(state.rows[0]?.clerkOrganizationId).toBe("org_a");
+    expect(state.events.map((event) => event.eventType)).toEqual([
+      "workspace.intent_pending", "workspace.attempt_claimed", "workspace.attempt_uncertain", "workspace.organization_reconciled"
+    ]);
+  });
+
+  it("quarantines a second org observation instead of silently choosing it", async () => {
+    const intent = await reserveClerkWorkspaceIntent("user_a", "Acme Plumbing");
+    const claim = await claimClerkWorkspaceCreateAttempt("user_a");
+    if (!claim.newlyClaimed) throw new Error("Claim expected");
+    const base = { createdBy: "user_a", privateMetadata: { renvaniIntentId: intent.id, renvaniAttemptId: claim.attemptId } };
+    expect(await reconcileObservedClerkWorkspaceOrganization("user_a", { ...base, id: "org_a" })).toBe(true);
+    await expect(reconcileObservedClerkWorkspaceOrganization("user_a", { ...base, id: "org_b" }))
+      .rejects.toMatchObject({ code: ErrorCode.CONFLICT });
+    expect(state.rows[0]?.clerkOrganizationId).toBe("org_a");
   });
 });

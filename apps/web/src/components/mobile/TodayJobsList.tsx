@@ -82,7 +82,7 @@ export function TodayJobsList() {
         ? `${authUser.firstName} ${authUser.lastName}`.trim()
         : "Technician";
 
-  if (technicianQuery.isLoading || jobsQuery.isLoading) {
+  if (technicianQuery.isLoading) {
     return (
       <div className="space-y-4 px-4 py-4">
         <SkeletonCard className="h-[140px]" />
@@ -92,13 +92,52 @@ export function TodayJobsList() {
     );
   }
 
-  if (technicianQuery.isError || jobsQuery.isError) {
+  if (technicianQuery.isError) {
     return (
-      <div className="px-4 py-6">
+      <div className="px-4 py-6" role="alert">
+        <EmptyState
+          icon={SunMedium}
+          title="Technician profile unavailable"
+          subtitle="We could not check your technician profile. Check your connection and try again."
+          action={<button type="button" disabled={technicianQuery.isFetching} onClick={() => void technicianQuery.refetch()} className="min-h-11 rounded-xl bg-brand-accent px-4 text-sm font-semibold text-white disabled:opacity-60">Retry profile</button>}
+          compact
+        />
+      </div>
+    );
+  }
+
+  if (!technicianQuery.technician) {
+    return (
+      <div className="px-4 py-6" role="status">
+        <EmptyState
+          icon={SunMedium}
+          title="Technician profile unavailable"
+          subtitle="We could not find your technician profile. Ask your office to check that your account is linked."
+          action={<button type="button" disabled={technicianQuery.isFetching} onClick={() => void technicianQuery.refetch()} className="min-h-11 rounded-xl bg-brand-accent px-4 text-sm font-semibold text-white disabled:opacity-60">Retry profile</button>}
+          compact
+        />
+      </div>
+    );
+  }
+
+  if (jobsQuery.isLoading) {
+    return (
+      <div className="space-y-4 px-4 py-4">
+        <SkeletonCard className="h-[140px]" />
+        <SkeletonCard className="h-[180px]" />
+        <SkeletonCard className="h-[180px]" />
+      </div>
+    );
+  }
+
+  if (jobsQuery.isError) {
+    return (
+      <div className="px-4 py-6" role="alert">
         <EmptyState
           icon={SunMedium}
           title="Today&apos;s jobs are unavailable"
-          subtitle="We could not load the technician schedule right now. Try refreshing in a moment."
+          subtitle="We could not load your schedule. Check your connection and try again."
+          action={<button type="button" disabled={jobsQuery.isFetching} onClick={() => void jobsQuery.refetch()} className="min-h-11 rounded-xl bg-brand-accent px-4 text-sm font-semibold text-white disabled:opacity-60">Retry jobs</button>}
           compact
         />
       </div>

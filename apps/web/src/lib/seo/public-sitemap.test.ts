@@ -10,7 +10,7 @@ const env = (vars: Record<string, string>) => vars as unknown as NodeJS.ProcessE
 
 describe("public sitemap", () => {
   it("lists only opted-in slugs that are published", async () => {
-    const fetcher = vi.fn(async (slug: string) => (slug === "summit" ? { companyName: "Summit" } : null));
+    const fetcher = vi.fn(async (slug: string) => (slug === "summit" || slug === "opted-out" ? { bookingSlug: slug, companyName: "Summit" } : null));
     const map = await buildPublicSitemap(env({ PUBLIC_SITE_URL: "https://shops.example/x", PUBLIC_SITE_SLUGS: "summit, draft-shop" }), fetcher);
     expect(map.map((e) => e.url)).toEqual([
       "https://shops.example/site/summit",
@@ -18,10 +18,11 @@ describe("public sitemap", () => {
       "https://shops.example/book/summit"
     ]);
     expect(fetcher).toHaveBeenCalledTimes(2);
+    expect(fetcher).not.toHaveBeenCalledWith("opted-out");
   });
 
   it("lists no shops without opt-in or base URL, and never enumerates", async () => {
-    const fetcher = vi.fn(async () => ({}));
+    const fetcher = vi.fn(async () => ({ bookingSlug: "summit", companyName: "Summit" }));
     expect(await buildPublicSitemap(env({ PUBLIC_SITE_URL: "https://s.example" }), fetcher)).toEqual([]);
     expect(await buildPublicSitemap(env({ PUBLIC_SITE_SLUGS: "summit" }), fetcher)).toEqual([]);
     expect(fetcher).not.toHaveBeenCalled();
@@ -35,12 +36,23 @@ describe("public sitemap", () => {
     const log = vi.spyOn(console, "error").mockImplementation(() => {});
     const fetcher = vi.fn(async (slug: string) => {
       if (slug === "down") throw new Error("503");
-      return slug === "ok" ? {} : null;
+      return slug === "ok" ? { bookingSlug: slug, companyName: "OK" } : null;
     });
     await expect(
       buildPublicSitemap(env({ PUBLIC_SITE_URL: "https://s.example", PUBLIC_SITE_SLUGS: "ok,down,draft" }), fetcher)
     ).rejects.toBeInstanceOf(SitemapPublishCheckError);
     expect(log).toHaveBeenCalledWith("[sitemap] publish check failed", { slug: "down", error: "503" });
+    log.mockRestore();
+  });
+
+  it("fails the render when a successful publish check has missing or mismatched shop data", async () => {
+    const log = vi.spyOn(console, "error").mockImplementation(() => {});
+    const fetcher = vi.fn(async (slug: string) => (slug === "missing" ? undefined : { bookingSlug: "another-shop", companyName: "Wrong" }));
+
+    await expect(
+      buildPublicSitemap(env({ PUBLIC_SITE_URL: "https://s.example", PUBLIC_SITE_SLUGS: "missing,mismatch" }), fetcher)
+    ).rejects.toMatchObject({ slugs: expect.arrayContaining(["missing", "mismatch"]) });
+    expect(log).toHaveBeenCalledTimes(2);
     log.mockRestore();
   });
 

@@ -66,6 +66,12 @@ export class SitemapPublishCheckError extends Error {
 
 type Fetcher = (slug: string) => Promise<unknown | null>;
 
+function isPublishedBookingSettings(value: unknown, slug: string): boolean {
+  if (typeof value !== "object" || value === null) return false;
+  const settings = value as Record<string, unknown>;
+  return settings.bookingSlug === slug && typeof settings.companyName === "string" && settings.companyName.trim().length > 0;
+}
+
 export async function buildPublicSitemap(
   env: NodeJS.ProcessEnv = process.env,
   fetchSettings: Fetcher = fetchPublicBookingSettingsBySlug
@@ -77,7 +83,12 @@ export async function buildPublicSitemap(
     optInSlugs(env).map(async (slug) => {
       try {
         // null = genuinely unpublished (API 404); a throw = outage/bad response, never treated as unpublished.
-        return (await fetchSettings(slug)) ? slug : null;
+        const settings = await fetchSettings(slug);
+        if (settings === null) return null;
+        if (!isPublishedBookingSettings(settings, slug)) {
+          throw new Error("Invalid public booking settings response");
+        }
+        return slug;
       } catch (error) {
         failures.push({ slug, error });
         return null;

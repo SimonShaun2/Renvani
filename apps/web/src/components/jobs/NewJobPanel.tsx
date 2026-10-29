@@ -170,7 +170,7 @@ export function NewJobPanel({ initialCustomerId = "" }: { initialCustomerId?: st
             )}
             {renderControl(field)}
             {fieldError(field.key) ? (
-              <p id={`new-job-${field.key}-error`} className="mt-1 text-[13px] text-[#b42318]">{fieldError(field.key)}</p>
+              <p id={`new-job-${field.key}-error`} role={field.key === "customerId" && customerLookupError ? "alert" : undefined} className="mt-1 text-[13px] text-[#b42318]">{fieldError(field.key)}</p>
             ) : null}
           </div>
         ))}

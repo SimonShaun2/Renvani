@@ -7,6 +7,7 @@ import type { PriceBookItemPickerSeed } from "@fsm/types";
 import { ProductCatalogPicker } from "@/src/components/jobs/ProductCatalogPicker";
 import { Sheet } from "@/src/components/ui/Sheet";
 import {
+  calculateLineTotal,
   createLineItemDraft,
   formatMoneyInput,
   formatQuantityInput,
@@ -151,7 +152,7 @@ export function EditableLineItemsTable({
               </tr>
             ) : (
               items.map((item) => {
-                const lineTotal = parseMoneyValue(item.quantity) * parseMoneyValue(item.unitPrice);
+                const lineTotal = calculateLineTotal(item.quantity, item.unitPrice);
                 return (
                   <tr key={item.localId} className="border-t border-[#e6dccb] align-middle">
                     <td className="px-5 py-3.5 font-semibold text-[#0f1530]">
@@ -196,7 +197,7 @@ export function EditableLineItemsTable({
                     </td>
                     <td className="px-5 py-3.5 text-[#2a3360]">
                       {readOnly ? (
-                        `$${formatMoneyInput(lineTotal)}`
+                        `$${lineTotal}`
                       ) : (
                         <div className="space-y-1">
                           <input
@@ -208,7 +209,7 @@ export function EditableLineItemsTable({
                             className={`${frameInput} w-24`}
                           />
                           {parseMoneyValue(item.quantity) !== 1 ? (
-                            <p className="text-xs text-[#5e6684]">${formatMoneyInput(lineTotal)} total</p>
+                            <p className="text-xs text-[#5e6684]">${lineTotal} total</p>
                           ) : null}
                         </div>
                       )}
@@ -341,7 +342,7 @@ export function EditableLineItemsTable({
                 </tr>
               ) : (
                 items.map((item) => {
-                  const lineTotal = parseMoneyValue(item.quantity) * parseMoneyValue(item.unitPrice);
+                  const lineTotal = calculateLineTotal(item.quantity, item.unitPrice);
 
                   return (
                     <tr key={item.localId} className="align-top">
@@ -417,7 +418,7 @@ export function EditableLineItemsTable({
                           />
                         )}
                       </td>
-                      <td className="py-4 pr-3 text-right font-semibold text-neutral-900">${formatMoneyInput(lineTotal)}</td>
+                      <td className="py-4 pr-3 text-right font-semibold text-neutral-900">${lineTotal}</td>
                       {!readOnly ? (
                         <td className="py-4 pl-3 text-right">
                           <div className="flex items-center justify-end gap-3">

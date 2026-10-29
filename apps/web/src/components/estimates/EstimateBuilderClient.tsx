@@ -38,6 +38,7 @@ import { buildEstimateSubtitle, canSendEstimate } from "./estimate-builder.utils
 import {
   buildEstimatePublicPath,
   computeRevenueTotals,
+  calculateLineTotal,
   formatMoneyInput,
   formatStatusLabel,
   formatQuantityInput,
@@ -306,7 +307,7 @@ function buildPublicEstimatePreview(draft: EstimateDraftState, taxRate: number):
         description: item.description || null,
         quantity: formatQuantityInput(item.quantity),
         unitPrice: formatMoneyInput(item.unitPrice),
-        total: formatMoneyInput(parseMoneyValue(item.quantity) * parseMoneyValue(item.unitPrice))
+        total: calculateLineTotal(item.quantity, item.unitPrice)
       }))
     };
   }
@@ -327,7 +328,7 @@ function buildPublicEstimatePreview(draft: EstimateDraftState, taxRate: number):
         description: item.description || null,
         quantity: formatQuantityInput(item.quantity),
         unitPrice: formatMoneyInput(item.unitPrice),
-        total: formatMoneyInput(parseMoneyValue(item.quantity) * parseMoneyValue(item.unitPrice))
+        total: calculateLineTotal(item.quantity, item.unitPrice)
       }))
     };
   });

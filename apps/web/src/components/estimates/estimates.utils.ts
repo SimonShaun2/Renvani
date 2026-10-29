@@ -1,5 +1,6 @@
 "use client";
 
+import { Decimal } from "decimal.js";
 import type {
   EstimateItemType,
   EstimateStatus,
@@ -71,17 +72,34 @@ export function parseMoneyValue(value: string | number | null | undefined): numb
   return 0;
 }
 
-export function roundCurrency(value: number): number {
-  return Math.round(value * 100) / 100;
-}
-
 export function formatMoneyInput(value: string | number | null | undefined): string {
-  return parseMoneyValue(value).toFixed(2);
+  try {
+    const amount = new Decimal(value ?? 0);
+    return amount.isFinite() ? amount.toFixed(2) : "0.00";
+  } catch {
+    return "0.00";
+  }
 }
 
 export function formatQuantityInput(value: string | number | null | undefined): string {
-  const parsed = parseMoneyValue(value);
-  return parsed > 0 ? parsed.toFixed(3).replace(/\.?0+$/, "") : "1";
+  try {
+    const parsed = new Decimal(value ?? 0);
+    return parsed.greaterThan(0) ? parsed.toFixed(3).replace(/\.?0+$/, "") : "1";
+  } catch {
+    return "1";
+  }
+}
+
+/** Match estimate-items.service: normalize qty/price, then round each extended line to cents. */
+export function calculateLineTotal(quantity: string, unitPrice: string): string {
+  try {
+    const normalizedQuantity = new Decimal(quantity).toFixed(3);
+    const normalizedUnitPrice = new Decimal(unitPrice).toFixed(2);
+    const lineTotal = new Decimal(normalizedQuantity).mul(normalizedUnitPrice);
+    return lineTotal.isFinite() ? lineTotal.toFixed(2) : "0.00";
+  } catch {
+    return "0.00";
+  }
 }
 
 export function getTierSortRank(label: string | null): number {
@@ -102,27 +120,22 @@ export function computeRevenueTotals(
   taxRate: number,
   discountAmount: number
 ): RevenueTotals {
-  const subtotal = roundCurrency(
-    items.reduce((sum, item) => sum + parseMoneyValue(item.quantity) * parseMoneyValue(item.unitPrice), 0)
-  );
-  const taxableSubtotal = roundCurrency(
-    items.reduce((sum, item) => {
-      if (!item.isTaxable) {
-        return sum;
-      }
-
-      return sum + parseMoneyValue(item.quantity) * parseMoneyValue(item.unitPrice);
-    }, 0)
-  );
-  const safeDiscount = roundCurrency(Math.max(0, discountAmount));
-  const taxAmount = roundCurrency(Math.max(0, taxableSubtotal - safeDiscount) * taxRate);
-  const total = roundCurrency(Math.max(0, subtotal - safeDiscount) + taxAmount);
+  let subtotal = new Decimal(0);
+  let taxableSubtotal = new Decimal(0);
+  for (const item of items) {
+    const lineTotal = new Decimal(calculateLineTotal(item.quantity, item.unitPrice));
+    subtotal = subtotal.add(lineTotal);
+    if (item.isTaxable) taxableSubtotal = taxableSubtotal.add(lineTotal);
+  }
+  const safeDiscount = new Decimal(formatMoneyInput(Math.max(0, discountAmount)));
+  const taxAmount = taxableSubtotal.mul(new Decimal(taxRate).toFixed(4));
+  const total = subtotal.add(taxAmount).sub(safeDiscount);
 
   return {
-    subtotal,
-    taxAmount,
-    discountAmount: safeDiscount,
-    total
+    subtotal: Number(subtotal.toFixed(2)),
+    taxAmount: Number(taxAmount.toFixed(2)),
+    discountAmount: Number(safeDiscount.toFixed(2)),
+    total: Number(total.toFixed(2))
   };
 }
 

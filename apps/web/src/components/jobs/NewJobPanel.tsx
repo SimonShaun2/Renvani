@@ -40,6 +40,9 @@ export function NewJobPanel({ initialCustomerId = "" }: { initialCustomerId?: st
   const customerSearch = useCustomerSearch(values.customerId ? "" : search);
   const technicians = useTechnicians({ status: "active", page: 1, limit: 100, sortBy: "firstName", sortOrder: "asc" });
 
+  const selectedCustomer = customer.data?.customer.id === values.customerId ? customer.data.customer : null;
+  const customerLookupError = values.customerId && customer.isError ? "Customer unavailable. Choose another customer." : undefined;
+  const fieldError = (key: NewJobFieldKey) => key === "customerId" ? customerLookupError ?? errors.customerId : errors[key];
   const propertyList = properties.data?.properties ?? [];
   useEffect(() => {
     if (propertyList.length === 1 && !values.propertyId) setValues((v) => ({ ...v, propertyId: propertyList[0]!.id }));
@@ -53,6 +56,9 @@ export function NewJobPanel({ initialCustomerId = "" }: { initialCustomerId?: st
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const nextErrors = validateNewJob(values);
+    if (values.customerId && !selectedCustomer) {
+      nextErrors.customerId = customerLookupError ?? "Wait for the customer to load";
+    }
     setErrors(nextErrors);
     if (Object.values(nextErrors).some(Boolean)) return;
     createJob.mutate(buildCreateJobPayload(values), {
@@ -61,23 +67,23 @@ export function NewJobPanel({ initialCustomerId = "" }: { initialCustomerId?: st
   };
 
   const busy = createJob.isPending;
+  const customerLoading = Boolean(values.customerId && !selectedCustomer && !customer.isError);
 
   const renderControl = (field: NewJobField) => {
     const id = `new-job-${field.key}`;
-    const describedBy = errors[field.key] ? `${id}-error` : undefined;
-    const common = { id, "aria-invalid": Boolean(errors[field.key]) || undefined, "aria-describedby": describedBy, disabled: busy };
+    const describedBy = fieldError(field.key) ? `${id}-error` : undefined;
+    const common = { id, "aria-invalid": Boolean(fieldError(field.key)) || undefined, "aria-describedby": describedBy, disabled: busy };
 
     switch (field.kind) {
       case "customer":
         if (values.customerId) {
-          const record = customer.data?.customer;
           return (
-            <div className="flex items-center justify-between rounded-[10px] border border-[#e6dccb] bg-white px-3.5 py-3" data-testid="new-job-customer">
+            <div className="flex items-center justify-between rounded-[10px] border border-[#e6dccb] bg-white px-3.5 py-3" role="group" aria-labelledby="new-job-customerId-label" aria-describedby={describedBy} data-testid="new-job-customer">
               <div>
-                <p className="text-[15px] font-semibold text-[#0f1530]">{record ? customerName(record) : customer.isError ? "—" : "Loading…"}</p>
-                {record?.phone || record?.email ? <p className="text-[13px] text-[#5e6684]">{record.phone ?? record.email}</p> : null}
+                <p className="text-[15px] font-semibold text-[#0f1530]">{selectedCustomer ? customerName(selectedCustomer) : customer.isError ? "Customer unavailable" : "Loading…"}</p>
+                {selectedCustomer?.phone || selectedCustomer?.email ? <p className="text-[13px] text-[#5e6684]">{selectedCustomer.phone ?? selectedCustomer.email}</p> : null}
               </div>
-              <button type="button" className="text-sm font-semibold text-[#2a3360] underline" onClick={() => set("customerId", "")} disabled={busy}>
+              <button type="button" className="text-sm font-semibold text-[#2a3360] underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#0f1530]" onClick={() => set("customerId", "")} disabled={busy}>
                 {NEW_JOB_COPY.customerChange}
               </button>
             </div>
@@ -95,10 +101,10 @@ export function NewJobPanel({ initialCustomerId = "" }: { initialCustomerId?: st
               autoComplete="off"
             />
             {(customerSearch.data?.customers ?? []).length > 0 ? (
-              <ul className="mt-1 divide-y divide-[#e6dccb] rounded-[10px] border border-[#e6dccb] bg-white" role="listbox" aria-label="Customers">
+              <ul className="mt-1 divide-y divide-[#e6dccb] rounded-[10px] border border-[#e6dccb] bg-white" aria-label="Customers">
                 {customerSearch.data!.customers.map((c) => (
-                  <li key={c.id} role="option" aria-selected={false}>
-                    <button type="button" className="w-full px-3.5 py-2.5 text-left text-sm hover:bg-[#fbf6ef]" onClick={() => set("customerId", c.id)}>
+                  <li key={c.id}>
+                    <button type="button" className="w-full px-3.5 py-2.5 text-left text-sm hover:bg-[#fbf6ef] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#0f1530]" onClick={() => set("customerId", c.id)}>
                       <span className="font-medium text-[#0f1530]">{customerName(c)}</span>
                       {c.phone || c.email ? <span className="ml-2 text-[#5e6684]">{c.phone ?? c.email}</span> : null}
                     </button>
@@ -152,13 +158,19 @@ export function NewJobPanel({ initialCustomerId = "" }: { initialCustomerId?: st
       <form className="mt-5 grid grid-cols-2 gap-4" onSubmit={onSubmit} noValidate>
         {NEW_JOB_FIELDS.map((field) => (
           <div key={field.key} className={field.span === 2 ? "col-span-2" : "col-span-1"}>
-            <label htmlFor={`new-job-${field.key}`} className="mb-1.5 block text-[13px] font-medium text-[#2a3360]">
-              {field.label}
-              {field.required ? <span aria-hidden="true"> *</span> : null}
-            </label>
+            {field.key === "customerId" && values.customerId ? (
+              <p id="new-job-customerId-label" className="mb-1.5 block text-[13px] font-medium text-[#2a3360]">
+                {field.label} <span aria-hidden="true">*</span>
+              </p>
+            ) : (
+              <label htmlFor={`new-job-${field.key}`} className="mb-1.5 block text-[13px] font-medium text-[#2a3360]">
+                {field.label}
+                {field.required ? <span aria-hidden="true"> *</span> : null}
+              </label>
+            )}
             {renderControl(field)}
-            {errors[field.key] ? (
-              <p id={`new-job-${field.key}-error`} className="mt-1 text-[13px] text-[#b42318]">{errors[field.key]}</p>
+            {fieldError(field.key) ? (
+              <p id={`new-job-${field.key}-error`} className="mt-1 text-[13px] text-[#b42318]">{fieldError(field.key)}</p>
             ) : null}
           </div>
         ))}
@@ -173,7 +185,7 @@ export function NewJobPanel({ initialCustomerId = "" }: { initialCustomerId?: st
           <Link href="/jobs" className="rounded-[10px] border border-[#e6dccb] bg-white px-4 py-2.5 text-sm font-semibold text-[#0f1530]">
             {NEW_JOB_COPY.cancel}
           </Link>
-          <button type="submit" disabled={busy} className="rounded-[10px] bg-[#0f1530] px-[18px] py-3 text-sm font-semibold text-white hover:bg-[#2a3360] disabled:opacity-60">
+          <button type="submit" disabled={busy || customerLoading} className="rounded-[10px] bg-[#0f1530] px-[18px] py-3 text-sm font-semibold text-white hover:bg-[#2a3360] disabled:opacity-60">
             {busy ? NEW_JOB_COPY.submitting : NEW_JOB_COPY.submit}
           </button>
         </div>

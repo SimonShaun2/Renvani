@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-type Company = { id: string; settings: { clerk: { organizationId: string } } };
+type Company = { id: string; settings: { clerk: { organizationId: string; createdBy?: string } } };
 type User = { id?: string; companyId: string; email: string; role: string; clerkUserId?: string | null; deletedAt?: Date | null; clerkUnlinkedAt?: Date | null };
 
 const state = vi.hoisted(() => ({
@@ -127,13 +127,13 @@ describe("clerk-provisioning race safety", () => {
     state.raceOnUpdate = null;
   });
 
-  it("concurrent organization.created + membership.created create one company and one owner", async () => {
+  it("concurrent memberships after organization creation grant owner only to its creator", async () => {
     const { provisionClerkMembership, provisionClerkOrganization } = await import("./clerk-provisioning.service.js");
+    await provisionClerkOrganization({ organizationId: "org_1", name: "Acme", createdBy: "user_a" });
     await Promise.all([
-      provisionClerkOrganization({ organizationId: "org_1", name: "Acme" }),
-      provisionClerkMembership({ organizationId: "org_1", name: "Acme", email: "A@x.com", firstName: "A", lastName: "", clerkOrgRole: "org:admin", clerkUserId: null, emailVerified: true }),
-      provisionClerkMembership({ organizationId: "org_1", name: "Acme", email: "b@x.com", firstName: "B", lastName: "", clerkOrgRole: "org:admin", clerkUserId: null, emailVerified: true }),
-      provisionClerkMembership({ organizationId: "org_1", name: "Acme", email: "c@x.com", firstName: "C", lastName: "", clerkOrgRole: "org:member", clerkUserId: null, emailVerified: true })
+      provisionClerkMembership({ organizationId: "org_1", name: "Acme", email: "A@x.com", firstName: "A", lastName: "", clerkOrgRole: "org:admin", clerkUserId: "user_a", emailVerified: true }),
+      provisionClerkMembership({ organizationId: "org_1", name: "Acme", email: "b@x.com", firstName: "B", lastName: "", clerkOrgRole: "org:admin", clerkUserId: "user_b", emailVerified: true }),
+      provisionClerkMembership({ organizationId: "org_1", name: "Acme", email: "c@x.com", firstName: "C", lastName: "", clerkOrgRole: "org:member", clerkUserId: "user_c", emailVerified: true })
     ]);
     expect(state.companies).toHaveLength(1);
     expect(state.users.filter((u) => u.role === "owner")).toHaveLength(1);
@@ -144,7 +144,7 @@ describe("clerk-provisioning race safety", () => {
 
 describe("FS-157 clerk_user_id provisioning", () => {
   beforeEach(() => {
-    state.companies = [];
+    state.companies = [{ id: "co_1", settings: { clerk: { organizationId: "org_1", createdBy: "user_a" } } }];
     state.users = [];
     state.lockCalls = 0;
     state.lockTail = Promise.resolve();
@@ -166,6 +166,7 @@ describe("FS-157 clerk_user_id provisioning", () => {
 
   it("org creator (organization.created first) becomes owner; a non-creator who joins first does not", async () => {
     const { provisionClerkOrganization, provisionClerkMembership } = await import("./clerk-provisioning.service.js");
+    state.companies = [];
     await provisionClerkOrganization({ organizationId: "org_1", name: "Acme", createdBy: "user_creator" });
     const other = await provisionClerkMembership({ ...base, email: "m@x.com", clerkUserId: "user_member", clerkOrgRole: "org:member" });
     const creator = await provisionClerkMembership({ ...base, email: "c@x.com", clerkUserId: "user_creator" });
@@ -177,18 +178,41 @@ describe("FS-157 clerk_user_id provisioning", () => {
 
   it("out of order (membership before organization.created): creator still owner, replays idempotent", async () => {
     const { provisionClerkOrganization, provisionClerkMembership } = await import("./clerk-provisioning.service.js");
+    state.companies = [];
     const membership = await provisionClerkMembership({ ...base, email: "c@x.com", clerkUserId: "user_creator" });
+    expect(membership).toEqual({ status: "deferred", companyId: null });
+    expect(state.companies).toHaveLength(0);
+    expect(state.users).toHaveLength(0);
     await provisionClerkOrganization({ organizationId: "org_1", name: "Acme", createdBy: "user_creator" });
     await provisionClerkOrganization({ organizationId: "org_1", name: "Acme", createdBy: "user_creator" });
     const replay = await provisionClerkMembership({ ...base, email: "c@x.com", clerkUserId: "user_creator" });
-    expect(membership).toMatchObject({ status: "created", role: "owner" });
-    expect(replay).toMatchObject({ status: "exists", role: "owner" });
+    expect(replay).toMatchObject({ status: "created", role: "owner" });
     expect(state.companies).toHaveLength(1);
     expect(state.users).toHaveLength(1);
   });
 
+  it("defers a foreign first member with no intent instead of creating its company or owner", async () => {
+    const { provisionClerkMembership } = await import("./clerk-provisioning.service.js");
+    state.companies = [];
+    const foreign = { ...base, organizationId: "org_foreign", name: "Other", email: "other@example.com", clerkUserId: "user_other" };
+    expect(await provisionClerkMembership(foreign)).toEqual({ status: "deferred", companyId: null });
+    expect(await provisionClerkMembership(foreign)).toEqual({ status: "deferred", companyId: null });
+    expect(state.companies).toHaveLength(0);
+    expect(state.users).toHaveLength(0);
+  });
+
+  it("defers memberships when an organization event omitted its creator", async () => {
+    const { provisionClerkMembership, provisionClerkOrganization } = await import("./clerk-provisioning.service.js");
+    state.companies = [];
+    await provisionClerkOrganization({ organizationId: "org_1", name: "Acme", createdBy: null });
+    expect(await provisionClerkMembership({ ...base, email: "a@x.com", clerkUserId: "user_a" }))
+      .toEqual({ status: "deferred", companyId: "co_1" });
+    expect(state.users).toHaveLength(0);
+  });
+
   it("cross-tenant: a creator of org_1 gains nothing in org_2", async () => {
     const { provisionClerkOrganization, provisionClerkMembership } = await import("./clerk-provisioning.service.js");
+    state.companies = [];
     await provisionClerkOrganization({ organizationId: "org_1", name: "Acme", createdBy: "user_a" });
     await provisionClerkOrganization({ organizationId: "org_2", name: "Beta", createdBy: "user_b" });
     await provisionClerkMembership({ ...base, email: "a@x.com", clerkUserId: "user_a" });
@@ -198,7 +222,7 @@ describe("FS-157 clerk_user_id provisioning", () => {
     expect(state.users[0]).toMatchObject({ companyId: "co_1", role: "owner" });
   });
 
-  it("returns the DB role so the webhook can publish it to Clerk (first member = owner, even before organization.created)", async () => {
+  it("returns the DB role so the webhook can publish only the recorded creator as owner", async () => {
     const { provisionClerkMembership } = await import("./clerk-provisioning.service.js");
     const first = await provisionClerkMembership({ ...base, email: "a@x.com", clerkUserId: "user_a" });
     const second = await provisionClerkMembership({ ...base, email: "b@x.com", clerkUserId: "user_b" });
@@ -226,8 +250,9 @@ describe("FS-157 clerk_user_id provisioning", () => {
   });
 
   it("skips a Clerk id already linked to a user in another company (cross-company isolation)", async () => {
-    const { provisionClerkMembership } = await import("./clerk-provisioning.service.js");
+    const { provisionClerkMembership, provisionClerkOrganization } = await import("./clerk-provisioning.service.js");
     await provisionClerkMembership({ ...base, email: "a@x.com", clerkUserId: "user_a" });
+    await provisionClerkOrganization({ organizationId: "org_2", name: "Other", createdBy: "user_other" });
     const res = await provisionClerkMembership({ ...base, organizationId: "org_2", name: "Other", email: "z@y.com", clerkUserId: "user_a" });
     expect(res.status).toBe("skipped");
     expect(state.users).toHaveLength(1);

@@ -156,6 +156,21 @@ describe("Clerk webhook", () => {
     });
   });
 
+  it("FS-235: no-intent membership-first is retried without granting owner or completing dedupe", async () => {
+    provisionClerkMembership.mockResolvedValue({ status: "deferred", companyId: null });
+    const body = { type: "organizationMembership.created", data: {
+      organization: { id: "org_unbound", name: "Other" },
+      public_user_data: { identifier: "other@example.com", user_id: "user_other" }
+    } };
+    const first = await send(body, { id: "msg_unbound" });
+    const replay = await send(body, { id: "msg_unbound" });
+    expect(first.statusCode).toBe(503);
+    expect(replay.statusCode).toBe(503);
+    expect(replay.json()).not.toMatchObject({ duplicate: true });
+    expect(provisionClerkMembership).toHaveBeenCalledTimes(2);
+    expect(syncClerkUserRoleMetadata).not.toHaveBeenCalled();
+  });
+
   it("FS-235: records membership-first and replay for an intent without granting a tenant or owner", async () => {
     deferClerkWorkspaceWebhook.mockResolvedValue(true);
     const body = {

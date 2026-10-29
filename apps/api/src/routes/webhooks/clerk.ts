@@ -132,6 +132,9 @@ async function handleEvent(event: ClerkWebhookEvent, reply: FastifyReply, svixId
       // organizationMembership payloads carry no email-verification proof: never link existing users by email here.
       emailVerified: false
     });
+    if (result.status === "deferred") {
+      return reply.status(503).send({ error: "CLERK_ORGANIZATION_UNVERIFIED", deferred: true });
+    }
     // The web/API read the staff role only from the session claim metadata.role (= public_metadata.role):
     // publish the DB role to Clerk so the new owner isn't routed to /no-access. Best effort, never throws.
     const roleSync =

@@ -18,7 +18,7 @@ export interface ClerkOrganizationInput {
   createdBy?: string | null;
 }
 
-/** Creator recorded at provisioning (settings.clerk.createdBy), or null when the company came from an earlier membership event. */
+/** Creator recorded at provisioning (settings.clerk.createdBy), or null if the provider supplied no creator. */
 function readClerkCreatedBy(company: CompanyRow): string | null {
   const clerk = (company.settings as { clerk?: { createdBy?: unknown } } | null)?.clerk;
   return typeof clerk?.createdBy === "string" && clerk.createdBy.length > 0 ? clerk.createdBy : null;
@@ -42,9 +42,8 @@ export interface ClerkMembershipInput extends ClerkOrganizationInput {
 type Tx = Parameters<Parameters<Database["transaction"]>[0]>[0];
 
 /**
- * Serialises all provisioning for one Clerk org (transaction-scoped advisory lock), so concurrent
- * organization.created / organizationMembership.created deliveries cannot create duplicate companies
- * or two first-owners.
+ * Serialises provisioning for one Clerk org (transaction-scoped advisory lock), so concurrent
+ * organization.created / organizationMembership.created deliveries cannot assign two owners.
  * FS-157: companies_clerk_organization_id_idx is the DB-level guarantee behind this lock.
  */
 async function lockClerkOrganization(tx: Tx, organizationId: string): Promise<void> {
@@ -98,8 +97,7 @@ export async function provisionClerkOrganization(input: ClerkOrganizationInput):
       const company = await findOrCreateCompany(tx, input);
       const createdBy = input.createdBy?.trim();
       if (createdBy && !readClerkCreatedBy(company)) {
-        // Out of order: membership.created provisioned the company first (its first member became owner).
-        // Never demote/re-assign here; just flag a mismatch for review.
+        // An older company may lack a creator; never retroactively assign ownership.
         const owner = await tx.query.users.findFirst({
           where: (userTable, operators) =>
             operators.and(
@@ -125,9 +123,7 @@ export async function provisionClerkOrganization(input: ClerkOrganizationInput):
 }
 
 /**
- * Owner = the Clerk org creator. When the creator is known (organization.created arrived first), only that
- * Clerk user becomes owner. When it is not yet known (membership.created arrived first), the first member
- * of the new org becomes owner: Clerk creates the creator's membership together with the org.
+ * Owner = the recorded Clerk org creator. Membership order cannot select an owner.
  */
 function mapClerkOrgRole(clerkOrgRole: string | null, isOwner: boolean): UserRole {
   if (isOwner) {
@@ -136,10 +132,11 @@ function mapClerkOrgRole(clerkOrgRole: string | null, isOwner: boolean): UserRol
   return clerkOrgRole === "org:admin" ? "admin" : "office";
 }
 
-type MembershipStatus = "created" | "exists" | "linked" | "skipped";
+type MembershipStatus = "created" | "exists" | "linked" | "skipped" | "deferred";
 
 /**
- * Idempotent: ensures company + staff user for a Clerk org membership. First user becomes owner.
+ * Idempotent: ensures a staff user only after an organization event established the
+ * company and its creator. A membership-first delivery is deferred for provider retry.
  * - Stores clerk_user_id on create; never re-points a user linked to a different Clerk id or reuses a Clerk id
  *   held by another user. Soft-deleted users are ignored in every lookup.
  * - Links an existing (same-company, unlinked) user by email ONLY when input.emailVerified is true.
@@ -155,7 +152,11 @@ export async function provisionClerkMembership(
   try {
     return await db.transaction(async (tx) => {
       await lockClerkOrganization(tx, input.organizationId);
-      const company = await findOrCreateCompany(tx, input);
+      const company = await findCompanyByClerkOrganizationId(input.organizationId, tx);
+      const createdBy = company ? readClerkCreatedBy(company) : null;
+      if (!company || !createdBy) {
+        return { status: "deferred" as const, companyId: company?.id ?? null };
+      }
 
       if (clerkUserId) {
         const byClerkId = await tx.query.users.findFirst({
@@ -224,13 +225,7 @@ export async function provisionClerkMembership(
         return { status: "linked" as const, companyId: company.id, role: reread.role };
       }
 
-      const anyUser = await tx.query.users.findFirst({
-        where: (userTable, operators) =>
-          operators.and(operators.eq(userTable.companyId, company.id), operators.isNull(userTable.deletedAt))
-      });
-
-      const createdBy = readClerkCreatedBy(company);
-      const isOwner = createdBy ? clerkUserId === createdBy : !anyUser;
+      const isOwner = clerkUserId === createdBy;
       const role = mapClerkOrgRole(input.clerkOrgRole, isOwner);
       await tx.insert(users).values({
         companyId: company.id,

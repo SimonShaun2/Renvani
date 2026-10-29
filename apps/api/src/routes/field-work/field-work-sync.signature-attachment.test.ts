@@ -12,6 +12,9 @@ import { setupTestEnv } from "../../test-support/env-setup.js";
 
 setupTestEnv();
 
+// App startup otherwise attempts Stripe platform branding sync with test env credentials.
+vi.mock("../../plugins/stripe-platform-sync.js", () => ({ default: async () => {} }));
+
 vi.mock("drizzle-orm", async () => {
   const helper = await import("../../test-support/fake-db.js");
   return helper.createDrizzleModuleMock();
@@ -308,6 +311,23 @@ describe("job.signature.capture with attachmentId", () => {
 
     expect(response.body.results[0].outcome).toBe("rejected");
     expect(response.body.results[0].message).toMatch(/PNG, JPEG, or WebP/);
+  });
+
+  it("rejects a soft-deleted signature attachment", async () => {
+    const seed = seedFieldJob();
+    const deleted = seedSignatureImage(seed.company.id, seed.job.id, {
+      deletedAt: new Date("2026-10-20T00:00:00.000Z")
+    });
+
+    const response = await capture(authOf(seed), seed.job.id, {
+      attachmentId: deleted.id,
+      signedByName: "Pat"
+    });
+
+    expect(response.body.results[0].outcome).toBe("rejected");
+    expect(response.body.results[0].code).toBe("SIGNATURE_ATTACHMENT_INVALID");
+    expect(response.body.results[0].message).toBe("Signature attachment not found on this job");
+    expect(fakeDb.getTestState().jobs[0]!.signatureUrl).toBeNull();
   });
 
   it("rejects an oversized attachment", async () => {

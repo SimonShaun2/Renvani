@@ -1,4 +1,4 @@
-import { and, desc, eq, isNull } from "drizzle-orm";
+import { and, desc, eq, isNull, or } from "drizzle-orm";
 import pino from "pino";
 
 import {
@@ -10,6 +10,7 @@ import {
   emitEventWithExecutor,
   jobNotes,
   jobPhotos,
+  jobTasks,
   jobs,
   properties,
   scheduleSlots,
@@ -1265,6 +1266,20 @@ export async function completeJob(
     (normalizedInput.signatureUrl || normalizedInput.signedByName ? completionTimestamp : null);
   const completedJob = await db.transaction(async (tx) => {
     const actor = await getActor(companyId, actorId, tx);
+    const [openRequiredTask] = await tx
+      .select({ id: jobTasks.id })
+      .from(jobTasks)
+      .where(and(
+        eq(jobTasks.companyId, companyId),
+        eq(jobTasks.jobId, jobId),
+        eq(jobTasks.isRequired, true),
+        or(eq(jobTasks.status, "pending"), eq(jobTasks.status, "in_progress")),
+        isNull(jobTasks.deletedAt)
+      ))
+      .limit(1);
+    if (openRequiredTask) {
+      throw new AppError(ErrorCode.CONFLICT, "Complete required checklist tasks before completing the job");
+    }
     const customer = await getCustomerRecord(companyId, existingJob.customerId, tx);
     const technician =
       existingJob.technicianId !== null

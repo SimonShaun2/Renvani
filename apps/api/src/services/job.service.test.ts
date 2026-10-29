@@ -517,6 +517,34 @@ describe("job.service", () => {
     expect(rolledBackState.customers.find((row) => row.id === customer.id)?.totalJobs).toBe(3);
   });
 
+  it("completeJob blocks open required tasks without changing state, then allows a retry after completion", async () => {
+    const { company, actor } = createAdminContext();
+    const { customer } = seedJobGraph(company.id);
+    const job = fakeDb.seedJob({ companyId: company.id, customerId: customer.id, title: "Checklist Job", status: "in_progress" });
+    const task = fakeDb.seedJobTask({ companyId: company.id, jobId: job.id, title: "Safety check", isRequired: true });
+    fakeDb.seedJobTask({ companyId: company.id, jobId: job.id, title: "Optional note" });
+
+    await expect(jobService.completeJob(company.id, actor.id, job.id, {})).rejects.toMatchObject({ code: ErrorCode.CONFLICT });
+    expect(fakeDb.getTestState().jobs.find((row) => row.id === job.id)?.status).toBe("in_progress");
+    expect(fakeDb.getTestState().activityEvents.some((event) => event.eventType === "job.completed")).toBe(false);
+    expect(addQueueJob).not.toHaveBeenCalled();
+
+    task.status = "completed";
+    const completed = await jobService.completeJob(company.id, actor.id, job.id, {});
+    expect(completed.status).toBe("completed");
+  });
+
+  it("completeJob ignores open tasks from another tenant and soft-deleted tasks", async () => {
+    const { company, actor } = createAdminContext();
+    const { customer } = seedJobGraph(company.id);
+    const job = fakeDb.seedJob({ companyId: company.id, customerId: customer.id, title: "Scoped Job", status: "in_progress" });
+    fakeDb.seedJobTask({ companyId: randomUUID(), jobId: job.id, title: "Other tenant", isRequired: true });
+    fakeDb.seedJobTask({ companyId: company.id, jobId: job.id, title: "Deleted", isRequired: true, deletedAt: new Date() });
+
+    const completed = await jobService.completeJob(company.id, actor.id, job.id, {});
+    expect(completed.status).toBe("completed");
+  });
+
   it("addNote creates a note and emits job.updated", async () => {
     const { company, actor } = createAdminContext();
     const { customer } = seedJobGraph(company.id);

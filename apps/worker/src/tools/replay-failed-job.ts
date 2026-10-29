@@ -40,8 +40,8 @@ async function main(): Promise<void> {
   const jobId = readArg("--job-id");
   const expectedCompanyId = readArg("--company-id");
 
-  if (!queueName || !jobId) {
-    console.error("Usage: replay-failed-job --queue <name> --job-id <id> [--company-id <uuid>]");
+  if (!queueName || !jobId || !expectedCompanyId) {
+    console.error("Usage: replay-failed-job --queue <name> --job-id <id> --company-id <uuid>");
     process.exit(1);
   }
 
@@ -54,7 +54,7 @@ async function main(): Promise<void> {
   const result = await replayFailedJobById(queue, {
     queueName: queueName as (typeof QUEUE_NAMES)[keyof typeof QUEUE_NAMES],
     jobId,
-    ...(expectedCompanyId ? { expectedCompanyId } : {})
+    expectedCompanyId
   });
 
   console.log(JSON.stringify({ ok: true, ...result }));

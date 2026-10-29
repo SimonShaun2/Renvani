@@ -15,8 +15,8 @@ export class JobReplayError extends Error {
 export type ReplayFailedJobInput = {
   queueName: (typeof QUEUE_NAMES)[keyof typeof QUEUE_NAMES];
   jobId: string;
-  /** When set, job payload must include the same `companyId` (tenant-safe replay). */
-  expectedCompanyId?: string;
+  /** Job payload must include the same `companyId` (tenant-safe replay). */
+  expectedCompanyId: string;
 };
 
 export function resolveCompanyIdFromJobData(data: unknown): string | undefined {
@@ -38,6 +38,10 @@ export async function replayFailedJobById(
   if (!jobId) {
     throw new JobReplayError("VALIDATION_ERROR", "jobId is required");
   }
+  const expectedCompanyId = input.expectedCompanyId.trim();
+  if (!expectedCompanyId) {
+    throw new JobReplayError("VALIDATION_ERROR", "expectedCompanyId is required");
+  }
 
   const job = await queue.getJob(jobId);
 
@@ -54,12 +58,9 @@ export async function replayFailedJobById(
     );
   }
 
-  if (input.expectedCompanyId) {
-    const payloadCompanyId = resolveCompanyIdFromJobData(job.data);
-
-    if (!payloadCompanyId || payloadCompanyId !== input.expectedCompanyId) {
-      throw new JobReplayError("FORBIDDEN", "Job payload companyId does not match expected tenant scope");
-    }
+  const payloadCompanyId = resolveCompanyIdFromJobData(job.data);
+  if (!payloadCompanyId || payloadCompanyId !== expectedCompanyId) {
+    throw new JobReplayError("FORBIDDEN", "Job payload companyId does not match expected tenant scope");
   }
 
   await job.retry();

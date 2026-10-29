@@ -38,13 +38,13 @@ Source-queue replay (failed job still in Redis) vs DLQ recovery:
 
 | Flow | When to use |
 |------|-------------|
-| `replayFailedJobById` + worker CLI | Job is in **`failed`** state on the source queue; optional `expectedCompanyId` guard |
+| `replayFailedJobById` + worker CLI | Job is in **`failed`** state on the source queue; required `expectedCompanyId` guard |
 | `recoverDeadLetterJob` | Job was forwarded to **`{queue}-dlq`**; re-enqueues payload to source with platform defaults |
 
 ## Replay tooling (Marcus)
 
-- Library: `replayFailedJobById(queue, { queueName, jobId, expectedCompanyId? })`
-- CLI (staging/ops): `pnpm --filter @fsm/worker replay-failed-job -- --queue notifications --job-id <id> [--company-id <uuid>]`
+- Library: `replayFailedJobById(queue, { queueName, jobId, expectedCompanyId })`
+- CLI (staging/ops): `pnpm --filter @fsm/worker replay-failed-job -- --queue notifications --job-id <id> --company-id <uuid>`
 
 ## Wiring
 

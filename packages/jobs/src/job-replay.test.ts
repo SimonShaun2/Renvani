@@ -54,7 +54,8 @@ describe("replayFailedJobById", () => {
     await expect(
       replayFailedJobById(queue, {
         queueName: QUEUE_NAMES.ai,
-        jobId: "job-2"
+        jobId: "job-2",
+        expectedCompanyId: "22222222-2222-4222-8222-222222222222"
       })
     ).rejects.toMatchObject({
       code: "INVALID_STATE"
@@ -98,10 +99,38 @@ describe("replayFailedJobById", () => {
     await expect(
       replayFailedJobById(queue, {
         queueName: QUEUE_NAMES.invoices,
-        jobId: "missing"
+        jobId: "missing",
+        expectedCompanyId: "22222222-2222-4222-8222-222222222222"
       })
     ).rejects.toMatchObject({
       code: "NOT_FOUND"
     });
+  });
+
+  it("rejects a blank tenant scope before reading or retrying a failed job", async () => {
+    const getJob = vi.fn();
+    await expect(replayFailedJobById({ getJob }, {
+      queueName: QUEUE_NAMES.notifications,
+      jobId: "job-4",
+      expectedCompanyId: "  "
+    })).rejects.toMatchObject({ code: "VALIDATION_ERROR" });
+    expect(getJob).not.toHaveBeenCalled();
+  });
+
+  it("rejects a failed job whose payload has no companyId", async () => {
+    const retry = vi.fn();
+    const queue = {
+      getJob: vi.fn().mockResolvedValue({
+        data: {},
+        getState: vi.fn().mockResolvedValue("failed"),
+        retry
+      })
+    };
+    await expect(replayFailedJobById(queue, {
+      queueName: QUEUE_NAMES.notifications,
+      jobId: "job-5",
+      expectedCompanyId: "22222222-2222-4222-8222-222222222222"
+    })).rejects.toMatchObject({ code: "FORBIDDEN" });
+    expect(retry).not.toHaveBeenCalled();
   });
 });

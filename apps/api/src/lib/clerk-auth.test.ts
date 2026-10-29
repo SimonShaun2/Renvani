@@ -171,6 +171,15 @@ describe("clerk-auth", () => {
       code: ErrorCode.UNAUTHORIZED
     });
   });
+
+  it("allows a verified bootstrap session without an organization only when explicitly requested", async () => {
+    mockEnv.CLERK_SECRET_KEY = "sk_test_mock";
+    vi.mocked(verifyToken).mockResolvedValue({ sub: "user_clerk_1", azp: AZP } as never);
+    await expect(verifyClerkBearerToken("sess_mock_token", { requireOrganization: false })).resolves.toMatchObject({
+      clerkUserId: "user_clerk_1",
+      clerkOrganizationId: null
+    });
+  });
 });
 
 describe("clerk-auth config source", () => {

@@ -68,6 +68,7 @@ import stripeRoutes from "./routes/stripe/index.js";
 import technicianExtensionRoutes from "./routes/technician-extensions/index.js";
 import technicianRoutes from "./routes/technicians/index.js";
 import meRoutes from "./routes/me/index.js";
+import clerkWorkspaceIntentRoutes from "./routes/clerk-workspace-intent/index.js";
 import userRoutes from "./routes/users/index.js";
 import timeRoutes from "./routes/time/index.js";
 import timesheetRoutes from "./routes/timesheets/index.js";
@@ -146,6 +147,7 @@ export async function buildApp() {
   await app.register(technicianRoutes, { prefix: "/api/v1/technicians" });
   await app.register(userRoutes, { prefix: "/api/v1/users" });
   await app.register(meRoutes, { prefix: "/api/v1/me" });
+  await app.register(clerkWorkspaceIntentRoutes, { prefix: "/api/v1/onboarding" });
   await app.register(technicianExtensionRoutes, { prefix: "/api/v1/technicians" });
   await app.register(timeRoutes, { prefix: "/api/v1/time" });
   await app.register(timesheetRoutes, { prefix: "/api/v1" });

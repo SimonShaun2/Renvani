@@ -529,6 +529,34 @@ export const companies = pgTable("companies", {
     .where(sql`${t.deletedAt} IS NULL AND (${t.settings} -> 'clerk' ->> 'organizationId') IS NOT NULL`),
 }));
 
+/** FS-235 pre-tenant identity boundary; only the verified Clerk subject can read it. */
+export const clerkWorkspaceIntents = pgTable("clerk_workspace_intents", {
+  id: id(),
+  clerkUserId: varchar("clerk_user_id", { length: 255 }).notNull(),
+  requestedName: varchar("requested_name", { length: 80 }).notNull(),
+  status: varchar("status", { length: 32 }).notNull().default("reserved"),
+  clerkOrganizationId: varchar("clerk_organization_id", { length: 255 }),
+  ...timestamps,
+}, (t) => ({
+  clerkUserIdx: uniqueIndex("clerk_workspace_intents_clerk_user_idx").on(t.clerkUserId),
+  clerkOrgIdx: uniqueIndex("clerk_workspace_intents_clerk_org_idx")
+    .on(t.clerkOrganizationId)
+    .where(sql`${t.clerkOrganizationId} IS NOT NULL`),
+}));
+
+/** Pre-tenant audit. Reconciliation later emits tenant activity_events after company binding. */
+export const clerkWorkspaceIntentEvents = pgTable("clerk_workspace_intent_events", {
+  id: id(),
+  intentId: uuid("intent_id").notNull().references(() => clerkWorkspaceIntents.id),
+  clerkUserId: varchar("clerk_user_id", { length: 255 }).notNull(),
+  eventType: varchar("event_type", { length: 64 }).notNull(),
+  details: jsonb("details").notNull().default({}),
+  ...timestamps,
+}, (t) => ({
+  intentIdx: index("clerk_workspace_intent_events_intent_idx").on(t.intentId),
+  clerkUserIdx: index("clerk_workspace_intent_events_clerk_user_idx").on(t.clerkUserId),
+}));
+
 export const users = pgTable("users", {
   id: id(),
   companyId: companyId(),

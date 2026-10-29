@@ -379,6 +379,13 @@
       "when": 1792723000000,
       "tag": "0053_fs195_crews",
       "breakpoints": true
+    },
+    {
+      "idx": 54,
+      "version": "7",
+      "when": 1793241794043,
+      "tag": "0055_fs235_clerk_workspace_intent",
+      "breakpoints": true
     }
   ]
 }

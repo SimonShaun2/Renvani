@@ -1,11 +1,10 @@
-import { and, eq, isNull } from "drizzle-orm";
+import { and, desc, eq, isNull } from "drizzle-orm";
 
 import { bookingRequests, customers, db } from "@fsm/db";
 import {
   AppError,
   ErrorCode,
   type CanonicalEntityRefV1,
-  type ChannelConsentSnapshot,
   type ConsentScope,
   type OutboundAuthorizationDecision,
   OUTBOUND_AUTHORIZATION_POLICY_V1,
@@ -26,37 +25,12 @@ export interface AuthorizeAgentActionExecutionInput {
   state: AgentActionState;
 }
 
-function parseConsentSnapshot(value: unknown): ChannelConsentSnapshot | null {
-  if (!value || typeof value !== "object") {
-    return null;
-  }
-
-  const record = value as Record<string, unknown>;
-  if (
-    typeof record.capturedAt !== "string" ||
-    typeof record.consentVersion !== "number" ||
-    typeof record.currentConsentVersion !== "number" ||
-    (record.consentScope !== "appointment" && record.consentScope !== "marketing")
-  ) {
-    return null;
-  }
-
-  return {
-    consentScope: record.consentScope as ConsentScope,
-    capturedAt: record.capturedAt,
-    consentVersion: record.consentVersion,
-    appointmentOptIn: Boolean(record.appointmentOptIn),
-    marketingOptIn: Boolean(record.marketingOptIn),
-    revokedAt: typeof record.revokedAt === "string" ? record.revokedAt : null,
-    currentConsentVersion: record.currentConsentVersion
-  };
-}
-
 async function loadConsentSnapshotForTarget(
   companyId: string,
   target: CanonicalEntityRefV1,
-  consentScope: ConsentScope
-): Promise<ChannelConsentSnapshot> {
+  consentScope: ConsentScope,
+  channel: "sms" | "email"
+) {
   if (target.entityType === "booking_request") {
     const [row] = await db
       .select()
@@ -80,8 +54,8 @@ async function loadConsentSnapshotForTarget(
       capturedAt: row.updatedAt.toISOString(),
       consentVersion,
       currentConsentVersion: consentVersion,
-      appointmentOptIn: row.smsConsentAppointments ?? false,
-      marketingOptIn: row.smsConsentMarketing ?? false,
+      appointmentOptIn: channel === "sms" && row.smsConsentAppointments === true,
+      marketingOptIn: channel === "sms" && row.smsConsentMarketing === true,
       revokedAt: null
     };
   }
@@ -99,15 +73,30 @@ async function loadConsentSnapshotForTarget(
       throw new AppError(ErrorCode.NOT_FOUND, "Customer not found for consent evaluation");
     }
 
-    const consentVersion = row.updatedAt.getTime();
-    const capturedAt = row.updatedAt.toISOString();
+    // Customer preferences have no opt-in fields. The latest tenant-owned, contact-matching
+    // inquiry is the only stored affirmative SMS grant; later opt-outs supersede older grants.
+    const [latestInquiry] = await db
+      .select()
+      .from(bookingRequests)
+      .where(
+        and(
+          eq(bookingRequests.companyId, companyId),
+          eq(bookingRequests.customerId, row.id),
+          isNull(bookingRequests.deletedAt)
+        )
+      )
+      .orderBy(desc(bookingRequests.updatedAt))
+      .limit(1);
+    const consentVersion = latestInquiry?.updatedAt.getTime() ?? row.updatedAt.getTime();
+    const capturedAt = latestInquiry?.updatedAt.toISOString() ?? row.updatedAt.toISOString();
+    const matchingSmsGrant = channel === "sms" && !!row.phone && latestInquiry?.phone === row.phone;
     return {
       consentScope,
       capturedAt,
       consentVersion,
       currentConsentVersion: consentVersion,
-      appointmentOptIn: !row.doNotContact,
-      marketingOptIn: !row.doNotContact,
+      appointmentOptIn: matchingSmsGrant && latestInquiry?.smsConsentAppointments === true,
+      marketingOptIn: matchingSmsGrant && latestInquiry?.smsConsentMarketing === true,
       revokedAt: row.doNotContact ? capturedAt : null
     };
   }
@@ -153,7 +142,7 @@ async function loadCustomerChannelPrefs(
     .limit(1);
 
   if (!customer) {
-    return { doNotContact: false, prefersSms: true, prefersEmail: true };
+    throw new AppError(ErrorCode.NOT_FOUND, "Customer not found for outbound authorization");
   }
 
   return {
@@ -163,14 +152,9 @@ async function loadCustomerChannelPrefs(
   };
 }
 
-function resolveConsentScope(parameters: Record<string, unknown>): ConsentScope {
-  if (parameters.consentScope === "marketing") {
-    return "marketing";
-  }
-  if (parameters.consentScope === "appointment") {
-    return "appointment";
-  }
-  if (parameters.workflow === "revenue.inquiry_response") {
+function resolveConsentScope(actionType: string, target: CanonicalEntityRefV1): ConsentScope {
+  if (actionType === "message.send_proposed" && target.entityType === "booking_request") return "appointment";
+  if (actionType === "revenue.invoice_reminder.propose" || actionType === "revenue.estimate_followup.propose") {
     return "appointment";
   }
   return "marketing";
@@ -179,12 +163,16 @@ function resolveConsentScope(parameters: Record<string, unknown>): ConsentScope 
 export async function authorizeAgentActionExecution(
   input: AuthorizeAgentActionExecutionInput
 ): Promise<OutboundAuthorizationDecision> {
-  const channel = input.parameters.channel === "email" ? "email" : "sms";
-  const consentScope = resolveConsentScope(input.parameters);
-  const embedded = parseConsentSnapshot(input.parameters.consentSnapshot);
-  const consent =
-    embedded ??
-    (await loadConsentSnapshotForTarget(input.companyId, input.target, consentScope));
+  if (input.parameters.channel !== "sms" && input.parameters.channel !== "email") {
+    throw new AppError(ErrorCode.CONSENT_REQUIRED, "Proposal must specify a supported outbound channel");
+  }
+  const channel = input.parameters.channel;
+  const consentScope = resolveConsentScope(input.actionType, input.target);
+  if (input.parameters.consentScope !== undefined && input.parameters.consentScope !== consentScope) {
+    throw new AppError(ErrorCode.CONSENT_REQUIRED, "Proposal consent scope does not match the action policy");
+  }
+  // Proposal snapshots are historical evidence. Execute always reads current tenant-owned consent.
+  const consent = await loadConsentSnapshotForTarget(input.companyId, input.target, consentScope, channel);
   const customer = await loadCustomerChannelPrefs(input.companyId, input.target);
 
   const decision = evaluateOutboundAuthorization({

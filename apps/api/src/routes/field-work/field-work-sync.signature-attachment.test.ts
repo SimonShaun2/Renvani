@@ -271,6 +271,35 @@ describe("job.signature.capture with attachmentId", () => {
     expect(fakeDb.getTestState().jobs[0]!.signatureUrl ?? null).toBeNull();
   });
 
+  it("rejects signature capture by a technician who is not assigned to the job", async () => {
+    const seed = seedFieldJob();
+    const otherUser = fakeDb.seedUser({
+      companyId: seed.company.id,
+      email: "other-tech@field-co.test",
+      firstName: "Other",
+      lastName: "Tech",
+      role: "technician"
+    });
+    fakeDb.seedTechnician({
+      companyId: seed.company.id,
+      userId: otherUser.id,
+      firstName: "Other",
+      lastName: "Tech",
+      phone: "+15555550102"
+    });
+    const attachment = seedSignatureImage(seed.company.id, seed.job.id);
+
+    const response = await capture(
+      { companyId: seed.company.id, userId: otherUser.id, role: "technician" },
+      seed.job.id,
+      { attachmentId: attachment.id, signedByName: "Pat" }
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.body.results[0].outcome).toBe("rejected");
+    expect(fakeDb.getTestState().jobs[0]!.signatureUrl).toBeNull();
+  });
+
   it("rejects a non-image attachment", async () => {
     const seed = seedFieldJob();
     const pdf = seedSignatureImage(seed.company.id, seed.job.id, { mimeType: "application/pdf", fileName: "a.pdf" });

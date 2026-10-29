@@ -37,9 +37,15 @@ Each operation includes:
 | `job.note.append` | Safe merge (append) | Not required |
 | `job.task.update` | Reject stale task version | `job_task` |
 | `job.signature.capture` | Reject stale job or differing existing signature | Job |
+| `job.media.register` | Idempotent via `clientOperationId` | Not required |
 
 `job.signature.capture` payload: `{ signedByName, attachmentId }` (preferred) or legacy `{ signedByName, signatureUrl }` — exactly one. `attachmentId` must be a PNG/JPEG/WebP attachment (≤5 MB) on the same job in the same company, otherwise the op is `rejected` with `code: "SIGNATURE_ATTACHMENT_INVALID"`. The server stores an internal object reference; job reads return a short-lived signed URL in `signatureUrl` (legacy full URLs are returned unchanged).
-| `job.media.register` | Idempotent via `clientOperationId` | Not required |
+
+### Technician signature flow (FS-192)
+
+1. Upload the signature image with `POST /api/v1/attachments` as multipart form data: `file`, `entityType=job`, and `entityId=<jobId>`. Use PNG, JPEG, or WebP and keep the image at or below 5 MB for signature capture. The response contains `attachment.id`.
+2. Submit `job.signature.capture` with that `attachmentId`, `signedByName`, the job's current `baseRecordVersion`, and stable batch/operation IDs. A technician must be assigned to that job; both upload and capture reject a different technician's job.
+3. Treat `applied` as saved. A stale version or a different signature already on the job yields `conflict`; an invalid attachment yields `rejected`. Read `GET /api/v1/jobs/:id` to display the signed `signatureUrl`.
 
 ## Response
 

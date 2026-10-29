@@ -53,7 +53,7 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
   const [addressLine1, setAddressLine1] = useState("");
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
-  const [serviceInterest, setServiceInterest] = useState(initialService ?? model.serviceCards[0]?.title ?? "Standard clean");
+  const [serviceInterest, setServiceInterest] = useState(initialService ?? model.serviceCards[0]?.title ?? "Service inquiry");
   const [notes, setNotes] = useState("");
   const [smsConsentAppointments, setSmsConsentAppointments] = useState(false);
   const [smsConsentMarketing, setSmsConsentMarketing] = useState(false);
@@ -67,11 +67,6 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     setErrorMessage(null);
-
-    if (!smsConsentAppointments) {
-      setErrorMessage("Please agree to appointment updates by text so we can confirm your request.");
-      return;
-    }
 
     try {
       const gate = await passInquiryGate(model.bookingSlug, honeypot);
@@ -108,7 +103,7 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
           customerNotes: `[Branded site inquiry] ${notes.trim()}`.trim(),
           urgency: "flexible",
           preferredWindow: "first_available",
-          smsConsentAppointments: true,
+          smsConsentAppointments,
           smsConsentMarketing
         }
       });
@@ -177,7 +172,7 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
       </label>
 
       <label className="block text-sm font-medium text-[#2a3360]">
-        Email (optional)
+        Email (recommended for a reply)
         <input
           type="email"
           value={email}
@@ -269,8 +264,8 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
             className="mt-0.5"
           />
           <span>
-            I agree to receive appointment-related texts from {model.companyName}. Message frequency varies. Reply STOP to
-            opt out.
+            Optional: I agree to receive appointment-related texts from {model.companyName}. Message frequency varies.
+            Reply STOP to opt out.
           </span>
         </label>
         <label className="flex gap-2 text-sm text-[#2a3360]">
@@ -280,7 +275,7 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
             onChange={(event) => setSmsConsentMarketing(event.target.checked)}
             className="mt-0.5"
           />
-          <span>Optional: send me occasional offers and cleaning tips by text.</span>
+          <span>Optional: send me occasional offers by text from {model.companyName}.</span>
         </label>
       </fieldset>
 

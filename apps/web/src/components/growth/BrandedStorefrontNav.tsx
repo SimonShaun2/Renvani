@@ -18,7 +18,7 @@ interface BrandedStorefrontNavProps {
 
 const NAV_LINKS = [
   { href: "#services", label: "Services" },
-  { href: "#pricing", label: "Pricing" },
+  { href: "#pricing", label: "Get started" },
   { href: "#areas", label: "Areas we serve" }
 ] as const;
 
@@ -132,7 +132,7 @@ export function BrandedStorefrontNav({
                 className={`inline-flex h-11 w-full items-center justify-center rounded-[10px] text-sm font-semibold text-white ${primaryClassName}`}
                 onClick={() => closeMenu(true)}
               >
-                Book a clean
+                Book service
               </Link>
             </li>
           </ul>

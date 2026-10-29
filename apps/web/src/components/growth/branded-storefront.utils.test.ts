@@ -77,10 +77,18 @@ describe("branded-storefront.utils", () => {
     expect(links).toEqual([{ label: "Google reviews", href: "https://google.com/reviews/acme" }]);
   });
 
-  it("falls back to cleaning cards when settings are empty", () => {
-    const model = buildBrandedStorefrontViewModel(baseSettings);
+  it.each([
+    ["HVAC", "Heating & air conditioning inquiry"],
+    ["plumbing", "Plumbing inquiry"],
+    ["unknown", "Service inquiry"]
+  ])("uses a verified or neutral fallback card for %s", (trade, title) => {
+    const settings = { ...baseSettings, trade };
+    const model = buildBrandedStorefrontViewModel(settings);
 
-    expect(model.serviceCards.length).toBe(4);
+    expect(model.serviceCards).toEqual([
+      { id: "service-inquiry", title, subtitle: "Tell us what you need to request a quote" }
+    ]);
+    expect(model.tagline).toBe("Tell us what you need and request a quote from our team.");
     expect(model.bookingSlug).toBe("sparkle-co");
   });
 });

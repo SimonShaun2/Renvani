@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth, useOrganizationList } from "@clerk/nextjs";
+import { useAuth, useOrganizationList, useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 
@@ -15,7 +15,7 @@ import {
 } from "./workspace-setup.config";
 
 type Status = "default" | "progress" | "error";
-type ErrorKind = "create" | "activate" | "company" | "role";
+type ErrorKind = "create" | "activate" | "lookup" | "reconcile" | "company" | "role";
 const PENDING_ORG_KEY = "renvani:onboarding:pending-org:";
 
 function pendingOrgStorageKey(userId: string): string {
@@ -34,6 +34,8 @@ async function checkCompany(token: string): Promise<number> {
 const ERROR_DETAIL: Record<ErrorKind, string> = {
   create: WORKSPACE_COPY.detailCreate,
   activate: WORKSPACE_COPY.detailActivate,
+  lookup: WORKSPACE_COPY.detailLookup,
+  reconcile: WORKSPACE_COPY.detailReconcile,
   company: WORKSPACE_COPY.detailCompany,
   role: WORKSPACE_COPY.detailRole
 };
@@ -41,6 +43,7 @@ const ERROR_DETAIL: Record<ErrorKind, string> = {
 export function CreateWorkspaceStep() {
   const router = useRouter();
   const { getToken, orgId, userId } = useAuth();
+  const { user } = useUser();
   const { isLoaded, createOrganization, setActive } = useOrganizationList();
   const [name, setName] = useState("");
   const [status, setStatus] = useState<Status>("default");
@@ -48,11 +51,23 @@ export function CreateWorkspaceStep() {
   const [orgReady, setOrgReady] = useState(Boolean(orgId));
   const [pendingOrgId, setPendingOrgId] = useState<string | null>(null);
   const inFlight = useRef(false);
+  const currentUserId = useRef(userId);
+  currentUserId.current = userId;
+  const previousUserId = useRef(userId);
 
   useEffect(() => {
-    if (!userId || orgId) return;
-    const savedOrgId = sessionStorage.getItem(pendingOrgStorageKey(userId));
-    if (savedOrgId) setPendingOrgId(savedOrgId);
+    if (previousUserId.current !== userId) {
+      previousUserId.current = userId;
+      inFlight.current = false;
+      setName("");
+      setStatus("default");
+      setErrorKind(null);
+      setOrgReady(Boolean(orgId));
+      setPendingOrgId(null);
+    }
+    if (userId && !orgId) {
+      setPendingOrgId(sessionStorage.getItem(pendingOrgStorageKey(userId)));
+    }
   }, [orgId, userId]);
 
   const poll = useCallback(async () => {
@@ -71,32 +86,54 @@ export function CreateWorkspaceStep() {
 
   const create = async () => {
     const trimmed = name.trim();
-    if ((!trimmed && !pendingOrgId) || !isLoaded || !createOrganization || !setActive || inFlight.current) return;
+    if ((!trimmed && !pendingOrgId) || !isLoaded || !user || !createOrganization || !setActive || inFlight.current) return;
+    const requestUserId = userId;
     inFlight.current = true;
     setStatus("progress");
     setErrorKind(null);
     let activationPending = false;
+    let lookupPending = false;
     try {
       let organizationId = pendingOrgId;
       if (!organizationId) {
-        const organization = await createOrganization({ name: trimmed });
-        organizationId = organization.id;
+        lookupPending = true;
+        const matches: string[] = [];
+        let pageNumber = 1;
+        do {
+          const page = await user.getOrganizationMemberships({ pageSize: 100, initialPage: pageNumber });
+          if (currentUserId.current !== requestUserId) return;
+          matches.push(...page.data.filter((membership) => membership.organization.name.trim().toLocaleLowerCase() === trimmed.toLocaleLowerCase()).map((membership) => membership.organization.id));
+          if (pageNumber * 100 >= page.total_count || page.data.length === 0) break;
+          pageNumber += 1;
+        } while (true);
+        lookupPending = false;
+        if (matches.length > 1) {
+          setErrorKind("reconcile");
+          setStatus("error");
+          return;
+        }
+        organizationId = matches[0] ?? null;
+        if (!organizationId) {
+          if (currentUserId.current !== requestUserId) return;
+          const organization = await createOrganization({ name: trimmed });
+          organizationId = organization.id;
+        }
+        if (requestUserId) sessionStorage.setItem(pendingOrgStorageKey(requestUserId), organizationId);
+        if (currentUserId.current !== requestUserId) return;
         setPendingOrgId(organizationId);
-        if (userId) sessionStorage.setItem(pendingOrgStorageKey(userId), organizationId);
       }
       activationPending = true;
       await setActive({ organization: organizationId });
+      if (currentUserId.current !== requestUserId) return;
       setOrgReady(true);
-    } catch {
-      setErrorKind(activationPending ? "activate" : "create");
-      setStatus("error");
-      inFlight.current = false;
-      return;
-    }
-    try {
       await poll();
+    } catch {
+      if (currentUserId.current !== requestUserId) return;
+      setErrorKind(activationPending ? "activate" : lookupPending ? "lookup" : "create");
+      setStatus("error");
+      return;
     } finally {
-      inFlight.current = false;
+      if (currentUserId.current === requestUserId) inFlight.current = false;
     }
   };
 
@@ -152,7 +189,7 @@ export function CreateWorkspaceStep() {
               <p className="ws-error__detail">{ERROR_DETAIL[errorKind]}</p>
             </div>
           ) : null}
-          <button type="submit" className="ws-button" disabled={!isLoaded || (!orgReady && !pendingOrgId && !name.trim())}>
+          <button type="submit" className="ws-button" disabled={!isLoaded || (!orgReady && !user) || (!orgReady && !pendingOrgId && !name.trim())}>
             {buttonLabel}
           </button>
         </>

@@ -78,6 +78,20 @@ STRIPE_SECRET_KEY="sk_test_x"
     expect(parsed.RENVANI_DEPLOYMENT_TIER).toBe("staging");
     expect(parsed.STRIPE_SECRET_KEY).toBe("sk_test_x");
   });
+
+  it("rejects duplicate keys without exposing either value", () => {
+    const first = ["sk", "test", "first-private-value"].join("_");
+    const second = ["sk", "live", "second-private-value"].join("_");
+    let message = "";
+    try {
+      parseEnvFile(`STRIPE_SECRET_KEY=${first}\nSTRIPE_SECRET_KEY=${second}\n`);
+    } catch (error) {
+      message = (error as Error).message;
+    }
+    expect(message).toBe("Duplicate environment key: STRIPE_SECRET_KEY");
+    expect(message).not.toContain(first);
+    expect(message).not.toContain(second);
+  });
 });
 
 describe("assertStripeLiveKeyAllowed (boot guard)", () => {

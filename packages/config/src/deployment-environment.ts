@@ -156,6 +156,9 @@ export function parseEnvFile(contents: string): Record<string, string> {
     }
 
     const key = trimmed.slice(0, eq).trim();
+    if (Object.prototype.hasOwnProperty.call(result, key)) {
+      throw new Error(`Duplicate environment key: ${key}`);
+    }
     let value = trimmed.slice(eq + 1).trim();
 
     if (

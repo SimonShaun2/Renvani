@@ -711,19 +711,23 @@ export async function createEstimate(
       await tx
         .insert(estimateItems)
         .values(
-          normalizedInput.items.map((item, index) => ({
-            companyId,
-            estimateId: createdEstimate.id,
-            name: item.name.trim(),
-            description: normalizeOptionalString(item.description) ?? null,
-            itemType: item.itemType ?? "service",
-            quantity: new Decimal(item.quantity).toFixed(3),
-            unitPrice: formatMoney(new Decimal(item.unitPrice)),
-            total: formatMoney(new Decimal(item.quantity).mul(item.unitPrice)),
-            isTaxable: item.isTaxable ?? true,
-            sortOrder: item.sortOrder ?? index,
-            ...(item.priceBookItemId ? { productCatalogId: item.priceBookItemId } : {})
-          }))
+          normalizedInput.items.map((item, index) => {
+            const quantity = new Decimal(item.quantity).toFixed(3);
+            const unitPrice = formatMoney(new Decimal(item.unitPrice));
+            return {
+              companyId,
+              estimateId: createdEstimate.id,
+              name: item.name.trim(),
+              description: normalizeOptionalString(item.description) ?? null,
+              itemType: item.itemType ?? "service",
+              quantity,
+              unitPrice,
+              total: formatMoney(new Decimal(quantity).mul(unitPrice)),
+              isTaxable: item.isTaxable ?? true,
+              sortOrder: item.sortOrder ?? index,
+              ...(item.priceBookItemId ? { productCatalogId: item.priceBookItemId } : {})
+            };
+          })
         )
         .returning();
     }

@@ -9,7 +9,8 @@ const mocks = vi.hoisted(() => ({
   upload: vi.fn(),
   transition: vi.fn(),
   retryJob: vi.fn(),
-  retryTasks: vi.fn()
+  retryTasks: vi.fn(),
+  toast: vi.fn()
 }));
 
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push: vi.fn() }) }));
@@ -20,6 +21,7 @@ vi.mock("@/src/hooks/jobs.hooks", () => ({
   useUploadAttachment: mocks.upload,
   useTransitionJob: mocks.transition
 }));
+vi.mock("@/src/stores/toast.store", () => ({ showToast: mocks.toast }));
 vi.mock("./CrewChecklist", () => ({
   CrewChecklist: () => <div>Checklist</div>,
   isTaskDone: (task: { status: string }) => task.status === "completed" || task.status === "skipped"
@@ -66,5 +68,20 @@ describe("CrewFinishJob loading failures", () => {
     expect(screen.queryByText("Job not found")).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: "Retry job" }));
     expect(mocks.retryJob).toHaveBeenCalledOnce();
+  });
+
+  it("refreshes job and checklist state when completion finds a server-side conflict", () => {
+    const mutate = vi.fn();
+    mocks.transition.mockReturnValue({ isPending: false, mutate });
+    render(<CrewFinishJob jobId="job-1" />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Mark complete" }));
+    expect(mutate).toHaveBeenCalledOnce();
+    const [, options] = mutate.mock.calls[0] as [unknown, { onError: (error: Error) => void }];
+    options.onError(Object.assign(new Error("Complete required checklist tasks before completing the job"), { status: 409 }));
+
+    expect(mocks.retryJob).toHaveBeenCalledOnce();
+    expect(mocks.retryTasks).toHaveBeenCalledOnce();
+    expect(mocks.toast).toHaveBeenCalledWith(expect.objectContaining({ tone: "error", title: "Checklist changed" }));
   });
 });

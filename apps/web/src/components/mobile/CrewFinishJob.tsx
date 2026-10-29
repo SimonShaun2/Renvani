@@ -165,7 +165,7 @@ export function CrewFinishJob({ jobId }: { jobId: string }) {
         <div className="mx-auto w-full max-w-[390px]">
           <button
             type="button"
-            disabled={requiredOpen || !canComplete || transitionJob.isPending}
+            disabled={requiredOpen || !canComplete || tasksQuery.isFetching || jobQuery.isFetching || transitionJob.isPending}
             onClick={() => {
               transitionJob.mutate(
                 { status: "completed" },
@@ -174,12 +174,22 @@ export function CrewFinishJob({ jobId }: { jobId: string }) {
                     showToast({ tone: "success", title: "Job marked complete", description: "The office can see it now." });
                     router.push(`/mobile/jobs/${jobId}`);
                   },
-                  onError: (error) =>
+                  onError: (error) => {
+                    if (error instanceof Error && "status" in error && error.status === 409) {
+                      void Promise.all([jobQuery.refetch(), tasksQuery.refetch()]);
+                      showToast({
+                        tone: "error",
+                        title: "Checklist changed",
+                        description: error.message
+                      });
+                      return;
+                    }
                     showToast({
                       tone: "error",
                       title: "Could not complete job",
                       description: error instanceof Error ? error.message : "Try again."
-                    })
+                    });
+                  }
                 }
               );
             }}
@@ -188,7 +198,7 @@ export function CrewFinishJob({ jobId }: { jobId: string }) {
             {transitionJob.isPending ? "Completing..." : "Mark complete"}
           </button>
           <p className="mt-3 text-xs text-[#5e6684]">
-            {completionHint(job.status, requiredOpen)}
+            {tasksQuery.isFetching ? "Checking checklist..." : completionHint(job.status, requiredOpen)}
           </p>
         </div>
       </div>

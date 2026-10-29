@@ -14,15 +14,23 @@ vi.mock("next/link", () => ({
 }));
 
 const mutate = vi.fn();
-const hooks = vi.hoisted(() => ({ createState: { isPending: false, isError: false } }));
+const hooks = vi.hoisted(() => ({
+  createState: { isPending: false, isError: false },
+  unavailableCustomerIds: new Set<string>()
+}));
 vi.mock("@/src/hooks/jobs.hooks", () => ({
   useCreateJob: () => ({ mutate, ...hooks.createState }),
   useJobsList: () => ({ data: { data: [], total: 0, totalPages: 1 }, isLoading: false, isError: false })
 }));
 vi.mock("@/src/hooks/customers.hooks", () => ({
   useCustomer: (id: string | null) => ({
-    data: id ? { customer: { id, firstName: "Dana", lastName: "Whitfield", displayName: null, phone: "555-0100", email: null } } : undefined,
-    isError: false
+    data: id && !hooks.unavailableCustomerIds.has(id)
+      ? { customer: { id, firstName: "Dana", lastName: "Whitfield", displayName: null, phone: "555-0100", email: null } }
+      : undefined,
+    isError: Boolean(id && hooks.unavailableCustomerIds.has(id)),
+    isLoading: false,
+    isPending: false,
+    isSuccess: Boolean(id && !hooks.unavailableCustomerIds.has(id))
   }),
   useCustomerProperties: (id: string | null) => ({
     data: id ? { properties: [{ id: "p1", addressLine1: "1842 Aspen Ridge Dr", city: "Denver", state: "CO" }] } : undefined,
@@ -96,6 +104,8 @@ describe("parseNewJobQuery", () => {
     expect(parseNewJobQuery({ customerId: "c1" })).toEqual({ open: false, customerId: "c1" });
     expect(parseNewJobQuery({ new: "1", customerId: "../x" })).toEqual({ open: true, customerId: "" });
     expect(parseNewJobQuery({ new: ["1"], customerId: ["c2", "c3"] })).toEqual({ open: true, customerId: "c2" });
+    expect(parseNewJobQuery({ new: "1", customerId: "x".repeat(65) })).toEqual({ open: true, customerId: "" });
+    expect(parseNewJobQuery({ new: "1", customerId: "c1?new=1" })).toEqual({ open: true, customerId: "" });
   });
 });
 
@@ -104,6 +114,7 @@ describe("NewJobPanel", () => {
     mutate.mockReset();
     push.mockReset();
     hooks.createState = { isPending: false, isError: false };
+    hooks.unavailableCustomerIds.clear();
   });
   afterEach(() => cleanup());
 
@@ -111,6 +122,26 @@ describe("NewJobPanel", () => {
     render(<NewJobPanel initialCustomerId="c1" />);
     expect(screen.getByTestId("new-job-customer").textContent).toContain("Dana Whitfield");
     expect((screen.getByLabelText("Service address") as HTMLSelectElement).value).toBe("p1");
+    expect(document.querySelector('label[for="new-job-customerId"]')).toBeNull();
+  });
+
+  it("does not submit a stale or cross-tenant customer deep link and lets the user recover", () => {
+    hooks.unavailableCustomerIds.add("unavailable-customer");
+    render(<NewJobPanel initialCustomerId="unavailable-customer" />);
+    fireEvent.change(screen.getByLabelText(/Service \*/), { target: { value: "No-heat diagnostic" } });
+    fireEvent.click(screen.getByRole("button", { name: "Create job" }));
+    expect(mutate).not.toHaveBeenCalled();
+    expect(screen.getByRole("button", { name: "Change" })).toBeTruthy();
+    expect(screen.getByRole("alert").textContent).toMatch(/customer/i);
+  });
+
+  it("keeps a pending create action from being submitted again", () => {
+    hooks.createState = { isPending: true, isError: false };
+    render(<NewJobPanel initialCustomerId="c1" />);
+    const submit = screen.getByRole("button", { name: "Creating…" }) as HTMLButtonElement;
+    expect(submit.disabled).toBe(true);
+    fireEvent.click(submit);
+    expect(mutate).not.toHaveBeenCalled();
   });
 
   it("shows validation errors and does not submit", () => {

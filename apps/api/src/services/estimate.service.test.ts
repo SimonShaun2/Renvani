@@ -756,3 +756,53 @@ describe("estimate.service", () => {
     );
   });
 });
+
+describe("estimate money contract (FS-174)", () => {
+  it("rounds each fractional-quantity line before summing the subtotal", async () => {
+    const { company, actor } = createAdminContext();
+    const { customer } = seedEstimateGraph(company.id);
+    const estimate = await estimateService.createEstimate(company.id, actor.id, {
+      customerId: customer.id,
+      items: ["First", "Second", "Third"].map((name) => ({
+        name,
+        quantity: 0.333,
+        unitPrice: 0.05
+      }))
+    });
+    const detail = await estimateService.getEstimate(company.id, estimate.id);
+
+    expect(detail.items.map((item) => item.total)).toEqual(["0.02", "0.02", "0.02"]);
+    expect(estimate.subtotal).toBe("0.06");
+    expect(estimate.total).toBe("0.06");
+  });
+
+  it("calculates tax on taxable lines before subtracting an estimate discount", async () => {
+    const { company, actor } = createAdminContext();
+    const { customer } = seedEstimateGraph(company.id);
+    const estimate = await estimateService.createEstimate(company.id, actor.id, {
+      customerId: customer.id,
+      taxRate: 0.1,
+      discountAmount: 10,
+      items: [{ name: "Service", quantity: 1, unitPrice: 100 }]
+    });
+
+    expect(estimate.subtotal).toBe("100.00");
+    expect(estimate.taxAmount).toBe("10.00");
+    expect(estimate.discountAmount).toBe("10.00");
+    expect(estimate.total).toBe("100.00");
+  });
+
+  it("uses the normalized unit price when extending a sub-cent input", async () => {
+    const { company, actor } = createAdminContext();
+    const { customer } = seedEstimateGraph(company.id);
+    const estimate = await estimateService.createEstimate(company.id, actor.id, {
+      customerId: customer.id,
+      items: [{ name: "Precision edge", quantity: 3, unitPrice: 1.005 }]
+    });
+    const detail = await estimateService.getEstimate(company.id, estimate.id);
+
+    expect(detail.items[0]?.unitPrice).toBe("1.01");
+    expect(detail.items[0]?.total).toBe("3.03");
+    expect(estimate.total).toBe("3.03");
+  });
+});

@@ -7,12 +7,13 @@ vi.mock("next/navigation", () => ({ useRouter: () => ({ replace, refresh }) }));
 
 const clerk = vi.hoisted(() => ({
   orgId: null as string | null,
+  userId: "user_1",
   getToken: vi.fn(),
   createOrganization: vi.fn(),
   setActive: vi.fn()
 }));
 vi.mock("@clerk/nextjs", () => ({
-  useAuth: () => ({ getToken: clerk.getToken, orgId: clerk.orgId }),
+  useAuth: () => ({ getToken: clerk.getToken, orgId: clerk.orgId, userId: clerk.userId }),
   useOrganizationList: () => ({ isLoaded: true, createOrganization: clerk.createOrganization, setActive: clerk.setActive })
 }));
 
@@ -23,6 +24,7 @@ import { CreateWorkspaceStep } from "./CreateWorkspaceStep";
 
 describe("CreateWorkspaceStep", () => {
   beforeEach(() => {
+    sessionStorage.clear();
     clerk.orgId = null;
     clerk.createOrganization.mockReset();
     clerk.setActive.mockReset();
@@ -70,6 +72,42 @@ describe("CreateWorkspaceStep", () => {
     expect(screen.getByRole("alert").textContent).toContain("couldn't be created");
     expect(screen.getByLabelText("Company name")).toBeTruthy();
     expect(wait.fn).not.toHaveBeenCalled();
+  });
+
+  it("retries activation of the created organization without creating another", async () => {
+    clerk.setActive.mockRejectedValueOnce(new Error("session unavailable"));
+    wait.fn.mockResolvedValue({ ok: true, role: "owner" });
+    render(<CreateWorkspaceStep />);
+    await submit("Acme Plumbing");
+
+    expect(screen.getByRole("alert").textContent).toContain("workspace was created");
+    expect(screen.queryByLabelText("Company name")).toBeNull();
+    expect(wait.fn).not.toHaveBeenCalled();
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Try again" }));
+    });
+    expect(clerk.createOrganization).toHaveBeenCalledTimes(1);
+    expect(clerk.setActive).toHaveBeenNthCalledWith(2, { organization: "org_1" });
+    expect(wait.fn).toHaveBeenCalledTimes(1);
+    expect(replace).toHaveBeenCalledWith("/onboarding/import");
+  });
+
+  it("recovers a created organization after remount before retrying activation", async () => {
+    clerk.setActive.mockRejectedValueOnce(new Error("session unavailable"));
+    wait.fn.mockResolvedValue({ ok: true, role: "owner" });
+    const first = render(<CreateWorkspaceStep />);
+    await submit("Acme Plumbing");
+    first.unmount();
+
+    render(<CreateWorkspaceStep />);
+    expect(screen.queryByLabelText("Company name")).toBeNull();
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Create workspace" }));
+    });
+    expect(clerk.createOrganization).toHaveBeenCalledTimes(1);
+    expect(clerk.setActive).toHaveBeenNthCalledWith(2, { organization: "org_1" });
+    expect(replace).toHaveBeenCalledWith("/onboarding/import");
   });
 
   it("shows the frame copy and a disabled progress button while waiting", async () => {

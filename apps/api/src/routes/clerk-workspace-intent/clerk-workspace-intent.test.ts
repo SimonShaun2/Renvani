@@ -16,7 +16,7 @@ describe("FS-235 workspace intent route", () => {
   beforeEach(() => {
     auth.verify.mockReset().mockResolvedValue({ clerkUserId: "user_a", clerkOrganizationId: null });
     service.get.mockReset().mockResolvedValue(null);
-    service.reserve.mockReset().mockResolvedValue({ id: "00000000-0000-4000-8000-000000000001", status: "reserved" });
+    service.reserve.mockReset().mockResolvedValue({ id: "00000000-0000-4000-8000-000000000001", status: "pending" });
   });
 
   async function app() {

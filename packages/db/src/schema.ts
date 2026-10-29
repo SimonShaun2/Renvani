@@ -534,11 +534,17 @@ export const clerkWorkspaceIntents = pgTable("clerk_workspace_intents", {
   id: id(),
   clerkUserId: varchar("clerk_user_id", { length: 255 }).notNull(),
   requestedName: varchar("requested_name", { length: 80 }).notNull(),
-  status: varchar("status", { length: 32 }).notNull().default("reserved"),
+  status: varchar("status", { length: 32 }).notNull().default("pending"),
+  attemptId: uuid("attempt_id"),
+  claimedAt: timestamp("claimed_at"),
+  uncertainAt: timestamp("uncertain_at"),
   clerkOrganizationId: varchar("clerk_organization_id", { length: 255 }),
   ...timestamps,
 }, (t) => ({
   clerkUserIdx: uniqueIndex("clerk_workspace_intents_clerk_user_idx").on(t.clerkUserId),
+  attemptIdx: uniqueIndex("clerk_workspace_intents_attempt_idx")
+    .on(t.attemptId)
+    .where(sql`${t.attemptId} IS NOT NULL`),
   clerkOrgIdx: uniqueIndex("clerk_workspace_intents_clerk_org_idx")
     .on(t.clerkOrganizationId)
     .where(sql`${t.clerkOrganizationId} IS NOT NULL`),

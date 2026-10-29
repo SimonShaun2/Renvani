@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-/** FS-235. This slice only reserves an intent; it does not create or activate an org. */
+/** FS-235. This slice records a claim, but does not call Clerk or activate an org. */
 export const ReserveClerkWorkspaceIntentBodySchema = z.object({
   name: z.string().trim().min(1).max(80)
 }).strict();
@@ -8,7 +8,7 @@ export const ReserveClerkWorkspaceIntentBodySchema = z.object({
 export const ClerkWorkspaceIntentResponseSchema = z.object({
   id: z.string().uuid(),
   requestedName: z.string(),
-  status: z.literal("reserved"),
+  status: z.enum(["pending", "claimed", "uncertain", "reconciled"]),
   createdAt: z.string().datetime()
 }).strict();
 

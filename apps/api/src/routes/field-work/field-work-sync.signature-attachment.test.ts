@@ -14,6 +14,7 @@ setupTestEnv();
 
 // App startup otherwise attempts Stripe platform branding sync with test env credentials.
 vi.mock("../../plugins/stripe-platform-sync.js", () => ({ default: async () => {} }));
+const eventFailure = vi.hoisted(() => ({ enabled: false }));
 
 vi.mock("drizzle-orm", async () => {
   const helper = await import("../../test-support/fake-db.js");
@@ -22,7 +23,15 @@ vi.mock("drizzle-orm", async () => {
 
 vi.mock("@fsm/db", async () => {
   const helper = await import("../../test-support/fake-db.js");
-  return helper.createDbModuleMock();
+  return {
+    ...helper.createDbModuleMock(),
+    emitEventWithExecutor: async (...args: Parameters<typeof helper.emitEventWithExecutor>) => {
+      if (eventFailure.enabled) {
+        throw new Error("activity event unavailable");
+      }
+      return helper.emitEventWithExecutor(...args);
+    }
+  };
 });
 
 vi.mock("../../lib/storage.js", async (importOriginal) => {
@@ -192,6 +201,24 @@ describe("job.signature.capture with attachmentId", () => {
     expect(stored.signedAt).toBeInstanceOf(Date);
   });
 
+  it("rolls back signature capture when its activity event cannot be stored", async () => {
+    const seed = seedFieldJob();
+    const attachment = seedSignatureImage(seed.company.id, seed.job.id);
+    eventFailure.enabled = true;
+
+    try {
+      const response = await capture(authOf(seed), seed.job.id, {
+        attachmentId: attachment.id,
+        signedByName: "Pat"
+      });
+      expect(response.status).toBe(500);
+      expect(fakeDb.getTestState().jobs[0]!.signatureUrl).toBeNull();
+      expect(fakeDb.getTestState().fieldSyncOperations).toHaveLength(0);
+    } finally {
+      eventFailure.enabled = false;
+    }
+  });
+
   it("is idempotent when the same signature is captured again", async () => {
     const seed = seedFieldJob();
     const attachment = seedSignatureImage(seed.company.id, seed.job.id);
@@ -206,6 +233,7 @@ describe("job.signature.capture with attachmentId", () => {
 
     expect(replay.body.results[0].outcome).toBe("applied");
     expect(replay.body.results[0].message).toMatch(/already captured/i);
+    expect(fakeDb.getTestState().activityEvents).toHaveLength(1);
   });
 
   it("conflicts when a different signature is already on file", async () => {

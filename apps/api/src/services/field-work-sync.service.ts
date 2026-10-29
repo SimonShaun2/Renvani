@@ -398,38 +398,48 @@ async function applyOperation(
       }
 
       const signedAt = new Date();
-      const updatedRows = await db
-        .update(jobs)
-        .set({
-          signatureUrl: signatureValue,
-          signedByName: operation.payload.signedByName.trim(),
-          signedAt,
-          updatedAt: signedAt
-        })
-        .where(
-          and(eq(jobs.companyId, actor.companyId), eq(jobs.id, operation.jobId), isNull(jobs.deletedAt))
-        )
-        .returning();
-      const updated = updatedRows[0];
+      const updated = await db.transaction(async (tx) => {
+        const [captured] = await tx
+          .update(jobs)
+          .set({
+            signatureUrl: signatureValue,
+            signedByName: operation.payload.signedByName.trim(),
+            signedAt,
+            updatedAt: signedAt
+          })
+          .where(
+            and(
+              eq(jobs.companyId, actor.companyId),
+              eq(jobs.id, operation.jobId),
+              isNull(jobs.deletedAt),
+              isNull(jobs.signatureUrl)
+            )
+          )
+          .returning();
+
+        if (captured) {
+          await emitEventWithExecutor(tx, "job.updated", {
+            companyId: actor.companyId,
+            actorId: actor.userId,
+            actorType: "user",
+            entityType: "job",
+            entityId: captured.id,
+            jobId: captured.id,
+            customerId: captured.customerId,
+            summary: `Captured customer signature on job ${captured.jobNumber}`,
+            // Never put the internal storage reference on the event bus.
+            payload: isJobSignatureObjectRef(captured.signatureUrl)
+              ? { signatureAttachmentId: operation.payload.attachmentId ?? null }
+              : { signatureUrl: captured.signatureUrl }
+          });
+        }
+
+        return captured;
+      });
 
       if (!updated) {
-        return { outcome: "rejected", resultPayload: { message: "Failed to capture signature" } };
+        return buildFieldWorkSyncVersionConflict(liveVersion, "Job signature changed concurrently");
       }
-
-      await emitEventWithExecutor(db, "job.updated", {
-        companyId: actor.companyId,
-        actorId: actor.userId,
-        actorType: "user",
-        entityType: "job",
-        entityId: updated.id,
-        jobId: updated.id,
-        customerId: updated.customerId,
-        summary: `Captured customer signature on job ${updated.jobNumber}`,
-        // Never put the internal storage reference on the event bus.
-        payload: isJobSignatureObjectRef(updated.signatureUrl)
-          ? { signatureAttachmentId: operation.payload.attachmentId ?? null }
-          : { signatureUrl: updated.signatureUrl }
-      });
 
       return {
         outcome: "applied",

@@ -9,7 +9,7 @@ import { SkeletonCard } from "@/src/components/ui/SkeletonCard";
 import { useCurrentTechnician } from "@/src/hooks/technicians.hooks";
 import { type JobListRecord, useJobsList } from "@/src/hooks/jobs.hooks";
 import { useBreakpoint } from "@/src/hooks/useBreakpoint";
-import { cn, formatCurrency } from "@/src/lib/utils";
+import { cn } from "@/src/lib/utils";
 import { useAuthStore } from "@/src/stores/auth.store";
 
 import { TabletJobsList } from "./tablet/TabletJobsList";
@@ -45,18 +45,6 @@ function getStatusClasses(status: string) {
   }
 }
 
-function getJobValue(job: JobListRecord) {
-  const fallbackValues = {
-    service_call: 280,
-    maintenance: 320,
-    installation: 1413,
-    inspection: 190,
-    estimate_only: 95
-  } as const;
-
-  return formatCurrency(fallbackValues[job.type as keyof typeof fallbackValues] ?? 240);
-}
-
 function sortJobsByTime(jobs: JobListRecord[]) {
   return jobs.slice().sort((left, right) => {
     const leftValue = left.scheduledStart ? new Date(left.scheduledStart).getTime() : Number.MAX_SAFE_INTEGER;
@@ -85,6 +73,7 @@ export function TodayJobsList() {
       job.scheduledStart ? isSameDay(parseISO(job.scheduledStart), new Date()) : true
     )
   );
+  const jobCountLabel = `${jobs.length} ${jobs.length === 1 ? "job" : "jobs"} shown`;
 
   const technicianName =
     technicianQuery.technician
@@ -117,7 +106,7 @@ export function TodayJobsList() {
   }
 
   if (isTablet) {
-    return <TabletJobsList jobs={jobs} technicianName={technicianName} />;
+    return <TabletJobsList jobs={jobs} technicianName={technicianName} jobCountLabel={jobCountLabel} />;
   }
 
   return (
@@ -126,7 +115,7 @@ export function TodayJobsList() {
         <header className="flex items-start justify-between gap-4">
           <div className="space-y-1">
             <h1 className="text-[2rem] font-semibold tracking-tight text-neutral-950">Today&apos;s Jobs</h1>
-            <p className="text-sm text-neutral-500">{format(new Date(), "EEE, MMM d")} · {jobs.length} jobs today</p>
+            <p className="text-sm text-neutral-500">{format(new Date(), "EEE, MMM d")} · {jobCountLabel}</p>
           </div>
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-accent text-sm font-semibold text-white shadow-[0_16px_40px_rgba(37,122,250,0.24)]">
             {authUser ? getInitials(authUser.firstName, authUser.lastName) : "SR"}
@@ -140,7 +129,7 @@ export function TodayJobsList() {
             </div>
             <div>
               <p className="text-sm font-semibold text-neutral-900">Good morning, {authUser?.firstName ?? "Tech"}</p>
-              <p className="text-xs text-neutral-500">3 jobs today · $2,973 potential · technician app live</p>
+              <p className="text-xs text-neutral-500">{jobCountLabel}</p>
             </div>
           </div>
         </section>
@@ -181,7 +170,6 @@ export function TodayJobsList() {
                         </span>
                       </div>
                     </div>
-                    <p className="text-xl font-semibold tracking-tight text-neutral-950">{getJobValue(job)}</p>
                   </div>
 
                   <div className="mt-3">

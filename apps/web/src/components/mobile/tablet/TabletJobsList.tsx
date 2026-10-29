@@ -5,11 +5,12 @@ import { format, isToday, parseISO } from "date-fns";
 import { ArrowRight, CarFront, MapPinned, SunMedium } from "lucide-react";
 
 import type { JobListRecord } from "@/src/hooks/jobs.hooks";
-import { cn, formatCurrency } from "@/src/lib/utils";
+import { cn } from "@/src/lib/utils";
 
 interface TabletJobsListProps {
   jobs: JobListRecord[];
   technicianName: string;
+  jobCountLabel: string;
 }
 
 function formatTimeWindow(job: JobListRecord) {
@@ -25,18 +26,6 @@ function formatTimeWindow(job: JobListRecord) {
   }
 
   return `${startLabel} - ${format(parseISO(job.scheduledEnd), "h:mm a")}`;
-}
-
-function getJobValue(job: JobListRecord) {
-  const baseValues = {
-    service_call: 320,
-    maintenance: 189,
-    installation: 1413,
-    inspection: 260,
-    estimate_only: 95
-  } as const;
-
-  return formatCurrency(baseValues[job.type as keyof typeof baseValues] ?? 240);
 }
 
 function getStatusLabel(status: string) {
@@ -58,7 +47,7 @@ function getStatusClasses(status: string) {
   }
 }
 
-export function TabletJobsList({ jobs, technicianName }: TabletJobsListProps) {
+export function TabletJobsList({ jobs, technicianName, jobCountLabel }: TabletJobsListProps) {
   return (
     <div className="min-h-[100svh] bg-[#F5F7FB] px-8 py-8">
       <div className="mx-auto max-w-7xl space-y-8">
@@ -67,7 +56,7 @@ export function TabletJobsList({ jobs, technicianName }: TabletJobsListProps) {
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-brand-accent">Technician Workspace</p>
             <h1 className="text-4xl font-semibold tracking-tight text-neutral-950">Today&apos;s Jobs</h1>
             <p className="text-sm text-neutral-500">
-              {format(new Date(), "EEE, MMM d")} · {jobs.length} scheduled stops for {technicianName}
+              {format(new Date(), "EEE, MMM d")} · {jobCountLabel} for {technicianName}
             </p>
           </div>
           <div className="rounded-[28px] border border-neutral-200 bg-white px-5 py-4 shadow-[0_20px_60px_rgba(16,33,99,0.08)]">
@@ -76,8 +65,8 @@ export function TabletJobsList({ jobs, technicianName }: TabletJobsListProps) {
                 <SunMedium className="h-5 w-5" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-neutral-900">Good conditions</p>
-                <p className="text-xs text-neutral-500">{jobs.length} jobs today · $2,973 potential</p>
+                <p className="text-sm font-semibold text-neutral-900">Your schedule</p>
+                <p className="text-xs text-neutral-500">{jobCountLabel}</p>
               </div>
             </div>
           </div>
@@ -109,7 +98,7 @@ export function TabletJobsList({ jobs, technicianName }: TabletJobsListProps) {
                 );
               })}
             </div>
-            <p className="text-sm font-semibold text-success">{jobs.length} jobs today · $2,973 potential</p>
+            <p className="text-sm font-semibold text-success">{jobCountLabel}</p>
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
@@ -145,7 +134,6 @@ export function TabletJobsList({ jobs, technicianName }: TabletJobsListProps) {
                       {job.property ? `, ${job.property.city}` : ""}
                     </p>
                   </div>
-                  <p className="text-2xl font-semibold tracking-tight text-success">{getJobValue(job)}</p>
                 </div>
 
                 <div className="mt-5 flex flex-wrap gap-3">

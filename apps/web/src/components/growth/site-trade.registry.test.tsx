@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { BrandedLocalSeo, serializeJsonLd } from "./BrandedLocalSeo";
 import { buildBrandedStorefrontViewModel, buildLocalBusinessJsonLd } from "./branded-storefront.utils";
-import { buildOpeningHours, buildSiteMetadataCopy, resolveSiteTrade } from "./site-trade.registry";
+import { buildSiteMetadataCopy, resolveSiteTrade } from "./site-trade.registry";
 
 const base = {
   companyName: "Summit Heating",
@@ -46,15 +46,14 @@ describe("site trade registry", () => {
     expect(resolveSiteTrade({ ...withServices("Deep clean"), trade: "plumbing" } as never).key).toBe("plumbing");
   });
 
-  it("emits phone, opening hours and trade @type; no rating unless real", () => {
+  it("emits phone and trade @type without claiming booking windows are business hours", () => {
     const settings = withServices("AC repair");
     const ld = buildLocalBusinessJsonLd(buildBrandedStorefrontViewModel(settings), "/site/summit", {
-      trade: resolveSiteTrade(settings),
-      openingHours: buildOpeningHours(settings)
+      trade: resolveSiteTrade(settings)
     });
     expect(ld["@type"]).toBe("HVACBusiness");
     expect(ld.telephone).toBe("555-0100");
-    expect(ld.openingHoursSpecification?.[0]).toMatchObject({ dayOfWeek: ["Monday", "Tuesday"], opens: "08:00", closes: "17:00" });
+    expect(ld.openingHoursSpecification).toBeUndefined();
     expect(ld.aggregateRating).toBeUndefined();
     const rated = buildLocalBusinessJsonLd(buildBrandedStorefrontViewModel(settings), "/s", { rating: { value: 4.8, count: 12 } });
     expect(rated.aggregateRating).toEqual({ "@type": "AggregateRating", ratingValue: 4.8, reviewCount: 12 });

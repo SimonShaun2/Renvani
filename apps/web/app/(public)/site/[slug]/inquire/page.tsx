@@ -9,7 +9,7 @@ import {
   buildBrandedStorefrontViewModel,
   buildLocalBusinessJsonLd
 } from "@/src/components/growth/branded-storefront.utils";
-import { buildOpeningHours, resolveSiteTrade } from "@/src/components/growth/site-trade.registry";
+import { resolveSiteTrade } from "@/src/components/growth/site-trade.registry";
 import { fetchPublicBookingSettingsBySlug } from "@/src/lib/public-booking-server";
 
 export async function generateMetadata({
@@ -54,8 +54,7 @@ export default async function BrandedInquiryPage({
   const acquisitionSource = query.src?.trim() || BRANDED_ACQUISITION_SOURCE;
   const sitePath = `/site/${slug}`;
   const jsonLd = buildLocalBusinessJsonLd(model, sitePath, {
-    trade: resolveSiteTrade(settings),
-    openingHours: buildOpeningHours(settings)
+    trade: resolveSiteTrade(settings)
   });
 
   return (

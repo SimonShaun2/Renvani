@@ -88,7 +88,7 @@ function hour(value: number): string {
   return `${String(Math.max(0, Math.min(24, Math.trunc(value)))).padStart(2, "0")}:00`;
 }
 
-/** schema.org openingHoursSpecification from the public booking hours (booking window = advertised hours). */
+/** Online booking window only. Do not publish this as business opening hours in LocalBusiness JSON-LD. */
 export function buildOpeningHours(
   settings: Pick<PublicBookingSettingsRecord, "availableDays" | "availableHoursStart" | "availableHoursEnd">
 ) {

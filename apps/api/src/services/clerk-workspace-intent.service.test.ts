@@ -100,9 +100,11 @@ vi.mock("@fsm/db", () => {
 
 import {
   claimClerkWorkspaceCreateAttempt,
+  evaluateClerkWorkspaceCreatorProvisioning,
   getClerkWorkspaceIntent,
   markClerkWorkspaceAttemptUncertain,
   matchesClerkWorkspaceIntent,
+  type ObservedClerkWorkspaceOrganization,
   reconcileObservedClerkWorkspaceOrganization,
   reserveClerkWorkspaceIntent
 } from "./clerk-workspace-intent.service.js";
@@ -230,5 +232,54 @@ describe("FS-235 Clerk workspace intent", () => {
     await expect(reconcileObservedClerkWorkspaceOrganization("user_a", { ...base, id: "org_b" }))
       .rejects.toMatchObject({ code: ErrorCode.CONFLICT });
     expect(state.rows[0]?.clerkOrganizationId).toBe("org_a");
+  });
+
+  it("defers membership-first and organization-first delivery until verified reconciliation and creator membership", async () => {
+    const intent = await reserveClerkWorkspaceIntent("user_a", "Acme Plumbing");
+    const claim = await claimClerkWorkspaceCreateAttempt("user_a");
+    if (!claim.newlyClaimed) throw new Error("Claim expected");
+    const observed = {
+      id: "org_a",
+      createdBy: "user_a",
+      privateMetadata: { renvaniIntentId: intent.id, renvaniAttemptId: claim.attemptId }
+    };
+    const creatorMembership = { organizationId: "org_a", clerkUserId: "user_a" };
+    const decide = (organization: typeof observed | null, membership: typeof creatorMembership | null) =>
+      evaluateClerkWorkspaceCreatorProvisioning(state.rows[0]!, organization, membership);
+
+    expect(decide(null, creatorMembership)).toEqual({ status: "defer", reason: "organization_unobserved" });
+    expect(decide(observed, creatorMembership)).toEqual({ status: "defer", reason: "intent_not_reconciled" });
+    await reconcileObservedClerkWorkspaceOrganization("user_a", observed);
+    expect(decide(observed, null)).toEqual({ status: "defer", reason: "creator_membership_unobserved" });
+    const allowed = { status: "allow", organizationId: "org_a", clerkUserId: "user_a" };
+    expect(decide(observed, creatorMembership)).toEqual(allowed);
+    expect(decide(observed, creatorMembership)).toEqual(allowed);
+    expect(state.events.filter((event) => event.eventType === "workspace.organization_reconciled")).toHaveLength(1);
+  });
+
+  it("denies company and owner eligibility when verified organization or membership differs", async () => {
+    const intent = await reserveClerkWorkspaceIntent("user_a", "Acme Plumbing");
+    const claim = await claimClerkWorkspaceCreateAttempt("user_a");
+    if (!claim.newlyClaimed) throw new Error("Claim expected");
+    const observed = {
+      id: "org_a",
+      createdBy: "user_a",
+      privateMetadata: { renvaniIntentId: intent.id, renvaniAttemptId: claim.attemptId }
+    };
+    await reconcileObservedClerkWorkspaceOrganization("user_a", observed);
+    const decide = (organization: ObservedClerkWorkspaceOrganization, organizationId: string, clerkUserId: string) =>
+      evaluateClerkWorkspaceCreatorProvisioning(state.rows[0]!, organization, { organizationId, clerkUserId });
+
+    expect(decide({ ...observed, createdBy: "user_b" }, "org_a", "user_a"))
+      .toEqual({ status: "deny", reason: "organization_mismatch" });
+    expect(decide({ ...observed, privateMetadata: null }, "org_a", "user_a"))
+      .toEqual({ status: "deny", reason: "organization_mismatch" });
+    expect(decide({ ...observed, id: "org_b" }, "org_b", "user_a"))
+      .toEqual({ status: "deny", reason: "organization_mismatch" });
+    expect(decide(observed, "org_b", "user_a"))
+      .toEqual({ status: "deny", reason: "membership_mismatch" });
+    expect(decide(observed, "org_a", "user_b"))
+      .toEqual({ status: "deny", reason: "membership_mismatch" });
+    expect(state.events.filter((event) => event.eventType === "workspace.organization_reconciled")).toHaveLength(1);
   });
 });

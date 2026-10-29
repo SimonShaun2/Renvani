@@ -156,6 +156,39 @@ export function matchesClerkWorkspaceIntent(
   );
 }
 
+export interface ObservedClerkWorkspaceMembership {
+  organizationId: string;
+  clerkUserId: string;
+}
+
+export type ClerkWorkspaceCreatorProvisioningDecision =
+  | { status: "defer"; reason: "organization_unobserved" | "intent_not_reconciled" | "creator_membership_unobserved" }
+  | { status: "deny"; reason: "organization_mismatch" | "membership_mismatch" }
+  | { status: "allow"; organizationId: string; clerkUserId: string };
+
+/**
+ * Provider-free decision for the initial company/owner grant. Inputs must come from a
+ * verified Clerk Backend API organization observation and authenticated webhook data.
+ * A deferred event needs durable retry or storage before this can be used by the live
+ * webhook handler. A membership arriving first must never choose the owner by order.
+ */
+export function evaluateClerkWorkspaceCreatorProvisioning(
+  intent: Pick<IntentRow, "id" | "clerkUserId" | "attemptId" | "status" | "clerkOrganizationId">,
+  observed: ObservedClerkWorkspaceOrganization | null,
+  membership: ObservedClerkWorkspaceMembership | null
+): ClerkWorkspaceCreatorProvisioningDecision {
+  if (!observed) return { status: "defer", reason: "organization_unobserved" };
+  if (!matchesClerkWorkspaceIntent(intent, observed)) return { status: "deny", reason: "organization_mismatch" };
+  if (intent.status !== "reconciled" || intent.clerkOrganizationId !== observed.id) {
+    return { status: "defer", reason: "intent_not_reconciled" };
+  }
+  if (!membership) return { status: "defer", reason: "creator_membership_unobserved" };
+  if (membership.organizationId !== observed.id || membership.clerkUserId !== intent.clerkUserId) {
+    return { status: "deny", reason: "membership_mismatch" };
+  }
+  return { status: "allow", organizationId: observed.id, clerkUserId: intent.clerkUserId };
+}
+
 /**
  * Reconcile an uncertain or claimed create outcome from a verified Backend API observation.
  * This binds only the intent to an org. It does not create a company or grant owner access.

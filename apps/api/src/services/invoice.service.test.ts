@@ -305,6 +305,40 @@ describe("invoice.service", () => {
     expect(preview.subtotal).toBe("100.00");
   });
 
+  it("createInvoice fromJobId excludes removed job products from lines and subtotal", async () => {
+    const { company, actor } = createAdminContext();
+    const customer = fakeDb.seedCustomer({ companyId: company.id, firstName: "Jo", lastName: "Lee" });
+    const job = fakeDb.seedJob({ companyId: company.id, customerId: customer.id, title: "Repair", status: "completed" });
+    fakeDb.seedJobProduct({
+      companyId: company.id,
+      jobId: job.id,
+      name: "Active repair",
+      quantity: "2.000",
+      unitPrice: "40.00",
+      total: "80.00"
+    });
+    fakeDb.seedJobProduct({
+      companyId: company.id,
+      jobId: job.id,
+      name: "Removed part",
+      quantity: "1.000",
+      unitPrice: "125.00",
+      total: "125.00",
+      deletedAt: new Date("2026-04-28T10:00:00.000Z")
+    });
+
+    const created = await invoiceService.createInvoice(company.id, actor.id, {
+      customerId: customer.id,
+      fromJobId: job.id
+    });
+
+    const items = fakeDb.getTestState().invoiceItems.filter((row) => row.invoiceId === created.id);
+    expect(items).toHaveLength(1);
+    expect(items[0]?.name).toBe("Active repair");
+    expect(items[0]?.total).toBe("80.00");
+    expect(created.subtotal).toBe("80.00");
+  });
+
   it("createInvoice leaves dueAt empty without a company default and keeps explicit items over job lines", async () => {
     const { company, actor } = createAdminContext();
     const { customer, job } = seedInvoiceGraph(company.id);

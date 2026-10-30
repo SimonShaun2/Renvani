@@ -9,8 +9,8 @@ import { ToolDirectory } from "./ToolDirectory";
 const ink = "var(--color-mkt-ink)";
 const ink2 = "var(--color-mkt-ink2)";
 const eyebrow = "text-[11px] font-medium tracking-[1.1px]";
-const section = "mx-auto flex max-w-[1440px] flex-col gap-6 px-6 py-12 md:px-20 md:py-20";
-const h1 = "text-[44px] font-semibold leading-[1.08] tracking-[-1.1px] md:text-[64px] md:tracking-[-1.6px]";
+const section = "mx-auto flex max-w-[1440px] flex-col gap-6 px-6 py-6 md:px-20 md:py-20";
+const h1 = "text-[42px] font-semibold leading-[1.08] tracking-[-1.05px] md:text-[64px] md:tracking-[-1.6px]";
 const h2 = "text-[34px] font-semibold leading-[1.08] tracking-[-0.85px] md:text-[48px] md:tracking-[-1.2px]";
 const pill = `${styles.press} inline-flex min-h-[44px] items-center rounded-full px-5 text-[15px] font-medium`;
 
@@ -87,7 +87,7 @@ export function HowItWorksPage() {
           <div className="grid gap-8 md:grid-cols-2">
             {p.trades.map((t) => (
               <div key={t.eyebrow} className="flex flex-col gap-4">
-                <img src={t.image} alt="" width={1248} height={660} className="h-[240px] w-full rounded-2xl object-cover md:h-[330px]" />
+                <img src={t.image} alt="" width={1248} height={660} className="h-[200px] w-full rounded-2xl object-cover md:h-[280px]" />
                 <p className={eyebrow} style={{ color: ink2 }}>{t.eyebrow}</p>
                 <h3 className="text-[24px] font-semibold md:text-[30px]">{t.title}</h3>
                 <MaybeLink href={t.link.href} className="text-[14px] font-medium" style={{ color: ink2 }}>{t.link.label}</MaybeLink>

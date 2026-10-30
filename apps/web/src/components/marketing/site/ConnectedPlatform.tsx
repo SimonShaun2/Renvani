@@ -118,7 +118,7 @@ export function ConnectedPlatform() {
 
       <div data-node-id="218:104" className="flex flex-col gap-4 rounded-2xl p-5 sm:flex-row sm:items-center" style={{ background: "var(--color-mkt-sand)" }}>
         <p className={`${eyebrow} sm:w-[200px]`} style={{ color: ink2 }}>{record.eyebrow}</p>
-        <ul className="grid flex-1 grid-cols-2 gap-4 text-[13px] font-medium sm:grid-cols-4">
+        <ul className="grid flex-1 grid-cols-1 gap-4 text-[13px] font-medium sm:grid-cols-4">
           {record.items.map((i) => <li key={i}>{i}</li>)}
         </ul>
         <img src="/marketing/platform/icon-open.svg" alt="" width={22} height={22} />

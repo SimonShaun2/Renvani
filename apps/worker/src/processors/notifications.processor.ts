@@ -39,6 +39,10 @@ type TransactionalEmailSendResult = {
 };
 
 interface EmailModule {
+  sendPlanReminderEmail?(
+    to: string,
+    params: { firstName: string; companyName: string; planName: string; dueDateLabel: string; reminderKind: "renewal" | "tune_up" }
+  ): Promise<unknown>;
   sendReviewRequestEmail?(
     to: string,
     params: { firstName: string; companyName: string; technicianName: string | null; reviewUrl: string }
@@ -292,6 +296,35 @@ export interface ReviewRequestSendContext {
   ruleEnabled: boolean;
 }
 
+export interface PlanReminderSendContext {
+  plan: { status: string; deleted: boolean; customerId: string } | null;
+  customer: { prefersEmail: boolean | null; prefersSms: boolean | null; doNotContact: boolean | null } | null;
+  ruleEnabled: boolean;
+}
+
+export type PlanReminderSendSkipReason =
+  | "plan_not_found"
+  | "plan_not_active"
+  | "rule_disabled"
+  | "customer_do_not_contact"
+  | "customer_opted_out";
+
+/** Send-time re-check for plan reminders (the #264 standard): reloaded by companyId just before sending. */
+export function planReminderSendSkipReason(
+  context: PlanReminderSendContext | null,
+  channel: "email" | "sms",
+  customerId: string | null
+): PlanReminderSendSkipReason | null {
+  if (!context?.plan || context.plan.deleted) return "plan_not_found";
+  if (context.plan.status !== "active") return "plan_not_active";
+  if (!context.ruleEnabled) return "rule_disabled";
+  if (!context.customer || (customerId && context.plan.customerId !== customerId)) return "customer_opted_out";
+  if (context.customer.doNotContact === true) return "customer_do_not_contact";
+  const consent = channel === "email" ? context.customer.prefersEmail : context.customer.prefersSms;
+  if (consent !== true) return "customer_opted_out";
+  return null;
+}
+
 export type ReviewRequestSendSkipReason =
   | "request_not_found"
   | "request_not_active"
@@ -338,6 +371,8 @@ export interface NotificationsDependencies {
     recipientId: string
   ): Promise<CampaignDeliveryContext | null>;
   loadCompanyOwner(companyId: string): Promise<CompanyOwnerContext | null>;
+  /** Fresh plan/consent/rule facts for the send-time re-check of a plan reminder. */
+  loadPlanReminderSendContext?(companyId: string, maintenancePlanId: string): Promise<PlanReminderSendContext | null>;
   /** Fresh facts for the send-time re-check of a (possibly delayed) review request. */
   loadReviewRequestSendContext?(
     companyId: string,
@@ -756,6 +791,41 @@ function createProductionDependencies(): Promise<NotificationsDependencies> {
         .limit(1);
 
       return owner ?? null;
+    },
+    async loadPlanReminderSendContext(companyId, maintenancePlanId) {
+      const [plan] = await db
+        .select()
+        .from(maintenancePlans)
+        .where(and(eq(maintenancePlans.companyId, companyId), eq(maintenancePlans.id, maintenancePlanId)))
+        .limit(1);
+      if (!plan) return null;
+      const [customerRows, ruleRows] = await Promise.all([
+        db
+          .select()
+          .from(customers)
+          .where(and(eq(customers.companyId, companyId), eq(customers.id, plan.customerId), isNull(customers.deletedAt)))
+          .limit(1),
+        db
+          .select()
+          .from(automationRules)
+          .where(
+            and(
+              eq(automationRules.companyId, companyId),
+              eq(automationRules.ruleType, "service_agreement_renewal"),
+              eq(automationRules.isEnabled, true),
+              isNull(automationRules.deletedAt)
+            )
+          )
+          .limit(1)
+      ]);
+      const customer = customerRows[0];
+      return {
+        plan: { status: plan.status, deleted: plan.deletedAt !== null, customerId: plan.customerId },
+        customer: customer
+          ? { prefersEmail: customer.prefersEmail, prefersSms: customer.prefersSms, doNotContact: customer.doNotContact }
+          : null,
+        ruleEnabled: ruleRows.length > 0
+      };
     },
     async loadReviewRequestSendContext(companyId, reviewRequestId, invoiceId) {
       const [request] = await db
@@ -1335,6 +1405,52 @@ export async function handleSendOnTheWayNotification(
   });
 }
 
+/** Plan renewal / tune-up reminder (queued by the API with a fixed job id). SMS goes through the provider registry. */
+export async function handleSendPlanReminder(
+  job: Job<Record<string, unknown>>,
+  dependencies: NotificationsDependencies
+): Promise<void> {
+  const data = job.data;
+  const kind = getJobString(data, "reminderKind") === "tune_up" ? "tune_up" : "renewal";
+  const log = { jobId: job.id ?? null, companyId: getJobString(data, "companyId"), maintenancePlanId: getJobString(data, "maintenancePlanId"), kind };
+  const channel = getJobString(data, "channel") === "sms" ? "sms" : "email";
+  if (dependencies.loadPlanReminderSendContext) {
+    const companyId = getJobString(data, "companyId");
+    const maintenancePlanId = getJobString(data, "maintenancePlanId");
+    const context =
+      companyId && maintenancePlanId ? await dependencies.loadPlanReminderSendContext(companyId, maintenancePlanId) : null;
+    const skip = planReminderSendSkipReason(context, channel, getJobString(data, "customerId"));
+    if (skip) {
+      logger.info({ ...log, channel, reason: skip }, "Plan reminder skipped at send time");
+      return;
+    }
+  }
+  if (getJobString(data, "channel") === "sms") {
+    const phone = getJobString(data, "customerPhone");
+    const body = getJobString(data, "smsBody");
+    if (!phone || !body) {
+      logger.warn(log, "Plan reminder SMS job missing required data");
+      return;
+    }
+    await dependencies.sms.sendSms(phone, body);
+    logger.info(log, "Plan reminder SMS processed");
+    return;
+  }
+  const to = getJobString(data, "customerEmail");
+  if (!to || !dependencies.email.sendPlanReminderEmail) {
+    logger.warn(log, "Plan reminder email job missing required data");
+    return;
+  }
+  await dependencies.email.sendPlanReminderEmail(to, {
+    firstName: getJobString(data, "firstName") ?? "",
+    companyName: getJobString(data, "companyName") ?? "",
+    planName: getJobString(data, "planName") ?? "maintenance plan",
+    dueDateLabel: getJobString(data, "dueDateLabel") ?? "",
+    reminderKind: kind
+  });
+  logger.info(log, "Plan reminder email sent");
+}
+
 export async function handleSendReviewRequest(
   job: Job<Record<string, unknown>>,
   dependencies: NotificationsDependencies
@@ -1638,6 +1754,9 @@ export function createNotificationsProcessor(
         return;
       case "send-review-request":
         await handleSendReviewRequest(job, dependencies);
+        return;
+      case "send-plan-reminder":
+        await handleSendPlanReminder(job, dependencies);
         return;
       case "send-booking-request-alert":
       case "send-booking-confirmation":

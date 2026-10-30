@@ -49,7 +49,7 @@ export function BrandedStorefront({ model, previewBanner }: BrandedStorefrontPro
           href={bookHref}
           className={`hidden h-11 items-center justify-center rounded-[10px] px-[18px] text-sm font-semibold text-white lg:inline-flex ${PRIMARY}`}
         >
-          Book a clean
+          Book a visit
         </Link>
       </header>
 

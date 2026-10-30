@@ -50,7 +50,7 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
   const [addressLine1, setAddressLine1] = useState("");
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
-  const [serviceInterest, setServiceInterest] = useState(initialService ?? model.serviceCards[0]?.title ?? "Standard clean");
+  const [serviceInterest, setServiceInterest] = useState(initialService ?? model.serviceCards[0]?.title ?? "Heating & cooling repair");
   const [notes, setNotes] = useState("");
   const [smsConsentAppointments, setSmsConsentAppointments] = useState(false);
   const [smsConsentMarketing, setSmsConsentMarketing] = useState(false);
@@ -100,7 +100,7 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
           state: state.trim().toUpperCase().slice(0, 2),
           zip: zip.trim(),
           propertyType: "residential",
-          serviceCategory: "Cleaning",
+          serviceCategory: "Home services",
           serviceType: serviceInterest,
           customerNotes: `[Branded site inquiry] ${notes.trim()}`.trim(),
           urgency: "flexible",
@@ -277,7 +277,7 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
             onChange={(event) => setSmsConsentMarketing(event.target.checked)}
             className="mt-0.5"
           />
-          <span>Optional: send me occasional offers and cleaning tips by text.</span>
+          <span>Optional: send me occasional offers and maintenance reminders by text.</span>
         </label>
       </fieldset>
 

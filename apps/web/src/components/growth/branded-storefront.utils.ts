@@ -41,11 +41,12 @@ export interface LocalBusinessJsonLd {
   aggregateRating?: { "@type": "AggregateRating"; ratingValue: number; reviewCount: number };
 }
 
-const CLEANING_FALLBACK_CARDS: BrandedServiceCard[] = [
-  { id: "standard", title: "Standard clean", subtitle: "from $129" },
-  { id: "deep", title: "Deep clean", subtitle: "from $219" },
-  { id: "move", title: "Move-in / move-out", subtitle: "from $289" },
-  { id: "recurring", title: "Recurring", subtitle: "save 10%" }
+/** Generic home-services cards (HVAC, plumbing, electrical) shown until the shop lists its services. */
+const HOME_SERVICES_FALLBACK_CARDS: BrandedServiceCard[] = [
+  { id: "hvac", title: "Heating & cooling repair", subtitle: "Diagnostic visit" },
+  { id: "plumbing", title: "Plumbing repair", subtitle: "Diagnostic visit" },
+  { id: "electrical", title: "Electrical repair", subtitle: "Diagnostic visit" },
+  { id: "maintenance", title: "Seasonal maintenance", subtitle: "Tune-up visit" }
 ];
 
 function readServiceLabel(service: Record<string, unknown>): string | null {
@@ -124,7 +125,7 @@ export function buildServiceCards(offeredServices: Array<Record<string, unknown>
   }
 
   if (cards.length === 0) {
-    return CLEANING_FALLBACK_CARDS;
+    return HOME_SERVICES_FALLBACK_CARDS;
   }
 
   return cards.slice(0, 4);
@@ -148,7 +149,7 @@ export function buildBrandedStorefrontViewModel(
   settings: PublicBookingSettingsRecord,
   options?: { staffPreviewLine?: string }
 ): BrandedStorefrontViewModel {
-  const companyName = settings.companyName.trim() || "Your cleaning team";
+  const companyName = settings.companyName.trim() || "Your service team";
   const tagline =
     settings.tagline?.trim() ||
     "Instant prices, real crew availability, and booking in under a minute. Same trusted crew every visit.";

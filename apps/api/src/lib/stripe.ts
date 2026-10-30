@@ -47,6 +47,10 @@ export interface CreateInvoiceCheckoutSessionInput {
   paymentToken: string;
   /** Tenant's Renvani plan; Flat pays no Service Fee (no Service Fee line is sent to Stripe). */
   renvaniPlan: RenvaniPlanId | null;
+  /** Force Stripe-hosted Checkout (public pay fallback) regardless of the embedded-checkout flag. */
+  forceHosted?: boolean;
+  /** Stripe idempotency key for the session create (concurrent identical requests reuse one session). */
+  idempotencyKey?: string;
 }
 
 export interface InvoiceCheckoutSessionResult {
@@ -253,8 +257,9 @@ export async function createInvoiceCheckoutSession(
     invoiceNumber: input.invoiceNumber
   };
 
+  const embedded = useEmbeddedCheckout && input.forceHosted !== true;
   const session = await stripe.checkout.sessions.create(
-    useEmbeddedCheckout
+    embedded
       ? {
           mode: "payment",
           ui_mode: "embedded",
@@ -281,10 +286,11 @@ export async function createInvoiceCheckoutSession(
               message: `Secure payment processed by ${RENVANI_STRIPE_BRAND.platformName}.`
             }
           }
-        }
+        },
+    input.idempotencyKey ? { idempotencyKey: input.idempotencyKey } : undefined
   );
 
-  if (useEmbeddedCheckout) {
+  if (embedded) {
     if (!session.client_secret) {
       throw new Error("Stripe embedded checkout session did not return client_secret");
     }
@@ -319,6 +325,32 @@ export async function retrieveInvoiceCheckoutClientSecret(sessionId: string): Pr
 
 export async function expireInvoiceCheckoutSession(sessionId: string): Promise<void> {
   await stripe.checkout.sessions.expire(sessionId);
+}
+
+export interface InvoiceCheckoutSessionSnapshot {
+  id: string;
+  uiMode: "hosted" | "embedded" | string | null;
+  /** open | complete | expired */
+  status: string | null;
+  paymentStatus: string | null;
+  url: string | null;
+  expiresAt: Date | null;
+  invoiceId: string | null;
+  companyId: string | null;
+}
+
+export async function retrieveInvoiceCheckoutSession(sessionId: string): Promise<InvoiceCheckoutSessionSnapshot> {
+  const session = await stripe.checkout.sessions.retrieve(sessionId);
+  return {
+    id: session.id,
+    uiMode: session.ui_mode ?? null,
+    status: session.status ?? null,
+    paymentStatus: session.payment_status ?? null,
+    url: session.url ?? null,
+    expiresAt: typeof session.expires_at === "number" ? new Date(session.expires_at * 1000) : null,
+    invoiceId: session.metadata?.invoiceId ?? null,
+    companyId: session.metadata?.companyId ?? null
+  };
 }
 
 export async function createServiceAgreementPrice(

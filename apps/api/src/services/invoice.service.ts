@@ -340,7 +340,8 @@ function applyPaymentToInvoice(invoice: InvoiceRow, paymentAmount: Decimal): {
 }
 
 function resolveStripePaymentMethod(paymentIntent: Stripe.PaymentIntent): PaymentMethod {
-  const paymentMethodType = paymentIntent.payment_method_types[0];
+  // Guard: some events/fixtures omit payment_method_types; never crash payment recording on it.
+  const paymentMethodType = paymentIntent.payment_method_types?.[0];
 
   switch (paymentMethodType) {
     case "card":

@@ -55,6 +55,7 @@ type TableName =
   | "bookingSettings"
   | "agentActions"
   | "inquirySubmitIdempotency"
+  | "serviceAreas"
   | "growthIntakeChecks"
   | "growthIntakeIdentityCandidates"
   | "growthIntakeFindings"
@@ -2030,6 +2031,18 @@ export interface TestAgentActionRecord {
   deletedAt: Date | null;
 }
 
+export interface TestServiceAreaRecord {
+  id: string;
+  companyId: string;
+  name: string;
+  zips: string[] | null;
+  notes: string | null;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date | null;
+}
+
 export interface TestInquirySubmitIdempotencyRecord {
   id: string;
   companyId: string;
@@ -2122,6 +2135,7 @@ type AnyTestRecord =
   | TestFieldSyncBatchRecord
   | TestFieldSyncOperationRecord
   | TestInquirySubmitIdempotencyRecord
+  | TestServiceAreaRecord
   | TestGrowthIntakeCheckRecord
   | TestGrowthIntakeIdentityCandidateRecord
   | TestGrowthIntakeFindingRecord
@@ -2175,6 +2189,7 @@ type MockTable =
   | typeof bookingSettingsTable
   | typeof agentActionsTable
   | typeof inquirySubmitIdempotencyTable
+  | typeof serviceAreasTable
   | typeof growthIntakeChecksTable
   | typeof growthIntakeIdentityCandidatesTable
   | typeof growthIntakeFindingsTable
@@ -2234,6 +2249,7 @@ interface TestState {
   bookingSettings: TestBookingSettingsRecord[];
   agentActions: TestAgentActionRecord[];
   inquirySubmitIdempotency: TestInquirySubmitIdempotencyRecord[];
+  serviceAreas: TestServiceAreaRecord[];
   growthIntakeChecks: TestGrowthIntakeCheckRecord[];
   growthIntakeIdentityCandidates: TestGrowthIntakeIdentityCandidateRecord[];
   growthIntakeFindings: TestGrowthIntakeFindingRecord[];
@@ -3520,6 +3536,19 @@ const agentActionsTable = {
   deletedAt: "deletedAt"
 } as const;
 
+const serviceAreasTable = {
+  __name: "serviceAreas",
+  id: "id",
+  companyId: "companyId",
+  name: "name",
+  zips: "zips",
+  notes: "notes",
+  isActive: "isActive",
+  createdAt: "createdAt",
+  updatedAt: "updatedAt",
+  deletedAt: "deletedAt"
+} as const;
+
 const inquirySubmitIdempotencyTable = {
   __name: "inquirySubmitIdempotency",
   id: "id",
@@ -3686,6 +3715,7 @@ const state: TestState = {
   bookingSettings: [],
   agentActions: [],
   inquirySubmitIdempotency: [],
+  serviceAreas: [],
   growthIntakeChecks: [],
   growthIntakeIdentityCandidates: [],
   growthIntakeFindings: [],
@@ -3752,6 +3782,7 @@ function restoreState(snapshot: TestState): void {
   state.bookingRequests.splice(0, state.bookingRequests.length, ...snapshot.bookingRequests);
   state.bookingSettings.splice(0, state.bookingSettings.length, ...snapshot.bookingSettings);
   state.agentActions.splice(0, state.agentActions.length, ...snapshot.agentActions);
+  state.serviceAreas.splice(0, state.serviceAreas.length, ...(snapshot.serviceAreas ?? []));
   state.inquirySubmitIdempotency.splice(
     0,
     state.inquirySubmitIdempotency.length,
@@ -3873,6 +3904,8 @@ function getRows(tableName: TableName): AnyTestRecord[] {
       return state.agentActions;
     case "inquirySubmitIdempotency":
       return state.inquirySubmitIdempotency;
+    case "serviceAreas":
+      return state.serviceAreas;
     case "growthIntakeChecks":
       return state.growthIntakeChecks;
     case "growthIntakeIdentityCandidates":
@@ -5124,6 +5157,31 @@ function createBookingSettingsRecord(
   };
 }
 
+function createServiceAreaRecord(
+  values: Partial<TestServiceAreaRecord> & Pick<TestServiceAreaRecord, "companyId" | "name">
+): TestServiceAreaRecord {
+  const now = new Date();
+  return {
+    id: values.id ?? nextId(),
+    companyId: values.companyId,
+    name: values.name,
+    zips: values.zips ?? [],
+    notes: values.notes ?? null,
+    isActive: values.isActive ?? true,
+    createdAt: values.createdAt ?? now,
+    updatedAt: values.updatedAt ?? now,
+    deletedAt: values.deletedAt ?? null
+  };
+}
+
+export function seedServiceArea(
+  values: Partial<TestServiceAreaRecord> & Pick<TestServiceAreaRecord, "companyId" | "name">
+): TestServiceAreaRecord {
+  const record = createServiceAreaRecord(values);
+  state.serviceAreas.push(record);
+  return record;
+}
+
 function createInquirySubmitIdempotencyRecord(
   values: Partial<TestInquirySubmitIdempotencyRecord> &
     Pick<
@@ -5588,6 +5646,10 @@ function createRow(tableName: TableName, values: Record<string, unknown>): AnyTe
       return createBookingSettingsRecord(
         values as Partial<TestBookingSettingsRecord> & Pick<TestBookingSettingsRecord, "companyId">
       );
+    case "serviceAreas": {
+      const v = values as Partial<TestServiceAreaRecord> & Pick<TestServiceAreaRecord, "companyId" | "name">;
+      return createServiceAreaRecord(v);
+    }
     case "inquirySubmitIdempotency":
       return createInquirySubmitIdempotencyRecord(
         values as Partial<TestInquirySubmitIdempotencyRecord> &
@@ -5995,6 +6057,7 @@ export const agentActions = agentActionsTable;
 export const fieldSyncBatches = fieldSyncBatchesTable;
 export const fieldSyncOperations = fieldSyncOperationsTable;
 export const inquirySubmitIdempotency = inquirySubmitIdempotencyTable;
+export const serviceAreas = serviceAreasTable;
 export const growthIntakeChecks = growthIntakeChecksTable;
 export const growthIntakeIdentityCandidates = growthIntakeIdentityCandidatesTable;
 export const growthIntakeFindings = growthIntakeFindingsTable;
@@ -6443,6 +6506,7 @@ export function createDbModuleMock() {
     fieldSyncBatches,
     fieldSyncOperations,
     inquirySubmitIdempotency,
+    serviceAreas,
     growthIntakeChecks,
     growthIntakeIdentityCandidates,
     growthIntakeFindings,
@@ -6511,6 +6575,7 @@ export function resetTestState(): void {
   state.fieldSyncBatches.length = 0;
   state.fieldSyncOperations.length = 0;
   state.inquirySubmitIdempotency.length = 0;
+  state.serviceAreas.length = 0;
   state.growthIntakeChecks.length = 0;
   state.growthIntakeIdentityCandidates.length = 0;
   state.growthIntakeFindings.length = 0;

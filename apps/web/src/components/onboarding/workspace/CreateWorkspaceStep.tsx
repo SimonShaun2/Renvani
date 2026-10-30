@@ -101,13 +101,13 @@ export function CreateWorkspaceStep() {
         lookupPending = true;
         const matches: string[] = [];
         let pageNumber = 1;
-        do {
+        for (;;) {
           const page = await user.getOrganizationMemberships({ pageSize: 100, initialPage: pageNumber });
           if (currentUserId.current !== requestUserId) return;
           matches.push(...page.data.filter((membership) => membership.organization.name.trim().toLocaleLowerCase() === trimmed.toLocaleLowerCase()).map((membership) => membership.organization.id));
           if (pageNumber * 100 >= page.total_count || page.data.length === 0) break;
           pageNumber += 1;
-        } while (true);
+        }
         lookupPending = false;
         if (matches.length > 1) {
           setErrorKind("reconcile");

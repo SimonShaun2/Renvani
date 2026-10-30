@@ -294,6 +294,8 @@ export interface PublicInvoicePaymentLink {
   feeRefundable: boolean;
   /** Service Fee percent (2); kept for back-compat with the old Flex-only fee. */
   platformFeePercent: number | null;
+  /** Same as platformFeePercent under the customer-facing "Service Fee" name. */
+  serviceFeePercent?: number | null;
   platformFeePaidByCustomer: boolean;
   /** Optional disclosure from `CUSTOMER_PLATFORM_FEE_DISCLOSURE` (empty = omit). */
   platformFeeDisclosure: string | null;

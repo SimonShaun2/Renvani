@@ -75,6 +75,7 @@ function buildStripeConnectStatus(
       lastPayoutAmount: snapshot.lastPayoutAmount,
       lastPayoutAt: snapshot.lastPayoutAt,
       platformFeePercent: resolveCompanyServiceFeePercent(company),
+      serviceFeePercent: resolveCompanyServiceFeePercent(company),
       renvaniPlanTier: readRenvaniSubscriptionPlan(company)
     };
   }
@@ -88,6 +89,7 @@ function buildStripeConnectStatus(
     detailsSubmitted: storedSettings.detailsSubmitted ?? false,
     stripeAccountId: company.stripeAccountId,
     platformFeePercent: resolveCompanyServiceFeePercent(company),
+    serviceFeePercent: resolveCompanyServiceFeePercent(company),
     renvaniPlanTier: readRenvaniSubscriptionPlan(company)
   };
 }

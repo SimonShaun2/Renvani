@@ -46,7 +46,10 @@ const ownerAdminNavigation: RoleNavigation = {
     { label: "AI Revenue Center", href: "/ai-revenue-center", icon: Sparkles },
     { label: "Command Center", href: "/command-center", icon: Inbox }
   ],
-  growth: [{ label: "Settings", href: "/settings", icon: Settings }]
+  growth: [
+    { label: "Booking requests", href: "/booking-requests", icon: Inbox },
+    { label: "Settings", href: "/settings", icon: Settings }
+  ]
 };
 
 const dispatcherNavigation: RoleNavigation = {
@@ -58,7 +61,10 @@ const dispatcherNavigation: RoleNavigation = {
     { label: "Invoices", href: "/invoices", icon: CreditCard },
     { label: "Command Center", href: "/command-center", icon: Inbox }
   ],
-  growth: [{ label: "Settings", href: "/settings", icon: Settings }]
+  growth: [
+    { label: "Booking requests", href: "/booking-requests", icon: Inbox },
+    { label: "Settings", href: "/settings", icon: Settings }
+  ]
 };
 
 export function getSidebarNavigation(role: UserRole): RoleNavigation {
@@ -97,6 +103,7 @@ export const bookingSettingsNavigation: NavItem[] = [
   { label: "Availability", href: "/settings/booking/availability", icon: CalendarDays },
   { label: "Booking Links", href: "/settings/booking/links", icon: MessageSquareText },
   { label: "Service Areas", href: "/settings/booking/service-areas", icon: Users },
+  { label: "Service area & emergency", href: "/settings/booking/service-area-emergency", icon: Users },
   { label: "Notifications", href: "/settings/booking/notifications", icon: MessageSquareText },
   { label: "Appearance", href: "/settings/booking/appearance", icon: Settings }
 ];

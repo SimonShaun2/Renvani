@@ -620,7 +620,8 @@ const LINK_SLUGS: Record<string, string> = {
   "inquiry & follow-up": "inquiry-response-follow-up",
   jobs: "jobs-work-orders",
   "time & photos": "time-tracking-job-photos",
-  "reminder emails": "reminders-win-backs"
+  "reminder emails": "reminders-win-backs",
+  "job source reporting": "reporting-job-sources" // CoS: Growth card item -> Reporting & Job Sources page
 };
 
 export function productLinkFor(label: string): string | null {

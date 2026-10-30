@@ -109,7 +109,7 @@ export const MARKETING_SITEMAP_PATHS = [
   { path: "/", priority: 1 },
   { path: "/product", priority: 0.9 },
   { path: "/how-it-works", priority: 0.9 },
-  ...["growth", "revenue", "operations", "retention", "command-center", "online-booking", "estimates-approvals", "scheduling-dispatch"].map((slug) => ({ path: `/product/${slug}`, priority: 0.8 })),
+  ...["growth", "revenue", "operations", "retention", "command-center", "online-booking", "estimates-approvals", "scheduling-dispatch", "technician-app", "invoices-payments", "service-agreements", "ai-revenue-intelligence", "customers-properties-assets", "onboarding-data-import", "inquiry-response-follow-up", "jobs-work-orders", "time-tracking-job-photos", "reminders-win-backs", "reporting-job-sources", "websites", "price-book-service-catalog", "customer-portal"].map((slug) => ({ path: `/product/${slug}`, priority: 0.8 })),
   { path: "/pricing", priority: 0.8 },
   { path: "/industries", priority: 0.8 },
   ...["hvac", "plumbing", "electrical"].map((slug) => ({ path: `/industries/${slug}`, priority: 0.7 }))

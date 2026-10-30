@@ -10,12 +10,15 @@ import {
   type InquiryServiceability,
   type PublicInquirySubmitResult,
   type StaffInquiryIntakeInput,
-  type SubmitBookingRequestInput
+  type SubmitBookingRequestInput,
+  readEmergencyServiceSettings,
+  resolveEmergencyRequest
 } from "@fsm/types";
 
 import {
   checkZipCoverage,
   createCompanyScopedInquiryBooking,
+  getPublicBookingCompany,
   resolvePublicBookingCompanyId,
   submitBookingRequest
 } from "./booking.service.js";
@@ -179,6 +182,11 @@ async function buildInquiryFromRow(
   });
 }
 
+function companyTrade(settings: unknown): string | null {
+  const trade = settings && typeof settings === "object" ? (settings as Record<string, unknown>).trade : null;
+  return typeof trade === "string" ? trade : null;
+}
+
 export async function submitPublicInquiryIntake(
   slug: string,
   body: SubmitBookingRequestInput,
@@ -211,7 +219,21 @@ export async function submitPublicInquiryIntake(
     }
   }
 
-  const submitResult = await submitBookingRequest(slug, body, sourceParam);
+  // 24/7 emergency: accepted only when the shop has emergency service on (and its trade is emergency-capable);
+  // otherwise downgraded to a normal request and reported back as `emergency.downgraded` (never rejected).
+  const shopSettings = (await getPublicBookingCompany(slug)).settings;
+  const emergency = resolveEmergencyRequest(
+    body.emergency === true,
+    readEmergencyServiceSettings(shopSettings),
+    companyTrade(shopSettings)
+  );
+  const { emergency: _emergencyFlag, ...bookingBody } = body;
+  const effectiveBody: SubmitBookingRequestInput = emergency.accepted
+    ? { ...bookingBody, urgency: "emergency" }
+    : emergency.downgraded && bookingBody.urgency === "emergency"
+      ? { ...bookingBody, urgency: "this_week" }
+      : bookingBody;
+  const submitResult = await submitBookingRequest(slug, effectiveBody, sourceParam);
   const [row] = await db
     .select()
     .from(bookingRequests)
@@ -253,7 +275,8 @@ export async function submitPublicInquiryIntake(
     },
     confirmation: submitResult.confirmation,
     holdToken: submitResult.holdToken,
-    inquiry
+    inquiry,
+    ...(emergency.requested ? { emergency } : {})
   };
 
   if (idempotencyKey) {

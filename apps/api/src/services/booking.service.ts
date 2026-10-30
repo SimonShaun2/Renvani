@@ -36,7 +36,8 @@ import {
   type SubmitBookingRequestInput,
   type UpdateBookingSettingsInput,
   type BookingRequestStatus,
-  ErrorCode
+  ErrorCode,
+  readEmergencyServiceSettings
 } from "@fsm/types";
 
 import {
@@ -187,6 +188,7 @@ function toPublicBookingSettings(
     facebookReviewUrl: row.facebookReviewUrl,
     customReviewUrl: row.customReviewUrl,
     tagline: row.tagline,
+    emergencyService: readEmergencyServiceSettings(company.settings),
     phone: company.phone,
     logoUrl: company.logoUrl,
     serviceAreaZipCodes,
@@ -825,6 +827,12 @@ function buildAvailabilityWindowsForDay(
   });
 }
 
+/** Company behind an enabled public booking slug (404 otherwise). */
+export async function getPublicBookingCompany(slug: string): Promise<CompanyRow> {
+  const { company } = await getCompanyByBookingSlug(slug, db);
+  return company;
+}
+
 export async function resolvePublicBookingCompanyId(slug: string): Promise<string> {
   const { settings } = await getCompanyByBookingSlug(slug, db);
   return settings.companyId;
@@ -964,7 +972,12 @@ export async function listBookingRequests(
   const filteredRows = rows
     .filter((row) => (query.status ? row.status === query.status : true))
     .filter((row) => (query.source ? row.source === query.source : true))
-    .sort((left, right) => right.createdAt.getTime() - left.createdAt.getTime());
+    // Lead inbox: emergency (24/7) requests first, then newest first.
+    .sort(
+      (left, right) =>
+        Number(right.urgency === "emergency") - Number(left.urgency === "emergency") ||
+        right.createdAt.getTime() - left.createdAt.getTime()
+    );
   const total = filteredRows.length;
   const totalPages = total === 0 ? 1 : Math.ceil(total / limit);
   const offset = (page - 1) * limit;
@@ -1524,7 +1537,8 @@ export async function submitBookingRequest(
       customerId: customer.id,
       payload: {
         source,
-        zip: bookingRequest.zip
+        zip: bookingRequest.zip,
+        ...(bookingRequest.urgency === "emergency" ? { emergency: true } : {})
       },
       summary: `Booking request ${bookingRequest.referenceNumber ?? bookingRequest.id} submitted`
     });

@@ -60,6 +60,8 @@ export interface PublicBookingSettings {
   facebookReviewUrl: string | null;
   customReviewUrl: string | null;
   tagline: string | null;
+  /** Read-only 24/7 emergency availability (company settings). */
+  emergencyService?: { enabled: boolean; hoursText: string | null };
   phone: string | null;
   logoUrl: string | null;
   serviceAreaZipCodes: string[];

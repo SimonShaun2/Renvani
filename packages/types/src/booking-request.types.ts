@@ -76,6 +76,8 @@ export interface SubmitBookingRequestInput {
   serviceType?: string;
   serviceDetail?: string;
   urgency?: BookingUrgency;
+  /** 24/7 emergency request from the public site; downgraded when the shop has emergency service off. */
+  emergency?: boolean;
   customerNotes?: string;
   preferredDate?: string;
   preferredWindow?: PreferredBookingWindow;

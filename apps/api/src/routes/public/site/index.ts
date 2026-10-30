@@ -12,7 +12,7 @@ import {
 } from "../../../services/public-service-inquiry.logic.js";
 import { intakeServicePageInquiry } from "../../../services/revenue-inquiry-intake.service.js";
 
-const SLUG_PATTERN = /^[a-z0-9](?:[a-z0-9-]{0,98}[a-z0-9])?$/u;
+import { publicSiteSlugParamsSchema, serviceInquiryBodySchema, zodIssuesToFieldErrors } from "./schemas.js";
 
 const errorBody = {
   type: "object",
@@ -78,10 +78,16 @@ function notFound(request: FastifyRequest, reply: FastifyReply): FastifyReply {
 }
 
 async function submitServiceInquiryHandler(request: FastifyRequest, reply: FastifyReply): Promise<FastifyReply> {
-  const slug = String((request.params as { slug?: string }).slug ?? "").trim().toLowerCase();
-  if (!SLUG_PATTERN.test(slug)) {
-    return notFound(request, reply);
+  const params = publicSiteSlugParamsSchema.safeParse(request.params);
+  if (!params.success) {
+    return reply.status(400).send({
+      error: "VALIDATION_ERROR",
+      message: "Please fix the highlighted fields.",
+      errors: zodIssuesToFieldErrors(params.error),
+      requestId: request.id
+    });
   }
+  const slug = params.data.slug;
 
   const limit = await checkPublicInquiryRateLimit(request.ip, slug);
   if (!limit.allowed) {
@@ -97,6 +103,16 @@ async function submitServiceInquiryHandler(request: FastifyRequest, reply: Fasti
   if (validation.honeypot) {
     request.log.info({ slug }, "public service inquiry honeypot tripped; nothing created");
     return reply.status(201).send({ inquiry: { status: "received", referenceNumber: decoyReferenceNumber() } });
+  }
+  // AGENTS.md rule 7: strict zod shape gate (unknown keys / wrong types) after the honeypot check, so bots still get the decoy.
+  const shape = serviceInquiryBodySchema.safeParse(request.body);
+  if (!shape.success) {
+    return reply.status(400).send({
+      error: "VALIDATION_ERROR",
+      message: "Please fix the highlighted fields.",
+      errors: zodIssuesToFieldErrors(shape.error),
+      requestId: request.id
+    });
   }
   if (!validation.ok) {
     return reply.status(400).send({

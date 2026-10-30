@@ -157,8 +157,42 @@ describe("POST /api/v1/public/site/:slug/inquiry", () => {
 
   it("returns 404 for an unknown or disabled shop", async () => {
     expect((await post("no-such-shop", valid)).statusCode).toBe(404);
-    expect((await post("Bad Slug!", valid)).statusCode).toBe(404);
     expect(fakeDb.getTestState().bookingRequests).toHaveLength(0);
+  });
+
+  it("zod: malformed slug -> 400 VALIDATION_ERROR with the standard shape", async () => {
+    const res = await post("Bad%20Slug!", valid);
+    expect(res.statusCode).toBe(400);
+    const body = res.json();
+    expect(Object.keys(body).sort()).toEqual(["error", "errors", "message", "requestId"]);
+    expect(body.error).toBe("VALIDATION_ERROR");
+    expect(body.errors).toEqual([expect.objectContaining({ field: "slug" })]);
+    expect((await post("-acme", valid)).statusCode).toBe(400);
+  });
+
+  it("zod: unknown keys and wrong types are rejected with 400 and nothing is created", async () => {
+    const before = fakeDb.getTestState().customers.length;
+    const res = await post("acme-hvac", { ...valid, companyId: "x", isAdmin: true });
+    expect(res.statusCode).toBe(400);
+    expect(res.json().errors).toEqual(
+      expect.arrayContaining([
+        { field: "companyId", message: "Unknown field" },
+        { field: "isAdmin", message: "Unknown field" }
+      ])
+    );
+    const typed = await post("acme-hvac", { ...valid, phone: 5125550100 });
+    expect(typed.statusCode).toBe(400);
+    expect(typed.json().errors).toEqual(expect.arrayContaining([{ field: "phone", message: "phone must be a string" }]));
+    expect((await post("acme-hvac", ["not", "an", "object"])).statusCode).toBe(400);
+    expect(fakeDb.getTestState().customers.length).toBe(before);
+  });
+
+  it("honeypot unchanged: decoy 201 even when the bot also sends unknown keys", async () => {
+    const before = fakeDb.getTestState().customers.length;
+    const res = await post("acme-hvac", { ...valid, website: "http://spam.example", extra: "x" });
+    expect(res.statusCode).toBe(201);
+    expect(res.json().inquiry.status).toBe("received");
+    expect(fakeDb.getTestState().customers.length).toBe(before);
   });
 
   it("scopes the service-area check to the resolved shop", async () => {

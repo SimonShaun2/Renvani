@@ -37,7 +37,7 @@ export const TRADE_SERVICE_CATALOG: Record<HomeServiceTrade, readonly TradeServi
     svc("hvac", "ac_repair", "AC repair", "Cooling", true),
     svc("hvac", "ac_install", "AC installation", "Cooling"),
     svc("hvac", "furnace_repair", "Furnace repair", "Heating", true),
-    svc("hvac", "furnace_tune_up", "Furnace tune-up", "Maintenance"),
+    svc("hvac", "furnace_tune_up", "Furnace tune-up", "Service and repair"),
     svc("hvac", "furnace_install", "Furnace installation", "Heating"),
     svc("hvac", "heat_pump", "Heat pump service", "Heating"),
     svc("hvac", "duct_cleaning", "Duct cleaning", "Air quality")
@@ -60,7 +60,7 @@ export const TRADE_SERVICE_CATALOG: Record<HomeServiceTrade, readonly TradeServi
   ],
   other: [
     svc("other", "repair", "Repair visit", "General"),
-    svc("other", "maintenance", "Maintenance visit", "General"),
+    svc("other", "service_repair", "Service and repair visit", "General"),
     svc("other", "estimate", "Free estimate", "General")
   ]
 };

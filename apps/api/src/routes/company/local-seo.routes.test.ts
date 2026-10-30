@@ -190,6 +190,19 @@ describe("public structured-data endpoint", () => {
   });
 });
 
+describe("structured-data rate limit", () => {
+  it("allows 30 requests/min per IP, then 429 with Retry-After; other IPs unaffected", async () => {
+    seedPublicShop("seo-rl", { trade: "hvac" });
+    const get = (ip: string) => app.inject({ method: "GET", url: "/api/v1/public/site/seo-rl/structured-data", remoteAddress: ip });
+    for (let i = 0; i < 30; i += 1) expect((await get("203.0.113.77")).statusCode).toBe(200);
+    const limited = await get("203.0.113.77");
+    expect(limited.statusCode).toBe(429);
+    expect(limited.json().error).toBe("RATE_LIMITED");
+    expect(Number(limited.headers["retry-after"])).toBeGreaterThan(0);
+    expect((await get("203.0.113.78")).statusCode).toBe(200);
+  });
+});
+
 describe("PATCH /company settings lock", () => {
   it("concurrent locked settings-key save + PATCH company: settings.trade and the other key both survive", async () => {
     const a = shop("lock-a", { trade: "plumbing", currency: "USD" });

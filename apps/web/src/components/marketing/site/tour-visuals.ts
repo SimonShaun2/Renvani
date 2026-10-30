@@ -393,7 +393,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                    "c": "font-medium leading-[1.38] relative text-[15.87px] text-[color:#0f1530] w-full",
                    "id": "I217:6328;200:75",
                    "k": [
-                    "Next available day"
+                    "Thursday, October 29"
                    ]
                   },
                   {
@@ -669,7 +669,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#2a3360] w-full",
                "id": "217:6354",
                "k": [
-                "Next available day"
+                "Thursday, October 29"
                ]
               },
               {
@@ -1941,7 +1941,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                  "c": "font-medium relative w-[169.244px] shrink-0",
                  "id": "I204:10062;200:148",
                  "k": [
-                  "TODAY"
+                  "THU 29 OCT"
                  ]
                 },
                 {
@@ -2366,7 +2366,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#2a3360] w-full",
                "id": "206:7232",
                "k": [
-                "TODAY · YOUR TEAM"
+                "THU 29 OCT · YOUR TEAM"
                ]
               },
               {

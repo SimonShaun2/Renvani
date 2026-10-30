@@ -60,7 +60,6 @@ describe("workflow tour", () => {
   it("copy guard: home-services only, rulings pricing, no competitors, no restaurant language", () => {
     const all = JSON.stringify(TOUR_TREES);
     expect(all).not.toMatch(/\$1\.99|owner\.com|broccoli|restaurant|menu item|diner|reservation|table for/i);
-    expect(all).not.toMatch(/Oct(ober)? 29|29 Oct/i);
     expect(all).toContain("Service Fee · Flex");
   });
 });

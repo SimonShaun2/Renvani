@@ -144,16 +144,7 @@ export async function requestPlanReminder(event: PlanReminderEvent, now: Date = 
     const onceKey = `fsm:plan-reminder:once:${jobId}`;
     if (!(await claimOnce(onceKey))) return { status: "skipped", reason: "already_sent" };
 
-    const customerHit = await hitFixedWindowRateLimit({
-      key: `fsm:plan-reminder:rate:customer:${customer.id}`,
-      limit: 1,
-      windowMs: settings.customerCooldownDays * DAY_MS
-    });
-    if (!customerHit.allowed) {
-      await releaseClaim(onceKey);
-      logger.info(log, "Plan reminder folded (customer cooldown); retried on a later scan");
-      return { status: "skipped", reason: "customer_rate_limited" };
-    }
+    // Company daily cap first, so a cap-held reminder never consumes the customer cooldown.
     const companyHit = await hitFixedWindowRateLimit({
       key: `fsm:plan-reminder:rate:company:${event.companyId}`,
       limit: settings.companyDailyLimit,
@@ -165,13 +156,24 @@ export async function requestPlanReminder(event: PlanReminderEvent, now: Date = 
       return { status: "skipped", reason: "company_rate_limited" };
     }
 
+    const customerHit = await hitFixedWindowRateLimit({
+      key: `fsm:plan-reminder:rate:customer:${customer.id}`,
+      limit: 1,
+      windowMs: settings.customerCooldownDays * DAY_MS
+    });
+    if (!customerHit.allowed) {
+      await releaseClaim(onceKey);
+      logger.info(log, "Plan reminder folded (customer cooldown); retried on a later scan");
+      return { status: "skipped", reason: "customer_rate_limited" };
+    }
     const dueDateLabel = formatDueDate(event.dueDate);
     const smsBody =
       event.reminderKind === "tune_up"
         ? `${company.name}: your ${plan.name} tune-up is due around ${dueDateLabel}. Reply or call us to book. Reply STOP to opt out.`
         : `${company.name}: your ${plan.name} renews on ${dueDateLabel}. Reply or call us with questions. Reply STOP to opt out.`;
 
-    await notificationsQueue.add(
+    try {
+      await notificationsQueue.add(
       PLAN_REMINDER_JOB_NAME,
       {
         companyId: event.companyId,
@@ -189,7 +191,13 @@ export async function requestPlanReminder(event: PlanReminderEvent, now: Date = 
         smsBody: smsBody.slice(0, 320)
       },
       { jobId }
-    );
+      );
+    } catch (error) {
+      // Release the send-once claim so the next scan in this window can retry instead of losing the reminder.
+      await releaseClaim(onceKey);
+      logger.error({ ...log, jobId, err: error }, "Plan reminder enqueue failed; claim released");
+      return { status: "skipped", reason: "error" };
+    }
     logger.info({ ...log, jobId, channel }, "Plan reminder queued");
     return { status: "queued", jobId, channel };
   } catch (error) {

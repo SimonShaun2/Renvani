@@ -830,4 +830,60 @@ describe("send-plan-reminder", () => {
     );
     expect(deps.sms.sendSms).toHaveBeenCalledWith("555-0100", "Tune-up due");
   });
+
+  describe("send-time re-check (#264 standard)", () => {
+    const job = (channel: "email" | "sms") =>
+      createJob("send-plan-reminder", {
+        companyId: "company-1",
+        maintenancePlanId: "plan-1",
+        customerId: "cust-1",
+        reminderKind: "renewal",
+        channel,
+        customerEmail: "chris@example.com",
+        customerPhone: "555-0100",
+        smsBody: "Renewal due",
+        firstName: "Chris",
+        companyName: "Acme HVAC",
+        planName: "Gold Plan",
+        dueDateLabel: "November 20, 2026"
+      });
+    const ok = {
+      plan: { status: "active", deleted: false, customerId: "cust-1" },
+      customer: { prefersEmail: true, prefersSms: true, doNotContact: false },
+      ruleEnabled: true
+    };
+
+    it.each([
+      ["plan gone", null],
+      ["plan deleted", { ...ok, plan: { ...ok.plan, deleted: true } }],
+      ["plan cancelled", { ...ok, plan: { ...ok.plan, status: "cancelled" } }],
+      ["rule turned off", { ...ok, ruleEnabled: false }],
+      ["do not contact", { ...ok, customer: { ...ok.customer, doNotContact: true } }],
+      ["email consent withdrawn", { ...ok, customer: { ...ok.customer, prefersEmail: false } }],
+      ["plan moved to another customer", { ...ok, plan: { ...ok.plan, customerId: "cust-2" } }]
+    ])("skips when %s", async (_label, context) => {
+      const deps = createDependencies();
+      const sendPlanReminderEmail = vi.fn(async () => undefined);
+      (deps.email as unknown as Record<string, unknown>).sendPlanReminderEmail = sendPlanReminderEmail;
+      const load = vi.fn(async () => context);
+      (deps as unknown as Record<string, unknown>).loadPlanReminderSendContext = load;
+      await notificationsProcessor.handleSendPlanReminder(job("email"), deps);
+      expect(load).toHaveBeenCalledWith("company-1", "plan-1");
+      expect(sendPlanReminderEmail).not.toHaveBeenCalled();
+    });
+
+    it("skips SMS when SMS consent is withdrawn, sends when consent and plan are still valid", async () => {
+      const deps = createDependencies();
+      (deps as unknown as Record<string, unknown>).loadPlanReminderSendContext = vi.fn(async () => ({
+        ...ok,
+        customer: { ...ok.customer, prefersSms: false }
+      }));
+      await notificationsProcessor.handleSendPlanReminder(job("sms"), deps);
+      expect(deps.sms.sendSms).not.toHaveBeenCalled();
+
+      (deps as unknown as Record<string, unknown>).loadPlanReminderSendContext = vi.fn(async () => ok);
+      await notificationsProcessor.handleSendPlanReminder(job("sms"), deps);
+      expect(deps.sms.sendSms).toHaveBeenCalledWith("555-0100", "Renewal due");
+    });
+  });
 });

@@ -198,7 +198,7 @@ describe("renewal.due automation", () => {
   });
 
   it("rate limits per customer (cooldown) and per company (daily cap); folded reminders retry later", async () => {
-    const s = seed({ rule: { config: { companyDailyLimit: 2 } } });
+    const s = seed({ rule: { config: { companyDailyLimit: 3 } } });
     const a = plan(s.company.id, s.customer.id, { endDate: "2026-11-20" });
     const b = plan(s.company.id, s.customer.id, { endDate: "2026-11-21" });
     const ev = (id: string, dueDate: string) => ({ companyId: s.company.id, maintenancePlanId: id, reminderKind: "renewal" as const, dueDate });
@@ -216,5 +216,30 @@ describe("renewal.due automation", () => {
     rateLimit.resetFixedWindowRateLimitStateForTests();
     expect((await service.requestPlanReminder(ev(p3.id, "2026-11-20"), new Date("2026-10-29T15:00:00Z"))).status).toBe("queued");
     expect(reminderCalls()).toHaveLength(3);
+  });
+
+  it("checks the company cap first, so a cap-held reminder does not consume the customer cooldown", async () => {
+    const s = seed({ rule: { config: { companyDailyLimit: 1 } } });
+    const other = fakeDb.seedCustomer({ companyId: s.company.id, firstName: "A", lastName: "B", email: "a@example.com", prefersEmail: true } as never);
+    const first = plan(s.company.id, other.id, { endDate: "2026-11-20" });
+    const held = plan(s.company.id, s.customer.id, { endDate: "2026-11-20" });
+    const ev = (id: string) => ({ companyId: s.company.id, maintenancePlanId: id, reminderKind: "renewal" as const, dueDate: "2026-11-20" });
+    expect((await service.requestPlanReminder(ev(first.id), NOW)).status).toBe("queued");
+    await expect(service.requestPlanReminder(ev(held.id), NOW)).resolves.toEqual({ status: "skipped", reason: "company_rate_limited" });
+
+    const nextDay = new Date(NOW.getTime() + 24 * 60 * 60 * 1000);
+    vi.setSystemTime(nextDay);
+    expect((await service.requestPlanReminder(ev(held.id), nextDay)).status).toBe("queued");
+  });
+
+  it("releases the send-once claim when queuing fails, so the reminder is retried", async () => {
+    const s = seed();
+    const p = plan(s.company.id, s.customer.id, { endDate: "2026-11-20" });
+    const ev = { companyId: s.company.id, maintenancePlanId: p.id, reminderKind: "renewal" as const, dueDate: "2026-11-20" };
+    addQueueJob.mockRejectedValueOnce(new Error("redis down"));
+    await expect(service.requestPlanReminder(ev, NOW)).resolves.toEqual({ status: "skipped", reason: "error" });
+    rateLimit.resetFixedWindowRateLimitStateForTests();
+    expect((await service.requestPlanReminder(ev, NOW)).status).toBe("queued");
+    expect(reminderCalls()).toHaveLength(2);
   });
 });

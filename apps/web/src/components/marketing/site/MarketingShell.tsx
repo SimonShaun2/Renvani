@@ -60,18 +60,18 @@ export function MarketingShell({ children }: { children: ReactNode }) {
         </details>
       </header>
       <main>{children}</main>
-      <footer data-node-id="203:4576" className="mx-auto flex max-w-[1440px] flex-col gap-6 px-6 py-12 md:p-8 lg:flex-row lg:items-start lg:px-16 lg:py-16">
-        <p className="text-[28px] lg:w-[350px]" style={serif}>
+      <footer data-node-id="203:4576" className="mx-auto flex max-w-[1440px] flex-col gap-6 px-6 py-6 md:flex-row md:flex-wrap md:items-start md:justify-between md:p-8 lg:flex-nowrap lg:justify-start lg:px-16 lg:py-16">
+        <p className="text-[28px] md:order-1 lg:w-[350px]" style={serif}>
           Renvani
         </p>
-        <nav aria-label="Footer" className="flex flex-col gap-4 md:flex-row md:flex-wrap text-[12px] lg:w-[510px]" style={{ color: "var(--color-mkt-ink2)" }}>
+        <nav aria-label="Footer" className="flex flex-col gap-4 md:order-3 md:w-full md:flex-row md:flex-wrap text-[12px] lg:order-2 lg:w-[510px]" style={{ color: "var(--color-mkt-ink2)" }}>
           {SITE_FOOTER.links.map((l) => (
             <Link key={l.label} href={l.href} className="min-w-[112px]">
               {l.label}
             </Link>
           ))}
         </nav>
-        <p className="text-[11px]" style={{ color: "var(--color-mkt-ink2)" }}>
+        <p className="text-[11px] md:order-2 lg:order-3" style={{ color: "var(--color-mkt-ink2)" }}>
           {SITE_FOOTER.copyright}
         </p>
       </footer>

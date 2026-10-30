@@ -53,6 +53,27 @@ async function safeRetrieve(sessionId: string): Promise<InvoiceCheckoutSessionSn
   }
 }
 
+function isStripeResourceMissing(error: unknown): boolean {
+  return Boolean(error && typeof error === "object" && (error as { code?: unknown }).code === "resource_missing");
+}
+
+/**
+ * The stored session must be known before a new one is created, or the invoice could end up with two payable
+ * sessions. Only Stripe's definitive resource_missing means it is safe to replace; any other failure (network,
+ * 5xx, rate limit) refuses with a retryable 409 and creates nothing / changes nothing.
+ */
+async function retrieveStoredSessionOrRefuse(sessionId: string): Promise<InvoiceCheckoutSessionSnapshot | null> {
+  try {
+    return await retrieveInvoiceCheckoutSession(sessionId);
+  } catch (error) {
+    if (isStripeResourceMissing(error)) {
+      return null;
+    }
+    logger.warn({ errorName: error instanceof Error ? error.name : typeof error }, "Hosted checkout: stored session could not be retrieved; refusing");
+    throw stripeAppErrorConflict("Payment page is temporarily unavailable; please retry in a moment");
+  }
+}
+
 /**
  * Stripe-hosted Checkout fallback for the public pay page (e.g. web has no publishable key, so embedded can't render).
  * - Tenant: invoice resolved by payment token; company/customer/items always filtered by the invoice's companyId,
@@ -118,7 +139,7 @@ export async function createPublicHostedCheckout(
 
   const previousSessionId = invoice.stripePaymentLinkId ?? null;
   if (previousSessionId) {
-    const previous = await safeRetrieve(previousSessionId);
+    const previous = await retrieveStoredSessionOrRefuse(previousSessionId);
     if (previous && sessionBelongsToInvoice(previous, companyId, invoice.id)) {
       if (previous.status === "complete") {
         throw stripeAppErrorConflict("A payment for this invoice is already processing");

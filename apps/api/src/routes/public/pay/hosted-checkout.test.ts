@@ -180,6 +180,33 @@ describe("POST /api/v1/public/pay/:token/hosted-checkout", () => {
     expect(expireMock).not.toHaveBeenCalled();
   });
 
+  it("stored session retrieve fails (transient) → retryable 409, no new session, no DB change", async () => {
+    const { invoice } = seed();
+    const row = () => fakeDb.getTestState().invoices.find((r) => r.id === invoice.id);
+    const before = JSON.stringify(row());
+    retrieveMock.mockRejectedValue(Object.assign(new Error("Stripe API connection error"), { type: "StripeConnectionError" }));
+    const res = await post();
+    expect(res.statusCode).toBe(409);
+    expect(res.json().message).toMatch(/retry/i);
+    expect(createMock).not.toHaveBeenCalled();
+    expect(expireMock).not.toHaveBeenCalled();
+    expect(JSON.stringify(row())).toBe(before);
+  });
+
+  it("stored session definitively missing (resource_missing) → replaced by exactly one new session", async () => {
+    const { invoice } = seed();
+    sessions.delete("cs_embedded_1");
+    const base = retrieveMock.getMockImplementation()!;
+    retrieveMock.mockImplementation(async (id: string) => {
+      if (id === "cs_embedded_1") throw Object.assign(new Error("No such checkout.session"), { code: "resource_missing" });
+      return base(id);
+    });
+    const res = await post();
+    expect(res.statusCode).toBe(200);
+    expect(createMock).toHaveBeenCalledTimes(1);
+    expect(fakeDb.getTestState().invoices.find((r) => r.id === invoice.id)?.stripePaymentLinkId).toBe("cs_hosted_1");
+  });
+
   it("refuses when the stored session already completed (payment in flight) — no second payable session", async () => {
     seed();
     sessions.get("cs_embedded_1")!.status = "complete";

@@ -74,3 +74,4 @@ export * from "./customer-portal-sections.types.js";
 export * from "./payouts-disputes/index.js";
 export * from "./geo/index.js";
 export * from "./revenue-agent-proposals.types.js";
+export * from "./home-services/trade.js";

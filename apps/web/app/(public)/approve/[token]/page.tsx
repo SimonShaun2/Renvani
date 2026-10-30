@@ -54,7 +54,7 @@ export default function PublicEstimatePage() {
           <EmptyState
             icon={FileText}
             title="Estimate not available"
-            subtitle="This approval link may have expired or already been used. Contact ServiceRev for help."
+            subtitle="This approval link may have expired or already been used. Contact Renvani for help."
           />
         </div>
       </div>

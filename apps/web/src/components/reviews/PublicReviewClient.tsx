@@ -118,7 +118,7 @@ export function PublicReviewClient({ token }: { token: string }) {
       <div className="mx-auto max-w-[640px] space-y-6">
         <section className="overflow-hidden rounded-[36px] border border-brand-accent/10 bg-white shadow-[0_24px_90px_rgba(16,33,99,0.12)]">
           <div className="border-b border-neutral-100 bg-brand-primary px-6 py-6 text-white">
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-white/70">ServiceRev Feedback</p>
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-white/70">Renvani Feedback</p>
             <h1 className="mt-3 text-3xl font-semibold tracking-tight">{review.companyName}</h1>
             <p className="mt-2 max-w-xl text-sm leading-6 text-white/72">
               Tell us how your visit went. Your rating helps the team improve, and we can direct you to your preferred review platform after submission.

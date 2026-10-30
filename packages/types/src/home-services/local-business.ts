@@ -13,8 +13,12 @@ export const SCHEMA_ORG_TRADE_TYPE_REGISTRY: Record<string, { schemaType: string
   other: { schemaType: "HomeAndConstructionBusiness" }
 };
 
+function own<T>(registry: Record<string, T>, key: unknown): T | undefined {
+  return typeof key === "string" && Object.prototype.hasOwnProperty.call(registry, key) ? registry[key] : undefined;
+}
+
 export function schemaOrgTypeForTrade(trade: string | null | undefined): string {
-  const entry = typeof trade === "string" ? SCHEMA_ORG_TRADE_TYPE_REGISTRY[trade] : undefined;
+  const entry = own(SCHEMA_ORG_TRADE_TYPE_REGISTRY, trade);
   return (entry ?? SCHEMA_ORG_TRADE_TYPE_REGISTRY.other!).schemaType;
 }
 
@@ -43,7 +47,7 @@ export function getGbpCategoriesForTrade(trade: string | null | undefined): GbpC
   trade: string;
   adapterStatus: typeof GBP_ADAPTER_STATUS;
 } {
-  const key = typeof trade === "string" && GBP_TRADE_CATEGORY_REGISTRY[trade] ? trade : "other";
+  const key = own(GBP_TRADE_CATEGORY_REGISTRY, trade) ? (trade as string) : "other";
   const mapping = GBP_TRADE_CATEGORY_REGISTRY[key]!;
   return { trade: key, primary: mapping.primary, secondary: [...mapping.secondary], adapterStatus: GBP_ADAPTER_STATUS };
 }
@@ -127,7 +131,7 @@ export function buildLocalBusinessJsonLd(input: LocalBusinessInput): Record<stri
   if (input.emergency24x7) {
     hours.push({ "@type": "OpeningHoursSpecification", dayOfWeek: ALL_DAYS, opens: "00:00", closes: "23:59" });
   } else {
-    const days = input.availableDays.map((day) => DAY_MAP[day.toLowerCase()]).filter((day): day is string => Boolean(day));
+    const days = input.availableDays.map((day) => own(DAY_MAP, day.toLowerCase())).filter((day): day is string => Boolean(day));
     const opens = input.availableHoursStart === null ? null : hourString(input.availableHoursStart);
     const closes = input.availableHoursEnd === null ? null : hourString(input.availableHoursEnd);
     if (days.length > 0 && opens && closes) {

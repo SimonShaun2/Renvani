@@ -59,11 +59,11 @@ export function BrandedStorefront({ model, previewBanner }: BrandedStorefrontPro
             {model.trustLine ? model.trustLine : "Local service"}
           </p>
           <h1 className="mt-5 text-4xl font-semibold leading-tight tracking-tight md:text-[56px] md:leading-[62px]">
-            A spotless home, on your schedule.
+            Home services you can count on, on your schedule.
           </h1>
           <p className="mt-5 max-w-[560px] text-lg leading-7 text-[#2a3360]">{model.tagline}</p>
           <ul className="mt-5 flex flex-wrap gap-3" aria-label="Trust badges">
-            {["Insured & background-checked", "Same crew every visit", "Pause anytime"].map((badge) => (
+            {["Licensed & insured", "Upfront pricing", "On-time arrival"].map((badge) => (
               <li
                 key={badge}
                 className="rounded-md bg-[#e4f1e8] px-2 py-0.5 text-[11px] font-medium text-[#2f7d4f]"

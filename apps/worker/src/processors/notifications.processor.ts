@@ -3,7 +3,7 @@ import { and, eq, isNull } from "drizzle-orm";
 import type { Job, Processor } from "bullmq";
 import pino from "pino";
 
-import { resolveTransactionalEmailFromAddress, type EmailTemplateId } from "@fsm/comms";
+import { isReceiptEmailAllowed, resolveTransactionalEmailFromAddress, type EmailTemplateId } from "@fsm/comms";
 import { env } from "@fsm/config";
 import { recordTransactionalEmailMessageLog } from "./transactional-email-message-log.js";
 import {
@@ -64,6 +64,18 @@ interface EmailModule {
       total: string;
       dueAt: string | null;
       paymentLinkUrl: string;
+      companyName: string;
+    }
+  ): Promise<void>;
+  sendInvoicePaymentReceiptEmail(
+    to: string,
+    params: {
+      firstName: string;
+      invoiceNumber: string;
+      amount: string;
+      balanceDue: string;
+      paidAt: string | null;
+      receiptUrl: string | null;
       companyName: string;
     }
   ): Promise<void>;
@@ -215,6 +227,8 @@ interface InvoiceEmailContext {
     firstName: string;
     lastName: string;
     email: string | null;
+    doNotContact?: boolean | null;
+    prefersEmail?: boolean | null;
   };
   company: {
     name: string;
@@ -590,7 +604,9 @@ function createProductionDependencies(): Promise<NotificationsDependencies> {
         customer: {
           firstName: customerRecord.firstName,
           lastName: customerRecord.lastName,
-          email: customerRecord.email
+          email: customerRecord.email,
+          doNotContact: customerRecord.doNotContact,
+          prefersEmail: customerRecord.prefersEmail
         },
         company: {
           name: companyRecord.name
@@ -998,6 +1014,51 @@ export async function handleSendInvoiceEmail(
   });
 
   logger.info({ companyId, invoiceId, customerId }, "Invoice email sent");
+}
+
+/**
+ * Payment receipt (Resend) after a recorded Stripe payment. Enqueued once per newly inserted payment row
+ * (jobId `invoice-receipt-<paymentId>`), so Stripe webhook redelivery cannot double-send. Tenant-scoped by
+ * companyId on every read; skipped when the customer opted out (doNotContact / prefersEmail=false).
+ */
+export async function handleSendInvoicePaymentReceipt(
+  job: Job<Record<string, unknown>>,
+  dependencies: NotificationsDependencies
+): Promise<void> {
+  const companyId = getJobString(job.data, "companyId");
+  const invoiceId = getJobString(job.data, "invoiceId");
+  const customerId = getJobString(job.data, "customerId");
+  const paymentId = getJobString(job.data, "paymentId");
+  const amount = getJobString(job.data, "amount");
+
+  if (!companyId || !invoiceId || !customerId || !paymentId || !amount) {
+    logger.warn({ jobId: job.id ?? null }, "Invoice receipt job missing required identifiers");
+    return;
+  }
+
+  const context = await dependencies.loadInvoiceEmailContext(companyId, invoiceId);
+
+  if (!context || context.customerId !== customerId) {
+    logger.warn({ companyId, invoiceId, customerId }, "Invoice receipt job skipped because invoice context was not found");
+    return;
+  }
+
+  if (!isReceiptEmailAllowed(context.customer)) {
+    logger.info({ companyId, invoiceId, customerId }, "Invoice receipt job skipped (no email or customer opted out)");
+    return;
+  }
+
+  await dependencies.email.sendInvoicePaymentReceiptEmail(context.customer.email, {
+    firstName: context.customer.firstName,
+    invoiceNumber: context.invoiceNumber,
+    amount,
+    balanceDue: context.balanceDue,
+    paidAt: getJobString(job.data, "paidAt"),
+    receiptUrl: context.stripePaymentLinkUrl ?? null,
+    companyName: context.company.name
+  });
+
+  logger.info({ companyId, invoiceId, customerId, paymentId }, "Invoice payment receipt sent");
 }
 
 export async function handleSendCampaignMessage(
@@ -1561,6 +1622,9 @@ export function createNotificationsProcessor(
         return;
       case "send-invoice-email":
         await handleSendInvoiceEmail(job, dependencies);
+        return;
+      case "send-invoice-receipt":
+        await handleSendInvoicePaymentReceipt(job, dependencies);
         return;
       case "send-invoice-reminder":
         await handleSendInvoiceReminder(job, dependencies);

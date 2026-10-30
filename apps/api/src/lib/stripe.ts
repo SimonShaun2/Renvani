@@ -36,6 +36,8 @@ export interface CreateInvoiceCheckoutSessionInput {
   invoiceId: string;
   customerId: string;
   customerEmail: string | null;
+  /** PaymentIntent receipt_email; null when the customer opted out of email (see isReceiptEmailAllowed). */
+  receiptEmail?: string | null;
   companyStripeAccountId: string;
   companyName: string;
   invoiceNumber: string;
@@ -205,6 +207,10 @@ export async function createInvoiceCheckoutSession(
       serviceFeeCents: String(fees.serviceFeeCents)
     }
   };
+
+  if (input.receiptEmail) {
+    paymentIntentData.receipt_email = input.receiptEmail;
+  }
 
   if (applicationFeeAmount > 0) {
     paymentIntentData.application_fee_amount = applicationFeeAmount;

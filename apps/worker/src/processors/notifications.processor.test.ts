@@ -66,6 +66,7 @@ function createDependencies(): notificationsProcessor.NotificationsDependencies 
       sendCampaignEmail: vi.fn(async () => undefined),
       sendInvoiceEmail: vi.fn(async () => undefined),
       sendInvoiceReminderEmail: vi.fn(async () => undefined),
+      sendInvoicePaymentReceiptEmail: vi.fn(async () => undefined),
       sendInvoiceReminderOwnerAlertEmail: vi.fn(async () => undefined),
       sendServiceAgreementRenewalReminderEmail: vi.fn(async () => undefined),
       sendServiceAgreementPaymentFailedEmail: vi.fn(async () => undefined),
@@ -186,6 +187,77 @@ describe("notifications.processor", () => {
     );
 
     expect(dependencies.email.sendEstimateEmail).not.toHaveBeenCalled();
+  });
+
+  describe("send-invoice-receipt", () => {
+    function receiptContext(customer: Record<string, unknown>) {
+      return {
+        companyId: "company-1",
+        invoiceId: "invoice-1",
+        customerId: "customer-1",
+        status: "paid" as const,
+        invoiceNumber: "INV-1001",
+        total: "400.00",
+        balanceDue: "0.00",
+        dueAt: null,
+        stripePaymentLinkUrl: "https://example.com/pay/tok",
+        reminder1SentAt: null,
+        reminder2SentAt: null,
+        reminder3SentAt: null,
+        customer: { firstName: "Chris", lastName: "Pine", email: "customer@example.com", ...customer },
+        company: { name: "Acme HVAC" }
+      };
+    }
+    const receiptJob = () =>
+      createJob("send-invoice-receipt", {
+        companyId: "company-1",
+        invoiceId: "invoice-1",
+        customerId: "customer-1",
+        paymentId: "payment-1",
+        amount: "400.00",
+        paidAt: "2026-10-28T15:00:00.000Z"
+      });
+
+    it("sends the receipt via the processor switch, tenant-scoped load", async () => {
+      vi.mocked(dependencies.loadInvoiceEmailContext).mockResolvedValue(receiptContext({}));
+      await notificationsProcessor.createNotificationsProcessor(dependencies)(receiptJob(), "token");
+      expect(dependencies.loadInvoiceEmailContext).toHaveBeenCalledWith("company-1", "invoice-1");
+      expect(dependencies.email.sendInvoicePaymentReceiptEmail).toHaveBeenCalledWith("customer@example.com", {
+        firstName: "Chris",
+        invoiceNumber: "INV-1001",
+        amount: "400.00",
+        balanceDue: "0.00",
+        paidAt: "2026-10-28T15:00:00.000Z",
+        receiptUrl: "https://example.com/pay/tok",
+        companyName: "Acme HVAC"
+      });
+    });
+
+    it.each([
+      ["doNotContact", { doNotContact: true }],
+      ["prefersEmail=false", { prefersEmail: false }],
+      ["no email", { email: null }]
+    ])("skips when %s", async (_label, customer) => {
+      vi.mocked(dependencies.loadInvoiceEmailContext).mockResolvedValue(receiptContext(customer));
+      await notificationsProcessor.handleSendInvoicePaymentReceipt(receiptJob(), dependencies);
+      expect(dependencies.email.sendInvoicePaymentReceiptEmail).not.toHaveBeenCalled();
+    });
+
+    it("skips when the invoice belongs to another customer / tenant (context mismatch)", async () => {
+      vi.mocked(dependencies.loadInvoiceEmailContext).mockResolvedValue({ ...receiptContext({}), customerId: "other" });
+      await notificationsProcessor.handleSendInvoicePaymentReceipt(receiptJob(), dependencies);
+      vi.mocked(dependencies.loadInvoiceEmailContext).mockResolvedValue(null);
+      await notificationsProcessor.handleSendInvoicePaymentReceipt(receiptJob(), dependencies);
+      expect(dependencies.email.sendInvoicePaymentReceiptEmail).not.toHaveBeenCalled();
+    });
+
+    it("skips when identifiers are missing", async () => {
+      await notificationsProcessor.handleSendInvoicePaymentReceipt(
+        createJob("send-invoice-receipt", { companyId: "company-1", invoiceId: "invoice-1" }),
+        dependencies
+      );
+      expect(dependencies.loadInvoiceEmailContext).not.toHaveBeenCalled();
+    });
   });
 
   it("send-invoice-email sends the invoice email when the customer can receive it", async () => {

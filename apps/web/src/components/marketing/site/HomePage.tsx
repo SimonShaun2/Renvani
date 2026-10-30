@@ -1,6 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { FigmaNode } from "./FigmaNode";
+import { HOME_TABLET } from "./home-tablet";
 import { GROWTH_CHECK_ENTRY, HOME } from "./site-config";
 import styles from "./site.module.css";
 
@@ -264,10 +266,37 @@ function JourneyCards() {
 }
 
 /** Home / Desktop 171:3, Home / Mobile 171:197, Home / Tablet 253:6780. Server component. */
+/** Inline capture row of the tablet frame ("Website capture / Tablet" 253:6791, 253:6912). */
+function TabletCapture({ id }: { id: string }) {
+  return (
+    <form action={GROWTH_CHECK_ENTRY.action} method="get" className="flex w-[704px] items-start gap-4" >
+      <input
+        id={id}
+        name="website"
+        type="text"
+        inputMode="url"
+        autoComplete="url"
+        aria-label={GROWTH_CHECK_ENTRY.label}
+        placeholder={GROWTH_CHECK_ENTRY.placeholder}
+        className="h-[52px] w-[472px] rounded-xl border bg-white p-4 text-[15px] outline-none focus-visible:ring-2"
+        style={{ borderColor: line, color: ink }}
+      />
+      <button type="submit" className={`${styles.press} inline-flex min-h-[44px] items-center justify-center rounded-full px-5 py-3 text-[14px] font-medium`} style={{ background: "var(--color-mkt-amber)", color: ink }}>
+        {GROWTH_CHECK_ENTRY.submit}
+      </button>
+    </form>
+  );
+}
+
 export function HomePage() {
   const { hero, trades, journey, intelligence, work, capture } = HOME;
   return (
     <>
+      {/* Tablet 768 (253:6780): its own layout from layer data, between md and lg. */}
+      <div className="hidden md:block lg:hidden">
+        <FigmaNode node={HOME_TABLET} slots={{ capture: <TabletCapture id="growth-check-tablet" />, "capture-end": <TabletCapture id="growth-check-tablet-end" /> }} />
+      </div>
+      <div className="md:hidden lg:block">
       <section data-node-id="203:4403" className={section} aria-labelledby="home-hero">
         <div className="grid items-start gap-12 lg:grid-cols-[480px_1fr] lg:gap-16">
           <div className="flex flex-col gap-6">
@@ -326,7 +355,7 @@ export function HomePage() {
             </div>
             <MobileIntelligenceVisual />
           </div>
-          <nav aria-label="Product areas" className="flex flex-wrap gap-x-4 gap-y-3 text-[14px] font-medium text-white">
+          <nav aria-label="Product areas" className="flex flex-col gap-3 md:flex-row md:flex-wrap md:gap-x-4 text-[14px] font-medium text-white">
             {intelligence.areas.map((a) => (
               <Link key={a.label} href={a.href} className="md:w-[220px]">{a.label}</Link>
             ))}
@@ -362,6 +391,7 @@ export function HomePage() {
           </div>
         </div>
       </section>
+      </div>
     </>
   );
 }

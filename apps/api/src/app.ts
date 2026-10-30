@@ -27,6 +27,7 @@ import customerRoutes from "./routes/customers/index.js";
 import crewRoutes from "./routes/crews/index.js";
 import dispatchRoutes from "./routes/dispatch/index.js";
 import fieldWorkRoutes from "./routes/field-work/index.js";
+import technicianMobileRoutes from "./routes/technician-mobile/index.js";
 import healthRoutes from "./routes/health/index.js";
 import globalRateLimitPlugin from "./plugins/global-rate-limit.js";
 import growthCheckIntakeRoutes from "./routes/growth-checks/index.js";
@@ -128,6 +129,7 @@ export async function buildApp() {
   await app.register(dispatchRoutes, { prefix: "/api/v1" });
   await app.register(crewRoutes, { prefix: "/api/v1" });
   await app.register(fieldWorkRoutes, { prefix: "/api/v1" });
+  await app.register(technicianMobileRoutes, { prefix: "/api/v1" });
   await app.register(growthCheckIntakeRoutes, { prefix: "/api/v1" });
   await app.register(internalAdminQueueRoutes, { prefix: "/api/v1" });
   await app.register(internalAdminQboSyncRoutes, { prefix: "/api/v1" });

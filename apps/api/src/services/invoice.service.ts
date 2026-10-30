@@ -825,6 +825,7 @@ export async function loadPublicInvoicePayment(
     totalDueCents: fees.totalCents,
     feeRefundable: false,
     platformFeePercent: fees.serviceFeeCents > 0 ? fees.serviceFeeRateBps / 100 : null,
+    serviceFeePercent: fees.serviceFeeCents > 0 ? fees.serviceFeeRateBps / 100 : null,
     platformFeePaidByCustomer: totalFeeCents > 0,
     platformFeeDisclosure: disclosure.length > 0 ? disclosure : null
   };

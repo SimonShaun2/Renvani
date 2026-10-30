@@ -36,7 +36,11 @@ import {
   type SubmitBookingRequestInput,
   type UpdateBookingSettingsInput,
   type BookingRequestStatus,
-  ErrorCode
+  ErrorCode,
+  HOME_SERVICE_TRADE_REGISTRY,
+  getTradeServices,
+  parseHomeServiceTrade,
+  parseTradeDescription
 } from "@fsm/types";
 
 import {
@@ -172,11 +176,29 @@ function toPublicBookingSettings(
   serviceAreaZipCodes: string[],
   serviceAreaNames: string[] = []
 ): PublicBookingSettings {
+  const settingsObject =
+    company.settings && typeof company.settings === "object" && !Array.isArray(company.settings)
+      ? (company.settings as Record<string, unknown>)
+      : {};
+  const trade = parseHomeServiceTrade(settingsObject.trade);
+  const configured = Array.isArray(row.offeredServices) ? (row.offeredServices as Array<Record<string, unknown>>) : [];
+  // Shop-entered services win; with none configured, a selected trade seeds the site with its default catalog.
+  const offeredServices =
+    configured.length === 0 && trade
+      ? getTradeServices(trade).map((service) => ({
+          key: service.key,
+          name: service.label,
+          label: service.label,
+          category: service.category,
+          emergency: service.emergency,
+          source: "trade_default"
+        }))
+      : configured;
   return {
     companyName: company.name,
     companySlug: company.slug,
     bookingSlug: row.bookingSlug ?? company.slug,
-    offeredServices: Array.isArray(row.offeredServices) ? (row.offeredServices as Array<Record<string, unknown>>) : [],
+    offeredServices,
     availableHoursStart: row.availableHoursStart ?? 8,
     availableHoursEnd: row.availableHoursEnd ?? 17,
     availableDays: row.availableDays ?? DEFAULT_AVAILABLE_DAYS,
@@ -191,7 +213,10 @@ function toPublicBookingSettings(
     logoUrl: company.logoUrl,
     serviceAreaZipCodes,
     serviceAreaNames,
-    timezone: company.timezone
+    timezone: company.timezone,
+    trade,
+    tradeSchemaType: trade ? HOME_SERVICE_TRADE_REGISTRY[trade].schemaType : null,
+    tradeDescription: parseTradeDescription(trade, settingsObject.tradeDescription)
   };
 }
 

@@ -51,7 +51,7 @@ describe("pricing (Figma 203:15719 desktop / 203:15720 mobile)", () => {
     expect(hrefs.length).toBeGreaterThanOrEqual(8);
     for (const h of hrefs) {
       const path = h.split("?")[0]!;
-      expect(existsSync(join(APP, `(auth)${path}`))).toBe(true);
+      expect(existsSync(join(APP, `(auth)${path}`)) || existsSync(join(APP, `(marketing)${path}/page.tsx`))).toBe(true);
     }
     for (const img of Array.from(container.querySelectorAll("img"))) {
       expect(existsSync(join(PUBLIC, img.getAttribute("src")!))).toBe(true);

@@ -714,7 +714,7 @@ export const PRICING_TREES: { desktop: VNode; mobile: VNode } = {
           "label": "Get a free demo",
           "kind": "Accent",
           "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px]",
-          "href": "/signup"
+          "href": "/demo"
          }
         ]
        }
@@ -1435,7 +1435,7 @@ export const PRICING_TREES: { desktop: VNode; mobile: VNode } = {
           "label": "Get a free demo",
           "kind": "Accent",
           "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px]",
-          "href": "/signup"
+          "href": "/demo"
          }
         ]
        }

@@ -37,7 +37,7 @@ export function serviceFeeNote(percent?: number | null): string {
 
 export const SETTINGS_FEE_COPY = {
   heading: SERVICE_FEE_NAME,
-  flexHint: "Paid by your customer at checkout. You receive the full invoice amount.",
+  flexHint: "Paid by your customer at checkout and non-refundable. You receive the full invoice amount.",
   flatValue: "None",
   flatHint: `Flat plan: no ${SERVICE_FEE_NAME}. Your customers pay the invoice amount only.`,
   unsetValue: "Not set",
@@ -50,4 +50,17 @@ export function payoutFeeNote(percent: number): string {
 }
 
 /** Legacy receipts only: shows a booking fee that was actually charged before it was removed. */
-export const LEGACY_BOOKING_FEE_LABEL = "Online booking fee";
+export const LEGACY_BOOKING_FEE_LABEL = "Online booking fee · non-refundable";
+
+/** Fee is non-refundable (API: feeRefundable=false). */
+export const NON_REFUNDABLE = "non-refundable";
+
+/** Receipt line: "Service Fee (2%) · non-refundable". */
+export function receiptFeeLabel(label: string): string {
+  return `${label} · ${NON_REFUNDABLE}`;
+}
+
+/** VIP join note under the fee line. */
+export function vipJoinFeeNote(percent?: number | null): string {
+  return `${serviceFeeNote(percent)} Charged at checkout; ${NON_REFUNDABLE}.`;
+}

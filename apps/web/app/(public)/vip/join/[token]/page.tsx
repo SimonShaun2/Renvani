@@ -5,7 +5,7 @@ import { Loader2 } from "lucide-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 import { EmptyState } from "@/src/components/ui/EmptyState";
-import { serviceFeeLineLabel, serviceFeeNote } from "@/src/lib/service-fee-copy";
+import { serviceFeeLineLabel, vipJoinFeeNote } from "@/src/lib/service-fee-copy";
 import { api } from "@/src/lib/api";
 
 interface VipJoinPreview {
@@ -97,7 +97,7 @@ export default function VipJoinPage() {
               <dt className="text-neutral-600">
                 {serviceFeeLineLabel(preview.platformFeePercent)}
                 <span className="mt-1 block text-xs font-normal text-neutral-500">
-                  {serviceFeeNote(preview.platformFeePercent)}
+                  {vipJoinFeeNote(preview.platformFeePercent)}
                 </span>
               </dt>
               <dd className="font-semibold text-neutral-900">{formatUsd(preview.platformFeeAmount)}</dd>

@@ -1,6 +1,6 @@
 "use client";
 
-import { LEGACY_BOOKING_FEE_LABEL } from "@/src/lib/service-fee-copy";
+import { LEGACY_BOOKING_FEE_LABEL, receiptFeeLabel } from "@/src/lib/service-fee-copy";
 import { useParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
@@ -39,7 +39,7 @@ export default function InvoiceReceiptPage() {
   const receipt = receiptQuery.data;
   const details: PaidDetail[] = [{ label: "Service amount", value: formatUsd(receipt.invoiceAmount) }];
   if (receipt.serviceFeeCents > 0 && receipt.serviceFeeLabel) {
-    details.push({ label: receipt.serviceFeeLabel, value: formatUsd(receipt.serviceFeeAmount) });
+    details.push({ label: receiptFeeLabel(receipt.serviceFeeLabel), value: formatUsd(receipt.serviceFeeAmount) });
   }
   // Booking fee was removed; keep this row only for legacy receipts that were charged one.
   if (receipt.bookingFeeCents > 0 && Number(receipt.bookingFeeAmount) > 0) {

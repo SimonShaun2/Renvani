@@ -172,6 +172,13 @@ interface EmailModule {
   ): Promise<TransactionalEmailSendResult>;
 }
 
+interface OwnerAlertEmailModule {
+  sendOwnerAlertEmail?(
+    to: string,
+    params: { companyName: string; headline: string; summary: string; actionUrl: string; actionLabel: string; kind: string }
+  ): Promise<void>;
+}
+
 interface SmsModule {
   sendSms(to: string, body: string): Promise<string>;
 }
@@ -455,6 +462,36 @@ async function handleSmsNotificationJob(
     );
     throw error;
   }
+}
+
+/** Owner alerts (new inquiry, low rating). Email via Resend template; SMS only if the API queued phones (SMS live). */
+export async function handleSendOwnerAlert(
+  job: Job<Record<string, unknown>, void, string>,
+  dependencies: NotificationsDependencies
+): Promise<void> {
+  const data = job.data;
+  const kind = getJobString(data, "kind") ?? "unknown";
+  const log = { jobId: job.id ?? null, companyId: getJobString(data, "companyId"), kind, entityId: getJobString(data, "entityId") };
+  const toEmail = getJobString(data, "toEmail");
+  const email = dependencies.email as EmailModule & OwnerAlertEmailModule;
+  if (toEmail && email.sendOwnerAlertEmail) {
+    await email.sendOwnerAlertEmail(toEmail, {
+      companyName: getJobString(data, "companyName") ?? "your shop",
+      headline: getJobString(data, "headline") ?? "New activity",
+      summary: getJobString(data, "summary") ?? "",
+      actionUrl: getJobString(data, "actionUrl") ?? "#",
+      actionLabel: getJobString(data, "actionLabel") ?? "Open Renvani",
+      kind
+    });
+  }
+  const phones = Array.isArray(data.toPhones) ? data.toPhones.filter((p): p is string => typeof p === "string" && p.length > 0) : [];
+  const smsBody = getJobString(data, "smsBody");
+  if (smsBody) {
+    for (const phone of phones) {
+      await dependencies.sms.sendSms(phone, smsBody);
+    }
+  }
+  logger.info({ ...log, emailed: Boolean(toEmail), texted: phones.length }, "Owner alert processed");
 }
 
 function isInvoiceUnpaid(status: InvoiceStatus): boolean {
@@ -1574,6 +1611,9 @@ export function createNotificationsProcessor(
         return;
       case "send-review-request":
         await handleSendReviewRequest(job, dependencies);
+        return;
+      case "send-owner-alert":
+        await handleSendOwnerAlert(job, dependencies);
         return;
       case "send-booking-request-alert":
       case "send-booking-confirmation":

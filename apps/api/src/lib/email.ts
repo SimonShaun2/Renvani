@@ -377,6 +377,16 @@ export async function sendVipMembershipPaymentFailedEmail(
   return result;
 }
 
+/** Owner alert (new public inquiry, low rating, ...): summary only, details stay in the app. */
+export async function sendOwnerAlertEmail(
+  to: string,
+  params: { companyName: string; headline: string; summary: string; actionUrl: string; actionLabel: string; kind: string }
+): Promise<void> {
+  const { kind, ...variables } = params;
+  await sendRenderedTemplateEmail(to, EMAIL_TEMPLATE_IDS.ownerAlert, variables, ["owner_alert", `owner_alert.${kind}`]);
+  logger.debug({ recipient: "[redacted]", kind }, "Owner alert email sent");
+}
+
 export async function sendReviewRequestEmail(
   to: string,
   params: { firstName: string; companyName: string; technicianName: string | null; reviewUrl: string }

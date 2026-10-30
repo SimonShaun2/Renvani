@@ -113,12 +113,18 @@ describe("CrewSignatureForm", () => {
     expect(m.push).toHaveBeenCalledWith(`/mobile/jobs/${JOB_ID}`);
   });
 
-  it("Error: banner + Retry, strokes kept, retry reuses the uploaded file", async () => {
-    m.post.mockResolvedValueOnce({ results: [{ outcome: "conflict" }] }).mockResolvedValueOnce({ results: [{ outcome: "applied" }] });
+  const opOf = (i: number) => m.post.mock.calls[i]![1].operations[0];
+  const LIVE = `rv1:job:${JOB_ID}:2026-10-29T17:05:00.000Z`;
+
+  it("Error on conflict: banner + Retry, strokes kept; retry uses a NEW op id and the liveRecordVersion", async () => {
+    m.post
+      .mockResolvedValueOnce({ results: [{ outcome: "conflict", conflict: { liveRecordVersion: LIVE, reason: "signature differs" } }] })
+      .mockResolvedValueOnce({ results: [{ outcome: "applied" }] });
     renderForm();
     draw();
     await act(async () => { fireEvent.click(btn("Save signature")); });
     expect(state()).toBe("error");
+    expect(screen.queryByText("✓ Signature saved")).toBeNull();
     expect(screen.getByRole("alert").textContent).toBe("We couldn't save the signature. Try again.");
     expect(screen.getByText("Your strokes are kept.")).toBeTruthy();
     expect(btn("Clear").disabled).toBe(false);
@@ -126,7 +132,50 @@ describe("CrewSignatureForm", () => {
     expect(state()).toBe("saved");
     expect(m.upload).toHaveBeenCalledTimes(1);
     expect(m.post).toHaveBeenCalledTimes(2);
-    expect(m.post.mock.calls[1]![1].operations[0].clientOperationId).toBe(m.post.mock.calls[0]![1].operations[0].clientOperationId);
+    expect(opOf(1).clientOperationId).not.toBe(opOf(0).clientOperationId);
+    expect(opOf(1).baseRecordVersion).toBe(LIVE);
+  });
+
+  it("never shows Saved for rejected; retry uses a new op id with a re-read base", async () => {
+    m.post.mockResolvedValueOnce({ results: [{ outcome: "rejected", code: "STALE" }] }).mockResolvedValueOnce({ results: [{ outcome: "duplicate" }] });
+    renderForm();
+    draw();
+    await act(async () => { fireEvent.click(btn("Save signature")); });
+    expect(state()).toBe("error");
+    expect(screen.queryByText("✓ Signature saved")).toBeNull();
+    await act(async () => { fireEvent.click(btn("Retry")); });
+    expect(opOf(1).clientOperationId).not.toBe(opOf(0).clientOperationId);
+    expect(state()).toBe("saved");
+  });
+
+  it("HTTP 409 / 400 show the error state (strokes kept) and rotate the op id", async () => {
+    m.post
+      .mockRejectedValueOnce(Object.assign(new Error("conflict"), { status: 409, payload: { conflict: { liveRecordVersion: LIVE } } }))
+      .mockRejectedValueOnce(Object.assign(new Error("bad"), { status: 400, payload: {} }));
+    renderForm();
+    draw();
+    await act(async () => { fireEvent.click(btn("Save signature")); });
+    expect(state()).toBe("error");
+    expect(screen.getByText("Your strokes are kept.")).toBeTruthy();
+    await act(async () => { fireEvent.click(btn("Retry")); });
+    expect(state()).toBe("error");
+    expect(screen.queryByText("✓ Signature saved")).toBeNull();
+    expect(opOf(1).clientOperationId).not.toBe(opOf(0).clientOperationId);
+    expect(opOf(1).baseRecordVersion).toBe(LIVE);
+  });
+
+  it("network / 5xx retry reuses the same op id and base", async () => {
+    m.post
+      .mockRejectedValueOnce(Object.assign(new Error("down"), { status: 503, payload: {} }))
+      .mockResolvedValueOnce({ results: [{ outcome: "duplicate" }] });
+    renderForm();
+    draw();
+    await act(async () => { fireEvent.click(btn("Save signature")); });
+    expect(state()).toBe("error");
+    await act(async () => { fireEvent.click(btn("Retry")); });
+    expect(state()).toBe("saved");
+    expect(opOf(1).clientOperationId).toBe(opOf(0).clientOperationId);
+    expect(opOf(1).baseRecordVersion).toBe(opOf(0).baseRecordVersion);
   });
 
   it("Saved on load when the job already has a signature", () => {

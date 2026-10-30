@@ -51,7 +51,9 @@ export function signatureMetaLine(name: string | null | undefined, signedAt: str
 /** One `job.signature.capture` op on the existing field-work sync contract (#245). */
 export function buildSignatureBatch(input: {
   jobId: string;
-  jobUpdatedAt: string | Date;
+  /** Base for a fresh op; ignored when `baseRecordVersion` is given (e.g. liveRecordVersion after a conflict). */
+  jobUpdatedAt?: string | Date;
+  baseRecordVersion?: string;
   attachmentId: string;
   signedByName: string;
   deviceId: string;
@@ -67,7 +69,7 @@ export function buildSignatureBatch(input: {
         clientOperationId: input.operationId,
         jobId: input.jobId,
         type: "job.signature.capture",
-        baseRecordVersion: buildRecordVersionV1("job", input.jobId, new Date(input.jobUpdatedAt)),
+        baseRecordVersion: input.baseRecordVersion ?? buildRecordVersionV1("job", input.jobId, new Date(input.jobUpdatedAt ?? Date.now())),
         payload: { attachmentId: input.attachmentId, signedByName: input.signedByName.trim() }
       }
     ]
@@ -77,4 +79,44 @@ export function buildSignatureBatch(input: {
 export function signatureBatchSucceeded(response: SubmitFieldWorkSyncBatchResponse): boolean {
   const outcome = response.results[0]?.outcome;
   return outcome === "applied" || outcome === "duplicate";
+}
+
+/** The op being sent: its client id and the base record version it was first sent with. */
+export interface SignatureOp {
+  id: string;
+  base: string | null;
+}
+
+export type SignatureAttempt =
+  | { kind: "saved" }
+  /** conflict (sync outcome or HTTP 409): new op id, base = liveRecordVersion when the server gave one. */
+  | { kind: "conflict"; liveRecordVersion: string | null }
+  /** rejected (sync outcome or HTTP 400/422): new op id and a re-read base; replaying the same id would be rejected again. */
+  | { kind: "rejected" }
+  /** network / 5xx: nothing was decided, so the same op id and base are safe to replay. */
+  | { kind: "transient" };
+
+export function classifySignatureResponse(response: SubmitFieldWorkSyncBatchResponse): SignatureAttempt {
+  const result = response.results[0];
+  if (result?.outcome === "applied" || result?.outcome === "duplicate") return { kind: "saved" };
+  if (result?.outcome === "conflict") return { kind: "conflict", liveRecordVersion: result.conflict?.liveRecordVersion ?? null };
+  return { kind: "rejected" };
+}
+
+export function classifySignatureError(error: unknown): SignatureAttempt {
+  const status = (error as { status?: unknown } | null)?.status;
+  if (status === 409) {
+    const payload = (error as { payload?: { liveRecordVersion?: unknown; conflict?: { liveRecordVersion?: unknown } } }).payload;
+    const live = payload?.conflict?.liveRecordVersion ?? payload?.liveRecordVersion;
+    return { kind: "conflict", liveRecordVersion: typeof live === "string" ? live : null };
+  }
+  if (status === 400 || status === 422) return { kind: "rejected" };
+  return { kind: "transient" };
+}
+
+/** Which op the next retry sends. */
+export function nextSignatureOp(current: SignatureOp, attempt: SignatureAttempt, newId: () => string): SignatureOp {
+  if (attempt.kind === "conflict") return { id: newId(), base: attempt.liveRecordVersion };
+  if (attempt.kind === "rejected") return { id: newId(), base: null };
+  return current;
 }

@@ -42,6 +42,8 @@ export interface BookingRequest {
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;
+  /** true when the request asked for 24/7 emergency but the shop downgraded it (detail read only; old rows false). */
+  downgraded?: boolean;
 }
 
 export interface BookingRequestListItem {
@@ -55,6 +57,10 @@ export interface BookingRequestListItem {
   zip: string;
   serviceCategory: string | null;
   serviceType: string | null;
+  /** "emergency" requests sort first in the inbox. */
+  urgency: BookingUrgency | null;
+  /** true when the request asked for 24/7 emergency but was downgraded (old rows false). */
+  downgraded: boolean;
   preferredDate: string | null;
   preferredWindow: PreferredBookingWindow | null;
   assignedTechnicianId: string | null;

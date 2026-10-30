@@ -2,9 +2,9 @@
 import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-const m = vi.hoisted(() => ({ trade: null as string | null, mutate: vi.fn() }));
+const m = vi.hoisted(() => ({ trade: null as string | null, description: null as string | null, loaded: true, mutate: vi.fn() }));
 vi.mock("@/src/hooks/company-trade.hooks", () => ({
-  useCompanyTrade: () => ({ data: { trade: { trade: m.trade, label: null, schemaType: null } } }),
+  useCompanyTrade: () => ({ data: m.loaded ? { trade: { trade: m.trade, label: null, schemaType: null, tradeDescription: m.description } } : undefined }),
   useUpdateCompanyTrade: () => ({ mutateAsync: m.mutate })
 }));
 
@@ -19,6 +19,8 @@ const radio = (name: RegExp) => screen.getByRole("radio", { name });
 
 beforeEach(() => {
   m.trade = "hvac";
+  m.description = null;
+  m.loaded = true;
   m.mutate.mockReset();
 });
 afterEach(() => cleanup());
@@ -66,13 +68,42 @@ describe("TradePicker (309:3333)", () => {
     fireEvent.click(radio(/Other/));
     const input = screen.getByPlaceholderText("Example: Garage door service") as HTMLInputElement;
     expect(screen.getByText(/Required\. We use this/)).toBeTruthy();
-    await act(async () => fireEvent.click(save()));
+    expect(save().disabled).toBe(true);
+    fireEvent.blur(input);
     expect(screen.getByText("Tell us your trade to continue.")).toBeTruthy();
     expect(input.getAttribute("aria-invalid")).toBe("true");
     expect(m.mutate).not.toHaveBeenCalled();
     fireEvent.change(input, { target: { value: "Garage door service" } });
     await act(async () => fireEvent.click(save()));
     expect(m.mutate).toHaveBeenCalledWith({ trade: "other", tradeDescription: "Garage door service" });
+  });
+});
+
+describe("TradePicker hydration (saved Other)", () => {
+  it("cached saved Other + description: describe is filled and Save stays disabled", () => {
+    m.trade = "other";
+    m.description = "Garage door service";
+    render(<TradePicker />);
+    expect(radio(/Other/).getAttribute("aria-checked")).toBe("true");
+    expect((screen.getByPlaceholderText("Example: Garage door service") as HTMLInputElement).value).toBe("Garage door service");
+    expect(status()).toBe("default");
+    expect(save().disabled).toBe(true);
+  });
+
+  it("data arriving after mount hydrates trade and description", () => {
+    m.loaded = false;
+    const view = render(<TradePicker />);
+    expect(save().disabled).toBe(true);
+    m.loaded = true;
+    m.trade = "other";
+    m.description = "Pool service";
+    view.rerender(<TradePicker />);
+    expect((screen.getByPlaceholderText("Example: Garage door service") as HTMLInputElement).value).toBe("Pool service");
+    expect(save().disabled).toBe(true);
+    fireEvent.change(screen.getByPlaceholderText("Example: Garage door service"), { target: { value: "" } });
+    expect(save().disabled).toBe(true);
+    fireEvent.change(screen.getByPlaceholderText("Example: Garage door service"), { target: { value: "Pool and spa" } });
+    expect(save().disabled).toBe(false);
   });
 });
 

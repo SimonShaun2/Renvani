@@ -17,21 +17,24 @@ export function TradePicker({ companyName }: { companyName?: string | undefined 
   const savedDescribe = tradeQuery.data?.trade.tradeDescription ?? "";
 
   const [selected, setSelected] = useState<HomeServiceTrade | null>(savedTrade);
-  const [describe, setDescribe] = useState("");
+  const [describe, setDescribe] = useState(savedDescribe);
+  const [hydrated, setHydrated] = useState(Boolean(tradeQuery.data));
   const [describeError, setDescribeError] = useState(false);
   const [phase, setPhase] = useState<"idle" | "saving" | "error" | "saved">("idle");
 
   useEffect(() => {
-    if (savedTrade && selected === null) {
-      setSelected(savedTrade);
-      setDescribe(savedDescribe);
-    }
-  }, [savedTrade, savedDescribe, selected]);
+    // Hydrate once from the saved trade, whether it was cached at mount or arrives later.
+    if (hydrated || !tradeQuery.data) return;
+    setSelected(savedTrade);
+    setDescribe(savedDescribe);
+    setHydrated(true);
+  }, [hydrated, tradeQuery.data, savedTrade, savedDescribe]);
 
   const dirty = selected !== null && (selected !== savedTrade || (selected === "other" && describe.trim() !== savedDescribe));
   const status: TradePickerStatus =
     phase === "saving" ? "saving" : phase === "error" ? "error" : phase === "saved" ? "saved" : dirty ? "selected" : "default";
-  const canSave = status === "selected" || status === "error";
+  const describeMissing = selected === "other" && describe.trim().length === 0;
+  const canSave = (status === "selected" || status === "error") && !describeMissing;
 
   function choose(trade: HomeServiceTrade) {
     setSelected(trade);
@@ -140,6 +143,7 @@ export function TradePicker({ companyName }: { companyName?: string | undefined 
               aria-invalid={describeError}
               disabled={status === "saving"}
               placeholder={COPY.describePlaceholder}
+              onBlur={() => setDescribeError(validateTradeSelection(selected, describe).describe === true)}
               onChange={(event) => {
                 setDescribe(event.target.value);
                 setDescribeError(false);

@@ -1,10 +1,10 @@
-import { publicEnv } from "@fsm/config";
+import { API_BASE_URL } from "./api-base-url";
 import type { FileAttachment } from "@fsm/types";
 
 import { ApiError, handleUnauthorized, resolveBearerToken, type ApiErrorPayload } from "./api";
 
 const MAX_FILE_SIZE_BYTES = 50 * 1024 * 1024;
-const API_BASE = publicEnv.NEXT_PUBLIC_API_URL;
+const API_BASE = API_BASE_URL;
 
 interface AttachmentResponse {
   attachment: FileAttachment;

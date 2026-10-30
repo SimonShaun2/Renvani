@@ -1,3 +1,4 @@
+import { buildOpeningHours, type SiteTradeConfig } from "@/src/components/growth/site-trade.registry";
 import type { PublicBookingSettingsRecord } from "@/src/hooks/booking.hooks";
 
 export interface BrandedServiceCard {
@@ -30,12 +31,14 @@ export interface BrandedStorefrontViewModel {
 
 export interface LocalBusinessJsonLd {
   "@context": "https://schema.org";
-  "@type": "LocalBusiness";
+  "@type": string;
   name: string;
   description: string;
   url: string;
   telephone?: string;
   areaServed: string[];
+  openingHoursSpecification?: ReturnType<typeof buildOpeningHours>;
+  aggregateRating?: { "@type": "AggregateRating"; ratingValue: number; reviewCount: number };
 }
 
 const CLEANING_FALLBACK_CARDS: BrandedServiceCard[] = [
@@ -175,17 +178,30 @@ export function buildInquirePath(slug: string, source = BRANDED_ACQUISITION_SOUR
   return `/site/${encodeURIComponent(slug)}/inquire?${query.toString()}`;
 }
 
+export interface LocalBusinessExtras {
+  trade?: SiteTradeConfig;
+  openingHours?: ReturnType<typeof buildOpeningHours>;
+  /** Only real review data; never fabricated. The public API does not expose a rating yet. */
+  rating?: { value: number; count: number } | null;
+}
+
 export function buildLocalBusinessJsonLd(
   model: BrandedStorefrontViewModel,
-  sitePath: string
+  sitePath: string,
+  extras: LocalBusinessExtras = {}
 ): LocalBusinessJsonLd {
+  const { trade, openingHours, rating } = extras;
   return {
     "@context": "https://schema.org",
-    "@type": "LocalBusiness",
+    "@type": trade?.schemaType ?? "LocalBusiness",
     name: model.companyName,
     description: model.tagline,
     url: sitePath,
     ...(model.phone ? { telephone: model.phone } : {}),
-    areaServed: model.serviceAreaZips.length > 0 ? model.serviceAreaZips : ["Local service area"]
+    areaServed: model.serviceAreaZips.length > 0 ? model.serviceAreaZips : ["Local service area"],
+    ...(openingHours ? { openingHoursSpecification: openingHours } : {}),
+    ...(rating && rating.count > 0
+      ? { aggregateRating: { "@type": "AggregateRating" as const, ratingValue: rating.value, reviewCount: rating.count } }
+      : {})
   };
 }

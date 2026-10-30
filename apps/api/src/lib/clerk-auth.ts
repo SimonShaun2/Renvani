@@ -1,5 +1,6 @@
 import { verifyToken } from "@clerk/backend";
 
+import { env } from "@fsm/config";
 import { featureFlags, isClerkAuthParallelJwtEnabled } from "@fsm/config/feature-flags";
 import { AppError, ErrorCode, type UserRole } from "@fsm/types";
 
@@ -19,7 +20,7 @@ export interface ClerkVerifiedSession {
   role: UserRole | null;
 }
 
-export function parseClerkAuthorizedParties(raw: string | undefined = process.env.CLERK_AUTHORIZED_PARTIES): string[] {
+export function parseClerkAuthorizedParties(raw: string | undefined = env.CLERK_AUTHORIZED_PARTIES): string[] {
   return (raw ?? "")
     .split(",")
     .map((entry) => entry.trim().replace(/\/$/, ""))
@@ -36,7 +37,8 @@ export function extractClerkRoleClaim(payload: Record<string, unknown>): UserRol
 }
 
 function readClerkSecretKey(): string | null {
-  const secret = process.env.CLERK_SECRET_KEY?.trim();
+  // Validated config only (packages/config); blank means Clerk verify is off (fail closed).
+  const secret = env.CLERK_SECRET_KEY.trim();
   return secret && secret.length > 0 ? secret : null;
 }
 
@@ -64,12 +66,12 @@ export function extractClerkOrganizationId(payload: Record<string, unknown>): st
  * FS-156: azp (CLERK_AUTHORIZED_PARTIES) is mandatory whenever Clerk login can be used:
  * deployment tier "staging" (where Clerk login is on) or NODE_ENV=production, or the Clerk flag is on.
  */
-export function isClerkAzpRequired(source: Record<string, string | undefined> = process.env): boolean {
+export function isClerkAzpRequired(source?: Record<string, string | undefined>): boolean {
   // FEATURE FLAG: clerk-auth-parallel-jwt
   return (
     featureFlags.clerkAuthParallelJwt ||
     isClerkAuthParallelJwtEnabled(source) ||
-    source.NODE_ENV === "production"
+    (source ? source.NODE_ENV : env.NODE_ENV) === "production"
   );
 }
 

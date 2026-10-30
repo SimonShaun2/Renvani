@@ -11,7 +11,7 @@ const ink2 = "var(--color-mkt-ink2)";
 const line = "var(--color-mkt-line)";
 const eyebrow = "text-[11px] font-medium tracking-[1.1px]";
 const h2 = "text-[34px] font-semibold leading-[1.08] tracking-[-0.85px] md:text-[48px] md:tracking-[-1.2px]";
-const section = "mx-auto flex max-w-[1440px] flex-col gap-8 px-6 py-12 md:px-20 md:py-20";
+const section = "mx-auto flex max-w-[1440px] flex-col gap-8 px-6 py-6 md:px-20 md:py-20";
 const card = "flex flex-col gap-4 rounded-2xl border bg-white p-5";
 
 function Lines({ lines }: { lines: readonly string[] }) {
@@ -321,7 +321,7 @@ export function HomePage() {
       </section>
 
       <section data-node-id="203:4455" style={{ background: "var(--color-mkt-sand)" }} aria-label="Trades">
-        <div className="mx-auto flex max-w-[1440px] flex-col gap-4 px-6 py-10 md:flex-row md:gap-8 md:px-10">
+        <div className="mx-auto flex max-w-[1440px] flex-col gap-[10px] px-6 py-6 md:flex-row md:gap-8 md:px-10 md:py-10">
           <p className={`${eyebrow} md:w-[300px]`} style={{ color: ink2 }}>{trades.eyebrow}</p>
           <div className="flex gap-6 text-[15px] font-medium">
             {trades.links.map((l) => (

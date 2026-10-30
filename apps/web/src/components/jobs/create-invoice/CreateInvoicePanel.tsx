@@ -4,7 +4,7 @@ import "./create-invoice.css";
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { X } from "lucide-react";
 import type { JobDetail, JobProduct } from "@fsm/types";
 
@@ -61,6 +61,11 @@ export function CreateInvoicePanel(props: CreateInvoicePanelProps) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [errors, setErrors] = useState<CreateInvoiceErrors>({ lines: {} });
   const [submitError, setSubmitError] = useState(false);
+  // One create-and-send sequence at a time; the created invoice id is reused so retries never create a duplicate.
+  const [busy, setBusy] = useState(false);
+  const busyRef = useRef(false);
+  const [createdInvoiceId, setCreatedInvoiceId] = useState<string | null>(null);
+  const [sendError, setSendError] = useState(false);
   const priceBook = usePriceBookItemSearch(searchOpen ? search : "");
 
   const totals = useMemo(
@@ -79,41 +84,81 @@ export function CreateInvoicePanel(props: CreateInvoicePanelProps) {
     setLines((current) => [...current, { ...line, key: `new-${Date.now()}-${current.length}`, include: true }]);
   }
 
+  async function sendAndOpen(invoiceId: string) {
+    if (sendNow) {
+      try {
+        await api.post(`/api/v1/invoices/${invoiceId}/send`, {});
+      } catch {
+        setSendError(true);
+        return;
+      }
+    }
+    router.push(`/invoices/${invoiceId}`);
+  }
+
+  async function runExclusive(task: () => Promise<void>) {
+    if (busyRef.current) return;
+    busyRef.current = true;
+    setBusy(true);
+    try {
+      await task();
+    } finally {
+      busyRef.current = false;
+      setBusy(false);
+    }
+  }
+
   async function handleSubmit() {
+    if (createdInvoiceId) return retrySend();
     const nextErrors = validateCreateInvoice(lines, dueDate, todayIso());
     setErrors(nextErrors);
     setSubmitError(false);
+    setSendError(false);
     if (hasCreateInvoiceErrors(nextErrors) || !job.customerId) {
       setSubmitError(true);
       return;
     }
-    try {
-      const response = await createInvoice.mutateAsync(
-        buildCreateInvoicePayload({
-          jobId: job.id,
-          customerId: job.customerId,
-          title: job.title,
-          lines,
-          taxRate,
-          discount: Number.parseFloat(discount) || 0,
-          dueDate,
-          messageToCustomer: message,
-          internalNotes: notes
-        })
-      );
-      if (sendNow) {
-        await api.post(`/api/v1/invoices/${response.invoice.id}/send`, {}).catch(() => undefined);
+    const customerId = job.customerId;
+    await runExclusive(async () => {
+      let invoiceId: string;
+      try {
+        const response = await createInvoice.mutateAsync(
+          buildCreateInvoicePayload({
+            jobId: job.id,
+            customerId,
+            title: job.title,
+            lines,
+            taxRate,
+            discount: Number.parseFloat(discount) || 0,
+            dueDate,
+            messageToCustomer: message,
+            internalNotes: notes
+          })
+        );
+        invoiceId = response.invoice.id;
+      } catch {
+        setSubmitError(true);
+        return;
       }
-      router.push(`/invoices/${response.invoice.id}`);
-    } catch {
-      setSubmitError(true);
-    }
+      setCreatedInvoiceId(invoiceId);
+      await sendAndOpen(invoiceId);
+    });
   }
+
+  /** Retries only the send for the invoice already created. */
+  function retrySend() {
+    if (!createdInvoiceId) return;
+    const invoiceId = createdInvoiceId;
+    setSendError(false);
+    return runExclusive(() => sendAndOpen(invoiceId));
+  }
+
+  const locked = busy || createdInvoiceId !== null;
 
   const header = (
     <>
       <div className="flex items-center justify-between font-mono text-[10px] font-medium text-[#5e6684]">
-        <button type="button" onClick={onClose} aria-label="Close" className="sm:hidden">
+        <button type="button" onClick={onClose} disabled={busy} aria-label="Close" className="sm:hidden">
           <X className="h-5 w-5 text-[#0f1530]" />
         </button>
         <span>{COPY.eyebrow}</span>
@@ -135,7 +180,7 @@ export function CreateInvoicePanel(props: CreateInvoicePanelProps) {
   return (
     <div
       className="create-invoice-backdrop fixed inset-0 z-50 flex items-stretch justify-center bg-[#0f1530]/40 sm:items-start sm:overflow-y-auto sm:p-8"
-      onClick={(event) => event.target === event.currentTarget && onClose()}
+      onClick={(event) => event.target === event.currentTarget && !busy && onClose()}
     >
       <div
         role="dialog"
@@ -174,12 +219,24 @@ export function CreateInvoicePanel(props: CreateInvoicePanelProps) {
           </div>
         ) : (
           <>
+            {sendError && createdInvoiceId ? (
+              <div role="alert" data-testid="send-error" className="create-invoice-error flex flex-wrap items-center gap-3 rounded-[10px] bg-[#fde3dc] px-3 py-2.5 text-[13px] text-[#c0392b]">
+                <span className="flex-1">{COPY.sendError}</span>
+                <button type="button" onClick={() => void retrySend()} disabled={busy} className="rounded-[10px] border border-[#e6dccb] bg-white px-3 py-2 text-[13px] font-semibold text-[#0f1530]">
+                  {COPY.retrySend}
+                </button>
+                <Link href={`/invoices/${createdInvoiceId}`} className="font-semibold text-[#0f1530] underline">
+                  {COPY.openUnsent}
+                </Link>
+              </div>
+            ) : null}
             {submitError ? (
               <p role="alert" className="create-invoice-error rounded-[10px] bg-[#fde3dc] px-3 py-2.5 text-[13px] text-[#c0392b]">
                 {COPY.submitError}
               </p>
             ) : null}
 
+            <fieldset disabled={locked} className="contents" data-testid="create-invoice-form">
             <div className="overflow-hidden rounded-[12px] border border-[#e6dccb] bg-white">
               <div className="hidden gap-[10px] bg-[#fbf6ef] px-3 py-2 font-mono text-[13px] font-medium text-[#5e6684] sm:flex">
                 <span className="w-4" />
@@ -290,7 +347,7 @@ export function CreateInvoicePanel(props: CreateInvoicePanelProps) {
                 <span>{COPY.customerTotal}</span>
                 <span className="text-[20px]">{formatUsd(totals.total)}</span>
               </div>
-              <button type="button" onClick={handleSubmit} disabled={createInvoice.isPending} className="mt-2 rounded-[10px] bg-[#0f1530] px-4 py-3 text-sm font-semibold text-white sm:hidden">
+              <button type="button" onClick={() => void handleSubmit()} disabled={locked} className="mt-2 rounded-[10px] bg-[#0f1530] px-4 py-3 text-sm font-semibold text-white sm:hidden">
                 {COPY.button}
               </button>
             </div>
@@ -313,11 +370,12 @@ export function CreateInvoicePanel(props: CreateInvoicePanelProps) {
               <input type="checkbox" role="switch" checked={sendNow} onChange={(event) => setSendNow(event.target.checked)} className="h-4 w-8 accent-[#0f1530]" />
               <span>{COPY.sendNow}</span>
             </label>
+            </fieldset>
             <div className="hidden justify-end gap-3 sm:flex">
-              <button type="button" onClick={onClose} className="rounded-[10px] border border-[#e6dccb] bg-white px-4 py-2.5 text-sm font-semibold text-[#0f1530]">
+              <button type="button" onClick={onClose} disabled={busy} className="rounded-[10px] border border-[#e6dccb] bg-white px-4 py-2.5 text-sm font-semibold text-[#0f1530]">
                 {COPY.cancel}
               </button>
-              <button type="button" onClick={handleSubmit} disabled={createInvoice.isPending} className="rounded-[10px] bg-[#0f1530] px-4 py-2.5 text-sm font-semibold text-white">
+              <button type="button" onClick={() => void handleSubmit()} disabled={locked} className="rounded-[10px] bg-[#0f1530] px-4 py-2.5 text-sm font-semibold text-white">
                 {COPY.button}
               </button>
             </div>

@@ -8,6 +8,8 @@ vi.mock("../../services/clerk-provisioning.service.js", () => ({
   provisionClerkOrganization,
   provisionClerkMembership
 }));
+const syncClerkUserRoleMetadata = vi.hoisted(() => vi.fn(async () => "synced"));
+vi.mock("../../lib/clerk-role-metadata.js", () => ({ syncClerkUserRoleMetadata }));
 const syncClerkUserUpdated = vi.fn();
 const deactivateClerkUser = vi.fn();
 const deactivateClerkMembership = vi.fn();
@@ -22,7 +24,8 @@ vi.mock("../../services/clerk-user-sync.service.js", async () => {
     deactivateClerkMembership
   };
 });
-vi.mock("@fsm/config", () => ({ env: { CLERK_WEBHOOK_SECRET: "", NODE_ENV: "test" } }));
+const mockEnv = vi.hoisted(() => ({ CLERK_WEBHOOK_SECRET: "", NODE_ENV: "test" }));
+vi.mock("@fsm/config", () => ({ env: mockEnv }));
 
 const SECRET = `whsec_${Buffer.from("test-secret-0123456789").toString("base64")}`;
 
@@ -56,7 +59,7 @@ async function send(body: unknown, opts: { secret?: string; timestamp?: number; 
 
 describe("Clerk webhook", () => {
   beforeEach(() => {
-    process.env.CLERK_WEBHOOK_SECRET = SECRET;
+    mockEnv.CLERK_WEBHOOK_SECRET = SECRET;
     provisionClerkOrganization.mockReset().mockResolvedValue({ id: "co_1" });
     provisionClerkMembership.mockReset().mockResolvedValue({ status: "created", companyId: "co_1" });
     syncClerkUserUpdated.mockReset().mockResolvedValue({ status: "updated" });
@@ -125,7 +128,7 @@ describe("Clerk webhook", () => {
   it("provisions a company on organization.created", async () => {
     const res = await send({ type: "organization.created", data: { id: "org_1", name: "Acme" } });
     expect(res.statusCode).toBe(200);
-    expect(provisionClerkOrganization).toHaveBeenCalledWith({ organizationId: "org_1", name: "Acme" });
+    expect(provisionClerkOrganization).toHaveBeenCalledWith({ organizationId: "org_1", name: "Acme", createdBy: null });
   });
 
   it("provisions company + user on organizationMembership.created", async () => {
@@ -150,6 +153,40 @@ describe("Clerk webhook", () => {
     });
   });
 
+  it("publishes the provisioned DB role to Clerk public_metadata (fixes /no-access for new owners)", async () => {
+    syncClerkUserRoleMetadata.mockClear();
+    provisionClerkMembership.mockResolvedValueOnce({ status: "created", companyId: "c1", role: "owner" });
+    const res = await send({
+      type: "organizationMembership.created",
+      data: {
+        role: "org:admin",
+        organization: { id: "org_1", name: "Acme" },
+        public_user_data: { identifier: "owner@acme.com", user_id: "user_ava" }
+      }
+    });
+    expect(res.statusCode).toBe(200);
+    expect(syncClerkUserRoleMetadata).toHaveBeenCalledWith("user_ava", "owner");
+    expect(res.json()).toMatchObject({ status: "created", role: "owner", roleSync: "synced" });
+  });
+
+  it("does not touch Clerk metadata when provisioning was skipped (tenant mismatch)", async () => {
+    syncClerkUserRoleMetadata.mockClear();
+    provisionClerkMembership.mockResolvedValueOnce({ status: "skipped", companyId: "c1" });
+    const res = await send({
+      type: "organizationMembership.created",
+      data: { organization: { id: "org_1" }, public_user_data: { identifier: "x@y.com", user_id: "user_x" } }
+    });
+    expect(res.statusCode).toBe(200);
+    expect(syncClerkUserRoleMetadata).not.toHaveBeenCalled();
+    expect(res.json()).toMatchObject({ roleSync: "not_needed" });
+  });
+
+  it("passes the org creator (created_by) on organization.created", async () => {
+    const res = await send({ type: "organization.created", data: { id: "org_9", name: "Nine", created_by: "user_c" } });
+    expect(res.statusCode).toBe(200);
+    expect(provisionClerkOrganization).toHaveBeenCalledWith({ organizationId: "org_9", name: "Nine", createdBy: "user_c" });
+  });
+
   it("acks user.created without provisioning", async () => {
     const res = await send({ type: "user.created", data: { id: "user_1" } });
     expect(res.statusCode).toBe(200);
@@ -157,9 +194,27 @@ describe("Clerk webhook", () => {
   });
 
   it("returns 503 when the secret is not configured", async () => {
-    process.env.CLERK_WEBHOOK_SECRET = "";
+    mockEnv.CLERK_WEBHOOK_SECRET = "";
     const res = await send({ type: "user.created" });
     expect(res.statusCode).toBe(503);
+    expect(provisionClerkOrganization).not.toHaveBeenCalled();
+  });
+
+  it("ignores process.env and reads only validated config (fail closed)", async () => {
+    mockEnv.CLERK_WEBHOOK_SECRET = "  ";
+    process.env.CLERK_WEBHOOK_SECRET = SECRET;
+    try {
+      const res = await send({ type: "user.created" });
+      expect(res.statusCode).toBe(503);
+    } finally {
+      delete process.env.CLERK_WEBHOOK_SECRET;
+    }
+  });
+
+  it("has no direct process.env reads", async () => {
+    const { readFileSync } = await import("node:fs");
+    const source = readFileSync(new URL("./clerk.ts", import.meta.url), "utf8");
+    expect(source).not.toMatch(/process\.env/);
   });
 
   const userUpdated = (status: string) => ({

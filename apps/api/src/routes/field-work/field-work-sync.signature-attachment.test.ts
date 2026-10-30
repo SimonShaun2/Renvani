@@ -411,13 +411,24 @@ describe("POST /field-work/jobs/:jobId/signature", () => {
       signerRole: "customer"
     };
     const first = await post(authOf(seed), seed.job.id, body);
-    expect(first.status).toBe(200);
+    expect(first.status).toBe(201);
+    expect(first.body.signature.created).toBe(true);
     expect(first.body.signature).toMatchObject({ jobId: seed.job.id, outcome: "applied", signedByName: "Pat Customer", signerRole: "customer" });
     expect(typeof first.body.signature.signedAt).toBe("string");
     expect(JSON.stringify(first.body)).not.toContain("renvani-object:");
 
     const again = await post(authOf(seed), seed.job.id, body);
     expect(again.status).toBe(200);
+    expect(again.body.signature.created).toBe(false);
+
+    // Same signature re-sent under a new clientOperationId: already captured -> 200, created false.
+    const resend = await post(authOf(seed), seed.job.id, {
+      ...body,
+      clientOperationId: "sig-ep-1b",
+      baseRecordVersion: liveJobVersion(seed.job.id)
+    });
+    expect(resend.status).toBe(200);
+    expect(resend.body.signature).toMatchObject({ created: false, outcome: "applied" });
     expect(again.body.signature.outcome).toBe("duplicate");
     expect(again.body.signature.signedAt).toBe(first.body.signature.signedAt);
   });
@@ -487,5 +498,13 @@ describe("POST /field-work/jobs/:jobId/signature", () => {
     });
     expect(res.status).toBe(404);
     expect(fakeDb.getTestState().jobs[0]!.signatureUrl).toBeNull();
+  });
+});
+
+describe("signature route rate limiting", () => {
+  it("is covered by the global per-IP limit just like the sibling sync route", async () => {
+    const { isGlobalRateLimitExcluded } = await import("../../plugins/global-rate-limit.js");
+    expect(isGlobalRateLimitExcluded({ method: "POST", url: "/api/v1/field-work/jobs/00000000-0000-4000-8000-000000000000/signature" })).toBe(false);
+    expect(isGlobalRateLimitExcluded({ method: "POST", url: "/api/v1/field-work/sync/batches" })).toBe(false);
   });
 });

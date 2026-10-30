@@ -27,5 +27,5 @@ export async function captureJobSignatureHandler(request: FastifyRequest, reply:
     jobId,
     request.body as CaptureJobSignatureBody
   );
-  return reply.code(200).send({ signature });
+  return reply.code(signature.created ? 201 : 200).send({ signature });
 }

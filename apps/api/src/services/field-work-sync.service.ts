@@ -398,7 +398,7 @@ async function applyOperation(
           resultPayload: {
             entityId: job.id,
             recordVersion: liveVersion,
-            message: "Signature already captured",
+            message: SIGNATURE_ALREADY_CAPTURED_MESSAGE,
             ...(job.signedAt ? { signedAt: job.signedAt.toISOString() } : {})
           }
         };
@@ -581,7 +581,11 @@ export async function submitFieldWorkSyncBatch(
   };
 }
 
+const SIGNATURE_ALREADY_CAPTURED_MESSAGE = "Signature already captured";
+
 export interface CapturedJobSignature {
+  /** true only when this request stored a new signature (route answers 201); replays / already-captured answer 200. */
+  created: boolean;
   jobId: string;
   outcome: "applied" | "duplicate";
   signedAt: string | null;
@@ -593,7 +597,10 @@ export interface CapturedJobSignature {
 /**
  * Dedicated signature capture (POST /field-work/jobs/:jobId/signature). Runs as a one-operation sync batch so it
  * shares validation, technician scope, idempotency (clientOperationId) and the stored-ref rules with the
- * `job.signature.capture` sync path used by #314. Conflict -> 409, rejected -> 400/403/404 (existing error shape).
+ * `job.signature.capture` sync path used by #314 (that path is unchanged). Real status codes, existing error shape:
+ * 201 newly captured, 200 replay or same signature already on file, 400 invalid body / rejected signature,
+ * 401 unauthenticated, 403 role or unassigned technician, 404 job not in this company, 409 stale recordVersion or a
+ * different signature already on file. No other codes (429 only from the global per-IP rate limit).
  */
 export async function captureJobSignature(
   actor: FieldWorkSyncActor,
@@ -640,6 +647,7 @@ export async function captureJobSignature(
     .where(and(eq(jobs.companyId, actor.companyId), eq(jobs.id, jobId), isNull(jobs.deletedAt)))
     .limit(1);
   return {
+    created: result.outcome === "applied" && result.message !== SIGNATURE_ALREADY_CAPTURED_MESSAGE,
     jobId,
     outcome: result.outcome,
     signedAt: job?.signedAt ? job.signedAt.toISOString() : (result.signedAt ?? null),

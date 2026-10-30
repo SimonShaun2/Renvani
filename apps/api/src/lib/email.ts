@@ -408,3 +408,23 @@ export async function sendVipMembershipPaymentFailedEmail(
   logger.debug({ recipient: "[redacted]" }, "VIP membership dunning email sent");
   return result;
 }
+
+export async function sendReviewRequestEmail(
+  to: string,
+  params: { firstName: string; companyName: string; technicianName: string | null; reviewUrl: string }
+): Promise<TransactionalEmailSendResult> {
+  const result = await sendRenderedTemplateEmail(
+    to,
+    EMAIL_TEMPLATE_IDS.reviewRequest,
+    {
+      firstName: params.firstName,
+      companyName: params.companyName,
+      technicianName: params.technicianName ?? "",
+      reviewUrl: params.reviewUrl
+    },
+    ["review_request.sent"]
+  );
+
+  logger.debug({ recipient: "[redacted]" }, "Review request email sent");
+  return result;
+}

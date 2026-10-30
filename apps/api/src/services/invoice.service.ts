@@ -54,6 +54,7 @@ import {
 } from "@fsm/types";
 
 import { readRenvaniSubscriptionPlan } from "../lib/company-renvani-plan.js";
+import { dispatchEventAutomation } from "./automation/event-automation.registry.js";
 import { generateInvoiceNumber } from "../lib/invoice-number.js";
 import {
   buildPublicPayViewFields,
@@ -340,7 +341,8 @@ function applyPaymentToInvoice(invoice: InvoiceRow, paymentAmount: Decimal): {
 }
 
 function resolveStripePaymentMethod(paymentIntent: Stripe.PaymentIntent): PaymentMethod {
-  const paymentMethodType = paymentIntent.payment_method_types[0];
+  // Guard: some events/fixtures omit payment_method_types; never crash payment recording on it.
+  const paymentMethodType = paymentIntent.payment_method_types?.[0];
 
   switch (paymentMethodType) {
     case "card":
@@ -1214,7 +1216,7 @@ export async function recordPayment(
   const normalizedInput = normalizeRecordPaymentInput(input);
   const paymentAmount = new Decimal(normalizedInput.amount);
 
-  return db.transaction(async (tx) => {
+  const result = await db.transaction(async (tx) => {
     const actor = await getUserRecord(companyId, actorId, tx);
     const customer = await getCustomerRecord(companyId, existingInvoice.customerId, tx);
     const insertedPayments = await tx
@@ -1295,8 +1297,17 @@ export async function recordPayment(
       });
     }
 
-    return toPayment(payment);
+    return {
+      payment: toPayment(payment),
+      paid: updatedInvoice.status === "paid"
+    };
   });
+
+  if (result.paid) {
+    await dispatchEventAutomation({ eventType: "invoice.paid", companyId, invoiceId });
+  }
+
+  return result.payment;
 }
 
 export async function resendInvoiceReminder(
@@ -1587,10 +1598,14 @@ export async function handleStripePaymentSuccess(
       });
     }
 
-    return { payment, customer };
+    return { payment, customer, paid: updatedInvoice.status === "paid" };
   });
 
   await enqueueInvoicePaymentReceipt(invoice.companyId, invoice.id, recorded.payment, recorded.customer);
+
+  if (recorded.paid) {
+    await dispatchEventAutomation({ eventType: "invoice.paid", companyId: invoice.companyId, invoiceId: invoice.id });
+  }
 }
 
 /**
@@ -1630,8 +1645,6 @@ async function enqueueInvoicePaymentReceipt(
     logger.error({ err: error, companyId, invoiceId, paymentId: payment.id }, "Failed to enqueue invoice payment receipt");
   }
 }
-
-
 
 export async function handleStripePaymentFailed(
   stripeEvent: Stripe.PaymentIntentPaymentFailedEvent

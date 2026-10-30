@@ -1,8 +1,7 @@
 import { publicEnv } from "@fsm/config";
 import type { FileAttachment } from "@fsm/types";
 
-import { getAuthToken } from "./auth";
-import { ApiError, type ApiErrorPayload } from "./api";
+import { ApiError, handleUnauthorized, resolveBearerToken, type ApiErrorPayload } from "./api";
 
 const MAX_FILE_SIZE_BYTES = 50 * 1024 * 1024;
 const API_BASE = publicEnv.NEXT_PUBLIC_API_URL;
@@ -52,10 +51,12 @@ export function getMaxUploadFileSizeBytes() {
 export async function uploadFile(input: UploadFileInput): Promise<FileAttachment> {
   validateFile(input.file);
 
+  // XHR (not fetch) for upload progress, so authorizedFetch can't be used; same token + 401 rules.
+  const { token, source } = await resolveBearerToken();
+
   return new Promise((resolve, reject) => {
     const formData = new FormData();
     const request = new XMLHttpRequest();
-    const token = getAuthToken();
 
     formData.append("file", input.file);
     formData.append("entityType", input.entityType);
@@ -91,6 +92,10 @@ export async function uploadFile(input: UploadFileInput): Promise<FileAttachment
     request.onerror = () => reject(new Error("Upload failed"));
 
     request.onload = () => {
+      if (request.status === 401) {
+        void handleUnauthorized(source);
+      }
+
       if (request.status < 200 || request.status >= 300) {
         reject(new ApiError(request.status, parseErrorPayload(request.responseText)));
         return;

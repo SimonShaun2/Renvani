@@ -19,7 +19,8 @@ export const EMAIL_TEMPLATE_IDS = {
   vipMembershipWelcome: "vip_membership.welcome",
   vipMembershipRenewal: "vip_membership.renewal_receipt",
   vipMembershipPaymentFailed: "vip_membership.payment_failed_dunning",
-  savedCardMigrationReenterCard: "saved_card_migration.reenter_card"
+  savedCardMigrationReenterCard: "saved_card_migration.reenter_card",
+  reviewRequest: "review_request.sent"
 } as const;
 
 export type EmailTemplateId = (typeof EMAIL_TEMPLATE_IDS)[keyof typeof EMAIL_TEMPLATE_IDS];
@@ -386,6 +387,20 @@ function renderTemplateBody(templateId: EmailTemplateId, variables: Record<strin
           <p>We could not automatically move your saved card from your prior processor. Please add your card again the next time you receive an invoice — it only takes a moment.</p>
           ${button(variables.paymentPortalUrl ?? "#", "Add payment method")}
           <p>If you have questions, contact ${variables.companyName ?? "our office"}.</p>
+        `)
+      };
+    }
+    case EMAIL_TEMPLATE_IDS.reviewRequest: {
+      const name = greetingName(variables.firstName ?? "");
+      const fromTech = e.technicianName ? ` with ${e.technicianName}` : "";
+      return {
+        templateId,
+        subject: `How did we do? — ${variables.companyName ?? "Renvani"}`,
+        html: emailShell(`
+          <p>Hi ${name},</p>
+          <p>Thanks for choosing ${e.companyName ?? "us"}. How was your recent visit${fromTech}?</p>
+          <p>It takes about 30 seconds and helps a local business a lot.</p>
+          ${button(variables.reviewUrl ?? "#", "Rate your visit")}
         `)
       };
     }

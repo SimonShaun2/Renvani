@@ -505,6 +505,79 @@ export async function createExpressConnectedAccount(companyId: string, companyNa
   };
 }
 
+/**
+ * Tester/dev-only: create a platform-onboarded Custom connected account in Stripe TEST mode with
+ * Stripe's documented test identity data, so a tester company can take test payments without the
+ * hosted onboarding form. Callers must gate on tier and an sk_test_ key; this refuses live keys too.
+ */
+export async function createTestProvisionedConnectedAccount(input: {
+  companyId: string;
+  companyName?: string | null;
+  tosIp: string;
+}): Promise<StripeConnectAccountSnapshot> {
+  if (!env.STRIPE_SECRET_KEY.startsWith("sk_test_")) {
+    throw new Error("Test provisioning requires a Stripe test secret key");
+  }
+
+  const appBaseUrl = env.APP_URL.replace(/\/$/, "");
+  const account = await stripe.accounts.create(
+    {
+      type: "custom",
+      country: "US",
+      email: `stripe-test+${input.companyId}@example.com`,
+      business_type: "individual",
+      metadata: { companyId: input.companyId, renvaniTestProvisioned: "true" },
+      capabilities: {
+        card_payments: { requested: true },
+        transfers: { requested: true }
+      },
+      business_profile: {
+        name: input.companyName ?? RENVANI_STRIPE_BRAND.platformName,
+        mcc: "1711",
+        product_description: "Field service (test account)",
+        support_url: appBaseUrl,
+        url: appBaseUrl
+      },
+      individual: {
+        first_name: "Test",
+        last_name: "Tester",
+        email: `stripe-test+${input.companyId}@example.com`,
+        phone: "+18885551234",
+        dob: { day: 1, month: 1, year: 1901 },
+        ssn_last_4: "0000",
+        id_number: "000000000",
+        address: {
+          line1: "address_full_match",
+          city: "Chicago",
+          state: "IL",
+          postal_code: "60601",
+          country: "US"
+        }
+      },
+      external_account: "btok_us_verified",
+      tos_acceptance: {
+        date: Math.floor(Date.now() / 1000),
+        ip: input.tosIp
+      },
+      settings: {
+        payments: { statement_descriptor: buildCardStatementDescriptor(input.companyName ?? undefined) }
+      }
+    },
+    { idempotencyKey: `renvani-test-provision-${input.companyId}` }
+  );
+
+  return {
+    id: account.id,
+    chargesEnabled: account.charges_enabled,
+    payoutsEnabled: account.payouts_enabled,
+    detailsSubmitted: account.details_submitted,
+    accountName: account.business_profile?.name ?? null,
+    payoutSchedule: null,
+    lastPayoutAmount: null,
+    lastPayoutAt: null
+  };
+}
+
 export async function applyConnectAccountBranding(accountId: string, companyName?: string | null): Promise<void> {
   const appBaseUrl = env.APP_URL.replace(/\/$/, "");
   const statementDescriptor = buildCardStatementDescriptor(companyName);

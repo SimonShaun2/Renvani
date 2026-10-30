@@ -5,7 +5,7 @@ import { Loader2 } from "lucide-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 import { EmptyState } from "@/src/components/ui/EmptyState";
-import { formatServiceFeeLineItemName } from "@fsm/config/stripe-pricing";
+import { serviceFeeLineLabel, vipJoinFeeNote } from "@/src/lib/service-fee-copy";
 import { api } from "@/src/lib/api";
 
 interface VipJoinPreview {
@@ -95,9 +95,9 @@ export default function VipJoinPage() {
           {preview.platformFeePercent != null && preview.platformFeeAmount ? (
             <div className="flex items-center justify-between gap-4">
               <dt className="text-neutral-600">
-                {formatServiceFeeLineItemName(Math.round(preview.platformFeePercent * 100))}
+                {serviceFeeLineLabel(preview.platformFeePercent)}
                 <span className="mt-1 block text-xs font-normal text-neutral-500">
-                  Paid by you at checkout; non-refundable. The shop receives the full membership price.
+                  {vipJoinFeeNote(preview.platformFeePercent)}
                 </span>
               </dt>
               <dd className="font-semibold text-neutral-900">{formatUsd(preview.platformFeeAmount)}</dd>

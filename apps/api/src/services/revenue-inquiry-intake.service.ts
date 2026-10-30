@@ -217,7 +217,7 @@ export async function submitPublicInquiryIntake(
   // otherwise downgraded to a normal request and reported back as `emergency.downgraded` (never rejected).
   // Same guard submitBookingRequest applies internally; computed here only to report the resolution back.
   const { input: effectiveBody, emergency } = applyPublicEmergencyGuard(body, (await getPublicBookingCompany(slug)).settings);
-  const submitResult = await submitBookingRequest(slug, effectiveBody, sourceParam);
+  const submitResult = await submitBookingRequest(slug, effectiveBody, sourceParam, emergency.downgraded);
   const [row] = await db
     .select()
     .from(bookingRequests)

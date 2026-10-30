@@ -195,6 +195,11 @@ describe("24/7 emergency requests", () => {
     const inbox = await request(app.server).get("/api/v1/booking-requests").set("Authorization", a.user("owner"));
     expect(inbox.status).toBe(200);
     expect(inbox.body.data[0].id).toBe(urgent.body.bookingRequest.id);
+    expect(inbox.body.data[0]).toMatchObject({ urgency: "emergency", downgraded: false });
+    expect(inbox.body.data.find((r: { id: string }) => r.id === normal.body.bookingRequest.id)).toMatchObject({ downgraded: false });
+    const detail = await request(app.server).get(`/api/v1/booking-requests/${urgent.body.bookingRequest.id}`).set("Authorization", a.user("owner"));
+    expect(detail.status).toBe(200);
+    expect(detail.body.bookingRequest).toMatchObject({ urgency: "emergency", downgraded: false });
   });
 
   it("downgrades (not rejects) emergency when the shop has it off, and documents it in the response", async () => {
@@ -221,6 +226,15 @@ describe("24/7 emergency requests", () => {
     const inbox = await request(app.server).get("/api/v1/booking-requests").set("Authorization", a.user("owner"));
     expect(inbox.body.data[0].id).toBe(later.body.bookingRequest.id);
     expect(inbox.body.data.map((r: { id: string }) => r.id)).toContain(first.body.bookingRequest.id);
+    expect(ev?.payload).toMatchObject({ emergencyDowngraded: true });
+    const item = inbox.body.data.find((r: { id: string }) => r.id === res.body.bookingRequest.id);
+    expect(item).toMatchObject({ urgency: "this_week", downgraded: true });
+    expect(inbox.body.data.find((r: { id: string }) => r.id === first.body.bookingRequest.id)).toMatchObject({ downgraded: false });
+    const detail = await request(app.server).get(`/api/v1/booking-requests/${res.body.bookingRequest.id}`).set("Authorization", a.user("owner"));
+    expect(detail.status).toBe(200);
+    expect(detail.body.bookingRequest).toMatchObject({ urgency: "this_week", downgraded: true });
+    const oldDetail = await request(app.server).get(`/api/v1/booking-requests/${first.body.bookingRequest.id}`).set("Authorization", a.user("owner"));
+    expect(oldDetail.body.bookingRequest.downgraded).toBe(false);
   });
 
   it("urgency 'emergency' alone is accepted when the shop has it on", async () => {

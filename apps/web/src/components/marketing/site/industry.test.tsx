@@ -28,7 +28,7 @@ const resolves = (h: string) => {
   if (h.startsWith("#")) return true;
   if (path.startsWith("/product/")) return PRODUCT_PAGES.some((p) => `/product/${p.slug}` === path);
   if (INDUSTRY_HREFS.includes(path)) return true;
-  return ["/", "/product", "/how-it-works", "/pricing", "/signup", "/demo", "/growth-check", "/login", "/product-tour"].includes(path);
+  return ["/", "/product", "/how-it-works", "/pricing", "/signup", "/demo", "/growth-check", "/login", "/tour"].includes(path);
 };
 const anchors = (el: Element) => Array.from(el.querySelectorAll("a")).map((a) => a.getAttribute("href")!);
 

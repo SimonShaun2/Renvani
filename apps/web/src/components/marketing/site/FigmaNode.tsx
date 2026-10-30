@@ -13,6 +13,8 @@ export type VNode =
       label?: string;
       kind?: string;
       href?: string;
+      /** Marks the link as the current page (aria-current). */
+      current?: boolean;
       /** Rendered as the element id (in-page anchor target). */
       anchor?: string;
       /** Replaced by `slots[slot]` (interactive pieces such as forms). */
@@ -38,7 +40,7 @@ export function FigmaNode({ node, className = "", inline = false, slots }: { nod
   const kids = node.k?.map((k, i) => <FigmaNode key={i} node={k} inline={childInline} slots={slots} />);
   if (node.href) {
     return (
-      <Link href={node.href} className={/(^| )(flex|grid|inline-flex)( |$)/.test(cls) ? cls : `${cls} block`} data-node-id={node.id}>
+      <Link href={node.href} aria-current={node.current ? "page" : undefined} className={/(^| )(flex|grid|inline-flex)( |$)/.test(cls) ? cls : `${cls} block`} data-node-id={node.id}>
         {kids}
       </Link>
     );

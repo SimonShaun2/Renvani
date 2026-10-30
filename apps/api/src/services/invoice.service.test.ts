@@ -740,8 +740,8 @@ describe("invoice.service", () => {
 
   it("getPublicInvoicePaymentLink: online-booked Flex = invoice + 2% Service Fee, Flat = invoice only; no booking fee", async () => {
     const expected = {
-      flex: { serviceFeeAmount: "2.47", platformFeeAmount: "2.47", totalDue: "125.72", serviceFeeCents: 247, totalDueCents: 12_572, platformFeePercent: 2, platformFeePaidByCustomer: true },
-      flat: { serviceFeeAmount: "0.00", platformFeeAmount: "0.00", totalDue: "123.25", serviceFeeCents: 0, totalDueCents: 12_325, platformFeePercent: null, platformFeePaidByCustomer: false }
+      flex: { serviceFeeAmount: "2.47", platformFeeAmount: "2.47", totalDue: "125.72", serviceFeeCents: 247, totalDueCents: 12_572, platformFeePercent: 2, serviceFeePercent: 2, platformFeePaidByCustomer: true },
+      flat: { serviceFeeAmount: "0.00", platformFeeAmount: "0.00", totalDue: "123.25", serviceFeeCents: 0, totalDueCents: 12_325, platformFeePercent: null, serviceFeePercent: null, platformFeePaidByCustomer: false }
     } as const;
     for (const planTier of ["flat", "flex"] as const) {
       const { company } = createAdminContext();

@@ -98,7 +98,7 @@ function createDependencies(): notificationsProcessor.NotificationsDependencies 
     loadCompanyOwner: vi.fn(async () => null),
     findAutomationRule: vi.fn(async () => null),
     markInvoiceReminderSent: vi.fn(async () => undefined),
-    claimInvoiceReceiptSend: vi.fn(async () => true),
+    claimInvoiceReceiptSend: vi.fn(async () => ({ claimed: true })),
     markInvoiceReceiptSent: vi.fn(async () => undefined),
     releaseInvoiceReceiptClaim: vi.fn(async () => undefined),
     markCampaignRecipientDelivered: vi.fn(async () => undefined),
@@ -256,22 +256,52 @@ describe("notifications.processor", () => {
 
     describe("idempotency (worker retry / stalled re-run)", () => {
       // In-memory stand-in for the message_logs (company, source_system, source_id) unique key.
-      function withClaimStore() {
-        const claims = new Map<string, "sending" | "sent">();
+      function withClaimStore(now: () => number = () => Date.now()) {
+        const claims = new Map<string, { status: "sending" | "sent"; at: number }>();
         const key = (companyId: string, paymentId: string) => `${companyId}:${paymentId}`;
         vi.mocked(dependencies.claimInvoiceReceiptSend).mockImplementation(async ({ companyId, paymentId }) => {
-          if (claims.has(key(companyId, paymentId))) return false;
-          claims.set(key(companyId, paymentId), "sending");
-          return true;
+          const existing = claims.get(key(companyId, paymentId));
+          if (!existing) {
+            claims.set(key(companyId, paymentId), { status: "sending", at: now() });
+            return { claimed: true };
+          }
+          const age = now() - existing.at;
+          if (existing.status === "sending" && age > notificationsProcessor.INVOICE_RECEIPT_STALE_CLAIM_MS) {
+            existing.at = now();
+            return { claimed: true, staleReclaimedAgeMs: age };
+          }
+          return { claimed: false };
         });
         vi.mocked(dependencies.markInvoiceReceiptSent).mockImplementation(async (companyId, paymentId) => {
-          claims.set(key(companyId, paymentId), "sent");
+          claims.set(key(companyId, paymentId), { status: "sent", at: now() });
         });
         vi.mocked(dependencies.releaseInvoiceReceiptClaim).mockImplementation(async (companyId, paymentId) => {
-          if (claims.get(key(companyId, paymentId)) === "sending") claims.delete(key(companyId, paymentId));
+          if (claims.get(key(companyId, paymentId))?.status === "sending") claims.delete(key(companyId, paymentId));
         });
         return claims;
       }
+
+      it("fresh 'sending' claim (another worker mid-send) → skip, no send", async () => {
+        const claims = withClaimStore();
+        claims.set("company-1:payment-1", { status: "sending", at: Date.now() - 60_000 });
+        vi.mocked(dependencies.loadInvoiceEmailContext).mockResolvedValue(receiptContext({}));
+        await notificationsProcessor.handleSendInvoicePaymentReceipt(receiptJob(), dependencies);
+        expect(dependencies.email.sendInvoicePaymentReceiptEmail).not.toHaveBeenCalled();
+      });
+
+      it("stale 'sending' claim (worker died between claim and send) → re-claim, send once, then sent", async () => {
+        const claims = withClaimStore();
+        claims.set("company-1:payment-1", { status: "sending", at: Date.now() - notificationsProcessor.INVOICE_RECEIPT_STALE_CLAIM_MS - 60_000 });
+        vi.mocked(dependencies.loadInvoiceEmailContext).mockResolvedValue(receiptContext({}));
+        await notificationsProcessor.handleSendInvoicePaymentReceipt(receiptJob(), dependencies);
+        await notificationsProcessor.handleSendInvoicePaymentReceipt(receiptJob(), dependencies);
+        expect(dependencies.email.sendInvoicePaymentReceiptEmail).toHaveBeenCalledTimes(1);
+        expect(claims.get("company-1:payment-1")?.status).toBe("sent");
+        expect(warnLogMock).toHaveBeenCalledWith(
+          expect.objectContaining({ companyId: "company-1", paymentId: "payment-1", claimAgeMs: expect.any(Number) }),
+          expect.stringContaining("stale")
+        );
+      });
 
       it("claims by companyId + paymentId before sending, then marks sent", async () => {
         const claims = withClaimStore();
@@ -280,7 +310,7 @@ describe("notifications.processor", () => {
         expect(dependencies.claimInvoiceReceiptSend).toHaveBeenCalledWith(
           expect.objectContaining({ companyId: "company-1", customerId: "customer-1", paymentId: "payment-1", toAddress: "customer@example.com" })
         );
-        expect(claims.get("company-1:payment-1")).toBe("sent");
+        expect(claims.get("company-1:payment-1")?.status).toBe("sent");
       });
 
       it("retry after a successful send does not send the receipt twice", async () => {
@@ -309,7 +339,7 @@ describe("notifications.processor", () => {
         await notificationsProcessor.handleSendInvoicePaymentReceipt(receiptJob(), dependencies);
         await notificationsProcessor.handleSendInvoicePaymentReceipt(receiptJob(), dependencies);
         expect(dependencies.email.sendInvoicePaymentReceiptEmail).toHaveBeenCalledTimes(2);
-        expect(claims.get("company-1:payment-1")).toBe("sent");
+        expect(claims.get("company-1:payment-1")?.status).toBe("sent");
       });
 
       it("opted-out customers never take a claim", async () => {

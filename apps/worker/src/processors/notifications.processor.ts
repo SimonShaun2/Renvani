@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, isNull, lt } from "drizzle-orm";
 import type { Job, Processor } from "bullmq";
 import pino from "pino";
 
@@ -358,6 +358,15 @@ export function reviewRequestSendSkipReason(
 
 export const INVOICE_RECEIPT_SOURCE_SYSTEM = "invoice_payment_receipt";
 
+/** A 'sending' claim older than this is from a worker that died between claim and send; it may be re-claimed. */
+export const INVOICE_RECEIPT_STALE_CLAIM_MS = 10 * 60 * 1000;
+
+export interface InvoiceReceiptClaimResult {
+  claimed: boolean;
+  /** Set when a stale 'sending' claim was taken over (age of the abandoned claim in ms). */
+  staleReclaimedAgeMs?: number;
+}
+
 export interface InvoiceReceiptClaim {
   companyId: string;
   customerId: string;
@@ -396,9 +405,10 @@ export interface NotificationsDependencies {
   markInvoiceReminderSent(companyId: string, invoiceId: string, reminderLevel: ReminderLevel): Promise<void>;
   /**
    * Atomically claims the one-time payment receipt send for (companyId, paymentId) via the message_logs
-   * (company, source_system, source_id) unique key. Returns false when already claimed/sent (retry/redelivery).
+   * (company, source_system, source_id) unique key. Not claimed when already sent or freshly 'sending'
+   * (retry/redelivery); a 'sending' claim older than INVOICE_RECEIPT_STALE_CLAIM_MS is atomically re-claimed.
    */
-  claimInvoiceReceiptSend(claim: InvoiceReceiptClaim): Promise<boolean>;
+  claimInvoiceReceiptSend(claim: InvoiceReceiptClaim): Promise<InvoiceReceiptClaimResult>;
   markInvoiceReceiptSent(companyId: string, paymentId: string): Promise<void>;
   /** Releases a claim when the send itself failed, so a retry can send. */
   releaseInvoiceReceiptClaim(companyId: string, paymentId: string): Promise<void>;
@@ -923,7 +933,45 @@ function createProductionDependencies(): Promise<NotificationsDependencies> {
         })
         .onConflictDoNothing()
         .returning({ id: messageLogs.id });
-      return inserted.length > 0;
+      if (inserted.length > 0) {
+        return { claimed: true };
+      }
+      // Existing claim: take it over only if it is still 'sending' and stale (worker died before send).
+      // Compare-and-set on updated_at so only one retry wins the takeover.
+      const now = new Date();
+      const staleBefore = new Date(now.getTime() - INVOICE_RECEIPT_STALE_CLAIM_MS);
+      const [existing] = await db
+        .select({ updatedAt: messageLogs.updatedAt })
+        .from(messageLogs)
+        .where(
+          and(
+            eq(messageLogs.companyId, claim.companyId),
+            eq(messageLogs.sourceSystem, INVOICE_RECEIPT_SOURCE_SYSTEM),
+            eq(messageLogs.sourceId, claim.paymentId),
+            eq(messageLogs.providerStatus, "sending"),
+            lt(messageLogs.updatedAt, staleBefore)
+          )
+        )
+        .limit(1);
+      if (!existing) {
+        return { claimed: false };
+      }
+      const reclaimed = await db
+        .update(messageLogs)
+        .set({ updatedAt: now })
+        .where(
+          and(
+            eq(messageLogs.companyId, claim.companyId),
+            eq(messageLogs.sourceSystem, INVOICE_RECEIPT_SOURCE_SYSTEM),
+            eq(messageLogs.sourceId, claim.paymentId),
+            eq(messageLogs.providerStatus, "sending"),
+            eq(messageLogs.updatedAt, existing.updatedAt)
+          )
+        )
+        .returning({ id: messageLogs.id });
+      return reclaimed.length > 0
+        ? { claimed: true, staleReclaimedAgeMs: now.getTime() - existing.updatedAt.getTime() }
+        : { claimed: false };
     },
     async markInvoiceReceiptSent(companyId, paymentId) {
       const now = new Date();
@@ -1190,9 +1238,16 @@ export async function handleSendInvoicePaymentReceipt(
     fromAddress: getOutboundEmailFromAddress()
   });
 
-  if (!claimed) {
+  if (!claimed.claimed) {
     logger.info({ companyId, invoiceId, paymentId }, "Invoice receipt already sent for payment; skipping");
     return;
+  }
+
+  if (claimed.staleReclaimedAgeMs !== undefined) {
+    logger.warn(
+      { companyId, invoiceId, paymentId, claimAgeMs: claimed.staleReclaimedAgeMs },
+      "Invoice receipt: stale 'sending' claim re-claimed (previous worker likely died before send); sending"
+    );
   }
 
   try {

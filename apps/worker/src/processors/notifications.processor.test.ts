@@ -303,6 +303,72 @@ describe("notifications.processor", () => {
         );
       });
 
+      describe("createInvoiceReceiptClaimer (atomic stale takeover, microsecond timestamps)", () => {
+        // Mimics Postgres: updated_at kept in MICROseconds; staleness evaluated "inside the DB" in one step.
+        function microStore(nowMicros: () => bigint) {
+          const rows = new Map<string, { status: "sending" | "sent"; updatedAtMicros: bigint }>();
+          const key = (c: string, p: string) => `${c}:${p}`;
+          const threshold = BigInt(notificationsProcessor.INVOICE_RECEIPT_STALE_CLAIM_MS) * 1000n;
+          const store = {
+            async insertClaim(claim: { companyId: string; paymentId: string }) {
+              await Promise.resolve();
+              if (rows.has(key(claim.companyId, claim.paymentId))) return false;
+              rows.set(key(claim.companyId, claim.paymentId), { status: "sending" as const, updatedAtMicros: nowMicros() });
+              return true;
+            },
+            async takeOverStaleClaim(companyId: string, paymentId: string) {
+              await Promise.resolve();
+              const row = rows.get(key(companyId, paymentId));
+              if (!row || row.status !== "sending" || !(row.updatedAtMicros < nowMicros() - threshold)) return false;
+              row.updatedAtMicros = nowMicros();
+              return true;
+            },
+            async readClaimAgeMs(companyId: string, paymentId: string) {
+              const row = rows.get(key(companyId, paymentId));
+              return row ? Number((nowMicros() - row.updatedAtMicros) / 1000n) : null;
+            }
+          };
+          return { rows, store };
+        }
+        const claim = { companyId: "company-1", customerId: "customer-1", paymentId: "payment-1", toAddress: "a@b.c", fromAddress: "x@y.z" };
+        const NOW = 1_800_000_000_123_456n; // micros, non-zero sub-ms part
+
+        it("stale claim with sub-ms updated_at: ms-truncated equality CAS would miss, atomic UPDATE wins", async () => {
+          const { rows, store } = microStore(() => NOW);
+          const staleMicros = NOW - BigInt(notificationsProcessor.INVOICE_RECEIPT_STALE_CLAIM_MS + 60_000) * 1000n + 789n;
+          rows.set("company-1:payment-1", { status: "sending", updatedAtMicros: staleMicros });
+          // What the old CAS did: read updated_at into a JS Date (ms) and compare for equality.
+          const readBackAsJsDateMicros = BigInt(new Date(Number(staleMicros / 1000n)).getTime()) * 1000n;
+          expect(readBackAsJsDateMicros === staleMicros).toBe(false);
+          const result = await notificationsProcessor.createInvoiceReceiptClaimer(store)(claim);
+          expect(result.claimed).toBe(true);
+          expect(result.staleReclaimedAgeMs).toBeGreaterThan(notificationsProcessor.INVOICE_RECEIPT_STALE_CLAIM_MS);
+          expect(rows.get("company-1:payment-1")?.updatedAtMicros).toBe(NOW);
+        });
+
+        it("two concurrent takeovers of a stale claim: exactly one wins", async () => {
+          const { rows, store } = microStore(() => NOW);
+          rows.set("company-1:payment-1", { status: "sending", updatedAtMicros: NOW - 3_600_000_000n + 1n });
+          const claimer = notificationsProcessor.createInvoiceReceiptClaimer(store);
+          const results = await Promise.all([claimer(claim), claimer(claim)]);
+          expect(results.filter((r) => r.claimed)).toHaveLength(1);
+        });
+
+        it("fresh 'sending' claim and 'sent' claim are skipped", async () => {
+          const { rows, store } = microStore(() => NOW);
+          const claimer = notificationsProcessor.createInvoiceReceiptClaimer(store);
+          rows.set("company-1:payment-1", { status: "sending", updatedAtMicros: NOW - 60_000_000n + 1n });
+          expect((await claimer(claim)).claimed).toBe(false);
+          rows.set("company-1:payment-1", { status: "sent", updatedAtMicros: NOW - 3_600_000_000n });
+          expect((await claimer(claim)).claimed).toBe(false);
+        });
+
+        it("no existing row: first insert claims", async () => {
+          const { store } = microStore(() => NOW);
+          expect(await notificationsProcessor.createInvoiceReceiptClaimer(store)(claim)).toEqual({ claimed: true });
+        });
+      });
+
       it("claims by companyId + paymentId before sending, then marks sent", async () => {
         const claims = withClaimStore();
         vi.mocked(dependencies.loadInvoiceEmailContext).mockResolvedValue(receiptContext({}));

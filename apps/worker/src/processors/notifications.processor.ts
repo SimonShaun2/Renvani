@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { and, eq, isNull, lt } from "drizzle-orm";
+import { and, eq, isNull, lt, sql } from "drizzle-orm";
 import type { Job, Processor } from "bullmq";
 import pino from "pino";
 
@@ -365,6 +365,35 @@ export interface InvoiceReceiptClaimResult {
   claimed: boolean;
   /** Set when a stale 'sending' claim was taken over (age of the abandoned claim in ms). */
   staleReclaimedAgeMs?: number;
+}
+
+/** Storage operations behind the receipt claim (production: message_logs; tests: in-memory). */
+export interface InvoiceReceiptClaimStore {
+  /** INSERT ... ON CONFLICT DO NOTHING; true when this call created the claim. */
+  insertClaim(claim: InvoiceReceiptClaim): Promise<boolean>;
+  /**
+   * Single atomic UPDATE ... SET updated_at = now() WHERE status = 'sending' AND updated_at < now() - threshold
+   * RETURNING id. true = this caller won the takeover of a stale claim.
+   */
+  takeOverStaleClaim(companyId: string, paymentId: string): Promise<boolean>;
+  /** Age of the existing claim for logging only (null if unknown). */
+  readClaimAgeMs(companyId: string, paymentId: string): Promise<number | null>;
+}
+
+export function createInvoiceReceiptClaimer(
+  store: InvoiceReceiptClaimStore
+): (claim: InvoiceReceiptClaim) => Promise<InvoiceReceiptClaimResult> {
+  return async (claim) => {
+    if (await store.insertClaim(claim)) {
+      return { claimed: true };
+    }
+    // Read the age BEFORE the takeover (the takeover resets updated_at); logging only.
+    const ageMs = await store.readClaimAgeMs(claim.companyId, claim.paymentId).catch(() => null);
+    if (!(await store.takeOverStaleClaim(claim.companyId, claim.paymentId))) {
+      return { claimed: false };
+    }
+    return { claimed: true, staleReclaimedAgeMs: ageMs ?? INVOICE_RECEIPT_STALE_CLAIM_MS };
+  };
 }
 
 export interface InvoiceReceiptClaim {
@@ -915,64 +944,61 @@ function createProductionDependencies(): Promise<NotificationsDependencies> {
 
       return rule ?? null;
     },
-    async claimInvoiceReceiptSend(claim) {
-      const inserted = await db
-        .insert(messageLogs)
-        .values({
-          companyId: claim.companyId,
-          customerId: claim.customerId,
-          channel: "email",
-          direction: "outbound",
-          toAddress: claim.toAddress,
-          fromAddress: claim.fromAddress,
-          subject: "Payment receipt",
-          body: "Payment receipt",
-          providerStatus: "sending",
-          sourceSystem: INVOICE_RECEIPT_SOURCE_SYSTEM,
-          sourceId: claim.paymentId
-        })
-        .onConflictDoNothing()
-        .returning({ id: messageLogs.id });
-      if (inserted.length > 0) {
-        return { claimed: true };
-      }
-      // Existing claim: take it over only if it is still 'sending' and stale (worker died before send).
-      // Compare-and-set on updated_at so only one retry wins the takeover.
-      const now = new Date();
-      const staleBefore = new Date(now.getTime() - INVOICE_RECEIPT_STALE_CLAIM_MS);
-      const [existing] = await db
-        .select({ updatedAt: messageLogs.updatedAt })
-        .from(messageLogs)
-        .where(
-          and(
-            eq(messageLogs.companyId, claim.companyId),
-            eq(messageLogs.sourceSystem, INVOICE_RECEIPT_SOURCE_SYSTEM),
-            eq(messageLogs.sourceId, claim.paymentId),
-            eq(messageLogs.providerStatus, "sending"),
-            lt(messageLogs.updatedAt, staleBefore)
+    claimInvoiceReceiptSend: createInvoiceReceiptClaimer({
+      async insertClaim(claim) {
+        const inserted = await db
+          .insert(messageLogs)
+          .values({
+            companyId: claim.companyId,
+            customerId: claim.customerId,
+            channel: "email",
+            direction: "outbound",
+            toAddress: claim.toAddress,
+            fromAddress: claim.fromAddress,
+            subject: "Payment receipt",
+            body: "Payment receipt",
+            providerStatus: "sending",
+            sourceSystem: INVOICE_RECEIPT_SOURCE_SYSTEM,
+            sourceId: claim.paymentId
+          })
+          .onConflictDoNothing()
+          .returning({ id: messageLogs.id });
+        return inserted.length > 0;
+      },
+      async takeOverStaleClaim(companyId, paymentId) {
+        // One atomic UPDATE: the staleness test runs inside Postgres (full precision), so concurrent
+        // retries race on the row lock and exactly one gets a row back. No JS round-trip of updated_at.
+        const [won] = await db
+          .update(messageLogs)
+          .set({ updatedAt: sql`now()` })
+          .where(
+            and(
+              eq(messageLogs.companyId, companyId),
+              eq(messageLogs.sourceSystem, INVOICE_RECEIPT_SOURCE_SYSTEM),
+              eq(messageLogs.sourceId, paymentId),
+              eq(messageLogs.providerStatus, "sending"),
+              lt(messageLogs.updatedAt, sql`now() - make_interval(secs => ${INVOICE_RECEIPT_STALE_CLAIM_MS / 1000})`)
+            )
           )
-        )
-        .limit(1);
-      if (!existing) {
-        return { claimed: false };
-      }
-      const reclaimed = await db
-        .update(messageLogs)
-        .set({ updatedAt: now })
-        .where(
-          and(
-            eq(messageLogs.companyId, claim.companyId),
-            eq(messageLogs.sourceSystem, INVOICE_RECEIPT_SOURCE_SYSTEM),
-            eq(messageLogs.sourceId, claim.paymentId),
-            eq(messageLogs.providerStatus, "sending"),
-            eq(messageLogs.updatedAt, existing.updatedAt)
+          .returning({ id: messageLogs.id });
+        return Boolean(won);
+      },
+      async readClaimAgeMs(companyId, paymentId) {
+        // Logging only; never used for the takeover decision.
+        const [row] = await db
+          .select({ updatedAt: messageLogs.updatedAt })
+          .from(messageLogs)
+          .where(
+            and(
+              eq(messageLogs.companyId, companyId),
+              eq(messageLogs.sourceSystem, INVOICE_RECEIPT_SOURCE_SYSTEM),
+              eq(messageLogs.sourceId, paymentId)
+            )
           )
-        )
-        .returning({ id: messageLogs.id });
-      return reclaimed.length > 0
-        ? { claimed: true, staleReclaimedAgeMs: now.getTime() - existing.updatedAt.getTime() }
-        : { claimed: false };
-    },
+          .limit(1);
+        return row ? Math.max(0, Date.now() - row.updatedAt.getTime()) : null;
+      }
+    }),
     async markInvoiceReceiptSent(companyId, paymentId) {
       const now = new Date();
       await db

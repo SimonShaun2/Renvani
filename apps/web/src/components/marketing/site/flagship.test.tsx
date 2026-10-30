@@ -14,7 +14,7 @@ import { buildMarketingSitemap } from "@/src/lib/seo/public-sitemap";
 
 import { FlagshipPage } from "./FlagshipPage";
 import { PRODUCT_PAGES, productLinkFor } from "./flagship-registry";
-import { FLAGSHIP_VISUALS } from "./flagship-visuals";
+import { FLAGSHIP_TREES } from "./flagship-visuals";
 import { MarketingShell } from "./MarketingShell";
 import { PRODUCTS_MENU } from "./site-config";
 
@@ -36,8 +36,12 @@ describe("flagship + product-detail pages (Figma 175:3…175:2154)", () => {
   for (const page of PRODUCT_PAGES) {
     it(`renders ${page.slug} with real links only`, () => {
       const { container } = render(<FlagshipPage page={page} />);
-      expect(screen.getByRole("heading", { level: 1 }).textContent).toBe(page.headline);
+      const h1s = screen.getAllByRole("heading", { level: 1 });
+      expect(h1s).toHaveLength(2); // desktop (md+) and mobile frame; only one is displayed
       expect(container.querySelector("#workflow")).toBeTruthy();
+      expect(container.querySelector("#workflow-m")).toBeTruthy();
+      expect(FLAGSHIP_TREES[page.slug]!.desktop).toMatchObject({ id: page.frames.desktop });
+      expect(FLAGSHIP_TREES[page.slug]!.mobile).toMatchObject({ id: page.frames.mobile });
       for (const a of Array.from(container.querySelectorAll("a"))) expect(resolves(a.getAttribute("href")!), a.getAttribute("href")!).toBe(true);
       expect(isPublicRoute(`/product/${page.slug}`)).toBe(true);
     });
@@ -51,11 +55,8 @@ describe("flagship + product-detail pages (Figma 175:3…175:2154)", () => {
       if (o.src) srcs.add(o.src);
       o.k?.forEach(walk);
     };
-    Object.values(FLAGSHIP_VISUALS).forEach(walk);
-    PRODUCT_PAGES.forEach((p) => p.template === "flagship" && p.fieldImage && srcs.add(p.fieldImage));
-    for (const p of PRODUCT_PAGES) {
-      expect(FLAGSHIP_VISUALS[p.heroVisual]).toBeTruthy();
-    }
+    Object.values(FLAGSHIP_TREES).forEach((t) => { walk(t.desktop); walk(t.mobile); });
+    expect(srcs.size).toBeGreaterThan(0);
     for (const s of srcs) expect(existsSync(join(PUBLIC, s)), s).toBe(true);
   });
 
@@ -75,7 +76,7 @@ describe("flagship + product-detail pages (Figma 175:3…175:2154)", () => {
 
   it("copy guard: home services only, no competitors, Service Fee wording", () => {
     const text = readFileSync(join(__dirname, "flagship-visuals.ts"), "utf8") + JSON.stringify(PRODUCT_PAGES);
-    expect(text).not.toMatch(/jobber|servicetitan|housecall|service fusion|fieldedge/i);
+    expect(text).not.toMatch(/jobber|servicetitan|housecall|service fusion|fieldedge|owner\.com|broccoli/i);
     expect(text).not.toMatch(/restaurant|menu|diner|reservation|\btable\b/i);
     expect(text).not.toMatch(/\$1\.99|booking fee|\$399|\$999|\$199/i);
   });

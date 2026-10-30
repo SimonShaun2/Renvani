@@ -43,6 +43,12 @@ export interface CompanyVipMembershipSettings {
   pastDueGraceDays?: number | null;
 }
 
+/** Growth: per-shop Google Business Profile sync opt-in (adapter is disabled until configured). */
+export interface CompanyGoogleBusinessProfileSettings {
+  optIn?: boolean | null;
+  updatedAt?: string | null;
+}
+
 export interface CompanySettings {
   tradingName?: string | null;
   currency?: string | null;
@@ -52,4 +58,5 @@ export interface CompanySettings {
   clerk?: CompanyClerkSettings | null;
   stripePlatformBilling?: CompanyStripePlatformBillingSettings | null;
   vipMembership?: CompanyVipMembershipSettings | null;
+  googleBusinessProfile?: CompanyGoogleBusinessProfileSettings | null;
 }

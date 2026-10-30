@@ -46,7 +46,7 @@ const HOME_SERVICES_FALLBACK_CARDS: BrandedServiceCard[] = [
   { id: "hvac", title: "Heating & cooling repair", subtitle: "Diagnostic visit" },
   { id: "plumbing", title: "Plumbing repair", subtitle: "Diagnostic visit" },
   { id: "electrical", title: "Electrical repair", subtitle: "Diagnostic visit" },
-  { id: "maintenance", title: "Seasonal maintenance", subtitle: "Tune-up visit" }
+  { id: "tune-up", title: "Seasonal tune-up", subtitle: "Tune-up visit" }
 ];
 
 function readServiceLabel(service: Record<string, unknown>): string | null {

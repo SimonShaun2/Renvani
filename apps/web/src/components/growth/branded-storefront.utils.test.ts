@@ -1,3 +1,4 @@
+import { suggestsRecurringServiceIntent } from "@/src/lib/booking-commit.utils";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -81,7 +82,10 @@ describe("branded-storefront.utils", () => {
     const model = buildBrandedStorefrontViewModel(baseSettings);
 
     expect(model.serviceCards.length).toBe(4);
-    expect(model.serviceCards.map((c) => c.id)).toEqual(["hvac", "plumbing", "electrical", "maintenance"]);
+    expect(model.serviceCards.map((c) => c.id)).toEqual(["hvac", "plumbing", "electrical", "tune-up"]);
+    for (const card of model.serviceCards) {
+      expect(suggestsRecurringServiceIntent({ serviceCategory: "Home services", serviceType: card.title, serviceDetail: card.subtitle })).toBe(false);
+    }
     expect(model.bookingSlug).toBe("sparkle-co");
   });
 });

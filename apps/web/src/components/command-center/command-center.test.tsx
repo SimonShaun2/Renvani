@@ -1,12 +1,14 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 
+vi.mock("@/src/hooks/company.hooks", () => ({ useCompany: () => ({ data: undefined }) }));
 vi.mock("@/src/hooks/operator-inbox.hooks", () => ({
   useOperatorInbox: () => ({ isLoading: true, isError: false, data: undefined }),
   useApproveAgentAction: () => ({ mutateAsync: vi.fn(), isPending: false })
 }));
 
 import { CommandCenterView } from "./CommandCenterView";
+import { hourIn } from "./LocalClock";
 import { CC_REGIONS, EMPTY, KPIS, agentLabel, greetingFor, itemStatus, needsYouCounts } from "./command-center.config";
 
 describe("command center config", () => {
@@ -32,11 +34,14 @@ describe("command center config", () => {
 
 describe("CommandCenterView", () => {
   const html = renderToStaticMarkup(
-    <CommandCenterView greeting="Good morning," firstName="Maya" dateLabel="Wednesday, Oct 28" monthLabel="Oct" />
+    <CommandCenterView firstName="Maya" />
   );
   it("renders header, KPIs with dashes, loop and rail", () => {
     expect(html).toContain("Maya.");
-    expect(html).toContain("Direct inquiries · Oct");
+    // Server render is time-neutral: no server-clock greeting or date.
+    expect(html).toContain("Hello,");
+    expect(html).not.toMatch(/Good (morning|afternoon|evening)/);
+    expect(html).toContain("Direct inquiries · —");
     expect(html.match(/data-testid="cc-kpi"/g)).toHaveLength(4);
     expect(html.match(/data-testid="cc-loop"/g)).toHaveLength(4);
     expect(html).toContain(EMPTY);
@@ -44,7 +49,16 @@ describe("CommandCenterView", () => {
     expect(html).not.toMatch(/\$1\.99|booking fee/i);
   });
   it("omits name when Clerk user is unavailable", () => {
-    const anon = renderToStaticMarkup(<CommandCenterView greeting="Good morning," firstName={null} dateLabel="x" monthLabel="Oct" />);
+    const anon = renderToStaticMarkup(<CommandCenterView firstName={null} />);
     expect(anon).not.toContain("Maya");
+  });
+});
+
+describe("hourIn", () => {
+  it("uses the shop time zone when given, else local", () => {
+    const d = new Date("2026-10-28T13:00:00.000Z");
+    expect(hourIn(d, "America/Chicago")).toBe(8);
+    expect(hourIn(d, "Asia/Tokyo")).toBe(22);
+    expect(hourIn(d, "Not/AZone")).toBe(d.getHours());
   });
 });

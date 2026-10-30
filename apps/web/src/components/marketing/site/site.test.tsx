@@ -29,10 +29,34 @@ describe("marketing site (Figma 171:2)", () => {
   });
 
   it("mobile hero and intelligence use the mobile-only Figma components", () => {
-    const { container } = render(<HomePage />);
+    const { container: root } = render(<HomePage />);
+    const container = root.querySelector(".md\\:hidden.lg\\:block")!;
     expect(container.querySelector('[data-node-id="219:9474"]')!.className).toContain("md:hidden");
     expect(container.querySelector('[data-node-id="253:6779"]')!.className).toContain("md:hidden");
     expect(container.querySelector('[data-node-id="200:46"]')!.parentElement!.className).toContain("hidden md:block");
+  });
+
+  it("tablet 768 renders its own frame (253:6780) between md and lg with real links and forms", () => {
+    const { container } = render(<HomePage />);
+    const tablet = container.querySelector('[data-node-id="253:6780"]')!;
+    expect(tablet.parentElement!.className).toBe("hidden md:block lg:hidden");
+    expect(tablet.parentElement!.nextElementSibling!.className).toBe("md:hidden lg:block");
+    expect(tablet.querySelectorAll("form")).toHaveLength(2);
+    expect(tablet.textContent).not.toMatch(/Oct 29/);
+    expect(tablet.textContent).toContain("Next available day");
+    const hrefs = [...tablet.querySelectorAll("a")].map((a) => a.getAttribute("href"));
+    for (const h of [HOME.journey.more.href, ...HOME.work.trades.map((t) => t.href), HOME.intelligence.cta.href, ...HOME.intelligence.areas.map((a) => a.href)]) expect(hrefs).toContain(h);
+    expect(tablet.querySelector("a a")).toBeNull();
+  });
+
+  it("nav collapses to the hamburger icon below lg; mobile footer and area links are one column", () => {
+    const { container } = render(<MarketingShell><HomePage /></MarketingShell>);
+    expect(screen.getByRole("navigation", { name: "Main" }).className).toContain("lg:flex");
+    const menu = container.querySelector('[data-node-id="177:737"]')!;
+    expect(menu.className).toContain("lg:hidden");
+    expect(menu.querySelector("summary img")).toBeTruthy();
+    expect(screen.getByRole("navigation", { name: "Footer" }).className).toMatch(/^flex flex-col /);
+    expect(screen.getByRole("navigation", { name: "Product areas" }).className).toMatch(/^flex flex-col /);
   });
 
   it("renders the shared nav with the Figma links and demo CTA", () => {
@@ -45,12 +69,14 @@ describe("marketing site (Figma 171:2)", () => {
 
   it("renders the home hero, sections and two growth check entries", () => {
     render(<HomePage />);
-    expect(screen.getByRole("heading", { level: 1 }).textContent).toContain("More direct jobs.");
+    const h1s = screen.getAllByRole("heading", { level: 1 });
+    expect(h1s).toHaveLength(2); // lg+/mobile hero and the tablet (253:6780) hero; only one is ever displayed
+    for (const h of h1s) expect(h.textContent).toContain("More direct jobs.");
     expect(screen.getByRole("heading", { name: /The first click is/ })).toBeTruthy();
     expect(screen.getByRole("heading", { name: /Good work/ })).toBeTruthy();
     expect(screen.getByRole("heading", { name: /Built around/ })).toBeTruthy();
-    expect(screen.getAllByRole("button", { name: "Get my growth report" })).toHaveLength(2);
-    expect(screen.getAllByRole("textbox")).toHaveLength(2);
+    expect(screen.getAllByRole("button", { name: "Get my growth report" })).toHaveLength(4);
+    expect(screen.getAllByRole("textbox")).toHaveLength(4);
   });
 
   it("uses home-services copy only and no competitor names", () => {

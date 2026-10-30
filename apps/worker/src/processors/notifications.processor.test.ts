@@ -66,6 +66,7 @@ function createDependencies(): notificationsProcessor.NotificationsDependencies 
       sendCampaignEmail: vi.fn(async () => undefined),
       sendInvoiceEmail: vi.fn(async () => undefined),
       sendInvoiceReminderEmail: vi.fn(async () => undefined),
+      sendInvoicePaymentReceiptEmail: vi.fn(async () => undefined),
       sendInvoiceReminderOwnerAlertEmail: vi.fn(async () => undefined),
       sendServiceAgreementRenewalReminderEmail: vi.fn(async () => undefined),
       sendServiceAgreementPaymentFailedEmail: vi.fn(async () => undefined),
@@ -186,6 +187,77 @@ describe("notifications.processor", () => {
     );
 
     expect(dependencies.email.sendEstimateEmail).not.toHaveBeenCalled();
+  });
+
+  describe("send-invoice-receipt", () => {
+    function receiptContext(customer: Record<string, unknown>) {
+      return {
+        companyId: "company-1",
+        invoiceId: "invoice-1",
+        customerId: "customer-1",
+        status: "paid" as const,
+        invoiceNumber: "INV-1001",
+        total: "400.00",
+        balanceDue: "0.00",
+        dueAt: null,
+        stripePaymentLinkUrl: "https://example.com/pay/tok",
+        reminder1SentAt: null,
+        reminder2SentAt: null,
+        reminder3SentAt: null,
+        customer: { firstName: "Chris", lastName: "Pine", email: "customer@example.com", ...customer },
+        company: { name: "Acme HVAC" }
+      };
+    }
+    const receiptJob = () =>
+      createJob("send-invoice-receipt", {
+        companyId: "company-1",
+        invoiceId: "invoice-1",
+        customerId: "customer-1",
+        paymentId: "payment-1",
+        amount: "400.00",
+        paidAt: "2026-10-28T15:00:00.000Z"
+      });
+
+    it("sends the receipt via the processor switch, tenant-scoped load", async () => {
+      vi.mocked(dependencies.loadInvoiceEmailContext).mockResolvedValue(receiptContext({}));
+      await notificationsProcessor.createNotificationsProcessor(dependencies)(receiptJob(), "token");
+      expect(dependencies.loadInvoiceEmailContext).toHaveBeenCalledWith("company-1", "invoice-1");
+      expect(dependencies.email.sendInvoicePaymentReceiptEmail).toHaveBeenCalledWith("customer@example.com", {
+        firstName: "Chris",
+        invoiceNumber: "INV-1001",
+        amount: "400.00",
+        balanceDue: "0.00",
+        paidAt: "2026-10-28T15:00:00.000Z",
+        receiptUrl: "https://example.com/pay/tok",
+        companyName: "Acme HVAC"
+      });
+    });
+
+    it.each([
+      ["doNotContact", { doNotContact: true }],
+      ["prefersEmail=false", { prefersEmail: false }],
+      ["no email", { email: null }]
+    ])("skips when %s", async (_label, customer) => {
+      vi.mocked(dependencies.loadInvoiceEmailContext).mockResolvedValue(receiptContext(customer));
+      await notificationsProcessor.handleSendInvoicePaymentReceipt(receiptJob(), dependencies);
+      expect(dependencies.email.sendInvoicePaymentReceiptEmail).not.toHaveBeenCalled();
+    });
+
+    it("skips when the invoice belongs to another customer / tenant (context mismatch)", async () => {
+      vi.mocked(dependencies.loadInvoiceEmailContext).mockResolvedValue({ ...receiptContext({}), customerId: "other" });
+      await notificationsProcessor.handleSendInvoicePaymentReceipt(receiptJob(), dependencies);
+      vi.mocked(dependencies.loadInvoiceEmailContext).mockResolvedValue(null);
+      await notificationsProcessor.handleSendInvoicePaymentReceipt(receiptJob(), dependencies);
+      expect(dependencies.email.sendInvoicePaymentReceiptEmail).not.toHaveBeenCalled();
+    });
+
+    it("skips when identifiers are missing", async () => {
+      await notificationsProcessor.handleSendInvoicePaymentReceipt(
+        createJob("send-invoice-receipt", { companyId: "company-1", invoiceId: "invoice-1" }),
+        dependencies
+      );
+      expect(dependencies.loadInvoiceEmailContext).not.toHaveBeenCalled();
+    });
   });
 
   it("send-invoice-email sends the invoice email when the customer can receive it", async () => {
@@ -790,5 +862,100 @@ describe("send-review-request send-time re-check (#264 review)", () => {
     });
     const ok = await run({ ...activeContext(), invoice: null, ruleEnabled: false }, job);
     expect(ok.sendReviewRequestEmail).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("send-plan-reminder", () => {
+  it("emails the renewal reminder via the Resend template", async () => {
+    const deps = createDependencies();
+    const sendPlanReminderEmail = vi.fn(async () => undefined);
+    (deps.email as unknown as Record<string, unknown>).sendPlanReminderEmail = sendPlanReminderEmail;
+    await notificationsProcessor.handleSendPlanReminder(
+      createJob("send-plan-reminder", {
+        companyId: "company-1",
+        maintenancePlanId: "plan-1",
+        reminderKind: "renewal",
+        channel: "email",
+        customerEmail: "chris@example.com",
+        firstName: "Chris",
+        companyName: "Acme HVAC",
+        planName: "Gold Plan",
+        dueDateLabel: "November 20, 2026"
+      }),
+      deps
+    );
+    expect(sendPlanReminderEmail).toHaveBeenCalledWith("chris@example.com", {
+      firstName: "Chris",
+      companyName: "Acme HVAC",
+      planName: "Gold Plan",
+      dueDateLabel: "November 20, 2026",
+      reminderKind: "renewal"
+    });
+    expect(deps.sms.sendSms).not.toHaveBeenCalled();
+  });
+
+  it("routes SMS jobs through the SMS module (disabled stub in dev)", async () => {
+    const deps = createDependencies();
+    await notificationsProcessor.handleSendPlanReminder(
+      createJob("send-plan-reminder", { channel: "sms", reminderKind: "tune_up", customerPhone: "555-0100", smsBody: "Tune-up due" }),
+      deps
+    );
+    expect(deps.sms.sendSms).toHaveBeenCalledWith("555-0100", "Tune-up due");
+  });
+
+  describe("send-time re-check (#264 standard)", () => {
+    const job = (channel: "email" | "sms") =>
+      createJob("send-plan-reminder", {
+        companyId: "company-1",
+        maintenancePlanId: "plan-1",
+        customerId: "cust-1",
+        reminderKind: "renewal",
+        channel,
+        customerEmail: "chris@example.com",
+        customerPhone: "555-0100",
+        smsBody: "Renewal due",
+        firstName: "Chris",
+        companyName: "Acme HVAC",
+        planName: "Gold Plan",
+        dueDateLabel: "November 20, 2026"
+      });
+    const ok = {
+      plan: { status: "active", deleted: false, customerId: "cust-1" },
+      customer: { prefersEmail: true, prefersSms: true, doNotContact: false },
+      ruleEnabled: true
+    };
+
+    it.each([
+      ["plan gone", null],
+      ["plan deleted", { ...ok, plan: { ...ok.plan, deleted: true } }],
+      ["plan cancelled", { ...ok, plan: { ...ok.plan, status: "cancelled" } }],
+      ["rule turned off", { ...ok, ruleEnabled: false }],
+      ["do not contact", { ...ok, customer: { ...ok.customer, doNotContact: true } }],
+      ["email consent withdrawn", { ...ok, customer: { ...ok.customer, prefersEmail: false } }],
+      ["plan moved to another customer", { ...ok, plan: { ...ok.plan, customerId: "cust-2" } }]
+    ])("skips when %s", async (_label, context) => {
+      const deps = createDependencies();
+      const sendPlanReminderEmail = vi.fn(async () => undefined);
+      (deps.email as unknown as Record<string, unknown>).sendPlanReminderEmail = sendPlanReminderEmail;
+      const load = vi.fn(async () => context);
+      (deps as unknown as Record<string, unknown>).loadPlanReminderSendContext = load;
+      await notificationsProcessor.handleSendPlanReminder(job("email"), deps);
+      expect(load).toHaveBeenCalledWith("company-1", "plan-1");
+      expect(sendPlanReminderEmail).not.toHaveBeenCalled();
+    });
+
+    it("skips SMS when SMS consent is withdrawn, sends when consent and plan are still valid", async () => {
+      const deps = createDependencies();
+      (deps as unknown as Record<string, unknown>).loadPlanReminderSendContext = vi.fn(async () => ({
+        ...ok,
+        customer: { ...ok.customer, prefersSms: false }
+      }));
+      await notificationsProcessor.handleSendPlanReminder(job("sms"), deps);
+      expect(deps.sms.sendSms).not.toHaveBeenCalled();
+
+      (deps as unknown as Record<string, unknown>).loadPlanReminderSendContext = vi.fn(async () => ok);
+      await notificationsProcessor.handleSendPlanReminder(job("sms"), deps);
+      expect(deps.sms.sendSms).toHaveBeenCalledWith("555-0100", "Renewal due");
+    });
   });
 });

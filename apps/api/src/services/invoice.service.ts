@@ -29,6 +29,7 @@ import {
   payments,
   users
 } from "@fsm/db";
+import { isReceiptEmailAllowed } from "@fsm/comms";
 import { aiQueue, invoicesQueue, notificationsQueue } from "@fsm/jobs";
 import {
   AppError,
@@ -1077,6 +1078,7 @@ export async function sendInvoice(
       invoiceId: existingInvoice.id,
       customerId: existingInvoice.customerId,
       customerEmail: customer.email,
+      receiptEmail: isReceiptEmailAllowed(customer) ? customer.email.trim() : null,
       companyStripeAccountId: company.stripeAccountId,
       companyName: company.name,
       invoiceNumber: existingInvoice.invoiceNumber,
@@ -1514,7 +1516,7 @@ export async function handleStripePaymentSuccess(
   // Only the invoice portion is applied to the balance; fees are recorded on their own columns.
   const paymentAmount = new Decimal(fees.invoiceAmountCents).div(100);
 
-  const paid = await db.transaction(async (tx) => {
+  const recorded = await db.transaction(async (tx) => {
     const customer = await getCustomerRecord(invoice.companyId, invoice.customerId, tx);
     const insertedPayments = await tx
       .insert(payments)
@@ -1596,11 +1598,51 @@ export async function handleStripePaymentSuccess(
       });
     }
 
-    return updatedInvoice.status === "paid";
+    return { payment, customer, paid: updatedInvoice.status === "paid" };
   });
 
-  if (paid) {
+  await enqueueInvoicePaymentReceipt(invoice.companyId, invoice.id, recorded.payment, recorded.customer);
+
+  if (recorded.paid) {
     await dispatchEventAutomation({ eventType: "invoice.paid", companyId: invoice.companyId, invoiceId: invoice.id });
+  }
+}
+
+/**
+ * Resend payment receipt. Only reached when this delivery inserted a NEW payment row (redelivery returns early on
+ * the existing intent), and the jobId makes BullMQ drop any duplicate enqueue, so receipts are at most once per payment.
+ * Opt-out is re-checked in the worker against fresh customer data; this pre-check just avoids pointless jobs.
+ * Enqueue failure is logged, never thrown: the payment is already committed and a 5xx would not re-enqueue.
+ */
+async function enqueueInvoicePaymentReceipt(
+  companyId: string,
+  invoiceId: string,
+  payment: { id: string; customerId: string; amount: string; paidAt: Date | null },
+  customer: { email: string | null; doNotContact?: boolean | null; prefersEmail?: boolean | null }
+): Promise<void> {
+  if (!isReceiptEmailAllowed(customer)) {
+    return;
+  }
+
+  try {
+    await notificationsQueue.add(
+      "send-invoice-receipt",
+      {
+        companyId,
+        invoiceId,
+        customerId: payment.customerId,
+        paymentId: payment.id,
+        amount: payment.amount,
+        paidAt: payment.paidAt ? payment.paidAt.toISOString() : null
+      },
+      {
+        jobId: `invoice-receipt-${payment.id}`,
+        attempts: 3,
+        backoff: { type: "exponential", delay: 5000 }
+      }
+    );
+  } catch (error) {
+    logger.error({ err: error, companyId, invoiceId, paymentId: payment.id }, "Failed to enqueue invoice payment receipt");
   }
 }
 

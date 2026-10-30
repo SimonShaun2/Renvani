@@ -45,9 +45,17 @@ export async function getCompanyTrade(companyId: string): Promise<CompanyTradeVi
 
 /** Owner/admin sets the shop trade in `companies.settings.trade`; other settings are preserved. */
 export async function setCompanyTrade(companyId: string, actorId: string, trade: HomeServiceTrade): Promise<CompanyTradeView> {
-  const company = await loadCompany(companyId);
-  const nextSettings = { ...settingsObject(company.settings), trade };
+  // Atomic: lock the company row inside the tenant transaction, re-read settings there and change only `trade`,
+  // so a concurrent settings save cannot be overwritten by a stale copy (and this write cannot undo theirs).
   await runTenantAwareTransaction(companyId, async (tx) => {
+    const [company] = await tx
+      .select()
+      .from(companies)
+      .where(and(eq(companies.id, companyId), isNull(companies.deletedAt)))
+      .for("update")
+      .limit(1);
+    if (!company) throw new AppError(ErrorCode.NOT_FOUND, "Company not found");
+    const nextSettings = { ...settingsObject(company.settings), trade };
     await tx.update(companies).set({ settings: nextSettings, updatedAt: new Date() }).where(eq(companies.id, companyId));
     await emitEventWithExecutor(tx, {
       companyId,

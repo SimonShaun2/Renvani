@@ -71,6 +71,27 @@ describe("company trade setting", () => {
     expect(res.status).toBe(403);
   });
 
+  it("returns 403 (not 400) to non-admin staff even with an invalid body", async () => {
+    const a = shop("o-shop");
+    for (const role of ["dispatcher", "technician"]) {
+      const res = await request(app.server).put("/api/v1/company/trade").set("Authorization", a.user(role)).send({ trade: "roofing", x: 1 });
+      expect(res.status).toBe(403);
+    }
+  });
+
+  it("changes only the trade key and keeps a concurrent settings save", async () => {
+    const a = shop("cc-shop");
+    const owner = a.user("owner");
+    const [put, patch] = await Promise.all([
+      request(app.server).put("/api/v1/company/trade").set("Authorization", owner).send({ trade: "plumbing" }),
+      request(app.server).patch("/api/v1/company").set("Authorization", owner).send({ settings: { tradingName: "Pipes R Us" } })
+    ]);
+    expect(put.status).toBe(200);
+    expect(patch.status).toBe(200);
+    const stored = fakeDb.getTestState().companies.find((c) => c.id === a.company.id)!.settings as Record<string, unknown>;
+    expect(stored).toMatchObject({ trade: "plumbing", tradingName: "Pipes R Us", currency: "USD" });
+  });
+
   it.each([[{ trade: "cleaning" }], [{ trade: "" }], [{}], [{ trade: "hvac", extra: 1 }]])("rejects invalid body %j", async (body) => {
     const a = shop("v-shop");
     const res = await request(app.server).put("/api/v1/company/trade").set("Authorization", a.user("owner")).send(body);
@@ -143,5 +164,12 @@ describe("public site uses the trade", () => {
     fakeDb.seedBookingSettings({ companyId: c.company.id, bookingSlug: "p-c", isEnabled: true } as never);
     const unset = await request(app.server).get("/api/v1/public/booking/p-c");
     expect(unset.body.booking).toMatchObject({ trade: null, tradeSchemaType: null, offeredServices: [] });
+
+    // A stored value outside the four-value enum is never exposed publicly.
+    const d = shop("p-d", { trade: "roofing" });
+    fakeDb.seedBookingSettings({ companyId: d.company.id, bookingSlug: "p-d", isEnabled: true } as never);
+    const bogus = await request(app.server).get("/api/v1/public/booking/p-d");
+    expect(bogus.body.booking.trade).toBeNull();
+    expect(HOME_SERVICE_TRADES).toEqual(["hvac", "plumbing", "electrical", "other"]);
   });
 });

@@ -18,7 +18,8 @@ export const companyTradeRoutes: FastifyPluginAsync = async (fastify) => {
 
   fastify.put(
     "/trade",
-    { preHandler: [fastify.authenticate, requireOwnerOrAdmin], preValidation: [updateTradeValidation] },
+    // Role check runs before body validation so non-owner/admin staff get 403, never a 400 that probes the schema.
+    { preHandler: [fastify.authenticate, requireOwnerOrAdmin, updateTradeValidation] },
     async (request: FastifyRequest, reply: FastifyReply) => {
       const body = request.body as UpdateCompanyTradeBody;
       return reply.send({ trade: await setCompanyTrade(request.company.id, request.user.id, body.trade) });

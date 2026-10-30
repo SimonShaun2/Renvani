@@ -1,3 +1,4 @@
+import type { HomeServiceTrade } from "./home-services/trade.js";
 export interface BookingSettings {
   id: string;
   companyId: string;
@@ -68,7 +69,7 @@ export interface PublicBookingSettings {
   /** IANA timezone for availableHoursStart/End + availableDays. */
   timezone: string;
   /** Shop-selected trade (company settings), or null when unset. */
-  trade?: string | null;
+  trade?: HomeServiceTrade | null;
   /** schema.org @type for the site JSON-LD derived from `trade`, or null when unset. */
   tradeSchemaType?: string | null;
 }

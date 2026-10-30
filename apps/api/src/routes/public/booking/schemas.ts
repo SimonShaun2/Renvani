@@ -1,3 +1,4 @@
+import { HOME_SERVICE_TRADES } from "@fsm/types";
 import { z } from "zod";
 
 import { withZodValidation } from "../../shared/validation.js";
@@ -192,7 +193,7 @@ export const publicBookingRouteSchema = {
             serviceAreaZipCodes: { type: "array", items: { type: "string" } },
             serviceAreaNames: { type: "array", items: { type: "string" } },
             timezone: { type: "string" },
-            trade: nullableStringSchema,
+            trade: { anyOf: [{ type: "string", enum: [...HOME_SERVICE_TRADES] }, { type: "null" }] },
             tradeSchemaType: nullableStringSchema
           }
         }

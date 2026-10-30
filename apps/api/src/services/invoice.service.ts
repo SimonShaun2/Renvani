@@ -53,6 +53,7 @@ import {
 } from "@fsm/types";
 
 import { readRenvaniSubscriptionPlan } from "../lib/company-renvani-plan.js";
+import { dispatchEventAutomation } from "./automation/event-automation.registry.js";
 import { generateInvoiceNumber } from "../lib/invoice-number.js";
 import {
   buildPublicPayViewFields,
@@ -339,7 +340,8 @@ function applyPaymentToInvoice(invoice: InvoiceRow, paymentAmount: Decimal): {
 }
 
 function resolveStripePaymentMethod(paymentIntent: Stripe.PaymentIntent): PaymentMethod {
-  const paymentMethodType = paymentIntent.payment_method_types[0];
+  // Guard: some events/fixtures omit payment_method_types; never crash payment recording on it.
+  const paymentMethodType = paymentIntent.payment_method_types?.[0];
 
   switch (paymentMethodType) {
     case "card":
@@ -1212,7 +1214,7 @@ export async function recordPayment(
   const normalizedInput = normalizeRecordPaymentInput(input);
   const paymentAmount = new Decimal(normalizedInput.amount);
 
-  return db.transaction(async (tx) => {
+  const result = await db.transaction(async (tx) => {
     const actor = await getUserRecord(companyId, actorId, tx);
     const customer = await getCustomerRecord(companyId, existingInvoice.customerId, tx);
     const insertedPayments = await tx
@@ -1293,8 +1295,17 @@ export async function recordPayment(
       });
     }
 
-    return toPayment(payment);
+    return {
+      payment: toPayment(payment),
+      paid: updatedInvoice.status === "paid"
+    };
   });
+
+  if (result.paid) {
+    await dispatchEventAutomation({ eventType: "invoice.paid", companyId, invoiceId });
+  }
+
+  return result.payment;
 }
 
 export async function resendInvoiceReminder(
@@ -1503,7 +1514,7 @@ export async function handleStripePaymentSuccess(
   // Only the invoice portion is applied to the balance; fees are recorded on their own columns.
   const paymentAmount = new Decimal(fees.invoiceAmountCents).div(100);
 
-  await db.transaction(async (tx) => {
+  const paid = await db.transaction(async (tx) => {
     const customer = await getCustomerRecord(invoice.companyId, invoice.customerId, tx);
     const insertedPayments = await tx
       .insert(payments)
@@ -1584,7 +1595,13 @@ export async function handleStripePaymentSuccess(
         summary: buildInvoiceSummary(updatedInvoice.invoiceNumber, "paid")
       });
     }
+
+    return updatedInvoice.status === "paid";
   });
+
+  if (paid) {
+    await dispatchEventAutomation({ eventType: "invoice.paid", companyId: invoice.companyId, invoiceId: invoice.id });
+  }
 }
 
 export async function handleStripePaymentFailed(

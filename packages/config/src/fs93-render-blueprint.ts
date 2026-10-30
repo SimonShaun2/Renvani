@@ -21,6 +21,8 @@ export const FS93_RENDER_BLUEPRINT_REF = {
     connectionEnvVar: "DATABASE_URL"
   },
   webHost: "vercel",
+  /** STACK-12: Neon project is US East (Ohio); every Render entry must use the same region. */
+  region: "ohio",
   /** Env names that hold credentials: must never carry a literal `value:` in the Blueprint. */
   secretEnvVars: [
     "DATABASE_URL",
@@ -56,6 +58,13 @@ export function validateFs93RenderBlueprintYaml(yaml: string): Fs93BlueprintVali
 
   if (!/STATUS:\s*NOT APPLIED/i.test(yaml)) {
     violations.push("blueprint header must mark STATUS: NOT APPLIED");
+  }
+
+  const regions = [...yaml.matchAll(/^\s+region:\s*(\S+)\s*$/gm)].map((m) => m[1]);
+  if (regions.length !== 4 || regions.some((r) => r !== FS93_RENDER_BLUEPRINT_REF.region)) {
+    violations.push(
+      `all four entries (api, worker, webhook, Key Value) must set region: ${FS93_RENDER_BLUEPRINT_REF.region} (STACK-12, Neon US East Ohio)`
+    );
   }
 
   if (/^databases:/m.test(yaml)) {

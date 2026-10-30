@@ -75,7 +75,16 @@ export function isClerkAzpRequired(source?: Record<string, string | undefined>):
   );
 }
 
-export async function verifyClerkBearerToken(accessToken: string): Promise<ClerkVerifiedSession> {
+export async function verifyClerkBearerToken(accessToken: string): Promise<ClerkVerifiedSession>;
+export async function verifyClerkBearerToken(
+  accessToken: string,
+  options: { requireOrganization: false }
+): Promise<Omit<ClerkVerifiedSession, "clerkOrganizationId"> & { clerkOrganizationId: string | null }>;
+export async function verifyClerkBearerToken(
+  accessToken: string,
+  options: { requireOrganization?: boolean } = {}
+): Promise<Omit<ClerkVerifiedSession, "clerkOrganizationId"> & { clerkOrganizationId: string | null }> {
+  const requireOrganization = options.requireOrganization !== false;
   if (!isClerkParallelAuthAvailable()) {
     throw new AppError(ErrorCode.FORBIDDEN, "Clerk authentication is not enabled");
   }
@@ -115,7 +124,7 @@ export async function verifyClerkBearerToken(accessToken: string): Promise<Clerk
   }
 
   const clerkOrganizationId = extractClerkOrganizationId(payload);
-  if (!clerkOrganizationId) {
+  if (!clerkOrganizationId && requireOrganization) {
     throw new AppError(ErrorCode.UNAUTHORIZED, "Clerk session missing organization");
   }
 

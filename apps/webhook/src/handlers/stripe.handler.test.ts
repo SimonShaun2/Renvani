@@ -811,4 +811,46 @@ describe("stripe.handler", () => {
     expect(secondReply.statusCode).toBe(200);
     expect(forwardStripePaymentSuccessMock).toHaveBeenCalledTimes(1);
   });
+
+  it("stripeHandler returns 500 when processing fails so Stripe redelivers, then 200 once a retry succeeds", async () => {
+    const event = {
+      id: "evt_fail_then_retry",
+      type: "payment_intent.succeeded",
+      data: { object: { id: "pi_fail", metadata: { companyId: "company-1", invoiceId: "invoice-1" } } }
+    } as unknown as Stripe.PaymentIntentSucceededEvent;
+    forwardStripePaymentSuccessMock.mockRejectedValueOnce(new Error("db down"));
+
+    const failedReply = createReplyRecorder();
+    await stripeHandlerModule.stripeHandler(createRequestWithEvent(event), failedReply);
+
+    expect(failedReply.statusCode).toBe(500);
+    expect(failedReply.payload).toEqual({
+      error: "STRIPE_WEBHOOK_PROCESSING_FAILED",
+      message: "Stripe event processing failed; retry"
+    });
+    expect(errorLogMock).toHaveBeenCalled();
+
+    const retryReply = createReplyRecorder();
+    await stripeHandlerModule.stripeHandler(createRequestWithEvent(event), retryReply);
+    const duplicateReply = createReplyRecorder();
+    await stripeHandlerModule.stripeHandler(createRequestWithEvent(event), duplicateReply);
+
+    expect(retryReply.statusCode).toBe(200);
+    expect(duplicateReply.statusCode).toBe(200);
+    expect(forwardStripePaymentSuccessMock).toHaveBeenCalledTimes(2);
+  });
+
+  it("stripeHandler returns 200 on successful processing", async () => {
+    const event = {
+      id: "evt_ok",
+      type: "payment_intent.succeeded",
+      data: { object: { id: "pi_ok", metadata: { companyId: "company-1", invoiceId: "invoice-1" } } }
+    } as unknown as Stripe.PaymentIntentSucceededEvent;
+    const reply = createReplyRecorder();
+
+    await stripeHandlerModule.stripeHandler(createRequestWithEvent(event), reply);
+
+    expect(reply.statusCode).toBe(200);
+    expect(reply.payload).toEqual({ received: true });
+  });
 });

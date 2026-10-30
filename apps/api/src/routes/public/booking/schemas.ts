@@ -170,7 +170,9 @@ export const publicBookingRouteSchema = {
             "facebookReviewUrl",
             "phone",
             "logoUrl",
-            "serviceAreaZipCodes"
+            "serviceAreaZipCodes",
+            "serviceAreaNames",
+            "timezone"
           ],
           properties: {
             companyName: { type: "string" },
@@ -187,7 +189,9 @@ export const publicBookingRouteSchema = {
             facebookReviewUrl: nullableStringSchema,
             phone: nullableStringSchema,
             logoUrl: nullableStringSchema,
-            serviceAreaZipCodes: { type: "array", items: { type: "string" } }
+            serviceAreaZipCodes: { type: "array", items: { type: "string" } },
+            serviceAreaNames: { type: "array", items: { type: "string" } },
+            timezone: { type: "string" }
           }
         }
       }

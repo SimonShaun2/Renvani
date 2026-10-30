@@ -70,6 +70,29 @@ export async function handleUnauthorized(source: "clerk" | "legacy" | null): Pro
   }
 }
 
+/**
+ * Authenticated raw fetch for requests that can't go through `api` (multipart uploads, etc.).
+ * Same rules as apiFetch: Clerk token first, legacy JWT fallback, and handleUnauthorized on 401
+ * (Clerk sessions are signed out, never bounced to /login). Returns the Response so callers keep
+ * their own error parsing.
+ */
+export async function authorizedFetch(path: string, init: RequestInit = {}): Promise<Response> {
+  const { token, source } = await resolveBearerToken();
+  const headers = new Headers(init.headers);
+
+  if (token && !headers.has("Authorization")) {
+    headers.set("Authorization", `Bearer ${token}`);
+  }
+
+  const response = await fetch(`${API_BASE}${path}`, { ...init, credentials: "include", headers });
+
+  if (response.status === 401) {
+    await handleUnauthorized(source);
+  }
+
+  return response;
+}
+
 async function apiFetch<TResponse>(path: string, options: RequestInit = {}): Promise<TResponse> {
   const { token, source } = await resolveBearerToken();
   const headers = new Headers(options.headers);

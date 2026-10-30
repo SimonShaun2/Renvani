@@ -13,6 +13,7 @@ import {
   jobs,
   properties,
   scheduleSlots,
+  serviceAreas,
   technicians,
   users
 } from "@fsm/db";
@@ -168,7 +169,8 @@ function toBookingSettings(row: BookingSettingsRow): BookingSettings {
 function toPublicBookingSettings(
   company: CompanyRow,
   row: BookingSettingsRow,
-  serviceAreaZipCodes: string[]
+  serviceAreaZipCodes: string[],
+  serviceAreaNames: string[] = []
 ): PublicBookingSettings {
   return {
     companyName: company.name,
@@ -187,7 +189,9 @@ function toPublicBookingSettings(
     tagline: row.tagline,
     phone: company.phone,
     logoUrl: company.logoUrl,
-    serviceAreaZipCodes
+    serviceAreaZipCodes,
+    serviceAreaNames,
+    timezone: company.timezone
   };
 }
 
@@ -835,7 +839,42 @@ export async function getPublicBookingSettingsBySlug(slug: string): Promise<Publ
     )
   ).sort((left, right) => left.localeCompare(right));
 
-  return toPublicBookingSettings(company, settings, serviceAreaZipCodes);
+  const areas = await listActiveServiceAreas(settings.companyId);
+  const serviceAreaNames = Array.from(new Set(areas.map((area) => area.name.trim()).filter((name) => name.length > 0))).sort(
+    (left, right) => left.localeCompare(right)
+  );
+
+  return toPublicBookingSettings(company, settings, serviceAreaZipCodes, serviceAreaNames);
+}
+
+/** Active service areas (name + ZIPs) for a company; tenant-scoped. */
+export async function listActiveServiceAreas(companyId: string): Promise<Array<{ name: string; zips: string[] }>> {
+  const rows = await db
+    .select()
+    .from(serviceAreas)
+    .where(and(eq(serviceAreas.companyId, companyId), eq(serviceAreas.isActive, true), isNull(serviceAreas.deletedAt)));
+  return rows.map((row) => ({ name: row.name, zips: row.zips ?? [] }));
+}
+
+/**
+ * Server-side service-area gate for public inquiries: in area if a technician or an active service area covers
+ * the ZIP (or the shop allows overflow). "unknown" when the shop has no coverage data at all.
+ */
+export async function resolvePublicZipServiceability(
+  slug: string,
+  zip: string
+): Promise<{ companyId: string; serviceability: "in_area" | "out_of_area" | "unknown" }> {
+  const { settings } = await getCompanyByBookingSlug(slug, db);
+  const technicianRows = await listCompanyTechnicians(settings.companyId, db);
+  const areas = await listActiveServiceAreas(settings.companyId);
+  const areaZips = new Set(areas.flatMap((area) => area.zips.map((value) => value.trim())));
+  const hasCoverageData = areaZips.size > 0 || technicianRows.some((row) => (row.serviceZipCodes ?? []).length > 0);
+  if (!hasCoverageData) {
+    return { companyId: settings.companyId, serviceability: settings.allowZipOverflow ? "in_area" : "unknown" };
+  }
+  const covered =
+    filterTechniciansByZip(technicianRows, zip).length > 0 || areaZips.has(zip) || Boolean(settings.allowZipOverflow);
+  return { companyId: settings.companyId, serviceability: covered ? "in_area" : "out_of_area" };
 }
 
 export async function checkZipCoverage(slug: string, zip: string): Promise<CheckZipCoverageResult> {

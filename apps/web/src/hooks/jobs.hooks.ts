@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  type CreateJobInput,
   type AddJobProductInput,
   type CreateReviewRequestInput,
   type CreateTaskInput,
@@ -311,6 +312,17 @@ export function useJobsList(query: JobListQueryInput) {
     queryKey: jobKeys.list(query),
     queryFn: () => api.get<JobListResponse>(`/api/v1/jobs?${queryString}`),
     enabled: query.enabled ?? true
+  });
+}
+
+export function useCreateJob() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (input: CreateJobInput) => api.post<JobResponse>("/api/v1/jobs", input),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: jobKeys.all });
+    }
   });
 }
 

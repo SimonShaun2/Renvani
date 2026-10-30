@@ -334,6 +334,10 @@ export interface PublicPayViewFields {
   paidAt: string | null;
   /** Masked (first character of the local part kept). */
   receiptEmail: string | null;
+  /** True once the invoice is fully paid. */
+  paid: boolean;
+  /** True when a Renvani receipt email is sent for the latest succeeded payment (address on file, not opted out). */
+  receiptEmailed: boolean;
   plan: "flex" | "flat" | null;
 }
 

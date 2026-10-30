@@ -52,6 +52,10 @@ const envSchema = z.object({
   EMAIL_FROM: z.string().default("Renvani <hello@mail.getrenvani.com>"),
   /** Optional absolute https URL of the Renvani logo image for emails; empty renders the HTML text mark. */
   EMAIL_LOGO_URL: z.string().default(""),
+  /** Growth marketing intake: internal inbox notified of demo requests / growth checks; empty = skip notifications. */
+  MARKETING_NOTIFY_EMAIL: z.string().default(""),
+  /** Growth marketing intake: secret salt for hashing client IPs (HMAC-SHA256); empty = store no IP hash. */
+  MARKETING_IP_HASH_SALT: z.string().default(""),
   R2_ACCOUNT_ID: z.string().min(1, "R2_ACCOUNT_ID is required"),
   R2_ACCESS_KEY_ID: z.string().min(1, "R2_ACCESS_KEY_ID is required"),
   R2_SECRET_ACCESS_KEY: z.string().min(1, "R2_SECRET_ACCESS_KEY is required"),

@@ -12,7 +12,7 @@ import {
 } from "@fsm/types";
 
 import { runTenantAwareTransaction } from "../lib/company-scoped-transaction.js";
-import { checkZipCoverage, getPublicBookingCompany } from "./booking.service.js";
+import { checkZipCoverageForBookingSettings, getPublicBookingContext } from "./booking.service.js";
 
 /**
  * Atomic single-key settings write: locks the company row inside the tenant transaction, re-reads settings
@@ -99,9 +99,9 @@ export async function setEmergencyService(
  * technician ZIPs, allowZipOverflow). Never returns the ZIP list, counts or technician data.
  */
 export async function publicServesZip(slug: string, zip: string): Promise<{ served: boolean }> {
-  const company = await getPublicBookingCompany(slug);
+  const { company, settings } = await getPublicBookingContext(slug);
   const area = readServiceAreaSettings(company.settings);
   if (area.zips.length > 0) return { served: area.zips.includes(zip) };
-  const coverage = await checkZipCoverage(slug, zip);
+  const coverage = await checkZipCoverageForBookingSettings(settings, zip);
   return { served: coverage.covered };
 }

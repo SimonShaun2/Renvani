@@ -37,7 +37,9 @@ import {
   type UpdateBookingSettingsInput,
   type BookingRequestStatus,
   ErrorCode,
-  readEmergencyServiceSettings
+  readEmergencyServiceSettings,
+  type EmergencyRequestResolution,
+  resolveEmergencyRequest
 } from "@fsm/types";
 
 import {
@@ -833,6 +835,11 @@ export async function getPublicBookingCompany(slug: string): Promise<CompanyRow>
   return company;
 }
 
+/** Company + booking settings for a public slug in one lookup (404 when unknown/disabled). */
+export async function getPublicBookingContext(slug: string) {
+  return getCompanyByBookingSlug(slug, db);
+}
+
 export async function resolvePublicBookingCompanyId(slug: string): Promise<string> {
   const { settings } = await getCompanyByBookingSlug(slug, db);
   return settings.companyId;
@@ -893,6 +900,14 @@ export async function checkZipCoverage(slug: string, zip: string): Promise<Check
   }
 
   const { settings } = await getCompanyByBookingSlug(slug, db);
+  return checkZipCoverageForBookingSettings(settings, normalizedZip);
+}
+
+/** ZIP coverage for an already-resolved booking settings row (no second slug lookup). */
+export async function checkZipCoverageForBookingSettings(
+  settings: { companyId: string; allowZipOverflow: boolean | null },
+  normalizedZip: string
+): Promise<CheckZipCoverageResult> {
   const technicianRows = await listCompanyTechnicians(settings.companyId, db);
   const coveredTechnicians = filterTechniciansByZip(technicianRows, normalizedZip);
   const covered = coveredTechnicians.length > 0 || Boolean(settings.allowZipOverflow);
@@ -1441,12 +1456,38 @@ export async function updateBookingSettings(
   });
 }
 
+/**
+ * Single emergency guard for every public booking submit: a request is treated as an emergency request when
+ * `emergency === true` OR `urgency === "emergency"`. It is accepted only if the shop has 24/7 emergency service on
+ * and its trade is emergency-capable; otherwise it is downgraded to "this_week" (never rejected).
+ */
+export function applyPublicEmergencyGuard(
+  input: SubmitBookingRequestInput,
+  companySettings: unknown
+): { input: SubmitBookingRequestInput; emergency: EmergencyRequestResolution } {
+  const settings = companySettings && typeof companySettings === "object" ? (companySettings as Record<string, unknown>) : {};
+  const trade = typeof settings.trade === "string" ? settings.trade : null;
+  const emergency = resolveEmergencyRequest(
+    input.emergency === true || input.urgency === "emergency",
+    readEmergencyServiceSettings(settings),
+    trade
+  );
+  const { emergency: _flag, ...rest } = input;
+  const urgency: SubmitBookingRequestInput["urgency"] = emergency.accepted
+    ? "emergency"
+    : rest.urgency === "emergency"
+      ? "this_week"
+      : rest.urgency;
+  return { input: { ...rest, ...(urgency !== undefined ? { urgency } : {}) }, emergency };
+}
+
 export async function submitBookingRequest(
   slug: string,
   input: SubmitBookingRequestInput,
   sourceParam?: string
 ): Promise<{ bookingRequest: BookingRequest; confirmation: BookingConfirmationView; holdToken: string | null }> {
   const { company, settings } = await getCompanyByBookingSlug(slug, db);
+  input = applyPublicEmergencyGuard(input, company.settings).input;
   const normalizedInput: NormalizedBookingInput = {
     firstName: input.firstName.trim(),
     lastName: input.lastName.trim(),

@@ -21,5 +21,7 @@ export interface StripeConnectStatus {
   lastPayoutAt?: string | null;
   /** Flex: customer-paid platform fee % added at checkout (0 on Flat). */
   platformFeePercent?: number;
+  /** Same value as platformFeePercent under the customer-facing "Service Fee" name. */
+  serviceFeePercent?: number;
   renvaniPlanTier?: "flex" | "flat" | null;
 }

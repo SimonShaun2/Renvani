@@ -1,11 +1,11 @@
-import { publicEnv } from "@fsm/config";
+import { API_BASE_URL } from "./api-base-url";
 import type { ErrorCode } from "@fsm/types";
 
 import { clearBrowserAuthSession, getAuthToken } from "./auth";
 import { CLERK_NO_ACCESS_ROUTE } from "./clerk/route-decision";
 import { getClerkSessionToken, signOutClerkSession } from "./clerk/token-bridge";
 
-const API_BASE = publicEnv.NEXT_PUBLIC_API_URL;
+const API_BASE = API_BASE_URL;
 
 export interface ApiErrorPayload {
   error: ErrorCode | "NOT_IMPLEMENTED";

@@ -1,6 +1,6 @@
 import { and, eq, gte, isNull } from "drizzle-orm";
 
-import { bookingRequests, db, emitEvent, inquirySubmitIdempotency } from "@fsm/db";
+import { bookingRequests, customers, db, emitEvent, inquirySubmitIdempotency } from "@fsm/db";
 import {
   AppError,
   ErrorCode,
@@ -411,6 +411,76 @@ export async function intakeInboxInquiry(
   });
 
   return inquiry;
+}
+
+/**
+ * Growth — public service-by-ZIP page inquiry (no address). Reuses the FS-17 company-scoped inquiry booking
+ * (customer match/create + booking_requests row + booking.requested event) and the revenue inquiry lifecycle
+ * events. booking_requests.source is a closed enum without "service_page", so the row is stored as "website" and
+ * the precise lead source goes on customers.lead_source (varchar, only when unset) and the inquiry attribution.
+ */
+export async function intakeServicePageInquiry(
+  companyId: string,
+  input: {
+    firstName: string;
+    lastName: string;
+    phone: string;
+    email: string | null;
+    zip: string;
+    customerNotes: string | null;
+    leadSource: string;
+    serviceability: InquiryServiceability;
+  }
+): Promise<{ referenceNumber: string; inquiry: InquiryIntakeV1 }> {
+  const actorName = `${input.firstName} ${input.lastName}`.trim();
+  const { bookingRequest, customerId } = await createCompanyScopedInquiryBooking(
+    companyId,
+    {
+      firstName: input.firstName,
+      lastName: input.lastName,
+      phone: input.phone,
+      email: input.email,
+      addressLine1: "Not provided (service page inquiry)",
+      city: "Pending",
+      state: "XX",
+      zip: input.zip,
+      customerNotes: input.customerNotes,
+      source: "website"
+    },
+    { id: null, type: "customer", name: actorName }
+  );
+
+  await db
+    .update(customers)
+    .set({ leadSource: input.leadSource })
+    .where(and(eq(customers.id, customerId), eq(customers.companyId, companyId), isNull(customers.leadSource)));
+
+  const [row] = await db
+    .select()
+    .from(bookingRequests)
+    .where(and(eq(bookingRequests.id, bookingRequest.id), eq(bookingRequests.companyId, companyId)))
+    .limit(1);
+
+  if (!row) {
+    throw new AppError(ErrorCode.INTERNAL_ERROR, "Inquiry booking row missing after service page intake");
+  }
+
+  const priorDuplicate = await findRecentDuplicateRow(companyId, row.phone, row.email, row.id);
+  const inquiry = await buildInquiryFromRow(
+    row,
+    {
+      channel: "web_form",
+      attributionProvenance: "query_param",
+      sourceAttribution: input.leadSource,
+      captureSurface: "site/service_page",
+      serviceability: input.serviceability
+    },
+    priorDuplicate,
+    customerId
+  );
+
+  await emitInquiryLifecycleEvents(inquiry, { type: "customer", name: actorName });
+  return { referenceNumber: bookingRequest.referenceNumber ?? bookingRequest.id, inquiry };
 }
 
 export async function getInquiryIntakeForBookingRequest(

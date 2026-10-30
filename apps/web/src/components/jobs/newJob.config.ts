@@ -85,7 +85,8 @@ export const NEW_JOB_COPY = {
   customerPays: "Customer pays",
   totalAfterTax: "Calculated after tax at checkout",
   submitError: "We couldn't create the job. Check the details and try again.",
-  itemsError: "Job created, but some line items couldn't be added. Add them on the job."
+  itemsError: "Job created, but some line items couldn't be saved.",
+  itemsRetry: "Retry failed items"
 } as const;
 
 /** "Service Fee (2%) · paid by customer at checkout"; null hides the line (Flat plan / no fee from the API). */
@@ -209,4 +210,14 @@ export function parseNewJobQuery(params: Record<string, string | string[] | unde
   const first = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v) ?? "";
   const customerId = first(params.customerId).trim();
   return { open: first(params.new) === "1", customerId: /^[A-Za-z0-9_-]{1,64}$/.test(customerId) ? customerId : "" };
+}
+
+/** Posts line items to a created job; resolves to the items that failed (empty = all saved). */
+export async function saveJobLineItems(
+  jobId: string,
+  items: readonly NewJobLineItem[],
+  post: (path: string, body: AddJobProductInput) => Promise<unknown>
+): Promise<NewJobLineItem[]> {
+  const results = await Promise.allSettled(items.map((item) => post(`/api/v1/jobs/${jobId}/products`, toAddJobProductInput(item))));
+  return items.filter((_, i) => results[i]!.status === "rejected");
 }

@@ -9,6 +9,7 @@ import {
   lineItemsSubtotal,
   newJobServiceFeeLabel,
   parseNewJobQuery,
+  saveJobLineItems,
   toAddJobProductInput,
   validateNewJob
 } from "./newJob.config";
@@ -208,6 +209,36 @@ describe("NewJobPanel", () => {
     );
     expect(apiPost).toHaveBeenCalledWith("/api/v1/jobs/j42/products", { name: "Furnace tune-up", quantity: 1, unitPrice: 129, isTaxable: true });
     expect(push).toHaveBeenCalledWith("/jobs/j42");
+  });
+
+  it("stays on the panel when a line item fails and retries only failed items without a second job", async () => {
+    apiPost.mockRejectedValueOnce(new Error("500")).mockResolvedValue({});
+    mutate.mockImplementation(async (_payload, opts: { onSuccess: (d: unknown) => void }) => opts.onSuccess({ job: { id: "j42" } }));
+    render(<NewJobPanel initialCustomerId="c1" />);
+    fireEvent.click(screen.getByRole("button", { name: "+ Add item from price book" }));
+    fireEvent.change(screen.getByLabelText("Search price book"), { target: { value: "furn" } });
+    fireEvent.click(screen.getByRole("button", { name: /Furnace tune-up/ }));
+    fireEvent.change(screen.getByLabelText("Job type / service"), { target: { value: "maintenance" } });
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Create job" }));
+    });
+    expect(push).not.toHaveBeenCalled();
+    expect(screen.getByRole("alert").textContent).toContain("couldn't be saved");
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Retry failed items" }));
+    });
+    expect(mutate).toHaveBeenCalledTimes(1);
+    expect(apiPost).toHaveBeenCalledTimes(2);
+    expect(apiPost).toHaveBeenLastCalledWith("/api/v1/jobs/j42/products", { name: "Furnace tune-up", quantity: 1, unitPrice: 129, isTaxable: true });
+    expect(push).toHaveBeenCalledWith("/jobs/j42");
+  });
+
+  it("saveJobLineItems returns only the failed items", async () => {
+    const a = { priceBookItemId: "a", name: "A", description: null, unitPrice: 1, quantity: 1, isTaxable: true, itemType: "service" };
+    const b = { ...a, priceBookItemId: "b", name: "B" };
+    const post = vi.fn((_p: string, body: { name?: string }) => (body.name === "B" ? Promise.reject(new Error("x")) : Promise.resolve({})));
+    const failed = await saveJobLineItems("j1", [a, b] as never, post);
+    expect(failed.map((i) => i.name)).toEqual(["B"]);
   });
 
   it("hides the Service Fee line on Flat", () => {

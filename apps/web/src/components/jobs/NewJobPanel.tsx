@@ -21,8 +21,8 @@ import {
   formatMoney,
   isMissingRequired,
   lineItemsSubtotal,
+  saveJobLineItems,
   newJobServiceFeeLabel,
-  toAddJobProductInput,
   validateNewJob,
   type NewJobErrors,
   type NewJobField,
@@ -47,7 +47,8 @@ export function NewJobPanel({ initialCustomerId = "" }: { initialCustomerId?: st
   const [items, setItems] = useState<NewJobLineItem[]>([]);
   const [itemPickerOpen, setItemPickerOpen] = useState(false);
   const [itemSearch, setItemSearch] = useState("");
-  const [itemsFailed, setItemsFailed] = useState(false);
+  const [createdJobId, setCreatedJobId] = useState<string | null>(null);
+  const [failedItems, setFailedItems] = useState<NewJobLineItem[]>([]);
   const [addingItems, setAddingItems] = useState(false);
   const createJob = useCreateJob();
 
@@ -75,18 +76,28 @@ export function NewJobPanel({ initialCustomerId = "" }: { initialCustomerId?: st
     const nextErrors = validateNewJob(values);
     setErrors(nextErrors);
     if (Object.values(nextErrors).some(Boolean)) return;
+    if (createdJobId) {
+      void saveItems(createdJobId, failedItems);
+      return;
+    }
     createJob.mutate(buildCreateJobPayload(values), {
-      onSuccess: async (data) => {
-        const jobId = data.job.id;
-        if (items.length > 0) {
-          setAddingItems(true);
-          const results = await Promise.allSettled(items.map((item) => api.post(`/api/v1/jobs/${jobId}/products`, toAddJobProductInput(item))));
-          setAddingItems(false);
-          if (results.some((r) => r.status === "rejected")) setItemsFailed(true);
-        }
-        router.push(`/jobs/${jobId}`);
+      onSuccess: (data) => {
+        setCreatedJobId(data.job.id);
+        void saveItems(data.job.id, items);
       }
     });
+  };
+
+  // Never re-creates the job: after create, only the failed line items are retried.
+  const saveItems = async (jobId: string, toSave: readonly NewJobLineItem[]) => {
+    if (toSave.length > 0) {
+      setAddingItems(true);
+      const failed = await saveJobLineItems(jobId, toSave, (path, body) => api.post(path, body));
+      setAddingItems(false);
+      setFailedItems(failed);
+      if (failed.length > 0) return;
+    }
+    router.push(`/jobs/${jobId}`);
   };
 
   const busy = createJob.isPending || addingItems;
@@ -319,7 +330,19 @@ export function NewJobPanel({ initialCustomerId = "" }: { initialCustomerId?: st
             {NEW_JOB_COPY.submitError}
           </p>
         ) : null}
-        {itemsFailed ? <p role="status" className="text-sm text-[#b42318] sm:col-span-2">{NEW_JOB_COPY.itemsError}</p> : null}
+        {failedItems.length > 0 ? (
+          <div role="alert" className="flex items-center justify-between gap-3 rounded-[10px] bg-[#fdecea] px-3.5 py-3 text-sm font-medium text-[#b42318] sm:col-span-2">
+            <span>{NEW_JOB_COPY.itemsError}</span>
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => createdJobId && void saveItems(createdJobId, failedItems)}
+              className="rounded-[10px] border border-[#b42318] bg-white px-3 py-1.5 text-sm font-semibold text-[#b42318] disabled:opacity-60"
+            >
+              {NEW_JOB_COPY.itemsRetry}
+            </button>
+          </div>
+        ) : null}
 
         <div className="flex justify-end gap-3 sm:col-span-2">
           <Link href="/jobs" className="rounded-[10px] border border-[#e6dccb] bg-white px-5 py-3 text-sm font-semibold text-[#0f1530]">

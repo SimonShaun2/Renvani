@@ -98,6 +98,9 @@ function createDependencies(): notificationsProcessor.NotificationsDependencies 
     loadCompanyOwner: vi.fn(async () => null),
     findAutomationRule: vi.fn(async () => null),
     markInvoiceReminderSent: vi.fn(async () => undefined),
+    claimInvoiceReceiptSend: vi.fn(async () => ({ claimed: true })),
+    markInvoiceReceiptSent: vi.fn(async () => undefined),
+    releaseInvoiceReceiptClaim: vi.fn(async () => undefined),
     markCampaignRecipientDelivered: vi.fn(async () => undefined),
     recordCampaignDeliveryFailure: vi.fn(async () => undefined)
   };
@@ -249,6 +252,167 @@ describe("notifications.processor", () => {
       vi.mocked(dependencies.loadInvoiceEmailContext).mockResolvedValue(null);
       await notificationsProcessor.handleSendInvoicePaymentReceipt(receiptJob(), dependencies);
       expect(dependencies.email.sendInvoicePaymentReceiptEmail).not.toHaveBeenCalled();
+    });
+
+    describe("idempotency (worker retry / stalled re-run)", () => {
+      // In-memory stand-in for the message_logs (company, source_system, source_id) unique key.
+      function withClaimStore(now: () => number = () => Date.now()) {
+        const claims = new Map<string, { status: "sending" | "sent"; at: number }>();
+        const key = (companyId: string, paymentId: string) => `${companyId}:${paymentId}`;
+        vi.mocked(dependencies.claimInvoiceReceiptSend).mockImplementation(async ({ companyId, paymentId }) => {
+          const existing = claims.get(key(companyId, paymentId));
+          if (!existing) {
+            claims.set(key(companyId, paymentId), { status: "sending", at: now() });
+            return { claimed: true };
+          }
+          const age = now() - existing.at;
+          if (existing.status === "sending" && age > notificationsProcessor.INVOICE_RECEIPT_STALE_CLAIM_MS) {
+            existing.at = now();
+            return { claimed: true, staleReclaimedAgeMs: age };
+          }
+          return { claimed: false };
+        });
+        vi.mocked(dependencies.markInvoiceReceiptSent).mockImplementation(async (companyId, paymentId) => {
+          claims.set(key(companyId, paymentId), { status: "sent", at: now() });
+        });
+        vi.mocked(dependencies.releaseInvoiceReceiptClaim).mockImplementation(async (companyId, paymentId) => {
+          if (claims.get(key(companyId, paymentId))?.status === "sending") claims.delete(key(companyId, paymentId));
+        });
+        return claims;
+      }
+
+      it("fresh 'sending' claim (another worker mid-send) → skip, no send", async () => {
+        const claims = withClaimStore();
+        claims.set("company-1:payment-1", { status: "sending", at: Date.now() - 60_000 });
+        vi.mocked(dependencies.loadInvoiceEmailContext).mockResolvedValue(receiptContext({}));
+        await notificationsProcessor.handleSendInvoicePaymentReceipt(receiptJob(), dependencies);
+        expect(dependencies.email.sendInvoicePaymentReceiptEmail).not.toHaveBeenCalled();
+      });
+
+      it("stale 'sending' claim (worker died between claim and send) → re-claim, send once, then sent", async () => {
+        const claims = withClaimStore();
+        claims.set("company-1:payment-1", { status: "sending", at: Date.now() - notificationsProcessor.INVOICE_RECEIPT_STALE_CLAIM_MS - 60_000 });
+        vi.mocked(dependencies.loadInvoiceEmailContext).mockResolvedValue(receiptContext({}));
+        await notificationsProcessor.handleSendInvoicePaymentReceipt(receiptJob(), dependencies);
+        await notificationsProcessor.handleSendInvoicePaymentReceipt(receiptJob(), dependencies);
+        expect(dependencies.email.sendInvoicePaymentReceiptEmail).toHaveBeenCalledTimes(1);
+        expect(claims.get("company-1:payment-1")?.status).toBe("sent");
+        expect(warnLogMock).toHaveBeenCalledWith(
+          expect.objectContaining({ companyId: "company-1", paymentId: "payment-1", claimAgeMs: expect.any(Number) }),
+          expect.stringContaining("stale")
+        );
+      });
+
+      describe("createInvoiceReceiptClaimer (atomic stale takeover, microsecond timestamps)", () => {
+        // Mimics Postgres: updated_at kept in MICROseconds; staleness evaluated "inside the DB" in one step.
+        function microStore(nowMicros: () => bigint) {
+          const rows = new Map<string, { status: "sending" | "sent"; updatedAtMicros: bigint }>();
+          const key = (c: string, p: string) => `${c}:${p}`;
+          const threshold = BigInt(notificationsProcessor.INVOICE_RECEIPT_STALE_CLAIM_MS) * 1000n;
+          const store = {
+            async insertClaim(claim: { companyId: string; paymentId: string }) {
+              await Promise.resolve();
+              if (rows.has(key(claim.companyId, claim.paymentId))) return false;
+              rows.set(key(claim.companyId, claim.paymentId), { status: "sending" as const, updatedAtMicros: nowMicros() });
+              return true;
+            },
+            async takeOverStaleClaim(companyId: string, paymentId: string) {
+              await Promise.resolve();
+              const row = rows.get(key(companyId, paymentId));
+              if (!row || row.status !== "sending" || !(row.updatedAtMicros < nowMicros() - threshold)) return false;
+              row.updatedAtMicros = nowMicros();
+              return true;
+            },
+            async readClaimAgeMs(companyId: string, paymentId: string) {
+              const row = rows.get(key(companyId, paymentId));
+              return row ? Number((nowMicros() - row.updatedAtMicros) / 1000n) : null;
+            }
+          };
+          return { rows, store };
+        }
+        const claim = { companyId: "company-1", customerId: "customer-1", paymentId: "payment-1", toAddress: "a@b.c", fromAddress: "x@y.z" };
+        const NOW = 1_800_000_000_123_456n; // micros, non-zero sub-ms part
+
+        it("stale claim with sub-ms updated_at: ms-truncated equality CAS would miss, atomic UPDATE wins", async () => {
+          const { rows, store } = microStore(() => NOW);
+          const staleMicros = NOW - BigInt(notificationsProcessor.INVOICE_RECEIPT_STALE_CLAIM_MS + 60_000) * 1000n + 789n;
+          rows.set("company-1:payment-1", { status: "sending", updatedAtMicros: staleMicros });
+          // What the old CAS did: read updated_at into a JS Date (ms) and compare for equality.
+          const readBackAsJsDateMicros = BigInt(new Date(Number(staleMicros / 1000n)).getTime()) * 1000n;
+          expect(readBackAsJsDateMicros === staleMicros).toBe(false);
+          const result = await notificationsProcessor.createInvoiceReceiptClaimer(store)(claim);
+          expect(result.claimed).toBe(true);
+          expect(result.staleReclaimedAgeMs).toBeGreaterThan(notificationsProcessor.INVOICE_RECEIPT_STALE_CLAIM_MS);
+          expect(rows.get("company-1:payment-1")?.updatedAtMicros).toBe(NOW);
+        });
+
+        it("two concurrent takeovers of a stale claim: exactly one wins", async () => {
+          const { rows, store } = microStore(() => NOW);
+          rows.set("company-1:payment-1", { status: "sending", updatedAtMicros: NOW - 3_600_000_000n + 1n });
+          const claimer = notificationsProcessor.createInvoiceReceiptClaimer(store);
+          const results = await Promise.all([claimer(claim), claimer(claim)]);
+          expect(results.filter((r) => r.claimed)).toHaveLength(1);
+        });
+
+        it("fresh 'sending' claim and 'sent' claim are skipped", async () => {
+          const { rows, store } = microStore(() => NOW);
+          const claimer = notificationsProcessor.createInvoiceReceiptClaimer(store);
+          rows.set("company-1:payment-1", { status: "sending", updatedAtMicros: NOW - 60_000_000n + 1n });
+          expect((await claimer(claim)).claimed).toBe(false);
+          rows.set("company-1:payment-1", { status: "sent", updatedAtMicros: NOW - 3_600_000_000n });
+          expect((await claimer(claim)).claimed).toBe(false);
+        });
+
+        it("no existing row: first insert claims", async () => {
+          const { store } = microStore(() => NOW);
+          expect(await notificationsProcessor.createInvoiceReceiptClaimer(store)(claim)).toEqual({ claimed: true });
+        });
+      });
+
+      it("claims by companyId + paymentId before sending, then marks sent", async () => {
+        const claims = withClaimStore();
+        vi.mocked(dependencies.loadInvoiceEmailContext).mockResolvedValue(receiptContext({}));
+        await notificationsProcessor.handleSendInvoicePaymentReceipt(receiptJob(), dependencies);
+        expect(dependencies.claimInvoiceReceiptSend).toHaveBeenCalledWith(
+          expect.objectContaining({ companyId: "company-1", customerId: "customer-1", paymentId: "payment-1", toAddress: "customer@example.com" })
+        );
+        expect(claims.get("company-1:payment-1")?.status).toBe("sent");
+      });
+
+      it("retry after a successful send does not send the receipt twice", async () => {
+        withClaimStore();
+        vi.mocked(dependencies.loadInvoiceEmailContext).mockResolvedValue(receiptContext({}));
+        await notificationsProcessor.handleSendInvoicePaymentReceipt(receiptJob(), dependencies);
+        await notificationsProcessor.handleSendInvoicePaymentReceipt(receiptJob(), dependencies);
+        expect(dependencies.email.sendInvoicePaymentReceiptEmail).toHaveBeenCalledTimes(1);
+      });
+
+      it("retry after send succeeded but mark-sent failed still does not resend", async () => {
+        withClaimStore();
+        vi.mocked(dependencies.markInvoiceReceiptSent).mockRejectedValueOnce(new Error("db down"));
+        vi.mocked(dependencies.loadInvoiceEmailContext).mockResolvedValue(receiptContext({}));
+        await notificationsProcessor.handleSendInvoicePaymentReceipt(receiptJob(), dependencies);
+        await notificationsProcessor.handleSendInvoicePaymentReceipt(receiptJob(), dependencies);
+        expect(dependencies.email.sendInvoicePaymentReceiptEmail).toHaveBeenCalledTimes(1);
+      });
+
+      it("a failed send releases the claim so the retry sends exactly once", async () => {
+        const claims = withClaimStore();
+        vi.mocked(dependencies.loadInvoiceEmailContext).mockResolvedValue(receiptContext({}));
+        vi.mocked(dependencies.email.sendInvoicePaymentReceiptEmail).mockRejectedValueOnce(new Error("resend 500"));
+        await expect(notificationsProcessor.handleSendInvoicePaymentReceipt(receiptJob(), dependencies)).rejects.toThrow("resend 500");
+        expect(claims.has("company-1:payment-1")).toBe(false);
+        await notificationsProcessor.handleSendInvoicePaymentReceipt(receiptJob(), dependencies);
+        await notificationsProcessor.handleSendInvoicePaymentReceipt(receiptJob(), dependencies);
+        expect(dependencies.email.sendInvoicePaymentReceiptEmail).toHaveBeenCalledTimes(2);
+        expect(claims.get("company-1:payment-1")?.status).toBe("sent");
+      });
+
+      it("opted-out customers never take a claim", async () => {
+        vi.mocked(dependencies.loadInvoiceEmailContext).mockResolvedValue(receiptContext({ doNotContact: true }));
+        await notificationsProcessor.handleSendInvoicePaymentReceipt(receiptJob(), dependencies);
+        expect(dependencies.claimInvoiceReceiptSend).not.toHaveBeenCalled();
+      });
     });
 
     it("skips when identifiers are missing", async () => {

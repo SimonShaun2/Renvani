@@ -1,9 +1,10 @@
 import { randomBytes } from "node:crypto";
 
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, inArray, isNull } from "drizzle-orm";
 import { Decimal } from "decimal.js";
 
 import {
+  activityEvents,
   bookingRequests,
   bookingSettings,
   companies,
@@ -975,6 +976,29 @@ async function assertHoldSlotMatchesPublishedAvailability(
   }
 }
 
+/** Booking request ids whose `booking.requested` event recorded an emergency downgrade (old rows: none). */
+async function loadEmergencyDowngradedIds(companyId: string, bookingRequestIds: string[]): Promise<Set<string>> {
+  if (bookingRequestIds.length === 0) return new Set();
+  const events = await db
+    .select()
+    .from(activityEvents)
+    .where(
+      and(
+        eq(activityEvents.companyId, companyId),
+        eq(activityEvents.eventType, "booking.requested"),
+        inArray(activityEvents.entityId, bookingRequestIds)
+      )
+    );
+  return new Set(
+    events
+      .filter((event) => {
+        const payload = event.payload as Record<string, unknown> | null;
+        return Boolean(payload && payload.emergencyDowngraded === true);
+      })
+      .map((event) => event.entityId as string)
+  );
+}
+
 export async function listBookingRequests(
   companyId: string,
   query: ListBookingRequestsQuery
@@ -996,9 +1020,14 @@ export async function listBookingRequests(
   const total = filteredRows.length;
   const totalPages = total === 0 ? 1 : Math.ceil(total / limit);
   const offset = (page - 1) * limit;
+  const pageRows = filteredRows.slice(offset, offset + limit);
+  const downgradedIds = await loadEmergencyDowngradedIds(
+    companyId,
+    pageRows.map((row) => row.id)
+  );
 
   return {
-    data: filteredRows.slice(offset, offset + limit).map((row) => ({
+    data: pageRows.map((row) => ({
       id: row.id,
       referenceNumber: row.referenceNumber,
       status: row.status as BookingRequest["status"],
@@ -1009,6 +1038,8 @@ export async function listBookingRequests(
       zip: row.zip,
       serviceCategory: row.serviceCategory,
       serviceType: row.serviceType,
+      urgency: row.urgency as BookingRequest["urgency"],
+      downgraded: downgradedIds.has(row.id),
       preferredDate: row.preferredDate,
       preferredWindow: row.preferredWindow as BookingRequest["preferredWindow"],
       assignedTechnicianId: row.assignedTechnicianId,
@@ -1023,7 +1054,8 @@ export async function listBookingRequests(
 
 export async function getBookingRequest(companyId: string, bookingRequestId: string): Promise<BookingRequest> {
   const bookingRequest = await getBookingRequestRecord(companyId, bookingRequestId, db);
-  return toBookingRequest(bookingRequest);
+  const downgradedIds = await loadEmergencyDowngradedIds(companyId, [bookingRequest.id]);
+  return { ...toBookingRequest(bookingRequest), downgraded: downgradedIds.has(bookingRequest.id) };
 }
 
 function buildBookingSlotHoldNote(bookingRequestId: string): string {
@@ -1484,10 +1516,13 @@ export function applyPublicEmergencyGuard(
 export async function submitBookingRequest(
   slug: string,
   input: SubmitBookingRequestInput,
-  sourceParam?: string
+  sourceParam?: string,
+  /** Set by callers that already ran applyPublicEmergencyGuard (public intake) so the downgrade is still recorded. */
+  emergencyAlreadyDowngraded = false
 ): Promise<{ bookingRequest: BookingRequest; confirmation: BookingConfirmationView; holdToken: string | null }> {
   const { company, settings } = await getCompanyByBookingSlug(slug, db);
-  input = applyPublicEmergencyGuard(input, company.settings).input;
+  const emergencyGuard = applyPublicEmergencyGuard(input, company.settings);
+  input = emergencyGuard.input;
   const normalizedInput: NormalizedBookingInput = {
     firstName: input.firstName.trim(),
     lastName: input.lastName.trim(),
@@ -1579,7 +1614,9 @@ export async function submitBookingRequest(
       payload: {
         source,
         zip: bookingRequest.zip,
-        ...(bookingRequest.urgency === "emergency" ? { emergency: true } : {})
+        ...(bookingRequest.urgency === "emergency" ? { emergency: true } : {}),
+        // Persisted (no migration) so the inbox can badge requests that asked for emergency but were downgraded.
+        ...(emergencyGuard.emergency.downgraded || emergencyAlreadyDowngraded ? { emergencyDowngraded: true } : {})
       },
       summary: `Booking request ${bookingRequest.referenceNumber ?? bookingRequest.id} submitted`
     });

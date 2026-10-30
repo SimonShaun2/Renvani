@@ -56,6 +56,7 @@ export async function completePublicReviewHandler(
       createdAt: reviewRequest.createdAt.toISOString(),
       updatedAt: reviewRequest.updatedAt.toISOString(),
       deletedAt: toIsoString(reviewRequest.deletedAt)
-    }
+    },
+    routing: reviewRequest.routing
   });
 }

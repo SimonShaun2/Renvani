@@ -1,0 +1,13 @@
+/* Feature motion for the migrate onboarding upload step (Figma 12:4). */
+.migrate-progress-fill {
+  transition: width 400ms ease-out;
+}
+.migrate-dropzone {
+  transition: border-color 150ms ease, background-color 150ms ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  .migrate-progress-fill,
+  .migrate-dropzone {
+    transition: none;
+  }
+}

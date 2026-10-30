@@ -7,8 +7,11 @@ import type Stripe from "stripe";
 
 import { env } from "@fsm/config";
 import {
-  computeCustomerPaidPlatformFee,
-  customerPlatformFeeDisclosure
+  centsToMoneyString,
+  computeCheckoutFees,
+  computeRefundableCents,
+  customerPlatformFeeDisclosure,
+  moneyStringToCents
 } from "@fsm/config/stripe-pricing";
 import {
   activityEvents,
@@ -44,12 +47,19 @@ import {
   type PaymentMethod,
   type PaymentStatus,
   type PublicInvoicePaymentLink,
+  type PublicInvoicePaymentLinkView,
   type RecordPaymentInput,
   type UpdateInvoiceInput
 } from "@fsm/types";
 
+import { readRenvaniSubscriptionPlan } from "../lib/company-renvani-plan.js";
+import { dispatchEventAutomation } from "./automation/event-automation.registry.js";
 import { generateInvoiceNumber } from "../lib/invoice-number.js";
-import { resolveCompanyConnectApplicationFeeFraction } from "../lib/company-renvani-plan.js";
+import {
+  buildPublicPayViewFields,
+  loadPublicPayContext,
+  type PublicPayContext
+} from "../lib/public-pay-view.js";
 import { featureFlags } from "@fsm/config/feature-flags";
 import {
   createInvoiceCheckoutSession,
@@ -57,6 +67,7 @@ import {
   retrieveInvoiceCheckoutClientSecret
 } from "../lib/stripe.js";
 import { listItems, recalculateTotals } from "./invoice-items.service.js";
+import { assertPriceBookItemsInCompany, findLivePriceBookItemIds } from "./price-book-item-scope.js";
 
 type CompanyRow = typeof companies.$inferSelect;
 type CustomerRow = typeof customers.$inferSelect;
@@ -140,13 +151,35 @@ function toInvoice(row: InvoiceRow): Invoice {
 function toInvoiceItem(row: InvoiceItemRow): InvoiceItem {
   return {
     ...row,
+    priceBookItemId: row.productCatalogId,
     itemType: normalizeInvoiceItemType(row.itemType)
+  };
+}
+
+function paymentFeeFields(row: PaymentRow): Pick<
+  Payment,
+  "serviceFeeAmount" | "bookingFeeAmount" | "feeRefundable" | "amountRefunded" | "refundableAmount"
+> {
+  const amountRefunded = row.amountRefunded ?? "0.00";
+  return {
+    serviceFeeAmount: row.serviceFeeAmount ?? "0.00",
+    bookingFeeAmount: row.bookingFeeAmount ?? "0.00",
+    // Fees are non-refundable by policy regardless of stored value.
+    feeRefundable: false,
+    amountRefunded,
+    refundableAmount: centsToMoneyString(
+      computeRefundableCents({
+        amountCents: moneyStringToCents(row.amount),
+        amountRefundedCents: moneyStringToCents(amountRefunded)
+      })
+    )
   };
 }
 
 function toPayment(row: PaymentRow): Payment {
   return {
     ...row,
+    ...paymentFeeFields(row),
     method: normalizePaymentMethod(row.method),
     status: normalizePaymentStatus(row.status)
   };
@@ -159,7 +192,10 @@ function toInvoicePaymentSummary(row: PaymentRow): InvoicePaymentSummary {
     method: normalizePaymentMethod(row.method),
     status: normalizePaymentStatus(row.status),
     paidAt: row.paidAt,
-    stripePaymentIntentId: row.stripePaymentIntentId
+    stripePaymentIntentId: row.stripePaymentIntentId,
+    serviceFeeAmount: row.serviceFeeAmount ?? "0.00",
+    bookingFeeAmount: row.bookingFeeAmount ?? "0.00",
+    feeRefundable: false
   };
 }
 
@@ -172,6 +208,8 @@ function toInvoiceListItem(row: InvoiceRow, customer: CustomerRow): InvoiceListI
     total: row.total,
     amountPaid: row.amountPaid ?? "0.00",
     balanceDue: row.balanceDue,
+    serviceFeeAmount: row.serviceFeeAmount ?? "0.00",
+    bookingFeeAmount: row.bookingFeeAmount ?? "0.00",
     dueAt: row.dueAt,
     paidAt: row.paidAt,
     customer: {
@@ -202,6 +240,8 @@ function toInvoiceDetail(
     total: row.total,
     amountPaid: row.amountPaid ?? "0.00",
     balanceDue: row.balanceDue,
+    serviceFeeAmount: row.serviceFeeAmount ?? "0.00",
+    bookingFeeAmount: row.bookingFeeAmount ?? "0.00",
     issuedAt: row.issuedAt,
     sentAt: row.sentAt,
     dueAt: row.dueAt,
@@ -300,7 +340,8 @@ function applyPaymentToInvoice(invoice: InvoiceRow, paymentAmount: Decimal): {
 }
 
 function resolveStripePaymentMethod(paymentIntent: Stripe.PaymentIntent): PaymentMethod {
-  const paymentMethodType = paymentIntent.payment_method_types[0];
+  // Guard: some events/fixtures omit payment_method_types; never crash payment recording on it.
+  const paymentMethodType = paymentIntent.payment_method_types?.[0];
 
   switch (paymentMethodType) {
     case "card":
@@ -738,16 +779,24 @@ function buildPublicPaymentPageUrl(paymentToken: string): string {
   return `${appBaseUrl}/pay/${paymentToken}`;
 }
 
-export async function getPublicInvoicePaymentLink(token: string): Promise<PublicInvoicePaymentLink> {
+export async function getPublicInvoicePaymentLink(token: string): Promise<PublicInvoicePaymentLinkView> {
+  const { link, context } = await loadPublicInvoicePayment(token);
+  return { ...link, ...buildPublicPayViewFields(context) };
+}
+
+/** Public pay link (legacy keys) plus the preloaded context used to build `fields`. */
+export async function loadPublicInvoicePayment(
+  token: string
+): Promise<{ link: PublicInvoicePaymentLink; context: PublicPayContext }> {
   const invoice = await getInvoiceByPaymentToken(token, db);
 
   if (!invoice.stripePaymentLinkId && !invoice.stripePaymentLinkUrl) {
     throw new AppError(ErrorCode.CONFLICT, "Invoice payment link is unavailable");
   }
 
-  const company = await getCompanyRecord(invoice.companyId, db);
-  const feeFraction = resolveCompanyConnectApplicationFeeFraction(company);
-  const breakdown = computeCustomerPaidPlatformFee(invoice.balanceDue, feeFraction);
+  const context = await loadPublicPayContext(invoice, db);
+  const fees = computeCheckoutFees({ chargeCents: moneyStringToCents(invoice.balanceDue), plan: context.plan });
+  const totalFeeCents = fees.serviceFeeCents;
 
   const disclosure = customerPlatformFeeDisclosure();
   const paymentLinkUrl =
@@ -760,17 +809,26 @@ export async function getPublicInvoicePaymentLink(token: string): Promise<Public
     checkoutClientSecret = await retrieveInvoiceCheckoutClientSecret(invoice.stripePaymentLinkId);
   }
 
-  return {
+  const link: PublicInvoicePaymentLink = {
     invoiceNumber: invoice.invoiceNumber,
     paymentLinkUrl,
     checkoutClientSecret,
-    invoiceAmount: breakdown.invoiceAmount,
-    platformFeeAmount: breakdown.platformFeeAmount,
-    totalDue: breakdown.totalDue,
-    platformFeePercent: breakdown.platformFeePercent,
-    platformFeePaidByCustomer: feeFraction > 0,
+    invoiceAmount: centsToMoneyString(fees.chargeCents),
+    platformFeeAmount: centsToMoneyString(totalFeeCents),
+    totalDue: centsToMoneyString(fees.totalCents),
+    serviceFeeAmount: centsToMoneyString(fees.serviceFeeCents),
+    bookingFeeAmount: "0.00",
+    invoiceAmountCents: fees.chargeCents,
+    serviceFeeCents: fees.serviceFeeCents,
+    bookingFeeCents: 0,
+    totalDueCents: fees.totalCents,
+    feeRefundable: false,
+    platformFeePercent: fees.serviceFeeCents > 0 ? fees.serviceFeeRateBps / 100 : null,
+    platformFeePaidByCustomer: totalFeeCents > 0,
     platformFeeDisclosure: disclosure.length > 0 ? disclosure : null
   };
+
+  return { link, context };
 }
 
 export async function createInvoice(
@@ -829,11 +887,33 @@ export async function createInvoice(
           quantity: item.quantity,
           unitPrice: item.unitPrice,
           isTaxable: item.isTaxable ?? true,
-          sortOrder: item.sortOrder ?? 0
+          sortOrder: item.sortOrder ?? 0,
+          priceBookItemId: item.productCatalogId
         }))
       : normalizedInput.items;
 
     if (sourceItems.length > 0) {
+      if (estimateRows.length > 0) {
+        // Lines copied from the caller's own estimate: a catalog item soft-deleted since the
+        // estimate was written must not block invoicing — drop the stale link instead.
+        const liveIds = await findLivePriceBookItemIds(
+          tx,
+          companyId,
+          sourceItems.map((item) => ("priceBookItemId" in item ? item.priceBookItemId : null))
+        );
+        for (const item of sourceItems) {
+          if ("priceBookItemId" in item && item.priceBookItemId && !liveIds.has(item.priceBookItemId)) {
+            item.priceBookItemId = null;
+          }
+        }
+      } else {
+        // Client-supplied ids must belong to the caller's company (404 otherwise).
+        await assertPriceBookItemsInCompany(
+          tx,
+          companyId,
+          sourceItems.map((item) => ("priceBookItemId" in item ? item.priceBookItemId : null))
+        );
+      }
       await tx
         .insert(invoiceItems)
         .values(
@@ -851,7 +931,10 @@ export async function createInvoice(
               )
             ),
             isTaxable: item.isTaxable ?? true,
-            sortOrder: item.sortOrder ?? index
+            sortOrder: item.sortOrder ?? index,
+            ...("priceBookItemId" in item && item.priceBookItemId
+              ? { productCatalogId: item.priceBookItemId }
+              : {})
           }))
         )
         .returning();
@@ -999,7 +1082,7 @@ export async function sendInvoice(
       invoiceNumber: existingInvoice.invoiceNumber,
       total: existingInvoice.balanceDue,
       paymentToken,
-      connectApplicationFeeFraction: resolveCompanyConnectApplicationFeeFraction(company),
+      renvaniPlan: readRenvaniSubscriptionPlan(company),
       items: items.map((item) => ({
         name: item.name,
         description: item.description,
@@ -1131,7 +1214,7 @@ export async function recordPayment(
   const normalizedInput = normalizeRecordPaymentInput(input);
   const paymentAmount = new Decimal(normalizedInput.amount);
 
-  return db.transaction(async (tx) => {
+  const result = await db.transaction(async (tx) => {
     const actor = await getUserRecord(companyId, actorId, tx);
     const customer = await getCustomerRecord(companyId, existingInvoice.customerId, tx);
     const insertedPayments = await tx
@@ -1212,8 +1295,17 @@ export async function recordPayment(
       });
     }
 
-    return toPayment(payment);
+    return {
+      payment: toPayment(payment),
+      paid: updatedInvoice.status === "paid"
+    };
   });
+
+  if (result.paid) {
+    await dispatchEventAutomation({ eventType: "invoice.paid", companyId, invoiceId });
+  }
+
+  return result.payment;
 }
 
 export async function resendInvoiceReminder(
@@ -1367,6 +1459,40 @@ export async function markOverdue(companyId: string, invoiceId: string): Promise
   return toInvoice(overdueInvoice);
 }
 
+function readNonNegativeIntMetadata(value: string | undefined): number | null {
+  if (value === undefined || !/^\d+$/.test(value)) {
+    return null;
+  }
+  return Number(value);
+}
+
+/**
+ * Splits a succeeded checkout PaymentIntent into invoice portion + fees using the metadata stamped
+ * at checkout creation. Legacy intents without fee metadata are treated as fee-free (whole amount).
+ */
+export function readCheckoutFeesFromIntent(paymentIntent: {
+  amount: number;
+  amount_received?: number | null;
+  metadata?: Record<string, string> | null;
+}): { invoiceAmountCents: number; serviceFeeCents: number; bookingFeeCents: number } {
+  const received = paymentIntent.amount_received || paymentIntent.amount;
+  const metadata = paymentIntent.metadata ?? {};
+  const serviceFeeCents = readNonNegativeIntMetadata(metadata.serviceFeeCents);
+  // Legacy: intents created before the online-booking fee was removed (2026-10-27) may still carry it.
+  const bookingFeeCents =
+    metadata.bookingFeeCents === undefined ? 0 : readNonNegativeIntMetadata(metadata.bookingFeeCents);
+
+  if (serviceFeeCents === null || bookingFeeCents === null) {
+    return { invoiceAmountCents: received, serviceFeeCents: 0, bookingFeeCents: 0 };
+  }
+
+  return {
+    invoiceAmountCents: Math.max(0, received - serviceFeeCents - bookingFeeCents),
+    serviceFeeCents,
+    bookingFeeCents
+  };
+}
+
 export async function handleStripePaymentSuccess(
   stripeEvent: Stripe.PaymentIntentSucceededEvent
 ): Promise<void> {
@@ -1384,9 +1510,11 @@ export async function handleStripePaymentSuccess(
   }
 
   const invoice = await getInvoiceById(invoiceId, db);
-  const paymentAmount = new Decimal(paymentIntent.amount_received || paymentIntent.amount).div(100);
+  const fees = readCheckoutFeesFromIntent(paymentIntent);
+  // Only the invoice portion is applied to the balance; fees are recorded on their own columns.
+  const paymentAmount = new Decimal(fees.invoiceAmountCents).div(100);
 
-  await db.transaction(async (tx) => {
+  const paid = await db.transaction(async (tx) => {
     const customer = await getCustomerRecord(invoice.companyId, invoice.customerId, tx);
     const insertedPayments = await tx
       .insert(payments)
@@ -1395,6 +1523,9 @@ export async function handleStripePaymentSuccess(
         invoiceId: invoice.id,
         customerId: invoice.customerId,
         amount: formatMoney(paymentAmount),
+        serviceFeeAmount: centsToMoneyString(fees.serviceFeeCents),
+        bookingFeeAmount: centsToMoneyString(fees.bookingFeeCents),
+        feeRefundable: false,
         method: resolveStripePaymentMethod(paymentIntent),
         status: "succeeded",
         stripePaymentIntentId: paymentIntent.id,
@@ -1417,6 +1548,8 @@ export async function handleStripePaymentSuccess(
         balanceDue: nextInvoiceValues.balanceDue,
         status: nextInvoiceValues.status,
         paidAt: nextInvoiceValues.paidAt,
+        serviceFeeAmount: addMoneyStrings(invoice.serviceFeeAmount ?? "0.00", centsToMoneyString(fees.serviceFeeCents)),
+        bookingFeeAmount: addMoneyStrings(invoice.bookingFeeAmount ?? "0.00", centsToMoneyString(fees.bookingFeeCents)),
         updatedAt: new Date()
       })
       .where(and(eq(invoices.companyId, invoice.companyId), eq(invoices.id, invoice.id), isNull(invoices.deletedAt)))
@@ -1462,7 +1595,13 @@ export async function handleStripePaymentSuccess(
         summary: buildInvoiceSummary(updatedInvoice.invoiceNumber, "paid")
       });
     }
+
+    return updatedInvoice.status === "paid";
   });
+
+  if (paid) {
+    await dispatchEventAutomation({ eventType: "invoice.paid", companyId: invoice.companyId, invoiceId: invoice.id });
+  }
 }
 
 export async function handleStripePaymentFailed(

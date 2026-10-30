@@ -1,0 +1,382 @@
+[
+ {
+  "isDraft": true,
+  "fieldData": {
+   "page": "home",
+   "section-key": "hero",
+   "eyebrow": "FOR SHOPS WITH 1–25 FIELD STAFF",
+   "headline": "Everything included. Unlimited users. Two simple plans. AI that does the work.",
+   "subhead": "AI agents book, schedule, invoice and collect. You set the rules.",
+   "callout": null,
+   "items": "We migrate your data. Pay nothing until you’re paid.\nMonth-to-month. Unlimited users. Everything included.\nREPORT PREVIEW\nThis week · Sample Home Services (sample business)\njuniperhome.co · Austin, TX\nFinds you\nRequests service\nBooks a job\nComes back\n✓ WHAT’S WORKING\nCustomers trust your business: 212 Google reviews with a 4.9 rating.\n! WHERE CUSTOMERS MAY GET STUCK\nI couldn’t find a way to book online. After 6 p.m., visitors are directed to voicemail.\nONE THING TO DO NEXT\nMake it easy to request a price and choose a time online.\nNo scores. Just what we found.\nSee how Renvani can help →",
+   "cta-label": "Get a free demo",
+   "cta-href": "/demo",
+   "data-json": null,
+   "review-notes": "Report preview lines are sample data.",
+   "figma-node": "129:1919",
+   "sort-order": 1,
+   "name": "home · hero",
+   "slug": "home-hero"
+  }
+ },
+ {
+  "isDraft": true,
+  "fieldData": {
+   "page": "home",
+   "section-key": "built-for",
+   "eyebrow": "BUILT FOR",
+   "headline": "One product for every home-service trade.",
+   "subhead": null,
+   "callout": "One product · HVAC, Plumbing, Electrical",
+   "items": "Residential cleaning\nHVAC\nPlumbing\nElectrical\nLawn and landscaping\nPest control\nPools\nGarage doors\nAppliance repair\nAnd more",
+   "cta-label": null,
+   "cta-href": null,
+   "data-json": null,
+   "review-notes": null,
+   "figma-node": "129:1986",
+   "sort-order": 2,
+   "name": "home · built-for",
+   "slug": "home-built-for"
+  }
+ },
+ {
+  "isDraft": true,
+  "fieldData": {
+   "page": "home",
+   "section-key": "growth-cycle",
+   "eyebrow": "HOW THE WORK GETS DONE",
+   "headline": "Find, book, serve, get paid, repeat.",
+   "subhead": "Five AI agents, one customer record.",
+   "callout": "The growth loop: Find → Book → Serve → Paid → Repeat",
+   "items": "Discover — Your booking page — Your services and prices, booked direct.\nBook — Booked on the spot\nServe — A field app built first\nGet paid — Paid at the visit\nRepeat — The next visit, asked for",
+   "cta-label": null,
+   "cta-href": null,
+   "data-json": null,
+   "review-notes": null,
+   "figma-node": "129:2013",
+   "sort-order": 3,
+   "name": "home · growth-cycle",
+   "slug": "home-growth-cycle"
+  }
+ },
+ {
+  "isDraft": true,
+  "fieldData": {
+   "page": "home",
+   "section-key": "revenue-leak",
+   "eyebrow": "REVENUE LEAK CALCULATOR · EXAMPLE",
+   "headline": "How much work slips through?",
+   "subhead": "Inquiries × share missed × average job.",
+   "callout": "Revenue leak · Every inquiry gets an answer",
+   "items": "Inquiries per month: 120 (example)\nShare you didn’t book: 25% (example)\nAverage job value: $180 (example)\nEXAMPLE ESTIMATE: $5,400 / month\nAn estimate, not a promise.",
+   "cta-label": "Get my revenue leak report",
+   "cta-href": null,
+   "data-json": null,
+   "review-notes": null,
+   "figma-node": "129:2073",
+   "sort-order": 4,
+   "name": "home · revenue-leak",
+   "slug": "home-revenue-leak"
+  }
+ },
+ {
+  "isDraft": true,
+  "fieldData": {
+   "page": "home",
+   "section-key": "rented-vs-owned",
+   "eyebrow": null,
+   "headline": "Stop paying for add-ons.",
+   "subhead": null,
+   "callout": "Before: Plan plus add-ons → After: Everything included",
+   "items": null,
+   "cta-label": null,
+   "cta-href": null,
+   "data-json": "{\"planPlusAddOns\":[\"Features locked by tier\",\"GPS and AI cost extra\",\"Per-user fees\",\"Card fees on you\",\"Annual contracts\",\"Rebuild your own data\",\"Pay from signup\",\"Field app as afterthought\"],\"renvani\":[\"Every feature, both plans\",\"AI included\",\"Unlimited users\",\"Customers cover card fees\",\"Month-to-month\",\"We migrate your data\",\"Billing starts when you’re paid\",\"Field app built first\"]}",
+   "review-notes": null,
+   "figma-node": "129:2371",
+   "sort-order": 5,
+   "name": "home · rented-vs-owned",
+   "slug": "home-rented-vs-owned"
+  }
+ },
+ {
+  "isDraft": true,
+  "fieldData": {
+   "page": "home",
+   "section-key": "pricing",
+   "eyebrow": "PRICING",
+   "headline": "Two plans, plus a startup price.",
+   "subhead": "Every plan: every feature, unlimited users, migration. Month-to-month.",
+   "callout": "Annual billing: 2 months free",
+   "items": "Flex · $399/mo — + 2% Service Fee, paid by your customer at checkout. $3,990/yr billed annually.\nFlat · $999/mo — No Service Fee. $9,990/yr billed annually.\nFounding · $199/mo — First 25 shops. $1,990/yr billed annually.\nStartup · $99/mo — For new shops. $990/yr billed annually.",
+   "cta-label": "Get a free demo",
+   "cta-href": "/demo",
+   "data-json": "{\"plans\":{\"flex\":{\"name\":\"Flex\",\"badge\":\"Best value\",\"monthly\":399,\"annual\":3990,\"annualPerMonth\":333,\"fee\":\"+ 2% Service Fee, paid by your customer at checkout\"},\"flat\":{\"name\":\"Flat\",\"monthly\":999,\"annual\":9990,\"annualPerMonth\":833,\"fee\":\"No Service Fee\"},\"founding\":{\"name\":\"Founding offer\",\"badge\":\"First 25 shops\",\"monthly\":199,\"annual\":1990,\"fee\":\"2% Service Fee paid by your customer at checkout\"},\"startup\":{\"name\":\"Startup program\",\"badge\":\"For new shops\",\"monthly\":99,\"annual\":990,\"fee\":\"2% Service Fee paid by your customer at checkout\",\"href\":\"/startup\"}},\"defaultBilling\":\"annual\",\"annualLabel\":\"Annual (2 months free)\",\"toggle\":[\"Monthly\",\"Annual\"],\"saveBadge\":\"Save 2 months\",\"secondaryCta\":{\"label\":\"See pricing\",\"href\":\"/pricing\"}}",
+   "review-notes": "Figma 10a still shows old prices and an 18-month Startup term; replaced with approved pricing. Figma note: [confirm: Startup includes the full product, same as Flex].",
+   "figma-node": "129:2424",
+   "sort-order": 6,
+   "name": "home · pricing",
+   "slug": "home-pricing"
+  }
+ },
+ {
+  "isDraft": true,
+  "fieldData": {
+   "page": "home",
+   "section-key": "total-cost",
+   "eyebrow": "TOTAL COST",
+   "headline": "What you pay, side by side.",
+   "subhead": "Bring your last invoice. We’ll fill this in.",
+   "callout": "Total cost · One price. Everything included.",
+   "items": null,
+   "cta-label": null,
+   "cta-href": null,
+   "data-json": "{\"columns\":[\"Renvani\",\"Your current setup\"],\"rows\":[[\"Plan\",\"$399 Flex, $999 Flat (annual: 2 months free)\"],[\"Service Fee\",\"Flex 2%, paid by your customer at checkout\"],[\"Add-ons\",\"None\"],[\"Users\",\"Unlimited\"],[\"Card fees\",\"Paid by customer\"],[\"Contract\",\"Month-to-month\"],[\"Migration\",\"Free, done for you\"],[\"Total\",\"One bill\"]]}",
+   "review-notes": "Figma Plan and Service Fee row values were old; replaced with approved pricing. The 'Your current setup' column is a placeholder.",
+   "figma-node": "129:2443",
+   "sort-order": 7,
+   "name": "home · total-cost",
+   "slug": "home-total-cost"
+  }
+ },
+ {
+  "isDraft": true,
+  "fieldData": {
+   "page": "home",
+   "section-key": "switching",
+   "eyebrow": "SWITCHING",
+   "headline": "We move your data.",
+   "subhead": null,
+   "callout": "Week 1 We export your data · Week 1 We move it for you · Week 2 First job booked",
+   "items": "Your current software\nQuickBooks\nSpreadsheet / CSV\n1. Send your export — Exports from your current software, QuickBooks, or a spreadsheet. One AI-guided importer.\n2. We migrate it — Customers, history, jobs, price books, notes, photos and files.\n3. Go live, payments on — Live within 14 days, assisted.",
+   "cta-label": "Get a free demo",
+   "cta-href": "/demo",
+   "data-json": null,
+   "review-notes": null,
+   "figma-node": "129:2487",
+   "sort-order": 8,
+   "name": "home · switching",
+   "slug": "home-switching"
+  }
+ },
+ {
+  "isDraft": true,
+  "fieldData": {
+   "page": "home",
+   "section-key": "guarantee",
+   "eyebrow": "OUR PROMISES",
+   "headline": "Month-to-month. Free migration. Cancel anytime.",
+   "subhead": "Billing starts with your first customer payment. Full terms on our terms page.",
+   "callout": null,
+   "items": null,
+   "cta-label": "Get a free demo",
+   "cta-href": "/demo",
+   "data-json": null,
+   "review-notes": "[confirm: legal review of promise wording, cancellation steps, and terms page link]",
+   "figma-node": "129:2505",
+   "sort-order": 9,
+   "name": "home · guarantee",
+   "slug": "home-guarantee"
+  }
+ },
+ {
+  "isDraft": true,
+  "fieldData": {
+   "page": "home",
+   "section-key": "measure",
+   "eyebrow": "MEASURE",
+   "headline": "See what Renvani did this month.",
+   "subhead": null,
+   "callout": null,
+   "items": "01 Jobs booked\n02 Invoices collected\n03 Needs you\n04 Autonomy rate — Jobs from inquiry to paid with no one touching them.",
+   "cta-label": null,
+   "cta-href": null,
+   "data-json": null,
+   "review-notes": "[no figure until real customer data]",
+   "figma-node": "129:2515",
+   "sort-order": 10,
+   "name": "home · measure",
+   "slug": "home-measure"
+  }
+ },
+ {
+  "isDraft": true,
+  "fieldData": {
+   "page": "home",
+   "section-key": "beliefs",
+   "eyebrow": null,
+   "headline": "What we believe.",
+   "subhead": null,
+   "callout": null,
+   "items": "01 Everything included. — No tiers, no upsells.\n02 You set the rules. — AI applies your prices and asks on exceptions.\n03 We earn when you do. — Billing starts when you get paid.",
+   "cta-label": null,
+   "cta-href": null,
+   "data-json": null,
+   "review-notes": null,
+   "figma-node": "129:2538",
+   "sort-order": 11,
+   "name": "home · beliefs",
+   "slug": "home-beliefs"
+  }
+ },
+ {
+  "isDraft": true,
+  "fieldData": {
+   "page": "home",
+   "section-key": "faq",
+   "eyebrow": "QUESTIONS",
+   "headline": "Questions owners ask.",
+   "subhead": null,
+   "callout": null,
+   "items": null,
+   "cta-label": null,
+   "cta-href": null,
+   "data-json": "{\"faq\":[[\"What’s included?\",\"Every feature, five AI agents, unlimited users, setup and migration.\"],[\"How much?\",\"Flex: $399/month plus a 2% Service Fee your customer pays at checkout. Flat: $999/month, no Service Fee. Pay annually and get 2 months free.\"],[\"Which plan?\",\"Flex for the lowest monthly price. Flat if you want no Service Fee on your customers’ invoices.\"],[\"When does billing start?\",\"At your first customer payment through Renvani.\"],[\"Who pays card fees?\",\"Your customers. Invoices show a card price and a lower bank price.\"],[\"Do I move my data?\",\"No. We migrate it.\"],[\"How do customers hear from us?\",\"By email. More channels coming.\"],[\"Leaving Service Fusion mid-contract?\",\"Most plans are month-to-month. Annual payers, check your renewal date.\"]]}",
+   "review-notes": "'How much?' and 'Which plan?' answers rewritten to approved pricing. [confirm: payments counsel sign-off on dual-pricing wording and state rules]",
+   "figma-node": "129:2556",
+   "sort-order": 12,
+   "name": "home · faq",
+   "slug": "home-faq"
+  }
+ },
+ {
+  "isDraft": true,
+  "fieldData": {
+   "page": "home",
+   "section-key": "founding-partners",
+   "eyebrow": "FOUNDING SHOPS",
+   "headline": "Be one of our first shops.",
+   "subhead": "A named onboarding owner and a direct line to the team.",
+   "callout": "Founding · $199/mo or $1,990/yr · First 25 shops",
+   "items": "Done-for-you migration — We move your data.\nNamed onboarding owner — One person, start to finish.\nField-app fixes first — Your bugs go first. We tell you when fixed.\nPublic changelog — Every release posted.\nPrefer to talk first? Book a free demo",
+   "cta-label": "Apply to be a founding partner",
+   "cta-href": "/founding-partners",
+   "data-json": null,
+   "review-notes": "[need: founding-partner terms] [confirm: fast-fix promise wording]",
+   "figma-node": "129:2571",
+   "sort-order": 13,
+   "name": "home · founding-partners",
+   "slug": "home-founding-partners"
+  }
+ },
+ {
+  "isDraft": true,
+  "fieldData": {
+   "page": "home",
+   "section-key": "final-cta",
+   "eyebrow": null,
+   "headline": "Bring your last software bill.",
+   "subhead": "20 minutes. One real job. Total cost side by side.",
+   "callout": null,
+   "items": null,
+   "cta-label": "Get a free demo",
+   "cta-href": "/demo",
+   "data-json": null,
+   "review-notes": null,
+   "figma-node": "129:2612",
+   "sort-order": 14,
+   "name": "home · final-cta",
+   "slug": "home-final-cta"
+  }
+ },
+ {
+  "isDraft": true,
+  "fieldData": {
+   "page": "pricing",
+   "section-key": "hero",
+   "eyebrow": "PRICING",
+   "headline": "Grow your shop. Renvani runs the rest.",
+   "subhead": "Our fees come from your customers, not from you.",
+   "callout": "Save 2 months",
+   "items": "Showing annual billing (default). Monthly prices are listed on each plan.",
+   "cta-label": null,
+   "cta-href": null,
+   "data-json": "{\"defaultBilling\":\"annual\",\"annualLabel\":\"Annual (2 months free)\",\"toggle\":[\"Monthly\",\"Annual\"],\"saveBadge\":\"Save 2 months\"}",
+   "review-notes": null,
+   "figma-node": "129:3332",
+   "sort-order": 15,
+   "name": "pricing · hero",
+   "slug": "pricing-hero"
+  }
+ },
+ {
+  "isDraft": true,
+  "fieldData": {
+   "page": "pricing",
+   "section-key": "plans",
+   "eyebrow": null,
+   "headline": "Everything included, unlimited users",
+   "subhead": null,
+   "callout": "Every plan includes",
+   "items": "Unlimited users\nUnlimited jobs\nUnlimited automations\nAll features\nFree done-for-you setup and import\nNo contracts",
+   "cta-label": null,
+   "cta-href": null,
+   "data-json": "{\"plans\":{\"flex\":{\"name\":\"Flex\",\"badge\":\"Best value\",\"monthly\":399,\"annual\":3990,\"annualPerMonth\":333,\"fee\":\"+ 2% Service Fee, paid by your customer at checkout\"},\"flat\":{\"name\":\"Flat\",\"monthly\":999,\"annual\":9990,\"annualPerMonth\":833,\"fee\":\"No Service Fee\"},\"founding\":{\"name\":\"Founding offer\",\"badge\":\"First 25 shops\",\"monthly\":199,\"annual\":1990,\"fee\":\"2% Service Fee paid by your customer at checkout\"},\"startup\":{\"name\":\"Startup program\",\"badge\":\"For new shops\",\"monthly\":99,\"annual\":990,\"fee\":\"2% Service Fee paid by your customer at checkout\",\"href\":\"/startup\"}},\"defaultBilling\":\"annual\",\"annualLabel\":\"Annual (2 months free)\",\"toggle\":[\"Monthly\",\"Annual\"],\"saveBadge\":\"Save 2 months\"}",
+   "review-notes": "",
+   "figma-node": "129:3347",
+   "sort-order": 16,
+   "name": "pricing · plans",
+   "slug": "pricing-plans"
+  }
+ },
+ {
+  "isDraft": true,
+  "fieldData": {
+   "page": "pricing",
+   "section-key": "fee-explainer",
+   "eyebrow": "HOW FEES WORK",
+   "headline": "Our fees come from your customers, not from you.",
+   "subhead": null,
+   "callout": null,
+   "items": "2% Service Fee — Flex, Founding and Startup — Added at checkout and paid by your customer. Flat plans have no Service Fee.",
+   "cta-label": null,
+   "cta-href": null,
+   "data-json": null,
+   "review-notes": "",
+   "figma-node": "129:3437",
+   "sort-order": 17,
+   "name": "pricing · fee-explainer",
+   "slug": "pricing-fee-explainer"
+  }
+ },
+ {
+  "isDraft": true,
+  "fieldData": {
+   "page": "pricing",
+   "section-key": "ai-growth-estimate",
+   "eyebrow": "AI GROWTH ESTIMATE",
+   "headline": "See what Renvani could add to your business",
+   "subhead": "A conservative estimate of how Renvani's AI growth tools can bring in more booked jobs, cut what you spend on leads and tools, and help you get paid sooner.",
+   "callout": null,
+   "items": "How many field techs do you have? (Example: 4)\nWhat's your average job ticket? (Example: $350)\nHow many jobs do you complete per month? (Example: 336)\nWhat share of your customers are repeat customers? (Example: 30%)\nMissed leads per month (Example: 40)\nChoose your plan: Flex / Flat / Startup / Founding\nBilling: Monthly / Annual (2 months free)\nAnnual selected (default): $3,990/yr, about $333/mo\nOptional: what you spend today. Leave blank and it counts as $0, so no savings are claimed.\nLead marketplaces per month (Example: $800)\nMarketing agency or retainer per month (Example: $1,000)\nCurrent software spend per month (Example: $300)\nShops like yours grow ~10× what Renvani costs\nConservative figure, rounded down from 10.9× in year one (15.1× at full run rate), Flex annual at $333/mo.\nGrow: about $4,460/mo\nSave: about $560/mo\nCash flow: Get paid about 4 days sooner, freeing about $6,270 once. Not counted in your return.\nYour customers pay a 2% Service Fee at checkout on Flex, Startup and Founding plans (none on Flat). This is not included in your plan cost.\nEstimates only, not a guarantee. Results depend on your market, pricing, team and how you use Renvani.",
+   "cta-label": null,
+   "cta-href": null,
+   "data-json": null,
+   "review-notes": "Calculator outputs are example figures.",
+   "figma-node": "129:3453",
+   "sort-order": 18,
+   "name": "pricing · ai-growth-estimate",
+   "slug": "pricing-ai-growth-estimate"
+  }
+ },
+ {
+  "isDraft": true,
+  "fieldData": {
+   "page": "pricing",
+   "section-key": "demo-cta",
+   "eyebrow": null,
+   "headline": "See Renvani on one real job.",
+   "subhead": "20 minutes on a real job from your shop. We reply by email.",
+   "callout": null,
+   "items": null,
+   "cta-label": "Get a free demo",
+   "cta-href": "/demo",
+   "data-json": null,
+   "review-notes": null,
+   "figma-node": "129:3548",
+   "sort-order": 19,
+   "name": "pricing · demo-cta",
+   "slug": "pricing-demo-cta"
+  }
+ }
+]

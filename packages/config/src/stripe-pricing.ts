@@ -26,7 +26,10 @@ function roundMoney(value: number): string {
   return (Math.round(value * 100) / 100).toFixed(2);
 }
 
-/** Customer-paid platform fee on top of the service/invoice total (Flex only). */
+/**
+ * Customer-paid platform fee on top of the service/invoice total (Flex only).
+ * @deprecated Legacy STRIPE_PLATFORM_FEE_PERCENT path; customer fees use computeCheckoutFees / SERVICE_FEE_RATE_BPS. Remove in a later cleanup.
+ */
 export function computeCustomerPaidPlatformFee(
   invoiceAmount: string,
   fraction: number
@@ -54,6 +57,7 @@ export function computeCustomerPaidPlatformFee(
   };
 }
 
+/** @deprecated Legacy "Renvani platform fee" label; use formatServiceFeeLineItemName. Remove in a later cleanup. */
 export function formatCustomerPlatformFeeLineItemName(fraction: number): string {
   const percent = Math.round(fraction * 10000) / 100;
   const label = Number.isInteger(percent) ? `${percent}` : `${percent}`;
@@ -110,4 +114,109 @@ export function resolveRenvaniPlanFromStripePriceId(priceId: string): RenvaniSub
   }
 
   return null;
+}
+
+// ─────────────────────────────────────────────
+// Customer checkout fees (Service Fee only; the online-booking fee was removed 2026-10-27)
+// ─────────────────────────────────────────────
+
+/** Renvani plans with list prices in integer cents. Annual = 10x monthly. */
+export type RenvaniPlanId = "flex" | "flat" | "founding" | "startup";
+
+export const RENVANI_PLAN_MONTHLY_PRICE_CENTS: Readonly<Record<RenvaniPlanId, number>> = {
+  flex: 39_900,
+  flat: 99_900,
+  founding: 19_900,
+  startup: 9_900
+};
+
+export function renvaniPlanAnnualPriceCents(plan: RenvaniPlanId): number {
+  return RENVANI_PLAN_MONTHLY_PRICE_CENTS[plan] * 10;
+}
+
+/** Customer-paid Service Fee rate in basis points (200 bps = 2%). Applies on Flex, Founding, Startup (not Flat). */
+export const SERVICE_FEE_RATE_BPS = 200;
+
+/** Plans whose customers pay NO Service Fee (published pricing: Flat is fee-free). */
+export const SERVICE_FEE_EXEMPT_PLANS: ReadonlySet<RenvaniPlanId> = new Set<RenvaniPlanId>(["flat"]);
+
+/**
+ * Service Fee rate (bps) for a tenant's plan. Flat -> 0. Flex/Founding/Startup -> SERVICE_FEE_RATE_BPS.
+ * Unknown/missing plan defaults to SERVICE_FEE_RATE_BPS (fail closed on revenue, matches pre-plan behavior).
+ */
+export function serviceFeeRateBpsForPlan(plan: RenvaniPlanId | null | undefined): number {
+  return plan && SERVICE_FEE_EXEMPT_PLANS.has(plan) ? 0 : SERVICE_FEE_RATE_BPS;
+}
+
+/** Customer-facing Service Fee line label derived from the rate, e.g. 200 -> "Service Fee (2%)". */
+export function formatServiceFeeLineItemName(rateBps: number = SERVICE_FEE_RATE_BPS): string {
+  const pct = Number((rateBps / 100).toFixed(2));
+  return `Service Fee (${pct}%)`;
+}
+
+/**
+ * Service Fee in integer cents: chargeCents * rate, rounded half up to the nearest cent.
+ * Integer math only: floor((chargeCents * bps + 5000) / 10000). e.g. 2% of $0.25 = 0.5c -> 1c.
+ */
+export function computeServiceFeeCents(chargeCents: number, rateBps: number = SERVICE_FEE_RATE_BPS): number {
+  if (!Number.isInteger(chargeCents) || chargeCents <= 0 || rateBps <= 0) {
+    return 0;
+  }
+
+  return Math.floor((chargeCents * rateBps + 5_000) / 10_000);
+}
+
+export interface CheckoutFeeBreakdown {
+  /** Amount applied to the invoice (shop revenue); never includes fees. */
+  chargeCents: number;
+  /** 2% customer-paid Service Fee (0 on Flat), separate line, non-refundable. */
+  serviceFeeCents: number;
+  /** chargeCents + serviceFeeCents. */
+  totalCents: number;
+  /** Effective Service Fee rate for this checkout's plan (0 on Flat). */
+  serviceFeeRateBps: number;
+  /** Fees are never refunded; refunds are capped at chargeCents. */
+  feeRefundable: false;
+}
+
+export interface CheckoutFeeInput {
+  chargeCents: number;
+  /** Tenant's Renvani plan. Flat pays no Service Fee; unknown/null is charged the standard rate. */
+  plan?: RenvaniPlanId | null;
+}
+
+/** Fees for a customer checkout. Only call for customer checkout (not manual record-payment). */
+export function computeCheckoutFees(input: CheckoutFeeInput): CheckoutFeeBreakdown {
+  const chargeCents = Number.isInteger(input.chargeCents) && input.chargeCents > 0 ? input.chargeCents : 0;
+  const serviceFeeRateBps = serviceFeeRateBpsForPlan(input.plan);
+  const serviceFeeCents = computeServiceFeeCents(chargeCents, serviceFeeRateBps);
+
+  return {
+    chargeCents,
+    serviceFeeCents,
+    totalCents: chargeCents + serviceFeeCents,
+    serviceFeeRateBps,
+    feeRefundable: false
+  };
+}
+
+/**
+ * Max refundable cents for a payment. Fees are non-refundable, so a refund can only return
+ * the invoice portion (`amountCents`) less anything already refunded.
+ */
+export function computeRefundableCents(input: { amountCents: number; amountRefundedCents: number }): number {
+  return Math.max(0, input.amountCents - Math.max(0, input.amountRefundedCents));
+}
+
+/** Converts a 2-decimal money string to integer cents, rounding half up. */
+export function moneyStringToCents(value: string | number | null | undefined): number {
+  const n = Number(value ?? 0);
+  if (!Number.isFinite(n)) {
+    return 0;
+  }
+  return Math.sign(n) * Math.round(Math.abs(n) * 100 + 1e-9);
+}
+
+export function centsToMoneyString(cents: number): string {
+  return (cents / 100).toFixed(2);
 }

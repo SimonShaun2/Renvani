@@ -47,6 +47,7 @@ vi.mock("@fsm/jobs", () => ({
 
 vi.mock("../lib/stripe.js", () => ({
   createInvoiceCheckoutSession: createInvoiceCheckoutSessionMock,
+  retrieveInvoiceCheckoutClientSecret: vi.fn(async () => null),
   expireInvoiceCheckoutSession: expireInvoiceCheckoutSessionMock
 }));
 
@@ -585,6 +586,198 @@ describe("invoice.service", () => {
     expect(updatedInvoice?.status).toBe("paid");
     expect(updatedInvoice?.amountPaid).toBe("150.00");
     expect(updatedInvoice?.balanceDue).toBe("0.00");
+  });
+
+  it("handleStripePaymentSuccess records the payment when payment_method_types is missing", async () => {
+    const { company } = createAdminContext();
+    const { customer } = seedInvoiceGraph(company.id);
+    const invoice = fakeDb.seedInvoice({
+      companyId: company.id,
+      customerId: customer.id,
+      invoiceNumber: "INV-0002",
+      status: "sent",
+      total: "100.00",
+      amountPaid: "0.00",
+      balanceDue: "100.00"
+    });
+    const event = {
+      data: {
+        object: {
+          id: "pi_no_types",
+          amount: 10000,
+          amount_received: 10000,
+          latest_charge: "ch_no_types",
+          metadata: { invoiceId: invoice.id }
+        }
+      }
+    } as unknown as Stripe.PaymentIntentSucceededEvent;
+
+    await invoiceService.handleStripePaymentSuccess(event);
+
+    const stored = fakeDb.getTestState().payments.filter((row) => row.invoiceId === invoice.id);
+    expect(stored).toHaveLength(1);
+    expect(stored[0]?.method).toBe("other");
+    expect(fakeDb.getTestState().invoices.find((row) => row.id === invoice.id)?.status).toBe("paid");
+  });
+
+  it("handleStripePaymentSuccess: legacy pre-removal intent with booking fee metadata still records it separately (non-refundable)", async () => {
+    const { company } = createAdminContext();
+    const { customer } = seedInvoiceGraph(company.id);
+    const invoice = fakeDb.seedInvoice({
+      companyId: company.id,
+      customerId: customer.id,
+      invoiceNumber: "INV-0002",
+      status: "sent",
+      total: "150.00",
+      amountPaid: "0.00",
+      balanceDue: "150.00"
+    });
+
+    const event = {
+      data: {
+        object: {
+          id: "pi_fees",
+          amount: 15_499,
+          amount_received: 15_499,
+          latest_charge: "ch_fees",
+          metadata: {
+            invoiceId: invoice.id,
+            invoiceAmountCents: "15000",
+            serviceFeeCents: "300",
+            bookingFeeCents: "199"
+          },
+          payment_method_types: ["card"]
+        }
+      }
+    } as unknown as Stripe.PaymentIntentSucceededEvent;
+
+    await invoiceService.handleStripePaymentSuccess(event);
+
+    const payment = fakeDb.getTestState().payments.find((row) => row.invoiceId === invoice.id);
+    const updatedInvoice = fakeDb.getTestState().invoices.find((row) => row.id === invoice.id);
+
+    expect(payment?.amount).toBe("150.00");
+    expect(payment?.serviceFeeAmount).toBe("3.00");
+    expect(payment?.bookingFeeAmount).toBe("1.99");
+    expect(payment?.feeRefundable).toBe(false);
+    // Fees never touch invoice total/balance.
+    expect(updatedInvoice?.status).toBe("paid");
+    expect(updatedInvoice?.total).toBe("150.00");
+    expect(updatedInvoice?.amountPaid).toBe("150.00");
+    expect(updatedInvoice?.balanceDue).toBe("0.00");
+    expect(updatedInvoice?.serviceFeeAmount).toBe("3.00");
+    expect(updatedInvoice?.bookingFeeAmount).toBe("1.99");
+  });
+
+  it("readCheckoutFeesFromIntent treats legacy intents without fee metadata as fee-free", () => {
+    expect(
+      invoiceService.readCheckoutFeesFromIntent({ amount: 15_000, amount_received: 15_000, metadata: { invoiceId: "x" } })
+    ).toEqual({ invoiceAmountCents: 15_000, serviceFeeCents: 0, bookingFeeCents: 0 });
+  });
+
+  it("readCheckoutFeesFromIntent: new intents (no bookingFeeCents metadata) split invoice + Service Fee only", () => {
+    expect(
+      invoiceService.readCheckoutFeesFromIntent({
+        amount: 15_300,
+        amount_received: 15_300,
+        metadata: { invoiceId: "x", invoiceAmountCents: "15000", serviceFeeCents: "300" }
+      })
+    ).toEqual({ invoiceAmountCents: 15_000, serviceFeeCents: 300, bookingFeeCents: 0 });
+  });
+
+  it("recordPayment (manual, non-checkout) charges no fees", async () => {
+    const { company, actor } = createAdminContext();
+    const { customer } = seedInvoiceGraph(company.id);
+    const invoice = fakeDb.seedInvoice({
+      companyId: company.id,
+      customerId: customer.id,
+      status: "sent",
+      total: "200.00",
+      amountPaid: "0.00",
+      balanceDue: "200.00"
+    });
+
+    const payment = await invoiceService.recordPayment(company.id, actor.id, invoice.id, {
+      amount: 200,
+      method: "cash"
+    });
+
+    expect(payment.serviceFeeAmount).toBe("0.00");
+    expect(payment.bookingFeeAmount).toBe("0.00");
+    expect(payment.feeRefundable).toBe(false);
+    expect(payment.refundableAmount).toBe("200.00");
+  });
+
+  it("sendInvoice: online-booked invoices get no booking fee flag (fee removed)", async () => {
+    const { company, actor } = createAdminContext();
+    company.stripeAccountId = "acct_123";
+    company.settings = { stripePlatformBilling: { planTier: "flat" } } as typeof company.settings;
+    const { customer } = seedInvoiceGraph(company.id);
+    const job = fakeDb.seedJob({
+      companyId: company.id,
+      customerId: customer.id,
+      title: "Online booked",
+      status: "completed",
+      tags: ["online_booking"]
+    });
+    const invoice = fakeDb.seedInvoice({
+      companyId: company.id,
+      customerId: customer.id,
+      jobId: job.id,
+      status: "draft",
+      total: "100.00",
+      subtotal: "100.00",
+      balanceDue: "100.00"
+    });
+
+    await invoiceService.sendInvoice(company.id, actor.id, invoice.id);
+
+    expect(createInvoiceCheckoutSessionMock).toHaveBeenCalledWith(
+      expect.objectContaining({ total: "100.00", renvaniPlan: "flat" })
+    );
+    expect(createInvoiceCheckoutSessionMock.mock.calls.at(-1)?.[0]).not.toHaveProperty("isOnlineBooking");
+  });
+
+  it("getPublicInvoicePaymentLink: online-booked Flex = invoice + 2% Service Fee, Flat = invoice only; no booking fee", async () => {
+    const expected = {
+      flex: { serviceFeeAmount: "2.47", platformFeeAmount: "2.47", totalDue: "125.72", serviceFeeCents: 247, totalDueCents: 12_572, platformFeePercent: 2, platformFeePaidByCustomer: true },
+      flat: { serviceFeeAmount: "0.00", platformFeeAmount: "0.00", totalDue: "123.25", serviceFeeCents: 0, totalDueCents: 12_325, platformFeePercent: null, platformFeePaidByCustomer: false }
+    } as const;
+    for (const planTier of ["flat", "flex"] as const) {
+      const { company } = createAdminContext();
+      company.settings = { stripePlatformBilling: { planTier } } as typeof company.settings;
+      const { customer } = seedInvoiceGraph(company.id);
+      const job = fakeDb.seedJob({
+        companyId: company.id,
+        customerId: customer.id,
+        title: "Online booked",
+        status: "completed",
+        tags: ["online_booking"]
+      });
+      const token = `tok_${planTier}`;
+      fakeDb.seedInvoice({
+        companyId: company.id,
+        customerId: customer.id,
+        jobId: job.id,
+        status: "sent",
+        total: "123.25",
+        balanceDue: "123.25",
+        paymentToken: token,
+        stripePaymentLinkId: "cs_test_fee",
+        stripePaymentLinkUrl: `https://app.test/pay/${token}`
+      });
+
+      const link = await invoiceService.getPublicInvoicePaymentLink(token);
+
+      expect(link).toMatchObject({
+        invoiceAmount: "123.25",
+        bookingFeeAmount: "0.00",
+        invoiceAmountCents: 12_325,
+        bookingFeeCents: 0,
+        feeRefundable: false,
+        ...expected[planTier]
+      });
+    }
   });
 
   it("handleStripePaymentFailed emits a payment.failed event without changing invoice status", async () => {

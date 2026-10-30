@@ -5,12 +5,24 @@ const {
   debugLogMock,
   errorLogMock,
   infoLogMock,
-  warnLogMock
+  warnLogMock,
+  recordTransactionalEmailMessageLogMock
 } = vi.hoisted(() => ({
   debugLogMock: vi.fn(),
   errorLogMock: vi.fn(),
   infoLogMock: vi.fn(),
-  warnLogMock: vi.fn()
+  warnLogMock: vi.fn(),
+  recordTransactionalEmailMessageLogMock: vi.fn(async () => undefined)
+}));
+
+const sampleTransactionalDelivery = {
+  templateId: "booking.confirmation",
+  subject: "Your appointment is confirmed",
+  providerMessageId: "resend-msg-1"
+};
+
+vi.mock("./transactional-email-message-log.js", () => ({
+  recordTransactionalEmailMessageLog: recordTransactionalEmailMessageLogMock
 }));
 
 vi.mock("@fsm/config", () => ({
@@ -57,11 +69,23 @@ function createDependencies(): notificationsProcessor.NotificationsDependencies 
       sendInvoiceReminderOwnerAlertEmail: vi.fn(async () => undefined),
       sendServiceAgreementRenewalReminderEmail: vi.fn(async () => undefined),
       sendServiceAgreementPaymentFailedEmail: vi.fn(async () => undefined),
-      sendBookingConfirmationEmail: vi.fn(async () => undefined),
-      sendBookingDeclineEmail: vi.fn(async () => undefined),
-      sendVipMembershipWelcomeEmail: vi.fn(async () => undefined),
-      sendVipMembershipRenewalEmail: vi.fn(async () => undefined),
-      sendVipMembershipPaymentFailedEmail: vi.fn(async () => undefined)
+      sendBookingConfirmationEmail: vi.fn(async () => sampleTransactionalDelivery),
+      sendBookingDeclineEmail: vi.fn(async () => ({
+        ...sampleTransactionalDelivery,
+        templateId: "booking.decline"
+      })),
+      sendVipMembershipWelcomeEmail: vi.fn(async () => ({
+        ...sampleTransactionalDelivery,
+        templateId: "vip_membership.welcome"
+      })),
+      sendVipMembershipRenewalEmail: vi.fn(async () => ({
+        ...sampleTransactionalDelivery,
+        templateId: "vip_membership.renewal_receipt"
+      })),
+      sendVipMembershipPaymentFailedEmail: vi.fn(async () => ({
+        ...sampleTransactionalDelivery,
+        templateId: "vip_membership.payment_failed_dunning"
+      }))
     },
     sms: {
       sendSms: vi.fn(async () => "SM123")
@@ -87,6 +111,7 @@ describe("notifications.processor", () => {
     errorLogMock.mockReset();
     infoLogMock.mockReset();
     warnLogMock.mockReset();
+    recordTransactionalEmailMessageLogMock.mockClear();
   });
 
   it("send-estimate-email sends the estimate email when the customer can receive it", async () => {
@@ -653,6 +678,14 @@ describe("notifications.processor", () => {
       referenceNumber: "BK-20260428-0001",
       scheduledLabel: "Apr 30 at 8:00 AM"
     });
+    expect(recordTransactionalEmailMessageLogMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        companyId: "company-1",
+        sourceSystem: "booking_notification",
+        sourceId: "booking-1:send-booking-confirmation",
+        delivery: sampleTransactionalDelivery
+      })
+    );
     expect(dependencies.sms.sendSms).not.toHaveBeenCalled();
   });
 
@@ -672,5 +705,90 @@ describe("notifications.processor", () => {
       "http://localhost:3000/reset-password?token=abc",
       "Pat"
     );
+  });
+});
+
+describe("send-review-request send-time re-check (#264 review)", () => {
+  const activeContext = (): notificationsProcessor.ReviewRequestSendContext => ({
+    requestStatus: "sent",
+    requestDeleted: false,
+    invoice: { status: "paid", total: "250.00", deleted: false },
+    customer: { prefersEmail: true, prefersSms: true, doNotContact: false },
+    ruleEnabled: true
+  });
+
+  function emailJob() {
+    return createJob("send-review-request", {
+      companyId: "company-1",
+      reviewRequestId: "review-1",
+      invoiceId: "invoice-1",
+      channel: "email",
+      customerEmail: "chris@example.com",
+      customerFirstName: "Chris",
+      referenceId: "c22927f5-988e-4bb6-bf33-f64e71e72a58",
+      companyName: "Acme HVAC"
+    });
+  }
+
+  async function run(context: notificationsProcessor.ReviewRequestSendContext | null, job = emailJob()) {
+    const deps = createDependencies();
+    const sendReviewRequestEmail = vi.fn(async () => undefined);
+    (deps.email as unknown as Record<string, unknown>).sendReviewRequestEmail = sendReviewRequestEmail;
+    deps.loadReviewRequestSendContext = vi.fn(async () => context);
+    await notificationsProcessor.handleSendReviewRequest(job, deps);
+    return { sendReviewRequestEmail, sendSms: deps.sms.sendSms };
+  }
+
+  it("sends when everything is still valid (happy path)", async () => {
+    const { sendReviewRequestEmail } = await run(activeContext());
+    expect(sendReviewRequestEmail).toHaveBeenCalledTimes(1);
+  });
+
+  it.each([
+    ["refunded / no longer paid", { invoice: { status: "refunded", total: "250.00", deleted: false } }, "invoice_not_paid"],
+    ["void", { invoice: { status: "void", total: "250.00", deleted: false } }, "invoice_not_paid"],
+    ["zero total", { invoice: { status: "paid", total: "0.00", deleted: false } }, "invoice_not_paid"],
+    ["do not contact", { customer: { prefersEmail: true, prefersSms: true, doNotContact: true } }, "customer_do_not_contact"],
+    ["email opt-out", { customer: { prefersEmail: false, prefersSms: true, doNotContact: false } }, "customer_opted_out"],
+    ["NULL prefersEmail is not consent", { customer: { prefersEmail: null, prefersSms: true, doNotContact: false } }, "customer_opted_out"],
+    ["rule disabled", { ruleEnabled: false }, "rule_disabled"],
+    ["request completed", { requestStatus: "completed" }, "request_not_active"],
+    ["request declined", { requestStatus: "declined" }, "request_not_active"],
+    ["request deleted", { requestDeleted: true }, "request_not_found"]
+  ] as const)("skips without sending: %s", async (_label, override, reason) => {
+    infoLogMock.mockClear();
+    const { sendReviewRequestEmail } = await run({ ...activeContext(), ...override } as notificationsProcessor.ReviewRequestSendContext);
+    expect(sendReviewRequestEmail).not.toHaveBeenCalled();
+    expect(infoLogMock).toHaveBeenCalledWith(expect.objectContaining({ reason }), "Review request skipped at send time");
+  });
+
+  it("skips when the request no longer exists", async () => {
+    const { sendReviewRequestEmail } = await run(null);
+    expect(sendReviewRequestEmail).not.toHaveBeenCalled();
+  });
+
+  it("SMS path: NULL prefersSms is not consent", async () => {
+    const job = createJob("send-review-request", {
+      companyId: "company-1",
+      reviewRequestId: "review-1",
+      invoiceId: "invoice-1",
+      channel: "sms",
+      customerPhone: "555-0100",
+      referenceId: "c22927f5-988e-4bb6-bf33-f64e71e72a58"
+    });
+    const { sendSms } = await run({ ...activeContext(), customer: { prefersEmail: true, prefersSms: null, doNotContact: false } }, job);
+    expect(sendSms).not.toHaveBeenCalled();
+  });
+
+  it("manual (non-invoice) requests skip the invoice/rule checks but keep consent checks", async () => {
+    const job = createJob("send-review-request", {
+      companyId: "company-1",
+      reviewRequestId: "review-1",
+      channel: "email",
+      customerEmail: "chris@example.com",
+      referenceId: "c22927f5-988e-4bb6-bf33-f64e71e72a58"
+    });
+    const ok = await run({ ...activeContext(), invoice: null, ruleEnabled: false }, job);
+    expect(ok.sendReviewRequestEmail).toHaveBeenCalledTimes(1);
   });
 });

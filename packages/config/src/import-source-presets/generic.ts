@@ -23,6 +23,40 @@ export const GENERIC_NOTES_PRESET: ImportSourcePreset = {
   }
 };
 
+export const GENERIC_SERVICE_AGREEMENTS_PRESET: ImportSourcePreset = {
+  id: "generic",
+  entity: "service_agreements",
+  label: "Generic service agreements CSV",
+  headerAliases: {
+    "agreement id": "sourceId",
+    agreement_id: "sourceId",
+    id: "sourceId",
+    "plan id": "sourceId",
+    "customer id": "customerSourceId",
+    customer_id: "customerSourceId",
+    "client id": "customerSourceId",
+    "plan name": "name",
+    plan_name: "name",
+    name: "name",
+    agreement: "name",
+    "next service": "nextServiceDate",
+    "next service date": "nextServiceDate",
+    "next due": "nextServiceDate",
+    "next due date": "nextServiceDate",
+    next_due_date: "nextServiceDate",
+    "start date": "startDate",
+    start_date: "startDate",
+    started: "startDate",
+    frequency: "frequency",
+    cadence: "frequency",
+    status: "status",
+    price: "price",
+    amount: "price",
+    "annual price": "price",
+    annual_price: "price",
+  },
+};
+
 export const GENERIC_CUSTOMER_PRESET: ImportSourcePreset = {
   id: "generic",
   entity: "customers",

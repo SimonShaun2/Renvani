@@ -59,3 +59,27 @@ describe("chunk-manifest", () => {
     });
   });
 });
+
+describe("chunk eligibility registry", () => {
+  it("makes properties eligible only with sourceId and a customer reference", async () => {
+    const { isChunkCommitEligibleEntity } = await import("./chunk-manifest.js");
+    expect(isChunkCommitEligibleEntity("properties", { a: "sourceId", b: "customerSourceId" })).toBe(true);
+    expect(isChunkCommitEligibleEntity("properties", { a: "sourceId", b: "customerId" })).toBe(true);
+    expect(isChunkCommitEligibleEntity("properties", { a: "sourceId" })).toBe(false);
+    expect(isChunkCommitEligibleEntity("properties", { b: "customerSourceId" })).toBe(false);
+  });
+
+  it("makes invoices eligible with sourceId or invoiceNumber plus a customer reference", async () => {
+    const { isChunkCommitEligibleEntity } = await import("./chunk-manifest.js");
+    expect(isChunkCommitEligibleEntity("invoices", { a: "invoiceNumber", b: "customerSourceId" })).toBe(true);
+    expect(isChunkCommitEligibleEntity("invoices", { a: "sourceId", b: "customerId" })).toBe(true);
+    expect(isChunkCommitEligibleEntity("invoices", { a: "invoiceNumber" })).toBe(false);
+  });
+
+  it("keeps payments and unknown types out of chunk commits", async () => {
+    const { isChunkCommitEligibleEntity } = await import("./chunk-manifest.js");
+    expect(isChunkCommitEligibleEntity("payments", { a: "sourceId", b: "customerSourceId" })).toBe(false);
+    expect(isChunkCommitEligibleEntity("toString", { a: "sourceId" })).toBe(false);
+    expect(isChunkCommitEligibleEntity("customers", { a: "email" })).toBe(false);
+  });
+});

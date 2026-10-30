@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  type CreateJobInput,
   type AddJobProductInput,
   type CreateReviewRequestInput,
   type CreateTaskInput,
@@ -314,6 +315,17 @@ export function useJobsList(query: JobListQueryInput) {
   });
 }
 
+export function useCreateJob() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (input: CreateJobInput) => api.post<JobResponse>("/api/v1/jobs", input),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: jobKeys.all });
+    }
+  });
+}
+
 export function useJob(jobId: string | null) {
   return useQuery({
     queryKey: jobId ? jobKeys.detail(jobId) : jobKeys.detail("pending"),
@@ -542,7 +554,8 @@ export function useJobAttachments(jobId: string | null) {
     queryKey: jobId ? jobKeys.attachments(jobId) : jobKeys.attachments("pending"),
     queryFn: () =>
       api.get<AttachmentListResponse>(`/api/v1/attachments?entityType=job&entityId=${jobId}&page=1&limit=100`),
-    enabled: Boolean(jobId)
+    enabled: Boolean(jobId),
+    staleTime: 4 * 60 * 1000
   });
 }
 

@@ -23,7 +23,25 @@ vi.mock("@fsm/jobs", () => ({
 }));
 
 vi.mock("../../lib/storage.js", () => ({
-  uploadFile: uploadFileMock
+  uploadFile: uploadFileMock,
+  createSignedDownloadUrl: vi.fn(async (objectKey: string) => ({
+    url: `https://signed.example/${objectKey}?expires=1`,
+    expiresAt: new Date(Date.now() + 900_000),
+    objectKey
+  })),
+  getFileKeyFromUrl: (reference: string) => {
+    const filesExamplePrefix = "https://files.example/";
+    if (reference.startsWith(filesExamplePrefix)) {
+      return reference.slice(filesExamplePrefix.length);
+    }
+
+    if (reference.startsWith("memory-object://")) {
+      return reference.slice("memory-object://".length);
+    }
+
+    return reference;
+  },
+  getMediaSignedUrlTtlSeconds: () => 900
 }));
 
 vi.mock("sharp", () => ({
@@ -178,5 +196,43 @@ describe("FS-85 attachments API tenant access", () => {
     );
 
     expect(response.status).toBe(401);
+  });
+
+  it("returns short-lived signed URLs for same-tenant list (FS-149)", async () => {
+    const company = fakeDb.seedCompany({ name: "Signed Co", slug: "fs149-signed" });
+    const user = fakeDb.seedUser({
+      companyId: company.id,
+      email: "signed@fs149.example",
+      firstName: "Sign",
+      lastName: "Ed",
+      role: "owner"
+    });
+    const customer = fakeDb.seedCustomer({
+      companyId: company.id,
+      firstName: "Cust",
+      lastName: "Files",
+      email: "files@fs149.example"
+    });
+    const objectKey = `${company.id}/imports/bundle-a/photo.jpg`;
+    fakeDb.seedFileAttachment({
+      companyId: company.id,
+      entityType: "customer",
+      entityId: customer.id,
+      customerId: customer.id,
+      uploadedById: user.id,
+      fileName: "photo.jpg",
+      fileUrl: `memory-object://${objectKey}`,
+      mimeType: "image/jpeg",
+      fileType: "photo"
+    });
+
+    const response = await request(app.server)
+      .get(`/api/v1/attachments?entityType=customer&entityId=${customer.id}`)
+      .set("Authorization", authForCompany(company.id, user.id));
+
+    expect(response.status).toBe(200);
+    expect(response.body.data).toHaveLength(1);
+    expect(response.body.data[0]?.fileUrl).toBe(`https://signed.example/${objectKey}?expires=1`);
+    expect(response.body.data[0]?.fileName).toBe("photo.jpg");
   });
 });

@@ -48,10 +48,20 @@ const JobTaskUpdatePayloadSchema = z.object({
   notes: z.string().max(5000).optional()
 });
 
-const JobSignatureCapturePayloadSchema = z.object({
-  signatureUrl: z.string().url().max(2048),
-  signedByName: z.string().min(1).max(255)
-});
+/**
+ * Exactly one of `attachmentId` (preferred: an image attachment already uploaded
+ * to the same job) or legacy `signatureUrl` must be provided.
+ */
+const JobSignatureCapturePayloadSchema = z
+  .object({
+    attachmentId: z.string().uuid().optional(),
+    signatureUrl: z.string().url().max(2048).optional(),
+    signedByName: z.string().trim().min(1).max(255)
+  })
+  .refine((payload) => (payload.attachmentId === undefined) !== (payload.signatureUrl === undefined), {
+    message: "Provide exactly one of attachmentId or signatureUrl",
+    path: ["attachmentId"]
+  });
 
 const JobMediaRegisterPayloadSchema = z.object({
   url: z.string().url().max(2048),
@@ -122,6 +132,8 @@ export const FieldWorkSyncOperationResultSchema = z.object({
   recordVersion: RecordVersionV1Schema.optional(),
   entityId: z.string().uuid().optional(),
   message: z.string().optional(),
+  /** Machine-readable reason for a rejected operation (additive; e.g. SIGNATURE_ATTACHMENT_INVALID). */
+  code: z.string().optional(),
   conflict: z
     .object({
       liveRecordVersion: RecordVersionV1Schema,

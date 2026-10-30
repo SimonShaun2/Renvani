@@ -122,12 +122,15 @@ export interface JobDetail extends Job {
   availableTransitions: JobStatus[];
 }
 
+export type JobNoteKind = "internal" | "field";
+
 export interface JobNote {
   id: string;
   companyId: string;
   jobId: string;
   authorId: string | null;
   content: string;
+  noteKind: JobNoteKind;
   isInternal: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -209,6 +212,7 @@ export interface CompleteJobInput {
 export interface AddNoteInput {
   content: string;
   isInternal?: boolean;
+  noteKind?: "internal" | "field";
 }
 
 export interface AddPhotoInput {

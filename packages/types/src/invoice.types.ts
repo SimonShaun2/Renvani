@@ -29,6 +29,10 @@ export interface Invoice {
   total: string;
   amountPaid: string | null;
   balanceDue: string;
+  /** Customer-paid 2% Service Fee collected at checkout (separate line; not in total/tax/balance). */
+  serviceFeeAmount: string;
+  /** @deprecated Legacy online-booking fee (removed 2026-10-27). Historical value only; never charged now ("0.00"). */
+  bookingFeeAmount: string;
   issuedAt: Date | null;
   dueAt: Date | null;
   sentAt: Date | null;
@@ -52,6 +56,7 @@ export interface InvoiceItem {
   id: string;
   invoiceId: string;
   companyId: string;
+  priceBookItemId: string | null;
   name: string;
   description: string | null;
   itemType: InvoiceItemType;
@@ -71,7 +76,18 @@ export interface Payment {
   invoiceId: string;
   customerId: string;
   collectedById: string | null;
+  /** Invoice portion applied to the balance (excludes fees). */
   amount: string;
+  /** Customer-paid 2% Service Fee on this payment ("0.00" for manual/non-checkout payments). */
+  serviceFeeAmount: string;
+  /** @deprecated Legacy online-booking fee recorded on this payment before removal (2026-10-27); "0.00" for new payments. */
+  bookingFeeAmount: string;
+  /** Always false: Service Fee and booking fee are non-refundable. */
+  feeRefundable: boolean;
+  /** Refunded portion of `amount` (fees are never refunded). */
+  amountRefunded: string;
+  /** Max still refundable = amount - amountRefunded (fees excluded). */
+  refundableAmount: string;
   method: PaymentMethod;
   status: PaymentStatus;
   stripePaymentIntentId: string | null;
@@ -107,6 +123,10 @@ export interface InvoiceListItem {
   total: string;
   amountPaid: string;
   balanceDue: string;
+  /** Customer-paid fees collected at checkout (separate from total). */
+  serviceFeeAmount?: string;
+  /** @deprecated Legacy online-booking fee (removed 2026-10-27); historical totals only. */
+  bookingFeeAmount?: string;
   dueAt: Date | null;
   paidAt: Date | null;
   customer: {
@@ -124,6 +144,9 @@ export interface InvoicePaymentSummary {
   status: PaymentStatus;
   paidAt: Date | null;
   stripePaymentIntentId: string | null;
+  serviceFeeAmount: string;
+  bookingFeeAmount: string;
+  feeRefundable: boolean;
 }
 
 export interface InvoiceDetail {
@@ -138,6 +161,9 @@ export interface InvoiceDetail {
   total: string;
   amountPaid: string;
   balanceDue: string;
+  serviceFeeAmount?: string;
+  /** @deprecated Legacy online-booking fee (removed 2026-10-27); historical totals only. */
+  bookingFeeAmount?: string;
   issuedAt: Date | null;
   sentAt: Date | null;
   dueAt: Date | null;
@@ -193,6 +219,7 @@ export interface AddInvoiceItemInput {
   unitPrice: number;
   isTaxable?: boolean;
   sortOrder?: number;
+  priceBookItemId?: string;
 }
 
 export interface UpdateInvoiceItemInput {
@@ -203,6 +230,7 @@ export interface UpdateInvoiceItemInput {
   unitPrice?: number;
   isTaxable?: boolean;
   sortOrder?: number;
+  priceBookItemId?: string | null;
 }
 
 export interface RecordPaymentInput {
@@ -250,11 +278,87 @@ export interface PublicInvoicePaymentLink {
   /** Present when invoice Checkout uses embedded UI on the pay page. */
   checkoutClientSecret: string | null;
   invoiceAmount: string;
+  /** Legacy alias: total customer-paid fees (the Service Fee). */
   platformFeeAmount: string;
+  /** invoiceAmount + serviceFeeAmount. */
   totalDue: string;
-  /** Set for Flex tenants when a customer-paid fee applies. */
+  /** 2% Service Fee, separate line, non-refundable. */
+  serviceFeeAmount: string;
+  /** @deprecated Online-booking fee removed 2026-10-27; always "0.00". Kept for payload compatibility. */
+  bookingFeeAmount: string;
+  invoiceAmountCents: number;
+  serviceFeeCents: number;
+  bookingFeeCents: number;
+  totalDueCents: number;
+  /** Always false. */
+  feeRefundable: boolean;
+  /** Service Fee percent (2); kept for back-compat with the old Flex-only fee. */
   platformFeePercent: number | null;
   platformFeePaidByCustomer: boolean;
   /** Optional disclosure from `CUSTOMER_PLATFORM_FEE_DISCLOSURE` (empty = omit). */
   platformFeeDisclosure: string | null;
+}
+
+/** Public pay link response: legacy keys plus additive payer-safe display keys. */
+export type PublicInvoicePaymentLinkView = PublicInvoicePaymentLink & PublicPayViewFields;
+
+/** Payer-safe line item on the public pay page (no internal ids). */
+export interface PublicPayLineItem {
+  description: string;
+  quantity: string;
+  /** Unit price, 2-decimal money string. */
+  unit: string;
+  total: string;
+}
+
+/**
+ * Additive, payer-safe top-level keys on GET /public/pay/:token and /receipt (Figma 53:3–53:465).
+ * Never carries tenant ids, row ids, Stripe ids or internal notes. Extend by adding a key here,
+ * a builder in apps/api/src/lib/public-pay-view.ts and the key in the route response allowlist.
+ */
+export interface PublicPayViewFields {
+  shopName: string | null;
+  shopLogoUrl: string | null;
+  shopUrl: string | null;
+  statementDescriptor: string | null;
+  /** First + last (or display) name, as the frame header shows. */
+  customerName: string | null;
+  /** Street line only (frame: "1840 Grape St · Service on Oct 20"). */
+  serviceAddress: string | null;
+  serviceDate: string | null;
+  dueAt: string | null;
+  lineItems: PublicPayLineItem[];
+  invoiceStatus: string;
+  paymentStatus: string | null;
+  paidAmount: string | null;
+  paidAt: string | null;
+  /** Masked (first character of the local part kept). */
+  receiptEmail: string | null;
+  plan: "flex" | "flat" | null;
+}
+
+/** Receipt-only fee split (Service Fee + legacy booking fee on old payments). Fees are never refundable. */
+export interface PublicPayReceiptFees {
+  serviceFeeLabel: string | null;
+  serviceFeeAmount: string;
+  serviceFeeCents: number;
+  /** @deprecated Legacy online-booking fee (removed 2026-10-27): non-zero only on payments recorded before removal. */
+  bookingFeeAmount: string;
+  /** @deprecated See bookingFeeAmount. */
+  bookingFeeCents: number;
+  feeRefundable: false;
+}
+
+/** Web client name for the GET /public/pay/:token response (apps/api routes/public/pay/schemas.ts). */
+export type PublicPaymentLinkResponse = PublicInvoicePaymentLinkView;
+
+/** GET /public/pay/:token/receipt response: legacy receipt keys + view keys + fee split. */
+export interface PublicInvoiceReceiptResponse extends PublicPayViewFields, PublicPayReceiptFees {
+  invoiceNumber: string;
+  totalDue: string;
+  invoiceAmount: string;
+  platformFeeAmount: string;
+  receiptPortalUrl: string;
+  pdfDownloadUrl: string;
+  brandName: string;
 }

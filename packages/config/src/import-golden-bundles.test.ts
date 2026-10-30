@@ -47,6 +47,17 @@ describe("FS-MIGRATE golden import bundles (CI fixtures)", () => {
     }
   });
 
+  it("Jobber golden bundle ships clients, jobs, invoices, payments with CI-gated presets", () => {
+    const manifest = GOLDEN_IMPORT_BUNDLE_MANIFESTS.find((entry) => entry.sourceSystem === "jobber");
+    expect(manifest).toBeDefined();
+    const entityTypes = manifest?.files.map((file) => file.entityType).sort();
+    expect(entityTypes).toContain("customers");
+    expect(entityTypes).toContain("jobs");
+    expect(entityTypes).toContain("invoices");
+    expect(entityTypes).toContain("payments");
+    assertGoldenImportBundleManifest(manifest!);
+  });
+
   it("includes media paths for Service Fusion file-batch smoke tests", () => {
     const manifest = GOLDEN_IMPORT_BUNDLE_MANIFESTS.find((entry) => entry.sourceSystem === "service_fusion");
     expect(manifest?.mediaRelativePaths.length).toBeGreaterThanOrEqual(2);

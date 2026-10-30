@@ -1,10 +1,11 @@
+import { randomUUID } from "node:crypto";
 import { and, eq, isNull } from "drizzle-orm";
 import type { Job, Processor } from "bullmq";
 import pino from "pino";
 
-import { resolveOutboundEmailFromAddress } from "@fsm/comms";
+import { resolveTransactionalEmailFromAddress, type EmailTemplateId } from "@fsm/comms";
 import { env } from "@fsm/config";
-import { featureFlags } from "@fsm/config/feature-flags";
+import { recordTransactionalEmailMessageLog } from "./transactional-email-message-log.js";
 import {
   automationRules,
   campaignRecipients,
@@ -16,6 +17,7 @@ import {
   estimates,
   invoices,
   maintenancePlans,
+  reviewRequests,
   messageLogs,
   serviceAgreementTemplates,
   users
@@ -30,7 +32,17 @@ type InvoiceStatus = (typeof invoices.$inferSelect)["status"];
 type AutomationRuleType = (typeof automationRules.$inferSelect)["ruleType"];
 type AgreementEmailType = "renewal_reminder" | "payment_failed";
 
+type TransactionalEmailSendResult = {
+  templateId: EmailTemplateId;
+  subject: string;
+  providerMessageId: string | null;
+};
+
 interface EmailModule {
+  sendReviewRequestEmail?(
+    to: string,
+    params: { firstName: string; companyName: string; technicianName: string | null; reviewUrl: string }
+  ): Promise<unknown>;
   sendPasswordResetEmail(to: string, resetUrl: string, firstName: string): Promise<void>;
   sendEstimateEmail(
     to: string,
@@ -116,7 +128,7 @@ interface EmailModule {
       referenceNumber: string;
       scheduledLabel: string | null;
     }
-  ): Promise<void>;
+  ): Promise<TransactionalEmailSendResult>;
   sendBookingDeclineEmail(
     to: string,
     params: {
@@ -125,7 +137,7 @@ interface EmailModule {
       referenceNumber: string;
       reason: string | null;
     }
-  ): Promise<void>;
+  ): Promise<TransactionalEmailSendResult>;
   sendVipMembershipWelcomeEmail(
     to: string,
     params: {
@@ -134,7 +146,7 @@ interface EmailModule {
       planName: string;
       portalUrl: string | null;
     }
-  ): Promise<void>;
+  ): Promise<TransactionalEmailSendResult>;
   sendVipMembershipRenewalEmail(
     to: string,
     params: {
@@ -144,7 +156,7 @@ interface EmailModule {
       amount: string;
       renewalDateLabel: string | null;
     }
-  ): Promise<void>;
+  ): Promise<TransactionalEmailSendResult>;
   sendVipMembershipPaymentFailedEmail(
     to: string,
     params: {
@@ -157,7 +169,7 @@ interface EmailModule {
       nextRetryAtLabel: string | null;
       dunningStepIndex: number;
     }
-  ): Promise<void>;
+  ): Promise<TransactionalEmailSendResult>;
 }
 
 interface SmsModule {
@@ -258,6 +270,45 @@ interface AutomationRuleContext {
   ruleType: AutomationRuleType;
 }
 
+export interface ReviewRequestSendContext {
+  requestStatus: string;
+  requestDeleted: boolean;
+  invoice: { status: string; total: string | number | null; deleted: boolean } | null;
+  customer: { prefersEmail: boolean | null; prefersSms: boolean | null; doNotContact: boolean | null } | null;
+  ruleEnabled: boolean;
+}
+
+export type ReviewRequestSendSkipReason =
+  | "request_not_found"
+  | "request_not_active"
+  | "invoice_not_paid"
+  | "customer_do_not_contact"
+  | "customer_opted_out"
+  | "rule_disabled";
+
+/**
+ * Send-time re-check (the review email/SMS may be delayed by hours). Invoice-originated requests also need the
+ * invoice still paid with total > 0 and the review_request rule still on. NULL channel preference = no consent.
+ */
+export function reviewRequestSendSkipReason(
+  context: ReviewRequestSendContext | null,
+  channel: "email" | "sms",
+  fromInvoice: boolean
+): ReviewRequestSendSkipReason | null {
+  if (!context || context.requestDeleted) return "request_not_found";
+  if (context.requestStatus !== "pending" && context.requestStatus !== "sent") return "request_not_active";
+  if (fromInvoice) {
+    if (!context.invoice || context.invoice.deleted) return "invoice_not_paid";
+    if (context.invoice.status !== "paid" || !(Number(context.invoice.total ?? 0) > 0)) return "invoice_not_paid";
+    if (!context.ruleEnabled) return "rule_disabled";
+  }
+  if (!context.customer) return "customer_opted_out";
+  if (context.customer.doNotContact === true) return "customer_do_not_contact";
+  const consent = channel === "email" ? context.customer.prefersEmail : context.customer.prefersSms;
+  if (consent !== true) return "customer_opted_out";
+  return null;
+}
+
 export interface NotificationsDependencies {
   email: EmailModule;
   sms: SmsModule;
@@ -273,6 +324,12 @@ export interface NotificationsDependencies {
     recipientId: string
   ): Promise<CampaignDeliveryContext | null>;
   loadCompanyOwner(companyId: string): Promise<CompanyOwnerContext | null>;
+  /** Fresh facts for the send-time re-check of a (possibly delayed) review request. */
+  loadReviewRequestSendContext?(
+    companyId: string,
+    reviewRequestId: string,
+    invoiceId: string | null
+  ): Promise<ReviewRequestSendContext | null>;
   findAutomationRule(
     companyId: string,
     ruleType: AutomationRuleType
@@ -340,10 +397,14 @@ function formatVipLabelFromIso(iso: string | null): string | null {
   return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 }
 
-function getOutboundEmailFromAddress(): string {
-  return resolveOutboundEmailFromAddress({
-    resendEmailEnabled: featureFlags.resendEmailEnabled,
+/** Same key-based selection as the API sender (apps/api/src/lib/outbound-email.ts), via @fsm/comms. */
+export function getOutboundEmailFromAddress(): string {
+  return resolveTransactionalEmailFromAddress({
+    resendApiKey: env.RESEND_API_KEY,
+    sendgridApiKey: env.SENDGRID_API_KEY,
+    nodeEnv: env.NODE_ENV,
     resendFromEmail: env.RESEND_FROM_EMAIL,
+    emailFrom: env.EMAIL_FROM,
     sendgridFromEmail: env.SENDGRID_FROM_EMAIL
   });
 }
@@ -679,6 +740,47 @@ function createProductionDependencies(): Promise<NotificationsDependencies> {
         .limit(1);
 
       return owner ?? null;
+    },
+    async loadReviewRequestSendContext(companyId, reviewRequestId, invoiceId) {
+      const [request] = await db
+        .select()
+        .from(reviewRequests)
+        .where(and(eq(reviewRequests.companyId, companyId), eq(reviewRequests.id, reviewRequestId)))
+        .limit(1);
+      if (!request) return null;
+      const [customerRows, invoiceRows, ruleRows] = await Promise.all([
+        db
+          .select()
+          .from(customers)
+          .where(and(eq(customers.companyId, companyId), eq(customers.id, request.customerId), isNull(customers.deletedAt)))
+          .limit(1),
+        invoiceId
+          ? db.select().from(invoices).where(and(eq(invoices.companyId, companyId), eq(invoices.id, invoiceId))).limit(1)
+          : Promise.resolve([]),
+        db
+          .select()
+          .from(automationRules)
+          .where(
+            and(
+              eq(automationRules.companyId, companyId),
+              eq(automationRules.ruleType, "review_request"),
+              eq(automationRules.isEnabled, true),
+              isNull(automationRules.deletedAt)
+            )
+          )
+          .limit(1)
+      ]);
+      const customer = customerRows[0];
+      const invoice = invoiceRows[0];
+      return {
+        requestStatus: request.status,
+        requestDeleted: request.deletedAt !== null,
+        invoice: invoice ? { status: invoice.status, total: invoice.total, deleted: invoice.deletedAt !== null } : null,
+        customer: customer
+          ? { prefersEmail: customer.prefersEmail, prefersSms: customer.prefersSms, doNotContact: customer.doNotContact }
+          : null,
+        ruleEnabled: ruleRows.length > 0
+      };
     },
     async findAutomationRule(companyId, ruleType) {
       const [rule] = await db
@@ -1176,6 +1278,42 @@ export async function handleSendReviewRequest(
   job: Job<Record<string, unknown>>,
   dependencies: NotificationsDependencies
 ): Promise<void> {
+  const companyId = getJobString(job.data, "companyId");
+  const reviewRequestId = getJobString(job.data, "reviewRequestId");
+  const invoiceId = getJobString(job.data, "invoiceId");
+  const channel = getJobString(job.data, "channel") === "email" ? "email" : "sms";
+  if (companyId && reviewRequestId && dependencies.loadReviewRequestSendContext) {
+    const context = await dependencies.loadReviewRequestSendContext(companyId, reviewRequestId, invoiceId);
+    const skip = reviewRequestSendSkipReason(context, channel, Boolean(invoiceId));
+    if (skip) {
+      logger.info(
+        { jobId: job.id ?? null, companyId, reviewRequestId, invoiceId, channel, reason: skip },
+        "Review request skipped at send time"
+      );
+      return;
+    }
+  }
+
+  if (channel === "email") {
+    const to = getJobString(job.data, "customerEmail");
+    const referenceId = getJobString(job.data, "referenceId");
+    if (!to || !referenceId || !dependencies.email.sendReviewRequestEmail) {
+      logger.warn({ jobId: job.id ?? null }, "Review request email job missing required data");
+      return;
+    }
+    await dependencies.email.sendReviewRequestEmail(to, {
+      firstName: getJobString(job.data, "customerFirstName") ?? "",
+      companyName: getJobString(job.data, "companyName") ?? "Renvani",
+      technicianName: getJobString(job.data, "technicianName"),
+      reviewUrl: `${env.APP_URL.replace(/\/$/, "")}/review/${referenceId}`
+    });
+    logger.info(
+      { companyId: getJobString(job.data, "companyId"), reviewRequestId: getJobString(job.data, "reviewRequestId") },
+      "Review request email sent"
+    );
+    return;
+  }
+
   await handleSmsNotificationJob(job, dependencies, {
     jobLabel: "Review request",
     buildBody(data) {
@@ -1234,12 +1372,28 @@ export async function handleSendVipMembershipEmail(
     return;
   }
 
+  // Fall back to the (stable across retries) BullMQ job id so emails missing Stripe ids never collide
+  // on the message_logs (company, source, source id) unique key.
+  const fallbackSourceKey = `job-${job.id ?? randomUUID()}`;
+  const stripeSubscriptionId = getJobString(job.data, "stripeSubscriptionId") ?? fallbackSourceKey;
+  const stripeInvoiceId = getJobString(job.data, "stripeInvoiceId") ?? fallbackSourceKey;
+  const fromAddress = getOutboundEmailFromAddress();
+
   if (emailKind === "welcome") {
-    await dependencies.email.sendVipMembershipWelcomeEmail(customer.email, {
+    const delivery = await dependencies.email.sendVipMembershipWelcomeEmail(customer.email, {
       firstName: customer.firstName,
       companyName: company.name,
       planName,
       portalUrl: null
+    });
+    await recordTransactionalEmailMessageLog({
+      companyId,
+      customerId,
+      toAddress: customer.email,
+      fromAddress,
+      delivery,
+      sourceSystem: "vip_membership_email",
+      sourceId: `${stripeSubscriptionId}:welcome`
     });
     logger.info({ companyId, customerId, emailKind }, "VIP membership welcome email sent");
     return;
@@ -1247,12 +1401,21 @@ export async function handleSendVipMembershipEmail(
 
   if (emailKind === "renewal_receipt") {
     const amount = getJobString(job.data, "amount") ?? "0.00";
-    await dependencies.email.sendVipMembershipRenewalEmail(customer.email, {
+    const delivery = await dependencies.email.sendVipMembershipRenewalEmail(customer.email, {
       firstName: customer.firstName,
       companyName: company.name,
       planName,
       amount,
       renewalDateLabel: formatVipLabelFromIso(new Date().toISOString())
+    });
+    await recordTransactionalEmailMessageLog({
+      companyId,
+      customerId,
+      toAddress: customer.email,
+      fromAddress,
+      delivery,
+      sourceSystem: "vip_membership_email",
+      sourceId: `${stripeSubscriptionId}:renewal:${stripeInvoiceId}`
     });
     logger.info({ companyId, customerId, emailKind }, "VIP membership renewal email sent");
     return;
@@ -1267,7 +1430,7 @@ export async function handleSendVipMembershipEmail(
       ? job.data.dunningStepIndex
       : 0;
 
-  await dependencies.email.sendVipMembershipPaymentFailedEmail(customer.email, {
+  const delivery = await dependencies.email.sendVipMembershipPaymentFailedEmail(customer.email, {
     firstName: customer.firstName,
     companyName: company.name,
     planName,
@@ -1276,6 +1439,16 @@ export async function handleSendVipMembershipEmail(
     graceEndsAtLabel,
     nextRetryAtLabel,
     dunningStepIndex
+  });
+
+  await recordTransactionalEmailMessageLog({
+    companyId,
+    customerId,
+    toAddress: customer.email,
+    fromAddress,
+    delivery,
+    sourceSystem: "vip_membership_email",
+    sourceId: `${stripeSubscriptionId}:dunning:${stripeInvoiceId}:step-${dunningStepIndex}`
   });
 
   logger.info({ companyId, customerId, emailKind, dunningStepIndex }, "VIP membership dunning email sent");
@@ -1312,19 +1485,33 @@ export async function handleSendBookingNotification(
   const reason = getJobString(job.data, "reason");
 
   if (toEmail && companyName && referenceNumber) {
-    if (job.name === "send-booking-decline") {
-      await dependencies.email.sendBookingDeclineEmail(toEmail, {
-        firstName,
-        companyName,
-        referenceNumber,
-        reason: reason ?? null
-      });
-    } else {
-      await dependencies.email.sendBookingConfirmationEmail(toEmail, {
-        firstName,
-        companyName,
-        referenceNumber,
-        scheduledLabel: scheduledLabel ?? null
+    const customerId = getJobString(job.data, "customerId");
+    const bookingRequestId = getJobString(job.data, "bookingRequestId");
+    const fromAddress = getOutboundEmailFromAddress();
+    const delivery =
+      job.name === "send-booking-decline"
+        ? await dependencies.email.sendBookingDeclineEmail(toEmail, {
+            firstName,
+            companyName,
+            referenceNumber,
+            reason: reason ?? null
+          })
+        : await dependencies.email.sendBookingConfirmationEmail(toEmail, {
+            firstName,
+            companyName,
+            referenceNumber,
+            scheduledLabel: scheduledLabel ?? null
+          });
+
+    if (companyId && bookingRequestId) {
+      await recordTransactionalEmailMessageLog({
+        companyId,
+        customerId: customerId ?? null,
+        toAddress: toEmail,
+        fromAddress,
+        delivery,
+        sourceSystem: "booking_notification",
+        sourceId: `${bookingRequestId}:${job.name}`
       });
     }
 

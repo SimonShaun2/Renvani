@@ -135,7 +135,7 @@ function getTimeZoneOffsetMinutes(dateValue: Date, timeZone: string): number {
   return Math.round((asUtc - dateValue.getTime()) / 60_000);
 }
 
-function createTimeZoneDate(date: string, hour: number, timeZone: string): Date {
+export function createTimeZoneDate(date: string, hour: number, timeZone: string): Date {
   const [year, month, day] = date.split("-").map(Number);
   const utcGuess = new Date(Date.UTC(year ?? 0, (month ?? 1) - 1, day ?? 1, hour, 0, 0));
   const offsetMinutes = getTimeZoneOffsetMinutes(utcGuess, timeZone);

@@ -1,3 +1,8 @@
+import type { GenerateRevenueProposalsBody } from "@fsm/types";
+import {
+  generateRevenueProposals,
+  proposeFromRecommendation
+} from "../../services/revenue-agent/revenue-agent-proposals.service.js";
 import type { FastifyReply, FastifyRequest } from "fastify";
 import type { ActionRecommendationInput, ListRecommendationsQuery } from "@fsm/types";
 
@@ -176,4 +181,20 @@ export async function labelPhotoHandler(
     label,
     caption
   });
+}
+
+export async function proposeRecommendationHandler(
+  request: FastifyRequest,
+  reply: FastifyReply
+): Promise<FastifyReply> {
+  const params = request.params as RecommendationIdParams;
+  return reply.send(await proposeFromRecommendation(request.company.id, request.user.id, params.id));
+}
+
+export async function generateRevenueProposalsHandler(
+  request: FastifyRequest,
+  reply: FastifyReply
+): Promise<FastifyReply> {
+  const body = (request.body ?? {}) as GenerateRevenueProposalsBody;
+  return reply.send(await generateRevenueProposals(request.company.id, request.user.id, body.limit));
 }

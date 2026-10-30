@@ -107,3 +107,39 @@ export const HOME = {
     body: "A few clear opportunities. A useful place to start."
   }
 } as const;
+
+const p = (slug: string) => `/product/${slug}`;
+/** Header products menu (177:640). `href: null` = page not built yet (plain text). */
+export const PRODUCTS_MENU = {
+  headline: "Five products. One connected business.",
+  all: { label: "All products", href: "/product" },
+  cta: { label: "Get a free demo", href: "/signup" },
+  groups: [
+    { title: "Growth", href: p("growth"), items: [{ label: "Websites", href: null }, { label: "Online Booking", href: p("online-booking") }] },
+    { title: "Revenue", href: p("revenue"), items: [{ label: "Inquiry Response & Follow-up", href: null }, { label: "Estimates & Approvals", href: p("estimates-approvals") }] },
+    {
+      title: "Operations",
+      href: p("operations"),
+      items: [
+        { label: "Scheduling & Dispatch", href: p("scheduling-dispatch") },
+        { label: "Jobs & Work Orders", href: null },
+        { label: "Technician App", href: null },
+        { label: "Invoices & Payments", href: null },
+        { label: "Customer Portal · Preview", href: null },
+        { label: "Price Book & Service Catalog", href: null },
+        { label: "Time Tracking & Job Photos", href: null }
+      ]
+    },
+    { title: "Retention", href: p("retention"), items: [{ label: "Service Agreements", href: null }, { label: "Reminders & Win-backs", href: null }] },
+    {
+      title: "Command Center",
+      href: p("command-center"),
+      items: [
+        { label: "Reporting & Job Sources", href: null },
+        { label: "Customers, Properties & Assets", href: null },
+        { label: "Onboarding & Data Import", href: null },
+        { label: "AI Revenue Intelligence", href: null }
+      ]
+    }
+  ] as { title: string; href: string; items: { label: string; href: string | null }[] }[]
+};

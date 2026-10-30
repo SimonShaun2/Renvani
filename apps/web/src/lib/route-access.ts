@@ -6,7 +6,7 @@ type DefaultRouteMap = Record<UserRole, string>;
 
 const EXACT_PUBLIC_ROUTES = new Set(["/", "/login", "/signup", "/verify-email", "/product-tour", "/product", "/how-it-works", "/pricing", "/industries/hvac", "/portal", "/robots.txt", "/sitemap.xml"]);
 
-const MARKETING_PRODUCT_PAGES = new Set(["growth", "revenue", "operations", "retention", "command-center"]);
+const MARKETING_PRODUCT_PAGES = new Set(["growth", "revenue", "operations", "retention", "command-center", "online-booking", "estimates-approvals", "scheduling-dispatch"]);
 
 const ROLE_ALLOWED_PREFIXES: Record<UserRole, string[]> = {
   owner: [

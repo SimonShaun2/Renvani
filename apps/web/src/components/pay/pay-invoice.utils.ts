@@ -144,3 +144,31 @@ export function buildPaidDetails(view: {
   if (view.receiptEmail) rows.push({ label: "Receipt sent to", value: view.receiptEmail });
   return rows;
 }
+
+export type PayLoadErrorKind = "temporary" | "invalid" | "unavailable";
+
+/**
+ * 5xx, 429 and network failures are temporary (retry); 400 is a malformed link;
+ * 404/410 and other 4xx keep the expired/unavailable copy.
+ */
+export function classifyPayLoadError(error: unknown): PayLoadErrorKind {
+  const status = typeof error === "object" && error !== null && "status" in error ? Number((error as { status: unknown }).status) : NaN;
+  if (!Number.isFinite(status) || status === 0 || status >= 500 || status === 429) return "temporary";
+  if (status === 400) return "invalid";
+  return "unavailable";
+}
+
+export const PAY_LOAD_ERROR_COPY: Record<PayLoadErrorKind, { title: string; subtitle: string }> = {
+  temporary: {
+    title: "Something went wrong",
+    subtitle: "We couldn't load this invoice right now. This is usually temporary — please try again."
+  },
+  invalid: {
+    title: "Payment link invalid",
+    subtitle: "This payment link isn't valid. Check the link or contact your service provider for a new one."
+  },
+  unavailable: {
+    title: "Payment link unavailable",
+    subtitle: "This payment link may have expired. Contact your service provider to request a new invoice link."
+  }
+};

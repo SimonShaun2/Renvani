@@ -1,27 +1,12 @@
-"use client";
+import type { ReactNode } from "react";
 
-import { usePathname } from "next/navigation";
-import { useEffect, useRef, type ReactNode } from "react";
+import { HeaderDisclosure } from "./HeaderDisclosure";
 
-/** Header industry menu (Figma 177:686). <details> so it works without JS; closes on navigation and Escape. Panel is server-rendered. */
+/** Header industry menu (Figma 177:686; panel 204:9052 rendered from the frame's layers). */
 export function IndustryMenu({ label, children }: { label: string; children: ReactNode }) {
-  const ref = useRef<HTMLDetailsElement>(null);
-  const pathname = usePathname();
-  useEffect(() => {
-    if (ref.current) ref.current.open = false;
-  }, [pathname]);
   return (
-    <details
-      ref={ref}
-      data-node-id="177:686"
-      onKeyDown={(e) => {
-        if (e.key === "Escape" && ref.current) ref.current.open = false;
-      }}
-    >
-      <summary className="cursor-pointer list-none hover:underline">{label}</summary>
-      <div className="absolute inset-x-0 top-[88px] z-30 border-t bg-white" style={{ borderColor: "var(--color-mkt-line)" }}>
-        <div className="mx-auto max-w-[1440px]">{children}</div>
-      </div>
-    </details>
+    <HeaderDisclosure nodeId="177:686" summary={label} summaryClassName="hover:underline" panelClassName="absolute inset-x-0 top-[88px] z-30 bg-white">
+      <div className="mx-auto max-w-[1440px]">{children}</div>
+    </HeaderDisclosure>
   );
 }

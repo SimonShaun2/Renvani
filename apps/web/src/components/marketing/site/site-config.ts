@@ -4,9 +4,9 @@ export type SiteLink = { label: string; href: string };
 
 export const SITE_NAV: { links: SiteLink[]; cta: SiteLink; signIn: SiteLink } = {
   links: [
-    { label: "Products", href: "/product-tour" },
+    { label: "Products", href: "/product" },
     { label: "Industries", href: "/industries/hvac" },
-    { label: "How it works", href: "/product-tour#how-it-works" },
+    { label: "How it works", href: "/how-it-works" },
     { label: "Pricing", href: "/pricing" }
   ],
   cta: { label: "Get a free demo", href: "/signup" },
@@ -15,7 +15,7 @@ export const SITE_NAV: { links: SiteLink[]; cta: SiteLink; signIn: SiteLink } = 
 
 export const SITE_FOOTER = {
   links: [
-    { label: "Products", href: "/product-tour" },
+    { label: "Products", href: "/product" },
     { label: "Industries", href: "/industries/hvac" },
     { label: "Pricing", href: "/pricing" },
     { label: "Get a free demo", href: "/signup" }

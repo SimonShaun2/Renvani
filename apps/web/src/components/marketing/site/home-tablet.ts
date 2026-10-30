@@ -120,7 +120,7 @@ export const HOME_TABLET: VNode = {
           },
           {
            "t": "div",
-           "c": "bg-[#f6b400] flex h-[30px] items-center px-[10px] relative rounded-[12px] flex-1 min-w-0",
+           "c": "bg-[#f6b400] flex h-[30px] items-center px-[10px] relative rounded-[12px] shrink-0",
            "n": "Status / Example",
            "id": "253:6802",
            "k": [
@@ -310,7 +310,7 @@ export const HOME_TABLET: VNode = {
           },
           {
            "t": "div",
-           "c": "bg-[#f6b400] flex h-[30px] items-center px-[10px] relative rounded-[12px] flex-1 min-w-0",
+           "c": "bg-[#f6b400] flex h-[30px] items-center px-[10px] relative rounded-[12px] shrink-0",
            "n": "Status / Example",
            "id": "253:6828",
            "k": [
@@ -414,7 +414,7 @@ export const HOME_TABLET: VNode = {
           },
           {
            "t": "div",
-           "c": "bg-[#f6b400] flex h-[30px] items-center px-[10px] relative rounded-[12px] flex-1 min-w-0",
+           "c": "bg-[#f6b400] flex h-[30px] items-center px-[10px] relative rounded-[12px] shrink-0",
            "n": "Status / Example",
            "id": "253:6841",
            "k": [
@@ -518,7 +518,7 @@ export const HOME_TABLET: VNode = {
           },
           {
            "t": "div",
-           "c": "bg-[#f6b400] flex h-[30px] items-center px-[10px] relative rounded-[12px] flex-1 min-w-0",
+           "c": "bg-[#f6b400] flex h-[30px] items-center px-[10px] relative rounded-[12px] shrink-0",
            "n": "Status / Example",
            "id": "253:6854",
            "k": [
@@ -692,7 +692,7 @@ export const HOME_TABLET: VNode = {
           },
           {
            "t": "div",
-           "c": "bg-[#f6b400] flex h-[30px] items-center px-[10px] relative rounded-[12px] flex-1 min-w-0",
+           "c": "bg-[#f6b400] flex h-[30px] items-center px-[10px] relative rounded-[12px] shrink-0",
            "n": "Status / Example",
            "id": "253:6766",
            "k": [

@@ -208,6 +208,50 @@ describe("24/7 emergency requests", () => {
     expect(row.urgency).toBe("this_week");
   });
 
+  it("urgency 'emergency' WITHOUT emergency:true is still downgraded when the shop has it off (not tagged, not first)", async () => {
+    const a = shop("em-u");
+    const first = await request(app.server).post("/api/v1/public/booking/em-u/submit").send(lead({}, "555-0320"));
+    const res = await request(app.server).post("/api/v1/public/booking/em-u/submit").send(lead({ urgency: "emergency" }, "555-0321"));
+    expect(res.status).toBe(201);
+    expect(res.body.emergency).toEqual({ requested: true, accepted: false, downgraded: true });
+    expect(fakeDb.getTestState().bookingRequests.find((r) => r.id === res.body.bookingRequest.id)!.urgency).toBe("this_week");
+    const ev = fakeDb.getTestState().activityEvents.find((e) => e.eventType === "booking.requested" && e.entityId === res.body.bookingRequest.id);
+    expect(ev?.payload).not.toMatchObject({ emergency: true });
+    const later = await request(app.server).post("/api/v1/public/booking/em-u/submit").send(lead({}, "555-0322"));
+    const inbox = await request(app.server).get("/api/v1/booking-requests").set("Authorization", a.user("owner"));
+    expect(inbox.body.data[0].id).toBe(later.body.bookingRequest.id);
+    expect(inbox.body.data.map((r: { id: string }) => r.id)).toContain(first.body.bookingRequest.id);
+  });
+
+  it("urgency 'emergency' alone is accepted when the shop has it on", async () => {
+    shop("em-u2", { emergencyService: { enabled: true, hoursText: null }, trade: "hvac" });
+    const res = await request(app.server).post("/api/v1/public/booking/em-u2/submit").send(lead({ urgency: "emergency" }, "555-0323"));
+    expect(res.body.emergency).toEqual({ requested: true, accepted: true, downgraded: false });
+    expect(fakeDb.getTestState().bookingRequests.find((r) => r.id === res.body.bookingRequest.id)!.urgency).toBe("emergency");
+  });
+
+  it("guard lives in submitBookingRequest itself: direct service callers cannot skip the downgrade", async () => {
+    shop("em-direct");
+    const bookingService = await import("../../services/booking.service.js");
+    const out = await bookingService.submitBookingRequest("em-direct", lead({ urgency: "emergency", emergency: true }, "555-0324") as never);
+    expect(out.bookingRequest.urgency).toBe("this_week");
+  });
+
+  it("public site inquiry path cannot carry urgency/emergency (strict body; stored non-emergency)", async () => {
+    shop("em-site");
+    const bad = await request(app.server)
+      .post("/api/v1/public/site/em-site/inquiry")
+      .set("X-Forwarded-For", freshIp())
+      .send({ name: "Dana Smith", phone: "(918) 555-0142", zip: "74103", urgency: "emergency", emergency: true });
+    expect(bad.status).toBe(400);
+    const ok = await request(app.server)
+      .post("/api/v1/public/site/em-site/inquiry")
+      .set("X-Forwarded-For", freshIp())
+      .send({ name: "Dana Smith", phone: "(918) 555-0142", zip: "74103", message: "EMERGENCY no heat" });
+    expect(ok.status).toBe(201);
+    expect(fakeDb.getTestState().bookingRequests.every((r) => r.urgency !== "emergency")).toBe(true);
+  });
+
   it("registry: non-emergency-capable trade downgrades; ZIP schema normalizes", () => {
     expect(resolveEmergencyRequest(true, { enabled: true, hoursText: null }, "other")).toEqual({ requested: true, accepted: false, downgraded: true });
     expect(resolveEmergencyRequest(true, { enabled: true, hoursText: null }, "hvac").accepted).toBe(true);

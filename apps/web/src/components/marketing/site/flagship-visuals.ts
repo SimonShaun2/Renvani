@@ -8314,5 +8314,831 @@ export const FLAGSHIP_VISUALS: Record<string, VNode> = {
     ]
    }
   ]
- }
+ },
+ "growth/heroMobile": {
+ "t": "div",
+ "c": " w-full",
+ "n": "Product example / Online Booking",
+ "id": "234:7442",
+ "k": [
+  {
+   "t": "div",
+   "c": "bg-[#0f1530] flex gap-[12px] h-[56px] items-center p-[16px] relative w-full",
+   "n": "Application header",
+   "id": "234:7420",
+   "k": [
+    {
+     "t": "div",
+     "c": "block font-semibold relative text-[14px] text-[color:#fff] flex-1 min-w-0",
+     "id": "234:7421",
+     "k": [
+      {
+       "t": "p",
+       "c": "leading-[1.38]",
+       "k": [
+        "Online Booking"
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#f6b400] flex h-[30px] items-center px-[10px] relative rounded-[12px] flex-1 min-w-0",
+     "n": "Status / Example",
+     "id": "234:7422",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] flex-1 min-w-0",
+       "id": "234:7423",
+       "k": [
+        "Example"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "t": "div",
+   "c": "bg-[#fff] flex flex-col gap-[12px] items-start p-[16px] relative w-full",
+   "n": "Editable product content",
+   "id": "234:7424",
+   "k": [
+    {
+     "t": "p",
+     "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+     "id": "234:7425",
+     "k": [
+      "Jordan Lee"
+     ]
+    },
+    {
+     "t": "p",
+     "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] w-full",
+     "id": "234:7426",
+     "k": [
+      "Request #B1042 · Website"
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[5px] items-start leading-[1.38] p-[12px] relative rounded-[12px] w-full",
+     "n": "Editable field / Service",
+     "id": "234:7427",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-normal relative text-[12px] text-[color:#2a3360] w-full",
+       "id": "234:7428",
+       "k": [
+        "Service"
+       ]
+      },
+      {
+       "t": "p",
+       "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+       "id": "234:7429",
+       "k": [
+        "AC diagnostic · $89"
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[5px] items-start leading-[1.38] p-[12px] relative rounded-[12px] w-full",
+     "n": "Editable field / Requested visit",
+     "id": "234:7430",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-normal relative text-[12px] text-[color:#2a3360] w-full",
+       "id": "234:7431",
+       "k": [
+        "Requested visit"
+       ]
+      },
+      {
+       "t": "p",
+       "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+       "id": "234:7432",
+       "k": [
+        "Oct 29 · 10:00–12:00"
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[5px] items-start leading-[1.38] p-[12px] relative rounded-[12px] w-full",
+     "n": "Editable field / Property",
+     "id": "234:7433",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-normal relative text-[12px] text-[color:#2a3360] w-full",
+       "id": "234:7434",
+       "k": [
+        "Property"
+       ]
+      },
+      {
+       "t": "p",
+       "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+       "id": "234:7435",
+       "k": [
+        "28 Maple Avenue"
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#e4f1e8] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-full",
+     "n": "Status / Request received",
+     "id": "234:7436",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] flex-1 min-w-0",
+       "id": "234:7437",
+       "k": [
+        "Request received"
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#fff4d6] flex gap-[10px] items-start p-[12px] relative rounded-[12px] w-full",
+     "n": "Connected handoff / Open Revenue inquiry",
+     "id": "234:7438",
+     "k": [
+      {
+       "t": "div",
+       "c": "relative size-[18px]",
+       "n": "Icon / arrow",
+       "id": "234:7439",
+       "k": [
+        {
+         "t": "img",
+         "c": "absolute block inset-0 size-full",
+         "src": "/marketing/flagship/icon-arrow.svg"
+        }
+       ]
+      },
+      {
+       "t": "p",
+       "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left flex-1 min-w-0",
+       "id": "234:7441",
+       "k": [
+        "Open Revenue inquiry"
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+},
+ "revenue/heroMobile": {
+ "t": "div",
+ "c": " w-full",
+ "n": "Product example / Estimate #2048",
+ "id": "234:7733",
+ "k": [
+  {
+   "t": "div",
+   "c": "bg-[#0f1530] flex gap-[12px] h-[56px] items-center p-[16px] relative w-full",
+   "n": "Application header",
+   "id": "234:7706",
+   "k": [
+    {
+     "t": "div",
+     "c": "block font-semibold relative text-[14px] text-[color:#fff] flex-1 min-w-0",
+     "id": "234:7707",
+     "k": [
+      {
+       "t": "p",
+       "c": "leading-[1.38]",
+       "k": [
+        "Estimate #2048"
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#f6b400] flex h-[30px] items-center px-[10px] relative rounded-[12px] flex-1 min-w-0",
+     "n": "Status / Example",
+     "id": "234:7708",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] flex-1 min-w-0",
+       "id": "234:7709",
+       "k": [
+        "Example"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "t": "div",
+   "c": "bg-[#fff] flex flex-col gap-[12px] items-start p-[16px] relative w-full",
+   "n": "Editable product content",
+   "id": "234:7710",
+   "k": [
+    {
+     "t": "p",
+     "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] w-full",
+     "id": "234:7711",
+     "k": [
+      "Jordan Lee · AC diagnostic"
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#fff4d6] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-full",
+     "n": "Status / Price book applied",
+     "id": "234:7712",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] flex-1 min-w-0",
+       "id": "234:7713",
+       "k": [
+        "Price book applied"
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "flex gap-[12px] items-start leading-[1.38] relative text-[13px] w-full",
+     "n": "Diagnostic visit",
+     "id": "234:7714",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-normal relative text-[color:#2a3360] flex-1 min-w-0",
+       "id": "234:7715",
+       "k": [
+        "Diagnostic visit"
+       ]
+      },
+      {
+       "t": "p",
+       "c": "font-medium relative text-[color:#0f1530] text-right flex-1 min-w-0",
+       "id": "234:7716",
+       "k": [
+        "$89"
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "flex gap-[12px] items-start leading-[1.38] relative text-[13px] w-full",
+     "n": "Capacitor replacement",
+     "id": "234:7717",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-normal relative text-[color:#2a3360] flex-1 min-w-0",
+       "id": "234:7718",
+       "k": [
+        "Capacitor replacement"
+       ]
+      },
+      {
+       "t": "p",
+       "c": "font-medium relative text-[color:#0f1530] text-right flex-1 min-w-0",
+       "id": "234:7719",
+       "k": [
+        "$185"
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#e6dccb] h-px relative w-full",
+     "n": "Divider",
+     "id": "234:7720"
+    },
+    {
+     "t": "div",
+     "c": "flex gap-[12px] items-start leading-[1.38] relative text-[13px] w-full",
+     "n": "Service total",
+     "id": "234:7721",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-normal relative text-[color:#2a3360] flex-1 min-w-0",
+       "id": "234:7722",
+       "k": [
+        "Service total"
+       ]
+      },
+      {
+       "t": "p",
+       "c": "font-medium relative text-[color:#0f1530] text-right flex-1 min-w-0",
+       "id": "234:7723",
+       "k": [
+        "$274"
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[5px] items-start leading-[1.38] p-[12px] relative rounded-[12px] w-full",
+     "n": "Editable field / Approval check",
+     "id": "234:7724",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-normal relative text-[12px] text-[color:#2a3360] w-full",
+       "id": "234:7725",
+       "k": [
+        "Approval check"
+       ]
+      },
+      {
+       "t": "p",
+       "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+       "id": "234:7726",
+       "k": [
+        "Owner review before sending"
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+     "n": "UI action / Review estimate",
+     "id": "234:7727",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+       "id": "234:7728",
+       "k": [
+        "Review estimate"
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#fff4d6] flex gap-[10px] items-start p-[12px] relative rounded-[12px] w-full",
+     "n": "Connected handoff / Customer acceptance → Job #1042",
+     "id": "234:7729",
+     "k": [
+      {
+       "t": "div",
+       "c": "relative size-[18px]",
+       "n": "Icon / arrow",
+       "id": "234:7730",
+       "k": [
+        {
+         "t": "img",
+         "c": "absolute block inset-0 size-full",
+         "src": "/marketing/flagship/icon-arrow.svg"
+        }
+       ]
+      },
+      {
+       "t": "p",
+       "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left flex-1 min-w-0",
+       "id": "234:7732",
+       "k": [
+        "Customer acceptance → Job #1042"
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+},
+ "operations/heroMobile": {
+ "t": "div",
+ "c": " w-full",
+ "n": "Product example / Job #1042",
+ "id": "234:8000",
+ "k": [
+  {
+   "t": "div",
+   "c": "bg-[#0f1530] flex gap-[12px] h-[56px] items-center p-[16px] relative w-full",
+   "n": "Application header",
+   "id": "234:7976",
+   "k": [
+    {
+     "t": "div",
+     "c": "block font-semibold relative text-[14px] text-[color:#fff] flex-1 min-w-0",
+     "id": "234:7977",
+     "k": [
+      {
+       "t": "p",
+       "c": "leading-[1.38]",
+       "k": [
+        "Job #1042"
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#f6b400] flex h-[30px] items-center px-[10px] relative rounded-[12px] flex-1 min-w-0",
+     "n": "Status / Example",
+     "id": "234:7978",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] flex-1 min-w-0",
+       "id": "234:7979",
+       "k": [
+        "Example"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "t": "div",
+   "c": "bg-[#fff] flex flex-col gap-[12px] items-start p-[16px] relative w-full",
+   "n": "Editable product content",
+   "id": "234:7980",
+   "k": [
+    {
+     "t": "div",
+     "c": "bg-[#e4f1e8] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-full",
+     "n": "Status / Estimate accepted",
+     "id": "234:7981",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] flex-1 min-w-0",
+       "id": "234:7982",
+       "k": [
+        "Estimate accepted"
+       ]
+      }
+     ]
+    },
+    {
+     "t": "p",
+     "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+     "id": "234:7983",
+     "k": [
+      "Jordan Lee"
+     ]
+    },
+    {
+     "t": "p",
+     "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] w-full",
+     "id": "234:7984",
+     "k": [
+      "AC diagnostic · 28 Maple Avenue"
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[5px] items-start leading-[1.38] p-[12px] relative rounded-[12px] w-full",
+     "n": "Editable field / Approved scope",
+     "id": "234:7985",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-normal relative text-[12px] text-[color:#2a3360] w-full",
+       "id": "234:7986",
+       "k": [
+        "Approved scope"
+       ]
+      },
+      {
+       "t": "p",
+       "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+       "id": "234:7987",
+       "k": [
+        "Diagnostic + capacitor replacement"
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "flex gap-[12px] items-start leading-[1.38] relative text-[13px] w-full",
+     "n": "Estimate",
+     "id": "234:7988",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-normal relative text-[color:#2a3360] flex-1 min-w-0",
+       "id": "234:7989",
+       "k": [
+        "Estimate"
+       ]
+      },
+      {
+       "t": "p",
+       "c": "font-medium relative text-[color:#0f1530] text-right flex-1 min-w-0",
+       "id": "234:7990",
+       "k": [
+        "#2048 · $274"
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[5px] items-start leading-[1.38] p-[12px] relative rounded-[12px] w-full",
+     "n": "Editable field / Dispatch assignment",
+     "id": "234:7991",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-normal relative text-[12px] text-[color:#2a3360] w-full",
+       "id": "234:7992",
+       "k": [
+        "Dispatch assignment"
+       ]
+      },
+      {
+       "t": "p",
+       "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+       "id": "234:7993",
+       "k": [
+        "Maya R. · Oct 29 · 10:00–12:00"
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+     "n": "UI action / Open schedule",
+     "id": "234:7994",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+       "id": "234:7995",
+       "k": [
+        "Open schedule"
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#fff4d6] flex gap-[10px] items-start p-[12px] relative rounded-[12px] w-full",
+     "n": "Connected handoff / Approved scope reaches Technician App",
+     "id": "234:7996",
+     "k": [
+      {
+       "t": "div",
+       "c": "relative size-[18px]",
+       "n": "Icon / arrow",
+       "id": "234:7997",
+       "k": [
+        {
+         "t": "img",
+         "c": "absolute block inset-0 size-full",
+         "src": "/marketing/flagship/icon-arrow.svg"
+        }
+       ]
+      },
+      {
+       "t": "p",
+       "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left flex-1 min-w-0",
+       "id": "234:7999",
+       "k": [
+        "Approved scope reaches Technician App"
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+},
+ "retention/heroMobile": {
+ "t": "div",
+ "c": " w-full",
+ "n": "Product example / Service Agreement",
+ "id": "234:8384",
+ "k": [
+  {
+   "t": "div",
+   "c": "bg-[#0f1530] flex gap-[12px] h-[56px] items-center p-[16px] relative w-full",
+   "n": "Application header",
+   "id": "234:8359",
+   "k": [
+    {
+     "t": "div",
+     "c": "block font-semibold relative text-[14px] text-[color:#fff] flex-1 min-w-0",
+     "id": "234:8360",
+     "k": [
+      {
+       "t": "p",
+       "c": "leading-[1.38]",
+       "k": [
+        "Service Agreement"
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#f6b400] flex h-[30px] items-center px-[10px] relative rounded-[12px] flex-1 min-w-0",
+     "n": "Status / Example",
+     "id": "234:8361",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] flex-1 min-w-0",
+       "id": "234:8362",
+       "k": [
+        "Example"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "t": "div",
+   "c": "bg-[#fff] flex flex-col gap-[12px] items-start p-[16px] relative w-full",
+   "n": "Editable product content",
+   "id": "234:8363",
+   "k": [
+    {
+     "t": "p",
+     "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] w-full",
+     "id": "234:8364",
+     "k": [
+      "Jordan Lee"
+     ]
+    },
+    {
+     "t": "p",
+     "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] w-full",
+     "id": "234:8365",
+     "k": [
+      "Job #1042 · Service complete"
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[5px] items-start leading-[1.38] p-[12px] relative rounded-[12px] w-full",
+     "n": "Editable field / Agreement",
+     "id": "234:8366",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-normal relative text-[12px] text-[color:#2a3360] w-full",
+       "id": "234:8367",
+       "k": [
+        "Agreement"
+       ]
+      },
+      {
+       "t": "p",
+       "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+       "id": "234:8368",
+       "k": [
+        "Home Comfort Plan"
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "flex gap-[12px] items-start leading-[1.38] relative text-[13px] w-full",
+     "n": "Coverage",
+     "id": "234:8369",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-normal relative text-[color:#2a3360] flex-1 min-w-0",
+       "id": "234:8370",
+       "k": [
+        "Coverage"
+       ]
+      },
+      {
+       "t": "p",
+       "c": "font-medium relative text-[color:#0f1530] text-right flex-1 min-w-0",
+       "id": "234:8371",
+       "k": [
+        "2 visits / year"
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "flex gap-[12px] items-start leading-[1.38] relative text-[13px] w-full",
+     "n": "Equipment",
+     "id": "234:8372",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-normal relative text-[color:#2a3360] flex-1 min-w-0",
+       "id": "234:8373",
+       "k": [
+        "Equipment"
+       ]
+      },
+      {
+       "t": "p",
+       "c": "font-medium relative text-[color:#0f1530] text-right flex-1 min-w-0",
+       "id": "234:8374",
+       "k": [
+        "Split AC"
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#e4f1e8] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-full",
+     "n": "Status / Active agreement",
+     "id": "234:8375",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] flex-1 min-w-0",
+       "id": "234:8376",
+       "k": [
+        "Active agreement"
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[5px] items-start leading-[1.38] p-[12px] relative rounded-[12px] w-full",
+     "n": "Editable field / Next service",
+     "id": "234:8377",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-normal relative text-[12px] text-[color:#2a3360] w-full",
+       "id": "234:8378",
+       "k": [
+        "Next service"
+       ]
+      },
+      {
+       "t": "p",
+       "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+       "id": "234:8379",
+       "k": [
+        "Spring tune-up · Apr 2027"
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#fff4d6] flex gap-[10px] items-start p-[12px] relative rounded-[12px] w-full",
+     "n": "Connected handoff / Review the next reminder",
+     "id": "234:8380",
+     "k": [
+      {
+       "t": "div",
+       "c": "relative size-[18px]",
+       "n": "Icon / arrow",
+       "id": "234:8381",
+       "k": [
+        {
+         "t": "img",
+         "c": "absolute block inset-0 size-full",
+         "src": "/marketing/flagship/icon-arrow.svg"
+        }
+       ]
+      },
+      {
+       "t": "p",
+       "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left flex-1 min-w-0",
+       "id": "234:8383",
+       "k": [
+        "Review the next reminder"
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
 };

@@ -2,6 +2,9 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { geist, newsreader } from "./fonts";
+import { FigmaNode } from "./FigmaNode";
+import { IndustryMenu } from "./IndustryMenu";
+import { INDUSTRY_TREES } from "./industry-visuals";
 import { ProductsMenu } from "./ProductsMenu";
 import { SITE_FOOTER, SITE_NAV } from "./site-config";
 import styles from "./site.module.css";
@@ -23,6 +26,10 @@ export function MarketingShell({ children }: { children: ReactNode }) {
           {SITE_NAV.links.map((l) =>
             l.href === "/product" ? (
               <ProductsMenu key={l.label} label={l.label} />
+            ) : l.href === "/industries" ? (
+              <IndustryMenu key={l.label} label={l.label}>
+                <FigmaNode node={INDUSTRY_TREES.menu!.desktop} className="w-full" />
+              </IndustryMenu>
             ) : (
               <Link key={l.label} href={l.href} className="hover:underline">
                 {l.label}

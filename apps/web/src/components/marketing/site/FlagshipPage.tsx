@@ -35,7 +35,15 @@ function Hero({ p, pad }: { p: ProductPageEntry; pad: string }) {
           <Link href="#workflow" className={pill} style={{ background: ink, color: "var(--color-mkt-cream)" }}>{p.heroCta}</Link>
           {p.template === "tool" ? <p className={eyebrow} style={{ color: ink2 }}>{p.caption}</p> : null}
         </div>
-        <Visual id={p.heroVisual} className="min-w-0 flex-1 overflow-x-auto" />
+        {FLAGSHIP_VISUALS[`${p.slug}/heroMobile`] ? (
+          <>
+            <Visual id={p.heroVisual} className="hidden min-w-0 flex-1 overflow-x-auto md:block" />
+            {/* Mobile frames use a separate "Readable mobile product" component (e.g. 234:7510). */}
+            <Visual id={`${p.slug}/heroMobile`} className="min-w-0 flex-1 md:hidden" />
+          </>
+        ) : (
+          <Visual id={p.heroVisual} className="min-w-0 flex-1 overflow-x-auto" />
+        )}
       </div>
     </section>
   );

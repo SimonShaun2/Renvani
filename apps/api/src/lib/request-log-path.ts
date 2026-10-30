@@ -10,11 +10,16 @@ export function requestPathForLog(rawUrl: string): string {
   return redactManageTokenInPath(rawUrl.slice(0, questionIndex));
 }
 
-const BOOKING_MANAGE_TOKEN_PATH = /(\/public\/booking\/manage\/)[^/?#]+/g;
+/** Public routes whose next path segment is a bearer token (manage JWT, VIP join token). */
+const TOKEN_PATH_PREFIXES = ["/public/booking/manage/", "/public/vip/join/"] as const;
 
-/** FS-153: customer manage links carry a bearer JWT as a path segment. */
+const TOKEN_PATH_PATTERNS = TOKEN_PATH_PREFIXES.map(
+  (prefix) => new RegExp(`(${prefix.replace(/[/]/g, "\\/")})[^/?#]+`, "g")
+);
+
+/** Redacts the token segment after any TOKEN_PATH_PREFIXES entry (FS-153 manage links, VIP join links). */
 export function redactManageTokenInPath(pathname: string): string {
-  return pathname.replace(BOOKING_MANAGE_TOKEN_PATH, "$1[REDACTED]");
+  return TOKEN_PATH_PATTERNS.reduce((path, pattern) => path.replace(pattern, "$1[REDACTED]"), pathname);
 }
 
 export function redactAccessTokenInUrl(rawUrl: string): string {

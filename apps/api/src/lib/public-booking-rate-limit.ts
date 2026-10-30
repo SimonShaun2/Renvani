@@ -1,3 +1,5 @@
+import { createHash } from "node:crypto";
+
 import { env } from "@fsm/config";
 
 import {
@@ -14,6 +16,7 @@ const RATE_LIMIT_WINDOW_SECONDS = Math.ceil(RATE_LIMIT_WINDOW_MS / 1000);
 const bookingRequestTimesByIp = new Map<string, number[]>();
 const slotHoldTimesByReference = new Map<string, number[]>();
 const manageTokenTimesByIp = new Map<string, number[]>();
+const vipJoinTimesByIpToken = new Map<string, number[]>();
 const authRegisterTimesByIp = new Map<string, number[]>();
 const authLoginTimesByIpEmail = new Map<string, number[]>();
 const authLoginTimesByIp = new Map<string, number[]>();
@@ -30,6 +33,9 @@ export const SAVED_CARD_FALLBACK_EMAIL_RATE_LIMIT = 100;
 export const PUBLIC_BOOKING_IP_RATE_LIMIT = 10;
 export const PUBLIC_SLOT_HOLD_REF_RATE_LIMIT = 15;
 export const PUBLIC_BOOKING_MANAGE_TOKEN_RATE_LIMIT = 30;
+/** Audit H3: public VIP join link, per IP + token per hour (checkout creates a Stripe session each call). */
+export const PUBLIC_VIP_JOIN_PREVIEW_RATE_LIMIT = 30;
+export const PUBLIC_VIP_JOIN_CHECKOUT_RATE_LIMIT = 5;
 export const AUTH_REGISTER_IP_RATE_LIMIT = 5;
 export const AUTH_LOGIN_RATE_LIMIT = 10;
 export const AUTH_LOGIN_IP_RATE_LIMIT = 30;
@@ -138,6 +144,22 @@ export async function checkPublicBookingManageTokenRateLimit(ipAddress: string):
   );
 }
 
+/** Key is IP + a hash of the token, so the raw token is never stored in Redis or memory. */
+export async function checkPublicVipJoinRateLimit(
+  ipAddress: string,
+  token: string,
+  action: "preview" | "checkout"
+): Promise<boolean> {
+  const normalizedIp = ipAddress.trim().length > 0 ? ipAddress.trim() : "unknown";
+  const tokenHash = createHash("sha256").update(token).digest("base64url").slice(0, 22);
+  return recordAttempt(
+    vipJoinTimesByIpToken,
+    `fsm:public-vip:rate:${action}`,
+    `${action}:${normalizedIp}:${tokenHash}`,
+    action === "checkout" ? PUBLIC_VIP_JOIN_CHECKOUT_RATE_LIMIT : PUBLIC_VIP_JOIN_PREVIEW_RATE_LIMIT
+  );
+}
+
 export async function checkAuthRegisterIpRateLimit(ipAddress: string): Promise<boolean> {
   const normalizedIp = ipAddress.trim().length > 0 ? ipAddress.trim() : "unknown";
   return recordAttempt(authRegisterTimesByIp, "fsm:auth-register:rate:ip", normalizedIp, AUTH_REGISTER_IP_RATE_LIMIT);
@@ -210,6 +232,7 @@ export function resetPublicBookingRateLimitStateForTests(): void {
   bookingRequestTimesByIp.clear();
   slotHoldTimesByReference.clear();
   manageTokenTimesByIp.clear();
+  vipJoinTimesByIpToken.clear();
   resetFixedWindowRateLimitStateForTests();
 }
 

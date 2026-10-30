@@ -73,6 +73,9 @@ import timeRoutes from "./routes/time/index.js";
 import timesheetRoutes from "./routes/timesheets/index.js";
 
 /** FS-66 — TRUST_PROXY_HOPS → Fastify trustProxy (0 = false; N = trust N hops of X-Forwarded-For). */
+/** Fastify route-param length cap (see buildApp). */
+export const API_MAX_PARAM_LENGTH = 512;
+
 export function resolveTrustProxySetting(hops: number): false | number {
   return Number.isInteger(hops) && hops > 0 ? hops : false;
 }
@@ -95,6 +98,9 @@ export async function buildApp() {
 
   const app = Fastify({
     loggerInstance: logger,
+    // Default is 100; signed public tokens (e.g. VIP join, ~165 chars) exceed it and 404'd before the handler.
+    // Route schemas still cap each token (VIP: 256), so oversized-but-<512 values get the handler's 404.
+    maxParamLength: API_MAX_PARAM_LENGTH,
     trustProxy: resolveTrustProxySetting(env.TRUST_PROXY_HOPS)
   });
 

@@ -98,6 +98,9 @@ function createDependencies(): notificationsProcessor.NotificationsDependencies 
     loadCompanyOwner: vi.fn(async () => null),
     findAutomationRule: vi.fn(async () => null),
     markInvoiceReminderSent: vi.fn(async () => undefined),
+    claimInvoiceReceiptSend: vi.fn(async () => true),
+    markInvoiceReceiptSent: vi.fn(async () => undefined),
+    releaseInvoiceReceiptClaim: vi.fn(async () => undefined),
     markCampaignRecipientDelivered: vi.fn(async () => undefined),
     recordCampaignDeliveryFailure: vi.fn(async () => undefined)
   };
@@ -249,6 +252,71 @@ describe("notifications.processor", () => {
       vi.mocked(dependencies.loadInvoiceEmailContext).mockResolvedValue(null);
       await notificationsProcessor.handleSendInvoicePaymentReceipt(receiptJob(), dependencies);
       expect(dependencies.email.sendInvoicePaymentReceiptEmail).not.toHaveBeenCalled();
+    });
+
+    describe("idempotency (worker retry / stalled re-run)", () => {
+      // In-memory stand-in for the message_logs (company, source_system, source_id) unique key.
+      function withClaimStore() {
+        const claims = new Map<string, "sending" | "sent">();
+        const key = (companyId: string, paymentId: string) => `${companyId}:${paymentId}`;
+        vi.mocked(dependencies.claimInvoiceReceiptSend).mockImplementation(async ({ companyId, paymentId }) => {
+          if (claims.has(key(companyId, paymentId))) return false;
+          claims.set(key(companyId, paymentId), "sending");
+          return true;
+        });
+        vi.mocked(dependencies.markInvoiceReceiptSent).mockImplementation(async (companyId, paymentId) => {
+          claims.set(key(companyId, paymentId), "sent");
+        });
+        vi.mocked(dependencies.releaseInvoiceReceiptClaim).mockImplementation(async (companyId, paymentId) => {
+          if (claims.get(key(companyId, paymentId)) === "sending") claims.delete(key(companyId, paymentId));
+        });
+        return claims;
+      }
+
+      it("claims by companyId + paymentId before sending, then marks sent", async () => {
+        const claims = withClaimStore();
+        vi.mocked(dependencies.loadInvoiceEmailContext).mockResolvedValue(receiptContext({}));
+        await notificationsProcessor.handleSendInvoicePaymentReceipt(receiptJob(), dependencies);
+        expect(dependencies.claimInvoiceReceiptSend).toHaveBeenCalledWith(
+          expect.objectContaining({ companyId: "company-1", customerId: "customer-1", paymentId: "payment-1", toAddress: "customer@example.com" })
+        );
+        expect(claims.get("company-1:payment-1")).toBe("sent");
+      });
+
+      it("retry after a successful send does not send the receipt twice", async () => {
+        withClaimStore();
+        vi.mocked(dependencies.loadInvoiceEmailContext).mockResolvedValue(receiptContext({}));
+        await notificationsProcessor.handleSendInvoicePaymentReceipt(receiptJob(), dependencies);
+        await notificationsProcessor.handleSendInvoicePaymentReceipt(receiptJob(), dependencies);
+        expect(dependencies.email.sendInvoicePaymentReceiptEmail).toHaveBeenCalledTimes(1);
+      });
+
+      it("retry after send succeeded but mark-sent failed still does not resend", async () => {
+        withClaimStore();
+        vi.mocked(dependencies.markInvoiceReceiptSent).mockRejectedValueOnce(new Error("db down"));
+        vi.mocked(dependencies.loadInvoiceEmailContext).mockResolvedValue(receiptContext({}));
+        await notificationsProcessor.handleSendInvoicePaymentReceipt(receiptJob(), dependencies);
+        await notificationsProcessor.handleSendInvoicePaymentReceipt(receiptJob(), dependencies);
+        expect(dependencies.email.sendInvoicePaymentReceiptEmail).toHaveBeenCalledTimes(1);
+      });
+
+      it("a failed send releases the claim so the retry sends exactly once", async () => {
+        const claims = withClaimStore();
+        vi.mocked(dependencies.loadInvoiceEmailContext).mockResolvedValue(receiptContext({}));
+        vi.mocked(dependencies.email.sendInvoicePaymentReceiptEmail).mockRejectedValueOnce(new Error("resend 500"));
+        await expect(notificationsProcessor.handleSendInvoicePaymentReceipt(receiptJob(), dependencies)).rejects.toThrow("resend 500");
+        expect(claims.has("company-1:payment-1")).toBe(false);
+        await notificationsProcessor.handleSendInvoicePaymentReceipt(receiptJob(), dependencies);
+        await notificationsProcessor.handleSendInvoicePaymentReceipt(receiptJob(), dependencies);
+        expect(dependencies.email.sendInvoicePaymentReceiptEmail).toHaveBeenCalledTimes(2);
+        expect(claims.get("company-1:payment-1")).toBe("sent");
+      });
+
+      it("opted-out customers never take a claim", async () => {
+        vi.mocked(dependencies.loadInvoiceEmailContext).mockResolvedValue(receiptContext({ doNotContact: true }));
+        await notificationsProcessor.handleSendInvoicePaymentReceipt(receiptJob(), dependencies);
+        expect(dependencies.claimInvoiceReceiptSend).not.toHaveBeenCalled();
+      });
     });
 
     it("skips when identifiers are missing", async () => {

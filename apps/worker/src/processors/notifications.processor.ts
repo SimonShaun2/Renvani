@@ -323,6 +323,16 @@ export function reviewRequestSendSkipReason(
   return null;
 }
 
+export const INVOICE_RECEIPT_SOURCE_SYSTEM = "invoice_payment_receipt";
+
+export interface InvoiceReceiptClaim {
+  companyId: string;
+  customerId: string;
+  paymentId: string;
+  toAddress: string;
+  fromAddress: string;
+}
+
 export interface NotificationsDependencies {
   email: EmailModule;
   sms: SmsModule;
@@ -349,6 +359,14 @@ export interface NotificationsDependencies {
     ruleType: AutomationRuleType
   ): Promise<AutomationRuleContext | null>;
   markInvoiceReminderSent(companyId: string, invoiceId: string, reminderLevel: ReminderLevel): Promise<void>;
+  /**
+   * Atomically claims the one-time payment receipt send for (companyId, paymentId) via the message_logs
+   * (company, source_system, source_id) unique key. Returns false when already claimed/sent (retry/redelivery).
+   */
+  claimInvoiceReceiptSend(claim: InvoiceReceiptClaim): Promise<boolean>;
+  markInvoiceReceiptSent(companyId: string, paymentId: string): Promise<void>;
+  /** Releases a claim when the send itself failed, so a retry can send. */
+  releaseInvoiceReceiptClaim(companyId: string, paymentId: string): Promise<void>;
   markCampaignRecipientDelivered(input: {
     companyId: string;
     campaignId: string;
@@ -817,6 +835,51 @@ function createProductionDependencies(): Promise<NotificationsDependencies> {
 
       return rule ?? null;
     },
+    async claimInvoiceReceiptSend(claim) {
+      const inserted = await db
+        .insert(messageLogs)
+        .values({
+          companyId: claim.companyId,
+          customerId: claim.customerId,
+          channel: "email",
+          direction: "outbound",
+          toAddress: claim.toAddress,
+          fromAddress: claim.fromAddress,
+          subject: "Payment receipt",
+          body: "Payment receipt",
+          providerStatus: "sending",
+          sourceSystem: INVOICE_RECEIPT_SOURCE_SYSTEM,
+          sourceId: claim.paymentId
+        })
+        .onConflictDoNothing()
+        .returning({ id: messageLogs.id });
+      return inserted.length > 0;
+    },
+    async markInvoiceReceiptSent(companyId, paymentId) {
+      const now = new Date();
+      await db
+        .update(messageLogs)
+        .set({ providerStatus: "sent", sentAt: now, updatedAt: now })
+        .where(
+          and(
+            eq(messageLogs.companyId, companyId),
+            eq(messageLogs.sourceSystem, INVOICE_RECEIPT_SOURCE_SYSTEM),
+            eq(messageLogs.sourceId, paymentId)
+          )
+        );
+    },
+    async releaseInvoiceReceiptClaim(companyId, paymentId) {
+      await db
+        .delete(messageLogs)
+        .where(
+          and(
+            eq(messageLogs.companyId, companyId),
+            eq(messageLogs.sourceSystem, INVOICE_RECEIPT_SOURCE_SYSTEM),
+            eq(messageLogs.sourceId, paymentId),
+            eq(messageLogs.providerStatus, "sending")
+          )
+        );
+    },
     async markInvoiceReminderSent(companyId, invoiceId, reminderLevel) {
       const now = new Date();
       const reminderColumn =
@@ -1048,14 +1111,39 @@ export async function handleSendInvoicePaymentReceipt(
     return;
   }
 
-  await dependencies.email.sendInvoicePaymentReceiptEmail(context.customer.email, {
-    firstName: context.customer.firstName,
-    invoiceNumber: context.invoiceNumber,
-    amount,
-    balanceDue: context.balanceDue,
-    paidAt: getJobString(job.data, "paidAt"),
-    receiptUrl: context.stripePaymentLinkUrl ?? null,
-    companyName: context.company.name
+  // Worker retries reuse the same job (and BullMQ may re-run a stalled job), so claim the send first.
+  const claimed = await dependencies.claimInvoiceReceiptSend({
+    companyId,
+    customerId,
+    paymentId,
+    toAddress: context.customer.email,
+    fromAddress: getOutboundEmailFromAddress()
+  });
+
+  if (!claimed) {
+    logger.info({ companyId, invoiceId, paymentId }, "Invoice receipt already sent for payment; skipping");
+    return;
+  }
+
+  try {
+    await dependencies.email.sendInvoicePaymentReceiptEmail(context.customer.email, {
+      firstName: context.customer.firstName,
+      invoiceNumber: context.invoiceNumber,
+      amount,
+      balanceDue: context.balanceDue,
+      paidAt: getJobString(job.data, "paidAt"),
+      receiptUrl: context.stripePaymentLinkUrl ?? null,
+      companyName: context.company.name
+    });
+  } catch (error) {
+    // Send failed: release the claim so the BullMQ retry can send. Never let a release error mask the send error.
+    await dependencies.releaseInvoiceReceiptClaim(companyId, paymentId).catch(() => undefined);
+    throw error;
+  }
+
+  // Already sent: a failure to mark must not fail the job (a retry would then be skipped anyway by the claim).
+  await dependencies.markInvoiceReceiptSent(companyId, paymentId).catch(() => {
+    logger.warn({ companyId, paymentId }, "Failed to mark invoice receipt sent; claim row remains");
   });
 
   logger.info({ companyId, invoiceId, customerId, paymentId }, "Invoice payment receipt sent");

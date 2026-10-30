@@ -1,7 +1,17 @@
 import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { buildCreateJobPayload, emptyNewJobValues, parseNewJobQuery, validateNewJob } from "./newJob.config";
+import {
+  NEW_JOB_FIELDS,
+  addLineItem,
+  buildCreateJobPayload,
+  emptyNewJobValues,
+  lineItemsSubtotal,
+  newJobServiceFeeLabel,
+  parseNewJobQuery,
+  toAddJobProductInput,
+  validateNewJob
+} from "./newJob.config";
 
 const push = vi.fn();
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push }) }));
@@ -34,6 +44,17 @@ vi.mock("@/src/hooks/dispatch.hooks", () => ({
     data: q.length >= 2 ? { customers: [{ id: "c9", firstName: "Grace", lastName: "Lin", displayName: null, email: null, phone: null }] } : undefined
   })
 }));
+const apiPost = vi.fn();
+vi.mock("@/src/lib/api", () => ({ api: { post: (...a: unknown[]) => apiPost(...a) } }));
+vi.mock("@/src/hooks/price-book.hooks", () => ({
+  usePriceBookItemSearch: (q: string) => ({
+    data: q ? { items: [{ priceBookItemId: "pb1", name: "Furnace tune-up", description: null, unitPrice: "129.00", isTaxable: true, itemType: "service" }] } : undefined
+  })
+}));
+const connectState = vi.hoisted(() => ({ fee: 2 as number | null }));
+vi.mock("@/src/hooks/stripe-connect.hooks", () => ({
+  useStripeConnectStatus: () => ({ data: { platformFeePercent: connectState.fee } })
+}));
 vi.mock("@/src/hooks/technicians.hooks", () => ({
   useTechnicians: () => ({ data: { data: [{ id: "t1", firstName: "Marco", lastName: "R." }] } })
 }));
@@ -41,14 +62,27 @@ vi.mock("@/src/hooks/technicians.hooks", () => ({
 import { NewJobPanel } from "./NewJobPanel";
 
 describe("validateNewJob", () => {
-  it("requires customer and service", () => {
+  it("requires customer and job type with frame copy", () => {
     const errors = validateNewJob(emptyNewJobValues());
-    expect(errors.customerId).toBe("Customer is required");
-    expect(errors.title).toBe("Service is required");
+    expect(errors.customerId).toBe("Required");
+    expect(errors.type).toBe("Required");
+  });
+
+  it("orders fields per frame 160:32", () => {
+    expect(NEW_JOB_FIELDS.map((f) => f.label)).toEqual([
+      "Customer",
+      "Service address",
+      "Job type / service",
+      "Description",
+      "Scheduled (optional)",
+      "Priority",
+      "Ends",
+      "Assigned crew / van (optional)"
+    ]);
   });
 
   it("requires both schedule ends and end after start", () => {
-    const base = { ...emptyNewJobValues("c1"), title: "Tune-up" };
+    const base = { ...emptyNewJobValues("c1"), type: "maintenance" };
     expect(validateNewJob({ ...base, scheduledStart: "2026-10-29T10:00" }).scheduledEnd).toBe("Add an end time");
     expect(validateNewJob({ ...base, scheduledEnd: "2026-10-29T10:00" }).scheduledStart).toBe("Add a start time");
     expect(validateNewJob({ ...base, scheduledStart: "2026-10-29T10:00", scheduledEnd: "2026-10-29T09:00" }).scheduledEnd).toBe(
@@ -57,36 +91,52 @@ describe("validateNewJob", () => {
     expect(validateNewJob({ ...base, scheduledStart: "2026-10-29T10:00", scheduledEnd: "2026-10-29T12:00" })).toEqual({});
   });
 
-  it("enforces max length and known type/priority", () => {
-    const errors = validateNewJob({ ...emptyNewJobValues("c1"), title: "x".repeat(201), type: "bogus", priority: "nope" });
-    expect(errors.title).toMatch(/200 characters/);
+  it("rejects unknown type/priority and long descriptions", () => {
+    const errors = validateNewJob({ ...emptyNewJobValues("c1"), description: "x".repeat(2001), type: "bogus", priority: "nope" });
+    expect(errors.description).toMatch(/2000 characters/);
     expect(errors.type).toBeDefined();
     expect(errors.priority).toBeDefined();
   });
 });
 
 describe("buildCreateJobPayload", () => {
-  it("sends only filled fields, trimmed, with ISO schedule", () => {
-    expect(buildCreateJobPayload({ ...emptyNewJobValues(" c1 "), title: "  No-heat diagnostic " })).toEqual({
+  it("derives the API title from description, else job type", () => {
+    expect(buildCreateJobPayload({ ...emptyNewJobValues(" c1 "), type: "maintenance" })).toEqual({
       customerId: "c1",
-      title: "No-heat diagnostic",
-      type: "service_call",
+      title: "Maintenance",
+      type: "maintenance",
       priority: "normal"
     });
     const full = buildCreateJobPayload({
       ...emptyNewJobValues("c1"),
-      title: "Tune-up",
       propertyId: "p1",
       technicianId: "t1",
       type: "maintenance",
       priority: "high",
       scheduledStart: "2026-10-29T10:00",
       scheduledEnd: "2026-10-29T12:00",
-      description: " Blower stops "
+      description: " Blower stops \nsecond line"
     });
-    expect(full).toMatchObject({ propertyId: "p1", technicianId: "t1", type: "maintenance", priority: "high", description: "Blower stops" });
+    expect(full).toMatchObject({ title: "Blower stops", propertyId: "p1", technicianId: "t1", priority: "high" });
     expect(full.scheduledStart).toBe(new Date("2026-10-29T10:00").toISOString());
     expect(full.scheduledEnd).toBe(new Date("2026-10-29T12:00").toISOString());
+  });
+});
+
+describe("line items and fee", () => {
+  const seed = { priceBookItemId: "pb1", name: "Air filter", description: null, unitPrice: "18.00", isTaxable: true, itemType: "material" as const };
+  it("adds, bumps quantity and sums", () => {
+    const items = addLineItem(addLineItem([], seed), seed);
+    expect(items).toHaveLength(1);
+    expect(items[0]!.quantity).toBe(2);
+    expect(lineItemsSubtotal([...items, { ...items[0]!, priceBookItemId: "x", unitPrice: 129, quantity: 1 }])).toBe(165);
+    expect(toAddJobProductInput(items[0]!)).toEqual({ name: "Air filter", quantity: 2, unitPrice: 18, isTaxable: true });
+  });
+  it("Service Fee label only on Flex; hidden on Flat/none", () => {
+    expect(newJobServiceFeeLabel(2)).toBe("Service Fee (2%) · paid by customer at checkout");
+    expect(newJobServiceFeeLabel(0)).toBeNull();
+    expect(newJobServiceFeeLabel(null)).toBeNull();
+    expect(newJobServiceFeeLabel(2)).not.toMatch(/1\.99|booking/i);
   });
 });
 
@@ -103,37 +153,70 @@ describe("NewJobPanel", () => {
   beforeEach(() => {
     mutate.mockReset();
     push.mockReset();
+    apiPost.mockReset();
+    connectState.fee = 2;
     hooks.createState = { isPending: false, isError: false };
   });
   afterEach(() => cleanup());
 
-  it("preselects the customer from the query and its only address", () => {
+  it("preselects the customer and autofills its only address", () => {
     render(<NewJobPanel initialCustomerId="c1" />);
     expect(screen.getByTestId("new-job-customer").textContent).toContain("Dana Whitfield");
+    expect(screen.getByText("Preselected when opened from a customer profile")).toBeTruthy();
     expect((screen.getByLabelText("Service address") as HTMLSelectElement).value).toBe("p1");
+    expect(screen.getByText("Autofilled — customer has one address")).toBeTruthy();
+    expect(screen.getByTestId("new-job-number").textContent).toBe("Job # assigned on create");
   });
 
-  it("shows validation errors and does not submit", () => {
+  it("shows the frame 160:102 error state and does not submit", () => {
     render(<NewJobPanel />);
     fireEvent.click(screen.getByRole("button", { name: "Create job" }));
-    expect(screen.getByText("Customer is required")).toBeTruthy();
-    expect(screen.getByText("Service is required")).toBeTruthy();
+    expect(screen.getByRole("alert").textContent).toBe("Add a customer and job type to continue.");
+    expect(screen.getAllByText("Required")).toHaveLength(2);
+    expect(screen.getByLabelText("Job type / service").getAttribute("aria-invalid")).toBe("true");
     expect(mutate).not.toHaveBeenCalled();
   });
 
-  it("submits the payload and opens the new job", async () => {
-    mutate.mockImplementation((_payload, opts: { onSuccess: (d: unknown) => void }) => opts.onSuccess({ job: { id: "j42" } }));
+  it("uses a single column below sm and two from sm", () => {
+    const { container } = render(<NewJobPanel />);
+    const form = container.querySelector("form")!;
+    expect(form.className).toContain("grid-cols-1");
+    expect(form.className).toContain("sm:grid-cols-2");
+    expect(form.className).not.toMatch(/(^| )grid-cols-2/);
+  });
+
+  it("adds price-book items, shows subtotal and fee line, posts items after create", async () => {
+    apiPost.mockResolvedValue({});
+    mutate.mockImplementation(async (_payload, opts: { onSuccess: (d: unknown) => Promise<void> }) => opts.onSuccess({ job: { id: "j42" } }));
     render(<NewJobPanel initialCustomerId="c1" />);
-    fireEvent.change(screen.getByLabelText(/Service \*/), { target: { value: "No-heat diagnostic" } });
-    fireEvent.change(screen.getByLabelText("Tech"), { target: { value: "t1" } });
+    expect(screen.getByText("No items yet")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "+ Add item from price book" }));
+    fireEvent.change(screen.getByLabelText("Search price book"), { target: { value: "furn" } });
+    fireEvent.click(screen.getByRole("button", { name: /Furnace tune-up/ }));
+    const totals = screen.getByTestId("new-job-totals").textContent ?? "";
+    expect(totals).toContain("$129.00");
+    expect(totals).toContain("Service Fee (2%) · paid by customer at checkout");
+    expect(totals).not.toMatch(/1\.99/);
+    fireEvent.change(screen.getByLabelText("Job type / service"), { target: { value: "maintenance" } });
+    fireEvent.change(screen.getByLabelText("Assigned crew / van (optional)"), { target: { value: "t1" } });
     await act(async () => {
       fireEvent.click(screen.getByRole("button", { name: "Create job" }));
     });
     expect(mutate).toHaveBeenCalledWith(
-      { customerId: "c1", propertyId: "p1", technicianId: "t1", title: "No-heat diagnostic", type: "service_call", priority: "normal" },
+      { customerId: "c1", propertyId: "p1", technicianId: "t1", title: "Maintenance", type: "maintenance", priority: "normal" },
       expect.any(Object)
     );
+    expect(apiPost).toHaveBeenCalledWith("/api/v1/jobs/j42/products", { name: "Furnace tune-up", quantity: 1, unitPrice: 129, isTaxable: true });
     expect(push).toHaveBeenCalledWith("/jobs/j42");
+  });
+
+  it("hides the Service Fee line on Flat", () => {
+    connectState.fee = 0;
+    render(<NewJobPanel initialCustomerId="c1" />);
+    fireEvent.click(screen.getByRole("button", { name: "+ Add item from price book" }));
+    fireEvent.change(screen.getByLabelText("Search price book"), { target: { value: "furn" } });
+    fireEvent.click(screen.getByRole("button", { name: /Furnace tune-up/ }));
+    expect(screen.getByTestId("new-job-totals").textContent).not.toContain("Service Fee");
   });
 
   it("picks a customer from search", () => {

@@ -5,7 +5,7 @@ import { useState } from "react";
 
 import { useBookingRequest, useBookingRequests } from "@/src/hooks/dispatch.hooks";
 
-import { isEmergency, sortInbox, sourceLabel, STATUS_LABEL, type InboxItem } from "./booking-requests.utils";
+import { DOWNGRADED_NOTE, isEmergency, sortInbox, sourceLabel, STATUS_LABEL, wasDowngraded, type InboxItem } from "./booking-requests.utils";
 
 const COPY = {
   title: "Booking requests",
@@ -103,6 +103,9 @@ export function BookingRequestsInbox() {
             </p>
             {detail?.customerNotes ? <p className="mt-3 text-[13px] text-[#2a3360]">{detail.customerNotes}</p> : null}
             {activeEmergency ? <p className="mt-3 text-[12px] text-[#5e6684]">{COPY.emergencyHelp}</p> : null}
+            {!activeEmergency && (wasDowngraded(detail) || wasDowngraded(active)) ? (
+              <p data-testid="downgraded-note" className="mt-3 text-[12px] text-[#5e6684]">{DOWNGRADED_NOTE}</p>
+            ) : null}
             <div className="mt-4 flex gap-3">
               <Link href="/dispatch" className="rounded-[10px] bg-[#f6b400] px-4 py-2.5 text-sm font-semibold text-[#0f1530]">
                 {COPY.assign}

@@ -13,6 +13,11 @@ export const SERVICE_AREA_COPY = {
   invalidZip: "Enter a 5-digit ZIP code.",
   saveError: "We couldn't add that ZIP. Check it and try again.",
   retry: "Retry",
+  forbidden: "You don't have permission to change this",
+  readOnly: "Only owners and admins can change this",
+  loadError: "We couldn't load your service area. Try again.",
+  maxZips: (max: number) => `You can add up to ${max} ZIP codes.`,
+  noRadius: "—",
   emergencyTitle: "Emergency service (24/7)",
   on: "On",
   off: "Off",
@@ -21,4 +26,3 @@ export const SERVICE_AREA_COPY = {
 } as const;
 
 export const RADIUS_STEP = 5;
-export const DEFAULT_RADIUS_MILES = 25;

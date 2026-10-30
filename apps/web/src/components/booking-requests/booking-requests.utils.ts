@@ -2,8 +2,14 @@ import type { BookingUrgency } from "@fsm/types";
 
 import type { BookingRequestListItem } from "@/src/hooks/dispatch.hooks";
 
-/** #320 sorts emergencies first server-side but the list item has no `urgency` yet (missing field for Dev A). */
-export type InboxItem = BookingRequestListItem & { urgency?: BookingUrgency | null };
+/** #320 (4074fa1) list/detail items carry `urgency` and `downgraded` (emergency asked for, shop has it off). */
+export type InboxItem = BookingRequestListItem & { urgency?: BookingUrgency | null; downgraded?: boolean };
+
+export function wasDowngraded(item: object | null | undefined): boolean {
+  return (item as { downgraded?: unknown } | null | undefined)?.downgraded === true;
+}
+
+export const DOWNGRADED_NOTE = "Asked for emergency · sent as a regular request";
 
 export function isEmergency(item: { urgency?: BookingUrgency | string | null | undefined }): boolean {
   return item.urgency === "emergency";

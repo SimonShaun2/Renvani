@@ -1390,6 +1390,7 @@ export interface TestEstimateRecord {
   companyId: string;
   estimateNumber: string;
   jobId: string | null;
+  importSessionId?: string | null;
   customerId: string;
   propertyId: string | null;
   createdById: string | null;
@@ -2545,6 +2546,7 @@ const dataExportSessionsTable = {
 } as const;
 
 const estimatesTable = {
+  importSessionId: "importSessionId",
   __name: "estimates",
   id: "id",
   companyId: "companyId",
@@ -4267,6 +4269,7 @@ function createEstimateRecord(
     id: values.id ?? nextId(),
     companyId: values.companyId,
     estimateNumber: values.estimateNumber ?? `EST-${String(state.estimates.length + 1).padStart(4, "0")}`,
+    importSessionId: values.importSessionId ?? null,
     jobId: values.jobId ?? null,
     customerId: values.customerId,
     propertyId: values.propertyId ?? null,

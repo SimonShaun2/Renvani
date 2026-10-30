@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 import { GROWTH_CHECK_ENTRY, HOME } from "./site-config";
@@ -91,7 +92,7 @@ function SiteVisual() {
         </div>
         <div className="grid gap-5 sm:grid-cols-[286fr_366fr]">
           <div className="flex flex-col gap-3">
-            <img src="/marketing/home/hvac-tech.jpg" alt="" width={572} height={336} className="h-[168px] w-full rounded-2xl object-cover" fetchPriority="high" />
+            <Image src="/marketing/home/hvac-tech.jpg" alt="" width={572} height={336} className="h-[168px] w-full rounded-2xl object-cover" priority />
             <p className="text-[26px] font-bold">{s.business}</p>
             <p className="text-[12px]" style={{ color: ink2 }}>{s.trade}</p>
             <p className="text-[20px] font-semibold">{s.tagline}</p>
@@ -114,6 +115,59 @@ function SiteVisual() {
             <UiAction tone="amber">{s.action}</UiAction>
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+const inter = "[font-family:Inter,system-ui,sans-serif]";
+
+/** Mobile-only hero visual: "Readable mobile booking preview" (Figma 219:9474, 342px). */
+function MobileSiteVisual() {
+  const s = HOME.site;
+  return (
+    <div data-node-id="219:9474" className={`${inter} flex w-full flex-col overflow-hidden rounded-2xl border bg-[#f6f7f9] md:hidden`} style={{ borderColor: line, color: ink }} aria-label="Example: booking a visit" role="img">
+      <div className="flex h-[44px] items-center gap-[14px] p-3" style={{ background: ink }}>
+        <p className="flex-1 text-[16px] font-bold leading-[1.38] text-white">{s.business}</p>
+        <p className="flex h-[28px] w-[100px] items-center rounded-xl px-[10px] text-[12px] font-medium" style={{ background: "var(--color-mkt-amber)" }}>EXAMPLE</p>
+      </div>
+      <Image src="/marketing/home/hvac-tech.jpg" alt="" width={684} height={184} className="h-[92px] w-full rounded-2xl object-cover" priority />
+      <div className="flex flex-col gap-3 p-4">
+        <p className="text-[23px] font-semibold leading-[1.38]">Book a visit</p>
+        <div className="flex h-[44px] items-center gap-3 rounded-xl p-3 text-[14px] font-semibold" style={{ background: "var(--color-mkt-amber-soft)" }}>
+          <span className="flex-1">{s.mobile.service.name}</span>
+          <span className="w-[50px]">{s.mobile.service.price}</span>
+        </div>
+        <p className="text-[12px] font-medium" style={{ color: ink2 }}>{s.day}</p>
+        <div className="grid grid-cols-2 gap-3 text-[12px] font-medium">
+          <p className="flex h-[28px] items-center rounded-xl px-[10px] text-white" style={{ background: ink }}>{s.slots[0]}</p>
+          <p className="flex h-[28px] items-center rounded-xl bg-white px-[10px]">{s.slots[1]}</p>
+        </div>
+        <p className="flex h-[38px] items-center justify-center rounded-xl px-[14px] text-[12px] font-medium" style={{ background: "var(--color-mkt-amber)" }}>{s.action}</p>
+      </div>
+    </div>
+  );
+}
+
+/** Mobile-only intelligence visual: "Website / Focused opportunity / Mobile" (Figma 253:6779, 342x354). */
+function MobileIntelligenceVisual() {
+  const v = HOME.intelligenceMobile;
+  return (
+    <div data-node-id="253:6779" className={`${inter} flex w-full flex-col overflow-hidden rounded-2xl border bg-white leading-[1.4] md:hidden`} style={{ borderColor: line, color: ink }} aria-label="Example: revenue opportunity" role="img">
+      <div className="flex h-[56px] items-center gap-3 p-4" style={{ background: ink }}>
+        <p className="flex-1 text-[14px] font-semibold text-white">{v.header}</p>
+        <p className="flex h-[30px] w-[78px] items-center rounded-xl px-[10px] text-[12px] font-medium" style={{ background: "var(--color-mkt-amber)" }}>{v.status}</p>
+      </div>
+      <div className="flex flex-col gap-3 p-4">
+        <p className="text-[21px] font-semibold">{v.title}</p>
+        <p className="text-[13px]" style={{ color: ink2 }}>{v.meta}</p>
+        <div className="flex flex-col gap-1 rounded-xl p-3" style={{ background: "var(--color-mkt-cream)" }}>
+          <p className="text-[12px]" style={{ color: ink2 }}>{v.whyLabel}</p>
+          <p className="text-[14px] font-medium">{v.why}</p>
+        </div>
+        <p className="flex h-[30px] w-[190px] items-center rounded-xl px-[10px] text-[12px] font-medium" style={{ background: "var(--color-mkt-amber-soft)" }}>{v.review}</p>
+        <p className="flex h-[44px] items-center justify-center rounded-xl px-[14px] text-[13px] font-medium text-white" style={{ background: ink }}>{v.action}</p>
+        <p className="text-[13px] font-medium">{v.link}</p>
       </div>
     </div>
   );
@@ -162,7 +216,7 @@ function JourneyCards() {
       <div className={`${card} ${styles.lift}`} style={{ borderColor: line }}>
         <p className={eyebrow} style={{ color: ink2 }}>01 / WEBSITE BOOKING</p>
         <p className="text-[22px] font-semibold">A direct path to your next job.</p>
-        <img src="/marketing/home/hvac-tech.jpg" alt="" width={740} height={264} className="h-[132px] w-full rounded-2xl object-cover" />
+        <Image src="/marketing/home/hvac-tech.jpg" alt="" width={740} height={264} className="h-[132px] w-full rounded-2xl object-cover" />
         <p className="text-[15px] font-semibold">AC tune-up · $89</p>
         <div className="grid grid-cols-2 gap-[10px]">
           <Chip tone="ambersoft">Thu 10–12</Chip>
@@ -173,7 +227,7 @@ function JourneyCards() {
       <div className={`${card} ${styles.lift}`} style={{ borderColor: line }}>
         <p className={eyebrow} style={{ color: ink2 }}>02 / THE WORK</p>
         <p className="text-[22px] font-semibold">The details travel with the job.</p>
-        <img src="/marketing/home/tech-job-context.jpg" alt="" width={740} height={264} className="h-[132px] w-full rounded-2xl object-cover" />
+        <Image src="/marketing/home/tech-job-context.jpg" alt="" width={740} height={264} className="h-[132px] w-full rounded-2xl object-cover" />
         <div className="flex items-start gap-3">
           <Chip tone="ink">MR</Chip>
           <p className="text-[12px] font-medium leading-[1.38]">
@@ -228,7 +282,10 @@ export function HomePage() {
             <GrowthCheckEntry id="growth-check-hero" />
           </div>
           <figure className="flex flex-col gap-3">
-            <SiteVisual />
+            <div className="hidden md:block">
+              <SiteVisual />
+            </div>
+            <MobileSiteVisual />
             <figcaption className="text-[11px]" style={{ color: ink2 }}>{hero.caption}</figcaption>
           </figure>
         </div>
@@ -264,7 +321,10 @@ export function HomePage() {
                 {intelligence.cta.label}
               </Link>
             </div>
-            <IntelligenceVisual />
+            <div className="hidden md:block">
+              <IntelligenceVisual />
+            </div>
+            <MobileIntelligenceVisual />
           </div>
           <nav aria-label="Product areas" className="flex flex-wrap gap-x-4 gap-y-3 text-[14px] font-medium text-white">
             {intelligence.areas.map((a) => (
@@ -280,7 +340,7 @@ export function HomePage() {
           <div className="grid gap-8 md:grid-cols-2">
             {work.trades.map((t) => (
               <div key={t.eyebrow} className="flex flex-col gap-4">
-                <img src={t.image} alt="" width={1248} height={660} className="h-[240px] w-full rounded-2xl object-cover md:h-[330px]" />
+                <Image src={t.image} alt="" width={1248} height={660} className="h-[240px] w-full rounded-2xl object-cover md:h-[330px]" />
                 <p className={eyebrow} style={{ color: ink2 }}>{t.eyebrow}</p>
                 <h3 className="text-[24px] font-semibold md:text-[30px]">{t.title}</h3>
                 <Link href={t.href} className="text-[14px] font-medium" style={{ color: ink2 }}>See the workflow →</Link>

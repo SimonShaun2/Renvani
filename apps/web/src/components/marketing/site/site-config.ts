@@ -20,7 +20,7 @@ export const SITE_FOOTER = {
     { label: "Pricing", href: "/pricing" },
     { label: "Get a free demo", href: "/signup" }
   ] satisfies SiteLink[],
-  copyright: `© ${2026} Renvani`
+  copyright: `© ${new Date().getFullYear()} Renvani`
 };
 
 export const HOME_META = {
@@ -55,9 +55,12 @@ export const HOME = {
       { name: "AC tune-up", price: "$89", selected: true },
       { name: "Plumbing diagnostic", price: "$99", selected: false }
     ],
-    day: "Thursday, October 29",
+    /** Non-date label (no fixed calendar date in the example). */
+    day: "Next available day",
     slots: ["10:00–12:00", "14:00–16:00"],
-    action: "Request this visit"
+    action: "Request this visit",
+    /** Mobile-only compact booking preview (Figma 219:9474). */
+    mobile: { service: { name: "AC diagnostic", price: "$89" } }
   },
   trades: {
     eyebrow: "BUILT AROUND YOUR WORK",
@@ -69,6 +72,18 @@ export const HOME = {
   journey: {
     headline: ["The first click is", "just the beginning."],
     more: { label: "Watch the whole workflow →", href: "/product-tour" }
+  },
+  /** Mobile-only focused opportunity (Figma 253:6779 "Website / Focused opportunity / Mobile"). */
+  intelligenceMobile: {
+    header: "Revenue opportunity",
+    status: "Example",
+    title: "Estimate #2063",
+    meta: "Morgan Reed · Furnace tune-up",
+    whyLabel: "Why this surfaced",
+    why: "Sent 4 days ago · no reply recorded",
+    review: "Owner review required",
+    action: "Review email draft",
+    link: "Open estimate →"
   },
   intelligence: {
     eyebrow: "YOUR RECORDS. YOUR NEXT MOVE.",

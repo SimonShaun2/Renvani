@@ -10,12 +10,31 @@ vi.mock("./fonts", () => ({ geist: { variable: "g" }, newsreader: { variable: "n
 
 import { HomePage } from "./HomePage";
 import { MarketingShell } from "./MarketingShell";
-import { HOME, SITE_NAV } from "./site-config";
+import { HOME, SITE_FOOTER, SITE_NAV } from "./site-config";
 
-const COMPETITORS = /jobber|servicetitan|housecall|service fusion|fieldedge/i;
+const COMPETITORS = /jobber|servicetitan|housecall|service fusion|fieldedge|owner\.com|\bowner com\b|broccoli/i;
 const RESTAURANT = /restaurant|menu|diner|reservation|table/i;
 
 describe("marketing site (Figma 171:2)", () => {
+  it("competitor guard scans HomePage.tsx, site-config and footer copy", () => {
+    const src = ["HomePage.tsx", "site-config.ts", "MarketingShell.tsx"].map((f) => readFileSync(join(__dirname, f), "utf8")).join("\n");
+    expect(src + JSON.stringify(SITE_FOOTER)).not.toMatch(COMPETITORS);
+    expect(COMPETITORS.test("Owner.com")).toBe(true);
+    expect(COMPETITORS.test("Broccoli")).toBe(true);
+  });
+
+  it("footer year is computed and the example has no fixed calendar date", () => {
+    expect(SITE_FOOTER.copyright).toBe(`© ${new Date().getFullYear()} Renvani`);
+    expect(JSON.stringify(HOME)).not.toMatch(/(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday), (January|February|March|April|May|June|July|August|September|October|November|December) \d/);
+  });
+
+  it("mobile hero and intelligence use the mobile-only Figma components", () => {
+    const { container } = render(<HomePage />);
+    expect(container.querySelector('[data-node-id="219:9474"]')!.className).toContain("md:hidden");
+    expect(container.querySelector('[data-node-id="253:6779"]')!.className).toContain("md:hidden");
+    expect(container.querySelector('[data-node-id="200:46"]')!.parentElement!.className).toContain("hidden md:block");
+  });
+
   it("renders the shared nav with the Figma links and demo CTA", () => {
     render(<MarketingShell><p>x</p></MarketingShell>);
     const main = screen.getByRole("navigation", { name: "Main" });

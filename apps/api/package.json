@@ -28,6 +28,7 @@
     "@fsm/import-normalize": "workspace:*",
     "@fsm/jobs": "workspace:*",
     "@fsm/types": "workspace:*",
+    "@js-temporal/polyfill": "^0.5.1",
     "@sendgrid/mail": "^8.1.5",
     "bcryptjs": "^3.0.2",
     "date-fns": "^4.1.0",

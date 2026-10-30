@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { assertStripeLiveKeyAllowed } from "./deployment-environment.js";
+
 const envSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   /** Injected by Render (and similar hosts); prefer over service-specific ports when set. */
@@ -15,6 +17,10 @@ const envSchema = z.object({
   DATABASE_TRANSACTION_MAX_RETRIES: z.coerce.number().int().nonnegative().default(3),
   DATABASE_TRANSACTION_RETRY_BASE_MS: z.coerce.number().int().positive().default(25),
   REDIS_URL: z.string().min(1, "REDIS_URL is required"),
+  /** FS-198 — geo/ETA provider id (registry in apps/api). Default needs no key and makes no calls. */
+  GEO_PROVIDER: z.string().regex(/^[a-z][a-z0-9_]{0,63}$/).default("straight_line"),
+  /** FS-198 — assumed average driving speed for straight-line ETAs (mph); clamped 5–80 at use. */
+  ETA_ASSUMED_SPEED_MPH: z.coerce.number().positive().default(30),
   STRIPE_SECRET_KEY: z.string().min(1, "STRIPE_SECRET_KEY is required"),
   STRIPE_WEBHOOK_SECRET: z.string().min(1, "STRIPE_WEBHOOK_SECRET is required"),
   STRIPE_CONNECT_CLIENT_ID: z.string().min(1, "STRIPE_CONNECT_CLIENT_ID is required"),
@@ -98,7 +104,10 @@ const envSchema = z.object({
   /** FS-66 — public slot-hold/confirm limits (fixed window). */
   PUBLIC_SLOT_HOLD_IP_RATE_LIMIT_MAX: z.coerce.number().int().positive().default(6),
   PUBLIC_SLOT_HOLD_COMPANY_RATE_LIMIT_MAX: z.coerce.number().int().positive().default(120),
-  PUBLIC_SLOT_HOLD_RATE_LIMIT_WINDOW_SECONDS: z.coerce.number().int().positive().default(600)
+  PUBLIC_SLOT_HOLD_RATE_LIMIT_WINDOW_SECONDS: z.coerce.number().int().positive().default(600),
+  /** FS-195 — dispatch drive-time estimator id (registry in apps/api) + assumed speed (mph, clamped 5–80). */
+  DRIVE_TIME_ESTIMATOR: z.string().regex(/^[a-z][a-z0-9_]{0,63}$/).default("straight_line"),
+  DRIVE_TIME_ASSUMED_SPEED_MPH: z.coerce.number().positive().default(30)
 });
 
 export type Env = z.infer<typeof envSchema>;
@@ -133,6 +142,7 @@ function parseEnv(): Env {
   if (!result.success) {
     throw new Error(`Environment validation failed: ${formatValidationErrors(result.error)}`);
   }
+  assertStripeLiveKeyAllowed(process.env);
 
   return result.data;
 }

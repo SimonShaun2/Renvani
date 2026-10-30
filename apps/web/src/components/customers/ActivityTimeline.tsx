@@ -1,52 +1,21 @@
 "use client";
 
-import Link from "next/link";
 import { CircleDot } from "lucide-react";
 
-import { useCustomerActivity, useCustomerHistoryTimeline } from "@/src/hooks/customers.hooks";
-import { ImportedHistoryTimeline } from "./ImportedHistoryTimeline";
+import { useCustomerActivity } from "@/src/hooks/customers.hooks";
+import { CustomerHistoryFeed } from "./CustomerHistoryFeed";
 import { TimeAgo } from "../ui/TimeAgo";
 import { EmptyState } from "../ui/EmptyState";
 import { SkeletonCard } from "../ui/SkeletonCard";
 
 export function ActivityTimeline({ customerId }: { customerId: string }) {
   const activityQuery = useCustomerActivity(customerId);
-  const financialQuery = useCustomerHistoryTimeline(customerId, {
-    limit: 8,
-    types: "invoice,payment,note,communication"
-  });
   const activityItems = activityQuery.data?.data ?? [];
-  const financialItems = financialQuery.data?.items ?? [];
 
   return (
     <section className="surface-card px-5 py-5">
       <h2 className="text-base font-semibold text-neutral-900">Activity Timeline</h2>
-      <ImportedHistoryTimeline customerId={customerId} />
-      {financialQuery.isLoading ? (
-        <SkeletonCard className="mb-4 h-[80px]" />
-      ) : financialItems.length > 0 ? (
-        <div className="mb-6 rounded-[22px] border border-neutral-200 bg-white px-4 py-4">
-          <h3 className="text-sm font-semibold text-neutral-900">Invoices, payments & comms</h3>
-          <ul className="mt-3 space-y-2">
-            {financialItems.map((item) => (
-              <li key={`${item.type}-${item.id}`} className="text-sm text-neutral-700">
-                <span className="mr-2 text-xs font-semibold uppercase text-neutral-400">{item.type}</span>
-                {item.href ? (
-                  <Link href={item.href} className="font-medium text-brand-accent hover:underline">
-                    {item.title}
-                  </Link>
-                ) : (
-                  <span className="font-medium text-neutral-900">{item.title}</span>
-                )}
-                <span className="text-xs text-neutral-400">
-                  {" "}
-                  · <TimeAgo value={item.occurredAt} />
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ) : null}
+      <CustomerHistoryFeed customerId={customerId} />
       <div className="mt-4 max-h-[420px] overflow-y-auto pr-1">
         {activityQuery.isLoading ? (
           <div className="space-y-3">

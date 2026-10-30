@@ -7,6 +7,7 @@ import { ContextResolveParamsV1Schema } from "./tools/context-resolve.params.js"
 import { MessageDraftParamsV1Schema } from "./tools/message-draft.params.js";
 import { MessageSendProposedParamsV1Schema } from "./tools/message-send-proposed.params.js";
 import { LoyaltyReminderProposeParamsV1Schema } from "./tools/loyalty-reminder-propose.params.js";
+import { ServiceJobBriefProposeParamsV1Schema } from "./tools/service-job-brief-propose.params.js";
 import { AgentToolNameV1Schema } from "./tools/registry.js";
 import {
   ContractVersionV1Schema,
@@ -60,11 +61,17 @@ export const LoyaltyReminderProposeProposalV1Schema = AgentActionProposalBaseV1S
   parameters: LoyaltyReminderProposeParamsV1Schema
 });
 
+export const ServiceJobBriefProposeProposalV1Schema = AgentActionProposalBaseV1Schema.extend({
+  actionType: z.literal("service.job_brief.propose"),
+  parameters: ServiceJobBriefProposeParamsV1Schema
+});
+
 export const AgentActionProposalV1Schema = z.discriminatedUnion("actionType", [
   ContextResolveProposalV1Schema,
   MessageDraftProposalV1Schema,
   MessageSendProposedProposalV1Schema,
-  LoyaltyReminderProposeProposalV1Schema
+  LoyaltyReminderProposeProposalV1Schema,
+  ServiceJobBriefProposeProposalV1Schema
 ]);
 
 export type AgentActionProposalV1 = z.infer<typeof AgentActionProposalV1Schema>;
@@ -86,6 +93,10 @@ export const CreateAgentActionProposalV1Schema = z.discriminatedUnion("actionTyp
   AgentActionProposalBaseV1Schema.omit({ id: true, state: true }).extend({
     actionType: z.literal("loyalty.reminder.propose"),
     parameters: LoyaltyReminderProposeParamsV1Schema
+  }),
+  AgentActionProposalBaseV1Schema.omit({ id: true, state: true }).extend({
+    actionType: z.literal("service.job_brief.propose"),
+    parameters: ServiceJobBriefProposeParamsV1Schema
   })
 ]);
 
@@ -95,7 +106,8 @@ export const AgentToolParametersV1Schema = z.union([
   ContextResolveParamsV1Schema,
   MessageDraftParamsV1Schema,
   MessageSendProposedParamsV1Schema,
-  LoyaltyReminderProposeParamsV1Schema
+  LoyaltyReminderProposeParamsV1Schema,
+  ServiceJobBriefProposeParamsV1Schema
 ]);
 
 export function parseAgentActionProposalV1(input: unknown): AgentActionProposalV1 {
@@ -122,6 +134,9 @@ export function assertActionTypeMatchesToolName(
       return;
     case "loyalty.reminder.propose":
       LoyaltyReminderProposeParamsV1Schema.parse(parameters);
+      return;
+    case "service.job_brief.propose":
+      ServiceJobBriefProposeParamsV1Schema.parse(parameters);
       return;
   }
 }

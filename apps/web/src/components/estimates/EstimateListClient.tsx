@@ -7,6 +7,7 @@ import { FileText, Plus, Search } from "lucide-react";
 import { PageLayout } from "@/src/components/layout/PageLayout";
 import { CurrencyDisplay } from "@/src/components/ui/CurrencyDisplay";
 import { EmptyState } from "@/src/components/ui/EmptyState";
+import { ErrorState } from "@/src/components/ui/ErrorState";
 import { SkeletonCard } from "@/src/components/ui/SkeletonCard";
 import { StatBadge } from "@/src/components/ui/StatBadge";
 import { useEstimates } from "@/src/hooks/estimates.hooks";
@@ -148,7 +149,15 @@ export function EstimateListClient() {
           </label>
         </div>
 
-        {visibleRows.length === 0 ? (
+        {estimatesQuery.isError ? (
+          <div className="px-5 py-10">
+            <ErrorState
+              title="Estimates could not be loaded"
+              onRetry={() => void estimatesQuery.refetch()}
+              isRetrying={estimatesQuery.isFetching}
+            />
+          </div>
+        ) : visibleRows.length === 0 ? (
           <div className="px-5 py-10">
             <EmptyState
               icon={FileText}

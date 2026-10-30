@@ -17,6 +17,7 @@ import {
   estimates,
   invoices,
   maintenancePlans,
+  reviewRequests,
   messageLogs,
   serviceAgreementTemplates,
   users
@@ -38,6 +39,10 @@ type TransactionalEmailSendResult = {
 };
 
 interface EmailModule {
+  sendReviewRequestEmail?(
+    to: string,
+    params: { firstName: string; companyName: string; technicianName: string | null; reviewUrl: string }
+  ): Promise<unknown>;
   sendPasswordResetEmail(to: string, resetUrl: string, firstName: string): Promise<void>;
   sendEstimateEmail(
     to: string,
@@ -265,6 +270,45 @@ interface AutomationRuleContext {
   ruleType: AutomationRuleType;
 }
 
+export interface ReviewRequestSendContext {
+  requestStatus: string;
+  requestDeleted: boolean;
+  invoice: { status: string; total: string | number | null; deleted: boolean } | null;
+  customer: { prefersEmail: boolean | null; prefersSms: boolean | null; doNotContact: boolean | null } | null;
+  ruleEnabled: boolean;
+}
+
+export type ReviewRequestSendSkipReason =
+  | "request_not_found"
+  | "request_not_active"
+  | "invoice_not_paid"
+  | "customer_do_not_contact"
+  | "customer_opted_out"
+  | "rule_disabled";
+
+/**
+ * Send-time re-check (the review email/SMS may be delayed by hours). Invoice-originated requests also need the
+ * invoice still paid with total > 0 and the review_request rule still on. NULL channel preference = no consent.
+ */
+export function reviewRequestSendSkipReason(
+  context: ReviewRequestSendContext | null,
+  channel: "email" | "sms",
+  fromInvoice: boolean
+): ReviewRequestSendSkipReason | null {
+  if (!context || context.requestDeleted) return "request_not_found";
+  if (context.requestStatus !== "pending" && context.requestStatus !== "sent") return "request_not_active";
+  if (fromInvoice) {
+    if (!context.invoice || context.invoice.deleted) return "invoice_not_paid";
+    if (context.invoice.status !== "paid" || !(Number(context.invoice.total ?? 0) > 0)) return "invoice_not_paid";
+    if (!context.ruleEnabled) return "rule_disabled";
+  }
+  if (!context.customer) return "customer_opted_out";
+  if (context.customer.doNotContact === true) return "customer_do_not_contact";
+  const consent = channel === "email" ? context.customer.prefersEmail : context.customer.prefersSms;
+  if (consent !== true) return "customer_opted_out";
+  return null;
+}
+
 export interface NotificationsDependencies {
   email: EmailModule;
   sms: SmsModule;
@@ -280,6 +324,12 @@ export interface NotificationsDependencies {
     recipientId: string
   ): Promise<CampaignDeliveryContext | null>;
   loadCompanyOwner(companyId: string): Promise<CompanyOwnerContext | null>;
+  /** Fresh facts for the send-time re-check of a (possibly delayed) review request. */
+  loadReviewRequestSendContext?(
+    companyId: string,
+    reviewRequestId: string,
+    invoiceId: string | null
+  ): Promise<ReviewRequestSendContext | null>;
   findAutomationRule(
     companyId: string,
     ruleType: AutomationRuleType
@@ -690,6 +740,47 @@ function createProductionDependencies(): Promise<NotificationsDependencies> {
         .limit(1);
 
       return owner ?? null;
+    },
+    async loadReviewRequestSendContext(companyId, reviewRequestId, invoiceId) {
+      const [request] = await db
+        .select()
+        .from(reviewRequests)
+        .where(and(eq(reviewRequests.companyId, companyId), eq(reviewRequests.id, reviewRequestId)))
+        .limit(1);
+      if (!request) return null;
+      const [customerRows, invoiceRows, ruleRows] = await Promise.all([
+        db
+          .select()
+          .from(customers)
+          .where(and(eq(customers.companyId, companyId), eq(customers.id, request.customerId), isNull(customers.deletedAt)))
+          .limit(1),
+        invoiceId
+          ? db.select().from(invoices).where(and(eq(invoices.companyId, companyId), eq(invoices.id, invoiceId))).limit(1)
+          : Promise.resolve([]),
+        db
+          .select()
+          .from(automationRules)
+          .where(
+            and(
+              eq(automationRules.companyId, companyId),
+              eq(automationRules.ruleType, "review_request"),
+              eq(automationRules.isEnabled, true),
+              isNull(automationRules.deletedAt)
+            )
+          )
+          .limit(1)
+      ]);
+      const customer = customerRows[0];
+      const invoice = invoiceRows[0];
+      return {
+        requestStatus: request.status,
+        requestDeleted: request.deletedAt !== null,
+        invoice: invoice ? { status: invoice.status, total: invoice.total, deleted: invoice.deletedAt !== null } : null,
+        customer: customer
+          ? { prefersEmail: customer.prefersEmail, prefersSms: customer.prefersSms, doNotContact: customer.doNotContact }
+          : null,
+        ruleEnabled: ruleRows.length > 0
+      };
     },
     async findAutomationRule(companyId, ruleType) {
       const [rule] = await db
@@ -1187,6 +1278,42 @@ export async function handleSendReviewRequest(
   job: Job<Record<string, unknown>>,
   dependencies: NotificationsDependencies
 ): Promise<void> {
+  const companyId = getJobString(job.data, "companyId");
+  const reviewRequestId = getJobString(job.data, "reviewRequestId");
+  const invoiceId = getJobString(job.data, "invoiceId");
+  const channel = getJobString(job.data, "channel") === "email" ? "email" : "sms";
+  if (companyId && reviewRequestId && dependencies.loadReviewRequestSendContext) {
+    const context = await dependencies.loadReviewRequestSendContext(companyId, reviewRequestId, invoiceId);
+    const skip = reviewRequestSendSkipReason(context, channel, Boolean(invoiceId));
+    if (skip) {
+      logger.info(
+        { jobId: job.id ?? null, companyId, reviewRequestId, invoiceId, channel, reason: skip },
+        "Review request skipped at send time"
+      );
+      return;
+    }
+  }
+
+  if (channel === "email") {
+    const to = getJobString(job.data, "customerEmail");
+    const referenceId = getJobString(job.data, "referenceId");
+    if (!to || !referenceId || !dependencies.email.sendReviewRequestEmail) {
+      logger.warn({ jobId: job.id ?? null }, "Review request email job missing required data");
+      return;
+    }
+    await dependencies.email.sendReviewRequestEmail(to, {
+      firstName: getJobString(job.data, "customerFirstName") ?? "",
+      companyName: getJobString(job.data, "companyName") ?? "Renvani",
+      technicianName: getJobString(job.data, "technicianName"),
+      reviewUrl: `${env.APP_URL.replace(/\/$/, "")}/review/${referenceId}`
+    });
+    logger.info(
+      { companyId: getJobString(job.data, "companyId"), reviewRequestId: getJobString(job.data, "reviewRequestId") },
+      "Review request email sent"
+    );
+    return;
+  }
+
   await handleSmsNotificationJob(job, dependencies, {
     jobLabel: "Review request",
     buildBody(data) {

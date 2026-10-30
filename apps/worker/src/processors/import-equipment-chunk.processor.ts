@@ -105,7 +105,7 @@ function resolveRowWindow(
   return { start, end: Math.min(start + chunkSize, totalRows) };
 }
 
-function mapEquipmentRow(row: ParsedCsvRow, columnMapping: ColumnMapping) {
+export function mapEquipmentRow(row: ParsedCsvRow, columnMapping: ColumnMapping) {
   const mapped = mapRowValues(row.values, columnMapping);
   const assetType =
     normalizeImportedAssetType(mapped.assetType) ??

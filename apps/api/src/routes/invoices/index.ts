@@ -1,3 +1,5 @@
+import { requireRole } from "../../lib/authorize.js";
+import { technicianOwnInvoiceJob } from "../../lib/technician-scope.js";
 import type { FastifyPluginAsync } from "fastify";
 
 import {
@@ -117,13 +119,13 @@ const invoiceRoutes: FastifyPluginAsync = async (fastify) => {
   }, deleteInvoiceItemHandler);
 
   fastify.get("/invoices/:id/payments", {
-    preHandler: authenticate,
+    preHandler: [authenticate, technicianOwnInvoiceJob],
     preValidation: invoiceIdValidation,
     schema: listInvoicePaymentsSchema
   }, listInvoicePaymentsHandler);
 
   fastify.get("/payments", {
-    preHandler: authenticate,
+    preHandler: [authenticate, requireRole(["owner", "admin", "dispatcher", "office"])],
     preValidation: listPaymentsValidation,
     schema: listPaymentsSchema
   }, listPaymentsHandler);

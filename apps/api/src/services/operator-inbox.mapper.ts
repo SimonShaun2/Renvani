@@ -9,6 +9,7 @@ import {
 } from "@fsm/types";
 
 import type { AgentActionState } from "./agent-action.service.js";
+import { getAgentActionTypeDefinition } from "./agent-action.registry.js";
 
 export interface AgentActionRowView {
   id: string;
@@ -36,38 +37,16 @@ function readString(value: unknown): string | null {
   return typeof value === "string" && value.trim().length > 0 ? value : null;
 }
 
+/** Risk and consequences come from the agent-action registry (per-kind entries, no switch). */
 export function resolveRiskLevel(actionType: string): OperatorInboxRiskLevel {
-  if (actionType === "message.send_proposed") {
-    return "high";
-  }
-
-  if (
-    actionType === "message.draft" ||
-    actionType === "revenue.inquiry.qualify" ||
-    actionType === "loyalty.reminder.propose" ||
-    actionType === "scheduling.booking.self_service"
-  ) {
-    return "medium";
-  }
-
-  return "low";
+  return getAgentActionTypeDefinition(actionType)?.risk ?? "low";
 }
 
+const DEFAULT_CONSEQUENCES = ["Applies the proposed agent action according to policy."];
+
 export function resolveConsequences(actionType: string): string[] {
-  switch (actionType) {
-    case "message.send_proposed":
-      return [
-        "Records an execution receipt in the audit trail (no live provider send in this slice).",
-        "Uses the operator-approved message body only at execute time.",
-        "Customer consent and policy checks remain enforced by the control plane."
-      ];
-    case "message.draft":
-      return ["Saves a draft proposal for later review; nothing is sent to the customer."];
-    case "revenue.inquiry.qualify":
-      return ["Updates inquiry qualification metadata for revenue workflows."];
-    default:
-      return ["Applies the proposed agent action according to policy."];
-  }
+  const consequences = getAgentActionTypeDefinition(actionType)?.consequences;
+  return consequences && consequences.length > 0 ? [...consequences] : [...DEFAULT_CONSEQUENCES];
 }
 
 export function resolveOverridePaths(state: AgentActionState, requiresApproval: boolean): OperatorOverridePath[] {

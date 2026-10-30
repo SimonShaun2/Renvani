@@ -10,6 +10,7 @@ import {
   SERVICE_INQUIRY_LEAD_SOURCE,
   validateServiceInquiry
 } from "../../../services/public-service-inquiry.logic.js";
+import { getPublicStructuredData } from "../../../services/company-home-services.service.js";
 import { intakeServicePageInquiry } from "../../../services/revenue-inquiry-intake.service.js";
 
 import { publicSiteSlugParamsSchema, serviceInquiryBodySchema, zodIssuesToFieldErrors } from "./schemas.js";
@@ -157,6 +158,14 @@ async function submitServiceInquiryHandler(request: FastifyRequest, reply: Fasti
 }
 
 const publicSiteRoutes: FastifyPluginAsync = async (fastify) => {
+  // schema.org LocalBusiness JSON-LD (public data only). `script` is pre-escaped for a <script type="application/ld+json">.
+  fastify.get("/:slug/structured-data", async (request: FastifyRequest, reply: FastifyReply) => {
+    const params = publicSiteSlugParamsSchema.safeParse(request.params);
+    if (!params.success) return notFound(request, reply);
+    const data = await getPublicStructuredData(params.data.slug);
+    return reply.header("Cache-Control", "public, max-age=300").send(data);
+  });
+
   fastify.post("/:slug/inquiry", {
     schema: serviceInquiryRouteSchema,
     bodyLimit: 16 * 1024,

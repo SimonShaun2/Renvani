@@ -3,7 +3,11 @@ import { companies, db, emitEventWithExecutor } from "@fsm/db";
 import {
   AppError,
   ErrorCode,
+  buildLocalBusinessJsonLd,
+  getGbpCategoriesForTrade,
   readEmergencyServiceSettings,
+  resolveEmergencyRequest,
+  serializeJsonLdForScript,
   readServiceAreaSettings,
   type EmergencyServiceSettings,
   type ServiceAreaSettings,
@@ -12,7 +16,8 @@ import {
 } from "@fsm/types";
 
 import { runTenantAwareTransaction } from "../lib/company-scoped-transaction.js";
-import { checkZipCoverage, getPublicBookingCompany } from "./booking.service.js";
+import { env } from "@fsm/config";
+import { checkZipCoverage, getPublicBookingCompany, getPublicBookingSettingsBySlug } from "./booking.service.js";
 
 /**
  * Atomic single-key settings write: locks the company row inside the tenant transaction, re-reads settings
@@ -104,4 +109,48 @@ export async function publicServesZip(slug: string, zip: string): Promise<{ serv
   if (area.zips.length > 0) return { served: area.zips.includes(zip) };
   const coverage = await checkZipCoverage(slug, zip);
   return { served: coverage.covered };
+}
+
+function readTrade(settings: unknown): string | null {
+  // settings.trade comes from #318; read defensively.
+  const trade = settings && typeof settings === "object" ? (settings as Record<string, unknown>).trade : null;
+  return typeof trade === "string" ? trade : null;
+}
+
+/**
+ * Public schema.org LocalBusiness JSON-LD for the shop site. Only public fields (name, site URL, public phone,
+ * locality, public ZIP list, hours, public profile links); no emails, street address or technician data.
+ */
+export async function getPublicStructuredData(slug: string): Promise<{ jsonLd: Record<string, unknown>; script: string }> {
+  const company = await getPublicBookingCompany(slug);
+  const publicSettings = await getPublicBookingSettingsBySlug(slug);
+  const trade = readTrade(company.settings);
+  const area = readServiceAreaSettings(company.settings);
+  const emergency = resolveEmergencyRequest(true, readEmergencyServiceSettings(company.settings), trade);
+  const siteUrl = `${env.APP_URL.replace(/\/$/u, "")}/site/${encodeURIComponent(publicSettings.bookingSlug)}`;
+  const jsonLd = buildLocalBusinessJsonLd({
+    name: publicSettings.companyName,
+    trade,
+    url: siteUrl,
+    telephone: publicSettings.phone,
+    logoUrl: publicSettings.logoUrl,
+    address: { city: company.city, state: company.state, zip: company.zip },
+    areaServedZips: area.zips.length > 0 ? area.zips : publicSettings.serviceAreaZipCodes,
+    availableDays: publicSettings.availableDays,
+    availableHoursStart: publicSettings.availableHoursStart,
+    availableHoursEnd: publicSettings.availableHoursEnd,
+    emergency24x7: emergency.accepted,
+    sameAs: [
+      company.website,
+      publicSettings.googleReviewUrl,
+      publicSettings.yelpReviewUrl,
+      publicSettings.facebookReviewUrl,
+      publicSettings.customReviewUrl
+    ]
+  });
+  return { jsonLd, script: serializeJsonLdForScript(jsonLd) };
+}
+
+export async function getCompanyGbpCategories(companyId: string): Promise<ReturnType<typeof getGbpCategoriesForTrade>> {
+  return getGbpCategoriesForTrade(readTrade(await loadCompanySettings(companyId)));
 }

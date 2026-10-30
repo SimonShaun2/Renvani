@@ -588,6 +588,38 @@ describe("invoice.service", () => {
     expect(updatedInvoice?.balanceDue).toBe("0.00");
   });
 
+  it("handleStripePaymentSuccess records the payment when payment_method_types is missing", async () => {
+    const { company } = createAdminContext();
+    const { customer } = seedInvoiceGraph(company.id);
+    const invoice = fakeDb.seedInvoice({
+      companyId: company.id,
+      customerId: customer.id,
+      invoiceNumber: "INV-0002",
+      status: "sent",
+      total: "100.00",
+      amountPaid: "0.00",
+      balanceDue: "100.00"
+    });
+    const event = {
+      data: {
+        object: {
+          id: "pi_no_types",
+          amount: 10000,
+          amount_received: 10000,
+          latest_charge: "ch_no_types",
+          metadata: { invoiceId: invoice.id }
+        }
+      }
+    } as unknown as Stripe.PaymentIntentSucceededEvent;
+
+    await invoiceService.handleStripePaymentSuccess(event);
+
+    const stored = fakeDb.getTestState().payments.filter((row) => row.invoiceId === invoice.id);
+    expect(stored).toHaveLength(1);
+    expect(stored[0]?.method).toBe("other");
+    expect(fakeDb.getTestState().invoices.find((row) => row.id === invoice.id)?.status).toBe("paid");
+  });
+
   it("handleStripePaymentSuccess: legacy pre-removal intent with booking fee metadata still records it separately (non-refundable)", async () => {
     const { company } = createAdminContext();
     const { customer } = seedInvoiceGraph(company.id);

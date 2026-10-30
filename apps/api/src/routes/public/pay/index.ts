@@ -1,7 +1,7 @@
 import type { FastifyPluginAsync } from "fastify";
 
 import { getPublicPaymentLinkHandler } from "./handlers.js";
-import { createPublicHostedCheckoutHandler } from "./hosted-checkout-handler.js";
+import { createPublicHostedCheckoutHandler, hostedCheckoutRateLimit } from "./hosted-checkout-handler.js";
 import {
   getPublicInvoiceReceiptHandler,
   getPublicInvoiceReceiptPdfHandler
@@ -31,6 +31,7 @@ const publicPayRoutes: FastifyPluginAsync = async (fastify) => {
   // Stripe-hosted Checkout fallback (embedded unusable, e.g. no publishable key, or payer opts in).
   fastify.post("/:token/hosted-checkout", {
     preValidation: publicPaymentValidation,
+    preHandler: hostedCheckoutRateLimit,
     schema: createPublicHostedCheckoutSchema
   }, createPublicHostedCheckoutHandler);
 };

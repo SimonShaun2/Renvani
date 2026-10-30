@@ -1,6 +1,8 @@
 import type Stripe from "stripe";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { resetFixedWindowRateLimitStateForTests } from "../../../lib/fixed-window-rate-limit.js";
+import { HOSTED_CHECKOUT_IP_LIMIT, HOSTED_CHECKOUT_TOKEN_LIMIT } from "../../../lib/public-hosted-checkout-rate-limit.js";
 import { setupTestEnv } from "../../../test-support/env-setup.js";
 
 setupTestEnv();
@@ -51,6 +53,7 @@ const OTHER_TOKEN = "o".repeat(40);
 const sessions = new Map<string, { id: string; uiMode: string; status: string; url: string | null; expiresAt: Date; invoiceId: string; companyId: string }>();
 
 beforeEach(async () => {
+  resetFixedWindowRateLimitStateForTests();
   fakeDb.resetTestState();
   sessions.clear();
   createMock.mockReset();
@@ -183,6 +186,30 @@ describe("POST /api/v1/public/pay/:token/hosted-checkout", () => {
     const res = await post();
     expect(res.statusCode).toBe(409);
     expect(createMock).not.toHaveBeenCalled();
+  });
+
+  it(`rate limits per token (${HOSTED_CHECKOUT_TOKEN_LIMIT}/10 min) across IPs with 429 + Retry-After, no Stripe call`, async () => {
+    for (let i = 0; i < HOSTED_CHECKOUT_TOKEN_LIMIT; i += 1) {
+      const ok = await app.inject({ method: "POST", url: `/api/v1/public/pay/${TOKEN}/hosted-checkout`, remoteAddress: `198.51.100.${i + 1}` });
+      expect(ok.statusCode).not.toBe(429);
+    }
+    const callsBefore = createMock.mock.calls.length;
+    const res = await app.inject({ method: "POST", url: `/api/v1/public/pay/${TOKEN}/hosted-checkout`, remoteAddress: "198.51.100.200" });
+    expect(res.statusCode).toBe(429);
+    expect(Number(res.headers["retry-after"])).toBeGreaterThan(0);
+    expect(Object.keys(res.json()).sort()).toEqual(["error", "message", "requestId"]);
+    expect(res.json().error).toBe("RATE_LIMITED");
+    expect(createMock.mock.calls.length).toBe(callsBefore);
+  });
+
+  it(`rate limits per IP (${HOSTED_CHECKOUT_IP_LIMIT}/10 min) across tokens`, async () => {
+    for (let i = 0; i < HOSTED_CHECKOUT_IP_LIMIT; i += 1) {
+      const res = await app.inject({ method: "POST", url: `/api/v1/public/pay/unknown-token-${String(i).padStart(30, "x")}/hosted-checkout`, remoteAddress: "203.0.113.7" });
+      expect(res.statusCode).not.toBe(429);
+    }
+    const res = await app.inject({ method: "POST", url: `/api/v1/public/pay/${TOKEN}/hosted-checkout`, remoteAddress: "203.0.113.7" });
+    expect(res.statusCode).toBe(429);
+    expect(res.headers["retry-after"]).toBeDefined();
   });
 
   it("unknown token → 404; short token → 400", async () => {

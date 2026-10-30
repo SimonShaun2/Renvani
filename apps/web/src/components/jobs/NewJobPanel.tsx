@@ -227,6 +227,8 @@ export function NewJobPanel({ initialCustomerId = "" }: { initialCustomerId?: st
           </p>
         ) : null}
 
+        {/* Once the job exists, edits here would never be saved: lock the form and only allow Retry. */}
+        <fieldset disabled={busy || Boolean(createdJobId)} className="contents" data-testid="new-job-editor">
         {visibleFields.map((field) => (
           <div key={field.key} className={field.span === 2 ? "sm:col-span-2" : undefined}>
             <label htmlFor={`new-job-${field.key}`} className={`mb-1.5 block text-[13px] font-medium ${errors[field.key] ? "text-[#b42318]" : "text-[#2a3360]"}`}>
@@ -324,6 +326,7 @@ export function NewJobPanel({ initialCustomerId = "" }: { initialCustomerId?: st
             </dl>
           ) : null}
         </div>
+        </fieldset>
 
         {createJob.isError ? (
           <p role="alert" className="rounded-[10px] bg-[#fdecea] px-3.5 py-3 text-sm font-medium text-[#b42318] sm:col-span-2">
@@ -332,7 +335,9 @@ export function NewJobPanel({ initialCustomerId = "" }: { initialCustomerId?: st
         ) : null}
         {failedItems.length > 0 ? (
           <div role="alert" className="flex items-center justify-between gap-3 rounded-[10px] bg-[#fdecea] px-3.5 py-3 text-sm font-medium text-[#b42318] sm:col-span-2">
-            <span>{NEW_JOB_COPY.itemsError}</span>
+            <span>
+              {NEW_JOB_COPY.itemsError} {NEW_JOB_COPY.itemsLocked}
+            </span>
             <button
               type="button"
               disabled={busy}
@@ -348,7 +353,7 @@ export function NewJobPanel({ initialCustomerId = "" }: { initialCustomerId?: st
           <Link href="/jobs" className="rounded-[10px] border border-[#e6dccb] bg-white px-5 py-3 text-sm font-semibold text-[#0f1530]">
             {NEW_JOB_COPY.cancel}
           </Link>
-          <button type="submit" disabled={busy} className="rounded-[10px] bg-[#0f1530] px-[18px] py-3 text-sm font-semibold text-white hover:bg-[#2a3360] disabled:opacity-60">
+          <button type="submit" disabled={busy || Boolean(createdJobId)} className="rounded-[10px] bg-[#0f1530] px-[18px] py-3 text-sm font-semibold text-white hover:bg-[#2a3360] disabled:opacity-60">
             {busy ? NEW_JOB_COPY.submitting : NEW_JOB_COPY.submit}
           </button>
         </div>

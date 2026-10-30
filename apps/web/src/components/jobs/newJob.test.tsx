@@ -49,7 +49,7 @@ const apiPost = vi.fn();
 vi.mock("@/src/lib/api", () => ({ api: { post: (...a: unknown[]) => apiPost(...a) } }));
 vi.mock("@/src/hooks/price-book.hooks", () => ({
   usePriceBookItemSearch: (q: string) => ({
-    data: q ? { items: [{ priceBookItemId: "pb1", name: "Furnace tune-up", description: null, unitPrice: "129.00", isTaxable: true, itemType: "service" }] } : undefined
+    data: q ? { items: [{ priceBookItemId: "pb1", name: "Furnace tune-up", description: null, unitPrice: "129.00", isTaxable: true, itemType: "service" }, { priceBookItemId: "pb2", name: "Air filter", description: null, unitPrice: "18.00", isTaxable: true, itemType: "material" }] } : undefined
   })
 }));
 const connectState = vi.hoisted(() => ({ fee: 2 as number | null }));
@@ -212,23 +212,40 @@ describe("NewJobPanel", () => {
   });
 
   it("stays on the panel when a line item fails and retries only failed items without a second job", async () => {
-    apiPost.mockRejectedValueOnce(new Error("500")).mockResolvedValue({});
+    let furnaceFails = true;
+    apiPost.mockImplementation((_path: string, body: { name: string }) => {
+      if (body.name === "Furnace tune-up" && furnaceFails) {
+        furnaceFails = false;
+        return Promise.reject(new Error("500"));
+      }
+      return Promise.resolve({});
+    });
     mutate.mockImplementation(async (_payload, opts: { onSuccess: (d: unknown) => void }) => opts.onSuccess({ job: { id: "j42" } }));
     render(<NewJobPanel initialCustomerId="c1" />);
     fireEvent.click(screen.getByRole("button", { name: "+ Add item from price book" }));
     fireEvent.change(screen.getByLabelText("Search price book"), { target: { value: "furn" } });
     fireEvent.click(screen.getByRole("button", { name: /Furnace tune-up/ }));
+    if (!screen.queryByLabelText("Search price book")) fireEvent.click(screen.getByRole("button", { name: "+ Add item from price book" }));
+    fireEvent.change(screen.getByLabelText("Search price book"), { target: { value: "air" } });
+    fireEvent.click(screen.getByRole("button", { name: /Air filter/ }));
     fireEvent.change(screen.getByLabelText("Job type / service"), { target: { value: "maintenance" } });
     await act(async () => {
       fireEvent.click(screen.getByRole("button", { name: "Create job" }));
     });
     expect(push).not.toHaveBeenCalled();
     expect(screen.getByRole("alert").textContent).toContain("couldn't be saved");
+    expect(screen.getByRole("alert").textContent).toContain("Job created. Retry saving the failed items.");
+    expect((screen.getByTestId("new-job-editor") as HTMLFieldSetElement).disabled).toBe(true);
+    expect((screen.getByLabelText("Job type / service").closest("fieldset") as HTMLFieldSetElement).disabled).toBe(true);
+    expect((screen.getByLabelText("Assigned crew / van (optional)").closest("fieldset") as HTMLFieldSetElement).disabled).toBe(true);
+    expect((screen.getByRole("button", { name: "Create job" }) as HTMLButtonElement).disabled).toBe(true);
+    expect((screen.getByRole("button", { name: "Retry failed items" }) as HTMLButtonElement).disabled).toBe(false);
     await act(async () => {
       fireEvent.click(screen.getByRole("button", { name: "Retry failed items" }));
     });
     expect(mutate).toHaveBeenCalledTimes(1);
-    expect(apiPost).toHaveBeenCalledTimes(2);
+    expect(apiPost).toHaveBeenCalledTimes(3);
+    expect(apiPost.mock.calls.filter(([, b]) => (b as { name: string }).name === "Air filter")).toHaveLength(1);
     expect(apiPost).toHaveBeenLastCalledWith("/api/v1/jobs/j42/products", { name: "Furnace tune-up", quantity: 1, unitPrice: 129, isTaxable: true });
     expect(push).toHaveBeenCalledWith("/jobs/j42");
   });

@@ -86,7 +86,8 @@ export const NEW_JOB_COPY = {
   totalAfterTax: "Calculated after tax at checkout",
   submitError: "We couldn't create the job. Check the details and try again.",
   itemsError: "Job created, but some line items couldn't be saved.",
-  itemsRetry: "Retry failed items"
+  itemsRetry: "Retry failed items",
+  itemsLocked: "Job created. Retry saving the failed items."
 } as const;
 
 /** "Service Fee (2%) · paid by customer at checkout"; null hides the line (Flat plan / no fee from the API). */

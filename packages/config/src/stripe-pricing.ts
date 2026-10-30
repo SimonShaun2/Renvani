@@ -57,13 +57,6 @@ export function computeCustomerPaidPlatformFee(
   };
 }
 
-/** @deprecated Legacy "Renvani platform fee" label; use formatServiceFeeLineItemName. Remove in a later cleanup. */
-export function formatCustomerPlatformFeeLineItemName(fraction: number): string {
-  const percent = Math.round(fraction * 10000) / 100;
-  const label = Number.isInteger(percent) ? `${percent}` : `${percent}`;
-  return `Renvani platform fee (${label}%)`;
-}
-
 /** Configurable disclosure for customer payment surfaces (no hard-coded legal text in app code). */
 export function customerPlatformFeeDisclosure(): string {
   return (env.CUSTOMER_PLATFORM_FEE_DISCLOSURE ?? "").trim();

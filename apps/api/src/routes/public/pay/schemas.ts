@@ -57,6 +57,7 @@ export const getPublicPaymentLinkSchema = {
         totalDueCents: { type: "integer" },
         feeRefundable: { type: "boolean" },
         platformFeePercent: { type: ["number", "null"] },
+        serviceFeePercent: { type: ["number", "null"] },
         platformFeePaidByCustomer: { type: "boolean" },
         platformFeeDisclosure: { type: ["string", "null"] },
         ...PUBLIC_PAY_VIEW_FIELD_SCHEMA

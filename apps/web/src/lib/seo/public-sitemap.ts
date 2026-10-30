@@ -1,5 +1,7 @@
 import type { MetadataRoute } from "next";
 
+import type { PublicBookingSettingsRecord } from "@/src/hooks/booking.hooks";
+import { listServiceAreaPages, serviceAreaPath } from "@/src/components/growth/service-pages/service-area-pages";
 import { fetchPublicBookingSettingsBySlug } from "@/src/lib/public-booking-server";
 
 /**
@@ -24,6 +26,7 @@ export const ROBOTS_ALLOW = [
   { key: "product-tour", prefix: "/product-tour" },
   { key: "industries", prefix: "/industries" },
   { key: "shop-site", prefix: "/site/" }, // shop sites + /site/:slug/inquire
+  { key: "service-area", prefix: "/site/*/*/" }, // /site/:slug/:service/:area (explicit; also under /site/)
   { key: "public-booking", prefix: "/book/" }
 ] as const;
 
@@ -66,6 +69,32 @@ export class SitemapPublishCheckError extends Error {
 
 type Fetcher = (slug: string) => Promise<unknown | null>;
 
+/** Per-shop cap on service x area URLs (offered services x ZIPs can grow fast). */
+export const MAX_SERVICE_AREA_URLS_PER_SHOP = 500;
+
+type ServiceAreaSource = Pick<PublicBookingSettingsRecord, "offeredServices" | "serviceAreaZipCodes">;
+
+/**
+ * Service x area pages for a published shop, from the same public settings the page route renders
+ * (resolveServiceAreaPage 404s anything not listed here). Deduped by path; empty service slugs skipped.
+ */
+export function serviceAreaSitemapPaths(slug: string, settings: unknown): string[] {
+  if (!settings || typeof settings !== "object") return [];
+  const source = settings as Partial<ServiceAreaSource>;
+  if (!Array.isArray(source.offeredServices)) return [];
+  const pages = listServiceAreaPages({
+    offeredServices: source.offeredServices,
+    serviceAreaZipCodes: Array.isArray(source.serviceAreaZipCodes) ? source.serviceAreaZipCodes : []
+  });
+  const paths = new Set<string>();
+  for (const page of pages) {
+    if (!page.serviceSlug) continue;
+    paths.add(serviceAreaPath(encodeURIComponent(slug), page));
+    if (paths.size >= MAX_SERVICE_AREA_URLS_PER_SHOP) break;
+  }
+  return [...paths];
+}
+
 export async function buildPublicSitemap(
   env: NodeJS.ProcessEnv = process.env,
   fetchSettings: Fetcher = fetchPublicBookingSettingsBySlug
@@ -77,7 +106,8 @@ export async function buildPublicSitemap(
     optInSlugs(env).map(async (slug) => {
       try {
         // null = genuinely unpublished (API 404); a throw = outage/bad response, never treated as unpublished.
-        return (await fetchSettings(slug)) ? slug : null;
+        const settings = await fetchSettings(slug);
+        return settings ? { slug, settings } : null;
       } catch (error) {
         failures.push({ slug, error });
         return null;
@@ -92,14 +122,19 @@ export async function buildPublicSitemap(
     throw new SitemapPublishCheckError(failures.map((f) => f.slug));
   }
   return published
-    .filter((slug): slug is string => slug !== null)
-    .flatMap((slug) =>
-      SHOP_PAGE_TYPES.map((type) => ({
+    .filter((shop): shop is { slug: string; settings: NonNullable<typeof shop>["settings"] } => shop !== null)
+    .flatMap(({ slug, settings }) => [
+      ...SHOP_PAGE_TYPES.map((type) => ({
         url: `${base}${type.path(encodeURIComponent(slug))}`,
         changeFrequency: "weekly" as const,
         priority: type.priority
+      })),
+      ...serviceAreaSitemapPaths(slug, settings).map((path) => ({
+        url: `${base}${path}`,
+        changeFrequency: "weekly" as const,
+        priority: 0.6
       }))
-    );
+    ]);
 }
 
 export function buildPublicRobots(env: NodeJS.ProcessEnv = process.env): MetadataRoute.Robots {

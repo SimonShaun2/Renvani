@@ -12,6 +12,7 @@ import {
 } from "@fsm/config/import-communications-presets";
 import {
   buildPresetColumnMapping,
+  entityHintFromImportEntityType,
   inferImportSourcePresetForSession
 } from "@fsm/config/import-source-presets";
 import { downloadFile, getFileKeyFromUrl } from "@fsm/config/storage";
@@ -24,10 +25,12 @@ import {
   QUICKBOOKS_IIF_RECORD_TYPE_BY_IMPORT_ENTITY
 } from "@fsm/import-engine";
 import { resolveSourceSystemForNotesImport } from "@fsm/config/import-notes-map";
+import { resolveSourceSystemForServiceAgreementsImport } from "@fsm/config/import-service-agreements-map";
 import {
   commitCommunicationsRows,
   commitNoteImportRows,
   commitPriceBookRows,
+  commitServiceAgreementImportRows,
   customers,
   db,
   emitEventWithExecutor,
@@ -37,7 +40,8 @@ import {
   resolveSourceSystemForPriceBookImport,
   validateCommunicationsRows,
   validateNoteImportRows,
-  validatePriceBookRows
+  validatePriceBookRows,
+  validateServiceAgreementImportRows,
 } from "@fsm/db";
 import {
   buildImportChunkCommitManifest,
@@ -54,6 +58,24 @@ import {
   type ImportSessionStatus,
 } from "@fsm/types";
 
+import {
+  buildCustomerLookupMaps,
+  buildCustomerUpdateValues,
+  findDuplicateCustomer,
+  getMappedCustomerName,
+  normalizeCustomerNameValue,
+  mapCustomerRow,
+  normalizeDuplicateActions,
+  normalizeEmailValue,
+  validateCustomerRows,
+  validatePropertyImportRows,
+  validateInvoiceImportRows,
+  countRowsWithoutValidation,
+  validateUnsupportedEntityRows,
+  UNSUPPORTED_IMPORT_ENTITY_MESSAGE,
+  type ValidationResult,
+  type CustomerRow
+} from "../lib/import-customer-rows.js";
 import { emitImportWorkflowStepReceipt } from "../lib/import-workflow-step-receipt.js";
 import { persistImportSessionReconciliationReportBestEffort } from "../lib/persist-import-session-reconciliation.js";
 import { handleImportChunkCommit, IMPORT_CHUNK_COMMIT_JOB_NAME } from "./import-chunk-commit.processor.js";
@@ -77,43 +99,12 @@ import {
 } from "@fsm/types";
 
 type ImportSessionRow = typeof importSessions.$inferSelect;
-type CustomerRow = typeof customers.$inferSelect;
 type CustomerInsert = typeof customers.$inferInsert;
 type PropertyInsert = typeof properties.$inferInsert;
 
 interface ParsedCsvRow {
   rowNumber: number;
   values: Record<string, string>;
-}
-
-interface CustomerImportRow {
-  firstName: string;
-  lastName: string;
-  displayName: string | null;
-  email: string | null;
-  phone: string | null;
-  altPhone: string | null;
-  addressLine1: string | null;
-  city: string | null;
-  state: string | null;
-  zip: string | null;
-  notes: string | null;
-  tags: string[];
-}
-
-interface ValidationResult {
-  totalRows: number;
-  validRows: number;
-  errorRows: number;
-  duplicateRows: number;
-  validationErrors: ValidationError[];
-}
-
-type DuplicateAction = "skip" | "update_existing" | "import_new";
-
-interface CustomerDuplicateMatch {
-  customer: CustomerRow;
-  reason: "email" | "phone" | "name";
 }
 
 const logger = pino({
@@ -190,6 +181,20 @@ function readPriceBookSourceSystem(
   return resolveSourceSystemForPriceBookImport(presetId ?? "generic");
 }
 
+function readServiceAgreementsSourceSystem(
+  aiInferences: unknown,
+  headers: string[],
+  entityType: string,
+): ReturnType<typeof resolveSourceSystemForServiceAgreementsImport> {
+  const inferences = normalizeAiInferences(aiInferences);
+  if (typeof inferences.sourceSystem === "string") {
+    return inferences.sourceSystem as ReturnType<typeof resolveSourceSystemForServiceAgreementsImport>;
+  }
+
+  const presetId = inferImportSourcePresetForSession(headers, entityType);
+  return resolveSourceSystemForServiceAgreementsImport(presetId ?? "generic");
+}
+
 function readNotesSourceSystem(
   aiInferences: unknown,
   headers: string[],
@@ -212,22 +217,6 @@ function readCommunicationsSourceSystem(aiInferences: unknown, headers: string[]
 
   const presetId = inferCommunicationsPresetFromHeaders(headers);
   return resolveSourceSystemForCommunicationsImport(presetId ?? "generic");
-}
-
-function normalizeDuplicateActions(value: unknown): Record<string, DuplicateAction> {
-  if (!isPlainObject(value)) {
-    return {};
-  }
-
-  const duplicateActions: Record<string, DuplicateAction> = {};
-
-  for (const [key, action] of Object.entries(value)) {
-    if (action === "skip" || action === "update_existing" || action === "import_new") {
-      duplicateActions[key] = action;
-    }
-  }
-
-  return duplicateActions;
 }
 
 function buildEmptyMapping(headers: string[]): ColumnMapping {
@@ -257,144 +246,6 @@ async function mirrorImportAiMappingToLangfuse(input: {
     occurredAt: new Date().toISOString(),
     ...(input.errorMessage ? { errorMessage: input.errorMessage } : {})
   });
-}
-
-function normalizeTextValue(value: string | null | undefined): string | null {
-  if (!value) {
-    return null;
-  }
-
-  const trimmedValue = sanitizeSpreadsheetCell(value.trim());
-  return trimmedValue.length > 0 ? trimmedValue : null;
-}
-
-function normalizeEmailValue(value: string | null | undefined): string | null {
-  const normalizedValue = normalizeTextValue(value);
-  return normalizedValue ? normalizedValue.toLowerCase() : null;
-}
-
-function normalizeCustomerNameValue(value: string | null | undefined): string | null {
-  const normalizedValue = normalizeTextValue(value);
-  return normalizedValue ? normalizedValue.toLowerCase() : null;
-}
-
-function isValidEmail(value: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/u.test(value);
-}
-
-function getMappedCustomerName(mappedRow: CustomerImportRow): string | null {
-  if (mappedRow.displayName) {
-    return mappedRow.displayName;
-  }
-
-  const fullName = `${mappedRow.firstName} ${mappedRow.lastName}`.trim();
-  return fullName.length > 0 ? fullName : null;
-}
-
-function buildCustomerLookupMaps(existingCustomers: CustomerRow[]) {
-  const emailMap = new Map<string, CustomerRow>();
-  const phoneMap = new Map<string, CustomerRow>();
-  const nameMap = new Map<string, CustomerRow>();
-
-  for (const customer of existingCustomers) {
-    const normalizedEmail = normalizeEmailValue(customer.email);
-    const normalizedPhone = normalizeImportPhone(customer.phone);
-    const normalizedName = normalizeCustomerNameValue(
-      customer.displayName ?? `${customer.firstName} ${customer.lastName}`.trim()
-    );
-
-    if (normalizedEmail && !emailMap.has(normalizedEmail)) {
-      emailMap.set(normalizedEmail, customer);
-    }
-
-    if (normalizedPhone && !phoneMap.has(normalizedPhone)) {
-      phoneMap.set(normalizedPhone, customer);
-    }
-
-    if (normalizedName && !nameMap.has(normalizedName)) {
-      nameMap.set(normalizedName, customer);
-    }
-  }
-
-  return {
-    emailMap,
-    phoneMap,
-    nameMap
-  };
-}
-
-function findDuplicateCustomer(
-  mappedRow: CustomerImportRow,
-  existingCustomers: ReturnType<typeof buildCustomerLookupMaps>
-): CustomerDuplicateMatch | null {
-  const normalizedEmail = normalizeEmailValue(mappedRow.email);
-  if (normalizedEmail) {
-    const customer = existingCustomers.emailMap.get(normalizedEmail);
-    if (customer) {
-      return { customer, reason: "email" };
-    }
-  }
-
-  const normalizedPhone = normalizeImportPhone(mappedRow.phone);
-  if (normalizedPhone) {
-    const customer = existingCustomers.phoneMap.get(normalizedPhone);
-    if (customer) {
-      return { customer, reason: "phone" };
-    }
-  }
-
-  const normalizedName = normalizeCustomerNameValue(getMappedCustomerName(mappedRow));
-  if (normalizedName) {
-    const customer = existingCustomers.nameMap.get(normalizedName);
-    if (customer) {
-      return { customer, reason: "name" };
-    }
-  }
-
-  return null;
-}
-
-function buildCustomerUpdateValues(
-  existingCustomer: CustomerRow,
-  mappedRow: CustomerImportRow,
-  importSessionId: string,
-  now: Date
-) {
-  const mergedTags = Array.from(
-    new Set([...(existingCustomer.tags ?? []), ...mappedRow.tags])
-  );
-  const mergedNotes = mappedRow.notes
-    ? existingCustomer.internalNotes
-      ? existingCustomer.internalNotes.includes(mappedRow.notes)
-        ? existingCustomer.internalNotes
-        : `${existingCustomer.internalNotes}\n${mappedRow.notes}`
-      : mappedRow.notes
-    : existingCustomer.internalNotes;
-
-  return {
-    ...(existingCustomer.firstName.trim().length === 0 && mappedRow.firstName.length > 0
-      ? { firstName: mappedRow.firstName }
-      : {}),
-    ...(existingCustomer.lastName.trim().length === 0 && mappedRow.lastName.length > 0
-      ? { lastName: mappedRow.lastName }
-      : {}),
-    ...(existingCustomer.displayName === null && mappedRow.displayName
-      ? { displayName: mappedRow.displayName }
-      : {}),
-    ...(existingCustomer.email === null && mappedRow.email
-      ? { email: mappedRow.email }
-      : {}),
-    ...(existingCustomer.phone === null && mappedRow.phone
-      ? { phone: mappedRow.phone }
-      : {}),
-    ...(existingCustomer.altPhone === null && mappedRow.altPhone
-      ? { altPhone: mappedRow.altPhone }
-      : {}),
-    tags: mergedTags,
-    internalNotes: mergedNotes,
-    importSessionId,
-    updatedAt: now
-  };
 }
 
 function parseCsv(buffer: Buffer): { headers: string[]; rows: ParsedCsvRow[] } {
@@ -468,88 +319,6 @@ function parseImportTabular(
   return parseCsv(buffer);
 }
 
-function mapCustomerRow(values: Record<string, string>, columnMapping: ColumnMapping): CustomerImportRow {
-  const mappedValues: Record<string, string> = {};
-
-  for (const [csvColumn, fieldName] of Object.entries(columnMapping)) {
-    if (typeof fieldName !== "string" || fieldName.length === 0) {
-      continue;
-    }
-
-    mappedValues[fieldName] = values[csvColumn] ?? "";
-  }
-
-  const firstName = normalizeTextValue(mappedValues.firstName);
-  const lastName = normalizeTextValue(mappedValues.lastName);
-  const displayName = normalizeTextValue(mappedValues.displayName);
-
-  return {
-    firstName: firstName ?? (displayName ?? ""),
-    lastName: lastName ?? "",
-    displayName,
-    email: normalizeEmailValue(mappedValues.email),
-    phone: normalizeTextValue(mappedValues.phone),
-    altPhone: normalizeTextValue(mappedValues.altPhone),
-    addressLine1: normalizeTextValue(mappedValues.addressLine1),
-    city: normalizeTextValue(mappedValues.city),
-    state: normalizeTextValue(mappedValues.state),
-    zip: normalizeTextValue(mappedValues.zip),
-    notes: normalizeTextValue(mappedValues.notes),
-    tags: normalizeTextValue(mappedValues.tags)
-      ?.split(",")
-      .map((tag) => tag.trim())
-      .filter((tag) => tag.length > 0) ?? []
-  };
-}
-
-function validateCustomerRows(rows: ParsedCsvRow[], columnMapping: ColumnMapping, existingCustomers: CustomerRow[]): ValidationResult {
-  const validationErrors: ValidationError[] = [];
-  const rowErrors = new Set<number>();
-  let duplicateRows = 0;
-  const customerLookupMaps = buildCustomerLookupMaps(existingCustomers);
-
-  for (const row of rows) {
-    const mappedRow = mapCustomerRow(row.values, columnMapping);
-    const hasDisplayName = mappedRow.displayName !== null;
-    const hasFirstAndLastName = mappedRow.firstName.length > 0 && mappedRow.lastName.length > 0;
-
-    if (!hasDisplayName && !hasFirstAndLastName) {
-      validationErrors.push({
-        row: row.rowNumber,
-        field: "firstName",
-        message: "Required field missing",
-        value: mappedRow.firstName
-      });
-      rowErrors.add(row.rowNumber);
-    }
-
-    if (mappedRow.email && !isValidEmail(mappedRow.email)) {
-      validationErrors.push({
-        row: row.rowNumber,
-        field: "email",
-        message: "Invalid email format",
-        value: mappedRow.email
-      });
-      rowErrors.add(row.rowNumber);
-    }
-
-    if (rowErrors.has(row.rowNumber)) {
-      continue;
-    }
-
-    if (findDuplicateCustomer(mappedRow, customerLookupMaps)) {
-      duplicateRows += 1;
-    }
-  }
-
-  return {
-    totalRows: rows.length,
-    validRows: rows.length - rowErrors.size - duplicateRows,
-    errorRows: rowErrors.size,
-    duplicateRows,
-    validationErrors
-  };
-}
 
 async function writeImportReconciliationReport(
   companyId: string,
@@ -590,6 +359,34 @@ async function getCompanyCustomers(companyId: string): Promise<CustomerRow[]> {
     .select()
     .from(customers)
     .where(and(eq(customers.companyId, companyId), isNull(customers.deletedAt)));
+}
+
+/**
+ * Validation for entity types without a dedicated execute-import writer. Customers use the
+ * duplicate-aware validator; properties/invoices check the fields their chunk committers need;
+ * jobs/estimates/assets are validated per row by their committers; anything else is reported
+ * as unsupported so it is never committed as customers.
+ */
+async function validateRowsForChunkedEntity(
+  entityType: string,
+  rows: ParsedCsvRow[],
+  columnMapping: ColumnMapping,
+  companyId: string
+): Promise<ValidationResult> {
+  switch (entityType) {
+    case "customers":
+      return validateCustomerRows(rows, columnMapping, await getCompanyCustomers(companyId));
+    case "properties":
+      return validatePropertyImportRows(rows, columnMapping);
+    case "invoices":
+      return validateInvoiceImportRows(rows, columnMapping);
+    case "jobs":
+    case "estimates":
+    case "assets":
+      return countRowsWithoutValidation(rows);
+    default:
+      return validateUnsupportedEntityRows(rows, entityType);
+  }
 }
 
 async function markImportFailed(importSession: ImportSessionRow, error: unknown): Promise<void> {
@@ -680,12 +477,13 @@ export async function handleMapCsvColumns(job: Job<Record<string, unknown>>): Pr
       importSession.entityType === "communications"
         ? inferCommunicationsPresetFromHeaders(parsedCsv.headers)
         : inferImportSourcePresetForSession(parsedCsv.headers, importSession.entityType);
+    const presetEntityHint = entityHintFromImportEntityType(importSession.entityType);
     const presetMapping =
       importSession.entityType === "communications"
         ? buildCommunicationsColumnMapping(parsedCsv.headers, sourcePresetId)
         : sourcePresetId
-          ? buildPresetColumnMapping(parsedCsv.headers, sourcePresetId)
-          : {};
+          ? buildPresetColumnMapping(parsedCsv.headers, sourcePresetId, presetEntityHint)
+          : buildPresetColumnMapping(parsedCsv.headers, "generic", presetEntityHint);
     let columnMapping: ColumnMapping = { ...presetMapping };
     const headerCount = parsedCsv.headers.length;
 
@@ -732,7 +530,15 @@ export async function handleMapCsvColumns(job: Job<Record<string, unknown>>): Pr
     const sourceSystem =
       importSession.entityType === "communications"
         ? readCommunicationsSourceSystem(importSession.aiInferences, parsedCsv.headers)
-        : resolveSourceSystemForPriceBookImport(sourcePresetId ?? "generic");
+        : importSession.entityType === "service_agreements"
+          ? readServiceAgreementsSourceSystem(
+              importSession.aiInferences,
+              parsedCsv.headers,
+              importSession.entityType,
+            )
+          : importSession.entityType === "notes"
+            ? readNotesSourceSystem(importSession.aiInferences, parsedCsv.headers, importSession.entityType)
+            : resolveSourceSystemForPriceBookImport(sourcePresetId ?? "generic");
 
     await db
       .update(importSessions)
@@ -811,9 +617,11 @@ export async function handleValidateCsvRows(job: Job<Record<string, unknown>>): 
           )
         : importSession.entityType === "notes"
           ? validateNoteImportRows(parsedCsv.rows, columnMapping)
+          : importSession.entityType === "service_agreements"
+            ? validateServiceAgreementImportRows(parsedCsv.rows, columnMapping)
           : importSession.entityType === "communications"
             ? validateCommunicationsRows(parsedCsv.rows, columnMapping)
-          : validateCustomerRows(parsedCsv.rows, columnMapping, await getCompanyCustomers(companyId));
+          : await validateRowsForChunkedEntity(importSession.entityType, parsedCsv.rows, columnMapping, companyId);
 
     const priorInferences = normalizeAiInferences(importSession.aiInferences);
     const sourceSystem =
@@ -871,6 +679,77 @@ export async function handleValidateCsvRows(job: Job<Record<string, unknown>>): 
     await markImportFailed(importSession, error);
     throw error;
   }
+}
+
+async function executeServiceAgreementsImport(
+  job: Job<Record<string, unknown>>,
+  companyId: string,
+  importSessionId: string,
+  importSession: ImportSessionRow
+): Promise<void> {
+  const fileBuffer = await downloadFile(getFileKeyFromUrl(importSession.fileUrl));
+  const parsedCsv = parseImportTabular(fileBuffer, importSession.fileName, importSession.entityType);
+  const columnMapping = normalizeColumnMappings(importSession.columnMappings);
+  const validationErrors = normalizeValidationErrors(importSession.validationErrors);
+  const invalidRowNumbers = new Set(validationErrors.map((validationError) => validationError.row));
+  const sourceSystem = readServiceAgreementsSourceSystem(
+    importSession.aiInferences,
+    parsedCsv.headers,
+    importSession.entityType,
+  );
+
+  const result = await commitServiceAgreementImportRows({
+    companyId,
+    importSessionId,
+    sourceSystem,
+    rows: parsedCsv.rows,
+    columnMapping,
+    invalidRowNumbers,
+  });
+
+  const completedAt = new Date();
+  const priorInferences = normalizeAiInferences(importSession.aiInferences);
+
+  await db.transaction(async (tx) => {
+    await tx
+      .update(importSessions)
+      .set({
+        status: "completed",
+        importedRows: result.importedRows,
+        skippedRows: result.skippedRows,
+        duplicateRows: 0,
+        completedAt,
+        errorMessage: null,
+        aiInferences: {
+          ...priorInferences,
+          serviceAgreementsImport: {
+            maintenancePlans: result.maintenancePlans,
+          },
+        },
+        updatedAt: completedAt,
+      })
+      .where(
+        and(eq(importSessions.companyId, companyId), eq(importSessions.id, importSessionId), isNull(importSessions.deletedAt)),
+      )
+      .returning();
+
+    await emitEventWithExecutor(tx, {
+      companyId,
+      eventType: "import.completed",
+      actorType: "system",
+      entityType: "import_session",
+      entityId: importSessionId,
+      payload: {
+        importedRows: result.importedRows,
+        skippedRows: result.skippedRows,
+        entityType: "service_agreements",
+        maintenancePlans: result.maintenancePlans,
+      },
+      summary: `Service agreements import ${importSession.fileName} completed`,
+    });
+  });
+
+  await job.updateProgress?.(100);
 }
 
 async function executeNotesImport(
@@ -1108,8 +987,32 @@ export async function handleExecuteImport(job: Job<Record<string, unknown>>): Pr
       return;
     }
 
+    if (importSession.entityType === "service_agreements") {
+      await executeServiceAgreementsImport(job, companyId, importSessionId, importSession);
+      return;
+    }
+
     if (importSession.entityType === "communications") {
       await executeCommunicationsImport(job, companyId, importSessionId, importSession);
+      return;
+    }
+
+    if (importSession.entityType !== "customers") {
+      const aiInferences = normalizeAiInferences(importSession.aiInferences);
+      if (importSession.entityType === "assets" && aiInferences.equipmentChunkPlan) {
+        // Equipment chunk jobs (scheduled alongside this one) commit these rows.
+        return;
+      }
+      // Never fall through to the customer writer for another entity type.
+      await markImportFailed(
+        importSession,
+        new Error(
+          `${UNSUPPORTED_IMPORT_ENTITY_MESSAGE(importSession.entityType)}` +
+            (importSession.entityType === "payments"
+              ? ""
+              : " Map a source id (and the customer reference for properties/invoices) so rows can be committed by the chunk committer.")
+        )
+      );
       return;
     }
 

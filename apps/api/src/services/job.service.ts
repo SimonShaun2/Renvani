@@ -19,6 +19,7 @@ import {
 import { aiQueue } from "@fsm/jobs";
 
 import { enqueuePostJobLoyaltyReminderEvaluation } from "./loyalty-reminder-post-job.service.js";
+import { enqueueServiceJobBriefAfterSchedule } from "./service-job-brief-post-schedule.service.js";
 import {
   AppError,
   ErrorCode,
@@ -342,9 +343,12 @@ function normalizeCompleteJobInput(input: CompleteJobInput) {
 }
 
 function normalizeAddNoteInput(input: AddNoteInput) {
+  const noteKind = input.noteKind ?? (input.isInternal === false ? "field" : "internal");
+  const isInternal = noteKind === "field" ? false : (input.isInternal ?? true);
   return {
     content: input.content.trim(),
-    isInternal: input.isInternal ?? true
+    noteKind,
+    isInternal
   };
 }
 
@@ -1228,6 +1232,20 @@ export async function scheduleJob(
   });
 
   await invalidateDispatchDates(companyId, existingJob.scheduledStart, updatedJob.scheduledStart);
+
+  try {
+    await enqueueServiceJobBriefAfterSchedule({
+      companyId,
+      jobId: updatedJob.id,
+      resourceVersion: updatedJob.updatedAt.toISOString()
+    });
+  } catch (error) {
+    logger.warn(
+      { err: error, companyId, jobId: updatedJob.id },
+      "Failed to enqueue service job brief build"
+    );
+  }
+
   return updatedJob;
 }
 
@@ -1393,6 +1411,7 @@ export async function addNote(
         jobId: existingJob.id,
         authorId: actorId,
         content: normalizedInput.content,
+        noteKind: normalizedInput.noteKind,
         isInternal: normalizedInput.isInternal
       })
       .returning();

@@ -23,6 +23,7 @@
     "build": "tsc -p tsconfig.json",
     "lint": "tsc --noEmit",
     "test": "vitest run",
+    "test:golden-import-e2e": "vitest run src/golden-import-e2e.integration.test.ts",
     "db:generate": "drizzle-kit generate --config drizzle.config.ts",
     "db:migrate": "drizzle-kit migrate --config drizzle.config.ts",
     "db:check-migrations": "pnpm run build && node ./scripts/check-migrations.mjs"

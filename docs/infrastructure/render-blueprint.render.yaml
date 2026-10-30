@@ -1,60 +1,64 @@
-# Renvani — Render Blueprint DRAFT (FS-93)
+# Renvani — Render Blueprint (FS-93 / STACK-12)
 #
-# STATUS: NOT APPLIED — reference only. Do not connect a Blueprint or provision resources
-# without founder authorization. Web stays on **Vercel** (no Render web service).
+# STATUS: NOT APPLIED — nothing is provisioned from this file until the founder connects it in the
+# Render Dashboard (New > Blueprint). Runbook: docs/infrastructure/RENDER-DEPLOY-RUNBOOK.md.
+# Canonical copy: /render.yaml. docs/infrastructure/render-blueprint.render.yaml must stay
+# byte-identical (enforced by packages/config/src/fs93-render-blueprint.test.ts).
 #
-# Folded from useful `deploy/render` @ 80c2cd07 (branch left untouched; not merged).
-# Health: FS-79 (#71) — use `/health` (liveness) and `/health/ready` (readiness); no duplicate routes.
-# Listen: Render injects `PORT`; apps use `PORT ?? API_PORT` / `PORT ?? WEBHOOK_PORT` (@fsm/config).
-#
-# CORS: API allows browser origin = `APP_URL` (set to production Vercel URL, sync: false).
-#
-# PostgreSQL: **Neon** (STACK-12) — same region as the Render API web service. Set `DATABASE_URL`
-# manually from Neon (pooler URL recommended); not provisioned by this Blueprint.
-#
-# Note: `@fsm/config` still validates the shared env schema at process start on all services.
-# Least-privilege blocks below are the secrets each service *should* receive in Render;
-# ops may need to add other required keys from docs/security/FS-76-secrets-env-inventory.md until
-# per-service env schemas land.
+# - Web stays on Vercel (no Render web service for apps/web).
+# - PostgreSQL is Neon (no `databases:` block). DATABASE_URL is entered by hand (sync: false).
+# - Key Value is required: BullMQ (packages/jobs) needs REDIS_URL, persistence and noeviction.
+# - Every service loads the full @fsm/config schema at boot, so each gets every required key.
+# - Secrets/env values are entered by name only (sync: false); never commit values here.
+# - region must match the Neon project region (STACK-12): Neon is US East (Ohio), so region: ohio.
 
 services:
   - type: keyvalue
     name: renvani-bullmq-kv
-    plan: starter
+    plan: 256mb
+    region: ohio
     maxmemoryPolicy: noeviction
+    persistenceMode: journal-snapshot
     ipAllowList: []
 
   - type: web
     name: renvani-api
     runtime: node
-    plan: starter
-    buildCommand: corepack enable && corepack pnpm install --frozen-lockfile && corepack pnpm build
+    plan: 0.5c-512mb
+    region: ohio
+    branch: dev
+    autoDeployTrigger: "off"
+    buildCommand: corepack enable && corepack pnpm install --frozen-lockfile --prod=false && corepack pnpm -r --filter @fsm/import-normalize --filter @fsm/types --filter @fsm/comms build && corepack pnpm -r --filter @fsm/import-engine --filter @fsm/config --filter @fsm/db --filter @fsm/jobs --filter @fsm/ai --filter @fsm/api --filter @fsm/worker --filter @fsm/webhook build
     preDeployCommand: corepack pnpm --filter @fsm/db db:migrate
     startCommand: corepack pnpm --filter @fsm/api start
-    healthCheckPath: /health
+    healthCheckPath: /health/live
     envVars:
       - key: NODE_ENV
-        value: production
-      - key: DATABASE_URL
-        sync: false
+        value: "production"
+      - key: NODE_VERSION
+        value: "22.16.0"
+      - key: COREPACK_ENABLE_DOWNLOAD_PROMPT
+        value: "0"
+      - key: ACCESS_TOKEN_TTL_SECONDS
+        value: "900"
+      - key: REFRESH_TOKEN_TTL_SECONDS
+        value: "2592000"
+      - key: RESET_TOKEN_TTL_SECONDS
+        value: "3600"
+      - key: FSM_PROCESS_ROLE
+        value: "api"
+      - key: TRUST_PROXY_HOPS
+        value: "1"
+      - key: GLOBAL_RATE_LIMIT_ENABLED
+        value: "false"
+      - key: QUICKBOOKS_ENVIRONMENT
+        value: "sandbox"
       - key: REDIS_URL
         fromService:
           type: keyvalue
           name: renvani-bullmq-kv
           property: connectionString
-      - key: APP_URL
-        sync: false
-      - key: JWT_SECRET
-        sync: false
-      - key: JWT_REFRESH_SECRET
-        sync: false
-      - key: BOOKING_HOLD_TOKEN_SECRET
-        sync: false
-      - key: ACCESS_TOKEN_TTL_SECONDS
-        sync: false
-      - key: REFRESH_TOKEN_TTL_SECONDS
-        sync: false
-      - key: RESET_TOKEN_TTL_SECONDS
+      - key: DATABASE_URL
         sync: false
       - key: STRIPE_SECRET_KEY
         sync: false
@@ -62,46 +66,98 @@ services:
         sync: false
       - key: STRIPE_CONNECT_CLIENT_ID
         sync: false
-      - key: STRIPE_PLATFORM_FEE_PERCENT
-        sync: false
       - key: OPENAI_API_KEY
         sync: false
       - key: TWILIO_ACCOUNT_SID
         sync: false
       - key: TWILIO_AUTH_TOKEN
         sync: false
-      - key: TWILIO_FROM_NUMBER
-        sync: false
       - key: SENDGRID_API_KEY
-        sync: false
-      - key: SENDGRID_FROM_EMAIL
-        sync: false
-      - key: R2_ACCOUNT_ID
         sync: false
       - key: R2_ACCESS_KEY_ID
         sync: false
       - key: R2_SECRET_ACCESS_KEY
         sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_REFRESH_SECRET
+        sync: false
+      - key: BOOKING_HOLD_TOKEN_SECRET
+        sync: false
+      - key: APP_URL
+        sync: false
+      - key: TWILIO_FROM_NUMBER
+        sync: false
+      - key: SENDGRID_FROM_EMAIL
+        sync: false
+      - key: R2_ACCOUNT_ID
+        sync: false
       - key: R2_BUCKET_NAME
+        sync: false
+      - key: STRIPE_PLATFORM_FEE_PERCENT
+        sync: false
+      - key: RENVANI_DEPLOYMENT_TIER
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: RESEND_FROM_EMAIL
+        sync: false
+      - key: SENTRY_DSN
+        sync: false
+      - key: CLERK_SECRET_KEY
+        sync: false
+      - key: CLERK_WEBHOOK_SECRET
+        sync: false
+      - key: CLERK_AUTHORIZED_PARTIES
+        sync: false
+      - key: QUICKBOOKS_CLIENT_ID
+        sync: false
+      - key: QUICKBOOKS_CLIENT_SECRET
+        sync: false
+      - key: QUICKBOOKS_REDIRECT_URI
+        sync: false
+      - key: QUICKBOOKS_TOKEN_ENCRYPTION_KEY
         sync: false
 
   - type: worker
     name: renvani-worker
     runtime: node
-    plan: starter
-    buildCommand: corepack enable && corepack pnpm install --frozen-lockfile && corepack pnpm build
+    plan: 0.5c-512mb
+    region: ohio
+    branch: dev
+    autoDeployTrigger: "off"
+    buildCommand: corepack enable && corepack pnpm install --frozen-lockfile --prod=false && corepack pnpm -r --filter @fsm/import-normalize --filter @fsm/types --filter @fsm/comms build && corepack pnpm -r --filter @fsm/import-engine --filter @fsm/config --filter @fsm/db --filter @fsm/jobs --filter @fsm/ai --filter @fsm/api --filter @fsm/worker --filter @fsm/webhook build
     startCommand: corepack pnpm --filter @fsm/worker start
+    maxShutdownDelaySeconds: 120
     envVars:
       - key: NODE_ENV
-        value: production
-      - key: DATABASE_URL
-        sync: false
+        value: "production"
+      - key: NODE_VERSION
+        value: "22.16.0"
+      - key: COREPACK_ENABLE_DOWNLOAD_PROMPT
+        value: "0"
+      - key: ACCESS_TOKEN_TTL_SECONDS
+        value: "900"
+      - key: REFRESH_TOKEN_TTL_SECONDS
+        value: "2592000"
+      - key: RESET_TOKEN_TTL_SECONDS
+        value: "3600"
+      - key: FSM_PROCESS_ROLE
+        value: "worker"
+      - key: QUICKBOOKS_ENVIRONMENT
+        value: "sandbox"
       - key: REDIS_URL
         fromService:
           type: keyvalue
           name: renvani-bullmq-kv
           property: connectionString
-      - key: APP_URL
+      - key: DATABASE_URL
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: STRIPE_CONNECT_CLIENT_ID
         sync: false
       - key: OPENAI_API_KEY
         sync: false
@@ -109,49 +165,114 @@ services:
         sync: false
       - key: TWILIO_AUTH_TOKEN
         sync: false
-      - key: TWILIO_FROM_NUMBER
-        sync: false
       - key: SENDGRID_API_KEY
-        sync: false
-      - key: SENDGRID_FROM_EMAIL
-        sync: false
-      - key: R2_ACCOUNT_ID
         sync: false
       - key: R2_ACCESS_KEY_ID
         sync: false
       - key: R2_SECRET_ACCESS_KEY
         sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_REFRESH_SECRET
+        sync: false
+      - key: BOOKING_HOLD_TOKEN_SECRET
+        sync: false
+      - key: APP_URL
+        sync: false
+      - key: TWILIO_FROM_NUMBER
+        sync: false
+      - key: SENDGRID_FROM_EMAIL
+        sync: false
+      - key: R2_ACCOUNT_ID
+        sync: false
       - key: R2_BUCKET_NAME
         sync: false
-      - key: STRIPE_SECRET_KEY
-        sync: false
       - key: STRIPE_PLATFORM_FEE_PERCENT
+        sync: false
+      - key: RENVANI_DEPLOYMENT_TIER
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: RESEND_FROM_EMAIL
+        sync: false
+      - key: SENTRY_DSN
+        sync: false
+      - key: QUICKBOOKS_CLIENT_ID
+        sync: false
+      - key: QUICKBOOKS_CLIENT_SECRET
+        sync: false
+      - key: QUICKBOOKS_TOKEN_ENCRYPTION_KEY
         sync: false
 
   - type: web
     name: renvani-webhook
     runtime: node
-    plan: starter
-    buildCommand: corepack enable && corepack pnpm install --frozen-lockfile && corepack pnpm build
+    plan: 0.5c-512mb
+    region: ohio
+    branch: dev
+    autoDeployTrigger: "off"
+    buildCommand: corepack enable && corepack pnpm install --frozen-lockfile --prod=false && corepack pnpm -r --filter @fsm/import-normalize --filter @fsm/types --filter @fsm/comms build && corepack pnpm -r --filter @fsm/import-engine --filter @fsm/config --filter @fsm/db --filter @fsm/jobs --filter @fsm/ai --filter @fsm/api --filter @fsm/worker --filter @fsm/webhook build
     startCommand: corepack pnpm --filter @fsm/webhook start
     healthCheckPath: /health
     envVars:
       - key: NODE_ENV
-        value: production
-      - key: DATABASE_URL
-        sync: false
+        value: "production"
+      - key: NODE_VERSION
+        value: "22.16.0"
+      - key: COREPACK_ENABLE_DOWNLOAD_PROMPT
+        value: "0"
+      - key: ACCESS_TOKEN_TTL_SECONDS
+        value: "900"
+      - key: REFRESH_TOKEN_TTL_SECONDS
+        value: "2592000"
+      - key: RESET_TOKEN_TTL_SECONDS
+        value: "3600"
+      - key: FSM_PROCESS_ROLE
+        value: "webhook"
       - key: REDIS_URL
         fromService:
           type: keyvalue
           name: renvani-bullmq-kv
           property: connectionString
-      - key: APP_URL
+      - key: DATABASE_URL
         sync: false
       - key: STRIPE_SECRET_KEY
         sync: false
       - key: STRIPE_WEBHOOK_SECRET
         sync: false
+      - key: STRIPE_CONNECT_CLIENT_ID
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: TWILIO_ACCOUNT_SID
+        sync: false
       - key: TWILIO_AUTH_TOKEN
         sync: false
+      - key: SENDGRID_API_KEY
+        sync: false
+      - key: R2_ACCESS_KEY_ID
+        sync: false
+      - key: R2_SECRET_ACCESS_KEY
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_REFRESH_SECRET
+        sync: false
+      - key: BOOKING_HOLD_TOKEN_SECRET
+        sync: false
+      - key: APP_URL
+        sync: false
       - key: TWILIO_FROM_NUMBER
+        sync: false
+      - key: SENDGRID_FROM_EMAIL
+        sync: false
+      - key: R2_ACCOUNT_ID
+        sync: false
+      - key: R2_BUCKET_NAME
+        sync: false
+      - key: STRIPE_PLATFORM_FEE_PERCENT
+        sync: false
+      - key: RENVANI_DEPLOYMENT_TIER
+        sync: false
+      - key: SENTRY_DSN
         sync: false

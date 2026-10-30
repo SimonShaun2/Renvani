@@ -44,6 +44,21 @@ export {
 export { FS_MIGRATE_RLS_POLICY_CATALOG, type RlsPolicySpec } from "./rls-policy-catalog.js";
 export { renderRlsPolicyStatements, renderStack10RlsMigrationSql } from "./rls-migration-sql.js";
 export { runTransactionWithTenantSession } from "./run-with-tenant-session.js";
+export {
+  createOrGetIntegrationOutboxOperation,
+  getIntegrationOutboxOperationById,
+  listIntegrationOutboxAuditEvents,
+  listIntegrationOutboxOperations,
+  recordIntegrationOutboxRetryReceipt,
+  type CreateIntegrationOutboxOperationInput
+} from "./integration-outbox.service.js";
+export {
+  getStripeDisputeById,
+  listStripeDisputes,
+  upsertStripeDisputeFromWebhook,
+  type ListStripeDisputesQuery,
+  type StripeDisputeSnapshot
+} from "./stripe-dispute.service.js";
 export { listM8ReactivationSignalsFromImportedJobHistory } from "./m8-job-history-reactivation-read.js";
 export {
   evaluateLoyaltyReminderCandidatesForCompany,
@@ -79,6 +94,13 @@ export {
   validateNoteImportRows,
   type NotesValidationResult
 } from "./import-notes-commit.js";
+export {
+  commitServiceAgreementImportRows,
+  mapServiceAgreementImportRow,
+  softDeleteServiceAgreementsImport,
+  validateServiceAgreementImportRows,
+  type ServiceAgreementsValidationResult
+} from "./import-service-agreements-commit.js";
 export { normalizeImportedPaymentMethod } from "./import-invoice-balance-commit.logic.js";
 export {
   commitImportedInvoiceRows,
@@ -111,3 +133,5 @@ export {
   commitImportedEquipmentRows,
   type ImportEquipmentEntityResolver,
 } from "./import-equipment-commit.service.js";
+export { assembleJobServiceBriefDraft, buildServiceJobBriefProposalParameters } from "./service-job-brief-assembler.js";
+export { createServiceJobBriefAgentProposal } from "./service-job-brief-proposal.js";

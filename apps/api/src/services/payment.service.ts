@@ -1,6 +1,11 @@
 import { and, eq, isNull } from "drizzle-orm";
 import { Decimal } from "decimal.js";
 
+import {
+  centsToMoneyString,
+  computeRefundableCents,
+  moneyStringToCents
+} from "@fsm/config/stripe-pricing";
 import { db, payments } from "@fsm/db";
 import {
   type ListPaymentsQuery,
@@ -25,9 +30,30 @@ function normalizePaymentStatus(value: PaymentRow["status"]): PaymentStatus {
   return value as PaymentStatus;
 }
 
+function paymentFeeFields(row: PaymentRow): Pick<
+  Payment,
+  "serviceFeeAmount" | "bookingFeeAmount" | "feeRefundable" | "amountRefunded" | "refundableAmount"
+> {
+  const amountRefunded = row.amountRefunded ?? "0.00";
+  return {
+    serviceFeeAmount: row.serviceFeeAmount ?? "0.00",
+    bookingFeeAmount: row.bookingFeeAmount ?? "0.00",
+    // Fees are non-refundable by policy regardless of stored value.
+    feeRefundable: false,
+    amountRefunded,
+    refundableAmount: centsToMoneyString(
+      computeRefundableCents({
+        amountCents: moneyStringToCents(row.amount),
+        amountRefundedCents: moneyStringToCents(amountRefunded)
+      })
+    )
+  };
+}
+
 function toPayment(row: PaymentRow): Payment {
   return {
     ...row,
+    ...paymentFeeFields(row),
     method: normalizePaymentMethod(row.method),
     status: normalizePaymentStatus(row.status)
   };

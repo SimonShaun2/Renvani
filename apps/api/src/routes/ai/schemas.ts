@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { GenerateRevenueProposalsBodySchema } from "@fsm/types";
 
 import { withZodValidation } from "../shared/validation.js";
 
@@ -388,3 +389,71 @@ export const labelPhotoRouteSchema = {
     401: errorResponseSchema
   }
 } as const;
+
+// Revenue Agent proposals (recommendation → agent action). Bodies are strict allowlists.
+export const proposeRecommendationValidation = withZodValidation({
+  params: RecommendationIdParamsSchema
+});
+
+export const generateRevenueProposalsValidation = withZodValidation({
+  body: GenerateRevenueProposalsBodySchema.default({})
+});
+
+const revenueProposalJsonSchema = {
+  type: "object",
+  additionalProperties: false,
+  required: [
+    "id", "actionType", "state", "requiresApproval", "recommendationId", "headline",
+    "estimatedRevenue", "proposedContent", "expiresAt", "createdAt"
+  ],
+  properties: {
+    id: { type: "string" },
+    actionType: { type: "string" },
+    state: { type: "string" },
+    requiresApproval: { type: "boolean" },
+    recommendationId: { type: "string" },
+    headline: { type: "string" },
+    estimatedRevenue: { type: ["string", "null"] },
+    proposedContent: {
+      type: "object",
+      additionalProperties: false,
+      required: ["channel", "subject", "body"],
+      properties: {
+        channel: { type: "string" },
+        subject: { type: ["string", "null"] },
+        body: { type: "string" }
+      }
+    },
+    expiresAt: { type: "string" },
+    createdAt: { type: "string" }
+  }
+} as const;
+
+export const proposeRecommendationRouteSchema = {
+  tags: ["ai"],
+  response: {
+    200: {
+      type: "object",
+      additionalProperties: false,
+      required: ["proposal", "created"],
+      properties: { proposal: revenueProposalJsonSchema, created: { type: "boolean" } }
+    }
+  }
+};
+
+export const generateRevenueProposalsRouteSchema = {
+  tags: ["ai"],
+  response: {
+    200: {
+      type: "object",
+      additionalProperties: false,
+      required: ["created", "existing", "skipped", "proposals"],
+      properties: {
+        created: { type: "integer" },
+        existing: { type: "integer" },
+        skipped: { type: "integer" },
+        proposals: { type: "array", items: revenueProposalJsonSchema }
+      }
+    }
+  }
+};

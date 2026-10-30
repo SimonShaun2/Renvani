@@ -38,11 +38,7 @@ import {
   type UpdateAgreementInput
 } from "@fsm/types";
 
-import {
-  computeCustomerPaidPlatformFee,
-  formatCustomerPlatformFeeLineItemName
-} from "@fsm/config/stripe-pricing";
-import { resolveCompanyConnectApplicationFeeFraction } from "../lib/company-renvani-plan.js";
+import { computeRecurringServiceFee } from "../lib/recurring-service-fee.js";
 import {
   cancelServiceAgreementSubscription,
   createServiceAgreementPrice,
@@ -890,19 +886,18 @@ export async function createAgreement(
       })).id;
     }
 
-    const connectApplicationFeeFraction = resolveCompanyConnectApplicationFeeFraction(company);
+    const serviceFee = resolvedPrice ? computeRecurringServiceFee(company, resolvedPrice) : null;
     let stripePlatformFeePriceId: string | null = null;
 
-    if (connectApplicationFeeFraction > 0 && resolvedPrice && template) {
-      const feeBreakdown = computeCustomerPaidPlatformFee(resolvedPrice, connectApplicationFeeFraction);
+    if (serviceFee && serviceFee.serviceFeeCents > 0) {
       const interval = billingCycle === "monthly" ? "month" : "year";
       stripePlatformFeePriceId = (
         await createServiceAgreementPrice({
           companyId,
           templateId: template.id,
           name: template.name,
-          productName: formatCustomerPlatformFeeLineItemName(connectApplicationFeeFraction),
-          amount: feeBreakdown.platformFeeAmount,
+          productName: serviceFee.lineItemName,
+          amount: serviceFee.serviceFeeAmount,
           interval
         })
       ).id;
@@ -916,7 +911,7 @@ export async function createAgreement(
       stripePriceId,
       stripePlatformFeePriceId,
       companyStripeAccountId: company.stripeAccountId,
-      connectApplicationFeeFraction
+      applicationFeePercent: stripePlatformFeePriceId ? serviceFee?.applicationFeePercent ?? null : null
     });
     stripeSubscriptionId = subscription.id;
     stripeCurrentPeriodStart = subscription.currentPeriodStart;

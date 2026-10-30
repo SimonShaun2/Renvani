@@ -12,6 +12,8 @@ import {
   type UpdateInvoiceItemInput
 } from "@fsm/types";
 
+import { assertPriceBookItemsInCompany } from "./price-book-item-scope.js";
+
 type InvoiceRow = typeof invoices.$inferSelect;
 type InvoiceItemRow = typeof invoiceItems.$inferSelect;
 type InvoiceExecutor = Pick<typeof db, "select" | "insert" | "update">;
@@ -31,8 +33,22 @@ function formatQuantity(value: Decimal): string {
 function toInvoiceItem(row: InvoiceItemRow): InvoiceItem {
   return {
     ...row,
+    priceBookItemId: row.productCatalogId,
     itemType: row.itemType as InvoiceItemType
   };
+}
+
+function normalizePriceBookItemId(value: string | null | undefined): string | null | undefined {
+  if (value === undefined) {
+    return undefined;
+  }
+
+  if (value === null) {
+    return null;
+  }
+
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : null;
 }
 
 async function getInvoiceRecord(
@@ -92,6 +108,7 @@ function normalizeItemInput(input: AddInvoiceItemInput | UpdateInvoiceItemInput)
   total?: string;
   isTaxable?: boolean;
   sortOrder?: number;
+  productCatalogId?: string | null;
 } {
   const normalizedQuantity =
     input.quantity !== undefined ? formatQuantity(new Decimal(input.quantity)) : undefined;
@@ -112,7 +129,10 @@ function normalizeItemInput(input: AddInvoiceItemInput | UpdateInvoiceItemInput)
         : {}
     ),
     ...(input.isTaxable !== undefined ? { isTaxable: input.isTaxable } : {}),
-    ...(input.sortOrder !== undefined ? { sortOrder: input.sortOrder } : {})
+    ...(input.sortOrder !== undefined ? { sortOrder: input.sortOrder } : {}),
+    ...(input.priceBookItemId !== undefined
+      ? { productCatalogId: normalizePriceBookItemId(input.priceBookItemId) ?? null }
+      : {})
   };
 }
 
@@ -137,6 +157,7 @@ export async function addItem(
     assertDraftInvoice(invoice);
 
     const normalizedInput = normalizeItemInput(input);
+    await assertPriceBookItemsInCompany(tx, companyId, [normalizedInput.productCatalogId]);
     const insertedItems = await tx
       .insert(invoiceItems)
       .values({
@@ -151,7 +172,10 @@ export async function addItem(
           normalizedInput.total ??
           formatMoney(new Decimal(input.quantity).mul(input.unitPrice)),
         isTaxable: normalizedInput.isTaxable ?? true,
-        sortOrder: normalizedInput.sortOrder ?? 0
+        sortOrder: normalizedInput.sortOrder ?? 0,
+        ...(normalizedInput.productCatalogId !== undefined
+          ? { productCatalogId: normalizedInput.productCatalogId }
+          : {})
       })
       .returning();
     const item = insertedItems[0];
@@ -178,6 +202,7 @@ export async function updateItem(
 
     const existingItem = await getInvoiceItemRecord(companyId, invoiceId, itemId, tx);
     const normalizedInput = normalizeItemInput(input);
+    await assertPriceBookItemsInCompany(tx, companyId, [normalizedInput.productCatalogId]);
     const nextQuantity = normalizedInput.quantity ?? existingItem.quantity;
     const nextUnitPrice = normalizedInput.unitPrice ?? existingItem.unitPrice;
     const updatedItems = await tx
@@ -191,6 +216,9 @@ export async function updateItem(
         total: formatMoney(new Decimal(nextQuantity).mul(nextUnitPrice)),
         ...(normalizedInput.isTaxable !== undefined ? { isTaxable: normalizedInput.isTaxable } : {}),
         ...(normalizedInput.sortOrder !== undefined ? { sortOrder: normalizedInput.sortOrder } : {}),
+        ...(normalizedInput.productCatalogId !== undefined
+          ? { productCatalogId: normalizedInput.productCatalogId }
+          : {}),
         updatedAt: new Date()
       })
       .where(and(eq(invoiceItems.companyId, companyId), eq(invoiceItems.id, itemId), isNull(invoiceItems.deletedAt)))

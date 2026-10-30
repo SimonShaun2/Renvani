@@ -1,0 +1,11 @@
+/* FS-179: 8px slide-in for portal sections; static under reduced motion. */
+@keyframes customer-portal-slide-in {
+  from { transform: translateY(8px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-portal-reveal] {
+    animation: customer-portal-slide-in 220ms ease-out both;
+  }
+}

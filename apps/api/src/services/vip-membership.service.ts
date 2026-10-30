@@ -7,10 +7,6 @@ import {
   buildVipMembershipJoinUrl,
   signVipMembershipJoinToken
 } from "@fsm/config/vip-membership-portal-token";
-import {
-  computeCustomerPaidPlatformFee,
-  formatCustomerPlatformFeeLineItemName
-} from "@fsm/config/stripe-pricing";
 import { env } from "@fsm/config";
 import {
   companies,
@@ -22,7 +18,7 @@ import {
 } from "@fsm/db";
 import { AppError, ErrorCode, type ServiceAgreementStripeStatus } from "@fsm/types";
 
-import { resolveCompanyConnectApplicationFeeFraction } from "../lib/company-renvani-plan.js";
+import { computeRecurringServiceFee } from "../lib/recurring-service-fee.js";
 import {
   cancelServiceAgreementSubscription,
   createServiceAgreementPrice,
@@ -270,18 +266,17 @@ export async function createVipMembershipCheckout(
       .where(and(eq(customers.companyId, companyId), eq(customers.id, customer.id)));
   }
 
-  const connectApplicationFeeFraction = resolveCompanyConnectApplicationFeeFraction(company);
+  const serviceFee = computeRecurringServiceFee(company, tier.monthlyPrice);
   let stripePlatformFeePriceId: string | null = null;
 
-  if (connectApplicationFeeFraction > 0) {
-    const feeBreakdown = computeCustomerPaidPlatformFee(tier.monthlyPrice, connectApplicationFeeFraction);
+  if (serviceFee.serviceFeeCents > 0) {
     stripePlatformFeePriceId = (
       await createServiceAgreementPrice({
         companyId,
         templateId: tier.id,
         name: tier.name,
-        productName: formatCustomerPlatformFeeLineItemName(connectApplicationFeeFraction),
-        amount: feeBreakdown.platformFeeAmount,
+        productName: serviceFee.lineItemName,
+        amount: serviceFee.serviceFeeAmount,
         interval: "month"
       })
     ).id;
@@ -302,7 +297,7 @@ export async function createVipMembershipCheckout(
     planId,
     stripeTierPriceId,
     stripePlatformFeePriceId,
-    connectApplicationFeeFraction,
+    applicationFeePercent: stripePlatformFeePriceId ? serviceFee.applicationFeePercent : null,
     joinToken
   });
 
@@ -341,9 +336,14 @@ export async function getPublicVipJoinPreview(joinToken: string): Promise<{
     throw error;
   }
 
-  const fraction = resolveCompanyConnectApplicationFeeFraction(company);
+  const serviceFee = computeRecurringServiceFee(company, tier.monthlyPrice);
   const fee =
-    fraction > 0 ? computeCustomerPaidPlatformFee(tier.monthlyPrice, fraction) : null;
+    serviceFee.serviceFeeCents > 0
+      ? {
+          platformFeeAmount: serviceFee.serviceFeeAmount,
+          platformFeePercent: serviceFee.serviceFeeRateBps / 100
+        }
+      : null;
 
   const totalDue = fee
     ? new Decimal(tier.monthlyPrice).add(fee.platformFeeAmount).toFixed(2)

@@ -1,3 +1,4 @@
+import "../../services/revenue-agent/revenue-proposal.kinds.js";
 import type { FastifyPluginAsync } from "fastify";
 
 import { requireRole } from "../../lib/authorize.js";

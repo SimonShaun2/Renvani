@@ -6,6 +6,7 @@ import {
   db,
   emitEventWithExecutor,
   fieldSyncBatches,
+  fileAttachments,
   fieldSyncOperations,
   jobs,
   jobTasks,
@@ -27,6 +28,12 @@ import {
   type UserRole
 } from "@fsm/types";
 
+import {
+  isJobSignatureObjectRef,
+  resolveTenantAttachmentObjectKey,
+  toJobSignatureObjectRef
+} from "../lib/job-signature-ref.js";
+
 import { addNote, addPhoto, transitionStatus } from "./job.service.js";
 import { updateTask } from "./job-tasks.service.js";
 
@@ -37,6 +44,62 @@ export interface FieldWorkSyncActor {
   companyId: string;
   userId: string;
   role: UserRole;
+}
+
+export const SIGNATURE_ATTACHMENT_INVALID = "SIGNATURE_ATTACHMENT_INVALID";
+const SIGNATURE_IMAGE_MIME_TYPES = new Set(["image/png", "image/jpeg", "image/webp"]);
+/** Signatures are small line drawings; anything larger is not a signature pad export. */
+const MAX_SIGNATURE_BYTES = 5 * 1024 * 1024;
+
+type SignatureCapturePayload = {
+  attachmentId?: string | undefined;
+  signatureUrl?: string | undefined;
+  signedByName: string;
+};
+
+async function resolveSignatureCaptureValue(
+  companyId: string,
+  jobId: string,
+  payload: SignatureCapturePayload
+): Promise<{ ok: true; value: string } | { ok: false; message: string }> {
+  if (!payload.attachmentId) {
+    return payload.signatureUrl
+      ? { ok: true, value: payload.signatureUrl }
+      : { ok: false, message: "Provide exactly one of attachmentId or signatureUrl" };
+  }
+
+  // Same generic message for missing / other job / other tenant: no existence leak.
+  const notUsable = { ok: false as const, message: "Signature attachment not found on this job" };
+  const [attachment] = await db
+    .select()
+    .from(fileAttachments)
+    .where(
+      and(
+        eq(fileAttachments.companyId, companyId),
+        eq(fileAttachments.id, payload.attachmentId),
+        isNull(fileAttachments.deletedAt)
+      )
+    )
+    .limit(1);
+
+  if (!attachment || attachment.companyId !== companyId) {
+    return notUsable;
+  }
+  const onJob = attachment.jobId === jobId || (attachment.entityType === "job" && attachment.entityId === jobId);
+  if (!onJob) {
+    return notUsable;
+  }
+  if (!attachment.mimeType || !SIGNATURE_IMAGE_MIME_TYPES.has(attachment.mimeType)) {
+    return { ok: false, message: "Signature attachment must be a PNG, JPEG, or WebP image" };
+  }
+  if (!attachment.fileSizeBytes || attachment.fileSizeBytes <= 0 || attachment.fileSizeBytes > MAX_SIGNATURE_BYTES) {
+    return { ok: false, message: "Signature attachment size is invalid" };
+  }
+  const objectKey = resolveTenantAttachmentObjectKey(companyId, attachment.fileUrl);
+  if (!objectKey) {
+    return notUsable;
+  }
+  return { ok: true, value: toJobSignatureObjectRef(objectKey) };
 }
 
 function hashPayload(value: unknown): string {
@@ -53,6 +116,7 @@ function toOperationResult(row: OperationRow) {
     recordVersion: typeof resultPayload.recordVersion === "string" ? resultPayload.recordVersion : undefined,
     entityId: typeof resultPayload.entityId === "string" ? resultPayload.entityId : undefined,
     message: typeof resultPayload.message === "string" ? resultPayload.message : undefined,
+    code: typeof resultPayload.code === "string" ? resultPayload.code : undefined,
     conflict:
       resultPayload.conflict && typeof resultPayload.conflict === "object"
         ? (resultPayload.conflict as { liveRecordVersion: string; reason: string })
@@ -306,14 +370,23 @@ async function applyOperation(
         return buildFieldWorkSyncVersionConflict(liveVersion, "Job recordVersion is stale");
       }
 
-      if (job.signatureUrl && job.signatureUrl !== operation.payload.signatureUrl) {
+      const resolvedSignature = await resolveSignatureCaptureValue(actor.companyId, operation.jobId, operation.payload);
+      if (!resolvedSignature.ok) {
+        return {
+          outcome: "rejected",
+          resultPayload: { code: SIGNATURE_ATTACHMENT_INVALID, message: resolvedSignature.message }
+        };
+      }
+      const signatureValue = resolvedSignature.value;
+
+      if (job.signatureUrl && job.signatureUrl !== signatureValue) {
         return buildFieldWorkSyncVersionConflict(
           liveVersion,
           "Job already has a different signature on file"
         );
       }
 
-      if (job.signatureUrl === operation.payload.signatureUrl) {
+      if (job.signatureUrl === signatureValue) {
         return {
           outcome: "applied",
           resultPayload: {
@@ -328,8 +401,8 @@ async function applyOperation(
       const updatedRows = await db
         .update(jobs)
         .set({
-          signatureUrl: operation.payload.signatureUrl,
-          signedByName: operation.payload.signedByName,
+          signatureUrl: signatureValue,
+          signedByName: operation.payload.signedByName.trim(),
           signedAt,
           updatedAt: signedAt
         })
@@ -352,7 +425,10 @@ async function applyOperation(
         jobId: updated.id,
         customerId: updated.customerId,
         summary: `Captured customer signature on job ${updated.jobNumber}`,
-        payload: { signatureUrl: updated.signatureUrl }
+        // Never put the internal storage reference on the event bus.
+        payload: isJobSignatureObjectRef(updated.signatureUrl)
+          ? { signatureAttachmentId: operation.payload.attachmentId ?? null }
+          : { signatureUrl: updated.signatureUrl }
       });
 
       return {

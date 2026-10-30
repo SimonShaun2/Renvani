@@ -28,6 +28,9 @@ import { getStoredSession } from "@/src/lib/auth";
 import { ApiError } from "@/src/lib/api";
 import { cn, formatDate } from "@/src/lib/utils";
 import { useAuthStore } from "@/src/stores/auth.store";
+import { formatServiceFeeLineItemName } from "@fsm/config/stripe-pricing";
+
+const VIP_TIER_FEE_NOTE = `Monthly price goes to the shop in full. The ${formatServiceFeeLineItemName()} is paid by the customer at checkout (none on the Flat plan).`;
 import { showToast } from "@/src/stores/toast.store";
 
 type MemberFilter = "all" | "active" | "grace" | "paused" | "cancelled";
@@ -596,7 +599,7 @@ export function VipOperatorConsoleClient() {
       <Sheet
         open={tierSheetOpen}
         title={editingTier ? "Edit VIP tier" : "New VIP tier"}
-        description="Monthly price flows to the shop in full; platform fee is a separate recurring line at checkout."
+        description={VIP_TIER_FEE_NOTE}
         onClose={() => setTierSheetOpen(false)}
       >
         <div className="space-y-4">

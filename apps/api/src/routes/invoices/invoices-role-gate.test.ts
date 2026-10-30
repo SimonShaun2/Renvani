@@ -129,7 +129,8 @@ const gatedRoutes: Array<{ method: "get" | "post" | "patch" | "delete"; path: st
   { method: "post", path: `/api/v1/invoices/${id}/items`, body: { name: "Labor", quantity: 1, unitPrice: 10 } },
   { method: "patch", path: `/api/v1/invoices/${id}/items/${itemId}`, body: { quantity: 2 } },
   { method: "delete", path: `/api/v1/invoices/${id}/items/${itemId}` },
-  { method: "get", path: `/api/v1/invoices/${id}/payments` },
+  // GET /invoices/:id/payments is technician-scoped (own job only, else 404) by #252; covered in
+  // routes/jobs/technician-authz-followup.test.ts, so it is not part of the blanket 403 list.
   { method: "post", path: `/api/v1/service-agreements/${id}/retry-payment`, body: {} }
 ];
 

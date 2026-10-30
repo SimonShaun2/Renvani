@@ -1,5 +1,11 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 
+import {
+  assertTechnicianAssignedToJob,
+  isTechnicianCaller,
+  resolveCallerTechnicianId
+} from "../../lib/technician-scope.js";
+import { withSignedJobSignature } from "../../lib/job-signature-ref.js";
 import type {
   ActivityEvent,
   AddNoteInput,
@@ -36,6 +42,10 @@ import {
   reorderTasks,
   updateTask
 } from "../../services/job-tasks.service.js";
+import {
+  getJobPreparationStatus,
+  getJobServiceBrief
+} from "../../services/job-service-brief.service.js";
 import {
   addNote,
   addPhoto,
@@ -184,6 +194,7 @@ function toJobNoteResponse(note: JobNote) {
     jobId: note.jobId,
     authorId: note.authorId,
     content: note.content,
+    noteKind: note.noteKind,
     isInternal: note.isInternal,
     createdAt: note.createdAt.toISOString(),
     updatedAt: note.updatedAt.toISOString(),
@@ -274,7 +285,16 @@ function toActivityEventResponse(event: ActivityEvent) {
 }
 
 export async function listJobsHandler(request: FastifyRequest, reply: FastifyReply): Promise<FastifyReply> {
-  const result = await listJobs(request.company.id, request.query as ListJobsQuery);
+  const query = request.query as ListJobsQuery;
+  if (isTechnicianCaller(request)) {
+    // Technicians only ever see their own jobs; any client technicianId is overridden.
+    const ownTechnicianId = await resolveCallerTechnicianId(request);
+    if (!ownTechnicianId) {
+      return reply.send({ data: [], total: 0, page: query.page ?? 1, limit: query.limit ?? 0, totalPages: 0 });
+    }
+    query.technicianId = ownTechnicianId;
+  }
+  const result = await listJobs(request.company.id, query);
 
   return reply.send({
     data: result.data.map((job) => toJobListItemResponse(job)),
@@ -290,16 +310,17 @@ export async function createJobHandler(request: FastifyRequest, reply: FastifyRe
   const detail = await getJob(request.company.id, job.id);
 
   return reply.status(201).send({
-    job: toJobDetailResponse(detail)
+    job: toJobDetailResponse(await withSignedJobSignature(detail))
   });
 }
 
 export async function getJobHandler(request: FastifyRequest, reply: FastifyReply): Promise<FastifyReply> {
   const params = request.params as JobIdParams;
+  await assertTechnicianAssignedToJob(request, params.id, { onUnassigned: "not_found" });
   const job = await getJob(request.company.id, params.id);
 
   return reply.send({
-    job: toJobDetailResponse(job)
+    job: toJobDetailResponse(await withSignedJobSignature(job))
   });
 }
 
@@ -308,7 +329,7 @@ export async function updateJobHandler(request: FastifyRequest, reply: FastifyRe
   const detail = await patchJob(request.company.id, request.user.id, params.id, request.body as UpdateJobInput);
 
   return reply.send({
-    job: toJobDetailResponse(detail)
+    job: toJobDetailResponse(await withSignedJobSignature(detail))
   });
 }
 
@@ -322,7 +343,7 @@ export async function transitionStatusHandler(
   const detail = await getJob(request.company.id, params.id);
 
   return reply.send({
-    job: toJobDetailResponse(detail)
+    job: toJobDetailResponse(await withSignedJobSignature(detail))
   });
 }
 
@@ -336,7 +357,7 @@ export async function assignTechnicianHandler(
   const detail = await getJob(request.company.id, params.id);
 
   return reply.send({
-    job: toJobDetailResponse(detail)
+    job: toJobDetailResponse(await withSignedJobSignature(detail))
   });
 }
 
@@ -346,17 +367,18 @@ export async function scheduleJobHandler(request: FastifyRequest, reply: Fastify
   const detail = await getJob(request.company.id, params.id);
 
   return reply.send({
-    job: toJobDetailResponse(detail)
+    job: toJobDetailResponse(await withSignedJobSignature(detail))
   });
 }
 
 export async function completeJobHandler(request: FastifyRequest, reply: FastifyReply): Promise<FastifyReply> {
   const params = request.params as JobIdParams;
+  await assertTechnicianAssignedToJob(request, params.id);
   await completeJob(request.company.id, request.user.id, params.id, request.body as CompleteJobInput);
   const detail = await getJob(request.company.id, params.id);
 
   return reply.send({
-    job: toJobDetailResponse(detail)
+    job: toJobDetailResponse(await withSignedJobSignature(detail))
   });
 }
 
@@ -376,6 +398,26 @@ export async function getNotesHandler(request: FastifyRequest, reply: FastifyRep
   return reply.send({
     notes: notes.map((note) => toJobNoteResponse(note))
   });
+}
+
+export async function getJobServiceBriefHandler(
+  request: FastifyRequest,
+  reply: FastifyReply
+): Promise<FastifyReply> {
+  const params = request.params as JobIdParams;
+  const brief = await getJobServiceBrief(request.company.id, params.id);
+
+  return reply.send({ brief });
+}
+
+export async function getJobPreparationStatusHandler(
+  request: FastifyRequest,
+  reply: FastifyReply
+): Promise<FastifyReply> {
+  const params = request.params as JobIdParams;
+  const status = await getJobPreparationStatus(request.company.id, params.id);
+
+  return reply.send({ preparation: status });
 }
 
 export async function addPhotoHandler(request: FastifyRequest, reply: FastifyReply): Promise<FastifyReply> {
@@ -430,6 +472,7 @@ export async function updateTaskHandler(request: FastifyRequest, reply: FastifyR
 
 export async function completeTaskHandler(request: FastifyRequest, reply: FastifyReply): Promise<FastifyReply> {
   const params = request.params as TaskIdParams;
+  await assertTechnicianAssignedToJob(request, params.id);
   const task = await completeTask(request.company.id, params.id, params.taskId, request.user.id);
 
   return reply.send({

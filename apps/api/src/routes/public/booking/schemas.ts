@@ -194,7 +194,8 @@ export const publicBookingRouteSchema = {
             serviceAreaNames: { type: "array", items: { type: "string" } },
             timezone: { type: "string" },
             trade: { anyOf: [{ type: "string", enum: [...HOME_SERVICE_TRADES] }, { type: "null" }] },
-            tradeSchemaType: nullableStringSchema
+            tradeSchemaType: nullableStringSchema,
+            tradeDescription: nullableStringSchema
           }
         }
       }

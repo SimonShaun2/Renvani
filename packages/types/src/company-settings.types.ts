@@ -54,4 +54,6 @@ export interface CompanySettings {
   vipMembership?: CompanyVipMembershipSettings | null;
   /** Growth: shop-selected home-services trade (`hvac|plumbing|electrical|other`), owner/admin set. */
   trade?: string | null;
+  /** Growth: "Describe your trade" (only for trade "other", max 100 chars). */
+  tradeDescription?: string | null;
 }

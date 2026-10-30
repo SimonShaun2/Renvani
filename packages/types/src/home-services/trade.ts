@@ -75,7 +75,30 @@ export function parseHomeServiceTrade(value: unknown): HomeServiceTrade | null {
   return parsed.success ? parsed.data : null;
 }
 
-export const UpdateCompanyTradeBodySchema = z.object({ trade: HomeServiceTradeSchema }).strict();
+export const TRADE_DESCRIPTION_MAX_LENGTH = 100;
+
+/**
+ * `tradeDescription` ("Describe your trade"): trimmed, max 100 chars. Required (non-empty) when trade is "other";
+ * ignored and cleared for any other trade.
+ */
+export const UpdateCompanyTradeBodySchema = z
+  .object({
+    trade: HomeServiceTradeSchema,
+    tradeDescription: z.string().trim().max(TRADE_DESCRIPTION_MAX_LENGTH).nullable().optional()
+  })
+  .strict()
+  .superRefine((body, ctx) => {
+    if (body.trade === "other" && !body.tradeDescription) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["tradeDescription"], message: 'Describe your trade when trade is "other"' });
+    }
+  });
+
+/** Stored description, only meaningful for trade "other"; null otherwise. */
+export function parseTradeDescription(trade: HomeServiceTrade | null, value: unknown): string | null {
+  if (trade !== "other" || typeof value !== "string") return null;
+  const trimmed = value.trim().slice(0, TRADE_DESCRIPTION_MAX_LENGTH);
+  return trimmed.length > 0 ? trimmed : null;
+}
 export type UpdateCompanyTradeBody = z.infer<typeof UpdateCompanyTradeBodySchema>;
 
 export const TradeServicesQuerySchema = z.object({ trade: HomeServiceTradeSchema.optional() }).strict();

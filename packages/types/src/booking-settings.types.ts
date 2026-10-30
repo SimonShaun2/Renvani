@@ -72,4 +72,6 @@ export interface PublicBookingSettings {
   trade?: HomeServiceTrade | null;
   /** schema.org @type for the site JSON-LD derived from `trade`, or null when unset. */
   tradeSchemaType?: string | null;
+  /** "Describe your trade" when trade is "other", else null. */
+  tradeDescription?: string | null;
 }

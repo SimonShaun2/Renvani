@@ -7,13 +7,14 @@ import type { HomeServiceTrade } from "@fsm/types";
 import { useCompanyTrade, useUpdateCompanyTrade } from "@/src/hooks/company-trade.hooks";
 
 import { TRADE_OPTIONS, TRADE_PICKER_COPY as COPY } from "./trade-picker.config";
-import { buildTradePayload, validateTradeSelection, type TradePickerStatus } from "./trade-picker.utils";
+import { buildTradePayload, TRADE_DESCRIBE_MAX, validateTradeSelection, type TradePickerStatus } from "./trade-picker.utils";
 
 /** Settings / Company trade (Figma 309:3333, "Other" field 309:3498). */
 export function TradePicker({ companyName }: { companyName?: string | undefined }) {
   const tradeQuery = useCompanyTrade();
   const updateTrade = useUpdateCompanyTrade();
   const savedTrade = tradeQuery.data?.trade.trade ?? null;
+  const savedDescribe = tradeQuery.data?.trade.tradeDescription ?? "";
 
   const [selected, setSelected] = useState<HomeServiceTrade | null>(savedTrade);
   const [describe, setDescribe] = useState("");
@@ -21,10 +22,13 @@ export function TradePicker({ companyName }: { companyName?: string | undefined 
   const [phase, setPhase] = useState<"idle" | "saving" | "error" | "saved">("idle");
 
   useEffect(() => {
-    if (savedTrade && selected === null) setSelected(savedTrade);
-  }, [savedTrade, selected]);
+    if (savedTrade && selected === null) {
+      setSelected(savedTrade);
+      setDescribe(savedDescribe);
+    }
+  }, [savedTrade, savedDescribe, selected]);
 
-  const dirty = selected !== null && (selected !== savedTrade || selected === "other");
+  const dirty = selected !== null && (selected !== savedTrade || (selected === "other" && describe.trim() !== savedDescribe));
   const status: TradePickerStatus =
     phase === "saving" ? "saving" : phase === "error" ? "error" : phase === "saved" ? "saved" : dirty ? "selected" : "default";
   const canSave = status === "selected" || status === "error";
@@ -43,7 +47,7 @@ export function TradePicker({ companyName }: { companyName?: string | undefined 
     }
     setPhase("saving");
     try {
-      await updateTrade.mutateAsync(buildTradePayload(selected));
+      await updateTrade.mutateAsync(buildTradePayload(selected, describe));
       setPhase("saved");
     } catch {
       setPhase("error");
@@ -132,6 +136,7 @@ export function TradePicker({ companyName }: { companyName?: string | undefined 
             <input
               value={describe}
               required
+              maxLength={TRADE_DESCRIBE_MAX}
               aria-invalid={describeError}
               disabled={status === "saving"}
               placeholder={COPY.describePlaceholder}

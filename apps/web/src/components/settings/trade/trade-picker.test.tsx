@@ -60,7 +60,7 @@ describe("TradePicker (309:3333)", () => {
     expect(status()).toBe("saved");
   });
 
-  it("Other empty (309:3499) → error (309:3575) → filled (309:3537); describe text is not sent", async () => {
+  it("Other empty (309:3499) → error (309:3575) → filled (309:3537); sends tradeDescription", async () => {
     m.mutate.mockResolvedValueOnce({});
     render(<TradePicker />);
     fireEvent.click(radio(/Other/));
@@ -72,7 +72,7 @@ describe("TradePicker (309:3333)", () => {
     expect(m.mutate).not.toHaveBeenCalled();
     fireEvent.change(input, { target: { value: "Garage door service" } });
     await act(async () => fireEvent.click(save()));
-    expect(m.mutate).toHaveBeenCalledWith({ trade: "other" });
+    expect(m.mutate).toHaveBeenCalledWith({ trade: "other", tradeDescription: "Garage door service" });
   });
 });
 
@@ -81,7 +81,8 @@ describe("payload + registry consumer", () => {
     expect(validateTradeSelection("other", " ")).toEqual({ describe: true });
     expect(validateTradeSelection("other", "Garage doors")).toEqual({});
     expect(validateTradeSelection("hvac", "")).toEqual({});
-    expect(buildTradePayload("other")).toEqual({ trade: "other" });
+    expect(buildTradePayload("other", "  Garage doors ")).toEqual({ trade: "other", tradeDescription: "Garage doors" });
+    expect(buildTradePayload("hvac", "ignored")).toEqual({ trade: "hvac" });
   });
 
   it("uses the configured trade over service inference", () => {

@@ -35,6 +35,7 @@ export interface PublicBookingSettingsRecord {
   /** Company trade from #318 (null when not set). */
   trade?: HomeServiceTrade | null;
   tradeSchemaType?: string | null;
+  tradeDescription?: string | null;
 }
 
 export interface ZipCoverageRecord {

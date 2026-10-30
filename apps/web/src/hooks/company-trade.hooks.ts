@@ -6,12 +6,13 @@ import type { HomeServiceTrade } from "@fsm/types";
 import { api } from "@/src/lib/api";
 
 export interface CompanyTradeResponse {
-  trade: { trade: HomeServiceTrade | null; label: string | null; schemaType: string | null };
+  trade: { trade: HomeServiceTrade | null; label: string | null; schemaType: string | null; tradeDescription?: string | null };
 }
 
-/** Body accepted by PUT /api/v1/company/trade (#318). The schema is strict: only `trade`. */
+/** Body accepted by PUT /api/v1/company/trade (#318, strict). `tradeDescription` is required for "other". */
 export interface UpdateCompanyTradeInput {
   trade: HomeServiceTrade;
+  tradeDescription?: string | null;
 }
 
 export const companyTradeKeys = { all: ["company", "trade"] as const };

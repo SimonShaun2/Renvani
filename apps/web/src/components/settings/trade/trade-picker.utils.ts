@@ -1,4 +1,4 @@
-import type { HomeServiceTrade } from "@fsm/types";
+import { TRADE_DESCRIPTION_MAX_LENGTH, type HomeServiceTrade } from "@fsm/types";
 
 import type { UpdateCompanyTradeInput } from "@/src/hooks/company-trade.hooks";
 
@@ -8,7 +8,9 @@ export function validateTradeSelection(trade: HomeServiceTrade | null, describe:
   return trade === "other" && describe.trim().length === 0 ? { describe: true } : {};
 }
 
-/** The API has no field for the "Describe your trade" text, so it is validated in the UI and never sent. */
-export function buildTradePayload(trade: HomeServiceTrade): UpdateCompanyTradeInput {
-  return { trade };
+export const TRADE_DESCRIBE_MAX = TRADE_DESCRIPTION_MAX_LENGTH;
+
+/** `tradeDescription` is sent (trimmed) only for "other"; other trades send `trade` alone so the API clears it. */
+export function buildTradePayload(trade: HomeServiceTrade, describe = ""): UpdateCompanyTradeInput {
+  return trade === "other" ? { trade, tradeDescription: describe.trim() } : { trade };
 }

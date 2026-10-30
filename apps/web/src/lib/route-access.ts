@@ -100,6 +100,11 @@ export function isPublicRoute(pathname: string): boolean {
     return true;
   }
 
+  // Static marketing art in /public/marketing (Figma 171:2 home imagery).
+  if (segments[0] === "marketing" && segments.length >= 2) {
+    return true;
+  }
+
   if (segments[0] === "book" && segments.length >= 2) {
     return true;
   }

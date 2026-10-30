@@ -2,24 +2,25 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { MarketingPage } from "@/src/components/marketing/visuals/MarketingPage";
-import { MARKETING_META } from "@/src/components/marketing/marketing-copy";
+import { HomePage } from "@/src/components/marketing/site/HomePage";
+import { MarketingShell } from "@/src/components/marketing/site/MarketingShell";
+import { HOME_META } from "@/src/components/marketing/site/site-config";
 import { getDefaultRouteForRole } from "@/src/lib/route-access";
 import { readServerAuthSession } from "@/src/lib/auth";
 
 export const metadata: Metadata = {
-  title: MARKETING_META.title,
-  description: MARKETING_META.description,
+  title: HOME_META.title,
+  description: HOME_META.description,
   openGraph: {
-    title: MARKETING_META.title,
-    description: MARKETING_META.description,
+    title: HOME_META.title,
+    description: HOME_META.description,
     url: "https://getrenvani.com",
     siteName: "Renvani",
     type: "website"
   }
 };
 
-export default async function HomePage() {
+export default async function Home() {
   const cookieStore = await cookies();
   const session = readServerAuthSession(cookieStore);
 
@@ -27,5 +28,9 @@ export default async function HomePage() {
     redirect(getDefaultRouteForRole(session.role));
   }
 
-  return <MarketingPage page="home" visual="home" />;
+  return (
+    <MarketingShell>
+      <HomePage />
+    </MarketingShell>
+  );
 }

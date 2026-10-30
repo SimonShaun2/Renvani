@@ -9,8 +9,8 @@ import styles from "./site.module.css";
 const ink = "var(--color-mkt-ink)";
 const ink2 = "var(--color-mkt-ink2)";
 const line = "var(--color-mkt-line)";
-const eyebrow = "text-[11px] font-medium tracking-[1.1px]";
-const h2 = "text-[34px] font-semibold leading-[1.08] tracking-[-0.85px] md:text-[48px] md:tracking-[-1.2px]";
+const eyebrow = "text-[11px] font-medium leading-[1.38] tracking-[1.1px]";
+const h2 = "text-[36px] font-semibold leading-[1.08] tracking-[-0.9px] md:text-[48px] md:tracking-[-1.2px]";
 const section = "mx-auto flex max-w-[1440px] flex-col gap-8 px-6 py-6 md:px-20 md:py-20";
 const card = "flex flex-col gap-4 rounded-2xl border bg-white p-5";
 
@@ -298,12 +298,12 @@ export function HomePage() {
       </div>
       <div className="md:hidden lg:block">
       <section data-node-id="203:4403" className={section} aria-labelledby="home-hero">
-        <div className="grid items-start gap-12 lg:grid-cols-[480px_1fr] lg:gap-16">
+        <div className="grid items-start gap-8 lg:grid-cols-[480px_1fr] lg:gap-16">
           <div className="flex flex-col gap-6">
             <p className={eyebrow} style={{ color: ink2 }}>{hero.eyebrow}</p>
             <h1 id="home-hero" className="flex flex-col gap-2">
-              <span className="text-[44px] font-semibold leading-[1.08] tracking-[-1.1px] md:text-[61px] md:tracking-[-1.525px]">{hero.headline}</span>
-              <span className="text-[46px] leading-[1.08] tracking-[-1.15px] md:text-[64px] md:tracking-[-1.6px]" style={{ fontFamily: "var(--font-mkt-serif), Georgia, serif", fontStyle: "italic", fontWeight: 400 }}>
+              <span className="text-[43px] font-semibold leading-[1.08] tracking-[-1.075px] md:text-[61px] md:tracking-[-1.525px]">{hero.headline}</span>
+              <span className="text-[44px] leading-[1.08] tracking-[-1.1px] md:text-[64px] md:tracking-[-1.6px]" style={{ fontFamily: "var(--font-mkt-serif), Georgia, serif", fontStyle: "italic", fontWeight: 400 }}>
                 <Lines lines={hero.accent} />
               </span>
             </h1>
@@ -323,7 +323,7 @@ export function HomePage() {
       <section data-node-id="203:4455" style={{ background: "var(--color-mkt-sand)" }} aria-label="Trades">
         <div className="mx-auto flex max-w-[1440px] flex-col gap-[10px] px-6 py-6 md:flex-row md:gap-8 md:px-10 md:py-10">
           <p className={`${eyebrow} md:w-[300px]`} style={{ color: ink2 }}>{trades.eyebrow}</p>
-          <div className="flex gap-6 text-[15px] font-medium">
+          <div className="flex gap-6 text-[15px] font-medium leading-[1.38]">
             {trades.links.map((l) => (
               <Link key={l.label} href={l.href} className="md:w-[170px]">{l.label}</Link>
             ))}
@@ -369,10 +369,10 @@ export function HomePage() {
           <div className="grid gap-8 md:grid-cols-2">
             {work.trades.map((t) => (
               <div key={t.eyebrow} className="flex flex-col gap-4">
-                <Image src={t.image} alt="" width={1248} height={660} className="h-[240px] w-full rounded-2xl object-cover md:h-[330px]" />
+                <Image src={t.image} alt="" width={1248} height={660} className="h-[250px] w-full rounded-2xl object-cover md:h-[330px]" />
                 <p className={eyebrow} style={{ color: ink2 }}>{t.eyebrow}</p>
-                <h3 className="text-[24px] font-semibold md:text-[30px]">{t.title}</h3>
-                <Link href={t.href} className="text-[14px] font-medium" style={{ color: ink2 }}>See the workflow →</Link>
+                <h3 className="text-[24px] font-semibold leading-[1.38] md:text-[30px]">{t.title}</h3>
+                <Link href={t.href} className="text-[14px] font-medium leading-[1.38]" style={{ color: ink2 }}>See the workflow →</Link>
               </div>
             ))}
           </div>

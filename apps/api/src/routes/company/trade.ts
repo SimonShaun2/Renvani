@@ -22,7 +22,7 @@ export const companyTradeRoutes: FastifyPluginAsync = async (fastify) => {
     { preHandler: [fastify.authenticate, requireOwnerOrAdmin, updateTradeValidation] },
     async (request: FastifyRequest, reply: FastifyReply) => {
       const body = request.body as UpdateCompanyTradeBody;
-      return reply.send({ trade: await setCompanyTrade(request.company.id, request.user.id, body.trade) });
+      return reply.send({ trade: await setCompanyTrade(request.company.id, request.user.id, body.trade, body.tradeDescription) });
     }
   );
 

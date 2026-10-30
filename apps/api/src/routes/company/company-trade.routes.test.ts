@@ -54,7 +54,7 @@ describe("company trade setting", () => {
     const a = shop("a-hvac");
     const before = await request(app.server).get("/api/v1/company/trade").set("Authorization", a.user("owner"));
     expect(before.status).toBe(200);
-    expect(before.body.trade).toEqual({ trade: null, label: null, schemaType: null });
+    expect(before.body.trade).toEqual({ trade: null, label: null, schemaType: null, tradeDescription: null });
 
     for (const role of ["owner", "admin"]) {
       const res = await request(app.server).put("/api/v1/company/trade").set("Authorization", a.user(role)).send({ trade: "hvac" });
@@ -171,5 +171,68 @@ describe("public site uses the trade", () => {
     const bogus = await request(app.server).get("/api/v1/public/booking/p-d");
     expect(bogus.body.booking.trade).toBeNull();
     expect(HOME_SERVICE_TRADES).toEqual(["hvac", "plumbing", "electrical", "other"]);
+  });
+});
+
+describe("tradeDescription (Describe your trade)", () => {
+  const put = (auth: string, body: unknown) => request(app.server).put("/api/v1/company/trade").set("Authorization", auth).send(body as object);
+  const stored = (id: string) => fakeDb.getTestState().companies.find((c) => c.id === id)!.settings as Record<string, unknown>;
+
+  it("is required (400) for trade other: missing, empty or whitespace", async () => {
+    const a = shop("d-req");
+    for (const body of [{ trade: "other" }, { trade: "other", tradeDescription: "" }, { trade: "other", tradeDescription: "   " }, { trade: "other", tradeDescription: null }]) {
+      expect((await put(a.user("owner"), body)).status).toBe(400);
+    }
+    expect(stored(a.company.id).trade).toBeUndefined();
+  });
+
+  it("saves trimmed for other and is returned by the owner read and public settings", async () => {
+    const a = shop("d-ok");
+    fakeDb.seedBookingSettings({ companyId: a.company.id, bookingSlug: "d-ok", isEnabled: true } as never);
+    const res = await put(a.user("admin"), { trade: "other", tradeDescription: "  Pool & spa repair  " });
+    expect(res.status).toBe(200);
+    expect(res.body.trade).toMatchObject({ trade: "other", tradeDescription: "Pool & spa repair" });
+    expect(stored(a.company.id)).toMatchObject({ trade: "other", tradeDescription: "Pool & spa repair", currency: "USD" });
+    const read = await request(app.server).get("/api/v1/company/trade").set("Authorization", a.user("owner"));
+    expect(read.body.trade.tradeDescription).toBe("Pool & spa repair");
+    const pub = await request(app.server).get("/api/v1/public/booking/d-ok");
+    expect(pub.body.booking.tradeDescription).toBe("Pool & spa repair");
+  });
+
+  it("rejects more than 100 characters (400); exactly 100 is ok", async () => {
+    const a = shop("d-len");
+    expect((await put(a.user("owner"), { trade: "other", tradeDescription: "x".repeat(101) })).status).toBe(400);
+    expect((await put(a.user("owner"), { trade: "other", tradeDescription: "x".repeat(100) })).status).toBe(200);
+  });
+
+  it("is cleared when trade is not other, even if sent; public settings return null", async () => {
+    const a = shop("d-clr");
+    fakeDb.seedBookingSettings({ companyId: a.company.id, bookingSlug: "d-clr", isEnabled: true } as never);
+    await put(a.user("owner"), { trade: "other", tradeDescription: "Chimney sweep" });
+    const res = await put(a.user("owner"), { trade: "plumbing", tradeDescription: "ignored" });
+    expect(res.status).toBe(200);
+    expect(res.body.trade.tradeDescription).toBeNull();
+    expect(stored(a.company.id)).not.toHaveProperty("tradeDescription");
+    expect((await request(app.server).get("/api/v1/public/booking/d-clr")).body.booking.tradeDescription).toBeNull();
+  });
+
+  it("staff get 403 before validation (invalid description)", async () => {
+    const a = shop("d-403");
+    for (const role of ["dispatcher", "technician"]) {
+      expect((await put(a.user(role), { trade: "other", tradeDescription: "x".repeat(500) })).status).toBe(403);
+      expect((await put(a.user(role), { trade: "other" })).status).toBe(403);
+    }
+  });
+
+  it("concurrent settings save keeps trade + description", async () => {
+    const a = shop("d-cc");
+    const owner = a.user("owner");
+    const [t, p] = await Promise.all([
+      put(owner, { trade: "other", tradeDescription: "Garage doors" }),
+      request(app.server).patch("/api/v1/company").set("Authorization", owner).send({ settings: { tradingName: "Doors Co" } })
+    ]);
+    expect(t.status).toBe(200);
+    expect(p.status).toBe(200);
+    expect(stored(a.company.id)).toMatchObject({ trade: "other", tradeDescription: "Garage doors", tradingName: "Doors Co", currency: "USD" });
   });
 });

@@ -39,7 +39,8 @@ import {
   ErrorCode,
   HOME_SERVICE_TRADE_REGISTRY,
   getTradeServices,
-  parseHomeServiceTrade
+  parseHomeServiceTrade,
+  parseTradeDescription
 } from "@fsm/types";
 
 import {
@@ -214,7 +215,8 @@ function toPublicBookingSettings(
     serviceAreaNames,
     timezone: company.timezone,
     trade,
-    tradeSchemaType: trade ? HOME_SERVICE_TRADE_REGISTRY[trade].schemaType : null
+    tradeSchemaType: trade ? HOME_SERVICE_TRADE_REGISTRY[trade].schemaType : null,
+    tradeDescription: parseTradeDescription(trade, settingsObject.tradeDescription)
   };
 }
 

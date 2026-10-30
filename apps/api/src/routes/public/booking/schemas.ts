@@ -191,7 +191,9 @@ export const publicBookingRouteSchema = {
             logoUrl: nullableStringSchema,
             serviceAreaZipCodes: { type: "array", items: { type: "string" } },
             serviceAreaNames: { type: "array", items: { type: "string" } },
-            timezone: { type: "string" }
+            timezone: { type: "string" },
+            trade: nullableStringSchema,
+            tradeSchemaType: nullableStringSchema
           }
         }
       }

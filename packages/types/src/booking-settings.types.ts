@@ -67,4 +67,8 @@ export interface PublicBookingSettings {
   serviceAreaNames: string[];
   /** IANA timezone for availableHoursStart/End + availableDays. */
   timezone: string;
+  /** Shop-selected trade (company settings), or null when unset. */
+  trade?: string | null;
+  /** schema.org @type for the site JSON-LD derived from `trade`, or null when unset. */
+  tradeSchemaType?: string | null;
 }

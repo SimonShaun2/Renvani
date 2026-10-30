@@ -52,4 +52,6 @@ export interface CompanySettings {
   clerk?: CompanyClerkSettings | null;
   stripePlatformBilling?: CompanyStripePlatformBillingSettings | null;
   vipMembership?: CompanyVipMembershipSettings | null;
+  /** Growth: shop-selected home-services trade (`hvac|plumbing|electrical|other`), owner/admin set. */
+  trade?: string | null;
 }

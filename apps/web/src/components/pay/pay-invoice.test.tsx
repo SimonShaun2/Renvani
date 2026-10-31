@@ -49,6 +49,14 @@ describe("pay invoice fee lines", () => {
     expect(buildPayInvoiceSummary(payment({ bookingFeeCents: 199 })).feeLines.map((line) => line.key)).toEqual(["service"]);
   });
 
+  it("totals match invoice frames 53:3 / 53:75 / 60:543 (Flex $244.80, Flat $240.00, VIP $208.08)", () => {
+    expect(buildPayInvoiceSummary(payment()).totalDue).toBe("244.80");
+    expect(buildPayInvoiceSummary(flat()).totalDue).toBe("240.00");
+    const vip = buildPayInvoiceSummary(payment({ invoiceAmount: "204.00", invoiceAmountCents: 20400, serviceFeeCents: 408, serviceFeeAmount: "4.08", platformFeeAmount: "4.08", totalDue: "208.08", totalDueCents: 20808 }));
+    expect(vip.feeLines).toEqual([{ key: "service", label: "Service Fee (2%)", amount: "4.08" }]);
+    expect(vip.totalDue).toBe("208.08");
+  });
+
   it("falls back to the config rate and combined fee for payloads without split cents", () => {
     const legacy: Partial<PublicPaymentLinkResponse> = payment({ platformFeeAmount: "4.80" });
     delete legacy.serviceFeeCents;

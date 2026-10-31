@@ -240,6 +240,96 @@ describe("Trusted Execution: duplicate operations (idempotency)", () => {
   });
 });
 
+/**
+ * Emulates Postgres transaction-scoped advisory locks on the fake db: `tx.execute(...)` (the
+ * pg_advisory_xact_lock call) waits for the previous holder and the lock is released when the
+ * owning transaction settles. Single global lock is enough here (one key under test).
+ */
+async function withAdvisoryLockEmulation<T>(run: () => Promise<T>): Promise<T> {
+  const { AsyncLocalStorage } = await import("node:async_hooks");
+  const { db } = (await import("@fsm/db")) as unknown as {
+    db: { transaction: (cb: unknown) => Promise<unknown>; execute?: (q: unknown) => Promise<unknown> };
+  };
+  const als = new AsyncLocalStorage<{ release?: () => void }>();
+  const originalTransaction = db.transaction;
+  let tail: Promise<void> = Promise.resolve();
+  db.transaction = (cb: unknown) => {
+    const ctx: { release?: () => void } = {};
+    return als.run(ctx, () => originalTransaction.call(db, cb)).finally(() => ctx.release?.());
+  };
+  db.execute = async () => {
+    const ctx = als.getStore();
+    const previous = tail;
+    let release!: () => void;
+    tail = new Promise<void>((resolve) => (release = resolve));
+    await previous;
+    if (ctx) ctx.release = release;
+  };
+  try {
+    return await run();
+  } finally {
+    db.transaction = originalTransaction;
+    delete db.execute;
+  }
+}
+
+describe("Trusted Execution: #370 review follow-ups", () => {
+  it("TE-DUP-05 concurrent execute with the same Idempotency-Key: both succeed (route → 200), the second replays (replayed: true)", async () => {
+    const { company, job, auth } = tenant("dup5");
+    const owner = auth("owner");
+    const action = seedSchedulingAction(company.id, job.id, "approved");
+    const body = { expectedVersion: stored(action.id).updatedAt.getTime() };
+    const service = await import("../services/agent-action.service.js");
+    // Direct service calls interleave at every await, so without the lock both pass the replay lookup and the
+    // second loses the compare-and-set (409). With the company+key lock the second waits and replays.
+    const send = () => service.executeAgentAction(company.id, action.id, owner.user.id, { ...body, idempotencyKey: "te-dup-concurrent-1" });
+    const [a, b] = await withAdvisoryLockEmulation(() => Promise.all([send(), send()]));
+    expect([(a as { replayed?: boolean }).replayed, (b as { replayed?: boolean }).replayed].filter((value) => value === true)).toHaveLength(1);
+    expect(a.executionReceipt).toEqual(b.executionReceipt);
+    expect(stored(action.id).state).toBe("succeeded");
+  });
+
+  it("TE-DUP-06 concurrent approve with the same Idempotency-Key: both succeed (route → 200), one replayed, same version", async () => {
+    const { company, job, auth } = tenant("dup6");
+    const owner = auth("owner");
+    const action = seedSchedulingAction(company.id, job.id, "awaiting_approval");
+    const body = { expectedVersion: stored(action.id).updatedAt.getTime() };
+    const service = await import("../services/agent-action.service.js");
+    const send = () => service.approveAgentAction(company.id, action.id, owner.user.id, { ...body, idempotencyKey: "te-dup-concurrent-2" });
+    const [a, b] = await withAdvisoryLockEmulation(() => Promise.all([send(), send()]));
+    expect([(a as { replayed?: boolean }).replayed, (b as { replayed?: boolean }).replayed].filter((value) => value === true)).toHaveLength(1);
+    expect(a.version).toBe(b.version);
+  });
+
+  it("TE-DUP-07 Idempotency-Key longer than 128 characters is 400 and applies nothing; exactly 128 is accepted", async () => {
+    const { company, job, auth } = tenant("dup7");
+    const owner = auth("owner");
+    const action = seedSchedulingAction(company.id, job.id, "awaiting_approval");
+    const body = { expectedVersion: stored(action.id).updatedAt.getTime() };
+    const tooLong = await request(app.server).post(`/api/v1/agent-actions/${action.id}/approve`).set("Authorization", owner.header).set("Idempotency-Key", "k".repeat(129)).send(body);
+    expect(tooLong.status).toBe(400);
+    expect(stored(action.id).state).toBe("awaiting_approval");
+    const ok = await request(app.server).post(`/api/v1/agent-actions/${action.id}/approve`).set("Authorization", owner.header).set("Idempotency-Key", "k".repeat(128)).send(body);
+    expect(ok.status).toBe(200);
+  });
+
+  it("TE-STALE-05 operator inbox edit without expectedVersion is 400 and leaves the body unchanged; with the current version it applies", async () => {
+    const t = tenant("stale5");
+    const customer = fakeDb.seedCustomer({ companyId: t.company.id, firstName: "Pat", lastName: "Doe" });
+    const action = seedMessageAction(t.company.id, customer.id, "awaiting_approval");
+    const owner = t.auth("owner");
+    const missing = await request(app.server).patch(`/api/v1/operator/inbox/${action.id}`).set("Authorization", owner.header).send({ body: "Edited blind" });
+    expect(missing.status).toBe(400);
+    expect((stored(action.id).parameters as Record<string, unknown>).body).toBe("Your technician is on the way.");
+    const ok = await request(app.server)
+      .patch(`/api/v1/operator/inbox/${action.id}`)
+      .set("Authorization", owner.header)
+      .send({ body: "Edited with the current version", expectedVersion: stored(action.id).updatedAt.getTime() });
+    expect(ok.status).toBe(200);
+    expect((stored(action.id).parameters as Record<string, unknown>).body).toBe("Edited with the current version");
+  });
+});
+
 describe("Trusted Execution: failed execution and receipt states", () => {
   const events = (id: string, type: string) =>
     fakeDb.getTestState().activityEvents.filter((e) => e.entityId === id && e.eventType === type);

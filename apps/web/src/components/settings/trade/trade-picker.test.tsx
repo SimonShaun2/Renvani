@@ -120,6 +120,15 @@ describe("payload + registry consumer", () => {
     const services = [{ name: "Water heater repair", category: "Plumbing" }];
     expect(resolveSiteTradeFromSettings({ offeredServices: services, trade: "electrical" }).key).toBe("electrical");
     expect(resolveSiteTradeFromSettings({ offeredServices: services, trade: null }).key).toBe("plumbing");
-    expect(["other", "default"]).toContain(resolveSiteTradeFromSettings({ offeredServices: services, trade: "other" }).key);
+    expect(resolveSiteTradeFromSettings({ offeredServices: services, trade: "other" }).key).toBe("other");
   });
+
+  it.each(["roofing", "constructor", "toString", "__proto__", "hasOwnProperty"])(
+    "unknown or prototype trade %j falls back to other without service inference",
+    (trade) => {
+      const services = [{ name: "Water heater repair", category: "Plumbing" }];
+      const settings = { offeredServices: services, trade } as unknown as Parameters<typeof resolveSiteTradeFromSettings>[0];
+      expect(resolveSiteTradeFromSettings(settings).key).toBe("other");
+    }
+  );
 });

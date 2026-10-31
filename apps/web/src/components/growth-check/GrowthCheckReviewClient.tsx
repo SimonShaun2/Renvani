@@ -11,6 +11,7 @@ import { SCAN_LIMIT, useGrowthCheckScans, useScanFindings } from "@/src/hooks/gr
 import { useAuthStore } from "@/src/stores/auth.store";
 
 import { FindingDetail } from "./FindingDetail";
+import { ReportEditor } from "./ReportEditor";
 import { STATUS_LABEL, formatDateTime, ownerValidationLabel, reviewStateLabel } from "./labels";
 
 /** Mirrors the API's review roles for /growth-check/scans and findings. */
@@ -83,6 +84,12 @@ export function GrowthCheckReviewClient() {
             <section aria-labelledby="gc-findings" className="rounded-xl border border-neutral-200 bg-white p-5">
               <h2 id="gc-findings" className="mb-3 text-base font-semibold text-neutral-900">Findings</h2>
               <FindingsPanel key={scanId} scanId={scanId} isOwner={isOwner} />
+            </section>
+          ) : null}
+          {scanId ? (
+            <section aria-labelledby="gc-report" className="rounded-xl border border-neutral-200 bg-white p-5">
+              <h2 id="gc-report" className="mb-3 text-base font-semibold text-neutral-900">Owner report</h2>
+              <ReportEditor key={scanId} scanId={scanId} />
             </section>
           ) : null}
         </div>

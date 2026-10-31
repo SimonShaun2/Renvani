@@ -1066,7 +1066,8 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   "Websites"
                  ]
                 }
-               ]
+               ],
+               "href": "/product/websites"
               },
               {
                "t": "div",
@@ -1342,7 +1343,8 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   "Inquiry & follow-up"
                  ]
                 }
-               ]
+               ],
+               "href": "/product/inquiry-response-follow-up"
               },
               {
                "t": "div",
@@ -1647,7 +1649,8 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   "Jobs"
                  ]
                 }
-               ]
+               ],
+               "href": "/product/jobs-work-orders"
               },
               {
                "t": "div",
@@ -1663,7 +1666,8 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   "Technician app"
                  ]
                 }
-               ]
+               ],
+               "href": "/product/technician-app"
               },
               {
                "t": "div",
@@ -1679,7 +1683,8 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   "Invoices & payments"
                  ]
                 }
-               ]
+               ],
+               "href": "/product/invoices-payments"
               },
               {
                "t": "div",
@@ -1695,7 +1700,8 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   "Price book"
                  ]
                 }
-               ]
+               ],
+               "href": "/product/price-book-service-catalog"
               }
              ]
             },
@@ -1719,7 +1725,8 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   "Time & photos"
                  ]
                 }
-               ]
+               ],
+               "href": "/product/time-tracking-job-photos"
               },
               {
                "t": "div",
@@ -1735,7 +1742,8 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   "Customer portal"
                  ]
                 }
-               ]
+               ],
+               "href": "/product/customer-portal"
               }
              ]
             }
@@ -1990,7 +1998,8 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   "Service agreements"
                  ]
                 }
-               ]
+               ],
+               "href": "/product/service-agreements"
               },
               {
                "t": "div",
@@ -2006,7 +2015,8 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   "Reminder emails"
                  ]
                 }
-               ]
+               ],
+               "href": "/product/reminders-win-backs"
               }
              ]
             }
@@ -2424,7 +2434,8 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                 "Customers & assets"
                ]
               }
-             ]
+             ],
+             "href": "/product/customers-properties-assets"
             },
             {
              "t": "div",
@@ -2440,7 +2451,8 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                 "Reporting & sources"
                ]
               }
-             ]
+             ],
+             "href": "/product/reporting-job-sources"
             },
             {
              "t": "div",
@@ -2456,7 +2468,8 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                 "Data import"
                ]
               }
-             ]
+             ],
+             "href": "/product/onboarding-data-import"
             }
            ]
           }
@@ -2923,7 +2936,8 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   "Websites"
                  ]
                 }
-               ]
+               ],
+               "href": "/product/websites"
               },
               {
                "t": "div",
@@ -3199,7 +3213,8 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   "Inquiry & follow-up"
                  ]
                 }
-               ]
+               ],
+               "href": "/product/inquiry-response-follow-up"
               }
              ]
             },
@@ -3512,7 +3527,8 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   "Jobs"
                  ]
                 }
-               ]
+               ],
+               "href": "/product/jobs-work-orders"
               },
               {
                "t": "div",
@@ -3528,7 +3544,8 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   "Technician app"
                  ]
                 }
-               ]
+               ],
+               "href": "/product/technician-app"
               }
              ]
             },
@@ -3552,7 +3569,8 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   "Invoices & payments"
                  ]
                 }
-               ]
+               ],
+               "href": "/product/invoices-payments"
               },
               {
                "t": "div",
@@ -3568,7 +3586,8 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   "Price book"
                  ]
                 }
-               ]
+               ],
+               "href": "/product/price-book-service-catalog"
               }
              ]
             },
@@ -3592,7 +3611,8 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   "Time & photos"
                  ]
                 }
-               ]
+               ],
+               "href": "/product/time-tracking-job-photos"
               },
               {
                "t": "div",
@@ -3608,7 +3628,8 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   "Customer portal"
                  ]
                 }
-               ]
+               ],
+               "href": "/product/customer-portal"
               }
              ]
             }
@@ -3863,7 +3884,8 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   "Service agreements"
                  ]
                 }
-               ]
+               ],
+               "href": "/product/service-agreements"
               },
               {
                "t": "div",
@@ -3879,7 +3901,8 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   "Reminder emails"
                  ]
                 }
-               ]
+               ],
+               "href": "/product/reminders-win-backs"
               }
              ]
             },
@@ -4303,7 +4326,8 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                 "Customers & assets"
                ]
               }
-             ]
+             ],
+             "href": "/product/customers-properties-assets"
             }
            ]
           },
@@ -4327,7 +4351,8 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                 "Reporting & sources"
                ]
               }
-             ]
+             ],
+             "href": "/product/reporting-job-sources"
             },
             {
              "t": "div",
@@ -4343,7 +4368,8 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                 "Data import"
                ]
               }
-             ]
+             ],
+             "href": "/product/onboarding-data-import"
             }
            ]
           }
@@ -4836,7 +4862,8 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   "Websites"
                  ]
                 }
-               ]
+               ],
+               "href": "/product/websites"
               },
               {
                "t": "div",
@@ -5112,7 +5139,8 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   "Inquiry & follow-up"
                  ]
                 }
-               ]
+               ],
+               "href": "/product/inquiry-response-follow-up"
               },
               {
                "t": "div",
@@ -5417,7 +5445,8 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   "Jobs"
                  ]
                 }
-               ]
+               ],
+               "href": "/product/jobs-work-orders"
               },
               {
                "t": "div",
@@ -5433,7 +5462,8 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   "Technician app"
                  ]
                 }
-               ]
+               ],
+               "href": "/product/technician-app"
               },
               {
                "t": "div",
@@ -5449,7 +5479,8 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   "Invoices & payments"
                  ]
                 }
-               ]
+               ],
+               "href": "/product/invoices-payments"
               },
               {
                "t": "div",
@@ -5465,7 +5496,8 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   "Price book"
                  ]
                 }
-               ]
+               ],
+               "href": "/product/price-book-service-catalog"
               }
              ]
             },
@@ -5489,7 +5521,8 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   "Time & photos"
                  ]
                 }
-               ]
+               ],
+               "href": "/product/time-tracking-job-photos"
               },
               {
                "t": "div",
@@ -5505,7 +5538,8 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   "Customer portal"
                  ]
                 }
-               ]
+               ],
+               "href": "/product/customer-portal"
               }
              ]
             }
@@ -5760,7 +5794,8 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   "Service agreements"
                  ]
                 }
-               ]
+               ],
+               "href": "/product/service-agreements"
               },
               {
                "t": "div",
@@ -5776,7 +5811,8 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   "Reminder emails"
                  ]
                 }
-               ]
+               ],
+               "href": "/product/reminders-win-backs"
               }
              ]
             }
@@ -6194,7 +6230,8 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                 "Customers & assets"
                ]
               }
-             ]
+             ],
+             "href": "/product/customers-properties-assets"
             },
             {
              "t": "div",
@@ -6210,7 +6247,8 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                 "Reporting & sources"
                ]
               }
-             ]
+             ],
+             "href": "/product/reporting-job-sources"
             },
             {
              "t": "div",
@@ -6226,7 +6264,8 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                 "Data import"
                ]
               }
-             ]
+             ],
+             "href": "/product/onboarding-data-import"
             }
            ]
           }
@@ -6693,7 +6732,8 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   "Websites"
                  ]
                 }
-               ]
+               ],
+               "href": "/product/websites"
               },
               {
                "t": "div",
@@ -6969,7 +7009,8 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   "Inquiry & follow-up"
                  ]
                 }
-               ]
+               ],
+               "href": "/product/inquiry-response-follow-up"
               }
              ]
             },
@@ -7282,7 +7323,8 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   "Jobs"
                  ]
                 }
-               ]
+               ],
+               "href": "/product/jobs-work-orders"
               },
               {
                "t": "div",
@@ -7298,7 +7340,8 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   "Technician app"
                  ]
                 }
-               ]
+               ],
+               "href": "/product/technician-app"
               }
              ]
             },
@@ -7322,7 +7365,8 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   "Invoices & payments"
                  ]
                 }
-               ]
+               ],
+               "href": "/product/invoices-payments"
               },
               {
                "t": "div",
@@ -7338,7 +7382,8 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   "Price book"
                  ]
                 }
-               ]
+               ],
+               "href": "/product/price-book-service-catalog"
               }
              ]
             },
@@ -7362,7 +7407,8 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   "Time & photos"
                  ]
                 }
-               ]
+               ],
+               "href": "/product/time-tracking-job-photos"
               },
               {
                "t": "div",
@@ -7378,7 +7424,8 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   "Customer portal"
                  ]
                 }
-               ]
+               ],
+               "href": "/product/customer-portal"
               }
              ]
             }
@@ -7633,7 +7680,8 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   "Service agreements"
                  ]
                 }
-               ]
+               ],
+               "href": "/product/service-agreements"
               },
               {
                "t": "div",
@@ -7649,7 +7697,8 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   "Reminder emails"
                  ]
                 }
-               ]
+               ],
+               "href": "/product/reminders-win-backs"
               }
              ]
             },
@@ -8073,7 +8122,8 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                 "Customers & assets"
                ]
               }
-             ]
+             ],
+             "href": "/product/customers-properties-assets"
             }
            ]
           },
@@ -8097,7 +8147,8 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                 "Reporting & sources"
                ]
               }
-             ]
+             ],
+             "href": "/product/reporting-job-sources"
             },
             {
              "t": "div",
@@ -8113,7 +8164,8 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                 "Data import"
                ]
               }
-             ]
+             ],
+             "href": "/product/onboarding-data-import"
             }
            ]
           }

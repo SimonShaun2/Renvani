@@ -157,6 +157,8 @@ export type GenerateOccurrencesResult = {
   requested: number;
   inserted: number;
   totalActive: number;
+  /** Set when generation was skipped: the series is paused/ended, or an external scheduler owns it. */
+  skippedReason?: "paused" | "cancelled" | "external_scheduler";
 };
 
 export async function generateRecurringVisitOccurrences(
@@ -175,7 +177,12 @@ export async function generateRecurringVisitOccurrences(
   }
 
   if (series.externalSchedulerAuthoritative) {
-    return { requested: count, inserted: 0, totalActive: 0 };
+    return { requested: count, inserted: 0, totalActive: 0, skippedReason: "external_scheduler" };
+  }
+
+  // Paused and ended series never get new visits (existing occurrences are left untouched).
+  if (series.status === "paused" || series.status === "cancelled") {
+    return { requested: count, inserted: 0, totalActive: 0, skippedReason: series.status };
   }
 
   const localDates = planOccurrenceLocalDates(series.anchorLocalDate, series.frequency, count);

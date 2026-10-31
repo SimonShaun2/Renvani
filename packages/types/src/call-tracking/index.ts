@@ -32,6 +32,38 @@ export const CALL_OUTCOME_REGISTRY: Readonly<Record<string, { label: string }>> 
   failed: { label: "Failed" }
 };
 
+/**
+ * Ownership verification of a tracking number with its provider. Only `verified` numbers may receive or attribute
+ * calls; the built-in disabled adapter can never verify, so every number stays `unverified`.
+ */
+export const CALL_TRACKING_NUMBER_VERIFICATION_STATUS_REGISTRY: Readonly<Record<string, { label: string; canReceiveCalls: boolean }>> = {
+  unverified: { label: "Not verified with the provider", canReceiveCalls: false },
+  pending: { label: "Verification in progress", canReceiveCalls: false },
+  verified: { label: "Ownership verified with the provider", canReceiveCalls: true },
+  failed: { label: "Verification failed", canReceiveCalls: false }
+};
+export const CALL_TRACKING_NUMBER_DEFAULT_VERIFICATION_STATUS = "unverified";
+
+/** True only for a known status whose registry entry allows calls. Unknown text fails closed. */
+export function callTrackingNumberCanReceiveCalls(status: string): boolean {
+  return Object.prototype.hasOwnProperty.call(CALL_TRACKING_NUMBER_VERIFICATION_STATUS_REGISTRY, status)
+    ? CALL_TRACKING_NUMBER_VERIFICATION_STATUS_REGISTRY[status]!.canReceiveCalls
+    : false;
+}
+
+/** Webhook events must be stamped within this many ms of server time (either side); duplicates still replay. */
+export const CALL_TRACKING_WEBHOOK_REPLAY_WINDOW_MS = 5 * 60 * 1000;
+
+/**
+ * A provider recording reference may be stored/exposed only if the disclosure was played AND the consent regime
+ * is satisfied: all-party needs explicit `granted`; one-party needs anything except `declined`.
+ */
+export function callRecordingRefAllowed(input: { consentMode: string; recordingDisclosurePlayed: boolean; callerConsent: string }): boolean {
+  if (!input.recordingDisclosurePlayed) return false;
+  if (input.consentMode === "one_party") return input.callerConsent === "granted" || input.callerConsent === "unknown";
+  return input.callerConsent === "granted";
+}
+
 const registryKey = (registry: Readonly<Record<string, unknown>>, name: string) =>
   z.string().refine((value) => Object.prototype.hasOwnProperty.call(registry, value), { message: `Unknown ${name}` });
 
@@ -100,6 +132,8 @@ export const inboundCallEventSchema = z
     trackingNumber: e164PhoneSchema,
     callerNumber: e164PhoneSchema,
     startedAt: z.string().datetime({ offset: true }),
+    /** When the provider emitted this event; checked against the replay window. */
+    occurredAt: z.string().datetime({ offset: true }),
     durationSeconds: z.number().int().min(0).max(86_400),
     outcome: registryKey(CALL_OUTCOME_REGISTRY, "call outcome"),
     /** Provider-side recording id/URI only; audio is never stored by Renvani. */
@@ -133,6 +167,10 @@ export interface CallTrackingNumber {
   marketingCampaign: string | null;
   forwardingNumber: string;
   active: boolean;
+  /** Key of CALL_TRACKING_NUMBER_VERIFICATION_STATUS_REGISTRY, resolved through the provider adapter. */
+  verificationStatus: string;
+  /** False until the number is verified; unverified numbers never receive or attribute calls. */
+  canReceiveCalls: boolean;
   version: number;
   createdAt: string;
   updatedAt: string;
@@ -169,4 +207,8 @@ export interface CallRecordListResponse {
 }
 export interface InboundCallWebhookResponse {
   status: "accepted" | "duplicate" | "ignored";
+  /** Set on `ignored` when the number exists but is not ownership-verified. */
+  reason?: "number_unverified";
+  /** True when the provider sent a recording ref that was dropped (no disclosure or consent not satisfied). */
+  recordingRefDropped?: boolean;
 }

@@ -87,6 +87,13 @@ const STATIC_PAGE_META: Array<{ prefix: string; meta: PageMeta }> = [
     }
   },
   {
+    prefix: "/inventory",
+    meta: {
+      title: "Inventory",
+      subtitle: "Parts on hand across your warehouse and service trucks."
+    }
+  },
+  {
     prefix: "/review-requests",
     meta: {
       title: "Review Requests",

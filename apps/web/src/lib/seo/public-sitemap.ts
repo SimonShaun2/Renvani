@@ -109,6 +109,7 @@ export const MARKETING_SITEMAP_PATHS = [
   { path: "/", priority: 1 },
   { path: "/product", priority: 0.9 },
   { path: "/how-it-works", priority: 0.9 },
+  ...["growth", "revenue", "operations", "retention", "command-center", "online-booking", "estimates-approvals", "scheduling-dispatch"].map((slug) => ({ path: `/product/${slug}`, priority: 0.8 })),
   { path: "/pricing", priority: 0.8 }
 ] as const;
 

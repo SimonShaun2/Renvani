@@ -10,6 +10,7 @@ import { ErrorState } from "@/src/components/ui/ErrorState";
 import { SkeletonCard } from "@/src/components/ui/SkeletonCard";
 import { useTechnicians } from "@/src/hooks/technicians.hooks";
 import {
+  ENTRY_LIMIT,
   TIMESHEET_STATUS_LABEL,
   fetchPayrollCsv,
   isConflict,
@@ -26,6 +27,9 @@ import {
 import { cn } from "@/src/lib/utils";
 import { useAuthStore } from "@/src/stores/auth.store";
 import { showToast } from "@/src/stores/toast.store";
+
+/** API page sizes; when a cap is hit the UI says so instead of silently truncating. */
+const TECH_LIMIT = 100;
 
 const MANAGER_ROLES = new Set(["owner", "admin", "dispatcher", "office"]);
 const PAYROLL_ROLES = new Set(["owner", "admin"]);
@@ -70,7 +74,10 @@ function EntryRow({ entry }: { entry: TimeEntryV1 }) {
   const [endedAt, setEndedAt] = useState(entry.endedAt ? toLocalInput(entry.endedAt) : "");
   const [notes, setNotes] = useState(entry.notes ?? "");
 
+  const endBeforeStart = Boolean(startedAt && endedAt) && new Date(endedAt).getTime() <= new Date(startedAt).getTime();
+
   const save = () => {
+    if (endBeforeStart) return;
     // Send only changed fields so untouched start/end keep their original seconds
     // (datetime-local inputs are minute precision). The PATCH schema allows any subset.
     const initialStart = toLocalInput(entry.startedAt);
@@ -135,8 +142,20 @@ function EntryRow({ entry }: { entry: TimeEntryV1 }) {
           </label>
           <label className="text-xs font-medium text-neutral-600">
             End
-            <input type="datetime-local" value={endedAt} onChange={(e) => setEndedAt(e.target.value)} className="mt-1 w-full rounded-xl border border-neutral-300 px-3 py-2 text-sm" />
+            <input
+              type="datetime-local"
+              value={endedAt}
+              onChange={(e) => setEndedAt(e.target.value)}
+              aria-invalid={endBeforeStart}
+              aria-describedby={endBeforeStart ? `end-error-${entry.id}` : undefined}
+              className="mt-1 w-full rounded-xl border border-neutral-300 px-3 py-2 text-sm"
+            />
           </label>
+          {endBeforeStart ? (
+            <p id={`end-error-${entry.id}`} role="alert" className="text-xs text-red-700 sm:col-span-full">
+              End must be after start.
+            </p>
+          ) : null}
           <label className="text-xs font-medium text-neutral-600">
             Notes
             <input value={notes} onChange={(e) => setNotes(e.target.value)} maxLength={2000} className="mt-1 w-full rounded-xl border border-neutral-300 px-3 py-2 text-sm" />
@@ -145,7 +164,7 @@ function EntryRow({ entry }: { entry: TimeEntryV1 }) {
             <button
               type="button"
               onClick={save}
-              disabled={update.isPending}
+              disabled={update.isPending || endBeforeStart}
               className="rounded-full bg-neutral-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
             >
               {update.isPending ? "Saving…" : "Save"}
@@ -306,9 +325,10 @@ export function TimesheetsClient() {
   const canManage = role !== null && MANAGER_ROLES.has(role);
   const canPayroll = role !== null && PAYROLL_ROLES.has(role);
   const [period, setPeriod] = useState<PeriodInput>(() => currentWeekPeriod());
-  const technicians = useTechnicians({ status: "active", page: 1, limit: 100, sortBy: "firstName", sortOrder: "asc" });
+  const technicians = useTechnicians({ status: "active", page: 1, limit: TECH_LIMIT, sortBy: "firstName", sortOrder: "asc" });
   const [technicianId, setTechnicianId] = useState<string | null>(null);
   const techList = technicians.data?.data ?? [];
+  const techTotal = technicians.data?.total ?? techList.length;
 
   useEffect(() => {
     const first = techList[0];
@@ -361,6 +381,11 @@ export function TimesheetsClient() {
         <EmptyState icon={Users} title="No active technicians" subtitle="Add a technician to start tracking time." />
       ) : (
         <div className="grid gap-6 lg:grid-cols-2">
+          {techTotal > techList.length ? (
+            <p role="status" data-testid="techs-cap-notice" className="rounded-xl bg-amber-50 px-3 py-2 text-xs text-amber-900 lg:col-span-2">
+              Showing the first {techList.length} of {techTotal} active technicians in the picker.
+            </p>
+          ) : null}
           <section className="space-y-3 rounded-[28px] border border-neutral-200 bg-white p-6 shadow-sm" aria-label="Time entries">
             <h2 className="text-base font-semibold text-neutral-900">Time entries</h2>
             {entries.isLoading ? (
@@ -370,11 +395,18 @@ export function TimesheetsClient() {
             ) : (entries.data?.entries ?? []).length === 0 ? (
               <EmptyState compact icon={Clock} title="No time entries" subtitle="No time was logged for this technician in this period." />
             ) : (
-              <ul className="space-y-2">
-                {entries.data!.entries.map((entry) => (
-                  <EntryRow key={entry.id} entry={entry} />
-                ))}
-              </ul>
+              <>
+                {entries.data!.hasMore ? (
+                  <p role="status" data-testid="entries-cap-notice" className="rounded-xl bg-amber-50 px-3 py-2 text-xs text-amber-900">
+                    Showing the first {ENTRY_LIMIT} entries. Narrow the date range to see the rest.
+                  </p>
+                ) : null}
+                <ul className="space-y-2">
+                  {entries.data!.entries.map((entry) => (
+                    <EntryRow key={entry.id} entry={entry} />
+                  ))}
+                </ul>
+              </>
             )}
           </section>
           <section className="space-y-3 rounded-[28px] border border-neutral-200 bg-white p-6 shadow-sm" aria-label="Pay periods">

@@ -28,7 +28,7 @@ export function Step3Preview({
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-accent">Step 3</p>
             <h3 className="mt-2 text-xl font-semibold text-neutral-900">Preview the first five rows</h3>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-neutral-500">
-              This is how the mapped data will look when it lands in ServiceRev. Double-check the names,
+              This is how the mapped data will look when it lands in Renvani. Double-check the names,
               contacts, and addresses before we look for duplicates.
             </p>
           </div>

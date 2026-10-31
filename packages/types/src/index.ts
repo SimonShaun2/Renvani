@@ -77,3 +77,4 @@ export * from "./geo/index.js";
 export * from "./revenue-agent-proposals.types.js";
 export * from "./home-services/service-area.js";
 export * from "./home-services/trade.js";
+export * from "./marketing-intake.types.js";

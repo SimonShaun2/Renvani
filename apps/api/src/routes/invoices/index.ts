@@ -1,6 +1,7 @@
+import type { FastifyPluginAsync, preHandlerHookHandler } from "fastify";
+
 import { requireRole } from "../../lib/authorize.js";
 import { technicianOwnInvoiceJob } from "../../lib/technician-scope.js";
-import type { FastifyPluginAsync } from "fastify";
 
 import {
   addInvoiceItemHandler,
@@ -45,6 +46,24 @@ import {
 
 const invoiceRoutes: FastifyPluginAsync = async (fastify) => {
   const authenticate = fastify.authenticate;
+
+  // Security: every /invoices* route is staff-only; technicians get 403.
+  // Appended after `authenticate` so unauthenticated requests still get 401.
+  // Exception: routes that carry their own technician scope (technicianOwnInvoiceJob, #252) keep it.
+  const invoiceRoles = requireRole(["owner", "admin", "dispatcher", "office"]);
+  fastify.addHook("onRoute", (routeOptions) => {
+    if (!routeOptions.url.includes("/invoices")) {
+      return;
+    }
+    const existing = routeOptions.preHandler;
+    const handlers: preHandlerHookHandler[] = existing
+      ? (Array.isArray(existing) ? [...existing] : [existing]) as preHandlerHookHandler[]
+      : [];
+    if (handlers.includes(technicianOwnInvoiceJob)) {
+      return;
+    }
+    routeOptions.preHandler = [...handlers, invoiceRoles];
+  });
 
   fastify.get("/invoices", {
     preHandler: authenticate,

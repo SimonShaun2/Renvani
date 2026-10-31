@@ -22,7 +22,7 @@ function payment(partial: Partial<PublicPaymentLinkResponse> = {}): PublicPaymen
     invoiceAmountCents: 24000, totalDueCents: 24480, serviceFeeAmount: "4.80", bookingFeeAmount: "0.00", feeRefundable: false,
     shopName: "Summit Heating & Air", shopLogoUrl: null, shopUrl: null, statementDescriptor: "SUMMIT HEATING",
     customerName: "Dana Whitfield", serviceAddress: "1840 Grape St", serviceDate: "2026-10-20", dueAt: "2026-10-30",
-    lineItems: [], invoiceStatus: "sent", paymentStatus: null, paidAmount: null, paidAt: null, receiptEmail: null, plan: "flex",
+    lineItems: [], invoiceStatus: "sent", paymentStatus: null, paidAmount: null, paidAt: null, receiptEmail: null, paid: false, receiptEmailed: false, plan: "flex",
     ...partial
   };
 }

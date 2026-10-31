@@ -28,9 +28,9 @@ import { getStoredSession } from "@/src/lib/auth";
 import { ApiError } from "@/src/lib/api";
 import { cn, formatDate } from "@/src/lib/utils";
 import { useAuthStore } from "@/src/stores/auth.store";
-import { formatServiceFeeLineItemName } from "@fsm/config/stripe-pricing";
+import { serviceFeeLineLabel } from "@/src/lib/service-fee-copy";
 
-const VIP_TIER_FEE_NOTE = `Monthly price goes to the shop in full. The ${formatServiceFeeLineItemName()} is paid by the customer at checkout (none on the Flat plan).`;
+const VIP_TIER_FEE_NOTE = `Monthly price goes to the shop in full. The ${serviceFeeLineLabel()} is paid by the customer at checkout (none on the Flat plan).`;
 import { showToast } from "@/src/stores/toast.store";
 
 type MemberFilter = "all" | "active" | "grace" | "paused" | "cancelled";

@@ -1,11 +1,11 @@
-import { publicEnv } from "@fsm/config";
+import { API_BASE_URL } from "./api-base-url";
 import type { ErrorCode } from "@fsm/types";
 
 import { clearBrowserAuthSession, getAuthToken } from "./auth";
 import { CLERK_NO_ACCESS_ROUTE } from "./clerk/route-decision";
 import { getClerkSessionToken, signOutClerkSession } from "./clerk/token-bridge";
 
-const API_BASE = publicEnv.NEXT_PUBLIC_API_URL;
+const API_BASE = API_BASE_URL;
 
 export interface ApiErrorPayload {
   error: ErrorCode | "NOT_IMPLEMENTED";
@@ -68,6 +68,29 @@ export async function handleUnauthorized(source: "clerk" | "legacy" | null): Pro
   if (typeof window !== "undefined") {
     window.location.assign(UNAUTHORIZED_REDIRECT);
   }
+}
+
+/**
+ * Authenticated raw fetch for requests that can't go through `api` (multipart uploads, etc.).
+ * Same rules as apiFetch: Clerk token first, legacy JWT fallback, and handleUnauthorized on 401
+ * (Clerk sessions are signed out, never bounced to /login). Returns the Response so callers keep
+ * their own error parsing.
+ */
+export async function authorizedFetch(path: string, init: RequestInit = {}): Promise<Response> {
+  const { token, source } = await resolveBearerToken();
+  const headers = new Headers(init.headers);
+
+  if (token && !headers.has("Authorization")) {
+    headers.set("Authorization", `Bearer ${token}`);
+  }
+
+  const response = await fetch(`${API_BASE}${path}`, { ...init, credentials: "include", headers });
+
+  if (response.status === 401) {
+    await handleUnauthorized(source);
+  }
+
+  return response;
 }
 
 async function apiFetch<TResponse>(path: string, options: RequestInit = {}): Promise<TResponse> {

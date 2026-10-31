@@ -27,6 +27,7 @@ import { PipelineMetrics } from "./PipelineMetrics";
 import { RecentActivityFeed } from "./RecentActivityFeed";
 import { RevenueChart } from "./RevenueChart";
 import { ReviewScore } from "./ReviewScore";
+import { ImportReconciliationReportSection } from "./ImportReconciliationReportSection";
 import { JobSourceReportingSection } from "./JobSourceReportingSection";
 import { TechUtilization } from "./TechUtilization";
 
@@ -242,6 +243,8 @@ export function ReportingDashboardClient() {
         </div>
 
         <JobSourceReportingSection />
+
+        <ImportReconciliationReportSection />
 
         <RecentActivityFeed items={activityQuery.data ?? []} isLoading={activityQuery.isLoading} />
       </div>

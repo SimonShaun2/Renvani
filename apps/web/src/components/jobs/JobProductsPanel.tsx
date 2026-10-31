@@ -445,7 +445,9 @@ export function JobProductsPanel({ jobId, products, taxRate, suggestion }: JobPr
       <ProductCatalogPicker
         open={catalogOpen}
         onClose={() => setCatalogOpen(false)}
-        onAddProduct={handleAddCatalogProduct}
+        onAddPriceBookItem={async (item) => {
+          await handleAddCatalogProduct(item.priceBookItemId);
+        }}
         pendingProductId={pendingCatalogProductId}
       />
     </section>

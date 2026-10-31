@@ -26,6 +26,15 @@ vi.mock("./tenant-context.service.js", () => ({
   }))
 }));
 
+const briefApply = vi.hoisted(() => ({
+  applyApprovedJobServiceBriefInTransaction: vi.fn(async () => undefined)
+}));
+
+vi.mock("./job-service-brief.service.js", () => ({
+  applyApprovedJobServiceBrief: vi.fn(),
+  applyApprovedJobServiceBriefInTransaction: briefApply.applyApprovedJobServiceBriefInTransaction
+}));
+
 vi.mock("@fsm/ai/langfuse", () => ({
   recordAgentAuditObservation: vi.fn(async () => undefined)
 }));
@@ -144,5 +153,64 @@ describe("agent-action.service tenant scope (FS-10)", () => {
     stored = fakeDb.getTestState().agentActions.find((row) => row.id === action.id);
     expect(stored?.state).toBe("awaiting_approval");
     expect(stored?.reviewerId).toBeNull();
+  });
+});
+
+describe("executeAgentAction service.job_brief.propose apply (FS-25 follow-up)", () => {
+  function seedApprovedBriefAction(companyId: string) {
+    const params = { summary: "Brief", brief: { jobId: "job-1" } };
+    const record = fakeDb.seedAgentAction({
+      companyId,
+      agentProduct: "service",
+      actionType: "service.job_brief.propose",
+      idempotencyKey: `brief-${companyId}`,
+      payloadHash: "hash-brief",
+      policyVersion: AGENT_POLICY_V1,
+      requiresApproval: true,
+      state: "approved",
+      parameters: params,
+      approvedParameters: params,
+      expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+      target: {
+        entityType: "job",
+        entityId: "job-1",
+        recordVersion: "rv1:1",
+        source: { channel: "web" }
+      }
+    } as never);
+    // createAgentActionRecord does not copy approvedParameters; set it on the stored row.
+    Object.assign(record as object, { approvedParameters: params });
+    return record;
+  }
+
+  it("rolls back to approved (not succeeded) when the brief apply fails", async () => {
+    const tenant = fakeDb.seedCompany({ name: "Tenant S", slug: "tenant-s-fail" });
+    const action = seedApprovedBriefAction(tenant.id);
+    briefApply.applyApprovedJobServiceBriefInTransaction.mockRejectedValueOnce(new Error("apply failed"));
+
+    await expect(
+      agentActionService.executeAgentAction(tenant.id, action.id, "reviewer-1")
+    ).rejects.toThrow("apply failed");
+
+    const stored = fakeDb.getTestState().agentActions.find((row) => row.id === action.id);
+    expect(stored?.state).toBe("approved");
+    expect(stored?.executionReceipt ?? null).toBeNull();
+  });
+
+  it("applies the brief inside the execute transaction before marking succeeded", async () => {
+    const tenant = fakeDb.seedCompany({ name: "Tenant S", slug: "tenant-s-ok" });
+    const action = seedApprovedBriefAction(tenant.id);
+    briefApply.applyApprovedJobServiceBriefInTransaction.mockImplementationOnce(async () => {
+      const during = fakeDb.getTestState().agentActions.find((row) => row.id === action.id);
+      expect(during?.state).toBe("executing");
+    });
+
+    const executed = await agentActionService.executeAgentAction(tenant.id, action.id, "reviewer-1");
+
+    expect(executed.state).toBe("succeeded");
+    expect(briefApply.applyApprovedJobServiceBriefInTransaction).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ companyId: tenant.id, jobId: "job-1", agentActionId: action.id })
+    );
   });
 });

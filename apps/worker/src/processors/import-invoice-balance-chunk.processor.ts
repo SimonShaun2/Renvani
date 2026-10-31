@@ -108,6 +108,25 @@ function resolveRowWindow(
   return { start, end: Math.min(start + chunkSize, totalRows) };
 }
 
+export function mapInvoiceCommitRow(row: ParsedCsvRow, columnMapping: ColumnMapping) {
+  const mapped = mapRowValues(row.values, columnMapping);
+  return ImportInvoiceCommitRowSchema.parse({
+    rowNumber: row.rowNumber,
+    sourceId: normalizeTextValue(mapped.sourceId) ?? mapped.invoiceNumber,
+    invoiceNumber: mapped.invoiceNumber,
+    customerId: normalizeTextValue(mapped.customerId) ?? undefined,
+    customerSourceId: normalizeTextValue(mapped.customerSourceId) ?? undefined,
+    jobSourceId: normalizeTextValue(mapped.jobSourceId) ?? undefined,
+    total: mapped.total,
+    balanceDue: normalizeTextValue(mapped.balanceDue) ?? undefined,
+    amountPaid: normalizeTextValue(mapped.amountPaid) ?? undefined,
+    issuedAt: normalizeTextValue(mapped.issuedAt) ?? undefined,
+    dueAt: normalizeTextValue(mapped.dueAt) ?? undefined,
+    paidAt: normalizeTextValue(mapped.paidAt) ?? undefined,
+    title: normalizeTextValue(mapped.title) ?? undefined,
+  });
+}
+
 function buildResolver(
   lineageMaps: ImportInvoiceBalanceCommitPayload["lineageMaps"],
 ): ImportInvoiceBalanceEntityResolver {
@@ -179,24 +198,7 @@ export async function handleImportInvoiceBalanceCommit(
   };
 
   if (payload.entityType === "invoices") {
-    const invoiceRows = chunkRows.map((row) => {
-      const mapped = mapRowValues(row.values, columnMapping);
-      return ImportInvoiceCommitRowSchema.parse({
-        rowNumber: row.rowNumber,
-        sourceId: normalizeTextValue(mapped.sourceId) ?? mapped.invoiceNumber,
-        invoiceNumber: mapped.invoiceNumber,
-        customerId: normalizeTextValue(mapped.customerId) ?? undefined,
-        customerSourceId: normalizeTextValue(mapped.customerSourceId) ?? undefined,
-        jobSourceId: normalizeTextValue(mapped.jobSourceId) ?? undefined,
-        total: mapped.total,
-        balanceDue: normalizeTextValue(mapped.balanceDue) ?? undefined,
-        amountPaid: normalizeTextValue(mapped.amountPaid) ?? undefined,
-        issuedAt: normalizeTextValue(mapped.issuedAt) ?? undefined,
-        dueAt: normalizeTextValue(mapped.dueAt) ?? undefined,
-        paidAt: normalizeTextValue(mapped.paidAt) ?? undefined,
-        title: normalizeTextValue(mapped.title) ?? undefined,
-      });
-    });
+    const invoiceRows = chunkRows.map((row) => mapInvoiceCommitRow(row, columnMapping));
 
     const result = await commitImportedInvoiceRows(ctx, invoiceRows, resolver);
     logger.info(

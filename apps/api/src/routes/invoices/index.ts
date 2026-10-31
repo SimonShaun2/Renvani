@@ -1,9 +1,13 @@
-import type { FastifyPluginAsync } from "fastify";
+import type { FastifyPluginAsync, preHandlerHookHandler } from "fastify";
+
+import { requireRole } from "../../lib/authorize.js";
+import { technicianOwnInvoiceJob } from "../../lib/technician-scope.js";
 
 import {
   addInvoiceItemHandler,
   createInvoiceHandler,
   deleteInvoiceItemHandler,
+  getInvoiceChargePreviewHandler,
   getInvoiceHandler,
   listInvoicePaymentsHandler,
   listInvoicesHandler,
@@ -44,6 +48,24 @@ import {
 const invoiceRoutes: FastifyPluginAsync = async (fastify) => {
   const authenticate = fastify.authenticate;
 
+  // Security: every /invoices* route is staff-only; technicians get 403.
+  // Appended after `authenticate` so unauthenticated requests still get 401.
+  // Exception: routes that carry their own technician scope (technicianOwnInvoiceJob, #252) keep it.
+  const invoiceRoles = requireRole(["owner", "admin", "dispatcher", "office"]);
+  fastify.addHook("onRoute", (routeOptions) => {
+    if (!routeOptions.url.includes("/invoices")) {
+      return;
+    }
+    const existing = routeOptions.preHandler;
+    const handlers: preHandlerHookHandler[] = existing
+      ? (Array.isArray(existing) ? [...existing] : [existing]) as preHandlerHookHandler[]
+      : [];
+    if (handlers.includes(technicianOwnInvoiceJob)) {
+      return;
+    }
+    routeOptions.preHandler = [...handlers, invoiceRoles];
+  });
+
   fastify.get("/invoices", {
     preHandler: authenticate,
     preValidation: listInvoicesValidation,
@@ -61,6 +83,11 @@ const invoiceRoutes: FastifyPluginAsync = async (fastify) => {
     preValidation: invoiceIdValidation,
     schema: getInvoiceSchema
   }, getInvoiceHandler);
+
+  fastify.get("/invoices/:id/charge-preview", {
+    preHandler: authenticate,
+    preValidation: invoiceIdValidation
+  }, getInvoiceChargePreviewHandler);
 
   fastify.patch("/invoices/:id", {
     preHandler: authenticate,
@@ -117,13 +144,13 @@ const invoiceRoutes: FastifyPluginAsync = async (fastify) => {
   }, deleteInvoiceItemHandler);
 
   fastify.get("/invoices/:id/payments", {
-    preHandler: authenticate,
+    preHandler: [authenticate, technicianOwnInvoiceJob],
     preValidation: invoiceIdValidation,
     schema: listInvoicePaymentsSchema
   }, listInvoicePaymentsHandler);
 
   fastify.get("/payments", {
-    preHandler: authenticate,
+    preHandler: [authenticate, requireRole(["owner", "admin", "dispatcher", "office"])],
     preValidation: listPaymentsValidation,
     schema: listPaymentsSchema
   }, listPaymentsHandler);

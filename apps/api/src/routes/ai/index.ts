@@ -4,6 +4,8 @@ import { requireRole } from "../../lib/authorize.js";
 import {
   actionRecommendationHandler,
   dismissRecommendationHandler,
+  generateRevenueProposalsHandler,
+  proposeRecommendationHandler,
   getRecommendationHandler,
   getRevenueSummaryHandler,
   labelPhotoHandler,
@@ -21,12 +23,17 @@ import {
   recommendationIdValidation,
   revenueSummaryRouteSchema,
   snoozeRecommendationValidation,
-  dismissRecommendationValidation
+  dismissRecommendationValidation,
+  generateRevenueProposalsRouteSchema,
+  generateRevenueProposalsValidation,
+  proposeRecommendationRouteSchema,
+  proposeRecommendationValidation
 } from "./schemas.js";
 
 const aiRoutes: FastifyPluginAsync = async (fastify) => {
   const authenticate = fastify.authenticate;
   const requireOwnerOrAdmin = requireRole(["owner", "admin"]);
+  const requireRevenueAgentReviewer = requireRole(["owner", "admin", "dispatcher"]);
 
   fastify.post("/label-photo", {
     preHandler: [authenticate],
@@ -68,6 +75,19 @@ const aiRoutes: FastifyPluginAsync = async (fastify) => {
     preValidation: snoozeRecommendationValidation,
     schema: mutateRecommendationRouteSchema
   }, snoozeRecommendationHandler);
+
+  // Revenue Agent: turn recommendations into approval-gated agent-action proposals (idempotent rec:<id>).
+  fastify.post("/recommendations/:id/propose", {
+    preHandler: [authenticate, requireRevenueAgentReviewer],
+    preValidation: proposeRecommendationValidation,
+    schema: proposeRecommendationRouteSchema
+  }, proposeRecommendationHandler);
+
+  fastify.post("/revenue-agent/proposals/generate", {
+    preHandler: [authenticate, requireRevenueAgentReviewer],
+    preValidation: generateRevenueProposalsValidation,
+    schema: generateRevenueProposalsRouteSchema
+  }, generateRevenueProposalsHandler);
 };
 
 export default aiRoutes;

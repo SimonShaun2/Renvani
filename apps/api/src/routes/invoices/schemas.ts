@@ -99,6 +99,7 @@ const invoiceItemSchema = {
     id: { type: "string" },
     invoiceId: { type: "string" },
     companyId: { type: "string" },
+    priceBookItemId: nullableStringSchema,
     name: { type: "string" },
     description: nullableStringSchema,
     itemType: { type: "string" },
@@ -146,6 +147,11 @@ const paymentSchema = {
     customerId: { type: "string" },
     collectedById: nullableStringSchema,
     amount: { type: "string" },
+    serviceFeeAmount: { type: "string" },
+    bookingFeeAmount: { type: "string" },
+    feeRefundable: { type: "boolean" },
+    amountRefunded: { type: "string" },
+    refundableAmount: { type: "string" },
     method: { type: "string" },
     status: { type: "string" },
     stripePaymentIntentId: nullableStringSchema,
@@ -170,7 +176,10 @@ const invoicePaymentSummarySchema = {
     method: { type: "string" },
     status: { type: "string" },
     paidAt: nullableDateTimeSchema,
-    stripePaymentIntentId: nullableStringSchema
+    stripePaymentIntentId: nullableStringSchema,
+    serviceFeeAmount: { type: "string" },
+    bookingFeeAmount: { type: "string" },
+    feeRefundable: { type: "boolean" }
   }
 } as const;
 
@@ -198,6 +207,8 @@ const invoiceListItemSchema = {
     total: { type: "string" },
     amountPaid: { type: "string" },
     balanceDue: { type: "string" },
+    serviceFeeAmount: { type: "string" },
+    bookingFeeAmount: { type: "string" },
     dueAt: nullableDateTimeSchema,
     paidAt: nullableDateTimeSchema,
     customer: {
@@ -254,6 +265,8 @@ const invoiceDetailSchema = {
     total: { type: "string" },
     amountPaid: { type: "string" },
     balanceDue: { type: "string" },
+    serviceFeeAmount: { type: "string" },
+    bookingFeeAmount: { type: "string" },
     issuedAt: nullableDateTimeSchema,
     sentAt: nullableDateTimeSchema,
     dueAt: nullableDateTimeSchema,
@@ -325,7 +338,8 @@ export const CreateInvoiceItemSchema = z
     quantity: z.number().min(0.001),
     unitPrice: z.number().min(0),
     isTaxable: z.boolean().optional().default(true),
-    sortOrder: z.number().int().optional().default(0)
+    sortOrder: z.number().int().optional().default(0),
+    priceBookItemId: uuidSchema.optional()
   })
   .strict();
 
@@ -336,7 +350,8 @@ export const UpdateInvoiceItemSchema = buildUpdateSchema({
   quantity: z.number().min(0.001).optional(),
   unitPrice: z.number().min(0).optional(),
   isTaxable: z.boolean().optional(),
-  sortOrder: z.number().int().optional()
+  sortOrder: z.number().int().optional(),
+  priceBookItemId: uuidSchema.nullable().optional()
 });
 
 export const CreateInvoiceSchema = z

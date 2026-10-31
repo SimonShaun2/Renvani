@@ -31,6 +31,7 @@ import {
   handleVipInvoicePaymentSucceeded,
   handleVipSubscriptionCreated
 } from "./stripe-vip-membership.handler.js";
+import { handleStripeDisputeEvent, isStripeDisputeEventType } from "./stripe-dispute.handler.js";
 import {
   claimEventProcessing,
   clearEventProcessingClaim,
@@ -676,6 +677,10 @@ export async function stripeHandler(
         await handleAccountUpdated(event, request.log);
         break;
       default:
+        if (isStripeDisputeEventType(event.type)) {
+          await handleStripeDisputeEvent(event, request.log);
+          break;
+        }
         request.log.warn(
           {
             eventId: event.id,
@@ -697,6 +702,12 @@ export async function stripeHandler(
       "Stripe webhook handler error"
     );
     await clearEventProcessingClaim(event.id);
+
+    // Non-2xx so Stripe redelivers; the claim is cleared and payment recording is idempotent per intent.
+    return reply.code(500).send({
+      error: "STRIPE_WEBHOOK_PROCESSING_FAILED",
+      message: "Stripe event processing failed; retry"
+    });
   }
 
   return reply.code(200).send({

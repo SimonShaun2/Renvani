@@ -48,10 +48,27 @@ const JobTaskUpdatePayloadSchema = z.object({
   notes: z.string().max(5000).optional()
 });
 
-const JobSignatureCapturePayloadSchema = z.object({
-  signatureUrl: z.string().url().max(2048),
-  signedByName: z.string().min(1).max(255)
-});
+/**
+ * Exactly one of `attachmentId` (preferred: an image attachment already uploaded
+ * to the same job) or legacy `signatureUrl` must be provided.
+ */
+/** Who signed: text-key registry (stored as varchar, not a pgEnum). Add keys here; never reorder. */
+export const SIGNER_ROLES = ["customer", "technician"] as const;
+export const SignerRoleSchema = z.enum(SIGNER_ROLES);
+export type SignerRole = z.infer<typeof SignerRoleSchema>;
+
+export const JobSignatureCapturePayloadSchema = z
+  .object({
+    attachmentId: z.string().uuid().optional(),
+    signatureUrl: z.string().url().max(2048).optional(),
+    signedByName: z.string().trim().min(1).max(255),
+    /** Additive; omitted = "customer" (pre-existing clients). */
+    signerRole: SignerRoleSchema.optional()
+  })
+  .refine((payload) => (payload.attachmentId === undefined) !== (payload.signatureUrl === undefined), {
+    message: "Provide exactly one of attachmentId or signatureUrl",
+    path: ["attachmentId"]
+  });
 
 const JobMediaRegisterPayloadSchema = z.object({
   url: z.string().url().max(2048),
@@ -122,6 +139,12 @@ export const FieldWorkSyncOperationResultSchema = z.object({
   recordVersion: RecordVersionV1Schema.optional(),
   entityId: z.string().uuid().optional(),
   message: z.string().optional(),
+  /** Machine-readable reason for a rejected operation (additive; e.g. SIGNATURE_ATTACHMENT_INVALID). */
+  code: z.string().optional(),
+  /** Additive, job.signature.capture only: server time the signature was recorded (ISO 8601). */
+  signedAt: z.string().optional(),
+  /** Additive, job.signature.capture only. */
+  signerRole: SignerRoleSchema.optional(),
   conflict: z
     .object({
       liveRecordVersion: RecordVersionV1Schema,
@@ -144,3 +167,22 @@ export type SubmitFieldWorkSyncBatchResponse = z.infer<typeof SubmitFieldWorkSyn
 export function isFieldWorkSyncOperationType(value: string): value is (typeof FIELD_WORK_SYNC_OPERATION_TYPES)[number] {
   return (FIELD_WORK_SYNC_OPERATION_TYPES as readonly string[]).includes(value);
 }
+
+/** POST /api/v1/field-work/jobs/:jobId/signature (dedicated endpoint; same rules as job.signature.capture). */
+export const CaptureJobSignatureBodySchema = z
+  .object({
+    clientOperationId: ClientOperationIdSchema,
+    baseRecordVersion: RecordVersionV1Schema,
+    attachmentId: z.string().uuid().optional(),
+    signatureUrl: z.string().url().max(2048).optional(),
+    signedByName: z.string().trim().min(1).max(255),
+    signerRole: SignerRoleSchema
+  })
+  .strict()
+  .refine((body) => (body.attachmentId === undefined) !== (body.signatureUrl === undefined), {
+    message: "Provide exactly one of attachmentId or signatureUrl",
+    path: ["attachmentId"]
+  });
+export type CaptureJobSignatureBody = z.infer<typeof CaptureJobSignatureBodySchema>;
+
+export const CaptureJobSignatureParamsSchema = z.object({ jobId: z.string().uuid() }).strict();

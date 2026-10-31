@@ -6,6 +6,7 @@ import {
   db,
   emitEventWithExecutor,
   fieldSyncBatches,
+  fileAttachments,
   fieldSyncOperations,
   jobs,
   jobTasks,
@@ -15,6 +16,8 @@ import {
   AppError,
   ErrorCode,
   FIELD_WORK_SYNC_CONTRACT_VERSION,
+  type CaptureJobSignatureBody,
+  type SignerRole,
   type FieldWorkSyncOperationInput,
   type FieldWorkSyncOperationOutcome,
   type SubmitFieldWorkSyncBatchBody,
@@ -27,6 +30,12 @@ import {
   type UserRole
 } from "@fsm/types";
 
+import {
+  isJobSignatureObjectRef,
+  resolveTenantAttachmentObjectKey,
+  toJobSignatureObjectRef
+} from "../lib/job-signature-ref.js";
+
 import { addNote, addPhoto, transitionStatus } from "./job.service.js";
 import { updateTask } from "./job-tasks.service.js";
 
@@ -37,6 +46,62 @@ export interface FieldWorkSyncActor {
   companyId: string;
   userId: string;
   role: UserRole;
+}
+
+export const SIGNATURE_ATTACHMENT_INVALID = "SIGNATURE_ATTACHMENT_INVALID";
+const SIGNATURE_IMAGE_MIME_TYPES = new Set(["image/png", "image/jpeg", "image/webp"]);
+/** Signatures are small line drawings; anything larger is not a signature pad export. */
+const MAX_SIGNATURE_BYTES = 5 * 1024 * 1024;
+
+type SignatureCapturePayload = {
+  attachmentId?: string | undefined;
+  signatureUrl?: string | undefined;
+  signedByName: string;
+};
+
+async function resolveSignatureCaptureValue(
+  companyId: string,
+  jobId: string,
+  payload: SignatureCapturePayload
+): Promise<{ ok: true; value: string } | { ok: false; message: string }> {
+  if (!payload.attachmentId) {
+    return payload.signatureUrl
+      ? { ok: true, value: payload.signatureUrl }
+      : { ok: false, message: "Provide exactly one of attachmentId or signatureUrl" };
+  }
+
+  // Same generic message for missing / other job / other tenant: no existence leak.
+  const notUsable = { ok: false as const, message: "Signature attachment not found on this job" };
+  const [attachment] = await db
+    .select()
+    .from(fileAttachments)
+    .where(
+      and(
+        eq(fileAttachments.companyId, companyId),
+        eq(fileAttachments.id, payload.attachmentId),
+        isNull(fileAttachments.deletedAt)
+      )
+    )
+    .limit(1);
+
+  if (!attachment || attachment.companyId !== companyId) {
+    return notUsable;
+  }
+  const onJob = attachment.jobId === jobId || (attachment.entityType === "job" && attachment.entityId === jobId);
+  if (!onJob) {
+    return notUsable;
+  }
+  if (!attachment.mimeType || !SIGNATURE_IMAGE_MIME_TYPES.has(attachment.mimeType)) {
+    return { ok: false, message: "Signature attachment must be a PNG, JPEG, or WebP image" };
+  }
+  if (!attachment.fileSizeBytes || attachment.fileSizeBytes <= 0 || attachment.fileSizeBytes > MAX_SIGNATURE_BYTES) {
+    return { ok: false, message: "Signature attachment size is invalid" };
+  }
+  const objectKey = resolveTenantAttachmentObjectKey(companyId, attachment.fileUrl);
+  if (!objectKey) {
+    return notUsable;
+  }
+  return { ok: true, value: toJobSignatureObjectRef(objectKey) };
 }
 
 function hashPayload(value: unknown): string {
@@ -53,6 +118,11 @@ function toOperationResult(row: OperationRow) {
     recordVersion: typeof resultPayload.recordVersion === "string" ? resultPayload.recordVersion : undefined,
     entityId: typeof resultPayload.entityId === "string" ? resultPayload.entityId : undefined,
     message: typeof resultPayload.message === "string" ? resultPayload.message : undefined,
+    code: typeof resultPayload.code === "string" ? resultPayload.code : undefined,
+    ...(typeof resultPayload.signedAt === "string" ? { signedAt: resultPayload.signedAt } : {}),
+    ...(resultPayload.signerRole === "customer" || resultPayload.signerRole === "technician"
+      ? { signerRole: resultPayload.signerRole as "customer" | "technician" }
+      : {}),
     conflict:
       resultPayload.conflict && typeof resultPayload.conflict === "object"
         ? (resultPayload.conflict as { liveRecordVersion: string; reason: string })
@@ -60,7 +130,7 @@ function toOperationResult(row: OperationRow) {
   };
 }
 
-async function assertJobFieldAccess(
+export async function assertJobFieldAccess(
   companyId: string,
   userId: string,
   role: UserRole,
@@ -306,20 +376,30 @@ async function applyOperation(
         return buildFieldWorkSyncVersionConflict(liveVersion, "Job recordVersion is stale");
       }
 
-      if (job.signatureUrl && job.signatureUrl !== operation.payload.signatureUrl) {
+      const resolvedSignature = await resolveSignatureCaptureValue(actor.companyId, operation.jobId, operation.payload);
+      if (!resolvedSignature.ok) {
+        return {
+          outcome: "rejected",
+          resultPayload: { code: SIGNATURE_ATTACHMENT_INVALID, message: resolvedSignature.message }
+        };
+      }
+      const signatureValue = resolvedSignature.value;
+
+      if (job.signatureUrl && job.signatureUrl !== signatureValue) {
         return buildFieldWorkSyncVersionConflict(
           liveVersion,
           "Job already has a different signature on file"
         );
       }
 
-      if (job.signatureUrl === operation.payload.signatureUrl) {
+      if (job.signatureUrl === signatureValue) {
         return {
           outcome: "applied",
           resultPayload: {
             entityId: job.id,
             recordVersion: liveVersion,
-            message: "Signature already captured"
+            message: SIGNATURE_ALREADY_CAPTURED_MESSAGE,
+            ...(job.signedAt ? { signedAt: job.signedAt.toISOString() } : {})
           }
         };
       }
@@ -328,8 +408,8 @@ async function applyOperation(
       const updatedRows = await db
         .update(jobs)
         .set({
-          signatureUrl: operation.payload.signatureUrl,
-          signedByName: operation.payload.signedByName,
+          signatureUrl: signatureValue,
+          signedByName: operation.payload.signedByName.trim(),
           signedAt,
           updatedAt: signedAt
         })
@@ -351,15 +431,21 @@ async function applyOperation(
         entityId: updated.id,
         jobId: updated.id,
         customerId: updated.customerId,
-        summary: `Captured customer signature on job ${updated.jobNumber}`,
-        payload: { signatureUrl: updated.signatureUrl }
+        summary: `Captured ${operation.payload.signerRole === "technician" ? "technician" : "customer"} signature on job ${updated.jobNumber}`,
+        // Never put the internal storage reference on the event bus.
+        payload: isJobSignatureObjectRef(updated.signatureUrl)
+          ? { signatureAttachmentId: operation.payload.attachmentId ?? null }
+          : { signatureUrl: updated.signatureUrl }
       });
 
       return {
         outcome: "applied",
         resultPayload: {
           entityId: updated.id,
-          recordVersion: buildRecordVersionV1("job", updated.id, updated.updatedAt)
+          recordVersion: buildRecordVersionV1("job", updated.id, updated.updatedAt),
+          signedAt: signedAt.toISOString(),
+          // Signer role is persisted on the stored operation result (no jobs column / migration).
+          signerRole: operation.payload.signerRole ?? "customer"
         }
       };
     }
@@ -492,5 +578,81 @@ export async function submitFieldWorkSyncBatch(
     batchClientId: input.batchClientId,
     lastAcknowledgedSequence,
     results
+  };
+}
+
+const SIGNATURE_ALREADY_CAPTURED_MESSAGE = "Signature already captured";
+
+export interface CapturedJobSignature {
+  /** true only when this request stored a new signature (route answers 201); replays / already-captured answer 200. */
+  created: boolean;
+  jobId: string;
+  outcome: "applied" | "duplicate";
+  signedAt: string | null;
+  signedByName: string | null;
+  signerRole: SignerRole | null;
+  recordVersion: string | null;
+}
+
+/**
+ * Dedicated signature capture (POST /field-work/jobs/:jobId/signature). Runs as a one-operation sync batch so it
+ * shares validation, technician scope, idempotency (clientOperationId) and the stored-ref rules with the
+ * `job.signature.capture` sync path used by #314 (that path is unchanged). Real status codes, existing error shape:
+ * 201 newly captured, 200 replay or same signature already on file, 400 invalid body / rejected signature,
+ * 401 unauthenticated, 403 role or unassigned technician, 404 job not in this company, 409 stale recordVersion or a
+ * different signature already on file. No other codes (429 only from the global per-IP rate limit).
+ */
+export async function captureJobSignature(
+  actor: FieldWorkSyncActor,
+  jobId: string,
+  body: CaptureJobSignatureBody
+): Promise<CapturedJobSignature> {
+  await assertJobFieldAccess(actor.companyId, actor.userId, actor.role, jobId);
+  const payload = {
+    signedByName: body.signedByName,
+    signerRole: body.signerRole,
+    ...(body.attachmentId !== undefined ? { attachmentId: body.attachmentId } : {}),
+    ...(body.signatureUrl !== undefined ? { signatureUrl: body.signatureUrl } : {})
+  };
+  const response = await submitFieldWorkSyncBatch(actor, {
+    contractVersion: FIELD_WORK_SYNC_CONTRACT_VERSION,
+    deviceId: "signature-endpoint",
+    batchClientId: `signature-${createHash("sha256").update(body.clientOperationId).digest("hex").slice(0, 40)}`,
+    operations: [
+      {
+        sequence: 1,
+        clientOperationId: body.clientOperationId,
+        jobId,
+        type: "job.signature.capture",
+        baseRecordVersion: body.baseRecordVersion,
+        payload
+      }
+    ]
+  } as SubmitFieldWorkSyncBatchBody);
+  const result = response.results[0];
+  if (!result) throw new AppError(ErrorCode.INTERNAL_ERROR, "Signature capture returned no result");
+  if (result.outcome === "conflict") {
+    throw new AppError(ErrorCode.CONFLICT, result.conflict?.reason ?? result.message ?? "Job recordVersion is stale", {
+      ...(result.conflict?.liveRecordVersion ? { liveRecordVersion: result.conflict.liveRecordVersion } : {})
+    });
+  }
+  if (result.outcome === "rejected") {
+    throw new AppError(ErrorCode.VALIDATION_ERROR, result.message ?? "Signature rejected", {
+      ...(result.code ? { code: result.code } : {})
+    });
+  }
+  const [job] = await db
+    .select()
+    .from(jobs)
+    .where(and(eq(jobs.companyId, actor.companyId), eq(jobs.id, jobId), isNull(jobs.deletedAt)))
+    .limit(1);
+  return {
+    created: result.outcome === "applied" && result.message !== SIGNATURE_ALREADY_CAPTURED_MESSAGE,
+    jobId,
+    outcome: result.outcome,
+    signedAt: job?.signedAt ? job.signedAt.toISOString() : (result.signedAt ?? null),
+    signedByName: job?.signedByName ?? null,
+    signerRole: result.signerRole ?? null,
+    recordVersion: job ? buildRecordVersionV1("job", job.id, job.updatedAt) : (result.recordVersion ?? null)
   };
 }

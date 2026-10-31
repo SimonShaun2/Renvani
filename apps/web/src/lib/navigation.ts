@@ -104,6 +104,7 @@ export const settingsNavigation: NavItem[] = [
   { label: "Notifications", href: "/settings/notifications", icon: MessageSquareText },
   { label: "Booking", href: "/settings/booking/general", icon: CalendarDays },
   { label: "Review Links", href: "/settings/review-links", icon: MessageSquareText },
+  { label: "Google Business", href: "/settings/google-business", icon: MessageSquareText },
   { label: "Users", href: "/settings/users", icon: Users },
   { label: "Billing", href: "/settings/billing", icon: Package }
 ];

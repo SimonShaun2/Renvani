@@ -376,6 +376,19 @@ describe("FS-42 tenant access audit", () => {
     expect(fakeDb.getTestState().callTrackingNumbers.find((n) => n.id === numberB.id)?.label).toBe("B line");
   });
 
+  it("FS42-XT-CALL-TRACKING-VERIFY number list shows only own numbers, each unverified on the disabled adapter", async () => {
+    const companyA = fakeDb.seedCompany({ name: "Verify A", slug: "verify-a" });
+    const companyB = fakeDb.seedCompany({ name: "Verify B", slug: "verify-b" });
+    const ownerA = fakeDb.seedUser({ companyId: companyA.id, email: "owner@verify-a.test", firstName: "O", lastName: "A", role: "owner" });
+    const numberA = fakeDb.seedCallTrackingNumber({ companyId: companyA.id, trackingNumber: "+15125550188", label: "A line" });
+    fakeDb.seedCallTrackingNumber({ companyId: companyB.id, trackingNumber: "+15125550199", label: "B line" });
+    const auth = `Bearer ${tokens.generateAccessToken({ userId: ownerA.id, companyId: companyA.id, role: "owner" })}`;
+    const response = await request(app.server).get("/api/v1/growth/call-tracking/numbers").set("Authorization", auth);
+    expect(response.status).toBe(200);
+    expect(response.body.numbers).toHaveLength(1);
+    expect(response.body.numbers[0]).toMatchObject({ id: numberA.id, verificationStatus: "unverified", canReceiveCalls: false });
+  });
+
   it("FS42-UNAUTH-GROWTH-FINDING-REVIEW POST /growth-check/findings/:id/reviews returns 401 without credentials", async () => {
     const response = await request(app.server)
       .post("/api/v1/growth-check/findings/00000000-0000-4000-8000-000000000001/reviews")

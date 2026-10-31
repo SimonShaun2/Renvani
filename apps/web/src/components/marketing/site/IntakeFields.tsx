@@ -45,10 +45,10 @@ export function TextInput({ id, name, error, type = "text", ...rest }: InputProp
 }
 
 /** `tabletChevron={false}`: hide the chevron at md only (the /demo tablet frame 253:6781 has none; mobile and desktop frames keep it). */
-export function SelectInput({ id, name, error, placeholder, options, required = true, tabletChevron = true }: { id: string; name: string; error?: string | undefined; placeholder: string; options: { value: string; label: string }[]; required?: boolean; tabletChevron?: boolean }) {
+export function SelectInput({ id, name, error, placeholder, options, required = true, tabletChevron = true, defaultValue = "" }: { defaultValue?: string; id: string; name: string; error?: string | undefined; placeholder: string; options: { value: string; label: string }[]; required?: boolean; tabletChevron?: boolean }) {
   return (
     <div className="relative">
-      <select id={id} name={name} required={required} defaultValue="" aria-invalid={error ? true : undefined} aria-describedby={error ? `${id}-error` : undefined} className={`${control} appearance-none pr-10`} style={{ borderColor: line, color: ink }}>
+      <select id={id} name={name} required={required} defaultValue={defaultValue} aria-invalid={error ? true : undefined} aria-describedby={error ? `${id}-error` : undefined} className={`${control} appearance-none pr-10`} style={{ borderColor: line, color: ink }}>
         <option value="" disabled>
           {placeholder}
         </option>

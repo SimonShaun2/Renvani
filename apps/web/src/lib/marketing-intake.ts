@@ -25,11 +25,11 @@ const L = MARKETING_INTAKE_LIMITS;
 /** Visitor-facing copy per field; the shared schemas carry developer messages. */
 const FIELD_MESSAGES: Record<string, { empty: string; invalid: string }> = {
   name: { empty: "Enter your name.", invalid: `Use ${L.name} characters or fewer.` },
-  email: { empty: "Enter your email.", invalid: "Enter a valid email." },
+  email: { empty: "Enter a complete email address.", invalid: "Enter a complete email address." },
   phone: { empty: "Enter a 10-digit US phone number.", invalid: "Enter a 10-digit US phone number." },
   company: { empty: "Enter your business name.", invalid: `Use ${L.company} characters or fewer.` },
   trade: { empty: "Choose your trade.", invalid: "Choose your trade." },
-  teamSize: { empty: "Choose team size.", invalid: "Choose team size." },
+  teamSize: { empty: "Choose your team size.", invalid: "Choose your team size." },
   websiteUrl: { empty: "Enter your website, like yourbusiness.com.", invalid: "Enter your website, like yourbusiness.com." },
   location: { empty: "Enter your ZIP or city.", invalid: "Enter a 5-digit ZIP or a city." }
 };
@@ -43,7 +43,7 @@ export type IntakeResult =
   | { status: "error"; message: string };
 
 export const INTAKE_MESSAGES = {
-  invalid: "Check the highlighted fields.",
+  invalid: "Check the highlighted details.",
   tooLarge: "That request is too long. Shorten it and try again.",
   rateLimited: "Too many requests. Please wait a moment and try again.",
   error: "Something went wrong on our side. Please try again."

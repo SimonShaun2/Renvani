@@ -1,4 +1,4 @@
-import { HOME_SERVICE_TRADES, PublicServesZipBodySchema } from "@fsm/types";
+import { HOME_SERVICE_TRADES, leadAttributionInputSchema, PublicServesZipBodySchema } from "@fsm/types";
 import { z } from "zod";
 
 import { withZodValidation } from "../../shared/validation.js";
@@ -95,7 +95,8 @@ export const SubmitBookingRequestSchema = z.object({
   preferredWindow: z.enum(["morning", "afternoon", "first_available"]).optional(),
   isPropertyOwner: z.boolean().optional(),
   smsConsentAppointments: z.boolean().optional(),
-  smsConsentMarketing: z.boolean().optional()
+  smsConsentMarketing: z.boolean().optional(),
+  leadAttribution: leadAttributionInputSchema
 }).strict();
 
 export const BookingSubmitQuerySchema = z.object({

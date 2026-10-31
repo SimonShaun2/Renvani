@@ -1,3 +1,4 @@
+import type { LeadAttribution } from "./lead-attribution.types.js";
 import type { PaginatedResult } from "./customer.types.js";
 
 export type BookingRequestStatus = "pending" | "confirmed" | "cancelled" | "completed" | "no_show";
@@ -90,6 +91,8 @@ export interface SubmitBookingRequestInput {
   isPropertyOwner?: boolean;
   smsConsentAppointments?: boolean;
   smsConsentMarketing?: boolean;
+  /** Sanitized via sanitizeLeadAttribution before storage. */
+  leadAttribution?: LeadAttribution;
   source?: BookingSource;
 }
 

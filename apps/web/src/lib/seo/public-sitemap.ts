@@ -22,6 +22,8 @@ export const ROBOTS_ALLOW = [
   { key: "pricing", prefix: "/pricing" },
   { key: "product", prefix: "/product/" },
   { key: "product-tour", prefix: "/product-tour" },
+  { key: "products", prefix: "/product$" }, // products directory (exact)
+  { key: "how-it-works", prefix: "/how-it-works" },
   { key: "industries", prefix: "/industries" },
   { key: "shop-site", prefix: "/site/" }, // shop sites + /site/:slug/inquire
   { key: "public-booking", prefix: "/book/" }
@@ -100,6 +102,23 @@ export async function buildPublicSitemap(
         priority: type.priority
       }))
     );
+}
+
+/** Marketing website pages (Figma 171:2) listed in the sitemap. Add a page here when its route ships. */
+export const MARKETING_SITEMAP_PATHS = [
+  { path: "/", priority: 1 },
+  { path: "/product", priority: 0.9 },
+  { path: "/how-it-works", priority: 0.9 },
+  ...["growth", "revenue", "operations", "retention", "command-center", "online-booking", "estimates-approvals", "scheduling-dispatch"].map((slug) => ({ path: `/product/${slug}`, priority: 0.8 })),
+  { path: "/pricing", priority: 0.8 },
+  { path: "/industries", priority: 0.8 },
+  ...["hvac", "plumbing", "electrical"].map((slug) => ({ path: `/industries/${slug}`, priority: 0.7 }))
+] as const;
+
+export function buildMarketingSitemap(env: NodeJS.ProcessEnv = process.env): MetadataRoute.Sitemap {
+  const base = publicSiteUrl(env);
+  if (!base) return [];
+  return MARKETING_SITEMAP_PATHS.map((p) => ({ url: `${base}${p.path === "/" ? "" : p.path}`, changeFrequency: "weekly" as const, priority: p.priority }));
 }
 
 export function buildPublicRobots(env: NodeJS.ProcessEnv = process.env): MetadataRoute.Robots {

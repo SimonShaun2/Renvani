@@ -39,7 +39,7 @@ Every agent action type must satisfy all seven items:
 | Item | Status | Evidence (file:line) |
 |---|---|---|
 | C2 Tenant scope | **PARTIAL** | <ul><li>Approve, reject, edit and execute run in `runTransactionWithTenantSession` (`agent-action.service.ts:314, 379, 450, 531`), as does escalate (`agent-action-escalation.service.ts:39`).</li><li>Every row query uses `agentActionScopedWhere` (`agent-action.service.ts:43-49`).</li><li>Bypasses are listed in §3 (B1–B4).</li></ul> |
-| C3 Permissions (role) | **PARTIAL** | <ul><li>The role gate owner/admin/dispatcher is at `routes/agent-actions/index.ts:18` and `routes/operator/index.ts:22`.</li><li>But `preValidation` (zod) runs **before** `preHandler` (`authenticate`, `requireRole`) at `routes/agent-actions/index.ts:21-44`. Unauthenticated or wrong-role callers therefore get 400 instead of 401/403 (TE-AUTH-01/02).</li><li>The executor policy call hard-codes `actorType: "user"` (`agent-action.executors.ts:53`).</li></ul> |
+| C3 Permissions (role) | **PARTIAL** (auth order fixed in the TE-AUTH PR) | <ul><li>The role gate owner/admin/dispatcher is at `routes/agent-actions/index.ts:18` and `routes/operator/index.ts:22`.</li><li>**Fixed:** `authenticate` and `requireRole` now run in `onRequest`, before `preValidation` (zod), on every `/agent-actions/*` and `/operator/*` route. Unauthenticated callers get 401 and wrong-role callers 403 before any validation (TE-AUTH-01/02, now in the default run, plus TE-AUTH-03/04/05).</li><li>The executor policy call hard-codes `actorType: "user"` (`agent-action.executors.ts:53`).</li></ul> |
 | C3 Permissions (actor per product) | PASS | Enforced at create by `registerAgentProduct` (`agent-action.registry.ts:63-93`) through `assertActionAllowedForProduct` (`agent-action.service.ts:185`). |
 | C3 Cross-tenant | PASS | 404 via scoped where plus `assertAgentActionTenantScope` (`agent-action.service.ts:135-149`). Covered by control CTRL-02. |
 | C4 Policy version | **PARTIAL** | <ul><li>Checked only at create (`agent-action.policy.ts:13-16`, `agent-action.service.ts:184`).</li><li>Approve and execute never re-check `row.policyVersion` (`agent-action.service.ts:305-371, 522-648`).</li><li>The receipt records only the *outbound* decision's version, and only for outbound executors (`agent-action.service.ts:588-595`).</li></ul> |
@@ -132,7 +132,7 @@ The fix is one new read-only endpoint, for example `GET /api/v1/reporting/comman
 | 3 | G-UI-APPROVE: "Approve & send" only approves | execution and delivery states / UX | (web; documented) | API: optional `POST /agent-actions/:id/approve-and-execute` (one tenant tx, same contract). Web (Dev C): relabel to "Approve", or call the combined endpoint. | yes (same as 2) |
 | 4 | G-VER: `expectedVersion` optional; edit has no compare-and-set — **FIXED for approve/execute/edit in fix PR 1** (reject/escalate still optional) | stale records | TE-STALE-01, -02, -03 (pass; default run) | Make `expectedVersion` required on approve/reject/execute/edit/escalate (400 if missing). Edit uses compare-and-set on `updated_at`. Web sends `item.version` (Dev C, same release). | no |
 | 5 | G-IDEM: no idempotency key on state changes — **FIXED for approve/execute in fix PR 1** | duplicates | TE-DUP-01, -02 (pass; default run) | Accept an `Idempotency-Key` header. Store `{op, key, resultVersion}` in the audit event payload (no new table) and replay the first result for the same key. | no |
-| 6 | G-AUTH-ORDER: validation before auth | unauthorized | TE-AUTH-01, -02 | Move `authenticate` and `requireRole` to `onRequest` (or validation to `preHandler`) for `/agent-actions/*` and `/operator/*`. | no |
+| 6 | G-AUTH-ORDER: validation before auth — **FIXED in the TE-AUTH PR** | unauthorized | TE-AUTH-01, -02 (pass; default run) | Move `authenticate` and `requireRole` to `onRequest` (or validation to `preHandler`) for `/agent-actions/*` and `/operator/*`. | no |
 | 7 | G-TX: tenant-session bypasses B1–B4 | tenant scope | (documented; needs Neon/RLS harness) | B1/B2 → `runTransactionWithTenantSession`. B3 → `resolveEntityRef(…, tx)`. B4 reads → tenant session. | no |
 | 8 | G-SCHEMA: no per-type parameter schema for `revenue.inquiry.qualify`, `scheduling.booking.self_service` and the 4 Revenue kinds | input schema | (documented) | Add an optional `parametersSchema` to `AgentActionTypeDefinition`, parsed at create and execute. | no |
 | 9 | G-POLICY: policy version not re-checked at approve/execute; executor actor hard-coded `"user"` | permissions / policy | (documented) | `assertPolicyVersion(row.policyVersion)` at approve/execute; pass the real actor type. | no |
@@ -152,6 +152,8 @@ The fix is one new read-only endpoint, for example `GET /api/v1/reporting/comman
 That is **10 gaps and 10 failing tests**, plus 2 passing controls, as audited.
 
 **Status after fix PR 1 (G-VER, G-IDEM):** TE-STALE-01/02/03 and TE-DUP-01/02 pass and moved to `apps/api/src/trusted-execution/trusted-execution.test.ts` in the default run, with TE-STALE-04 and TE-DUP-03/04 added. The gap script now holds 5 failing tests (TE-AUTH-01/02, TE-FAIL-01, TE-RCPT-01/02) plus the 2 controls.
+
+**Status after the TE-AUTH PR (G-AUTH-ORDER):** TE-AUTH-01/02 pass and moved to `trusted-execution.test.ts` in the default run, with TE-AUTH-03/04/05 added (operator surface, escalate, and validation still running for authorised callers). The gap script now holds 3 failing tests (TE-FAIL-01, TE-RCPT-01/02) plus the 2 controls.
 
 ## 7. Failing-test output (as audited, 2026-10-31; see the status note in §6 for what now passes)
 
@@ -179,3 +181,22 @@ That is **10 gaps and 10 failing tests**, plus 2 passing controls, as audited.
 - **Mocked outbound policy:** TE-RCPT tests mock `authorizeAgentActionExecution` to "allowed" so that execution is reached without consent rows. This is why the real consent behaviour depends on #301.
 - **Target version mocked:** `resolveEntityRef` is mocked to a stable `recordVersion`, and stale-target behaviour is not under test.
 - **Web-only gaps:** Command Center KPIs and the "Approve & send" label are web code and have no failing test in this PR.
+
+## 9. Fix status (updated 2026-10-31, after #370 merged)
+
+#370 (fix PR 1: TE-STALE, TE-DUP) is merged into dev. This PR (#380) adds only building blocks: nothing in `executeAgentAction` calls them yet, so the three tests below still fail and stay in the gap script.
+
+| Gap test | Status | Notes |
+|---|---|---|
+| TE-FAIL-01 | **PARTIAL: building blocks in #380; wiring is the follow-up after #380 merges** | `services/agent-action-receipt.ts` adds `persistAgentActionExecutionFailure`. After the execute tx rolls back, it opens a second tenant tx and does a compare-and-set from `approved`/`executing` to `failed`, writing a failed receipt and an `execution_failed` audit event. The first tx has already rolled back, so no row lock is held and this cannot deadlock. The caller passes `actorType` (no hardcoded `user`). The receipt keeps an AppError's code and message; any other error gets `EXECUTION_FAILED` with a generic message, and the raw (truncated) error text is kept only in the audit event detail. |
+| TE-RCPT-01 | **PARTIAL: building blocks in #380; wiring is the follow-up** | Executors declare `delivery: "outbound"` for message.send_proposed, loyalty.reminder.propose and the 4 Revenue kinds. `buildAgentActionExecutionResultForType` returns state `executing` with outcome `queued` for these, never `succeeded`. |
+| TE-RCPT-02 | **PARTIAL: building blocks in #380; wiring is the follow-up** | `@fsm/types` adds `AgentActionDeliveryStateV1Schema` (`queued` \| `provider_accepted` \| `delivered` \| `failed`). `ExecutionReceiptV1Schema` gains `outcome: "queued"` and an optional `deliveryState`. |
+| TE-AUTH-01/02 | Open on dev; fixed in #382 (separate PR) | Still in the gap script on dev. #382 moves auth and role checks to `onRequest` and moves both tests to the default run. |
+
+Gap script on this branch: 5 failing (TE-AUTH-01/02, TE-FAIL-01, TE-RCPT-01/02) plus 2 passing controls. After #382 merges it is 3 failing.
+
+**Follow-up after #380 merges (in `executeAgentAction`, `agent-action.service.ts`):**
+1. Replace the hard-coded receipt and `state: "succeeded"` with `buildAgentActionExecutionResultForType(row.actionType, base)`. Write `result.state` and `result.receipt`, and transition from `executing` to `result.state`. For outbound kinds the row stays `executing` with a `queued` receipt.
+2. Keep the `agent.execution_succeeded` audit event (and its idempotency detail) for both outcomes, so a same-key replay still finds it. Alternatively, record queued executes under their own event type and extend `IDEMPOTENT_OPERATION_EVENT_TYPE`.
+3. In the catch, when the error happened after the row was loaded and is not an expiry, stale or version conflict, call `persistAgentActionExecutionFailure({ companyId, actionId, actorId, actorType: "user", error })`, then rethrow.
+4. Move TE-FAIL-01 and TE-RCPT-01/02 out of the gap script into the default run, and set these rows to fixed.

@@ -45,7 +45,7 @@ export function AgentInbox() {
                 setSelectedId(null);
               }}
               className={cn(
-                "rounded-full border px-3 py-1.5 text-[13px] font-medium",
+                "min-h-11 rounded-full border px-3 py-1.5 text-[13px] font-medium",
                 tab === t.key ? "border-[#0f1530] bg-[#0f1530] text-white" : "border-[#e6dccb] bg-white text-[#0f1530]"
               )}
             >
@@ -58,7 +58,7 @@ export function AgentInbox() {
           aria-label="Agent"
           value={agent}
           onChange={(e) => setAgent(e.target.value)}
-          className="rounded-full border border-[#e6dccb] bg-white px-3 py-1.5 text-[13px] font-medium"
+          className="min-h-11 rounded-full border border-[#e6dccb] bg-white px-3 py-1.5 text-[13px] font-medium"
         >
           <option value="all">All agents</option>
           {agentProducts(items).map((p) => (
@@ -72,7 +72,7 @@ export function AgentInbox() {
             type="button"
             disabled={generate.isPending}
             onClick={() => generate.mutate({ limit: GENERATE_LIMIT })}
-            className="ml-auto rounded-[10px] border border-[#e6dccb] bg-white px-3 py-1.5 text-sm font-medium disabled:opacity-50"
+            className="ml-auto min-h-11 rounded-[10px] border border-[#e6dccb] bg-white px-3 py-1.5 text-sm font-medium disabled:opacity-50"
           >
             {generate.isPending ? "Finding…" : "Find new proposals"}
           </button>

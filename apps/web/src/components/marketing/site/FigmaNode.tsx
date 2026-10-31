@@ -60,3 +60,22 @@ export function FigmaNode({ node, className = "", inline = false, slots }: { nod
     </div>
   );
 }
+
+/**
+ * Desktop frame at xl+, the Figma mobile frame below xl. Desktop frames are laid out for 1440 and need ~1150px
+ * (only Home and Demo have tablet frames), so from md up the mobile frame sits in a centred 600px column with 32px
+ * gutters, keeping each section's full-width background.
+ */
+export function FrameSwitch({ desktop, mobile, slots }: { desktop: VNode; mobile?: VNode | undefined; slots?: Record<string, ReactNode> }) {
+  if (!mobile) return <FigmaNode node={desktop} className="w-full" slots={slots} />;
+  return (
+    <>
+      <div className="hidden xl:block">
+        <FigmaNode node={desktop} className="w-full" slots={slots} />
+      </div>
+      <div className="xl:hidden md:[&>div>div]:px-8 md:[&>div>div>*]:mx-auto md:[&>div>div>*]:w-full md:[&>div>div>*]:max-w-[600px]">
+        <FigmaNode node={mobile} className="w-full" slots={slots} />
+      </div>
+    </>
+  );
+}

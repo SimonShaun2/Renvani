@@ -24,21 +24,21 @@ export function DemoPage({ action = submitDemoRequest }: { action?: (prev: Intak
   const [state, formAction] = useActionState(action, null);
   const errors = state?.status === "invalid" ? state.fields : {};
   return (
-    <section data-node-id="204:9229" className="mx-auto flex max-w-[1440px] flex-col gap-8 p-6 md:gap-7 md:p-8 lg:gap-8 lg:p-20" aria-labelledby="demo-title">
-      <div className="flex flex-col gap-8 md:gap-7 lg:flex-row lg:gap-16">
-        <div className="flex flex-col gap-6 md:gap-7 lg:w-[600px] lg:shrink-0 lg:gap-6">
+    <section data-node-id="204:9229" className="mx-auto flex max-w-[1440px] flex-col gap-8 p-6 md:gap-7 md:p-8 xl:gap-8 xl:p-20" aria-labelledby="demo-title">
+      <div className="flex flex-col gap-8 md:gap-7 xl:flex-row xl:gap-16">
+        <div className="flex min-w-0 flex-col gap-6 md:gap-7 xl:flex-1 xl:gap-6">
           <p className="text-[11px] font-medium leading-[1.38] tracking-[1.1px]" style={{ color: ink2 }}>
             {DEMO.eyebrow}
           </p>
-          <h1 id="demo-title" className="text-[42px] font-semibold leading-[1.08] tracking-[-1.05px] md:text-[48px] md:tracking-[-1.2px] lg:text-[64px] lg:tracking-[-1.6px]" style={{ color: ink }}>
-            <span className="block md:inline lg:block">{DEMO.headline[0]}</span> <span className="block md:inline lg:block">{DEMO.headline[1]}</span>
+          <h1 id="demo-title" className="text-[42px] font-semibold leading-[1.08] tracking-[-1.05px] md:text-[48px] md:tracking-[-1.2px] xl:text-[64px] xl:tracking-[-1.6px]" style={{ color: ink }}>
+            <span className="block md:inline xl:block">{DEMO.headline[0]}</span> <span className="block md:inline xl:block">{DEMO.headline[1]}</span>
           </h1>
-          <Image src="/marketing/demo/owner.png" alt="" width={1200} height={760} priority className="h-[230px] w-full rounded-2xl object-cover md:hidden lg:block lg:h-[380px]" />
+          <Image src="/marketing/demo/owner.png" alt="" width={1200} height={760} priority className="h-[230px] w-full rounded-2xl object-cover md:hidden xl:block xl:h-[380px]" />
         </div>
-        <div data-node-id="204:9235" className="flex w-full flex-col gap-[14px] rounded-2xl border bg-white p-5 md:gap-5 md:p-6 lg:w-[616px] lg:shrink-0 lg:gap-[14px] lg:p-5" style={{ borderColor: line }}>
+        <div data-node-id="204:9235" className="flex w-full flex-col gap-[14px] rounded-2xl border bg-white p-5 md:gap-5 md:p-6 xl:w-[616px] xl:shrink-0 xl:gap-[14px] xl:p-5" style={{ borderColor: line }}>
           {state?.status === "success" ? (
             <div role="status" className="flex flex-col gap-3">
-              <h2 className="text-[27px] font-semibold leading-[1.38] md:text-[28px] lg:text-[32px]" style={{ color: ink }}>
+              <h2 className="text-[27px] font-semibold leading-[1.38] md:text-[28px] xl:text-[32px]" style={{ color: ink }}>
                 {DEMO.success.title}
               </h2>
               <p className="text-[15px] leading-[1.38]" style={{ color: ink2 }}>
@@ -54,18 +54,18 @@ export function DemoPage({ action = submitDemoRequest }: { action?: (prev: Intak
               </Link>
             </div>
           ) : (
-            <form action={formAction} noValidate className="relative flex flex-col gap-[14px] md:gap-5 lg:gap-[14px]">
-              <h2 className="text-[27px] font-semibold leading-[1.38] md:text-[28px] lg:text-[32px]" style={{ color: ink }}>
+            <form action={formAction} noValidate className="relative flex flex-col gap-[14px] md:gap-5 xl:gap-[14px]">
+              <h2 className="text-[27px] font-semibold leading-[1.38] md:text-[28px] xl:text-[32px]" style={{ color: ink }}>
                 {DEMO.title}
               </h2>
-              <div className="grid grid-cols-1 gap-[14px] md:grid-cols-2 md:gap-5 lg:gap-x-4 lg:gap-y-[14px]">
-                <Field id="demo-name" label="Your name" error={errors.name} className="order-1 lg:col-span-2">
+              <div className="grid grid-cols-1 gap-[14px] md:grid-cols-2 md:gap-5 xl:gap-x-4 xl:gap-y-[14px]">
+                <Field id="demo-name" label="Your name" error={errors.name} className="order-1 xl:col-span-2">
                   <TextInput id="demo-name" name="name" placeholder="First and last name" autoComplete="name" maxLength={120} error={errors.name} />
                 </Field>
-                <Field id="demo-email" label="Work email" error={errors.email} className="order-2 md:order-3 md:col-span-2 lg:order-2">
+                <Field id="demo-email" label="Work email" error={errors.email} className="order-2 md:order-3 md:col-span-2 xl:order-2">
                   <TextInput id="demo-email" name="email" type="email" inputMode="email" placeholder="you@yourbusiness.com" autoComplete="email" maxLength={254} error={errors.email} />
                 </Field>
-                <Field id="demo-company" label="Business name" error={errors.company} className="order-3 md:order-2 lg:order-3 lg:col-span-2">
+                <Field id="demo-company" label="Business name" error={errors.company} className="order-3 md:order-2 xl:order-3 xl:col-span-2">
                   <TextInput id="demo-company" name="company" placeholder="Your business" autoComplete="organization" maxLength={160} error={errors.company} />
                 </Field>
                 <Field id="demo-trade" label="Trade" error={errors.trade} className="order-4">

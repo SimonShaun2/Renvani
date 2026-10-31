@@ -1,19 +1,8 @@
-import { FigmaNode } from "./FigmaNode";
+import { FrameSwitch } from "./FigmaNode";
 import { INDUSTRY_TREES } from "./industry-visuals";
 
-/** Renders an Industries frame: desktop tree at md+, the Figma mobile frame below md. Server component. */
+/** Renders an Industries frame via FrameSwitch: desktop tree at xl+, the Figma mobile frame below xl. Server component. */
 export function IndustryFrames({ tree }: { tree: "industries" | "hvac" | "plumbing" | "electrical" }) {
   const t = INDUSTRY_TREES[tree]!;
-  return (
-    <>
-      <div className="hidden md:block">
-        <FigmaNode node={t.desktop} className="w-full" />
-      </div>
-      {t.mobile ? (
-        <div className="md:hidden">
-          <FigmaNode node={t.mobile} className="w-full" />
-        </div>
-      ) : null}
-    </>
-  );
+  return <FrameSwitch desktop={t.desktop} mobile={t.mobile} />;
 }

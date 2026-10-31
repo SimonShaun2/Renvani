@@ -40,7 +40,7 @@ describe("marketing site (Figma 171:2)", () => {
     const { container } = render(<HomePage />);
     const tablet = container.querySelector('[data-node-id="253:6780"]')!;
     expect(tablet.parentElement!.className).toBe("hidden md:block lg:hidden");
-    expect(tablet.parentElement!.nextElementSibling!.className).toBe("md:hidden lg:block");
+    expect(tablet.parentElement!.nextElementSibling!.className).toBe("leading-[1.38] md:hidden lg:block");
     expect(tablet.querySelectorAll("form")).toHaveLength(2);
     expect(tablet.textContent).not.toMatch(/Oct 29/);
     expect(tablet.textContent).toContain("Next available day");

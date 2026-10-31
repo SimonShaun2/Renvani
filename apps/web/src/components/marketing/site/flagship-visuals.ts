@@ -40969,7 +40969,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "flex gap-[12.533px] items-start relative w-full",
+                 "c": "flex flex-wrap gap-[12.533px] items-start relative w-full",
                  "n": "Attachment labels",
                  "id": "219:8770",
                  "k": [

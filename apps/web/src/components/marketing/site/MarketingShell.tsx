@@ -67,7 +67,7 @@ export function MarketingShell({ children }: { children: ReactNode }) {
         </HeaderDisclosure>
       </header>
       <main>{children}</main>
-      <footer data-node-id="203:4576" className="mx-auto flex max-w-[1440px] flex-col gap-6 px-6 py-6 md:flex-row md:flex-wrap md:items-start md:justify-between md:p-8 lg:flex-nowrap lg:justify-start lg:px-16 lg:py-16">
+      <footer data-node-id="203:4576" className="mx-auto flex max-w-[1440px] flex-col gap-6 leading-[1.38] px-6 py-6 md:flex-row md:flex-wrap md:items-start md:justify-between md:p-8 lg:flex-nowrap lg:justify-start lg:px-16 lg:py-16">
         <p className="text-[28px] md:order-1 lg:w-[350px]" style={serif}>
           Renvani
         </p>

@@ -581,3 +581,52 @@ describe("FS-200 security follow-up: ownership, recording gating, rate limits, r
     });
   });
 });
+
+describe("FS-200 0060: verified_at persistence on the ownership-verification path", () => {
+  beforeEach(async () => {
+    (await registry()).registerCallTrackingAdapter(fakeAdapter);
+  });
+  afterEach(async () => {
+    (await registry()).unregisterCallTrackingAdapter(FAKE_PROVIDER);
+  });
+
+  async function setup(w: ReturnType<typeof seedWorld>) {
+    const res = await request(app.server)
+      .put("/api/v1/growth/call-tracking/settings")
+      .set("Authorization", w.owner)
+      .send({ expectedVersion: 0, provider: FAKE_PROVIDER, enabled: true });
+    expect(res.status).toBe(200);
+  }
+
+  it("stores verified_at when the adapter confirms ownership and returns it on read", async () => {
+    const w = seedWorld();
+    await setup(w);
+    const num = await request(app.server)
+      .post("/api/v1/growth/call-tracking/numbers")
+      .set("Authorization", w.admin)
+      .send({ trackingNumber: "+15125550111", label: "Yard signs", marketingSource: "yard signs", forwardingNumber: "+15125550100" });
+    expect(num.status).toBe(201);
+    expect(num.body.number.verificationStatus).toBe("verified");
+    const stored = fakeDb.getTestState().callTrackingNumbers.find((n) => n.id === num.body.number.id)!;
+    expect(stored.verifiedAt).toBeInstanceOf(Date);
+    expect(num.body.number.verifiedAt).toBe(stored.verifiedAt!.toISOString());
+    const list = await request(app.server).get("/api/v1/growth/call-tracking/numbers").set("Authorization", w.owner);
+    expect(list.body.numbers[0].verifiedAt).toEqual(expect.any(String));
+  });
+
+  it("does not stamp verified_at for unverified numbers, keeps prior history, and never touches another tenant", async () => {
+    const w = seedWorld();
+    await setup(w);
+    fakeOwnership = "unverified";
+    const prior = new Date("2026-10-01T00:00:00.000Z");
+    const mine = fakeDb.seedCallTrackingNumber({ companyId: w.company.id, trackingNumber: "+15125550111", provider: FAKE_PROVIDER, verifiedAt: prior });
+    const theirs = fakeDb.seedCallTrackingNumber({ companyId: w.other.id, trackingNumber: "+15125550333", provider: FAKE_PROVIDER });
+    const list = await request(app.server).get("/api/v1/growth/call-tracking/numbers").set("Authorization", w.owner);
+    expect(list.status).toBe(200);
+    expect(list.body.numbers).toHaveLength(1);
+    expect(list.body.numbers[0]).toMatchObject({ id: mine.id, verificationStatus: "unverified", canReceiveCalls: false, verifiedAt: prior.toISOString() });
+    const state = fakeDb.getTestState().callTrackingNumbers;
+    expect(state.find((n) => n.id === mine.id)!.verifiedAt).toEqual(prior);
+    expect(state.find((n) => n.id === theirs.id)!.verifiedAt).toBeNull();
+  });
+});

@@ -2650,6 +2650,8 @@ export const callTrackingNumbers = pgTable(
     forwardingNumber: varchar("forwarding_number", { length: 20 }).notNull(),
     active: boolean("active").notNull().default(true),
     version: integer("version").notNull().default(1),
+    /** FS-200 (0060): last time the provider adapter confirmed ownership. Null = never verified. */
+    verifiedAt: timestamp("verified_at", { withTimezone: true }),
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
     deletedAt: timestamp("deleted_at")

@@ -20,6 +20,9 @@ export interface PeriodInput {
   periodEnd: string;
 }
 
+/** Max entries fetched per period; the list shows a notice when the API reports more (hasMore). */
+export const ENTRY_LIMIT = 200;
+
 interface TimeEntriesResponse {
   entries: TimeEntryV1[];
   limit: number;
@@ -56,7 +59,7 @@ export function useTimeEntries(technicianId: string | null, period: PeriodInput)
   return useQuery({
     queryKey: timesheetKeys.entries(technicianId ?? "none", period),
     queryFn: () =>
-      api.get<TimeEntriesResponse>(`/api/v1/time/entries?${qs({ technicianId: technicianId ?? undefined, from: period.periodStart, to: period.periodEnd, limit: 200 })}`),
+      api.get<TimeEntriesResponse>(`/api/v1/time/entries?${qs({ technicianId: technicianId ?? undefined, from: period.periodStart, to: period.periodEnd, limit: ENTRY_LIMIT })}`),
     enabled: Boolean(technicianId)
   });
 }

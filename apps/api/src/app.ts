@@ -3,6 +3,7 @@ import fastifyCors from "@fastify/cors";
 import { allowedAppOrigins, runWithRequestOrigin } from "./lib/app-origins.js";
 import { parseClerkAuthorizedParties } from "./lib/clerk-auth.js";
 import clerkWebhookRoutes from "./routes/webhooks/clerk.js";
+import callTrackingWebhookRoutes from "./routes/webhooks/call-tracking.js";
 import Fastify from "fastify";
 import pino from "pino";
 
@@ -50,6 +51,7 @@ import dataExportRoutes from "./routes/data-exports/index.js";
 import jobEngagementRoutes from "./routes/job-engagement/index.js";
 import jobEtaRoutes from "./routes/job-eta/index.js";
 import googleBusinessProfileRoutes from "./routes/google-business-profile/index.js";
+import callTrackingRoutes from "./routes/call-tracking/index.js";
 import { assertGeoProviderConfigured } from "./services/geo/geo-provider.registry.js";
 import jobRoutes from "./routes/jobs/index.js";
 import loyaltyRoutes from "./routes/loyalty/index.js";
@@ -152,6 +154,7 @@ export async function buildApp() {
   await app.register(jobEngagementRoutes, { prefix: "/api/v1/jobs" });
   await app.register(jobEtaRoutes, { prefix: "/api/v1/jobs" });
   await app.register(googleBusinessProfileRoutes, { prefix: "/api/v1/integrations/google-business-profile" });
+  await app.register(callTrackingRoutes, { prefix: "/api/v1/growth/call-tracking" });
   await app.register(messageLogRoutes, { prefix: "/api/v1" });
   await app.register(productRoutes, { prefix: "/api/v1" });
   await app.register(inventoryRoutes, { prefix: "/api/v1" });
@@ -180,6 +183,7 @@ export async function buildApp() {
   await app.register(qboSyncRoutes, { prefix: "/api/v1" });
   await app.register(publicRoutes, { prefix: "/api/v1/public" });
   await app.register(clerkWebhookRoutes, { prefix: "/api/v1/webhooks" });
+  await app.register(callTrackingWebhookRoutes, { prefix: "/api/v1/webhooks" });
 
   // FS-198 follow-up: all geo providers are registered by now; fail fast on a bad GEO_PROVIDER.
   assertGeoProviderConfigured(env.GEO_PROVIDER);

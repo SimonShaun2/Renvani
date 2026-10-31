@@ -4,7 +4,7 @@ export type UserRole = (typeof USER_ROLES)[number];
 
 type DefaultRouteMap = Record<UserRole, string>;
 
-const EXACT_PUBLIC_ROUTES = new Set(["/", "/login", "/signup", "/verify-email", "/product-tour", "/product", "/how-it-works", "/pricing", "/industries", "/industries/hvac", "/industries/plumbing", "/industries/electrical", "/portal", "/robots.txt", "/sitemap.xml", "/sitemap-index.xml"]);
+const EXACT_PUBLIC_ROUTES = new Set(["/", "/login", "/signup", "/verify-email", "/product-tour", "/product", "/how-it-works", "/pricing", "/industries", "/industries/hvac", "/industries/plumbing", "/industries/electrical", "/demo", "/growth-check", "/portal", "/robots.txt", "/sitemap.xml", "/sitemap-index.xml"]);
 
 /** Split sitemaps from app/sitemap.ts generateSitemaps. */
 const SPLIT_SITEMAP_ROUTE = /^\/sitemap\/\d+\.xml$/;

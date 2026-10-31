@@ -7,10 +7,12 @@ import {
   Wallet,
   Crown,
   FileText,
+  ClipboardCheck,
   Gauge,
   MessageSquareText,
   Package,
   Warehouse,
+  PhoneCall,
   Settings,
   ShieldCheck,
   Inbox,
@@ -51,7 +53,9 @@ const ownerAdminNavigation: RoleNavigation = {
     { label: "Command Center", href: "/command-center", icon: Inbox }
   ],
   growth: [
+    { label: "Growth Check", href: "/growth/growth-check", icon: ClipboardCheck },
     { label: "Booking requests", href: "/booking-requests", icon: Inbox },
+    { label: "Call tracking", href: "/growth/call-tracking", icon: PhoneCall },
     { label: "Settings", href: "/settings", icon: Settings }
   ]
 };

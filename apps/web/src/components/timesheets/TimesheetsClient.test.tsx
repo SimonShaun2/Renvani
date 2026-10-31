@@ -204,6 +204,41 @@ describe("TimesheetsClient", () => {
 });
 
 describe("timesheet helpers", () => {
+  it("shows a notice instead of silently truncating when the entry cap is hit", async () => {
+    m.routes["/api/v1/time/entries"] = () => Promise.resolve({ entries: [entry()], limit: 200, offset: 0, hasMore: true });
+    renderClient();
+    expect((await screen.findByTestId("entries-cap-notice")).textContent).toMatch(/first 200 entries.*Narrow the date range/);
+  });
+
+  it("shows a notice when there are more active technicians than the picker loads", async () => {
+    m.routes["/api/v1/technicians"] = () => Promise.resolve({ data: [TECH], total: 140, page: 1, limit: 100, totalPages: 2 });
+    renderClient();
+    expect((await screen.findByTestId("techs-cap-notice")).textContent).toMatch(/first 1 of 140/);
+  });
+
+  it("no cap notices when everything fits", async () => {
+    renderClient();
+    await screen.findByTestId("time-entry-e1");
+    expect(screen.queryByTestId("entries-cap-notice")).toBeNull();
+    expect(screen.queryByTestId("techs-cap-notice")).toBeNull();
+  });
+
+  it("blocks saving an edit whose end is before its start: inline error, Save disabled, no request", async () => {
+    renderClient();
+    fireEvent.click(await screen.findByRole("button", { name: "Edit" }));
+    const start = screen.getByLabelText("Start") as HTMLInputElement;
+    const [d] = start.value.split("T");
+    fireEvent.change(screen.getByLabelText("End"), { target: { value: `${d}T00:01` } });
+    expect(screen.getByRole("alert").textContent).toBe("End must be after start.");
+    const save = screen.getByRole("button", { name: "Save" }) as HTMLButtonElement;
+    expect(save.disabled).toBe(true);
+    fireEvent.click(save);
+    expect(m.patch).not.toHaveBeenCalled();
+    fireEvent.change(screen.getByLabelText("End"), { target: { value: `${d}T23:58` } });
+    expect(screen.queryByRole("alert")).toBeNull();
+    expect((screen.getByRole("button", { name: "Save" }) as HTMLButtonElement).disabled).toBe(false);
+  });
+
   it("computes a Monday-Sunday default period", () => {
     expect(currentWeekPeriod(new Date(2026, 9, 31))).toEqual({ periodStart: "2026-10-26", periodEnd: "2026-11-01" });
   });

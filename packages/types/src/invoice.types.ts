@@ -294,6 +294,8 @@ export interface PublicInvoicePaymentLink {
   feeRefundable: boolean;
   /** Service Fee percent (2); kept for back-compat with the old Flex-only fee. */
   platformFeePercent: number | null;
+  /** Same as platformFeePercent under the customer-facing "Service Fee" name. */
+  serviceFeePercent?: number | null;
   platformFeePaidByCustomer: boolean;
   /** Optional disclosure from `CUSTOMER_PLATFORM_FEE_DISCLOSURE` (empty = omit). */
   platformFeeDisclosure: string | null;
@@ -334,6 +336,10 @@ export interface PublicPayViewFields {
   paidAt: string | null;
   /** Masked (first character of the local part kept). */
   receiptEmail: string | null;
+  /** True once the invoice is fully paid. */
+  paid: boolean;
+  /** True when a Renvani receipt email is sent for the latest succeeded payment (address on file, not opted out). */
+  receiptEmailed: boolean;
   plan: "flex" | "flat" | null;
 }
 

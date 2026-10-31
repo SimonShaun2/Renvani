@@ -59,7 +59,7 @@ export async function renderInvoiceReceiptPdf(paymentToken: string): Promise<Uin
   draw(`Invoice ${view.invoiceNumber}`, 14, true);
   draw(`Service amount: $${view.invoiceAmount}`, 12);
   if (Number(view.platformFeeAmount) > 0) {
-    draw(`Platform fee: $${view.platformFeeAmount}`, 12);
+    draw(`Service Fee: $${view.platformFeeAmount}`, 12);
   }
   draw(`Total paid: $${view.totalDue}`, 12, true);
   draw("Payments processed by Renvani on behalf of your service provider.", 10);

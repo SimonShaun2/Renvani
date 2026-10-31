@@ -1,0 +1,15 @@
+.pad {
+  touch-action: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .spinner {
+    animation: crew-signature-spin 0.8s linear infinite;
+  }
+}
+
+@keyframes crew-signature-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

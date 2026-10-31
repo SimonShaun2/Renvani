@@ -1,6 +1,6 @@
 import type { PublicBookingSettingsRecord } from "@/src/hooks/booking.hooks";
 
-/** Trade registry for the public shop site: metadata + schema.org @type per trade. Add a trade = add one entry. */
+/** Trade registry (hvac | plumbing | electrical | other) for the public shop site: metadata + schema.org @type per trade. Add a trade = add one entry. */
 export interface SiteTradeConfig {
   key: string;
   label: string;
@@ -32,18 +32,12 @@ export const SITE_TRADES = {
     keywords: ["electrician", "electrical repair", "panel upgrade", "wiring"],
     match: ["electric", "wiring", "panel", "outlet", "breaker", "ev charger"]
   },
-  cleaning: {
-    key: "cleaning",
-    label: "Residential cleaning",
-    schemaType: "HomeAndConstructionBusiness",
-    keywords: ["residential cleaning", "house cleaning", "book cleaning online"],
-    match: ["clean", "maid", "move-in", "move-out"]
-  },
-  default: {
-    key: "default",
+  /** Any other home-services shop; also the fallback for an unknown or missing trade. */
+  other: {
+    key: "other",
     label: "Home services",
-    schemaType: "LocalBusiness",
-    keywords: ["home services", "local service", "book online"],
+    schemaType: "HomeAndConstructionBusiness",
+    keywords: ["home services", "home repair", "book online"],
     match: []
   }
 } as const satisfies Record<string, SiteTradeConfig>;
@@ -60,7 +54,7 @@ function serviceText(settings: Pick<PublicBookingSettingsRecord, "offeredService
 
 /**
  * Resolves the trade: an explicit `trade`/`industry` field if the API ever sends one, otherwise the trade whose
- * words appear most in the offered services, otherwise `default` (never assumes cleaning).
+ * words appear most in the offered services, otherwise `other`.
  */
 export function resolveSiteTrade(settings: Pick<PublicBookingSettingsRecord, "offeredServices">): SiteTradeConfig {
   const explicit = (settings as { trade?: unknown; industry?: unknown }).trade ?? (settings as { industry?: unknown }).industry;
@@ -68,7 +62,7 @@ export function resolveSiteTrade(settings: Pick<PublicBookingSettingsRecord, "of
     return SITE_TRADES[explicit.toLowerCase() as SiteTradeKey];
   }
   const text = ` ${serviceText(settings)} `;
-  let best: SiteTradeConfig = SITE_TRADES.default;
+  let best: SiteTradeConfig = SITE_TRADES.other;
   let bestScore = 0;
   for (const trade of Object.values(SITE_TRADES)) {
     const score = trade.match.filter((word) => text.includes(word)).length;

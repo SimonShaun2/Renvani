@@ -16,7 +16,8 @@ export const PROPOSAL_STATES = [
   { key: "awaiting_approval", label: "Needs approval" },
   { key: "approved", label: "Approved" },
   { key: "executed", label: "Sent" },
-  { key: "rejected", label: "Rejected" }
+  { key: "rejected", label: "Rejected" },
+  { key: "escalated", label: "Escalated" }
 ] as const;
 
 /** Actions shown on a card / detail (Figma 10:309 card, 10:430–434 detail). `path` maps to API override paths. */

@@ -53,12 +53,28 @@ export const ListStockLocationsQuerySchema = z.object({
 });
 export type ListStockLocationsQuery = z.infer<typeof ListStockLocationsQuerySchema>;
 
+/** List pagination (limit/offset + hasMore, same convention as the timesheets lists). */
+export const INVENTORY_LIST_DEFAULT_LIMIT = 100;
+export const INVENTORY_LIST_MAX_LIMIT = 200;
+
+export interface InventoryPageV1 {
+  limit: number;
+  offset: number;
+  /** True when more rows exist after this page. */
+  hasMore: boolean;
+}
+
+const InventoryLimit = z.coerce.number().int().min(1).max(INVENTORY_LIST_MAX_LIMIT).optional().default(INVENTORY_LIST_DEFAULT_LIMIT);
+const InventoryOffset = z.coerce.number().int().min(0).max(1_000_000).optional().default(0);
+
 export const ListStockLevelsQuerySchema = z.object({
   locationId: z.string().uuid().optional(),
   productId: z.string().uuid().optional(),
-  lowStock: z.enum(["true", "false"]).optional()
-});
-export type ListStockLevelsQuery = z.infer<typeof ListStockLevelsQuerySchema>;
+  lowStock: z.enum(["true", "false"]).optional(),
+  limit: InventoryLimit,
+  offset: InventoryOffset
+}).strict();
+export type ListStockLevelsQuery = z.input<typeof ListStockLevelsQuerySchema>;
 
 export const UpdateStockLevelBodySchema = z.object({
   lowStockThreshold: Qty.min(0).max(1_000_000).nullable(),
@@ -106,9 +122,10 @@ export const ListStockMovementsQuerySchema = z.object({
   locationId: z.string().uuid().optional(),
   productId: z.string().uuid().optional(),
   jobId: z.string().uuid().optional(),
-  limit: z.coerce.number().int().min(1).max(200).optional()
-});
-export type ListStockMovementsQuery = z.infer<typeof ListStockMovementsQuerySchema>;
+  limit: InventoryLimit,
+  offset: InventoryOffset
+}).strict();
+export type ListStockMovementsQuery = z.input<typeof ListStockMovementsQuerySchema>;
 
 export interface StockLocation {
   id: string;

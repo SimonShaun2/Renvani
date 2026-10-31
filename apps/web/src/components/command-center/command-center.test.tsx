@@ -24,7 +24,7 @@ vi.mock("@/src/hooks/operator-inbox.hooks", () => ({
 
 import { CommandCenterView } from "./CommandCenterView";
 import { DirectDemandCard } from "./DirectDemandCard";
-import { canViewDirectDemand, formatUsdFromDecimal, isoDateIn, jobsLabel, last30DaysRange } from "./direct-demand.utils";
+import { canViewDirectDemand, formatUsdFromDecimal, isoDateIn, jobsLabel, monthToDateRange } from "./direct-demand.utils";
 import { hourIn } from "./LocalClock";
 import { CC_REGIONS, EMPTY, KPIS, agentLabel, greetingFor, itemStatus, needsYouCounts } from "./command-center.config";
 
@@ -104,7 +104,8 @@ describe("DirectDemandCard", () => {
     dd.query = { isLoading: false, isError: false, data: summary(12, "4830.5") };
     const html = render();
     expect(html).toContain("12 jobs, $4,830.50");
-    expect(html).toContain("Last 30 days, from online booking and lead sources");
+    expect(html).toContain("This month, from online booking and lead sources");
+    expect(html).not.toContain("Last 30 days");
     expect(html).not.toMatch(/\$1\.99|booking fee|service fee/i);
   });
   it("shows the zero state", () => {
@@ -124,11 +125,11 @@ describe("DirectDemandCard", () => {
     expect(render()).toBe("");
     expect(dd.calls.every((c) => c.enabled === false)).toBe(true);
   });
-  it("dispatcher sees it and queries the last 30 days", () => {
+  it("dispatcher sees it and queries the same calendar month as the Key numbers tiles", () => {
     dd.query = { isLoading: false, isError: false, data: summary(1, "99.999") };
     const html = render();
     expect(html).toContain("1 job, $100.00");
-    expect(dd.calls.at(-1)).toEqual({ range: { startDate: "2026-10-02", endDate: "2026-10-31" }, enabled: true });
+    expect(dd.calls.at(-1)).toEqual({ range: { startDate: "2026-10-01", endDate: "2026-10-31" }, enabled: true });
   });
 });
 
@@ -143,8 +144,9 @@ describe("direct-demand utils", () => {
   });
   it("computes the range in the shop time zone", () => {
     const late = new Date("2026-11-01T03:30:00.000Z"); // Oct 31, 10:30 PM in Chicago
-    expect(last30DaysRange(late, "America/Chicago")).toEqual({ startDate: "2026-10-02", endDate: "2026-10-31" });
-    expect(last30DaysRange(late, "Asia/Tokyo")).toEqual({ startDate: "2026-10-03", endDate: "2026-11-01" });
+    expect(monthToDateRange(late, "America/Chicago")).toEqual({ startDate: "2026-10-01", endDate: "2026-10-31" });
+    expect(monthToDateRange(late, "Asia/Tokyo")).toEqual({ startDate: "2026-11-01", endDate: "2026-11-01" });
+    expect(monthToDateRange(late, "Bad/Zone").startDate).toMatch(/^\d{4}-\d{2}-01$/);
     expect(isoDateIn(late, "Bad/Zone")).toMatch(/^\d{4}-\d{2}-\d{2}$/);
   });
   it("gates roles like the API and pluralizes jobs", () => {

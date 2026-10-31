@@ -59,6 +59,13 @@ const STATIC_PAGE_META: Array<{ prefix: string; meta: PageMeta }> = [
     }
   },
   {
+    prefix: "/timesheets",
+    meta: {
+      title: "Timesheets",
+      subtitle: "Technician time, pay-period approval, and payroll export."
+    }
+  },
+  {
     prefix: "/service-agreements",
     meta: {
       title: "Service Agreements",

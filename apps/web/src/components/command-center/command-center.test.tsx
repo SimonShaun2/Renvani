@@ -4,7 +4,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const dd = vi.hoisted(() => ({
   role: null as string | null,
   query: { isLoading: false, isError: false, data: undefined as unknown },
-  calls: [] as Array<{ range: { startDate: string; endDate: string }; enabled: boolean }>
+  calls: [] as Array<{ range: { startDate: string; endDate: string }; enabled: boolean }>,
+  inbox: { isLoading: true, isError: false, data: undefined as unknown }
 }));
 vi.mock("@/src/stores/auth.store", () => ({
   useAuthStore: (sel: (s: unknown) => unknown) => sel({ user: dd.role ? { role: dd.role } : null })
@@ -18,11 +19,12 @@ vi.mock("@/src/hooks/direct-demand.hooks", () => ({
 
 vi.mock("@/src/hooks/company.hooks", () => ({ useCompany: () => ({ data: undefined }) }));
 vi.mock("@/src/hooks/operator-inbox.hooks", () => ({
-  useOperatorInbox: () => ({ isLoading: true, isError: false, data: undefined }),
+  useOperatorInbox: () => dd.inbox,
   useApproveAgentAction: () => ({ mutateAsync: vi.fn(), isPending: false })
 }));
 
 import { CommandCenterView } from "./CommandCenterView";
+import { NeedsYou } from "./NeedsYou";
 import { DirectDemandCard } from "./DirectDemandCard";
 import { canViewDirectDemand, formatUsdFromDecimal, isoDateIn, jobsLabel, last30DaysRange } from "./direct-demand.utils";
 import { hourIn } from "./LocalClock";
@@ -151,5 +153,24 @@ describe("direct-demand utils", () => {
     expect(["owner", "admin", "dispatcher"].every(canViewDirectDemand)).toBe(true);
     expect(["technician", "office", null].some(canViewDirectDemand)).toBe(false);
     expect(jobsLabel(1)).toBe("1 job");
+  });
+});
+
+describe("NeedsYou failed items", () => {
+  it("shows Delivery failure with executionReceipt.error.message", () => {
+    const failed = {
+      id: "f1",
+      state: "failed",
+      overridePaths: [],
+      recipient: { displayName: "J. Morgan" },
+      provenance: { agentProduct: "revenue_agent", actionType: "revenue.estimate_followup.propose", sourceEvents: [], policyVersion: "operating-v1" },
+      executionReceipt: { outcome: "failed", deliveryState: "failed", error: { code: "EXECUTION_FAILED", message: "Execution failed" } }
+    };
+    dd.inbox = { isLoading: false, isError: false, data: { items: [failed] } };
+    const html = renderToStaticMarkup(<NeedsYou />);
+    dd.inbox = { isLoading: true, isError: false, data: undefined };
+    expect(html).toContain('data-testid="cc-failure"');
+    expect(html).toContain("Delivery failure · Execution failed");
+    expect(html).not.toContain("Approve &amp; send");
   });
 });

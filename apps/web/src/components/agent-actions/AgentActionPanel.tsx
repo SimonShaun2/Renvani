@@ -6,6 +6,7 @@ import type { OperatorInboxItem } from "@fsm/types";
 
 import { ProposalDetail } from "@/src/components/revenue-agent/ProposalDetail";
 import {
+  type AgentActionResult,
   agentActionErrorMessage,
   useApproveAgentAction,
   useEditOperatorInboxItem,
@@ -18,7 +19,11 @@ import { ACTION_TONE_CLASS, agentActionsFor, receiptRows, type AgentActionKey } 
 import "./agent-actions-motion.css";
 
 /** Detail + every allowed action for one inbox item (Figma 10:379 detail, 10:425 audit trail, 10:430–434 buttons). */
-export function AgentActionPanel({ item, onDone }: { item: OperatorInboxItem; onDone?: () => void }) {
+/**
+ * `onDone` gets the action row the API returned (approve / execute / reject), so callers show its real state
+ * (`executing` = queued, `succeeded`, `failed`) instead of assuming success. "Approve & send" only approves.
+ */
+export function AgentActionPanel({ item, onDone }: { item: OperatorInboxItem; onDone?: (result?: AgentActionResult) => void }) {
   const approve = useApproveAgentAction(item);
   const reject = useRejectAgentAction(item.id);
   const execute = useExecuteAgentAction(item);
@@ -35,8 +40,8 @@ export function AgentActionPanel({ item, onDone }: { item: OperatorInboxItem; on
   async function attempt(fn: () => Promise<unknown>, done = true) {
     setError(null);
     try {
-      await fn();
-      if (done) onDone?.();
+      const result = await fn();
+      if (done) onDone?.(isActionResult(result) ? result : undefined);
       return true;
     } catch (err) {
       setError(agentActionErrorMessage(err));
@@ -129,4 +134,8 @@ export function AgentActionPanel({ item, onDone }: { item: OperatorInboxItem; on
       ) : null}
     </div>
   );
+}
+
+function isActionResult(value: unknown): value is AgentActionResult {
+  return typeof value === "object" && value !== null && typeof (value as { id?: unknown }).id === "string" && typeof (value as { state?: unknown }).state === "string";
 }

@@ -40,6 +40,7 @@ A literal value = non-secret config committed in the Blueprint. **—** = not se
 | `JWT_REFRESH_SECRET` | prompt | prompt | prompt |
 | `BOOKING_HOLD_TOKEN_SECRET` | prompt | prompt | prompt |
 | `APP_URL` | prompt | prompt | prompt |
+| `APP_URL_ALLOWED` | prompt | — | — |
 | `TWILIO_FROM_NUMBER` | prompt | prompt | prompt |
 | `SENDGRID_FROM_EMAIL` | prompt | prompt | prompt |
 | `R2_ACCOUNT_ID` | prompt | prompt | prompt |

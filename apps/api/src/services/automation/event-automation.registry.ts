@@ -4,15 +4,25 @@
  */
 import pino from "pino";
 
+import { requestPlanReminder } from "../plan-reminders/plan-reminder.service.js";
 import { requestReviewForPaidInvoice } from "../review-request.service.js";
 
 const logger = pino({ name: "event-automation" });
 
-export type AutomationEvent = {
-  eventType: "invoice.paid";
-  companyId: string;
-  invoiceId: string;
-};
+export type AutomationEvent =
+  | {
+      eventType: "invoice.paid";
+      companyId: string;
+      invoiceId: string;
+    }
+  | {
+      /** Plan renewal or seasonal tune-up is inside its reminder window (daily plan-reminder scan). */
+      eventType: "renewal.due";
+      companyId: string;
+      maintenancePlanId: string;
+      reminderKind: "renewal" | "tune_up";
+      dueDate: string;
+    };
 
 export type AutomationEventType = AutomationEvent["eventType"];
 
@@ -55,11 +65,16 @@ export async function dispatchEventAutomation(event: AutomationEvent): Promise<v
 }
 
 export const INVOICE_PAID_REVIEW_REQUEST_AUTOMATION_ID = "review-request.on-invoice-paid";
+export const RENEWAL_DUE_PLAN_REMINDER_AUTOMATION_ID = "plan-reminder.on-renewal-due";
 
 function registerDefaultEventAutomations(): void {
   registerEventAutomation("invoice.paid", {
     id: INVOICE_PAID_REVIEW_REQUEST_AUTOMATION_ID,
-    run: (event) => requestReviewForPaidInvoice(event.companyId, event.invoiceId)
+    run: (event) => (event.eventType === "invoice.paid" ? requestReviewForPaidInvoice(event.companyId, event.invoiceId) : Promise.resolve(null))
+  });
+  registerEventAutomation("renewal.due", {
+    id: RENEWAL_DUE_PLAN_REMINDER_AUTOMATION_ID,
+    run: (event) => (event.eventType === "renewal.due" ? requestPlanReminder(event) : Promise.resolve(null))
   });
 }
 

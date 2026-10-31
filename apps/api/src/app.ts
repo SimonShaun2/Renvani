@@ -1,5 +1,6 @@
 import fastifyCors from "@fastify/cors";
 
+import { allowedAppOrigins, runWithRequestOrigin } from "./lib/app-origins.js";
 import { parseClerkAuthorizedParties } from "./lib/clerk-auth.js";
 import clerkWebhookRoutes from "./routes/webhooks/clerk.js";
 import Fastify from "fastify";
@@ -21,11 +22,13 @@ import authRoutes from "./routes/auth/index.js";
 import billingRoutes from "./routes/billing/index.js";
 import bookingRoutes from "./routes/booking/index.js";
 import companyRoutes from "./routes/company/index.js";
+import companyHomeServicesRoutes from "./routes/company/home-services.js";
 import campaignRoutes from "./routes/campaigns/index.js";
 import customerRoutes from "./routes/customers/index.js";
 import crewRoutes from "./routes/crews/index.js";
 import dispatchRoutes from "./routes/dispatch/index.js";
 import fieldWorkRoutes from "./routes/field-work/index.js";
+import technicianMobileRoutes from "./routes/technician-mobile/index.js";
 import healthRoutes from "./routes/health/index.js";
 import globalRateLimitPlugin from "./plugins/global-rate-limit.js";
 import growthCheckIntakeRoutes from "./routes/growth-checks/index.js";
@@ -100,9 +103,15 @@ export async function buildApp() {
   });
 
   await app.register(fastifyCors, {
-    origin: [...new Set([new URL(env.APP_URL).origin, ...parseClerkAuthorizedParties(env.CLERK_AUTHORIZED_PARTIES)])],
+    // APP_URL primary + APP_URL_ALLOWED extras (staging tier only, exact match) + Clerk authorized parties.
+    origin: [...new Set([...allowedAppOrigins(), ...parseClerkAuthorizedParties(env.CLERK_AUTHORIZED_PARTIES)])],
     credentials: true,
     allowedHeaders: ["Authorization", "Content-Type", "Idempotency-Key", "X-Request-Id", "X-Customer-Portal-Token"]
+  });
+  // Bind the caller's Origin so Stripe return URLs can target an allowed tester origin (falls back to APP_URL).
+  app.addHook("onRequest", (request, _reply, done) => {
+    const origin = typeof request.headers.origin === "string" ? request.headers.origin : null;
+    runWithRequestOrigin(origin, done);
   });
   await app.register(requestLoggerPlugin);
   await app.register(globalRateLimitPlugin);
@@ -123,10 +132,12 @@ export async function buildApp() {
   await app.register(authRoutes, { prefix: "/api/v1/auth" });
   await app.register(campaignRoutes, { prefix: "/api/v1" });
   await app.register(companyRoutes, { prefix: "/api/v1/company" });
+  await app.register(companyHomeServicesRoutes, { prefix: "/api/v1/company" });
   await app.register(customerRoutes, { prefix: "/api/v1/customers" });
   await app.register(dispatchRoutes, { prefix: "/api/v1" });
   await app.register(crewRoutes, { prefix: "/api/v1" });
   await app.register(fieldWorkRoutes, { prefix: "/api/v1" });
+  await app.register(technicianMobileRoutes, { prefix: "/api/v1" });
   await app.register(growthCheckIntakeRoutes, { prefix: "/api/v1" });
   await app.register(internalAdminQueueRoutes, { prefix: "/api/v1" });
   await app.register(internalAdminQboSyncRoutes, { prefix: "/api/v1" });

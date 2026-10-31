@@ -32,6 +32,16 @@ describe("GBP provider registry", () => {
     expect(getGbpProvider("disabled")).toBe(disabledGbpProvider);
   });
 
+  it("stays disabled with no GBP keys in env (absent keys never fail boot)", async () => {
+    for (const key of Object.keys(process.env)) {
+      if (key.startsWith("GOOGLE_BUSINESS_PROFILE_")) delete process.env[key];
+    }
+    vi.resetModules();
+    const registry = await import("./gbp-provider.registry.js");
+    expect(registry.activeGbpProviderId()).toBe("disabled");
+    expect(registry.listGbpProviderIds()).toEqual(["disabled"]);
+  });
+
   it("rejects invalid ids and unknown providers with a handled error", () => {
     expect(() => registerGbpProvider({ ...disabledGbpProvider, id: "Bad-Id" })).toThrow();
     expect(() => getGbpProvider("nope")).toThrow(/GBP_PROVIDER_UNKNOWN/);

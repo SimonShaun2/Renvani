@@ -14,8 +14,10 @@ import {
 } from "@fsm/types";
 
 import {
+  applyPublicEmergencyGuard,
   checkZipCoverage,
   createCompanyScopedInquiryBooking,
+  getPublicBookingCompany,
   resolvePublicBookingCompanyId,
   submitBookingRequest
 } from "./booking.service.js";
@@ -211,7 +213,11 @@ export async function submitPublicInquiryIntake(
     }
   }
 
-  const submitResult = await submitBookingRequest(slug, body, sourceParam);
+  // 24/7 emergency: accepted only when the shop has emergency service on (and its trade is emergency-capable);
+  // otherwise downgraded to a normal request and reported back as `emergency.downgraded` (never rejected).
+  // Same guard submitBookingRequest applies internally; computed here only to report the resolution back.
+  const { input: effectiveBody, emergency } = applyPublicEmergencyGuard(body, (await getPublicBookingCompany(slug)).settings);
+  const submitResult = await submitBookingRequest(slug, effectiveBody, sourceParam, emergency.downgraded);
   const [row] = await db
     .select()
     .from(bookingRequests)
@@ -253,7 +259,8 @@ export async function submitPublicInquiryIntake(
     },
     confirmation: submitResult.confirmation,
     holdToken: submitResult.holdToken,
-    inquiry
+    inquiry,
+    ...(emergency.requested ? { emergency } : {})
   };
 
   if (idempotencyKey) {

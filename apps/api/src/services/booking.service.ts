@@ -1,9 +1,10 @@
 import { randomBytes } from "node:crypto";
 
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, inArray, isNull } from "drizzle-orm";
 import { Decimal } from "decimal.js";
 
 import {
+  activityEvents,
   bookingRequests,
   bookingSettings,
   companies,
@@ -34,9 +35,17 @@ import {
   type ListBookingRequestsQuery,
   type PublicBookingSettings,
   type SubmitBookingRequestInput,
+  sanitizeLeadAttribution,
   type UpdateBookingSettingsInput,
   type BookingRequestStatus,
-  ErrorCode
+  ErrorCode,
+  readEmergencyServiceSettings,
+  type EmergencyRequestResolution,
+  resolveEmergencyRequest,
+  HOME_SERVICE_TRADE_REGISTRY,
+  getTradeServices,
+  parseHomeServiceTrade,
+  parseTradeDescription
 } from "@fsm/types";
 
 import {
@@ -172,11 +181,29 @@ function toPublicBookingSettings(
   serviceAreaZipCodes: string[],
   serviceAreaNames: string[] = []
 ): PublicBookingSettings {
+  const settingsObject =
+    company.settings && typeof company.settings === "object" && !Array.isArray(company.settings)
+      ? (company.settings as Record<string, unknown>)
+      : {};
+  const trade = parseHomeServiceTrade(settingsObject.trade);
+  const configured = Array.isArray(row.offeredServices) ? (row.offeredServices as Array<Record<string, unknown>>) : [];
+  // Shop-entered services win; with none configured, a selected trade seeds the site with its default catalog.
+  const offeredServices =
+    configured.length === 0 && trade
+      ? getTradeServices(trade).map((service) => ({
+          key: service.key,
+          name: service.label,
+          label: service.label,
+          category: service.category,
+          emergency: service.emergency,
+          source: "trade_default"
+        }))
+      : configured;
   return {
     companyName: company.name,
     companySlug: company.slug,
     bookingSlug: row.bookingSlug ?? company.slug,
-    offeredServices: Array.isArray(row.offeredServices) ? (row.offeredServices as Array<Record<string, unknown>>) : [],
+    offeredServices,
     availableHoursStart: row.availableHoursStart ?? 8,
     availableHoursEnd: row.availableHoursEnd ?? 17,
     availableDays: row.availableDays ?? DEFAULT_AVAILABLE_DAYS,
@@ -187,11 +214,15 @@ function toPublicBookingSettings(
     facebookReviewUrl: row.facebookReviewUrl,
     customReviewUrl: row.customReviewUrl,
     tagline: row.tagline,
+    emergencyService: readEmergencyServiceSettings(company.settings),
     phone: company.phone,
     logoUrl: company.logoUrl,
     serviceAreaZipCodes,
     serviceAreaNames,
-    timezone: company.timezone
+    timezone: company.timezone,
+    trade,
+    tradeSchemaType: trade ? HOME_SERVICE_TRADE_REGISTRY[trade].schemaType : null,
+    tradeDescription: parseTradeDescription(trade, settingsObject.tradeDescription)
   };
 }
 
@@ -668,6 +699,7 @@ async function createJobFromBooking(
       priority: bookingRequest.urgency === "emergency" ? "urgent" : "normal",
       status: "scheduled",
       leadSource: bookingRequest.source,
+      leadAttribution: bookingRequest.leadAttribution ?? null,
       title: buildJobTitle(bookingRequest),
       description: bookingRequest.customerNotes,
       scheduledStart,
@@ -825,6 +857,17 @@ function buildAvailabilityWindowsForDay(
   });
 }
 
+/** Company behind an enabled public booking slug (404 otherwise). */
+export async function getPublicBookingCompany(slug: string): Promise<CompanyRow> {
+  const { company } = await getCompanyByBookingSlug(slug, db);
+  return company;
+}
+
+/** Company + booking settings for a public slug in one lookup (404 when unknown/disabled). */
+export async function getPublicBookingContext(slug: string) {
+  return getCompanyByBookingSlug(slug, db);
+}
+
 export async function resolvePublicBookingCompanyId(slug: string): Promise<string> {
   const { settings } = await getCompanyByBookingSlug(slug, db);
   return settings.companyId;
@@ -885,6 +928,14 @@ export async function checkZipCoverage(slug: string, zip: string): Promise<Check
   }
 
   const { settings } = await getCompanyByBookingSlug(slug, db);
+  return checkZipCoverageForBookingSettings(settings, normalizedZip);
+}
+
+/** ZIP coverage for an already-resolved booking settings row (no second slug lookup). */
+export async function checkZipCoverageForBookingSettings(
+  settings: { companyId: string; allowZipOverflow: boolean | null },
+  normalizedZip: string
+): Promise<CheckZipCoverageResult> {
   const technicianRows = await listCompanyTechnicians(settings.companyId, db);
   const coveredTechnicians = filterTechniciansByZip(technicianRows, normalizedZip);
   const covered = coveredTechnicians.length > 0 || Boolean(settings.allowZipOverflow);
@@ -952,6 +1003,29 @@ async function assertHoldSlotMatchesPublishedAvailability(
   }
 }
 
+/** Booking request ids whose `booking.requested` event recorded an emergency downgrade (old rows: none). */
+async function loadEmergencyDowngradedIds(companyId: string, bookingRequestIds: string[]): Promise<Set<string>> {
+  if (bookingRequestIds.length === 0) return new Set();
+  const events = await db
+    .select()
+    .from(activityEvents)
+    .where(
+      and(
+        eq(activityEvents.companyId, companyId),
+        eq(activityEvents.eventType, "booking.requested"),
+        inArray(activityEvents.entityId, bookingRequestIds)
+      )
+    );
+  return new Set(
+    events
+      .filter((event) => {
+        const payload = event.payload as Record<string, unknown> | null;
+        return Boolean(payload && payload.emergencyDowngraded === true);
+      })
+      .map((event) => event.entityId as string)
+  );
+}
+
 export async function listBookingRequests(
   companyId: string,
   query: ListBookingRequestsQuery
@@ -964,13 +1038,23 @@ export async function listBookingRequests(
   const filteredRows = rows
     .filter((row) => (query.status ? row.status === query.status : true))
     .filter((row) => (query.source ? row.source === query.source : true))
-    .sort((left, right) => right.createdAt.getTime() - left.createdAt.getTime());
+    // Lead inbox: emergency (24/7) requests first, then newest first.
+    .sort(
+      (left, right) =>
+        Number(right.urgency === "emergency") - Number(left.urgency === "emergency") ||
+        right.createdAt.getTime() - left.createdAt.getTime()
+    );
   const total = filteredRows.length;
   const totalPages = total === 0 ? 1 : Math.ceil(total / limit);
   const offset = (page - 1) * limit;
+  const pageRows = filteredRows.slice(offset, offset + limit);
+  const downgradedIds = await loadEmergencyDowngradedIds(
+    companyId,
+    pageRows.map((row) => row.id)
+  );
 
   return {
-    data: filteredRows.slice(offset, offset + limit).map((row) => ({
+    data: pageRows.map((row) => ({
       id: row.id,
       referenceNumber: row.referenceNumber,
       status: row.status as BookingRequest["status"],
@@ -981,6 +1065,8 @@ export async function listBookingRequests(
       zip: row.zip,
       serviceCategory: row.serviceCategory,
       serviceType: row.serviceType,
+      urgency: row.urgency as BookingRequest["urgency"],
+      downgraded: downgradedIds.has(row.id),
       preferredDate: row.preferredDate,
       preferredWindow: row.preferredWindow as BookingRequest["preferredWindow"],
       assignedTechnicianId: row.assignedTechnicianId,
@@ -995,7 +1081,8 @@ export async function listBookingRequests(
 
 export async function getBookingRequest(companyId: string, bookingRequestId: string): Promise<BookingRequest> {
   const bookingRequest = await getBookingRequestRecord(companyId, bookingRequestId, db);
-  return toBookingRequest(bookingRequest);
+  const downgradedIds = await loadEmergencyDowngradedIds(companyId, [bookingRequest.id]);
+  return { ...toBookingRequest(bookingRequest), downgraded: downgradedIds.has(bookingRequest.id) };
 }
 
 function buildBookingSlotHoldNote(bookingRequestId: string): string {
@@ -1428,12 +1515,41 @@ export async function updateBookingSettings(
   });
 }
 
+/**
+ * Single emergency guard for every public booking submit: a request is treated as an emergency request when
+ * `emergency === true` OR `urgency === "emergency"`. It is accepted only if the shop has 24/7 emergency service on
+ * and its trade is emergency-capable; otherwise it is downgraded to "this_week" (never rejected).
+ */
+export function applyPublicEmergencyGuard(
+  input: SubmitBookingRequestInput,
+  companySettings: unknown
+): { input: SubmitBookingRequestInput; emergency: EmergencyRequestResolution } {
+  const settings = companySettings && typeof companySettings === "object" ? (companySettings as Record<string, unknown>) : {};
+  const trade = typeof settings.trade === "string" ? settings.trade : null;
+  const emergency = resolveEmergencyRequest(
+    input.emergency === true || input.urgency === "emergency",
+    readEmergencyServiceSettings(settings),
+    trade
+  );
+  const { emergency: _flag, ...rest } = input;
+  const urgency: SubmitBookingRequestInput["urgency"] = emergency.accepted
+    ? "emergency"
+    : rest.urgency === "emergency"
+      ? "this_week"
+      : rest.urgency;
+  return { input: { ...rest, ...(urgency !== undefined ? { urgency } : {}) }, emergency };
+}
+
 export async function submitBookingRequest(
   slug: string,
   input: SubmitBookingRequestInput,
-  sourceParam?: string
+  sourceParam?: string,
+  /** Set by callers that already ran applyPublicEmergencyGuard (public intake) so the downgrade is still recorded. */
+  emergencyAlreadyDowngraded = false
 ): Promise<{ bookingRequest: BookingRequest; confirmation: BookingConfirmationView; holdToken: string | null }> {
   const { company, settings } = await getCompanyByBookingSlug(slug, db);
+  const emergencyGuard = applyPublicEmergencyGuard(input, company.settings);
+  input = emergencyGuard.input;
   const normalizedInput: NormalizedBookingInput = {
     firstName: input.firstName.trim(),
     lastName: input.lastName.trim(),
@@ -1504,6 +1620,7 @@ export async function submitBookingRequest(
         isPropertyOwner: input.isPropertyOwner ?? false,
         smsConsentAppointments: input.smsConsentAppointments ?? false,
         smsConsentMarketing: input.smsConsentMarketing ?? false,
+        leadAttribution: sanitizeLeadAttribution(input.leadAttribution),
         confirmedAt: settings.autoConfirm ? new Date() : null,
         confirmationSentAt: new Date()
       })
@@ -1524,7 +1641,10 @@ export async function submitBookingRequest(
       customerId: customer.id,
       payload: {
         source,
-        zip: bookingRequest.zip
+        zip: bookingRequest.zip,
+        ...(bookingRequest.urgency === "emergency" ? { emergency: true } : {}),
+        // Persisted (no migration) so the inbox can badge requests that asked for emergency but were downgraded.
+        ...(emergencyGuard.emergency.downgraded || emergencyAlreadyDowngraded ? { emergencyDowngraded: true } : {})
       },
       summary: `Booking request ${bookingRequest.referenceNumber ?? bookingRequest.id} submitted`
     });

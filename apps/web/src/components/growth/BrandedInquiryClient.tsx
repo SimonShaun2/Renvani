@@ -11,6 +11,7 @@ import {
 } from "@/src/components/growth/branded-storefront.utils";
 import { useCheckZipCoverage, useSubmitBookingRequest } from "@/src/hooks/booking.hooks";
 import { ApiError } from "@/src/lib/api";
+import { SITE_TRADES } from "@/src/components/growth/site-trade.registry";
 import { HONEYPOT_FIELD } from "@/src/lib/inquiry-rate-limit";
 
 interface BrandedInquiryClientProps {
@@ -18,6 +19,8 @@ interface BrandedInquiryClientProps {
   acquisitionSource: string;
   initialService?: string;
   initialZip?: string;
+  /** Trade label from `resolveSiteTrade` (#262), sent as `serviceCategory`. */
+  serviceCategory?: string;
 }
 
 function createIdempotencyKey(): string {
@@ -38,7 +41,7 @@ async function passInquiryGate(slug: string, honeypot: string): Promise<{ ok: bo
   return { ok: response.ok, accepted: payload.accepted !== false, ...(payload.message ? { message: payload.message } : {}) };
 }
 
-export function BrandedInquiryClient({ model, acquisitionSource, initialService, initialZip }: BrandedInquiryClientProps) {
+export function BrandedInquiryClient({ model, acquisitionSource, initialService, initialZip, serviceCategory }: BrandedInquiryClientProps) {
   const submitMutation = useSubmitBookingRequest(model.bookingSlug);
   const zipCheckMutation = useCheckZipCoverage(model.bookingSlug);
   const [firstName, setFirstName] = useState("");
@@ -50,7 +53,7 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
   const [addressLine1, setAddressLine1] = useState("");
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
-  const [serviceInterest, setServiceInterest] = useState(initialService ?? model.serviceCards[0]?.title ?? "Standard clean");
+  const [serviceInterest, setServiceInterest] = useState(initialService ?? model.serviceCards[0]?.title ?? "Heating & cooling repair");
   const [notes, setNotes] = useState("");
   const [smsConsentAppointments, setSmsConsentAppointments] = useState(false);
   const [smsConsentMarketing, setSmsConsentMarketing] = useState(false);
@@ -100,7 +103,7 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
           state: state.trim().toUpperCase().slice(0, 2),
           zip: zip.trim(),
           propertyType: "residential",
-          serviceCategory: "Cleaning",
+          serviceCategory: serviceCategory ?? SITE_TRADES.other.label,
           serviceType: serviceInterest,
           customerNotes: `[Branded site inquiry] ${notes.trim()}`.trim(),
           urgency: "flexible",
@@ -277,7 +280,7 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
             onChange={(event) => setSmsConsentMarketing(event.target.checked)}
             className="mt-0.5"
           />
-          <span>Optional: send me occasional offers and cleaning tips by text.</span>
+          <span>Optional: send me occasional offers and maintenance reminders by text.</span>
         </label>
       </fieldset>
 

@@ -63,6 +63,11 @@ const envSchema = z.object({
     .positive("MEDIA_SIGNED_URL_TTL_SECONDS must be greater than zero")
     .default(900),
   APP_URL: z.string().url("APP_URL must be a valid URL"),
+  /**
+   * Comma-separated extra web origins (exact match, no wildcards). APP_URL stays primary. Extras are honored only when
+   * RENVANI_DEPLOYMENT_TIER=staging (tester tier) for API CORS, Clerk authorized parties and Stripe return URLs.
+   */
+  APP_URL_ALLOWED: z.string().default(""),
   JWT_SECRET: z.string().min(1, "JWT_SECRET is required"),
   JWT_REFRESH_SECRET: z.string().min(1, "JWT_REFRESH_SECRET is required"),
   BOOKING_HOLD_TOKEN_SECRET: z.string().min(1, "BOOKING_HOLD_TOKEN_SECRET is required"),
@@ -82,6 +87,11 @@ const envSchema = z.object({
   CLERK_SECRET_KEY: z.string().default(""),
   /** Clerk webhook signing secret (whsec_…) for POST /api/v1/webhooks/clerk (svix). */
   CLERK_WEBHOOK_SECRET: z.string().default(""),
+  /**
+   * Optional shared secret the web proxy (Vercel) sends as `x-origin-secret` on /api/v1/public/* calls.
+   * Unset = off: client IP is request.ip (TRUST_PROXY_HOPS). Set on BOTH Vercel web and Render api.
+   */
+  ORIGIN_SECRET: z.string().optional(),
   /** Comma-separated web origins allowed as Clerk `azp` and for CORS (e.g. https://staging.renvani.com). */
   CLERK_AUTHORIZED_PARTIES: z.string().default(""),
   /** STACK-04 / FS-133 — optional Sentry DSN for QBO sync issue alerts */

@@ -59,8 +59,8 @@ describe("pricing (Figma 203:15719 desktop / 203:15720 mobile)", () => {
       expect(text).toContain(s);
     }
     expect(container.querySelectorAll("h1")).toHaveLength(2);
-    expect(container.querySelector(".lg\\:hidden")).not.toBeNull();
-    expect(container.querySelector(".hidden.lg\\:block")).not.toBeNull();
+    expect(container.querySelector(".xl\\:hidden")).not.toBeNull();
+    expect(container.querySelector(".hidden.xl\\:block")).not.toBeNull();
   });
 
   it("every link resolves to a real route and images exist", () => {

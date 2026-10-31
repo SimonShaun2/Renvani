@@ -10334,19 +10334,19 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
    "k": [
     {
      "t": "div",
-     "c": "flex gap-[24px] items-start relative shrink-0",
+     "c": "flex gap-[24px] items-start relative w-[544px] shrink-0",
      "n": "HVAC and plumbing links",
      "id": "204:9053",
      "k": [
       {
        "t": "div",
-       "c": "flex flex-col gap-[14px] items-start relative flex-1 min-w-0",
+       "c": "flex flex-col gap-[14px] items-start relative w-[260px] shrink-0",
        "n": "Industry preview / HVAC",
        "id": "204:9054",
        "k": [
         {
          "t": "div",
-         "c": "h-[160px] relative rounded-[16px] w-full",
+         "c": "h-[160px] relative rounded-[16px] w-[260px] shrink-0",
          "n": "Illustrative HVAC work",
          "id": "204:9055",
          "k": [
@@ -10359,13 +10359,13 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
         },
         {
          "t": "div",
-         "c": "flex gap-[10px] h-[48px] items-center relative w-full",
+         "c": "flex gap-[10px] h-[48px] items-center relative w-[260px] shrink-0",
          "n": "Navigation / HVAC",
          "id": "204:9056",
          "k": [
           {
            "t": "p",
-           "c": "font-medium leading-[1.38] relative text-[22px] text-[color:#0f1530] text-left flex-1 min-w-0",
+           "c": "font-medium leading-[1.38] relative text-[22px] text-[color:#0f1530] text-left w-[226px] shrink-0",
            "id": "204:9057",
            "k": [
             "HVAC"
@@ -10391,13 +10391,13 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
       },
       {
        "t": "div",
-       "c": "flex flex-col gap-[14px] items-start relative flex-1 min-w-0",
+       "c": "flex flex-col gap-[14px] items-start relative w-[260px] shrink-0",
        "n": "Industry preview / Plumbing",
        "id": "204:9060",
        "k": [
         {
          "t": "div",
-         "c": "h-[160px] relative rounded-[16px] w-full",
+         "c": "h-[160px] relative rounded-[16px] w-[260px] shrink-0",
          "n": "Illustrative Plumbing work",
          "id": "204:9061",
          "k": [
@@ -10410,13 +10410,13 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
         },
         {
          "t": "div",
-         "c": "flex gap-[10px] h-[48px] items-center relative w-full",
+         "c": "flex gap-[10px] h-[48px] items-center relative w-[260px] shrink-0",
          "n": "Navigation / Plumbing",
          "id": "204:9062",
          "k": [
           {
            "t": "p",
-           "c": "font-medium leading-[1.38] relative text-[22px] text-[color:#0f1530] text-left flex-1 min-w-0",
+           "c": "font-medium leading-[1.38] relative text-[22px] text-[color:#0f1530] text-left w-[226px] shrink-0",
            "id": "204:9063",
            "k": [
             "Plumbing"
@@ -10444,13 +10444,13 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
     },
     {
      "t": "div",
-     "c": "flex flex-col gap-[20px] items-start relative flex-1 min-w-0",
+     "c": "flex flex-col gap-[20px] items-start relative w-[704px] shrink-0",
      "n": "Other industries",
      "id": "204:9066",
      "k": [
       {
        "t": "p",
-       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[704px] shrink-0",
        "id": "204:9067",
        "k": [
         "WORKFLOW EXAMPLES"
@@ -10458,19 +10458,19 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
       },
       {
        "t": "div",
-       "c": "flex gap-[24px] items-start relative w-full",
+       "c": "flex gap-[24px] items-start relative w-[704px] shrink-0",
        "n": "Industry menu row",
        "id": "204:9068",
        "k": [
         {
          "t": "div",
-         "c": "flex gap-[10px] h-[48px] items-center relative flex-1 min-w-0",
+         "c": "flex gap-[10px] h-[48px] items-center relative w-[340px] shrink-0",
          "n": "Navigation / Electrical",
          "id": "204:9069",
          "k": [
           {
            "t": "p",
-           "c": "font-medium leading-[1.38] relative text-[16px] text-[color:#0f1530] text-left flex-1 min-w-0",
+           "c": "font-medium leading-[1.38] relative text-[16px] text-[color:#0f1530] text-left w-[306px] shrink-0",
            "id": "204:9070",
            "k": [
             "Electrical"
@@ -10496,13 +10496,13 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
       },
       {
        "t": "div",
-       "c": "flex gap-[10px] h-[48px] items-center relative w-full",
+       "c": "flex gap-[10px] h-[48px] items-center relative w-[340px] shrink-0",
        "n": "Navigation / All industries",
        "id": "204:9095",
        "k": [
         {
          "t": "p",
-         "c": "font-medium leading-[1.38] relative text-[15px] text-[color:#0f1530] text-left flex-1 min-w-0",
+         "c": "font-medium leading-[1.38] relative text-[15px] text-[color:#0f1530] text-left w-[306px] shrink-0",
          "id": "204:9096",
          "k": [
           "All industries"

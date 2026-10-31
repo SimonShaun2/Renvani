@@ -2,14 +2,15 @@ import { useRef } from "react";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import type { EditAgentActionParametersInput, OperatorInboxItem } from "@fsm/types";
+import type { EditAgentActionParametersInput, OperatorInboxItem, OperatorInboxTimelineEntry } from "@fsm/types";
 
 import { ApiError, api } from "@/src/lib/api";
 
 const operatorInboxKeys = {
   all: ["operator-inbox"] as const,
   list: (state?: string) => [...operatorInboxKeys.all, "list", state ?? "all"] as const,
-  detail: (id: string) => [...operatorInboxKeys.all, "detail", id] as const
+  detail: (id: string) => [...operatorInboxKeys.all, "detail", id] as const,
+  timeline: (id: string) => [...operatorInboxKeys.all, "timeline", id] as const
 };
 
 /** The fields a guarded write needs: the id and the `version` the operator saw. */
@@ -129,4 +130,14 @@ export function useRejectAgentAction(id: string) {
 
 export function useExecuteAgentAction(item: GuardedInboxItem) {
   return useGuardedAgentAction(item, "execute");
+}
+
+/** GET /operator/inbox/:id/timeline (event trail), fetched only when the owner opens it. */
+export function useOperatorInboxTimeline(id: string, enabled: boolean) {
+  return useQuery({
+    queryKey: operatorInboxKeys.timeline(id),
+    queryFn: () => api.get<{ items: OperatorInboxTimelineEntry[] }>(`/api/v1/operator/inbox/${id}/timeline`),
+    select: (data) => data.items ?? [],
+    enabled
+  });
 }

@@ -58,6 +58,9 @@ export type SeriesErrorKind =
 export interface SeriesErrorView {
   kind: SeriesErrorKind;
   message: string;
+  /** Figma 364:4335 alerts: bold line + follow-up line (message stays the combined copy). */
+  title?: string;
+  detail?: string;
   reload: boolean;
   jobId?: string;
 }
@@ -67,31 +70,33 @@ export function describeSeriesError(error: unknown): SeriesErrorView {
   const fields = error.payload.fields ?? {};
   switch (fields.reason) {
     case "stale_version":
-      return { kind: "stale", message: "Someone else changed this plan since you opened it. Reload, then preview again.", reload: true };
+      return { kind: "stale", message: "Someone else changed this plan since you opened it. Reload, then preview again.", title: "Someone else changed this plan since you opened it.", detail: "Reload, then preview again.", reload: true };
     case "preview_stale":
-      return { kind: "preview_stale", message: "The plan changed since you previewed it. Reload and preview again before applying.", reload: true };
+      return { kind: "preview_stale", message: "The plan changed since you previewed it. Reload and preview again before applying.", title: "The plan changed since you previewed it.", detail: "Reload and preview again before applying.", reload: true };
     case "idempotency_conflict":
       return { kind: "idempotency", message: "This change was already submitted with different details. Reload and start again.", reload: true };
     case "occurrence_conflict":
-      return { kind: "occurrence_conflict", message: "Another visit in this plan is already on that date. Pick a different day.", reload: true };
+      return { kind: "occurrence_conflict", message: "Another visit in this plan is already on that date. Pick a different day.", title: "Another visit in this plan is already on that date.", detail: "Pick a different day.", reload: true };
     case "linked_job":
       return {
         kind: "linked_job",
-        message: "This visit already has a job, so it wasn't changed here. It's been flagged for a person — change it from the job instead.",
+        message: "This visit already has a job, so it wasn’t changed here. It’s been flagged for a person — change it from the job instead.",
+        title: "This visit already has a job, so it wasn’t changed here.",
+        detail: "It’s been flagged for a person — change it from the job instead.",
         reload: true,
         ...(fields.jobId ? { jobId: fields.jobId } : {})
       };
     case "series_ended":
-      return { kind: "series_ended", message: "This plan has ended. Ended plans can't be changed.", reload: true };
+      return { kind: "series_ended", message: "This plan has ended. Ended plans can’t be changed.", title: "This plan has ended. Ended plans can’t be changed.", detail: "Visits stay in history.", reload: true };
     case "external_scheduler":
-      return { kind: "external_scheduler", message: "This plan is scheduled by another system, so it can't be changed here.", reload: false };
+      return { kind: "external_scheduler", message: "This plan is scheduled by another system, so it can’t be changed here.", title: "This plan is scheduled by another system, so it can’t be changed here.", detail: "Make changes in the system that owns this schedule.", reload: false };
     case "occurrence_not_open":
       return { kind: "not_open", message: "Only upcoming scheduled visits can be changed.", reload: true };
     default:
       break;
   }
   if (fields.localDate === "in_past") return { kind: "validation", message: "Pick a date after today.", reload: false };
-  if (fields.localTime === "unchanged") return { kind: "validation", message: "That's already the plan's visit time.", reload: false };
+  if (fields.localTime === "unchanged") return { kind: "validation", message: "That’s already the plan’s visit time.", title: "No visits change.", detail: "That’s already the plan’s visit time.", reload: false };
   if (error.status === 403) return { kind: "forbidden", message: "You don't have permission to change this plan.", reload: false };
   if (error.status === 409) return { kind: "other", message: error.message, reload: true };
   if (error.status === 400) return { kind: "validation", message: error.message, reload: false };
@@ -133,3 +138,10 @@ export const OCCURRENCE_STATUS_LABELS: Record<string, string> = {
   completed: "Completed"
 };
 export const occurrenceStatusLabel = (s: string) => OCCURRENCE_STATUS_LABELS[s] ?? s.replace(/_/gu, " ");
+
+/** "2030-01-15" -> "Jan 15, 2030" (Figma 364:4217 visit rows), no timezone drift. */
+export function formatShortDate(localDate: string): string {
+  const [y, m, d] = localDate.split("-").map(Number);
+  if (!y || !m || !d) return localDate;
+  return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
+}

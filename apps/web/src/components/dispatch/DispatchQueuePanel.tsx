@@ -93,23 +93,12 @@ function QueueTabButton({ isActive, label, count, onClick }: QueueTabButtonProps
       )}
     >
       <span>{label}</span>
-      <span className={cn("rounded-full px-1.5 py-0.5 text-[10px]", isActive ? "bg-white/20" : "bg-white text-neutral-500")}>
-        {count}
-      </span>
+      <span className={cn("rounded-full px-1.5 py-0.5 text-[10px]", isActive ? "bg-white/20" : "bg-white text-neutral-500")}>{count}</span>
     </button>
   );
 }
 
-function DraggableJobCard({
-  id,
-  label,
-  subtitle,
-  meta,
-  tone,
-  isSelected,
-  preferredTechnicianId,
-  onClick
-}: DraggableJobCardProps) {
+function DraggableJobCard({ id, label, subtitle, meta, tone, isSelected, preferredTechnicianId, onClick }: DraggableJobCardProps) {
   const dragData: DispatchDragJobData = {
     type: "dispatch-job",
     jobId: id,
@@ -356,7 +345,9 @@ function BookingRequestsSection({
           onClick={() => onSelectBookingRequest(request.id)}
           className={cn(
             "w-full rounded-[24px] border bg-white px-4 py-4 text-left shadow-sm transition",
-            selectedBookingRequestId === request.id ? "border-brand-accent shadow-[0_20px_48px_rgba(37,122,250,0.18)]" : "border-neutral-200 hover:border-brand-accent/30"
+            selectedBookingRequestId === request.id
+              ? "border-brand-accent shadow-[0_20px_48px_rgba(37,122,250,0.18)]"
+              : "border-neutral-200 hover:border-brand-accent/30"
           )}
         >
           <div className="flex items-center justify-between gap-3">
@@ -415,9 +406,7 @@ function ApprovedEstimateSection({
           <div key={estimate.id} className="rounded-2xl bg-neutral-50 px-3 py-3">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className="text-sm font-semibold text-neutral-900">
-                  {estimate.title ?? estimate.estimateNumber}
-                </p>
+                <p className="text-sm font-semibold text-neutral-900">{estimate.title ?? estimate.estimateNumber}</p>
                 <p className="mt-1 text-sm text-neutral-500">
                   {estimate.customer.firstName} {estimate.customer.lastName}
                 </p>
@@ -548,13 +537,13 @@ export function DispatchQueuePanel({
                 <QueueError title="Smart queue could not be loaded" error={smartQueueError} />
               ) : (
                 <NextBestJobsSection
-                jobs={nextBestJobs}
-                isLoading={isLoading}
-                selectedJobId={selectedJobId}
-                autoFittingJobId={autoFittingJobId}
-                onSelectJob={onSelectJob}
-                onAutoFitJob={onAutoFitJob}
-              />
+                  jobs={nextBestJobs}
+                  isLoading={isLoading}
+                  selectedJobId={selectedJobId}
+                  autoFittingJobId={autoFittingJobId}
+                  onSelectJob={onSelectJob}
+                  onAutoFitJob={onAutoFitJob}
+                />
               )}
             </>
           ) : null}
@@ -589,11 +578,11 @@ export function DispatchQueuePanel({
                 <QueueError title="Booking requests could not be loaded" error={bookingRequestsError} />
               ) : (
                 <BookingRequestsSection
-                requests={filteredBookingRequests}
-                isLoading={bookingRequestsLoading}
-                selectedBookingRequestId={selectedBookingRequestId}
-                onSelectBookingRequest={onSelectBookingRequest}
-              />
+                  requests={filteredBookingRequests}
+                  isLoading={bookingRequestsLoading}
+                  selectedBookingRequestId={selectedBookingRequestId}
+                  onSelectBookingRequest={onSelectBookingRequest}
+                />
               )}
             </>
           ) : null}
@@ -611,11 +600,11 @@ export function DispatchQueuePanel({
                 <QueueError title="Unscheduled jobs could not be loaded" error={unscheduledError} />
               ) : (
                 <UnscheduledSection
-                jobs={filteredUnscheduledJobs}
-                isLoading={unscheduledLoading}
-                selectedJobId={selectedJobId}
-                onSelectJob={onSelectJob}
-              />
+                  jobs={filteredUnscheduledJobs}
+                  isLoading={unscheduledLoading}
+                  selectedJobId={selectedJobId}
+                  onSelectJob={onSelectJob}
+                />
               )}
             </>
           ) : null}
@@ -623,20 +612,21 @@ export function DispatchQueuePanel({
       </section>
 
       {approvedEstimatesError ? (
-                <QueueError title="Approved estimates could not be loaded" error={approvedEstimatesError} />
-              ) : (
-                <ApprovedEstimateSection
-        estimates={approvedEstimates}
-        isLoading={approvedEstimatesLoading}
-        convertingEstimateId={convertingEstimateId}
-        onConvertEstimate={onConvertEstimate}
-      />
-              )}
+        <QueueError title="Approved estimates could not be loaded" error={approvedEstimatesError} />
+      ) : (
+        <ApprovedEstimateSection
+          estimates={approvedEstimates}
+          isLoading={approvedEstimatesLoading}
+          convertingEstimateId={convertingEstimateId}
+          onConvertEstimate={onConvertEstimate}
+        />
+      )}
 
       <section className="rounded-[28px] border border-neutral-200 bg-white px-4 py-4 shadow-sm">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-400">Tip</p>
         <p className="mt-2 text-sm leading-6 text-neutral-600">
-          Drag any queue card onto an amber gap to schedule it. Booking requests refresh every 30 seconds, and approved estimates can convert directly into jobs here.
+          Drag any queue card onto an amber gap to schedule it. Booking requests refresh every 30 seconds, and approved estimates can
+          convert directly into jobs here.
         </p>
         <div className="mt-4 flex items-center gap-2 text-xs font-medium text-neutral-500">
           <span className="rounded-full bg-warning-light px-2 py-1 text-warning">Drop zone</span>

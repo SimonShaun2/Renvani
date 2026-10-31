@@ -35,7 +35,7 @@ export function DemoPage({ action = submitDemoRequest }: { action?: (prev: Intak
           <h1 id="demo-title" className="text-[42px] font-semibold leading-[1.08] tracking-[-1.05px] md:text-[48px] md:tracking-[-1.2px] lg:text-[64px] lg:tracking-[-1.6px]" style={{ color: ink }}>
             <span className="block md:inline lg:block">{DEMO.headline[0]}</span> <span className="block md:inline lg:block">{DEMO.headline[1]}</span>
           </h1>
-          <Image src="/marketing/demo/owner.png" alt="" width={1200} height={760} priority className="h-[230px] w-full rounded-2xl object-cover md:hidden lg:block lg:h-[380px]" />
+          <Image src="/marketing/demo/demo-hero.png" alt="Home service business owner using a tablet beside his open work van" width={1200} height={760} priority className="h-[230px] w-full rounded-2xl object-cover md:hidden lg:block lg:h-[380px]" />
         </div>
         <div data-node-id="204:9235" className="flex w-full flex-col gap-[14px] rounded-2xl border bg-white p-5 md:gap-5 md:p-6 lg:w-[616px] lg:shrink-0 lg:gap-[14px] lg:p-5" style={{ borderColor: line }}>
           {state?.status === "success" ? (
@@ -73,8 +73,8 @@ export function DemoPage({ action = submitDemoRequest }: { action?: (prev: Intak
                 <Field id="demo-trade" label="Trade" error={errors.trade} className="order-4">
                   <SelectInput id="demo-trade" name="trade" placeholder="Choose your trade" error={errors.trade} options={HOME_SERVICE_TRADES.map((t) => ({ value: t, label: TRADE_LABELS[t] }))} />
                 </Field>
-                <Field id="demo-team" label="Team size" error={errors.message} className="order-5">
-                  <SelectInput id="demo-team" name="teamSize" placeholder="Choose team size" required={false} options={DEMO.teamSizes.map((t) => ({ value: t, label: t }))} />
+                <Field id="demo-team" label="Team size" error={errors.teamSize} className="order-5">
+                  <SelectInput id="demo-team" name="teamSize" placeholder="Choose team size" error={errors.teamSize} required={false} options={DEMO.teamSizes.map((t) => ({ value: t, label: t }))} />
                 </Field>
               </div>
               <Honeypot />

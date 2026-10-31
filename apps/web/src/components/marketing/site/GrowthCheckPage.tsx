@@ -84,7 +84,7 @@ export function GrowthCheckPage({ website = "", action = submitGrowthCheck }: { 
                 {GROWTH_CHECK.note}
               </p>
             </form>
-            <Image src="/marketing/demo/owner.png" alt="" width={1264} height={760} className="h-[200px] w-full rounded-2xl object-cover lg:h-[380px] lg:w-[632px] lg:shrink-0" />
+            <Image src="/marketing/demo/demo-hero.png" alt="Home service business owner using a tablet beside his open work van" width={1264} height={760} className="h-[200px] w-full rounded-2xl object-cover lg:h-[380px] lg:w-[632px] lg:shrink-0" />
           </div>
         </>
       )}

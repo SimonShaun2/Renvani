@@ -140,3 +140,23 @@ describe("marketing intake types (#328)", () => {
     expect(lib.HOME_SERVICE_TRADES).toBe(shared.HOME_SERVICE_TRADES);
   });
 });
+
+describe("demo Team size errors", () => {
+  it("maps the API `message` error to the teamSize field on /demo only", async () => {
+    const f = vi.fn(async () => new Response(JSON.stringify({ error: "VALIDATION_ERROR", fields: { message: "Too long" } }), { status: 400 }));
+    const demo = await postMarketingIntake("demo-requests", { name: "A", email: "a@b.co", company: "C", trade: "hvac", hp: "" }, f as unknown as typeof fetch, "http://api");
+    expect(demo).toMatchObject({ status: "invalid", fields: { teamSize: "Too long" } });
+    const gc = await postMarketingIntake("growth-checks", { websiteUrl: "https://a.co", trade: "hvac", zip: "74103", email: "a@b.co", hp: "" }, f as unknown as typeof fetch, "http://api");
+    expect(gc).toMatchObject({ status: "invalid", fields: { message: "Too long" } });
+  });
+
+  it("shows a Team size error under its own select", async () => {
+    const action = vi.fn(async () => ({ status: "invalid", fields: { teamSize: "Choose team size." }, message: "Check the highlighted fields." }) as IntakeResult);
+    const { container } = render(<DemoPage action={action} />);
+    await act(async () => {
+      fireEvent.submit(container.querySelector("form")!);
+    });
+    expect(container.querySelector("#demo-team")!.getAttribute("aria-invalid")).toBe("true");
+    expect(container.querySelector("#demo-team-error")!.textContent).toBe("Choose team size.");
+  });
+});

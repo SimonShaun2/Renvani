@@ -1,7 +1,12 @@
+import { productLinkFor } from "./flagship-registry";
+
 /** Products (176:204 / 176:313) and How it works (176:585 / 176:664) config. Figma jiGHTNUJNltWbHA4Il3hk7, page 171:2. */
 
 /** A tool link. `href: null` = the tool's page is not built yet; it renders as text, never as a dead or redirecting link. */
 export type ToolLink = { label: string; href: string | null };
+
+/** Tool link: a real product page when one is built (flagship-registry), otherwise plain text. */
+const t = (label: string): ToolLink => ({ label, href: productLinkFor(label) });
 
 export const FLAGSHIP_HREF = {
   growth: "/product/growth",
@@ -23,10 +28,10 @@ export const PLATFORM = {
     open: { label: "Open owner view →", href: FLAGSHIP_HREF.commandCenter }
   },
   flagships: {
-    growth: { title: "Growth", href: FLAGSHIP_HREF.growth, tools: [{ label: "Website →", href: null }, { label: "Online Booking →", href: "/product/online-booking" }] },
-    revenue: { title: "Revenue", href: FLAGSHIP_HREF.revenue, tools: [{ label: "Price Book →", href: null }, { label: "Estimates & Approvals →", href: "/product/estimates-approvals" }] },
-    operations: { title: "Operations", href: FLAGSHIP_HREF.operations, tools: [{ label: "Scheduling & Dispatch →", href: "/product/scheduling-dispatch" }, { label: "Technician App →", href: null }, { label: "Payments →", href: null }] },
-    retention: { title: "Retention", href: FLAGSHIP_HREF.retention, tools: [{ label: "Service Agreements →", href: null }, { label: "Reminders & Win-backs →", href: null }] }
+    growth: { title: "Growth", href: FLAGSHIP_HREF.growth, tools: [t("Website →"), { label: "Online Booking →", href: "/product/online-booking" }] },
+    revenue: { title: "Revenue", href: FLAGSHIP_HREF.revenue, tools: [t("Price Book →"), { label: "Estimates & Approvals →", href: "/product/estimates-approvals" }] },
+    operations: { title: "Operations", href: FLAGSHIP_HREF.operations, tools: [{ label: "Scheduling & Dispatch →", href: "/product/scheduling-dispatch" }, t("Technician App →"), t("Payments →")] },
+    retention: { title: "Retention", href: FLAGSHIP_HREF.retention, tools: [t("Service Agreements →"), t("Reminders & Win-backs →")] }
   },
   record: { eyebrow: "ONE CONNECTED RECORD", items: ["Jordan Lee", "Job #1042", "Property + equipment", "Visit history"] },
   caption: "Illustrative job · Example data"
@@ -34,7 +39,6 @@ export const PLATFORM = {
 
 export type ToolGroup = { key: string; title: string; href: string; tagline: string; tools: ToolLink[] };
 
-const t = (label: string): ToolLink => ({ label, href: null });
 
 export const TOOL_GROUPS: { left: ToolGroup[]; right: ToolGroup[] } = {
   left: [
@@ -76,7 +80,7 @@ export const PRODUCTS_PAGE = {
   secondary: { label: "Find your next tool ↓", href: "#tools" },
   toolsEyebrow: "THE TOOLS BEHIND THE WORK",
   toolsHeadline: "Find your next tool.",
-  cta: { headline: "See your business in Renvani.", primary: { label: "Get a free demo", href: "/signup" }, secondary: { label: "See the initial industries →", href: null as string | null } }
+  cta: { headline: "See your business in Renvani.", primary: { label: "Get a free demo", href: "/signup" }, secondary: { label: "See the initial industries →", href: "/industries" as string | null } }
 };
 
 export const HOW_PAGE = {
@@ -91,5 +95,5 @@ export const HOW_PAGE = {
     { eyebrow: "HVAC", title: "No heat. Approved repair. Next tune-up.", image: "/marketing/home/hvac-tech.jpg", link: { label: "See the full workflow →", href: "/industries/hvac" as string | null } },
     { eyebrow: "PLUMBING", title: "A leak. A repair. A customer for next time.", image: "/marketing/home/plumbing-work.jpg", link: { label: "See the full workflow →", href: "/industries/plumbing" as string | null } }
   ],
-  cta: { headline: "See your business in Renvani.", primary: { label: "Get a free demo", href: "/signup" }, secondary: { label: "Bring your existing records →", href: null as string | null } }
+  cta: { headline: "See your business in Renvani.", primary: { label: "Get a free demo", href: "/signup" }, secondary: { label: "Bring your existing records →", href: productLinkFor("Onboarding & Data Import") as string | null } }
 };

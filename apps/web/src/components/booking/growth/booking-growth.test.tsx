@@ -59,6 +59,15 @@ describe("ZipCheckCard", () => {
     expect(state()).toBe("in_area");
   });
 
+  it("editing the ZIP after a check resets the old result", async () => {
+    setup(async () => ({ served: true }));
+    await click("Check ZIP");
+    expect(state()).toBe("in_area");
+    fireEvent.change(screen.getByLabelText("ZIP code"), { target: { value: "7873" } });
+    expect(state()).toBe("idle");
+    expect(screen.queryByText("✓ Yes, we serve 78704")).toBeNull();
+  });
+
   it("invalid ZIP never calls the API", async () => {
     const p = setup(async () => ({ served: true }), "7870x");
     await click("Check ZIP");

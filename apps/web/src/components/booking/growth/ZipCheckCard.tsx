@@ -76,6 +76,9 @@ export function ZipCheckCard({ companyName, zip, onZipChange, checkZip, onContin
           onChange={(event) => {
             onZipChange(event.target.value);
             setInvalid(false);
+            // Editing the ZIP invalidates the previous result.
+            setState("idle");
+            setEmailState("idle");
           }}
           aria-invalid={errored}
           className={`${input} ${errored ? "border-[#b42318]" : "border-[#e6dccb]"}`}

@@ -468,7 +468,7 @@ export function BookingFlowClient({
   const settings = settingsQuery.data.booking;
 
   return (
-    <div className="mx-auto w-full max-w-[480px] px-4 py-6">
+    <div className="mx-auto w-full max-w-[480px] px-4 py-6 md:max-w-[688px] md:px-6">
       <div className="space-y-4">
         <BookingHeader slug={slug} source={source} step={step} settings={settings} />
 

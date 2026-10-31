@@ -1,6 +1,6 @@
-# FSM Platform
+# Renvani (FSM Platform)
 
-AI-native field service management monorepo for HVAC, plumbing, and home service operators.
+Renvani aims to be the **Owner.com of home and field services**—a growth platform for one vertical ([Owner.com](https://www.owner.com/) as aspirational guide, not a literal product/pricing/app blueprint). **Revenue growth leads** the product (get found, win jobs, earn repeat)—same sequencing idea as Owner.com vs Toast/Square (growth first, POS on the back end), applied vs operations-first FSM (Jobber, ServiceTitan, Service Fusion) with FSM depth as the back end. **Growth outcomes lead;** AI powers workflows behind the five areas; not an “agent company” pitch. **FSM modules in this monorepo are the supporting system-of-record layer** on standalone Renvani SoR (legacy import-only), with human approval and policy where required. Build tickets, schema, and phase history: [`docs/README.md`](docs/README.md).
 
 ## Prerequisites
 

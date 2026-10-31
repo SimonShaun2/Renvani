@@ -148,13 +148,15 @@ export async function publicPost<TResponse>(path: string, body: unknown): Promis
 
 export const api = {
   get: <TResponse>(path: string) => apiFetch<TResponse>(path),
-  post: <TResponse>(path: string, body: unknown) =>
+  post: <TResponse>(path: string, body: unknown, init?: { headers?: HeadersInit }) =>
     apiFetch<TResponse>(path, {
+      ...init,
       method: "POST",
       body: JSON.stringify(body)
     }),
-  patch: <TResponse>(path: string, body: unknown) =>
+  patch: <TResponse>(path: string, body: unknown, init?: { headers?: HeadersInit }) =>
     apiFetch<TResponse>(path, {
+      ...init,
       method: "PATCH",
       body: JSON.stringify(body)
     }),

@@ -23,7 +23,7 @@ import { and, eq, inArray, isNull } from "drizzle-orm";
 import { activityEvents, db, recurringVisitOccurrences, recurringVisitSeries } from "@fsm/db";
 import { AppError, ErrorCode, type UserRole } from "@fsm/types";
 
-import { canonicalJson } from "./growth-check-report-render.js";
+import { canonicalJson } from "../lib/canonical-json.js";
 import { localDateTimeToUtc, todayLocalDate } from "./recurring-visit-occurrence.schedule.js";
 
 type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];

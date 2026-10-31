@@ -15,6 +15,7 @@ vi.mock("@/src/lib/api", async (orig) => {
   return { ...actual, api: { get, post: m.post, put: m.post, patch: m.post, delete: m.post } };
 });
 
+import { ApiError } from "@/src/lib/api";
 import { useAuthStore } from "@/src/stores/auth.store";
 import { GrowthCheckReviewClient } from "./GrowthCheckReviewClient";
 
@@ -118,5 +119,34 @@ describe("GrowthCheckReviewClient", () => {
     renderClient();
     expect(await screen.findByText("Owners and admins only")).toBeTruthy();
     expect(m.get).not.toHaveBeenCalled();
+  });
+  it("matches the Figma header, context row and finding pills", async () => {
+    renderClient();
+    expect(screen.getByText("Check what the Growth Check found on your shop. Confirm, reject or keep each finding.")).toBeTruthy();
+    await openFinding();
+    expect(screen.getByTestId("gc-context").textContent).toBe("https://acmehvac.example · Growth Check Oct 29, 2026");
+    expect(screen.getAllByText("Machine observation").length).toBeGreaterThanOrEqual(2);
+    expect(screen.getByText("Needs review")).toBeTruthy();
+    expect(screen.getByRole("button", { name: /Service-area pages/ }).getAttribute("aria-current")).toBe("true");
+  });
+
+  it("shows the stale alert with Reload on a 409 and refetches", async () => {
+    m.post.mockReset().mockRejectedValue(new ApiError(409, { message: "conflict" } as never));
+    renderClient();
+    await openFinding();
+    fireEvent.click(screen.getByRole("button", { name: "Owner confirms" }));
+    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+    expect(await screen.findByText("This finding changed since you opened it.")).toBeTruthy();
+    const before = m.get.mock.calls.filter(([p]) => p === `${B}/findings/f1`).length;
+    fireEvent.click(screen.getByRole("button", { name: "Reload" }));
+    await waitFor(() => expect(m.get.mock.calls.filter(([p]) => p === `${B}/findings/f1`).length).toBeGreaterThan(before));
+    expect(screen.queryByText("This finding changed since you opened it.")).toBeNull();
+  });
+
+  it("shows the empty-findings alert", async () => {
+    m.routes[`${B}/scans/s1/findings`] = () => Promise.resolve({ scanId: "s1", rubricId: "home-services", rubricVersion: "1", findings: [] });
+    renderClient();
+    fireEvent.click(await screen.findByRole("button", { name: /acmehvac\.example/ }));
+    expect(await screen.findByText("No findings in this check")).toBeTruthy();
   });
 });

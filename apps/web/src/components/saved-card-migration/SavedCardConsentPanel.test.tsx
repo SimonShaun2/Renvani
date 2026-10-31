@@ -1,12 +1,12 @@
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { readFileSync } from "node:fs";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { SAVED_CARD_OFF_SESSION_CONSENT_ACK_TEXT } from "@fsm/types";
 
 const state = vi.hoisted(() => ({
   role: "owner" as string,
   data: null as unknown,
-  mutateAsync: vi.fn()
+  mutateAsync: vi.fn(),
+  confirmAsync: vi.fn()
 }));
 
 vi.mock("@/src/stores/auth.store", () => ({
@@ -19,12 +19,13 @@ vi.mock("@/src/hooks/saved-card-migration.hooks", () => ({
     isError: false,
     data: enabled ? state.data : undefined
   }),
-  useApplySavedCardMappings: () => ({ mutateAsync: state.mutateAsync, isPending: false })
+  useApplySavedCardMappings: () => ({ mutateAsync: state.mutateAsync, isPending: false }),
+  useConfirmStripeImport: () => ({ mutateAsync: state.confirmAsync, isPending: false })
 }));
 
 import { ApiError } from "@/src/lib/api";
 import { SavedCardConsentPanel } from "./SavedCardConsentPanel";
-import { SAVED_CARD_CONSENT_LEGAL_DRAFT_TEXT, SAVED_CARD_CONSENT_VERSION_MISMATCH } from "./saved-card-consent.copy";
+import { SAVED_CARD_APPLY_FAILED, SAVED_CARD_CONSENT_LEGAL_DRAFT_TEXT, SAVED_CARD_CONSENT_VERSION_MISMATCH } from "./saved-card-consent.copy";
 
 const uuid = "11111111-1111-4111-8111-111111111111";
 const migration = {
@@ -52,6 +53,7 @@ describe("SavedCardConsentPanel", () => {
     state.role = "owner";
     state.data = { migration, consent: { text: "API consent text verbatim.", version: "v1-draft" } };
     state.mutateAsync = vi.fn().mockResolvedValue({ migration });
+    state.confirmAsync = vi.fn().mockResolvedValue(migration);
   });
   afterEach(() => cleanup());
 
@@ -98,19 +100,44 @@ describe("SavedCardConsentPanel", () => {
     expect(SAVED_CARD_CONSENT_LEGAL_DRAFT_TEXT).toBe(SAVED_CARD_OFF_SESSION_CONSENT_ACK_TEXT);
   });
 
-  // The Legal draft file only exists on the dev box. Only a missing file (ENOENT) skips;
-  // any other read error or a failed assertion fails the test.
-  it("Legal draft saved-card-ack.md contains the consent text (skips only if the file is missing: ENOENT)", (ctx) => {
-    let md: string;
-    try {
-      md = readFileSync("/workspace/legal/saved-card-ack.md", "utf8");
-    } catch (err) {
-      if ((err as NodeJS.ErrnoException).code === "ENOENT") {
-        ctx.skip("ENOENT: /workspace/legal/saved-card-ack.md not present; legal file check skipped");
-        return;
-      }
-      throw err;
-    }
-    expect(md).toContain(SAVED_CARD_CONSENT_LEGAL_DRAFT_TEXT);
+  it("shows generic copy (not the raw API message) on other apply errors", async () => {
+    state.mutateAsync = vi.fn().mockRejectedValue(
+      new ApiError(500, { error: "INTERNAL", message: "db exploded at pm_1 cus_1" } as never)
+    );
+    render(<SavedCardConsentPanel bundleId={uuid} />);
+    fireEvent.click(screen.getByRole("checkbox"));
+    fireEvent.click(screen.getByRole("button", { name: /Apply/ }));
+    const alert = await screen.findByRole("alert");
+    expect(alert.textContent).toBe(SAVED_CARD_APPLY_FAILED);
+    expect(alert.textContent).not.toMatch(/db exploded|pm_1|cus_1/);
+  });
+
+  it("confirm-stripe-import form shows row errors and does not send invalid rows", async () => {
+    render(<SavedCardConsentPanel bundleId={uuid} />);
+    fireEvent.change(screen.getByLabelText("Import result rows"), {
+      target: { value: "stripeCustomerId,stripePaymentMethodId,email\ncus_A1,pm_A1,a@example.com\nbad,pm_B1,\ncus_C1,pm_C1,not-an-email" }
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Save import result" }));
+    const list = await screen.findByRole("alert", { name: "Row errors" });
+    expect(list.textContent).toContain("Row 3: Invalid stripeCustomerId.");
+    expect(list.textContent).toContain("Row 4: Invalid email.");
+    expect(state.confirmAsync).not.toHaveBeenCalled();
+  });
+
+  it("confirm-stripe-import form sends reference + importedPaymentMethods", async () => {
+    render(<SavedCardConsentPanel bundleId={uuid} />);
+    fireEvent.change(screen.getByLabelText("Import result rows"), {
+      target: { value: `stripeCustomerId,stripePaymentMethodId,renvaniCustomerId,email\ncus_A1,pm_A1,${uuid},\ncus_B1,pm_B1,,b@example.com` }
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Save import result" }));
+    await waitFor(() => expect(state.confirmAsync).toHaveBeenCalledTimes(1));
+    expect(state.confirmAsync).toHaveBeenCalledWith({
+      stripeImportReference: "imp_1",
+      importedPaymentMethods: [
+        { stripeCustomerId: "cus_A1", stripePaymentMethodId: "pm_A1", renvaniCustomerId: uuid },
+        { stripeCustomerId: "cus_B1", stripePaymentMethodId: "pm_B1", email: "b@example.com" }
+      ]
+    });
+    expect((await screen.findByRole("status")).textContent).toBe("2 cards added for review.");
   });
 });

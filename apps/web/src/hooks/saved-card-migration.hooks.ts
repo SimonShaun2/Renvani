@@ -3,6 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type {
   ApplySavedCardMigrationMappingsBody,
+  ConfirmStripeImportBody,
   GetSavedCardMigrationResponse,
   SavedCardMigration
 } from "@fsm/types";
@@ -25,8 +26,21 @@ export function useApplySavedCardMappings(bundleId: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (body: ApplySavedCardMigrationMappingsBody) =>
-      api.post<{ migration: SavedCardMigration }>(
+      api.post<SavedCardMigration>(
         `/api/v1/migrate/onboarding/sessions/${bundleId}/saved-card-migration/apply-mappings`,
+        body
+      ),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: key(bundleId) })
+  });
+}
+
+/** POST confirm-stripe-import: saves Stripe import result rows as pending mappings (#224). */
+export function useConfirmStripeImport(bundleId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (body: ConfirmStripeImportBody) =>
+      api.post<SavedCardMigration>(
+        `/api/v1/migrate/onboarding/sessions/${bundleId}/saved-card-migration/confirm-stripe-import`,
         body
       ),
     onSettled: () => queryClient.invalidateQueries({ queryKey: key(bundleId) })

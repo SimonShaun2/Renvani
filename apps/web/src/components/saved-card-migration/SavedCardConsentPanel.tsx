@@ -10,11 +10,13 @@ import { useAuthStore } from "@/src/stores/auth.store";
 import { getStoredSession } from "@/src/lib/auth";
 
 import {
+  SAVED_CARD_APPLY_FAILED,
   SAVED_CARD_CONSENT_CHECKBOX_LABEL,
   SAVED_CARD_CONSENT_DRAFT_MARKER,
   SAVED_CARD_CONSENT_VERSION_MISMATCH,
   isDraftConsent
 } from "./saved-card-consent.copy";
+import { StripeImportForm } from "./StripeImportForm";
 
 export function buildApplyRows(migration: SavedCardMigration): ApplySavedCardMigrationMappingsBody["rows"] {
   return migration.customerMappings
@@ -72,13 +74,7 @@ export function SavedCardConsentPanel({ bundleId }: { bundleId: string }) {
       });
       setAcknowledged(false);
     } catch (caught) {
-      setError(
-        isVersionMismatch(caught)
-          ? SAVED_CARD_CONSENT_VERSION_MISMATCH
-          : caught instanceof Error
-            ? caught.message
-            : "Mappings could not be applied."
-      );
+      setError(isVersionMismatch(caught) ? SAVED_CARD_CONSENT_VERSION_MISMATCH : SAVED_CARD_APPLY_FAILED);
     }
   }
 
@@ -92,6 +88,10 @@ export function SavedCardConsentPanel({ bundleId }: { bundleId: string }) {
           {summary.matched} matched · {summary.unmatched} unmatched · {summary.failed} failed of {summary.total}
         </p>
       </div>
+
+      {migration.status === "awaiting_stripe_import" || migration.status === "mapping" ? (
+        <StripeImportForm bundleId={bundleId} defaultReference={migration.stripeImportReference} />
+      ) : null}
 
       <div className="rounded-[20px] border border-neutral-200 bg-neutral-50 px-4 py-4">
         {isDraftConsent(consent) ? (

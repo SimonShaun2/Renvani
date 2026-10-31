@@ -2,7 +2,7 @@
  * FS-172: single swappable source for saved-card consent UI copy.
  *
  * The consent text itself is rendered verbatim from the API (GET saved-card-migration → consent.text).
- * LEGAL_DRAFT_TEXT mirrors Legal's draft (/workspace/legal/saved-card-ack.md) and is used only to
+ * LEGAL_DRAFT_TEXT mirrors Legal's draft (same text as SAVED_CARD_OFF_SESSION_CONSENT_ACK_TEXT in @fsm/types) and is used only to
  * detect that the API is serving the draft, so the DRAFT marker is shown. Swap this file when counsel
  * signs off (and the API version drops the "draft" suffix).
  */
@@ -15,6 +15,10 @@ export const SAVED_CARD_CONSENT_CHECKBOX_LABEL = "I have read and agree to the a
 
 export const SAVED_CARD_CONSENT_VERSION_MISMATCH =
   "The consent text changed since this page loaded. Reload the page, re-read the acknowledgment, and confirm again.";
+
+export const SAVED_CARD_APPLY_FAILED = "Mappings could not be applied.";
+
+export const SAVED_CARD_IMPORT_FAILED = "The import result could not be saved. Check the reference and rows, then try again.";
 
 export function isDraftConsent(consent: { text: string; version: string }): boolean {
   return /draft/i.test(consent.version) || consent.text.trim() === SAVED_CARD_CONSENT_LEGAL_DRAFT_TEXT;

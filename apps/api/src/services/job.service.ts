@@ -867,7 +867,7 @@ export async function createJob(
     }
 
     if (normalizedInput.crewId) {
-      await assertActiveCrewInTransaction(tx as never, companyId, normalizedInput.crewId);
+      await assertActiveCrewInTransaction(tx, companyId, normalizedInput.crewId);
     }
 
     const jobNumber = await generateJobNumber(companyId, tx);
@@ -900,7 +900,7 @@ export async function createJob(
     }
 
     for (const product of normalizedInput.products) {
-      await insertJobProductInTransaction(tx as never, companyId, createdJob, actorId, product);
+      await insertJobProductInTransaction(tx, companyId, createdJob, actorId, product);
     }
 
     await emitJobEvent(

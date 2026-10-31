@@ -14,6 +14,14 @@ type CompanyRow = typeof companies.$inferSelect;
 export interface ClerkOrganizationInput {
   organizationId: string;
   name: string;
+  /** Clerk user id of the org creator (organization.created `created_by`); only known from that event. */
+  createdBy?: string | null;
+}
+
+/** Creator recorded at provisioning (settings.clerk.createdBy), or null when the company came from an earlier membership event. */
+function readClerkCreatedBy(company: CompanyRow): string | null {
+  const clerk = (company.settings as { clerk?: { createdBy?: unknown } } | null)?.clerk;
+  return typeof clerk?.createdBy === "string" && clerk.createdBy.length > 0 ? clerk.createdBy : null;
 }
 
 export interface ClerkMembershipInput extends ClerkOrganizationInput {
@@ -54,7 +62,13 @@ async function findOrCreateCompany(tx: Tx, input: ClerkOrganizationInput): Promi
   const slug = await generateUniqueCompanySlug(name, tx);
   const [company] = await tx
     .insert(companies)
-    .values({ name, slug, timezone: "America/Chicago", settings: { clerk: { organizationId: input.organizationId } } })
+    .values({ name, slug, timezone: "America/Chicago", settings: {
+        clerk: {
+          organizationId: input.organizationId,
+          ...(input.createdBy?.trim() ? { createdBy: input.createdBy.trim() } : {})
+        }
+      }
+    })
     .returning();
 
   if (!company) {
@@ -81,7 +95,24 @@ export async function provisionClerkOrganization(input: ClerkOrganizationInput):
   try {
     return await db.transaction(async (tx) => {
       await lockClerkOrganization(tx, input.organizationId);
-      return findOrCreateCompany(tx, input);
+      const company = await findOrCreateCompany(tx, input);
+      const createdBy = input.createdBy?.trim();
+      if (createdBy && !readClerkCreatedBy(company)) {
+        // Out of order: membership.created provisioned the company first (its first member became owner).
+        // Never demote/re-assign here; just flag a mismatch for review.
+        const owner = await tx.query.users.findFirst({
+          where: (userTable, operators) =>
+            operators.and(
+              operators.eq(userTable.companyId, company.id),
+              operators.eq(userTable.role, "owner"),
+              operators.isNull(userTable.deletedAt)
+            )
+        });
+        if (owner && owner.clerkUserId !== createdBy) {
+          logger.warn({ companyId: company.id }, "Clerk org creator is not the provisioned owner (out-of-order events); not changed");
+        }
+      }
+      return company;
     });
   } catch (error) {
     if (error instanceof ClerkOrganizationAmbiguousError) return null;
@@ -93,8 +124,13 @@ export async function provisionClerkOrganization(input: ClerkOrganizationInput):
   }
 }
 
-function mapClerkOrgRole(clerkOrgRole: string | null, isFirstUser: boolean): UserRole {
-  if (isFirstUser) {
+/**
+ * Owner = the Clerk org creator. When the creator is known (organization.created arrived first), only that
+ * Clerk user becomes owner. When it is not yet known (membership.created arrived first), the first member
+ * of the new org becomes owner: Clerk creates the creator's membership together with the org.
+ */
+function mapClerkOrgRole(clerkOrgRole: string | null, isOwner: boolean): UserRole {
+  if (isOwner) {
     return "owner";
   }
   return clerkOrgRole === "org:admin" ? "admin" : "office";
@@ -112,7 +148,7 @@ type MembershipStatus = "created" | "exists" | "linked" | "skipped";
  */
 export async function provisionClerkMembership(
   input: ClerkMembershipInput
-): Promise<{ status: MembershipStatus; companyId: string | null }> {
+): Promise<{ status: MembershipStatus; companyId: string | null; role?: UserRole }> {
   const email = input.email.trim().toLowerCase();
   const clerkUserId = input.clerkUserId?.trim() || null;
 
@@ -131,7 +167,7 @@ export async function provisionClerkMembership(
             logger.warn({ companyId: company.id }, "Clerk user id already linked to a different staff user; skipped");
             return { status: "skipped" as const, companyId: company.id };
           }
-          return { status: "exists" as const, companyId: company.id };
+          return { status: "exists" as const, companyId: company.id, role: byClerkId.role };
         }
       }
 
@@ -185,7 +221,7 @@ export async function provisionClerkMembership(
           logger.warn({ companyId: company.id }, "Clerk link lost a race (row linked elsewhere); skipped");
           return { status: "skipped" as const, companyId: company.id };
         }
-        return { status: "linked" as const, companyId: company.id };
+        return { status: "linked" as const, companyId: company.id, role: reread.role };
       }
 
       const anyUser = await tx.query.users.findFirst({
@@ -193,6 +229,9 @@ export async function provisionClerkMembership(
           operators.and(operators.eq(userTable.companyId, company.id), operators.isNull(userTable.deletedAt))
       });
 
+      const createdBy = readClerkCreatedBy(company);
+      const isOwner = createdBy ? clerkUserId === createdBy : !anyUser;
+      const role = mapClerkOrgRole(input.clerkOrgRole, isOwner);
       await tx.insert(users).values({
         companyId: company.id,
         email,
@@ -200,10 +239,10 @@ export async function provisionClerkMembership(
         passwordHash: null,
         firstName: input.firstName.trim() || "Owner",
         lastName: input.lastName.trim() || "",
-        role: mapClerkOrgRole(input.clerkOrgRole, !anyUser)
+        role
       });
 
-      return { status: "created" as const, companyId: company.id };
+      return { status: "created" as const, companyId: company.id, role };
     });
   } catch (error) {
     if (error instanceof ClerkOrganizationAmbiguousError) {

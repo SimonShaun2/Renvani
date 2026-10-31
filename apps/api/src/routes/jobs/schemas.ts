@@ -492,11 +492,14 @@ export const JobIdParamsSchema = z
   })
   .strict();
 
+/** Line-item description cap (create, preview, add product). */
+export const JOB_LINE_ITEM_DESCRIPTION_MAX = 2000;
+
 const jobLineItemInputSchema = z
   .object({
     productCatalogId: uuidSchema.optional(),
     name: z.string().trim().min(1).max(255).optional(),
-    description: z.string().trim().optional(),
+    description: z.string().trim().max(JOB_LINE_ITEM_DESCRIPTION_MAX).optional(),
     category: productCategorySchema.optional().default("service"),
     quantity: z.coerce.number().positive().optional().default(1),
     unitPrice: z.coerce.number().positive().optional(),
@@ -509,7 +512,7 @@ const jobLineItemInputSchema = z
     path: ["name"]
   });
 
-const MAX_JOB_LINE_ITEMS_AT_CREATE = 50;
+export const MAX_JOB_LINE_ITEMS_AT_CREATE = 50;
 
 export const JobCreatePreviewSchema = z
   .object({

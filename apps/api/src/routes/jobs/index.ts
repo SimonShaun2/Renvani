@@ -1,6 +1,7 @@
-import type { FastifyPluginAsync } from "fastify";
+import type { FastifyPluginAsync, FastifyReply, FastifyRequest } from "fastify";
 
 import { requireRole } from "../../lib/authorize.js";
+import { hitFixedWindowRateLimit } from "../../lib/fixed-window-rate-limit.js";
 import { denyTechnician, technicianOwnJob } from "../../lib/technician-scope.js";
 
 import {
@@ -13,6 +14,7 @@ import {
   completeTaskHandler,
   createTaskHandler,
   createJobHandler,
+  previewJobCreateHandler,
   deleteTaskHandler,
   getJobHandler,
   getJobPreparationStatusHandler,
@@ -48,6 +50,7 @@ import {
   completeTaskValidation,
   createJobSchema,
   createJobValidation,
+  jobCreatePreviewValidation,
   createTaskRouteSchema,
   createTaskValidation,
   deleteTaskRouteSchema,
@@ -83,6 +86,28 @@ import {
   updateJobValidation
 } from "./schemas.js";
 
+/** POST /jobs/preview: up to 50 catalog lookups + a job-number read per call, so cap it per user (company-scoped key). */
+export const JOB_PREVIEW_RATE_LIMIT = 60;
+export const JOB_PREVIEW_WINDOW_MS = 60_000;
+
+async function jobPreviewRateLimit(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+  const companyId = request.company?.id ?? "unknown";
+  const userId = request.user?.id ?? "unknown";
+  const result = await hitFixedWindowRateLimit({
+    key: `fsm:jobs:preview:company:${companyId}:user:${userId}`,
+    limit: JOB_PREVIEW_RATE_LIMIT,
+    windowMs: JOB_PREVIEW_WINDOW_MS
+  });
+  if (!result.allowed) {
+    reply.header("Retry-After", String(result.retryAfterSeconds));
+    await reply.status(429).send({
+      error: "RATE_LIMITED",
+      message: "Too many job previews. Please try again shortly.",
+      requestId: request.id
+    });
+  }
+}
+
 const jobRoutes: FastifyPluginAsync = async (fastify) => {
   const authenticate = [fastify.authenticate];
   // FS-25: field-prep reads are for staff (incl. technicians in the field), explicit per route.
@@ -107,6 +132,12 @@ const jobRoutes: FastifyPluginAsync = async (fastify) => {
     preValidation: createJobValidation,
     schema: createJobSchema
   }, createJobHandler);
+
+  // Before "/:id/*" routes. Staff only; read-only (no job number reserved).
+  fastify.post("/preview", {
+    preHandler: [...staffOnly, jobPreviewRateLimit],
+    preValidation: jobCreatePreviewValidation
+  }, previewJobCreateHandler);
 
   fastify.post("/:id/status", {
     preHandler: ownJobWrite,

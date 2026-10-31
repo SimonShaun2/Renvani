@@ -133,3 +133,71 @@ export const jobSourceReportingRouteSchema = {
     403: errorResponseSchema
   }
 } as const;
+
+export const directDemandQuerySchema = z.object({
+  startDate: isoDateSchema,
+  endDate: isoDateSchema
+});
+
+export const directDemandValidation = withZodValidation({
+  query: directDemandQuerySchema
+});
+
+export const directDemandRouteSchema = {
+  tags: ["reporting"],
+  summary:
+    "Direct demand (Growth source tracking): booked jobs with captured lead attribution in the period, by source (utm_source, else referrer host), with paid invoice revenue via invoices.job_id. Same date rules as job-sources.",
+  querystring: {
+    type: "object",
+    additionalProperties: false,
+    required: ["startDate", "endDate"],
+    properties: {
+      startDate: { type: "string" },
+      endDate: { type: "string" }
+    }
+  },
+  response: {
+    200: {
+      type: "object",
+      additionalProperties: false,
+      required: ["period", "totals", "sources"],
+      properties: {
+        period: {
+          type: "object",
+          additionalProperties: false,
+          required: ["startDate", "endDate", "timeZone"],
+          properties: {
+            startDate: { type: "string" },
+            endDate: { type: "string" },
+            timeZone: { type: "string" }
+          }
+        },
+        totals: {
+          type: "object",
+          additionalProperties: false,
+          required: ["jobCount", "paidRevenue"],
+          properties: {
+            jobCount: { type: "integer" },
+            paidRevenue: { type: "string" }
+          }
+        },
+        sources: {
+          type: "array",
+          items: {
+            type: "object",
+            additionalProperties: false,
+            required: ["source", "jobCount", "paidRevenue"],
+            properties: {
+              source: { type: "string" },
+              jobCount: { type: "integer" },
+              paidRevenue: { type: "string" }
+            }
+          }
+        }
+      }
+    },
+    400: errorResponseSchema,
+    401: errorResponseSchema,
+    403: errorResponseSchema
+  }
+} as const;

@@ -52,6 +52,12 @@ async function requireCrew(tx: Tx, companyId: string, crewId: string): Promise<C
   return crew;
 }
 
+/** Validates an active tenant crew inside the caller's transaction (job create). */
+export async function assertActiveCrewInTransaction(tx: Tx, companyId: string, crewId: string): Promise<void> {
+  const crew = await requireCrew(tx, companyId, crewId);
+  if (!crew.isActive) throw new AppError(ErrorCode.VALIDATION_ERROR, "Crew is inactive");
+}
+
 /** Bumps the crew version iff it still matches `expectedVersion` (optimistic concurrency / idempotency guard). */
 async function bumpVersion(tx: Tx, companyId: string, crewId: string, expectedVersion: number, patch: Partial<typeof crews.$inferInsert> = {}): Promise<void> {
   const updated = await tx

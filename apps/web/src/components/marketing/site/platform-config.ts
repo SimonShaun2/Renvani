@@ -88,7 +88,7 @@ export const HOW_PAGE = {
   eyebrow: "HOW RENVANI WORKS",
   headline: ["One business.", "Every handoff connected."],
   body: "Five products. The tools to move every job forward.",
-  primary: { label: "Watch a job from start to finish", href: "/product-tour" },
+  primary: { label: "Watch a job from start to finish", href: "/tour" },
   secondary: { label: "Explore the tools →", href: "/product#tools" },
   tradesHeadline: ["Your work.", "One connected flow."],
   trades: [

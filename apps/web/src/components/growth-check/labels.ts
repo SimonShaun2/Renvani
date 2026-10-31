@@ -5,3 +5,4 @@ export const ownerValidationLabel = (key: string) => GROWTH_CHECK_OWNER_VALIDATI
 export const STATUS_LABEL: Record<string, string> = { pass: "Pass", fail: "Needs work", warning: "Warning", unknown: "Unknown" };
 export const formatDateTime = (iso: string) =>
   new Date(iso).toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" });
+export const formatDate = (iso: string) => new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });

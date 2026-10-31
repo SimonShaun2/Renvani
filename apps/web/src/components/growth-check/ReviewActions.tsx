@@ -8,6 +8,7 @@ import { ApiError } from "@/src/lib/api";
 import { showToast } from "@/src/stores/toast.store";
 
 import { STATUS_LABEL } from "./labels";
+import { Alert, darkButton, fieldLabel, inputClass, secondaryButton } from "./ui";
 
 const REASON_ACTIONS = new Set(["edit", "mark_not_applicable", "dismiss"]);
 
@@ -22,13 +23,14 @@ const errorMessage = (error: unknown) =>
  * Review actions for one finding. Owner-only answers (owner_confirm/reject/cannot_answer) are rendered only for the
  * account owner; for anyone else they are absent and no request can be sent. The API remains the authority.
  */
-export function ReviewActions({ finding, isOwner }: { finding: GrowthCheckFindingView; isOwner: boolean }) {
+export function ReviewActions({ finding, isOwner, onReload }: { finding: GrowthCheckFindingView; isOwner: boolean; onReload?: () => void }) {
   const review = useReviewFinding(finding.id);
   const actions = GROWTH_CHECK_REVIEW_ACTION_REGISTRY.filter((a) => isOwner || !a.ownerOnly);
   const [action, setAction] = useState<string | null>(null);
   const [text, setText] = useState("");
   const [status, setStatus] = useState<string>("");
   const [summary, setSummary] = useState("");
+  const [stale, setStale] = useState(false);
 
   const needsReason = action !== null && REASON_ACTIONS.has(action);
   const needsNote = action === "add_note";
@@ -37,6 +39,7 @@ export function ReviewActions({ finding, isOwner }: { finding: GrowthCheckFindin
 
   const submit = () => {
     if (!action) return;
+    setStale(false);
     const base = { expectedRevision: finding.revision, idempotencyKey: newIdempotencyKey() };
     const note = text.trim() || undefined;
     let body: GrowthCheckFindingReviewBody;
@@ -59,13 +62,17 @@ export function ReviewActions({ finding, isOwner }: { finding: GrowthCheckFindin
         setStatus("");
         setSummary("");
       },
-      onError: (error) => showToast({ tone: "error", title: "Could not update finding", description: errorMessage(error) })
+      onError: (error) => {
+        // Figma 366:4217 "Stale" state: inline alert with Reload instead of a toast.
+        if (error instanceof ApiError && error.status === 409) setStale(true);
+        else showToast({ tone: "error", title: "Could not update finding", description: errorMessage(error) });
+      }
     });
   };
 
   return (
-    <section aria-labelledby="gc-actions" className="space-y-3">
-      <h3 id="gc-actions" className="text-sm font-semibold text-neutral-900">Review</h3>
+    <section aria-labelledby="gc-actions" className="space-y-3.5">
+      <h3 id="gc-actions" className="text-[15px] font-semibold text-[#0f1530]">Review</h3>
       <div className="flex flex-wrap gap-2">
         {actions.map((a) => (
           <button
@@ -73,51 +80,65 @@ export function ReviewActions({ finding, isOwner }: { finding: GrowthCheckFindin
             type="button"
             aria-pressed={action === a.key}
             onClick={() => setAction(a.key)}
-            className={`rounded-md border px-2.5 py-1 text-xs font-medium ${a.ownerOnly ? "border-emerald-300 text-emerald-800" : "border-neutral-300 text-neutral-800"} ${action === a.key ? "bg-neutral-100" : "bg-white"}`}
+            className={a.key === "owner_confirm" || action === a.key ? darkButton : secondaryButton}
           >
             {a.label}
           </button>
         ))}
       </div>
       {action ? (
-        <div className="space-y-2">
+        <div className="space-y-3.5">
           {action === "edit" ? (
             <>
-              <label className="block text-xs text-neutral-700">
+              <label className={fieldLabel}>
                 Corrected result
-                <select className="mt-1 block rounded-md border border-neutral-300 px-2 py-1 text-sm" value={status} onChange={(e) => setStatus(e.target.value)}>
+                <select className={`${inputClass} h-11`} value={status} onChange={(e) => setStatus(e.target.value)}>
                   <option value="">Keep current</option>
                   {Object.entries(STATUS_LABEL).map(([k, l]) => (
                     <option key={k} value={k}>{l}</option>
                   ))}
                 </select>
               </label>
-              <label className="block text-xs text-neutral-700">
+              <label className={fieldLabel}>
                 Corrected summary
-                <textarea className="mt-1 block w-full rounded-md border border-neutral-300 px-2 py-1 text-sm" value={summary} onChange={(e) => setSummary(e.target.value)} />
+                <textarea className={`${inputClass} h-[88px] py-3`} value={summary} onChange={(e) => setSummary(e.target.value)} />
               </label>
             </>
           ) : null}
-          <label className="block text-xs text-neutral-700">
+          <label className={fieldLabel}>
             {needsReason ? "Reason (required)" : needsNote ? "Note (required)" : "Note (optional)"}
-            <textarea className="mt-1 block w-full rounded-md border border-neutral-300 px-2 py-1 text-sm" value={text} onChange={(e) => setText(e.target.value)} />
+            <textarea className={`${inputClass} min-h-11 py-3`} rows={1} placeholder="Add context for your team" value={text} onChange={(e) => setText(e.target.value)} />
           </label>
           <div className="flex gap-2">
             <button
               type="button"
               onClick={submit}
               disabled={!textValid || !editValid || review.isPending}
-              className="rounded-md bg-neutral-900 px-3 py-1.5 text-xs font-medium text-white disabled:opacity-50"
+              className={darkButton}
             >
               {review.isPending ? "Saving…" : "Save"}
             </button>
-            <button type="button" onClick={() => setAction(null)} className="rounded-md border border-neutral-300 px-3 py-1.5 text-xs">
+            <button type="button" onClick={() => setAction(null)} className={secondaryButton}>
               Cancel
             </button>
           </div>
         </div>
       ) : null}
-      {!isOwner ? <p className="text-xs text-neutral-500">Only the shop owner can confirm or reject a finding.</p> : null}
+      {stale ? (
+        <Alert tone="error" role="alert" title="This finding changed since you opened it." detail="Reload and try again.">
+          <button
+            type="button"
+            className={secondaryButton}
+            onClick={() => {
+              setStale(false);
+              onReload?.();
+            }}
+          >
+            Reload
+          </button>
+        </Alert>
+      ) : null}
+      {!isOwner ? <p className="text-[12.5px] text-[#5e6684]">Only the shop owner can confirm or reject a finding.</p> : null}
     </section>
   );
 }

@@ -80,10 +80,21 @@ describe("TE-FAIL-01 failed receipt and post-rollback persistence", () => {
     const now = new Date("2026-10-31T18:00:00.000Z");
     const outbound = receipt.buildAgentActionFailedReceipt("outbound", new Error("x".repeat(900)), now);
     expect(outbound).toMatchObject({ outcome: "failed", deliveryState: "failed", error: { code: "EXECUTION_FAILED" }, failedAt: now.toISOString() });
-    expect(outbound.error.message).toHaveLength(500);
+    expect(outbound.error.message).toBe(receipt.AGENT_ACTION_GENERIC_FAILURE_MESSAGE);
     const internal = receipt.buildAgentActionFailedReceipt("internal", new types.AppError(types.ErrorCode.CONFLICT, "gone"), now);
     expect(internal).not.toHaveProperty("deliveryState");
     expect(internal.error).toEqual({ code: String(types.ErrorCode.CONFLICT), message: "gone" });
+  });
+
+  it("never stores raw non-AppError text in the receipt (generic message), but keeps AppError code + message", () => {
+    const raw = receipt.buildAgentActionFailedReceipt("internal", new Error("ECONNREFUSED 10.0.0.5:5432 password=hunter2"));
+    expect(raw.error).toEqual({ code: "EXECUTION_FAILED", message: receipt.AGENT_ACTION_GENERIC_FAILURE_MESSAGE });
+    expect(JSON.stringify(raw)).not.toContain("hunter2");
+    const thrownString = receipt.buildAgentActionFailedReceipt("internal", "boom");
+    expect(thrownString.error.message).toBe(receipt.AGENT_ACTION_GENERIC_FAILURE_MESSAGE);
+    const app = receipt.buildAgentActionFailedReceipt("internal", new types.AppError(types.ErrorCode.FORBIDDEN, "y".repeat(900)));
+    expect(app.error.code).toBe(String(types.ErrorCode.FORBIDDEN));
+    expect(app.error.message).toHaveLength(500);
   });
 
   function seed(companyId: string, state: string, actionType = "message.send_proposed") {
@@ -102,22 +113,39 @@ describe("TE-FAIL-01 failed receipt and post-rollback persistence", () => {
   it("persists failed + receipt + execution_failed audit for an action left approved by the rollback", async () => {
     const company = fakeDb.seedCompany({ name: "TE fail", slug: "te-fail" });
     const action = seed(company.id, "approved");
-    const updated = await receipt.persistAgentActionExecutionFailure({ companyId: company.id, actionId: action.id, actorId: "u1", error: new Error("provider adapter unavailable") });
+    const updated = await receipt.persistAgentActionExecutionFailure({ companyId: company.id, actionId: action.id, actorId: "u1", actorType: "user", error: new Error("provider adapter unavailable") });
     expect(updated?.state).toBe("failed");
     expect(row(action.id).state).toBe("failed");
-    expect(row(action.id).executionReceipt).toMatchObject({ outcome: "failed", deliveryState: "failed", error: { message: "provider adapter unavailable" } });
+    expect(row(action.id).executionReceipt).toMatchObject({
+      outcome: "failed",
+      deliveryState: "failed",
+      error: { code: "EXECUTION_FAILED", message: receipt.AGENT_ACTION_GENERIC_FAILURE_MESSAGE }
+    });
+    expect(JSON.stringify(row(action.id).executionReceipt)).not.toContain("provider adapter unavailable");
     const events = fakeDb.getTestState().activityEvents.filter((e) => e.entityId === action.id);
     expect(events.map((e) => e.eventType)).toContain("agent.execution_failed");
+    const failed = events.find((e) => e.eventType === "agent.execution_failed")!;
+    // Raw error text lives only in the audit event detail.
+    expect(JSON.stringify(failed.payload)).toContain("provider adapter unavailable");
+  });
+
+  it("records the caller-supplied actorType on the execution_failed audit event (not hardcoded user)", async () => {
+    const company = fakeDb.seedCompany({ name: "TE fail ai", slug: "te-fail-ai" });
+    const action = seed(company.id, "approved");
+    await receipt.persistAgentActionExecutionFailure({ companyId: company.id, actionId: action.id, actorId: "agent-1", actorType: "ai", error: new Error("x") });
+    const failed = fakeDb.getTestState().activityEvents.find((e) => e.entityId === action.id && e.eventType === "agent.execution_failed")!;
+    expect(failed.actorType).toBe("ai");
+    expect(failed.actorId).toBe("agent-1");
   });
 
   it("writes nothing when the row already moved on (e.g. succeeded) or belongs to another tenant", async () => {
     const company = fakeDb.seedCompany({ name: "TE fail2", slug: "te-fail2" });
     const other = fakeDb.seedCompany({ name: "TE other", slug: "te-other" });
     const done = seed(company.id, "succeeded", "service.job_brief.propose");
-    expect(await receipt.persistAgentActionExecutionFailure({ companyId: company.id, actionId: done.id, actorId: "u1", error: new Error("late") })).toBeNull();
+    expect(await receipt.persistAgentActionExecutionFailure({ companyId: company.id, actionId: done.id, actorId: "u1", actorType: "user", error: new Error("late") })).toBeNull();
     expect(row(done.id).state).toBe("succeeded");
     const theirs = seed(other.id, "approved");
-    expect(await receipt.persistAgentActionExecutionFailure({ companyId: company.id, actionId: theirs.id, actorId: "u1", error: new Error("x") })).toBeNull();
+    expect(await receipt.persistAgentActionExecutionFailure({ companyId: company.id, actionId: theirs.id, actorId: "u1", actorType: "user", error: new Error("x") })).toBeNull();
     expect(row(theirs.id).state).toBe("approved");
     expect(fakeDb.getTestState().activityEvents.filter((e) => e.eventType === "agent.execution_failed")).toHaveLength(0);
   });

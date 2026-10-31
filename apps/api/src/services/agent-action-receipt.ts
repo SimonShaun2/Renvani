@@ -17,6 +17,11 @@ import { AppError, type AgentActionDeliveryStateV1 } from "@fsm/types";
 import { emitAgentActionAuditEvent } from "./agent-action-audit.js";
 import { getAgentActionDeliveryKind, type AgentActionDeliveryKind } from "./agent-action.executors.js";
 
+/** Receipt text for a non-AppError failure; the raw error text goes only to the audit event detail. */
+export const AGENT_ACTION_GENERIC_FAILURE_MESSAGE = "Execution failed";
+
+type AgentActionAuditActorType = NonNullable<Parameters<typeof emitAgentActionAuditEvent>[1]["actorType"]>;
+
 export const AGENT_ACTION_QUEUED_NOTE = "Queued for delivery; no provider send has happened (provider adapter disabled)";
 const ERROR_MESSAGE_MAX = 500;
 
@@ -65,17 +70,30 @@ export interface AgentActionFailedReceipt {
   failedAt: string;
 }
 
-/** Failed receipt. Error text is truncated; AppError codes are kept, anything else reads EXECUTION_FAILED. */
+/**
+ * Failed receipt (stored on the row and shown to operators). An AppError keeps its code and (truncated) message,
+ * which are written for users. Any other error (provider/adapter/driver) gets EXECUTION_FAILED and a GENERIC
+ * message so internal error text never lands in the receipt; see agentActionFailureErrorDetail for the raw text.
+ */
 export function buildAgentActionFailedReceipt(delivery: AgentActionDeliveryKind, error: unknown, now: Date = new Date()): AgentActionFailedReceipt {
-  const code = error instanceof AppError ? String(error.code) : "EXECUTION_FAILED";
-  const raw = error instanceof Error ? error.message : "Execution failed";
+  const isAppError = error instanceof AppError;
   return {
     outcome: "failed",
     emittedEventIds: [],
     ...(delivery === "outbound" ? { deliveryState: "failed" as const } : {}),
-    error: { code, message: raw.slice(0, ERROR_MESSAGE_MAX) },
+    error: {
+      code: isAppError ? String(error.code) : "EXECUTION_FAILED",
+      message: isAppError ? error.message.slice(0, ERROR_MESSAGE_MAX) : AGENT_ACTION_GENERIC_FAILURE_MESSAGE
+    },
     failedAt: now.toISOString()
   };
+}
+
+/** Raw (truncated) error text for the tenant-scoped audit event detail only. */
+export function agentActionFailureErrorDetail(error: unknown): { name: string; message: string } {
+  const name = error instanceof Error ? error.name : typeof error;
+  const message = error instanceof Error ? error.message : String(error);
+  return { name, message: message.slice(0, ERROR_MESSAGE_MAX) };
 }
 
 /** States a failed execute may be recorded from (the row is back at `approved` after rollback). */
@@ -89,6 +107,8 @@ export async function persistAgentActionExecutionFailure(input: {
   companyId: string;
   actionId: string;
   actorId: string;
+  /** Who triggered the execute (user, system, ai, customer); recorded on the audit event. */
+  actorType: AgentActionAuditActorType;
   error: unknown;
   now?: Date;
 }) {
@@ -118,9 +138,9 @@ export async function persistAgentActionExecutionFailure(input: {
       lifecycle: "execution_failed",
       row: updated,
       actorId: input.actorId,
-      actorType: "user",
+      actorType: input.actorType,
       summary: `Agent action execution failed (${updated.actionType})`,
-      detail: { actionType: updated.actionType, receipt }
+      detail: { actionType: updated.actionType, receipt, error: agentActionFailureErrorDetail(input.error) }
     });
     return updated;
   });

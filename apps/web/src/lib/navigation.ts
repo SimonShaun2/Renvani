@@ -11,6 +11,7 @@ import {
   Gauge,
   MessageSquareText,
   Package,
+  PhoneCall,
   Settings,
   ShieldCheck,
   Inbox,
@@ -52,6 +53,7 @@ const ownerAdminNavigation: RoleNavigation = {
   growth: [
     { label: "Growth Check", href: "/growth/growth-check", icon: ClipboardCheck },
     { label: "Booking requests", href: "/booking-requests", icon: Inbox },
+    { label: "Call tracking", href: "/growth/call-tracking", icon: PhoneCall },
     { label: "Settings", href: "/settings", icon: Settings }
   ]
 };

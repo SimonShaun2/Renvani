@@ -7,6 +7,7 @@ import {
   Wallet,
   Crown,
   FileText,
+  ClipboardCheck,
   Gauge,
   MessageSquareText,
   Package,
@@ -49,6 +50,7 @@ const ownerAdminNavigation: RoleNavigation = {
     { label: "Command Center", href: "/command-center", icon: Inbox }
   ],
   growth: [
+    { label: "Growth Check", href: "/growth/growth-check", icon: ClipboardCheck },
     { label: "Booking requests", href: "/booking-requests", icon: Inbox },
     { label: "Settings", href: "/settings", icon: Settings }
   ]

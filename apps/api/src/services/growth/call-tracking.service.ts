@@ -79,8 +79,8 @@ function toSettings(row: SettingsRow | undefined): CallTrackingSettings {
 
 /**
  * Ownership status comes from the number's provider adapter and fails closed: unknown adapter, a thrown error or
- * an unknown status all read as `unverified`. Not persisted yet (see FS-200 security follow-up): with only the
- * disabled adapter there is nothing to store, and a real provider will add a verified_at column with its migration.
+ * an unknown status all read as `unverified`. The status itself is not cached; only the time of the last positive
+ * confirmation is persisted in `verified_at` (migration 0060), see persistCallTrackingNumberVerifiedAt.
  */
 export async function resolveCallTrackingNumberVerification(row: Pick<NumberRow, "provider" | "trackingNumber" | "providerNumberId">): Promise<string> {
   const adapter = findCallTrackingAdapter(row.provider);
@@ -93,16 +93,26 @@ export async function resolveCallTrackingNumberVerification(row: Pick<NumberRow,
   }
 }
 
+/**
+ * Persist the time the provider adapter last confirmed ownership. Tenant-scoped (company_id + id, not deleted) and
+ * written only on a `verified` result; never cleared here, so a later failure does not erase history (the
+ * fail-closed status still gates calls).
+ */
+export async function persistCallTrackingNumberVerifiedAt(companyId: string, numberId: string, verifiedAt: Date): Promise<Date | null> {
+  const [row] = await db
+    .update(callTrackingNumbers)
+    .set({ verifiedAt })
+    .where(and(eq(callTrackingNumbers.companyId, companyId), eq(callTrackingNumbers.id, numberId), isNull(callTrackingNumbers.deletedAt)))
+    .returning({ verifiedAt: callTrackingNumbers.verifiedAt });
+  return row?.verifiedAt ?? null;
+}
+
 /** A provider "verified" older than this (or with a bad/future verifiedAt) is treated as unverified. */
 export const CALL_TRACKING_OWNERSHIP_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
 /** Clock skew tolerated on a provider verifiedAt that is slightly in the future. */
 const OWNERSHIP_FUTURE_SKEW_MS = 5 * 60 * 1000;
 
-/**
- * verified_at handling without persistence: the freshness rule is enforced on every resolve. Persisting
- * verified_at (and caching the status) needs a column on call_tracking_numbers; that ships with the first real
- * adapter's migration, not here.
- */
+/** Freshness rule for a provider verifiedAt, enforced on every resolve (persistence: persistCallTrackingNumberVerifiedAt). */
 export function normalizeOwnershipResult(result: CallTrackingNumberOwnershipResult | unknown, now: number): string {
   const fallback = CALL_TRACKING_NUMBER_DEFAULT_VERIFICATION_STATUS;
   let status: unknown = result;
@@ -122,7 +132,10 @@ export function normalizeOwnershipResult(result: CallTrackingNumberOwnershipResu
 }
 
 async function toNumberResolved(row: NumberRow): Promise<CallTrackingNumber> {
-  return toNumber(row, await resolveCallTrackingNumberVerification(row));
+  const status = await resolveCallTrackingNumberVerification(row);
+  let verifiedAt = row.verifiedAt ?? null;
+  if (status === "verified") verifiedAt = (await persistCallTrackingNumberVerifiedAt(row.companyId, row.id, new Date())) ?? verifiedAt;
+  return toNumber({ ...row, verifiedAt }, status);
 }
 
 function toNumber(row: NumberRow, verificationStatus: string): CallTrackingNumber {
@@ -137,6 +150,7 @@ function toNumber(row: NumberRow, verificationStatus: string): CallTrackingNumbe
     active: row.active,
     verificationStatus,
     canReceiveCalls: callTrackingNumberCanReceiveCalls(verificationStatus),
+    verifiedAt: row.verifiedAt ? row.verifiedAt.toISOString() : null,
     version: row.version,
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString()

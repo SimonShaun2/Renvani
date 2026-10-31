@@ -171,6 +171,8 @@ export interface CallTrackingNumber {
   verificationStatus: string;
   /** False until the number is verified; unverified numbers never receive or attribute calls. */
   canReceiveCalls: boolean;
+  /** ISO time the provider last confirmed ownership (persisted, FS-200 0060); null if never verified. */
+  verifiedAt?: string | null;
   version: number;
   createdAt: string;
   updatedAt: string;

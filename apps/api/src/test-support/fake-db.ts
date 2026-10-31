@@ -3150,6 +3150,7 @@ export interface TestCallTrackingNumberRecord {
   forwardingNumber: string;
   active: boolean;
   version: number;
+  verifiedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;
@@ -3168,6 +3169,7 @@ const callTrackingNumbersTable = {
   forwardingNumber: "forwardingNumber",
   active: "active",
   version: "version",
+  verifiedAt: "verifiedAt",
   createdAt: "createdAt",
   updatedAt: "updatedAt",
   deletedAt: "deletedAt",
@@ -3190,6 +3192,7 @@ function createCallTrackingNumberRecord(values: Partial<TestCallTrackingNumberRe
     forwardingNumber: values.forwardingNumber ?? "+15125550100",
     active: values.active ?? true,
     version: values.version ?? 1,
+    verifiedAt: values.verifiedAt ?? null,
     createdAt: values.createdAt ?? now,
     updatedAt: values.updatedAt ?? now,
     deletedAt: values.deletedAt ?? null

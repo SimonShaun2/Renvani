@@ -178,7 +178,7 @@ export function CustomerEstimateView({
                 <CheckCircle2 className="mx-auto h-10 w-10 text-success" />
                 <h2 className="mt-4 text-2xl font-semibold tracking-tight text-neutral-900">Approved</h2>
                 <p className="mt-2 text-sm leading-6 text-neutral-600">
-                  The selection has been recorded. ServiceRev will follow up with the next step shortly.
+                  The selection has been recorded. Renvani will follow up with the next step shortly.
                 </p>
               </div>
             ) : (

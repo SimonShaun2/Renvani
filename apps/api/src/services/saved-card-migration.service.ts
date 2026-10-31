@@ -274,11 +274,18 @@ export async function confirmStripeImportForBundle(
   }
 
   const now = new Date();
+  const customerMappings = await mergePendingImportMappings(
+    companyId,
+    migration.customerMappings,
+    input.importedPaymentMethods ?? []
+  );
+  const pending = customerMappings.filter((mapping) => mapping.status === "pending").length;
   const [updatedRow] = await db
     .update(savedCardMigrations)
     .set({
       status: "mapping",
       stripeImportReference: input.stripeImportReference,
+      customerMappings,
       updatedAt: now
     })
     .where(and(eq(savedCardMigrations.id, migration.id), eq(savedCardMigrations.companyId, companyId)))
@@ -296,7 +303,7 @@ export async function confirmStripeImportForBundle(
     entityType: "saved_card_migration",
     entityId: updated.id,
     summary: "Stripe card import confirmed; ready to map payment methods",
-    payload: { stripeImportReference: input.stripeImportReference }
+    payload: { stripeImportReference: input.stripeImportReference, pendingMappings: pending }
   });
 
   return toMigrationResponse(updated);
@@ -342,6 +349,35 @@ async function resolveRenvaniCustomer(
   }
 
   return null;
+}
+
+/**
+ * Saves Stripe import rows as `pending` mappings. Keyed by payment method: a replay never duplicates a
+ * row and never downgrades one that apply-mappings already processed (attached/failed/fallback_required).
+ * Customers are matched only inside this company (resolveRenvaniCustomer is company-scoped).
+ */
+async function mergePendingImportMappings(
+  companyId: string,
+  prior: SavedCardMigrationCustomerMapping[],
+  rows: NonNullable<ConfirmStripeImportBody["importedPaymentMethods"]>
+): Promise<SavedCardMigrationCustomerMapping[]> {
+  const byPaymentMethod = new Map<string, SavedCardMigrationCustomerMapping>();
+  for (const mapping of prior) byPaymentMethod.set(mapping.stripePaymentMethodId, mapping);
+
+  for (const row of rows) {
+    const existing = byPaymentMethod.get(row.stripePaymentMethodId);
+    if (existing && existing.status !== "pending") continue;
+    const customer = await resolveRenvaniCustomer(companyId, row.renvaniCustomerId, row.email);
+    byPaymentMethod.set(row.stripePaymentMethodId, {
+      renvaniCustomerId: customer?.id ?? null,
+      email: customer ? customer.email : (row.email ?? null),
+      stripeCustomerId: row.stripeCustomerId,
+      stripePaymentMethodId: row.stripePaymentMethodId,
+      matchMethod: !customer ? "unmatched" : row.renvaniCustomerId && customer.id === row.renvaniCustomerId ? "renvani_customer_id" : "email",
+      status: "pending"
+    });
+  }
+  return [...byPaymentMethod.values()];
 }
 
 export async function applySavedCardMigrationMappingsForBundle(
@@ -494,7 +530,13 @@ export async function applySavedCardMigrationMappingsForBundle(
     }
   }
 
-  const mappings = [...byPaymentMethod.values()];
+  // Imported rows with no customer match can never be attached: route them to the re-enter-card fallback.
+  const mappings = [...byPaymentMethod.values()].map((mapping) =>
+    mapping.status === "pending" && mapping.matchMethod === "unmatched"
+      ? { ...mapping, status: "fallback_required" as const }
+      : mapping
+  );
+  const stillPending = mappings.some((mapping) => mapping.status === "pending");
   const summary: SavedCardMigrationMappingSummary = {
     matched: mappings.filter((m) => m.status === "attached").length,
     unmatched: mappings.filter((m) => m.status === "fallback_required").length,
@@ -502,8 +544,12 @@ export async function applySavedCardMigrationMappingsForBundle(
     total: mappings.length
   };
 
-  const nextStatus: SavedCardMigrationStatus =
-    summary.unmatched > 0 || summary.failed > 0 ? "fallback_required" : "completed";
+  // Matched imported rows not yet applied (e.g. beyond one 200-row batch) keep the migration in mapping.
+  const nextStatus: SavedCardMigrationStatus = stillPending
+    ? "mapping"
+    : summary.unmatched > 0 || summary.failed > 0
+      ? "fallback_required"
+      : "completed";
 
   const now = new Date();
   const [updatedRow] = await db

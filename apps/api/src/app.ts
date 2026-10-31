@@ -1,5 +1,6 @@
 import fastifyCors from "@fastify/cors";
 
+import { allowedAppOrigins, runWithRequestOrigin } from "./lib/app-origins.js";
 import { parseClerkAuthorizedParties } from "./lib/clerk-auth.js";
 import clerkWebhookRoutes from "./routes/webhooks/clerk.js";
 import Fastify from "fastify";
@@ -48,6 +49,7 @@ import savedCardMigrationRoutes from "./routes/saved-card-migration/index.js";
 import dataExportRoutes from "./routes/data-exports/index.js";
 import jobEngagementRoutes from "./routes/job-engagement/index.js";
 import jobEtaRoutes from "./routes/job-eta/index.js";
+import googleBusinessProfileRoutes from "./routes/google-business-profile/index.js";
 import { assertGeoProviderConfigured } from "./services/geo/geo-provider.registry.js";
 import jobRoutes from "./routes/jobs/index.js";
 import loyaltyRoutes from "./routes/loyalty/index.js";
@@ -101,9 +103,15 @@ export async function buildApp() {
   });
 
   await app.register(fastifyCors, {
-    origin: [...new Set([new URL(env.APP_URL).origin, ...parseClerkAuthorizedParties(env.CLERK_AUTHORIZED_PARTIES)])],
+    // APP_URL primary + APP_URL_ALLOWED extras (staging tier only, exact match) + Clerk authorized parties.
+    origin: [...new Set([...allowedAppOrigins(), ...parseClerkAuthorizedParties(env.CLERK_AUTHORIZED_PARTIES)])],
     credentials: true,
     allowedHeaders: ["Authorization", "Content-Type", "Idempotency-Key", "X-Request-Id", "X-Customer-Portal-Token"]
+  });
+  // Bind the caller's Origin so Stripe return URLs can target an allowed tester origin (falls back to APP_URL).
+  app.addHook("onRequest", (request, _reply, done) => {
+    const origin = typeof request.headers.origin === "string" ? request.headers.origin : null;
+    runWithRequestOrigin(origin, done);
   });
   await app.register(requestLoggerPlugin);
   await app.register(globalRateLimitPlugin);
@@ -143,6 +151,7 @@ export async function buildApp() {
   await app.register(jobRoutes, { prefix: "/api/v1/jobs" });
   await app.register(jobEngagementRoutes, { prefix: "/api/v1/jobs" });
   await app.register(jobEtaRoutes, { prefix: "/api/v1/jobs" });
+  await app.register(googleBusinessProfileRoutes, { prefix: "/api/v1/integrations/google-business-profile" });
   await app.register(messageLogRoutes, { prefix: "/api/v1" });
   await app.register(productRoutes, { prefix: "/api/v1" });
   await app.register(inventoryRoutes, { prefix: "/api/v1" });

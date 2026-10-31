@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { api } from "@/src/lib/api";
+import { ApiError, api } from "@/src/lib/api";
 import type {
   CreateStockLocationBody,
   StockAdjustmentBody,
@@ -47,6 +47,10 @@ function useInventoryMutation<TBody, TResponse>(path: string) {
     mutationFn: (body: TBody) => api.post<TResponse>(path, body),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: inventoryKeys.all });
+    },
+    // A 409 (stale recordVersion or insufficient stock) means our copy is out of date: refetch, never auto-retry.
+    onError: async (err) => {
+      if (err instanceof ApiError && err.status === 409) await queryClient.invalidateQueries({ queryKey: inventoryKeys.all });
     }
   });
 }

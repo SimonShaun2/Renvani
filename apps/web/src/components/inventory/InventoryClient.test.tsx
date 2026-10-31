@@ -179,7 +179,8 @@ describe("AdjustPanel / TransferPanel", () => {
         locationId: L1,
         productId: P1,
         quantityDelta: -4,
-        reason: "Damaged"
+        reason: "Damaged",
+        recordVersion: "v"
       })
     );
     expect((await screen.findByRole("alert")).textContent).toMatch(/Not enough stock/);
@@ -203,9 +204,58 @@ describe("AdjustPanel / TransferPanel", () => {
         fromLocationId: L1,
         toLocationId: L2,
         productId: P1,
-        quantity: 2
+        quantity: 2,
+        recordVersion: "v"
       })
     );
     expect(await screen.findByText("Transfer saved.")).toBeTruthy();
+  });
+
+  it("omits recordVersion when the location has no stock level for that part yet", async () => {
+    routeGet();
+    apiPost.mockResolvedValue({ levels: [{ quantity: 5 }], movements: [] });
+    wrap(<AdjustPanel />);
+    await screen.findByRole("option", { name: "Capacitor 45/5 · CAP-455" });
+    fireEvent.change(screen.getByLabelText("Location"), { target: { value: L2 } });
+    fireEvent.change(screen.getByLabelText("Part"), { target: { value: P1 } });
+    fireEvent.change(screen.getByLabelText(/Change/), { target: { value: "5" } });
+    fireEvent.change(screen.getByLabelText("Reason"), { target: { value: "Restock" } });
+    fireEvent.click(screen.getByRole("button", { name: "Save adjustment" }));
+    await waitFor(() =>
+      expect(apiPost).toHaveBeenCalledWith("/api/v1/inventory/adjustments", {
+        locationId: L2,
+        productId: P1,
+        quantityDelta: 5,
+        reason: "Restock"
+      })
+    );
+  });
+
+  it("on a stale recordVersion 409 shows the refresh message and refetches stock levels (no auto-retry)", async () => {
+    routeGet();
+    apiPost.mockRejectedValueOnce(new ApiError(409, { error: "CONFLICT", reason: "stale_record_version", message: "x" } as never));
+    wrap(<TransferPanel />);
+    await screen.findByRole("option", { name: "Capacitor 45/5 · CAP-455" });
+    fireEvent.change(screen.getByLabelText("From"), { target: { value: L1 } });
+    fireEvent.change(screen.getByLabelText("To"), { target: { value: L2 } });
+    fireEvent.change(screen.getByLabelText("Part"), { target: { value: P1 } });
+    fireEvent.change(screen.getByLabelText("Quantity"), { target: { value: "1" } });
+    const levelCalls = () => apiGet.mock.calls.filter(([p]) => String(p).startsWith("/api/v1/inventory/levels")).length;
+    const before = levelCalls();
+    fireEvent.click(screen.getByRole("button", { name: "Save transfer" }));
+    expect((await screen.findByRole("alert")).textContent).toMatch(/changed since you loaded it/);
+    await waitFor(() => expect(levelCalls()).toBeGreaterThan(before));
+    expect(apiPost).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("stock table", () => {
+  it("sits in its own horizontal scroll container", async () => {
+    routeGet();
+    wrap(<StockLevelsPanel lowStock={false} />);
+    await screen.findByText("Capacitor 45/5 · CAP-455");
+    const scroller = screen.getByTestId("stock-table-scroll");
+    expect(scroller.className).toMatch(/overflow-x-auto/);
+    expect(scroller.querySelector("table")).toBeTruthy();
   });
 });

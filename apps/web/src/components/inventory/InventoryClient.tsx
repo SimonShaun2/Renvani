@@ -49,7 +49,7 @@ const PILL = {
 } as const;
 function Pill({ tone, children }: { tone: keyof typeof PILL; children: React.ReactNode }) {
   return (
-    <span className={`inline-flex h-[22px] w-fit shrink-0 items-center rounded-full px-2.5 text-[10.5px] font-medium uppercase tracking-[0.06em] ${PILL[tone]}`}>
+    <span className={`inline-flex h-[22px] w-fit shrink-0 items-center whitespace-nowrap rounded-full px-2.5 text-[10.5px] font-medium uppercase tracking-[0.06em] ${PILL[tone]}`}>
       {children}
     </span>
   );
@@ -250,7 +250,7 @@ export function StockLevelsPanel({ lowStock }: { lowStock: boolean }) {
                   <td className="flex items-start justify-between gap-3 text-[15px] font-semibold text-[#0f1530] [overflow-wrap:anywhere] lg:table-cell lg:px-3 lg:align-middle lg:text-sm lg:font-medium">
                     <span data-testid="part-label">{partLabel(lvl)}</span>
                     {lvl.isLowStock ? (
-                      <span className="lg:hidden">
+                      <span className="shrink-0 lg:hidden">
                         <Pill tone="error">Low</Pill>
                       </span>
                     ) : null}

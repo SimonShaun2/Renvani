@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { getClerkPublishableKey, isClerkEnabled } from "./config";
 import { resolveClerkRole, resolveClerkRouteDecision } from "./route-decision";
+import { getDefaultRouteForRole } from "../route-access";
 
 const PUBLIC_TOKEN_ROUTES = [
   "/",
@@ -75,6 +76,11 @@ describe("clerk config", () => {
 });
 
 describe("post-sign-up workspace step access", () => {
+  it("sends a user who already has a role away from /onboarding/workspace to their home", () => {
+    expect(resolveClerkRouteDecision("/onboarding/workspace", "user_1", "owner")).toEqual({ action: "redirect", to: getDefaultRouteForRole("owner") });
+    expect(resolveClerkRouteDecision("/onboarding/workspace", "user_1", "technician")).toEqual({ action: "redirect", to: getDefaultRouteForRole("technician") });
+  });
+
   it("lets a signed-in user with no role reach /onboarding/workspace", () => {
     expect(resolveClerkRouteDecision("/onboarding/workspace", "user_1", null)).toEqual({ action: "next" });
   });

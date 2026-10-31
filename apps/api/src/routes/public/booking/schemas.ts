@@ -1,3 +1,4 @@
+import { HOME_SERVICE_TRADES, PublicServesZipBodySchema } from "@fsm/types";
 import { z } from "zod";
 
 import { withZodValidation } from "../../shared/validation.js";
@@ -88,6 +89,7 @@ export const SubmitBookingRequestSchema = z.object({
   serviceType: z.string().trim().optional(),
   serviceDetail: z.string().trim().optional(),
   urgency: z.enum(["emergency", "this_week", "flexible"]).optional(),
+  emergency: z.boolean().optional(),
   customerNotes: z.string().trim().optional(),
   preferredDate: z.string().regex(isoDatePattern).refine(isValidIsoDate, "Invalid ISO date").optional(),
   preferredWindow: z.enum(["morning", "afternoon", "first_available"]).optional(),
@@ -170,7 +172,9 @@ export const publicBookingRouteSchema = {
             "facebookReviewUrl",
             "phone",
             "logoUrl",
-            "serviceAreaZipCodes"
+            "serviceAreaZipCodes",
+            "serviceAreaNames",
+            "timezone"
           ],
           properties: {
             companyName: { type: "string" },
@@ -181,13 +185,24 @@ export const publicBookingRouteSchema = {
             availableHoursEnd: { type: "integer" },
             availableDays: { type: "array", items: { type: "string" } },
             slotDuration: { type: "integer" },
+            emergencyService: {
+              type: "object",
+              additionalProperties: false,
+              required: ["enabled", "hoursText"],
+              properties: { enabled: { type: "boolean" }, hoursText: nullableStringSchema }
+            },
             maxAdvanceDays: { type: "integer" },
             googleReviewUrl: nullableStringSchema,
             yelpReviewUrl: nullableStringSchema,
             facebookReviewUrl: nullableStringSchema,
             phone: nullableStringSchema,
             logoUrl: nullableStringSchema,
-            serviceAreaZipCodes: { type: "array", items: { type: "string" } }
+            serviceAreaZipCodes: { type: "array", items: { type: "string" } },
+            serviceAreaNames: { type: "array", items: { type: "string" } },
+            timezone: { type: "string" },
+            trade: { anyOf: [{ type: "string", enum: [...HOME_SERVICE_TRADES] }, { type: "null" }] },
+            tradeSchemaType: nullableStringSchema,
+            tradeDescription: nullableStringSchema
           }
         }
       }
@@ -278,6 +293,12 @@ export const submitBookingRouteSchema = {
           }
         },
         holdToken: { anyOf: [{ type: "string" }, { type: "null" }] },
+        emergency: {
+          type: "object",
+          additionalProperties: false,
+          required: ["requested", "accepted", "downgraded"],
+          properties: { requested: { type: "boolean" }, accepted: { type: "boolean" }, downgraded: { type: "boolean" } }
+        },
         confirmation: {
           type: "object",
           additionalProperties: false,
@@ -428,6 +449,27 @@ export const publicSlotHoldRouteSchema = {
     400: errorResponseSchema,
     404: errorResponseSchema,
     409: errorResponseSchema,
+    429: errorResponseSchema
+  }
+} as const;
+
+export const servesZipValidation = withZodValidation({
+  params: BookingSlugParamsSchema,
+  body: PublicServesZipBodySchema
+});
+
+/** Public ZIP coverage: in/out only. No ZIP list, counts, or technician data. */
+export const servesZipRouteSchema = {
+  tags: ["public-booking"],
+  response: {
+    200: {
+      type: "object",
+      additionalProperties: false,
+      required: ["served"],
+      properties: { served: { type: "boolean" } }
+    },
+    400: errorResponseSchema,
+    404: errorResponseSchema,
     429: errorResponseSchema
   }
 } as const;

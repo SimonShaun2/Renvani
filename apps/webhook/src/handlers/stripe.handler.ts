@@ -702,6 +702,12 @@ export async function stripeHandler(
       "Stripe webhook handler error"
     );
     await clearEventProcessingClaim(event.id);
+
+    // Non-2xx so Stripe redelivers; the claim is cleared and payment recording is idempotent per intent.
+    return reply.code(500).send({
+      error: "STRIPE_WEBHOOK_PROCESSING_FAILED",
+      message: "Stripe event processing failed; retry"
+    });
   }
 
   return reply.code(200).send({

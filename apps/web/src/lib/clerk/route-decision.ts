@@ -39,7 +39,8 @@ export function resolveClerkRouteDecision(
     if (isAuthPage(pathname) || pathname === "/") return { action: "redirect", to: home };
     if (isPublicRoute(pathname)) return { action: "next" };
     if (!role) return isNoRoleSetupRoute(pathname) ? { action: "next" } : { action: "redirect", to: CLERK_NO_ACCESS_ROUTE };
-    if (isNoRoleSetupRoute(pathname)) return { action: "next" };
+    // A user who already has a role must not create another Clerk org (the API would provision an orphan company).
+    if (isNoRoleSetupRoute(pathname)) return { action: "redirect", to: home };
     return canRoleAccessPath(role, pathname) ? { action: "next" } : { action: "redirect", to: home };
   }
 

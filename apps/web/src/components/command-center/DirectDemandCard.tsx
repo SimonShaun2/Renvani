@@ -6,7 +6,8 @@ import { useCompany } from "@/src/hooks/company.hooks";
 import { useDirectDemandSummary } from "@/src/hooks/direct-demand.hooks";
 import { useAuthStore } from "@/src/stores/auth.store";
 
-import { canViewDirectDemand, formatUsdFromDecimal, jobsLabel, last30DaysRange } from "./direct-demand.utils";
+import { KEY_NUMBERS_PERIOD } from "./command-center.config";
+import { canViewDirectDemand, formatUsdFromDecimal, jobsLabel } from "./direct-demand.utils";
 
 const card = "rounded-[14px] border border-[#e6dccb] bg-white";
 const mono = "font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-[#5e6684]";
@@ -17,7 +18,7 @@ export function DirectDemandCard({ now }: { now?: Date }) {
   const allowed = canViewDirectDemand(role);
   const company = useCompany();
   const timeZone = company.data?.company.timezone || undefined;
-  const range = useMemo(() => last30DaysRange(now ?? new Date(), timeZone), [now, timeZone]);
+  const range = useMemo(() => KEY_NUMBERS_PERIOD.range(now ?? new Date(), timeZone), [now, timeZone]);
   const query = useDirectDemandSummary(range, allowed);
 
   if (!allowed) return null;
@@ -45,7 +46,7 @@ export function DirectDemandCard({ now }: { now?: Date }) {
           {zero ? <p className="text-[13px] font-medium text-[#5e6684]">No direct-demand jobs yet</p> : null}
         </>
       )}
-      <p className="text-xs text-[#5e6684]">Last 30 days, from online booking and lead sources</p>
+      <p className="text-xs text-[#5e6684]">{KEY_NUMBERS_PERIOD.caption}, from online booking and lead sources</p>
     </section>
   );
 }

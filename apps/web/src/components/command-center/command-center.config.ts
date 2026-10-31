@@ -1,5 +1,7 @@
 import type { OperatorInboxItem } from "@fsm/types";
 
+import { monthToDateRange } from "./direct-demand.utils";
+
 /**
  * Command Center (Figma 10:2) region registry. Each region is a plug-in point: add/reorder entries here.
  * Values that no dev API serves yet render EMPTY ("—") rather than invented numbers.
@@ -26,6 +28,12 @@ export interface Kpi {
 const pending = () => null;
 
 /** KPI row (10:74). Needs a period-scoped KPI aggregate endpoint; until then each shows "—". */
+/**
+ * Period shared by the Key numbers tiles (labelled with <LocalDate month />) and the Direct demand card:
+ * the current calendar month in the shop time zone (browser fallback). Change it here only.
+ */
+export const KEY_NUMBERS_PERIOD = { caption: "This month", range: monthToDateRange } as const;
+
 export const KPIS: Kpi[] = [
   { key: "direct", label: "Direct inquiries", value: pending, detail: pending, source: "Your branded site + app" },
   { key: "booked", label: "Inquiry → booked", value: pending, detail: pending, source: "Revenue Agent handoffs" },

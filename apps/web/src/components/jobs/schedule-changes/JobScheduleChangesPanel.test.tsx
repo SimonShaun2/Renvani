@@ -109,4 +109,26 @@ describe("JobScheduleChangesPanel", () => {
     expect(m.flag).toHaveBeenCalledWith(expect.objectContaining({ kind: "late_staff", delayMinutes: 40, note: "Panel upgrade ran long", expectedVersion: 4 }));
     expect(screen.getByRole("status").textContent).toMatch(/flagged for a person/i);
   });
+
+  it("matches the Figma header, context pill and per-form copy", () => {
+    mount("cancel");
+    expect(screen.getByRole("heading", { name: "Change this visit" })).toBeTruthy();
+    expect(screen.getByText("Reschedule, cancel or flag a visit. The customer is never messaged automatically.")).toBeTruthy();
+    expect(screen.getByTestId("schedule-context").textContent).toMatch(/scheduled/i);
+    expect(screen.getByText("The customer is not messaged automatically.")).toBeTruthy();
+  });
+
+  it("uses reason radios, shows the 1–480 hint and an inline delay error without calling the API", async () => {
+    mount("flag");
+    expect(screen.getByText("1–480 minutes")).toBeTruthy();
+    fireEvent.click(screen.getByRole("radio", { name: "Customer can’t make it" }));
+    expect(screen.queryByRole("spinbutton")).toBeNull();
+    fireEvent.click(screen.getByRole("radio", { name: "Tech running late" }));
+    fireEvent.change(screen.getByRole("spinbutton"), { target: { value: "600" } });
+    fireEvent.change(screen.getByRole("textbox"), { target: { value: "Long day" } });
+    await act(async () => fireEvent.submit(screen.getByRole("form", { name: "Flag a problem" })));
+    expect(screen.getByText("Delay must be between 1 and 480 minutes.")).toBeTruthy();
+    expect(screen.getByRole("spinbutton").getAttribute("aria-invalid")).toBe("true");
+    expect(m.flag).not.toHaveBeenCalled();
+  });
 });

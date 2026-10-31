@@ -121,20 +121,21 @@ describe("ReportEditor", () => {
   it("approves the current version after confirmation", async () => {
     m.post.mockResolvedValue({ draft: draft({ approved: true }), revision: {}, replayed: false });
     renderEditor();
-    fireEvent.click(await screen.findByRole("button", { name: "Approve version 2" }));
     fireEvent.click(await screen.findByRole("button", { name: "Approve" }));
+    const approves = await screen.findAllByRole("button", { name: "Approve" });
+    fireEvent.click(approves[approves.length - 1]!);
     await waitFor(() => expect(m.post).toHaveBeenCalledWith(`${B}/report-drafts/d1/approve`, { expectedVersion: 2, idempotencyKey: expect.any(String) }));
   });
 
   it("blocks export until approved, and shows the state on a 409 not_approved", async () => {
     renderEditor();
     expect(await screen.findByText("Approve the current version to export or copy this report.")).toBeTruthy();
-    expect((screen.getByRole("button", { name: "Export Markdown" }) as HTMLButtonElement).disabled).toBe(true);
+    expect((screen.getByRole("button", { name: "Markdown" }) as HTMLButtonElement).disabled).toBe(true);
     cleanup();
     approved = true;
     m.fetch.mockResolvedValue(new Response(JSON.stringify({ error: "CONFLICT", message: "nope", fields: { reason: "not_approved" } }), { status: 409 }));
     renderEditor();
-    const exportBtn = await screen.findByRole("button", { name: "Export HTML" });
+    const exportBtn = await screen.findByRole("button", { name: "HTML" });
     await waitFor(() => expect((exportBtn as HTMLButtonElement).disabled).toBe(false));
     fireEvent.click(exportBtn);
     await waitFor(() => expect(m.fetch).toHaveBeenCalledWith(`${B}/report-drafts/d1/export?format=html`));
@@ -177,6 +178,29 @@ describe("ReportEditor", () => {
     expect((screen.getByRole("button", { name: "Email the report" }) as HTMLButtonElement).disabled).toBe(true);
     expect((screen.getByRole("button", { name: "Text a report link" }) as HTMLButtonElement).disabled).toBe(true);
     expect(m.post.mock.calls.some(([p]) => String(p).includes("/deliveries"))).toBe(false);
+  });
+  it("matches the Figma edit card: draft pill, score pills, hint and Save + Approve row", async () => {
+    const withOpp = { ...content, opportunities: [{ findingId: "f1", headline: "Add a Round Rock service-area page", nextStep: "", impact: 3, evidence: 2, actionability: 3 }] };
+    m.routes[`${B}/report-drafts/d1`] = () => Promise.resolve({ draft: draft({ content: withOpp }), history: [] });
+    renderEditor();
+    expect(await screen.findByText("Draft · not approved")).toBeTruthy();
+    expect(await screen.findByText("Impact · High")).toBeTruthy();
+    expect(screen.getByText("Evidence · Hypothesis")).toBeTruthy();
+    expect(screen.getByText("Actionability · Easy")).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "Edit report" })).toBeTruthy();
+    expect(screen.getByText("Add 1–3 opportunities to finish the report.")).toBeTruthy();
+    expect(screen.getByText("Export & share")).toBeTruthy();
+  });
+
+  it("shows the Figma stale state when approval hits a 409 stale_version", async () => {
+    m.post.mockRejectedValueOnce(apiErr(409, "stale_version", { currentVersion: "3" }));
+    renderEditor();
+    fireEvent.click(await screen.findByRole("button", { name: "Approve" }));
+    const approves = await screen.findAllByRole("button", { name: "Approve" });
+    fireEvent.click(approves[approves.length - 1]!);
+    expect(await screen.findByText("The report changed since you opened it.")).toBeTruthy();
+    expect(screen.getByText("Refresh and review it before approving.")).toBeTruthy();
+    expect(screen.getByText("Stale")).toBeTruthy();
   });
 });
 

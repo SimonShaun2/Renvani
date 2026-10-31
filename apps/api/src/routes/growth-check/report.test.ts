@@ -401,4 +401,64 @@ describe("FS-57 growth check owner report", () => {
     expect(fetchSpy).not.toHaveBeenCalled();
     fetchSpy.mockRestore();
   });
+
+  describe("export audit logging", () => {
+    const exportAudits = () =>
+      fakeDb.getTestState().activityEvents.filter(
+        (e) => e.eventType === "export.downloaded" && (e.payload as { kind?: string } | null)?.kind === "growth_check_report_export"
+      );
+    async function approvedDraft(w: ReturnType<typeof seedWorld>) {
+      const draftId = (await createDraft(w.owner, w.scan.id, "create-key-0001", { businessName: "Northside Heating & Air" })).body.draft.id as string;
+      expect((await approve(w.owner, draftId, 1, "approve-key-001")).status).toBe(200);
+      return draftId;
+    }
+
+    it.each(["markdown", "html", "json", "text"] as const)("writes one audit event with actor, draft, version, format and hash for %s", async (format) => {
+      const w = seedWorld();
+      const draftId = await approvedDraft(w);
+      const res = await api().get(`${base}/report-drafts/${draftId}/export?format=${format}`).set("Authorization", w.admin);
+      expect(res.status).toBe(200);
+      expect(res.text.length).toBeGreaterThan(0);
+      const events = exportAudits();
+      expect(events).toHaveLength(1);
+      expect(events[0]).toMatchObject({
+        companyId: w.company.id,
+        actorId: w.adminId,
+        actorType: "user",
+        entityType: "growth_check_report_draft",
+        entityId: draftId,
+        summary: "Growth Check report exported",
+        payload: { kind: "growth_check_report_export", draftId, scanId: w.scan.id, version: 2, format, contentHash: res.headers["x-report-content-hash"] }
+      });
+      const payload = events[0]!.payload as Record<string, unknown>;
+      expect(Object.keys(payload).sort()).toEqual(["contentHash", "draftId", "format", "kind", "scanId", "version"]);
+      expect(JSON.stringify(events[0])).not.toContain("Northside Heating");
+    });
+
+    it("defaults to markdown and logs every repeated export", async () => {
+      const w = seedWorld();
+      const draftId = await approvedDraft(w);
+      for (let i = 0; i < 3; i += 1) {
+        expect((await api().get(`${base}/report-drafts/${draftId}/export`).set("Authorization", w.owner)).status).toBe(200);
+      }
+      const events = exportAudits();
+      expect(events).toHaveLength(3);
+      expect(events.every((e) => (e.payload as { format: string }).format === "markdown")).toBe(true);
+      expect(new Set(events.map((e) => (e.payload as { contentHash: string }).contentHash)).size).toBe(1);
+    });
+
+    it("writes nothing on 401, 403, 404 and 409 not_approved", async () => {
+      const w = seedWorld();
+      const unapproved = (await createDraft(w.owner, w.scan.id, "create-key-0009")).body.draft.id as string;
+      expect((await api().get(`${base}/report-drafts/${unapproved}/export`)).status).toBe(401);
+      expect((await api().get(`${base}/report-drafts/${unapproved}/export`).set("Authorization", w.dispatcher)).status).toBe(403);
+      expect((await api().get(`${base}/report-drafts/${unapproved}/export`).set("Authorization", w.technician)).status).toBe(403);
+      expect((await api().get(`${base}/report-drafts/00000000-0000-4000-8000-000000000009/export`).set("Authorization", w.owner)).status).toBe(404);
+      expect((await api().get(`${base}/report-drafts/${unapproved}/export`).set("Authorization", w.otherOwner)).status).toBe(404);
+      const blocked = await api().get(`${base}/report-drafts/${unapproved}/export`).set("Authorization", w.owner);
+      expect(blocked.status).toBe(409);
+      expect(blocked.body.fields).toMatchObject({ reason: "not_approved" });
+      expect(exportAudits()).toHaveLength(0);
+    });
+  });
 });

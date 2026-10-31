@@ -10,7 +10,7 @@ import { createHash, randomBytes } from "node:crypto";
 
 import { and, desc, eq, isNull } from "drizzle-orm";
 
-import { db, growthCheckReportDraftRevisions, growthCheckReportDrafts, growthCheckReportShares, growthCheckScans } from "@fsm/db";
+import { db, emitEvent, growthCheckReportDraftRevisions, growthCheckReportDrafts, growthCheckReportShares, growthCheckScans } from "@fsm/db";
 import {
   AppError,
   ErrorCode,
@@ -410,11 +410,16 @@ const EXPORT_FORMATS: Record<GrowthCheckReportExportFormat, { contentType: strin
   json: { contentType: "application/json; charset=utf-8", ext: "json" }
 };
 
+/** Payload discriminator on the reused `export.downloaded` lifecycle (no enum migration; same approach as #342). */
+export const GROWTH_CHECK_REPORT_EXPORT_AUDIT_KIND = "growth_check_report_export" as const;
+export const GROWTH_CHECK_REPORT_EXPORT_AUDIT_SUMMARY = "Growth Check report exported";
+
 export async function exportGrowthCheckReportDraft(
-  companyId: string,
+  actor: Pick<GrowthCheckReportActor, "companyId" | "userId">,
   draftId: string,
   format: GrowthCheckReportExportFormat
 ): Promise<GrowthCheckReportExportFile> {
+  const companyId = actor.companyId;
   const draft = await loadDraft(companyId, draftId);
   assertApproved(draft);
   const report = await buildDocument(companyId, draft);
@@ -428,6 +433,25 @@ export async function exportGrowthCheckReportDraft(
           ? renderGrowthCheckReportText(report)
           : `${JSON.stringify({ report, contentHash, version: draft.version }, null, 2)}\n`;
   const meta = EXPORT_FORMATS[format];
+  // Audit every successful export (replays included). Ids, version, format and hash only: no report
+  // content or customer PII. Awaited like other emitEvent audit writes, so an audit failure fails the export.
+  await emitEvent({
+    companyId,
+    actorId: actor.userId,
+    actorType: "user",
+    eventType: "export.downloaded",
+    entityType: "growth_check_report_draft",
+    entityId: draft.id,
+    payload: {
+      kind: GROWTH_CHECK_REPORT_EXPORT_AUDIT_KIND,
+      draftId: draft.id,
+      scanId: draft.scanId,
+      version: draft.version,
+      format,
+      contentHash
+    },
+    summary: GROWTH_CHECK_REPORT_EXPORT_AUDIT_SUMMARY
+  });
   return {
     body,
     contentType: meta.contentType,

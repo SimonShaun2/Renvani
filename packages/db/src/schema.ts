@@ -2813,3 +2813,40 @@ export const crewMembers = pgTable("crew_members", {
   technicianIdx: index("crew_members_technician_idx").on(t.technicianId),
   crewTechnicianIdx: uniqueIndex("crew_members_crew_technician_idx").on(t.crewId, t.technicianId).where(sql`"deleted_at" IS NULL`),
 }));
+
+// ─────────────────────────────────────────────
+// Growth — marketing-site intake (platform-level, NOT tenant-scoped: no company_id, no tenant RLS).
+// trade/status are varchar + app-level registry (HOME_SERVICE_TRADES / MARKETING_INTAKE_STATUSES), no pgEnum.
+// ─────────────────────────────────────────────
+
+export const marketingDemoRequests = pgTable("marketing_demo_requests", {
+  id: id(),
+  name: varchar("name", { length: 120 }).notNull(),
+  email: varchar("email", { length: 254 }).notNull(),
+  phone: varchar("phone", { length: 20 }),
+  company: varchar("company", { length: 160 }).notNull(),
+  trade: varchar("trade", { length: 32 }).notNull(),
+  message: text("message"),
+  status: varchar("status", { length: 32 }).notNull().default("new"),
+  /** Salted SHA-256 of the client IP (never the raw IP); null when no salt is configured. */
+  ipHash: varchar("ip_hash", { length: 64 }),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+}, (t) => ({
+  createdAtIdx: index("marketing_demo_requests_created_at_idx").on(t.createdAt),
+  emailIdx: index("marketing_demo_requests_email_idx").on(t.email),
+}));
+
+export const marketingGrowthChecks = pgTable("marketing_growth_checks", {
+  id: id(),
+  websiteUrl: varchar("website_url", { length: 2048 }).notNull(),
+  trade: varchar("trade", { length: 32 }).notNull(),
+  zip: varchar("zip", { length: 5 }),
+  city: varchar("city", { length: 100 }),
+  email: varchar("email", { length: 254 }).notNull(),
+  status: varchar("status", { length: 32 }).notNull().default("new"),
+  ipHash: varchar("ip_hash", { length: 64 }),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+}, (t) => ({
+  createdAtIdx: index("marketing_growth_checks_created_at_idx").on(t.createdAt),
+  emailIdx: index("marketing_growth_checks_email_idx").on(t.email),
+}));

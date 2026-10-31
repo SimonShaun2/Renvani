@@ -67,7 +67,13 @@ describe("EstimateOptionSetClient", () => {
     mount();
     const text = screen.getByTestId("option-set-options").textContent ?? "";
     expect(text.indexOf("Good")).toBeLessThan(text.indexOf("Better"));
-    expect(screen.getAllByText("Recommended")).toHaveLength(1);
+    expect(screen.getByTestId("option-b").textContent).toMatch(/Option 2 · Better/);
+    expect(screen.getByTestId("option-b").textContent).toMatch(/Recommended/);
+    expect(screen.getByTestId("option-a").textContent).not.toMatch(/Recommended/);
+    expect(screen.getByTestId("option-set-manager").textContent).toMatch(/2 of 3 · minimum 2/);
+    expect(screen.getByTestId("option-set-manager").textContent).toMatch(/Recommended\s*Option 2 · Better/);
+    expect(screen.getByTestId("option-set-at-minimum").textContent).toMatch(/A set needs at least 2 options\./);
+    expect(screen.queryByText(/1\.99|booking fee/i)).toBeNull();
     expect(screen.queryByText(/financ/i)).toBeNull();
     // 2 options = minimum: no Remove
     expect(screen.queryByRole("button", { name: "Remove" })).toBeNull();
@@ -85,7 +91,7 @@ describe("EstimateOptionSetClient", () => {
   it("stale_version shows Reload which refetches", async () => {
     m.send.mockRejectedValue(conflict("stale_version"));
     mount();
-    await act(async () => fireEvent.click(screen.getByRole("button", { name: "Send options" })));
+    await act(async () => fireEvent.click(screen.getByRole("button", { name: "Send to customer" })));
     expect(screen.getByTestId("option-set-error").textContent).toMatch(/someone else changed/i);
     await act(async () => fireEvent.click(screen.getByRole("button", { name: "Reload" })));
     expect(m.refetch).toHaveBeenCalled();
@@ -100,6 +106,23 @@ describe("EstimateOptionSetClient", () => {
     expect(m.remove.mock.calls[0]![0]).toMatchObject({ estimateId: "a", expectedVersion: 5 });
     expect(screen.getByTestId("option-set-error").textContent).toMatch(/at least 2/);
     expect(screen.queryByRole("button", { name: "Reload" })).toBeNull();
+  });
+
+  it("Clear recommended PATCHes recommendedEstimateId null", async () => {
+    m.update.mockResolvedValue(set());
+    mount();
+    await act(async () => fireEvent.click(screen.getByRole("button", { name: "Clear recommended" })));
+    expect(m.update.mock.calls[0]![0]).toMatchObject({ expectedVersion: 5, recommendedEstimateId: null });
+  });
+
+  it("idempotency conflict shows the Figma copy with Reload", async () => {
+    m.send.mockRejectedValue(conflict("idempotency_conflict"));
+    mount();
+    await act(async () => fireEvent.click(screen.getByRole("button", { name: "Send to customer" })));
+    const alert = screen.getByTestId("option-set-error").textContent ?? "";
+    expect(alert).toMatch(/That change conflicts with an earlier request\./);
+    expect(alert).toMatch(/Reload and try again\./);
+    expect(screen.getByRole("button", { name: "Reload" })).toBeTruthy();
   });
 
   it("adds an option with the suggested Best label", async () => {
@@ -122,8 +145,9 @@ describe("EstimateOptionSetClient", () => {
     m.data = set("sent");
     mount();
     expect(screen.getByTestId("option-set-locked")).toBeTruthy();
-    expect(screen.queryByRole("button", { name: "Send options" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Send to customer" })).toBeNull();
     expect(screen.queryByRole("button", { name: "Mark recommended" })).toBeNull();
     expect(screen.queryByRole("button", { name: "Add option" })).toBeNull();
+    expect(screen.getByTestId("option-set-locked").textContent).toMatch(/The customer approves one option from their link\./);
   });
 });

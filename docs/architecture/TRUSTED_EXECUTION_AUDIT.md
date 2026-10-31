@@ -82,7 +82,7 @@ All of these still filter by `companyId`, so none is a known cross-tenant leak. 
 
 | Required distinct state | Where it is represented today | Collapse |
 |---|---|---|
-| `approved` | `agent_actions.state = "approved"` (service:330) | The Command Center button labelled **"Approve & send"** (`apps/web/src/components/command-center/NeedsYou.tsx:43-51, 82-83`; also `agent-actions.config.ts:8` and `revenue-agent/proposal.config.ts:29`) calls only `POST /agent-actions/:id/approve` (`operator-inbox.hooks.ts:46`). Execute is a separate call (`:68`) that the Command Center never makes. **"Approved" reads as "sent".** |
+| `approved` | `agent_actions.state = "approved"` (service:330) | The Command Center button labelled **"Approve & send"** (`apps/web/src/components/command-center/NeedsYou.tsx:43-51, 82-83`; also `agent-actions.config.ts:8` and `revenue-agent/proposal.config.ts:24`) calls only `POST /agent-actions/:id/approve` (`operator-inbox.hooks.ts:46`). Execute is a separate call (`:68`) that the Command Center never makes. **"Approved" reads as "sent".** |
 | `queued` | nowhere | collapses into `succeeded` |
 | `provider_accepted` | nowhere | collapses into `succeeded` |
 | `delivered` | nowhere | collapses into `succeeded`. The web labels it "Completed" (`agent-actions.config.ts:29`). |

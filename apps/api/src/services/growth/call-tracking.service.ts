@@ -9,8 +9,6 @@
  * - Attribution reuses the lead attribution whitelist (#271): utm_source/utm_campaign from the number mapping,
  *   utm_medium "phone".
  */
-import { createHash } from "node:crypto";
-
 import { and, desc, eq, isNull } from "drizzle-orm";
 
 import { callRecords, callTrackingNumbers, callTrackingSettings, db } from "@fsm/db";
@@ -35,6 +33,10 @@ import {
   listCallTrackingAdapterIds,
   type CallTrackingWebhookInput
 } from "./call-tracking-adapter.registry.js";
+
+import { hashCallerNumber } from "./call-tracking-caller-hash.js";
+
+export { deriveCallerHashKey, hashCallerNumber } from "./call-tracking-caller-hash.js";
 
 type SettingsRow = typeof callTrackingSettings.$inferSelect;
 type NumberRow = typeof callTrackingNumbers.$inferSelect;
@@ -276,10 +278,6 @@ export async function listCallRecords(companyId: string, query: CallRecordListQu
 }
 
 /** Tenant-scoped pseudonymous caller key (groups repeat callers within one shop; not reversible by the API). */
-export function hashCallerNumber(companyId: string, callerNumber: string): string {
-  return createHash("sha256").update(`call-tracking:v1:${companyId}:${callerNumber}`).digest("hex");
-}
-
 export type InboundCallOutcome =
   | { httpStatus: 404; error: "UNKNOWN_PROVIDER" }
   | { httpStatus: 503; error: "CALL_TRACKING_DISABLED" }

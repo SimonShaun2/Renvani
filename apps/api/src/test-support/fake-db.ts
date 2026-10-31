@@ -6556,6 +6556,17 @@ export function createDrizzleModuleMock() {
       return JOB_ACTIVITY_AT_MARKER;
     }
 
+    // Column-to-column "a is not null and b <= a" (e.g. inventory low-stock: threshold vs quantity).
+    if (template.includes("is not null and") && template.includes("<=") && values.length === 3) {
+      const limitKey = resolveFieldKey(values[0]);
+      const valueKey = resolveFieldKey(values[1]);
+      return (row: Record<string, unknown>) => {
+        const bound = row[limitKey];
+        const current = row[valueKey];
+        return bound !== null && bound !== undefined && (current as number) <= (bound as number);
+      };
+    }
+
     if (template.includes("clerk") && template.includes("organizationId")) {
       const clerkOrganizationId = values.at(-1);
       if (typeof clerkOrganizationId !== "string") {

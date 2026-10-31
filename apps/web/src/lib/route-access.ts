@@ -4,7 +4,7 @@ export type UserRole = (typeof USER_ROLES)[number];
 
 type DefaultRouteMap = Record<UserRole, string>;
 
-const EXACT_PUBLIC_ROUTES = new Set(["/", "/login", "/signup", "/verify-email", "/product-tour", "/product", "/how-it-works", "/pricing", "/industries/hvac", "/portal", "/robots.txt", "/sitemap.xml"]);
+const EXACT_PUBLIC_ROUTES = new Set(["/", "/login", "/signup", "/verify-email", "/product-tour", "/product", "/how-it-works", "/pricing", "/industries", "/industries/hvac", "/industries/plumbing", "/industries/electrical", "/portal", "/robots.txt", "/sitemap.xml"]);
 
 const MARKETING_PRODUCT_PAGES = new Set(["growth", "revenue", "operations", "retention", "command-center", "online-booking", "estimates-approvals", "scheduling-dispatch"]);
 
@@ -97,6 +97,11 @@ export function isPublicRoute(pathname: string): boolean {
   const segments = pathname.split("/").filter(Boolean);
 
   if (segments[0] === "product" && segments.length === 2 && MARKETING_PRODUCT_PAGES.has(segments[1] ?? "")) {
+    return true;
+  }
+
+  // /industries/<slug> is marketing-only (no app routes there); unknown slugs render the 404 page instead of a login redirect.
+  if (segments[0] === "industries" && segments.length === 2) {
     return true;
   }
 

@@ -110,7 +110,9 @@ export const MARKETING_SITEMAP_PATHS = [
   { path: "/product", priority: 0.9 },
   { path: "/how-it-works", priority: 0.9 },
   ...["growth", "revenue", "operations", "retention", "command-center", "online-booking", "estimates-approvals", "scheduling-dispatch"].map((slug) => ({ path: `/product/${slug}`, priority: 0.8 })),
-  { path: "/pricing", priority: 0.8 }
+  { path: "/pricing", priority: 0.8 },
+  { path: "/industries", priority: 0.8 },
+  ...["hvac", "plumbing", "electrical"].map((slug) => ({ path: `/industries/${slug}`, priority: 0.7 }))
 ] as const;
 
 export function buildMarketingSitemap(env: NodeJS.ProcessEnv = process.env): MetadataRoute.Sitemap {

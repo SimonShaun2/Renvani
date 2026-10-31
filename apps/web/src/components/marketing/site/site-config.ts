@@ -5,7 +5,7 @@ export type SiteLink = { label: string; href: string };
 export const SITE_NAV: { links: SiteLink[]; cta: SiteLink; signIn: SiteLink } = {
   links: [
     { label: "Products", href: "/product" },
-    { label: "Industries", href: "/industries/hvac" },
+    { label: "Industries", href: "/industries" },
     { label: "How it works", href: "/how-it-works" },
     { label: "Pricing", href: "/pricing" }
   ],
@@ -16,7 +16,7 @@ export const SITE_NAV: { links: SiteLink[]; cta: SiteLink; signIn: SiteLink } = 
 export const SITE_FOOTER = {
   links: [
     { label: "Products", href: "/product" },
-    { label: "Industries", href: "/industries/hvac" },
+    { label: "Industries", href: "/industries" },
     { label: "Pricing", href: "/pricing" },
     { label: "Get a free demo", href: "/signup" }
   ] satisfies SiteLink[],
@@ -66,7 +66,7 @@ export const HOME = {
     eyebrow: "BUILT AROUND YOUR WORK",
     links: [
       { label: "HVAC →", href: "/industries/hvac" },
-      { label: "Plumbing →", href: "/industries/hvac#plumbing" }
+      { label: "Plumbing →", href: "/industries/plumbing" }
     ]
   },
   journey: {
@@ -113,7 +113,7 @@ export const HOME = {
     headline: ["Built around", "the work you do."],
     trades: [
       { eyebrow: "HVAC", title: "From no heat to job complete.", image: "/marketing/home/hvac-tech.jpg", href: "/industries/hvac" },
-      { eyebrow: "PLUMBING", title: "Keep good jobs flowing.", image: "/marketing/home/plumbing-work.jpg", href: "/industries/hvac#plumbing" }
+      { eyebrow: "PLUMBING", title: "Keep good jobs flowing.", image: "/marketing/home/plumbing-work.jpg", href: "/industries/plumbing" }
     ]
   },
   capture: {

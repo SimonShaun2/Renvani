@@ -22,7 +22,10 @@ const ROUTE_FILES: Record<string, string> = {
   "/product": "(marketing)/product/page.tsx",
   "/how-it-works": "(marketing)/how-it-works/page.tsx",
   "/pricing": "(marketing)/pricing/page.tsx",
-  "/industries/hvac": "(marketing)/industries/hvac/page.tsx",
+  "/industries": "(marketing)/industries/page.tsx",
+  "/industries/hvac": "(marketing)/industries/[slug]/page.tsx",
+  "/industries/plumbing": "(marketing)/industries/[slug]/page.tsx",
+  "/industries/electrical": "(marketing)/industries/[slug]/page.tsx",
   "/signup": "(auth)/signup/[[...rest]]/page.tsx",
   "/login": "(auth)/login/[[...rest]]/page.tsx"
 };

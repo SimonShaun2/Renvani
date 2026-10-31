@@ -89,7 +89,7 @@ export const HOW_PAGE = {
   tradesHeadline: ["Your work.", "One connected flow."],
   trades: [
     { eyebrow: "HVAC", title: "No heat. Approved repair. Next tune-up.", image: "/marketing/home/hvac-tech.jpg", link: { label: "See the full workflow →", href: "/industries/hvac" as string | null } },
-    { eyebrow: "PLUMBING", title: "A leak. A repair. A customer for next time.", image: "/marketing/home/plumbing-work.jpg", link: { label: "See the full workflow →", href: null as string | null } }
+    { eyebrow: "PLUMBING", title: "A leak. A repair. A customer for next time.", image: "/marketing/home/plumbing-work.jpg", link: { label: "See the full workflow →", href: "/industries/plumbing" as string | null } }
   ],
   cta: { headline: "See your business in Renvani.", primary: { label: "Get a free demo", href: "/signup" }, secondary: { label: "Bring your existing records →", href: null as string | null } }
 };

@@ -305,6 +305,48 @@ describe("invoice.service", () => {
     expect(preview.subtotal).toBe("100.00");
   });
 
+  it("getInvoiceChargePreview: Flex adds the 2% Service Fee on balance due, Flat adds none, other tenant is NOT_FOUND", async () => {
+    const flex = fakeDb.seedCompany({ name: "Flex Co", slug: "flex-co", timezone: "America/Chicago", settings: { stripePlatformBilling: { planTier: "flex" } } } as never);
+    const flat = fakeDb.seedCompany({ name: "Flat Co", slug: "flat-co", timezone: "America/Chicago", settings: { stripePlatformBilling: { planTier: "flat" } } } as never);
+    const flexCustomer = fakeDb.seedCustomer({ companyId: flex.id, firstName: "A", lastName: "B" });
+    const flatCustomer = fakeDb.seedCustomer({ companyId: flat.id, firstName: "C", lastName: "D" });
+    const flexInvoice = fakeDb.seedInvoice({ companyId: flex.id, customerId: flexCustomer.id, total: "100.00", balanceDue: "100.00" } as never);
+    const flatInvoice = fakeDb.seedInvoice({ companyId: flat.id, customerId: flatCustomer.id, total: "100.00", balanceDue: "100.00" } as never);
+
+    await expect(invoiceService.getInvoiceChargePreview(flex.id, flexInvoice.id)).resolves.toMatchObject({
+      invoiceId: flexInvoice.id,
+      invoiceTotal: "100.00",
+      plan: "flex",
+      subtotal: "100.00",
+      serviceFeeAmount: "2.00",
+      serviceFeeRateBps: 200,
+      total: "102.00"
+    });
+    await expect(invoiceService.getInvoiceChargePreview(flat.id, flatInvoice.id)).resolves.toMatchObject({
+      plan: "flat",
+      serviceFeeAmount: "0.00",
+      serviceFeeRateBps: 0,
+      serviceFeeLabel: null,
+      total: "100.00"
+    });
+    await expect(invoiceService.getInvoiceChargePreview(flex.id, flatInvoice.id)).rejects.toMatchObject({ code: ErrorCode.NOT_FOUND });
+  });
+
+  it("updateCompany sets, keeps and clears invoicing.defaultPaymentTermsDays without touching other settings", async () => {
+    const companyService = await import("./company.service.js");
+    const company = fakeDb.seedCompany({ name: "Terms Set", slug: "terms-set", timezone: "America/Chicago", settings: { tradingName: "TS" } } as never);
+    const actor = fakeDb.seedUser({ companyId: company.id, email: "o@terms.test", firstName: "O", lastName: "W", role: "owner" });
+    const read = () => fakeDb.getTestState().companies.find((row) => row.id === company.id)?.settings as Record<string, any>;
+
+    await companyService.updateCompany(company.id, actor.id, { settings: { invoicing: { defaultPaymentTermsDays: 30 } } } as never);
+    expect(read().invoicing).toEqual({ defaultPaymentTermsDays: 30 });
+    expect(read().tradingName).toBe("TS");
+    await companyService.updateCompany(company.id, actor.id, { settings: { invoicing: {} } } as never);
+    expect(read().invoicing).toEqual({ defaultPaymentTermsDays: 30 });
+    await companyService.updateCompany(company.id, actor.id, { settings: { invoicing: { defaultPaymentTermsDays: null } } } as never);
+    expect(read().invoicing).toEqual({ defaultPaymentTermsDays: null });
+  });
+
   it("createInvoice leaves dueAt empty without a company default and keeps explicit items over job lines", async () => {
     const { company, actor } = createAdminContext();
     const { customer, job } = seedInvoiceGraph(company.id);

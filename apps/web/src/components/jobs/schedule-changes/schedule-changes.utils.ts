@@ -29,8 +29,8 @@ export function cancelBlockedReason(role: string | null | undefined, scheduledSt
 
 export const EXCEPTION_LABELS: Record<ScheduleExceptionKind, string> = {
   late_staff: "Tech running late",
-  customer_conflict: "Customer can't make it",
-  access_issue: "Can't get access (gate, lockbox, pets)",
+  customer_conflict: "Customer can’t make it",
+  access_issue: "Can’t get access (gate, lockbox, pets)",
   weather: "Weather",
   parts_delay: "Waiting on parts or equipment",
   other: "Something else"

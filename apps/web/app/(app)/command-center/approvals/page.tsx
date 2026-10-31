@@ -7,7 +7,7 @@ export default function ApprovalsPage() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-        <Link href="/command-center" className="text-sm text-neutral-500 hover:text-neutral-800">
+        <Link href="/command-center" className="inline-flex min-h-11 items-center text-sm text-neutral-500 hover:text-neutral-800">
           ← Command Center
         </Link>
         <h1 className="mt-2 text-2xl font-semibold text-neutral-900">Approvals</h1>
@@ -18,7 +18,7 @@ export default function ApprovalsPage() {
         {/* Figma 10:288 Button/secondary/Policy & limits */}
         <Link
           href="/settings/automation"
-          className="rounded-[10px] border border-[#e6dccb] bg-white px-3 py-1.5 text-sm font-medium text-[#0f1530] hover:border-[#d4c6ad]"
+          className="inline-flex min-h-11 items-center rounded-[10px] border border-[#e6dccb] bg-white px-3 py-1.5 text-sm font-medium text-[#0f1530] hover:border-[#d4c6ad]"
         >
           Policy &amp; limits
         </Link>

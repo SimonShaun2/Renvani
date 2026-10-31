@@ -163,4 +163,11 @@ describe("AgentInbox", () => {
     expect(m.post.mock.calls.some(([p]) => String(p).endsWith("/execute"))).toBe(false);
     expect((await screen.findByTestId("action-result")).textContent).toMatch(/^Approved\. Nothing is sent until you execute it\./);
   });
+  it("gives tabs, the agent filter and Find new proposals a 44px minimum tap height", async () => {
+    renderInbox();
+    await screen.findByText("Consent blocked");
+    for (const el of [...screen.getAllByRole("tab"), screen.getByRole("combobox", { name: "Agent" }), screen.getByRole("button", { name: "Find new proposals" })]) {
+      expect(el.className).toContain("min-h-11");
+    }
+  });
 });

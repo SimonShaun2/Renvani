@@ -81,3 +81,11 @@ describe("AgentProposalCard / ProposalDetail", () => {
     expect(html).toContain("—");
   });
 });
+
+describe("proposalStateLabel", () => {
+  it("capitalises escalated like the other state pills", async () => {
+    const { proposalStateLabel } = await import("./proposal.config");
+    expect(proposalStateLabel("escalated")).toBe("Escalated");
+    expect(proposalStateLabel("awaiting_approval")).toBe("Needs approval");
+  });
+});

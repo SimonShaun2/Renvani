@@ -127,8 +127,8 @@ The fix is one new read-only endpoint, for example `GET /api/v1/reporting/comman
 
 | Order | Gap | Category | Failing test | Proposed small PR | Depends on #301 |
 |---|---|---|---|---|---|
-| 1 | G-FAIL: execute failure is not persisted | failed execution | TE-FAIL-01 | Run executor work in a savepoint. On throw, roll back the side effects and in a second tenant tx write `state=failed` plus a receipt `{outcome:"failed", error code, at}` with an audit `execution_failed`. Rethrow. | no |
-| 2 | G-RCPT: outbound "succeeded" without a send | execution and delivery states | TE-RCPT-01, TE-RCPT-02 | Add a receipt `deliveryState` with tokens `queued` \| `provider_accepted` \| `delivered` \| `failed` (Figma steps Queued, Provider accepted and Delivered, plus Delivery failure; frame 331:4230). Business outcome is recorded separately. Outbound executors stop at `queued` (an outbox row, no provider call), and only a provider callback moves the state on to `provider_accepted` or `delivered`. No migration is needed, since the receipt is jsonb and state stays `executing` until delivery. | **yes**: outbound consent must be the #301 current-consent check before anything is queued |
+| 1 | G-FAIL: execute failure is not persisted — **FIXED in the wiring PR** (non-AppError executor throws) | failed execution | TE-FAIL-01 (passes; default run) | Run executor work in a savepoint. On throw, roll back the side effects and in a second tenant tx write `state=failed` plus a receipt `{outcome:"failed", error code, at}` with an audit `execution_failed`. Rethrow. | no |
+| 2 | G-RCPT: outbound "succeeded" without a send — **FIXED in the wiring PR** (outbound stops at `executing` + `queued`; no outbox/provider yet) | execution and delivery states | TE-RCPT-01, TE-RCPT-02 (pass; default run) | Add a receipt `deliveryState` with tokens `queued` \| `provider_accepted` \| `delivered` \| `failed` (Figma steps Queued, Provider accepted and Delivered, plus Delivery failure; frame 331:4230). Business outcome is recorded separately. Outbound executors stop at `queued` (an outbox row, no provider call), and only a provider callback moves the state on to `provider_accepted` or `delivered`. No migration is needed, since the receipt is jsonb and state stays `executing` until delivery. | **yes**: outbound consent must be the #301 current-consent check before anything is queued |
 | 3 | G-UI-APPROVE: "Approve & send" only approves | execution and delivery states / UX | (web; documented) | API: optional `POST /agent-actions/:id/approve-and-execute` (one tenant tx, same contract). Web (Dev C): relabel to "Approve", or call the combined endpoint. | yes (same as 2) |
 | 4 | G-VER: `expectedVersion` optional; edit has no compare-and-set — **FIXED for approve/execute/edit in fix PR 1** (reject/escalate still optional) | stale records | TE-STALE-01, -02, -03 (pass; default run) | Make `expectedVersion` required on approve/reject/execute/edit/escalate (400 if missing). Edit uses compare-and-set on `updated_at`. Web sends `item.version` (Dev C, same release). | no |
 | 5 | G-IDEM: no idempotency key on state changes — **FIXED for approve/execute in fix PR 1** | duplicates | TE-DUP-01, -02 (pass; default run) | Accept an `Idempotency-Key` header. Store `{op, key, resultVersion}` in the audit event payload (no new table) and replay the first result for the same key. | no |
@@ -151,9 +151,11 @@ The fix is one new read-only endpoint, for example `GET /api/v1/reporting/comman
 
 That is **10 gaps and 10 failing tests**, plus 2 passing controls, as audited.
 
-**Status after fix PR 1 (G-VER, G-IDEM):** TE-STALE-01/02/03 and TE-DUP-01/02 pass and moved to `apps/api/src/trusted-execution/trusted-execution.test.ts` in the default run, with TE-STALE-04 and TE-DUP-03/04 added. The gap script now holds 5 failing tests (TE-AUTH-01/02, TE-FAIL-01, TE-RCPT-01/02) plus the 2 controls.
+**Status after fix PR 1 (G-VER, G-IDEM):** TE-STALE-01/02/03 and TE-DUP-01/02 pass and moved to `apps/api/src/trusted-execution/trusted-execution.test.ts` in the default run, with TE-STALE-04 and TE-DUP-03/04 added. The gap script then held 5 failing tests (TE-AUTH-01/02, TE-FAIL-01, TE-RCPT-01/02) plus the 2 controls.
 
-**Status after the TE-AUTH PR (G-AUTH-ORDER):** TE-AUTH-01/02 pass and moved to `trusted-execution.test.ts` in the default run, with TE-AUTH-03/04/05 added (operator surface, escalate, and validation still running for authorised callers). The gap script now holds 3 failing tests (TE-FAIL-01, TE-RCPT-01/02) plus the 2 controls.
+**Status after the TE-AUTH PR (#382, G-AUTH-ORDER):** TE-AUTH-01/02 pass and moved to `trusted-execution.test.ts` in the default run, with TE-AUTH-03/04/05 added (operator surface, escalate, and validation still running for authorised callers). The gap script then held 3 failing tests (TE-FAIL-01, TE-RCPT-01/02) plus the 2 controls.
+
+**Status after #380 and the wiring PR (#395, G-FAIL, G-RCPT):** TE-FAIL-01 and TE-RCPT-01/02 pass and moved to `trusted-execution.test.ts` in the default run, with TE-FAIL-02 and TE-RCPT-03/04 added. With #382 also merged, the gap script holds only the 2 controls (0 failing); the script and its exclude are kept as the home for future gap tests.
 
 ## 7. Failing-test output (as audited, 2026-10-31; see the status note in §6 for what now passes)
 
@@ -182,21 +184,19 @@ That is **10 gaps and 10 failing tests**, plus 2 passing controls, as audited.
 - **Target version mocked:** `resolveEntityRef` is mocked to a stable `recordVersion`, and stale-target behaviour is not under test.
 - **Web-only gaps:** Command Center KPIs and the "Approve & send" label are web code and have no failing test in this PR.
 
-## 9. Fix status (updated 2026-10-31, after #370 merged)
+## 9. Fix status (updated 2026-10-31, after #370, #380 and #382 merged; wiring PR #395)
 
-#370 (fix PR 1: TE-STALE, TE-DUP) is merged into dev. This PR (#380) adds only building blocks: nothing in `executeAgentAction` calls them yet, so the three tests below still fail and stay in the gap script.
+#370 (fix PR 1: TE-STALE, TE-DUP), #380 (receipt and delivery-state building blocks) and #382 (TE-AUTH) are merged into dev. The wiring PR connects the building blocks in `executeAgentAction` (`apps/api/src/services/agent-action.service.ts`).
 
 | Gap test | Status | Notes |
 |---|---|---|
-| TE-FAIL-01 | **PARTIAL: building blocks in #380; wiring is the follow-up after #380 merges** | `services/agent-action-receipt.ts` adds `persistAgentActionExecutionFailure`. After the execute tx rolls back, it opens a second tenant tx and does a compare-and-set from `approved`/`executing` to `failed`, writing a failed receipt and an `execution_failed` audit event. The first tx has already rolled back, so no row lock is held and this cannot deadlock. The caller passes `actorType` (no hardcoded `user`). The receipt keeps an AppError's code and message; any other error gets `EXECUTION_FAILED` with a generic message, and the raw (truncated) error text is kept only in the audit event detail. |
-| TE-RCPT-01 | **PARTIAL: building blocks in #380; wiring is the follow-up** | Executors declare `delivery: "outbound"` for message.send_proposed, loyalty.reminder.propose and the 4 Revenue kinds. `buildAgentActionExecutionResultForType` returns state `executing` with outcome `queued` for these, never `succeeded`. |
-| TE-RCPT-02 | **PARTIAL: building blocks in #380; wiring is the follow-up** | `@fsm/types` adds `AgentActionDeliveryStateV1Schema` (`queued` \| `provider_accepted` \| `delivered` \| `failed`). `ExecutionReceiptV1Schema` gains `outcome: "queued"` and an optional `deliveryState`. |
-| TE-AUTH-01/02 | Open on dev; fixed in #382 (separate PR) | Still in the gap script on dev. #382 moves auth and role checks to `onRequest` and moves both tests to the default run. |
+| TE-FAIL-01 | **FIXED (wiring PR); default run** | A flag is set only while `executor.applyInTransaction` runs. If that step throws a non-AppError (provider or adapter error), the execute tx rolls back (side effects undone, no row lock held). Afterwards `persistAgentActionExecutionFailure({ companyId, actionId, actorId, actorType: "user", error })` writes `failed`, a failed receipt (code `EXECUTION_FAILED`, generic message) and an `agent.execution_failed` audit event with the raw text in its detail. Then the original error is rethrown; an error while recording never masks it. The actor is `"user"` because execute is only reachable from the authenticated `/agent-actions/:id/execute` route (`request.user.id`). AppError rejections from an executor (validation, cross-tenant, not found) and every check before the side effect (version, stale target, expiry, policy) keep rolling back to the prior state (TE-FAIL-02 plus the existing executor tests). |
+| TE-RCPT-01 | **FIXED (wiring PR); default run** | `buildAgentActionExecutionResultForType` decides the final state. Outbound kinds (message.send_proposed, loyalty.reminder.propose, 4 Revenue kinds) end in `executing` and never `succeeded`. Internal kinds still end `succeeded` (TE-RCPT-03). |
+| TE-RCPT-02 | **FIXED (wiring PR); default run** | The outbound receipt has `outcome: "queued"` and `deliveryState: "queued"` plus a note that no provider send happened. Only a future provider callback may move delivery on. |
+| TE-DUP replay for outbound | Covered (TE-RCPT-04) | The `agent.execution_succeeded` audit event (with its idempotency detail) is still written for both outcomes; its receipt says `queued` for outbound. A same-key replay returns the `executing` row without re-running, and a fresh execute of an `executing` row is rejected by the state machine. |
+| TE-AUTH-01/02 | **FIXED (#382, merged); default run** | `authenticate` and `requireRole` run in `onRequest` on `/agent-actions` and `/operator`; TE-AUTH-01/02 moved to `trusted-execution.test.ts` with TE-AUTH-03/04/05. |
 
-Gap script on this branch: 5 failing (TE-AUTH-01/02, TE-FAIL-01, TE-RCPT-01/02) plus 2 passing controls. After #382 merges it is 3 failing.
-
-**Follow-up after #380 merges (in `executeAgentAction`, `agent-action.service.ts`):**
-1. Replace the hard-coded receipt and `state: "succeeded"` with `buildAgentActionExecutionResultForType(row.actionType, base)`. Write `result.state` and `result.receipt`, and transition from `executing` to `result.state`. For outbound kinds the row stays `executing` with a `queued` receipt.
-2. Keep the `agent.execution_succeeded` audit event (and its idempotency detail) for both outcomes, so a same-key replay still finds it. Alternatively, record queued executes under their own event type and extend `IDEMPOTENT_OPERATION_EVENT_TYPE`.
-3. In the catch, when the error happened after the row was loaded and is not an expiry, stale or version conflict, call `persistAgentActionExecutionFailure({ companyId, actionId, actorId, actorType: "user", error })`, then rethrow.
-4. Move TE-FAIL-01 and TE-RCPT-01/02 out of the gap script into the default run, and set these rows to fixed.
+**Remaining follow-ups:**
+1. Outbound delivery: an outbox and provider adapter behind #301 consent, plus a provider callback that moves `deliveryState` to `provider_accepted`, `delivered` or `failed` and the row to `succeeded` or `failed`.
+2. Actions without approval execute from `policy_evaluated`, which is not in `AGENT_ACTION_FAILABLE_STATES`. Today every registered type requires approval; add `policy_evaluated` when an auto-execute type lands.
+3. Web (Dev C): see the web needs in the PR.

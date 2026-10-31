@@ -35,5 +35,8 @@ export const WORKSPACE_COPY = {
   /** Secondary detail under the frame's error banner (not in the frame). */
   detailCompany: "Your company is still being set up on our side.",
   detailRole: "Your workspace exists, but owner access hasn't reached your session yet.",
+  detailActivate: "Your workspace was created, but it couldn't be activated. Try again to continue.",
+  detailLookup: "We couldn't check your existing workspaces. Try again before creating one.",
+  detailReconcile: "More than one workspace has this name. Contact support to choose the right one.",
   detailCreate: "The workspace couldn't be created. Check the name."
 } as const;

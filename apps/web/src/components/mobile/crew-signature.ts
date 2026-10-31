@@ -91,7 +91,7 @@ export type SignatureAttempt =
   | { kind: "saved" }
   /** conflict (sync outcome or HTTP 409): new op id, base = liveRecordVersion when the server gave one. */
   | { kind: "conflict"; liveRecordVersion: string | null }
-  /** rejected (sync outcome or HTTP 400/422): new op id and a re-read base; replaying the same id would be rejected again. */
+  /** rejected (sync outcome or HTTP 400/401/403/404/422): new op id and a re-read base; replaying the same id would be rejected again. */
   | { kind: "rejected" }
   /** network / 5xx: nothing was decided, so the same op id and base are safe to replay. */
   | { kind: "transient" };
@@ -110,7 +110,8 @@ export function classifySignatureError(error: unknown): SignatureAttempt {
     const live = payload?.conflict?.liveRecordVersion ?? payload?.liveRecordVersion;
     return { kind: "conflict", liveRecordVersion: typeof live === "string" ? live : null };
   }
-  if (status === 400 || status === 422) return { kind: "rejected" };
+  // 400/422 and 401/403/404 are decided by the server (not applied): retry with a new op id, never the same one.
+  if (status === 400 || status === 422 || status === 401 || status === 403 || status === 404) return { kind: "rejected" };
   return { kind: "transient" };
 }
 

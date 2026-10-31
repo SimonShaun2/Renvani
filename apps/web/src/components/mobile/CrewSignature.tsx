@@ -190,7 +190,11 @@ export function CrewSignatureForm({ job }: { job: JobDetail }) {
         <input
           id="signature-signed-by"
           value={saved ? saved.name || name : name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={(e) => {
+            // A different "Signed by" is a different payload: never replay the old op id with it.
+            if (e.target.value !== name) op.current = { id: newOperationId(), base: null };
+            setName(e.target.value);
+          }}
           readOnly={locked}
           maxLength={255}
           className={`w-full rounded-[10px] border border-[#e6dccb] py-3 pl-3.5 pr-3 text-[15px] text-[#0f1530] ${locked ? "bg-[#f7f3ec]" : "bg-white"}`}

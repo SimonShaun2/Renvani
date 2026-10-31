@@ -12,7 +12,7 @@ vi.mock("next/navigation", () => ({ useRouter: () => ({ push: m.push }) }));
 vi.mock("next/link", () => ({ default: ({ href, children }: { href: string; children: React.ReactNode }) => <a href={href}>{children}</a> }));
 
 import { CrewSignatureForm } from "./CrewSignature";
-import { buildSignatureBatch, deriveSignatureState, signatureJobLine, signatureMetaLine } from "./crew-signature";
+import { buildSignatureBatch, classifySignatureError, deriveSignatureState, signatureJobLine, signatureMetaLine } from "./crew-signature";
 
 const JOB_ID = "11111111-1111-4111-8111-111111111111";
 const UPDATED = "2026-10-29T17:00:00.000Z";
@@ -176,6 +176,37 @@ describe("CrewSignatureForm", () => {
     expect(state()).toBe("saved");
     expect(opOf(1).clientOperationId).toBe(opOf(0).clientOperationId);
     expect(opOf(1).baseRecordVersion).toBe(opOf(0).baseRecordVersion);
+  });
+
+  it("editing Signed by after a temporary error sends a NEW op id", async () => {
+    m.post
+      .mockRejectedValueOnce(Object.assign(new Error("down"), { status: 503, payload: {} }))
+      .mockResolvedValueOnce({ results: [{ outcome: "applied" }] });
+    renderForm();
+    draw();
+    await act(async () => { fireEvent.click(btn("Save signature")); });
+    expect(state()).toBe("error");
+    fireEvent.change(screen.getByLabelText("Signed by"), { target: { value: "Dana W." } });
+    await act(async () => { fireEvent.click(btn("Retry")); });
+    expect(state()).toBe("saved");
+    expect(opOf(1).clientOperationId).not.toBe(opOf(0).clientOperationId);
+  });
+
+  it("401 / 403 / 404 are not temporary: error state and a new op id", async () => {
+    for (const status of [401, 403, 404]) {
+      expect(classifySignatureError(Object.assign(new Error("x"), { status }))).toEqual({ kind: "rejected" });
+    }
+    expect(classifySignatureError(Object.assign(new Error("x"), { status: 503 }))).toEqual({ kind: "transient" });
+    m.post
+      .mockRejectedValueOnce(Object.assign(new Error("forbidden"), { status: 403, payload: {} }))
+      .mockRejectedValueOnce(Object.assign(new Error("forbidden"), { status: 403, payload: {} }));
+    renderForm();
+    draw();
+    await act(async () => { fireEvent.click(btn("Save signature")); });
+    expect(state()).toBe("error");
+    await act(async () => { fireEvent.click(btn("Retry")); });
+    expect(state()).toBe("error");
+    expect(opOf(1).clientOperationId).not.toBe(opOf(0).clientOperationId);
   });
 
   it("Saved on load when the job already has a signature", () => {

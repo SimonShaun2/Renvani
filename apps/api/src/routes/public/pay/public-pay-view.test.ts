@@ -191,6 +191,8 @@ describe("public pay view fields", () => {
       paidAmount: null,
       paidAt: null,
       receiptEmail: "d•••@example.com",
+      paid: false,
+      receiptEmailed: false,
       plan: "flex",
       serviceFeeCents: 200,
       bookingFeeCents: 0
@@ -201,6 +203,15 @@ describe("public pay view fields", () => {
     assertPayerSafe(response.body, ids);
   });
 
+  it("paid view reports receiptEmailed=false when the customer opted out of email", async () => {
+    seedGraph({ plan: "flex", onlineBooking: false, paid: true });
+    const customer = fakeDb.getTestState().customers.find((row) => row.email === "dana@example.com");
+    if (customer) customer.prefersEmail = false;
+    const response = await request(app.server).get(`/api/v1/public/pay/${TOKEN}/receipt`);
+    expect(response.status).toBe(200);
+    expect(response.body).toMatchObject({ paid: true, receiptEmailed: false });
+  });
+
   it("receipt: legacy payment with a recorded $1.99 booking fee (pre-removal) still renders safely; no card fields", async () => {
     const { ids } = seedGraph({ plan: "flex", onlineBooking: true, paid: true });
     const response = await request(app.server).get(`/api/v1/public/pay/${TOKEN}/receipt`);
@@ -208,6 +219,8 @@ describe("public pay view fields", () => {
     expect(response.status).toBe(200);
     expect(response.body).toMatchObject({
       invoiceStatus: "paid",
+      paid: true,
+      receiptEmailed: true,
       paymentStatus: "succeeded",
       paidAmount: "103.99",
       paidAt: "2026-10-26T18:00:00.000Z",

@@ -2,6 +2,7 @@ import { SignUp } from "@clerk/nextjs";
 
 import { AuthShell } from "@/src/components/auth/AuthShell";
 import { LegacySignupForm } from "@/src/components/auth/LegacySignupForm";
+import { WORKSPACE_SETUP_ROUTE } from "@/src/components/onboarding/workspace/workspace-setup.config";
 import { renvaniClerkAppearance } from "@/src/lib/clerk/appearance";
 import { CLERK_SIGN_IN_PATH, CLERK_SIGN_UP_PATH, isClerkEnabled } from "@/src/lib/clerk/config";
 
@@ -23,6 +24,7 @@ export default function SignupPage() {
         routing="path"
         path={CLERK_SIGN_UP_PATH}
         signInUrl={CLERK_SIGN_IN_PATH}
+        fallbackRedirectUrl={WORKSPACE_SETUP_ROUTE}
         appearance={renvaniClerkAppearance}
       />
     </AuthShell>

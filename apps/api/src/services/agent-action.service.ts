@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 
 import { and, eq, isNull } from "drizzle-orm";
 
-import { agentActions, db } from "@fsm/db";
+import { agentActions, db, runTransactionWithTenantSession } from "@fsm/db";
 import {
   AppError,
   ErrorCode,
@@ -29,7 +29,7 @@ import {
   isAgentActionEditable,
   requiresHumanApproval
 } from "./agent-action.policy.js";
-import { getAgentActionExecutor } from "./agent-action.executors.js";
+import { requireAgentActionExecutor, getAgentActionExecutor } from "./agent-action.executors.js";
 import { resolveEntityRef } from "./tenant-context.service.js";
 import {
   emitAgentActionAuditEvent,
@@ -90,8 +90,36 @@ function mapRow(row: typeof agentActions.$inferSelect) {
     approvedParameters: (row.approvedParameters as Record<string, unknown> | null) ?? null,
     executionReceipt: row.executionReceipt as Record<string, unknown> | null,
     createdAt: row.createdAt.toISOString(),
-    updatedAt: row.updatedAt.toISOString()
+    updatedAt: row.updatedAt.toISOString(),
+    version: agentActionVersion(row)
   };
+}
+
+/**
+ * Optimistic-concurrency token for state changes: clients echo it back as `expectedVersion`.
+ * Derived from updated_at (every state change bumps it), so no schema change is needed.
+ */
+export function agentActionVersion(row: Pick<typeof agentActions.$inferSelect, "updatedAt">): number {
+  return row.updatedAt.getTime();
+}
+
+export interface AgentActionStateChangeOptions {
+  expectedVersion?: number | undefined;
+}
+
+function assertExpectedVersion(row: typeof agentActions.$inferSelect, options: AgentActionStateChangeOptions): void {
+  if (options.expectedVersion !== undefined && options.expectedVersion !== agentActionVersion(row)) {
+    throw agentActionVersionConflictError();
+  }
+}
+
+function agentActionVersionConflictError(): AppError {
+  return new AppError(ErrorCode.CONFLICT, "Agent action changed since it was loaded; reload and retry");
+}
+
+/** Compare-and-set predicate: the transition only applies if the row is still in `fromState`. */
+function agentActionTransitionWhere(companyId: string, actionId: string, fromState: string) {
+  return and(agentActionScopedWhere(companyId, actionId), eq(agentActions.state, fromState as AgentActionState));
 }
 
 function toLifecycleSlice(row: typeof agentActions.$inferSelect) {
@@ -121,10 +149,12 @@ async function getActionRow(companyId: string, actionId: string, executor: Selec
 }
 
 async function persistTerminalExpiredState(companyId: string, actionId: string): Promise<void> {
-  await db
-    .update(agentActions)
-    .set({ state: "expired", updatedAt: new Date() })
-    .where(agentActionScopedWhere(companyId, actionId));
+  await runTransactionWithTenantSession(companyId, async (tx) => {
+    await tx
+      .update(agentActions)
+      .set({ state: "expired", updatedAt: new Date() })
+      .where(agentActionScopedWhere(companyId, actionId));
+  });
 }
 
 function resolveProposalPolicy(input: CreateAgentActionInput) {
@@ -272,13 +302,19 @@ export async function listAgentActions(
     .map(mapRow);
 }
 
-export async function approveAgentAction(companyId: string, actionId: string, reviewerId: string) {
+export async function approveAgentAction(
+  companyId: string,
+  actionId: string,
+  reviewerId: string,
+  options: AgentActionStateChangeOptions = {}
+) {
   let persistExpiredAfterRollback = false;
 
   try {
-    const mapped = await db.transaction(async (tx) => {
+    const mapped = await runTransactionWithTenantSession(companyId, async (tx) => {
       const row = await getActionRow(companyId, actionId, tx);
 
+      assertExpectedVersion(row, options);
       assertAgentActionApprovable(toLifecycleSlice(row));
 
       if (isAgentActionExpired(row.expiresAt)) {
@@ -296,12 +332,12 @@ export async function approveAgentAction(companyId: string, actionId: string, re
           approvedParameters,
           updatedAt: new Date()
         })
-        .where(agentActionScopedWhere(companyId, actionId))
+        .where(agentActionTransitionWhere(companyId, actionId, row.state))
         .returning();
 
       const updated = updatedRows[0];
       if (!updated) {
-        throw new AppError(ErrorCode.INTERNAL_ERROR, "Failed to approve agent action");
+        throw agentActionVersionConflictError();
       }
 
       await emitAgentActionAuditEvent(tx, {
@@ -334,9 +370,16 @@ export async function approveAgentAction(companyId: string, actionId: string, re
   }
 }
 
-export async function rejectAgentAction(companyId: string, actionId: string, reviewerId: string) {
-  const result = await db.transaction(async (tx) => {
+export async function rejectAgentAction(
+  companyId: string,
+  actionId: string,
+  reviewerId: string,
+  options: AgentActionStateChangeOptions = {}
+) {
+  const result = await runTransactionWithTenantSession(companyId, async (tx) => {
     const row = await getActionRow(companyId, actionId, tx);
+
+    assertExpectedVersion(row, options);
 
     assertAgentActionRejectable(toLifecycleSlice(row));
 
@@ -353,12 +396,12 @@ export async function rejectAgentAction(companyId: string, actionId: string, rev
     const updatedRows = await tx
       .update(agentActions)
       .set({ state: "cancelled", reviewerId, updatedAt: new Date() })
-      .where(agentActionScopedWhere(companyId, actionId))
+      .where(agentActionTransitionWhere(companyId, actionId, row.state))
       .returning();
 
     const updated = updatedRows[0];
     if (!updated) {
-      throw new AppError(ErrorCode.INTERNAL_ERROR, "Failed to reject agent action");
+      throw agentActionVersionConflictError();
     }
 
     await emitAgentActionAuditEvent(tx, {
@@ -404,7 +447,7 @@ export async function editAgentActionParameters(
   editorId: string,
   patch: { channel?: "sms" | "email"; subject?: string | null; body: string }
 ) {
-  const result = await db.transaction(async (tx) => {
+  const result = await runTransactionWithTenantSession(companyId, async (tx) => {
     const row = await getActionRow(companyId, actionId, tx);
 
     if (row.state !== "awaiting_approval") {
@@ -476,12 +519,19 @@ export async function editAgentActionParameters(
   return result.mapped;
 }
 
-export async function executeAgentAction(companyId: string, actionId: string, actorId: string) {
+export async function executeAgentAction(
+  companyId: string,
+  actionId: string,
+  actorId: string,
+  options: AgentActionStateChangeOptions = {}
+) {
   let persistExpiredAfterRollback = false;
 
   try {
-    const result = await db.transaction(async (tx) => {
+    const result = await runTransactionWithTenantSession(companyId, async (tx) => {
       const row = await getActionRow(companyId, actionId, tx);
+
+      assertExpectedVersion(row, options);
 
       if (isAgentActionExpired(row.expiresAt)) {
         persistExpiredAfterRollback = true;
@@ -489,6 +539,8 @@ export async function executeAgentAction(companyId: string, actionId: string, ac
       }
 
       assertAgentActionExecutable(toLifecycleSlice(row));
+      // Fail closed: an action type with no registered executor cannot be executed.
+      const executor = requireAgentActionExecutor(row.actionType);
 
       const executableParameters = resolveExecutableParameters(row);
       const target = row.target as CanonicalEntityRefV1;
@@ -497,7 +549,6 @@ export async function executeAgentAction(companyId: string, actionId: string, ac
         throw agentActionStaleTargetError();
       }
 
-      const executor = getAgentActionExecutor(row.actionType);
       const executionContext = {
         tx,
         companyId,
@@ -509,15 +560,19 @@ export async function executeAgentAction(companyId: string, actionId: string, ac
         requiresApproval: row.requiresApproval,
         state: row.state
       };
-      const authorizationDecision = (await executor?.beforeExecute?.(executionContext)) ?? null;
+      const authorizationDecision = (await executor.beforeExecute?.(executionContext)) ?? null;
 
-      await tx
+      const claimed = await tx
         .update(agentActions)
         .set({ state: "executing", updatedAt: new Date() })
-        .where(agentActionScopedWhere(companyId, actionId));
+        .where(agentActionTransitionWhere(companyId, actionId, row.state))
+        .returning();
+      if (!claimed[0]) {
+        throw agentActionVersionConflictError();
+      }
 
       // Side effects (e.g. FS-25 brief apply) commit atomically with the succeeded state.
-      await executor?.applyInTransaction?.(executionContext);
+      await executor.applyInTransaction?.(executionContext);
 
       const receipt = {
         outcome: "succeeded" as const,
@@ -547,7 +602,7 @@ export async function executeAgentAction(companyId: string, actionId: string, ac
           executionReceipt: receipt,
           updatedAt: new Date()
         })
-        .where(agentActionScopedWhere(companyId, actionId))
+        .where(agentActionTransitionWhere(companyId, actionId, "executing"))
         .returning();
 
       const updated = updatedRows[0];

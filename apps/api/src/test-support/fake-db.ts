@@ -55,6 +55,7 @@ type TableName =
   | "bookingSettings"
   | "agentActions"
   | "inquirySubmitIdempotency"
+  | "serviceAreas"
   | "growthIntakeChecks"
   | "growthIntakeIdentityCandidates"
   | "growthIntakeFindings"
@@ -312,6 +313,7 @@ export interface TestJobRecord {
   priority: JobPriority;
   status: JobStatus;
   leadSource: string | null;
+  leadAttribution: Partial<Record<string, string>> | null;
   title: string;
   description: string | null;
   scheduledStart: Date | null;
@@ -1044,6 +1046,7 @@ export interface TestBookingRequestRecord {
   isPropertyOwner: boolean | null;
   smsConsentAppointments: boolean | null;
   smsConsentMarketing: boolean | null;
+  leadAttribution: Partial<Record<string, string>> | null;
   confirmedAt: Date | null;
   confirmedById: string | null;
   confirmationSentAt: Date | null;
@@ -1306,6 +1309,7 @@ export interface TestJobRecord {
   priority: JobPriority;
   status: JobStatus;
   leadSource: string | null;
+  leadAttribution: Partial<Record<string, string>> | null;
   title: string;
   description: string | null;
   scheduledStart: Date | null;
@@ -1390,6 +1394,7 @@ export interface TestEstimateRecord {
   companyId: string;
   estimateNumber: string;
   jobId: string | null;
+  importSessionId?: string | null;
   customerId: string;
   propertyId: string | null;
   createdById: string | null;
@@ -1964,6 +1969,7 @@ export interface TestBookingRequestRecord {
   isPropertyOwner: boolean | null;
   smsConsentAppointments: boolean | null;
   smsConsentMarketing: boolean | null;
+  leadAttribution: Partial<Record<string, string>> | null;
   confirmedAt: Date | null;
   confirmedById: string | null;
   confirmationSentAt: Date | null;
@@ -2025,6 +2031,18 @@ export interface TestAgentActionRecord {
   expiresAt: Date;
   reviewerId: string | null;
   executionReceipt: Record<string, unknown> | null;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date | null;
+}
+
+export interface TestServiceAreaRecord {
+  id: string;
+  companyId: string;
+  name: string;
+  zips: string[] | null;
+  notes: string | null;
+  isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;
@@ -2122,6 +2140,7 @@ type AnyTestRecord =
   | TestFieldSyncBatchRecord
   | TestFieldSyncOperationRecord
   | TestInquirySubmitIdempotencyRecord
+  | TestServiceAreaRecord
   | TestGrowthIntakeCheckRecord
   | TestGrowthIntakeIdentityCandidateRecord
   | TestGrowthIntakeFindingRecord
@@ -2175,6 +2194,7 @@ type MockTable =
   | typeof bookingSettingsTable
   | typeof agentActionsTable
   | typeof inquirySubmitIdempotencyTable
+  | typeof serviceAreasTable
   | typeof growthIntakeChecksTable
   | typeof growthIntakeIdentityCandidatesTable
   | typeof growthIntakeFindingsTable
@@ -2234,6 +2254,7 @@ interface TestState {
   bookingSettings: TestBookingSettingsRecord[];
   agentActions: TestAgentActionRecord[];
   inquirySubmitIdempotency: TestInquirySubmitIdempotencyRecord[];
+  serviceAreas: TestServiceAreaRecord[];
   growthIntakeChecks: TestGrowthIntakeCheckRecord[];
   growthIntakeIdentityCandidates: TestGrowthIntakeIdentityCandidateRecord[];
   growthIntakeFindings: TestGrowthIntakeFindingRecord[];
@@ -2408,6 +2429,7 @@ const jobsTable = {
   priority: "priority",
   status: "status",
   leadSource: "leadSource",
+  leadAttribution: "leadAttribution",
   title: "title",
   description: "description",
   scheduledStart: "scheduledStart",
@@ -2545,6 +2567,7 @@ const dataExportSessionsTable = {
 } as const;
 
 const estimatesTable = {
+  importSessionId: "importSessionId",
   __name: "estimates",
   id: "id",
   companyId: "companyId",
@@ -3454,6 +3477,7 @@ const bookingRequestsTable = {
   isPropertyOwner: "isPropertyOwner",
   smsConsentAppointments: "smsConsentAppointments",
   smsConsentMarketing: "smsConsentMarketing",
+  leadAttribution: "leadAttribution",
   confirmedAt: "confirmedAt",
   confirmedById: "confirmedById",
   confirmationSentAt: "confirmationSentAt",
@@ -3515,6 +3539,19 @@ const agentActionsTable = {
   expiresAt: "expiresAt",
   reviewerId: "reviewerId",
   executionReceipt: "executionReceipt",
+  createdAt: "createdAt",
+  updatedAt: "updatedAt",
+  deletedAt: "deletedAt"
+} as const;
+
+const serviceAreasTable = {
+  __name: "serviceAreas",
+  id: "id",
+  companyId: "companyId",
+  name: "name",
+  zips: "zips",
+  notes: "notes",
+  isActive: "isActive",
   createdAt: "createdAt",
   updatedAt: "updatedAt",
   deletedAt: "deletedAt"
@@ -3686,6 +3723,7 @@ const state: TestState = {
   bookingSettings: [],
   agentActions: [],
   inquirySubmitIdempotency: [],
+  serviceAreas: [],
   growthIntakeChecks: [],
   growthIntakeIdentityCandidates: [],
   growthIntakeFindings: [],
@@ -3752,6 +3790,7 @@ function restoreState(snapshot: TestState): void {
   state.bookingRequests.splice(0, state.bookingRequests.length, ...snapshot.bookingRequests);
   state.bookingSettings.splice(0, state.bookingSettings.length, ...snapshot.bookingSettings);
   state.agentActions.splice(0, state.agentActions.length, ...snapshot.agentActions);
+  state.serviceAreas.splice(0, state.serviceAreas.length, ...(snapshot.serviceAreas ?? []));
   state.inquirySubmitIdempotency.splice(
     0,
     state.inquirySubmitIdempotency.length,
@@ -3873,6 +3912,8 @@ function getRows(tableName: TableName): AnyTestRecord[] {
       return state.agentActions;
     case "inquirySubmitIdempotency":
       return state.inquirySubmitIdempotency;
+    case "serviceAreas":
+      return state.serviceAreas;
     case "growthIntakeChecks":
       return state.growthIntakeChecks;
     case "growthIntakeIdentityCandidates":
@@ -4137,6 +4178,7 @@ function createJobRecord(
     priority: values.priority ?? "normal",
     status: values.status ?? "lead",
     leadSource: values.leadSource ?? null,
+    leadAttribution: values.leadAttribution ?? null,
     title: values.title ?? "Service Call",
     description: values.description ?? null,
     scheduledStart: values.scheduledStart ?? null,
@@ -4267,6 +4309,7 @@ function createEstimateRecord(
     id: values.id ?? nextId(),
     companyId: values.companyId,
     estimateNumber: values.estimateNumber ?? `EST-${String(state.estimates.length + 1).padStart(4, "0")}`,
+    importSessionId: values.importSessionId ?? null,
     jobId: values.jobId ?? null,
     customerId: values.customerId,
     propertyId: values.propertyId ?? null,
@@ -5081,6 +5124,7 @@ function createBookingRequestRecord(
     isPropertyOwner: values.isPropertyOwner ?? false,
     smsConsentAppointments: values.smsConsentAppointments ?? false,
     smsConsentMarketing: values.smsConsentMarketing ?? false,
+    leadAttribution: values.leadAttribution ?? null,
     confirmedAt: values.confirmedAt ?? null,
     confirmedById: values.confirmedById ?? null,
     confirmationSentAt: values.confirmationSentAt ?? null,
@@ -5122,6 +5166,31 @@ function createBookingSettingsRecord(
     updatedAt: values.updatedAt ?? now,
     deletedAt: values.deletedAt ?? null
   };
+}
+
+function createServiceAreaRecord(
+  values: Partial<TestServiceAreaRecord> & Pick<TestServiceAreaRecord, "companyId" | "name">
+): TestServiceAreaRecord {
+  const now = new Date();
+  return {
+    id: values.id ?? nextId(),
+    companyId: values.companyId,
+    name: values.name,
+    zips: values.zips ?? [],
+    notes: values.notes ?? null,
+    isActive: values.isActive ?? true,
+    createdAt: values.createdAt ?? now,
+    updatedAt: values.updatedAt ?? now,
+    deletedAt: values.deletedAt ?? null
+  };
+}
+
+export function seedServiceArea(
+  values: Partial<TestServiceAreaRecord> & Pick<TestServiceAreaRecord, "companyId" | "name">
+): TestServiceAreaRecord {
+  const record = createServiceAreaRecord(values);
+  state.serviceAreas.push(record);
+  return record;
 }
 
 function createInquirySubmitIdempotencyRecord(
@@ -5588,6 +5657,10 @@ function createRow(tableName: TableName, values: Record<string, unknown>): AnyTe
       return createBookingSettingsRecord(
         values as Partial<TestBookingSettingsRecord> & Pick<TestBookingSettingsRecord, "companyId">
       );
+    case "serviceAreas": {
+      const v = values as Partial<TestServiceAreaRecord> & Pick<TestServiceAreaRecord, "companyId" | "name">;
+      return createServiceAreaRecord(v);
+    }
     case "inquirySubmitIdempotency":
       return createInquirySubmitIdempotencyRecord(
         values as Partial<TestInquirySubmitIdempotencyRecord> &
@@ -5995,6 +6068,7 @@ export const agentActions = agentActionsTable;
 export const fieldSyncBatches = fieldSyncBatchesTable;
 export const fieldSyncOperations = fieldSyncOperationsTable;
 export const inquirySubmitIdempotency = inquirySubmitIdempotencyTable;
+export const serviceAreas = serviceAreasTable;
 export const growthIntakeChecks = growthIntakeChecksTable;
 export const growthIntakeIdentityCandidates = growthIntakeIdentityCandidatesTable;
 export const growthIntakeFindings = growthIntakeFindingsTable;
@@ -6443,6 +6517,7 @@ export function createDbModuleMock() {
     fieldSyncBatches,
     fieldSyncOperations,
     inquirySubmitIdempotency,
+    serviceAreas,
     growthIntakeChecks,
     growthIntakeIdentityCandidates,
     growthIntakeFindings,
@@ -6511,6 +6586,7 @@ export function resetTestState(): void {
   state.fieldSyncBatches.length = 0;
   state.fieldSyncOperations.length = 0;
   state.inquirySubmitIdempotency.length = 0;
+  state.serviceAreas.length = 0;
   state.growthIntakeChecks.length = 0;
   state.growthIntakeIdentityCandidates.length = 0;
   state.growthIntakeFindings.length = 0;
@@ -6881,6 +6957,28 @@ export function seedAgentAction(
     ...values
   });
   state.agentActions.push(record);
+  return record;
+}
+
+export function seedVipMembershipTier(
+  values: Partial<TestVipMembershipTierRecord> & Pick<TestVipMembershipTierRecord, "companyId" | "name">
+): TestVipMembershipTierRecord {
+  const record: TestVipMembershipTierRecord = {
+    id: values.id ?? randomUUID(),
+    companyId: values.companyId,
+    name: values.name,
+    description: values.description ?? null,
+    monthlyPrice: values.monthlyPrice ?? "29.00",
+    discountPercent: values.discountPercent ?? "10",
+    includedVisitsPerMonth: values.includedVisitsPerMonth ?? null,
+    stripeMonthlyPriceId: values.stripeMonthlyPriceId ?? null,
+    sortOrder: values.sortOrder ?? 0,
+    isActive: values.isActive ?? true,
+    createdAt: values.createdAt ?? new Date(),
+    updatedAt: values.updatedAt ?? new Date(),
+    deletedAt: values.deletedAt ?? null
+  };
+  state.vipMembershipTiers.push(record);
   return record;
 }
 

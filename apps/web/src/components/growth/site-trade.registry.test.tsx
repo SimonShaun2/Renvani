@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { BrandedLocalSeo, serializeJsonLd } from "./BrandedLocalSeo";
 import { buildBrandedStorefrontViewModel, buildLocalBusinessJsonLd } from "./branded-storefront.utils";
-import { buildOpeningHours, buildSiteMetadataCopy, resolveSiteTrade } from "./site-trade.registry";
+import { SITE_TRADES, buildOpeningHours, buildSiteMetadataCopy, resolveSiteTrade } from "./site-trade.registry";
 
 const base = {
   companyName: "Summit Heating",
@@ -28,8 +28,8 @@ describe("site trade registry", () => {
     [["AC repair", "Furnace tune-up"], "HVACBusiness", "Heating & air conditioning"],
     [["Drain cleaning", "Water heater install"], "Plumber", "Plumbing"],
     [["Panel upgrade", "EV charger install"], "Electrician", "Electrical"],
-    [["Deep clean", "Move-out clean"], "HomeAndConstructionBusiness", "Residential cleaning"],
-    [["Handyman visit"], "LocalBusiness", "Home services"]
+    [["Handyman visit"], "HomeAndConstructionBusiness", "Home services"],
+    [[], "HomeAndConstructionBusiness", "Home services"]
   ])("%j → %s", (labels, schemaType, label) => {
     const meta = buildSiteMetadataCopy(withServices(...labels));
     expect(meta.trade.schemaType).toBe(schemaType);
@@ -37,9 +37,17 @@ describe("site trade registry", () => {
     expect(meta.keywords).toContain("Summit Heating");
   });
 
-  it("never labels a non-cleaning shop as cleaning", () => {
-    const meta = buildSiteMetadataCopy(withServices("AC repair"));
-    expect(JSON.stringify(meta).toLowerCase()).not.toContain("cleaning");
+  it("has exactly hvac | plumbing | electrical | other", () => {
+    expect(Object.keys(SITE_TRADES)).toEqual(["hvac", "plumbing", "electrical", "other"]);
+    expect(JSON.stringify(SITE_TRADES).toLowerCase()).not.toMatch(/residential cleaning|maid|restaurant|menu/);
+  });
+
+  it.each(["cleaning", "restaurant", "", 42, null])("unknown or missing trade %j falls back to other", (trade) => {
+    expect(resolveSiteTrade({ ...withServices("Handyman visit"), trade } as never).key).toBe("other");
+  });
+
+  it("an old cleaning-style service list no longer resolves to a cleaning trade", () => {
+    expect(resolveSiteTrade(withServices("Deep clean", "Move-out clean")).key).toBe("other");
   });
 
   it("prefers an explicit trade field when present", () => {

@@ -55,7 +55,7 @@ export default function BookingLinksSettingsPage() {
   const settingsQuery = useBookingSettings();
   const statsQuery = useBookingStats(30);
   const qrWrapperRef = useRef<HTMLDivElement | null>(null);
-  const [origin, setOrigin] = useState("https://servicerev.app");
+  const [origin, setOrigin] = useState("");
 
   useEffect(() => {
     if (typeof window !== "undefined") {

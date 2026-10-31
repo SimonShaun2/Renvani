@@ -147,7 +147,7 @@ export function CSVImportWizardClient({ presentation = "onboarding" }: CSVImport
     importSession?.totalRows ?? 0
   );
   const isImportRunning = currentStep === 6 && importSession?.status === "importing";
-  const companyName = companyQuery.data?.company.name ?? authSession?.company.name ?? "ServiceRev";
+  const companyName = companyQuery.data?.company.name ?? authSession?.company.name ?? "Renvani";
   const workEmail = authSession?.user.email ?? "owner@example.com";
 
   useUnsavedChanges({

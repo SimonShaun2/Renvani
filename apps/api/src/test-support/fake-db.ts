@@ -313,6 +313,7 @@ export interface TestJobRecord {
   priority: JobPriority;
   status: JobStatus;
   leadSource: string | null;
+  leadAttribution: Partial<Record<string, string>> | null;
   title: string;
   description: string | null;
   scheduledStart: Date | null;
@@ -1045,6 +1046,7 @@ export interface TestBookingRequestRecord {
   isPropertyOwner: boolean | null;
   smsConsentAppointments: boolean | null;
   smsConsentMarketing: boolean | null;
+  leadAttribution: Partial<Record<string, string>> | null;
   confirmedAt: Date | null;
   confirmedById: string | null;
   confirmationSentAt: Date | null;
@@ -1307,6 +1309,7 @@ export interface TestJobRecord {
   priority: JobPriority;
   status: JobStatus;
   leadSource: string | null;
+  leadAttribution: Partial<Record<string, string>> | null;
   title: string;
   description: string | null;
   scheduledStart: Date | null;
@@ -1965,6 +1968,7 @@ export interface TestBookingRequestRecord {
   isPropertyOwner: boolean | null;
   smsConsentAppointments: boolean | null;
   smsConsentMarketing: boolean | null;
+  leadAttribution: Partial<Record<string, string>> | null;
   confirmedAt: Date | null;
   confirmedById: string | null;
   confirmationSentAt: Date | null;
@@ -2424,6 +2428,7 @@ const jobsTable = {
   priority: "priority",
   status: "status",
   leadSource: "leadSource",
+  leadAttribution: "leadAttribution",
   title: "title",
   description: "description",
   scheduledStart: "scheduledStart",
@@ -3470,6 +3475,7 @@ const bookingRequestsTable = {
   isPropertyOwner: "isPropertyOwner",
   smsConsentAppointments: "smsConsentAppointments",
   smsConsentMarketing: "smsConsentMarketing",
+  leadAttribution: "leadAttribution",
   confirmedAt: "confirmedAt",
   confirmedById: "confirmedById",
   confirmationSentAt: "confirmationSentAt",
@@ -4170,6 +4176,7 @@ function createJobRecord(
     priority: values.priority ?? "normal",
     status: values.status ?? "lead",
     leadSource: values.leadSource ?? null,
+    leadAttribution: values.leadAttribution ?? null,
     title: values.title ?? "Service Call",
     description: values.description ?? null,
     scheduledStart: values.scheduledStart ?? null,
@@ -5114,6 +5121,7 @@ function createBookingRequestRecord(
     isPropertyOwner: values.isPropertyOwner ?? false,
     smsConsentAppointments: values.smsConsentAppointments ?? false,
     smsConsentMarketing: values.smsConsentMarketing ?? false,
+    leadAttribution: values.leadAttribution ?? null,
     confirmedAt: values.confirmedAt ?? null,
     confirmedById: values.confirmedById ?? null,
     confirmationSentAt: values.confirmationSentAt ?? null,

@@ -7,12 +7,15 @@ vi.mock("next/navigation", () => ({ useRouter: () => ({ replace, refresh }) }));
 
 const clerk = vi.hoisted(() => ({
   orgId: null as string | null,
+  userId: "user_1",
   getToken: vi.fn(),
+  getOrganizationMemberships: vi.fn(),
   createOrganization: vi.fn(),
   setActive: vi.fn()
 }));
 vi.mock("@clerk/nextjs", () => ({
-  useAuth: () => ({ getToken: clerk.getToken, orgId: clerk.orgId }),
+  useAuth: () => ({ getToken: clerk.getToken, orgId: clerk.orgId, userId: clerk.userId }),
+  useUser: () => ({ user: { getOrganizationMemberships: clerk.getOrganizationMemberships } }),
   useOrganizationList: () => ({ isLoaded: true, createOrganization: clerk.createOrganization, setActive: clerk.setActive })
 }));
 
@@ -23,8 +26,12 @@ import { CreateWorkspaceStep } from "./CreateWorkspaceStep";
 
 describe("CreateWorkspaceStep", () => {
   beforeEach(() => {
+    sessionStorage.clear();
     clerk.orgId = null;
+    clerk.userId = "user_1";
     clerk.createOrganization.mockReset();
+    clerk.getOrganizationMemberships.mockReset();
+    clerk.getOrganizationMemberships.mockResolvedValue({ data: [], total_count: 0 });
     clerk.setActive.mockReset();
     clerk.createOrganization.mockResolvedValue({ id: "org_1" });
     clerk.setActive.mockResolvedValue(undefined);
@@ -70,6 +77,108 @@ describe("CreateWorkspaceStep", () => {
     expect(screen.getByRole("alert").textContent).toContain("couldn't be created");
     expect(screen.getByLabelText("Company name")).toBeTruthy();
     expect(wait.fn).not.toHaveBeenCalled();
+  });
+
+  it("retries activation of the created organization without creating another", async () => {
+    clerk.setActive.mockRejectedValueOnce(new Error("session unavailable"));
+    wait.fn.mockResolvedValue({ ok: true, role: "owner" });
+    render(<CreateWorkspaceStep />);
+    await submit("Acme Plumbing");
+
+    expect(screen.getByRole("alert").textContent).toContain("workspace was created");
+    expect(screen.queryByLabelText("Company name")).toBeNull();
+    expect(wait.fn).not.toHaveBeenCalled();
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Try again" }));
+    });
+    expect(clerk.createOrganization).toHaveBeenCalledTimes(1);
+    expect(clerk.setActive).toHaveBeenNthCalledWith(2, { organization: "org_1" });
+    expect(wait.fn).toHaveBeenCalledTimes(1);
+    expect(replace).toHaveBeenCalledWith("/onboarding/import");
+  });
+
+  it("recovers a created organization after remount before retrying activation", async () => {
+    clerk.setActive.mockRejectedValueOnce(new Error("session unavailable"));
+    wait.fn.mockResolvedValue({ ok: true, role: "owner" });
+    const first = render(<CreateWorkspaceStep />);
+    await submit("Acme Plumbing");
+    first.unmount();
+
+    render(<CreateWorkspaceStep />);
+    expect(screen.queryByLabelText("Company name")).toBeNull();
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Create workspace" }));
+    });
+    expect(clerk.createOrganization).toHaveBeenCalledTimes(1);
+    expect(clerk.setActive).toHaveBeenNthCalledWith(2, { organization: "org_1" });
+    expect(replace).toHaveBeenCalledWith("/onboarding/import");
+  });
+
+  it("finds the created organization from Clerk when a new tab has no session storage", async () => {
+    clerk.setActive.mockRejectedValueOnce(new Error("session unavailable"));
+    wait.fn.mockResolvedValue({ ok: true, role: "owner" });
+    const first = render(<CreateWorkspaceStep />);
+    await submit("Acme Plumbing");
+    first.unmount();
+    sessionStorage.clear();
+    clerk.getOrganizationMemberships.mockResolvedValue({
+      data: [{ organization: { id: "org_1", name: "Acme Plumbing" } }],
+      total_count: 1
+    });
+
+    render(<CreateWorkspaceStep />);
+    await submit("Acme Plumbing");
+    expect(clerk.createOrganization).toHaveBeenCalledTimes(1);
+    expect(clerk.setActive).toHaveBeenNthCalledWith(2, { organization: "org_1" });
+    expect(replace).toHaveBeenCalledWith("/onboarding/import");
+  });
+
+  it("does not create an organization when the membership lookup fails", async () => {
+    clerk.getOrganizationMemberships.mockRejectedValue(new Error("network unavailable"));
+    render(<CreateWorkspaceStep />);
+    await submit("Acme Plumbing");
+    expect(screen.getByRole("alert").textContent).toContain("couldn't check your existing workspaces");
+    expect(clerk.createOrganization).not.toHaveBeenCalled();
+    expect(clerk.setActive).not.toHaveBeenCalled();
+  });
+
+  it("clears prior account retry state when the signed-in user changes", async () => {
+    clerk.setActive.mockRejectedValueOnce(new Error("session unavailable"));
+    const view = render(<CreateWorkspaceStep />);
+    await submit("Acme Plumbing");
+    expect(screen.queryByLabelText("Company name")).toBeNull();
+
+    clerk.userId = "user_2";
+    view.rerender(<CreateWorkspaceStep />);
+    expect(screen.getByLabelText("Company name")).toBeTruthy();
+    expect(screen.queryByRole("alert")).toBeNull();
+    expect(screen.getByRole("button", { name: "Create workspace" })).toBeTruthy();
+    expect(clerk.createOrganization).toHaveBeenCalledTimes(1);
+    clerk.createOrganization.mockResolvedValueOnce({ id: "org_2" });
+    wait.fn.mockResolvedValue({ ok: true, role: "owner" });
+    await submit("New Electric");
+    expect(clerk.createOrganization).toHaveBeenCalledTimes(2);
+    expect(clerk.setActive).toHaveBeenNthCalledWith(2, { organization: "org_2" });
+  });
+
+  it("ignores a readiness result from the previous account after a user switch", async () => {
+    clerk.orgId = "org_1";
+    let finishPoll: (result: { ok: true; role: "owner" }) => void = () => {};
+    wait.fn.mockReturnValue(new Promise((resolve) => { finishPoll = resolve; }));
+    const view = render(<CreateWorkspaceStep />);
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Continue" }));
+    });
+
+    clerk.userId = "user_2";
+    clerk.orgId = null;
+    view.rerender(<CreateWorkspaceStep />);
+    await act(async () => { finishPoll({ ok: true, role: "owner" }); });
+
+    expect(replace).not.toHaveBeenCalled();
+    expect(screen.queryByRole("alert")).toBeNull();
+    expect(screen.getByLabelText("Company name")).toBeTruthy();
   });
 
   it("shows the frame copy and a disabled progress button while waiting", async () => {

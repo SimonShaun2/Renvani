@@ -234,6 +234,46 @@ describe("FS-42 tenant access audit", () => {
     expect(response.status).toBe(404);
   });
 
+  it("FS42-UNAUTH-INVOICE-CHARGE-PREVIEW GET /invoices/:id/charge-preview returns 401 without credentials", async () => {
+    const response = await request(app.server).get("/api/v1/invoices/00000000-0000-4000-8000-000000000001/charge-preview");
+    expect(response.status).toBe(401);
+  });
+
+  it("FS42-ROLE-INVOICE-CHARGE-PREVIEW technician cannot read an invoice charge preview", async () => {
+    const company = fakeDb.seedCompany({ name: "Charge Role Co", slug: "charge-role-co" });
+    const technician = fakeDb.seedUser({
+      companyId: company.id,
+      email: "tech@charge-role.test",
+      firstName: "Tech",
+      lastName: "User",
+      role: "technician"
+    });
+    const customer = fakeDb.seedCustomer({ companyId: company.id, firstName: "C", lastName: "R" });
+    const invoice = fakeDb.seedInvoice({ companyId: company.id, customerId: customer.id });
+    const response = await request(app.server)
+      .get(`/api/v1/invoices/${invoice.id}/charge-preview`)
+      .set("Authorization", technicianAuth(company.id, technician.id));
+    expect(response.status).toBe(403);
+  });
+
+  it("FS42-XT-INVOICE-CHARGE-PREVIEW cross-tenant invoice id is 404", async () => {
+    const companyA = fakeDb.seedCompany({ name: "Charge A", slug: "charge-a" });
+    const companyB = fakeDb.seedCompany({ name: "Charge B", slug: "charge-b" });
+    const office = fakeDb.seedUser({
+      companyId: companyA.id,
+      email: "office@charge-a.test",
+      firstName: "Off",
+      lastName: "User",
+      role: "dispatcher"
+    });
+    const customerB = fakeDb.seedCustomer({ companyId: companyB.id, firstName: "B", lastName: "C" });
+    const invoiceB = fakeDb.seedInvoice({ companyId: companyB.id, customerId: customerB.id });
+    const response = await request(app.server)
+      .get(`/api/v1/invoices/${invoiceB.id}/charge-preview`)
+      .set("Authorization", technicianAuth(companyA.id, office.id, "dispatcher"));
+    expect(response.status).toBe(404);
+  });
+
   it("FS42-SPOOF-01 import list rejects client-supplied companyId query param", async () => {
     const { tenantA, tenantB } = seedSyntheticTenantPair(fakeDb, tokens, "fs42-spoof");
     seedTenantIsolationBundle(fakeDb, tenantA.company.id, tenantA.owner.id);

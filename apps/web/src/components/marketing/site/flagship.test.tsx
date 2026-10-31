@@ -79,10 +79,11 @@ describe("flagship + product-detail + tool pages (Figma 175:3…175:4156, 215:63
   });
 
   it("tool items without a Current-page frame stay plain text (no dead links)", () => {
-    for (const l of ["Local Search · Preview →", "Owner App & Approval Rules →", "Job Source Reporting →", "Owner rules"]) expect(productLinkFor(l), l).toBeNull();
+    expect(productLinkFor("Job Source Reporting →")).toBe("/product/reporting-job-sources");
+    for (const l of ["Local Search · Preview →", "Owner App & Approval Rules →", "Owner rules"]) expect(productLinkFor(l), l).toBeNull();
     const tools = [...TOOL_GROUPS.left, ...TOOL_GROUPS.right].flatMap((g) => g.tools);
     for (const t of tools) if (t.href) expect(resolves(t.href), t.href).toBe(true);
-    expect(tools.filter((t) => !t.href).map((t) => t.label)).toEqual(["Job Source Reporting →", "Local Search · Preview →", "Owner App & Approval Rules →"]);
+    expect(tools.filter((t) => !t.href).map((t) => t.label)).toEqual(["Local Search · Preview →", "Owner App & Approval Rules →"]);
   });
 
   it("sitemap lists every product page", () => {

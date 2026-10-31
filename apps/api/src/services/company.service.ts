@@ -238,21 +238,32 @@ export async function updateCompany(
     ...(input.state !== undefined ? { state: input.state } : {}),
     ...(input.zip !== undefined ? { zip: input.zip } : {}),
     ...(input.timezone !== undefined ? { timezone: input.timezone } : {}),
-    ...(input.logoUrl !== undefined ? { logoUrl: input.logoUrl } : {}),
-    ...(input.settings !== undefined
-      ? { settings: buildCompanySettingsUpdate(existingCompany.settings, input.settings) ?? existingCompany.settings }
-      : {})
+    ...(input.logoUrl !== undefined ? { logoUrl: input.logoUrl } : {})
   };
 
-  if (Object.keys(updateValues).length === 0) {
+  if (Object.keys(updateValues).length === 0 && input.settings === undefined) {
     return existingCompany;
   }
 
   return runTenantAwareTransaction(companyId, async (tx) => {
+    // Lock the company row inside the tenant transaction and merge settings from the LOCKED row, so a stale
+    // settings save cannot overwrite keys written concurrently (e.g. settings.trade, serviceArea, emergencyService).
+    let settingsUpdate: { settings?: CompanyRecord["settings"] } = {};
+    if (input.settings !== undefined) {
+      const [locked] = await tx
+        .select()
+        .from(companies)
+        .where(and(eq(companies.id, companyId), isNull(companies.deletedAt)))
+        .for("update")
+        .limit(1);
+      const lockedSettings = requireResult(locked, "Company not found").settings;
+      settingsUpdate = { settings: buildCompanySettingsUpdate(lockedSettings, input.settings) ?? lockedSettings };
+    }
     const updatedCompanies = await tx
       .update(companies)
       .set({
         ...updateValues,
+        ...settingsUpdate,
         updatedAt: new Date()
       })
       .where(eq(companies.id, companyId))
@@ -266,7 +277,7 @@ export async function updateCompany(
       actorName: actor ? buildActorName(actor.firstName, actor.lastName) : undefined,
       entityType: "company",
       entityId: companyId,
-      payload: updateValues,
+      payload: { ...updateValues, ...settingsUpdate },
       summary: `${updatedCompany.name} company profile updated`
     });
 

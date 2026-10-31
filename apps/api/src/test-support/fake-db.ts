@@ -6952,6 +6952,28 @@ export function seedAgentAction(
   return record;
 }
 
+export function seedVipMembershipTier(
+  values: Partial<TestVipMembershipTierRecord> & Pick<TestVipMembershipTierRecord, "companyId" | "name">
+): TestVipMembershipTierRecord {
+  const record: TestVipMembershipTierRecord = {
+    id: values.id ?? randomUUID(),
+    companyId: values.companyId,
+    name: values.name,
+    description: values.description ?? null,
+    monthlyPrice: values.monthlyPrice ?? "29.00",
+    discountPercent: values.discountPercent ?? "10",
+    includedVisitsPerMonth: values.includedVisitsPerMonth ?? null,
+    stripeMonthlyPriceId: values.stripeMonthlyPriceId ?? null,
+    sortOrder: values.sortOrder ?? 0,
+    isActive: values.isActive ?? true,
+    createdAt: values.createdAt ?? new Date(),
+    updatedAt: values.updatedAt ?? new Date(),
+    deletedAt: values.deletedAt ?? null
+  };
+  state.vipMembershipTiers.push(record);
+  return record;
+}
+
 export function seedSavedCardMigration(
   values: Partial<{
     id: string;

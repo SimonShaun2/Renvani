@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, isNull, lt, sql } from "drizzle-orm";
 import type { Job, Processor } from "bullmq";
 import pino from "pino";
 
@@ -356,6 +356,54 @@ export function reviewRequestSendSkipReason(
   return null;
 }
 
+export const INVOICE_RECEIPT_SOURCE_SYSTEM = "invoice_payment_receipt";
+
+/** A 'sending' claim older than this is from a worker that died between claim and send; it may be re-claimed. */
+export const INVOICE_RECEIPT_STALE_CLAIM_MS = 10 * 60 * 1000;
+
+export interface InvoiceReceiptClaimResult {
+  claimed: boolean;
+  /** Set when a stale 'sending' claim was taken over (age of the abandoned claim in ms). */
+  staleReclaimedAgeMs?: number;
+}
+
+/** Storage operations behind the receipt claim (production: message_logs; tests: in-memory). */
+export interface InvoiceReceiptClaimStore {
+  /** INSERT ... ON CONFLICT DO NOTHING; true when this call created the claim. */
+  insertClaim(claim: InvoiceReceiptClaim): Promise<boolean>;
+  /**
+   * Single atomic UPDATE ... SET updated_at = now() WHERE status = 'sending' AND updated_at < now() - threshold
+   * RETURNING id. true = this caller won the takeover of a stale claim.
+   */
+  takeOverStaleClaim(companyId: string, paymentId: string): Promise<boolean>;
+  /** Age of the existing claim for logging only (null if unknown). */
+  readClaimAgeMs(companyId: string, paymentId: string): Promise<number | null>;
+}
+
+export function createInvoiceReceiptClaimer(
+  store: InvoiceReceiptClaimStore
+): (claim: InvoiceReceiptClaim) => Promise<InvoiceReceiptClaimResult> {
+  return async (claim) => {
+    if (await store.insertClaim(claim)) {
+      return { claimed: true };
+    }
+    // Read the age BEFORE the takeover (the takeover resets updated_at); logging only.
+    const ageMs = await store.readClaimAgeMs(claim.companyId, claim.paymentId).catch(() => null);
+    if (!(await store.takeOverStaleClaim(claim.companyId, claim.paymentId))) {
+      return { claimed: false };
+    }
+    return { claimed: true, staleReclaimedAgeMs: ageMs ?? INVOICE_RECEIPT_STALE_CLAIM_MS };
+  };
+}
+
+export interface InvoiceReceiptClaim {
+  companyId: string;
+  customerId: string;
+  paymentId: string;
+  toAddress: string;
+  fromAddress: string;
+}
+
 export interface NotificationsDependencies {
   email: EmailModule;
   sms: SmsModule;
@@ -384,6 +432,15 @@ export interface NotificationsDependencies {
     ruleType: AutomationRuleType
   ): Promise<AutomationRuleContext | null>;
   markInvoiceReminderSent(companyId: string, invoiceId: string, reminderLevel: ReminderLevel): Promise<void>;
+  /**
+   * Atomically claims the one-time payment receipt send for (companyId, paymentId) via the message_logs
+   * (company, source_system, source_id) unique key. Not claimed when already sent or freshly 'sending'
+   * (retry/redelivery); a 'sending' claim older than INVOICE_RECEIPT_STALE_CLAIM_MS is atomically re-claimed.
+   */
+  claimInvoiceReceiptSend(claim: InvoiceReceiptClaim): Promise<InvoiceReceiptClaimResult>;
+  markInvoiceReceiptSent(companyId: string, paymentId: string): Promise<void>;
+  /** Releases a claim when the send itself failed, so a retry can send. */
+  releaseInvoiceReceiptClaim(companyId: string, paymentId: string): Promise<void>;
   markCampaignRecipientDelivered(input: {
     companyId: string;
     campaignId: string;
@@ -887,6 +944,86 @@ function createProductionDependencies(): Promise<NotificationsDependencies> {
 
       return rule ?? null;
     },
+    claimInvoiceReceiptSend: createInvoiceReceiptClaimer({
+      async insertClaim(claim) {
+        const inserted = await db
+          .insert(messageLogs)
+          .values({
+            companyId: claim.companyId,
+            customerId: claim.customerId,
+            channel: "email",
+            direction: "outbound",
+            toAddress: claim.toAddress,
+            fromAddress: claim.fromAddress,
+            subject: "Payment receipt",
+            body: "Payment receipt",
+            providerStatus: "sending",
+            sourceSystem: INVOICE_RECEIPT_SOURCE_SYSTEM,
+            sourceId: claim.paymentId
+          })
+          .onConflictDoNothing()
+          .returning({ id: messageLogs.id });
+        return inserted.length > 0;
+      },
+      async takeOverStaleClaim(companyId, paymentId) {
+        // One atomic UPDATE: the staleness test runs inside Postgres (full precision), so concurrent
+        // retries race on the row lock and exactly one gets a row back. No JS round-trip of updated_at.
+        const [won] = await db
+          .update(messageLogs)
+          .set({ updatedAt: sql`now()` })
+          .where(
+            and(
+              eq(messageLogs.companyId, companyId),
+              eq(messageLogs.sourceSystem, INVOICE_RECEIPT_SOURCE_SYSTEM),
+              eq(messageLogs.sourceId, paymentId),
+              eq(messageLogs.providerStatus, "sending"),
+              lt(messageLogs.updatedAt, sql`now() - make_interval(secs => ${INVOICE_RECEIPT_STALE_CLAIM_MS / 1000})`)
+            )
+          )
+          .returning({ id: messageLogs.id });
+        return Boolean(won);
+      },
+      async readClaimAgeMs(companyId, paymentId) {
+        // Logging only; never used for the takeover decision.
+        const [row] = await db
+          .select({ updatedAt: messageLogs.updatedAt })
+          .from(messageLogs)
+          .where(
+            and(
+              eq(messageLogs.companyId, companyId),
+              eq(messageLogs.sourceSystem, INVOICE_RECEIPT_SOURCE_SYSTEM),
+              eq(messageLogs.sourceId, paymentId)
+            )
+          )
+          .limit(1);
+        return row ? Math.max(0, Date.now() - row.updatedAt.getTime()) : null;
+      }
+    }),
+    async markInvoiceReceiptSent(companyId, paymentId) {
+      const now = new Date();
+      await db
+        .update(messageLogs)
+        .set({ providerStatus: "sent", sentAt: now, updatedAt: now })
+        .where(
+          and(
+            eq(messageLogs.companyId, companyId),
+            eq(messageLogs.sourceSystem, INVOICE_RECEIPT_SOURCE_SYSTEM),
+            eq(messageLogs.sourceId, paymentId)
+          )
+        );
+    },
+    async releaseInvoiceReceiptClaim(companyId, paymentId) {
+      await db
+        .delete(messageLogs)
+        .where(
+          and(
+            eq(messageLogs.companyId, companyId),
+            eq(messageLogs.sourceSystem, INVOICE_RECEIPT_SOURCE_SYSTEM),
+            eq(messageLogs.sourceId, paymentId),
+            eq(messageLogs.providerStatus, "sending")
+          )
+        );
+    },
     async markInvoiceReminderSent(companyId, invoiceId, reminderLevel) {
       const now = new Date();
       const reminderColumn =
@@ -1118,14 +1255,46 @@ export async function handleSendInvoicePaymentReceipt(
     return;
   }
 
-  await dependencies.email.sendInvoicePaymentReceiptEmail(context.customer.email, {
-    firstName: context.customer.firstName,
-    invoiceNumber: context.invoiceNumber,
-    amount,
-    balanceDue: context.balanceDue,
-    paidAt: getJobString(job.data, "paidAt"),
-    receiptUrl: context.stripePaymentLinkUrl ?? null,
-    companyName: context.company.name
+  // Worker retries reuse the same job (and BullMQ may re-run a stalled job), so claim the send first.
+  const claimed = await dependencies.claimInvoiceReceiptSend({
+    companyId,
+    customerId,
+    paymentId,
+    toAddress: context.customer.email,
+    fromAddress: getOutboundEmailFromAddress()
+  });
+
+  if (!claimed.claimed) {
+    logger.info({ companyId, invoiceId, paymentId }, "Invoice receipt already sent for payment; skipping");
+    return;
+  }
+
+  if (claimed.staleReclaimedAgeMs !== undefined) {
+    logger.warn(
+      { companyId, invoiceId, paymentId, claimAgeMs: claimed.staleReclaimedAgeMs },
+      "Invoice receipt: stale 'sending' claim re-claimed (previous worker likely died before send); sending"
+    );
+  }
+
+  try {
+    await dependencies.email.sendInvoicePaymentReceiptEmail(context.customer.email, {
+      firstName: context.customer.firstName,
+      invoiceNumber: context.invoiceNumber,
+      amount,
+      balanceDue: context.balanceDue,
+      paidAt: getJobString(job.data, "paidAt"),
+      receiptUrl: context.stripePaymentLinkUrl ?? null,
+      companyName: context.company.name
+    });
+  } catch (error) {
+    // Send failed: release the claim so the BullMQ retry can send. Never let a release error mask the send error.
+    await dependencies.releaseInvoiceReceiptClaim(companyId, paymentId).catch(() => undefined);
+    throw error;
+  }
+
+  // Already sent: a failure to mark must not fail the job (a retry would then be skipped anyway by the claim).
+  await dependencies.markInvoiceReceiptSent(companyId, paymentId).catch(() => {
+    logger.warn({ companyId, paymentId }, "Failed to mark invoice receipt sent; claim row remains");
   });
 
   logger.info({ companyId, invoiceId, customerId, paymentId }, "Invoice payment receipt sent");

@@ -2607,6 +2607,86 @@ export const growthCheckFindings = pgTable(
   })
 );
 
+/** FS-200 Growth: per-tenant call tracking settings (provider id from the adapter registry, not an enum). */
+export const callTrackingSettings = pgTable(
+  "call_tracking_settings",
+  {
+    id: id(),
+    companyId: companyId(),
+    provider: varchar("provider", { length: 64 }).notNull().default("disabled"),
+    enabled: boolean("enabled").notNull().default(false),
+    recordingEnabled: boolean("recording_enabled").notNull().default(false),
+    recordingDisclosureEnabled: boolean("recording_disclosure_enabled").notNull().default(true),
+    consentMode: varchar("consent_mode", { length: 32 }).notNull().default("all_party"),
+    recordingNoticeState: varchar("recording_notice_state", { length: 2 }),
+    version: integer("version").notNull().default(1),
+    updatedByUserId: uuid("updated_by_user_id").references(() => users.id, { onDelete: "set null" }),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at").notNull().defaultNow()
+  },
+  (t) => ({
+    companyUnique: uniqueIndex("call_tracking_settings_company_idx").on(t.companyId)
+  })
+);
+
+/** FS-200: tracking number -> marketing source/campaign mapping and forwarding target (business numbers only). */
+export const callTrackingNumbers = pgTable(
+  "call_tracking_numbers",
+  {
+    id: id(),
+    companyId: companyId(),
+    provider: varchar("provider", { length: 64 }).notNull(),
+    providerNumberId: varchar("provider_number_id", { length: 128 }),
+    trackingNumber: varchar("tracking_number", { length: 20 }).notNull(),
+    label: varchar("label", { length: 100 }).notNull(),
+    marketingSource: varchar("marketing_source", { length: 64 }).notNull(),
+    marketingCampaign: varchar("marketing_campaign", { length: 100 }),
+    forwardingNumber: varchar("forwarding_number", { length: 20 }).notNull(),
+    active: boolean("active").notNull().default(true),
+    version: integer("version").notNull().default(1),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
+    deletedAt: timestamp("deleted_at")
+  },
+  (t) => ({
+    companyIdx: index("call_tracking_numbers_company_idx").on(t.companyId),
+    trackingNumberUnique: uniqueIndex("call_tracking_numbers_tracking_number_idx")
+      .on(t.trackingNumber)
+      .where(sql`${t.deletedAt} IS NULL`)
+  })
+);
+
+/** FS-200: inbound call records. Caller stored as tenant-scoped hash + last 4 only; recording by reference only. */
+export const callRecords = pgTable(
+  "call_records",
+  {
+    id: id(),
+    companyId: companyId(),
+    trackingNumberId: uuid("tracking_number_id")
+      .notNull()
+      .references(() => callTrackingNumbers.id, { onDelete: "cascade" }),
+    provider: varchar("provider", { length: 64 }).notNull(),
+    providerCallId: varchar("provider_call_id", { length: 128 }).notNull(),
+    callerHash: varchar("caller_hash", { length: 64 }).notNull(),
+    callerLast4: varchar("caller_last4", { length: 4 }).notNull(),
+    startedAt: timestamp("started_at").notNull(),
+    durationSeconds: integer("duration_seconds").notNull(),
+    outcome: varchar("outcome", { length: 32 }).notNull(),
+    /** Lead attribution (#271 whitelist) derived from the tracking number mapping. */
+    attribution: jsonb("lead_attribution").$type<Partial<Record<string, string>>>(),
+    recordingRef: varchar("recording_ref", { length: 512 }),
+    recordingDisclosurePlayed: boolean("recording_disclosure_played").notNull().default(false),
+    callerConsent: varchar("caller_consent", { length: 32 }).notNull().default("unknown"),
+    recordingNoticeState: varchar("recording_notice_state", { length: 2 }),
+    createdAt: timestamp("created_at").notNull().defaultNow()
+  },
+  (t) => ({
+    companyStartedIdx: index("call_records_company_started_idx").on(t.companyId, t.startedAt),
+    trackingNumberIdx: index("call_records_tracking_number_idx").on(t.trackingNumberId),
+    providerCallUnique: uniqueIndex("call_records_provider_call_idx").on(t.provider, t.providerCallId)
+  })
+);
+
 /** FS-56: append-only review history for Growth Check findings (machine observation stays untouched). */
 export const growthCheckFindingRevisions = pgTable(
   "growth_check_finding_revisions",

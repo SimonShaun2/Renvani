@@ -44,6 +44,7 @@ export * from "./spreadsheet-sanitize.js";
 export * from "./invoice.types.js";
 export * from "./job.types.js";
 export * from "./job-source-reporting.types.js";
+export * from "./revenue-outcomes.types.js";
 export * from "./lead-attribution.types.js";
 export * from "./job-product.types.js";
 export * from "./job-task.types.js";

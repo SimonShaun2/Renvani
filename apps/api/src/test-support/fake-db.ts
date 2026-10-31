@@ -39,6 +39,9 @@ type TableName =
   | "stockLocations"
   | "stockLevels"
   | "stockMovements"
+  | "callTrackingSettings"
+  | "callTrackingNumbers"
+  | "callRecords"
   | "growthCheckScans"
   | "growthCheckFindings"
   | "growthCheckFindingRevisions"
@@ -2098,6 +2101,9 @@ type AnyTestRecord =
   | TestStockLocationRecord
   | TestStockLevelRecord
   | TestStockMovementRecord
+  | TestCallTrackingSettingsRecord
+  | TestCallTrackingNumberRecord
+  | TestCallRecordRecord
   | TestGrowthCheckScanRecord
   | TestGrowthCheckFindingRecord
   | TestGrowthCheckFindingRevisionRecord
@@ -2184,6 +2190,9 @@ type MockTable =
   | typeof stockLocationsTable
   | typeof stockLevelsTable
   | typeof stockMovementsTable
+  | typeof callTrackingSettingsTable
+  | typeof callTrackingNumbersTable
+  | typeof callRecordsTable
   | typeof growthCheckScansTable
   | typeof growthCheckFindingsTable
   | typeof growthCheckFindingRevisionsTable
@@ -2247,6 +2256,9 @@ interface TestState {
   stockLocations: TestStockLocationRecord[];
   stockLevels: TestStockLevelRecord[];
   stockMovements: TestStockMovementRecord[];
+  callTrackingSettings: TestCallTrackingSettingsRecord[];
+  callTrackingNumbers: TestCallTrackingNumberRecord[];
+  callRecords: TestCallRecordRecord[];
   growthCheckScans: TestGrowthCheckScanRecord[];
   growthCheckFindings: TestGrowthCheckFindingRecord[];
   growthCheckFindingRevisions: TestGrowthCheckFindingRevisionRecord[];
@@ -3048,6 +3060,198 @@ export interface TestStockMovementRecord {
   allowNegative: boolean;
   actorUserId: string | null;
   createdAt: Date;
+}
+
+export interface TestCallTrackingSettingsRecord {
+  id: string;
+  companyId: string;
+  provider: string;
+  enabled: boolean;
+  recordingEnabled: boolean;
+  recordingDisclosureEnabled: boolean;
+  consentMode: string;
+  recordingNoticeState: string | null;
+  version: number;
+  updatedByUserId: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const callTrackingSettingsTable = {
+  __name: "callTrackingSettings",
+  id: "id",
+  companyId: "companyId",
+  provider: "provider",
+  enabled: "enabled",
+  recordingEnabled: "recordingEnabled",
+  recordingDisclosureEnabled: "recordingDisclosureEnabled",
+  consentMode: "consentMode",
+  recordingNoticeState: "recordingNoticeState",
+  version: "version",
+  updatedByUserId: "updatedByUserId",
+  createdAt: "createdAt",
+  updatedAt: "updatedAt",
+} as const;
+
+function createCallTrackingSettingsRecord(values: Partial<TestCallTrackingSettingsRecord> & Pick<TestCallTrackingSettingsRecord, "companyId">): TestCallTrackingSettingsRecord {
+  if (state.callTrackingSettings.some((row) => row.companyId === values.companyId)) {
+    throw Object.assign(new Error("duplicate key value violates unique constraint"), { code: "23505" });
+  }
+  const now = new Date();
+  return {
+    id: values.id ?? nextId(),
+    companyId: values.companyId,
+    provider: values.provider ?? "disabled",
+    enabled: values.enabled ?? false,
+    recordingEnabled: values.recordingEnabled ?? false,
+    recordingDisclosureEnabled: values.recordingDisclosureEnabled ?? true,
+    consentMode: values.consentMode ?? "all_party",
+    recordingNoticeState: values.recordingNoticeState ?? null,
+    version: values.version ?? 1,
+    updatedByUserId: values.updatedByUserId ?? null,
+    createdAt: values.createdAt ?? now,
+    updatedAt: values.updatedAt ?? now
+  };
+}
+
+export function seedCallTrackingSettings(values: Partial<TestCallTrackingSettingsRecord> & Pick<TestCallTrackingSettingsRecord, "companyId">): TestCallTrackingSettingsRecord {
+  const record = createCallTrackingSettingsRecord(values);
+  state.callTrackingSettings.push(record);
+  return record;
+}
+
+export interface TestCallTrackingNumberRecord {
+  id: string;
+  companyId: string;
+  provider: string;
+  providerNumberId: string | null;
+  trackingNumber: string;
+  label: string;
+  marketingSource: string;
+  marketingCampaign: string | null;
+  forwardingNumber: string;
+  active: boolean;
+  version: number;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date | null;
+}
+
+const callTrackingNumbersTable = {
+  __name: "callTrackingNumbers",
+  id: "id",
+  companyId: "companyId",
+  provider: "provider",
+  providerNumberId: "providerNumberId",
+  trackingNumber: "trackingNumber",
+  label: "label",
+  marketingSource: "marketingSource",
+  marketingCampaign: "marketingCampaign",
+  forwardingNumber: "forwardingNumber",
+  active: "active",
+  version: "version",
+  createdAt: "createdAt",
+  updatedAt: "updatedAt",
+  deletedAt: "deletedAt",
+} as const;
+
+function createCallTrackingNumberRecord(values: Partial<TestCallTrackingNumberRecord> & Pick<TestCallTrackingNumberRecord, "companyId" | "trackingNumber">): TestCallTrackingNumberRecord {
+  if (state.callTrackingNumbers.some((row) => row.deletedAt === null && row.trackingNumber === values.trackingNumber && (values.deletedAt ?? null) === null)) {
+    throw Object.assign(new Error("duplicate key value violates unique constraint"), { code: "23505" });
+  }
+  const now = new Date();
+  return {
+    id: values.id ?? nextId(),
+    companyId: values.companyId,
+    provider: values.provider ?? "disabled",
+    providerNumberId: values.providerNumberId ?? null,
+    trackingNumber: values.trackingNumber,
+    label: values.label ?? "Main line",
+    marketingSource: values.marketingSource ?? "google",
+    marketingCampaign: values.marketingCampaign ?? null,
+    forwardingNumber: values.forwardingNumber ?? "+15125550100",
+    active: values.active ?? true,
+    version: values.version ?? 1,
+    createdAt: values.createdAt ?? now,
+    updatedAt: values.updatedAt ?? now,
+    deletedAt: values.deletedAt ?? null
+  };
+}
+
+export function seedCallTrackingNumber(values: Partial<TestCallTrackingNumberRecord> & Pick<TestCallTrackingNumberRecord, "companyId" | "trackingNumber">): TestCallTrackingNumberRecord {
+  const record = createCallTrackingNumberRecord(values);
+  state.callTrackingNumbers.push(record);
+  return record;
+}
+
+export interface TestCallRecordRecord {
+  id: string;
+  companyId: string;
+  trackingNumberId: string;
+  provider: string;
+  providerCallId: string;
+  callerHash: string;
+  callerLast4: string;
+  startedAt: Date;
+  durationSeconds: number;
+  outcome: string;
+  attribution: Record<string, string> | null;
+  recordingRef: string | null;
+  recordingDisclosurePlayed: boolean;
+  callerConsent: string;
+  recordingNoticeState: string | null;
+  createdAt: Date;
+}
+
+const callRecordsTable = {
+  __name: "callRecords",
+  id: "id",
+  companyId: "companyId",
+  trackingNumberId: "trackingNumberId",
+  provider: "provider",
+  providerCallId: "providerCallId",
+  callerHash: "callerHash",
+  callerLast4: "callerLast4",
+  startedAt: "startedAt",
+  durationSeconds: "durationSeconds",
+  outcome: "outcome",
+  attribution: "attribution",
+  recordingRef: "recordingRef",
+  recordingDisclosurePlayed: "recordingDisclosurePlayed",
+  callerConsent: "callerConsent",
+  recordingNoticeState: "recordingNoticeState",
+  createdAt: "createdAt",
+} as const;
+
+function createCallRecordRecord(values: Partial<TestCallRecordRecord> & Pick<TestCallRecordRecord, "companyId" | "trackingNumberId" | "providerCallId">): TestCallRecordRecord {
+  if (state.callRecords.some((row) => row.provider === (values.provider ?? "disabled") && row.providerCallId === values.providerCallId)) {
+    throw Object.assign(new Error("duplicate key value violates unique constraint"), { code: "23505" });
+  }
+  const now = new Date();
+  return {
+    id: values.id ?? nextId(),
+    companyId: values.companyId,
+    trackingNumberId: values.trackingNumberId,
+    provider: values.provider ?? "disabled",
+    providerCallId: values.providerCallId,
+    callerHash: values.callerHash ?? "0".repeat(64),
+    callerLast4: values.callerLast4 ?? "0000",
+    startedAt: values.startedAt ?? now,
+    durationSeconds: values.durationSeconds ?? 0,
+    outcome: values.outcome ?? "answered",
+    attribution: values.attribution ?? null,
+    recordingRef: values.recordingRef ?? null,
+    recordingDisclosurePlayed: values.recordingDisclosurePlayed ?? false,
+    callerConsent: values.callerConsent ?? "unknown",
+    recordingNoticeState: values.recordingNoticeState ?? null,
+    createdAt: values.createdAt ?? now
+  };
+}
+
+export function seedCallRecord(values: Partial<TestCallRecordRecord> & Pick<TestCallRecordRecord, "companyId" | "trackingNumberId" | "providerCallId">): TestCallRecordRecord {
+  const record = createCallRecordRecord(values);
+  state.callRecords.push(record);
+  return record;
 }
 
 export interface TestGrowthCheckScanRecord {
@@ -3861,6 +4065,9 @@ const state: TestState = {
   stockLocations: [],
   stockLevels: [],
   stockMovements: [],
+  callTrackingSettings: [],
+  callTrackingNumbers: [],
+  callRecords: [],
   growthCheckScans: [],
   growthCheckFindings: [],
   growthCheckFindingRevisions: [],
@@ -3928,6 +4135,9 @@ function restoreState(snapshot: TestState): void {
   state.stockLocations.splice(0, state.stockLocations.length, ...snapshot.stockLocations);
   state.stockLevels.splice(0, state.stockLevels.length, ...snapshot.stockLevels);
   state.stockMovements.splice(0, state.stockMovements.length, ...snapshot.stockMovements);
+  state.callTrackingSettings.splice(0, state.callTrackingSettings.length, ...snapshot.callTrackingSettings);
+  state.callTrackingNumbers.splice(0, state.callTrackingNumbers.length, ...snapshot.callTrackingNumbers);
+  state.callRecords.splice(0, state.callRecords.length, ...snapshot.callRecords);
   state.growthCheckScans.splice(0, state.growthCheckScans.length, ...snapshot.growthCheckScans);
   state.growthCheckFindings.splice(0, state.growthCheckFindings.length, ...snapshot.growthCheckFindings);
   state.growthCheckFindingRevisions.splice(0, state.growthCheckFindingRevisions.length, ...snapshot.growthCheckFindingRevisions);
@@ -4040,6 +4250,12 @@ function getRows(tableName: TableName): AnyTestRecord[] {
       return state.stockLevels;
     case "stockMovements":
       return state.stockMovements;
+    case "callTrackingSettings":
+      return state.callTrackingSettings;
+    case "callTrackingNumbers":
+      return state.callTrackingNumbers;
+    case "callRecords":
+      return state.callRecords;
     case "growthCheckScans":
       return state.growthCheckScans;
     case "growthCheckFindings":
@@ -5753,6 +5969,12 @@ function createRow(tableName: TableName, values: Record<string, unknown>): AnyTe
       return createStockLocationRecord(values as Partial<TestStockLocationRecord> & Pick<TestStockLocationRecord, "companyId" | "name" | "kind">);
     case "stockLevels":
       return createStockLevelRecord(values as Partial<TestStockLevelRecord> & Pick<TestStockLevelRecord, "companyId" | "locationId" | "productId">);
+    case "callTrackingSettings":
+      return createCallTrackingSettingsRecord(values as Partial<TestCallTrackingSettingsRecord> & Pick<TestCallTrackingSettingsRecord, "companyId">);
+    case "callTrackingNumbers":
+      return createCallTrackingNumberRecord(values as Partial<TestCallTrackingNumberRecord> & Pick<TestCallTrackingNumberRecord, "companyId" | "trackingNumber">);
+    case "callRecords":
+      return createCallRecordRecord(values as Partial<TestCallRecordRecord> & Pick<TestCallRecordRecord, "companyId" | "trackingNumberId" | "providerCallId">);
     case "growthCheckScans":
       return createGrowthCheckScanRecord(values as Partial<TestGrowthCheckScanRecord> & Pick<TestGrowthCheckScanRecord, "companyId">);
     case "growthCheckFindings":
@@ -6233,6 +6455,9 @@ export const productCatalog = productCatalogTable;
 export const stockLocations = stockLocationsTable;
 export const stockLevels = stockLevelsTable;
 export const stockMovements = stockMovementsTable;
+export const callTrackingSettings = callTrackingSettingsTable;
+export const callTrackingNumbers = callTrackingNumbersTable;
+export const callRecords = callRecordsTable;
 export const growthCheckScans = growthCheckScansTable;
 export const growthCheckFindings = growthCheckFindingsTable;
 export const growthCheckFindingRevisions = growthCheckFindingRevisionsTable;
@@ -6697,6 +6922,9 @@ export function createDbModuleMock() {
     stockLocations,
     stockLevels,
     stockMovements,
+    callTrackingSettings,
+    callTrackingNumbers,
+    callRecords,
     growthCheckScans,
     growthCheckFindings,
     growthCheckFindingRevisions,
@@ -6769,6 +6997,9 @@ export function resetTestState(): void {
   state.stockLocations.length = 0;
   state.stockLevels.length = 0;
   state.stockMovements.length = 0;
+  state.callTrackingSettings.length = 0;
+  state.callTrackingNumbers.length = 0;
+  state.callRecords.length = 0;
   state.growthCheckScans.length = 0;
   state.growthCheckFindings.length = 0;
   state.growthCheckFindingRevisions.length = 0;

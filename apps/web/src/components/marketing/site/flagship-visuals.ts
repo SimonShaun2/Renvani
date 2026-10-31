@@ -195,7 +195,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+                 "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[220px] shrink-0",
                  "n": "Status / Tulsa + surrounding areas",
                  "id": "200:27",
                  "k": [
@@ -571,7 +571,8 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 "Websites"
                ]
               }
-             ]
+             ],
+             "href": "/product/websites"
             },
             {
              "t": "div",
@@ -587,7 +588,8 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 "Job Sources"
                ]
               }
-             ]
+             ],
+             "href": "/product/reporting-job-sources"
             }
            ]
           }
@@ -747,7 +749,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#e4f1e8] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-full",
+               "c": "bg-[#e4f1e8] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-[158px] shrink-0",
                "n": "Status / Request received",
                "id": "234:7314",
                "k": [
@@ -887,7 +889,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
              "k": [
               {
                "t": "div",
-               "c": "bg-[#fff4d6] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-full",
+               "c": "bg-[#fff4d6] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-[124px] shrink-0",
                "n": "Status / Email draft",
                "id": "234:7332",
                "k": [
@@ -1066,7 +1068,8 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 "Inquiry Response"
                ]
               }
-             ]
+             ],
+             "href": "/product/inquiry-response-follow-up"
             },
             {
              "t": "div",
@@ -1198,7 +1201,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
            "k": [
             {
              "t": "div",
-             "c": "bg-[#fff4d6] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#fff4d6] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-[145px] shrink-0",
              "n": "Status / Preview scope",
              "id": "234:7366",
              "k": [
@@ -1407,7 +1410,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "label": "Get a free demo",
          "kind": "Accent",
          "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#0f1530]",
-         "href": "/signup"
+         "href": "/demo"
         }
        ]
       }
@@ -1612,7 +1615,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#e4f1e8] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#e4f1e8] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-[158px] shrink-0",
              "n": "Status / Request received",
              "id": "234:7436",
              "k": [
@@ -1877,7 +1880,8 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 "Websites"
                ]
               }
-             ]
+             ],
+             "href": "/product/websites"
             },
             {
              "t": "div",
@@ -1893,7 +1897,8 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 "Job Sources"
                ]
               }
-             ]
+             ],
+             "href": "/product/reporting-job-sources"
             }
            ]
           }
@@ -2053,7 +2058,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#e4f1e8] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-full",
+               "c": "bg-[#e4f1e8] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-[158px] shrink-0",
                "n": "Status / Request received",
                "id": "234:7436",
                "k": [
@@ -2193,7 +2198,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
              "k": [
               {
                "t": "div",
-               "c": "bg-[#fff4d6] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-full",
+               "c": "bg-[#fff4d6] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-[124px] shrink-0",
                "n": "Status / Email draft",
                "id": "234:7454",
                "k": [
@@ -2372,7 +2377,8 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 "Inquiry Response"
                ]
               }
-             ]
+             ],
+             "href": "/product/inquiry-response-follow-up"
             },
             {
              "t": "div",
@@ -2504,7 +2510,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
            "k": [
             {
              "t": "div",
-             "c": "bg-[#fff4d6] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#fff4d6] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-[145px] shrink-0",
              "n": "Status / Preview scope",
              "id": "234:7488",
              "k": [
@@ -2713,7 +2719,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "label": "Get a free demo",
          "kind": "Accent",
          "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#0f1530]",
-         "href": "/signup"
+         "href": "/demo"
         }
        ]
       }
@@ -2978,7 +2984,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+                 "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[160px] shrink-0",
                  "n": "Status / Price book applied",
                  "id": "200:110",
                  "k": [
@@ -3127,7 +3133,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                   },
                   {
                    "t": "div",
-                   "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+                   "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[125px] shrink-0",
                    "n": "Status / Accepted",
                    "id": "200:130",
                    "k": [
@@ -3265,7 +3271,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
              "k": [
               {
                "t": "div",
-               "c": "bg-[#fff4d6] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-full",
+               "c": "bg-[#fff4d6] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-[124px] shrink-0",
                "n": "Status / Email draft",
                "id": "234:7543",
                "k": [
@@ -3444,7 +3450,8 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 "Inquiry Response"
                ]
               }
-             ]
+             ],
+             "href": "/product/inquiry-response-follow-up"
             }
            ]
           }
@@ -3524,7 +3531,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#fff4d6] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-full",
+               "c": "bg-[#fff4d6] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-[168px] shrink-0",
                "n": "Status / Price book applied",
                "id": "234:7576",
                "k": [
@@ -3709,7 +3716,8 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 "Price Book"
                ]
               }
-             ]
+             ],
+             "href": "/product/price-book-service-catalog"
             },
             {
              "t": "div",
@@ -3798,7 +3806,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
              "k": [
               {
                "t": "div",
-               "c": "bg-[#e4f1e8] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-full",
+               "c": "bg-[#e4f1e8] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-[174px] shrink-0",
                "n": "Status / Estimate accepted",
                "id": "234:7611",
                "k": [
@@ -3969,7 +3977,8 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 "Jobs & Work Orders"
                ]
               }
-             ]
+             ],
+             "href": "/product/jobs-work-orders"
             },
             {
              "t": "div",
@@ -4339,7 +4348,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "label": "Get a free demo",
          "kind": "Accent",
          "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#0f1530]",
-         "href": "/signup"
+         "href": "/demo"
         }
        ]
       }
@@ -4464,7 +4473,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff4d6] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#fff4d6] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-[168px] shrink-0",
              "n": "Status / Price book applied",
              "id": "234:7712",
              "k": [
@@ -4719,7 +4728,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
              "k": [
               {
                "t": "div",
-               "c": "bg-[#fff4d6] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-full",
+               "c": "bg-[#fff4d6] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-[124px] shrink-0",
                "n": "Status / Email draft",
                "id": "234:7679",
                "k": [
@@ -4898,7 +4907,8 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 "Inquiry Response"
                ]
               }
-             ]
+             ],
+             "href": "/product/inquiry-response-follow-up"
             }
            ]
           }
@@ -4978,7 +4988,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#fff4d6] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-full",
+               "c": "bg-[#fff4d6] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-[168px] shrink-0",
                "n": "Status / Price book applied",
                "id": "234:7712",
                "k": [
@@ -5163,7 +5173,8 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 "Price Book"
                ]
               }
-             ]
+             ],
+             "href": "/product/price-book-service-catalog"
             },
             {
              "t": "div",
@@ -5252,7 +5263,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
              "k": [
               {
                "t": "div",
-               "c": "bg-[#e4f1e8] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-full",
+               "c": "bg-[#e4f1e8] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-[174px] shrink-0",
                "n": "Status / Estimate accepted",
                "id": "234:7747",
                "k": [
@@ -5423,7 +5434,8 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 "Jobs & Work Orders"
                ]
               }
-             ]
+             ],
+             "href": "/product/jobs-work-orders"
             },
             {
              "t": "div",
@@ -5793,7 +5805,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "label": "Get a free demo",
          "kind": "Accent",
          "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#0f1530]",
-         "href": "/signup"
+         "href": "/demo"
         }
        ]
       }
@@ -6291,7 +6303,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
              "k": [
               {
                "t": "div",
-               "c": "bg-[#e4f1e8] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-full",
+               "c": "bg-[#e4f1e8] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-[174px] shrink-0",
                "n": "Status / Estimate accepted",
                "id": "234:7843",
                "k": [
@@ -6462,7 +6474,8 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 "Jobs & Work Orders"
                ]
               }
-             ]
+             ],
+             "href": "/product/jobs-work-orders"
             },
             {
              "t": "div",
@@ -6766,7 +6779,8 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 "Technician App"
                ]
               }
-             ]
+             ],
+             "href": "/product/technician-app"
             },
             {
              "t": "div",
@@ -6782,7 +6796,8 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 "Time & Job Photos"
                ]
               }
-             ]
+             ],
+             "href": "/product/time-tracking-job-photos"
             }
            ]
           }
@@ -6948,7 +6963,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#e4f1e8] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-full",
+               "c": "bg-[#e4f1e8] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-[172px] shrink-0",
                "n": "Status / Awaiting payment",
                "id": "234:7927",
                "k": [
@@ -7055,7 +7070,8 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 "Invoices & Payments"
                ]
               }
-             ]
+             ],
+             "href": "/product/invoices-payments"
             },
             {
              "t": "div",
@@ -7264,7 +7280,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#e4f1e8] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#e4f1e8] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-[170px] shrink-0",
              "n": "Status / Active agreement",
              "id": "234:7961",
              "k": [
@@ -7377,7 +7393,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "label": "Get a free demo",
          "kind": "Accent",
          "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#0f1530]",
-         "href": "/signup"
+         "href": "/demo"
         }
        ]
       }
@@ -7494,7 +7510,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
            "k": [
             {
              "t": "div",
-             "c": "bg-[#e4f1e8] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#e4f1e8] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-[174px] shrink-0",
              "n": "Status / Estimate accepted",
              "id": "234:7981",
              "k": [
@@ -7735,7 +7751,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
              "k": [
               {
                "t": "div",
-               "c": "bg-[#e4f1e8] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-full",
+               "c": "bg-[#e4f1e8] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-[174px] shrink-0",
                "n": "Status / Estimate accepted",
                "id": "234:7981",
                "k": [
@@ -7906,7 +7922,8 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 "Jobs & Work Orders"
                ]
               }
-             ]
+             ],
+             "href": "/product/jobs-work-orders"
             },
             {
              "t": "div",
@@ -8210,7 +8227,8 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 "Technician App"
                ]
               }
-             ]
+             ],
+             "href": "/product/technician-app"
             },
             {
              "t": "div",
@@ -8226,7 +8244,8 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 "Time & Job Photos"
                ]
               }
-             ]
+             ],
+             "href": "/product/time-tracking-job-photos"
             }
            ]
           }
@@ -8392,7 +8411,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#e4f1e8] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-full",
+               "c": "bg-[#e4f1e8] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-[172px] shrink-0",
                "n": "Status / Awaiting payment",
                "id": "234:8065",
                "k": [
@@ -8499,7 +8518,8 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 "Invoices & Payments"
                ]
               }
-             ]
+             ],
+             "href": "/product/invoices-payments"
             },
             {
              "t": "div",
@@ -8708,7 +8728,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#e4f1e8] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#e4f1e8] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-[170px] shrink-0",
              "n": "Status / Active agreement",
              "id": "234:8099",
              "k": [
@@ -8821,7 +8841,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "label": "Get a free demo",
          "kind": "Accent",
          "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#0f1530]",
-         "href": "/signup"
+         "href": "/demo"
         }
        ]
       }
@@ -8864,7 +8884,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
            ]
           },
           {
-           "t": "p",
+           "t": "h1",
            "c": "font-semibold leading-[1.08] relative text-[60px] text-[color:#0f1530] tracking-[-1.5px] w-full",
            "id": "203:10669",
            "k": [
@@ -9102,7 +9122,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+                 "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[190px] shrink-0",
                  "n": "Status / ACTIVE AGREEMENT",
                  "id": "200:304",
                  "k": [
@@ -9162,7 +9182,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                  ]
                 },
                 {
-                 "t": "h1",
+                 "t": "p",
                  "c": "font-bold leading-[1.08] relative text-[64px] text-[color:#0f1530] tracking-[-1.6px] w-full",
                  "id": "200:313",
                  "k": [
@@ -9371,7 +9391,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#e4f1e8] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-full",
+               "c": "bg-[#e4f1e8] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-[170px] shrink-0",
                "n": "Status / Active agreement",
                "id": "234:8251",
                "k": [
@@ -9462,7 +9482,8 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 "Jobs & Work Orders"
                ]
               }
-             ]
+             ],
+             "href": "/product/jobs-work-orders"
             },
             {
              "t": "div",
@@ -9478,7 +9499,8 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 "Service Agreements"
                ]
               }
-             ]
+             ],
+             "href": "/product/service-agreements"
             }
            ]
           }
@@ -9550,7 +9572,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
              "k": [
               {
                "t": "div",
-               "c": "bg-[#fff4d6] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-full",
+               "c": "bg-[#fff4d6] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-[124px] shrink-0",
                "n": "Status / Email draft",
                "id": "234:8274",
                "k": [
@@ -9726,7 +9748,8 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 "Reminders & Win-backs"
                ]
               }
-             ]
+             ],
+             "href": "/product/reminders-win-backs"
             }
            ]
           }
@@ -10088,7 +10111,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
            "k": [
             {
              "t": "div",
-             "c": "bg-[#fff4d6] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#fff4d6] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-[124px] shrink-0",
              "n": "Status / Email draft",
              "id": "234:8335",
              "k": [
@@ -10123,7 +10146,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
              "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#2a3360] w-full",
              "id": "234:8339",
              "k": [
-              "How was your visit? Share your experience with the team."
+              "Thanks for choosing us. Here's what we did today."
              ]
             },
             {
@@ -10270,7 +10293,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "label": "Get a free demo",
          "kind": "Accent",
          "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#0f1530]",
-         "href": "/signup"
+         "href": "/demo"
         }
        ]
       }
@@ -10475,7 +10498,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#e4f1e8] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#e4f1e8] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-[170px] shrink-0",
              "n": "Status / Active agreement",
              "id": "234:8375",
              "k": [
@@ -10724,7 +10747,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#e4f1e8] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-full",
+               "c": "bg-[#e4f1e8] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-[170px] shrink-0",
                "n": "Status / Active agreement",
                "id": "234:8375",
                "k": [
@@ -10815,7 +10838,8 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 "Jobs & Work Orders"
                ]
               }
-             ]
+             ],
+             "href": "/product/jobs-work-orders"
             },
             {
              "t": "div",
@@ -10831,7 +10855,8 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 "Service Agreements"
                ]
               }
-             ]
+             ],
+             "href": "/product/service-agreements"
             }
            ]
           }
@@ -10903,7 +10928,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
              "k": [
               {
                "t": "div",
-               "c": "bg-[#fff4d6] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-full",
+               "c": "bg-[#fff4d6] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-[124px] shrink-0",
                "n": "Status / Email draft",
                "id": "234:8398",
                "k": [
@@ -11079,7 +11104,8 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 "Reminders & Win-backs"
                ]
               }
-             ]
+             ],
+             "href": "/product/reminders-win-backs"
             }
            ]
           }
@@ -11441,7 +11467,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
            "k": [
             {
              "t": "div",
-             "c": "bg-[#fff4d6] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#fff4d6] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-[124px] shrink-0",
              "n": "Status / Email draft",
              "id": "234:8459",
              "k": [
@@ -11476,7 +11502,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
              "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#2a3360] w-full",
              "id": "234:8463",
              "k": [
-              "How was your visit? Share your experience with the team."
+              "Thanks for choosing us. Here's what we did today."
              ]
             },
             {
@@ -11623,7 +11649,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "label": "Get a free demo",
          "kind": "Accent",
          "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#0f1530]",
-         "href": "/signup"
+         "href": "/demo"
         }
        ]
       }
@@ -11979,7 +12005,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
              "k": [
               {
                "t": "div",
-               "c": "bg-[#fff4d6] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-full",
+               "c": "bg-[#fff4d6] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-[170px] shrink-0",
                "n": "Status / Example controls",
                "id": "234:8514",
                "k": [
@@ -12420,7 +12446,8 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 "Customers & Assets"
                ]
               }
-             ]
+             ],
+             "href": "/product/customers-properties-assets"
             },
             {
              "t": "div",
@@ -12436,7 +12463,8 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 "Data Import"
                ]
               }
-             ]
+             ],
+             "href": "/product/onboarding-data-import"
             }
            ]
           }
@@ -12712,7 +12740,8 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 "Reporting & Sources"
                ]
               }
-             ]
+             ],
+             "href": "/product/reporting-job-sources"
             },
             {
              "t": "div",
@@ -12728,7 +12757,8 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 "Revenue Intelligence"
                ]
               }
-             ]
+             ],
+             "href": "/product/ai-revenue-intelligence"
             }
            ]
           }
@@ -12826,7 +12856,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
            "k": [
             {
              "t": "div",
-             "c": "bg-[#fff4d6] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#fff4d6] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-[188px] shrink-0",
              "n": "Status / Owner review needed",
              "id": "234:8612",
              "k": [
@@ -13067,7 +13097,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "label": "Get a free demo",
          "kind": "Accent",
          "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#0f1530]",
-         "href": "/signup"
+         "href": "/demo"
         }
        ]
       }
@@ -13421,7 +13451,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
              "k": [
               {
                "t": "div",
-               "c": "bg-[#fff4d6] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-full",
+               "c": "bg-[#fff4d6] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-[170px] shrink-0",
                "n": "Status / Example controls",
                "id": "234:8672",
                "k": [
@@ -13862,7 +13892,8 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 "Customers & Assets"
                ]
               }
-             ]
+             ],
+             "href": "/product/customers-properties-assets"
             },
             {
              "t": "div",
@@ -13878,7 +13909,8 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 "Data Import"
                ]
               }
-             ]
+             ],
+             "href": "/product/onboarding-data-import"
             }
            ]
           }
@@ -14154,7 +14186,8 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 "Reporting & Sources"
                ]
               }
-             ]
+             ],
+             "href": "/product/reporting-job-sources"
             },
             {
              "t": "div",
@@ -14170,7 +14203,8 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 "Revenue Intelligence"
                ]
               }
-             ]
+             ],
+             "href": "/product/ai-revenue-intelligence"
             }
            ]
           }
@@ -14268,7 +14302,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
            "k": [
             {
              "t": "div",
-             "c": "bg-[#fff4d6] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#fff4d6] flex h-[30px] items-center px-[10px] relative rounded-[12px] w-[188px] shrink-0",
              "n": "Status / Owner review needed",
              "id": "234:8770",
              "k": [
@@ -14509,7 +14543,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "label": "Get a free demo",
          "kind": "Accent",
          "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#0f1530]",
-         "href": "/signup"
+         "href": "/demo"
         }
        ]
       }
@@ -14719,7 +14753,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#fff] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-full",
+                 "c": "bg-[#fff] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[229.778px] shrink-0",
                  "n": "Status / Tulsa + surrounding areas",
                  "id": "I203:8097;200:64",
                  "k": [
@@ -15501,2531 +15535,40 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
      "n": "03 / Connected workflow and demo",
      "id": "203:8214",
      "k": [
-      {
-       "t": "p",
-       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#f6b400] tracking-[1.1px] w-full",
-       "id": "219:9968",
-       "k": [
-        "WORKS ACROSS YOUR BUSINESS"
-       ]
-      },
-      {
-       "t": "p",
-       "c": "font-semibold leading-[1.08] relative text-[36px] text-[color:#fff] tracking-[-0.9px] w-full",
-       "id": "219:9969",
-       "k": [
-        "One job. Connected all the way."
-       ]
-      },
-      {
-       "t": "div",
-       "c": "flex gap-[16px] items-center relative w-full",
-       "n": "Flagship and tool handoff",
-       "id": "219:9970",
-       "k": [
-        {
-         "t": "div",
-         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] flex-1 min-w-0",
-         "n": "Connected feature / Websites / Desktop",
-         "id": "219:9981",
-         "k": [
-          {
-           "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
-           "n": "Suite and record",
-           "id": "219:9972",
-           "k": [
-            {
-             "t": "div",
-             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
-             "n": "Status / Growth",
-             "id": "219:9973",
-             "k": [
-              {
-               "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
-               "id": "219:9974",
-               "k": [
-                "Growth"
-               ]
-              }
-             ]
-            },
-            {
-             "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[222px] shrink-0",
-             "id": "219:9975",
-             "k": [
-              "Inquiry #1042"
-             ]
-            }
-           ]
-          },
-          {
-           "t": "p",
-           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
-           "id": "219:9976",
-           "k": [
-            "Websites"
-           ]
-          },
-          {
-           "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
-           "n": "Handoff evidence",
-           "id": "219:9977",
-           "k": [
-            {
-             "t": "div",
-             "c": "relative size-[18px]",
-             "n": "Icon / check",
-             "id": "219:9978",
-             "k": [
-              {
-               "t": "img",
-               "c": "absolute block inset-0 size-full",
-               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
-              }
-             ]
-            },
-            {
-             "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
-             "id": "219:9980",
-             "k": [
-              "Service selected"
-             ]
-            }
-           ]
-          }
-         ]
-        },
-        {
-         "t": "div",
-         "c": "flex h-[24px] items-center justify-center relative w-[32px] shrink-0",
-         "n": "Next connected state",
-         "id": "219:9982",
-         "k": [
-          {
-           "t": "div",
-           "c": "relative size-[24px]",
-           "n": "Icon / arrow",
-           "id": "219:9983",
-           "k": [
-            {
-             "t": "img",
-             "c": "absolute block inset-0 size-full",
-             "src": "/marketing/flagship/icon-arrow-84befcc1.svg"
-            }
-           ]
-          }
-         ]
-        },
-        {
-         "t": "div",
-         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] flex-1 min-w-0",
-         "n": "Connected feature / Online booking / Desktop",
-         "id": "219:9995",
-         "k": [
-          {
-           "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
-           "n": "Suite and record",
-           "id": "219:9986",
-           "k": [
-            {
-             "t": "div",
-             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
-             "n": "Status / Growth",
-             "id": "219:9987",
-             "k": [
-              {
-               "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
-               "id": "219:9988",
-               "k": [
-                "Growth"
-               ]
-              }
-             ]
-            },
-            {
-             "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[222px] shrink-0",
-             "id": "219:9989",
-             "k": [
-              "Job #1042 · Jordan Lee"
-             ]
-            }
-           ]
-          },
-          {
-           "t": "p",
-           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
-           "id": "219:9990",
-           "k": [
-            "Online booking"
-           ]
-          },
-          {
-           "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
-           "n": "Handoff evidence",
-           "id": "219:9991",
-           "k": [
-            {
-             "t": "div",
-             "c": "relative size-[18px]",
-             "n": "Icon / check",
-             "id": "219:9992",
-             "k": [
-              {
-               "t": "img",
-               "c": "absolute block inset-0 size-full",
-               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
-              }
-             ]
-            },
-            {
-             "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
-             "id": "219:9994",
-             "k": [
-              "Visit requested"
-             ]
-            }
-           ]
-          }
-         ]
-        },
-        {
-         "t": "div",
-         "c": "flex h-[24px] items-center justify-center relative w-[32px] shrink-0",
-         "n": "Next connected state",
-         "id": "219:9996",
-         "k": [
-          {
-           "t": "div",
-           "c": "relative size-[24px]",
-           "n": "Icon / arrow",
-           "id": "219:9997",
-           "k": [
-            {
-             "t": "img",
-             "c": "absolute block inset-0 size-full",
-             "src": "/marketing/flagship/icon-arrow-84befcc1.svg"
-            }
-           ]
-          }
-         ]
-        },
-        {
-         "t": "div",
-         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] flex-1 min-w-0",
-         "n": "Connected feature / Scheduling & dispatch / Desktop",
-         "id": "219:10009",
-         "k": [
-          {
-           "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
-           "n": "Suite and record",
-           "id": "219:10000",
-           "k": [
-            {
-             "t": "div",
-             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
-             "n": "Status / Operations",
-             "id": "219:10001",
-             "k": [
-              {
-               "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
-               "id": "219:10002",
-               "k": [
-                "Operations"
-               ]
-              }
-             ]
-            },
-            {
-             "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[222px] shrink-0",
-             "id": "219:10003",
-             "k": [
-              "Job #1042 · Jordan Lee"
-             ]
-            }
-           ]
-          },
-          {
-           "t": "p",
-           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
-           "id": "219:10004",
-           "k": [
-            "Scheduling & dispatch"
-           ]
-          },
-          {
-           "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
-           "n": "Handoff evidence",
-           "id": "219:10005",
-           "k": [
-            {
-             "t": "div",
-             "c": "relative size-[18px]",
-             "n": "Icon / check",
-             "id": "219:10006",
-             "k": [
-              {
-               "t": "img",
-               "c": "absolute block inset-0 size-full",
-               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
-              }
-             ]
-            },
-            {
-             "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
-             "id": "219:10008",
-             "k": [
-              "Assigned to Maya"
-             ]
-            }
-           ]
-          }
-         ]
-        }
-       ]
-      },
-      {
-       "t": "button",
-       "label": "Get a free demo",
-       "kind": "Accent",
-       "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#0f1530]",
-       "href": "/signup"
-      }
-     ]
-    }
-   ]
-  },
-  "mobile": {
-   "t": "div",
-   "c": "bg-[#fbf6ef] flex flex-col items-start relative",
-   "n": "Online Booking / Mobile",
-   "id": "175:1582",
-   "k": [
-    {
-     "t": "div",
-     "c": "bg-[#fbf6ef] flex flex-col gap-[32px] items-start p-[24px] relative w-full",
-     "n": "01 / Product in view",
-     "id": "203:8230",
-     "k": [
-      {
-       "t": "div",
-       "c": "flex flex-col gap-[32px] items-start relative w-full",
-       "n": "Outcome and product",
-       "id": "203:8231",
-       "k": [
-        {
-         "t": "div",
-         "c": "flex flex-col gap-[20px] items-start relative w-full",
-         "n": "Short outcome copy",
-         "id": "203:8232",
-         "k": [
-          {
-           "t": "p",
-           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
-           "id": "203:8233",
-           "k": [
-            "ONLINE BOOKING"
-           ]
-          },
-          {
-           "t": "h1",
-           "c": "font-semibold leading-[1.08] relative text-[40px] text-[color:#0f1530] tracking-[-1px] w-full",
-           "id": "203:8234",
-           "k": [
-            "Your next job starts here."
-           ]
-          },
-          {
-           "t": "p",
-           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-full",
-           "id": "203:8235",
-           "k": [
-            "Let customers choose a service and request a real opening."
-           ]
-          },
-          {
-           "t": "button",
-           "label": "Try the booking flow",
-           "kind": "Dark",
-           "c": "bg-[#0f1530] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#fbf6ef]",
-           "href": "#workflow-m"
-          },
-          {
-           "t": "p",
-           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
-           "id": "203:8238",
-           "k": [
-            "EXAMPLE BUSINESS · JUNIPER"
-           ]
-          }
-         ]
-        },
-        {
-         "t": "div",
-         "c": "bg-[#f6f7f9] border-[0.475px] border-[#e6dccb] border-solid flex flex-col h-[231.8px] items-start overflow-clip relative rounded-[7.6px] w-full",
-         "n": "Product demonstration / Online Booking",
-         "id": "203:8239",
-         "k": [
-          {
-           "t": "div",
-           "c": "bg-[#0f1530] flex gap-[7.6px] h-[25.65px] items-center p-[7.6px] relative w-full",
-           "n": "Product chrome",
-           "id": "I203:8239;200:48",
-           "k": [
-            {
-             "t": "p",
-             "c": "font-bold leading-[1.38] relative text-[8.07px] text-[color:#fff] w-[66.5px] shrink-0",
-             "id": "I203:8239;200:49",
-             "k": [
-              "Renvani"
-             ]
-            },
-            {
-             "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[5.7px] text-[color:#fff] w-[196.65px] shrink-0",
-             "id": "I203:8239;200:50",
-             "k": [
-              "Online booking"
-             ]
-            },
-            {
-             "t": "div",
-             "c": "bg-[#f6b400] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[48.45px] shrink-0",
-             "n": "Status / EXAMPLE",
-             "id": "I203:8239;200:51",
-             "k": [
-              {
-               "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#0f1530] w-[38.95px] shrink-0",
-               "id": "I203:8239;200:52",
-               "k": [
-                "EXAMPLE"
-               ]
-              }
-             ]
-            }
-           ]
-          },
-          {
-           "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[7.6px] items-start p-[11.4px] relative w-full",
-           "n": "Product workspace",
-           "id": "I203:8239;200:53",
-           "k": [
-            {
-             "t": "div",
-             "c": "flex gap-[7.6px] items-start relative w-full",
-             "n": "Screen title",
-             "id": "I203:8239;200:54",
-             "k": [
-              {
-               "t": "p",
-               "c": "font-semibold leading-[1.38] relative text-[10.92px] text-[color:#0f1530] w-[218.5px] shrink-0",
-               "id": "I203:8239;200:55",
-               "k": [
-                "Online booking"
-               ]
-              },
-              {
-               "t": "div",
-               "c": "bg-[#fff] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[85.5px] shrink-0",
-               "n": "Status / Your business",
-               "id": "I203:8239;200:56",
-               "k": [
-                {
-                 "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#2a3360] w-[76px] shrink-0",
-                 "id": "I203:8239;200:57",
-                 "k": [
-                  "Your business"
-                 ]
-                }
-               ]
-              }
-             ]
-            },
-            {
-             "t": "div",
-             "c": "flex gap-[9.5px] items-start relative w-full",
-             "n": "Branded website and booking",
-             "id": "I203:8239;200:58",
-             "k": [
-              {
-               "t": "div",
-               "c": "flex flex-col gap-[5.7px] items-start relative w-[135.85px] shrink-0",
-               "n": "Business website",
-               "id": "I203:8239;200:59",
-               "k": [
-                {
-                 "t": "div",
-                 "c": "h-[79.8px] relative rounded-[7.6px] w-full",
-                 "n": "Trade work on the customer website",
-                 "id": "I203:8239;200:60",
-                 "k": [
-                  {
-                   "t": "img",
-                   "c": "absolute inset-0 object-cover rounded-[7.6px] size-full",
-                   "src": "/marketing/flagship/trade-work-on-the-customer-website-f1266660.jpg"
-                  }
-                 ]
-                },
-                {
-                 "t": "p",
-                 "c": "font-bold leading-[1.38] relative text-[12.35px] text-[color:#0f1530] w-full",
-                 "id": "I203:8239;200:61",
-                 "k": [
-                  "Juniper"
-                 ]
-                },
-                {
-                 "t": "p",
-                 "c": "font-normal leading-[1.38] relative text-[5.7px] text-[color:#2a3360] w-full",
-                 "id": "I203:8239;200:62",
-                 "k": [
-                  "Heating & Plumbing"
-                 ]
-                },
-                {
-                 "t": "p",
-                 "c": "font-semibold leading-[1.38] relative text-[9.5px] text-[color:#0f1530] w-full",
-                 "id": "I203:8239;200:63",
-                 "k": [
-                  "Comfort starts at home."
-                 ]
-                },
-                {
-                 "t": "div",
-                 "c": "bg-[#fff] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-full",
-                 "n": "Status / Tulsa + surrounding areas",
-                 "id": "I203:8239;200:64",
-                 "k": [
-                  {
-                   "t": "p",
-                   "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#2a3360] w-[95px] shrink-0",
-                   "id": "I203:8239;200:65",
-                   "k": [
-                    "Tulsa + surrounding areas"
-                   ]
-                  }
-                 ]
-                }
-               ]
-              },
-              {
-               "t": "div",
-               "c": "bg-[#fff] border-[0.475px] border-[#e6dccb] border-solid flex flex-col gap-[6.65px] items-start p-[9.5px] relative rounded-[7.6px] w-[173.85px] shrink-0",
-               "n": "Book a visit",
-               "id": "I203:8239;200:66",
-               "k": [
-                {
-                 "t": "p",
-                 "c": "font-semibold leading-[1.38] relative text-[9.97px] text-[color:#0f1530] w-full",
-                 "id": "I203:8239;200:67",
-                 "k": [
-                  "Book a visit"
-                 ]
-                },
-                {
-                 "t": "p",
-                 "c": "font-normal leading-[1.38] relative text-[5.7px] text-[color:#2a3360] w-full",
-                 "id": "I203:8239;200:68",
-                 "k": [
-                  "Choose your service"
-                 ]
-                },
-                {
-                 "t": "div",
-                 "c": "bg-[#fff4d6] flex font-medium gap-[5.7px] items-start leading-[1.38] p-[5.7px] relative rounded-[5.7px] text-[6.17px] text-[color:#0f1530] w-full",
-                 "n": "AC tune-up",
-                 "id": "I203:8239;200:69",
-                 "k": [
-                  {
-                   "t": "p",
-                   "c": "relative w-[114px] shrink-0",
-                   "id": "I203:8239;200:70",
-                   "k": [
-                    "AC tune-up"
-                   ]
-                  },
-                  {
-                   "t": "p",
-                   "c": "relative w-[23.75px] shrink-0",
-                   "id": "I203:8239;200:71",
-                   "k": [
-                    "$89"
-                   ]
-                  }
-                 ]
-                },
-                {
-                 "t": "div",
-                 "c": "bg-[#f6f7f9] flex font-medium gap-[5.7px] items-start leading-[1.38] p-[5.7px] relative rounded-[5.7px] text-[6.17px] text-[color:#0f1530] w-full",
-                 "n": "Plumbing diagnostic",
-                 "id": "I203:8239;200:72",
-                 "k": [
-                  {
-                   "t": "p",
-                   "c": "relative w-[114px] shrink-0",
-                   "id": "I203:8239;200:73",
-                   "k": [
-                    "Plumbing diagnostic"
-                   ]
-                  },
-                  {
-                   "t": "p",
-                   "c": "relative w-[23.75px] shrink-0",
-                   "id": "I203:8239;200:74",
-                   "k": [
-                    "$99"
-                   ]
-                  }
-                 ]
-                },
-                {
-                 "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[5.7px] text-[color:#0f1530] w-full",
-                 "id": "I203:8239;200:75",
-                 "k": [
-                  "Next available day"
-                 ]
-                },
-                {
-                 "t": "div",
-                 "c": "flex gap-[4.75px] items-start relative w-full",
-                 "n": "Available visits",
-                 "id": "I203:8239;200:76",
-                 "k": [
-                  {
-                   "t": "div",
-                   "c": "bg-[#0f1530] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[72.2px] shrink-0",
-                   "n": "Status / 10:00–12:00",
-                   "id": "I203:8239;200:77",
-                   "k": [
-                    {
-                     "t": "p",
-                     "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#fff] w-[62.7px] shrink-0",
-                     "id": "I203:8239;200:78",
-                     "k": [
-                      "10:00–12:00"
-                     ]
-                    }
-                   ]
-                  },
-                  {
-                   "t": "div",
-                   "c": "bg-[#fbf6ef] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[72.2px] shrink-0",
-                   "n": "Status / 14:00–16:00",
-                   "id": "I203:8239;200:79",
-                   "k": [
-                    {
-                     "t": "p",
-                     "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#0f1530] w-[62.7px] shrink-0",
-                     "id": "I203:8239;200:80",
-                     "k": [
-                      "14:00–16:00"
-                     ]
-                    }
-                   ]
-                  }
-                 ]
-                },
-                {
-                 "t": "div",
-                 "c": "bg-[#f6b400] flex h-[18.05px] items-center justify-center px-[6.65px] relative rounded-[5.7px] w-full",
-                 "n": "UI action / Request this visit",
-                 "id": "I203:8239;200:81",
-                 "k": [
-                  {
-                   "t": "p",
-                   "c": "font-medium leading-[1.38] relative text-[5.7px] text-[color:#0f1530] text-center w-[141.55px] shrink-0",
-                   "id": "I203:8239;200:82",
-                   "k": [
-                    "Request this visit"
-                   ]
-                  }
-                 ]
-                }
-               ]
-              }
-             ]
-            }
-           ]
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "t": "div",
-     "c": "bg-[#fff] flex flex-col gap-[32px] items-start p-[24px] relative w-full",
-     "n": "02 / A workflow you can see",
-     "id": "203:8275",
-     "k": [
-      {
-       "t": "div",
-       "c": "flex flex-col gap-[12px] items-start leading-[1.38] relative w-full",
-       "n": "Workflow heading",
-       "id": "203:8276",
-       "k": [
-        {
-         "t": "p",
-         "c": "font-medium relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
-         "id": "203:8277",
-         "k": [
-          "EXAMPLE WORKFLOW"
-         ]
-        },
-        {
-         "t": "p",
-         "c": "font-semibold relative text-[32px] text-[color:#0f1530] w-full",
-         "id": "203:8278",
-         "k": [
-          "See the work happen."
-         ]
-        }
-       ]
-      },
-      {
-       "t": "div",
-       "c": "flex flex-col gap-[24px] items-start relative w-full",
-       "n": "Three product moments",
-       "id": "203:8279",
-       "k": [
-        {
-         "t": "div",
-         "c": "bg-[#fff] border-[0.855px] border-[#e6dccb] border-solid flex flex-col gap-[15.39px] h-[444.6px] items-start p-[18.81px] relative rounded-[13.68px] w-full",
-         "n": "Workflow moment / Choose the service",
-         "id": "203:8280",
-         "k": [
-          {
-           "t": "div",
-           "c": "flex gap-[10.26px] items-start relative w-full",
-           "n": "Step heading",
-           "id": "I203:8280;203:8139",
-           "k": [
-            {
-             "t": "div",
-             "c": "bg-[#0f1530] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[34.2px] shrink-0",
-             "n": "Status / 01",
-             "id": "I203:8280;203:8140",
-             "k": [
-              {
-               "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#fff] w-[17.1px] shrink-0",
-               "id": "I203:8280;203:8141",
-               "k": [
-                "01"
-               ]
-              }
-             ]
-            },
-            {
-             "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[15.39px] text-[color:#0f1530] flex-1 min-w-0",
-             "id": "I203:8280;203:8142",
-             "k": [
-              "Choose the service"
-             ]
-            }
-           ]
-          },
-          {
-           "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[11.97px] h-[342px] items-start p-[15.39px] relative rounded-[10.26px] w-full",
-           "n": "Illustrated product state / services",
-           "id": "I203:8280;203:8143",
-           "k": [
-            {
-             "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[16.24px] text-[color:#0f1530] w-full",
-             "id": "I203:8280;203:8144",
-             "k": [
-              "What can we help with?"
-             ]
-            },
-            {
-             "t": "div",
-             "c": "bg-[#fff4d6] flex gap-[8.55px] h-[51.3px] items-start p-[10.26px] relative rounded-[10.26px] w-full",
-             "n": "AC tune-up",
-             "id": "I203:8280;203:8145",
-             "k": [
-              {
-               "t": "div",
-               "c": "relative size-[18.81px]",
-               "n": "Icon / check",
-               "id": "I203:8280;203:8146",
+     
+... 736292 bytes omitted ...
+    "n": "Icon / check",
+               "id": "219:7909",
                "k": [
                 {
                  "t": "img",
                  "c": "absolute block inset-0 size-full",
-                 "src": "/marketing/flagship/icon-check1-514b67c3.svg"
+                 "src": "/marketing/flagship/icon-check1-46fe38a0.svg"
                 }
                ]
               },
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[11.97px] text-[color:#0f1530] w-[166.725px] shrink-0",
-               "id": "I203:8280;203:8148",
+               "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] flex-1 min-w-0",
+               "id": "219:7911",
                "k": [
-                "AC tune-up"
-               ]
-              },
-              {
-               "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[11.97px] text-[color:#0f1530] w-[38.475px] shrink-0",
-               "id": "I203:8280;203:8149",
-               "k": [
-                "$89"
+                "Stop when the customer replies"
                ]
               }
-             ]
-            },
-            {
-             "t": "div",
-             "c": "bg-[#fff] flex gap-[8.55px] h-[51.3px] items-start p-[10.26px] relative rounded-[10.26px] w-full",
-             "n": "Plumbing diagnostic",
-             "id": "I203:8280;203:8150",
-             "k": [
-              {
-               "t": "div",
-               "c": "relative size-[18.81px]",
-               "n": "Icon / plus",
-               "id": "I203:8280;203:8151",
-               "k": [
-                {
-                 "t": "img",
-                 "c": "absolute block inset-0 size-full",
-                 "src": "/marketing/flagship/icon-plus-6523beab.svg"
-                }
-               ]
-              },
-              {
-               "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[11.97px] text-[color:#0f1530] w-[166.725px] shrink-0",
-               "id": "I203:8280;203:8153",
-               "k": [
-                "Plumbing diagnostic"
-               ]
-              },
-              {
-               "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[11.97px] text-[color:#0f1530] w-[38.475px] shrink-0",
-               "id": "I203:8280;203:8154",
-               "k": [
-                "$99"
-               ]
-              }
-             ]
-            },
-            {
-             "t": "div",
-             "c": "bg-[#0f1530] flex h-[32.49px] items-center justify-center px-[11.97px] relative rounded-[10.26px] w-full",
-             "n": "UI action / Select service",
-             "id": "I203:8280;203:8155",
-             "k": [
-              {
-               "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[10.26px] text-[color:#fff] text-center flex-1 min-w-0",
-               "id": "I203:8280;203:8156",
-               "k": [
-                "Select service"
-               ]
-              }
-             ]
-            }
-           ]
-          }
-         ]
-        },
-        {
-         "t": "div",
-         "c": "bg-[#fff] border-[0.855px] border-[#e6dccb] border-solid flex flex-col gap-[15.39px] h-[444.6px] items-start p-[18.81px] relative rounded-[13.68px] w-full",
-         "n": "Workflow moment / Find a time",
-         "id": "203:8299",
-         "k": [
-          {
-           "t": "div",
-           "c": "flex gap-[10.26px] items-start relative w-full",
-           "n": "Step heading",
-           "id": "I203:8299;203:8159",
-           "k": [
-            {
-             "t": "div",
-             "c": "bg-[#0f1530] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[34.2px] shrink-0",
-             "n": "Status / 02",
-             "id": "I203:8299;203:8160",
-             "k": [
-              {
-               "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#fff] w-[17.1px] shrink-0",
-               "id": "I203:8299;203:8161",
-               "k": [
-                "02"
-               ]
-              }
-             ]
-            },
-            {
-             "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[15.39px] text-[color:#0f1530] flex-1 min-w-0",
-             "id": "I203:8299;203:8162",
-             "k": [
-              "Find a time"
-             ]
-            }
-           ]
-          },
-          {
-           "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[11.97px] h-[342px] items-start p-[15.39px] relative rounded-[10.26px] w-full",
-           "n": "Illustrated product state / calendar",
-           "id": "I203:8299;203:8163",
-           "k": [
-            {
-             "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[17.95px] text-[color:#0f1530] w-full",
-             "id": "I203:8299;203:8164",
-             "k": [
-              "October 2026"
-             ]
-            },
-            {
-             "t": "div",
-             "c": "flex font-medium gap-[3.42px] items-start leading-[1.38] relative text-[10.26px] text-[color:#2a3360] text-center w-full",
-             "n": "Weekday labels",
-             "id": "I203:8299;203:8165",
-             "k": [
-              {
-               "t": "p",
-               "c": "relative w-[35.91px] shrink-0",
-               "id": "I203:8299;203:8166",
-               "k": [
-                "M"
-               ]
-              },
-              {
-               "t": "p",
-               "c": "relative w-[35.91px] shrink-0",
-               "id": "I203:8299;203:8167",
-               "k": [
-                "T"
-               ]
-              },
-              {
-               "t": "p",
-               "c": "relative w-[35.91px] shrink-0",
-               "id": "I203:8299;203:8168",
-               "k": [
-                "W"
-               ]
-              },
-              {
-               "t": "p",
-               "c": "relative w-[35.91px] shrink-0",
-               "id": "I203:8299;203:8169",
-               "k": [
-                "T"
-               ]
-              },
-              {
-               "t": "p",
-               "c": "relative w-[35.91px] shrink-0",
-               "id": "I203:8299;203:8170",
-               "k": [
-                "F"
-               ]
-              },
-              {
-               "t": "p",
-               "c": "relative w-[35.91px] shrink-0",
-               "id": "I203:8299;203:8171",
-               "k": [
-                "S"
-               ]
-              },
-              {
-               "t": "p",
-               "c": "relative w-[35.91px] shrink-0",
-               "id": "I203:8299;203:8172",
-               "k": [
-                "S"
-               ]
-              }
-             ]
-            },
-            {
-             "t": "div",
-             "c": "flex gap-[3.42px] items-start relative w-full",
-             "n": "Available dates",
-             "id": "I203:8299;203:8173",
-             "k": [
-              {
-               "t": "div",
-               "c": "bg-[#fff] flex items-center justify-center relative rounded-[10.26px] size-[35.91px]",
-               "n": "Date 26",
-               "id": "I203:8299;203:8174",
-               "k": [
-                {
-                 "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[12.82px] text-[color:#0f1530] text-center w-[34.2px] shrink-0",
-                 "id": "I203:8299;203:8175",
-                 "k": [
-                  "26"
-                 ]
-                }
-               ]
-              },
-              {
-               "t": "div",
-               "c": "bg-[#fff] flex items-center justify-center relative rounded-[10.26px] size-[35.91px]",
-               "n": "Date 27",
-               "id": "I203:8299;203:8176",
-               "k": [
-                {
-                 "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[12.82px] text-[color:#0f1530] text-center w-[34.2px] shrink-0",
-                 "id": "I203:8299;203:8177",
-                 "k": [
-                  "27"
-                 ]
-                }
-               ]
-              },
-              {
-               "t": "div",
-               "c": "bg-[#fff] flex items-center justify-center relative rounded-[10.26px] size-[35.91px]",
-               "n": "Date 28",
-               "id": "I203:8299;203:8178",
-               "k": [
-                {
-                 "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[12.82px] text-[color:#0f1530] text-center w-[34.2px] shrink-0",
-                 "id": "I203:8299;203:8179",
-                 "k": [
-                  "28"
-                 ]
-                }
-               ]
-              },
-              {
-               "t": "div",
-               "c": "bg-[#0f1530] flex items-center justify-center relative rounded-[10.26px] size-[35.91px]",
-               "n": "Date 29",
-               "id": "I203:8299;203:8180",
-               "k": [
-                {
-                 "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[12.82px] text-[color:#fff] text-center w-[34.2px] shrink-0",
-                 "id": "I203:8299;203:8181",
-                 "k": [
-                  "29"
-                 ]
-                }
-               ]
-              },
-              {
-               "t": "div",
-               "c": "bg-[#fff] flex items-center justify-center relative rounded-[10.26px] size-[35.91px]",
-               "n": "Date 30",
-               "id": "I203:8299;203:8182",
-               "k": [
-                {
-                 "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[12.82px] text-[color:#0f1530] text-center w-[34.2px] shrink-0",
-                 "id": "I203:8299;203:8183",
-                 "k": [
-                  "30"
-                 ]
-                }
-               ]
-              },
-              {
-               "t": "div",
-               "c": "bg-[#fff] flex items-center justify-center relative rounded-[10.26px] size-[35.91px]",
-               "n": "Date 31",
-               "id": "I203:8299;203:8184",
-               "k": [
-                {
-                 "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[12.82px] text-[color:#0f1530] text-center w-[34.2px] shrink-0",
-                 "id": "I203:8299;203:8185",
-                 "k": [
-                  "31"
-                 ]
-                }
-               ]
-              },
-              {
-               "t": "div",
-               "c": "bg-[#fff] flex items-center justify-center relative rounded-[10.26px] size-[35.91px]",
-               "n": "Date 1",
-               "id": "I203:8299;203:8186",
-               "k": [
-                {
-                 "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[12.82px] text-[color:#0f1530] text-center w-[34.2px] shrink-0",
-                 "id": "I203:8299;203:8187",
-                 "k": [
-                  "1"
-                 ]
-                }
-               ]
-              }
-             ]
-            },
-            {
-             "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[11.97px] text-[color:#2a3360] w-full",
-             "id": "I203:8299;203:8188",
-             "k": [
-              "Choose an available visit"
-             ]
-            },
-            {
-             "t": "div",
-             "c": "flex gap-[8.55px] items-start relative w-full",
-             "n": "Time choices",
-             "id": "I203:8299;203:8189",
-             "k": [
-              {
-               "t": "div",
-               "c": "bg-[#fff4d6] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[131.67px] shrink-0",
-               "n": "Status / 10:00–12:00",
-               "id": "I203:8299;203:8190",
-               "k": [
-                {
-                 "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#0f1530] w-[114.57px] shrink-0",
-                 "id": "I203:8299;203:8191",
-                 "k": [
-                  "10:00–12:00"
-                 ]
-                }
-               ]
-              },
-              {
-               "t": "div",
-               "c": "bg-[#fff] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[131.67px] shrink-0",
-               "n": "Status / 14:00–16:00",
-               "id": "I203:8299;203:8192",
-               "k": [
-                {
-                 "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#0f1530] w-[114.57px] shrink-0",
-                 "id": "I203:8299;203:8193",
-                 "k": [
-                  "14:00–16:00"
-                 ]
-                }
-               ]
-              }
-             ]
-            },
-            {
-             "t": "div",
-             "c": "bg-[#0f1530] flex h-[32.49px] items-center justify-center px-[11.97px] relative rounded-[10.26px] w-full",
-             "n": "UI action / Choose this time",
-             "id": "I203:8299;203:8194",
-             "k": [
-              {
-               "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[10.26px] text-[color:#fff] text-center flex-1 min-w-0",
-               "id": "I203:8299;203:8195",
-               "k": [
-                "Choose this time"
-               ]
-              }
-             ]
-            }
-           ]
-          }
-         ]
-        },
-        {
-         "t": "div",
-         "c": "bg-[#fff] border-[0.855px] border-[#e6dccb] border-solid flex flex-col gap-[15.39px] h-[444.6px] items-start p-[18.81px] relative rounded-[13.68px] w-full",
-         "n": "Workflow moment / Get confirmation",
-         "id": "203:8337",
-         "k": [
-          {
-           "t": "div",
-           "c": "flex gap-[10.26px] items-start relative w-full",
-           "n": "Step heading",
-           "id": "I203:8337;203:8198",
-           "k": [
-            {
-             "t": "div",
-             "c": "bg-[#0f1530] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[34.2px] shrink-0",
-             "n": "Status / 03",
-             "id": "I203:8337;203:8199",
-             "k": [
-              {
-               "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#fff] w-[17.1px] shrink-0",
-               "id": "I203:8337;203:8200",
-               "k": [
-                "03"
-               ]
-              }
-             ]
-            },
-            {
-             "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[15.39px] text-[color:#0f1530] flex-1 min-w-0",
-             "id": "I203:8337;203:8201",
-             "k": [
-              "Get confirmation"
-             ]
-            }
-           ]
-          },
-          {
-           "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[11.97px] h-[342px] items-start p-[15.39px] relative rounded-[10.26px] w-full",
-           "n": "Illustrated product state / confirmation",
-           "id": "I203:8337;203:8202",
-           "k": [
-            {
-             "t": "div",
-             "c": "flex gap-[10.26px] items-start relative w-full",
-             "n": "Confirmed status",
-             "id": "I203:8337;203:8203",
-             "k": [
-              {
-               "t": "div",
-               "c": "relative size-[29.07px]",
-               "n": "Icon / check",
-               "id": "I203:8337;203:8204",
-               "k": [
-                {
-                 "t": "img",
-                 "c": "absolute block inset-0 size-full",
-                 "src": "/marketing/flagship/icon-check2-4ceb0368.svg"
-                }
-               ]
-              },
-              {
-               "t": "p",
-               "c": "font-semibold leading-[1.38] relative text-[20.52px] text-[color:#0f1530] w-[230.85px] shrink-0",
-               "id": "I203:8337;203:8206",
-               "k": [
-                "You’re booked"
-               ]
-              }
-             ]
-            },
-            {
-             "t": "p",
-             "c": "font-bold leading-[1.08] relative text-[39.33px] text-[color:#0f1530] tracking-[-0.9832px] w-full",
-             "id": "I203:8337;203:8207",
-             "k": [
-              "Oct 29"
-             ]
-            },
-            {
-             "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[13.68px] text-[color:#0f1530] w-full",
-             "id": "I203:8337;203:8208",
-             "k": [
-              "10:00–12:00 · AC tune-up"
-             ]
-            },
-            {
-             "t": "div",
-             "c": "bg-[#e6dccb] h-[0.855px] relative w-full",
-             "n": "Divider",
-             "id": "I203:8337;203:8209"
-            },
-            {
-             "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[11.97px] text-[color:#2a3360] w-full",
-             "id": "I203:8337;203:8210",
-             "k": [
-              "Confirmation sent by email"
-             ]
-            },
-            {
-             "t": "div",
-             "c": "bg-[#fff] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-full",
-             "n": "Status / Service address checked",
-             "id": "I203:8337;203:8211",
-             "k": [
-              {
-               "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#0f1530] w-[193.23px] shrink-0",
-               "id": "I203:8337;203:8212",
-               "k": [
-                "Service address checked"
-               ]
-              }
-             ]
-            }
-           ]
-          }
-         ]
-        }
-       ]
-      }
-     ],
-     "anchor": "workflow-m"
-    },
-    {
-     "t": "div",
-     "c": "bg-[#0f1530] flex flex-col gap-[16px] items-start p-[24px] relative w-full",
-     "n": "03 / Connected workflow and demo",
-     "id": "203:8353",
-     "k": [
-      {
-       "t": "p",
-       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#f6b400] tracking-[1.1px] w-full",
-       "id": "219:10010",
-       "k": [
-        "WORKS ACROSS YOUR BUSINESS"
-       ]
-      },
-      {
-       "t": "p",
-       "c": "font-semibold leading-[1.38] relative text-[28px] text-[color:#fff] w-full",
-       "id": "219:10011",
-       "k": [
-        "One job. Connected all the way."
-       ]
-      },
-      {
-       "t": "div",
-       "c": "flex flex-col gap-[12px] items-center relative w-full",
-       "n": "Flagship and tool handoff",
-       "id": "219:10012",
-       "k": [
-        {
-         "t": "div",
-         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] w-full",
-         "n": "Connected feature / Websites / Mobile",
-         "id": "219:10023",
-         "k": [
-          {
-           "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
-           "n": "Suite and record",
-           "id": "219:10014",
-           "k": [
-            {
-             "t": "div",
-             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
-             "n": "Status / Growth",
-             "id": "219:10015",
-             "k": [
-              {
-               "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
-               "id": "219:10016",
-               "k": [
-                "Growth"
-               ]
-              }
-             ]
-            },
-            {
-             "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[180px] shrink-0",
-             "id": "219:10017",
-             "k": [
-              "Inquiry #1042"
-             ]
-            }
-           ]
-          },
-          {
-           "t": "p",
-           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
-           "id": "219:10018",
-           "k": [
-            "Websites"
-           ]
-          },
-          {
-           "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
-           "n": "Handoff evidence",
-           "id": "219:10019",
-           "k": [
-            {
-             "t": "div",
-             "c": "relative size-[18px]",
-             "n": "Icon / check",
-             "id": "219:10020",
-             "k": [
-              {
-               "t": "img",
-               "c": "absolute block inset-0 size-full",
-               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
-              }
-             ]
-            },
-            {
-             "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
-             "id": "219:10022",
-             "k": [
-              "Service selected"
-             ]
-            }
-           ]
-          }
-         ]
-        },
-        {
-         "t": "div",
-         "c": "flex flex-col h-[24px] items-center justify-center relative w-full",
-         "n": "Next connected state",
-         "id": "219:10024",
-         "k": [
-          {
-           "t": "div",
-           "c": "relative size-[24px]",
-           "n": "Frame",
-           "id": "219:10025",
-           "k": [
-            {
-             "t": "img",
-             "c": "absolute block inset-0 size-full",
-             "src": "/marketing/flagship/frame-08fa5d7a.svg"
-            }
-           ]
-          }
-         ]
-        },
-        {
-         "t": "div",
-         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] w-full",
-         "n": "Connected feature / Online booking / Mobile",
-         "id": "219:10037",
-         "k": [
-          {
-           "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
-           "n": "Suite and record",
-           "id": "219:10028",
-           "k": [
-            {
-             "t": "div",
-             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
-             "n": "Status / Growth",
-             "id": "219:10029",
-             "k": [
-              {
-               "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
-               "id": "219:10030",
-               "k": [
-                "Growth"
-               ]
-              }
-             ]
-            },
-            {
-             "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[180px] shrink-0",
-             "id": "219:10031",
-             "k": [
-              "Job #1042 · Jordan Lee"
-             ]
-            }
-           ]
-          },
-          {
-           "t": "p",
-           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
-           "id": "219:10032",
-           "k": [
-            "Online booking"
-           ]
-          },
-          {
-           "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
-           "n": "Handoff evidence",
-           "id": "219:10033",
-           "k": [
-            {
-             "t": "div",
-             "c": "relative size-[18px]",
-             "n": "Icon / check",
-             "id": "219:10034",
-             "k": [
-              {
-               "t": "img",
-               "c": "absolute block inset-0 size-full",
-               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
-              }
-             ]
-            },
-            {
-             "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
-             "id": "219:10036",
-             "k": [
-              "Visit requested"
-             ]
-            }
-           ]
-          }
-         ]
-        },
-        {
-         "t": "div",
-         "c": "flex flex-col h-[24px] items-center justify-center relative w-full",
-         "n": "Next connected state",
-         "id": "219:10038",
-         "k": [
-          {
-           "t": "div",
-           "c": "relative size-[24px]",
-           "n": "Frame",
-           "id": "219:10039",
-           "k": [
-            {
-             "t": "img",
-             "c": "absolute block inset-0 size-full",
-             "src": "/marketing/flagship/frame-08fa5d7a.svg"
-            }
-           ]
-          }
-         ]
-        },
-        {
-         "t": "div",
-         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] w-full",
-         "n": "Connected feature / Scheduling & dispatch / Mobile",
-         "id": "219:10051",
-         "k": [
-          {
-           "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
-           "n": "Suite and record",
-           "id": "219:10042",
-           "k": [
-            {
-             "t": "div",
-             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
-             "n": "Status / Operations",
-             "id": "219:10043",
-             "k": [
-              {
-               "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
-               "id": "219:10044",
-               "k": [
-                "Operations"
-               ]
-              }
-             ]
-            },
-            {
-             "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[180px] shrink-0",
-             "id": "219:10045",
-             "k": [
-              "Job #1042 · Jordan Lee"
-             ]
-            }
-           ]
-          },
-          {
-           "t": "p",
-           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
-           "id": "219:10046",
-           "k": [
-            "Scheduling & dispatch"
-           ]
-          },
-          {
-           "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
-           "n": "Handoff evidence",
-           "id": "219:10047",
-           "k": [
-            {
-             "t": "div",
-             "c": "relative size-[18px]",
-             "n": "Icon / check",
-             "id": "219:10048",
-             "k": [
-              {
-               "t": "img",
-               "c": "absolute block inset-0 size-full",
-               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
-              }
-             ]
-            },
-            {
-             "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
-             "id": "219:10050",
-             "k": [
-              "Assigned to Maya"
-             ]
-            }
-           ]
-          }
-         ]
-        }
-       ]
-      },
-      {
-       "t": "button",
-       "label": "Get a free demo",
-       "kind": "Accent",
-       "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#0f1530]",
-       "href": "/signup"
-      }
-     ]
-    }
-   ]
-  }
- },
- "estimates-approvals": {
-  "desktop": {
-   "t": "div",
-   "c": "bg-[#fbf6ef] flex flex-col items-start relative",
-   "n": "Estimates & Approvals / Desktop",
-   "id": "175:1722",
-   "k": [
-    {
-     "t": "div",
-     "c": "bg-[#fbf6ef] flex flex-col gap-[32px] items-start p-[80px] relative w-full",
-     "n": "01 / Product in view",
-     "id": "203:11146",
-     "k": [
-      {
-       "t": "div",
-       "c": "flex gap-[48px] items-center relative w-full",
-       "n": "Outcome and product",
-       "id": "203:11147",
-       "k": [
-        {
-         "t": "div",
-         "c": "flex flex-col gap-[20px] items-start relative w-[480px] shrink-0",
-         "n": "Short outcome copy",
-         "id": "203:11148",
-         "k": [
-          {
-           "t": "p",
-           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
-           "id": "203:11149",
-           "k": [
-            "ESTIMATES & APPROVALS"
-           ]
-          },
-          {
-           "t": "h1",
-           "c": "font-semibold leading-[1.08] relative text-[60px] text-[color:#0f1530] tracking-[-1.5px] w-full",
-           "id": "203:11150",
-           "k": [
-            "Your prices. A clear path to yes."
-           ]
-          },
-          {
-           "t": "p",
-           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-full",
-           "id": "203:11151",
-           "k": [
-            "Build from your price book. Review exceptions before customers see them."
-           ]
-          },
-          {
-           "t": "button",
-           "label": "See an estimate",
-           "kind": "Dark",
-           "c": "bg-[#0f1530] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#fbf6ef]",
-           "href": "#workflow"
-          },
-          {
-           "t": "p",
-           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
-           "id": "203:11154",
-           "k": [
-            "EXAMPLE BUSINESS · JUNIPER"
-           ]
-          }
-         ]
-        },
-        {
-         "t": "div",
-         "c": "bg-[#f6f7f9] border-[1.044px] border-[#e6dccb] border-solid flex flex-col h-[502.378px] items-start overflow-clip relative rounded-[16.711px] flex-1 min-w-0",
-         "n": "Product demonstration / Estimates & Approvals",
-         "id": "203:11155",
-         "k": [
-          {
-           "t": "div",
-           "c": "bg-[#0f1530] flex gap-[16.711px] h-[56.4px] items-center p-[16.711px] relative w-full",
-           "n": "Product chrome",
-           "id": "I203:11155;200:85",
-           "k": [
-            {
-             "t": "p",
-             "c": "font-bold leading-[1.38] relative text-[17.76px] text-[color:#fff] w-[146.222px] shrink-0",
-             "id": "I203:11155;200:86",
-             "k": [
-              "Renvani"
-             ]
-            },
-            {
-             "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[12.53px] text-[color:#fff] flex-1 min-w-0",
-             "id": "I203:11155;200:87",
-             "k": [
-              "Estimates"
-             ]
-            },
-            {
-             "t": "div",
-             "c": "bg-[#f6b400] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[106.533px] shrink-0",
-             "n": "Status / EXAMPLE",
-             "id": "I203:11155;200:88",
-             "k": [
-              {
-               "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[10.44px] text-[color:#0f1530] w-[85.644px] shrink-0",
-               "id": "I203:11155;200:89",
-               "k": [
-                "EXAMPLE"
-               ]
-              }
-             ]
-            }
-           ]
-          },
-          {
-           "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[16.711px] items-start p-[25.067px] relative w-full",
-           "n": "Product workspace",
-           "id": "I203:11155;200:90",
-           "k": [
-            {
-             "t": "div",
-             "c": "flex gap-[16.711px] items-start relative w-full",
-             "n": "Screen title",
-             "id": "I203:11155;200:91",
-             "k": [
-              {
-               "t": "p",
-               "c": "font-semibold leading-[1.38] relative text-[24.02px] text-[color:#0f1530] flex-1 min-w-0",
-               "id": "I203:11155;200:92",
-               "k": [
-                "Estimates"
-               ]
-              },
-              {
-               "t": "div",
-               "c": "bg-[#fff] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[188px] shrink-0",
-               "n": "Status / Your business",
-               "id": "I203:11155;200:93",
-               "k": [
-                {
-                 "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[10.44px] text-[color:#2a3360] w-[167.111px] shrink-0",
-                 "id": "I203:11155;200:94",
-                 "k": [
-                  "Your business"
-                 ]
-                }
-               ]
-              }
-             ]
-            },
-            {
-             "t": "div",
-             "c": "flex gap-[20.889px] items-start relative w-full",
-             "n": "Document and customer status",
-             "id": "I203:11155;200:95",
-             "k": [
-              {
-               "t": "div",
-               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] flex-1 min-w-0",
-               "n": "Service document",
-               "id": "I203:11155;200:96",
-               "k": [
-                {
-                 "t": "p",
-                 "c": "font-semibold leading-[1.38] relative text-[19.84px] text-[color:#0f1530] w-full",
-                 "id": "I203:11155;200:97",
-                 "k": [
-                  "Estimate #2048"
-                 ]
-                },
-                {
-                 "t": "p",
-                 "c": "font-normal leading-[1.38] relative text-[12.53px] text-[color:#2a3360] w-full",
-                 "id": "I203:11155;200:98",
-                 "k": [
-                  "Jordan Lee · AC diagnostic"
-                 ]
-                },
-                {
-                 "t": "div",
-                 "c": "bg-[#e6dccb] h-[1.044px] relative w-full",
-                 "n": "Divider",
-                 "id": "I203:11155;200:99"
-                },
-                {
-                 "t": "div",
-                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.53px] w-full",
-                 "n": "Field / Diagnostic visit",
-                 "id": "I203:11155;200:100",
-                 "k": [
-                  {
-                   "t": "p",
-                   "c": "font-normal relative text-[color:#2a3360] w-[196.356px] shrink-0",
-                   "id": "I203:11155;200:101",
-                   "k": [
-                    "Diagnostic visit"
-                   ]
-                  },
-                  {
-                   "t": "p",
-                   "c": "font-medium relative text-[color:#0f1530] w-[150.4px] shrink-0",
-                   "id": "I203:11155;200:102",
-                   "k": [
-                    "$89"
-                   ]
-                  }
-                 ]
-                },
-                {
-                 "t": "div",
-                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.53px] w-full",
-                 "n": "Field / Capacitor replacement",
-                 "id": "I203:11155;200:103",
-                 "k": [
-                  {
-                   "t": "p",
-                   "c": "font-normal relative text-[color:#2a3360] w-[196.356px] shrink-0",
-                   "id": "I203:11155;200:104",
-                   "k": [
-                    "Capacitor replacement"
-                   ]
-                  },
-                  {
-                   "t": "p",
-                   "c": "font-medium relative text-[color:#0f1530] w-[150.4px] shrink-0",
-                   "id": "I203:11155;200:105",
-                   "k": [
-                    "$185"
-                   ]
-                  }
-                 ]
-                },
-                {
-                 "t": "div",
-                 "c": "bg-[#e6dccb] h-[1.044px] relative w-full",
-                 "n": "Divider",
-                 "id": "I203:11155;200:106"
-                },
-                {
-                 "t": "div",
-                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.53px] w-full",
-                 "n": "Field / Service total",
-                 "id": "I203:11155;200:107",
-                 "k": [
-                  {
-                   "t": "p",
-                   "c": "font-normal relative text-[color:#2a3360] w-[196.356px] shrink-0",
-                   "id": "I203:11155;200:108",
-                   "k": [
-                    "Service total"
-                   ]
-                  },
-                  {
-                   "t": "p",
-                   "c": "font-medium relative text-[color:#0f1530] w-[150.4px] shrink-0",
-                   "id": "I203:11155;200:109",
-                   "k": [
-                    "$274"
-                   ]
-                  }
-                 ]
-                },
-                {
-                 "t": "div",
-                 "c": "bg-[#fff4d6] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-full",
-                 "n": "Status / Price book applied",
-                 "id": "I203:11155;200:110",
-                 "k": [
-                  {
-                   "t": "p",
-                   "c": "font-medium leading-[1.38] relative text-[10.44px] text-[color:#0f1530] w-[146.222px] shrink-0",
-                   "id": "I203:11155;200:111",
-                   "k": [
-                    "Price book applied"
-                   ]
-                  }
-                 ]
-                },
-                {
-                 "t": "div",
-                 "c": "bg-[#0f1530] flex h-[39.689px] items-center justify-center px-[14.622px] relative rounded-[12.533px] w-full",
-                 "n": "UI action / Approve estimate",
-                 "id": "I203:11155;200:112",
-                 "k": [
-                  {
-                   "t": "p",
-                   "c": "font-medium leading-[1.38] relative text-[12.53px] text-[color:#fff] text-center flex-1 min-w-0",
-                   "id": "I203:11155;200:113",
-                   "k": [
-                    "Approve estimate"
-                   ]
-                  }
-                 ]
-                }
-               ]
-              },
-              {
-               "t": "div",
-               "c": "flex flex-col gap-[16.711px] items-start relative flex-1 min-w-0",
-               "n": "Approval and outcome",
-               "id": "I203:11155;200:114",
-               "k": [
-                {
-                 "t": "div",
-                 "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] w-full",
-                 "n": "Status",
-                 "id": "I203:11155;200:115",
-                 "k": [
-                  {
-                   "t": "p",
-                   "c": "font-medium leading-[1.38] relative text-[11.49px] text-[color:#2a3360] tracking-[1.149px] w-full",
-                   "id": "I203:11155;200:116",
-                   "k": [
-                    "CUSTOMER VIEW"
-                   ]
-                  },
-                  {
-                   "t": "p",
-                   "c": "font-semibold leading-[1.38] relative text-[25.07px] text-[color:#0f1530] w-full",
-                   "id": "I203:11155;200:117",
-                   "k": [
-                    "Ready for a yes."
-                   ]
-                  },
-                  {
-                   "t": "div",
-                   "c": "flex gap-[10.444px] items-start relative w-full",
-                   "n": "Scope reviewed",
-                   "id": "I203:11155;200:118",
-                   "k": [
-                    {
-                     "t": "div",
-                     "c": "relative size-[18.8px]",
-                     "n": "Icon / check",
-                     "id": "I203:11155;200:119",
-                     "k": [
-                      {
-                       "t": "img",
-                       "c": "absolute block inset-0 size-full",
-                       "src": "/marketing/flagship/icon-check2-85fd1521.svg"
-                      }
-                     ]
-                    },
-                    {
-                     "t": "p",
-                     "c": "font-normal leading-[1.38] relative text-[12.53px] text-[color:#2a3360] w-[208.889px] shrink-0",
-                     "id": "I203:11155;200:121",
-                     "k": [
-                      "Scope reviewed"
-                     ]
-                    }
-                   ]
-                  },
-                  {
-                   "t": "div",
-                   "c": "flex gap-[10.444px] items-start relative w-full",
-                   "n": "Price confirmed",
-                   "id": "I203:11155;200:122",
-                   "k": [
-                    {
-                     "t": "div",
-                     "c": "relative size-[18.8px]",
-                     "n": "Icon / check",
-                     "id": "I203:11155;200:123",
-                     "k": [
-                      {
-                       "t": "img",
-                       "c": "absolute block inset-0 size-full",
-                       "src": "/marketing/flagship/icon-check2-85fd1521.svg"
-                      }
-                     ]
-                    },
-                    {
-                     "t": "p",
-                     "c": "font-normal leading-[1.38] relative text-[12.53px] text-[color:#2a3360] w-[208.889px] shrink-0",
-                     "id": "I203:11155;200:125",
-                     "k": [
-                      "Price confirmed"
-                     ]
-                    }
-                   ]
-                  },
-                  {
-                   "t": "div",
-                   "c": "flex gap-[10.444px] items-start relative w-full",
-                   "n": "Customer accepted",
-                   "id": "I203:11155;200:126",
-                   "k": [
-                    {
-                     "t": "div",
-                     "c": "relative size-[18.8px]",
-                     "n": "Icon / check",
-                     "id": "I203:11155;200:127",
-                     "k": [
-                      {
-                       "t": "img",
-                       "c": "absolute block inset-0 size-full",
-                       "src": "/marketing/flagship/icon-check2-85fd1521.svg"
-                      }
-                     ]
-                    },
-                    {
-                     "t": "p",
-                     "c": "font-normal leading-[1.38] relative text-[12.53px] text-[color:#2a3360] w-[208.889px] shrink-0",
-                     "id": "I203:11155;200:129",
-                     "k": [
-                      "Customer accepted"
-                     ]
-                    }
-                   ]
-                  },
-                  {
-                   "t": "div",
-                   "c": "bg-[#e4f1e8] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-full",
-                   "n": "Status / Accepted",
-                   "id": "I203:11155;200:130",
-                   "k": [
-                    {
-                     "t": "p",
-                     "c": "font-medium leading-[1.38] relative text-[10.44px] text-[color:#0f1530] w-[109.667px] shrink-0",
-                     "id": "I203:11155;200:131",
-                     "k": [
-                      "Accepted"
-                     ]
-                    }
-                   ]
-                  }
-                 ]
-                },
-                {
-                 "t": "div",
-                 "c": "bg-[#fff4d6] flex flex-col gap-[5.222px] items-start leading-[1.38] p-[16.711px] relative rounded-[12.533px] w-full",
-                 "n": "Matched to job",
-                 "id": "I203:11155;200:132",
-                 "k": [
-                  {
-                   "t": "p",
-                   "c": "font-semibold relative text-[16.71px] text-[color:#0f1530] w-full",
-                   "id": "I203:11155;200:133",
-                   "k": [
-                    "Job #1042"
-                   ]
-                  },
-                  {
-                   "t": "p",
-                   "c": "font-normal relative text-[11.49px] text-[color:#2a3360] w-full",
-                   "id": "I203:11155;200:134",
-                   "k": [
-                    "Everything stays connected."
-                   ]
-                  }
-                 ]
-                }
-               ]
-              }
-             ]
-            }
-           ]
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "t": "div",
-     "c": "bg-[#fff] flex flex-col gap-[32px] items-start p-[80px] relative w-full",
-     "n": "02 / A workflow you can see",
-     "id": "203:11206",
-     "k": [
-      {
-       "t": "div",
-       "c": "flex flex-col gap-[12px] items-start relative w-full",
-       "n": "Workflow heading",
-       "id": "203:11207",
-       "k": [
-        {
-         "t": "p",
-         "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
-         "id": "203:11208",
-         "k": [
-          "EXAMPLE WORKFLOW"
-         ]
-        },
-        {
-         "t": "p",
-         "c": "font-semibold leading-[1.08] relative text-[44px] text-[color:#0f1530] tracking-[-1.1px] w-full",
-         "id": "203:11209",
-         "k": [
-          "See the work happen."
-         ]
-        }
-       ]
-      },
-      {
-       "t": "div",
-       "c": "flex gap-[40px] items-start relative w-full",
-       "n": "Three product moments",
-       "id": "203:11210",
-       "k": [
-        {
-         "t": "div",
-         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[var(--radius\\\\/16,16px)] flex-1 min-w-0",
-         "n": "Feature workflow / Build the estimate",
-         "id": "203:11230",
-         "k": [
-          {
-           "t": "div",
-           "c": "flex gap-[12px] items-start relative w-full",
-           "n": "Step heading",
-           "id": "203:11212",
-           "k": [
-            {
-             "t": "div",
-             "c": "bg-[#0f1530] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[40px] shrink-0",
-             "n": "Status / 01",
-             "id": "203:11213",
-             "k": [
-              {
-               "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#fff] w-[20px] shrink-0",
-               "id": "203:11214",
-               "k": [
-                "01"
-               ]
-              }
-             ]
-            },
-            {
-             "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] flex-1 min-w-0",
-             "id": "203:11215",
-             "k": [
-              "Build the estimate"
-             ]
-            }
-           ]
-          },
-          {
-           "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-full",
-           "n": "Illustrated product state / estimate",
-           "id": "203:11216",
-           "k": [
-            {
-             "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[21px] text-[color:#0f1530] w-full",
-             "id": "203:11217",
-             "k": [
-              "Estimate #2048"
-             ]
-            },
-            {
-             "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] w-full",
-             "id": "203:11218",
-             "k": [
-              "Juniper Heating & Plumbing"
-             ]
-            },
-            {
-             "t": "div",
-             "c": "bg-[#e6dccb] h-px relative w-full",
-             "n": "Divider",
-             "id": "203:11219"
-            },
-            {
-             "t": "div",
-             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-full",
-             "n": "Field / Diagnostic visit",
-             "id": "203:11220",
-             "k": [
-              {
-               "t": "p",
-               "c": "font-normal relative text-[color:#2a3360] w-[175px] shrink-0",
-               "id": "203:11221",
-               "k": [
-                "Diagnostic visit"
-               ]
-              },
-              {
-               "t": "p",
-               "c": "font-medium relative text-[color:#0f1530] w-[133px] shrink-0",
-               "id": "203:11222",
-               "k": [
-                "$89"
-               ]
-              }
-             ]
-            },
-            {
-             "t": "div",
-             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-full",
-             "n": "Field / Capacitor replacement",
-             "id": "203:11223",
-             "k": [
-              {
-               "t": "p",
-               "c": "font-normal relative text-[color:#2a3360] w-[175px] shrink-0",
-               "id": "203:11224",
-               "k": [
-                "Capacitor replacement"
-               ]
-              },
-              {
-               "t": "p",
-               "c": "font-medium relative text-[color:#0f1530] w-[133px] shrink-0",
-               "id": "203:11225",
-               "k": [
-                "$185"
-               ]
-              }
-             ]
-            },
-            {
-             "t": "div",
-             "c": "bg-[#e6dccb] h-px relative w-full",
-             "n": "Divider",
-             "id": "203:11226"
-            },
-            {
-             "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[27px] text-[color:#0f1530] w-full",
-             "id": "203:11227",
-             "k": [
-              "Total $274"
              ]
             },
             {
              "t": "div",
              "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
-             "n": "UI action / Review estimate",
-             "id": "203:11228",
+             "n": "UI action / Review follow-up",
+             "id": "219:7912",
              "k": [
               {
                "t": "p",
                "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
-               "id": "203:11229",
+               "id": "219:7913",
                "k": [
-                "Review estimate"
-               ]
-              }
-             ]
-            }
-           ]
-          }
-         ]
-        },
-        {
-         "t": "div",
-         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[var(--radius\\\\/16,16px)] flex-1 min-w-0",
-         "n": "Feature workflow / Review the exception",
-         "id": "203:11250",
-         "k": [
-          {
-           "t": "div",
-           "c": "flex gap-[12px] items-start relative w-full",
-           "n": "Step heading",
-           "id": "203:11232",
-           "k": [
-            {
-             "t": "div",
-             "c": "bg-[#0f1530] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[40px] shrink-0",
-             "n": "Status / 02",
-             "id": "203:11233",
-             "k": [
-              {
-               "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#fff] w-[20px] shrink-0",
-               "id": "203:11234",
-               "k": [
-                "02"
-               ]
-              }
-             ]
-            },
-            {
-             "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] flex-1 min-w-0",
-             "id": "203:11235",
-             "k": [
-              "Review the exception"
-             ]
-            }
-           ]
-          },
-          {
-           "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-full",
-           "n": "Illustrated product state / approval",
-           "id": "203:11236",
-           "k": [
-            {
-             "t": "div",
-             "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
-             "n": "Status / OWNER REVIEW",
-             "id": "203:11237",
-             "k": [
-              {
-               "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[140px] shrink-0",
-               "id": "203:11238",
-               "k": [
-                "OWNER REVIEW"
-               ]
-              }
-             ]
-            },
-            {
-             "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[21px] text-[color:#0f1530] w-full",
-             "id": "203:11239",
-             "k": [
-              "Discount exception"
-             ]
-            },
-            {
-             "t": "div",
-             "c": "flex gap-[16px] items-start leading-[1.38] relative w-full",
-             "n": "Policy comparison",
-             "id": "203:11240",
-             "k": [
-              {
-               "t": "div",
-               "c": "bg-[#fff] flex flex-col gap-[6px] items-start p-[14px] relative rounded-[12px] w-[151px] shrink-0",
-               "n": "Request",
-               "id": "203:11241",
-               "k": [
-                {
-                 "t": "p",
-                 "c": "font-bold relative text-[32px] text-[color:#0f1530] w-full",
-                 "id": "203:11242",
-                 "k": [
-                  "15%"
-                 ]
-                },
-                {
-                 "t": "p",
-                 "c": "font-normal relative text-[12px] text-[color:#2a3360] w-full",
-                 "id": "203:11243",
-                 "k": [
-                  "Requested"
-                 ]
-                }
-               ]
-              },
-              {
-               "t": "div",
-               "c": "bg-[#fff] flex flex-col gap-[6px] items-start p-[14px] relative rounded-[12px] w-[151px] shrink-0",
-               "n": "Limit",
-               "id": "203:11244",
-               "k": [
-                {
-                 "t": "p",
-                 "c": "font-bold relative text-[32px] text-[color:#0f1530] w-full",
-                 "id": "203:11245",
-                 "k": [
-                  "10%"
-                 ]
-                },
-                {
-                 "t": "p",
-                 "c": "font-normal relative text-[12px] text-[color:#2a3360] w-full",
-                 "id": "203:11246",
-                 "k": [
-                  "Your limit"
-                 ]
-                }
-               ]
-              }
-             ]
-            },
-            {
-             "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] w-full",
-             "id": "203:11247",
-             "k": [
-              "Reason · Returning customer"
-             ]
-            },
-            {
-             "t": "div",
-             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
-             "n": "UI action / Approve exception",
-             "id": "203:11248",
-             "k": [
-              {
-               "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
-               "id": "203:11249",
-               "k": [
-                "Approve exception"
-               ]
-              }
-             ]
-            }
-           ]
-          }
-         ]
-        },
-        {
-         "t": "div",
-         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[var(--radius\\\\/16,16px)] flex-1 min-w-0",
-         "n": "Feature workflow / Make acceptance simple",
-         "id": "203:11268",
-         "k": [
-          {
-           "t": "div",
-           "c": "flex gap-[12px] items-start relative w-full",
-           "n": "Step heading",
-           "id": "203:11252",
-           "k": [
-            {
-             "t": "div",
-             "c": "bg-[#0f1530] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[40px] shrink-0",
-             "n": "Status / 03",
-             "id": "203:11253",
-             "k": [
-              {
-               "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#fff] w-[20px] shrink-0",
-               "id": "203:11254",
-               "k": [
-                "03"
-               ]
-              }
-             ]
-            },
-            {
-             "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] flex-1 min-w-0",
-             "id": "203:11255",
-             "k": [
-              "Make acceptance simple"
-             ]
-            }
-           ]
-          },
-          {
-           "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-full",
-           "n": "Illustrated product state / accept",
-           "id": "203:11256",
-           "k": [
-            {
-             "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
-             "id": "203:11257",
-             "k": [
-              "Your repair estimate"
-             ]
-            },
-            {
-             "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] w-full",
-             "id": "203:11258",
-             "k": [
-              "Juniper Heating & Plumbing"
-             ]
-            },
-            {
-             "t": "p",
-             "c": "font-bold leading-[1.08] relative text-[46px] text-[color:#0f1530] tracking-[-1.15px] w-full",
-             "id": "203:11259",
-             "k": [
-              "$274"
-             ]
-            },
-            {
-             "t": "div",
-             "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
-             "n": "Status / Work + terms included",
-             "id": "203:11260",
-             "k": [
-              {
-               "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[220px] shrink-0",
-               "id": "203:11261",
-               "k": [
-                "Work + terms included"
-               ]
-              }
-             ]
-            },
-            {
-             "t": "div",
-             "c": "flex gap-[10px] items-start relative w-full",
-             "n": "Consent",
-             "id": "203:11262",
-             "k": [
-              {
-               "t": "div",
-               "c": "relative size-[22px]",
-               "n": "Icon / check",
-               "id": "203:11263",
-               "k": [
-                {
-                 "t": "img",
-                 "c": "absolute block inset-0 size-full",
-                 "src": "/marketing/flagship/icon-check1-c690b1c5.svg"
-                }
-               ]
-              },
-              {
-               "t": "p",
-               "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#0f1530] flex-1 min-w-0",
-               "id": "203:11265",
-               "k": [
-                "I accept this estimate"
-               ]
-              }
-             ]
-            },
-            {
-             "t": "div",
-             "c": "bg-[#f6b400] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
-             "n": "UI action / Accept estimate",
-             "id": "203:11266",
-             "k": [
-              {
-               "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-center flex-1 min-w-0",
-               "id": "203:11267",
-               "k": [
-                "Accept estimate"
+                "Review follow-up"
                ]
               }
              ]
@@ -18041,14 +15584,14 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
     },
     {
      "t": "div",
-     "c": "bg-[#0f1530] flex flex-col gap-[16px] items-start px-[80px] py-[48px] relative w-full",
+     "c": "bg-[#0f1530] flex flex-col gap-[24px] items-start px-[80px] py-[48px] relative w-full",
      "n": "03 / Connected workflow and demo",
-     "id": "203:11269",
+     "id": "219:7915",
      "k": [
       {
        "t": "p",
        "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#f6b400] tracking-[1.1px] w-full",
-       "id": "219:10052",
+       "id": "219:7916",
        "k": [
         "WORKS ACROSS YOUR BUSINESS"
        ]
@@ -18056,7 +15599,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
       {
        "t": "p",
        "c": "font-semibold leading-[1.08] relative text-[36px] text-[color:#fff] tracking-[-0.9px] w-full",
-       "id": "219:10053",
+       "id": "219:7917",
        "k": [
         "One job. Connected all the way."
        ]
@@ -18065,32 +15608,32 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
        "t": "div",
        "c": "flex gap-[16px] items-center relative w-full",
        "n": "Flagship and tool handoff",
-       "id": "219:10054",
+       "id": "219:7918",
        "k": [
         {
          "t": "div",
          "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] flex-1 min-w-0",
-         "n": "Connected feature / Price Book & Catalog / Desktop",
-         "id": "219:10065",
+         "n": "Connected feature / Websites / Desktop",
+         "id": "219:7929",
          "k": [
           {
            "t": "div",
            "c": "flex gap-[10px] items-start relative w-full",
            "n": "Suite and record",
-           "id": "219:10056",
+           "id": "219:7920",
            "k": [
             {
              "t": "div",
              "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
-             "n": "Status / Operations",
-             "id": "219:10057",
+             "n": "Status / Growth",
+             "id": "219:7921",
              "k": [
               {
                "t": "p",
                "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
-               "id": "219:10058",
+               "id": "219:7922",
                "k": [
-                "Operations"
+                "Growth"
                ]
               }
              ]
@@ -18098,9 +15641,9 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             {
              "t": "p",
              "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[222px] shrink-0",
-             "id": "219:10059",
+             "id": "219:7923",
              "k": [
-              "Estimate #2048"
+              "Inquiry #1042"
              ]
             }
            ]
@@ -18108,22 +15651,22 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           {
            "t": "p",
            "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
-           "id": "219:10060",
+           "id": "219:7924",
            "k": [
-            "Price Book & Catalog"
+            "Websites"
            ]
           },
           {
            "t": "div",
            "c": "flex gap-[10px] items-start relative w-full",
            "n": "Handoff evidence",
-           "id": "219:10061",
+           "id": "219:7925",
            "k": [
             {
              "t": "div",
              "c": "relative size-[18px]",
              "n": "Icon / check",
-             "id": "219:10062",
+             "id": "219:7926",
              "k": [
               {
                "t": "img",
@@ -18135,9 +15678,9 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             {
              "t": "p",
              "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
-             "id": "219:10064",
+             "id": "219:7928",
              "k": [
-              "Your prices applied"
+              "Inquiry captured"
              ]
             }
            ]
@@ -18148,13 +15691,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "t": "div",
          "c": "flex h-[24px] items-center justify-center relative w-[32px] shrink-0",
          "n": "Next connected state",
-         "id": "219:10066",
+         "id": "219:7930",
          "k": [
           {
            "t": "div",
            "c": "relative size-[24px]",
            "n": "Icon / arrow",
-           "id": "219:10067",
+           "id": "219:7931",
            "k": [
             {
              "t": "img",
@@ -18168,25 +15711,25 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         {
          "t": "div",
          "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] flex-1 min-w-0",
-         "n": "Connected feature / Estimates & approvals / Desktop",
-         "id": "219:10079",
+         "n": "Connected feature / Inquiry follow-up / Desktop",
+         "id": "219:7943",
          "k": [
           {
            "t": "div",
            "c": "flex gap-[10px] items-start relative w-full",
            "n": "Suite and record",
-           "id": "219:10070",
+           "id": "219:7934",
            "k": [
             {
              "t": "div",
              "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
              "n": "Status / Revenue",
-             "id": "219:10071",
+             "id": "219:7935",
              "k": [
               {
                "t": "p",
                "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
-               "id": "219:10072",
+               "id": "219:7936",
                "k": [
                 "Revenue"
                ]
@@ -18196,9 +15739,9 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             {
              "t": "p",
              "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[222px] shrink-0",
-             "id": "219:10073",
+             "id": "219:7937",
              "k": [
-              "Estimate #2048"
+              "Inquiry #1042"
              ]
             }
            ]
@@ -18206,22 +15749,22 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           {
            "t": "p",
            "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
-           "id": "219:10074",
+           "id": "219:7938",
            "k": [
-            "Estimates & approvals"
+            "Inquiry follow-up"
            ]
           },
           {
            "t": "div",
            "c": "flex gap-[10px] items-start relative w-full",
            "n": "Handoff evidence",
-           "id": "219:10075",
+           "id": "219:7939",
            "k": [
             {
              "t": "div",
              "c": "relative size-[18px]",
              "n": "Icon / check",
-             "id": "219:10076",
+             "id": "219:7940",
              "k": [
               {
                "t": "img",
@@ -18233,9 +15776,9 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             {
              "t": "p",
              "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
-             "id": "219:10078",
+             "id": "219:7942",
              "k": [
-              "Customer accepted"
+              "Owner-approved email draft"
              ]
             }
            ]
@@ -18246,13 +15789,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "t": "div",
          "c": "flex h-[24px] items-center justify-center relative w-[32px] shrink-0",
          "n": "Next connected state",
-         "id": "219:10080",
+         "id": "219:7944",
          "k": [
           {
            "t": "div",
            "c": "relative size-[24px]",
            "n": "Icon / arrow",
-           "id": "219:10081",
+           "id": "219:7945",
            "k": [
             {
              "t": "img",
@@ -18267,24 +15810,24 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "t": "div",
          "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] flex-1 min-w-0",
          "n": "Connected feature / Jobs & work orders / Desktop",
-         "id": "219:10093",
+         "id": "219:7957",
          "k": [
           {
            "t": "div",
            "c": "flex gap-[10px] items-start relative w-full",
            "n": "Suite and record",
-           "id": "219:10084",
+           "id": "219:7948",
            "k": [
             {
              "t": "div",
              "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
              "n": "Status / Operations",
-             "id": "219:10085",
+             "id": "219:7949",
              "k": [
               {
                "t": "p",
                "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
-               "id": "219:10086",
+               "id": "219:7950",
                "k": [
                 "Operations"
                ]
@@ -18294,7 +15837,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             {
              "t": "p",
              "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[222px] shrink-0",
-             "id": "219:10087",
+             "id": "219:7951",
              "k": [
               "Job #1042 · Jordan Lee"
              ]
@@ -18304,7 +15847,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           {
            "t": "p",
            "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
-           "id": "219:10088",
+           "id": "219:7952",
            "k": [
             "Jobs & work orders"
            ]
@@ -18313,13 +15856,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
            "t": "div",
            "c": "flex gap-[10px] items-start relative w-full",
            "n": "Handoff evidence",
-           "id": "219:10089",
+           "id": "219:7953",
            "k": [
             {
              "t": "div",
              "c": "relative size-[18px]",
              "n": "Icon / check",
-             "id": "219:10090",
+             "id": "219:7954",
              "k": [
               {
                "t": "img",
@@ -18331,9 +15874,9 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             {
              "t": "p",
              "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
-             "id": "219:10092",
+             "id": "219:7956",
              "k": [
-              "Approved scope received"
+              "Accepted work becomes a job"
              ]
             }
            ]
@@ -18347,7 +15890,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
        "label": "Get a free demo",
        "kind": "Accent",
        "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#0f1530]",
-       "href": "/signup"
+       "href": "/demo"
       }
      ]
     }
@@ -18356,54 +15899,54 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
   "mobile": {
    "t": "div",
    "c": "bg-[#fbf6ef] flex flex-col items-start relative",
-   "n": "Estimates & Approvals / Mobile",
-   "id": "175:1868",
+   "n": "Inquiry Response & Follow-up / Mobile",
+   "id": "215:6309",
    "k": [
     {
      "t": "div",
-     "c": "bg-[#fbf6ef] flex flex-col gap-[32px] items-start p-[24px] relative w-full",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[24px] items-start p-[24px] relative w-full",
      "n": "01 / Product in view",
-     "id": "203:11285",
+     "id": "219:7972",
      "k": [
       {
        "t": "div",
-       "c": "flex flex-col gap-[32px] items-start relative w-full",
-       "n": "Outcome and product",
-       "id": "203:11286",
+       "c": "flex flex-col gap-[24px] items-start relative w-full",
+       "n": "Outcome and actual workflow",
+       "id": "219:7973",
        "k": [
         {
          "t": "div",
-         "c": "flex flex-col gap-[20px] items-start relative w-full",
-         "n": "Short outcome copy",
-         "id": "203:11287",
+         "c": "flex flex-col gap-[16px] items-start relative w-full",
+         "n": "Short product promise",
+         "id": "219:7974",
          "k": [
           {
            "t": "p",
            "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
-           "id": "203:11288",
+           "id": "219:7975",
            "k": [
-            "ESTIMATES & APPROVALS"
+            "REVENUE / INQUIRY RESPONSE & FOLLOW-UP"
            ]
           },
           {
            "t": "h1",
            "c": "font-semibold leading-[1.08] relative text-[40px] text-[color:#0f1530] tracking-[-1px] w-full",
-           "id": "203:11289",
+           "id": "219:7976",
            "k": [
-            "Your prices. A clear path to yes."
+            "Respond while the opportunity is fresh."
            ]
           },
           {
            "t": "p",
            "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-full",
-           "id": "203:11290",
+           "id": "219:7977",
            "k": [
-            "Build from your price book. Review exceptions before customers see them."
+            "Review every reply and keep follow-up connected to the inquiry."
            ]
           },
           {
            "t": "button",
-           "label": "See an estimate",
+           "label": "See a response",
            "kind": "Dark",
            "c": "bg-[#0f1530] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#fbf6ef]",
            "href": "#workflow-m"
@@ -18411,7 +15954,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           {
            "t": "p",
            "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
-           "id": "203:11293",
+           "id": "219:7980",
            "k": [
             "EXAMPLE BUSINESS · JUNIPER"
            ]
@@ -18420,20 +15963,20 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "div",
-         "c": "bg-[#f6f7f9] border-[0.475px] border-[#e6dccb] border-solid flex flex-col h-[228.475px] items-start overflow-clip relative rounded-[7.6px] w-full",
-         "n": "Product demonstration / Estimates & Approvals",
-         "id": "203:11294",
+         "c": "bg-[#f6f7f9] border-[0.475px] border-[#e6dccb] border-solid flex flex-col items-start relative rounded-[7.6px] w-full",
+         "n": "Product demonstration / Inquiry Response & Follow-up",
+         "id": "219:7981",
          "k": [
           {
            "t": "div",
            "c": "bg-[#0f1530] flex gap-[7.6px] h-[25.65px] items-center p-[7.6px] relative w-full",
            "n": "Product chrome",
-           "id": "I203:11294;200:85",
+           "id": "I219:7981;219:7849",
            "k": [
             {
              "t": "p",
-             "c": "font-bold leading-[1.38] relative text-[8.07px] text-[color:#fff] w-[66.5px] shrink-0",
-             "id": "I203:11294;200:86",
+             "c": "font-bold leading-[1.38] relative text-[8.08px] text-[color:#fff] w-[66.5px] shrink-0",
+             "id": "I219:7981;219:7850",
              "k": [
               "Renvani"
              ]
@@ -18441,21 +15984,21 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             {
              "t": "p",
              "c": "font-medium leading-[1.38] relative text-[5.7px] text-[color:#fff] w-[196.65px] shrink-0",
-             "id": "I203:11294;200:87",
+             "id": "I219:7981;219:7851",
              "k": [
-              "Estimates"
+              "Inquiries & follow-up"
              ]
             },
             {
              "t": "div",
              "c": "bg-[#f6b400] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[48.45px] shrink-0",
              "n": "Status / EXAMPLE",
-             "id": "I203:11294;200:88",
+             "id": "I219:7981;219:7852",
              "k": [
               {
                "t": "p",
                "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#0f1530] w-[38.95px] shrink-0",
-               "id": "I203:11294;200:89",
+               "id": "I219:7981;219:7853",
                "k": [
                 "EXAMPLE"
                ]
@@ -18468,339 +16011,166 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
            "t": "div",
            "c": "bg-[#f6f7f9] flex flex-col gap-[7.6px] items-start p-[11.4px] relative w-full",
            "n": "Product workspace",
-           "id": "I203:11294;200:90",
+           "id": "I219:7981;219:7854",
            "k": [
             {
-             "t": "div",
-             "c": "flex gap-[7.6px] items-start relative w-full",
-             "n": "Screen title",
-             "id": "I203:11294;200:91",
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[11.4px] text-[color:#0f1530] w-full",
+             "id": "I219:7981;219:7855",
              "k": [
-              {
-               "t": "p",
-               "c": "font-semibold leading-[1.38] relative text-[10.92px] text-[color:#0f1530] w-[218.5px] shrink-0",
-               "id": "I203:11294;200:92",
-               "k": [
-                "Estimates"
-               ]
-              },
-              {
-               "t": "div",
-               "c": "bg-[#fff] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[85.5px] shrink-0",
-               "n": "Status / Your business",
-               "id": "I203:11294;200:93",
-               "k": [
-                {
-                 "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#2a3360] w-[76px] shrink-0",
-                 "id": "I203:11294;200:94",
-                 "k": [
-                  "Your business"
-                 ]
-                }
-               ]
-              }
+              "One inquiry. One clear next step."
              ]
             },
             {
              "t": "div",
              "c": "flex gap-[9.5px] items-start relative w-full",
-             "n": "Document and customer status",
-             "id": "I203:11294;200:95",
+             "n": "Inquiry and reviewed response",
+             "id": "I219:7981;219:7856",
              "k": [
               {
                "t": "div",
-               "c": "bg-[#fff] border-[0.475px] border-[#e6dccb] border-solid flex flex-col gap-[6.65px] items-start p-[9.5px] relative rounded-[7.6px] w-[181.45px] shrink-0",
-               "n": "Service document",
-               "id": "I203:11294;200:96",
+               "c": "bg-[#fff] border-[0.475px] border-[#e6dccb] border-solid flex flex-col gap-[6.65px] items-start p-[9.5px] relative rounded-[7.6px] w-[133.95px] shrink-0",
+               "n": "Incoming inquiry",
+               "id": "I219:7981;219:7857",
                "k": [
                 {
-                 "t": "p",
-                 "c": "font-semibold leading-[1.38] relative text-[9.02px] text-[color:#0f1530] w-full",
-                 "id": "I203:11294;200:97",
+                 "t": "div",
+                 "c": "bg-[#fff4d6] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[99.75px] shrink-0",
+                 "n": "Status / WEBSITE INQUIRY",
+                 "id": "I219:7981;219:7858",
                  "k": [
-                  "Estimate #2048"
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#0f1530] w-[90.25px] shrink-0",
+                   "id": "I219:7981;219:7859",
+                   "k": [
+                    "WEBSITE INQUIRY"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-semibold leading-[1.38] relative text-[10.92px] text-[color:#0f1530] w-full",
+                 "id": "I219:7981;219:7860",
+                 "k": [
+                  "Jordan Lee"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal leading-[1.38] relative text-[7.6px] text-[color:#0f1530] w-full",
+                 "id": "I219:7981;219:7861",
+                 "k": [
+                  "AC runs, but won’t cool."
                  ]
                 },
                 {
                  "t": "p",
                  "c": "font-normal leading-[1.38] relative text-[5.7px] text-[color:#2a3360] w-full",
-                 "id": "I203:11294;200:98",
+                 "id": "I219:7981;219:7862",
                  "k": [
-                  "Jordan Lee · AC diagnostic"
+                  "Requested · Diagnostic visit"
                  ]
                 },
                 {
                  "t": "div",
                  "c": "bg-[#e6dccb] h-[0.475px] relative w-full",
                  "n": "Divider",
-                 "id": "I203:11294;200:99"
+                 "id": "I219:7981;219:7863"
                 },
                 {
                  "t": "div",
-                 "c": "flex gap-[4.75px] items-start leading-[1.38] relative text-[5.7px] w-full",
-                 "n": "Field / Diagnostic visit",
-                 "id": "I203:11294;200:100",
+                 "c": "bg-[#e4f1e8] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[85.5px] shrink-0",
+                 "n": "Status / Consent recorded",
+                 "id": "I219:7981;219:7864",
                  "k": [
                   {
                    "t": "p",
-                   "c": "font-normal relative text-[color:#2a3360] w-[89.3px] shrink-0",
-                   "id": "I203:11294;200:101",
+                   "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#0f1530] w-[76px] shrink-0",
+                   "id": "I219:7981;219:7865",
                    "k": [
-                    "Diagnostic visit"
-                   ]
-                  },
-                  {
-                   "t": "p",
-                   "c": "font-medium relative text-[color:#0f1530] w-[68.4px] shrink-0",
-                   "id": "I203:11294;200:102",
-                   "k": [
-                    "$89"
+                    "Consent recorded"
                    ]
                   }
                  ]
                 },
                 {
-                 "t": "div",
-                 "c": "flex gap-[4.75px] items-start leading-[1.38] relative text-[5.7px] w-full",
-                 "n": "Field / Capacitor replacement",
-                 "id": "I203:11294;200:103",
+                 "t": "p",
+                 "c": "font-normal leading-[1.38] relative text-[5.22px] text-[color:#2a3360] w-full",
+                 "id": "I219:7981;219:7866",
                  "k": [
-                  {
-                   "t": "p",
-                   "c": "font-normal relative text-[color:#2a3360] w-[89.3px] shrink-0",
-                   "id": "I203:11294;200:104",
-                   "k": [
-                    "Capacitor replacement"
-                   ]
-                  },
-                  {
-                   "t": "p",
-                   "c": "font-medium relative text-[color:#0f1530] w-[68.4px] shrink-0",
-                   "id": "I203:11294;200:105",
-                   "k": [
-                    "$185"
-                   ]
-                  }
-                 ]
-                },
-                {
-                 "t": "div",
-                 "c": "bg-[#e6dccb] h-[0.475px] relative w-full",
-                 "n": "Divider",
-                 "id": "I203:11294;200:106"
-                },
-                {
-                 "t": "div",
-                 "c": "flex gap-[4.75px] items-start leading-[1.38] relative text-[5.7px] w-full",
-                 "n": "Field / Service total",
-                 "id": "I203:11294;200:107",
-                 "k": [
-                  {
-                   "t": "p",
-                   "c": "font-normal relative text-[color:#2a3360] w-[89.3px] shrink-0",
-                   "id": "I203:11294;200:108",
-                   "k": [
-                    "Service total"
-                   ]
-                  },
-                  {
-                   "t": "p",
-                   "c": "font-medium relative text-[color:#0f1530] w-[68.4px] shrink-0",
-                   "id": "I203:11294;200:109",
-                   "k": [
-                    "$274"
-                   ]
-                  }
-                 ]
-                },
-                {
-                 "t": "div",
-                 "c": "bg-[#fff4d6] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-full",
-                 "n": "Status / Price book applied",
-                 "id": "I203:11294;200:110",
-                 "k": [
-                  {
-                   "t": "p",
-                   "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#0f1530] w-[66.5px] shrink-0",
-                   "id": "I203:11294;200:111",
-                   "k": [
-                    "Price book applied"
-                   ]
-                  }
-                 ]
-                },
-                {
-                 "t": "div",
-                 "c": "bg-[#0f1530] flex h-[18.05px] items-center justify-center px-[6.65px] relative rounded-[5.7px] w-full",
-                 "n": "UI action / Approve estimate",
-                 "id": "I203:11294;200:112",
-                 "k": [
-                  {
-                   "t": "p",
-                   "c": "font-medium leading-[1.38] relative text-[5.7px] text-[color:#fff] text-center w-[149.15px] shrink-0",
-                   "id": "I203:11294;200:113",
-                   "k": [
-                    "Approve estimate"
-                   ]
-                  }
+                  "No response sent yet"
                  ]
                 }
                ]
               },
               {
                "t": "div",
-               "c": "flex flex-col gap-[7.6px] items-start relative w-[128.25px] shrink-0",
-               "n": "Approval and outcome",
-               "id": "I203:11294;200:114",
+               "c": "bg-[#fff] border-[0.475px] border-[#e6dccb] border-solid flex flex-col gap-[6.65px] items-start p-[9.5px] relative rounded-[7.6px] w-[175.75px] shrink-0",
+               "n": "Response draft",
+               "id": "I219:7981;219:7867",
                "k": [
                 {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[5.22px] text-[color:#2a3360] tracking-[0.522px] w-full",
+                 "id": "I219:7981;219:7868",
+                 "k": [
+                  "EMAIL DRAFT"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-semibold leading-[1.38] relative text-[10.92px] text-[color:#0f1530] w-full",
+                 "id": "I219:7981;219:7869",
+                 "k": [
+                  "Let’s look at your AC."
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal leading-[1.38] relative text-[5.7px] text-[color:#2a3360] w-full",
+                 "id": "I219:7981;219:7870",
+                 "k": [
+                  "To · Jordan Lee"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal leading-[1.38] relative text-[6.65px] text-[color:#0f1530] w-full",
+                 "id": "I219:7981;219:7871",
+                 "k": [
+                  "We can inspect the system and prepare an estimate for your review."
+                 ]
+                },
+                {
                  "t": "div",
-                 "c": "bg-[#fff] border-[0.475px] border-[#e6dccb] border-solid flex flex-col gap-[6.65px] items-start p-[9.5px] relative rounded-[7.6px] w-full",
-                 "n": "Status",
-                 "id": "I203:11294;200:115",
+                 "c": "bg-[#fff4d6] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[118.75px] shrink-0",
+                 "n": "Status / Awaiting owner approval",
+                 "id": "I219:7981;219:7872",
                  "k": [
                   {
                    "t": "p",
-                   "c": "font-medium leading-[1.38] relative text-[5.22px] text-[color:#2a3360] tracking-[0.522px] w-full",
-                   "id": "I203:11294;200:116",
+                   "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#0f1530] w-[109.25px] shrink-0",
+                   "id": "I219:7981;219:7873",
                    "k": [
-                    "CUSTOMER VIEW"
-                   ]
-                  },
-                  {
-                   "t": "p",
-                   "c": "font-semibold leading-[1.38] relative text-[11.4px] text-[color:#0f1530] w-full",
-                   "id": "I203:11294;200:117",
-                   "k": [
-                    "Ready for a yes."
-                   ]
-                  },
-                  {
-                   "t": "div",
-                   "c": "flex gap-[4.75px] items-start relative w-full",
-                   "n": "Scope reviewed",
-                   "id": "I203:11294;200:118",
-                   "k": [
-                    {
-                     "t": "div",
-                     "c": "relative size-[8.55px]",
-                     "n": "Icon / check",
-                     "id": "I203:11294;200:119",
-                     "k": [
-                      {
-                       "t": "img",
-                       "c": "absolute block inset-0 size-full",
-                       "src": "/marketing/flagship/icon-check1-76fc982c.svg"
-                      }
-                     ]
-                    },
-                    {
-                     "t": "p",
-                     "c": "font-normal leading-[1.38] relative text-[5.7px] text-[color:#2a3360] w-[95px] shrink-0",
-                     "id": "I203:11294;200:121",
-                     "k": [
-                      "Scope reviewed"
-                     ]
-                    }
-                   ]
-                  },
-                  {
-                   "t": "div",
-                   "c": "flex gap-[4.75px] items-start relative w-full",
-                   "n": "Price confirmed",
-                   "id": "I203:11294;200:122",
-                   "k": [
-                    {
-                     "t": "div",
-                     "c": "relative size-[8.55px]",
-                     "n": "Icon / check",
-                     "id": "I203:11294;200:123",
-                     "k": [
-                      {
-                       "t": "img",
-                       "c": "absolute block inset-0 size-full",
-                       "src": "/marketing/flagship/icon-check1-76fc982c.svg"
-                      }
-                     ]
-                    },
-                    {
-                     "t": "p",
-                     "c": "font-normal leading-[1.38] relative text-[5.7px] text-[color:#2a3360] w-[95px] shrink-0",
-                     "id": "I203:11294;200:125",
-                     "k": [
-                      "Price confirmed"
-                     ]
-                    }
-                   ]
-                  },
-                  {
-                   "t": "div",
-                   "c": "flex gap-[4.75px] items-start relative w-full",
-                   "n": "Customer accepted",
-                   "id": "I203:11294;200:126",
-                   "k": [
-                    {
-                     "t": "div",
-                     "c": "relative size-[8.55px]",
-                     "n": "Icon / check",
-                     "id": "I203:11294;200:127",
-                     "k": [
-                      {
-                       "t": "img",
-                       "c": "absolute block inset-0 size-full",
-                       "src": "/marketing/flagship/icon-check1-76fc982c.svg"
-                      }
-                     ]
-                    },
-                    {
-                     "t": "p",
-                     "c": "font-normal leading-[1.38] relative text-[5.7px] text-[color:#2a3360] w-[95px] shrink-0",
-                     "id": "I203:11294;200:129",
-                     "k": [
-                      "Customer accepted"
-                     ]
-                    }
-                   ]
-                  },
-                  {
-                   "t": "div",
-                   "c": "bg-[#e4f1e8] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-full",
-                   "n": "Status / Accepted",
-                   "id": "I203:11294;200:130",
-                   "k": [
-                    {
-                     "t": "p",
-                     "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#0f1530] w-[49.875px] shrink-0",
-                     "id": "I203:11294;200:131",
-                     "k": [
-                      "Accepted"
-                     ]
-                    }
+                    "Awaiting owner approval"
                    ]
                   }
                  ]
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#fff4d6] flex flex-col gap-[2.375px] items-start leading-[1.38] p-[7.6px] relative rounded-[5.7px] w-full",
-                 "n": "Matched to job",
-                 "id": "I203:11294;200:132",
+                 "c": "bg-[#0f1530] flex h-[18.05px] items-center justify-center px-[6.65px] relative rounded-[5.7px] w-[156.75px] shrink-0",
+                 "n": "UI action / Review and send",
+                 "id": "I219:7981;219:7874",
                  "k": [
                   {
                    "t": "p",
-                   "c": "font-semibold relative text-[7.6px] text-[color:#0f1530] w-full",
-                   "id": "I203:11294;200:133",
+                   "c": "font-medium leading-[1.38] relative text-[5.7px] text-[color:#fff] text-center w-[143.45px] shrink-0",
+                   "id": "I219:7981;219:7875",
                    "k": [
-                    "Job #1042"
-                   ]
-                  },
-                  {
-                   "t": "p",
-                   "c": "font-normal relative text-[5.22px] text-[color:#2a3360] w-full",
-                   "id": "I203:11294;200:134",
-                   "k": [
-                    "Everything stays connected."
+                    "Review and send"
                    ]
                   }
                  ]
@@ -18819,465 +16189,282 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
     },
     {
      "t": "div",
-     "c": "bg-[#fff] flex flex-col gap-[32px] items-start p-[24px] relative w-full",
-     "n": "02 / A workflow you can see",
-     "id": "203:11345",
+     "c": "bg-[#fff] flex flex-col gap-[24px] items-start p-[24px] relative w-full",
+     "n": "02 / Three visible product states",
+     "id": "219:8009",
      "k": [
       {
-       "t": "div",
-       "c": "flex flex-col gap-[12px] items-start leading-[1.38] relative w-full",
-       "n": "Workflow heading",
-       "id": "203:11346",
+       "t": "p",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+       "id": "219:8010",
        "k": [
-        {
-         "t": "p",
-         "c": "font-medium relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
-         "id": "203:11347",
-         "k": [
-          "EXAMPLE WORKFLOW"
-         ]
-        },
-        {
-         "t": "p",
-         "c": "font-semibold relative text-[32px] text-[color:#0f1530] w-full",
-         "id": "203:11348",
-         "k": [
-          "See the work happen."
-         ]
-        }
+        "EXAMPLE WORKFLOW"
+       ]
+      },
+      {
+       "t": "p",
+       "c": "font-semibold leading-[1.38] relative text-[30px] text-[color:#0f1530] w-full",
+       "id": "219:8011",
+       "k": [
+        "See the work happen."
        ]
       },
       {
        "t": "div",
-       "c": "flex flex-col gap-[24px] items-start relative w-full",
-       "n": "Three product moments",
-       "id": "203:11349",
+       "c": "flex flex-col gap-[16px] items-start relative w-full",
+       "n": "Product workflow states",
+       "id": "219:8012",
        "k": [
         {
          "t": "div",
-         "c": "bg-[#fff] border-[0.855px] border-[#e6dccb] border-solid flex flex-col gap-[15.39px] h-[444.6px] items-start p-[18.81px] relative rounded-[13.68px] w-full",
-         "n": "Workflow moment / Build the estimate",
-         "id": "203:11350",
+         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[var(--radius\\\\/16,16px)] w-full",
+         "n": "Complementary workflow / Capture the inquiry / Mobile",
+         "id": "219:8023",
          "k": [
           {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] w-full",
+           "id": "219:8014",
+           "k": [
+            "Capture the inquiry"
+           ]
+          },
+          {
            "t": "div",
-           "c": "flex gap-[10.26px] items-start relative w-full",
-           "n": "Step heading",
-           "id": "I203:11350;203:11212",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[235px] items-start p-[16px] relative rounded-[12px] w-full",
+           "n": "Example state / inbound",
+           "id": "219:8015",
            "k": [
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[34.2px] shrink-0",
-             "n": "Status / 01",
-             "id": "I203:11350;203:11213",
+             "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[170px] shrink-0",
+             "n": "Status / WEB / EMAIL",
+             "id": "219:8016",
              "k": [
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#fff] w-[17.1px] shrink-0",
-               "id": "I203:11350;203:11214",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[150px] shrink-0",
+               "id": "219:8017",
                "k": [
-                "01"
+                "WEB / EMAIL"
                ]
               }
              ]
             },
             {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[15.39px] text-[color:#0f1530] flex-1 min-w-0",
-             "id": "I203:11350;203:11215",
+             "c": "font-semibold leading-[1.38] relative text-[23px] text-[color:#0f1530] w-full",
+             "id": "219:8018",
              "k": [
-              "Build the estimate"
+              "Jordan Lee"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[16px] text-[color:#0f1530] w-full",
+             "id": "219:8019",
+             "k": [
+              "AC runs, but won’t cool."
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] w-full",
+             "id": "219:8020",
+             "k": [
+              "Requested · Diagnostic visit"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[185px] shrink-0",
+             "n": "Status / Inquiry captured",
+             "id": "219:8021",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[165px] shrink-0",
+               "id": "219:8022",
+               "k": [
+                "Inquiry captured"
+               ]
+              }
              ]
             }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[var(--radius\\\\/16,16px)] w-full",
+         "n": "Complementary workflow / Review the reply / Mobile",
+         "id": "219:8032",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] w-full",
+           "id": "219:8025",
+           "k": [
+            "Review the reply"
            ]
           },
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[11.97px] h-[342px] items-start p-[15.39px] relative rounded-[10.26px] w-full",
-           "n": "Illustrated product state / estimate",
-           "id": "I203:11350;203:11216",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[235px] items-start p-[16px] relative rounded-[12px] w-full",
+           "n": "Example state / response",
+           "id": "219:8026",
            "k": [
             {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[17.95px] text-[color:#0f1530] w-full",
-             "id": "I203:11350;203:11217",
+             "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+             "id": "219:8027",
+             "k": [
+              "EMAIL DRAFT"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "font-semibold relative text-[25px] text-[color:#0f1530] w-full",
+             "id": "219:8028",
+             "k": [
+              {
+               "t": "p",
+               "c": "leading-[1.38] mb-0",
+               "k": [
+                "Let’s inspect"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "leading-[1.38]",
+               "k": [
+                "your AC."
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] w-full",
+             "id": "219:8029",
+             "k": [
+              "To · Jordan Lee"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+             "n": "UI action / Owner review",
+             "id": "219:8030",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+               "id": "219:8031",
+               "k": [
+                "Owner review"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[var(--radius\\\\/16,16px)] w-full",
+         "n": "Complementary workflow / Follow up with consent / Mobile",
+         "id": "219:8046",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] w-full",
+           "id": "219:8034",
+           "k": [
+            "Follow up with consent"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[235px] items-start p-[16px] relative rounded-[12px] w-full",
+           "n": "Example state / followup",
+           "id": "219:8035",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+             "id": "219:8036",
              "k": [
               "Estimate #2048"
              ]
             },
             {
-             "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[10.26px] text-[color:#2a3360] w-full",
-             "id": "I203:11350;203:11218",
-             "k": [
-              "Juniper Heating & Plumbing"
-             ]
-            },
-            {
              "t": "div",
-             "c": "bg-[#e6dccb] h-[0.855px] relative w-full",
-             "n": "Divider",
-             "id": "I203:11350;203:11219"
-            },
-            {
-             "t": "div",
-             "c": "flex gap-[8.55px] items-start leading-[1.38] relative text-[10.26px] w-full",
-             "n": "Field / Diagnostic visit",
-             "id": "I203:11350;203:11220",
+             "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[185px] shrink-0",
+             "n": "Status / Consent recorded",
+             "id": "219:8037",
              "k": [
               {
                "t": "p",
-               "c": "font-normal relative text-[color:#2a3360] w-[149.625px] shrink-0",
-               "id": "I203:11350;203:11221",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[165px] shrink-0",
+               "id": "219:8038",
                "k": [
-                "Diagnostic visit"
-               ]
-              },
-              {
-               "t": "p",
-               "c": "font-medium relative text-[color:#0f1530] w-[113.715px] shrink-0",
-               "id": "I203:11350;203:11222",
-               "k": [
-                "$89"
-               ]
-              }
-             ]
-            },
-            {
-             "t": "div",
-             "c": "flex gap-[8.55px] items-start leading-[1.38] relative text-[10.26px] w-full",
-             "n": "Field / Capacitor replacement",
-             "id": "I203:11350;203:11223",
-             "k": [
-              {
-               "t": "p",
-               "c": "font-normal relative text-[color:#2a3360] w-[149.625px] shrink-0",
-               "id": "I203:11350;203:11224",
-               "k": [
-                "Capacitor replacement"
-               ]
-              },
-              {
-               "t": "p",
-               "c": "font-medium relative text-[color:#0f1530] w-[113.715px] shrink-0",
-               "id": "I203:11350;203:11225",
-               "k": [
-                "$185"
-               ]
-              }
-             ]
-            },
-            {
-             "t": "div",
-             "c": "bg-[#e6dccb] h-[0.855px] relative w-full",
-             "n": "Divider",
-             "id": "I203:11350;203:11226"
-            },
-            {
-             "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[23.08px] text-[color:#0f1530] w-full",
-             "id": "I203:11350;203:11227",
-             "k": [
-              "Total $274"
-             ]
-            },
-            {
-             "t": "div",
-             "c": "bg-[#0f1530] flex h-[32.49px] items-center justify-center px-[11.97px] relative rounded-[10.26px] w-full",
-             "n": "UI action / Review estimate",
-             "id": "I203:11350;203:11228",
-             "k": [
-              {
-               "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[10.26px] text-[color:#fff] text-center flex-1 min-w-0",
-               "id": "I203:11350;203:11229",
-               "k": [
-                "Review estimate"
-               ]
-              }
-             ]
-            }
-           ]
-          }
-         ]
-        },
-        {
-         "t": "div",
-         "c": "bg-[#fff] border-[0.855px] border-[#e6dccb] border-solid flex flex-col gap-[15.39px] h-[444.6px] items-start p-[18.81px] relative rounded-[13.68px] w-full",
-         "n": "Workflow moment / Review the exception",
-         "id": "203:11369",
-         "k": [
-          {
-           "t": "div",
-           "c": "flex gap-[10.26px] items-start relative w-full",
-           "n": "Step heading",
-           "id": "I203:11369;203:11232",
-           "k": [
-            {
-             "t": "div",
-             "c": "bg-[#0f1530] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[34.2px] shrink-0",
-             "n": "Status / 02",
-             "id": "I203:11369;203:11233",
-             "k": [
-              {
-               "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#fff] w-[17.1px] shrink-0",
-               "id": "I203:11369;203:11234",
-               "k": [
-                "02"
+                "Consent recorded"
                ]
               }
              ]
             },
             {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[15.39px] text-[color:#0f1530] flex-1 min-w-0",
-             "id": "I203:11369;203:11235",
+             "c": "font-normal leading-[1.38] relative text-[15px] text-[color:#0f1530] w-full",
+             "id": "219:8039",
              "k": [
-              "Review the exception"
-             ]
-            }
-           ]
-          },
-          {
-           "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[11.97px] h-[342px] items-start p-[15.39px] relative rounded-[10.26px] w-full",
-           "n": "Illustrated product state / approval",
-           "id": "I203:11369;203:11236",
-           "k": [
-            {
-             "t": "div",
-             "c": "bg-[#fff4d6] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-full",
-             "n": "Status / OWNER REVIEW",
-             "id": "I203:11369;203:11237",
-             "k": [
-              {
-               "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#0f1530] w-[119.7px] shrink-0",
-               "id": "I203:11369;203:11238",
-               "k": [
-                "OWNER REVIEW"
-               ]
-              }
-             ]
-            },
-            {
-             "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[17.95px] text-[color:#0f1530] w-full",
-             "id": "I203:11369;203:11239",
-             "k": [
-              "Discount exception"
+              "Follow-up email ready"
              ]
             },
             {
              "t": "div",
-             "c": "flex gap-[13.68px] items-start leading-[1.38] relative w-full",
-             "n": "Policy comparison",
-             "id": "I203:11369;203:11240",
+             "c": "flex gap-[10px] items-start relative w-full",
+             "n": "Stop condition",
+             "id": "219:8040",
              "k": [
               {
                "t": "div",
-               "c": "bg-[#fff] flex flex-col gap-[5.13px] items-start p-[11.97px] relative rounded-[10.26px] w-[129.105px] shrink-0",
-               "n": "Request",
-               "id": "I203:11369;203:11241",
-               "k": [
-                {
-                 "t": "p",
-                 "c": "font-bold relative text-[27.36px] text-[color:#0f1530] w-full",
-                 "id": "I203:11369;203:11242",
-                 "k": [
-                  "15%"
-                 ]
-                },
-                {
-                 "t": "p",
-                 "c": "font-normal relative text-[10.26px] text-[color:#2a3360] w-full",
-                 "id": "I203:11369;203:11243",
-                 "k": [
-                  "Requested"
-                 ]
-                }
-               ]
-              },
-              {
-               "t": "div",
-               "c": "bg-[#fff] flex flex-col gap-[5.13px] items-start p-[11.97px] relative rounded-[10.26px] w-[129.105px] shrink-0",
-               "n": "Limit",
-               "id": "I203:11369;203:11244",
-               "k": [
-                {
-                 "t": "p",
-                 "c": "font-bold relative text-[27.36px] text-[color:#0f1530] w-full",
-                 "id": "I203:11369;203:11245",
-                 "k": [
-                  "10%"
-                 ]
-                },
-                {
-                 "t": "p",
-                 "c": "font-normal relative text-[10.26px] text-[color:#2a3360] w-full",
-                 "id": "I203:11369;203:11246",
-                 "k": [
-                  "Your limit"
-                 ]
-                }
-               ]
-              }
-             ]
-            },
-            {
-             "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[11.11px] text-[color:#2a3360] w-full",
-             "id": "I203:11369;203:11247",
-             "k": [
-              "Reason · Returning customer"
-             ]
-            },
-            {
-             "t": "div",
-             "c": "bg-[#0f1530] flex h-[32.49px] items-center justify-center px-[11.97px] relative rounded-[10.26px] w-full",
-             "n": "UI action / Approve exception",
-             "id": "I203:11369;203:11248",
-             "k": [
-              {
-               "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[10.26px] text-[color:#fff] text-center flex-1 min-w-0",
-               "id": "I203:11369;203:11249",
-               "k": [
-                "Approve exception"
-               ]
-              }
-             ]
-            }
-           ]
-          }
-         ]
-        },
-        {
-         "t": "div",
-         "c": "bg-[#fff] border-[0.855px] border-[#e6dccb] border-solid flex flex-col gap-[15.39px] h-[444.6px] items-start p-[18.81px] relative rounded-[13.68px] w-full",
-         "n": "Workflow moment / Make acceptance simple",
-         "id": "203:11388",
-         "k": [
-          {
-           "t": "div",
-           "c": "flex gap-[10.26px] items-start relative w-full",
-           "n": "Step heading",
-           "id": "I203:11388;203:11252",
-           "k": [
-            {
-             "t": "div",
-             "c": "bg-[#0f1530] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[34.2px] shrink-0",
-             "n": "Status / 03",
-             "id": "I203:11388;203:11253",
-             "k": [
-              {
-               "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#fff] w-[17.1px] shrink-0",
-               "id": "I203:11388;203:11254",
-               "k": [
-                "03"
-               ]
-              }
-             ]
-            },
-            {
-             "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[15.39px] text-[color:#0f1530] flex-1 min-w-0",
-             "id": "I203:11388;203:11255",
-             "k": [
-              "Make acceptance simple"
-             ]
-            }
-           ]
-          },
-          {
-           "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[11.97px] h-[342px] items-start p-[15.39px] relative rounded-[10.26px] w-full",
-           "n": "Illustrated product state / accept",
-           "id": "I203:11388;203:11256",
-           "k": [
-            {
-             "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[18.81px] text-[color:#0f1530] w-full",
-             "id": "I203:11388;203:11257",
-             "k": [
-              "Your repair estimate"
-             ]
-            },
-            {
-             "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[10.26px] text-[color:#2a3360] w-full",
-             "id": "I203:11388;203:11258",
-             "k": [
-              "Juniper Heating & Plumbing"
-             ]
-            },
-            {
-             "t": "p",
-             "c": "font-bold leading-[1.08] relative text-[39.33px] text-[color:#0f1530] tracking-[-0.9832px] w-full",
-             "id": "I203:11388;203:11259",
-             "k": [
-              "$274"
-             ]
-            },
-            {
-             "t": "div",
-             "c": "bg-[#fff] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-full",
-             "n": "Status / Work + terms included",
-             "id": "I203:11388;203:11260",
-             "k": [
-              {
-               "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#0f1530] w-[188.1px] shrink-0",
-               "id": "I203:11388;203:11261",
-               "k": [
-                "Work + terms included"
-               ]
-              }
-             ]
-            },
-            {
-             "t": "div",
-             "c": "flex gap-[8.55px] items-start relative w-full",
-             "n": "Consent",
-             "id": "I203:11388;203:11262",
-             "k": [
-              {
-               "t": "div",
-               "c": "relative size-[18.81px]",
+               "c": "relative size-[20px]",
                "n": "Icon / check",
-               "id": "I203:11388;203:11263",
+               "id": "219:8041",
                "k": [
                 {
                  "t": "img",
                  "c": "absolute block inset-0 size-full",
-                 "src": "/marketing/flagship/icon-check2-514b67c3.svg"
+                 "src": "/marketing/flagship/icon-check1-46fe38a0.svg"
                 }
                ]
               },
               {
                "t": "p",
-               "c": "font-normal leading-[1.38] relative text-[11.97px] text-[color:#0f1530] flex-1 min-w-0",
-               "id": "I203:11388;203:11265",
+               "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] flex-1 min-w-0",
+               "id": "219:8043",
                "k": [
-                "I accept this estimate"
+                "Stop when the customer replies"
                ]
               }
              ]
             },
             {
              "t": "div",
-             "c": "bg-[#f6b400] flex h-[32.49px] items-center justify-center px-[11.97px] relative rounded-[10.26px] w-full",
-             "n": "UI action / Accept estimate",
-             "id": "I203:11388;203:11266",
+             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+             "n": "UI action / Review follow-up",
+             "id": "219:8044",
              "k": [
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[10.26px] text-[color:#0f1530] text-center flex-1 min-w-0",
-               "id": "I203:11388;203:11267",
+               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+               "id": "219:8045",
                "k": [
-                "Accept estimate"
+                "Review follow-up"
                ]
               }
              ]
@@ -19293,14 +16480,14 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
     },
     {
      "t": "div",
-     "c": "bg-[#0f1530] flex flex-col gap-[16px] items-start p-[24px] relative w-full",
+     "c": "bg-[#0f1530] flex flex-col gap-[24px] items-start p-[24px] relative w-full",
      "n": "03 / Connected workflow and demo",
-     "id": "203:11405",
+     "id": "219:8047",
      "k": [
       {
        "t": "p",
        "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#f6b400] tracking-[1.1px] w-full",
-       "id": "219:10094",
+       "id": "219:8048",
        "k": [
         "WORKS ACROSS YOUR BUSINESS"
        ]
@@ -19308,7 +16495,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
       {
        "t": "p",
        "c": "font-semibold leading-[1.38] relative text-[28px] text-[color:#fff] w-full",
-       "id": "219:10095",
+       "id": "219:8049",
        "k": [
         "One job. Connected all the way."
        ]
@@ -19317,32 +16504,32 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
        "t": "div",
        "c": "flex flex-col gap-[12px] items-center relative w-full",
        "n": "Flagship and tool handoff",
-       "id": "219:10096",
+       "id": "219:8050",
        "k": [
         {
          "t": "div",
          "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] w-full",
-         "n": "Connected feature / Price Book & Catalog / Mobile",
-         "id": "219:10107",
+         "n": "Connected feature / Websites / Mobile",
+         "id": "219:8061",
          "k": [
           {
            "t": "div",
            "c": "flex gap-[10px] items-start relative w-full",
            "n": "Suite and record",
-           "id": "219:10098",
+           "id": "219:8052",
            "k": [
             {
              "t": "div",
              "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
-             "n": "Status / Operations",
-             "id": "219:10099",
+             "n": "Status / Growth",
+             "id": "219:8053",
              "k": [
               {
                "t": "p",
                "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
-               "id": "219:10100",
+               "id": "219:8054",
                "k": [
-                "Operations"
+                "Growth"
                ]
               }
              ]
@@ -19350,9 +16537,9 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             {
              "t": "p",
              "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[180px] shrink-0",
-             "id": "219:10101",
+             "id": "219:8055",
              "k": [
-              "Estimate #2048"
+              "Inquiry #1042"
              ]
             }
            ]
@@ -19360,22 +16547,22 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           {
            "t": "p",
            "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
-           "id": "219:10102",
+           "id": "219:8056",
            "k": [
-            "Price Book & Catalog"
+            "Websites"
            ]
           },
           {
            "t": "div",
            "c": "flex gap-[10px] items-start relative w-full",
            "n": "Handoff evidence",
-           "id": "219:10103",
+           "id": "219:8057",
            "k": [
             {
              "t": "div",
              "c": "relative size-[18px]",
              "n": "Icon / check",
-             "id": "219:10104",
+             "id": "219:8058",
              "k": [
               {
                "t": "img",
@@ -19387,9 +16574,9 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             {
              "t": "p",
              "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
-             "id": "219:10106",
+             "id": "219:8060",
              "k": [
-              "Your prices applied"
+              "Inquiry captured"
              ]
             }
            ]
@@ -19400,13 +16587,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "t": "div",
          "c": "flex flex-col h-[24px] items-center justify-center relative w-full",
          "n": "Next connected state",
-         "id": "219:10108",
+         "id": "219:8062",
          "k": [
           {
            "t": "div",
            "c": "relative size-[24px]",
            "n": "Frame",
-           "id": "219:10109",
+           "id": "219:8063",
            "k": [
             {
              "t": "img",
@@ -19420,25 +16607,25 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         {
          "t": "div",
          "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] w-full",
-         "n": "Connected feature / Estimates & approvals / Mobile",
-         "id": "219:10121",
+         "n": "Connected feature / Inquiry follow-up / Mobile",
+         "id": "219:8075",
          "k": [
           {
            "t": "div",
            "c": "flex gap-[10px] items-start relative w-full",
            "n": "Suite and record",
-           "id": "219:10112",
+           "id": "219:8066",
            "k": [
             {
              "t": "div",
              "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
              "n": "Status / Revenue",
-             "id": "219:10113",
+             "id": "219:8067",
              "k": [
               {
                "t": "p",
                "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
-               "id": "219:10114",
+               "id": "219:8068",
                "k": [
                 "Revenue"
                ]
@@ -19448,9 +16635,9 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             {
              "t": "p",
              "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[180px] shrink-0",
-             "id": "219:10115",
+             "id": "219:8069",
              "k": [
-              "Estimate #2048"
+              "Inquiry #1042"
              ]
             }
            ]
@@ -19458,22 +16645,22 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           {
            "t": "p",
            "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
-           "id": "219:10116",
+           "id": "219:8070",
            "k": [
-            "Estimates & approvals"
+            "Inquiry follow-up"
            ]
           },
           {
            "t": "div",
            "c": "flex gap-[10px] items-start relative w-full",
            "n": "Handoff evidence",
-           "id": "219:10117",
+           "id": "219:8071",
            "k": [
             {
              "t": "div",
              "c": "relative size-[18px]",
              "n": "Icon / check",
-             "id": "219:10118",
+             "id": "219:8072",
              "k": [
               {
                "t": "img",
@@ -19485,9 +16672,9 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             {
              "t": "p",
              "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
-             "id": "219:10120",
+             "id": "219:8074",
              "k": [
-              "Customer accepted"
+              "Owner-approved email draft"
              ]
             }
            ]
@@ -19498,13 +16685,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "t": "div",
          "c": "flex flex-col h-[24px] items-center justify-center relative w-full",
          "n": "Next connected state",
-         "id": "219:10122",
+         "id": "219:8076",
          "k": [
           {
            "t": "div",
            "c": "relative size-[24px]",
            "n": "Frame",
-           "id": "219:10123",
+           "id": "219:8077",
            "k": [
             {
              "t": "img",
@@ -19519,24 +16706,24 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "t": "div",
          "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] w-full",
          "n": "Connected feature / Jobs & work orders / Mobile",
-         "id": "219:10135",
+         "id": "219:8089",
          "k": [
           {
            "t": "div",
            "c": "flex gap-[10px] items-start relative w-full",
            "n": "Suite and record",
-           "id": "219:10126",
+           "id": "219:8080",
            "k": [
             {
              "t": "div",
              "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
              "n": "Status / Operations",
-             "id": "219:10127",
+             "id": "219:8081",
              "k": [
               {
                "t": "p",
                "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
-               "id": "219:10128",
+               "id": "219:8082",
                "k": [
                 "Operations"
                ]
@@ -19546,7 +16733,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             {
              "t": "p",
              "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[180px] shrink-0",
-             "id": "219:10129",
+             "id": "219:8083",
              "k": [
               "Job #1042 · Jordan Lee"
              ]
@@ -19556,7 +16743,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           {
            "t": "p",
            "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
-           "id": "219:10130",
+           "id": "219:8084",
            "k": [
             "Jobs & work orders"
            ]
@@ -19565,13 +16752,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
            "t": "div",
            "c": "flex gap-[10px] items-start relative w-full",
            "n": "Handoff evidence",
-           "id": "219:10131",
+           "id": "219:8085",
            "k": [
             {
              "t": "div",
              "c": "relative size-[18px]",
              "n": "Icon / check",
-             "id": "219:10132",
+             "id": "219:8086",
              "k": [
               {
                "t": "img",
@@ -19583,9 +16770,9 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             {
              "t": "p",
              "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
-             "id": "219:10134",
+             "id": "219:8088",
              "k": [
-              "Approved scope received"
+              "Accepted work becomes a job"
              ]
             }
            ]
@@ -19599,65 +16786,65 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
        "label": "Get a free demo",
        "kind": "Accent",
        "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#0f1530]",
-       "href": "/signup"
+       "href": "/demo"
       }
      ]
     }
    ]
   }
  },
- "scheduling-dispatch": {
+ "jobs-work-orders": {
   "desktop": {
    "t": "div",
    "c": "bg-[#fbf6ef] flex flex-col items-start relative",
-   "n": "Scheduling & Dispatch / Desktop",
-   "id": "175:2008",
+   "n": "Jobs & Work Orders / Desktop",
+   "id": "215:6310",
    "k": [
     {
      "t": "div",
-     "c": "bg-[#fbf6ef] flex flex-col gap-[32px] items-start p-[80px] relative w-full",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[24px] items-start px-[80px] py-[48px] relative w-full",
      "n": "01 / Product in view",
-     "id": "203:11425",
+     "id": "219:8108",
      "k": [
       {
        "t": "div",
        "c": "flex gap-[48px] items-center relative w-full",
-       "n": "Outcome and product",
-       "id": "203:11426",
+       "n": "Outcome and actual workflow",
+       "id": "219:8109",
        "k": [
         {
          "t": "div",
-         "c": "flex flex-col gap-[20px] items-start relative w-[480px] shrink-0",
-         "n": "Short outcome copy",
-         "id": "203:11427",
+         "c": "flex flex-col gap-[16px] items-start relative flex-1 min-w-0",
+         "n": "Short product promise",
+         "id": "219:8110",
          "k": [
           {
            "t": "p",
            "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
-           "id": "203:11428",
+           "id": "219:8111",
            "k": [
-            "SCHEDULING & DISPATCH"
+            "OPERATIONS / JOBS & WORK ORDERS"
            ]
           },
           {
            "t": "h1",
-           "c": "font-semibold leading-[1.08] relative text-[60px] text-[color:#0f1530] tracking-[-1.5px] w-full",
-           "id": "203:11429",
+           "c": "font-semibold leading-[1.08] relative text-[58px] text-[color:#0f1530] tracking-[-1.45px] w-full",
+           "id": "219:8112",
            "k": [
-            "A clear plan for every visit."
+            "One job. Every detail."
            ]
           },
           {
            "t": "p",
            "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-full",
-           "id": "203:11430",
+           "id": "219:8113",
            "k": [
-            "Match jobs with technician availability and keep changes visible."
+            "Keep the approved work, crew, tasks, and files together."
            ]
           },
           {
            "t": "button",
-           "label": "See the schedule",
+           "label": "See a work order",
            "kind": "Dark",
            "c": "bg-[#0f1530] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#fbf6ef]",
            "href": "#workflow"
@@ -19665,7 +16852,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           {
            "t": "p",
            "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
-           "id": "203:11433",
+           "id": "219:8116",
            "k": [
             "EXAMPLE BUSINESS · JUNIPER"
            ]
@@ -19674,42 +16861,42 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "div",
-         "c": "bg-[#f6f7f9] border-[1.044px] border-[#e6dccb] border-solid flex flex-col h-[537.889px] items-start overflow-clip relative rounded-[16.711px] flex-1 min-w-0",
-         "n": "Product demonstration / Scheduling & Dispatch",
-         "id": "203:11434",
+         "c": "bg-[#f6f7f9] border-[1.044px] border-[#e6dccb] border-solid flex flex-col items-start relative rounded-[16.711px] bg-[#f6f7f9] border-[1.044px] border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col items-start relative rounded-[16.711px] flex-1 min-w-0",
+         "n": "Complementary product view / jobs",
+         "id": "219:8163",
          "k": [
           {
            "t": "div",
            "c": "bg-[#0f1530] flex gap-[16.711px] h-[56.4px] items-center p-[16.711px] relative w-full",
            "n": "Product chrome",
-           "id": "I203:11434;200:137",
+           "id": "219:8118",
            "k": [
             {
              "t": "p",
-             "c": "font-bold leading-[1.38] relative text-[17.76px] text-[color:#fff] w-[146.222px] shrink-0",
-             "id": "I203:11434;200:138",
+             "c": "font-bold leading-[1.38] relative text-[17.756px] text-[color:#fff] w-[146.222px] shrink-0",
+             "id": "219:8119",
              "k": [
               "Renvani"
              ]
             },
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[12.53px] text-[color:#fff] flex-1 min-w-0",
-             "id": "I203:11434;200:139",
+             "c": "font-medium leading-[1.38] relative text-[12.533px] text-[color:#fff] flex-1 min-w-0",
+             "id": "219:8120",
              "k": [
-              "Schedule"
+              "Jobs & work orders"
              ]
             },
             {
              "t": "div",
              "c": "bg-[#f6b400] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[106.533px] shrink-0",
              "n": "Status / EXAMPLE",
-             "id": "I203:11434;200:140",
+             "id": "219:8121",
              "k": [
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[10.44px] text-[color:#0f1530] w-[85.644px] shrink-0",
-               "id": "I203:11434;200:141",
+               "c": "font-medium leading-[1.38] relative text-[10.444px] text-[color:#0f1530] w-[85.644px] shrink-0",
+               "id": "219:8122",
                "k": [
                 "EXAMPLE"
                ]
@@ -19722,288 +16909,303 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
            "t": "div",
            "c": "bg-[#f6f7f9] flex flex-col gap-[16.711px] items-start p-[25.067px] relative w-full",
            "n": "Product workspace",
-           "id": "I203:11434;200:142",
+           "id": "219:8123",
            "k": [
             {
              "t": "div",
-             "c": "flex gap-[16.711px] items-start relative w-full",
-             "n": "Screen title",
-             "id": "I203:11434;200:143",
+             "c": "flex gap-[20.889px] items-start relative w-full",
+             "n": "Work order heading",
+             "id": "219:8124",
              "k": [
               {
                "t": "p",
-               "c": "font-semibold leading-[1.38] relative text-[24.02px] text-[color:#0f1530] flex-1 min-w-0",
-               "id": "I203:11434;200:144",
-               "k": [
-                "Schedule"
-               ]
-              },
-              {
-               "t": "div",
-               "c": "bg-[#fff] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[188px] shrink-0",
-               "n": "Status / Your business",
-               "id": "I203:11434;200:145",
-               "k": [
-                {
-                 "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[10.44px] text-[color:#2a3360] w-[167.111px] shrink-0",
-                 "id": "I203:11434;200:146",
-                 "k": [
-                  "Your business"
-                 ]
-                }
-               ]
-              }
-             ]
-            },
-            {
-             "t": "div",
-             "c": "bg-[#fff] flex gap-[12.533px] items-start leading-[1.38] p-[12.533px] relative rounded-[12.533px] text-[11.49px] text-[color:#2a3360] w-full",
-             "n": "Time scale",
-             "id": "I203:11434;200:147",
-             "k": [
-              {
-               "t": "p",
-               "c": "font-medium relative w-[133.689px] shrink-0",
-               "id": "I203:11434;200:148",
-               "k": [
-                "THU 29 OCT"
-               ]
-              },
-              {
-               "t": "p",
-               "c": "font-normal relative w-[112.8px] shrink-0",
-               "id": "I203:11434;200:149",
-               "k": [
-                "09:00"
-               ]
-              },
-              {
-               "t": "p",
-               "c": "font-normal relative w-[112.8px] shrink-0",
-               "id": "I203:11434;200:150",
-               "k": [
-                "10:00"
-               ]
-              },
-              {
-               "t": "p",
-               "c": "font-normal relative w-[112.8px] shrink-0",
-               "id": "I203:11434;200:151",
-               "k": [
-                "11:00"
-               ]
-              },
-              {
-               "t": "p",
-               "c": "font-normal relative w-[112.8px] shrink-0",
-               "id": "I203:11434;200:152",
-               "k": [
-                "12:00"
-               ]
-              }
-             ]
-            },
-            {
-             "t": "div",
-             "c": "bg-[#fff] flex gap-[12.533px] h-[73.111px] items-center p-[12.533px] relative w-full",
-             "n": "Crew / Maya R.",
-             "id": "I203:11434;200:153",
-             "k": [
-              {
-               "t": "div",
-               "c": "bg-[#0f1530] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[41.778px] shrink-0",
-               "n": "Status / MR",
-               "id": "I203:11434;200:154",
-               "k": [
-                {
-                 "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[10.44px] text-[color:#fff] w-[20.889px] shrink-0",
-                 "id": "I203:11434;200:155",
-                 "k": [
-                  "MR"
-                 ]
-                }
-               ]
-              },
-              {
-               "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[12.53px] text-[color:#0f1530] w-[79.378px] shrink-0",
-               "id": "I203:11434;200:156",
-               "k": [
-                "Maya R."
-               ]
-              },
-              {
-               "t": "div",
-               "c": "bg-[#fff4d6] flex gap-[10.444px] h-[50.133px] items-start leading-[1.38] p-[12.533px] relative rounded-[12.533px] flex-1 min-w-0",
-               "n": "Scheduled job",
-               "id": "I203:11434;200:157",
-               "k": [
-                {
-                 "t": "p",
-                 "c": "font-medium relative text-[12.53px] text-[color:#0f1530] w-[233.956px] shrink-0",
-                 "id": "I203:11434;200:158",
-                 "k": [
-                  "AC diagnostic"
-                 ]
-                },
-                {
-                 "t": "p",
-                 "c": "font-normal relative text-[11.49px] text-[color:#2a3360] w-[229.778px] shrink-0",
-                 "id": "I203:11434;200:159",
-                 "k": [
-                  "10–12 · Jordan Lee"
-                 ]
-                }
-               ]
-              }
-             ]
-            },
-            {
-             "t": "div",
-             "c": "bg-[#fff] flex gap-[12.533px] h-[73.111px] items-center p-[12.533px] relative w-full",
-             "n": "Crew / Eli T.",
-             "id": "I203:11434;200:160",
-             "k": [
-              {
-               "t": "div",
-               "c": "bg-[#0f1530] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[41.778px] shrink-0",
-               "n": "Status / ET",
-               "id": "I203:11434;200:161",
-               "k": [
-                {
-                 "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[10.44px] text-[color:#fff] w-[20.889px] shrink-0",
-                 "id": "I203:11434;200:162",
-                 "k": [
-                  "ET"
-                 ]
-                }
-               ]
-              },
-              {
-               "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[12.53px] text-[color:#0f1530] w-[79.378px] shrink-0",
-               "id": "I203:11434;200:163",
-               "k": [
-                "Eli T."
-               ]
-              },
-              {
-               "t": "div",
-               "c": "bg-[#e4f1e8] flex gap-[10.444px] h-[50.133px] items-start leading-[1.38] p-[12.533px] relative rounded-[12.533px] flex-1 min-w-0",
-               "n": "Scheduled job",
-               "id": "I203:11434;200:164",
-               "k": [
-                {
-                 "t": "p",
-                 "c": "font-medium relative text-[12.53px] text-[color:#0f1530] w-[233.956px] shrink-0",
-                 "id": "I203:11434;200:165",
-                 "k": [
-                  "Heating tune-up"
-                 ]
-                },
-                {
-                 "t": "p",
-                 "c": "font-normal relative text-[11.49px] text-[color:#2a3360] w-[229.778px] shrink-0",
-                 "id": "I203:11434;200:166",
-                 "k": [
-                  "09–11 · Morgan Reed"
-                 ]
-                }
-               ]
-              }
-             ]
-            },
-            {
-             "t": "div",
-             "c": "bg-[#fff] flex gap-[12.533px] h-[73.111px] items-center p-[12.533px] relative w-full",
-             "n": "Crew / Alex J.",
-             "id": "I203:11434;200:167",
-             "k": [
-              {
-               "t": "div",
-               "c": "bg-[#0f1530] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[41.778px] shrink-0",
-               "n": "Status / AJ",
-               "id": "I203:11434;200:168",
-               "k": [
-                {
-                 "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[10.44px] text-[color:#fff] w-[20.889px] shrink-0",
-                 "id": "I203:11434;200:169",
-                 "k": [
-                  "AJ"
-                 ]
-                }
-               ]
-              },
-              {
-               "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[12.53px] text-[color:#0f1530] w-[79.378px] shrink-0",
-               "id": "I203:11434;200:170",
-               "k": [
-                "Alex J."
-               ]
-              },
-              {
-               "t": "div",
-               "c": "bg-[#fff] flex gap-[10.444px] h-[50.133px] items-start leading-[1.38] p-[12.533px] relative rounded-[12.533px] flex-1 min-w-0",
-               "n": "Scheduled job",
-               "id": "I203:11434;200:171",
-               "k": [
-                {
-                 "t": "p",
-                 "c": "font-medium relative text-[12.53px] text-[color:#0f1530] w-[233.956px] shrink-0",
-                 "id": "I203:11434;200:172",
-                 "k": [
-                  "Water heater visit"
-                 ]
-                },
-                {
-                 "t": "p",
-                 "c": "font-normal relative text-[11.49px] text-[color:#2a3360] w-[229.778px] shrink-0",
-                 "id": "I203:11434;200:173",
-                 "k": [
-                  "11–13 · Sam Park"
-                 ]
-                }
-               ]
-              }
-             ]
-            },
-            {
-             "t": "div",
-             "c": "bg-[#0f1530] flex gap-[16.711px] h-[54.311px] items-start p-[16.711px] relative rounded-[12.533px] w-full",
-             "n": "Assignment strip",
-             "id": "I203:11434;200:174",
-             "k": [
-              {
-               "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[12.53px] text-[color:#fff] w-[146.222px] shrink-0",
-               "id": "I203:11434;200:175",
+               "c": "font-semibold leading-[1.38] relative text-[28.2px] text-[color:#0f1530] flex-1 min-w-0",
+               "id": "219:8125",
                "k": [
                 "Job #1042"
                ]
               },
               {
-               "t": "p",
-               "c": "font-normal leading-[1.38] relative text-[12.53px] text-[color:#fff] flex-1 min-w-0",
-               "id": "I203:11434;200:176",
+               "t": "div",
+               "c": "bg-[#fff4d6] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[208.889px] shrink-0",
+               "n": "Status / IN PROGRESS",
+               "id": "219:8126",
                "k": [
-                "Assigned to Maya · Details ready"
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10.444px] text-[color:#0f1530] w-[188px] shrink-0",
+                 "id": "219:8127",
+                 "k": [
+                  "IN PROGRESS"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[20.889px] items-start relative w-full",
+             "n": "Work order details",
+             "id": "219:8128",
+             "k": [
+              {
+               "t": "div",
+               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start leading-[1.38] p-[20.889px] relative rounded-[16.711px] flex-1 min-w-0",
+               "n": "Job facts",
+               "id": "219:8129",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-semibold relative text-[24.022px] text-[color:#0f1530] w-full",
+                 "id": "219:8130",
+                 "k": [
+                  "AC diagnostic"
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[10.444px] items-start relative text-[12.533px] w-full",
+                 "n": "Field / Customer",
+                 "id": "219:8131",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[color:#2a3360] w-[138.911px] shrink-0",
+                   "id": "219:8132",
+                   "k": [
+                    "Customer"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-medium relative text-[color:#0f1530] w-[103.4px] shrink-0",
+                   "id": "219:8133",
+                   "k": [
+                    "Jordan Lee"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[10.444px] items-start relative text-[12.533px] w-full",
+                 "n": "Field / Technician",
+                 "id": "219:8134",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[color:#2a3360] w-[138.911px] shrink-0",
+                   "id": "219:8135",
+                   "k": [
+                    "Technician"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-medium relative text-[color:#0f1530] w-[103.4px] shrink-0",
+                   "id": "219:8136",
+                   "k": [
+                    "Maya R."
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[10.444px] items-start relative text-[12.533px] w-full",
+                 "n": "Field / Visit",
+                 "id": "219:8137",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[color:#2a3360] w-[138.911px] shrink-0",
+                   "id": "219:8138",
+                   "k": [
+                    "Visit"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-medium relative text-[color:#0f1530] w-[103.4px] shrink-0",
+                   "id": "219:8139",
+                   "k": [
+                    "10:00–12:00"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[10.444px] items-start relative text-[12.533px] w-full",
+                 "n": "Field / Estimate",
+                 "id": "219:8140",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[color:#2a3360] w-[138.911px] shrink-0",
+                   "id": "219:8141",
+                   "k": [
+                    "Estimate"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-medium relative text-[color:#0f1530] w-[103.4px] shrink-0",
+                   "id": "219:8142",
+                   "k": [
+                    "#2048 accepted"
+                   ]
+                  }
+                 ]
+                }
                ]
               },
               {
                "t": "div",
-               "c": "relative size-[20.889px]",
-               "n": "Icon / check",
-               "id": "I203:11434;200:177",
+               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] flex-1 min-w-0",
+               "n": "Work order tasks",
+               "id": "219:8143",
                "k": [
                 {
-                 "t": "img",
-                 "c": "absolute block inset-0 size-full",
-                 "src": "/marketing/flagship/icon-check1-73a25a6e.svg"
+                 "t": "p",
+                 "c": "font-semibold leading-[1.38] relative text-[22.978px] text-[color:#0f1530] w-full",
+                 "id": "219:8144",
+                 "k": [
+                  "Ready for the crew"
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[10.444px] items-start relative w-full",
+                 "n": "Approved scope attached",
+                 "id": "219:8145",
+                 "k": [
+                  {
+                   "t": "div",
+                   "c": "relative size-[19.844px]",
+                   "n": "Icon / check",
+                   "id": "219:8146",
+                   "k": [
+                    {
+                     "t": "img",
+                     "c": "absolute block inset-0 size-full",
+                     "src": "/marketing/flagship/icon-check3-565fcbb1.svg"
+                    }
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-normal leading-[1.38] relative text-[13.578px] text-[color:#0f1530] flex-1 min-w-0",
+                   "id": "219:8148",
+                   "k": [
+                    "Approved scope attached"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[10.444px] items-start relative w-full",
+                 "n": "Equipment details available",
+                 "id": "219:8149",
+                 "k": [
+                  {
+                   "t": "div",
+                   "c": "relative size-[19.844px]",
+                   "n": "Icon / check",
+                   "id": "219:8150",
+                   "k": [
+                    {
+                     "t": "img",
+                     "c": "absolute block inset-0 size-full",
+                     "src": "/marketing/flagship/icon-check4-87ac9ecd.svg"
+                    }
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-normal leading-[1.38] relative text-[13.578px] text-[color:#0f1530] flex-1 min-w-0",
+                   "id": "219:8152",
+                   "k": [
+                    "Equipment details available"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[10.444px] items-start relative w-full",
+                 "n": "Site checklist ready",
+                 "id": "219:8153",
+                 "k": [
+                  {
+                   "t": "div",
+                   "c": "relative size-[19.844px]",
+                   "n": "Icon / check",
+                   "id": "219:8154",
+                   "k": [
+                    {
+                     "t": "img",
+                     "c": "absolute block inset-0 size-full",
+                     "src": "/marketing/flagship/icon-check5-80f9d63f.svg"
+                    }
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-normal leading-[1.38] relative text-[13.578px] text-[color:#0f1530] flex-1 min-w-0",
+                   "id": "219:8156",
+                   "k": [
+                    "Site checklist ready"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[10.444px] items-start relative w-full",
+                 "n": "Job photos attached",
+                 "id": "219:8157",
+                 "k": [
+                  {
+                   "t": "div",
+                   "c": "relative size-[19.844px]",
+                   "n": "Icon / check",
+                   "id": "219:8158",
+                   "k": [
+                    {
+                     "t": "img",
+                     "c": "absolute block inset-0 size-full",
+                     "src": "/marketing/flagship/icon-check6-7b78a6f8.svg"
+                    }
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-normal leading-[1.38] relative text-[13.578px] text-[color:#0f1530] flex-1 min-w-0",
+                   "id": "219:8160",
+                   "k": [
+                    "Job photos attached"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#0f1530] flex h-[39.689px] items-center justify-center px-[14.622px] relative rounded-[12.533px] w-full",
+                 "n": "UI action / Open work order",
+                 "id": "219:8161",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[12.533px] text-[color:#fff] text-center flex-1 min-w-0",
+                   "id": "219:8162",
+                   "k": [
+                    "Open work order"
+                   ]
+                  }
+                 ]
                 }
                ]
               }
@@ -20019,184 +17221,101 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
     },
     {
      "t": "div",
-     "c": "bg-[#fff] flex flex-col gap-[32px] items-start p-[80px] relative w-full",
-     "n": "02 / A workflow you can see",
-     "id": "203:11477",
+     "c": "bg-[#fff] flex flex-col gap-[24px] items-start px-[80px] py-[48px] relative w-full",
+     "n": "02 / Three visible product states",
+     "id": "219:8164",
      "k": [
       {
-       "t": "div",
-       "c": "flex flex-col gap-[12px] items-start relative w-full",
-       "n": "Workflow heading",
-       "id": "203:11478",
+       "t": "p",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+       "id": "219:8165",
        "k": [
-        {
-         "t": "p",
-         "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
-         "id": "203:11479",
-         "k": [
-          "EXAMPLE WORKFLOW"
-         ]
-        },
-        {
-         "t": "p",
-         "c": "font-semibold leading-[1.08] relative text-[44px] text-[color:#0f1530] tracking-[-1.1px] w-full",
-         "id": "203:11480",
-         "k": [
-          "See the work happen."
-         ]
-        }
+        "EXAMPLE WORKFLOW"
+       ]
+      },
+      {
+       "t": "p",
+       "c": "font-semibold leading-[1.08] relative text-[40px] text-[color:#0f1530] tracking-[-1px] w-full",
+       "id": "219:8166",
+       "k": [
+        "See the work happen."
        ]
       },
       {
        "t": "div",
        "c": "flex gap-[40px] items-start relative w-full",
-       "n": "Three product moments",
-       "id": "203:11481",
+       "n": "Product workflow states",
+       "id": "219:8167",
        "k": [
         {
          "t": "div",
-         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[var(--radius\\\\/16,16px)] flex-1 min-w-0",
-         "n": "Feature workflow / See the day",
-         "id": "203:11501",
+         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[var(--radius\\\\/16,16px)] flex-1 min-w-0",
+         "n": "Complementary workflow / Start with approved work / Desktop",
+         "id": "219:8178",
          "k": [
           {
-           "t": "div",
-           "c": "flex gap-[12px] items-start relative w-full",
-           "n": "Step heading",
-           "id": "203:11483",
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+           "id": "219:8169",
            "k": [
-            {
-             "t": "div",
-             "c": "bg-[#0f1530] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[40px] shrink-0",
-             "n": "Status / 01",
-             "id": "203:11484",
-             "k": [
-              {
-               "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#fff] w-[20px] shrink-0",
-               "id": "203:11485",
-               "k": [
-                "01"
-               ]
-              }
-             ]
-            },
-            {
-             "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] flex-1 min-w-0",
-             "id": "203:11486",
-             "k": [
-              "See the day"
-             ]
-            }
+            "Start with approved work"
            ]
           },
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-full",
-           "n": "Illustrated product state / schedule",
-           "id": "203:11487",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[250px] items-start p-[16px] relative rounded-[12px] w-full",
+           "n": "Example state / accepted",
+           "id": "219:8170",
            "k": [
             {
+             "t": "div",
+             "c": "relative size-[30px]",
+             "n": "Icon / check",
+             "id": "219:8171",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check1-7e17b6d5.svg"
+              }
+             ]
+            },
+            {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[21px] text-[color:#0f1530] w-full",
-             "id": "203:11488",
+             "c": "font-semibold leading-[1.38] relative text-[23px] text-[color:#0f1530] w-full",
+             "id": "219:8173",
              "k": [
-              "Next available day"
+              "Estimate accepted"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#2a3360] w-full",
+             "id": "219:8174",
+             "k": [
+              "#2048 · Jordan Lee"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-bold leading-[1.08] relative text-[38px] text-[color:#0f1530] tracking-[-0.95px] w-full",
+             "id": "219:8175",
+             "k": [
+              "$274"
              ]
             },
             {
              "t": "div",
-             "c": "bg-[#fff4d6] flex gap-[10px] h-[56px] items-start p-[12px] relative rounded-[12px] w-full",
-             "n": "Maya",
-             "id": "203:11489",
+             "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+             "n": "Status / Approved scope attached",
+             "id": "219:8176",
              "k": [
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[13px] text-[color:#2a3360] w-[56px] shrink-0",
-               "id": "203:11490",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] flex-1 min-w-0",
+               "id": "219:8177",
                "k": [
-                "10:00"
-               ]
-              },
-              {
-               "t": "div",
-               "c": "flex flex-col items-start relative w-[226px] shrink-0",
-               "n": "Assignment",
-               "id": "203:11491",
-               "k": [
-                {
-                 "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[14px] text-[color:#0f1530] w-full",
-                 "id": "203:11492",
-                 "k": [
-                  "Maya · AC tune-up"
-                 ]
-                }
-               ]
-              }
-             ]
-            },
-            {
-             "t": "div",
-             "c": "bg-[#fff] flex gap-[10px] h-[56px] items-start p-[12px] relative rounded-[12px] w-full",
-             "n": "Alex",
-             "id": "203:11493",
-             "k": [
-              {
-               "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[13px] text-[color:#2a3360] w-[56px] shrink-0",
-               "id": "203:11494",
-               "k": [
-                "10:30"
-               ]
-              },
-              {
-               "t": "div",
-               "c": "flex flex-col items-start relative w-[226px] shrink-0",
-               "n": "Assignment",
-               "id": "203:11495",
-               "k": [
-                {
-                 "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[14px] text-[color:#0f1530] w-full",
-                 "id": "203:11496",
-                 "k": [
-                  "Alex · Leak repair"
-                 ]
-                }
-               ]
-              }
-             ]
-            },
-            {
-             "t": "div",
-             "c": "bg-[#fff] flex gap-[10px] h-[56px] items-start p-[12px] relative rounded-[12px] w-full",
-             "n": "Open",
-             "id": "203:11497",
-             "k": [
-              {
-               "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[13px] text-[color:#2a3360] w-[56px] shrink-0",
-               "id": "203:11498",
-               "k": [
-                "14:00"
-               ]
-              },
-              {
-               "t": "div",
-               "c": "flex flex-col items-start relative w-[226px] shrink-0",
-               "n": "Assignment",
-               "id": "203:11499",
-               "k": [
-                {
-                 "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[14px] text-[color:#0f1530] w-full",
-                 "id": "203:11500",
-                 "k": [
-                  "Open · Available"
-                 ]
-                }
+                "Approved scope attached"
                ]
               }
              ]
@@ -20207,134 +17326,131 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "div",
-         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[var(--radius\\\\/16,16px)] flex-1 min-w-0",
-         "n": "Feature workflow / Review the fit",
-         "id": "203:11519",
+         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[var(--radius\\\\/16,16px)] flex-1 min-w-0",
+         "n": "Complementary workflow / Prepare the crew / Desktop",
+         "id": "219:8197",
          "k": [
           {
-           "t": "div",
-           "c": "flex gap-[12px] items-start relative w-full",
-           "n": "Step heading",
-           "id": "203:11503",
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+           "id": "219:8180",
            "k": [
-            {
-             "t": "div",
-             "c": "bg-[#0f1530] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[40px] shrink-0",
-             "n": "Status / 02",
-             "id": "203:11504",
-             "k": [
-              {
-               "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#fff] w-[20px] shrink-0",
-               "id": "203:11505",
-               "k": [
-                "02"
-               ]
-              }
-             ]
-            },
-            {
-             "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] flex-1 min-w-0",
-             "id": "203:11506",
-             "k": [
-              "Review the fit"
-             ]
-            }
+            "Prepare the crew"
            ]
           },
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-full",
-           "n": "Illustrated product state / assignment",
-           "id": "203:11507",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[250px] items-start p-[16px] relative rounded-[12px] w-full",
+           "n": "Example state / tasks",
+           "id": "219:8181",
            "k": [
             {
-             "t": "div",
-             "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
-             "n": "Status / HVAC JOB",
-             "id": "203:11508",
-             "k": [
-              {
-               "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[170px] shrink-0",
-               "id": "203:11509",
-               "k": [
-                "HVAC JOB"
-               ]
-              }
-             ]
-            },
-            {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[27px] text-[color:#0f1530] w-full",
-             "id": "203:11510",
+             "c": "font-semibold leading-[1.38] relative text-[23px] text-[color:#0f1530] w-full",
+             "id": "219:8182",
              "k": [
-              "Maya R."
-             ]
-            },
-            {
-             "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#2a3360] w-full",
-             "id": "203:11511",
-             "k": [
-              "Available · 10:00–12:00"
+              "Job #1042"
              ]
             },
             {
              "t": "div",
-             "c": "bg-[#fff] flex gap-[12px] h-[66px] items-start p-[14px] relative rounded-[12px] w-full",
-             "n": "Context",
-             "id": "203:11512",
+             "c": "flex gap-[10px] items-start relative w-full",
+             "n": "Maya R. assigned",
+             "id": "219:8183",
              "k": [
               {
                "t": "div",
-               "c": "relative size-[30px]",
-               "n": "Icon / calendar",
-               "id": "203:11513",
+               "c": "relative size-[20px]",
+               "n": "Icon / check",
+               "id": "219:8184",
                "k": [
                 {
                  "t": "img",
                  "c": "absolute block inset-0 size-full",
-                 "src": "/marketing/flagship/icon-calendar-56f51515.svg"
+                 "src": "/marketing/flagship/icon-check2-46fe38a0.svg"
                 }
                ]
               },
               {
-               "t": "div",
-               "c": "font-normal relative text-[14px] text-[color:#0f1530] flex-1 min-w-0",
-               "id": "203:11516",
+               "t": "p",
+               "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#0f1530] flex-1 min-w-0",
+               "id": "219:8186",
                "k": [
-                {
-                 "t": "p",
-                 "c": "leading-[1.38] mb-0",
-                 "k": [
-                  "Job #1042"
-                 ]
-                },
-                {
-                 "t": "p",
-                 "c": "leading-[1.38]",
-                 "k": [
-                  "AC diagnostic"
-                 ]
-                }
+                "Maya R. assigned"
                ]
               }
              ]
             },
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
-             "n": "UI action / Review assignment",
-             "id": "203:11517",
+             "c": "flex gap-[10px] items-start relative w-full",
+             "n": "Equipment details ready",
+             "id": "219:8187",
+             "k": [
+              {
+               "t": "div",
+               "c": "relative size-[20px]",
+               "n": "Icon / check",
+               "id": "219:8188",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-check2-46fe38a0.svg"
+                }
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#0f1530] flex-1 min-w-0",
+               "id": "219:8190",
+               "k": [
+                "Equipment details ready"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[10px] items-start relative w-full",
+             "n": "Checklist attached",
+             "id": "219:8191",
+             "k": [
+              {
+               "t": "div",
+               "c": "relative size-[20px]",
+               "n": "Icon / check",
+               "id": "219:8192",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-check2-46fe38a0.svg"
+                }
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#0f1530] flex-1 min-w-0",
+               "id": "219:8194",
+               "k": [
+                "Checklist attached"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[210px] shrink-0",
+             "n": "Status / Work order ready",
+             "id": "219:8195",
              "k": [
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
-               "id": "203:11518",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[190px] shrink-0",
+               "id": "219:8196",
                "k": [
-                "Review assignment"
+                "Work order ready"
                ]
               }
              ]
@@ -20345,118 +17461,89 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "div",
-         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[var(--radius\\\\/16,16px)] flex-1 min-w-0",
-         "n": "Feature workflow / Handle the change",
-         "id": "203:11537",
+         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[var(--radius\\\\/16,16px)] flex-1 min-w-0",
+         "n": "Complementary workflow / Close the job / Desktop",
+         "id": "219:8212",
          "k": [
           {
-           "t": "div",
-           "c": "flex gap-[12px] items-start relative w-full",
-           "n": "Step heading",
-           "id": "203:11521",
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+           "id": "219:8199",
            "k": [
-            {
-             "t": "div",
-             "c": "bg-[#0f1530] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[40px] shrink-0",
-             "n": "Status / 03",
-             "id": "203:11522",
-             "k": [
-              {
-               "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#fff] w-[20px] shrink-0",
-               "id": "203:11523",
-               "k": [
-                "03"
-               ]
-              }
-             ]
-            },
-            {
-             "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] flex-1 min-w-0",
-             "id": "203:11524",
-             "k": [
-              "Handle the change"
-             ]
-            }
+            "Close the job"
            ]
           },
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-full",
-           "n": "Illustrated product state / reschedule",
-           "id": "203:11525",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[250px] items-start p-[16px] relative rounded-[12px] w-full",
+           "n": "Example state / completion",
+           "id": "219:8200",
            "k": [
             {
              "t": "div",
-             "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
-             "n": "Status / CHANGE REQUEST",
-             "id": "203:11526",
+             "c": "relative size-[30px]",
+             "n": "Icon / check",
+             "id": "219:8201",
              "k": [
               {
-               "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[170px] shrink-0",
-               "id": "203:11527",
-               "k": [
-                "CHANGE REQUEST"
-               ]
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check1-7e17b6d5.svg"
               }
              ]
             },
             {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[27px] text-[color:#0f1530] w-full",
-             "id": "203:11528",
+             "c": "font-semibold leading-[1.38] relative text-[25px] text-[color:#0f1530] w-full",
+             "id": "219:8203",
              "k": [
-              "Friday, 9:00 AM"
-             ]
-            },
-            {
-             "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#2a3360] w-full",
-             "id": "203:11529",
-             "k": [
-              "Jordan requested a new time"
+              "Visit complete"
              ]
             },
             {
              "t": "div",
-             "c": "bg-[#fff] flex gap-[12px] h-[66px] items-start p-[14px] relative rounded-[12px] w-full",
-             "n": "Context",
-             "id": "203:11530",
+             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-full",
+             "n": "Field / Checklist",
+             "id": "219:8204",
              "k": [
               {
-               "t": "div",
-               "c": "relative size-[30px]",
-               "n": "Icon / calendar",
-               "id": "203:11531",
+               "t": "p",
+               "c": "font-normal relative text-[color:#2a3360] w-[183px] shrink-0",
+               "id": "219:8205",
                "k": [
-                {
-                 "t": "img",
-                 "c": "absolute block inset-0 size-full",
-                 "src": "/marketing/flagship/icon-calendar-56f51515.svg"
-                }
+                "Checklist"
                ]
               },
               {
-               "t": "div",
-               "c": "font-normal relative text-[14px] text-[color:#0f1530] flex-1 min-w-0",
-               "id": "203:11534",
+               "t": "p",
+               "c": "font-medium relative text-[color:#0f1530] w-[139px] shrink-0",
+               "id": "219:8206",
                "k": [
-                {
-                 "t": "p",
-                 "c": "leading-[1.38] mb-0",
-                 "k": [
-                  "Proposed visit"
-                 ]
-                },
-                {
-                 "t": "p",
-                 "c": "leading-[1.38]",
-                 "k": [
-                  "Owner approval required"
-                 ]
-                }
+                "6 of 6"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-full",
+             "n": "Field / Job photos",
+             "id": "219:8207",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-normal relative text-[color:#2a3360] w-[183px] shrink-0",
+               "id": "219:8208",
+               "k": [
+                "Job photos"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium relative text-[color:#0f1530] w-[139px] shrink-0",
+               "id": "219:8209",
+               "k": [
+                "2 attached"
                ]
               }
              ]
@@ -20464,15 +17551,15 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             {
              "t": "div",
              "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
-             "n": "UI action / Confirm change",
-             "id": "203:11535",
+             "n": "UI action / Create invoice",
+             "id": "219:8210",
              "k": [
               {
                "t": "p",
                "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
-               "id": "203:11536",
+               "id": "219:8211",
                "k": [
-                "Confirm change"
+                "Create invoice"
                ]
               }
              ]
@@ -20488,14 +17575,14 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
     },
     {
      "t": "div",
-     "c": "bg-[#0f1530] flex flex-col gap-[16px] items-start px-[80px] py-[48px] relative w-full",
+     "c": "bg-[#0f1530] flex flex-col gap-[24px] items-start px-[80px] py-[48px] relative w-full",
      "n": "03 / Connected workflow and demo",
-     "id": "203:11538",
+     "id": "219:8213",
      "k": [
       {
        "t": "p",
        "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#f6b400] tracking-[1.1px] w-full",
-       "id": "219:10136",
+       "id": "219:8214",
        "k": [
         "WORKS ACROSS YOUR BUSINESS"
        ]
@@ -20503,7 +17590,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
       {
        "t": "p",
        "c": "font-semibold leading-[1.08] relative text-[36px] text-[color:#fff] tracking-[-0.9px] w-full",
-       "id": "219:10137",
+       "id": "219:8215",
        "k": [
         "One job. Connected all the way."
        ]
@@ -20512,30 +17599,30 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
        "t": "div",
        "c": "flex gap-[16px] items-center relative w-full",
        "n": "Flagship and tool handoff",
-       "id": "219:10138",
+       "id": "219:8216",
        "k": [
         {
          "t": "div",
          "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] flex-1 min-w-0",
          "n": "Connected feature / Estimates & approvals / Desktop",
-         "id": "219:10149",
+         "id": "219:8227",
          "k": [
           {
            "t": "div",
            "c": "flex gap-[10px] items-start relative w-full",
            "n": "Suite and record",
-           "id": "219:10140",
+           "id": "219:8218",
            "k": [
             {
              "t": "div",
              "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
              "n": "Status / Revenue",
-             "id": "219:10141",
+             "id": "219:8219",
              "k": [
               {
                "t": "p",
                "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
-               "id": "219:10142",
+               "id": "219:8220",
                "k": [
                 "Revenue"
                ]
@@ -20545,7 +17632,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             {
              "t": "p",
              "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[222px] shrink-0",
-             "id": "219:10143",
+             "id": "219:8221",
              "k": [
               "Estimate #2048"
              ]
@@ -20555,7 +17642,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           {
            "t": "p",
            "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
-           "id": "219:10144",
+           "id": "219:8222",
            "k": [
             "Estimates & approvals"
            ]
@@ -20564,13 +17651,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
            "t": "div",
            "c": "flex gap-[10px] items-start relative w-full",
            "n": "Handoff evidence",
-           "id": "219:10145",
+           "id": "219:8223",
            "k": [
             {
              "t": "div",
              "c": "relative size-[18px]",
              "n": "Icon / check",
-             "id": "219:10146",
+             "id": "219:8224",
              "k": [
               {
                "t": "img",
@@ -20582,9 +17669,9 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             {
              "t": "p",
              "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
-             "id": "219:10148",
+             "id": "219:8226",
              "k": [
-              "Scope accepted"
+              "Customer accepted"
              ]
             }
            ]
@@ -20595,13 +17682,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "t": "div",
          "c": "flex h-[24px] items-center justify-center relative w-[32px] shrink-0",
          "n": "Next connected state",
-         "id": "219:10150",
+         "id": "219:8228",
          "k": [
           {
            "t": "div",
            "c": "relative size-[24px]",
            "n": "Icon / arrow",
-           "id": "219:10151",
+           "id": "219:8229",
            "k": [
             {
              "t": "img",
@@ -20615,25 +17702,25 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         {
          "t": "div",
          "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] flex-1 min-w-0",
-         "n": "Connected feature / Scheduling & dispatch / Desktop",
-         "id": "219:10163",
+         "n": "Connected feature / Jobs & work orders / Desktop",
+         "id": "219:8241",
          "k": [
           {
            "t": "div",
            "c": "flex gap-[10px] items-start relative w-full",
            "n": "Suite and record",
-           "id": "219:10154",
+           "id": "219:8232",
            "k": [
             {
              "t": "div",
              "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
              "n": "Status / Operations",
-             "id": "219:10155",
+             "id": "219:8233",
              "k": [
               {
                "t": "p",
                "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
-               "id": "219:10156",
+               "id": "219:8234",
                "k": [
                 "Operations"
                ]
@@ -20643,7 +17730,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             {
              "t": "p",
              "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[222px] shrink-0",
-             "id": "219:10157",
+             "id": "219:8235",
              "k": [
               "Job #1042 · Jordan Lee"
              ]
@@ -20653,22 +17740,22 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           {
            "t": "p",
            "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
-           "id": "219:10158",
+           "id": "219:8236",
            "k": [
-            "Scheduling & dispatch"
+            "Jobs & work orders"
            ]
           },
           {
            "t": "div",
            "c": "flex gap-[10px] items-start relative w-full",
            "n": "Handoff evidence",
-           "id": "219:10159",
+           "id": "219:8237",
            "k": [
             {
              "t": "div",
              "c": "relative size-[18px]",
              "n": "Icon / check",
-             "id": "219:10160",
+             "id": "219:8238",
              "k": [
               {
                "t": "img",
@@ -20680,9 +17767,9 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             {
              "t": "p",
              "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
-             "id": "219:10162",
+             "id": "219:8240",
              "k": [
-              "Visit assigned"
+              "Crew and work connected"
              ]
             }
            ]
@@ -20693,13 +17780,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "t": "div",
          "c": "flex h-[24px] items-center justify-center relative w-[32px] shrink-0",
          "n": "Next connected state",
-         "id": "219:10164",
+         "id": "219:8242",
          "k": [
           {
            "t": "div",
            "c": "relative size-[24px]",
            "n": "Icon / arrow",
-           "id": "219:10165",
+           "id": "219:8243",
            "k": [
             {
              "t": "img",
@@ -20713,25 +17800,25 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         {
          "t": "div",
          "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] flex-1 min-w-0",
-         "n": "Connected feature / Technician App / Desktop",
-         "id": "219:10177",
+         "n": "Connected feature / Invoices & payments / Desktop",
+         "id": "219:8255",
          "k": [
           {
            "t": "div",
            "c": "flex gap-[10px] items-start relative w-full",
            "n": "Suite and record",
-           "id": "219:10168",
+           "id": "219:8246",
            "k": [
             {
              "t": "div",
              "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
              "n": "Status / Operations",
-             "id": "219:10169",
+             "id": "219:8247",
              "k": [
               {
                "t": "p",
                "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
-               "id": "219:10170",
+               "id": "219:8248",
                "k": [
                 "Operations"
                ]
@@ -20741,7 +17828,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             {
              "t": "p",
              "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[222px] shrink-0",
-             "id": "219:10171",
+             "id": "219:8249",
              "k": [
               "Job #1042 · Jordan Lee"
              ]
@@ -20751,22 +17838,22 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           {
            "t": "p",
            "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
-           "id": "219:10172",
+           "id": "219:8250",
            "k": [
-            "Technician App"
+            "Invoices & payments"
            ]
           },
           {
            "t": "div",
            "c": "flex gap-[10px] items-start relative w-full",
            "n": "Handoff evidence",
-           "id": "219:10173",
+           "id": "219:8251",
            "k": [
             {
              "t": "div",
              "c": "relative size-[18px]",
              "n": "Icon / check",
-             "id": "219:10174",
+             "id": "219:8252",
              "k": [
               {
                "t": "img",
@@ -20778,9 +17865,9 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             {
              "t": "p",
              "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
-             "id": "219:10176",
+             "id": "219:8254",
              "k": [
-              "Details ready for the field"
+              "Completed work ready to bill"
              ]
             }
            ]
@@ -20794,7 +17881,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
        "label": "Get a free demo",
        "kind": "Accent",
        "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#0f1530]",
-       "href": "/signup"
+       "href": "/demo"
       }
      ]
     }
@@ -20803,54 +17890,54 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
   "mobile": {
    "t": "div",
    "c": "bg-[#fbf6ef] flex flex-col items-start relative",
-   "n": "Scheduling & Dispatch / Mobile",
-   "id": "175:2154",
+   "n": "Jobs & Work Orders / Mobile",
+   "id": "215:6311",
    "k": [
     {
      "t": "div",
-     "c": "bg-[#fbf6ef] flex flex-col gap-[32px] items-start p-[24px] relative w-full",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[24px] items-start p-[24px] relative w-full",
      "n": "01 / Product in view",
-     "id": "203:11554",
+     "id": "219:8270",
      "k": [
       {
        "t": "div",
-       "c": "flex flex-col gap-[32px] items-start relative w-full",
-       "n": "Outcome and product",
-       "id": "203:11555",
+       "c": "flex flex-col gap-[24px] items-start relative w-full",
+       "n": "Outcome and actual workflow",
+       "id": "219:8271",
        "k": [
         {
          "t": "div",
-         "c": "flex flex-col gap-[20px] items-start relative w-full",
-         "n": "Short outcome copy",
-         "id": "203:11556",
+         "c": "flex flex-col gap-[16px] items-start relative w-full",
+         "n": "Short product promise",
+         "id": "219:8272",
          "k": [
           {
            "t": "p",
            "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
-           "id": "203:11557",
+           "id": "219:8273",
            "k": [
-            "SCHEDULING & DISPATCH"
+            "OPERATIONS / JOBS & WORK ORDERS"
            ]
           },
           {
            "t": "h1",
            "c": "font-semibold leading-[1.08] relative text-[40px] text-[color:#0f1530] tracking-[-1px] w-full",
-           "id": "203:11558",
+           "id": "219:8274",
            "k": [
-            "A clear plan for every visit."
+            "One job. Every detail."
            ]
           },
           {
            "t": "p",
            "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-full",
-           "id": "203:11559",
+           "id": "219:8275",
            "k": [
-            "Match jobs with technician availability and keep changes visible."
+            "Keep the approved work, crew, tasks, and files together."
            ]
           },
           {
            "t": "button",
-           "label": "See the schedule",
+           "label": "See a work order",
            "kind": "Dark",
            "c": "bg-[#0f1530] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#fbf6ef]",
            "href": "#workflow-m"
@@ -20858,7 +17945,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           {
            "t": "p",
            "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
-           "id": "203:11562",
+           "id": "219:8278",
            "k": [
             "EXAMPLE BUSINESS · JUNIPER"
            ]
@@ -20867,20 +17954,20 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "div",
-         "c": "bg-[#f6f7f9] border-[0.475px] border-[#e6dccb] border-solid flex flex-col h-[244.625px] items-start overflow-clip relative rounded-[7.6px] w-full",
-         "n": "Product demonstration / Scheduling & Dispatch",
-         "id": "203:11563",
+         "c": "bg-[#f6f7f9] border-[0.475px] border-[#e6dccb] border-solid flex flex-col items-start relative rounded-[7.6px] w-full",
+         "n": "Product demonstration / Jobs & Work Orders",
+         "id": "219:8279",
          "k": [
           {
            "t": "div",
            "c": "bg-[#0f1530] flex gap-[7.6px] h-[25.65px] items-center p-[7.6px] relative w-full",
            "n": "Product chrome",
-           "id": "I203:11563;200:137",
+           "id": "I219:8279;219:8118",
            "k": [
             {
              "t": "p",
-             "c": "font-bold leading-[1.38] relative text-[8.07px] text-[color:#fff] w-[66.5px] shrink-0",
-             "id": "I203:11563;200:138",
+             "c": "font-bold leading-[1.38] relative text-[8.08px] text-[color:#fff] w-[66.5px] shrink-0",
+             "id": "I219:8279;219:8119",
              "k": [
               "Renvani"
              ]
@@ -20888,21 +17975,21 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             {
              "t": "p",
              "c": "font-medium leading-[1.38] relative text-[5.7px] text-[color:#fff] w-[196.65px] shrink-0",
-             "id": "I203:11563;200:139",
+             "id": "I219:8279;219:8120",
              "k": [
-              "Schedule"
+              "Jobs & work orders"
              ]
             },
             {
              "t": "div",
              "c": "bg-[#f6b400] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[48.45px] shrink-0",
              "n": "Status / EXAMPLE",
-             "id": "I203:11563;200:140",
+             "id": "I219:8279;219:8121",
              "k": [
               {
                "t": "p",
                "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#0f1530] w-[38.95px] shrink-0",
-               "id": "I203:11563;200:141",
+               "id": "I219:8279;219:8122",
                "k": [
                 "EXAMPLE"
                ]
@@ -20915,288 +18002,303 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
            "t": "div",
            "c": "bg-[#f6f7f9] flex flex-col gap-[7.6px] items-start p-[11.4px] relative w-full",
            "n": "Product workspace",
-           "id": "I203:11563;200:142",
+           "id": "I219:8279;219:8123",
            "k": [
             {
              "t": "div",
-             "c": "flex gap-[7.6px] items-start relative w-full",
-             "n": "Screen title",
-             "id": "I203:11563;200:143",
+             "c": "flex gap-[9.5px] items-start relative w-full",
+             "n": "Work order heading",
+             "id": "I219:8279;219:8124",
              "k": [
               {
                "t": "p",
-               "c": "font-semibold leading-[1.38] relative text-[10.92px] text-[color:#0f1530] w-[218.5px] shrink-0",
-               "id": "I203:11563;200:144",
-               "k": [
-                "Schedule"
-               ]
-              },
-              {
-               "t": "div",
-               "c": "bg-[#fff] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[85.5px] shrink-0",
-               "n": "Status / Your business",
-               "id": "I203:11563;200:145",
-               "k": [
-                {
-                 "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#2a3360] w-[76px] shrink-0",
-                 "id": "I203:11563;200:146",
-                 "k": [
-                  "Your business"
-                 ]
-                }
-               ]
-              }
-             ]
-            },
-            {
-             "t": "div",
-             "c": "bg-[#fff] flex gap-[5.7px] items-start leading-[1.38] p-[5.7px] relative rounded-[5.7px] text-[5.22px] text-[color:#2a3360] w-full",
-             "n": "Time scale",
-             "id": "I203:11563;200:147",
-             "k": [
-              {
-               "t": "p",
-               "c": "font-medium relative w-[60.8px] shrink-0",
-               "id": "I203:11563;200:148",
-               "k": [
-                "THU 29 OCT"
-               ]
-              },
-              {
-               "t": "p",
-               "c": "font-normal relative w-[51.3px] shrink-0",
-               "id": "I203:11563;200:149",
-               "k": [
-                "09:00"
-               ]
-              },
-              {
-               "t": "p",
-               "c": "font-normal relative w-[51.3px] shrink-0",
-               "id": "I203:11563;200:150",
-               "k": [
-                "10:00"
-               ]
-              },
-              {
-               "t": "p",
-               "c": "font-normal relative w-[51.3px] shrink-0",
-               "id": "I203:11563;200:151",
-               "k": [
-                "11:00"
-               ]
-              },
-              {
-               "t": "p",
-               "c": "font-normal relative w-[51.3px] shrink-0",
-               "id": "I203:11563;200:152",
-               "k": [
-                "12:00"
-               ]
-              }
-             ]
-            },
-            {
-             "t": "div",
-             "c": "bg-[#fff] flex gap-[5.7px] h-[33.25px] items-center p-[5.7px] relative w-full",
-             "n": "Crew / Maya R.",
-             "id": "I203:11563;200:153",
-             "k": [
-              {
-               "t": "div",
-               "c": "bg-[#0f1530] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[19px] shrink-0",
-               "n": "Status / MR",
-               "id": "I203:11563;200:154",
-               "k": [
-                {
-                 "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#fff] w-[9.5px] shrink-0",
-                 "id": "I203:11563;200:155",
-                 "k": [
-                  "MR"
-                 ]
-                }
-               ]
-              },
-              {
-               "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[5.7px] text-[color:#0f1530] w-[36.1px] shrink-0",
-               "id": "I203:11563;200:156",
-               "k": [
-                "Maya R."
-               ]
-              },
-              {
-               "t": "div",
-               "c": "bg-[#fff4d6] flex gap-[4.75px] h-[22.8px] items-start leading-[1.38] p-[5.7px] relative rounded-[5.7px] w-[228px] shrink-0",
-               "n": "Scheduled job",
-               "id": "I203:11563;200:157",
-               "k": [
-                {
-                 "t": "p",
-                 "c": "font-medium relative text-[5.7px] text-[color:#0f1530] w-[106.4px] shrink-0",
-                 "id": "I203:11563;200:158",
-                 "k": [
-                  "AC diagnostic"
-                 ]
-                },
-                {
-                 "t": "p",
-                 "c": "font-normal relative text-[5.22px] text-[color:#2a3360] w-[104.5px] shrink-0",
-                 "id": "I203:11563;200:159",
-                 "k": [
-                  "10–12 · Jordan Lee"
-                 ]
-                }
-               ]
-              }
-             ]
-            },
-            {
-             "t": "div",
-             "c": "bg-[#fff] flex gap-[5.7px] h-[33.25px] items-center p-[5.7px] relative w-full",
-             "n": "Crew / Eli T.",
-             "id": "I203:11563;200:160",
-             "k": [
-              {
-               "t": "div",
-               "c": "bg-[#0f1530] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[19px] shrink-0",
-               "n": "Status / ET",
-               "id": "I203:11563;200:161",
-               "k": [
-                {
-                 "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#fff] w-[9.5px] shrink-0",
-                 "id": "I203:11563;200:162",
-                 "k": [
-                  "ET"
-                 ]
-                }
-               ]
-              },
-              {
-               "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[5.7px] text-[color:#0f1530] w-[36.1px] shrink-0",
-               "id": "I203:11563;200:163",
-               "k": [
-                "Eli T."
-               ]
-              },
-              {
-               "t": "div",
-               "c": "bg-[#e4f1e8] flex gap-[4.75px] h-[22.8px] items-start leading-[1.38] p-[5.7px] relative rounded-[5.7px] w-[228px] shrink-0",
-               "n": "Scheduled job",
-               "id": "I203:11563;200:164",
-               "k": [
-                {
-                 "t": "p",
-                 "c": "font-medium relative text-[5.7px] text-[color:#0f1530] w-[106.4px] shrink-0",
-                 "id": "I203:11563;200:165",
-                 "k": [
-                  "Heating tune-up"
-                 ]
-                },
-                {
-                 "t": "p",
-                 "c": "font-normal relative text-[5.22px] text-[color:#2a3360] w-[104.5px] shrink-0",
-                 "id": "I203:11563;200:166",
-                 "k": [
-                  "09–11 · Morgan Reed"
-                 ]
-                }
-               ]
-              }
-             ]
-            },
-            {
-             "t": "div",
-             "c": "bg-[#fff] flex gap-[5.7px] h-[33.25px] items-center p-[5.7px] relative w-full",
-             "n": "Crew / Alex J.",
-             "id": "I203:11563;200:167",
-             "k": [
-              {
-               "t": "div",
-               "c": "bg-[#0f1530] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[19px] shrink-0",
-               "n": "Status / AJ",
-               "id": "I203:11563;200:168",
-               "k": [
-                {
-                 "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#fff] w-[9.5px] shrink-0",
-                 "id": "I203:11563;200:169",
-                 "k": [
-                  "AJ"
-                 ]
-                }
-               ]
-              },
-              {
-               "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[5.7px] text-[color:#0f1530] w-[36.1px] shrink-0",
-               "id": "I203:11563;200:170",
-               "k": [
-                "Alex J."
-               ]
-              },
-              {
-               "t": "div",
-               "c": "bg-[#fff] flex gap-[4.75px] h-[22.8px] items-start leading-[1.38] p-[5.7px] relative rounded-[5.7px] w-[228px] shrink-0",
-               "n": "Scheduled job",
-               "id": "I203:11563;200:171",
-               "k": [
-                {
-                 "t": "p",
-                 "c": "font-medium relative text-[5.7px] text-[color:#0f1530] w-[106.4px] shrink-0",
-                 "id": "I203:11563;200:172",
-                 "k": [
-                  "Water heater visit"
-                 ]
-                },
-                {
-                 "t": "p",
-                 "c": "font-normal relative text-[5.22px] text-[color:#2a3360] w-[104.5px] shrink-0",
-                 "id": "I203:11563;200:173",
-                 "k": [
-                  "11–13 · Sam Park"
-                 ]
-                }
-               ]
-              }
-             ]
-            },
-            {
-             "t": "div",
-             "c": "bg-[#0f1530] flex gap-[7.6px] h-[24.7px] items-start p-[7.6px] relative rounded-[5.7px] w-full",
-             "n": "Assignment strip",
-             "id": "I203:11563;200:174",
-             "k": [
-              {
-               "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[5.7px] text-[color:#fff] w-[66.5px] shrink-0",
-               "id": "I203:11563;200:175",
+               "c": "font-semibold leading-[1.38] relative text-[12.83px] text-[color:#0f1530] w-[204.25px] shrink-0",
+               "id": "I219:8279;219:8125",
                "k": [
                 "Job #1042"
                ]
               },
               {
-               "t": "p",
-               "c": "font-normal leading-[1.38] relative text-[5.7px] text-[color:#fff] w-[166.25px] shrink-0",
-               "id": "I203:11563;200:176",
+               "t": "div",
+               "c": "bg-[#fff4d6] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[95px] shrink-0",
+               "n": "Status / IN PROGRESS",
+               "id": "I219:8279;219:8126",
                "k": [
-                "Assigned to Maya · Details ready"
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#0f1530] w-[85.5px] shrink-0",
+                 "id": "I219:8279;219:8127",
+                 "k": [
+                  "IN PROGRESS"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[9.5px] items-start relative w-full",
+             "n": "Work order details",
+             "id": "I219:8279;219:8128",
+             "k": [
+              {
+               "t": "div",
+               "c": "bg-[#fff] border-[0.475px] border-[#e6dccb] border-solid flex flex-col gap-[6.65px] items-start leading-[1.38] p-[9.5px] relative rounded-[7.6px] w-[133.95px] shrink-0",
+               "n": "Job facts",
+               "id": "I219:8279;219:8129",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-semibold relative text-[10.92px] text-[color:#0f1530] w-full",
+                 "id": "I219:8279;219:8130",
+                 "k": [
+                  "AC diagnostic"
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[4.75px] items-start relative text-[5.7px] w-full",
+                 "n": "Field / Customer",
+                 "id": "I219:8279;219:8131",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[color:#2a3360] w-[63.175px] shrink-0",
+                   "id": "I219:8279;219:8132",
+                   "k": [
+                    "Customer"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-medium relative text-[color:#0f1530] w-[47.025px] shrink-0",
+                   "id": "I219:8279;219:8133",
+                   "k": [
+                    "Jordan Lee"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[4.75px] items-start relative text-[5.7px] w-full",
+                 "n": "Field / Technician",
+                 "id": "I219:8279;219:8134",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[color:#2a3360] w-[63.175px] shrink-0",
+                   "id": "I219:8279;219:8135",
+                   "k": [
+                    "Technician"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-medium relative text-[color:#0f1530] w-[47.025px] shrink-0",
+                   "id": "I219:8279;219:8136",
+                   "k": [
+                    "Maya R."
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[4.75px] items-start relative text-[5.7px] w-full",
+                 "n": "Field / Visit",
+                 "id": "I219:8279;219:8137",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[color:#2a3360] w-[63.175px] shrink-0",
+                   "id": "I219:8279;219:8138",
+                   "k": [
+                    "Visit"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-medium relative text-[color:#0f1530] w-[47.025px] shrink-0",
+                   "id": "I219:8279;219:8139",
+                   "k": [
+                    "10:00–12:00"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[4.75px] items-start relative text-[5.7px] w-full",
+                 "n": "Field / Estimate",
+                 "id": "I219:8279;219:8140",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[color:#2a3360] w-[63.175px] shrink-0",
+                   "id": "I219:8279;219:8141",
+                   "k": [
+                    "Estimate"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-medium relative text-[color:#0f1530] w-[47.025px] shrink-0",
+                   "id": "I219:8279;219:8142",
+                   "k": [
+                    "#2048 accepted"
+                   ]
+                  }
+                 ]
+                }
                ]
               },
               {
                "t": "div",
-               "c": "relative size-[9.5px]",
-               "n": "Icon / check",
-               "id": "I203:11563;200:177",
+               "c": "bg-[#fff] border-[0.475px] border-[#e6dccb] border-solid flex flex-col gap-[6.65px] items-start p-[9.5px] relative rounded-[7.6px] w-[175.75px] shrink-0",
+               "n": "Work order tasks",
+               "id": "I219:8279;219:8143",
                "k": [
                 {
-                 "t": "img",
-                 "c": "absolute block inset-0 size-full",
-                 "src": "/marketing/flagship/icon-check1-f3c0d878.svg"
+                 "t": "p",
+                 "c": "font-semibold leading-[1.38] relative text-[10.45px] text-[color:#0f1530] w-full",
+                 "id": "I219:8279;219:8144",
+                 "k": [
+                  "Ready for the crew"
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[4.75px] items-start relative w-full",
+                 "n": "Approved scope attached",
+                 "id": "I219:8279;219:8145",
+                 "k": [
+                  {
+                   "t": "div",
+                   "c": "relative size-[9.025px]",
+                   "n": "Icon / check",
+                   "id": "I219:8279;219:8146",
+                   "k": [
+                    {
+                     "t": "img",
+                     "c": "absolute block inset-0 size-full",
+                     "src": "/marketing/flagship/icon-check3-45c308d6.svg"
+                    }
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-normal leading-[1.38] relative text-[6.17px] text-[color:#0f1530] w-[142.975px] shrink-0",
+                   "id": "I219:8279;219:8148",
+                   "k": [
+                    "Approved scope attached"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[4.75px] items-start relative w-full",
+                 "n": "Equipment details available",
+                 "id": "I219:8279;219:8149",
+                 "k": [
+                  {
+                   "t": "div",
+                   "c": "relative size-[9.025px]",
+                   "n": "Icon / check",
+                   "id": "I219:8279;219:8150",
+                   "k": [
+                    {
+                     "t": "img",
+                     "c": "absolute block inset-0 size-full",
+                     "src": "/marketing/flagship/icon-check4-42c1bdbc.svg"
+                    }
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-normal leading-[1.38] relative text-[6.17px] text-[color:#0f1530] w-[142.975px] shrink-0",
+                   "id": "I219:8279;219:8152",
+                   "k": [
+                    "Equipment details available"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[4.75px] items-start relative w-full",
+                 "n": "Site checklist ready",
+                 "id": "I219:8279;219:8153",
+                 "k": [
+                  {
+                   "t": "div",
+                   "c": "relative size-[9.025px]",
+                   "n": "Icon / check",
+                   "id": "I219:8279;219:8154",
+                   "k": [
+                    {
+                     "t": "img",
+                     "c": "absolute block inset-0 size-full",
+                     "src": "/marketing/flagship/icon-check5-60743f1f.svg"
+                    }
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-normal leading-[1.38] relative text-[6.17px] text-[color:#0f1530] w-[142.975px] shrink-0",
+                   "id": "I219:8279;219:8156",
+                   "k": [
+                    "Site checklist ready"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[4.75px] items-start relative w-full",
+                 "n": "Job photos attached",
+                 "id": "I219:8279;219:8157",
+                 "k": [
+                  {
+                   "t": "div",
+                   "c": "relative size-[9.025px]",
+                   "n": "Icon / check",
+                   "id": "I219:8279;219:8158",
+                   "k": [
+                    {
+                     "t": "img",
+                     "c": "absolute block inset-0 size-full",
+                     "src": "/marketing/flagship/icon-check6-3d2f22d7.svg"
+                    }
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-normal leading-[1.38] relative text-[6.17px] text-[color:#0f1530] w-[142.975px] shrink-0",
+                   "id": "I219:8279;219:8160",
+                   "k": [
+                    "Job photos attached"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#0f1530] flex h-[18.05px] items-center justify-center px-[6.65px] relative rounded-[5.7px] w-[156.75px] shrink-0",
+                 "n": "UI action / Open work order",
+                 "id": "I219:8279;219:8161",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[5.7px] text-[color:#fff] text-center w-[143.45px] shrink-0",
+                   "id": "I219:8279;219:8162",
+                   "k": [
+                    "Open work order"
+                   ]
+                  }
+                 ]
                 }
                ]
               }
@@ -21212,184 +18314,101 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
     },
     {
      "t": "div",
-     "c": "bg-[#fff] flex flex-col gap-[32px] items-start p-[24px] relative w-full",
-     "n": "02 / A workflow you can see",
-     "id": "203:11606",
+     "c": "bg-[#fff] flex flex-col gap-[24px] items-start p-[24px] relative w-full",
+     "n": "02 / Three visible product states",
+     "id": "219:8325",
      "k": [
       {
-       "t": "div",
-       "c": "flex flex-col gap-[12px] items-start leading-[1.38] relative w-full",
-       "n": "Workflow heading",
-       "id": "203:11607",
+       "t": "p",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+       "id": "219:8326",
        "k": [
-        {
-         "t": "p",
-         "c": "font-medium relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
-         "id": "203:11608",
-         "k": [
-          "EXAMPLE WORKFLOW"
-         ]
-        },
-        {
-         "t": "p",
-         "c": "font-semibold relative text-[32px] text-[color:#0f1530] w-full",
-         "id": "203:11609",
-         "k": [
-          "See the work happen."
-         ]
-        }
+        "EXAMPLE WORKFLOW"
+       ]
+      },
+      {
+       "t": "p",
+       "c": "font-semibold leading-[1.38] relative text-[30px] text-[color:#0f1530] w-full",
+       "id": "219:8327",
+       "k": [
+        "See the work happen."
        ]
       },
       {
        "t": "div",
-       "c": "flex flex-col gap-[24px] items-start relative w-full",
-       "n": "Three product moments",
-       "id": "203:11610",
+       "c": "flex flex-col gap-[16px] items-start relative w-full",
+       "n": "Product workflow states",
+       "id": "219:8328",
        "k": [
         {
          "t": "div",
-         "c": "bg-[#fff] border-[0.855px] border-[#e6dccb] border-solid flex flex-col gap-[15.39px] h-[444.6px] items-start p-[18.81px] relative rounded-[13.68px] w-full",
-         "n": "Workflow moment / See the day",
-         "id": "203:11611",
+         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[var(--radius\\\\/16,16px)] w-full",
+         "n": "Complementary workflow / Start with approved work / Mobile",
+         "id": "219:8339",
          "k": [
           {
-           "t": "div",
-           "c": "flex gap-[10.26px] items-start relative w-full",
-           "n": "Step heading",
-           "id": "I203:11611;203:11483",
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] w-full",
+           "id": "219:8330",
            "k": [
-            {
-             "t": "div",
-             "c": "bg-[#0f1530] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[34.2px] shrink-0",
-             "n": "Status / 01",
-             "id": "I203:11611;203:11484",
-             "k": [
-              {
-               "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#fff] w-[17.1px] shrink-0",
-               "id": "I203:11611;203:11485",
-               "k": [
-                "01"
-               ]
-              }
-             ]
-            },
-            {
-             "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[15.39px] text-[color:#0f1530] flex-1 min-w-0",
-             "id": "I203:11611;203:11486",
-             "k": [
-              "See the day"
-             ]
-            }
+            "Start with approved work"
            ]
           },
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[11.97px] h-[342px] items-start p-[15.39px] relative rounded-[10.26px] w-full",
-           "n": "Illustrated product state / schedule",
-           "id": "I203:11611;203:11487",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[235px] items-start p-[16px] relative rounded-[12px] w-full",
+           "n": "Example state / accepted",
+           "id": "219:8331",
            "k": [
             {
+             "t": "div",
+             "c": "relative size-[30px]",
+             "n": "Icon / check",
+             "id": "219:8332",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check1-7e17b6d5.svg"
+              }
+             ]
+            },
+            {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[17.95px] text-[color:#0f1530] w-full",
-             "id": "I203:11611;203:11488",
+             "c": "font-semibold leading-[1.38] relative text-[23px] text-[color:#0f1530] w-full",
+             "id": "219:8334",
              "k": [
-              "Next available day"
+              "Estimate accepted"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#2a3360] w-full",
+             "id": "219:8335",
+             "k": [
+              "#2048 · Jordan Lee"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-bold leading-[1.08] relative text-[38px] text-[color:#0f1530] tracking-[-0.95px] w-full",
+             "id": "219:8336",
+             "k": [
+              "$274"
              ]
             },
             {
              "t": "div",
-             "c": "bg-[#fff4d6] flex gap-[8.55px] h-[47.88px] items-start p-[10.26px] relative rounded-[10.26px] w-full",
-             "n": "Maya",
-             "id": "I203:11611;203:11489",
+             "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+             "n": "Status / Approved scope attached",
+             "id": "219:8337",
              "k": [
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[11.11px] text-[color:#2a3360] w-[47.88px] shrink-0",
-               "id": "I203:11611;203:11490",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] flex-1 min-w-0",
+               "id": "219:8338",
                "k": [
-                "10:00"
-               ]
-              },
-              {
-               "t": "div",
-               "c": "flex flex-col items-start relative w-[193.23px] shrink-0",
-               "n": "Assignment",
-               "id": "I203:11611;203:11491",
-               "k": [
-                {
-                 "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[11.97px] text-[color:#0f1530] w-full",
-                 "id": "I203:11611;203:11492",
-                 "k": [
-                  "Maya · AC tune-up"
-                 ]
-                }
-               ]
-              }
-             ]
-            },
-            {
-             "t": "div",
-             "c": "bg-[#fff] flex gap-[8.55px] h-[47.88px] items-start p-[10.26px] relative rounded-[10.26px] w-full",
-             "n": "Alex",
-             "id": "I203:11611;203:11493",
-             "k": [
-              {
-               "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[11.11px] text-[color:#2a3360] w-[47.88px] shrink-0",
-               "id": "I203:11611;203:11494",
-               "k": [
-                "10:30"
-               ]
-              },
-              {
-               "t": "div",
-               "c": "flex flex-col items-start relative w-[193.23px] shrink-0",
-               "n": "Assignment",
-               "id": "I203:11611;203:11495",
-               "k": [
-                {
-                 "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[11.97px] text-[color:#0f1530] w-full",
-                 "id": "I203:11611;203:11496",
-                 "k": [
-                  "Alex · Leak repair"
-                 ]
-                }
-               ]
-              }
-             ]
-            },
-            {
-             "t": "div",
-             "c": "bg-[#fff] flex gap-[8.55px] h-[47.88px] items-start p-[10.26px] relative rounded-[10.26px] w-full",
-             "n": "Open",
-             "id": "I203:11611;203:11497",
-             "k": [
-              {
-               "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[11.11px] text-[color:#2a3360] w-[47.88px] shrink-0",
-               "id": "I203:11611;203:11498",
-               "k": [
-                "14:00"
-               ]
-              },
-              {
-               "t": "div",
-               "c": "flex flex-col items-start relative w-[193.23px] shrink-0",
-               "n": "Assignment",
-               "id": "I203:11611;203:11499",
-               "k": [
-                {
-                 "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[11.97px] text-[color:#0f1530] w-full",
-                 "id": "I203:11611;203:11500",
-                 "k": [
-                  "Open · Available"
-                 ]
-                }
+                "Approved scope attached"
                ]
               }
              ]
@@ -21400,134 +18419,131 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "div",
-         "c": "bg-[#fff] border-[0.855px] border-[#e6dccb] border-solid flex flex-col gap-[15.39px] h-[444.6px] items-start p-[18.81px] relative rounded-[13.68px] w-full",
-         "n": "Workflow moment / Review the fit",
-         "id": "203:11630",
+         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[var(--radius\\\\/16,16px)] w-full",
+         "n": "Complementary workflow / Prepare the crew / Mobile",
+         "id": "219:8358",
          "k": [
           {
-           "t": "div",
-           "c": "flex gap-[10.26px] items-start relative w-full",
-           "n": "Step heading",
-           "id": "I203:11630;203:11503",
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] w-full",
+           "id": "219:8341",
            "k": [
-            {
-             "t": "div",
-             "c": "bg-[#0f1530] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[34.2px] shrink-0",
-             "n": "Status / 02",
-             "id": "I203:11630;203:11504",
-             "k": [
-              {
-               "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#fff] w-[17.1px] shrink-0",
-               "id": "I203:11630;203:11505",
-               "k": [
-                "02"
-               ]
-              }
-             ]
-            },
-            {
-             "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[15.39px] text-[color:#0f1530] flex-1 min-w-0",
-             "id": "I203:11630;203:11506",
-             "k": [
-              "Review the fit"
-             ]
-            }
+            "Prepare the crew"
            ]
           },
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[11.97px] h-[342px] items-start p-[15.39px] relative rounded-[10.26px] w-full",
-           "n": "Illustrated product state / assignment",
-           "id": "I203:11630;203:11507",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[235px] items-start p-[16px] relative rounded-[12px] w-full",
+           "n": "Example state / tasks",
+           "id": "219:8342",
            "k": [
             {
-             "t": "div",
-             "c": "bg-[#fff4d6] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-full",
-             "n": "Status / HVAC JOB",
-             "id": "I203:11630;203:11508",
-             "k": [
-              {
-               "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#0f1530] w-[145.35px] shrink-0",
-               "id": "I203:11630;203:11509",
-               "k": [
-                "HVAC JOB"
-               ]
-              }
-             ]
-            },
-            {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[23.08px] text-[color:#0f1530] w-full",
-             "id": "I203:11630;203:11510",
+             "c": "font-semibold leading-[1.38] relative text-[23px] text-[color:#0f1530] w-full",
+             "id": "219:8343",
              "k": [
-              "Maya R."
-             ]
-            },
-            {
-             "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[11.97px] text-[color:#2a3360] w-full",
-             "id": "I203:11630;203:11511",
-             "k": [
-              "Available · 10:00–12:00"
+              "Job #1042"
              ]
             },
             {
              "t": "div",
-             "c": "bg-[#fff] flex gap-[10.26px] h-[56.43px] items-start p-[11.97px] relative rounded-[10.26px] w-full",
-             "n": "Context",
-             "id": "I203:11630;203:11512",
+             "c": "flex gap-[10px] items-start relative w-full",
+             "n": "Maya R. assigned",
+             "id": "219:8344",
              "k": [
               {
                "t": "div",
-               "c": "relative size-[25.65px]",
-               "n": "Icon / calendar",
-               "id": "I203:11630;203:11513",
+               "c": "relative size-[20px]",
+               "n": "Icon / check",
+               "id": "219:8345",
                "k": [
                 {
                  "t": "img",
                  "c": "absolute block inset-0 size-full",
-                 "src": "/marketing/flagship/icon-calendar-f3b6fc63.svg"
+                 "src": "/marketing/flagship/icon-check2-46fe38a0.svg"
                 }
                ]
               },
               {
-               "t": "div",
-               "c": "font-normal relative text-[11.97px] text-[color:#0f1530] w-[212.04px] shrink-0",
-               "id": "I203:11630;203:11516",
+               "t": "p",
+               "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#0f1530] flex-1 min-w-0",
+               "id": "219:8347",
                "k": [
-                {
-                 "t": "p",
-                 "c": "leading-[1.38] mb-0",
-                 "k": [
-                  "Job #1042"
-                 ]
-                },
-                {
-                 "t": "p",
-                 "c": "leading-[1.38]",
-                 "k": [
-                  "AC diagnostic"
-                 ]
-                }
+                "Maya R. assigned"
                ]
               }
              ]
             },
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex h-[32.49px] items-center justify-center px-[11.97px] relative rounded-[10.26px] w-full",
-             "n": "UI action / Review assignment",
-             "id": "I203:11630;203:11517",
+             "c": "flex gap-[10px] items-start relative w-full",
+             "n": "Equipment details ready",
+             "id": "219:8348",
+             "k": [
+              {
+               "t": "div",
+               "c": "relative size-[20px]",
+               "n": "Icon / check",
+               "id": "219:8349",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-check2-46fe38a0.svg"
+                }
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#0f1530] flex-1 min-w-0",
+               "id": "219:8351",
+               "k": [
+                "Equipment details ready"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[10px] items-start relative w-full",
+             "n": "Checklist attached",
+             "id": "219:8352",
+             "k": [
+              {
+               "t": "div",
+               "c": "relative size-[20px]",
+               "n": "Icon / check",
+               "id": "219:8353",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-check2-46fe38a0.svg"
+                }
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#0f1530] flex-1 min-w-0",
+               "id": "219:8355",
+               "k": [
+                "Checklist attached"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[210px] shrink-0",
+             "n": "Status / Work order ready",
+             "id": "219:8356",
              "k": [
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[10.26px] text-[color:#fff] text-center flex-1 min-w-0",
-               "id": "I203:11630;203:11518",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[190px] shrink-0",
+               "id": "219:8357",
                "k": [
-                "Review assignment"
+                "Work order ready"
                ]
               }
              ]
@@ -21538,134 +18554,105 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "div",
-         "c": "bg-[#fff] border-[0.855px] border-[#e6dccb] border-solid flex flex-col gap-[15.39px] h-[444.6px] items-start p-[18.81px] relative rounded-[13.68px] w-full",
-         "n": "Workflow moment / Handle the change",
-         "id": "203:11647",
+         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[var(--radius\\\\/16,16px)] w-full",
+         "n": "Complementary workflow / Close the job / Mobile",
+         "id": "219:8373",
          "k": [
           {
-           "t": "div",
-           "c": "flex gap-[10.26px] items-start relative w-full",
-           "n": "Step heading",
-           "id": "I203:11647;203:11521",
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] w-full",
+           "id": "219:8360",
            "k": [
-            {
-             "t": "div",
-             "c": "bg-[#0f1530] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[34.2px] shrink-0",
-             "n": "Status / 03",
-             "id": "I203:11647;203:11522",
-             "k": [
-              {
-               "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#fff] w-[17.1px] shrink-0",
-               "id": "I203:11647;203:11523",
-               "k": [
-                "03"
-               ]
-              }
-             ]
-            },
-            {
-             "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[15.39px] text-[color:#0f1530] flex-1 min-w-0",
-             "id": "I203:11647;203:11524",
-             "k": [
-              "Handle the change"
-             ]
-            }
+            "Close the job"
            ]
           },
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[11.97px] h-[342px] items-start p-[15.39px] relative rounded-[10.26px] w-full",
-           "n": "Illustrated product state / reschedule",
-           "id": "I203:11647;203:11525",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[235px] items-start p-[16px] relative rounded-[12px] w-full",
+           "n": "Example state / completion",
+           "id": "219:8361",
            "k": [
             {
              "t": "div",
-             "c": "bg-[#fff4d6] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-full",
-             "n": "Status / CHANGE REQUEST",
-             "id": "I203:11647;203:11526",
+             "c": "relative size-[30px]",
+             "n": "Icon / check",
+             "id": "219:8362",
              "k": [
               {
-               "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#0f1530] w-[145.35px] shrink-0",
-               "id": "I203:11647;203:11527",
-               "k": [
-                "CHANGE REQUEST"
-               ]
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check1-7e17b6d5.svg"
               }
              ]
             },
             {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[23.08px] text-[color:#0f1530] w-full",
-             "id": "I203:11647;203:11528",
+             "c": "font-semibold leading-[1.38] relative text-[25px] text-[color:#0f1530] w-full",
+             "id": "219:8364",
              "k": [
-              "Friday, 9:00 AM"
-             ]
-            },
-            {
-             "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[11.97px] text-[color:#2a3360] w-full",
-             "id": "I203:11647;203:11529",
-             "k": [
-              "Jordan requested a new time"
+              "Visit complete"
              ]
             },
             {
              "t": "div",
-             "c": "bg-[#fff] flex gap-[10.26px] h-[56.43px] items-start p-[11.97px] relative rounded-[10.26px] w-full",
-             "n": "Context",
-             "id": "I203:11647;203:11530",
+             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-full",
+             "n": "Field / Checklist",
+             "id": "219:8365",
              "k": [
               {
-               "t": "div",
-               "c": "relative size-[25.65px]",
-               "n": "Icon / calendar",
-               "id": "I203:11647;203:11531",
+               "t": "p",
+               "c": "font-normal relative text-[color:#2a3360] w-[151px] shrink-0",
+               "id": "219:8366",
                "k": [
-                {
-                 "t": "img",
-                 "c": "absolute block inset-0 size-full",
-                 "src": "/marketing/flagship/icon-calendar-f3b6fc63.svg"
-                }
+                "Checklist"
                ]
               },
               {
-               "t": "div",
-               "c": "font-normal relative text-[11.97px] text-[color:#0f1530] w-[212.04px] shrink-0",
-               "id": "I203:11647;203:11534",
+               "t": "p",
+               "c": "font-medium relative text-[color:#0f1530] w-[113px] shrink-0",
+               "id": "219:8367",
                "k": [
-                {
-                 "t": "p",
-                 "c": "leading-[1.38] mb-0",
-                 "k": [
-                  "Proposed visit"
-                 ]
-                },
-                {
-                 "t": "p",
-                 "c": "leading-[1.38]",
-                 "k": [
-                  "Owner approval required"
-                 ]
-                }
+                "6 of 6"
                ]
               }
              ]
             },
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex h-[32.49px] items-center justify-center px-[11.97px] relative rounded-[10.26px] w-full",
-             "n": "UI action / Confirm change",
-             "id": "I203:11647;203:11535",
+             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-full",
+             "n": "Field / Job photos",
+             "id": "219:8368",
              "k": [
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[10.26px] text-[color:#fff] text-center flex-1 min-w-0",
-               "id": "I203:11647;203:11536",
+               "c": "font-normal relative text-[color:#2a3360] w-[151px] shrink-0",
+               "id": "219:8369",
                "k": [
-                "Confirm change"
+                "Job photos"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium relative text-[color:#0f1530] w-[113px] shrink-0",
+               "id": "219:8370",
+               "k": [
+                "2 attached"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+             "n": "UI action / Create invoice",
+             "id": "219:8371",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+               "id": "219:8372",
+               "k": [
+                "Create invoice"
                ]
               }
              ]
@@ -21681,14 +18668,14 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
     },
     {
      "t": "div",
-     "c": "bg-[#0f1530] flex flex-col gap-[16px] items-start p-[24px] relative w-full",
+     "c": "bg-[#0f1530] flex flex-col gap-[24px] items-start p-[24px] relative w-full",
      "n": "03 / Connected workflow and demo",
-     "id": "203:11664",
+     "id": "219:8374",
      "k": [
       {
        "t": "p",
        "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#f6b400] tracking-[1.1px] w-full",
-       "id": "219:10178",
+       "id": "219:8375",
        "k": [
         "WORKS ACROSS YOUR BUSINESS"
        ]
@@ -21696,7 +18683,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
       {
        "t": "p",
        "c": "font-semibold leading-[1.38] relative text-[28px] text-[color:#fff] w-full",
-       "id": "219:10179",
+       "id": "219:8376",
        "k": [
         "One job. Connected all the way."
        ]
@@ -21705,30 +18692,30 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
        "t": "div",
        "c": "flex flex-col gap-[12px] items-center relative w-full",
        "n": "Flagship and tool handoff",
-       "id": "219:10180",
+       "id": "219:8377",
        "k": [
         {
          "t": "div",
          "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] w-full",
          "n": "Connected feature / Estimates & approvals / Mobile",
-         "id": "219:10191",
+         "id": "219:8388",
          "k": [
           {
            "t": "div",
            "c": "flex gap-[10px] items-start relative w-full",
            "n": "Suite and record",
-           "id": "219:10182",
+           "id": "219:8379",
            "k": [
             {
              "t": "div",
              "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
              "n": "Status / Revenue",
-             "id": "219:10183",
+             "id": "219:8380",
              "k": [
               {
                "t": "p",
                "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
-               "id": "219:10184",
+               "id": "219:8381",
                "k": [
                 "Revenue"
                ]
@@ -21738,7 +18725,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             {
              "t": "p",
              "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[180px] shrink-0",
-             "id": "219:10185",
+             "id": "219:8382",
              "k": [
               "Estimate #2048"
              ]
@@ -21748,7 +18735,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           {
            "t": "p",
            "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
-           "id": "219:10186",
+           "id": "219:8383",
            "k": [
             "Estimates & approvals"
            ]
@@ -21757,13 +18744,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
            "t": "div",
            "c": "flex gap-[10px] items-start relative w-full",
            "n": "Handoff evidence",
-           "id": "219:10187",
+           "id": "219:8384",
            "k": [
             {
              "t": "div",
              "c": "relative size-[18px]",
              "n": "Icon / check",
-             "id": "219:10188",
+             "id": "219:8385",
              "k": [
               {
                "t": "img",
@@ -21775,9 +18762,9 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             {
              "t": "p",
              "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
-             "id": "219:10190",
+             "id": "219:8387",
              "k": [
-              "Scope accepted"
+              "Customer accepted"
              ]
             }
            ]
@@ -21788,13 +18775,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "t": "div",
          "c": "flex flex-col h-[24px] items-center justify-center relative w-full",
          "n": "Next connected state",
-         "id": "219:10192",
+         "id": "219:8389",
          "k": [
           {
            "t": "div",
            "c": "relative size-[24px]",
            "n": "Frame",
-           "id": "219:10193",
+           "id": "219:8390",
            "k": [
             {
              "t": "img",
@@ -21808,25 +18795,25 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         {
          "t": "div",
          "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] w-full",
-         "n": "Connected feature / Scheduling & dispatch / Mobile",
-         "id": "219:10205",
+         "n": "Connected feature / Jobs & work orders / Mobile",
+         "id": "219:8402",
          "k": [
           {
            "t": "div",
            "c": "flex gap-[10px] items-start relative w-full",
            "n": "Suite and record",
-           "id": "219:10196",
+           "id": "219:8393",
            "k": [
             {
              "t": "div",
              "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
              "n": "Status / Operations",
-             "id": "219:10197",
+             "id": "219:8394",
              "k": [
               {
                "t": "p",
                "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
-               "id": "219:10198",
+               "id": "219:8395",
                "k": [
                 "Operations"
                ]
@@ -21836,7 +18823,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             {
              "t": "p",
              "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[180px] shrink-0",
-             "id": "219:10199",
+             "id": "219:8396",
              "k": [
               "Job #1042 · Jordan Lee"
              ]
@@ -21846,22 +18833,22 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           {
            "t": "p",
            "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
-           "id": "219:10200",
+           "id": "219:8397",
            "k": [
-            "Scheduling & dispatch"
+            "Jobs & work orders"
            ]
           },
           {
            "t": "div",
            "c": "flex gap-[10px] items-start relative w-full",
            "n": "Handoff evidence",
-           "id": "219:10201",
+           "id": "219:8398",
            "k": [
             {
              "t": "div",
              "c": "relative size-[18px]",
              "n": "Icon / check",
-             "id": "219:10202",
+             "id": "219:8399",
              "k": [
               {
                "t": "img",
@@ -21873,9 +18860,9 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             {
              "t": "p",
              "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
-             "id": "219:10204",
+             "id": "219:8401",
              "k": [
-              "Visit assigned"
+              "Crew and work connected"
              ]
             }
            ]
@@ -21886,13 +18873,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "t": "div",
          "c": "flex flex-col h-[24px] items-center justify-center relative w-full",
          "n": "Next connected state",
-         "id": "219:10206",
+         "id": "219:8403",
          "k": [
           {
            "t": "div",
            "c": "relative size-[24px]",
            "n": "Frame",
-           "id": "219:10207",
+           "id": "219:8404",
            "k": [
             {
              "t": "img",
@@ -21906,25 +18893,25 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         {
          "t": "div",
          "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] w-full",
-         "n": "Connected feature / Technician App / Mobile",
-         "id": "219:10219",
+         "n": "Connected feature / Invoices & payments / Mobile",
+         "id": "219:8416",
          "k": [
           {
            "t": "div",
            "c": "flex gap-[10px] items-start relative w-full",
            "n": "Suite and record",
-           "id": "219:10210",
+           "id": "219:8407",
            "k": [
             {
              "t": "div",
              "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
              "n": "Status / Operations",
-             "id": "219:10211",
+             "id": "219:8408",
              "k": [
               {
                "t": "p",
                "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
-               "id": "219:10212",
+               "id": "219:8409",
                "k": [
                 "Operations"
                ]
@@ -21934,7 +18921,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             {
              "t": "p",
              "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[180px] shrink-0",
-             "id": "219:10213",
+             "id": "219:8410",
              "k": [
               "Job #1042 · Jordan Lee"
              ]
@@ -21944,22 +18931,22 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           {
            "t": "p",
            "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
-           "id": "219:10214",
+           "id": "219:8411",
            "k": [
-            "Technician App"
+            "Invoices & payments"
            ]
           },
           {
            "t": "div",
            "c": "flex gap-[10px] items-start relative w-full",
            "n": "Handoff evidence",
-           "id": "219:10215",
+           "id": "219:8412",
            "k": [
             {
              "t": "div",
              "c": "relative size-[18px]",
              "n": "Icon / check",
-             "id": "219:10216",
+             "id": "219:8413",
              "k": [
               {
                "t": "img",
@@ -21971,9 +18958,9 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             {
              "t": "p",
              "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
-             "id": "219:10218",
+             "id": "219:8415",
              "k": [
-              "Details ready for the field"
+              "Completed work ready to bill"
              ]
             }
            ]
@@ -21987,7 +18974,12038 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
        "label": "Get a free demo",
        "kind": "Accent",
        "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#0f1530]",
-       "href": "/signup"
+       "href": "/demo"
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "time-tracking-job-photos": {
+  "desktop": {
+   "t": "div",
+   "c": "bg-[#fbf6ef] flex flex-col items-start relative",
+   "n": "Time Tracking & Job Photos / Desktop",
+   "id": "215:6312",
+   "k": [
+    {
+     "t": "div",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[24px] items-start px-[80px] py-[48px] relative w-full",
+     "n": "01 / Product in view",
+     "id": "219:8738",
+     "k": [
+      {
+       "t": "div",
+       "c": "flex gap-[48px] items-center relative w-full",
+       "n": "Outcome and actual workflow",
+       "id": "219:8739",
+       "k": [
+        {
+         "t": "div",
+         "c": "flex flex-col gap-[16px] items-start relative flex-1 min-w-0",
+         "n": "Short product promise",
+         "id": "219:8740",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "219:8741",
+           "k": [
+            "OPERATIONS / TIME TRACKING & JOB PHOTOS"
+           ]
+          },
+          {
+           "t": "h1",
+           "c": "font-semibold leading-[1.08] relative text-[58px] text-[color:#0f1530] tracking-[-1.45px] w-full",
+           "id": "219:8742",
+           "k": [
+            "Show the work behind the job."
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-full",
+           "id": "219:8743",
+           "k": [
+            "Keep time entries and job photos attached to the visit."
+           ]
+          },
+          {
+           "t": "button",
+           "label": "See a visit record",
+           "kind": "Dark",
+           "c": "bg-[#0f1530] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#fbf6ef]",
+           "href": "#workflow"
+          },
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "219:8746",
+           "k": [
+            "EXAMPLE BUSINESS · JUNIPER"
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#f6f7f9] border-[1.044px] border-[#e6dccb] border-solid flex flex-col items-start relative rounded-[16.711px] bg-[#f6f7f9] border-[1.044px] border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col items-start relative rounded-[16.711px] flex-1 min-w-0",
+         "n": "Complementary product view / time",
+         "id": "219:8776",
+         "k": [
+          {
+           "t": "div",
+           "c": "bg-[#0f1530] flex gap-[16.711px] h-[56.4px] items-center p-[16.711px] relative w-full",
+           "n": "Product chrome",
+           "id": "219:8748",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-bold leading-[1.38] relative text-[17.756px] text-[color:#fff] w-[146.222px] shrink-0",
+             "id": "219:8749",
+             "k": [
+              "Renvani"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-medium leading-[1.38] relative text-[12.533px] text-[color:#fff] flex-1 min-w-0",
+             "id": "219:8750",
+             "k": [
+              "Visit record"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#f6b400] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[106.533px] shrink-0",
+             "n": "Status / EXAMPLE",
+             "id": "219:8751",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10.444px] text-[color:#0f1530] w-[85.644px] shrink-0",
+               "id": "219:8752",
+               "k": [
+                "EXAMPLE"
+               ]
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[16.711px] items-start p-[25.067px] relative w-full",
+           "n": "Product workspace",
+           "id": "219:8753",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[26.111px] text-[color:#0f1530] w-full",
+             "id": "219:8754",
+             "k": [
+              "The visit, documented."
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[20.889px] items-start relative w-full",
+             "n": "Time and evidence",
+             "id": "219:8755",
+             "k": [
+              {
+               "t": "div",
+               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] flex-1 min-w-0",
+               "n": "Time entry",
+               "id": "219:8756",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[11.489px] text-[color:#2a3360] tracking-[1.1489px] w-full",
+                 "id": "219:8757",
+                 "k": [
+                  "TIME ENTRY"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-bold leading-[1.08] relative text-[48.044px] text-[color:#0f1530] tracking-[-1.2011px] w-full",
+                 "id": "219:8758",
+                 "k": [
+                  "1h 42m"
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.533px] w-full",
+                 "n": "Field / Start",
+                 "id": "219:8759",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[color:#2a3360] w-[138.911px] shrink-0",
+                   "id": "219:8760",
+                   "k": [
+                    "Start"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-medium relative text-[color:#0f1530] w-[103.4px] shrink-0",
+                   "id": "219:8761",
+                   "k": [
+                    "10:02 AM"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.533px] w-full",
+                 "n": "Field / End",
+                 "id": "219:8762",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[color:#2a3360] w-[138.911px] shrink-0",
+                   "id": "219:8763",
+                   "k": [
+                    "End"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-medium relative text-[color:#0f1530] w-[103.4px] shrink-0",
+                   "id": "219:8764",
+                   "k": [
+                    "11:44 AM"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#e4f1e8] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[229.778px] shrink-0",
+                 "n": "Status / Saved to job #1042",
+                 "id": "219:8765",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[10.444px] text-[color:#0f1530] w-[208.889px] shrink-0",
+                   "id": "219:8766",
+                   "k": [
+                    "Saved to job #1042"
+                   ]
+                  }
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] flex-1 min-w-0",
+               "n": "Job attachments",
+               "id": "219:8767",
+               "k": [
+                {
+                 "t": "div",
+                 "c": "h-[156.667px] relative rounded-[16.711px] w-full",
+                 "n": "Illustrative equipment visit",
+                 "id": "219:8768",
+                 "k": [
+                  {
+                   "t": "img",
+                   "c": "absolute inset-0 object-cover rounded-[16.711px] size-full",
+                   "src": "/marketing/flagship/illustrative-job-photo-f1266660.jpg"
+                  }
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-semibold leading-[1.38] relative text-[18.8px] text-[color:#0f1530] w-full",
+                 "id": "219:8769",
+                 "k": [
+                  "Job photos · 2 files"
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[12.533px] items-start relative w-full",
+                 "n": "Attachment labels",
+                 "id": "219:8770",
+                 "k": [
+                  {
+                   "t": "div",
+                   "c": "bg-[#fbf6ef] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[156.667px] shrink-0",
+                   "n": "Status / Before.jpg",
+                   "id": "219:8771",
+                   "k": [
+                    {
+                     "t": "p",
+                     "c": "font-medium leading-[1.38] relative text-[10.444px] text-[color:#0f1530] w-[135.778px] shrink-0",
+                     "id": "219:8772",
+                     "k": [
+                      "Before.jpg"
+                     ]
+                    }
+                   ]
+                  },
+                  {
+                   "t": "div",
+                   "c": "bg-[#fbf6ef] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[156.667px] shrink-0",
+                   "n": "Status / After.jpg",
+                   "id": "219:8773",
+                   "k": [
+                    {
+                     "t": "p",
+                     "c": "font-medium leading-[1.38] relative text-[10.444px] text-[color:#0f1530] w-[135.778px] shrink-0",
+                     "id": "219:8774",
+                     "k": [
+                      "After.jpg"
+                     ]
+                    }
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal leading-[1.38] relative text-[12.533px] text-[color:#2a3360] w-full",
+                 "id": "219:8775",
+                 "k": [
+                  "Maya R. · Notes saved"
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#fff] flex flex-col gap-[24px] items-start px-[80px] py-[48px] relative w-full",
+     "n": "02 / Three visible product states",
+     "id": "219:8777",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+       "id": "219:8778",
+       "k": [
+        "EXAMPLE WORKFLOW"
+       ]
+      },
+      {
+       "t": "p",
+       "c": "font-semibold leading-[1.08] relative text-[40px] text-[color:#0f1530] tracking-[-1px] w-full",
+       "id": "219:8779",
+       "k": [
+        "See the work happen."
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex gap-[40px] items-start relative w-full",
+       "n": "Product workflow states",
+       "id": "219:8780",
+       "k": [
+        {
+         "t": "div",
+         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[var(--radius\\\\/16,16px)] flex-1 min-w-0",
+         "n": "Complementary workflow / Save the time entry / Desktop",
+         "id": "219:8794",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+           "id": "219:8782",
+           "k": [
+            "Save the time entry"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[250px] items-start p-[16px] relative rounded-[12px] w-full",
+           "n": "Example state / clock",
+           "id": "219:8783",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+             "id": "219:8784",
+             "k": [
+              "TIME ENTRY"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-bold leading-[1.08] relative text-[42px] text-[color:#0f1530] tracking-[-1.05px] w-full",
+             "id": "219:8785",
+             "k": [
+              "1h 42m"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-full",
+             "n": "Field / Start",
+             "id": "219:8786",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-normal relative text-[color:#2a3360] w-[183px] shrink-0",
+               "id": "219:8787",
+               "k": [
+                "Start"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium relative text-[color:#0f1530] w-[139px] shrink-0",
+               "id": "219:8788",
+               "k": [
+                "10:02 AM"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-full",
+             "n": "Field / End",
+             "id": "219:8789",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-normal relative text-[color:#2a3360] w-[183px] shrink-0",
+               "id": "219:8790",
+               "k": [
+                "End"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium relative text-[color:#0f1530] w-[139px] shrink-0",
+               "id": "219:8791",
+               "k": [
+                "11:44 AM"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[235px] shrink-0",
+             "n": "Status / Saved to job #1042",
+             "id": "219:8792",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[215px] shrink-0",
+               "id": "219:8793",
+               "k": [
+                "Saved to job #1042"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[var(--radius\\\\/16,16px)] flex-1 min-w-0",
+         "n": "Complementary workflow / Attach the job photos / Desktop",
+         "id": "219:8805",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+           "id": "219:8796",
+           "k": [
+            "Attach the job photos"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[250px] items-start p-[16px] relative rounded-[12px] w-full",
+           "n": "Example state / photos",
+           "id": "219:8797",
+           "k": [
+            {
+             "t": "div",
+             "c": "h-[100px] relative rounded-[16px] w-full",
+             "n": "Illustrative job photo",
+             "id": "219:8798",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute inset-0 object-cover rounded-[16px] size-full",
+               "src": "/marketing/flagship/illustrative-job-photo-f1266660.jpg"
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[8px] items-start relative w-full",
+             "n": "File labels",
+             "id": "219:8799",
+             "k": [
+              {
+               "t": "div",
+               "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[162px] shrink-0",
+               "n": "Status / Before.jpg",
+               "id": "219:8800",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[142px] shrink-0",
+                 "id": "219:8801",
+                 "k": [
+                  "Before.jpg"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[162px] shrink-0",
+               "n": "Status / After.jpg",
+               "id": "219:8802",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[142px] shrink-0",
+                 "id": "219:8803",
+                 "k": [
+                  "After.jpg"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] w-full",
+             "id": "219:8804",
+             "k": [
+              "2 attachments · Job #1042"
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[var(--radius\\\\/16,16px)] flex-1 min-w-0",
+         "n": "Complementary workflow / Keep the visit record / Desktop",
+         "id": "219:8821",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+           "id": "219:8807",
+           "k": [
+            "Keep the visit record"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[250px] items-start p-[16px] relative rounded-[12px] w-full",
+           "n": "Example state / visitrecord",
+           "id": "219:8808",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+             "id": "219:8809",
+             "k": [
+              "Visit record saved"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-full",
+             "n": "Field / Time",
+             "id": "219:8810",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-normal relative text-[color:#2a3360] w-[183px] shrink-0",
+               "id": "219:8811",
+               "k": [
+                "Time"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium relative text-[color:#0f1530] w-[139px] shrink-0",
+               "id": "219:8812",
+               "k": [
+                "1h 42m"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-full",
+             "n": "Field / Photos",
+             "id": "219:8813",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-normal relative text-[color:#2a3360] w-[183px] shrink-0",
+               "id": "219:8814",
+               "k": [
+                "Photos"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium relative text-[color:#0f1530] w-[139px] shrink-0",
+               "id": "219:8815",
+               "k": [
+                "2 files"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-full",
+             "n": "Field / Notes",
+             "id": "219:8816",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-normal relative text-[color:#2a3360] w-[183px] shrink-0",
+               "id": "219:8817",
+               "k": [
+                "Notes"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium relative text-[color:#0f1530] w-[139px] shrink-0",
+               "id": "219:8818",
+               "k": [
+                "Saved"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[230px] shrink-0",
+             "n": "Status / Maya R. · Complete",
+             "id": "219:8819",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[210px] shrink-0",
+               "id": "219:8820",
+               "k": [
+                "Maya R. · Complete"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ],
+     "anchor": "workflow"
+    },
+    {
+     "t": "div",
+     "c": "bg-[#0f1530] flex flex-col gap-[24px] items-start px-[80px] py-[48px] relative w-full",
+     "n": "03 / Connected workflow and demo",
+     "id": "219:8822",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#f6b400] tracking-[1.1px] w-full",
+       "id": "219:8823",
+       "k": [
+        "WORKS ACROSS YOUR BUSINESS"
+       ]
+      },
+      {
+       "t": "p",
+       "c": "font-semibold leading-[1.08] relative text-[36px] text-[color:#fff] tracking-[-0.9px] w-full",
+       "id": "219:8824",
+       "k": [
+        "One job. Connected all the way."
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex gap-[16px] items-center relative w-full",
+       "n": "Flagship and tool handoff",
+       "id": "219:8825",
+       "k": [
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] flex-1 min-w-0",
+         "n": "Connected feature / Jobs & work orders / Desktop",
+         "id": "219:8836",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:8827",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Operations",
+             "id": "219:8828",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:8829",
+               "k": [
+                "Operations"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[222px] shrink-0",
+             "id": "219:8830",
+             "k": [
+              "Job #1042 · Jordan Lee"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:8831",
+           "k": [
+            "Jobs & work orders"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:8832",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:8833",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:8835",
+             "k": [
+              "Visit opened"
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex h-[24px] items-center justify-center relative w-[32px] shrink-0",
+         "n": "Next connected state",
+         "id": "219:8837",
+         "k": [
+          {
+           "t": "div",
+           "c": "relative size-[24px]",
+           "n": "Icon / arrow",
+           "id": "219:8838",
+           "k": [
+            {
+             "t": "img",
+             "c": "absolute block inset-0 size-full",
+             "src": "/marketing/flagship/icon-arrow-84befcc1.svg"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] flex-1 min-w-0",
+         "n": "Connected feature / Time & job photos / Desktop",
+         "id": "219:8850",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:8841",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Operations",
+             "id": "219:8842",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:8843",
+               "k": [
+                "Operations"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[222px] shrink-0",
+             "id": "219:8844",
+             "k": [
+              "Job #1042 · Jordan Lee"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:8845",
+           "k": [
+            "Time & job photos"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:8846",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:8847",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:8849",
+             "k": [
+              "Time and evidence saved"
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex h-[24px] items-center justify-center relative w-[32px] shrink-0",
+         "n": "Next connected state",
+         "id": "219:8851",
+         "k": [
+          {
+           "t": "div",
+           "c": "relative size-[24px]",
+           "n": "Icon / arrow",
+           "id": "219:8852",
+           "k": [
+            {
+             "t": "img",
+             "c": "absolute block inset-0 size-full",
+             "src": "/marketing/flagship/icon-arrow-84befcc1.svg"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] flex-1 min-w-0",
+         "n": "Connected feature / Customer history / Desktop",
+         "id": "219:8864",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:8855",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Command Center",
+             "id": "219:8856",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:8857",
+               "k": [
+                "Command Center"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[222px] shrink-0",
+             "id": "219:8858",
+             "k": [
+              "Job #1042 · Jordan Lee"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:8859",
+           "k": [
+            "Customer history"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:8860",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:8861",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:8863",
+             "k": [
+              "Completion record available"
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "t": "button",
+       "label": "Get a free demo",
+       "kind": "Accent",
+       "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#0f1530]",
+       "href": "/demo"
+      }
+     ]
+    }
+   ]
+  },
+  "mobile": {
+   "t": "div",
+   "c": "bg-[#fbf6ef] flex flex-col items-start relative",
+   "n": "Time Tracking & Job Photos / Mobile",
+   "id": "215:6313",
+   "k": [
+    {
+     "t": "div",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[24px] items-start p-[24px] relative w-full",
+     "n": "01 / Product in view",
+     "id": "219:8879",
+     "k": [
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[24px] items-start relative w-full",
+       "n": "Outcome and actual workflow",
+       "id": "219:8880",
+       "k": [
+        {
+         "t": "div",
+         "c": "flex flex-col gap-[16px] items-start relative w-full",
+         "n": "Short product promise",
+         "id": "219:8881",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "219:8882",
+           "k": [
+            "OPERATIONS / TIME TRACKING & JOB PHOTOS"
+           ]
+          },
+          {
+           "t": "h1",
+           "c": "font-semibold leading-[1.08] relative text-[40px] text-[color:#0f1530] tracking-[-1px] w-full",
+           "id": "219:8883",
+           "k": [
+            "Show the work behind the job."
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-full",
+           "id": "219:8884",
+           "k": [
+            "Keep time entries and job photos attached to the visit."
+           ]
+          },
+          {
+           "t": "button",
+           "label": "See a visit record",
+           "kind": "Dark",
+           "c": "bg-[#0f1530] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#fbf6ef]",
+           "href": "#workflow-m"
+          },
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "219:8887",
+           "k": [
+            "EXAMPLE BUSINESS · JUNIPER"
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#f6f7f9] border-[0.475px] border-[#e6dccb] border-solid flex flex-col items-start relative rounded-[7.6px] w-full",
+         "n": "Product demonstration / Time Tracking & Job Photos",
+         "id": "219:8888",
+         "k": [
+          {
+           "t": "div",
+           "c": "bg-[#0f1530] flex gap-[7.6px] h-[25.65px] items-center p-[7.6px] relative w-full",
+           "n": "Product chrome",
+           "id": "I219:8888;219:8748",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-bold leading-[1.38] relative text-[8.08px] text-[color:#fff] w-[66.5px] shrink-0",
+             "id": "I219:8888;219:8749",
+             "k": [
+              "Renvani"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-medium leading-[1.38] relative text-[5.7px] text-[color:#fff] w-[196.65px] shrink-0",
+             "id": "I219:8888;219:8750",
+             "k": [
+              "Visit record"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#f6b400] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[48.45px] shrink-0",
+             "n": "Status / EXAMPLE",
+             "id": "I219:8888;219:8751",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#0f1530] w-[38.95px] shrink-0",
+               "id": "I219:8888;219:8752",
+               "k": [
+                "EXAMPLE"
+               ]
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[7.6px] items-start p-[11.4px] relative w-full",
+           "n": "Product workspace",
+           "id": "I219:8888;219:8753",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[11.87px] text-[color:#0f1530] w-full",
+             "id": "I219:8888;219:8754",
+             "k": [
+              "The visit, documented."
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[9.5px] items-start relative w-full",
+             "n": "Time and evidence",
+             "id": "I219:8888;219:8755",
+             "k": [
+              {
+               "t": "div",
+               "c": "bg-[#fff] border-[0.475px] border-[#e6dccb] border-solid flex flex-col gap-[6.65px] items-start p-[9.5px] relative rounded-[7.6px] w-[133.95px] shrink-0",
+               "n": "Time entry",
+               "id": "I219:8888;219:8756",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[5.22px] text-[color:#2a3360] tracking-[0.522px] w-full",
+                 "id": "I219:8888;219:8757",
+                 "k": [
+                  "TIME ENTRY"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-bold leading-[1.08] relative text-[21.85px] text-[color:#0f1530] tracking-[-0.5463px] w-full",
+                 "id": "I219:8888;219:8758",
+                 "k": [
+                  "1h 42m"
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[4.75px] items-start leading-[1.38] relative text-[5.7px] w-full",
+                 "n": "Field / Start",
+                 "id": "I219:8888;219:8759",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[color:#2a3360] w-[63.175px] shrink-0",
+                   "id": "I219:8888;219:8760",
+                   "k": [
+                    "Start"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-medium relative text-[color:#0f1530] w-[47.025px] shrink-0",
+                   "id": "I219:8888;219:8761",
+                   "k": [
+                    "10:02 AM"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[4.75px] items-start leading-[1.38] relative text-[5.7px] w-full",
+                 "n": "Field / End",
+                 "id": "I219:8888;219:8762",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[color:#2a3360] w-[63.175px] shrink-0",
+                   "id": "I219:8888;219:8763",
+                   "k": [
+                    "End"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-medium relative text-[color:#0f1530] w-[47.025px] shrink-0",
+                   "id": "I219:8888;219:8764",
+                   "k": [
+                    "11:44 AM"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#e4f1e8] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[104.5px] shrink-0",
+                 "n": "Status / Saved to job #1042",
+                 "id": "I219:8888;219:8765",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#0f1530] w-[95px] shrink-0",
+                   "id": "I219:8888;219:8766",
+                   "k": [
+                    "Saved to job #1042"
+                   ]
+                  }
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border-[0.475px] border-[#e6dccb] border-solid flex flex-col gap-[6.65px] items-start p-[9.5px] relative rounded-[7.6px] w-[175.75px] shrink-0",
+               "n": "Job attachments",
+               "id": "I219:8888;219:8767",
+               "k": [
+                {
+                 "t": "div",
+                 "c": "h-[71.25px] relative rounded-[7.6px] w-full",
+                 "n": "Illustrative equipment visit",
+                 "id": "I219:8888;219:8768",
+                 "k": [
+                  {
+                   "t": "img",
+                   "c": "absolute inset-0 object-cover rounded-[7.6px] size-full",
+                   "src": "/marketing/flagship/illustrative-job-photo-f1266660.jpg"
+                  }
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-semibold leading-[1.38] relative text-[8.55px] text-[color:#0f1530] w-full",
+                 "id": "I219:8888;219:8769",
+                 "k": [
+                  "Job photos · 2 files"
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[5.7px] items-start relative w-full",
+                 "n": "Attachment labels",
+                 "id": "I219:8888;219:8770",
+                 "k": [
+                  {
+                   "t": "div",
+                   "c": "bg-[#fbf6ef] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[71.25px] shrink-0",
+                   "n": "Status / Before.jpg",
+                   "id": "I219:8888;219:8771",
+                   "k": [
+                    {
+                     "t": "p",
+                     "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#0f1530] w-[61.75px] shrink-0",
+                     "id": "I219:8888;219:8772",
+                     "k": [
+                      "Before.jpg"
+                     ]
+                    }
+                   ]
+                  },
+                  {
+                   "t": "div",
+                   "c": "bg-[#fbf6ef] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[71.25px] shrink-0",
+                   "n": "Status / After.jpg",
+                   "id": "I219:8888;219:8773",
+                   "k": [
+                    {
+                     "t": "p",
+                     "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#0f1530] w-[61.75px] shrink-0",
+                     "id": "I219:8888;219:8774",
+                     "k": [
+                      "After.jpg"
+                     ]
+                    }
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal leading-[1.38] relative text-[5.7px] text-[color:#2a3360] w-full",
+                 "id": "I219:8888;219:8775",
+                 "k": [
+                  "Maya R. · Notes saved"
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#fff] flex flex-col gap-[24px] items-start p-[24px] relative w-full",
+     "n": "02 / Three visible product states",
+     "id": "219:8917",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+       "id": "219:8918",
+       "k": [
+        "EXAMPLE WORKFLOW"
+       ]
+      },
+      {
+       "t": "p",
+       "c": "font-semibold leading-[1.38] relative text-[30px] text-[color:#0f1530] w-full",
+       "id": "219:8919",
+       "k": [
+        "See the work happen."
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[16px] items-start relative w-full",
+       "n": "Product workflow states",
+       "id": "219:8920",
+       "k": [
+        {
+         "t": "div",
+         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[var(--radius\\\\/16,16px)] w-full",
+         "n": "Complementary workflow / Save the time entry / Mobile",
+         "id": "219:8934",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] w-full",
+           "id": "219:8922",
+           "k": [
+            "Save the time entry"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[235px] items-start p-[16px] relative rounded-[12px] w-full",
+           "n": "Example state / clock",
+           "id": "219:8923",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+             "id": "219:8924",
+             "k": [
+              "TIME ENTRY"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-bold leading-[1.08] relative text-[42px] text-[color:#0f1530] tracking-[-1.05px] w-full",
+             "id": "219:8925",
+             "k": [
+              "1h 42m"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-full",
+             "n": "Field / Start",
+             "id": "219:8926",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-normal relative text-[color:#2a3360] w-[151px] shrink-0",
+               "id": "219:8927",
+               "k": [
+                "Start"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium relative text-[color:#0f1530] w-[113px] shrink-0",
+               "id": "219:8928",
+               "k": [
+                "10:02 AM"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-full",
+             "n": "Field / End",
+             "id": "219:8929",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-normal relative text-[color:#2a3360] w-[151px] shrink-0",
+               "id": "219:8930",
+               "k": [
+                "End"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium relative text-[color:#0f1530] w-[113px] shrink-0",
+               "id": "219:8931",
+               "k": [
+                "11:44 AM"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[235px] shrink-0",
+             "n": "Status / Saved to job #1042",
+             "id": "219:8932",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[215px] shrink-0",
+               "id": "219:8933",
+               "k": [
+                "Saved to job #1042"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[var(--radius\\\\/16,16px)] w-full",
+         "n": "Complementary workflow / Attach the job photos / Mobile",
+         "id": "219:8945",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] w-full",
+           "id": "219:8936",
+           "k": [
+            "Attach the job photos"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[235px] items-start p-[16px] relative rounded-[12px] w-full",
+           "n": "Example state / photos",
+           "id": "219:8937",
+           "k": [
+            {
+             "t": "div",
+             "c": "h-[100px] relative rounded-[16px] w-full",
+             "n": "Illustrative job photo",
+             "id": "219:8938",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute inset-0 object-cover rounded-[16px] size-full",
+               "src": "/marketing/flagship/illustrative-job-photo-f1266660.jpg"
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[8px] items-start relative w-full",
+             "n": "File labels",
+             "id": "219:8939",
+             "k": [
+              {
+               "t": "div",
+               "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[133px] shrink-0",
+               "n": "Status / Before.jpg",
+               "id": "219:8940",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[113px] shrink-0",
+                 "id": "219:8941",
+                 "k": [
+                  "Before.jpg"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[133px] shrink-0",
+               "n": "Status / After.jpg",
+               "id": "219:8942",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[113px] shrink-0",
+                 "id": "219:8943",
+                 "k": [
+                  "After.jpg"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] w-full",
+             "id": "219:8944",
+             "k": [
+              "2 attachments · Job #1042"
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[var(--radius\\\\/16,16px)] w-full",
+         "n": "Complementary workflow / Keep the visit record / Mobile",
+         "id": "219:8961",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] w-full",
+           "id": "219:8947",
+           "k": [
+            "Keep the visit record"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[235px] items-start p-[16px] relative rounded-[12px] w-full",
+           "n": "Example state / visitrecord",
+           "id": "219:8948",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+             "id": "219:8949",
+             "k": [
+              "Visit record saved"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-full",
+             "n": "Field / Time",
+             "id": "219:8950",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-normal relative text-[color:#2a3360] w-[151px] shrink-0",
+               "id": "219:8951",
+               "k": [
+                "Time"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium relative text-[color:#0f1530] w-[113px] shrink-0",
+               "id": "219:8952",
+               "k": [
+                "1h 42m"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-full",
+             "n": "Field / Photos",
+             "id": "219:8953",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-normal relative text-[color:#2a3360] w-[151px] shrink-0",
+               "id": "219:8954",
+               "k": [
+                "Photos"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium relative text-[color:#0f1530] w-[113px] shrink-0",
+               "id": "219:8955",
+               "k": [
+                "2 files"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-full",
+             "n": "Field / Notes",
+             "id": "219:8956",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-normal relative text-[color:#2a3360] w-[151px] shrink-0",
+               "id": "219:8957",
+               "k": [
+                "Notes"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium relative text-[color:#0f1530] w-[113px] shrink-0",
+               "id": "219:8958",
+               "k": [
+                "Saved"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[230px] shrink-0",
+             "n": "Status / Maya R. · Complete",
+             "id": "219:8959",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[210px] shrink-0",
+               "id": "219:8960",
+               "k": [
+                "Maya R. · Complete"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ],
+     "anchor": "workflow-m"
+    },
+    {
+     "t": "div",
+     "c": "bg-[#0f1530] flex flex-col gap-[24px] items-start p-[24px] relative w-full",
+     "n": "03 / Connected workflow and demo",
+     "id": "219:8962",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#f6b400] tracking-[1.1px] w-full",
+       "id": "219:8963",
+       "k": [
+        "WORKS ACROSS YOUR BUSINESS"
+       ]
+      },
+      {
+       "t": "p",
+       "c": "font-semibold leading-[1.38] relative text-[28px] text-[color:#fff] w-full",
+       "id": "219:8964",
+       "k": [
+        "One job. Connected all the way."
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[12px] items-center relative w-full",
+       "n": "Flagship and tool handoff",
+       "id": "219:8965",
+       "k": [
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] w-full",
+         "n": "Connected feature / Jobs & work orders / Mobile",
+         "id": "219:8976",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:8967",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Operations",
+             "id": "219:8968",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:8969",
+               "k": [
+                "Operations"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[180px] shrink-0",
+             "id": "219:8970",
+             "k": [
+              "Job #1042 · Jordan Lee"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:8971",
+           "k": [
+            "Jobs & work orders"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:8972",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:8973",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:8975",
+             "k": [
+              "Visit opened"
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex flex-col h-[24px] items-center justify-center relative w-full",
+         "n": "Next connected state",
+         "id": "219:8977",
+         "k": [
+          {
+           "t": "div",
+           "c": "relative size-[24px]",
+           "n": "Frame",
+           "id": "219:8978",
+           "k": [
+            {
+             "t": "img",
+             "c": "absolute block inset-0 size-full",
+             "src": "/marketing/flagship/frame-08fa5d7a.svg"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] w-full",
+         "n": "Connected feature / Time & job photos / Mobile",
+         "id": "219:8990",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:8981",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Operations",
+             "id": "219:8982",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:8983",
+               "k": [
+                "Operations"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[180px] shrink-0",
+             "id": "219:8984",
+             "k": [
+              "Job #1042 · Jordan Lee"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:8985",
+           "k": [
+            "Time & job photos"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:8986",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:8987",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:8989",
+             "k": [
+              "Time and evidence saved"
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex flex-col h-[24px] items-center justify-center relative w-full",
+         "n": "Next connected state",
+         "id": "219:8991",
+         "k": [
+          {
+           "t": "div",
+           "c": "relative size-[24px]",
+           "n": "Frame",
+           "id": "219:8992",
+           "k": [
+            {
+             "t": "img",
+             "c": "absolute block inset-0 size-full",
+             "src": "/marketing/flagship/frame-08fa5d7a.svg"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] w-full",
+         "n": "Connected feature / Customer history / Mobile",
+         "id": "219:9004",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:8995",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Command Center",
+             "id": "219:8996",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:8997",
+               "k": [
+                "Command Center"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[180px] shrink-0",
+             "id": "219:8998",
+             "k": [
+              "Job #1042 · Jordan Lee"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:8999",
+           "k": [
+            "Customer history"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:9000",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:9001",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:9003",
+             "k": [
+              "Completion record available"
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "t": "button",
+       "label": "Get a free demo",
+       "kind": "Accent",
+       "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#0f1530]",
+       "href": "/demo"
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "reminders-win-backs": {
+  "desktop": {
+   "t": "div",
+   "c": "bg-[#fbf6ef] flex flex-col items-start relative",
+   "n": "Reminders & Win-backs / Desktop",
+   "id": "215:6314",
+   "k": [
+    {
+     "t": "div",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[24px] items-start px-[80px] py-[48px] relative w-full",
+     "n": "01 / Product in view",
+     "id": "219:9023",
+     "k": [
+      {
+       "t": "div",
+       "c": "flex gap-[48px] items-center relative w-full",
+       "n": "Outcome and actual workflow",
+       "id": "219:9024",
+       "k": [
+        {
+         "t": "div",
+         "c": "flex flex-col gap-[16px] items-start relative flex-1 min-w-0",
+         "n": "Short product promise",
+         "id": "219:9025",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "219:9026",
+           "k": [
+            "RETENTION / REMINDERS & WIN-BACKS"
+           ]
+          },
+          {
+           "t": "h1",
+           "c": "font-semibold leading-[1.08] relative text-[58px] text-[color:#0f1530] tracking-[-1.45px] w-full",
+           "id": "219:9027",
+           "k": [
+            "Give good customers a reason to return."
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-full",
+           "id": "219:9028",
+           "k": [
+            "Review consented reminders and make the next visit easy to request."
+           ]
+          },
+          {
+           "t": "button",
+           "label": "See a reminder",
+           "kind": "Dark",
+           "c": "bg-[#0f1530] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#fbf6ef]",
+           "href": "#workflow"
+          },
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "219:9031",
+           "k": [
+            "EXAMPLE BUSINESS · JUNIPER"
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#f6f7f9] border-[1.044px] border-[#e6dccb] border-solid flex flex-col items-start relative rounded-[16.711px] bg-[#f6f7f9] border-[1.044px] border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col items-start relative rounded-[16.711px] flex-1 min-w-0",
+         "n": "Complementary product view / reminders",
+         "id": "219:9060",
+         "k": [
+          {
+           "t": "div",
+           "c": "bg-[#0f1530] flex gap-[16.711px] h-[56.4px] items-center p-[16.711px] relative w-full",
+           "n": "Product chrome",
+           "id": "219:9033",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-bold leading-[1.38] relative text-[17.756px] text-[color:#fff] w-[146.222px] shrink-0",
+             "id": "219:9034",
+             "k": [
+              "Renvani"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-medium leading-[1.38] relative text-[12.533px] text-[color:#fff] flex-1 min-w-0",
+             "id": "219:9035",
+             "k": [
+              "Reminders & win-backs"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#f6b400] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[106.533px] shrink-0",
+             "n": "Status / EXAMPLE",
+             "id": "219:9036",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10.444px] text-[color:#0f1530] w-[85.644px] shrink-0",
+               "id": "219:9037",
+               "k": [
+                "EXAMPLE"
+               ]
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[16.711px] items-start p-[25.067px] relative w-full",
+           "n": "Product workspace",
+           "id": "219:9038",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[25.067px] text-[color:#0f1530] w-full",
+             "id": "219:9039",
+             "k": [
+              "The next visit starts with context."
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[20.889px] items-start relative w-full",
+             "n": "Due visit and email",
+             "id": "219:9040",
+             "k": [
+              {
+               "t": "div",
+               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] flex-1 min-w-0",
+               "n": "Customer history",
+               "id": "219:9041",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-semibold leading-[1.38] relative text-[24.022px] text-[color:#0f1530] w-full",
+                 "id": "219:9042",
+                 "k": [
+                  "Jordan Lee"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal leading-[1.38] relative text-[14.622px] text-[color:#0f1530] w-full",
+                 "id": "219:9043",
+                 "k": [
+                  "Home Comfort Plan"
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.533px] w-full",
+                 "n": "Field / Last service",
+                 "id": "219:9044",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[color:#2a3360] w-[138.911px] shrink-0",
+                   "id": "219:9045",
+                   "k": [
+                    "Last service"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-medium relative text-[color:#0f1530] w-[103.4px] shrink-0",
+                   "id": "219:9046",
+                   "k": [
+                    "Apr 18"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.533px] w-full",
+                 "n": "Field / Next service",
+                 "id": "219:9047",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[color:#2a3360] w-[138.911px] shrink-0",
+                   "id": "219:9048",
+                   "k": [
+                    "Next service"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-medium relative text-[color:#0f1530] w-[103.4px] shrink-0",
+                   "id": "219:9049",
+                   "k": [
+                    "November"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#e4f1e8] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-full",
+                 "n": "Status / Email consent recorded",
+                 "id": "219:9050",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[10.444px] text-[color:#0f1530] w-[224.556px] shrink-0",
+                   "id": "219:9051",
+                   "k": [
+                    "Email consent recorded"
+                   ]
+                  }
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] flex-1 min-w-0",
+               "n": "Reminder draft",
+               "id": "219:9052",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[11.489px] text-[color:#2a3360] tracking-[1.1489px] w-full",
+                 "id": "219:9053",
+                 "k": [
+                  "EMAIL DRAFT"
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "font-semibold relative text-[25.067px] text-[color:#0f1530] w-full",
+                 "id": "219:9054",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "leading-[1.38] mb-0",
+                   "k": [
+                    "Your fall tune-up"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "leading-[1.38]",
+                   "k": [
+                    "is coming up."
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal leading-[1.38] relative text-[14.622px] text-[color:#2a3360] w-full",
+                 "id": "219:9055",
+                 "k": [
+                  "Review the next visit with Jordan."
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#fff4d6] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-full",
+                 "n": "Status / Owner review required",
+                 "id": "219:9056",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[10.444px] text-[color:#0f1530] w-[229.778px] shrink-0",
+                   "id": "219:9057",
+                   "k": [
+                    "Owner review required"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#0f1530] flex h-[39.689px] items-center justify-center px-[14.622px] relative rounded-[12.533px] w-full",
+                 "n": "UI action / Review reminder",
+                 "id": "219:9058",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[12.533px] text-[color:#fff] text-center flex-1 min-w-0",
+                   "id": "219:9059",
+                   "k": [
+                    "Review reminder"
+                   ]
+                  }
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#fff] flex flex-col gap-[24px] items-start px-[80px] py-[48px] relative w-full",
+     "n": "02 / Three visible product states",
+     "id": "219:9061",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+       "id": "219:9062",
+       "k": [
+        "EXAMPLE WORKFLOW"
+       ]
+      },
+      {
+       "t": "p",
+       "c": "font-semibold leading-[1.08] relative text-[40px] text-[color:#0f1530] tracking-[-1px] w-full",
+       "id": "219:9063",
+       "k": [
+        "See the work happen."
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex gap-[40px] items-start relative w-full",
+       "n": "Product workflow states",
+       "id": "219:9064",
+       "k": [
+        {
+         "t": "div",
+         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[var(--radius\\\\/16,16px)] flex-1 min-w-0",
+         "n": "Complementary workflow / Use the service history / Desktop",
+         "id": "219:9078",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+           "id": "219:9066",
+           "k": [
+            "Use the service history"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[250px] items-start p-[16px] relative rounded-[12px] w-full",
+           "n": "Example state / due",
+           "id": "219:9067",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+             "id": "219:9068",
+             "k": [
+              "SERVICE HISTORY"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[24px] text-[color:#0f1530] w-full",
+             "id": "219:9069",
+             "k": [
+              "Jordan Lee"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-full",
+             "n": "Field / Last visit",
+             "id": "219:9070",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-normal relative text-[color:#2a3360] w-[183px] shrink-0",
+               "id": "219:9071",
+               "k": [
+                "Last visit"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium relative text-[color:#0f1530] w-[139px] shrink-0",
+               "id": "219:9072",
+               "k": [
+                "Apr 18"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-full",
+             "n": "Field / Due next",
+             "id": "219:9073",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-normal relative text-[color:#2a3360] w-[183px] shrink-0",
+               "id": "219:9074",
+               "k": [
+                "Due next"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium relative text-[color:#0f1530] w-[139px] shrink-0",
+               "id": "219:9075",
+               "k": [
+                "November"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+             "n": "Status / Consented email reminder",
+             "id": "219:9076",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] flex-1 min-w-0",
+               "id": "219:9077",
+               "k": [
+                "Consented email reminder"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[var(--radius\\\\/16,16px)] flex-1 min-w-0",
+         "n": "Complementary workflow / Review the email / Desktop",
+         "id": "219:9090",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+           "id": "219:9080",
+           "k": [
+            "Review the email"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[250px] items-start p-[16px] relative rounded-[12px] w-full",
+           "n": "Example state / reminder",
+           "id": "219:9081",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[30px]",
+             "n": "Icon / mail",
+             "id": "219:9082",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-mail-851b3398.svg"
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "font-semibold relative text-[24px] text-[color:#0f1530] w-full",
+             "id": "219:9085",
+             "k": [
+              {
+               "t": "p",
+               "c": "leading-[1.38] mb-0",
+               "k": [
+                "Your next tune-up"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "leading-[1.38]",
+               "k": [
+                "is due."
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+             "n": "Status / Owner review required",
+             "id": "219:9086",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[230px] shrink-0",
+               "id": "219:9087",
+               "k": [
+                "Owner review required"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+             "n": "UI action / Review email",
+             "id": "219:9088",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+               "id": "219:9089",
+               "k": [
+                "Review email"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[var(--radius\\\\/16,16px)] flex-1 min-w-0",
+         "n": "Complementary workflow / Request the next visit / Desktop",
+         "id": "219:9102",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+           "id": "219:9092",
+           "k": [
+            "Request the next visit"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[250px] items-start p-[16px] relative rounded-[12px] w-full",
+           "n": "Example state / rebook",
+           "id": "219:9093",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[28px]",
+             "n": "Icon / calendar",
+             "id": "219:9094",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-calendar-2f11c7ba.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[24px] text-[color:#0f1530] w-full",
+             "id": "219:9097",
+             "k": [
+              "Request a visit"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-medium leading-[1.38] relative text-[21px] text-[color:#0f1530] w-full",
+             "id": "219:9098",
+             "k": [
+              "November 12"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[185px] shrink-0",
+             "n": "Status / 10:00–12:00",
+             "id": "219:9099",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[165px] shrink-0",
+               "id": "219:9100",
+               "k": [
+                "10:00–12:00"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] w-full",
+             "id": "219:9101",
+             "k": [
+              "Request awaits confirmation"
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ],
+     "anchor": "workflow"
+    },
+    {
+     "t": "div",
+     "c": "bg-[#0f1530] flex flex-col gap-[24px] items-start px-[80px] py-[48px] relative w-full",
+     "n": "03 / Connected workflow and demo",
+     "id": "219:9103",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#f6b400] tracking-[1.1px] w-full",
+       "id": "219:9104",
+       "k": [
+        "WORKS ACROSS YOUR BUSINESS"
+       ]
+      },
+      {
+       "t": "p",
+       "c": "font-semibold leading-[1.08] relative text-[36px] text-[color:#fff] tracking-[-0.9px] w-full",
+       "id": "219:9105",
+       "k": [
+        "One job. Connected all the way."
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex gap-[16px] items-center relative w-full",
+       "n": "Flagship and tool handoff",
+       "id": "219:9106",
+       "k": [
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] flex-1 min-w-0",
+         "n": "Connected feature / Invoices & payments / Desktop",
+         "id": "219:9117",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:9108",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Operations",
+             "id": "219:9109",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:9110",
+               "k": [
+                "Operations"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[222px] shrink-0",
+             "id": "219:9111",
+             "k": [
+              "Invoice #1042"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:9112",
+           "k": [
+            "Invoices & payments"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:9113",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:9114",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:9116",
+             "k": [
+              "Service history recorded"
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex h-[24px] items-center justify-center relative w-[32px] shrink-0",
+         "n": "Next connected state",
+         "id": "219:9118",
+         "k": [
+          {
+           "t": "div",
+           "c": "relative size-[24px]",
+           "n": "Icon / arrow",
+           "id": "219:9119",
+           "k": [
+            {
+             "t": "img",
+             "c": "absolute block inset-0 size-full",
+             "src": "/marketing/flagship/icon-arrow-84befcc1.svg"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] flex-1 min-w-0",
+         "n": "Connected feature / Reminders & win-backs / Desktop",
+         "id": "219:9131",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:9122",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Retention",
+             "id": "219:9123",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:9124",
+               "k": [
+                "Retention"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[222px] shrink-0",
+             "id": "219:9125",
+             "k": [
+              "Job #1042 · Jordan Lee"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:9126",
+           "k": [
+            "Reminders & win-backs"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:9127",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:9128",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:9130",
+             "k": [
+              "Consented email reviewed"
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex h-[24px] items-center justify-center relative w-[32px] shrink-0",
+         "n": "Next connected state",
+         "id": "219:9132",
+         "k": [
+          {
+           "t": "div",
+           "c": "relative size-[24px]",
+           "n": "Icon / arrow",
+           "id": "219:9133",
+           "k": [
+            {
+             "t": "img",
+             "c": "absolute block inset-0 size-full",
+             "src": "/marketing/flagship/icon-arrow-84befcc1.svg"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] flex-1 min-w-0",
+         "n": "Connected feature / Online booking / Desktop",
+         "id": "219:9145",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:9136",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Growth",
+             "id": "219:9137",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:9138",
+               "k": [
+                "Growth"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[222px] shrink-0",
+             "id": "219:9139",
+             "k": [
+              "Job #1042 · Jordan Lee"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:9140",
+           "k": [
+            "Online booking"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:9141",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:9142",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:9144",
+             "k": [
+              "Next visit requested"
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "t": "button",
+       "label": "Get a free demo",
+       "kind": "Accent",
+       "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#0f1530]",
+       "href": "/demo"
+      }
+     ]
+    }
+   ]
+  },
+  "mobile": {
+   "t": "div",
+   "c": "bg-[#fbf6ef] flex flex-col items-start relative",
+   "n": "Reminders & Win-backs / Mobile",
+   "id": "215:6315",
+   "k": [
+    {
+     "t": "div",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[24px] items-start p-[24px] relative w-full",
+     "n": "01 / Product in view",
+     "id": "219:9160",
+     "k": [
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[24px] items-start relative w-full",
+       "n": "Outcome and actual workflow",
+       "id": "219:9161",
+       "k": [
+        {
+         "t": "div",
+         "c": "flex flex-col gap-[16px] items-start relative w-full",
+         "n": "Short product promise",
+         "id": "219:9162",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "219:9163",
+           "k": [
+            "RETENTION / REMINDERS & WIN-BACKS"
+           ]
+          },
+          {
+           "t": "h1",
+           "c": "font-semibold leading-[1.08] relative text-[40px] text-[color:#0f1530] tracking-[-1px] w-full",
+           "id": "219:9164",
+           "k": [
+            "Give good customers a reason to return."
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-full",
+           "id": "219:9165",
+           "k": [
+            "Review consented reminders and make the next visit easy to request."
+           ]
+          },
+          {
+           "t": "button",
+           "label": "See a reminder",
+           "kind": "Dark",
+           "c": "bg-[#0f1530] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#fbf6ef]",
+           "href": "#workflow-m"
+          },
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "219:9168",
+           "k": [
+            "EXAMPLE BUSINESS · JUNIPER"
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#f6f7f9] border-[0.475px] border-[#e6dccb] border-solid flex flex-col items-start relative rounded-[7.6px] w-full",
+         "n": "Product demonstration / Reminders & Win-backs",
+         "id": "219:9169",
+         "k": [
+          {
+           "t": "div",
+           "c": "bg-[#0f1530] flex gap-[7.6px] h-[25.65px] items-center p-[7.6px] relative w-full",
+           "n": "Product chrome",
+           "id": "I219:9169;219:9033",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-bold leading-[1.38] relative text-[8.08px] text-[color:#fff] w-[66.5px] shrink-0",
+             "id": "I219:9169;219:9034",
+             "k": [
+              "Renvani"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-medium leading-[1.38] relative text-[5.7px] text-[color:#fff] w-[196.65px] shrink-0",
+             "id": "I219:9169;219:9035",
+             "k": [
+              "Reminders & win-backs"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#f6b400] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[48.45px] shrink-0",
+             "n": "Status / EXAMPLE",
+             "id": "I219:9169;219:9036",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#0f1530] w-[38.95px] shrink-0",
+               "id": "I219:9169;219:9037",
+               "k": [
+                "EXAMPLE"
+               ]
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[7.6px] items-start p-[11.4px] relative w-full",
+           "n": "Product workspace",
+           "id": "I219:9169;219:9038",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[11.4px] text-[color:#0f1530] w-full",
+             "id": "I219:9169;219:9039",
+             "k": [
+              "The next visit starts with context."
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[9.5px] items-start relative w-full",
+             "n": "Due visit and email",
+             "id": "I219:9169;219:9040",
+             "k": [
+              {
+               "t": "div",
+               "c": "bg-[#fff] border-[0.475px] border-[#e6dccb] border-solid flex flex-col gap-[6.65px] items-start p-[9.5px] relative rounded-[7.6px] w-[133.95px] shrink-0",
+               "n": "Customer history",
+               "id": "I219:9169;219:9041",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-semibold leading-[1.38] relative text-[10.92px] text-[color:#0f1530] w-full",
+                 "id": "I219:9169;219:9042",
+                 "k": [
+                  "Jordan Lee"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal leading-[1.38] relative text-[6.65px] text-[color:#0f1530] w-full",
+                 "id": "I219:9169;219:9043",
+                 "k": [
+                  "Home Comfort Plan"
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[4.75px] items-start leading-[1.38] relative text-[5.7px] w-full",
+                 "n": "Field / Last service",
+                 "id": "I219:9169;219:9044",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[color:#2a3360] w-[63.175px] shrink-0",
+                   "id": "I219:9169;219:9045",
+                   "k": [
+                    "Last service"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-medium relative text-[color:#0f1530] w-[47.025px] shrink-0",
+                   "id": "I219:9169;219:9046",
+                   "k": [
+                    "Apr 18"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[4.75px] items-start leading-[1.38] relative text-[5.7px] w-full",
+                 "n": "Field / Next service",
+                 "id": "I219:9169;219:9047",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[color:#2a3360] w-[63.175px] shrink-0",
+                   "id": "I219:9169;219:9048",
+                   "k": [
+                    "Next service"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-medium relative text-[color:#0f1530] w-[47.025px] shrink-0",
+                   "id": "I219:9169;219:9049",
+                   "k": [
+                    "November"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#e4f1e8] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[111.625px] shrink-0",
+                 "n": "Status / Email consent recorded",
+                 "id": "I219:9169;219:9050",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#0f1530] w-[102.125px] shrink-0",
+                   "id": "I219:9169;219:9051",
+                   "k": [
+                    "Email consent recorded"
+                   ]
+                  }
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border-[0.475px] border-[#e6dccb] border-solid flex flex-col gap-[6.65px] items-start p-[9.5px] relative rounded-[7.6px] w-[175.75px] shrink-0",
+               "n": "Reminder draft",
+               "id": "I219:9169;219:9052",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[5.22px] text-[color:#2a3360] tracking-[0.522px] w-full",
+                 "id": "I219:9169;219:9053",
+                 "k": [
+                  "EMAIL DRAFT"
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "font-semibold relative text-[11.4px] text-[color:#0f1530] w-full",
+                 "id": "I219:9169;219:9054",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "leading-[1.38] mb-0",
+                   "k": [
+                    "Your fall tune-up"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "leading-[1.38]",
+                   "k": [
+                    "is coming up."
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal leading-[1.38] relative text-[6.65px] text-[color:#2a3360] w-full",
+                 "id": "I219:9169;219:9055",
+                 "k": [
+                  "Review the next visit with Jordan."
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#fff4d6] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[114px] shrink-0",
+                 "n": "Status / Owner review required",
+                 "id": "I219:9169;219:9056",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#0f1530] w-[104.5px] shrink-0",
+                   "id": "I219:9169;219:9057",
+                   "k": [
+                    "Owner review required"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#0f1530] flex h-[18.05px] items-center justify-center px-[6.65px] relative rounded-[5.7px] w-[156.75px] shrink-0",
+                 "n": "UI action / Review reminder",
+                 "id": "I219:9169;219:9058",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[5.7px] text-[color:#fff] text-center w-[143.45px] shrink-0",
+                   "id": "I219:9169;219:9059",
+                   "k": [
+                    "Review reminder"
+                   ]
+                  }
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#fff] flex flex-col gap-[24px] items-start p-[24px] relative w-full",
+     "n": "02 / Three visible product states",
+     "id": "219:9197",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+       "id": "219:9198",
+       "k": [
+        "EXAMPLE WORKFLOW"
+       ]
+      },
+      {
+       "t": "p",
+       "c": "font-semibold leading-[1.38] relative text-[30px] text-[color:#0f1530] w-full",
+       "id": "219:9199",
+       "k": [
+        "See the work happen."
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[16px] items-start relative w-full",
+       "n": "Product workflow states",
+       "id": "219:9200",
+       "k": [
+        {
+         "t": "div",
+         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[var(--radius\\\\/16,16px)] w-full",
+         "n": "Complementary workflow / Use the service history / Mobile",
+         "id": "219:9214",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] w-full",
+           "id": "219:9202",
+           "k": [
+            "Use the service history"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[235px] items-start p-[16px] relative rounded-[12px] w-full",
+           "n": "Example state / due",
+           "id": "219:9203",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+             "id": "219:9204",
+             "k": [
+              "SERVICE HISTORY"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[24px] text-[color:#0f1530] w-full",
+             "id": "219:9205",
+             "k": [
+              "Jordan Lee"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-full",
+             "n": "Field / Last visit",
+             "id": "219:9206",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-normal relative text-[color:#2a3360] w-[151px] shrink-0",
+               "id": "219:9207",
+               "k": [
+                "Last visit"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium relative text-[color:#0f1530] w-[113px] shrink-0",
+               "id": "219:9208",
+               "k": [
+                "Apr 18"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-full",
+             "n": "Field / Due next",
+             "id": "219:9209",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-normal relative text-[color:#2a3360] w-[151px] shrink-0",
+               "id": "219:9210",
+               "k": [
+                "Due next"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium relative text-[color:#0f1530] w-[113px] shrink-0",
+               "id": "219:9211",
+               "k": [
+                "November"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+             "n": "Status / Consented email reminder",
+             "id": "219:9212",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] flex-1 min-w-0",
+               "id": "219:9213",
+               "k": [
+                "Consented email reminder"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[var(--radius\\\\/16,16px)] w-full",
+         "n": "Complementary workflow / Review the email / Mobile",
+         "id": "219:9226",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] w-full",
+           "id": "219:9216",
+           "k": [
+            "Review the email"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[235px] items-start p-[16px] relative rounded-[12px] w-full",
+           "n": "Example state / reminder",
+           "id": "219:9217",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[30px]",
+             "n": "Icon / mail",
+             "id": "219:9218",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-mail-851b3398.svg"
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "font-semibold relative text-[24px] text-[color:#0f1530] w-full",
+             "id": "219:9221",
+             "k": [
+              {
+               "t": "p",
+               "c": "leading-[1.38] mb-0",
+               "k": [
+                "Your next tune-up"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "leading-[1.38]",
+               "k": [
+                "is due."
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+             "n": "Status / Owner review required",
+             "id": "219:9222",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[230px] shrink-0",
+               "id": "219:9223",
+               "k": [
+                "Owner review required"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+             "n": "UI action / Review email",
+             "id": "219:9224",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+               "id": "219:9225",
+               "k": [
+                "Review email"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[var(--radius\\\\/16,16px)] w-full",
+         "n": "Complementary workflow / Request the next visit / Mobile",
+         "id": "219:9238",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] w-full",
+           "id": "219:9228",
+           "k": [
+            "Request the next visit"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[235px] items-start p-[16px] relative rounded-[12px] w-full",
+           "n": "Example state / rebook",
+           "id": "219:9229",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[28px]",
+             "n": "Icon / calendar",
+             "id": "219:9230",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-calendar-2f11c7ba.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[24px] text-[color:#0f1530] w-full",
+             "id": "219:9233",
+             "k": [
+              "Request a visit"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-medium leading-[1.38] relative text-[21px] text-[color:#0f1530] w-full",
+             "id": "219:9234",
+             "k": [
+              "November 12"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[185px] shrink-0",
+             "n": "Status / 10:00–12:00",
+             "id": "219:9235",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[165px] shrink-0",
+               "id": "219:9236",
+               "k": [
+                "10:00–12:00"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] w-full",
+             "id": "219:9237",
+             "k": [
+              "Request awaits confirmation"
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ],
+     "anchor": "workflow-m"
+    },
+    {
+     "t": "div",
+     "c": "bg-[#0f1530] flex flex-col gap-[24px] items-start p-[24px] relative w-full",
+     "n": "03 / Connected workflow and demo",
+     "id": "219:9239",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#f6b400] tracking-[1.1px] w-full",
+       "id": "219:9240",
+       "k": [
+        "WORKS ACROSS YOUR BUSINESS"
+       ]
+      },
+      {
+       "t": "p",
+       "c": "font-semibold leading-[1.38] relative text-[28px] text-[color:#fff] w-full",
+       "id": "219:9241",
+       "k": [
+        "One job. Connected all the way."
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[12px] items-center relative w-full",
+       "n": "Flagship and tool handoff",
+       "id": "219:9242",
+       "k": [
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] w-full",
+         "n": "Connected feature / Invoices & payments / Mobile",
+         "id": "219:9253",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:9244",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Operations",
+             "id": "219:9245",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:9246",
+               "k": [
+                "Operations"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[180px] shrink-0",
+             "id": "219:9247",
+             "k": [
+              "Invoice #1042"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:9248",
+           "k": [
+            "Invoices & payments"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:9249",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:9250",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:9252",
+             "k": [
+              "Service history recorded"
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex flex-col h-[24px] items-center justify-center relative w-full",
+         "n": "Next connected state",
+         "id": "219:9254",
+         "k": [
+          {
+           "t": "div",
+           "c": "relative size-[24px]",
+           "n": "Frame",
+           "id": "219:9255",
+           "k": [
+            {
+             "t": "img",
+             "c": "absolute block inset-0 size-full",
+             "src": "/marketing/flagship/frame-08fa5d7a.svg"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] w-full",
+         "n": "Connected feature / Reminders & win-backs / Mobile",
+         "id": "219:9267",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:9258",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Retention",
+             "id": "219:9259",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:9260",
+               "k": [
+                "Retention"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[180px] shrink-0",
+             "id": "219:9261",
+             "k": [
+              "Job #1042 · Jordan Lee"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:9262",
+           "k": [
+            "Reminders & win-backs"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:9263",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:9264",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:9266",
+             "k": [
+              "Consented email reviewed"
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex flex-col h-[24px] items-center justify-center relative w-full",
+         "n": "Next connected state",
+         "id": "219:9268",
+         "k": [
+          {
+           "t": "div",
+           "c": "relative size-[24px]",
+           "n": "Frame",
+           "id": "219:9269",
+           "k": [
+            {
+             "t": "img",
+             "c": "absolute block inset-0 size-full",
+             "src": "/marketing/flagship/frame-08fa5d7a.svg"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] w-full",
+         "n": "Connected feature / Online booking / Mobile",
+         "id": "219:9281",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:9272",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Growth",
+             "id": "219:9273",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:9274",
+               "k": [
+                "Growth"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[180px] shrink-0",
+             "id": "219:9275",
+             "k": [
+              "Job #1042 · Jordan Lee"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:9276",
+           "k": [
+            "Online booking"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:9277",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:9278",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:9280",
+             "k": [
+              "Next visit requested"
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "t": "button",
+       "label": "Get a free demo",
+       "kind": "Accent",
+       "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#0f1530]",
+       "href": "/demo"
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "reporting-job-sources": {
+  "desktop": {
+   "t": "div",
+   "c": "bg-[#fbf6ef] flex flex-col items-start relative",
+   "n": "Reporting & Job Sources / Desktop",
+   "id": "215:6316",
+   "k": [
+    {
+     "t": "div",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[24px] items-start px-[80px] py-[48px] relative w-full",
+     "n": "01 / Product in view",
+     "id": "219:9671",
+     "k": [
+      {
+       "t": "div",
+       "c": "flex gap-[48px] items-center relative w-full",
+       "n": "Outcome and actual workflow",
+       "id": "219:9672",
+       "k": [
+        {
+         "t": "div",
+         "c": "flex flex-col gap-[16px] items-start relative flex-1 min-w-0",
+         "n": "Short product promise",
+         "id": "219:9673",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "219:9674",
+           "k": [
+            "COMMAND CENTER / REPORTING & JOB SOURCES"
+           ]
+          },
+          {
+           "t": "h1",
+           "c": "font-semibold leading-[1.08] relative text-[58px] text-[color:#0f1530] tracking-[-1.45px] w-full",
+           "id": "219:9675",
+           "k": [
+            "See where the work comes from."
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-full",
+           "id": "219:9676",
+           "k": [
+            "Follow recorded sources from the booking to the paid invoice."
+           ]
+          },
+          {
+           "t": "button",
+           "label": "Explore the records",
+           "kind": "Dark",
+           "c": "bg-[#0f1530] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#fbf6ef]",
+           "href": "#workflow"
+          },
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "219:9679",
+           "k": [
+            "EXAMPLE BUSINESS · JUNIPER"
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#f6f7f9] border-[1.044px] border-[#e6dccb] border-solid flex flex-col items-start relative rounded-[16.711px] bg-[#f6f7f9] border-[1.044px] border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col items-start relative rounded-[16.711px] flex-1 min-w-0",
+         "n": "Complementary product view / reporting",
+         "id": "219:9729",
+         "k": [
+          {
+           "t": "div",
+           "c": "bg-[#0f1530] flex gap-[16.711px] h-[56.4px] items-center p-[16.711px] relative w-full",
+           "n": "Product chrome",
+           "id": "219:9681",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-bold leading-[1.38] relative text-[17.756px] text-[color:#fff] w-[146.222px] shrink-0",
+             "id": "219:9682",
+             "k": [
+              "Renvani"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-medium leading-[1.38] relative text-[12.533px] text-[color:#fff] flex-1 min-w-0",
+             "id": "219:9683",
+             "k": [
+              "Reporting & sources"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#f6b400] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[106.533px] shrink-0",
+             "n": "Status / EXAMPLE",
+             "id": "219:9684",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10.444px] text-[color:#0f1530] w-[85.644px] shrink-0",
+               "id": "219:9685",
+               "k": [
+                "EXAMPLE"
+               ]
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[16.711px] items-start p-[25.067px] relative w-full",
+           "n": "Product workspace",
+           "id": "219:9686",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[26.111px] text-[color:#0f1530] w-full",
+             "id": "219:9687",
+             "k": [
+              "Follow the recorded source."
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[20.889px] items-start relative w-full",
+             "n": "Source reporting and record",
+             "id": "219:9688",
+             "k": [
+              {
+               "t": "div",
+               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] flex-1 min-w-0",
+               "n": "Recorded sources",
+               "id": "219:9689",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[11.489px] text-[color:#2a3360] tracking-[1.1489px] w-full",
+                 "id": "219:9690",
+                 "k": [
+                  "BOOKED JOB RECORDS"
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex flex-col gap-[5.222px] items-start relative w-full",
+                 "n": "Website",
+                 "id": "219:9691",
+                 "k": [
+                  {
+                   "t": "div",
+                   "c": "flex gap-[12.533px] items-start leading-[1.38] relative w-full",
+                   "n": "Count",
+                   "id": "219:9692",
+                   "k": [
+                    {
+                     "t": "p",
+                     "c": "font-normal relative text-[12.533px] text-[color:#2a3360] flex-1 min-w-0",
+                     "id": "219:9693",
+                     "k": [
+                      "Website"
+                     ]
+                    },
+                    {
+                     "t": "p",
+                     "c": "font-semibold relative text-[14.622px] text-[color:#0f1530] w-[39.689px] shrink-0",
+                     "id": "219:9694",
+                     "k": [
+                      "8"
+                     ]
+                    }
+                   ]
+                  },
+                  {
+                   "t": "div",
+                   "c": "bg-[#fbf6ef] flex h-[11.489px] items-start relative rounded-[12.533px] w-full",
+                   "n": "Count bar",
+                   "id": "219:9695",
+                   "k": [
+                    {
+                     "t": "div",
+                     "c": "bg-[#0f1530] h-[11.489px] relative flex-1 min-w-0",
+                     "n": "Source count 8",
+                     "id": "219:9696"
+                    }
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex flex-col gap-[5.222px] items-start relative w-full",
+                 "n": "Repeat customer",
+                 "id": "219:9697",
+                 "k": [
+                  {
+                   "t": "div",
+                   "c": "flex gap-[12.533px] items-start leading-[1.38] relative w-full",
+                   "n": "Count",
+                   "id": "219:9698",
+                   "k": [
+                    {
+                     "t": "p",
+                     "c": "font-normal relative text-[12.533px] text-[color:#2a3360] flex-1 min-w-0",
+                     "id": "219:9699",
+                     "k": [
+                      "Repeat customer"
+                     ]
+                    },
+                    {
+                     "t": "p",
+                     "c": "font-semibold relative text-[14.622px] text-[color:#0f1530] w-[39.689px] shrink-0",
+                     "id": "219:9700",
+                     "k": [
+                      "5"
+                     ]
+                    }
+                   ]
+                  },
+                  {
+                   "t": "div",
+                   "c": "bg-[#fbf6ef] flex h-[11.489px] items-start relative rounded-[12.533px] w-full",
+                   "n": "Count bar",
+                   "id": "219:9701",
+                   "k": [
+                    {
+                     "t": "div",
+                     "c": "bg-[#0f1530] h-[11.489px] relative w-[202.361px] shrink-0",
+                     "n": "Source count 5",
+                     "id": "219:9702"
+                    }
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex flex-col gap-[5.222px] items-start relative w-full",
+                 "n": "Referral",
+                 "id": "219:9703",
+                 "k": [
+                  {
+                   "t": "div",
+                   "c": "flex gap-[12.533px] items-start leading-[1.38] relative w-full",
+                   "n": "Count",
+                   "id": "219:9704",
+                   "k": [
+                    {
+                     "t": "p",
+                     "c": "font-normal relative text-[12.533px] text-[color:#2a3360] flex-1 min-w-0",
+                     "id": "219:9705",
+                     "k": [
+                      "Referral"
+                     ]
+                    },
+                    {
+                     "t": "p",
+                     "c": "font-semibold relative text-[14.622px] text-[color:#0f1530] w-[39.689px] shrink-0",
+                     "id": "219:9706",
+                     "k": [
+                      "3"
+                     ]
+                    }
+                   ]
+                  },
+                  {
+                   "t": "div",
+                   "c": "bg-[#fbf6ef] flex h-[11.489px] items-start relative rounded-[12.533px] w-full",
+                   "n": "Count bar",
+                   "id": "219:9707",
+                   "k": [
+                    {
+                     "t": "div",
+                     "c": "bg-[#0f1530] h-[11.489px] relative w-[121.417px] shrink-0",
+                     "n": "Source count 3",
+                     "id": "219:9708"
+                    }
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex flex-col gap-[5.222px] items-start relative w-full",
+                 "n": "Not recorded",
+                 "id": "219:9709",
+                 "k": [
+                  {
+                   "t": "div",
+                   "c": "flex gap-[12.533px] items-start leading-[1.38] relative w-full",
+                   "n": "Count",
+                   "id": "219:9710",
+                   "k": [
+                    {
+                     "t": "p",
+                     "c": "font-normal relative text-[12.533px] text-[color:#2a3360] flex-1 min-w-0",
+                     "id": "219:9711",
+                     "k": [
+                      "Not recorded"
+                     ]
+                    },
+                    {
+                     "t": "p",
+                     "c": "font-semibold relative text-[14.622px] text-[color:#0f1530] w-[39.689px] shrink-0",
+                     "id": "219:9712",
+                     "k": [
+                      "2"
+                     ]
+                    }
+                   ]
+                  },
+                  {
+                   "t": "div",
+                   "c": "bg-[#fbf6ef] flex h-[11.489px] items-start relative rounded-[12.533px] w-full",
+                   "n": "Count bar",
+                   "id": "219:9713",
+                   "k": [
+                    {
+                     "t": "div",
+                     "c": "bg-[#e6dccb] h-[11.489px] relative w-[80.944px] shrink-0",
+                     "n": "Source count 2",
+                     "id": "219:9714"
+                    }
+                   ]
+                  }
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] flex-1 min-w-0",
+               "n": "Source drill-down",
+               "id": "219:9715",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-semibold leading-[1.38] relative text-[24.022px] text-[color:#0f1530] w-full",
+                 "id": "219:9716",
+                 "k": [
+                  "Job #1042"
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.533px] w-full",
+                 "n": "Field / Source",
+                 "id": "219:9717",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[color:#2a3360] w-[150.4px] shrink-0",
+                   "id": "219:9718",
+                   "k": [
+                    "Source"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-medium relative text-[color:#0f1530] w-[112.8px] shrink-0",
+                   "id": "219:9719",
+                   "k": [
+                    "Website"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.533px] w-full",
+                 "n": "Field / Booking",
+                 "id": "219:9720",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[color:#2a3360] w-[150.4px] shrink-0",
+                   "id": "219:9721",
+                   "k": [
+                    "Booking"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-medium relative text-[color:#0f1530] w-[112.8px] shrink-0",
+                   "id": "219:9722",
+                   "k": [
+                    "Confirmed"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.533px] w-full",
+                 "n": "Field / Invoice",
+                 "id": "219:9723",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[color:#2a3360] w-[150.4px] shrink-0",
+                   "id": "219:9724",
+                   "k": [
+                    "Invoice"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-medium relative text-[color:#0f1530] w-[112.8px] shrink-0",
+                   "id": "219:9725",
+                   "k": [
+                    "#1042 paid"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-semibold leading-[1.38] relative text-[33.422px] text-[color:#0f1530] w-full",
+                 "id": "219:9726",
+                 "k": [
+                  "$279.48"
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#0f1530] flex h-[39.689px] items-center justify-center px-[14.622px] relative rounded-[12.533px] w-full",
+                 "n": "UI action / View source record",
+                 "id": "219:9727",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[12.533px] text-[color:#fff] text-center flex-1 min-w-0",
+                   "id": "219:9728",
+                   "k": [
+                    "View source record"
+                   ]
+                  }
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#fff] flex flex-col gap-[24px] items-start px-[80px] py-[48px] relative w-full",
+     "n": "02 / Three visible product states",
+     "id": "219:9730",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+       "id": "219:9731",
+       "k": [
+        "EXAMPLE WORKFLOW"
+       ]
+      },
+      {
+       "t": "p",
+       "c": "font-semibold leading-[1.08] relative text-[40px] text-[color:#0f1530] tracking-[-1px] w-full",
+       "id": "219:9732",
+       "k": [
+        "See the work happen."
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex gap-[40px] items-start relative w-full",
+       "n": "Product workflow states",
+       "id": "219:9733",
+       "k": [
+        {
+         "t": "div",
+         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[var(--radius\\\\/16,16px)] flex-1 min-w-0",
+         "n": "Complementary workflow / See the source / Desktop",
+         "id": "219:9742",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+           "id": "219:9735",
+           "k": [
+            "See the source"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[250px] items-start p-[16px] relative rounded-[12px] w-full",
+           "n": "Example state / source",
+           "id": "219:9736",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+             "id": "219:9737",
+             "k": [
+              "RECORDED SOURCE"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[32px] text-[color:#0f1530] w-full",
+             "id": "219:9738",
+             "k": [
+              "Website"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#2a3360] w-full",
+             "id": "219:9739",
+             "k": [
+              "Inquiry #1042 · Jordan Lee"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+             "n": "Status / Source attached to record",
+             "id": "219:9740",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] flex-1 min-w-0",
+               "id": "219:9741",
+               "k": [
+                "Source attached to record"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[var(--radius\\\\/16,16px)] flex-1 min-w-0",
+         "n": "Complementary workflow / Follow the booking / Desktop",
+         "id": "219:9753",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+           "id": "219:9744",
+           "k": [
+            "Follow the booking"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[250px] items-start p-[16px] relative rounded-[12px] w-full",
+           "n": "Example state / booked",
+           "id": "219:9745",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[30px]",
+             "n": "Icon / check",
+             "id": "219:9746",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check1-7e17b6d5.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[27px] text-[color:#0f1530] w-full",
+             "id": "219:9748",
+             "k": [
+              "Job #1042"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[15px] text-[color:#0f1530] w-full",
+             "id": "219:9749",
+             "k": [
+              "AC diagnostic · Oct 29"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[225px] shrink-0",
+             "n": "Status / Booking confirmed",
+             "id": "219:9750",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[205px] shrink-0",
+               "id": "219:9751",
+               "k": [
+                "Booking confirmed"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] w-full",
+             "id": "219:9752",
+             "k": [
+              "Recorded source · Website"
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[var(--radius\\\\/16,16px)] flex-1 min-w-0",
+         "n": "Complementary workflow / Inspect the paid job / Desktop",
+         "id": "219:9764",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+           "id": "219:9755",
+           "k": [
+            "Inspect the paid job"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[250px] items-start p-[16px] relative rounded-[12px] w-full",
+           "n": "Example state / paid",
+           "id": "219:9756",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[30px]",
+             "n": "Icon / check",
+             "id": "219:9757",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check1-7e17b6d5.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[32px] text-[color:#0f1530] w-full",
+             "id": "219:9759",
+             "k": [
+              "$279.48 paid"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[16px] text-[color:#0f1530] w-full",
+             "id": "219:9760",
+             "k": [
+              "Invoice #1042"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[240px] shrink-0",
+             "n": "Status / Matched to job #1042",
+             "id": "219:9761",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[220px] shrink-0",
+               "id": "219:9762",
+               "k": [
+                "Matched to job #1042"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] w-full",
+             "id": "219:9763",
+             "k": [
+              "Recorded source · Website"
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ],
+     "anchor": "workflow"
+    },
+    {
+     "t": "div",
+     "c": "bg-[#0f1530] flex flex-col gap-[24px] items-start px-[80px] py-[48px] relative w-full",
+     "n": "03 / Connected workflow and demo",
+     "id": "219:9765",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#f6b400] tracking-[1.1px] w-full",
+       "id": "219:9766",
+       "k": [
+        "WORKS ACROSS YOUR BUSINESS"
+       ]
+      },
+      {
+       "t": "p",
+       "c": "font-semibold leading-[1.08] relative text-[36px] text-[color:#fff] tracking-[-0.9px] w-full",
+       "id": "219:9767",
+       "k": [
+        "One job. Connected all the way."
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex gap-[16px] items-center relative w-full",
+       "n": "Flagship and tool handoff",
+       "id": "219:9768",
+       "k": [
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] flex-1 min-w-0",
+         "n": "Connected feature / Online booking / Desktop",
+         "id": "219:9779",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:9770",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Growth",
+             "id": "219:9771",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:9772",
+               "k": [
+                "Growth"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[222px] shrink-0",
+             "id": "219:9773",
+             "k": [
+              "Job #1042 · Jordan Lee"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:9774",
+           "k": [
+            "Online booking"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:9775",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:9776",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:9778",
+             "k": [
+              "Booking source recorded"
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex h-[24px] items-center justify-center relative w-[32px] shrink-0",
+         "n": "Next connected state",
+         "id": "219:9780",
+         "k": [
+          {
+           "t": "div",
+           "c": "relative size-[24px]",
+           "n": "Icon / arrow",
+           "id": "219:9781",
+           "k": [
+            {
+             "t": "img",
+             "c": "absolute block inset-0 size-full",
+             "src": "/marketing/flagship/icon-arrow-84befcc1.svg"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] flex-1 min-w-0",
+         "n": "Connected feature / Invoices & payments / Desktop",
+         "id": "219:9793",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:9784",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Operations",
+             "id": "219:9785",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:9786",
+               "k": [
+                "Operations"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[222px] shrink-0",
+             "id": "219:9787",
+             "k": [
+              "Invoice #1042"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:9788",
+           "k": [
+            "Invoices & payments"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:9789",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:9790",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:9792",
+             "k": [
+              "Paid invoice matched to job"
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex h-[24px] items-center justify-center relative w-[32px] shrink-0",
+         "n": "Next connected state",
+         "id": "219:9794",
+         "k": [
+          {
+           "t": "div",
+           "c": "relative size-[24px]",
+           "n": "Icon / arrow",
+           "id": "219:9795",
+           "k": [
+            {
+             "t": "img",
+             "c": "absolute block inset-0 size-full",
+             "src": "/marketing/flagship/icon-arrow-84befcc1.svg"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] flex-1 min-w-0",
+         "n": "Connected feature / Reporting & job sources / Desktop",
+         "id": "219:9807",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:9798",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Command Center",
+             "id": "219:9799",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:9800",
+               "k": [
+                "Command Center"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[222px] shrink-0",
+             "id": "219:9801",
+             "k": [
+              "Job #1042 · Jordan Lee"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:9802",
+           "k": [
+            "Reporting & job sources"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:9803",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:9804",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:9806",
+             "k": [
+              "Underlying record ready to inspect"
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "t": "button",
+       "label": "Get a free demo",
+       "kind": "Accent",
+       "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#0f1530]",
+       "href": "/demo"
+      }
+     ]
+    }
+   ]
+  },
+  "mobile": {
+   "t": "div",
+   "c": "bg-[#fbf6ef] flex flex-col items-start relative",
+   "n": "Reporting & Job Sources / Mobile",
+   "id": "215:6317",
+   "k": [
+    {
+     "t": "div",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[24px] items-start p-[24px] relative w-full",
+     "n": "01 / Product in view",
+     "id": "219:9822",
+     "k": [
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[24px] items-start relative w-full",
+       "n": "Outcome and actual workflow",
+       "id": "219:9823",
+       "k": [
+        {
+         "t": "div",
+         "c": "flex flex-col gap-[16px] items-start relative w-full",
+         "n": "Short product promise",
+         "id": "219:9824",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "219:9825",
+           "k": [
+            "COMMAND CENTER / REPORTING & JOB SOURCES"
+           ]
+          },
+          {
+           "t": "h1",
+           "c": "font-semibold leading-[1.08] relative text-[40px] text-[color:#0f1530] tracking-[-1px] w-full",
+           "id": "219:9826",
+           "k": [
+            "See where the work comes from."
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-full",
+           "id": "219:9827",
+           "k": [
+            "Follow recorded sources from the booking to the paid invoice."
+           ]
+          },
+          {
+           "t": "button",
+           "label": "Explore the records",
+           "kind": "Dark",
+           "c": "bg-[#0f1530] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#fbf6ef]",
+           "href": "#workflow-m"
+          },
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "219:9830",
+           "k": [
+            "EXAMPLE BUSINESS · JUNIPER"
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#f6f7f9] border-[0.475px] border-[#e6dccb] border-solid flex flex-col items-start relative rounded-[7.6px] w-full",
+         "n": "Product demonstration / Reporting & Job Sources",
+         "id": "219:9831",
+         "k": [
+          {
+           "t": "div",
+           "c": "bg-[#0f1530] flex gap-[7.6px] h-[25.65px] items-center p-[7.6px] relative w-full",
+           "n": "Product chrome",
+           "id": "I219:9831;219:9681",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-bold leading-[1.38] relative text-[8.08px] text-[color:#fff] w-[66.5px] shrink-0",
+             "id": "I219:9831;219:9682",
+             "k": [
+              "Renvani"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-medium leading-[1.38] relative text-[5.7px] text-[color:#fff] w-[196.65px] shrink-0",
+             "id": "I219:9831;219:9683",
+             "k": [
+              "Reporting & sources"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#f6b400] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[48.45px] shrink-0",
+             "n": "Status / EXAMPLE",
+             "id": "I219:9831;219:9684",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#0f1530] w-[38.95px] shrink-0",
+               "id": "I219:9831;219:9685",
+               "k": [
+                "EXAMPLE"
+               ]
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[7.6px] items-start p-[11.4px] relative w-full",
+           "n": "Product workspace",
+           "id": "I219:9831;219:9686",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[11.87px] text-[color:#0f1530] w-full",
+             "id": "I219:9831;219:9687",
+             "k": [
+              "Follow the recorded source."
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[9.5px] items-start relative w-full",
+             "n": "Source reporting and record",
+             "id": "I219:9831;219:9688",
+             "k": [
+              {
+               "t": "div",
+               "c": "bg-[#fff] border-[0.475px] border-[#e6dccb] border-solid flex flex-col gap-[6.65px] items-start p-[9.5px] relative rounded-[7.6px] w-[166.25px] shrink-0",
+               "n": "Recorded sources",
+               "id": "I219:9831;219:9689",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[5.22px] text-[color:#2a3360] tracking-[0.522px] w-full",
+                 "id": "I219:9831;219:9690",
+                 "k": [
+                  "BOOKED JOB RECORDS"
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex flex-col gap-[2.375px] items-start relative w-full",
+                 "n": "Website",
+                 "id": "I219:9831;219:9691",
+                 "k": [
+                  {
+                   "t": "div",
+                   "c": "flex gap-[5.7px] items-start leading-[1.38] relative w-full",
+                   "n": "Count",
+                   "id": "I219:9831;219:9692",
+                   "k": [
+                    {
+                     "t": "p",
+                     "c": "font-normal relative text-[5.7px] text-[color:#2a3360] w-[123.5px] shrink-0",
+                     "id": "I219:9831;219:9693",
+                     "k": [
+                      "Website"
+                     ]
+                    },
+                    {
+                     "t": "p",
+                     "c": "font-semibold relative text-[6.65px] text-[color:#0f1530] w-[18.05px] shrink-0",
+                     "id": "I219:9831;219:9694",
+                     "k": [
+                      "8"
+                     ]
+                    }
+                   ]
+                  },
+                  {
+                   "t": "div",
+                   "c": "bg-[#fbf6ef] flex h-[5.225px] items-start relative rounded-[5.7px] w-[147.25px] shrink-0",
+                   "n": "Count bar",
+                   "id": "I219:9831;219:9695",
+                   "k": [
+                    {
+                     "t": "div",
+                     "c": "bg-[#0f1530] h-[5.225px] relative w-[147.25px] shrink-0",
+                     "n": "Source count 8",
+                     "id": "I219:9831;219:9696"
+                    }
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex flex-col gap-[2.375px] items-start relative w-full",
+                 "n": "Repeat customer",
+                 "id": "I219:9831;219:9697",
+                 "k": [
+                  {
+                   "t": "div",
+                   "c": "flex gap-[5.7px] items-start leading-[1.38] relative w-full",
+                   "n": "Count",
+                   "id": "I219:9831;219:9698",
+                   "k": [
+                    {
+                     "t": "p",
+                     "c": "font-normal relative text-[5.7px] text-[color:#2a3360] w-[123.5px] shrink-0",
+                     "id": "I219:9831;219:9699",
+                     "k": [
+                      "Repeat customer"
+                     ]
+                    },
+                    {
+                     "t": "p",
+                     "c": "font-semibold relative text-[6.65px] text-[color:#0f1530] w-[18.05px] shrink-0",
+                     "id": "I219:9831;219:9700",
+                     "k": [
+                      "5"
+                     ]
+                    }
+                   ]
+                  },
+                  {
+                   "t": "div",
+                   "c": "bg-[#fbf6ef] flex h-[5.225px] items-start relative rounded-[5.7px] w-[147.25px] shrink-0",
+                   "n": "Count bar",
+                   "id": "I219:9831;219:9701",
+                   "k": [
+                    {
+                     "t": "div",
+                     "c": "bg-[#0f1530] h-[5.225px] relative w-[92.031px] shrink-0",
+                     "n": "Source count 5",
+                     "id": "I219:9831;219:9702"
+                    }
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex flex-col gap-[2.375px] items-start relative w-full",
+                 "n": "Referral",
+                 "id": "I219:9831;219:9703",
+                 "k": [
+                  {
+                   "t": "div",
+                   "c": "flex gap-[5.7px] items-start leading-[1.38] relative w-full",
+                   "n": "Count",
+                   "id": "I219:9831;219:9704",
+                   "k": [
+                    {
+                     "t": "p",
+                     "c": "font-normal relative text-[5.7px] text-[color:#2a3360] w-[123.5px] shrink-0",
+                     "id": "I219:9831;219:9705",
+                     "k": [
+                      "Referral"
+                     ]
+                    },
+                    {
+                     "t": "p",
+                     "c": "font-semibold relative text-[6.65px] text-[color:#0f1530] w-[18.05px] shrink-0",
+                     "id": "I219:9831;219:9706",
+                     "k": [
+                      "3"
+                     ]
+                    }
+                   ]
+                  },
+                  {
+                   "t": "div",
+                   "c": "bg-[#fbf6ef] flex h-[5.225px] items-start relative rounded-[5.7px] w-[147.25px] shrink-0",
+                   "n": "Count bar",
+                   "id": "I219:9831;219:9707",
+                   "k": [
+                    {
+                     "t": "div",
+                     "c": "bg-[#0f1530] h-[5.225px] relative w-[55.219px] shrink-0",
+                     "n": "Source count 3",
+                     "id": "I219:9831;219:9708"
+                    }
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex flex-col gap-[2.375px] items-start relative w-full",
+                 "n": "Not recorded",
+                 "id": "I219:9831;219:9709",
+                 "k": [
+                  {
+                   "t": "div",
+                   "c": "flex gap-[5.7px] items-start leading-[1.38] relative w-full",
+                   "n": "Count",
+                   "id": "I219:9831;219:9710",
+                   "k": [
+                    {
+                     "t": "p",
+                     "c": "font-normal relative text-[5.7px] text-[color:#2a3360] w-[123.5px] shrink-0",
+                     "id": "I219:9831;219:9711",
+                     "k": [
+                      "Not recorded"
+                     ]
+                    },
+                    {
+                     "t": "p",
+                     "c": "font-semibold relative text-[6.65px] text-[color:#0f1530] w-[18.05px] shrink-0",
+                     "id": "I219:9831;219:9712",
+                     "k": [
+                      "2"
+                     ]
+                    }
+                   ]
+                  },
+                  {
+                   "t": "div",
+                   "c": "bg-[#fbf6ef] flex h-[5.225px] items-start relative rounded-[5.7px] w-[147.25px] shrink-0",
+                   "n": "Count bar",
+                   "id": "I219:9831;219:9713",
+                   "k": [
+                    {
+                     "t": "div",
+                     "c": "bg-[#e6dccb] h-[5.225px] relative w-[36.812px] shrink-0",
+                     "n": "Source count 2",
+                     "id": "I219:9831;219:9714"
+                    }
+                   ]
+                  }
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border-[0.475px] border-[#e6dccb] border-solid flex flex-col gap-[6.65px] items-start p-[9.5px] relative rounded-[7.6px] w-[143.45px] shrink-0",
+               "n": "Source drill-down",
+               "id": "I219:9831;219:9715",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-semibold leading-[1.38] relative text-[10.92px] text-[color:#0f1530] w-full",
+                 "id": "I219:9831;219:9716",
+                 "k": [
+                  "Job #1042"
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[4.75px] items-start leading-[1.38] relative text-[5.7px] w-full",
+                 "n": "Field / Source",
+                 "id": "I219:9831;219:9717",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[color:#2a3360] w-[68.4px] shrink-0",
+                   "id": "I219:9831;219:9718",
+                   "k": [
+                    "Source"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-medium relative text-[color:#0f1530] w-[51.3px] shrink-0",
+                   "id": "I219:9831;219:9719",
+                   "k": [
+                    "Website"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[4.75px] items-start leading-[1.38] relative text-[5.7px] w-full",
+                 "n": "Field / Booking",
+                 "id": "I219:9831;219:9720",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[color:#2a3360] w-[68.4px] shrink-0",
+                   "id": "I219:9831;219:9721",
+                   "k": [
+                    "Booking"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-medium relative text-[color:#0f1530] w-[51.3px] shrink-0",
+                   "id": "I219:9831;219:9722",
+                   "k": [
+                    "Confirmed"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[4.75px] items-start leading-[1.38] relative text-[5.7px] w-full",
+                 "n": "Field / Invoice",
+                 "id": "I219:9831;219:9723",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[color:#2a3360] w-[68.4px] shrink-0",
+                   "id": "I219:9831;219:9724",
+                   "k": [
+                    "Invoice"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-medium relative text-[color:#0f1530] w-[51.3px] shrink-0",
+                   "id": "I219:9831;219:9725",
+                   "k": [
+                    "#1042 paid"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-semibold leading-[1.38] relative text-[15.2px] text-[color:#0f1530] w-full",
+                 "id": "I219:9831;219:9726",
+                 "k": [
+                  "$279.48"
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#0f1530] flex h-[18.05px] items-center justify-center px-[6.65px] relative rounded-[5.7px] w-[124.45px] shrink-0",
+                 "n": "UI action / View source record",
+                 "id": "I219:9831;219:9727",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[5.7px] text-[color:#fff] text-center w-[111.15px] shrink-0",
+                   "id": "I219:9831;219:9728",
+                   "k": [
+                    "View source record"
+                   ]
+                  }
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#fff] flex flex-col gap-[24px] items-start p-[24px] relative w-full",
+     "n": "02 / Three visible product states",
+     "id": "219:9880",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+       "id": "219:9881",
+       "k": [
+        "EXAMPLE WORKFLOW"
+       ]
+      },
+      {
+       "t": "p",
+       "c": "font-semibold leading-[1.38] relative text-[30px] text-[color:#0f1530] w-full",
+       "id": "219:9882",
+       "k": [
+        "See the work happen."
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[16px] items-start relative w-full",
+       "n": "Product workflow states",
+       "id": "219:9883",
+       "k": [
+        {
+         "t": "div",
+         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[var(--radius\\\\/16,16px)] w-full",
+         "n": "Complementary workflow / See the source / Mobile",
+         "id": "219:9892",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] w-full",
+           "id": "219:9885",
+           "k": [
+            "See the source"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[235px] items-start p-[16px] relative rounded-[12px] w-full",
+           "n": "Example state / source",
+           "id": "219:9886",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+             "id": "219:9887",
+             "k": [
+              "RECORDED SOURCE"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[32px] text-[color:#0f1530] w-full",
+             "id": "219:9888",
+             "k": [
+              "Website"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#2a3360] w-full",
+             "id": "219:9889",
+             "k": [
+              "Inquiry #1042 · Jordan Lee"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+             "n": "Status / Source attached to record",
+             "id": "219:9890",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] flex-1 min-w-0",
+               "id": "219:9891",
+               "k": [
+                "Source attached to record"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[var(--radius\\\\/16,16px)] w-full",
+         "n": "Complementary workflow / Follow the booking / Mobile",
+         "id": "219:9903",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] w-full",
+           "id": "219:9894",
+           "k": [
+            "Follow the booking"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[235px] items-start p-[16px] relative rounded-[12px] w-full",
+           "n": "Example state / booked",
+           "id": "219:9895",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[30px]",
+             "n": "Icon / check",
+             "id": "219:9896",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check1-7e17b6d5.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[27px] text-[color:#0f1530] w-full",
+             "id": "219:9898",
+             "k": [
+              "Job #1042"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[15px] text-[color:#0f1530] w-full",
+             "id": "219:9899",
+             "k": [
+              "AC diagnostic · Oct 29"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[225px] shrink-0",
+             "n": "Status / Booking confirmed",
+             "id": "219:9900",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[205px] shrink-0",
+               "id": "219:9901",
+               "k": [
+                "Booking confirmed"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] w-full",
+             "id": "219:9902",
+             "k": [
+              "Recorded source · Website"
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[var(--radius\\\\/16,16px)] w-full",
+         "n": "Complementary workflow / Inspect the paid job / Mobile",
+         "id": "219:9914",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] w-full",
+           "id": "219:9905",
+           "k": [
+            "Inspect the paid job"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[235px] items-start p-[16px] relative rounded-[12px] w-full",
+           "n": "Example state / paid",
+           "id": "219:9906",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[30px]",
+             "n": "Icon / check",
+             "id": "219:9907",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check1-7e17b6d5.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[32px] text-[color:#0f1530] w-full",
+             "id": "219:9909",
+             "k": [
+              "$279.48 paid"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[16px] text-[color:#0f1530] w-full",
+             "id": "219:9910",
+             "k": [
+              "Invoice #1042"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[240px] shrink-0",
+             "n": "Status / Matched to job #1042",
+             "id": "219:9911",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[220px] shrink-0",
+               "id": "219:9912",
+               "k": [
+                "Matched to job #1042"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] w-full",
+             "id": "219:9913",
+             "k": [
+              "Recorded source · Website"
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ],
+     "anchor": "workflow-m"
+    },
+    {
+     "t": "div",
+     "c": "bg-[#0f1530] flex flex-col gap-[24px] items-start p-[24px] relative w-full",
+     "n": "03 / Connected workflow and demo",
+     "id": "219:9915",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#f6b400] tracking-[1.1px] w-full",
+       "id": "219:9916",
+       "k": [
+        "WORKS ACROSS YOUR BUSINESS"
+       ]
+      },
+      {
+       "t": "p",
+       "c": "font-semibold leading-[1.38] relative text-[28px] text-[color:#fff] w-full",
+       "id": "219:9917",
+       "k": [
+        "One job. Connected all the way."
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[12px] items-center relative w-full",
+       "n": "Flagship and tool handoff",
+       "id": "219:9918",
+       "k": [
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] w-full",
+         "n": "Connected feature / Online booking / Mobile",
+         "id": "219:9929",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:9920",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Growth",
+             "id": "219:9921",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:9922",
+               "k": [
+                "Growth"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[180px] shrink-0",
+             "id": "219:9923",
+             "k": [
+              "Job #1042 · Jordan Lee"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:9924",
+           "k": [
+            "Online booking"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:9925",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:9926",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:9928",
+             "k": [
+              "Booking source recorded"
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex flex-col h-[24px] items-center justify-center relative w-full",
+         "n": "Next connected state",
+         "id": "219:9930",
+         "k": [
+          {
+           "t": "div",
+           "c": "relative size-[24px]",
+           "n": "Frame",
+           "id": "219:9931",
+           "k": [
+            {
+             "t": "img",
+             "c": "absolute block inset-0 size-full",
+             "src": "/marketing/flagship/frame-08fa5d7a.svg"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] w-full",
+         "n": "Connected feature / Invoices & payments / Mobile",
+         "id": "219:9943",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:9934",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Operations",
+             "id": "219:9935",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:9936",
+               "k": [
+                "Operations"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[180px] shrink-0",
+             "id": "219:9937",
+             "k": [
+              "Invoice #1042"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:9938",
+           "k": [
+            "Invoices & payments"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:9939",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:9940",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:9942",
+             "k": [
+              "Paid invoice matched to job"
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex flex-col h-[24px] items-center justify-center relative w-full",
+         "n": "Next connected state",
+         "id": "219:9944",
+         "k": [
+          {
+           "t": "div",
+           "c": "relative size-[24px]",
+           "n": "Frame",
+           "id": "219:9945",
+           "k": [
+            {
+             "t": "img",
+             "c": "absolute block inset-0 size-full",
+             "src": "/marketing/flagship/frame-08fa5d7a.svg"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] w-full",
+         "n": "Connected feature / Reporting & job sources / Mobile",
+         "id": "219:9957",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:9948",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Command Center",
+             "id": "219:9949",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:9950",
+               "k": [
+                "Command Center"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[180px] shrink-0",
+             "id": "219:9951",
+             "k": [
+              "Job #1042 · Jordan Lee"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:9952",
+           "k": [
+            "Reporting & job sources"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:9953",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:9954",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:9956",
+             "k": [
+              "Underlying record ready to inspect"
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "t": "button",
+       "label": "Get a free demo",
+       "kind": "Accent",
+       "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#0f1530]",
+       "href": "/demo"
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "websites": {
+  "desktop": {
+   "t": "div",
+   "c": "bg-[#fbf6ef] flex flex-col items-start relative",
+   "n": "Websites / Desktop",
+   "id": "216:6308",
+   "k": [
+    {
+     "t": "div",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[24px] items-start p-[64px] relative w-full",
+     "n": "01 / Product in view",
+     "id": "218:9026",
+     "k": [
+      {
+       "t": "div",
+       "c": "flex gap-[64px] items-center relative w-full",
+       "n": "Headline and real product view",
+       "id": "218:9027",
+       "k": [
+        {
+         "t": "div",
+         "c": "flex flex-col gap-[20px] items-start relative flex-1 min-w-0",
+         "n": "Outcome copy",
+         "id": "218:9028",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "218:9029",
+           "k": [
+            "GROWTH / WEBSITES"
+           ]
+          },
+          {
+           "t": "h1",
+           "c": "font-semibold relative text-[60px] text-[color:#0f1530] tracking-[-1.5px] w-full",
+           "id": "218:9030",
+           "k": [
+            {
+             "t": "p",
+             "c": "leading-[1.08] mb-0",
+             "k": [
+              "Your business."
+             ]
+            },
+            {
+             "t": "p",
+             "c": "leading-[1.08]",
+             "k": [
+              "Your own website."
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-full",
+           "id": "218:9031",
+           "k": [
+            "Show your services, earn trust, and turn local visits into service requests."
+           ]
+          },
+          {
+           "t": "button",
+           "label": "See your website",
+           "kind": "Dark",
+           "c": "bg-[#0f1530] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#fbf6ef]",
+           "href": "#workflow"
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#f6f7f9] border border-[#e6dccb] border-solid flex flex-col items-start overflow-clip relative rounded-[16px] bg-[#f6f7f9] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col items-start overflow-clip relative rounded-[var(--radius\\\\/16,16px)] flex-1 min-w-0",
+         "n": "Editable product visual / website",
+         "id": "218:9034",
+         "k": [
+          {
+           "t": "div",
+           "c": "bg-[#0f1530] flex gap-[12px] h-[42px] items-center p-[12px] relative w-full",
+           "n": "Browser / product chrome",
+           "id": "218:9035",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#fff] flex-1 min-w-0",
+             "id": "218:9036",
+             "k": [
+              "juniper.example"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#f6b400] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[94px] shrink-0",
+             "n": "Status / EXAMPLE",
+             "id": "218:9037",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[74px] shrink-0",
+               "id": "218:9038",
+               "k": [
+                "EXAMPLE"
+               ]
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#fff] flex flex-col gap-[12px] items-start p-[24px] relative w-full",
+           "n": "Native product content",
+           "id": "218:9039",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex gap-[12px] items-center leading-[1.38] relative w-full",
+             "n": "Customer website navigation",
+             "id": "218:9040",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-semibold relative text-[26px] text-[color:#0f1530] w-[230px] shrink-0",
+               "id": "218:9041",
+               "k": [
+                "Juniper"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-normal relative text-[12px] text-[color:#2a3360] flex-1 min-w-0",
+               "id": "218:9042",
+               "k": [
+                "Heating   Cooling   Plumbing"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[20px] items-start relative w-full",
+             "n": "Customer business website",
+             "id": "218:9043",
+             "k": [
+              {
+               "t": "div",
+               "c": "flex flex-col gap-[12px] items-start relative flex-1 min-w-0",
+               "n": "Customer site message",
+               "id": "218:9044",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-semibold leading-[1.08] relative text-[36px] text-[color:#0f1530] tracking-[-0.9px] w-full",
+                 "id": "218:9045",
+                 "k": [
+                  "A home that works."
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#2a3360] w-full",
+                 "id": "218:9046",
+                 "k": [
+                  "Heating & plumbing in Tulsa"
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#f6b400] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+                 "n": "UI action / Request service",
+                 "id": "218:9047",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-center flex-1 min-w-0",
+                   "id": "218:9048",
+                   "k": [
+                    "Request service"
+                   ]
+                  }
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "h-[230px] relative rounded-[16px] flex-1 min-w-0",
+               "n": "HVAC service on customer website",
+               "id": "218:9049",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute inset-0 object-cover rounded-[16px] size-full",
+                 "src": "/marketing/flagship/service-page-preview-f1266660.jpg"
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[8px] items-start relative w-full",
+             "n": "Website services",
+             "id": "218:9050",
+             "k": [
+              {
+               "t": "div",
+               "c": "bg-[#fbf6ef] flex items-start p-[10px] relative rounded-[12px] w-[218.667px] shrink-0",
+               "n": "Customer service / Heating + cooling",
+               "id": "218:9051",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[13px] text-[color:#0f1530] w-[198.667px] shrink-0",
+                 "id": "218:9052",
+                 "k": [
+                  "Heating + cooling"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fbf6ef] flex items-start p-[10px] relative rounded-[12px] w-[218.667px] shrink-0",
+               "n": "Customer service / Plumbing repairs",
+               "id": "218:9053",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[13px] text-[color:#0f1530] w-[198.667px] shrink-0",
+                 "id": "218:9054",
+                 "k": [
+                  "Plumbing repairs"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fbf6ef] flex items-start p-[10px] relative rounded-[12px] w-[218.667px] shrink-0",
+               "n": "Customer service / Maintenance visits",
+               "id": "218:9055",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[13px] text-[color:#0f1530] w-[198.667px] shrink-0",
+                 "id": "218:9056",
+                 "k": [
+                  "Maintenance visits"
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#fff] flex flex-col gap-[24px] items-start p-[64px] relative w-full",
+     "n": "02 / Actual workflow states",
+     "id": "218:9057",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-semibold leading-[1.08] relative text-[40px] text-[color:#0f1530] tracking-[-1px] w-full",
+       "id": "218:9058",
+       "k": [
+        "Show it. Approve it. Book it."
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex gap-[24px] items-start relative w-full",
+       "n": "Three workflow moments",
+       "id": "218:9059",
+       "k": [
+        {
+         "t": "div",
+         "c": "flex flex-col gap-[12px] items-start relative flex-1 min-w-0",
+         "n": "Moment / Set your services",
+         "id": "218:9060",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "218:9061",
+           "k": [
+            "01 / SET YOUR SERVICES"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] border border-[#e6dccb] border-solid flex flex-col items-start overflow-clip relative rounded-[16px] bg-[#f6f7f9] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col items-start overflow-clip relative rounded-[var(--radius\\\\/16,16px)] w-full",
+           "n": "Editable product visual / web-settings",
+           "id": "218:9062",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex gap-[12px] h-[42px] items-center p-[12px] relative w-full",
+             "n": "Browser / product chrome",
+             "id": "218:9063",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#fff] flex-1 min-w-0",
+               "id": "218:9064",
+               "k": [
+                "Renvani"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#f6b400] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[94px] shrink-0",
+               "n": "Status / EXAMPLE",
+               "id": "218:9065",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[74px] shrink-0",
+                 "id": "218:9066",
+                 "k": [
+                  "EXAMPLE"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#f6f7f9] flex flex-col gap-[12px] items-start p-[16px] relative w-full",
+             "n": "Native product content",
+             "id": "218:9067",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+               "id": "218:9068",
+               "k": [
+                "Your website"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[4px] items-start leading-[1.38] p-[10px] relative rounded-[12px] w-full",
+               "n": "Business name",
+               "id": "218:9069",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "id": "218:9070",
+                 "k": [
+                  "Business name"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "id": "218:9071",
+                 "k": [
+                  "Juniper Heating & Plumbing"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[4px] items-start leading-[1.38] p-[10px] relative rounded-[12px] w-full",
+               "n": "Web address",
+               "id": "218:9072",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "id": "218:9073",
+                 "k": [
+                  "Web address"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "id": "218:9074",
+                 "k": [
+                  "juniper.example"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[4px] items-start leading-[1.38] p-[10px] relative rounded-[12px] w-full",
+               "n": "Service area",
+               "id": "218:9075",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "id": "218:9076",
+                 "k": [
+                  "Service area"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "id": "218:9077",
+                 "k": [
+                  "Tulsa + nearby communities"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[174px] shrink-0",
+               "n": "Status / Services ready for review",
+               "id": "218:9078",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[154px] shrink-0",
+                 "id": "218:9079",
+                 "k": [
+                  "Services ready for review"
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex flex-col gap-[12px] items-start relative flex-1 min-w-0",
+         "n": "Moment / Approve the page",
+         "id": "218:9080",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "218:9081",
+           "k": [
+            "02 / APPROVE THE PAGE"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] border border-[#e6dccb] border-solid flex flex-col items-start overflow-clip relative rounded-[16px] bg-[#f6f7f9] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col items-start overflow-clip relative rounded-[var(--radius\\\\/16,16px)] w-full",
+           "n": "Editable product visual / web-approve",
+           "id": "218:9082",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex gap-[12px] h-[42px] items-center p-[12px] relative w-full",
+             "n": "Browser / product chrome",
+             "id": "218:9083",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#fff] flex-1 min-w-0",
+               "id": "218:9084",
+               "k": [
+                "Renvani"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#f6b400] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[94px] shrink-0",
+               "n": "Status / EXAMPLE",
+               "id": "218:9085",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[74px] shrink-0",
+                 "id": "218:9086",
+                 "k": [
+                  "EXAMPLE"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#f6f7f9] flex flex-col gap-[12px] items-start p-[16px] relative w-full",
+             "n": "Native product content",
+             "id": "218:9087",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+               "id": "218:9088",
+               "k": [
+                "Review the service page"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "h-[90px] relative rounded-[16px] w-full",
+               "n": "Service page preview",
+               "id": "218:9089",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute inset-0 object-cover rounded-[16px] size-full",
+                 "src": "/marketing/flagship/service-page-preview-f1266660.jpg"
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[4px] items-start leading-[1.38] p-[10px] relative rounded-[12px] w-full",
+               "n": "Proposed update",
+               "id": "218:9090",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "id": "218:9091",
+                 "k": [
+                  "Proposed update"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "id": "218:9092",
+                 "k": [
+                  "AC service + Tulsa service area"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[162px] shrink-0",
+               "n": "Status / Awaiting owner approval",
+               "id": "218:9093",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[142px] shrink-0",
+                 "id": "218:9094",
+                 "k": [
+                  "Awaiting owner approval"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+               "n": "UI action / Approve page",
+               "id": "218:9095",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+                 "id": "218:9096",
+                 "k": [
+                  "Approve page"
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex flex-col gap-[12px] items-start relative flex-1 min-w-0",
+         "n": "Moment / Capture the request",
+         "id": "218:9097",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "218:9098",
+           "k": [
+            "03 / CAPTURE THE REQUEST"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] border border-[#e6dccb] border-solid flex flex-col items-start overflow-clip relative rounded-[16px] bg-[#f6f7f9] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col items-start overflow-clip relative rounded-[var(--radius\\\\/16,16px)] w-full",
+           "n": "Editable product visual / web-inquiry",
+           "id": "218:9099",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex gap-[12px] h-[42px] items-center p-[12px] relative w-full",
+             "n": "Browser / product chrome",
+             "id": "218:9100",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#fff] flex-1 min-w-0",
+               "id": "218:9101",
+               "k": [
+                "Renvani"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#f6b400] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[94px] shrink-0",
+               "n": "Status / EXAMPLE",
+               "id": "218:9102",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[74px] shrink-0",
+                 "id": "218:9103",
+                 "k": [
+                  "EXAMPLE"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#f6f7f9] flex flex-col gap-[12px] items-start p-[16px] relative w-full",
+             "n": "Native product content",
+             "id": "218:9104",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+               "id": "218:9105",
+               "k": [
+                "New service request"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[4px] items-start leading-[1.38] p-[10px] relative rounded-[12px] w-full",
+               "n": "Customer",
+               "id": "218:9106",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "id": "218:9107",
+                 "k": [
+                  "Customer"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "id": "218:9108",
+                 "k": [
+                  "Jordan Lee"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[4px] items-start leading-[1.38] p-[10px] relative rounded-[12px] w-full",
+               "n": "Service",
+               "id": "218:9109",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "id": "218:9110",
+                 "k": [
+                  "Service"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "id": "218:9111",
+                 "k": [
+                  "AC diagnostic"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[4px] items-start leading-[1.38] p-[10px] relative rounded-[12px] w-full",
+               "n": "Details",
+               "id": "218:9112",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "id": "218:9113",
+                 "k": [
+                  "Details"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "id": "218:9114",
+                 "k": [
+                  "AC runs, but won’t cool."
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[138px] shrink-0",
+               "n": "Status / Next: Revenue inbox",
+               "id": "218:9115",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[118px] shrink-0",
+                 "id": "218:9116",
+                 "k": [
+                  "Next: Revenue inbox"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+               "n": "UI action / Review inquiry",
+               "id": "218:9117",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+                 "id": "218:9118",
+                 "k": [
+                  "Review inquiry"
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ],
+     "anchor": "workflow"
+    },
+    {
+     "t": "div",
+     "c": "bg-[#f3eadc] flex flex-col gap-[20px] items-start p-[64px] relative w-full",
+     "n": "03 / Flagships share the work",
+     "id": "218:9119",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-semibold leading-[1.08] relative text-[36px] text-[color:#0f1530] tracking-[-0.9px] w-full",
+       "id": "218:9120",
+       "k": [
+        "One customer. Connected work."
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex font-medium gap-[12px] items-start leading-[1.38] relative text-left w-full",
+       "n": "Related product handoffs",
+       "id": "218:9121",
+       "k": [
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[6px] items-start p-[16px] relative rounded-[12px] flex-1 min-w-0",
+         "n": "Link / Growth / Your website",
+         "id": "218:9122",
+         "k": [
+          {
+           "t": "p",
+           "c": "relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "218:9123",
+           "k": [
+            "GROWTH"
+           ]
+          },
+          {
+           "t": "p",
+           "c": "relative text-[18px] text-[color:#0f1530] w-full",
+           "id": "218:9124",
+           "k": [
+            "Your website"
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[6px] items-start p-[16px] relative rounded-[12px] flex-1 min-w-0",
+         "n": "Link / Revenue / Inquiry inbox",
+         "id": "218:9125",
+         "k": [
+          {
+           "t": "p",
+           "c": "relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "218:9126",
+           "k": [
+            "REVENUE"
+           ]
+          },
+          {
+           "t": "p",
+           "c": "relative text-[18px] text-[color:#0f1530] w-full",
+           "id": "218:9127",
+           "k": [
+            "Inquiry inbox"
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[6px] items-start p-[16px] relative rounded-[12px] flex-1 min-w-0",
+         "n": "Link / Operations / Booking + dispatch",
+         "id": "218:9128",
+         "k": [
+          {
+           "t": "p",
+           "c": "relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "218:9129",
+           "k": [
+            "OPERATIONS"
+           ]
+          },
+          {
+           "t": "p",
+           "c": "relative text-[18px] text-[color:#0f1530] w-full",
+           "id": "218:9130",
+           "k": [
+            "Booking + dispatch"
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex gap-[10px] items-start relative w-full",
+       "n": "Shared owner control",
+       "id": "218:9131",
+       "k": [
+        {
+         "t": "div",
+         "c": "relative size-[18px]",
+         "n": "Icon / check",
+         "id": "218:9132",
+         "k": [
+          {
+           "t": "img",
+           "c": "absolute block inset-0 size-full",
+           "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+          }
+         ]
+        },
+        {
+         "t": "p",
+         "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] text-left flex-1 min-w-0",
+         "id": "218:9134",
+         "k": [
+          "Command Center oversees rules and approvals."
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#0f1530] flex flex-col gap-[24px] items-start p-[64px] relative w-full",
+     "n": "04 / See your workflow",
+     "id": "218:9135",
+     "k": [
+      {
+       "t": "div",
+       "c": "font-semibold relative text-[48px] text-[color:#fff] tracking-[-1.2px] w-full",
+       "id": "218:9136",
+       "k": [
+        {
+         "t": "p",
+         "c": "leading-[1.08] mb-0",
+         "k": [
+          "See your business"
+         ]
+        },
+        {
+         "t": "p",
+         "c": "leading-[1.08]",
+         "k": [
+          "in Renvani."
+         ]
+        }
+       ]
+      },
+      {
+       "t": "button",
+       "label": "Get a free demo",
+       "kind": "Accent",
+       "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#0f1530]",
+       "href": "/demo"
+      }
+     ]
+    }
+   ]
+  },
+  "mobile": {
+   "t": "div",
+   "c": "bg-[#fbf6ef] flex flex-col items-start relative",
+   "n": "Websites / Mobile",
+   "id": "216:6309",
+   "k": [
+    {
+     "t": "div",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[24px] items-start p-[24px] relative w-full",
+     "n": "01 / Product in view",
+     "id": "218:9151",
+     "k": [
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[20px] items-center relative w-full",
+       "n": "Headline and real product view",
+       "id": "218:9152",
+       "k": [
+        {
+         "t": "div",
+         "c": "flex flex-col gap-[16px] items-start relative w-full",
+         "n": "Outcome copy",
+         "id": "218:9153",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "218:9154",
+           "k": [
+            "GROWTH / WEBSITES"
+           ]
+          },
+          {
+           "t": "h1",
+           "c": "font-semibold relative text-[40px] text-[color:#0f1530] tracking-[-1px] w-full",
+           "id": "218:9155",
+           "k": [
+            {
+             "t": "p",
+             "c": "leading-[1.08] mb-0",
+             "k": [
+              "Your business."
+             ]
+            },
+            {
+             "t": "p",
+             "c": "leading-[1.08]",
+             "k": [
+              "Your own website."
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-full",
+           "id": "218:9156",
+           "k": [
+            "Show your services, earn trust, and turn local visits into service requests."
+           ]
+          },
+          {
+           "t": "button",
+           "label": "See your website",
+           "kind": "Dark",
+           "c": "bg-[#0f1530] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#fbf6ef]",
+           "href": "#workflow-m"
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#f6f7f9] border border-[#e6dccb] border-solid flex flex-col items-start overflow-clip relative rounded-[16px] bg-[#f6f7f9] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col items-start overflow-clip relative rounded-[var(--radius\\\\/16,16px)] w-full",
+         "n": "Editable product visual / website",
+         "id": "218:9159",
+         "k": [
+          {
+           "t": "div",
+           "c": "bg-[#0f1530] flex gap-[12px] h-[42px] items-center p-[12px] relative w-full",
+           "n": "Browser / product chrome",
+           "id": "218:9160",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#fff] w-[212px] shrink-0",
+             "id": "218:9161",
+             "k": [
+              "juniper.example"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#f6b400] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[94px] shrink-0",
+             "n": "Status / EXAMPLE",
+             "id": "218:9162",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[74px] shrink-0",
+               "id": "218:9163",
+               "k": [
+                "EXAMPLE"
+               ]
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#fff] flex flex-col gap-[8px] items-start px-[16px] py-[12px] relative w-full",
+           "n": "Native product content",
+           "id": "218:9164",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex gap-[12px] items-center relative w-full",
+             "n": "Customer website navigation",
+             "id": "218:9165",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] flex-1 min-w-0",
+               "id": "218:9166",
+               "k": [
+                "Juniper"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "relative size-[20px]",
+               "n": "Icon / menu",
+               "id": "218:9167",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-menu-e04852a9.svg"
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex flex-col gap-[20px] items-start relative w-full",
+             "n": "Customer business website",
+             "id": "218:9169",
+             "k": [
+              {
+               "t": "div",
+               "c": "flex flex-col gap-[12px] items-start relative w-full",
+               "n": "Customer site message",
+               "id": "218:9170",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-semibold leading-[1.38] relative text-[28px] text-[color:#0f1530] w-full",
+                 "id": "218:9171",
+                 "k": [
+                  "A home that works."
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] w-full",
+                 "id": "218:9172",
+                 "k": [
+                  "Heating & plumbing in Tulsa"
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "h-[140px] relative rounded-[16px] w-full",
+                 "n": "HVAC service on customer website",
+                 "id": "218:9173",
+                 "k": [
+                  {
+                   "t": "img",
+                   "c": "absolute inset-0 object-cover rounded-[16px] size-full",
+                   "src": "/marketing/flagship/service-page-preview-f1266660.jpg"
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#f6b400] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+                 "n": "UI action / Request service",
+                 "id": "218:9174",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-center flex-1 min-w-0",
+                   "id": "218:9175",
+                   "k": [
+                    "Request service"
+                   ]
+                  }
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex flex-col gap-[8px] items-start relative w-full",
+             "n": "Website services",
+             "id": "218:9176",
+             "k": [
+              {
+               "t": "div",
+               "c": "bg-[#fbf6ef] flex items-start p-[10px] relative rounded-[12px] w-full",
+               "n": "Customer service / Heating + cooling",
+               "id": "218:9177",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] flex-1 min-w-0",
+                 "id": "218:9178",
+                 "k": [
+                  "Heating + cooling"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fbf6ef] flex items-start p-[10px] relative rounded-[12px] w-full",
+               "n": "Customer service / Plumbing repairs",
+               "id": "218:9179",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] flex-1 min-w-0",
+                 "id": "218:9180",
+                 "k": [
+                  "Plumbing repairs"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fbf6ef] flex items-start p-[10px] relative rounded-[12px] w-full",
+               "n": "Customer service / Maintenance visits",
+               "id": "218:9181",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] flex-1 min-w-0",
+                 "id": "218:9182",
+                 "k": [
+                  "Maintenance visits"
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#fff] flex flex-col gap-[24px] items-start p-[24px] relative w-full",
+     "n": "02 / Actual workflow states",
+     "id": "218:9183",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-semibold leading-[1.38] relative text-[32px] text-[color:#0f1530] w-full",
+       "id": "218:9184",
+       "k": [
+        "Show it. Approve it. Book it."
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[20px] items-start relative w-full",
+       "n": "Three workflow moments",
+       "id": "218:9185",
+       "k": [
+        {
+         "t": "div",
+         "c": "flex flex-col gap-[12px] items-start relative w-full",
+         "n": "Moment / Set your services",
+         "id": "218:9186",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "218:9187",
+           "k": [
+            "01 / SET YOUR SERVICES"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] border border-[#e6dccb] border-solid flex flex-col items-start overflow-clip relative rounded-[16px] bg-[#f6f7f9] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col items-start overflow-clip relative rounded-[var(--radius\\\\/16,16px)] w-full",
+           "n": "Editable product visual / web-settings",
+           "id": "218:9188",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex gap-[12px] h-[42px] items-center p-[12px] relative w-full",
+             "n": "Browser / product chrome",
+             "id": "218:9189",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#fff] w-[212px] shrink-0",
+               "id": "218:9190",
+               "k": [
+                "Renvani"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#f6b400] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[94px] shrink-0",
+               "n": "Status / EXAMPLE",
+               "id": "218:9191",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[74px] shrink-0",
+                 "id": "218:9192",
+                 "k": [
+                  "EXAMPLE"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#f6f7f9] flex flex-col gap-[8px] items-start px-[16px] py-[12px] relative w-full",
+             "n": "Native product content",
+             "id": "218:9193",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+               "id": "218:9194",
+               "k": [
+                "Your website"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[3px] items-start leading-[1.38] px-[10px] py-[8px] relative rounded-[12px] w-full",
+               "n": "Business name",
+               "id": "218:9195",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "id": "218:9196",
+                 "k": [
+                  "Business name"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "id": "218:9197",
+                 "k": [
+                  "Juniper Heating & Plumbing"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[3px] items-start leading-[1.38] px-[10px] py-[8px] relative rounded-[12px] w-full",
+               "n": "Web address",
+               "id": "218:9198",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "id": "218:9199",
+                 "k": [
+                  "Web address"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "id": "218:9200",
+                 "k": [
+                  "juniper.example"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[3px] items-start leading-[1.38] px-[10px] py-[8px] relative rounded-[12px] w-full",
+               "n": "Service area",
+               "id": "218:9201",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "id": "218:9202",
+                 "k": [
+                  "Service area"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "id": "218:9203",
+                 "k": [
+                  "Tulsa + nearby communities"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[174px] shrink-0",
+               "n": "Status / Services ready for review",
+               "id": "218:9204",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[154px] shrink-0",
+                 "id": "218:9205",
+                 "k": [
+                  "Services ready for review"
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex flex-col gap-[12px] items-start relative w-full",
+         "n": "Moment / Approve the page",
+         "id": "218:9206",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "218:9207",
+           "k": [
+            "02 / APPROVE THE PAGE"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] border border-[#e6dccb] border-solid flex flex-col items-start overflow-clip relative rounded-[16px] bg-[#f6f7f9] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col items-start overflow-clip relative rounded-[var(--radius\\\\/16,16px)] w-full",
+           "n": "Editable product visual / web-approve",
+           "id": "218:9208",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex gap-[12px] h-[42px] items-center p-[12px] relative w-full",
+             "n": "Browser / product chrome",
+             "id": "218:9209",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#fff] w-[212px] shrink-0",
+               "id": "218:9210",
+               "k": [
+                "Renvani"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#f6b400] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[94px] shrink-0",
+               "n": "Status / EXAMPLE",
+               "id": "218:9211",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[74px] shrink-0",
+                 "id": "218:9212",
+                 "k": [
+                  "EXAMPLE"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#f6f7f9] flex flex-col gap-[8px] items-start px-[16px] py-[12px] relative w-full",
+             "n": "Native product content",
+             "id": "218:9213",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+               "id": "218:9214",
+               "k": [
+                "Review the service page"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "h-[90px] relative rounded-[16px] w-full",
+               "n": "Service page preview",
+               "id": "218:9215",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute inset-0 object-cover rounded-[16px] size-full",
+                 "src": "/marketing/flagship/service-page-preview-f1266660.jpg"
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[3px] items-start leading-[1.38] px-[10px] py-[8px] relative rounded-[12px] w-full",
+               "n": "Proposed update",
+               "id": "218:9216",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "id": "218:9217",
+                 "k": [
+                  "Proposed update"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "id": "218:9218",
+                 "k": [
+                  "AC service + Tulsa service area"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[162px] shrink-0",
+               "n": "Status / Awaiting owner approval",
+               "id": "218:9219",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[142px] shrink-0",
+                 "id": "218:9220",
+                 "k": [
+                  "Awaiting owner approval"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+               "n": "UI action / Approve page",
+               "id": "218:9221",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+                 "id": "218:9222",
+                 "k": [
+                  "Approve page"
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex flex-col gap-[12px] items-start relative w-full",
+         "n": "Moment / Capture the request",
+         "id": "218:9223",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "218:9224",
+           "k": [
+            "03 / CAPTURE THE REQUEST"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] border border-[#e6dccb] border-solid flex flex-col items-start overflow-clip relative rounded-[16px] bg-[#f6f7f9] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col items-start overflow-clip relative rounded-[var(--radius\\\\/16,16px)] w-full",
+           "n": "Editable product visual / web-inquiry",
+           "id": "218:9225",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex gap-[12px] h-[42px] items-center p-[12px] relative w-full",
+             "n": "Browser / product chrome",
+             "id": "218:9226",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#fff] w-[212px] shrink-0",
+               "id": "218:9227",
+               "k": [
+                "Renvani"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#f6b400] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[94px] shrink-0",
+               "n": "Status / EXAMPLE",
+               "id": "218:9228",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[74px] shrink-0",
+                 "id": "218:9229",
+                 "k": [
+                  "EXAMPLE"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#f6f7f9] flex flex-col gap-[8px] items-start px-[16px] py-[12px] relative w-full",
+             "n": "Native product content",
+             "id": "218:9230",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+               "id": "218:9231",
+               "k": [
+                "New service request"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[3px] items-start leading-[1.38] px-[10px] py-[8px] relative rounded-[12px] w-full",
+               "n": "Customer",
+               "id": "218:9232",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "id": "218:9233",
+                 "k": [
+                  "Customer"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "id": "218:9234",
+                 "k": [
+                  "Jordan Lee"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[3px] items-start leading-[1.38] px-[10px] py-[8px] relative rounded-[12px] w-full",
+               "n": "Service",
+               "id": "218:9235",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "id": "218:9236",
+                 "k": [
+                  "Service"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "id": "218:9237",
+                 "k": [
+                  "AC diagnostic"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[3px] items-start leading-[1.38] px-[10px] py-[8px] relative rounded-[12px] w-full",
+               "n": "Details",
+               "id": "218:9238",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "id": "218:9239",
+                 "k": [
+                  "Details"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "id": "218:9240",
+                 "k": [
+                  "AC runs, but won’t cool."
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[138px] shrink-0",
+               "n": "Status / Next: Revenue inbox",
+               "id": "218:9241",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[118px] shrink-0",
+                 "id": "218:9242",
+                 "k": [
+                  "Next: Revenue inbox"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+               "n": "UI action / Review inquiry",
+               "id": "218:9243",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+                 "id": "218:9244",
+                 "k": [
+                  "Review inquiry"
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ],
+     "anchor": "workflow-m"
+    },
+    {
+     "t": "div",
+     "c": "bg-[#f3eadc] flex flex-col gap-[20px] items-start p-[24px] relative w-full",
+     "n": "03 / Flagships share the work",
+     "id": "218:9245",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-semibold leading-[1.38] relative text-[28px] text-[color:#0f1530] w-full",
+       "id": "218:9246",
+       "k": [
+        "One customer. Connected work."
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex font-medium gap-[12px] items-start leading-[1.38] relative text-left w-full",
+       "n": "Related product handoffs",
+       "id": "218:9247",
+       "k": [
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[6px] h-[112px] items-start p-[12px] relative rounded-[12px] w-[106px] shrink-0",
+         "n": "Link / Growth / Your website",
+         "id": "218:9248",
+         "k": [
+          {
+           "t": "p",
+           "c": "relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "218:9249",
+           "k": [
+            "GROWTH"
+           ]
+          },
+          {
+           "t": "p",
+           "c": "relative text-[14px] text-[color:#0f1530] w-full",
+           "id": "218:9250",
+           "k": [
+            "Your website"
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[6px] h-[112px] items-start p-[12px] relative rounded-[12px] w-[106px] shrink-0",
+         "n": "Link / Revenue / Inquiry inbox",
+         "id": "218:9251",
+         "k": [
+          {
+           "t": "p",
+           "c": "relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "218:9252",
+           "k": [
+            "REVENUE"
+           ]
+          },
+          {
+           "t": "p",
+           "c": "relative text-[14px] text-[color:#0f1530] w-full",
+           "id": "218:9253",
+           "k": [
+            "Inquiry inbox"
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[6px] h-[112px] items-start p-[12px] relative rounded-[12px] w-[106px] shrink-0",
+         "n": "Link / Operations / Booking + dispatch",
+         "id": "218:9254",
+         "k": [
+          {
+           "t": "p",
+           "c": "relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "218:9255",
+           "k": [
+            "OPERATIONS"
+           ]
+          },
+          {
+           "t": "p",
+           "c": "relative text-[14px] text-[color:#0f1530] w-full",
+           "id": "218:9256",
+           "k": [
+            "Booking + dispatch"
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex gap-[10px] items-start relative w-full",
+       "n": "Shared owner control",
+       "id": "218:9257",
+       "k": [
+        {
+         "t": "div",
+         "c": "relative size-[18px]",
+         "n": "Icon / check",
+         "id": "218:9258",
+         "k": [
+          {
+           "t": "img",
+           "c": "absolute block inset-0 size-full",
+           "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+          }
+         ]
+        },
+        {
+         "t": "p",
+         "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] text-left flex-1 min-w-0",
+         "id": "218:9260",
+         "k": [
+          "Command Center oversees rules and approvals."
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#0f1530] flex flex-col gap-[24px] items-start p-[24px] relative w-full",
+     "n": "04 / See your workflow",
+     "id": "218:9261",
+     "k": [
+      {
+       "t": "div",
+       "c": "font-semibold relative text-[36px] text-[color:#fff] tracking-[-0.9px] w-full",
+       "id": "218:9262",
+       "k": [
+        {
+         "t": "p",
+         "c": "leading-[1.08] mb-0",
+         "k": [
+          "See your business"
+         ]
+        },
+        {
+         "t": "p",
+         "c": "leading-[1.08]",
+         "k": [
+          "in Renvani."
+         ]
+        }
+       ]
+      },
+      {
+       "t": "button",
+       "label": "Get a free demo",
+       "kind": "Accent",
+       "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#0f1530]",
+       "href": "/demo"
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "price-book-service-catalog": {
+  "desktop": {
+   "t": "div",
+   "c": "bg-[#fbf6ef] flex flex-col items-start relative",
+   "n": "Price Book & Service Catalog / Desktop",
+   "id": "216:6310",
+   "k": [
+    {
+     "t": "div",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[24px] items-start p-[64px] relative w-full",
+     "n": "01 / Product in view",
+     "id": "219:7463",
+     "k": [
+      {
+       "t": "div",
+       "c": "flex gap-[64px] items-center relative w-full",
+       "n": "Headline and real product view",
+       "id": "219:7464",
+       "k": [
+        {
+         "t": "div",
+         "c": "flex flex-col gap-[20px] items-start relative flex-1 min-w-0",
+         "n": "Outcome copy",
+         "id": "219:7465",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "219:7466",
+           "k": [
+            "OPERATIONS / PRICE BOOK"
+           ]
+          },
+          {
+           "t": "h1",
+           "c": "font-semibold relative text-[60px] text-[color:#0f1530] tracking-[-1.5px] w-full",
+           "id": "219:7467",
+           "k": [
+            {
+             "t": "p",
+             "c": "leading-[1.08] mb-0",
+             "k": [
+              "One price book."
+             ]
+            },
+            {
+             "t": "p",
+             "c": "leading-[1.08]",
+             "k": [
+              "Connected work."
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-full",
+           "id": "219:7468",
+           "k": [
+            "Use your services, labor, and materials across estimates and jobs."
+           ]
+          },
+          {
+           "t": "button",
+           "label": "See an estimate",
+           "kind": "Dark",
+           "c": "bg-[#0f1530] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#fbf6ef]",
+           "href": "#workflow"
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#f6f7f9] border border-[#e6dccb] border-solid flex flex-col items-start overflow-clip relative rounded-[16px] bg-[#f6f7f9] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col items-start overflow-clip relative rounded-[var(--radius\\\\/16,16px)] flex-1 min-w-0",
+         "n": "Editable product visual / catalog",
+         "id": "219:7471",
+         "k": [
+          {
+           "t": "div",
+           "c": "bg-[#0f1530] flex gap-[12px] h-[42px] items-center p-[12px] relative w-full",
+           "n": "Browser / product chrome",
+           "id": "219:7472",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#fff] flex-1 min-w-0",
+             "id": "219:7473",
+             "k": [
+              "Renvani"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#f6b400] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[94px] shrink-0",
+             "n": "Status / EXAMPLE",
+             "id": "219:7474",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[74px] shrink-0",
+               "id": "219:7475",
+               "k": [
+                "EXAMPLE"
+               ]
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] items-start p-[24px] relative w-full",
+           "n": "Native product content",
+           "id": "219:7476",
+           "k": [
+            {
+             "t": "div",
+             "c": "flex gap-[12px] items-start relative w-full",
+             "n": "Price book title",
+             "id": "219:7477",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-semibold leading-[1.38] relative text-[26px] text-[color:#0f1530] flex-1 min-w-0",
+               "id": "219:7478",
+               "k": [
+                "Price book"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[114px] shrink-0",
+               "n": "Status / 3 ITEMS",
+               "id": "219:7479",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[94px] shrink-0",
+                 "id": "219:7480",
+                 "k": [
+                  "3 ITEMS"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col items-start p-[12px] relative rounded-[12px] w-full",
+             "n": "Search catalog",
+             "id": "219:7481",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] w-full",
+               "id": "219:7482",
+               "k": [
+                "Search services, labor, materials"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col items-start overflow-clip p-[12px] relative rounded-[10px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col items-start overflow-clip p-[var(--space\\\\/12,12px)] relative rounded-[10px] w-full",
+             "n": "Reusable price-book row / 672",
+             "id": "219:7483",
+             "k": [
+              {
+               "t": "div",
+               "c": "flex gap-[10px] items-start leading-[1.38] relative w-full",
+               "n": "Line item",
+               "id": "219:7484",
+               "k": [
+                {
+                 "t": "div",
+                 "c": "flex flex-col gap-[4px] items-start relative flex-1 min-w-0",
+                 "n": "Item name and type",
+                 "id": "219:7485",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-semibold relative text-[14px] text-[color:#0f1530] w-full",
+                   "id": "219:7486",
+                   "k": [
+                    "AC diagnostic"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                   "id": "219:7487",
+                   "k": [
+                    "Service · AC-DIAG"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-semibold relative text-[16px] text-[color:#0f1530] text-right w-[66px] shrink-0",
+                 "id": "219:7488",
+                 "k": [
+                  "$89"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col items-start overflow-clip p-[12px] relative rounded-[10px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col items-start overflow-clip p-[var(--space\\\\/12,12px)] relative rounded-[10px] w-full",
+             "n": "Reusable price-book row / 672",
+             "id": "219:7483",
+             "k": [
+              {
+               "t": "div",
+               "c": "flex gap-[10px] items-start leading-[1.38] relative w-full",
+               "n": "Line item",
+               "id": "219:7484",
+               "k": [
+                {
+                 "t": "div",
+                 "c": "flex flex-col gap-[4px] items-start relative flex-1 min-w-0",
+                 "n": "Item name and type",
+                 "id": "219:7485",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-semibold relative text-[14px] text-[color:#0f1530] w-full",
+                   "id": "219:7486",
+                   "k": [
+                    "AC diagnostic"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                   "id": "219:7487",
+                   "k": [
+                    "Service · AC-DIAG"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-semibold relative text-[16px] text-[color:#0f1530] text-right w-[66px] shrink-0",
+                 "id": "219:7488",
+                 "k": [
+                  "$89"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col items-start overflow-clip p-[12px] relative rounded-[10px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col items-start overflow-clip p-[var(--space\\\\/12,12px)] relative rounded-[10px] w-full",
+             "n": "Reusable price-book row / 672",
+             "id": "219:7483",
+             "k": [
+              {
+               "t": "div",
+               "c": "flex gap-[10px] items-start leading-[1.38] relative w-full",
+               "n": "Line item",
+               "id": "219:7484",
+               "k": [
+                {
+                 "t": "div",
+                 "c": "flex flex-col gap-[4px] items-start relative flex-1 min-w-0",
+                 "n": "Item name and type",
+                 "id": "219:7485",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-semibold relative text-[14px] text-[color:#0f1530] w-full",
+                   "id": "219:7486",
+                   "k": [
+                    "AC diagnostic"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                   "id": "219:7487",
+                   "k": [
+                    "Service · AC-DIAG"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-semibold relative text-[16px] text-[color:#0f1530] text-right w-[66px] shrink-0",
+                 "id": "219:7488",
+                 "k": [
+                  "$89"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex gap-[12px] items-start leading-[1.38] p-[12px] relative rounded-[12px] text-[color:#fff] w-full",
+             "n": "Reused in estimate",
+             "id": "219:7507",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium relative text-[12px] flex-1 min-w-0",
+               "id": "219:7508",
+               "k": [
+                "Estimate #2048"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-semibold relative text-[18px] w-[72px] shrink-0",
+               "id": "219:7509",
+               "k": [
+                "$274"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[168px] shrink-0",
+             "n": "Status / Owner review before send",
+             "id": "219:7510",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[148px] shrink-0",
+               "id": "219:7511",
+               "k": [
+                "Owner review before send"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#fff] flex flex-col gap-[24px] items-start p-[64px] relative w-full",
+     "n": "02 / Actual workflow states",
+     "id": "219:7512",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-semibold leading-[1.08] relative text-[40px] text-[color:#0f1530] tracking-[-1px] w-full",
+       "id": "219:7513",
+       "k": [
+        "Price once. Carry the details through."
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex gap-[24px] items-start relative w-full",
+       "n": "Three workflow moments",
+       "id": "219:7514",
+       "k": [
+        {
+         "t": "div",
+         "c": "flex flex-col gap-[12px] items-start relative flex-1 min-w-0",
+         "n": "Moment / Set the price",
+         "id": "219:7515",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "219:7516",
+           "k": [
+            "01 / SET THE PRICE"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] border border-[#e6dccb] border-solid flex flex-col items-start overflow-clip relative rounded-[16px] bg-[#f6f7f9] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col items-start overflow-clip relative rounded-[var(--radius\\\\/16,16px)] w-full",
+           "n": "Editable product visual / catalog-item",
+           "id": "219:7517",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex gap-[12px] h-[42px] items-center p-[12px] relative w-full",
+             "n": "Browser / product chrome",
+             "id": "219:7518",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#fff] flex-1 min-w-0",
+               "id": "219:7519",
+               "k": [
+                "Renvani"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#f6b400] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[94px] shrink-0",
+               "n": "Status / EXAMPLE",
+               "id": "219:7520",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[74px] shrink-0",
+                 "id": "219:7521",
+                 "k": [
+                  "EXAMPLE"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#f6f7f9] flex flex-col gap-[12px] items-start p-[16px] relative w-full",
+             "n": "Native product content",
+             "id": "219:7522",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+               "id": "219:7523",
+               "k": [
+                "Capacitor"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[138px] shrink-0",
+               "n": "Status / MATERIAL · CAP-45/5",
+               "id": "219:7524",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[118px] shrink-0",
+                 "id": "219:7525",
+                 "k": [
+                  "MATERIAL · CAP-45/5"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[4px] items-start leading-[1.38] p-[10px] relative rounded-[12px] w-full",
+               "n": "Price",
+               "id": "219:7526",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "id": "219:7527",
+                 "k": [
+                  "Price"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "id": "219:7528",
+                 "k": [
+                  "60.00 USD / each"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[4px] items-start leading-[1.38] p-[10px] relative rounded-[12px] w-full",
+               "n": "Used in",
+               "id": "219:7529",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "id": "219:7530",
+                 "k": [
+                  "Used in"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "id": "219:7531",
+                 "k": [
+                  "Estimates + job line items"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[186px] shrink-0",
+               "n": "Status / Price change needs approval",
+               "id": "219:7532",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[166px] shrink-0",
+                 "id": "219:7533",
+                 "k": [
+                  "Price change needs approval"
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex flex-col gap-[12px] items-start relative flex-1 min-w-0",
+         "n": "Moment / Build the estimate",
+         "id": "219:7534",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "219:7535",
+           "k": [
+            "02 / BUILD THE ESTIMATE"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] border border-[#e6dccb] border-solid flex flex-col items-start overflow-clip relative rounded-[16px] bg-[#f6f7f9] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col items-start overflow-clip relative rounded-[var(--radius\\\\/16,16px)] w-full",
+           "n": "Editable product visual / catalog-estimate",
+           "id": "219:7536",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex gap-[12px] h-[42px] items-center p-[12px] relative w-full",
+             "n": "Browser / product chrome",
+             "id": "219:7537",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#fff] flex-1 min-w-0",
+               "id": "219:7538",
+               "k": [
+                "Renvani"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#f6b400] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[94px] shrink-0",
+               "n": "Status / EXAMPLE",
+               "id": "219:7539",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[74px] shrink-0",
+                 "id": "219:7540",
+                 "k": [
+                  "EXAMPLE"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#f6f7f9] flex flex-col gap-[12px] items-start p-[16px] relative w-full",
+             "n": "Native product content",
+             "id": "219:7541",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+               "id": "219:7542",
+               "k": [
+                "Estimate #2048"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] w-full",
+               "id": "219:7543",
+               "k": [
+                "Jordan Lee · AC diagnostic + repair"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col items-start overflow-clip p-[12px] relative rounded-[10px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col items-start overflow-clip p-[var(--space\\\\/12,12px)] relative rounded-[10px] w-full",
+               "n": "Reusable price-book row / 389.3333333333333",
+               "id": "219:7544",
+               "k": [
+                {
+                 "t": "div",
+                 "c": "flex gap-[10px] items-start leading-[1.38] relative w-full",
+                 "n": "Line item",
+                 "id": "219:7545",
+                 "k": [
+                  {
+                   "t": "div",
+                   "c": "flex flex-col gap-[4px] items-start relative flex-1 min-w-0",
+                   "n": "Item name and type",
+                   "id": "219:7546",
+                   "k": [
+                    {
+                     "t": "p",
+                     "c": "font-semibold relative text-[14px] text-[color:#0f1530] w-full",
+                     "id": "219:7547",
+                     "k": [
+                      "AC diagnostic"
+                     ]
+                    },
+                    {
+                     "t": "p",
+                     "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                     "id": "219:7548",
+                     "k": [
+                      "Service · AC-DIAG"
+                     ]
+                    }
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-semibold relative text-[16px] text-[color:#0f1530] text-right w-[66px] shrink-0",
+                   "id": "219:7549",
+                   "k": [
+                    "$89"
+                   ]
+                  }
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col items-start overflow-clip p-[12px] relative rounded-[10px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col items-start overflow-clip p-[var(--space\\\\/12,12px)] relative rounded-[10px] w-full",
+               "n": "Reusable price-book row / 389.3333333333333",
+               "id": "219:7544",
+               "k": [
+                {
+                 "t": "div",
+                 "c": "flex gap-[10px] items-start leading-[1.38] relative w-full",
+                 "n": "Line item",
+                 "id": "219:7545",
+                 "k": [
+                  {
+                   "t": "div",
+                   "c": "flex flex-col gap-[4px] items-start relative flex-1 min-w-0",
+                   "n": "Item name and type",
+                   "id": "219:7546",
+                   "k": [
+                    {
+                     "t": "p",
+                     "c": "font-semibold relative text-[14px] text-[color:#0f1530] w-full",
+                     "id": "219:7547",
+                     "k": [
+                      "AC diagnostic"
+                     ]
+                    },
+                    {
+                     "t": "p",
+                     "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                     "id": "219:7548",
+                     "k": [
+                      "Service · AC-DIAG"
+                     ]
+                    }
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-semibold relative text-[16px] text-[color:#0f1530] text-right w-[66px] shrink-0",
+                   "id": "219:7549",
+                   "k": [
+                    "$89"
+                   ]
+                  }
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col items-start overflow-clip p-[12px] relative rounded-[10px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col items-start overflow-clip p-[var(--space\\\\/12,12px)] relative rounded-[10px] w-full",
+               "n": "Reusable price-book row / 389.3333333333333",
+               "id": "219:7544",
+               "k": [
+                {
+                 "t": "div",
+                 "c": "flex gap-[10px] items-start leading-[1.38] relative w-full",
+                 "n": "Line item",
+                 "id": "219:7545",
+                 "k": [
+                  {
+                   "t": "div",
+                   "c": "flex flex-col gap-[4px] items-start relative flex-1 min-w-0",
+                   "n": "Item name and type",
+                   "id": "219:7546",
+                   "k": [
+                    {
+                     "t": "p",
+                     "c": "font-semibold relative text-[14px] text-[color:#0f1530] w-full",
+                     "id": "219:7547",
+                     "k": [
+                      "AC diagnostic"
+                     ]
+                    },
+                    {
+                     "t": "p",
+                     "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                     "id": "219:7548",
+                     "k": [
+                      "Service · AC-DIAG"
+                     ]
+                    }
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-semibold relative text-[16px] text-[color:#0f1530] text-right w-[66px] shrink-0",
+                   "id": "219:7549",
+                   "k": [
+                    "$89"
+                   ]
+                  }
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-full",
+               "n": "Field / Service total",
+               "id": "219:7568",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[color:#2a3360] w-[214px] shrink-0",
+                 "id": "219:7569",
+                 "k": [
+                  "Service total"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-medium relative text-[color:#0f1530] w-[165px] shrink-0",
+                 "id": "219:7570",
+                 "k": [
+                  "$274"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[162px] shrink-0",
+               "n": "Status / Awaiting owner approval",
+               "id": "219:7571",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[142px] shrink-0",
+                 "id": "219:7572",
+                 "k": [
+                  "Awaiting owner approval"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+               "n": "UI action / Review estimate",
+               "id": "219:7573",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+                 "id": "219:7574",
+                 "k": [
+                  "Review estimate"
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex flex-col gap-[12px] items-start relative flex-1 min-w-0",
+         "n": "Moment / Carry it into work",
+         "id": "219:7575",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "219:7576",
+           "k": [
+            "03 / CARRY IT INTO WORK"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] border border-[#e6dccb] border-solid flex flex-col items-start overflow-clip relative rounded-[16px] bg-[#f6f7f9] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col items-start overflow-clip relative rounded-[var(--radius\\\\/16,16px)] w-full",
+           "n": "Editable product visual / catalog-job",
+           "id": "219:7577",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex gap-[12px] h-[42px] items-center p-[12px] relative w-full",
+             "n": "Browser / product chrome",
+             "id": "219:7578",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#fff] flex-1 min-w-0",
+               "id": "219:7579",
+               "k": [
+                "Renvani"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#f6b400] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[94px] shrink-0",
+               "n": "Status / EXAMPLE",
+               "id": "219:7580",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[74px] shrink-0",
+                 "id": "219:7581",
+                 "k": [
+                  "EXAMPLE"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#f6f7f9] flex flex-col gap-[12px] items-start p-[16px] relative w-full",
+             "n": "Native product content",
+             "id": "219:7582",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+               "id": "219:7583",
+               "k": [
+                "Job #1042"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] w-full",
+               "id": "219:7584",
+               "k": [
+                "Maya R. · AC diagnostic + repair"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[180px] shrink-0",
+               "n": "Status / Approved estimate attached",
+               "id": "219:7585",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[160px] shrink-0",
+                 "id": "219:7586",
+                 "k": [
+                  "Approved estimate attached"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col items-start overflow-clip p-[12px] relative rounded-[10px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col items-start overflow-clip p-[var(--space\\\\/12,12px)] relative rounded-[10px] w-full",
+               "n": "Reusable price-book row / 389.3333333333333",
+               "id": "219:7544",
+               "k": [
+                {
+                 "t": "div",
+                 "c": "flex gap-[10px] items-start leading-[1.38] relative w-full",
+                 "n": "Line item",
+                 "id": "219:7545",
+                 "k": [
+                  {
+                   "t": "div",
+                   "c": "flex flex-col gap-[4px] items-start relative flex-1 min-w-0",
+                   "n": "Item name and type",
+                   "id": "219:7546",
+                   "k": [
+                    {
+                     "t": "p",
+                     "c": "font-semibold relative text-[14px] text-[color:#0f1530] w-full",
+                     "id": "219:7547",
+                     "k": [
+                      "AC diagnostic"
+                     ]
+                    },
+                    {
+                     "t": "p",
+                     "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                     "id": "219:7548",
+                     "k": [
+                      "Service · AC-DIAG"
+                     ]
+                    }
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-semibold relative text-[16px] text-[color:#0f1530] text-right w-[66px] shrink-0",
+                   "id": "219:7549",
+                   "k": [
+                    "$89"
+                   ]
+                  }
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col items-start overflow-clip p-[12px] relative rounded-[10px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col items-start overflow-clip p-[var(--space\\\\/12,12px)] relative rounded-[10px] w-full",
+               "n": "Reusable price-book row / 389.3333333333333",
+               "id": "219:7544",
+               "k": [
+                {
+                 "t": "div",
+                 "c": "flex gap-[10px] items-start leading-[1.38] relative w-full",
+                 "n": "Line item",
+                 "id": "219:7545",
+                 "k": [
+                  {
+                   "t": "div",
+                   "c": "flex flex-col gap-[4px] items-start relative flex-1 min-w-0",
+                   "n": "Item name and type",
+                   "id": "219:7546",
+                   "k": [
+                    {
+                     "t": "p",
+                     "c": "font-semibold relative text-[14px] text-[color:#0f1530] w-full",
+                     "id": "219:7547",
+                     "k": [
+                      "AC diagnostic"
+                     ]
+                    },
+                    {
+                     "t": "p",
+                     "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                     "id": "219:7548",
+                     "k": [
+                      "Service · AC-DIAG"
+                     ]
+                    }
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-semibold relative text-[16px] text-[color:#0f1530] text-right w-[66px] shrink-0",
+                   "id": "219:7549",
+                   "k": [
+                    "$89"
+                   ]
+                  }
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col items-start overflow-clip p-[12px] relative rounded-[10px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col items-start overflow-clip p-[var(--space\\\\/12,12px)] relative rounded-[10px] w-full",
+               "n": "Reusable price-book row / 389.3333333333333",
+               "id": "219:7544",
+               "k": [
+                {
+                 "t": "div",
+                 "c": "flex gap-[10px] items-start leading-[1.38] relative w-full",
+                 "n": "Line item",
+                 "id": "219:7545",
+                 "k": [
+                  {
+                   "t": "div",
+                   "c": "flex flex-col gap-[4px] items-start relative flex-1 min-w-0",
+                   "n": "Item name and type",
+                   "id": "219:7546",
+                   "k": [
+                    {
+                     "t": "p",
+                     "c": "font-semibold relative text-[14px] text-[color:#0f1530] w-full",
+                     "id": "219:7547",
+                     "k": [
+                      "AC diagnostic"
+                     ]
+                    },
+                    {
+                     "t": "p",
+                     "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                     "id": "219:7548",
+                     "k": [
+                      "Service · AC-DIAG"
+                     ]
+                    }
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-semibold relative text-[16px] text-[color:#0f1530] text-right w-[66px] shrink-0",
+                   "id": "219:7549",
+                   "k": [
+                    "$89"
+                   ]
+                  }
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-full",
+               "n": "Field / Quoted service total",
+               "id": "219:7605",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[color:#2a3360] w-[214px] shrink-0",
+                 "id": "219:7606",
+                 "k": [
+                  "Quoted service total"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-medium relative text-[color:#0f1530] w-[165px] shrink-0",
+                 "id": "219:7607",
+                 "k": [
+                  "$274"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+               "n": "UI action / Open work order",
+               "id": "219:7608",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+                 "id": "219:7609",
+                 "k": [
+                  "Open work order"
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ],
+     "anchor": "workflow"
+    },
+    {
+     "t": "div",
+     "c": "bg-[#f3eadc] flex flex-col gap-[20px] items-start p-[64px] relative w-full",
+     "n": "03 / Flagships share the work",
+     "id": "219:7610",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-semibold leading-[1.08] relative text-[36px] text-[color:#0f1530] tracking-[-0.9px] w-full",
+       "id": "219:7611",
+       "k": [
+        "One customer. Connected work."
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex font-medium gap-[12px] items-start leading-[1.38] relative text-left w-full",
+       "n": "Related product handoffs",
+       "id": "219:7612",
+       "k": [
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[6px] items-start p-[16px] relative rounded-[12px] flex-1 min-w-0",
+         "n": "Link / Operations / Price book",
+         "id": "219:7613",
+         "k": [
+          {
+           "t": "p",
+           "c": "relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "219:7614",
+           "k": [
+            "OPERATIONS"
+           ]
+          },
+          {
+           "t": "p",
+           "c": "relative text-[18px] text-[color:#0f1530] w-full",
+           "id": "219:7615",
+           "k": [
+            "Price book"
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[6px] items-start p-[16px] relative rounded-[12px] flex-1 min-w-0",
+         "n": "Link / Revenue / Approved estimate",
+         "id": "219:7616",
+         "k": [
+          {
+           "t": "p",
+           "c": "relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "219:7617",
+           "k": [
+            "REVENUE"
+           ]
+          },
+          {
+           "t": "p",
+           "c": "relative text-[18px] text-[color:#0f1530] w-full",
+           "id": "219:7618",
+           "k": [
+            "Approved estimate"
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[6px] items-start p-[16px] relative rounded-[12px] flex-1 min-w-0",
+         "n": "Link / Operations / Job + work order",
+         "id": "219:7619",
+         "k": [
+          {
+           "t": "p",
+           "c": "relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "219:7620",
+           "k": [
+            "OPERATIONS"
+           ]
+          },
+          {
+           "t": "p",
+           "c": "relative text-[18px] text-[color:#0f1530] w-full",
+           "id": "219:7621",
+           "k": [
+            "Job + work order"
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex gap-[10px] items-start relative w-full",
+       "n": "Shared owner control",
+       "id": "219:7622",
+       "k": [
+        {
+         "t": "div",
+         "c": "relative size-[18px]",
+         "n": "Icon / check",
+         "id": "219:7623",
+         "k": [
+          {
+           "t": "img",
+           "c": "absolute block inset-0 size-full",
+           "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+          }
+         ]
+        },
+        {
+         "t": "p",
+         "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] text-left flex-1 min-w-0",
+         "id": "219:7625",
+         "k": [
+          "Command Center oversees rules and approvals."
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#0f1530] flex flex-col gap-[24px] items-start p-[64px] relative w-full",
+     "n": "04 / See your workflow",
+     "id": "219:7626",
+     "k": [
+      {
+       "t": "div",
+       "c": "font-semibold relative text-[48px] text-[color:#fff] tracking-[-1.2px] w-full",
+       "id": "219:7627",
+       "k": [
+        {
+         "t": "p",
+         "c": "leading-[1.08] mb-0",
+         "k": [
+          "See your business"
+         ]
+        },
+        {
+         "t": "p",
+         "c": "leading-[1.08]",
+         "k": [
+          "in Renvani."
+         ]
+        }
+       ]
+      },
+      {
+       "t": "button",
+       "label": "Get a free demo",
+       "kind": "Accent",
+       "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#0f1530]",
+       "href": "/demo"
+      }
+     ]
+    }
+   ]
+  },
+  "mobile": {
+   "t": "div",
+   "c": "bg-[#fbf6ef] flex flex-col items-start relative",
+   "n": "Price Book & Service Catalog / Mobile",
+   "id": "216:6311",
+   "k": [
+    {
+     "t": "div",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[24px] items-start p-[24px] relative w-full",
+     "n": "01 / Product in view",
+     "id": "219:7643",
+     "k": [
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[20px] items-center relative w-full",
+       "n": "Headline and real product view",
+       "id": "219:7644",
+       "k": [
+        {
+         "t": "div",
+         "c": "flex flex-col gap-[16px] items-start relative w-full",
+         "n": "Outcome copy",
+         "id": "219:7645",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "219:7646",
+           "k": [
+            "OPERATIONS / PRICE BOOK"
+           ]
+          },
+          {
+           "t": "h1",
+           "c": "font-semibold relative text-[40px] text-[color:#0f1530] tracking-[-1px] w-full",
+           "id": "219:7647",
+           "k": [
+            {
+             "t": "p",
+             "c": "leading-[1.08] mb-0",
+             "k": [
+              "One price book."
+             ]
+            },
+            {
+             "t": "p",
+             "c": "leading-[1.08]",
+             "k": [
+              "Connected work."
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-full",
+           "id": "219:7648",
+           "k": [
+            "Use your services, labor, and materials across estimates and jobs."
+           ]
+          },
+          {
+           "t": "button",
+           "label": "See an estimate",
+           "kind": "Dark",
+           "c": "bg-[#0f1530] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#fbf6ef]",
+           "href": "#workflow-m"
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#f6f7f9] border border-[#e6dccb] border-solid flex flex-col items-start overflow-clip relative rounded-[16px] bg-[#f6f7f9] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col items-start overflow-clip relative rounded-[var(--radius\\\\/16,16px)] w-full",
+         "n": "Editable product visual / catalog",
+         "id": "219:7651",
+         "k": [
+          {
+           "t": "div",
+           "c": "bg-[#0f1530] flex gap-[12px] h-[42px] items-center p-[12px] relative w-full",
+           "n": "Browser / product chrome",
+           "id": "219:7652",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#fff] w-[212px] shrink-0",
+             "id": "219:7653",
+             "k": [
+              "Renvani"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#f6b400] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[94px] shrink-0",
+             "n": "Status / EXAMPLE",
+             "id": "219:7654",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[74px] shrink-0",
+               "id": "219:7655",
+               "k": [
+                "EXAMPLE"
+               ]
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[8px] items-start px-[16px] py-[12px] relative w-full",
+           "n": "Native product content",
+           "id": "219:7656",
+           "k": [
+            {
+             "t": "div",
+             "c": "flex gap-[12px] items-start relative w-full",
+             "n": "Price book title",
+             "id": "219:7657",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-[184px] shrink-0",
+               "id": "219:7658",
+               "k": [
+                "Price book"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[114px] shrink-0",
+               "n": "Status / 3 ITEMS",
+               "id": "219:7659",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[94px] shrink-0",
+                 "id": "219:7660",
+                 "k": [
+                  "3 ITEMS"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col items-start p-[12px] relative rounded-[12px] w-full",
+             "n": "Search catalog",
+             "id": "219:7661",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] w-full",
+               "id": "219:7662",
+               "k": [
+                "Search services, labor, materials"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col items-start overflow-clip px-[12px] py-[5px] relative rounded-[10px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col items-start overflow-clip px-[var(--space\\\\/12,12px)] py-[5px] relative rounded-[10px] w-full",
+             "n": "Reusable price-book row / 310",
+             "id": "219:7663",
+             "k": [
+              {
+               "t": "div",
+               "c": "flex gap-[10px] items-start leading-[1.38] relative w-full",
+               "n": "Line item",
+               "id": "219:7664",
+               "k": [
+                {
+                 "t": "div",
+                 "c": "flex flex-col gap-[2px] items-start relative w-[198px] shrink-0",
+                 "n": "Item name and type",
+                 "id": "219:7665",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-semibold relative text-[14px] text-[color:#0f1530] w-full",
+                   "id": "219:7666",
+                   "k": [
+                    "AC diagnostic"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                   "id": "219:7667",
+                   "k": [
+                    "Service · AC-DIAG"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-semibold relative text-[16px] text-[color:#0f1530] text-right w-[66px] shrink-0",
+                 "id": "219:7668",
+                 "k": [
+                  "$89"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col items-start overflow-clip px-[12px] py-[5px] relative rounded-[10px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col items-start overflow-clip px-[var(--space\\\\/12,12px)] py-[5px] relative rounded-[10px] w-full",
+             "n": "Reusable price-book row / 310",
+             "id": "219:7663",
+             "k": [
+              {
+               "t": "div",
+               "c": "flex gap-[10px] items-start leading-[1.38] relative w-full",
+               "n": "Line item",
+               "id": "219:7664",
+               "k": [
+                {
+                 "t": "div",
+                 "c": "flex flex-col gap-[2px] items-start relative w-[198px] shrink-0",
+                 "n": "Item name and type",
+                 "id": "219:7665",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-semibold relative text-[14px] text-[color:#0f1530] w-full",
+                   "id": "219:7666",
+                   "k": [
+                    "AC diagnostic"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                   "id": "219:7667",
+                   "k": [
+                    "Service · AC-DIAG"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-semibold relative text-[16px] text-[color:#0f1530] text-right w-[66px] shrink-0",
+                 "id": "219:7668",
+                 "k": [
+                  "$89"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col items-start overflow-clip px-[12px] py-[5px] relative rounded-[10px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col items-start overflow-clip px-[var(--space\\\\/12,12px)] py-[5px] relative rounded-[10px] w-full",
+             "n": "Reusable price-book row / 310",
+             "id": "219:7663",
+             "k": [
+              {
+               "t": "div",
+               "c": "flex gap-[10px] items-start leading-[1.38] relative w-full",
+               "n": "Line item",
+               "id": "219:7664",
+               "k": [
+                {
+                 "t": "div",
+                 "c": "flex flex-col gap-[2px] items-start relative w-[198px] shrink-0",
+                 "n": "Item name and type",
+                 "id": "219:7665",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-semibold relative text-[14px] text-[color:#0f1530] w-full",
+                   "id": "219:7666",
+                   "k": [
+                    "AC diagnostic"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                   "id": "219:7667",
+                   "k": [
+                    "Service · AC-DIAG"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-semibold relative text-[16px] text-[color:#0f1530] text-right w-[66px] shrink-0",
+                 "id": "219:7668",
+                 "k": [
+                  "$89"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex gap-[12px] items-start leading-[1.38] p-[12px] relative rounded-[12px] text-[color:#fff] w-full",
+             "n": "Reused in estimate",
+             "id": "219:7687",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium relative text-[12px] w-[202px] shrink-0",
+               "id": "219:7688",
+               "k": [
+                "Estimate #2048"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-semibold relative text-[18px] w-[72px] shrink-0",
+               "id": "219:7689",
+               "k": [
+                "$274"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[168px] shrink-0",
+             "n": "Status / Owner review before send",
+             "id": "219:7690",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[148px] shrink-0",
+               "id": "219:7691",
+               "k": [
+                "Owner review before send"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#fff] flex flex-col gap-[24px] items-start p-[24px] relative w-full",
+     "n": "02 / Actual workflow states",
+     "id": "219:7692",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-semibold leading-[1.38] relative text-[32px] text-[color:#0f1530] w-full",
+       "id": "219:7693",
+       "k": [
+        "Price once. Carry the details through."
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[20px] items-start relative w-full",
+       "n": "Three workflow moments",
+       "id": "219:7694",
+       "k": [
+        {
+         "t": "div",
+         "c": "flex flex-col gap-[12px] items-start relative w-full",
+         "n": "Moment / Set the price",
+         "id": "219:7695",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "219:7696",
+           "k": [
+            "01 / SET THE PRICE"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] border border-[#e6dccb] border-solid flex flex-col items-start overflow-clip relative rounded-[16px] bg-[#f6f7f9] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col items-start overflow-clip relative rounded-[var(--radius\\\\/16,16px)] w-full",
+           "n": "Editable product visual / catalog-item",
+           "id": "219:7697",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex gap-[12px] h-[42px] items-center p-[12px] relative w-full",
+             "n": "Browser / product chrome",
+             "id": "219:7698",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#fff] w-[212px] shrink-0",
+               "id": "219:7699",
+               "k": [
+                "Renvani"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#f6b400] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[94px] shrink-0",
+               "n": "Status / EXAMPLE",
+               "id": "219:7700",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[74px] shrink-0",
+                 "id": "219:7701",
+                 "k": [
+                  "EXAMPLE"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#f6f7f9] flex flex-col gap-[8px] items-start px-[16px] py-[12px] relative w-full",
+             "n": "Native product content",
+             "id": "219:7702",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+               "id": "219:7703",
+               "k": [
+                "Capacitor"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[138px] shrink-0",
+               "n": "Status / MATERIAL · CAP-45/5",
+               "id": "219:7704",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[118px] shrink-0",
+                 "id": "219:7705",
+                 "k": [
+                  "MATERIAL · CAP-45/5"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[3px] items-start leading-[1.38] px-[10px] py-[8px] relative rounded-[12px] w-full",
+               "n": "Price",
+               "id": "219:7706",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "id": "219:7707",
+                 "k": [
+                  "Price"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "id": "219:7708",
+                 "k": [
+                  "60.00 USD / each"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[3px] items-start leading-[1.38] px-[10px] py-[8px] relative rounded-[12px] w-full",
+               "n": "Used in",
+               "id": "219:7709",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "id": "219:7710",
+                 "k": [
+                  "Used in"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "id": "219:7711",
+                 "k": [
+                  "Estimates + job line items"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[186px] shrink-0",
+               "n": "Status / Price change needs approval",
+               "id": "219:7712",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[166px] shrink-0",
+                 "id": "219:7713",
+                 "k": [
+                  "Price change needs approval"
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex flex-col gap-[12px] items-start relative w-full",
+         "n": "Moment / Build the estimate",
+         "id": "219:7714",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "219:7715",
+           "k": [
+            "02 / BUILD THE ESTIMATE"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] border border-[#e6dccb] border-solid flex flex-col items-start overflow-clip relative rounded-[16px] bg-[#f6f7f9] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col items-start overflow-clip relative rounded-[var(--radius\\\\/16,16px)] w-full",
+           "n": "Editable product visual / catalog-estimate",
+           "id": "219:7716",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex gap-[12px] h-[42px] items-center p-[12px] relative w-full",
+             "n": "Browser / product chrome",
+             "id": "219:7717",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#fff] w-[212px] shrink-0",
+               "id": "219:7718",
+               "k": [
+                "Renvani"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#f6b400] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[94px] shrink-0",
+               "n": "Status / EXAMPLE",
+               "id": "219:7719",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[74px] shrink-0",
+                 "id": "219:7720",
+                 "k": [
+                  "EXAMPLE"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#f6f7f9] flex flex-col gap-[8px] items-start px-[16px] py-[12px] relative w-full",
+             "n": "Native product content",
+             "id": "219:7721",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+               "id": "219:7722",
+               "k": [
+                "Estimate #2048"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] w-full",
+               "id": "219:7723",
+               "k": [
+                "Jordan Lee · AC diagnostic + repair"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col items-start overflow-clip px-[12px] py-[5px] relative rounded-[10px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col items-start overflow-clip px-[var(--space\\\\/12,12px)] py-[5px] relative rounded-[10px] w-full",
+               "n": "Reusable price-book row / 310",
+               "id": "219:7663",
+               "k": [
+                {
+                 "t": "div",
+                 "c": "flex gap-[10px] items-start leading-[1.38] relative w-full",
+                 "n": "Line item",
+                 "id": "219:7664",
+                 "k": [
+                  {
+                   "t": "div",
+                   "c": "flex flex-col gap-[2px] items-start relative w-[198px] shrink-0",
+                   "n": "Item name and type",
+                   "id": "219:7665",
+                   "k": [
+                    {
+                     "t": "p",
+                     "c": "font-semibold relative text-[14px] text-[color:#0f1530] w-full",
+                     "id": "219:7666",
+                     "k": [
+                      "AC diagnostic"
+                     ]
+                    },
+                    {
+                     "t": "p",
+                     "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                     "id": "219:7667",
+                     "k": [
+                      "Service · AC-DIAG"
+                     ]
+                    }
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-semibold relative text-[16px] text-[color:#0f1530] text-right w-[66px] shrink-0",
+                   "id": "219:7668",
+                   "k": [
+                    "$89"
+                   ]
+                  }
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col items-start overflow-clip px-[12px] py-[5px] relative rounded-[10px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col items-start overflow-clip px-[var(--space\\\\/12,12px)] py-[5px] relative rounded-[10px] w-full",
+               "n": "Reusable price-book row / 310",
+               "id": "219:7663",
+               "k": [
+                {
+                 "t": "div",
+                 "c": "flex gap-[10px] items-start leading-[1.38] relative w-full",
+                 "n": "Line item",
+                 "id": "219:7664",
+                 "k": [
+                  {
+                   "t": "div",
+                   "c": "flex flex-col gap-[2px] items-start relative w-[198px] shrink-0",
+                   "n": "Item name and type",
+                   "id": "219:7665",
+                   "k": [
+                    {
+                     "t": "p",
+                     "c": "font-semibold relative text-[14px] text-[color:#0f1530] w-full",
+                     "id": "219:7666",
+                     "k": [
+                      "AC diagnostic"
+                     ]
+                    },
+                    {
+                     "t": "p",
+                     "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                     "id": "219:7667",
+                     "k": [
+                      "Service · AC-DIAG"
+                     ]
+                    }
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-semibold relative text-[16px] text-[color:#0f1530] text-right w-[66px] shrink-0",
+                   "id": "219:7668",
+                   "k": [
+                    "$89"
+                   ]
+                  }
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col items-start overflow-clip px-[12px] py-[5px] relative rounded-[10px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col items-start overflow-clip px-[var(--space\\\\/12,12px)] py-[5px] relative rounded-[10px] w-full",
+               "n": "Reusable price-book row / 310",
+               "id": "219:7663",
+               "k": [
+                {
+                 "t": "div",
+                 "c": "flex gap-[10px] items-start leading-[1.38] relative w-full",
+                 "n": "Line item",
+                 "id": "219:7664",
+                 "k": [
+                  {
+                   "t": "div",
+                   "c": "flex flex-col gap-[2px] items-start relative w-[198px] shrink-0",
+                   "n": "Item name and type",
+                   "id": "219:7665",
+                   "k": [
+                    {
+                     "t": "p",
+                     "c": "font-semibold relative text-[14px] text-[color:#0f1530] w-full",
+                     "id": "219:7666",
+                     "k": [
+                      "AC diagnostic"
+                     ]
+                    },
+                    {
+                     "t": "p",
+                     "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                     "id": "219:7667",
+                     "k": [
+                      "Service · AC-DIAG"
+                     ]
+                    }
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-semibold relative text-[16px] text-[color:#0f1530] text-right w-[66px] shrink-0",
+                   "id": "219:7668",
+                   "k": [
+                    "$89"
+                   ]
+                  }
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-full",
+               "n": "Field / Service total",
+               "id": "219:7742",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[color:#2a3360] w-[171px] shrink-0",
+                 "id": "219:7743",
+                 "k": [
+                  "Service total"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-medium relative text-[color:#0f1530] w-[130px] shrink-0",
+                 "id": "219:7744",
+                 "k": [
+                  "$274"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[162px] shrink-0",
+               "n": "Status / Awaiting owner approval",
+               "id": "219:7745",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[142px] shrink-0",
+                 "id": "219:7746",
+                 "k": [
+                  "Awaiting owner approval"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+               "n": "UI action / Review estimate",
+               "id": "219:7747",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+                 "id": "219:7748",
+                 "k": [
+                  "Review estimate"
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex flex-col gap-[12px] items-start relative w-full",
+         "n": "Moment / Carry it into work",
+         "id": "219:7749",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "219:7750",
+           "k": [
+            "03 / CARRY IT INTO WORK"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] border border-[#e6dccb] border-solid flex flex-col items-start overflow-clip relative rounded-[16px] bg-[#f6f7f9] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col items-start overflow-clip relative rounded-[var(--radius\\\\/16,16px)] w-full",
+           "n": "Editable product visual / catalog-job",
+           "id": "219:7751",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex gap-[12px] h-[42px] items-center p-[12px] relative w-full",
+             "n": "Browser / product chrome",
+             "id": "219:7752",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#fff] w-[212px] shrink-0",
+               "id": "219:7753",
+               "k": [
+                "Renvani"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#f6b400] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[94px] shrink-0",
+               "n": "Status / EXAMPLE",
+               "id": "219:7754",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[74px] shrink-0",
+                 "id": "219:7755",
+                 "k": [
+                  "EXAMPLE"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#f6f7f9] flex flex-col gap-[8px] items-start px-[16px] py-[12px] relative w-full",
+             "n": "Native product content",
+             "id": "219:7756",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+               "id": "219:7757",
+               "k": [
+                "Job #1042"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] w-full",
+               "id": "219:7758",
+               "k": [
+                "Maya R. · AC diagnostic + repair"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[180px] shrink-0",
+               "n": "Status / Approved estimate attached",
+               "id": "219:7759",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[160px] shrink-0",
+                 "id": "219:7760",
+                 "k": [
+                  "Approved estimate attached"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col items-start overflow-clip px-[12px] py-[5px] relative rounded-[10px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col items-start overflow-clip px-[var(--space\\\\/12,12px)] py-[5px] relative rounded-[10px] w-full",
+               "n": "Reusable price-book row / 310",
+               "id": "219:7663",
+               "k": [
+                {
+                 "t": "div",
+                 "c": "flex gap-[10px] items-start leading-[1.38] relative w-full",
+                 "n": "Line item",
+                 "id": "219:7664",
+                 "k": [
+                  {
+                   "t": "div",
+                   "c": "flex flex-col gap-[2px] items-start relative w-[198px] shrink-0",
+                   "n": "Item name and type",
+                   "id": "219:7665",
+                   "k": [
+                    {
+                     "t": "p",
+                     "c": "font-semibold relative text-[14px] text-[color:#0f1530] w-full",
+                     "id": "219:7666",
+                     "k": [
+                      "AC diagnostic"
+                     ]
+                    },
+                    {
+                     "t": "p",
+                     "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                     "id": "219:7667",
+                     "k": [
+                      "Service · AC-DIAG"
+                     ]
+                    }
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-semibold relative text-[16px] text-[color:#0f1530] text-right w-[66px] shrink-0",
+                   "id": "219:7668",
+                   "k": [
+                    "$89"
+                   ]
+                  }
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col items-start overflow-clip px-[12px] py-[5px] relative rounded-[10px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col items-start overflow-clip px-[var(--space\\\\/12,12px)] py-[5px] relative rounded-[10px] w-full",
+               "n": "Reusable price-book row / 310",
+               "id": "219:7663",
+               "k": [
+                {
+                 "t": "div",
+                 "c": "flex gap-[10px] items-start leading-[1.38] relative w-full",
+                 "n": "Line item",
+                 "id": "219:7664",
+                 "k": [
+                  {
+                   "t": "div",
+                   "c": "flex flex-col gap-[2px] items-start relative w-[198px] shrink-0",
+                   "n": "Item name and type",
+                   "id": "219:7665",
+                   "k": [
+                    {
+                     "t": "p",
+                     "c": "font-semibold relative text-[14px] text-[color:#0f1530] w-full",
+                     "id": "219:7666",
+                     "k": [
+                      "AC diagnostic"
+                     ]
+                    },
+                    {
+                     "t": "p",
+                     "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                     "id": "219:7667",
+                     "k": [
+                      "Service · AC-DIAG"
+                     ]
+                    }
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-semibold relative text-[16px] text-[color:#0f1530] text-right w-[66px] shrink-0",
+                   "id": "219:7668",
+                   "k": [
+                    "$89"
+                   ]
+                  }
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col items-start overflow-clip px-[12px] py-[5px] relative rounded-[10px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col items-start overflow-clip px-[var(--space\\\\/12,12px)] py-[5px] relative rounded-[10px] w-full",
+               "n": "Reusable price-book row / 310",
+               "id": "219:7663",
+               "k": [
+                {
+                 "t": "div",
+                 "c": "flex gap-[10px] items-start leading-[1.38] relative w-full",
+                 "n": "Line item",
+                 "id": "219:7664",
+                 "k": [
+                  {
+                   "t": "div",
+                   "c": "flex flex-col gap-[2px] items-start relative w-[198px] shrink-0",
+                   "n": "Item name and type",
+                   "id": "219:7665",
+                   "k": [
+                    {
+                     "t": "p",
+                     "c": "font-semibold relative text-[14px] text-[color:#0f1530] w-full",
+                     "id": "219:7666",
+                     "k": [
+                      "AC diagnostic"
+                     ]
+                    },
+                    {
+                     "t": "p",
+                     "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                     "id": "219:7667",
+                     "k": [
+                      "Service · AC-DIAG"
+                     ]
+                    }
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-semibold relative text-[16px] text-[color:#0f1530] text-right w-[66px] shrink-0",
+                   "id": "219:7668",
+                   "k": [
+                    "$89"
+                   ]
+                  }
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-full",
+               "n": "Field / Quoted service total",
+               "id": "219:7779",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[color:#2a3360] w-[171px] shrink-0",
+                 "id": "219:7780",
+                 "k": [
+                  "Quoted service total"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-medium relative text-[color:#0f1530] w-[130px] shrink-0",
+                 "id": "219:7781",
+                 "k": [
+                  "$274"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+               "n": "UI action / Open work order",
+               "id": "219:7782",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+                 "id": "219:7783",
+                 "k": [
+                  "Open work order"
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ],
+     "anchor": "workflow-m"
+    },
+    {
+     "t": "div",
+     "c": "bg-[#f3eadc] flex flex-col gap-[20px] items-start p-[24px] relative w-full",
+     "n": "03 / Flagships share the work",
+     "id": "219:7784",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-semibold leading-[1.38] relative text-[28px] text-[color:#0f1530] w-full",
+       "id": "219:7785",
+       "k": [
+        "One customer. Connected work."
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex font-medium gap-[12px] items-start leading-[1.38] relative text-left w-full",
+       "n": "Related product handoffs",
+       "id": "219:7786",
+       "k": [
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[6px] h-[112px] items-start p-[12px] relative rounded-[12px] w-[106px] shrink-0",
+         "n": "Link / Operations / Price book",
+         "id": "219:7787",
+         "k": [
+          {
+           "t": "p",
+           "c": "relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "219:7788",
+           "k": [
+            "OPERATIONS"
+           ]
+          },
+          {
+           "t": "p",
+           "c": "relative text-[14px] text-[color:#0f1530] w-full",
+           "id": "219:7789",
+           "k": [
+            "Price book"
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[6px] h-[112px] items-start p-[12px] relative rounded-[12px] w-[106px] shrink-0",
+         "n": "Link / Revenue / Approved estimate",
+         "id": "219:7790",
+         "k": [
+          {
+           "t": "p",
+           "c": "relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "219:7791",
+           "k": [
+            "REVENUE"
+           ]
+          },
+          {
+           "t": "p",
+           "c": "relative text-[14px] text-[color:#0f1530] w-full",
+           "id": "219:7792",
+           "k": [
+            "Approved estimate"
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[6px] h-[112px] items-start p-[12px] relative rounded-[12px] w-[106px] shrink-0",
+         "n": "Link / Operations / Job + work order",
+         "id": "219:7793",
+         "k": [
+          {
+           "t": "p",
+           "c": "relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "219:7794",
+           "k": [
+            "OPERATIONS"
+           ]
+          },
+          {
+           "t": "p",
+           "c": "relative text-[14px] text-[color:#0f1530] w-full",
+           "id": "219:7795",
+           "k": [
+            "Job + work order"
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex gap-[10px] items-start relative w-full",
+       "n": "Shared owner control",
+       "id": "219:7796",
+       "k": [
+        {
+         "t": "div",
+         "c": "relative size-[18px]",
+         "n": "Icon / check",
+         "id": "219:7797",
+         "k": [
+          {
+           "t": "img",
+           "c": "absolute block inset-0 size-full",
+           "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+          }
+         ]
+        },
+        {
+         "t": "p",
+         "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] text-left flex-1 min-w-0",
+         "id": "219:7799",
+         "k": [
+          "Command Center oversees rules and approvals."
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#0f1530] flex flex-col gap-[24px] items-start p-[24px] relative w-full",
+     "n": "04 / See your workflow",
+     "id": "219:7800",
+     "k": [
+      {
+       "t": "div",
+       "c": "font-semibold relative text-[36px] text-[color:#fff] tracking-[-0.9px] w-full",
+       "id": "219:7801",
+       "k": [
+        {
+         "t": "p",
+         "c": "leading-[1.08] mb-0",
+         "k": [
+          "See your business"
+         ]
+        },
+        {
+         "t": "p",
+         "c": "leading-[1.08]",
+         "k": [
+          "in Renvani."
+         ]
+        }
+       ]
+      },
+      {
+       "t": "button",
+       "label": "Get a free demo",
+       "kind": "Accent",
+       "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#0f1530]",
+       "href": "/demo"
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "customer-portal": {
+  "desktop": {
+   "t": "div",
+   "c": "bg-[#fbf6ef] flex flex-col items-start relative",
+   "n": "Customer Portal / Desktop",
+   "id": "216:6312",
+   "k": [
+    {
+     "t": "div",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[24px] items-start p-[64px] relative w-full",
+     "n": "01 / Product in view",
+     "id": "219:8456",
+     "k": [
+      {
+       "t": "div",
+       "c": "flex gap-[64px] items-center relative w-full",
+       "n": "Headline and real product view",
+       "id": "219:8457",
+       "k": [
+        {
+         "t": "div",
+         "c": "flex flex-col gap-[20px] items-start relative flex-1 min-w-0",
+         "n": "Outcome copy",
+         "id": "219:8458",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "219:8459",
+           "k": [
+            "OPERATIONS / CUSTOMER PORTAL"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[190px] shrink-0",
+           "n": "Status / Illustrative preview",
+           "id": "219:8460",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[170px] shrink-0",
+             "id": "219:8461",
+             "k": [
+              "Illustrative preview"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "h1",
+           "c": "font-semibold leading-[1.08] relative text-[60px] text-[color:#0f1530] tracking-[-1.5px] w-full",
+           "id": "219:8462",
+           "k": [
+            "Give customers a clearer next step."
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-full",
+           "id": "219:8463",
+           "k": [
+            "Preview visits, approved estimates, payments, and reschedule requests in one place."
+           ]
+          },
+          {
+           "t": "button",
+           "label": "Preview the experience",
+           "kind": "Dark",
+           "c": "bg-[#0f1530] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#fbf6ef]",
+           "href": "#workflow"
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#f6f7f9] border border-[#e6dccb] border-solid flex flex-col items-start overflow-clip relative rounded-[16px] bg-[#f6f7f9] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col items-start overflow-clip relative rounded-[var(--radius\\\\/16,16px)] flex-1 min-w-0",
+         "n": "Editable product visual / portal",
+         "id": "219:8466",
+         "k": [
+          {
+           "t": "div",
+           "c": "bg-[#0f1530] flex gap-[12px] h-[42px] items-center p-[12px] relative w-full",
+           "n": "Browser / product chrome",
+           "id": "219:8467",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#fff] flex-1 min-w-0",
+             "id": "219:8468",
+             "k": [
+              "Juniper customer portal"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#f6b400] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[142px] shrink-0",
+             "n": "Status / EXAMPLE PREVIEW",
+             "id": "219:8469",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[122px] shrink-0",
+               "id": "219:8470",
+               "k": [
+                "EXAMPLE PREVIEW"
+               ]
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] items-start p-[24px] relative w-full",
+           "n": "Native product content",
+           "id": "219:8471",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[32px] text-[color:#0f1530] w-full",
+             "id": "219:8472",
+             "k": [
+              "Hi, Jordan."
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] w-full",
+             "id": "219:8473",
+             "k": [
+              "Your service, in one place."
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[14px] items-start p-[20px] relative rounded-[16px] w-full",
+             "n": "Upcoming visit",
+             "id": "219:8474",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+               "id": "219:8475",
+               "k": [
+                "NEXT VISIT"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-semibold leading-[1.38] relative text-[26px] text-[color:#0f1530] w-full",
+               "id": "219:8476",
+               "k": [
+                "Heating tune-up"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#2a3360] w-full",
+               "id": "219:8477",
+               "k": [
+                "November 12 · 10:00–12:00"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+               "n": "UI action / Request a new time",
+               "id": "219:8478",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+                 "id": "219:8479",
+                 "k": [
+                  "Request a new time"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex gap-[12px] items-start p-[16px] relative rounded-[12px] w-full",
+             "n": "Invoice ready",
+             "id": "219:8480",
+             "k": [
+              {
+               "t": "div",
+               "c": "flex flex-col gap-[4px] items-start leading-[1.38] relative text-left flex-1 min-w-0",
+               "n": "Invoice details",
+               "id": "219:8481",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-semibold relative text-[14px] text-[color:#0f1530] w-full",
+                 "id": "219:8482",
+                 "k": [
+                  "Invoice #1042"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[11px] text-[color:#2a3360] w-full",
+                 "id": "219:8483",
+                 "k": [
+                  "Flex · $5.48 Service Fee"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-[108px] shrink-0",
+               "n": "UI action / Pay $279.48",
+               "id": "222:7323",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center w-[80px] shrink-0",
+                 "id": "222:7324",
+                 "k": [
+                  "Pay $279.48"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[162px] shrink-0",
+             "n": "Status / History + approved work",
+             "id": "219:8485",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[142px] shrink-0",
+               "id": "219:8486",
+               "k": [
+                "History + approved work"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#fff] flex flex-col gap-[24px] items-start p-[64px] relative w-full",
+     "n": "02 / Actual workflow states",
+     "id": "219:8487",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-semibold leading-[1.08] relative text-[40px] text-[color:#0f1530] tracking-[-1px] w-full",
+       "id": "219:8488",
+       "k": [
+        "A clearer view of every visit."
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex gap-[24px] items-start relative w-full",
+       "n": "Three workflow moments",
+       "id": "219:8489",
+       "k": [
+        {
+         "t": "div",
+         "c": "flex flex-col gap-[12px] items-start relative flex-1 min-w-0",
+         "n": "Moment / Review approved work",
+         "id": "219:8490",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "219:8491",
+           "k": [
+            "01 / REVIEW APPROVED WORK"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] border border-[#e6dccb] border-solid flex flex-col items-start overflow-clip relative rounded-[16px] bg-[#f6f7f9] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col items-start overflow-clip relative rounded-[var(--radius\\\\/16,16px)] w-full",
+           "n": "Editable product visual / portal-quote",
+           "id": "219:8492",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex gap-[12px] h-[42px] items-center p-[12px] relative w-full",
+             "n": "Browser / product chrome",
+             "id": "219:8493",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#fff] flex-1 min-w-0",
+               "id": "219:8494",
+               "k": [
+                "Juniper customer portal"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#f6b400] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[142px] shrink-0",
+               "n": "Status / EXAMPLE PREVIEW",
+               "id": "219:8495",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[122px] shrink-0",
+                 "id": "219:8496",
+                 "k": [
+                  "EXAMPLE PREVIEW"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#f6f7f9] flex flex-col gap-[12px] items-start p-[16px] relative w-full",
+             "n": "Native product content",
+             "id": "219:8497",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+               "id": "219:8498",
+               "k": [
+                "Your repair estimate"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[144px] shrink-0",
+               "n": "Status / Approved by the shop",
+               "id": "219:8499",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[124px] shrink-0",
+                 "id": "219:8500",
+                 "k": [
+                  "Approved by the shop"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[4px] items-start leading-[1.38] p-[10px] relative rounded-[12px] w-full",
+               "n": "Scope",
+               "id": "219:8501",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "id": "219:8502",
+                 "k": [
+                  "Scope"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "id": "219:8503",
+                 "k": [
+                  "AC diagnostic + repair"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-full",
+               "n": "Field / Service total",
+               "id": "219:8504",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[color:#2a3360] w-[214px] shrink-0",
+                 "id": "219:8505",
+                 "k": [
+                  "Service total"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-medium relative text-[color:#0f1530] w-[165px] shrink-0",
+                 "id": "219:8506",
+                 "k": [
+                  "$274"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-normal leading-[1.38] relative text-[11px] text-[color:#2a3360] w-full",
+               "id": "219:8507",
+               "k": [
+                "Estimate #2048"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#f6b400] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+               "n": "UI action / Accept estimate",
+               "id": "219:8508",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-center flex-1 min-w-0",
+                 "id": "219:8509",
+                 "k": [
+                  "Accept estimate"
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex flex-col gap-[12px] items-start relative flex-1 min-w-0",
+         "n": "Moment / See your history",
+         "id": "219:8510",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "219:8511",
+           "k": [
+            "02 / SEE YOUR HISTORY"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] border border-[#e6dccb] border-solid flex flex-col items-start overflow-clip relative rounded-[16px] bg-[#f6f7f9] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col items-start overflow-clip relative rounded-[var(--radius\\\\/16,16px)] w-full",
+           "n": "Editable product visual / portal-history",
+           "id": "219:8512",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex gap-[12px] h-[42px] items-center p-[12px] relative w-full",
+             "n": "Browser / product chrome",
+             "id": "219:8513",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#fff] flex-1 min-w-0",
+               "id": "219:8514",
+               "k": [
+                "Juniper customer portal"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#f6b400] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[142px] shrink-0",
+               "n": "Status / EXAMPLE PREVIEW",
+               "id": "219:8515",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[122px] shrink-0",
+                 "id": "219:8516",
+                 "k": [
+                  "EXAMPLE PREVIEW"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#f6f7f9] flex flex-col gap-[12px] items-start p-[16px] relative w-full",
+             "n": "Native product content",
+             "id": "219:8517",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+               "id": "219:8518",
+               "k": [
+                "Your service history"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[4px] items-start leading-[1.38] p-[10px] relative rounded-[12px] w-full",
+               "n": "October 29",
+               "id": "219:8519",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "id": "219:8520",
+                 "k": [
+                  "October 29"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "id": "219:8521",
+                 "k": [
+                  "AC repair · Job #1042"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[4px] items-start leading-[1.38] p-[10px] relative rounded-[12px] w-full",
+               "n": "Invoice #1042",
+               "id": "219:8522",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "id": "219:8523",
+                 "k": [
+                  "Invoice #1042"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "id": "219:8524",
+                 "k": [
+                  "Paid · Receipt available"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[4px] items-start leading-[1.38] p-[10px] relative rounded-[12px] w-full",
+               "n": "Next visit",
+               "id": "219:8525",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "id": "219:8526",
+                 "k": [
+                  "Next visit"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "id": "219:8527",
+                 "k": [
+                  "Heating tune-up · November 12"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+               "n": "UI action / View visit details",
+               "id": "219:8528",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+                 "id": "219:8529",
+                 "k": [
+                  "View visit details"
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex flex-col gap-[12px] items-start relative flex-1 min-w-0",
+         "n": "Moment / Request a new time",
+         "id": "219:8530",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "219:8531",
+           "k": [
+            "03 / REQUEST A NEW TIME"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] border border-[#e6dccb] border-solid flex flex-col items-start overflow-clip relative rounded-[16px] bg-[#f6f7f9] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col items-start overflow-clip relative rounded-[var(--radius\\\\/16,16px)] w-full",
+           "n": "Editable product visual / portal-reschedule",
+           "id": "219:8532",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex gap-[12px] h-[42px] items-center p-[12px] relative w-full",
+             "n": "Browser / product chrome",
+             "id": "219:8533",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#fff] flex-1 min-w-0",
+               "id": "219:8534",
+               "k": [
+                "Juniper customer portal"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#f6b400] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[142px] shrink-0",
+               "n": "Status / EXAMPLE PREVIEW",
+               "id": "219:8535",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[122px] shrink-0",
+                 "id": "219:8536",
+                 "k": [
+                  "EXAMPLE PREVIEW"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#f6f7f9] flex flex-col gap-[12px] items-start p-[16px] relative w-full",
+             "n": "Native product content",
+             "id": "219:8537",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+               "id": "219:8538",
+               "k": [
+                "Request a new time"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[4px] items-start leading-[1.38] p-[10px] relative rounded-[12px] w-full",
+               "n": "Current visit",
+               "id": "219:8539",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "id": "219:8540",
+                 "k": [
+                  "Current visit"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "id": "219:8541",
+                 "k": [
+                  "Nov 12 · 10:00–12:00"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[4px] items-start leading-[1.38] p-[10px] relative rounded-[12px] w-full",
+               "n": "Requested visit",
+               "id": "219:8542",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "id": "219:8543",
+                 "k": [
+                  "Requested visit"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "id": "219:8544",
+                 "k": [
+                  "Nov 13 · 14:00–16:00"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[156px] shrink-0",
+               "n": "Status / Awaiting shop approval",
+               "id": "219:8545",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[136px] shrink-0",
+                 "id": "219:8546",
+                 "k": [
+                  "Awaiting shop approval"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] w-full",
+               "id": "219:8547",
+               "k": [
+                "Your visit changes after approval."
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+               "n": "UI action / Request sent",
+               "id": "219:8548",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+                 "id": "219:8549",
+                 "k": [
+                  "Request sent"
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ],
+     "anchor": "workflow"
+    },
+    {
+     "t": "div",
+     "c": "bg-[#f3eadc] flex flex-col gap-[20px] items-start p-[64px] relative w-full",
+     "n": "03 / Flagships share the work",
+     "id": "219:8550",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-semibold leading-[1.08] relative text-[36px] text-[color:#0f1530] tracking-[-0.9px] w-full",
+       "id": "219:8551",
+       "k": [
+        "One customer. Connected work."
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex font-medium gap-[12px] items-start leading-[1.38] relative text-left w-full",
+       "n": "Related product handoffs",
+       "id": "219:8552",
+       "k": [
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[6px] items-start p-[16px] relative rounded-[12px] flex-1 min-w-0",
+         "n": "Link / Operations / Visit + payment",
+         "id": "219:8553",
+         "k": [
+          {
+           "t": "p",
+           "c": "relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "219:8554",
+           "k": [
+            "OPERATIONS"
+           ]
+          },
+          {
+           "t": "p",
+           "c": "relative text-[18px] text-[color:#0f1530] w-full",
+           "id": "219:8555",
+           "k": [
+            "Visit + payment"
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[6px] items-start p-[16px] relative rounded-[12px] flex-1 min-w-0",
+         "n": "Link / Revenue / Approved work",
+         "id": "219:8556",
+         "k": [
+          {
+           "t": "p",
+           "c": "relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "219:8557",
+           "k": [
+            "REVENUE"
+           ]
+          },
+          {
+           "t": "p",
+           "c": "relative text-[18px] text-[color:#0f1530] w-full",
+           "id": "219:8558",
+           "k": [
+            "Approved work"
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[6px] items-start p-[16px] relative rounded-[12px] flex-1 min-w-0",
+         "n": "Link / Retention / The next visit",
+         "id": "219:8559",
+         "k": [
+          {
+           "t": "p",
+           "c": "relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "219:8560",
+           "k": [
+            "RETENTION"
+           ]
+          },
+          {
+           "t": "p",
+           "c": "relative text-[18px] text-[color:#0f1530] w-full",
+           "id": "219:8561",
+           "k": [
+            "The next visit"
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex gap-[10px] items-start relative w-full",
+       "n": "Shared owner control",
+       "id": "219:8562",
+       "k": [
+        {
+         "t": "div",
+         "c": "relative size-[18px]",
+         "n": "Icon / check",
+         "id": "219:8563",
+         "k": [
+          {
+           "t": "img",
+           "c": "absolute block inset-0 size-full",
+           "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+          }
+         ]
+        },
+        {
+         "t": "p",
+         "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] text-left flex-1 min-w-0",
+         "id": "219:8565",
+         "k": [
+          "Command Center oversees rules and approvals."
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#0f1530] flex flex-col gap-[24px] items-start p-[64px] relative w-full",
+     "n": "04 / See your workflow",
+     "id": "219:8566",
+     "k": [
+      {
+       "t": "div",
+       "c": "font-semibold relative text-[48px] text-[color:#fff] tracking-[-1.2px] w-full",
+       "id": "219:8567",
+       "k": [
+        {
+         "t": "p",
+         "c": "leading-[1.08] mb-0",
+         "k": [
+          "See your business"
+         ]
+        },
+        {
+         "t": "p",
+         "c": "leading-[1.08]",
+         "k": [
+          "in Renvani."
+         ]
+        }
+       ]
+      },
+      {
+       "t": "button",
+       "label": "Get a free demo",
+       "kind": "Accent",
+       "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#0f1530]",
+       "href": "/demo"
+      }
+     ]
+    }
+   ]
+  },
+  "mobile": {
+   "t": "div",
+   "c": "bg-[#fbf6ef] flex flex-col items-start relative",
+   "n": "Customer Portal / Mobile",
+   "id": "216:6313",
+   "k": [
+    {
+     "t": "div",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[24px] items-start p-[24px] relative w-full",
+     "n": "01 / Product in view",
+     "id": "219:8583",
+     "k": [
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[20px] items-center relative w-full",
+       "n": "Headline and real product view",
+       "id": "219:8584",
+       "k": [
+        {
+         "t": "div",
+         "c": "flex flex-col gap-[16px] items-start relative w-full",
+         "n": "Outcome copy",
+         "id": "219:8585",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "219:8586",
+           "k": [
+            "OPERATIONS / CUSTOMER PORTAL"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[190px] shrink-0",
+           "n": "Status / Illustrative preview",
+           "id": "219:8587",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[170px] shrink-0",
+             "id": "219:8588",
+             "k": [
+              "Illustrative preview"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "h1",
+           "c": "font-semibold leading-[1.08] relative text-[40px] text-[color:#0f1530] tracking-[-1px] w-full",
+           "id": "219:8589",
+           "k": [
+            "Give customers a clearer next step."
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-full",
+           "id": "219:8590",
+           "k": [
+            "Preview visits, approved estimates, payments, and reschedule requests in one place."
+           ]
+          },
+          {
+           "t": "button",
+           "label": "Preview the experience",
+           "kind": "Dark",
+           "c": "bg-[#0f1530] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#fbf6ef]",
+           "href": "#workflow-m"
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#f6f7f9] border border-[#e6dccb] border-solid flex flex-col items-start overflow-clip relative rounded-[16px] bg-[#f6f7f9] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col items-start overflow-clip relative rounded-[var(--radius\\\\/16,16px)] w-full",
+         "n": "Editable product visual / portal",
+         "id": "219:8593",
+         "k": [
+          {
+           "t": "div",
+           "c": "bg-[#0f1530] flex gap-[12px] h-[42px] items-center p-[12px] relative w-full",
+           "n": "Browser / product chrome",
+           "id": "219:8594",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#fff] w-[164px] shrink-0",
+             "id": "219:8595",
+             "k": [
+              "Juniper customer portal"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#f6b400] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[142px] shrink-0",
+             "n": "Status / EXAMPLE PREVIEW",
+             "id": "219:8596",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[122px] shrink-0",
+               "id": "219:8597",
+               "k": [
+                "EXAMPLE PREVIEW"
+               ]
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[8px] items-start px-[16px] py-[12px] relative w-full",
+           "n": "Native product content",
+           "id": "219:8598",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[26px] text-[color:#0f1530] w-full",
+             "id": "219:8599",
+             "k": [
+              "Hi, Jordan."
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] w-full",
+             "id": "219:8600",
+             "k": [
+              "Your service, in one place."
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[14px] items-start p-[20px] relative rounded-[16px] w-full",
+             "n": "Upcoming visit",
+             "id": "219:8601",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+               "id": "219:8602",
+               "k": [
+                "NEXT VISIT"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] w-full",
+               "id": "219:8603",
+               "k": [
+                "Heating tune-up"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#2a3360] w-full",
+               "id": "219:8604",
+               "k": [
+                "November 12 · 10:00–12:00"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+               "n": "UI action / Request a new time",
+               "id": "219:8605",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+                 "id": "219:8606",
+                 "k": [
+                  "Request a new time"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex gap-[12px] items-start p-[16px] relative rounded-[12px] w-full",
+             "n": "Invoice ready",
+             "id": "219:8607",
+             "k": [
+              {
+               "t": "div",
+               "c": "flex flex-col gap-[4px] items-start leading-[1.38] relative text-left w-[158px] shrink-0",
+               "n": "Invoice details",
+               "id": "219:8608",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-semibold relative text-[14px] text-[color:#0f1530] w-full",
+                 "id": "219:8609",
+                 "k": [
+                  "Invoice #1042"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[11px] text-[color:#2a3360] w-full",
+                 "id": "219:8610",
+                 "k": [
+                  "Flex · $5.48 Service Fee"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-[108px] shrink-0",
+               "n": "UI action / Pay $279.48",
+               "id": "222:7326",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center w-[80px] shrink-0",
+                 "id": "222:7327",
+                 "k": [
+                  "Pay $279.48"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[162px] shrink-0",
+             "n": "Status / History + approved work",
+             "id": "219:8612",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[142px] shrink-0",
+               "id": "219:8613",
+               "k": [
+                "History + approved work"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#fff] flex flex-col gap-[24px] items-start p-[24px] relative w-full",
+     "n": "02 / Actual workflow states",
+     "id": "219:8614",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-semibold leading-[1.38] relative text-[32px] text-[color:#0f1530] w-full",
+       "id": "219:8615",
+       "k": [
+        "A clearer view of every visit."
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[20px] items-start relative w-full",
+       "n": "Three workflow moments",
+       "id": "219:8616",
+       "k": [
+        {
+         "t": "div",
+         "c": "flex flex-col gap-[12px] items-start relative w-full",
+         "n": "Moment / Review approved work",
+         "id": "219:8617",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "219:8618",
+           "k": [
+            "01 / REVIEW APPROVED WORK"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] border border-[#e6dccb] border-solid flex flex-col items-start overflow-clip relative rounded-[16px] bg-[#f6f7f9] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col items-start overflow-clip relative rounded-[var(--radius\\\\/16,16px)] w-full",
+           "n": "Editable product visual / portal-quote",
+           "id": "219:8619",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex gap-[12px] h-[42px] items-center p-[12px] relative w-full",
+             "n": "Browser / product chrome",
+             "id": "219:8620",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#fff] w-[164px] shrink-0",
+               "id": "219:8621",
+               "k": [
+                "Juniper customer portal"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#f6b400] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[142px] shrink-0",
+               "n": "Status / EXAMPLE PREVIEW",
+               "id": "219:8622",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[122px] shrink-0",
+                 "id": "219:8623",
+                 "k": [
+                  "EXAMPLE PREVIEW"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#f6f7f9] flex flex-col gap-[8px] items-start px-[16px] py-[12px] relative w-full",
+             "n": "Native product content",
+             "id": "219:8624",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+               "id": "219:8625",
+               "k": [
+                "Your repair estimate"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[144px] shrink-0",
+               "n": "Status / Approved by the shop",
+               "id": "219:8626",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[124px] shrink-0",
+                 "id": "219:8627",
+                 "k": [
+                  "Approved by the shop"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[3px] items-start leading-[1.38] px-[10px] py-[8px] relative rounded-[12px] w-full",
+               "n": "Scope",
+               "id": "219:8628",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "id": "219:8629",
+                 "k": [
+                  "Scope"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "id": "219:8630",
+                 "k": [
+                  "AC diagnostic + repair"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-full",
+               "n": "Field / Service total",
+               "id": "219:8631",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[color:#2a3360] w-[171px] shrink-0",
+                 "id": "219:8632",
+                 "k": [
+                  "Service total"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-medium relative text-[color:#0f1530] w-[130px] shrink-0",
+                 "id": "219:8633",
+                 "k": [
+                  "$274"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-normal leading-[1.38] relative text-[11px] text-[color:#2a3360] w-full",
+               "id": "219:8634",
+               "k": [
+                "Estimate #2048"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#f6b400] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+               "n": "UI action / Accept estimate",
+               "id": "219:8635",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-center flex-1 min-w-0",
+                 "id": "219:8636",
+                 "k": [
+                  "Accept estimate"
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex flex-col gap-[12px] items-start relative w-full",
+         "n": "Moment / See your history",
+         "id": "219:8637",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "219:8638",
+           "k": [
+            "02 / SEE YOUR HISTORY"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] border border-[#e6dccb] border-solid flex flex-col items-start overflow-clip relative rounded-[16px] bg-[#f6f7f9] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col items-start overflow-clip relative rounded-[var(--radius\\\\/16,16px)] w-full",
+           "n": "Editable product visual / portal-history",
+           "id": "219:8639",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex gap-[12px] h-[42px] items-center p-[12px] relative w-full",
+             "n": "Browser / product chrome",
+             "id": "219:8640",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#fff] w-[164px] shrink-0",
+               "id": "219:8641",
+               "k": [
+                "Juniper customer portal"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#f6b400] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[142px] shrink-0",
+               "n": "Status / EXAMPLE PREVIEW",
+               "id": "219:8642",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[122px] shrink-0",
+                 "id": "219:8643",
+                 "k": [
+                  "EXAMPLE PREVIEW"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#f6f7f9] flex flex-col gap-[8px] items-start px-[16px] py-[12px] relative w-full",
+             "n": "Native product content",
+             "id": "219:8644",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+               "id": "219:8645",
+               "k": [
+                "Your service history"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[3px] items-start leading-[1.38] px-[10px] py-[8px] relative rounded-[12px] w-full",
+               "n": "October 29",
+               "id": "219:8646",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "id": "219:8647",
+                 "k": [
+                  "October 29"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "id": "219:8648",
+                 "k": [
+                  "AC repair · Job #1042"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[3px] items-start leading-[1.38] px-[10px] py-[8px] relative rounded-[12px] w-full",
+               "n": "Invoice #1042",
+               "id": "219:8649",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "id": "219:8650",
+                 "k": [
+                  "Invoice #1042"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "id": "219:8651",
+                 "k": [
+                  "Paid · Receipt available"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[3px] items-start leading-[1.38] px-[10px] py-[8px] relative rounded-[12px] w-full",
+               "n": "Next visit",
+               "id": "219:8652",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "id": "219:8653",
+                 "k": [
+                  "Next visit"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "id": "219:8654",
+                 "k": [
+                  "Heating tune-up · November 12"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+               "n": "UI action / View visit details",
+               "id": "219:8655",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+                 "id": "219:8656",
+                 "k": [
+                  "View visit details"
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex flex-col gap-[12px] items-start relative w-full",
+         "n": "Moment / Request a new time",
+         "id": "219:8657",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "219:8658",
+           "k": [
+            "03 / REQUEST A NEW TIME"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] border border-[#e6dccb] border-solid flex flex-col items-start overflow-clip relative rounded-[16px] bg-[#f6f7f9] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col items-start overflow-clip relative rounded-[var(--radius\\\\/16,16px)] w-full",
+           "n": "Editable product visual / portal-reschedule",
+           "id": "219:8659",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex gap-[12px] h-[42px] items-center p-[12px] relative w-full",
+             "n": "Browser / product chrome",
+             "id": "219:8660",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#fff] w-[164px] shrink-0",
+               "id": "219:8661",
+               "k": [
+                "Juniper customer portal"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#f6b400] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[142px] shrink-0",
+               "n": "Status / EXAMPLE PREVIEW",
+               "id": "219:8662",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[122px] shrink-0",
+                 "id": "219:8663",
+                 "k": [
+                  "EXAMPLE PREVIEW"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#f6f7f9] flex flex-col gap-[8px] items-start px-[16px] py-[12px] relative w-full",
+             "n": "Native product content",
+             "id": "219:8664",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+               "id": "219:8665",
+               "k": [
+                "Request a new time"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[3px] items-start leading-[1.38] px-[10px] py-[8px] relative rounded-[12px] w-full",
+               "n": "Current visit",
+               "id": "219:8666",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "id": "219:8667",
+                 "k": [
+                  "Current visit"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "id": "219:8668",
+                 "k": [
+                  "Nov 12 · 10:00–12:00"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[3px] items-start leading-[1.38] px-[10px] py-[8px] relative rounded-[12px] w-full",
+               "n": "Requested visit",
+               "id": "219:8669",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "id": "219:8670",
+                 "k": [
+                  "Requested visit"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "id": "219:8671",
+                 "k": [
+                  "Nov 13 · 14:00–16:00"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[156px] shrink-0",
+               "n": "Status / Awaiting shop approval",
+               "id": "219:8672",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[136px] shrink-0",
+                 "id": "219:8673",
+                 "k": [
+                  "Awaiting shop approval"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] w-full",
+               "id": "219:8674",
+               "k": [
+                "Your visit changes after approval."
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+               "n": "UI action / Request sent",
+               "id": "219:8675",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+                 "id": "219:8676",
+                 "k": [
+                  "Request sent"
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ],
+     "anchor": "workflow-m"
+    },
+    {
+     "t": "div",
+     "c": "bg-[#f3eadc] flex flex-col gap-[20px] items-start p-[24px] relative w-full",
+     "n": "03 / Flagships share the work",
+     "id": "219:8677",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-semibold leading-[1.38] relative text-[28px] text-[color:#0f1530] w-full",
+       "id": "219:8678",
+       "k": [
+        "One customer. Connected work."
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex font-medium gap-[12px] items-start leading-[1.38] relative text-left w-full",
+       "n": "Related product handoffs",
+       "id": "219:8679",
+       "k": [
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[6px] h-[112px] items-start p-[12px] relative rounded-[12px] w-[106px] shrink-0",
+         "n": "Link / Operations / Visit + payment",
+         "id": "219:8680",
+         "k": [
+          {
+           "t": "p",
+           "c": "relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "219:8681",
+           "k": [
+            "OPERATIONS"
+           ]
+          },
+          {
+           "t": "p",
+           "c": "relative text-[14px] text-[color:#0f1530] w-full",
+           "id": "219:8682",
+           "k": [
+            "Visit + payment"
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[6px] h-[112px] items-start p-[12px] relative rounded-[12px] w-[106px] shrink-0",
+         "n": "Link / Revenue / Approved work",
+         "id": "219:8683",
+         "k": [
+          {
+           "t": "p",
+           "c": "relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "219:8684",
+           "k": [
+            "REVENUE"
+           ]
+          },
+          {
+           "t": "p",
+           "c": "relative text-[14px] text-[color:#0f1530] w-full",
+           "id": "219:8685",
+           "k": [
+            "Approved work"
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[6px] h-[112px] items-start p-[12px] relative rounded-[12px] w-[106px] shrink-0",
+         "n": "Link / Retention / The next visit",
+         "id": "219:8686",
+         "k": [
+          {
+           "t": "p",
+           "c": "relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "219:8687",
+           "k": [
+            "RETENTION"
+           ]
+          },
+          {
+           "t": "p",
+           "c": "relative text-[14px] text-[color:#0f1530] w-full",
+           "id": "219:8688",
+           "k": [
+            "The next visit"
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex gap-[10px] items-start relative w-full",
+       "n": "Shared owner control",
+       "id": "219:8689",
+       "k": [
+        {
+         "t": "div",
+         "c": "relative size-[18px]",
+         "n": "Icon / check",
+         "id": "219:8690",
+         "k": [
+          {
+           "t": "img",
+           "c": "absolute block inset-0 size-full",
+           "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+          }
+         ]
+        },
+        {
+         "t": "p",
+         "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] text-left flex-1 min-w-0",
+         "id": "219:8692",
+         "k": [
+          "Command Center oversees rules and approvals."
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#0f1530] flex flex-col gap-[24px] items-start p-[24px] relative w-full",
+     "n": "04 / See your workflow",
+     "id": "219:8693",
+     "k": [
+      {
+       "t": "div",
+       "c": "font-semibold relative text-[36px] text-[color:#fff] tracking-[-0.9px] w-full",
+       "id": "219:8694",
+       "k": [
+        {
+         "t": "p",
+         "c": "leading-[1.08] mb-0",
+         "k": [
+          "See your business"
+         ]
+        },
+        {
+         "t": "p",
+         "c": "leading-[1.08]",
+         "k": [
+          "in Renvani."
+         ]
+        }
+       ]
+      },
+      {
+       "t": "button",
+       "label": "Get a free demo",
+       "kind": "Accent",
+       "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#0f1530]",
+       "href": "/demo"
       }
      ]
     }

@@ -11,6 +11,7 @@ import type { CreateEstimateInput, EstimateStatus } from "@fsm/types";
 import { PageLayout } from "@/src/components/layout/PageLayout";
 import { CurrencyDisplay } from "@/src/components/ui/CurrencyDisplay";
 import { EmptyState } from "@/src/components/ui/EmptyState";
+import { ErrorState } from "@/src/components/ui/ErrorState";
 import { Sheet } from "@/src/components/ui/Sheet";
 import { SkeletonCard } from "@/src/components/ui/SkeletonCard";
 import { StatBadge } from "@/src/components/ui/StatBadge";
@@ -32,6 +33,8 @@ import { getCompanyTaxRate } from "@/src/components/jobs/jobs.utils";
 import { CustomerEstimateView } from "./CustomerEstimateView";
 import { EditableLineItemsTable } from "./EditableLineItemsTable";
 import { EstimateSendModal } from "./EstimateSendModal";
+import { EstimateChecksPanel, EstimateFrequencyOptions, EstimateTotalsCard } from "./EstimateFigmaPanels";
+import { buildEstimateSubtitle, canSendEstimate } from "./estimate-builder.utils";
 import {
   buildEstimatePublicPath,
   computeRevenueTotals,
@@ -247,6 +250,19 @@ function getEstimateViewStatus(primaryStatus: EstimateStatus): EstimateStatus {
   return primaryStatus;
 }
 
+function toEstimateLineItemPayload(item: RevenueLineItemDraft, index: number) {
+  return {
+    name: item.name,
+    ...(item.description ? { description: item.description } : {}),
+    itemType: item.itemType,
+    quantity: parseMoneyValue(item.quantity),
+    unitPrice: parseMoneyValue(item.unitPrice),
+    isTaxable: item.isTaxable,
+    sortOrder: index,
+    ...(item.priceBookItemId ? { priceBookItemId: item.priceBookItemId } : {})
+  };
+}
+
 function buildCreateEstimateInput(
   draft: EstimateDraftState,
   tier: EstimateTierDraft,
@@ -264,15 +280,7 @@ function buildCreateEstimateInput(
     financingOffered: draft.financingOffered,
     ...(tier.label ? { tierLabel: tier.label } : {}),
     ...(tierGroupId ? { tierGroupId } : {}),
-    items: normalizeLineItems(tier.items).map((item, index) => ({
-      name: item.name,
-      ...(item.description ? { description: item.description } : {}),
-      itemType: item.itemType,
-      quantity: parseMoneyValue(item.quantity),
-      unitPrice: parseMoneyValue(item.unitPrice),
-      isTaxable: item.isTaxable,
-      sortOrder: index
-    }))
+    items: normalizeLineItems(tier.items).map((item, index) => toEstimateLineItemPayload(item, index))
   };
 }
 
@@ -397,10 +405,13 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
   const [declineOpen, setDeclineOpen] = useState(false);
   const [declineForm, setDeclineForm] = useState<DeclineFormState>(emptyDeclineForm);
   const [editingOverride, setEditingOverride] = useState(false);
+  const [saveNow, setSaveNow] = useState(0);
+  const saveNowRef = useRef(false);
 
   const hydratedEstimateIdRef = useRef<string | null>(null);
   const savedSignatureRef = useRef<string>(getDraftSignature(createDefaultDraft()));
   const draftSignature = getDraftSignature(draft);
+  const isDirty = draftSignature !== savedSignatureRef.current;
 
   const selectedCustomerId = draft.customerId || null;
   const customerDetailQuery = useCustomer(selectedCustomerId);
@@ -457,7 +468,9 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
       return;
     }
 
+    const delay = saveNowRef.current ? 0 : 2000;
     const timeoutId = window.setTimeout(() => {
+      saveNowRef.current = false;
       void (async () => {
         setSaveState("saving");
         setErrorMessage(null);
@@ -509,15 +522,7 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
 
             for (const [index, item] of normalizedItems.entries()) {
                 if (!item.id) {
-                  await api.post(`/api/v1/estimates/${singleTier.estimateId}/items`, {
-                    name: item.name,
-                    ...(item.description ? { description: item.description } : {}),
-                    itemType: item.itemType,
-                    quantity: parseMoneyValue(item.quantity),
-                    unitPrice: parseMoneyValue(item.unitPrice),
-                  isTaxable: item.isTaxable,
-                  sortOrder: index
-                });
+                  await api.post(`/api/v1/estimates/${singleTier.estimateId}/items`, toEstimateLineItemPayload(item, index));
                 continue;
               }
 
@@ -534,20 +539,13 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
                 formatQuantityInput(normalizedExisting.quantity) === formatQuantityInput(item.quantity) &&
                 formatMoneyInput(normalizedExisting.unitPrice) === formatMoneyInput(item.unitPrice) &&
                 normalizedExisting.isTaxable === item.isTaxable &&
-                normalizedExisting.sortOrder === item.sortOrder
+                normalizedExisting.sortOrder === item.sortOrder &&
+                (normalizedExisting.priceBookItemId ?? null) === (item.priceBookItemId ?? null)
               ) {
                 continue;
               }
 
-              await api.patch(`/api/v1/estimates/${singleTier.estimateId}/items/${item.id}`, {
-                name: item.name,
-                ...(item.description ? { description: item.description } : {}),
-                itemType: item.itemType,
-                quantity: parseMoneyValue(item.quantity),
-                unitPrice: parseMoneyValue(item.unitPrice),
-                isTaxable: item.isTaxable,
-                sortOrder: index
-              });
+              await api.patch(`/api/v1/estimates/${singleTier.estimateId}/items/${item.id}`, toEstimateLineItemPayload(item, index));
             }
 
             const localIds = new Set(normalizedItems.map((item) => item.id).filter((value): value is string => Boolean(value)));
@@ -601,15 +599,7 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
 
               for (const [index, item] of normalizedItems.entries()) {
                 if (!item.id) {
-                  await api.post(`/api/v1/estimates/${tier.estimateId}/items`, {
-                    name: item.name,
-                    ...(item.description ? { description: item.description } : {}),
-                    itemType: item.itemType,
-                    quantity: parseMoneyValue(item.quantity),
-                    unitPrice: parseMoneyValue(item.unitPrice),
-                    isTaxable: item.isTaxable,
-                    sortOrder: index
-                  });
+                  await api.post(`/api/v1/estimates/${tier.estimateId}/items`, toEstimateLineItemPayload(item, index));
                   continue;
                 }
 
@@ -626,20 +616,13 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
                   formatQuantityInput(normalizedExisting.quantity) === formatQuantityInput(item.quantity) &&
                   formatMoneyInput(normalizedExisting.unitPrice) === formatMoneyInput(item.unitPrice) &&
                   normalizedExisting.isTaxable === item.isTaxable &&
-                  normalizedExisting.sortOrder === item.sortOrder
+                  normalizedExisting.sortOrder === item.sortOrder &&
+                  (normalizedExisting.priceBookItemId ?? null) === (item.priceBookItemId ?? null)
                 ) {
                   continue;
                 }
 
-                await api.patch(`/api/v1/estimates/${tier.estimateId}/items/${item.id}`, {
-                  name: item.name,
-                  ...(item.description ? { description: item.description } : {}),
-                  itemType: item.itemType,
-                  quantity: parseMoneyValue(item.quantity),
-                  unitPrice: parseMoneyValue(item.unitPrice),
-                  isTaxable: item.isTaxable,
-                  sortOrder: index
-                });
+                await api.patch(`/api/v1/estimates/${tier.estimateId}/items/${item.id}`, toEstimateLineItemPayload(item, index));
               }
 
               const localIds = new Set(normalizedItems.map((item) => item.id).filter((value): value is string => Boolean(value)));
@@ -681,7 +664,7 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
           setErrorMessage(error instanceof Error ? error.message : "Estimate draft could not be saved.");
         }
       })();
-    }, 2000);
+    }, delay);
 
     return () => window.clearTimeout(timeoutId);
   }, [
@@ -693,6 +676,7 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
     isExisting,
     queryClient,
     router,
+    saveNow,
     taxRate
   ]);
 
@@ -839,7 +823,17 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
     );
   }
 
-  if (isExisting && (groupQuery.isError || !groupQuery.data)) {
+  if (isExisting && groupQuery.isError) {
+    return (
+      <ErrorState
+        title="Estimate couldn't load"
+        onRetry={() => void groupQuery.refetch()}
+        isRetrying={groupQuery.isFetching}
+      />
+    );
+  }
+
+  if (isExisting && !groupQuery.data) {
     return (
       <EmptyState
         icon={WandSparkles}
@@ -857,8 +851,16 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
   return (
     <>
       <PageLayout
-        title={isExisting ? draft.title || "Estimate Detail" : "New Estimate"}
-        subtitle={isExisting ? `${draft.customerId ? "Saved draft and approval state" : "Build the scope, send it out, and capture approval."}` : "Build a single quote or a Good / Better / Best option set."}
+        title={isExisting ? "Estimate" : "New estimate"}
+        subtitle={
+          (isExisting
+            ? buildEstimateSubtitle({
+                estimateNumber: primaryEstimate?.estimateNumber ?? null,
+                customerName: primaryEstimate ? `${primaryEstimate.customer.firstName} ${primaryEstimate.customer.lastName}` : null,
+                address: primaryEstimate?.property?.addressLine1 ?? null
+              })
+            : null) ?? "Build a single quote or a Good / Better / Best option set."
+        }
         actions={(
           <div className="flex flex-wrap items-center gap-2">
             <Link href="/estimates" className="text-sm font-semibold text-brand-accent">
@@ -866,6 +868,29 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
             </Link>
             {isExisting ? (
               <StatBadge label={formatStatusLabel(currentStatus)} tone={getEstimateStatusTone(currentStatus)} />
+            ) : null}
+            {isEditable ? (
+              <>
+                <button
+                  type="button"
+                  disabled={!draft.customerId || saveState === "saving" || draftSignature === savedSignatureRef.current}
+                  onClick={() => {
+                    saveNowRef.current = true;
+                    setSaveNow((n) => n + 1);
+                  }}
+                  className="rounded-[10px] border border-[#e6dccb] bg-white px-4 py-2 text-sm font-semibold text-[#0f1530] disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {saveState === "saving" ? "Saving…" : "Save draft"}
+                </button>
+                <button
+                  type="button"
+                  disabled={!canSendEstimate({ hasEstimateId: Boolean(anchorTier?.estimateId), isDirty, saveState })}
+                  onClick={() => setSendModalOpen(true)}
+                  className="rounded-[10px] bg-[#f6b400] px-4 py-2 text-sm font-semibold text-[#0f1530] disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Approve &amp; send
+                </button>
+              </>
             ) : null}
           </div>
         )}
@@ -1024,6 +1049,8 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
                       subtitle="Add products, labor, fees, or materials from the catalog and keep the estimate draft current."
                       items={draft.single.items}
                       readOnly={!isEditable}
+                      variant="frame"
+                      discountAmount={activeTotals.discountAmount}
                       onChange={(items) =>
                         setDraft((current) => ({
                           ...current,
@@ -1071,6 +1098,8 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
                                 subtitle={`Scope and pricing for the ${tier.label?.toLowerCase()} option.`}
                                 items={tier.items}
                                 readOnly={!isEditable}
+                                variant="frame"
+                                discountAmount={tierTotals.discountAmount}
                                 onChange={(items) =>
                                   setDraft((current) => ({
                                     ...current,
@@ -1094,6 +1123,17 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
                 )}
               </section>
 
+              <EstimateTotalsCard
+                label={draft.mode === "tiers" ? activeTier.label : null}
+                subtotal={activeTotals.subtotal}
+                taxAmount={activeTotals.taxAmount}
+                taxRate={taxRate}
+                discountAmount={activeTotals.discountAmount}
+                total={activeTotals.total}
+              />
+
+              <EstimateFrequencyOptions />
+
               {errorMessage ? (
                 <section className="rounded-[28px] border border-error/20 bg-error-light px-5 py-4 text-sm text-error">
                   {errorMessage}
@@ -1102,6 +1142,11 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
             </div>
 
             <aside className="space-y-6">
+              <EstimateChecksPanel
+                status={currentStatus}
+                discountAmount={activeTotals.discountAmount}
+                expiresAt={primaryEstimate?.expiresAt ?? null}
+              />
               <section className="surface-card px-5 py-5">
                 <div className="space-y-2">
                   <label className="text-sm font-semibold text-neutral-700">Notes to customer</label>
@@ -1163,14 +1208,6 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
                   ) : null}
 
                   <div className="flex items-center justify-between gap-3 text-neutral-500">
-                    <span>Subtotal</span>
-                    <CurrencyDisplay value={activeTotals.subtotal} showCents />
-                  </div>
-                  <div className="mt-2 flex items-center justify-between gap-3 text-neutral-500">
-                    <span>Tax ({(taxRate * 100).toFixed(2)}%)</span>
-                    <CurrencyDisplay value={activeTotals.taxAmount} showCents />
-                  </div>
-                  <div className="mt-2 flex items-center justify-between gap-3 text-neutral-500">
                     <span>Discount</span>
                     {isEditable ? (
                       <input
@@ -1189,19 +1226,12 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
                   </div>
                 </div>
 
-                <div className="mt-4 border-t border-neutral-200 pt-4">
-                  <div className="flex items-center justify-between gap-3 text-base font-semibold text-neutral-900">
-                    <span>Total</span>
-                    <CurrencyDisplay value={activeTotals.total} showCents className="text-2xl" />
-                  </div>
-                </div>
-
                 <div className="mt-5 space-y-3">
                   {isEditable ? (
                     <>
                       <button
                         type="button"
-                        disabled={!anchorTier?.estimateId || saveState === "saving"}
+                        disabled={!canSendEstimate({ hasEstimateId: Boolean(anchorTier?.estimateId), isDirty, saveState })}
                         onClick={() => setSendModalOpen(true)}
                         className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-brand-accent px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-primary disabled:cursor-not-allowed disabled:opacity-50"
                       >
@@ -1346,7 +1376,7 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
         customerPhone={customerDetailQuery.data?.customer.phone ?? null}
         estimateNumber={anchorTier?.estimateNumber ?? "DRAFT"}
         publicUrl={anchorPublicUrl}
-        defaultMessage={`Hi ${customerDetailQuery.data?.customer.firstName ?? ""}, here is your ServiceRev estimate. Review and approve here: {{link}}`}
+        defaultMessage={`Hi ${customerDetailQuery.data?.customer.firstName ?? ""}, here is your Renvani estimate. Review and approve here: {{link}}`}
         isPending={false}
         onSend={sendEstimateToCustomer}
       />

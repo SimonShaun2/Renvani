@@ -4,7 +4,7 @@ export interface PageMeta {
 }
 
 const DEFAULT_META: PageMeta = {
-  title: "ServiceRev",
+  title: "Renvani",
   subtitle: "Thinner system. Smarter brain."
 };
 
@@ -49,6 +49,13 @@ const STATIC_PAGE_META: Array<{ prefix: string; meta: PageMeta }> = [
     meta: {
       title: "Invoices",
       subtitle: "Send, collect, and recover revenue in one flow."
+    }
+  },
+  {
+    prefix: "/payments",
+    meta: {
+      title: "Payments",
+      subtitle: "Collections, payouts, and disputes at a glance."
     }
   },
   {

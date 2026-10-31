@@ -34,6 +34,10 @@
       "types": "./dist/import-notes-map.d.ts",
       "import": "./dist/import-notes-map.js"
     },
+    "./import-service-agreements-map": {
+      "types": "./dist/import-service-agreements-map.d.ts",
+      "import": "./dist/import-service-agreements-map.js"
+    },
     "./import-communications-presets": {
       "types": "./dist/import-communications-presets.d.ts",
       "import": "./dist/import-communications-presets.js"

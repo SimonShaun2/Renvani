@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { publicEnv } from "@fsm/config";
+import { API_BASE_URL } from "@/src/lib/api-base-url";
 import type {
   AutoFitResponse,
   ConfirmBookingRequestInput,
@@ -11,8 +11,9 @@ import type {
   CreateJobInput
 } from "@fsm/types";
 
-import { api } from "@/src/lib/api";
-import { getAuthToken } from "@/src/lib/auth";
+import { api, resolveBearerToken } from "@/src/lib/api";
+import { assignAndScheduleJob } from "@/src/lib/dispatch-actions";
+import { useDispatchStore } from "@/src/stores/dispatch.store";
 import type { UnscheduledJobListItem } from "@/src/hooks/dashboard.hooks";
 
 interface PaginatedResponse<TItem> {
@@ -120,40 +121,44 @@ async function invalidateDispatchQueries(queryClient: ReturnType<typeof useQuery
 
 export function useDispatchView(date: string) {
   const queryClient = useQueryClient();
-  const [streamLive, setStreamLive] = useState(true);
+  const [streamLive, setStreamLiveState] = useState(true);
+  const setStreamLive = useDispatchStore((state) => state.setStreamLive);
 
   useEffect(() => {
-    const token = getAuthToken();
-    if (!token) {
-      setStreamLive(false);
-      return;
-    }
-
-    const params = new URLSearchParams({
-      date,
-      access_token: token
-    });
-    const streamUrl = `${publicEnv.NEXT_PUBLIC_API_URL}/api/v1/dispatch/stream?${params.toString()}`;
-    const eventSource = new EventSource(streamUrl);
-
-    eventSource.onopen = () => {
-      setStreamLive(true);
+    let cancelled = false;
+    let eventSource: EventSource | null = null;
+    const update = (live: boolean) => {
+      if (cancelled) return;
+      setStreamLiveState(live);
+      setStreamLive(live);
     };
 
-    eventSource.addEventListener("ping", () => {
-      void invalidateDispatchQueries(queryClient);
-    });
+    // Same precedence as apiFetch: Clerk session token first, legacy JWT as fallback.
+    void resolveBearerToken().then(({ token }) => {
+      if (cancelled) return;
+      if (!token || typeof EventSource === "undefined") {
+        update(false);
+        return;
+      }
 
-    eventSource.onerror = () => {
-      setStreamLive(false);
-      eventSource.close();
-    };
+      const params = new URLSearchParams({ date, access_token: token });
+      eventSource = new EventSource(`${API_BASE_URL}/api/v1/dispatch/stream?${params.toString()}`);
+      eventSource.onopen = () => update(true);
+      eventSource.addEventListener("ping", () => {
+        void invalidateDispatchQueries(queryClient);
+      });
+      eventSource.onerror = () => {
+        update(false);
+        eventSource?.close();
+      };
+    });
 
     return () => {
-      setStreamLive(false);
-      eventSource.close();
+      update(false);
+      cancelled = true;
+      eventSource?.close();
     };
-  }, [date, queryClient]);
+  }, [date, queryClient, setStreamLive]);
 
   return useQuery({
     queryKey: ["dispatch", date],
@@ -168,13 +173,9 @@ export function useScheduleJob() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ jobId, technicianId, scheduledStart, scheduledEnd }: ScheduleBoardJobInput) =>
-      api.patch<{ job: JobDetail }>(`/api/v1/jobs/${jobId}`, {
-        technicianId,
-        scheduledStart,
-        scheduledEnd
-      }),
-    onSuccess: async () => {
+    mutationFn: (input: ScheduleBoardJobInput) => assignAndScheduleJob(api, input),
+    // Refresh on failure too: a half-applied assign must not leave the job looking unassigned.
+    onSettled: async () => {
       await invalidateDispatchQueries(queryClient);
     }
   });

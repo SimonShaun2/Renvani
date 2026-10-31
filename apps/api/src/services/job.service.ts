@@ -19,6 +19,7 @@ import {
 import { aiQueue } from "@fsm/jobs";
 
 import { enqueuePostJobLoyaltyReminderEvaluation } from "./loyalty-reminder-post-job.service.js";
+import { enqueueServiceJobBriefAfterSchedule } from "./service-job-brief-post-schedule.service.js";
 import {
   AppError,
   ErrorCode,
@@ -42,6 +43,8 @@ import {
 } from "@fsm/types";
 
 import { generateJobNumber } from "../lib/job-number.js";
+import { assertActiveCrewInTransaction } from "./crews/crews.service.js";
+import { insertJobProductInTransaction } from "./job-products.service.js";
 import { runTenantAwareTransaction } from "../lib/company-scoped-transaction.js";
 import { enforceJobCreationPlanLimit } from "../lib/plan-usage-limits.js";
 import {
@@ -303,7 +306,9 @@ function normalizeCreateJobInput(input: CreateJobInput) {
     tags: normalizeStringArray(input.tags) ?? [],
     scheduledStart,
     scheduledEnd,
-    scheduledDurationMinutes: calculateDurationMinutes(scheduledStart, scheduledEnd)
+    scheduledDurationMinutes: calculateDurationMinutes(scheduledStart, scheduledEnd),
+    products: input.products ?? [],
+    crewId: input.crewId
   };
 }
 
@@ -342,9 +347,12 @@ function normalizeCompleteJobInput(input: CompleteJobInput) {
 }
 
 function normalizeAddNoteInput(input: AddNoteInput) {
+  const noteKind = input.noteKind ?? (input.isInternal === false ? "field" : "internal");
+  const isInternal = noteKind === "field" ? false : (input.isInternal ?? true);
   return {
     content: input.content.trim(),
-    isInternal: input.isInternal ?? true
+    noteKind,
+    isInternal
   };
 }
 
@@ -858,6 +866,10 @@ export async function createJob(
       await getTechnicianRecord(companyId, normalizedInput.technicianId, tx);
     }
 
+    if (normalizedInput.crewId) {
+      await assertActiveCrewInTransaction(tx, companyId, normalizedInput.crewId);
+    }
+
     const jobNumber = await generateJobNumber(companyId, tx);
     const insertedJobs = await tx
       .insert(jobs)
@@ -877,6 +889,7 @@ export async function createJob(
         scheduledEnd: normalizedInput.scheduledEnd,
         scheduledDurationMinutes: normalizedInput.scheduledDurationMinutes,
         tags: normalizedInput.tags,
+        crewId: normalizedInput.crewId ?? null,
         jobNumber
       })
       .returning();
@@ -884,6 +897,10 @@ export async function createJob(
 
     if (!createdJob) {
       throw new AppError(ErrorCode.INTERNAL_ERROR, "Failed to create job");
+    }
+
+    for (const product of normalizedInput.products) {
+      await insertJobProductInTransaction(tx, companyId, createdJob, actorId, product);
     }
 
     await emitJobEvent(
@@ -1228,6 +1245,20 @@ export async function scheduleJob(
   });
 
   await invalidateDispatchDates(companyId, existingJob.scheduledStart, updatedJob.scheduledStart);
+
+  try {
+    await enqueueServiceJobBriefAfterSchedule({
+      companyId,
+      jobId: updatedJob.id,
+      resourceVersion: updatedJob.updatedAt.toISOString()
+    });
+  } catch (error) {
+    logger.warn(
+      { err: error, companyId, jobId: updatedJob.id },
+      "Failed to enqueue service job brief build"
+    );
+  }
+
   return updatedJob;
 }
 
@@ -1393,6 +1424,7 @@ export async function addNote(
         jobId: existingJob.id,
         authorId: actorId,
         content: normalizedInput.content,
+        noteKind: normalizedInput.noteKind,
         isInternal: normalizedInput.isInternal
       })
       .returning();

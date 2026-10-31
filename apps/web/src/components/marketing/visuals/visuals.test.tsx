@@ -102,17 +102,20 @@ describe("PricingSection", () => {
   });
 });
 
-describe("booking fee", () => {
-  it("shows the $1.99 online-booking checkout fee on pricing", () => {
-    const pricing = pricingFromSection(FALLBACK_HOME_PRICING.find((s) => s.page === "pricing" && s.sectionKey === "plans"))!;
-    render(<PricingSection pricing={pricing} />);
-    expect(screen.getByTestId("booking-fee").textContent).toMatch(/\$1\.99 booking fee on online bookings, paid at checkout/);
+describe("no booking fee", () => {
+  it("pricing shows plan Service Fee copy only, never a $1.99 booking fee", () => {
+    for (const key of [["pricing", "plans"], ["home", "pricing"]] as const) {
+      const pricing = pricingFromSection(FALLBACK_HOME_PRICING.find((s) => s.page === key[0] && s.sectionKey === key[1]))!;
+      const { container, unmount } = render(<PricingSection pricing={pricing} />);
+      expect(container.textContent).not.toMatch(/1\.99|booking fee/i);
+      expect(screen.queryByTestId("booking-fee")).toBeNull();
+      expect(container.textContent).toContain("No Service Fee");
+      unmount();
+    }
   });
 
-  it("falls back to the default $1.99 booking fee when the CMS omits it", () => {
-    const pricing = pricingFromSection(FALLBACK_HOME_PRICING.find((s) => s.page === "home" && s.sectionKey === "pricing"))!;
-    render(<PricingSection pricing={{ ...pricing, bookingFee: undefined }} />);
-    expect(screen.getByTestId("booking-fee").textContent).toContain("$1.99");
+  it("CMS snapshot has no booking fee mention", () => {
+    expect(JSON.stringify(FALLBACK_HOME_PRICING)).not.toMatch(/1\.99|booking fee/i);
   });
 });
 
@@ -121,14 +124,13 @@ describe("SectionBlock", () => {
     const section = mapSection({
       fieldData: {
         page: "industries/hvac", "section-key": "hero", headline: "[Copy: HVAC headline]",
-        eyebrow: "HVAC", subhead: "Platform fee (5%) on agreements", "review-notes": "SECRET EDITOR NOTE",
+        eyebrow: "HVAC", subhead: "Service Fee (2%, paid by customer) on agreements", "review-notes": "SECRET EDITOR NOTE",
         items: "Tune-ups — Emailed [Copy: value]\nAgreements — Offered after the visit"
       }
     })!;
     const { container } = render(<SectionBlock section={section} />);
     expect(container.textContent).not.toContain("SECRET EDITOR NOTE");
     expect(container.textContent).toContain("Service Fee (2%, paid by customer)");
-    expect(container.textContent).not.toContain("Platform fee");
     expect(container.textContent).not.toMatch(/\[Copy:|TODO/);
     expect(container.querySelector("[data-todo]")).toBeNull();
     expect(container.textContent).toContain("Agreements — Offered after the visit");
@@ -160,7 +162,7 @@ describe("SectionBlock", () => {
     for (const section of [...FALLBACK_HOME_PRICING, ...STATIC_PRODUCT_SECTIONS]) {
       const { container, unmount } = render(<SectionBlock section={section} />);
       expect(container.textContent).not.toMatch(/Items = remaining Figma text/);
-      expect(container.textContent).not.toMatch(/Platform fee \(5%/);
+      expect(container.textContent).not.toMatch(/platform fee/i);
       expect(container.textContent).not.toMatch(/service fusion|servicetitan|housecall/i);
       unmount();
     }

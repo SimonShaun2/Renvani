@@ -1,7 +1,6 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { publicEnv } from "@fsm/config";
 import type {
   ColumnMapping,
   ImportSessionIngestStatus,
@@ -9,8 +8,7 @@ import type {
 } from "@fsm/types";
 
 import type { CustomerListRecord } from "@/src/hooks/customers.hooks";
-import { clearBrowserAuthSession, getAuthToken } from "@/src/lib/auth";
-import { api, ApiError, type ApiErrorPayload } from "@/src/lib/api";
+import { api, ApiError, authorizedFetch, type ApiErrorPayload } from "@/src/lib/api";
 
 export interface ImportSessionRecord {
   id: string;
@@ -67,29 +65,9 @@ function parseError(responseText: string): ApiErrorPayload {
 
 async function uploadImportFile(file: File): Promise<ImportSessionResponse> {
   const formData = new FormData();
-  const token = getAuthToken();
-
   formData.append("file", file);
 
-  const requestHeaders = token
-    ? {
-        Authorization: `Bearer ${token}`
-      }
-    : null;
-  const uploadResponse = await fetch(`${publicEnv.NEXT_PUBLIC_API_URL}/api/v1/imports`, {
-    method: "POST",
-    body: formData,
-    credentials: "include",
-    ...(requestHeaders ? { headers: requestHeaders } : {})
-  });
-
-  if (uploadResponse.status === 401) {
-    clearBrowserAuthSession();
-
-    if (typeof window !== "undefined") {
-      window.location.assign("/login");
-    }
-  }
+  const uploadResponse = await authorizedFetch("/api/v1/imports", { method: "POST", body: formData });
 
   if (!uploadResponse.ok) {
     throw new ApiError(uploadResponse.status, parseError(await uploadResponse.text()));
@@ -158,6 +136,19 @@ export function useImportErrors(importSessionId: string | null, enabled = true) 
     queryKey: importSessionId ? importKeys.errors(importSessionId) : importKeys.errors("pending"),
     queryFn: () => api.get<ImportErrorsResponse>(`/api/v1/imports/${importSessionId}/errors`),
     enabled: enabled && Boolean(importSessionId)
+  });
+}
+
+export interface ImportSessionListResponse {
+  data: ImportSessionRecord[];
+  total?: number;
+}
+
+export function useImportSessions(limit = 20, enabled = true) {
+  return useQuery({
+    queryKey: [...importKeys.all, "list", limit] as const,
+    enabled,
+    queryFn: () => api.get<ImportSessionListResponse>(`/api/v1/imports?page=1&limit=${limit}`)
   });
 }
 

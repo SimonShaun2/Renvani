@@ -9,6 +9,12 @@ import {
   maintenanceVisits
 } from "@fsm/db";
 
+import {
+  DEFAULT_RECURRING_OCCURRENCE_HORIZON,
+  ensureRecurringVisitSeriesForMaintenancePlan,
+  generateRecurringVisitOccurrences
+} from "./recurring-visit-series.service.js";
+
 type BookingRequestRow = typeof bookingRequests.$inferSelect;
 type RecurringScheduleJobContext = {
   id: string;
@@ -146,6 +152,19 @@ export async function attachConfirmedBookingToRecurringSchedules(
       updatedAt: new Date()
     })
     .where(and(eq(maintenancePlans.companyId, companyId), eq(maintenancePlans.id, plan.id)));
+
+  const series = await ensureRecurringVisitSeriesForMaintenancePlan(
+    companyId,
+    plan,
+    visit,
+    executor
+  );
+  await generateRecurringVisitOccurrences(
+    companyId,
+    series.id,
+    DEFAULT_RECURRING_OCCURRENCE_HORIZON,
+    executor
+  );
 
   await emitEventWithExecutor(executor, {
     companyId,

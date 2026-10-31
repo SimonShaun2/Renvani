@@ -1,3 +1,4 @@
+import { buildOpeningHours, type SiteTradeConfig } from "@/src/components/growth/site-trade.registry";
 import type { PublicBookingSettingsRecord } from "@/src/hooks/booking.hooks";
 
 export interface BrandedServiceCard {
@@ -30,19 +31,22 @@ export interface BrandedStorefrontViewModel {
 
 export interface LocalBusinessJsonLd {
   "@context": "https://schema.org";
-  "@type": "LocalBusiness";
+  "@type": string;
   name: string;
   description: string;
   url: string;
   telephone?: string;
   areaServed: string[];
+  openingHoursSpecification?: ReturnType<typeof buildOpeningHours>;
+  aggregateRating?: { "@type": "AggregateRating"; ratingValue: number; reviewCount: number };
 }
 
-const CLEANING_FALLBACK_CARDS: BrandedServiceCard[] = [
-  { id: "standard", title: "Standard clean", subtitle: "from $129" },
-  { id: "deep", title: "Deep clean", subtitle: "from $219" },
-  { id: "move", title: "Move-in / move-out", subtitle: "from $289" },
-  { id: "recurring", title: "Recurring", subtitle: "save 10%" }
+/** Generic home-services cards (HVAC, plumbing, electrical) shown until the shop lists its services. */
+const HOME_SERVICES_FALLBACK_CARDS: BrandedServiceCard[] = [
+  { id: "hvac", title: "Heating & cooling repair", subtitle: "Diagnostic visit" },
+  { id: "plumbing", title: "Plumbing repair", subtitle: "Diagnostic visit" },
+  { id: "electrical", title: "Electrical repair", subtitle: "Diagnostic visit" },
+  { id: "tune-up", title: "Seasonal tune-up", subtitle: "Tune-up visit" }
 ];
 
 function readServiceLabel(service: Record<string, unknown>): string | null {
@@ -121,7 +125,7 @@ export function buildServiceCards(offeredServices: Array<Record<string, unknown>
   }
 
   if (cards.length === 0) {
-    return CLEANING_FALLBACK_CARDS;
+    return HOME_SERVICES_FALLBACK_CARDS;
   }
 
   return cards.slice(0, 4);
@@ -145,10 +149,10 @@ export function buildBrandedStorefrontViewModel(
   settings: PublicBookingSettingsRecord,
   options?: { staffPreviewLine?: string }
 ): BrandedStorefrontViewModel {
-  const companyName = settings.companyName.trim() || "Your cleaning team";
+  const companyName = settings.companyName.trim() || "Your service team";
   const tagline =
     settings.tagline?.trim() ||
-    "Instant prices, real crew availability, and booking in under a minute. Same trusted crew every visit.";
+    "Instant prices, real tech availability, and booking in under a minute. Same trusted tech every visit.";
   const serviceAreaZips = settings.serviceAreaZipCodes ?? [];
 
   return {
@@ -175,17 +179,30 @@ export function buildInquirePath(slug: string, source = BRANDED_ACQUISITION_SOUR
   return `/site/${encodeURIComponent(slug)}/inquire?${query.toString()}`;
 }
 
+export interface LocalBusinessExtras {
+  trade?: SiteTradeConfig;
+  openingHours?: ReturnType<typeof buildOpeningHours>;
+  /** Only real review data; never fabricated. The public API does not expose a rating yet. */
+  rating?: { value: number; count: number } | null;
+}
+
 export function buildLocalBusinessJsonLd(
   model: BrandedStorefrontViewModel,
-  sitePath: string
+  sitePath: string,
+  extras: LocalBusinessExtras = {}
 ): LocalBusinessJsonLd {
+  const { trade, openingHours, rating } = extras;
   return {
     "@context": "https://schema.org",
-    "@type": "LocalBusiness",
+    "@type": trade?.schemaType ?? "LocalBusiness",
     name: model.companyName,
     description: model.tagline,
     url: sitePath,
     ...(model.phone ? { telephone: model.phone } : {}),
-    areaServed: model.serviceAreaZips.length > 0 ? model.serviceAreaZips : ["Local service area"]
+    areaServed: model.serviceAreaZips.length > 0 ? model.serviceAreaZips : ["Local service area"],
+    ...(openingHours ? { openingHoursSpecification: openingHours } : {}),
+    ...(rating && rating.count > 0
+      ? { aggregateRating: { "@type": "AggregateRating" as const, ratingValue: rating.value, reviewCount: rating.count } }
+      : {})
   };
 }

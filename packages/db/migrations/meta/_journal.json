@@ -281,6 +281,118 @@
       "when": 1777713000000,
       "tag": "0039_fs160b_clerk_unlink_tombstone",
       "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1777714000000,
+      "tag": "0040_fs_migrate_service_agreements_import",
+      "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "7",
+      "when": 1777715000000,
+      "tag": "0041_fs147_price_book_line_picker",
+      "breakpoints": true
+    },
+    {
+      "idx": 42,
+      "version": "7",
+      "when": 1792716506137,
+      "tag": "0042_fs138_saved_card_migration",
+      "breakpoints": true
+    },
+    {
+      "idx": 43,
+      "version": "7",
+      "when": 1792716506138,
+      "tag": "0043_payments_service_fee_booking_fee",
+      "breakpoints": true
+    },
+    {
+      "idx": 44,
+      "version": "7",
+      "when": 1792716506139,
+      "tag": "0044_fs170_inventory",
+      "breakpoints": true
+    },
+    {
+      "idx": 45,
+      "version": "7",
+      "when": 1792716506140,
+      "tag": "0045_fs171_timesheets_payroll",
+      "breakpoints": true
+    },
+    {
+      "idx": 46,
+      "version": "7",
+      "when": 1792716506141,
+      "tag": "0046_fs171_open_time_entry_unique",
+      "breakpoints": true
+    },
+    {
+      "idx": 47,
+      "version": "7",
+      "when": 1792717000000,
+      "tag": "0047_fs59_recurring_visit_series",
+      "breakpoints": true
+    },
+    {
+      "idx": 48,
+      "version": "7",
+      "when": 1792718000000,
+      "tag": "0048_fs59_recurring_visit_rls_unique",
+      "breakpoints": true
+    },
+    {
+      "idx": 49,
+      "version": "7",
+      "when": 1792719000000,
+      "tag": "0049_fs25_service_agent_job_brief",
+      "breakpoints": true
+    },
+    {
+      "idx": 50,
+      "version": "7",
+      "when": 1792720000000,
+      "tag": "0050_fs15_integration_outbox_audit",
+      "breakpoints": true
+    },
+    {
+      "idx": 51,
+      "version": "7",
+      "when": 1792721000000,
+      "tag": "0051_fs15_outbox_kind_registry",
+      "breakpoints": true
+    },
+    {
+      "idx": 52,
+      "version": "7",
+      "when": 1792722000000,
+      "tag": "0052_fs199_stripe_disputes",
+      "breakpoints": true
+    },
+    {
+      "idx": 53,
+      "version": "7",
+      "when": 1792723000000,
+      "tag": "0053_fs195_crews",
+      "breakpoints": true
+    },
+    {
+      "idx": 54,
+      "version": "7",
+      "when": 1792724000000,
+      "tag": "0054_growth_lead_attribution",
+      "breakpoints": true
+    },
+    {
+      "idx": 55,
+      "version": "7",
+      "when": 1792725000000,
+      "tag": "0055_growth_marketing_intake",
+      "breakpoints": true
     }
   ]
 }

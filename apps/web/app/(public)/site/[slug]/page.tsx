@@ -7,6 +7,8 @@ import {
   buildBrandedStorefrontViewModel,
   buildLocalBusinessJsonLd
 } from "@/src/components/growth/branded-storefront.utils";
+import { buildOpeningHours, buildSiteMetadataCopy } from "@/src/components/growth/site-trade.registry";
+import { resolveSiteTradeFromSettings } from "@/src/components/growth/site-trade.from-settings";
 import { fetchPublicBookingSettingsBySlug } from "@/src/lib/public-booking-server";
 
 export async function generateMetadata({
@@ -21,23 +23,14 @@ export async function generateMetadata({
     return { title: "Business not found" };
   }
 
-  const title = `${settings.companyName} · Residential cleaning`;
-  const description =
-    settings.tagline ??
-    `${settings.companyName} — book online or send a direct inquiry. Local SEO-ready storefront powered by Renvani.`;
+  const { title, description, keywords } = buildSiteMetadataCopy(settings);
 
   return {
     title,
     description,
     openGraph: { title, description, type: "website" },
     robots: { index: true, follow: true },
-    keywords: [
-      "residential cleaning",
-      settings.companyName,
-      "house cleaning",
-      "book cleaning online",
-      "local cleaning service"
-    ]
+    keywords
   };
 }
 
@@ -51,7 +44,10 @@ export default async function BrandedWebsitePage({ params }: { params: Promise<{
 
   const model = buildBrandedStorefrontViewModel(settings);
   const sitePath = `/site/${slug}`;
-  const jsonLd = buildLocalBusinessJsonLd(model, sitePath);
+  const jsonLd = buildLocalBusinessJsonLd(model, sitePath, {
+    trade: resolveSiteTradeFromSettings(settings),
+    openingHours: buildOpeningHours(settings)
+  });
 
   return (
     <>

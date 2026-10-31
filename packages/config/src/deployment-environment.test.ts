@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  assertStripeLiveKeyAllowed,
   integrationProfileForTier,
   parseEnvFile,
   resolveDeploymentTier,
@@ -76,5 +77,41 @@ STRIPE_SECRET_KEY="sk_test_x"
 `);
     expect(parsed.RENVANI_DEPLOYMENT_TIER).toBe("staging");
     expect(parsed.STRIPE_SECRET_KEY).toBe("sk_test_x");
+  });
+});
+
+describe("assertStripeLiveKeyAllowed (boot guard)", () => {
+  // Built at runtime so push protection does not flag fixture strings.
+  const live = ["sk", "live", "x".repeat(24)].join("_");
+  const testKey = ["sk", "test", "x".repeat(24)].join("_");
+  it("allows sk_test in non-prod", () => {
+    expect(() => assertStripeLiveKeyAllowed({ STRIPE_SECRET_KEY: testKey })).not.toThrow();
+    expect(() =>
+      assertStripeLiveKeyAllowed({ STRIPE_SECRET_KEY: testKey, RENVANI_DEPLOYMENT_TIER: "staging" })
+    ).not.toThrow();
+  });
+  it("throws for sk_live in non-prod (unset tier fails closed) without leaking the key", () => {
+    for (const tier of [undefined, "", "development", "staging"]) {
+      let message = "";
+      try {
+        assertStripeLiveKeyAllowed({ STRIPE_SECRET_KEY: live, RENVANI_DEPLOYMENT_TIER: tier });
+      } catch (error) {
+        message = (error as Error).message;
+      }
+      expect(message).toMatch(/Refusing to start/);
+      expect(message).not.toContain(live);
+    }
+  });
+  it("throws for sk_live with an invalid tier", () => {
+    expect(() => assertStripeLiveKeyAllowed({ STRIPE_SECRET_KEY: live, RENVANI_DEPLOYMENT_TIER: "prod" })).toThrow();
+  });
+  it("allows sk_live in production", () => {
+    expect(() =>
+      assertStripeLiveKeyAllowed({ STRIPE_SECRET_KEY: live, RENVANI_DEPLOYMENT_TIER: "production" })
+    ).not.toThrow();
+  });
+  it("leaves unset key behaviour unchanged", () => {
+    expect(() => assertStripeLiveKeyAllowed({})).not.toThrow();
+    expect(() => assertStripeLiveKeyAllowed({ STRIPE_SECRET_KEY: "" })).not.toThrow();
   });
 });

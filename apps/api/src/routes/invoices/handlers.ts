@@ -17,6 +17,7 @@ import type {
 import {
   createInvoice,
   getInvoice,
+  getInvoiceChargePreview,
   listInvoices,
   recordPayment,
   resendInvoiceReminder,
@@ -72,6 +73,11 @@ function toPaymentResponse(payment: Payment) {
     customerId: payment.customerId,
     collectedById: payment.collectedById,
     amount: payment.amount,
+    serviceFeeAmount: payment.serviceFeeAmount,
+    bookingFeeAmount: payment.bookingFeeAmount,
+    feeRefundable: payment.feeRefundable,
+    amountRefunded: payment.amountRefunded,
+    refundableAmount: payment.refundableAmount,
     method: payment.method,
     status: payment.status,
     stripePaymentIntentId: payment.stripePaymentIntentId,
@@ -95,6 +101,8 @@ function toInvoiceListItemResponse(invoice: InvoiceListItem) {
     total: invoice.total,
     amountPaid: invoice.amountPaid,
     balanceDue: invoice.balanceDue,
+    serviceFeeAmount: invoice.serviceFeeAmount ?? "0.00",
+    bookingFeeAmount: invoice.bookingFeeAmount ?? "0.00",
     dueAt: toIsoString(invoice.dueAt),
     paidAt: toIsoString(invoice.paidAt),
     customer: invoice.customer,
@@ -115,6 +123,8 @@ function toInvoiceDetailResponse(invoice: InvoiceDetail) {
     total: invoice.total,
     amountPaid: invoice.amountPaid,
     balanceDue: invoice.balanceDue,
+    serviceFeeAmount: invoice.serviceFeeAmount ?? "0.00",
+    bookingFeeAmount: invoice.bookingFeeAmount ?? "0.00",
     issuedAt: toIsoString(invoice.issuedAt),
     sentAt: toIsoString(invoice.sentAt),
     dueAt: toIsoString(invoice.dueAt),
@@ -152,6 +162,11 @@ export async function createInvoiceHandler(request: FastifyRequest, reply: Fasti
   return reply.status(201).send({
     invoice: toInvoiceDetailResponse(detail)
   });
+}
+
+export async function getInvoiceChargePreviewHandler(request: FastifyRequest, reply: FastifyReply): Promise<FastifyReply> {
+  const params = request.params as InvoiceIdParams;
+  return reply.send(await getInvoiceChargePreview(request.company.id, params.id));
 }
 
 export async function getInvoiceHandler(request: FastifyRequest, reply: FastifyReply): Promise<FastifyReply> {

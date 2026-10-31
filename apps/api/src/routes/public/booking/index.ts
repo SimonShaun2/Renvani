@@ -48,9 +48,33 @@ import {
   publicSlotHoldRouteSchema,
   submitBookingRouteSchema,
   submitBookingValidation,
+  servesZipRouteSchema,
+  servesZipValidation,
   zipCheckRouteSchema,
   zipCheckValidation
 } from "./schemas.js";
+import { hitFixedWindowRateLimit, normalizeRateLimitIp } from "../../../lib/fixed-window-rate-limit.js";
+import { publicServesZip } from "../../../services/company-home-services.service.js";
+
+/** Per-IP limit for the public "do you serve my ZIP?" check (stops ZIP-list enumeration). */
+export const PUBLIC_SERVES_ZIP_IP_RATE_LIMIT = 30;
+export const PUBLIC_SERVES_ZIP_WINDOW_MS = 60_000;
+
+async function servesZipRateLimit(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+  const result = await hitFixedWindowRateLimit({
+    key: `fsm:public:serves-zip:ip:${normalizeRateLimitIp(request.ip)}`,
+    limit: PUBLIC_SERVES_ZIP_IP_RATE_LIMIT,
+    windowMs: PUBLIC_SERVES_ZIP_WINDOW_MS
+  });
+  if (!result.allowed) {
+    reply.header("Retry-After", String(result.retryAfterSeconds));
+    await reply.status(429).send({
+      error: "RATE_LIMITED",
+      message: "Too many ZIP checks. Please try again later.",
+      requestId: request.id
+    });
+  }
+}
 
 async function bookingRateLimit(request: FastifyRequest, reply: FastifyReply): Promise<void> {
   if (request.method !== "POST") {
@@ -146,6 +170,15 @@ const publicBookingRoutes: FastifyPluginAsync = async (fastify) => {
     preValidation: [bookingRateLimit, zipCheckValidation],
     schema: zipCheckRouteSchema
   }, checkZipCoverageHandler);
+
+  fastify.post("/:slug/serves-zip", {
+    preValidation: [servesZipRateLimit, servesZipValidation],
+    schema: servesZipRouteSchema
+  }, async (request, reply) => {
+    const { slug } = request.params as { slug: string };
+    const { zip } = request.body as { zip: string };
+    return reply.send(await publicServesZip(slug, zip));
+  });
 
   fastify.post("/:slug/email-capture", {
     preValidation: [bookingRateLimit, emailCaptureValidation],

@@ -12,6 +12,7 @@ import {
   properties,
   softDeleteCommunicationsImport,
   softDeleteNotesImport,
+  softDeleteServiceAgreementsImport,
   softDeletePriceBookImport
 } from "@fsm/db";
 import { importsQueue } from "@fsm/jobs";
@@ -35,6 +36,7 @@ import {
 
 import { scheduleEquipmentImportChunksFromSessionAiInferences } from "./import-equipment-commit.service.js";
 import { scheduleMigrateFileBatchesFromSessionAiInferences } from "./import-migrate-file-batch.service.js";
+import { rollbackImportedBilling } from "./import-rollback-billing.js";
 import { scheduleImportChunkCommitsFromSessionAiInferences } from "./import-workflow-runtime.service.js";
 import { uploadCsvToR2 } from "./file-upload.service.js";
 
@@ -565,6 +567,9 @@ export async function rollbackImport(
   return db.transaction(async (tx) => {
     const now = new Date();
 
+    // Billing first: refuses (no writes) when imported invoices have payments or estimates were accepted.
+    await rollbackImportedBilling(tx, companyId, importSessionId, now);
+
     for (const snapshot of customerUpdateSnapshots) {
       await tx
         .update(customers)
@@ -675,6 +680,10 @@ export async function rollbackImport(
 
     if (importSession.entityType === "communications") {
       await softDeleteCommunicationsImport(companyId, importSessionId);
+    }
+
+    if (importSession.entityType === "service_agreements") {
+      await softDeleteServiceAgreementsImport(companyId, importSessionId);
     }
 
     const updatedSessions = await tx

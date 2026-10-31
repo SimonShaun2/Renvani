@@ -1,21 +1,11 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { publicEnv } from "@fsm/config";
 
-import { api, ApiError, type ApiErrorPayload } from "@/src/lib/api";
-import { getAuthToken } from "@/src/lib/auth";
+import { api, ApiError, authorizedFetch, type ApiErrorPayload } from "@/src/lib/api";
 
 async function postMultipart<TResponse>(path: string, formData: FormData): Promise<TResponse> {
-  const token = getAuthToken();
-  const headers: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {};
-
-  const response = await fetch(`${publicEnv.NEXT_PUBLIC_API_URL}${path}`, {
-    method: "POST",
-    body: formData,
-    credentials: "include",
-    headers
-  });
+  const response = await authorizedFetch(path, { method: "POST", body: formData });
 
   if (!response.ok) {
     let payload: ApiErrorPayload;

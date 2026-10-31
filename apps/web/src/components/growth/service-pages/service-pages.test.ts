@@ -3,7 +3,12 @@ import { describe, expect, it } from "vitest";
 import { clientKey, createFixedWindowLimiter } from "@/src/lib/inquiry-rate-limit";
 
 import { generateServiceCopy, openAiCopyProvider, toPlainText, type ServiceCopyProvider } from "./copy-providers";
-import { listServiceAreaPages, resolveServiceAreaPage, serviceAreaPath, slugifyService } from "./service-area-pages";
+import {
+  hoursChip,
+  nearbyServicePages,
+  serviceEyebrow,
+  listServiceAreaPages, resolveServiceAreaPage, serviceAreaPath, slugifyService
+} from "./service-area-pages";
 
 const settings = {
   offeredServices: [{ label: "AC Tune-up", priceHint: "from $129" }, { label: "Water heater" }],
@@ -32,7 +37,9 @@ describe("copy providers", () => {
     const copy = await generateServiceCopy(input, env({}));
     expect(copy.provider).toBe("template");
     expect(copy.headline).toBe("AC Tune-up in 78704");
-    expect(copy.bullets).toContain("Pricing: from $129");
+    expect(copy.intro).toBe(
+      "Need ac tune-up in 78704? Summit sends a licensed tech to homes across 78704 with clear, upfront pricing. Pick a time online and get your confirmation by email."
+    );
   });
 
   it("keeps the OpenAI adapter disabled without both key and approval", () => {
@@ -61,7 +68,30 @@ describe("inquiry rate limit", () => {
     expect(limiter.check("a", 1001).ok).toBe(true);
   });
 
-  it("keys by first forwarded IP", () => {
-    expect(clientKey(new Headers({ "x-forwarded-for": "1.2.3.4, 10.0.0.1" }))).toBe("1.2.3.4");
+  it("keys by the edge-set IP, never a spoofable left-most forwarded value", () => {
+    expect(clientKey(new Headers({ "x-vercel-forwarded-for": "9.9.9.9", "x-forwarded-for": "1.1.1.1, 9.9.9.9" }))).toBe("9.9.9.9");
+    expect(clientKey(new Headers({ "x-real-ip": "8.8.8.8", "x-forwarded-for": "1.1.1.1" }))).toBe("8.8.8.8");
+    expect(clientKey(new Headers({ "x-forwarded-for": "6.6.6.6, 10.0.0.1" }))).toBe("10.0.0.1");
+    expect(clientKey(new Headers())).toBe("unknown");
+  });
+});
+
+describe("155:79 page helpers", () => {
+  it("lists other services in the same ZIP as nearby", () => {
+    expect(nearbyServicePages(settings, { serviceSlug: "ac-tune-up", area: "78704" }).map((p) => p.serviceSlug)).toEqual([
+      "water-heater"
+    ]);
+  });
+
+  it("builds the eyebrow from the first service-area name when present", () => {
+    expect(serviceEyebrow("Summit", { serviceAreaNames: ["Austin", "Round Rock"] })).toBe("Summit · Austin");
+    expect(serviceEyebrow("Summit", {})).toBe("Summit");
+  });
+
+  it("collapses booking days into an hours chip", () => {
+    const base = { availableHoursStart: 7, availableHoursEnd: 18 };
+    expect(hoursChip({ ...base, availableDays: ["mon", "tue", "wed", "thu", "fri"] })).toBe("Mon–Fri 7am–6pm");
+    expect(hoursChip({ ...base, availableDays: ["mon", "wed", "thu", "sat"] })).toBe("Mon, Wed–Thu, Sat 7am–6pm");
+    expect(hoursChip({ ...base, availableDays: [] })).toBeNull();
   });
 });

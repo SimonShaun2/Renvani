@@ -46,6 +46,7 @@ export type StatusTone = "approval" | "escalated" | "stale" | "neutral";
 /** Status pill per inbox state (10:107 Needs approval, 10:123 Escalated, 10:155 Stale version). */
 export const ITEM_STATUS: Record<string, { label: string; tone: StatusTone; exception: boolean }> = {
   awaiting_approval: { label: "Needs approval", tone: "approval", exception: false },
+  approved: { label: "Ready to execute", tone: "neutral", exception: false },
   escalated: { label: "Escalated", tone: "escalated", exception: true },
   failed: { label: "Failed", tone: "escalated", exception: true },
   stale: { label: "Stale version", tone: "stale", exception: true }
@@ -73,6 +74,8 @@ export function needsYouCounts(items: Pick<OperatorInboxItem, "state">[]) {
   }
   return { approvals, exceptions };
 }
+
+export const NEUTRAL_GREETING = "Hello,";
 
 export function greetingFor(hour: number): string {
   if (hour < 12) return "Good morning,";

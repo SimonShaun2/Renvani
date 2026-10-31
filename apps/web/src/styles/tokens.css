@@ -42,4 +42,8 @@
   --color-mkt-blue: #2b4acb;
   --color-mkt-blue-soft: #e5eafb;
   --color-mkt-line: #e6dccb;
+  /* Figma 171:2 "11 Website" */
+  --color-mkt-ink2: #2a3360;
+  --color-mkt-sand: #f3eadc;
+  --color-mkt-panel: #f6f7f9;
 }

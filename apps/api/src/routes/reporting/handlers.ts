@@ -1,8 +1,9 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 
-import type { JobSourceReportingQuery } from "@fsm/types";
+import type { JobSourceReportingQuery, RevenueOutcomesQuery } from "@fsm/types";
 
 import { getDirectDemandSummary, getJobSourceReportingSummary } from "../../services/job-source-reporting.service.js";
+import { getRevenueOutcomesSummary } from "../../services/revenue-outcomes.service.js";
 
 export async function getJobSourceReportingHandler(
   request: FastifyRequest,
@@ -24,6 +25,16 @@ export async function getDirectDemandHandler(
 ): Promise<FastifyReply> {
   const query = request.query as Pick<JobSourceReportingQuery, "startDate" | "endDate">;
   const summary = await getDirectDemandSummary(request.company.id, request.company.timezone, query);
+
+  return reply.send(summary);
+}
+
+export async function getRevenueOutcomesHandler(
+  request: FastifyRequest,
+  reply: FastifyReply
+): Promise<FastifyReply> {
+  const query = request.query as RevenueOutcomesQuery;
+  const summary = await getRevenueOutcomesSummary(request.company.id, request.company.timezone, query);
 
   return reply.send(summary);
 }

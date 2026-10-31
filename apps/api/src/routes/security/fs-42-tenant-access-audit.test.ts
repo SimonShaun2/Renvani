@@ -81,7 +81,7 @@ afterEach(async () => {
   await app.close();
 });
 
-function technicianAuth(companyId: string, userId: string, role: "technician" | "dispatcher" = "technician") {
+function technicianAuth(companyId: string, userId: string, role: "technician" | "dispatcher" | "owner" = "technician") {
   const accessToken = tokens.generateAccessToken({ userId, companyId, role });
   return `Bearer ${accessToken}`;
 }
@@ -232,6 +232,59 @@ describe("FS-42 tenant access audit", () => {
       .set("Authorization", technicianAuth(companyA.id, dispatcher.id, "dispatcher"))
       .send({ products: [{ productCatalogId: foreign.id }] });
     expect(response.status).toBe(404);
+  });
+
+  it("FS42-UNAUTH-REVENUE-OUTCOMES GET /reporting/revenue-outcomes returns 401 without credentials", async () => {
+    const response = await request(app.server)
+      .get("/api/v1/reporting/revenue-outcomes")
+      .query({ startDate: "2026-10-01", endDate: "2026-10-31" });
+    expect(response.status).toBe(401);
+  });
+
+  it("FS42-ROLE-REVENUE-OUTCOMES technician and dispatcher cannot read revenue outcomes", async () => {
+    const company = fakeDb.seedCompany({ name: "Outcomes Role Co", slug: "outcomes-role-co" });
+    for (const role of ["technician", "dispatcher"] as const) {
+      const user = fakeDb.seedUser({
+        companyId: company.id,
+        email: `${role}@outcomes-role.test`,
+        firstName: "Field",
+        lastName: "User",
+        role
+      });
+      const response = await request(app.server)
+        .get("/api/v1/reporting/revenue-outcomes")
+        .query({ startDate: "2026-10-01", endDate: "2026-10-31" })
+        .set("Authorization", technicianAuth(company.id, user.id, role));
+      expect(response.status).toBe(403);
+      expect(response.body.error).toBe("FORBIDDEN");
+    }
+  });
+
+  it("FS42-XT-REVENUE-OUTCOMES owner sees only own tenant aggregates", async () => {
+    const companyA = fakeDb.seedCompany({ name: "Outcomes A", slug: "outcomes-a" });
+    const companyB = fakeDb.seedCompany({ name: "Outcomes B", slug: "outcomes-b" });
+    const owner = fakeDb.seedUser({
+      companyId: companyA.id,
+      email: "owner@outcomes-a.test",
+      firstName: "Owner",
+      lastName: "A",
+      role: "owner"
+    });
+    const foreignCustomer = fakeDb.seedCustomer({ companyId: companyB.id, firstName: "B", lastName: "Customer" });
+    fakeDb.seedJob({
+      companyId: companyB.id,
+      customerId: foreignCustomer.id,
+      status: "paid",
+      scheduledStart: new Date("2026-10-10T15:00:00.000Z"),
+      amountPaid: "750.00"
+    } as never);
+    const response = await request(app.server)
+      .get("/api/v1/reporting/revenue-outcomes")
+      .query({ startDate: "2026-10-01", endDate: "2026-10-31" })
+      .set("Authorization", technicianAuth(companyA.id, owner.id, "owner"));
+    expect(response.status).toBe(200);
+    expect(response.body.revenue.completedRevenue).toBe("0.00");
+    expect(response.body.funnel.every((stage: { count: number }) => stage.count === 0)).toBe(true);
   });
 
   it("FS42-UNAUTH-INVOICE-CHARGE-PREVIEW GET /invoices/:id/charge-preview returns 401 without credentials", async () => {

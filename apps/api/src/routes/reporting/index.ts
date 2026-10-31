@@ -1,12 +1,14 @@
 import type { FastifyPluginAsync } from "fastify";
 
 import { requireRole } from "../../lib/authorize.js";
-import { getDirectDemandHandler, getJobSourceReportingHandler } from "./handlers.js";
+import { getDirectDemandHandler, getJobSourceReportingHandler, getRevenueOutcomesHandler } from "./handlers.js";
 import {
   directDemandRouteSchema,
   directDemandValidation,
   jobSourceReportingRouteSchema,
-  jobSourceReportingValidation
+  jobSourceReportingValidation,
+  revenueOutcomesRouteSchema,
+  revenueOutcomesValidation
 } from "./schemas.js";
 
 const ownerOrAdmin = requireRole(["owner", "admin"]);
@@ -25,6 +27,13 @@ const reportingRoutes: FastifyPluginAsync = async (fastify) => {
     preHandler: [fastify.authenticate, directDemandRoles],
     schema: directDemandRouteSchema
   }, getDirectDemandHandler);
+
+  // FS-22 Command Center: revenue outcome instrumentation (owner/admin only).
+  fastify.get("/reporting/revenue-outcomes", {
+    preValidation: [revenueOutcomesValidation],
+    preHandler: [fastify.authenticate, ownerOrAdmin],
+    schema: revenueOutcomesRouteSchema
+  }, getRevenueOutcomesHandler);
 };
 
 export default reportingRoutes;

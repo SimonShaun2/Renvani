@@ -339,4 +339,40 @@ describe("FS-42 tenant access audit", () => {
     expect(response.status).toBe(400);
     expect(response.body.error).toBe("VALIDATION_ERROR");
   });
+
+  it("FS42-UNAUTH-CALL-TRACKING GET /growth/call-tracking/calls returns 401 without credentials", async () => {
+    const response = await request(app.server).get("/api/v1/growth/call-tracking/calls");
+    expect(response.status).toBe(401);
+  });
+
+  it("FS42-ROLE-CALL-TRACKING dispatcher cannot change call tracking settings", async () => {
+    const company = fakeDb.seedCompany({ name: "Calls Role Co", slug: "calls-role-co" });
+    const dispatcher = fakeDb.seedUser({
+      companyId: company.id,
+      email: "disp@calls-role.test",
+      firstName: "Disp",
+      lastName: "User",
+      role: "dispatcher"
+    });
+    const response = await request(app.server)
+      .put("/api/v1/growth/call-tracking/settings")
+      .set("Authorization", technicianAuth(company.id, dispatcher.id, "dispatcher"))
+      .send({});
+    expect(response.status).toBe(403);
+    expect(response.body.error).toBe("FORBIDDEN");
+  });
+
+  it("FS42-XT-CALL-TRACKING cross-tenant tracking number id is 404 and unchanged", async () => {
+    const companyA = fakeDb.seedCompany({ name: "Calls A", slug: "calls-a" });
+    const companyB = fakeDb.seedCompany({ name: "Calls B", slug: "calls-b" });
+    const ownerA = fakeDb.seedUser({ companyId: companyA.id, email: "owner@calls-a.test", firstName: "O", lastName: "A", role: "owner" });
+    const numberB = fakeDb.seedCallTrackingNumber({ companyId: companyB.id, trackingNumber: "+15125550177", label: "B line" });
+    const auth = `Bearer ${tokens.generateAccessToken({ userId: ownerA.id, companyId: companyA.id, role: "owner" })}`;
+    const response = await request(app.server)
+      .patch(`/api/v1/growth/call-tracking/numbers/${numberB.id}`)
+      .set("Authorization", auth)
+      .send({ expectedVersion: 1, label: "Taken" });
+    expect(response.status).toBe(404);
+    expect(fakeDb.getTestState().callTrackingNumbers.find((n) => n.id === numberB.id)?.label).toBe("B line");
+  });
 });

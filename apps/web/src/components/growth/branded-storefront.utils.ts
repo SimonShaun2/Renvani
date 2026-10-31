@@ -152,7 +152,7 @@ export function buildBrandedStorefrontViewModel(
   const companyName = settings.companyName.trim() || "Your service team";
   const tagline =
     settings.tagline?.trim() ||
-    "Instant prices, real crew availability, and booking in under a minute. Same trusted crew every visit.";
+    "Instant prices, real tech availability, and booking in under a minute. Same trusted tech every visit.";
   const serviceAreaZips = settings.serviceAreaZipCodes ?? [];
 
   return {

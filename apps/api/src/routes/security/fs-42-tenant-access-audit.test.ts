@@ -474,4 +474,34 @@ describe("FS-42 tenant access audit", () => {
     expect(fakeDb.getGrowthCheckReportDraftRevisions()).toHaveLength(revisionsBefore);
     expect(fakeDb.getGrowthCheckReportShares()[0]?.revokedAt).toBeNull();
   });
+
+  it("FS42-XT-ESTIMATE-OPTION-SET cross-tenant option set ids are 404, write nothing, and technicians are 403", async () => {
+    const companyA = fakeDb.seedCompany({ name: "Options A", slug: "options-a" });
+    const companyB = fakeDb.seedCompany({ name: "Options B", slug: "options-b" });
+    const ownerA = fakeDb.seedUser({ companyId: companyA.id, email: "owner@options-a.test", firstName: "O", lastName: "A", role: "owner" });
+    const ownerB = fakeDb.seedUser({ companyId: companyB.id, email: "owner@options-b.test", firstName: "O", lastName: "B", role: "owner" });
+    const techB = fakeDb.seedUser({ companyId: companyB.id, email: "tech@options-b.test", firstName: "T", lastName: "B", role: "technician" });
+    const customerB = fakeDb.seedCustomer({ companyId: companyB.id, firstName: "Pat", lastName: "Doe", email: "pat@example.test", phone: "555-0109" });
+    const authA = `Bearer ${tokens.generateAccessToken({ userId: ownerA.id, companyId: companyA.id, role: "owner" })}`;
+    const authB = `Bearer ${tokens.generateAccessToken({ userId: ownerB.id, companyId: companyB.id, role: "owner" })}`;
+    const authTechB = `Bearer ${tokens.generateAccessToken({ userId: techB.id, companyId: companyB.id, role: "technician" })}`;
+    const items = [{ name: "Panel upgrade", quantity: 1, unitPrice: 1800 }];
+    const created = await request(app.server).post("/api/v1/estimates/option-sets").set("Authorization", authB).send({
+      idempotencyKey: "fs42-options-b-01", customerId: customerB.id, options: [{ tierLabel: "Good", items }, { tierLabel: "Best", items }]
+    });
+    expect(created.status).toBe(201);
+    const setId = created.body.optionSet.tierGroupId as string;
+    const optionId = created.body.optionSet.options[0].estimateId as string;
+    const before = JSON.stringify(fakeDb.getTestState().estimates);
+    expect((await request(app.server).post("/api/v1/estimates/option-sets").set("Authorization", authA).send({
+      idempotencyKey: "fs42-options-a-01", customerId: customerB.id, options: [{ tierLabel: "Good", items }, { tierLabel: "Best", items }]
+    })).status).toBe(404);
+    expect((await request(app.server).get(`/api/v1/estimates/option-sets/${setId}`).set("Authorization", authA)).status).toBe(404);
+    expect((await request(app.server).patch(`/api/v1/estimates/option-sets/${setId}`).set("Authorization", authA).send({ idempotencyKey: "fs42-options-a-02", expectedVersion: 1, title: "Taken" })).status).toBe(404);
+    expect((await request(app.server).delete(`/api/v1/estimates/option-sets/${setId}/options/${optionId}?expectedVersion=1&idempotencyKey=fs42-options-a-03`).set("Authorization", authA)).status).toBe(404);
+    expect((await request(app.server).post(`/api/v1/estimates/option-sets/${setId}/send`).set("Authorization", authA).send({ idempotencyKey: "fs42-options-a-04", expectedVersion: 1 })).status).toBe(404);
+    expect((await request(app.server).get(`/api/v1/estimates/option-sets/${setId}/financing-quotes`).set("Authorization", authA)).status).toBe(404);
+    expect((await request(app.server).get(`/api/v1/estimates/option-sets/${setId}`).set("Authorization", authTechB)).status).toBe(403);
+    expect(JSON.stringify(fakeDb.getTestState().estimates)).toBe(before);
+  });
 });

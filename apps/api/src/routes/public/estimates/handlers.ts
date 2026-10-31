@@ -26,6 +26,7 @@ function toPublicEstimateResponse(estimate: Awaited<ReturnType<typeof getPublicE
     financingOffered: estimate.financingOffered,
     tierLabel: estimate.tierLabel,
     expiresAt: estimate.expiresAt?.toISOString() ?? null,
+    ...(estimate.financing ? { financing: estimate.financing } : {}),
     tiers: estimate.tiers ?? null,
     items: estimate.items
   };

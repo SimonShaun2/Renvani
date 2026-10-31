@@ -4,7 +4,10 @@ export type UserRole = (typeof USER_ROLES)[number];
 
 type DefaultRouteMap = Record<UserRole, string>;
 
-const EXACT_PUBLIC_ROUTES = new Set(["/", "/login", "/signup", "/verify-email", "/product-tour", "/product", "/how-it-works", "/pricing", "/industries", "/industries/hvac", "/industries/plumbing", "/industries/electrical", "/portal", "/robots.txt", "/sitemap.xml"]);
+const EXACT_PUBLIC_ROUTES = new Set(["/", "/login", "/signup", "/verify-email", "/product-tour", "/product", "/how-it-works", "/pricing", "/industries", "/industries/hvac", "/industries/plumbing", "/industries/electrical", "/portal", "/robots.txt", "/sitemap.xml", "/sitemap-index.xml"]);
+
+/** Split sitemaps from app/sitemap.ts generateSitemaps. */
+const SPLIT_SITEMAP_ROUTE = /^\/sitemap\/\d+\.xml$/;
 
 const MARKETING_PRODUCT_PAGES = new Set(["growth", "revenue", "operations", "retention", "command-center", "online-booking", "estimates-approvals", "scheduling-dispatch"]);
 
@@ -90,7 +93,7 @@ export function getDefaultRouteForRole(role: UserRole): string {
 }
 
 export function isPublicRoute(pathname: string): boolean {
-  if (EXACT_PUBLIC_ROUTES.has(pathname)) {
+  if (EXACT_PUBLIC_ROUTES.has(pathname) || SPLIT_SITEMAP_ROUTE.test(pathname)) {
     return true;
   }
 

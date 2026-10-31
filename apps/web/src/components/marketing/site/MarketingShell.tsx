@@ -38,9 +38,6 @@ export function MarketingShell({ children }: { children: ReactNode }) {
           )}
         </nav>
         <div className="hidden items-center gap-4 lg:flex">
-          <Link href={SITE_NAV.signIn.href} className="text-[14px] font-medium" style={{ color: "var(--color-mkt-ink2)" }}>
-            {SITE_NAV.signIn.label}
-          </Link>
           <Link
             href={SITE_NAV.cta.href}
             className={`${styles.press} inline-flex min-h-[44px] items-center rounded-full px-5 text-[15px] font-medium`}
@@ -55,7 +52,7 @@ export function MarketingShell({ children }: { children: ReactNode }) {
             <img src="/marketing/home/tablet/icon-menu-fb31084f.svg" alt="" width={24} height={24} />
           </summary>
           <nav aria-label="Mobile" className="absolute right-0 z-20 mt-2 flex w-64 flex-col gap-1 rounded-2xl border p-3" style={{ background: "var(--color-mkt-cream)", borderColor: "var(--color-mkt-line)" }}>
-            {[...SITE_NAV.links, SITE_NAV.signIn].map((l) => (
+            {SITE_NAV.links.map((l) => (
               <Link key={l.label} href={l.href} className="flex min-h-[44px] items-center px-2 text-[15px]">
                 {l.label}
               </Link>

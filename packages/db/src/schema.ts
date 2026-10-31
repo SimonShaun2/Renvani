@@ -2607,6 +2607,44 @@ export const growthCheckFindings = pgTable(
   })
 );
 
+/** FS-56: append-only review history for Growth Check findings (machine observation stays untouched). */
+export const growthCheckFindingRevisions = pgTable(
+  "growth_check_finding_revisions",
+  {
+    id: id(),
+    companyId: companyId(),
+    findingId: uuid("finding_id")
+      .notNull()
+      .references(() => growthCheckFindings.id, { onDelete: "cascade" }),
+    scanId: uuid("scan_id")
+      .notNull()
+      .references(() => growthCheckScans.id, { onDelete: "cascade" }),
+    revision: integer("revision").notNull(),
+    action: varchar("action", { length: 64 }).notNull(),
+    actorUserId: uuid("actor_user_id").references(() => users.id, { onDelete: "set null" }),
+    reason: text("reason"),
+    note: text("note"),
+    previousState: jsonb("previous_state").notNull(),
+    nextState: jsonb("next_state").notNull(),
+    idempotencyKey: varchar("idempotency_key", { length: 128 }).notNull(),
+    payloadHash: varchar("payload_hash", { length: 64 }).notNull(),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+  },
+  (t) => ({
+    companyIdx: index("growth_check_finding_revisions_company_idx").on(t.companyId),
+    findingIdx: index("growth_check_finding_revisions_finding_idx").on(t.findingId),
+    scanIdx: index("growth_check_finding_revisions_scan_idx").on(t.scanId),
+    findingRevisionUnique: uniqueIndex("growth_check_finding_revisions_finding_revision_idx").on(
+      t.findingId,
+      t.revision
+    ),
+    companyIdempotencyUnique: uniqueIndex("growth_check_finding_revisions_company_idempotency_idx").on(
+      t.companyId,
+      t.idempotencyKey
+    ),
+  })
+);
+
 // ─────────────────────────────────────────────
 // RELATIONS
 // ─────────────────────────────────────────────

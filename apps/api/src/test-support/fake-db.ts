@@ -39,6 +39,9 @@ type TableName =
   | "stockLocations"
   | "stockLevels"
   | "stockMovements"
+  | "growthCheckScans"
+  | "growthCheckFindings"
+  | "growthCheckFindingRevisions"
   | "technicians"
   | "jobTasks"
   | "jobProducts"
@@ -2095,6 +2098,9 @@ type AnyTestRecord =
   | TestStockLocationRecord
   | TestStockLevelRecord
   | TestStockMovementRecord
+  | TestGrowthCheckScanRecord
+  | TestGrowthCheckFindingRecord
+  | TestGrowthCheckFindingRevisionRecord
   | TestCompanyRecord
   | TestUserRecord
   | TestRefreshTokenRecord
@@ -2178,6 +2184,9 @@ type MockTable =
   | typeof stockLocationsTable
   | typeof stockLevelsTable
   | typeof stockMovementsTable
+  | typeof growthCheckScansTable
+  | typeof growthCheckFindingsTable
+  | typeof growthCheckFindingRevisionsTable
   | typeof techniciansTable
   | typeof jobTasksTable
   | typeof jobProductsTable
@@ -2238,6 +2247,9 @@ interface TestState {
   stockLocations: TestStockLocationRecord[];
   stockLevels: TestStockLevelRecord[];
   stockMovements: TestStockMovementRecord[];
+  growthCheckScans: TestGrowthCheckScanRecord[];
+  growthCheckFindings: TestGrowthCheckFindingRecord[];
+  growthCheckFindingRevisions: TestGrowthCheckFindingRevisionRecord[];
   technicians: TestTechnicianRecord[];
   jobTasks: TestJobTaskRecord[];
   jobProducts: TestJobProductRecord[];
@@ -3038,6 +3050,148 @@ export interface TestStockMovementRecord {
   createdAt: Date;
 }
 
+export interface TestGrowthCheckScanRecord {
+  id: string;
+  companyId: string;
+  requestedByUserId: string | null;
+  targetUrl: string;
+  rubricId: string;
+  rubricVersion: string;
+  status: "queued" | "running" | "completed" | "failed";
+  progress: Record<string, unknown>;
+  idempotencyKey: string;
+  failureReason: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date | null;
+}
+
+export interface TestGrowthCheckFindingRecord {
+  id: string;
+  companyId: string;
+  scanId: string;
+  areaId: string;
+  checkId: string;
+  sourceUrl: string;
+  observedAt: Date;
+  status: "pass" | "fail" | "warning" | "unknown";
+  confidence: "high" | "medium" | "low";
+  summary: string;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date | null;
+}
+
+export interface TestGrowthCheckFindingRevisionRecord {
+  id: string;
+  companyId: string;
+  findingId: string;
+  scanId: string;
+  revision: number;
+  action: string;
+  actorUserId: string | null;
+  reason: string | null;
+  note: string | null;
+  previousState: Record<string, unknown>;
+  nextState: Record<string, unknown>;
+  idempotencyKey: string;
+  payloadHash: string;
+  createdAt: Date;
+}
+
+const growthCheckScansTable = {
+  __name: "growthCheckScans",
+  id: "id", companyId: "companyId", requestedByUserId: "requestedByUserId", targetUrl: "targetUrl",
+  rubricId: "rubricId", rubricVersion: "rubricVersion", status: "status", progress: "progress",
+  idempotencyKey: "idempotencyKey", failureReason: "failureReason", createdAt: "createdAt",
+  updatedAt: "updatedAt", deletedAt: "deletedAt"
+} as const;
+
+const growthCheckFindingsTable = {
+  __name: "growthCheckFindings",
+  id: "id", companyId: "companyId", scanId: "scanId", areaId: "areaId", checkId: "checkId",
+  sourceUrl: "sourceUrl", observedAt: "observedAt", status: "status", confidence: "confidence",
+  summary: "summary", createdAt: "createdAt", updatedAt: "updatedAt", deletedAt: "deletedAt"
+} as const;
+
+const growthCheckFindingRevisionsTable = {
+  __name: "growthCheckFindingRevisions",
+  id: "id", companyId: "companyId", findingId: "findingId", scanId: "scanId", revision: "revision",
+  action: "action", actorUserId: "actorUserId", reason: "reason", note: "note",
+  previousState: "previousState", nextState: "nextState", idempotencyKey: "idempotencyKey",
+  payloadHash: "payloadHash", createdAt: "createdAt"
+} as const;
+
+function createGrowthCheckScanRecord(
+  values: Partial<TestGrowthCheckScanRecord> & Pick<TestGrowthCheckScanRecord, "companyId">
+): TestGrowthCheckScanRecord {
+  const now = new Date();
+  return {
+    id: values.id ?? nextId(), companyId: values.companyId, requestedByUserId: values.requestedByUserId ?? null,
+    targetUrl: values.targetUrl ?? "https://example.test/", rubricId: values.rubricId ?? "home-services",
+    rubricVersion: values.rubricVersion ?? "1.0.0", status: values.status ?? "completed",
+    progress: values.progress ?? {}, idempotencyKey: values.idempotencyKey ?? `gc-${nextId()}`,
+    failureReason: values.failureReason ?? null, createdAt: values.createdAt ?? now,
+    updatedAt: values.updatedAt ?? now, deletedAt: values.deletedAt ?? null
+  };
+}
+
+function createGrowthCheckFindingRecord(
+  values: Partial<TestGrowthCheckFindingRecord> & Pick<TestGrowthCheckFindingRecord, "companyId" | "scanId">
+): TestGrowthCheckFindingRecord {
+  const now = new Date();
+  return {
+    id: values.id ?? nextId(), companyId: values.companyId, scanId: values.scanId,
+    areaId: values.areaId ?? "booking_intake", checkId: values.checkId ?? "booking_cta",
+    sourceUrl: values.sourceUrl ?? "https://example.test/", observedAt: values.observedAt ?? now,
+    status: values.status ?? "fail", confidence: values.confidence ?? "medium",
+    summary: values.summary ?? "No service request call-to-action found", createdAt: values.createdAt ?? now,
+    updatedAt: values.updatedAt ?? now, deletedAt: values.deletedAt ?? null
+  };
+}
+
+function createGrowthCheckFindingRevisionRecord(
+  values: Partial<TestGrowthCheckFindingRevisionRecord> &
+    Pick<TestGrowthCheckFindingRevisionRecord, "companyId" | "findingId" | "scanId" | "revision" | "action">
+): TestGrowthCheckFindingRevisionRecord {
+  const duplicate = state.growthCheckFindingRevisions.find(
+    (row) =>
+      (row.findingId === values.findingId && row.revision === values.revision) ||
+      (row.companyId === values.companyId && row.idempotencyKey === values.idempotencyKey)
+  );
+  if (duplicate) {
+    // Mirrors the unique indexes (finding_id, revision) and (company_id, idempotency_key).
+    throw Object.assign(new Error("duplicate key value violates unique constraint"), { code: "23505" });
+  }
+  return {
+    id: values.id ?? nextId(), companyId: values.companyId, findingId: values.findingId, scanId: values.scanId,
+    revision: values.revision, action: values.action, actorUserId: values.actorUserId ?? null,
+    reason: values.reason ?? null, note: values.note ?? null, previousState: values.previousState ?? {},
+    nextState: values.nextState ?? {}, idempotencyKey: values.idempotencyKey ?? `rev-${nextId()}`,
+    payloadHash: values.payloadHash ?? "hash", createdAt: values.createdAt ?? new Date()
+  };
+}
+
+export function seedGrowthCheckScan(
+  values: Partial<TestGrowthCheckScanRecord> & Pick<TestGrowthCheckScanRecord, "companyId">
+): TestGrowthCheckScanRecord {
+  const record = createGrowthCheckScanRecord(values);
+  state.growthCheckScans.push(record);
+  return record;
+}
+
+export function seedGrowthCheckFinding(
+  values: Partial<TestGrowthCheckFindingRecord> & Pick<TestGrowthCheckFindingRecord, "companyId" | "scanId">
+): TestGrowthCheckFindingRecord {
+  const record = createGrowthCheckFindingRecord(values);
+  state.growthCheckFindings.push(record);
+  return record;
+}
+
+export function getGrowthCheckFindingRevisions(): TestGrowthCheckFindingRevisionRecord[] {
+  return state.growthCheckFindingRevisions;
+}
+
 const stockLocationsTable = {
   __name: "stockLocations",
   id: "id", companyId: "companyId", name: "name", kind: "kind", technicianId: "technicianId",
@@ -3707,6 +3861,9 @@ const state: TestState = {
   stockLocations: [],
   stockLevels: [],
   stockMovements: [],
+  growthCheckScans: [],
+  growthCheckFindings: [],
+  growthCheckFindingRevisions: [],
   technicians: [],
   jobTasks: [],
   jobProducts: [],
@@ -3771,6 +3928,9 @@ function restoreState(snapshot: TestState): void {
   state.stockLocations.splice(0, state.stockLocations.length, ...snapshot.stockLocations);
   state.stockLevels.splice(0, state.stockLevels.length, ...snapshot.stockLevels);
   state.stockMovements.splice(0, state.stockMovements.length, ...snapshot.stockMovements);
+  state.growthCheckScans.splice(0, state.growthCheckScans.length, ...snapshot.growthCheckScans);
+  state.growthCheckFindings.splice(0, state.growthCheckFindings.length, ...snapshot.growthCheckFindings);
+  state.growthCheckFindingRevisions.splice(0, state.growthCheckFindingRevisions.length, ...snapshot.growthCheckFindingRevisions);
   state.technicians.splice(0, state.technicians.length, ...snapshot.technicians);
   state.jobTasks.splice(0, state.jobTasks.length, ...snapshot.jobTasks);
   state.jobProducts.splice(0, state.jobProducts.length, ...snapshot.jobProducts);
@@ -3880,6 +4040,12 @@ function getRows(tableName: TableName): AnyTestRecord[] {
       return state.stockLevels;
     case "stockMovements":
       return state.stockMovements;
+    case "growthCheckScans":
+      return state.growthCheckScans;
+    case "growthCheckFindings":
+      return state.growthCheckFindings;
+    case "growthCheckFindingRevisions":
+      return state.growthCheckFindingRevisions;
     case "technicians":
       return state.technicians;
     case "jobTasks":
@@ -5587,6 +5753,15 @@ function createRow(tableName: TableName, values: Record<string, unknown>): AnyTe
       return createStockLocationRecord(values as Partial<TestStockLocationRecord> & Pick<TestStockLocationRecord, "companyId" | "name" | "kind">);
     case "stockLevels":
       return createStockLevelRecord(values as Partial<TestStockLevelRecord> & Pick<TestStockLevelRecord, "companyId" | "locationId" | "productId">);
+    case "growthCheckScans":
+      return createGrowthCheckScanRecord(values as Partial<TestGrowthCheckScanRecord> & Pick<TestGrowthCheckScanRecord, "companyId">);
+    case "growthCheckFindings":
+      return createGrowthCheckFindingRecord(values as Partial<TestGrowthCheckFindingRecord> & Pick<TestGrowthCheckFindingRecord, "companyId" | "scanId">);
+    case "growthCheckFindingRevisions":
+      return createGrowthCheckFindingRevisionRecord(
+        values as Partial<TestGrowthCheckFindingRevisionRecord> &
+          Pick<TestGrowthCheckFindingRevisionRecord, "companyId" | "findingId" | "scanId" | "revision" | "action">
+      );
     case "stockMovements":
       return createStockMovementRecord(values as Partial<TestStockMovementRecord> & Pick<TestStockMovementRecord, "companyId" | "locationId" | "productId" | "kind" | "quantityDelta" | "quantityAfter">);
     case "productCatalog":
@@ -6058,6 +6233,9 @@ export const productCatalog = productCatalogTable;
 export const stockLocations = stockLocationsTable;
 export const stockLevels = stockLevelsTable;
 export const stockMovements = stockMovementsTable;
+export const growthCheckScans = growthCheckScansTable;
+export const growthCheckFindings = growthCheckFindingsTable;
+export const growthCheckFindingRevisions = growthCheckFindingRevisionsTable;
 export const technicians = techniciansTable;
 export const jobTasks = jobTasksTable;
 export const jobProducts = jobProductsTable;
@@ -6508,6 +6686,9 @@ export function createDbModuleMock() {
     stockLocations,
     stockLevels,
     stockMovements,
+    growthCheckScans,
+    growthCheckFindings,
+    growthCheckFindingRevisions,
     technicians,
     jobTasks,
     jobProducts,
@@ -6577,6 +6758,9 @@ export function resetTestState(): void {
   state.stockLocations.length = 0;
   state.stockLevels.length = 0;
   state.stockMovements.length = 0;
+  state.growthCheckScans.length = 0;
+  state.growthCheckFindings.length = 0;
+  state.growthCheckFindingRevisions.length = 0;
   state.technicians.length = 0;
   state.jobTasks.length = 0;
   state.jobProducts.length = 0;

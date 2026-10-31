@@ -33,7 +33,7 @@ describe("marketing site (Figma 171:2)", () => {
     const container = root.querySelector(".md\\:hidden.lg\\:block")!;
     expect(container.querySelector('[data-node-id="219:9474"]')!.className).toContain("md:hidden");
     expect(container.querySelector('[data-node-id="253:6779"]')!.className).toContain("md:hidden");
-    expect(container.querySelector('[data-node-id="200:46"]')!.parentElement!.className).toContain("hidden md:block");
+    expect(container.querySelector('[data-node-id="200:46"]')!.closest(".hidden")!.className).toContain("hidden md:block");
   });
 
   it("tablet 768 renders its own frame (253:6780) between md and lg with real links and forms", () => {

@@ -7,6 +7,7 @@ import { IndustryMenu } from "./IndustryMenu";
 import { INDUSTRY_TREES } from "./industry-visuals";
 import { HeaderDisclosure } from "./HeaderDisclosure";
 import { ProductsMenuPanel } from "./ProductsMenuPanel";
+import { ScaleToFrame } from "./ScaleToFrame";
 import { SITE_FOOTER, SITE_NAV } from "./site-config";
 import styles from "./site.module.css";
 
@@ -27,7 +28,9 @@ export function MarketingShell({ children }: { children: ReactNode }) {
           {SITE_NAV.links.map((l) =>
             l.href === "/product" ? (
               <HeaderDisclosure key={l.label} nodeId="177:640" summary={l.label} summaryClassName="hover:underline" panelClassName="absolute inset-x-0 top-[88px] z-30">
-                <ProductsMenuPanel variant="desktop" />
+                <ScaleToFrame>
+                  <ProductsMenuPanel variant="desktop" />
+                </ScaleToFrame>
               </HeaderDisclosure>
             ) : l.href === "/industries" ? (
               <IndustryMenu key={l.label} label={l.label}>

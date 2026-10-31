@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { ScaleToFrame } from "./ScaleToFrame";
 import Link from "next/link";
 
 import { FigmaNode } from "./FigmaNode";
@@ -299,7 +300,7 @@ export function HomePage() {
       </div>
       <div className="leading-[1.38] md:hidden lg:block">
       <section data-node-id="203:4403" className={section} aria-labelledby="home-hero">
-        <div className="grid items-start gap-8 lg:grid-cols-[480px_1fr] lg:gap-16">
+        <div className="grid items-start gap-8 lg:grid-cols-[480px_minmax(0,1fr)] lg:gap-16">
           <div className="flex flex-col gap-6">
             <p className={eyebrow} style={{ color: ink2 }}>{hero.eyebrow}</p>
             <h1 id="home-hero" className="flex flex-col gap-2">
@@ -313,7 +314,9 @@ export function HomePage() {
           </div>
           <figure className="flex flex-col gap-3">
             <div className="hidden md:block">
-              <SiteVisual />
+              <ScaleToFrame width={720}>
+                <SiteVisual />
+              </ScaleToFrame>
             </div>
             <MobileSiteVisual />
             <figcaption className="text-[11px]" style={{ color: ink2 }}>{hero.caption}</figcaption>
@@ -342,7 +345,7 @@ export function HomePage() {
 
       <section data-node-id="203:4501" style={{ background: ink }} aria-labelledby="home-intel">
         <div className={section}>
-          <div className="grid items-start gap-6 lg:grid-cols-[448px_1fr] lg:gap-12">
+          <div className="grid items-start gap-6 lg:grid-cols-[448px_minmax(0,1fr)] lg:gap-12">
             <div className="flex flex-col items-start gap-6 text-white">
               <p className={eyebrow} style={{ color: "var(--color-mkt-amber)" }}>{intelligence.eyebrow}</p>
               <h2 id="home-intel" className={h2}><Lines lines={intelligence.headline} /></h2>
@@ -353,7 +356,9 @@ export function HomePage() {
             </div>
             {/* 203:4510 scales the 720px symbol to 784px (x1.0889); zoom keeps that scale at any column width. */}
             <div className="hidden [zoom:1.0889] md:block">
-              <IntelligenceVisual />
+              <ScaleToFrame width={720}>
+                <IntelligenceVisual />
+              </ScaleToFrame>
             </div>
             <MobileIntelligenceVisual />
           </div>

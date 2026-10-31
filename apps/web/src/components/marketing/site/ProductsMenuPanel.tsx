@@ -11,8 +11,8 @@ const row = "flex w-full items-center gap-2 rounded-[12px] bg-white p-3 text-lef
 export function ProductsMenuPanel({ variant }: { variant: "desktop" | "mobile" }) {
   const m = variant === "mobile";
   return (
-    <div data-node-id={m ? "226:7296" : "226:7154"} className={m ? "flex flex-col gap-7 p-6" : "mx-auto flex max-w-[1440px] flex-col gap-9 p-16"} style={{ background: "var(--color-mkt-cream)" }}>
-      <div className={m ? "flex flex-col items-center gap-5" : "flex items-center gap-5"}>
+    <div data-node-id={m ? "226:7296" : "226:7154"} className={m ? "flex flex-col items-center gap-7 p-6" : "flex w-[1440px] flex-col gap-9 p-16"} style={{ background: "var(--color-mkt-cream)" }}>
+      <div data-node-id={m ? "226:7297" : "226:7155"} className={m ? "flex w-[342px] shrink-0 flex-col items-center gap-5" : "flex w-[1312px] shrink-0 items-center gap-5"}>
         <p className={`${m ? "w-full text-[28px]" : "flex-1 text-[32px]"} font-semibold leading-[1.38]`} style={ink}>
           {m ? MOBILE_HEADLINE : PRODUCTS_MENU.headline}
         </p>
@@ -21,7 +21,7 @@ export function ProductsMenuPanel({ variant }: { variant: "desktop" | "mobile" }
         </Link>
       </div>
       {m ? (
-        <nav aria-label="Explore the website" className="flex flex-col gap-2">
+        <nav data-node-id="226:7302" aria-label="Explore the website" className="flex w-[342px] shrink-0 flex-col gap-2">
           {[...MOBILE_EXPLORE, SITE_NAV.signIn].map((l) => (
             <Link key={l.label} href={l.href} className={row} style={ink}>
               <span className="flex-1">{l.label}</span>
@@ -30,9 +30,9 @@ export function ProductsMenuPanel({ variant }: { variant: "desktop" | "mobile" }
           ))}
         </nav>
       ) : null}
-      <div className={m ? "flex flex-col gap-7" : "flex items-start gap-6"}>
-        {PRODUCTS_MENU.groups.map((g) => (
-          <div key={g.title} className={`flex flex-col gap-[10px] ${m ? "w-full" : "min-w-0 flex-1"}`}>
+      <div data-node-id={m ? "226:7323" : "226:7160"} className={m ? "flex w-[342px] shrink-0 flex-col gap-7" : "flex w-[1312px] shrink-0 items-start gap-6"}>
+        {PRODUCTS_MENU.groups.map((g, gi) => (
+          <div key={g.title} data-node-id={(m ? GROUPS_MOBILE : GROUPS_DESKTOP)[gi]} className={`flex shrink-0 flex-col gap-[10px] ${m ? "w-[342px]" : "w-[243.2px]"}`}>
             <Link href={g.href} className="flex w-full items-start gap-2 text-left text-[20px] font-semibold leading-[1.38]" style={ink}>
               <span className="flex-1">{g.title}</span>
               <Arrow size={20} />
@@ -46,7 +46,7 @@ export function ProductsMenuPanel({ variant }: { variant: "desktop" | "mobile" }
           </div>
         ))}
       </div>
-      <div className={m ? "flex flex-col items-center gap-4" : "flex items-center gap-4"}>
+      <div data-node-id={m ? "226:7444" : "226:7281"} className={m ? "flex w-[342px] shrink-0 flex-col items-center gap-4" : "flex w-[1312px] shrink-0 items-center gap-4"}>
         <Link href={PRODUCTS_MENU.cta.href} className="inline-flex min-h-[44px] items-center justify-center rounded-full px-5 py-3 text-[15px] font-medium leading-[1.5]" style={{ background: "var(--color-mkt-amber)", color: "var(--color-mkt-ink)" }}>
           {PRODUCTS_MENU.cta.label}
         </Link>
@@ -57,6 +57,10 @@ export function ProductsMenuPanel({ variant }: { variant: "desktop" | "mobile" }
     </div>
   );
 }
+
+/** Figma group node ids (Growth, Revenue, Operations, Retention, Command Center). */
+const GROUPS_DESKTOP = ["226:7161", "226:7177", "226:7193", "226:7234", "226:7255"];
+const GROUPS_MOBILE = ["226:7324", "226:7340", "226:7356", "226:7397", "226:7418"];
 
 /** Mobile menu (177:737) heading and "Explore the website" rows. */
 export const MOBILE_HEADLINE = "Find your next step.";

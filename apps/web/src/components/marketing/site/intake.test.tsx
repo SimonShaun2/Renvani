@@ -14,6 +14,8 @@ import { MARKETING_SITEMAP_PATHS } from "@/src/lib/seo/public-sitemap";
 import { postMarketingIntake, runIntake, type IntakeResult } from "@/src/lib/marketing-intake";
 
 import { DemoPage } from "./DemoPage";
+import { demoPlanInterest, planInterestLine } from "./pricing-config";
+import { TOUR_STEPS } from "./tour-config";
 import { GrowthCheckPage } from "./GrowthCheckPage";
 
 const json = (status: number, body: unknown, headers: Record<string, string> = {}) => new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json", ...headers } });
@@ -158,5 +160,52 @@ describe("demo Team size errors", () => {
     });
     expect(container.querySelector("#demo-team")!.getAttribute("aria-invalid")).toBe("true");
     expect(container.querySelector("#demo-team-error")!.textContent).toBe("Choose team size.");
+  });
+});
+
+describe("marketing parity: demo plan interest + tour routes (Figma 246:5648 / 246:5650, 217:6308 → /tour)", () => {
+  it("shows the Flex/Flat plan-interest panel only for ?plan=flex|flat, with Service Fee wording", () => {
+    expect(demoPlanInterest("flex")).toBe("flex");
+    expect(demoPlanInterest("flat")).toBe("flat");
+    expect(demoPlanInterest("vip")).toBeNull();
+    expect(demoPlanInterest(["flex"])).toBeNull();
+    expect(planInterestLine("flex")).toBe("Flex · $399/mo + 2% customer-paid Service Fee");
+    expect(planInterestLine("flat")).toBe("Flat · $999/mo · No customer-paid Service Fee");
+    const { rerender } = render(<DemoPage action={vi.fn()} plan="flex" />);
+    expect(screen.getByTestId("demo-plan-interest").textContent).toContain("Flex · $399/mo + 2% customer-paid Service Fee");
+    expect(screen.getByRole("link", { name: "Change plan" }).getAttribute("href")).toBe("/pricing");
+    expect(document.body.textContent).not.toMatch(/booking fee|\$1\.99/i);
+    rerender(<DemoPage action={vi.fn()} />);
+    expect(screen.queryByTestId("demo-plan-interest")).toBeNull();
+  });
+
+  it("every tour step is public and in the sitemap (Book direct = /tour)", () => {
+    const paths = MARKETING_SITEMAP_PATHS.map((p) => p.path as string);
+    expect(isPublicRoute("/tour")).toBe(true);
+    expect(paths).toContain("/tour");
+    for (const step of TOUR_STEPS.slice(1)) {
+      expect(isPublicRoute(`/tour/${step.slug}`)).toBe(true);
+      expect(paths).toContain(`/tour/${step.slug}`);
+    }
+  });
+
+  it("demo done state matches Figma 204:9214 and Edit request details restores the filled form", async () => {
+    const action = vi.fn(async () => ({ status: "success", confirmationId: "c_7" }) as IntakeResult);
+    const { container } = render(<DemoPage action={action} />);
+    fireEvent.change(screen.getByLabelText("Your name"), { target: { value: "Alex Rivera" } });
+    fireEvent.change(screen.getByLabelText("Work email"), { target: { value: "alex@example.com" } });
+    await act(async () => fireEvent.submit(container.querySelector("form")!));
+    expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("Let’s look at your business.");
+    const status = screen.getByRole("status").textContent ?? "";
+    for (const t of ["Your request is in. We’ll be in touch by email.", "YOUR CONTACT EMAIL", "alex@example.com", "c_7"]) expect(status).toContain(t);
+    expect(screen.getByRole("link", { name: "Explore the product" }).getAttribute("href")).toBe("/product");
+    fireEvent.click(screen.getByRole("button", { name: "Edit request details" }));
+    expect((screen.getByLabelText("Your name") as HTMLInputElement).value).toBe("Alex Rivera");
+    expect((screen.getByLabelText("Work email") as HTMLInputElement).value).toBe("alex@example.com");
+  });
+
+  it("validation copy matches Figma 246:5638", async () => {
+    const r = await runIntake("demo-requests", demoForm({ name: "", email: "", company: "", trade: "", teamSize: "" }), vi.fn() as unknown as typeof fetch);
+    expect(r).toMatchObject({ status: "invalid", message: "Check the highlighted details.", fields: { name: "Enter your name.", email: "Enter a complete email address.", company: "Enter your business name.", trade: "Choose your trade." } });
   });
 });

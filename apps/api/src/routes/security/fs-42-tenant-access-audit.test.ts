@@ -194,6 +194,46 @@ describe("FS-42 tenant access audit", () => {
     expect(JSON.stringify(response.body)).not.toContain("servicetitan");
   });
 
+  it("FS42-UNAUTH-JOBS-PREVIEW POST /jobs/preview returns 401 without credentials", async () => {
+    const response = await request(app.server).post("/api/v1/jobs/preview").send({});
+    expect(response.status).toBe(401);
+  });
+
+  it("FS42-ROLE-JOBS-PREVIEW technician cannot preview job create", async () => {
+    const company = fakeDb.seedCompany({ name: "Preview Role Co", slug: "preview-role-co" });
+    const technician = fakeDb.seedUser({
+      companyId: company.id,
+      email: "tech@preview-role.test",
+      firstName: "Tech",
+      lastName: "User",
+      role: "technician"
+    });
+    const response = await request(app.server)
+      .post("/api/v1/jobs/preview")
+      .set("Authorization", technicianAuth(company.id, technician.id))
+      .send({});
+    expect(response.status).toBe(403);
+    expect(response.body.error).toBe("FORBIDDEN");
+  });
+
+  it("FS42-XT-JOBS-PREVIEW cross-tenant productCatalogId is rejected", async () => {
+    const companyA = fakeDb.seedCompany({ name: "Preview A", slug: "preview-a" });
+    const companyB = fakeDb.seedCompany({ name: "Preview B", slug: "preview-b" });
+    const dispatcher = fakeDb.seedUser({
+      companyId: companyA.id,
+      email: "disp@preview-a.test",
+      firstName: "Disp",
+      lastName: "User",
+      role: "dispatcher"
+    });
+    const foreign = fakeDb.seedProductCatalog({ companyId: companyB.id, name: "Foreign", unitPrice: "99.00" } as never);
+    const response = await request(app.server)
+      .post("/api/v1/jobs/preview")
+      .set("Authorization", technicianAuth(companyA.id, dispatcher.id, "dispatcher"))
+      .send({ products: [{ productCatalogId: foreign.id }] });
+    expect(response.status).toBe(404);
+  });
+
   it("FS42-SPOOF-01 import list rejects client-supplied companyId query param", async () => {
     const { tenantA, tenantB } = seedSyntheticTenantPair(fakeDb, tokens, "fs42-spoof");
     seedTenantIsolationBundle(fakeDb, tenantA.company.id, tenantA.owner.id);

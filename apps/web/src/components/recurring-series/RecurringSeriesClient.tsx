@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { AlertTriangle, ArrowLeft, CalendarClock, RotateCcw, UserRound } from "lucide-react";
 
-import { StatBadge } from "@/src/components/ui/StatBadge";
 import { useApplySeriesChange, usePreviewSeriesChange, useRecurringSeries } from "@/src/hooks/recurring-series.hooks";
 import { useAuthStore } from "@/src/stores/auth.store";
 
@@ -32,13 +31,28 @@ interface Props {
 
 const inputClass =
   "mt-1 w-full rounded-2xl border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-700 outline-none transition focus:border-brand-accent";
-// Figma 10:1746 Button/secondary/Preview changes: white, #E6DCCB stroke.
+// Figma 10:1746 Button/secondary/Preview changes and 10:983 Button/dark/New plan:
+// 44px tall, 18px side padding, 8px gap, radius 10, 14px semibold.
 const secondaryButton =
-  "inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-4 py-2 text-sm font-semibold text-neutral-700 transition hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-60";
+  "inline-flex h-11 items-center gap-2 rounded-[10px] border border-[#e6dccb] bg-white px-[18px] text-sm text-[#0f1530] font-semibold transition hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-60";
 const primaryButton =
-  "inline-flex items-center gap-2 rounded-full bg-brand-accent px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary disabled:cursor-not-allowed disabled:opacity-60";
+  "inline-flex h-11 items-center gap-2 rounded-[10px] bg-brand-accent px-[18px] text-sm font-semibold text-white transition hover:bg-brand-primary disabled:cursor-not-allowed disabled:opacity-60";
 
-const statusTone = (s: string) => (s === "active" ? "green" : s === "paused" ? "neutral" : "gray");
+// Figma 10:1003 Status/Active and 10:1012 Status/Paused: 24px pill, 10px/4px padding,
+// 6px gap, 6px dot in the text color, 12px semibold. "Ended" has no frame; uses the Paused colors.
+const STATUS_PILL: Record<string, { bg: string; fg: string }> = {
+  active: { bg: "#e4f1e8", fg: "#2f7d4f" },
+  paused: { bg: "#eef0f5", fg: "#6a7290" },
+};
+function StatusPill({ status }: { status: string }) {
+  const c = STATUS_PILL[status] ?? STATUS_PILL.paused!;
+  return (
+    <span data-testid="series-status-pill" className="inline-flex h-6 items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold" style={{ backgroundColor: c.bg, color: c.fg }}>
+      <span data-testid="series-status-dot" aria-hidden="true" className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: c.fg }} />
+      {seriesStatusLabel(status)}
+    </span>
+  );
+}
 const SINGLE_VISIT_ACTIONS: SeriesAction[] = ["skip_occurrence", "reschedule_occurrence"];
 
 export function RecurringSeriesClient({ seriesId, now }: Props) {
@@ -156,7 +170,7 @@ export function RecurringSeriesClient({ seriesId, now }: Props) {
         </Link>
         <div className="mt-5 flex flex-wrap items-center gap-3">
           <h1 className="text-3xl font-semibold tracking-tight text-neutral-900">Recurring visits</h1>
-          {series ? <StatBadge label={seriesStatusLabel(series.status)} tone={statusTone(series.status)} className="px-3 py-1.5 text-sm" /> : null}
+          {series ? <StatusPill status={series.status} /> : null}
         </div>
         {series ? (
           <p className="mt-3 text-sm text-neutral-500">

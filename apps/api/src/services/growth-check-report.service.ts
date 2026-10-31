@@ -35,10 +35,10 @@ import {
   type UserRole
 } from "@fsm/types";
 
+import { canonicalJson } from "../lib/canonical-json.js";
 import { listGrowthCheckScanFindings } from "./growth-check-findings-review.service.js";
 import {
   buildGrowthCheckReportDocument,
-  canonicalJson,
   renderGrowthCheckReportHtml,
   renderGrowthCheckReportHtmlDocument,
   renderGrowthCheckReportMarkdown,

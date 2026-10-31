@@ -36,6 +36,7 @@ import {
 import {
   findCallTrackingAdapter,
   listCallTrackingAdapterIds,
+  type CallTrackingNumberOwnershipResult,
   type CallTrackingWebhookInput
 } from "./call-tracking-adapter.registry.js";
 
@@ -85,10 +86,8 @@ export async function resolveCallTrackingNumberVerification(row: Pick<NumberRow,
   const adapter = findCallTrackingAdapter(row.provider);
   if (!adapter || !adapter.enabled) return CALL_TRACKING_NUMBER_DEFAULT_VERIFICATION_STATUS;
   try {
-    const status = await adapter.verifyNumberOwnership({ trackingNumber: row.trackingNumber, providerNumberId: row.providerNumberId });
-    return typeof status === "string" && Object.prototype.hasOwnProperty.call(CALL_TRACKING_NUMBER_VERIFICATION_STATUS_REGISTRY, status)
-      ? status
-      : CALL_TRACKING_NUMBER_DEFAULT_VERIFICATION_STATUS;
+    const result = await adapter.verifyNumberOwnership({ trackingNumber: row.trackingNumber, providerNumberId: row.providerNumberId });
+    return normalizeOwnershipResult(result, nowMs());
   } catch {
     return CALL_TRACKING_NUMBER_DEFAULT_VERIFICATION_STATUS;
   }
@@ -106,6 +105,30 @@ export async function persistCallTrackingNumberVerifiedAt(companyId: string, num
     .where(and(eq(callTrackingNumbers.companyId, companyId), eq(callTrackingNumbers.id, numberId), isNull(callTrackingNumbers.deletedAt)))
     .returning({ verifiedAt: callTrackingNumbers.verifiedAt });
   return row?.verifiedAt ?? null;
+}
+
+/** A provider "verified" older than this (or with a bad/future verifiedAt) is treated as unverified. */
+export const CALL_TRACKING_OWNERSHIP_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
+/** Clock skew tolerated on a provider verifiedAt that is slightly in the future. */
+const OWNERSHIP_FUTURE_SKEW_MS = 5 * 60 * 1000;
+
+/** Freshness rule for a provider verifiedAt, enforced on every resolve (persistence: persistCallTrackingNumberVerifiedAt). */
+export function normalizeOwnershipResult(result: CallTrackingNumberOwnershipResult | unknown, now: number): string {
+  const fallback = CALL_TRACKING_NUMBER_DEFAULT_VERIFICATION_STATUS;
+  let status: unknown = result;
+  let verifiedAt: unknown;
+  if (result && typeof result === "object") {
+    status = (result as { status?: unknown }).status;
+    verifiedAt = (result as { verifiedAt?: unknown }).verifiedAt;
+  }
+  if (typeof status !== "string" || !Object.prototype.hasOwnProperty.call(CALL_TRACKING_NUMBER_VERIFICATION_STATUS_REGISTRY, status)) {
+    return fallback;
+  }
+  if (verifiedAt === undefined || verifiedAt === null || !callTrackingNumberCanReceiveCalls(status)) return status;
+  if (typeof verifiedAt !== "string") return fallback;
+  const at = Date.parse(verifiedAt);
+  if (!Number.isFinite(at) || at - now > OWNERSHIP_FUTURE_SKEW_MS || now - at > CALL_TRACKING_OWNERSHIP_MAX_AGE_MS) return fallback;
+  return status;
 }
 
 async function toNumberResolved(row: NumberRow): Promise<CallTrackingNumber> {
@@ -363,6 +386,18 @@ export async function ingestInboundCall(providerId: string, input: CallTrackingW
   }
   if (!verified) return { httpStatus: 401, error: "INVALID_SIGNATURE" };
 
+  // Prefer the provider's signed timestamp header when the adapter exposes it: the body's occurredAt is only as
+  // trustworthy as the provider's body signing. A signing adapter that yields no timestamp fails closed.
+  let signedAt: number | null = null;
+  if (typeof adapter.signedTimestampMs === "function") {
+    try {
+      signedAt = adapter.signedTimestampMs(input);
+    } catch {
+      signedAt = null;
+    }
+    if (typeof signedAt !== "number" || !Number.isFinite(signedAt)) return { httpStatus: 401, error: "INVALID_SIGNATURE" };
+  }
+
   let parsed;
   try {
     parsed = inboundCallEventSchema.safeParse(adapter.parseInboundCall(input.rawBody));
@@ -388,7 +423,7 @@ export async function ingestInboundCall(providerId: string, input: CallTrackingW
     .limit(1);
   if (duplicate) return { httpStatus: 200, body: { status: "duplicate" } };
 
-  const skew = Date.parse(event.occurredAt) - nowMs();
+  const skew = (signedAt ?? Date.parse(event.occurredAt)) - nowMs();
   if (!Number.isFinite(skew) || Math.abs(skew) > CALL_TRACKING_WEBHOOK_REPLAY_WINDOW_MS) {
     return { httpStatus: 400, error: "EVENT_OUTSIDE_REPLAY_WINDOW" };
   }

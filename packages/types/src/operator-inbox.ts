@@ -76,7 +76,9 @@ export type OperatorInboxItem = z.infer<typeof OperatorInboxItemSchema>;
 export const EditAgentActionParametersSchema = z.object({
   channel: z.enum(["sms", "email"]).optional(),
   subject: z.string().max(998).nullable().optional(),
-  body: z.string().min(1).max(16000)
+  body: z.string().min(1).max(16000),
+  /** Optimistic-concurrency token (the item's `version`); a stale value is rejected with 409. */
+  expectedVersion: z.number().int().nonnegative().optional()
 });
 
 export type EditAgentActionParametersInput = z.infer<typeof EditAgentActionParametersSchema>;

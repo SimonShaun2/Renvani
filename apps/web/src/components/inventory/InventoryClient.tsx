@@ -189,31 +189,33 @@ export function StockLevelsPanel({ lowStock }: { lowStock: boolean }) {
           }
         />
       ) : (
-        <table className="w-full text-left text-sm">
-          <thead>
-            <tr className="text-neutral-500">
-              <th className="py-2">Part</th>
-              <th>Location</th>
-              <th className="text-right">On hand</th>
-              <th className="text-right">Reorder at</th>
-            </tr>
-          </thead>
-          <tbody>
-            {(levels.data?.levels ?? []).map((lvl: StockLevel) => (
-              <tr key={lvl.id} className="border-t border-neutral-200">
-                <td className="py-2">
-                  <span data-testid="part-label">{partLabel(lvl)}</span>
-                  {lvl.isLowStock ? (
-                    <span className="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-800">Low</span>
-                  ) : null}
-                </td>
-                <td>{locName(lvl.locationId)}</td>
-                <td className="text-right tabular-nums">{lvl.quantity}</td>
-                <td className="text-right tabular-nums">{lvl.lowStockThreshold ?? "—"}</td>
+        <div className="max-w-full overflow-x-auto" data-testid="stock-table-scroll">
+          <table className="w-full min-w-[520px] text-left text-sm">
+            <thead>
+              <tr className="text-neutral-500">
+                <th className="py-2">Part</th>
+                <th>Location</th>
+                <th className="text-right">On hand</th>
+                <th className="text-right">Reorder at</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {(levels.data?.levels ?? []).map((lvl: StockLevel) => (
+                <tr key={lvl.id} className="border-t border-neutral-200">
+                  <td className="py-2 pr-3 [overflow-wrap:anywhere]">
+                    <span data-testid="part-label">{partLabel(lvl)}</span>
+                    {lvl.isLowStock ? (
+                      <span className="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-800">Low</span>
+                    ) : null}
+                  </td>
+                  <td>{locName(lvl.locationId)}</td>
+                  <td className="text-right tabular-nums">{lvl.quantity}</td>
+                  <td className="text-right tabular-nums">{lvl.lowStockThreshold ?? "—"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </section>
   );
@@ -320,8 +322,16 @@ function Feedback({ error, ok }: { error: string | null; ok: string | null }) {
   return null;
 }
 
+/** recordVersion of the (location, part) stock level the operator is looking at, from the loaded levels. */
+export function useLevelVersion() {
+  const levels = useStockLevels(null, false);
+  return (locationId: string, productId: string): string | undefined =>
+    levels.data?.levels.find((l) => l.locationId === locationId && l.productId === productId)?.recordVersion;
+}
+
 export function AdjustPanel() {
   const adjust = useAdjustStock();
+  const levelVersion = useLevelVersion();
   const [locationId, setLocationId] = useState("");
   const [productId, setProductId] = useState("");
   const [delta, setDelta] = useState("");
@@ -336,7 +346,14 @@ export function AdjustPanel() {
     setError(null);
     setOk(null);
     try {
-      const res = await adjust.mutateAsync({ locationId, productId, quantityDelta: qty, reason: reason.trim() });
+      const recordVersion = levelVersion(locationId, productId);
+      const res = await adjust.mutateAsync({
+        locationId,
+        productId,
+        quantityDelta: qty,
+        reason: reason.trim(),
+        ...(recordVersion ? { recordVersion } : {})
+      });
       setOk(`Saved. On hand now ${res.levels[0]?.quantity ?? "updated"}.`);
       setDelta("");
       setReason("");
@@ -367,6 +384,7 @@ export function AdjustPanel() {
 
 export function TransferPanel() {
   const transfer = useTransferStock();
+  const levelVersion = useLevelVersion();
   const [fromLocationId, setFrom] = useState("");
   const [toLocationId, setTo] = useState("");
   const [productId, setProductId] = useState("");
@@ -382,7 +400,8 @@ export function TransferPanel() {
     setError(null);
     setOk(null);
     try {
-      await transfer.mutateAsync({ fromLocationId, toLocationId, productId, quantity: qty });
+      const recordVersion = levelVersion(fromLocationId, productId);
+      await transfer.mutateAsync({ fromLocationId, toLocationId, productId, quantity: qty, ...(recordVersion ? { recordVersion } : {}) });
       setOk("Transfer saved.");
       setQuantity("");
     } catch (err) {

@@ -492,6 +492,94 @@ describe("FS-200 security follow-up: ownership, recording gating, rate limits, r
     expect((await postWebhook(FAKE_PROVIDER, callEvent())).status).toBe(429);
     expect(fakeParse).not.toHaveBeenCalled();
   });
+
+  describe("review nits: signed timestamp header + timingSafeEqual, verified_at freshness", () => {
+    const SIGNING_SECRET = "test-only-signing-secret";
+    const SIG_HEADER = "x-provider-signature";
+    const TS_HEADER = "x-provider-timestamp";
+    async function signingAdapter() {
+      const { verifySignedWebhook, parseSignedTimestampMs } = await import("../../lib/webhook-signature.js");
+      return {
+        ...fakeAdapter,
+        verifyWebhookSignature: (input: { headers: Readonly<Record<string, string | undefined>>; rawBody: string }) =>
+          verifySignedWebhook({
+            secret: SIGNING_SECRET,
+            rawBody: input.rawBody,
+            signature: input.headers[SIG_HEADER],
+            timestamp: input.headers[TS_HEADER],
+            toleranceMs: 5 * 60_000
+          }).ok,
+        signedTimestampMs: (input: { headers: Readonly<Record<string, string | undefined>> }) => parseSignedTimestampMs(input.headers[TS_HEADER])
+      };
+    }
+    async function postSigned(body: unknown, signedAtMs: number, opts: { tamper?: boolean } = {}) {
+      const { createHmac } = await import("node:crypto");
+      const raw = JSON.stringify(body);
+      const ts = String(Math.floor(signedAtMs / 1000));
+      const sig = createHmac("sha256", SIGNING_SECRET).update(`${ts}.${raw}`).digest("hex");
+      return request(app.server)
+        .post(`/api/v1/webhooks/call-tracking/${FAKE_PROVIDER}`)
+        .set("content-type", "application/json")
+        .set(SIG_HEADER, sig)
+        .set(TS_HEADER, ts)
+        .send(opts.tamper ? raw.replace("answered", "missed") : raw);
+    }
+
+    it("uses the provider's signed timestamp (not the body occurredAt) for the replay window", async () => {
+      const w = seedWorld();
+      await enable(w);
+      (await registry()).registerCallTrackingAdapter(await signingAdapter());
+      const minute = 60_000;
+      // Body claims a stale occurredAt, but the provider signed it just now: accepted.
+      const fresh = await postSigned(callEvent({ providerCallId: "CA-signed-1", occurredAt: new Date(Date.now() - 60 * minute).toISOString() }), Date.now());
+      expect(fresh.status).toBe(202);
+      expect(fresh.body).toEqual({ status: "accepted" });
+      // Body claims "now", but the signed header is 10 minutes old: the signature check rejects it (401).
+      const replayed = await postSigned(callEvent({ providerCallId: "CA-signed-2" }), Date.now() - 10 * minute);
+      expect(replayed.status).toBe(401);
+      // Tampered body under a valid header signature is rejected by the constant-time compare.
+      expect((await postSigned(callEvent({ providerCallId: "CA-signed-3" }), Date.now(), { tamper: true })).status).toBe(401);
+      expect(recorded().map((r) => r.providerCallId)).toEqual(["CA-signed-1"]);
+    });
+
+    it("a signing adapter that yields no signed timestamp fails closed (401) before any write", async () => {
+      const w = seedWorld();
+      await enable(w);
+      (await registry()).registerCallTrackingAdapter({ ...fakeAdapter, signedTimestampMs: () => null });
+      const res = await postWebhook(FAKE_PROVIDER, callEvent({ providerCallId: "CA-nots-header" }));
+      expect(res.status).toBe(401);
+      expect(res.body).toEqual({ error: "INVALID_SIGNATURE" });
+      (await registry()).registerCallTrackingAdapter({ ...fakeAdapter, signedTimestampMs: () => { throw new Error("bad header"); } });
+      expect((await postWebhook(FAKE_PROVIDER, callEvent({ providerCallId: "CA-throw-header" }))).status).toBe(401);
+      expect(recorded()).toHaveLength(0);
+    });
+
+    it("honors provider verified_at only while fresh; stale, future or invalid verified_at reads as unverified", async () => {
+      const w = seedWorld();
+      await enable(w);
+      const day = 24 * 60 * 60_000;
+      const cases: Array<[unknown, string]> = [
+        [{ status: "verified", verifiedAt: new Date(Date.now() - day).toISOString() }, "verified"],
+        [{ status: "verified" }, "verified"],
+        [{ status: "verified", verifiedAt: new Date(Date.now() - 31 * day).toISOString() }, "unverified"],
+        [{ status: "verified", verifiedAt: new Date(Date.now() + day).toISOString() }, "unverified"],
+        [{ status: "verified", verifiedAt: "not-a-date" }, "unverified"],
+        [{ status: "verified", verifiedAt: 12345 }, "unverified"],
+        [{ status: "pending", verifiedAt: new Date().toISOString() }, "pending"],
+        [{ status: "__proto__" }, "unverified"]
+      ];
+      for (const [reported, expected] of cases) {
+        fakeVerifyOwnership.mockImplementationOnce((async () => reported) as never);
+        const list = await request(app.server).get("/api/v1/growth/call-tracking/numbers").set("Authorization", w.owner);
+        expect(list.body.numbers[0]).toMatchObject({ verificationStatus: expected, canReceiveCalls: expected === "verified" });
+      }
+      // A stale verification also blocks ingest.
+      fakeVerifyOwnership.mockImplementationOnce((async () => ({ status: "verified", verifiedAt: new Date(Date.now() - 31 * day).toISOString() })) as never);
+      const res = await postWebhook(FAKE_PROVIDER, callEvent({ providerCallId: "CA-stale-verified" }));
+      expect(res.body).toEqual({ status: "ignored", reason: "number_unverified" });
+      expect(recorded()).toHaveLength(0);
+    });
+  });
 });
 
 describe("FS-200 0060: verified_at persistence on the ownership-verification path", () => {

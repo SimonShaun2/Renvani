@@ -869,6 +869,14 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
             {isExisting ? (
               <StatBadge label={formatStatusLabel(currentStatus)} tone={getEstimateStatusTone(currentStatus)} />
             ) : null}
+            {isExisting && groupQuery.data?.primary.tierGroupId ? (
+              <Link
+                href={`/estimates/option-sets/${groupQuery.data.primary.tierGroupId}`}
+                className="rounded-[10px] border border-[#e6dccb] bg-white px-4 py-2 text-sm font-semibold text-[#0f1530]"
+              >
+                Manage options
+              </Link>
+            ) : null}
             {isEditable ? (
               <>
                 <button

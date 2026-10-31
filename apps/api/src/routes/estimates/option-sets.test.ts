@@ -258,6 +258,106 @@ describe("FS-212 estimate option sets", () => {
     expect(after.body.optionSet.status).toBe("approved");
   });
 
+  describe("compare-and-set on optionSetVersion (concurrent writer between read and write)", () => {
+    type SetRow = { tierGroupId: string | null; optionSetVersion: number | null; deletedAt: Date | null };
+    const setRows = (id: string) =>
+      (fakeDb.getTestState().estimates as unknown as SetRow[]).filter((e) => e.tierGroupId === id && !e.deletedAt);
+
+    /**
+     * Simulates a second request that committed after this request read the set (version check passed)
+     * but before its first write: on the first db.update call every live row in the set moves to version 2.
+     * Records the highest version seen on any later write so a double bump would be caught.
+     */
+    function raceOnFirstUpdate(id: string) {
+      const original = fakeDb.db.update.bind(fakeDb.db);
+      let calls = 0;
+      const seen: number[] = [];
+      const spy = vi.spyOn(fakeDb.db, "update").mockImplementation(((table: Parameters<typeof original>[0]) => {
+        calls += 1;
+        if (calls === 1) for (const row of setRows(id)) row.optionSetVersion = 2;
+        else seen.push(...setRows(id).map((row) => row.optionSetVersion ?? 0));
+        return original(table);
+      }) as typeof original);
+      return { spy, maxSeen: () => Math.max(2, ...seen) };
+    }
+
+    async function freshSet(w: ReturnType<typeof world>, idempotencyKey?: string) {
+      const created = await create(w.owner, createBody(w.customer.id, idempotencyKey ? { idempotencyKey } : {}));
+      expect(created.status).toBe(201);
+      return created.body.optionSet as { tierGroupId: string; options: Array<{ estimateId: string }> };
+    }
+
+    function snapshot(id: string) {
+      return JSON.stringify(fakeDb.getTestState().estimates.filter((e) => e.tierGroupId === id));
+    }
+
+    it("PATCH that loses the race returns 409 stale_version, writes nothing and never double-bumps", async () => {
+      const w = world();
+      const set = await freshSet(w);
+      const before = snapshot(set.tierGroupId);
+      const race = raceOnFirstUpdate(set.tierGroupId);
+      const res = await api().patch(`${base}/${set.tierGroupId}`).set("Authorization", w.owner).send({
+        idempotencyKey: "fs212-race-patch-1", expectedVersion: 1, title: "Mine",
+        options: [{ estimateId: set.options[0]!.estimateId, tierLabel: "Basic" }],
+        recommendedEstimateId: set.options[0]!.estimateId
+      });
+      race.spy.mockRestore();
+      expect(res.status).toBe(409);
+      expect(res.body.fields).toMatchObject({ reason: "stale_version" });
+      expect(race.maxSeen()).toBe(2);
+      // Transaction rolled back: no partial title/label/recommended writes from the losing request.
+      expect(snapshot(set.tierGroupId)).toBe(before);
+    });
+
+    it("sequential stale second PATCH is 409 and the version is bumped exactly once", async () => {
+      const w = world();
+      const set = await freshSet(w);
+      const url = `${base}/${set.tierGroupId}`;
+      const first = await api().patch(url).set("Authorization", w.owner).send({ idempotencyKey: "fs212-seq-1", expectedVersion: 1, title: "A" });
+      const second = await api().patch(url).set("Authorization", w.owner).send({ idempotencyKey: "fs212-seq-2", expectedVersion: 1, title: "B" });
+      expect(first.status).toBe(200);
+      expect(second.status).toBe(409);
+      expect(second.body.fields).toMatchObject({ reason: "stale_version" });
+      expect(setRows(set.tierGroupId).map((row) => row.optionSetVersion)).toEqual([2, 2, 2]);
+      expect((await api().get(url).set("Authorization", w.owner)).body.optionSet).toMatchObject({ version: 2, title: "A" });
+    });
+
+    it("add option, remove option and send that lose the race are 409 stale_version with no partial writes", async () => {
+      const w = world();
+      const twoOptions = await create(w.owner, createBody(w.customer.id, { options: [option("Good", 100), option("Best", 300)] }));
+      const addId = twoOptions.body.optionSet.tierGroupId as string;
+      const beforeAdd = snapshot(addId);
+      let race = raceOnFirstUpdate(addId);
+      const added = await api().post(`${base}/${addId}/options`).set("Authorization", w.owner).send({
+        idempotencyKey: "fs212-race-add-1", expectedVersion: 1, option: option("Better", 200)
+      });
+      race.spy.mockRestore();
+      expect(added.status).toBe(409);
+      expect(added.body.fields).toMatchObject({ reason: "stale_version" });
+      expect(race.maxSeen()).toBe(2);
+      expect(snapshot(addId)).toBe(beforeAdd);
+
+      const set = await freshSet(w, "fs212-race-create-2");
+      const beforeRemove = snapshot(set.tierGroupId);
+      race = raceOnFirstUpdate(set.tierGroupId);
+      const removed = await api()
+        .delete(`${base}/${set.tierGroupId}/options/${set.options[1]!.estimateId}?expectedVersion=1&idempotencyKey=fs212-race-del-1`)
+        .set("Authorization", w.owner);
+      race.spy.mockRestore();
+      expect(removed.status).toBe(409);
+      expect(removed.body.fields).toMatchObject({ reason: "stale_version" });
+      expect(snapshot(set.tierGroupId)).toBe(beforeRemove);
+
+      race = raceOnFirstUpdate(set.tierGroupId);
+      const sent = await api().post(`${base}/${set.tierGroupId}/send`).set("Authorization", w.owner).send({ idempotencyKey: "fs212-race-send-1", expectedVersion: 1 });
+      race.spy.mockRestore();
+      expect(sent.status).toBe(409);
+      expect(sent.body.fields).toMatchObject({ reason: "stale_version" });
+      expect(addNotificationQueueJob).not.toHaveBeenCalled();
+      expect(snapshot(set.tierGroupId)).toBe(beforeRemove);
+    });
+  });
+
   it("keeps financing disabled: quotes [] with financing_disabled, applications 403, no network calls", async () => {
     const w = world();
     const fetchSpy = vi.fn();

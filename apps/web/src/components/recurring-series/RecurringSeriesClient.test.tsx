@@ -75,6 +75,19 @@ describe("RecurringSeriesClient", () => {
     expect(screen.getByText(/has a job — change it from the job/i)).toBeTruthy();
   });
 
+  it("status pill has a leading dot and buttons use the 44px Figma size", () => {
+    mount();
+    const pill = screen.getByTestId("series-status-pill");
+    expect(pill.textContent).toBe("Active");
+    expect(pill.style.backgroundColor).toMatch(/#e4f1e8|rgb\(228, 241, 232\)/);
+    const dot = screen.getByTestId("series-status-dot");
+    expect(dot.className).toContain("h-1.5");
+    expect(dot.style.backgroundColor).toMatch(/#2f7d4f|rgb\(47, 125, 79\)/);
+    const btn = screen.getByRole("button", { name: "Pause plan" });
+    expect(btn.className).toContain("h-11");
+    expect(btn.className).toContain("rounded-[10px]");
+  });
+
   it("an ended plan shows the ended state and no controls", () => {
     m.data = detail("cancelled");
     mount();

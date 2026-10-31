@@ -22,19 +22,35 @@ export interface CallTrackingNumberOwnershipInput {
   providerNumberId: string | null;
 }
 
+/**
+ * Ownership result. A bare status string is still accepted. When the provider reports when it verified the
+ * number (`verifiedAt`, ISO-8601), the service only honors `verified` while that timestamp is fresh
+ * (see CALL_TRACKING_OWNERSHIP_MAX_AGE_MS); a missing/invalid/future/stale timestamp fails closed.
+ */
+export type CallTrackingNumberOwnershipResult = string | { status: string; verifiedAt?: string | null };
+
 export interface CallTrackingAdapter {
   id: string;
   /** False for the disabled adapter: the webhook rejects before touching the payload. */
   enabled: boolean;
-  /** Must be constant-time and fail closed. */
+  /**
+   * Must be constant-time (timingSafeEqual) and fail closed. Real adapters should use
+   * verifySignedWebhook() from lib/webhook-signature.ts, which signs `${timestamp}.${rawBody}`.
+   */
   verifyWebhookSignature(input: CallTrackingWebhookInput): boolean;
+  /**
+   * Provider's signed timestamp (ms since epoch) for this delivery, read from the signed header. When an adapter
+   * implements this, the replay window uses it instead of the body's occurredAt, and a missing value is rejected.
+   * Only called after verifyWebhookSignature returned true.
+   */
+  signedTimestampMs?(input: CallTrackingWebhookInput): number | null;
   /** Maps the provider payload to the normalized inbound call shape (validated by the caller). */
   parseInboundCall(rawBody: string): unknown;
   /**
    * Confirms with the provider that this account owns the number. Returns a key of
    * CALL_TRACKING_NUMBER_VERIFICATION_STATUS_REGISTRY; anything else is treated as unverified.
    */
-  verifyNumberOwnership(number: CallTrackingNumberOwnershipInput): Promise<string>;
+  verifyNumberOwnership(number: CallTrackingNumberOwnershipInput): Promise<CallTrackingNumberOwnershipResult>;
 }
 
 const adapters = new Map<string, CallTrackingAdapter>();

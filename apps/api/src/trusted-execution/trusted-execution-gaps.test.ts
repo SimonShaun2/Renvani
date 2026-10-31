@@ -1,7 +1,8 @@
 /**
  * Ticket A "Trusted Execution": REPRODUCIBLE FAILING TESTS for documented gaps. NO FIXES.
  *
- * These tests intentionally fail on dev: each one asserts the behaviour the trusted-execution contract
+ * TE-STALE-01/02/03 and TE-DUP-01/02 are fixed and now live in trusted-execution.test.ts (default run).
+ * These remaining tests intentionally fail on dev: each one asserts the behaviour the trusted-execution contract
  * requires and that dev does not provide yet. They are excluded from the default `vitest run`
  * (see vitest.config.ts) and run only through `pnpm --filter @fsm/api test:trusted-execution-gaps`.
  * Each title starts with its gap id from docs/architecture/TRUSTED_EXECUTION_AUDIT.md.
@@ -156,9 +157,15 @@ describe("Trusted Execution gaps: controls (pass today; prove the harness works)
     const { company, job, auth } = tenant("ctrl");
     const owner = auth("owner");
     const pending = seedSchedulingAction(company.id, job.id, "awaiting_approval");
-    const approved = await request(app.server).post(`/api/v1/agent-actions/${pending.id}/approve`).set("Authorization", owner.header).send({});
+    const approved = await request(app.server)
+      .post(`/api/v1/agent-actions/${pending.id}/approve`)
+      .set("Authorization", owner.header)
+      .send({ expectedVersion: stored(pending.id).updatedAt.getTime() });
     expect(approved.status).toBe(200);
-    const executed = await request(app.server).post(`/api/v1/agent-actions/${pending.id}/execute`).set("Authorization", owner.header).send({});
+    const executed = await request(app.server)
+      .post(`/api/v1/agent-actions/${pending.id}/execute`)
+      .set("Authorization", owner.header)
+      .send({ expectedVersion: approved.body.version });
     expect(executed.status).toBe(200);
     expect(executed.body.state).toBe("succeeded");
   });
@@ -170,68 +177,11 @@ describe("Trusted Execution gaps: controls (pass today; prove the harness works)
     const tech = a.auth("technician");
     const ownerB = b.auth("owner");
     for (const op of ["approve", "execute"]) {
-      expect((await request(app.server).post(`/api/v1/agent-actions/${action.id}/${op}`).set("Authorization", tech.header).send({})).status).toBe(403);
-      expect((await request(app.server).post(`/api/v1/agent-actions/${action.id}/${op}`).set("Authorization", ownerB.header).send({})).status).toBe(404);
+      const body = { expectedVersion: stored(action.id).updatedAt.getTime() };
+      expect((await request(app.server).post(`/api/v1/agent-actions/${action.id}/${op}`).set("Authorization", tech.header).send(body)).status).toBe(403);
+      expect((await request(app.server).post(`/api/v1/agent-actions/${action.id}/${op}`).set("Authorization", ownerB.header).send(body)).status).toBe(404);
     }
     expect(stored(action.id).state).toBe("awaiting_approval");
-  });
-});
-
-describe("Trusted Execution gaps: stale records (expectedVersion)", () => {
-  it("TE-STALE-01 approve without expectedVersion must be rejected (400), not applied blind", async () => {
-    const { company, job, auth } = tenant("stale1");
-    const action = seedSchedulingAction(company.id, job.id, "awaiting_approval");
-    const res = await request(app.server).post(`/api/v1/agent-actions/${action.id}/approve`).set("Authorization", auth("owner").header).send({});
-    expect(res.status, "approve must require expectedVersion").toBe(400);
-    expect(stored(action.id).state).toBe("awaiting_approval");
-  });
-
-  it("TE-STALE-02 execute without expectedVersion must be rejected (400), not applied blind", async () => {
-    const { company, job, auth } = tenant("stale2");
-    const action = seedSchedulingAction(company.id, job.id, "approved");
-    const res = await request(app.server).post(`/api/v1/agent-actions/${action.id}/execute`).set("Authorization", auth("owner").header).send({});
-    expect(res.status, "execute must require expectedVersion").toBe(400);
-    expect(stored(action.id).state).toBe("approved");
-  });
-
-  it("TE-STALE-03 operator edit with a stale expectedVersion must be 409 and leave the body unchanged", async () => {
-    const { company, customer, auth } = (() => {
-      const t = tenant("stale3");
-      const c = fakeDb.seedCustomer({ companyId: t.company.id, firstName: "Pat", lastName: "Doe" });
-      return { ...t, customer: c };
-    })();
-    const action = seedMessageAction(company.id, customer.id, "awaiting_approval");
-    const staleVersion = stored(action.id).updatedAt.getTime() - 60_000;
-    const res = await request(app.server)
-      .patch(`/api/v1/operator/inbox/${action.id}`)
-      .set("Authorization", auth("owner").header)
-      .send({ body: "Edited against a stale copy", expectedVersion: staleVersion });
-    expect(res.status, "edit must honour expectedVersion").toBe(409);
-    expect((stored(action.id).parameters as Record<string, unknown>).body).toBe("Your technician is on the way.");
-  });
-});
-
-describe("Trusted Execution gaps: duplicate operations (idempotency)", () => {
-  it("TE-DUP-01 double approve with the same Idempotency-Key replays the first result (200, same version)", async () => {
-    const { company, job, auth } = tenant("dup1");
-    const owner = auth("owner");
-    const action = seedSchedulingAction(company.id, job.id, "awaiting_approval");
-    const first = await request(app.server).post(`/api/v1/agent-actions/${action.id}/approve`).set("Authorization", owner.header).set("Idempotency-Key", "te-dup-approve-1").send({});
-    expect(first.status).toBe(200);
-    const second = await request(app.server).post(`/api/v1/agent-actions/${action.id}/approve`).set("Authorization", owner.header).set("Idempotency-Key", "te-dup-approve-1").send({});
-    expect(second.status, "same-key approve should replay, not 409").toBe(200);
-    expect(second.body.version).toBe(first.body.version);
-  });
-
-  it("TE-DUP-02 double execute with the same Idempotency-Key replays the same receipt (200)", async () => {
-    const { company, job, auth } = tenant("dup2");
-    const owner = auth("owner");
-    const action = seedSchedulingAction(company.id, job.id, "approved");
-    const first = await request(app.server).post(`/api/v1/agent-actions/${action.id}/execute`).set("Authorization", owner.header).set("Idempotency-Key", "te-dup-exec-1").send({});
-    expect(first.status).toBe(200);
-    const second = await request(app.server).post(`/api/v1/agent-actions/${action.id}/execute`).set("Authorization", owner.header).set("Idempotency-Key", "te-dup-exec-1").send({});
-    expect(second.status, "same-key execute should replay, not 409").toBe(200);
-    expect(second.body.executionReceipt).toEqual(first.body.executionReceipt);
   });
 });
 

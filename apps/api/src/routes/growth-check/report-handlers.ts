@@ -59,7 +59,7 @@ export async function previewReportDraftHandler(request: FastifyRequest, reply: 
 
 export async function exportReportDraftHandler(request: FastifyRequest, reply: FastifyReply) {
   const { format } = request.query as { format?: GrowthCheckReportExportFormat };
-  const file = await exportGrowthCheckReportDraft(request.company.id, draftIdOf(request), format ?? "markdown");
+  const file = await exportGrowthCheckReportDraft(actorOf(request), draftIdOf(request), format ?? "markdown");
   return reply
     .header("Content-Type", file.contentType)
     .header("Content-Disposition", `attachment; filename="${file.filename}"`)

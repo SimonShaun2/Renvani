@@ -77,6 +77,17 @@ describe("ZipCheckCard", () => {
 });
 
 describe("Emergency toggle + badge", () => {
+  it.each([true, false])("renders the inline switch (on=%s) with no /booking/ image request", (on) => {
+    const { container } = render(<EmergencyToggle on={on} onChange={() => {}} />);
+    expect(container.querySelector("img")).toBeNull();
+    expect(container.innerHTML).not.toContain("/booking/");
+    const sw = screen.getByTestId("emergency-toggle-switch");
+    expect(sw.getAttribute("data-state")).toBe(on ? "on" : "off");
+    expect(sw.querySelector("rect")?.getAttribute("fill")).toBe(on ? "#F6B400" : "#D9D3C7");
+    expect(sw.querySelector("circle")?.getAttribute("cx")).toBe(on ? "32" : "12");
+    expect(screen.getByRole("switch").getAttribute("aria-checked")).toBe(String(on));
+  });
+
   it("off (310:251) and on (310:275) copy and switch state", () => {
     const onChange = vi.fn();
     const { rerender } = render(<EmergencyToggle on={false} onChange={onChange} />);

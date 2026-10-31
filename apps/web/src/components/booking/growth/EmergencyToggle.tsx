@@ -16,7 +16,11 @@ export function EmergencyToggle({ on, onChange }: { on: boolean; onChange: (on: 
           on ? "border-[#b42318] bg-[#fbe3dc]" : "border-[#e6dccb] bg-white"
         }`}
       >
-        <img alt="" width={44} height={24} className="h-[24px] w-[44px] shrink-0" src={on ? "/booking/toggle-on.svg" : "/booking/toggle-off.svg"} />
+        {/* Inline switch (Figma 310:293 Toggle/On, 44x24, 18px knob): no /booking/* asset, which is auth-gated for logged-out customers. */}
+        <svg aria-hidden="true" data-testid="emergency-toggle-switch" data-state={on ? "on" : "off"} width={44} height={24} viewBox="0 0 44 24" fill="none" className="h-[24px] w-[44px] shrink-0">
+          <rect width="44" height="24" rx="12" fill={on ? "#F6B400" : "#D9D3C7"} />
+          <circle cx={on ? 32 : 12} cy="12" r="9" fill="white" />
+        </svg>
         <span className="min-w-0 flex-1 text-[14px] font-medium text-[#0f1530]">{C.label}</span>
       </button>
       <p className="text-[12px] text-[#5e6684]">{on ? C.helpOn : C.helpOff}</p>

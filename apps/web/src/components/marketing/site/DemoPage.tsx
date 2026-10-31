@@ -20,7 +20,7 @@ export const DEMO = {
   success: { title: "Thanks. Your demo request is in.", body: "We’ll reply by email to set a time that works for you." }
 };
 
-/** Demo page. Figma page 11: desktop 176:737, tablet 253:6781, mobile 176:826. */
+/** Demo page. Figma page 11: desktop 176:737, tablet 253:6781, mobile 176:826. ScaleToFrame (1440) from 1024 up. */
 export function DemoPage({ action = submitDemoRequest }: { action?: (prev: IntakeResult | null, fd: FormData) => Promise<IntakeResult> }) {
   const [state, formAction] = useActionState(action, null);
   const errors = state?.status === "invalid" ? state.fields : {};

@@ -50,6 +50,10 @@ beforeAll(async () => {
 
 beforeEach(async () => {
   fakeDb.resetTestState();
+  const limiter = await import("../../lib/fixed-window-rate-limit.js");
+  limiter.setRateLimitRedisClientForTests(null);
+  limiter.resetFixedWindowRateLimitStateForTests();
+  fakeOwnership = "verified";
   app = await buildAppModule.buildApp();
   await app.ready();
 });
@@ -65,11 +69,15 @@ function bearer(companyId: string, userId: string, role: string): string {
 const FAKE_PROVIDER = "fake_tracker";
 const FAKE_SECRET_HEADER = "x-fake-signature";
 const fakeParse = vi.fn((raw: string) => JSON.parse(raw) as unknown);
+/** Ownership the fake provider reports; tests flip it to exercise unverified numbers. */
+let fakeOwnership = "verified";
+const fakeVerifyOwnership = vi.fn(async () => fakeOwnership);
 const fakeAdapter = {
   id: FAKE_PROVIDER,
   enabled: true,
   verifyWebhookSignature: (input: { headers: Readonly<Record<string, string | undefined>> }) => input.headers[FAKE_SECRET_HEADER] === "valid",
-  parseInboundCall: fakeParse
+  parseInboundCall: fakeParse,
+  verifyNumberOwnership: fakeVerifyOwnership
 };
 
 async function registry() {
@@ -100,6 +108,7 @@ const callEvent = (overrides: Record<string, unknown> = {}) => ({
   trackingNumber: "+15125550111",
   callerNumber: "+15125559876",
   startedAt: "2026-10-30T15:00:00.000Z",
+  occurredAt: new Date().toISOString(),
   durationSeconds: 184,
   outcome: "answered",
   recordingRef: "rec-abc123",
@@ -309,5 +318,178 @@ describe("FS-200 call tracking settings, numbers and calls", () => {
     expect((await post({ ...valid, callerName: "x" })).status).toBe(400);
     expect((await request(app.server).get("/api/v1/growth/call-tracking/calls?limit=500").set("Authorization", w.owner)).status).toBe(400);
     expect((await request(app.server).patch("/api/v1/growth/call-tracking/numbers/not-a-uuid").set("Authorization", w.owner).send({ expectedVersion: 1 })).status).toBe(400);
+  });
+});
+
+describe("FS-200 security follow-up: ownership, recording gating, rate limits, replay window", () => {
+  beforeEach(async () => {
+    (await registry()).registerCallTrackingAdapter(fakeAdapter);
+    fakeParse.mockClear();
+    fakeVerifyOwnership.mockClear();
+  });
+  afterEach(async () => {
+    (await registry()).unregisterCallTrackingAdapter(FAKE_PROVIDER);
+    vi.useRealTimers();
+  });
+
+  async function enable(w: ReturnType<typeof seedWorld>, extra: Record<string, unknown> = {}) {
+    const res = await request(app.server)
+      .put("/api/v1/growth/call-tracking/settings")
+      .set("Authorization", w.owner)
+      .send({ expectedVersion: 0, provider: FAKE_PROVIDER, enabled: true, ...(extra.recordingEnabled ? { recordingNoticeState: "TX" } : {}), ...extra });
+    expect(res.status).toBe(200);
+    const num = await request(app.server)
+      .post("/api/v1/growth/call-tracking/numbers")
+      .set("Authorization", w.admin)
+      .send({ trackingNumber: "+15125550111", label: "Yard signs", marketingSource: "yard signs", forwardingNumber: "+15125550100" });
+    expect(num.status).toBe(201);
+    return num.body.number as { id: string; verificationStatus: string; canReceiveCalls: boolean };
+  }
+
+  const recorded = () => fakeDb.getTestState().callRecords;
+
+  it("numbers on the disabled adapter are always unverified and cannot receive calls", async () => {
+    const w = seedWorld();
+    const fetchSpy = vi.spyOn(globalThis, "fetch");
+    const num = await request(app.server)
+      .post("/api/v1/growth/call-tracking/numbers")
+      .set("Authorization", w.owner)
+      .send({ trackingNumber: "+15125550222", label: "Truck", marketingSource: "truck wrap", forwardingNumber: "+15125550100" });
+    expect(num.status).toBe(201);
+    expect(num.body.number).toMatchObject({ provider: "disabled", verificationStatus: "unverified", canReceiveCalls: false });
+    const list = await request(app.server).get("/api/v1/growth/call-tracking/numbers").set("Authorization", w.owner);
+    expect(list.body.numbers[0]).toMatchObject({ verificationStatus: "unverified", canReceiveCalls: false });
+    expect(fetchSpy).not.toHaveBeenCalled();
+    fetchSpy.mockRestore();
+  });
+
+  it("reports provider ownership states and fails closed on unknown status or adapter errors", async () => {
+    const w = seedWorld();
+    const num = await enable(w);
+    expect(num).toMatchObject({ verificationStatus: "verified", canReceiveCalls: true });
+    const states: Array<[string | (() => never), string, boolean]> = [
+      ["pending", "pending", false],
+      ["failed", "failed", false],
+      ["unverified", "unverified", false],
+      ["owned!", "unverified", false],
+      [() => { throw new Error("provider down"); }, "unverified", false]
+    ];
+    for (const [reported, expected, canReceive] of states) {
+      if (typeof reported === "function") fakeVerifyOwnership.mockImplementationOnce(async () => reported());
+      else fakeOwnership = reported;
+      const list = await request(app.server).get("/api/v1/growth/call-tracking/numbers").set("Authorization", w.owner);
+      expect(list.body.numbers[0]).toMatchObject({ verificationStatus: expected, canReceiveCalls: canReceive });
+    }
+  });
+
+  it("ignores calls to numbers that are not ownership-verified and writes nothing", async () => {
+    const w = seedWorld();
+    await enable(w, { recordingEnabled: true });
+    for (const status of ["unverified", "pending", "failed"]) {
+      fakeOwnership = status;
+      const res = await postWebhook(FAKE_PROVIDER, callEvent({ providerCallId: `CA-${status}`, occurredAt: new Date().toISOString() }));
+      expect(res.status).toBe(202);
+      expect(res.body).toEqual({ status: "ignored", reason: "number_unverified" });
+    }
+    expect(recorded()).toHaveLength(0);
+    fakeOwnership = "verified";
+    expect((await postWebhook(FAKE_PROVIDER, callEvent({ occurredAt: new Date().toISOString() }))).body).toEqual({ status: "accepted" });
+    expect(recorded()).toHaveLength(1);
+  });
+
+  it("stores the recording ref only when the disclosure played and consent mode is satisfied, else drops and flags it", async () => {
+    const w = seedWorld();
+    await enable(w, { recordingEnabled: true });
+    const cases: Array<[Record<string, unknown>, boolean]> = [
+      [{ recordingDisclosurePlayed: true, callerConsent: "granted" }, true],
+      [{ recordingDisclosurePlayed: false, callerConsent: "granted" }, false],
+      [{ recordingDisclosurePlayed: undefined, callerConsent: "granted" }, false],
+      [{ recordingDisclosurePlayed: true, callerConsent: "unknown" }, false],
+      [{ recordingDisclosurePlayed: true, callerConsent: "declined" }, false]
+    ];
+    let i = 0;
+    for (const [overrides, kept] of cases) {
+      const id = `CA-rec-${i++}`;
+      const res = await postWebhook(FAKE_PROVIDER, callEvent({ providerCallId: id, occurredAt: new Date().toISOString(), ...overrides }));
+      expect(res.status).toBe(202);
+      expect(res.body).toEqual(kept ? { status: "accepted" } : { status: "accepted", recordingRefDropped: true });
+      const row = recorded().find((r) => r.providerCallId === id)!;
+      expect(row.recordingRef).toBe(kept ? "rec-abc123" : null);
+    }
+    // No ref sent: nothing to drop, no flag.
+    const none = await postWebhook(FAKE_PROVIDER, callEvent({ providerCallId: "CA-noref", recordingRef: null, occurredAt: new Date().toISOString() }));
+    expect(none.body).toEqual({ status: "accepted" });
+    const calls = await request(app.server).get("/api/v1/growth/call-tracking/calls").set("Authorization", w.owner);
+    expect(calls.body.calls.filter((c: { recordingRef: string | null }) => c.recordingRef !== null)).toHaveLength(1);
+  });
+
+  it("one-party consent accepts a played disclosure with unknown consent but never a declined caller", async () => {
+    const w = seedWorld();
+    await enable(w, { recordingEnabled: true, consentMode: "one_party" });
+    await postWebhook(FAKE_PROVIDER, callEvent({ providerCallId: "CA-1p-a", callerConsent: "unknown", occurredAt: new Date().toISOString() }));
+    await postWebhook(FAKE_PROVIDER, callEvent({ providerCallId: "CA-1p-b", callerConsent: "declined", occurredAt: new Date().toISOString() }));
+    await postWebhook(FAKE_PROVIDER, callEvent({ providerCallId: "CA-1p-c", recordingDisclosurePlayed: false, occurredAt: new Date().toISOString() }));
+    const refs = Object.fromEntries(recorded().map((r) => [r.providerCallId, r.recordingRef]));
+    expect(refs).toEqual({ "CA-1p-a": "rec-abc123", "CA-1p-b": null, "CA-1p-c": null });
+  });
+
+  it("hides a legacy stored ref on read when disclosure/consent was not satisfied", async () => {
+    const w = seedWorld();
+    await enable(w, { recordingEnabled: true });
+    await postWebhook(FAKE_PROVIDER, callEvent({ occurredAt: new Date().toISOString() }));
+    const row = recorded()[0]!;
+    row.recordingDisclosurePlayed = false; // simulate a pre-gate row that kept its ref
+    const calls = await request(app.server).get("/api/v1/growth/call-tracking/calls").set("Authorization", w.owner);
+    expect(calls.body.calls[0].recordingRef).toBeNull();
+  });
+
+  it("rejects events outside the ±5 minute replay window but keeps duplicate retries idempotent", async () => {
+    const w = seedWorld();
+    await enable(w);
+    const minute = 60_000;
+    const stale = await postWebhook(FAKE_PROVIDER, callEvent({ providerCallId: "CA-stale", occurredAt: new Date(Date.now() - 6 * minute).toISOString() }));
+    expect(stale.status).toBe(400);
+    expect(stale.body).toEqual({ error: "EVENT_OUTSIDE_REPLAY_WINDOW" });
+    const future = await postWebhook(FAKE_PROVIDER, callEvent({ providerCallId: "CA-future", occurredAt: new Date(Date.now() + 6 * minute).toISOString() }));
+    expect(future.status).toBe(400);
+    const edge = await postWebhook(FAKE_PROVIDER, callEvent({ providerCallId: "CA-edge", occurredAt: new Date(Date.now() - 4 * minute).toISOString() }));
+    expect(edge.status).toBe(202);
+    expect(recorded().map((r) => r.providerCallId)).toEqual(["CA-edge"]);
+
+    // A provider retry of a stored event after the window is still a 200 duplicate, not an error or a second row.
+    const retry = await postWebhook(FAKE_PROVIDER, callEvent({ providerCallId: "CA-edge", occurredAt: new Date(Date.now() - 60 * minute).toISOString() }));
+    expect(retry.status).toBe(200);
+    expect(retry.body).toEqual({ status: "duplicate" });
+    expect(recorded()).toHaveLength(1);
+    expect((await postWebhook(FAKE_PROVIDER, callEvent({ providerCallId: "CA-nots", occurredAt: undefined }))).status).toBe(400);
+  });
+
+  it("rate limits per provider+number with 429 and Retry-After, without affecting other numbers", async () => {
+    const w = seedWorld();
+    await enable(w);
+    const { CALL_TRACKING_WEBHOOK_NUMBER_LIMIT } = await import("../../services/growth/call-tracking.service.js");
+    for (let i = 0; i < CALL_TRACKING_WEBHOOK_NUMBER_LIMIT; i++) {
+      const res = await postWebhook(FAKE_PROVIDER, callEvent({ providerCallId: `CA-rl-${i}`, occurredAt: new Date().toISOString() }));
+      expect(res.status).not.toBe(429);
+    }
+    const limited = await postWebhook(FAKE_PROVIDER, callEvent({ providerCallId: "CA-rl-over", occurredAt: new Date().toISOString() }));
+    expect(limited.status).toBe(429);
+    expect(limited.body).toEqual({ error: "RATE_LIMITED" });
+    expect(Number(limited.headers["retry-after"])).toBeGreaterThan(0);
+    expect(recorded().some((r) => r.providerCallId === "CA-rl-over")).toBe(false);
+    const other = await postWebhook(FAKE_PROVIDER, callEvent({ providerCallId: "CA-other", trackingNumber: "+15125550999", occurredAt: new Date().toISOString() }));
+    expect(other.status).toBe(202);
+  });
+
+  it("rate limits per IP before any provider lookup, including the disabled adapter", async () => {
+    const { CALL_TRACKING_WEBHOOK_IP_LIMIT } = await import("../../services/growth/call-tracking.service.js");
+    for (let i = 0; i < CALL_TRACKING_WEBHOOK_IP_LIMIT; i++) {
+      expect((await postWebhook("disabled", {})).status).toBe(503);
+    }
+    const limited = await postWebhook("disabled", {});
+    expect(limited.status).toBe(429);
+    expect(Number(limited.headers["retry-after"])).toBeGreaterThan(0);
+    expect((await postWebhook(FAKE_PROVIDER, callEvent())).status).toBe(429);
+    expect(fakeParse).not.toHaveBeenCalled();
   });
 });

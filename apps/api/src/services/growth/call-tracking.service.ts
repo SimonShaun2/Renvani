@@ -15,6 +15,11 @@ import { callRecords, callTrackingNumbers, callTrackingSettings, db } from "@fsm
 import {
   AppError,
   CALL_TRACKING_DISABLED_PROVIDER_ID,
+  CALL_TRACKING_NUMBER_DEFAULT_VERIFICATION_STATUS,
+  CALL_TRACKING_NUMBER_VERIFICATION_STATUS_REGISTRY,
+  CALL_TRACKING_WEBHOOK_REPLAY_WINDOW_MS,
+  callRecordingRefAllowed,
+  callTrackingNumberCanReceiveCalls,
   ErrorCode,
   inboundCallEventSchema,
   sanitizeLeadAttribution,
@@ -35,6 +40,13 @@ import {
 } from "./call-tracking-adapter.registry.js";
 
 import { hashCallerNumber } from "./call-tracking-caller-hash.js";
+import { hitFixedWindowRateLimit } from "../../lib/fixed-window-rate-limit.js";
+
+/** Webhook limits (FS-66 fixed window; Redis across instances, memory fallback). */
+export const CALL_TRACKING_WEBHOOK_WINDOW_MS = 60_000;
+export const CALL_TRACKING_WEBHOOK_IP_LIMIT = 120;
+export const CALL_TRACKING_WEBHOOK_NUMBER_LIMIT = 30;
+const nowMs = () => Date.now();
 
 export { deriveCallerHashKey, hashCallerNumber } from "./call-tracking-caller-hash.js";
 
@@ -64,7 +76,29 @@ function toSettings(row: SettingsRow | undefined): CallTrackingSettings {
   };
 }
 
-function toNumber(row: NumberRow): CallTrackingNumber {
+/**
+ * Ownership status comes from the number's provider adapter and fails closed: unknown adapter, a thrown error or
+ * an unknown status all read as `unverified`. Not persisted yet (see FS-200 security follow-up): with only the
+ * disabled adapter there is nothing to store, and a real provider will add a verified_at column with its migration.
+ */
+export async function resolveCallTrackingNumberVerification(row: Pick<NumberRow, "provider" | "trackingNumber" | "providerNumberId">): Promise<string> {
+  const adapter = findCallTrackingAdapter(row.provider);
+  if (!adapter || !adapter.enabled) return CALL_TRACKING_NUMBER_DEFAULT_VERIFICATION_STATUS;
+  try {
+    const status = await adapter.verifyNumberOwnership({ trackingNumber: row.trackingNumber, providerNumberId: row.providerNumberId });
+    return typeof status === "string" && Object.prototype.hasOwnProperty.call(CALL_TRACKING_NUMBER_VERIFICATION_STATUS_REGISTRY, status)
+      ? status
+      : CALL_TRACKING_NUMBER_DEFAULT_VERIFICATION_STATUS;
+  } catch {
+    return CALL_TRACKING_NUMBER_DEFAULT_VERIFICATION_STATUS;
+  }
+}
+
+async function toNumberResolved(row: NumberRow): Promise<CallTrackingNumber> {
+  return toNumber(row, await resolveCallTrackingNumberVerification(row));
+}
+
+function toNumber(row: NumberRow, verificationStatus: string): CallTrackingNumber {
   return {
     id: row.id,
     provider: row.provider,
@@ -74,13 +108,16 @@ function toNumber(row: NumberRow): CallTrackingNumber {
     marketingCampaign: row.marketingCampaign,
     forwardingNumber: row.forwardingNumber,
     active: row.active,
+    verificationStatus,
+    canReceiveCalls: callTrackingNumberCanReceiveCalls(verificationStatus),
     version: row.version,
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString()
   };
 }
 
-function toCall(row: CallRow): CallRecord {
+/** Read-side gate too: never expose a ref stored before the disclosure/consent rule existed. */
+function toCall(row: CallRow, consentMode: string): CallRecord {
   return {
     id: row.id,
     trackingNumberId: row.trackingNumberId,
@@ -90,7 +127,11 @@ function toCall(row: CallRow): CallRecord {
     durationSeconds: row.durationSeconds,
     outcome: row.outcome,
     leadAttribution: (row.attribution as Record<string, string> | null) ?? null,
-    recordingRef: row.recordingRef,
+    recordingRef:
+      row.recordingRef &&
+      callRecordingRefAllowed({ consentMode, recordingDisclosurePlayed: row.recordingDisclosurePlayed, callerConsent: row.callerConsent })
+        ? row.recordingRef
+        : null,
     recordingDisclosurePlayed: row.recordingDisclosurePlayed,
     callerConsent: row.callerConsent,
     recordingNoticeState: row.recordingNoticeState,
@@ -180,7 +221,7 @@ export async function listCallTrackingNumbers(companyId: string): Promise<CallTr
     .from(callTrackingNumbers)
     .where(and(eq(callTrackingNumbers.companyId, companyId), isNull(callTrackingNumbers.deletedAt)))
     .orderBy(desc(callTrackingNumbers.createdAt));
-  return rows.map(toNumber);
+  return Promise.all(rows.map(toNumberResolved));
 }
 
 export async function createCallTrackingNumber(companyId: string, input: CallTrackingNumberCreate): Promise<CallTrackingNumber> {
@@ -215,7 +256,7 @@ export async function createCallTrackingNumber(companyId: string, input: CallTra
         updatedAt: now
       })
       .returning();
-    return toNumber(row!);
+    return await toNumberResolved(row!);
   } catch (error) {
     if (isUniqueViolation(error)) throw new AppError(ErrorCode.CONFLICT, "Tracking number is already in use");
     throw error;
@@ -259,7 +300,7 @@ export async function updateCallTrackingNumber(
     .where(and(eq(callTrackingNumbers.companyId, companyId), eq(callTrackingNumbers.id, row.id), eq(callTrackingNumbers.version, row.version)))
     .returning();
   if (!updated) throw new AppError(ErrorCode.CONFLICT, "Tracking number changed; reload and retry");
-  return toNumber(updated);
+  return toNumberResolved(updated);
 }
 
 export async function listCallRecords(companyId: string, query: CallRecordListQuery): Promise<CallRecord[]> {
@@ -274,7 +315,8 @@ export async function listCallRecords(companyId: string, query: CallRecordListQu
     )
     .orderBy(desc(callRecords.startedAt))
     .limit(query.limit ?? 50);
-  return rows.map(toCall);
+  const consentMode = (await loadSettingsRow(companyId))?.consentMode ?? "all_party";
+  return rows.map((row) => toCall(row, consentMode));
 }
 
 /** Tenant-scoped pseudonymous caller key (groups repeat callers within one shop; not reversible by the API). */
@@ -282,7 +324,8 @@ export type InboundCallOutcome =
   | { httpStatus: 404; error: "UNKNOWN_PROVIDER" }
   | { httpStatus: 503; error: "CALL_TRACKING_DISABLED" }
   | { httpStatus: 401; error: "INVALID_SIGNATURE" }
-  | { httpStatus: 400; error: "INVALID_PAYLOAD" }
+  | { httpStatus: 400; error: "INVALID_PAYLOAD" | "EVENT_OUTSIDE_REPLAY_WINDOW" }
+  | { httpStatus: 429; error: "RATE_LIMITED"; retryAfterSeconds: number }
   | { httpStatus: 200 | 202; body: InboundCallWebhookResponse };
 
 /**
@@ -311,6 +354,27 @@ export async function ingestInboundCall(providerId: string, input: CallTrackingW
   if (!parsed.success) return { httpStatus: 400, error: "INVALID_PAYLOAD" };
   const event = parsed.data;
 
+  // Per provider+number limit: a flood aimed at one number cannot starve the others.
+  const numberLimit = await hitFixedWindowRateLimit({
+    key: `fsm:webhook:call-tracking:number:${adapter.id}:${event.trackingNumber}`,
+    limit: CALL_TRACKING_WEBHOOK_NUMBER_LIMIT,
+    windowMs: CALL_TRACKING_WEBHOOK_WINDOW_MS
+  });
+  if (!numberLimit.allowed) return { httpStatus: 429, error: "RATE_LIMITED", retryAfterSeconds: numberLimit.retryAfterSeconds };
+
+  // A provider retry of an event we already stored stays an idempotent 200, even outside the replay window.
+  const [duplicate] = await db
+    .select({ id: callRecords.id })
+    .from(callRecords)
+    .where(and(eq(callRecords.provider, adapter.id), eq(callRecords.providerCallId, event.providerCallId)))
+    .limit(1);
+  if (duplicate) return { httpStatus: 200, body: { status: "duplicate" } };
+
+  const skew = Date.parse(event.occurredAt) - nowMs();
+  if (!Number.isFinite(skew) || Math.abs(skew) > CALL_TRACKING_WEBHOOK_REPLAY_WINDOW_MS) {
+    return { httpStatus: 400, error: "EVENT_OUTSIDE_REPLAY_WINDOW" };
+  }
+
   const [number] = await db
     .select()
     .from(callTrackingNumbers)
@@ -324,20 +388,24 @@ export async function ingestInboundCall(providerId: string, input: CallTrackingW
     )
     .limit(1);
   if (!number) return { httpStatus: 202, body: { status: "ignored" } };
+  if (!callTrackingNumberCanReceiveCalls(await resolveCallTrackingNumberVerification(number))) {
+    return { httpStatus: 202, body: { status: "ignored", reason: "number_unverified" } };
+  }
 
   const settings = await loadSettingsRow(number.companyId);
   if (!settings || !settings.enabled || settings.provider !== adapter.id) {
     return { httpStatus: 202, body: { status: "ignored" } };
   }
 
-  const [duplicate] = await db
-    .select({ id: callRecords.id })
-    .from(callRecords)
-    .where(and(eq(callRecords.provider, adapter.id), eq(callRecords.providerCallId, event.providerCallId)))
-    .limit(1);
-  if (duplicate) return { httpStatus: 200, body: { status: "duplicate" } };
-
   const recordingAllowed = settings.recordingEnabled;
+  const recordingDisclosurePlayed = event.recordingDisclosurePlayed ?? false;
+  const callerConsent = recordingAllowed ? (event.callerConsent ?? "unknown") : "not_required";
+  const keepRecordingRef =
+    recordingAllowed &&
+    Boolean(event.recordingRef) &&
+    callRecordingRefAllowed({ consentMode: settings.consentMode, recordingDisclosurePlayed, callerConsent });
+  // Flag (never silently keep) a ref sent without a played disclosure / satisfied consent. No caller data logged.
+  const recordingRefDropped = Boolean(event.recordingRef) && recordingAllowed && !keepRecordingRef;
   const attribution = sanitizeLeadAttribution({
     utm_source: number.marketingSource,
     utm_medium: "phone",
@@ -356,14 +424,14 @@ export async function ingestInboundCall(providerId: string, input: CallTrackingW
       durationSeconds: event.durationSeconds,
       outcome: event.outcome,
       attribution,
-      recordingRef: recordingAllowed ? (event.recordingRef ?? null) : null,
-      recordingDisclosurePlayed: event.recordingDisclosurePlayed ?? false,
-      callerConsent: recordingAllowed ? (event.callerConsent ?? "unknown") : "not_required",
+      recordingRef: keepRecordingRef ? (event.recordingRef ?? null) : null,
+      recordingDisclosurePlayed,
+      callerConsent,
       recordingNoticeState: settings.recordingNoticeState
     });
   } catch (error) {
     if (isUniqueViolation(error)) return { httpStatus: 200, body: { status: "duplicate" } };
     throw error;
   }
-  return { httpStatus: 202, body: { status: "accepted" } };
+  return { httpStatus: 202, body: recordingRefDropped ? { status: "accepted", recordingRefDropped: true } : { status: "accepted" } };
 }

@@ -1,14 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import Link from "next/link";
-import type { EstimateOption, EstimateOptionSet } from "@fsm/types";
+import { ESTIMATE_OPTION_SET_MAX_OPTIONS, ESTIMATE_OPTION_SET_MIN_OPTIONS, type EstimateOption, type EstimateOptionSet } from "@fsm/types";
 
 import { PageLayout } from "@/src/components/layout/PageLayout";
 import { CurrencyDisplay } from "@/src/components/ui/CurrencyDisplay";
 import { ErrorState } from "@/src/components/ui/ErrorState";
 import { SkeletonCard } from "@/src/components/ui/SkeletonCard";
-import { StatBadge } from "@/src/components/ui/StatBadge";
 import {
   useAddEstimateOption,
   useEstimateOptionSet,
@@ -18,7 +17,6 @@ import {
 } from "@/src/hooks/estimate-option-sets.hooks";
 import { useAuthStore } from "@/src/stores/auth.store";
 
-import { getEstimateStatusTone } from "../estimates/estimates.utils";
 import {
   canAddOption,
   canManageOptionSets,
@@ -26,6 +24,7 @@ import {
   describeOptionSetError,
   isDraftSet,
   newIdempotencyKey,
+  optionPositionLabel,
   setStatusLabel,
   sortOptions,
   suggestedTierLabel,
@@ -33,8 +32,13 @@ import {
 } from "./estimate-option-sets.utils";
 
 // Figma 10:604 "Operator / 05 Estimate builder" button styles (same as the builder header).
+// Figma 362:4217: secondary buttons are 44px (tablet/mobile) / 40px (desktop), r10, 18px padding, 13px semibold.
 const secondaryButton =
-  "inline-flex items-center justify-center rounded-[10px] border border-[#e6dccb] bg-white px-4 py-2 text-sm font-semibold text-[#0f1530] disabled:cursor-not-allowed disabled:opacity-50";
+  "inline-flex h-11 items-center justify-center rounded-[10px] border border-[#e6dccb] bg-white px-[18px] text-[13px] font-semibold text-[#0f1530] disabled:cursor-not-allowed disabled:opacity-50 lg:h-10";
+const disabledButton =
+  "inline-flex h-11 items-center justify-center rounded-[10px] bg-[#eef0f5] px-[18px] text-[13px] font-semibold text-[#5e6684] disabled:cursor-not-allowed lg:h-10";
+const textButton =
+  "inline-flex h-11 items-center justify-center px-2 text-[13px] font-semibold text-[#0f1530] disabled:cursor-not-allowed disabled:opacity-50 lg:h-10";
 const primaryButton =
   "inline-flex items-center justify-center rounded-[10px] bg-[#f6b400] px-4 py-2 text-sm font-semibold text-[#0f1530] disabled:cursor-not-allowed disabled:opacity-50";
 const inputClass = "mt-1 w-full rounded-2xl border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-700 outline-none focus:border-brand-accent";
@@ -98,103 +102,180 @@ export function EstimateOptionSetClient({ tierGroupId }: Props) {
     await query.refetch();
   };
 
+  const removable = canRemoveOption(set);
+  const atLimit = draft && !canAddOption(set);
+  const atMinimum = draft && !removable;
+  const recommendedLabel = optionPositionLabel(options, set.recommendedEstimateId ?? options.find((o) => o.recommended)?.estimateId ?? null);
+
   return (
-    <PageLayout
-      title={set.title ?? "Estimate options"}
-      subtitle="Good / Better / Best options the customer picks from. Each option is its own estimate."
-      actions={(
-        <div className="flex flex-wrap items-center gap-2">
-          <Link href={options[0] ? `/estimates/${options[0].estimateId}` : "/estimates"} className="text-sm font-semibold text-brand-accent">
+    <div className="space-y-6">
+      {/* Figma 362:4217 header: eyebrow, title, subtitle, divider, status pill + context row. */}
+      <header className="space-y-2">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-[#2b4acb]">Estimate options</p>
+          <Link href={options[0] ? `/estimates/${options[0].estimateId}` : "/estimates"} className="text-sm font-semibold text-[#2b4acb]">
             ← Back to estimate
           </Link>
-          <StatBadge label={setStatusLabel(set.status)} tone={set.status === "mixed" ? "gray" : getEstimateStatusTone(set.status)} />
-          {draft ? (
-            <button
-              type="button"
-              className={primaryButton}
-              disabled={pending}
-              onClick={() => void run(() => send.mutateAsync(versioned()), "Sent. The customer gets one email and picks one option.")}
-            >
-              Send options
+        </div>
+        <h1 className="text-2xl font-semibold tracking-tight text-[#0f1530] md:text-[28px] lg:text-[30px]">Estimate options</h1>
+        <p className="text-[15px] text-[#5e6684]">Good / Better / Best options the customer picks from. Each option is its own estimate.</p>
+        <div className="!mt-4 border-t border-[#e6dccb]" />
+        <div className="flex flex-wrap items-center gap-3 pt-2">
+          <Pill className={draft ? "bg-[#eef0f5] text-[#2a3360]" : "bg-[#e5eafb] text-[#2b4acb]"}>
+            {draft ? setStatusLabel(set.status) : `${setStatusLabel(set.status)} · Locked`}
+          </Pill>
+          <p className="text-[13px] text-[#2a3360]" data-testid="option-set-context">
+            {[set.title, options[0]?.estimateNumber].filter(Boolean).join(" · ")}
+          </p>
+        </div>
+      </header>
+
+      {!draft ? (
+        <Alert testId="option-set-locked" tone="info" title="These options were sent, so they can no longer be changed." detail="The customer approves one option from their link." />
+      ) : null}
+      {error ? (
+        <Alert
+          testId="option-set-error"
+          tone={error.reload ? "error" : "warn"}
+          title={error.title ?? error.message}
+          detail={error.detail}
+          action={error.reload ? (
+            <button type="button" className={secondaryButton} onClick={() => void reload()}>
+              Reload
             </button>
+          ) : undefined}
+        />
+      ) : null}
+      {notice ? (
+        <p role="status" className="rounded-[10px] border border-[#e6dccb] bg-white px-4 py-3 text-[13px] text-[#2a3360]">
+          {notice}
+        </p>
+      ) : null}
+
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start">
+        <div className="space-y-4">
+          <section className="grid gap-4 lg:grid-cols-3" data-testid="option-set-options">
+            {options.map((option, index) => (
+              <OptionCard
+                key={option.estimateId}
+                option={option}
+                position={index + 1}
+                draft={draft}
+                pending={pending}
+                canRemove={removable}
+                onRecommend={() =>
+                  void run(
+                    () => update.mutateAsync({ ...versioned(), recommendedEstimateId: option.recommended ? null : option.estimateId }),
+                    option.recommended ? "Recommendation removed." : `${option.tierLabel ?? "Option"} is now the recommended option.`
+                  )
+                }
+                onRemove={() =>
+                  void run(() => remove.mutateAsync({ ...versioned(), estimateId: option.estimateId }), `${option.tierLabel ?? "Option"} removed.`)
+                }
+              />
+            ))}
+          </section>
+          {draft && adding && canAddOption(set) ? (
+            <AddOptionForm
+              defaultLabel={suggestedTierLabel(options)}
+              pending={pending}
+              onCancel={() => setAdding(false)}
+              onSubmit={async (option) => {
+                const ok = await run(() => add.mutateAsync({ ...versioned(), option }), `${option.tierLabel} added.`);
+                if (ok) setAdding(false);
+              }}
+            />
           ) : null}
         </div>
-      )}
-    >
-      <div className="space-y-6">
-        {!draft ? (
-          <p data-testid="option-set-locked" className="surface-card px-6 py-4 text-sm text-neutral-600">
-            These options were sent, so they can no longer be changed. The customer approves one option from their link.
-          </p>
-        ) : null}
 
-        {error ? (
-          <div role="alert" data-testid="option-set-error" className="surface-card flex flex-wrap items-center justify-between gap-3 border-error/30 px-6 py-4 text-sm text-error">
-            <span>{error.message}</span>
-            {error.reload ? (
-              <button type="button" className={secondaryButton} onClick={() => void reload()}>
-                Reload
+        {/* Figma 362:4217 "Option set manager" panel (stacks under the cards on tablet 362:4409 / mobile 362:4558). */}
+        <aside data-testid="option-set-manager" className="space-y-4 rounded-[14px] border border-[#e6dccb] bg-white p-5">
+          <h2 className="text-[17px] font-semibold text-[#0f1530]">Option set</h2>
+          <dl className="space-y-2 text-[13px]">
+            <div className="flex items-center justify-between gap-3">
+              <dt className="text-[#5e6684]">Options</dt>
+              <dd className="flex items-center gap-2 font-semibold text-[#0f1530]">
+                {options.length} of {ESTIMATE_OPTION_SET_MAX_OPTIONS} · minimum {ESTIMATE_OPTION_SET_MIN_OPTIONS}
+                {atLimit ? (
+                  <span data-testid="option-set-at-limit">
+                    <Pill className="bg-[#fff4d6] text-[#0f1530]">Limit</Pill>
+                  </span>
+                ) : null}
+              </dd>
+            </div>
+            <div className="flex items-center justify-between gap-3">
+              <dt className="text-[#5e6684]">Recommended</dt>
+              <dd className="font-semibold text-[#0f1530]">{recommendedLabel ?? "None"}</dd>
+            </div>
+          </dl>
+          {draft ? (
+            <>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  className={atLimit ? disabledButton : secondaryButton}
+                  disabled={pending || atLimit || adding}
+                  onClick={() => setAdding(true)}
+                >
+                  Add option
+                </button>
+                <button
+                  type="button"
+                  className={secondaryButton}
+                  disabled={pending || !recommendedLabel}
+                  onClick={() => void run(() => update.mutateAsync({ ...versioned(), recommendedEstimateId: null }), "Recommendation removed.")}
+                >
+                  Clear recommended
+                </button>
+              </div>
+              <p className="text-[12.5px] text-[#5e6684]">Up to 3 options. Remove one to add another. A set needs at least 2.</p>
+              {atMinimum ? (
+                <Alert testId="option-set-at-minimum" tone="warn" title="A set needs at least 2 options." detail="Add another option before removing this one." />
+              ) : null}
+              <div className="border-t border-[#e6dccb]" />
+              <button
+                type="button"
+                className="inline-flex h-12 w-full items-center justify-center rounded-[10px] bg-[#0f1530] text-sm font-semibold text-white outline-none focus-visible:ring-2 focus-visible:ring-[#0f1530] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 lg:h-11"
+                disabled={pending}
+                onClick={() => void run(() => send.mutateAsync(versioned()), "Sent. The customer gets one email and picks one option.")}
+              >
+                Send to customer
               </button>
-            ) : null}
-          </div>
-        ) : null}
-        {notice ? (
-          <p role="status" className="surface-card px-6 py-4 text-sm text-neutral-700">
-            {notice}
-          </p>
-        ) : null}
-
-        <section className="grid gap-4 lg:grid-cols-3" data-testid="option-set-options">
-          {options.map((option) => (
-            <OptionCard
-              key={option.estimateId}
-              option={option}
-              draft={draft}
-              pending={pending}
-              canRemove={canRemoveOption(set)}
-              onRecommend={() =>
-                void run(
-                  () => update.mutateAsync({ ...versioned(), recommendedEstimateId: option.recommended ? null : option.estimateId }),
-                  option.recommended ? "Recommendation removed." : `${option.tierLabel ?? "Option"} is now the recommended option.`
-                )
-              }
-              onRemove={() =>
-                void run(() => remove.mutateAsync({ ...versioned(), estimateId: option.estimateId }), `${option.tierLabel ?? "Option"} removed.`)
-              }
-            />
-          ))}
-        </section>
-
-        {draft ? (
-          canAddOption(set) ? (
-            adding ? (
-              <AddOptionForm
-                defaultLabel={suggestedTierLabel(options)}
-                pending={pending}
-                onCancel={() => setAdding(false)}
-                onSubmit={async (option) => {
-                  const ok = await run(() => add.mutateAsync({ ...versioned(), option }), `${option.tierLabel} added.`);
-                  if (ok) setAdding(false);
-                }}
-              />
-            ) : (
-              <button type="button" className={secondaryButton} disabled={pending} onClick={() => setAdding(true)}>
-                Add option
-              </button>
-            )
-          ) : (
-            <p data-testid="option-set-at-limit" className="text-sm text-neutral-500">
-              This estimate already shows the maximum of 3 options.
-            </p>
-          )
-        ) : null}
+              <p className="text-[12.5px] text-[#5e6684]">The customer gets one email and picks one option. Each option is its own estimate.</p>
+            </>
+          ) : null}
+        </aside>
       </div>
-    </PageLayout>
+    </div>
+  );
+}
+
+function Pill({ className, children }: { className: string; children: ReactNode }) {
+  return <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-[10.5px] font-medium uppercase tracking-[0.08em] ${className}`}>{children}</span>;
+}
+
+// Figma 362:4325 state alerts: warn (limit/minimum) #fff4d6, error (stale/conflict) #fbe3dc, info (sent · locked) #e5eafb.
+const alertTones = {
+  warn: "bg-[#fff4d6] text-[#0f1530]",
+  error: "bg-[#fbe3dc] text-[#b42318]",
+  info: "bg-[#e5eafb] text-[#0f1530]"
+} as const;
+
+function Alert({ testId, tone, title, detail, action }: { testId: string; tone: keyof typeof alertTones; title: string; detail?: string | undefined; action?: ReactNode }) {
+  return (
+    <div role={tone === "info" ? "status" : "alert"} data-testid={testId} className={`flex flex-wrap items-center justify-between gap-3 rounded-[10px] p-3.5 ${alertTones[tone]}`}>
+      <div>
+        <p className="text-sm font-semibold">{title}</p>
+        {detail ? <p className="mt-0.5 text-[13px]">{detail}</p> : null}
+      </div>
+      {action}
+    </div>
   );
 }
 
 function OptionCard({
   option,
+  position,
   draft,
   pending,
   canRemove,
@@ -202,6 +283,7 @@ function OptionCard({
   onRemove
 }: {
   option: EstimateOption;
+  position: number;
   draft: boolean;
   pending: boolean;
   canRemove: boolean;
@@ -209,43 +291,45 @@ function OptionCard({
   onRemove: () => void;
 }) {
   return (
-    <article data-testid={`option-${option.estimateId}`} className="surface-card flex flex-col gap-3 px-5 py-5">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-400">{option.tierLabel ?? "Option"}</p>
-          <h3 className="mt-1 text-lg font-semibold text-neutral-900">{option.title ?? option.estimateNumber}</h3>
-          <p className="text-xs text-neutral-500">{option.estimateNumber}</p>
-        </div>
-        <div className="flex flex-col items-end gap-1">
-          {option.recommended ? <StatBadge label="Recommended" tone="purple" className="px-3 py-1.5 text-xs" /> : null}
-          {option.isSelectedTier ? <StatBadge label="Customer picked" tone="green" className="px-3 py-1.5 text-xs" /> : null}
-        </div>
+    <article
+      data-testid={`option-${option.estimateId}`}
+      className={`flex flex-col gap-3.5 rounded-[14px] border bg-white p-5 ${option.recommended ? "border-[#0f1530]" : "border-[#e6dccb]"}`}
+    >
+      <div className="flex flex-wrap items-center gap-2">
+        <p className="text-[11px] font-medium uppercase tracking-[0.08em] text-[#2a3360]">
+          Option {position}{option.tierLabel ? ` · ${option.tierLabel}` : ""}
+        </p>
+        {option.recommended ? <Pill className="bg-[#fff4d6] text-[#0f1530]">Recommended</Pill> : null}
+        {option.isSelectedTier ? <Pill className="bg-[#e4f1e8] text-[#2f7d4f]">Customer picked</Pill> : null}
       </div>
-      <CurrencyDisplay value={option.total} className="text-2xl font-semibold tracking-tight text-neutral-900" showCents />
-      <ul className="space-y-1 text-sm text-neutral-600">
+      <h3 className="text-lg font-semibold text-[#0f1530]">{option.title ?? option.estimateNumber}</h3>
+      <ul className="space-y-1 text-[13.5px] text-[#2a3360]">
         {option.items.map((item) => (
-          <li key={item.id} className="flex justify-between gap-3">
-            <span>{item.name}</span>
-            <span className="shrink-0 text-neutral-500">× {item.quantity}</span>
-          </li>
+          <li key={item.id}>•  {item.name}</li>
         ))}
       </ul>
-      <div className="mt-auto flex flex-wrap gap-2 pt-2">
-        <Link href={`/estimates/${option.estimateId}`} className={secondaryButton}>
-          Edit items
-        </Link>
+      <div className="mt-auto border-t border-[#e6dccb] pt-3">
+        <div className="flex items-center justify-between gap-3 text-[13.5px]">
+          <span className="text-[#5e6684]">Total</span>
+          <CurrencyDisplay value={option.total} className="font-semibold text-[#0f1530]" showCents />
+        </div>
+      </div>
+      <div className="flex flex-wrap items-center gap-2">
         {draft ? (
           <>
             <button type="button" className={secondaryButton} disabled={pending} onClick={onRecommend}>
               {option.recommended ? "Remove recommendation" : "Mark recommended"}
             </button>
             {canRemove ? (
-              <button type="button" className={secondaryButton} disabled={pending} onClick={onRemove}>
+              <button type="button" className={textButton} disabled={pending} onClick={onRemove}>
                 Remove
               </button>
             ) : null}
           </>
         ) : null}
+        <Link href={`/estimates/${option.estimateId}`} className={textButton}>
+          Edit items
+        </Link>
       </div>
     </article>
   );

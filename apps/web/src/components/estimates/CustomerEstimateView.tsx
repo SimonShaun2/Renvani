@@ -46,7 +46,7 @@ function TierCard({
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-400">{tier.tierLabel ?? "Quote"}</p>
           <h3 className="mt-2 text-xl font-semibold tracking-tight text-neutral-900">{tier.title ?? "Option"}</h3>
         </div>
-        {(tier.tierLabel ?? "").trim().toLowerCase() === "better" ? (
+        {tier.recommended ? (
           <StatBadge label="Recommended" tone="purple" className="px-3 py-1.5 text-xs" />
         ) : null}
       </div>
@@ -63,6 +63,16 @@ function TierCard({
   );
 }
 
+/** FS-212: preselect the business's recommended option; otherwise the middle option as before. */
+export function defaultTierNumber(tiers: PublicEstimateTierRecord[]): string | undefined {
+  return tiers.find((tier) => tier.recommended)?.estimateNumber ?? tiers[1]?.estimateNumber ?? tiers[0]?.estimateNumber;
+}
+
+/** FS-212: financing is disabled, so the teaser only shows once the API reports a ready provider. */
+export function showFinancingTeaser(estimate: Pick<PublicEstimateRecord, "financing">): boolean {
+  return Boolean(estimate.financing?.offered && estimate.financing.providerReady);
+}
+
 export function CustomerEstimateView({
   estimate,
   backLabel = "Back",
@@ -76,7 +86,7 @@ export function CustomerEstimateView({
   const [approvedByName, setApprovedByName] = useState("");
   const [declineReason, setDeclineReason] = useState("");
   const [selectedEstimateNumber, setSelectedEstimateNumber] = useState<string | undefined>(
-    tiers[1]?.estimateNumber ?? tiers[0]?.estimateNumber
+    defaultTierNumber(tiers)
   );
   const activeTier = useMemo(
     () => tiers.find((tier) => tier.estimateNumber === selectedEstimateNumber) ?? null,
@@ -252,7 +262,7 @@ export function CustomerEstimateView({
                   ) : null}
                 </div>
 
-                {estimate.financingOffered ? (
+                {showFinancingTeaser(estimate) ? (
                   <div className="rounded-[28px] border border-ai/20 bg-ai-light px-5 py-5 text-sm leading-6 text-neutral-700">
                     <div className="flex items-center gap-2 text-ai">
                       <ShieldCheck className="h-4 w-4" />

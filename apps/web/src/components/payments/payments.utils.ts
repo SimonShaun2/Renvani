@@ -1,3 +1,5 @@
+import { serviceFeeCheckoutLabel, serviceFeeLineLabel } from "@/src/lib/service-fee-copy";
+
 export const PAYMENT_STATUSES = ["pending", "succeeded", "failed", "refunded", "disputed"] as const;
 export const PAYMENT_METHODS = ["card", "ach", "cash", "check", "financing", "other"] as const;
 
@@ -60,7 +62,7 @@ export function serviceFeeLabel(platformFeePercent: number | null | undefined): 
   if (platformFeePercent === null || platformFeePercent === undefined || platformFeePercent <= 0) {
     return null;
   }
-  return `Service Fee (${platformFeePercent}%) · paid by customer at checkout`;
+  return serviceFeeCheckoutLabel(platformFeePercent);
 }
 
 /** Frame 52:469 status chip copy: Stripe "pending" reads as "Processing". */
@@ -99,5 +101,5 @@ export function formatShortDate(value: string): string {
 /** Column header "Service Fee (2%)"; null hides the column (Flat plan or no fee from the API). */
 export function serviceFeeColumnLabel(platformFeePercent: number | null | undefined): string | null {
   if (platformFeePercent === null || platformFeePercent === undefined || platformFeePercent <= 0) return null;
-  return `Service Fee (${platformFeePercent}%)`;
+  return serviceFeeLineLabel(platformFeePercent);
 }

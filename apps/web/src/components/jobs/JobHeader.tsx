@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import type { JobDetail } from "@fsm/types";
@@ -13,9 +14,10 @@ interface JobHeaderProps {
   job: JobDetail;
   pendingRequiredTasks: number;
   onOpenOTW: () => void;
+  invoiceAction?: ReactNode;
 }
 
-export function JobHeader({ job, pendingRequiredTasks, onOpenOTW }: JobHeaderProps) {
+export function JobHeader({ job, pendingRequiredTasks, onOpenOTW, invoiceAction }: JobHeaderProps) {
   return (
     <section className="surface-card px-6 py-6">
       <Link href="/jobs" className="inline-flex items-center gap-2 text-sm font-semibold text-brand-accent">
@@ -46,7 +48,8 @@ export function JobHeader({ job, pendingRequiredTasks, onOpenOTW }: JobHeaderPro
           </div>
         </div>
 
-        <div className="xl:max-w-[56%]">
+        <div className="flex flex-col gap-3 xl:max-w-[56%] xl:items-end">
+          {invoiceAction ? <div className="flex flex-wrap gap-3">{invoiceAction}</div> : null}
           <JobStatusTransitions job={job} pendingRequiredTasks={pendingRequiredTasks} onOpenOTW={onOpenOTW} />
         </div>
       </div>

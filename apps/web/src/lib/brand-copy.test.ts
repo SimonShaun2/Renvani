@@ -3,13 +3,11 @@ import { join, relative } from "node:path";
 import { describe, expect, it } from "vitest";
 
 const ROOT = join(__dirname, "..", "..");
-// Persisted store keys keep the legacy name (renaming drops saved drafts); the reporting
-// export is owned by #219's ReportingDashboardClient and is left untouched here.
+// Persisted store keys keep the legacy name (renaming drops saved drafts).
 const ALLOWED = new Set([
   "src/stores/csv-import.store.ts",
   "src/stores/booking-flow.store.ts",
   "src/stores/estimate-flow.store.ts",
-  "src/components/reporting/ReportingDashboardClient.tsx",
   "src/components/marketing/marketing-copy.test.ts",
   "src/lib/brand-copy.test.ts"
 ]);

@@ -1,15 +1,7 @@
 "use client";
 
 import { useDeferredValue, useEffect, useMemo, useState, useTransition } from "react";
-import {
-  DndContext,
-  DragOverlay,
-  PointerSensor,
-  type DragEndEvent,
-  type DragStartEvent,
-  useSensor,
-  useSensors
-} from "@dnd-kit/core";
+import { DndContext, DragOverlay, PointerSensor, type DragEndEvent, type DragStartEvent, useSensor, useSensors } from "@dnd-kit/core";
 import { addDays, addHours, format, parseISO, subDays } from "date-fns";
 import { AlertTriangle, ChevronLeft, ChevronRight, Search, Sparkles } from "lucide-react";
 import type { AutoFitSuggestion, JobDetail } from "@fsm/types";
@@ -30,11 +22,7 @@ import {
 } from "@/src/hooks/dispatch.hooks";
 import { ApiError } from "@/src/lib/api";
 import { cn } from "@/src/lib/utils";
-import {
-  useDispatchStore,
-  type DispatchTab,
-  type DispatchViewMode
-} from "@/src/stores/dispatch.store";
+import { useDispatchStore, type DispatchTab, type DispatchViewMode } from "@/src/stores/dispatch.store";
 
 import { DispatchDetailPanel } from "./DispatchDetailPanel";
 import { DispatchQueuePanel } from "./DispatchQueuePanel";
@@ -42,13 +30,7 @@ import { DispatchTimeline } from "./DispatchTimeline";
 import { DispatchHeader, DispatchLoadError } from "./DispatchHeader";
 import { formatDispatchSummary, summarizeDispatch } from "@/src/lib/dispatch-actions";
 import type { DispatchDragJobData, DispatchDropSlot, DispatchDropTargetData } from "./dispatch.utils";
-import {
-  formatDispatchDateLabel,
-  formatFrameDuration,
-  formatFrameRange,
-  formatFrameTime,
-  matchesSearch
-} from "./dispatch.utils";
+import { formatDispatchDateLabel, formatFrameDuration, formatFrameRange, formatFrameTime, matchesSearch } from "./dispatch.utils";
 
 type AutoFitOverlayState = {
   jobId: string;
@@ -67,8 +49,8 @@ function findCustomerLastName(
   unscheduled: Array<{ id: string; customer: { lastName: string } }>,
   technicians: Array<{ jobs: Array<{ id: string; customer: { lastName: string } }> }>
 ): string | null {
-  const job = unscheduled.find((item) => item.id === jobId)
-    ?? technicians.flatMap((technician) => technician.jobs).find((item) => item.id === jobId);
+  const job =
+    unscheduled.find((item) => item.id === jobId) ?? technicians.flatMap((technician) => technician.jobs).find((item) => item.id === jobId);
   return job?.customer.lastName.trim() || null;
 }
 
@@ -228,11 +210,7 @@ export function DispatchBoardClient() {
     return technicians
       .filter((technician) => technicianFilter === "all" || technician.id === technicianFilter)
       .map((technician) => {
-        const technicianMatchesSearch = matchesSearch(
-          deferredSearch,
-          technician.name,
-          technician.serviceZipCodes.join(" ")
-        );
+        const technicianMatchesSearch = matchesSearch(deferredSearch, technician.name, technician.serviceZipCodes.join(" "));
         const filteredJobs = technician.jobs.filter((job) => {
           const statusMatches = statusFilter === "all" || job.status === statusFilter;
           const searchMatches =
@@ -262,10 +240,7 @@ export function DispatchBoardClient() {
 
   const unscheduledJobs = unscheduledJobsQuery.data?.jobs ?? [];
   const firstUnscheduled = unscheduledJobs[0] ?? null;
-  const summaryText = formatDispatchSummary(
-    formatDispatchDateLabel(selectedDate),
-    summarizeDispatch(technicians, unscheduledJobs.length)
-  );
+  const summaryText = formatDispatchSummary(formatDispatchDateLabel(selectedDate), summarizeDispatch(technicians, unscheduledJobs.length));
 
   function openAddVisit() {
     const technician = technicians[0];
@@ -395,10 +370,7 @@ export function DispatchBoardClient() {
     }
   }
 
-  async function handleConfirmBooking(
-    id: string,
-    input: Parameters<typeof confirmBookingMutation.mutateAsync>[0]["input"]
-  ) {
+  async function handleConfirmBooking(id: string, input: Parameters<typeof confirmBookingMutation.mutateAsync>[0]["input"]) {
     try {
       const result = await confirmBookingMutation.mutateAsync({ id, input });
 
@@ -463,28 +435,28 @@ export function DispatchBoardClient() {
   }
 
   // Figma 10:478 shows the agent proposal inline (banner 10:553 + dashed block 10:590), not as a modal.
-  const topSuggestion = autoFitOverlay && !autoFitOverlay.isLoading ? autoFitOverlay.suggestions[0] ?? null : null;
-  const proposalCustomerLastName = autoFitOverlay
-    ? findCustomerLastName(autoFitOverlay.jobId, unscheduledJobs, technicians)
-    : null;
+  const topSuggestion = autoFitOverlay && !autoFitOverlay.isLoading ? (autoFitOverlay.suggestions[0] ?? null) : null;
+  const proposalCustomerLastName = autoFitOverlay ? findCustomerLastName(autoFitOverlay.jobId, unscheduledJobs, technicians) : null;
   const proposalJobLabel = autoFitOverlay ? findJobLabel(autoFitOverlay.jobId, unscheduledJobs, technicians) : null;
-  const bannerJob = autoFitOverlay && proposalJobLabel
-    ? {
-        id: autoFitOverlay.jobId,
-        label: proposalJobLabel,
-        statusLabel: unscheduledJobs.some((job) => job.id === autoFitOverlay.jobId) ? "Unassigned" : "Reschedule"
-      }
-    : firstUnscheduled
-      ? { id: firstUnscheduled.id, label: jobLabel(firstUnscheduled.title, firstUnscheduled.customer) }
+  const bannerJob =
+    autoFitOverlay && proposalJobLabel
+      ? {
+          id: autoFitOverlay.jobId,
+          label: proposalJobLabel,
+          statusLabel: unscheduledJobs.some((job) => job.id === autoFitOverlay.jobId) ? "Unassigned" : "Reschedule"
+        }
+      : firstUnscheduled
+        ? { id: firstUnscheduled.id, label: jobLabel(firstUnscheduled.title, firstUnscheduled.customer) }
+        : null;
+  const timelineSuggestion =
+    topSuggestion && autoFitOverlay
+      ? {
+          technicianId: topSuggestion.technicianId,
+          label: proposalCustomerLastName ?? "Visit",
+          scheduledStart: topSuggestion.scheduledStart,
+          scheduledEnd: topSuggestion.scheduledEnd
+        }
       : null;
-  const timelineSuggestion = topSuggestion && autoFitOverlay
-    ? {
-        technicianId: topSuggestion.technicianId,
-        label: proposalCustomerLastName ?? "Visit",
-        scheduledStart: topSuggestion.scheduledStart,
-        scheduledEnd: topSuggestion.scheduledEnd
-      }
-    : null;
 
   return (
     <div className="-mx-4 -my-6 space-y-5 px-4 py-6 md:-mx-8 md:-my-8 md:px-8 md:py-8">
@@ -658,10 +630,24 @@ export function DispatchBoardClient() {
             unscheduledLoading={unscheduledJobsQuery.isLoading}
             approvedEstimates={approvedEstimatesQuery.data?.estimates ?? []}
             approvedEstimatesLoading={approvedEstimatesQuery.isLoading}
-            smartQueueError={dispatchQuery.isError ? { onRetry: () => void dispatchQuery.refetch(), isRetrying: dispatchQuery.isFetching } : null}
-            bookingRequestsError={bookingRequestsQuery.isError ? { onRetry: () => void bookingRequestsQuery.refetch(), isRetrying: bookingRequestsQuery.isFetching } : null}
-            unscheduledError={unscheduledJobsQuery.isError ? { onRetry: () => void unscheduledJobsQuery.refetch(), isRetrying: unscheduledJobsQuery.isFetching } : null}
-            approvedEstimatesError={approvedEstimatesQuery.isError ? { onRetry: () => void approvedEstimatesQuery.refetch(), isRetrying: approvedEstimatesQuery.isFetching } : null}
+            smartQueueError={
+              dispatchQuery.isError ? { onRetry: () => void dispatchQuery.refetch(), isRetrying: dispatchQuery.isFetching } : null
+            }
+            bookingRequestsError={
+              bookingRequestsQuery.isError
+                ? { onRetry: () => void bookingRequestsQuery.refetch(), isRetrying: bookingRequestsQuery.isFetching }
+                : null
+            }
+            unscheduledError={
+              unscheduledJobsQuery.isError
+                ? { onRetry: () => void unscheduledJobsQuery.refetch(), isRetrying: unscheduledJobsQuery.isFetching }
+                : null
+            }
+            approvedEstimatesError={
+              approvedEstimatesQuery.isError
+                ? { onRetry: () => void approvedEstimatesQuery.refetch(), isRetrying: approvedEstimatesQuery.isFetching }
+                : null
+            }
             search={deferredSearch}
             onSelectTab={selectTab}
             onSelectJob={(jobId) => {

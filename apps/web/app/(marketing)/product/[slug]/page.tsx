@@ -1,30 +1,24 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import { MarketingPage } from "@/src/components/marketing/visuals/MarketingPage";
+import { FlagshipPage } from "@/src/components/marketing/site/FlagshipPage";
+import { PRODUCT_PAGE_BY_SLUG, PRODUCT_PAGES } from "@/src/components/marketing/site/flagship-registry";
 
-export const revalidate = 300;
-
-const PRODUCTS = {
-  growth: "Growth",
-  revenue: "Revenue",
-  operations: "Operations",
-  retention: "Retention",
-  "command-center": "Command Center"
-} as const;
-type Slug = keyof typeof PRODUCTS;
+export const dynamicParams = false;
 
 export function generateStaticParams() {
-  return Object.keys(PRODUCTS).map((slug) => ({ slug }));
+  return PRODUCT_PAGES.map((p) => ({ slug: p.slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  return { title: `${PRODUCTS[slug as Slug] ?? "Product"} · Renvani` };
+  const page = PRODUCT_PAGE_BY_SLUG[slug];
+  return page ? { title: `${page.name} · Renvani`, description: page.body } : {};
 }
 
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  if (!(slug in PRODUCTS)) notFound();
-  return <MarketingPage page={slug} visual={slug as Slug} />;
+  const page = PRODUCT_PAGE_BY_SLUG[slug];
+  if (!page) notFound();
+  return <FlagshipPage page={page} />;
 }

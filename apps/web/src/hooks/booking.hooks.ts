@@ -31,6 +31,10 @@ export interface PublicBookingSettingsRecord {
   phone?: string | null;
   logoUrl?: string | null;
   serviceAreaZipCodes?: string[];
+  /** Active service-area names (inquiry contract, Dev C #268). Absent until that API ships. */
+  serviceAreaNames?: string[];
+  /** Shop IANA timezone for the hours above (inquiry contract, Dev C #268). */
+  timezone?: string | null;
 }
 
 export interface ZipCoverageRecord {

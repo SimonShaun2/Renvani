@@ -65,7 +65,7 @@ describe("Products + How it works (Figma 176:204/176:313, 176:585/176:664)", () 
       const h = a.getAttribute("href")!;
       if (h.startsWith("#")) continue;
       const p = path(h);
-      const ok = ROUTE_FILES[p] ? existsSync(join(APP, ROUTE_FILES[p]!)) : /^\/product\/(growth|revenue|operations|retention|command-center)$/.test(p) || p === "/product-tour";
+      const ok = ROUTE_FILES[p] ? existsSync(join(APP, ROUTE_FILES[p]!)) : /^\/product\/(growth|revenue|operations|retention|command-center|online-booking|estimates-approvals|scheduling-dispatch)$/.test(p) || p === "/product-tour";
       expect(ok, h).toBe(true);
     }
   });

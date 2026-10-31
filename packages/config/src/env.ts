@@ -82,6 +82,11 @@ const envSchema = z.object({
   CLERK_SECRET_KEY: z.string().default(""),
   /** Clerk webhook signing secret (whsec_…) for POST /api/v1/webhooks/clerk (svix). */
   CLERK_WEBHOOK_SECRET: z.string().default(""),
+  /**
+   * Optional shared secret the web proxy (Vercel) sends as `x-origin-secret` on /api/v1/public/* calls.
+   * Unset = off: client IP is request.ip (TRUST_PROXY_HOPS). Set on BOTH Vercel web and Render api.
+   */
+  ORIGIN_SECRET: z.string().optional(),
   /** Comma-separated web origins allowed as Clerk `azp` and for CORS (e.g. https://staging.renvani.com). */
   CLERK_AUTHORIZED_PARTIES: z.string().default(""),
   /** STACK-04 / FS-133 — optional Sentry DSN for QBO sync issue alerts */

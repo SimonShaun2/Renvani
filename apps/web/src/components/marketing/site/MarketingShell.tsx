@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { geist, newsreader } from "./fonts";
+import { ProductsMenu } from "./ProductsMenu";
 import { SITE_FOOTER, SITE_NAV } from "./site-config";
 import styles from "./site.module.css";
 
@@ -14,16 +15,20 @@ export function MarketingShell({ children }: { children: ReactNode }) {
       className={`${geist.variable} ${newsreader.variable} min-h-screen`}
       style={{ background: "var(--color-mkt-cream)", color: "var(--color-mkt-ink)", fontFamily: "var(--font-mkt-sans), system-ui, sans-serif" }}
     >
-      <header data-node-id="203:4394" className="mx-auto flex h-[76px] max-w-[1440px] items-center justify-between gap-10 px-6 lg:h-[88px] lg:px-16">
+      <header data-node-id="203:4394" className="relative mx-auto flex h-[76px] max-w-[1440px] items-center justify-between gap-10 px-6 lg:h-[88px] lg:px-16">
         <Link href="/" className="text-[26px] lg:text-[30px]" style={serif}>
           Renvani
         </Link>
         <nav aria-label="Main" className="hidden items-center gap-10 text-[14px] font-medium lg:flex" style={{ color: "var(--color-mkt-ink2)" }}>
-          {SITE_NAV.links.map((l) => (
-            <Link key={l.label} href={l.href} className="hover:underline">
-              {l.label}
-            </Link>
-          ))}
+          {SITE_NAV.links.map((l) =>
+            l.href === "/product" ? (
+              <ProductsMenu key={l.label} label={l.label} />
+            ) : (
+              <Link key={l.label} href={l.href} className="hover:underline">
+                {l.label}
+              </Link>
+            )
+          )}
         </nav>
         <div className="hidden items-center gap-4 lg:flex">
           <Link href={SITE_NAV.signIn.href} className="text-[14px] font-medium" style={{ color: "var(--color-mkt-ink2)" }}>

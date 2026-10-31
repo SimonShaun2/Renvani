@@ -23,9 +23,9 @@ export const PLATFORM = {
     open: { label: "Open owner view →", href: FLAGSHIP_HREF.commandCenter }
   },
   flagships: {
-    growth: { title: "Growth", href: FLAGSHIP_HREF.growth, tools: [{ label: "Website →", href: null }, { label: "Online Booking →", href: null }] },
-    revenue: { title: "Revenue", href: FLAGSHIP_HREF.revenue, tools: [{ label: "Price Book →", href: null }, { label: "Estimates & Approvals →", href: null }] },
-    operations: { title: "Operations", href: FLAGSHIP_HREF.operations, tools: [{ label: "Scheduling & Dispatch →", href: null }, { label: "Technician App →", href: null }, { label: "Payments →", href: null }] },
+    growth: { title: "Growth", href: FLAGSHIP_HREF.growth, tools: [{ label: "Website →", href: null }, { label: "Online Booking →", href: "/product/online-booking" }] },
+    revenue: { title: "Revenue", href: FLAGSHIP_HREF.revenue, tools: [{ label: "Price Book →", href: null }, { label: "Estimates & Approvals →", href: "/product/estimates-approvals" }] },
+    operations: { title: "Operations", href: FLAGSHIP_HREF.operations, tools: [{ label: "Scheduling & Dispatch →", href: "/product/scheduling-dispatch" }, { label: "Technician App →", href: null }, { label: "Payments →", href: null }] },
     retention: { title: "Retention", href: FLAGSHIP_HREF.retention, tools: [{ label: "Service Agreements →", href: null }, { label: "Reminders & Win-backs →", href: null }] }
   },
   record: { eyebrow: "ONE CONNECTED RECORD", items: ["Jordan Lee", "Job #1042", "Property + equipment", "Visit history"] },
@@ -38,14 +38,14 @@ const t = (label: string): ToolLink => ({ label, href: null });
 
 export const TOOL_GROUPS: { left: ToolGroup[]; right: ToolGroup[] } = {
   left: [
-    { key: "growth", title: "Growth", href: FLAGSHIP_HREF.growth, tagline: "Get found. Get booked.", tools: [t("Websites →"), t("Online Booking →"), t("Job Source Reporting →"), t("Local Search · Preview →")] },
+    { key: "growth", title: "Growth", href: FLAGSHIP_HREF.growth, tagline: "Get found. Get booked.", tools: [t("Websites →"), { label: "Online Booking →", href: "/product/online-booking" }, t("Job Source Reporting →"), t("Local Search · Preview →")] },
     {
       key: "operations",
       title: "Operations",
       href: FLAGSHIP_HREF.operations,
       tagline: "Deliver the work. Get paid.",
       tools: [
-        t("Scheduling & Dispatch →"),
+        { label: "Scheduling & Dispatch →", href: "/product/scheduling-dispatch" },
         t("Jobs & Work Orders →"),
         t("Technician App & On-the-Way →"),
         t("Invoices & Payments →"),
@@ -56,7 +56,7 @@ export const TOOL_GROUPS: { left: ToolGroup[]; right: ToolGroup[] } = {
     }
   ],
   right: [
-    { key: "revenue", title: "Revenue", href: FLAGSHIP_HREF.revenue, tagline: "Turn an inquiry into approved work.", tools: [t("Inquiry Response & Follow-up →"), t("Estimates & Approvals →")] },
+    { key: "revenue", title: "Revenue", href: FLAGSHIP_HREF.revenue, tagline: "Turn an inquiry into approved work.", tools: [t("Inquiry Response & Follow-up →"), { label: "Estimates & Approvals →", href: "/product/estimates-approvals" }] },
     { key: "retention", title: "Retention", href: FLAGSHIP_HREF.retention, tagline: "Make the next visit happen.", tools: [t("Service Agreements →"), t("Reminders & Win-backs →")] },
     {
       key: "command-center",

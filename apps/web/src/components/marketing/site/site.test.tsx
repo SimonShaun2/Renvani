@@ -45,7 +45,7 @@ describe("marketing site (Figma 171:2)", () => {
     expect(tablet.textContent).not.toMatch(/Oct 29/);
     expect(tablet.textContent).toContain("Next available day");
     const hrefs = [...tablet.querySelectorAll("a")].map((a) => a.getAttribute("href"));
-    for (const h of ["/product-tour", "/industries/hvac", "/industries/hvac#plumbing", "/product/revenue", "/product/command-center"]) expect(hrefs).toContain(h);
+    for (const h of [HOME.journey.more.href, ...HOME.work.trades.map((t) => t.href), HOME.intelligence.cta.href, ...HOME.intelligence.areas.map((a) => a.href)]) expect(hrefs).toContain(h);
     expect(tablet.querySelector("a a")).toBeNull();
   });
 

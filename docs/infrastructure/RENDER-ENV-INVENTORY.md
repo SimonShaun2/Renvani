@@ -23,6 +23,7 @@ A literal value = non-secret config committed in the Blueprint. **—** = not se
 | `FSM_PROCESS_ROLE` | `api` | `worker` | `webhook` |
 | `TRUST_PROXY_HOPS` | `1` | — | — |
 | `GLOBAL_RATE_LIMIT_ENABLED` | `false` | — | — |
+| `ORIGIN_SECRET` | prompt (optional; same value as Vercel web) | — | — |
 | `QUICKBOOKS_ENVIRONMENT` | `sandbox` | `sandbox` | — |
 | `REDIS_URL` | from KV | from KV | from KV |
 | `DATABASE_URL` | prompt | prompt | prompt |

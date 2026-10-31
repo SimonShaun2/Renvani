@@ -6,7 +6,7 @@ type DefaultRouteMap = Record<UserRole, string>;
 
 const EXACT_PUBLIC_ROUTES = new Set(["/", "/login", "/signup", "/verify-email", "/product-tour", "/product", "/how-it-works", "/pricing", "/industries/hvac", "/portal", "/robots.txt", "/sitemap.xml"]);
 
-const MARKETING_PRODUCT_PAGES = new Set(["growth", "revenue", "operations", "retention", "command-center"]);
+const MARKETING_PRODUCT_PAGES = new Set(["growth", "revenue", "operations", "retention", "command-center", "online-booking", "estimates-approvals", "scheduling-dispatch"]);
 
 const ROLE_ALLOWED_PREFIXES: Record<UserRole, string[]> = {
   owner: [
@@ -141,4 +141,14 @@ export function canRoleAccessPath(role: UserRole, pathname: string): boolean {
   const allowedPrefixes = ROLE_ALLOWED_PREFIXES[role];
 
   return allowedPrefixes.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
+}
+
+/**
+ * Routes a signed-in Clerk user may reach before any role claim exists (post-sign-up workspace
+ * setup). Clerk middleware path only; the legacy cookie path is unchanged.
+ */
+export const NO_ROLE_SETUP_ROUTES = ["/onboarding/workspace"] as const;
+
+export function isNoRoleSetupRoute(pathname: string): boolean {
+  return (NO_ROLE_SETUP_ROUTES as readonly string[]).includes(pathname);
 }

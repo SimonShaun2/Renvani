@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 import type { OperatorInboxItem } from "@fsm/types";
 
 import { AgentProposalCard } from "@/src/components/revenue-agent/AgentProposalCard";
-import { ProposalDetail } from "@/src/components/revenue-agent/ProposalDetail";
+import { AgentActionPanel } from "@/src/components/agent-actions/AgentActionPanel";
 import { proposalTypeConfig } from "@/src/components/revenue-agent/proposal.config";
 import { useApproveAgentAction, useOperatorInbox } from "@/src/hooks/operator-inbox.hooks";
 import { ApiError } from "@/src/lib/api";
@@ -92,7 +92,7 @@ function NeedsYouItem({ item }: { item: OperatorInboxItem }) {
       {open ? (
         <div className="space-y-3 pt-2">
           <AgentProposalCard item={item} />
-          <ProposalDetail item={item} />
+          <AgentActionPanel item={item} onDone={() => setOpen(false)} />
         </div>
       ) : null}
     </li>

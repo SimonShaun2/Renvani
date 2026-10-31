@@ -82,6 +82,15 @@ describe("createInvoiceCheckoutSession fee lines", () => {
     expect(p.payment_intent_data.metadata).not.toHaveProperty("bookingFeeCents");
   });
 
+  it("sets receipt_email on the PaymentIntent only when a receiptEmail is provided", async () => {
+    await createInvoiceCheckoutSession(baseInput({ receiptEmail: "payer@example.com" }));
+    expect((lastCall().payment_intent_data as { receipt_email?: string }).receipt_email).toBe("payer@example.com");
+    await createInvoiceCheckoutSession(baseInput({ receiptEmail: null }));
+    expect(lastCall().payment_intent_data).not.toHaveProperty("receipt_email");
+    await createInvoiceCheckoutSession(baseInput({}));
+    expect(lastCall().payment_intent_data).not.toHaveProperty("receipt_email");
+  });
+
   it("unknown/null plan defaults to the standard Service Fee", async () => {
     await createInvoiceCheckoutSession(baseInput({ renvaniPlan: null }));
     const p = lastCall();

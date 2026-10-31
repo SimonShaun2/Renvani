@@ -10,13 +10,13 @@
 # - Key Value is required: BullMQ (packages/jobs) needs REDIS_URL, persistence and noeviction.
 # - Every service loads the full @fsm/config schema at boot, so each gets every required key.
 # - Secrets/env values are entered by name only (sync: false); never commit values here.
-# - region must match the Neon project region (STACK-12); change before first apply if needed.
+# - region must match the Neon project region (STACK-12): Neon is US East (Ohio), so region: ohio.
 
 services:
   - type: keyvalue
     name: renvani-bullmq-kv
     plan: 256mb
-    region: oregon
+    region: ohio
     maxmemoryPolicy: noeviction
     persistenceMode: journal-snapshot
     ipAllowList: []
@@ -25,7 +25,7 @@ services:
     name: renvani-api
     runtime: node
     plan: 0.5c-512mb
-    region: oregon
+    region: ohio
     branch: dev
     autoDeployTrigger: "off"
     buildCommand: corepack enable && corepack pnpm install --frozen-lockfile --prod=false && corepack pnpm -r --filter @fsm/import-normalize --filter @fsm/types --filter @fsm/comms build && corepack pnpm -r --filter @fsm/import-engine --filter @fsm/config --filter @fsm/db --filter @fsm/jobs --filter @fsm/ai --filter @fsm/api --filter @fsm/worker --filter @fsm/webhook build
@@ -125,7 +125,7 @@ services:
     name: renvani-worker
     runtime: node
     plan: 0.5c-512mb
-    region: oregon
+    region: ohio
     branch: dev
     autoDeployTrigger: "off"
     buildCommand: corepack enable && corepack pnpm install --frozen-lockfile --prod=false && corepack pnpm -r --filter @fsm/import-normalize --filter @fsm/types --filter @fsm/comms build && corepack pnpm -r --filter @fsm/import-engine --filter @fsm/config --filter @fsm/db --filter @fsm/jobs --filter @fsm/ai --filter @fsm/api --filter @fsm/worker --filter @fsm/webhook build
@@ -210,7 +210,7 @@ services:
     name: renvani-webhook
     runtime: node
     plan: 0.5c-512mb
-    region: oregon
+    region: ohio
     branch: dev
     autoDeployTrigger: "off"
     buildCommand: corepack enable && corepack pnpm install --frozen-lockfile --prod=false && corepack pnpm -r --filter @fsm/import-normalize --filter @fsm/types --filter @fsm/comms build && corepack pnpm -r --filter @fsm/import-engine --filter @fsm/config --filter @fsm/db --filter @fsm/jobs --filter @fsm/ai --filter @fsm/api --filter @fsm/worker --filter @fsm/webhook build

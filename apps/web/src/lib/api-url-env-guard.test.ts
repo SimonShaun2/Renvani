@@ -9,8 +9,19 @@ describe("checkApiUrlEnv", () => {
     expect(result.level !== "ok" && result.message).toContain("NEXT_PUBLIC_API_URL");
   });
 
-  it("only warns on Vercel preview builds", () => {
-    expect(checkApiUrlEnv({ VERCEL_ENV: "preview" }).level).toBe("warn");
+  it("fails a Vercel preview build without NEXT_PUBLIC_API_URL", () => {
+    const result = checkApiUrlEnv({ VERCEL_ENV: "preview" });
+    expect(result.level).toBe("error");
+    expect(result.level !== "ok" && result.message).toContain("NEXT_PUBLIC_API_URL");
+  });
+
+  it("passes a Vercel preview build when NEXT_PUBLIC_API_URL is set", () => {
+    expect(checkApiUrlEnv({ VERCEL_ENV: "preview", NEXT_PUBLIC_API_URL: "https://api-pr.example.com" }).level).toBe("ok");
+  });
+
+  it("still fails preview with only API_URL or a blank value", () => {
+    expect(checkApiUrlEnv({ VERCEL_ENV: "preview", API_URL: "https://api.example.com" }).level).toBe("error");
+    expect(checkApiUrlEnv({ VERCEL_ENV: "preview", NEXT_PUBLIC_API_URL: " " }).level).toBe("error");
   });
 
   it("passes when NEXT_PUBLIC_API_URL is set", () => {
@@ -32,5 +43,6 @@ describe("checkApiUrlEnv", () => {
 
   it("SKIP_ENV_GUARD=1 bypasses the guard", () => {
     expect(checkApiUrlEnv({ VERCEL_ENV: "production", SKIP_ENV_GUARD: "1" }).level).toBe("ok");
+    expect(checkApiUrlEnv({ VERCEL_ENV: "preview", SKIP_ENV_GUARD: "1" }).level).toBe("ok");
   });
 });

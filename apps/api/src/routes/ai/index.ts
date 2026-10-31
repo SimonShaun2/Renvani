@@ -3,6 +3,7 @@ import type { FastifyPluginAsync } from "fastify";
 import { requireRole } from "../../lib/authorize.js";
 import {
   actionRecommendationHandler,
+  checkRevenueProposalConsentHandler,
   dismissRecommendationHandler,
   generateRevenueProposalsHandler,
   proposeRecommendationHandler,
@@ -88,6 +89,11 @@ const aiRoutes: FastifyPluginAsync = async (fastify) => {
     preValidation: generateRevenueProposalsValidation,
     schema: generateRevenueProposalsRouteSchema
   }, generateRevenueProposalsHandler);
+
+  fastify.get("/revenue-agent/proposals/:id/consent", {
+    preHandler: [authenticate, requireRevenueAgentReviewer],
+    preValidation: proposeRecommendationValidation
+  }, checkRevenueProposalConsentHandler);
 };
 
 export default aiRoutes;

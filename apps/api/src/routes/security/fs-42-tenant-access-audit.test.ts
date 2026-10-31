@@ -286,4 +286,45 @@ describe("FS-42 tenant access audit", () => {
     expect(response.status).toBe(400);
     expect(response.body.error).toBe("VALIDATION_ERROR");
   });
+
+  it("FS42-UNAUTH-GROWTH-FINDING-REVIEW POST /growth-check/findings/:id/reviews returns 401 without credentials", async () => {
+    const response = await request(app.server)
+      .post("/api/v1/growth-check/findings/00000000-0000-4000-8000-000000000001/reviews")
+      .send({});
+    expect(response.status).toBe(401);
+  });
+
+  it("FS42-ROLE-GROWTH-FINDING-REVIEW dispatcher cannot review growth check findings", async () => {
+    const company = fakeDb.seedCompany({ name: "Review Role Co", slug: "review-role-co" });
+    const dispatcher = fakeDb.seedUser({
+      companyId: company.id,
+      email: "disp@review-role.test",
+      firstName: "Disp",
+      lastName: "User",
+      role: "dispatcher"
+    });
+    const response = await request(app.server)
+      .post("/api/v1/growth-check/findings/00000000-0000-4000-8000-000000000001/reviews")
+      .set("Authorization", technicianAuth(company.id, dispatcher.id, "dispatcher"))
+      .send({});
+    expect(response.status).toBe(403);
+    expect(response.body.error).toBe("FORBIDDEN");
+  });
+
+  it("FS42-XT-GROWTH-FINDING-REVIEW cross-tenant finding id is 404 and writes no history", async () => {
+    const companyA = fakeDb.seedCompany({ name: "Review A", slug: "review-a" });
+    const companyB = fakeDb.seedCompany({ name: "Review B", slug: "review-b" });
+    const ownerA = fakeDb.seedUser({ companyId: companyA.id, email: "owner@review-a.test", firstName: "O", lastName: "A", role: "owner" });
+    const scanB = fakeDb.seedGrowthCheckScan({ companyId: companyB.id });
+    const findingB = fakeDb.seedGrowthCheckFinding({ companyId: companyB.id, scanId: scanB.id });
+    const auth = `Bearer ${tokens.generateAccessToken({ userId: ownerA.id, companyId: companyA.id, role: "owner" })}`;
+    const read = await request(app.server).get(`/api/v1/growth-check/findings/${findingB.id}`).set("Authorization", auth);
+    expect(read.status).toBe(404);
+    const response = await request(app.server)
+      .post(`/api/v1/growth-check/findings/${findingB.id}/reviews`)
+      .set("Authorization", auth)
+      .send({ action: "dismiss", reason: "Not relevant", expectedRevision: 0, idempotencyKey: "fs42-xt-key-01" });
+    expect(response.status).toBe(404);
+    expect(fakeDb.getGrowthCheckFindingRevisions()).toHaveLength(0);
+  });
 });

@@ -88,7 +88,7 @@ export const PRICING_TREES: { desktop: VNode; mobile: VNode } = {
            },
            {
             "t": "p",
-            "c": "font-normal leading-[1.38] relative text-[16px] text-[color:#2a3360] flex-1 min-w-0",
+            "c": "font-normal leading-[1.38] relative text-[16px] text-[color:#2a3360] w-[80px] shrink-0 text-right",
             "id": "204:7822",
             "k": [
              "/month"
@@ -106,13 +106,13 @@ export const PRICING_TREES: { desktop: VNode; mobile: VNode } = {
          },
          {
           "t": "div",
-          "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+          "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[220px] shrink-0",
           "n": "Status / 2 months free annually",
           "id": "204:7824",
           "k": [
            {
             "t": "p",
-            "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] flex-1 min-w-0",
+            "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[200px] shrink-0",
             "id": "204:7825",
             "k": [
              "{{annualNote}}"
@@ -146,7 +146,7 @@ export const PRICING_TREES: { desktop: VNode; mobile: VNode } = {
           "t": "button",
           "label": "Explore Flex",
           "kind": "Dark",
-          "c": "bg-[#0f1530] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px]",
+          "c": "bg-[#0f1530] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] text-[color:#fbf6ef] whitespace-nowrap",
           "href": "/signup?plan=flex"
          }
         ]
@@ -181,7 +181,7 @@ export const PRICING_TREES: { desktop: VNode; mobile: VNode } = {
            },
            {
             "t": "p",
-            "c": "font-normal leading-[1.38] relative text-[16px] text-[color:#2a3360] flex-1 min-w-0",
+            "c": "font-normal leading-[1.38] relative text-[16px] text-[color:#2a3360] w-[80px] shrink-0 text-right",
             "id": "I204:7831;204:7822",
             "k": [
              "/month"
@@ -199,13 +199,13 @@ export const PRICING_TREES: { desktop: VNode; mobile: VNode } = {
          },
          {
           "t": "div",
-          "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+          "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[220px] shrink-0",
           "n": "Status / 2 months free annually",
           "id": "I204:7831;204:7824",
           "k": [
            {
             "t": "p",
-            "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] flex-1 min-w-0",
+            "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[200px] shrink-0",
             "id": "I204:7831;204:7825",
             "k": [
              "{{annualNote}}"
@@ -308,13 +308,13 @@ export const PRICING_TREES: { desktop: VNode; mobile: VNode } = {
            },
            {
             "t": "div",
-            "c": "bg-[#f6b400] flex h-[27px] items-center px-[10px] relative rounded-[12px] flex-1 min-w-0",
+            "c": "bg-[#f6b400] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[98px] shrink-0",
             "n": "Status / EXAMPLE",
             "id": "204:7851",
             "k": [
              {
               "t": "p",
-              "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] flex-1 min-w-0",
+              "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[78px] shrink-0",
               "id": "204:7852",
               "k": [
                "EXAMPLE"
@@ -362,7 +362,7 @@ export const PRICING_TREES: { desktop: VNode; mobile: VNode } = {
            },
            {
             "t": "p",
-            "c": "font-medium relative text-[color:#0f1530] text-right flex-1 min-w-0",
+            "c": "font-medium relative text-[color:#0f1530] text-right w-[255px] shrink-0",
             "id": "204:7858",
             "k": [
              "{{ex.subtotal}}"
@@ -386,7 +386,7 @@ export const PRICING_TREES: { desktop: VNode; mobile: VNode } = {
            },
            {
             "t": "p",
-            "c": "font-medium relative text-[14px] text-[color:#0f1530] text-right flex-1 min-w-0",
+            "c": "font-medium relative text-[14px] text-[color:#0f1530] text-right w-[100px] shrink-0",
             "id": "204:7861",
             "k": [
              "{{ex.flexFee}}"
@@ -416,7 +416,7 @@ export const PRICING_TREES: { desktop: VNode; mobile: VNode } = {
            },
            {
             "t": "p",
-            "c": "relative text-[30px] text-right flex-1 min-w-0",
+            "c": "relative text-[30px] text-right w-[180px] shrink-0",
             "id": "204:7865",
             "k": [
              "{{ex.flexTotal}}"
@@ -472,13 +472,13 @@ export const PRICING_TREES: { desktop: VNode; mobile: VNode } = {
            },
            {
             "t": "div",
-            "c": "bg-[#f6b400] flex h-[27px] items-center px-[10px] relative rounded-[12px] flex-1 min-w-0",
+            "c": "bg-[#f6b400] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[98px] shrink-0",
             "n": "Status / EXAMPLE",
             "id": "I204:7869;204:7851",
             "k": [
              {
               "t": "p",
-              "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] flex-1 min-w-0",
+              "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[78px] shrink-0",
               "id": "I204:7869;204:7852",
               "k": [
                "EXAMPLE"
@@ -526,7 +526,7 @@ export const PRICING_TREES: { desktop: VNode; mobile: VNode } = {
            },
            {
             "t": "p",
-            "c": "font-medium relative text-[color:#0f1530] text-right flex-1 min-w-0",
+            "c": "font-medium relative text-[color:#0f1530] text-right w-[255px] shrink-0",
             "id": "I204:7869;204:7858",
             "k": [
              "{{ex.subtotal}}"
@@ -550,7 +550,7 @@ export const PRICING_TREES: { desktop: VNode; mobile: VNode } = {
            },
            {
             "t": "p",
-            "c": "font-medium relative text-[14px] text-[color:#0f1530] text-right flex-1 min-w-0",
+            "c": "font-medium relative text-[14px] text-[color:#0f1530] text-right w-[100px] shrink-0",
             "id": "I204:7869;204:7861",
             "k": [
              "{{ex.flatFee}}"
@@ -580,7 +580,7 @@ export const PRICING_TREES: { desktop: VNode; mobile: VNode } = {
            },
            {
             "t": "p",
-            "c": "relative text-[30px] text-right flex-1 min-w-0",
+            "c": "relative text-[30px] text-right w-[180px] shrink-0",
             "id": "I204:7869;204:7865",
             "k": [
              "{{ex.flatTotal}}"
@@ -624,7 +624,7 @@ export const PRICING_TREES: { desktop: VNode; mobile: VNode } = {
       "k": [
        {
         "t": "div",
-        "c": "flex flex-col gap-[8px] items-start leading-[1.38] relative flex-1 min-w-0",
+        "c": "flex flex-col gap-[8px] items-start leading-[1.38] relative w-[1012px] shrink-0",
         "n": "Program pricing",
         "id": "204:7912",
         "k": [
@@ -650,7 +650,7 @@ export const PRICING_TREES: { desktop: VNode; mobile: VNode } = {
         "t": "button",
         "label": "Ask about programs",
         "kind": "Dark",
-        "c": "bg-[#0f1530] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px]",
+        "c": "bg-[#0f1530] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] text-[color:#fbf6ef] whitespace-nowrap",
         "href": "/signup?plan=programs"
        }
       ]
@@ -671,7 +671,7 @@ export const PRICING_TREES: { desktop: VNode; mobile: VNode } = {
       "k": [
        {
         "t": "div",
-        "c": "h-[270px] relative rounded-[16px] flex-1 min-w-0",
+        "c": "h-[270px] relative rounded-[16px] w-[430px] shrink-0",
         "n": "Illustrative owner reviewing work",
         "id": "204:7919",
         "k": [
@@ -713,7 +713,7 @@ export const PRICING_TREES: { desktop: VNode; mobile: VNode } = {
           "t": "button",
           "label": "Get a free demo",
           "kind": "Accent",
-          "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px]",
+          "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] text-[color:#0f1530] whitespace-nowrap",
           "href": "/signup"
          }
         ]
@@ -809,7 +809,7 @@ export const PRICING_TREES: { desktop: VNode; mobile: VNode } = {
            },
            {
             "t": "p",
-            "c": "font-normal leading-[1.38] relative text-[16px] text-[color:#2a3360] flex-1 min-w-0",
+            "c": "font-normal leading-[1.38] relative text-[16px] text-[color:#2a3360] w-[80px] shrink-0 text-right",
             "id": "204:7945",
             "k": [
              "/month"
@@ -827,13 +827,13 @@ export const PRICING_TREES: { desktop: VNode; mobile: VNode } = {
          },
          {
           "t": "div",
-          "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+          "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[220px] shrink-0",
           "n": "Status / 2 months free annually",
           "id": "204:7947",
           "k": [
            {
             "t": "p",
-            "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] flex-1 min-w-0",
+            "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[200px] shrink-0",
             "id": "204:7948",
             "k": [
              "{{annualNote}}"
@@ -867,7 +867,7 @@ export const PRICING_TREES: { desktop: VNode; mobile: VNode } = {
           "t": "button",
           "label": "Explore Flex",
           "kind": "Dark",
-          "c": "bg-[#0f1530] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px]",
+          "c": "bg-[#0f1530] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] text-[color:#fbf6ef] whitespace-nowrap",
           "href": "/signup?plan=flex"
          }
         ]
@@ -902,7 +902,7 @@ export const PRICING_TREES: { desktop: VNode; mobile: VNode } = {
            },
            {
             "t": "p",
-            "c": "font-normal leading-[1.38] relative text-[16px] text-[color:#2a3360] flex-1 min-w-0",
+            "c": "font-normal leading-[1.38] relative text-[16px] text-[color:#2a3360] w-[80px] shrink-0 text-right",
             "id": "I204:7954;204:7945",
             "k": [
              "/month"
@@ -920,13 +920,13 @@ export const PRICING_TREES: { desktop: VNode; mobile: VNode } = {
          },
          {
           "t": "div",
-          "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+          "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[220px] shrink-0",
           "n": "Status / 2 months free annually",
           "id": "I204:7954;204:7947",
           "k": [
            {
             "t": "p",
-            "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] flex-1 min-w-0",
+            "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[200px] shrink-0",
             "id": "I204:7954;204:7948",
             "k": [
              "{{annualNote}}"
@@ -1029,13 +1029,13 @@ export const PRICING_TREES: { desktop: VNode; mobile: VNode } = {
            },
            {
             "t": "div",
-            "c": "bg-[#f6b400] flex h-[27px] items-center px-[10px] relative rounded-[12px] flex-1 min-w-0",
+            "c": "bg-[#f6b400] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[98px] shrink-0",
             "n": "Status / EXAMPLE",
             "id": "204:7974",
             "k": [
              {
               "t": "p",
-              "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] flex-1 min-w-0",
+              "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[78px] shrink-0",
               "id": "204:7975",
               "k": [
                "EXAMPLE"
@@ -1083,7 +1083,7 @@ export const PRICING_TREES: { desktop: VNode; mobile: VNode } = {
            },
            {
             "t": "p",
-            "c": "font-medium relative text-[color:#0f1530] text-right flex-1 min-w-0",
+            "c": "font-medium relative text-[color:#0f1530] text-right w-[126px] shrink-0",
             "id": "204:7981",
             "k": [
              "{{ex.subtotal}}"
@@ -1107,7 +1107,7 @@ export const PRICING_TREES: { desktop: VNode; mobile: VNode } = {
            },
            {
             "t": "p",
-            "c": "font-medium relative text-[14px] text-[color:#0f1530] text-right flex-1 min-w-0",
+            "c": "font-medium relative text-[14px] text-[color:#0f1530] text-right w-[100px] shrink-0",
             "id": "204:7984",
             "k": [
              "{{ex.flexFee}}"
@@ -1137,7 +1137,7 @@ export const PRICING_TREES: { desktop: VNode; mobile: VNode } = {
            },
            {
             "t": "p",
-            "c": "relative text-[24px] text-right flex-1 min-w-0",
+            "c": "relative text-[24px] text-right w-[120px] shrink-0",
             "id": "204:7988",
             "k": [
              "{{ex.flexTotal}}"
@@ -1193,13 +1193,13 @@ export const PRICING_TREES: { desktop: VNode; mobile: VNode } = {
            },
            {
             "t": "div",
-            "c": "bg-[#f6b400] flex h-[27px] items-center px-[10px] relative rounded-[12px] flex-1 min-w-0",
+            "c": "bg-[#f6b400] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[98px] shrink-0",
             "n": "Status / EXAMPLE",
             "id": "I204:7992;204:7974",
             "k": [
              {
               "t": "p",
-              "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] flex-1 min-w-0",
+              "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[78px] shrink-0",
               "id": "I204:7992;204:7975",
               "k": [
                "EXAMPLE"
@@ -1247,7 +1247,7 @@ export const PRICING_TREES: { desktop: VNode; mobile: VNode } = {
            },
            {
             "t": "p",
-            "c": "font-medium relative text-[color:#0f1530] text-right flex-1 min-w-0",
+            "c": "font-medium relative text-[color:#0f1530] text-right w-[126px] shrink-0",
             "id": "I204:7992;204:7981",
             "k": [
              "{{ex.subtotal}}"
@@ -1271,7 +1271,7 @@ export const PRICING_TREES: { desktop: VNode; mobile: VNode } = {
            },
            {
             "t": "p",
-            "c": "font-medium relative text-[14px] text-[color:#0f1530] text-right flex-1 min-w-0",
+            "c": "font-medium relative text-[14px] text-[color:#0f1530] text-right w-[100px] shrink-0",
             "id": "I204:7992;204:7984",
             "k": [
              "{{ex.flatFee}}"
@@ -1301,7 +1301,7 @@ export const PRICING_TREES: { desktop: VNode; mobile: VNode } = {
            },
            {
             "t": "p",
-            "c": "relative text-[24px] text-right flex-1 min-w-0",
+            "c": "relative text-[24px] text-right w-[120px] shrink-0",
             "id": "I204:7992;204:7988",
             "k": [
              "{{ex.flatTotal}}"
@@ -1371,7 +1371,7 @@ export const PRICING_TREES: { desktop: VNode; mobile: VNode } = {
         "t": "button",
         "label": "Ask about programs",
         "kind": "Dark",
-        "c": "bg-[#0f1530] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px]",
+        "c": "bg-[#0f1530] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] text-[color:#fbf6ef] whitespace-nowrap",
         "href": "/signup?plan=programs"
        }
       ]
@@ -1434,7 +1434,7 @@ export const PRICING_TREES: { desktop: VNode; mobile: VNode } = {
           "t": "button",
           "label": "Get a free demo",
           "kind": "Accent",
-          "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px]",
+          "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] text-[color:#0f1530] whitespace-nowrap",
           "href": "/signup"
          }
         ]

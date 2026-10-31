@@ -77,6 +77,14 @@ async function findOrCreateCompany(tx: Tx, input: ClerkOrganizationInput): Promi
   return company;
 }
 
+/** Active staff user already holding this Clerk user id (global lookup on the existing clerk_user_id link). */
+async function findActiveUserByClerkId(tx: Tx, clerkUserId: string) {
+  return tx.query.users.findFirst({
+    where: (userTable, operators) =>
+      operators.and(operators.eq(userTable.clerkUserId, clerkUserId), operators.isNull(userTable.deletedAt))
+  });
+}
+
 function isUniqueViolation(error: unknown): boolean {
   let current: unknown = error;
   for (let depth = 0; depth < 4 && current && typeof current === "object"; depth += 1) {
@@ -91,12 +99,28 @@ function isUniqueViolation(error: unknown): boolean {
  * Returns null (and logs) when the org id is ambiguous or a unique constraint clashes, so the webhook
  * acks with 2xx instead of a 500 that Svix would retry forever.
  */
+export type ClerkOrganizationSkipReason = "creator_already_linked" | "ambiguous_org" | "unique_violation";
+
 export async function provisionClerkOrganization(input: ClerkOrganizationInput): Promise<CompanyRow | null> {
+  return (await provisionClerkOrganizationDetailed(input)).company;
+}
+
+/** Same as provisionClerkOrganization, plus why it skipped (for the webhook ack). */
+export async function provisionClerkOrganizationDetailed(
+  input: ClerkOrganizationInput
+): Promise<{ company: CompanyRow | null; skipReason?: ClerkOrganizationSkipReason }> {
   try {
     return await db.transaction(async (tx) => {
       await lockClerkOrganization(tx, input.organizationId);
-      const company = await findOrCreateCompany(tx, input);
       const createdBy = input.createdBy?.trim();
+      const existing = await findCompanyByClerkOrganizationId(input.organizationId, tx);
+      if (!existing && createdBy && (await findActiveUserByClerkId(tx, createdBy))) {
+        // Orphan guard: the creator already belongs to a company, so the membership for this org would be
+        // skipped and the new company would have no members. Don't create it; ack so Clerk doesn't retry.
+        logger.warn({ clerkOrganizationId: input.organizationId }, "Clerk org creator already linked to a company; org not provisioned");
+        return { company: null, skipReason: "creator_already_linked" as const };
+      }
+      const company = existing ?? (await findOrCreateCompany(tx, input));
       if (createdBy && !readClerkCreatedBy(company)) {
         // Out of order: membership.created provisioned the company first (its first member became owner).
         // Never demote/re-assign here; just flag a mismatch for review.
@@ -112,13 +136,13 @@ export async function provisionClerkOrganization(input: ClerkOrganizationInput):
           logger.warn({ companyId: company.id }, "Clerk org creator is not the provisioned owner (out-of-order events); not changed");
         }
       }
-      return company;
+      return { company };
     });
   } catch (error) {
-    if (error instanceof ClerkOrganizationAmbiguousError) return null;
+    if (error instanceof ClerkOrganizationAmbiguousError) return { company: null, skipReason: "ambiguous_org" };
     if (isUniqueViolation(error)) {
       logger.warn({ clerkOrganizationId: input.organizationId }, "Clerk organization provisioning hit a unique constraint; skipped");
-      return null;
+      return { company: null, skipReason: "unique_violation" };
     }
     throw error;
   }
@@ -155,7 +179,20 @@ export async function provisionClerkMembership(
   try {
     return await db.transaction(async (tx) => {
       await lockClerkOrganization(tx, input.organizationId);
-      const company = await findOrCreateCompany(tx, input);
+      const existing = await findCompanyByClerkOrganizationId(input.organizationId, tx);
+      if (!existing) {
+        // Orphan guard: for a not-yet-provisioned org, a member already linked elsewhere (by Clerk id) or whose
+        // email belongs to any existing user row would be skipped below; don't create an empty company first.
+        const linked = clerkUserId ? await findActiveUserByClerkId(tx, clerkUserId) : undefined;
+        const emailTaken = linked
+          ? undefined
+          : await tx.query.users.findFirst({ where: (userTable, operators) => operators.eq(userTable.email, email) });
+        if (linked || emailTaken) {
+          logger.warn({ clerkOrganizationId: input.organizationId }, "Clerk member already linked to a company; org not provisioned");
+          return { status: "skipped" as const, companyId: null };
+        }
+      }
+      const company = existing ?? (await findOrCreateCompany(tx, input));
 
       if (clerkUserId) {
         const byClerkId = await tx.query.users.findFirst({

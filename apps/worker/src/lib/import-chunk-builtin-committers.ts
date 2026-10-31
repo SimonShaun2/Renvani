@@ -464,10 +464,10 @@ export const commitPropertyChunk: ImportChunkCommitter = async (input) => {
 
 export const commitJobChunk: ImportChunkCommitter = async (input) => {
   const ctx = commitContext(input);
-  const jobRows = input.rows.map((row) => {
+  const parsedJobRows = input.rows.map((row) => {
     const mapped = mapImportRowValues(row.values, input.columnMapping);
     const text = (key: string) => normalizeImportTextValue(mapped[key]) ?? undefined;
-    return ImportJobCommitRowSchema.parse({
+    return ImportJobCommitRowSchema.safeParse({
       rowNumber: row.rowNumber,
       sourceId: normalizeImportTextValue(mapped.sourceId) ?? mapped.jobNumber,
       jobNumber: mapped.jobNumber,
@@ -490,6 +490,10 @@ export const commitJobChunk: ImportChunkCommitter = async (input) => {
     });
   });
 
+  // Row-level schema failures are counted, not thrown (one bad row must not fail the chunk).
+  const jobRows = parsedJobRows.flatMap((parsed) => (parsed.success ? [parsed.data] : []));
+  const invalidRowCount = parsedJobRows.length - jobRows.length;
+
   return runTransactionWithTenantSession(ctx.companyId, async (tx) => {
     const resolver = scopeImportResolver(
       await createDbHistoryChunkResolver(ctx.companyId, ctx.sourceSystem, tx),
@@ -497,16 +501,16 @@ export const commitJobChunk: ImportChunkCommitter = async (input) => {
       ctx.companyId,
     );
     const result = await commitImportedJobRows(ctx, jobRows, resolver, tx);
-    return { rowsOk: result.rowsCommitted, rowsFailed: result.rowsFailed };
+    return { rowsOk: result.rowsCommitted, rowsFailed: result.rowsFailed + invalidRowCount };
   });
 };
 
 export const commitEstimateChunk: ImportChunkCommitter = async (input) => {
   const ctx = commitContext(input);
-  const estimateRows = input.rows.map((row) => {
+  const parsedEstimateRows = input.rows.map((row) => {
     const mapped = mapImportRowValues(row.values, input.columnMapping);
     const text = (key: string) => normalizeImportTextValue(mapped[key]) ?? undefined;
-    return ImportEstimateCommitRowSchema.parse({
+    return ImportEstimateCommitRowSchema.safeParse({
       rowNumber: row.rowNumber,
       sourceId: normalizeImportTextValue(mapped.sourceId) ?? mapped.estimateNumber,
       estimateNumber: mapped.estimateNumber,
@@ -525,6 +529,10 @@ export const commitEstimateChunk: ImportChunkCommitter = async (input) => {
     });
   });
 
+  // Row-level schema failures are counted, not thrown (one bad row must not fail the chunk).
+  const estimateRows = parsedEstimateRows.flatMap((parsed) => (parsed.success ? [parsed.data] : []));
+  const invalidRowCount = parsedEstimateRows.length - estimateRows.length;
+
   return runTransactionWithTenantSession(ctx.companyId, async (tx) => {
     const resolver = scopeImportResolver(
       await createDbHistoryChunkResolver(ctx.companyId, ctx.sourceSystem, tx),
@@ -532,7 +540,7 @@ export const commitEstimateChunk: ImportChunkCommitter = async (input) => {
       ctx.companyId,
     );
     const result = await commitImportedEstimateRows(ctx, estimateRows, resolver, tx);
-    return { rowsOk: result.rowsCommitted, rowsFailed: result.rowsFailed };
+    return { rowsOk: result.rowsCommitted, rowsFailed: result.rowsFailed + invalidRowCount };
   });
 };
 

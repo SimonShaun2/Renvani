@@ -313,6 +313,7 @@ export interface TestJobRecord {
   priority: JobPriority;
   status: JobStatus;
   leadSource: string | null;
+  leadAttribution: Partial<Record<string, string>> | null;
   title: string;
   description: string | null;
   scheduledStart: Date | null;
@@ -1045,6 +1046,7 @@ export interface TestBookingRequestRecord {
   isPropertyOwner: boolean | null;
   smsConsentAppointments: boolean | null;
   smsConsentMarketing: boolean | null;
+  leadAttribution: Partial<Record<string, string>> | null;
   confirmedAt: Date | null;
   confirmedById: string | null;
   confirmationSentAt: Date | null;
@@ -1307,6 +1309,7 @@ export interface TestJobRecord {
   priority: JobPriority;
   status: JobStatus;
   leadSource: string | null;
+  leadAttribution: Partial<Record<string, string>> | null;
   title: string;
   description: string | null;
   scheduledStart: Date | null;
@@ -1391,6 +1394,7 @@ export interface TestEstimateRecord {
   companyId: string;
   estimateNumber: string;
   jobId: string | null;
+  importSessionId?: string | null;
   customerId: string;
   propertyId: string | null;
   createdById: string | null;
@@ -1965,6 +1969,7 @@ export interface TestBookingRequestRecord {
   isPropertyOwner: boolean | null;
   smsConsentAppointments: boolean | null;
   smsConsentMarketing: boolean | null;
+  leadAttribution: Partial<Record<string, string>> | null;
   confirmedAt: Date | null;
   confirmedById: string | null;
   confirmationSentAt: Date | null;
@@ -2424,6 +2429,7 @@ const jobsTable = {
   priority: "priority",
   status: "status",
   leadSource: "leadSource",
+  leadAttribution: "leadAttribution",
   title: "title",
   description: "description",
   scheduledStart: "scheduledStart",
@@ -2561,6 +2567,7 @@ const dataExportSessionsTable = {
 } as const;
 
 const estimatesTable = {
+  importSessionId: "importSessionId",
   __name: "estimates",
   id: "id",
   companyId: "companyId",
@@ -3470,6 +3477,7 @@ const bookingRequestsTable = {
   isPropertyOwner: "isPropertyOwner",
   smsConsentAppointments: "smsConsentAppointments",
   smsConsentMarketing: "smsConsentMarketing",
+  leadAttribution: "leadAttribution",
   confirmedAt: "confirmedAt",
   confirmedById: "confirmedById",
   confirmationSentAt: "confirmationSentAt",
@@ -4170,6 +4178,7 @@ function createJobRecord(
     priority: values.priority ?? "normal",
     status: values.status ?? "lead",
     leadSource: values.leadSource ?? null,
+    leadAttribution: values.leadAttribution ?? null,
     title: values.title ?? "Service Call",
     description: values.description ?? null,
     scheduledStart: values.scheduledStart ?? null,
@@ -4300,6 +4309,7 @@ function createEstimateRecord(
     id: values.id ?? nextId(),
     companyId: values.companyId,
     estimateNumber: values.estimateNumber ?? `EST-${String(state.estimates.length + 1).padStart(4, "0")}`,
+    importSessionId: values.importSessionId ?? null,
     jobId: values.jobId ?? null,
     customerId: values.customerId,
     propertyId: values.propertyId ?? null,
@@ -5114,6 +5124,7 @@ function createBookingRequestRecord(
     isPropertyOwner: values.isPropertyOwner ?? false,
     smsConsentAppointments: values.smsConsentAppointments ?? false,
     smsConsentMarketing: values.smsConsentMarketing ?? false,
+    leadAttribution: values.leadAttribution ?? null,
     confirmedAt: values.confirmedAt ?? null,
     confirmedById: values.confirmedById ?? null,
     confirmationSentAt: values.confirmationSentAt ?? null,
@@ -6946,6 +6957,28 @@ export function seedAgentAction(
     ...values
   });
   state.agentActions.push(record);
+  return record;
+}
+
+export function seedVipMembershipTier(
+  values: Partial<TestVipMembershipTierRecord> & Pick<TestVipMembershipTierRecord, "companyId" | "name">
+): TestVipMembershipTierRecord {
+  const record: TestVipMembershipTierRecord = {
+    id: values.id ?? randomUUID(),
+    companyId: values.companyId,
+    name: values.name,
+    description: values.description ?? null,
+    monthlyPrice: values.monthlyPrice ?? "29.00",
+    discountPercent: values.discountPercent ?? "10",
+    includedVisitsPerMonth: values.includedVisitsPerMonth ?? null,
+    stripeMonthlyPriceId: values.stripeMonthlyPriceId ?? null,
+    sortOrder: values.sortOrder ?? 0,
+    isActive: values.isActive ?? true,
+    createdAt: values.createdAt ?? new Date(),
+    updatedAt: values.updatedAt ?? new Date(),
+    deletedAt: values.deletedAt ?? null
+  };
+  state.vipMembershipTiers.push(record);
   return record;
 }
 

@@ -78,8 +78,8 @@ function toSettings(row: SettingsRow | undefined): CallTrackingSettings {
 
 /**
  * Ownership status comes from the number's provider adapter and fails closed: unknown adapter, a thrown error or
- * an unknown status all read as `unverified`. Not persisted yet (see FS-200 security follow-up): with only the
- * disabled adapter there is nothing to store, and a real provider will add a verified_at column with its migration.
+ * an unknown status all read as `unverified`. The status itself is not cached; only the time of the last positive
+ * confirmation is persisted in `verified_at` (migration 0060), see persistCallTrackingNumberVerifiedAt.
  */
 export async function resolveCallTrackingNumberVerification(row: Pick<NumberRow, "provider" | "trackingNumber" | "providerNumberId">): Promise<string> {
   const adapter = findCallTrackingAdapter(row.provider);
@@ -94,8 +94,25 @@ export async function resolveCallTrackingNumberVerification(row: Pick<NumberRow,
   }
 }
 
+/**
+ * Persist the time the provider adapter last confirmed ownership. Tenant-scoped (company_id + id, not deleted) and
+ * written only on a `verified` result; never cleared here, so a later failure does not erase history (the
+ * fail-closed status still gates calls).
+ */
+export async function persistCallTrackingNumberVerifiedAt(companyId: string, numberId: string, verifiedAt: Date): Promise<Date | null> {
+  const [row] = await db
+    .update(callTrackingNumbers)
+    .set({ verifiedAt })
+    .where(and(eq(callTrackingNumbers.companyId, companyId), eq(callTrackingNumbers.id, numberId), isNull(callTrackingNumbers.deletedAt)))
+    .returning({ verifiedAt: callTrackingNumbers.verifiedAt });
+  return row?.verifiedAt ?? null;
+}
+
 async function toNumberResolved(row: NumberRow): Promise<CallTrackingNumber> {
-  return toNumber(row, await resolveCallTrackingNumberVerification(row));
+  const status = await resolveCallTrackingNumberVerification(row);
+  let verifiedAt = row.verifiedAt ?? null;
+  if (status === "verified") verifiedAt = (await persistCallTrackingNumberVerifiedAt(row.companyId, row.id, new Date())) ?? verifiedAt;
+  return toNumber({ ...row, verifiedAt }, status);
 }
 
 function toNumber(row: NumberRow, verificationStatus: string): CallTrackingNumber {
@@ -110,6 +127,7 @@ function toNumber(row: NumberRow, verificationStatus: string): CallTrackingNumbe
     active: row.active,
     verificationStatus,
     canReceiveCalls: callTrackingNumberCanReceiveCalls(verificationStatus),
+    verifiedAt: row.verifiedAt ? row.verifiedAt.toISOString() : null,
     version: row.version,
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString()

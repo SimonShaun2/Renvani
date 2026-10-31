@@ -45,6 +45,9 @@ export const newIdempotencyKey = () =>
 export interface OptionSetErrorView {
   kind: string;
   message: string;
+  /** Figma 362:4325 alert: bold first line and the follow-up line (message stays the combined copy). */
+  title?: string;
+  detail?: string;
   /** stale_version / not_draft / idempotency_conflict: the set changed under us, so offer Reload. */
   reload: boolean;
 }
@@ -54,19 +57,32 @@ export function describeOptionSetError(error: unknown): OptionSetErrorView {
   const fields = (error.payload.fields ?? {}) as Record<string, string>;
   switch (fields.reason) {
     case "stale_version":
-      return { kind: "stale_version", message: "Someone else changed these options. Reload to see the latest before trying again.", reload: true };
+      return { kind: "stale_version", message: "Someone else changed these options. Reload to see the latest before trying again.", title: "Someone else changed these options.", detail: "Reload to see the latest before trying again.", reload: true };
     case "not_draft":
       return { kind: "not_draft", message: "These options were already sent, so they can't be changed here.", reload: true };
     case "idempotency_conflict":
-      return { kind: "idempotency_conflict", message: "That change conflicts with an earlier request. Reload and try again.", reload: true };
+      return { kind: "idempotency_conflict", message: "That change conflicts with an earlier request. Reload and try again.", title: "That change conflicts with an earlier request.", detail: "Reload and try again.", reload: true };
     case "option_limit":
-      return { kind: "option_limit", message: `An estimate can show at most ${ESTIMATE_OPTION_SET_MAX_OPTIONS} options.`, reload: false };
+      return { kind: "option_limit", message: `Up to ${ESTIMATE_OPTION_SET_MAX_OPTIONS} options per set. Remove one to add another.`, reload: false };
     case "option_minimum":
-      return { kind: "option_minimum", message: `An estimate needs at least ${ESTIMATE_OPTION_SET_MIN_OPTIONS} options.`, reload: false };
+      return {
+        kind: "option_minimum",
+        message: `A set needs at least ${ESTIMATE_OPTION_SET_MIN_OPTIONS} options.`,
+        detail: "Add another option before removing this one.",
+        reload: false
+      };
     default:
       break;
   }
   if (error.status === 403) return { kind: "forbidden", message: "Your role can't change estimate options.", reload: false };
   if (error.status === 404) return { kind: "not_found", message: "These estimate options weren't found.", reload: false };
   return { kind: "error", message: error.payload.message || "Something went wrong. Try again.", reload: false };
+}
+
+/** Figma 362:4217: "Option 2 · Better" (1-based position in the sorted set). */
+export function optionPositionLabel(options: Array<{ estimateId: string; tierLabel: string | null }>, estimateId: string | null): string | null {
+  const index = options.findIndex((o) => o.estimateId === estimateId);
+  if (index < 0) return null;
+  const tier = options[index]!.tierLabel;
+  return tier ? `Option ${index + 1} · ${tier}` : `Option ${index + 1}`;
 }

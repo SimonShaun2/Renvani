@@ -5,7 +5,13 @@ import { Loader2 } from "lucide-react";
 
 import { PayHostedCheckoutButton } from "@/src/components/pay/PayHostedCheckoutButton";
 import { PayInvoiceCheckoutBody, PayInvoicePaidCard, PayInvoiceShell } from "@/src/components/pay/PayInvoiceView";
-import { buildPaidDetails, resolvePayInvoiceState, resolvePayNotice } from "@/src/components/pay/pay-invoice.utils";
+import {
+  PAY_LOAD_ERROR_COPY,
+  buildPaidDetails,
+  classifyPayLoadError,
+  resolvePayInvoiceState,
+  resolvePayNotice
+} from "@/src/components/pay/pay-invoice.utils";
 import { isEmbeddedCheckoutAvailable, StripeEmbeddedInvoiceCheckout } from "@/src/components/stripe/StripeEmbeddedInvoiceCheckout";
 import { EmptyState } from "@/src/components/ui/EmptyState";
 import { usePublicPaymentLink } from "@/src/hooks/invoices.hooks";
@@ -18,14 +24,24 @@ export default function PublicPaymentPage() {
   const status = searchParams.get("status");
 
   if (paymentQuery.isError) {
+    const kind = classifyPayLoadError(paymentQuery.error);
+    const copy = PAY_LOAD_ERROR_COPY[kind];
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#fbf6ef] px-4">
-        <div className="w-full max-w-lg">
-          <EmptyState
-            icon={Loader2}
-            title="Payment link unavailable"
-            subtitle="This payment link may have expired. Contact your service provider to request a new invoice link."
-          />
+        <div className="w-full max-w-lg" role={kind === "temporary" ? "alert" : undefined} data-testid={`pay-error-${kind}`}>
+          <EmptyState icon={Loader2} title={copy.title} subtitle={copy.subtitle} />
+          {kind === "temporary" ? (
+            <div className="mt-4 flex justify-center">
+              <button
+                type="button"
+                onClick={() => void paymentQuery.refetch()}
+                disabled={paymentQuery.isFetching}
+                className="min-h-[44px] w-full rounded-[10px] bg-[#0f1530] px-5 text-sm font-semibold text-white disabled:opacity-60 sm:w-auto"
+              >
+                {paymentQuery.isFetching ? "Trying again…" : "Try again"}
+              </button>
+            </div>
+          ) : null}
         </div>
       </div>
     );

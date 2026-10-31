@@ -7,6 +7,7 @@ import { useActionState } from "react";
 import { submitGrowthCheck } from "@/app/(marketing)/growth-check/actions";
 import { HOME_SERVICE_TRADES, TRADE_LABELS, type IntakeResult } from "@/src/lib/marketing-intake";
 
+import { ScaleToFrame } from "./ScaleToFrame";
 import { Field, FormAlert, Honeypot, SelectInput, SubmitButton, TextInput, ink, ink2, line } from "./IntakeFields";
 
 export const GROWTH_CHECK = {
@@ -25,6 +26,7 @@ export function GrowthCheckPage({ website = "", action = submitGrowthCheck }: { 
   const [state, formAction] = useActionState(action, null);
   const errors = state?.status === "invalid" ? state.fields : {};
   return (
+    <ScaleToFrame width={1440} from={1024}>
     <section data-node-id="204:9515" className="mx-auto flex max-w-[1440px] flex-col gap-8 p-6 md:p-8 lg:p-20" aria-labelledby="growth-check-title">
       <p className="text-[11px] font-medium leading-[1.38] tracking-[1.1px]" style={{ color: ink2 }}>
         {GROWTH_CHECK.eyebrow}
@@ -82,10 +84,11 @@ export function GrowthCheckPage({ website = "", action = submitGrowthCheck }: { 
                 {GROWTH_CHECK.note}
               </p>
             </form>
-            <Image src="/marketing/demo/owner.png" alt="" width={1264} height={760} className="hidden h-[380px] w-full rounded-2xl object-cover lg:block lg:w-[632px]" />
+            <Image src="/marketing/demo/owner.png" alt="" width={1264} height={760} className="h-[200px] w-full rounded-2xl object-cover lg:h-[380px] lg:w-[632px] lg:shrink-0" />
           </div>
         </>
       )}
     </section>
+    </ScaleToFrame>
   );
 }

@@ -7,6 +7,7 @@ import { useActionState } from "react";
 import { submitDemoRequest } from "@/app/(marketing)/demo/actions";
 import { HOME_SERVICE_TRADES, TRADE_LABELS, type IntakeResult } from "@/src/lib/marketing-intake";
 
+import { ScaleToFrame } from "./ScaleToFrame";
 import { Field, FormAlert, Honeypot, SelectInput, SubmitButton, TextInput, ink, ink2, line } from "./IntakeFields";
 
 export const DEMO = {
@@ -24,6 +25,7 @@ export function DemoPage({ action = submitDemoRequest }: { action?: (prev: Intak
   const [state, formAction] = useActionState(action, null);
   const errors = state?.status === "invalid" ? state.fields : {};
   return (
+    <ScaleToFrame width={1440} from={1024}>
     <section data-node-id="204:9229" className="mx-auto flex max-w-[1440px] flex-col gap-8 p-6 md:gap-7 md:p-8 lg:gap-8 lg:p-20" aria-labelledby="demo-title">
       <div className="flex flex-col gap-8 md:gap-7 lg:flex-row lg:gap-16">
         <div className="flex flex-col gap-6 md:gap-7 lg:w-[600px] lg:shrink-0 lg:gap-6">
@@ -88,5 +90,6 @@ export function DemoPage({ action = submitDemoRequest }: { action?: (prev: Intak
         </div>
       </div>
     </section>
+    </ScaleToFrame>
   );
 }

@@ -129,3 +129,14 @@ describe("demo and growth-check pages", () => {
     }
   });
 });
+
+describe("marketing intake types (#328)", () => {
+  it("uses the shared @fsm/types contract the API validates with", async () => {
+    const shared = await import("@fsm/types");
+    const lib = await import("@/src/lib/marketing-intake");
+    expect(lib.MarketingDemoRequestBodySchema).toBe(shared.MarketingDemoRequestBodySchema);
+    expect(lib.MarketingGrowthCheckBodySchema).toBe(shared.MarketingGrowthCheckBodySchema);
+    expect(lib.MARKETING_HONEYPOT_FIELD).toBe(shared.MARKETING_HONEYPOT_FIELD);
+    expect(lib.HOME_SERVICE_TRADES).toBe(shared.HOME_SERVICE_TRADES);
+  });
+});

@@ -36,7 +36,7 @@ export function GrowthCheckPage({ website = "", action = submitGrowthCheck }: { 
           <svg aria-hidden="true" viewBox="0 0 42 42" className="size-[42px]" fill="none" stroke={ink} strokeWidth="2.5">
             <path d="M8 22l9 9 17-19" />
           </svg>
-          <h1 id="growth-check-title" className="text-[34px] font-semibold leading-[1.08] tracking-[-0.85px] md:text-[46px] md:tracking-[-1.15px]" style={{ color: ink }}>
+          <h1 id="growth-check-title" className="text-[32px] font-semibold leading-[1.38] md:text-[46px] md:leading-[1.08] md:tracking-[-1.15px]" style={{ color: ink }}>
             {GROWTH_CHECK.done.title}
           </h1>
           <p className="text-[16px] leading-[1.38]" style={{ color: ink2 }}>

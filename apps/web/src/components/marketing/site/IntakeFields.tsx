@@ -44,7 +44,8 @@ export function TextInput({ id, name, error, type = "text", ...rest }: InputProp
   return <input id={id} name={name} type={type} required aria-invalid={error ? true : undefined} aria-describedby={error ? `${id}-error` : undefined} className={control} style={{ borderColor: line, color: ink }} {...rest} />;
 }
 
-export function SelectInput({ id, name, error, placeholder, options, required = true }: { id: string; name: string; error?: string | undefined; placeholder: string; options: { value: string; label: string }[]; required?: boolean }) {
+/** `tabletChevron={false}`: hide the chevron at md only (the /demo tablet frame 253:6781 has none; mobile and desktop frames keep it). */
+export function SelectInput({ id, name, error, placeholder, options, required = true, tabletChevron = true }: { id: string; name: string; error?: string | undefined; placeholder: string; options: { value: string; label: string }[]; required?: boolean; tabletChevron?: boolean }) {
   return (
     <div className="relative">
       <select id={id} name={name} required={required} defaultValue="" aria-invalid={error ? true : undefined} aria-describedby={error ? `${id}-error` : undefined} className={`${control} appearance-none pr-10`} style={{ borderColor: line, color: ink }}>
@@ -57,7 +58,7 @@ export function SelectInput({ id, name, error, placeholder, options, required = 
           </option>
         ))}
       </select>
-      <svg aria-hidden="true" viewBox="0 0 16 16" className="pointer-events-none absolute right-4 top-1/2 size-4 -translate-y-1/2" fill="none" stroke={ink} strokeWidth="1.5">
+      <svg aria-hidden="true" viewBox="0 0 16 16" className={`pointer-events-none absolute right-4 top-1/2 size-4 -translate-y-1/2${tabletChevron ? "" : " md:hidden lg:block"}`} fill="none" stroke={ink} strokeWidth="1.5">
         <path d="M4 6l4 4 4-4" />
       </svg>
     </div>

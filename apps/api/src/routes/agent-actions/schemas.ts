@@ -1,6 +1,8 @@
 import { z } from "zod";
 
 import {
+  AppError,
+  ErrorCode,
   AgentActionIdParamsV1Schema,
   ListAgentActionsQueryV1Schema,
   type ListAgentActionsQueryV1
@@ -42,11 +44,18 @@ export const agentActionGuardedStateChangeValidation = withZodValidation({
 /** Optional `Idempotency-Key` header for approve/execute (TE-DUP-01/02). */
 export const AGENT_ACTION_IDEMPOTENCY_KEY_MAX = 128;
 
+/**
+ * Reads the optional `Idempotency-Key`. Blank → no key. Longer than 128 characters → 400 (it used to be ignored
+ * silently, which turned a retry-safe request into a non-idempotent one).
+ */
 export function readIdempotencyKeyHeader(headers: Record<string, unknown>): string | undefined {
   const raw = headers["idempotency-key"];
   if (typeof raw !== "string") {
     return undefined;
   }
   const key = raw.trim();
-  return key.length > 0 && key.length <= AGENT_ACTION_IDEMPOTENCY_KEY_MAX ? key : undefined;
+  if (key.length > AGENT_ACTION_IDEMPOTENCY_KEY_MAX) {
+    throw new AppError(ErrorCode.VALIDATION_ERROR, `Idempotency-Key must be at most ${AGENT_ACTION_IDEMPOTENCY_KEY_MAX} characters`);
+  }
+  return key.length > 0 ? key : undefined;
 }

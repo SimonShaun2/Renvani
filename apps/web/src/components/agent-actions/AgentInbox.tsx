@@ -2,11 +2,13 @@
 
 import { useState } from "react";
 
-import { AgentProposalCard } from "@/src/components/revenue-agent/AgentProposalCard";
+import { ConsentAwareProposalCard } from "@/src/components/revenue-agent/ConsentAwareProposalCard";
+import { ErrorState } from "@/src/components/ui/ErrorState";
 import { agentLabel } from "@/src/components/command-center/command-center.config";
 import { useOperatorInbox } from "@/src/hooks/operator-inbox.hooks";
-import { useGenerateRevenueProposals } from "@/src/hooks/revenue-proposals.hooks";
+import { GENERATE_LIMIT, REVENUE_REVIEWER_ROLES, useGenerateRevenueProposals } from "@/src/hooks/revenue-proposals.hooks";
 import { cn } from "@/src/lib/utils";
+import { useAuthStore } from "@/src/stores/auth.store";
 
 import "@/src/components/revenue-agent/revenue-agent-motion.css";
 
@@ -20,6 +22,8 @@ export function AgentInbox() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const inbox = useOperatorInbox(tab);
   const generate = useGenerateRevenueProposals();
+  const role = useAuthStore((state) => state.user?.role ?? null);
+  const canReview = role !== null && REVENUE_REVIEWER_ROLES.has(role);
   const items = inbox.data?.items ?? [];
   const visible = agent === "all" ? items : items.filter((i) => i.provenance.agentProduct === agent);
   const selected = visible.find((i) => i.id === selectedId) ?? null;
@@ -61,15 +65,22 @@ export function AgentInbox() {
             </option>
           ))}
         </select>
-        <button
-          type="button"
-          disabled={generate.isPending}
-          onClick={() => generate.mutate({})}
-          className="ml-auto rounded-[10px] border border-[#e6dccb] bg-white px-3 py-1.5 text-sm font-medium disabled:opacity-50"
-        >
-          {generate.isPending ? "Finding…" : "Find new proposals"}
-        </button>
+        {canReview ? (
+          <button
+            type="button"
+            disabled={generate.isPending}
+            onClick={() => generate.mutate({ limit: GENERATE_LIMIT })}
+            className="ml-auto rounded-[10px] border border-[#e6dccb] bg-white px-3 py-1.5 text-sm font-medium disabled:opacity-50"
+          >
+            {generate.isPending ? "Finding…" : "Find new proposals"}
+          </button>
+        ) : null}
       </div>
+      {generate.isError ? (
+        <p role="alert" className="text-sm text-[#b42318]">
+          Couldn’t find new proposals{generate.error instanceof Error && generate.error.message ? `: ${generate.error.message}` : "."}
+        </p>
+      ) : null}
       {generate.data ? (
         <p className="text-sm text-[#5e6684]">
           {generate.data.created} new · {generate.data.existing} already waiting · {generate.data.skipped} skipped
@@ -79,12 +90,20 @@ export function AgentInbox() {
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
         <div className="space-y-3">
           {inbox.isLoading ? <p className="text-sm text-[#5e6684]">Loading…</p> : null}
-          {inbox.isError ? <p className="text-sm text-[#b42318]">Couldn’t load the inbox.</p> : null}
+          {inbox.isError ? (
+            <ErrorState compact title="Couldn’t load the inbox" onRetry={() => void inbox.refetch()} isRetrying={inbox.isFetching} />
+          ) : null}
           {!inbox.isLoading && !inbox.isError && visible.length === 0 ? (
             <p className="rounded-[14px] border border-dashed border-[#e6dccb] bg-white p-6 text-sm text-[#5e6684]">Nothing here.</p>
           ) : null}
           {visible.map((item) => (
-            <AgentProposalCard key={item.id} item={item} selected={item.id === selectedId} onSelect={setSelectedId} />
+            <ConsentAwareProposalCard
+              key={item.id}
+              item={item}
+              selected={item.id === selectedId}
+              canReview={canReview}
+              onSelect={setSelectedId}
+            />
           ))}
         </div>
         <div className="rounded-[14px] border border-[#e6dccb] bg-white p-6">

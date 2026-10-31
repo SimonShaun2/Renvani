@@ -13,7 +13,7 @@ import styles from "./site.module.css";
 
 const serif = { fontFamily: "var(--font-mkt-serif), Georgia, serif", fontStyle: "italic" } as const;
 
-/** Shared marketing nav (200:521) and footer (200:530). Server component. */
+/** Shared marketing nav (200:521) and footer (200:530; tablet 768 per 253:6918 / 253:6961, md to below lg only). Server component. */
 export function MarketingShell({ children }: { children: ReactNode }) {
   return (
     <div
@@ -70,18 +70,18 @@ export function MarketingShell({ children }: { children: ReactNode }) {
         </HeaderDisclosure>
       </header>
       <main>{children}</main>
-      <footer data-node-id="203:4576" className="mx-auto flex max-w-[1440px] flex-col gap-6 leading-[1.38] px-6 py-6 md:flex-row md:flex-wrap md:items-start md:justify-between md:p-8 lg:flex-nowrap lg:justify-start lg:px-16 lg:py-16">
-        <p className="text-[28px] md:order-1 lg:w-[350px]" style={serif}>
+      <footer data-node-id="203:4576" className="mx-auto flex max-w-[1440px] flex-col gap-6 leading-[1.38] px-6 py-6 md:grid md:grid-cols-[484px_204px] md:gap-x-4 md:gap-y-6 md:p-8 lg:flex lg:flex-row lg:flex-nowrap lg:items-start lg:justify-start lg:gap-6 lg:px-16 lg:py-16">
+        <p className="text-[28px] md:order-1 md:leading-[1.4] lg:w-[350px] lg:leading-[inherit]" style={serif}>
           Renvani
         </p>
-        <nav aria-label="Footer" className="flex flex-col gap-4 md:order-3 md:w-full md:flex-row md:flex-wrap text-[12px] lg:order-2 lg:w-[510px]" style={{ color: "var(--color-mkt-ink2)" }}>
+        <nav aria-label="Footer" className="flex flex-col gap-4 md:order-3 md:col-span-2 md:w-[704px] md:flex-row md:text-[14px] md:leading-[1.4] text-[12px] lg:order-2 lg:col-auto lg:w-[510px] lg:flex-wrap lg:text-[12px] lg:leading-[inherit]" style={{ color: "var(--color-mkt-ink2)" }}>
           {SITE_FOOTER.links.map((l) => (
-            <Link key={l.label} href={l.href} className="min-w-[112px]">
+            <Link key={l.label} href={l.href} className="min-w-[112px] md:w-[164px] md:shrink-0 lg:w-auto lg:shrink">
               {l.label}
             </Link>
           ))}
         </nav>
-        <p className="text-[11px] md:order-2 lg:order-3" style={{ color: "var(--color-mkt-ink2)" }}>
+        <p className="text-[11px] md:order-2 md:text-[12px] md:leading-[1.4] lg:order-3 lg:text-[11px] lg:leading-[inherit]" style={{ color: "var(--color-mkt-ink2)" }}>
           {SITE_FOOTER.copyright}
         </p>
       </footer>

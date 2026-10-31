@@ -63,6 +63,7 @@ import priceBookRoutes from "./routes/price-book/index.js";
 import productRoutes from "./routes/products/index.js";
 import qboSyncRoutes from "./routes/qbo-sync/index.js";
 import reportingRoutes from "./routes/reporting/index.js";
+import commandCenterRoutes from "./routes/command-center/index.js";
 import reviewRequestRoutes from "./routes/review-requests/index.js";
 import revenueInquiryRoutes from "./routes/revenue-inquiries/index.js";
 import schedulingAgentRoutes from "./routes/scheduling-agent/index.js";
@@ -125,6 +126,7 @@ export async function buildApp() {
 
   await app.register(activityEventRoutes, { prefix: "/api/v1" });
   await app.register(agentActionRoutes, { prefix: "/api/v1" });
+  await app.register(commandCenterRoutes, { prefix: "/api/v1" });
   await app.register(operatorRoutes, { prefix: "/api/v1" });
   await app.register(tenantContextRoutes, { prefix: "/api/v1" });
   await app.register(revenueInquiryRoutes, { prefix: "/api/v1" });

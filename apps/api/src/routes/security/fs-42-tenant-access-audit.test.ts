@@ -535,4 +535,46 @@ describe("FS-42 tenant access audit", () => {
     expect(exportEvents()).toHaveLength(1);
     expect(exportEvents()[0]).toMatchObject({ companyId: companyB.id, actorId: ownerB.id, entityId: draftId });
   });
+
+  it("FS42-UNAUTH-COMMAND-CENTER-BRIEF GET /command-center/brief returns 401 without credentials", async () => {
+    const response = await request(app.server).get("/api/v1/command-center/brief");
+    expect(response.status).toBe(401);
+  });
+
+  it("FS42-ROLE-COMMAND-CENTER-BRIEF technician and dispatcher cannot read the owner brief", async () => {
+    const company = fakeDb.seedCompany({ name: "Brief Role Co", slug: "brief-role-co" });
+    for (const role of ["technician", "dispatcher"] as const) {
+      const user = fakeDb.seedUser({ companyId: company.id, email: `${role}@brief-role.test`, firstName: "Field", lastName: "User", role });
+      const response = await request(app.server).get("/api/v1/command-center/brief").set("Authorization", technicianAuth(company.id, user.id, role));
+      expect(response.status).toBe(403);
+      expect(response.body.error).toBe("FORBIDDEN");
+    }
+  });
+
+  it("FS42-XT-COMMAND-CENTER-BRIEF owner brief excludes another tenant's records", async () => {
+    const companyA = fakeDb.seedCompany({ name: "Brief A", slug: "brief-a" });
+    const companyB = fakeDb.seedCompany({ name: "Brief B", slug: "brief-b" });
+    const owner = fakeDb.seedUser({ companyId: companyA.id, email: "owner@brief-a.test", firstName: "Owner", lastName: "A", role: "owner" });
+    const foreignCustomer = fakeDb.seedCustomer({ companyId: companyB.id, firstName: "B", lastName: "Customer" });
+    fakeDb.seedJob({ companyId: companyB.id, customerId: foreignCustomer.id, status: "scheduled", scheduledStart: new Date() } as never);
+    fakeDb.seedAgentAction({ companyId: companyB.id, state: "awaiting_approval" } as never);
+    fakeDb.seedCrew({ companyId: companyB.id, name: "B crew" });
+    const response = await request(app.server).get("/api/v1/command-center/brief").set("Authorization", technicianAuth(companyA.id, owner.id, "owner"));
+    expect(response.status).toBe(200);
+    expect(response.body.needsYou.counts).toEqual({ approvals: 0, exceptions: 0 });
+    expect(response.body.today.jobsToday).toBe(0);
+    expect(response.body.crewsToday).toEqual([]);
+    expect(response.body.emptyStates.hasAnyData).toBe(false);
+  });
+
+  it("FS42-SPOOF-COMMAND-CENTER-BRIEF rejects a client-supplied companyId query param", async () => {
+    const companyA = fakeDb.seedCompany({ name: "Brief Spoof A", slug: "brief-spoof-a" });
+    const companyB = fakeDb.seedCompany({ name: "Brief Spoof B", slug: "brief-spoof-b" });
+    const owner = fakeDb.seedUser({ companyId: companyA.id, email: "owner@brief-spoof.test", firstName: "Owner", lastName: "A", role: "owner" });
+    const response = await request(app.server)
+      .get("/api/v1/command-center/brief")
+      .query({ companyId: companyB.id })
+      .set("Authorization", technicianAuth(companyA.id, owner.id, "owner"));
+    expect(response.status).toBe(400);
+  });
 });

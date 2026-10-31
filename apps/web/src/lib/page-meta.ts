@@ -4,7 +4,7 @@ export interface PageMeta {
 }
 
 const DEFAULT_META: PageMeta = {
-  title: "ServiceRev",
+  title: "Renvani",
   subtitle: "Thinner system. Smarter brain."
 };
 

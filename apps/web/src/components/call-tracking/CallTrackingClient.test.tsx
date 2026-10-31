@@ -20,6 +20,7 @@ vi.mock("@/src/lib/api", async (orig) => {
   return { ...actual, api: { get, put: m.put, post: m.post, patch: m.post, delete: m.post } };
 });
 
+import { ApiError } from "@/src/lib/api";
 import { useAuthStore } from "@/src/stores/auth.store";
 import { CallTrackingClient } from "./CallTrackingClient";
 
@@ -75,7 +76,8 @@ describe("CallTrackingClient", () => {
 
   it("shows provider-not-enabled state, caveats and empty lists with no fake data", async () => {
     renderClient();
-    expect(await screen.findByText("Call tracking provider not enabled")).toBeTruthy();
+    expect(await screen.findByText("Provider not enabled")).toBeTruthy();
+    expect((screen.getByRole("button", { name: "Add tracking number" }) as HTMLButtonElement).disabled).toBe(true);
     expect(screen.getByText(/verify that your shop owns the number/)).toBeTruthy();
     expect(await screen.findByText("No tracking numbers yet")).toBeTruthy();
     expect(await screen.findByText("No calls logged yet")).toBeTruthy();
@@ -90,14 +92,14 @@ describe("CallTrackingClient", () => {
     expect(await screen.findByText("Could not load call tracking")).toBeTruthy();
     fail = false;
     fireEvent.click(screen.getByRole("button", { name: /retry/i }));
-    expect(await screen.findByText("Call tracking provider not enabled")).toBeTruthy();
+    expect(await screen.findByText("Provider not enabled")).toBeTruthy();
   });
 
   it("blocks recording until disclosure and notice state are set, then saves them together", async () => {
     renderClient();
     const record = (await screen.findByLabelText("Record calls")) as HTMLInputElement;
     expect(record.disabled).toBe(true);
-    expect(screen.getByText(/Turn on the recording disclosure/)).toBeTruthy();
+    expect(screen.getByText(/Call recording stays off until/)).toBeTruthy();
     fireEvent.click(screen.getByLabelText(/Play a recording disclosure/));
     expect(record.disabled).toBe(true);
     fireEvent.change(screen.getByLabelText("State whose recording notice applies"), { target: { value: "tx" } });
@@ -130,7 +132,7 @@ describe("CallTrackingClient", () => {
     m.routes[`${BASE}/calls`] = () => Promise.resolve({ calls: [call(), call({ id: "c2", outcome: "answered", leadAttribution: { jobId: "j1" } })] });
     renderClient();
     expect((await screen.findAllByText("Truck wrap")).length).toBeGreaterThan(0);
-    expect(screen.queryByText("Call tracking provider not enabled")).toBeNull();
+    expect(screen.queryByText("Provider not enabled")).toBeNull();
     expect(await screen.findByText("Missed")).toBeTruthy();
     expect(screen.getByText("Yes")).toBeTruthy();
     expect(screen.getByRole("form", { name: "Add tracking number" })).toBeTruthy();
@@ -142,5 +144,25 @@ describe("CallTrackingClient", () => {
     expect(await screen.findByText("Owners and admins only")).toBeTruthy();
     expect(m.get).not.toHaveBeenCalled();
     expect(m.put).not.toHaveBeenCalled();
+  });
+  it("matches the Figma header and layout copy", async () => {
+    renderClient();
+    expect(screen.getByRole("heading", { level: 1, name: "Call tracking" })).toBeTruthy();
+    expect(screen.getByText("See which marketing source made the phone ring, which calls were missed and which calls booked a job.")).toBeTruthy();
+    expect(await screen.findByRole("heading", { name: "Call recording" })).toBeTruthy();
+    expect((screen.getByLabelText("State whose recording notice applies") as HTMLInputElement).placeholder).toBe("No state recording notice set yet.");
+    expect(screen.getByRole("switch", { name: /Play a recording disclosure/ })).toBeTruthy();
+  });
+
+  it("shows the CONFLICT card with Reload on a 409 and refetches settings", async () => {
+    m.put.mockReset().mockRejectedValue(new ApiError(409, { message: "conflict" } as never));
+    renderClient();
+    fireEvent.click(await screen.findByRole("button", { name: "Save settings" }));
+    expect(await screen.findByText("Someone else changed this.")).toBeTruthy();
+    expect(screen.getByText("Conflict")).toBeTruthy();
+    const before = m.get.mock.calls.filter(([p]) => p === `${BASE}/settings`).length;
+    fireEvent.click(screen.getByRole("button", { name: "Reload" }));
+    await waitFor(() => expect(m.get.mock.calls.filter(([p]) => p === `${BASE}/settings`).length).toBeGreaterThan(before));
+    expect(screen.queryByText("Someone else changed this.")).toBeNull();
   });
 });

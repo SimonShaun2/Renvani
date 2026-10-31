@@ -15535,9 +15535,21748 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
      "n": "03 / Connected workflow and demo",
      "id": "203:8214",
      "k": [
-     
-... 736292 bytes omitted ...
-    "n": "Icon / check",
+      {
+       "t": "p",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#f6b400] tracking-[1.1px] w-full",
+       "id": "219:9968",
+       "k": [
+        "WORKS ACROSS YOUR BUSINESS"
+       ]
+      },
+      {
+       "t": "p",
+       "c": "font-semibold leading-[1.08] relative text-[36px] text-[color:#fff] tracking-[-0.9px] w-full",
+       "id": "219:9969",
+       "k": [
+        "One job. Connected all the way."
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex gap-[16px] items-center relative w-full",
+       "n": "Flagship and tool handoff",
+       "id": "219:9970",
+       "k": [
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] flex-1 min-w-0",
+         "n": "Connected feature / Websites / Desktop",
+         "id": "219:9981",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:9972",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Growth",
+             "id": "219:9973",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:9974",
+               "k": [
+                "Growth"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[222px] shrink-0",
+             "id": "219:9975",
+             "k": [
+              "Inquiry #1042"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:9976",
+           "k": [
+            "Websites"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:9977",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:9978",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:9980",
+             "k": [
+              "Service selected"
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex h-[24px] items-center justify-center relative w-[32px] shrink-0",
+         "n": "Next connected state",
+         "id": "219:9982",
+         "k": [
+          {
+           "t": "div",
+           "c": "relative size-[24px]",
+           "n": "Icon / arrow",
+           "id": "219:9983",
+           "k": [
+            {
+             "t": "img",
+             "c": "absolute block inset-0 size-full",
+             "src": "/marketing/flagship/icon-arrow-84befcc1.svg"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] flex-1 min-w-0",
+         "n": "Connected feature / Online booking / Desktop",
+         "id": "219:9995",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:9986",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Growth",
+             "id": "219:9987",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:9988",
+               "k": [
+                "Growth"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[222px] shrink-0",
+             "id": "219:9989",
+             "k": [
+              "Job #1042 · Jordan Lee"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:9990",
+           "k": [
+            "Online booking"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:9991",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:9992",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:9994",
+             "k": [
+              "Visit requested"
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex h-[24px] items-center justify-center relative w-[32px] shrink-0",
+         "n": "Next connected state",
+         "id": "219:9996",
+         "k": [
+          {
+           "t": "div",
+           "c": "relative size-[24px]",
+           "n": "Icon / arrow",
+           "id": "219:9997",
+           "k": [
+            {
+             "t": "img",
+             "c": "absolute block inset-0 size-full",
+             "src": "/marketing/flagship/icon-arrow-84befcc1.svg"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] flex-1 min-w-0",
+         "n": "Connected feature / Scheduling & dispatch / Desktop",
+         "id": "219:10009",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:10000",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Operations",
+             "id": "219:10001",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:10002",
+               "k": [
+                "Operations"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[222px] shrink-0",
+             "id": "219:10003",
+             "k": [
+              "Job #1042 · Jordan Lee"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:10004",
+           "k": [
+            "Scheduling & dispatch"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:10005",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:10006",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:10008",
+             "k": [
+              "Assigned to Maya"
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "t": "button",
+       "label": "Get a free demo",
+       "kind": "Accent",
+       "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#0f1530]",
+       "href": "/demo"
+      }
+     ]
+    }
+   ]
+  },
+  "mobile": {
+   "t": "div",
+   "c": "bg-[#fbf6ef] flex flex-col items-start relative",
+   "n": "Online Booking / Mobile",
+   "id": "175:1582",
+   "k": [
+    {
+     "t": "div",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[32px] items-start p-[24px] relative w-full",
+     "n": "01 / Product in view",
+     "id": "203:8230",
+     "k": [
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[32px] items-start relative w-full",
+       "n": "Outcome and product",
+       "id": "203:8231",
+       "k": [
+        {
+         "t": "div",
+         "c": "flex flex-col gap-[20px] items-start relative w-full",
+         "n": "Short outcome copy",
+         "id": "203:8232",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "203:8233",
+           "k": [
+            "ONLINE BOOKING"
+           ]
+          },
+          {
+           "t": "h1",
+           "c": "font-semibold leading-[1.08] relative text-[40px] text-[color:#0f1530] tracking-[-1px] w-full",
+           "id": "203:8234",
+           "k": [
+            "Your next job starts here."
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-full",
+           "id": "203:8235",
+           "k": [
+            "Let customers choose a service and request a real opening."
+           ]
+          },
+          {
+           "t": "button",
+           "label": "Try the booking flow",
+           "kind": "Dark",
+           "c": "bg-[#0f1530] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#fbf6ef]",
+           "href": "#workflow-m"
+          },
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "203:8238",
+           "k": [
+            "EXAMPLE BUSINESS · JUNIPER"
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#f6f7f9] border-[0.475px] border-[#e6dccb] border-solid flex flex-col h-[231.8px] items-start overflow-clip relative rounded-[7.6px] w-full",
+         "n": "Product demonstration / Online Booking",
+         "id": "203:8239",
+         "k": [
+          {
+           "t": "div",
+           "c": "bg-[#0f1530] flex gap-[7.6px] h-[25.65px] items-center p-[7.6px] relative w-full",
+           "n": "Product chrome",
+           "id": "I203:8239;200:48",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-bold leading-[1.38] relative text-[8.07px] text-[color:#fff] w-[66.5px] shrink-0",
+             "id": "I203:8239;200:49",
+             "k": [
+              "Renvani"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-medium leading-[1.38] relative text-[5.7px] text-[color:#fff] w-[196.65px] shrink-0",
+             "id": "I203:8239;200:50",
+             "k": [
+              "Online booking"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#f6b400] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[48.45px] shrink-0",
+             "n": "Status / EXAMPLE",
+             "id": "I203:8239;200:51",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#0f1530] w-[38.95px] shrink-0",
+               "id": "I203:8239;200:52",
+               "k": [
+                "EXAMPLE"
+               ]
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[7.6px] items-start p-[11.4px] relative w-full",
+           "n": "Product workspace",
+           "id": "I203:8239;200:53",
+           "k": [
+            {
+             "t": "div",
+             "c": "flex gap-[7.6px] items-start relative w-full",
+             "n": "Screen title",
+             "id": "I203:8239;200:54",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-semibold leading-[1.38] relative text-[10.92px] text-[color:#0f1530] w-[218.5px] shrink-0",
+               "id": "I203:8239;200:55",
+               "k": [
+                "Online booking"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[85.5px] shrink-0",
+               "n": "Status / Your business",
+               "id": "I203:8239;200:56",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#2a3360] w-[76px] shrink-0",
+                 "id": "I203:8239;200:57",
+                 "k": [
+                  "Your business"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[9.5px] items-start relative w-full",
+             "n": "Branded website and booking",
+             "id": "I203:8239;200:58",
+             "k": [
+              {
+               "t": "div",
+               "c": "flex flex-col gap-[5.7px] items-start relative w-[135.85px] shrink-0",
+               "n": "Business website",
+               "id": "I203:8239;200:59",
+               "k": [
+                {
+                 "t": "div",
+                 "c": "h-[79.8px] relative rounded-[7.6px] w-full",
+                 "n": "Trade work on the customer website",
+                 "id": "I203:8239;200:60",
+                 "k": [
+                  {
+                   "t": "img",
+                   "c": "absolute inset-0 object-cover rounded-[7.6px] size-full",
+                   "src": "/marketing/flagship/trade-work-on-the-customer-website-f1266660.jpg"
+                  }
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-bold leading-[1.38] relative text-[12.35px] text-[color:#0f1530] w-full",
+                 "id": "I203:8239;200:61",
+                 "k": [
+                  "Juniper"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal leading-[1.38] relative text-[5.7px] text-[color:#2a3360] w-full",
+                 "id": "I203:8239;200:62",
+                 "k": [
+                  "Heating & Plumbing"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-semibold leading-[1.38] relative text-[9.5px] text-[color:#0f1530] w-full",
+                 "id": "I203:8239;200:63",
+                 "k": [
+                  "Comfort starts at home."
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#fff] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[104.5px] shrink-0",
+                 "n": "Status / Tulsa + surrounding areas",
+                 "id": "I203:8239;200:64",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#2a3360] w-[95px] shrink-0",
+                   "id": "I203:8239;200:65",
+                   "k": [
+                    "Tulsa + surrounding areas"
+                   ]
+                  }
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border-[0.475px] border-[#e6dccb] border-solid flex flex-col gap-[6.65px] items-start p-[9.5px] relative rounded-[7.6px] w-[173.85px] shrink-0",
+               "n": "Book a visit",
+               "id": "I203:8239;200:66",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-semibold leading-[1.38] relative text-[9.97px] text-[color:#0f1530] w-full",
+                 "id": "I203:8239;200:67",
+                 "k": [
+                  "Book a visit"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal leading-[1.38] relative text-[5.7px] text-[color:#2a3360] w-full",
+                 "id": "I203:8239;200:68",
+                 "k": [
+                  "Choose your service"
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#fff4d6] flex font-medium gap-[5.7px] items-start leading-[1.38] p-[5.7px] relative rounded-[5.7px] text-[6.17px] text-[color:#0f1530] w-full",
+                 "n": "AC tune-up",
+                 "id": "I203:8239;200:69",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "relative w-[114px] shrink-0",
+                   "id": "I203:8239;200:70",
+                   "k": [
+                    "AC tune-up"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "relative w-[23.75px] shrink-0",
+                   "id": "I203:8239;200:71",
+                   "k": [
+                    "$89"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#f6f7f9] flex font-medium gap-[5.7px] items-start leading-[1.38] p-[5.7px] relative rounded-[5.7px] text-[6.17px] text-[color:#0f1530] w-full",
+                 "n": "Plumbing diagnostic",
+                 "id": "I203:8239;200:72",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "relative w-[114px] shrink-0",
+                   "id": "I203:8239;200:73",
+                   "k": [
+                    "Plumbing diagnostic"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "relative w-[23.75px] shrink-0",
+                   "id": "I203:8239;200:74",
+                   "k": [
+                    "$99"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[5.7px] text-[color:#0f1530] w-full",
+                 "id": "I203:8239;200:75",
+                 "k": [
+                  "Next available day"
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[4.75px] items-start relative w-full",
+                 "n": "Available visits",
+                 "id": "I203:8239;200:76",
+                 "k": [
+                  {
+                   "t": "div",
+                   "c": "bg-[#0f1530] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[72.2px] shrink-0",
+                   "n": "Status / 10:00–12:00",
+                   "id": "I203:8239;200:77",
+                   "k": [
+                    {
+                     "t": "p",
+                     "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#fff] w-[62.7px] shrink-0",
+                     "id": "I203:8239;200:78",
+                     "k": [
+                      "10:00–12:00"
+                     ]
+                    }
+                   ]
+                  },
+                  {
+                   "t": "div",
+                   "c": "bg-[#fbf6ef] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[72.2px] shrink-0",
+                   "n": "Status / 14:00–16:00",
+                   "id": "I203:8239;200:79",
+                   "k": [
+                    {
+                     "t": "p",
+                     "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#0f1530] w-[62.7px] shrink-0",
+                     "id": "I203:8239;200:80",
+                     "k": [
+                      "14:00–16:00"
+                     ]
+                    }
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#f6b400] flex h-[18.05px] items-center justify-center px-[6.65px] relative rounded-[5.7px] w-[154.85px] shrink-0",
+                 "n": "UI action / Request this visit",
+                 "id": "I203:8239;200:81",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[5.7px] text-[color:#0f1530] text-center w-[141.55px] shrink-0",
+                   "id": "I203:8239;200:82",
+                   "k": [
+                    "Request this visit"
+                   ]
+                  }
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#fff] flex flex-col gap-[32px] items-start p-[24px] relative w-full",
+     "n": "02 / A workflow you can see",
+     "id": "203:8275",
+     "k": [
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[12px] items-start leading-[1.38] relative w-full",
+       "n": "Workflow heading",
+       "id": "203:8276",
+       "k": [
+        {
+         "t": "p",
+         "c": "font-medium relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+         "id": "203:8277",
+         "k": [
+          "EXAMPLE WORKFLOW"
+         ]
+        },
+        {
+         "t": "p",
+         "c": "font-semibold relative text-[32px] text-[color:#0f1530] w-full",
+         "id": "203:8278",
+         "k": [
+          "See the work happen."
+         ]
+        }
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[24px] items-start relative w-full",
+       "n": "Three product moments",
+       "id": "203:8279",
+       "k": [
+        {
+         "t": "div",
+         "c": "bg-[#fff] border-[0.855px] border-[#e6dccb] border-solid flex flex-col gap-[15.39px] h-[444.6px] items-start p-[18.81px] relative rounded-[13.68px] w-full",
+         "n": "Workflow moment / Choose the service",
+         "id": "203:8280",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10.26px] items-start relative w-full",
+           "n": "Step heading",
+           "id": "I203:8280;203:8139",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[34.2px] shrink-0",
+             "n": "Status / 01",
+             "id": "I203:8280;203:8140",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#fff] w-[17.1px] shrink-0",
+               "id": "I203:8280;203:8141",
+               "k": [
+                "01"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[15.39px] text-[color:#0f1530] flex-1 min-w-0",
+             "id": "I203:8280;203:8142",
+             "k": [
+              "Choose the service"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[11.97px] h-[342px] items-start p-[15.39px] relative rounded-[10.26px] w-full",
+           "n": "Illustrated product state / services",
+           "id": "I203:8280;203:8143",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[16.24px] text-[color:#0f1530] w-full",
+             "id": "I203:8280;203:8144",
+             "k": [
+              "What can we help with?"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff4d6] flex gap-[8.55px] h-[51.3px] items-start p-[10.26px] relative rounded-[10.26px] w-full",
+             "n": "AC tune-up",
+             "id": "I203:8280;203:8145",
+             "k": [
+              {
+               "t": "div",
+               "c": "relative size-[18.81px]",
+               "n": "Icon / check",
+               "id": "I203:8280;203:8146",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-check1-514b67c3.svg"
+                }
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[11.97px] text-[color:#0f1530] w-[166.725px] shrink-0",
+               "id": "I203:8280;203:8148",
+               "k": [
+                "AC tune-up"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[11.97px] text-[color:#0f1530] w-[38.475px] shrink-0",
+               "id": "I203:8280;203:8149",
+               "k": [
+                "$89"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex gap-[8.55px] h-[51.3px] items-start p-[10.26px] relative rounded-[10.26px] w-full",
+             "n": "Plumbing diagnostic",
+             "id": "I203:8280;203:8150",
+             "k": [
+              {
+               "t": "div",
+               "c": "relative size-[18.81px]",
+               "n": "Icon / plus",
+               "id": "I203:8280;203:8151",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-plus-6523beab.svg"
+                }
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[11.97px] text-[color:#0f1530] w-[166.725px] shrink-0",
+               "id": "I203:8280;203:8153",
+               "k": [
+                "Plumbing diagnostic"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[11.97px] text-[color:#0f1530] w-[38.475px] shrink-0",
+               "id": "I203:8280;203:8154",
+               "k": [
+                "$99"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[32.49px] items-center justify-center px-[11.97px] relative rounded-[10.26px] w-full",
+             "n": "UI action / Select service",
+             "id": "I203:8280;203:8155",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10.26px] text-[color:#fff] text-center flex-1 min-w-0",
+               "id": "I203:8280;203:8156",
+               "k": [
+                "Select service"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] border-[0.855px] border-[#e6dccb] border-solid flex flex-col gap-[15.39px] h-[444.6px] items-start p-[18.81px] relative rounded-[13.68px] w-full",
+         "n": "Workflow moment / Find a time",
+         "id": "203:8299",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10.26px] items-start relative w-full",
+           "n": "Step heading",
+           "id": "I203:8299;203:8159",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[34.2px] shrink-0",
+             "n": "Status / 02",
+             "id": "I203:8299;203:8160",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#fff] w-[17.1px] shrink-0",
+               "id": "I203:8299;203:8161",
+               "k": [
+                "02"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[15.39px] text-[color:#0f1530] flex-1 min-w-0",
+             "id": "I203:8299;203:8162",
+             "k": [
+              "Find a time"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[11.97px] h-[342px] items-start p-[15.39px] relative rounded-[10.26px] w-full",
+           "n": "Illustrated product state / calendar",
+           "id": "I203:8299;203:8163",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[17.95px] text-[color:#0f1530] w-full",
+             "id": "I203:8299;203:8164",
+             "k": [
+              "October 2026"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex font-medium gap-[3.42px] items-start leading-[1.38] relative text-[10.26px] text-[color:#2a3360] text-center w-full",
+             "n": "Weekday labels",
+             "id": "I203:8299;203:8165",
+             "k": [
+              {
+               "t": "p",
+               "c": "relative w-[35.91px] shrink-0",
+               "id": "I203:8299;203:8166",
+               "k": [
+                "M"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "relative w-[35.91px] shrink-0",
+               "id": "I203:8299;203:8167",
+               "k": [
+                "T"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "relative w-[35.91px] shrink-0",
+               "id": "I203:8299;203:8168",
+               "k": [
+                "W"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "relative w-[35.91px] shrink-0",
+               "id": "I203:8299;203:8169",
+               "k": [
+                "T"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "relative w-[35.91px] shrink-0",
+               "id": "I203:8299;203:8170",
+               "k": [
+                "F"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "relative w-[35.91px] shrink-0",
+               "id": "I203:8299;203:8171",
+               "k": [
+                "S"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "relative w-[35.91px] shrink-0",
+               "id": "I203:8299;203:8172",
+               "k": [
+                "S"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[3.42px] items-start relative w-full",
+             "n": "Available dates",
+             "id": "I203:8299;203:8173",
+             "k": [
+              {
+               "t": "div",
+               "c": "bg-[#fff] flex items-center justify-center relative rounded-[10.26px] size-[35.91px]",
+               "n": "Date 26",
+               "id": "I203:8299;203:8174",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[12.82px] text-[color:#0f1530] text-center w-[34.2px] shrink-0",
+                 "id": "I203:8299;203:8175",
+                 "k": [
+                  "26"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] flex items-center justify-center relative rounded-[10.26px] size-[35.91px]",
+               "n": "Date 27",
+               "id": "I203:8299;203:8176",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[12.82px] text-[color:#0f1530] text-center w-[34.2px] shrink-0",
+                 "id": "I203:8299;203:8177",
+                 "k": [
+                  "27"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] flex items-center justify-center relative rounded-[10.26px] size-[35.91px]",
+               "n": "Date 28",
+               "id": "I203:8299;203:8178",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[12.82px] text-[color:#0f1530] text-center w-[34.2px] shrink-0",
+                 "id": "I203:8299;203:8179",
+                 "k": [
+                  "28"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#0f1530] flex items-center justify-center relative rounded-[10.26px] size-[35.91px]",
+               "n": "Date 29",
+               "id": "I203:8299;203:8180",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[12.82px] text-[color:#fff] text-center w-[34.2px] shrink-0",
+                 "id": "I203:8299;203:8181",
+                 "k": [
+                  "29"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] flex items-center justify-center relative rounded-[10.26px] size-[35.91px]",
+               "n": "Date 30",
+               "id": "I203:8299;203:8182",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[12.82px] text-[color:#0f1530] text-center w-[34.2px] shrink-0",
+                 "id": "I203:8299;203:8183",
+                 "k": [
+                  "30"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] flex items-center justify-center relative rounded-[10.26px] size-[35.91px]",
+               "n": "Date 31",
+               "id": "I203:8299;203:8184",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[12.82px] text-[color:#0f1530] text-center w-[34.2px] shrink-0",
+                 "id": "I203:8299;203:8185",
+                 "k": [
+                  "31"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] flex items-center justify-center relative rounded-[10.26px] size-[35.91px]",
+               "n": "Date 1",
+               "id": "I203:8299;203:8186",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[12.82px] text-[color:#0f1530] text-center w-[34.2px] shrink-0",
+                 "id": "I203:8299;203:8187",
+                 "k": [
+                  "1"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[11.97px] text-[color:#2a3360] w-full",
+             "id": "I203:8299;203:8188",
+             "k": [
+              "Choose an available visit"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[8.55px] items-start relative w-full",
+             "n": "Time choices",
+             "id": "I203:8299;203:8189",
+             "k": [
+              {
+               "t": "div",
+               "c": "bg-[#fff4d6] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[131.67px] shrink-0",
+               "n": "Status / 10:00–12:00",
+               "id": "I203:8299;203:8190",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#0f1530] w-[114.57px] shrink-0",
+                 "id": "I203:8299;203:8191",
+                 "k": [
+                  "10:00–12:00"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[131.67px] shrink-0",
+               "n": "Status / 14:00–16:00",
+               "id": "I203:8299;203:8192",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#0f1530] w-[114.57px] shrink-0",
+                 "id": "I203:8299;203:8193",
+                 "k": [
+                  "14:00–16:00"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[32.49px] items-center justify-center px-[11.97px] relative rounded-[10.26px] w-full",
+             "n": "UI action / Choose this time",
+             "id": "I203:8299;203:8194",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10.26px] text-[color:#fff] text-center flex-1 min-w-0",
+               "id": "I203:8299;203:8195",
+               "k": [
+                "Choose this time"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] border-[0.855px] border-[#e6dccb] border-solid flex flex-col gap-[15.39px] h-[444.6px] items-start p-[18.81px] relative rounded-[13.68px] w-full",
+         "n": "Workflow moment / Get confirmation",
+         "id": "203:8337",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10.26px] items-start relative w-full",
+           "n": "Step heading",
+           "id": "I203:8337;203:8198",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[34.2px] shrink-0",
+             "n": "Status / 03",
+             "id": "I203:8337;203:8199",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#fff] w-[17.1px] shrink-0",
+               "id": "I203:8337;203:8200",
+               "k": [
+                "03"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[15.39px] text-[color:#0f1530] flex-1 min-w-0",
+             "id": "I203:8337;203:8201",
+             "k": [
+              "Get confirmation"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[11.97px] h-[342px] items-start p-[15.39px] relative rounded-[10.26px] w-full",
+           "n": "Illustrated product state / confirmation",
+           "id": "I203:8337;203:8202",
+           "k": [
+            {
+             "t": "div",
+             "c": "flex gap-[10.26px] items-start relative w-full",
+             "n": "Confirmed status",
+             "id": "I203:8337;203:8203",
+             "k": [
+              {
+               "t": "div",
+               "c": "relative size-[29.07px]",
+               "n": "Icon / check",
+               "id": "I203:8337;203:8204",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-check2-4ceb0368.svg"
+                }
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-semibold leading-[1.38] relative text-[20.52px] text-[color:#0f1530] w-[230.85px] shrink-0",
+               "id": "I203:8337;203:8206",
+               "k": [
+                "You’re booked"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-bold leading-[1.08] relative text-[39.33px] text-[color:#0f1530] tracking-[-0.9832px] w-full",
+             "id": "I203:8337;203:8207",
+             "k": [
+              "Oct 29"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-medium leading-[1.38] relative text-[13.68px] text-[color:#0f1530] w-full",
+             "id": "I203:8337;203:8208",
+             "k": [
+              "10:00–12:00 · AC tune-up"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#e6dccb] h-[0.855px] relative w-full",
+             "n": "Divider",
+             "id": "I203:8337;203:8209"
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[11.97px] text-[color:#2a3360] w-full",
+             "id": "I203:8337;203:8210",
+             "k": [
+              "Confirmation sent by email"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[210.33px] shrink-0",
+             "n": "Status / Service address checked",
+             "id": "I203:8337;203:8211",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#0f1530] w-[193.23px] shrink-0",
+               "id": "I203:8337;203:8212",
+               "k": [
+                "Service address checked"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ],
+     "anchor": "workflow-m"
+    },
+    {
+     "t": "div",
+     "c": "bg-[#0f1530] flex flex-col gap-[16px] items-start p-[24px] relative w-full",
+     "n": "03 / Connected workflow and demo",
+     "id": "203:8353",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#f6b400] tracking-[1.1px] w-full",
+       "id": "219:10010",
+       "k": [
+        "WORKS ACROSS YOUR BUSINESS"
+       ]
+      },
+      {
+       "t": "p",
+       "c": "font-semibold leading-[1.38] relative text-[28px] text-[color:#fff] w-full",
+       "id": "219:10011",
+       "k": [
+        "One job. Connected all the way."
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[12px] items-center relative w-full",
+       "n": "Flagship and tool handoff",
+       "id": "219:10012",
+       "k": [
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] w-full",
+         "n": "Connected feature / Websites / Mobile",
+         "id": "219:10023",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:10014",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Growth",
+             "id": "219:10015",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:10016",
+               "k": [
+                "Growth"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[180px] shrink-0",
+             "id": "219:10017",
+             "k": [
+              "Inquiry #1042"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:10018",
+           "k": [
+            "Websites"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:10019",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:10020",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:10022",
+             "k": [
+              "Service selected"
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex flex-col h-[24px] items-center justify-center relative w-full",
+         "n": "Next connected state",
+         "id": "219:10024",
+         "k": [
+          {
+           "t": "div",
+           "c": "relative size-[24px]",
+           "n": "Frame",
+           "id": "219:10025",
+           "k": [
+            {
+             "t": "img",
+             "c": "absolute block inset-0 size-full",
+             "src": "/marketing/flagship/frame-08fa5d7a.svg"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] w-full",
+         "n": "Connected feature / Online booking / Mobile",
+         "id": "219:10037",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:10028",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Growth",
+             "id": "219:10029",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:10030",
+               "k": [
+                "Growth"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[180px] shrink-0",
+             "id": "219:10031",
+             "k": [
+              "Job #1042 · Jordan Lee"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:10032",
+           "k": [
+            "Online booking"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:10033",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:10034",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:10036",
+             "k": [
+              "Visit requested"
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex flex-col h-[24px] items-center justify-center relative w-full",
+         "n": "Next connected state",
+         "id": "219:10038",
+         "k": [
+          {
+           "t": "div",
+           "c": "relative size-[24px]",
+           "n": "Frame",
+           "id": "219:10039",
+           "k": [
+            {
+             "t": "img",
+             "c": "absolute block inset-0 size-full",
+             "src": "/marketing/flagship/frame-08fa5d7a.svg"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] w-full",
+         "n": "Connected feature / Scheduling & dispatch / Mobile",
+         "id": "219:10051",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:10042",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Operations",
+             "id": "219:10043",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:10044",
+               "k": [
+                "Operations"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[180px] shrink-0",
+             "id": "219:10045",
+             "k": [
+              "Job #1042 · Jordan Lee"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:10046",
+           "k": [
+            "Scheduling & dispatch"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:10047",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:10048",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:10050",
+             "k": [
+              "Assigned to Maya"
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "t": "button",
+       "label": "Get a free demo",
+       "kind": "Accent",
+       "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#0f1530]",
+       "href": "/demo"
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "estimates-approvals": {
+  "desktop": {
+   "t": "div",
+   "c": "bg-[#fbf6ef] flex flex-col items-start relative",
+   "n": "Estimates & Approvals / Desktop",
+   "id": "175:1722",
+   "k": [
+    {
+     "t": "div",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[32px] items-start p-[80px] relative w-full",
+     "n": "01 / Product in view",
+     "id": "203:11146",
+     "k": [
+      {
+       "t": "div",
+       "c": "flex gap-[48px] items-center relative w-full",
+       "n": "Outcome and product",
+       "id": "203:11147",
+       "k": [
+        {
+         "t": "div",
+         "c": "flex flex-col gap-[20px] items-start relative w-[480px] shrink-0",
+         "n": "Short outcome copy",
+         "id": "203:11148",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "203:11149",
+           "k": [
+            "ESTIMATES & APPROVALS"
+           ]
+          },
+          {
+           "t": "h1",
+           "c": "font-semibold leading-[1.08] relative text-[60px] text-[color:#0f1530] tracking-[-1.5px] w-full",
+           "id": "203:11150",
+           "k": [
+            "Your prices. A clear path to yes."
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-full",
+           "id": "203:11151",
+           "k": [
+            "Build from your price book. Review exceptions before customers see them."
+           ]
+          },
+          {
+           "t": "button",
+           "label": "See an estimate",
+           "kind": "Dark",
+           "c": "bg-[#0f1530] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#fbf6ef]",
+           "href": "#workflow"
+          },
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "203:11154",
+           "k": [
+            "EXAMPLE BUSINESS · JUNIPER"
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#f6f7f9] border-[1.044px] border-[#e6dccb] border-solid flex flex-col h-[502.378px] items-start overflow-clip relative rounded-[16.711px] flex-1 min-w-0",
+         "n": "Product demonstration / Estimates & Approvals",
+         "id": "203:11155",
+         "k": [
+          {
+           "t": "div",
+           "c": "bg-[#0f1530] flex gap-[16.711px] h-[56.4px] items-center p-[16.711px] relative w-full",
+           "n": "Product chrome",
+           "id": "I203:11155;200:85",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-bold leading-[1.38] relative text-[17.76px] text-[color:#fff] w-[146.222px] shrink-0",
+             "id": "I203:11155;200:86",
+             "k": [
+              "Renvani"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-medium leading-[1.38] relative text-[12.53px] text-[color:#fff] flex-1 min-w-0",
+             "id": "I203:11155;200:87",
+             "k": [
+              "Estimates"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#f6b400] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[106.533px] shrink-0",
+             "n": "Status / EXAMPLE",
+             "id": "I203:11155;200:88",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10.44px] text-[color:#0f1530] w-[85.644px] shrink-0",
+               "id": "I203:11155;200:89",
+               "k": [
+                "EXAMPLE"
+               ]
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[16.711px] items-start p-[25.067px] relative w-full",
+           "n": "Product workspace",
+           "id": "I203:11155;200:90",
+           "k": [
+            {
+             "t": "div",
+             "c": "flex gap-[16.711px] items-start relative w-full",
+             "n": "Screen title",
+             "id": "I203:11155;200:91",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-semibold leading-[1.38] relative text-[24.02px] text-[color:#0f1530] flex-1 min-w-0",
+               "id": "I203:11155;200:92",
+               "k": [
+                "Estimates"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[188px] shrink-0",
+               "n": "Status / Your business",
+               "id": "I203:11155;200:93",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10.44px] text-[color:#2a3360] w-[167.111px] shrink-0",
+                 "id": "I203:11155;200:94",
+                 "k": [
+                  "Your business"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[20.889px] items-start relative w-full",
+             "n": "Document and customer status",
+             "id": "I203:11155;200:95",
+             "k": [
+              {
+               "t": "div",
+               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] flex-1 min-w-0",
+               "n": "Service document",
+               "id": "I203:11155;200:96",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-semibold leading-[1.38] relative text-[19.84px] text-[color:#0f1530] w-full",
+                 "id": "I203:11155;200:97",
+                 "k": [
+                  "Estimate #2048"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal leading-[1.38] relative text-[12.53px] text-[color:#2a3360] w-full",
+                 "id": "I203:11155;200:98",
+                 "k": [
+                  "Jordan Lee · AC diagnostic"
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#e6dccb] h-[1.044px] relative w-full",
+                 "n": "Divider",
+                 "id": "I203:11155;200:99"
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.53px] w-full",
+                 "n": "Field / Diagnostic visit",
+                 "id": "I203:11155;200:100",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[color:#2a3360] w-[196.356px] shrink-0",
+                   "id": "I203:11155;200:101",
+                   "k": [
+                    "Diagnostic visit"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-medium relative text-[color:#0f1530] w-[150.4px] shrink-0",
+                   "id": "I203:11155;200:102",
+                   "k": [
+                    "$89"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.53px] w-full",
+                 "n": "Field / Capacitor replacement",
+                 "id": "I203:11155;200:103",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[color:#2a3360] w-[196.356px] shrink-0",
+                   "id": "I203:11155;200:104",
+                   "k": [
+                    "Capacitor replacement"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-medium relative text-[color:#0f1530] w-[150.4px] shrink-0",
+                   "id": "I203:11155;200:105",
+                   "k": [
+                    "$185"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#e6dccb] h-[1.044px] relative w-full",
+                 "n": "Divider",
+                 "id": "I203:11155;200:106"
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.53px] w-full",
+                 "n": "Field / Service total",
+                 "id": "I203:11155;200:107",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[color:#2a3360] w-[196.356px] shrink-0",
+                   "id": "I203:11155;200:108",
+                   "k": [
+                    "Service total"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-medium relative text-[color:#0f1530] w-[150.4px] shrink-0",
+                   "id": "I203:11155;200:109",
+                   "k": [
+                    "$274"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#fff4d6] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[167.111px] shrink-0",
+                 "n": "Status / Price book applied",
+                 "id": "I203:11155;200:110",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[10.44px] text-[color:#0f1530] w-[146.222px] shrink-0",
+                   "id": "I203:11155;200:111",
+                   "k": [
+                    "Price book applied"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#0f1530] flex h-[39.689px] items-center justify-center px-[14.622px] relative rounded-[12.533px] w-full",
+                 "n": "UI action / Approve estimate",
+                 "id": "I203:11155;200:112",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[12.53px] text-[color:#fff] text-center flex-1 min-w-0",
+                   "id": "I203:11155;200:113",
+                   "k": [
+                    "Approve estimate"
+                   ]
+                  }
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "flex flex-col gap-[16.711px] items-start relative flex-1 min-w-0",
+               "n": "Approval and outcome",
+               "id": "I203:11155;200:114",
+               "k": [
+                {
+                 "t": "div",
+                 "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] w-full",
+                 "n": "Status",
+                 "id": "I203:11155;200:115",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[11.49px] text-[color:#2a3360] tracking-[1.149px] w-full",
+                   "id": "I203:11155;200:116",
+                   "k": [
+                    "CUSTOMER VIEW"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-semibold leading-[1.38] relative text-[25.07px] text-[color:#0f1530] w-full",
+                   "id": "I203:11155;200:117",
+                   "k": [
+                    "Ready for a yes."
+                   ]
+                  },
+                  {
+                   "t": "div",
+                   "c": "flex gap-[10.444px] items-start relative w-full",
+                   "n": "Scope reviewed",
+                   "id": "I203:11155;200:118",
+                   "k": [
+                    {
+                     "t": "div",
+                     "c": "relative size-[18.8px]",
+                     "n": "Icon / check",
+                     "id": "I203:11155;200:119",
+                     "k": [
+                      {
+                       "t": "img",
+                       "c": "absolute block inset-0 size-full",
+                       "src": "/marketing/flagship/icon-check2-85fd1521.svg"
+                      }
+                     ]
+                    },
+                    {
+                     "t": "p",
+                     "c": "font-normal leading-[1.38] relative text-[12.53px] text-[color:#2a3360] w-[208.889px] shrink-0",
+                     "id": "I203:11155;200:121",
+                     "k": [
+                      "Scope reviewed"
+                     ]
+                    }
+                   ]
+                  },
+                  {
+                   "t": "div",
+                   "c": "flex gap-[10.444px] items-start relative w-full",
+                   "n": "Price confirmed",
+                   "id": "I203:11155;200:122",
+                   "k": [
+                    {
+                     "t": "div",
+                     "c": "relative size-[18.8px]",
+                     "n": "Icon / check",
+                     "id": "I203:11155;200:123",
+                     "k": [
+                      {
+                       "t": "img",
+                       "c": "absolute block inset-0 size-full",
+                       "src": "/marketing/flagship/icon-check2-85fd1521.svg"
+                      }
+                     ]
+                    },
+                    {
+                     "t": "p",
+                     "c": "font-normal leading-[1.38] relative text-[12.53px] text-[color:#2a3360] w-[208.889px] shrink-0",
+                     "id": "I203:11155;200:125",
+                     "k": [
+                      "Price confirmed"
+                     ]
+                    }
+                   ]
+                  },
+                  {
+                   "t": "div",
+                   "c": "flex gap-[10.444px] items-start relative w-full",
+                   "n": "Customer accepted",
+                   "id": "I203:11155;200:126",
+                   "k": [
+                    {
+                     "t": "div",
+                     "c": "relative size-[18.8px]",
+                     "n": "Icon / check",
+                     "id": "I203:11155;200:127",
+                     "k": [
+                      {
+                       "t": "img",
+                       "c": "absolute block inset-0 size-full",
+                       "src": "/marketing/flagship/icon-check2-85fd1521.svg"
+                      }
+                     ]
+                    },
+                    {
+                     "t": "p",
+                     "c": "font-normal leading-[1.38] relative text-[12.53px] text-[color:#2a3360] w-[208.889px] shrink-0",
+                     "id": "I203:11155;200:129",
+                     "k": [
+                      "Customer accepted"
+                     ]
+                    }
+                   ]
+                  },
+                  {
+                   "t": "div",
+                   "c": "bg-[#e4f1e8] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[130.556px] shrink-0",
+                   "n": "Status / Accepted",
+                   "id": "I203:11155;200:130",
+                   "k": [
+                    {
+                     "t": "p",
+                     "c": "font-medium leading-[1.38] relative text-[10.44px] text-[color:#0f1530] w-[109.667px] shrink-0",
+                     "id": "I203:11155;200:131",
+                     "k": [
+                      "Accepted"
+                     ]
+                    }
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#fff4d6] flex flex-col gap-[5.222px] items-start leading-[1.38] p-[16.711px] relative rounded-[12.533px] w-full",
+                 "n": "Matched to job",
+                 "id": "I203:11155;200:132",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-semibold relative text-[16.71px] text-[color:#0f1530] w-full",
+                   "id": "I203:11155;200:133",
+                   "k": [
+                    "Job #1042"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[11.49px] text-[color:#2a3360] w-full",
+                   "id": "I203:11155;200:134",
+                   "k": [
+                    "Everything stays connected."
+                   ]
+                  }
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#fff] flex flex-col gap-[32px] items-start p-[80px] relative w-full",
+     "n": "02 / A workflow you can see",
+     "id": "203:11206",
+     "k": [
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[12px] items-start relative w-full",
+       "n": "Workflow heading",
+       "id": "203:11207",
+       "k": [
+        {
+         "t": "p",
+         "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+         "id": "203:11208",
+         "k": [
+          "EXAMPLE WORKFLOW"
+         ]
+        },
+        {
+         "t": "p",
+         "c": "font-semibold leading-[1.08] relative text-[44px] text-[color:#0f1530] tracking-[-1.1px] w-full",
+         "id": "203:11209",
+         "k": [
+          "See the work happen."
+         ]
+        }
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex gap-[40px] items-start relative w-full",
+       "n": "Three product moments",
+       "id": "203:11210",
+       "k": [
+        {
+         "t": "div",
+         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[var(--radius\\\\/16,16px)] flex-1 min-w-0",
+         "n": "Feature workflow / Build the estimate",
+         "id": "203:11230",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[12px] items-start relative w-full",
+           "n": "Step heading",
+           "id": "203:11212",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[40px] shrink-0",
+             "n": "Status / 01",
+             "id": "203:11213",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#fff] w-[20px] shrink-0",
+               "id": "203:11214",
+               "k": [
+                "01"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] flex-1 min-w-0",
+             "id": "203:11215",
+             "k": [
+              "Build the estimate"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-full",
+           "n": "Illustrated product state / estimate",
+           "id": "203:11216",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[21px] text-[color:#0f1530] w-full",
+             "id": "203:11217",
+             "k": [
+              "Estimate #2048"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] w-full",
+             "id": "203:11218",
+             "k": [
+              "Juniper Heating & Plumbing"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#e6dccb] h-px relative w-full",
+             "n": "Divider",
+             "id": "203:11219"
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-full",
+             "n": "Field / Diagnostic visit",
+             "id": "203:11220",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-normal relative text-[color:#2a3360] w-[175px] shrink-0",
+               "id": "203:11221",
+               "k": [
+                "Diagnostic visit"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium relative text-[color:#0f1530] w-[133px] shrink-0",
+               "id": "203:11222",
+               "k": [
+                "$89"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-full",
+             "n": "Field / Capacitor replacement",
+             "id": "203:11223",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-normal relative text-[color:#2a3360] w-[175px] shrink-0",
+               "id": "203:11224",
+               "k": [
+                "Capacitor replacement"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium relative text-[color:#0f1530] w-[133px] shrink-0",
+               "id": "203:11225",
+               "k": [
+                "$185"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#e6dccb] h-px relative w-full",
+             "n": "Divider",
+             "id": "203:11226"
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[27px] text-[color:#0f1530] w-full",
+             "id": "203:11227",
+             "k": [
+              "Total $274"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+             "n": "UI action / Review estimate",
+             "id": "203:11228",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+               "id": "203:11229",
+               "k": [
+                "Review estimate"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[var(--radius\\\\/16,16px)] flex-1 min-w-0",
+         "n": "Feature workflow / Review the exception",
+         "id": "203:11250",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[12px] items-start relative w-full",
+           "n": "Step heading",
+           "id": "203:11232",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[40px] shrink-0",
+             "n": "Status / 02",
+             "id": "203:11233",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#fff] w-[20px] shrink-0",
+               "id": "203:11234",
+               "k": [
+                "02"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] flex-1 min-w-0",
+             "id": "203:11235",
+             "k": [
+              "Review the exception"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-full",
+           "n": "Illustrated product state / approval",
+           "id": "203:11236",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[160px] shrink-0",
+             "n": "Status / OWNER REVIEW",
+             "id": "203:11237",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[140px] shrink-0",
+               "id": "203:11238",
+               "k": [
+                "OWNER REVIEW"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[21px] text-[color:#0f1530] w-full",
+             "id": "203:11239",
+             "k": [
+              "Discount exception"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[16px] items-start leading-[1.38] relative w-full",
+             "n": "Policy comparison",
+             "id": "203:11240",
+             "k": [
+              {
+               "t": "div",
+               "c": "bg-[#fff] flex flex-col gap-[6px] items-start p-[14px] relative rounded-[12px] w-[151px] shrink-0",
+               "n": "Request",
+               "id": "203:11241",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-bold relative text-[32px] text-[color:#0f1530] w-full",
+                 "id": "203:11242",
+                 "k": [
+                  "15%"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[12px] text-[color:#2a3360] w-full",
+                 "id": "203:11243",
+                 "k": [
+                  "Requested"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] flex flex-col gap-[6px] items-start p-[14px] relative rounded-[12px] w-[151px] shrink-0",
+               "n": "Limit",
+               "id": "203:11244",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-bold relative text-[32px] text-[color:#0f1530] w-full",
+                 "id": "203:11245",
+                 "k": [
+                  "10%"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[12px] text-[color:#2a3360] w-full",
+                 "id": "203:11246",
+                 "k": [
+                  "Your limit"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] w-full",
+             "id": "203:11247",
+             "k": [
+              "Reason · Returning customer"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+             "n": "UI action / Approve exception",
+             "id": "203:11248",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+               "id": "203:11249",
+               "k": [
+                "Approve exception"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[var(--radius\\\\/16,16px)] flex-1 min-w-0",
+         "n": "Feature workflow / Make acceptance simple",
+         "id": "203:11268",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[12px] items-start relative w-full",
+           "n": "Step heading",
+           "id": "203:11252",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[40px] shrink-0",
+             "n": "Status / 03",
+             "id": "203:11253",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#fff] w-[20px] shrink-0",
+               "id": "203:11254",
+               "k": [
+                "03"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] flex-1 min-w-0",
+             "id": "203:11255",
+             "k": [
+              "Make acceptance simple"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-full",
+           "n": "Illustrated product state / accept",
+           "id": "203:11256",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+             "id": "203:11257",
+             "k": [
+              "Your repair estimate"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] w-full",
+             "id": "203:11258",
+             "k": [
+              "Juniper Heating & Plumbing"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-bold leading-[1.08] relative text-[46px] text-[color:#0f1530] tracking-[-1.15px] w-full",
+             "id": "203:11259",
+             "k": [
+              "$274"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[240px] shrink-0",
+             "n": "Status / Work + terms included",
+             "id": "203:11260",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[220px] shrink-0",
+               "id": "203:11261",
+               "k": [
+                "Work + terms included"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[10px] items-start relative w-full",
+             "n": "Consent",
+             "id": "203:11262",
+             "k": [
+              {
+               "t": "div",
+               "c": "relative size-[22px]",
+               "n": "Icon / check",
+               "id": "203:11263",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-check1-c690b1c5.svg"
+                }
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#0f1530] flex-1 min-w-0",
+               "id": "203:11265",
+               "k": [
+                "I accept this estimate"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#f6b400] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+             "n": "UI action / Accept estimate",
+             "id": "203:11266",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-center flex-1 min-w-0",
+               "id": "203:11267",
+               "k": [
+                "Accept estimate"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ],
+     "anchor": "workflow"
+    },
+    {
+     "t": "div",
+     "c": "bg-[#0f1530] flex flex-col gap-[16px] items-start px-[80px] py-[48px] relative w-full",
+     "n": "03 / Connected workflow and demo",
+     "id": "203:11269",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#f6b400] tracking-[1.1px] w-full",
+       "id": "219:10052",
+       "k": [
+        "WORKS ACROSS YOUR BUSINESS"
+       ]
+      },
+      {
+       "t": "p",
+       "c": "font-semibold leading-[1.08] relative text-[36px] text-[color:#fff] tracking-[-0.9px] w-full",
+       "id": "219:10053",
+       "k": [
+        "One job. Connected all the way."
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex gap-[16px] items-center relative w-full",
+       "n": "Flagship and tool handoff",
+       "id": "219:10054",
+       "k": [
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] flex-1 min-w-0",
+         "n": "Connected feature / Price Book & Catalog / Desktop",
+         "id": "219:10065",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:10056",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Operations",
+             "id": "219:10057",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:10058",
+               "k": [
+                "Operations"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[222px] shrink-0",
+             "id": "219:10059",
+             "k": [
+              "Estimate #2048"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:10060",
+           "k": [
+            "Price Book & Catalog"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:10061",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:10062",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:10064",
+             "k": [
+              "Your prices applied"
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex h-[24px] items-center justify-center relative w-[32px] shrink-0",
+         "n": "Next connected state",
+         "id": "219:10066",
+         "k": [
+          {
+           "t": "div",
+           "c": "relative size-[24px]",
+           "n": "Icon / arrow",
+           "id": "219:10067",
+           "k": [
+            {
+             "t": "img",
+             "c": "absolute block inset-0 size-full",
+             "src": "/marketing/flagship/icon-arrow-84befcc1.svg"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] flex-1 min-w-0",
+         "n": "Connected feature / Estimates & approvals / Desktop",
+         "id": "219:10079",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:10070",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Revenue",
+             "id": "219:10071",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:10072",
+               "k": [
+                "Revenue"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[222px] shrink-0",
+             "id": "219:10073",
+             "k": [
+              "Estimate #2048"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:10074",
+           "k": [
+            "Estimates & approvals"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:10075",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:10076",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:10078",
+             "k": [
+              "Customer accepted"
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex h-[24px] items-center justify-center relative w-[32px] shrink-0",
+         "n": "Next connected state",
+         "id": "219:10080",
+         "k": [
+          {
+           "t": "div",
+           "c": "relative size-[24px]",
+           "n": "Icon / arrow",
+           "id": "219:10081",
+           "k": [
+            {
+             "t": "img",
+             "c": "absolute block inset-0 size-full",
+             "src": "/marketing/flagship/icon-arrow-84befcc1.svg"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] flex-1 min-w-0",
+         "n": "Connected feature / Jobs & work orders / Desktop",
+         "id": "219:10093",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:10084",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Operations",
+             "id": "219:10085",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:10086",
+               "k": [
+                "Operations"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[222px] shrink-0",
+             "id": "219:10087",
+             "k": [
+              "Job #1042 · Jordan Lee"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:10088",
+           "k": [
+            "Jobs & work orders"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:10089",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:10090",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:10092",
+             "k": [
+              "Approved scope received"
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "t": "button",
+       "label": "Get a free demo",
+       "kind": "Accent",
+       "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#0f1530]",
+       "href": "/demo"
+      }
+     ]
+    }
+   ]
+  },
+  "mobile": {
+   "t": "div",
+   "c": "bg-[#fbf6ef] flex flex-col items-start relative",
+   "n": "Estimates & Approvals / Mobile",
+   "id": "175:1868",
+   "k": [
+    {
+     "t": "div",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[32px] items-start p-[24px] relative w-full",
+     "n": "01 / Product in view",
+     "id": "203:11285",
+     "k": [
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[32px] items-start relative w-full",
+       "n": "Outcome and product",
+       "id": "203:11286",
+       "k": [
+        {
+         "t": "div",
+         "c": "flex flex-col gap-[20px] items-start relative w-full",
+         "n": "Short outcome copy",
+         "id": "203:11287",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "203:11288",
+           "k": [
+            "ESTIMATES & APPROVALS"
+           ]
+          },
+          {
+           "t": "h1",
+           "c": "font-semibold leading-[1.08] relative text-[40px] text-[color:#0f1530] tracking-[-1px] w-full",
+           "id": "203:11289",
+           "k": [
+            "Your prices. A clear path to yes."
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-full",
+           "id": "203:11290",
+           "k": [
+            "Build from your price book. Review exceptions before customers see them."
+           ]
+          },
+          {
+           "t": "button",
+           "label": "See an estimate",
+           "kind": "Dark",
+           "c": "bg-[#0f1530] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#fbf6ef]",
+           "href": "#workflow-m"
+          },
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "203:11293",
+           "k": [
+            "EXAMPLE BUSINESS · JUNIPER"
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#f6f7f9] border-[0.475px] border-[#e6dccb] border-solid flex flex-col h-[228.475px] items-start overflow-clip relative rounded-[7.6px] w-full",
+         "n": "Product demonstration / Estimates & Approvals",
+         "id": "203:11294",
+         "k": [
+          {
+           "t": "div",
+           "c": "bg-[#0f1530] flex gap-[7.6px] h-[25.65px] items-center p-[7.6px] relative w-full",
+           "n": "Product chrome",
+           "id": "I203:11294;200:85",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-bold leading-[1.38] relative text-[8.07px] text-[color:#fff] w-[66.5px] shrink-0",
+             "id": "I203:11294;200:86",
+             "k": [
+              "Renvani"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-medium leading-[1.38] relative text-[5.7px] text-[color:#fff] w-[196.65px] shrink-0",
+             "id": "I203:11294;200:87",
+             "k": [
+              "Estimates"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#f6b400] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[48.45px] shrink-0",
+             "n": "Status / EXAMPLE",
+             "id": "I203:11294;200:88",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#0f1530] w-[38.95px] shrink-0",
+               "id": "I203:11294;200:89",
+               "k": [
+                "EXAMPLE"
+               ]
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[7.6px] items-start p-[11.4px] relative w-full",
+           "n": "Product workspace",
+           "id": "I203:11294;200:90",
+           "k": [
+            {
+             "t": "div",
+             "c": "flex gap-[7.6px] items-start relative w-full",
+             "n": "Screen title",
+             "id": "I203:11294;200:91",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-semibold leading-[1.38] relative text-[10.92px] text-[color:#0f1530] w-[218.5px] shrink-0",
+               "id": "I203:11294;200:92",
+               "k": [
+                "Estimates"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[85.5px] shrink-0",
+               "n": "Status / Your business",
+               "id": "I203:11294;200:93",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#2a3360] w-[76px] shrink-0",
+                 "id": "I203:11294;200:94",
+                 "k": [
+                  "Your business"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[9.5px] items-start relative w-full",
+             "n": "Document and customer status",
+             "id": "I203:11294;200:95",
+             "k": [
+              {
+               "t": "div",
+               "c": "bg-[#fff] border-[0.475px] border-[#e6dccb] border-solid flex flex-col gap-[6.65px] items-start p-[9.5px] relative rounded-[7.6px] w-[181.45px] shrink-0",
+               "n": "Service document",
+               "id": "I203:11294;200:96",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-semibold leading-[1.38] relative text-[9.02px] text-[color:#0f1530] w-full",
+                 "id": "I203:11294;200:97",
+                 "k": [
+                  "Estimate #2048"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal leading-[1.38] relative text-[5.7px] text-[color:#2a3360] w-full",
+                 "id": "I203:11294;200:98",
+                 "k": [
+                  "Jordan Lee · AC diagnostic"
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#e6dccb] h-[0.475px] relative w-full",
+                 "n": "Divider",
+                 "id": "I203:11294;200:99"
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[4.75px] items-start leading-[1.38] relative text-[5.7px] w-full",
+                 "n": "Field / Diagnostic visit",
+                 "id": "I203:11294;200:100",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[color:#2a3360] w-[89.3px] shrink-0",
+                   "id": "I203:11294;200:101",
+                   "k": [
+                    "Diagnostic visit"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-medium relative text-[color:#0f1530] w-[68.4px] shrink-0",
+                   "id": "I203:11294;200:102",
+                   "k": [
+                    "$89"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[4.75px] items-start leading-[1.38] relative text-[5.7px] w-full",
+                 "n": "Field / Capacitor replacement",
+                 "id": "I203:11294;200:103",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[color:#2a3360] w-[89.3px] shrink-0",
+                   "id": "I203:11294;200:104",
+                   "k": [
+                    "Capacitor replacement"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-medium relative text-[color:#0f1530] w-[68.4px] shrink-0",
+                   "id": "I203:11294;200:105",
+                   "k": [
+                    "$185"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#e6dccb] h-[0.475px] relative w-full",
+                 "n": "Divider",
+                 "id": "I203:11294;200:106"
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[4.75px] items-start leading-[1.38] relative text-[5.7px] w-full",
+                 "n": "Field / Service total",
+                 "id": "I203:11294;200:107",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[color:#2a3360] w-[89.3px] shrink-0",
+                   "id": "I203:11294;200:108",
+                   "k": [
+                    "Service total"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-medium relative text-[color:#0f1530] w-[68.4px] shrink-0",
+                   "id": "I203:11294;200:109",
+                   "k": [
+                    "$274"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#fff4d6] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[76px] shrink-0",
+                 "n": "Status / Price book applied",
+                 "id": "I203:11294;200:110",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#0f1530] w-[66.5px] shrink-0",
+                   "id": "I203:11294;200:111",
+                   "k": [
+                    "Price book applied"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#0f1530] flex h-[18.05px] items-center justify-center px-[6.65px] relative rounded-[5.7px] w-[162.45px] shrink-0",
+                 "n": "UI action / Approve estimate",
+                 "id": "I203:11294;200:112",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[5.7px] text-[color:#fff] text-center w-[149.15px] shrink-0",
+                   "id": "I203:11294;200:113",
+                   "k": [
+                    "Approve estimate"
+                   ]
+                  }
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "flex flex-col gap-[7.6px] items-start relative w-[128.25px] shrink-0",
+               "n": "Approval and outcome",
+               "id": "I203:11294;200:114",
+               "k": [
+                {
+                 "t": "div",
+                 "c": "bg-[#fff] border-[0.475px] border-[#e6dccb] border-solid flex flex-col gap-[6.65px] items-start p-[9.5px] relative rounded-[7.6px] w-full",
+                 "n": "Status",
+                 "id": "I203:11294;200:115",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[5.22px] text-[color:#2a3360] tracking-[0.522px] w-full",
+                   "id": "I203:11294;200:116",
+                   "k": [
+                    "CUSTOMER VIEW"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-semibold leading-[1.38] relative text-[11.4px] text-[color:#0f1530] w-full",
+                   "id": "I203:11294;200:117",
+                   "k": [
+                    "Ready for a yes."
+                   ]
+                  },
+                  {
+                   "t": "div",
+                   "c": "flex gap-[4.75px] items-start relative w-full",
+                   "n": "Scope reviewed",
+                   "id": "I203:11294;200:118",
+                   "k": [
+                    {
+                     "t": "div",
+                     "c": "relative size-[8.55px]",
+                     "n": "Icon / check",
+                     "id": "I203:11294;200:119",
+                     "k": [
+                      {
+                       "t": "img",
+                       "c": "absolute block inset-0 size-full",
+                       "src": "/marketing/flagship/icon-check1-76fc982c.svg"
+                      }
+                     ]
+                    },
+                    {
+                     "t": "p",
+                     "c": "font-normal leading-[1.38] relative text-[5.7px] text-[color:#2a3360] w-[95px] shrink-0",
+                     "id": "I203:11294;200:121",
+                     "k": [
+                      "Scope reviewed"
+                     ]
+                    }
+                   ]
+                  },
+                  {
+                   "t": "div",
+                   "c": "flex gap-[4.75px] items-start relative w-full",
+                   "n": "Price confirmed",
+                   "id": "I203:11294;200:122",
+                   "k": [
+                    {
+                     "t": "div",
+                     "c": "relative size-[8.55px]",
+                     "n": "Icon / check",
+                     "id": "I203:11294;200:123",
+                     "k": [
+                      {
+                       "t": "img",
+                       "c": "absolute block inset-0 size-full",
+                       "src": "/marketing/flagship/icon-check1-76fc982c.svg"
+                      }
+                     ]
+                    },
+                    {
+                     "t": "p",
+                     "c": "font-normal leading-[1.38] relative text-[5.7px] text-[color:#2a3360] w-[95px] shrink-0",
+                     "id": "I203:11294;200:125",
+                     "k": [
+                      "Price confirmed"
+                     ]
+                    }
+                   ]
+                  },
+                  {
+                   "t": "div",
+                   "c": "flex gap-[4.75px] items-start relative w-full",
+                   "n": "Customer accepted",
+                   "id": "I203:11294;200:126",
+                   "k": [
+                    {
+                     "t": "div",
+                     "c": "relative size-[8.55px]",
+                     "n": "Icon / check",
+                     "id": "I203:11294;200:127",
+                     "k": [
+                      {
+                       "t": "img",
+                       "c": "absolute block inset-0 size-full",
+                       "src": "/marketing/flagship/icon-check1-76fc982c.svg"
+                      }
+                     ]
+                    },
+                    {
+                     "t": "p",
+                     "c": "font-normal leading-[1.38] relative text-[5.7px] text-[color:#2a3360] w-[95px] shrink-0",
+                     "id": "I203:11294;200:129",
+                     "k": [
+                      "Customer accepted"
+                     ]
+                    }
+                   ]
+                  },
+                  {
+                   "t": "div",
+                   "c": "bg-[#e4f1e8] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[59.375px] shrink-0",
+                   "n": "Status / Accepted",
+                   "id": "I203:11294;200:130",
+                   "k": [
+                    {
+                     "t": "p",
+                     "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#0f1530] w-[49.875px] shrink-0",
+                     "id": "I203:11294;200:131",
+                     "k": [
+                      "Accepted"
+                     ]
+                    }
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#fff4d6] flex flex-col gap-[2.375px] items-start leading-[1.38] p-[7.6px] relative rounded-[5.7px] w-full",
+                 "n": "Matched to job",
+                 "id": "I203:11294;200:132",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-semibold relative text-[7.6px] text-[color:#0f1530] w-full",
+                   "id": "I203:11294;200:133",
+                   "k": [
+                    "Job #1042"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[5.22px] text-[color:#2a3360] w-full",
+                   "id": "I203:11294;200:134",
+                   "k": [
+                    "Everything stays connected."
+                   ]
+                  }
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#fff] flex flex-col gap-[32px] items-start p-[24px] relative w-full",
+     "n": "02 / A workflow you can see",
+     "id": "203:11345",
+     "k": [
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[12px] items-start leading-[1.38] relative w-full",
+       "n": "Workflow heading",
+       "id": "203:11346",
+       "k": [
+        {
+         "t": "p",
+         "c": "font-medium relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+         "id": "203:11347",
+         "k": [
+          "EXAMPLE WORKFLOW"
+         ]
+        },
+        {
+         "t": "p",
+         "c": "font-semibold relative text-[32px] text-[color:#0f1530] w-full",
+         "id": "203:11348",
+         "k": [
+          "See the work happen."
+         ]
+        }
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[24px] items-start relative w-full",
+       "n": "Three product moments",
+       "id": "203:11349",
+       "k": [
+        {
+         "t": "div",
+         "c": "bg-[#fff] border-[0.855px] border-[#e6dccb] border-solid flex flex-col gap-[15.39px] h-[444.6px] items-start p-[18.81px] relative rounded-[13.68px] w-full",
+         "n": "Workflow moment / Build the estimate",
+         "id": "203:11350",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10.26px] items-start relative w-full",
+           "n": "Step heading",
+           "id": "I203:11350;203:11212",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[34.2px] shrink-0",
+             "n": "Status / 01",
+             "id": "I203:11350;203:11213",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#fff] w-[17.1px] shrink-0",
+               "id": "I203:11350;203:11214",
+               "k": [
+                "01"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[15.39px] text-[color:#0f1530] flex-1 min-w-0",
+             "id": "I203:11350;203:11215",
+             "k": [
+              "Build the estimate"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[11.97px] h-[342px] items-start p-[15.39px] relative rounded-[10.26px] w-full",
+           "n": "Illustrated product state / estimate",
+           "id": "I203:11350;203:11216",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[17.95px] text-[color:#0f1530] w-full",
+             "id": "I203:11350;203:11217",
+             "k": [
+              "Estimate #2048"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10.26px] text-[color:#2a3360] w-full",
+             "id": "I203:11350;203:11218",
+             "k": [
+              "Juniper Heating & Plumbing"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#e6dccb] h-[0.855px] relative w-full",
+             "n": "Divider",
+             "id": "I203:11350;203:11219"
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[8.55px] items-start leading-[1.38] relative text-[10.26px] w-full",
+             "n": "Field / Diagnostic visit",
+             "id": "I203:11350;203:11220",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-normal relative text-[color:#2a3360] w-[149.625px] shrink-0",
+               "id": "I203:11350;203:11221",
+               "k": [
+                "Diagnostic visit"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium relative text-[color:#0f1530] w-[113.715px] shrink-0",
+               "id": "I203:11350;203:11222",
+               "k": [
+                "$89"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[8.55px] items-start leading-[1.38] relative text-[10.26px] w-full",
+             "n": "Field / Capacitor replacement",
+             "id": "I203:11350;203:11223",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-normal relative text-[color:#2a3360] w-[149.625px] shrink-0",
+               "id": "I203:11350;203:11224",
+               "k": [
+                "Capacitor replacement"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium relative text-[color:#0f1530] w-[113.715px] shrink-0",
+               "id": "I203:11350;203:11225",
+               "k": [
+                "$185"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#e6dccb] h-[0.855px] relative w-full",
+             "n": "Divider",
+             "id": "I203:11350;203:11226"
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[23.08px] text-[color:#0f1530] w-full",
+             "id": "I203:11350;203:11227",
+             "k": [
+              "Total $274"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[32.49px] items-center justify-center px-[11.97px] relative rounded-[10.26px] w-full",
+             "n": "UI action / Review estimate",
+             "id": "I203:11350;203:11228",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10.26px] text-[color:#fff] text-center flex-1 min-w-0",
+               "id": "I203:11350;203:11229",
+               "k": [
+                "Review estimate"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] border-[0.855px] border-[#e6dccb] border-solid flex flex-col gap-[15.39px] h-[444.6px] items-start p-[18.81px] relative rounded-[13.68px] w-full",
+         "n": "Workflow moment / Review the exception",
+         "id": "203:11369",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10.26px] items-start relative w-full",
+           "n": "Step heading",
+           "id": "I203:11369;203:11232",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[34.2px] shrink-0",
+             "n": "Status / 02",
+             "id": "I203:11369;203:11233",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#fff] w-[17.1px] shrink-0",
+               "id": "I203:11369;203:11234",
+               "k": [
+                "02"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[15.39px] text-[color:#0f1530] flex-1 min-w-0",
+             "id": "I203:11369;203:11235",
+             "k": [
+              "Review the exception"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[11.97px] h-[342px] items-start p-[15.39px] relative rounded-[10.26px] w-full",
+           "n": "Illustrated product state / approval",
+           "id": "I203:11369;203:11236",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fff4d6] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[136.8px] shrink-0",
+             "n": "Status / OWNER REVIEW",
+             "id": "I203:11369;203:11237",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#0f1530] w-[119.7px] shrink-0",
+               "id": "I203:11369;203:11238",
+               "k": [
+                "OWNER REVIEW"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[17.95px] text-[color:#0f1530] w-full",
+             "id": "I203:11369;203:11239",
+             "k": [
+              "Discount exception"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[13.68px] items-start leading-[1.38] relative w-full",
+             "n": "Policy comparison",
+             "id": "I203:11369;203:11240",
+             "k": [
+              {
+               "t": "div",
+               "c": "bg-[#fff] flex flex-col gap-[5.13px] items-start p-[11.97px] relative rounded-[10.26px] w-[129.105px] shrink-0",
+               "n": "Request",
+               "id": "I203:11369;203:11241",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-bold relative text-[27.36px] text-[color:#0f1530] w-full",
+                 "id": "I203:11369;203:11242",
+                 "k": [
+                  "15%"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[10.26px] text-[color:#2a3360] w-full",
+                 "id": "I203:11369;203:11243",
+                 "k": [
+                  "Requested"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] flex flex-col gap-[5.13px] items-start p-[11.97px] relative rounded-[10.26px] w-[129.105px] shrink-0",
+               "n": "Limit",
+               "id": "I203:11369;203:11244",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-bold relative text-[27.36px] text-[color:#0f1530] w-full",
+                 "id": "I203:11369;203:11245",
+                 "k": [
+                  "10%"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[10.26px] text-[color:#2a3360] w-full",
+                 "id": "I203:11369;203:11246",
+                 "k": [
+                  "Your limit"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[11.11px] text-[color:#2a3360] w-full",
+             "id": "I203:11369;203:11247",
+             "k": [
+              "Reason · Returning customer"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[32.49px] items-center justify-center px-[11.97px] relative rounded-[10.26px] w-full",
+             "n": "UI action / Approve exception",
+             "id": "I203:11369;203:11248",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10.26px] text-[color:#fff] text-center flex-1 min-w-0",
+               "id": "I203:11369;203:11249",
+               "k": [
+                "Approve exception"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] border-[0.855px] border-[#e6dccb] border-solid flex flex-col gap-[15.39px] h-[444.6px] items-start p-[18.81px] relative rounded-[13.68px] w-full",
+         "n": "Workflow moment / Make acceptance simple",
+         "id": "203:11388",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10.26px] items-start relative w-full",
+           "n": "Step heading",
+           "id": "I203:11388;203:11252",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[34.2px] shrink-0",
+             "n": "Status / 03",
+             "id": "I203:11388;203:11253",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#fff] w-[17.1px] shrink-0",
+               "id": "I203:11388;203:11254",
+               "k": [
+                "03"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[15.39px] text-[color:#0f1530] flex-1 min-w-0",
+             "id": "I203:11388;203:11255",
+             "k": [
+              "Make acceptance simple"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[11.97px] h-[342px] items-start p-[15.39px] relative rounded-[10.26px] w-full",
+           "n": "Illustrated product state / accept",
+           "id": "I203:11388;203:11256",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[18.81px] text-[color:#0f1530] w-full",
+             "id": "I203:11388;203:11257",
+             "k": [
+              "Your repair estimate"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10.26px] text-[color:#2a3360] w-full",
+             "id": "I203:11388;203:11258",
+             "k": [
+              "Juniper Heating & Plumbing"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-bold leading-[1.08] relative text-[39.33px] text-[color:#0f1530] tracking-[-0.9832px] w-full",
+             "id": "I203:11388;203:11259",
+             "k": [
+              "$274"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[205.2px] shrink-0",
+             "n": "Status / Work + terms included",
+             "id": "I203:11388;203:11260",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#0f1530] w-[188.1px] shrink-0",
+               "id": "I203:11388;203:11261",
+               "k": [
+                "Work + terms included"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[8.55px] items-start relative w-full",
+             "n": "Consent",
+             "id": "I203:11388;203:11262",
+             "k": [
+              {
+               "t": "div",
+               "c": "relative size-[18.81px]",
+               "n": "Icon / check",
+               "id": "I203:11388;203:11263",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-check2-514b67c3.svg"
+                }
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-normal leading-[1.38] relative text-[11.97px] text-[color:#0f1530] flex-1 min-w-0",
+               "id": "I203:11388;203:11265",
+               "k": [
+                "I accept this estimate"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#f6b400] flex h-[32.49px] items-center justify-center px-[11.97px] relative rounded-[10.26px] w-full",
+             "n": "UI action / Accept estimate",
+             "id": "I203:11388;203:11266",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10.26px] text-[color:#0f1530] text-center flex-1 min-w-0",
+               "id": "I203:11388;203:11267",
+               "k": [
+                "Accept estimate"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ],
+     "anchor": "workflow-m"
+    },
+    {
+     "t": "div",
+     "c": "bg-[#0f1530] flex flex-col gap-[16px] items-start p-[24px] relative w-full",
+     "n": "03 / Connected workflow and demo",
+     "id": "203:11405",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#f6b400] tracking-[1.1px] w-full",
+       "id": "219:10094",
+       "k": [
+        "WORKS ACROSS YOUR BUSINESS"
+       ]
+      },
+      {
+       "t": "p",
+       "c": "font-semibold leading-[1.38] relative text-[28px] text-[color:#fff] w-full",
+       "id": "219:10095",
+       "k": [
+        "One job. Connected all the way."
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[12px] items-center relative w-full",
+       "n": "Flagship and tool handoff",
+       "id": "219:10096",
+       "k": [
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] w-full",
+         "n": "Connected feature / Price Book & Catalog / Mobile",
+         "id": "219:10107",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:10098",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Operations",
+             "id": "219:10099",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:10100",
+               "k": [
+                "Operations"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[180px] shrink-0",
+             "id": "219:10101",
+             "k": [
+              "Estimate #2048"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:10102",
+           "k": [
+            "Price Book & Catalog"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:10103",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:10104",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:10106",
+             "k": [
+              "Your prices applied"
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex flex-col h-[24px] items-center justify-center relative w-full",
+         "n": "Next connected state",
+         "id": "219:10108",
+         "k": [
+          {
+           "t": "div",
+           "c": "relative size-[24px]",
+           "n": "Frame",
+           "id": "219:10109",
+           "k": [
+            {
+             "t": "img",
+             "c": "absolute block inset-0 size-full",
+             "src": "/marketing/flagship/frame-08fa5d7a.svg"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] w-full",
+         "n": "Connected feature / Estimates & approvals / Mobile",
+         "id": "219:10121",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:10112",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Revenue",
+             "id": "219:10113",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:10114",
+               "k": [
+                "Revenue"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[180px] shrink-0",
+             "id": "219:10115",
+             "k": [
+              "Estimate #2048"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:10116",
+           "k": [
+            "Estimates & approvals"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:10117",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:10118",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:10120",
+             "k": [
+              "Customer accepted"
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex flex-col h-[24px] items-center justify-center relative w-full",
+         "n": "Next connected state",
+         "id": "219:10122",
+         "k": [
+          {
+           "t": "div",
+           "c": "relative size-[24px]",
+           "n": "Frame",
+           "id": "219:10123",
+           "k": [
+            {
+             "t": "img",
+             "c": "absolute block inset-0 size-full",
+             "src": "/marketing/flagship/frame-08fa5d7a.svg"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] w-full",
+         "n": "Connected feature / Jobs & work orders / Mobile",
+         "id": "219:10135",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:10126",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Operations",
+             "id": "219:10127",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:10128",
+               "k": [
+                "Operations"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[180px] shrink-0",
+             "id": "219:10129",
+             "k": [
+              "Job #1042 · Jordan Lee"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:10130",
+           "k": [
+            "Jobs & work orders"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:10131",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:10132",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:10134",
+             "k": [
+              "Approved scope received"
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "t": "button",
+       "label": "Get a free demo",
+       "kind": "Accent",
+       "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#0f1530]",
+       "href": "/demo"
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "scheduling-dispatch": {
+  "desktop": {
+   "t": "div",
+   "c": "bg-[#fbf6ef] flex flex-col items-start relative",
+   "n": "Scheduling & Dispatch / Desktop",
+   "id": "175:2008",
+   "k": [
+    {
+     "t": "div",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[32px] items-start p-[80px] relative w-full",
+     "n": "01 / Product in view",
+     "id": "203:11425",
+     "k": [
+      {
+       "t": "div",
+       "c": "flex gap-[48px] items-center relative w-full",
+       "n": "Outcome and product",
+       "id": "203:11426",
+       "k": [
+        {
+         "t": "div",
+         "c": "flex flex-col gap-[20px] items-start relative w-[480px] shrink-0",
+         "n": "Short outcome copy",
+         "id": "203:11427",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "203:11428",
+           "k": [
+            "SCHEDULING & DISPATCH"
+           ]
+          },
+          {
+           "t": "h1",
+           "c": "font-semibold leading-[1.08] relative text-[60px] text-[color:#0f1530] tracking-[-1.5px] w-full",
+           "id": "203:11429",
+           "k": [
+            "A clear plan for every visit."
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-full",
+           "id": "203:11430",
+           "k": [
+            "Match jobs with technician availability and keep changes visible."
+           ]
+          },
+          {
+           "t": "button",
+           "label": "See the schedule",
+           "kind": "Dark",
+           "c": "bg-[#0f1530] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#fbf6ef]",
+           "href": "#workflow"
+          },
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "203:11433",
+           "k": [
+            "EXAMPLE BUSINESS · JUNIPER"
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#f6f7f9] border-[1.044px] border-[#e6dccb] border-solid flex flex-col h-[537.889px] items-start overflow-clip relative rounded-[16.711px] flex-1 min-w-0",
+         "n": "Product demonstration / Scheduling & Dispatch",
+         "id": "203:11434",
+         "k": [
+          {
+           "t": "div",
+           "c": "bg-[#0f1530] flex gap-[16.711px] h-[56.4px] items-center p-[16.711px] relative w-full",
+           "n": "Product chrome",
+           "id": "I203:11434;200:137",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-bold leading-[1.38] relative text-[17.76px] text-[color:#fff] w-[146.222px] shrink-0",
+             "id": "I203:11434;200:138",
+             "k": [
+              "Renvani"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-medium leading-[1.38] relative text-[12.53px] text-[color:#fff] flex-1 min-w-0",
+             "id": "I203:11434;200:139",
+             "k": [
+              "Schedule"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#f6b400] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[106.533px] shrink-0",
+             "n": "Status / EXAMPLE",
+             "id": "I203:11434;200:140",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10.44px] text-[color:#0f1530] w-[85.644px] shrink-0",
+               "id": "I203:11434;200:141",
+               "k": [
+                "EXAMPLE"
+               ]
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[16.711px] items-start p-[25.067px] relative w-full",
+           "n": "Product workspace",
+           "id": "I203:11434;200:142",
+           "k": [
+            {
+             "t": "div",
+             "c": "flex gap-[16.711px] items-start relative w-full",
+             "n": "Screen title",
+             "id": "I203:11434;200:143",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-semibold leading-[1.38] relative text-[24.02px] text-[color:#0f1530] flex-1 min-w-0",
+               "id": "I203:11434;200:144",
+               "k": [
+                "Schedule"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[188px] shrink-0",
+               "n": "Status / Your business",
+               "id": "I203:11434;200:145",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10.44px] text-[color:#2a3360] w-[167.111px] shrink-0",
+                 "id": "I203:11434;200:146",
+                 "k": [
+                  "Your business"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex gap-[12.533px] items-start leading-[1.38] p-[12.533px] relative rounded-[12.533px] text-[11.49px] text-[color:#2a3360] w-full",
+             "n": "Time scale",
+             "id": "I203:11434;200:147",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium relative w-[133.689px] shrink-0",
+               "id": "I203:11434;200:148",
+               "k": [
+                "THU 29 OCT"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-normal relative w-[112.8px] shrink-0",
+               "id": "I203:11434;200:149",
+               "k": [
+                "09:00"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-normal relative w-[112.8px] shrink-0",
+               "id": "I203:11434;200:150",
+               "k": [
+                "10:00"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-normal relative w-[112.8px] shrink-0",
+               "id": "I203:11434;200:151",
+               "k": [
+                "11:00"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-normal relative w-[112.8px] shrink-0",
+               "id": "I203:11434;200:152",
+               "k": [
+                "12:00"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex gap-[12.533px] h-[73.111px] items-center p-[12.533px] relative w-full",
+             "n": "Crew / Maya R.",
+             "id": "I203:11434;200:153",
+             "k": [
+              {
+               "t": "div",
+               "c": "bg-[#0f1530] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[41.778px] shrink-0",
+               "n": "Status / MR",
+               "id": "I203:11434;200:154",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10.44px] text-[color:#fff] w-[20.889px] shrink-0",
+                 "id": "I203:11434;200:155",
+                 "k": [
+                  "MR"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[12.53px] text-[color:#0f1530] w-[79.378px] shrink-0",
+               "id": "I203:11434;200:156",
+               "k": [
+                "Maya R."
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff4d6] flex gap-[10.444px] h-[50.133px] items-start leading-[1.38] p-[12.533px] relative rounded-[12.533px] flex-1 min-w-0",
+               "n": "Scheduled job",
+               "id": "I203:11434;200:157",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium relative text-[12.53px] text-[color:#0f1530] w-[233.956px] shrink-0",
+                 "id": "I203:11434;200:158",
+                 "k": [
+                  "AC diagnostic"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[11.49px] text-[color:#2a3360] w-[229.778px] shrink-0",
+                 "id": "I203:11434;200:159",
+                 "k": [
+                  "10–12 · Jordan Lee"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex gap-[12.533px] h-[73.111px] items-center p-[12.533px] relative w-full",
+             "n": "Crew / Eli T.",
+             "id": "I203:11434;200:160",
+             "k": [
+              {
+               "t": "div",
+               "c": "bg-[#0f1530] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[41.778px] shrink-0",
+               "n": "Status / ET",
+               "id": "I203:11434;200:161",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10.44px] text-[color:#fff] w-[20.889px] shrink-0",
+                 "id": "I203:11434;200:162",
+                 "k": [
+                  "ET"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[12.53px] text-[color:#0f1530] w-[79.378px] shrink-0",
+               "id": "I203:11434;200:163",
+               "k": [
+                "Eli T."
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#e4f1e8] flex gap-[10.444px] h-[50.133px] items-start leading-[1.38] p-[12.533px] relative rounded-[12.533px] flex-1 min-w-0",
+               "n": "Scheduled job",
+               "id": "I203:11434;200:164",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium relative text-[12.53px] text-[color:#0f1530] w-[233.956px] shrink-0",
+                 "id": "I203:11434;200:165",
+                 "k": [
+                  "Heating tune-up"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[11.49px] text-[color:#2a3360] w-[229.778px] shrink-0",
+                 "id": "I203:11434;200:166",
+                 "k": [
+                  "09–11 · Morgan Reed"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex gap-[12.533px] h-[73.111px] items-center p-[12.533px] relative w-full",
+             "n": "Crew / Alex J.",
+             "id": "I203:11434;200:167",
+             "k": [
+              {
+               "t": "div",
+               "c": "bg-[#0f1530] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[41.778px] shrink-0",
+               "n": "Status / AJ",
+               "id": "I203:11434;200:168",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10.44px] text-[color:#fff] w-[20.889px] shrink-0",
+                 "id": "I203:11434;200:169",
+                 "k": [
+                  "AJ"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[12.53px] text-[color:#0f1530] w-[79.378px] shrink-0",
+               "id": "I203:11434;200:170",
+               "k": [
+                "Alex J."
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] flex gap-[10.444px] h-[50.133px] items-start leading-[1.38] p-[12.533px] relative rounded-[12.533px] flex-1 min-w-0",
+               "n": "Scheduled job",
+               "id": "I203:11434;200:171",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium relative text-[12.53px] text-[color:#0f1530] w-[233.956px] shrink-0",
+                 "id": "I203:11434;200:172",
+                 "k": [
+                  "Water heater visit"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[11.49px] text-[color:#2a3360] w-[229.778px] shrink-0",
+                 "id": "I203:11434;200:173",
+                 "k": [
+                  "11–13 · Sam Park"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex gap-[16.711px] h-[54.311px] items-start p-[16.711px] relative rounded-[12.533px] w-full",
+             "n": "Assignment strip",
+             "id": "I203:11434;200:174",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[12.53px] text-[color:#fff] w-[146.222px] shrink-0",
+               "id": "I203:11434;200:175",
+               "k": [
+                "Job #1042"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-normal leading-[1.38] relative text-[12.53px] text-[color:#fff] flex-1 min-w-0",
+               "id": "I203:11434;200:176",
+               "k": [
+                "Assigned to Maya · Details ready"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "relative size-[20.889px]",
+               "n": "Icon / check",
+               "id": "I203:11434;200:177",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-check1-73a25a6e.svg"
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#fff] flex flex-col gap-[32px] items-start p-[80px] relative w-full",
+     "n": "02 / A workflow you can see",
+     "id": "203:11477",
+     "k": [
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[12px] items-start relative w-full",
+       "n": "Workflow heading",
+       "id": "203:11478",
+       "k": [
+        {
+         "t": "p",
+         "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+         "id": "203:11479",
+         "k": [
+          "EXAMPLE WORKFLOW"
+         ]
+        },
+        {
+         "t": "p",
+         "c": "font-semibold leading-[1.08] relative text-[44px] text-[color:#0f1530] tracking-[-1.1px] w-full",
+         "id": "203:11480",
+         "k": [
+          "See the work happen."
+         ]
+        }
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex gap-[40px] items-start relative w-full",
+       "n": "Three product moments",
+       "id": "203:11481",
+       "k": [
+        {
+         "t": "div",
+         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[var(--radius\\\\/16,16px)] flex-1 min-w-0",
+         "n": "Feature workflow / See the day",
+         "id": "203:11501",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[12px] items-start relative w-full",
+           "n": "Step heading",
+           "id": "203:11483",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[40px] shrink-0",
+             "n": "Status / 01",
+             "id": "203:11484",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#fff] w-[20px] shrink-0",
+               "id": "203:11485",
+               "k": [
+                "01"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] flex-1 min-w-0",
+             "id": "203:11486",
+             "k": [
+              "See the day"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-full",
+           "n": "Illustrated product state / schedule",
+           "id": "203:11487",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[21px] text-[color:#0f1530] w-full",
+             "id": "203:11488",
+             "k": [
+              "Next available day"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff4d6] flex gap-[10px] h-[56px] items-start p-[12px] relative rounded-[12px] w-full",
+             "n": "Maya",
+             "id": "203:11489",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[13px] text-[color:#2a3360] w-[56px] shrink-0",
+               "id": "203:11490",
+               "k": [
+                "10:00"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "flex flex-col items-start relative w-[226px] shrink-0",
+               "n": "Assignment",
+               "id": "203:11491",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[14px] text-[color:#0f1530] w-full",
+                 "id": "203:11492",
+                 "k": [
+                  "Maya · AC tune-up"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex gap-[10px] h-[56px] items-start p-[12px] relative rounded-[12px] w-full",
+             "n": "Alex",
+             "id": "203:11493",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[13px] text-[color:#2a3360] w-[56px] shrink-0",
+               "id": "203:11494",
+               "k": [
+                "10:30"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "flex flex-col items-start relative w-[226px] shrink-0",
+               "n": "Assignment",
+               "id": "203:11495",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[14px] text-[color:#0f1530] w-full",
+                 "id": "203:11496",
+                 "k": [
+                  "Alex · Leak repair"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex gap-[10px] h-[56px] items-start p-[12px] relative rounded-[12px] w-full",
+             "n": "Open",
+             "id": "203:11497",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[13px] text-[color:#2a3360] w-[56px] shrink-0",
+               "id": "203:11498",
+               "k": [
+                "14:00"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "flex flex-col items-start relative w-[226px] shrink-0",
+               "n": "Assignment",
+               "id": "203:11499",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[14px] text-[color:#0f1530] w-full",
+                 "id": "203:11500",
+                 "k": [
+                  "Open · Available"
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[var(--radius\\\\/16,16px)] flex-1 min-w-0",
+         "n": "Feature workflow / Review the fit",
+         "id": "203:11519",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[12px] items-start relative w-full",
+           "n": "Step heading",
+           "id": "203:11503",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[40px] shrink-0",
+             "n": "Status / 02",
+             "id": "203:11504",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#fff] w-[20px] shrink-0",
+               "id": "203:11505",
+               "k": [
+                "02"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] flex-1 min-w-0",
+             "id": "203:11506",
+             "k": [
+              "Review the fit"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-full",
+           "n": "Illustrated product state / assignment",
+           "id": "203:11507",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[190px] shrink-0",
+             "n": "Status / HVAC JOB",
+             "id": "203:11508",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[170px] shrink-0",
+               "id": "203:11509",
+               "k": [
+                "HVAC JOB"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[27px] text-[color:#0f1530] w-full",
+             "id": "203:11510",
+             "k": [
+              "Maya R."
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#2a3360] w-full",
+             "id": "203:11511",
+             "k": [
+              "Available · 10:00–12:00"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex gap-[12px] h-[66px] items-start p-[14px] relative rounded-[12px] w-full",
+             "n": "Context",
+             "id": "203:11512",
+             "k": [
+              {
+               "t": "div",
+               "c": "relative size-[30px]",
+               "n": "Icon / calendar",
+               "id": "203:11513",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-calendar-56f51515.svg"
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "font-normal relative text-[14px] text-[color:#0f1530] flex-1 min-w-0",
+               "id": "203:11516",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "leading-[1.38] mb-0",
+                 "k": [
+                  "Job #1042"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "leading-[1.38]",
+                 "k": [
+                  "AC diagnostic"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+             "n": "UI action / Review assignment",
+             "id": "203:11517",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+               "id": "203:11518",
+               "k": [
+                "Review assignment"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[var(--radius\\\\/16,16px)] flex-1 min-w-0",
+         "n": "Feature workflow / Handle the change",
+         "id": "203:11537",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[12px] items-start relative w-full",
+           "n": "Step heading",
+           "id": "203:11521",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[40px] shrink-0",
+             "n": "Status / 03",
+             "id": "203:11522",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#fff] w-[20px] shrink-0",
+               "id": "203:11523",
+               "k": [
+                "03"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] flex-1 min-w-0",
+             "id": "203:11524",
+             "k": [
+              "Handle the change"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-full",
+           "n": "Illustrated product state / reschedule",
+           "id": "203:11525",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[190px] shrink-0",
+             "n": "Status / CHANGE REQUEST",
+             "id": "203:11526",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[170px] shrink-0",
+               "id": "203:11527",
+               "k": [
+                "CHANGE REQUEST"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[27px] text-[color:#0f1530] w-full",
+             "id": "203:11528",
+             "k": [
+              "Friday, 9:00 AM"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#2a3360] w-full",
+             "id": "203:11529",
+             "k": [
+              "Jordan requested a new time"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex gap-[12px] h-[66px] items-start p-[14px] relative rounded-[12px] w-full",
+             "n": "Context",
+             "id": "203:11530",
+             "k": [
+              {
+               "t": "div",
+               "c": "relative size-[30px]",
+               "n": "Icon / calendar",
+               "id": "203:11531",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-calendar-56f51515.svg"
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "font-normal relative text-[14px] text-[color:#0f1530] flex-1 min-w-0",
+               "id": "203:11534",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "leading-[1.38] mb-0",
+                 "k": [
+                  "Proposed visit"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "leading-[1.38]",
+                 "k": [
+                  "Owner approval required"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+             "n": "UI action / Confirm change",
+             "id": "203:11535",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+               "id": "203:11536",
+               "k": [
+                "Confirm change"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ],
+     "anchor": "workflow"
+    },
+    {
+     "t": "div",
+     "c": "bg-[#0f1530] flex flex-col gap-[16px] items-start px-[80px] py-[48px] relative w-full",
+     "n": "03 / Connected workflow and demo",
+     "id": "203:11538",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#f6b400] tracking-[1.1px] w-full",
+       "id": "219:10136",
+       "k": [
+        "WORKS ACROSS YOUR BUSINESS"
+       ]
+      },
+      {
+       "t": "p",
+       "c": "font-semibold leading-[1.08] relative text-[36px] text-[color:#fff] tracking-[-0.9px] w-full",
+       "id": "219:10137",
+       "k": [
+        "One job. Connected all the way."
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex gap-[16px] items-center relative w-full",
+       "n": "Flagship and tool handoff",
+       "id": "219:10138",
+       "k": [
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] flex-1 min-w-0",
+         "n": "Connected feature / Estimates & approvals / Desktop",
+         "id": "219:10149",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:10140",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Revenue",
+             "id": "219:10141",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:10142",
+               "k": [
+                "Revenue"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[222px] shrink-0",
+             "id": "219:10143",
+             "k": [
+              "Estimate #2048"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:10144",
+           "k": [
+            "Estimates & approvals"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:10145",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:10146",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:10148",
+             "k": [
+              "Scope accepted"
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex h-[24px] items-center justify-center relative w-[32px] shrink-0",
+         "n": "Next connected state",
+         "id": "219:10150",
+         "k": [
+          {
+           "t": "div",
+           "c": "relative size-[24px]",
+           "n": "Icon / arrow",
+           "id": "219:10151",
+           "k": [
+            {
+             "t": "img",
+             "c": "absolute block inset-0 size-full",
+             "src": "/marketing/flagship/icon-arrow-84befcc1.svg"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] flex-1 min-w-0",
+         "n": "Connected feature / Scheduling & dispatch / Desktop",
+         "id": "219:10163",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:10154",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Operations",
+             "id": "219:10155",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:10156",
+               "k": [
+                "Operations"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[222px] shrink-0",
+             "id": "219:10157",
+             "k": [
+              "Job #1042 · Jordan Lee"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:10158",
+           "k": [
+            "Scheduling & dispatch"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:10159",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:10160",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:10162",
+             "k": [
+              "Visit assigned"
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex h-[24px] items-center justify-center relative w-[32px] shrink-0",
+         "n": "Next connected state",
+         "id": "219:10164",
+         "k": [
+          {
+           "t": "div",
+           "c": "relative size-[24px]",
+           "n": "Icon / arrow",
+           "id": "219:10165",
+           "k": [
+            {
+             "t": "img",
+             "c": "absolute block inset-0 size-full",
+             "src": "/marketing/flagship/icon-arrow-84befcc1.svg"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] flex-1 min-w-0",
+         "n": "Connected feature / Technician App / Desktop",
+         "id": "219:10177",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:10168",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Operations",
+             "id": "219:10169",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:10170",
+               "k": [
+                "Operations"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[222px] shrink-0",
+             "id": "219:10171",
+             "k": [
+              "Job #1042 · Jordan Lee"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:10172",
+           "k": [
+            "Technician App"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:10173",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:10174",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:10176",
+             "k": [
+              "Details ready for the field"
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "t": "button",
+       "label": "Get a free demo",
+       "kind": "Accent",
+       "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#0f1530]",
+       "href": "/demo"
+      }
+     ]
+    }
+   ]
+  },
+  "mobile": {
+   "t": "div",
+   "c": "bg-[#fbf6ef] flex flex-col items-start relative",
+   "n": "Scheduling & Dispatch / Mobile",
+   "id": "175:2154",
+   "k": [
+    {
+     "t": "div",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[32px] items-start p-[24px] relative w-full",
+     "n": "01 / Product in view",
+     "id": "203:11554",
+     "k": [
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[32px] items-start relative w-full",
+       "n": "Outcome and product",
+       "id": "203:11555",
+       "k": [
+        {
+         "t": "div",
+         "c": "flex flex-col gap-[20px] items-start relative w-full",
+         "n": "Short outcome copy",
+         "id": "203:11556",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "203:11557",
+           "k": [
+            "SCHEDULING & DISPATCH"
+           ]
+          },
+          {
+           "t": "h1",
+           "c": "font-semibold leading-[1.08] relative text-[40px] text-[color:#0f1530] tracking-[-1px] w-full",
+           "id": "203:11558",
+           "k": [
+            "A clear plan for every visit."
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-full",
+           "id": "203:11559",
+           "k": [
+            "Match jobs with technician availability and keep changes visible."
+           ]
+          },
+          {
+           "t": "button",
+           "label": "See the schedule",
+           "kind": "Dark",
+           "c": "bg-[#0f1530] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#fbf6ef]",
+           "href": "#workflow-m"
+          },
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "203:11562",
+           "k": [
+            "EXAMPLE BUSINESS · JUNIPER"
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#f6f7f9] border-[0.475px] border-[#e6dccb] border-solid flex flex-col h-[244.625px] items-start overflow-clip relative rounded-[7.6px] w-full",
+         "n": "Product demonstration / Scheduling & Dispatch",
+         "id": "203:11563",
+         "k": [
+          {
+           "t": "div",
+           "c": "bg-[#0f1530] flex gap-[7.6px] h-[25.65px] items-center p-[7.6px] relative w-full",
+           "n": "Product chrome",
+           "id": "I203:11563;200:137",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-bold leading-[1.38] relative text-[8.07px] text-[color:#fff] w-[66.5px] shrink-0",
+             "id": "I203:11563;200:138",
+             "k": [
+              "Renvani"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-medium leading-[1.38] relative text-[5.7px] text-[color:#fff] w-[196.65px] shrink-0",
+             "id": "I203:11563;200:139",
+             "k": [
+              "Schedule"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#f6b400] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[48.45px] shrink-0",
+             "n": "Status / EXAMPLE",
+             "id": "I203:11563;200:140",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#0f1530] w-[38.95px] shrink-0",
+               "id": "I203:11563;200:141",
+               "k": [
+                "EXAMPLE"
+               ]
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[7.6px] items-start p-[11.4px] relative w-full",
+           "n": "Product workspace",
+           "id": "I203:11563;200:142",
+           "k": [
+            {
+             "t": "div",
+             "c": "flex gap-[7.6px] items-start relative w-full",
+             "n": "Screen title",
+             "id": "I203:11563;200:143",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-semibold leading-[1.38] relative text-[10.92px] text-[color:#0f1530] w-[218.5px] shrink-0",
+               "id": "I203:11563;200:144",
+               "k": [
+                "Schedule"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[85.5px] shrink-0",
+               "n": "Status / Your business",
+               "id": "I203:11563;200:145",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#2a3360] w-[76px] shrink-0",
+                 "id": "I203:11563;200:146",
+                 "k": [
+                  "Your business"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex gap-[5.7px] items-start leading-[1.38] p-[5.7px] relative rounded-[5.7px] text-[5.22px] text-[color:#2a3360] w-full",
+             "n": "Time scale",
+             "id": "I203:11563;200:147",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium relative w-[60.8px] shrink-0",
+               "id": "I203:11563;200:148",
+               "k": [
+                "THU 29 OCT"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-normal relative w-[51.3px] shrink-0",
+               "id": "I203:11563;200:149",
+               "k": [
+                "09:00"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-normal relative w-[51.3px] shrink-0",
+               "id": "I203:11563;200:150",
+               "k": [
+                "10:00"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-normal relative w-[51.3px] shrink-0",
+               "id": "I203:11563;200:151",
+               "k": [
+                "11:00"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-normal relative w-[51.3px] shrink-0",
+               "id": "I203:11563;200:152",
+               "k": [
+                "12:00"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex gap-[5.7px] h-[33.25px] items-center p-[5.7px] relative w-full",
+             "n": "Crew / Maya R.",
+             "id": "I203:11563;200:153",
+             "k": [
+              {
+               "t": "div",
+               "c": "bg-[#0f1530] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[19px] shrink-0",
+               "n": "Status / MR",
+               "id": "I203:11563;200:154",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#fff] w-[9.5px] shrink-0",
+                 "id": "I203:11563;200:155",
+                 "k": [
+                  "MR"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[5.7px] text-[color:#0f1530] w-[36.1px] shrink-0",
+               "id": "I203:11563;200:156",
+               "k": [
+                "Maya R."
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff4d6] flex gap-[4.75px] h-[22.8px] items-start leading-[1.38] p-[5.7px] relative rounded-[5.7px] w-[228px] shrink-0",
+               "n": "Scheduled job",
+               "id": "I203:11563;200:157",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium relative text-[5.7px] text-[color:#0f1530] w-[106.4px] shrink-0",
+                 "id": "I203:11563;200:158",
+                 "k": [
+                  "AC diagnostic"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[5.22px] text-[color:#2a3360] w-[104.5px] shrink-0",
+                 "id": "I203:11563;200:159",
+                 "k": [
+                  "10–12 · Jordan Lee"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex gap-[5.7px] h-[33.25px] items-center p-[5.7px] relative w-full",
+             "n": "Crew / Eli T.",
+             "id": "I203:11563;200:160",
+             "k": [
+              {
+               "t": "div",
+               "c": "bg-[#0f1530] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[19px] shrink-0",
+               "n": "Status / ET",
+               "id": "I203:11563;200:161",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#fff] w-[9.5px] shrink-0",
+                 "id": "I203:11563;200:162",
+                 "k": [
+                  "ET"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[5.7px] text-[color:#0f1530] w-[36.1px] shrink-0",
+               "id": "I203:11563;200:163",
+               "k": [
+                "Eli T."
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#e4f1e8] flex gap-[4.75px] h-[22.8px] items-start leading-[1.38] p-[5.7px] relative rounded-[5.7px] w-[228px] shrink-0",
+               "n": "Scheduled job",
+               "id": "I203:11563;200:164",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium relative text-[5.7px] text-[color:#0f1530] w-[106.4px] shrink-0",
+                 "id": "I203:11563;200:165",
+                 "k": [
+                  "Heating tune-up"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[5.22px] text-[color:#2a3360] w-[104.5px] shrink-0",
+                 "id": "I203:11563;200:166",
+                 "k": [
+                  "09–11 · Morgan Reed"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex gap-[5.7px] h-[33.25px] items-center p-[5.7px] relative w-full",
+             "n": "Crew / Alex J.",
+             "id": "I203:11563;200:167",
+             "k": [
+              {
+               "t": "div",
+               "c": "bg-[#0f1530] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[19px] shrink-0",
+               "n": "Status / AJ",
+               "id": "I203:11563;200:168",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#fff] w-[9.5px] shrink-0",
+                 "id": "I203:11563;200:169",
+                 "k": [
+                  "AJ"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[5.7px] text-[color:#0f1530] w-[36.1px] shrink-0",
+               "id": "I203:11563;200:170",
+               "k": [
+                "Alex J."
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] flex gap-[4.75px] h-[22.8px] items-start leading-[1.38] p-[5.7px] relative rounded-[5.7px] w-[228px] shrink-0",
+               "n": "Scheduled job",
+               "id": "I203:11563;200:171",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium relative text-[5.7px] text-[color:#0f1530] w-[106.4px] shrink-0",
+                 "id": "I203:11563;200:172",
+                 "k": [
+                  "Water heater visit"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[5.22px] text-[color:#2a3360] w-[104.5px] shrink-0",
+                 "id": "I203:11563;200:173",
+                 "k": [
+                  "11–13 · Sam Park"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex gap-[7.6px] h-[24.7px] items-start p-[7.6px] relative rounded-[5.7px] w-full",
+             "n": "Assignment strip",
+             "id": "I203:11563;200:174",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[5.7px] text-[color:#fff] w-[66.5px] shrink-0",
+               "id": "I203:11563;200:175",
+               "k": [
+                "Job #1042"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-normal leading-[1.38] relative text-[5.7px] text-[color:#fff] w-[166.25px] shrink-0",
+               "id": "I203:11563;200:176",
+               "k": [
+                "Assigned to Maya · Details ready"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "relative size-[9.5px]",
+               "n": "Icon / check",
+               "id": "I203:11563;200:177",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-check1-f3c0d878.svg"
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#fff] flex flex-col gap-[32px] items-start p-[24px] relative w-full",
+     "n": "02 / A workflow you can see",
+     "id": "203:11606",
+     "k": [
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[12px] items-start leading-[1.38] relative w-full",
+       "n": "Workflow heading",
+       "id": "203:11607",
+       "k": [
+        {
+         "t": "p",
+         "c": "font-medium relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+         "id": "203:11608",
+         "k": [
+          "EXAMPLE WORKFLOW"
+         ]
+        },
+        {
+         "t": "p",
+         "c": "font-semibold relative text-[32px] text-[color:#0f1530] w-full",
+         "id": "203:11609",
+         "k": [
+          "See the work happen."
+         ]
+        }
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[24px] items-start relative w-full",
+       "n": "Three product moments",
+       "id": "203:11610",
+       "k": [
+        {
+         "t": "div",
+         "c": "bg-[#fff] border-[0.855px] border-[#e6dccb] border-solid flex flex-col gap-[15.39px] h-[444.6px] items-start p-[18.81px] relative rounded-[13.68px] w-full",
+         "n": "Workflow moment / See the day",
+         "id": "203:11611",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10.26px] items-start relative w-full",
+           "n": "Step heading",
+           "id": "I203:11611;203:11483",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[34.2px] shrink-0",
+             "n": "Status / 01",
+             "id": "I203:11611;203:11484",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#fff] w-[17.1px] shrink-0",
+               "id": "I203:11611;203:11485",
+               "k": [
+                "01"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[15.39px] text-[color:#0f1530] flex-1 min-w-0",
+             "id": "I203:11611;203:11486",
+             "k": [
+              "See the day"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[11.97px] h-[342px] items-start p-[15.39px] relative rounded-[10.26px] w-full",
+           "n": "Illustrated product state / schedule",
+           "id": "I203:11611;203:11487",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[17.95px] text-[color:#0f1530] w-full",
+             "id": "I203:11611;203:11488",
+             "k": [
+              "Next available day"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff4d6] flex gap-[8.55px] h-[47.88px] items-start p-[10.26px] relative rounded-[10.26px] w-full",
+             "n": "Maya",
+             "id": "I203:11611;203:11489",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[11.11px] text-[color:#2a3360] w-[47.88px] shrink-0",
+               "id": "I203:11611;203:11490",
+               "k": [
+                "10:00"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "flex flex-col items-start relative w-[193.23px] shrink-0",
+               "n": "Assignment",
+               "id": "I203:11611;203:11491",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[11.97px] text-[color:#0f1530] w-full",
+                 "id": "I203:11611;203:11492",
+                 "k": [
+                  "Maya · AC tune-up"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex gap-[8.55px] h-[47.88px] items-start p-[10.26px] relative rounded-[10.26px] w-full",
+             "n": "Alex",
+             "id": "I203:11611;203:11493",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[11.11px] text-[color:#2a3360] w-[47.88px] shrink-0",
+               "id": "I203:11611;203:11494",
+               "k": [
+                "10:30"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "flex flex-col items-start relative w-[193.23px] shrink-0",
+               "n": "Assignment",
+               "id": "I203:11611;203:11495",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[11.97px] text-[color:#0f1530] w-full",
+                 "id": "I203:11611;203:11496",
+                 "k": [
+                  "Alex · Leak repair"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex gap-[8.55px] h-[47.88px] items-start p-[10.26px] relative rounded-[10.26px] w-full",
+             "n": "Open",
+             "id": "I203:11611;203:11497",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[11.11px] text-[color:#2a3360] w-[47.88px] shrink-0",
+               "id": "I203:11611;203:11498",
+               "k": [
+                "14:00"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "flex flex-col items-start relative w-[193.23px] shrink-0",
+               "n": "Assignment",
+               "id": "I203:11611;203:11499",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[11.97px] text-[color:#0f1530] w-full",
+                 "id": "I203:11611;203:11500",
+                 "k": [
+                  "Open · Available"
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] border-[0.855px] border-[#e6dccb] border-solid flex flex-col gap-[15.39px] h-[444.6px] items-start p-[18.81px] relative rounded-[13.68px] w-full",
+         "n": "Workflow moment / Review the fit",
+         "id": "203:11630",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10.26px] items-start relative w-full",
+           "n": "Step heading",
+           "id": "I203:11630;203:11503",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[34.2px] shrink-0",
+             "n": "Status / 02",
+             "id": "I203:11630;203:11504",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#fff] w-[17.1px] shrink-0",
+               "id": "I203:11630;203:11505",
+               "k": [
+                "02"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[15.39px] text-[color:#0f1530] flex-1 min-w-0",
+             "id": "I203:11630;203:11506",
+             "k": [
+              "Review the fit"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[11.97px] h-[342px] items-start p-[15.39px] relative rounded-[10.26px] w-full",
+           "n": "Illustrated product state / assignment",
+           "id": "I203:11630;203:11507",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fff4d6] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[162.45px] shrink-0",
+             "n": "Status / HVAC JOB",
+             "id": "I203:11630;203:11508",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#0f1530] w-[145.35px] shrink-0",
+               "id": "I203:11630;203:11509",
+               "k": [
+                "HVAC JOB"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[23.08px] text-[color:#0f1530] w-full",
+             "id": "I203:11630;203:11510",
+             "k": [
+              "Maya R."
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[11.97px] text-[color:#2a3360] w-full",
+             "id": "I203:11630;203:11511",
+             "k": [
+              "Available · 10:00–12:00"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex gap-[10.26px] h-[56.43px] items-start p-[11.97px] relative rounded-[10.26px] w-full",
+             "n": "Context",
+             "id": "I203:11630;203:11512",
+             "k": [
+              {
+               "t": "div",
+               "c": "relative size-[25.65px]",
+               "n": "Icon / calendar",
+               "id": "I203:11630;203:11513",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-calendar-f3b6fc63.svg"
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "font-normal relative text-[11.97px] text-[color:#0f1530] w-[212.04px] shrink-0",
+               "id": "I203:11630;203:11516",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "leading-[1.38] mb-0",
+                 "k": [
+                  "Job #1042"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "leading-[1.38]",
+                 "k": [
+                  "AC diagnostic"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[32.49px] items-center justify-center px-[11.97px] relative rounded-[10.26px] w-full",
+             "n": "UI action / Review assignment",
+             "id": "I203:11630;203:11517",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10.26px] text-[color:#fff] text-center flex-1 min-w-0",
+               "id": "I203:11630;203:11518",
+               "k": [
+                "Review assignment"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] border-[0.855px] border-[#e6dccb] border-solid flex flex-col gap-[15.39px] h-[444.6px] items-start p-[18.81px] relative rounded-[13.68px] w-full",
+         "n": "Workflow moment / Handle the change",
+         "id": "203:11647",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10.26px] items-start relative w-full",
+           "n": "Step heading",
+           "id": "I203:11647;203:11521",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[34.2px] shrink-0",
+             "n": "Status / 03",
+             "id": "I203:11647;203:11522",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#fff] w-[17.1px] shrink-0",
+               "id": "I203:11647;203:11523",
+               "k": [
+                "03"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[15.39px] text-[color:#0f1530] flex-1 min-w-0",
+             "id": "I203:11647;203:11524",
+             "k": [
+              "Handle the change"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[11.97px] h-[342px] items-start p-[15.39px] relative rounded-[10.26px] w-full",
+           "n": "Illustrated product state / reschedule",
+           "id": "I203:11647;203:11525",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fff4d6] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[162.45px] shrink-0",
+             "n": "Status / CHANGE REQUEST",
+             "id": "I203:11647;203:11526",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#0f1530] w-[145.35px] shrink-0",
+               "id": "I203:11647;203:11527",
+               "k": [
+                "CHANGE REQUEST"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[23.08px] text-[color:#0f1530] w-full",
+             "id": "I203:11647;203:11528",
+             "k": [
+              "Friday, 9:00 AM"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[11.97px] text-[color:#2a3360] w-full",
+             "id": "I203:11647;203:11529",
+             "k": [
+              "Jordan requested a new time"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex gap-[10.26px] h-[56.43px] items-start p-[11.97px] relative rounded-[10.26px] w-full",
+             "n": "Context",
+             "id": "I203:11647;203:11530",
+             "k": [
+              {
+               "t": "div",
+               "c": "relative size-[25.65px]",
+               "n": "Icon / calendar",
+               "id": "I203:11647;203:11531",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-calendar-f3b6fc63.svg"
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "font-normal relative text-[11.97px] text-[color:#0f1530] w-[212.04px] shrink-0",
+               "id": "I203:11647;203:11534",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "leading-[1.38] mb-0",
+                 "k": [
+                  "Proposed visit"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "leading-[1.38]",
+                 "k": [
+                  "Owner approval required"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[32.49px] items-center justify-center px-[11.97px] relative rounded-[10.26px] w-full",
+             "n": "UI action / Confirm change",
+             "id": "I203:11647;203:11535",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10.26px] text-[color:#fff] text-center flex-1 min-w-0",
+               "id": "I203:11647;203:11536",
+               "k": [
+                "Confirm change"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ],
+     "anchor": "workflow-m"
+    },
+    {
+     "t": "div",
+     "c": "bg-[#0f1530] flex flex-col gap-[16px] items-start p-[24px] relative w-full",
+     "n": "03 / Connected workflow and demo",
+     "id": "203:11664",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#f6b400] tracking-[1.1px] w-full",
+       "id": "219:10178",
+       "k": [
+        "WORKS ACROSS YOUR BUSINESS"
+       ]
+      },
+      {
+       "t": "p",
+       "c": "font-semibold leading-[1.38] relative text-[28px] text-[color:#fff] w-full",
+       "id": "219:10179",
+       "k": [
+        "One job. Connected all the way."
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[12px] items-center relative w-full",
+       "n": "Flagship and tool handoff",
+       "id": "219:10180",
+       "k": [
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] w-full",
+         "n": "Connected feature / Estimates & approvals / Mobile",
+         "id": "219:10191",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:10182",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Revenue",
+             "id": "219:10183",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:10184",
+               "k": [
+                "Revenue"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[180px] shrink-0",
+             "id": "219:10185",
+             "k": [
+              "Estimate #2048"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:10186",
+           "k": [
+            "Estimates & approvals"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:10187",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:10188",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:10190",
+             "k": [
+              "Scope accepted"
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex flex-col h-[24px] items-center justify-center relative w-full",
+         "n": "Next connected state",
+         "id": "219:10192",
+         "k": [
+          {
+           "t": "div",
+           "c": "relative size-[24px]",
+           "n": "Frame",
+           "id": "219:10193",
+           "k": [
+            {
+             "t": "img",
+             "c": "absolute block inset-0 size-full",
+             "src": "/marketing/flagship/frame-08fa5d7a.svg"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] w-full",
+         "n": "Connected feature / Scheduling & dispatch / Mobile",
+         "id": "219:10205",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:10196",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Operations",
+             "id": "219:10197",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:10198",
+               "k": [
+                "Operations"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[180px] shrink-0",
+             "id": "219:10199",
+             "k": [
+              "Job #1042 · Jordan Lee"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:10200",
+           "k": [
+            "Scheduling & dispatch"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:10201",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:10202",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:10204",
+             "k": [
+              "Visit assigned"
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex flex-col h-[24px] items-center justify-center relative w-full",
+         "n": "Next connected state",
+         "id": "219:10206",
+         "k": [
+          {
+           "t": "div",
+           "c": "relative size-[24px]",
+           "n": "Frame",
+           "id": "219:10207",
+           "k": [
+            {
+             "t": "img",
+             "c": "absolute block inset-0 size-full",
+             "src": "/marketing/flagship/frame-08fa5d7a.svg"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] w-full",
+         "n": "Connected feature / Technician App / Mobile",
+         "id": "219:10219",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:10210",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Operations",
+             "id": "219:10211",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:10212",
+               "k": [
+                "Operations"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[180px] shrink-0",
+             "id": "219:10213",
+             "k": [
+              "Job #1042 · Jordan Lee"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:10214",
+           "k": [
+            "Technician App"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:10215",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:10216",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:10218",
+             "k": [
+              "Details ready for the field"
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "t": "button",
+       "label": "Get a free demo",
+       "kind": "Accent",
+       "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#0f1530]",
+       "href": "/demo"
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "technician-app": {
+  "desktop": {
+   "t": "div",
+   "c": "bg-[#fbf6ef] flex flex-col items-start relative",
+   "n": "Technician App / Desktop",
+   "id": "175:2294",
+   "k": [
+    {
+     "t": "div",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[32px] items-start p-[80px] relative w-full",
+     "n": "01 / Product in view",
+     "id": "203:11684",
+     "k": [
+      {
+       "t": "div",
+       "c": "flex gap-[48px] items-center relative w-full",
+       "n": "Outcome and product",
+       "id": "203:11685",
+       "k": [
+        {
+         "t": "div",
+         "c": "flex flex-col gap-[20px] items-start relative flex-1 min-w-0",
+         "n": "Short outcome copy",
+         "id": "203:11686",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "203:11687",
+           "k": [
+            "TECHNICIAN APP"
+           ]
+          },
+          {
+           "t": "h1",
+           "c": "font-semibold leading-[1.08] relative text-[60px] text-[color:#0f1530] tracking-[-1.5px] w-full",
+           "id": "203:11688",
+           "k": [
+            "Everything for the job. Right here."
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-full",
+           "id": "203:11689",
+           "k": [
+            "Put equipment, tasks, photos, and job history in the technician’s hand."
+           ]
+          },
+          {
+           "t": "button",
+           "label": "Tour the field app",
+           "kind": "Dark",
+           "c": "bg-[#0f1530] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#fbf6ef]",
+           "href": "#workflow"
+          },
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "203:11692",
+           "k": [
+            "EXAMPLE BUSINESS · JUNIPER"
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#f6f7f9] border-[1.044px] border-[#e6dccb] border-solid flex flex-col h-[499.244px] items-start overflow-clip relative rounded-[16.711px] flex-1 min-w-0",
+         "n": "Product demonstration / Technician App",
+         "id": "203:11693",
+         "k": [
+          {
+           "t": "div",
+           "c": "bg-[#0f1530] flex gap-[16.711px] h-[56.4px] items-center p-[16.711px] relative w-full",
+           "n": "Product chrome",
+           "id": "I203:11693;200:181",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-bold leading-[1.38] relative text-[17.76px] text-[color:#fff] w-[146.222px] shrink-0",
+             "id": "I203:11693;200:182",
+             "k": [
+              "Renvani"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-medium leading-[1.38] relative text-[12.53px] text-[color:#fff] flex-1 min-w-0",
+             "id": "I203:11693;200:183",
+             "k": [
+              "Technician app"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#f6b400] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[106.533px] shrink-0",
+             "n": "Status / EXAMPLE",
+             "id": "I203:11693;200:184",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10.44px] text-[color:#0f1530] w-[85.644px] shrink-0",
+               "id": "I203:11693;200:185",
+               "k": [
+                "EXAMPLE"
+               ]
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[16.711px] items-start p-[25.067px] relative w-full",
+           "n": "Product workspace",
+           "id": "I203:11693;200:186",
+           "k": [
+            {
+             "t": "div",
+             "c": "flex gap-[16.711px] items-start relative w-full",
+             "n": "Screen title",
+             "id": "I203:11693;200:187",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-semibold leading-[1.38] relative text-[24.02px] text-[color:#0f1530] flex-1 min-w-0",
+               "id": "I203:11693;200:188",
+               "k": [
+                "Technician app"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[188px] shrink-0",
+               "n": "Status / Your business",
+               "id": "I203:11693;200:189",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10.44px] text-[color:#2a3360] w-[167.111px] shrink-0",
+                 "id": "I203:11693;200:190",
+                 "k": [
+                  "Your business"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[20.889px] items-start relative w-full",
+             "n": "Field work",
+             "id": "I203:11693;200:191",
+             "k": [
+              {
+               "t": "div",
+               "c": "flex flex-col gap-[12.533px] items-start relative flex-1 min-w-0",
+               "n": "Job site",
+               "id": "I203:11693;200:192",
+               "k": [
+                {
+                 "t": "div",
+                 "c": "h-[271.556px] relative rounded-[16.711px] w-full",
+                 "n": "Technician at the job",
+                 "id": "I203:11693;200:193",
+                 "k": [
+                  {
+                   "t": "img",
+                   "c": "absolute inset-0 object-cover rounded-[16.711px] size-full",
+                   "src": "/marketing/flagship/technician-at-the-job-0cac1c92.jpg"
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#0f1530] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[208.889px] shrink-0",
+                 "n": "Status / ON SITE · MAYA R.",
+                 "id": "I203:11693;200:194",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[10.44px] text-[color:#fff] w-[188px] shrink-0",
+                   "id": "I203:11693;200:195",
+                   "k": [
+                    "ON SITE · MAYA R."
+                   ]
+                  }
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] flex-1 min-w-0",
+               "n": "Technician checklist",
+               "id": "I203:11693;200:196",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-semibold leading-[1.38] relative text-[22.98px] text-[color:#0f1530] w-full",
+                 "id": "I203:11693;200:197",
+                 "k": [
+                  "AC diagnostic"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal leading-[1.38] relative text-[12.53px] text-[color:#2a3360] w-full",
+                 "id": "I203:11693;200:198",
+                 "k": [
+                  "Jordan Lee · Job #1042"
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[10.444px] items-start relative w-full",
+                 "n": "Equipment checked",
+                 "id": "I203:11693;200:199",
+                 "k": [
+                  {
+                   "t": "div",
+                   "c": "relative size-[19.844px]",
+                   "n": "Icon / check",
+                   "id": "I203:11693;200:200",
+                   "k": [
+                    {
+                     "t": "img",
+                     "c": "absolute block inset-0 size-full",
+                     "src": "/marketing/flagship/icon-check2-0e55cdba.svg"
+                    }
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-normal leading-[1.38] relative text-[12.53px] text-[color:#0f1530] flex-1 min-w-0",
+                   "id": "I203:11693;200:202",
+                   "k": [
+                    "Equipment checked"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[10.444px] items-start relative w-full",
+                 "n": "Repair completed",
+                 "id": "I203:11693;200:203",
+                 "k": [
+                  {
+                   "t": "div",
+                   "c": "relative size-[19.844px]",
+                   "n": "Icon / check",
+                   "id": "I203:11693;200:204",
+                   "k": [
+                    {
+                     "t": "img",
+                     "c": "absolute block inset-0 size-full",
+                     "src": "/marketing/flagship/icon-check2-0e55cdba.svg"
+                    }
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-normal leading-[1.38] relative text-[12.53px] text-[color:#0f1530] flex-1 min-w-0",
+                   "id": "I203:11693;200:206",
+                   "k": [
+                    "Repair completed"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[10.444px] items-start relative w-full",
+                 "n": "Function test passed",
+                 "id": "I203:11693;200:207",
+                 "k": [
+                  {
+                   "t": "div",
+                   "c": "relative size-[19.844px]",
+                   "n": "Icon / check",
+                   "id": "I203:11693;200:208",
+                   "k": [
+                    {
+                     "t": "img",
+                     "c": "absolute block inset-0 size-full",
+                     "src": "/marketing/flagship/icon-check2-0e55cdba.svg"
+                    }
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-normal leading-[1.38] relative text-[12.53px] text-[color:#0f1530] flex-1 min-w-0",
+                   "id": "I203:11693;200:210",
+                   "k": [
+                    "Function test passed"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[10.444px] items-start relative w-full",
+                 "n": "Photos added",
+                 "id": "I203:11693;200:211",
+                 "k": [
+                  {
+                   "t": "div",
+                   "c": "relative size-[19.844px]",
+                   "n": "Icon / check",
+                   "id": "I203:11693;200:212",
+                   "k": [
+                    {
+                     "t": "img",
+                     "c": "absolute block inset-0 size-full",
+                     "src": "/marketing/flagship/icon-check2-0e55cdba.svg"
+                    }
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-normal leading-[1.38] relative text-[12.53px] text-[color:#0f1530] flex-1 min-w-0",
+                   "id": "I203:11693;200:214",
+                   "k": [
+                    "Photos added"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#e4f1e8] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[177.556px] shrink-0",
+                 "n": "Status / 6 of 6 complete",
+                 "id": "I203:11693;200:215",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[10.44px] text-[color:#0f1530] w-[156.667px] shrink-0",
+                   "id": "I203:11693;200:216",
+                   "k": [
+                    "6 of 6 complete"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#f6b400] flex h-[39.689px] items-center justify-center px-[14.622px] relative rounded-[12.533px] w-full",
+                 "n": "UI action / Complete visit",
+                 "id": "I203:11693;200:217",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[12.53px] text-[color:#0f1530] text-center flex-1 min-w-0",
+                   "id": "I203:11693;200:218",
+                   "k": [
+                    "Complete visit"
+                   ]
+                  }
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#fff] flex flex-col gap-[32px] items-start p-[80px] relative w-full",
+     "n": "02 / A workflow you can see",
+     "id": "203:11732",
+     "k": [
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[12px] items-start relative w-full",
+       "n": "Workflow heading",
+       "id": "203:11733",
+       "k": [
+        {
+         "t": "p",
+         "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+         "id": "203:11734",
+         "k": [
+          "EXAMPLE WORKFLOW"
+         ]
+        },
+        {
+         "t": "p",
+         "c": "font-semibold leading-[1.08] relative text-[44px] text-[color:#0f1530] tracking-[-1.1px] w-full",
+         "id": "203:11735",
+         "k": [
+          "See the work happen."
+         ]
+        }
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex gap-[40px] items-start relative w-full",
+       "n": "Three product moments",
+       "id": "203:11736",
+       "k": [
+        {
+         "t": "div",
+         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[var(--radius\\\\/16,16px)] flex-1 min-w-0",
+         "n": "Feature workflow / Arrive prepared",
+         "id": "203:11750",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[12px] items-start relative w-full",
+           "n": "Step heading",
+           "id": "203:11738",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[40px] shrink-0",
+             "n": "Status / 01",
+             "id": "203:11739",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#fff] w-[20px] shrink-0",
+               "id": "203:11740",
+               "k": [
+                "01"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] flex-1 min-w-0",
+             "id": "203:11741",
+             "k": [
+              "Arrive prepared"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-full",
+           "n": "Illustrated product state / prepared",
+           "id": "203:11742",
+           "k": [
+            {
+             "t": "div",
+             "c": "h-[120px] relative rounded-[16px] w-full",
+             "n": "Illustrative HVAC job context",
+             "id": "203:11743",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute inset-0 object-cover rounded-[16px] size-full",
+               "src": "/marketing/flagship/example-job-photo-f1266660.jpg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[19px] text-[color:#0f1530] w-full",
+             "id": "203:11744",
+             "k": [
+              "Next job · Jordan Lee"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] w-full",
+             "id": "203:11745",
+             "k": [
+              "10:00 AM · AC diagnostic"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+             "n": "Status / Access · Gate on left",
+             "id": "203:11746",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[226px] shrink-0",
+               "id": "203:11747",
+               "k": [
+                "Access · Gate on left"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex gap-[10px] h-[56px] items-start p-[10px] relative rounded-[12px] w-full",
+             "n": "On-the-Way Updates / Email preview",
+             "id": "220:7316",
+             "k": [
+              {
+               "t": "div",
+               "c": "relative size-[22px]",
+               "n": "Icon / mail",
+               "id": "220:7317",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-mail-eabc094f.svg"
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "flex flex-col gap-[2px] items-start leading-[1.38] relative flex-1 min-w-0",
+               "n": "Email update",
+               "id": "220:7320",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "id": "220:7321",
+                 "k": [
+                  "On-the-way email"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[11px] text-[color:#2a3360] w-full",
+                 "id": "220:7322",
+                 "k": [
+                  "Review and send · Email"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+             "n": "UI action / Open equipment history",
+             "id": "203:11748",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+               "id": "203:11749",
+               "k": [
+                "Open equipment history"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[var(--radius\\\\/16,16px)] flex-1 min-w-0",
+         "n": "Feature workflow / Do the work",
+         "id": "203:11772",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[12px] items-start relative w-full",
+           "n": "Step heading",
+           "id": "203:11752",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[40px] shrink-0",
+             "n": "Status / 02",
+             "id": "203:11753",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#fff] w-[20px] shrink-0",
+               "id": "203:11754",
+               "k": [
+                "02"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] flex-1 min-w-0",
+             "id": "203:11755",
+             "k": [
+              "Do the work"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-full",
+           "n": "Illustrated product state / checklist",
+           "id": "203:11756",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+             "id": "203:11757",
+             "k": [
+              "System checklist"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex gap-[10px] h-[54px] items-start p-[12px] relative rounded-[12px] w-full",
+             "n": "Check thermostat",
+             "id": "203:11758",
+             "k": [
+              {
+               "t": "div",
+               "c": "relative size-[22px]",
+               "n": "Icon / check",
+               "id": "203:11759",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-check1-c690b1c5.svg"
+                }
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[14px] text-[color:#0f1530] flex-1 min-w-0",
+               "id": "203:11761",
+               "k": [
+                "Check thermostat"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex gap-[10px] h-[54px] items-start p-[12px] relative rounded-[12px] w-full",
+             "n": "Test capacitor",
+             "id": "203:11762",
+             "k": [
+              {
+               "t": "div",
+               "c": "relative size-[22px]",
+               "n": "Icon / check",
+               "id": "203:11763",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-check1-c690b1c5.svg"
+                }
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[14px] text-[color:#0f1530] flex-1 min-w-0",
+               "id": "203:11765",
+               "k": [
+                "Test capacitor"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex gap-[10px] h-[54px] items-start p-[12px] relative rounded-[12px] w-full",
+             "n": "Record readings",
+             "id": "203:11766",
+             "k": [
+              {
+               "t": "div",
+               "c": "relative size-[22px]",
+               "n": "Icon / plus",
+               "id": "203:11767",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-plus-4f421c9b.svg"
+                }
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[14px] text-[color:#0f1530] flex-1 min-w-0",
+               "id": "203:11769",
+               "k": [
+                "Record readings"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[220px] shrink-0",
+             "n": "Status / 2 of 3 tasks complete",
+             "id": "203:11770",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[200px] shrink-0",
+               "id": "203:11771",
+               "k": [
+                "2 of 3 tasks complete"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[var(--radius\\\\/16,16px)] flex-1 min-w-0",
+         "n": "Feature workflow / Leave a clear record",
+         "id": "203:11788",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[12px] items-start relative w-full",
+           "n": "Step heading",
+           "id": "203:11774",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[40px] shrink-0",
+             "n": "Status / 03",
+             "id": "203:11775",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#fff] w-[20px] shrink-0",
+               "id": "203:11776",
+               "k": [
+                "03"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] flex-1 min-w-0",
+             "id": "203:11777",
+             "k": [
+              "Leave a clear record"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-full",
+           "n": "Illustrated product state / record",
+           "id": "203:11778",
+           "k": [
+            {
+             "t": "div",
+             "c": "h-[114px] relative rounded-[16px] w-full",
+             "n": "Example job photo",
+             "id": "203:11779",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute inset-0 object-cover rounded-[16px] size-full",
+               "src": "/marketing/flagship/example-job-photo-f1266660.jpg"
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[12px] items-start relative w-full",
+             "n": "Attachment count",
+             "id": "203:11780",
+             "k": [
+              {
+               "t": "div",
+               "c": "relative size-[22px]",
+               "n": "Icon / check",
+               "id": "203:11781",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-check1-c690b1c5.svg"
+                }
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#0f1530] flex-1 min-w-0",
+               "id": "203:11783",
+               "k": [
+                "Service note + photos saved"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal italic leading-[1.38] relative text-[26px] text-[color:#0f1530] w-full",
+             "id": "203:11784",
+             "k": [
+              "Jordan Lee"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] w-full",
+             "id": "203:11785",
+             "k": [
+              "Example customer signature"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+             "n": "UI action / Mark visit complete",
+             "id": "203:11786",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+               "id": "203:11787",
+               "k": [
+                "Mark visit complete"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ],
+     "anchor": "workflow"
+    },
+    {
+     "t": "div",
+     "c": "bg-[#0f1530] flex flex-col gap-[16px] items-start px-[80px] py-[48px] relative w-full",
+     "n": "03 / Connected workflow and demo",
+     "id": "203:11789",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#f6b400] tracking-[1.1px] w-full",
+       "id": "219:10220",
+       "k": [
+        "WORKS ACROSS YOUR BUSINESS"
+       ]
+      },
+      {
+       "t": "p",
+       "c": "font-semibold leading-[1.08] relative text-[36px] text-[color:#fff] tracking-[-0.9px] w-full",
+       "id": "219:10221",
+       "k": [
+        "One job. Connected all the way."
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex gap-[16px] items-center relative w-full",
+       "n": "Flagship and tool handoff",
+       "id": "219:10222",
+       "k": [
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] flex-1 min-w-0",
+         "n": "Connected feature / Estimates & approvals / Desktop",
+         "id": "219:10233",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:10224",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Revenue",
+             "id": "219:10225",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:10226",
+               "k": [
+                "Revenue"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[222px] shrink-0",
+             "id": "219:10227",
+             "k": [
+              "Estimate #2048"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:10228",
+           "k": [
+            "Estimates & approvals"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:10229",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:10230",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:10232",
+             "k": [
+              "Approved work attached"
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex h-[24px] items-center justify-center relative w-[32px] shrink-0",
+         "n": "Next connected state",
+         "id": "219:10234",
+         "k": [
+          {
+           "t": "div",
+           "c": "relative size-[24px]",
+           "n": "Icon / arrow",
+           "id": "219:10235",
+           "k": [
+            {
+             "t": "img",
+             "c": "absolute block inset-0 size-full",
+             "src": "/marketing/flagship/icon-arrow-84befcc1.svg"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] flex-1 min-w-0",
+         "n": "Connected feature / Technician App / Desktop",
+         "id": "219:10247",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:10238",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Operations",
+             "id": "219:10239",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:10240",
+               "k": [
+                "Operations"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[222px] shrink-0",
+             "id": "219:10241",
+             "k": [
+              "Job #1042 · Jordan Lee"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:10242",
+           "k": [
+            "Technician App"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:10243",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:10244",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:10246",
+             "k": [
+              "Tasks and photos saved"
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex h-[24px] items-center justify-center relative w-[32px] shrink-0",
+         "n": "Next connected state",
+         "id": "219:10248",
+         "k": [
+          {
+           "t": "div",
+           "c": "relative size-[24px]",
+           "n": "Icon / arrow",
+           "id": "219:10249",
+           "k": [
+            {
+             "t": "img",
+             "c": "absolute block inset-0 size-full",
+             "src": "/marketing/flagship/icon-arrow-84befcc1.svg"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] flex-1 min-w-0",
+         "n": "Connected feature / Invoices & payments / Desktop",
+         "id": "219:10261",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:10252",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Operations",
+             "id": "219:10253",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:10254",
+               "k": [
+                "Operations"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[222px] shrink-0",
+             "id": "219:10255",
+             "k": [
+              "Job #1042 · Jordan Lee"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:10256",
+           "k": [
+            "Invoices & payments"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:10257",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:10258",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:10260",
+             "k": [
+              "Completed work ready to bill"
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "t": "button",
+       "label": "Get a free demo",
+       "kind": "Accent",
+       "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#0f1530]",
+       "href": "/demo"
+      }
+     ]
+    }
+   ]
+  },
+  "mobile": {
+   "t": "div",
+   "c": "bg-[#fbf6ef] flex flex-col items-start relative",
+   "n": "Technician App / Mobile",
+   "id": "175:2440",
+   "k": [
+    {
+     "t": "div",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[32px] items-start p-[24px] relative w-full",
+     "n": "01 / Product in view",
+     "id": "203:11805",
+     "k": [
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[32px] items-start relative w-full",
+       "n": "Outcome and product",
+       "id": "203:11806",
+       "k": [
+        {
+         "t": "div",
+         "c": "flex flex-col gap-[20px] items-start relative w-full",
+         "n": "Short outcome copy",
+         "id": "203:11807",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "203:11808",
+           "k": [
+            "TECHNICIAN APP"
+           ]
+          },
+          {
+           "t": "h1",
+           "c": "font-semibold leading-[1.08] relative text-[40px] text-[color:#0f1530] tracking-[-1px] w-full",
+           "id": "203:11809",
+           "k": [
+            "Everything for the job. Right here."
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-full",
+           "id": "203:11810",
+           "k": [
+            "Put equipment, tasks, photos, and job history in the technician’s hand."
+           ]
+          },
+          {
+           "t": "button",
+           "label": "Tour the field app",
+           "kind": "Dark",
+           "c": "bg-[#0f1530] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#fbf6ef]",
+           "href": "#workflow-m"
+          },
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "203:11813",
+           "k": [
+            "EXAMPLE BUSINESS · JUNIPER"
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#f6f7f9] border-[0.475px] border-[#e6dccb] border-solid flex flex-col h-[227.05px] items-start overflow-clip relative rounded-[7.6px] w-full",
+         "n": "Product demonstration / Technician App",
+         "id": "203:11814",
+         "k": [
+          {
+           "t": "div",
+           "c": "bg-[#0f1530] flex gap-[7.6px] h-[25.65px] items-center p-[7.6px] relative w-full",
+           "n": "Product chrome",
+           "id": "I203:11814;200:181",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-bold leading-[1.38] relative text-[8.07px] text-[color:#fff] w-[66.5px] shrink-0",
+             "id": "I203:11814;200:182",
+             "k": [
+              "Renvani"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-medium leading-[1.38] relative text-[5.7px] text-[color:#fff] w-[196.65px] shrink-0",
+             "id": "I203:11814;200:183",
+             "k": [
+              "Technician app"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#f6b400] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[48.45px] shrink-0",
+             "n": "Status / EXAMPLE",
+             "id": "I203:11814;200:184",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#0f1530] w-[38.95px] shrink-0",
+               "id": "I203:11814;200:185",
+               "k": [
+                "EXAMPLE"
+               ]
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[7.6px] items-start p-[11.4px] relative w-full",
+           "n": "Product workspace",
+           "id": "I203:11814;200:186",
+           "k": [
+            {
+             "t": "div",
+             "c": "flex gap-[7.6px] items-start relative w-full",
+             "n": "Screen title",
+             "id": "I203:11814;200:187",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-semibold leading-[1.38] relative text-[10.92px] text-[color:#0f1530] w-[218.5px] shrink-0",
+               "id": "I203:11814;200:188",
+               "k": [
+                "Technician app"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[85.5px] shrink-0",
+               "n": "Status / Your business",
+               "id": "I203:11814;200:189",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#2a3360] w-[76px] shrink-0",
+                 "id": "I203:11814;200:190",
+                 "k": [
+                  "Your business"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[9.5px] items-start relative w-full",
+             "n": "Field work",
+             "id": "I203:11814;200:191",
+             "k": [
+              {
+               "t": "div",
+               "c": "flex flex-col gap-[5.7px] items-start relative w-[162.45px] shrink-0",
+               "n": "Job site",
+               "id": "I203:11814;200:192",
+               "k": [
+                {
+                 "t": "div",
+                 "c": "h-[123.5px] relative rounded-[7.6px] w-full",
+                 "n": "Technician at the job",
+                 "id": "I203:11814;200:193",
+                 "k": [
+                  {
+                   "t": "img",
+                   "c": "absolute inset-0 object-cover rounded-[7.6px] size-full",
+                   "src": "/marketing/flagship/technician-at-the-job-0cac1c92.jpg"
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#0f1530] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[95px] shrink-0",
+                 "n": "Status / ON SITE · MAYA R.",
+                 "id": "I203:11814;200:194",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#fff] w-[85.5px] shrink-0",
+                   "id": "I203:11814;200:195",
+                   "k": [
+                    "ON SITE · MAYA R."
+                   ]
+                  }
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border-[0.475px] border-[#e6dccb] border-solid flex flex-col gap-[6.65px] items-start p-[9.5px] relative rounded-[7.6px] w-[147.25px] shrink-0",
+               "n": "Technician checklist",
+               "id": "I203:11814;200:196",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-semibold leading-[1.38] relative text-[10.45px] text-[color:#0f1530] w-full",
+                 "id": "I203:11814;200:197",
+                 "k": [
+                  "AC diagnostic"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal leading-[1.38] relative text-[5.7px] text-[color:#2a3360] w-full",
+                 "id": "I203:11814;200:198",
+                 "k": [
+                  "Jordan Lee · Job #1042"
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[4.75px] items-start relative w-full",
+                 "n": "Equipment checked",
+                 "id": "I203:11814;200:199",
+                 "k": [
+                  {
+                   "t": "div",
+                   "c": "relative size-[9.025px]",
+                   "n": "Icon / check",
+                   "id": "I203:11814;200:200",
+                   "k": [
+                    {
+                     "t": "img",
+                     "c": "absolute block inset-0 size-full",
+                     "src": "/marketing/flagship/icon-check1-ee9efdc9.svg"
+                    }
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-normal leading-[1.38] relative text-[5.7px] text-[color:#0f1530] w-[114px] shrink-0",
+                   "id": "I203:11814;200:202",
+                   "k": [
+                    "Equipment checked"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[4.75px] items-start relative w-full",
+                 "n": "Repair completed",
+                 "id": "I203:11814;200:203",
+                 "k": [
+                  {
+                   "t": "div",
+                   "c": "relative size-[9.025px]",
+                   "n": "Icon / check",
+                   "id": "I203:11814;200:204",
+                   "k": [
+                    {
+                     "t": "img",
+                     "c": "absolute block inset-0 size-full",
+                     "src": "/marketing/flagship/icon-check1-ee9efdc9.svg"
+                    }
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-normal leading-[1.38] relative text-[5.7px] text-[color:#0f1530] w-[114px] shrink-0",
+                   "id": "I203:11814;200:206",
+                   "k": [
+                    "Repair completed"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[4.75px] items-start relative w-full",
+                 "n": "Function test passed",
+                 "id": "I203:11814;200:207",
+                 "k": [
+                  {
+                   "t": "div",
+                   "c": "relative size-[9.025px]",
+                   "n": "Icon / check",
+                   "id": "I203:11814;200:208",
+                   "k": [
+                    {
+                     "t": "img",
+                     "c": "absolute block inset-0 size-full",
+                     "src": "/marketing/flagship/icon-check1-ee9efdc9.svg"
+                    }
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-normal leading-[1.38] relative text-[5.7px] text-[color:#0f1530] w-[114px] shrink-0",
+                   "id": "I203:11814;200:210",
+                   "k": [
+                    "Function test passed"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[4.75px] items-start relative w-full",
+                 "n": "Photos added",
+                 "id": "I203:11814;200:211",
+                 "k": [
+                  {
+                   "t": "div",
+                   "c": "relative size-[9.025px]",
+                   "n": "Icon / check",
+                   "id": "I203:11814;200:212",
+                   "k": [
+                    {
+                     "t": "img",
+                     "c": "absolute block inset-0 size-full",
+                     "src": "/marketing/flagship/icon-check1-ee9efdc9.svg"
+                    }
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-normal leading-[1.38] relative text-[5.7px] text-[color:#0f1530] w-[114px] shrink-0",
+                   "id": "I203:11814;200:214",
+                   "k": [
+                    "Photos added"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#e4f1e8] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[80.75px] shrink-0",
+                 "n": "Status / 6 of 6 complete",
+                 "id": "I203:11814;200:215",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#0f1530] w-[71.25px] shrink-0",
+                   "id": "I203:11814;200:216",
+                   "k": [
+                    "6 of 6 complete"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#f6b400] flex h-[18.05px] items-center justify-center px-[6.65px] relative rounded-[5.7px] w-[128.25px] shrink-0",
+                 "n": "UI action / Complete visit",
+                 "id": "I203:11814;200:217",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[5.7px] text-[color:#0f1530] text-center w-[114.95px] shrink-0",
+                   "id": "I203:11814;200:218",
+                   "k": [
+                    "Complete visit"
+                   ]
+                  }
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#fff] flex flex-col gap-[32px] items-start p-[24px] relative w-full",
+     "n": "02 / A workflow you can see",
+     "id": "203:11853",
+     "k": [
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[12px] items-start leading-[1.38] relative w-full",
+       "n": "Workflow heading",
+       "id": "203:11854",
+       "k": [
+        {
+         "t": "p",
+         "c": "font-medium relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+         "id": "203:11855",
+         "k": [
+          "EXAMPLE WORKFLOW"
+         ]
+        },
+        {
+         "t": "p",
+         "c": "font-semibold relative text-[32px] text-[color:#0f1530] w-full",
+         "id": "203:11856",
+         "k": [
+          "See the work happen."
+         ]
+        }
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[24px] items-start relative w-full",
+       "n": "Three product moments",
+       "id": "203:11857",
+       "k": [
+        {
+         "t": "div",
+         "c": "bg-[#fff] border-[0.855px] border-[#e6dccb] border-solid flex flex-col gap-[15.39px] h-[444.6px] items-start p-[18.81px] relative rounded-[13.68px] w-full",
+         "n": "Workflow moment / Arrive prepared",
+         "id": "203:11858",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10.26px] items-start relative w-full",
+           "n": "Step heading",
+           "id": "I203:11858;203:11738",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[34.2px] shrink-0",
+             "n": "Status / 01",
+             "id": "I203:11858;203:11739",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#fff] w-[17.1px] shrink-0",
+               "id": "I203:11858;203:11740",
+               "k": [
+                "01"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[15.39px] text-[color:#0f1530] flex-1 min-w-0",
+             "id": "I203:11858;203:11741",
+             "k": [
+              "Arrive prepared"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[11.97px] h-[342px] items-start p-[15.39px] relative rounded-[10.26px] w-full",
+           "n": "Illustrated product state / prepared",
+           "id": "I203:11858;203:11742",
+           "k": [
+            {
+             "t": "div",
+             "c": "h-[102.6px] relative rounded-[13.68px] w-full",
+             "n": "Illustrative HVAC job context",
+             "id": "I203:11858;203:11743",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute inset-0 object-cover rounded-[13.68px] size-full",
+               "src": "/marketing/flagship/illustrative-hvac-job-context-f1266660.jpg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[16.24px] text-[color:#0f1530] w-full",
+             "id": "I203:11858;203:11744",
+             "k": [
+              "Next job · Jordan Lee"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[11.11px] text-[color:#2a3360] w-full",
+             "id": "I203:11858;203:11745",
+             "k": [
+              "10:00 AM · AC diagnostic"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[210.33px] shrink-0",
+             "n": "Status / Access · Gate on left",
+             "id": "I203:11858;203:11746",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#0f1530] w-[193.23px] shrink-0",
+               "id": "I203:11858;203:11747",
+               "k": [
+                "Access · Gate on left"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex gap-[8.55px] h-[47.88px] items-start p-[8.55px] relative rounded-[10.26px] w-full",
+             "n": "On-the-Way Updates / Email preview",
+             "id": "I203:11858;220:7316",
+             "k": [
+              {
+               "t": "div",
+               "c": "relative size-[18.81px]",
+               "n": "Icon / mail",
+               "id": "I203:11858;220:7317",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-mail-feb984ad.svg"
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "flex flex-col gap-[1.71px] items-start leading-[1.38] relative w-[227.43px] shrink-0",
+               "n": "Email update",
+               "id": "I203:11858;220:7320",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium relative text-[11.97px] text-[color:#0f1530] w-full",
+                 "id": "I203:11858;220:7321",
+                 "k": [
+                  "On-the-way email"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[9.4px] text-[color:#2a3360] w-full",
+                 "id": "I203:11858;220:7322",
+                 "k": [
+                  "Review and send · Email"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[32.49px] items-center justify-center px-[11.97px] relative rounded-[10.26px] w-full",
+             "n": "UI action / Open equipment history",
+             "id": "I203:11858;203:11748",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10.26px] text-[color:#fff] text-center flex-1 min-w-0",
+               "id": "I203:11858;203:11749",
+               "k": [
+                "Open equipment history"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] border-[0.855px] border-[#e6dccb] border-solid flex flex-col gap-[15.39px] h-[444.6px] items-start p-[18.81px] relative rounded-[13.68px] w-full",
+         "n": "Workflow moment / Do the work",
+         "id": "203:11871",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10.26px] items-start relative w-full",
+           "n": "Step heading",
+           "id": "I203:11871;203:11752",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[34.2px] shrink-0",
+             "n": "Status / 02",
+             "id": "I203:11871;203:11753",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#fff] w-[17.1px] shrink-0",
+               "id": "I203:11871;203:11754",
+               "k": [
+                "02"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[15.39px] text-[color:#0f1530] flex-1 min-w-0",
+             "id": "I203:11871;203:11755",
+             "k": [
+              "Do the work"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[11.97px] h-[342px] items-start p-[15.39px] relative rounded-[10.26px] w-full",
+           "n": "Illustrated product state / checklist",
+           "id": "I203:11871;203:11756",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[18.81px] text-[color:#0f1530] w-full",
+             "id": "I203:11871;203:11757",
+             "k": [
+              "System checklist"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex gap-[8.55px] h-[46.17px] items-start p-[10.26px] relative rounded-[10.26px] w-full",
+             "n": "Check thermostat",
+             "id": "I203:11871;203:11758",
+             "k": [
+              {
+               "t": "div",
+               "c": "relative size-[18.81px]",
+               "n": "Icon / check",
+               "id": "I203:11871;203:11759",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-check2-514b67c3.svg"
+                }
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[11.97px] text-[color:#0f1530] w-[224.01px] shrink-0",
+               "id": "I203:11871;203:11761",
+               "k": [
+                "Check thermostat"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex gap-[8.55px] h-[46.17px] items-start p-[10.26px] relative rounded-[10.26px] w-full",
+             "n": "Test capacitor",
+             "id": "I203:11871;203:11762",
+             "k": [
+              {
+               "t": "div",
+               "c": "relative size-[18.81px]",
+               "n": "Icon / check",
+               "id": "I203:11871;203:11763",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-check2-514b67c3.svg"
+                }
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[11.97px] text-[color:#0f1530] w-[224.01px] shrink-0",
+               "id": "I203:11871;203:11765",
+               "k": [
+                "Test capacitor"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex gap-[8.55px] h-[46.17px] items-start p-[10.26px] relative rounded-[10.26px] w-full",
+             "n": "Record readings",
+             "id": "I203:11871;203:11766",
+             "k": [
+              {
+               "t": "div",
+               "c": "relative size-[18.81px]",
+               "n": "Icon / plus",
+               "id": "I203:11871;203:11767",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-plus-6523beab.svg"
+                }
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[11.97px] text-[color:#0f1530] w-[224.01px] shrink-0",
+               "id": "I203:11871;203:11769",
+               "k": [
+                "Record readings"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff4d6] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[188.1px] shrink-0",
+             "n": "Status / 2 of 3 tasks complete",
+             "id": "I203:11871;203:11770",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#0f1530] w-[171px] shrink-0",
+               "id": "I203:11871;203:11771",
+               "k": [
+                "2 of 3 tasks complete"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] border-[0.855px] border-[#e6dccb] border-solid flex flex-col gap-[15.39px] h-[444.6px] items-start p-[18.81px] relative rounded-[13.68px] w-full",
+         "n": "Workflow moment / Leave a clear record",
+         "id": "203:11892",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10.26px] items-start relative w-full",
+           "n": "Step heading",
+           "id": "I203:11892;203:11774",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[34.2px] shrink-0",
+             "n": "Status / 03",
+             "id": "I203:11892;203:11775",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#fff] w-[17.1px] shrink-0",
+               "id": "I203:11892;203:11776",
+               "k": [
+                "03"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[15.39px] text-[color:#0f1530] flex-1 min-w-0",
+             "id": "I203:11892;203:11777",
+             "k": [
+              "Leave a clear record"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[11.97px] h-[342px] items-start p-[15.39px] relative rounded-[10.26px] w-full",
+           "n": "Illustrated product state / record",
+           "id": "I203:11892;203:11778",
+           "k": [
+            {
+             "t": "div",
+             "c": "h-[97.47px] relative rounded-[13.68px] w-full",
+             "n": "Example job photo",
+             "id": "I203:11892;203:11779",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute inset-0 object-cover rounded-[13.68px] size-full",
+               "src": "/marketing/flagship/illustrative-hvac-job-context-f1266660.jpg"
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[10.26px] items-start relative w-full",
+             "n": "Attachment count",
+             "id": "I203:11892;203:11780",
+             "k": [
+              {
+               "t": "div",
+               "c": "relative size-[18.81px]",
+               "n": "Icon / check",
+               "id": "I203:11892;203:11781",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-check2-514b67c3.svg"
+                }
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-normal leading-[1.38] relative text-[11.97px] text-[color:#0f1530] flex-1 min-w-0",
+               "id": "I203:11892;203:11783",
+               "k": [
+                "Service note + photos saved"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal italic leading-[1.38] relative text-[22.23px] text-[color:#0f1530] w-full",
+             "id": "I203:11892;203:11784",
+             "k": [
+              "Jordan Lee"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[8.55px] text-[color:#2a3360] w-full",
+             "id": "I203:11892;203:11785",
+             "k": [
+              "Example customer signature"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[32.49px] items-center justify-center px-[11.97px] relative rounded-[10.26px] w-full",
+             "n": "UI action / Mark visit complete",
+             "id": "I203:11892;203:11786",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10.26px] text-[color:#fff] text-center flex-1 min-w-0",
+               "id": "I203:11892;203:11787",
+               "k": [
+                "Mark visit complete"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ],
+     "anchor": "workflow-m"
+    },
+    {
+     "t": "div",
+     "c": "bg-[#0f1530] flex flex-col gap-[16px] items-start p-[24px] relative w-full",
+     "n": "03 / Connected workflow and demo",
+     "id": "203:11907",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#f6b400] tracking-[1.1px] w-full",
+       "id": "219:10262",
+       "k": [
+        "WORKS ACROSS YOUR BUSINESS"
+       ]
+      },
+      {
+       "t": "p",
+       "c": "font-semibold leading-[1.38] relative text-[28px] text-[color:#fff] w-full",
+       "id": "219:10263",
+       "k": [
+        "One job. Connected all the way."
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[12px] items-center relative w-full",
+       "n": "Flagship and tool handoff",
+       "id": "219:10264",
+       "k": [
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] w-full",
+         "n": "Connected feature / Estimates & approvals / Mobile",
+         "id": "219:10275",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:10266",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Revenue",
+             "id": "219:10267",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:10268",
+               "k": [
+                "Revenue"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[180px] shrink-0",
+             "id": "219:10269",
+             "k": [
+              "Estimate #2048"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:10270",
+           "k": [
+            "Estimates & approvals"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:10271",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:10272",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:10274",
+             "k": [
+              "Approved work attached"
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex flex-col h-[24px] items-center justify-center relative w-full",
+         "n": "Next connected state",
+         "id": "219:10276",
+         "k": [
+          {
+           "t": "div",
+           "c": "relative size-[24px]",
+           "n": "Frame",
+           "id": "219:10277",
+           "k": [
+            {
+             "t": "img",
+             "c": "absolute block inset-0 size-full",
+             "src": "/marketing/flagship/frame-08fa5d7a.svg"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] w-full",
+         "n": "Connected feature / Technician App / Mobile",
+         "id": "219:10289",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:10280",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Operations",
+             "id": "219:10281",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:10282",
+               "k": [
+                "Operations"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[180px] shrink-0",
+             "id": "219:10283",
+             "k": [
+              "Job #1042 · Jordan Lee"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:10284",
+           "k": [
+            "Technician App"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:10285",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:10286",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:10288",
+             "k": [
+              "Tasks and photos saved"
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex flex-col h-[24px] items-center justify-center relative w-full",
+         "n": "Next connected state",
+         "id": "219:10290",
+         "k": [
+          {
+           "t": "div",
+           "c": "relative size-[24px]",
+           "n": "Frame",
+           "id": "219:10291",
+           "k": [
+            {
+             "t": "img",
+             "c": "absolute block inset-0 size-full",
+             "src": "/marketing/flagship/frame-08fa5d7a.svg"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] w-full",
+         "n": "Connected feature / Invoices & payments / Mobile",
+         "id": "219:10303",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:10294",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Operations",
+             "id": "219:10295",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:10296",
+               "k": [
+                "Operations"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[180px] shrink-0",
+             "id": "219:10297",
+             "k": [
+              "Job #1042 · Jordan Lee"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:10298",
+           "k": [
+            "Invoices & payments"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:10299",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:10300",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:10302",
+             "k": [
+              "Completed work ready to bill"
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "t": "button",
+       "label": "Get a free demo",
+       "kind": "Accent",
+       "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#0f1530]",
+       "href": "/demo"
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "invoices-payments": {
+  "desktop": {
+   "t": "div",
+   "c": "bg-[#fbf6ef] flex flex-col items-start relative",
+   "n": "Invoices & Payments / Desktop",
+   "id": "175:2580",
+   "k": [
+    {
+     "t": "div",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[32px] items-start p-[80px] relative w-full",
+     "n": "01 / Product in view",
+     "id": "203:8373",
+     "k": [
+      {
+       "t": "div",
+       "c": "flex gap-[48px] items-center relative w-full",
+       "n": "Outcome and product",
+       "id": "203:8374",
+       "k": [
+        {
+         "t": "div",
+         "c": "flex flex-col gap-[20px] items-start relative flex-1 min-w-0",
+         "n": "Short outcome copy",
+         "id": "203:8375",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "203:8376",
+           "k": [
+            "INVOICES & PAYMENTS"
+           ]
+          },
+          {
+           "t": "h1",
+           "c": "font-semibold leading-[1.08] relative text-[60px] text-[color:#0f1530] tracking-[-1.5px] w-full",
+           "id": "203:8377",
+           "k": [
+            "Finish the job. Send the invoice."
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-full",
+           "id": "203:8378",
+           "k": [
+            "Create the invoice from completed work and track payment."
+           ]
+          },
+          {
+           "t": "button",
+           "label": "See a payment",
+           "kind": "Dark",
+           "c": "bg-[#0f1530] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#fbf6ef]",
+           "href": "#workflow"
+          },
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "203:8381",
+           "k": [
+            "EXAMPLE BUSINESS · JUNIPER"
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#f6f7f9] border-[1.044px] border-[#e6dccb] border-solid flex flex-col h-[534.756px] items-start overflow-clip relative rounded-[16.711px] flex-1 min-w-0",
+         "n": "Product demonstration / Invoices & Payments",
+         "id": "203:8382",
+         "k": [
+          {
+           "t": "div",
+           "c": "bg-[#0f1530] flex gap-[16.711px] h-[56.4px] items-center p-[16.711px] relative w-full",
+           "n": "Product chrome",
+           "id": "I203:8382;200:221",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-bold leading-[1.38] relative text-[17.76px] text-[color:#fff] w-[146.222px] shrink-0",
+             "id": "I203:8382;200:222",
+             "k": [
+              "Renvani"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-medium leading-[1.38] relative text-[12.53px] text-[color:#fff] flex-1 min-w-0",
+             "id": "I203:8382;200:223",
+             "k": [
+              "Invoices & payments"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#f6b400] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[106.533px] shrink-0",
+             "n": "Status / EXAMPLE",
+             "id": "I203:8382;200:224",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10.44px] text-[color:#0f1530] w-[85.644px] shrink-0",
+               "id": "I203:8382;200:225",
+               "k": [
+                "EXAMPLE"
+               ]
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[16.711px] items-start p-[25.067px] relative w-full",
+           "n": "Product workspace",
+           "id": "I203:8382;200:226",
+           "k": [
+            {
+             "t": "div",
+             "c": "flex gap-[16.711px] items-start relative w-full",
+             "n": "Screen title",
+             "id": "I203:8382;200:227",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-semibold leading-[1.38] relative text-[24.02px] text-[color:#0f1530] flex-1 min-w-0",
+               "id": "I203:8382;200:228",
+               "k": [
+                "Invoices & payments"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[188px] shrink-0",
+               "n": "Status / Your business",
+               "id": "I203:8382;200:229",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10.44px] text-[color:#2a3360] w-[167.111px] shrink-0",
+                 "id": "I203:8382;200:230",
+                 "k": [
+                  "Your business"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[20.889px] items-start relative w-full",
+             "n": "Document and customer status",
+             "id": "I203:8382;200:231",
+             "k": [
+              {
+               "t": "div",
+               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] flex-1 min-w-0",
+               "n": "Service document",
+               "id": "I203:8382;200:232",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-semibold leading-[1.38] relative text-[19.84px] text-[color:#0f1530] w-full",
+                 "id": "I203:8382;200:233",
+                 "k": [
+                  "Invoice #1042"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal leading-[1.38] relative text-[12.53px] text-[color:#2a3360] w-full",
+                 "id": "I203:8382;200:234",
+                 "k": [
+                  "Jordan Lee · AC diagnostic"
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#e6dccb] h-[1.044px] relative w-full",
+                 "n": "Divider",
+                 "id": "I203:8382;200:235"
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.53px] w-full",
+                 "n": "Field / Diagnostic visit",
+                 "id": "I203:8382;200:236",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[color:#2a3360] w-[196.356px] shrink-0",
+                   "id": "I203:8382;200:237",
+                   "k": [
+                    "Diagnostic visit"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-medium relative text-[color:#0f1530] w-[150.4px] shrink-0",
+                   "id": "I203:8382;200:238",
+                   "k": [
+                    "$89"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.53px] w-full",
+                 "n": "Field / Capacitor replacement",
+                 "id": "I203:8382;200:239",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[color:#2a3360] w-[196.356px] shrink-0",
+                   "id": "I203:8382;200:240",
+                   "k": [
+                    "Capacitor replacement"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-medium relative text-[color:#0f1530] w-[150.4px] shrink-0",
+                   "id": "I203:8382;200:241",
+                   "k": [
+                    "$185"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#e6dccb] h-[1.044px] relative w-full",
+                 "n": "Divider",
+                 "id": "I203:8382;200:242"
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.53px] w-full",
+                 "n": "Field / Service total",
+                 "id": "I203:8382;200:243",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[color:#2a3360] w-[196.356px] shrink-0",
+                   "id": "I203:8382;200:244",
+                   "k": [
+                    "Service total"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-medium relative text-[color:#0f1530] w-[150.4px] shrink-0",
+                   "id": "I203:8382;200:245",
+                   "k": [
+                    "$274"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.53px] w-full",
+                 "n": "Field / Service Fee · Flex",
+                 "id": "I203:8382;200:246",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[color:#2a3360] w-[196.356px] shrink-0",
+                   "id": "I203:8382;200:247",
+                   "k": [
+                    "Service Fee · Flex"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-medium relative text-[color:#0f1530] w-[150.4px] shrink-0",
+                   "id": "I203:8382;200:248",
+                   "k": [
+                    "$5.48"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.53px] w-full",
+                 "n": "Field / Total due",
+                 "id": "I203:8382;200:249",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[color:#2a3360] w-[196.356px] shrink-0",
+                   "id": "I203:8382;200:250",
+                   "k": [
+                    "Total due"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-medium relative text-[color:#0f1530] w-[150.4px] shrink-0",
+                   "id": "I203:8382;200:251",
+                   "k": [
+                    "$279.48"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal leading-[1.38] relative text-[9.4px] text-[color:#2a3360] w-full",
+                 "id": "I203:8382;200:252",
+                 "k": [
+                  "Example checkout · No tax shown"
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#0f1530] flex h-[39.689px] items-center justify-center px-[14.622px] relative rounded-[12.533px] w-full",
+                 "n": "UI action / Send payment link",
+                 "id": "I203:8382;200:253",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[12.53px] text-[color:#fff] text-center flex-1 min-w-0",
+                   "id": "I203:8382;200:254",
+                   "k": [
+                    "Send payment link"
+                   ]
+                  }
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "flex flex-col gap-[16.711px] items-start relative flex-1 min-w-0",
+               "n": "Approval and outcome",
+               "id": "I203:8382;200:255",
+               "k": [
+                {
+                 "t": "div",
+                 "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] w-full",
+                 "n": "Status",
+                 "id": "I203:8382;200:256",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[11.49px] text-[color:#2a3360] tracking-[1.149px] w-full",
+                   "id": "I203:8382;200:257",
+                   "k": [
+                    "CUSTOMER VIEW"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-semibold leading-[1.38] relative text-[25.07px] text-[color:#0f1530] w-full",
+                   "id": "I203:8382;200:258",
+                   "k": [
+                    "Ready to pay."
+                   ]
+                  },
+                  {
+                   "t": "div",
+                   "c": "flex gap-[10.444px] items-start relative w-full",
+                   "n": "Scope reviewed",
+                   "id": "I203:8382;200:259",
+                   "k": [
+                    {
+                     "t": "div",
+                     "c": "relative size-[18.8px]",
+                     "n": "Icon / check",
+                     "id": "I203:8382;200:260",
+                     "k": [
+                      {
+                       "t": "img",
+                       "c": "absolute block inset-0 size-full",
+                       "src": "/marketing/flagship/icon-check2-85fd1521.svg"
+                      }
+                     ]
+                    },
+                    {
+                     "t": "p",
+                     "c": "font-normal leading-[1.38] relative text-[12.53px] text-[color:#2a3360] w-[208.889px] shrink-0",
+                     "id": "I203:8382;200:262",
+                     "k": [
+                      "Scope reviewed"
+                     ]
+                    }
+                   ]
+                  },
+                  {
+                   "t": "div",
+                   "c": "flex gap-[10.444px] items-start relative w-full",
+                   "n": "Price confirmed",
+                   "id": "I203:8382;200:263",
+                   "k": [
+                    {
+                     "t": "div",
+                     "c": "relative size-[18.8px]",
+                     "n": "Icon / check",
+                     "id": "I203:8382;200:264",
+                     "k": [
+                      {
+                       "t": "img",
+                       "c": "absolute block inset-0 size-full",
+                       "src": "/marketing/flagship/icon-check2-85fd1521.svg"
+                      }
+                     ]
+                    },
+                    {
+                     "t": "p",
+                     "c": "font-normal leading-[1.38] relative text-[12.53px] text-[color:#2a3360] w-[208.889px] shrink-0",
+                     "id": "I203:8382;200:266",
+                     "k": [
+                      "Price confirmed"
+                     ]
+                    }
+                   ]
+                  },
+                  {
+                   "t": "div",
+                   "c": "flex gap-[10.444px] items-start relative w-full",
+                   "n": "Receipt emailed",
+                   "id": "I203:8382;200:267",
+                   "k": [
+                    {
+                     "t": "div",
+                     "c": "relative size-[18.8px]",
+                     "n": "Icon / check",
+                     "id": "I203:8382;200:268",
+                     "k": [
+                      {
+                       "t": "img",
+                       "c": "absolute block inset-0 size-full",
+                       "src": "/marketing/flagship/icon-check2-85fd1521.svg"
+                      }
+                     ]
+                    },
+                    {
+                     "t": "p",
+                     "c": "font-normal leading-[1.38] relative text-[12.53px] text-[color:#2a3360] w-[208.889px] shrink-0",
+                     "id": "I203:8382;200:270",
+                     "k": [
+                      "Receipt emailed"
+                     ]
+                    }
+                   ]
+                  },
+                  {
+                   "t": "div",
+                   "c": "bg-[#e4f1e8] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[130.556px] shrink-0",
+                   "n": "Status / Paid",
+                   "id": "I203:8382;200:271",
+                   "k": [
+                    {
+                     "t": "p",
+                     "c": "font-medium leading-[1.38] relative text-[10.44px] text-[color:#0f1530] w-[109.667px] shrink-0",
+                     "id": "I203:8382;200:272",
+                     "k": [
+                      "Paid"
+                     ]
+                    }
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#fff4d6] flex flex-col gap-[5.222px] items-start leading-[1.38] p-[16.711px] relative rounded-[12.533px] w-full",
+                 "n": "Matched to job",
+                 "id": "I203:8382;200:273",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-semibold relative text-[16.71px] text-[color:#0f1530] w-full",
+                   "id": "I203:8382;200:274",
+                   "k": [
+                    "Job #1042"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[11.49px] text-[color:#2a3360] w-full",
+                   "id": "I203:8382;200:275",
+                   "k": [
+                    "Everything stays connected."
+                   ]
+                  }
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#fff] flex flex-col gap-[32px] items-start p-[80px] relative w-full",
+     "n": "02 / A workflow you can see",
+     "id": "203:8438",
+     "k": [
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[12px] items-start relative w-full",
+       "n": "Workflow heading",
+       "id": "203:8439",
+       "k": [
+        {
+         "t": "p",
+         "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+         "id": "203:8440",
+         "k": [
+          "EXAMPLE WORKFLOW"
+         ]
+        },
+        {
+         "t": "p",
+         "c": "font-semibold leading-[1.08] relative text-[44px] text-[color:#0f1530] tracking-[-1.1px] w-full",
+         "id": "203:8441",
+         "k": [
+          "See the work happen."
+         ]
+        }
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex gap-[40px] items-start relative w-full",
+       "n": "Three product moments",
+       "id": "203:8442",
+       "k": [
+        {
+         "t": "div",
+         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[var(--radius\\\\/16,16px)] flex-1 min-w-0",
+         "n": "Feature workflow / Turn work into an invoice",
+         "id": "203:8462",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[12px] items-start relative w-full",
+           "n": "Step heading",
+           "id": "203:8444",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[40px] shrink-0",
+             "n": "Status / 01",
+             "id": "203:8445",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#fff] w-[20px] shrink-0",
+               "id": "203:8446",
+               "k": [
+                "01"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] flex-1 min-w-0",
+             "id": "203:8447",
+             "k": [
+              "Turn work into an invoice"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-full",
+           "n": "Illustrated product state / invoice",
+           "id": "203:8448",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[21px] text-[color:#0f1530] w-full",
+             "id": "203:8449",
+             "k": [
+              "Invoice #1042"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] w-full",
+             "id": "203:8450",
+             "k": [
+              "Juniper Heating & Plumbing"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#e6dccb] h-px relative w-full",
+             "n": "Divider",
+             "id": "203:8451"
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-full",
+             "n": "Field / Diagnostic visit",
+             "id": "203:8452",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-normal relative text-[color:#2a3360] w-[175px] shrink-0",
+               "id": "203:8453",
+               "k": [
+                "Diagnostic visit"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium relative text-[color:#0f1530] w-[133px] shrink-0",
+               "id": "203:8454",
+               "k": [
+                "$89"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-full",
+             "n": "Field / Capacitor replacement",
+             "id": "203:8455",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-normal relative text-[color:#2a3360] w-[175px] shrink-0",
+               "id": "203:8456",
+               "k": [
+                "Capacitor replacement"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium relative text-[color:#0f1530] w-[133px] shrink-0",
+               "id": "203:8457",
+               "k": [
+                "$185"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#e6dccb] h-px relative w-full",
+             "n": "Divider",
+             "id": "203:8458"
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[27px] text-[color:#0f1530] w-full",
+             "id": "203:8459",
+             "k": [
+              "Total $274"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+             "n": "UI action / Create invoice",
+             "id": "203:8460",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+               "id": "203:8461",
+               "k": [
+                "Create invoice"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[var(--radius\\\\/16,16px)] flex-1 min-w-0",
+         "n": "Feature workflow / Show the full checkout",
+         "id": "203:8483",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[12px] items-start relative w-full",
+           "n": "Step heading",
+           "id": "203:8464",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[40px] shrink-0",
+             "n": "Status / 02",
+             "id": "203:8465",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#fff] w-[20px] shrink-0",
+               "id": "203:8466",
+               "k": [
+                "02"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] flex-1 min-w-0",
+             "id": "203:8467",
+             "k": [
+              "Show the full checkout"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-full",
+           "n": "Illustrated product state / checkout",
+           "id": "203:8468",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[21px] text-[color:#0f1530] w-full",
+             "id": "203:8469",
+             "k": [
+              "Checkout"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] w-full",
+             "id": "203:8470",
+             "k": [
+              "Juniper Heating & Plumbing"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#e6dccb] h-px relative w-full",
+             "n": "Divider",
+             "id": "203:8471"
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-full",
+             "n": "Field / Service subtotal",
+             "id": "203:8472",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-normal relative text-[color:#2a3360] w-[175px] shrink-0",
+               "id": "203:8473",
+               "k": [
+                "Service subtotal"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium relative text-[color:#0f1530] w-[133px] shrink-0",
+               "id": "203:8474",
+               "k": [
+                "$274.00"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-full",
+             "n": "Field / Service Fee · Flex",
+             "id": "203:8475",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-normal relative text-[color:#2a3360] w-[175px] shrink-0",
+               "id": "203:8476",
+               "k": [
+                "Service Fee · Flex"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium relative text-[color:#0f1530] w-[133px] shrink-0",
+               "id": "203:8477",
+               "k": [
+                "$5.48"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#e6dccb] h-px relative w-full",
+             "n": "Divider",
+             "id": "203:8478"
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[27px] text-[color:#0f1530] w-full",
+             "id": "203:8479",
+             "k": [
+              "Total $279.48"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] w-full",
+             "id": "203:8480",
+             "k": [
+              "Example checkout · No tax shown"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+             "n": "UI action / Pay securely",
+             "id": "203:8481",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+               "id": "203:8482",
+               "k": [
+                "Pay securely"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[var(--radius\\\\/16,16px)] flex-1 min-w-0",
+         "n": "Feature workflow / Track the payment",
+         "id": "203:8500",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[12px] items-start relative w-full",
+           "n": "Step heading",
+           "id": "203:8485",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[40px] shrink-0",
+             "n": "Status / 03",
+             "id": "203:8486",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#fff] w-[20px] shrink-0",
+               "id": "203:8487",
+               "k": [
+                "03"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] flex-1 min-w-0",
+             "id": "203:8488",
+             "k": [
+              "Track the payment"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#e4f1e8] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-full",
+           "n": "Illustrated product state / receipt",
+           "id": "203:8489",
+           "k": [
+            {
+             "t": "div",
+             "c": "flex gap-[12px] items-start relative w-full",
+             "n": "Confirmed status",
+             "id": "203:8490",
+             "k": [
+              {
+               "t": "div",
+               "c": "relative size-[34px]",
+               "n": "Icon / check",
+               "id": "203:8491",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-check1-01f1ab89.svg"
+                }
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-semibold leading-[1.38] relative text-[24px] text-[color:#0f1530] flex-1 min-w-0",
+               "id": "203:8493",
+               "k": [
+                "Payment received"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-bold leading-[1.08] relative text-[46px] text-[color:#0f1530] tracking-[-1.15px] w-full",
+             "id": "203:8494",
+             "k": [
+              "$279.48"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-medium leading-[1.38] relative text-[16px] text-[color:#0f1530] w-full",
+             "id": "203:8495",
+             "k": [
+              "Invoice #1042 · Jordan Lee"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#e6dccb] h-px relative w-full",
+             "n": "Divider",
+             "id": "203:8496"
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#2a3360] w-full",
+             "id": "203:8497",
+             "k": [
+              "Receipt emailed"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+             "n": "Status / Matched to job #1042",
+             "id": "203:8498",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[226px] shrink-0",
+               "id": "203:8499",
+               "k": [
+                "Matched to job #1042"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ],
+     "anchor": "workflow"
+    },
+    {
+     "t": "div",
+     "c": "bg-[#0f1530] flex flex-col gap-[16px] items-start px-[80px] py-[48px] relative w-full",
+     "n": "03 / Connected workflow and demo",
+     "id": "203:8501",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#f6b400] tracking-[1.1px] w-full",
+       "id": "219:10304",
+       "k": [
+        "WORKS ACROSS YOUR BUSINESS"
+       ]
+      },
+      {
+       "t": "p",
+       "c": "font-semibold leading-[1.08] relative text-[36px] text-[color:#fff] tracking-[-0.9px] w-full",
+       "id": "219:10305",
+       "k": [
+        "One job. Connected all the way."
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex gap-[16px] items-center relative w-full",
+       "n": "Flagship and tool handoff",
+       "id": "219:10306",
+       "k": [
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] flex-1 min-w-0",
+         "n": "Connected feature / Jobs & work orders / Desktop",
+         "id": "219:10317",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:10308",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Operations",
+             "id": "219:10309",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:10310",
+               "k": [
+                "Operations"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[222px] shrink-0",
+             "id": "219:10311",
+             "k": [
+              "Job #1042 · Jordan Lee"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:10312",
+           "k": [
+            "Jobs & work orders"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:10313",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:10314",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:10316",
+             "k": [
+              "Work completed"
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex h-[24px] items-center justify-center relative w-[32px] shrink-0",
+         "n": "Next connected state",
+         "id": "219:10318",
+         "k": [
+          {
+           "t": "div",
+           "c": "relative size-[24px]",
+           "n": "Icon / arrow",
+           "id": "219:10319",
+           "k": [
+            {
+             "t": "img",
+             "c": "absolute block inset-0 size-full",
+             "src": "/marketing/flagship/icon-arrow-84befcc1.svg"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] flex-1 min-w-0",
+         "n": "Connected feature / Invoices & payments / Desktop",
+         "id": "219:10331",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:10322",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Operations",
+             "id": "219:10323",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:10324",
+               "k": [
+                "Operations"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[222px] shrink-0",
+             "id": "219:10325",
+             "k": [
+              "Invoice #1042"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:10326",
+           "k": [
+            "Invoices & payments"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:10327",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:10328",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:10330",
+             "k": [
+              "Payment recorded"
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex h-[24px] items-center justify-center relative w-[32px] shrink-0",
+         "n": "Next connected state",
+         "id": "219:10332",
+         "k": [
+          {
+           "t": "div",
+           "c": "relative size-[24px]",
+           "n": "Icon / arrow",
+           "id": "219:10333",
+           "k": [
+            {
+             "t": "img",
+             "c": "absolute block inset-0 size-full",
+             "src": "/marketing/flagship/icon-arrow-84befcc1.svg"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] flex-1 min-w-0",
+         "n": "Connected feature / Reminders & win-backs / Desktop",
+         "id": "219:10345",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:10336",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Retention",
+             "id": "219:10337",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:10338",
+               "k": [
+                "Retention"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[222px] shrink-0",
+             "id": "219:10339",
+             "k": [
+              "Job #1042 · Jordan Lee"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:10340",
+           "k": [
+            "Reminders & win-backs"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:10341",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:10342",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:10344",
+             "k": [
+              "Next visit identified"
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "t": "button",
+       "label": "Get a free demo",
+       "kind": "Accent",
+       "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#0f1530]",
+       "href": "/demo"
+      }
+     ]
+    }
+   ]
+  },
+  "mobile": {
+   "t": "div",
+   "c": "bg-[#fbf6ef] flex flex-col items-start relative",
+   "n": "Invoices & Payments / Mobile",
+   "id": "175:2726",
+   "k": [
+    {
+     "t": "div",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[32px] items-start p-[24px] relative w-full",
+     "n": "01 / Product in view",
+     "id": "203:8517",
+     "k": [
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[32px] items-start relative w-full",
+       "n": "Outcome and product",
+       "id": "203:8518",
+       "k": [
+        {
+         "t": "div",
+         "c": "flex flex-col gap-[20px] items-start relative w-full",
+         "n": "Short outcome copy",
+         "id": "203:8519",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "203:8520",
+           "k": [
+            "INVOICES & PAYMENTS"
+           ]
+          },
+          {
+           "t": "h1",
+           "c": "font-semibold leading-[1.08] relative text-[40px] text-[color:#0f1530] tracking-[-1px] w-full",
+           "id": "203:8521",
+           "k": [
+            "Finish the job. Send the invoice."
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-full",
+           "id": "203:8522",
+           "k": [
+            "Create the invoice from completed work and track payment."
+           ]
+          },
+          {
+           "t": "button",
+           "label": "See a payment",
+           "kind": "Dark",
+           "c": "bg-[#0f1530] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#fbf6ef]",
+           "href": "#workflow-m"
+          },
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "203:8525",
+           "k": [
+            "EXAMPLE BUSINESS · JUNIPER"
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#f6f7f9] border-[0.475px] border-[#e6dccb] border-solid flex flex-col h-[243.2px] items-start overflow-clip relative rounded-[7.6px] w-full",
+         "n": "Product demonstration / Invoices & Payments",
+         "id": "203:8526",
+         "k": [
+          {
+           "t": "div",
+           "c": "bg-[#0f1530] flex gap-[7.6px] h-[25.65px] items-center p-[7.6px] relative w-full",
+           "n": "Product chrome",
+           "id": "I203:8526;200:221",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-bold leading-[1.38] relative text-[8.07px] text-[color:#fff] w-[66.5px] shrink-0",
+             "id": "I203:8526;200:222",
+             "k": [
+              "Renvani"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-medium leading-[1.38] relative text-[5.7px] text-[color:#fff] w-[196.65px] shrink-0",
+             "id": "I203:8526;200:223",
+             "k": [
+              "Invoices & payments"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#f6b400] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[48.45px] shrink-0",
+             "n": "Status / EXAMPLE",
+             "id": "I203:8526;200:224",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#0f1530] w-[38.95px] shrink-0",
+               "id": "I203:8526;200:225",
+               "k": [
+                "EXAMPLE"
+               ]
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[7.6px] items-start p-[11.4px] relative w-full",
+           "n": "Product workspace",
+           "id": "I203:8526;200:226",
+           "k": [
+            {
+             "t": "div",
+             "c": "flex gap-[7.6px] items-start relative w-full",
+             "n": "Screen title",
+             "id": "I203:8526;200:227",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-semibold leading-[1.38] relative text-[10.92px] text-[color:#0f1530] w-[218.5px] shrink-0",
+               "id": "I203:8526;200:228",
+               "k": [
+                "Invoices & payments"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[85.5px] shrink-0",
+               "n": "Status / Your business",
+               "id": "I203:8526;200:229",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#2a3360] w-[76px] shrink-0",
+                 "id": "I203:8526;200:230",
+                 "k": [
+                  "Your business"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[9.5px] items-start relative w-full",
+             "n": "Document and customer status",
+             "id": "I203:8526;200:231",
+             "k": [
+              {
+               "t": "div",
+               "c": "bg-[#fff] border-[0.475px] border-[#e6dccb] border-solid flex flex-col gap-[6.65px] items-start p-[9.5px] relative rounded-[7.6px] w-[181.45px] shrink-0",
+               "n": "Service document",
+               "id": "I203:8526;200:232",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-semibold leading-[1.38] relative text-[9.02px] text-[color:#0f1530] w-full",
+                 "id": "I203:8526;200:233",
+                 "k": [
+                  "Invoice #1042"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal leading-[1.38] relative text-[5.7px] text-[color:#2a3360] w-full",
+                 "id": "I203:8526;200:234",
+                 "k": [
+                  "Jordan Lee · AC diagnostic"
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#e6dccb] h-[0.475px] relative w-full",
+                 "n": "Divider",
+                 "id": "I203:8526;200:235"
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[4.75px] items-start leading-[1.38] relative text-[5.7px] w-full",
+                 "n": "Field / Diagnostic visit",
+                 "id": "I203:8526;200:236",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[color:#2a3360] w-[89.3px] shrink-0",
+                   "id": "I203:8526;200:237",
+                   "k": [
+                    "Diagnostic visit"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-medium relative text-[color:#0f1530] w-[68.4px] shrink-0",
+                   "id": "I203:8526;200:238",
+                   "k": [
+                    "$89"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[4.75px] items-start leading-[1.38] relative text-[5.7px] w-full",
+                 "n": "Field / Capacitor replacement",
+                 "id": "I203:8526;200:239",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[color:#2a3360] w-[89.3px] shrink-0",
+                   "id": "I203:8526;200:240",
+                   "k": [
+                    "Capacitor replacement"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-medium relative text-[color:#0f1530] w-[68.4px] shrink-0",
+                   "id": "I203:8526;200:241",
+                   "k": [
+                    "$185"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#e6dccb] h-[0.475px] relative w-full",
+                 "n": "Divider",
+                 "id": "I203:8526;200:242"
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[4.75px] items-start leading-[1.38] relative text-[5.7px] w-full",
+                 "n": "Field / Service total",
+                 "id": "I203:8526;200:243",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[color:#2a3360] w-[89.3px] shrink-0",
+                   "id": "I203:8526;200:244",
+                   "k": [
+                    "Service total"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-medium relative text-[color:#0f1530] w-[68.4px] shrink-0",
+                   "id": "I203:8526;200:245",
+                   "k": [
+                    "$274"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[4.75px] items-start leading-[1.38] relative text-[5.7px] w-full",
+                 "n": "Field / Service Fee · Flex",
+                 "id": "I203:8526;200:246",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[color:#2a3360] w-[89.3px] shrink-0",
+                   "id": "I203:8526;200:247",
+                   "k": [
+                    "Service Fee · Flex"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-medium relative text-[color:#0f1530] w-[68.4px] shrink-0",
+                   "id": "I203:8526;200:248",
+                   "k": [
+                    "$5.48"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[4.75px] items-start leading-[1.38] relative text-[5.7px] w-full",
+                 "n": "Field / Total due",
+                 "id": "I203:8526;200:249",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[color:#2a3360] w-[89.3px] shrink-0",
+                   "id": "I203:8526;200:250",
+                   "k": [
+                    "Total due"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-medium relative text-[color:#0f1530] w-[68.4px] shrink-0",
+                   "id": "I203:8526;200:251",
+                   "k": [
+                    "$279.48"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal leading-[1.38] relative text-[4.27px] text-[color:#2a3360] w-full",
+                 "id": "I203:8526;200:252",
+                 "k": [
+                  "Example checkout · No tax shown"
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#0f1530] flex h-[18.05px] items-center justify-center px-[6.65px] relative rounded-[5.7px] w-[162.45px] shrink-0",
+                 "n": "UI action / Send payment link",
+                 "id": "I203:8526;200:253",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[5.7px] text-[color:#fff] text-center w-[149.15px] shrink-0",
+                   "id": "I203:8526;200:254",
+                   "k": [
+                    "Send payment link"
+                   ]
+                  }
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "flex flex-col gap-[7.6px] items-start relative w-[128.25px] shrink-0",
+               "n": "Approval and outcome",
+               "id": "I203:8526;200:255",
+               "k": [
+                {
+                 "t": "div",
+                 "c": "bg-[#fff] border-[0.475px] border-[#e6dccb] border-solid flex flex-col gap-[6.65px] items-start p-[9.5px] relative rounded-[7.6px] w-full",
+                 "n": "Status",
+                 "id": "I203:8526;200:256",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[5.22px] text-[color:#2a3360] tracking-[0.522px] w-full",
+                   "id": "I203:8526;200:257",
+                   "k": [
+                    "CUSTOMER VIEW"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-semibold leading-[1.38] relative text-[11.4px] text-[color:#0f1530] w-full",
+                   "id": "I203:8526;200:258",
+                   "k": [
+                    "Ready to pay."
+                   ]
+                  },
+                  {
+                   "t": "div",
+                   "c": "flex gap-[4.75px] items-start relative w-full",
+                   "n": "Scope reviewed",
+                   "id": "I203:8526;200:259",
+                   "k": [
+                    {
+                     "t": "div",
+                     "c": "relative size-[8.55px]",
+                     "n": "Icon / check",
+                     "id": "I203:8526;200:260",
+                     "k": [
+                      {
+                       "t": "img",
+                       "c": "absolute block inset-0 size-full",
+                       "src": "/marketing/flagship/icon-check1-76fc982c.svg"
+                      }
+                     ]
+                    },
+                    {
+                     "t": "p",
+                     "c": "font-normal leading-[1.38] relative text-[5.7px] text-[color:#2a3360] w-[95px] shrink-0",
+                     "id": "I203:8526;200:262",
+                     "k": [
+                      "Scope reviewed"
+                     ]
+                    }
+                   ]
+                  },
+                  {
+                   "t": "div",
+                   "c": "flex gap-[4.75px] items-start relative w-full",
+                   "n": "Price confirmed",
+                   "id": "I203:8526;200:263",
+                   "k": [
+                    {
+                     "t": "div",
+                     "c": "relative size-[8.55px]",
+                     "n": "Icon / check",
+                     "id": "I203:8526;200:264",
+                     "k": [
+                      {
+                       "t": "img",
+                       "c": "absolute block inset-0 size-full",
+                       "src": "/marketing/flagship/icon-check1-76fc982c.svg"
+                      }
+                     ]
+                    },
+                    {
+                     "t": "p",
+                     "c": "font-normal leading-[1.38] relative text-[5.7px] text-[color:#2a3360] w-[95px] shrink-0",
+                     "id": "I203:8526;200:266",
+                     "k": [
+                      "Price confirmed"
+                     ]
+                    }
+                   ]
+                  },
+                  {
+                   "t": "div",
+                   "c": "flex gap-[4.75px] items-start relative w-full",
+                   "n": "Receipt emailed",
+                   "id": "I203:8526;200:267",
+                   "k": [
+                    {
+                     "t": "div",
+                     "c": "relative size-[8.55px]",
+                     "n": "Icon / check",
+                     "id": "I203:8526;200:268",
+                     "k": [
+                      {
+                       "t": "img",
+                       "c": "absolute block inset-0 size-full",
+                       "src": "/marketing/flagship/icon-check1-76fc982c.svg"
+                      }
+                     ]
+                    },
+                    {
+                     "t": "p",
+                     "c": "font-normal leading-[1.38] relative text-[5.7px] text-[color:#2a3360] w-[95px] shrink-0",
+                     "id": "I203:8526;200:270",
+                     "k": [
+                      "Receipt emailed"
+                     ]
+                    }
+                   ]
+                  },
+                  {
+                   "t": "div",
+                   "c": "bg-[#e4f1e8] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[59.375px] shrink-0",
+                   "n": "Status / Paid",
+                   "id": "I203:8526;200:271",
+                   "k": [
+                    {
+                     "t": "p",
+                     "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#0f1530] w-[49.875px] shrink-0",
+                     "id": "I203:8526;200:272",
+                     "k": [
+                      "Paid"
+                     ]
+                    }
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#fff4d6] flex flex-col gap-[2.375px] items-start leading-[1.38] p-[7.6px] relative rounded-[5.7px] w-full",
+                 "n": "Matched to job",
+                 "id": "I203:8526;200:273",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-semibold relative text-[7.6px] text-[color:#0f1530] w-full",
+                   "id": "I203:8526;200:274",
+                   "k": [
+                    "Job #1042"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[5.22px] text-[color:#2a3360] w-full",
+                   "id": "I203:8526;200:275",
+                   "k": [
+                    "Everything stays connected."
+                   ]
+                  }
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#fff] flex flex-col gap-[32px] items-start p-[24px] relative w-full",
+     "n": "02 / A workflow you can see",
+     "id": "203:8582",
+     "k": [
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[12px] items-start leading-[1.38] relative w-full",
+       "n": "Workflow heading",
+       "id": "203:8583",
+       "k": [
+        {
+         "t": "p",
+         "c": "font-medium relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+         "id": "203:8584",
+         "k": [
+          "EXAMPLE WORKFLOW"
+         ]
+        },
+        {
+         "t": "p",
+         "c": "font-semibold relative text-[32px] text-[color:#0f1530] w-full",
+         "id": "203:8585",
+         "k": [
+          "See the work happen."
+         ]
+        }
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[24px] items-start relative w-full",
+       "n": "Three product moments",
+       "id": "203:8586",
+       "k": [
+        {
+         "t": "div",
+         "c": "bg-[#fff] border-[0.855px] border-[#e6dccb] border-solid flex flex-col gap-[15.39px] h-[444.6px] items-start p-[18.81px] relative rounded-[13.68px] w-full",
+         "n": "Workflow moment / Turn work into an invoice",
+         "id": "203:8587",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10.26px] items-start relative w-full",
+           "n": "Step heading",
+           "id": "I203:8587;203:8444",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[34.2px] shrink-0",
+             "n": "Status / 01",
+             "id": "I203:8587;203:8445",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#fff] w-[17.1px] shrink-0",
+               "id": "I203:8587;203:8446",
+               "k": [
+                "01"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[15.39px] text-[color:#0f1530] flex-1 min-w-0",
+             "id": "I203:8587;203:8447",
+             "k": [
+              "Turn work into an invoice"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[11.97px] h-[342px] items-start p-[15.39px] relative rounded-[10.26px] w-full",
+           "n": "Illustrated product state / invoice",
+           "id": "I203:8587;203:8448",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[17.95px] text-[color:#0f1530] w-full",
+             "id": "I203:8587;203:8449",
+             "k": [
+              "Invoice #1042"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10.26px] text-[color:#2a3360] w-full",
+             "id": "I203:8587;203:8450",
+             "k": [
+              "Juniper Heating & Plumbing"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#e6dccb] h-[0.855px] relative w-full",
+             "n": "Divider",
+             "id": "I203:8587;203:8451"
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[8.55px] items-start leading-[1.38] relative text-[10.26px] w-full",
+             "n": "Field / Diagnostic visit",
+             "id": "I203:8587;203:8452",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-normal relative text-[color:#2a3360] w-[149.625px] shrink-0",
+               "id": "I203:8587;203:8453",
+               "k": [
+                "Diagnostic visit"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium relative text-[color:#0f1530] w-[113.715px] shrink-0",
+               "id": "I203:8587;203:8454",
+               "k": [
+                "$89"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[8.55px] items-start leading-[1.38] relative text-[10.26px] w-full",
+             "n": "Field / Capacitor replacement",
+             "id": "I203:8587;203:8455",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-normal relative text-[color:#2a3360] w-[149.625px] shrink-0",
+               "id": "I203:8587;203:8456",
+               "k": [
+                "Capacitor replacement"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium relative text-[color:#0f1530] w-[113.715px] shrink-0",
+               "id": "I203:8587;203:8457",
+               "k": [
+                "$185"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#e6dccb] h-[0.855px] relative w-full",
+             "n": "Divider",
+             "id": "I203:8587;203:8458"
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[23.08px] text-[color:#0f1530] w-full",
+             "id": "I203:8587;203:8459",
+             "k": [
+              "Total $274"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[32.49px] items-center justify-center px-[11.97px] relative rounded-[10.26px] w-full",
+             "n": "UI action / Create invoice",
+             "id": "I203:8587;203:8460",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10.26px] text-[color:#fff] text-center flex-1 min-w-0",
+               "id": "I203:8587;203:8461",
+               "k": [
+                "Create invoice"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] border-[0.855px] border-[#e6dccb] border-solid flex flex-col gap-[15.39px] h-[444.6px] items-start p-[18.81px] relative rounded-[13.68px] w-full",
+         "n": "Workflow moment / Show the full checkout",
+         "id": "203:8606",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10.26px] items-start relative w-full",
+           "n": "Step heading",
+           "id": "I203:8606;203:8464",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[34.2px] shrink-0",
+             "n": "Status / 02",
+             "id": "I203:8606;203:8465",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#fff] w-[17.1px] shrink-0",
+               "id": "I203:8606;203:8466",
+               "k": [
+                "02"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[15.39px] text-[color:#0f1530] flex-1 min-w-0",
+             "id": "I203:8606;203:8467",
+             "k": [
+              "Show the full checkout"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[11.97px] h-[342px] items-start p-[15.39px] relative rounded-[10.26px] w-full",
+           "n": "Illustrated product state / checkout",
+           "id": "I203:8606;203:8468",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[17.95px] text-[color:#0f1530] w-full",
+             "id": "I203:8606;203:8469",
+             "k": [
+              "Checkout"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10.26px] text-[color:#2a3360] w-full",
+             "id": "I203:8606;203:8470",
+             "k": [
+              "Juniper Heating & Plumbing"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#e6dccb] h-[0.855px] relative w-full",
+             "n": "Divider",
+             "id": "I203:8606;203:8471"
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[8.55px] items-start leading-[1.38] relative text-[10.26px] w-full",
+             "n": "Field / Service subtotal",
+             "id": "I203:8606;203:8472",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-normal relative text-[color:#2a3360] w-[149.625px] shrink-0",
+               "id": "I203:8606;203:8473",
+               "k": [
+                "Service subtotal"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium relative text-[color:#0f1530] w-[113.715px] shrink-0",
+               "id": "I203:8606;203:8474",
+               "k": [
+                "$274.00"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[8.55px] items-start leading-[1.38] relative text-[10.26px] w-full",
+             "n": "Field / Service Fee · Flex",
+             "id": "I203:8606;203:8475",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-normal relative text-[color:#2a3360] w-[149.625px] shrink-0",
+               "id": "I203:8606;203:8476",
+               "k": [
+                "Service Fee · Flex"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium relative text-[color:#0f1530] w-[113.715px] shrink-0",
+               "id": "I203:8606;203:8477",
+               "k": [
+                "$5.48"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#e6dccb] h-[0.855px] relative w-full",
+             "n": "Divider",
+             "id": "I203:8606;203:8478"
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[23.08px] text-[color:#0f1530] w-full",
+             "id": "I203:8606;203:8479",
+             "k": [
+              "Total $279.48"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[8.55px] text-[color:#2a3360] w-full",
+             "id": "I203:8606;203:8480",
+             "k": [
+              "Example checkout · No tax shown"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[32.49px] items-center justify-center px-[11.97px] relative rounded-[10.26px] w-full",
+             "n": "UI action / Pay securely",
+             "id": "I203:8606;203:8481",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10.26px] text-[color:#fff] text-center flex-1 min-w-0",
+               "id": "I203:8606;203:8482",
+               "k": [
+                "Pay securely"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] border-[0.855px] border-[#e6dccb] border-solid flex flex-col gap-[15.39px] h-[444.6px] items-start p-[18.81px] relative rounded-[13.68px] w-full",
+         "n": "Workflow moment / Track the payment",
+         "id": "203:8626",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10.26px] items-start relative w-full",
+           "n": "Step heading",
+           "id": "I203:8626;203:8485",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[34.2px] shrink-0",
+             "n": "Status / 03",
+             "id": "I203:8626;203:8486",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#fff] w-[17.1px] shrink-0",
+               "id": "I203:8626;203:8487",
+               "k": [
+                "03"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[15.39px] text-[color:#0f1530] flex-1 min-w-0",
+             "id": "I203:8626;203:8488",
+             "k": [
+              "Track the payment"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#e4f1e8] flex flex-col gap-[11.97px] h-[342px] items-start p-[15.39px] relative rounded-[10.26px] w-full",
+           "n": "Illustrated product state / receipt",
+           "id": "I203:8626;203:8489",
+           "k": [
+            {
+             "t": "div",
+             "c": "flex gap-[10.26px] items-start relative w-full",
+             "n": "Confirmed status",
+             "id": "I203:8626;203:8490",
+             "k": [
+              {
+               "t": "div",
+               "c": "relative size-[29.07px]",
+               "n": "Icon / check",
+               "id": "I203:8626;203:8491",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-check2-4ceb0368.svg"
+                }
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-semibold leading-[1.38] relative text-[20.52px] text-[color:#0f1530] w-[230.85px] shrink-0",
+               "id": "I203:8626;203:8493",
+               "k": [
+                "Payment received"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-bold leading-[1.08] relative text-[39.33px] text-[color:#0f1530] tracking-[-0.9832px] w-full",
+             "id": "I203:8626;203:8494",
+             "k": [
+              "$279.48"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-medium leading-[1.38] relative text-[13.68px] text-[color:#0f1530] w-full",
+             "id": "I203:8626;203:8495",
+             "k": [
+              "Invoice #1042 · Jordan Lee"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#e6dccb] h-[0.855px] relative w-full",
+             "n": "Divider",
+             "id": "I203:8626;203:8496"
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[11.97px] text-[color:#2a3360] w-full",
+             "id": "I203:8626;203:8497",
+             "k": [
+              "Receipt emailed"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[210.33px] shrink-0",
+             "n": "Status / Matched to job #1042",
+             "id": "I203:8626;203:8498",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#0f1530] w-[193.23px] shrink-0",
+               "id": "I203:8626;203:8499",
+               "k": [
+                "Matched to job #1042"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ],
+     "anchor": "workflow-m"
+    },
+    {
+     "t": "div",
+     "c": "bg-[#0f1530] flex flex-col gap-[16px] items-start p-[24px] relative w-full",
+     "n": "03 / Connected workflow and demo",
+     "id": "203:8642",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#f6b400] tracking-[1.1px] w-full",
+       "id": "219:10346",
+       "k": [
+        "WORKS ACROSS YOUR BUSINESS"
+       ]
+      },
+      {
+       "t": "p",
+       "c": "font-semibold leading-[1.38] relative text-[28px] text-[color:#fff] w-full",
+       "id": "219:10347",
+       "k": [
+        "One job. Connected all the way."
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[12px] items-center relative w-full",
+       "n": "Flagship and tool handoff",
+       "id": "219:10348",
+       "k": [
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] w-full",
+         "n": "Connected feature / Jobs & work orders / Mobile",
+         "id": "219:10359",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:10350",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Operations",
+             "id": "219:10351",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:10352",
+               "k": [
+                "Operations"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[180px] shrink-0",
+             "id": "219:10353",
+             "k": [
+              "Job #1042 · Jordan Lee"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:10354",
+           "k": [
+            "Jobs & work orders"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:10355",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:10356",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:10358",
+             "k": [
+              "Work completed"
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex flex-col h-[24px] items-center justify-center relative w-full",
+         "n": "Next connected state",
+         "id": "219:10360",
+         "k": [
+          {
+           "t": "div",
+           "c": "relative size-[24px]",
+           "n": "Frame",
+           "id": "219:10361",
+           "k": [
+            {
+             "t": "img",
+             "c": "absolute block inset-0 size-full",
+             "src": "/marketing/flagship/frame-08fa5d7a.svg"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] w-full",
+         "n": "Connected feature / Invoices & payments / Mobile",
+         "id": "219:10373",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:10364",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Operations",
+             "id": "219:10365",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:10366",
+               "k": [
+                "Operations"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[180px] shrink-0",
+             "id": "219:10367",
+             "k": [
+              "Invoice #1042"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:10368",
+           "k": [
+            "Invoices & payments"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:10369",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:10370",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:10372",
+             "k": [
+              "Payment recorded"
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex flex-col h-[24px] items-center justify-center relative w-full",
+         "n": "Next connected state",
+         "id": "219:10374",
+         "k": [
+          {
+           "t": "div",
+           "c": "relative size-[24px]",
+           "n": "Frame",
+           "id": "219:10375",
+           "k": [
+            {
+             "t": "img",
+             "c": "absolute block inset-0 size-full",
+             "src": "/marketing/flagship/frame-08fa5d7a.svg"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] w-full",
+         "n": "Connected feature / Reminders & win-backs / Mobile",
+         "id": "219:10387",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:10378",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Retention",
+             "id": "219:10379",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:10380",
+               "k": [
+                "Retention"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[180px] shrink-0",
+             "id": "219:10381",
+             "k": [
+              "Job #1042 · Jordan Lee"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:10382",
+           "k": [
+            "Reminders & win-backs"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:10383",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:10384",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:10386",
+             "k": [
+              "Next visit identified"
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "t": "button",
+       "label": "Get a free demo",
+       "kind": "Accent",
+       "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#0f1530]",
+       "href": "/demo"
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "service-agreements": {
+  "desktop": {
+   "t": "div",
+   "c": "bg-[#fbf6ef] flex flex-col items-start relative",
+   "n": "Service Agreements / Desktop",
+   "id": "175:2866",
+   "k": [
+    {
+     "t": "div",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[32px] items-start p-[80px] relative w-full",
+     "n": "01 / Product in view",
+     "id": "203:11927",
+     "k": [
+      {
+       "t": "div",
+       "c": "flex gap-[48px] items-center relative w-full",
+       "n": "Outcome and product",
+       "id": "203:11928",
+       "k": [
+        {
+         "t": "div",
+         "c": "flex flex-col gap-[20px] items-start relative flex-1 min-w-0",
+         "n": "Short outcome copy",
+         "id": "203:11929",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "203:11930",
+           "k": [
+            "SERVICE AGREEMENTS"
+           ]
+          },
+          {
+           "t": "h1",
+           "c": "font-semibold leading-[1.08] relative text-[60px] text-[color:#0f1530] tracking-[-1.5px] w-full",
+           "id": "203:11931",
+           "k": [
+            "Turn today’s visit into a relationship."
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-full",
+           "id": "203:11932",
+           "k": [
+            "Keep covered visits, agreement terms, and upcoming renewals together."
+           ]
+          },
+          {
+           "t": "button",
+           "label": "See an agreement",
+           "kind": "Dark",
+           "c": "bg-[#0f1530] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#fbf6ef]",
+           "href": "#workflow"
+          },
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "203:11935",
+           "k": [
+            "EXAMPLE BUSINESS · JUNIPER"
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#f6f7f9] border-[1.044px] border-[#e6dccb] border-solid flex flex-col h-[485.667px] items-start overflow-clip relative rounded-[16.711px] flex-1 min-w-0",
+         "n": "Product demonstration / Service Agreements",
+         "id": "203:11936",
+         "k": [
+          {
+           "t": "div",
+           "c": "bg-[#0f1530] flex gap-[16.711px] h-[56.4px] items-center p-[16.711px] relative w-full",
+           "n": "Product chrome",
+           "id": "I203:11936;200:278",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-bold leading-[1.38] relative text-[17.76px] text-[color:#fff] w-[146.222px] shrink-0",
+             "id": "I203:11936;200:279",
+             "k": [
+              "Renvani"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-medium leading-[1.38] relative text-[12.53px] text-[color:#fff] flex-1 min-w-0",
+             "id": "I203:11936;200:280",
+             "k": [
+              "Service agreements"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#f6b400] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[106.533px] shrink-0",
+             "n": "Status / EXAMPLE",
+             "id": "I203:11936;200:281",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10.44px] text-[color:#0f1530] w-[85.644px] shrink-0",
+               "id": "I203:11936;200:282",
+               "k": [
+                "EXAMPLE"
+               ]
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[16.711px] items-start p-[25.067px] relative w-full",
+           "n": "Product workspace",
+           "id": "I203:11936;200:283",
+           "k": [
+            {
+             "t": "div",
+             "c": "flex gap-[16.711px] items-start relative w-full",
+             "n": "Screen title",
+             "id": "I203:11936;200:284",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-semibold leading-[1.38] relative text-[24.02px] text-[color:#0f1530] flex-1 min-w-0",
+               "id": "I203:11936;200:285",
+               "k": [
+                "Service agreements"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[188px] shrink-0",
+               "n": "Status / Your business",
+               "id": "I203:11936;200:286",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10.44px] text-[color:#2a3360] w-[167.111px] shrink-0",
+                 "id": "I203:11936;200:287",
+                 "k": [
+                  "Your business"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[20.889px] items-start relative w-full",
+             "n": "Agreement and future visit",
+             "id": "I203:11936;200:288",
+             "k": [
+              {
+               "t": "div",
+               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] flex-1 min-w-0",
+               "n": "Maintenance plan",
+               "id": "I203:11936;200:289",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[11.49px] text-[color:#2a3360] tracking-[1.149px] w-full",
+                 "id": "I203:11936;200:290",
+                 "k": [
+                  "JUNIPER MEMBERSHIP"
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "font-semibold relative text-[30.29px] text-[color:#0f1530] w-full",
+                 "id": "I203:11936;200:291",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "leading-[1.38] mb-0",
+                   "k": [
+                    "Home Comfort"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "leading-[1.38]",
+                   "k": [
+                    "Plan"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[10.444px] items-start relative w-full",
+                 "n": "2 tune-ups each year",
+                 "id": "I203:11936;200:292",
+                 "k": [
+                  {
+                   "t": "div",
+                   "c": "relative size-[19.844px]",
+                   "n": "Icon / check",
+                   "id": "I203:11936;200:293",
+                   "k": [
+                    {
+                     "t": "img",
+                     "c": "absolute block inset-0 size-full",
+                     "src": "/marketing/flagship/icon-check2-0e55cdba.svg"
+                    }
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-normal leading-[1.38] relative text-[12.53px] text-[color:#0f1530] flex-1 min-w-0",
+                   "id": "I203:11936;200:295",
+                   "k": [
+                    "2 tune-ups each year"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[10.444px] items-start relative w-full",
+                 "n": "Heating + cooling covered",
+                 "id": "I203:11936;200:296",
+                 "k": [
+                  {
+                   "t": "div",
+                   "c": "relative size-[19.844px]",
+                   "n": "Icon / check",
+                   "id": "I203:11936;200:297",
+                   "k": [
+                    {
+                     "t": "img",
+                     "c": "absolute block inset-0 size-full",
+                     "src": "/marketing/flagship/icon-check2-0e55cdba.svg"
+                    }
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-normal leading-[1.38] relative text-[12.53px] text-[color:#0f1530] flex-1 min-w-0",
+                   "id": "I203:11936;200:299",
+                   "k": [
+                    "Heating + cooling covered"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[10.444px] items-start relative w-full",
+                 "n": "Member repair discount",
+                 "id": "I203:11936;200:300",
+                 "k": [
+                  {
+                   "t": "div",
+                   "c": "relative size-[19.844px]",
+                   "n": "Icon / check",
+                   "id": "I203:11936;200:301",
+                   "k": [
+                    {
+                     "t": "img",
+                     "c": "absolute block inset-0 size-full",
+                     "src": "/marketing/flagship/icon-check2-0e55cdba.svg"
+                    }
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-normal leading-[1.38] relative text-[12.53px] text-[color:#0f1530] flex-1 min-w-0",
+                   "id": "I203:11936;200:303",
+                   "k": [
+                    "Member repair discount"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#e4f1e8] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[198.444px] shrink-0",
+                 "n": "Status / ACTIVE AGREEMENT",
+                 "id": "I203:11936;200:304",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[10.44px] text-[color:#0f1530] w-[177.556px] shrink-0",
+                   "id": "I203:11936;200:305",
+                   "k": [
+                    "ACTIVE AGREEMENT"
+                   ]
+                  }
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] flex-1 min-w-0",
+               "n": "Next service",
+               "id": "I203:11936;200:306",
+               "k": [
+                {
+                 "t": "div",
+                 "c": "relative size-[31.333px]",
+                 "n": "Icon / calendar",
+                 "id": "I203:11936;200:307",
+                 "k": [
+                  {
+                   "t": "img",
+                   "c": "absolute block inset-0 size-full",
+                   "src": "/marketing/flagship/icon-calendar-c602e0b6.svg"
+                  }
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-semibold leading-[1.38] relative text-[22.98px] text-[color:#0f1530] w-full",
+                 "id": "I203:11936;200:310",
+                 "k": [
+                  "Your next visit"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal leading-[1.38] relative text-[14.62px] text-[color:#0f1530] w-full",
+                 "id": "I203:11936;200:311",
+                 "k": [
+                  "Fall heating tune-up"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[12.53px] text-[color:#2a3360] w-full",
+                 "id": "I203:11936;200:312",
+                 "k": [
+                  "NOV"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-bold leading-[1.08] relative text-[66.84px] text-[color:#0f1530] tracking-[-1.671px] w-full",
+                 "id": "I203:11936;200:313",
+                 "k": [
+                  "12"
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#0f1530] flex h-[39.689px] items-center justify-center px-[14.622px] relative rounded-[12.533px] w-full",
+                 "n": "UI action / Review reminder email",
+                 "id": "I203:11936;200:314",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[12.53px] text-[color:#fff] text-center flex-1 min-w-0",
+                   "id": "I203:11936;200:315",
+                   "k": [
+                    "Review reminder email"
+                   ]
+                  }
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#fff] flex flex-col gap-[32px] items-start p-[80px] relative w-full",
+     "n": "02 / A workflow you can see",
+     "id": "203:11975",
+     "k": [
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[12px] items-start relative w-full",
+       "n": "Workflow heading",
+       "id": "203:11976",
+       "k": [
+        {
+         "t": "p",
+         "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+         "id": "203:11977",
+         "k": [
+          "EXAMPLE WORKFLOW"
+         ]
+        },
+        {
+         "t": "p",
+         "c": "font-semibold leading-[1.08] relative text-[44px] text-[color:#0f1530] tracking-[-1.1px] w-full",
+         "id": "203:11978",
+         "k": [
+          "See the work happen."
+         ]
+        }
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex gap-[40px] items-start relative w-full",
+       "n": "Three product moments",
+       "id": "203:11979",
+       "k": [
+        {
+         "t": "div",
+         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[var(--radius\\\\/16,16px)] flex-1 min-w-0",
+         "n": "Feature workflow / Define the coverage",
+         "id": "203:12001",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[12px] items-start relative w-full",
+           "n": "Step heading",
+           "id": "203:11981",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[40px] shrink-0",
+             "n": "Status / 01",
+             "id": "203:11982",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#fff] w-[20px] shrink-0",
+               "id": "203:11983",
+               "k": [
+                "01"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] flex-1 min-w-0",
+             "id": "203:11984",
+             "k": [
+              "Define the coverage"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-full",
+           "n": "Illustrated product state / coverage",
+           "id": "203:11985",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+             "id": "203:11986",
+             "k": [
+              "Home Comfort Agreement"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex gap-[10px] h-[54px] items-start p-[12px] relative rounded-[12px] w-full",
+             "n": "Heating tune-up",
+             "id": "203:11987",
+             "k": [
+              {
+               "t": "div",
+               "c": "relative size-[22px]",
+               "n": "Icon / check",
+               "id": "203:11988",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-check1-c690b1c5.svg"
+                }
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[14px] text-[color:#0f1530] flex-1 min-w-0",
+               "id": "203:11990",
+               "k": [
+                "Heating tune-up"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex gap-[10px] h-[54px] items-start p-[12px] relative rounded-[12px] w-full",
+             "n": "Cooling tune-up",
+             "id": "203:11991",
+             "k": [
+              {
+               "t": "div",
+               "c": "relative size-[22px]",
+               "n": "Icon / check",
+               "id": "203:11992",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-check1-c690b1c5.svg"
+                }
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[14px] text-[color:#0f1530] flex-1 min-w-0",
+               "id": "203:11994",
+               "k": [
+                "Cooling tune-up"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex gap-[10px] h-[54px] items-start p-[12px] relative rounded-[12px] w-full",
+             "n": "12-month agreement",
+             "id": "203:11995",
+             "k": [
+              {
+               "t": "div",
+               "c": "relative size-[22px]",
+               "n": "Icon / check",
+               "id": "203:11996",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-check1-c690b1c5.svg"
+                }
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[14px] text-[color:#0f1530] flex-1 min-w-0",
+               "id": "203:11998",
+               "k": [
+                "12-month agreement"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[220px] shrink-0",
+             "n": "Status / Coverage defined",
+             "id": "203:11999",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[200px] shrink-0",
+               "id": "203:12000",
+               "k": [
+                "Coverage defined"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[var(--radius\\\\/16,16px)] flex-1 min-w-0",
+         "n": "Feature workflow / Plan the next visit",
+         "id": "203:12040",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[12px] items-start relative w-full",
+           "n": "Step heading",
+           "id": "203:12003",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[40px] shrink-0",
+             "n": "Status / 02",
+             "id": "203:12004",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#fff] w-[20px] shrink-0",
+               "id": "203:12005",
+               "k": [
+                "02"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] flex-1 min-w-0",
+             "id": "203:12006",
+             "k": [
+              "Plan the next visit"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-full",
+           "n": "Illustrated product state / calendar",
+           "id": "203:12007",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[21px] text-[color:#0f1530] w-full",
+             "id": "203:12008",
+             "k": [
+              "November 2026"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex font-medium gap-[4px] items-start leading-[1.38] relative text-[12px] text-[color:#2a3360] text-center w-full",
+             "n": "Weekday labels",
+             "id": "203:12009",
+             "k": [
+              {
+               "t": "p",
+               "c": "relative w-[42px] shrink-0",
+               "id": "203:12010",
+               "k": [
+                "M"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "relative w-[42px] shrink-0",
+               "id": "203:12011",
+               "k": [
+                "T"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "relative w-[42px] shrink-0",
+               "id": "203:12012",
+               "k": [
+                "W"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "relative w-[42px] shrink-0",
+               "id": "203:12013",
+               "k": [
+                "T"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "relative w-[42px] shrink-0",
+               "id": "203:12014",
+               "k": [
+                "F"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "relative w-[42px] shrink-0",
+               "id": "203:12015",
+               "k": [
+                "S"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "relative w-[42px] shrink-0",
+               "id": "203:12016",
+               "k": [
+                "S"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[4px] items-start relative w-full",
+             "n": "Available dates",
+             "id": "203:12017",
+             "k": [
+              {
+               "t": "div",
+               "c": "bg-[#fff] flex items-center justify-center relative rounded-[12px] size-[42px]",
+               "n": "Date 9",
+               "id": "203:12018",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[15px] text-[color:#0f1530] text-center w-[40px] shrink-0",
+                 "id": "203:12019",
+                 "k": [
+                  "9"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] flex items-center justify-center relative rounded-[12px] size-[42px]",
+               "n": "Date 10",
+               "id": "203:12020",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[15px] text-[color:#0f1530] text-center w-[40px] shrink-0",
+                 "id": "203:12021",
+                 "k": [
+                  "10"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] flex items-center justify-center relative rounded-[12px] size-[42px]",
+               "n": "Date 11",
+               "id": "203:12022",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[15px] text-[color:#0f1530] text-center w-[40px] shrink-0",
+                 "id": "203:12023",
+                 "k": [
+                  "11"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#0f1530] flex items-center justify-center relative rounded-[12px] size-[42px]",
+               "n": "Date 12",
+               "id": "203:12024",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[15px] text-[color:#fff] text-center w-[40px] shrink-0",
+                 "id": "203:12025",
+                 "k": [
+                  "12"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] flex items-center justify-center relative rounded-[12px] size-[42px]",
+               "n": "Date 13",
+               "id": "203:12026",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[15px] text-[color:#0f1530] text-center w-[40px] shrink-0",
+                 "id": "203:12027",
+                 "k": [
+                  "13"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] flex items-center justify-center relative rounded-[12px] size-[42px]",
+               "n": "Date 14",
+               "id": "203:12028",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[15px] text-[color:#0f1530] text-center w-[40px] shrink-0",
+                 "id": "203:12029",
+                 "k": [
+                  "14"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] flex items-center justify-center relative rounded-[12px] size-[42px]",
+               "n": "Date 15",
+               "id": "203:12030",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[15px] text-[color:#0f1530] text-center w-[40px] shrink-0",
+                 "id": "203:12031",
+                 "k": [
+                  "15"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#2a3360] w-full",
+             "id": "203:12032",
+             "k": [
+              "Fall heating tune-up"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[10px] items-start relative w-full",
+             "n": "Time choices",
+             "id": "203:12033",
+             "k": [
+              {
+               "t": "div",
+               "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[154px] shrink-0",
+               "n": "Status / 10:00–12:00",
+               "id": "203:12034",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[134px] shrink-0",
+                 "id": "203:12035",
+                 "k": [
+                  "10:00–12:00"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[154px] shrink-0",
+               "n": "Status / 14:00–16:00",
+               "id": "203:12036",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[134px] shrink-0",
+                 "id": "203:12037",
+                 "k": [
+                  "14:00–16:00"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+             "n": "UI action / Choose this time",
+             "id": "203:12038",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+               "id": "203:12039",
+               "k": [
+                "Choose this time"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[var(--radius\\\\/16,16px)] flex-1 min-w-0",
+         "n": "Feature workflow / See renewals coming",
+         "id": "203:12058",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[12px] items-start relative w-full",
+           "n": "Step heading",
+           "id": "203:12042",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[40px] shrink-0",
+             "n": "Status / 03",
+             "id": "203:12043",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#fff] w-[20px] shrink-0",
+               "id": "203:12044",
+               "k": [
+                "03"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] flex-1 min-w-0",
+             "id": "203:12045",
+             "k": [
+              "See renewals coming"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-full",
+           "n": "Illustrated product state / renewal",
+           "id": "203:12046",
+           "k": [
+            {
+             "t": "div",
+             "c": "flex gap-[10px] items-start relative w-full",
+             "n": "Email header",
+             "id": "203:12047",
+             "k": [
+              {
+               "t": "div",
+               "c": "relative size-[24px]",
+               "n": "Icon / mail",
+               "id": "203:12048",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-mail-672ee2a1.svg"
+                }
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] flex-1 min-w-0",
+               "id": "203:12051",
+               "k": [
+                "Email draft"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "font-semibold relative text-[24px] text-[color:#0f1530] w-full",
+             "id": "203:12052",
+             "k": [
+              {
+               "t": "p",
+               "c": "leading-[1.38] mb-0",
+               "k": [
+                "Your agreement"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "leading-[1.38]",
+               "k": [
+                "renews April 18."
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] w-full",
+             "id": "203:12053",
+             "k": [
+              "To: Jordan Lee"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[180px] shrink-0",
+             "n": "Status / Agreement #301",
+             "id": "203:12054",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[160px] shrink-0",
+               "id": "203:12055",
+               "k": [
+                "Agreement #301"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+             "n": "UI action / Review renewal email",
+             "id": "203:12056",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+               "id": "203:12057",
+               "k": [
+                "Review renewal email"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ],
+     "anchor": "workflow"
+    },
+    {
+     "t": "div",
+     "c": "bg-[#0f1530] flex flex-col gap-[16px] items-start px-[80px] py-[48px] relative w-full",
+     "n": "03 / Connected workflow and demo",
+     "id": "203:12059",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#f6b400] tracking-[1.1px] w-full",
+       "id": "219:10438",
+       "k": [
+        "WORKS ACROSS YOUR BUSINESS"
+       ]
+      },
+      {
+       "t": "p",
+       "c": "font-semibold leading-[1.08] relative text-[36px] text-[color:#fff] tracking-[-0.9px] w-full",
+       "id": "219:10439",
+       "k": [
+        "One job. Connected all the way."
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex gap-[16px] items-center relative w-full",
+       "n": "Flagship and tool handoff",
+       "id": "219:10440",
+       "k": [
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] flex-1 min-w-0",
+         "n": "Connected feature / Customer history / Desktop",
+         "id": "219:10451",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:10442",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Command Center",
+             "id": "219:10443",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:10444",
+               "k": [
+                "Command Center"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[222px] shrink-0",
+             "id": "219:10445",
+             "k": [
+              "Job #1042 · Jordan Lee"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:10446",
+           "k": [
+            "Customer history"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:10447",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:10448",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:10450",
+             "k": [
+              "Service record connected"
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex h-[24px] items-center justify-center relative w-[32px] shrink-0",
+         "n": "Next connected state",
+         "id": "219:10452",
+         "k": [
+          {
+           "t": "div",
+           "c": "relative size-[24px]",
+           "n": "Icon / arrow",
+           "id": "219:10453",
+           "k": [
+            {
+             "t": "img",
+             "c": "absolute block inset-0 size-full",
+             "src": "/marketing/flagship/icon-arrow-84befcc1.svg"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] flex-1 min-w-0",
+         "n": "Connected feature / Service agreements / Desktop",
+         "id": "219:10465",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:10456",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Retention",
+             "id": "219:10457",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:10458",
+               "k": [
+                "Retention"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[222px] shrink-0",
+             "id": "219:10459",
+             "k": [
+              "Job #1042 · Jordan Lee"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:10460",
+           "k": [
+            "Service agreements"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:10461",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:10462",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:10464",
+             "k": [
+              "Covered visit due"
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex h-[24px] items-center justify-center relative w-[32px] shrink-0",
+         "n": "Next connected state",
+         "id": "219:10466",
+         "k": [
+          {
+           "t": "div",
+           "c": "relative size-[24px]",
+           "n": "Icon / arrow",
+           "id": "219:10467",
+           "k": [
+            {
+             "t": "img",
+             "c": "absolute block inset-0 size-full",
+             "src": "/marketing/flagship/icon-arrow-84befcc1.svg"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] flex-1 min-w-0",
+         "n": "Connected feature / Scheduling & dispatch / Desktop",
+         "id": "219:10479",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:10470",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Operations",
+             "id": "219:10471",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:10472",
+               "k": [
+                "Operations"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[222px] shrink-0",
+             "id": "219:10473",
+             "k": [
+              "Job #1042 · Jordan Lee"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:10474",
+           "k": [
+            "Scheduling & dispatch"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:10475",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:10476",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:10478",
+             "k": [
+              "Next visit requested"
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "t": "button",
+       "label": "Get a free demo",
+       "kind": "Accent",
+       "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#0f1530]",
+       "href": "/demo"
+      }
+     ]
+    }
+   ]
+  },
+  "mobile": {
+   "t": "div",
+   "c": "bg-[#fbf6ef] flex flex-col items-start relative",
+   "n": "Service Agreements / Mobile",
+   "id": "175:3012",
+   "k": [
+    {
+     "t": "div",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[32px] items-start p-[24px] relative w-full",
+     "n": "01 / Product in view",
+     "id": "203:12075",
+     "k": [
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[32px] items-start relative w-full",
+       "n": "Outcome and product",
+       "id": "203:12076",
+       "k": [
+        {
+         "t": "div",
+         "c": "flex flex-col gap-[20px] items-start relative w-full",
+         "n": "Short outcome copy",
+         "id": "203:12077",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "203:12078",
+           "k": [
+            "SERVICE AGREEMENTS"
+           ]
+          },
+          {
+           "t": "h1",
+           "c": "font-semibold leading-[1.08] relative text-[40px] text-[color:#0f1530] tracking-[-1px] w-full",
+           "id": "203:12079",
+           "k": [
+            "Turn today’s visit into a relationship."
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-full",
+           "id": "203:12080",
+           "k": [
+            "Keep covered visits, agreement terms, and upcoming renewals together."
+           ]
+          },
+          {
+           "t": "button",
+           "label": "See an agreement",
+           "kind": "Dark",
+           "c": "bg-[#0f1530] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#fbf6ef]",
+           "href": "#workflow-m"
+          },
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "203:12083",
+           "k": [
+            "EXAMPLE BUSINESS · JUNIPER"
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#f6f7f9] border-[0.475px] border-[#e6dccb] border-solid flex flex-col h-[220.875px] items-start overflow-clip relative rounded-[7.6px] w-full",
+         "n": "Product demonstration / Service Agreements",
+         "id": "203:12084",
+         "k": [
+          {
+           "t": "div",
+           "c": "bg-[#0f1530] flex gap-[7.6px] h-[25.65px] items-center p-[7.6px] relative w-full",
+           "n": "Product chrome",
+           "id": "I203:12084;200:278",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-bold leading-[1.38] relative text-[8.07px] text-[color:#fff] w-[66.5px] shrink-0",
+             "id": "I203:12084;200:279",
+             "k": [
+              "Renvani"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-medium leading-[1.38] relative text-[5.7px] text-[color:#fff] w-[196.65px] shrink-0",
+             "id": "I203:12084;200:280",
+             "k": [
+              "Service agreements"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#f6b400] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[48.45px] shrink-0",
+             "n": "Status / EXAMPLE",
+             "id": "I203:12084;200:281",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#0f1530] w-[38.95px] shrink-0",
+               "id": "I203:12084;200:282",
+               "k": [
+                "EXAMPLE"
+               ]
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[7.6px] items-start p-[11.4px] relative w-full",
+           "n": "Product workspace",
+           "id": "I203:12084;200:283",
+           "k": [
+            {
+             "t": "div",
+             "c": "flex gap-[7.6px] items-start relative w-full",
+             "n": "Screen title",
+             "id": "I203:12084;200:284",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-semibold leading-[1.38] relative text-[10.92px] text-[color:#0f1530] w-[218.5px] shrink-0",
+               "id": "I203:12084;200:285",
+               "k": [
+                "Service agreements"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[85.5px] shrink-0",
+               "n": "Status / Your business",
+               "id": "I203:12084;200:286",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#2a3360] w-[76px] shrink-0",
+                 "id": "I203:12084;200:287",
+                 "k": [
+                  "Your business"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[9.5px] items-start relative w-full",
+             "n": "Agreement and future visit",
+             "id": "I203:12084;200:288",
+             "k": [
+              {
+               "t": "div",
+               "c": "bg-[#fff] border-[0.475px] border-[#e6dccb] border-solid flex flex-col gap-[6.65px] items-start p-[9.5px] relative rounded-[7.6px] w-[156.75px] shrink-0",
+               "n": "Maintenance plan",
+               "id": "I203:12084;200:289",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[5.22px] text-[color:#2a3360] tracking-[0.522px] w-full",
+                 "id": "I203:12084;200:290",
+                 "k": [
+                  "JUNIPER MEMBERSHIP"
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "font-semibold relative text-[13.77px] text-[color:#0f1530] w-full",
+                 "id": "I203:12084;200:291",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "leading-[1.38] mb-0",
+                   "k": [
+                    "Home Comfort"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "leading-[1.38]",
+                   "k": [
+                    "Plan"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[4.75px] items-start relative w-full",
+                 "n": "2 tune-ups each year",
+                 "id": "I203:12084;200:292",
+                 "k": [
+                  {
+                   "t": "div",
+                   "c": "relative size-[9.025px]",
+                   "n": "Icon / check",
+                   "id": "I203:12084;200:293",
+                   "k": [
+                    {
+                     "t": "img",
+                     "c": "absolute block inset-0 size-full",
+                     "src": "/marketing/flagship/icon-check1-ee9efdc9.svg"
+                    }
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-normal leading-[1.38] relative text-[5.7px] text-[color:#0f1530] w-[123.5px] shrink-0",
+                   "id": "I203:12084;200:295",
+                   "k": [
+                    "2 tune-ups each year"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[4.75px] items-start relative w-full",
+                 "n": "Heating + cooling covered",
+                 "id": "I203:12084;200:296",
+                 "k": [
+                  {
+                   "t": "div",
+                   "c": "relative size-[9.025px]",
+                   "n": "Icon / check",
+                   "id": "I203:12084;200:297",
+                   "k": [
+                    {
+                     "t": "img",
+                     "c": "absolute block inset-0 size-full",
+                     "src": "/marketing/flagship/icon-check1-ee9efdc9.svg"
+                    }
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-normal leading-[1.38] relative text-[5.7px] text-[color:#0f1530] w-[123.5px] shrink-0",
+                   "id": "I203:12084;200:299",
+                   "k": [
+                    "Heating + cooling covered"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[4.75px] items-start relative w-full",
+                 "n": "Member repair discount",
+                 "id": "I203:12084;200:300",
+                 "k": [
+                  {
+                   "t": "div",
+                   "c": "relative size-[9.025px]",
+                   "n": "Icon / check",
+                   "id": "I203:12084;200:301",
+                   "k": [
+                    {
+                     "t": "img",
+                     "c": "absolute block inset-0 size-full",
+                     "src": "/marketing/flagship/icon-check1-ee9efdc9.svg"
+                    }
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-normal leading-[1.38] relative text-[5.7px] text-[color:#0f1530] w-[123.5px] shrink-0",
+                   "id": "I203:12084;200:303",
+                   "k": [
+                    "Member repair discount"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#e4f1e8] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[90.25px] shrink-0",
+                 "n": "Status / ACTIVE AGREEMENT",
+                 "id": "I203:12084;200:304",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#0f1530] w-[80.75px] shrink-0",
+                   "id": "I203:12084;200:305",
+                   "k": [
+                    "ACTIVE AGREEMENT"
+                   ]
+                  }
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border-[0.475px] border-[#e6dccb] border-solid flex flex-col gap-[6.65px] items-start p-[9.5px] relative rounded-[7.6px] w-[152.95px] shrink-0",
+               "n": "Next service",
+               "id": "I203:12084;200:306",
+               "k": [
+                {
+                 "t": "div",
+                 "c": "relative size-[14.25px]",
+                 "n": "Icon / calendar",
+                 "id": "I203:12084;200:307",
+                 "k": [
+                  {
+                   "t": "img",
+                   "c": "absolute block inset-0 size-full",
+                   "src": "/marketing/flagship/icon-calendar-17e8aab7.svg"
+                  }
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-semibold leading-[1.38] relative text-[10.45px] text-[color:#0f1530] w-full",
+                 "id": "I203:12084;200:310",
+                 "k": [
+                  "Your next visit"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal leading-[1.38] relative text-[6.65px] text-[color:#0f1530] w-full",
+                 "id": "I203:12084;200:311",
+                 "k": [
+                  "Fall heating tune-up"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[5.7px] text-[color:#2a3360] w-full",
+                 "id": "I203:12084;200:312",
+                 "k": [
+                  "NOV"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-bold leading-[1.08] relative text-[30.4px] text-[color:#0f1530] tracking-[-0.76px] w-full",
+                 "id": "I203:12084;200:313",
+                 "k": [
+                  "12"
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#0f1530] flex h-[18.05px] items-center justify-center px-[6.65px] relative rounded-[5.7px] w-[133.95px] shrink-0",
+                 "n": "UI action / Review reminder email",
+                 "id": "I203:12084;200:314",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[5.7px] text-[color:#fff] text-center w-[120.65px] shrink-0",
+                   "id": "I203:12084;200:315",
+                   "k": [
+                    "Review reminder email"
+                   ]
+                  }
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#fff] flex flex-col gap-[32px] items-start p-[24px] relative w-full",
+     "n": "02 / A workflow you can see",
+     "id": "203:12123",
+     "k": [
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[12px] items-start leading-[1.38] relative w-full",
+       "n": "Workflow heading",
+       "id": "203:12124",
+       "k": [
+        {
+         "t": "p",
+         "c": "font-medium relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+         "id": "203:12125",
+         "k": [
+          "EXAMPLE WORKFLOW"
+         ]
+        },
+        {
+         "t": "p",
+         "c": "font-semibold relative text-[32px] text-[color:#0f1530] w-full",
+         "id": "203:12126",
+         "k": [
+          "See the work happen."
+         ]
+        }
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[24px] items-start relative w-full",
+       "n": "Three product moments",
+       "id": "203:12127",
+       "k": [
+        {
+         "t": "div",
+         "c": "bg-[#fff] border-[0.855px] border-[#e6dccb] border-solid flex flex-col gap-[15.39px] h-[444.6px] items-start p-[18.81px] relative rounded-[13.68px] w-full",
+         "n": "Workflow moment / Define the coverage",
+         "id": "203:12128",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10.26px] items-start relative w-full",
+           "n": "Step heading",
+           "id": "I203:12128;203:11981",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[34.2px] shrink-0",
+             "n": "Status / 01",
+             "id": "I203:12128;203:11982",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#fff] w-[17.1px] shrink-0",
+               "id": "I203:12128;203:11983",
+               "k": [
+                "01"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[15.39px] text-[color:#0f1530] flex-1 min-w-0",
+             "id": "I203:12128;203:11984",
+             "k": [
+              "Define the coverage"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[11.97px] h-[342px] items-start p-[15.39px] relative rounded-[10.26px] w-full",
+           "n": "Illustrated product state / coverage",
+           "id": "I203:12128;203:11985",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[18.81px] text-[color:#0f1530] w-full",
+             "id": "I203:12128;203:11986",
+             "k": [
+              "Home Comfort Agreement"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex gap-[8.55px] h-[46.17px] items-start p-[10.26px] relative rounded-[10.26px] w-full",
+             "n": "Heating tune-up",
+             "id": "I203:12128;203:11987",
+             "k": [
+              {
+               "t": "div",
+               "c": "relative size-[18.81px]",
+               "n": "Icon / check",
+               "id": "I203:12128;203:11988",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-check2-514b67c3.svg"
+                }
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[11.97px] text-[color:#0f1530] w-[224.01px] shrink-0",
+               "id": "I203:12128;203:11990",
+               "k": [
+                "Heating tune-up"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex gap-[8.55px] h-[46.17px] items-start p-[10.26px] relative rounded-[10.26px] w-full",
+             "n": "Cooling tune-up",
+             "id": "I203:12128;203:11991",
+             "k": [
+              {
+               "t": "div",
+               "c": "relative size-[18.81px]",
+               "n": "Icon / check",
+               "id": "I203:12128;203:11992",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-check2-514b67c3.svg"
+                }
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[11.97px] text-[color:#0f1530] w-[224.01px] shrink-0",
+               "id": "I203:12128;203:11994",
+               "k": [
+                "Cooling tune-up"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex gap-[8.55px] h-[46.17px] items-start p-[10.26px] relative rounded-[10.26px] w-full",
+             "n": "12-month agreement",
+             "id": "I203:12128;203:11995",
+             "k": [
+              {
+               "t": "div",
+               "c": "relative size-[18.81px]",
+               "n": "Icon / check",
+               "id": "I203:12128;203:11996",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-check2-514b67c3.svg"
+                }
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[11.97px] text-[color:#0f1530] w-[224.01px] shrink-0",
+               "id": "I203:12128;203:11998",
+               "k": [
+                "12-month agreement"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff4d6] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[188.1px] shrink-0",
+             "n": "Status / Coverage defined",
+             "id": "I203:12128;203:11999",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#0f1530] w-[171px] shrink-0",
+               "id": "I203:12128;203:12000",
+               "k": [
+                "Coverage defined"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] border-[0.855px] border-[#e6dccb] border-solid flex flex-col gap-[15.39px] h-[444.6px] items-start p-[18.81px] relative rounded-[13.68px] w-full",
+         "n": "Workflow moment / Plan the next visit",
+         "id": "203:12149",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10.26px] items-start relative w-full",
+           "n": "Step heading",
+           "id": "I203:12149;203:12003",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[34.2px] shrink-0",
+             "n": "Status / 02",
+             "id": "I203:12149;203:12004",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#fff] w-[17.1px] shrink-0",
+               "id": "I203:12149;203:12005",
+               "k": [
+                "02"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[15.39px] text-[color:#0f1530] flex-1 min-w-0",
+             "id": "I203:12149;203:12006",
+             "k": [
+              "Plan the next visit"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[11.97px] h-[342px] items-start p-[15.39px] relative rounded-[10.26px] w-full",
+           "n": "Illustrated product state / calendar",
+           "id": "I203:12149;203:12007",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[17.95px] text-[color:#0f1530] w-full",
+             "id": "I203:12149;203:12008",
+             "k": [
+              "November 2026"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex font-medium gap-[3.42px] items-start leading-[1.38] relative text-[10.26px] text-[color:#2a3360] text-center w-full",
+             "n": "Weekday labels",
+             "id": "I203:12149;203:12009",
+             "k": [
+              {
+               "t": "p",
+               "c": "relative w-[35.91px] shrink-0",
+               "id": "I203:12149;203:12010",
+               "k": [
+                "M"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "relative w-[35.91px] shrink-0",
+               "id": "I203:12149;203:12011",
+               "k": [
+                "T"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "relative w-[35.91px] shrink-0",
+               "id": "I203:12149;203:12012",
+               "k": [
+                "W"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "relative w-[35.91px] shrink-0",
+               "id": "I203:12149;203:12013",
+               "k": [
+                "T"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "relative w-[35.91px] shrink-0",
+               "id": "I203:12149;203:12014",
+               "k": [
+                "F"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "relative w-[35.91px] shrink-0",
+               "id": "I203:12149;203:12015",
+               "k": [
+                "S"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "relative w-[35.91px] shrink-0",
+               "id": "I203:12149;203:12016",
+               "k": [
+                "S"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[3.42px] items-start relative w-full",
+             "n": "Available dates",
+             "id": "I203:12149;203:12017",
+             "k": [
+              {
+               "t": "div",
+               "c": "bg-[#fff] flex items-center justify-center relative rounded-[10.26px] size-[35.91px]",
+               "n": "Date 9",
+               "id": "I203:12149;203:12018",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[12.82px] text-[color:#0f1530] text-center w-[34.2px] shrink-0",
+                 "id": "I203:12149;203:12019",
+                 "k": [
+                  "9"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] flex items-center justify-center relative rounded-[10.26px] size-[35.91px]",
+               "n": "Date 10",
+               "id": "I203:12149;203:12020",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[12.82px] text-[color:#0f1530] text-center w-[34.2px] shrink-0",
+                 "id": "I203:12149;203:12021",
+                 "k": [
+                  "10"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] flex items-center justify-center relative rounded-[10.26px] size-[35.91px]",
+               "n": "Date 11",
+               "id": "I203:12149;203:12022",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[12.82px] text-[color:#0f1530] text-center w-[34.2px] shrink-0",
+                 "id": "I203:12149;203:12023",
+                 "k": [
+                  "11"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#0f1530] flex items-center justify-center relative rounded-[10.26px] size-[35.91px]",
+               "n": "Date 12",
+               "id": "I203:12149;203:12024",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[12.82px] text-[color:#fff] text-center w-[34.2px] shrink-0",
+                 "id": "I203:12149;203:12025",
+                 "k": [
+                  "12"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] flex items-center justify-center relative rounded-[10.26px] size-[35.91px]",
+               "n": "Date 13",
+               "id": "I203:12149;203:12026",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[12.82px] text-[color:#0f1530] text-center w-[34.2px] shrink-0",
+                 "id": "I203:12149;203:12027",
+                 "k": [
+                  "13"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] flex items-center justify-center relative rounded-[10.26px] size-[35.91px]",
+               "n": "Date 14",
+               "id": "I203:12149;203:12028",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[12.82px] text-[color:#0f1530] text-center w-[34.2px] shrink-0",
+                 "id": "I203:12149;203:12029",
+                 "k": [
+                  "14"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] flex items-center justify-center relative rounded-[10.26px] size-[35.91px]",
+               "n": "Date 15",
+               "id": "I203:12149;203:12030",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[12.82px] text-[color:#0f1530] text-center w-[34.2px] shrink-0",
+                 "id": "I203:12149;203:12031",
+                 "k": [
+                  "15"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[11.97px] text-[color:#2a3360] w-full",
+             "id": "I203:12149;203:12032",
+             "k": [
+              "Fall heating tune-up"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[8.55px] items-start relative w-full",
+             "n": "Time choices",
+             "id": "I203:12149;203:12033",
+             "k": [
+              {
+               "t": "div",
+               "c": "bg-[#fff4d6] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[131.67px] shrink-0",
+               "n": "Status / 10:00–12:00",
+               "id": "I203:12149;203:12034",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#0f1530] w-[114.57px] shrink-0",
+                 "id": "I203:12149;203:12035",
+                 "k": [
+                  "10:00–12:00"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[131.67px] shrink-0",
+               "n": "Status / 14:00–16:00",
+               "id": "I203:12149;203:12036",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#0f1530] w-[114.57px] shrink-0",
+                 "id": "I203:12149;203:12037",
+                 "k": [
+                  "14:00–16:00"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[32.49px] items-center justify-center px-[11.97px] relative rounded-[10.26px] w-full",
+             "n": "UI action / Choose this time",
+             "id": "I203:12149;203:12038",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10.26px] text-[color:#fff] text-center flex-1 min-w-0",
+               "id": "I203:12149;203:12039",
+               "k": [
+                "Choose this time"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] border-[0.855px] border-[#e6dccb] border-solid flex flex-col gap-[15.39px] h-[444.6px] items-start p-[18.81px] relative rounded-[13.68px] w-full",
+         "n": "Workflow moment / See renewals coming",
+         "id": "203:12187",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10.26px] items-start relative w-full",
+           "n": "Step heading",
+           "id": "I203:12187;203:12042",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[34.2px] shrink-0",
+             "n": "Status / 03",
+             "id": "I203:12187;203:12043",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#fff] w-[17.1px] shrink-0",
+               "id": "I203:12187;203:12044",
+               "k": [
+                "03"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[15.39px] text-[color:#0f1530] flex-1 min-w-0",
+             "id": "I203:12187;203:12045",
+             "k": [
+              "See renewals coming"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[11.97px] h-[342px] items-start p-[15.39px] relative rounded-[10.26px] w-full",
+           "n": "Illustrated product state / renewal",
+           "id": "I203:12187;203:12046",
+           "k": [
+            {
+             "t": "div",
+             "c": "flex gap-[8.55px] items-start relative w-full",
+             "n": "Email header",
+             "id": "I203:12187;203:12047",
+             "k": [
+              {
+               "t": "div",
+               "c": "relative size-[20.52px]",
+               "n": "Icon / mail",
+               "id": "I203:12187;203:12048",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-mail-52129061.svg"
+                }
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-normal leading-[1.38] relative text-[11.11px] text-[color:#2a3360] flex-1 min-w-0",
+               "id": "I203:12187;203:12051",
+               "k": [
+                "Email draft"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "font-semibold relative text-[20.52px] text-[color:#0f1530] w-full",
+             "id": "I203:12187;203:12052",
+             "k": [
+              {
+               "t": "p",
+               "c": "leading-[1.38] mb-0",
+               "k": [
+                "Your agreement"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "leading-[1.38]",
+               "k": [
+                "renews April 18."
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[11.11px] text-[color:#2a3360] w-full",
+             "id": "I203:12187;203:12053",
+             "k": [
+              "To: Jordan Lee"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[153.9px] shrink-0",
+             "n": "Status / Agreement #301",
+             "id": "I203:12187;203:12054",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#0f1530] w-[136.8px] shrink-0",
+               "id": "I203:12187;203:12055",
+               "k": [
+                "Agreement #301"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[32.49px] items-center justify-center px-[11.97px] relative rounded-[10.26px] w-full",
+             "n": "UI action / Review renewal email",
+             "id": "I203:12187;203:12056",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10.26px] text-[color:#fff] text-center flex-1 min-w-0",
+               "id": "I203:12187;203:12057",
+               "k": [
+                "Review renewal email"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ],
+     "anchor": "workflow-m"
+    },
+    {
+     "t": "div",
+     "c": "bg-[#0f1530] flex flex-col gap-[16px] items-start p-[24px] relative w-full",
+     "n": "03 / Connected workflow and demo",
+     "id": "203:12204",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#f6b400] tracking-[1.1px] w-full",
+       "id": "219:10480",
+       "k": [
+        "WORKS ACROSS YOUR BUSINESS"
+       ]
+      },
+      {
+       "t": "p",
+       "c": "font-semibold leading-[1.38] relative text-[28px] text-[color:#fff] w-full",
+       "id": "219:10481",
+       "k": [
+        "One job. Connected all the way."
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[12px] items-center relative w-full",
+       "n": "Flagship and tool handoff",
+       "id": "219:10482",
+       "k": [
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] w-full",
+         "n": "Connected feature / Customer history / Mobile",
+         "id": "219:10493",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:10484",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Command Center",
+             "id": "219:10485",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:10486",
+               "k": [
+                "Command Center"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[180px] shrink-0",
+             "id": "219:10487",
+             "k": [
+              "Job #1042 · Jordan Lee"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:10488",
+           "k": [
+            "Customer history"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:10489",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:10490",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:10492",
+             "k": [
+              "Service record connected"
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex flex-col h-[24px] items-center justify-center relative w-full",
+         "n": "Next connected state",
+         "id": "219:10494",
+         "k": [
+          {
+           "t": "div",
+           "c": "relative size-[24px]",
+           "n": "Frame",
+           "id": "219:10495",
+           "k": [
+            {
+             "t": "img",
+             "c": "absolute block inset-0 size-full",
+             "src": "/marketing/flagship/frame-08fa5d7a.svg"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] w-full",
+         "n": "Connected feature / Service agreements / Mobile",
+         "id": "219:10507",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:10498",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Retention",
+             "id": "219:10499",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:10500",
+               "k": [
+                "Retention"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[180px] shrink-0",
+             "id": "219:10501",
+             "k": [
+              "Job #1042 · Jordan Lee"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:10502",
+           "k": [
+            "Service agreements"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:10503",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:10504",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:10506",
+             "k": [
+              "Covered visit due"
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex flex-col h-[24px] items-center justify-center relative w-full",
+         "n": "Next connected state",
+         "id": "219:10508",
+         "k": [
+          {
+           "t": "div",
+           "c": "relative size-[24px]",
+           "n": "Frame",
+           "id": "219:10509",
+           "k": [
+            {
+             "t": "img",
+             "c": "absolute block inset-0 size-full",
+             "src": "/marketing/flagship/frame-08fa5d7a.svg"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] w-full",
+         "n": "Connected feature / Scheduling & dispatch / Mobile",
+         "id": "219:10521",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:10512",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Operations",
+             "id": "219:10513",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:10514",
+               "k": [
+                "Operations"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[180px] shrink-0",
+             "id": "219:10515",
+             "k": [
+              "Job #1042 · Jordan Lee"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:10516",
+           "k": [
+            "Scheduling & dispatch"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:10517",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:10518",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:10520",
+             "k": [
+              "Next visit requested"
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "t": "button",
+       "label": "Get a free demo",
+       "kind": "Accent",
+       "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#0f1530]",
+       "href": "/demo"
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "ai-revenue-intelligence": {
+  "desktop": {
+   "t": "div",
+   "c": "bg-[#fbf6ef] flex flex-col items-start relative",
+   "n": "AI Revenue Intelligence / Desktop",
+   "id": "175:3152",
+   "k": [
+    {
+     "t": "div",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[32px] items-start p-[80px] relative w-full",
+     "n": "01 / Product in view",
+     "id": "203:12729",
+     "k": [
+      {
+       "t": "div",
+       "c": "flex gap-[48px] items-center relative w-full",
+       "n": "Outcome and product",
+       "id": "203:12730",
+       "k": [
+        {
+         "t": "div",
+         "c": "flex flex-col gap-[20px] items-start relative flex-1 min-w-0",
+         "n": "Short outcome copy",
+         "id": "203:12731",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "203:12732",
+           "k": [
+            "AI REVENUE INTELLIGENCE"
+           ]
+          },
+          {
+           "t": "h1",
+           "c": "font-semibold leading-[1.08] relative text-[60px] text-[color:#0f1530] tracking-[-1.5px] w-full",
+           "id": "203:12733",
+           "k": [
+            "See the next opportunity in your records."
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-full",
+           "id": "203:12734",
+           "k": [
+            "Review open opportunities and choose the next action using your own records."
+           ]
+          },
+          {
+           "t": "button",
+           "label": "Explore the view",
+           "kind": "Dark",
+           "c": "bg-[#0f1530] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#fbf6ef]",
+           "href": "#workflow"
+          },
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "203:12737",
+           "k": [
+            "EXAMPLE BUSINESS · JUNIPER"
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#f6f7f9] border-[1.044px] border-[#e6dccb] border-solid flex flex-col h-[444.933px] items-start overflow-clip relative rounded-[16.711px] flex-1 min-w-0",
+         "n": "Product demonstration / AI Revenue Intelligence",
+         "id": "203:12738",
+         "k": [
+          {
+           "t": "div",
+           "c": "bg-[#0f1530] flex gap-[16.711px] h-[56.4px] items-center p-[16.711px] relative w-full",
+           "n": "Product chrome",
+           "id": "I203:12738;200:353",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-bold leading-[1.38] relative text-[17.76px] text-[color:#fff] w-[146.222px] shrink-0",
+             "id": "I203:12738;200:354",
+             "k": [
+              "Renvani"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-medium leading-[1.38] relative text-[12.53px] text-[color:#fff] flex-1 min-w-0",
+             "id": "I203:12738;200:355",
+             "k": [
+              "Revenue opportunities"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#f6b400] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[106.533px] shrink-0",
+             "n": "Status / EXAMPLE",
+             "id": "I203:12738;200:356",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10.44px] text-[color:#0f1530] w-[85.644px] shrink-0",
+               "id": "I203:12738;200:357",
+               "k": [
+                "EXAMPLE"
+               ]
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[16.711px] items-start p-[25.067px] relative w-full",
+           "n": "Product workspace",
+           "id": "I203:12738;200:358",
+           "k": [
+            {
+             "t": "div",
+             "c": "flex gap-[16.711px] items-start relative w-full",
+             "n": "Screen title",
+             "id": "I203:12738;200:359",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-semibold leading-[1.38] relative text-[24.02px] text-[color:#0f1530] flex-1 min-w-0",
+               "id": "I203:12738;200:360",
+               "k": [
+                "Revenue opportunities"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[188px] shrink-0",
+               "n": "Status / Your business",
+               "id": "I203:12738;200:361",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10.44px] text-[color:#2a3360] w-[167.111px] shrink-0",
+                 "id": "I203:12738;200:362",
+                 "k": [
+                  "Your business"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[12.533px] items-start relative w-full",
+             "n": "Today summary",
+             "id": "I203:12738;200:363",
+             "k": [
+              {
+               "t": "div",
+               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] w-[225.6px] shrink-0",
+               "n": "Booked jobs",
+               "id": "I203:12738;200:364",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-bold leading-[1.08] relative text-[35.51px] text-[color:#0f1530] w-full",
+                 "id": "I203:12738;200:365",
+                 "k": [
+                  "8"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal leading-[1.38] relative text-[11.49px] text-[color:#2a3360] w-full",
+                 "id": "I203:12738;200:366",
+                 "k": [
+                  "Booked jobs"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] w-[225.6px] shrink-0",
+               "n": "In progress",
+               "id": "I203:12738;200:367",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-bold leading-[1.08] relative text-[35.51px] text-[color:#0f1530] w-full",
+                 "id": "I203:12738;200:368",
+                 "k": [
+                  "3"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal leading-[1.38] relative text-[11.49px] text-[color:#2a3360] w-full",
+                 "id": "I203:12738;200:369",
+                 "k": [
+                  "In progress"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] w-[225.6px] shrink-0",
+               "n": "Need your review",
+               "id": "I203:12738;200:370",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-bold leading-[1.08] relative text-[35.51px] text-[color:#0f1530] w-full",
+                 "id": "I203:12738;200:371",
+                 "k": [
+                  "2"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal leading-[1.38] relative text-[11.49px] text-[color:#2a3360] w-full",
+                 "id": "I203:12738;200:372",
+                 "k": [
+                  "Need your review"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] w-full",
+             "n": "Decision with evidence",
+             "id": "I203:12738;200:373",
+             "k": [
+              {
+               "t": "div",
+               "c": "flex gap-[16.711px] items-start relative w-full",
+               "n": "Action header",
+               "id": "I203:12738;200:374",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-semibold leading-[1.38] relative text-[18.8px] text-[color:#0f1530] flex-1 min-w-0",
+                 "id": "I203:12738;200:375",
+                 "k": [
+                  "Open estimate worth a follow-up"
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#fff4d6] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[125.333px] shrink-0",
+                 "n": "Status / REVIEW",
+                 "id": "I203:12738;200:376",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[10.44px] text-[color:#0f1530] w-[104.444px] shrink-0",
+                   "id": "I203:12738;200:377",
+                   "k": [
+                    "REVIEW"
+                   ]
+                  }
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-normal leading-[1.38] relative text-[12.53px] text-[color:#2a3360] w-full",
+               "id": "I203:12738;200:378",
+               "k": [
+                "Estimate #2048 · Sent 4 days ago · No reply recorded"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "flex gap-[12.533px] items-start relative w-full",
+               "n": "Owner actions",
+               "id": "I203:12738;200:379",
+               "k": [
+                {
+                 "t": "div",
+                 "c": "bg-[#0f1530] flex h-[39.689px] items-center justify-center px-[14.622px] relative rounded-[12.533px] w-[208.889px] shrink-0",
+                 "n": "UI action / Review email draft",
+                 "id": "I203:12738;200:380",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[12.53px] text-[color:#fff] text-center w-[179.644px] shrink-0",
+                   "id": "I203:12738;200:381",
+                   "k": [
+                    "Review email draft"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#fbf6ef] flex h-[39.689px] items-center justify-center px-[14.622px] relative rounded-[12.533px] w-[104.444px] shrink-0",
+                 "n": "UI action / Edit",
+                 "id": "I203:12738;200:382",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[12.53px] text-[color:#0f1530] text-center w-[75.2px] shrink-0",
+                   "id": "I203:12738;200:383",
+                   "k": [
+                    "Edit"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#fbf6ef] flex h-[39.689px] items-center justify-center px-[14.622px] relative rounded-[12.533px] w-[114.889px] shrink-0",
+                 "n": "UI action / Snooze",
+                 "id": "I203:12738;200:384",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[12.53px] text-[color:#0f1530] text-center w-[85.644px] shrink-0",
+                   "id": "I203:12738;200:385",
+                   "k": [
+                    "Snooze"
+                   ]
+                  }
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#fff] flex flex-col gap-[32px] items-start p-[80px] relative w-full",
+     "n": "02 / A workflow you can see",
+     "id": "203:12772",
+     "k": [
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[12px] items-start relative w-full",
+       "n": "Workflow heading",
+       "id": "203:12773",
+       "k": [
+        {
+         "t": "p",
+         "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+         "id": "203:12774",
+         "k": [
+          "EXAMPLE WORKFLOW"
+         ]
+        },
+        {
+         "t": "p",
+         "c": "font-semibold leading-[1.08] relative text-[44px] text-[color:#0f1530] tracking-[-1.1px] w-full",
+         "id": "203:12775",
+         "k": [
+          "See the work happen."
+         ]
+        }
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex gap-[40px] items-start relative w-full",
+       "n": "Three product moments",
+       "id": "203:12776",
+       "k": [
+        {
+         "t": "div",
+         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[var(--radius\\\\/16,16px)] flex-1 min-w-0",
+         "n": "Feature workflow / Spot unfinished work",
+         "id": "203:12794",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[12px] items-start relative w-full",
+           "n": "Step heading",
+           "id": "203:12778",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[40px] shrink-0",
+             "n": "Status / 01",
+             "id": "203:12779",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#fff] w-[20px] shrink-0",
+               "id": "203:12780",
+               "k": [
+                "01"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] flex-1 min-w-0",
+             "id": "203:12781",
+             "k": [
+              "Spot unfinished work"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-full",
+           "n": "Illustrated product state / openEstimates",
+           "id": "203:12782",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[21px] text-[color:#0f1530] w-full",
+             "id": "203:12783",
+             "k": [
+              "Open estimates"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-bold leading-[1.08] relative text-[54px] text-[color:#0f1530] tracking-[-1.35px] w-full",
+             "id": "203:12784",
+             "k": [
+              "12"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[10px] items-start leading-[1.38] relative w-full",
+             "n": "Response states",
+             "id": "203:12785",
+             "k": [
+              {
+               "t": "div",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[14px] items-start p-[20px] relative rounded-[16px] w-[154px] shrink-0",
+               "n": "Awaiting reply",
+               "id": "203:12786",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-semibold relative text-[28px] text-[color:#0f1530] w-full",
+                 "id": "203:12787",
+                 "k": [
+                  "7"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[12px] text-[color:#2a3360] w-full",
+                 "id": "203:12788",
+                 "k": [
+                  "Awaiting reply"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[14px] items-start p-[20px] relative rounded-[16px] w-[154px] shrink-0",
+               "n": "Owner review",
+               "id": "203:12789",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-semibold relative text-[28px] text-[color:#0f1530] w-full",
+                 "id": "203:12790",
+                 "k": [
+                  "2"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[12px] text-[color:#2a3360] w-full",
+                 "id": "203:12791",
+                 "k": [
+                  "Owner review"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[222px] shrink-0",
+             "n": "Status / Sorted · Oldest first",
+             "id": "203:12792",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[202px] shrink-0",
+               "id": "203:12793",
+               "k": [
+                "Sorted · Oldest first"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[var(--radius\\\\/16,16px)] flex-1 min-w-0",
+         "n": "Feature workflow / See the reason",
+         "id": "203:12812",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[12px] items-start relative w-full",
+           "n": "Step heading",
+           "id": "203:12796",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[40px] shrink-0",
+             "n": "Status / 02",
+             "id": "203:12797",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#fff] w-[20px] shrink-0",
+               "id": "203:12798",
+               "k": [
+                "02"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] flex-1 min-w-0",
+             "id": "203:12799",
+             "k": [
+              "See the reason"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-full",
+           "n": "Illustrated product state / reason",
+           "id": "203:12800",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+             "id": "203:12801",
+             "k": [
+              "Estimate #2048"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[180px] shrink-0",
+             "n": "Status / Sent 4 days ago",
+             "id": "203:12802",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[160px] shrink-0",
+               "id": "203:12803",
+               "k": [
+                "Sent 4 days ago"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex gap-[12px] h-[92px] items-start p-[16px] relative rounded-[12px] w-full",
+             "n": "Evidence",
+             "id": "203:12804",
+             "k": [
+              {
+               "t": "div",
+               "c": "relative size-[30px]",
+               "n": "Icon / clock",
+               "id": "203:12805",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-clock-bc1171ea.svg"
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "font-medium relative text-[16px] text-[color:#0f1530] flex-1 min-w-0",
+               "id": "203:12808",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "leading-[1.38] mb-0",
+                 "k": [
+                  "No customer reply"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "leading-[1.38]",
+                 "k": [
+                  "recorded"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] w-full",
+             "id": "203:12809",
+             "k": [
+              "Suggested action · Follow up"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+             "n": "UI action / Review the opportunity",
+             "id": "203:12810",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+               "id": "203:12811",
+               "k": [
+                "Review the opportunity"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[var(--radius\\\\/16,16px)] flex-1 min-w-0",
+         "n": "Feature workflow / Choose the next action",
+         "id": "203:12830",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[12px] items-start relative w-full",
+           "n": "Step heading",
+           "id": "203:12814",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[40px] shrink-0",
+             "n": "Status / 03",
+             "id": "203:12815",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#fff] w-[20px] shrink-0",
+               "id": "203:12816",
+               "k": [
+                "03"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] flex-1 min-w-0",
+             "id": "203:12817",
+             "k": [
+              "Choose the next action"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-full",
+           "n": "Illustrated product state / email",
+           "id": "203:12818",
+           "k": [
+            {
+             "t": "div",
+             "c": "flex gap-[10px] items-start relative w-full",
+             "n": "Email header",
+             "id": "203:12819",
+             "k": [
+              {
+               "t": "div",
+               "c": "relative size-[24px]",
+               "n": "Icon / mail",
+               "id": "203:12820",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-mail-672ee2a1.svg"
+                }
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] flex-1 min-w-0",
+               "id": "203:12823",
+               "k": [
+                "Email draft"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "font-semibold relative text-[24px] text-[color:#0f1530] w-full",
+             "id": "203:12824",
+             "k": [
+              {
+               "t": "p",
+               "c": "leading-[1.38] mb-0",
+               "k": [
+                "Your repair estimate"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "leading-[1.38]",
+               "k": [
+                "is ready."
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] w-full",
+             "id": "203:12825",
+             "k": [
+              "To: Jordan Lee"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[180px] shrink-0",
+             "n": "Status / Estimate #2048",
+             "id": "203:12826",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[160px] shrink-0",
+               "id": "203:12827",
+               "k": [
+                "Estimate #2048"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+             "n": "UI action / Review and approve",
+             "id": "203:12828",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+               "id": "203:12829",
+               "k": [
+                "Review and approve"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ],
+     "anchor": "workflow"
+    },
+    {
+     "t": "div",
+     "c": "bg-[#0f1530] flex flex-col gap-[16px] items-start px-[80px] py-[48px] relative w-full",
+     "n": "03 / Connected workflow and demo",
+     "id": "203:12831",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#f6b400] tracking-[1.1px] w-full",
+       "id": "219:10522",
+       "k": [
+        "WORKS ACROSS YOUR BUSINESS"
+       ]
+      },
+      {
+       "t": "p",
+       "c": "font-semibold leading-[1.08] relative text-[36px] text-[color:#fff] tracking-[-0.9px] w-full",
+       "id": "219:10523",
+       "k": [
+        "One job. Connected all the way."
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex gap-[16px] items-center relative w-full",
+       "n": "Flagship and tool handoff",
+       "id": "219:10524",
+       "k": [
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] flex-1 min-w-0",
+         "n": "Connected feature / Revenue intelligence / Desktop",
+         "id": "219:10535",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:10526",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Command Center",
+             "id": "219:10527",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:10528",
+               "k": [
+                "Command Center"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[222px] shrink-0",
+             "id": "219:10529",
+             "k": [
+              "Estimate #2048"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:10530",
+           "k": [
+            "Revenue intelligence"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:10531",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:10532",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:10534",
+             "k": [
+              "Open estimate surfaced"
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex h-[24px] items-center justify-center relative w-[32px] shrink-0",
+         "n": "Next connected state",
+         "id": "219:10536",
+         "k": [
+          {
+           "t": "div",
+           "c": "relative size-[24px]",
+           "n": "Icon / arrow",
+           "id": "219:10537",
+           "k": [
+            {
+             "t": "img",
+             "c": "absolute block inset-0 size-full",
+             "src": "/marketing/flagship/icon-arrow-84befcc1.svg"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] flex-1 min-w-0",
+         "n": "Connected feature / Owner review / Desktop",
+         "id": "219:10549",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:10540",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Command Center",
+             "id": "219:10541",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:10542",
+               "k": [
+                "Command Center"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[222px] shrink-0",
+             "id": "219:10543",
+             "k": [
+              "Estimate #2048"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:10544",
+           "k": [
+            "Owner review"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:10545",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:10546",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:10548",
+             "k": [
+              "Reason and history reviewed"
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex h-[24px] items-center justify-center relative w-[32px] shrink-0",
+         "n": "Next connected state",
+         "id": "219:10550",
+         "k": [
+          {
+           "t": "div",
+           "c": "relative size-[24px]",
+           "n": "Icon / arrow",
+           "id": "219:10551",
+           "k": [
+            {
+             "t": "img",
+             "c": "absolute block inset-0 size-full",
+             "src": "/marketing/flagship/icon-arrow-84befcc1.svg"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] flex-1 min-w-0",
+         "n": "Connected feature / Inquiry follow-up / Desktop",
+         "id": "219:10563",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:10554",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Revenue",
+             "id": "219:10555",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:10556",
+               "k": [
+                "Revenue"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[222px] shrink-0",
+             "id": "219:10557",
+             "k": [
+              "Estimate #2048"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:10558",
+           "k": [
+            "Inquiry follow-up"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:10559",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:10560",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:10562",
+             "k": [
+              "Email draft ready for approval"
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "t": "button",
+       "label": "Get a free demo",
+       "kind": "Accent",
+       "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#0f1530]",
+       "href": "/demo"
+      }
+     ]
+    }
+   ]
+  },
+  "mobile": {
+   "t": "div",
+   "c": "bg-[#fbf6ef] flex flex-col items-start relative",
+   "n": "AI Revenue Intelligence / Mobile",
+   "id": "175:3298",
+   "k": [
+    {
+     "t": "div",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[32px] items-start p-[24px] relative w-full",
+     "n": "01 / Product in view",
+     "id": "203:12847",
+     "k": [
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[32px] items-start relative w-full",
+       "n": "Outcome and product",
+       "id": "203:12848",
+       "k": [
+        {
+         "t": "div",
+         "c": "flex flex-col gap-[20px] items-start relative w-full",
+         "n": "Short outcome copy",
+         "id": "203:12849",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "203:12850",
+           "k": [
+            "AI REVENUE INTELLIGENCE"
+           ]
+          },
+          {
+           "t": "h1",
+           "c": "font-semibold leading-[1.08] relative text-[40px] text-[color:#0f1530] tracking-[-1px] w-full",
+           "id": "203:12851",
+           "k": [
+            "See the next opportunity in your records."
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-full",
+           "id": "203:12852",
+           "k": [
+            "Review open opportunities and choose the next action using your own records."
+           ]
+          },
+          {
+           "t": "button",
+           "label": "Explore the view",
+           "kind": "Dark",
+           "c": "bg-[#0f1530] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#fbf6ef]",
+           "href": "#workflow-m"
+          },
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "203:12855",
+           "k": [
+            "EXAMPLE BUSINESS · JUNIPER"
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#f6f7f9] border-[0.475px] border-[#e6dccb] border-solid flex flex-col h-[202.35px] items-start overflow-clip relative rounded-[7.6px] w-full",
+         "n": "Product demonstration / AI Revenue Intelligence",
+         "id": "203:12856",
+         "k": [
+          {
+           "t": "div",
+           "c": "bg-[#0f1530] flex gap-[7.6px] h-[25.65px] items-center p-[7.6px] relative w-full",
+           "n": "Product chrome",
+           "id": "I203:12856;200:353",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-bold leading-[1.38] relative text-[8.07px] text-[color:#fff] w-[66.5px] shrink-0",
+             "id": "I203:12856;200:354",
+             "k": [
+              "Renvani"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-medium leading-[1.38] relative text-[5.7px] text-[color:#fff] w-[196.65px] shrink-0",
+             "id": "I203:12856;200:355",
+             "k": [
+              "Revenue opportunities"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#f6b400] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[48.45px] shrink-0",
+             "n": "Status / EXAMPLE",
+             "id": "I203:12856;200:356",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#0f1530] w-[38.95px] shrink-0",
+               "id": "I203:12856;200:357",
+               "k": [
+                "EXAMPLE"
+               ]
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[7.6px] items-start p-[11.4px] relative w-full",
+           "n": "Product workspace",
+           "id": "I203:12856;200:358",
+           "k": [
+            {
+             "t": "div",
+             "c": "flex gap-[7.6px] items-start relative w-full",
+             "n": "Screen title",
+             "id": "I203:12856;200:359",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-semibold leading-[1.38] relative text-[10.92px] text-[color:#0f1530] w-[218.5px] shrink-0",
+               "id": "I203:12856;200:360",
+               "k": [
+                "Revenue opportunities"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[85.5px] shrink-0",
+               "n": "Status / Your business",
+               "id": "I203:12856;200:361",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#2a3360] w-[76px] shrink-0",
+                 "id": "I203:12856;200:362",
+                 "k": [
+                  "Your business"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[5.7px] items-start relative w-full",
+             "n": "Today summary",
+             "id": "I203:12856;200:363",
+             "k": [
+              {
+               "t": "div",
+               "c": "bg-[#fff] border-[0.475px] border-[#e6dccb] border-solid flex flex-col gap-[6.65px] items-start p-[9.5px] relative rounded-[7.6px] w-[102.6px] shrink-0",
+               "n": "Booked jobs",
+               "id": "I203:12856;200:364",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-bold leading-[1.08] relative text-[16.15px] text-[color:#0f1530] w-full",
+                 "id": "I203:12856;200:365",
+                 "k": [
+                  "8"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal leading-[1.38] relative text-[5.22px] text-[color:#2a3360] w-full",
+                 "id": "I203:12856;200:366",
+                 "k": [
+                  "Booked jobs"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border-[0.475px] border-[#e6dccb] border-solid flex flex-col gap-[6.65px] items-start p-[9.5px] relative rounded-[7.6px] w-[102.6px] shrink-0",
+               "n": "In progress",
+               "id": "I203:12856;200:367",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-bold leading-[1.08] relative text-[16.15px] text-[color:#0f1530] w-full",
+                 "id": "I203:12856;200:368",
+                 "k": [
+                  "3"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal leading-[1.38] relative text-[5.22px] text-[color:#2a3360] w-full",
+                 "id": "I203:12856;200:369",
+                 "k": [
+                  "In progress"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border-[0.475px] border-[#e6dccb] border-solid flex flex-col gap-[6.65px] items-start p-[9.5px] relative rounded-[7.6px] w-[102.6px] shrink-0",
+               "n": "Need your review",
+               "id": "I203:12856;200:370",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-bold leading-[1.08] relative text-[16.15px] text-[color:#0f1530] w-full",
+                 "id": "I203:12856;200:371",
+                 "k": [
+                  "2"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal leading-[1.38] relative text-[5.22px] text-[color:#2a3360] w-full",
+                 "id": "I203:12856;200:372",
+                 "k": [
+                  "Need your review"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] border-[0.475px] border-[#e6dccb] border-solid flex flex-col gap-[6.65px] items-start p-[9.5px] relative rounded-[7.6px] w-full",
+             "n": "Decision with evidence",
+             "id": "I203:12856;200:373",
+             "k": [
+              {
+               "t": "div",
+               "c": "flex gap-[7.6px] items-start relative w-full",
+               "n": "Action header",
+               "id": "I203:12856;200:374",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-semibold leading-[1.38] relative text-[8.55px] text-[color:#0f1530] w-[209px] shrink-0",
+                 "id": "I203:12856;200:375",
+                 "k": [
+                  "Open estimate worth a follow-up"
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#fff4d6] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[57px] shrink-0",
+                 "n": "Status / REVIEW",
+                 "id": "I203:12856;200:376",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#0f1530] w-[47.5px] shrink-0",
+                   "id": "I203:12856;200:377",
+                   "k": [
+                    "REVIEW"
+                   ]
+                  }
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-normal leading-[1.38] relative text-[5.7px] text-[color:#2a3360] w-full",
+               "id": "I203:12856;200:378",
+               "k": [
+                "Estimate #2048 · Sent 4 days ago · No reply recorded"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "flex gap-[5.7px] items-start relative w-full",
+               "n": "Owner actions",
+               "id": "I203:12856;200:379",
+               "k": [
+                {
+                 "t": "div",
+                 "c": "bg-[#0f1530] flex h-[18.05px] items-center justify-center px-[6.65px] relative rounded-[5.7px] w-[95px] shrink-0",
+                 "n": "UI action / Review email draft",
+                 "id": "I203:12856;200:380",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[5.7px] text-[color:#fff] text-center w-[81.7px] shrink-0",
+                   "id": "I203:12856;200:381",
+                   "k": [
+                    "Review email draft"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#fbf6ef] flex h-[18.05px] items-center justify-center px-[6.65px] relative rounded-[5.7px] w-[47.5px] shrink-0",
+                 "n": "UI action / Edit",
+                 "id": "I203:12856;200:382",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[5.7px] text-[color:#0f1530] text-center w-[34.2px] shrink-0",
+                   "id": "I203:12856;200:383",
+                   "k": [
+                    "Edit"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#fbf6ef] flex h-[18.05px] items-center justify-center px-[6.65px] relative rounded-[5.7px] w-[52.25px] shrink-0",
+                 "n": "UI action / Snooze",
+                 "id": "I203:12856;200:384",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[5.7px] text-[color:#0f1530] text-center w-[38.95px] shrink-0",
+                   "id": "I203:12856;200:385",
+                   "k": [
+                    "Snooze"
+                   ]
+                  }
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#fff] flex flex-col gap-[32px] items-start p-[24px] relative w-full",
+     "n": "02 / A workflow you can see",
+     "id": "203:12890",
+     "k": [
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[12px] items-start leading-[1.38] relative w-full",
+       "n": "Workflow heading",
+       "id": "203:12891",
+       "k": [
+        {
+         "t": "p",
+         "c": "font-medium relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+         "id": "203:12892",
+         "k": [
+          "EXAMPLE WORKFLOW"
+         ]
+        },
+        {
+         "t": "p",
+         "c": "font-semibold relative text-[32px] text-[color:#0f1530] w-full",
+         "id": "203:12893",
+         "k": [
+          "See the work happen."
+         ]
+        }
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[24px] items-start relative w-full",
+       "n": "Three product moments",
+       "id": "203:12894",
+       "k": [
+        {
+         "t": "div",
+         "c": "bg-[#fff] border-[0.855px] border-[#e6dccb] border-solid flex flex-col gap-[15.39px] h-[444.6px] items-start p-[18.81px] relative rounded-[13.68px] w-full",
+         "n": "Workflow moment / Spot unfinished work",
+         "id": "203:12895",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10.26px] items-start relative w-full",
+           "n": "Step heading",
+           "id": "I203:12895;203:12778",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[34.2px] shrink-0",
+             "n": "Status / 01",
+             "id": "I203:12895;203:12779",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#fff] w-[17.1px] shrink-0",
+               "id": "I203:12895;203:12780",
+               "k": [
+                "01"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[15.39px] text-[color:#0f1530] flex-1 min-w-0",
+             "id": "I203:12895;203:12781",
+             "k": [
+              "Spot unfinished work"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[11.97px] h-[342px] items-start p-[15.39px] relative rounded-[10.26px] w-full",
+           "n": "Illustrated product state / openEstimates",
+           "id": "I203:12895;203:12782",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[17.95px] text-[color:#0f1530] w-full",
+             "id": "I203:12895;203:12783",
+             "k": [
+              "Open estimates"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-bold leading-[1.08] relative text-[46.17px] text-[color:#0f1530] tracking-[-1.1542px] w-full",
+             "id": "I203:12895;203:12784",
+             "k": [
+              "12"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[8.55px] items-start leading-[1.38] relative w-full",
+             "n": "Response states",
+             "id": "I203:12895;203:12785",
+             "k": [
+              {
+               "t": "div",
+               "c": "bg-[#fff] border-[0.855px] border-[#e6dccb] border-solid flex flex-col gap-[11.97px] items-start p-[17.1px] relative rounded-[13.68px] w-[131.67px] shrink-0",
+               "n": "Awaiting reply",
+               "id": "I203:12895;203:12786",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-semibold relative text-[23.94px] text-[color:#0f1530] w-full",
+                 "id": "I203:12895;203:12787",
+                 "k": [
+                  "7"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[10.26px] text-[color:#2a3360] w-full",
+                 "id": "I203:12895;203:12788",
+                 "k": [
+                  "Awaiting reply"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border-[0.855px] border-[#e6dccb] border-solid flex flex-col gap-[11.97px] items-start p-[17.1px] relative rounded-[13.68px] w-[131.67px] shrink-0",
+               "n": "Owner review",
+               "id": "I203:12895;203:12789",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-semibold relative text-[23.94px] text-[color:#0f1530] w-full",
+                 "id": "I203:12895;203:12790",
+                 "k": [
+                  "2"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[10.26px] text-[color:#2a3360] w-full",
+                 "id": "I203:12895;203:12791",
+                 "k": [
+                  "Owner review"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[189.81px] shrink-0",
+             "n": "Status / Sorted · Oldest first",
+             "id": "I203:12895;203:12792",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#0f1530] w-[172.71px] shrink-0",
+               "id": "I203:12895;203:12793",
+               "k": [
+                "Sorted · Oldest first"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] border-[0.855px] border-[#e6dccb] border-solid flex flex-col gap-[15.39px] h-[444.6px] items-start p-[18.81px] relative rounded-[13.68px] w-full",
+         "n": "Workflow moment / See the reason",
+         "id": "203:12912",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10.26px] items-start relative w-full",
+           "n": "Step heading",
+           "id": "I203:12912;203:12796",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[34.2px] shrink-0",
+             "n": "Status / 02",
+             "id": "I203:12912;203:12797",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#fff] w-[17.1px] shrink-0",
+               "id": "I203:12912;203:12798",
+               "k": [
+                "02"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[15.39px] text-[color:#0f1530] flex-1 min-w-0",
+             "id": "I203:12912;203:12799",
+             "k": [
+              "See the reason"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[11.97px] h-[342px] items-start p-[15.39px] relative rounded-[10.26px] w-full",
+           "n": "Illustrated product state / reason",
+           "id": "I203:12912;203:12800",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[18.81px] text-[color:#0f1530] w-full",
+             "id": "I203:12912;203:12801",
+             "k": [
+              "Estimate #2048"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff4d6] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[153.9px] shrink-0",
+             "n": "Status / Sent 4 days ago",
+             "id": "I203:12912;203:12802",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#0f1530] w-[136.8px] shrink-0",
+               "id": "I203:12912;203:12803",
+               "k": [
+                "Sent 4 days ago"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex gap-[10.26px] h-[78.66px] items-start p-[13.68px] relative rounded-[10.26px] w-full",
+             "n": "Evidence",
+             "id": "I203:12912;203:12804",
+             "k": [
+              {
+               "t": "div",
+               "c": "relative size-[25.65px]",
+               "n": "Icon / clock",
+               "id": "I203:12912;203:12805",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-clock-7d1f0405.svg"
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "font-medium relative text-[13.68px] text-[color:#0f1530] w-[208.62px] shrink-0",
+               "id": "I203:12912;203:12808",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "leading-[1.38] mb-0",
+                 "k": [
+                  "No customer reply"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "leading-[1.38]",
+                 "k": [
+                  "recorded"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[11.11px] text-[color:#2a3360] w-full",
+             "id": "I203:12912;203:12809",
+             "k": [
+              "Suggested action · Follow up"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[32.49px] items-center justify-center px-[11.97px] relative rounded-[10.26px] w-full",
+             "n": "UI action / Review the opportunity",
+             "id": "I203:12912;203:12810",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10.26px] text-[color:#fff] text-center flex-1 min-w-0",
+               "id": "I203:12912;203:12811",
+               "k": [
+                "Review the opportunity"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] border-[0.855px] border-[#e6dccb] border-solid flex flex-col gap-[15.39px] h-[444.6px] items-start p-[18.81px] relative rounded-[13.68px] w-full",
+         "n": "Workflow moment / Choose the next action",
+         "id": "203:12929",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10.26px] items-start relative w-full",
+           "n": "Step heading",
+           "id": "I203:12929;203:12814",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[34.2px] shrink-0",
+             "n": "Status / 03",
+             "id": "I203:12929;203:12815",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#fff] w-[17.1px] shrink-0",
+               "id": "I203:12929;203:12816",
+               "k": [
+                "03"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[15.39px] text-[color:#0f1530] flex-1 min-w-0",
+             "id": "I203:12929;203:12817",
+             "k": [
+              "Choose the next action"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[11.97px] h-[342px] items-start p-[15.39px] relative rounded-[10.26px] w-full",
+           "n": "Illustrated product state / email",
+           "id": "I203:12929;203:12818",
+           "k": [
+            {
+             "t": "div",
+             "c": "flex gap-[8.55px] items-start relative w-full",
+             "n": "Email header",
+             "id": "I203:12929;203:12819",
+             "k": [
+              {
+               "t": "div",
+               "c": "relative size-[20.52px]",
+               "n": "Icon / mail",
+               "id": "I203:12929;203:12820",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-mail-52129061.svg"
+                }
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-normal leading-[1.38] relative text-[11.11px] text-[color:#2a3360] flex-1 min-w-0",
+               "id": "I203:12929;203:12823",
+               "k": [
+                "Email draft"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "font-semibold relative text-[20.52px] text-[color:#0f1530] w-full",
+             "id": "I203:12929;203:12824",
+             "k": [
+              {
+               "t": "p",
+               "c": "leading-[1.38] mb-0",
+               "k": [
+                "Your repair estimate"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "leading-[1.38]",
+               "k": [
+                "is ready."
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[11.11px] text-[color:#2a3360] w-full",
+             "id": "I203:12929;203:12825",
+             "k": [
+              "To: Jordan Lee"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[153.9px] shrink-0",
+             "n": "Status / Estimate #2048",
+             "id": "I203:12929;203:12826",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#0f1530] w-[136.8px] shrink-0",
+               "id": "I203:12929;203:12827",
+               "k": [
+                "Estimate #2048"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[32.49px] items-center justify-center px-[11.97px] relative rounded-[10.26px] w-full",
+             "n": "UI action / Review and approve",
+             "id": "I203:12929;203:12828",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10.26px] text-[color:#fff] text-center flex-1 min-w-0",
+               "id": "I203:12929;203:12829",
+               "k": [
+                "Review and approve"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ],
+     "anchor": "workflow-m"
+    },
+    {
+     "t": "div",
+     "c": "bg-[#0f1530] flex flex-col gap-[16px] items-start p-[24px] relative w-full",
+     "n": "03 / Connected workflow and demo",
+     "id": "203:12946",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#f6b400] tracking-[1.1px] w-full",
+       "id": "219:10564",
+       "k": [
+        "WORKS ACROSS YOUR BUSINESS"
+       ]
+      },
+      {
+       "t": "p",
+       "c": "font-semibold leading-[1.38] relative text-[28px] text-[color:#fff] w-full",
+       "id": "219:10565",
+       "k": [
+        "One job. Connected all the way."
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[12px] items-center relative w-full",
+       "n": "Flagship and tool handoff",
+       "id": "219:10566",
+       "k": [
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] w-full",
+         "n": "Connected feature / Revenue intelligence / Mobile",
+         "id": "219:10577",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:10568",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Command Center",
+             "id": "219:10569",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:10570",
+               "k": [
+                "Command Center"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[180px] shrink-0",
+             "id": "219:10571",
+             "k": [
+              "Estimate #2048"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:10572",
+           "k": [
+            "Revenue intelligence"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:10573",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:10574",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:10576",
+             "k": [
+              "Open estimate surfaced"
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex flex-col h-[24px] items-center justify-center relative w-full",
+         "n": "Next connected state",
+         "id": "219:10578",
+         "k": [
+          {
+           "t": "div",
+           "c": "relative size-[24px]",
+           "n": "Frame",
+           "id": "219:10579",
+           "k": [
+            {
+             "t": "img",
+             "c": "absolute block inset-0 size-full",
+             "src": "/marketing/flagship/frame-08fa5d7a.svg"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] w-full",
+         "n": "Connected feature / Owner review / Mobile",
+         "id": "219:10591",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:10582",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Command Center",
+             "id": "219:10583",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:10584",
+               "k": [
+                "Command Center"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[180px] shrink-0",
+             "id": "219:10585",
+             "k": [
+              "Estimate #2048"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:10586",
+           "k": [
+            "Owner review"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:10587",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:10588",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:10590",
+             "k": [
+              "Reason and history reviewed"
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex flex-col h-[24px] items-center justify-center relative w-full",
+         "n": "Next connected state",
+         "id": "219:10592",
+         "k": [
+          {
+           "t": "div",
+           "c": "relative size-[24px]",
+           "n": "Frame",
+           "id": "219:10593",
+           "k": [
+            {
+             "t": "img",
+             "c": "absolute block inset-0 size-full",
+             "src": "/marketing/flagship/frame-08fa5d7a.svg"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] w-full",
+         "n": "Connected feature / Inquiry follow-up / Mobile",
+         "id": "219:10605",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:10596",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Revenue",
+             "id": "219:10597",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:10598",
+               "k": [
+                "Revenue"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[180px] shrink-0",
+             "id": "219:10599",
+             "k": [
+              "Estimate #2048"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:10600",
+           "k": [
+            "Inquiry follow-up"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:10601",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:10602",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:10604",
+             "k": [
+              "Email draft ready for approval"
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "t": "button",
+       "label": "Get a free demo",
+       "kind": "Accent",
+       "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#0f1530]",
+       "href": "/demo"
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "customers-properties-assets": {
+  "desktop": {
+   "t": "div",
+   "c": "bg-[#fbf6ef] flex flex-col items-start relative",
+   "n": "Customers, Properties & Assets / Desktop",
+   "id": "175:3438",
+   "k": [
+    {
+     "t": "div",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[32px] items-start p-[80px] relative w-full",
+     "n": "01 / Product in view",
+     "id": "203:12966",
+     "k": [
+      {
+       "t": "div",
+       "c": "flex gap-[48px] items-center relative w-full",
+       "n": "Outcome and product",
+       "id": "203:12967",
+       "k": [
+        {
+         "t": "div",
+         "c": "flex flex-col gap-[20px] items-start relative flex-1 min-w-0",
+         "n": "Short outcome copy",
+         "id": "203:12968",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "203:12969",
+           "k": [
+            "CUSTOMERS, PROPERTIES & ASSETS"
+           ]
+          },
+          {
+           "t": "h1",
+           "c": "font-semibold leading-[1.08] relative text-[60px] text-[color:#0f1530] tracking-[-1.5px] w-full",
+           "id": "203:12970",
+           "k": [
+            "Know the home before you arrive."
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-full",
+           "id": "203:12971",
+           "k": [
+            "Bring each customer, property, equipment record, and service visit together."
+           ]
+          },
+          {
+           "t": "button",
+           "label": "Explore a customer",
+           "kind": "Dark",
+           "c": "bg-[#0f1530] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#fbf6ef]",
+           "href": "#workflow"
+          },
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "203:12974",
+           "k": [
+            "EXAMPLE BUSINESS · JUNIPER"
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#f6f7f9] border-[1.044px] border-[#e6dccb] border-solid flex flex-col h-[531.622px] items-start overflow-clip relative rounded-[16.711px] flex-1 min-w-0",
+         "n": "Product demonstration / Customers, Properties & Assets",
+         "id": "203:12975",
+         "k": [
+          {
+           "t": "div",
+           "c": "bg-[#0f1530] flex gap-[16.711px] h-[56.4px] items-center p-[16.711px] relative w-full",
+           "n": "Product chrome",
+           "id": "I203:12975;200:388",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-bold leading-[1.38] relative text-[17.76px] text-[color:#fff] w-[146.222px] shrink-0",
+             "id": "I203:12975;200:389",
+             "k": [
+              "Renvani"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-medium leading-[1.38] relative text-[12.53px] text-[color:#fff] flex-1 min-w-0",
+             "id": "I203:12975;200:390",
+             "k": [
+              "Customers & equipment"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#f6b400] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[106.533px] shrink-0",
+             "n": "Status / EXAMPLE",
+             "id": "I203:12975;200:391",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10.44px] text-[color:#0f1530] w-[85.644px] shrink-0",
+               "id": "I203:12975;200:392",
+               "k": [
+                "EXAMPLE"
+               ]
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[16.711px] items-start p-[25.067px] relative w-full",
+           "n": "Product workspace",
+           "id": "I203:12975;200:393",
+           "k": [
+            {
+             "t": "div",
+             "c": "flex gap-[16.711px] items-start relative w-full",
+             "n": "Screen title",
+             "id": "I203:12975;200:394",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-semibold leading-[1.38] relative text-[24.02px] text-[color:#0f1530] flex-1 min-w-0",
+               "id": "I203:12975;200:395",
+               "k": [
+                "Customers & equipment"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[188px] shrink-0",
+               "n": "Status / Your business",
+               "id": "I203:12975;200:396",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10.44px] text-[color:#2a3360] w-[167.111px] shrink-0",
+                 "id": "I203:12975;200:397",
+                 "k": [
+                  "Your business"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[20.889px] items-start relative w-full",
+             "n": "Customer record",
+             "id": "I203:12975;200:398",
+             "k": [
+              {
+               "t": "div",
+               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] flex-1 min-w-0",
+               "n": "Customer profile",
+               "id": "I203:12975;200:399",
+               "k": [
+                {
+                 "t": "div",
+                 "c": "bg-[#0f1530] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[45.956px] shrink-0",
+                 "n": "Status / JL",
+                 "id": "I203:12975;200:400",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[10.44px] text-[color:#fff] w-[25.067px] shrink-0",
+                   "id": "I203:12975;200:401",
+                   "k": [
+                    "JL"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-semibold leading-[1.38] relative text-[24.02px] text-[color:#0f1530] w-full",
+                 "id": "I203:12975;200:402",
+                 "k": [
+                  "Jordan Lee"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal leading-[1.38] relative text-[11.49px] text-[color:#2a3360] w-full",
+                 "id": "I203:12975;200:403",
+                 "k": [
+                  "Customer since April 2024"
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#e6dccb] h-[1.044px] relative w-full",
+                 "n": "Divider",
+                 "id": "I203:12975;200:404"
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.53px] w-full",
+                 "n": "Field / Properties",
+                 "id": "I203:12975;200:405",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[color:#2a3360] w-[124.289px] shrink-0",
+                   "id": "I203:12975;200:406",
+                   "k": [
+                    "Properties"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-medium relative text-[color:#0f1530] w-[90.867px] shrink-0",
+                   "id": "I203:12975;200:407",
+                   "k": [
+                    "2"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.53px] w-full",
+                 "n": "Field / Completed visits",
+                 "id": "I203:12975;200:408",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[color:#2a3360] w-[124.289px] shrink-0",
+                   "id": "I203:12975;200:409",
+                   "k": [
+                    "Completed visits"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-medium relative text-[color:#0f1530] w-[90.867px] shrink-0",
+                   "id": "I203:12975;200:410",
+                   "k": [
+                    "3"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.53px] w-full",
+                 "n": "Field / Contact",
+                 "id": "I203:12975;200:411",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[color:#2a3360] w-[124.289px] shrink-0",
+                   "id": "I203:12975;200:412",
+                   "k": [
+                    "Contact"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-medium relative text-[color:#0f1530] w-[90.867px] shrink-0",
+                   "id": "I203:12975;200:413",
+                   "k": [
+                    "Email"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#e4f1e8] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[182.778px] shrink-0",
+                 "n": "Status / Active agreement",
+                 "id": "I203:12975;200:414",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[10.44px] text-[color:#0f1530] w-[161.889px] shrink-0",
+                   "id": "I203:12975;200:415",
+                   "k": [
+                    "Active agreement"
+                   ]
+                  }
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] flex-1 min-w-0",
+               "n": "Equipment and history",
+               "id": "I203:12975;200:416",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-semibold leading-[1.38] relative text-[19.84px] text-[color:#0f1530] w-full",
+                 "id": "I203:12975;200:417",
+                 "k": [
+                  "Primary home"
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "h-[135.778px] relative rounded-[16.711px] w-full",
+                 "n": "Equipment context",
+                 "id": "I203:12975;200:418",
+                 "k": [
+                  {
+                   "t": "img",
+                   "c": "absolute inset-0 object-cover rounded-[16.711px] size-full",
+                   "src": "/marketing/flagship/illustrative-hvac-job-context-f1266660.jpg"
+                  }
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[14.62px] text-[color:#0f1530] w-full",
+                 "id": "I203:12975;200:419",
+                 "k": [
+                  "Split AC · Installed 2021"
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.53px] w-full",
+                 "n": "Field / Last service",
+                 "id": "I203:12975;200:420",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[color:#2a3360] w-[204.711px] shrink-0",
+                   "id": "I203:12975;200:421",
+                   "k": [
+                    "Last service"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-medium relative text-[color:#0f1530] w-[156.667px] shrink-0",
+                   "id": "I203:12975;200:422",
+                   "k": [
+                    "Apr 18"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.53px] w-full",
+                 "n": "Field / Latest work",
+                 "id": "I203:12975;200:423",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[color:#2a3360] w-[204.711px] shrink-0",
+                   "id": "I203:12975;200:424",
+                   "k": [
+                    "Latest work"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-medium relative text-[color:#0f1530] w-[156.667px] shrink-0",
+                   "id": "I203:12975;200:425",
+                   "k": [
+                    "Capacitor replaced"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#0f1530] flex h-[39.689px] items-center justify-center px-[14.622px] relative rounded-[12.533px] w-full",
+                 "n": "UI action / Open job history",
+                 "id": "I203:12975;200:426",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[12.53px] text-[color:#fff] text-center flex-1 min-w-0",
+                   "id": "I203:12975;200:427",
+                   "k": [
+                    "Open job history"
+                   ]
+                  }
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#fff] flex flex-col gap-[32px] items-start p-[80px] relative w-full",
+     "n": "02 / A workflow you can see",
+     "id": "203:13016",
+     "k": [
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[12px] items-start relative w-full",
+       "n": "Workflow heading",
+       "id": "203:13017",
+       "k": [
+        {
+         "t": "p",
+         "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+         "id": "203:13018",
+         "k": [
+          "EXAMPLE WORKFLOW"
+         ]
+        },
+        {
+         "t": "p",
+         "c": "font-semibold leading-[1.08] relative text-[44px] text-[color:#0f1530] tracking-[-1.1px] w-full",
+         "id": "203:13019",
+         "k": [
+          "See the work happen."
+         ]
+        }
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex gap-[40px] items-start relative w-full",
+       "n": "Three product moments",
+       "id": "203:13020",
+       "k": [
+        {
+         "t": "div",
+         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[var(--radius\\\\/16,16px)] flex-1 min-w-0",
+         "n": "Feature workflow / One customer record",
+         "id": "203:13039",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[12px] items-start relative w-full",
+           "n": "Step heading",
+           "id": "203:13022",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[40px] shrink-0",
+             "n": "Status / 01",
+             "id": "203:13023",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#fff] w-[20px] shrink-0",
+               "id": "203:13024",
+               "k": [
+                "01"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] flex-1 min-w-0",
+             "id": "203:13025",
+             "k": [
+              "One customer record"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-full",
+           "n": "Illustrated product state / profile",
+           "id": "203:13026",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[54px] shrink-0",
+             "n": "Status / JL",
+             "id": "203:13027",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#fff] w-[34px] shrink-0",
+               "id": "203:13028",
+               "k": [
+                "JL"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[30px] text-[color:#0f1530] w-full",
+             "id": "203:13029",
+             "k": [
+              "Jordan Lee"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[12px] items-start leading-[1.38] relative w-full",
+             "n": "Customer facts",
+             "id": "203:13030",
+             "k": [
+              {
+               "t": "div",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[14px] items-start p-[20px] relative rounded-[16px] w-[153px] shrink-0",
+               "n": "Properties",
+               "id": "203:13031",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-bold relative text-[30px] text-[color:#0f1530] w-full",
+                 "id": "203:13032",
+                 "k": [
+                  "2"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[12px] text-[color:#2a3360] w-full",
+                 "id": "203:13033",
+                 "k": [
+                  "Properties"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[14px] items-start p-[20px] relative rounded-[16px] w-[153px] shrink-0",
+               "n": "Visits",
+               "id": "203:13034",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-bold relative text-[30px] text-[color:#0f1530] w-full",
+                 "id": "203:13035",
+                 "k": [
+                  "3"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[12px] text-[color:#2a3360] w-full",
+                 "id": "203:13036",
+                 "k": [
+                  "Visits"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+             "n": "Status / Contact preference · Email",
+             "id": "203:13037",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] flex-1 min-w-0",
+               "id": "203:13038",
+               "k": [
+                "Contact preference · Email"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[var(--radius\\\\/16,16px)] flex-1 min-w-0",
+         "n": "Feature workflow / Know the equipment",
+         "id": "203:13053",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[12px] items-start relative w-full",
+           "n": "Step heading",
+           "id": "203:13041",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[40px] shrink-0",
+             "n": "Status / 02",
+             "id": "203:13042",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#fff] w-[20px] shrink-0",
+               "id": "203:13043",
+               "k": [
+                "02"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] flex-1 min-w-0",
+             "id": "203:13044",
+             "k": [
+              "Know the equipment"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-full",
+           "n": "Illustrated product state / equipment",
+           "id": "203:13045",
+           "k": [
+            {
+             "t": "div",
+             "c": "h-[120px] relative rounded-[16px] w-full",
+             "n": "Illustrative HVAC job context",
+             "id": "203:13046",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute inset-0 object-cover rounded-[16px] size-full",
+               "src": "/marketing/flagship/illustrative-hvac-job-context-f1266660.jpg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[19px] text-[color:#0f1530] w-full",
+             "id": "203:13047",
+             "k": [
+              "Split AC · Installed 2021"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] w-full",
+             "id": "203:13048",
+             "k": [
+              "Primary home"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+             "n": "Status / Last service · Apr 18",
+             "id": "203:13049",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[226px] shrink-0",
+               "id": "203:13050",
+               "k": [
+                "Last service · Apr 18"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+             "n": "UI action / Open equipment history",
+             "id": "203:13051",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+               "id": "203:13052",
+               "k": [
+                "Open equipment history"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[var(--radius\\\\/16,16px)] flex-1 min-w-0",
+         "n": "Feature workflow / Bring the history",
+         "id": "203:13079",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[12px] items-start relative w-full",
+           "n": "Step heading",
+           "id": "203:13055",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[40px] shrink-0",
+             "n": "Status / 03",
+             "id": "203:13056",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#fff] w-[20px] shrink-0",
+               "id": "203:13057",
+               "k": [
+                "03"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] flex-1 min-w-0",
+             "id": "203:13058",
+             "k": [
+              "Bring the history"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-full",
+           "n": "Illustrated product state / history",
+           "id": "203:13059",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+             "id": "203:13060",
+             "k": [
+              "Service history"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex gap-[10px] h-[60px] items-start p-[12px] relative rounded-[12px] w-full",
+             "n": "Apr 18",
+             "id": "203:13061",
+             "k": [
+              {
+               "t": "div",
+               "c": "relative size-[20px]",
+               "n": "Icon / check",
+               "id": "203:13062",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-check1-46fe38a0.svg"
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "flex flex-col gap-[2px] items-start leading-[1.38] relative flex-1 min-w-0",
+               "n": "Event",
+               "id": "203:13064",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[11px] text-[color:#2a3360] w-full",
+                 "id": "203:13065",
+                 "k": [
+                  "Apr 18"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "id": "203:13066",
+                 "k": [
+                  "Spring tune-up"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex gap-[10px] h-[60px] items-start p-[12px] relative rounded-[12px] w-full",
+             "n": "Oct 29",
+             "id": "203:13067",
+             "k": [
+              {
+               "t": "div",
+               "c": "relative size-[20px]",
+               "n": "Icon / check",
+               "id": "203:13068",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-check1-46fe38a0.svg"
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "flex flex-col gap-[2px] items-start leading-[1.38] relative flex-1 min-w-0",
+               "n": "Event",
+               "id": "203:13070",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[11px] text-[color:#2a3360] w-full",
+                 "id": "203:13071",
+                 "k": [
+                  "Oct 29"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "id": "203:13072",
+                 "k": [
+                  "Capacitor replaced"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex gap-[10px] h-[60px] items-start p-[12px] relative rounded-[12px] w-full",
+             "n": "Nov 12",
+             "id": "203:13073",
+             "k": [
+              {
+               "t": "div",
+               "c": "relative size-[20px]",
+               "n": "Icon / check",
+               "id": "203:13074",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-check1-46fe38a0.svg"
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "flex flex-col gap-[2px] items-start leading-[1.38] relative flex-1 min-w-0",
+               "n": "Event",
+               "id": "203:13076",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[11px] text-[color:#2a3360] w-full",
+                 "id": "203:13077",
+                 "k": [
+                  "Nov 12"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "id": "203:13078",
+                 "k": [
+                  "Next visit"
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ],
+     "anchor": "workflow"
+    },
+    {
+     "t": "div",
+     "c": "bg-[#0f1530] flex flex-col gap-[16px] items-start px-[80px] py-[48px] relative w-full",
+     "n": "03 / Connected workflow and demo",
+     "id": "203:13080",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#f6b400] tracking-[1.1px] w-full",
+       "id": "219:10606",
+       "k": [
+        "WORKS ACROSS YOUR BUSINESS"
+       ]
+      },
+      {
+       "t": "p",
+       "c": "font-semibold leading-[1.08] relative text-[36px] text-[color:#fff] tracking-[-0.9px] w-full",
+       "id": "219:10607",
+       "k": [
+        "One job. Connected all the way."
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex gap-[16px] items-center relative w-full",
+       "n": "Flagship and tool handoff",
+       "id": "219:10608",
+       "k": [
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] flex-1 min-w-0",
+         "n": "Connected feature / Jobs & work orders / Desktop",
+         "id": "219:10619",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:10610",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Operations",
+             "id": "219:10611",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:10612",
+               "k": [
+                "Operations"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[222px] shrink-0",
+             "id": "219:10613",
+             "k": [
+              "Job #1042 · Jordan Lee"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:10614",
+           "k": [
+            "Jobs & work orders"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:10615",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:10616",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:10618",
+             "k": [
+              "Visit history saved"
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex h-[24px] items-center justify-center relative w-[32px] shrink-0",
+         "n": "Next connected state",
+         "id": "219:10620",
+         "k": [
+          {
+           "t": "div",
+           "c": "relative size-[24px]",
+           "n": "Icon / arrow",
+           "id": "219:10621",
+           "k": [
+            {
+             "t": "img",
+             "c": "absolute block inset-0 size-full",
+             "src": "/marketing/flagship/icon-arrow-84befcc1.svg"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] flex-1 min-w-0",
+         "n": "Connected feature / Customers & assets / Desktop",
+         "id": "219:10633",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:10624",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Command Center",
+             "id": "219:10625",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:10626",
+               "k": [
+                "Command Center"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[222px] shrink-0",
+             "id": "219:10627",
+             "k": [
+              "Job #1042 · Jordan Lee"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:10628",
+           "k": [
+            "Customers & assets"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:10629",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:10630",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:10632",
+             "k": [
+              "One connected customer record"
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex h-[24px] items-center justify-center relative w-[32px] shrink-0",
+         "n": "Next connected state",
+         "id": "219:10634",
+         "k": [
+          {
+           "t": "div",
+           "c": "relative size-[24px]",
+           "n": "Icon / arrow",
+           "id": "219:10635",
+           "k": [
+            {
+             "t": "img",
+             "c": "absolute block inset-0 size-full",
+             "src": "/marketing/flagship/icon-arrow-84befcc1.svg"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] flex-1 min-w-0",
+         "n": "Connected feature / Service agreements / Desktop",
+         "id": "219:10647",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:10638",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Retention",
+             "id": "219:10639",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:10640",
+               "k": [
+                "Retention"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[222px] shrink-0",
+             "id": "219:10641",
+             "k": [
+              "Job #1042 · Jordan Lee"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:10642",
+           "k": [
+            "Service agreements"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:10643",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:10644",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:10646",
+             "k": [
+              "Next covered visit in view"
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "t": "button",
+       "label": "Get a free demo",
+       "kind": "Accent",
+       "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#0f1530]",
+       "href": "/demo"
+      }
+     ]
+    }
+   ]
+  },
+  "mobile": {
+   "t": "div",
+   "c": "bg-[#fbf6ef] flex flex-col items-start relative",
+   "n": "Customers, Properties & Assets / Mobile",
+   "id": "175:3584",
+   "k": [
+    {
+     "t": "div",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[32px] items-start p-[24px] relative w-full",
+     "n": "01 / Product in view",
+     "id": "203:13096",
+     "k": [
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[32px] items-start relative w-full",
+       "n": "Outcome and product",
+       "id": "203:13097",
+       "k": [
+        {
+         "t": "div",
+         "c": "flex flex-col gap-[20px] items-start relative w-full",
+         "n": "Short outcome copy",
+         "id": "203:13098",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "203:13099",
+           "k": [
+            "CUSTOMERS, PROPERTIES & ASSETS"
+           ]
+          },
+          {
+           "t": "h1",
+           "c": "font-semibold leading-[1.08] relative text-[40px] text-[color:#0f1530] tracking-[-1px] w-full",
+           "id": "203:13100",
+           "k": [
+            "Know the home before you arrive."
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-full",
+           "id": "203:13101",
+           "k": [
+            "Bring each customer, property, equipment record, and service visit together."
+           ]
+          },
+          {
+           "t": "button",
+           "label": "Explore a customer",
+           "kind": "Dark",
+           "c": "bg-[#0f1530] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#fbf6ef]",
+           "href": "#workflow-m"
+          },
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "203:13104",
+           "k": [
+            "EXAMPLE BUSINESS · JUNIPER"
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#f6f7f9] border-[0.475px] border-[#e6dccb] border-solid flex flex-col h-[241.775px] items-start overflow-clip relative rounded-[7.6px] w-full",
+         "n": "Product demonstration / Customers, Properties & Assets",
+         "id": "203:13105",
+         "k": [
+          {
+           "t": "div",
+           "c": "bg-[#0f1530] flex gap-[7.6px] h-[25.65px] items-center p-[7.6px] relative w-full",
+           "n": "Product chrome",
+           "id": "I203:13105;200:388",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-bold leading-[1.38] relative text-[8.07px] text-[color:#fff] w-[66.5px] shrink-0",
+             "id": "I203:13105;200:389",
+             "k": [
+              "Renvani"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-medium leading-[1.38] relative text-[5.7px] text-[color:#fff] w-[196.65px] shrink-0",
+             "id": "I203:13105;200:390",
+             "k": [
+              "Customers & equipment"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#f6b400] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[48.45px] shrink-0",
+             "n": "Status / EXAMPLE",
+             "id": "I203:13105;200:391",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#0f1530] w-[38.95px] shrink-0",
+               "id": "I203:13105;200:392",
+               "k": [
+                "EXAMPLE"
+               ]
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[7.6px] items-start p-[11.4px] relative w-full",
+           "n": "Product workspace",
+           "id": "I203:13105;200:393",
+           "k": [
+            {
+             "t": "div",
+             "c": "flex gap-[7.6px] items-start relative w-full",
+             "n": "Screen title",
+             "id": "I203:13105;200:394",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-semibold leading-[1.38] relative text-[10.92px] text-[color:#0f1530] w-[218.5px] shrink-0",
+               "id": "I203:13105;200:395",
+               "k": [
+                "Customers & equipment"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[85.5px] shrink-0",
+               "n": "Status / Your business",
+               "id": "I203:13105;200:396",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#2a3360] w-[76px] shrink-0",
+                 "id": "I203:13105;200:397",
+                 "k": [
+                  "Your business"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[9.5px] items-start relative w-full",
+             "n": "Customer record",
+             "id": "I203:13105;200:398",
+             "k": [
+              {
+               "t": "div",
+               "c": "bg-[#fff] border-[0.475px] border-[#e6dccb] border-solid flex flex-col gap-[6.65px] items-start p-[9.5px] relative rounded-[7.6px] w-[121.6px] shrink-0",
+               "n": "Customer profile",
+               "id": "I203:13105;200:399",
+               "k": [
+                {
+                 "t": "div",
+                 "c": "bg-[#0f1530] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[20.9px] shrink-0",
+                 "n": "Status / JL",
+                 "id": "I203:13105;200:400",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#fff] w-[11.4px] shrink-0",
+                   "id": "I203:13105;200:401",
+                   "k": [
+                    "JL"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-semibold leading-[1.38] relative text-[10.92px] text-[color:#0f1530] w-full",
+                 "id": "I203:13105;200:402",
+                 "k": [
+                  "Jordan Lee"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal leading-[1.38] relative text-[5.22px] text-[color:#2a3360] w-full",
+                 "id": "I203:13105;200:403",
+                 "k": [
+                  "Customer since April 2024"
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#e6dccb] h-[0.475px] relative w-full",
+                 "n": "Divider",
+                 "id": "I203:13105;200:404"
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[4.75px] items-start leading-[1.38] relative text-[5.7px] w-full",
+                 "n": "Field / Properties",
+                 "id": "I203:13105;200:405",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[color:#2a3360] w-[56.525px] shrink-0",
+                   "id": "I203:13105;200:406",
+                   "k": [
+                    "Properties"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-medium relative text-[color:#0f1530] w-[41.325px] shrink-0",
+                   "id": "I203:13105;200:407",
+                   "k": [
+                    "2"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[4.75px] items-start leading-[1.38] relative text-[5.7px] w-full",
+                 "n": "Field / Completed visits",
+                 "id": "I203:13105;200:408",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[color:#2a3360] w-[56.525px] shrink-0",
+                   "id": "I203:13105;200:409",
+                   "k": [
+                    "Completed visits"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-medium relative text-[color:#0f1530] w-[41.325px] shrink-0",
+                   "id": "I203:13105;200:410",
+                   "k": [
+                    "3"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[4.75px] items-start leading-[1.38] relative text-[5.7px] w-full",
+                 "n": "Field / Contact",
+                 "id": "I203:13105;200:411",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[color:#2a3360] w-[56.525px] shrink-0",
+                   "id": "I203:13105;200:412",
+                   "k": [
+                    "Contact"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-medium relative text-[color:#0f1530] w-[41.325px] shrink-0",
+                   "id": "I203:13105;200:413",
+                   "k": [
+                    "Email"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#e4f1e8] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[83.125px] shrink-0",
+                 "n": "Status / Active agreement",
+                 "id": "I203:13105;200:414",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#0f1530] w-[73.625px] shrink-0",
+                   "id": "I203:13105;200:415",
+                   "k": [
+                    "Active agreement"
+                   ]
+                  }
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border-[0.475px] border-[#e6dccb] border-solid flex flex-col gap-[6.65px] items-start p-[9.5px] relative rounded-[7.6px] w-[188.1px] shrink-0",
+               "n": "Equipment and history",
+               "id": "I203:13105;200:416",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-semibold leading-[1.38] relative text-[9.02px] text-[color:#0f1530] w-full",
+                 "id": "I203:13105;200:417",
+                 "k": [
+                  "Primary home"
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "h-[61.75px] relative rounded-[7.6px] w-full",
+                 "n": "Equipment context",
+                 "id": "I203:13105;200:418",
+                 "k": [
+                  {
+                   "t": "img",
+                   "c": "absolute inset-0 object-cover rounded-[7.6px] size-full",
+                   "src": "/marketing/flagship/equipment-context-f1266660.jpg"
+                  }
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[6.65px] text-[color:#0f1530] w-full",
+                 "id": "I203:13105;200:419",
+                 "k": [
+                  "Split AC · Installed 2021"
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[4.75px] items-start leading-[1.38] relative text-[5.7px] w-full",
+                 "n": "Field / Last service",
+                 "id": "I203:13105;200:420",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[color:#2a3360] w-[93.1px] shrink-0",
+                   "id": "I203:13105;200:421",
+                   "k": [
+                    "Last service"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-medium relative text-[color:#0f1530] w-[71.25px] shrink-0",
+                   "id": "I203:13105;200:422",
+                   "k": [
+                    "Apr 18"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[4.75px] items-start leading-[1.38] relative text-[5.7px] w-full",
+                 "n": "Field / Latest work",
+                 "id": "I203:13105;200:423",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[color:#2a3360] w-[93.1px] shrink-0",
+                   "id": "I203:13105;200:424",
+                   "k": [
+                    "Latest work"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-medium relative text-[color:#0f1530] w-[71.25px] shrink-0",
+                   "id": "I203:13105;200:425",
+                   "k": [
+                    "Capacitor replaced"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#0f1530] flex h-[18.05px] items-center justify-center px-[6.65px] relative rounded-[5.7px] w-[169.1px] shrink-0",
+                 "n": "UI action / Open job history",
+                 "id": "I203:13105;200:426",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[5.7px] text-[color:#fff] text-center w-[155.8px] shrink-0",
+                   "id": "I203:13105;200:427",
+                   "k": [
+                    "Open job history"
+                   ]
+                  }
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#fff] flex flex-col gap-[32px] items-start p-[24px] relative w-full",
+     "n": "02 / A workflow you can see",
+     "id": "203:13146",
+     "k": [
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[12px] items-start leading-[1.38] relative w-full",
+       "n": "Workflow heading",
+       "id": "203:13147",
+       "k": [
+        {
+         "t": "p",
+         "c": "font-medium relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+         "id": "203:13148",
+         "k": [
+          "EXAMPLE WORKFLOW"
+         ]
+        },
+        {
+         "t": "p",
+         "c": "font-semibold relative text-[32px] text-[color:#0f1530] w-full",
+         "id": "203:13149",
+         "k": [
+          "See the work happen."
+         ]
+        }
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[24px] items-start relative w-full",
+       "n": "Three product moments",
+       "id": "203:13150",
+       "k": [
+        {
+         "t": "div",
+         "c": "bg-[#fff] border-[0.855px] border-[#e6dccb] border-solid flex flex-col gap-[15.39px] h-[444.6px] items-start p-[18.81px] relative rounded-[13.68px] w-full",
+         "n": "Workflow moment / One customer record",
+         "id": "203:13151",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10.26px] items-start relative w-full",
+           "n": "Step heading",
+           "id": "I203:13151;203:13022",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[34.2px] shrink-0",
+             "n": "Status / 01",
+             "id": "I203:13151;203:13023",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#fff] w-[17.1px] shrink-0",
+               "id": "I203:13151;203:13024",
+               "k": [
+                "01"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[15.39px] text-[color:#0f1530] flex-1 min-w-0",
+             "id": "I203:13151;203:13025",
+             "k": [
+              "One customer record"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[11.97px] h-[342px] items-start p-[15.39px] relative rounded-[10.26px] w-full",
+           "n": "Illustrated product state / profile",
+           "id": "I203:13151;203:13026",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[46.17px] shrink-0",
+             "n": "Status / JL",
+             "id": "I203:13151;203:13027",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#fff] w-[29.07px] shrink-0",
+               "id": "I203:13151;203:13028",
+               "k": [
+                "JL"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[25.65px] text-[color:#0f1530] w-full",
+             "id": "I203:13151;203:13029",
+             "k": [
+              "Jordan Lee"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[10.26px] items-start leading-[1.38] relative w-full",
+             "n": "Customer facts",
+             "id": "I203:13151;203:13030",
+             "k": [
+              {
+               "t": "div",
+               "c": "bg-[#fff] border-[0.855px] border-[#e6dccb] border-solid flex flex-col gap-[11.97px] items-start p-[17.1px] relative rounded-[13.68px] w-[130.815px] shrink-0",
+               "n": "Properties",
+               "id": "I203:13151;203:13031",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-bold relative text-[25.65px] text-[color:#0f1530] w-full",
+                 "id": "I203:13151;203:13032",
+                 "k": [
+                  "2"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[10.26px] text-[color:#2a3360] w-full",
+                 "id": "I203:13151;203:13033",
+                 "k": [
+                  "Properties"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border-[0.855px] border-[#e6dccb] border-solid flex flex-col gap-[11.97px] items-start p-[17.1px] relative rounded-[13.68px] w-[130.815px] shrink-0",
+               "n": "Visits",
+               "id": "I203:13151;203:13034",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-bold relative text-[25.65px] text-[color:#0f1530] w-full",
+                 "id": "I203:13151;203:13035",
+                 "k": [
+                  "3"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[10.26px] text-[color:#2a3360] w-full",
+                 "id": "I203:13151;203:13036",
+                 "k": [
+                  "Visits"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[230.85px] shrink-0",
+             "n": "Status / Contact preference · Email",
+             "id": "I203:13151;203:13037",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#0f1530] w-[213.75px] shrink-0",
+               "id": "I203:13151;203:13038",
+               "k": [
+                "Contact preference · Email"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] border-[0.855px] border-[#e6dccb] border-solid flex flex-col gap-[15.39px] h-[444.6px] items-start p-[18.81px] relative rounded-[13.68px] w-full",
+         "n": "Workflow moment / Know the equipment",
+         "id": "203:13169",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10.26px] items-start relative w-full",
+           "n": "Step heading",
+           "id": "I203:13169;203:13041",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[34.2px] shrink-0",
+             "n": "Status / 02",
+             "id": "I203:13169;203:13042",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#fff] w-[17.1px] shrink-0",
+               "id": "I203:13169;203:13043",
+               "k": [
+                "02"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[15.39px] text-[color:#0f1530] flex-1 min-w-0",
+             "id": "I203:13169;203:13044",
+             "k": [
+              "Know the equipment"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[11.97px] h-[342px] items-start p-[15.39px] relative rounded-[10.26px] w-full",
+           "n": "Illustrated product state / equipment",
+           "id": "I203:13169;203:13045",
+           "k": [
+            {
+             "t": "div",
+             "c": "h-[102.6px] relative rounded-[13.68px] w-full",
+             "n": "Illustrative HVAC job context",
+             "id": "I203:13169;203:13046",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute inset-0 object-cover rounded-[13.68px] size-full",
+               "src": "/marketing/flagship/equipment-context-f1266660.jpg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[16.24px] text-[color:#0f1530] w-full",
+             "id": "I203:13169;203:13047",
+             "k": [
+              "Split AC · Installed 2021"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[11.11px] text-[color:#2a3360] w-full",
+             "id": "I203:13169;203:13048",
+             "k": [
+              "Primary home"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[210.33px] shrink-0",
+             "n": "Status / Last service · Apr 18",
+             "id": "I203:13169;203:13049",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#0f1530] w-[193.23px] shrink-0",
+               "id": "I203:13169;203:13050",
+               "k": [
+                "Last service · Apr 18"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[32.49px] items-center justify-center px-[11.97px] relative rounded-[10.26px] w-full",
+             "n": "UI action / Open equipment history",
+             "id": "I203:13169;203:13051",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10.26px] text-[color:#fff] text-center flex-1 min-w-0",
+               "id": "I203:13169;203:13052",
+               "k": [
+                "Open equipment history"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] border-[0.855px] border-[#e6dccb] border-solid flex flex-col gap-[15.39px] h-[444.6px] items-start p-[18.81px] relative rounded-[13.68px] w-full",
+         "n": "Workflow moment / Bring the history",
+         "id": "203:13182",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10.26px] items-start relative w-full",
+           "n": "Step heading",
+           "id": "I203:13182;203:13055",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[34.2px] shrink-0",
+             "n": "Status / 03",
+             "id": "I203:13182;203:13056",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#fff] w-[17.1px] shrink-0",
+               "id": "I203:13182;203:13057",
+               "k": [
+                "03"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[15.39px] text-[color:#0f1530] flex-1 min-w-0",
+             "id": "I203:13182;203:13058",
+             "k": [
+              "Bring the history"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[11.97px] h-[342px] items-start p-[15.39px] relative rounded-[10.26px] w-full",
+           "n": "Illustrated product state / history",
+           "id": "I203:13182;203:13059",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[18.81px] text-[color:#0f1530] w-full",
+             "id": "I203:13182;203:13060",
+             "k": [
+              "Service history"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex gap-[8.55px] h-[51.3px] items-start p-[10.26px] relative rounded-[10.26px] w-full",
+             "n": "Apr 18",
+             "id": "I203:13182;203:13061",
+             "k": [
+              {
+               "t": "div",
+               "c": "relative size-[17.1px]",
+               "n": "Icon / check",
+               "id": "I203:13182;203:13062",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-check1-50e0cdf8.svg"
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "flex flex-col gap-[1.71px] items-start leading-[1.38] relative w-[224.01px] shrink-0",
+               "n": "Event",
+               "id": "I203:13182;203:13064",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[9.4px] text-[color:#2a3360] w-full",
+                 "id": "I203:13182;203:13065",
+                 "k": [
+                  "Apr 18"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-medium relative text-[11.97px] text-[color:#0f1530] w-full",
+                 "id": "I203:13182;203:13066",
+                 "k": [
+                  "Spring tune-up"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex gap-[8.55px] h-[51.3px] items-start p-[10.26px] relative rounded-[10.26px] w-full",
+             "n": "Oct 29",
+             "id": "I203:13182;203:13067",
+             "k": [
+              {
+               "t": "div",
+               "c": "relative size-[17.1px]",
+               "n": "Icon / check",
+               "id": "I203:13182;203:13068",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-check1-50e0cdf8.svg"
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "flex flex-col gap-[1.71px] items-start leading-[1.38] relative w-[224.01px] shrink-0",
+               "n": "Event",
+               "id": "I203:13182;203:13070",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[9.4px] text-[color:#2a3360] w-full",
+                 "id": "I203:13182;203:13071",
+                 "k": [
+                  "Oct 29"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-medium relative text-[11.97px] text-[color:#0f1530] w-full",
+                 "id": "I203:13182;203:13072",
+                 "k": [
+                  "Capacitor replaced"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex gap-[8.55px] h-[51.3px] items-start p-[10.26px] relative rounded-[10.26px] w-full",
+             "n": "Nov 12",
+             "id": "I203:13182;203:13073",
+             "k": [
+              {
+               "t": "div",
+               "c": "relative size-[17.1px]",
+               "n": "Icon / check",
+               "id": "I203:13182;203:13074",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-check1-50e0cdf8.svg"
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "flex flex-col gap-[1.71px] items-start leading-[1.38] relative w-[224.01px] shrink-0",
+               "n": "Event",
+               "id": "I203:13182;203:13076",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-normal relative text-[9.4px] text-[color:#2a3360] w-full",
+                 "id": "I203:13182;203:13077",
+                 "k": [
+                  "Nov 12"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-medium relative text-[11.97px] text-[color:#0f1530] w-full",
+                 "id": "I203:13182;203:13078",
+                 "k": [
+                  "Next visit"
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ],
+     "anchor": "workflow-m"
+    },
+    {
+     "t": "div",
+     "c": "bg-[#0f1530] flex flex-col gap-[16px] items-start p-[24px] relative w-full",
+     "n": "03 / Connected workflow and demo",
+     "id": "203:13207",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#f6b400] tracking-[1.1px] w-full",
+       "id": "219:10648",
+       "k": [
+        "WORKS ACROSS YOUR BUSINESS"
+       ]
+      },
+      {
+       "t": "p",
+       "c": "font-semibold leading-[1.38] relative text-[28px] text-[color:#fff] w-full",
+       "id": "219:10649",
+       "k": [
+        "One job. Connected all the way."
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[12px] items-center relative w-full",
+       "n": "Flagship and tool handoff",
+       "id": "219:10650",
+       "k": [
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] w-full",
+         "n": "Connected feature / Jobs & work orders / Mobile",
+         "id": "219:10661",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:10652",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Operations",
+             "id": "219:10653",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:10654",
+               "k": [
+                "Operations"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[180px] shrink-0",
+             "id": "219:10655",
+             "k": [
+              "Job #1042 · Jordan Lee"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:10656",
+           "k": [
+            "Jobs & work orders"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:10657",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:10658",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:10660",
+             "k": [
+              "Visit history saved"
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex flex-col h-[24px] items-center justify-center relative w-full",
+         "n": "Next connected state",
+         "id": "219:10662",
+         "k": [
+          {
+           "t": "div",
+           "c": "relative size-[24px]",
+           "n": "Frame",
+           "id": "219:10663",
+           "k": [
+            {
+             "t": "img",
+             "c": "absolute block inset-0 size-full",
+             "src": "/marketing/flagship/frame-08fa5d7a.svg"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] w-full",
+         "n": "Connected feature / Customers & assets / Mobile",
+         "id": "219:10675",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:10666",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Command Center",
+             "id": "219:10667",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:10668",
+               "k": [
+                "Command Center"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[180px] shrink-0",
+             "id": "219:10669",
+             "k": [
+              "Job #1042 · Jordan Lee"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:10670",
+           "k": [
+            "Customers & assets"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:10671",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:10672",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:10674",
+             "k": [
+              "One connected customer record"
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex flex-col h-[24px] items-center justify-center relative w-full",
+         "n": "Next connected state",
+         "id": "219:10676",
+         "k": [
+          {
+           "t": "div",
+           "c": "relative size-[24px]",
+           "n": "Frame",
+           "id": "219:10677",
+           "k": [
+            {
+             "t": "img",
+             "c": "absolute block inset-0 size-full",
+             "src": "/marketing/flagship/frame-08fa5d7a.svg"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] w-full",
+         "n": "Connected feature / Service agreements / Mobile",
+         "id": "219:10689",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:10680",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Retention",
+             "id": "219:10681",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:10682",
+               "k": [
+                "Retention"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[180px] shrink-0",
+             "id": "219:10683",
+             "k": [
+              "Job #1042 · Jordan Lee"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:10684",
+           "k": [
+            "Service agreements"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:10685",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:10686",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:10688",
+             "k": [
+              "Next covered visit in view"
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "t": "button",
+       "label": "Get a free demo",
+       "kind": "Accent",
+       "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#0f1530]",
+       "href": "/demo"
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "onboarding-data-import": {
+  "desktop": {
+   "t": "div",
+   "c": "bg-[#fbf6ef] flex flex-col items-start relative",
+   "n": "Onboarding & Data Import / Desktop",
+   "id": "175:4010",
+   "k": [
+    {
+     "t": "div",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[32px] items-start p-[80px] relative w-full",
+     "n": "01 / Product in view",
+     "id": "203:13486",
+     "k": [
+      {
+       "t": "div",
+       "c": "flex gap-[48px] items-center relative w-full",
+       "n": "Outcome and product",
+       "id": "203:13487",
+       "k": [
+        {
+         "t": "div",
+         "c": "flex flex-col gap-[20px] items-start relative flex-1 min-w-0",
+         "n": "Short outcome copy",
+         "id": "203:13488",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "203:13489",
+           "k": [
+            "ONBOARDING & DATA IMPORT"
+           ]
+          },
+          {
+           "t": "h1",
+           "c": "font-semibold leading-[1.08] relative text-[60px] text-[color:#0f1530] tracking-[-1.5px] w-full",
+           "id": "203:13490",
+           "k": [
+            "Bring the business you’ve already built."
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-full",
+           "id": "203:13491",
+           "k": [
+            "Upload your export, review the mapping, and check what comes across."
+           ]
+          },
+          {
+           "t": "button",
+           "label": "See the import flow",
+           "kind": "Dark",
+           "c": "bg-[#0f1530] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#fbf6ef]",
+           "href": "#workflow"
+          },
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "203:13494",
+           "k": [
+            "EXAMPLE BUSINESS · JUNIPER"
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#f6f7f9] border-[1.044px] border-[#e6dccb] border-solid flex flex-col h-[470px] items-start overflow-clip relative rounded-[16.711px] flex-1 min-w-0",
+         "n": "Product demonstration / Onboarding & Data Import",
+         "id": "203:13495",
+         "k": [
+          {
+           "t": "div",
+           "c": "bg-[#0f1530] flex gap-[16.711px] h-[56.4px] items-center p-[16.711px] relative w-full",
+           "n": "Product chrome",
+           "id": "I203:13495;200:472",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-bold leading-[1.38] relative text-[17.76px] text-[color:#fff] w-[146.222px] shrink-0",
+             "id": "I203:13495;200:473",
+             "k": [
+              "Renvani"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-medium leading-[1.38] relative text-[12.53px] text-[color:#fff] flex-1 min-w-0",
+             "id": "I203:13495;200:474",
+             "k": [
+              "Data import"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#f6b400] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[106.533px] shrink-0",
+             "n": "Status / EXAMPLE",
+             "id": "I203:13495;200:475",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10.44px] text-[color:#0f1530] w-[85.644px] shrink-0",
+               "id": "I203:13495;200:476",
+               "k": [
+                "EXAMPLE"
+               ]
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[16.711px] items-start p-[25.067px] relative w-full",
+           "n": "Product workspace",
+           "id": "I203:13495;200:477",
+           "k": [
+            {
+             "t": "div",
+             "c": "flex gap-[16.711px] items-start relative w-full",
+             "n": "Screen title",
+             "id": "I203:13495;200:478",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-semibold leading-[1.38] relative text-[24.02px] text-[color:#0f1530] flex-1 min-w-0",
+               "id": "I203:13495;200:479",
+               "k": [
+                "Data import"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[188px] shrink-0",
+               "n": "Status / Your business",
+               "id": "I203:13495;200:480",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10.44px] text-[color:#2a3360] w-[167.111px] shrink-0",
+                 "id": "I203:13495;200:481",
+                 "k": [
+                  "Your business"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[16.711px] items-start relative w-full",
+             "n": "Import steps",
+             "id": "I203:13495;200:482",
+             "k": [
+              {
+               "t": "div",
+               "c": "bg-[#fff] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[222.467px] shrink-0",
+               "n": "Status / 1  Upload",
+               "id": "I203:13495;200:483",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10.44px] text-[color:#0f1530] w-[201.578px] shrink-0",
+                 "id": "I203:13495;200:484",
+                 "k": [
+                  "1 Upload"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#0f1530] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[222.467px] shrink-0",
+               "n": "Status / 2  Review",
+               "id": "I203:13495;200:485",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10.44px] text-[color:#fff] w-[201.578px] shrink-0",
+                 "id": "I203:13495;200:486",
+                 "k": [
+                  "2 Review"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[222.467px] shrink-0",
+               "n": "Status / 3  Import",
+               "id": "I203:13495;200:487",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[10.44px] text-[color:#0f1530] w-[201.578px] shrink-0",
+                 "id": "I203:13495;200:488",
+                 "k": [
+                  "3 Import"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[20.889px] items-start relative w-full",
+             "n": "File mapping",
+             "id": "I203:13495;200:489",
+             "k": [
+              {
+               "t": "div",
+               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] flex-1 min-w-0",
+               "n": "Source file",
+               "id": "I203:13495;200:490",
+               "k": [
+                {
+                 "t": "div",
+                 "c": "relative size-[33.422px]",
+                 "n": "Icon / upload",
+                 "id": "I203:13495;200:491",
+                 "k": [
+                  {
+                   "t": "img",
+                   "c": "absolute block inset-0 size-full",
+                   "src": "/marketing/flagship/icon-upload1-df31b9d6.svg"
+                  }
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-semibold leading-[1.38] relative text-[20.89px] text-[color:#0f1530] w-full",
+                 "id": "I203:13495;200:493",
+                 "k": [
+                  "customers.csv"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal leading-[1.38] relative text-[12.53px] text-[color:#2a3360] w-full",
+                 "id": "I203:13495;200:494",
+                 "k": [
+                  "248 customer records"
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#e4f1e8] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[167.111px] shrink-0",
+                 "n": "Status / File received",
+                 "id": "I203:13495;200:495",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[10.44px] text-[color:#0f1530] w-[146.222px] shrink-0",
+                   "id": "I203:13495;200:496",
+                   "k": [
+                    "File received"
+                   ]
+                  }
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] flex-1 min-w-0",
+               "n": "Map columns",
+               "id": "I203:13495;200:497",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-semibold leading-[1.38] relative text-[21.93px] text-[color:#0f1530] w-full",
+                 "id": "I203:13495;200:498",
+                 "k": [
+                  "Match your columns"
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.53px] w-full",
+                 "n": "Field / Client name",
+                 "id": "I203:13495;200:499",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[color:#2a3360] w-[206.8px] shrink-0",
+                   "id": "I203:13495;200:500",
+                   "k": [
+                    "Client name"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-medium relative text-[color:#0f1530] w-[158.756px] shrink-0",
+                   "id": "I203:13495;200:501",
+                   "k": [
+                    "Customer"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.53px] w-full",
+                 "n": "Field / Site address",
+                 "id": "I203:13495;200:502",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[color:#2a3360] w-[206.8px] shrink-0",
+                   "id": "I203:13495;200:503",
+                   "k": [
+                    "Site address"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-medium relative text-[color:#0f1530] w-[158.756px] shrink-0",
+                   "id": "I203:13495;200:504",
+                   "k": [
+                    "Property"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.53px] w-full",
+                 "n": "Field / Unit model",
+                 "id": "I203:13495;200:505",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[color:#2a3360] w-[206.8px] shrink-0",
+                   "id": "I203:13495;200:506",
+                   "k": [
+                    "Unit model"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-medium relative text-[color:#0f1530] w-[158.756px] shrink-0",
+                   "id": "I203:13495;200:507",
+                   "k": [
+                    "Equipment"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#fff4d6] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[229.778px] shrink-0",
+                 "n": "Status / 6 duplicates to review",
+                 "id": "I203:13495;200:508",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[10.44px] text-[color:#0f1530] w-[208.889px] shrink-0",
+                   "id": "I203:13495;200:509",
+                   "k": [
+                    "6 duplicates to review"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#0f1530] flex h-[39.689px] items-center justify-center px-[14.622px] relative rounded-[12.533px] w-full",
+                 "n": "UI action / Preview import",
+                 "id": "I203:13495;200:510",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[12.53px] text-[color:#fff] text-center flex-1 min-w-0",
+                   "id": "I203:13495;200:511",
+                   "k": [
+                    "Preview import"
+                   ]
+                  }
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#fff] flex flex-col gap-[32px] items-start p-[80px] relative w-full",
+     "n": "02 / A workflow you can see",
+     "id": "203:13536",
+     "k": [
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[12px] items-start relative w-full",
+       "n": "Workflow heading",
+       "id": "203:13537",
+       "k": [
+        {
+         "t": "p",
+         "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+         "id": "203:13538",
+         "k": [
+          "EXAMPLE WORKFLOW"
+         ]
+        },
+        {
+         "t": "p",
+         "c": "font-semibold leading-[1.08] relative text-[44px] text-[color:#0f1530] tracking-[-1.1px] w-full",
+         "id": "203:13539",
+         "k": [
+          "See the work happen."
+         ]
+        }
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex gap-[40px] items-start relative w-full",
+       "n": "Three product moments",
+       "id": "203:13540",
+       "k": [
+        {
+         "t": "div",
+         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[var(--radius\\\\/16,16px)] flex-1 min-w-0",
+         "n": "Feature workflow / Bring your export",
+         "id": "203:13564",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[12px] items-start relative w-full",
+           "n": "Step heading",
+           "id": "203:13542",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[40px] shrink-0",
+             "n": "Status / 01",
+             "id": "203:13543",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#fff] w-[20px] shrink-0",
+               "id": "203:13544",
+               "k": [
+                "01"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] flex-1 min-w-0",
+             "id": "203:13545",
+             "k": [
+              "Bring your export"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-full",
+           "n": "Illustrated product state / files",
+           "id": "203:13546",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[32px]",
+             "n": "Icon / upload",
+             "id": "203:13547",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-upload-ec798472.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+             "id": "203:13549",
+             "k": [
+              "Bring your export"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex gap-[10px] h-[40px] items-start p-[10px] relative rounded-[12px] w-full",
+             "n": "customers.csv",
+             "id": "203:13550",
+             "k": [
+              {
+               "t": "div",
+               "c": "relative size-[18px]",
+               "n": "Icon / check",
+               "id": "203:13551",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+                }
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#0f1530] flex-1 min-w-0",
+               "id": "203:13553",
+               "k": [
+                "customers.csv"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex gap-[10px] h-[40px] items-start p-[10px] relative rounded-[12px] w-full",
+             "n": "jobs.csv",
+             "id": "203:13554",
+             "k": [
+              {
+               "t": "div",
+               "c": "relative size-[18px]",
+               "n": "Icon / check",
+               "id": "203:13555",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+                }
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#0f1530] flex-1 min-w-0",
+               "id": "203:13557",
+               "k": [
+                "jobs.csv"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex gap-[10px] h-[40px] items-start p-[10px] relative rounded-[12px] w-full",
+             "n": "equipment.csv",
+             "id": "203:13558",
+             "k": [
+              {
+               "t": "div",
+               "c": "relative size-[18px]",
+               "n": "Icon / check",
+               "id": "203:13559",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+                }
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#0f1530] flex-1 min-w-0",
+               "id": "203:13561",
+               "k": [
+                "equipment.csv"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+             "n": "UI action / Upload files",
+             "id": "203:13562",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+               "id": "203:13563",
+               "k": [
+                "Upload files"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[var(--radius\\\\/16,16px)] flex-1 min-w-0",
+         "n": "Feature workflow / Review the mapping",
+         "id": "203:13591",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[12px] items-start relative w-full",
+           "n": "Step heading",
+           "id": "203:13566",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[40px] shrink-0",
+             "n": "Status / 02",
+             "id": "203:13567",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#fff] w-[20px] shrink-0",
+               "id": "203:13568",
+               "k": [
+                "02"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] flex-1 min-w-0",
+             "id": "203:13569",
+             "k": [
+              "Review the mapping"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-full",
+           "n": "Illustrated product state / mapping",
+           "id": "203:13570",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[21px] text-[color:#0f1530] w-full",
+             "id": "203:13571",
+             "k": [
+              "Match your columns"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex gap-[10px] h-[48px] items-start p-[10px] relative rounded-[12px] w-full",
+             "n": "Client name",
+             "id": "203:13572",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] w-[127px] shrink-0",
+               "id": "203:13573",
+               "k": [
+                "Client name"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "relative size-[20px]",
+               "n": "Icon / arrow",
+               "id": "203:13574",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-arrow-98ad10eb.svg"
+                }
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[13px] text-[color:#0f1530] w-[131px] shrink-0",
+               "id": "203:13576",
+               "k": [
+                "Customer"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex gap-[10px] h-[48px] items-start p-[10px] relative rounded-[12px] w-full",
+             "n": "Site address",
+             "id": "203:13577",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] w-[127px] shrink-0",
+               "id": "203:13578",
+               "k": [
+                "Site address"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "relative size-[20px]",
+               "n": "Icon / arrow",
+               "id": "203:13579",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-arrow-98ad10eb.svg"
+                }
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[13px] text-[color:#0f1530] w-[131px] shrink-0",
+               "id": "203:13581",
+               "k": [
+                "Property"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex gap-[10px] h-[48px] items-start p-[10px] relative rounded-[12px] w-full",
+             "n": "Unit model",
+             "id": "203:13582",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] w-[127px] shrink-0",
+               "id": "203:13583",
+               "k": [
+                "Unit model"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "relative size-[20px]",
+               "n": "Icon / arrow",
+               "id": "203:13584",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-arrow-98ad10eb.svg"
+                }
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[13px] text-[color:#0f1530] w-[131px] shrink-0",
+               "id": "203:13586",
+               "k": [
+                "Equipment"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[220px] shrink-0",
+             "n": "Status / 3 fields need review",
+             "id": "203:13587",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[200px] shrink-0",
+               "id": "203:13588",
+               "k": [
+                "3 fields need review"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+             "n": "UI action / Review mapping",
+             "id": "203:13589",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+               "id": "203:13590",
+               "k": [
+                "Review mapping"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[18px] h-[520px] items-start p-[22px] relative rounded-[var(--radius\\\\/16,16px)] flex-1 min-w-0",
+         "n": "Feature workflow / Check before importing",
+         "id": "203:13610",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[12px] items-start relative w-full",
+           "n": "Step heading",
+           "id": "203:13593",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[40px] shrink-0",
+             "n": "Status / 03",
+             "id": "203:13594",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#fff] w-[20px] shrink-0",
+               "id": "203:13595",
+               "k": [
+                "03"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] flex-1 min-w-0",
+             "id": "203:13596",
+             "k": [
+              "Check before importing"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-full",
+           "n": "Illustrated product state / importPreview",
+           "id": "203:13597",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[21px] text-[color:#0f1530] w-full",
+             "id": "203:13598",
+             "k": [
+              "Check before importing"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-full",
+             "n": "Field / Customers",
+             "id": "203:13599",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-normal relative text-[color:#2a3360] w-[175px] shrink-0",
+               "id": "203:13600",
+               "k": [
+                "Customers"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium relative text-[color:#0f1530] w-[133px] shrink-0",
+               "id": "203:13601",
+               "k": [
+                "248"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-full",
+             "n": "Field / Jobs",
+             "id": "203:13602",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-normal relative text-[color:#2a3360] w-[175px] shrink-0",
+               "id": "203:13603",
+               "k": [
+                "Jobs"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium relative text-[color:#0f1530] w-[133px] shrink-0",
+               "id": "203:13604",
+               "k": [
+                "1,126"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#e6dccb] h-px relative w-full",
+             "n": "Divider",
+             "id": "203:13605"
+            },
+            {
+             "t": "p",
+             "c": "font-bold leading-[1.08] relative text-[48px] text-[color:#0f1530] tracking-[-1.2px] w-full",
+             "id": "203:13606",
+             "k": [
+              "6"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#2a3360] w-full",
+             "id": "203:13607",
+             "k": [
+              "Duplicates to review"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+             "n": "UI action / Preview import",
+             "id": "203:13608",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+               "id": "203:13609",
+               "k": [
+                "Preview import"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ],
+     "anchor": "workflow"
+    },
+    {
+     "t": "div",
+     "c": "bg-[#0f1530] flex flex-col gap-[16px] items-start px-[80px] py-[48px] relative w-full",
+     "n": "03 / Connected workflow and demo",
+     "id": "203:13611",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#f6b400] tracking-[1.1px] w-full",
+       "id": "219:10774",
+       "k": [
+        "WORKS ACROSS YOUR BUSINESS"
+       ]
+      },
+      {
+       "t": "p",
+       "c": "font-semibold leading-[1.08] relative text-[36px] text-[color:#fff] tracking-[-0.9px] w-full",
+       "id": "219:10775",
+       "k": [
+        "One job. Connected all the way."
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex gap-[16px] items-center relative w-full",
+       "n": "Flagship and tool handoff",
+       "id": "219:10776",
+       "k": [
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] flex-1 min-w-0",
+         "n": "Connected feature / Data import / Desktop",
+         "id": "219:10787",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:10778",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Command Center",
+             "id": "219:10779",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:10780",
+               "k": [
+                "Command Center"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[222px] shrink-0",
+             "id": "219:10781",
+             "k": [
+              "Customer records"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:10782",
+           "k": [
+            "Data import"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:10783",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:10784",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:10786",
+             "k": [
+              "Records reviewed and imported"
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex h-[24px] items-center justify-center relative w-[32px] shrink-0",
+         "n": "Next connected state",
+         "id": "219:10788",
+         "k": [
+          {
+           "t": "div",
+           "c": "relative size-[24px]",
+           "n": "Icon / arrow",
+           "id": "219:10789",
+           "k": [
+            {
+             "t": "img",
+             "c": "absolute block inset-0 size-full",
+             "src": "/marketing/flagship/icon-arrow1-84befcc1.svg"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] flex-1 min-w-0",
+         "n": "Connected feature / Customers & assets / Desktop",
+         "id": "219:10801",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:10792",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Command Center",
+             "id": "219:10793",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:10794",
+               "k": [
+                "Command Center"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[222px] shrink-0",
+             "id": "219:10795",
+             "k": [
+              "Customer records"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:10796",
+           "k": [
+            "Customers & assets"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:10797",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:10798",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:10800",
+             "k": [
+              "History available to the team"
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex h-[24px] items-center justify-center relative w-[32px] shrink-0",
+         "n": "Next connected state",
+         "id": "219:10802",
+         "k": [
+          {
+           "t": "div",
+           "c": "relative size-[24px]",
+           "n": "Icon / arrow",
+           "id": "219:10803",
+           "k": [
+            {
+             "t": "img",
+             "c": "absolute block inset-0 size-full",
+             "src": "/marketing/flagship/icon-arrow1-84befcc1.svg"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] flex-1 min-w-0",
+         "n": "Connected feature / Inquiry follow-up / Desktop",
+         "id": "219:10815",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:10806",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Revenue",
+             "id": "219:10807",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:10808",
+               "k": [
+                "Revenue"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[222px] shrink-0",
+             "id": "219:10809",
+             "k": [
+              "Estimate records"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:10810",
+           "k": [
+            "Inquiry follow-up"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:10811",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:10812",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:10814",
+             "k": [
+              "Open estimates ready to review"
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "t": "button",
+       "label": "Get a free demo",
+       "kind": "Accent",
+       "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#0f1530]",
+       "href": "/demo"
+      }
+     ]
+    }
+   ]
+  },
+  "mobile": {
+   "t": "div",
+   "c": "bg-[#fbf6ef] flex flex-col items-start relative",
+   "n": "Onboarding & Data Import / Mobile",
+   "id": "175:4156",
+   "k": [
+    {
+     "t": "div",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[32px] items-start p-[24px] relative w-full",
+     "n": "01 / Product in view",
+     "id": "203:13627",
+     "k": [
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[32px] items-start relative w-full",
+       "n": "Outcome and product",
+       "id": "203:13628",
+       "k": [
+        {
+         "t": "div",
+         "c": "flex flex-col gap-[20px] items-start relative w-full",
+         "n": "Short outcome copy",
+         "id": "203:13629",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "203:13630",
+           "k": [
+            "ONBOARDING & DATA IMPORT"
+           ]
+          },
+          {
+           "t": "h1",
+           "c": "font-semibold leading-[1.08] relative text-[40px] text-[color:#0f1530] tracking-[-1px] w-full",
+           "id": "203:13631",
+           "k": [
+            "Bring the business you’ve already built."
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-full",
+           "id": "203:13632",
+           "k": [
+            "Upload your export, review the mapping, and check what comes across."
+           ]
+          },
+          {
+           "t": "button",
+           "label": "See the import flow",
+           "kind": "Dark",
+           "c": "bg-[#0f1530] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#fbf6ef]",
+           "href": "#workflow-m"
+          },
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "203:13635",
+           "k": [
+            "EXAMPLE BUSINESS · JUNIPER"
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#f6f7f9] border-[0.475px] border-[#e6dccb] border-solid flex flex-col h-[213.75px] items-start overflow-clip relative rounded-[7.6px] w-full",
+         "n": "Product demonstration / Onboarding & Data Import",
+         "id": "203:13636",
+         "k": [
+          {
+           "t": "div",
+           "c": "bg-[#0f1530] flex gap-[7.6px] h-[25.65px] items-center p-[7.6px] relative w-full",
+           "n": "Product chrome",
+           "id": "I203:13636;200:472",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-bold leading-[1.38] relative text-[8.07px] text-[color:#fff] w-[66.5px] shrink-0",
+             "id": "I203:13636;200:473",
+             "k": [
+              "Renvani"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-medium leading-[1.38] relative text-[5.7px] text-[color:#fff] w-[196.65px] shrink-0",
+             "id": "I203:13636;200:474",
+             "k": [
+              "Data import"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#f6b400] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[48.45px] shrink-0",
+             "n": "Status / EXAMPLE",
+             "id": "I203:13636;200:475",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#0f1530] w-[38.95px] shrink-0",
+               "id": "I203:13636;200:476",
+               "k": [
+                "EXAMPLE"
+               ]
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[7.6px] items-start p-[11.4px] relative w-full",
+           "n": "Product workspace",
+           "id": "I203:13636;200:477",
+           "k": [
+            {
+             "t": "div",
+             "c": "flex gap-[7.6px] items-start relative w-full",
+             "n": "Screen title",
+             "id": "I203:13636;200:478",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-semibold leading-[1.38] relative text-[10.92px] text-[color:#0f1530] w-[218.5px] shrink-0",
+               "id": "I203:13636;200:479",
+               "k": [
+                "Data import"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[85.5px] shrink-0",
+               "n": "Status / Your business",
+               "id": "I203:13636;200:480",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#2a3360] w-[76px] shrink-0",
+                 "id": "I203:13636;200:481",
+                 "k": [
+                  "Your business"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[7.6px] items-start relative w-full",
+             "n": "Import steps",
+             "id": "I203:13636;200:482",
+             "k": [
+              {
+               "t": "div",
+               "c": "bg-[#fff] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[101.175px] shrink-0",
+               "n": "Status / 1  Upload",
+               "id": "I203:13636;200:483",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#0f1530] w-[91.675px] shrink-0",
+                 "id": "I203:13636;200:484",
+                 "k": [
+                  "1 Upload"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#0f1530] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[101.175px] shrink-0",
+               "n": "Status / 2  Review",
+               "id": "I203:13636;200:485",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#fff] w-[91.675px] shrink-0",
+                 "id": "I203:13636;200:486",
+                 "k": [
+                  "2 Review"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[101.175px] shrink-0",
+               "n": "Status / 3  Import",
+               "id": "I203:13636;200:487",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#0f1530] w-[91.675px] shrink-0",
+                 "id": "I203:13636;200:488",
+                 "k": [
+                  "3 Import"
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[9.5px] items-start relative w-full",
+             "n": "File mapping",
+             "id": "I203:13636;200:489",
+             "k": [
+              {
+               "t": "div",
+               "c": "bg-[#fff] border-[0.475px] border-[#e6dccb] border-solid flex flex-col gap-[6.65px] items-start p-[9.5px] relative rounded-[7.6px] w-[119.7px] shrink-0",
+               "n": "Source file",
+               "id": "I203:13636;200:490",
+               "k": [
+                {
+                 "t": "div",
+                 "c": "relative size-[15.2px]",
+                 "n": "Icon / upload",
+                 "id": "I203:13636;200:491",
+                 "k": [
+                  {
+                   "t": "img",
+                   "c": "absolute block inset-0 size-full",
+                   "src": "/marketing/flagship/icon-upload-799e602a.svg"
+                  }
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-semibold leading-[1.38] relative text-[9.5px] text-[color:#0f1530] w-full",
+                 "id": "I203:13636;200:493",
+                 "k": [
+                  "customers.csv"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal leading-[1.38] relative text-[5.7px] text-[color:#2a3360] w-full",
+                 "id": "I203:13636;200:494",
+                 "k": [
+                  "248 customer records"
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#e4f1e8] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[76px] shrink-0",
+                 "n": "Status / File received",
+                 "id": "I203:13636;200:495",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#0f1530] w-[66.5px] shrink-0",
+                   "id": "I203:13636;200:496",
+                   "k": [
+                    "File received"
+                   ]
+                  }
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border-[0.475px] border-[#e6dccb] border-solid flex flex-col gap-[6.65px] items-start p-[9.5px] relative rounded-[7.6px] w-[190px] shrink-0",
+               "n": "Map columns",
+               "id": "I203:13636;200:497",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-semibold leading-[1.38] relative text-[9.97px] text-[color:#0f1530] w-full",
+                 "id": "I203:13636;200:498",
+                 "k": [
+                  "Match your columns"
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[4.75px] items-start leading-[1.38] relative text-[5.7px] w-full",
+                 "n": "Field / Client name",
+                 "id": "I203:13636;200:499",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[color:#2a3360] w-[94.05px] shrink-0",
+                   "id": "I203:13636;200:500",
+                   "k": [
+                    "Client name"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-medium relative text-[color:#0f1530] w-[72.2px] shrink-0",
+                   "id": "I203:13636;200:501",
+                   "k": [
+                    "Customer"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[4.75px] items-start leading-[1.38] relative text-[5.7px] w-full",
+                 "n": "Field / Site address",
+                 "id": "I203:13636;200:502",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[color:#2a3360] w-[94.05px] shrink-0",
+                   "id": "I203:13636;200:503",
+                   "k": [
+                    "Site address"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-medium relative text-[color:#0f1530] w-[72.2px] shrink-0",
+                   "id": "I203:13636;200:504",
+                   "k": [
+                    "Property"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "flex gap-[4.75px] items-start leading-[1.38] relative text-[5.7px] w-full",
+                 "n": "Field / Unit model",
+                 "id": "I203:13636;200:505",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-normal relative text-[color:#2a3360] w-[94.05px] shrink-0",
+                   "id": "I203:13636;200:506",
+                   "k": [
+                    "Unit model"
+                   ]
+                  },
+                  {
+                   "t": "p",
+                   "c": "font-medium relative text-[color:#0f1530] w-[72.2px] shrink-0",
+                   "id": "I203:13636;200:507",
+                   "k": [
+                    "Equipment"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#fff4d6] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[104.5px] shrink-0",
+                 "n": "Status / 6 duplicates to review",
+                 "id": "I203:13636;200:508",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[4.75px] text-[color:#0f1530] w-[95px] shrink-0",
+                   "id": "I203:13636;200:509",
+                   "k": [
+                    "6 duplicates to review"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#0f1530] flex h-[18.05px] items-center justify-center px-[6.65px] relative rounded-[5.7px] w-[171px] shrink-0",
+                 "n": "UI action / Preview import",
+                 "id": "I203:13636;200:510",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[5.7px] text-[color:#fff] text-center w-[157.7px] shrink-0",
+                   "id": "I203:13636;200:511",
+                   "k": [
+                    "Preview import"
+                   ]
+                  }
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#fff] flex flex-col gap-[32px] items-start p-[24px] relative w-full",
+     "n": "02 / A workflow you can see",
+     "id": "203:13677",
+     "k": [
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[12px] items-start leading-[1.38] relative w-full",
+       "n": "Workflow heading",
+       "id": "203:13678",
+       "k": [
+        {
+         "t": "p",
+         "c": "font-medium relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+         "id": "203:13679",
+         "k": [
+          "EXAMPLE WORKFLOW"
+         ]
+        },
+        {
+         "t": "p",
+         "c": "font-semibold relative text-[32px] text-[color:#0f1530] w-full",
+         "id": "203:13680",
+         "k": [
+          "See the work happen."
+         ]
+        }
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[24px] items-start relative w-full",
+       "n": "Three product moments",
+       "id": "203:13681",
+       "k": [
+        {
+         "t": "div",
+         "c": "bg-[#fff] border-[0.855px] border-[#e6dccb] border-solid flex flex-col gap-[15.39px] h-[444.6px] items-start p-[18.81px] relative rounded-[13.68px] w-full",
+         "n": "Workflow moment / Bring your export",
+         "id": "203:13682",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10.26px] items-start relative w-full",
+           "n": "Step heading",
+           "id": "I203:13682;203:13542",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[34.2px] shrink-0",
+             "n": "Status / 01",
+             "id": "I203:13682;203:13543",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#fff] w-[17.1px] shrink-0",
+               "id": "I203:13682;203:13544",
+               "k": [
+                "01"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[15.39px] text-[color:#0f1530] flex-1 min-w-0",
+             "id": "I203:13682;203:13545",
+             "k": [
+              "Bring your export"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[11.97px] h-[342px] items-start p-[15.39px] relative rounded-[10.26px] w-full",
+           "n": "Illustrated product state / files",
+           "id": "I203:13682;203:13546",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[27.36px]",
+             "n": "Icon / upload",
+             "id": "I203:13682;203:13547",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-upload1-cfe55643.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[18.81px] text-[color:#0f1530] w-full",
+             "id": "I203:13682;203:13549",
+             "k": [
+              "Bring your export"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex gap-[8.55px] h-[34.2px] items-start p-[8.55px] relative rounded-[10.26px] w-full",
+             "n": "customers.csv",
+             "id": "I203:13682;203:13550",
+             "k": [
+              {
+               "t": "div",
+               "c": "relative size-[15.39px]",
+               "n": "Icon / check",
+               "id": "I203:13682;203:13551",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-check1-9c028546.svg"
+                }
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-normal leading-[1.38] relative text-[11.97px] text-[color:#0f1530] w-[230.85px] shrink-0",
+               "id": "I203:13682;203:13553",
+               "k": [
+                "customers.csv"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex gap-[8.55px] h-[34.2px] items-start p-[8.55px] relative rounded-[10.26px] w-full",
+             "n": "jobs.csv",
+             "id": "I203:13682;203:13554",
+             "k": [
+              {
+               "t": "div",
+               "c": "relative size-[15.39px]",
+               "n": "Icon / check",
+               "id": "I203:13682;203:13555",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-check1-9c028546.svg"
+                }
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-normal leading-[1.38] relative text-[11.97px] text-[color:#0f1530] w-[230.85px] shrink-0",
+               "id": "I203:13682;203:13557",
+               "k": [
+                "jobs.csv"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex gap-[8.55px] h-[34.2px] items-start p-[8.55px] relative rounded-[10.26px] w-full",
+             "n": "equipment.csv",
+             "id": "I203:13682;203:13558",
+             "k": [
+              {
+               "t": "div",
+               "c": "relative size-[15.39px]",
+               "n": "Icon / check",
+               "id": "I203:13682;203:13559",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-check1-9c028546.svg"
+                }
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-normal leading-[1.38] relative text-[11.97px] text-[color:#0f1530] w-[230.85px] shrink-0",
+               "id": "I203:13682;203:13561",
+               "k": [
+                "equipment.csv"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[32.49px] items-center justify-center px-[11.97px] relative rounded-[10.26px] w-full",
+             "n": "UI action / Upload files",
+             "id": "I203:13682;203:13562",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10.26px] text-[color:#fff] text-center flex-1 min-w-0",
+               "id": "I203:13682;203:13563",
+               "k": [
+                "Upload files"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] border-[0.855px] border-[#e6dccb] border-solid flex flex-col gap-[15.39px] h-[444.6px] items-start p-[18.81px] relative rounded-[13.68px] w-full",
+         "n": "Workflow moment / Review the mapping",
+         "id": "203:13705",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10.26px] items-start relative w-full",
+           "n": "Step heading",
+           "id": "I203:13705;203:13566",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[34.2px] shrink-0",
+             "n": "Status / 02",
+             "id": "I203:13705;203:13567",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#fff] w-[17.1px] shrink-0",
+               "id": "I203:13705;203:13568",
+               "k": [
+                "02"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[15.39px] text-[color:#0f1530] flex-1 min-w-0",
+             "id": "I203:13705;203:13569",
+             "k": [
+              "Review the mapping"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[11.97px] h-[342px] items-start p-[15.39px] relative rounded-[10.26px] w-full",
+           "n": "Illustrated product state / mapping",
+           "id": "I203:13705;203:13570",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[17.95px] text-[color:#0f1530] w-full",
+             "id": "I203:13705;203:13571",
+             "k": [
+              "Match your columns"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex gap-[8.55px] h-[41.04px] items-start p-[8.55px] relative rounded-[10.26px] w-full",
+             "n": "Client name",
+             "id": "I203:13705;203:13572",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-normal leading-[1.38] relative text-[10.26px] text-[color:#2a3360] w-[108.585px] shrink-0",
+               "id": "I203:13705;203:13573",
+               "k": [
+                "Client name"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "relative size-[17.1px]",
+               "n": "Icon / arrow",
+               "id": "I203:13705;203:13574",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-arrow-01bed9a7.svg"
+                }
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[11.11px] text-[color:#0f1530] w-[112.005px] shrink-0",
+               "id": "I203:13705;203:13576",
+               "k": [
+                "Customer"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex gap-[8.55px] h-[41.04px] items-start p-[8.55px] relative rounded-[10.26px] w-full",
+             "n": "Site address",
+             "id": "I203:13705;203:13577",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-normal leading-[1.38] relative text-[10.26px] text-[color:#2a3360] w-[108.585px] shrink-0",
+               "id": "I203:13705;203:13578",
+               "k": [
+                "Site address"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "relative size-[17.1px]",
+               "n": "Icon / arrow",
+               "id": "I203:13705;203:13579",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-arrow-01bed9a7.svg"
+                }
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[11.11px] text-[color:#0f1530] w-[112.005px] shrink-0",
+               "id": "I203:13705;203:13581",
+               "k": [
+                "Property"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex gap-[8.55px] h-[41.04px] items-start p-[8.55px] relative rounded-[10.26px] w-full",
+             "n": "Unit model",
+             "id": "I203:13705;203:13582",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-normal leading-[1.38] relative text-[10.26px] text-[color:#2a3360] w-[108.585px] shrink-0",
+               "id": "I203:13705;203:13583",
+               "k": [
+                "Unit model"
+               ]
+              },
+              {
+               "t": "div",
+               "c": "relative size-[17.1px]",
+               "n": "Icon / arrow",
+               "id": "I203:13705;203:13584",
+               "k": [
+                {
+                 "t": "img",
+                 "c": "absolute block inset-0 size-full",
+                 "src": "/marketing/flagship/icon-arrow-01bed9a7.svg"
+                }
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[11.11px] text-[color:#0f1530] w-[112.005px] shrink-0",
+               "id": "I203:13705;203:13586",
+               "k": [
+                "Equipment"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff4d6] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[188.1px] shrink-0",
+             "n": "Status / 3 fields need review",
+             "id": "I203:13705;203:13587",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#0f1530] w-[171px] shrink-0",
+               "id": "I203:13705;203:13588",
+               "k": [
+                "3 fields need review"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[32.49px] items-center justify-center px-[11.97px] relative rounded-[10.26px] w-full",
+             "n": "UI action / Review mapping",
+             "id": "I203:13705;203:13589",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10.26px] text-[color:#fff] text-center flex-1 min-w-0",
+               "id": "I203:13705;203:13590",
+               "k": [
+                "Review mapping"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] border-[0.855px] border-[#e6dccb] border-solid flex flex-col gap-[15.39px] h-[444.6px] items-start p-[18.81px] relative rounded-[13.68px] w-full",
+         "n": "Workflow moment / Check before importing",
+         "id": "203:13731",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10.26px] items-start relative w-full",
+           "n": "Step heading",
+           "id": "I203:13731;203:13593",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[34.2px] shrink-0",
+             "n": "Status / 03",
+             "id": "I203:13731;203:13594",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[8.55px] text-[color:#fff] w-[17.1px] shrink-0",
+               "id": "I203:13731;203:13595",
+               "k": [
+                "03"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[15.39px] text-[color:#0f1530] flex-1 min-w-0",
+             "id": "I203:13731;203:13596",
+             "k": [
+              "Check before importing"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[11.97px] h-[342px] items-start p-[15.39px] relative rounded-[10.26px] w-full",
+           "n": "Illustrated product state / importPreview",
+           "id": "I203:13731;203:13597",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[17.95px] text-[color:#0f1530] w-full",
+             "id": "I203:13731;203:13598",
+             "k": [
+              "Check before importing"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[8.55px] items-start leading-[1.38] relative text-[10.26px] w-full",
+             "n": "Field / Customers",
+             "id": "I203:13731;203:13599",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-normal relative text-[color:#2a3360] w-[149.625px] shrink-0",
+               "id": "I203:13731;203:13600",
+               "k": [
+                "Customers"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium relative text-[color:#0f1530] w-[113.715px] shrink-0",
+               "id": "I203:13731;203:13601",
+               "k": [
+                "248"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[8.55px] items-start leading-[1.38] relative text-[10.26px] w-full",
+             "n": "Field / Jobs",
+             "id": "I203:13731;203:13602",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-normal relative text-[color:#2a3360] w-[149.625px] shrink-0",
+               "id": "I203:13731;203:13603",
+               "k": [
+                "Jobs"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "font-medium relative text-[color:#0f1530] w-[113.715px] shrink-0",
+               "id": "I203:13731;203:13604",
+               "k": [
+                "1,126"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#e6dccb] h-[0.855px] relative w-full",
+             "n": "Divider",
+             "id": "I203:13731;203:13605"
+            },
+            {
+             "t": "p",
+             "c": "font-bold leading-[1.08] relative text-[41.04px] text-[color:#0f1530] tracking-[-1.026px] w-full",
+             "id": "I203:13731;203:13606",
+             "k": [
+              "6"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[11.97px] text-[color:#2a3360] w-full",
+             "id": "I203:13731;203:13607",
+             "k": [
+              "Duplicates to review"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[32.49px] items-center justify-center px-[11.97px] relative rounded-[10.26px] w-full",
+             "n": "UI action / Preview import",
+             "id": "I203:13731;203:13608",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10.26px] text-[color:#fff] text-center flex-1 min-w-0",
+               "id": "I203:13731;203:13609",
+               "k": [
+                "Preview import"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ],
+     "anchor": "workflow-m"
+    },
+    {
+     "t": "div",
+     "c": "bg-[#0f1530] flex flex-col gap-[16px] items-start p-[24px] relative w-full",
+     "n": "03 / Connected workflow and demo",
+     "id": "203:13749",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#f6b400] tracking-[1.1px] w-full",
+       "id": "219:10816",
+       "k": [
+        "WORKS ACROSS YOUR BUSINESS"
+       ]
+      },
+      {
+       "t": "p",
+       "c": "font-semibold leading-[1.38] relative text-[28px] text-[color:#fff] w-full",
+       "id": "219:10817",
+       "k": [
+        "One job. Connected all the way."
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex flex-col gap-[12px] items-center relative w-full",
+       "n": "Flagship and tool handoff",
+       "id": "219:10818",
+       "k": [
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] w-full",
+         "n": "Connected feature / Data import / Mobile",
+         "id": "219:10829",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:10820",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Command Center",
+             "id": "219:10821",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:10822",
+               "k": [
+                "Command Center"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[180px] shrink-0",
+             "id": "219:10823",
+             "k": [
+              "Customer records"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:10824",
+           "k": [
+            "Data import"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:10825",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:10826",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:10828",
+             "k": [
+              "Records reviewed and imported"
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex flex-col h-[24px] items-center justify-center relative w-full",
+         "n": "Next connected state",
+         "id": "219:10830",
+         "k": [
+          {
+           "t": "div",
+           "c": "relative size-[24px]",
+           "n": "Frame",
+           "id": "219:10831",
+           "k": [
+            {
+             "t": "img",
+             "c": "absolute block inset-0 size-full",
+             "src": "/marketing/flagship/frame-08fa5d7a.svg"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] w-full",
+         "n": "Connected feature / Customers & assets / Mobile",
+         "id": "219:10843",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:10834",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Command Center",
+             "id": "219:10835",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:10836",
+               "k": [
+                "Command Center"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[180px] shrink-0",
+             "id": "219:10837",
+             "k": [
+              "Customer records"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:10838",
+           "k": [
+            "Customers & assets"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:10839",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:10840",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:10842",
+             "k": [
+              "History available to the team"
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "flex flex-col h-[24px] items-center justify-center relative w-full",
+         "n": "Next connected state",
+         "id": "219:10844",
+         "k": [
+          {
+           "t": "div",
+           "c": "relative size-[24px]",
+           "n": "Frame",
+           "id": "219:10845",
+           "k": [
+            {
+             "t": "img",
+             "c": "absolute block inset-0 size-full",
+             "src": "/marketing/flagship/frame-08fa5d7a.svg"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] flex flex-col gap-[10px] items-start p-[16px] relative rounded-[12px] bg-[var(--color\\\\/white,white)] flex flex-col gap-[10px] items-start p-[var(--space\\\\/16,16px)] relative rounded-[var(--radius\\\\/12,12px)] w-full",
+         "n": "Connected feature / Inquiry follow-up / Mobile",
+         "id": "219:10857",
+         "k": [
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Suite and record",
+           "id": "219:10848",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fbf6ef] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[120px] shrink-0",
+             "n": "Status / Revenue",
+             "id": "219:10849",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] text-left w-[100px] shrink-0",
+               "id": "219:10850",
+               "k": [
+                "Revenue"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] text-left w-[180px] shrink-0",
+             "id": "219:10851",
+             "k": [
+              "Estimate records"
+             ]
+            }
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "id": "219:10852",
+           "k": [
+            "Inquiry follow-up"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "flex gap-[10px] items-start relative w-full",
+           "n": "Handoff evidence",
+           "id": "219:10853",
+           "k": [
+            {
+             "t": "div",
+             "c": "relative size-[18px]",
+             "n": "Icon / check",
+             "id": "219:10854",
+             "k": [
+              {
+               "t": "img",
+               "c": "absolute block inset-0 size-full",
+               "src": "/marketing/flagship/icon-check-c8f6ca54.svg"
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "id": "219:10856",
+             "k": [
+              "Open estimates ready to review"
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "t": "button",
+       "label": "Get a free demo",
+       "kind": "Accent",
+       "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#0f1530]",
+       "href": "/demo"
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "inquiry-response-follow-up": {
+  "desktop": {
+   "t": "div",
+   "c": "bg-[#fbf6ef] flex flex-col items-start relative",
+   "n": "Inquiry Response & Follow-up / Desktop",
+   "id": "215:6308",
+   "k": [
+    {
+     "t": "div",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[24px] items-start px-[80px] py-[48px] relative w-full",
+     "n": "01 / Product in view",
+     "id": "219:7839",
+     "k": [
+      {
+       "t": "div",
+       "c": "flex gap-[48px] items-center relative w-full",
+       "n": "Outcome and actual workflow",
+       "id": "219:7840",
+       "k": [
+        {
+         "t": "div",
+         "c": "flex flex-col gap-[16px] items-start relative flex-1 min-w-0",
+         "n": "Short product promise",
+         "id": "219:7841",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "219:7842",
+           "k": [
+            "REVENUE / INQUIRY RESPONSE & FOLLOW-UP"
+           ]
+          },
+          {
+           "t": "h1",
+           "c": "font-semibold leading-[1.08] relative text-[58px] text-[color:#0f1530] tracking-[-1.45px] w-full",
+           "id": "219:7843",
+           "k": [
+            "Respond while the opportunity is fresh."
+           ]
+          },
+          {
+           "t": "p",
+           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-full",
+           "id": "219:7844",
+           "k": [
+            "Review every reply and keep follow-up connected to the inquiry."
+           ]
+          },
+          {
+           "t": "button",
+           "label": "See a response",
+           "kind": "Dark",
+           "c": "bg-[#0f1530] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] whitespace-nowrap text-[#fbf6ef]",
+           "href": "#workflow"
+          },
+          {
+           "t": "p",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "id": "219:7847",
+           "k": [
+            "EXAMPLE BUSINESS · JUNIPER"
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#f6f7f9] border-[1.044px] border-[#e6dccb] border-solid flex flex-col items-start relative rounded-[16.711px] bg-[#f6f7f9] border-[1.044px] border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col items-start relative rounded-[16.711px] flex-1 min-w-0",
+         "n": "Complementary product view / inquiry",
+         "id": "219:7876",
+         "k": [
+          {
+           "t": "div",
+           "c": "bg-[#0f1530] flex gap-[16.711px] h-[56.4px] items-center p-[16.711px] relative w-full",
+           "n": "Product chrome",
+           "id": "219:7849",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-bold leading-[1.38] relative text-[17.756px] text-[color:#fff] w-[146.222px] shrink-0",
+             "id": "219:7850",
+             "k": [
+              "Renvani"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-medium leading-[1.38] relative text-[12.533px] text-[color:#fff] flex-1 min-w-0",
+             "id": "219:7851",
+             "k": [
+              "Inquiries & follow-up"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#f6b400] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[106.533px] shrink-0",
+             "n": "Status / EXAMPLE",
+             "id": "219:7852",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10.444px] text-[color:#0f1530] w-[85.644px] shrink-0",
+               "id": "219:7853",
+               "k": [
+                "EXAMPLE"
+               ]
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[16.711px] items-start p-[25.067px] relative w-full",
+           "n": "Product workspace",
+           "id": "219:7854",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[25.067px] text-[color:#0f1530] w-full",
+             "id": "219:7855",
+             "k": [
+              "One inquiry. One clear next step."
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[20.889px] items-start relative w-full",
+             "n": "Inquiry and reviewed response",
+             "id": "219:7856",
+             "k": [
+              {
+               "t": "div",
+               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] flex-1 min-w-0",
+               "n": "Incoming inquiry",
+               "id": "219:7857",
+               "k": [
+                {
+                 "t": "div",
+                 "c": "bg-[#fff4d6] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[219.333px] shrink-0",
+                 "n": "Status / WEBSITE INQUIRY",
+                 "id": "219:7858",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[10.444px] text-[color:#0f1530] w-[198.444px] shrink-0",
+                   "id": "219:7859",
+                   "k": [
+                    "WEBSITE INQUIRY"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-semibold leading-[1.38] relative text-[24.022px] text-[color:#0f1530] w-full",
+                 "id": "219:7860",
+                 "k": [
+                  "Jordan Lee"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal leading-[1.38] relative text-[16.711px] text-[color:#0f1530] w-full",
+                 "id": "219:7861",
+                 "k": [
+                  "AC runs, but won’t cool."
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal leading-[1.38] relative text-[12.533px] text-[color:#2a3360] w-full",
+                 "id": "219:7862",
+                 "k": [
+                  "Requested · Diagnostic visit"
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#e6dccb] h-[1.044px] relative w-full",
+                 "n": "Divider",
+                 "id": "219:7863"
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#e4f1e8] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[188px] shrink-0",
+                 "n": "Status / Consent recorded",
+                 "id": "219:7864",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[10.444px] text-[color:#0f1530] w-[167.111px] shrink-0",
+                   "id": "219:7865",
+                   "k": [
+                    "Consent recorded"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal leading-[1.38] relative text-[11.489px] text-[color:#2a3360] w-full",
+                 "id": "219:7866",
+                 "k": [
+                  "No response sent yet"
+                 ]
+                }
+               ]
+              },
+              {
+               "t": "div",
+               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] flex-1 min-w-0",
+               "n": "Response draft",
+               "id": "219:7867",
+               "k": [
+                {
+                 "t": "p",
+                 "c": "font-medium leading-[1.38] relative text-[11.489px] text-[color:#2a3360] tracking-[1.1489px] w-full",
+                 "id": "219:7868",
+                 "k": [
+                  "EMAIL DRAFT"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-semibold leading-[1.38] relative text-[24.022px] text-[color:#0f1530] w-full",
+                 "id": "219:7869",
+                 "k": [
+                  "Let’s look at your AC."
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal leading-[1.38] relative text-[12.533px] text-[color:#2a3360] w-full",
+                 "id": "219:7870",
+                 "k": [
+                  "To · Jordan Lee"
+                 ]
+                },
+                {
+                 "t": "p",
+                 "c": "font-normal leading-[1.38] relative text-[14.622px] text-[color:#0f1530] w-full",
+                 "id": "219:7871",
+                 "k": [
+                  "We can inspect the system and prepare an estimate for your review."
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#fff4d6] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-full",
+                 "n": "Status / Awaiting owner approval",
+                 "id": "219:7872",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[10.444px] text-[color:#0f1530] flex-1 min-w-0",
+                   "id": "219:7873",
+                   "k": [
+                    "Awaiting owner approval"
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "t": "div",
+                 "c": "bg-[#0f1530] flex h-[39.689px] items-center justify-center px-[14.622px] relative rounded-[12.533px] w-full",
+                 "n": "UI action / Review and send",
+                 "id": "219:7874",
+                 "k": [
+                  {
+                   "t": "p",
+                   "c": "font-medium leading-[1.38] relative text-[12.533px] text-[color:#fff] text-center flex-1 min-w-0",
+                   "id": "219:7875",
+                   "k": [
+                    "Review and send"
+                   ]
+                  }
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "t": "div",
+     "c": "bg-[#fff] flex flex-col gap-[24px] items-start px-[80px] py-[48px] relative w-full",
+     "n": "02 / Three visible product states",
+     "id": "219:7877",
+     "k": [
+      {
+       "t": "p",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+       "id": "219:7878",
+       "k": [
+        "EXAMPLE WORKFLOW"
+       ]
+      },
+      {
+       "t": "p",
+       "c": "font-semibold leading-[1.08] relative text-[40px] text-[color:#0f1530] tracking-[-1px] w-full",
+       "id": "219:7879",
+       "k": [
+        "See the work happen."
+       ]
+      },
+      {
+       "t": "div",
+       "c": "flex gap-[40px] items-start relative w-full",
+       "n": "Product workflow states",
+       "id": "219:7880",
+       "k": [
+        {
+         "t": "div",
+         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[var(--radius\\\\/16,16px)] flex-1 min-w-0",
+         "n": "Complementary workflow / Capture the inquiry / Desktop",
+         "id": "219:7891",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+           "id": "219:7882",
+           "k": [
+            "Capture the inquiry"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[250px] items-start p-[16px] relative rounded-[12px] w-full",
+           "n": "Example state / inbound",
+           "id": "219:7883",
+           "k": [
+            {
+             "t": "div",
+             "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[170px] shrink-0",
+             "n": "Status / WEB / EMAIL",
+             "id": "219:7884",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[150px] shrink-0",
+               "id": "219:7885",
+               "k": [
+                "WEB / EMAIL"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[23px] text-[color:#0f1530] w-full",
+             "id": "219:7886",
+             "k": [
+              "Jordan Lee"
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[16px] text-[color:#0f1530] w-full",
+             "id": "219:7887",
+             "k": [
+              "AC runs, but won’t cool."
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] w-full",
+             "id": "219:7888",
+             "k": [
+              "Requested · Diagnostic visit"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[185px] shrink-0",
+             "n": "Status / Inquiry captured",
+             "id": "219:7889",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[165px] shrink-0",
+               "id": "219:7890",
+               "k": [
+                "Inquiry captured"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[var(--radius\\\\/16,16px)] flex-1 min-w-0",
+         "n": "Complementary workflow / Review the reply / Desktop",
+         "id": "219:7900",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+           "id": "219:7893",
+           "k": [
+            "Review the reply"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[250px] items-start p-[16px] relative rounded-[12px] w-full",
+           "n": "Example state / response",
+           "id": "219:7894",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+             "id": "219:7895",
+             "k": [
+              "EMAIL DRAFT"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "font-semibold relative text-[25px] text-[color:#0f1530] w-full",
+             "id": "219:7896",
+             "k": [
+              {
+               "t": "p",
+               "c": "leading-[1.38] mb-0",
+               "k": [
+                "Let’s inspect"
+               ]
+              },
+              {
+               "t": "p",
+               "c": "leading-[1.38]",
+               "k": [
+                "your AC."
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] w-full",
+             "id": "219:7897",
+             "k": [
+              "To · Jordan Lee"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+             "n": "UI action / Owner review",
+             "id": "219:7898",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+               "id": "219:7899",
+               "k": [
+                "Owner review"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "t": "div",
+         "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[16px] bg-[var(--color\\\\/white,white)] border border-[var(--color\\\\/line,#e6dccb)] border-solid flex flex-col gap-[14px] items-start p-[18px] relative rounded-[var(--radius\\\\/16,16px)] flex-1 min-w-0",
+         "n": "Complementary workflow / Follow up with consent / Desktop",
+         "id": "219:7914",
+         "k": [
+          {
+           "t": "p",
+           "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+           "id": "219:7902",
+           "k": [
+            "Follow up with consent"
+           ]
+          },
+          {
+           "t": "div",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[250px] items-start p-[16px] relative rounded-[12px] w-full",
+           "n": "Example state / followup",
+           "id": "219:7903",
+           "k": [
+            {
+             "t": "p",
+             "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+             "id": "219:7904",
+             "k": [
+              "Estimate #2048"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[185px] shrink-0",
+             "n": "Status / Consent recorded",
+             "id": "219:7905",
+             "k": [
+              {
+               "t": "p",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[165px] shrink-0",
+               "id": "219:7906",
+               "k": [
+                "Consent recorded"
+               ]
+              }
+             ]
+            },
+            {
+             "t": "p",
+             "c": "font-normal leading-[1.38] relative text-[15px] text-[color:#0f1530] w-full",
+             "id": "219:7907",
+             "k": [
+              "Follow-up email ready"
+             ]
+            },
+            {
+             "t": "div",
+             "c": "flex gap-[10px] items-start relative w-full",
+             "n": "Stop condition",
+             "id": "219:7908",
+             "k": [
+              {
+               "t": "div",
+               "c": "relative size-[20px]",
+               "n": "Icon / check",
                "id": "219:7909",
                "k": [
                 {

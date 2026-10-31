@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
-import { AlertTriangle, ArrowLeft, CalendarClock, RotateCcw, UserRound } from "lucide-react";
+import { useMemo, useState, type ReactNode } from "react";
+import { ArrowLeft } from "lucide-react";
 
 import { useApplySeriesChange, usePreviewSeriesChange, useRecurringSeries } from "@/src/hooks/recurring-series.hooks";
 import { useAuthStore } from "@/src/stores/auth.store";
@@ -13,8 +13,8 @@ import {
   allowedSeriesActions,
   canManageSeries,
   describeSeriesError,
-  formatLocalDate,
   formatLocalTime,
+  formatShortDate,
   formatTimeInZone,
   frequencyLabel,
   isChangeableOccurrence,
@@ -29,31 +29,68 @@ interface Props {
   now?: Date;
 }
 
+// Figma 364:4217 fields: 44px input, r8, #e6dccb border, 12px side padding, 14px text.
 const inputClass =
-  "mt-1 w-full rounded-2xl border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-700 outline-none transition focus:border-brand-accent";
-// Figma 10:1746 Button/secondary/Preview changes and 10:983 Button/dark/New plan:
-// 44px tall, 18px side padding, 8px gap, radius 10, 14px semibold.
-const secondaryButton =
-  "inline-flex h-11 items-center gap-2 rounded-[10px] border border-[#e6dccb] bg-white px-[18px] text-sm text-[#0f1530] font-semibold transition hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-60";
-const primaryButton =
-  "inline-flex h-11 items-center gap-2 rounded-[10px] bg-brand-accent px-[18px] text-sm font-semibold text-white transition hover:bg-brand-primary disabled:cursor-not-allowed disabled:opacity-60";
+  "mt-1.5 h-11 w-full rounded-[8px] border border-[#e6dccb] bg-white px-3 text-sm text-[#0f1530] outline-none transition focus:border-[#0f1530]";
+const labelClass = "block text-[13px] font-medium text-[#2a3360]";
+// Figma 10:1746 / 364:4217 secondary + dark buttons: 44px (48px on tablet/mobile for Apply), r10, 18px padding, 14px semibold, 2px ink focus ring.
+const focusRing = "outline-none focus-visible:ring-2 focus-visible:ring-[#0f1530] focus-visible:ring-offset-2";
+const secondaryButton = `inline-flex h-11 items-center justify-center gap-2 rounded-[10px] border border-[#e6dccb] bg-white px-[18px] text-sm text-[#0f1530] font-semibold transition hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-60 ${focusRing}`;
+const darkButton = `inline-flex h-12 items-center justify-center gap-2 rounded-[10px] bg-[#0f1530] px-[18px] text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-60 lg:h-11 ${focusRing}`;
+const cardClass = "rounded-[14px] border border-[#e6dccb] bg-white p-5";
 
-// Figma 10:1003 Status/Active and 10:1012 Status/Paused: 24px pill, 10px/4px padding,
-// 6px gap, 6px dot in the text color, 12px semibold. "Ended" has no frame; uses the Paused colors.
-const STATUS_PILL: Record<string, { bg: string; fg: string }> = {
+// Figma 364:4217 / 364:4335 pills: r999, 10px/4px padding, 10.5px medium uppercase.
+const PILL: Record<string, { bg: string; fg: string }> = {
   active: { bg: "#e4f1e8", fg: "#2f7d4f" },
-  paused: { bg: "#eef0f5", fg: "#6a7290" },
+  paused: { bg: "#eef0f5", fg: "#2a3360" },
+  cancelled: { bg: "#eef0f5", fg: "#2a3360" },
+  scheduled: { bg: "#e5eafb", fg: "#2b4acb" },
+  skipped: { bg: "#eef0f5", fg: "#2a3360" },
+  completed: { bg: "#e4f1e8", fg: "#2f7d4f" },
+  preview: { bg: "#e5eafb", fg: "#2b4acb" },
+  job: { bg: "#fff4d6", fg: "#0f1530" }
 };
-function StatusPill({ status }: { status: string }) {
-  const c = STATUS_PILL[status] ?? STATUS_PILL.paused!;
+function Pill({ tone, label, testId }: { tone: string; label: string; testId?: string }) {
+  const c = PILL[tone] ?? PILL.skipped!;
   return (
-    <span data-testid="series-status-pill" className="inline-flex h-6 items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold" style={{ backgroundColor: c.bg, color: c.fg }}>
-      <span data-testid="series-status-dot" aria-hidden="true" className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: c.fg }} />
-      {seriesStatusLabel(status)}
+    <span data-testid={testId} className="inline-flex h-[22px] shrink-0 items-center rounded-full px-2.5 py-1 text-[10.5px] font-medium uppercase tracking-[0.06em]" style={{ backgroundColor: c.bg, color: c.fg }}>
+      {label}
     </span>
   );
 }
+
+// Figma 364:4335 alert tones.
+const ALERT = {
+  error: { box: "bg-[#fbe3dc]", title: "text-[#b42318]", detail: "text-[#b42318]" },
+  warn: { box: "bg-[#fff4d6]", title: "text-[#0f1530]", detail: "text-[#2a3360]" },
+  neutral: { box: "bg-[#eef0f5]", title: "text-[#0f1530]", detail: "text-[#2a3360]" },
+  info: { box: "bg-[#e5eafb]", title: "text-[#0f1530]", detail: "text-[#2a3360]" }
+} as const;
+function Alert({ tone, title, detail, children, testId, role }: { tone: keyof typeof ALERT; title: string; detail?: string | undefined; children?: ReactNode; testId?: string; role?: string }) {
+  const c = ALERT[tone];
+  return (
+    <div data-testid={testId} role={role} className={`space-y-1.5 rounded-[10px] p-3.5 ${c.box}`}>
+      <p className={`text-sm font-semibold ${c.title}`}>{title}</p>
+      {detail ? <p className={`text-[13px] ${c.detail}`}>{detail}</p> : null}
+      {children}
+    </div>
+  );
+}
+const errorTone = (kind: SeriesErrorView["kind"]): keyof typeof ALERT =>
+  kind === "linked_job" ? "warn" : kind === "series_ended" ? "neutral" : kind === "external_scheduler" ? "info" : "error";
+
+function Row({ label, value }: { label: string; value: ReactNode }) {
+  return (
+    <div className="flex flex-col gap-0.5 text-[13.5px] sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
+      <span className="text-[#5e6684]">{label}</span>
+      <span className="font-medium text-[#0f1530]">{value}</span>
+    </div>
+  );
+}
+
 const SINGLE_VISIT_ACTIONS: SeriesAction[] = ["skip_occurrence", "reschedule_occurrence"];
+// Figma 364:4217 change-type order; pause/resume/end (no frame) follow.
+const ACTION_ORDER: SeriesAction[] = ["skip_occurrence", "reschedule_occurrence", "reschedule_future", "pause", "resume", "end"];
 
 export function RecurringSeriesClient({ seriesId, now }: Props) {
   const role = useAuthStore((s) => s.user?.role ?? null);
@@ -160,259 +197,260 @@ export function RecurringSeriesClient({ seriesId, now }: Props) {
   const pending = previewMutation.isPending || applyMutation.isPending;
   const canPreview = Boolean(buildChange()) && !pending;
   const tz = series?.timeZone ?? "UTC";
+  const changeable = (data?.occurrences ?? []).filter((o) => actions.length > 0 && isChangeableOccurrence(o, now));
+  const orderedActions = ACTION_ORDER.filter((a) => actions.includes(a) && (!SINGLE_VISIT_ACTIONS.includes(a) || changeable.length > 0));
+  const p = preview?.response.preview;
+  const statusChanged = p ? p.series.before.status !== p.series.after.status : false;
+  const timeChanged = p ? p.series.before.localTime !== p.series.after.localTime : false;
+  const nothingChanges = p ? p.occurrences.length === 0 && !statusChanged && !timeChanged : false;
+
+  const visitsCard = data ? (
+    <section className={`${cardClass} space-y-3.5 lg:col-start-1`} aria-labelledby="series-visits-title">
+      <h2 id="series-visits-title" className="text-[17px] font-semibold text-[#0f1530]">
+        Visits in this plan
+      </h2>
+      {data.occurrences.length === 0 ? <p className="text-[13px] text-[#5e6684]">No visits generated yet.</p> : null}
+      <ul className="space-y-0.5" data-testid="series-visits">
+        {data.occurrences.map((o) => (
+          <li
+            key={o.id}
+            data-testid={`visit-${o.id}`}
+            className={`flex min-h-14 items-center justify-between gap-3 rounded-[10px] px-3 py-2 ${o.id === occurrenceId && action && SINGLE_VISIT_ACTIONS.includes(action) ? "bg-[#f3eadc]" : ""}`}
+          >
+            <div className="min-w-0 space-y-0.5">
+              <p className="text-sm font-semibold text-[#0f1530]">{formatShortDate(o.localDate)}</p>
+              <p className="text-[13px] text-[#5e6684]">
+                {o.status === "scheduled" || o.status === "completed" ? formatTimeInZone(o.scheduledAtUtc, tz) : occurrenceStatusLabel(o.status)}
+                {o.jobId ? (
+                  <>
+                    {" · "}
+                    <Link className="underline" href={`/jobs/${o.jobId}`}>
+                      Has a job — change it from the job
+                    </Link>
+                  </>
+                ) : null}
+              </p>
+            </div>
+            <div className="flex shrink-0 items-center gap-1.5">
+              {o.jobId ? <Pill tone="job" label="Has job" /> : null}
+              <Pill tone={o.status} label={occurrenceStatusLabel(o.status)} />
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
+  ) : null;
 
   return (
     <div className="space-y-6">
-      <section className="surface-card px-6 py-6">
-        <Link href="/service-agreements" className="inline-flex items-center gap-2 text-sm font-semibold text-brand-accent">
+      {/* Figma 364:4217 page header + context row. */}
+      <header className="space-y-2">
+        <Link href="/service-agreements" className="inline-flex items-center gap-2 text-sm font-semibold text-[#2b4acb]">
           <ArrowLeft className="h-4 w-4" />
           Back to Agreements
         </Link>
-        <div className="mt-5 flex flex-wrap items-center gap-3">
-          <h1 className="text-3xl font-semibold tracking-tight text-neutral-900">Recurring visits</h1>
-          {series ? <StatusPill status={series.status} /> : null}
-        </div>
+        <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-[#2b4acb]">Recurring visits</p>
+        <h1 className="text-2xl font-semibold tracking-tight text-[#0f1530] md:text-[28px] lg:text-[30px]">Recurring visits</h1>
+        <p className="text-[15px] text-[#5e6684]">Skip or move a visit, preview what changes, then apply.</p>
+        <div className="!mt-4 border-t border-[#e6dccb]" />
         {series ? (
-          <p className="mt-3 text-sm text-neutral-500">
-            {frequencyLabel(series.frequency)} · {formatLocalTime(series.localTime)} ({series.timeZone})
-          </p>
+          <div className="flex flex-wrap items-center gap-2.5 pt-2">
+            <Pill tone={series.status} label={seriesStatusLabel(series.status)} testId="series-status-pill" />
+            <p className="text-[13px] text-[#2a3360]">
+              {frequencyLabel(series.frequency)} · {formatLocalTime(series.localTime)} ({series.timeZone})
+            </p>
+          </div>
         ) : null}
-        {query.isLoading ? <p className="mt-3 text-sm text-neutral-500">Loading plan…</p> : null}
+        {query.isLoading ? <p className="text-sm text-[#5e6684]">Loading plan…</p> : null}
         {query.isError ? (
-          <div className="mt-3 flex items-center gap-3 text-sm text-error" role="alert">
-            <span>This plan couldn&apos;t be loaded.</span>
+          <Alert tone="error" role="alert" title="This plan couldn’t be loaded.">
             <button type="button" className={secondaryButton} onClick={() => void reload()}>
-              <RotateCcw className="h-4 w-4" /> Reload
+              Reload
             </button>
-          </div>
+          </Alert>
         ) : null}
-        {series?.status === "cancelled" ? (
-          <p className="mt-3 rounded-3xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm text-neutral-600" data-testid="series-ended">
-            This plan has ended. Its visits are kept for history and it can&apos;t be changed.
-          </p>
-        ) : null}
-      </section>
+      </header>
 
-      {series && actions.length > 0 ? (
-        <section className="surface-card px-6 py-6" aria-labelledby="series-change-title">
-          <h2 id="series-change-title" className="text-lg font-semibold tracking-tight text-neutral-900">
-            Change this plan
-          </h2>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {actions
-              .filter((a) => !SINGLE_VISIT_ACTIONS.includes(a))
-              .map((a) => (
-                <button key={a} type="button" className={secondaryButton} aria-pressed={action === a} disabled={pending} onClick={() => resetForm(a)}>
-                  {ACTION_LABELS[a]}
-                </button>
-              ))}
-          </div>
-
-          {action ? (
-            <form
-              className="mt-4 space-y-3"
-              aria-label={ACTION_LABELS[action]}
-              onSubmit={(e) => {
-                e.preventDefault();
-                void runPreview();
-              }}
-            >
-              <p className="text-sm font-semibold text-neutral-700">{ACTION_LABELS[action]}</p>
-              {SINGLE_VISIT_ACTIONS.includes(action) && occurrenceById.get(occurrenceId) ? (
-                <p className="text-sm text-neutral-600">Visit on {formatLocalDate(occurrenceById.get(occurrenceId)!.localDate)}</p>
-              ) : null}
-              {action === "reschedule_occurrence" ? (
-                <label className="block text-xs font-semibold text-neutral-500">
-                  New date
-                  <input type="date" className={inputClass} value={localDate} onChange={(e) => (setLocalDate(e.target.value), setPreview(null))} required />
-                </label>
-              ) : null}
-              {action === "reschedule_future" ? (
-                <label className="block text-xs font-semibold text-neutral-500">
-                  New visit time ({series.timeZone})
-                  <input type="time" className={inputClass} value={localTime} onChange={(e) => (setLocalTime(e.target.value), setPreview(null))} required />
-                </label>
-              ) : null}
-              <label className="block text-xs font-semibold text-neutral-500">
-                Reason
-                <textarea
-                  className={`${inputClass} min-h-20`}
-                  maxLength={500}
-                  value={reason}
-                  onChange={(e) => (setReason(e.target.value), setPreview(null))}
-                  placeholder="e.g. Homeowner is away for the winter; resume before the spring AC tune-up"
-                  required
-                />
-              </label>
-              <div className="flex justify-end gap-2">
-                <button type="button" className={secondaryButton} onClick={() => resetForm(null)} disabled={pending}>
-                  Back
-                </button>
-                <button type="submit" className={secondaryButton} disabled={!canPreview}>
-                  {previewMutation.isPending ? "Previewing…" : "Preview changes"}
-                </button>
-              </div>
-            </form>
-          ) : null}
-
-          {preview ? (
-            <div className="mt-5 rounded-3xl border border-neutral-200 bg-neutral-50 px-4 py-4" data-testid="series-preview">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-400">What will change</p>
-              <ul className="mt-2 space-y-1 text-sm text-neutral-700">
-                {preview.response.preview.series.before.status !== preview.response.preview.series.after.status ? (
-                  <li>
-                    Plan: {seriesStatusLabel(preview.response.preview.series.before.status)} → {seriesStatusLabel(preview.response.preview.series.after.status)}
-                  </li>
-                ) : null}
-                {preview.response.preview.series.before.localTime !== preview.response.preview.series.after.localTime ? (
-                  <li>
-                    Visit time: {formatLocalTime(preview.response.preview.series.before.localTime)} → {formatLocalTime(preview.response.preview.series.after.localTime)}
-                  </li>
-                ) : null}
-                {preview.response.preview.occurrences.map((d) => (
-                  <li key={d.occurrenceId}>
-                    Visit {formatLocalDate(d.before.localDate)} {formatTimeInZone(d.before.scheduledAtUtc, tz)} →{" "}
-                    {d.after.status !== d.before.status
-                      ? occurrenceStatusLabel(d.after.status)
-                      : `${formatLocalDate(d.after.localDate)} ${formatTimeInZone(d.after.scheduledAtUtc, tz)}`}
-                  </li>
-                ))}
-                {preview.response.preview.occurrences.length === 0 && preview.response.preview.series.before.status === preview.response.preview.series.after.status && preview.response.preview.series.before.localTime === preview.response.preview.series.after.localTime ? (
-                  <li>No visits change.</li>
-                ) : null}
-              </ul>
-              {preview.response.preview.exceptions.length > 0 ? (
-                <div className="mt-3 text-sm text-neutral-700" data-testid="series-preview-exceptions">
-                  <p className="flex items-center gap-2 font-semibold">
-                    <UserRound className="h-4 w-4" /> Needs a person
-                  </p>
-                  <ul className="mt-1 space-y-1">
-                    {preview.response.preview.exceptions.map((x) => (
-                      <li key={x.occurrenceId}>
-                        Visit on {formatLocalDate(occurrenceById.get(x.occurrenceId)?.localDate ?? "")} already has a{" "}
-                        <Link className="font-semibold underline" href={`/jobs/${x.jobId}`}>
-                          job
-                        </Link>
-                        , so it won&apos;t be changed. It will be flagged for a person.
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ) : null}
-              <p className="mt-3 text-xs text-neutral-500">Nothing changes until you apply. No message is sent to the customer.</p>
-              <div className="mt-3 flex justify-end">
-                <button type="button" className={primaryButton} onClick={() => void apply()} disabled={pending}>
-                  {applyMutation.isPending ? "Applying…" : "Apply changes"}
-                </button>
-              </div>
-            </div>
-          ) : null}
-        </section>
+      {series?.status === "cancelled" ? (
+        <Alert testId="series-ended" tone="neutral" title="This plan has ended. Ended plans can’t be changed." detail="Visits stay in history." />
       ) : null}
 
       {error ? (
-        <div role="alert" data-testid="series-error" className="rounded-3xl border border-error/15 bg-error-light px-4 py-3 text-sm text-error">
-          <div className="flex items-start gap-2">
-            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
-            <div className="space-y-2">
-              <p>{error.message}</p>
+        <Alert testId="series-error" role="alert" tone={errorTone(error.kind)} title={error.title ?? error.message} detail={error.detail}>
+          {error.jobId || error.reload ? (
+            <div className="flex flex-wrap gap-2.5 pt-1">
               {error.jobId ? (
-                <Link className="font-semibold underline" href={`/jobs/${error.jobId}`}>
+                <Link className={secondaryButton} href={`/jobs/${error.jobId}`}>
                   Open the job
                 </Link>
               ) : null}
               {error.reload ? (
                 <button type="button" className={secondaryButton} onClick={() => void reload()}>
-                  <RotateCcw className="h-4 w-4" /> Reload plan
+                  Reload
                 </button>
               ) : null}
             </div>
-          </div>
-        </div>
+          ) : null}
+        </Alert>
       ) : null}
 
       {notice ? (
-        <p role="status" className="rounded-3xl border border-success/20 bg-success-light px-4 py-3 text-sm text-neutral-700">
+        <p role="status" className="rounded-[10px] bg-[#e4f1e8] p-3.5 text-sm text-[#0f1530]">
           {notice}
         </p>
       ) : null}
 
-      {data && data.openExceptions.length > 0 ? (
-        <section className="surface-card px-6 py-6" data-testid="series-open-exceptions">
-          <h2 className="flex items-center gap-2 text-lg font-semibold tracking-tight text-neutral-900">
-            <UserRound className="h-4 w-4 text-brand-accent" /> Needs a person
-          </h2>
-          <ul className="mt-3 space-y-2 text-sm text-neutral-700">
+      {/* Desktop: visits / preview / history on the left, 420px change panel on the right. Tablet + mobile stack in Figma order. */}
+      <div className="grid gap-5 lg:grid-flow-dense lg:grid-cols-[minmax(0,1fr)_420px] lg:items-start lg:gap-6">
+        {visitsCard}
+
+        {series && actions.length > 0 ? (
+          <section className={`${cardClass} space-y-3.5 lg:col-start-2 lg:row-span-4 lg:row-start-1`} aria-labelledby="series-change-title">
+            <h2 id="series-change-title" className="text-[17px] font-semibold text-[#0f1530]">
+              Change this plan
+            </h2>
+            <div role="radiogroup" aria-label="Change type" className="space-y-0.5">
+              {orderedActions.map((a) => (
+                <label key={a} className="flex min-h-11 cursor-pointer items-center gap-2.5 text-sm text-[#0f1530]">
+                  <input
+                    type="radio"
+                    name="series-action"
+                    className="h-5 w-5 accent-[#0f1530]"
+                    checked={action === a}
+                    disabled={pending}
+                    onChange={() => resetForm(a, SINGLE_VISIT_ACTIONS.includes(a) ? changeable[0] : undefined)}
+                  />
+                  <span className={action === a ? "font-semibold" : ""}>{ACTION_LABELS[a]}</span>
+                </label>
+              ))}
+            </div>
+
+            {action ? (
+              <form
+                className="space-y-3.5"
+                aria-label={ACTION_LABELS[action]}
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  void runPreview();
+                }}
+              >
+                {SINGLE_VISIT_ACTIONS.includes(action) ? (
+                  <label className={labelClass}>
+                    Visit
+                    <select className={inputClass} value={occurrenceId} onChange={(e) => (setOccurrenceId(e.target.value), setPreview(null))}>
+                      {changeable.map((o) => (
+                        <option key={o.id} value={o.id}>
+                          {formatShortDate(o.localDate)} · {formatTimeInZone(o.scheduledAtUtc, tz)}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                ) : null}
+                {action === "reschedule_occurrence" ? (
+                  <label className={labelClass}>
+                    New date
+                    <input type="date" className={inputClass} value={localDate} onChange={(e) => (setLocalDate(e.target.value), setPreview(null))} required />
+                  </label>
+                ) : null}
+                {action === "reschedule_future" ? (
+                  <label className={labelClass}>
+                    New time ({series.timeZone})
+                    <input type="time" className={inputClass} value={localTime} onChange={(e) => (setLocalTime(e.target.value), setPreview(null))} required />
+                  </label>
+                ) : null}
+                <label className={labelClass}>
+                  Reason
+                  <textarea
+                    className={`${inputClass} h-[88px] py-3`}
+                    maxLength={500}
+                    value={reason}
+                    onChange={(e) => (setReason(e.target.value), setPreview(null))}
+                    placeholder="e.g. Homeowner is away for the winter; resume before the spring AC tune-up"
+                    required
+                  />
+                </label>
+                <button type="submit" className={`${secondaryButton} w-full`} disabled={!canPreview}>
+                  {previewMutation.isPending ? "Previewing…" : "Preview changes"}
+                </button>
+              </form>
+            ) : null}
+          </section>
+        ) : null}
+
+        {preview && p ? (
+          <section className={`${cardClass} space-y-3.5 lg:col-start-1`} data-testid="series-preview">
+            <div className="flex items-center gap-3">
+              <h2 className="text-[17px] font-semibold text-[#0f1530]">What will change</h2>
+              <Pill tone="preview" label="Preview" />
+            </div>
+            {statusChanged ? <Row label="Plan" value={`${seriesStatusLabel(p.series.before.status)} → ${seriesStatusLabel(p.series.after.status)}`} /> : null}
+            {timeChanged ? <Row label="Visit time" value={`${formatLocalTime(p.series.before.localTime)} → ${formatLocalTime(p.series.after.localTime)}`} /> : null}
+            {p.occurrences.map((d) => (
+              <Row
+                key={d.occurrenceId}
+                label={`${formatShortDate(d.before.localDate)} · ${formatTimeInZone(d.before.scheduledAtUtc, tz)}`}
+                value={`→  ${d.after.status !== d.before.status ? occurrenceStatusLabel(d.after.status) : `${formatShortDate(d.after.localDate)} · ${formatTimeInZone(d.after.scheduledAtUtc, tz)}`}`}
+              />
+            ))}
+            {nothingChanges ? <Alert tone="neutral" title="No visits change." /> : p.occurrences.length > 0 && !statusChanged && !timeChanged ? <Row label="Other visits" value="No change" /> : null}
+            {p.exceptions.length > 0 ? (
+              <div className="space-y-2" data-testid="series-preview-exceptions">
+                {p.exceptions.map((x) => (
+                  <Alert
+                    key={x.occurrenceId}
+                    tone="warn"
+                    title={`The ${formatShortDate(occurrenceById.get(x.occurrenceId)?.localDate ?? "")} visit already has a job, so it won’t be changed here.`}
+                    detail="It will be flagged for a person — change it from the job instead."
+                  >
+                    <Link className="text-[13px] font-semibold text-[#0f1530] underline" href={`/jobs/${x.jobId}`}>
+                      Open the job
+                    </Link>
+                  </Alert>
+                ))}
+              </div>
+            ) : null}
+            <Alert tone="neutral" title="Nothing changes until you apply. No message is sent to the customer." />
+            <div className="flex">
+              <button type="button" className={darkButton} onClick={() => void apply()} disabled={pending}>
+                {applyMutation.isPending ? "Applying…" : "Apply changes"}
+              </button>
+            </div>
+          </section>
+        ) : null}
+
+        {data && data.openExceptions.length > 0 ? (
+          <section className={`${cardClass} space-y-3.5 lg:col-start-1`} data-testid="series-open-exceptions">
+            <h2 className="text-[17px] font-semibold text-[#0f1530]">Needs a person</h2>
             {data.openExceptions.map((x) => (
-              <li key={`${x.occurrenceId}-${x.recordedAt}`} className="rounded-2xl border border-neutral-200 bg-neutral-50 px-3 py-2">
-                Visit on {formatLocalDate(occurrenceById.get(x.occurrenceId)?.localDate ?? "")} has a job and wasn&apos;t changed by &quot;{ACTION_LABELS[x.action as SeriesAction] ?? x.action}&quot;.{" "}
-                <Link className="font-semibold underline" href={`/jobs/${x.jobId}`}>
+              <Alert
+                key={`${x.occurrenceId}-${x.recordedAt}`}
+                tone="warn"
+                title={`The ${formatShortDate(occurrenceById.get(x.occurrenceId)?.localDate ?? "")} visit has a job and wasn’t changed by “${ACTION_LABELS[x.action as SeriesAction] ?? x.action}”.`}
+                detail="Change it from the job instead."
+              >
+                <Link className="text-[13px] font-semibold text-[#0f1530] underline" href={`/jobs/${x.jobId}`}>
                   Open the job
                 </Link>
-              </li>
+              </Alert>
             ))}
-          </ul>
-        </section>
-      ) : null}
+          </section>
+        ) : null}
 
-      {data ? (
-        <section className="surface-card px-6 py-6" aria-labelledby="series-visits-title">
-          <h2 id="series-visits-title" className="flex items-center gap-2 text-lg font-semibold tracking-tight text-neutral-900">
-            <CalendarClock className="h-4 w-4 text-brand-accent" /> Visits
-          </h2>
-          {data.occurrences.length === 0 ? <p className="mt-3 text-sm text-neutral-500">No visits generated yet.</p> : null}
-          <ul className="mt-3 divide-y divide-neutral-200" data-testid="series-visits">
-            {data.occurrences.map((o) => {
-              const changeable = actions.length > 0 && isChangeableOccurrence(o, now);
-              return (
-                <li key={o.id} className="flex flex-wrap items-center justify-between gap-3 py-3 text-sm">
-                  <div>
-                    <p className="font-semibold text-neutral-800">
-                      {formatLocalDate(o.localDate)} · {formatTimeInZone(o.scheduledAtUtc, tz)}
-                    </p>
-                    <p className="text-xs text-neutral-500">
-                      {occurrenceStatusLabel(o.status)}
-                      {o.jobId ? (
-                        <>
-                          {" · "}
-                          <Link className="underline" href={`/jobs/${o.jobId}`}>
-                            Has a job — change it from the job
-                          </Link>
-                        </>
-                      ) : null}
-                    </p>
-                  </div>
-                  {changeable ? (
-                    <div className="flex gap-2">
-                      <button type="button" className={secondaryButton} disabled={pending} onClick={() => resetForm("skip_occurrence", o)}>
-                        Skip
-                      </button>
-                      <button type="button" className={secondaryButton} disabled={pending} onClick={() => resetForm("reschedule_occurrence", o)}>
-                        Move
-                      </button>
-                    </div>
-                  ) : null}
-                </li>
-              );
-            })}
-          </ul>
-        </section>
-      ) : null}
-
-      {data && data.history.length > 0 ? (
-        <section className="surface-card px-6 py-6">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-400">Recent changes</p>
-          <ul className="mt-2 space-y-2" data-testid="series-history">
-            {data.history.slice(0, 10).map((h) => (
-              <li key={h.id} className="rounded-2xl border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm text-neutral-700">
-                <span className="font-semibold">{ACTION_LABELS[h.action]}</span>
-                <span className="text-neutral-500"> · {h.reason}</span>
-                <span className="block text-xs text-neutral-400">{new Date(h.occurredAt).toLocaleString()}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
+        {data && data.history.length > 0 ? (
+          <section className={`${cardClass} space-y-3.5 lg:col-start-1`}>
+            <h2 className="text-[17px] font-semibold text-[#0f1530]">Recent changes</h2>
+            <div className="space-y-2" data-testid="series-history">
+              {data.history.slice(0, 10).map((h) => (
+                <Row
+                  key={h.id}
+                  label={new Date(h.occurredAt).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
+                  value={<span className="font-normal">{ACTION_LABELS[h.action]} · {h.reason}</span>}
+                />
+              ))}
+            </div>
+          </section>
+        ) : null}
+      </div>
     </div>
   );
 }

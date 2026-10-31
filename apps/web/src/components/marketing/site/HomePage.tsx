@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { ScaleToFrame } from "./ScaleToFrame";
 import Link from "next/link";
 
 import { FigmaNode } from "./FigmaNode";
@@ -72,7 +73,7 @@ export function GrowthCheckEntry({ id }: { id: string }) {
         className="h-14 w-full rounded-xl border bg-white px-4 text-[15px] outline-none focus-visible:ring-2"
         style={{ borderColor: line, color: ink }}
       />
-      <button type="submit" className={`${styles.press} inline-flex min-h-[44px] items-center rounded-full px-5 text-[15px] font-medium`} style={{ background: "var(--color-mkt-amber)", color: ink }}>
+      <button type="submit" className={`${styles.press} inline-flex min-h-[44px] items-center rounded-full px-5 py-3 text-[15px] font-medium leading-[1.5]`} style={{ background: "var(--color-mkt-amber)", color: ink }}>
         {GROWTH_CHECK_ENTRY.submit}
       </button>
       <Link href={GROWTH_CHECK_ENTRY.secondary.href} className="text-[13px] font-medium" style={{ color: ink2 }}>
@@ -85,7 +86,7 @@ export function GrowthCheckEntry({ id }: { id: string }) {
 function SiteVisual() {
   const s = HOME.site;
   return (
-    <div data-node-id="200:46" className="overflow-hidden rounded-2xl border" style={{ background: "var(--color-mkt-panel)", borderColor: line }} aria-label="Example: website and booking" role="img">
+    <div data-node-id="200:46" className="w-[720px] shrink-0 overflow-hidden rounded-2xl border" style={{ background: "var(--color-mkt-panel)", borderColor: line }} aria-label="Example: website and booking" role="img">
       <ProductChrome title="Website + booking" />
       <div className="flex flex-col gap-4 p-6">
         <div className="flex items-start justify-between gap-4">
@@ -175,30 +176,31 @@ function MobileIntelligenceVisual() {
   );
 }
 
+/** Desktop intelligence visual: symbol 200:386 at 1x (720px); the Home instance 203:4510 scales it to 784px (see zoom below). */
 function IntelligenceVisual() {
   const v = HOME.intelligence;
   return (
-    <div data-node-id="200:386" className="overflow-hidden rounded-2xl border" style={{ background: "var(--color-mkt-panel)", borderColor: line, color: ink }} aria-label="Example: revenue opportunities" role="img">
+    <div data-node-id="200:386" className="w-[720px] shrink-0 overflow-hidden rounded-2xl border" style={{ background: "var(--color-mkt-panel)", borderColor: line, color: ink }} aria-label="Example: revenue opportunities" role="img">
       <ProductChrome title="Revenue opportunities" />
       <div className="flex flex-col gap-4 p-6">
         <div className="flex items-start justify-between gap-4">
-          <p className="text-[25px] font-semibold">Revenue opportunities</p>
+          <p className="text-[23px] font-semibold">Revenue opportunities</p>
           <Chip>Your business</Chip>
         </div>
         <div className="grid grid-cols-3 gap-3">
           {v.stats.map((st) => (
-            <div key={st.label} className="flex flex-col gap-4 rounded-2xl border bg-white p-5" style={{ borderColor: line }}>
-              <span className="text-[37px] font-bold leading-[1.08]">{st.value}</span>
-              <span className="text-[12px]" style={{ color: ink2 }}>{st.label}</span>
+            <div key={st.label} className="flex flex-col gap-[14px] rounded-2xl border bg-white p-5" style={{ borderColor: line }}>
+              <span className="text-[34px] font-bold leading-[1.08]">{st.value}</span>
+              <span className="text-[11px]" style={{ color: ink2 }}>{st.label}</span>
             </div>
           ))}
         </div>
-        <div className="flex flex-col gap-4 rounded-2xl border bg-white p-5" style={{ borderColor: line }}>
+        <div className="flex flex-col gap-[14px] rounded-2xl border bg-white p-5" style={{ borderColor: line }}>
           <div className="flex items-start justify-between gap-4">
-            <p className="text-[19.6px] font-semibold">{v.decision.title}</p>
+            <p className="text-[18px] font-semibold">{v.decision.title}</p>
             <Chip tone="ambersoft">{v.decision.status}</Chip>
           </div>
-          <p className="text-[13px]" style={{ color: ink2 }}>{v.decision.detail}</p>
+          <p className="text-[12px]" style={{ color: ink2 }}>{v.decision.detail}</p>
           <div className="flex flex-wrap gap-3">
             {v.decision.actions.map((a, i) => (
               <UiAction key={a} tone={i === 0 ? "ink" : "cream"} wide={false}>
@@ -296,9 +298,9 @@ export function HomePage() {
       <div className="hidden md:block lg:hidden">
         <FigmaNode node={HOME_TABLET} slots={{ capture: <TabletCapture id="growth-check-tablet" />, "capture-end": <TabletCapture id="growth-check-tablet-end" /> }} />
       </div>
-      <div className="md:hidden lg:block">
+      <div className="leading-[1.38] md:hidden lg:block">
       <section data-node-id="203:4403" className={section} aria-labelledby="home-hero">
-        <div className="grid items-start gap-8 lg:grid-cols-[480px_1fr] lg:gap-16">
+        <div className="grid items-start gap-8 lg:grid-cols-[480px_minmax(0,1fr)] lg:gap-16">
           <div className="flex flex-col gap-6">
             <p className={eyebrow} style={{ color: ink2 }}>{hero.eyebrow}</p>
             <h1 id="home-hero" className="flex flex-col gap-2">
@@ -312,7 +314,9 @@ export function HomePage() {
           </div>
           <figure className="flex flex-col gap-3">
             <div className="hidden md:block">
-              <SiteVisual />
+              <ScaleToFrame width={720}>
+                <SiteVisual />
+              </ScaleToFrame>
             </div>
             <MobileSiteVisual />
             <figcaption className="text-[11px]" style={{ color: ink2 }}>{hero.caption}</figcaption>
@@ -341,21 +345,24 @@ export function HomePage() {
 
       <section data-node-id="203:4501" style={{ background: ink }} aria-labelledby="home-intel">
         <div className={section}>
-          <div className="grid items-start gap-12 lg:grid-cols-[448px_1fr]">
+          <div className="grid items-start gap-6 lg:grid-cols-[448px_minmax(0,1fr)] lg:gap-12">
             <div className="flex flex-col items-start gap-6 text-white">
               <p className={eyebrow} style={{ color: "var(--color-mkt-amber)" }}>{intelligence.eyebrow}</p>
               <h2 id="home-intel" className={h2}><Lines lines={intelligence.headline} /></h2>
               <p className="text-[17px]">{intelligence.body}</p>
-              <Link href={intelligence.cta.href} className={`${styles.press} inline-flex min-h-[44px] items-center rounded-full px-5 text-[15px] font-medium`} style={{ background: "var(--color-mkt-amber)", color: ink }}>
+              <Link href={intelligence.cta.href} className={`${styles.press} inline-flex min-h-[44px] items-center rounded-full px-5 py-3 text-[15px] font-medium leading-[1.5]`} style={{ background: "var(--color-mkt-amber)", color: ink }}>
                 {intelligence.cta.label}
               </Link>
             </div>
-            <div className="hidden md:block">
-              <IntelligenceVisual />
+            {/* 203:4510 scales the 720px symbol to 784px (x1.0889); zoom keeps that scale at any column width. */}
+            <div className="hidden [zoom:1.0889] md:block">
+              <ScaleToFrame width={720}>
+                <IntelligenceVisual />
+              </ScaleToFrame>
             </div>
             <MobileIntelligenceVisual />
           </div>
-          <nav aria-label="Product areas" className="flex flex-col gap-3 md:flex-row md:flex-wrap md:gap-x-4 text-[14px] font-medium text-white">
+          <nav aria-label="Product areas" className="flex flex-col gap-4 md:flex-row md:flex-wrap md:gap-x-4 text-[14px] font-medium text-white">
             {intelligence.areas.map((a) => (
               <Link key={a.label} href={a.href} className="md:w-[220px]">{a.label}</Link>
             ))}
@@ -381,7 +388,7 @@ export function HomePage() {
 
       <section data-node-id="203:4563" style={{ background: "var(--color-mkt-amber-soft)" }} aria-labelledby="home-capture">
         <div className={section}>
-          <div className="grid items-start gap-10 lg:grid-cols-[minmax(0,700px)_minmax(0,480px)] lg:gap-16">
+          <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,700px)_minmax(0,480px)] lg:gap-16">
             <div className="flex flex-col gap-4">
               <p className={eyebrow} style={{ color: ink2 }}>{capture.eyebrow}</p>
               <h2 id="home-capture" className={h2}><Lines lines={capture.headline} /></h2>

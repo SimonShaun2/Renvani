@@ -5,7 +5,9 @@ import { geist, newsreader } from "./fonts";
 import { FigmaNode } from "./FigmaNode";
 import { IndustryMenu } from "./IndustryMenu";
 import { INDUSTRY_TREES } from "./industry-visuals";
-import { ProductsMenu } from "./ProductsMenu";
+import { HeaderDisclosure } from "./HeaderDisclosure";
+import { ProductsMenuPanel } from "./ProductsMenuPanel";
+import { ScaleToFrame } from "./ScaleToFrame";
 import { SITE_FOOTER, SITE_NAV } from "./site-config";
 import styles from "./site.module.css";
 
@@ -25,7 +27,11 @@ export function MarketingShell({ children }: { children: ReactNode }) {
         <nav aria-label="Main" className="hidden items-center gap-10 text-[14px] font-medium lg:flex" style={{ color: "var(--color-mkt-ink2)" }}>
           {SITE_NAV.links.map((l) =>
             l.href === "/product" ? (
-              <ProductsMenu key={l.label} label={l.label} />
+              <HeaderDisclosure key={l.label} nodeId="177:640" summary={l.label} summaryClassName="hover:underline" panelClassName="absolute inset-x-0 top-[88px] z-30">
+                <ScaleToFrame>
+                  <ProductsMenuPanel variant="desktop" />
+                </ScaleToFrame>
+              </HeaderDisclosure>
             ) : l.href === "/industries" ? (
               <IndustryMenu key={l.label} label={l.label}>
                 <FigmaNode node={INDUSTRY_TREES.menu!.desktop} className="w-full" />
@@ -49,25 +55,22 @@ export function MarketingShell({ children }: { children: ReactNode }) {
             {SITE_NAV.cta.label}
           </Link>
         </div>
-        <details data-node-id="177:737" className="relative lg:hidden">
-          {/* Hamburger icon per 253:6782 / 200:535 (icon from the frame's layer). */}
-          <summary aria-label="Menu" className="flex size-11 cursor-pointer list-none items-center justify-center">
-            <img src="/marketing/home/tablet/icon-menu-fb31084f.svg" alt="" width={24} height={24} />
-          </summary>
-          <nav aria-label="Mobile" className="absolute right-0 z-20 mt-2 flex w-64 flex-col gap-1 rounded-2xl border p-3" style={{ background: "var(--color-mkt-cream)", borderColor: "var(--color-mkt-line)" }}>
-            {[...SITE_NAV.links, SITE_NAV.signIn].map((l) => (
-              <Link key={l.label} href={l.href} className="flex min-h-[44px] items-center px-2 text-[15px]">
-                {l.label}
-              </Link>
-            ))}
-            <Link href={SITE_NAV.cta.href} className="mt-2 flex min-h-[44px] items-center justify-center rounded-full text-[15px] font-medium" style={{ background: "var(--color-mkt-ink)", color: "var(--color-mkt-cream)" }}>
-              {SITE_NAV.cta.label}
-            </Link>
+        {/* Mobile + tablet menu (177:737; product menu 226:7296). Hamburger per 253:6782 / 200:535. */}
+        <HeaderDisclosure
+          nodeId="177:737"
+          className="lg:hidden"
+          summaryClassName="flex size-11 items-center justify-center"
+          summaryLabel={{ open: "Close menu", closed: "Open menu" }}
+          summary={<img src="/marketing/home/tablet/icon-menu-fb31084f.svg" alt="" width={24} height={24} />}
+          panelClassName="absolute inset-x-0 top-[76px] z-30 max-h-[calc(100dvh-76px)] overflow-y-auto"
+        >
+          <nav aria-label="Mobile">
+            <ProductsMenuPanel variant="mobile" />
           </nav>
-        </details>
+        </HeaderDisclosure>
       </header>
       <main>{children}</main>
-      <footer data-node-id="203:4576" className="mx-auto flex max-w-[1440px] flex-col gap-6 px-6 py-6 md:grid md:grid-cols-[484px_204px] md:gap-x-4 md:gap-y-6 md:p-8 lg:flex lg:flex-row lg:flex-nowrap lg:items-start lg:justify-start lg:gap-6 lg:px-16 lg:py-16">
+      <footer data-node-id="203:4576" className="mx-auto flex max-w-[1440px] flex-col gap-6 leading-[1.38] px-6 py-6 md:grid md:grid-cols-[484px_204px] md:gap-x-4 md:gap-y-6 md:p-8 lg:flex lg:flex-row lg:flex-nowrap lg:items-start lg:justify-start lg:gap-6 lg:px-16 lg:py-16">
         <p className="text-[28px] md:order-1 md:leading-[1.4] lg:w-[350px] lg:leading-[inherit]" style={serif}>
           Renvani
         </p>

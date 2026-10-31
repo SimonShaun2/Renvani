@@ -91,6 +91,7 @@ const BOOKING_LEAD_SOURCES = new Set([
 
 const OWN_WEBSITE_LEAD_SOURCES = new Set([
   "website",
+  "service_page",
   "direct",
   "direct_web",
   "gbp",

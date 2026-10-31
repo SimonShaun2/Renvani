@@ -11,10 +11,13 @@ import {
 } from "@/src/components/growth/branded-storefront.utils";
 import { useCheckZipCoverage, useSubmitBookingRequest } from "@/src/hooks/booking.hooks";
 import { ApiError } from "@/src/lib/api";
+import { HONEYPOT_FIELD } from "@/src/lib/inquiry-rate-limit";
 
 interface BrandedInquiryClientProps {
   model: BrandedStorefrontViewModel;
   acquisitionSource: string;
+  initialService?: string;
+  initialZip?: string;
 }
 
 function createIdempotencyKey(): string {
@@ -25,18 +28,29 @@ function createIdempotencyKey(): string {
   return `inquiry-${Date.now()}`;
 }
 
-export function BrandedInquiryClient({ model, acquisitionSource }: BrandedInquiryClientProps) {
+async function passInquiryGate(slug: string, honeypot: string): Promise<{ ok: boolean; accepted: boolean; message?: string }> {
+  const response = await fetch(`/api/site/${encodeURIComponent(slug)}/inquiry-gate`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ [HONEYPOT_FIELD]: honeypot })
+  });
+  const payload = (await response.json().catch(() => ({}))) as { accepted?: boolean; message?: string };
+  return { ok: response.ok, accepted: payload.accepted !== false, ...(payload.message ? { message: payload.message } : {}) };
+}
+
+export function BrandedInquiryClient({ model, acquisitionSource, initialService, initialZip }: BrandedInquiryClientProps) {
   const submitMutation = useSubmitBookingRequest(model.bookingSlug);
   const zipCheckMutation = useCheckZipCoverage(model.bookingSlug);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
-  const [zip, setZip] = useState("");
+  const [zip, setZip] = useState(initialZip ?? "");
+  const [honeypot, setHoneypot] = useState("");
   const [addressLine1, setAddressLine1] = useState("");
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
-  const [serviceInterest, setServiceInterest] = useState(model.serviceCards[0]?.title ?? "Standard clean");
+  const [serviceInterest, setServiceInterest] = useState(initialService ?? model.serviceCards[0]?.title ?? "Standard clean");
   const [notes, setNotes] = useState("");
   const [smsConsentAppointments, setSmsConsentAppointments] = useState(false);
   const [smsConsentMarketing, setSmsConsentMarketing] = useState(false);
@@ -57,6 +71,16 @@ export function BrandedInquiryClient({ model, acquisitionSource }: BrandedInquir
     }
 
     try {
+      const gate = await passInquiryGate(model.bookingSlug, honeypot);
+      if (!gate.ok) {
+        setErrorMessage(gate.message ?? "Please try again in a few minutes.");
+        return;
+      }
+      if (!gate.accepted) {
+        setReferenceNumber("received");
+        return;
+      }
+
       const coverage = await zipCheckMutation.mutateAsync(zip.trim());
       if (!coverage.covered) {
         setErrorMessage("That ZIP is outside our current service area. You can still leave your email on the booking page.");
@@ -262,6 +286,20 @@ export function BrandedInquiryClient({ model, acquisitionSource }: BrandedInquir
           {errorMessage}
         </p>
       ) : null}
+
+      <div aria-hidden="true" className="absolute left-[-10000px] h-px w-px overflow-hidden">
+        <label>
+          Website
+          <input
+            type="text"
+            name={HONEYPOT_FIELD}
+            tabIndex={-1}
+            autoComplete="off"
+            value={honeypot}
+            onChange={(event) => setHoneypot(event.target.value)}
+          />
+        </label>
+      </div>
 
       <button
         type="submit"

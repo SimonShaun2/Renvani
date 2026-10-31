@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 
 import { and, eq, isNull } from "drizzle-orm";
 
-import { agentActions, db, runTransactionWithTenantSession } from "@fsm/db";
+import { activityEvents, agentActions, db, runTransactionWithTenantSession } from "@fsm/db";
 import {
   AppError,
   ErrorCode,
@@ -105,6 +105,69 @@ export function agentActionVersion(row: Pick<typeof agentActions.$inferSelect, "
 
 export interface AgentActionStateChangeOptions {
   expectedVersion?: number | undefined;
+  /** Client `Idempotency-Key` (approve/execute): same key + same request replays; different request → 409. */
+  idempotencyKey?: string | undefined;
+}
+
+type TenantTx = Parameters<Parameters<typeof runTransactionWithTenantSession>[1]>[0];
+type IdempotentOperation = "approve" | "execute";
+
+const IDEMPOTENT_OPERATION_EVENT_TYPE = {
+  approve: "agent.proposal_approved",
+  execute: "agent.execution_succeeded"
+} as const;
+
+function idempotencyRequestHash(operation: IdempotentOperation, options: AgentActionStateChangeOptions): string {
+  return hashPayload({ operation, expectedVersion: options.expectedVersion ?? null });
+}
+
+function idempotencyDetail(operation: IdempotentOperation, options: AgentActionStateChangeOptions) {
+  return options.idempotencyKey
+    ? { idempotency: { key: options.idempotencyKey, requestHash: idempotencyRequestHash(operation, options) } }
+    : {};
+}
+
+/**
+ * Replay lookup for approve/execute (TE-DUP-01/02). The key and request hash are recorded on the
+ * tenant-scoped audit event written in the same transaction as the transition, so no migration is needed.
+ * Returns the current row (marked `replayed: true`) when the same key and request were already applied;
+ * throws 409 when the key was used with a different request; returns null when the key is new.
+ */
+async function findIdempotentReplay(
+  tx: TenantTx,
+  companyId: string,
+  row: typeof agentActions.$inferSelect,
+  operation: IdempotentOperation,
+  options: AgentActionStateChangeOptions
+) {
+  if (!options.idempotencyKey) {
+    return null;
+  }
+
+  const events = await tx
+    .select()
+    .from(activityEvents)
+    .where(
+      and(
+        eq(activityEvents.companyId, companyId),
+        eq(activityEvents.entityType, "agent_action"),
+        eq(activityEvents.entityId, row.id),
+        eq(activityEvents.eventType, IDEMPOTENT_OPERATION_EVENT_TYPE[operation])
+      )
+    );
+
+  const prior = events
+    .map((event) => (event.payload as { idempotency?: { key?: unknown; requestHash?: unknown } } | null)?.idempotency)
+    .find((entry) => entry?.key === options.idempotencyKey);
+  if (!prior) {
+    return null;
+  }
+
+  if (prior.requestHash !== idempotencyRequestHash(operation, options)) {
+    throw new AppError(ErrorCode.CONFLICT, "Idempotency-Key was already used with a different request");
+  }
+
+  return { ...mapRow(row), replayed: true as const };
 }
 
 function assertExpectedVersion(row: typeof agentActions.$inferSelect, options: AgentActionStateChangeOptions): void {
@@ -314,6 +377,11 @@ export async function approveAgentAction(
     const mapped = await runTransactionWithTenantSession(companyId, async (tx) => {
       const row = await getActionRow(companyId, actionId, tx);
 
+      const replay = await findIdempotentReplay(tx, companyId, row, "approve", options);
+      if (replay) {
+        return { mapped: replay, row, replayed: true };
+      }
+
       assertExpectedVersion(row, options);
       assertAgentActionApprovable(toLifecycleSlice(row));
 
@@ -346,11 +414,16 @@ export async function approveAgentAction(
         row: updated,
         actorId: reviewerId,
         actorType: "user",
-        summary: "Agent proposal approved"
+        summary: "Agent proposal approved",
+        ...(options.idempotencyKey ? { detail: idempotencyDetail("approve", options) } : {})
       });
 
-      return { mapped: mapRow(updated), row: updated };
+      return { mapped: mapRow(updated), row: updated, replayed: false };
     });
+
+    if (mapped.replayed) {
+      return mapped.mapped;
+    }
 
     await mirrorAgentActionAuditToLangfuse({
       companyId,
@@ -445,10 +518,14 @@ export async function editAgentActionParameters(
   companyId: string,
   actionId: string,
   editorId: string,
-  patch: { channel?: "sms" | "email"; subject?: string | null; body: string }
+  patch: { channel?: "sms" | "email"; subject?: string | null; body: string },
+  options: AgentActionStateChangeOptions = {}
 ) {
   const result = await runTransactionWithTenantSession(companyId, async (tx) => {
     const row = await getActionRow(companyId, actionId, tx);
+
+    // TE-STALE-03: an edit made against a stale copy must not overwrite the current body.
+    assertExpectedVersion(row, options);
 
     if (row.state !== "awaiting_approval") {
       throw new AppError(ErrorCode.CONFLICT, "Only awaiting-approval actions can be edited");
@@ -480,12 +557,12 @@ export async function editAgentActionParameters(
         approvedParameters: null,
         updatedAt: new Date()
       })
-      .where(agentActionScopedWhere(companyId, actionId))
+      .where(agentActionTransitionWhere(companyId, actionId, "awaiting_approval"))
       .returning();
 
     const updated = updatedRows[0];
     if (!updated) {
-      throw new AppError(ErrorCode.INTERNAL_ERROR, "Failed to edit agent action");
+      throw agentActionVersionConflictError();
     }
 
     const detail = {
@@ -530,6 +607,11 @@ export async function executeAgentAction(
   try {
     const result = await runTransactionWithTenantSession(companyId, async (tx) => {
       const row = await getActionRow(companyId, actionId, tx);
+
+      const replay = await findIdempotentReplay(tx, companyId, row, "execute", options);
+      if (replay) {
+        return { mapped: replay, row, detail: null, replayed: true };
+      }
 
       assertExpectedVersion(row, options);
 
@@ -612,7 +694,8 @@ export async function executeAgentAction(
 
       const detail = {
         actionType: row.actionType,
-        receipt
+        receipt,
+        ...idempotencyDetail("execute", options)
       };
 
       await emitAgentActionAuditEvent(tx, {
@@ -625,8 +708,12 @@ export async function executeAgentAction(
         detail
       });
 
-      return { mapped: mapRow(updated), row: updated, detail };
+      return { mapped: mapRow(updated), row: updated, detail, replayed: false };
     });
+
+    if (result.replayed || !result.detail) {
+      return result.mapped;
+    }
 
     await mirrorAgentActionAuditToLangfuse({
       companyId,

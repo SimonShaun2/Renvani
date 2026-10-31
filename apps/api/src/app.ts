@@ -1,5 +1,6 @@
 import fastifyCors from "@fastify/cors";
 
+import { allowedAppOrigins, runWithRequestOrigin } from "./lib/app-origins.js";
 import { parseClerkAuthorizedParties } from "./lib/clerk-auth.js";
 import clerkWebhookRoutes from "./routes/webhooks/clerk.js";
 import Fastify from "fastify";
@@ -101,9 +102,15 @@ export async function buildApp() {
   });
 
   await app.register(fastifyCors, {
-    origin: [...new Set([new URL(env.APP_URL).origin, ...parseClerkAuthorizedParties(env.CLERK_AUTHORIZED_PARTIES)])],
+    // APP_URL primary + APP_URL_ALLOWED extras (staging tier only, exact match) + Clerk authorized parties.
+    origin: [...new Set([...allowedAppOrigins(), ...parseClerkAuthorizedParties(env.CLERK_AUTHORIZED_PARTIES)])],
     credentials: true,
     allowedHeaders: ["Authorization", "Content-Type", "Idempotency-Key", "X-Request-Id", "X-Customer-Portal-Token"]
+  });
+  // Bind the caller's Origin so Stripe return URLs can target an allowed tester origin (falls back to APP_URL).
+  app.addHook("onRequest", (request, _reply, done) => {
+    const origin = typeof request.headers.origin === "string" ? request.headers.origin : null;
+    runWithRequestOrigin(origin, done);
   });
   await app.register(requestLoggerPlugin);
   await app.register(globalRateLimitPlugin);

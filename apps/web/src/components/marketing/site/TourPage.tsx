@@ -1,4 +1,5 @@
 import { FigmaNode } from "./FigmaNode";
+import { ScaleToFrame } from "./ScaleToFrame";
 import type { TourStep } from "./tour-config";
 import { TOUR_TREES } from "./tour-visuals";
 
@@ -8,10 +9,12 @@ export function TourPage({ step }: { step: TourStep }) {
   if (!t) return null;
   return (
     <>
-      <div className="hidden md:block">
-        <FigmaNode node={t.desktop} className="w-full" />
+      <div className="hidden lg:block">
+        <ScaleToFrame>
+          <FigmaNode node={t.desktop} className="w-full" />
+        </ScaleToFrame>
       </div>
-      <div className="md:hidden">
+      <div className="lg:hidden">
         <FigmaNode node={t.mobile} className="w-full" />
       </div>
     </>

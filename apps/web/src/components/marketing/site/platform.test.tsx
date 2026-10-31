@@ -71,7 +71,7 @@ describe("Products + How it works (Figma 176:204/176:313, 176:585/176:664)", () 
       const h = a.getAttribute("href")!;
       if (h.startsWith("#")) continue;
       const p = path(h);
-      const ok = ROUTE_FILES[p] ? existsSync(join(APP, ROUTE_FILES[p]!)) : PRODUCT_PAGES.some((x) => `/product/${x.slug}` === p) || p === "/product-tour";
+      const ok = ROUTE_FILES[p] ? existsSync(join(APP, ROUTE_FILES[p]!)) : PRODUCT_PAGES.some((x) => `/product/${x.slug}` === p) || p === "/tour";
       expect(ok, h).toBe(true);
     }
   });

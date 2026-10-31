@@ -37,7 +37,7 @@ export const GROWTH_CHECK_ENTRY = {
   submit: "Get my growth report",
   /** The website is carried into the Growth Check request (/growth-check?website=…). */
   action: "/growth-check",
-  secondary: { label: "Or see the product in action →", href: "/product-tour" }
+  secondary: { label: "Or see the product in action →", href: "/tour" }
 };
 
 export const HOME = {
@@ -73,7 +73,7 @@ export const HOME = {
   },
   journey: {
     headline: ["The first click is", "just the beginning."],
-    more: { label: "Watch the whole workflow →", href: "/product-tour" }
+    more: { label: "Watch the whole workflow →", href: "/tour" }
   },
   /** Mobile-only focused opportunity (Figma 253:6779 "Website / Focused opportunity / Mobile"). */
   intelligenceMobile: {

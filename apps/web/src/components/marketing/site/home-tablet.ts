@@ -77,7 +77,7 @@ export const HOME_TABLET: VNode = {
        ]
       }
      ],
-     "href": "/product-tour"
+     "href": "/tour"
     },
     {
      "t": "div",
@@ -615,7 +615,7 @@ export const HOME_TABLET: VNode = {
        ]
       }
      ],
-     "href": "/product-tour"
+     "href": "/tour"
     }
    ]
   },

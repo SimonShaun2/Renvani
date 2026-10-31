@@ -39,12 +39,17 @@ const envSchema = z.object({
   STRIPE_PLATFORM_BILLING_PRICE_ID_FLEX: z.string().default(""),
   /** STACK-13/14 — Flat $799/mo Stripe Price id (test mode) */
   STRIPE_PLATFORM_BILLING_PRICE_ID_FLAT: z.string().default(""),
-  OPENAI_API_KEY: z.string().min(1, "OPENAI_API_KEY is required"),
-  TWILIO_ACCOUNT_SID: z.string().min(1, "TWILIO_ACCOUNT_SID is required"),
-  TWILIO_AUTH_TOKEN: z.string().min(1, "TWILIO_AUTH_TOKEN is required"),
-  TWILIO_FROM_NUMBER: z.string().min(1, "TWILIO_FROM_NUMBER is required"),
-  SENDGRID_API_KEY: z.string().min(1, "SENDGRID_API_KEY is required"),
-  SENDGRID_FROM_EMAIL: z.string().email("SENDGRID_FROM_EMAIL must be a valid email"),
+  /** Optional (non-core). Empty = AI features disabled (import mapping falls back to presets). */
+  OPENAI_API_KEY: z.string().trim().default(""),
+  /** Optional (non-core) as a group: all three or none. Empty = SMS and inbound Twilio webhooks disabled. */
+  TWILIO_ACCOUNT_SID: z.string().trim().default(""),
+  TWILIO_AUTH_TOKEN: z.string().trim().default(""),
+  TWILIO_FROM_NUMBER: z.string().trim().default(""),
+  /** Optional (non-core). Empty = SendGrid fallback off (Resend, if set, still sends). */
+  SENDGRID_API_KEY: z.string().trim().default(""),
+  SENDGRID_FROM_EMAIL: z
+    .union([z.literal(""), z.string().trim().email("SENDGRID_FROM_EMAIL must be a valid email")])
+    .default(""),
   /** MVP email-first (Resend); optional until STACK-08 wires transactional sends */
   RESEND_API_KEY: z.string().default(""),
   RESEND_FROM_EMAIL: z.string().default(""),
@@ -143,8 +148,45 @@ function parseEnv(): Env {
     throw new Error(`Environment validation failed: ${formatValidationErrors(result.error)}`);
   }
   assertStripeLiveKeyAllowed(process.env);
+  assertOptionalIntegrationGroupsComplete(result.data);
 
   return result.data;
+}
+
+const TWILIO_ENV_NAMES = ["TWILIO_ACCOUNT_SID", "TWILIO_AUTH_TOKEN", "TWILIO_FROM_NUMBER"] as const;
+
+/**
+ * Non-core integrations may be absent, but never half-configured. Names only in errors, never values.
+ */
+export function assertOptionalIntegrationGroupsComplete(
+  config: Pick<Env, (typeof TWILIO_ENV_NAMES)[number] | "SENDGRID_API_KEY" | "SENDGRID_FROM_EMAIL">
+): void {
+  const twilioSet = TWILIO_ENV_NAMES.filter((name) => config[name] !== "");
+  if (twilioSet.length > 0 && twilioSet.length < TWILIO_ENV_NAMES.length) {
+    const missing = TWILIO_ENV_NAMES.filter((name) => config[name] === "");
+    throw new Error(
+      `Environment validation failed: Twilio is partially configured; set all of ${TWILIO_ENV_NAMES.join(", ")} or none (missing: ${missing.join(", ")})`
+    );
+  }
+  if (config.SENDGRID_API_KEY !== "" && config.SENDGRID_FROM_EMAIL === "") {
+    throw new Error("Environment validation failed: SENDGRID_FROM_EMAIL is required when SENDGRID_API_KEY is set");
+  }
+}
+
+export function isOpenAiConfigured(config: Pick<Env, "OPENAI_API_KEY"> = env): boolean {
+  return config.OPENAI_API_KEY !== "";
+}
+
+export function isTwilioConfigured(
+  config: Pick<Env, (typeof TWILIO_ENV_NAMES)[number]> = env
+): boolean {
+  return TWILIO_ENV_NAMES.every((name) => config[name] !== "");
+}
+
+export function isSendgridConfigured(
+  config: Pick<Env, "SENDGRID_API_KEY" | "SENDGRID_FROM_EMAIL"> = env
+): boolean {
+  return config.SENDGRID_API_KEY !== "" && config.SENDGRID_FROM_EMAIL !== "";
 }
 
 let cachedEnv: Env | null = null;

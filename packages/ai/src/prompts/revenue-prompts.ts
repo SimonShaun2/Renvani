@@ -1,6 +1,7 @@
 import pino from "pino";
 
 import { env } from "@fsm/config";
+import { assertOpenAiConfigured } from "./openai-config.js";
 
 const logger = pino({
   name: "revenue-prompts"
@@ -119,6 +120,7 @@ function extractResponseText(responseBody: OpenAiResponseBody): string {
 }
 
 async function generateSms(prompt: string, jobType: string): Promise<string> {
+  assertOpenAiConfigured();
   const response = await fetch("https://api.openai.com/v1/responses", {
     method: "POST",
     headers: {

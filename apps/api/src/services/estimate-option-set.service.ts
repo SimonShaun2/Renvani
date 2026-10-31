@@ -277,10 +277,15 @@ async function clearRecommended(tx: Executor, companyId: string, tierGroupId: st
     .returning();
 }
 
-/** Guarded single-row write inside a set mutation; 0 rows means a concurrent writer moved the version. */
-async function updateOptionRow(
+/**
+ * Guarded single-row write inside a set mutation; 0 rows means a concurrent writer moved the version (or the
+ * estimate is not in this set). Scoped by company + tierGroupId + estimateId so the guard stands alone and never
+ * touches an estimate in another option set, even if a caller passes a mismatched id. Exported for tests.
+ */
+export async function updateOptionRow(
   tx: Executor,
   companyId: string,
+  tierGroupId: string,
   estimateId: string,
   expectedVersion: number,
   values: Partial<typeof estimates.$inferInsert>
@@ -291,6 +296,7 @@ async function updateOptionRow(
     .where(
       and(
         eq(estimates.companyId, companyId),
+        eq(estimates.tierGroupId, tierGroupId),
         eq(estimates.id, estimateId),
         isNull(estimates.deletedAt),
         eq(estimates.optionSetVersion, expectedVersion)
@@ -496,12 +502,12 @@ export async function updateEstimateOptionSet(
       if (updated.length !== rows.length) throw staleVersion();
     }
     for (const option of body.options ?? []) {
-      await updateOptionRow(tx, actor.companyId, option.estimateId, version, { tierLabel: option.tierLabel.trim(), updatedAt: now });
+      await updateOptionRow(tx, actor.companyId, tierGroupId, option.estimateId, version, { tierLabel: option.tierLabel.trim(), updatedAt: now });
     }
     if (body.recommendedEstimateId !== undefined) {
       await clearRecommended(tx, actor.companyId, tierGroupId, version);
       if (body.recommendedEstimateId) {
-        await updateOptionRow(tx, actor.companyId, body.recommendedEstimateId, version, { isRecommended: true, updatedAt: now });
+        await updateOptionRow(tx, actor.companyId, tierGroupId, body.recommendedEstimateId, version, { isRecommended: true, updatedAt: now });
       }
     }
     await bumpVersion(tx, actor.companyId, tierGroupId, version, rows.length, now);
@@ -573,7 +579,7 @@ export async function removeEstimateOption(
       throw conflict("option_minimum", `An option set needs at least ${ESTIMATE_OPTION_SET_MIN_OPTIONS} options`);
     }
     const now = new Date();
-    await updateOptionRow(tx, actor.companyId, estimateId, version, { deletedAt: now, isRecommended: false, updatedAt: now });
+    await updateOptionRow(tx, actor.companyId, tierGroupId, estimateId, version, { deletedAt: now, isRecommended: false, updatedAt: now });
     await bumpVersion(tx, actor.companyId, tierGroupId, version, rows.length - 1, now);
     await emitSetEvent(tx, {
       actor, tierGroupId, customerId: rows[0]!.customerId, op: "remove_option", key: body.idempotencyKey, hash, version: version + 1,

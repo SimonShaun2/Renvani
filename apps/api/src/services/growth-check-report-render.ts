@@ -99,8 +99,6 @@ export function buildGrowthCheckReportDocument(
   };
 }
 
-/** Deterministic JSON (sorted keys) so the content hash is stable. */
-
 export function reportContentHash(report: GrowthCheckReportDocument): string {
   return createHash("sha256").update(canonicalJson(report)).digest("hex");
 }

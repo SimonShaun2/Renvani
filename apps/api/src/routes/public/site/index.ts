@@ -10,6 +10,8 @@ import {
   SERVICE_INQUIRY_LEAD_SOURCE,
   validateServiceInquiry
 } from "../../../services/public-service-inquiry.logic.js";
+import { hitFixedWindowRateLimit, normalizeRateLimitIp } from "../../../lib/fixed-window-rate-limit.js";
+import { getPublicStructuredData } from "../../../services/company-home-services.service.js";
 import { intakeServicePageInquiry } from "../../../services/revenue-inquiry-intake.service.js";
 
 import { publicSiteSlugParamsSchema, serviceInquiryBodySchema, zodIssuesToFieldErrors } from "./schemas.js";
@@ -67,6 +69,26 @@ export const serviceInquiryRouteSchema = {
     429: errorBody
   }
 } as const;
+
+/** Per-IP limit for the public JSON-LD endpoint (each call does unauthenticated DB lookups). */
+export const PUBLIC_STRUCTURED_DATA_IP_RATE_LIMIT = 30;
+export const PUBLIC_STRUCTURED_DATA_WINDOW_MS = 60_000;
+
+async function structuredDataRateLimit(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+  const result = await hitFixedWindowRateLimit({
+    key: `fsm:public:structured-data:ip:${normalizeRateLimitIp(request.ip)}`,
+    limit: PUBLIC_STRUCTURED_DATA_IP_RATE_LIMIT,
+    windowMs: PUBLIC_STRUCTURED_DATA_WINDOW_MS
+  });
+  if (!result.allowed) {
+    reply.header("Retry-After", String(result.retryAfterSeconds));
+    await reply.status(429).send({
+      error: "RATE_LIMITED",
+      message: "Too many requests. Please try again later.",
+      requestId: request.id
+    });
+  }
+}
 
 function decoyReferenceNumber(): string {
   const datePart = new Date().toISOString().slice(0, 10).replace(/-/gu, "");
@@ -157,6 +179,14 @@ async function submitServiceInquiryHandler(request: FastifyRequest, reply: Fasti
 }
 
 const publicSiteRoutes: FastifyPluginAsync = async (fastify) => {
+  // schema.org LocalBusiness JSON-LD (public data only). `script` is pre-escaped for a <script type="application/ld+json">.
+  fastify.get("/:slug/structured-data", { preHandler: [structuredDataRateLimit] }, async (request: FastifyRequest, reply: FastifyReply) => {
+    const params = publicSiteSlugParamsSchema.safeParse(request.params);
+    if (!params.success) return notFound(request, reply);
+    const data = await getPublicStructuredData(params.data.slug);
+    return reply.header("Cache-Control", "public, max-age=300").send(data);
+  });
+
   fastify.post("/:slug/inquiry", {
     schema: serviceInquiryRouteSchema,
     bodyLimit: 16 * 1024,

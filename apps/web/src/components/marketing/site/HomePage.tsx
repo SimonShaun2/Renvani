@@ -85,7 +85,7 @@ export function GrowthCheckEntry({ id }: { id: string }) {
 function SiteVisual() {
   const s = HOME.site;
   return (
-    <div data-node-id="200:46" className="overflow-hidden rounded-2xl border" style={{ background: "var(--color-mkt-panel)", borderColor: line }} aria-label="Example: website and booking" role="img">
+    <div data-node-id="200:46" className="w-[720px] shrink-0 overflow-hidden rounded-2xl border" style={{ background: "var(--color-mkt-panel)", borderColor: line }} aria-label="Example: website and booking" role="img">
       <ProductChrome title="Website + booking" />
       <div className="flex flex-col gap-4 p-6">
         <div className="flex items-start justify-between gap-4">
@@ -179,7 +179,7 @@ function MobileIntelligenceVisual() {
 function IntelligenceVisual() {
   const v = HOME.intelligence;
   return (
-    <div data-node-id="200:386" className="overflow-hidden rounded-2xl border" style={{ background: "var(--color-mkt-panel)", borderColor: line, color: ink }} aria-label="Example: revenue opportunities" role="img">
+    <div data-node-id="200:386" className="w-[720px] shrink-0 overflow-hidden rounded-2xl border" style={{ background: "var(--color-mkt-panel)", borderColor: line, color: ink }} aria-label="Example: revenue opportunities" role="img">
       <ProductChrome title="Revenue opportunities" />
       <div className="flex flex-col gap-4 p-6">
         <div className="flex items-start justify-between gap-4">

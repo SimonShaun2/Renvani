@@ -142,7 +142,7 @@ export function Step4Duplicates({
       <aside className="rounded-[30px] border border-neutral-200 bg-white px-5 py-5 shadow-sm">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-400">Recommended default</p>
         <p className="mt-4 text-sm leading-6 text-neutral-500">
-          Skip is the safest action when a customer is already in ServiceRev. Use update existing when
+          Skip is the safest action when a customer is already in Renvani. Use update existing when
           the file fills in missing details, and import as new only when the match is a false positive.
         </p>
       </aside>

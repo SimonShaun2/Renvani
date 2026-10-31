@@ -4,7 +4,7 @@ export interface PageMeta {
 }
 
 const DEFAULT_META: PageMeta = {
-  title: "ServiceRev",
+  title: "Renvani",
   subtitle: "Thinner system. Smarter brain."
 };
 
@@ -56,6 +56,13 @@ const STATIC_PAGE_META: Array<{ prefix: string; meta: PageMeta }> = [
     meta: {
       title: "Payments",
       subtitle: "Collections, payouts, and disputes at a glance."
+    }
+  },
+  {
+    prefix: "/timesheets",
+    meta: {
+      title: "Timesheets",
+      subtitle: "Technician time, pay-period approval, and payroll export."
     }
   },
   {

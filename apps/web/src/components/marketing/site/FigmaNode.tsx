@@ -54,7 +54,7 @@ export function FigmaNode({ node, className = "", inline = false, slots }: { nod
     );
   }
   if (inline) return <span className={`${cls} block`}>{kids}</span>;
-  if (node.t === "p") return <p className={cls}>{kids}</p>;
+  if (node.t === "p") return <p className={cls} data-node-id={node.id}>{kids}</p>;
   return (
     <div className={cls} data-node-id={node.id} id={node.anchor}>
       {kids}

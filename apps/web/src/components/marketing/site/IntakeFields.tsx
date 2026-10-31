@@ -20,7 +20,7 @@ export function Honeypot() {
 }
 
 const control =
-  "h-[52px] w-full rounded-[12px] border p-4 placeholder:text-[#2a3360] text-[14px] leading-[1.38] outline-none focus-visible:ring-2 aria-[invalid=true]:border-[#b42318] md:bg-[#fbf6ef] md:text-[15px] lg:bg-white lg:text-[14px]";
+  "h-[52px] w-full rounded-[12px] border bg-white p-4 placeholder:text-[#2a3360] text-[14px] leading-[1.38] outline-none focus-visible:ring-2 aria-[invalid=true]:border-[#b42318] md:bg-[#fbf6ef] md:text-[15px] lg:bg-white lg:text-[14px]";
 
 export function Field({ id, label, error, className = "", children }: { id: string; label: string; error?: string | undefined; className?: string; children: ReactNode }) {
   return (

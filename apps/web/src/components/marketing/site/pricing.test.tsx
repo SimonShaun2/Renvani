@@ -13,6 +13,8 @@ import { isPublicRoute } from "@/src/lib/route-access";
 import { buildMarketingSitemap } from "@/src/lib/seo/public-sitemap";
 
 import { PLANS, pricingTokens } from "./pricing-config";
+import { PRICING_TREES } from "./pricing-visuals";
+import type { VNode } from "./FigmaNode";
 import { PricingFrames } from "./PricingPage";
 import { SITE_FOOTER, SITE_NAV } from "./site-config";
 
@@ -21,6 +23,22 @@ const PUBLIC = join(__dirname, "../../../../public");
 const COMPETITORS = /jobber|servicetitan|housecall|service fusion|fieldedge|owner\.com|\bowner com\b|broccoli/i;
 
 describe("pricing (Figma 203:15719 desktop / 203:15720 mobile)", () => {
+  it("every button label has a text color that contrasts with its pill (review 5721672368)", () => {
+    const buttons: { c?: string; kind?: string }[] = [];
+    const walk = (n: VNode) => {
+      if (typeof n === "string") return;
+      if (n.t === "button") buttons.push(n as { c?: string; kind?: string });
+      n.k?.forEach(walk);
+    };
+    walk(PRICING_TREES.desktop);
+    walk(PRICING_TREES.mobile);
+    expect(buttons.length).toBeGreaterThan(0);
+    for (const b of buttons) {
+      if (b.c?.includes("bg-[#0f1530]")) expect(b.c).toContain("text-[color:#fbf6ef]");
+      if (b.c?.includes("bg-[#f6b400]")) expect(b.c).toContain("text-[color:#0f1530]");
+    }
+  });
+
   it("plans follow the pricing rulings", () => {
     const by = Object.fromEntries(PLANS.map((p) => [p.key, p]));
     expect(by.flex).toMatchObject({ monthly: 399, serviceFeePct: 2 });

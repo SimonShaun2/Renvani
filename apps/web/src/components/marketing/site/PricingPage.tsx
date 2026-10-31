@@ -7,8 +7,8 @@ function resolve(node: VNode, tokens: Record<string, string>): VNode {
   return node.k ? { ...node, k: node.k.map((k) => resolve(k, tokens)) } : node;
 }
 
-/** Pricing (Figma 203:15719 desktop at xl+, 203:15720 mobile below xl, via FrameSwitch). Figures come from pricing-config.ts. Server component. */
+/** Pricing (Figma 203:15719 desktop scaled to the 1440 frame at xl+, 203:15720 mobile below xl, via FrameSwitch). Figures come from pricing-config.ts. Server component. */
 export function PricingFrames() {
   const tokens = pricingTokens();
-  return <FrameSwitch desktop={resolve(PRICING_TREES.desktop, tokens)} mobile={resolve(PRICING_TREES.mobile, tokens)} />;
+  return <FrameSwitch desktop={resolve(PRICING_TREES.desktop, tokens)} mobile={resolve(PRICING_TREES.mobile, tokens)} scaleDesktop />;
 }

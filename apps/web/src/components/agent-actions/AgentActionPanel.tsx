@@ -6,12 +6,12 @@ import type { OperatorInboxItem } from "@fsm/types";
 
 import { ProposalDetail } from "@/src/components/revenue-agent/ProposalDetail";
 import {
+  agentActionErrorMessage,
   useApproveAgentAction,
   useEditOperatorInboxItem,
   useExecuteAgentAction,
   useRejectAgentAction
 } from "@/src/hooks/operator-inbox.hooks";
-import { ApiError } from "@/src/lib/api";
 import { cn } from "@/src/lib/utils";
 
 import { ACTION_TONE_CLASS, agentActionsFor, receiptRows, type AgentActionKey } from "./agent-actions.config";
@@ -19,10 +19,10 @@ import "./agent-actions-motion.css";
 
 /** Detail + every allowed action for one inbox item (Figma 10:379 detail, 10:425 audit trail, 10:430–434 buttons). */
 export function AgentActionPanel({ item, onDone }: { item: OperatorInboxItem; onDone?: () => void }) {
-  const approve = useApproveAgentAction(item.id);
+  const approve = useApproveAgentAction(item);
   const reject = useRejectAgentAction(item.id);
-  const execute = useExecuteAgentAction(item.id);
-  const edit = useEditOperatorInboxItem(item.id);
+  const execute = useExecuteAgentAction(item);
+  const edit = useEditOperatorInboxItem(item);
   const [editing, setEditing] = useState(false);
   const [body, setBody] = useState(item.proposedContent.body);
   const [subject, setSubject] = useState(item.proposedContent.subject ?? "");
@@ -39,7 +39,7 @@ export function AgentActionPanel({ item, onDone }: { item: OperatorInboxItem; on
       if (done) onDone?.();
       return true;
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Action failed");
+      setError(agentActionErrorMessage(err));
       return false;
     }
   }

@@ -14,6 +14,8 @@ import "@/src/components/revenue-agent/revenue-agent-motion.css";
 
 import { AgentActionPanel } from "./AgentActionPanel";
 import { INBOX_TABS, agentProducts, type InboxTabKey } from "./agent-actions.config";
+import { DeliveryStates } from "./DeliveryStates";
+import { sortApprovals } from "./delivery-states.config";
 
 /** Approvals inbox for every agent (Figma 10:220: tabs 10:289–10:304, list 10:309+, detail 10:379). */
 export function AgentInbox() {
@@ -25,7 +27,7 @@ export function AgentInbox() {
   const role = useAuthStore((state) => state.user?.role ?? null);
   const canReview = role !== null && REVENUE_REVIEWER_ROLES.has(role);
   const items = inbox.data?.items ?? [];
-  const visible = agent === "all" ? items : items.filter((i) => i.provenance.agentProduct === agent);
+  const visible = sortApprovals(agent === "all" ? items : items.filter((i) => i.provenance.agentProduct === agent));
   const selected = visible.find((i) => i.id === selectedId) ?? null;
 
   return (
@@ -114,6 +116,7 @@ export function AgentInbox() {
           )}
         </div>
       </div>
+      {selected ? <DeliveryStates key={`delivery-${selected.id}`} item={selected} /> : null}
     </div>
   );
 }

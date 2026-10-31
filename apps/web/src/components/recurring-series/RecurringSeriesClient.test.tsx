@@ -67,25 +67,30 @@ describe("RecurringSeriesClient", () => {
     expect(screen.getByTestId("series-no-access")).toBeTruthy();
   });
 
-  it("offers status-appropriate actions and only per-visit controls on open visits without a job", () => {
+  it("offers status-appropriate change types in Figma order and only open visits without a job", () => {
     mount();
-    expect(screen.getByRole("button", { name: "Pause plan" })).toBeTruthy();
-    expect(screen.queryByRole("button", { name: "Resume plan" })).toBeNull();
-    expect(screen.getAllByRole("button", { name: "Skip" })).toHaveLength(1);
+    const radios = screen.getAllByRole("radio").map((r) => r.closest("label")?.textContent);
+    expect(radios).toEqual(["Skip one visit", "Move one visit", "Move all future visits to a new time", "Pause plan", "End plan"]);
+    fireEvent.click(screen.getByRole("radio", { name: "Skip one visit" }));
+    const visit = screen.getByLabelText("Visit") as HTMLSelectElement;
+    expect(Array.from(visit.options).map((o) => o.value)).toEqual(["o1"]);
     expect(screen.getByText(/has a job — change it from the job/i)).toBeTruthy();
+    expect(screen.getByTestId("visit-o2").textContent).toMatch(/Has job/);
   });
 
-  it("status pill has a leading dot and buttons use the 44px Figma size", () => {
+  it("header and pill follow Figma 364:4217; Preview button is 44px", () => {
     mount();
+    expect(screen.getByText("Skip or move a visit, preview what changes, then apply.")).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "Visits in this plan" })).toBeTruthy();
     const pill = screen.getByTestId("series-status-pill");
     expect(pill.textContent).toBe("Active");
     expect(pill.style.backgroundColor).toMatch(/#e4f1e8|rgb\(228, 241, 232\)/);
-    const dot = screen.getByTestId("series-status-dot");
-    expect(dot.className).toContain("h-1.5");
-    expect(dot.style.backgroundColor).toMatch(/#2f7d4f|rgb\(47, 125, 79\)/);
-    const btn = screen.getByRole("button", { name: "Pause plan" });
+    expect(pill.style.color).toMatch(/#2f7d4f|rgb\(47, 125, 79\)/);
+    fireEvent.click(screen.getByRole("radio", { name: "Pause plan" }));
+    const btn = screen.getByRole("button", { name: "Preview changes" });
     expect(btn.className).toContain("h-11");
     expect(btn.className).toContain("rounded-[10px]");
+    expect(document.body.textContent).not.toMatch(/1\.99|booking fee/i);
   });
 
   it("an ended plan shows the ended state and no controls", () => {
@@ -93,14 +98,15 @@ describe("RecurringSeriesClient", () => {
     mount();
     expect(screen.getByTestId("series-ended")).toBeTruthy();
     expect(screen.queryByRole("button", { name: /preview changes/i })).toBeNull();
-    expect(screen.queryByRole("button", { name: "Skip" })).toBeNull();
+    expect(screen.queryByRole("radio")).toBeNull();
+    expect(screen.getByTestId("series-ended").textContent).toMatch(/Ended plans can’t be changed\./);
   });
 
   it("previews first, shows exactly what changes and who needs a person, then applies with the previewHash", async () => {
     m.preview.mockResolvedValue(previewResponse());
     m.apply.mockResolvedValue({ replayed: false });
     mount();
-    fireEvent.click(screen.getByRole("button", { name: "End plan" }));
+    fireEvent.click(screen.getByRole("radio", { name: "End plan" }));
     typeReason("Homeowner sold the house");
     expect(m.apply).not.toHaveBeenCalled();
     await act(async () => fireEvent.click(screen.getByRole("button", { name: "Preview changes" })));
@@ -108,7 +114,8 @@ describe("RecurringSeriesClient", () => {
     const preview = screen.getByTestId("series-preview");
     expect(preview.textContent).toMatch(/Active → Ended/);
     expect(preview.textContent).toMatch(/Cancelled/);
-    expect(screen.getByTestId("series-preview-exceptions").textContent).toMatch(/needs a person/i);
+    expect(screen.getByTestId("series-preview-exceptions").textContent).toMatch(/flagged for a person/i);
+    expect(preview.textContent).toMatch(/Nothing changes until you apply\. No message is sent to the customer\./);
     await act(async () => fireEvent.click(screen.getByRole("button", { name: "Apply changes" })));
     expect(m.apply).toHaveBeenCalledWith(
       expect.objectContaining({ expectedVersion: 3, previewHash: "c".repeat(64), change: { action: "end", reason: "Homeowner sold the house" }, idempotencyKey: expect.any(String) })
@@ -120,12 +127,12 @@ describe("RecurringSeriesClient", () => {
     m.preview.mockResolvedValue(previewResponse());
     m.apply.mockRejectedValue(new ApiError(409, { error: ErrorCode.CONFLICT, message: "x", fields: { reason: "preview_stale" } }));
     mount();
-    fireEvent.click(screen.getByRole("button", { name: "Pause plan" }));
+    fireEvent.click(screen.getByRole("radio", { name: "Pause plan" }));
     typeReason("Away for winter");
     await act(async () => fireEvent.click(screen.getByRole("button", { name: "Preview changes" })));
     await act(async () => fireEvent.click(screen.getByRole("button", { name: "Apply changes" })));
-    expect(screen.getByTestId("series-error").textContent).toMatch(/changed since you previewed/i);
-    await act(async () => fireEvent.click(screen.getByRole("button", { name: /reload plan/i })));
+    expect(screen.getByTestId("series-error").textContent).toMatch(/The plan changed since you previewed it\.Reload and preview again before applying\./);
+    await act(async () => fireEvent.click(screen.getByRole("button", { name: "Reload" })));
     expect(m.refetch).toHaveBeenCalled();
     expect(screen.queryByTestId("series-preview")).toBeNull();
   });
@@ -133,11 +140,13 @@ describe("RecurringSeriesClient", () => {
   it("moving one visit sends occurrenceId + localDate; external scheduler is explained", async () => {
     m.preview.mockRejectedValue(new ApiError(409, { error: ErrorCode.CONFLICT, message: "x", fields: { reason: "external_scheduler" } }));
     mount();
-    fireEvent.click(screen.getByRole("button", { name: "Move" }));
+    fireEvent.click(screen.getByRole("radio", { name: "Move one visit" }));
     fireEvent.change(screen.getByLabelText("New date"), { target: { value: "2030-03-08" } });
     typeReason("Customer asked for the following week");
     await act(async () => fireEvent.click(screen.getByRole("button", { name: "Preview changes" })));
     expect(m.preview).toHaveBeenCalledWith({ action: "reschedule_occurrence", occurrenceId: "o1", localDate: "2030-03-08", reason: "Customer asked for the following week" });
     expect(screen.getByTestId("series-error").textContent).toMatch(/scheduled by another system/i);
+    expect(screen.getByTestId("series-error").textContent).toMatch(/Make changes in the system that owns this schedule\./);
+    expect(screen.queryByRole("button", { name: "Reload" })).toBeNull();
   });
 });

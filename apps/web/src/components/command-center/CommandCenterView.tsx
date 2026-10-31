@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { EMPTY, KPIS, LOOP_STAGES } from "./command-center.config";
+import { DirectDemandCard } from "./DirectDemandCard";
 import { LocalDate, LocalGreeting } from "./LocalClock";
 import { HeaderSummary, NeedsYou } from "./NeedsYou";
 import "./command-center-motion.css";
@@ -55,6 +56,8 @@ export function CommandCenterView({ firstName }: CommandCenterViewProps) {
           </div>
         ))}
       </section>
+
+      <DirectDemandCard />
 
       <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_400px]">
         <NeedsYou />

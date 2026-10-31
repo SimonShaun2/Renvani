@@ -487,4 +487,22 @@ describe("FS-42 tenant access audit", () => {
     expect(fakeDb.getGrowthCheckReportDraftRevisions()).toHaveLength(revisionsBefore);
     expect(fakeDb.getGrowthCheckReportShares()[0]?.revokedAt).toBeNull();
   });
+
+  it("FS42-XT-GROWTH-REPORT-EXPORT-AUDIT cross-tenant export is 404 and writes no audit event in either tenant", async () => {
+    const companyA = fakeDb.seedCompany({ name: "Export A", slug: "export-a" });
+    const companyB = fakeDb.seedCompany({ name: "Export B", slug: "export-b" });
+    const ownerA = fakeDb.seedUser({ companyId: companyA.id, email: "owner@export-a.test", firstName: "O", lastName: "A", role: "owner" });
+    const ownerB = fakeDb.seedUser({ companyId: companyB.id, email: "owner@export-b.test", firstName: "O", lastName: "B", role: "owner" });
+    const scanB = fakeDb.seedGrowthCheckScan({ companyId: companyB.id });
+    const authA = `Bearer ${tokens.generateAccessToken({ userId: ownerA.id, companyId: companyA.id, role: "owner" })}`;
+    const authB = `Bearer ${tokens.generateAccessToken({ userId: ownerB.id, companyId: companyB.id, role: "owner" })}`;
+    const draftId = (await request(app.server).post(`/api/v1/growth-check/scans/${scanB.id}/report-draft`).set("Authorization", authB).send({ idempotencyKey: "fs42-export-b-01" })).body.draft.id as string;
+    await request(app.server).post(`/api/v1/growth-check/report-drafts/${draftId}/approve`).set("Authorization", authB).send({ expectedVersion: 1, idempotencyKey: "fs42-export-b-02" });
+    const exportEvents = () => fakeDb.getTestState().activityEvents.filter((e) => e.eventType === "export.downloaded");
+    expect((await request(app.server).get(`/api/v1/growth-check/report-drafts/${draftId}/export`).set("Authorization", authA)).status).toBe(404);
+    expect(exportEvents()).toHaveLength(0);
+    expect((await request(app.server).get(`/api/v1/growth-check/report-drafts/${draftId}/export`).set("Authorization", authB)).status).toBe(200);
+    expect(exportEvents()).toHaveLength(1);
+    expect(exportEvents()[0]).toMatchObject({ companyId: companyB.id, actorId: ownerB.id, entityId: draftId });
+  });
 });

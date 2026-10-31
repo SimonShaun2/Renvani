@@ -431,6 +431,8 @@ export interface TestEstimateRecord {
   tierLabel: string | null;
   tierGroupId: string | null;
   isSelectedTier: boolean | null;
+  isRecommended: boolean;
+  optionSetVersion: number;
   subtotal: string;
   taxRate: string | null;
   taxAmount: string | null;
@@ -1411,6 +1413,8 @@ export interface TestEstimateRecord {
   tierLabel: string | null;
   tierGroupId: string | null;
   isSelectedTier: boolean | null;
+  isRecommended: boolean;
+  optionSetVersion: number;
   subtotal: string;
   taxRate: string | null;
   taxAmount: string | null;
@@ -2616,6 +2620,8 @@ const estimatesTable = {
   tierLabel: "tierLabel",
   tierGroupId: "tierGroupId",
   isSelectedTier: "isSelectedTier",
+  isRecommended: "isRecommended",
+  optionSetVersion: "optionSetVersion",
   subtotal: "subtotal",
   taxRate: "taxRate",
   taxAmount: "taxAmount",
@@ -4856,6 +4862,8 @@ function createEstimateRecord(
     tierLabel: values.tierLabel ?? null,
     tierGroupId: values.tierGroupId ?? null,
     isSelectedTier: values.isSelectedTier ?? false,
+    isRecommended: values.isRecommended ?? false,
+    optionSetVersion: values.optionSetVersion ?? 1,
     subtotal: values.subtotal ?? "0.00",
     taxRate: values.taxRate ?? "0.0000",
     taxAmount: values.taxAmount ?? "0.00",

@@ -16,6 +16,7 @@ import {
   updateEstimateHandler,
   updateEstimateItemHandler
 } from "./handlers.js";
+import { registerEstimateOptionSetRoutes } from "./option-sets.js";
 import {
   addEstimateItemSchema,
   addEstimateItemValidation,
@@ -43,6 +44,9 @@ import {
 
 const estimateRoutes: FastifyPluginAsync = async (fastify) => {
   const authenticate = fastify.authenticate;
+
+  // FS-212 option sets (registered first; static "option-sets" segment wins over "/:id").
+  registerEstimateOptionSetRoutes(fastify);
 
   fastify.get("/", {
     preHandler: authenticate,

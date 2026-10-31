@@ -667,7 +667,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
        "k": [
         {
          "t": "div",
-         "c": "flex flex-col gap-[24px] items-start relative flex-1 min-w-0",
+         "c": "flex flex-col gap-[24px] items-start relative w-[480px] shrink-0",
          "n": "Outcome copy",
          "id": "203:8672",
          "k": [
@@ -738,7 +738,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
           },
           {
            "t": "div",
-           "c": "absolute bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[12px] items-start left-[402px] p-[18px] rounded-[16px] top-[258px] w-full",
+           "c": "absolute bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[12px] items-start left-[402px] p-[18px] rounded-[16px] top-[258px] w-[310px]",
            "n": "Example booking card",
            "id": "203:8680",
            "k": [
@@ -2619,7 +2619,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
           },
           {
            "t": "div",
-           "c": "absolute bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[12px] items-start left-[24px] p-[18px] rounded-[16px] top-[172px] w-full",
+           "c": "absolute bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[12px] items-start left-[24px] p-[18px] rounded-[16px] top-[172px] right-[24px]",
            "n": "Example booking card",
            "id": "203:8798",
            "k": [
@@ -4437,7 +4437,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
        "k": [
         {
          "t": "div",
-         "c": "flex flex-col gap-[24px] items-start relative flex-1 min-w-0",
+         "c": "flex flex-col gap-[24px] items-start relative w-[480px] shrink-0",
          "n": "Outcome copy",
          "id": "203:8909",
          "k": [
@@ -4508,7 +4508,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
           },
           {
            "t": "div",
-           "c": "absolute bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[12px] items-start left-[402px] p-[18px] rounded-[16px] top-[258px] w-full",
+           "c": "absolute bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[12px] items-start left-[402px] p-[18px] rounded-[16px] top-[258px] w-[310px]",
            "n": "Example booking card",
            "id": "203:8917",
            "k": [
@@ -6389,7 +6389,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
           },
           {
            "t": "div",
-           "c": "absolute bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[12px] items-start left-[24px] p-[18px] rounded-[16px] top-[172px] w-full",
+           "c": "absolute bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[12px] items-start left-[24px] p-[18px] rounded-[16px] top-[172px] right-[24px]",
            "n": "Example booking card",
            "id": "203:9035",
            "k": [
@@ -8207,7 +8207,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
        "k": [
         {
          "t": "div",
-         "c": "flex flex-col gap-[24px] items-start relative flex-1 min-w-0",
+         "c": "flex flex-col gap-[24px] items-start relative w-[480px] shrink-0",
          "n": "Outcome copy",
          "id": "203:13787",
          "k": [

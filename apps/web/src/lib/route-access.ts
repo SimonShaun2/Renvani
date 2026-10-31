@@ -100,6 +100,11 @@ export function isPublicRoute(pathname: string): boolean {
     return true;
   }
 
+  // /industries/<slug> is marketing-only (no app routes there); unknown slugs render the 404 page instead of a login redirect.
+  if (segments[0] === "industries" && segments.length === 2) {
+    return true;
+  }
+
   // Static marketing art in /public/marketing (Figma 171:2 home imagery).
   if (segments[0] === "marketing" && segments.length >= 2) {
     return true;

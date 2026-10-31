@@ -11,7 +11,7 @@ export const SITE_NAV: { links: SiteLink[]; cta: SiteLink; signIn: SiteLink } = 
     { label: "How it works", href: "/how-it-works" },
     { label: "Pricing", href: "/pricing" }
   ],
-  cta: { label: "Get a free demo", href: "/signup" },
+  cta: { label: "Get a free demo", href: "/demo" },
   signIn: { label: "Sign in", href: "/login" }
 };
 
@@ -20,7 +20,7 @@ export const SITE_FOOTER = {
     { label: "Products", href: "/product" },
     { label: "Industries", href: "/industries" },
     { label: "Pricing", href: "/pricing" },
-    { label: "Get a free demo", href: "/signup" }
+    { label: "Get a free demo", href: "/demo" }
   ] satisfies SiteLink[],
   copyright: `© ${new Date().getFullYear()} Renvani`
 };
@@ -35,8 +35,8 @@ export const GROWTH_CHECK_ENTRY = {
   label: "START WITH YOUR WEBSITE",
   placeholder: "yourbusiness.com",
   submit: "Get my growth report",
-  /** No Growth Check intake route exists yet; the website is carried into sign-up. */
-  action: "/signup",
+  /** The website is carried into the Growth Check request (/growth-check?website=…). */
+  action: "/growth-check",
   secondary: { label: "Or see the product in action →", href: "/product-tour" }
 };
 
@@ -130,7 +130,7 @@ const p = (slug: string) => `/product/${slug}`;
 export const PRODUCTS_MENU = {
   headline: "Five products. One connected business.",
   all: { label: "All products", href: "/product" },
-  cta: { label: "Get a free demo", href: "/signup" },
+  cta: { label: "Get a free demo", href: "/demo" },
   groups: [
     { title: "Growth", href: p("growth"), items: [{ label: "Websites", href: productLinkFor("Websites") }, { label: "Online Booking", href: p("online-booking") }] },
     { title: "Revenue", href: p("revenue"), items: [{ label: "Inquiry Response & Follow-up", href: productLinkFor("Inquiry Response & Follow-up") }, { label: "Estimates & Approvals", href: p("estimates-approvals") }] },

@@ -25,7 +25,7 @@ const resolves = (h: string) => {
   const path = h.split("#")[0] || "/";
   if (h.startsWith("#")) return true;
   if (path.startsWith("/product/")) return SLUGS.includes(path.slice(9));
-  return ["/", "/product", "/how-it-works", "/pricing", "/industries", "/industries/hvac", "/industries/plumbing", "/industries/electrical", "/signup", "/login", "/product-tour"].includes(path);
+  return ["/", "/product", "/how-it-works", "/pricing", "/industries", "/industries/hvac", "/industries/plumbing", "/industries/electrical", "/signup", "/demo", "/growth-check", "/login", "/product-tour"].includes(path);
 };
 
 describe("flagship + product-detail + tool pages (Figma 175:3…175:4156, 215:6308…216:6313)", () => {

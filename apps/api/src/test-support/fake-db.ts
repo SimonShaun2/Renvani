@@ -5909,12 +5909,20 @@ interface TestDb {
   };
 }
 
+/** drizzle-orm `count()` in a select projection: collapses the matched rows into one `{ alias: n }` row. */
+const COUNT_AGGREGATE_MARKER = { __aggregate: "count" } as const;
+
 function projectRows<T extends Record<string, unknown>>(
   rows: T[],
   projection?: Record<string, unknown>
 ): Array<Record<string, unknown>> {
   if (!projection) {
     return rows;
+  }
+
+  const countAlias = Object.entries(projection).find(([, column]) => column === COUNT_AGGREGATE_MARKER)?.[0];
+  if (countAlias) {
+    return [{ [countAlias]: rows.length }];
   }
 
   return rows.map((row) => {
@@ -6444,7 +6452,8 @@ export function createDrizzleModuleMock() {
     inArray: <T>(field: unknown, values: Array<T[keyof T]>): Predicate<T> => (row: T) =>
       values.includes(row[resolveFieldKey(field) as keyof T]),
     isNull: <T>(field: keyof T): Predicate<T> => (row: T) => row[resolveFieldKey(field) as keyof T] === null,
-    sql: sqlTag
+    sql: sqlTag,
+    count: () => COUNT_AGGREGATE_MARKER
   };
 }
 

@@ -3,6 +3,7 @@ import { and, eq, inArray, isNull } from "drizzle-orm";
 import { agentActions, runTransactionWithTenantSession } from "@fsm/db";
 import { AppError, ErrorCode, type CanonicalEntityRefV1 } from "@fsm/types";
 
+import { emitAgentActionAuditEvent, mirrorAgentActionAuditToLangfuse } from "./agent-action-audit.js";
 import { getAgentActionExecutor } from "./agent-action.executors.js";
 import { getAgentAction } from "./agent-action.service.js";
 
@@ -19,6 +20,12 @@ export function agentActionRowVersion(row: { updatedAt: Date }): number {
   return row.updatedAt.getTime();
 }
 
+export const ESCALATION_AUDIT_SUMMARY = "Agent proposal escalated";
+
+function escalationAuditDetail(previousState: string, input: EscalateAgentActionInput): Record<string, unknown> {
+  return { outcome: "escalated", previousState, hasReason: Boolean(input.reason) };
+}
+
 /**
  * Escalate a pending proposal: terminal state "escalated", escalation recorded on the execution receipt,
  * executor holds released via onRejectInTransaction. No side effects, no external sends.
@@ -29,7 +36,7 @@ export async function escalateAgentAction(
   actorId: string,
   input: EscalateAgentActionInput = {}
 ) {
-  await runTransactionWithTenantSession(companyId, async (tx) => {
+  const escalated = await runTransactionWithTenantSession(companyId, async (tx) => {
     const scoped = and(
       eq(agentActions.companyId, companyId),
       eq(agentActions.id, actionId),
@@ -39,6 +46,7 @@ export async function escalateAgentAction(
     if (!row) {
       throw new AppError(ErrorCode.NOT_FOUND, "Agent action not found");
     }
+    const previousState = row.state;
     if (input.expectedVersion !== undefined && input.expectedVersion !== agentActionRowVersion(row)) {
       throw new AppError(ErrorCode.CONFLICT, "Agent action changed since it was loaded; reload and retry");
     }
@@ -71,10 +79,35 @@ export async function escalateAgentAction(
         updatedAt: now
       })
       .where(and(scoped, inArray(agentActions.state, [...ESCALATABLE_AGENT_ACTION_STATES])))
-      .returning({ id: agentActions.id });
-    if (updated.length === 0) {
+      .returning();
+    const [updatedRow] = updated;
+    if (!updatedRow) {
       throw new AppError(ErrorCode.CONFLICT, "Agent action changed since it was loaded; reload and retry");
     }
+
+    // FS-42 audit, same transaction. No escalate value in the activity_event_type enum, so this is
+    // recorded as a proposal_rejected lifecycle with detail.outcome = "escalated" (no migration).
+    // Ids and flags only: the free-text reason stays on the execution receipt, not in the event payload.
+    await emitAgentActionAuditEvent(tx, {
+      companyId,
+      lifecycle: "proposal_rejected",
+      row: updatedRow,
+      actorId,
+      actorType: "user",
+      summary: ESCALATION_AUDIT_SUMMARY,
+      detail: escalationAuditDetail(previousState, input)
+    });
+    return { row: updatedRow, previousState };
+  });
+
+  await mirrorAgentActionAuditToLangfuse({
+    companyId,
+    lifecycle: "proposal_rejected",
+    row: escalated.row,
+    actorId,
+    actorType: "user",
+    summary: ESCALATION_AUDIT_SUMMARY,
+    detail: escalationAuditDetail(escalated.previousState, input)
   });
 
   return getAgentAction(companyId, actionId);

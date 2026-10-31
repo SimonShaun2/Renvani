@@ -381,7 +381,7 @@ export function HomePage() {
 
       <section data-node-id="203:4563" style={{ background: "var(--color-mkt-amber-soft)" }} aria-labelledby="home-capture">
         <div className={section}>
-          <div className="grid items-start gap-10 lg:grid-cols-[700px_480px] lg:gap-16">
+          <div className="grid items-start gap-10 lg:grid-cols-[minmax(0,700px)_minmax(0,480px)] lg:gap-16">
             <div className="flex flex-col gap-4">
               <p className={eyebrow} style={{ color: ink2 }}>{capture.eyebrow}</p>
               <h2 id="home-capture" className={h2}><Lines lines={capture.headline} /></h2>

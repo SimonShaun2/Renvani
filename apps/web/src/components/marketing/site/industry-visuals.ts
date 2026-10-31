@@ -883,7 +883,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
            "k": [
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex gap-[12px] h-[44px] items-center p-[12px] relative w-full",
+             "c": "bg-[#0f1530] flex gap-[12px] h-[44px] items-center p-[12px] relative w-full justify-between",
              "n": "Product chrome / Juniper Heating",
              "id": "219:6502",
              "k": [
@@ -897,13 +897,13 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "div",
-               "c": "bg-[#f6b400] flex h-[28px] items-center px-[10px] relative rounded-[12px] flex-1 min-w-0",
+               "c": "bg-[#f6b400] flex h-[28px] items-center px-[10px] relative rounded-[12px] shrink-0",
                "n": "Status / EXAMPLE",
                "id": "219:6504",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] flex-1 min-w-0",
+                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] shrink-0",
                  "id": "219:6505",
                  "k": [
                   "EXAMPLE"
@@ -921,7 +921,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
              "k": [
               {
                "t": "div",
-               "c": "flex flex-col gap-[10px] items-start relative flex-1 min-w-0",
+               "c": "flex flex-col gap-[10px] items-start relative shrink-0",
                "n": "Owned business website",
                "id": "219:6507",
                "k": [
@@ -1054,7 +1054,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
              "k": [
               {
                "t": "div",
-               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
                "n": "Supporting tool / Websites",
                "id": "219:6523",
                "k": [
@@ -1070,7 +1070,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "div",
-               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
                "n": "Supporting tool / Online Booking",
                "id": "219:6525",
                "k": [
@@ -1121,7 +1121,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
            "k": [
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex gap-[12px] h-[44px] items-center p-[12px] relative w-full",
+             "c": "bg-[#0f1530] flex gap-[12px] h-[44px] items-center p-[12px] relative w-full justify-between",
              "n": "Product chrome / Inquiry + estimate",
              "id": "219:6532",
              "k": [
@@ -1135,13 +1135,13 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "div",
-               "c": "bg-[#f6b400] flex h-[28px] items-center px-[10px] relative rounded-[12px] flex-1 min-w-0",
+               "c": "bg-[#f6b400] flex h-[28px] items-center px-[10px] relative rounded-[12px] shrink-0",
                "n": "Status / EXAMPLE",
                "id": "219:6534",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] flex-1 min-w-0",
+                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] shrink-0",
                  "id": "219:6535",
                  "k": [
                   "EXAMPLE"
@@ -1232,7 +1232,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   },
                   {
                    "t": "p",
-                   "c": "font-medium relative text-[13px] text-[color:#0f1530] flex-1 min-w-0",
+                   "c": "font-medium relative text-[13px] text-[color:#0f1530] shrink-0",
                    "id": "219:6548",
                    "k": [
                     "$89"
@@ -1256,7 +1256,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   },
                   {
                    "t": "p",
-                   "c": "font-medium relative text-[13px] text-[color:#0f1530] flex-1 min-w-0",
+                   "c": "font-medium relative text-[13px] text-[color:#0f1530] shrink-0",
                    "id": "219:6551",
                    "k": [
                     "$140"
@@ -1286,7 +1286,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   },
                   {
                    "t": "p",
-                   "c": "font-bold relative text-[27px] text-[color:#0f1530] flex-1 min-w-0",
+                   "c": "font-bold relative text-[27px] text-[color:#0f1530] shrink-0",
                    "id": "219:6555",
                    "k": [
                     "$229"
@@ -1330,7 +1330,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
              "k": [
               {
                "t": "div",
-               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
                "n": "Supporting tool / Inquiry & follow-up",
                "id": "219:6560",
                "k": [
@@ -1346,7 +1346,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "div",
-               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
                "n": "Supporting tool / Estimates & approvals",
                "id": "219:6562",
                "k": [
@@ -1405,7 +1405,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
            "k": [
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex gap-[12px] h-[44px] items-center p-[12px] relative w-full",
+             "c": "bg-[#0f1530] flex gap-[12px] h-[44px] items-center p-[12px] relative w-full justify-between",
              "n": "Product chrome / Job #1042",
              "id": "219:6570",
              "k": [
@@ -1419,13 +1419,13 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "div",
-               "c": "bg-[#f6b400] flex h-[28px] items-center px-[10px] relative rounded-[12px] flex-1 min-w-0",
+               "c": "bg-[#f6b400] flex h-[28px] items-center px-[10px] relative rounded-[12px] shrink-0",
                "n": "Status / EXAMPLE",
                "id": "219:6572",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] flex-1 min-w-0",
+                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] shrink-0",
                  "id": "219:6573",
                  "k": [
                   "EXAMPLE"
@@ -1582,7 +1582,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   },
                   {
                    "t": "p",
-                   "c": "font-bold relative text-[27px] flex-1 min-w-0",
+                   "c": "font-bold relative text-[27px] shrink-0",
                    "id": "219:6594",
                    "k": [
                     "$229"
@@ -1618,7 +1618,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
              "k": [
               {
                "t": "div",
-               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
                "n": "Supporting tool / Dispatch",
                "id": "219:6598",
                "k": [
@@ -1635,7 +1635,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "div",
-               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
                "n": "Supporting tool / Jobs",
                "id": "219:6600",
                "k": [
@@ -1651,7 +1651,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "div",
-               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
                "n": "Supporting tool / Technician app",
                "id": "219:6602",
                "k": [
@@ -1667,7 +1667,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "div",
-               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
                "n": "Supporting tool / Invoices & payments",
                "id": "219:6604",
                "k": [
@@ -1683,7 +1683,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "div",
-               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
                "n": "Supporting tool / Price book",
                "id": "219:6606",
                "k": [
@@ -1707,7 +1707,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
              "k": [
               {
                "t": "div",
-               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
                "n": "Supporting tool / Time & photos",
                "id": "219:6609",
                "k": [
@@ -1723,7 +1723,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "div",
-               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
                "n": "Supporting tool / Customer portal",
                "id": "219:6611",
                "k": [
@@ -1773,7 +1773,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
            "k": [
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex gap-[12px] h-[44px] items-center p-[12px] relative w-full",
+             "c": "bg-[#0f1530] flex gap-[12px] h-[44px] items-center p-[12px] relative w-full justify-between",
              "n": "Product chrome / Customer retention",
              "id": "219:6618",
              "k": [
@@ -1787,13 +1787,13 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "div",
-               "c": "bg-[#f6b400] flex h-[28px] items-center px-[10px] relative rounded-[12px] flex-1 min-w-0",
+               "c": "bg-[#f6b400] flex h-[28px] items-center px-[10px] relative rounded-[12px] shrink-0",
                "n": "Status / EXAMPLE",
                "id": "219:6620",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] flex-1 min-w-0",
+                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] shrink-0",
                  "id": "219:6621",
                  "k": [
                   "EXAMPLE"
@@ -1978,7 +1978,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
              "k": [
               {
                "t": "div",
-               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
                "n": "Supporting tool / Service agreements",
                "id": "219:6646",
                "k": [
@@ -1994,7 +1994,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "div",
-               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
                "n": "Supporting tool / Reminder emails",
                "id": "219:6648",
                "k": [
@@ -2062,7 +2062,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
          "k": [
           {
            "t": "div",
-           "c": "bg-[#fff] flex flex-col gap-[12px] items-start p-[16px] relative rounded-[12px] flex-1 min-w-0",
+           "c": "bg-[#fff] flex flex-col gap-[12px] items-start p-[16px] relative rounded-[12px] shrink-0",
            "n": "Customer and asset record",
            "id": "219:6659",
            "k": [
@@ -2098,7 +2098,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "p",
-               "c": "font-medium relative text-[13px] text-[color:#0f1530] flex-1 min-w-0",
+               "c": "font-medium relative text-[13px] text-[color:#0f1530] shrink-0",
                "id": "219:6664",
                "k": [
                 "Your website"
@@ -2122,7 +2122,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "p",
-               "c": "font-medium relative text-[13px] text-[color:#0f1530] flex-1 min-w-0",
+               "c": "font-medium relative text-[13px] text-[color:#0f1530] shrink-0",
                "id": "219:6667",
                "k": [
                 "Job #1042"
@@ -2162,7 +2162,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
              "k": [
               {
                "t": "div",
-               "c": "flex gap-[12px] items-start relative w-full",
+               "c": "flex gap-[12px] items-start relative w-full justify-between",
                "n": "Decision status",
                "id": "219:6672",
                "k": [
@@ -2176,13 +2176,13 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#e4f1e8] flex h-[28px] items-center px-[10px] relative rounded-[12px] flex-1 min-w-0",
+                 "c": "bg-[#e4f1e8] flex h-[28px] items-center px-[10px] relative rounded-[12px] shrink-0",
                  "n": "Status / Recorded",
                  "id": "219:6674",
                  "k": [
                   {
                    "t": "p",
-                   "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] flex-1 min-w-0",
+                   "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] shrink-0",
                    "id": "219:6675",
                    "k": [
                     "Recorded"
@@ -2218,7 +2218,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
              "k": [
               {
                "t": "div",
-               "c": "flex gap-[12px] items-start relative w-full",
+               "c": "flex gap-[12px] items-start relative w-full justify-between",
                "n": "Decision status",
                "id": "219:6679",
                "k": [
@@ -2232,13 +2232,13 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#e4f1e8] flex h-[28px] items-center px-[10px] relative rounded-[12px] flex-1 min-w-0",
+                 "c": "bg-[#e4f1e8] flex h-[28px] items-center px-[10px] relative rounded-[12px] shrink-0",
                  "n": "Status / Approved",
                  "id": "219:6681",
                  "k": [
                   {
                    "t": "p",
-                   "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] flex-1 min-w-0",
+                   "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] shrink-0",
                    "id": "219:6682",
                    "k": [
                     "Approved"
@@ -2274,7 +2274,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
              "k": [
               {
                "t": "div",
-               "c": "flex gap-[12px] items-start relative w-full",
+               "c": "flex gap-[12px] items-start relative w-full justify-between",
                "n": "Decision status",
                "id": "219:6686",
                "k": [
@@ -2288,13 +2288,13 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#e4f1e8] flex h-[28px] items-center px-[10px] relative rounded-[12px] flex-1 min-w-0",
+                 "c": "bg-[#e4f1e8] flex h-[28px] items-center px-[10px] relative rounded-[12px] shrink-0",
                  "n": "Status / Confirmed",
                  "id": "219:6688",
                  "k": [
                   {
                    "t": "p",
-                   "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] flex-1 min-w-0",
+                   "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] shrink-0",
                    "id": "219:6689",
                    "k": [
                     "Confirmed"
@@ -2330,7 +2330,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
              "k": [
               {
                "t": "div",
-               "c": "flex gap-[12px] items-start relative w-full",
+               "c": "flex gap-[12px] items-start relative w-full justify-between",
                "n": "Decision status",
                "id": "219:6693",
                "k": [
@@ -2344,13 +2344,13 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#fff4d6] flex h-[28px] items-center px-[10px] relative rounded-[12px] flex-1 min-w-0",
+                 "c": "bg-[#fff4d6] flex h-[28px] items-center px-[10px] relative rounded-[12px] shrink-0",
                  "n": "Status / Review needed",
                  "id": "219:6695",
                  "k": [
                   {
                    "t": "p",
-                   "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] flex-1 min-w-0",
+                   "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] shrink-0",
                    "id": "219:6696",
                    "k": [
                     "Review needed"
@@ -2396,7 +2396,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
            "k": [
             {
              "t": "div",
-             "c": "bg-[#fff] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+             "c": "bg-[#fff] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
              "n": "Supporting tool / Owner rules",
              "id": "219:6701",
              "k": [
@@ -2412,7 +2412,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
             },
             {
              "t": "div",
-             "c": "bg-[#fff] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+             "c": "bg-[#fff] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
              "n": "Supporting tool / Customers & assets",
              "id": "219:6703",
              "k": [
@@ -2428,7 +2428,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
             },
             {
              "t": "div",
-             "c": "bg-[#fff] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+             "c": "bg-[#fff] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
              "n": "Supporting tool / Reporting & sources",
              "id": "219:6705",
              "k": [
@@ -2444,7 +2444,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
             },
             {
              "t": "div",
-             "c": "bg-[#fff] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+             "c": "bg-[#fff] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
              "n": "Supporting tool / Data import",
              "id": "219:6707",
              "k": [
@@ -2501,7 +2501,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
         },
         {
          "t": "div",
-         "c": "flex flex-col gap-[14px] items-start relative flex-1 min-w-0",
+         "c": "flex flex-col gap-[14px] items-start relative shrink-0",
          "n": "Demo action",
          "id": "203:8772",
          "k": [
@@ -2764,7 +2764,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
            "k": [
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex gap-[12px] h-[44px] items-center p-[12px] relative w-full",
+             "c": "bg-[#0f1530] flex gap-[12px] h-[44px] items-center p-[12px] relative w-full justify-between",
              "n": "Product chrome / Juniper Heating",
              "id": "219:6718",
              "k": [
@@ -2778,13 +2778,13 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "div",
-               "c": "bg-[#f6b400] flex h-[28px] items-center px-[10px] relative rounded-[12px] flex-1 min-w-0",
+               "c": "bg-[#f6b400] flex h-[28px] items-center px-[10px] relative rounded-[12px] shrink-0",
                "n": "Status / EXAMPLE",
                "id": "219:6720",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] flex-1 min-w-0",
+                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] shrink-0",
                  "id": "219:6721",
                  "k": [
                   "EXAMPLE"
@@ -2911,7 +2911,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
              "k": [
               {
                "t": "div",
-               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
                "n": "Supporting tool / Websites",
                "id": "219:6736",
                "k": [
@@ -2927,7 +2927,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "div",
-               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
                "n": "Supporting tool / Online Booking",
                "id": "219:6738",
                "k": [
@@ -2978,7 +2978,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
            "k": [
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex gap-[12px] h-[44px] items-center p-[12px] relative w-full",
+             "c": "bg-[#0f1530] flex gap-[12px] h-[44px] items-center p-[12px] relative w-full justify-between",
              "n": "Product chrome / Inquiry + estimate",
              "id": "219:6745",
              "k": [
@@ -2992,13 +2992,13 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "div",
-               "c": "bg-[#f6b400] flex h-[28px] items-center px-[10px] relative rounded-[12px] flex-1 min-w-0",
+               "c": "bg-[#f6b400] flex h-[28px] items-center px-[10px] relative rounded-[12px] shrink-0",
                "n": "Status / EXAMPLE",
                "id": "219:6747",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] flex-1 min-w-0",
+                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] shrink-0",
                  "id": "219:6748",
                  "k": [
                   "EXAMPLE"
@@ -3089,7 +3089,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   },
                   {
                    "t": "p",
-                   "c": "font-medium relative text-[13px] text-[color:#0f1530] flex-1 min-w-0",
+                   "c": "font-medium relative text-[13px] text-[color:#0f1530] shrink-0",
                    "id": "219:6761",
                    "k": [
                     "$89"
@@ -3113,7 +3113,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   },
                   {
                    "t": "p",
-                   "c": "font-medium relative text-[13px] text-[color:#0f1530] flex-1 min-w-0",
+                   "c": "font-medium relative text-[13px] text-[color:#0f1530] shrink-0",
                    "id": "219:6764",
                    "k": [
                     "$140"
@@ -3143,7 +3143,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   },
                   {
                    "t": "p",
-                   "c": "font-bold relative text-[27px] text-[color:#0f1530] flex-1 min-w-0",
+                   "c": "font-bold relative text-[27px] text-[color:#0f1530] shrink-0",
                    "id": "219:6768",
                    "k": [
                     "$229"
@@ -3187,7 +3187,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
              "k": [
               {
                "t": "div",
-               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
                "n": "Supporting tool / Inquiry & follow-up",
                "id": "219:6773",
                "k": [
@@ -3211,7 +3211,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
              "k": [
               {
                "t": "div",
-               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
                "n": "Supporting tool / Estimates & approvals",
                "id": "219:6776",
                "k": [
@@ -3270,7 +3270,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
            "k": [
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex gap-[12px] h-[44px] items-center p-[12px] relative w-full",
+             "c": "bg-[#0f1530] flex gap-[12px] h-[44px] items-center p-[12px] relative w-full justify-between",
              "n": "Product chrome / Job #1042",
              "id": "219:6784",
              "k": [
@@ -3284,13 +3284,13 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "div",
-               "c": "bg-[#f6b400] flex h-[28px] items-center px-[10px] relative rounded-[12px] flex-1 min-w-0",
+               "c": "bg-[#f6b400] flex h-[28px] items-center px-[10px] relative rounded-[12px] shrink-0",
                "n": "Status / EXAMPLE",
                "id": "219:6786",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] flex-1 min-w-0",
+                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] shrink-0",
                  "id": "219:6787",
                  "k": [
                   "EXAMPLE"
@@ -3447,7 +3447,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   },
                   {
                    "t": "p",
-                   "c": "font-bold relative text-[27px] flex-1 min-w-0",
+                   "c": "font-bold relative text-[27px] shrink-0",
                    "id": "219:6808",
                    "k": [
                     "$229"
@@ -3483,7 +3483,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
              "k": [
               {
                "t": "div",
-               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
                "n": "Supporting tool / Dispatch",
                "id": "219:6812",
                "k": [
@@ -3500,7 +3500,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "div",
-               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
                "n": "Supporting tool / Jobs",
                "id": "219:6814",
                "k": [
@@ -3516,7 +3516,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "div",
-               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
                "n": "Supporting tool / Technician app",
                "id": "219:6816",
                "k": [
@@ -3540,7 +3540,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
              "k": [
               {
                "t": "div",
-               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
                "n": "Supporting tool / Invoices & payments",
                "id": "219:6819",
                "k": [
@@ -3556,7 +3556,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "div",
-               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
                "n": "Supporting tool / Price book",
                "id": "219:6821",
                "k": [
@@ -3580,7 +3580,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
              "k": [
               {
                "t": "div",
-               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
                "n": "Supporting tool / Time & photos",
                "id": "219:6824",
                "k": [
@@ -3596,7 +3596,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "div",
-               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
                "n": "Supporting tool / Customer portal",
                "id": "219:6826",
                "k": [
@@ -3646,7 +3646,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
            "k": [
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex gap-[12px] h-[44px] items-center p-[12px] relative w-full",
+             "c": "bg-[#0f1530] flex gap-[12px] h-[44px] items-center p-[12px] relative w-full justify-between",
              "n": "Product chrome / Customer retention",
              "id": "219:6833",
              "k": [
@@ -3660,13 +3660,13 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "div",
-               "c": "bg-[#f6b400] flex h-[28px] items-center px-[10px] relative rounded-[12px] flex-1 min-w-0",
+               "c": "bg-[#f6b400] flex h-[28px] items-center px-[10px] relative rounded-[12px] shrink-0",
                "n": "Status / EXAMPLE",
                "id": "219:6835",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] flex-1 min-w-0",
+                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] shrink-0",
                  "id": "219:6836",
                  "k": [
                   "EXAMPLE"
@@ -3851,7 +3851,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
              "k": [
               {
                "t": "div",
-               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
                "n": "Supporting tool / Service agreements",
                "id": "219:6861",
                "k": [
@@ -3867,7 +3867,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "div",
-               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
                "n": "Supporting tool / Reminder emails",
                "id": "219:6863",
                "k": [
@@ -3977,7 +3977,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "p",
-               "c": "font-medium relative text-[13px] text-[color:#0f1530] flex-1 min-w-0",
+               "c": "font-medium relative text-[13px] text-[color:#0f1530] shrink-0",
                "id": "219:6880",
                "k": [
                 "Your website"
@@ -4001,7 +4001,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "p",
-               "c": "font-medium relative text-[13px] text-[color:#0f1530] flex-1 min-w-0",
+               "c": "font-medium relative text-[13px] text-[color:#0f1530] shrink-0",
                "id": "219:6883",
                "k": [
                 "Job #1042"
@@ -4041,7 +4041,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
              "k": [
               {
                "t": "div",
-               "c": "flex gap-[12px] items-start relative w-full",
+               "c": "flex gap-[12px] items-start relative w-full justify-between",
                "n": "Decision status",
                "id": "219:6888",
                "k": [
@@ -4055,13 +4055,13 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#e4f1e8] flex h-[28px] items-center px-[10px] relative rounded-[12px] flex-1 min-w-0",
+                 "c": "bg-[#e4f1e8] flex h-[28px] items-center px-[10px] relative rounded-[12px] shrink-0",
                  "n": "Status / Recorded",
                  "id": "219:6890",
                  "k": [
                   {
                    "t": "p",
-                   "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] flex-1 min-w-0",
+                   "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] shrink-0",
                    "id": "219:6891",
                    "k": [
                     "Recorded"
@@ -4097,7 +4097,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
              "k": [
               {
                "t": "div",
-               "c": "flex gap-[12px] items-start relative w-full",
+               "c": "flex gap-[12px] items-start relative w-full justify-between",
                "n": "Decision status",
                "id": "219:6895",
                "k": [
@@ -4111,13 +4111,13 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#e4f1e8] flex h-[28px] items-center px-[10px] relative rounded-[12px] flex-1 min-w-0",
+                 "c": "bg-[#e4f1e8] flex h-[28px] items-center px-[10px] relative rounded-[12px] shrink-0",
                  "n": "Status / Approved",
                  "id": "219:6897",
                  "k": [
                   {
                    "t": "p",
-                   "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] flex-1 min-w-0",
+                   "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] shrink-0",
                    "id": "219:6898",
                    "k": [
                     "Approved"
@@ -4153,7 +4153,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
              "k": [
               {
                "t": "div",
-               "c": "flex gap-[12px] items-start relative w-full",
+               "c": "flex gap-[12px] items-start relative w-full justify-between",
                "n": "Decision status",
                "id": "219:6902",
                "k": [
@@ -4167,13 +4167,13 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#e4f1e8] flex h-[28px] items-center px-[10px] relative rounded-[12px] flex-1 min-w-0",
+                 "c": "bg-[#e4f1e8] flex h-[28px] items-center px-[10px] relative rounded-[12px] shrink-0",
                  "n": "Status / Confirmed",
                  "id": "219:6904",
                  "k": [
                   {
                    "t": "p",
-                   "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] flex-1 min-w-0",
+                   "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] shrink-0",
                    "id": "219:6905",
                    "k": [
                     "Confirmed"
@@ -4209,7 +4209,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
              "k": [
               {
                "t": "div",
-               "c": "flex gap-[12px] items-start relative w-full",
+               "c": "flex gap-[12px] items-start relative w-full justify-between",
                "n": "Decision status",
                "id": "219:6909",
                "k": [
@@ -4223,13 +4223,13 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#fff4d6] flex h-[28px] items-center px-[10px] relative rounded-[12px] flex-1 min-w-0",
+                 "c": "bg-[#fff4d6] flex h-[28px] items-center px-[10px] relative rounded-[12px] shrink-0",
                  "n": "Status / Review needed",
                  "id": "219:6911",
                  "k": [
                   {
                    "t": "p",
-                   "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] flex-1 min-w-0",
+                   "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] shrink-0",
                    "id": "219:6912",
                    "k": [
                     "Review needed"
@@ -4275,7 +4275,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
            "k": [
             {
              "t": "div",
-             "c": "bg-[#fff] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+             "c": "bg-[#fff] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
              "n": "Supporting tool / Owner rules",
              "id": "219:6917",
              "k": [
@@ -4291,7 +4291,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
             },
             {
              "t": "div",
-             "c": "bg-[#fff] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+             "c": "bg-[#fff] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
              "n": "Supporting tool / Customers & assets",
              "id": "219:6919",
              "k": [
@@ -4315,7 +4315,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
            "k": [
             {
              "t": "div",
-             "c": "bg-[#fff] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+             "c": "bg-[#fff] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
              "n": "Supporting tool / Reporting & sources",
              "id": "219:6922",
              "k": [
@@ -4331,7 +4331,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
             },
             {
              "t": "div",
-             "c": "bg-[#fff] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+             "c": "bg-[#fff] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
              "n": "Supporting tool / Data import",
              "id": "219:6924",
              "k": [
@@ -4653,7 +4653,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
            "k": [
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex gap-[12px] h-[44px] items-center p-[12px] relative w-full",
+             "c": "bg-[#0f1530] flex gap-[12px] h-[44px] items-center p-[12px] relative w-full justify-between",
              "n": "Product chrome / Juniper Heating",
              "id": "I219:6999;219:6502",
              "k": [
@@ -4667,13 +4667,13 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "div",
-               "c": "bg-[#f6b400] flex h-[28px] items-center px-[10px] relative rounded-[12px] flex-1 min-w-0",
+               "c": "bg-[#f6b400] flex h-[28px] items-center px-[10px] relative rounded-[12px] shrink-0",
                "n": "Status / EXAMPLE",
                "id": "I219:6999;219:6504",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] flex-1 min-w-0",
+                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] shrink-0",
                  "id": "I219:6999;219:6505",
                  "k": [
                   "EXAMPLE"
@@ -4691,7 +4691,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
              "k": [
               {
                "t": "div",
-               "c": "flex flex-col gap-[10px] items-start relative flex-1 min-w-0",
+               "c": "flex flex-col gap-[10px] items-start relative shrink-0",
                "n": "Owned business website",
                "id": "I219:6999;219:6507",
                "k": [
@@ -4824,7 +4824,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
              "k": [
               {
                "t": "div",
-               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
                "n": "Supporting tool / Websites",
                "id": "I219:6999;219:6523",
                "k": [
@@ -4840,7 +4840,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "div",
-               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
                "n": "Supporting tool / Online Booking",
                "id": "I219:6999;219:6525",
                "k": [
@@ -4891,7 +4891,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
            "k": [
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex gap-[12px] h-[44px] items-center p-[12px] relative w-full",
+             "c": "bg-[#0f1530] flex gap-[12px] h-[44px] items-center p-[12px] relative w-full justify-between",
              "n": "Product chrome / Inquiry + estimate",
              "id": "I219:7028;219:6532",
              "k": [
@@ -4905,13 +4905,13 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "div",
-               "c": "bg-[#f6b400] flex h-[28px] items-center px-[10px] relative rounded-[12px] flex-1 min-w-0",
+               "c": "bg-[#f6b400] flex h-[28px] items-center px-[10px] relative rounded-[12px] shrink-0",
                "n": "Status / EXAMPLE",
                "id": "I219:7028;219:6534",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] flex-1 min-w-0",
+                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] shrink-0",
                  "id": "I219:7028;219:6535",
                  "k": [
                   "EXAMPLE"
@@ -5002,7 +5002,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   },
                   {
                    "t": "p",
-                   "c": "font-medium relative text-[13px] text-[color:#0f1530] flex-1 min-w-0",
+                   "c": "font-medium relative text-[13px] text-[color:#0f1530] shrink-0",
                    "id": "I219:7028;219:6548",
                    "k": [
                     "$85"
@@ -5026,7 +5026,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   },
                   {
                    "t": "p",
-                   "c": "font-medium relative text-[13px] text-[color:#0f1530] flex-1 min-w-0",
+                   "c": "font-medium relative text-[13px] text-[color:#0f1530] shrink-0",
                    "id": "I219:7028;219:6551",
                    "k": [
                     "$160"
@@ -5056,7 +5056,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   },
                   {
                    "t": "p",
-                   "c": "font-bold relative text-[27px] text-[color:#0f1530] flex-1 min-w-0",
+                   "c": "font-bold relative text-[27px] text-[color:#0f1530] shrink-0",
                    "id": "I219:7028;219:6555",
                    "k": [
                     "$245"
@@ -5100,7 +5100,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
              "k": [
               {
                "t": "div",
-               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
                "n": "Supporting tool / Inquiry & follow-up",
                "id": "I219:7028;219:6560",
                "k": [
@@ -5116,7 +5116,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "div",
-               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
                "n": "Supporting tool / Estimates & approvals",
                "id": "I219:7028;219:6562",
                "k": [
@@ -5175,7 +5175,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
            "k": [
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex gap-[12px] h-[44px] items-center p-[12px] relative w-full",
+             "c": "bg-[#0f1530] flex gap-[12px] h-[44px] items-center p-[12px] relative w-full justify-between",
              "n": "Product chrome / Job #1042",
              "id": "I219:7065;219:6570",
              "k": [
@@ -5189,13 +5189,13 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "div",
-               "c": "bg-[#f6b400] flex h-[28px] items-center px-[10px] relative rounded-[12px] flex-1 min-w-0",
+               "c": "bg-[#f6b400] flex h-[28px] items-center px-[10px] relative rounded-[12px] shrink-0",
                "n": "Status / EXAMPLE",
                "id": "I219:7065;219:6572",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] flex-1 min-w-0",
+                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] shrink-0",
                  "id": "I219:7065;219:6573",
                  "k": [
                   "EXAMPLE"
@@ -5352,7 +5352,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   },
                   {
                    "t": "p",
-                   "c": "font-bold relative text-[27px] flex-1 min-w-0",
+                   "c": "font-bold relative text-[27px] shrink-0",
                    "id": "I219:7065;219:6594",
                    "k": [
                     "$245"
@@ -5388,7 +5388,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
              "k": [
               {
                "t": "div",
-               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
                "n": "Supporting tool / Dispatch",
                "id": "I219:7065;219:6598",
                "k": [
@@ -5405,7 +5405,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "div",
-               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
                "n": "Supporting tool / Jobs",
                "id": "I219:7065;219:6600",
                "k": [
@@ -5421,7 +5421,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "div",
-               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
                "n": "Supporting tool / Technician app",
                "id": "I219:7065;219:6602",
                "k": [
@@ -5437,7 +5437,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "div",
-               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
                "n": "Supporting tool / Invoices & payments",
                "id": "I219:7065;219:6604",
                "k": [
@@ -5453,7 +5453,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "div",
-               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
                "n": "Supporting tool / Price book",
                "id": "I219:7065;219:6606",
                "k": [
@@ -5477,7 +5477,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
              "k": [
               {
                "t": "div",
-               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
                "n": "Supporting tool / Time & photos",
                "id": "I219:7065;219:6609",
                "k": [
@@ -5493,7 +5493,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "div",
-               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
                "n": "Supporting tool / Customer portal",
                "id": "I219:7065;219:6611",
                "k": [
@@ -5543,7 +5543,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
            "k": [
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex gap-[12px] h-[44px] items-center p-[12px] relative w-full",
+             "c": "bg-[#0f1530] flex gap-[12px] h-[44px] items-center p-[12px] relative w-full justify-between",
              "n": "Product chrome / Customer retention",
              "id": "I219:7112;219:6618",
              "k": [
@@ -5557,13 +5557,13 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "div",
-               "c": "bg-[#f6b400] flex h-[28px] items-center px-[10px] relative rounded-[12px] flex-1 min-w-0",
+               "c": "bg-[#f6b400] flex h-[28px] items-center px-[10px] relative rounded-[12px] shrink-0",
                "n": "Status / EXAMPLE",
                "id": "I219:7112;219:6620",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] flex-1 min-w-0",
+                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] shrink-0",
                  "id": "I219:7112;219:6621",
                  "k": [
                   "EXAMPLE"
@@ -5748,7 +5748,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
              "k": [
               {
                "t": "div",
-               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
                "n": "Supporting tool / Service agreements",
                "id": "I219:7112;219:6646",
                "k": [
@@ -5764,7 +5764,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "div",
-               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
                "n": "Supporting tool / Reminder emails",
                "id": "I219:7112;219:6648",
                "k": [
@@ -5832,7 +5832,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
          "k": [
           {
            "t": "div",
-           "c": "bg-[#fff] flex flex-col gap-[12px] items-start p-[16px] relative rounded-[12px] flex-1 min-w-0",
+           "c": "bg-[#fff] flex flex-col gap-[12px] items-start p-[16px] relative rounded-[12px] shrink-0",
            "n": "Customer and asset record",
            "id": "I219:7152;219:6659",
            "k": [
@@ -5868,7 +5868,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "p",
-               "c": "font-medium relative text-[13px] text-[color:#0f1530] flex-1 min-w-0",
+               "c": "font-medium relative text-[13px] text-[color:#0f1530] shrink-0",
                "id": "I219:7152;219:6664",
                "k": [
                 "Your website"
@@ -5892,7 +5892,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "p",
-               "c": "font-medium relative text-[13px] text-[color:#0f1530] flex-1 min-w-0",
+               "c": "font-medium relative text-[13px] text-[color:#0f1530] shrink-0",
                "id": "I219:7152;219:6667",
                "k": [
                 "Job #1043"
@@ -5932,7 +5932,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
              "k": [
               {
                "t": "div",
-               "c": "flex gap-[12px] items-start relative w-full",
+               "c": "flex gap-[12px] items-start relative w-full justify-between",
                "n": "Decision status",
                "id": "I219:7152;219:6672",
                "k": [
@@ -5946,13 +5946,13 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#e4f1e8] flex h-[28px] items-center px-[10px] relative rounded-[12px] flex-1 min-w-0",
+                 "c": "bg-[#e4f1e8] flex h-[28px] items-center px-[10px] relative rounded-[12px] shrink-0",
                  "n": "Status / Recorded",
                  "id": "I219:7152;219:6674",
                  "k": [
                   {
                    "t": "p",
-                   "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] flex-1 min-w-0",
+                   "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] shrink-0",
                    "id": "I219:7152;219:6675",
                    "k": [
                     "Recorded"
@@ -5988,7 +5988,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
              "k": [
               {
                "t": "div",
-               "c": "flex gap-[12px] items-start relative w-full",
+               "c": "flex gap-[12px] items-start relative w-full justify-between",
                "n": "Decision status",
                "id": "I219:7152;219:6679",
                "k": [
@@ -6002,13 +6002,13 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#e4f1e8] flex h-[28px] items-center px-[10px] relative rounded-[12px] flex-1 min-w-0",
+                 "c": "bg-[#e4f1e8] flex h-[28px] items-center px-[10px] relative rounded-[12px] shrink-0",
                  "n": "Status / Approved",
                  "id": "I219:7152;219:6681",
                  "k": [
                   {
                    "t": "p",
-                   "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] flex-1 min-w-0",
+                   "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] shrink-0",
                    "id": "I219:7152;219:6682",
                    "k": [
                     "Approved"
@@ -6044,7 +6044,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
              "k": [
               {
                "t": "div",
-               "c": "flex gap-[12px] items-start relative w-full",
+               "c": "flex gap-[12px] items-start relative w-full justify-between",
                "n": "Decision status",
                "id": "I219:7152;219:6686",
                "k": [
@@ -6058,13 +6058,13 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#e4f1e8] flex h-[28px] items-center px-[10px] relative rounded-[12px] flex-1 min-w-0",
+                 "c": "bg-[#e4f1e8] flex h-[28px] items-center px-[10px] relative rounded-[12px] shrink-0",
                  "n": "Status / Confirmed",
                  "id": "I219:7152;219:6688",
                  "k": [
                   {
                    "t": "p",
-                   "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] flex-1 min-w-0",
+                   "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] shrink-0",
                    "id": "I219:7152;219:6689",
                    "k": [
                     "Confirmed"
@@ -6100,7 +6100,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
              "k": [
               {
                "t": "div",
-               "c": "flex gap-[12px] items-start relative w-full",
+               "c": "flex gap-[12px] items-start relative w-full justify-between",
                "n": "Decision status",
                "id": "I219:7152;219:6693",
                "k": [
@@ -6114,13 +6114,13 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#fff4d6] flex h-[28px] items-center px-[10px] relative rounded-[12px] flex-1 min-w-0",
+                 "c": "bg-[#fff4d6] flex h-[28px] items-center px-[10px] relative rounded-[12px] shrink-0",
                  "n": "Status / Review needed",
                  "id": "I219:7152;219:6695",
                  "k": [
                   {
                    "t": "p",
-                   "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] flex-1 min-w-0",
+                   "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] shrink-0",
                    "id": "I219:7152;219:6696",
                    "k": [
                     "Review needed"
@@ -6166,7 +6166,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
            "k": [
             {
              "t": "div",
-             "c": "bg-[#fff] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+             "c": "bg-[#fff] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
              "n": "Supporting tool / Owner rules",
              "id": "I219:7152;219:6701",
              "k": [
@@ -6182,7 +6182,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
             },
             {
              "t": "div",
-             "c": "bg-[#fff] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+             "c": "bg-[#fff] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
              "n": "Supporting tool / Customers & assets",
              "id": "I219:7152;219:6703",
              "k": [
@@ -6198,7 +6198,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
             },
             {
              "t": "div",
-             "c": "bg-[#fff] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+             "c": "bg-[#fff] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
              "n": "Supporting tool / Reporting & sources",
              "id": "I219:7152;219:6705",
              "k": [
@@ -6214,7 +6214,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
             },
             {
              "t": "div",
-             "c": "bg-[#fff] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+             "c": "bg-[#fff] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
              "n": "Supporting tool / Data import",
              "id": "I219:7152;219:6707",
              "k": [
@@ -6271,7 +6271,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
         },
         {
          "t": "div",
-         "c": "flex flex-col gap-[14px] items-start relative flex-1 min-w-0",
+         "c": "flex flex-col gap-[14px] items-start relative shrink-0",
          "n": "Demo action",
          "id": "203:9009",
          "k": [
@@ -6534,7 +6534,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
            "k": [
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex gap-[12px] h-[44px] items-center p-[12px] relative w-full",
+             "c": "bg-[#0f1530] flex gap-[12px] h-[44px] items-center p-[12px] relative w-full justify-between",
              "n": "Product chrome / Juniper Heating",
              "id": "I219:7210;219:6718",
              "k": [
@@ -6548,13 +6548,13 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "div",
-               "c": "bg-[#f6b400] flex h-[28px] items-center px-[10px] relative rounded-[12px] flex-1 min-w-0",
+               "c": "bg-[#f6b400] flex h-[28px] items-center px-[10px] relative rounded-[12px] shrink-0",
                "n": "Status / EXAMPLE",
                "id": "I219:7210;219:6720",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] flex-1 min-w-0",
+                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] shrink-0",
                  "id": "I219:7210;219:6721",
                  "k": [
                   "EXAMPLE"
@@ -6681,7 +6681,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
              "k": [
               {
                "t": "div",
-               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
                "n": "Supporting tool / Websites",
                "id": "I219:7210;219:6736",
                "k": [
@@ -6697,7 +6697,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "div",
-               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
                "n": "Supporting tool / Online Booking",
                "id": "I219:7210;219:6738",
                "k": [
@@ -6748,7 +6748,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
            "k": [
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex gap-[12px] h-[44px] items-center p-[12px] relative w-full",
+             "c": "bg-[#0f1530] flex gap-[12px] h-[44px] items-center p-[12px] relative w-full justify-between",
              "n": "Product chrome / Inquiry + estimate",
              "id": "I219:7236;219:6745",
              "k": [
@@ -6762,13 +6762,13 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "div",
-               "c": "bg-[#f6b400] flex h-[28px] items-center px-[10px] relative rounded-[12px] flex-1 min-w-0",
+               "c": "bg-[#f6b400] flex h-[28px] items-center px-[10px] relative rounded-[12px] shrink-0",
                "n": "Status / EXAMPLE",
                "id": "I219:7236;219:6747",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] flex-1 min-w-0",
+                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] shrink-0",
                  "id": "I219:7236;219:6748",
                  "k": [
                   "EXAMPLE"
@@ -6859,7 +6859,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   },
                   {
                    "t": "p",
-                   "c": "font-medium relative text-[13px] text-[color:#0f1530] flex-1 min-w-0",
+                   "c": "font-medium relative text-[13px] text-[color:#0f1530] shrink-0",
                    "id": "I219:7236;219:6761",
                    "k": [
                     "$85"
@@ -6883,7 +6883,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   },
                   {
                    "t": "p",
-                   "c": "font-medium relative text-[13px] text-[color:#0f1530] flex-1 min-w-0",
+                   "c": "font-medium relative text-[13px] text-[color:#0f1530] shrink-0",
                    "id": "I219:7236;219:6764",
                    "k": [
                     "$160"
@@ -6913,7 +6913,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   },
                   {
                    "t": "p",
-                   "c": "font-bold relative text-[27px] text-[color:#0f1530] flex-1 min-w-0",
+                   "c": "font-bold relative text-[27px] text-[color:#0f1530] shrink-0",
                    "id": "I219:7236;219:6768",
                    "k": [
                     "$245"
@@ -6957,7 +6957,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
              "k": [
               {
                "t": "div",
-               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
                "n": "Supporting tool / Inquiry & follow-up",
                "id": "I219:7236;219:6773",
                "k": [
@@ -6981,7 +6981,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
              "k": [
               {
                "t": "div",
-               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
                "n": "Supporting tool / Estimates & approvals",
                "id": "I219:7236;219:6776",
                "k": [
@@ -7040,7 +7040,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
            "k": [
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex gap-[12px] h-[44px] items-center p-[12px] relative w-full",
+             "c": "bg-[#0f1530] flex gap-[12px] h-[44px] items-center p-[12px] relative w-full justify-between",
              "n": "Product chrome / Job #1042",
              "id": "I219:7274;219:6784",
              "k": [
@@ -7054,13 +7054,13 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "div",
-               "c": "bg-[#f6b400] flex h-[28px] items-center px-[10px] relative rounded-[12px] flex-1 min-w-0",
+               "c": "bg-[#f6b400] flex h-[28px] items-center px-[10px] relative rounded-[12px] shrink-0",
                "n": "Status / EXAMPLE",
                "id": "I219:7274;219:6786",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] flex-1 min-w-0",
+                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] shrink-0",
                  "id": "I219:7274;219:6787",
                  "k": [
                   "EXAMPLE"
@@ -7217,7 +7217,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   },
                   {
                    "t": "p",
-                   "c": "font-bold relative text-[27px] flex-1 min-w-0",
+                   "c": "font-bold relative text-[27px] shrink-0",
                    "id": "I219:7274;219:6808",
                    "k": [
                     "$245"
@@ -7253,7 +7253,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
              "k": [
               {
                "t": "div",
-               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
                "n": "Supporting tool / Dispatch",
                "id": "I219:7274;219:6812",
                "k": [
@@ -7270,7 +7270,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "div",
-               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
                "n": "Supporting tool / Jobs",
                "id": "I219:7274;219:6814",
                "k": [
@@ -7286,7 +7286,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "div",
-               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
                "n": "Supporting tool / Technician app",
                "id": "I219:7274;219:6816",
                "k": [
@@ -7310,7 +7310,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
              "k": [
               {
                "t": "div",
-               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
                "n": "Supporting tool / Invoices & payments",
                "id": "I219:7274;219:6819",
                "k": [
@@ -7326,7 +7326,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "div",
-               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
                "n": "Supporting tool / Price book",
                "id": "I219:7274;219:6821",
                "k": [
@@ -7350,7 +7350,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
              "k": [
               {
                "t": "div",
-               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
                "n": "Supporting tool / Time & photos",
                "id": "I219:7274;219:6824",
                "k": [
@@ -7366,7 +7366,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "div",
-               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
                "n": "Supporting tool / Customer portal",
                "id": "I219:7274;219:6826",
                "k": [
@@ -7416,7 +7416,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
            "k": [
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex gap-[12px] h-[44px] items-center p-[12px] relative w-full",
+             "c": "bg-[#0f1530] flex gap-[12px] h-[44px] items-center p-[12px] relative w-full justify-between",
              "n": "Product chrome / Customer retention",
              "id": "I219:7322;219:6833",
              "k": [
@@ -7430,13 +7430,13 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "div",
-               "c": "bg-[#f6b400] flex h-[28px] items-center px-[10px] relative rounded-[12px] flex-1 min-w-0",
+               "c": "bg-[#f6b400] flex h-[28px] items-center px-[10px] relative rounded-[12px] shrink-0",
                "n": "Status / EXAMPLE",
                "id": "I219:7322;219:6835",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] flex-1 min-w-0",
+                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] shrink-0",
                  "id": "I219:7322;219:6836",
                  "k": [
                   "EXAMPLE"
@@ -7621,7 +7621,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
              "k": [
               {
                "t": "div",
-               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
                "n": "Supporting tool / Service agreements",
                "id": "I219:7322;219:6861",
                "k": [
@@ -7637,7 +7637,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "div",
-               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+               "c": "bg-[#fbf6ef] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
                "n": "Supporting tool / Reminder emails",
                "id": "I219:7322;219:6863",
                "k": [
@@ -7747,7 +7747,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "p",
-               "c": "font-medium relative text-[13px] text-[color:#0f1530] flex-1 min-w-0",
+               "c": "font-medium relative text-[13px] text-[color:#0f1530] shrink-0",
                "id": "I219:7363;219:6880",
                "k": [
                 "Your website"
@@ -7771,7 +7771,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "p",
-               "c": "font-medium relative text-[13px] text-[color:#0f1530] flex-1 min-w-0",
+               "c": "font-medium relative text-[13px] text-[color:#0f1530] shrink-0",
                "id": "I219:7363;219:6883",
                "k": [
                 "Job #1043"
@@ -7811,7 +7811,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
              "k": [
               {
                "t": "div",
-               "c": "flex gap-[12px] items-start relative w-full",
+               "c": "flex gap-[12px] items-start relative w-full justify-between",
                "n": "Decision status",
                "id": "I219:7363;219:6888",
                "k": [
@@ -7825,13 +7825,13 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#e4f1e8] flex h-[28px] items-center px-[10px] relative rounded-[12px] flex-1 min-w-0",
+                 "c": "bg-[#e4f1e8] flex h-[28px] items-center px-[10px] relative rounded-[12px] shrink-0",
                  "n": "Status / Recorded",
                  "id": "I219:7363;219:6890",
                  "k": [
                   {
                    "t": "p",
-                   "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] flex-1 min-w-0",
+                   "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] shrink-0",
                    "id": "I219:7363;219:6891",
                    "k": [
                     "Recorded"
@@ -7867,7 +7867,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
              "k": [
               {
                "t": "div",
-               "c": "flex gap-[12px] items-start relative w-full",
+               "c": "flex gap-[12px] items-start relative w-full justify-between",
                "n": "Decision status",
                "id": "I219:7363;219:6895",
                "k": [
@@ -7881,13 +7881,13 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#e4f1e8] flex h-[28px] items-center px-[10px] relative rounded-[12px] flex-1 min-w-0",
+                 "c": "bg-[#e4f1e8] flex h-[28px] items-center px-[10px] relative rounded-[12px] shrink-0",
                  "n": "Status / Approved",
                  "id": "I219:7363;219:6897",
                  "k": [
                   {
                    "t": "p",
-                   "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] flex-1 min-w-0",
+                   "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] shrink-0",
                    "id": "I219:7363;219:6898",
                    "k": [
                     "Approved"
@@ -7923,7 +7923,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
              "k": [
               {
                "t": "div",
-               "c": "flex gap-[12px] items-start relative w-full",
+               "c": "flex gap-[12px] items-start relative w-full justify-between",
                "n": "Decision status",
                "id": "I219:7363;219:6902",
                "k": [
@@ -7937,13 +7937,13 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#e4f1e8] flex h-[28px] items-center px-[10px] relative rounded-[12px] flex-1 min-w-0",
+                 "c": "bg-[#e4f1e8] flex h-[28px] items-center px-[10px] relative rounded-[12px] shrink-0",
                  "n": "Status / Confirmed",
                  "id": "I219:7363;219:6904",
                  "k": [
                   {
                    "t": "p",
-                   "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] flex-1 min-w-0",
+                   "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] shrink-0",
                    "id": "I219:7363;219:6905",
                    "k": [
                     "Confirmed"
@@ -7979,7 +7979,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
              "k": [
               {
                "t": "div",
-               "c": "flex gap-[12px] items-start relative w-full",
+               "c": "flex gap-[12px] items-start relative w-full justify-between",
                "n": "Decision status",
                "id": "I219:7363;219:6909",
                "k": [
@@ -7993,13 +7993,13 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#fff4d6] flex h-[28px] items-center px-[10px] relative rounded-[12px] flex-1 min-w-0",
+                 "c": "bg-[#fff4d6] flex h-[28px] items-center px-[10px] relative rounded-[12px] shrink-0",
                  "n": "Status / Review needed",
                  "id": "I219:7363;219:6911",
                  "k": [
                   {
                    "t": "p",
-                   "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] flex-1 min-w-0",
+                   "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] shrink-0",
                    "id": "I219:7363;219:6912",
                    "k": [
                     "Review needed"
@@ -8045,7 +8045,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
            "k": [
             {
              "t": "div",
-             "c": "bg-[#fff] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+             "c": "bg-[#fff] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
              "n": "Supporting tool / Owner rules",
              "id": "I219:7363;219:6917",
              "k": [
@@ -8061,7 +8061,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
             },
             {
              "t": "div",
-             "c": "bg-[#fff] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+             "c": "bg-[#fff] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
              "n": "Supporting tool / Customers & assets",
              "id": "I219:7363;219:6919",
              "k": [
@@ -8085,7 +8085,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
            "k": [
             {
              "t": "div",
-             "c": "bg-[#fff] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+             "c": "bg-[#fff] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
              "n": "Supporting tool / Reporting & sources",
              "id": "I219:7363;219:6922",
              "k": [
@@ -8101,7 +8101,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
             },
             {
              "t": "div",
-             "c": "bg-[#fff] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] flex-1 min-w-0",
+             "c": "bg-[#fff] border border-[#0f1530] border-solid flex h-[44px] items-center justify-center min-h-[44px] px-[10px] relative rounded-[999px] shrink-0",
              "n": "Supporting tool / Data import",
              "id": "I219:7363;219:6924",
              "k": [
@@ -8277,7 +8277,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
              "k": [
               {
                "t": "p",
-               "c": "font-bold leading-[1.38] relative text-[17.38px] text-[color:#fff] flex-1 min-w-0",
+               "c": "font-bold leading-[1.38] relative text-[17.38px] text-[color:#fff] shrink-0",
                "id": "I203:13794;200:86",
                "k": [
                 "Renvani"
@@ -8293,13 +8293,13 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "div",
-               "c": "bg-[#f6b400] flex h-[27.6px] items-center px-[10.222px] relative rounded-[12.267px] flex-1 min-w-0",
+               "c": "bg-[#f6b400] flex h-[27.6px] items-center px-[10.222px] relative rounded-[12.267px] shrink-0",
                "n": "Status / EXAMPLE",
                "id": "I203:13794;200:88",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[10.22px] text-[color:#0f1530] flex-1 min-w-0",
+                 "c": "font-medium leading-[1.38] relative text-[10.22px] text-[color:#0f1530] shrink-0",
                  "id": "I203:13794;200:89",
                  "k": [
                   "EXAMPLE"
@@ -8331,13 +8331,13 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#fff] flex h-[27.6px] items-center px-[10.222px] relative rounded-[12.267px] flex-1 min-w-0",
+                 "c": "bg-[#fff] flex h-[27.6px] items-center px-[10.222px] relative rounded-[12.267px] shrink-0",
                  "n": "Status / Your business",
                  "id": "I203:13794;200:93",
                  "k": [
                   {
                    "t": "p",
-                   "c": "font-medium leading-[1.38] relative text-[10.22px] text-[color:#2a3360] flex-1 min-w-0",
+                   "c": "font-medium leading-[1.38] relative text-[10.22px] text-[color:#2a3360] shrink-0",
                    "id": "I203:13794;200:94",
                    "k": [
                     "Electrical"
@@ -8397,7 +8397,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                     },
                     {
                      "t": "p",
-                     "c": "font-medium relative text-[color:#0f1530] flex-1 min-w-0",
+                     "c": "font-medium relative text-[color:#0f1530] shrink-0",
                      "id": "I203:13794;200:102",
                      "k": [
                       "$65"
@@ -8421,7 +8421,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                     },
                     {
                      "t": "p",
-                     "c": "font-medium relative text-[color:#0f1530] flex-1 min-w-0",
+                     "c": "font-medium relative text-[color:#0f1530] shrink-0",
                      "id": "I203:13794;200:105",
                      "k": [
                       "$120"
@@ -8451,7 +8451,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                     },
                     {
                      "t": "p",
-                     "c": "font-medium relative text-[color:#0f1530] flex-1 min-w-0",
+                     "c": "font-medium relative text-[color:#0f1530] shrink-0",
                      "id": "I203:13794;200:109",
                      "k": [
                       "$185"
@@ -8495,7 +8495,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                 },
                 {
                  "t": "div",
-                 "c": "flex flex-col gap-[16.356px] items-start relative flex-1 min-w-0",
+                 "c": "flex flex-col gap-[16.356px] items-start relative shrink-0",
                  "n": "Approval and outcome",
                  "id": "I203:13794;200:114",
                  "k": [
@@ -8686,7 +8686,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
        "k": [
         {
          "t": "p",
-         "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] flex-1 min-w-0",
+         "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] shrink-0",
          "id": "203:13848",
          "k": [
           "THE JOB, CONNECTED"
@@ -8722,13 +8722,13 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
            "k": [
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex h-[32.421px] items-center px-[12.008px] relative rounded-[14.409px] flex-1 min-w-0",
+             "c": "bg-[#0f1530] flex h-[32.421px] items-center px-[12.008px] relative rounded-[14.409px] shrink-0",
              "n": "Status / 01",
              "id": "203:13853",
              "k": [
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[12.008px] text-[color:#fff] flex-1 min-w-0",
+               "c": "font-medium leading-[1.38] relative text-[12.008px] text-[color:#fff] shrink-0",
                "id": "203:13854",
                "k": [
                 "01"
@@ -8861,13 +8861,13 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
            "k": [
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex h-[32.421px] items-center px-[12.008px] relative rounded-[14.409px] flex-1 min-w-0",
+             "c": "bg-[#0f1530] flex h-[32.421px] items-center px-[12.008px] relative rounded-[14.409px] shrink-0",
              "n": "Status / 02",
              "id": "203:13873",
              "k": [
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[12.008px] text-[color:#fff] flex-1 min-w-0",
+               "c": "font-medium leading-[1.38] relative text-[12.008px] text-[color:#fff] shrink-0",
                "id": "203:13874",
                "k": [
                 "02"
@@ -8929,7 +8929,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "p",
-               "c": "font-medium relative text-[color:#0f1530] flex-1 min-w-0",
+               "c": "font-medium relative text-[color:#0f1530] shrink-0",
                "id": "203:13882",
                "k": [
                 "$65"
@@ -8953,7 +8953,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "p",
-               "c": "font-medium relative text-[color:#0f1530] flex-1 min-w-0",
+               "c": "font-medium relative text-[color:#0f1530] shrink-0",
                "id": "203:13885",
                "k": [
                 "$120"
@@ -8985,7 +8985,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
             },
             {
              "t": "p",
-             "c": "font-bold relative text-[32.421px] text-[color:#0f1530] flex-1 min-w-0",
+             "c": "font-bold relative text-[32.421px] text-[color:#0f1530] shrink-0",
              "id": "203:13889",
              "k": [
               "$185"
@@ -9025,13 +9025,13 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
            "k": [
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex h-[32.421px] items-center px-[12.008px] relative rounded-[14.409px] flex-1 min-w-0",
+             "c": "bg-[#0f1530] flex h-[32.421px] items-center px-[12.008px] relative rounded-[14.409px] shrink-0",
              "n": "Status / 03",
              "id": "203:13895",
              "k": [
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[12.008px] text-[color:#fff] flex-1 min-w-0",
+               "c": "font-medium leading-[1.38] relative text-[12.008px] text-[color:#fff] shrink-0",
                "id": "203:13896",
                "k": [
                 "03"
@@ -9309,7 +9309,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
         },
         {
          "t": "div",
-         "c": "flex flex-col gap-[14px] items-start relative flex-1 min-w-0",
+         "c": "flex flex-col gap-[14px] items-start relative shrink-0",
          "n": "Demo action",
          "id": "203:13931",
          "k": [
@@ -9420,7 +9420,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
            "k": [
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex gap-[14px] h-[48px] items-center p-[14px] relative w-full",
+             "c": "bg-[#0f1530] flex gap-[14px] h-[48px] items-center p-[14px] relative w-full justify-between",
              "n": "Mobile app chrome",
              "id": "204:5790",
              "k": [
@@ -9434,13 +9434,13 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "div",
-               "c": "bg-[#f6b400] flex h-[27px] items-center px-[10px] relative rounded-[12px] flex-1 min-w-0",
+               "c": "bg-[#f6b400] flex h-[27px] items-center px-[10px] relative rounded-[12px] shrink-0",
                "n": "Status / EXAMPLE",
                "id": "204:5792",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] flex-1 min-w-0",
+                 "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] shrink-0",
                  "id": "204:5793",
                  "k": [
                   "EXAMPLE"
@@ -9494,7 +9494,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   },
                   {
                    "t": "p",
-                   "c": "font-medium relative text-[color:#0f1530] flex-1 min-w-0",
+                   "c": "font-medium relative text-[color:#0f1530] shrink-0",
                    "id": "204:5800",
                    "k": [
                     "$65"
@@ -9518,7 +9518,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   },
                   {
                    "t": "p",
-                   "c": "font-medium relative text-[color:#0f1530] flex-1 min-w-0",
+                   "c": "font-medium relative text-[color:#0f1530] shrink-0",
                    "id": "204:5803",
                    "k": [
                     "$120"
@@ -9548,7 +9548,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
                   },
                   {
                    "t": "p",
-                   "c": "font-bold relative text-[28px] text-[color:#0f1530] flex-1 min-w-0",
+                   "c": "font-bold relative text-[28px] text-[color:#0f1530] shrink-0",
                    "id": "204:5807",
                    "k": [
                     "$185"
@@ -9652,19 +9652,19 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
          "k": [
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-full justify-between",
            "n": "Product state title",
            "id": "I203:14013;203:13852",
            "k": [
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex h-[27px] items-center px-[10px] relative rounded-[12px] flex-1 min-w-0",
+             "c": "bg-[#0f1530] flex h-[27px] items-center px-[10px] relative rounded-[12px] shrink-0",
              "n": "Status / 01",
              "id": "I203:14013;203:13853",
              "k": [
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#fff] flex-1 min-w-0",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#fff] shrink-0",
                "id": "I203:14013;203:13854",
                "k": [
                 "01"
@@ -9791,19 +9791,19 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
          "k": [
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-full justify-between",
            "n": "Product state title",
            "id": "I203:14032;203:13872",
            "k": [
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex h-[27px] items-center px-[10px] relative rounded-[12px] flex-1 min-w-0",
+             "c": "bg-[#0f1530] flex h-[27px] items-center px-[10px] relative rounded-[12px] shrink-0",
              "n": "Status / 02",
              "id": "I203:14032;203:13873",
              "k": [
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#fff] flex-1 min-w-0",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#fff] shrink-0",
                "id": "I203:14032;203:13874",
                "k": [
                 "02"
@@ -9865,7 +9865,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "p",
-               "c": "font-medium relative text-[color:#0f1530] flex-1 min-w-0",
+               "c": "font-medium relative text-[color:#0f1530] shrink-0",
                "id": "I203:14032;203:13882",
                "k": [
                 "$65"
@@ -9889,7 +9889,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
               },
               {
                "t": "p",
-               "c": "font-medium relative text-[color:#0f1530] flex-1 min-w-0",
+               "c": "font-medium relative text-[color:#0f1530] shrink-0",
                "id": "I203:14032;203:13885",
                "k": [
                 "$120"
@@ -9921,7 +9921,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
             },
             {
              "t": "p",
-             "c": "font-bold relative text-[27px] text-[color:#0f1530] flex-1 min-w-0",
+             "c": "font-bold relative text-[27px] text-[color:#0f1530] shrink-0",
              "id": "I203:14032;203:13889",
              "k": [
               "$185"
@@ -9955,19 +9955,19 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
          "k": [
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-full justify-between",
            "n": "Product state title",
            "id": "I203:14053;203:13894",
            "k": [
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex h-[27px] items-center px-[10px] relative rounded-[12px] flex-1 min-w-0",
+             "c": "bg-[#0f1530] flex h-[27px] items-center px-[10px] relative rounded-[12px] shrink-0",
              "n": "Status / 03",
              "id": "I203:14053;203:13895",
              "k": [
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#fff] flex-1 min-w-0",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#fff] shrink-0",
                "id": "I203:14053;203:13896",
                "k": [
                 "03"
@@ -10282,7 +10282,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
    "k": [
     {
      "t": "div",
-     "c": "flex gap-[24px] items-start relative flex-1 min-w-0",
+     "c": "flex gap-[24px] items-start relative shrink-0",
      "n": "HVAC and plumbing links",
      "id": "204:9053",
      "k": [

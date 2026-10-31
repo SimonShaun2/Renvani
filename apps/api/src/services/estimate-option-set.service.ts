@@ -230,20 +230,74 @@ function assertUniqueLabels(labels: Array<string | null>): void {
   }
 }
 
-async function bumpVersion(tx: Executor, companyId: string, tierGroupId: string, next: number, now: Date): Promise<void> {
-  await tx
-    .update(estimates)
-    .set({ optionSetVersion: next, updatedAt: now })
-    .where(and(eq(estimates.companyId, companyId), eq(estimates.tierGroupId, tierGroupId), isNull(estimates.deletedAt)))
-    .returning();
+function staleVersion(): AppError {
+  return conflict("stale_version", "Option set changed since it was loaded; reload and retry");
 }
 
-async function clearRecommended(tx: Executor, companyId: string, tierGroupId: string): Promise<void> {
+/**
+ * Compare-and-set bump: only rows still at expectedVersion move to expectedVersion + 1.
+ * If fewer rows than expected match, a concurrent writer won the race: throw 409 stale_version,
+ * which rolls back every earlier write in the same transaction (so the version is never double-bumped).
+ */
+async function bumpVersion(
+  tx: Executor,
+  companyId: string,
+  tierGroupId: string,
+  expectedVersion: number,
+  expectedRows: number,
+  now: Date
+): Promise<void> {
+  const updated = await tx
+    .update(estimates)
+    .set({ optionSetVersion: expectedVersion + 1, updatedAt: now })
+    .where(
+      and(
+        eq(estimates.companyId, companyId),
+        eq(estimates.tierGroupId, tierGroupId),
+        isNull(estimates.deletedAt),
+        eq(estimates.optionSetVersion, expectedVersion)
+      )
+    )
+    .returning();
+  if (updated.length !== expectedRows) throw staleVersion();
+}
+
+async function clearRecommended(tx: Executor, companyId: string, tierGroupId: string, expectedVersion: number): Promise<void> {
   await tx
     .update(estimates)
     .set({ isRecommended: false })
-    .where(and(eq(estimates.companyId, companyId), eq(estimates.tierGroupId, tierGroupId), eq(estimates.isRecommended, true)))
+    .where(
+      and(
+        eq(estimates.companyId, companyId),
+        eq(estimates.tierGroupId, tierGroupId),
+        eq(estimates.isRecommended, true),
+        eq(estimates.optionSetVersion, expectedVersion)
+      )
+    )
     .returning();
+}
+
+/** Guarded single-row write inside a set mutation; 0 rows means a concurrent writer moved the version. */
+async function updateOptionRow(
+  tx: Executor,
+  companyId: string,
+  estimateId: string,
+  expectedVersion: number,
+  values: Partial<typeof estimates.$inferInsert>
+): Promise<void> {
+  const [updated] = await tx
+    .update(estimates)
+    .set(values)
+    .where(
+      and(
+        eq(estimates.companyId, companyId),
+        eq(estimates.id, estimateId),
+        isNull(estimates.deletedAt),
+        eq(estimates.optionSetVersion, expectedVersion)
+      )
+    )
+    .returning();
+  if (!updated) throw staleVersion();
 }
 
 async function insertOption(
@@ -426,31 +480,31 @@ export async function updateEstimateOptionSet(
       throw new AppError(ErrorCode.NOT_FOUND, "Estimate option not found");
     }
     const now = new Date();
-    const scope = and(eq(estimates.companyId, actor.companyId), eq(estimates.tierGroupId, tierGroupId), isNull(estimates.deletedAt));
+    const scope = and(
+      eq(estimates.companyId, actor.companyId),
+      eq(estimates.tierGroupId, tierGroupId),
+      isNull(estimates.deletedAt),
+      eq(estimates.optionSetVersion, version)
+    );
     const shared = {
       ...(body.title !== undefined ? { title: body.title } : {}),
       ...(body.messageToCustomer !== undefined ? { messageToCustomer: body.messageToCustomer } : {}),
       ...(body.financingOffered !== undefined ? { financingOffered: body.financingOffered } : {})
     };
-    if (Object.keys(shared).length > 0) await tx.update(estimates).set({ ...shared, updatedAt: now }).where(scope).returning();
+    if (Object.keys(shared).length > 0) {
+      const updated = await tx.update(estimates).set({ ...shared, updatedAt: now }).where(scope).returning();
+      if (updated.length !== rows.length) throw staleVersion();
+    }
     for (const option of body.options ?? []) {
-      await tx
-        .update(estimates)
-        .set({ tierLabel: option.tierLabel.trim(), updatedAt: now })
-        .where(and(eq(estimates.companyId, actor.companyId), eq(estimates.id, option.estimateId)))
-        .returning();
+      await updateOptionRow(tx, actor.companyId, option.estimateId, version, { tierLabel: option.tierLabel.trim(), updatedAt: now });
     }
     if (body.recommendedEstimateId !== undefined) {
-      await clearRecommended(tx, actor.companyId, tierGroupId);
+      await clearRecommended(tx, actor.companyId, tierGroupId, version);
       if (body.recommendedEstimateId) {
-        await tx
-          .update(estimates)
-          .set({ isRecommended: true, updatedAt: now })
-          .where(and(eq(estimates.companyId, actor.companyId), eq(estimates.id, body.recommendedEstimateId)))
-          .returning();
+        await updateOptionRow(tx, actor.companyId, body.recommendedEstimateId, version, { isRecommended: true, updatedAt: now });
       }
     }
-    await bumpVersion(tx, actor.companyId, tierGroupId, version + 1, now);
+    await bumpVersion(tx, actor.companyId, tierGroupId, version, rows.length, now);
     await emitSetEvent(tx, {
       actor, tierGroupId, customerId: rows[0]!.customerId, op: "update", key: body.idempotencyKey, hash, version: version + 1,
       summary: "Estimate option set updated"
@@ -475,7 +529,7 @@ export async function addEstimateOption(
     }
     assertUniqueLabels([...rows.map((row) => row.tierLabel), body.option.tierLabel]);
     await assertPriceBookItemsInCompany(tx, actor.companyId, body.option.items.map((item) => item.priceBookItemId));
-    if (body.option.recommended) await clearRecommended(tx, actor.companyId, tierGroupId);
+    if (body.option.recommended) await clearRecommended(tx, actor.companyId, tierGroupId, version);
     const primary = primaryRow(rows);
     await insertOption(
       tx,
@@ -492,7 +546,8 @@ export async function addEstimateOption(
       },
       body.option
     );
-    await bumpVersion(tx, actor.companyId, tierGroupId, version + 1, new Date());
+    // The inserted option starts at `version`, so the bump must move rows.length + 1 rows.
+    await bumpVersion(tx, actor.companyId, tierGroupId, version, rows.length + 1, new Date());
     await emitSetEvent(tx, {
       actor, tierGroupId, customerId: primary.customerId, op: "add_option", key: body.idempotencyKey, hash, version: version + 1,
       summary: "Estimate option added"
@@ -518,12 +573,8 @@ export async function removeEstimateOption(
       throw conflict("option_minimum", `An option set needs at least ${ESTIMATE_OPTION_SET_MIN_OPTIONS} options`);
     }
     const now = new Date();
-    await tx
-      .update(estimates)
-      .set({ deletedAt: now, isRecommended: false, updatedAt: now })
-      .where(and(eq(estimates.companyId, actor.companyId), eq(estimates.id, estimateId)))
-      .returning();
-    await bumpVersion(tx, actor.companyId, tierGroupId, version + 1, now);
+    await updateOptionRow(tx, actor.companyId, estimateId, version, { deletedAt: now, isRecommended: false, updatedAt: now });
+    await bumpVersion(tx, actor.companyId, tierGroupId, version, rows.length - 1, now);
     await emitSetEvent(tx, {
       actor, tierGroupId, customerId: rows[0]!.customerId, op: "remove_option", key: body.idempotencyKey, hash, version: version + 1,
       summary: "Estimate option removed"
@@ -564,9 +615,17 @@ export async function sendEstimateOptionSet(
           optionSetVersion: version + 1,
           updatedAt: sentAt
         })
-        .where(and(eq(estimates.companyId, actor.companyId), eq(estimates.id, row.id), eq(estimates.status, "draft")))
+        .where(
+          and(
+            eq(estimates.companyId, actor.companyId),
+            eq(estimates.id, row.id),
+            eq(estimates.status, "draft"),
+            isNull(estimates.deletedAt),
+            eq(estimates.optionSetVersion, version)
+          )
+        )
         .returning();
-      if (!updated) throw conflict("stale_version", "Option set changed since it was loaded; reload and retry");
+      if (!updated) throw staleVersion();
       await emitEventWithExecutor(tx, {
         companyId: actor.companyId,
         eventType: "estimate.sent",

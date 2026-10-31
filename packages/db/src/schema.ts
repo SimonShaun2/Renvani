@@ -915,6 +915,9 @@ export const estimates = pgTable("estimates", {
   tierLabel: varchar("tier_label", { length: 50 }), // "Good", "Better", "Best", null if single
   tierGroupId: uuid("tier_group_id"), // groups the 3 tiers together
   isSelectedTier: boolean("is_selected_tier").default(false),
+  // FS-212: at most one recommended option per tier group (partial unique index); set-level version on every row
+  isRecommended: boolean("is_recommended").notNull().default(false),
+  optionSetVersion: integer("option_set_version").notNull().default(1),
   // Totals (computed from items)
   subtotal: decimal("subtotal", { precision: 10, scale: 2 }).notNull().default("0"),
   taxRate: decimal("tax_rate", { precision: 5, scale: 4 }).default("0"),
@@ -948,6 +951,9 @@ export const estimates = pgTable("estimates", {
   customerIdx: index("estimates_customer_idx").on(t.customerId),
   statusIdx: index("estimates_status_idx").on(t.status),
   tokenIdx: uniqueIndex("estimates_approval_token_idx").on(t.approvalToken),
+  tierGroupRecommendedIdx: uniqueIndex("estimates_tier_group_recommended_idx")
+    .on(t.companyId, t.tierGroupId)
+    .where(sql`${t.isRecommended} = true AND ${t.deletedAt} IS NULL AND ${t.tierGroupId} IS NOT NULL`),
   numberIdx: uniqueIndex("estimates_number_company_idx").on(t.estimateNumber, t.companyId),
   importLineageIdx: uniqueIndex("estimates_import_lineage_idx").on(
     t.companyId,

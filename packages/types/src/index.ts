@@ -17,6 +17,7 @@ export * from "./technician-mobile/v1/index.js";
 export * from "./timesheets/v1/index.js";
 export * from "./inventory/v1/index.js";
 export * from "./estimate.types.js";
+export * from "./estimate-options.types.js";
 export * from "./file-attachment.types.js";
 export * from "./import.types.js";
 export * from "./import-reconciliation.schemas.js";

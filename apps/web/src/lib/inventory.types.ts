@@ -1,7 +1,6 @@
 /**
- * FS-181: web-side mirror of the FS-170 inventory v1 response/body shapes
- * (packages/types/src/inventory/v1 on PR #220, head f1ce4c5). #220 is not in dev yet,
- * so these stay local to apps/web; switch to `@fsm/types` imports once it lands.
+ * FS-181/FS-211: web-side mirror of the inventory v1 shapes (packages/types/src/inventory/v1),
+ * including productName/productSku from #345.
  */
 export type StockLocationKind = "warehouse" | "van";
 
@@ -20,6 +19,10 @@ export interface StockLevel {
   id: string;
   locationId: string;
   productId: string;
+  /** #345: catalog name, null when the product is missing. */
+  productName: string | null;
+  /** #345: SKU when set. */
+  productSku: string | null;
   quantity: number;
   lowStockThreshold: number | null;
   isLowStock: boolean;
@@ -31,6 +34,10 @@ export interface StockMovement {
   id: string;
   locationId: string;
   productId: string;
+  /** #345: catalog name, null when the product is missing. */
+  productName: string | null;
+  /** #345: SKU when set. */
+  productSku: string | null;
   kind: "adjustment" | "transfer_out" | "transfer_in" | "job_usage";
   quantityDelta: number;
   quantityAfter: number;

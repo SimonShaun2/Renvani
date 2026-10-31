@@ -9,6 +9,7 @@ import {
   Gauge,
   MessageSquareText,
   Package,
+  Warehouse,
   Settings,
   ShieldCheck,
   Inbox,
@@ -43,6 +44,7 @@ const ownerAdminNavigation: RoleNavigation = {
     { label: "Invoices", href: "/invoices", icon: CreditCard },
     { label: "Payments", href: "/payments", icon: Wallet },
     { label: "Service Agreements", href: "/service-agreements", icon: ShieldCheck },
+    { label: "Inventory", href: "/inventory", icon: Warehouse },
     { label: "AI Revenue Center", href: "/ai-revenue-center", icon: Sparkles },
     { label: "Command Center", href: "/command-center", icon: Inbox }
   ],
@@ -59,7 +61,8 @@ const dispatcherNavigation: RoleNavigation = {
     { label: "Jobs", href: "/jobs", icon: BriefcaseBusiness },
     { label: "Estimates", href: "/estimates", icon: FileText },
     { label: "Invoices", href: "/invoices", icon: CreditCard },
-    { label: "Command Center", href: "/command-center", icon: Inbox }
+    { label: "Command Center", href: "/command-center", icon: Inbox },
+    { label: "Inventory", href: "/inventory", icon: Warehouse }
   ],
   growth: [
     { label: "Booking requests", href: "/booking-requests", icon: Inbox },

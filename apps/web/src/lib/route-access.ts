@@ -73,7 +73,7 @@ const ROLE_ALLOWED_PREFIXES: Record<UserRole, string[]> = {
     "/inventory",
     "/settings"
   ],
-  technician: ["/mobile"]
+  technician: ["/mobile", "/inventory"]
 };
 
 export const ROLE_DEFAULT_ROUTES: DefaultRouteMap = {

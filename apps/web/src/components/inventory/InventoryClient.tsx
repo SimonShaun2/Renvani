@@ -25,7 +25,7 @@ type Tab = "stock" | "low" | "locations" | "adjust" | "transfer";
 const TABS: Array<{ id: Tab; label: string }> = [
   { id: "stock", label: "Stock" },
   { id: "low", label: "Low stock" },
-  { id: "locations", label: "Locations & vans" },
+  { id: "locations", label: "Warehouse & trucks" },
   { id: "adjust", label: "Adjust" },
   { id: "transfer", label: "Transfer" }
 ];
@@ -48,40 +48,57 @@ export function inventoryErrorMessage(error: unknown): string {
   return "Request failed. Check your connection and try again.";
 }
 
-/** Product names come from /api/v1/products, which only owner/admin can read; others see a short id. */
-function useProductNames() {
+const MANAGE_ROLES = new Set(["owner", "admin", "dispatcher", "office"]);
+
+/** Stock management is owner/admin/dispatcher/office; technicians get a read-only view. */
+export function useCanManageStock() {
+  const role = useAuthStore((state) => state.user?.role ?? null);
+  return role !== null && MANAGE_ROLES.has(role);
+}
+
+/** Part label from the #345 productName/productSku fields; short id only if the product is missing. */
+export function partLabel(row: { productId: string; productName: string | null; productSku: string | null }) {
+  const name = row.productName ?? `Unknown part ${row.productId.slice(0, 8)}`;
+  return row.productSku ? `${name} · ${row.productSku}` : name;
+}
+
+/**
+ * Part picker options: the full catalog for owner/admin (/api/v1/products is owner/admin only),
+ * plus every part already stocked (names come from the #345 inventory fields), so dispatcher/office pick by name too.
+ */
+function usePartOptions() {
   const role = useAuthStore((state) => state.user?.role ?? null);
   const canReadCatalog = role === "owner" || role === "admin";
-  const query = useInventoryProductOptions(canReadCatalog);
-  const names = useMemo(() => {
+  const catalog = useInventoryProductOptions(canReadCatalog);
+  const levels = useStockLevels(null, false);
+  return useMemo(() => {
     const map = new Map<string, string>();
-    if (canReadCatalog) for (const p of query.data?.data ?? []) map.set(p.id, p.name);
-    return map;
-  }, [canReadCatalog, query.data]);
-  return {
-    canReadCatalog,
-    products: canReadCatalog ? query.data?.data ?? [] : [],
-    nameOf: (id: string) => names.get(id) ?? `Item ${id.slice(0, 8)}`
-  };
+    for (const l of levels.data?.levels ?? []) map.set(l.productId, partLabel(l));
+    if (canReadCatalog) for (const p of catalog.data?.data ?? []) if (!map.has(p.id)) map.set(p.id, p.name);
+    return [...map.entries()].map(([id, name]) => ({ id, name })).sort((a, b) => a.name.localeCompare(b.name));
+  }, [canReadCatalog, catalog.data, levels.data]);
 }
 
 export function InventoryClient() {
   const [tab, setTab] = useState<Tab>("stock");
   const locations = useStockLocations();
+  const canManage = useCanManageStock();
+  const tabs = canManage ? TABS : TABS.filter((t) => t.id !== "adjust" && t.id !== "transfer");
+  const activeTab: Tab = tabs.some((t) => t.id === tab) ? tab : "stock";
 
   return (
     <div className="space-y-5">
       <div role="tablist" aria-label="Inventory" className="flex flex-wrap gap-2">
-        {TABS.map((t) => (
+        {tabs.map((t) => (
           <button
             key={t.id}
             type="button"
             role="tab"
-            aria-selected={tab === t.id}
+            aria-selected={activeTab === t.id}
             onClick={() => setTab(t.id)}
             className={[
               "rounded-full px-4 py-2 text-sm font-semibold",
-              tab === t.id ? "bg-neutral-900 text-white" : "border border-neutral-300 bg-white text-neutral-800"
+              activeTab === t.id ? "bg-neutral-900 text-white" : "border border-neutral-300 bg-white text-neutral-800"
             ].join(" ")}
           >
             {t.label}
@@ -89,21 +106,23 @@ export function InventoryClient() {
         ))}
       </div>
 
+      {canManage ? null : (
+        <p data-testid="inventory-read-only" className="text-sm text-neutral-600">
+          View only. Ask the office or dispatch to adjust or move parts.
+        </p>
+      )}
+
       {locations.isLoading ? (
         <SkeletonCard className="h-[320px]" />
       ) : locations.isError ? (
-        <ErrorState
-          title="Couldn't load stock locations"
-          onRetry={() => void locations.refetch()}
-          isRetrying={locations.isFetching}
-        />
+        <ErrorState title="Couldn't load stock locations" onRetry={() => void locations.refetch()} isRetrying={locations.isFetching} />
       ) : (
-        <div data-inventory-reveal key={tab}>
-          {tab === "stock" && <StockLevelsPanel lowStock={false} />}
-          {tab === "low" && <StockLevelsPanel lowStock />}
-          {tab === "locations" && <LocationsPanel />}
-          {tab === "adjust" && <AdjustPanel />}
-          {tab === "transfer" && <TransferPanel />}
+        <div data-inventory-reveal key={activeTab}>
+          {activeTab === "stock" && <StockLevelsPanel lowStock={false} />}
+          {activeTab === "low" && <StockLevelsPanel lowStock />}
+          {activeTab === "locations" && <LocationsPanel canManage={canManage} />}
+          {canManage && activeTab === "adjust" && <AdjustPanel />}
+          {canManage && activeTab === "transfer" && <TransferPanel />}
         </div>
       )}
     </div>
@@ -131,7 +150,7 @@ function LocationSelect({
         <option value="">{allowAll ? "All locations" : "Select a location"}</option>
         {(locations.data?.locations ?? []).map((l) => (
           <option key={l.id} value={l.id}>
-            {l.name} ({l.kind === "van" ? "Van" : "Warehouse"})
+            {l.name} ({l.kind === "van" ? "Truck" : "Warehouse"})
           </option>
         ))}
       </select>
@@ -143,7 +162,6 @@ export function StockLevelsPanel({ lowStock }: { lowStock: boolean }) {
   const [locationId, setLocationId] = useState("");
   const levels = useStockLevels(locationId || null, lowStock);
   const locations = useStockLocations();
-  const { nameOf } = useProductNames();
   const locName = (id: string) => locations.data?.locations.find((l) => l.id === id)?.name ?? id.slice(0, 8);
 
   return (
@@ -158,24 +176,26 @@ export function StockLevelsPanel({ lowStock }: { lowStock: boolean }) {
       ) : (levels.data?.levels ?? []).length === 0 ? (
         <EmptyState
           icon={Boxes}
-          title={lowStock ? "Nothing is low on stock" : "No stock recorded yet"}
-          subtitle={lowStock ? "Items at or under their threshold show up here." : "Adjust stock to add items to a location."}
+          title={lowStock ? "No parts running low" : "No parts on hand yet"}
+          subtitle={
+            lowStock ? "Parts at or under their reorder point show up here." : "Adjust stock to add parts to the warehouse or a truck."
+          }
         />
       ) : (
         <table className="w-full text-left text-sm">
           <thead>
             <tr className="text-neutral-500">
-              <th className="py-2">Item</th>
+              <th className="py-2">Part</th>
               <th>Location</th>
               <th className="text-right">On hand</th>
-              <th className="text-right">Low at</th>
+              <th className="text-right">Reorder at</th>
             </tr>
           </thead>
           <tbody>
             {(levels.data?.levels ?? []).map((lvl: StockLevel) => (
               <tr key={lvl.id} className="border-t border-neutral-200">
                 <td className="py-2">
-                  {nameOf(lvl.productId)}
+                  <span data-testid="part-label">{partLabel(lvl)}</span>
                   {lvl.isLowStock ? (
                     <span className="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-800">Low</span>
                   ) : null}
@@ -192,7 +212,7 @@ export function StockLevelsPanel({ lowStock }: { lowStock: boolean }) {
   );
 }
 
-export function LocationsPanel() {
+export function LocationsPanel({ canManage = true }: { canManage?: boolean }) {
   const locations = useStockLocations();
   const create = useCreateStockLocation();
   const [name, setName] = useState("");
@@ -214,67 +234,82 @@ export function LocationsPanel() {
   return (
     <section className="space-y-4">
       {list.length === 0 ? (
-        <EmptyState icon={MapPin} title="No locations yet" subtitle="Add a warehouse or a van to start tracking stock." compact />
+        <EmptyState
+          icon={MapPin}
+          title="No warehouse or trucks yet"
+          subtitle="Add your warehouse or a service truck to start tracking parts."
+          compact
+        />
       ) : (
         <ul className="divide-y divide-neutral-200 rounded-2xl border border-neutral-200">
           {list.map((l) => (
             <li key={l.id} className="flex items-center justify-between px-4 py-3 text-sm">
               <span className="font-medium text-neutral-900">{l.name}</span>
               <span className="text-neutral-500">
-                {l.kind === "van" ? "Van" : "Warehouse"}
+                {l.kind === "van" ? "Truck" : "Warehouse"}
                 {l.isActive ? "" : " · Inactive"}
               </span>
             </li>
           ))}
         </ul>
       )}
-      <form onSubmit={submit} className="grid max-w-md gap-3" aria-label="Add location">
-        <label className="block text-sm font-medium text-neutral-800">
-          Name
-          <input className={inputCls} value={name} onChange={(e) => setName(e.target.value)} maxLength={255} />
-        </label>
-        <label className="block text-sm font-medium text-neutral-800">
-          Type
-          <select className={inputCls} value={kind} onChange={(e) => setKind(e.target.value as StockLocationKind)}>
-            <option value="warehouse">Warehouse</option>
-            <option value="van">Van</option>
-          </select>
-        </label>
-        {error ? <p role="alert" className="text-sm text-red-700">{error}</p> : null}
-        <button type="submit" className={btnCls} disabled={!name.trim() || create.isPending}>
-          {create.isPending ? "Adding…" : "Add location"}
-        </button>
-      </form>
+      {canManage ? (
+        <form onSubmit={submit} className="grid max-w-md gap-3" aria-label="Add location">
+          <label className="block text-sm font-medium text-neutral-800">
+            Name
+            <input className={inputCls} value={name} onChange={(e) => setName(e.target.value)} maxLength={255} />
+          </label>
+          <label className="block text-sm font-medium text-neutral-800">
+            Type
+            <select className={inputCls} value={kind} onChange={(e) => setKind(e.target.value as StockLocationKind)}>
+              <option value="warehouse">Warehouse</option>
+              <option value="van">Service truck</option>
+            </select>
+          </label>
+          {error ? (
+            <p role="alert" className="text-sm text-red-700">
+              {error}
+            </p>
+          ) : null}
+          <button type="submit" className={btnCls} disabled={!name.trim() || create.isPending}>
+            {create.isPending ? "Adding…" : "Add location"}
+          </button>
+        </form>
+      ) : null}
     </section>
   );
 }
 
 function ProductField({ value, onChange }: { value: string; onChange: (v: string) => void }) {
-  const { canReadCatalog, products } = useProductNames();
-  if (canReadCatalog) {
-    return (
-      <label className="block text-sm font-medium text-neutral-800">
-        Item
-        <select className={inputCls} value={value} onChange={(e) => onChange(e.target.value)}>
-          <option value="">Select an item</option>
-          {products.map((p) => (
-            <option key={p.id} value={p.id}>{p.name}</option>
-          ))}
-        </select>
-      </label>
-    );
-  }
+  const options = usePartOptions();
   return (
     <label className="block text-sm font-medium text-neutral-800">
-      Item ID
-      <input className={inputCls} value={value} onChange={(e) => onChange(e.target.value.trim())} />
+      Part
+      <select className={inputCls} value={value} onChange={(e) => onChange(e.target.value)}>
+        <option value="">Select a part</option>
+        {options.map((p) => (
+          <option key={p.id} value={p.id}>
+            {p.name}
+          </option>
+        ))}
+      </select>
     </label>
   );
 }
 
 function Feedback({ error, ok }: { error: string | null; ok: string | null }) {
-  if (error) return <p role="alert" className="text-sm text-red-700">{error}</p>;
-  if (ok) return <p role="status" className="text-sm text-emerald-700">{ok}</p>;
+  if (error)
+    return (
+      <p role="alert" className="text-sm text-red-700">
+        {error}
+      </p>
+    );
+  if (ok)
+    return (
+      <p role="status" className="text-sm text-emerald-700">
+        {ok}
+      </p>
+    );
   return null;
 }
 

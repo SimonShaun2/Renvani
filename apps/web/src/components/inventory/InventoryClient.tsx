@@ -2,10 +2,8 @@
 
 import "./inventory-motion.css";
 
-import { Boxes, MapPin } from "lucide-react";
 import { useMemo, useState } from "react";
 
-import { EmptyState } from "@/src/components/ui/EmptyState";
 import { ErrorState } from "@/src/components/ui/ErrorState";
 import { SkeletonCard } from "@/src/components/ui/SkeletonCard";
 import {
@@ -37,8 +35,34 @@ const TABS: Array<{ id: Tab; label: string }> = [
   { id: "transfer", label: "Transfer" }
 ];
 
-const inputCls = "w-full rounded-xl border border-neutral-300 px-3 py-2 text-sm";
-const btnCls = "rounded-full bg-neutral-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50";
+// Figma 367:4647 / 367:4839 / 367:5013 (Operator / 11 Inventory · Stock & low stock) styles.
+const ring = "outline-none focus-visible:ring-2 focus-visible:ring-[#0f1530] focus-visible:ring-offset-2";
+const inputCls = "mt-1.5 block h-11 w-full rounded-[8px] border border-[#e6dccb] bg-white px-3 text-sm text-[#0f1530] outline-none focus:border-[#0f1530]";
+const labelCls = "block text-[13px] font-medium text-[#2a3360]";
+const cardCls = "space-y-3.5 rounded-[14px] border border-[#e6dccb] bg-white p-5";
+const btnCls = `inline-flex h-11 w-full items-center justify-center rounded-[10px] bg-[#0f1530] px-[18px] text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50 md:h-12 lg:h-11 ${ring}`;
+const PILL = {
+  error: "bg-[#fbe3dc] text-[#b42318]",
+  success: "bg-[#e4f1e8] text-[#2f7d4f]",
+  info: "bg-[#e5eafb] text-[#2b4acb]",
+  neutral: "bg-[#eef0f5] text-[#2a3360]"
+} as const;
+function Pill({ tone, children }: { tone: keyof typeof PILL; children: React.ReactNode }) {
+  return (
+    <span className={`inline-flex h-[22px] w-fit shrink-0 items-center rounded-full px-2.5 text-[10.5px] font-medium uppercase tracking-[0.06em] ${PILL[tone]}`}>
+      {children}
+    </span>
+  );
+}
+/** Figma state alert: semibold title, 13px detail (gray empty states 367:4793 / 367:4828). */
+function NoticeAlert({ title, detail, testId }: { title: string; detail: string; testId?: string }) {
+  return (
+    <div className="space-y-1.5 rounded-[10px] bg-[#eef0f5] p-3.5" data-testid={testId}>
+      <p className="text-sm font-semibold text-[#0f1530]">{title}</p>
+      <p className="text-[13px] text-[#2a3360]">{detail}</p>
+    </div>
+  );
+}
 
 export function inventoryErrorMessage(error: unknown): string {
   if (error instanceof ApiError) {
@@ -49,7 +73,7 @@ export function inventoryErrorMessage(error: unknown): string {
     if (error.status === 409 && payload.reason === "stale_record_version") {
       return "This stock level changed since you loaded it. Refresh and try again.";
     }
-    if (error.status === 403) return "Your role can't make this change.";
+    if (error.status === 403) return "Your role can’t make this change.";
     return error.message || "Request failed.";
   }
   return "Request failed. Check your connection and try again.";
@@ -94,8 +118,16 @@ export function InventoryClient() {
   const activeTab: Tab = tabs.some((t) => t.id === tab) ? tab : "stock";
 
   return (
-    <div className="space-y-5">
-      <div role="tablist" aria-label="Inventory" className="flex flex-wrap gap-2">
+    <div className="space-y-6">
+      <header className="space-y-2">
+        <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-[#2b4acb]">Inventory</p>
+        <h2 className="text-2xl font-semibold tracking-tight text-[#0f1530] md:text-[28px] lg:text-[30px]">Inventory</h2>
+        <p className="text-[15px] text-[#5e6684]">
+          Track parts in your warehouse and service trucks. Low stock shows parts at or under their reorder point.
+        </p>
+      </header>
+      <div className="border-t border-[#e6dccb]" />
+      <div role="tablist" aria-label="Inventory" className="inline-flex max-w-full flex-wrap gap-1 rounded-[10px] bg-[#f3eadc] p-1">
         {tabs.map((t) => (
           <button
             key={t.id}
@@ -104,8 +136,8 @@ export function InventoryClient() {
             aria-selected={activeTab === t.id}
             onClick={() => setTab(t.id)}
             className={[
-              "rounded-full px-4 py-2 text-sm font-semibold",
-              activeTab === t.id ? "bg-neutral-900 text-white" : "border border-neutral-300 bg-white text-neutral-800"
+              `h-11 rounded-[10px] px-3.5 text-sm text-[#0f1530] ${ring}`,
+              activeTab === t.id ? "bg-white font-semibold" : "font-normal"
             ].join(" ")}
           >
             {t.label}
@@ -114,7 +146,7 @@ export function InventoryClient() {
       </div>
 
       {canManage ? null : (
-        <p data-testid="inventory-read-only" className="text-sm text-neutral-600">
+        <p data-testid="inventory-read-only" className="text-[13px] text-[#5e6684]">
           View only. Ask the office or dispatch to adjust or move parts.
         </p>
       )}
@@ -151,7 +183,7 @@ function LocationSelect({
 }) {
   const locations = useStockLocations();
   return (
-    <label htmlFor={id} className="block text-sm font-medium text-neutral-800">
+    <label htmlFor={id} className={labelCls}>
       {label}
       <select id={id} className={inputCls} value={value} onChange={(e) => onChange(e.target.value)}>
         <option value="">{allowAll ? "All locations" : "Select a location"}</option>
@@ -171,46 +203,73 @@ export function StockLevelsPanel({ lowStock }: { lowStock: boolean }) {
   const locations = useStockLocations();
   const locName = (id: string) => locations.data?.locations.find((l) => l.id === id)?.name ?? id.slice(0, 8);
 
+  const rows = levels.data?.levels ?? [];
+  const cell = "flex items-center justify-between gap-4 lg:table-cell lg:px-3 lg:align-middle";
+  const cellLabel = "text-[13.5px] text-[#2a3360] lg:hidden";
+
   return (
-    <section className="space-y-4">
-      <div className="max-w-xs">
+    <section className={cardCls}>
+      <div className="lg:max-w-[148px]">
         <LocationSelect id={`levels-loc-${lowStock}`} label="Location" value={locationId} onChange={setLocationId} allowAll />
       </div>
       {levels.isLoading ? (
         <SkeletonCard className="h-[240px]" />
       ) : levels.isError ? (
         <ErrorState title="Couldn't load stock levels" onRetry={() => void levels.refetch()} isRetrying={levels.isFetching} />
-      ) : (levels.data?.levels ?? []).length === 0 ? (
-        <EmptyState
-          icon={Boxes}
+      ) : rows.length === 0 ? (
+        <NoticeAlert
+          testId="stock-empty"
           title={lowStock ? "No parts running low" : "No parts on hand yet"}
-          subtitle={
-            lowStock ? "Parts at or under their reorder point show up here." : "Adjust stock to add parts to the warehouse or a truck."
-          }
+          detail={lowStock ? "Parts at or under their reorder point show up here." : "Adjust stock to add parts to the warehouse or a truck."}
         />
       ) : (
         <div className="max-w-full overflow-x-auto" data-testid="stock-table-scroll">
-          <table className="w-full min-w-[520px] text-left text-sm">
-            <thead>
-              <tr className="text-neutral-500">
-                <th className="py-2">Part</th>
-                <th>Location</th>
-                <th className="text-right">On hand</th>
-                <th className="text-right">Reorder at</th>
+          <table className="block w-full border-separate border-spacing-y-0 text-left text-sm lg:table lg:min-w-[520px]">
+            <thead className="hidden lg:table-header-group">
+              <tr className="text-[11px] font-medium uppercase tracking-[0.08em] text-[#5e6684]">
+                <th className="h-9 rounded-l-[8px] bg-[#f3eadc] px-3 font-medium">Part</th>
+                <th className="bg-[#f3eadc] px-3 font-medium">Location</th>
+                <th className="bg-[#f3eadc] px-3 font-medium">On hand</th>
+                <th className="bg-[#f3eadc] px-3 font-medium">Reorder at</th>
+                <th className="rounded-r-[8px] bg-[#f3eadc] px-3 font-medium">
+                  <span className="sr-only">Status</span>
+                </th>
               </tr>
             </thead>
-            <tbody>
-              {(levels.data?.levels ?? []).map((lvl: StockLevel) => (
-                <tr key={lvl.id} className="border-t border-neutral-200">
-                  <td className="py-2 pr-3 [overflow-wrap:anywhere]">
+            <tbody className="block space-y-3 lg:table-row-group lg:space-y-0">
+              {rows.map((lvl: StockLevel) => (
+                <tr
+                  key={lvl.id}
+                  data-testid="stock-row"
+                  data-low={lvl.isLowStock || undefined}
+                  className={[
+                    "block space-y-2 rounded-[14px] border p-4 lg:table-row lg:h-[52px] lg:space-y-0 lg:border-0 lg:p-0 [&>td:first-child]:lg:rounded-l-[8px] [&>td:last-child]:lg:rounded-r-[8px]",
+                    lvl.isLowStock ? "border-[#fbe3dc] bg-[#fbe3dc]" : "border-[#e6dccb] bg-white lg:bg-transparent"
+                  ].join(" ")}
+                >
+                  <td className="flex items-start justify-between gap-3 text-[15px] font-semibold text-[#0f1530] [overflow-wrap:anywhere] lg:table-cell lg:px-3 lg:align-middle lg:text-sm lg:font-medium">
                     <span data-testid="part-label">{partLabel(lvl)}</span>
                     {lvl.isLowStock ? (
-                      <span className="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-800">Low</span>
+                      <span className="lg:hidden">
+                        <Pill tone="error">Low</Pill>
+                      </span>
                     ) : null}
                   </td>
-                  <td>{locName(lvl.locationId)}</td>
-                  <td className="text-right tabular-nums">{lvl.quantity}</td>
-                  <td className="text-right tabular-nums">{lvl.lowStockThreshold ?? "—"}</td>
+                  <td className={cell}>
+                    <span className={cellLabel}>Location</span>
+                    <span className="text-[13.5px] text-[#0f1530]">{locName(lvl.locationId)}</span>
+                  </td>
+                  <td className={cell}>
+                    <span className={cellLabel}>On hand</span>
+                    <span className="font-semibold tabular-nums text-[#0f1530]">{lvl.quantity}</span>
+                  </td>
+                  <td className={cell}>
+                    <span className={cellLabel}>Reorder at</span>
+                    <span className="text-[13.5px] tabular-nums text-[#0f1530]">{lvl.lowStockThreshold ?? "—"}</span>
+                  </td>
+                  <td className="hidden lg:table-cell lg:px-3 lg:align-middle">
+                    {lvl.isLowStock ? <Pill tone="error">Low</Pill> : null}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -241,20 +300,15 @@ export function LocationsPanel({ canManage = true }: { canManage?: boolean }) {
   }
 
   return (
-    <section className="space-y-4">
+    <section className={cardCls}>
       {list.length === 0 ? (
-        <EmptyState
-          icon={MapPin}
-          title="No warehouse or trucks yet"
-          subtitle="Add your warehouse or a service truck to start tracking parts."
-          compact
-        />
+        <NoticeAlert title="No warehouse or trucks yet" detail="Add your warehouse or a service truck to start tracking parts." />
       ) : (
-        <ul className="divide-y divide-neutral-200 rounded-2xl border border-neutral-200">
+        <ul className="divide-y divide-[#e6dccb] rounded-[10px] border border-[#e6dccb]">
           {list.map((l) => (
             <li key={l.id} className="flex items-center justify-between px-4 py-3 text-sm">
-              <span className="font-medium text-neutral-900">{l.name}</span>
-              <span className="text-neutral-500">
+              <span className="font-medium text-[#0f1530]">{l.name}</span>
+              <span className="text-[#5e6684]">
                 {l.kind === "van" ? "Truck" : "Warehouse"}
                 {l.isActive ? "" : " · Inactive"}
               </span>
@@ -263,23 +317,19 @@ export function LocationsPanel({ canManage = true }: { canManage?: boolean }) {
         </ul>
       )}
       {canManage ? (
-        <form onSubmit={submit} className="grid max-w-md gap-3" aria-label="Add location">
-          <label className="block text-sm font-medium text-neutral-800">
+        <form onSubmit={submit} className="grid gap-3.5 lg:max-w-md" aria-label="Add location">
+          <label className={labelCls}>
             Name
             <input className={inputCls} value={name} onChange={(e) => setName(e.target.value)} maxLength={255} />
           </label>
-          <label className="block text-sm font-medium text-neutral-800">
+          <label className={labelCls}>
             Type
             <select className={inputCls} value={kind} onChange={(e) => setKind(e.target.value as StockLocationKind)}>
               <option value="warehouse">Warehouse</option>
               <option value="van">Service truck</option>
             </select>
           </label>
-          {error ? (
-            <p role="alert" className="text-sm text-red-700">
-              {error}
-            </p>
-          ) : null}
+          <Feedback error={error} ok={null} />
           <button type="submit" className={btnCls} disabled={!name.trim() || create.isPending}>
             {create.isPending ? "Adding…" : "Add location"}
           </button>
@@ -292,7 +342,7 @@ export function LocationsPanel({ canManage = true }: { canManage?: boolean }) {
 function ProductField({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   const options = usePartOptions();
   return (
-    <label className="block text-sm font-medium text-neutral-800">
+    <label className={labelCls}>
       Part
       <select className={inputCls} value={value} onChange={(e) => onChange(e.target.value)}>
         <option value="">Select a part</option>
@@ -306,16 +356,30 @@ function ProductField({ value, onChange }: { value: string; onChange: (v: string
   );
 }
 
+/** Figma state alerts 367:4796 (ERROR), 367:4801 (CONFLICT), 367:4834 (ACCESS), 367:4823 (saved). */
+function errorPill(message: string) {
+  if (message.startsWith("This stock level changed")) return { label: "Conflict", tone: "error" as const };
+  if (message.startsWith("Your role")) return { label: "Access", tone: "neutral" as const };
+  return { label: "Error", tone: "error" as const };
+}
 function Feedback({ error, ok }: { error: string | null; ok: string | null }) {
-  if (error)
+  if (error) {
+    const pill = errorPill(error);
+    const i = error.indexOf(". ");
+    const [title, detail] = i === -1 ? [error, null] : [error.slice(0, i + 1), error.slice(i + 2)];
     return (
-      <p role="alert" className="text-sm text-red-700">
-        {error}
-      </p>
+      <div className="space-y-2">
+        <Pill tone={pill.tone}>{pill.label}</Pill>
+        <div role="alert" className={`space-y-1.5 rounded-[10px] p-3.5 ${pill.tone === "neutral" ? "bg-[#eef0f5] text-[#0f1530]" : "bg-[#fbe3dc] text-[#b42318]"}`}>
+          <p className="text-sm font-semibold">{title}</p>
+          {detail ? <p className="text-[13px]">{detail}</p> : null}
+        </div>
+      </div>
     );
+  }
   if (ok)
     return (
-      <p role="status" className="text-sm text-emerald-700">
+      <p role="status" className="rounded-[10px] bg-[#e4f1e8] p-3.5 text-sm font-semibold text-[#0f1530]">
         {ok}
       </p>
     );
@@ -363,14 +427,20 @@ export function AdjustPanel() {
   }
 
   return (
-    <form onSubmit={submit} className="grid max-w-md gap-3" aria-label="Adjust stock">
-      <LocationSelect id="adjust-loc" label="Location" value={locationId} onChange={setLocationId} />
+    <form onSubmit={submit} className={`${cardCls} lg:max-w-[360px]`} aria-label="Adjust stock">
+      <h3 className="text-[17px] font-semibold text-[#0f1530]">Adjust stock</h3>
       <ProductField value={productId} onChange={setProductId} />
-      <label className="block text-sm font-medium text-neutral-800">
-        Change (+ to add, − to remove)
-        <input className={inputCls} inputMode="numeric" value={delta} onChange={(e) => setDelta(e.target.value)} />
-      </label>
-      <label className="block text-sm font-medium text-neutral-800">
+      <LocationSelect id="adjust-loc" label="Location" value={locationId} onChange={setLocationId} />
+      <div>
+        <label className={labelCls}>
+          Quantity
+          <input className={inputCls} inputMode="numeric" value={delta} onChange={(e) => setDelta(e.target.value)} aria-describedby="adjust-qty-help" />
+        </label>
+        <p id="adjust-qty-help" className="mt-1.5 text-[12.5px] text-[#5e6684]">
+          Use a negative number to remove parts.
+        </p>
+      </div>
+      <label className={labelCls}>
         Reason
         <input className={inputCls} value={reason} onChange={(e) => setReason(e.target.value)} maxLength={500} />
       </label>
@@ -410,12 +480,15 @@ export function TransferPanel() {
   }
 
   return (
-    <form onSubmit={submit} className="grid max-w-md gap-3" aria-label="Transfer stock">
-      <LocationSelect id="transfer-from" label="From" value={fromLocationId} onChange={setFrom} />
-      <LocationSelect id="transfer-to" label="To" value={toLocationId} onChange={setTo} />
-      {same ? <p className="text-sm text-amber-800">Pick two different locations.</p> : null}
+    <form onSubmit={submit} className={`${cardCls} lg:max-w-[360px]`} aria-label="Transfer stock">
+      <Pill tone="info">Transfer</Pill>
+      <div className="grid grid-cols-2 gap-3">
+        <LocationSelect id="transfer-from" label="From" value={fromLocationId} onChange={setFrom} />
+        <LocationSelect id="transfer-to" label="To" value={toLocationId} onChange={setTo} />
+      </div>
+      {same ? <p className="text-[12.5px] text-[#b42318]">Pick two different locations.</p> : null}
       <ProductField value={productId} onChange={setProductId} />
-      <label className="block text-sm font-medium text-neutral-800">
+      <label className={labelCls}>
         Quantity
         <input className={inputCls} inputMode="numeric" value={quantity} onChange={(e) => setQuantity(e.target.value)} />
       </label>

@@ -102,7 +102,7 @@ describe("InventoryClient", () => {
     routeGet();
     wrap(<InventoryClient />);
     expect(await screen.findByText("Capacitor 45/5 · CAP-455")).toBeTruthy();
-    expect(screen.getByText("Low")).toBeTruthy();
+    expect(screen.getAllByText("Low").length).toBeGreaterThan(0);
     expect(screen.getAllByText("Main shop").length).toBeGreaterThan(0);
   });
 
@@ -171,7 +171,7 @@ describe("AdjustPanel / TransferPanel", () => {
     await screen.findByRole("option", { name: "Capacitor 45/5 · CAP-455" });
     fireEvent.change(screen.getByLabelText("Location"), { target: { value: L1 } });
     fireEvent.change(screen.getByLabelText("Part"), { target: { value: P1 } });
-    fireEvent.change(screen.getByLabelText(/Change/), { target: { value: "-4" } });
+    fireEvent.change(screen.getByLabelText("Quantity"), { target: { value: "-4" } });
     fireEvent.change(screen.getByLabelText("Reason"), { target: { value: "Damaged" } });
     fireEvent.click(screen.getByRole("button", { name: "Save adjustment" }));
     await waitFor(() =>
@@ -218,7 +218,7 @@ describe("AdjustPanel / TransferPanel", () => {
     await screen.findByRole("option", { name: "Capacitor 45/5 · CAP-455" });
     fireEvent.change(screen.getByLabelText("Location"), { target: { value: L2 } });
     fireEvent.change(screen.getByLabelText("Part"), { target: { value: P1 } });
-    fireEvent.change(screen.getByLabelText(/Change/), { target: { value: "5" } });
+    fireEvent.change(screen.getByLabelText("Quantity"), { target: { value: "5" } });
     fireEvent.change(screen.getByLabelText("Reason"), { target: { value: "Restock" } });
     fireEvent.click(screen.getByRole("button", { name: "Save adjustment" }));
     await waitFor(() =>
@@ -257,5 +257,17 @@ describe("stock table", () => {
     const scroller = screen.getByTestId("stock-table-scroll");
     expect(scroller.className).toMatch(/overflow-x-auto/);
     expect(scroller.querySelector("table")).toBeTruthy();
+  });
+
+  it("matches the Figma page header, LOW pill row tint and adjust-quantity hint", async () => {
+    routeGet();
+    wrap(<StockLevelsPanel lowStock={false} />);
+    await screen.findByText("Capacitor 45/5 · CAP-455");
+    const low = screen.getAllByTestId("stock-row").find((r) => r.getAttribute("data-low"));
+    expect(low?.className).toMatch(/bg-\[#fbe3dc\]/);
+    cleanup();
+    wrap(<AdjustPanel />);
+    expect(screen.getByRole("heading", { name: "Adjust stock" })).toBeTruthy();
+    expect(screen.getByText("Use a negative number to remove parts.")).toBeTruthy();
   });
 });

@@ -123,7 +123,7 @@ function toJobDetailResponse(job: JobDetail) {
     propertyId: job.propertyId,
     assetId: job.assetId,
     technicianId: job.technicianId,
-    crewId: (job as { crewId?: string | null }).crewId ?? null,
+    crewId: job.crewId ?? null,
     assignedById: job.assignedById,
     type: job.type,
     priority: job.priority,

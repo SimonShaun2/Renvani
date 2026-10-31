@@ -37,6 +37,8 @@ export interface Job {
   propertyId: string | null;
   assetId: string | null;
   technicianId: string | null;
+  /** FS-195 crew assigned at create (null when none). */
+  crewId?: string | null;
   assignedById: string | null;
   type: JobType;
   priority: JobPriority;

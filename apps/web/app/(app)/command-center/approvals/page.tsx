@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { RevenueProposalsInbox } from "@/src/components/revenue-agent/RevenueProposalsInbox";
+import { AgentInbox } from "@/src/components/agent-actions/AgentInbox";
 
 export default function ApprovalsPage() {
   return (
@@ -14,7 +14,7 @@ export default function ApprovalsPage() {
           Nothing reaches a customer until it passes policy, consent and — where your rules say so — you.
         </p>
       </div>
-      <RevenueProposalsInbox />
+      <AgentInbox />
     </div>
   );
 }

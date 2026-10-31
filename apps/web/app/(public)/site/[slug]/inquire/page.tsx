@@ -68,7 +68,11 @@ export default async function BrandedInquiryPage({
         <h1 className="mt-4 text-3xl font-semibold tracking-tight">Request a quote</h1>
       </header>
       <main className="px-6 py-10 md:px-16">
-        <BrandedInquiryClient model={model} acquisitionSource={acquisitionSource} />
+        <BrandedInquiryClient
+          model={model}
+          acquisitionSource={acquisitionSource}
+          serviceCategory={resolveSiteTrade(settings).label}
+        />
       </main>
     </div>
   );

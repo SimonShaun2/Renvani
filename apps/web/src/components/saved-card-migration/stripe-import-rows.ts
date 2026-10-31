@@ -9,8 +9,34 @@ export type ParsedStripeImport = { rows: SavedCardStripeImportRow[]; errors: Str
 const COLUMNS = ["stripeCustomerId", "stripePaymentMethodId", "renvaniCustomerId", "email"] as const;
 const SECRET_PATTERN = /\b(sk|rk)_(test|live)_[A-Za-z0-9]+|whsec_[A-Za-z0-9]+/;
 
-function splitCsvLine(line: string): string[] {
-  return line.split(",").map((cell) => cell.trim().replace(/^"(.*)"$/, "$1").trim());
+/** RFC 4180-style cell split: quoted cells may contain commas and "" escaped quotes. */
+export function splitCsvLine(line: string): string[] {
+  const cells: string[] = [];
+  let cell = "";
+  let quoted = false;
+  for (let i = 0; i < line.length; i += 1) {
+    const ch = line[i];
+    if (quoted) {
+      if (ch === '"' && line[i + 1] === '"') {
+        cell += '"';
+        i += 1;
+      } else if (ch === '"') {
+        quoted = false;
+      } else {
+        cell += ch;
+      }
+    } else if (ch === '"' && cell.trim() === "") {
+      quoted = true;
+      cell = "";
+    } else if (ch === ",") {
+      cells.push(cell.trim());
+      cell = "";
+    } else {
+      cell += ch;
+    }
+  }
+  cells.push(cell.trim());
+  return cells;
 }
 
 /**

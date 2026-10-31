@@ -16,6 +16,7 @@ import {
   SAVED_CARD_CONSENT_VERSION_MISMATCH,
   isDraftConsent
 } from "./saved-card-consent.copy";
+import { StartSavedCardMigrationForm } from "./StartSavedCardMigrationForm";
 import { StripeImportForm } from "./StripeImportForm";
 
 export function buildApplyRows(migration: SavedCardMigration): ApplySavedCardMigrationMappingsBody["rows"] {
@@ -57,8 +58,18 @@ export function SavedCardConsentPanel({ bundleId }: { bundleId: string }) {
     );
   }
   const data = query.data;
-  if (!data?.migration) {
+  if (!data) {
     return null;
+  }
+  if (!data.migration) {
+    return (
+      <section className="surface-card space-y-4 px-5 py-5" aria-labelledby="saved-card-start-title">
+        <p id="saved-card-start-title" className="text-sm font-semibold text-neutral-900">
+          Bring saved cards from your previous processor
+        </p>
+        <StartSavedCardMigrationForm bundleId={bundleId} />
+      </section>
+    );
   }
   const { migration, consent } = data;
   const rows = buildApplyRows(migration);

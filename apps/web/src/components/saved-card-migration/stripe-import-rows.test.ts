@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { parseStripeImportCsv, STRIPE_IMPORT_MAX_ROWS } from "./stripe-import-rows";
+import { parseStripeImportCsv, splitCsvLine, STRIPE_IMPORT_MAX_ROWS } from "./stripe-import-rows";
 
 const H = "stripeCustomerId,stripePaymentMethodId,renvaniCustomerId,email";
 
@@ -37,5 +37,18 @@ describe("parseStripeImportCsv", () => {
   it("caps rows at the API max", () => {
     const lines = Array.from({ length: STRIPE_IMPORT_MAX_ROWS + 1 }, (_, i) => `cus_${i},pm_${i},,`);
     expect(parseStripeImportCsv([H, ...lines].join("\n")).errors.at(-1)?.message).toMatch(/Up to 200 rows/);
+  });
+
+  it("splits RFC 4180-style quoted cells (commas, escaped quotes, empty quoted)", () => {
+    expect(splitCsvLine('a,"b,c",d')).toEqual(["a", "b,c", "d"]);
+    expect(splitCsvLine('"say ""hi""",x')).toEqual(['say "hi"', "x"]);
+    expect(splitCsvLine('"",x,')).toEqual(["", "x", ""]);
+    expect(splitCsvLine(' "a, b" , c')).toEqual(["a, b", "c"]);
+  });
+
+  it("parses rows whose quoted cells contain commas", () => {
+    const r = parseStripeImportCsv('"stripeCustomerId","stripePaymentMethodId","note, extra","email"\n"cus_1","pm_1","x, y","a@example.com"');
+    expect(r.errors).toEqual([]);
+    expect(r.rows).toEqual([{ stripeCustomerId: "cus_1", stripePaymentMethodId: "pm_1", email: "a@example.com" }]);
   });
 });

@@ -5,7 +5,8 @@ import type {
   ApplySavedCardMigrationMappingsBody,
   ConfirmStripeImportBody,
   GetSavedCardMigrationResponse,
-  SavedCardMigration
+  SavedCardMigration,
+  StartSavedCardMigrationBody
 } from "@fsm/types";
 
 import { api } from "@/src/lib/api";
@@ -43,6 +44,16 @@ export function useConfirmStripeImport(bundleId: string) {
         `/api/v1/migrate/onboarding/sessions/${bundleId}/saved-card-migration/confirm-stripe-import`,
         body
       ),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: key(bundleId) })
+  });
+}
+
+/** POST start (201, returns the migration object): creates the saved-card migration for this import. */
+export function useStartSavedCardMigration(bundleId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (body: StartSavedCardMigrationBody) =>
+      api.post<SavedCardMigration>(`/api/v1/migrate/onboarding/sessions/${bundleId}/saved-card-migration`, body),
     onSettled: () => queryClient.invalidateQueries({ queryKey: key(bundleId) })
   });
 }

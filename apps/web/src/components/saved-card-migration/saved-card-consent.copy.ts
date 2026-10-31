@@ -20,6 +20,8 @@ export const SAVED_CARD_APPLY_FAILED = "Mappings could not be applied.";
 
 export const SAVED_CARD_IMPORT_FAILED = "The import result could not be saved. Check the reference and rows, then try again.";
 
+export const SAVED_CARD_START_FAILED = "Saved-card migration could not be started. Check the details and try again.";
+
 export function isDraftConsent(consent: { text: string; version: string }): boolean {
   return /draft/i.test(consent.version) || consent.text.trim() === SAVED_CARD_CONSENT_LEGAL_DRAFT_TEXT;
 }

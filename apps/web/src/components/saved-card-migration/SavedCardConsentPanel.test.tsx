@@ -6,7 +6,8 @@ const state = vi.hoisted(() => ({
   role: "owner" as string,
   data: null as unknown,
   mutateAsync: vi.fn(),
-  confirmAsync: vi.fn()
+  confirmAsync: vi.fn(),
+  startAsync: vi.fn()
 }));
 
 vi.mock("@/src/stores/auth.store", () => ({
@@ -20,12 +21,13 @@ vi.mock("@/src/hooks/saved-card-migration.hooks", () => ({
     data: enabled ? state.data : undefined
   }),
   useApplySavedCardMappings: () => ({ mutateAsync: state.mutateAsync, isPending: false }),
-  useConfirmStripeImport: () => ({ mutateAsync: state.confirmAsync, isPending: false })
+  useConfirmStripeImport: () => ({ mutateAsync: state.confirmAsync, isPending: false }),
+  useStartSavedCardMigration: () => ({ mutateAsync: state.startAsync, isPending: false })
 }));
 
 import { ApiError } from "@/src/lib/api";
 import { SavedCardConsentPanel } from "./SavedCardConsentPanel";
-import { SAVED_CARD_APPLY_FAILED, SAVED_CARD_CONSENT_LEGAL_DRAFT_TEXT, SAVED_CARD_CONSENT_VERSION_MISMATCH } from "./saved-card-consent.copy";
+import { SAVED_CARD_APPLY_FAILED, SAVED_CARD_START_FAILED, SAVED_CARD_CONSENT_LEGAL_DRAFT_TEXT, SAVED_CARD_CONSENT_VERSION_MISMATCH } from "./saved-card-consent.copy";
 
 const uuid = "11111111-1111-4111-8111-111111111111";
 const migration = {
@@ -88,6 +90,37 @@ describe("SavedCardConsentPanel", () => {
     fireEvent.click(screen.getByRole("checkbox"));
     fireEvent.click(screen.getByRole("button", { name: /Apply/ }));
     expect((await screen.findByRole("alert")).textContent).toBe(SAVED_CARD_CONSENT_VERSION_MISMATCH);
+  });
+
+  it("null migration -> start form -> start -> import form", async () => {
+    const started = { ...migration, status: "awaiting_stripe_import", stripeImportReference: null, customerMappings: [], mappingSummary: { matched: 0, unmatched: 0, failed: 0, total: 0 } };
+    state.data = { migration: null, consent: { text: "API consent text verbatim.", version: "v1-draft" } };
+    state.startAsync = vi.fn().mockImplementation(async () => {
+      state.data = { migration: started, consent: { text: "API consent text verbatim.", version: "v1-draft" } };
+      return started;
+    });
+    const { rerender } = render(<SavedCardConsentPanel bundleId={uuid} />);
+    expect(screen.queryByRole("form", { name: "Stripe import result" })).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Start saved-card migration" }));
+    expect((await screen.findByRole("alert")).textContent).toMatch(/previous payment processor/);
+    expect(state.startAsync).not.toHaveBeenCalled();
+    fireEvent.change(screen.getByLabelText("Previous payment processor"), { target: { value: "  Prior processor  " } });
+    fireEvent.change(screen.getByLabelText("Stripe import reference (optional)"), { target: { value: "imp_9" } });
+    fireEvent.click(screen.getByRole("button", { name: "Start saved-card migration" }));
+    await waitFor(() => expect(state.startAsync).toHaveBeenCalledWith({ priorProcessorName: "Prior processor", stripeImportReference: "imp_9" }));
+    rerender(<SavedCardConsentPanel bundleId={uuid} />);
+    expect(screen.getByRole("form", { name: "Stripe import result" })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Start saved-card migration" })).toBeNull();
+  });
+
+  it("start omits an empty reference and shows generic copy on failure", async () => {
+    state.data = { migration: null, consent: { text: "x", version: "v1-draft" } };
+    state.startAsync = vi.fn().mockRejectedValue(new ApiError(409, { error: "CONFLICT", message: "raw detail" } as never));
+    render(<SavedCardConsentPanel bundleId={uuid} />);
+    fireEvent.change(screen.getByLabelText("Previous payment processor"), { target: { value: "Prior" } });
+    fireEvent.click(screen.getByRole("button", { name: "Start saved-card migration" }));
+    expect((await screen.findByRole("alert")).textContent).toBe(SAVED_CARD_START_FAILED);
+    expect(state.startAsync).toHaveBeenCalledWith({ priorProcessorName: "Prior" });
   });
 
   it("renders nothing for non owner/admin roles", () => {

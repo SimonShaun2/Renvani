@@ -163,4 +163,124 @@ describe("operator inbox command-center fields", () => {
     expect(mapper.formatProposalNumber(7)).toBe("P-0007");
     expect(mapper.formatProposalNumber(12345)).toBe("P-12345");
   });
+
+  it("returns correct proposal numbers via a bounded lookup with many actions", async () => {
+    const company = fakeDb.seedCompany({ name: "Many Co", slug: "many-co" });
+    const other = fakeDb.seedCompany({ name: "Other Co", slug: "other-co" });
+    const base = Date.UTC(2026, 0, 1);
+    const mine: Array<{ id: string }> = [];
+    for (let i = 0; i < 60; i += 1) {
+      mine.push(seedAction(company.id, "succeeded", {}, new Date(base + i * 60_000)));
+      seedAction(other.id, "succeeded", {}, new Date(base + i * 60_000 + 1));
+    }
+    // Same createdAt tie: ordered by id, both still numbered.
+    const tieA = seedAction(company.id, "awaiting_approval", {}, new Date(base + 999 * 60_000));
+    const tieB = seedAction(company.id, "awaiting_approval", {}, new Date(base + 999 * 60_000));
+    const [lo, hi] = [tieA, tieB].sort((a, b) => (a.id < b.id ? -1 : 1));
+
+    const target = mine[41]!;
+    const selectSpy = vi.spyOn(fakeDb.db, "select");
+    const one = await inbox.loadProposalSequences(company.id, [target.id]);
+    expect(one.get(target.id)).toBe(42);
+
+    // Bounded: target lookup + one COUNT + a window, never a full tenant id list.
+    expect(selectSpy).toHaveBeenCalledTimes(3);
+    expect(selectSpy.mock.calls[1]?.[0]).toEqual({ value: expect.anything() });
+    selectSpy.mockRestore();
+
+    const many = await inbox.loadProposalSequences(company.id, [lo!.id, hi!.id, mine[0]!.id]);
+    expect(many.get(mine[0]!.id)).toBe(1);
+    expect(many.get(lo!.id)).toBe(61);
+    expect(many.get(hi!.id)).toBe(62);
+
+    const item = await inbox.getOperatorInboxItem(company.id, target.id);
+    expect(item.proposalNumber).toBe("P-0042");
+  });
+
+  it("numbers proposals whose created_at has sub-millisecond precision (Postgres microseconds)", async () => {
+    // Models a timestamp column with microseconds: comparisons (valueOf) see the fraction, while the
+    // value the driver hands back to JS (getTime) is millisecond-truncated.
+    class MicroDate extends Date {
+      constructor(ms: number, private readonly micros: number) {
+        super(ms);
+      }
+      override valueOf(): number {
+        return super.getTime() + this.micros / 1000;
+      }
+    }
+    const company = fakeDb.seedCompany({ name: "Micro Co", slug: "micro-co" });
+    const base = Date.UTC(2026, 2, 1);
+    const early = seedAction(company.id, "succeeded", {}, new MicroDate(base - 5, 900) as Date);
+    const sameMsA = seedAction(company.id, "succeeded", {}, new MicroDate(base, 100) as Date);
+    const sameMsB = seedAction(company.id, "awaiting_approval", {}, new MicroDate(base, 600) as Date);
+    const later = seedAction(company.id, "awaiting_approval", {}, new MicroDate(base + 3, 999) as Date);
+    const ordered = [sameMsA, sameMsB].sort((a, b) => (a.id < b.id ? -1 : 1));
+
+    for (const row of [early, ...ordered, later]) {
+      const single = await inbox.loadProposalSequences(company.id, [row.id]);
+      expect(single.get(row.id)).toBeDefined();
+    }
+    const all = await inbox.loadProposalSequences(company.id, [later.id, sameMsB.id, sameMsA.id, early.id]);
+    expect(all.get(early.id)).toBe(1);
+    expect(all.get(ordered[0]!.id)).toBe(2);
+    expect(all.get(ordered[1]!.id)).toBe(3);
+    expect(all.get(later.id)).toBe(4);
+    // Same-ms rows are numbered in the window (not the prefix), so single lookups agree with batch ones.
+    expect((await inbox.loadProposalSequences(company.id, [ordered[1]!.id])).get(ordered[1]!.id)).toBe(3);
+    expect((await inbox.loadProposalSequences(company.id, [later.id])).get(later.id)).toBe(4);
+  });
+
+  it("never numbers another tenant's proposal", async () => {
+    const a = fakeDb.seedCompany({ name: "A Co", slug: "a-co-n" });
+    const b = fakeDb.seedCompany({ name: "B Co", slug: "b-co-n" });
+    seedAction(a.id, "succeeded", {}, new Date("2026-01-01T00:00:00Z"));
+    const foreign = seedAction(b.id, "awaiting_approval", {}, new Date("2026-01-02T00:00:00Z"));
+    const seqs = await inbox.loadProposalSequences(a.id, [foreign.id]);
+    expect(seqs.size).toBe(0);
+    expect((await inbox.loadProposalSequences(b.id, [foreign.id])).get(foreign.id)).toBe(1);
+  });
+});
+
+describe("escalate audit event (#287 nit)", () => {
+  it("emits an agent_action audit event in the escalate transaction, ids only", async () => {
+    const company = fakeDb.seedCompany({ name: "Aud Co", slug: "aud-co" });
+    const other = fakeDb.seedCompany({ name: "Aud Other", slug: "aud-other" });
+    const action = seedAction(company.id, "awaiting_approval");
+    await escalation.escalateAgentAction(company.id, action.id, "00000000-0000-4000-8000-0000000000aa", {
+      reason: "Customer phone 555-0100 looks wrong"
+    });
+
+    const events = fakeDb.getTestState().activityEvents.filter(
+      (event) => event.entityType === "agent_action" && event.entityId === action.id
+    );
+    expect(events).toHaveLength(1);
+    const event = events[0]!;
+    expect(event).toMatchObject({
+      companyId: company.id,
+      eventType: "agent.proposal_rejected",
+      actorId: "00000000-0000-4000-8000-0000000000aa",
+      actorType: "user",
+      summary: "Agent proposal escalated"
+    });
+    expect(event.payload).toMatchObject({
+      outcome: "escalated",
+      previousState: "awaiting_approval",
+      hasReason: true,
+      audit: expect.objectContaining({ lifecycle: "proposal_rejected", agentActionId: action.id })
+    });
+    expect(JSON.stringify(event.payload)).not.toContain("555-0100");
+    expect(fakeDb.getTestState().activityEvents.some((e) => e.companyId === other.id)).toBe(false);
+
+    const timeline = await inbox.getOperatorInboxTimeline(company.id, action.id);
+    expect(timeline.filter((entry) => entry.kind === "agent.proposal_escalated")).toHaveLength(1);
+  });
+
+  it("emits no event when escalation is refused", async () => {
+    const company = fakeDb.seedCompany({ name: "Ref Co", slug: "ref-co" });
+    const done = seedAction(company.id, "succeeded");
+    await expect(escalation.escalateAgentAction(company.id, done.id, "user-1")).rejects.toMatchObject({
+      code: ErrorCode.CONFLICT
+    });
+    expect(fakeDb.getTestState().activityEvents.filter((e) => e.entityId === done.id)).toHaveLength(0);
+  });
 });

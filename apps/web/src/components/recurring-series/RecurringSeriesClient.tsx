@@ -224,7 +224,7 @@ export function RecurringSeriesClient({ seriesId, now }: Props) {
                 {o.jobId ? (
                   <>
                     {" · "}
-                    <Link className="underline" href={`/jobs/${o.jobId}`}>
+                    <Link className="inline-flex min-h-11 items-center underline" href={`/jobs/${o.jobId}`}>
                       Has a job — change it from the job
                     </Link>
                   </>
@@ -245,7 +245,7 @@ export function RecurringSeriesClient({ seriesId, now }: Props) {
     <div className="space-y-6">
       {/* Figma 364:4217 page header + context row. */}
       <header className="space-y-2">
-        <Link href="/service-agreements" className="inline-flex items-center gap-2 text-sm font-semibold text-[#2b4acb]">
+        <Link href="/service-agreements" className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-[#2b4acb]">
           <ArrowLeft className="h-4 w-4" />
           Back to Agreements
         </Link>

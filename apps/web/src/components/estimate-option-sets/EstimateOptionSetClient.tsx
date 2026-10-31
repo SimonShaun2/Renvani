@@ -113,7 +113,7 @@ export function EstimateOptionSetClient({ tierGroupId }: Props) {
       <header className="space-y-2">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-[#2b4acb]">Estimate options</p>
-          <Link href={options[0] ? `/estimates/${options[0].estimateId}` : "/estimates"} className="text-sm font-semibold text-[#2b4acb]">
+          <Link href={options[0] ? `/estimates/${options[0].estimateId}` : "/estimates"} className="inline-flex min-h-11 items-center text-sm font-semibold text-[#2b4acb]">
             ← Back to estimate
           </Link>
         </div>

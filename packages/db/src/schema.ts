@@ -2725,6 +2725,89 @@ export const growthCheckFindingRevisions = pgTable(
   })
 );
 
+/** FS-57 Growth Check owner report drafts (one per scan; content versioned via append-only revisions). */
+export const growthCheckReportDrafts = pgTable(
+  "growth_check_report_drafts",
+  {
+    id: id(),
+    companyId: companyId(),
+    scanId: uuid("scan_id")
+      .notNull()
+      .references(() => growthCheckScans.id, { onDelete: "cascade" }),
+    version: integer("version").notNull().default(1),
+    content: jsonb("content").notNull(),
+    approvedVersion: integer("approved_version"),
+    approvedByUserId: uuid("approved_by_user_id").references(() => users.id, { onDelete: "set null" }),
+    approvedAt: timestamp("approved_at"),
+    createdByUserId: uuid("created_by_user_id").references(() => users.id, { onDelete: "set null" }),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  },
+  (t) => ({
+    companyIdx: index("growth_check_report_drafts_company_idx").on(t.companyId),
+    companyScanUnique: uniqueIndex("growth_check_report_drafts_company_scan_idx").on(t.companyId, t.scanId),
+  })
+);
+
+export const growthCheckReportDraftRevisions = pgTable(
+  "growth_check_report_draft_revisions",
+  {
+    id: id(),
+    companyId: companyId(),
+    draftId: uuid("draft_id")
+      .notNull()
+      .references(() => growthCheckReportDrafts.id, { onDelete: "cascade" }),
+    version: integer("version").notNull(),
+    action: varchar("action", { length: 64 }).notNull(),
+    actorUserId: uuid("actor_user_id").references(() => users.id, { onDelete: "set null" }),
+    previousContent: jsonb("previous_content"),
+    nextContent: jsonb("next_content").notNull(),
+    idempotencyKey: varchar("idempotency_key", { length: 128 }).notNull(),
+    payloadHash: varchar("payload_hash", { length: 64 }).notNull(),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+  },
+  (t) => ({
+    companyIdx: index("growth_check_report_draft_revisions_company_idx").on(t.companyId),
+    draftVersionUnique: uniqueIndex("growth_check_report_draft_revisions_draft_version_idx").on(t.draftId, t.version),
+    companyIdempotencyUnique: uniqueIndex("growth_check_report_draft_revisions_company_idempotency_idx").on(
+      t.companyId,
+      t.idempotencyKey
+    ),
+  })
+);
+
+/** FS-57 share snapshots: frozen approved content + hash; raw token never stored (sha256 only). */
+export const growthCheckReportShares = pgTable(
+  "growth_check_report_shares",
+  {
+    id: id(),
+    companyId: companyId(),
+    draftId: uuid("draft_id")
+      .notNull()
+      .references(() => growthCheckReportDrafts.id, { onDelete: "cascade" }),
+    draftVersion: integer("draft_version").notNull(),
+    contentHash: varchar("content_hash", { length: 64 }).notNull(),
+    snapshot: jsonb("snapshot").notNull(),
+    tokenHash: varchar("token_hash", { length: 64 }).notNull(),
+    createdByUserId: uuid("created_by_user_id").references(() => users.id, { onDelete: "set null" }),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    expiresAt: timestamp("expires_at"),
+    revokedAt: timestamp("revoked_at"),
+    revokedByUserId: uuid("revoked_by_user_id").references(() => users.id, { onDelete: "set null" }),
+    idempotencyKey: varchar("idempotency_key", { length: 128 }).notNull(),
+    payloadHash: varchar("payload_hash", { length: 64 }).notNull(),
+  },
+  (t) => ({
+    companyIdx: index("growth_check_report_shares_company_idx").on(t.companyId),
+    draftIdx: index("growth_check_report_shares_draft_idx").on(t.draftId),
+    tokenHashUnique: uniqueIndex("growth_check_report_shares_token_hash_idx").on(t.tokenHash),
+    companyIdempotencyUnique: uniqueIndex("growth_check_report_shares_company_idempotency_idx").on(
+      t.companyId,
+      t.idempotencyKey
+    ),
+  })
+);
+
 // ─────────────────────────────────────────────
 // RELATIONS
 // ─────────────────────────────────────────────

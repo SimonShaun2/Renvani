@@ -11,13 +11,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
    "k": [
     {
      "t": "div",
-     "c": "bg-[#fbf6ef] flex flex-col gap-[32px] items-start p-[80px] relative w-full",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[32px] items-start p-[80px] relative w-[1440px] shrink-0",
      "n": "A job in motion",
      "id": "217:6310",
      "k": [
       {
        "t": "p",
-       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[1280px] shrink-0",
        "id": "217:6311",
        "k": [
         "PRODUCT TOUR · EXAMPLE HVAC JOB"
@@ -25,7 +25,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
       },
       {
        "t": "h1",
-       "c": "font-semibold relative text-[58px] text-[color:#0f1530] tracking-[-1.45px] w-full",
+       "c": "font-semibold relative text-[58px] text-[color:#0f1530] tracking-[-1.45px] w-[1280px] shrink-0",
        "id": "217:6312",
        "k": [
         {
@@ -46,7 +46,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
       },
       {
        "t": "div",
-       "c": "flex gap-[48px] items-start relative w-full",
+       "c": "flex gap-[48px] items-start relative w-[1280px] shrink-0",
        "n": "Interactive product tour",
        "id": "217:6313",
        "k": [
@@ -58,13 +58,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
          "k": [
           {
            "t": "div",
-           "c": "bg-[#0f1530] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-full",
+           "c": "bg-[#0f1530] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-[280px] shrink-0",
            "n": "Select / 01  Book direct",
            "id": "217:6315",
            "k": [
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] flex-1 min-w-0",
+             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] w-[254px] shrink-0",
              "id": "217:6316",
              "k": [
               "01 Book direct"
@@ -76,13 +76,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
           },
           {
            "t": "div",
-           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-full",
+           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-[280px] shrink-0",
            "n": "Select / 02  Approve the work",
            "id": "217:6317",
            "k": [
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left flex-1 min-w-0",
+             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left w-[254px] shrink-0",
              "id": "217:6318",
              "k": [
               "02 Approve the work"
@@ -93,13 +93,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
           },
           {
            "t": "div",
-           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-full",
+           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-[280px] shrink-0",
            "n": "Select / 03  Plan the day",
            "id": "217:6319",
            "k": [
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left flex-1 min-w-0",
+             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left w-[254px] shrink-0",
              "id": "217:6320",
              "k": [
               "03 Plan the day"
@@ -110,13 +110,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
           },
           {
            "t": "div",
-           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-full",
+           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-[280px] shrink-0",
            "n": "Select / 04  Complete the visit",
            "id": "217:6321",
            "k": [
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left flex-1 min-w-0",
+             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left w-[254px] shrink-0",
              "id": "217:6322",
              "k": [
               "04 Complete the visit"
@@ -127,13 +127,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
           },
           {
            "t": "div",
-           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-full",
+           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-[280px] shrink-0",
            "n": "Select / 05  Get paid",
            "id": "217:6323",
            "k": [
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left flex-1 min-w-0",
+             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left w-[254px] shrink-0",
              "id": "217:6324",
              "k": [
               "05 Get paid"
@@ -144,13 +144,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
           },
           {
            "t": "div",
-           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-full",
+           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-[280px] shrink-0",
            "n": "Select / 06  Bring them back",
            "id": "217:6325",
            "k": [
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left flex-1 min-w-0",
+             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left w-[254px] shrink-0",
              "id": "217:6326",
              "k": [
               "06 Bring them back"
@@ -163,19 +163,19 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
         },
         {
          "t": "div",
-         "c": "flex flex-col gap-[24px] items-start relative flex-1 min-w-0",
+         "c": "flex flex-col gap-[24px] items-start relative w-[952px] shrink-0",
          "n": "Product tour viewport",
          "id": "217:6327",
          "k": [
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] border-[1.322px] border-[#e6dccb] border-solid flex flex-col h-[645.244px] items-start overflow-clip relative rounded-[21.156px] w-full",
+           "c": "bg-[#f6f7f9] border-[1.322px] border-[#e6dccb] border-solid flex flex-col h-[645.244px] items-start overflow-clip relative rounded-[21.156px] w-[952px] shrink-0",
            "n": "Marketing visual / booking",
            "id": "217:6328",
            "k": [
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex gap-[21.156px] h-[71.4px] items-center p-[21.156px] relative w-full",
+             "c": "bg-[#0f1530] flex gap-[21.156px] h-[71.4px] items-center p-[21.156px] relative w-[952px] shrink-0",
              "n": "Product chrome",
              "id": "I217:6328;200:48",
              "k": [
@@ -189,7 +189,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
               },
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[15.87px] text-[color:#fff] flex-1 min-w-0",
+               "c": "font-medium leading-[1.38] relative text-[15.87px] text-[color:#fff] w-[547.4px] shrink-0",
                "id": "I217:6328;200:50",
                "k": [
                 "Online booking"
@@ -215,19 +215,19 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
             },
             {
              "t": "div",
-             "c": "bg-[#f6f7f9] flex flex-col gap-[21.156px] items-start p-[31.733px] relative w-full",
+             "c": "bg-[#f6f7f9] flex flex-col gap-[21.156px] items-start p-[31.733px] relative w-[952px] shrink-0",
              "n": "Product workspace",
              "id": "I217:6328;200:53",
              "k": [
               {
                "t": "div",
-               "c": "flex gap-[21.156px] items-start relative w-full",
+               "c": "flex gap-[21.156px] items-start relative w-[888.533px] shrink-0",
                "n": "Screen title",
                "id": "I217:6328;200:54",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-semibold leading-[1.38] relative text-[30.41px] text-[color:#0f1530] flex-1 min-w-0",
+                 "c": "font-semibold leading-[1.38] relative text-[30.41px] text-[color:#0f1530] w-[608.222px] shrink-0",
                  "id": "I217:6328;200:55",
                  "k": [
                   "Online booking"
@@ -253,19 +253,19 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
               },
               {
                "t": "div",
-               "c": "flex gap-[26.444px] items-start relative w-full",
+               "c": "flex gap-[26.444px] items-start relative w-[888.533px] shrink-0",
                "n": "Branded website and booking",
                "id": "I217:6328;200:58",
                "k": [
                 {
                  "t": "div",
-                 "c": "flex flex-col gap-[15.867px] items-start relative flex-1 min-w-0",
+                 "c": "flex flex-col gap-[15.867px] items-start relative w-[378.156px] shrink-0",
                  "n": "Business website",
                  "id": "I217:6328;200:59",
                  "k": [
                   {
                    "t": "div",
-                   "c": "h-[222.133px] relative rounded-[21.156px] w-full",
+                   "c": "h-[222.133px] relative rounded-[21.156px] w-[378.156px] shrink-0",
                    "n": "Trade work on the customer website",
                    "id": "I217:6328;200:60",
                    "k": [
@@ -278,7 +278,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                   },
                   {
                    "t": "p",
-                   "c": "font-bold leading-[1.38] relative text-[34.38px] text-[color:#0f1530] w-full",
+                   "c": "font-bold leading-[1.38] relative text-[34.38px] text-[color:#0f1530] w-[378.156px] shrink-0",
                    "id": "I217:6328;200:61",
                    "k": [
                     "Juniper"
@@ -286,7 +286,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                   },
                   {
                    "t": "p",
-                   "c": "font-normal leading-[1.38] relative text-[15.87px] text-[color:#2a3360] w-full",
+                   "c": "font-normal leading-[1.38] relative text-[15.87px] text-[color:#2a3360] w-[378.156px] shrink-0",
                    "id": "I217:6328;200:62",
                    "k": [
                     "Heating & Plumbing"
@@ -294,7 +294,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                   },
                   {
                    "t": "p",
-                   "c": "font-semibold leading-[1.38] relative text-[26.44px] text-[color:#0f1530] w-full",
+                   "c": "font-semibold leading-[1.38] relative text-[26.44px] text-[color:#0f1530] w-[378.156px] shrink-0",
                    "id": "I217:6328;200:63",
                    "k": [
                     "Comfort starts at home."
@@ -302,13 +302,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                   },
                   {
                    "t": "div",
-                   "c": "bg-[#fff] flex h-[35.7px] items-center px-[13.222px] relative rounded-[15.867px] w-full",
+                   "c": "bg-[#fff] flex h-[35.7px] items-center px-[13.222px] relative rounded-[15.867px] w-[290.889px] shrink-0",
                    "n": "Status / Tulsa + surrounding areas",
                    "id": "I217:6328;200:64",
                    "k": [
                     {
                      "t": "p",
-                     "c": "font-medium leading-[1.38] relative text-[13.22px] text-[color:#2a3360] flex-1 min-w-0",
+                     "c": "font-medium leading-[1.38] relative text-[13.22px] text-[color:#2a3360] w-[264.444px] shrink-0",
                      "id": "I217:6328;200:65",
                      "k": [
                       "Tulsa + surrounding areas"
@@ -320,13 +320,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#fff] border-[1.322px] border-[#e6dccb] border-solid flex flex-col gap-[18.511px] items-start p-[26.444px] relative rounded-[21.156px] flex-1 min-w-0",
+                 "c": "bg-[#fff] border-[1.322px] border-[#e6dccb] border-solid flex flex-col gap-[18.511px] items-start p-[26.444px] relative rounded-[21.156px] w-[483.933px] shrink-0",
                  "n": "Book a visit",
                  "id": "I217:6328;200:66",
                  "k": [
                   {
                    "t": "p",
-                   "c": "font-semibold leading-[1.38] relative text-[27.77px] text-[color:#0f1530] w-full",
+                   "c": "font-semibold leading-[1.38] relative text-[27.77px] text-[color:#0f1530] w-[431.044px] shrink-0",
                    "id": "I217:6328;200:67",
                    "k": [
                     "Book a visit"
@@ -334,7 +334,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                   },
                   {
                    "t": "p",
-                   "c": "font-normal leading-[1.38] relative text-[15.87px] text-[color:#2a3360] w-full",
+                   "c": "font-normal leading-[1.38] relative text-[15.87px] text-[color:#2a3360] w-[431.044px] shrink-0",
                    "id": "I217:6328;200:68",
                    "k": [
                     "Choose your service"
@@ -342,13 +342,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                   },
                   {
                    "t": "div",
-                   "c": "bg-[#fff4d6] flex font-medium gap-[15.867px] items-start leading-[1.38] p-[15.867px] relative rounded-[15.867px] text-[17.19px] text-[color:#0f1530] w-full",
+                   "c": "bg-[#fff4d6] flex font-medium gap-[15.867px] items-start leading-[1.38] p-[15.867px] relative rounded-[15.867px] text-[17.19px] text-[color:#0f1530] w-[431.044px] shrink-0",
                    "n": "AC tune-up",
                    "id": "I217:6328;200:69",
                    "k": [
                     {
                      "t": "p",
-                     "c": "relative flex-1 min-w-0",
+                     "c": "relative w-[317.333px] shrink-0",
                      "id": "I217:6328;200:70",
                      "k": [
                       "AC tune-up"
@@ -366,13 +366,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                   },
                   {
                    "t": "div",
-                   "c": "bg-[#f6f7f9] flex font-medium gap-[15.867px] items-start leading-[1.38] p-[15.867px] relative rounded-[15.867px] text-[17.19px] text-[color:#0f1530] w-full",
+                   "c": "bg-[#f6f7f9] flex font-medium gap-[15.867px] items-start leading-[1.38] p-[15.867px] relative rounded-[15.867px] text-[17.19px] text-[color:#0f1530] w-[431.044px] shrink-0",
                    "n": "Plumbing diagnostic",
                    "id": "I217:6328;200:72",
                    "k": [
                     {
                      "t": "p",
-                     "c": "relative flex-1 min-w-0",
+                     "c": "relative w-[317.333px] shrink-0",
                      "id": "I217:6328;200:73",
                      "k": [
                       "Plumbing diagnostic"
@@ -390,7 +390,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                   },
                   {
                    "t": "p",
-                   "c": "font-medium leading-[1.38] relative text-[15.87px] text-[color:#0f1530] w-full",
+                   "c": "font-medium leading-[1.38] relative text-[15.87px] text-[color:#0f1530] w-[431.044px] shrink-0",
                    "id": "I217:6328;200:75",
                    "k": [
                     "Thursday, October 29"
@@ -398,7 +398,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                   },
                   {
                    "t": "div",
-                   "c": "flex gap-[13.222px] items-start relative w-full",
+                   "c": "flex gap-[13.222px] items-start relative w-[431.044px] shrink-0",
                    "n": "Available visits",
                    "id": "I217:6328;200:76",
                    "k": [
@@ -438,13 +438,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                   },
                   {
                    "t": "div",
-                   "c": "bg-[#f6b400] flex h-[50.244px] items-center justify-center px-[18.511px] relative rounded-[15.867px] w-full",
+                   "c": "bg-[#f6b400] flex h-[50.244px] items-center justify-center px-[18.511px] relative rounded-[15.867px] w-[431.044px] shrink-0",
                    "n": "UI action / Request this visit",
                    "id": "I217:6328;200:81",
                    "k": [
                     {
                      "t": "p",
-                     "c": "font-medium leading-[1.38] relative text-[15.87px] text-[color:#0f1530] text-center flex-1 min-w-0",
+                     "c": "font-medium leading-[1.38] relative text-[15.87px] text-[color:#0f1530] text-center w-[394.022px] shrink-0",
                      "id": "I217:6328;200:82",
                      "k": [
                       "Request this visit"
@@ -462,7 +462,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
           },
           {
            "t": "div",
-           "c": "flex gap-[16px] items-start relative w-full",
+           "c": "flex gap-[16px] items-start relative w-[952px] shrink-0",
            "n": "Tour navigation",
            "id": "217:6329",
            "k": [
@@ -477,7 +477,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
           },
           {
            "t": "div",
-           "c": "block font-medium relative text-[13px] text-[color:#2a3360] w-full",
+           "c": "block font-medium relative text-[13px] text-[color:#2a3360] w-[952px] shrink-0",
            "id": "217:6331",
            "k": [
             {
@@ -561,7 +561,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
           },
           {
            "t": "p",
-           "c": "font-semibold relative text-[18px] text-[color:#0f1530] flex-1 min-w-0",
+           "c": "font-semibold relative text-[18px] text-[color:#0f1530] w-[250px] shrink-0",
            "id": "217:6341",
            "k": [
             "Book direct"
@@ -780,13 +780,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
    "k": [
     {
      "t": "div",
-     "c": "bg-[#fbf6ef] flex flex-col gap-[32px] items-start p-[80px] relative w-full",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[32px] items-start p-[80px] relative w-[1440px] shrink-0",
      "n": "A job in motion",
      "id": "204:9953",
      "k": [
       {
        "t": "p",
-       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[1280px] shrink-0",
        "id": "204:9954",
        "k": [
         "PRODUCT TOUR · EXAMPLE HVAC JOB"
@@ -794,7 +794,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
       },
       {
        "t": "h1",
-       "c": "font-semibold relative text-[58px] text-[color:#0f1530] tracking-[-1.45px] w-full",
+       "c": "font-semibold relative text-[58px] text-[color:#0f1530] tracking-[-1.45px] w-[1280px] shrink-0",
        "id": "204:9955",
        "k": [
         {
@@ -815,7 +815,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
       },
       {
        "t": "div",
-       "c": "flex gap-[48px] items-start relative w-full",
+       "c": "flex gap-[48px] items-start relative w-[1280px] shrink-0",
        "n": "Interactive product tour",
        "id": "204:9956",
        "k": [
@@ -827,13 +827,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
          "k": [
           {
            "t": "div",
-           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-full",
+           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-[280px] shrink-0",
            "n": "Select / 01  Book direct",
            "id": "204:9958",
            "k": [
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left flex-1 min-w-0",
+             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left w-[254px] shrink-0",
              "id": "204:9959",
              "k": [
               "01 Book direct"
@@ -844,13 +844,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
           },
           {
            "t": "div",
-           "c": "bg-[#0f1530] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-full",
+           "c": "bg-[#0f1530] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-[280px] shrink-0",
            "n": "Select / 02  Approve the work",
            "id": "204:9960",
            "k": [
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] flex-1 min-w-0",
+             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] w-[254px] shrink-0",
              "id": "204:9961",
              "k": [
               "02 Approve the work"
@@ -862,13 +862,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
           },
           {
            "t": "div",
-           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-full",
+           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-[280px] shrink-0",
            "n": "Select / 03  Plan the day",
            "id": "204:9962",
            "k": [
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left flex-1 min-w-0",
+             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left w-[254px] shrink-0",
              "id": "204:9963",
              "k": [
               "03 Plan the day"
@@ -879,13 +879,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
           },
           {
            "t": "div",
-           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-full",
+           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-[280px] shrink-0",
            "n": "Select / 04  Complete the visit",
            "id": "204:9964",
            "k": [
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left flex-1 min-w-0",
+             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left w-[254px] shrink-0",
              "id": "204:9965",
              "k": [
               "04 Complete the visit"
@@ -896,13 +896,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
           },
           {
            "t": "div",
-           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-full",
+           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-[280px] shrink-0",
            "n": "Select / 05  Get paid",
            "id": "204:9966",
            "k": [
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left flex-1 min-w-0",
+             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left w-[254px] shrink-0",
              "id": "204:9967",
              "k": [
               "05 Get paid"
@@ -913,13 +913,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
           },
           {
            "t": "div",
-           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-full",
+           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-[280px] shrink-0",
            "n": "Select / 06  Bring them back",
            "id": "204:9968",
            "k": [
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left flex-1 min-w-0",
+             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left w-[254px] shrink-0",
              "id": "204:9969",
              "k": [
               "06 Bring them back"
@@ -932,19 +932,19 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
         },
         {
          "t": "div",
-         "c": "flex flex-col gap-[24px] items-start relative flex-1 min-w-0",
+         "c": "flex flex-col gap-[24px] items-start relative w-[952px] shrink-0",
          "n": "Product tour viewport",
          "id": "204:9970",
          "k": [
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] border-[1.322px] border-[#e6dccb] border-solid flex flex-col h-[635.989px] items-start overflow-clip relative rounded-[21.156px] w-full",
+           "c": "bg-[#f6f7f9] border-[1.322px] border-[#e6dccb] border-solid flex flex-col h-[635.989px] items-start overflow-clip relative rounded-[21.156px] w-[952px] shrink-0",
            "n": "Marketing visual / estimate",
            "id": "204:9971",
            "k": [
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex gap-[21.156px] h-[71.4px] items-center p-[21.156px] relative w-full",
+             "c": "bg-[#0f1530] flex gap-[21.156px] h-[71.4px] items-center p-[21.156px] relative w-[952px] shrink-0",
              "n": "Product chrome",
              "id": "I204:9971;200:85",
              "k": [
@@ -958,7 +958,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
               },
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[15.87px] text-[color:#fff] flex-1 min-w-0",
+               "c": "font-medium leading-[1.38] relative text-[15.87px] text-[color:#fff] w-[547.4px] shrink-0",
                "id": "I204:9971;200:87",
                "k": [
                 "Estimates"
@@ -984,19 +984,19 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
             },
             {
              "t": "div",
-             "c": "bg-[#f6f7f9] flex flex-col gap-[21.156px] items-start p-[31.733px] relative w-full",
+             "c": "bg-[#f6f7f9] flex flex-col gap-[21.156px] items-start p-[31.733px] relative w-[952px] shrink-0",
              "n": "Product workspace",
              "id": "I204:9971;200:90",
              "k": [
               {
                "t": "div",
-               "c": "flex gap-[21.156px] items-start relative w-full",
+               "c": "flex gap-[21.156px] items-start relative w-[888.533px] shrink-0",
                "n": "Screen title",
                "id": "I204:9971;200:91",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-semibold leading-[1.38] relative text-[30.41px] text-[color:#0f1530] flex-1 min-w-0",
+                 "c": "font-semibold leading-[1.38] relative text-[30.41px] text-[color:#0f1530] w-[608.222px] shrink-0",
                  "id": "I204:9971;200:92",
                  "k": [
                   "Estimates"
@@ -1022,19 +1022,19 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
               },
               {
                "t": "div",
-               "c": "flex gap-[26.444px] items-start relative w-full",
+               "c": "flex gap-[26.444px] items-start relative w-[888.533px] shrink-0",
                "n": "Document and customer status",
                "id": "I204:9971;200:95",
                "k": [
                 {
                  "t": "div",
-                 "c": "bg-[#fff] border-[1.322px] border-[#e6dccb] border-solid flex flex-col gap-[18.511px] items-start p-[26.444px] relative rounded-[21.156px] flex-1 min-w-0",
+                 "c": "bg-[#fff] border-[1.322px] border-[#e6dccb] border-solid flex flex-col gap-[18.511px] items-start p-[26.444px] relative rounded-[21.156px] w-[505.089px] shrink-0",
                  "n": "Service document",
                  "id": "I204:9971;200:96",
                  "k": [
                   {
                    "t": "p",
-                   "c": "font-semibold leading-[1.38] relative text-[25.12px] text-[color:#0f1530] w-full",
+                   "c": "font-semibold leading-[1.38] relative text-[25.12px] text-[color:#0f1530] w-[452.2px] shrink-0",
                    "id": "I204:9971;200:97",
                    "k": [
                     "Estimate #2048"
@@ -1042,7 +1042,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                   },
                   {
                    "t": "p",
-                   "c": "font-normal leading-[1.38] relative text-[15.87px] text-[color:#2a3360] w-full",
+                   "c": "font-normal leading-[1.38] relative text-[15.87px] text-[color:#2a3360] w-[452.2px] shrink-0",
                    "id": "I204:9971;200:98",
                    "k": [
                     "Jordan Lee · AC diagnostic"
@@ -1050,19 +1050,19 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                   },
                   {
                    "t": "div",
-                   "c": "bg-[#e6dccb] h-[1.322px] relative w-full",
+                   "c": "bg-[#e6dccb] h-[1.322px] relative w-[452.2px] shrink-0",
                    "n": "Divider",
                    "id": "I204:9971;200:99"
                   },
                   {
                    "t": "div",
-                   "c": "flex gap-[13.222px] items-start leading-[1.38] relative text-[15.87px] w-full",
+                   "c": "flex gap-[13.222px] items-start leading-[1.38] relative text-[15.87px] w-[452.2px] shrink-0",
                    "n": "Field / Diagnostic visit",
                    "id": "I204:9971;200:100",
                    "k": [
                     {
                      "t": "p",
-                     "c": "font-normal relative text-[color:#2a3360] flex-1 min-w-0",
+                     "c": "font-normal relative text-[color:#2a3360] w-[248.578px] shrink-0",
                      "id": "I204:9971;200:101",
                      "k": [
                       "Diagnostic visit"
@@ -1080,13 +1080,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                   },
                   {
                    "t": "div",
-                   "c": "flex gap-[13.222px] items-start leading-[1.38] relative text-[15.87px] w-full",
+                   "c": "flex gap-[13.222px] items-start leading-[1.38] relative text-[15.87px] w-[452.2px] shrink-0",
                    "n": "Field / Capacitor replacement",
                    "id": "I204:9971;200:103",
                    "k": [
                     {
                      "t": "p",
-                     "c": "font-normal relative text-[color:#2a3360] flex-1 min-w-0",
+                     "c": "font-normal relative text-[color:#2a3360] w-[248.578px] shrink-0",
                      "id": "I204:9971;200:104",
                      "k": [
                       "Capacitor replacement"
@@ -1104,19 +1104,19 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                   },
                   {
                    "t": "div",
-                   "c": "bg-[#e6dccb] h-[1.322px] relative w-full",
+                   "c": "bg-[#e6dccb] h-[1.322px] relative w-[452.2px] shrink-0",
                    "n": "Divider",
                    "id": "I204:9971;200:106"
                   },
                   {
                    "t": "div",
-                   "c": "flex gap-[13.222px] items-start leading-[1.38] relative text-[15.87px] w-full",
+                   "c": "flex gap-[13.222px] items-start leading-[1.38] relative text-[15.87px] w-[452.2px] shrink-0",
                    "n": "Field / Service total",
                    "id": "I204:9971;200:107",
                    "k": [
                     {
                      "t": "p",
-                     "c": "font-normal relative text-[color:#2a3360] flex-1 min-w-0",
+                     "c": "font-normal relative text-[color:#2a3360] w-[248.578px] shrink-0",
                      "id": "I204:9971;200:108",
                      "k": [
                       "Service total"
@@ -1134,7 +1134,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                   },
                   {
                    "t": "div",
-                   "c": "bg-[#fff4d6] flex h-[35.7px] items-center px-[13.222px] relative rounded-[15.867px] w-full",
+                   "c": "bg-[#fff4d6] flex h-[35.7px] items-center px-[13.222px] relative rounded-[15.867px] w-[211.556px] shrink-0",
                    "n": "Status / Price book applied",
                    "id": "I204:9971;200:110",
                    "k": [
@@ -1150,13 +1150,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                   },
                   {
                    "t": "div",
-                   "c": "bg-[#0f1530] flex h-[50.244px] items-center justify-center px-[18.511px] relative rounded-[15.867px] w-full",
+                   "c": "bg-[#0f1530] flex h-[50.244px] items-center justify-center px-[18.511px] relative rounded-[15.867px] w-[452.2px] shrink-0",
                    "n": "UI action / Approve estimate",
                    "id": "I204:9971;200:112",
                    "k": [
                     {
                      "t": "p",
-                     "c": "font-medium leading-[1.38] relative text-[15.87px] text-[color:#fff] text-center flex-1 min-w-0",
+                     "c": "font-medium leading-[1.38] relative text-[15.87px] text-[color:#fff] text-center w-[415.178px] shrink-0",
                      "id": "I204:9971;200:113",
                      "k": [
                       "Approve estimate"
@@ -1168,19 +1168,19 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                 },
                 {
                  "t": "div",
-                 "c": "flex flex-col gap-[21.156px] items-start relative flex-1 min-w-0",
+                 "c": "flex flex-col gap-[21.156px] items-start relative w-[357px] shrink-0",
                  "n": "Approval and outcome",
                  "id": "I204:9971;200:114",
                  "k": [
                   {
                    "t": "div",
-                   "c": "bg-[#fff] border-[1.322px] border-[#e6dccb] border-solid flex flex-col gap-[18.511px] items-start p-[26.444px] relative rounded-[21.156px] w-full",
+                   "c": "bg-[#fff] border-[1.322px] border-[#e6dccb] border-solid flex flex-col gap-[18.511px] items-start p-[26.444px] relative rounded-[21.156px] w-[357px] shrink-0",
                    "n": "Status",
                    "id": "I204:9971;200:115",
                    "k": [
                     {
                      "t": "p",
-                     "c": "font-medium leading-[1.38] relative text-[14.54px] text-[color:#2a3360] tracking-[1.454px] w-full",
+                     "c": "font-medium leading-[1.38] relative text-[14.54px] text-[color:#2a3360] tracking-[1.454px] w-[304.111px] shrink-0",
                      "id": "I204:9971;200:116",
                      "k": [
                       "CUSTOMER VIEW"
@@ -1188,7 +1188,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                     },
                     {
                      "t": "p",
-                     "c": "font-semibold leading-[1.38] relative text-[31.73px] text-[color:#0f1530] w-full",
+                     "c": "font-semibold leading-[1.38] relative text-[31.73px] text-[color:#0f1530] w-[304.111px] shrink-0",
                      "id": "I204:9971;200:117",
                      "k": [
                       "Ready for a yes."
@@ -1196,7 +1196,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                     },
                     {
                      "t": "div",
-                     "c": "flex gap-[13.222px] items-start relative w-full",
+                     "c": "flex gap-[13.222px] items-start relative w-[304.111px] shrink-0",
                      "n": "Scope reviewed",
                      "id": "I204:9971;200:118",
                      "k": [
@@ -1215,7 +1215,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                       },
                       {
                        "t": "p",
-                       "c": "font-normal leading-[1.38] relative text-[15.87px] text-[color:#2a3360] flex-1 min-w-0",
+                       "c": "font-normal leading-[1.38] relative text-[15.87px] text-[color:#2a3360] w-[264.444px] shrink-0",
                        "id": "I204:9971;200:121",
                        "k": [
                         "Scope reviewed"
@@ -1225,7 +1225,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                     },
                     {
                      "t": "div",
-                     "c": "flex gap-[13.222px] items-start relative w-full",
+                     "c": "flex gap-[13.222px] items-start relative w-[304.111px] shrink-0",
                      "n": "Price confirmed",
                      "id": "I204:9971;200:122",
                      "k": [
@@ -1244,7 +1244,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                       },
                       {
                        "t": "p",
-                       "c": "font-normal leading-[1.38] relative text-[15.87px] text-[color:#2a3360] flex-1 min-w-0",
+                       "c": "font-normal leading-[1.38] relative text-[15.87px] text-[color:#2a3360] w-[264.444px] shrink-0",
                        "id": "I204:9971;200:125",
                        "k": [
                         "Price confirmed"
@@ -1254,7 +1254,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                     },
                     {
                      "t": "div",
-                     "c": "flex gap-[13.222px] items-start relative w-full",
+                     "c": "flex gap-[13.222px] items-start relative w-[304.111px] shrink-0",
                      "n": "Customer accepted",
                      "id": "I204:9971;200:126",
                      "k": [
@@ -1273,7 +1273,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                       },
                       {
                        "t": "p",
-                       "c": "font-normal leading-[1.38] relative text-[15.87px] text-[color:#2a3360] flex-1 min-w-0",
+                       "c": "font-normal leading-[1.38] relative text-[15.87px] text-[color:#2a3360] w-[264.444px] shrink-0",
                        "id": "I204:9971;200:129",
                        "k": [
                         "Customer accepted"
@@ -1283,7 +1283,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                     },
                     {
                      "t": "div",
-                     "c": "bg-[#e4f1e8] flex h-[35.7px] items-center px-[13.222px] relative rounded-[15.867px] w-full",
+                     "c": "bg-[#e4f1e8] flex h-[35.7px] items-center px-[13.222px] relative rounded-[15.867px] w-[165.278px] shrink-0",
                      "n": "Status / Accepted",
                      "id": "I204:9971;200:130",
                      "k": [
@@ -1301,13 +1301,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                   },
                   {
                    "t": "div",
-                   "c": "bg-[#fff4d6] flex flex-col gap-[6.611px] items-start leading-[1.38] p-[21.156px] relative rounded-[15.867px] w-full",
+                   "c": "bg-[#fff4d6] flex flex-col gap-[6.611px] items-start leading-[1.38] p-[21.156px] relative rounded-[15.867px] w-[357px] shrink-0",
                    "n": "Matched to job",
                    "id": "I204:9971;200:132",
                    "k": [
                     {
                      "t": "p",
-                     "c": "font-semibold relative text-[21.16px] text-[color:#0f1530] w-full",
+                     "c": "font-semibold relative text-[21.16px] text-[color:#0f1530] w-[314.689px] shrink-0",
                      "id": "I204:9971;200:133",
                      "k": [
                       "Job #1042"
@@ -1315,7 +1315,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                     },
                     {
                      "t": "p",
-                     "c": "font-normal relative text-[14.54px] text-[color:#2a3360] w-full",
+                     "c": "font-normal relative text-[14.54px] text-[color:#2a3360] w-[314.689px] shrink-0",
                      "id": "I204:9971;200:134",
                      "k": [
                       "Everything stays connected."
@@ -1333,7 +1333,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
           },
           {
            "t": "div",
-           "c": "flex gap-[16px] items-start relative w-full",
+           "c": "flex gap-[16px] items-start relative w-[952px] shrink-0",
            "n": "Tour navigation",
            "id": "204:10022",
            "k": [
@@ -1355,7 +1355,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
           },
           {
            "t": "div",
-           "c": "block font-medium relative text-[13px] text-[color:#2a3360] w-full",
+           "c": "block font-medium relative text-[13px] text-[color:#2a3360] w-[952px] shrink-0",
            "id": "204:10027",
            "k": [
             {
@@ -1439,7 +1439,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
           },
           {
            "t": "p",
-           "c": "font-semibold relative text-[18px] text-[color:#0f1530] flex-1 min-w-0",
+           "c": "font-semibold relative text-[18px] text-[color:#0f1530] w-[250px] shrink-0",
            "id": "204:10443",
            "k": [
             "Approve the work"
@@ -1690,13 +1690,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
    "k": [
     {
      "t": "div",
-     "c": "bg-[#fbf6ef] flex flex-col gap-[32px] items-start p-[80px] relative w-full",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[32px] items-start p-[80px] relative w-[1440px] shrink-0",
      "n": "A job in motion",
      "id": "204:10044",
      "k": [
       {
        "t": "p",
-       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[1280px] shrink-0",
        "id": "204:10045",
        "k": [
         "PRODUCT TOUR · EXAMPLE HVAC JOB"
@@ -1704,7 +1704,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
       },
       {
        "t": "h1",
-       "c": "font-semibold relative text-[58px] text-[color:#0f1530] tracking-[-1.45px] w-full",
+       "c": "font-semibold relative text-[58px] text-[color:#0f1530] tracking-[-1.45px] w-[1280px] shrink-0",
        "id": "204:10046",
        "k": [
         {
@@ -1725,7 +1725,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
       },
       {
        "t": "div",
-       "c": "flex gap-[48px] items-start relative w-full",
+       "c": "flex gap-[48px] items-start relative w-[1280px] shrink-0",
        "n": "Interactive product tour",
        "id": "204:10047",
        "k": [
@@ -1737,13 +1737,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
          "k": [
           {
            "t": "div",
-           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-full",
+           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-[280px] shrink-0",
            "n": "Select / 01  Book direct",
            "id": "204:10049",
            "k": [
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left flex-1 min-w-0",
+             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left w-[254px] shrink-0",
              "id": "204:10050",
              "k": [
               "01 Book direct"
@@ -1754,13 +1754,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
           },
           {
            "t": "div",
-           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-full",
+           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-[280px] shrink-0",
            "n": "Select / 02  Approve the work",
            "id": "204:10051",
            "k": [
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left flex-1 min-w-0",
+             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left w-[254px] shrink-0",
              "id": "204:10052",
              "k": [
               "02 Approve the work"
@@ -1771,13 +1771,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
           },
           {
            "t": "div",
-           "c": "bg-[#0f1530] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-full",
+           "c": "bg-[#0f1530] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-[280px] shrink-0",
            "n": "Select / 03  Plan the day",
            "id": "204:10053",
            "k": [
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] flex-1 min-w-0",
+             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] w-[254px] shrink-0",
              "id": "204:10054",
              "k": [
               "03 Plan the day"
@@ -1789,13 +1789,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
           },
           {
            "t": "div",
-           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-full",
+           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-[280px] shrink-0",
            "n": "Select / 04  Complete the visit",
            "id": "204:10055",
            "k": [
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left flex-1 min-w-0",
+             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left w-[254px] shrink-0",
              "id": "204:10056",
              "k": [
               "04 Complete the visit"
@@ -1806,13 +1806,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
           },
           {
            "t": "div",
-           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-full",
+           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-[280px] shrink-0",
            "n": "Select / 05  Get paid",
            "id": "204:10057",
            "k": [
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left flex-1 min-w-0",
+             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left w-[254px] shrink-0",
              "id": "204:10058",
              "k": [
               "05 Get paid"
@@ -1823,13 +1823,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
           },
           {
            "t": "div",
-           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-full",
+           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-[280px] shrink-0",
            "n": "Select / 06  Bring them back",
            "id": "204:10059",
            "k": [
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left flex-1 min-w-0",
+             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left w-[254px] shrink-0",
              "id": "204:10060",
              "k": [
               "06 Bring them back"
@@ -1842,19 +1842,19 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
         },
         {
          "t": "div",
-         "c": "flex flex-col gap-[24px] items-start relative flex-1 min-w-0",
+         "c": "flex flex-col gap-[24px] items-start relative w-[952px] shrink-0",
          "n": "Product tour viewport",
          "id": "204:10061",
          "k": [
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] border-[1.322px] border-[#e6dccb] border-solid flex flex-col h-[680.944px] items-start overflow-clip relative rounded-[21.156px] w-full",
+           "c": "bg-[#f6f7f9] border-[1.322px] border-[#e6dccb] border-solid flex flex-col h-[680.944px] items-start overflow-clip relative rounded-[21.156px] w-[952px] shrink-0",
            "n": "Marketing visual / dispatch",
            "id": "204:10062",
            "k": [
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex gap-[21.156px] h-[71.4px] items-center p-[21.156px] relative w-full",
+             "c": "bg-[#0f1530] flex gap-[21.156px] h-[71.4px] items-center p-[21.156px] relative w-[952px] shrink-0",
              "n": "Product chrome",
              "id": "I204:10062;200:137",
              "k": [
@@ -1868,7 +1868,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
               },
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[15.87px] text-[color:#fff] flex-1 min-w-0",
+               "c": "font-medium leading-[1.38] relative text-[15.87px] text-[color:#fff] w-[547.4px] shrink-0",
                "id": "I204:10062;200:139",
                "k": [
                 "Schedule"
@@ -1894,19 +1894,19 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
             },
             {
              "t": "div",
-             "c": "bg-[#f6f7f9] flex flex-col gap-[21.156px] items-start p-[31.733px] relative w-full",
+             "c": "bg-[#f6f7f9] flex flex-col gap-[21.156px] items-start p-[31.733px] relative w-[952px] shrink-0",
              "n": "Product workspace",
              "id": "I204:10062;200:142",
              "k": [
               {
                "t": "div",
-               "c": "flex gap-[21.156px] items-start relative w-full",
+               "c": "flex gap-[21.156px] items-start relative w-[888.533px] shrink-0",
                "n": "Screen title",
                "id": "I204:10062;200:143",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-semibold leading-[1.38] relative text-[30.41px] text-[color:#0f1530] flex-1 min-w-0",
+                 "c": "font-semibold leading-[1.38] relative text-[30.41px] text-[color:#0f1530] w-[608.222px] shrink-0",
                  "id": "I204:10062;200:144",
                  "k": [
                   "Schedule"
@@ -1932,7 +1932,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
               },
               {
                "t": "div",
-               "c": "bg-[#fff] flex gap-[15.867px] items-start leading-[1.38] p-[15.867px] relative rounded-[15.867px] text-[14.54px] text-[color:#2a3360] w-full",
+               "c": "bg-[#fff] flex gap-[15.867px] items-start leading-[1.38] p-[15.867px] relative rounded-[15.867px] text-[14.54px] text-[color:#2a3360] w-[888.533px] shrink-0",
                "n": "Time scale",
                "id": "I204:10062;200:147",
                "k": [
@@ -1980,7 +1980,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
               },
               {
                "t": "div",
-               "c": "bg-[#fff] flex gap-[15.867px] h-[92.556px] items-center p-[15.867px] relative w-full",
+               "c": "bg-[#fff] flex gap-[15.867px] h-[92.556px] items-center p-[15.867px] relative w-[888.533px] shrink-0",
                "n": "Crew / Maya R.",
                "id": "I204:10062;200:153",
                "k": [
@@ -2010,13 +2010,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#fff4d6] flex gap-[13.222px] h-[63.467px] items-start leading-[1.38] p-[15.867px] relative rounded-[15.867px] flex-1 min-w-0",
+                 "c": "bg-[#fff4d6] flex gap-[13.222px] h-[63.467px] items-start leading-[1.38] p-[15.867px] relative rounded-[15.867px] w-[634.667px] shrink-0",
                  "n": "Scheduled job",
                  "id": "I204:10062;200:157",
                  "k": [
                   {
                    "t": "p",
-                   "c": "font-medium relative text-[15.87px] text-[color:#0f1530] flex-1 min-w-0",
+                   "c": "font-medium relative text-[15.87px] text-[color:#0f1530] w-[296.178px] shrink-0",
                    "id": "I204:10062;200:158",
                    "k": [
                     "AC diagnostic"
@@ -2024,7 +2024,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                   },
                   {
                    "t": "p",
-                   "c": "font-normal relative text-[14.54px] text-[color:#2a3360] flex-1 min-w-0",
+                   "c": "font-normal relative text-[14.54px] text-[color:#2a3360] w-[290.889px] shrink-0",
                    "id": "I204:10062;200:159",
                    "k": [
                     "10–12 · Jordan Lee"
@@ -2036,7 +2036,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
               },
               {
                "t": "div",
-               "c": "bg-[#fff] flex gap-[15.867px] h-[92.556px] items-center p-[15.867px] relative w-full",
+               "c": "bg-[#fff] flex gap-[15.867px] h-[92.556px] items-center p-[15.867px] relative w-[888.533px] shrink-0",
                "n": "Crew / Eli T.",
                "id": "I204:10062;200:160",
                "k": [
@@ -2066,13 +2066,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#e4f1e8] flex gap-[13.222px] h-[63.467px] items-start leading-[1.38] p-[15.867px] relative rounded-[15.867px] flex-1 min-w-0",
+                 "c": "bg-[#e4f1e8] flex gap-[13.222px] h-[63.467px] items-start leading-[1.38] p-[15.867px] relative rounded-[15.867px] w-[634.667px] shrink-0",
                  "n": "Scheduled job",
                  "id": "I204:10062;200:164",
                  "k": [
                   {
                    "t": "p",
-                   "c": "font-medium relative text-[15.87px] text-[color:#0f1530] flex-1 min-w-0",
+                   "c": "font-medium relative text-[15.87px] text-[color:#0f1530] w-[296.178px] shrink-0",
                    "id": "I204:10062;200:165",
                    "k": [
                     "Heating tune-up"
@@ -2080,7 +2080,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                   },
                   {
                    "t": "p",
-                   "c": "font-normal relative text-[14.54px] text-[color:#2a3360] flex-1 min-w-0",
+                   "c": "font-normal relative text-[14.54px] text-[color:#2a3360] w-[290.889px] shrink-0",
                    "id": "I204:10062;200:166",
                    "k": [
                     "09–11 · Morgan Reed"
@@ -2092,7 +2092,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
               },
               {
                "t": "div",
-               "c": "bg-[#fff] flex gap-[15.867px] h-[92.556px] items-center p-[15.867px] relative w-full",
+               "c": "bg-[#fff] flex gap-[15.867px] h-[92.556px] items-center p-[15.867px] relative w-[888.533px] shrink-0",
                "n": "Crew / Alex J.",
                "id": "I204:10062;200:167",
                "k": [
@@ -2122,13 +2122,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#fff] flex gap-[13.222px] h-[63.467px] items-start leading-[1.38] p-[15.867px] relative rounded-[15.867px] flex-1 min-w-0",
+                 "c": "bg-[#fff] flex gap-[13.222px] h-[63.467px] items-start leading-[1.38] p-[15.867px] relative rounded-[15.867px] w-[634.667px] shrink-0",
                  "n": "Scheduled job",
                  "id": "I204:10062;200:171",
                  "k": [
                   {
                    "t": "p",
-                   "c": "font-medium relative text-[15.87px] text-[color:#0f1530] flex-1 min-w-0",
+                   "c": "font-medium relative text-[15.87px] text-[color:#0f1530] w-[296.178px] shrink-0",
                    "id": "I204:10062;200:172",
                    "k": [
                     "Water heater visit"
@@ -2136,7 +2136,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                   },
                   {
                    "t": "p",
-                   "c": "font-normal relative text-[14.54px] text-[color:#2a3360] flex-1 min-w-0",
+                   "c": "font-normal relative text-[14.54px] text-[color:#2a3360] w-[290.889px] shrink-0",
                    "id": "I204:10062;200:173",
                    "k": [
                     "11–13 · Sam Park"
@@ -2148,7 +2148,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
               },
               {
                "t": "div",
-               "c": "bg-[#0f1530] flex gap-[21.156px] h-[68.756px] items-start p-[21.156px] relative rounded-[15.867px] w-full",
+               "c": "bg-[#0f1530] flex gap-[21.156px] h-[68.756px] items-start p-[21.156px] relative rounded-[15.867px] w-[888.533px] shrink-0",
                "n": "Assignment strip",
                "id": "I204:10062;200:174",
                "k": [
@@ -2162,7 +2162,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                 },
                 {
                  "t": "p",
-                 "c": "font-normal leading-[1.38] relative text-[15.87px] text-[color:#fff] flex-1 min-w-0",
+                 "c": "font-normal leading-[1.38] relative text-[15.87px] text-[color:#fff] w-[462.778px] shrink-0",
                  "id": "I204:10062;200:176",
                  "k": [
                   "Assigned to Maya · Details ready"
@@ -2189,7 +2189,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
           },
           {
            "t": "div",
-           "c": "flex gap-[16px] items-start relative w-full",
+           "c": "flex gap-[16px] items-start relative w-[952px] shrink-0",
            "n": "Tour navigation",
            "id": "204:10105",
            "k": [
@@ -2211,7 +2211,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
           },
           {
            "t": "div",
-           "c": "block font-medium relative text-[13px] text-[color:#2a3360] w-full",
+           "c": "block font-medium relative text-[13px] text-[color:#2a3360] w-[952px] shrink-0",
            "id": "204:10110",
            "k": [
             {
@@ -2295,7 +2295,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
           },
           {
            "t": "p",
-           "c": "font-semibold relative text-[18px] text-[color:#0f1530] flex-1 min-w-0",
+           "c": "font-semibold relative text-[18px] text-[color:#0f1530] w-[250px] shrink-0",
            "id": "204:10520",
            "k": [
             "Plan the day"
@@ -2572,13 +2572,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
    "k": [
     {
      "t": "div",
-     "c": "bg-[#fbf6ef] flex flex-col gap-[32px] items-start p-[80px] relative w-full",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[32px] items-start p-[80px] relative w-[1440px] shrink-0",
      "n": "A job in motion",
      "id": "204:10127",
      "k": [
       {
        "t": "p",
-       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[1280px] shrink-0",
        "id": "204:10128",
        "k": [
         "PRODUCT TOUR · EXAMPLE HVAC JOB"
@@ -2586,7 +2586,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
       },
       {
        "t": "h1",
-       "c": "font-semibold relative text-[58px] text-[color:#0f1530] tracking-[-1.45px] w-full",
+       "c": "font-semibold relative text-[58px] text-[color:#0f1530] tracking-[-1.45px] w-[1280px] shrink-0",
        "id": "204:10129",
        "k": [
         {
@@ -2607,7 +2607,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
       },
       {
        "t": "div",
-       "c": "flex gap-[48px] items-start relative w-full",
+       "c": "flex gap-[48px] items-start relative w-[1280px] shrink-0",
        "n": "Interactive product tour",
        "id": "204:10130",
        "k": [
@@ -2619,13 +2619,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
          "k": [
           {
            "t": "div",
-           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-full",
+           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-[280px] shrink-0",
            "n": "Select / 01  Book direct",
            "id": "204:10132",
            "k": [
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left flex-1 min-w-0",
+             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left w-[254px] shrink-0",
              "id": "204:10133",
              "k": [
               "01 Book direct"
@@ -2636,13 +2636,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
           },
           {
            "t": "div",
-           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-full",
+           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-[280px] shrink-0",
            "n": "Select / 02  Approve the work",
            "id": "204:10134",
            "k": [
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left flex-1 min-w-0",
+             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left w-[254px] shrink-0",
              "id": "204:10135",
              "k": [
               "02 Approve the work"
@@ -2653,13 +2653,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
           },
           {
            "t": "div",
-           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-full",
+           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-[280px] shrink-0",
            "n": "Select / 03  Plan the day",
            "id": "204:10136",
            "k": [
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left flex-1 min-w-0",
+             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left w-[254px] shrink-0",
              "id": "204:10137",
              "k": [
               "03 Plan the day"
@@ -2670,13 +2670,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
           },
           {
            "t": "div",
-           "c": "bg-[#0f1530] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-full",
+           "c": "bg-[#0f1530] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-[280px] shrink-0",
            "n": "Select / 04  Complete the visit",
            "id": "204:10138",
            "k": [
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] flex-1 min-w-0",
+             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] w-[254px] shrink-0",
              "id": "204:10139",
              "k": [
               "04 Complete the visit"
@@ -2688,13 +2688,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
           },
           {
            "t": "div",
-           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-full",
+           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-[280px] shrink-0",
            "n": "Select / 05  Get paid",
            "id": "204:10140",
            "k": [
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left flex-1 min-w-0",
+             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left w-[254px] shrink-0",
              "id": "204:10141",
              "k": [
               "05 Get paid"
@@ -2705,13 +2705,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
           },
           {
            "t": "div",
-           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-full",
+           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-[280px] shrink-0",
            "n": "Select / 06  Bring them back",
            "id": "204:10142",
            "k": [
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left flex-1 min-w-0",
+             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left w-[254px] shrink-0",
              "id": "204:10143",
              "k": [
               "06 Bring them back"
@@ -2724,19 +2724,19 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
         },
         {
          "t": "div",
-         "c": "flex flex-col gap-[24px] items-start relative flex-1 min-w-0",
+         "c": "flex flex-col gap-[24px] items-start relative w-[952px] shrink-0",
          "n": "Product tour viewport",
          "id": "204:10144",
          "k": [
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] border-[1.322px] border-[#e6dccb] border-solid flex flex-col h-[632.022px] items-start overflow-clip relative rounded-[21.156px] w-full",
+           "c": "bg-[#f6f7f9] border-[1.322px] border-[#e6dccb] border-solid flex flex-col h-[632.022px] items-start overflow-clip relative rounded-[21.156px] w-[952px] shrink-0",
            "n": "Marketing visual / field",
            "id": "204:10145",
            "k": [
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex gap-[21.156px] h-[71.4px] items-center p-[21.156px] relative w-full",
+             "c": "bg-[#0f1530] flex gap-[21.156px] h-[71.4px] items-center p-[21.156px] relative w-[952px] shrink-0",
              "n": "Product chrome",
              "id": "I204:10145;200:181",
              "k": [
@@ -2750,7 +2750,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
               },
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[15.87px] text-[color:#fff] flex-1 min-w-0",
+               "c": "font-medium leading-[1.38] relative text-[15.87px] text-[color:#fff] w-[547.4px] shrink-0",
                "id": "I204:10145;200:183",
                "k": [
                 "Technician app"
@@ -2776,19 +2776,19 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
             },
             {
              "t": "div",
-             "c": "bg-[#f6f7f9] flex flex-col gap-[21.156px] items-start p-[31.733px] relative w-full",
+             "c": "bg-[#f6f7f9] flex flex-col gap-[21.156px] items-start p-[31.733px] relative w-[952px] shrink-0",
              "n": "Product workspace",
              "id": "I204:10145;200:186",
              "k": [
               {
                "t": "div",
-               "c": "flex gap-[21.156px] items-start relative w-full",
+               "c": "flex gap-[21.156px] items-start relative w-[888.533px] shrink-0",
                "n": "Screen title",
                "id": "I204:10145;200:187",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-semibold leading-[1.38] relative text-[30.41px] text-[color:#0f1530] flex-1 min-w-0",
+                 "c": "font-semibold leading-[1.38] relative text-[30.41px] text-[color:#0f1530] w-[608.222px] shrink-0",
                  "id": "I204:10145;200:188",
                  "k": [
                   "Technician app"
@@ -2814,19 +2814,19 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
               },
               {
                "t": "div",
-               "c": "flex gap-[26.444px] items-start relative w-full",
+               "c": "flex gap-[26.444px] items-start relative w-[888.533px] shrink-0",
                "n": "Field work",
                "id": "I204:10145;200:191",
                "k": [
                 {
                  "t": "div",
-                 "c": "flex flex-col gap-[15.867px] items-start relative flex-1 min-w-0",
+                 "c": "flex flex-col gap-[15.867px] items-start relative w-[452.2px] shrink-0",
                  "n": "Job site",
                  "id": "I204:10145;200:192",
                  "k": [
                   {
                    "t": "div",
-                   "c": "h-[343.778px] relative rounded-[21.156px] w-full",
+                   "c": "h-[343.778px] relative rounded-[21.156px] w-[452.2px] shrink-0",
                    "n": "Technician at the job",
                    "id": "I204:10145;200:193",
                    "k": [
@@ -2839,7 +2839,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                   },
                   {
                    "t": "div",
-                   "c": "bg-[#0f1530] flex h-[35.7px] items-center px-[13.222px] relative rounded-[15.867px] w-full",
+                   "c": "bg-[#0f1530] flex h-[35.7px] items-center px-[13.222px] relative rounded-[15.867px] w-[264.444px] shrink-0",
                    "n": "Status / ON SITE · MAYA R.",
                    "id": "I204:10145;200:194",
                    "k": [
@@ -2857,13 +2857,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#fff] border-[1.322px] border-[#e6dccb] border-solid flex flex-col gap-[18.511px] items-start p-[26.444px] relative rounded-[21.156px] flex-1 min-w-0",
+                 "c": "bg-[#fff] border-[1.322px] border-[#e6dccb] border-solid flex flex-col gap-[18.511px] items-start p-[26.444px] relative rounded-[21.156px] w-[409.889px] shrink-0",
                  "n": "Technician checklist",
                  "id": "I204:10145;200:196",
                  "k": [
                   {
                    "t": "p",
-                   "c": "font-semibold leading-[1.38] relative text-[29.09px] text-[color:#0f1530] w-full",
+                   "c": "font-semibold leading-[1.38] relative text-[29.09px] text-[color:#0f1530] w-[357px] shrink-0",
                    "id": "I204:10145;200:197",
                    "k": [
                     "AC diagnostic"
@@ -2871,7 +2871,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                   },
                   {
                    "t": "p",
-                   "c": "font-normal leading-[1.38] relative text-[15.87px] text-[color:#2a3360] w-full",
+                   "c": "font-normal leading-[1.38] relative text-[15.87px] text-[color:#2a3360] w-[357px] shrink-0",
                    "id": "I204:10145;200:198",
                    "k": [
                     "Jordan Lee · Job #1042"
@@ -2879,7 +2879,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                   },
                   {
                    "t": "div",
-                   "c": "flex gap-[13.222px] items-start relative w-full",
+                   "c": "flex gap-[13.222px] items-start relative w-[357px] shrink-0",
                    "n": "Equipment checked",
                    "id": "I204:10145;200:199",
                    "k": [
@@ -2898,7 +2898,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                     },
                     {
                      "t": "p",
-                     "c": "font-normal leading-[1.38] relative text-[15.87px] text-[color:#0f1530] flex-1 min-w-0",
+                     "c": "font-normal leading-[1.38] relative text-[15.87px] text-[color:#0f1530] w-[317.333px] shrink-0",
                      "id": "I204:10145;200:202",
                      "k": [
                       "Equipment checked"
@@ -2908,7 +2908,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                   },
                   {
                    "t": "div",
-                   "c": "flex gap-[13.222px] items-start relative w-full",
+                   "c": "flex gap-[13.222px] items-start relative w-[357px] shrink-0",
                    "n": "Repair completed",
                    "id": "I204:10145;200:203",
                    "k": [
@@ -2927,7 +2927,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                     },
                     {
                      "t": "p",
-                     "c": "font-normal leading-[1.38] relative text-[15.87px] text-[color:#0f1530] flex-1 min-w-0",
+                     "c": "font-normal leading-[1.38] relative text-[15.87px] text-[color:#0f1530] w-[317.333px] shrink-0",
                      "id": "I204:10145;200:206",
                      "k": [
                       "Repair completed"
@@ -2937,7 +2937,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                   },
                   {
                    "t": "div",
-                   "c": "flex gap-[13.222px] items-start relative w-full",
+                   "c": "flex gap-[13.222px] items-start relative w-[357px] shrink-0",
                    "n": "Function test passed",
                    "id": "I204:10145;200:207",
                    "k": [
@@ -2956,7 +2956,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                     },
                     {
                      "t": "p",
-                     "c": "font-normal leading-[1.38] relative text-[15.87px] text-[color:#0f1530] flex-1 min-w-0",
+                     "c": "font-normal leading-[1.38] relative text-[15.87px] text-[color:#0f1530] w-[317.333px] shrink-0",
                      "id": "I204:10145;200:210",
                      "k": [
                       "Function test passed"
@@ -2966,7 +2966,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                   },
                   {
                    "t": "div",
-                   "c": "flex gap-[13.222px] items-start relative w-full",
+                   "c": "flex gap-[13.222px] items-start relative w-[357px] shrink-0",
                    "n": "Photos added",
                    "id": "I204:10145;200:211",
                    "k": [
@@ -2985,7 +2985,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                     },
                     {
                      "t": "p",
-                     "c": "font-normal leading-[1.38] relative text-[15.87px] text-[color:#0f1530] flex-1 min-w-0",
+                     "c": "font-normal leading-[1.38] relative text-[15.87px] text-[color:#0f1530] w-[317.333px] shrink-0",
                      "id": "I204:10145;200:214",
                      "k": [
                       "Photos added"
@@ -2995,7 +2995,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                   },
                   {
                    "t": "div",
-                   "c": "bg-[#e4f1e8] flex h-[35.7px] items-center px-[13.222px] relative rounded-[15.867px] w-full",
+                   "c": "bg-[#e4f1e8] flex h-[35.7px] items-center px-[13.222px] relative rounded-[15.867px] w-[224.778px] shrink-0",
                    "n": "Status / 6 of 6 complete",
                    "id": "I204:10145;200:215",
                    "k": [
@@ -3011,13 +3011,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                   },
                   {
                    "t": "div",
-                   "c": "bg-[#f6b400] flex h-[50.244px] items-center justify-center px-[18.511px] relative rounded-[15.867px] w-full",
+                   "c": "bg-[#f6b400] flex h-[50.244px] items-center justify-center px-[18.511px] relative rounded-[15.867px] w-[357px] shrink-0",
                    "n": "UI action / Complete visit",
                    "id": "I204:10145;200:217",
                    "k": [
                     {
                      "t": "p",
-                     "c": "font-medium leading-[1.38] relative text-[15.87px] text-[color:#0f1530] text-center flex-1 min-w-0",
+                     "c": "font-medium leading-[1.38] relative text-[15.87px] text-[color:#0f1530] text-center w-[319.978px] shrink-0",
                      "id": "I204:10145;200:218",
                      "k": [
                       "Complete visit"
@@ -3035,7 +3035,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
           },
           {
            "t": "div",
-           "c": "flex gap-[16px] items-start relative w-full",
+           "c": "flex gap-[16px] items-start relative w-[952px] shrink-0",
            "n": "Tour navigation",
            "id": "204:10184",
            "k": [
@@ -3057,7 +3057,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
           },
           {
            "t": "div",
-           "c": "block font-medium relative text-[13px] text-[color:#2a3360] w-full",
+           "c": "block font-medium relative text-[13px] text-[color:#2a3360] w-[952px] shrink-0",
            "id": "204:10189",
            "k": [
             {
@@ -3141,7 +3141,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
           },
           {
            "t": "p",
-           "c": "font-semibold relative text-[18px] text-[color:#0f1530] flex-1 min-w-0",
+           "c": "font-semibold relative text-[18px] text-[color:#0f1530] w-[250px] shrink-0",
            "id": "204:10589",
            "k": [
             "Complete the visit"
@@ -3430,13 +3430,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
    "k": [
     {
      "t": "div",
-     "c": "bg-[#fbf6ef] flex flex-col gap-[32px] items-start p-[80px] relative w-full",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[32px] items-start p-[80px] relative w-[1440px] shrink-0",
      "n": "A job in motion",
      "id": "204:10206",
      "k": [
       {
        "t": "p",
-       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[1280px] shrink-0",
        "id": "204:10207",
        "k": [
         "PRODUCT TOUR · EXAMPLE HVAC JOB"
@@ -3444,7 +3444,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
       },
       {
        "t": "h1",
-       "c": "font-semibold relative text-[58px] text-[color:#0f1530] tracking-[-1.45px] w-full",
+       "c": "font-semibold relative text-[58px] text-[color:#0f1530] tracking-[-1.45px] w-[1280px] shrink-0",
        "id": "204:10208",
        "k": [
         {
@@ -3465,7 +3465,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
       },
       {
        "t": "div",
-       "c": "flex gap-[48px] items-start relative w-full",
+       "c": "flex gap-[48px] items-start relative w-[1280px] shrink-0",
        "n": "Interactive product tour",
        "id": "204:10209",
        "k": [
@@ -3477,13 +3477,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
          "k": [
           {
            "t": "div",
-           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-full",
+           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-[280px] shrink-0",
            "n": "Select / 01  Book direct",
            "id": "204:10211",
            "k": [
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left flex-1 min-w-0",
+             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left w-[254px] shrink-0",
              "id": "204:10212",
              "k": [
               "01 Book direct"
@@ -3494,13 +3494,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
           },
           {
            "t": "div",
-           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-full",
+           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-[280px] shrink-0",
            "n": "Select / 02  Approve the work",
            "id": "204:10213",
            "k": [
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left flex-1 min-w-0",
+             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left w-[254px] shrink-0",
              "id": "204:10214",
              "k": [
               "02 Approve the work"
@@ -3511,13 +3511,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
           },
           {
            "t": "div",
-           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-full",
+           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-[280px] shrink-0",
            "n": "Select / 03  Plan the day",
            "id": "204:10215",
            "k": [
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left flex-1 min-w-0",
+             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left w-[254px] shrink-0",
              "id": "204:10216",
              "k": [
               "03 Plan the day"
@@ -3528,13 +3528,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
           },
           {
            "t": "div",
-           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-full",
+           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-[280px] shrink-0",
            "n": "Select / 04  Complete the visit",
            "id": "204:10217",
            "k": [
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left flex-1 min-w-0",
+             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left w-[254px] shrink-0",
              "id": "204:10218",
              "k": [
               "04 Complete the visit"
@@ -3545,13 +3545,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
           },
           {
            "t": "div",
-           "c": "bg-[#0f1530] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-full",
+           "c": "bg-[#0f1530] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-[280px] shrink-0",
            "n": "Select / 05  Get paid",
            "id": "204:10219",
            "k": [
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] flex-1 min-w-0",
+             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] w-[254px] shrink-0",
              "id": "204:10220",
              "k": [
               "05 Get paid"
@@ -3563,13 +3563,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
           },
           {
            "t": "div",
-           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-full",
+           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-[280px] shrink-0",
            "n": "Select / 06  Bring them back",
            "id": "204:10221",
            "k": [
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left flex-1 min-w-0",
+             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left w-[254px] shrink-0",
              "id": "204:10222",
              "k": [
               "06 Bring them back"
@@ -3582,19 +3582,19 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
         },
         {
          "t": "div",
-         "c": "flex flex-col gap-[24px] items-start relative flex-1 min-w-0",
+         "c": "flex flex-col gap-[24px] items-start relative w-[952px] shrink-0",
          "n": "Product tour viewport",
          "id": "204:10223",
          "k": [
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] border-[1.322px] border-[#e6dccb] border-solid flex flex-col h-[676.978px] items-start overflow-clip relative rounded-[21.156px] w-full",
+           "c": "bg-[#f6f7f9] border-[1.322px] border-[#e6dccb] border-solid flex flex-col h-[676.978px] items-start overflow-clip relative rounded-[21.156px] w-[952px] shrink-0",
            "n": "Marketing visual / invoice",
            "id": "204:10224",
            "k": [
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex gap-[21.156px] h-[71.4px] items-center p-[21.156px] relative w-full",
+             "c": "bg-[#0f1530] flex gap-[21.156px] h-[71.4px] items-center p-[21.156px] relative w-[952px] shrink-0",
              "n": "Product chrome",
              "id": "I204:10224;200:221",
              "k": [
@@ -3608,7 +3608,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
               },
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[15.87px] text-[color:#fff] flex-1 min-w-0",
+               "c": "font-medium leading-[1.38] relative text-[15.87px] text-[color:#fff] w-[547.4px] shrink-0",
                "id": "I204:10224;200:223",
                "k": [
                 "Invoices & payments"
@@ -3634,19 +3634,19 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
             },
             {
              "t": "div",
-             "c": "bg-[#f6f7f9] flex flex-col gap-[21.156px] items-start p-[31.733px] relative w-full",
+             "c": "bg-[#f6f7f9] flex flex-col gap-[21.156px] items-start p-[31.733px] relative w-[952px] shrink-0",
              "n": "Product workspace",
              "id": "I204:10224;200:226",
              "k": [
               {
                "t": "div",
-               "c": "flex gap-[21.156px] items-start relative w-full",
+               "c": "flex gap-[21.156px] items-start relative w-[888.533px] shrink-0",
                "n": "Screen title",
                "id": "I204:10224;200:227",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-semibold leading-[1.38] relative text-[30.41px] text-[color:#0f1530] flex-1 min-w-0",
+                 "c": "font-semibold leading-[1.38] relative text-[30.41px] text-[color:#0f1530] w-[608.222px] shrink-0",
                  "id": "I204:10224;200:228",
                  "k": [
                   "Invoices & payments"
@@ -3672,19 +3672,19 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
               },
               {
                "t": "div",
-               "c": "flex gap-[26.444px] items-start relative w-full",
+               "c": "flex gap-[26.444px] items-start relative w-[888.533px] shrink-0",
                "n": "Document and customer status",
                "id": "I204:10224;200:231",
                "k": [
                 {
                  "t": "div",
-                 "c": "bg-[#fff] border-[1.322px] border-[#e6dccb] border-solid flex flex-col gap-[18.511px] items-start p-[26.444px] relative rounded-[21.156px] flex-1 min-w-0",
+                 "c": "bg-[#fff] border-[1.322px] border-[#e6dccb] border-solid flex flex-col gap-[18.511px] items-start p-[26.444px] relative rounded-[21.156px] w-[505.089px] shrink-0",
                  "n": "Service document",
                  "id": "I204:10224;200:232",
                  "k": [
                   {
                    "t": "p",
-                   "c": "font-semibold leading-[1.38] relative text-[25.12px] text-[color:#0f1530] w-full",
+                   "c": "font-semibold leading-[1.38] relative text-[25.12px] text-[color:#0f1530] w-[452.2px] shrink-0",
                    "id": "I204:10224;200:233",
                    "k": [
                     "Invoice #1042"
@@ -3692,7 +3692,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                   },
                   {
                    "t": "p",
-                   "c": "font-normal leading-[1.38] relative text-[15.87px] text-[color:#2a3360] w-full",
+                   "c": "font-normal leading-[1.38] relative text-[15.87px] text-[color:#2a3360] w-[452.2px] shrink-0",
                    "id": "I204:10224;200:234",
                    "k": [
                     "Jordan Lee · AC diagnostic"
@@ -3700,19 +3700,19 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                   },
                   {
                    "t": "div",
-                   "c": "bg-[#e6dccb] h-[1.322px] relative w-full",
+                   "c": "bg-[#e6dccb] h-[1.322px] relative w-[452.2px] shrink-0",
                    "n": "Divider",
                    "id": "I204:10224;200:235"
                   },
                   {
                    "t": "div",
-                   "c": "flex gap-[13.222px] items-start leading-[1.38] relative text-[15.87px] w-full",
+                   "c": "flex gap-[13.222px] items-start leading-[1.38] relative text-[15.87px] w-[452.2px] shrink-0",
                    "n": "Field / Diagnostic visit",
                    "id": "I204:10224;200:236",
                    "k": [
                     {
                      "t": "p",
-                     "c": "font-normal relative text-[color:#2a3360] flex-1 min-w-0",
+                     "c": "font-normal relative text-[color:#2a3360] w-[248.578px] shrink-0",
                      "id": "I204:10224;200:237",
                      "k": [
                       "Diagnostic visit"
@@ -3730,13 +3730,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                   },
                   {
                    "t": "div",
-                   "c": "flex gap-[13.222px] items-start leading-[1.38] relative text-[15.87px] w-full",
+                   "c": "flex gap-[13.222px] items-start leading-[1.38] relative text-[15.87px] w-[452.2px] shrink-0",
                    "n": "Field / Capacitor replacement",
                    "id": "I204:10224;200:239",
                    "k": [
                     {
                      "t": "p",
-                     "c": "font-normal relative text-[color:#2a3360] flex-1 min-w-0",
+                     "c": "font-normal relative text-[color:#2a3360] w-[248.578px] shrink-0",
                      "id": "I204:10224;200:240",
                      "k": [
                       "Capacitor replacement"
@@ -3754,19 +3754,19 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                   },
                   {
                    "t": "div",
-                   "c": "bg-[#e6dccb] h-[1.322px] relative w-full",
+                   "c": "bg-[#e6dccb] h-[1.322px] relative w-[452.2px] shrink-0",
                    "n": "Divider",
                    "id": "I204:10224;200:242"
                   },
                   {
                    "t": "div",
-                   "c": "flex gap-[13.222px] items-start leading-[1.38] relative text-[15.87px] w-full",
+                   "c": "flex gap-[13.222px] items-start leading-[1.38] relative text-[15.87px] w-[452.2px] shrink-0",
                    "n": "Field / Service total",
                    "id": "I204:10224;200:243",
                    "k": [
                     {
                      "t": "p",
-                     "c": "font-normal relative text-[color:#2a3360] flex-1 min-w-0",
+                     "c": "font-normal relative text-[color:#2a3360] w-[248.578px] shrink-0",
                      "id": "I204:10224;200:244",
                      "k": [
                       "Service total"
@@ -3784,13 +3784,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                   },
                   {
                    "t": "div",
-                   "c": "flex gap-[13.222px] items-start leading-[1.38] relative text-[15.87px] w-full",
+                   "c": "flex gap-[13.222px] items-start leading-[1.38] relative text-[15.87px] w-[452.2px] shrink-0",
                    "n": "Field / Service Fee · Flex",
                    "id": "I204:10224;200:246",
                    "k": [
                     {
                      "t": "p",
-                     "c": "font-normal relative text-[color:#2a3360] flex-1 min-w-0",
+                     "c": "font-normal relative text-[color:#2a3360] w-[248.578px] shrink-0",
                      "id": "I204:10224;200:247",
                      "k": [
                       "Service Fee · Flex"
@@ -3808,13 +3808,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                   },
                   {
                    "t": "div",
-                   "c": "flex gap-[13.222px] items-start leading-[1.38] relative text-[15.87px] w-full",
+                   "c": "flex gap-[13.222px] items-start leading-[1.38] relative text-[15.87px] w-[452.2px] shrink-0",
                    "n": "Field / Total due",
                    "id": "I204:10224;200:249",
                    "k": [
                     {
                      "t": "p",
-                     "c": "font-normal relative text-[color:#2a3360] flex-1 min-w-0",
+                     "c": "font-normal relative text-[color:#2a3360] w-[248.578px] shrink-0",
                      "id": "I204:10224;200:250",
                      "k": [
                       "Total due"
@@ -3832,7 +3832,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                   },
                   {
                    "t": "p",
-                   "c": "font-normal leading-[1.38] relative text-[11.9px] text-[color:#2a3360] w-full",
+                   "c": "font-normal leading-[1.38] relative text-[11.9px] text-[color:#2a3360] w-[452.2px] shrink-0",
                    "id": "I204:10224;200:252",
                    "k": [
                     "Example checkout · No tax shown"
@@ -3840,13 +3840,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                   },
                   {
                    "t": "div",
-                   "c": "bg-[#0f1530] flex h-[50.244px] items-center justify-center px-[18.511px] relative rounded-[15.867px] w-full",
+                   "c": "bg-[#0f1530] flex h-[50.244px] items-center justify-center px-[18.511px] relative rounded-[15.867px] w-[452.2px] shrink-0",
                    "n": "UI action / Send payment link",
                    "id": "I204:10224;200:253",
                    "k": [
                     {
                      "t": "p",
-                     "c": "font-medium leading-[1.38] relative text-[15.87px] text-[color:#fff] text-center flex-1 min-w-0",
+                     "c": "font-medium leading-[1.38] relative text-[15.87px] text-[color:#fff] text-center w-[415.178px] shrink-0",
                      "id": "I204:10224;200:254",
                      "k": [
                       "Send payment link"
@@ -3858,19 +3858,19 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                 },
                 {
                  "t": "div",
-                 "c": "flex flex-col gap-[21.156px] items-start relative flex-1 min-w-0",
+                 "c": "flex flex-col gap-[21.156px] items-start relative w-[357px] shrink-0",
                  "n": "Approval and outcome",
                  "id": "I204:10224;200:255",
                  "k": [
                   {
                    "t": "div",
-                   "c": "bg-[#fff] border-[1.322px] border-[#e6dccb] border-solid flex flex-col gap-[18.511px] items-start p-[26.444px] relative rounded-[21.156px] w-full",
+                   "c": "bg-[#fff] border-[1.322px] border-[#e6dccb] border-solid flex flex-col gap-[18.511px] items-start p-[26.444px] relative rounded-[21.156px] w-[357px] shrink-0",
                    "n": "Status",
                    "id": "I204:10224;200:256",
                    "k": [
                     {
                      "t": "p",
-                     "c": "font-medium leading-[1.38] relative text-[14.54px] text-[color:#2a3360] tracking-[1.454px] w-full",
+                     "c": "font-medium leading-[1.38] relative text-[14.54px] text-[color:#2a3360] tracking-[1.454px] w-[304.111px] shrink-0",
                      "id": "I204:10224;200:257",
                      "k": [
                       "CUSTOMER VIEW"
@@ -3878,7 +3878,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                     },
                     {
                      "t": "p",
-                     "c": "font-semibold leading-[1.38] relative text-[31.73px] text-[color:#0f1530] w-full",
+                     "c": "font-semibold leading-[1.38] relative text-[31.73px] text-[color:#0f1530] w-[304.111px] shrink-0",
                      "id": "I204:10224;200:258",
                      "k": [
                       "Ready to pay."
@@ -3886,7 +3886,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                     },
                     {
                      "t": "div",
-                     "c": "flex gap-[13.222px] items-start relative w-full",
+                     "c": "flex gap-[13.222px] items-start relative w-[304.111px] shrink-0",
                      "n": "Scope reviewed",
                      "id": "I204:10224;200:259",
                      "k": [
@@ -3905,7 +3905,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                       },
                       {
                        "t": "p",
-                       "c": "font-normal leading-[1.38] relative text-[15.87px] text-[color:#2a3360] flex-1 min-w-0",
+                       "c": "font-normal leading-[1.38] relative text-[15.87px] text-[color:#2a3360] w-[264.444px] shrink-0",
                        "id": "I204:10224;200:262",
                        "k": [
                         "Scope reviewed"
@@ -3915,7 +3915,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                     },
                     {
                      "t": "div",
-                     "c": "flex gap-[13.222px] items-start relative w-full",
+                     "c": "flex gap-[13.222px] items-start relative w-[304.111px] shrink-0",
                      "n": "Price confirmed",
                      "id": "I204:10224;200:263",
                      "k": [
@@ -3934,7 +3934,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                       },
                       {
                        "t": "p",
-                       "c": "font-normal leading-[1.38] relative text-[15.87px] text-[color:#2a3360] flex-1 min-w-0",
+                       "c": "font-normal leading-[1.38] relative text-[15.87px] text-[color:#2a3360] w-[264.444px] shrink-0",
                        "id": "I204:10224;200:266",
                        "k": [
                         "Price confirmed"
@@ -3944,7 +3944,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                     },
                     {
                      "t": "div",
-                     "c": "flex gap-[13.222px] items-start relative w-full",
+                     "c": "flex gap-[13.222px] items-start relative w-[304.111px] shrink-0",
                      "n": "Receipt emailed",
                      "id": "I204:10224;200:267",
                      "k": [
@@ -3963,7 +3963,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                       },
                       {
                        "t": "p",
-                       "c": "font-normal leading-[1.38] relative text-[15.87px] text-[color:#2a3360] flex-1 min-w-0",
+                       "c": "font-normal leading-[1.38] relative text-[15.87px] text-[color:#2a3360] w-[264.444px] shrink-0",
                        "id": "I204:10224;200:270",
                        "k": [
                         "Receipt emailed"
@@ -3973,7 +3973,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                     },
                     {
                      "t": "div",
-                     "c": "bg-[#e4f1e8] flex h-[35.7px] items-center px-[13.222px] relative rounded-[15.867px] w-full",
+                     "c": "bg-[#e4f1e8] flex h-[35.7px] items-center px-[13.222px] relative rounded-[15.867px] w-[165.278px] shrink-0",
                      "n": "Status / Paid",
                      "id": "I204:10224;200:271",
                      "k": [
@@ -3991,13 +3991,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                   },
                   {
                    "t": "div",
-                   "c": "bg-[#fff4d6] flex flex-col gap-[6.611px] items-start leading-[1.38] p-[21.156px] relative rounded-[15.867px] w-full",
+                   "c": "bg-[#fff4d6] flex flex-col gap-[6.611px] items-start leading-[1.38] p-[21.156px] relative rounded-[15.867px] w-[357px] shrink-0",
                    "n": "Matched to job",
                    "id": "I204:10224;200:273",
                    "k": [
                     {
                      "t": "p",
-                     "c": "font-semibold relative text-[21.16px] text-[color:#0f1530] w-full",
+                     "c": "font-semibold relative text-[21.16px] text-[color:#0f1530] w-[314.689px] shrink-0",
                      "id": "I204:10224;200:274",
                      "k": [
                       "Job #1042"
@@ -4005,7 +4005,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                     },
                     {
                      "t": "p",
-                     "c": "font-normal relative text-[14.54px] text-[color:#2a3360] w-full",
+                     "c": "font-normal relative text-[14.54px] text-[color:#2a3360] w-[314.689px] shrink-0",
                      "id": "I204:10224;200:275",
                      "k": [
                       "Everything stays connected."
@@ -4023,7 +4023,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
           },
           {
            "t": "div",
-           "c": "flex gap-[16px] items-start relative w-full",
+           "c": "flex gap-[16px] items-start relative w-[952px] shrink-0",
            "n": "Tour navigation",
            "id": "204:10280",
            "k": [
@@ -4045,7 +4045,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
           },
           {
            "t": "div",
-           "c": "block font-medium relative text-[13px] text-[color:#2a3360] w-full",
+           "c": "block font-medium relative text-[13px] text-[color:#2a3360] w-[952px] shrink-0",
            "id": "204:10285",
            "k": [
             {
@@ -4129,7 +4129,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
           },
           {
            "t": "p",
-           "c": "font-semibold relative text-[18px] text-[color:#0f1530] flex-1 min-w-0",
+           "c": "font-semibold relative text-[18px] text-[color:#0f1530] w-[250px] shrink-0",
            "id": "204:10654",
            "k": [
             "Get paid"
@@ -4380,13 +4380,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
    "k": [
     {
      "t": "div",
-     "c": "bg-[#fbf6ef] flex flex-col gap-[32px] items-start p-[80px] relative w-full",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[32px] items-start p-[80px] relative w-[1440px] shrink-0",
      "n": "A job in motion",
      "id": "204:10302",
      "k": [
       {
        "t": "p",
-       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[1280px] shrink-0",
        "id": "204:10303",
        "k": [
         "PRODUCT TOUR · EXAMPLE HVAC JOB"
@@ -4394,7 +4394,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
       },
       {
        "t": "h1",
-       "c": "font-semibold relative text-[58px] text-[color:#0f1530] tracking-[-1.45px] w-full",
+       "c": "font-semibold relative text-[58px] text-[color:#0f1530] tracking-[-1.45px] w-[1280px] shrink-0",
        "id": "204:10304",
        "k": [
         {
@@ -4415,7 +4415,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
       },
       {
        "t": "div",
-       "c": "flex gap-[48px] items-start relative w-full",
+       "c": "flex gap-[48px] items-start relative w-[1280px] shrink-0",
        "n": "Interactive product tour",
        "id": "204:10305",
        "k": [
@@ -4427,13 +4427,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
          "k": [
           {
            "t": "div",
-           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-full",
+           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-[280px] shrink-0",
            "n": "Select / 01  Book direct",
            "id": "204:10307",
            "k": [
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left flex-1 min-w-0",
+             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left w-[254px] shrink-0",
              "id": "204:10308",
              "k": [
               "01 Book direct"
@@ -4444,13 +4444,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
           },
           {
            "t": "div",
-           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-full",
+           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-[280px] shrink-0",
            "n": "Select / 02  Approve the work",
            "id": "204:10309",
            "k": [
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left flex-1 min-w-0",
+             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left w-[254px] shrink-0",
              "id": "204:10310",
              "k": [
               "02 Approve the work"
@@ -4461,13 +4461,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
           },
           {
            "t": "div",
-           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-full",
+           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-[280px] shrink-0",
            "n": "Select / 03  Plan the day",
            "id": "204:10311",
            "k": [
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left flex-1 min-w-0",
+             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left w-[254px] shrink-0",
              "id": "204:10312",
              "k": [
               "03 Plan the day"
@@ -4478,13 +4478,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
           },
           {
            "t": "div",
-           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-full",
+           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-[280px] shrink-0",
            "n": "Select / 04  Complete the visit",
            "id": "204:10313",
            "k": [
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left flex-1 min-w-0",
+             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left w-[254px] shrink-0",
              "id": "204:10314",
              "k": [
               "04 Complete the visit"
@@ -4495,13 +4495,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
           },
           {
            "t": "div",
-           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-full",
+           "c": "bg-[#fff] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-[280px] shrink-0",
            "n": "Select / 05  Get paid",
            "id": "204:10315",
            "k": [
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left flex-1 min-w-0",
+             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-left w-[254px] shrink-0",
              "id": "204:10316",
              "k": [
               "05 Get paid"
@@ -4512,13 +4512,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
           },
           {
            "t": "div",
-           "c": "bg-[#0f1530] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-full",
+           "c": "bg-[#0f1530] border border-[#e6dccb] border-solid flex h-[42px] items-center p-[12px] relative rounded-[12px] w-[280px] shrink-0",
            "n": "Select / 06  Bring them back",
            "id": "204:10317",
            "k": [
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] flex-1 min-w-0",
+             "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] w-[254px] shrink-0",
              "id": "204:10318",
              "k": [
               "06 Bring them back"
@@ -4532,19 +4532,19 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
         },
         {
          "t": "div",
-         "c": "flex flex-col gap-[24px] items-start relative flex-1 min-w-0",
+         "c": "flex flex-col gap-[24px] items-start relative w-[952px] shrink-0",
          "n": "Product tour viewport",
          "id": "204:10319",
          "k": [
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] border-[1.322px] border-[#e6dccb] border-solid flex flex-col h-[614.833px] items-start overflow-clip relative rounded-[21.156px] w-full",
+           "c": "bg-[#f6f7f9] border-[1.322px] border-[#e6dccb] border-solid flex flex-col h-[614.833px] items-start overflow-clip relative rounded-[21.156px] w-[952px] shrink-0",
            "n": "Marketing visual / membership",
            "id": "204:10320",
            "k": [
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex gap-[21.156px] h-[71.4px] items-center p-[21.156px] relative w-full",
+             "c": "bg-[#0f1530] flex gap-[21.156px] h-[71.4px] items-center p-[21.156px] relative w-[952px] shrink-0",
              "n": "Product chrome",
              "id": "I204:10320;200:278",
              "k": [
@@ -4558,7 +4558,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
               },
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[15.87px] text-[color:#fff] flex-1 min-w-0",
+               "c": "font-medium leading-[1.38] relative text-[15.87px] text-[color:#fff] w-[547.4px] shrink-0",
                "id": "I204:10320;200:280",
                "k": [
                 "Service agreements"
@@ -4584,19 +4584,19 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
             },
             {
              "t": "div",
-             "c": "bg-[#f6f7f9] flex flex-col gap-[21.156px] items-start p-[31.733px] relative w-full",
+             "c": "bg-[#f6f7f9] flex flex-col gap-[21.156px] items-start p-[31.733px] relative w-[952px] shrink-0",
              "n": "Product workspace",
              "id": "I204:10320;200:283",
              "k": [
               {
                "t": "div",
-               "c": "flex gap-[21.156px] items-start relative w-full",
+               "c": "flex gap-[21.156px] items-start relative w-[888.533px] shrink-0",
                "n": "Screen title",
                "id": "I204:10320;200:284",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-semibold leading-[1.38] relative text-[30.41px] text-[color:#0f1530] flex-1 min-w-0",
+                 "c": "font-semibold leading-[1.38] relative text-[30.41px] text-[color:#0f1530] w-[608.222px] shrink-0",
                  "id": "I204:10320;200:285",
                  "k": [
                   "Service agreements"
@@ -4622,19 +4622,19 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
               },
               {
                "t": "div",
-               "c": "flex gap-[26.444px] items-start relative w-full",
+               "c": "flex gap-[26.444px] items-start relative w-[888.533px] shrink-0",
                "n": "Agreement and future visit",
                "id": "I204:10320;200:288",
                "k": [
                 {
                  "t": "div",
-                 "c": "bg-[#fff] border-[1.322px] border-[#e6dccb] border-solid flex flex-col gap-[18.511px] items-start p-[26.444px] relative rounded-[21.156px] flex-1 min-w-0",
+                 "c": "bg-[#fff] border-[1.322px] border-[#e6dccb] border-solid flex flex-col gap-[18.511px] items-start p-[26.444px] relative rounded-[21.156px] w-[436.333px] shrink-0",
                  "n": "Maintenance plan",
                  "id": "I204:10320;200:289",
                  "k": [
                   {
                    "t": "p",
-                   "c": "font-medium leading-[1.38] relative text-[14.54px] text-[color:#2a3360] tracking-[1.454px] w-full",
+                   "c": "font-medium leading-[1.38] relative text-[14.54px] text-[color:#2a3360] tracking-[1.454px] w-[383.444px] shrink-0",
                    "id": "I204:10320;200:290",
                    "k": [
                     "JUNIPER MEMBERSHIP"
@@ -4642,7 +4642,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                   },
                   {
                    "t": "div",
-                   "c": "font-semibold relative text-[38.34px] text-[color:#0f1530] w-full",
+                   "c": "font-semibold relative text-[38.34px] text-[color:#0f1530] w-[383.444px] shrink-0",
                    "id": "I204:10320;200:291",
                    "k": [
                     {
@@ -4663,7 +4663,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                   },
                   {
                    "t": "div",
-                   "c": "flex gap-[13.222px] items-start relative w-full",
+                   "c": "flex gap-[13.222px] items-start relative w-[383.444px] shrink-0",
                    "n": "2 tune-ups each year",
                    "id": "I204:10320;200:292",
                    "k": [
@@ -4682,7 +4682,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                     },
                     {
                      "t": "p",
-                     "c": "font-normal leading-[1.38] relative text-[15.87px] text-[color:#0f1530] flex-1 min-w-0",
+                     "c": "font-normal leading-[1.38] relative text-[15.87px] text-[color:#0f1530] w-[343.778px] shrink-0",
                      "id": "I204:10320;200:295",
                      "k": [
                       "2 tune-ups each year"
@@ -4692,7 +4692,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                   },
                   {
                    "t": "div",
-                   "c": "flex gap-[13.222px] items-start relative w-full",
+                   "c": "flex gap-[13.222px] items-start relative w-[383.444px] shrink-0",
                    "n": "Heating + cooling covered",
                    "id": "I204:10320;200:296",
                    "k": [
@@ -4711,7 +4711,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                     },
                     {
                      "t": "p",
-                     "c": "font-normal leading-[1.38] relative text-[15.87px] text-[color:#0f1530] flex-1 min-w-0",
+                     "c": "font-normal leading-[1.38] relative text-[15.87px] text-[color:#0f1530] w-[343.778px] shrink-0",
                      "id": "I204:10320;200:299",
                      "k": [
                       "Heating + cooling covered"
@@ -4721,7 +4721,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                   },
                   {
                    "t": "div",
-                   "c": "flex gap-[13.222px] items-start relative w-full",
+                   "c": "flex gap-[13.222px] items-start relative w-[383.444px] shrink-0",
                    "n": "Member repair discount",
                    "id": "I204:10320;200:300",
                    "k": [
@@ -4740,7 +4740,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                     },
                     {
                      "t": "p",
-                     "c": "font-normal leading-[1.38] relative text-[15.87px] text-[color:#0f1530] flex-1 min-w-0",
+                     "c": "font-normal leading-[1.38] relative text-[15.87px] text-[color:#0f1530] w-[343.778px] shrink-0",
                      "id": "I204:10320;200:303",
                      "k": [
                       "Member repair discount"
@@ -4750,7 +4750,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                   },
                   {
                    "t": "div",
-                   "c": "bg-[#e4f1e8] flex h-[35.7px] items-center px-[13.222px] relative rounded-[15.867px] w-full",
+                   "c": "bg-[#e4f1e8] flex h-[35.7px] items-center px-[13.222px] relative rounded-[15.867px] w-[251.222px] shrink-0",
                    "n": "Status / ACTIVE AGREEMENT",
                    "id": "I204:10320;200:304",
                    "k": [
@@ -4768,7 +4768,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#fff] border-[1.322px] border-[#e6dccb] border-solid flex flex-col gap-[18.511px] items-start p-[26.444px] relative rounded-[21.156px] flex-1 min-w-0",
+                 "c": "bg-[#fff] border-[1.322px] border-[#e6dccb] border-solid flex flex-col gap-[18.511px] items-start p-[26.444px] relative rounded-[21.156px] w-[425.756px] shrink-0",
                  "n": "Next service",
                  "id": "I204:10320;200:306",
                  "k": [
@@ -4787,7 +4787,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                   },
                   {
                    "t": "p",
-                   "c": "font-semibold leading-[1.38] relative text-[29.09px] text-[color:#0f1530] w-full",
+                   "c": "font-semibold leading-[1.38] relative text-[29.09px] text-[color:#0f1530] w-[372.867px] shrink-0",
                    "id": "I204:10320;200:310",
                    "k": [
                     "Your next visit"
@@ -4795,7 +4795,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                   },
                   {
                    "t": "p",
-                   "c": "font-normal leading-[1.38] relative text-[18.51px] text-[color:#0f1530] w-full",
+                   "c": "font-normal leading-[1.38] relative text-[18.51px] text-[color:#0f1530] w-[372.867px] shrink-0",
                    "id": "I204:10320;200:311",
                    "k": [
                     "Fall heating tune-up"
@@ -4803,7 +4803,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                   },
                   {
                    "t": "p",
-                   "c": "font-medium leading-[1.38] relative text-[15.87px] text-[color:#2a3360] w-full",
+                   "c": "font-medium leading-[1.38] relative text-[15.87px] text-[color:#2a3360] w-[372.867px] shrink-0",
                    "id": "I204:10320;200:312",
                    "k": [
                     "NOV"
@@ -4811,7 +4811,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                   },
                   {
                    "t": "p",
-                   "c": "font-bold leading-[1.08] relative text-[84.62px] text-[color:#0f1530] tracking-[-2.1155px] w-full",
+                   "c": "font-bold leading-[1.08] relative text-[84.62px] text-[color:#0f1530] tracking-[-2.1155px] w-[372.867px] shrink-0",
                    "id": "I204:10320;200:313",
                    "k": [
                     "12"
@@ -4819,13 +4819,13 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
                   },
                   {
                    "t": "div",
-                   "c": "bg-[#0f1530] flex h-[50.244px] items-center justify-center px-[18.511px] relative rounded-[15.867px] w-full",
+                   "c": "bg-[#0f1530] flex h-[50.244px] items-center justify-center px-[18.511px] relative rounded-[15.867px] w-[372.867px] shrink-0",
                    "n": "UI action / Review reminder email",
                    "id": "I204:10320;200:314",
                    "k": [
                     {
                      "t": "p",
-                     "c": "font-medium leading-[1.38] relative text-[15.87px] text-[color:#fff] text-center flex-1 min-w-0",
+                     "c": "font-medium leading-[1.38] relative text-[15.87px] text-[color:#fff] text-center w-[335.844px] shrink-0",
                      "id": "I204:10320;200:315",
                      "k": [
                       "Review reminder email"
@@ -4843,7 +4843,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
           },
           {
            "t": "div",
-           "c": "flex gap-[16px] items-start relative w-full",
+           "c": "flex gap-[16px] items-start relative w-[952px] shrink-0",
            "n": "Tour navigation",
            "id": "204:10359",
            "k": [
@@ -4865,7 +4865,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
           },
           {
            "t": "div",
-           "c": "block font-medium relative text-[13px] text-[color:#2a3360] w-full",
+           "c": "block font-medium relative text-[13px] text-[color:#2a3360] w-[952px] shrink-0",
            "id": "204:10364",
            "k": [
             {
@@ -4949,7 +4949,7 @@ export const TOUR_TREES: Record<string, { desktop: VNode; mobile: VNode }> = {
           },
           {
            "t": "p",
-           "c": "font-semibold relative text-[18px] text-[color:#0f1530] flex-1 min-w-0",
+           "c": "font-semibold relative text-[18px] text-[color:#0f1530] w-[250px] shrink-0",
            "id": "204:10736",
            "k": [
             "Bring them back"

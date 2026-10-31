@@ -5,3 +5,4 @@ export * from "./rubric-registry.js";
 export * from "./findings-review.js";
 export * from "./public-signals.js";
 export * from "./ssrf-allowlist.js";
+export * from "./report.js";

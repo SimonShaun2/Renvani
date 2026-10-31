@@ -22037,25 +22037,25 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
    "k": [
     {
      "t": "div",
-     "c": "bg-[#fbf6ef] flex flex-col gap-[32px] items-start p-[80px] relative w-full",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[32px] items-start p-[80px] relative w-[1440px] shrink-0",
      "n": "01 / Product in view",
      "id": "203:11684",
      "k": [
       {
        "t": "div",
-       "c": "flex gap-[48px] items-center relative w-full",
+       "c": "flex gap-[48px] items-center relative w-[1280px] shrink-0",
        "n": "Outcome and product",
        "id": "203:11685",
        "k": [
         {
          "t": "div",
-         "c": "flex flex-col gap-[20px] items-start relative flex-1 min-w-0",
+         "c": "flex flex-col gap-[20px] items-start relative w-[480px] shrink-0",
          "n": "Short outcome copy",
          "id": "203:11686",
          "k": [
           {
            "t": "p",
-           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[480px] shrink-0",
            "id": "203:11687",
            "k": [
             "TECHNICIAN APP"
@@ -22063,7 +22063,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "h1",
-           "c": "font-semibold leading-[1.08] relative text-[60px] text-[color:#0f1530] tracking-[-1.5px] w-full",
+           "c": "font-semibold leading-[1.08] relative text-[60px] text-[color:#0f1530] tracking-[-1.5px] w-[480px] shrink-0",
            "id": "203:11688",
            "k": [
             "Everything for the job. Right here."
@@ -22071,7 +22071,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-full",
+           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-[480px] shrink-0",
            "id": "203:11689",
            "k": [
             "Put equipment, tasks, photos, and job history in the technician’s hand."
@@ -22086,7 +22086,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[480px] shrink-0",
            "id": "203:11692",
            "k": [
             "EXAMPLE BUSINESS · JUNIPER"
@@ -22096,13 +22096,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "div",
-         "c": "bg-[#f6f7f9] border-[1.044px] border-[#e6dccb] border-solid flex flex-col h-[499.244px] items-start overflow-clip relative rounded-[16.711px] flex-1 min-w-0",
+         "c": "bg-[#f6f7f9] border-[1.044px] border-[#e6dccb] border-solid flex flex-col h-[499.244px] items-start overflow-clip relative rounded-[16.711px] w-[752px] shrink-0",
          "n": "Product demonstration / Technician App",
          "id": "203:11693",
          "k": [
           {
            "t": "div",
-           "c": "bg-[#0f1530] flex gap-[16.711px] h-[56.4px] items-center p-[16.711px] relative w-full",
+           "c": "bg-[#0f1530] flex gap-[16.711px] h-[56.4px] items-center p-[16.711px] relative w-[752px] shrink-0",
            "n": "Product chrome",
            "id": "I203:11693;200:181",
            "k": [
@@ -22116,7 +22116,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[12.53px] text-[color:#fff] flex-1 min-w-0",
+             "c": "font-medium leading-[1.38] relative text-[12.53px] text-[color:#fff] w-[432.4px] shrink-0",
              "id": "I203:11693;200:183",
              "k": [
               "Technician app"
@@ -22142,19 +22142,19 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[16.711px] items-start p-[25.067px] relative w-full",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[16.711px] items-start p-[25.067px] relative w-[752px] shrink-0",
            "n": "Product workspace",
            "id": "I203:11693;200:186",
            "k": [
             {
              "t": "div",
-             "c": "flex gap-[16.711px] items-start relative w-full",
+             "c": "flex gap-[16.711px] items-start relative w-[701.867px] shrink-0",
              "n": "Screen title",
              "id": "I203:11693;200:187",
              "k": [
               {
                "t": "p",
-               "c": "font-semibold leading-[1.38] relative text-[24.02px] text-[color:#0f1530] flex-1 min-w-0",
+               "c": "font-semibold leading-[1.38] relative text-[24.02px] text-[color:#0f1530] w-[480.444px] shrink-0",
                "id": "I203:11693;200:188",
                "k": [
                 "Technician app"
@@ -22180,19 +22180,19 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "flex gap-[20.889px] items-start relative w-full",
+             "c": "flex gap-[20.889px] items-start relative w-[701.867px] shrink-0",
              "n": "Field work",
              "id": "I203:11693;200:191",
              "k": [
               {
                "t": "div",
-               "c": "flex flex-col gap-[12.533px] items-start relative flex-1 min-w-0",
+               "c": "flex flex-col gap-[12.533px] items-start relative w-[357.2px] shrink-0",
                "n": "Job site",
                "id": "I203:11693;200:192",
                "k": [
                 {
                  "t": "div",
-                 "c": "h-[271.556px] relative rounded-[16.711px] w-full",
+                 "c": "h-[271.556px] relative rounded-[16.711px] w-[357.2px] shrink-0",
                  "n": "Technician at the job",
                  "id": "I203:11693;200:193",
                  "k": [
@@ -22205,7 +22205,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#0f1530] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-full",
+                 "c": "bg-[#0f1530] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[208.889px] shrink-0",
                  "n": "Status / ON SITE · MAYA R.",
                  "id": "I203:11693;200:194",
                  "k": [
@@ -22223,13 +22223,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] flex-1 min-w-0",
+               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] w-[323.778px] shrink-0",
                "n": "Technician checklist",
                "id": "I203:11693;200:196",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-semibold leading-[1.38] relative text-[22.98px] text-[color:#0f1530] w-full",
+                 "c": "font-semibold leading-[1.38] relative text-[22.98px] text-[color:#0f1530] w-[282px] shrink-0",
                  "id": "I203:11693;200:197",
                  "k": [
                   "AC diagnostic"
@@ -22237,7 +22237,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-normal leading-[1.38] relative text-[12.53px] text-[color:#2a3360] w-full",
+                 "c": "font-normal leading-[1.38] relative text-[12.53px] text-[color:#2a3360] w-[282px] shrink-0",
                  "id": "I203:11693;200:198",
                  "k": [
                   "Jordan Lee · Job #1042"
@@ -22245,7 +22245,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "flex gap-[10.444px] items-start relative w-full",
+                 "c": "flex gap-[10.444px] items-start relative w-[282px] shrink-0",
                  "n": "Equipment checked",
                  "id": "I203:11693;200:199",
                  "k": [
@@ -22264,7 +22264,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                   },
                   {
                    "t": "p",
-                   "c": "font-normal leading-[1.38] relative text-[12.53px] text-[color:#0f1530] flex-1 min-w-0",
+                   "c": "font-normal leading-[1.38] relative text-[12.53px] text-[color:#0f1530] w-[250.667px] shrink-0",
                    "id": "I203:11693;200:202",
                    "k": [
                     "Equipment checked"
@@ -22274,7 +22274,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "flex gap-[10.444px] items-start relative w-full",
+                 "c": "flex gap-[10.444px] items-start relative w-[282px] shrink-0",
                  "n": "Repair completed",
                  "id": "I203:11693;200:203",
                  "k": [
@@ -22293,7 +22293,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                   },
                   {
                    "t": "p",
-                   "c": "font-normal leading-[1.38] relative text-[12.53px] text-[color:#0f1530] flex-1 min-w-0",
+                   "c": "font-normal leading-[1.38] relative text-[12.53px] text-[color:#0f1530] w-[250.667px] shrink-0",
                    "id": "I203:11693;200:206",
                    "k": [
                     "Repair completed"
@@ -22303,7 +22303,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "flex gap-[10.444px] items-start relative w-full",
+                 "c": "flex gap-[10.444px] items-start relative w-[282px] shrink-0",
                  "n": "Function test passed",
                  "id": "I203:11693;200:207",
                  "k": [
@@ -22322,7 +22322,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                   },
                   {
                    "t": "p",
-                   "c": "font-normal leading-[1.38] relative text-[12.53px] text-[color:#0f1530] flex-1 min-w-0",
+                   "c": "font-normal leading-[1.38] relative text-[12.53px] text-[color:#0f1530] w-[250.667px] shrink-0",
                    "id": "I203:11693;200:210",
                    "k": [
                     "Function test passed"
@@ -22332,7 +22332,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "flex gap-[10.444px] items-start relative w-full",
+                 "c": "flex gap-[10.444px] items-start relative w-[282px] shrink-0",
                  "n": "Photos added",
                  "id": "I203:11693;200:211",
                  "k": [
@@ -22351,7 +22351,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                   },
                   {
                    "t": "p",
-                   "c": "font-normal leading-[1.38] relative text-[12.53px] text-[color:#0f1530] flex-1 min-w-0",
+                   "c": "font-normal leading-[1.38] relative text-[12.53px] text-[color:#0f1530] w-[250.667px] shrink-0",
                    "id": "I203:11693;200:214",
                    "k": [
                     "Photos added"
@@ -22361,7 +22361,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#e4f1e8] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-full",
+                 "c": "bg-[#e4f1e8] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[177.556px] shrink-0",
                  "n": "Status / 6 of 6 complete",
                  "id": "I203:11693;200:215",
                  "k": [
@@ -22377,13 +22377,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#f6b400] flex h-[39.689px] items-center justify-center px-[14.622px] relative rounded-[12.533px] w-full",
+                 "c": "bg-[#f6b400] flex h-[39.689px] items-center justify-center px-[14.622px] relative rounded-[12.533px] w-[282px] shrink-0",
                  "n": "UI action / Complete visit",
                  "id": "I203:11693;200:217",
                  "k": [
                   {
                    "t": "p",
-                   "c": "font-medium leading-[1.38] relative text-[12.53px] text-[color:#0f1530] text-center flex-1 min-w-0",
+                   "c": "font-medium leading-[1.38] relative text-[12.53px] text-[color:#0f1530] text-center w-[252.756px] shrink-0",
                    "id": "I203:11693;200:218",
                    "k": [
                     "Complete visit"
@@ -22405,19 +22405,19 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
     },
     {
      "t": "div",
-     "c": "bg-[#fff] flex flex-col gap-[32px] items-start p-[80px] relative w-full",
+     "c": "bg-[#fff] flex flex-col gap-[32px] items-start p-[80px] relative w-[1440px] shrink-0",
      "n": "02 / A workflow you can see",
      "id": "203:11732",
      "k": [
       {
        "t": "div",
-       "c": "flex flex-col gap-[12px] items-start relative w-full",
+       "c": "flex flex-col gap-[12px] items-start relative w-[1280px] shrink-0",
        "n": "Workflow heading",
        "id": "203:11733",
        "k": [
         {
          "t": "p",
-         "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+         "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[1280px] shrink-0",
          "id": "203:11734",
          "k": [
           "EXAMPLE WORKFLOW"
@@ -22425,7 +22425,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "p",
-         "c": "font-semibold leading-[1.08] relative text-[44px] text-[color:#0f1530] tracking-[-1.1px] w-full",
+         "c": "font-semibold leading-[1.08] relative text-[44px] text-[color:#0f1530] tracking-[-1.1px] w-[1280px] shrink-0",
          "id": "203:11735",
          "k": [
           "See the work happen."
@@ -22435,7 +22435,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
       },
       {
        "t": "div",
-       "c": "flex gap-[40px] items-start relative w-full",
+       "c": "flex gap-[40px] items-start relative w-[1280px] shrink-0",
        "n": "Three product moments",
        "id": "203:11736",
        "k": [
@@ -22447,7 +22447,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "flex gap-[12px] items-start relative w-full",
+           "c": "flex gap-[12px] items-start relative w-[354px] shrink-0",
            "n": "Step heading",
            "id": "203:11738",
            "k": [
@@ -22469,7 +22469,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] flex-1 min-w-0",
+             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] w-[302px] shrink-0",
              "id": "203:11741",
              "k": [
               "Arrive prepared"
@@ -22479,13 +22479,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-full",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-[354px] shrink-0",
            "n": "Illustrated product state / prepared",
            "id": "203:11742",
            "k": [
             {
              "t": "div",
-             "c": "h-[120px] relative rounded-[16px] w-full",
+             "c": "h-[120px] relative rounded-[16px] w-[318px] shrink-0",
              "n": "Illustrative HVAC job context",
              "id": "203:11743",
              "k": [
@@ -22498,7 +22498,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[19px] text-[color:#0f1530] w-full",
+             "c": "font-semibold leading-[1.38] relative text-[19px] text-[color:#0f1530] w-[318px] shrink-0",
              "id": "203:11744",
              "k": [
               "Next job · Jordan Lee"
@@ -22506,7 +22506,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] w-full",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] w-[318px] shrink-0",
              "id": "203:11745",
              "k": [
               "10:00 AM · AC diagnostic"
@@ -22514,7 +22514,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[246px] shrink-0",
              "n": "Status / Access · Gate on left",
              "id": "203:11746",
              "k": [
@@ -22530,7 +22530,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff] flex gap-[10px] h-[56px] items-start p-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#fff] flex gap-[10px] h-[56px] items-start p-[10px] relative rounded-[12px] w-[318px] shrink-0",
              "n": "On-the-Way Updates / Email preview",
              "id": "220:7316",
              "k": [
@@ -22549,13 +22549,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "flex flex-col gap-[2px] items-start leading-[1.38] relative flex-1 min-w-0",
+               "c": "flex flex-col gap-[2px] items-start leading-[1.38] relative w-[266px] shrink-0",
                "n": "Email update",
                "id": "220:7320",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-[266px] shrink-0",
                  "id": "220:7321",
                  "k": [
                   "On-the-way email"
@@ -22563,7 +22563,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-normal relative text-[11px] text-[color:#2a3360] w-full",
+                 "c": "font-normal relative text-[11px] text-[color:#2a3360] w-[266px] shrink-0",
                  "id": "220:7322",
                  "k": [
                   "Review and send · Email"
@@ -22575,13 +22575,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-[318px] shrink-0",
              "n": "UI action / Open equipment history",
              "id": "203:11748",
              "k": [
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center w-[290px] shrink-0",
                "id": "203:11749",
                "k": [
                 "Open equipment history"
@@ -22601,7 +22601,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "flex gap-[12px] items-start relative w-full",
+           "c": "flex gap-[12px] items-start relative w-[354px] shrink-0",
            "n": "Step heading",
            "id": "203:11752",
            "k": [
@@ -22623,7 +22623,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] flex-1 min-w-0",
+             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] w-[302px] shrink-0",
              "id": "203:11755",
              "k": [
               "Do the work"
@@ -22633,13 +22633,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-full",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-[354px] shrink-0",
            "n": "Illustrated product state / checklist",
            "id": "203:11756",
            "k": [
             {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+             "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-[318px] shrink-0",
              "id": "203:11757",
              "k": [
               "System checklist"
@@ -22647,7 +22647,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff] flex gap-[10px] h-[54px] items-start p-[12px] relative rounded-[12px] w-full",
+             "c": "bg-[#fff] flex gap-[10px] h-[54px] items-start p-[12px] relative rounded-[12px] w-[318px] shrink-0",
              "n": "Check thermostat",
              "id": "203:11758",
              "k": [
@@ -22666,7 +22666,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[14px] text-[color:#0f1530] flex-1 min-w-0",
+               "c": "font-medium leading-[1.38] relative text-[14px] text-[color:#0f1530] w-[262px] shrink-0",
                "id": "203:11761",
                "k": [
                 "Check thermostat"
@@ -22676,7 +22676,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff] flex gap-[10px] h-[54px] items-start p-[12px] relative rounded-[12px] w-full",
+             "c": "bg-[#fff] flex gap-[10px] h-[54px] items-start p-[12px] relative rounded-[12px] w-[318px] shrink-0",
              "n": "Test capacitor",
              "id": "203:11762",
              "k": [
@@ -22695,7 +22695,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[14px] text-[color:#0f1530] flex-1 min-w-0",
+               "c": "font-medium leading-[1.38] relative text-[14px] text-[color:#0f1530] w-[262px] shrink-0",
                "id": "203:11765",
                "k": [
                 "Test capacitor"
@@ -22705,7 +22705,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff] flex gap-[10px] h-[54px] items-start p-[12px] relative rounded-[12px] w-full",
+             "c": "bg-[#fff] flex gap-[10px] h-[54px] items-start p-[12px] relative rounded-[12px] w-[318px] shrink-0",
              "n": "Record readings",
              "id": "203:11766",
              "k": [
@@ -22724,7 +22724,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[14px] text-[color:#0f1530] flex-1 min-w-0",
+               "c": "font-medium leading-[1.38] relative text-[14px] text-[color:#0f1530] w-[262px] shrink-0",
                "id": "203:11769",
                "k": [
                 "Record readings"
@@ -22734,7 +22734,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[220px] shrink-0",
              "n": "Status / 2 of 3 tasks complete",
              "id": "203:11770",
              "k": [
@@ -22760,7 +22760,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "flex gap-[12px] items-start relative w-full",
+           "c": "flex gap-[12px] items-start relative w-[354px] shrink-0",
            "n": "Step heading",
            "id": "203:11774",
            "k": [
@@ -22782,7 +22782,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] flex-1 min-w-0",
+             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] w-[302px] shrink-0",
              "id": "203:11777",
              "k": [
               "Leave a clear record"
@@ -22792,13 +22792,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-full",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-[354px] shrink-0",
            "n": "Illustrated product state / record",
            "id": "203:11778",
            "k": [
             {
              "t": "div",
-             "c": "h-[114px] relative rounded-[16px] w-full",
+             "c": "h-[114px] relative rounded-[16px] w-[318px] shrink-0",
              "n": "Example job photo",
              "id": "203:11779",
              "k": [
@@ -22811,7 +22811,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "flex gap-[12px] items-start relative w-full",
+             "c": "flex gap-[12px] items-start relative w-[318px] shrink-0",
              "n": "Attachment count",
              "id": "203:11780",
              "k": [
@@ -22830,7 +22830,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "p",
-               "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#0f1530] flex-1 min-w-0",
+               "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#0f1530] w-[284px] shrink-0",
                "id": "203:11783",
                "k": [
                 "Service note + photos saved"
@@ -22840,7 +22840,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal italic leading-[1.38] relative text-[26px] text-[color:#0f1530] w-full",
+             "c": "font-normal italic leading-[1.38] relative text-[26px] text-[color:#0f1530] w-[318px] shrink-0",
              "id": "203:11784",
              "k": [
               "Jordan Lee"
@@ -22848,7 +22848,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] w-full",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] w-[318px] shrink-0",
              "id": "203:11785",
              "k": [
               "Example customer signature"
@@ -22856,13 +22856,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-[318px] shrink-0",
              "n": "UI action / Mark visit complete",
              "id": "203:11786",
              "k": [
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center w-[290px] shrink-0",
                "id": "203:11787",
                "k": [
                 "Mark visit complete"
@@ -22881,13 +22881,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
     },
     {
      "t": "div",
-     "c": "bg-[#0f1530] flex flex-col gap-[16px] items-start px-[80px] py-[48px] relative w-full",
+     "c": "bg-[#0f1530] flex flex-col gap-[16px] items-start px-[80px] py-[48px] relative w-[1440px] shrink-0",
      "n": "03 / Connected workflow and demo",
      "id": "203:11789",
      "k": [
       {
        "t": "p",
-       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#f6b400] tracking-[1.1px] w-full",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#f6b400] tracking-[1.1px] w-[1280px] shrink-0",
        "id": "219:10220",
        "k": [
         "WORKS ACROSS YOUR BUSINESS"
@@ -22895,7 +22895,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
       },
       {
        "t": "p",
-       "c": "font-semibold leading-[1.08] relative text-[36px] text-[color:#fff] tracking-[-0.9px] w-full",
+       "c": "font-semibold leading-[1.08] relative text-[36px] text-[color:#fff] tracking-[-0.9px] w-[1280px] shrink-0",
        "id": "219:10221",
        "k": [
         "One job. Connected all the way."
@@ -22903,7 +22903,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
       },
       {
        "t": "div",
-       "c": "flex gap-[16px] items-center relative w-full",
+       "c": "flex gap-[16px] items-center relative w-[1280px] shrink-0",
        "n": "Flagship and tool handoff",
        "id": "219:10222",
        "k": [
@@ -22915,7 +22915,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Suite and record",
            "id": "219:10224",
            "k": [
@@ -22947,7 +22947,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-[352px] shrink-0",
            "id": "219:10228",
            "k": [
             "Estimates & approvals"
@@ -22955,7 +22955,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Handoff evidence",
            "id": "219:10229",
            "k": [
@@ -22974,7 +22974,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left w-[324px] shrink-0",
              "id": "219:10232",
              "k": [
               "Approved work attached"
@@ -23013,7 +23013,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Suite and record",
            "id": "219:10238",
            "k": [
@@ -23045,7 +23045,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-[352px] shrink-0",
            "id": "219:10242",
            "k": [
             "Technician App"
@@ -23053,7 +23053,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Handoff evidence",
            "id": "219:10243",
            "k": [
@@ -23072,7 +23072,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left w-[324px] shrink-0",
              "id": "219:10246",
              "k": [
               "Tasks and photos saved"
@@ -23111,7 +23111,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Suite and record",
            "id": "219:10252",
            "k": [
@@ -23143,7 +23143,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-[352px] shrink-0",
            "id": "219:10256",
            "k": [
             "Invoices & payments"
@@ -23151,7 +23151,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Handoff evidence",
            "id": "219:10257",
            "k": [
@@ -23170,7 +23170,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left w-[324px] shrink-0",
              "id": "219:10260",
              "k": [
               "Completed work ready to bill"
@@ -23369,7 +23369,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#0f1530] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-full",
+                 "c": "bg-[#0f1530] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[95px] shrink-0",
                  "n": "Status / ON SITE · MAYA R.",
                  "id": "I203:11814;200:194",
                  "k": [
@@ -23525,7 +23525,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#e4f1e8] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-full",
+                 "c": "bg-[#e4f1e8] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[80.75px] shrink-0",
                  "n": "Status / 6 of 6 complete",
                  "id": "I203:11814;200:215",
                  "k": [
@@ -23678,7 +23678,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-full",
+             "c": "bg-[#fff] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[210.33px] shrink-0",
              "n": "Status / Access · Gate on left",
              "id": "I203:11858;203:11746",
              "k": [
@@ -23898,7 +23898,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff4d6] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-full",
+             "c": "bg-[#fff4d6] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[188.1px] shrink-0",
              "n": "Status / 2 of 3 tasks complete",
              "id": "I203:11871;203:11770",
              "k": [
@@ -24150,7 +24150,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "div",
-         "c": "flex flex-col h-[24px] items-center justify-center relative w-full",
+         "c": "flex flex-col h-[24px] items-center justify-center relative w-[32px] shrink-0",
          "n": "Next connected state",
          "id": "219:10276",
          "k": [
@@ -24248,7 +24248,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "div",
-         "c": "flex flex-col h-[24px] items-center justify-center relative w-full",
+         "c": "flex flex-col h-[24px] items-center justify-center relative w-[32px] shrink-0",
          "n": "Next connected state",
          "id": "219:10290",
          "k": [
@@ -24367,25 +24367,25 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
    "k": [
     {
      "t": "div",
-     "c": "bg-[#fbf6ef] flex flex-col gap-[32px] items-start p-[80px] relative w-full",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[32px] items-start p-[80px] relative w-[1440px] shrink-0",
      "n": "01 / Product in view",
      "id": "203:8373",
      "k": [
       {
        "t": "div",
-       "c": "flex gap-[48px] items-center relative w-full",
+       "c": "flex gap-[48px] items-center relative w-[1280px] shrink-0",
        "n": "Outcome and product",
        "id": "203:8374",
        "k": [
         {
          "t": "div",
-         "c": "flex flex-col gap-[20px] items-start relative flex-1 min-w-0",
+         "c": "flex flex-col gap-[20px] items-start relative w-[480px] shrink-0",
          "n": "Short outcome copy",
          "id": "203:8375",
          "k": [
           {
            "t": "p",
-           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[480px] shrink-0",
            "id": "203:8376",
            "k": [
             "INVOICES & PAYMENTS"
@@ -24393,7 +24393,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "h1",
-           "c": "font-semibold leading-[1.08] relative text-[60px] text-[color:#0f1530] tracking-[-1.5px] w-full",
+           "c": "font-semibold leading-[1.08] relative text-[60px] text-[color:#0f1530] tracking-[-1.5px] w-[480px] shrink-0",
            "id": "203:8377",
            "k": [
             "Finish the job. Send the invoice."
@@ -24401,7 +24401,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-full",
+           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-[480px] shrink-0",
            "id": "203:8378",
            "k": [
             "Create the invoice from completed work and track payment."
@@ -24416,7 +24416,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[480px] shrink-0",
            "id": "203:8381",
            "k": [
             "EXAMPLE BUSINESS · JUNIPER"
@@ -24426,13 +24426,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "div",
-         "c": "bg-[#f6f7f9] border-[1.044px] border-[#e6dccb] border-solid flex flex-col h-[534.756px] items-start overflow-clip relative rounded-[16.711px] flex-1 min-w-0",
+         "c": "bg-[#f6f7f9] border-[1.044px] border-[#e6dccb] border-solid flex flex-col h-[534.756px] items-start overflow-clip relative rounded-[16.711px] w-[752px] shrink-0",
          "n": "Product demonstration / Invoices & Payments",
          "id": "203:8382",
          "k": [
           {
            "t": "div",
-           "c": "bg-[#0f1530] flex gap-[16.711px] h-[56.4px] items-center p-[16.711px] relative w-full",
+           "c": "bg-[#0f1530] flex gap-[16.711px] h-[56.4px] items-center p-[16.711px] relative w-[752px] shrink-0",
            "n": "Product chrome",
            "id": "I203:8382;200:221",
            "k": [
@@ -24446,7 +24446,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[12.53px] text-[color:#fff] flex-1 min-w-0",
+             "c": "font-medium leading-[1.38] relative text-[12.53px] text-[color:#fff] w-[432.4px] shrink-0",
              "id": "I203:8382;200:223",
              "k": [
               "Invoices & payments"
@@ -24472,19 +24472,19 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[16.711px] items-start p-[25.067px] relative w-full",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[16.711px] items-start p-[25.067px] relative w-[752px] shrink-0",
            "n": "Product workspace",
            "id": "I203:8382;200:226",
            "k": [
             {
              "t": "div",
-             "c": "flex gap-[16.711px] items-start relative w-full",
+             "c": "flex gap-[16.711px] items-start relative w-[701.867px] shrink-0",
              "n": "Screen title",
              "id": "I203:8382;200:227",
              "k": [
               {
                "t": "p",
-               "c": "font-semibold leading-[1.38] relative text-[24.02px] text-[color:#0f1530] flex-1 min-w-0",
+               "c": "font-semibold leading-[1.38] relative text-[24.02px] text-[color:#0f1530] w-[480.444px] shrink-0",
                "id": "I203:8382;200:228",
                "k": [
                 "Invoices & payments"
@@ -24510,19 +24510,19 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "flex gap-[20.889px] items-start relative w-full",
+             "c": "flex gap-[20.889px] items-start relative w-[701.867px] shrink-0",
              "n": "Document and customer status",
              "id": "I203:8382;200:231",
              "k": [
               {
                "t": "div",
-               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] flex-1 min-w-0",
+               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] w-[398.978px] shrink-0",
                "n": "Service document",
                "id": "I203:8382;200:232",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-semibold leading-[1.38] relative text-[19.84px] text-[color:#0f1530] w-full",
+                 "c": "font-semibold leading-[1.38] relative text-[19.84px] text-[color:#0f1530] w-[357.2px] shrink-0",
                  "id": "I203:8382;200:233",
                  "k": [
                   "Invoice #1042"
@@ -24530,7 +24530,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-normal leading-[1.38] relative text-[12.53px] text-[color:#2a3360] w-full",
+                 "c": "font-normal leading-[1.38] relative text-[12.53px] text-[color:#2a3360] w-[357.2px] shrink-0",
                  "id": "I203:8382;200:234",
                  "k": [
                   "Jordan Lee · AC diagnostic"
@@ -24538,13 +24538,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#e6dccb] h-[1.044px] relative w-full",
+                 "c": "bg-[#e6dccb] h-[1.044px] relative w-[357.2px] shrink-0",
                  "n": "Divider",
                  "id": "I203:8382;200:235"
                 },
                 {
                  "t": "div",
-                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.53px] w-full",
+                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.53px] w-[357.2px] shrink-0",
                  "n": "Field / Diagnostic visit",
                  "id": "I203:8382;200:236",
                  "k": [
@@ -24568,7 +24568,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.53px] w-full",
+                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.53px] w-[357.2px] shrink-0",
                  "n": "Field / Capacitor replacement",
                  "id": "I203:8382;200:239",
                  "k": [
@@ -24592,13 +24592,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#e6dccb] h-[1.044px] relative w-full",
+                 "c": "bg-[#e6dccb] h-[1.044px] relative w-[357.2px] shrink-0",
                  "n": "Divider",
                  "id": "I203:8382;200:242"
                 },
                 {
                  "t": "div",
-                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.53px] w-full",
+                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.53px] w-[357.2px] shrink-0",
                  "n": "Field / Service total",
                  "id": "I203:8382;200:243",
                  "k": [
@@ -24622,7 +24622,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.53px] w-full",
+                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.53px] w-[357.2px] shrink-0",
                  "n": "Field / Service Fee · Flex",
                  "id": "I203:8382;200:246",
                  "k": [
@@ -24646,7 +24646,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.53px] w-full",
+                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.53px] w-[357.2px] shrink-0",
                  "n": "Field / Total due",
                  "id": "I203:8382;200:249",
                  "k": [
@@ -24670,7 +24670,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-normal leading-[1.38] relative text-[9.4px] text-[color:#2a3360] w-full",
+                 "c": "font-normal leading-[1.38] relative text-[9.4px] text-[color:#2a3360] w-[357.2px] shrink-0",
                  "id": "I203:8382;200:252",
                  "k": [
                   "Example checkout · No tax shown"
@@ -24678,13 +24678,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#0f1530] flex h-[39.689px] items-center justify-center px-[14.622px] relative rounded-[12.533px] w-full",
+                 "c": "bg-[#0f1530] flex h-[39.689px] items-center justify-center px-[14.622px] relative rounded-[12.533px] w-[357.2px] shrink-0",
                  "n": "UI action / Send payment link",
                  "id": "I203:8382;200:253",
                  "k": [
                   {
                    "t": "p",
-                   "c": "font-medium leading-[1.38] relative text-[12.53px] text-[color:#fff] text-center flex-1 min-w-0",
+                   "c": "font-medium leading-[1.38] relative text-[12.53px] text-[color:#fff] text-center w-[327.956px] shrink-0",
                    "id": "I203:8382;200:254",
                    "k": [
                     "Send payment link"
@@ -24696,19 +24696,19 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "flex flex-col gap-[16.711px] items-start relative flex-1 min-w-0",
+               "c": "flex flex-col gap-[16.711px] items-start relative w-[282px] shrink-0",
                "n": "Approval and outcome",
                "id": "I203:8382;200:255",
                "k": [
                 {
                  "t": "div",
-                 "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] w-full",
+                 "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] w-[282px] shrink-0",
                  "n": "Status",
                  "id": "I203:8382;200:256",
                  "k": [
                   {
                    "t": "p",
-                   "c": "font-medium leading-[1.38] relative text-[11.49px] text-[color:#2a3360] tracking-[1.149px] w-full",
+                   "c": "font-medium leading-[1.38] relative text-[11.49px] text-[color:#2a3360] tracking-[1.149px] w-[240.222px] shrink-0",
                    "id": "I203:8382;200:257",
                    "k": [
                     "CUSTOMER VIEW"
@@ -24716,7 +24716,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                   },
                   {
                    "t": "p",
-                   "c": "font-semibold leading-[1.38] relative text-[25.07px] text-[color:#0f1530] w-full",
+                   "c": "font-semibold leading-[1.38] relative text-[25.07px] text-[color:#0f1530] w-[240.222px] shrink-0",
                    "id": "I203:8382;200:258",
                    "k": [
                     "Ready to pay."
@@ -24724,7 +24724,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                   },
                   {
                    "t": "div",
-                   "c": "flex gap-[10.444px] items-start relative w-full",
+                   "c": "flex gap-[10.444px] items-start relative w-[240.222px] shrink-0",
                    "n": "Scope reviewed",
                    "id": "I203:8382;200:259",
                    "k": [
@@ -24753,7 +24753,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                   },
                   {
                    "t": "div",
-                   "c": "flex gap-[10.444px] items-start relative w-full",
+                   "c": "flex gap-[10.444px] items-start relative w-[240.222px] shrink-0",
                    "n": "Price confirmed",
                    "id": "I203:8382;200:263",
                    "k": [
@@ -24782,7 +24782,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                   },
                   {
                    "t": "div",
-                   "c": "flex gap-[10.444px] items-start relative w-full",
+                   "c": "flex gap-[10.444px] items-start relative w-[240.222px] shrink-0",
                    "n": "Receipt emailed",
                    "id": "I203:8382;200:267",
                    "k": [
@@ -24811,7 +24811,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                   },
                   {
                    "t": "div",
-                   "c": "bg-[#e4f1e8] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-full",
+                   "c": "bg-[#e4f1e8] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[130.556px] shrink-0",
                    "n": "Status / Paid",
                    "id": "I203:8382;200:271",
                    "k": [
@@ -24829,13 +24829,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#fff4d6] flex flex-col gap-[5.222px] items-start leading-[1.38] p-[16.711px] relative rounded-[12.533px] w-full",
+                 "c": "bg-[#fff4d6] flex flex-col gap-[5.222px] items-start leading-[1.38] p-[16.711px] relative rounded-[12.533px] w-[282px] shrink-0",
                  "n": "Matched to job",
                  "id": "I203:8382;200:273",
                  "k": [
                   {
                    "t": "p",
-                   "c": "font-semibold relative text-[16.71px] text-[color:#0f1530] w-full",
+                   "c": "font-semibold relative text-[16.71px] text-[color:#0f1530] w-[248.578px] shrink-0",
                    "id": "I203:8382;200:274",
                    "k": [
                     "Job #1042"
@@ -24843,7 +24843,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                   },
                   {
                    "t": "p",
-                   "c": "font-normal relative text-[11.49px] text-[color:#2a3360] w-full",
+                   "c": "font-normal relative text-[11.49px] text-[color:#2a3360] w-[248.578px] shrink-0",
                    "id": "I203:8382;200:275",
                    "k": [
                     "Everything stays connected."
@@ -24865,19 +24865,19 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
     },
     {
      "t": "div",
-     "c": "bg-[#fff] flex flex-col gap-[32px] items-start p-[80px] relative w-full",
+     "c": "bg-[#fff] flex flex-col gap-[32px] items-start p-[80px] relative w-[1440px] shrink-0",
      "n": "02 / A workflow you can see",
      "id": "203:8438",
      "k": [
       {
        "t": "div",
-       "c": "flex flex-col gap-[12px] items-start relative w-full",
+       "c": "flex flex-col gap-[12px] items-start relative w-[1280px] shrink-0",
        "n": "Workflow heading",
        "id": "203:8439",
        "k": [
         {
          "t": "p",
-         "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+         "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[1280px] shrink-0",
          "id": "203:8440",
          "k": [
           "EXAMPLE WORKFLOW"
@@ -24885,7 +24885,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "p",
-         "c": "font-semibold leading-[1.08] relative text-[44px] text-[color:#0f1530] tracking-[-1.1px] w-full",
+         "c": "font-semibold leading-[1.08] relative text-[44px] text-[color:#0f1530] tracking-[-1.1px] w-[1280px] shrink-0",
          "id": "203:8441",
          "k": [
           "See the work happen."
@@ -24895,7 +24895,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
       },
       {
        "t": "div",
-       "c": "flex gap-[40px] items-start relative w-full",
+       "c": "flex gap-[40px] items-start relative w-[1280px] shrink-0",
        "n": "Three product moments",
        "id": "203:8442",
        "k": [
@@ -24907,7 +24907,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "flex gap-[12px] items-start relative w-full",
+           "c": "flex gap-[12px] items-start relative w-[354px] shrink-0",
            "n": "Step heading",
            "id": "203:8444",
            "k": [
@@ -24929,7 +24929,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] flex-1 min-w-0",
+             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] w-[302px] shrink-0",
              "id": "203:8447",
              "k": [
               "Turn work into an invoice"
@@ -24939,13 +24939,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-full",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-[354px] shrink-0",
            "n": "Illustrated product state / invoice",
            "id": "203:8448",
            "k": [
             {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[21px] text-[color:#0f1530] w-full",
+             "c": "font-semibold leading-[1.38] relative text-[21px] text-[color:#0f1530] w-[318px] shrink-0",
              "id": "203:8449",
              "k": [
               "Invoice #1042"
@@ -24953,7 +24953,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] w-full",
+             "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] w-[318px] shrink-0",
              "id": "203:8450",
              "k": [
               "Juniper Heating & Plumbing"
@@ -24961,13 +24961,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#e6dccb] h-px relative w-full",
+             "c": "bg-[#e6dccb] h-px relative w-[318px] shrink-0",
              "n": "Divider",
              "id": "203:8451"
             },
             {
              "t": "div",
-             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-full",
+             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-[318px] shrink-0",
              "n": "Field / Diagnostic visit",
              "id": "203:8452",
              "k": [
@@ -24991,7 +24991,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-full",
+             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-[318px] shrink-0",
              "n": "Field / Capacitor replacement",
              "id": "203:8455",
              "k": [
@@ -25015,13 +25015,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#e6dccb] h-px relative w-full",
+             "c": "bg-[#e6dccb] h-px relative w-[318px] shrink-0",
              "n": "Divider",
              "id": "203:8458"
             },
             {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[27px] text-[color:#0f1530] w-full",
+             "c": "font-semibold leading-[1.38] relative text-[27px] text-[color:#0f1530] w-[318px] shrink-0",
              "id": "203:8459",
              "k": [
               "Total $274"
@@ -25029,13 +25029,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-[318px] shrink-0",
              "n": "UI action / Create invoice",
              "id": "203:8460",
              "k": [
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center w-[290px] shrink-0",
                "id": "203:8461",
                "k": [
                 "Create invoice"
@@ -25055,7 +25055,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "flex gap-[12px] items-start relative w-full",
+           "c": "flex gap-[12px] items-start relative w-[354px] shrink-0",
            "n": "Step heading",
            "id": "203:8464",
            "k": [
@@ -25077,7 +25077,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] flex-1 min-w-0",
+             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] w-[302px] shrink-0",
              "id": "203:8467",
              "k": [
               "Show the full checkout"
@@ -25087,13 +25087,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-full",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-[354px] shrink-0",
            "n": "Illustrated product state / checkout",
            "id": "203:8468",
            "k": [
             {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[21px] text-[color:#0f1530] w-full",
+             "c": "font-semibold leading-[1.38] relative text-[21px] text-[color:#0f1530] w-[318px] shrink-0",
              "id": "203:8469",
              "k": [
               "Checkout"
@@ -25101,7 +25101,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] w-full",
+             "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] w-[318px] shrink-0",
              "id": "203:8470",
              "k": [
               "Juniper Heating & Plumbing"
@@ -25109,13 +25109,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#e6dccb] h-px relative w-full",
+             "c": "bg-[#e6dccb] h-px relative w-[318px] shrink-0",
              "n": "Divider",
              "id": "203:8471"
             },
             {
              "t": "div",
-             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-full",
+             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-[318px] shrink-0",
              "n": "Field / Service subtotal",
              "id": "203:8472",
              "k": [
@@ -25139,7 +25139,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-full",
+             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-[318px] shrink-0",
              "n": "Field / Service Fee · Flex",
              "id": "203:8475",
              "k": [
@@ -25163,13 +25163,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#e6dccb] h-px relative w-full",
+             "c": "bg-[#e6dccb] h-px relative w-[318px] shrink-0",
              "n": "Divider",
              "id": "203:8478"
             },
             {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[27px] text-[color:#0f1530] w-full",
+             "c": "font-semibold leading-[1.38] relative text-[27px] text-[color:#0f1530] w-[318px] shrink-0",
              "id": "203:8479",
              "k": [
               "Total $279.48"
@@ -25177,7 +25177,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] w-full",
+             "c": "font-normal leading-[1.38] relative text-[10px] text-[color:#2a3360] w-[318px] shrink-0",
              "id": "203:8480",
              "k": [
               "Example checkout · No tax shown"
@@ -25185,13 +25185,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-[318px] shrink-0",
              "n": "UI action / Pay securely",
              "id": "203:8481",
              "k": [
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center w-[290px] shrink-0",
                "id": "203:8482",
                "k": [
                 "Pay securely"
@@ -25211,7 +25211,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "flex gap-[12px] items-start relative w-full",
+           "c": "flex gap-[12px] items-start relative w-[354px] shrink-0",
            "n": "Step heading",
            "id": "203:8485",
            "k": [
@@ -25233,7 +25233,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] flex-1 min-w-0",
+             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] w-[302px] shrink-0",
              "id": "203:8488",
              "k": [
               "Track the payment"
@@ -25243,13 +25243,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "bg-[#e4f1e8] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-full",
+           "c": "bg-[#e4f1e8] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-[354px] shrink-0",
            "n": "Illustrated product state / receipt",
            "id": "203:8489",
            "k": [
             {
              "t": "div",
-             "c": "flex gap-[12px] items-start relative w-full",
+             "c": "flex gap-[12px] items-start relative w-[318px] shrink-0",
              "n": "Confirmed status",
              "id": "203:8490",
              "k": [
@@ -25268,7 +25268,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "p",
-               "c": "font-semibold leading-[1.38] relative text-[24px] text-[color:#0f1530] flex-1 min-w-0",
+               "c": "font-semibold leading-[1.38] relative text-[24px] text-[color:#0f1530] w-[270px] shrink-0",
                "id": "203:8493",
                "k": [
                 "Payment received"
@@ -25278,7 +25278,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-bold leading-[1.08] relative text-[46px] text-[color:#0f1530] tracking-[-1.15px] w-full",
+             "c": "font-bold leading-[1.08] relative text-[46px] text-[color:#0f1530] tracking-[-1.15px] w-[318px] shrink-0",
              "id": "203:8494",
              "k": [
               "$279.48"
@@ -25286,7 +25286,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[16px] text-[color:#0f1530] w-full",
+             "c": "font-medium leading-[1.38] relative text-[16px] text-[color:#0f1530] w-[318px] shrink-0",
              "id": "203:8495",
              "k": [
               "Invoice #1042 · Jordan Lee"
@@ -25294,13 +25294,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#e6dccb] h-px relative w-full",
+             "c": "bg-[#e6dccb] h-px relative w-[318px] shrink-0",
              "n": "Divider",
              "id": "203:8496"
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#2a3360] w-full",
+             "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#2a3360] w-[318px] shrink-0",
              "id": "203:8497",
              "k": [
               "Receipt emailed"
@@ -25308,7 +25308,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[246px] shrink-0",
              "n": "Status / Matched to job #1042",
              "id": "203:8498",
              "k": [
@@ -25333,13 +25333,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
     },
     {
      "t": "div",
-     "c": "bg-[#0f1530] flex flex-col gap-[16px] items-start px-[80px] py-[48px] relative w-full",
+     "c": "bg-[#0f1530] flex flex-col gap-[16px] items-start px-[80px] py-[48px] relative w-[1440px] shrink-0",
      "n": "03 / Connected workflow and demo",
      "id": "203:8501",
      "k": [
       {
        "t": "p",
-       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#f6b400] tracking-[1.1px] w-full",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#f6b400] tracking-[1.1px] w-[1280px] shrink-0",
        "id": "219:10304",
        "k": [
         "WORKS ACROSS YOUR BUSINESS"
@@ -25347,7 +25347,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
       },
       {
        "t": "p",
-       "c": "font-semibold leading-[1.08] relative text-[36px] text-[color:#fff] tracking-[-0.9px] w-full",
+       "c": "font-semibold leading-[1.08] relative text-[36px] text-[color:#fff] tracking-[-0.9px] w-[1280px] shrink-0",
        "id": "219:10305",
        "k": [
         "One job. Connected all the way."
@@ -25355,7 +25355,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
       },
       {
        "t": "div",
-       "c": "flex gap-[16px] items-center relative w-full",
+       "c": "flex gap-[16px] items-center relative w-[1280px] shrink-0",
        "n": "Flagship and tool handoff",
        "id": "219:10306",
        "k": [
@@ -25367,7 +25367,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Suite and record",
            "id": "219:10308",
            "k": [
@@ -25399,7 +25399,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-[352px] shrink-0",
            "id": "219:10312",
            "k": [
             "Jobs & work orders"
@@ -25407,7 +25407,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Handoff evidence",
            "id": "219:10313",
            "k": [
@@ -25426,7 +25426,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left w-[324px] shrink-0",
              "id": "219:10316",
              "k": [
               "Work completed"
@@ -25465,7 +25465,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Suite and record",
            "id": "219:10322",
            "k": [
@@ -25497,7 +25497,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-[352px] shrink-0",
            "id": "219:10326",
            "k": [
             "Invoices & payments"
@@ -25505,7 +25505,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Handoff evidence",
            "id": "219:10327",
            "k": [
@@ -25524,7 +25524,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left w-[324px] shrink-0",
              "id": "219:10330",
              "k": [
               "Payment recorded"
@@ -25563,7 +25563,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Suite and record",
            "id": "219:10336",
            "k": [
@@ -25595,7 +25595,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-[352px] shrink-0",
            "id": "219:10340",
            "k": [
             "Reminders & win-backs"
@@ -25603,7 +25603,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Handoff evidence",
            "id": "219:10341",
            "k": [
@@ -25622,7 +25622,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left w-[324px] shrink-0",
              "id": "219:10344",
              "k": [
               "Next visit identified"
@@ -26097,7 +26097,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                   },
                   {
                    "t": "div",
-                   "c": "bg-[#e4f1e8] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-full",
+                   "c": "bg-[#e4f1e8] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[59.375px] shrink-0",
                    "n": "Status / Paid",
                    "id": "I203:8526;200:271",
                    "k": [
@@ -26594,7 +26594,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-full",
+             "c": "bg-[#fff] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[210.33px] shrink-0",
              "n": "Status / Matched to job #1042",
              "id": "I203:8626;203:8498",
              "k": [
@@ -26724,7 +26724,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "div",
-         "c": "flex flex-col h-[24px] items-center justify-center relative w-full",
+         "c": "flex flex-col h-[24px] items-center justify-center relative w-[32px] shrink-0",
          "n": "Next connected state",
          "id": "219:10360",
          "k": [
@@ -26822,7 +26822,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "div",
-         "c": "flex flex-col h-[24px] items-center justify-center relative w-full",
+         "c": "flex flex-col h-[24px] items-center justify-center relative w-[32px] shrink-0",
          "n": "Next connected state",
          "id": "219:10374",
          "k": [
@@ -26941,25 +26941,25 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
    "k": [
     {
      "t": "div",
-     "c": "bg-[#fbf6ef] flex flex-col gap-[32px] items-start p-[80px] relative w-full",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[32px] items-start p-[80px] relative w-[1440px] shrink-0",
      "n": "01 / Product in view",
      "id": "203:11927",
      "k": [
       {
        "t": "div",
-       "c": "flex gap-[48px] items-center relative w-full",
+       "c": "flex gap-[48px] items-center relative w-[1280px] shrink-0",
        "n": "Outcome and product",
        "id": "203:11928",
        "k": [
         {
          "t": "div",
-         "c": "flex flex-col gap-[20px] items-start relative flex-1 min-w-0",
+         "c": "flex flex-col gap-[20px] items-start relative w-[480px] shrink-0",
          "n": "Short outcome copy",
          "id": "203:11929",
          "k": [
           {
            "t": "p",
-           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[480px] shrink-0",
            "id": "203:11930",
            "k": [
             "SERVICE AGREEMENTS"
@@ -26967,7 +26967,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "h1",
-           "c": "font-semibold leading-[1.08] relative text-[60px] text-[color:#0f1530] tracking-[-1.5px] w-full",
+           "c": "font-semibold leading-[1.08] relative text-[60px] text-[color:#0f1530] tracking-[-1.5px] w-[480px] shrink-0",
            "id": "203:11931",
            "k": [
             "Turn today’s visit into a relationship."
@@ -26975,7 +26975,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-full",
+           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-[480px] shrink-0",
            "id": "203:11932",
            "k": [
             "Keep covered visits, agreement terms, and upcoming renewals together."
@@ -26990,7 +26990,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[480px] shrink-0",
            "id": "203:11935",
            "k": [
             "EXAMPLE BUSINESS · JUNIPER"
@@ -27000,13 +27000,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "div",
-         "c": "bg-[#f6f7f9] border-[1.044px] border-[#e6dccb] border-solid flex flex-col h-[485.667px] items-start overflow-clip relative rounded-[16.711px] flex-1 min-w-0",
+         "c": "bg-[#f6f7f9] border-[1.044px] border-[#e6dccb] border-solid flex flex-col h-[485.667px] items-start overflow-clip relative rounded-[16.711px] w-[752px] shrink-0",
          "n": "Product demonstration / Service Agreements",
          "id": "203:11936",
          "k": [
           {
            "t": "div",
-           "c": "bg-[#0f1530] flex gap-[16.711px] h-[56.4px] items-center p-[16.711px] relative w-full",
+           "c": "bg-[#0f1530] flex gap-[16.711px] h-[56.4px] items-center p-[16.711px] relative w-[752px] shrink-0",
            "n": "Product chrome",
            "id": "I203:11936;200:278",
            "k": [
@@ -27020,7 +27020,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[12.53px] text-[color:#fff] flex-1 min-w-0",
+             "c": "font-medium leading-[1.38] relative text-[12.53px] text-[color:#fff] w-[432.4px] shrink-0",
              "id": "I203:11936;200:280",
              "k": [
               "Service agreements"
@@ -27046,19 +27046,19 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[16.711px] items-start p-[25.067px] relative w-full",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[16.711px] items-start p-[25.067px] relative w-[752px] shrink-0",
            "n": "Product workspace",
            "id": "I203:11936;200:283",
            "k": [
             {
              "t": "div",
-             "c": "flex gap-[16.711px] items-start relative w-full",
+             "c": "flex gap-[16.711px] items-start relative w-[701.867px] shrink-0",
              "n": "Screen title",
              "id": "I203:11936;200:284",
              "k": [
               {
                "t": "p",
-               "c": "font-semibold leading-[1.38] relative text-[24.02px] text-[color:#0f1530] flex-1 min-w-0",
+               "c": "font-semibold leading-[1.38] relative text-[24.02px] text-[color:#0f1530] w-[480.444px] shrink-0",
                "id": "I203:11936;200:285",
                "k": [
                 "Service agreements"
@@ -27084,19 +27084,19 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "flex gap-[20.889px] items-start relative w-full",
+             "c": "flex gap-[20.889px] items-start relative w-[701.867px] shrink-0",
              "n": "Agreement and future visit",
              "id": "I203:11936;200:288",
              "k": [
               {
                "t": "div",
-               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] flex-1 min-w-0",
+               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] w-[344.667px] shrink-0",
                "n": "Maintenance plan",
                "id": "I203:11936;200:289",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[11.49px] text-[color:#2a3360] tracking-[1.149px] w-full",
+                 "c": "font-medium leading-[1.38] relative text-[11.49px] text-[color:#2a3360] tracking-[1.149px] w-[302.889px] shrink-0",
                  "id": "I203:11936;200:290",
                  "k": [
                   "JUNIPER MEMBERSHIP"
@@ -27104,7 +27104,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "font-semibold relative text-[30.29px] text-[color:#0f1530] w-full",
+                 "c": "font-semibold relative text-[30.29px] text-[color:#0f1530] w-[302.889px] shrink-0",
                  "id": "I203:11936;200:291",
                  "k": [
                   {
@@ -27125,7 +27125,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "flex gap-[10.444px] items-start relative w-full",
+                 "c": "flex gap-[10.444px] items-start relative w-[302.889px] shrink-0",
                  "n": "2 tune-ups each year",
                  "id": "I203:11936;200:292",
                  "k": [
@@ -27144,7 +27144,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                   },
                   {
                    "t": "p",
-                   "c": "font-normal leading-[1.38] relative text-[12.53px] text-[color:#0f1530] flex-1 min-w-0",
+                   "c": "font-normal leading-[1.38] relative text-[12.53px] text-[color:#0f1530] w-[271.556px] shrink-0",
                    "id": "I203:11936;200:295",
                    "k": [
                     "2 tune-ups each year"
@@ -27154,7 +27154,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "flex gap-[10.444px] items-start relative w-full",
+                 "c": "flex gap-[10.444px] items-start relative w-[302.889px] shrink-0",
                  "n": "Heating + cooling covered",
                  "id": "I203:11936;200:296",
                  "k": [
@@ -27173,7 +27173,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                   },
                   {
                    "t": "p",
-                   "c": "font-normal leading-[1.38] relative text-[12.53px] text-[color:#0f1530] flex-1 min-w-0",
+                   "c": "font-normal leading-[1.38] relative text-[12.53px] text-[color:#0f1530] w-[271.556px] shrink-0",
                    "id": "I203:11936;200:299",
                    "k": [
                     "Heating + cooling covered"
@@ -27183,7 +27183,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "flex gap-[10.444px] items-start relative w-full",
+                 "c": "flex gap-[10.444px] items-start relative w-[302.889px] shrink-0",
                  "n": "Member repair discount",
                  "id": "I203:11936;200:300",
                  "k": [
@@ -27202,7 +27202,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                   },
                   {
                    "t": "p",
-                   "c": "font-normal leading-[1.38] relative text-[12.53px] text-[color:#0f1530] flex-1 min-w-0",
+                   "c": "font-normal leading-[1.38] relative text-[12.53px] text-[color:#0f1530] w-[271.556px] shrink-0",
                    "id": "I203:11936;200:303",
                    "k": [
                     "Member repair discount"
@@ -27212,7 +27212,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#e4f1e8] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-full",
+                 "c": "bg-[#e4f1e8] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[198.444px] shrink-0",
                  "n": "Status / ACTIVE AGREEMENT",
                  "id": "I203:11936;200:304",
                  "k": [
@@ -27230,7 +27230,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] flex-1 min-w-0",
+               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] w-[336.311px] shrink-0",
                "n": "Next service",
                "id": "I203:11936;200:306",
                "k": [
@@ -27249,7 +27249,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-semibold leading-[1.38] relative text-[22.98px] text-[color:#0f1530] w-full",
+                 "c": "font-semibold leading-[1.38] relative text-[22.98px] text-[color:#0f1530] w-[294.533px] shrink-0",
                  "id": "I203:11936;200:310",
                  "k": [
                   "Your next visit"
@@ -27257,7 +27257,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-normal leading-[1.38] relative text-[14.62px] text-[color:#0f1530] w-full",
+                 "c": "font-normal leading-[1.38] relative text-[14.62px] text-[color:#0f1530] w-[294.533px] shrink-0",
                  "id": "I203:11936;200:311",
                  "k": [
                   "Fall heating tune-up"
@@ -27265,7 +27265,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[12.53px] text-[color:#2a3360] w-full",
+                 "c": "font-medium leading-[1.38] relative text-[12.53px] text-[color:#2a3360] w-[294.533px] shrink-0",
                  "id": "I203:11936;200:312",
                  "k": [
                   "NOV"
@@ -27273,7 +27273,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-bold leading-[1.08] relative text-[66.84px] text-[color:#0f1530] tracking-[-1.671px] w-full",
+                 "c": "font-bold leading-[1.08] relative text-[66.84px] text-[color:#0f1530] tracking-[-1.671px] w-[294.533px] shrink-0",
                  "id": "I203:11936;200:313",
                  "k": [
                   "12"
@@ -27281,13 +27281,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#0f1530] flex h-[39.689px] items-center justify-center px-[14.622px] relative rounded-[12.533px] w-full",
+                 "c": "bg-[#0f1530] flex h-[39.689px] items-center justify-center px-[14.622px] relative rounded-[12.533px] w-[294.533px] shrink-0",
                  "n": "UI action / Review reminder email",
                  "id": "I203:11936;200:314",
                  "k": [
                   {
                    "t": "p",
-                   "c": "font-medium leading-[1.38] relative text-[12.53px] text-[color:#fff] text-center flex-1 min-w-0",
+                   "c": "font-medium leading-[1.38] relative text-[12.53px] text-[color:#fff] text-center w-[265.289px] shrink-0",
                    "id": "I203:11936;200:315",
                    "k": [
                     "Review reminder email"
@@ -27309,19 +27309,19 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
     },
     {
      "t": "div",
-     "c": "bg-[#fff] flex flex-col gap-[32px] items-start p-[80px] relative w-full",
+     "c": "bg-[#fff] flex flex-col gap-[32px] items-start p-[80px] relative w-[1440px] shrink-0",
      "n": "02 / A workflow you can see",
      "id": "203:11975",
      "k": [
       {
        "t": "div",
-       "c": "flex flex-col gap-[12px] items-start relative w-full",
+       "c": "flex flex-col gap-[12px] items-start relative w-[1280px] shrink-0",
        "n": "Workflow heading",
        "id": "203:11976",
        "k": [
         {
          "t": "p",
-         "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+         "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[1280px] shrink-0",
          "id": "203:11977",
          "k": [
           "EXAMPLE WORKFLOW"
@@ -27329,7 +27329,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "p",
-         "c": "font-semibold leading-[1.08] relative text-[44px] text-[color:#0f1530] tracking-[-1.1px] w-full",
+         "c": "font-semibold leading-[1.08] relative text-[44px] text-[color:#0f1530] tracking-[-1.1px] w-[1280px] shrink-0",
          "id": "203:11978",
          "k": [
           "See the work happen."
@@ -27339,7 +27339,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
       },
       {
        "t": "div",
-       "c": "flex gap-[40px] items-start relative w-full",
+       "c": "flex gap-[40px] items-start relative w-[1280px] shrink-0",
        "n": "Three product moments",
        "id": "203:11979",
        "k": [
@@ -27351,7 +27351,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "flex gap-[12px] items-start relative w-full",
+           "c": "flex gap-[12px] items-start relative w-[354px] shrink-0",
            "n": "Step heading",
            "id": "203:11981",
            "k": [
@@ -27373,7 +27373,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] flex-1 min-w-0",
+             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] w-[302px] shrink-0",
              "id": "203:11984",
              "k": [
               "Define the coverage"
@@ -27383,13 +27383,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-full",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-[354px] shrink-0",
            "n": "Illustrated product state / coverage",
            "id": "203:11985",
            "k": [
             {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+             "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-[318px] shrink-0",
              "id": "203:11986",
              "k": [
               "Home Comfort Agreement"
@@ -27397,7 +27397,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff] flex gap-[10px] h-[54px] items-start p-[12px] relative rounded-[12px] w-full",
+             "c": "bg-[#fff] flex gap-[10px] h-[54px] items-start p-[12px] relative rounded-[12px] w-[318px] shrink-0",
              "n": "Heating tune-up",
              "id": "203:11987",
              "k": [
@@ -27416,7 +27416,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[14px] text-[color:#0f1530] flex-1 min-w-0",
+               "c": "font-medium leading-[1.38] relative text-[14px] text-[color:#0f1530] w-[262px] shrink-0",
                "id": "203:11990",
                "k": [
                 "Heating tune-up"
@@ -27426,7 +27426,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff] flex gap-[10px] h-[54px] items-start p-[12px] relative rounded-[12px] w-full",
+             "c": "bg-[#fff] flex gap-[10px] h-[54px] items-start p-[12px] relative rounded-[12px] w-[318px] shrink-0",
              "n": "Cooling tune-up",
              "id": "203:11991",
              "k": [
@@ -27445,7 +27445,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[14px] text-[color:#0f1530] flex-1 min-w-0",
+               "c": "font-medium leading-[1.38] relative text-[14px] text-[color:#0f1530] w-[262px] shrink-0",
                "id": "203:11994",
                "k": [
                 "Cooling tune-up"
@@ -27455,7 +27455,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff] flex gap-[10px] h-[54px] items-start p-[12px] relative rounded-[12px] w-full",
+             "c": "bg-[#fff] flex gap-[10px] h-[54px] items-start p-[12px] relative rounded-[12px] w-[318px] shrink-0",
              "n": "12-month agreement",
              "id": "203:11995",
              "k": [
@@ -27474,7 +27474,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[14px] text-[color:#0f1530] flex-1 min-w-0",
+               "c": "font-medium leading-[1.38] relative text-[14px] text-[color:#0f1530] w-[262px] shrink-0",
                "id": "203:11998",
                "k": [
                 "12-month agreement"
@@ -27484,7 +27484,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[220px] shrink-0",
              "n": "Status / Coverage defined",
              "id": "203:11999",
              "k": [
@@ -27510,7 +27510,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "flex gap-[12px] items-start relative w-full",
+           "c": "flex gap-[12px] items-start relative w-[354px] shrink-0",
            "n": "Step heading",
            "id": "203:12003",
            "k": [
@@ -27532,7 +27532,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] flex-1 min-w-0",
+             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] w-[302px] shrink-0",
              "id": "203:12006",
              "k": [
               "Plan the next visit"
@@ -27542,13 +27542,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-full",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-[354px] shrink-0",
            "n": "Illustrated product state / calendar",
            "id": "203:12007",
            "k": [
             {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[21px] text-[color:#0f1530] w-full",
+             "c": "font-semibold leading-[1.38] relative text-[21px] text-[color:#0f1530] w-[318px] shrink-0",
              "id": "203:12008",
              "k": [
               "November 2026"
@@ -27556,7 +27556,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "flex font-medium gap-[4px] items-start leading-[1.38] relative text-[12px] text-[color:#2a3360] text-center w-full",
+             "c": "flex font-medium gap-[4px] items-start leading-[1.38] relative text-[12px] text-[color:#2a3360] text-center w-[318px] shrink-0",
              "n": "Weekday labels",
              "id": "203:12009",
              "k": [
@@ -27620,7 +27620,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "flex gap-[4px] items-start relative w-full",
+             "c": "flex gap-[4px] items-start relative w-[318px] shrink-0",
              "n": "Available dates",
              "id": "203:12017",
              "k": [
@@ -27740,7 +27740,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#2a3360] w-full",
+             "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#2a3360] w-[318px] shrink-0",
              "id": "203:12032",
              "k": [
               "Fall heating tune-up"
@@ -27748,7 +27748,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "flex gap-[10px] items-start relative w-full",
+             "c": "flex gap-[10px] items-start relative w-[318px] shrink-0",
              "n": "Time choices",
              "id": "203:12033",
              "k": [
@@ -27788,13 +27788,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-[318px] shrink-0",
              "n": "UI action / Choose this time",
              "id": "203:12038",
              "k": [
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center w-[290px] shrink-0",
                "id": "203:12039",
                "k": [
                 "Choose this time"
@@ -27814,7 +27814,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "flex gap-[12px] items-start relative w-full",
+           "c": "flex gap-[12px] items-start relative w-[354px] shrink-0",
            "n": "Step heading",
            "id": "203:12042",
            "k": [
@@ -27836,7 +27836,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] flex-1 min-w-0",
+             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] w-[302px] shrink-0",
              "id": "203:12045",
              "k": [
               "See renewals coming"
@@ -27846,13 +27846,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-full",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-[354px] shrink-0",
            "n": "Illustrated product state / renewal",
            "id": "203:12046",
            "k": [
             {
              "t": "div",
-             "c": "flex gap-[10px] items-start relative w-full",
+             "c": "flex gap-[10px] items-start relative w-[318px] shrink-0",
              "n": "Email header",
              "id": "203:12047",
              "k": [
@@ -27871,7 +27871,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "p",
-               "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] flex-1 min-w-0",
+               "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] w-[284px] shrink-0",
                "id": "203:12051",
                "k": [
                 "Email draft"
@@ -27881,7 +27881,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "font-semibold relative text-[24px] text-[color:#0f1530] w-full",
+             "c": "font-semibold relative text-[24px] text-[color:#0f1530] w-[318px] shrink-0",
              "id": "203:12052",
              "k": [
               {
@@ -27902,7 +27902,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] w-full",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] w-[318px] shrink-0",
              "id": "203:12053",
              "k": [
               "To: Jordan Lee"
@@ -27910,7 +27910,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[180px] shrink-0",
              "n": "Status / Agreement #301",
              "id": "203:12054",
              "k": [
@@ -27926,13 +27926,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-[318px] shrink-0",
              "n": "UI action / Review renewal email",
              "id": "203:12056",
              "k": [
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center w-[290px] shrink-0",
                "id": "203:12057",
                "k": [
                 "Review renewal email"
@@ -27951,13 +27951,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
     },
     {
      "t": "div",
-     "c": "bg-[#0f1530] flex flex-col gap-[16px] items-start px-[80px] py-[48px] relative w-full",
+     "c": "bg-[#0f1530] flex flex-col gap-[16px] items-start px-[80px] py-[48px] relative w-[1440px] shrink-0",
      "n": "03 / Connected workflow and demo",
      "id": "203:12059",
      "k": [
       {
        "t": "p",
-       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#f6b400] tracking-[1.1px] w-full",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#f6b400] tracking-[1.1px] w-[1280px] shrink-0",
        "id": "219:10438",
        "k": [
         "WORKS ACROSS YOUR BUSINESS"
@@ -27965,7 +27965,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
       },
       {
        "t": "p",
-       "c": "font-semibold leading-[1.08] relative text-[36px] text-[color:#fff] tracking-[-0.9px] w-full",
+       "c": "font-semibold leading-[1.08] relative text-[36px] text-[color:#fff] tracking-[-0.9px] w-[1280px] shrink-0",
        "id": "219:10439",
        "k": [
         "One job. Connected all the way."
@@ -27973,7 +27973,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
       },
       {
        "t": "div",
-       "c": "flex gap-[16px] items-center relative w-full",
+       "c": "flex gap-[16px] items-center relative w-[1280px] shrink-0",
        "n": "Flagship and tool handoff",
        "id": "219:10440",
        "k": [
@@ -27985,7 +27985,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Suite and record",
            "id": "219:10442",
            "k": [
@@ -28017,7 +28017,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-[352px] shrink-0",
            "id": "219:10446",
            "k": [
             "Customer history"
@@ -28025,7 +28025,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Handoff evidence",
            "id": "219:10447",
            "k": [
@@ -28044,7 +28044,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left w-[324px] shrink-0",
              "id": "219:10450",
              "k": [
               "Service record connected"
@@ -28083,7 +28083,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Suite and record",
            "id": "219:10456",
            "k": [
@@ -28115,7 +28115,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-[352px] shrink-0",
            "id": "219:10460",
            "k": [
             "Service agreements"
@@ -28123,7 +28123,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Handoff evidence",
            "id": "219:10461",
            "k": [
@@ -28142,7 +28142,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left w-[324px] shrink-0",
              "id": "219:10464",
              "k": [
               "Covered visit due"
@@ -28181,7 +28181,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Suite and record",
            "id": "219:10470",
            "k": [
@@ -28213,7 +28213,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-[352px] shrink-0",
            "id": "219:10474",
            "k": [
             "Scheduling & dispatch"
@@ -28221,7 +28221,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Handoff evidence",
            "id": "219:10475",
            "k": [
@@ -28240,7 +28240,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left w-[324px] shrink-0",
              "id": "219:10478",
              "k": [
               "Next visit requested"
@@ -28542,7 +28542,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#e4f1e8] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-full",
+                 "c": "bg-[#e4f1e8] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[90.25px] shrink-0",
                  "n": "Status / ACTIVE AGREEMENT",
                  "id": "I203:12084;200:304",
                  "k": [
@@ -28814,7 +28814,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff4d6] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-full",
+             "c": "bg-[#fff4d6] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[188.1px] shrink-0",
              "n": "Status / Coverage defined",
              "id": "I203:12128;203:11999",
              "k": [
@@ -29240,7 +29240,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-full",
+             "c": "bg-[#fff] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[153.9px] shrink-0",
              "n": "Status / Agreement #301",
              "id": "I203:12187;203:12054",
              "k": [
@@ -29386,7 +29386,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "div",
-         "c": "flex flex-col h-[24px] items-center justify-center relative w-full",
+         "c": "flex flex-col h-[24px] items-center justify-center relative w-[32px] shrink-0",
          "n": "Next connected state",
          "id": "219:10494",
          "k": [
@@ -29484,7 +29484,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "div",
-         "c": "flex flex-col h-[24px] items-center justify-center relative w-full",
+         "c": "flex flex-col h-[24px] items-center justify-center relative w-[32px] shrink-0",
          "n": "Next connected state",
          "id": "219:10508",
          "k": [
@@ -29603,25 +29603,25 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
    "k": [
     {
      "t": "div",
-     "c": "bg-[#fbf6ef] flex flex-col gap-[32px] items-start p-[80px] relative w-full",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[32px] items-start p-[80px] relative w-[1440px] shrink-0",
      "n": "01 / Product in view",
      "id": "203:12729",
      "k": [
       {
        "t": "div",
-       "c": "flex gap-[48px] items-center relative w-full",
+       "c": "flex gap-[48px] items-center relative w-[1280px] shrink-0",
        "n": "Outcome and product",
        "id": "203:12730",
        "k": [
         {
          "t": "div",
-         "c": "flex flex-col gap-[20px] items-start relative flex-1 min-w-0",
+         "c": "flex flex-col gap-[20px] items-start relative w-[480px] shrink-0",
          "n": "Short outcome copy",
          "id": "203:12731",
          "k": [
           {
            "t": "p",
-           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[480px] shrink-0",
            "id": "203:12732",
            "k": [
             "AI REVENUE INTELLIGENCE"
@@ -29629,7 +29629,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "h1",
-           "c": "font-semibold leading-[1.08] relative text-[60px] text-[color:#0f1530] tracking-[-1.5px] w-full",
+           "c": "font-semibold leading-[1.08] relative text-[60px] text-[color:#0f1530] tracking-[-1.5px] w-[480px] shrink-0",
            "id": "203:12733",
            "k": [
             "See the next opportunity in your records."
@@ -29637,7 +29637,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-full",
+           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-[480px] shrink-0",
            "id": "203:12734",
            "k": [
             "Review open opportunities and choose the next action using your own records."
@@ -29652,7 +29652,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[480px] shrink-0",
            "id": "203:12737",
            "k": [
             "EXAMPLE BUSINESS · JUNIPER"
@@ -29662,13 +29662,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "div",
-         "c": "bg-[#f6f7f9] border-[1.044px] border-[#e6dccb] border-solid flex flex-col h-[444.933px] items-start overflow-clip relative rounded-[16.711px] flex-1 min-w-0",
+         "c": "bg-[#f6f7f9] border-[1.044px] border-[#e6dccb] border-solid flex flex-col h-[444.933px] items-start overflow-clip relative rounded-[16.711px] w-[752px] shrink-0",
          "n": "Product demonstration / AI Revenue Intelligence",
          "id": "203:12738",
          "k": [
           {
            "t": "div",
-           "c": "bg-[#0f1530] flex gap-[16.711px] h-[56.4px] items-center p-[16.711px] relative w-full",
+           "c": "bg-[#0f1530] flex gap-[16.711px] h-[56.4px] items-center p-[16.711px] relative w-[752px] shrink-0",
            "n": "Product chrome",
            "id": "I203:12738;200:353",
            "k": [
@@ -29682,7 +29682,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[12.53px] text-[color:#fff] flex-1 min-w-0",
+             "c": "font-medium leading-[1.38] relative text-[12.53px] text-[color:#fff] w-[432.4px] shrink-0",
              "id": "I203:12738;200:355",
              "k": [
               "Revenue opportunities"
@@ -29708,19 +29708,19 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[16.711px] items-start p-[25.067px] relative w-full",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[16.711px] items-start p-[25.067px] relative w-[752px] shrink-0",
            "n": "Product workspace",
            "id": "I203:12738;200:358",
            "k": [
             {
              "t": "div",
-             "c": "flex gap-[16.711px] items-start relative w-full",
+             "c": "flex gap-[16.711px] items-start relative w-[701.867px] shrink-0",
              "n": "Screen title",
              "id": "I203:12738;200:359",
              "k": [
               {
                "t": "p",
-               "c": "font-semibold leading-[1.38] relative text-[24.02px] text-[color:#0f1530] flex-1 min-w-0",
+               "c": "font-semibold leading-[1.38] relative text-[24.02px] text-[color:#0f1530] w-[480.444px] shrink-0",
                "id": "I203:12738;200:360",
                "k": [
                 "Revenue opportunities"
@@ -29746,7 +29746,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "flex gap-[12.533px] items-start relative w-full",
+             "c": "flex gap-[12.533px] items-start relative w-[701.867px] shrink-0",
              "n": "Today summary",
              "id": "I203:12738;200:363",
              "k": [
@@ -29758,7 +29758,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                "k": [
                 {
                  "t": "p",
-                 "c": "font-bold leading-[1.08] relative text-[35.51px] text-[color:#0f1530] w-full",
+                 "c": "font-bold leading-[1.08] relative text-[35.51px] text-[color:#0f1530] w-[183.822px] shrink-0",
                  "id": "I203:12738;200:365",
                  "k": [
                   "8"
@@ -29766,7 +29766,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-normal leading-[1.38] relative text-[11.49px] text-[color:#2a3360] w-full",
+                 "c": "font-normal leading-[1.38] relative text-[11.49px] text-[color:#2a3360] w-[183.822px] shrink-0",
                  "id": "I203:12738;200:366",
                  "k": [
                   "Booked jobs"
@@ -29782,7 +29782,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                "k": [
                 {
                  "t": "p",
-                 "c": "font-bold leading-[1.08] relative text-[35.51px] text-[color:#0f1530] w-full",
+                 "c": "font-bold leading-[1.08] relative text-[35.51px] text-[color:#0f1530] w-[183.822px] shrink-0",
                  "id": "I203:12738;200:368",
                  "k": [
                   "3"
@@ -29790,7 +29790,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-normal leading-[1.38] relative text-[11.49px] text-[color:#2a3360] w-full",
+                 "c": "font-normal leading-[1.38] relative text-[11.49px] text-[color:#2a3360] w-[183.822px] shrink-0",
                  "id": "I203:12738;200:369",
                  "k": [
                   "In progress"
@@ -29806,7 +29806,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                "k": [
                 {
                  "t": "p",
-                 "c": "font-bold leading-[1.08] relative text-[35.51px] text-[color:#0f1530] w-full",
+                 "c": "font-bold leading-[1.08] relative text-[35.51px] text-[color:#0f1530] w-[183.822px] shrink-0",
                  "id": "I203:12738;200:371",
                  "k": [
                   "2"
@@ -29814,7 +29814,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-normal leading-[1.38] relative text-[11.49px] text-[color:#2a3360] w-full",
+                 "c": "font-normal leading-[1.38] relative text-[11.49px] text-[color:#2a3360] w-[183.822px] shrink-0",
                  "id": "I203:12738;200:372",
                  "k": [
                   "Need your review"
@@ -29826,19 +29826,19 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] w-full",
+             "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] w-[701.867px] shrink-0",
              "n": "Decision with evidence",
              "id": "I203:12738;200:373",
              "k": [
               {
                "t": "div",
-               "c": "flex gap-[16.711px] items-start relative w-full",
+               "c": "flex gap-[16.711px] items-start relative w-[660.089px] shrink-0",
                "n": "Action header",
                "id": "I203:12738;200:374",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-semibold leading-[1.38] relative text-[18.8px] text-[color:#0f1530] flex-1 min-w-0",
+                 "c": "font-semibold leading-[1.38] relative text-[18.8px] text-[color:#0f1530] w-[459.556px] shrink-0",
                  "id": "I203:12738;200:375",
                  "k": [
                   "Open estimate worth a follow-up"
@@ -29864,7 +29864,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "p",
-               "c": "font-normal leading-[1.38] relative text-[12.53px] text-[color:#2a3360] w-full",
+               "c": "font-normal leading-[1.38] relative text-[12.53px] text-[color:#2a3360] w-[660.089px] shrink-0",
                "id": "I203:12738;200:378",
                "k": [
                 "Estimate #2048 · Sent 4 days ago · No reply recorded"
@@ -29872,7 +29872,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "flex gap-[12.533px] items-start relative w-full",
+               "c": "flex gap-[12.533px] items-start relative w-[660.089px] shrink-0",
                "n": "Owner actions",
                "id": "I203:12738;200:379",
                "k": [
@@ -29938,19 +29938,19 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
     },
     {
      "t": "div",
-     "c": "bg-[#fff] flex flex-col gap-[32px] items-start p-[80px] relative w-full",
+     "c": "bg-[#fff] flex flex-col gap-[32px] items-start p-[80px] relative w-[1440px] shrink-0",
      "n": "02 / A workflow you can see",
      "id": "203:12772",
      "k": [
       {
        "t": "div",
-       "c": "flex flex-col gap-[12px] items-start relative w-full",
+       "c": "flex flex-col gap-[12px] items-start relative w-[1280px] shrink-0",
        "n": "Workflow heading",
        "id": "203:12773",
        "k": [
         {
          "t": "p",
-         "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+         "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[1280px] shrink-0",
          "id": "203:12774",
          "k": [
           "EXAMPLE WORKFLOW"
@@ -29958,7 +29958,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "p",
-         "c": "font-semibold leading-[1.08] relative text-[44px] text-[color:#0f1530] tracking-[-1.1px] w-full",
+         "c": "font-semibold leading-[1.08] relative text-[44px] text-[color:#0f1530] tracking-[-1.1px] w-[1280px] shrink-0",
          "id": "203:12775",
          "k": [
           "See the work happen."
@@ -29968,7 +29968,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
       },
       {
        "t": "div",
-       "c": "flex gap-[40px] items-start relative w-full",
+       "c": "flex gap-[40px] items-start relative w-[1280px] shrink-0",
        "n": "Three product moments",
        "id": "203:12776",
        "k": [
@@ -29980,7 +29980,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "flex gap-[12px] items-start relative w-full",
+           "c": "flex gap-[12px] items-start relative w-[354px] shrink-0",
            "n": "Step heading",
            "id": "203:12778",
            "k": [
@@ -30002,7 +30002,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] flex-1 min-w-0",
+             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] w-[302px] shrink-0",
              "id": "203:12781",
              "k": [
               "Spot unfinished work"
@@ -30012,13 +30012,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-full",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-[354px] shrink-0",
            "n": "Illustrated product state / openEstimates",
            "id": "203:12782",
            "k": [
             {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[21px] text-[color:#0f1530] w-full",
+             "c": "font-semibold leading-[1.38] relative text-[21px] text-[color:#0f1530] w-[318px] shrink-0",
              "id": "203:12783",
              "k": [
               "Open estimates"
@@ -30026,7 +30026,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-bold leading-[1.08] relative text-[54px] text-[color:#0f1530] tracking-[-1.35px] w-full",
+             "c": "font-bold leading-[1.08] relative text-[54px] text-[color:#0f1530] tracking-[-1.35px] w-[318px] shrink-0",
              "id": "203:12784",
              "k": [
               "12"
@@ -30034,7 +30034,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "flex gap-[10px] items-start leading-[1.38] relative w-full",
+             "c": "flex gap-[10px] items-start leading-[1.38] relative w-[318px] shrink-0",
              "n": "Response states",
              "id": "203:12785",
              "k": [
@@ -30046,7 +30046,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                "k": [
                 {
                  "t": "p",
-                 "c": "font-semibold relative text-[28px] text-[color:#0f1530] w-full",
+                 "c": "font-semibold relative text-[28px] text-[color:#0f1530] w-[114px] shrink-0",
                  "id": "203:12787",
                  "k": [
                   "7"
@@ -30054,7 +30054,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-normal relative text-[12px] text-[color:#2a3360] w-full",
+                 "c": "font-normal relative text-[12px] text-[color:#2a3360] w-[114px] shrink-0",
                  "id": "203:12788",
                  "k": [
                   "Awaiting reply"
@@ -30070,7 +30070,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                "k": [
                 {
                  "t": "p",
-                 "c": "font-semibold relative text-[28px] text-[color:#0f1530] w-full",
+                 "c": "font-semibold relative text-[28px] text-[color:#0f1530] w-[114px] shrink-0",
                  "id": "203:12790",
                  "k": [
                   "2"
@@ -30078,7 +30078,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-normal relative text-[12px] text-[color:#2a3360] w-full",
+                 "c": "font-normal relative text-[12px] text-[color:#2a3360] w-[114px] shrink-0",
                  "id": "203:12791",
                  "k": [
                   "Owner review"
@@ -30090,7 +30090,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[222px] shrink-0",
              "n": "Status / Sorted · Oldest first",
              "id": "203:12792",
              "k": [
@@ -30116,7 +30116,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "flex gap-[12px] items-start relative w-full",
+           "c": "flex gap-[12px] items-start relative w-[354px] shrink-0",
            "n": "Step heading",
            "id": "203:12796",
            "k": [
@@ -30138,7 +30138,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] flex-1 min-w-0",
+             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] w-[302px] shrink-0",
              "id": "203:12799",
              "k": [
               "See the reason"
@@ -30148,13 +30148,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-full",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-[354px] shrink-0",
            "n": "Illustrated product state / reason",
            "id": "203:12800",
            "k": [
             {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+             "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-[318px] shrink-0",
              "id": "203:12801",
              "k": [
               "Estimate #2048"
@@ -30162,7 +30162,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[180px] shrink-0",
              "n": "Status / Sent 4 days ago",
              "id": "203:12802",
              "k": [
@@ -30178,7 +30178,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff] flex gap-[12px] h-[92px] items-start p-[16px] relative rounded-[12px] w-full",
+             "c": "bg-[#fff] flex gap-[12px] h-[92px] items-start p-[16px] relative rounded-[12px] w-[318px] shrink-0",
              "n": "Evidence",
              "id": "203:12804",
              "k": [
@@ -30197,7 +30197,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "font-medium relative text-[16px] text-[color:#0f1530] flex-1 min-w-0",
+               "c": "font-medium relative text-[16px] text-[color:#0f1530] w-[244px] shrink-0",
                "id": "203:12808",
                "k": [
                 {
@@ -30220,7 +30220,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] w-full",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] w-[318px] shrink-0",
              "id": "203:12809",
              "k": [
               "Suggested action · Follow up"
@@ -30228,13 +30228,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-[318px] shrink-0",
              "n": "UI action / Review the opportunity",
              "id": "203:12810",
              "k": [
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center w-[290px] shrink-0",
                "id": "203:12811",
                "k": [
                 "Review the opportunity"
@@ -30254,7 +30254,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "flex gap-[12px] items-start relative w-full",
+           "c": "flex gap-[12px] items-start relative w-[354px] shrink-0",
            "n": "Step heading",
            "id": "203:12814",
            "k": [
@@ -30276,7 +30276,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] flex-1 min-w-0",
+             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] w-[302px] shrink-0",
              "id": "203:12817",
              "k": [
               "Choose the next action"
@@ -30286,13 +30286,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-full",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-[354px] shrink-0",
            "n": "Illustrated product state / email",
            "id": "203:12818",
            "k": [
             {
              "t": "div",
-             "c": "flex gap-[10px] items-start relative w-full",
+             "c": "flex gap-[10px] items-start relative w-[318px] shrink-0",
              "n": "Email header",
              "id": "203:12819",
              "k": [
@@ -30311,7 +30311,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "p",
-               "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] flex-1 min-w-0",
+               "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] w-[284px] shrink-0",
                "id": "203:12823",
                "k": [
                 "Email draft"
@@ -30321,7 +30321,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "font-semibold relative text-[24px] text-[color:#0f1530] w-full",
+             "c": "font-semibold relative text-[24px] text-[color:#0f1530] w-[318px] shrink-0",
              "id": "203:12824",
              "k": [
               {
@@ -30342,7 +30342,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] w-full",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] w-[318px] shrink-0",
              "id": "203:12825",
              "k": [
               "To: Jordan Lee"
@@ -30350,7 +30350,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[180px] shrink-0",
              "n": "Status / Estimate #2048",
              "id": "203:12826",
              "k": [
@@ -30366,13 +30366,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-[318px] shrink-0",
              "n": "UI action / Review and approve",
              "id": "203:12828",
              "k": [
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center w-[290px] shrink-0",
                "id": "203:12829",
                "k": [
                 "Review and approve"
@@ -30391,13 +30391,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
     },
     {
      "t": "div",
-     "c": "bg-[#0f1530] flex flex-col gap-[16px] items-start px-[80px] py-[48px] relative w-full",
+     "c": "bg-[#0f1530] flex flex-col gap-[16px] items-start px-[80px] py-[48px] relative w-[1440px] shrink-0",
      "n": "03 / Connected workflow and demo",
      "id": "203:12831",
      "k": [
       {
        "t": "p",
-       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#f6b400] tracking-[1.1px] w-full",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#f6b400] tracking-[1.1px] w-[1280px] shrink-0",
        "id": "219:10522",
        "k": [
         "WORKS ACROSS YOUR BUSINESS"
@@ -30405,7 +30405,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
       },
       {
        "t": "p",
-       "c": "font-semibold leading-[1.08] relative text-[36px] text-[color:#fff] tracking-[-0.9px] w-full",
+       "c": "font-semibold leading-[1.08] relative text-[36px] text-[color:#fff] tracking-[-0.9px] w-[1280px] shrink-0",
        "id": "219:10523",
        "k": [
         "One job. Connected all the way."
@@ -30413,7 +30413,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
       },
       {
        "t": "div",
-       "c": "flex gap-[16px] items-center relative w-full",
+       "c": "flex gap-[16px] items-center relative w-[1280px] shrink-0",
        "n": "Flagship and tool handoff",
        "id": "219:10524",
        "k": [
@@ -30425,7 +30425,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Suite and record",
            "id": "219:10526",
            "k": [
@@ -30457,7 +30457,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-[352px] shrink-0",
            "id": "219:10530",
            "k": [
             "Revenue intelligence"
@@ -30465,7 +30465,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Handoff evidence",
            "id": "219:10531",
            "k": [
@@ -30484,7 +30484,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left w-[324px] shrink-0",
              "id": "219:10534",
              "k": [
               "Open estimate surfaced"
@@ -30523,7 +30523,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Suite and record",
            "id": "219:10540",
            "k": [
@@ -30555,7 +30555,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-[352px] shrink-0",
            "id": "219:10544",
            "k": [
             "Owner review"
@@ -30563,7 +30563,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Handoff evidence",
            "id": "219:10545",
            "k": [
@@ -30582,7 +30582,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left w-[324px] shrink-0",
              "id": "219:10548",
              "k": [
               "Reason and history reviewed"
@@ -30621,7 +30621,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Suite and record",
            "id": "219:10554",
            "k": [
@@ -30653,7 +30653,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-[352px] shrink-0",
            "id": "219:10558",
            "k": [
             "Inquiry follow-up"
@@ -30661,7 +30661,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Handoff evidence",
            "id": "219:10559",
            "k": [
@@ -30680,7 +30680,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left w-[324px] shrink-0",
              "id": "219:10562",
              "k": [
               "Email draft ready for approval"
@@ -30940,7 +30940,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
              "k": [
               {
                "t": "div",
-               "c": "flex gap-[7.6px] items-start relative w-full",
+               "c": "flex gap-[7.6px] items-start relative w-[300.2px] shrink-0",
                "n": "Action header",
                "id": "I203:12856;200:374",
                "k": [
@@ -30972,7 +30972,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "p",
-               "c": "font-normal leading-[1.38] relative text-[5.7px] text-[color:#2a3360] w-full",
+               "c": "font-normal leading-[1.38] relative text-[5.7px] text-[color:#2a3360] w-[300.2px] shrink-0",
                "id": "I203:12856;200:378",
                "k": [
                 "Estimate #2048 · Sent 4 days ago · No reply recorded"
@@ -30980,7 +30980,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "flex gap-[5.7px] items-start relative w-full",
+               "c": "flex gap-[5.7px] items-start relative w-[300.2px] shrink-0",
                "n": "Owner actions",
                "id": "I203:12856;200:379",
                "k": [
@@ -31198,7 +31198,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-full",
+             "c": "bg-[#fff] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[189.81px] shrink-0",
              "n": "Status / Sorted · Oldest first",
              "id": "I203:12895;203:12792",
              "k": [
@@ -31270,7 +31270,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff4d6] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-full",
+             "c": "bg-[#fff4d6] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[153.9px] shrink-0",
              "n": "Status / Sent 4 days ago",
              "id": "I203:12912;203:12802",
              "k": [
@@ -31458,7 +31458,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-full",
+             "c": "bg-[#fff] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[153.9px] shrink-0",
              "n": "Status / Estimate #2048",
              "id": "I203:12929;203:12826",
              "k": [
@@ -31604,7 +31604,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "div",
-         "c": "flex flex-col h-[24px] items-center justify-center relative w-full",
+         "c": "flex flex-col h-[24px] items-center justify-center relative w-[32px] shrink-0",
          "n": "Next connected state",
          "id": "219:10578",
          "k": [
@@ -31702,7 +31702,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "div",
-         "c": "flex flex-col h-[24px] items-center justify-center relative w-full",
+         "c": "flex flex-col h-[24px] items-center justify-center relative w-[32px] shrink-0",
          "n": "Next connected state",
          "id": "219:10592",
          "k": [
@@ -31821,25 +31821,25 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
    "k": [
     {
      "t": "div",
-     "c": "bg-[#fbf6ef] flex flex-col gap-[32px] items-start p-[80px] relative w-full",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[32px] items-start p-[80px] relative w-[1440px] shrink-0",
      "n": "01 / Product in view",
      "id": "203:12966",
      "k": [
       {
        "t": "div",
-       "c": "flex gap-[48px] items-center relative w-full",
+       "c": "flex gap-[48px] items-center relative w-[1280px] shrink-0",
        "n": "Outcome and product",
        "id": "203:12967",
        "k": [
         {
          "t": "div",
-         "c": "flex flex-col gap-[20px] items-start relative flex-1 min-w-0",
+         "c": "flex flex-col gap-[20px] items-start relative w-[480px] shrink-0",
          "n": "Short outcome copy",
          "id": "203:12968",
          "k": [
           {
            "t": "p",
-           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[480px] shrink-0",
            "id": "203:12969",
            "k": [
             "CUSTOMERS, PROPERTIES & ASSETS"
@@ -31847,7 +31847,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "h1",
-           "c": "font-semibold leading-[1.08] relative text-[60px] text-[color:#0f1530] tracking-[-1.5px] w-full",
+           "c": "font-semibold leading-[1.08] relative text-[60px] text-[color:#0f1530] tracking-[-1.5px] w-[480px] shrink-0",
            "id": "203:12970",
            "k": [
             "Know the home before you arrive."
@@ -31855,7 +31855,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-full",
+           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-[480px] shrink-0",
            "id": "203:12971",
            "k": [
             "Bring each customer, property, equipment record, and service visit together."
@@ -31870,7 +31870,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[480px] shrink-0",
            "id": "203:12974",
            "k": [
             "EXAMPLE BUSINESS · JUNIPER"
@@ -31880,13 +31880,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "div",
-         "c": "bg-[#f6f7f9] border-[1.044px] border-[#e6dccb] border-solid flex flex-col h-[531.622px] items-start overflow-clip relative rounded-[16.711px] flex-1 min-w-0",
+         "c": "bg-[#f6f7f9] border-[1.044px] border-[#e6dccb] border-solid flex flex-col h-[531.622px] items-start overflow-clip relative rounded-[16.711px] w-[752px] shrink-0",
          "n": "Product demonstration / Customers, Properties & Assets",
          "id": "203:12975",
          "k": [
           {
            "t": "div",
-           "c": "bg-[#0f1530] flex gap-[16.711px] h-[56.4px] items-center p-[16.711px] relative w-full",
+           "c": "bg-[#0f1530] flex gap-[16.711px] h-[56.4px] items-center p-[16.711px] relative w-[752px] shrink-0",
            "n": "Product chrome",
            "id": "I203:12975;200:388",
            "k": [
@@ -31900,7 +31900,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[12.53px] text-[color:#fff] flex-1 min-w-0",
+             "c": "font-medium leading-[1.38] relative text-[12.53px] text-[color:#fff] w-[432.4px] shrink-0",
              "id": "I203:12975;200:390",
              "k": [
               "Customers & equipment"
@@ -31926,19 +31926,19 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[16.711px] items-start p-[25.067px] relative w-full",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[16.711px] items-start p-[25.067px] relative w-[752px] shrink-0",
            "n": "Product workspace",
            "id": "I203:12975;200:393",
            "k": [
             {
              "t": "div",
-             "c": "flex gap-[16.711px] items-start relative w-full",
+             "c": "flex gap-[16.711px] items-start relative w-[701.867px] shrink-0",
              "n": "Screen title",
              "id": "I203:12975;200:394",
              "k": [
               {
                "t": "p",
-               "c": "font-semibold leading-[1.38] relative text-[24.02px] text-[color:#0f1530] flex-1 min-w-0",
+               "c": "font-semibold leading-[1.38] relative text-[24.02px] text-[color:#0f1530] w-[480.444px] shrink-0",
                "id": "I203:12975;200:395",
                "k": [
                 "Customers & equipment"
@@ -31964,19 +31964,19 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "flex gap-[20.889px] items-start relative w-full",
+             "c": "flex gap-[20.889px] items-start relative w-[701.867px] shrink-0",
              "n": "Customer record",
              "id": "I203:12975;200:398",
              "k": [
               {
                "t": "div",
-               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] flex-1 min-w-0",
+               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] w-[267.378px] shrink-0",
                "n": "Customer profile",
                "id": "I203:12975;200:399",
                "k": [
                 {
                  "t": "div",
-                 "c": "bg-[#0f1530] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-full",
+                 "c": "bg-[#0f1530] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[45.956px] shrink-0",
                  "n": "Status / JL",
                  "id": "I203:12975;200:400",
                  "k": [
@@ -31992,7 +31992,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-semibold leading-[1.38] relative text-[24.02px] text-[color:#0f1530] w-full",
+                 "c": "font-semibold leading-[1.38] relative text-[24.02px] text-[color:#0f1530] w-[225.6px] shrink-0",
                  "id": "I203:12975;200:402",
                  "k": [
                   "Jordan Lee"
@@ -32000,7 +32000,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-normal leading-[1.38] relative text-[11.49px] text-[color:#2a3360] w-full",
+                 "c": "font-normal leading-[1.38] relative text-[11.49px] text-[color:#2a3360] w-[225.6px] shrink-0",
                  "id": "I203:12975;200:403",
                  "k": [
                   "Customer since April 2024"
@@ -32008,13 +32008,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#e6dccb] h-[1.044px] relative w-full",
+                 "c": "bg-[#e6dccb] h-[1.044px] relative w-[225.6px] shrink-0",
                  "n": "Divider",
                  "id": "I203:12975;200:404"
                 },
                 {
                  "t": "div",
-                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.53px] w-full",
+                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.53px] w-[225.6px] shrink-0",
                  "n": "Field / Properties",
                  "id": "I203:12975;200:405",
                  "k": [
@@ -32038,7 +32038,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.53px] w-full",
+                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.53px] w-[225.6px] shrink-0",
                  "n": "Field / Completed visits",
                  "id": "I203:12975;200:408",
                  "k": [
@@ -32062,7 +32062,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.53px] w-full",
+                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.53px] w-[225.6px] shrink-0",
                  "n": "Field / Contact",
                  "id": "I203:12975;200:411",
                  "k": [
@@ -32086,7 +32086,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#e4f1e8] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-full",
+                 "c": "bg-[#e4f1e8] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[182.778px] shrink-0",
                  "n": "Status / Active agreement",
                  "id": "I203:12975;200:414",
                  "k": [
@@ -32104,13 +32104,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] flex-1 min-w-0",
+               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] w-[413.6px] shrink-0",
                "n": "Equipment and history",
                "id": "I203:12975;200:416",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-semibold leading-[1.38] relative text-[19.84px] text-[color:#0f1530] w-full",
+                 "c": "font-semibold leading-[1.38] relative text-[19.84px] text-[color:#0f1530] w-[371.822px] shrink-0",
                  "id": "I203:12975;200:417",
                  "k": [
                   "Primary home"
@@ -32118,7 +32118,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "h-[135.778px] relative rounded-[16.711px] w-full",
+                 "c": "h-[135.778px] relative rounded-[16.711px] w-[371.822px] shrink-0",
                  "n": "Equipment context",
                  "id": "I203:12975;200:418",
                  "k": [
@@ -32131,7 +32131,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[14.62px] text-[color:#0f1530] w-full",
+                 "c": "font-medium leading-[1.38] relative text-[14.62px] text-[color:#0f1530] w-[371.822px] shrink-0",
                  "id": "I203:12975;200:419",
                  "k": [
                   "Split AC · Installed 2021"
@@ -32139,7 +32139,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.53px] w-full",
+                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.53px] w-[371.822px] shrink-0",
                  "n": "Field / Last service",
                  "id": "I203:12975;200:420",
                  "k": [
@@ -32163,7 +32163,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.53px] w-full",
+                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.53px] w-[371.822px] shrink-0",
                  "n": "Field / Latest work",
                  "id": "I203:12975;200:423",
                  "k": [
@@ -32187,13 +32187,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#0f1530] flex h-[39.689px] items-center justify-center px-[14.622px] relative rounded-[12.533px] w-full",
+                 "c": "bg-[#0f1530] flex h-[39.689px] items-center justify-center px-[14.622px] relative rounded-[12.533px] w-[371.822px] shrink-0",
                  "n": "UI action / Open job history",
                  "id": "I203:12975;200:426",
                  "k": [
                   {
                    "t": "p",
-                   "c": "font-medium leading-[1.38] relative text-[12.53px] text-[color:#fff] text-center flex-1 min-w-0",
+                   "c": "font-medium leading-[1.38] relative text-[12.53px] text-[color:#fff] text-center w-[342.578px] shrink-0",
                    "id": "I203:12975;200:427",
                    "k": [
                     "Open job history"
@@ -32215,19 +32215,19 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
     },
     {
      "t": "div",
-     "c": "bg-[#fff] flex flex-col gap-[32px] items-start p-[80px] relative w-full",
+     "c": "bg-[#fff] flex flex-col gap-[32px] items-start p-[80px] relative w-[1440px] shrink-0",
      "n": "02 / A workflow you can see",
      "id": "203:13016",
      "k": [
       {
        "t": "div",
-       "c": "flex flex-col gap-[12px] items-start relative w-full",
+       "c": "flex flex-col gap-[12px] items-start relative w-[1280px] shrink-0",
        "n": "Workflow heading",
        "id": "203:13017",
        "k": [
         {
          "t": "p",
-         "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+         "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[1280px] shrink-0",
          "id": "203:13018",
          "k": [
           "EXAMPLE WORKFLOW"
@@ -32235,7 +32235,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "p",
-         "c": "font-semibold leading-[1.08] relative text-[44px] text-[color:#0f1530] tracking-[-1.1px] w-full",
+         "c": "font-semibold leading-[1.08] relative text-[44px] text-[color:#0f1530] tracking-[-1.1px] w-[1280px] shrink-0",
          "id": "203:13019",
          "k": [
           "See the work happen."
@@ -32245,7 +32245,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
       },
       {
        "t": "div",
-       "c": "flex gap-[40px] items-start relative w-full",
+       "c": "flex gap-[40px] items-start relative w-[1280px] shrink-0",
        "n": "Three product moments",
        "id": "203:13020",
        "k": [
@@ -32257,7 +32257,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "flex gap-[12px] items-start relative w-full",
+           "c": "flex gap-[12px] items-start relative w-[354px] shrink-0",
            "n": "Step heading",
            "id": "203:13022",
            "k": [
@@ -32279,7 +32279,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] flex-1 min-w-0",
+             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] w-[302px] shrink-0",
              "id": "203:13025",
              "k": [
               "One customer record"
@@ -32289,13 +32289,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-full",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-[354px] shrink-0",
            "n": "Illustrated product state / profile",
            "id": "203:13026",
            "k": [
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#0f1530] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[54px] shrink-0",
              "n": "Status / JL",
              "id": "203:13027",
              "k": [
@@ -32311,7 +32311,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[30px] text-[color:#0f1530] w-full",
+             "c": "font-semibold leading-[1.38] relative text-[30px] text-[color:#0f1530] w-[318px] shrink-0",
              "id": "203:13029",
              "k": [
               "Jordan Lee"
@@ -32319,7 +32319,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "flex gap-[12px] items-start leading-[1.38] relative w-full",
+             "c": "flex gap-[12px] items-start leading-[1.38] relative w-[318px] shrink-0",
              "n": "Customer facts",
              "id": "203:13030",
              "k": [
@@ -32331,7 +32331,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                "k": [
                 {
                  "t": "p",
-                 "c": "font-bold relative text-[30px] text-[color:#0f1530] w-full",
+                 "c": "font-bold relative text-[30px] text-[color:#0f1530] w-[113px] shrink-0",
                  "id": "203:13032",
                  "k": [
                   "2"
@@ -32339,7 +32339,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-normal relative text-[12px] text-[color:#2a3360] w-full",
+                 "c": "font-normal relative text-[12px] text-[color:#2a3360] w-[113px] shrink-0",
                  "id": "203:13033",
                  "k": [
                   "Properties"
@@ -32355,7 +32355,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                "k": [
                 {
                  "t": "p",
-                 "c": "font-bold relative text-[30px] text-[color:#0f1530] w-full",
+                 "c": "font-bold relative text-[30px] text-[color:#0f1530] w-[113px] shrink-0",
                  "id": "203:13035",
                  "k": [
                   "3"
@@ -32363,7 +32363,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-normal relative text-[12px] text-[color:#2a3360] w-full",
+                 "c": "font-normal relative text-[12px] text-[color:#2a3360] w-[113px] shrink-0",
                  "id": "203:13036",
                  "k": [
                   "Visits"
@@ -32375,13 +32375,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[270px] shrink-0",
              "n": "Status / Contact preference · Email",
              "id": "203:13037",
              "k": [
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] flex-1 min-w-0",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[250px] shrink-0",
                "id": "203:13038",
                "k": [
                 "Contact preference · Email"
@@ -32401,7 +32401,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "flex gap-[12px] items-start relative w-full",
+           "c": "flex gap-[12px] items-start relative w-[354px] shrink-0",
            "n": "Step heading",
            "id": "203:13041",
            "k": [
@@ -32423,7 +32423,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] flex-1 min-w-0",
+             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] w-[302px] shrink-0",
              "id": "203:13044",
              "k": [
               "Know the equipment"
@@ -32433,13 +32433,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-full",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-[354px] shrink-0",
            "n": "Illustrated product state / equipment",
            "id": "203:13045",
            "k": [
             {
              "t": "div",
-             "c": "h-[120px] relative rounded-[16px] w-full",
+             "c": "h-[120px] relative rounded-[16px] w-[318px] shrink-0",
              "n": "Illustrative HVAC job context",
              "id": "203:13046",
              "k": [
@@ -32452,7 +32452,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[19px] text-[color:#0f1530] w-full",
+             "c": "font-semibold leading-[1.38] relative text-[19px] text-[color:#0f1530] w-[318px] shrink-0",
              "id": "203:13047",
              "k": [
               "Split AC · Installed 2021"
@@ -32460,7 +32460,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] w-full",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] w-[318px] shrink-0",
              "id": "203:13048",
              "k": [
               "Primary home"
@@ -32468,7 +32468,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[246px] shrink-0",
              "n": "Status / Last service · Apr 18",
              "id": "203:13049",
              "k": [
@@ -32484,13 +32484,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-[318px] shrink-0",
              "n": "UI action / Open equipment history",
              "id": "203:13051",
              "k": [
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center w-[290px] shrink-0",
                "id": "203:13052",
                "k": [
                 "Open equipment history"
@@ -32510,7 +32510,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "flex gap-[12px] items-start relative w-full",
+           "c": "flex gap-[12px] items-start relative w-[354px] shrink-0",
            "n": "Step heading",
            "id": "203:13055",
            "k": [
@@ -32532,7 +32532,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] flex-1 min-w-0",
+             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] w-[302px] shrink-0",
              "id": "203:13058",
              "k": [
               "Bring the history"
@@ -32542,13 +32542,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-full",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-[354px] shrink-0",
            "n": "Illustrated product state / history",
            "id": "203:13059",
            "k": [
             {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+             "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-[318px] shrink-0",
              "id": "203:13060",
              "k": [
               "Service history"
@@ -32556,7 +32556,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff] flex gap-[10px] h-[60px] items-start p-[12px] relative rounded-[12px] w-full",
+             "c": "bg-[#fff] flex gap-[10px] h-[60px] items-start p-[12px] relative rounded-[12px] w-[318px] shrink-0",
              "n": "Apr 18",
              "id": "203:13061",
              "k": [
@@ -32575,13 +32575,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "flex flex-col gap-[2px] items-start leading-[1.38] relative flex-1 min-w-0",
+               "c": "flex flex-col gap-[2px] items-start leading-[1.38] relative w-[262px] shrink-0",
                "n": "Event",
                "id": "203:13064",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-normal relative text-[11px] text-[color:#2a3360] w-full",
+                 "c": "font-normal relative text-[11px] text-[color:#2a3360] w-[262px] shrink-0",
                  "id": "203:13065",
                  "k": [
                   "Apr 18"
@@ -32589,7 +32589,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-[262px] shrink-0",
                  "id": "203:13066",
                  "k": [
                   "Spring tune-up"
@@ -32601,7 +32601,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff] flex gap-[10px] h-[60px] items-start p-[12px] relative rounded-[12px] w-full",
+             "c": "bg-[#fff] flex gap-[10px] h-[60px] items-start p-[12px] relative rounded-[12px] w-[318px] shrink-0",
              "n": "Oct 29",
              "id": "203:13067",
              "k": [
@@ -32620,13 +32620,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "flex flex-col gap-[2px] items-start leading-[1.38] relative flex-1 min-w-0",
+               "c": "flex flex-col gap-[2px] items-start leading-[1.38] relative w-[262px] shrink-0",
                "n": "Event",
                "id": "203:13070",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-normal relative text-[11px] text-[color:#2a3360] w-full",
+                 "c": "font-normal relative text-[11px] text-[color:#2a3360] w-[262px] shrink-0",
                  "id": "203:13071",
                  "k": [
                   "Oct 29"
@@ -32634,7 +32634,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-[262px] shrink-0",
                  "id": "203:13072",
                  "k": [
                   "Capacitor replaced"
@@ -32646,7 +32646,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff] flex gap-[10px] h-[60px] items-start p-[12px] relative rounded-[12px] w-full",
+             "c": "bg-[#fff] flex gap-[10px] h-[60px] items-start p-[12px] relative rounded-[12px] w-[318px] shrink-0",
              "n": "Nov 12",
              "id": "203:13073",
              "k": [
@@ -32665,13 +32665,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "flex flex-col gap-[2px] items-start leading-[1.38] relative flex-1 min-w-0",
+               "c": "flex flex-col gap-[2px] items-start leading-[1.38] relative w-[262px] shrink-0",
                "n": "Event",
                "id": "203:13076",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-normal relative text-[11px] text-[color:#2a3360] w-full",
+                 "c": "font-normal relative text-[11px] text-[color:#2a3360] w-[262px] shrink-0",
                  "id": "203:13077",
                  "k": [
                   "Nov 12"
@@ -32679,7 +32679,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-[262px] shrink-0",
                  "id": "203:13078",
                  "k": [
                   "Next visit"
@@ -32700,13 +32700,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
     },
     {
      "t": "div",
-     "c": "bg-[#0f1530] flex flex-col gap-[16px] items-start px-[80px] py-[48px] relative w-full",
+     "c": "bg-[#0f1530] flex flex-col gap-[16px] items-start px-[80px] py-[48px] relative w-[1440px] shrink-0",
      "n": "03 / Connected workflow and demo",
      "id": "203:13080",
      "k": [
       {
        "t": "p",
-       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#f6b400] tracking-[1.1px] w-full",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#f6b400] tracking-[1.1px] w-[1280px] shrink-0",
        "id": "219:10606",
        "k": [
         "WORKS ACROSS YOUR BUSINESS"
@@ -32714,7 +32714,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
       },
       {
        "t": "p",
-       "c": "font-semibold leading-[1.08] relative text-[36px] text-[color:#fff] tracking-[-0.9px] w-full",
+       "c": "font-semibold leading-[1.08] relative text-[36px] text-[color:#fff] tracking-[-0.9px] w-[1280px] shrink-0",
        "id": "219:10607",
        "k": [
         "One job. Connected all the way."
@@ -32722,7 +32722,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
       },
       {
        "t": "div",
-       "c": "flex gap-[16px] items-center relative w-full",
+       "c": "flex gap-[16px] items-center relative w-[1280px] shrink-0",
        "n": "Flagship and tool handoff",
        "id": "219:10608",
        "k": [
@@ -32734,7 +32734,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Suite and record",
            "id": "219:10610",
            "k": [
@@ -32766,7 +32766,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-[352px] shrink-0",
            "id": "219:10614",
            "k": [
             "Jobs & work orders"
@@ -32774,7 +32774,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Handoff evidence",
            "id": "219:10615",
            "k": [
@@ -32793,7 +32793,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left w-[324px] shrink-0",
              "id": "219:10618",
              "k": [
               "Visit history saved"
@@ -32832,7 +32832,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Suite and record",
            "id": "219:10624",
            "k": [
@@ -32864,7 +32864,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-[352px] shrink-0",
            "id": "219:10628",
            "k": [
             "Customers & assets"
@@ -32872,7 +32872,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Handoff evidence",
            "id": "219:10629",
            "k": [
@@ -32891,7 +32891,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left w-[324px] shrink-0",
              "id": "219:10632",
              "k": [
               "One connected customer record"
@@ -32930,7 +32930,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Suite and record",
            "id": "219:10638",
            "k": [
@@ -32962,7 +32962,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-[352px] shrink-0",
            "id": "219:10642",
            "k": [
             "Service agreements"
@@ -32970,7 +32970,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Handoff evidence",
            "id": "219:10643",
            "k": [
@@ -32989,7 +32989,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left w-[324px] shrink-0",
              "id": "219:10646",
              "k": [
               "Next covered visit in view"
@@ -33175,7 +33175,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                "k": [
                 {
                  "t": "div",
-                 "c": "bg-[#0f1530] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-full",
+                 "c": "bg-[#0f1530] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[20.9px] shrink-0",
                  "n": "Status / JL",
                  "id": "I203:13105;200:400",
                  "k": [
@@ -33285,7 +33285,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#e4f1e8] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-full",
+                 "c": "bg-[#e4f1e8] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[83.125px] shrink-0",
                  "n": "Status / Active agreement",
                  "id": "I203:13105;200:414",
                  "k": [
@@ -33494,7 +33494,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
            "k": [
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-full",
+             "c": "bg-[#0f1530] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[46.17px] shrink-0",
              "n": "Status / JL",
              "id": "I203:13151;203:13027",
              "k": [
@@ -33574,7 +33574,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-full",
+             "c": "bg-[#fff] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[230.85px] shrink-0",
              "n": "Status / Contact preference · Email",
              "id": "I203:13151;203:13037",
              "k": [
@@ -33667,7 +33667,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-full",
+             "c": "bg-[#fff] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[210.33px] shrink-0",
              "n": "Status / Last service · Apr 18",
              "id": "I203:13169;203:13049",
              "k": [
@@ -34004,7 +34004,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "div",
-         "c": "flex flex-col h-[24px] items-center justify-center relative w-full",
+         "c": "flex flex-col h-[24px] items-center justify-center relative w-[32px] shrink-0",
          "n": "Next connected state",
          "id": "219:10662",
          "k": [
@@ -34102,7 +34102,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "div",
-         "c": "flex flex-col h-[24px] items-center justify-center relative w-full",
+         "c": "flex flex-col h-[24px] items-center justify-center relative w-[32px] shrink-0",
          "n": "Next connected state",
          "id": "219:10676",
          "k": [
@@ -34221,25 +34221,25 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
    "k": [
     {
      "t": "div",
-     "c": "bg-[#fbf6ef] flex flex-col gap-[32px] items-start p-[80px] relative w-full",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[32px] items-start p-[80px] relative w-[1440px] shrink-0",
      "n": "01 / Product in view",
      "id": "203:13486",
      "k": [
       {
        "t": "div",
-       "c": "flex gap-[48px] items-center relative w-full",
+       "c": "flex gap-[48px] items-center relative w-[1280px] shrink-0",
        "n": "Outcome and product",
        "id": "203:13487",
        "k": [
         {
          "t": "div",
-         "c": "flex flex-col gap-[20px] items-start relative flex-1 min-w-0",
+         "c": "flex flex-col gap-[20px] items-start relative w-[480px] shrink-0",
          "n": "Short outcome copy",
          "id": "203:13488",
          "k": [
           {
            "t": "p",
-           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[480px] shrink-0",
            "id": "203:13489",
            "k": [
             "ONBOARDING & DATA IMPORT"
@@ -34247,7 +34247,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "h1",
-           "c": "font-semibold leading-[1.08] relative text-[60px] text-[color:#0f1530] tracking-[-1.5px] w-full",
+           "c": "font-semibold leading-[1.08] relative text-[60px] text-[color:#0f1530] tracking-[-1.5px] w-[480px] shrink-0",
            "id": "203:13490",
            "k": [
             "Bring the business you’ve already built."
@@ -34255,7 +34255,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-full",
+           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-[480px] shrink-0",
            "id": "203:13491",
            "k": [
             "Upload your export, review the mapping, and check what comes across."
@@ -34270,7 +34270,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[480px] shrink-0",
            "id": "203:13494",
            "k": [
             "EXAMPLE BUSINESS · JUNIPER"
@@ -34280,13 +34280,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "div",
-         "c": "bg-[#f6f7f9] border-[1.044px] border-[#e6dccb] border-solid flex flex-col h-[470px] items-start overflow-clip relative rounded-[16.711px] flex-1 min-w-0",
+         "c": "bg-[#f6f7f9] border-[1.044px] border-[#e6dccb] border-solid flex flex-col h-[470px] items-start overflow-clip relative rounded-[16.711px] w-[752px] shrink-0",
          "n": "Product demonstration / Onboarding & Data Import",
          "id": "203:13495",
          "k": [
           {
            "t": "div",
-           "c": "bg-[#0f1530] flex gap-[16.711px] h-[56.4px] items-center p-[16.711px] relative w-full",
+           "c": "bg-[#0f1530] flex gap-[16.711px] h-[56.4px] items-center p-[16.711px] relative w-[752px] shrink-0",
            "n": "Product chrome",
            "id": "I203:13495;200:472",
            "k": [
@@ -34300,7 +34300,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[12.53px] text-[color:#fff] flex-1 min-w-0",
+             "c": "font-medium leading-[1.38] relative text-[12.53px] text-[color:#fff] w-[432.4px] shrink-0",
              "id": "I203:13495;200:474",
              "k": [
               "Data import"
@@ -34326,19 +34326,19 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[16.711px] items-start p-[25.067px] relative w-full",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[16.711px] items-start p-[25.067px] relative w-[752px] shrink-0",
            "n": "Product workspace",
            "id": "I203:13495;200:477",
            "k": [
             {
              "t": "div",
-             "c": "flex gap-[16.711px] items-start relative w-full",
+             "c": "flex gap-[16.711px] items-start relative w-[701.867px] shrink-0",
              "n": "Screen title",
              "id": "I203:13495;200:478",
              "k": [
               {
                "t": "p",
-               "c": "font-semibold leading-[1.38] relative text-[24.02px] text-[color:#0f1530] flex-1 min-w-0",
+               "c": "font-semibold leading-[1.38] relative text-[24.02px] text-[color:#0f1530] w-[480.444px] shrink-0",
                "id": "I203:13495;200:479",
                "k": [
                 "Data import"
@@ -34364,7 +34364,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "flex gap-[16.711px] items-start relative w-full",
+             "c": "flex gap-[16.711px] items-start relative w-[701.867px] shrink-0",
              "n": "Import steps",
              "id": "I203:13495;200:482",
              "k": [
@@ -34420,13 +34420,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "flex gap-[20.889px] items-start relative w-full",
+             "c": "flex gap-[20.889px] items-start relative w-[701.867px] shrink-0",
              "n": "File mapping",
              "id": "I203:13495;200:489",
              "k": [
               {
                "t": "div",
-               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] flex-1 min-w-0",
+               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] w-[263.2px] shrink-0",
                "n": "Source file",
                "id": "I203:13495;200:490",
                "k": [
@@ -34445,7 +34445,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-semibold leading-[1.38] relative text-[20.89px] text-[color:#0f1530] w-full",
+                 "c": "font-semibold leading-[1.38] relative text-[20.89px] text-[color:#0f1530] w-[221.422px] shrink-0",
                  "id": "I203:13495;200:493",
                  "k": [
                   "customers.csv"
@@ -34453,7 +34453,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-normal leading-[1.38] relative text-[12.53px] text-[color:#2a3360] w-full",
+                 "c": "font-normal leading-[1.38] relative text-[12.53px] text-[color:#2a3360] w-[221.422px] shrink-0",
                  "id": "I203:13495;200:494",
                  "k": [
                   "248 customer records"
@@ -34461,7 +34461,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#e4f1e8] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-full",
+                 "c": "bg-[#e4f1e8] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[167.111px] shrink-0",
                  "n": "Status / File received",
                  "id": "I203:13495;200:495",
                  "k": [
@@ -34479,13 +34479,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] flex-1 min-w-0",
+               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] w-[417.778px] shrink-0",
                "n": "Map columns",
                "id": "I203:13495;200:497",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-semibold leading-[1.38] relative text-[21.93px] text-[color:#0f1530] w-full",
+                 "c": "font-semibold leading-[1.38] relative text-[21.93px] text-[color:#0f1530] w-[376px] shrink-0",
                  "id": "I203:13495;200:498",
                  "k": [
                   "Match your columns"
@@ -34493,7 +34493,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.53px] w-full",
+                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.53px] w-[376px] shrink-0",
                  "n": "Field / Client name",
                  "id": "I203:13495;200:499",
                  "k": [
@@ -34517,7 +34517,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.53px] w-full",
+                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.53px] w-[376px] shrink-0",
                  "n": "Field / Site address",
                  "id": "I203:13495;200:502",
                  "k": [
@@ -34541,7 +34541,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.53px] w-full",
+                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.53px] w-[376px] shrink-0",
                  "n": "Field / Unit model",
                  "id": "I203:13495;200:505",
                  "k": [
@@ -34565,7 +34565,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#fff4d6] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-full",
+                 "c": "bg-[#fff4d6] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[229.778px] shrink-0",
                  "n": "Status / 6 duplicates to review",
                  "id": "I203:13495;200:508",
                  "k": [
@@ -34581,13 +34581,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#0f1530] flex h-[39.689px] items-center justify-center px-[14.622px] relative rounded-[12.533px] w-full",
+                 "c": "bg-[#0f1530] flex h-[39.689px] items-center justify-center px-[14.622px] relative rounded-[12.533px] w-[376px] shrink-0",
                  "n": "UI action / Preview import",
                  "id": "I203:13495;200:510",
                  "k": [
                   {
                    "t": "p",
-                   "c": "font-medium leading-[1.38] relative text-[12.53px] text-[color:#fff] text-center flex-1 min-w-0",
+                   "c": "font-medium leading-[1.38] relative text-[12.53px] text-[color:#fff] text-center w-[346.756px] shrink-0",
                    "id": "I203:13495;200:511",
                    "k": [
                     "Preview import"
@@ -34609,19 +34609,19 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
     },
     {
      "t": "div",
-     "c": "bg-[#fff] flex flex-col gap-[32px] items-start p-[80px] relative w-full",
+     "c": "bg-[#fff] flex flex-col gap-[32px] items-start p-[80px] relative w-[1440px] shrink-0",
      "n": "02 / A workflow you can see",
      "id": "203:13536",
      "k": [
       {
        "t": "div",
-       "c": "flex flex-col gap-[12px] items-start relative w-full",
+       "c": "flex flex-col gap-[12px] items-start relative w-[1280px] shrink-0",
        "n": "Workflow heading",
        "id": "203:13537",
        "k": [
         {
          "t": "p",
-         "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+         "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[1280px] shrink-0",
          "id": "203:13538",
          "k": [
           "EXAMPLE WORKFLOW"
@@ -34629,7 +34629,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "p",
-         "c": "font-semibold leading-[1.08] relative text-[44px] text-[color:#0f1530] tracking-[-1.1px] w-full",
+         "c": "font-semibold leading-[1.08] relative text-[44px] text-[color:#0f1530] tracking-[-1.1px] w-[1280px] shrink-0",
          "id": "203:13539",
          "k": [
           "See the work happen."
@@ -34639,7 +34639,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
       },
       {
        "t": "div",
-       "c": "flex gap-[40px] items-start relative w-full",
+       "c": "flex gap-[40px] items-start relative w-[1280px] shrink-0",
        "n": "Three product moments",
        "id": "203:13540",
        "k": [
@@ -34651,7 +34651,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "flex gap-[12px] items-start relative w-full",
+           "c": "flex gap-[12px] items-start relative w-[354px] shrink-0",
            "n": "Step heading",
            "id": "203:13542",
            "k": [
@@ -34673,7 +34673,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] flex-1 min-w-0",
+             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] w-[302px] shrink-0",
              "id": "203:13545",
              "k": [
               "Bring your export"
@@ -34683,7 +34683,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-full",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-[354px] shrink-0",
            "n": "Illustrated product state / files",
            "id": "203:13546",
            "k": [
@@ -34702,7 +34702,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+             "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-[318px] shrink-0",
              "id": "203:13549",
              "k": [
               "Bring your export"
@@ -34710,7 +34710,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff] flex gap-[10px] h-[40px] items-start p-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#fff] flex gap-[10px] h-[40px] items-start p-[10px] relative rounded-[12px] w-[318px] shrink-0",
              "n": "customers.csv",
              "id": "203:13550",
              "k": [
@@ -34729,7 +34729,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "p",
-               "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#0f1530] flex-1 min-w-0",
+               "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#0f1530] w-[270px] shrink-0",
                "id": "203:13553",
                "k": [
                 "customers.csv"
@@ -34739,7 +34739,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff] flex gap-[10px] h-[40px] items-start p-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#fff] flex gap-[10px] h-[40px] items-start p-[10px] relative rounded-[12px] w-[318px] shrink-0",
              "n": "jobs.csv",
              "id": "203:13554",
              "k": [
@@ -34758,7 +34758,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "p",
-               "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#0f1530] flex-1 min-w-0",
+               "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#0f1530] w-[270px] shrink-0",
                "id": "203:13557",
                "k": [
                 "jobs.csv"
@@ -34768,7 +34768,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff] flex gap-[10px] h-[40px] items-start p-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#fff] flex gap-[10px] h-[40px] items-start p-[10px] relative rounded-[12px] w-[318px] shrink-0",
              "n": "equipment.csv",
              "id": "203:13558",
              "k": [
@@ -34787,7 +34787,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "p",
-               "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#0f1530] flex-1 min-w-0",
+               "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#0f1530] w-[270px] shrink-0",
                "id": "203:13561",
                "k": [
                 "equipment.csv"
@@ -34797,13 +34797,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-[318px] shrink-0",
              "n": "UI action / Upload files",
              "id": "203:13562",
              "k": [
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center w-[290px] shrink-0",
                "id": "203:13563",
                "k": [
                 "Upload files"
@@ -34823,7 +34823,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "flex gap-[12px] items-start relative w-full",
+           "c": "flex gap-[12px] items-start relative w-[354px] shrink-0",
            "n": "Step heading",
            "id": "203:13566",
            "k": [
@@ -34845,7 +34845,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] flex-1 min-w-0",
+             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] w-[302px] shrink-0",
              "id": "203:13569",
              "k": [
               "Review the mapping"
@@ -34855,13 +34855,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-full",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-[354px] shrink-0",
            "n": "Illustrated product state / mapping",
            "id": "203:13570",
            "k": [
             {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[21px] text-[color:#0f1530] w-full",
+             "c": "font-semibold leading-[1.38] relative text-[21px] text-[color:#0f1530] w-[318px] shrink-0",
              "id": "203:13571",
              "k": [
               "Match your columns"
@@ -34869,7 +34869,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff] flex gap-[10px] h-[48px] items-start p-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#fff] flex gap-[10px] h-[48px] items-start p-[10px] relative rounded-[12px] w-[318px] shrink-0",
              "n": "Client name",
              "id": "203:13572",
              "k": [
@@ -34906,7 +34906,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff] flex gap-[10px] h-[48px] items-start p-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#fff] flex gap-[10px] h-[48px] items-start p-[10px] relative rounded-[12px] w-[318px] shrink-0",
              "n": "Site address",
              "id": "203:13577",
              "k": [
@@ -34943,7 +34943,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff] flex gap-[10px] h-[48px] items-start p-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#fff] flex gap-[10px] h-[48px] items-start p-[10px] relative rounded-[12px] w-[318px] shrink-0",
              "n": "Unit model",
              "id": "203:13582",
              "k": [
@@ -34980,7 +34980,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[220px] shrink-0",
              "n": "Status / 3 fields need review",
              "id": "203:13587",
              "k": [
@@ -34996,13 +34996,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-[318px] shrink-0",
              "n": "UI action / Review mapping",
              "id": "203:13589",
              "k": [
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center w-[290px] shrink-0",
                "id": "203:13590",
                "k": [
                 "Review mapping"
@@ -35022,7 +35022,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "flex gap-[12px] items-start relative w-full",
+           "c": "flex gap-[12px] items-start relative w-[354px] shrink-0",
            "n": "Step heading",
            "id": "203:13593",
            "k": [
@@ -35044,7 +35044,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] flex-1 min-w-0",
+             "c": "font-semibold leading-[1.38] relative text-[18px] text-[color:#0f1530] w-[302px] shrink-0",
              "id": "203:13596",
              "k": [
               "Check before importing"
@@ -35054,13 +35054,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-full",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[14px] h-[400px] items-start p-[18px] relative rounded-[12px] w-[354px] shrink-0",
            "n": "Illustrated product state / importPreview",
            "id": "203:13597",
            "k": [
             {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[21px] text-[color:#0f1530] w-full",
+             "c": "font-semibold leading-[1.38] relative text-[21px] text-[color:#0f1530] w-[318px] shrink-0",
              "id": "203:13598",
              "k": [
               "Check before importing"
@@ -35068,7 +35068,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-full",
+             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-[318px] shrink-0",
              "n": "Field / Customers",
              "id": "203:13599",
              "k": [
@@ -35092,7 +35092,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-full",
+             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-[318px] shrink-0",
              "n": "Field / Jobs",
              "id": "203:13602",
              "k": [
@@ -35116,13 +35116,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#e6dccb] h-px relative w-full",
+             "c": "bg-[#e6dccb] h-px relative w-[318px] shrink-0",
              "n": "Divider",
              "id": "203:13605"
             },
             {
              "t": "p",
-             "c": "font-bold leading-[1.08] relative text-[48px] text-[color:#0f1530] tracking-[-1.2px] w-full",
+             "c": "font-bold leading-[1.08] relative text-[48px] text-[color:#0f1530] tracking-[-1.2px] w-[318px] shrink-0",
              "id": "203:13606",
              "k": [
               "6"
@@ -35130,7 +35130,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#2a3360] w-full",
+             "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#2a3360] w-[318px] shrink-0",
              "id": "203:13607",
              "k": [
               "Duplicates to review"
@@ -35138,13 +35138,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-[318px] shrink-0",
              "n": "UI action / Preview import",
              "id": "203:13608",
              "k": [
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center w-[290px] shrink-0",
                "id": "203:13609",
                "k": [
                 "Preview import"
@@ -35163,13 +35163,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
     },
     {
      "t": "div",
-     "c": "bg-[#0f1530] flex flex-col gap-[16px] items-start px-[80px] py-[48px] relative w-full",
+     "c": "bg-[#0f1530] flex flex-col gap-[16px] items-start px-[80px] py-[48px] relative w-[1440px] shrink-0",
      "n": "03 / Connected workflow and demo",
      "id": "203:13611",
      "k": [
       {
        "t": "p",
-       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#f6b400] tracking-[1.1px] w-full",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#f6b400] tracking-[1.1px] w-[1280px] shrink-0",
        "id": "219:10774",
        "k": [
         "WORKS ACROSS YOUR BUSINESS"
@@ -35177,7 +35177,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
       },
       {
        "t": "p",
-       "c": "font-semibold leading-[1.08] relative text-[36px] text-[color:#fff] tracking-[-0.9px] w-full",
+       "c": "font-semibold leading-[1.08] relative text-[36px] text-[color:#fff] tracking-[-0.9px] w-[1280px] shrink-0",
        "id": "219:10775",
        "k": [
         "One job. Connected all the way."
@@ -35185,7 +35185,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
       },
       {
        "t": "div",
-       "c": "flex gap-[16px] items-center relative w-full",
+       "c": "flex gap-[16px] items-center relative w-[1280px] shrink-0",
        "n": "Flagship and tool handoff",
        "id": "219:10776",
        "k": [
@@ -35197,7 +35197,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Suite and record",
            "id": "219:10778",
            "k": [
@@ -35229,7 +35229,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-[352px] shrink-0",
            "id": "219:10782",
            "k": [
             "Data import"
@@ -35237,7 +35237,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Handoff evidence",
            "id": "219:10783",
            "k": [
@@ -35256,7 +35256,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left w-[324px] shrink-0",
              "id": "219:10786",
              "k": [
               "Records reviewed and imported"
@@ -35295,7 +35295,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Suite and record",
            "id": "219:10792",
            "k": [
@@ -35327,7 +35327,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-[352px] shrink-0",
            "id": "219:10796",
            "k": [
             "Customers & assets"
@@ -35335,7 +35335,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Handoff evidence",
            "id": "219:10797",
            "k": [
@@ -35354,7 +35354,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left w-[324px] shrink-0",
              "id": "219:10800",
              "k": [
               "History available to the team"
@@ -35393,7 +35393,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Suite and record",
            "id": "219:10806",
            "k": [
@@ -35425,7 +35425,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-[352px] shrink-0",
            "id": "219:10810",
            "k": [
             "Inquiry follow-up"
@@ -35433,7 +35433,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Handoff evidence",
            "id": "219:10811",
            "k": [
@@ -35452,7 +35452,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left w-[324px] shrink-0",
              "id": "219:10814",
              "k": [
               "Open estimates ready to review"
@@ -35723,7 +35723,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#e4f1e8] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-full",
+                 "c": "bg-[#e4f1e8] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[76px] shrink-0",
                  "n": "Status / File received",
                  "id": "I203:13636;200:495",
                  "k": [
@@ -35827,7 +35827,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#fff4d6] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-full",
+                 "c": "bg-[#fff4d6] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[104.5px] shrink-0",
                  "n": "Status / 6 duplicates to review",
                  "id": "I203:13636;200:508",
                  "k": [
@@ -36242,7 +36242,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff4d6] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-full",
+             "c": "bg-[#fff4d6] flex h-[23.085px] items-center px-[8.55px] relative rounded-[10.26px] w-[188.1px] shrink-0",
              "n": "Status / 3 fields need review",
              "id": "I203:13705;203:13587",
              "k": [
@@ -36530,7 +36530,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "div",
-         "c": "flex flex-col h-[24px] items-center justify-center relative w-full",
+         "c": "flex flex-col h-[24px] items-center justify-center relative w-[32px] shrink-0",
          "n": "Next connected state",
          "id": "219:10830",
          "k": [
@@ -36628,7 +36628,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "div",
-         "c": "flex flex-col h-[24px] items-center justify-center relative w-full",
+         "c": "flex flex-col h-[24px] items-center justify-center relative w-[32px] shrink-0",
          "n": "Next connected state",
          "id": "219:10844",
          "k": [
@@ -36747,25 +36747,25 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
    "k": [
     {
      "t": "div",
-     "c": "bg-[#fbf6ef] flex flex-col gap-[24px] items-start px-[80px] py-[48px] relative w-full",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[24px] items-start px-[80px] py-[48px] relative w-[1440px] shrink-0",
      "n": "01 / Product in view",
      "id": "219:7839",
      "k": [
       {
        "t": "div",
-       "c": "flex gap-[48px] items-center relative w-full",
+       "c": "flex gap-[48px] items-center relative w-[1280px] shrink-0",
        "n": "Outcome and actual workflow",
        "id": "219:7840",
        "k": [
         {
          "t": "div",
-         "c": "flex flex-col gap-[16px] items-start relative flex-1 min-w-0",
+         "c": "flex flex-col gap-[16px] items-start relative w-[480px] shrink-0",
          "n": "Short product promise",
          "id": "219:7841",
          "k": [
           {
            "t": "p",
-           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[480px] shrink-0",
            "id": "219:7842",
            "k": [
             "REVENUE / INQUIRY RESPONSE & FOLLOW-UP"
@@ -36773,7 +36773,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "h1",
-           "c": "font-semibold leading-[1.08] relative text-[58px] text-[color:#0f1530] tracking-[-1.45px] w-full",
+           "c": "font-semibold leading-[1.08] relative text-[58px] text-[color:#0f1530] tracking-[-1.45px] w-[480px] shrink-0",
            "id": "219:7843",
            "k": [
             "Respond while the opportunity is fresh."
@@ -36781,7 +36781,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-full",
+           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-[480px] shrink-0",
            "id": "219:7844",
            "k": [
             "Review every reply and keep follow-up connected to the inquiry."
@@ -36796,7 +36796,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[480px] shrink-0",
            "id": "219:7847",
            "k": [
             "EXAMPLE BUSINESS · JUNIPER"
@@ -36812,7 +36812,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "bg-[#0f1530] flex gap-[16.711px] h-[56.4px] items-center p-[16.711px] relative w-full",
+           "c": "bg-[#0f1530] flex gap-[16.711px] h-[56.4px] items-center p-[16.711px] relative w-[752px] shrink-0",
            "n": "Product chrome",
            "id": "219:7849",
            "k": [
@@ -36826,7 +36826,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[12.533px] text-[color:#fff] flex-1 min-w-0",
+             "c": "font-medium leading-[1.38] relative text-[12.533px] text-[color:#fff] w-[432.4px] shrink-0",
              "id": "219:7851",
              "k": [
               "Inquiries & follow-up"
@@ -36852,13 +36852,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[16.711px] items-start p-[25.067px] relative w-full",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[16.711px] items-start p-[25.067px] relative w-[752px] shrink-0",
            "n": "Product workspace",
            "id": "219:7854",
            "k": [
             {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[25.067px] text-[color:#0f1530] w-full",
+             "c": "font-semibold leading-[1.38] relative text-[25.067px] text-[color:#0f1530] w-[701.867px] shrink-0",
              "id": "219:7855",
              "k": [
               "One inquiry. One clear next step."
@@ -36866,19 +36866,19 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "flex gap-[20.889px] items-start relative w-full",
+             "c": "flex gap-[20.889px] items-start relative w-[701.867px] shrink-0",
              "n": "Inquiry and reviewed response",
              "id": "219:7856",
              "k": [
               {
                "t": "div",
-               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] flex-1 min-w-0",
+               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] w-[294.533px] shrink-0",
                "n": "Incoming inquiry",
                "id": "219:7857",
                "k": [
                 {
                  "t": "div",
-                 "c": "bg-[#fff4d6] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-full",
+                 "c": "bg-[#fff4d6] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[219.333px] shrink-0",
                  "n": "Status / WEBSITE INQUIRY",
                  "id": "219:7858",
                  "k": [
@@ -36894,7 +36894,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-semibold leading-[1.38] relative text-[24.022px] text-[color:#0f1530] w-full",
+                 "c": "font-semibold leading-[1.38] relative text-[24.022px] text-[color:#0f1530] w-[252.756px] shrink-0",
                  "id": "219:7860",
                  "k": [
                   "Jordan Lee"
@@ -36902,7 +36902,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-normal leading-[1.38] relative text-[16.711px] text-[color:#0f1530] w-full",
+                 "c": "font-normal leading-[1.38] relative text-[16.711px] text-[color:#0f1530] w-[252.756px] shrink-0",
                  "id": "219:7861",
                  "k": [
                   "AC runs, but won’t cool."
@@ -36910,7 +36910,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-normal leading-[1.38] relative text-[12.533px] text-[color:#2a3360] w-full",
+                 "c": "font-normal leading-[1.38] relative text-[12.533px] text-[color:#2a3360] w-[252.756px] shrink-0",
                  "id": "219:7862",
                  "k": [
                   "Requested · Diagnostic visit"
@@ -36918,13 +36918,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#e6dccb] h-[1.044px] relative w-full",
+                 "c": "bg-[#e6dccb] h-[1.044px] relative w-[252.756px] shrink-0",
                  "n": "Divider",
                  "id": "219:7863"
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#e4f1e8] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-full",
+                 "c": "bg-[#e4f1e8] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[188px] shrink-0",
                  "n": "Status / Consent recorded",
                  "id": "219:7864",
                  "k": [
@@ -36940,7 +36940,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-normal leading-[1.38] relative text-[11.489px] text-[color:#2a3360] w-full",
+                 "c": "font-normal leading-[1.38] relative text-[11.489px] text-[color:#2a3360] w-[252.756px] shrink-0",
                  "id": "219:7866",
                  "k": [
                   "No response sent yet"
@@ -36950,13 +36950,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] flex-1 min-w-0",
+               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] w-[386.444px] shrink-0",
                "n": "Response draft",
                "id": "219:7867",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[11.489px] text-[color:#2a3360] tracking-[1.1489px] w-full",
+                 "c": "font-medium leading-[1.38] relative text-[11.489px] text-[color:#2a3360] tracking-[1.1489px] w-[344.667px] shrink-0",
                  "id": "219:7868",
                  "k": [
                   "EMAIL DRAFT"
@@ -36964,7 +36964,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-semibold leading-[1.38] relative text-[24.022px] text-[color:#0f1530] w-full",
+                 "c": "font-semibold leading-[1.38] relative text-[24.022px] text-[color:#0f1530] w-[344.667px] shrink-0",
                  "id": "219:7869",
                  "k": [
                   "Let’s look at your AC."
@@ -36972,7 +36972,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-normal leading-[1.38] relative text-[12.533px] text-[color:#2a3360] w-full",
+                 "c": "font-normal leading-[1.38] relative text-[12.533px] text-[color:#2a3360] w-[344.667px] shrink-0",
                  "id": "219:7870",
                  "k": [
                   "To · Jordan Lee"
@@ -36980,7 +36980,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-normal leading-[1.38] relative text-[14.622px] text-[color:#0f1530] w-full",
+                 "c": "font-normal leading-[1.38] relative text-[14.622px] text-[color:#0f1530] w-[344.667px] shrink-0",
                  "id": "219:7871",
                  "k": [
                   "We can inspect the system and prepare an estimate for your review."
@@ -36988,13 +36988,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#fff4d6] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-full",
+                 "c": "bg-[#fff4d6] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[261.111px] shrink-0",
                  "n": "Status / Awaiting owner approval",
                  "id": "219:7872",
                  "k": [
                   {
                    "t": "p",
-                   "c": "font-medium leading-[1.38] relative text-[10.444px] text-[color:#0f1530] flex-1 min-w-0",
+                   "c": "font-medium leading-[1.38] relative text-[10.444px] text-[color:#0f1530] w-[240.222px] shrink-0",
                    "id": "219:7873",
                    "k": [
                     "Awaiting owner approval"
@@ -37004,13 +37004,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#0f1530] flex h-[39.689px] items-center justify-center px-[14.622px] relative rounded-[12.533px] w-full",
+                 "c": "bg-[#0f1530] flex h-[39.689px] items-center justify-center px-[14.622px] relative rounded-[12.533px] w-[344.667px] shrink-0",
                  "n": "UI action / Review and send",
                  "id": "219:7874",
                  "k": [
                   {
                    "t": "p",
-                   "c": "font-medium leading-[1.38] relative text-[12.533px] text-[color:#fff] text-center flex-1 min-w-0",
+                   "c": "font-medium leading-[1.38] relative text-[12.533px] text-[color:#fff] text-center w-[315.422px] shrink-0",
                    "id": "219:7875",
                    "k": [
                     "Review and send"
@@ -37032,13 +37032,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
     },
     {
      "t": "div",
-     "c": "bg-[#fff] flex flex-col gap-[24px] items-start px-[80px] py-[48px] relative w-full",
+     "c": "bg-[#fff] flex flex-col gap-[24px] items-start px-[80px] py-[48px] relative w-[1440px] shrink-0",
      "n": "02 / Three visible product states",
      "id": "219:7877",
      "k": [
       {
        "t": "p",
-       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[1280px] shrink-0",
        "id": "219:7878",
        "k": [
         "EXAMPLE WORKFLOW"
@@ -37046,7 +37046,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
       },
       {
        "t": "p",
-       "c": "font-semibold leading-[1.08] relative text-[40px] text-[color:#0f1530] tracking-[-1px] w-full",
+       "c": "font-semibold leading-[1.08] relative text-[40px] text-[color:#0f1530] tracking-[-1px] w-[1280px] shrink-0",
        "id": "219:7879",
        "k": [
         "See the work happen."
@@ -37054,7 +37054,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
       },
       {
        "t": "div",
-       "c": "flex gap-[40px] items-start relative w-full",
+       "c": "flex gap-[40px] items-start relative w-[1280px] shrink-0",
        "n": "Product workflow states",
        "id": "219:7880",
        "k": [
@@ -37066,7 +37066,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "p",
-           "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+           "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-[364px] shrink-0",
            "id": "219:7882",
            "k": [
             "Capture the inquiry"
@@ -37074,13 +37074,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[250px] items-start p-[16px] relative rounded-[12px] w-full",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[250px] items-start p-[16px] relative rounded-[12px] w-[364px] shrink-0",
            "n": "Example state / inbound",
            "id": "219:7883",
            "k": [
             {
              "t": "div",
-             "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[170px] shrink-0",
              "n": "Status / WEB / EMAIL",
              "id": "219:7884",
              "k": [
@@ -37096,7 +37096,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[23px] text-[color:#0f1530] w-full",
+             "c": "font-semibold leading-[1.38] relative text-[23px] text-[color:#0f1530] w-[332px] shrink-0",
              "id": "219:7886",
              "k": [
               "Jordan Lee"
@@ -37104,7 +37104,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[16px] text-[color:#0f1530] w-full",
+             "c": "font-normal leading-[1.38] relative text-[16px] text-[color:#0f1530] w-[332px] shrink-0",
              "id": "219:7887",
              "k": [
               "AC runs, but won’t cool."
@@ -37112,7 +37112,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] w-full",
+             "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] w-[332px] shrink-0",
              "id": "219:7888",
              "k": [
               "Requested · Diagnostic visit"
@@ -37120,7 +37120,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[185px] shrink-0",
              "n": "Status / Inquiry captured",
              "id": "219:7889",
              "k": [
@@ -37146,7 +37146,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "p",
-           "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+           "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-[364px] shrink-0",
            "id": "219:7893",
            "k": [
             "Review the reply"
@@ -37154,13 +37154,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[250px] items-start p-[16px] relative rounded-[12px] w-full",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[250px] items-start p-[16px] relative rounded-[12px] w-[364px] shrink-0",
            "n": "Example state / response",
            "id": "219:7894",
            "k": [
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+             "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[332px] shrink-0",
              "id": "219:7895",
              "k": [
               "EMAIL DRAFT"
@@ -37168,7 +37168,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "font-semibold relative text-[25px] text-[color:#0f1530] w-full",
+             "c": "font-semibold relative text-[25px] text-[color:#0f1530] w-[332px] shrink-0",
              "id": "219:7896",
              "k": [
               {
@@ -37189,7 +37189,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] w-full",
+             "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] w-[332px] shrink-0",
              "id": "219:7897",
              "k": [
               "To · Jordan Lee"
@@ -37197,13 +37197,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-[332px] shrink-0",
              "n": "UI action / Owner review",
              "id": "219:7898",
              "k": [
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center w-[304px] shrink-0",
                "id": "219:7899",
                "k": [
                 "Owner review"
@@ -37223,7 +37223,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "p",
-           "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+           "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-[364px] shrink-0",
            "id": "219:7902",
            "k": [
             "Follow up with consent"
@@ -37231,13 +37231,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[250px] items-start p-[16px] relative rounded-[12px] w-full",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[250px] items-start p-[16px] relative rounded-[12px] w-[364px] shrink-0",
            "n": "Example state / followup",
            "id": "219:7903",
            "k": [
             {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+             "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-[332px] shrink-0",
              "id": "219:7904",
              "k": [
               "Estimate #2048"
@@ -37245,7 +37245,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[185px] shrink-0",
              "n": "Status / Consent recorded",
              "id": "219:7905",
              "k": [
@@ -37261,7 +37261,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[15px] text-[color:#0f1530] w-full",
+             "c": "font-normal leading-[1.38] relative text-[15px] text-[color:#0f1530] w-[332px] shrink-0",
              "id": "219:7907",
              "k": [
               "Follow-up email ready"
@@ -37269,7 +37269,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "flex gap-[10px] items-start relative w-full",
+             "c": "flex gap-[10px] items-start relative w-[332px] shrink-0",
              "n": "Stop condition",
              "id": "219:7908",
              "k": [
@@ -37288,7 +37288,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "p",
-               "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] flex-1 min-w-0",
+               "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] w-[302px] shrink-0",
                "id": "219:7911",
                "k": [
                 "Stop when the customer replies"
@@ -37298,13 +37298,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-[332px] shrink-0",
              "n": "UI action / Review follow-up",
              "id": "219:7912",
              "k": [
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center w-[304px] shrink-0",
                "id": "219:7913",
                "k": [
                 "Review follow-up"
@@ -37323,13 +37323,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
     },
     {
      "t": "div",
-     "c": "bg-[#0f1530] flex flex-col gap-[24px] items-start px-[80px] py-[48px] relative w-full",
+     "c": "bg-[#0f1530] flex flex-col gap-[24px] items-start px-[80px] py-[48px] relative w-[1440px] shrink-0",
      "n": "03 / Connected workflow and demo",
      "id": "219:7915",
      "k": [
       {
        "t": "p",
-       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#f6b400] tracking-[1.1px] w-full",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#f6b400] tracking-[1.1px] w-[1280px] shrink-0",
        "id": "219:7916",
        "k": [
         "WORKS ACROSS YOUR BUSINESS"
@@ -37337,7 +37337,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
       },
       {
        "t": "p",
-       "c": "font-semibold leading-[1.08] relative text-[36px] text-[color:#fff] tracking-[-0.9px] w-full",
+       "c": "font-semibold leading-[1.08] relative text-[36px] text-[color:#fff] tracking-[-0.9px] w-[1280px] shrink-0",
        "id": "219:7917",
        "k": [
         "One job. Connected all the way."
@@ -37345,7 +37345,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
       },
       {
        "t": "div",
-       "c": "flex gap-[16px] items-center relative w-full",
+       "c": "flex gap-[16px] items-center relative w-[1280px] shrink-0",
        "n": "Flagship and tool handoff",
        "id": "219:7918",
        "k": [
@@ -37357,7 +37357,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Suite and record",
            "id": "219:7920",
            "k": [
@@ -37389,7 +37389,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-[352px] shrink-0",
            "id": "219:7924",
            "k": [
             "Websites"
@@ -37397,7 +37397,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Handoff evidence",
            "id": "219:7925",
            "k": [
@@ -37416,7 +37416,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left w-[324px] shrink-0",
              "id": "219:7928",
              "k": [
               "Inquiry captured"
@@ -37455,7 +37455,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Suite and record",
            "id": "219:7934",
            "k": [
@@ -37487,7 +37487,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-[352px] shrink-0",
            "id": "219:7938",
            "k": [
             "Inquiry follow-up"
@@ -37495,7 +37495,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Handoff evidence",
            "id": "219:7939",
            "k": [
@@ -37514,7 +37514,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left w-[324px] shrink-0",
              "id": "219:7942",
              "k": [
               "Owner-approved email draft"
@@ -37553,7 +37553,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Suite and record",
            "id": "219:7948",
            "k": [
@@ -37585,7 +37585,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-[352px] shrink-0",
            "id": "219:7952",
            "k": [
             "Jobs & work orders"
@@ -37593,7 +37593,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Handoff evidence",
            "id": "219:7953",
            "k": [
@@ -37612,7 +37612,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left w-[324px] shrink-0",
              "id": "219:7956",
              "k": [
               "Accepted work becomes a job"
@@ -37774,7 +37774,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                "k": [
                 {
                  "t": "div",
-                 "c": "bg-[#fff4d6] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-full",
+                 "c": "bg-[#fff4d6] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[99.75px] shrink-0",
                  "n": "Status / WEBSITE INQUIRY",
                  "id": "I219:7981;219:7858",
                  "k": [
@@ -37820,7 +37820,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#e4f1e8] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-full",
+                 "c": "bg-[#e4f1e8] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[85.5px] shrink-0",
                  "n": "Status / Consent recorded",
                  "id": "I219:7981;219:7864",
                  "k": [
@@ -37884,7 +37884,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#fff4d6] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-full",
+                 "c": "bg-[#fff4d6] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[118.75px] shrink-0",
                  "n": "Status / Awaiting owner approval",
                  "id": "I219:7981;219:7872",
                  "k": [
@@ -37976,7 +37976,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
            "k": [
             {
              "t": "div",
-             "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[170px] shrink-0",
              "n": "Status / WEB / EMAIL",
              "id": "219:8016",
              "k": [
@@ -38016,7 +38016,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[185px] shrink-0",
              "n": "Status / Inquiry captured",
              "id": "219:8021",
              "k": [
@@ -38141,7 +38141,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[185px] shrink-0",
              "n": "Status / Consent recorded",
              "id": "219:8037",
              "k": [
@@ -38324,7 +38324,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "div",
-         "c": "flex flex-col h-[24px] items-center justify-center relative w-full",
+         "c": "flex flex-col h-[24px] items-center justify-center relative w-[32px] shrink-0",
          "n": "Next connected state",
          "id": "219:8062",
          "k": [
@@ -38422,7 +38422,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "div",
-         "c": "flex flex-col h-[24px] items-center justify-center relative w-full",
+         "c": "flex flex-col h-[24px] items-center justify-center relative w-[32px] shrink-0",
          "n": "Next connected state",
          "id": "219:8076",
          "k": [
@@ -38541,25 +38541,25 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
    "k": [
     {
      "t": "div",
-     "c": "bg-[#fbf6ef] flex flex-col gap-[24px] items-start px-[80px] py-[48px] relative w-full",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[24px] items-start px-[80px] py-[48px] relative w-[1440px] shrink-0",
      "n": "01 / Product in view",
      "id": "219:8108",
      "k": [
       {
        "t": "div",
-       "c": "flex gap-[48px] items-center relative w-full",
+       "c": "flex gap-[48px] items-center relative w-[1280px] shrink-0",
        "n": "Outcome and actual workflow",
        "id": "219:8109",
        "k": [
         {
          "t": "div",
-         "c": "flex flex-col gap-[16px] items-start relative flex-1 min-w-0",
+         "c": "flex flex-col gap-[16px] items-start relative w-[480px] shrink-0",
          "n": "Short product promise",
          "id": "219:8110",
          "k": [
           {
            "t": "p",
-           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[480px] shrink-0",
            "id": "219:8111",
            "k": [
             "OPERATIONS / JOBS & WORK ORDERS"
@@ -38567,7 +38567,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "h1",
-           "c": "font-semibold leading-[1.08] relative text-[58px] text-[color:#0f1530] tracking-[-1.45px] w-full",
+           "c": "font-semibold leading-[1.08] relative text-[58px] text-[color:#0f1530] tracking-[-1.45px] w-[480px] shrink-0",
            "id": "219:8112",
            "k": [
             "One job. Every detail."
@@ -38575,7 +38575,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-full",
+           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-[480px] shrink-0",
            "id": "219:8113",
            "k": [
             "Keep the approved work, crew, tasks, and files together."
@@ -38590,7 +38590,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[480px] shrink-0",
            "id": "219:8116",
            "k": [
             "EXAMPLE BUSINESS · JUNIPER"
@@ -38606,7 +38606,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "bg-[#0f1530] flex gap-[16.711px] h-[56.4px] items-center p-[16.711px] relative w-full",
+           "c": "bg-[#0f1530] flex gap-[16.711px] h-[56.4px] items-center p-[16.711px] relative w-[752px] shrink-0",
            "n": "Product chrome",
            "id": "219:8118",
            "k": [
@@ -38620,7 +38620,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[12.533px] text-[color:#fff] flex-1 min-w-0",
+             "c": "font-medium leading-[1.38] relative text-[12.533px] text-[color:#fff] w-[432.4px] shrink-0",
              "id": "219:8120",
              "k": [
               "Jobs & work orders"
@@ -38646,19 +38646,19 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[16.711px] items-start p-[25.067px] relative w-full",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[16.711px] items-start p-[25.067px] relative w-[752px] shrink-0",
            "n": "Product workspace",
            "id": "219:8123",
            "k": [
             {
              "t": "div",
-             "c": "flex gap-[20.889px] items-start relative w-full",
+             "c": "flex gap-[20.889px] items-start relative w-[701.867px] shrink-0",
              "n": "Work order heading",
              "id": "219:8124",
              "k": [
               {
                "t": "p",
-               "c": "font-semibold leading-[1.38] relative text-[28.2px] text-[color:#0f1530] flex-1 min-w-0",
+               "c": "font-semibold leading-[1.38] relative text-[28.2px] text-[color:#0f1530] w-[449.111px] shrink-0",
                "id": "219:8125",
                "k": [
                 "Job #1042"
@@ -38684,19 +38684,19 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "flex gap-[20.889px] items-start relative w-full",
+             "c": "flex gap-[20.889px] items-start relative w-[701.867px] shrink-0",
              "n": "Work order details",
              "id": "219:8128",
              "k": [
               {
                "t": "div",
-               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start leading-[1.38] p-[20.889px] relative rounded-[16.711px] flex-1 min-w-0",
+               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start leading-[1.38] p-[20.889px] relative rounded-[16.711px] w-[294.533px] shrink-0",
                "n": "Job facts",
                "id": "219:8129",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-semibold relative text-[24.022px] text-[color:#0f1530] w-full",
+                 "c": "font-semibold relative text-[24.022px] text-[color:#0f1530] w-[252.756px] shrink-0",
                  "id": "219:8130",
                  "k": [
                   "AC diagnostic"
@@ -38704,7 +38704,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "flex gap-[10.444px] items-start relative text-[12.533px] w-full",
+                 "c": "flex gap-[10.444px] items-start relative text-[12.533px] w-[252.756px] shrink-0",
                  "n": "Field / Customer",
                  "id": "219:8131",
                  "k": [
@@ -38728,7 +38728,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "flex gap-[10.444px] items-start relative text-[12.533px] w-full",
+                 "c": "flex gap-[10.444px] items-start relative text-[12.533px] w-[252.756px] shrink-0",
                  "n": "Field / Technician",
                  "id": "219:8134",
                  "k": [
@@ -38752,7 +38752,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "flex gap-[10.444px] items-start relative text-[12.533px] w-full",
+                 "c": "flex gap-[10.444px] items-start relative text-[12.533px] w-[252.756px] shrink-0",
                  "n": "Field / Visit",
                  "id": "219:8137",
                  "k": [
@@ -38776,7 +38776,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "flex gap-[10.444px] items-start relative text-[12.533px] w-full",
+                 "c": "flex gap-[10.444px] items-start relative text-[12.533px] w-[252.756px] shrink-0",
                  "n": "Field / Estimate",
                  "id": "219:8140",
                  "k": [
@@ -38802,13 +38802,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] flex-1 min-w-0",
+               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] w-[386.444px] shrink-0",
                "n": "Work order tasks",
                "id": "219:8143",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-semibold leading-[1.38] relative text-[22.978px] text-[color:#0f1530] w-full",
+                 "c": "font-semibold leading-[1.38] relative text-[22.978px] text-[color:#0f1530] w-[344.667px] shrink-0",
                  "id": "219:8144",
                  "k": [
                   "Ready for the crew"
@@ -38816,7 +38816,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "flex gap-[10.444px] items-start relative w-full",
+                 "c": "flex gap-[10.444px] items-start relative w-[344.667px] shrink-0",
                  "n": "Approved scope attached",
                  "id": "219:8145",
                  "k": [
@@ -38835,7 +38835,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                   },
                   {
                    "t": "p",
-                   "c": "font-normal leading-[1.38] relative text-[13.578px] text-[color:#0f1530] flex-1 min-w-0",
+                   "c": "font-normal leading-[1.38] relative text-[13.578px] text-[color:#0f1530] w-[314.378px] shrink-0",
                    "id": "219:8148",
                    "k": [
                     "Approved scope attached"
@@ -38845,7 +38845,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "flex gap-[10.444px] items-start relative w-full",
+                 "c": "flex gap-[10.444px] items-start relative w-[344.667px] shrink-0",
                  "n": "Equipment details available",
                  "id": "219:8149",
                  "k": [
@@ -38864,7 +38864,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                   },
                   {
                    "t": "p",
-                   "c": "font-normal leading-[1.38] relative text-[13.578px] text-[color:#0f1530] flex-1 min-w-0",
+                   "c": "font-normal leading-[1.38] relative text-[13.578px] text-[color:#0f1530] w-[314.378px] shrink-0",
                    "id": "219:8152",
                    "k": [
                     "Equipment details available"
@@ -38874,7 +38874,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "flex gap-[10.444px] items-start relative w-full",
+                 "c": "flex gap-[10.444px] items-start relative w-[344.667px] shrink-0",
                  "n": "Site checklist ready",
                  "id": "219:8153",
                  "k": [
@@ -38893,7 +38893,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                   },
                   {
                    "t": "p",
-                   "c": "font-normal leading-[1.38] relative text-[13.578px] text-[color:#0f1530] flex-1 min-w-0",
+                   "c": "font-normal leading-[1.38] relative text-[13.578px] text-[color:#0f1530] w-[314.378px] shrink-0",
                    "id": "219:8156",
                    "k": [
                     "Site checklist ready"
@@ -38903,7 +38903,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "flex gap-[10.444px] items-start relative w-full",
+                 "c": "flex gap-[10.444px] items-start relative w-[344.667px] shrink-0",
                  "n": "Job photos attached",
                  "id": "219:8157",
                  "k": [
@@ -38922,7 +38922,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                   },
                   {
                    "t": "p",
-                   "c": "font-normal leading-[1.38] relative text-[13.578px] text-[color:#0f1530] flex-1 min-w-0",
+                   "c": "font-normal leading-[1.38] relative text-[13.578px] text-[color:#0f1530] w-[314.378px] shrink-0",
                    "id": "219:8160",
                    "k": [
                     "Job photos attached"
@@ -38932,13 +38932,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#0f1530] flex h-[39.689px] items-center justify-center px-[14.622px] relative rounded-[12.533px] w-full",
+                 "c": "bg-[#0f1530] flex h-[39.689px] items-center justify-center px-[14.622px] relative rounded-[12.533px] w-[344.667px] shrink-0",
                  "n": "UI action / Open work order",
                  "id": "219:8161",
                  "k": [
                   {
                    "t": "p",
-                   "c": "font-medium leading-[1.38] relative text-[12.533px] text-[color:#fff] text-center flex-1 min-w-0",
+                   "c": "font-medium leading-[1.38] relative text-[12.533px] text-[color:#fff] text-center w-[315.422px] shrink-0",
                    "id": "219:8162",
                    "k": [
                     "Open work order"
@@ -38960,13 +38960,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
     },
     {
      "t": "div",
-     "c": "bg-[#fff] flex flex-col gap-[24px] items-start px-[80px] py-[48px] relative w-full",
+     "c": "bg-[#fff] flex flex-col gap-[24px] items-start px-[80px] py-[48px] relative w-[1440px] shrink-0",
      "n": "02 / Three visible product states",
      "id": "219:8164",
      "k": [
       {
        "t": "p",
-       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[1280px] shrink-0",
        "id": "219:8165",
        "k": [
         "EXAMPLE WORKFLOW"
@@ -38974,7 +38974,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
       },
       {
        "t": "p",
-       "c": "font-semibold leading-[1.08] relative text-[40px] text-[color:#0f1530] tracking-[-1px] w-full",
+       "c": "font-semibold leading-[1.08] relative text-[40px] text-[color:#0f1530] tracking-[-1px] w-[1280px] shrink-0",
        "id": "219:8166",
        "k": [
         "See the work happen."
@@ -38982,7 +38982,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
       },
       {
        "t": "div",
-       "c": "flex gap-[40px] items-start relative w-full",
+       "c": "flex gap-[40px] items-start relative w-[1280px] shrink-0",
        "n": "Product workflow states",
        "id": "219:8167",
        "k": [
@@ -38994,7 +38994,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "p",
-           "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+           "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-[364px] shrink-0",
            "id": "219:8169",
            "k": [
             "Start with approved work"
@@ -39002,7 +39002,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[250px] items-start p-[16px] relative rounded-[12px] w-full",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[250px] items-start p-[16px] relative rounded-[12px] w-[364px] shrink-0",
            "n": "Example state / accepted",
            "id": "219:8170",
            "k": [
@@ -39021,7 +39021,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[23px] text-[color:#0f1530] w-full",
+             "c": "font-semibold leading-[1.38] relative text-[23px] text-[color:#0f1530] w-[332px] shrink-0",
              "id": "219:8173",
              "k": [
               "Estimate accepted"
@@ -39029,7 +39029,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#2a3360] w-full",
+             "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#2a3360] w-[332px] shrink-0",
              "id": "219:8174",
              "k": [
               "#2048 · Jordan Lee"
@@ -39037,7 +39037,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-bold leading-[1.08] relative text-[38px] text-[color:#0f1530] tracking-[-0.95px] w-full",
+             "c": "font-bold leading-[1.08] relative text-[38px] text-[color:#0f1530] tracking-[-0.95px] w-[332px] shrink-0",
              "id": "219:8175",
              "k": [
               "$274"
@@ -39045,13 +39045,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[265px] shrink-0",
              "n": "Status / Approved scope attached",
              "id": "219:8176",
              "k": [
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] flex-1 min-w-0",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[245px] shrink-0",
                "id": "219:8177",
                "k": [
                 "Approved scope attached"
@@ -39071,7 +39071,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "p",
-           "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+           "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-[364px] shrink-0",
            "id": "219:8180",
            "k": [
             "Prepare the crew"
@@ -39079,13 +39079,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[250px] items-start p-[16px] relative rounded-[12px] w-full",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[250px] items-start p-[16px] relative rounded-[12px] w-[364px] shrink-0",
            "n": "Example state / tasks",
            "id": "219:8181",
            "k": [
             {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[23px] text-[color:#0f1530] w-full",
+             "c": "font-semibold leading-[1.38] relative text-[23px] text-[color:#0f1530] w-[332px] shrink-0",
              "id": "219:8182",
              "k": [
               "Job #1042"
@@ -39093,7 +39093,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "flex gap-[10px] items-start relative w-full",
+             "c": "flex gap-[10px] items-start relative w-[332px] shrink-0",
              "n": "Maya R. assigned",
              "id": "219:8183",
              "k": [
@@ -39112,7 +39112,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "p",
-               "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#0f1530] flex-1 min-w-0",
+               "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#0f1530] w-[302px] shrink-0",
                "id": "219:8186",
                "k": [
                 "Maya R. assigned"
@@ -39122,7 +39122,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "flex gap-[10px] items-start relative w-full",
+             "c": "flex gap-[10px] items-start relative w-[332px] shrink-0",
              "n": "Equipment details ready",
              "id": "219:8187",
              "k": [
@@ -39141,7 +39141,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "p",
-               "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#0f1530] flex-1 min-w-0",
+               "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#0f1530] w-[302px] shrink-0",
                "id": "219:8190",
                "k": [
                 "Equipment details ready"
@@ -39151,7 +39151,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "flex gap-[10px] items-start relative w-full",
+             "c": "flex gap-[10px] items-start relative w-[332px] shrink-0",
              "n": "Checklist attached",
              "id": "219:8191",
              "k": [
@@ -39170,7 +39170,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "p",
-               "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#0f1530] flex-1 min-w-0",
+               "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#0f1530] w-[302px] shrink-0",
                "id": "219:8194",
                "k": [
                 "Checklist attached"
@@ -39180,7 +39180,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[210px] shrink-0",
              "n": "Status / Work order ready",
              "id": "219:8195",
              "k": [
@@ -39206,7 +39206,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "p",
-           "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+           "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-[364px] shrink-0",
            "id": "219:8199",
            "k": [
             "Close the job"
@@ -39214,7 +39214,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[250px] items-start p-[16px] relative rounded-[12px] w-full",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[250px] items-start p-[16px] relative rounded-[12px] w-[364px] shrink-0",
            "n": "Example state / completion",
            "id": "219:8200",
            "k": [
@@ -39233,7 +39233,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[25px] text-[color:#0f1530] w-full",
+             "c": "font-semibold leading-[1.38] relative text-[25px] text-[color:#0f1530] w-[332px] shrink-0",
              "id": "219:8203",
              "k": [
               "Visit complete"
@@ -39241,7 +39241,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-full",
+             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-[332px] shrink-0",
              "n": "Field / Checklist",
              "id": "219:8204",
              "k": [
@@ -39265,7 +39265,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-full",
+             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-[332px] shrink-0",
              "n": "Field / Job photos",
              "id": "219:8207",
              "k": [
@@ -39289,13 +39289,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-[332px] shrink-0",
              "n": "UI action / Create invoice",
              "id": "219:8210",
              "k": [
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center w-[304px] shrink-0",
                "id": "219:8211",
                "k": [
                 "Create invoice"
@@ -39314,13 +39314,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
     },
     {
      "t": "div",
-     "c": "bg-[#0f1530] flex flex-col gap-[24px] items-start px-[80px] py-[48px] relative w-full",
+     "c": "bg-[#0f1530] flex flex-col gap-[24px] items-start px-[80px] py-[48px] relative w-[1440px] shrink-0",
      "n": "03 / Connected workflow and demo",
      "id": "219:8213",
      "k": [
       {
        "t": "p",
-       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#f6b400] tracking-[1.1px] w-full",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#f6b400] tracking-[1.1px] w-[1280px] shrink-0",
        "id": "219:8214",
        "k": [
         "WORKS ACROSS YOUR BUSINESS"
@@ -39328,7 +39328,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
       },
       {
        "t": "p",
-       "c": "font-semibold leading-[1.08] relative text-[36px] text-[color:#fff] tracking-[-0.9px] w-full",
+       "c": "font-semibold leading-[1.08] relative text-[36px] text-[color:#fff] tracking-[-0.9px] w-[1280px] shrink-0",
        "id": "219:8215",
        "k": [
         "One job. Connected all the way."
@@ -39336,7 +39336,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
       },
       {
        "t": "div",
-       "c": "flex gap-[16px] items-center relative w-full",
+       "c": "flex gap-[16px] items-center relative w-[1280px] shrink-0",
        "n": "Flagship and tool handoff",
        "id": "219:8216",
        "k": [
@@ -39348,7 +39348,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Suite and record",
            "id": "219:8218",
            "k": [
@@ -39380,7 +39380,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-[352px] shrink-0",
            "id": "219:8222",
            "k": [
             "Estimates & approvals"
@@ -39388,7 +39388,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Handoff evidence",
            "id": "219:8223",
            "k": [
@@ -39407,7 +39407,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left w-[324px] shrink-0",
              "id": "219:8226",
              "k": [
               "Customer accepted"
@@ -39446,7 +39446,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Suite and record",
            "id": "219:8232",
            "k": [
@@ -39478,7 +39478,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-[352px] shrink-0",
            "id": "219:8236",
            "k": [
             "Jobs & work orders"
@@ -39486,7 +39486,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Handoff evidence",
            "id": "219:8237",
            "k": [
@@ -39505,7 +39505,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left w-[324px] shrink-0",
              "id": "219:8240",
              "k": [
               "Crew and work connected"
@@ -39544,7 +39544,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Suite and record",
            "id": "219:8246",
            "k": [
@@ -39576,7 +39576,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-[352px] shrink-0",
            "id": "219:8250",
            "k": [
             "Invoices & payments"
@@ -39584,7 +39584,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Handoff evidence",
            "id": "219:8251",
            "k": [
@@ -39603,7 +39603,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left w-[324px] shrink-0",
              "id": "219:8254",
              "k": [
               "Completed work ready to bill"
@@ -40138,13 +40138,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[265px] shrink-0",
              "n": "Status / Approved scope attached",
              "id": "219:8337",
              "k": [
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] flex-1 min-w-0",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[245px] shrink-0",
                "id": "219:8338",
                "k": [
                 "Approved scope attached"
@@ -40273,7 +40273,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[210px] shrink-0",
              "n": "Status / Work order ready",
              "id": "219:8356",
              "k": [
@@ -40512,7 +40512,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "div",
-         "c": "flex flex-col h-[24px] items-center justify-center relative w-full",
+         "c": "flex flex-col h-[24px] items-center justify-center relative w-[32px] shrink-0",
          "n": "Next connected state",
          "id": "219:8389",
          "k": [
@@ -40610,7 +40610,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "div",
-         "c": "flex flex-col h-[24px] items-center justify-center relative w-full",
+         "c": "flex flex-col h-[24px] items-center justify-center relative w-[32px] shrink-0",
          "n": "Next connected state",
          "id": "219:8403",
          "k": [
@@ -40729,25 +40729,25 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
    "k": [
     {
      "t": "div",
-     "c": "bg-[#fbf6ef] flex flex-col gap-[24px] items-start px-[80px] py-[48px] relative w-full",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[24px] items-start px-[80px] py-[48px] relative w-[1440px] shrink-0",
      "n": "01 / Product in view",
      "id": "219:8738",
      "k": [
       {
        "t": "div",
-       "c": "flex gap-[48px] items-center relative w-full",
+       "c": "flex gap-[48px] items-center relative w-[1280px] shrink-0",
        "n": "Outcome and actual workflow",
        "id": "219:8739",
        "k": [
         {
          "t": "div",
-         "c": "flex flex-col gap-[16px] items-start relative flex-1 min-w-0",
+         "c": "flex flex-col gap-[16px] items-start relative w-[480px] shrink-0",
          "n": "Short product promise",
          "id": "219:8740",
          "k": [
           {
            "t": "p",
-           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[480px] shrink-0",
            "id": "219:8741",
            "k": [
             "OPERATIONS / TIME TRACKING & JOB PHOTOS"
@@ -40755,7 +40755,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "h1",
-           "c": "font-semibold leading-[1.08] relative text-[58px] text-[color:#0f1530] tracking-[-1.45px] w-full",
+           "c": "font-semibold leading-[1.08] relative text-[58px] text-[color:#0f1530] tracking-[-1.45px] w-[480px] shrink-0",
            "id": "219:8742",
            "k": [
             "Show the work behind the job."
@@ -40763,7 +40763,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-full",
+           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-[480px] shrink-0",
            "id": "219:8743",
            "k": [
             "Keep time entries and job photos attached to the visit."
@@ -40778,7 +40778,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[480px] shrink-0",
            "id": "219:8746",
            "k": [
             "EXAMPLE BUSINESS · JUNIPER"
@@ -40794,7 +40794,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "bg-[#0f1530] flex gap-[16.711px] h-[56.4px] items-center p-[16.711px] relative w-full",
+           "c": "bg-[#0f1530] flex gap-[16.711px] h-[56.4px] items-center p-[16.711px] relative w-[752px] shrink-0",
            "n": "Product chrome",
            "id": "219:8748",
            "k": [
@@ -40808,7 +40808,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[12.533px] text-[color:#fff] flex-1 min-w-0",
+             "c": "font-medium leading-[1.38] relative text-[12.533px] text-[color:#fff] w-[432.4px] shrink-0",
              "id": "219:8750",
              "k": [
               "Visit record"
@@ -40834,13 +40834,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[16.711px] items-start p-[25.067px] relative w-full",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[16.711px] items-start p-[25.067px] relative w-[752px] shrink-0",
            "n": "Product workspace",
            "id": "219:8753",
            "k": [
             {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[26.111px] text-[color:#0f1530] w-full",
+             "c": "font-semibold leading-[1.38] relative text-[26.111px] text-[color:#0f1530] w-[701.867px] shrink-0",
              "id": "219:8754",
              "k": [
               "The visit, documented."
@@ -40848,19 +40848,19 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "flex gap-[20.889px] items-start relative w-full",
+             "c": "flex gap-[20.889px] items-start relative w-[701.867px] shrink-0",
              "n": "Time and evidence",
              "id": "219:8755",
              "k": [
               {
                "t": "div",
-               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] flex-1 min-w-0",
+               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] w-[294.533px] shrink-0",
                "n": "Time entry",
                "id": "219:8756",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[11.489px] text-[color:#2a3360] tracking-[1.1489px] w-full",
+                 "c": "font-medium leading-[1.38] relative text-[11.489px] text-[color:#2a3360] tracking-[1.1489px] w-[252.756px] shrink-0",
                  "id": "219:8757",
                  "k": [
                   "TIME ENTRY"
@@ -40868,7 +40868,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-bold leading-[1.08] relative text-[48.044px] text-[color:#0f1530] tracking-[-1.2011px] w-full",
+                 "c": "font-bold leading-[1.08] relative text-[48.044px] text-[color:#0f1530] tracking-[-1.2011px] w-[252.756px] shrink-0",
                  "id": "219:8758",
                  "k": [
                   "1h 42m"
@@ -40876,7 +40876,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.533px] w-full",
+                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.533px] w-[252.756px] shrink-0",
                  "n": "Field / Start",
                  "id": "219:8759",
                  "k": [
@@ -40900,7 +40900,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.533px] w-full",
+                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.533px] w-[252.756px] shrink-0",
                  "n": "Field / End",
                  "id": "219:8762",
                  "k": [
@@ -40924,7 +40924,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#e4f1e8] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-full",
+                 "c": "bg-[#e4f1e8] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[229.778px] shrink-0",
                  "n": "Status / Saved to job #1042",
                  "id": "219:8765",
                  "k": [
@@ -40942,13 +40942,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] flex-1 min-w-0",
+               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] w-[386.444px] shrink-0",
                "n": "Job attachments",
                "id": "219:8767",
                "k": [
                 {
                  "t": "div",
-                 "c": "h-[156.667px] relative rounded-[16.711px] w-full",
+                 "c": "h-[156.667px] relative rounded-[16.711px] w-[344.667px] shrink-0",
                  "n": "Illustrative equipment visit",
                  "id": "219:8768",
                  "k": [
@@ -40961,7 +40961,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-semibold leading-[1.38] relative text-[18.8px] text-[color:#0f1530] w-full",
+                 "c": "font-semibold leading-[1.38] relative text-[18.8px] text-[color:#0f1530] w-[344.667px] shrink-0",
                  "id": "219:8769",
                  "k": [
                   "Job photos · 2 files"
@@ -40969,7 +40969,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "flex gap-[12.533px] items-start relative w-full",
+                 "c": "flex gap-[12.533px] items-start relative w-[344.667px] shrink-0",
                  "n": "Attachment labels",
                  "id": "219:8770",
                  "k": [
@@ -41009,7 +41009,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-normal leading-[1.38] relative text-[12.533px] text-[color:#2a3360] w-full",
+                 "c": "font-normal leading-[1.38] relative text-[12.533px] text-[color:#2a3360] w-[344.667px] shrink-0",
                  "id": "219:8775",
                  "k": [
                   "Maya R. · Notes saved"
@@ -41029,13 +41029,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
     },
     {
      "t": "div",
-     "c": "bg-[#fff] flex flex-col gap-[24px] items-start px-[80px] py-[48px] relative w-full",
+     "c": "bg-[#fff] flex flex-col gap-[24px] items-start px-[80px] py-[48px] relative w-[1440px] shrink-0",
      "n": "02 / Three visible product states",
      "id": "219:8777",
      "k": [
       {
        "t": "p",
-       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[1280px] shrink-0",
        "id": "219:8778",
        "k": [
         "EXAMPLE WORKFLOW"
@@ -41043,7 +41043,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
       },
       {
        "t": "p",
-       "c": "font-semibold leading-[1.08] relative text-[40px] text-[color:#0f1530] tracking-[-1px] w-full",
+       "c": "font-semibold leading-[1.08] relative text-[40px] text-[color:#0f1530] tracking-[-1px] w-[1280px] shrink-0",
        "id": "219:8779",
        "k": [
         "See the work happen."
@@ -41051,7 +41051,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
       },
       {
        "t": "div",
-       "c": "flex gap-[40px] items-start relative w-full",
+       "c": "flex gap-[40px] items-start relative w-[1280px] shrink-0",
        "n": "Product workflow states",
        "id": "219:8780",
        "k": [
@@ -41063,7 +41063,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "p",
-           "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+           "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-[364px] shrink-0",
            "id": "219:8782",
            "k": [
             "Save the time entry"
@@ -41071,13 +41071,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[250px] items-start p-[16px] relative rounded-[12px] w-full",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[250px] items-start p-[16px] relative rounded-[12px] w-[364px] shrink-0",
            "n": "Example state / clock",
            "id": "219:8783",
            "k": [
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+             "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[332px] shrink-0",
              "id": "219:8784",
              "k": [
               "TIME ENTRY"
@@ -41085,7 +41085,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-bold leading-[1.08] relative text-[42px] text-[color:#0f1530] tracking-[-1.05px] w-full",
+             "c": "font-bold leading-[1.08] relative text-[42px] text-[color:#0f1530] tracking-[-1.05px] w-[332px] shrink-0",
              "id": "219:8785",
              "k": [
               "1h 42m"
@@ -41093,7 +41093,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-full",
+             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-[332px] shrink-0",
              "n": "Field / Start",
              "id": "219:8786",
              "k": [
@@ -41117,7 +41117,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-full",
+             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-[332px] shrink-0",
              "n": "Field / End",
              "id": "219:8789",
              "k": [
@@ -41141,7 +41141,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[235px] shrink-0",
              "n": "Status / Saved to job #1042",
              "id": "219:8792",
              "k": [
@@ -41167,7 +41167,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "p",
-           "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+           "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-[364px] shrink-0",
            "id": "219:8796",
            "k": [
             "Attach the job photos"
@@ -41175,13 +41175,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[250px] items-start p-[16px] relative rounded-[12px] w-full",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[250px] items-start p-[16px] relative rounded-[12px] w-[364px] shrink-0",
            "n": "Example state / photos",
            "id": "219:8797",
            "k": [
             {
              "t": "div",
-             "c": "h-[100px] relative rounded-[16px] w-full",
+             "c": "h-[100px] relative rounded-[16px] w-[332px] shrink-0",
              "n": "Illustrative job photo",
              "id": "219:8798",
              "k": [
@@ -41194,7 +41194,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "flex gap-[8px] items-start relative w-full",
+             "c": "flex gap-[8px] items-start relative w-[332px] shrink-0",
              "n": "File labels",
              "id": "219:8799",
              "k": [
@@ -41234,7 +41234,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] w-full",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] w-[332px] shrink-0",
              "id": "219:8804",
              "k": [
               "2 attachments · Job #1042"
@@ -41252,7 +41252,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "p",
-           "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+           "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-[364px] shrink-0",
            "id": "219:8807",
            "k": [
             "Keep the visit record"
@@ -41260,13 +41260,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[250px] items-start p-[16px] relative rounded-[12px] w-full",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[250px] items-start p-[16px] relative rounded-[12px] w-[364px] shrink-0",
            "n": "Example state / visitrecord",
            "id": "219:8808",
            "k": [
             {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+             "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-[332px] shrink-0",
              "id": "219:8809",
              "k": [
               "Visit record saved"
@@ -41274,7 +41274,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-full",
+             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-[332px] shrink-0",
              "n": "Field / Time",
              "id": "219:8810",
              "k": [
@@ -41298,7 +41298,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-full",
+             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-[332px] shrink-0",
              "n": "Field / Photos",
              "id": "219:8813",
              "k": [
@@ -41322,7 +41322,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-full",
+             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-[332px] shrink-0",
              "n": "Field / Notes",
              "id": "219:8816",
              "k": [
@@ -41346,7 +41346,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[230px] shrink-0",
              "n": "Status / Maya R. · Complete",
              "id": "219:8819",
              "k": [
@@ -41371,13 +41371,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
     },
     {
      "t": "div",
-     "c": "bg-[#0f1530] flex flex-col gap-[24px] items-start px-[80px] py-[48px] relative w-full",
+     "c": "bg-[#0f1530] flex flex-col gap-[24px] items-start px-[80px] py-[48px] relative w-[1440px] shrink-0",
      "n": "03 / Connected workflow and demo",
      "id": "219:8822",
      "k": [
       {
        "t": "p",
-       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#f6b400] tracking-[1.1px] w-full",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#f6b400] tracking-[1.1px] w-[1280px] shrink-0",
        "id": "219:8823",
        "k": [
         "WORKS ACROSS YOUR BUSINESS"
@@ -41385,7 +41385,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
       },
       {
        "t": "p",
-       "c": "font-semibold leading-[1.08] relative text-[36px] text-[color:#fff] tracking-[-0.9px] w-full",
+       "c": "font-semibold leading-[1.08] relative text-[36px] text-[color:#fff] tracking-[-0.9px] w-[1280px] shrink-0",
        "id": "219:8824",
        "k": [
         "One job. Connected all the way."
@@ -41393,7 +41393,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
       },
       {
        "t": "div",
-       "c": "flex gap-[16px] items-center relative w-full",
+       "c": "flex gap-[16px] items-center relative w-[1280px] shrink-0",
        "n": "Flagship and tool handoff",
        "id": "219:8825",
        "k": [
@@ -41405,7 +41405,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Suite and record",
            "id": "219:8827",
            "k": [
@@ -41437,7 +41437,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-[352px] shrink-0",
            "id": "219:8831",
            "k": [
             "Jobs & work orders"
@@ -41445,7 +41445,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Handoff evidence",
            "id": "219:8832",
            "k": [
@@ -41464,7 +41464,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left w-[324px] shrink-0",
              "id": "219:8835",
              "k": [
               "Visit opened"
@@ -41503,7 +41503,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Suite and record",
            "id": "219:8841",
            "k": [
@@ -41535,7 +41535,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-[352px] shrink-0",
            "id": "219:8845",
            "k": [
             "Time & job photos"
@@ -41543,7 +41543,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Handoff evidence",
            "id": "219:8846",
            "k": [
@@ -41562,7 +41562,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left w-[324px] shrink-0",
              "id": "219:8849",
              "k": [
               "Time and evidence saved"
@@ -41601,7 +41601,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Suite and record",
            "id": "219:8855",
            "k": [
@@ -41633,7 +41633,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-[352px] shrink-0",
            "id": "219:8859",
            "k": [
             "Customer history"
@@ -41641,7 +41641,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Handoff evidence",
            "id": "219:8860",
            "k": [
@@ -41660,7 +41660,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left w-[324px] shrink-0",
              "id": "219:8863",
              "k": [
               "Completion record available"
@@ -41886,7 +41886,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#e4f1e8] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-full",
+                 "c": "bg-[#e4f1e8] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[104.5px] shrink-0",
                  "n": "Status / Saved to job #1042",
                  "id": "I219:8888;219:8765",
                  "k": [
@@ -42103,7 +42103,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[235px] shrink-0",
              "n": "Status / Saved to job #1042",
              "id": "219:8932",
              "k": [
@@ -42308,7 +42308,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[230px] shrink-0",
              "n": "Status / Maya R. · Complete",
              "id": "219:8959",
              "k": [
@@ -42438,7 +42438,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "div",
-         "c": "flex flex-col h-[24px] items-center justify-center relative w-full",
+         "c": "flex flex-col h-[24px] items-center justify-center relative w-[32px] shrink-0",
          "n": "Next connected state",
          "id": "219:8977",
          "k": [
@@ -42536,7 +42536,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "div",
-         "c": "flex flex-col h-[24px] items-center justify-center relative w-full",
+         "c": "flex flex-col h-[24px] items-center justify-center relative w-[32px] shrink-0",
          "n": "Next connected state",
          "id": "219:8991",
          "k": [
@@ -42655,25 +42655,25 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
    "k": [
     {
      "t": "div",
-     "c": "bg-[#fbf6ef] flex flex-col gap-[24px] items-start px-[80px] py-[48px] relative w-full",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[24px] items-start px-[80px] py-[48px] relative w-[1440px] shrink-0",
      "n": "01 / Product in view",
      "id": "219:9023",
      "k": [
       {
        "t": "div",
-       "c": "flex gap-[48px] items-center relative w-full",
+       "c": "flex gap-[48px] items-center relative w-[1280px] shrink-0",
        "n": "Outcome and actual workflow",
        "id": "219:9024",
        "k": [
         {
          "t": "div",
-         "c": "flex flex-col gap-[16px] items-start relative flex-1 min-w-0",
+         "c": "flex flex-col gap-[16px] items-start relative w-[480px] shrink-0",
          "n": "Short product promise",
          "id": "219:9025",
          "k": [
           {
            "t": "p",
-           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[480px] shrink-0",
            "id": "219:9026",
            "k": [
             "RETENTION / REMINDERS & WIN-BACKS"
@@ -42681,7 +42681,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "h1",
-           "c": "font-semibold leading-[1.08] relative text-[58px] text-[color:#0f1530] tracking-[-1.45px] w-full",
+           "c": "font-semibold leading-[1.08] relative text-[58px] text-[color:#0f1530] tracking-[-1.45px] w-[480px] shrink-0",
            "id": "219:9027",
            "k": [
             "Give good customers a reason to return."
@@ -42689,7 +42689,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-full",
+           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-[480px] shrink-0",
            "id": "219:9028",
            "k": [
             "Review consented reminders and make the next visit easy to request."
@@ -42704,7 +42704,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[480px] shrink-0",
            "id": "219:9031",
            "k": [
             "EXAMPLE BUSINESS · JUNIPER"
@@ -42720,7 +42720,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "bg-[#0f1530] flex gap-[16.711px] h-[56.4px] items-center p-[16.711px] relative w-full",
+           "c": "bg-[#0f1530] flex gap-[16.711px] h-[56.4px] items-center p-[16.711px] relative w-[752px] shrink-0",
            "n": "Product chrome",
            "id": "219:9033",
            "k": [
@@ -42734,7 +42734,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[12.533px] text-[color:#fff] flex-1 min-w-0",
+             "c": "font-medium leading-[1.38] relative text-[12.533px] text-[color:#fff] w-[432.4px] shrink-0",
              "id": "219:9035",
              "k": [
               "Reminders & win-backs"
@@ -42760,13 +42760,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[16.711px] items-start p-[25.067px] relative w-full",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[16.711px] items-start p-[25.067px] relative w-[752px] shrink-0",
            "n": "Product workspace",
            "id": "219:9038",
            "k": [
             {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[25.067px] text-[color:#0f1530] w-full",
+             "c": "font-semibold leading-[1.38] relative text-[25.067px] text-[color:#0f1530] w-[701.867px] shrink-0",
              "id": "219:9039",
              "k": [
               "The next visit starts with context."
@@ -42774,19 +42774,19 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "flex gap-[20.889px] items-start relative w-full",
+             "c": "flex gap-[20.889px] items-start relative w-[701.867px] shrink-0",
              "n": "Due visit and email",
              "id": "219:9040",
              "k": [
               {
                "t": "div",
-               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] flex-1 min-w-0",
+               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] w-[294.533px] shrink-0",
                "n": "Customer history",
                "id": "219:9041",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-semibold leading-[1.38] relative text-[24.022px] text-[color:#0f1530] w-full",
+                 "c": "font-semibold leading-[1.38] relative text-[24.022px] text-[color:#0f1530] w-[252.756px] shrink-0",
                  "id": "219:9042",
                  "k": [
                   "Jordan Lee"
@@ -42794,7 +42794,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-normal leading-[1.38] relative text-[14.622px] text-[color:#0f1530] w-full",
+                 "c": "font-normal leading-[1.38] relative text-[14.622px] text-[color:#0f1530] w-[252.756px] shrink-0",
                  "id": "219:9043",
                  "k": [
                   "Home Comfort Plan"
@@ -42802,7 +42802,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.533px] w-full",
+                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.533px] w-[252.756px] shrink-0",
                  "n": "Field / Last service",
                  "id": "219:9044",
                  "k": [
@@ -42826,7 +42826,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.533px] w-full",
+                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.533px] w-[252.756px] shrink-0",
                  "n": "Field / Next service",
                  "id": "219:9047",
                  "k": [
@@ -42850,7 +42850,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#e4f1e8] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-full",
+                 "c": "bg-[#e4f1e8] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[245.444px] shrink-0",
                  "n": "Status / Email consent recorded",
                  "id": "219:9050",
                  "k": [
@@ -42868,13 +42868,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] flex-1 min-w-0",
+               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] w-[386.444px] shrink-0",
                "n": "Reminder draft",
                "id": "219:9052",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[11.489px] text-[color:#2a3360] tracking-[1.1489px] w-full",
+                 "c": "font-medium leading-[1.38] relative text-[11.489px] text-[color:#2a3360] tracking-[1.1489px] w-[344.667px] shrink-0",
                  "id": "219:9053",
                  "k": [
                   "EMAIL DRAFT"
@@ -42882,7 +42882,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "font-semibold relative text-[25.067px] text-[color:#0f1530] w-full",
+                 "c": "font-semibold relative text-[25.067px] text-[color:#0f1530] w-[344.667px] shrink-0",
                  "id": "219:9054",
                  "k": [
                   {
@@ -42903,7 +42903,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-normal leading-[1.38] relative text-[14.622px] text-[color:#2a3360] w-full",
+                 "c": "font-normal leading-[1.38] relative text-[14.622px] text-[color:#2a3360] w-[344.667px] shrink-0",
                  "id": "219:9055",
                  "k": [
                   "Review the next visit with Jordan."
@@ -42911,7 +42911,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#fff4d6] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-full",
+                 "c": "bg-[#fff4d6] flex h-[28.2px] items-center px-[10.444px] relative rounded-[12.533px] w-[250.667px] shrink-0",
                  "n": "Status / Owner review required",
                  "id": "219:9056",
                  "k": [
@@ -42927,13 +42927,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#0f1530] flex h-[39.689px] items-center justify-center px-[14.622px] relative rounded-[12.533px] w-full",
+                 "c": "bg-[#0f1530] flex h-[39.689px] items-center justify-center px-[14.622px] relative rounded-[12.533px] w-[344.667px] shrink-0",
                  "n": "UI action / Review reminder",
                  "id": "219:9058",
                  "k": [
                   {
                    "t": "p",
-                   "c": "font-medium leading-[1.38] relative text-[12.533px] text-[color:#fff] text-center flex-1 min-w-0",
+                   "c": "font-medium leading-[1.38] relative text-[12.533px] text-[color:#fff] text-center w-[315.422px] shrink-0",
                    "id": "219:9059",
                    "k": [
                     "Review reminder"
@@ -42955,13 +42955,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
     },
     {
      "t": "div",
-     "c": "bg-[#fff] flex flex-col gap-[24px] items-start px-[80px] py-[48px] relative w-full",
+     "c": "bg-[#fff] flex flex-col gap-[24px] items-start px-[80px] py-[48px] relative w-[1440px] shrink-0",
      "n": "02 / Three visible product states",
      "id": "219:9061",
      "k": [
       {
        "t": "p",
-       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[1280px] shrink-0",
        "id": "219:9062",
        "k": [
         "EXAMPLE WORKFLOW"
@@ -42969,7 +42969,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
       },
       {
        "t": "p",
-       "c": "font-semibold leading-[1.08] relative text-[40px] text-[color:#0f1530] tracking-[-1px] w-full",
+       "c": "font-semibold leading-[1.08] relative text-[40px] text-[color:#0f1530] tracking-[-1px] w-[1280px] shrink-0",
        "id": "219:9063",
        "k": [
         "See the work happen."
@@ -42977,7 +42977,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
       },
       {
        "t": "div",
-       "c": "flex gap-[40px] items-start relative w-full",
+       "c": "flex gap-[40px] items-start relative w-[1280px] shrink-0",
        "n": "Product workflow states",
        "id": "219:9064",
        "k": [
@@ -42989,7 +42989,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "p",
-           "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+           "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-[364px] shrink-0",
            "id": "219:9066",
            "k": [
             "Use the service history"
@@ -42997,13 +42997,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[250px] items-start p-[16px] relative rounded-[12px] w-full",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[250px] items-start p-[16px] relative rounded-[12px] w-[364px] shrink-0",
            "n": "Example state / due",
            "id": "219:9067",
            "k": [
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+             "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[332px] shrink-0",
              "id": "219:9068",
              "k": [
               "SERVICE HISTORY"
@@ -43011,7 +43011,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[24px] text-[color:#0f1530] w-full",
+             "c": "font-semibold leading-[1.38] relative text-[24px] text-[color:#0f1530] w-[332px] shrink-0",
              "id": "219:9069",
              "k": [
               "Jordan Lee"
@@ -43019,7 +43019,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-full",
+             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-[332px] shrink-0",
              "n": "Field / Last visit",
              "id": "219:9070",
              "k": [
@@ -43043,7 +43043,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-full",
+             "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-[332px] shrink-0",
              "n": "Field / Due next",
              "id": "219:9073",
              "k": [
@@ -43067,13 +43067,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[270px] shrink-0",
              "n": "Status / Consented email reminder",
              "id": "219:9076",
              "k": [
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] flex-1 min-w-0",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[250px] shrink-0",
                "id": "219:9077",
                "k": [
                 "Consented email reminder"
@@ -43093,7 +43093,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "p",
-           "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+           "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-[364px] shrink-0",
            "id": "219:9080",
            "k": [
             "Review the email"
@@ -43101,7 +43101,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[250px] items-start p-[16px] relative rounded-[12px] w-full",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[250px] items-start p-[16px] relative rounded-[12px] w-[364px] shrink-0",
            "n": "Example state / reminder",
            "id": "219:9081",
            "k": [
@@ -43120,7 +43120,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "font-semibold relative text-[24px] text-[color:#0f1530] w-full",
+             "c": "font-semibold relative text-[24px] text-[color:#0f1530] w-[332px] shrink-0",
              "id": "219:9085",
              "k": [
               {
@@ -43141,7 +43141,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[250px] shrink-0",
              "n": "Status / Owner review required",
              "id": "219:9086",
              "k": [
@@ -43157,13 +43157,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+             "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-[332px] shrink-0",
              "n": "UI action / Review email",
              "id": "219:9088",
              "k": [
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+               "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center w-[304px] shrink-0",
                "id": "219:9089",
                "k": [
                 "Review email"
@@ -43183,7 +43183,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "p",
-           "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+           "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-[364px] shrink-0",
            "id": "219:9092",
            "k": [
             "Request the next visit"
@@ -43191,7 +43191,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[250px] items-start p-[16px] relative rounded-[12px] w-full",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[250px] items-start p-[16px] relative rounded-[12px] w-[364px] shrink-0",
            "n": "Example state / rebook",
            "id": "219:9093",
            "k": [
@@ -43210,7 +43210,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[24px] text-[color:#0f1530] w-full",
+             "c": "font-semibold leading-[1.38] relative text-[24px] text-[color:#0f1530] w-[332px] shrink-0",
              "id": "219:9097",
              "k": [
               "Request a visit"
@@ -43218,7 +43218,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[21px] text-[color:#0f1530] w-full",
+             "c": "font-medium leading-[1.38] relative text-[21px] text-[color:#0f1530] w-[332px] shrink-0",
              "id": "219:9098",
              "k": [
               "November 12"
@@ -43226,7 +43226,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[185px] shrink-0",
              "n": "Status / 10:00–12:00",
              "id": "219:9099",
              "k": [
@@ -43242,7 +43242,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] w-full",
+             "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] w-[332px] shrink-0",
              "id": "219:9101",
              "k": [
               "Request awaits confirmation"
@@ -43259,13 +43259,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
     },
     {
      "t": "div",
-     "c": "bg-[#0f1530] flex flex-col gap-[24px] items-start px-[80px] py-[48px] relative w-full",
+     "c": "bg-[#0f1530] flex flex-col gap-[24px] items-start px-[80px] py-[48px] relative w-[1440px] shrink-0",
      "n": "03 / Connected workflow and demo",
      "id": "219:9103",
      "k": [
       {
        "t": "p",
-       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#f6b400] tracking-[1.1px] w-full",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#f6b400] tracking-[1.1px] w-[1280px] shrink-0",
        "id": "219:9104",
        "k": [
         "WORKS ACROSS YOUR BUSINESS"
@@ -43273,7 +43273,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
       },
       {
        "t": "p",
-       "c": "font-semibold leading-[1.08] relative text-[36px] text-[color:#fff] tracking-[-0.9px] w-full",
+       "c": "font-semibold leading-[1.08] relative text-[36px] text-[color:#fff] tracking-[-0.9px] w-[1280px] shrink-0",
        "id": "219:9105",
        "k": [
         "One job. Connected all the way."
@@ -43281,7 +43281,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
       },
       {
        "t": "div",
-       "c": "flex gap-[16px] items-center relative w-full",
+       "c": "flex gap-[16px] items-center relative w-[1280px] shrink-0",
        "n": "Flagship and tool handoff",
        "id": "219:9106",
        "k": [
@@ -43293,7 +43293,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Suite and record",
            "id": "219:9108",
            "k": [
@@ -43325,7 +43325,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-[352px] shrink-0",
            "id": "219:9112",
            "k": [
             "Invoices & payments"
@@ -43333,7 +43333,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Handoff evidence",
            "id": "219:9113",
            "k": [
@@ -43352,7 +43352,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left w-[324px] shrink-0",
              "id": "219:9116",
              "k": [
               "Service history recorded"
@@ -43391,7 +43391,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Suite and record",
            "id": "219:9122",
            "k": [
@@ -43423,7 +43423,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-[352px] shrink-0",
            "id": "219:9126",
            "k": [
             "Reminders & win-backs"
@@ -43431,7 +43431,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Handoff evidence",
            "id": "219:9127",
            "k": [
@@ -43450,7 +43450,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left w-[324px] shrink-0",
              "id": "219:9130",
              "k": [
               "Consented email reviewed"
@@ -43489,7 +43489,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Suite and record",
            "id": "219:9136",
            "k": [
@@ -43521,7 +43521,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-[352px] shrink-0",
            "id": "219:9140",
            "k": [
             "Online booking"
@@ -43529,7 +43529,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Handoff evidence",
            "id": "219:9141",
            "k": [
@@ -43548,7 +43548,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left w-[324px] shrink-0",
              "id": "219:9144",
              "k": [
               "Next visit requested"
@@ -43835,7 +43835,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#fff4d6] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-full",
+                 "c": "bg-[#fff4d6] flex h-[12.825px] items-center px-[4.75px] relative rounded-[5.7px] w-[114px] shrink-0",
                  "n": "Status / Owner review required",
                  "id": "I219:9169;219:9056",
                  "k": [
@@ -44065,7 +44065,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[250px] shrink-0",
              "n": "Status / Owner review required",
              "id": "219:9222",
              "k": [
@@ -44150,7 +44150,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[185px] shrink-0",
              "n": "Status / 10:00–12:00",
              "id": "219:9235",
              "k": [
@@ -44288,7 +44288,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "div",
-         "c": "flex flex-col h-[24px] items-center justify-center relative w-full",
+         "c": "flex flex-col h-[24px] items-center justify-center relative w-[32px] shrink-0",
          "n": "Next connected state",
          "id": "219:9254",
          "k": [
@@ -44386,7 +44386,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "div",
-         "c": "flex flex-col h-[24px] items-center justify-center relative w-full",
+         "c": "flex flex-col h-[24px] items-center justify-center relative w-[32px] shrink-0",
          "n": "Next connected state",
          "id": "219:9268",
          "k": [
@@ -44505,25 +44505,25 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
    "k": [
     {
      "t": "div",
-     "c": "bg-[#fbf6ef] flex flex-col gap-[24px] items-start px-[80px] py-[48px] relative w-full",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[24px] items-start px-[80px] py-[48px] relative w-[1440px] shrink-0",
      "n": "01 / Product in view",
      "id": "219:9671",
      "k": [
       {
        "t": "div",
-       "c": "flex gap-[48px] items-center relative w-full",
+       "c": "flex gap-[48px] items-center relative w-[1280px] shrink-0",
        "n": "Outcome and actual workflow",
        "id": "219:9672",
        "k": [
         {
          "t": "div",
-         "c": "flex flex-col gap-[16px] items-start relative flex-1 min-w-0",
+         "c": "flex flex-col gap-[16px] items-start relative w-[480px] shrink-0",
          "n": "Short product promise",
          "id": "219:9673",
          "k": [
           {
            "t": "p",
-           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[480px] shrink-0",
            "id": "219:9674",
            "k": [
             "COMMAND CENTER / REPORTING & JOB SOURCES"
@@ -44531,7 +44531,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "h1",
-           "c": "font-semibold leading-[1.08] relative text-[58px] text-[color:#0f1530] tracking-[-1.45px] w-full",
+           "c": "font-semibold leading-[1.08] relative text-[58px] text-[color:#0f1530] tracking-[-1.45px] w-[480px] shrink-0",
            "id": "219:9675",
            "k": [
             "See where the work comes from."
@@ -44539,7 +44539,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-full",
+           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-[480px] shrink-0",
            "id": "219:9676",
            "k": [
             "Follow recorded sources from the booking to the paid invoice."
@@ -44554,7 +44554,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[480px] shrink-0",
            "id": "219:9679",
            "k": [
             "EXAMPLE BUSINESS · JUNIPER"
@@ -44570,7 +44570,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "bg-[#0f1530] flex gap-[16.711px] h-[56.4px] items-center p-[16.711px] relative w-full",
+           "c": "bg-[#0f1530] flex gap-[16.711px] h-[56.4px] items-center p-[16.711px] relative w-[752px] shrink-0",
            "n": "Product chrome",
            "id": "219:9681",
            "k": [
@@ -44584,7 +44584,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[12.533px] text-[color:#fff] flex-1 min-w-0",
+             "c": "font-medium leading-[1.38] relative text-[12.533px] text-[color:#fff] w-[432.4px] shrink-0",
              "id": "219:9683",
              "k": [
               "Reporting & sources"
@@ -44610,13 +44610,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[16.711px] items-start p-[25.067px] relative w-full",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[16.711px] items-start p-[25.067px] relative w-[752px] shrink-0",
            "n": "Product workspace",
            "id": "219:9686",
            "k": [
             {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[26.111px] text-[color:#0f1530] w-full",
+             "c": "font-semibold leading-[1.38] relative text-[26.111px] text-[color:#0f1530] w-[701.867px] shrink-0",
              "id": "219:9687",
              "k": [
               "Follow the recorded source."
@@ -44624,19 +44624,19 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "flex gap-[20.889px] items-start relative w-full",
+             "c": "flex gap-[20.889px] items-start relative w-[701.867px] shrink-0",
              "n": "Source reporting and record",
              "id": "219:9688",
              "k": [
               {
                "t": "div",
-               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] flex-1 min-w-0",
+               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] w-[365.556px] shrink-0",
                "n": "Recorded sources",
                "id": "219:9689",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[11.489px] text-[color:#2a3360] tracking-[1.1489px] w-full",
+                 "c": "font-medium leading-[1.38] relative text-[11.489px] text-[color:#2a3360] tracking-[1.1489px] w-[323.778px] shrink-0",
                  "id": "219:9690",
                  "k": [
                   "BOOKED JOB RECORDS"
@@ -44644,19 +44644,19 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "flex flex-col gap-[5.222px] items-start relative w-full",
+                 "c": "flex flex-col gap-[5.222px] items-start relative w-[323.778px] shrink-0",
                  "n": "Website",
                  "id": "219:9691",
                  "k": [
                   {
                    "t": "div",
-                   "c": "flex gap-[12.533px] items-start leading-[1.38] relative w-full",
+                   "c": "flex gap-[12.533px] items-start leading-[1.38] relative w-[323.778px] shrink-0",
                    "n": "Count",
                    "id": "219:9692",
                    "k": [
                     {
                      "t": "p",
-                     "c": "font-normal relative text-[12.533px] text-[color:#2a3360] flex-1 min-w-0",
+                     "c": "font-normal relative text-[12.533px] text-[color:#2a3360] w-[271.556px] shrink-0",
                      "id": "219:9693",
                      "k": [
                       "Website"
@@ -44674,13 +44674,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                   },
                   {
                    "t": "div",
-                   "c": "bg-[#fbf6ef] flex h-[11.489px] items-start relative rounded-[12.533px] w-full",
+                   "c": "bg-[#fbf6ef] flex h-[11.489px] items-start relative rounded-[12.533px] w-[323.778px] shrink-0",
                    "n": "Count bar",
                    "id": "219:9695",
                    "k": [
                     {
                      "t": "div",
-                     "c": "bg-[#0f1530] h-[11.489px] relative flex-1 min-w-0",
+                     "c": "bg-[#0f1530] h-[11.489px] relative w-[323.778px] shrink-0",
                      "n": "Source count 8",
                      "id": "219:9696"
                     }
@@ -44690,19 +44690,19 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "flex flex-col gap-[5.222px] items-start relative w-full",
+                 "c": "flex flex-col gap-[5.222px] items-start relative w-[323.778px] shrink-0",
                  "n": "Repeat customer",
                  "id": "219:9697",
                  "k": [
                   {
                    "t": "div",
-                   "c": "flex gap-[12.533px] items-start leading-[1.38] relative w-full",
+                   "c": "flex gap-[12.533px] items-start leading-[1.38] relative w-[323.778px] shrink-0",
                    "n": "Count",
                    "id": "219:9698",
                    "k": [
                     {
                      "t": "p",
-                     "c": "font-normal relative text-[12.533px] text-[color:#2a3360] flex-1 min-w-0",
+                     "c": "font-normal relative text-[12.533px] text-[color:#2a3360] w-[271.556px] shrink-0",
                      "id": "219:9699",
                      "k": [
                       "Repeat customer"
@@ -44720,7 +44720,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                   },
                   {
                    "t": "div",
-                   "c": "bg-[#fbf6ef] flex h-[11.489px] items-start relative rounded-[12.533px] w-full",
+                   "c": "bg-[#fbf6ef] flex h-[11.489px] items-start relative rounded-[12.533px] w-[323.778px] shrink-0",
                    "n": "Count bar",
                    "id": "219:9701",
                    "k": [
@@ -44736,19 +44736,19 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "flex flex-col gap-[5.222px] items-start relative w-full",
+                 "c": "flex flex-col gap-[5.222px] items-start relative w-[323.778px] shrink-0",
                  "n": "Referral",
                  "id": "219:9703",
                  "k": [
                   {
                    "t": "div",
-                   "c": "flex gap-[12.533px] items-start leading-[1.38] relative w-full",
+                   "c": "flex gap-[12.533px] items-start leading-[1.38] relative w-[323.778px] shrink-0",
                    "n": "Count",
                    "id": "219:9704",
                    "k": [
                     {
                      "t": "p",
-                     "c": "font-normal relative text-[12.533px] text-[color:#2a3360] flex-1 min-w-0",
+                     "c": "font-normal relative text-[12.533px] text-[color:#2a3360] w-[271.556px] shrink-0",
                      "id": "219:9705",
                      "k": [
                       "Referral"
@@ -44766,7 +44766,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                   },
                   {
                    "t": "div",
-                   "c": "bg-[#fbf6ef] flex h-[11.489px] items-start relative rounded-[12.533px] w-full",
+                   "c": "bg-[#fbf6ef] flex h-[11.489px] items-start relative rounded-[12.533px] w-[323.778px] shrink-0",
                    "n": "Count bar",
                    "id": "219:9707",
                    "k": [
@@ -44782,19 +44782,19 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "flex flex-col gap-[5.222px] items-start relative w-full",
+                 "c": "flex flex-col gap-[5.222px] items-start relative w-[323.778px] shrink-0",
                  "n": "Not recorded",
                  "id": "219:9709",
                  "k": [
                   {
                    "t": "div",
-                   "c": "flex gap-[12.533px] items-start leading-[1.38] relative w-full",
+                   "c": "flex gap-[12.533px] items-start leading-[1.38] relative w-[323.778px] shrink-0",
                    "n": "Count",
                    "id": "219:9710",
                    "k": [
                     {
                      "t": "p",
-                     "c": "font-normal relative text-[12.533px] text-[color:#2a3360] flex-1 min-w-0",
+                     "c": "font-normal relative text-[12.533px] text-[color:#2a3360] w-[271.556px] shrink-0",
                      "id": "219:9711",
                      "k": [
                       "Not recorded"
@@ -44812,7 +44812,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                   },
                   {
                    "t": "div",
-                   "c": "bg-[#fbf6ef] flex h-[11.489px] items-start relative rounded-[12.533px] w-full",
+                   "c": "bg-[#fbf6ef] flex h-[11.489px] items-start relative rounded-[12.533px] w-[323.778px] shrink-0",
                    "n": "Count bar",
                    "id": "219:9713",
                    "k": [
@@ -44830,13 +44830,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] flex-1 min-w-0",
+               "c": "bg-[#fff] border-[1.044px] border-[#e6dccb] border-solid flex flex-col gap-[14.622px] items-start p-[20.889px] relative rounded-[16.711px] w-[315.422px] shrink-0",
                "n": "Source drill-down",
                "id": "219:9715",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-semibold leading-[1.38] relative text-[24.022px] text-[color:#0f1530] w-full",
+                 "c": "font-semibold leading-[1.38] relative text-[24.022px] text-[color:#0f1530] w-[273.644px] shrink-0",
                  "id": "219:9716",
                  "k": [
                   "Job #1042"
@@ -44844,7 +44844,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.533px] w-full",
+                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.533px] w-[273.644px] shrink-0",
                  "n": "Field / Source",
                  "id": "219:9717",
                  "k": [
@@ -44868,7 +44868,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.533px] w-full",
+                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.533px] w-[273.644px] shrink-0",
                  "n": "Field / Booking",
                  "id": "219:9720",
                  "k": [
@@ -44892,7 +44892,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.533px] w-full",
+                 "c": "flex gap-[10.444px] items-start leading-[1.38] relative text-[12.533px] w-[273.644px] shrink-0",
                  "n": "Field / Invoice",
                  "id": "219:9723",
                  "k": [
@@ -44916,7 +44916,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-semibold leading-[1.38] relative text-[33.422px] text-[color:#0f1530] w-full",
+                 "c": "font-semibold leading-[1.38] relative text-[33.422px] text-[color:#0f1530] w-[273.644px] shrink-0",
                  "id": "219:9726",
                  "k": [
                   "$279.48"
@@ -44924,13 +44924,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#0f1530] flex h-[39.689px] items-center justify-center px-[14.622px] relative rounded-[12.533px] w-full",
+                 "c": "bg-[#0f1530] flex h-[39.689px] items-center justify-center px-[14.622px] relative rounded-[12.533px] w-[273.644px] shrink-0",
                  "n": "UI action / View source record",
                  "id": "219:9727",
                  "k": [
                   {
                    "t": "p",
-                   "c": "font-medium leading-[1.38] relative text-[12.533px] text-[color:#fff] text-center flex-1 min-w-0",
+                   "c": "font-medium leading-[1.38] relative text-[12.533px] text-[color:#fff] text-center w-[244.4px] shrink-0",
                    "id": "219:9728",
                    "k": [
                     "View source record"
@@ -44952,13 +44952,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
     },
     {
      "t": "div",
-     "c": "bg-[#fff] flex flex-col gap-[24px] items-start px-[80px] py-[48px] relative w-full",
+     "c": "bg-[#fff] flex flex-col gap-[24px] items-start px-[80px] py-[48px] relative w-[1440px] shrink-0",
      "n": "02 / Three visible product states",
      "id": "219:9730",
      "k": [
       {
        "t": "p",
-       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[1280px] shrink-0",
        "id": "219:9731",
        "k": [
         "EXAMPLE WORKFLOW"
@@ -44966,7 +44966,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
       },
       {
        "t": "p",
-       "c": "font-semibold leading-[1.08] relative text-[40px] text-[color:#0f1530] tracking-[-1px] w-full",
+       "c": "font-semibold leading-[1.08] relative text-[40px] text-[color:#0f1530] tracking-[-1px] w-[1280px] shrink-0",
        "id": "219:9732",
        "k": [
         "See the work happen."
@@ -44974,7 +44974,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
       },
       {
        "t": "div",
-       "c": "flex gap-[40px] items-start relative w-full",
+       "c": "flex gap-[40px] items-start relative w-[1280px] shrink-0",
        "n": "Product workflow states",
        "id": "219:9733",
        "k": [
@@ -44986,7 +44986,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "p",
-           "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+           "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-[364px] shrink-0",
            "id": "219:9735",
            "k": [
             "See the source"
@@ -44994,13 +44994,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[250px] items-start p-[16px] relative rounded-[12px] w-full",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[250px] items-start p-[16px] relative rounded-[12px] w-[364px] shrink-0",
            "n": "Example state / source",
            "id": "219:9736",
            "k": [
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+             "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[332px] shrink-0",
              "id": "219:9737",
              "k": [
               "RECORDED SOURCE"
@@ -45008,7 +45008,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[32px] text-[color:#0f1530] w-full",
+             "c": "font-semibold leading-[1.38] relative text-[32px] text-[color:#0f1530] w-[332px] shrink-0",
              "id": "219:9738",
              "k": [
               "Website"
@@ -45016,7 +45016,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#2a3360] w-full",
+             "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#2a3360] w-[332px] shrink-0",
              "id": "219:9739",
              "k": [
               "Inquiry #1042 · Jordan Lee"
@@ -45024,13 +45024,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[265px] shrink-0",
              "n": "Status / Source attached to record",
              "id": "219:9740",
              "k": [
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] flex-1 min-w-0",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[245px] shrink-0",
                "id": "219:9741",
                "k": [
                 "Source attached to record"
@@ -45050,7 +45050,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "p",
-           "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+           "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-[364px] shrink-0",
            "id": "219:9744",
            "k": [
             "Follow the booking"
@@ -45058,7 +45058,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[250px] items-start p-[16px] relative rounded-[12px] w-full",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[250px] items-start p-[16px] relative rounded-[12px] w-[364px] shrink-0",
            "n": "Example state / booked",
            "id": "219:9745",
            "k": [
@@ -45077,7 +45077,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[27px] text-[color:#0f1530] w-full",
+             "c": "font-semibold leading-[1.38] relative text-[27px] text-[color:#0f1530] w-[332px] shrink-0",
              "id": "219:9748",
              "k": [
               "Job #1042"
@@ -45085,7 +45085,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[15px] text-[color:#0f1530] w-full",
+             "c": "font-normal leading-[1.38] relative text-[15px] text-[color:#0f1530] w-[332px] shrink-0",
              "id": "219:9749",
              "k": [
               "AC diagnostic · Oct 29"
@@ -45093,7 +45093,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[225px] shrink-0",
              "n": "Status / Booking confirmed",
              "id": "219:9750",
              "k": [
@@ -45109,7 +45109,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] w-full",
+             "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] w-[332px] shrink-0",
              "id": "219:9752",
              "k": [
               "Recorded source · Website"
@@ -45127,7 +45127,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "p",
-           "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+           "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-[364px] shrink-0",
            "id": "219:9755",
            "k": [
             "Inspect the paid job"
@@ -45135,7 +45135,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[250px] items-start p-[16px] relative rounded-[12px] w-full",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] h-[250px] items-start p-[16px] relative rounded-[12px] w-[364px] shrink-0",
            "n": "Example state / paid",
            "id": "219:9756",
            "k": [
@@ -45154,7 +45154,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[32px] text-[color:#0f1530] w-full",
+             "c": "font-semibold leading-[1.38] relative text-[32px] text-[color:#0f1530] w-[332px] shrink-0",
              "id": "219:9759",
              "k": [
               "$279.48 paid"
@@ -45162,7 +45162,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[16px] text-[color:#0f1530] w-full",
+             "c": "font-normal leading-[1.38] relative text-[16px] text-[color:#0f1530] w-[332px] shrink-0",
              "id": "219:9760",
              "k": [
               "Invoice #1042"
@@ -45170,7 +45170,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[240px] shrink-0",
              "n": "Status / Matched to job #1042",
              "id": "219:9761",
              "k": [
@@ -45186,7 +45186,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] w-full",
+             "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] w-[332px] shrink-0",
              "id": "219:9763",
              "k": [
               "Recorded source · Website"
@@ -45203,13 +45203,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
     },
     {
      "t": "div",
-     "c": "bg-[#0f1530] flex flex-col gap-[24px] items-start px-[80px] py-[48px] relative w-full",
+     "c": "bg-[#0f1530] flex flex-col gap-[24px] items-start px-[80px] py-[48px] relative w-[1440px] shrink-0",
      "n": "03 / Connected workflow and demo",
      "id": "219:9765",
      "k": [
       {
        "t": "p",
-       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#f6b400] tracking-[1.1px] w-full",
+       "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#f6b400] tracking-[1.1px] w-[1280px] shrink-0",
        "id": "219:9766",
        "k": [
         "WORKS ACROSS YOUR BUSINESS"
@@ -45217,7 +45217,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
       },
       {
        "t": "p",
-       "c": "font-semibold leading-[1.08] relative text-[36px] text-[color:#fff] tracking-[-0.9px] w-full",
+       "c": "font-semibold leading-[1.08] relative text-[36px] text-[color:#fff] tracking-[-0.9px] w-[1280px] shrink-0",
        "id": "219:9767",
        "k": [
         "One job. Connected all the way."
@@ -45225,7 +45225,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
       },
       {
        "t": "div",
-       "c": "flex gap-[16px] items-center relative w-full",
+       "c": "flex gap-[16px] items-center relative w-[1280px] shrink-0",
        "n": "Flagship and tool handoff",
        "id": "219:9768",
        "k": [
@@ -45237,7 +45237,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Suite and record",
            "id": "219:9770",
            "k": [
@@ -45269,7 +45269,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-[352px] shrink-0",
            "id": "219:9774",
            "k": [
             "Online booking"
@@ -45277,7 +45277,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Handoff evidence",
            "id": "219:9775",
            "k": [
@@ -45296,7 +45296,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left w-[324px] shrink-0",
              "id": "219:9778",
              "k": [
               "Booking source recorded"
@@ -45335,7 +45335,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Suite and record",
            "id": "219:9784",
            "k": [
@@ -45367,7 +45367,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-[352px] shrink-0",
            "id": "219:9788",
            "k": [
             "Invoices & payments"
@@ -45375,7 +45375,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Handoff evidence",
            "id": "219:9789",
            "k": [
@@ -45394,7 +45394,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left w-[324px] shrink-0",
              "id": "219:9792",
              "k": [
               "Paid invoice matched to job"
@@ -45433,7 +45433,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Suite and record",
            "id": "219:9798",
            "k": [
@@ -45465,7 +45465,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-full",
+           "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] text-left w-[352px] shrink-0",
            "id": "219:9802",
            "k": [
             "Reporting & job sources"
@@ -45473,7 +45473,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "flex gap-[10px] items-start relative w-full",
+           "c": "flex gap-[10px] items-start relative w-[352px] shrink-0",
            "n": "Handoff evidence",
            "id": "219:9803",
            "k": [
@@ -45492,7 +45492,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left flex-1 min-w-0",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] text-left w-[324px] shrink-0",
              "id": "219:9806",
              "k": [
               "Underlying record ready to inspect"
@@ -46042,13 +46042,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[265px] shrink-0",
              "n": "Status / Source attached to record",
              "id": "219:9890",
              "k": [
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] flex-1 min-w-0",
+               "c": "font-medium leading-[1.38] relative text-[10px] text-[color:#0f1530] w-[245px] shrink-0",
                "id": "219:9891",
                "k": [
                 "Source attached to record"
@@ -46111,7 +46111,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[225px] shrink-0",
              "n": "Status / Booking confirmed",
              "id": "219:9900",
              "k": [
@@ -46188,7 +46188,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[240px] shrink-0",
              "n": "Status / Matched to job #1042",
              "id": "219:9911",
              "k": [
@@ -46326,7 +46326,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "div",
-         "c": "flex flex-col h-[24px] items-center justify-center relative w-full",
+         "c": "flex flex-col h-[24px] items-center justify-center relative w-[32px] shrink-0",
          "n": "Next connected state",
          "id": "219:9930",
          "k": [
@@ -46424,7 +46424,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "div",
-         "c": "flex flex-col h-[24px] items-center justify-center relative w-full",
+         "c": "flex flex-col h-[24px] items-center justify-center relative w-[32px] shrink-0",
          "n": "Next connected state",
          "id": "219:9944",
          "k": [
@@ -46543,25 +46543,25 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
    "k": [
     {
      "t": "div",
-     "c": "bg-[#fbf6ef] flex flex-col gap-[24px] items-start p-[64px] relative w-full",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[24px] items-start p-[64px] relative w-[1440px] shrink-0",
      "n": "01 / Product in view",
      "id": "218:9026",
      "k": [
       {
        "t": "div",
-       "c": "flex gap-[64px] items-center relative w-full",
+       "c": "flex gap-[64px] items-center relative w-[1312px] shrink-0",
        "n": "Headline and real product view",
        "id": "218:9027",
        "k": [
         {
          "t": "div",
-         "c": "flex flex-col gap-[20px] items-start relative flex-1 min-w-0",
+         "c": "flex flex-col gap-[20px] items-start relative w-[528px] shrink-0",
          "n": "Outcome copy",
          "id": "218:9028",
          "k": [
           {
            "t": "p",
-           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[528px] shrink-0",
            "id": "218:9029",
            "k": [
             "GROWTH / WEBSITES"
@@ -46569,7 +46569,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "h1",
-           "c": "font-semibold relative text-[60px] text-[color:#0f1530] tracking-[-1.5px] w-full",
+           "c": "font-semibold relative text-[60px] text-[color:#0f1530] tracking-[-1.5px] w-[528px] shrink-0",
            "id": "218:9030",
            "k": [
             {
@@ -46590,7 +46590,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-full",
+           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-[528px] shrink-0",
            "id": "218:9031",
            "k": [
             "Show your services, earn trust, and turn local visits into service requests."
@@ -46613,13 +46613,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "bg-[#0f1530] flex gap-[12px] h-[42px] items-center p-[12px] relative w-full",
+           "c": "bg-[#0f1530] flex gap-[12px] h-[42px] items-center p-[12px] relative w-[720px] shrink-0",
            "n": "Browser / product chrome",
            "id": "218:9035",
            "k": [
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#fff] flex-1 min-w-0",
+             "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#fff] w-[590px] shrink-0",
              "id": "218:9036",
              "k": [
               "juniper.example"
@@ -46645,13 +46645,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "bg-[#fff] flex flex-col gap-[12px] items-start p-[24px] relative w-full",
+           "c": "bg-[#fff] flex flex-col gap-[12px] items-start p-[24px] relative w-[720px] shrink-0",
            "n": "Native product content",
            "id": "218:9039",
            "k": [
             {
              "t": "div",
-             "c": "bg-[#fff] flex gap-[12px] items-center leading-[1.38] relative w-full",
+             "c": "bg-[#fff] flex gap-[12px] items-center leading-[1.38] relative w-[672px] shrink-0",
              "n": "Customer website navigation",
              "id": "218:9040",
              "k": [
@@ -46665,7 +46665,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "p",
-               "c": "font-normal relative text-[12px] text-[color:#2a3360] flex-1 min-w-0",
+               "c": "font-normal relative text-[12px] text-[color:#2a3360] w-[430px] shrink-0",
                "id": "218:9042",
                "k": [
                 "Heating   Cooling   Plumbing"
@@ -46675,19 +46675,19 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "flex gap-[20px] items-start relative w-full",
+             "c": "flex gap-[20px] items-start relative w-[672px] shrink-0",
              "n": "Customer business website",
              "id": "218:9043",
              "k": [
               {
                "t": "div",
-               "c": "flex flex-col gap-[12px] items-start relative flex-1 min-w-0",
+               "c": "flex flex-col gap-[12px] items-start relative w-[326px] shrink-0",
                "n": "Customer site message",
                "id": "218:9044",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-semibold leading-[1.08] relative text-[36px] text-[color:#0f1530] tracking-[-0.9px] w-full",
+                 "c": "font-semibold leading-[1.08] relative text-[36px] text-[color:#0f1530] tracking-[-0.9px] w-[326px] shrink-0",
                  "id": "218:9045",
                  "k": [
                   "A home that works."
@@ -46695,7 +46695,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#2a3360] w-full",
+                 "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#2a3360] w-[326px] shrink-0",
                  "id": "218:9046",
                  "k": [
                   "Heating & plumbing in Tulsa"
@@ -46703,13 +46703,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "div",
-                 "c": "bg-[#f6b400] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+                 "c": "bg-[#f6b400] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-[326px] shrink-0",
                  "n": "UI action / Request service",
                  "id": "218:9047",
                  "k": [
                   {
                    "t": "p",
-                   "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-center flex-1 min-w-0",
+                   "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-center w-[298px] shrink-0",
                    "id": "218:9048",
                    "k": [
                     "Request service"
@@ -46721,7 +46721,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "h-[230px] relative rounded-[16px] flex-1 min-w-0",
+               "c": "h-[230px] relative rounded-[16px] w-[326px] shrink-0",
                "n": "HVAC service on customer website",
                "id": "218:9049",
                "k": [
@@ -46736,7 +46736,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "flex gap-[8px] items-start relative w-full",
+             "c": "flex gap-[8px] items-start relative w-[672px] shrink-0",
              "n": "Website services",
              "id": "218:9050",
              "k": [
@@ -46800,13 +46800,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
     },
     {
      "t": "div",
-     "c": "bg-[#fff] flex flex-col gap-[24px] items-start p-[64px] relative w-full",
+     "c": "bg-[#fff] flex flex-col gap-[24px] items-start p-[64px] relative w-[1440px] shrink-0",
      "n": "02 / Actual workflow states",
      "id": "218:9057",
      "k": [
       {
        "t": "p",
-       "c": "font-semibold leading-[1.08] relative text-[40px] text-[color:#0f1530] tracking-[-1px] w-full",
+       "c": "font-semibold leading-[1.08] relative text-[40px] text-[color:#0f1530] tracking-[-1px] w-[1312px] shrink-0",
        "id": "218:9058",
        "k": [
         "Show it. Approve it. Book it."
@@ -46814,19 +46814,19 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
       },
       {
        "t": "div",
-       "c": "flex gap-[24px] items-start relative w-full",
+       "c": "flex gap-[24px] items-start relative w-[1312px] shrink-0",
        "n": "Three workflow moments",
        "id": "218:9059",
        "k": [
         {
          "t": "div",
-         "c": "flex flex-col gap-[12px] items-start relative flex-1 min-w-0",
+         "c": "flex flex-col gap-[12px] items-start relative w-[421.333px] shrink-0",
          "n": "Moment / Set your services",
          "id": "218:9060",
          "k": [
           {
            "t": "p",
-           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[421.333px] shrink-0",
            "id": "218:9061",
            "k": [
             "01 / SET YOUR SERVICES"
@@ -46840,13 +46840,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
            "k": [
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex gap-[12px] h-[42px] items-center p-[12px] relative w-full",
+             "c": "bg-[#0f1530] flex gap-[12px] h-[42px] items-center p-[12px] relative w-[421.333px] shrink-0",
              "n": "Browser / product chrome",
              "id": "218:9063",
              "k": [
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#fff] flex-1 min-w-0",
+               "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#fff] w-[291.333px] shrink-0",
                "id": "218:9064",
                "k": [
                 "Renvani"
@@ -46872,13 +46872,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#f6f7f9] flex flex-col gap-[12px] items-start p-[16px] relative w-full",
+             "c": "bg-[#f6f7f9] flex flex-col gap-[12px] items-start p-[16px] relative w-[421.333px] shrink-0",
              "n": "Native product content",
              "id": "218:9067",
              "k": [
               {
                "t": "p",
-               "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+               "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-[389.333px] shrink-0",
                "id": "218:9068",
                "k": [
                 "Your website"
@@ -46886,13 +46886,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[4px] items-start leading-[1.38] p-[10px] relative rounded-[12px] w-full",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[4px] items-start leading-[1.38] p-[10px] relative rounded-[12px] w-[389.333px] shrink-0",
                "n": "Business name",
                "id": "218:9069",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-[369.333px] shrink-0",
                  "id": "218:9070",
                  "k": [
                   "Business name"
@@ -46900,7 +46900,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-[369.333px] shrink-0",
                  "id": "218:9071",
                  "k": [
                   "Juniper Heating & Plumbing"
@@ -46910,13 +46910,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[4px] items-start leading-[1.38] p-[10px] relative rounded-[12px] w-full",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[4px] items-start leading-[1.38] p-[10px] relative rounded-[12px] w-[389.333px] shrink-0",
                "n": "Web address",
                "id": "218:9072",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-[369.333px] shrink-0",
                  "id": "218:9073",
                  "k": [
                   "Web address"
@@ -46924,7 +46924,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-[369.333px] shrink-0",
                  "id": "218:9074",
                  "k": [
                   "juniper.example"
@@ -46934,13 +46934,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[4px] items-start leading-[1.38] p-[10px] relative rounded-[12px] w-full",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[4px] items-start leading-[1.38] p-[10px] relative rounded-[12px] w-[389.333px] shrink-0",
                "n": "Service area",
                "id": "218:9075",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-[369.333px] shrink-0",
                  "id": "218:9076",
                  "k": [
                   "Service area"
@@ -46948,7 +46948,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-[369.333px] shrink-0",
                  "id": "218:9077",
                  "k": [
                   "Tulsa + nearby communities"
@@ -46958,7 +46958,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+               "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[174px] shrink-0",
                "n": "Status / Services ready for review",
                "id": "218:9078",
                "k": [
@@ -46980,13 +46980,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "div",
-         "c": "flex flex-col gap-[12px] items-start relative flex-1 min-w-0",
+         "c": "flex flex-col gap-[12px] items-start relative w-[421.333px] shrink-0",
          "n": "Moment / Approve the page",
          "id": "218:9080",
          "k": [
           {
            "t": "p",
-           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[421.333px] shrink-0",
            "id": "218:9081",
            "k": [
             "02 / APPROVE THE PAGE"
@@ -47000,13 +47000,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
            "k": [
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex gap-[12px] h-[42px] items-center p-[12px] relative w-full",
+             "c": "bg-[#0f1530] flex gap-[12px] h-[42px] items-center p-[12px] relative w-[421.333px] shrink-0",
              "n": "Browser / product chrome",
              "id": "218:9083",
              "k": [
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#fff] flex-1 min-w-0",
+               "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#fff] w-[291.333px] shrink-0",
                "id": "218:9084",
                "k": [
                 "Renvani"
@@ -47032,13 +47032,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#f6f7f9] flex flex-col gap-[12px] items-start p-[16px] relative w-full",
+             "c": "bg-[#f6f7f9] flex flex-col gap-[12px] items-start p-[16px] relative w-[421.333px] shrink-0",
              "n": "Native product content",
              "id": "218:9087",
              "k": [
               {
                "t": "p",
-               "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+               "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-[389.333px] shrink-0",
                "id": "218:9088",
                "k": [
                 "Review the service page"
@@ -47046,7 +47046,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "h-[90px] relative rounded-[16px] w-full",
+               "c": "h-[90px] relative rounded-[16px] w-[389.333px] shrink-0",
                "n": "Service page preview",
                "id": "218:9089",
                "k": [
@@ -47059,13 +47059,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[4px] items-start leading-[1.38] p-[10px] relative rounded-[12px] w-full",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[4px] items-start leading-[1.38] p-[10px] relative rounded-[12px] w-[389.333px] shrink-0",
                "n": "Proposed update",
                "id": "218:9090",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-[369.333px] shrink-0",
                  "id": "218:9091",
                  "k": [
                   "Proposed update"
@@ -47073,7 +47073,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-[369.333px] shrink-0",
                  "id": "218:9092",
                  "k": [
                   "AC service + Tulsa service area"
@@ -47083,7 +47083,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+               "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[162px] shrink-0",
                "n": "Status / Awaiting owner approval",
                "id": "218:9093",
                "k": [
@@ -47099,13 +47099,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+               "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-[389.333px] shrink-0",
                "n": "UI action / Approve page",
                "id": "218:9095",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center w-[361.333px] shrink-0",
                  "id": "218:9096",
                  "k": [
                   "Approve page"
@@ -47121,13 +47121,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "div",
-         "c": "flex flex-col gap-[12px] items-start relative flex-1 min-w-0",
+         "c": "flex flex-col gap-[12px] items-start relative w-[421.333px] shrink-0",
          "n": "Moment / Capture the request",
          "id": "218:9097",
          "k": [
           {
            "t": "p",
-           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[421.333px] shrink-0",
            "id": "218:9098",
            "k": [
             "03 / CAPTURE THE REQUEST"
@@ -47141,13 +47141,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
            "k": [
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex gap-[12px] h-[42px] items-center p-[12px] relative w-full",
+             "c": "bg-[#0f1530] flex gap-[12px] h-[42px] items-center p-[12px] relative w-[421.333px] shrink-0",
              "n": "Browser / product chrome",
              "id": "218:9100",
              "k": [
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#fff] flex-1 min-w-0",
+               "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#fff] w-[291.333px] shrink-0",
                "id": "218:9101",
                "k": [
                 "Renvani"
@@ -47173,13 +47173,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#f6f7f9] flex flex-col gap-[12px] items-start p-[16px] relative w-full",
+             "c": "bg-[#f6f7f9] flex flex-col gap-[12px] items-start p-[16px] relative w-[421.333px] shrink-0",
              "n": "Native product content",
              "id": "218:9104",
              "k": [
               {
                "t": "p",
-               "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+               "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-[389.333px] shrink-0",
                "id": "218:9105",
                "k": [
                 "New service request"
@@ -47187,13 +47187,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[4px] items-start leading-[1.38] p-[10px] relative rounded-[12px] w-full",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[4px] items-start leading-[1.38] p-[10px] relative rounded-[12px] w-[389.333px] shrink-0",
                "n": "Customer",
                "id": "218:9106",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-[369.333px] shrink-0",
                  "id": "218:9107",
                  "k": [
                   "Customer"
@@ -47201,7 +47201,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-[369.333px] shrink-0",
                  "id": "218:9108",
                  "k": [
                   "Jordan Lee"
@@ -47211,13 +47211,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[4px] items-start leading-[1.38] p-[10px] relative rounded-[12px] w-full",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[4px] items-start leading-[1.38] p-[10px] relative rounded-[12px] w-[389.333px] shrink-0",
                "n": "Service",
                "id": "218:9109",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-[369.333px] shrink-0",
                  "id": "218:9110",
                  "k": [
                   "Service"
@@ -47225,7 +47225,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-[369.333px] shrink-0",
                  "id": "218:9111",
                  "k": [
                   "AC diagnostic"
@@ -47235,13 +47235,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[4px] items-start leading-[1.38] p-[10px] relative rounded-[12px] w-full",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[4px] items-start leading-[1.38] p-[10px] relative rounded-[12px] w-[389.333px] shrink-0",
                "n": "Details",
                "id": "218:9112",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-[369.333px] shrink-0",
                  "id": "218:9113",
                  "k": [
                   "Details"
@@ -47249,7 +47249,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-[369.333px] shrink-0",
                  "id": "218:9114",
                  "k": [
                   "AC runs, but won’t cool."
@@ -47259,7 +47259,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+               "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[138px] shrink-0",
                "n": "Status / Next: Revenue inbox",
                "id": "218:9115",
                "k": [
@@ -47275,13 +47275,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+               "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-[389.333px] shrink-0",
                "n": "UI action / Review inquiry",
                "id": "218:9117",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center w-[361.333px] shrink-0",
                  "id": "218:9118",
                  "k": [
                   "Review inquiry"
@@ -47302,13 +47302,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
     },
     {
      "t": "div",
-     "c": "bg-[#f3eadc] flex flex-col gap-[20px] items-start p-[64px] relative w-full",
+     "c": "bg-[#f3eadc] flex flex-col gap-[20px] items-start p-[64px] relative w-[1440px] shrink-0",
      "n": "03 / Flagships share the work",
      "id": "218:9119",
      "k": [
       {
        "t": "p",
-       "c": "font-semibold leading-[1.08] relative text-[36px] text-[color:#0f1530] tracking-[-0.9px] w-full",
+       "c": "font-semibold leading-[1.08] relative text-[36px] text-[color:#0f1530] tracking-[-0.9px] w-[1312px] shrink-0",
        "id": "218:9120",
        "k": [
         "One customer. Connected work."
@@ -47316,19 +47316,19 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
       },
       {
        "t": "div",
-       "c": "flex font-medium gap-[12px] items-start leading-[1.38] relative text-left w-full",
+       "c": "flex font-medium gap-[12px] items-start leading-[1.38] relative text-left w-[1312px] shrink-0",
        "n": "Related product handoffs",
        "id": "218:9121",
        "k": [
         {
          "t": "div",
-         "c": "bg-[#fff] flex flex-col gap-[6px] items-start p-[16px] relative rounded-[12px] flex-1 min-w-0",
+         "c": "bg-[#fff] flex flex-col gap-[6px] items-start p-[16px] relative rounded-[12px] w-[429.333px] shrink-0",
          "n": "Link / Growth / Your website",
          "id": "218:9122",
          "k": [
           {
            "t": "p",
-           "c": "relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "c": "relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[397.333px] shrink-0",
            "id": "218:9123",
            "k": [
             "GROWTH"
@@ -47336,7 +47336,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "relative text-[18px] text-[color:#0f1530] w-full",
+           "c": "relative text-[18px] text-[color:#0f1530] w-[397.333px] shrink-0",
            "id": "218:9124",
            "k": [
             "Your website"
@@ -47346,13 +47346,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "div",
-         "c": "bg-[#fff] flex flex-col gap-[6px] items-start p-[16px] relative rounded-[12px] flex-1 min-w-0",
+         "c": "bg-[#fff] flex flex-col gap-[6px] items-start p-[16px] relative rounded-[12px] w-[429.333px] shrink-0",
          "n": "Link / Revenue / Inquiry inbox",
          "id": "218:9125",
          "k": [
           {
            "t": "p",
-           "c": "relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "c": "relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[397.333px] shrink-0",
            "id": "218:9126",
            "k": [
             "REVENUE"
@@ -47360,7 +47360,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "relative text-[18px] text-[color:#0f1530] w-full",
+           "c": "relative text-[18px] text-[color:#0f1530] w-[397.333px] shrink-0",
            "id": "218:9127",
            "k": [
             "Inquiry inbox"
@@ -47370,13 +47370,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "div",
-         "c": "bg-[#fff] flex flex-col gap-[6px] items-start p-[16px] relative rounded-[12px] flex-1 min-w-0",
+         "c": "bg-[#fff] flex flex-col gap-[6px] items-start p-[16px] relative rounded-[12px] w-[429.333px] shrink-0",
          "n": "Link / Operations / Booking + dispatch",
          "id": "218:9128",
          "k": [
           {
            "t": "p",
-           "c": "relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "c": "relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[397.333px] shrink-0",
            "id": "218:9129",
            "k": [
             "OPERATIONS"
@@ -47384,7 +47384,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "relative text-[18px] text-[color:#0f1530] w-full",
+           "c": "relative text-[18px] text-[color:#0f1530] w-[397.333px] shrink-0",
            "id": "218:9130",
            "k": [
             "Booking + dispatch"
@@ -47396,7 +47396,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
       },
       {
        "t": "div",
-       "c": "flex gap-[10px] items-start relative w-full",
+       "c": "flex gap-[10px] items-start relative w-[1312px] shrink-0",
        "n": "Shared owner control",
        "id": "218:9131",
        "k": [
@@ -47415,7 +47415,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "p",
-         "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] text-left flex-1 min-w-0",
+         "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] text-left w-[1284px] shrink-0",
          "id": "218:9134",
          "k": [
           "Command Center oversees rules and approvals."
@@ -47427,13 +47427,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
     },
     {
      "t": "div",
-     "c": "bg-[#0f1530] flex flex-col gap-[24px] items-start p-[64px] relative w-full",
+     "c": "bg-[#0f1530] flex flex-col gap-[24px] items-start p-[64px] relative w-[1440px] shrink-0",
      "n": "04 / See your workflow",
      "id": "218:9135",
      "k": [
       {
        "t": "div",
-       "c": "font-semibold relative text-[48px] text-[color:#fff] tracking-[-1.2px] w-full",
+       "c": "font-semibold relative text-[48px] text-[color:#fff] tracking-[-1.2px] w-[1312px] shrink-0",
        "id": "218:9136",
        "k": [
         {
@@ -47825,7 +47825,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                "k": [
                 {
                  "t": "p",
-                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-[290px] shrink-0",
                  "id": "218:9196",
                  "k": [
                   "Business name"
@@ -47833,7 +47833,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-[290px] shrink-0",
                  "id": "218:9197",
                  "k": [
                   "Juniper Heating & Plumbing"
@@ -47849,7 +47849,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                "k": [
                 {
                  "t": "p",
-                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-[290px] shrink-0",
                  "id": "218:9199",
                  "k": [
                   "Web address"
@@ -47857,7 +47857,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-[290px] shrink-0",
                  "id": "218:9200",
                  "k": [
                   "juniper.example"
@@ -47873,7 +47873,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                "k": [
                 {
                  "t": "p",
-                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-[290px] shrink-0",
                  "id": "218:9202",
                  "k": [
                   "Service area"
@@ -47881,7 +47881,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-[290px] shrink-0",
                  "id": "218:9203",
                  "k": [
                   "Tulsa + nearby communities"
@@ -47891,7 +47891,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+               "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[174px] shrink-0",
                "n": "Status / Services ready for review",
                "id": "218:9204",
                "k": [
@@ -47998,7 +47998,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                "k": [
                 {
                  "t": "p",
-                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-[290px] shrink-0",
                  "id": "218:9217",
                  "k": [
                   "Proposed update"
@@ -48006,7 +48006,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-[290px] shrink-0",
                  "id": "218:9218",
                  "k": [
                   "AC service + Tulsa service area"
@@ -48016,7 +48016,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+               "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[162px] shrink-0",
                "n": "Status / Awaiting owner approval",
                "id": "218:9219",
                "k": [
@@ -48126,7 +48126,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                "k": [
                 {
                  "t": "p",
-                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-[290px] shrink-0",
                  "id": "218:9233",
                  "k": [
                   "Customer"
@@ -48134,7 +48134,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-[290px] shrink-0",
                  "id": "218:9234",
                  "k": [
                   "Jordan Lee"
@@ -48150,7 +48150,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                "k": [
                 {
                  "t": "p",
-                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-[290px] shrink-0",
                  "id": "218:9236",
                  "k": [
                   "Service"
@@ -48158,7 +48158,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-[290px] shrink-0",
                  "id": "218:9237",
                  "k": [
                   "AC diagnostic"
@@ -48174,7 +48174,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                "k": [
                 {
                  "t": "p",
-                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-[290px] shrink-0",
                  "id": "218:9239",
                  "k": [
                   "Details"
@@ -48182,7 +48182,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-[290px] shrink-0",
                  "id": "218:9240",
                  "k": [
                   "AC runs, but won’t cool."
@@ -48192,7 +48192,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+               "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[138px] shrink-0",
                "n": "Status / Next: Revenue inbox",
                "id": "218:9241",
                "k": [
@@ -48309,7 +48309,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "p",
-           "c": "relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "c": "relative text-[11px] text-[color:#2a3360] tracking-[1.1px] shrink-0 w-max whitespace-nowrap",
            "id": "218:9255",
            "k": [
             "OPERATIONS"
@@ -48406,25 +48406,25 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
    "k": [
     {
      "t": "div",
-     "c": "bg-[#fbf6ef] flex flex-col gap-[24px] items-start p-[64px] relative w-full",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[24px] items-start p-[64px] relative w-[1440px] shrink-0",
      "n": "01 / Product in view",
      "id": "219:7463",
      "k": [
       {
        "t": "div",
-       "c": "flex gap-[64px] items-center relative w-full",
+       "c": "flex gap-[64px] items-center relative w-[1312px] shrink-0",
        "n": "Headline and real product view",
        "id": "219:7464",
        "k": [
         {
          "t": "div",
-         "c": "flex flex-col gap-[20px] items-start relative flex-1 min-w-0",
+         "c": "flex flex-col gap-[20px] items-start relative w-[528px] shrink-0",
          "n": "Outcome copy",
          "id": "219:7465",
          "k": [
           {
            "t": "p",
-           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[528px] shrink-0",
            "id": "219:7466",
            "k": [
             "OPERATIONS / PRICE BOOK"
@@ -48432,7 +48432,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "h1",
-           "c": "font-semibold relative text-[60px] text-[color:#0f1530] tracking-[-1.5px] w-full",
+           "c": "font-semibold relative text-[60px] text-[color:#0f1530] tracking-[-1.5px] w-[528px] shrink-0",
            "id": "219:7467",
            "k": [
             {
@@ -48453,7 +48453,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-full",
+           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-[528px] shrink-0",
            "id": "219:7468",
            "k": [
             "Use your services, labor, and materials across estimates and jobs."
@@ -48476,13 +48476,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "bg-[#0f1530] flex gap-[12px] h-[42px] items-center p-[12px] relative w-full",
+           "c": "bg-[#0f1530] flex gap-[12px] h-[42px] items-center p-[12px] relative w-[720px] shrink-0",
            "n": "Browser / product chrome",
            "id": "219:7472",
            "k": [
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#fff] flex-1 min-w-0",
+             "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#fff] w-[590px] shrink-0",
              "id": "219:7473",
              "k": [
               "Renvani"
@@ -48508,19 +48508,19 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] items-start p-[24px] relative w-full",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] items-start p-[24px] relative w-[720px] shrink-0",
            "n": "Native product content",
            "id": "219:7476",
            "k": [
             {
              "t": "div",
-             "c": "flex gap-[12px] items-start relative w-full",
+             "c": "flex gap-[12px] items-start relative w-[672px] shrink-0",
              "n": "Price book title",
              "id": "219:7477",
              "k": [
               {
                "t": "p",
-               "c": "font-semibold leading-[1.38] relative text-[26px] text-[color:#0f1530] flex-1 min-w-0",
+               "c": "font-semibold leading-[1.38] relative text-[26px] text-[color:#0f1530] w-[546px] shrink-0",
                "id": "219:7478",
                "k": [
                 "Price book"
@@ -48546,13 +48546,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col items-start p-[12px] relative rounded-[12px] w-full",
+             "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col items-start p-[12px] relative rounded-[12px] w-[672px] shrink-0",
              "n": "Search catalog",
              "id": "219:7481",
              "k": [
               {
                "t": "p",
-               "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] w-full",
+               "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] w-[648px] shrink-0",
                "id": "219:7482",
                "k": [
                 "Search services, labor, materials"
@@ -48568,19 +48568,19 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
              "k": [
               {
                "t": "div",
-               "c": "flex gap-[10px] items-start leading-[1.38] relative w-full",
+               "c": "flex gap-[10px] items-start leading-[1.38] relative w-[648px] shrink-0",
                "n": "Line item",
                "id": "219:7484",
                "k": [
                 {
                  "t": "div",
-                 "c": "flex flex-col gap-[4px] items-start relative flex-1 min-w-0",
+                 "c": "flex flex-col gap-[4px] items-start relative w-[560px] shrink-0",
                  "n": "Item name and type",
                  "id": "219:7485",
                  "k": [
                   {
                    "t": "p",
-                   "c": "font-semibold relative text-[14px] text-[color:#0f1530] w-full",
+                   "c": "font-semibold relative text-[14px] text-[color:#0f1530] w-[560px] shrink-0",
                    "id": "219:7486",
                    "k": [
                     "AC diagnostic"
@@ -48588,7 +48588,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                   },
                   {
                    "t": "p",
-                   "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                   "c": "font-normal relative text-[10px] text-[color:#2a3360] w-[560px] shrink-0",
                    "id": "219:7487",
                    "k": [
                     "Service · AC-DIAG"
@@ -48616,19 +48616,19 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
              "k": [
               {
                "t": "div",
-               "c": "flex gap-[10px] items-start leading-[1.38] relative w-full",
+               "c": "flex gap-[10px] items-start leading-[1.38] relative w-[648px] shrink-0",
                "n": "Line item",
                "id": "219:7484",
                "k": [
                 {
                  "t": "div",
-                 "c": "flex flex-col gap-[4px] items-start relative flex-1 min-w-0",
+                 "c": "flex flex-col gap-[4px] items-start relative w-[560px] shrink-0",
                  "n": "Item name and type",
                  "id": "219:7485",
                  "k": [
                   {
                    "t": "p",
-                   "c": "font-semibold relative text-[14px] text-[color:#0f1530] w-full",
+                   "c": "font-semibold relative text-[14px] text-[color:#0f1530] w-[560px] shrink-0",
                    "id": "219:7486",
                    "k": [
                     "AC diagnostic"
@@ -48636,7 +48636,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                   },
                   {
                    "t": "p",
-                   "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                   "c": "font-normal relative text-[10px] text-[color:#2a3360] w-[560px] shrink-0",
                    "id": "219:7487",
                    "k": [
                     "Service · AC-DIAG"
@@ -48664,19 +48664,19 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
              "k": [
               {
                "t": "div",
-               "c": "flex gap-[10px] items-start leading-[1.38] relative w-full",
+               "c": "flex gap-[10px] items-start leading-[1.38] relative w-[648px] shrink-0",
                "n": "Line item",
                "id": "219:7484",
                "k": [
                 {
                  "t": "div",
-                 "c": "flex flex-col gap-[4px] items-start relative flex-1 min-w-0",
+                 "c": "flex flex-col gap-[4px] items-start relative w-[560px] shrink-0",
                  "n": "Item name and type",
                  "id": "219:7485",
                  "k": [
                   {
                    "t": "p",
-                   "c": "font-semibold relative text-[14px] text-[color:#0f1530] w-full",
+                   "c": "font-semibold relative text-[14px] text-[color:#0f1530] w-[560px] shrink-0",
                    "id": "219:7486",
                    "k": [
                     "AC diagnostic"
@@ -48684,7 +48684,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                   },
                   {
                    "t": "p",
-                   "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                   "c": "font-normal relative text-[10px] text-[color:#2a3360] w-[560px] shrink-0",
                    "id": "219:7487",
                    "k": [
                     "Service · AC-DIAG"
@@ -48706,13 +48706,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex gap-[12px] items-start leading-[1.38] p-[12px] relative rounded-[12px] text-[color:#fff] w-full",
+             "c": "bg-[#0f1530] flex gap-[12px] items-start leading-[1.38] p-[12px] relative rounded-[12px] text-[color:#fff] w-[672px] shrink-0",
              "n": "Reused in estimate",
              "id": "219:7507",
              "k": [
               {
                "t": "p",
-               "c": "font-medium relative text-[12px] flex-1 min-w-0",
+               "c": "font-medium relative text-[12px] w-[564px] shrink-0",
                "id": "219:7508",
                "k": [
                 "Estimate #2048"
@@ -48730,7 +48730,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[168px] shrink-0",
              "n": "Status / Owner review before send",
              "id": "219:7510",
              "k": [
@@ -48754,13 +48754,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
     },
     {
      "t": "div",
-     "c": "bg-[#fff] flex flex-col gap-[24px] items-start p-[64px] relative w-full",
+     "c": "bg-[#fff] flex flex-col gap-[24px] items-start p-[64px] relative w-[1440px] shrink-0",
      "n": "02 / Actual workflow states",
      "id": "219:7512",
      "k": [
       {
        "t": "p",
-       "c": "font-semibold leading-[1.08] relative text-[40px] text-[color:#0f1530] tracking-[-1px] w-full",
+       "c": "font-semibold leading-[1.08] relative text-[40px] text-[color:#0f1530] tracking-[-1px] w-[1312px] shrink-0",
        "id": "219:7513",
        "k": [
         "Price once. Carry the details through."
@@ -48768,19 +48768,19 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
       },
       {
        "t": "div",
-       "c": "flex gap-[24px] items-start relative w-full",
+       "c": "flex gap-[24px] items-start relative w-[1312px] shrink-0",
        "n": "Three workflow moments",
        "id": "219:7514",
        "k": [
         {
          "t": "div",
-         "c": "flex flex-col gap-[12px] items-start relative flex-1 min-w-0",
+         "c": "flex flex-col gap-[12px] items-start relative w-[421.333px] shrink-0",
          "n": "Moment / Set the price",
          "id": "219:7515",
          "k": [
           {
            "t": "p",
-           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[421.333px] shrink-0",
            "id": "219:7516",
            "k": [
             "01 / SET THE PRICE"
@@ -48794,13 +48794,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
            "k": [
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex gap-[12px] h-[42px] items-center p-[12px] relative w-full",
+             "c": "bg-[#0f1530] flex gap-[12px] h-[42px] items-center p-[12px] relative w-[421.333px] shrink-0",
              "n": "Browser / product chrome",
              "id": "219:7518",
              "k": [
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#fff] flex-1 min-w-0",
+               "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#fff] w-[291.333px] shrink-0",
                "id": "219:7519",
                "k": [
                 "Renvani"
@@ -48826,13 +48826,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#f6f7f9] flex flex-col gap-[12px] items-start p-[16px] relative w-full",
+             "c": "bg-[#f6f7f9] flex flex-col gap-[12px] items-start p-[16px] relative w-[421.333px] shrink-0",
              "n": "Native product content",
              "id": "219:7522",
              "k": [
               {
                "t": "p",
-               "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+               "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-[389.333px] shrink-0",
                "id": "219:7523",
                "k": [
                 "Capacitor"
@@ -48840,7 +48840,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+               "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[138px] shrink-0",
                "n": "Status / MATERIAL · CAP-45/5",
                "id": "219:7524",
                "k": [
@@ -48856,13 +48856,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[4px] items-start leading-[1.38] p-[10px] relative rounded-[12px] w-full",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[4px] items-start leading-[1.38] p-[10px] relative rounded-[12px] w-[389.333px] shrink-0",
                "n": "Price",
                "id": "219:7526",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-[369.333px] shrink-0",
                  "id": "219:7527",
                  "k": [
                   "Price"
@@ -48870,7 +48870,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-[369.333px] shrink-0",
                  "id": "219:7528",
                  "k": [
                   "60.00 USD / each"
@@ -48880,13 +48880,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[4px] items-start leading-[1.38] p-[10px] relative rounded-[12px] w-full",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[4px] items-start leading-[1.38] p-[10px] relative rounded-[12px] w-[389.333px] shrink-0",
                "n": "Used in",
                "id": "219:7529",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-[369.333px] shrink-0",
                  "id": "219:7530",
                  "k": [
                   "Used in"
@@ -48894,7 +48894,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-[369.333px] shrink-0",
                  "id": "219:7531",
                  "k": [
                   "Estimates + job line items"
@@ -48904,7 +48904,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+               "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[186px] shrink-0",
                "n": "Status / Price change needs approval",
                "id": "219:7532",
                "k": [
@@ -48926,13 +48926,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "div",
-         "c": "flex flex-col gap-[12px] items-start relative flex-1 min-w-0",
+         "c": "flex flex-col gap-[12px] items-start relative w-[421.333px] shrink-0",
          "n": "Moment / Build the estimate",
          "id": "219:7534",
          "k": [
           {
            "t": "p",
-           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[421.333px] shrink-0",
            "id": "219:7535",
            "k": [
             "02 / BUILD THE ESTIMATE"
@@ -48946,13 +48946,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
            "k": [
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex gap-[12px] h-[42px] items-center p-[12px] relative w-full",
+             "c": "bg-[#0f1530] flex gap-[12px] h-[42px] items-center p-[12px] relative w-[421.333px] shrink-0",
              "n": "Browser / product chrome",
              "id": "219:7537",
              "k": [
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#fff] flex-1 min-w-0",
+               "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#fff] w-[291.333px] shrink-0",
                "id": "219:7538",
                "k": [
                 "Renvani"
@@ -48978,13 +48978,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#f6f7f9] flex flex-col gap-[12px] items-start p-[16px] relative w-full",
+             "c": "bg-[#f6f7f9] flex flex-col gap-[12px] items-start p-[16px] relative w-[421.333px] shrink-0",
              "n": "Native product content",
              "id": "219:7541",
              "k": [
               {
                "t": "p",
-               "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+               "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-[389.333px] shrink-0",
                "id": "219:7542",
                "k": [
                 "Estimate #2048"
@@ -48992,7 +48992,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "p",
-               "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] w-full",
+               "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] w-[389.333px] shrink-0",
                "id": "219:7543",
                "k": [
                 "Jordan Lee · AC diagnostic + repair"
@@ -49006,19 +49006,19 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                "k": [
                 {
                  "t": "div",
-                 "c": "flex gap-[10px] items-start leading-[1.38] relative w-full",
+                 "c": "flex gap-[10px] items-start leading-[1.38] relative w-[365.333px] shrink-0",
                  "n": "Line item",
                  "id": "219:7545",
                  "k": [
                   {
                    "t": "div",
-                   "c": "flex flex-col gap-[4px] items-start relative flex-1 min-w-0",
+                   "c": "flex flex-col gap-[4px] items-start relative w-[277.333px] shrink-0",
                    "n": "Item name and type",
                    "id": "219:7546",
                    "k": [
                     {
                      "t": "p",
-                     "c": "font-semibold relative text-[14px] text-[color:#0f1530] w-full",
+                     "c": "font-semibold relative text-[14px] text-[color:#0f1530] w-[277.333px] shrink-0",
                      "id": "219:7547",
                      "k": [
                       "AC diagnostic"
@@ -49026,7 +49026,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                     },
                     {
                      "t": "p",
-                     "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                     "c": "font-normal relative text-[10px] text-[color:#2a3360] w-[277.333px] shrink-0",
                      "id": "219:7548",
                      "k": [
                       "Service · AC-DIAG"
@@ -49054,19 +49054,19 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                "k": [
                 {
                  "t": "div",
-                 "c": "flex gap-[10px] items-start leading-[1.38] relative w-full",
+                 "c": "flex gap-[10px] items-start leading-[1.38] relative w-[365.333px] shrink-0",
                  "n": "Line item",
                  "id": "219:7545",
                  "k": [
                   {
                    "t": "div",
-                   "c": "flex flex-col gap-[4px] items-start relative flex-1 min-w-0",
+                   "c": "flex flex-col gap-[4px] items-start relative w-[277.333px] shrink-0",
                    "n": "Item name and type",
                    "id": "219:7546",
                    "k": [
                     {
                      "t": "p",
-                     "c": "font-semibold relative text-[14px] text-[color:#0f1530] w-full",
+                     "c": "font-semibold relative text-[14px] text-[color:#0f1530] w-[277.333px] shrink-0",
                      "id": "219:7547",
                      "k": [
                       "AC diagnostic"
@@ -49074,7 +49074,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                     },
                     {
                      "t": "p",
-                     "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                     "c": "font-normal relative text-[10px] text-[color:#2a3360] w-[277.333px] shrink-0",
                      "id": "219:7548",
                      "k": [
                       "Service · AC-DIAG"
@@ -49102,19 +49102,19 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                "k": [
                 {
                  "t": "div",
-                 "c": "flex gap-[10px] items-start leading-[1.38] relative w-full",
+                 "c": "flex gap-[10px] items-start leading-[1.38] relative w-[365.333px] shrink-0",
                  "n": "Line item",
                  "id": "219:7545",
                  "k": [
                   {
                    "t": "div",
-                   "c": "flex flex-col gap-[4px] items-start relative flex-1 min-w-0",
+                   "c": "flex flex-col gap-[4px] items-start relative w-[277.333px] shrink-0",
                    "n": "Item name and type",
                    "id": "219:7546",
                    "k": [
                     {
                      "t": "p",
-                     "c": "font-semibold relative text-[14px] text-[color:#0f1530] w-full",
+                     "c": "font-semibold relative text-[14px] text-[color:#0f1530] w-[277.333px] shrink-0",
                      "id": "219:7547",
                      "k": [
                       "AC diagnostic"
@@ -49122,7 +49122,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                     },
                     {
                      "t": "p",
-                     "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                     "c": "font-normal relative text-[10px] text-[color:#2a3360] w-[277.333px] shrink-0",
                      "id": "219:7548",
                      "k": [
                       "Service · AC-DIAG"
@@ -49144,7 +49144,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-full",
+               "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-[389.333px] shrink-0",
                "n": "Field / Service total",
                "id": "219:7568",
                "k": [
@@ -49168,7 +49168,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+               "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[162px] shrink-0",
                "n": "Status / Awaiting owner approval",
                "id": "219:7571",
                "k": [
@@ -49184,13 +49184,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+               "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-[389.333px] shrink-0",
                "n": "UI action / Review estimate",
                "id": "219:7573",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center w-[361.333px] shrink-0",
                  "id": "219:7574",
                  "k": [
                   "Review estimate"
@@ -49206,13 +49206,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "div",
-         "c": "flex flex-col gap-[12px] items-start relative flex-1 min-w-0",
+         "c": "flex flex-col gap-[12px] items-start relative w-[421.333px] shrink-0",
          "n": "Moment / Carry it into work",
          "id": "219:7575",
          "k": [
           {
            "t": "p",
-           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[421.333px] shrink-0",
            "id": "219:7576",
            "k": [
             "03 / CARRY IT INTO WORK"
@@ -49226,13 +49226,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
            "k": [
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex gap-[12px] h-[42px] items-center p-[12px] relative w-full",
+             "c": "bg-[#0f1530] flex gap-[12px] h-[42px] items-center p-[12px] relative w-[421.333px] shrink-0",
              "n": "Browser / product chrome",
              "id": "219:7578",
              "k": [
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#fff] flex-1 min-w-0",
+               "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#fff] w-[291.333px] shrink-0",
                "id": "219:7579",
                "k": [
                 "Renvani"
@@ -49258,13 +49258,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#f6f7f9] flex flex-col gap-[12px] items-start p-[16px] relative w-full",
+             "c": "bg-[#f6f7f9] flex flex-col gap-[12px] items-start p-[16px] relative w-[421.333px] shrink-0",
              "n": "Native product content",
              "id": "219:7582",
              "k": [
               {
                "t": "p",
-               "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+               "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-[389.333px] shrink-0",
                "id": "219:7583",
                "k": [
                 "Job #1042"
@@ -49272,7 +49272,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "p",
-               "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] w-full",
+               "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] w-[389.333px] shrink-0",
                "id": "219:7584",
                "k": [
                 "Maya R. · AC diagnostic + repair"
@@ -49280,7 +49280,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+               "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[180px] shrink-0",
                "n": "Status / Approved estimate attached",
                "id": "219:7585",
                "k": [
@@ -49302,19 +49302,19 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                "k": [
                 {
                  "t": "div",
-                 "c": "flex gap-[10px] items-start leading-[1.38] relative w-full",
+                 "c": "flex gap-[10px] items-start leading-[1.38] relative w-[365.333px] shrink-0",
                  "n": "Line item",
                  "id": "219:7545",
                  "k": [
                   {
                    "t": "div",
-                   "c": "flex flex-col gap-[4px] items-start relative flex-1 min-w-0",
+                   "c": "flex flex-col gap-[4px] items-start relative w-[277.333px] shrink-0",
                    "n": "Item name and type",
                    "id": "219:7546",
                    "k": [
                     {
                      "t": "p",
-                     "c": "font-semibold relative text-[14px] text-[color:#0f1530] w-full",
+                     "c": "font-semibold relative text-[14px] text-[color:#0f1530] w-[277.333px] shrink-0",
                      "id": "219:7547",
                      "k": [
                       "AC diagnostic"
@@ -49322,7 +49322,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                     },
                     {
                      "t": "p",
-                     "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                     "c": "font-normal relative text-[10px] text-[color:#2a3360] w-[277.333px] shrink-0",
                      "id": "219:7548",
                      "k": [
                       "Service · AC-DIAG"
@@ -49350,19 +49350,19 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                "k": [
                 {
                  "t": "div",
-                 "c": "flex gap-[10px] items-start leading-[1.38] relative w-full",
+                 "c": "flex gap-[10px] items-start leading-[1.38] relative w-[365.333px] shrink-0",
                  "n": "Line item",
                  "id": "219:7545",
                  "k": [
                   {
                    "t": "div",
-                   "c": "flex flex-col gap-[4px] items-start relative flex-1 min-w-0",
+                   "c": "flex flex-col gap-[4px] items-start relative w-[277.333px] shrink-0",
                    "n": "Item name and type",
                    "id": "219:7546",
                    "k": [
                     {
                      "t": "p",
-                     "c": "font-semibold relative text-[14px] text-[color:#0f1530] w-full",
+                     "c": "font-semibold relative text-[14px] text-[color:#0f1530] w-[277.333px] shrink-0",
                      "id": "219:7547",
                      "k": [
                       "AC diagnostic"
@@ -49370,7 +49370,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                     },
                     {
                      "t": "p",
-                     "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                     "c": "font-normal relative text-[10px] text-[color:#2a3360] w-[277.333px] shrink-0",
                      "id": "219:7548",
                      "k": [
                       "Service · AC-DIAG"
@@ -49398,19 +49398,19 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                "k": [
                 {
                  "t": "div",
-                 "c": "flex gap-[10px] items-start leading-[1.38] relative w-full",
+                 "c": "flex gap-[10px] items-start leading-[1.38] relative w-[365.333px] shrink-0",
                  "n": "Line item",
                  "id": "219:7545",
                  "k": [
                   {
                    "t": "div",
-                   "c": "flex flex-col gap-[4px] items-start relative flex-1 min-w-0",
+                   "c": "flex flex-col gap-[4px] items-start relative w-[277.333px] shrink-0",
                    "n": "Item name and type",
                    "id": "219:7546",
                    "k": [
                     {
                      "t": "p",
-                     "c": "font-semibold relative text-[14px] text-[color:#0f1530] w-full",
+                     "c": "font-semibold relative text-[14px] text-[color:#0f1530] w-[277.333px] shrink-0",
                      "id": "219:7547",
                      "k": [
                       "AC diagnostic"
@@ -49418,7 +49418,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                     },
                     {
                      "t": "p",
-                     "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                     "c": "font-normal relative text-[10px] text-[color:#2a3360] w-[277.333px] shrink-0",
                      "id": "219:7548",
                      "k": [
                       "Service · AC-DIAG"
@@ -49440,7 +49440,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-full",
+               "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-[389.333px] shrink-0",
                "n": "Field / Quoted service total",
                "id": "219:7605",
                "k": [
@@ -49464,13 +49464,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+               "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-[389.333px] shrink-0",
                "n": "UI action / Open work order",
                "id": "219:7608",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center w-[361.333px] shrink-0",
                  "id": "219:7609",
                  "k": [
                   "Open work order"
@@ -49491,13 +49491,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
     },
     {
      "t": "div",
-     "c": "bg-[#f3eadc] flex flex-col gap-[20px] items-start p-[64px] relative w-full",
+     "c": "bg-[#f3eadc] flex flex-col gap-[20px] items-start p-[64px] relative w-[1440px] shrink-0",
      "n": "03 / Flagships share the work",
      "id": "219:7610",
      "k": [
       {
        "t": "p",
-       "c": "font-semibold leading-[1.08] relative text-[36px] text-[color:#0f1530] tracking-[-0.9px] w-full",
+       "c": "font-semibold leading-[1.08] relative text-[36px] text-[color:#0f1530] tracking-[-0.9px] w-[1312px] shrink-0",
        "id": "219:7611",
        "k": [
         "One customer. Connected work."
@@ -49505,19 +49505,19 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
       },
       {
        "t": "div",
-       "c": "flex font-medium gap-[12px] items-start leading-[1.38] relative text-left w-full",
+       "c": "flex font-medium gap-[12px] items-start leading-[1.38] relative text-left w-[1312px] shrink-0",
        "n": "Related product handoffs",
        "id": "219:7612",
        "k": [
         {
          "t": "div",
-         "c": "bg-[#fff] flex flex-col gap-[6px] items-start p-[16px] relative rounded-[12px] flex-1 min-w-0",
+         "c": "bg-[#fff] flex flex-col gap-[6px] items-start p-[16px] relative rounded-[12px] w-[429.333px] shrink-0",
          "n": "Link / Operations / Price book",
          "id": "219:7613",
          "k": [
           {
            "t": "p",
-           "c": "relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "c": "relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[397.333px] shrink-0",
            "id": "219:7614",
            "k": [
             "OPERATIONS"
@@ -49525,7 +49525,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "relative text-[18px] text-[color:#0f1530] w-full",
+           "c": "relative text-[18px] text-[color:#0f1530] w-[397.333px] shrink-0",
            "id": "219:7615",
            "k": [
             "Price book"
@@ -49535,13 +49535,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "div",
-         "c": "bg-[#fff] flex flex-col gap-[6px] items-start p-[16px] relative rounded-[12px] flex-1 min-w-0",
+         "c": "bg-[#fff] flex flex-col gap-[6px] items-start p-[16px] relative rounded-[12px] w-[429.333px] shrink-0",
          "n": "Link / Revenue / Approved estimate",
          "id": "219:7616",
          "k": [
           {
            "t": "p",
-           "c": "relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "c": "relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[397.333px] shrink-0",
            "id": "219:7617",
            "k": [
             "REVENUE"
@@ -49549,7 +49549,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "relative text-[18px] text-[color:#0f1530] w-full",
+           "c": "relative text-[18px] text-[color:#0f1530] w-[397.333px] shrink-0",
            "id": "219:7618",
            "k": [
             "Approved estimate"
@@ -49559,13 +49559,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "div",
-         "c": "bg-[#fff] flex flex-col gap-[6px] items-start p-[16px] relative rounded-[12px] flex-1 min-w-0",
+         "c": "bg-[#fff] flex flex-col gap-[6px] items-start p-[16px] relative rounded-[12px] w-[429.333px] shrink-0",
          "n": "Link / Operations / Job + work order",
          "id": "219:7619",
          "k": [
           {
            "t": "p",
-           "c": "relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "c": "relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[397.333px] shrink-0",
            "id": "219:7620",
            "k": [
             "OPERATIONS"
@@ -49573,7 +49573,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "relative text-[18px] text-[color:#0f1530] w-full",
+           "c": "relative text-[18px] text-[color:#0f1530] w-[397.333px] shrink-0",
            "id": "219:7621",
            "k": [
             "Job + work order"
@@ -49585,7 +49585,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
       },
       {
        "t": "div",
-       "c": "flex gap-[10px] items-start relative w-full",
+       "c": "flex gap-[10px] items-start relative w-[1312px] shrink-0",
        "n": "Shared owner control",
        "id": "219:7622",
        "k": [
@@ -49604,7 +49604,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "p",
-         "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] text-left flex-1 min-w-0",
+         "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] text-left w-[1284px] shrink-0",
          "id": "219:7625",
          "k": [
           "Command Center oversees rules and approvals."
@@ -49616,13 +49616,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
     },
     {
      "t": "div",
-     "c": "bg-[#0f1530] flex flex-col gap-[24px] items-start p-[64px] relative w-full",
+     "c": "bg-[#0f1530] flex flex-col gap-[24px] items-start p-[64px] relative w-[1440px] shrink-0",
      "n": "04 / See your workflow",
      "id": "219:7626",
      "k": [
       {
        "t": "div",
-       "c": "font-semibold relative text-[48px] text-[color:#fff] tracking-[-1.2px] w-full",
+       "c": "font-semibold relative text-[48px] text-[color:#fff] tracking-[-1.2px] w-[1312px] shrink-0",
        "id": "219:7627",
        "k": [
         {
@@ -49806,7 +49806,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
              "k": [
               {
                "t": "p",
-               "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] w-full",
+               "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] w-[286px] shrink-0",
                "id": "219:7662",
                "k": [
                 "Search services, labor, materials"
@@ -49822,7 +49822,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
              "k": [
               {
                "t": "div",
-               "c": "flex gap-[10px] items-start leading-[1.38] relative w-full",
+               "c": "flex gap-[10px] items-start leading-[1.38] relative w-[286px] shrink-0",
                "n": "Line item",
                "id": "219:7664",
                "k": [
@@ -49870,7 +49870,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
              "k": [
               {
                "t": "div",
-               "c": "flex gap-[10px] items-start leading-[1.38] relative w-full",
+               "c": "flex gap-[10px] items-start leading-[1.38] relative w-[286px] shrink-0",
                "n": "Line item",
                "id": "219:7664",
                "k": [
@@ -49918,7 +49918,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
              "k": [
               {
                "t": "div",
-               "c": "flex gap-[10px] items-start leading-[1.38] relative w-full",
+               "c": "flex gap-[10px] items-start leading-[1.38] relative w-[286px] shrink-0",
                "n": "Line item",
                "id": "219:7664",
                "k": [
@@ -49984,7 +49984,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[168px] shrink-0",
              "n": "Status / Owner review before send",
              "id": "219:7690",
              "k": [
@@ -50094,7 +50094,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+               "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[138px] shrink-0",
                "n": "Status / MATERIAL · CAP-45/5",
                "id": "219:7704",
                "k": [
@@ -50116,7 +50116,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                "k": [
                 {
                  "t": "p",
-                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-[290px] shrink-0",
                  "id": "219:7707",
                  "k": [
                   "Price"
@@ -50124,7 +50124,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-[290px] shrink-0",
                  "id": "219:7708",
                  "k": [
                   "60.00 USD / each"
@@ -50140,7 +50140,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                "k": [
                 {
                  "t": "p",
-                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-[290px] shrink-0",
                  "id": "219:7710",
                  "k": [
                   "Used in"
@@ -50148,7 +50148,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-[290px] shrink-0",
                  "id": "219:7711",
                  "k": [
                   "Estimates + job line items"
@@ -50158,7 +50158,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+               "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[186px] shrink-0",
                "n": "Status / Price change needs approval",
                "id": "219:7712",
                "k": [
@@ -50260,7 +50260,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                "k": [
                 {
                  "t": "div",
-                 "c": "flex gap-[10px] items-start leading-[1.38] relative w-full",
+                 "c": "flex gap-[10px] items-start leading-[1.38] relative w-[286px] shrink-0",
                  "n": "Line item",
                  "id": "219:7664",
                  "k": [
@@ -50308,7 +50308,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                "k": [
                 {
                  "t": "div",
-                 "c": "flex gap-[10px] items-start leading-[1.38] relative w-full",
+                 "c": "flex gap-[10px] items-start leading-[1.38] relative w-[286px] shrink-0",
                  "n": "Line item",
                  "id": "219:7664",
                  "k": [
@@ -50356,7 +50356,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                "k": [
                 {
                  "t": "div",
-                 "c": "flex gap-[10px] items-start leading-[1.38] relative w-full",
+                 "c": "flex gap-[10px] items-start leading-[1.38] relative w-[286px] shrink-0",
                  "n": "Line item",
                  "id": "219:7664",
                  "k": [
@@ -50422,7 +50422,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+               "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[162px] shrink-0",
                "n": "Status / Awaiting owner approval",
                "id": "219:7745",
                "k": [
@@ -50534,7 +50534,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+               "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[180px] shrink-0",
                "n": "Status / Approved estimate attached",
                "id": "219:7759",
                "k": [
@@ -50556,7 +50556,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                "k": [
                 {
                  "t": "div",
-                 "c": "flex gap-[10px] items-start leading-[1.38] relative w-full",
+                 "c": "flex gap-[10px] items-start leading-[1.38] relative w-[286px] shrink-0",
                  "n": "Line item",
                  "id": "219:7664",
                  "k": [
@@ -50604,7 +50604,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                "k": [
                 {
                  "t": "div",
-                 "c": "flex gap-[10px] items-start leading-[1.38] relative w-full",
+                 "c": "flex gap-[10px] items-start leading-[1.38] relative w-[286px] shrink-0",
                  "n": "Line item",
                  "id": "219:7664",
                  "k": [
@@ -50652,7 +50652,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                "k": [
                 {
                  "t": "div",
-                 "c": "flex gap-[10px] items-start leading-[1.38] relative w-full",
+                 "c": "flex gap-[10px] items-start leading-[1.38] relative w-[286px] shrink-0",
                  "n": "Line item",
                  "id": "219:7664",
                  "k": [
@@ -50771,7 +50771,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "p",
-           "c": "relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "c": "relative text-[11px] text-[color:#2a3360] tracking-[1.1px] shrink-0 w-max whitespace-nowrap",
            "id": "219:7788",
            "k": [
             "OPERATIONS"
@@ -50819,7 +50819,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "p",
-           "c": "relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "c": "relative text-[11px] text-[color:#2a3360] tracking-[1.1px] shrink-0 w-max whitespace-nowrap",
            "id": "219:7794",
            "k": [
             "OPERATIONS"
@@ -50916,25 +50916,25 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
    "k": [
     {
      "t": "div",
-     "c": "bg-[#fbf6ef] flex flex-col gap-[24px] items-start p-[64px] relative w-full",
+     "c": "bg-[#fbf6ef] flex flex-col gap-[24px] items-start p-[64px] relative w-[1440px] shrink-0",
      "n": "01 / Product in view",
      "id": "219:8456",
      "k": [
       {
        "t": "div",
-       "c": "flex gap-[64px] items-center relative w-full",
+       "c": "flex gap-[64px] items-center relative w-[1312px] shrink-0",
        "n": "Headline and real product view",
        "id": "219:8457",
        "k": [
         {
          "t": "div",
-         "c": "flex flex-col gap-[20px] items-start relative flex-1 min-w-0",
+         "c": "flex flex-col gap-[20px] items-start relative w-[528px] shrink-0",
          "n": "Outcome copy",
          "id": "219:8458",
          "k": [
           {
            "t": "p",
-           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[528px] shrink-0",
            "id": "219:8459",
            "k": [
             "OPERATIONS / CUSTOMER PORTAL"
@@ -50942,7 +50942,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+           "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[190px] shrink-0",
            "n": "Status / Illustrative preview",
            "id": "219:8460",
            "k": [
@@ -50958,7 +50958,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "h1",
-           "c": "font-semibold leading-[1.08] relative text-[60px] text-[color:#0f1530] tracking-[-1.5px] w-full",
+           "c": "font-semibold leading-[1.08] relative text-[60px] text-[color:#0f1530] tracking-[-1.5px] w-[528px] shrink-0",
            "id": "219:8462",
            "k": [
             "Give customers a clearer next step."
@@ -50966,7 +50966,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-full",
+           "c": "font-normal leading-[1.38] relative text-[18px] text-[color:#2a3360] w-[528px] shrink-0",
            "id": "219:8463",
            "k": [
             "Preview visits, approved estimates, payments, and reschedule requests in one place."
@@ -50989,13 +50989,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "div",
-           "c": "bg-[#0f1530] flex gap-[12px] h-[42px] items-center p-[12px] relative w-full",
+           "c": "bg-[#0f1530] flex gap-[12px] h-[42px] items-center p-[12px] relative w-[720px] shrink-0",
            "n": "Browser / product chrome",
            "id": "219:8467",
            "k": [
             {
              "t": "p",
-             "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#fff] flex-1 min-w-0",
+             "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#fff] w-[542px] shrink-0",
              "id": "219:8468",
              "k": [
               "Juniper customer portal"
@@ -51021,13 +51021,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] items-start p-[24px] relative w-full",
+           "c": "bg-[#f6f7f9] flex flex-col gap-[12px] items-start p-[24px] relative w-[720px] shrink-0",
            "n": "Native product content",
            "id": "219:8471",
            "k": [
             {
              "t": "p",
-             "c": "font-semibold leading-[1.38] relative text-[32px] text-[color:#0f1530] w-full",
+             "c": "font-semibold leading-[1.38] relative text-[32px] text-[color:#0f1530] w-[672px] shrink-0",
              "id": "219:8472",
              "k": [
               "Hi, Jordan."
@@ -51035,7 +51035,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "p",
-             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] w-full",
+             "c": "font-normal leading-[1.38] relative text-[13px] text-[color:#2a3360] w-[672px] shrink-0",
              "id": "219:8473",
              "k": [
               "Your service, in one place."
@@ -51043,13 +51043,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[14px] items-start p-[20px] relative rounded-[16px] w-full",
+             "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[14px] items-start p-[20px] relative rounded-[16px] w-[672px] shrink-0",
              "n": "Upcoming visit",
              "id": "219:8474",
              "k": [
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+               "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[632px] shrink-0",
                "id": "219:8475",
                "k": [
                 "NEXT VISIT"
@@ -51057,7 +51057,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "p",
-               "c": "font-semibold leading-[1.38] relative text-[26px] text-[color:#0f1530] w-full",
+               "c": "font-semibold leading-[1.38] relative text-[26px] text-[color:#0f1530] w-[632px] shrink-0",
                "id": "219:8476",
                "k": [
                 "Heating tune-up"
@@ -51065,7 +51065,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "p",
-               "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#2a3360] w-full",
+               "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#2a3360] w-[632px] shrink-0",
                "id": "219:8477",
                "k": [
                 "November 12 · 10:00–12:00"
@@ -51073,13 +51073,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+               "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-[632px] shrink-0",
                "n": "UI action / Request a new time",
                "id": "219:8478",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center w-[604px] shrink-0",
                  "id": "219:8479",
                  "k": [
                   "Request a new time"
@@ -51091,19 +51091,19 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff] flex gap-[12px] items-start p-[16px] relative rounded-[12px] w-full",
+             "c": "bg-[#fff] flex gap-[12px] items-start p-[16px] relative rounded-[12px] w-[672px] shrink-0",
              "n": "Invoice ready",
              "id": "219:8480",
              "k": [
               {
                "t": "div",
-               "c": "flex flex-col gap-[4px] items-start leading-[1.38] relative text-left flex-1 min-w-0",
+               "c": "flex flex-col gap-[4px] items-start leading-[1.38] relative text-left w-[520px] shrink-0",
                "n": "Invoice details",
                "id": "219:8481",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-semibold relative text-[14px] text-[color:#0f1530] w-full",
+                 "c": "font-semibold relative text-[14px] text-[color:#0f1530] w-[520px] shrink-0",
                  "id": "219:8482",
                  "k": [
                   "Invoice #1042"
@@ -51111,7 +51111,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-normal relative text-[11px] text-[color:#2a3360] w-full",
+                 "c": "font-normal relative text-[11px] text-[color:#2a3360] w-[520px] shrink-0",
                  "id": "219:8483",
                  "k": [
                   "Flex · $5.48 Service Fee"
@@ -51139,7 +51139,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[162px] shrink-0",
              "n": "Status / History + approved work",
              "id": "219:8485",
              "k": [
@@ -51163,13 +51163,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
     },
     {
      "t": "div",
-     "c": "bg-[#fff] flex flex-col gap-[24px] items-start p-[64px] relative w-full",
+     "c": "bg-[#fff] flex flex-col gap-[24px] items-start p-[64px] relative w-[1440px] shrink-0",
      "n": "02 / Actual workflow states",
      "id": "219:8487",
      "k": [
       {
        "t": "p",
-       "c": "font-semibold leading-[1.08] relative text-[40px] text-[color:#0f1530] tracking-[-1px] w-full",
+       "c": "font-semibold leading-[1.08] relative text-[40px] text-[color:#0f1530] tracking-[-1px] w-[1312px] shrink-0",
        "id": "219:8488",
        "k": [
         "A clearer view of every visit."
@@ -51177,19 +51177,19 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
       },
       {
        "t": "div",
-       "c": "flex gap-[24px] items-start relative w-full",
+       "c": "flex gap-[24px] items-start relative w-[1312px] shrink-0",
        "n": "Three workflow moments",
        "id": "219:8489",
        "k": [
         {
          "t": "div",
-         "c": "flex flex-col gap-[12px] items-start relative flex-1 min-w-0",
+         "c": "flex flex-col gap-[12px] items-start relative w-[421.333px] shrink-0",
          "n": "Moment / Review approved work",
          "id": "219:8490",
          "k": [
           {
            "t": "p",
-           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[421.333px] shrink-0",
            "id": "219:8491",
            "k": [
             "01 / REVIEW APPROVED WORK"
@@ -51203,13 +51203,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
            "k": [
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex gap-[12px] h-[42px] items-center p-[12px] relative w-full",
+             "c": "bg-[#0f1530] flex gap-[12px] h-[42px] items-center p-[12px] relative w-[421.333px] shrink-0",
              "n": "Browser / product chrome",
              "id": "219:8493",
              "k": [
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#fff] flex-1 min-w-0",
+               "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#fff] w-[243.333px] shrink-0",
                "id": "219:8494",
                "k": [
                 "Juniper customer portal"
@@ -51235,13 +51235,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#f6f7f9] flex flex-col gap-[12px] items-start p-[16px] relative w-full",
+             "c": "bg-[#f6f7f9] flex flex-col gap-[12px] items-start p-[16px] relative w-[421.333px] shrink-0",
              "n": "Native product content",
              "id": "219:8497",
              "k": [
               {
                "t": "p",
-               "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+               "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-[389.333px] shrink-0",
                "id": "219:8498",
                "k": [
                 "Your repair estimate"
@@ -51249,7 +51249,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+               "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[144px] shrink-0",
                "n": "Status / Approved by the shop",
                "id": "219:8499",
                "k": [
@@ -51265,13 +51265,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[4px] items-start leading-[1.38] p-[10px] relative rounded-[12px] w-full",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[4px] items-start leading-[1.38] p-[10px] relative rounded-[12px] w-[389.333px] shrink-0",
                "n": "Scope",
                "id": "219:8501",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-[369.333px] shrink-0",
                  "id": "219:8502",
                  "k": [
                   "Scope"
@@ -51279,7 +51279,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-[369.333px] shrink-0",
                  "id": "219:8503",
                  "k": [
                   "AC diagnostic + repair"
@@ -51289,7 +51289,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-full",
+               "c": "flex gap-[10px] items-start leading-[1.38] relative text-[12px] w-[389.333px] shrink-0",
                "n": "Field / Service total",
                "id": "219:8504",
                "k": [
@@ -51313,7 +51313,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "p",
-               "c": "font-normal leading-[1.38] relative text-[11px] text-[color:#2a3360] w-full",
+               "c": "font-normal leading-[1.38] relative text-[11px] text-[color:#2a3360] w-[389.333px] shrink-0",
                "id": "219:8507",
                "k": [
                 "Estimate #2048"
@@ -51321,13 +51321,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#f6b400] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+               "c": "bg-[#f6b400] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-[389.333px] shrink-0",
                "n": "UI action / Accept estimate",
                "id": "219:8508",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-center flex-1 min-w-0",
+                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#0f1530] text-center w-[361.333px] shrink-0",
                  "id": "219:8509",
                  "k": [
                   "Accept estimate"
@@ -51343,13 +51343,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "div",
-         "c": "flex flex-col gap-[12px] items-start relative flex-1 min-w-0",
+         "c": "flex flex-col gap-[12px] items-start relative w-[421.333px] shrink-0",
          "n": "Moment / See your history",
          "id": "219:8510",
          "k": [
           {
            "t": "p",
-           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[421.333px] shrink-0",
            "id": "219:8511",
            "k": [
             "02 / SEE YOUR HISTORY"
@@ -51363,13 +51363,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
            "k": [
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex gap-[12px] h-[42px] items-center p-[12px] relative w-full",
+             "c": "bg-[#0f1530] flex gap-[12px] h-[42px] items-center p-[12px] relative w-[421.333px] shrink-0",
              "n": "Browser / product chrome",
              "id": "219:8513",
              "k": [
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#fff] flex-1 min-w-0",
+               "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#fff] w-[243.333px] shrink-0",
                "id": "219:8514",
                "k": [
                 "Juniper customer portal"
@@ -51395,13 +51395,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#f6f7f9] flex flex-col gap-[12px] items-start p-[16px] relative w-full",
+             "c": "bg-[#f6f7f9] flex flex-col gap-[12px] items-start p-[16px] relative w-[421.333px] shrink-0",
              "n": "Native product content",
              "id": "219:8517",
              "k": [
               {
                "t": "p",
-               "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+               "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-[389.333px] shrink-0",
                "id": "219:8518",
                "k": [
                 "Your service history"
@@ -51409,13 +51409,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[4px] items-start leading-[1.38] p-[10px] relative rounded-[12px] w-full",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[4px] items-start leading-[1.38] p-[10px] relative rounded-[12px] w-[389.333px] shrink-0",
                "n": "October 29",
                "id": "219:8519",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-[369.333px] shrink-0",
                  "id": "219:8520",
                  "k": [
                   "October 29"
@@ -51423,7 +51423,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-[369.333px] shrink-0",
                  "id": "219:8521",
                  "k": [
                   "AC repair · Job #1042"
@@ -51433,13 +51433,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[4px] items-start leading-[1.38] p-[10px] relative rounded-[12px] w-full",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[4px] items-start leading-[1.38] p-[10px] relative rounded-[12px] w-[389.333px] shrink-0",
                "n": "Invoice #1042",
                "id": "219:8522",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-[369.333px] shrink-0",
                  "id": "219:8523",
                  "k": [
                   "Invoice #1042"
@@ -51447,7 +51447,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-[369.333px] shrink-0",
                  "id": "219:8524",
                  "k": [
                   "Paid · Receipt available"
@@ -51457,13 +51457,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[4px] items-start leading-[1.38] p-[10px] relative rounded-[12px] w-full",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[4px] items-start leading-[1.38] p-[10px] relative rounded-[12px] w-[389.333px] shrink-0",
                "n": "Next visit",
                "id": "219:8525",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-[369.333px] shrink-0",
                  "id": "219:8526",
                  "k": [
                   "Next visit"
@@ -51471,7 +51471,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-[369.333px] shrink-0",
                  "id": "219:8527",
                  "k": [
                   "Heating tune-up · November 12"
@@ -51481,13 +51481,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+               "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-[389.333px] shrink-0",
                "n": "UI action / View visit details",
                "id": "219:8528",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center w-[361.333px] shrink-0",
                  "id": "219:8529",
                  "k": [
                   "View visit details"
@@ -51503,13 +51503,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "div",
-         "c": "flex flex-col gap-[12px] items-start relative flex-1 min-w-0",
+         "c": "flex flex-col gap-[12px] items-start relative w-[421.333px] shrink-0",
          "n": "Moment / Request a new time",
          "id": "219:8530",
          "k": [
           {
            "t": "p",
-           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[421.333px] shrink-0",
            "id": "219:8531",
            "k": [
             "03 / REQUEST A NEW TIME"
@@ -51523,13 +51523,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
            "k": [
             {
              "t": "div",
-             "c": "bg-[#0f1530] flex gap-[12px] h-[42px] items-center p-[12px] relative w-full",
+             "c": "bg-[#0f1530] flex gap-[12px] h-[42px] items-center p-[12px] relative w-[421.333px] shrink-0",
              "n": "Browser / product chrome",
              "id": "219:8533",
              "k": [
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#fff] flex-1 min-w-0",
+               "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#fff] w-[243.333px] shrink-0",
                "id": "219:8534",
                "k": [
                 "Juniper customer portal"
@@ -51555,13 +51555,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#f6f7f9] flex flex-col gap-[12px] items-start p-[16px] relative w-full",
+             "c": "bg-[#f6f7f9] flex flex-col gap-[12px] items-start p-[16px] relative w-[421.333px] shrink-0",
              "n": "Native product content",
              "id": "219:8537",
              "k": [
               {
                "t": "p",
-               "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-full",
+               "c": "font-semibold leading-[1.38] relative text-[22px] text-[color:#0f1530] w-[389.333px] shrink-0",
                "id": "219:8538",
                "k": [
                 "Request a new time"
@@ -51569,13 +51569,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[4px] items-start leading-[1.38] p-[10px] relative rounded-[12px] w-full",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[4px] items-start leading-[1.38] p-[10px] relative rounded-[12px] w-[389.333px] shrink-0",
                "n": "Current visit",
                "id": "219:8539",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-[369.333px] shrink-0",
                  "id": "219:8540",
                  "k": [
                   "Current visit"
@@ -51583,7 +51583,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-[369.333px] shrink-0",
                  "id": "219:8541",
                  "k": [
                   "Nov 12 · 10:00–12:00"
@@ -51593,13 +51593,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[4px] items-start leading-[1.38] p-[10px] relative rounded-[12px] w-full",
+               "c": "bg-[#fff] border border-[#e6dccb] border-solid flex flex-col gap-[4px] items-start leading-[1.38] p-[10px] relative rounded-[12px] w-[389.333px] shrink-0",
                "n": "Requested visit",
                "id": "219:8542",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-[369.333px] shrink-0",
                  "id": "219:8543",
                  "k": [
                   "Requested visit"
@@ -51607,7 +51607,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-[369.333px] shrink-0",
                  "id": "219:8544",
                  "k": [
                   "Nov 13 · 14:00–16:00"
@@ -51617,7 +51617,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+               "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[156px] shrink-0",
                "n": "Status / Awaiting shop approval",
                "id": "219:8545",
                "k": [
@@ -51633,7 +51633,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "p",
-               "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] w-full",
+               "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] w-[389.333px] shrink-0",
                "id": "219:8547",
                "k": [
                 "Your visit changes after approval."
@@ -51641,13 +51641,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+               "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-[389.333px] shrink-0",
                "n": "UI action / Request sent",
                "id": "219:8548",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center w-[361.333px] shrink-0",
                  "id": "219:8549",
                  "k": [
                   "Request sent"
@@ -51668,13 +51668,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
     },
     {
      "t": "div",
-     "c": "bg-[#f3eadc] flex flex-col gap-[20px] items-start p-[64px] relative w-full",
+     "c": "bg-[#f3eadc] flex flex-col gap-[20px] items-start p-[64px] relative w-[1440px] shrink-0",
      "n": "03 / Flagships share the work",
      "id": "219:8550",
      "k": [
       {
        "t": "p",
-       "c": "font-semibold leading-[1.08] relative text-[36px] text-[color:#0f1530] tracking-[-0.9px] w-full",
+       "c": "font-semibold leading-[1.08] relative text-[36px] text-[color:#0f1530] tracking-[-0.9px] w-[1312px] shrink-0",
        "id": "219:8551",
        "k": [
         "One customer. Connected work."
@@ -51682,19 +51682,19 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
       },
       {
        "t": "div",
-       "c": "flex font-medium gap-[12px] items-start leading-[1.38] relative text-left w-full",
+       "c": "flex font-medium gap-[12px] items-start leading-[1.38] relative text-left w-[1312px] shrink-0",
        "n": "Related product handoffs",
        "id": "219:8552",
        "k": [
         {
          "t": "div",
-         "c": "bg-[#fff] flex flex-col gap-[6px] items-start p-[16px] relative rounded-[12px] flex-1 min-w-0",
+         "c": "bg-[#fff] flex flex-col gap-[6px] items-start p-[16px] relative rounded-[12px] w-[429.333px] shrink-0",
          "n": "Link / Operations / Visit + payment",
          "id": "219:8553",
          "k": [
           {
            "t": "p",
-           "c": "relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "c": "relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[397.333px] shrink-0",
            "id": "219:8554",
            "k": [
             "OPERATIONS"
@@ -51702,7 +51702,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "relative text-[18px] text-[color:#0f1530] w-full",
+           "c": "relative text-[18px] text-[color:#0f1530] w-[397.333px] shrink-0",
            "id": "219:8555",
            "k": [
             "Visit + payment"
@@ -51712,13 +51712,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "div",
-         "c": "bg-[#fff] flex flex-col gap-[6px] items-start p-[16px] relative rounded-[12px] flex-1 min-w-0",
+         "c": "bg-[#fff] flex flex-col gap-[6px] items-start p-[16px] relative rounded-[12px] w-[429.333px] shrink-0",
          "n": "Link / Revenue / Approved work",
          "id": "219:8556",
          "k": [
           {
            "t": "p",
-           "c": "relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "c": "relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[397.333px] shrink-0",
            "id": "219:8557",
            "k": [
             "REVENUE"
@@ -51726,7 +51726,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "relative text-[18px] text-[color:#0f1530] w-full",
+           "c": "relative text-[18px] text-[color:#0f1530] w-[397.333px] shrink-0",
            "id": "219:8558",
            "k": [
             "Approved work"
@@ -51736,13 +51736,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "div",
-         "c": "bg-[#fff] flex flex-col gap-[6px] items-start p-[16px] relative rounded-[12px] flex-1 min-w-0",
+         "c": "bg-[#fff] flex flex-col gap-[6px] items-start p-[16px] relative rounded-[12px] w-[429.333px] shrink-0",
          "n": "Link / Retention / The next visit",
          "id": "219:8559",
          "k": [
           {
            "t": "p",
-           "c": "relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "c": "relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[397.333px] shrink-0",
            "id": "219:8560",
            "k": [
             "RETENTION"
@@ -51750,7 +51750,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "p",
-           "c": "relative text-[18px] text-[color:#0f1530] w-full",
+           "c": "relative text-[18px] text-[color:#0f1530] w-[397.333px] shrink-0",
            "id": "219:8561",
            "k": [
             "The next visit"
@@ -51762,7 +51762,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
       },
       {
        "t": "div",
-       "c": "flex gap-[10px] items-start relative w-full",
+       "c": "flex gap-[10px] items-start relative w-[1312px] shrink-0",
        "n": "Shared owner control",
        "id": "219:8562",
        "k": [
@@ -51781,7 +51781,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
         },
         {
          "t": "p",
-         "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] text-left flex-1 min-w-0",
+         "c": "font-normal leading-[1.38] relative text-[12px] text-[color:#2a3360] text-left w-[1284px] shrink-0",
          "id": "219:8565",
          "k": [
           "Command Center oversees rules and approvals."
@@ -51793,13 +51793,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
     },
     {
      "t": "div",
-     "c": "bg-[#0f1530] flex flex-col gap-[24px] items-start p-[64px] relative w-full",
+     "c": "bg-[#0f1530] flex flex-col gap-[24px] items-start p-[64px] relative w-[1440px] shrink-0",
      "n": "04 / See your workflow",
      "id": "219:8566",
      "k": [
       {
        "t": "div",
-       "c": "font-semibold relative text-[48px] text-[color:#fff] tracking-[-1.2px] w-full",
+       "c": "font-semibold relative text-[48px] text-[color:#fff] tracking-[-1.2px] w-[1312px] shrink-0",
        "id": "219:8567",
        "k": [
         {
@@ -51863,7 +51863,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
           },
           {
            "t": "div",
-           "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+           "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[190px] shrink-0",
            "n": "Status / Illustrative preview",
            "id": "219:8587",
            "k": [
@@ -51970,7 +51970,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
              "k": [
               {
                "t": "p",
-               "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+               "c": "font-medium leading-[1.38] relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-[270px] shrink-0",
                "id": "219:8602",
                "k": [
                 "NEXT VISIT"
@@ -51978,7 +51978,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "p",
-               "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] w-full",
+               "c": "font-semibold leading-[1.38] relative text-[20px] text-[color:#0f1530] w-[270px] shrink-0",
                "id": "219:8603",
                "k": [
                 "Heating tune-up"
@@ -51986,7 +51986,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "p",
-               "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#2a3360] w-full",
+               "c": "font-normal leading-[1.38] relative text-[14px] text-[color:#2a3360] w-[270px] shrink-0",
                "id": "219:8604",
                "k": [
                 "November 12 · 10:00–12:00"
@@ -51994,13 +51994,13 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-full",
+               "c": "bg-[#0f1530] flex h-[38px] items-center justify-center px-[14px] relative rounded-[12px] w-[270px] shrink-0",
                "n": "UI action / Request a new time",
                "id": "219:8605",
                "k": [
                 {
                  "t": "p",
-                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center flex-1 min-w-0",
+                 "c": "font-medium leading-[1.38] relative text-[12px] text-[color:#fff] text-center w-[242px] shrink-0",
                  "id": "219:8606",
                  "k": [
                   "Request a new time"
@@ -52060,7 +52060,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
             },
             {
              "t": "div",
-             "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+             "c": "bg-[#fff] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[162px] shrink-0",
              "n": "Status / History + approved work",
              "id": "219:8612",
              "k": [
@@ -52170,7 +52170,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+               "c": "bg-[#e4f1e8] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[144px] shrink-0",
                "n": "Status / Approved by the shop",
                "id": "219:8626",
                "k": [
@@ -52192,7 +52192,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                "k": [
                 {
                  "t": "p",
-                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-[290px] shrink-0",
                  "id": "219:8629",
                  "k": [
                   "Scope"
@@ -52200,7 +52200,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-[290px] shrink-0",
                  "id": "219:8630",
                  "k": [
                   "AC diagnostic + repair"
@@ -52336,7 +52336,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                "k": [
                 {
                  "t": "p",
-                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-[290px] shrink-0",
                  "id": "219:8647",
                  "k": [
                   "October 29"
@@ -52344,7 +52344,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-[290px] shrink-0",
                  "id": "219:8648",
                  "k": [
                   "AC repair · Job #1042"
@@ -52360,7 +52360,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                "k": [
                 {
                  "t": "p",
-                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-[290px] shrink-0",
                  "id": "219:8650",
                  "k": [
                   "Invoice #1042"
@@ -52368,7 +52368,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-[290px] shrink-0",
                  "id": "219:8651",
                  "k": [
                   "Paid · Receipt available"
@@ -52384,7 +52384,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                "k": [
                 {
                  "t": "p",
-                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-[290px] shrink-0",
                  "id": "219:8653",
                  "k": [
                   "Next visit"
@@ -52392,7 +52392,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-[290px] shrink-0",
                  "id": "219:8654",
                  "k": [
                   "Heating tune-up · November 12"
@@ -52496,7 +52496,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                "k": [
                 {
                  "t": "p",
-                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-[290px] shrink-0",
                  "id": "219:8667",
                  "k": [
                   "Current visit"
@@ -52504,7 +52504,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-[290px] shrink-0",
                  "id": "219:8668",
                  "k": [
                   "Nov 12 · 10:00–12:00"
@@ -52520,7 +52520,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                "k": [
                 {
                  "t": "p",
-                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-full",
+                 "c": "font-normal relative text-[10px] text-[color:#2a3360] w-[290px] shrink-0",
                  "id": "219:8670",
                  "k": [
                   "Requested visit"
@@ -52528,7 +52528,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
                 },
                 {
                  "t": "p",
-                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-full",
+                 "c": "font-medium relative text-[14px] text-[color:#0f1530] w-[290px] shrink-0",
                  "id": "219:8671",
                  "k": [
                   "Nov 13 · 14:00–16:00"
@@ -52538,7 +52538,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
               },
               {
                "t": "div",
-               "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-full",
+               "c": "bg-[#fff4d6] flex h-[27px] items-center px-[10px] relative rounded-[12px] w-[156px] shrink-0",
                "n": "Status / Awaiting shop approval",
                "id": "219:8672",
                "k": [
@@ -52615,7 +52615,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
          "k": [
           {
            "t": "p",
-           "c": "relative text-[11px] text-[color:#2a3360] tracking-[1.1px] w-full",
+           "c": "relative text-[11px] text-[color:#2a3360] tracking-[1.1px] shrink-0 w-max whitespace-nowrap",
            "id": "219:8681",
            "k": [
             "OPERATIONS"

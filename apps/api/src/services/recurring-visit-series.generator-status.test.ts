@@ -27,7 +27,7 @@ beforeEach(() => {
   fakeDb.resetTestState();
 });
 
-function seedSeries(companyId: string, customerId: string, status: "active" | "paused" | "cancelled") {
+function seedSeries(companyId: string, customerId: string, status: string) {
   const row = {
     id: crypto.randomUUID(),
     companyId,
@@ -72,6 +72,13 @@ describe("FS-59 generator respects series status", () => {
     const w = world();
     const s = seedSeries(w.a.id, w.ca.id, "cancelled");
     await expect(generateRecurringVisitOccurrences(w.a.id, s.id, 4)).resolves.toMatchObject({ inserted: 0, skippedReason: "cancelled" });
+    expect(occurrencesOf(s.id)).toHaveLength(0);
+  });
+
+  it("fails safe: an unknown/future status is skipped as inactive", async () => {
+    const w = world();
+    const s = seedSeries(w.a.id, w.ca.id, "archived");
+    await expect(generateRecurringVisitOccurrences(w.a.id, s.id, 3)).resolves.toEqual({ requested: 3, inserted: 0, totalActive: 0, skippedReason: "inactive" });
     expect(occurrencesOf(s.id)).toHaveLength(0);
   });
 

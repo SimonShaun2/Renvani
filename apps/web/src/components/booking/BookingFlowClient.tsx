@@ -17,12 +17,20 @@ import {
 import {
   useBookingConfirmation,
   useCaptureBookingInterest,
-  useCheckZipCoverage,
   usePublicAvailability,
   usePublicBookingSettings,
   useSubmitBookingRequest,
   type PublicBookingSettingsRecord
 } from "@/src/hooks/booking.hooks";
+import { useServesZip } from "@/src/hooks/public-growth.hooks";
+import { ZipCheckCard } from "@/src/components/booking/growth/ZipCheckCard";
+import { EmergencyBadge, EmergencyToggle } from "@/src/components/booking/growth/EmergencyToggle";
+import {
+  EMERGENCY_COPY,
+  emergencyAvailable,
+  emergencySubmitFields,
+  emergencyWasDowngraded
+} from "@/src/components/booking/growth/booking-growth.utils";
 import {
   buildRecurringScheduleMessage,
   clearConfirmedBookingSnapshot,
@@ -281,7 +289,7 @@ export function BookingFlowClient({
   const searchParams = useSearchParams();
   const source = searchParams.get("src") ?? "direct";
   const settingsQuery = usePublicBookingSettings(slug);
-  const zipCheckMutation = useCheckZipCoverage(slug);
+  const servesZipMutation = useServesZip(slug);
   const emailCaptureMutation = useCaptureBookingInterest(slug);
   const submitMutation = useSubmitBookingRequest(slug);
   const {
@@ -304,7 +312,6 @@ export function BookingFlowClient({
     notes,
     smsConsent,
     smsConsentMarketing,
-    servedTechCount,
     hydrateFromRoute,
     setReferenceNumber,
     setHoldToken,
@@ -315,8 +322,8 @@ export function BookingFlowClient({
     setZipCoverage,
     updateFields
   } = useBookingFlowStore();
-  const [zipCaptureEmail, setZipCaptureEmail] = useState("");
-  const [zipNotServed, setZipNotServed] = useState(false);
+  const emergencyOn = emergencyAvailable(settingsQuery.data?.booking);
+  const isEmergency = emergencyOn && urgency === "emergency";
   const [showAllTimes, setShowAllTimes] = useState(preferredWindow !== "first_available");
   const availabilityDate = preferredDate || new Date().toISOString().slice(0, 10);
   const availabilityQuery = usePublicAvailability(slug, zipVerified ? zip : null, availabilityDate);
@@ -348,46 +355,6 @@ export function BookingFlowClient({
     router.push(buildStepHref(slug, nextStep, source));
   }
 
-  async function handleCheckCoverage() {
-    try {
-      const coverage = await zipCheckMutation.mutateAsync(zip);
-      setZipCoverage(coverage.covered, coverage.techCount);
-      setZipNotServed(!coverage.covered);
-
-      if (!coverage.covered) {
-        showToast({
-          tone: "info",
-          title: "That ZIP is not currently covered",
-          description: "Leave an email and we will notify you when service expands."
-        });
-      }
-    } catch (error) {
-      showToast({
-        tone: "error",
-        title: "Coverage check failed",
-        description: error instanceof Error ? error.message : "Please try again."
-      });
-    }
-  }
-
-  async function handleCaptureInterest() {
-    try {
-      await emailCaptureMutation.mutateAsync({ zip, email: zipCaptureEmail });
-      showToast({
-        tone: "success",
-        title: "You are on the list",
-        description: "We will notify you when this area opens up."
-      });
-      setZipCaptureEmail("");
-    } catch (error) {
-      showToast({
-        tone: "error",
-        title: "Could not save that email",
-        description: error instanceof Error ? error.message : "Please try again."
-      });
-    }
-  }
-
   async function handleSubmitBooking() {
     if (submitMutation.isPending) {
       return;
@@ -412,7 +379,7 @@ export function BookingFlowClient({
           serviceCategory,
           serviceType,
           serviceDetail,
-          urgency,
+          ...emergencySubmitFields(isEmergency, urgency),
           preferredDate,
           preferredWindow,
           customerNotes: notes,
@@ -422,6 +389,9 @@ export function BookingFlowClient({
       });
 
       clearBookingIdempotencyKey(slug);
+      if (emergencyWasDowngraded(response)) {
+        showToast({ tone: "info", title: EMERGENCY_COPY.downgraded });
+      }
       const reference = response.confirmation.referenceNumber;
       setReferenceNumber(reference);
       setHoldToken(response.holdToken ?? null);
@@ -496,49 +466,28 @@ export function BookingFlowClient({
   }
 
   const settings = settingsQuery.data.booking;
-  const serviceAreaZipCodes = settings.serviceAreaZipCodes ?? [];
 
   return (
-    <div className="mx-auto w-full max-w-[480px] px-4 py-6">
+    <div className="mx-auto w-full max-w-[480px] px-4 py-6 md:max-w-[688px] md:px-6">
       <div className="space-y-4">
         <BookingHeader slug={slug} source={source} step={step} settings={settings} />
 
         {step === "location" ? (
           <div className="space-y-4">
-            <BookingCard>
-              <h2 className="text-2xl font-semibold tracking-tight text-neutral-950">Where are you located?</h2>
-              <p className="mt-2 text-sm leading-6 text-neutral-500">
-                Enter your ZIP code so we can check coverage and route the right technician to you.
-              </p>
-              <label className="mt-5 block">
-                <span className="text-sm font-semibold text-neutral-700">ZIP code</span>
-                <input
-                  value={zip}
-                  onChange={(event) => updateFields({ zip: event.target.value })}
-                  placeholder="e.g. 74133"
-                  className="mt-2 min-h-12 w-full rounded-[20px] border border-neutral-200 px-4 text-base outline-none transition focus:border-brand-accent"
-                />
-              </label>
-              <p className="mt-3 text-xs text-neutral-400">
-                We currently cover {serviceAreaZipCodes.length} ZIP codes across our core service area.
-              </p>
-              <button
-                type="button"
-                onClick={() => {
-                  void handleCheckCoverage();
-                }}
-                disabled={zip.trim().length < 5 || zipCheckMutation.isPending}
-                className="mt-5 inline-flex min-h-12 w-full items-center justify-center rounded-[20px] bg-brand-accent px-4 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {zipCheckMutation.isPending ? "Checking..." : "Check My Area"}
-              </button>
-              {zipVerified ? (
-                <div className="mt-5 rounded-[24px] border border-success/20 bg-success-light px-4 py-4 text-sm text-success">
-                  <p className="font-semibold">Great news - we serve {zip}!</p>
-                  <p className="mt-1">{servedTechCount} technicians currently cover your area.</p>
-                </div>
-              ) : null}
-            </BookingCard>
+            <ZipCheckCard
+              companyName={settings.companyName}
+              zip={zip}
+              onZipChange={(value) => {
+                updateFields({ zip: value });
+                if (zipVerified) setZipCoverage(false, 0);
+              }}
+              checkZip={(value) => servesZipMutation.mutateAsync(value)}
+              onContinue={(value) => {
+                updateFields({ zip: value });
+                setZipCoverage(true, 0);
+              }}
+              captureEmail={(input) => emailCaptureMutation.mutateAsync(input)}
+            />
 
             {zipVerified ? (
               <BookingCard>
@@ -593,37 +542,6 @@ export function BookingFlowClient({
               </BookingCard>
             ) : null}
 
-            {zipNotServed ? (
-              <BookingCard>
-                <h3 className="text-xl font-semibold tracking-tight text-neutral-950">We&apos;re not in your area yet</h3>
-                <p className="mt-2 text-sm leading-6 text-neutral-500">
-                  Leave an email and we&apos;ll notify you if we expand service into {zip}.
-                </p>
-                <input
-                  value={zipCaptureEmail}
-                  onChange={(event) => setZipCaptureEmail(event.target.value)}
-                  placeholder="Email address"
-                  className="mt-4 min-h-12 w-full rounded-[20px] border border-neutral-200 px-4 text-sm outline-none transition focus:border-brand-accent"
-                />
-                <button
-                  type="button"
-                  onClick={() => {
-                    void handleCaptureInterest();
-                  }}
-                  disabled={!zipCaptureEmail.trim() || emailCaptureMutation.isPending}
-                  className="mt-4 inline-flex min-h-12 w-full items-center justify-center rounded-[20px] bg-neutral-950 px-4 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  {emailCaptureMutation.isPending ? "Saving..." : "Notify me when you&apos;re in my area"}
-                </button>
-                <div className="mt-5 flex flex-wrap gap-2">
-                  {serviceAreaZipCodes.slice(0, 10).map((servedZip) => (
-                    <span key={servedZip} className="rounded-full bg-neutral-100 px-3 py-1 text-xs font-semibold text-neutral-500">
-                      {servedZip}
-                    </span>
-                  ))}
-                </div>
-              </BookingCard>
-            ) : null}
           </div>
         ) : null}
 
@@ -689,9 +607,16 @@ export function BookingFlowClient({
                 ))}
               </div>
             ) : null}
-            <div className="mt-5 space-y-2">
+            {emergencyOn ? (
+              <div className="mt-5">
+                <EmergencyToggle
+                  on={isEmergency}
+                  onChange={(on) => updateFields({ urgency: on ? "emergency" : "this_week" })}
+                />
+              </div>
+            ) : null}
+            <div className={cn("mt-5 space-y-2", isEmergency && "hidden")}>
               {[
-                { value: "emergency", label: "Emergency", note: "No cooling or heating" },
                 { value: "this_week", label: "This week", note: "Soon, but flexible" },
                 { value: "flexible", label: "Flexible", note: "Best rate availability" }
               ].map((option) => (
@@ -912,7 +837,10 @@ export function BookingFlowClient({
                 Back
               </a>
             </div>
-            <h2 className="mt-4 text-2xl font-semibold tracking-tight text-neutral-950">Review your booking</h2>
+            <div className="mt-4 flex items-center justify-between gap-3">
+              <h2 className="text-2xl font-semibold tracking-tight text-neutral-950">Review your booking</h2>
+              {isEmergency ? <EmergencyBadge /> : null}
+            </div>
             <div className="mt-4 rounded-[24px] border-l-4 border-brand-accent bg-brand-accent-light/30 px-4 py-4">
               <dl className="space-y-3 text-sm">
                 <div className="flex items-start justify-between gap-4">
@@ -937,6 +865,12 @@ export function BookingFlowClient({
                     {city}, {state} {zip}
                   </dd>
                 </div>
+                {isEmergency ? (
+                  <div className="flex items-start justify-between gap-4">
+                    <dt className="text-neutral-500">{EMERGENCY_COPY.priorityLabel}</dt>
+                    <dd className="text-right font-semibold text-neutral-900">{EMERGENCY_COPY.priorityValue}</dd>
+                  </div>
+                ) : null}
                 <div className="flex items-start justify-between gap-4">
                   <dt className="text-neutral-500">Contact</dt>
                   <dd className="text-right font-semibold text-neutral-900">

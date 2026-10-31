@@ -1,5 +1,7 @@
 import type { MetadataRoute } from "next";
 
+import type { PublicBookingSettingsRecord } from "@/src/hooks/booking.hooks";
+import { listServiceAreaPages, serviceAreaPath } from "@/src/components/growth/service-pages/service-area-pages";
 import { fetchPublicBookingSettingsBySlug } from "@/src/lib/public-booking-server";
 
 /**
@@ -26,6 +28,7 @@ export const ROBOTS_ALLOW = [
   { key: "how-it-works", prefix: "/how-it-works" },
   { key: "industries", prefix: "/industries" },
   { key: "shop-site", prefix: "/site/" }, // shop sites + /site/:slug/inquire
+  { key: "service-area", prefix: "/site/*/*/" }, // /site/:slug/:service/:area (explicit; also under /site/)
   { key: "public-booking", prefix: "/book/" }
 ] as const;
 
@@ -68,6 +71,32 @@ export class SitemapPublishCheckError extends Error {
 
 type Fetcher = (slug: string) => Promise<unknown | null>;
 
+/** Per-shop cap on service x area URLs (offered services x ZIPs can grow fast). */
+export const MAX_SERVICE_AREA_URLS_PER_SHOP = 500;
+
+type ServiceAreaSource = Pick<PublicBookingSettingsRecord, "offeredServices" | "serviceAreaZipCodes">;
+
+/**
+ * Service x area pages for a published shop, from the same public settings the page route renders
+ * (resolveServiceAreaPage 404s anything not listed here). Deduped by path; empty service slugs skipped.
+ */
+export function serviceAreaSitemapPaths(slug: string, settings: unknown): string[] {
+  if (!settings || typeof settings !== "object") return [];
+  const source = settings as Partial<ServiceAreaSource>;
+  if (!Array.isArray(source.offeredServices)) return [];
+  const pages = listServiceAreaPages({
+    offeredServices: source.offeredServices,
+    serviceAreaZipCodes: Array.isArray(source.serviceAreaZipCodes) ? source.serviceAreaZipCodes : []
+  });
+  const paths = new Set<string>();
+  for (const page of pages) {
+    if (!page.serviceSlug) continue;
+    paths.add(serviceAreaPath(encodeURIComponent(slug), page));
+    if (paths.size >= MAX_SERVICE_AREA_URLS_PER_SHOP) break;
+  }
+  return [...paths];
+}
+
 export async function buildPublicSitemap(
   env: NodeJS.ProcessEnv = process.env,
   fetchSettings: Fetcher = fetchPublicBookingSettingsBySlug
@@ -79,7 +108,8 @@ export async function buildPublicSitemap(
     optInSlugs(env).map(async (slug) => {
       try {
         // null = genuinely unpublished (API 404); a throw = outage/bad response, never treated as unpublished.
-        return (await fetchSettings(slug)) ? slug : null;
+        const settings = await fetchSettings(slug);
+        return settings ? { slug, settings } : null;
       } catch (error) {
         failures.push({ slug, error });
         return null;
@@ -94,14 +124,19 @@ export async function buildPublicSitemap(
     throw new SitemapPublishCheckError(failures.map((f) => f.slug));
   }
   return published
-    .filter((slug): slug is string => slug !== null)
-    .flatMap((slug) =>
-      SHOP_PAGE_TYPES.map((type) => ({
+    .filter((shop): shop is { slug: string; settings: NonNullable<typeof shop>["settings"] } => shop !== null)
+    .flatMap(({ slug, settings }) => [
+      ...SHOP_PAGE_TYPES.map((type) => ({
         url: `${base}${type.path(encodeURIComponent(slug))}`,
         changeFrequency: "weekly" as const,
         priority: type.priority
+      })),
+      ...serviceAreaSitemapPaths(slug, settings).map((path) => ({
+        url: `${base}${path}`,
+        changeFrequency: "weekly" as const,
+        priority: 0.6
       }))
-    );
+    ]);
 }
 
 /** Marketing website pages (Figma 171:2) listed in the sitemap. Add a page here when its route ships. */
@@ -109,7 +144,7 @@ export const MARKETING_SITEMAP_PATHS = [
   { path: "/", priority: 1 },
   { path: "/product", priority: 0.9 },
   { path: "/how-it-works", priority: 0.9 },
-  ...["growth", "revenue", "operations", "retention", "command-center", "online-booking", "estimates-approvals", "scheduling-dispatch"].map((slug) => ({ path: `/product/${slug}`, priority: 0.8 })),
+  ...["growth", "revenue", "operations", "retention", "command-center", "online-booking", "estimates-approvals", "scheduling-dispatch", "technician-app", "invoices-payments", "service-agreements", "ai-revenue-intelligence", "customers-properties-assets", "onboarding-data-import", "inquiry-response-follow-up", "jobs-work-orders", "time-tracking-job-photos", "reminders-win-backs", "reporting-job-sources", "websites", "price-book-service-catalog", "customer-portal"].map((slug) => ({ path: `/product/${slug}`, priority: 0.8 })),
   { path: "/pricing", priority: 0.8 },
   { path: "/industries", priority: 0.8 },
   ...["hvac", "plumbing", "electrical"].map((slug) => ({ path: `/industries/${slug}`, priority: 0.7 }))
@@ -127,7 +162,45 @@ export function buildPublicRobots(env: NodeJS.ProcessEnv = process.env): Metadat
   if (!base) return { rules: [{ userAgent: "*", disallow: "/" }] };
   return {
     rules: [{ userAgent: "*", allow: ROBOTS_ALLOW.map((a) => a.prefix), disallow: [...ROBOTS_DISALLOW] }],
-    sitemap: `${base}/sitemap.xml`,
+    sitemap: `${base}${SITEMAP_INDEX_PATH}`,
     host: base
   };
+}
+
+/** Protocol limit per sitemap file (sitemaps.org): 50,000 URLs. */
+export const SITEMAP_URL_LIMIT = 50_000;
+/** Opt-in shops are capped at 500 (optInSlugs), each with at most SHOP_PAGE_TYPES + MAX_SERVICE_AREA_URLS_PER_SHOP URLs. */
+export const MAX_SITEMAP_URLS =
+  MARKETING_SITEMAP_PATHS.length + 500 * (SHOP_PAGE_TYPES.length + MAX_SERVICE_AREA_URLS_PER_SHOP);
+/** Fixed sitemap count covering the worst case, so ids are stable for generateSitemaps and the index. */
+export const SITEMAP_COUNT = Math.ceil(MAX_SITEMAP_URLS / SITEMAP_URL_LIMIT);
+export const SITEMAP_INDEX_PATH = "/sitemap-index.xml";
+
+export function sitemapIds(): { id: number }[] {
+  return Array.from({ length: SITEMAP_COUNT }, (_, id) => ({ id }));
+}
+
+/** Deterministic split: chunk `id` holds entries [id*limit, (id+1)*limit). Empty chunks are valid empty urlsets. */
+export function sitemapChunk(all: MetadataRoute.Sitemap, id: number, limit = SITEMAP_URL_LIMIT): MetadataRoute.Sitemap {
+  if (!Number.isInteger(id) || id < 0) return [];
+  return all.slice(id * limit, (id + 1) * limit);
+}
+
+export async function buildFullSitemap(
+  env: NodeJS.ProcessEnv = process.env,
+  fetchSettings: Fetcher = fetchPublicBookingSettingsBySlug
+): Promise<MetadataRoute.Sitemap> {
+  return [...buildMarketingSitemap(env), ...(await buildPublicSitemap(env, fetchSettings))];
+}
+
+const xmlEscape = (v: string) => v.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;");
+
+/** Sitemap index (sitemaps.org) listing every split sitemap served by app/sitemap.ts at /sitemap/{id}.xml. */
+export function buildSitemapIndexXml(env: NodeJS.ProcessEnv = process.env): string | null {
+  const base = publicSiteUrl(env);
+  if (!base) return null;
+  const items = sitemapIds()
+    .map(({ id }) => `<sitemap><loc>${xmlEscape(`${base}/sitemap/${id}.xml`)}</loc></sitemap>`)
+    .join("");
+  return `<?xml version="1.0" encoding="UTF-8"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${items}</sitemapindex>`;
 }

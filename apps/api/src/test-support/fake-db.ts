@@ -45,6 +45,9 @@ type TableName =
   | "growthCheckScans"
   | "growthCheckFindings"
   | "growthCheckFindingRevisions"
+  | "growthCheckReportDrafts"
+  | "growthCheckReportDraftRevisions"
+  | "growthCheckReportShares"
   | "technicians"
   | "jobTasks"
   | "jobProducts"
@@ -2107,6 +2110,9 @@ type AnyTestRecord =
   | TestGrowthCheckScanRecord
   | TestGrowthCheckFindingRecord
   | TestGrowthCheckFindingRevisionRecord
+  | TestGrowthCheckReportDraftRecord
+  | TestGrowthCheckReportDraftRevisionRecord
+  | TestGrowthCheckReportShareRecord
   | TestCompanyRecord
   | TestUserRecord
   | TestRefreshTokenRecord
@@ -2196,6 +2202,9 @@ type MockTable =
   | typeof growthCheckScansTable
   | typeof growthCheckFindingsTable
   | typeof growthCheckFindingRevisionsTable
+  | typeof growthCheckReportDraftsTable
+  | typeof growthCheckReportDraftRevisionsTable
+  | typeof growthCheckReportSharesTable
   | typeof techniciansTable
   | typeof jobTasksTable
   | typeof jobProductsTable
@@ -2262,6 +2271,9 @@ interface TestState {
   growthCheckScans: TestGrowthCheckScanRecord[];
   growthCheckFindings: TestGrowthCheckFindingRecord[];
   growthCheckFindingRevisions: TestGrowthCheckFindingRevisionRecord[];
+  growthCheckReportDrafts: TestGrowthCheckReportDraftRecord[];
+  growthCheckReportDraftRevisions: TestGrowthCheckReportDraftRevisionRecord[];
+  growthCheckReportShares: TestGrowthCheckReportShareRecord[];
   technicians: TestTechnicianRecord[];
   jobTasks: TestJobTaskRecord[];
   jobProducts: TestJobProductRecord[];
@@ -3396,6 +3408,138 @@ export function getGrowthCheckFindingRevisions(): TestGrowthCheckFindingRevision
   return state.growthCheckFindingRevisions;
 }
 
+export interface TestGrowthCheckReportDraftRecord {
+  id: string;
+  companyId: string;
+  scanId: string;
+  version: number;
+  content: Record<string, unknown>;
+  approvedVersion: number | null;
+  approvedByUserId: string | null;
+  approvedAt: Date | null;
+  createdByUserId: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface TestGrowthCheckReportDraftRevisionRecord {
+  id: string;
+  companyId: string;
+  draftId: string;
+  version: number;
+  action: string;
+  actorUserId: string | null;
+  previousContent: Record<string, unknown> | null;
+  nextContent: Record<string, unknown>;
+  idempotencyKey: string;
+  payloadHash: string;
+  createdAt: Date;
+}
+
+export interface TestGrowthCheckReportShareRecord {
+  id: string;
+  companyId: string;
+  draftId: string;
+  draftVersion: number;
+  contentHash: string;
+  snapshot: Record<string, unknown>;
+  tokenHash: string;
+  createdByUserId: string | null;
+  createdAt: Date;
+  expiresAt: Date | null;
+  revokedAt: Date | null;
+  revokedByUserId: string | null;
+  idempotencyKey: string;
+  payloadHash: string;
+}
+
+const growthCheckReportDraftsTable = {
+  __name: "growthCheckReportDrafts",
+  id: "id", companyId: "companyId", scanId: "scanId", version: "version", content: "content",
+  approvedVersion: "approvedVersion", approvedByUserId: "approvedByUserId", approvedAt: "approvedAt",
+  createdByUserId: "createdByUserId", createdAt: "createdAt", updatedAt: "updatedAt"
+} as const;
+
+const growthCheckReportDraftRevisionsTable = {
+  __name: "growthCheckReportDraftRevisions",
+  id: "id", companyId: "companyId", draftId: "draftId", version: "version", action: "action",
+  actorUserId: "actorUserId", previousContent: "previousContent", nextContent: "nextContent",
+  idempotencyKey: "idempotencyKey", payloadHash: "payloadHash", createdAt: "createdAt"
+} as const;
+
+const growthCheckReportSharesTable = {
+  __name: "growthCheckReportShares",
+  id: "id", companyId: "companyId", draftId: "draftId", draftVersion: "draftVersion", contentHash: "contentHash",
+  snapshot: "snapshot", tokenHash: "tokenHash", createdByUserId: "createdByUserId", createdAt: "createdAt",
+  expiresAt: "expiresAt", revokedAt: "revokedAt", revokedByUserId: "revokedByUserId",
+  idempotencyKey: "idempotencyKey", payloadHash: "payloadHash"
+} as const;
+
+function uniqueViolation(): Error {
+  return Object.assign(new Error("duplicate key value violates unique constraint"), { code: "23505" });
+}
+
+function createGrowthCheckReportDraftRecord(
+  values: Partial<TestGrowthCheckReportDraftRecord> & Pick<TestGrowthCheckReportDraftRecord, "companyId" | "scanId" | "content">
+): TestGrowthCheckReportDraftRecord {
+  // Mirrors the unique index (company_id, scan_id).
+  if (state.growthCheckReportDrafts.some((row) => row.companyId === values.companyId && row.scanId === values.scanId)) throw uniqueViolation();
+  const now = new Date();
+  return {
+    id: values.id ?? nextId(), companyId: values.companyId, scanId: values.scanId, version: values.version ?? 1,
+    content: values.content, approvedVersion: values.approvedVersion ?? null, approvedByUserId: values.approvedByUserId ?? null,
+    approvedAt: values.approvedAt ?? null, createdByUserId: values.createdByUserId ?? null,
+    createdAt: values.createdAt ?? now, updatedAt: values.updatedAt ?? now
+  };
+}
+
+function createGrowthCheckReportDraftRevisionRecord(
+  values: Partial<TestGrowthCheckReportDraftRevisionRecord> &
+    Pick<TestGrowthCheckReportDraftRevisionRecord, "companyId" | "draftId" | "version" | "action" | "nextContent">
+): TestGrowthCheckReportDraftRevisionRecord {
+  // Mirrors the unique indexes (draft_id, version) and (company_id, idempotency_key).
+  if (
+    state.growthCheckReportDraftRevisions.some(
+      (row) =>
+        (row.draftId === values.draftId && row.version === values.version) ||
+        (row.companyId === values.companyId && row.idempotencyKey === values.idempotencyKey)
+    )
+  ) throw uniqueViolation();
+  return {
+    id: values.id ?? nextId(), companyId: values.companyId, draftId: values.draftId, version: values.version,
+    action: values.action, actorUserId: values.actorUserId ?? null, previousContent: values.previousContent ?? null,
+    nextContent: values.nextContent, idempotencyKey: values.idempotencyKey ?? `rdr-${nextId()}`,
+    payloadHash: values.payloadHash ?? "hash", createdAt: values.createdAt ?? new Date()
+  };
+}
+
+function createGrowthCheckReportShareRecord(
+  values: Partial<TestGrowthCheckReportShareRecord> &
+    Pick<TestGrowthCheckReportShareRecord, "companyId" | "draftId" | "draftVersion" | "contentHash" | "tokenHash">
+): TestGrowthCheckReportShareRecord {
+  // Mirrors the unique indexes (token_hash) and (company_id, idempotency_key).
+  if (
+    state.growthCheckReportShares.some(
+      (row) => row.tokenHash === values.tokenHash || (row.companyId === values.companyId && row.idempotencyKey === values.idempotencyKey)
+    )
+  ) throw uniqueViolation();
+  return {
+    id: values.id ?? nextId(), companyId: values.companyId, draftId: values.draftId, draftVersion: values.draftVersion,
+    contentHash: values.contentHash, snapshot: values.snapshot ?? {}, tokenHash: values.tokenHash,
+    createdByUserId: values.createdByUserId ?? null, createdAt: values.createdAt ?? new Date(),
+    expiresAt: values.expiresAt ?? null, revokedAt: values.revokedAt ?? null, revokedByUserId: values.revokedByUserId ?? null,
+    idempotencyKey: values.idempotencyKey ?? `rsh-${nextId()}`, payloadHash: values.payloadHash ?? "hash"
+  };
+}
+
+export function getGrowthCheckReportShares(): TestGrowthCheckReportShareRecord[] {
+  return state.growthCheckReportShares;
+}
+
+export function getGrowthCheckReportDraftRevisions(): TestGrowthCheckReportDraftRevisionRecord[] {
+  return state.growthCheckReportDraftRevisions;
+}
+
 const stockLocationsTable = {
   __name: "stockLocations",
   id: "id", companyId: "companyId", name: "name", kind: "kind", technicianId: "technicianId",
@@ -4071,6 +4215,9 @@ const state: TestState = {
   growthCheckScans: [],
   growthCheckFindings: [],
   growthCheckFindingRevisions: [],
+  growthCheckReportDrafts: [],
+  growthCheckReportDraftRevisions: [],
+  growthCheckReportShares: [],
   technicians: [],
   jobTasks: [],
   jobProducts: [],
@@ -4141,6 +4288,9 @@ function restoreState(snapshot: TestState): void {
   state.growthCheckScans.splice(0, state.growthCheckScans.length, ...snapshot.growthCheckScans);
   state.growthCheckFindings.splice(0, state.growthCheckFindings.length, ...snapshot.growthCheckFindings);
   state.growthCheckFindingRevisions.splice(0, state.growthCheckFindingRevisions.length, ...snapshot.growthCheckFindingRevisions);
+  state.growthCheckReportDrafts.splice(0, state.growthCheckReportDrafts.length, ...snapshot.growthCheckReportDrafts);
+  state.growthCheckReportDraftRevisions.splice(0, state.growthCheckReportDraftRevisions.length, ...snapshot.growthCheckReportDraftRevisions);
+  state.growthCheckReportShares.splice(0, state.growthCheckReportShares.length, ...snapshot.growthCheckReportShares);
   state.technicians.splice(0, state.technicians.length, ...snapshot.technicians);
   state.jobTasks.splice(0, state.jobTasks.length, ...snapshot.jobTasks);
   state.jobProducts.splice(0, state.jobProducts.length, ...snapshot.jobProducts);
@@ -4262,6 +4412,12 @@ function getRows(tableName: TableName): AnyTestRecord[] {
       return state.growthCheckFindings;
     case "growthCheckFindingRevisions":
       return state.growthCheckFindingRevisions;
+    case "growthCheckReportDrafts":
+      return state.growthCheckReportDrafts;
+    case "growthCheckReportDraftRevisions":
+      return state.growthCheckReportDraftRevisions;
+    case "growthCheckReportShares":
+      return state.growthCheckReportShares;
     case "technicians":
       return state.technicians;
     case "jobTasks":
@@ -5984,6 +6140,12 @@ function createRow(tableName: TableName, values: Record<string, unknown>): AnyTe
         values as Partial<TestGrowthCheckFindingRevisionRecord> &
           Pick<TestGrowthCheckFindingRevisionRecord, "companyId" | "findingId" | "scanId" | "revision" | "action">
       );
+    case "growthCheckReportDrafts":
+      return createGrowthCheckReportDraftRecord(values as Partial<TestGrowthCheckReportDraftRecord> & Pick<TestGrowthCheckReportDraftRecord, "companyId" | "scanId" | "content">);
+    case "growthCheckReportDraftRevisions":
+      return createGrowthCheckReportDraftRevisionRecord(values as Partial<TestGrowthCheckReportDraftRevisionRecord> & Pick<TestGrowthCheckReportDraftRevisionRecord, "companyId" | "draftId" | "version" | "action" | "nextContent">);
+    case "growthCheckReportShares":
+      return createGrowthCheckReportShareRecord(values as Partial<TestGrowthCheckReportShareRecord> & Pick<TestGrowthCheckReportShareRecord, "companyId" | "draftId" | "draftVersion" | "contentHash" | "tokenHash">);
     case "stockMovements":
       return createStockMovementRecord(values as Partial<TestStockMovementRecord> & Pick<TestStockMovementRecord, "companyId" | "locationId" | "productId" | "kind" | "quantityDelta" | "quantityAfter">);
     case "productCatalog":
@@ -6461,6 +6623,9 @@ export const callRecords = callRecordsTable;
 export const growthCheckScans = growthCheckScansTable;
 export const growthCheckFindings = growthCheckFindingsTable;
 export const growthCheckFindingRevisions = growthCheckFindingRevisionsTable;
+export const growthCheckReportDrafts = growthCheckReportDraftsTable;
+export const growthCheckReportDraftRevisions = growthCheckReportDraftRevisionsTable;
+export const growthCheckReportShares = growthCheckReportSharesTable;
 export const technicians = techniciansTable;
 export const jobTasks = jobTasksTable;
 export const jobProducts = jobProductsTable;
@@ -6928,6 +7093,9 @@ export function createDbModuleMock() {
     growthCheckScans,
     growthCheckFindings,
     growthCheckFindingRevisions,
+    growthCheckReportDrafts,
+    growthCheckReportDraftRevisions,
+    growthCheckReportShares,
     technicians,
     jobTasks,
     jobProducts,
@@ -7003,6 +7171,9 @@ export function resetTestState(): void {
   state.growthCheckScans.length = 0;
   state.growthCheckFindings.length = 0;
   state.growthCheckFindingRevisions.length = 0;
+  state.growthCheckReportDrafts.length = 0;
+  state.growthCheckReportDraftRevisions.length = 0;
+  state.growthCheckReportShares.length = 0;
   state.technicians.length = 0;
   state.jobTasks.length = 0;
   state.jobProducts.length = 0;

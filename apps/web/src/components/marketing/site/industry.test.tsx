@@ -28,7 +28,7 @@ const resolves = (h: string) => {
   if (h.startsWith("#")) return true;
   if (path.startsWith("/product/")) return PRODUCT_PAGES.some((p) => `/product/${p.slug}` === path);
   if (INDUSTRY_HREFS.includes(path)) return true;
-  return ["/", "/product", "/how-it-works", "/pricing", "/signup", "/login", "/product-tour"].includes(path);
+  return ["/", "/product", "/how-it-works", "/pricing", "/signup", "/demo", "/growth-check", "/login", "/tour"].includes(path);
 };
 const anchors = (el: Element) => Array.from(el.querySelectorAll("a")).map((a) => a.getAttribute("href")!);
 
@@ -44,7 +44,7 @@ describe("industries (Figma 176:417/176:504, 175:4297…175:5015, menu 177:686)"
       const { container } = render(<IndustryFrames tree={tree} />);
       expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(2);
       const hrefs = anchors(container);
-      expect(hrefs).toContain("/signup");
+      expect(hrefs).toContain("/demo");
       for (const h of hrefs) expect(resolves(h), h).toBe(true);
     });
   }

@@ -23,10 +23,12 @@ export const ROBOTS_ALLOW = [
   { key: "home", prefix: "/$" }, // marketing home (exact)
   { key: "pricing", prefix: "/pricing" },
   { key: "product", prefix: "/product/" },
-  { key: "product-tour", prefix: "/product-tour" },
+  { key: "tour", prefix: "/tour" },
   { key: "products", prefix: "/product$" }, // products directory (exact)
   { key: "how-it-works", prefix: "/how-it-works" },
   { key: "industries", prefix: "/industries" },
+  { key: "demo", prefix: "/demo" },
+  { key: "growth-check", prefix: "/growth-check" },
   { key: "shop-site", prefix: "/site/" }, // shop sites + /site/:slug/inquire
   { key: "service-area", prefix: "/site/*/*/" }, // /site/:slug/:service/:area (explicit; also under /site/)
   { key: "public-booking", prefix: "/book/" }
@@ -145,8 +147,12 @@ export const MARKETING_SITEMAP_PATHS = [
   { path: "/product", priority: 0.9 },
   { path: "/how-it-works", priority: 0.9 },
   ...["growth", "revenue", "operations", "retention", "command-center", "online-booking", "estimates-approvals", "scheduling-dispatch", "technician-app", "invoices-payments", "service-agreements", "ai-revenue-intelligence", "customers-properties-assets", "onboarding-data-import", "inquiry-response-follow-up", "jobs-work-orders", "time-tracking-job-photos", "reminders-win-backs", "reporting-job-sources", "websites", "price-book-service-catalog", "customer-portal"].map((slug) => ({ path: `/product/${slug}`, priority: 0.8 })),
+  { path: "/tour", priority: 0.8 },
+  ...["approve-the-work", "plan-the-day", "complete-the-visit", "get-paid", "bring-them-back"].map((slug) => ({ path: `/tour/${slug}`, priority: 0.7 })),
   { path: "/pricing", priority: 0.8 },
   { path: "/industries", priority: 0.8 },
+  { path: "/demo", priority: 0.8 },
+  { path: "/growth-check", priority: 0.7 },
   ...["hvac", "plumbing", "electrical"].map((slug) => ({ path: `/industries/${slug}`, priority: 0.7 }))
 ] as const;
 

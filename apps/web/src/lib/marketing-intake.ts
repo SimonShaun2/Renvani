@@ -1,0 +1,174 @@
+import type { z } from "zod";
+
+import {
+  HOME_SERVICE_TRADES,
+  MARKETING_HONEYPOT_FIELD,
+  MARKETING_INTAKE_LIMITS,
+  MarketingDemoRequestBodySchema,
+  MarketingGrowthCheckBodySchema,
+  type HomeServiceTrade,
+  type MarketingDemoRequestBody,
+  type MarketingGrowthCheckBody,
+  type MarketingIntakeResponse
+} from "@fsm/types";
+
+import { API_BASE_URL } from "@/src/lib/api-base-url";
+
+/** Marketing intake contract (#328): schemas, limits, honeypot field and trades come from @fsm/types (the same ones the API validates with). */
+export { HOME_SERVICE_TRADES, MARKETING_HONEYPOT_FIELD, MarketingDemoRequestBodySchema, MarketingGrowthCheckBodySchema };
+export type { MarketingDemoRequestBody, MarketingGrowthCheckBody, MarketingIntakeResponse };
+
+export const TRADE_LABELS: Record<HomeServiceTrade, string> = { hvac: "HVAC", plumbing: "Plumbing", electrical: "Electrical", other: "Other home service" };
+
+const L = MARKETING_INTAKE_LIMITS;
+
+/** Visitor-facing copy per field; the shared schemas carry developer messages. */
+const FIELD_MESSAGES: Record<string, { empty: string; invalid: string }> = {
+  name: { empty: "Enter your name.", invalid: `Use ${L.name} characters or fewer.` },
+  email: { empty: "Enter your email.", invalid: "Enter a valid email." },
+  phone: { empty: "Enter a 10-digit US phone number.", invalid: "Enter a 10-digit US phone number." },
+  company: { empty: "Enter your business name.", invalid: `Use ${L.company} characters or fewer.` },
+  trade: { empty: "Choose your trade.", invalid: "Choose your trade." },
+  teamSize: { empty: "Choose team size.", invalid: "Choose team size." },
+  websiteUrl: { empty: "Enter your website, like yourbusiness.com.", invalid: "Enter your website, like yourbusiness.com." },
+  location: { empty: "Enter your ZIP or city.", invalid: "Enter a 5-digit ZIP or a city." }
+};
+
+export type IntakeKind = "demo-requests" | "growth-checks";
+
+export type IntakeResult =
+  | { status: "success"; confirmationId: string }
+  | { status: "invalid"; fields: Record<string, string>; message: string }
+  | { status: "rate-limited"; retryAfterSeconds: number | null; message: string }
+  | { status: "error"; message: string };
+
+export const INTAKE_MESSAGES = {
+  invalid: "Check the highlighted fields.",
+  tooLarge: "That request is too long. Shorten it and try again.",
+  rateLimited: "Too many requests. Please wait a moment and try again.",
+  error: "Something went wrong on our side. Please try again."
+} as const;
+
+/** Adds https:// when the visitor types a bare domain ("yourbusiness.com"). */
+export function normalizeWebsite(raw: string): string {
+  const v = raw.trim();
+  if (!v) return v;
+  return /^https?:\/\//i.test(v) ? v : `https://${v}`;
+}
+
+/** Splits the single "ZIP or city" input into the contract's zip / city fields. */
+export function splitLocation(raw: string): { zip?: string; city?: string } {
+  const v = raw.trim();
+  if (!v) return {};
+  return /^\d{5}$/.test(v) ? { zip: v } : { city: v };
+}
+
+/**
+ * Contract field -> form field. zip/city share the single "location" input; on /demo the API `message`
+ * only carries the Team size choice, so its errors belong to the "teamSize" select.
+ */
+export function formFieldKey(kind: IntakeKind | undefined, apiField: string): string {
+  if (apiField === "zip" || apiField === "city") return "location";
+  if (kind === "demo-requests" && apiField === "message") return "teamSize";
+  return apiField;
+}
+
+/** Maps shared-schema issues to visitor copy; zip/city both map to the single "location" input. */
+export function fieldErrors(issues: z.ZodIssue[], raw: Record<string, unknown> = {}, kind?: IntakeKind): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const i of issues) {
+    const p = String(i.path[0] ?? "form");
+    const key = formFieldKey(kind, p);
+    const m = FIELD_MESSAGES[key];
+    const v = key === "location" ? (raw.zip ?? raw.city) : raw[p];
+    out[key] ??= m ? (typeof v === "string" && v.trim() ? m.invalid : m.empty) : i.message;
+  }
+  return out;
+}
+
+function mapApiFields(raw: unknown, kind?: IntakeKind): Record<string, string> {
+  const out: Record<string, string> = {};
+  if (!raw || typeof raw !== "object") return out;
+  for (const [k, v] of Object.entries(raw as Record<string, unknown>)) {
+    const msg = Array.isArray(v) ? v[0] : v;
+    out[formFieldKey(kind, k)] = typeof msg === "string" && msg ? msg : "Check this field.";
+  }
+  return out;
+}
+
+/**
+ * Server-side POST to the API (the API's CORS only allows the app origins, so the browser never calls it).
+ * Never logs the body: it carries names and emails.
+ */
+export async function postMarketingIntake(kind: IntakeKind, body: MarketingDemoRequestBody | MarketingGrowthCheckBody, fetchImpl: typeof fetch = fetch, baseUrl: string = API_BASE_URL): Promise<IntakeResult> {
+  let res: Response;
+  try {
+    res = await fetchImpl(`${baseUrl}/api/v1/public/marketing/${kind}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify(body),
+      cache: "no-store"
+    });
+  } catch {
+    console.error(`[marketing-intake] ${kind}: network error`);
+    return { status: "error", message: INTAKE_MESSAGES.error };
+  }
+  const json = (await res.json().catch(() => null)) as (Partial<MarketingIntakeResponse> & Record<string, unknown>) | null;
+  if (res.status === 201 || (res.ok && json?.ok === true)) {
+    return { status: "success", confirmationId: typeof json?.confirmationId === "string" ? json.confirmationId : "" };
+  }
+  if (res.status === 400) {
+    const err = (json?.error ?? json) as Record<string, unknown> | null;
+    return { status: "invalid", fields: mapApiFields(err?.fields ?? json?.fields, kind), message: INTAKE_MESSAGES.invalid };
+  }
+  if (res.status === 413) return { status: "error", message: INTAKE_MESSAGES.tooLarge };
+  if (res.status === 429) {
+    const ra = Number(res.headers.get("Retry-After"));
+    return { status: "rate-limited", retryAfterSeconds: Number.isFinite(ra) && ra > 0 ? ra : null, message: INTAKE_MESSAGES.rateLimited };
+  }
+  console.error(`[marketing-intake] ${kind}: API status ${res.status}`);
+  return { status: "error", message: INTAKE_MESSAGES.error };
+}
+
+const str = (fd: FormData, k: string) => {
+  const v = fd.get(k);
+  return typeof v === "string" ? v : "";
+};
+
+export function demoBodyFromForm(fd: FormData) {
+  const teamSize = str(fd, "teamSize").trim();
+  const raw = {
+    name: str(fd, "name").trim(),
+    email: str(fd, "email").trim(),
+    company: str(fd, "company").trim(),
+    trade: str(fd, "trade"),
+    ...(teamSize ? { message: `Team size: ${teamSize}` } : {}),
+    hp: str(fd, MARKETING_HONEYPOT_FIELD)
+  };
+  return { raw, parsed: MarketingDemoRequestBodySchema.safeParse(raw) };
+}
+
+export function growthBodyFromForm(fd: FormData) {
+  const raw = {
+    websiteUrl: normalizeWebsite(str(fd, "websiteUrl")),
+    trade: str(fd, "trade"),
+    ...splitLocation(str(fd, "location")),
+    email: str(fd, "email").trim(),
+    hp: str(fd, MARKETING_HONEYPOT_FIELD)
+  };
+  return { raw, parsed: MarketingGrowthCheckBodySchema.safeParse(raw) };
+}
+
+/** Shared action body. A filled honeypot gets a quiet fake success and never reaches the API. */
+export async function runIntake(kind: IntakeKind, fd: FormData, fetchImpl?: typeof fetch): Promise<IntakeResult> {
+  if (str(fd, MARKETING_HONEYPOT_FIELD) !== "") return { status: "success", confirmationId: "" };
+  const { raw, parsed } = kind === "demo-requests" ? demoBodyFromForm(fd) : growthBodyFromForm(fd);
+  if (!parsed.success) {
+    const fields = fieldErrors(parsed.error.issues, raw, kind);
+    // zod skips the object-level ZIP/city refine when a field already failed; report it together.
+    if (kind === "growth-checks" && !str(fd, "location").trim()) fields.location ??= "Enter your ZIP or city.";
+    return { status: "invalid", fields, message: INTAKE_MESSAGES.invalid };
+  }
+  // Send the validated input as typed (the API re-parses and normalizes it).
+  return postMarketingIntake(kind, raw as MarketingDemoRequestBody | MarketingGrowthCheckBody, fetchImpl);
+}

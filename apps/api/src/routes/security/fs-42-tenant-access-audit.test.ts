@@ -416,4 +416,62 @@ describe("FS-42 tenant access audit", () => {
     expect(response.status).toBe(404);
     expect(fakeDb.getGrowthCheckFindingRevisions()).toHaveLength(0);
   });
+
+  it("FS42-UNAUTH-GROWTH-REPORT-DRAFT POST /growth-check/scans/:id/report-draft returns 401 without credentials", async () => {
+    const response = await request(app.server)
+      .post("/api/v1/growth-check/scans/00000000-0000-4000-8000-000000000001/report-draft")
+      .send({});
+    expect(response.status).toBe(401);
+  });
+
+  it("FS42-ROLE-GROWTH-REPORT-DRAFT dispatcher cannot create, edit or share growth check reports", async () => {
+    const company = fakeDb.seedCompany({ name: "Report Role Co", slug: "report-role-co" });
+    const dispatcher = fakeDb.seedUser({
+      companyId: company.id,
+      email: "disp@report-role.test",
+      firstName: "Disp",
+      lastName: "User",
+      role: "dispatcher"
+    });
+    const auth = technicianAuth(company.id, dispatcher.id, "dispatcher");
+    const id = "00000000-0000-4000-8000-000000000001";
+    for (const [method, path] of [
+      ["post", `/api/v1/growth-check/scans/${id}/report-draft`],
+      ["patch", `/api/v1/growth-check/report-drafts/${id}`],
+      ["post", `/api/v1/growth-check/report-drafts/${id}/shares`]
+    ] as const) {
+      const response = await request(app.server)[method](path).set("Authorization", auth).send({});
+      expect(response.status).toBe(403);
+      expect(response.body.error).toBe("FORBIDDEN");
+    }
+  });
+
+  it("FS42-XT-GROWTH-REPORT-DRAFT cross-tenant scan, draft and share ids are 404 and write nothing", async () => {
+    const companyA = fakeDb.seedCompany({ name: "Report A", slug: "report-a" });
+    const companyB = fakeDb.seedCompany({ name: "Report B", slug: "report-b" });
+    const ownerA = fakeDb.seedUser({ companyId: companyA.id, email: "owner@report-a.test", firstName: "O", lastName: "A", role: "owner" });
+    const ownerB = fakeDb.seedUser({ companyId: companyB.id, email: "owner@report-b.test", firstName: "O", lastName: "B", role: "owner" });
+    const scanB = fakeDb.seedGrowthCheckScan({ companyId: companyB.id });
+    const authA = `Bearer ${tokens.generateAccessToken({ userId: ownerA.id, companyId: companyA.id, role: "owner" })}`;
+    const authB = `Bearer ${tokens.generateAccessToken({ userId: ownerB.id, companyId: companyB.id, role: "owner" })}`;
+    const created = await request(app.server)
+      .post(`/api/v1/growth-check/scans/${scanB.id}/report-draft`)
+      .set("Authorization", authB)
+      .send({ idempotencyKey: "fs42-report-b-01" });
+    expect(created.status).toBe(201);
+    const draftId = created.body.draft.id as string;
+    await request(app.server).post(`/api/v1/growth-check/report-drafts/${draftId}/approve`).set("Authorization", authB).send({ expectedVersion: 1, idempotencyKey: "fs42-report-b-02" });
+    const share = await request(app.server).post(`/api/v1/growth-check/report-drafts/${draftId}/shares`).set("Authorization", authB).send({ expectedVersion: 2, idempotencyKey: "fs42-report-b-03" });
+    expect(share.status).toBe(201);
+    const revisionsBefore = fakeDb.getGrowthCheckReportDraftRevisions().length;
+
+    expect((await request(app.server).post(`/api/v1/growth-check/scans/${scanB.id}/report-draft`).set("Authorization", authA).send({ idempotencyKey: "fs42-report-a-01" })).status).toBe(404);
+    expect((await request(app.server).get(`/api/v1/growth-check/report-drafts/${draftId}`).set("Authorization", authA)).status).toBe(404);
+    expect((await request(app.server).get(`/api/v1/growth-check/report-drafts/${draftId}/preview`).set("Authorization", authA)).status).toBe(404);
+    expect((await request(app.server).get(`/api/v1/growth-check/report-drafts/${draftId}/export`).set("Authorization", authA)).status).toBe(404);
+    expect((await request(app.server).patch(`/api/v1/growth-check/report-drafts/${draftId}`).set("Authorization", authA).send({ expectedVersion: 2, idempotencyKey: "fs42-report-a-02", title: "Taken" })).status).toBe(404);
+    expect((await request(app.server).post(`/api/v1/growth-check/report-shares/${share.body.share.id}/revoke`).set("Authorization", authA).send({})).status).toBe(404);
+    expect(fakeDb.getGrowthCheckReportDraftRevisions()).toHaveLength(revisionsBefore);
+    expect(fakeDb.getGrowthCheckReportShares()[0]?.revokedAt).toBeNull();
+  });
 });

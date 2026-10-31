@@ -179,3 +179,22 @@ That is **10 gaps and 10 failing tests**, plus 2 passing controls, as audited.
 - **Mocked outbound policy:** TE-RCPT tests mock `authorizeAgentActionExecution` to "allowed" so that execution is reached without consent rows. This is why the real consent behaviour depends on #301.
 - **Target version mocked:** `resolveEntityRef` is mocked to a stable `recordVersion`, and stale-target behaviour is not under test.
 - **Web-only gaps:** Command Center KPIs and the "Approve & send" label are web code and have no failing test in this PR.
+
+## 9. Fix status (updated 2026-10-31, after #370 merged)
+
+#370 (fix PR 1: TE-STALE, TE-DUP) is merged into dev. This PR (#380) adds only building blocks: nothing in `executeAgentAction` calls them yet, so the three tests below still fail and stay in the gap script.
+
+| Gap test | Status | Notes |
+|---|---|---|
+| TE-FAIL-01 | **PARTIAL: building blocks in #380; wiring is the follow-up after #380 merges** | `services/agent-action-receipt.ts` adds `persistAgentActionExecutionFailure`. After the execute tx rolls back, it opens a second tenant tx and does a compare-and-set from `approved`/`executing` to `failed`, writing a failed receipt and an `execution_failed` audit event. The first tx has already rolled back, so no row lock is held and this cannot deadlock. The caller passes `actorType` (no hardcoded `user`). The receipt keeps an AppError's code and message; any other error gets `EXECUTION_FAILED` with a generic message, and the raw (truncated) error text is kept only in the audit event detail. |
+| TE-RCPT-01 | **PARTIAL: building blocks in #380; wiring is the follow-up** | Executors declare `delivery: "outbound"` for message.send_proposed, loyalty.reminder.propose and the 4 Revenue kinds. `buildAgentActionExecutionResultForType` returns state `executing` with outcome `queued` for these, never `succeeded`. |
+| TE-RCPT-02 | **PARTIAL: building blocks in #380; wiring is the follow-up** | `@fsm/types` adds `AgentActionDeliveryStateV1Schema` (`queued` \| `provider_accepted` \| `delivered` \| `failed`). `ExecutionReceiptV1Schema` gains `outcome: "queued"` and an optional `deliveryState`. |
+| TE-AUTH-01/02 | Open on dev; fixed in #382 (separate PR) | Still in the gap script on dev. #382 moves auth and role checks to `onRequest` and moves both tests to the default run. |
+
+Gap script on this branch: 5 failing (TE-AUTH-01/02, TE-FAIL-01, TE-RCPT-01/02) plus 2 passing controls. After #382 merges it is 3 failing.
+
+**Follow-up after #380 merges (in `executeAgentAction`, `agent-action.service.ts`):**
+1. Replace the hard-coded receipt and `state: "succeeded"` with `buildAgentActionExecutionResultForType(row.actionType, base)`. Write `result.state` and `result.receipt`, and transition from `executing` to `result.state`. For outbound kinds the row stays `executing` with a `queued` receipt.
+2. Keep the `agent.execution_succeeded` audit event (and its idempotency detail) for both outcomes, so a same-key replay still finds it. Alternatively, record queued executes under their own event type and extend `IDEMPOTENT_OPERATION_EVENT_TYPE`.
+3. In the catch, when the error happened after the row was loaded and is not an expiry, stale or version conflict, call `persistAgentActionExecutionFailure({ companyId, actionId, actorId, actorType: "user", error })`, then rethrow.
+4. Move TE-FAIL-01 and TE-RCPT-01/02 out of the gap script into the default run, and set these rows to fixed.

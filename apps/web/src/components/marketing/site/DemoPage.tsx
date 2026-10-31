@@ -71,10 +71,10 @@ export function DemoPage({ action = submitDemoRequest }: { action?: (prev: Intak
                   <TextInput id="demo-company" name="company" placeholder="Your business" autoComplete="organization" maxLength={160} error={errors.company} />
                 </Field>
                 <Field id="demo-trade" label="Trade" error={errors.trade} className="order-4">
-                  <SelectInput id="demo-trade" name="trade" placeholder="Choose your trade" error={errors.trade} options={HOME_SERVICE_TRADES.map((t) => ({ value: t, label: TRADE_LABELS[t] }))} />
+                  <SelectInput tabletChevron={false} id="demo-trade" name="trade" placeholder="Choose your trade" error={errors.trade} options={HOME_SERVICE_TRADES.map((t) => ({ value: t, label: TRADE_LABELS[t] }))} />
                 </Field>
                 <Field id="demo-team" label="Team size" error={errors.teamSize} className="order-5">
-                  <SelectInput id="demo-team" name="teamSize" placeholder="Choose team size" error={errors.teamSize} required={false} options={DEMO.teamSizes.map((t) => ({ value: t, label: t }))} />
+                  <SelectInput tabletChevron={false} id="demo-team" name="teamSize" placeholder="Choose team size" error={errors.teamSize} required={false} options={DEMO.teamSizes.map((t) => ({ value: t, label: t }))} />
                 </Field>
               </div>
               <Honeypot />

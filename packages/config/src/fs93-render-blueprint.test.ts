@@ -45,6 +45,13 @@ describe("FS-93 render blueprint reference", () => {
     ).toMatchObject({ ok: false });
   });
 
+  it("requires region: ohio on all four entries (STACK-12, Neon US East Ohio)", () => {
+    const yaml = readFileSync(blueprintPath, "utf8");
+    expect(FS93_RENDER_BLUEPRINT_REF.region).toBe("ohio");
+    expect([...yaml.matchAll(/^\s+region:\s*(\S+)\s*$/gm)].map((m) => m[1])).toEqual(["ohio", "ohio", "ohio", "ohio"]);
+    expect(validateFs93RenderBlueprintYaml(yaml.replace("    region: ohio", "    region: oregon"))).toMatchObject({ ok: false });
+  });
+
   it("STACK-12 runbook links FS-93 runbook and Neon region rule", () => {
     const doc = readFileSync(
       join(repoRoot, "docs/infrastructure/STACK-12-render-neon-region.md"),
@@ -53,5 +60,6 @@ describe("FS-93 render blueprint reference", () => {
     expect(doc).toContain("Neon");
     expect(doc).toContain("FS-93");
     expect(doc).toContain("render-blueprint.render.yaml");
+    expect(doc).toContain("`ohio`");
   });
 });

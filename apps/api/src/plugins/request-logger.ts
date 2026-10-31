@@ -1,5 +1,6 @@
 import fp from "fastify-plugin";
 
+import { getRequestActorOrgContext } from "../lib/request-actor-context.js";
 import { requestPathForLog } from "../lib/request-log-path.js";
 
 declare module "fastify" {
@@ -18,11 +19,15 @@ const requestLoggerPlugin = fp(async (fastify) => {
   fastify.addHook("onResponse", async (request, reply) => {
     const durationMs = Date.now() - request.requestStartTime;
 
+    const actorOrg = getRequestActorOrgContext(request);
+
     request.log.info(
       {
         requestId: request.id,
-        companyId: request.company?.id ?? null,
-        userId: request.user?.id ?? null,
+        companyId: actorOrg.companyId,
+        userId: actorOrg.userId,
+        role: actorOrg.role,
+        authProvider: actorOrg.authProvider,
         method: request.method,
         path: requestPathForLog(request.url),
         statusCode: reply.statusCode,

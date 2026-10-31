@@ -770,6 +770,8 @@ export const jobs = pgTable("jobs", {
   status: jobStatusEnum("status").notNull().default("lead"),
   // Source
   leadSource: varchar("lead_source", { length: 100 }),
+  /** Growth source tracking: whitelisted UTM/referrer attribution (LeadAttribution, packages/types). */
+  leadAttribution: jsonb("lead_attribution").$type<Partial<Record<string, string>>>(),
   // Description
   title: varchar("title", { length: 255 }).notNull(),
   description: text("description"),
@@ -2176,6 +2178,8 @@ export const bookingRequests = pgTable("booking_requests", {
   preferredWindow: varchar("preferred_window", { length: 50 }),
   status: bookingRequestStatusEnum("status").notNull().default("pending"),
   source: bookingSourceEnum("source").notNull().default("direct"),
+  /** Growth source tracking: whitelisted UTM/referrer attribution (LeadAttribution, packages/types). */
+  leadAttribution: jsonb("lead_attribution").$type<Partial<Record<string, string>>>(),
   referenceNumber: varchar("reference_number", { length: 50 }),
   isPropertyOwner: boolean("is_property_owner").default(false),
   smsConsentAppointments: boolean("sms_consent_appointments").default(false),

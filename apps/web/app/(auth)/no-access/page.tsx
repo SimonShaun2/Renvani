@@ -2,6 +2,7 @@ import { SignOutButton } from "@clerk/nextjs";
 import Link from "next/link";
 
 import { AuthShell } from "@/src/components/auth/AuthShell";
+import { NoAccessCreateWorkspace } from "@/src/components/auth/NoAccessCreateWorkspace";
 import { isClerkEnabled } from "@/src/lib/clerk/config";
 
 /** Signed in, but no Renvani workspace/role is linked to this account. Never redirects back into the app. */
@@ -13,11 +14,14 @@ export default function NoAccessPage() {
         <p className="mt-2 text-sm text-gray-600">
           Your account is signed in but isn&apos;t linked to a Renvani workspace. Ask your shop owner for an invite, or sign out and use another account.
         </p>
-        <div className="mt-6">
+        <div className="mt-6 flex flex-col items-center gap-3">
           {isClerkEnabled() ? (
-            <SignOutButton redirectUrl="/login">
-              <button type="button" className="min-h-[44px] rounded-full bg-black px-5 text-white">Sign out</button>
-            </SignOutButton>
+            <>
+              <NoAccessCreateWorkspace />
+              <SignOutButton redirectUrl="/login">
+                <button type="button" className="min-h-[44px] rounded-full border border-gray-300 px-5">Sign out</button>
+              </SignOutButton>
+            </>
           ) : (
             <Link href="/login" className="underline">Back to sign in</Link>
           )}

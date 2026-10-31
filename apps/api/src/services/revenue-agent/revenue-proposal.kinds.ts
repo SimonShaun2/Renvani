@@ -106,6 +106,7 @@ export function registerRevenueProposalKind(kind: RevenueProposalKind): void {
     build: (input) => buildDefaultRevenueProposalParameters(input, { consentScope: kind.consentScope })
   });
   registerAgentActionExecutor(kind.actionType, {
+    delivery: "outbound",
     beforeExecute: authorizeOutboundAgentActionExecution,
     applyInTransaction: (ctx) => transitionRecommendation(ctx, "actioned", { required: true }),
     onRejectInTransaction: (ctx) => transitionRecommendation(ctx, "dismissed", { required: false })

@@ -29,6 +29,11 @@ export interface AgentActionExecutionContext {
  * so a failure rolls the whole execute back.
  */
 export interface AgentActionExecutor {
+  /**
+   * `outbound`: the action contacts a customer, so a successful execute only means it was queued (receipt
+   * deliveryState `queued`); it must not read as done until a provider confirms. Default `internal`.
+   */
+  delivery?: AgentActionDeliveryKind;
   beforeExecute?: (ctx: AgentActionExecutionContext) => Promise<AuthorizationDecision | void> | void;
   applyInTransaction?: (ctx: AgentActionExecutionContext) => Promise<void>;
   /** Optional side effect when an operator rejects the proposal (runs inside the reject transaction). */
@@ -63,7 +68,14 @@ export async function authorizeOutboundAgentActionExecution(ctx: AgentActionExec
   return decision;
 }
 
+export type AgentActionDeliveryKind = "internal" | "outbound";
+
 const executors = new Map<string, AgentActionExecutor>();
+
+/** Delivery kind for an action type; unknown types read as internal (they also fail closed at execute). */
+export function getAgentActionDeliveryKind(actionType: string): AgentActionDeliveryKind {
+  return executors.get(actionType)?.delivery ?? "internal";
+}
 
 export function registerAgentActionExecutor(actionType: string, executor: AgentActionExecutor): void {
   executors.set(actionType, executor);
@@ -122,12 +134,14 @@ export function internalRecordExecutor(parameterKey: keyof typeof INTERNAL_TARGE
 }
 
 registerAgentActionExecutor("loyalty.reminder.propose", {
+  delivery: "outbound",
   beforeExecute: () => {
     assertLoyaltyReminderExecutionAllowed();
   }
 });
 
 registerAgentActionExecutor("message.send_proposed", {
+  delivery: "outbound",
   beforeExecute: authorizeOutboundAgentActionExecution
 });
 

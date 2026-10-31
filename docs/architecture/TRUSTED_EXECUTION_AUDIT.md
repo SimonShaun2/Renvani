@@ -177,3 +177,17 @@ That is **10 gaps and 10 failing tests**, plus 2 passing controls.
 - **Mocked outbound policy:** TE-RCPT tests mock `authorizeAgentActionExecution` to "allowed" so that execution is reached without consent rows. This is why the real consent behaviour depends on #301.
 - **Target version mocked:** `resolveEntityRef` is mocked to a stable `recordVersion`, and stale-target behaviour is not under test.
 - **Web-only gaps:** Command Center KPIs and the "Approve & send" label are web code and have no failing test in this PR.
+
+## 9. Fix status (updated 2026-10-31)
+
+| Gap test | Status | Notes |
+|---|---|---|
+| TE-FAIL-01 | **PARTIAL: building blocks landed; wiring pending #370** | `services/agent-action-receipt.ts` adds `persistAgentActionExecutionFailure`. After the execute tx rolls back, it opens a second tenant tx and does a compare-and-set from `approved`/`executing` to `failed`, writing a failed receipt and an `execution_failed` audit event. Because the first tx has already rolled back, no row lock is held, so this cannot deadlock. The test calls `executeAgentAction`, which lives in `agent-action.service.ts` (a #370 file), so the call site is not wired yet. The test stays in the gap script. |
+| TE-RCPT-01 | **PARTIAL: building blocks landed; wiring pending #370** | Executors declare `delivery: "outbound"` for message.send_proposed, loyalty.reminder.propose and the 4 Revenue kinds. `buildAgentActionExecutionResultForType` returns state `executing` with outcome `queued` for these, never `succeeded`. The test stays in the gap script. |
+| TE-RCPT-02 | **PARTIAL: building blocks landed; wiring pending #370** | `@fsm/types` adds `AgentActionDeliveryStateV1Schema` (`queued` \| `provider_accepted` \| `delivered` \| `failed`). `ExecutionReceiptV1Schema` gains `outcome: "queued"` and an optional `deliveryState`. The test stays in the gap script. |
+| TE-AUTH-01/02 | Open | Still in the gap script. |
+
+**Wiring (after #370 merges, in `executeAgentAction`):**
+1. Replace the hard-coded receipt and `state: "succeeded"` with `buildAgentActionExecutionResultForType(row.actionType, base)` and write `result.state` / `result.receipt`.
+2. In the catch, when the error happened after the row was loaded and is not an expiry, call `persistAgentActionExecutionFailure({ companyId, actionId, actorId, error })`, then rethrow.
+3. Move TE-FAIL-01 and TE-RCPT-01/02 into the default run.

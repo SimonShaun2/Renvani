@@ -1,9 +1,9 @@
 // Build-time guard for the API origin. NEXT_PUBLIC_API_URL (and API_URL) are inlined at build time;
 // without NEXT_PUBLIC_API_URL the /api/v1/public rewrite and every client fetch point at http://localhost:3001.
-// Fails only Vercel production builds; Vercel preview warns; local dev, tests and CI are untouched.
+// Fails Vercel production and preview builds; local dev, tests and CI (no VERCEL_ENV) are untouched.
 // Escape hatch: SKIP_ENV_GUARD=1.
 
-export type ApiUrlEnvCheck = { level: "ok" } | { level: "warn" | "error"; message: string };
+export type ApiUrlEnvCheck = { level: "ok" } | { level: "error"; message: string };
 
 export function checkApiUrlEnv(env: Record<string, string | undefined>): ApiUrlEnvCheck {
   if (env.SKIP_ENV_GUARD === "1") return { level: "ok" };
@@ -18,5 +18,5 @@ export function checkApiUrlEnv(env: Record<string, string | undefined>): ApiUrlE
     "NEXT_PUBLIC_API_URL is not set. Set NEXT_PUBLIC_API_URL to the API origin " +
     "(e.g. the Render api URL) in the Vercel web project env and redeploy; otherwise the app and the " +
     "/api/v1/public rewrite call http://localhost:3001. Set SKIP_ENV_GUARD=1 to bypass.";
-  return vercelEnv === "production" ? { level: "error", message } : { level: "warn", message };
+  return { level: "error", message };
 }

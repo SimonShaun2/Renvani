@@ -1,13 +1,17 @@
 import { and, eq, gte, inArray, isNull, lt, lte, sql } from "drizzle-orm";
 import { Decimal } from "decimal.js";
 
-import { customers, db, jobs } from "@fsm/db";
+import { customers, db, invoices, jobs } from "@fsm/db";
 import {
+  type DirectDemandSourceSummary,
+  type DirectDemandSummary,
   type JobGrowthChannel,
   type JobSourceChannelSummary,
   type JobSourceReportingQuery,
   type JobSourceReportingSummary,
-  type JobStatus
+  type JobStatus,
+  leadAttributionSourceKey,
+  sanitizeLeadAttribution
 } from "@fsm/types";
 
 import { assertJobSourceReportingPeriodAllowed, resolveReportingPeriod } from "../lib/reporting-period.js";
@@ -360,5 +364,82 @@ export async function getJobSourceReportingSummary(
       unknownAttributionDefinition: UNKNOWN_ATTRIBUTION_DEFINITION
     },
     channels
+  };
+}
+
+/**
+ * Growth (source tracking) "Direct demand": booked jobs in the period that carry captured lead attribution,
+ * grouped by attribution source (utm_source, else referrer host), with paid invoice revenue via invoices.job_id.
+ * Surfaced as a Command Center card.
+ */
+export async function getDirectDemandSummary(
+  companyId: string,
+  timeZone: string,
+  query: Pick<JobSourceReportingQuery, "startDate" | "endDate">
+): Promise<DirectDemandSummary> {
+  const period = resolveReportingPeriod(query.startDate, query.endDate, timeZone);
+  assertJobSourceReportingPeriodAllowed(period);
+
+  const periodJobRows = await db
+    .select({ id: jobs.id, leadAttribution: jobs.leadAttribution })
+    .from(jobs)
+    .where(
+      and(
+        eq(jobs.companyId, companyId),
+        isNull(jobs.deletedAt),
+        inArray(jobs.status, BOOKED_JOB_STATUS_LIST),
+        jobActivityOnOrAfter(period.start),
+        jobActivityOnOrBefore(period.end)
+      )
+    );
+
+  const sourceByJobId = new Map<string, string>();
+  for (const job of periodJobRows) {
+    // Re-sanitize on read: never trust stored jsonb shape.
+    const attribution = sanitizeLeadAttribution(job.leadAttribution);
+    if (attribution) {
+      sourceByJobId.set(job.id, leadAttributionSourceKey(attribution));
+    }
+  }
+
+  const buckets = new Map<string, { jobCount: number; paidRevenue: Decimal }>();
+  for (const source of sourceByJobId.values()) {
+    const bucket = buckets.get(source) ?? { jobCount: 0, paidRevenue: new Decimal(0) };
+    bucket.jobCount += 1;
+    buckets.set(source, bucket);
+  }
+
+  if (sourceByJobId.size > 0) {
+    const paidInvoiceRows = await db
+      .select({ jobId: invoices.jobId, total: invoices.total })
+      .from(invoices)
+      .where(
+        and(
+          eq(invoices.companyId, companyId),
+          isNull(invoices.deletedAt),
+          eq(invoices.status, "paid"),
+          inArray(invoices.jobId, [...sourceByJobId.keys()])
+        )
+      );
+
+    for (const invoice of paidInvoiceRows) {
+      const source = invoice.jobId ? sourceByJobId.get(invoice.jobId) : undefined;
+      const bucket = source ? buckets.get(source) : undefined;
+      if (bucket) {
+        bucket.paidRevenue = bucket.paidRevenue.plus(new Decimal(invoice.total ?? "0"));
+      }
+    }
+  }
+
+  const sources: DirectDemandSourceSummary[] = [...buckets.entries()]
+    .map(([source, bucket]) => ({ source, jobCount: bucket.jobCount, paidRevenue: formatMoney(bucket.paidRevenue) }))
+    .sort((left, right) => right.jobCount - left.jobCount || left.source.localeCompare(right.source));
+
+  const totalPaid = [...buckets.values()].reduce((sum, bucket) => sum.plus(bucket.paidRevenue), new Decimal(0));
+
+  return {
+    period: { startDate: period.start.toISOString(), endDate: period.end.toISOString(), timeZone: period.timeZone },
+    totals: { jobCount: sourceByJobId.size, paidRevenue: formatMoney(totalPaid) },
+    sources
   };
 }

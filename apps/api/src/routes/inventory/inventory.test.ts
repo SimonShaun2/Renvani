@@ -239,4 +239,50 @@ describe("FS-170 inventory API", () => {
     expect(locs.body.locations.map((l: { id: string }) => l.id)).toEqual([w.otherLoc.id]);
     expect((await api().get("/api/v1/inventory/levels").set("Authorization", w.otherAuth)).body.levels).toHaveLength(0);
   });
+  it("levels and movements carry tenant-scoped productName/productSku for dispatcher and office", async () => {
+    const w = seedWorld();
+    const dispatcher = fakeDb.seedUser({ companyId: w.company.id, email: "disp@inv.test", firstName: "D", lastName: "S", role: "dispatcher" });
+    const dispatcherAuth = bearer(w.company.id, dispatcher.id, "dispatcher");
+    const skuProduct = fakeDb.seedProductCatalog({ companyId: w.company.id, name: "Capacitor 45/5", sku: "CAP-455" } as never);
+    fakeDb.seedStockLevel({ companyId: w.company.id, locationId: w.van.id, productId: skuProduct.id, quantity: 4 });
+    // Missing product and a foreign tenant's product id must never resolve a label.
+    const missingId = "00000000-0000-4000-8000-000000000999";
+    fakeDb.seedStockLevel({ companyId: w.company.id, locationId: w.van.id, productId: missingId, quantity: 1 });
+    fakeDb.seedStockLevel({ companyId: w.company.id, locationId: w.warehouse.id, productId: w.otherProduct.id, quantity: 2 });
+
+    const adjust = await api().post("/api/v1/inventory/adjustments").set("Authorization", w.officeAuth)
+      .send({ locationId: w.warehouse.id, productId: w.product.id, quantityDelta: -1, reason: "count" });
+    expect(adjust.status).toBe(201);
+    expect(adjust.body.levels[0]).toMatchObject({ productName: "Filter 16x25", productSku: null });
+    expect(adjust.body.movements[0]).toMatchObject({ productName: "Filter 16x25", productSku: null });
+
+    for (const auth of [dispatcherAuth, w.officeAuth]) {
+      const levels = await api().get("/api/v1/inventory/levels").set("Authorization", auth);
+      expect(levels.status).toBe(200);
+      const byProduct = new Map(levels.body.levels.map((l: { productId: string }) => [l.productId, l]));
+      expect(byProduct.get(w.product.id)).toMatchObject({ productName: "Filter 16x25", productSku: null });
+      expect(byProduct.get(skuProduct.id)).toMatchObject({ productName: "Capacitor 45/5", productSku: "CAP-455" });
+      expect(byProduct.get(missingId)).toMatchObject({ productName: null, productSku: null });
+      expect(byProduct.get(w.otherProduct.id)).toMatchObject({ productName: null, productSku: null });
+      expect(JSON.stringify(levels.body)).not.toContain("Other filter");
+      // Existing fields unchanged.
+      expect(Object.keys(byProduct.get(w.product.id) as object).sort()).toEqual([
+        "id", "isLowStock", "locationId", "lowStockThreshold", "productId", "productName", "productSku",
+        "quantity", "recordVersion", "updatedAt"
+      ]);
+
+      const moves = await api().get(`/api/v1/inventory/movements?productId=${w.product.id}`).set("Authorization", auth);
+      expect(moves.status).toBe(200);
+      expect(moves.body.movements[0]).toMatchObject({ productId: w.product.id, productName: "Filter 16x25", productSku: null, kind: "adjustment" });
+      expect(Object.keys(moves.body.movements[0]).sort()).toEqual([
+        "actorUserId", "allowNegative", "createdAt", "id", "jobId", "kind", "locationId", "productId", "productName",
+        "productSku", "quantityAfter", "quantityDelta", "reason", "transferGroupId"
+      ]);
+    }
+
+    const low = await api().get("/api/v1/inventory/low-stock").set("Authorization", w.techAuth);
+    expect(low.status).toBe(200);
+    const otherLevels = await api().get("/api/v1/inventory/levels").set("Authorization", w.otherAuth);
+    expect(otherLevels.body.levels).toHaveLength(0);
+  });
 });

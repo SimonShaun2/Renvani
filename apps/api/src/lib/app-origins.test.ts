@@ -32,6 +32,14 @@ describe("APP_URL_ALLOWED", () => {
     expect(parseAllowedOriginList(undefined)).toEqual([]);
   });
 
+  it("accepts https extras; allows plain http only for localhost / 127.0.0.1", () => {
+    expect(
+      parseAllowedOriginList(
+        "http://tester.renvani.com,http://preview.vercel.app,https://tester.renvani.com,http://localhost:3000,http://127.0.0.1:3000"
+      )
+    ).toEqual(["https://tester.renvani.com", "http://localhost:3000", "http://127.0.0.1:3000"]);
+  });
+
   it("extras are honored only in the staging tier; APP_URL is always primary and first", () => {
     expect(allowedAppOrigins(src, STAGING)).toEqual([
       "https://app.renvani.com",

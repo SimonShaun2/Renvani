@@ -6,6 +6,7 @@ import { resolveDeploymentTier } from "@fsm/config/deployment-environment";
 /**
  * APP_URL_ALLOWED: extra web origins for the tester tier.
  * - Exact origin match only (scheme + host + port). Entries with wildcards, paths, queries or non-http(s) schemes are ignored.
+ * - https only; plain http is accepted only for localhost / 127.0.0.1.
  * - Non-primary origins are honored only when RENVANI_DEPLOYMENT_TIER=staging; elsewhere only APP_URL is used.
  * - APP_URL is always the primary (default for links and Stripe return URLs).
  */
@@ -21,7 +22,11 @@ function normalizeOrigin(entry: string): string | null {
   } catch {
     return null;
   }
-  if (url.protocol !== "https:" && url.protocol !== "http:") return null;
+  if (url.protocol === "http:") {
+    if (url.hostname !== "localhost" && url.hostname !== "127.0.0.1") return null;
+  } else if (url.protocol !== "https:") {
+    return null;
+  }
   if (url.username || url.password || url.search || url.hash) return null;
   if (url.pathname !== "/" && url.pathname !== "") return null;
   return url.origin;

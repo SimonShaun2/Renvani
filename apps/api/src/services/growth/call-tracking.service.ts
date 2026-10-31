@@ -83,13 +83,21 @@ function toSettings(row: SettingsRow | undefined): CallTrackingSettings {
  * confirmation is persisted in `verified_at` (migration 0060), see persistCallTrackingNumberVerifiedAt.
  */
 export async function resolveCallTrackingNumberVerification(row: Pick<NumberRow, "provider" | "trackingNumber" | "providerNumberId">): Promise<string> {
+  return (await resolveCallTrackingNumberOwnership(row)).status;
+}
+
+/** Status plus the provider's normalized `verifiedAt` (null when the provider gave none or status is not verified). */
+export async function resolveCallTrackingNumberOwnership(
+  row: Pick<NumberRow, "provider" | "trackingNumber" | "providerNumberId">
+): Promise<NormalizedOwnership> {
+  const unverified = { status: CALL_TRACKING_NUMBER_DEFAULT_VERIFICATION_STATUS, verifiedAt: null };
   const adapter = findCallTrackingAdapter(row.provider);
-  if (!adapter || !adapter.enabled) return CALL_TRACKING_NUMBER_DEFAULT_VERIFICATION_STATUS;
+  if (!adapter || !adapter.enabled) return unverified;
   try {
     const result = await adapter.verifyNumberOwnership({ trackingNumber: row.trackingNumber, providerNumberId: row.providerNumberId });
-    return normalizeOwnershipResult(result, nowMs());
+    return normalizeOwnership(result, nowMs());
   } catch {
-    return CALL_TRACKING_NUMBER_DEFAULT_VERIFICATION_STATUS;
+    return unverified;
   }
 }
 
@@ -112,9 +120,19 @@ export const CALL_TRACKING_OWNERSHIP_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
 /** Clock skew tolerated on a provider verifiedAt that is slightly in the future. */
 const OWNERSHIP_FUTURE_SKEW_MS = 5 * 60 * 1000;
 
+export interface NormalizedOwnership {
+  status: string;
+  /** Provider-reported confirmation time, only for a fresh `verified` result that carried one. */
+  verifiedAt: Date | null;
+}
+
 /** Freshness rule for a provider verifiedAt, enforced on every resolve (persistence: persistCallTrackingNumberVerifiedAt). */
 export function normalizeOwnershipResult(result: CallTrackingNumberOwnershipResult | unknown, now: number): string {
-  const fallback = CALL_TRACKING_NUMBER_DEFAULT_VERIFICATION_STATUS;
+  return normalizeOwnership(result, now).status;
+}
+
+export function normalizeOwnership(result: CallTrackingNumberOwnershipResult | unknown, now: number): NormalizedOwnership {
+  const fallback = { status: CALL_TRACKING_NUMBER_DEFAULT_VERIFICATION_STATUS, verifiedAt: null };
   let status: unknown = result;
   let verifiedAt: unknown;
   if (result && typeof result === "object") {
@@ -124,18 +142,31 @@ export function normalizeOwnershipResult(result: CallTrackingNumberOwnershipResu
   if (typeof status !== "string" || !Object.prototype.hasOwnProperty.call(CALL_TRACKING_NUMBER_VERIFICATION_STATUS_REGISTRY, status)) {
     return fallback;
   }
-  if (verifiedAt === undefined || verifiedAt === null || !callTrackingNumberCanReceiveCalls(status)) return status;
+  if (verifiedAt === undefined || verifiedAt === null || !callTrackingNumberCanReceiveCalls(status)) return { status, verifiedAt: null };
   if (typeof verifiedAt !== "string") return fallback;
   const at = Date.parse(verifiedAt);
   if (!Number.isFinite(at) || at - now > OWNERSHIP_FUTURE_SKEW_MS || now - at > CALL_TRACKING_OWNERSHIP_MAX_AGE_MS) return fallback;
-  return status;
+  return { status, verifiedAt: new Date(at) };
+}
+
+/**
+ * The `verified_at` to store for a resolve, or null when nothing should be written.
+ * - verified with a provider time: the provider's normalized time, written only when it differs from the stored one;
+ * - verified without a provider time: keep the stored value; stamp `now` only when nothing is stored yet;
+ * - anything else: never written (history is kept, the fail-closed status still gates calls).
+ */
+export function nextCallTrackingVerifiedAt(stored: Date | null, ownership: NormalizedOwnership, now: Date): Date | null {
+  if (ownership.status !== "verified") return null;
+  const target = ownership.verifiedAt ?? stored ?? now;
+  return stored && stored.getTime() === target.getTime() ? null : target;
 }
 
 async function toNumberResolved(row: NumberRow): Promise<CallTrackingNumber> {
-  const status = await resolveCallTrackingNumberVerification(row);
+  const ownership = await resolveCallTrackingNumberOwnership(row);
   let verifiedAt = row.verifiedAt ?? null;
-  if (status === "verified") verifiedAt = (await persistCallTrackingNumberVerifiedAt(row.companyId, row.id, new Date())) ?? verifiedAt;
-  return toNumber({ ...row, verifiedAt }, status);
+  const next = nextCallTrackingVerifiedAt(verifiedAt, ownership, new Date());
+  if (next) verifiedAt = (await persistCallTrackingNumberVerifiedAt(row.companyId, row.id, next)) ?? verifiedAt;
+  return toNumber({ ...row, verifiedAt }, ownership.status);
 }
 
 function toNumber(row: NumberRow, verificationStatus: string): CallTrackingNumber {

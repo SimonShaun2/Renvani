@@ -629,4 +629,101 @@ describe("FS-200 0060: verified_at persistence on the ownership-verification pat
     expect(state.find((n) => n.id === mine.id)!.verifiedAt).toEqual(prior);
     expect(state.find((n) => n.id === theirs.id)!.verifiedAt).toBeNull();
   });
+
+  describe("#379 review nit: provider verifiedAt, no write per GET", () => {
+    const hour = 60 * 60 * 1000;
+    async function updateSpy() {
+      const dbMod = (await import("@fsm/db")) as unknown as { db: { update: (...args: unknown[]) => unknown } };
+      return vi.spyOn(dbMod.db, "update");
+    }
+    const list = (w: ReturnType<typeof seedWorld>) =>
+      request(app.server).get("/api/v1/growth/call-tracking/numbers").set("Authorization", w.owner);
+    const storedAt = (id: string) => fakeDb.getTestState().callTrackingNumbers.find((n) => n.id === id)!.verifiedAt;
+
+    it("stores the provider's normalized verifiedAt (not the request time)", async () => {
+      const w = seedWorld();
+      await setup(w);
+      const providerAt = new Date(Date.now() - 3 * hour);
+      fakeVerifyOwnership.mockImplementation((async () => ({ status: "verified", verifiedAt: providerAt.toISOString() })) as never);
+      try {
+        const n = fakeDb.seedCallTrackingNumber({ companyId: w.company.id, trackingNumber: "+15125550111", provider: FAKE_PROVIDER });
+        const res = await list(w);
+        expect(res.body.numbers[0]).toMatchObject({ id: n.id, verificationStatus: "verified", verifiedAt: providerAt.toISOString() });
+        expect(storedAt(n.id)).toEqual(providerAt);
+      } finally {
+        fakeVerifyOwnership.mockImplementation(async () => fakeOwnership);
+      }
+    });
+
+    it("does not UPDATE on a repeat GET when the provider value is unchanged, and updates when it changes", async () => {
+      const w = seedWorld();
+      await setup(w);
+      let providerAt = new Date(Date.now() - 3 * hour);
+      fakeVerifyOwnership.mockImplementation((async () => ({ status: "verified", verifiedAt: providerAt.toISOString() })) as never);
+      const spy = await updateSpy();
+      try {
+        const n = fakeDb.seedCallTrackingNumber({ companyId: w.company.id, trackingNumber: "+15125550111", provider: FAKE_PROVIDER });
+        await list(w);
+        expect(spy).toHaveBeenCalledTimes(1);
+        spy.mockClear();
+        await list(w);
+        await list(w);
+        expect(spy).not.toHaveBeenCalled();
+        expect(storedAt(n.id)).toEqual(providerAt);
+
+        providerAt = new Date(Date.now() - hour);
+        const res = await list(w);
+        expect(spy).toHaveBeenCalledTimes(1);
+        expect(storedAt(n.id)).toEqual(providerAt);
+        expect(res.body.numbers[0].verifiedAt).toBe(providerAt.toISOString());
+      } finally {
+        spy.mockRestore();
+        fakeVerifyOwnership.mockImplementation(async () => fakeOwnership);
+      }
+    });
+
+    it("verified without a provider time: stamps now once when nothing is stored, then keeps it (no write per GET)", async () => {
+      const w = seedWorld();
+      await setup(w);
+      const spy = await updateSpy();
+      try {
+        const fresh = fakeDb.seedCallTrackingNumber({ companyId: w.company.id, trackingNumber: "+15125550111", provider: FAKE_PROVIDER });
+        const prior = new Date("2026-10-20T00:00:00.000Z");
+        const known = fakeDb.seedCallTrackingNumber({ companyId: w.company.id, trackingNumber: "+15125550112", provider: FAKE_PROVIDER, verifiedAt: prior });
+        await list(w);
+        expect(spy).toHaveBeenCalledTimes(1);
+        expect(storedAt(fresh.id)).toBeInstanceOf(Date);
+        expect(storedAt(known.id)).toEqual(prior);
+        const first = storedAt(fresh.id);
+        spy.mockClear();
+        await list(w);
+        expect(spy).not.toHaveBeenCalled();
+        expect(storedAt(fresh.id)).toEqual(first);
+      } finally {
+        spy.mockRestore();
+      }
+    });
+
+    it("unverified or stale provider results never stamp, and other tenants are untouched", async () => {
+      const w = seedWorld();
+      await setup(w);
+      const spy = await updateSpy();
+      try {
+        fakeVerifyOwnership.mockImplementation((async () => ({ status: "verified", verifiedAt: new Date(Date.now() - 40 * 24 * hour).toISOString() })) as never);
+        const mine = fakeDb.seedCallTrackingNumber({ companyId: w.company.id, trackingNumber: "+15125550111", provider: FAKE_PROVIDER });
+        const theirs = fakeDb.seedCallTrackingNumber({ companyId: w.other.id, trackingNumber: "+15125550333", provider: FAKE_PROVIDER });
+        const res = await list(w);
+        expect(res.body.numbers).toHaveLength(1);
+        expect(res.body.numbers[0]).toMatchObject({ id: mine.id, verificationStatus: "unverified", verifiedAt: null });
+        fakeVerifyOwnership.mockImplementation((async () => "pending") as never);
+        await list(w);
+        expect(spy).not.toHaveBeenCalled();
+        expect(storedAt(mine.id)).toBeNull();
+        expect(storedAt(theirs.id)).toBeNull();
+      } finally {
+        spy.mockRestore();
+        fakeVerifyOwnership.mockImplementation(async () => fakeOwnership);
+      }
+    });
+  });
 });

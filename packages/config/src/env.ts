@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { assertStripeLiveKeyAllowed } from "./deployment-environment.js";
+
 const envSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   /** Injected by Render (and similar hosts); prefer over service-specific ports when set. */
@@ -15,6 +17,10 @@ const envSchema = z.object({
   DATABASE_TRANSACTION_MAX_RETRIES: z.coerce.number().int().nonnegative().default(3),
   DATABASE_TRANSACTION_RETRY_BASE_MS: z.coerce.number().int().positive().default(25),
   REDIS_URL: z.string().min(1, "REDIS_URL is required"),
+  /** FS-198 — geo/ETA provider id (registry in apps/api). Default needs no key and makes no calls. */
+  GEO_PROVIDER: z.string().regex(/^[a-z][a-z0-9_]{0,63}$/).default("straight_line"),
+  /** FS-198 — assumed average driving speed for straight-line ETAs (mph); clamped 5–80 at use. */
+  ETA_ASSUMED_SPEED_MPH: z.coerce.number().positive().default(30),
   STRIPE_SECRET_KEY: z.string().min(1, "STRIPE_SECRET_KEY is required"),
   STRIPE_WEBHOOK_SECRET: z.string().min(1, "STRIPE_WEBHOOK_SECRET is required"),
   STRIPE_CONNECT_CLIENT_ID: z.string().min(1, "STRIPE_CONNECT_CLIENT_ID is required"),
@@ -57,6 +63,11 @@ const envSchema = z.object({
     .positive("MEDIA_SIGNED_URL_TTL_SECONDS must be greater than zero")
     .default(900),
   APP_URL: z.string().url("APP_URL must be a valid URL"),
+  /**
+   * Comma-separated extra web origins (exact match, no wildcards). APP_URL stays primary. Extras are honored only when
+   * RENVANI_DEPLOYMENT_TIER=staging (tester tier) for API CORS, Clerk authorized parties and Stripe return URLs.
+   */
+  APP_URL_ALLOWED: z.string().default(""),
   JWT_SECRET: z.string().min(1, "JWT_SECRET is required"),
   JWT_REFRESH_SECRET: z.string().min(1, "JWT_REFRESH_SECRET is required"),
   BOOKING_HOLD_TOKEN_SECRET: z.string().min(1, "BOOKING_HOLD_TOKEN_SECRET is required"),
@@ -76,6 +87,11 @@ const envSchema = z.object({
   CLERK_SECRET_KEY: z.string().default(""),
   /** Clerk webhook signing secret (whsec_…) for POST /api/v1/webhooks/clerk (svix). */
   CLERK_WEBHOOK_SECRET: z.string().default(""),
+  /**
+   * Optional shared secret the web proxy (Vercel) sends as `x-origin-secret` on /api/v1/public/* calls.
+   * Unset = off: client IP is request.ip (TRUST_PROXY_HOPS). Set on BOTH Vercel web and Render api.
+   */
+  ORIGIN_SECRET: z.string().optional(),
   /** Comma-separated web origins allowed as Clerk `azp` and for CORS (e.g. https://staging.renvani.com). */
   CLERK_AUTHORIZED_PARTIES: z.string().default(""),
   /** STACK-04 / FS-133 — optional Sentry DSN for QBO sync issue alerts */
@@ -98,7 +114,10 @@ const envSchema = z.object({
   /** FS-66 — public slot-hold/confirm limits (fixed window). */
   PUBLIC_SLOT_HOLD_IP_RATE_LIMIT_MAX: z.coerce.number().int().positive().default(6),
   PUBLIC_SLOT_HOLD_COMPANY_RATE_LIMIT_MAX: z.coerce.number().int().positive().default(120),
-  PUBLIC_SLOT_HOLD_RATE_LIMIT_WINDOW_SECONDS: z.coerce.number().int().positive().default(600)
+  PUBLIC_SLOT_HOLD_RATE_LIMIT_WINDOW_SECONDS: z.coerce.number().int().positive().default(600),
+  /** FS-195 — dispatch drive-time estimator id (registry in apps/api) + assumed speed (mph, clamped 5–80). */
+  DRIVE_TIME_ESTIMATOR: z.string().regex(/^[a-z][a-z0-9_]{0,63}$/).default("straight_line"),
+  DRIVE_TIME_ASSUMED_SPEED_MPH: z.coerce.number().positive().default(30)
 });
 
 export type Env = z.infer<typeof envSchema>;
@@ -133,6 +152,7 @@ function parseEnv(): Env {
   if (!result.success) {
     throw new Error(`Environment validation failed: ${formatValidationErrors(result.error)}`);
   }
+  assertStripeLiveKeyAllowed(process.env);
 
   return result.data;
 }

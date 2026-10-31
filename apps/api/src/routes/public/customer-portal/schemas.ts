@@ -174,3 +174,34 @@ export const listCustomerPortalInvoicesSchema = {
     ...errors
   }
 } as const;
+
+/** Portal sections: payloads are validated by the explicit zod allowlist schemas in @fsm/types. */
+const sectionKeyParams = {
+  type: "object",
+  required: ["key"],
+  properties: { key: { type: "string", minLength: 1, maxLength: 64, pattern: "^[a-z][a-z0-9_-]*$" } }
+} as const;
+
+export const listCustomerPortalSectionsSchema = {
+  tags: ["public", "customer-portal"],
+  response: {
+    200: {
+      type: "object",
+      additionalProperties: false,
+      required: ["sections"],
+      properties: { sections: { type: "array", items: { type: "string" } } }
+    },
+    ...errors
+  }
+} as const;
+
+export const getCustomerPortalSectionSchema = {
+  tags: ["public", "customer-portal"],
+  params: sectionKeyParams,
+  response: { ...errors, 404: errorResponseSchema }
+} as const;
+
+export const getCustomerPortalNamedSectionSchema = {
+  tags: ["public", "customer-portal"],
+  response: { ...errors }
+} as const;

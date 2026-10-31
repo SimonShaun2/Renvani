@@ -19,6 +19,7 @@ import {
   stopTimeEntry,
   type OnTheWayNotification
 } from "../../services/time-tracking.service.js";
+import { TimesheetConflictError } from "../../services/timesheets.service.js";
 import type {
   JobIdParams,
   OnTheWayBody
@@ -96,7 +97,15 @@ export async function startTimeEntryHandler(
   reply: FastifyReply
 ): Promise<FastifyReply> {
   const params = request.params as JobIdParams;
-  const entry = await startTimeEntry(request.company.id, request.user.id, params.id, request.body as StartTimeEntryInput);
+  let entry: TimeEntry;
+  try {
+    entry = await startTimeEntry(request.company.id, request.user.id, params.id, request.body as StartTimeEntryInput);
+  } catch (error) {
+    if (error instanceof TimesheetConflictError) {
+      return reply.code(409).send({ error: "CONFLICT", reason: error.reason, message: error.message, current: error.current, requestId: request.id });
+    }
+    throw error;
+  }
 
   return reply.status(201).send({
     timeEntry: toTimeEntryResponse(entry)

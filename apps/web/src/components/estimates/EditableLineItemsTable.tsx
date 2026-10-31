@@ -20,6 +20,10 @@ interface EditableLineItemsTableProps {
   items: RevenueLineItemDraft[];
   readOnly?: boolean;
   onChange: (items: RevenueLineItemDraft[]) => void;
+  /** "frame" = Figma 10:676 Line item / Detail / Qty / Price layout (estimate builder). */
+  variant?: "default" | "frame";
+  /** Estimate-level discount shown as its own row in the frame layout (only when > 0). */
+  discountAmount?: number;
 }
 
 interface CustomItemFormState {
@@ -45,7 +49,9 @@ export function EditableLineItemsTable({
   subtitle,
   items,
   readOnly = false,
-  onChange
+  onChange,
+  variant = "default",
+  discountAmount = 0
 }: EditableLineItemsTableProps) {
   const [catalogOpen, setCatalogOpen] = useState(false);
   const [pendingProductId, setPendingProductId] = useState<string | null>(null);
@@ -121,8 +127,170 @@ export function EditableLineItemsTable({
     setCustomItemOpen(false);
   }
 
+  const frameInput =
+    "w-full rounded-[8px] border border-[#e6dccb] bg-[#fbf6ef] px-2 py-1.5 text-[13px] text-[#0f1530] outline-none transition focus:border-[#0f1530]";
+  const frameTable = (
+    <section className="overflow-hidden rounded-[14px] border border-[#e6dccb] bg-white" aria-label={title}>
+      <div className="overflow-x-auto">
+        <table className="w-full text-left text-[13px]">
+          <thead className="bg-[#fbf6ef] font-mono text-[10px] font-medium uppercase tracking-[0.8px] text-[#5e6684]">
+            <tr>
+              <th className="px-5 py-2.5 font-medium">Line item</th>
+              <th className="px-5 py-2.5 font-medium">Detail</th>
+              <th className="px-5 py-2.5 font-medium">Qty</th>
+              <th className="px-5 py-2.5 font-medium">Price</th>
+              {!readOnly ? <th className="px-5 py-2.5 font-medium"><span className="sr-only">Actions</span></th> : null}
+            </tr>
+          </thead>
+          <tbody>
+            {items.length === 0 ? (
+              <tr className="border-t border-[#e6dccb]">
+                <td colSpan={readOnly ? 4 : 5} className="px-5 py-8 text-center text-[#5e6684]">
+                  No line items yet.
+                </td>
+              </tr>
+            ) : (
+              items.map((item) => {
+                const lineTotal = parseMoneyValue(item.quantity) * parseMoneyValue(item.unitPrice);
+                return (
+                  <tr key={item.localId} className="border-t border-[#e6dccb] align-middle">
+                    <td className="px-5 py-3.5 font-semibold text-[#0f1530]">
+                      {readOnly ? (
+                        item.name
+                      ) : (
+                        <input
+                          aria-label="Line item"
+                          value={item.name}
+                          onChange={(event) => updateItem(item.localId, { name: event.target.value })}
+                          placeholder="Line item name"
+                          className={`${frameInput} font-semibold`}
+                        />
+                      )}
+                    </td>
+                    <td className="px-5 py-3.5 text-[#2a3360]">
+                      {readOnly ? (
+                        item.description || "—"
+                      ) : (
+                        <input
+                          aria-label="Detail"
+                          value={item.description}
+                          onChange={(event) => updateItem(item.localId, { description: event.target.value })}
+                          placeholder="Detail"
+                          className={frameInput}
+                        />
+                      )}
+                    </td>
+                    <td className="px-5 py-3.5 text-[#2a3360]">
+                      {readOnly ? (
+                        item.quantity
+                      ) : (
+                        <input
+                          aria-label="Qty"
+                          value={item.quantity}
+                          onChange={(event) => updateItem(item.localId, { quantity: event.target.value })}
+                          onBlur={() => updateItem(item.localId, { quantity: formatQuantityInput(item.quantity) })}
+                          inputMode="decimal"
+                          className={`${frameInput} w-16`}
+                        />
+                      )}
+                    </td>
+                    <td className="px-5 py-3.5 text-[#2a3360]">
+                      {readOnly ? (
+                        `$${formatMoneyInput(lineTotal)}`
+                      ) : (
+                        <div className="space-y-1">
+                          <input
+                            aria-label="Unit price"
+                            value={item.unitPrice}
+                            onChange={(event) => updateItem(item.localId, { unitPrice: event.target.value })}
+                            onBlur={() => updateItem(item.localId, { unitPrice: formatMoneyInput(item.unitPrice) })}
+                            inputMode="decimal"
+                            className={`${frameInput} w-24`}
+                          />
+                          {parseMoneyValue(item.quantity) !== 1 ? (
+                            <p className="text-xs text-[#5e6684]">${formatMoneyInput(lineTotal)} total</p>
+                          ) : null}
+                        </div>
+                      )}
+                    </td>
+                    {!readOnly ? (
+                      <td className="px-5 py-3.5">
+                        <div className="flex items-center justify-end gap-2">
+                          <select
+                            aria-label="Type"
+                            value={item.itemType}
+                            onChange={(event) =>
+                              updateItem(item.localId, { itemType: event.target.value as RevenueLineItemDraft["itemType"] })
+                            }
+                            className={`${frameInput} w-auto`}
+                          >
+                            <option value="service">Service</option>
+                            <option value="labor">Labor</option>
+                            <option value="material">Material</option>
+                            <option value="fee">Fee</option>
+                          </select>
+                          <label className="inline-flex items-center gap-1.5 text-xs text-[#5e6684]">
+                            <input
+                              type="checkbox"
+                              checked={item.isTaxable}
+                              onChange={(event) => updateItem(item.localId, { isTaxable: event.target.checked })}
+                              className="h-4 w-4 rounded border-[#e6dccb]"
+                            />
+                            Taxable
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => removeItem(item.localId)}
+                            className="rounded-full p-1.5 text-[#5e6684] transition hover:bg-[#fde4df] hover:text-[#a3261a]"
+                            aria-label={`Remove ${item.name}`}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </td>
+                    ) : null}
+                  </tr>
+                );
+              })
+            )}
+            {discountAmount > 0 ? (
+              <tr className="border-t border-[#e6dccb]">
+                <td className="px-5 py-3.5 font-semibold text-[#0f1530]">Discount</td>
+                <td className="px-5 py-3.5 text-[#2a3360]">Applied to this estimate</td>
+                <td className="px-5 py-3.5 text-[#2a3360]">—</td>
+                <td className="px-5 py-3.5 text-[#2a3360]">−${formatMoneyInput(discountAmount)}</td>
+                {!readOnly ? <td /> : null}
+              </tr>
+            ) : null}
+          </tbody>
+        </table>
+      </div>
+      {!readOnly ? (
+        <div className="flex flex-wrap gap-2 border-t border-[#e6dccb] px-5 py-3">
+          <button
+            type="button"
+            onClick={() => setCatalogOpen(true)}
+            className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-[#0f1530]"
+          >
+            <Plus className="h-4 w-4" />
+            Add from catalog
+          </button>
+          <button
+            type="button"
+            onClick={() => setCustomItemOpen(true)}
+            className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-[#2a3360]"
+          >
+            <Plus className="h-4 w-4" />
+            Add custom item
+          </button>
+        </div>
+      ) : null}
+    </section>
+  );
+
   return (
     <>
+      {variant === "frame" ? frameTable : (
       <section className="rounded-[28px] border border-neutral-200 bg-white px-5 py-5 shadow-sm">
         <div className="flex flex-col gap-4 border-b border-neutral-200 pb-4 md:flex-row md:items-start md:justify-between">
           <div>
@@ -281,6 +449,7 @@ export function EditableLineItemsTable({
           </table>
         </div>
       </section>
+      )}
 
       <ProductCatalogPicker
         open={catalogOpen}

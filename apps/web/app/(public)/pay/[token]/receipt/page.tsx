@@ -1,55 +1,65 @@
 "use client";
 
+import { LEGACY_BOOKING_FEE_LABEL, receiptFeeLabel } from "@/src/lib/service-fee-copy";
 import { useParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 
-import { api } from "@/src/lib/api";
+import { PayInvoicePaidCard, PayInvoiceShell, type PaidDetail } from "@/src/components/pay/PayInvoiceView";
+import type { PublicInvoiceReceiptResponse } from "@fsm/types";
 
-interface ReceiptView {
-  invoiceNumber: string;
-  totalDue: string;
-  invoiceAmount: string;
-  platformFeeAmount: string;
-  receiptPortalUrl: string;
-  pdfDownloadUrl: string;
-  brandName: string;
-}
+import { buildPaidDetails, formatUsd } from "@/src/components/pay/pay-invoice.utils";
+import { publicApi } from "@/src/lib/public-api";
 
+
+/** Receipt view styled as the Paid success card (Figma 53:219 desktop / 53:465 mobile). */
 export default function InvoiceReceiptPage() {
   const params = useParams<{ token: string }>();
   const receiptQuery = useQuery({
     queryKey: ["public-receipt", params.token],
-    queryFn: () => api.get<ReceiptView>(`/api/v1/public/pay/${params.token}/receipt`)
+    queryFn: () => publicApi.get<PublicInvoiceReceiptResponse>(`/api/v1/public/pay/${params.token}/receipt`)
   });
+
+  if (receiptQuery.isError) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#fbf6ef] px-4 text-center text-sm text-[#5e6684]">
+        Receipt unavailable. Contact your service provider for a copy.
+      </div>
+    );
+  }
 
   if (receiptQuery.isLoading || !receiptQuery.data) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-neutral-50">
+      <div className="flex min-h-screen items-center justify-center bg-[#fbf6ef]">
         <Loader2 className="h-10 w-10 animate-spin text-brand-accent" />
       </div>
     );
   }
 
   const receipt = receiptQuery.data;
+  const details: PaidDetail[] = [{ label: "Service amount", value: formatUsd(receipt.invoiceAmount) }];
+  if (receipt.serviceFeeCents > 0 && receipt.serviceFeeLabel) {
+    details.push({ label: receiptFeeLabel(receipt.serviceFeeLabel), value: formatUsd(receipt.serviceFeeAmount) });
+  }
+  // Booking fee was removed; keep this row only for legacy receipts that were charged one.
+  if (receipt.bookingFeeCents > 0 && Number(receipt.bookingFeeAmount) > 0) {
+    details.push({ label: LEGACY_BOOKING_FEE_LABEL, value: formatUsd(receipt.bookingFeeAmount) });
+  }
+  details.push(...buildPaidDetails(receipt));
+  const amount = receipt.paidAmount ?? (Number(receipt.totalDue) > 0 ? receipt.totalDue : null);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-neutral-50 px-4 py-12">
-      <div className="w-full max-w-md rounded-[32px] border border-neutral-200 bg-white px-8 py-10 shadow-sm">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-400">{receipt.brandName} receipt</p>
-        <h1 className="mt-3 text-2xl font-semibold text-neutral-900">{receipt.invoiceNumber}</h1>
-        <p className="mt-6 text-sm text-neutral-600">Service amount: ${receipt.invoiceAmount}</p>
-        {Number(receipt.platformFeeAmount) > 0 ? (
-          <p className="mt-2 text-sm text-neutral-600">Platform fee: ${receipt.platformFeeAmount}</p>
-        ) : null}
-        <p className="mt-4 text-lg font-semibold text-neutral-900">Total: ${receipt.totalDue}</p>
-        <a
-          href={receipt.pdfDownloadUrl}
-          className="mt-8 inline-flex w-full items-center justify-center rounded-full bg-brand-accent px-6 py-3 text-sm font-semibold text-white"
-        >
-          Download PDF
-        </a>
-      </div>
-    </div>
+    <PayInvoiceShell shopName={receipt.shopName} shopLogoUrl={receipt.shopLogoUrl} invoiceNumber={receipt.invoiceNumber}>
+      <PayInvoicePaidCard
+        amount={amount}
+        invoiceNumber={receipt.invoiceNumber}
+        customerName={receipt.customerName}
+        shopName={receipt.shopName}
+        shopUrl={receipt.shopUrl}
+        details={details}
+        receiptHref={receipt.pdfDownloadUrl}
+        receiptLabel="Download PDF"
+      />
+    </PayInvoiceShell>
   );
 }

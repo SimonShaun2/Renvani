@@ -6,6 +6,7 @@ import type {
   CreateInvoiceInput,
   InvoiceStatus,
   ListInvoicesQuery,
+  PublicPaymentLinkResponse,
   RecordPaymentInput,
   UpdateInvoiceInput,
   UpdateInvoiceItemInput
@@ -111,17 +112,7 @@ interface InvoiceItemResponse {
   item: InvoiceItemRecord;
 }
 
-interface PublicPaymentLinkResponse {
-  invoiceNumber: string;
-  paymentLinkUrl: string;
-  checkoutClientSecret: string | null;
-  invoiceAmount: string;
-  platformFeeAmount: string;
-  totalDue: string;
-  platformFeePercent: number | null;
-  platformFeePaidByCustomer: boolean;
-  platformFeeDisclosure: string | null;
-}
+export type { PublicPaymentLinkResponse } from "@fsm/types";
 
 function buildQueryString(values: Record<string, string | number | undefined>) {
   const params = new URLSearchParams();
@@ -177,6 +168,23 @@ export function useInvoices(query: ListInvoicesQuery) {
   return useQuery({
     queryKey: invoiceKeys.list(query),
     queryFn: () => api.get<PaginatedResponse<InvoiceListRecord>>(`/api/v1/invoices?${queryString}`)
+  });
+}
+
+export interface PaymentListRecord {
+  id: string;
+  amount: string;
+  status: string;
+  paidAt: string | null;
+  createdAt: string;
+}
+
+/** GET /api/v1/payments — succeeded payments created since `createdAfter` (max 100 per page). */
+export function useSucceededPaymentsSince(createdAfter: string) {
+  const queryString = buildQueryString({ status: "succeeded", createdAfter, page: 1, limit: 100 });
+  return useQuery({
+    queryKey: [...invoiceKeys.all, "payments", "succeeded", createdAfter] as const,
+    queryFn: () => api.get<PaginatedResponse<PaymentListRecord>>(`/api/v1/payments?${queryString}`)
   });
 }
 

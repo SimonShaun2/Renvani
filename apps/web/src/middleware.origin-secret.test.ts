@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
 
 import { middleware } from "../middleware";
+import { readOriginSecret } from "./lib/origin-secret-env";
 
 const PUBLIC_URL = "http://localhost:3000/api/v1/public/booking/acme-hvac";
 
@@ -38,6 +39,27 @@ describe("middleware x-origin-secret on public API proxy", () => {
 
     expect(forwardedOriginSecret(response)).toBe("test-origin-secret");
     expect(overriddenHeaderNames(response)).toContain("x-origin-secret");
+  });
+
+  it("an invalid (non header-safe) ORIGIN_SECRET is an explicit 500 config error, never logged or forwarded", async () => {
+    const bad = "line1\nline2";
+    vi.stubEnv("ORIGIN_SECRET", bad);
+    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const response = await middleware(new NextRequest(PUBLIC_URL, { method: "GET", headers: { "x-origin-secret": "spoofed" } }));
+
+    expect(response.status).toBe(500);
+    expect(forwardedOriginSecret(response)).toBeNull();
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(String(spy.mock.calls[0]?.[0])).toContain("ORIGIN_SECRET must be");
+    expect(String(spy.mock.calls[0]?.[0])).not.toContain("line1");
+    spy.mockRestore();
+  });
+
+  it("readOriginSecret: unset/empty -> undefined; spaces, tabs and newlines rejected", () => {
+    expect(readOriginSecret({})).toEqual({ ok: true, secret: undefined });
+    expect(readOriginSecret({ ORIGIN_SECRET: "" })).toEqual({ ok: true, secret: undefined });
+    expect(readOriginSecret({ ORIGIN_SECRET: "abc-123_XYZ" })).toEqual({ ok: true, secret: "abc-123_XYZ" });
+    for (const v of ["a b", "a\tb", "a\r\nb", "é"]) expect(readOriginSecret({ ORIGIN_SECRET: v }).ok).toBe(false);
   });
 
   it("does not add the header when ORIGIN_SECRET is unset", async () => {

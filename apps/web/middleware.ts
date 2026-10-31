@@ -10,6 +10,7 @@ import {
   isPublicApiProxyPath
 } from "@/src/lib/public-api-path-security";
 import { isClerkEnabled } from "@/src/lib/clerk/config";
+import { readOriginSecret } from "@/src/lib/origin-secret-env";
 import { resolveClerkRole, resolveClerkRouteDecision } from "@/src/lib/clerk/route-decision";
 import { canRoleAccessPath, getDefaultRouteForRole, isPublicRoute, normalizeUserRole, type UserRole } from "@/src/lib/route-access";
 
@@ -83,8 +84,13 @@ export async function legacyMiddleware(request: NextRequest, clerkUserId: string
 
     const headers = new Headers(request.headers);
     headers.delete("x-origin-secret"); // never pass a client-supplied value through
-    const originSecret = process.env.ORIGIN_SECRET;
-    if (originSecret) headers.set("x-origin-secret", originSecret);
+    const originSecret = readOriginSecret();
+    if (!originSecret.ok) {
+      // Explicit configuration error; the value itself is never logged.
+      console.error(`[middleware] ${originSecret.error}`);
+      return new NextResponse(null, { status: 500 });
+    }
+    if (originSecret.secret) headers.set("x-origin-secret", originSecret.secret);
     return NextResponse.next({ request: { headers } });
   }
 

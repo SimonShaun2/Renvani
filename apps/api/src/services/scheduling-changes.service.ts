@@ -17,7 +17,7 @@ import { and, eq, inArray, isNull } from "drizzle-orm";
 import { activityEvents, db, jobs, technicians } from "@fsm/db";
 import { AppError, ErrorCode, type UserRole } from "@fsm/types";
 
-import { canonicalJson } from "./growth-check-report-render.js";
+import { canonicalJson } from "../lib/canonical-json.js";
 
 type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
 type JobRow = typeof jobs.$inferSelect;

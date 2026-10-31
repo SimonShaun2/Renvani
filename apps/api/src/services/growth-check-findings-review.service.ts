@@ -30,6 +30,8 @@ import {
   type UserRole
 } from "@fsm/types";
 
+import { canonicalJson } from "../lib/canonical-json.js";
+
 type FindingRow = typeof growthCheckFindings.$inferSelect;
 type RevisionRow = typeof growthCheckFindingRevisions.$inferSelect;
 
@@ -153,8 +155,7 @@ export function applyGrowthCheckReviewAction(
 
 function payloadHash(body: GrowthCheckFindingReviewBody): string {
   const { idempotencyKey: _ignored, ...rest } = body;
-  const sorted = Object.fromEntries(Object.entries(rest).sort(([a], [b]) => a.localeCompare(b)));
-  return createHash("sha256").update(JSON.stringify(sorted)).digest("hex");
+  return createHash("sha256").update(canonicalJson(rest)).digest("hex");
 }
 
 function isUniqueViolation(error: unknown): boolean {

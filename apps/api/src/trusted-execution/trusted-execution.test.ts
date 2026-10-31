@@ -1,7 +1,7 @@
 /**
  * Ticket A "Trusted Execution", fix PR 1: stale-version and idempotent-replay guarantees for
- * agent-action approve/execute and operator edit (TE-STALE-*, TE-DUP-*), plus failed-execution and outbound
- * receipt states (TE-FAIL-01, TE-RCPT-01/02). Runs in the default suite.
+ * agent-action approve/execute and operator edit (TE-STALE-*, TE-DUP-*), auth-before-validation (TE-AUTH-*),
+ * plus failed-execution and outbound receipt states (TE-FAIL-*, TE-RCPT-*). Runs in the default suite.
  * Gap ids refer to docs/architecture/TRUSTED_EXECUTION_AUDIT.md. No network, no env reads, no provider send.
  */
 import request from "supertest";
@@ -335,5 +335,49 @@ describe("Trusted Execution: failed execution and receipt states", () => {
     expect([403, 409]).toContain(again.status);
     expect(stored(action.id).state).toBe("executing");
     expect(events(action.id, "agent.execution_succeeded")).toHaveLength(1);
+  });
+});
+
+describe("Trusted Execution: auth runs before validation (onRequest)", () => {
+  it("TE-AUTH-01 unauthenticated approve with a malformed id must be 401 (auth before validation), not 400", async () => {
+    const res = await request(app.server).post("/api/v1/agent-actions/not-a-uuid/approve").send({ expectedVersion: "x" });
+    expect(res.status).toBe(401);
+  });
+
+  it("TE-AUTH-02 technician execute with a malformed body must be 403 (role before validation), not 400", async () => {
+    const { company, job, auth } = tenant("auth2");
+    const action = seedSchedulingAction(company.id, job.id, "approved");
+    const res = await request(app.server)
+      .post(`/api/v1/agent-actions/${action.id}/execute`)
+      .set("Authorization", auth("technician").header)
+      .send({ expectedVersion: "not-a-number" });
+    expect(res.status).toBe(403);
+  });
+});
+
+describe("Trusted Execution: auth before validation on the operator surface", () => {
+  it("TE-AUTH-03 unauthenticated operator inbox edit with a malformed id is 401, not 400", async () => {
+    const res = await request(app.server).patch("/api/v1/operator/inbox/not-a-uuid").send({});
+    expect(res.status).toBe(401);
+  });
+
+  it("TE-AUTH-04 technician escalate with a malformed body is 403, not 400", async () => {
+    const { company, job, auth } = tenant("auth4");
+    const action = seedSchedulingAction(company.id, job.id, "awaiting_approval");
+    const res = await request(app.server)
+      .post(`/api/v1/agent-actions/${action.id}/escalate`)
+      .set("Authorization", auth("technician").header)
+      .send({ expectedVersion: "not-a-number" });
+    expect(res.status).toBe(403);
+  });
+
+  it("TE-AUTH-05 an authorised owner with a malformed body still gets 400 (validation still runs)", async () => {
+    const { company, job, auth } = tenant("auth5");
+    const action = seedSchedulingAction(company.id, job.id, "approved");
+    const res = await request(app.server)
+      .post(`/api/v1/agent-actions/${action.id}/execute`)
+      .set("Authorization", auth("owner").header)
+      .send({ expectedVersion: "not-a-number" });
+    expect(res.status).toBe(400);
   });
 });

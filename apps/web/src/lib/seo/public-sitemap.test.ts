@@ -8,6 +8,13 @@ import {
   MAX_SERVICE_AREA_URLS_PER_SHOP,
   ROBOTS_ALLOW,
   SitemapPublishCheckError,
+  MARKETING_SITEMAP_PATHS,
+  SITEMAP_COUNT,
+  SITEMAP_URL_LIMIT,
+  buildFullSitemap,
+  buildSitemapIndexXml,
+  sitemapChunk,
+  sitemapIds,
   serviceAreaSitemapPaths, buildPublicRobots, buildPublicSitemap, optInSlugs, publicSiteUrl } from "./public-sitemap";
 
 const env = (vars: Record<string, string>) => vars as unknown as NodeJS.ProcessEnv;
@@ -63,7 +70,7 @@ describe("robots", () => {
     expect(list(rule?.disallow)).toEqual(expect.arrayContaining(["/", "/book/*/manage"]));
     expect(list(rule?.allow)).toEqual(ROBOTS_ALLOW.map((a) => a.prefix));
     expect(list(rule?.allow)).toEqual(expect.arrayContaining(["/site/", "/book/", "/pricing"]));
-    expect(robots.sitemap).toBe("https://s.example/sitemap.xml");
+    expect(robots.sitemap).toBe("https://s.example/sitemap-index.xml");
   });
 
   it("disallows everything and omits the sitemap when PUBLIC_SITE_URL is unset (previews)", () => {
@@ -136,5 +143,39 @@ describe("service x area sitemap entries", () => {
 
   it("robots explicitly allows the service-area route", () => {
     expect(ROBOTS_ALLOW.map((a) => a.prefix)).toContain("/site/*/*/");
+  });
+});
+
+describe("split sitemaps at 500-shop scale", () => {
+  it("keeps every sitemap at most 50,000 URLs, loses or duplicates nothing, and the index covers all", async () => {
+    const slugs = Array.from({ length: 500 }, (_, i) => `shop-${i}`);
+    const zips = Array.from({ length: 125 }, (_, i) => String(10000 + i));
+    const settings = {
+      offeredServices: ["AC Repair", "Furnace Install", "Drain Cleaning", "Panel Upgrade"].map((name) => ({ name })),
+      serviceAreaZipCodes: zips
+    };
+    const e = env({ PUBLIC_SITE_URL: "https://s.example", PUBLIC_SITE_SLUGS: slugs.join(",") });
+    const all = await buildFullSitemap(e, async () => settings);
+    const perShop = serviceAreaSitemapPaths("shop-0", settings).length;
+    expect(perShop).toBe(Math.min(4 * 125, MAX_SERVICE_AREA_URLS_PER_SHOP));
+    expect(all.length).toBeGreaterThan(SITEMAP_URL_LIMIT);
+    expect(all.length).toBe(MARKETING_SITEMAP_PATHS.length + 500 * (3 + perShop));
+
+    const chunks = sitemapIds().map(({ id }) => sitemapChunk(all, id));
+    for (const chunk of chunks) expect(chunk.length).toBeLessThanOrEqual(SITEMAP_URL_LIMIT);
+    const urls = chunks.flat().map((x) => x.url);
+    expect(urls).toHaveLength(all.length);
+    expect(new Set(urls).size).toBe(urls.length);
+    expect(new Set(urls)).toEqual(new Set(all.map((x) => x.url)));
+    expect(sitemapChunk(all, SITEMAP_COUNT)).toEqual([]);
+
+    const xml = buildSitemapIndexXml(e)!;
+    const locs = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
+    expect(locs).toEqual(sitemapIds().map(({ id }) => `https://s.example/sitemap/${id}.xml`));
+    expect(locs.length).toBe(SITEMAP_COUNT);
+  });
+
+  it("serves no index without a base URL", () => {
+    expect(buildSitemapIndexXml(env({}))).toBeNull();
   });
 });

@@ -162,7 +162,45 @@ export function buildPublicRobots(env: NodeJS.ProcessEnv = process.env): Metadat
   if (!base) return { rules: [{ userAgent: "*", disallow: "/" }] };
   return {
     rules: [{ userAgent: "*", allow: ROBOTS_ALLOW.map((a) => a.prefix), disallow: [...ROBOTS_DISALLOW] }],
-    sitemap: `${base}/sitemap.xml`,
+    sitemap: `${base}${SITEMAP_INDEX_PATH}`,
     host: base
   };
+}
+
+/** Protocol limit per sitemap file (sitemaps.org): 50,000 URLs. */
+export const SITEMAP_URL_LIMIT = 50_000;
+/** Opt-in shops are capped at 500 (optInSlugs), each with at most SHOP_PAGE_TYPES + MAX_SERVICE_AREA_URLS_PER_SHOP URLs. */
+export const MAX_SITEMAP_URLS =
+  MARKETING_SITEMAP_PATHS.length + 500 * (SHOP_PAGE_TYPES.length + MAX_SERVICE_AREA_URLS_PER_SHOP);
+/** Fixed sitemap count covering the worst case, so ids are stable for generateSitemaps and the index. */
+export const SITEMAP_COUNT = Math.ceil(MAX_SITEMAP_URLS / SITEMAP_URL_LIMIT);
+export const SITEMAP_INDEX_PATH = "/sitemap-index.xml";
+
+export function sitemapIds(): { id: number }[] {
+  return Array.from({ length: SITEMAP_COUNT }, (_, id) => ({ id }));
+}
+
+/** Deterministic split: chunk `id` holds entries [id*limit, (id+1)*limit). Empty chunks are valid empty urlsets. */
+export function sitemapChunk(all: MetadataRoute.Sitemap, id: number, limit = SITEMAP_URL_LIMIT): MetadataRoute.Sitemap {
+  if (!Number.isInteger(id) || id < 0) return [];
+  return all.slice(id * limit, (id + 1) * limit);
+}
+
+export async function buildFullSitemap(
+  env: NodeJS.ProcessEnv = process.env,
+  fetchSettings: Fetcher = fetchPublicBookingSettingsBySlug
+): Promise<MetadataRoute.Sitemap> {
+  return [...buildMarketingSitemap(env), ...(await buildPublicSitemap(env, fetchSettings))];
+}
+
+const xmlEscape = (v: string) => v.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;");
+
+/** Sitemap index (sitemaps.org) listing every split sitemap served by app/sitemap.ts at /sitemap/{id}.xml. */
+export function buildSitemapIndexXml(env: NodeJS.ProcessEnv = process.env): string | null {
+  const base = publicSiteUrl(env);
+  if (!base) return null;
+  const items = sitemapIds()
+    .map(({ id }) => `<sitemap><loc>${xmlEscape(`${base}/sitemap/${id}.xml`)}</loc></sitemap>`)
+    .join("");
+  return `<?xml version="1.0" encoding="UTF-8"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${items}</sitemapindex>`;
 }

@@ -46,7 +46,9 @@ export async function editOperatorInboxItemHandler(request: FastifyRequest, repl
     patch.subject = body.subject;
   }
 
-  const action = await editAgentActionParameters(request.company.id, id, request.user.id, patch);
+  const action = await editAgentActionParameters(request.company.id, id, request.user.id, patch, {
+    expectedVersion: body.expectedVersion
+  });
   const item = await getOperatorInboxItem(request.company.id, action.id);
   return reply.send(item);
 }

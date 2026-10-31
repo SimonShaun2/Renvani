@@ -219,12 +219,12 @@ describe("revenue agent proposals", () => {
     const approved = await request(app.server)
       .post(`/api/v1/agent-actions/${proposal.id}/approve`)
       .set("Authorization", owner.authorization)
-      .send({});
+      .send({ expectedVersion: fakeDb.getTestState().agentActions.find((row) => row.id === proposal.id)!.updatedAt.getTime() });
     expect(approved.status).toBe(200);
     const executed = await request(app.server)
       .post(`/api/v1/agent-actions/${proposal.id}/execute`)
       .set("Authorization", owner.authorization)
-      .send({});
+      .send({ expectedVersion: approved.body.version });
     expect(executed.status).toBe(200);
     const stored = fakeDb.getTestState().aiRecommendations.find((row) => row.id === rec.id);
     expect(stored?.status).toBe("actioned");
@@ -255,14 +255,15 @@ describe("revenue agent proposals", () => {
     const { proposal } = (await propose(owner.authorization, rec.id)).body;
     customer.doNotContact = true;
 
-    await request(app.server)
+    const approved = await request(app.server)
       .post(`/api/v1/agent-actions/${proposal.id}/approve`)
       .set("Authorization", owner.authorization)
-      .send({});
+      .send({ expectedVersion: fakeDb.getTestState().agentActions.find((row) => row.id === proposal.id)!.updatedAt.getTime() });
     const executed = await request(app.server)
       .post(`/api/v1/agent-actions/${proposal.id}/execute`)
       .set("Authorization", owner.authorization)
-      .send({});
+      .send({ expectedVersion: approved.body.version });
+    expect(approved.status).toBe(200);
     expect(executed.status).toBeGreaterThanOrEqual(400);
     expect(fakeDb.getTestState().aiRecommendations.find((row) => row.id === rec.id)?.status).toBe("pending");
   });

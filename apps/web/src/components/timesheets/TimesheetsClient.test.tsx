@@ -123,11 +123,40 @@ describe("TimesheetsClient", () => {
     expect(locked.textContent).toContain("Locked");
     expect(locked.querySelector("button")).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: "Edit" }));
+    fireEvent.change(screen.getByLabelText("Notes"), { target: { value: "Swapped capacitor" } });
     fireEvent.click(screen.getByRole("button", { name: "Save" }));
     await waitFor(() => expect(m.patch).toHaveBeenCalled());
     const [path, body] = m.patch.mock.calls[0]!;
     expect(path).toBe("/api/v1/time/entries/e1");
-    expect(body).toMatchObject({ recordVersion: "v1", notes: null });
+    expect(body).toMatchObject({ recordVersion: "v1", notes: "Swapped capacitor" });
+  });
+
+  it("notes-only save sends only notes, so start/end keep their seconds", async () => {
+    m.routes["/api/v1/time/entries"] = page("entries", [
+      entry({ startedAt: "2026-10-26T14:00:37.000Z", endedAt: "2026-10-26T16:30:59.000Z" })
+    ]);
+    renderClient();
+    fireEvent.click(await screen.findByRole("button", { name: "Edit" }));
+    fireEvent.change(screen.getByLabelText("Notes"), { target: { value: "Gate code 4411" } });
+    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+    await waitFor(() => expect(m.patch).toHaveBeenCalled());
+    const [, body] = m.patch.mock.calls[0]!;
+    expect(body).toEqual({ notes: "Gate code 4411", recordVersion: "v1" });
+  });
+
+  it("saving with no changes sends no request; changing start sends start only", async () => {
+    renderClient();
+    fireEvent.click(await screen.findByRole("button", { name: "Edit" }));
+    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+    expect(m.patch).not.toHaveBeenCalled();
+    fireEvent.click(await screen.findByRole("button", { name: "Edit" }));
+    const start = screen.getByLabelText("Start") as HTMLInputElement;
+    const [d, t] = start.value.split("T");
+    fireEvent.change(start, { target: { value: `${d}T${t === "06:15" ? "06:16" : "06:15"}` } });
+    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+    await waitFor(() => expect(m.patch).toHaveBeenCalled());
+    const [, body] = m.patch.mock.calls[0]!;
+    expect(Object.keys(body as object).sort()).toEqual(["recordVersion", "startedAt"]);
   });
 
   it("approves a submitted timesheet and shows approved periods as read-only", async () => {

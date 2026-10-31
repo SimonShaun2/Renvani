@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Clock, Download, FileClock, Lock, Users } from "lucide-react";
-import type { TimeEntryV1, TimesheetV1 } from "@fsm/types";
+import type { TimeEntryV1, TimesheetV1, UpdateTimeEntryBody } from "@fsm/types";
 
 import { PageLayout } from "@/src/components/layout/PageLayout";
 import { EmptyState } from "@/src/components/ui/EmptyState";
@@ -71,15 +71,25 @@ function EntryRow({ entry }: { entry: TimeEntryV1 }) {
   const [notes, setNotes] = useState(entry.notes ?? "");
 
   const save = () => {
+    // Send only changed fields so untouched start/end keep their original seconds
+    // (datetime-local inputs are minute precision). The PATCH schema allows any subset.
+    const initialStart = toLocalInput(entry.startedAt);
+    const initialEnd = entry.endedAt ? toLocalInput(entry.endedAt) : "";
+    const nextNotes = notes.trim() ? notes.trim() : null;
+    const body: UpdateTimeEntryBody = {
+      ...(startedAt !== initialStart ? { startedAt: new Date(startedAt).toISOString() } : {}),
+      ...(endedAt !== initialEnd ? { endedAt: endedAt ? new Date(endedAt).toISOString() : null } : {}),
+      ...(nextNotes !== (entry.notes ?? null) ? { notes: nextNotes } : {}),
+      recordVersion: entry.recordVersion
+    };
+    if (Object.keys(body).length === 1) {
+      setEditing(false);
+      return;
+    }
     update.mutate(
       {
         id: entry.id,
-        body: {
-          startedAt: new Date(startedAt).toISOString(),
-          ...(endedAt ? { endedAt: new Date(endedAt).toISOString() } : {}),
-          notes: notes.trim() ? notes.trim() : null,
-          recordVersion: entry.recordVersion
-        }
+        body
       },
       {
         onSuccess: () => {

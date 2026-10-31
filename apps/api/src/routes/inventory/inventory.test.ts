@@ -285,4 +285,87 @@ describe("FS-170 inventory API", () => {
     const otherLevels = await api().get("/api/v1/inventory/levels").set("Authorization", w.otherAuth);
     expect(otherLevels.body.levels).toHaveLength(0);
   });
+
+  describe("list pagination (#345 follow-up)", () => {
+    function seedLevels(w: ReturnType<typeof seedWorld>, count: number) {
+      for (let i = 0; i < count; i += 1) {
+        const product = fakeDb.seedProductCatalog({ companyId: w.company.id, name: `Part ${i}` });
+        fakeDb.seedStockLevel({
+          companyId: w.company.id, locationId: w.van.id, productId: product.id, quantity: i, lowStockThreshold: i % 2 === 0 ? 100 : null
+        });
+      }
+    }
+
+    it("caps levels at the default page size and reports page metadata", async () => {
+      const w = seedWorld();
+      seedLevels(w, 120);
+      const res = await api().get("/api/v1/inventory/levels").set("Authorization", w.officeAuth);
+      expect(res.status).toBe(200);
+      expect(res.body.levels).toHaveLength(100);
+      expect(res.body).toMatchObject({ limit: 100, offset: 0, hasMore: true });
+      const rest = await api().get("/api/v1/inventory/levels?offset=100").set("Authorization", w.officeAuth);
+      expect(rest.body.levels).toHaveLength(21);
+      expect(rest.body).toMatchObject({ limit: 100, offset: 100, hasMore: false });
+    });
+
+    it("rejects limit above the max, below 1, negative offset and unknown params", async () => {
+      const w = seedWorld();
+      for (const qs of ["limit=201", "limit=0", "offset=-1", "limit=abc", "bogus=1"]) {
+        expect((await api().get(`/api/v1/inventory/levels?${qs}`).set("Authorization", w.officeAuth)).status).toBe(400);
+        expect((await api().get(`/api/v1/inventory/low-stock?${qs}`).set("Authorization", w.officeAuth)).status).toBe(400);
+        expect((await api().get(`/api/v1/inventory/movements?${qs}`).set("Authorization", w.officeAuth)).status).toBe(400);
+      }
+      const max = await api().get("/api/v1/inventory/levels?limit=200").set("Authorization", w.officeAuth);
+      expect(max.status).toBe(200);
+      expect(max.body.limit).toBe(200);
+    });
+
+    it("pages levels in a stable order with no overlap or gaps", async () => {
+      const w = seedWorld();
+      seedLevels(w, 7);
+      const seen: string[] = [];
+      for (let offset = 0; offset < 8; offset += 3) {
+        const res = await api().get(`/api/v1/inventory/levels?limit=3&offset=${offset}`).set("Authorization", w.officeAuth);
+        seen.push(...res.body.levels.map((l: { id: string }) => l.id));
+      }
+      const all = await api().get("/api/v1/inventory/levels?limit=200").set("Authorization", w.officeAuth);
+      const allIds = all.body.levels.map((l: { id: string }) => l.id);
+      expect(seen).toEqual(allIds);
+      expect(new Set(seen).size).toBe(8);
+      expect([...allIds].sort()).toEqual(allIds);
+    });
+
+    it("applies the low-stock filter before the cap", async () => {
+      const w = seedWorld();
+      seedLevels(w, 10);
+      const res = await api().get("/api/v1/inventory/low-stock?limit=2").set("Authorization", w.officeAuth);
+      expect(res.status).toBe(200);
+      expect(res.body.levels).toHaveLength(2);
+      expect(res.body.levels.every((l: { isLowStock: boolean }) => l.isLowStock)).toBe(true);
+      expect(res.body.hasMore).toBe(true);
+      const all = await api().get("/api/v1/inventory/low-stock?limit=200").set("Authorization", w.officeAuth);
+      expect(all.body.levels).toHaveLength(5);
+      expect(all.body.levels.every((l: { isLowStock: boolean }) => l.isLowStock)).toBe(true);
+    });
+
+    it("pages movements newest first with stable order", async () => {
+      const w = seedWorld();
+      for (let i = 0; i < 5; i += 1) {
+        const adj = await api().post("/api/v1/inventory/adjustments").set("Authorization", w.officeAuth)
+          .send({ locationId: w.warehouse.id, productId: w.product.id, quantityDelta: 1, reason: `r${i}` });
+        expect(adj.status).toBe(201);
+      }
+      const p1 = await api().get("/api/v1/inventory/movements?limit=2").set("Authorization", w.officeAuth);
+      const p2 = await api().get("/api/v1/inventory/movements?limit=2&offset=2").set("Authorization", w.officeAuth);
+      const p3 = await api().get("/api/v1/inventory/movements?limit=2&offset=4").set("Authorization", w.officeAuth);
+      expect(p1.body).toMatchObject({ limit: 2, offset: 0, hasMore: true });
+      expect(p3.body).toMatchObject({ hasMore: false });
+      const reasons = [...p1.body.movements, ...p2.body.movements, ...p3.body.movements].map((m: { reason: string }) => m.reason);
+      expect(reasons).toEqual(["r4", "r3", "r2", "r1", "r0"]);
+      expect(p1.body.movements[0]).toMatchObject({ productName: "Filter 16x25" });
+      const dflt = await api().get("/api/v1/inventory/movements").set("Authorization", w.officeAuth);
+      expect(dflt.body.limit).toBe(100);
+    });
+  });
 });
+

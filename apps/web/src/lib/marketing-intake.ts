@@ -1,52 +1,38 @@
-import { z } from "zod";
+import type { z } from "zod";
+
+import {
+  HOME_SERVICE_TRADES,
+  MARKETING_HONEYPOT_FIELD,
+  MARKETING_INTAKE_LIMITS,
+  MarketingDemoRequestBodySchema,
+  MarketingGrowthCheckBodySchema,
+  type HomeServiceTrade,
+  type MarketingDemoRequestBody,
+  type MarketingGrowthCheckBody,
+  type MarketingIntakeResponse
+} from "@fsm/types";
 
 import { API_BASE_URL } from "@/src/lib/api-base-url";
 
-/**
- * Marketing intake contract (PR #328, Dev A).
- * TODO(#328): once #328 lands in dev, delete these local copies and import
- * MarketingDemoRequestBodySchema, MarketingGrowthCheckBodySchema, MARKETING_HONEYPOT_FIELD and HOME_SERVICE_TRADES
- * from "@fsm/types".
- */
-export const MARKETING_HONEYPOT_FIELD = "hp" as const;
-export const HOME_SERVICE_TRADES = ["hvac", "plumbing", "electrical", "other"] as const;
-export const TRADE_LABELS: Record<(typeof HOME_SERVICE_TRADES)[number], string> = { hvac: "HVAC", plumbing: "Plumbing", electrical: "Electrical", other: "Other home service" };
+/** Marketing intake contract (#328): schemas, limits, honeypot field and trades come from @fsm/types (the same ones the API validates with). */
+export { HOME_SERVICE_TRADES, MARKETING_HONEYPOT_FIELD, MarketingDemoRequestBodySchema, MarketingGrowthCheckBodySchema };
+export type { MarketingDemoRequestBody, MarketingGrowthCheckBody, MarketingIntakeResponse };
 
-const trade = z.enum(HOME_SERVICE_TRADES, { errorMap: () => ({ message: "Choose your trade." }) });
-const email = z.string().trim().min(1, "Enter your email.").max(254, "Use 254 characters or fewer.").email("Enter a valid email.");
-const hp = z.string().max(0);
+export const TRADE_LABELS: Record<HomeServiceTrade, string> = { hvac: "HVAC", plumbing: "Plumbing", electrical: "Electrical", other: "Other home service" };
 
-export const MarketingDemoRequestBodySchema = z
-  .object({
-    name: z.string().trim().min(1, "Enter your name.").max(120, "Use 120 characters or fewer."),
-    email,
-    phone: z.string().regex(/^\d{10}$/, "Enter a 10-digit US phone number.").optional(),
-    company: z.string().trim().min(1, "Enter your business name.").max(160, "Use 160 characters or fewer."),
-    trade,
-    message: z.string().max(2000, "Use 2,000 characters or fewer.").optional(),
-    hp
-  })
-  .strict();
+const L = MARKETING_INTAKE_LIMITS;
 
-export const MarketingGrowthCheckBodySchema = z
-  .object({
-    websiteUrl: z
-      .string()
-      .trim()
-      .max(2048, "Use a shorter website address.")
-      .refine((v) => /^https?:\/\/[^\s.]+\.[^\s]+$/i.test(v), "Enter your website, like yourbusiness.com."),
-    trade,
-    zip: z.string().regex(/^\d{5}$/, "Enter a 5-digit ZIP.").optional(),
-    city: z.string().trim().min(1).max(100, "Use 100 characters or fewer.").optional(),
-    email,
-    hp
-  })
-  .strict()
-  .refine((v) => Boolean(v.zip || v.city), { message: "Enter your ZIP or city.", path: ["location"] });
-
-export type MarketingDemoRequestBody = z.infer<typeof MarketingDemoRequestBodySchema>;
-export type MarketingGrowthCheckBody = z.infer<typeof MarketingGrowthCheckBodySchema>;
-export type MarketingIntakeResponse = { ok: true; confirmationId: string };
+/** Visitor-facing copy per field; the shared schemas carry developer messages. */
+const FIELD_MESSAGES: Record<string, { empty: string; invalid: string }> = {
+  name: { empty: "Enter your name.", invalid: `Use ${L.name} characters or fewer.` },
+  email: { empty: "Enter your email.", invalid: "Enter a valid email." },
+  phone: { empty: "Enter a 10-digit US phone number.", invalid: "Enter a 10-digit US phone number." },
+  company: { empty: "Enter your business name.", invalid: `Use ${L.company} characters or fewer.` },
+  trade: { empty: "Choose your trade.", invalid: "Choose your trade." },
+  teamSize: { empty: "Choose team size.", invalid: "Choose team size." },
+  websiteUrl: { empty: "Enter your website, like yourbusiness.com.", invalid: "Enter your website, like yourbusiness.com." },
+  location: { empty: "Enter your ZIP or city.", invalid: "Enter a 5-digit ZIP or a city." }
+};
 
 export type IntakeKind = "demo-requests" | "growth-checks";
 
@@ -77,21 +63,35 @@ export function splitLocation(raw: string): { zip?: string; city?: string } {
   return /^\d{5}$/.test(v) ? { zip: v } : { city: v };
 }
 
-export function fieldErrors(issues: z.ZodIssue[]): Record<string, string> {
+/**
+ * Contract field -> form field. zip/city share the single "location" input; on /demo the API `message`
+ * only carries the Team size choice, so its errors belong to the "teamSize" select.
+ */
+export function formFieldKey(kind: IntakeKind | undefined, apiField: string): string {
+  if (apiField === "zip" || apiField === "city") return "location";
+  if (kind === "demo-requests" && apiField === "message") return "teamSize";
+  return apiField;
+}
+
+/** Maps shared-schema issues to visitor copy; zip/city both map to the single "location" input. */
+export function fieldErrors(issues: z.ZodIssue[], raw: Record<string, unknown> = {}, kind?: IntakeKind): Record<string, string> {
   const out: Record<string, string> = {};
   for (const i of issues) {
-    const key = String(i.path[0] ?? "form");
-    out[key] ??= i.message;
+    const p = String(i.path[0] ?? "form");
+    const key = formFieldKey(kind, p);
+    const m = FIELD_MESSAGES[key];
+    const v = key === "location" ? (raw.zip ?? raw.city) : raw[p];
+    out[key] ??= m ? (typeof v === "string" && v.trim() ? m.invalid : m.empty) : i.message;
   }
   return out;
 }
 
-function mapApiFields(raw: unknown): Record<string, string> {
+function mapApiFields(raw: unknown, kind?: IntakeKind): Record<string, string> {
   const out: Record<string, string> = {};
   if (!raw || typeof raw !== "object") return out;
   for (const [k, v] of Object.entries(raw as Record<string, unknown>)) {
     const msg = Array.isArray(v) ? v[0] : v;
-    out[k === "zip" || k === "city" ? "location" : k] = typeof msg === "string" && msg ? msg : "Check this field.";
+    out[formFieldKey(kind, k)] = typeof msg === "string" && msg ? msg : "Check this field.";
   }
   return out;
 }
@@ -113,13 +113,13 @@ export async function postMarketingIntake(kind: IntakeKind, body: MarketingDemoR
     console.error(`[marketing-intake] ${kind}: network error`);
     return { status: "error", message: INTAKE_MESSAGES.error };
   }
-  const json = (await res.json().catch(() => null)) as Record<string, unknown> | null;
+  const json = (await res.json().catch(() => null)) as (Partial<MarketingIntakeResponse> & Record<string, unknown>) | null;
   if (res.status === 201 || (res.ok && json?.ok === true)) {
     return { status: "success", confirmationId: typeof json?.confirmationId === "string" ? json.confirmationId : "" };
   }
   if (res.status === 400) {
     const err = (json?.error ?? json) as Record<string, unknown> | null;
-    return { status: "invalid", fields: mapApiFields(err?.fields ?? json?.fields), message: INTAKE_MESSAGES.invalid };
+    return { status: "invalid", fields: mapApiFields(err?.fields ?? json?.fields, kind), message: INTAKE_MESSAGES.invalid };
   }
   if (res.status === 413) return { status: "error", message: INTAKE_MESSAGES.tooLarge };
   if (res.status === 429) {
@@ -145,7 +145,7 @@ export function demoBodyFromForm(fd: FormData) {
     ...(teamSize ? { message: `Team size: ${teamSize}` } : {}),
     hp: str(fd, MARKETING_HONEYPOT_FIELD)
   };
-  return MarketingDemoRequestBodySchema.safeParse(raw);
+  return { raw, parsed: MarketingDemoRequestBodySchema.safeParse(raw) };
 }
 
 export function growthBodyFromForm(fd: FormData) {
@@ -156,18 +156,19 @@ export function growthBodyFromForm(fd: FormData) {
     email: str(fd, "email").trim(),
     hp: str(fd, MARKETING_HONEYPOT_FIELD)
   };
-  return MarketingGrowthCheckBodySchema.safeParse(raw);
+  return { raw, parsed: MarketingGrowthCheckBodySchema.safeParse(raw) };
 }
 
 /** Shared action body. A filled honeypot gets a quiet fake success and never reaches the API. */
 export async function runIntake(kind: IntakeKind, fd: FormData, fetchImpl?: typeof fetch): Promise<IntakeResult> {
   if (str(fd, MARKETING_HONEYPOT_FIELD) !== "") return { status: "success", confirmationId: "" };
-  const parsed = kind === "demo-requests" ? demoBodyFromForm(fd) : growthBodyFromForm(fd);
+  const { raw, parsed } = kind === "demo-requests" ? demoBodyFromForm(fd) : growthBodyFromForm(fd);
   if (!parsed.success) {
-    const fields = fieldErrors(parsed.error.issues);
+    const fields = fieldErrors(parsed.error.issues, raw, kind);
     // zod skips the object-level ZIP/city refine when a field already failed; report it together.
     if (kind === "growth-checks" && !str(fd, "location").trim()) fields.location ??= "Enter your ZIP or city.";
     return { status: "invalid", fields, message: INTAKE_MESSAGES.invalid };
   }
-  return postMarketingIntake(kind, parsed.data, fetchImpl);
+  // Send the validated input as typed (the API re-parses and normalizes it).
+  return postMarketingIntake(kind, raw as MarketingDemoRequestBody | MarketingGrowthCheckBody, fetchImpl);
 }

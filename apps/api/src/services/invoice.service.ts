@@ -24,6 +24,7 @@ import {
   estimates,
   invoices,
   invoiceItems,
+  jobProducts,
   jobs,
   markInvoiceOverdueIfNeeded,
   payments,
@@ -53,6 +54,7 @@ import {
   type UpdateInvoiceInput
 } from "@fsm/types";
 
+import { buildChargePreview } from "../lib/charge-preview.js";
 import { readRenvaniSubscriptionPlan } from "../lib/company-renvani-plan.js";
 import { dispatchEventAutomation } from "./automation/event-automation.registry.js";
 import { generateInvoiceNumber } from "../lib/invoice-number.js";
@@ -833,6 +835,54 @@ export async function loadPublicInvoicePayment(
   return { link, context };
 }
 
+async function resolveDefaultDueAt(companyId: string, executor: SelectExecutor): Promise<Date | null> {
+  const [company] = await executor
+    .select({ settings: companies.settings })
+    .from(companies)
+    .where(eq(companies.id, companyId))
+    .limit(1);
+  const settings = company?.settings as { invoicing?: { defaultPaymentTermsDays?: unknown } | null } | null | undefined;
+  const days = settings?.invoicing?.defaultPaymentTermsDays;
+  if (typeof days !== "number" || !Number.isInteger(days) || days < 0) {
+    return null;
+  }
+  return new Date(Date.now() + days * 24 * 60 * 60 * 1000);
+}
+
+async function getInvoiceableJobProductRows(companyId: string, jobId: string, executor: SelectExecutor) {
+  const rows = await executor
+    .select()
+    .from(jobProducts)
+    .where(and(eq(jobProducts.companyId, companyId), eq(jobProducts.jobId, jobId)));
+  return rows
+    .filter((row) => !row.isUpsell || row.upsellApproved === true)
+    .map((row, index) => ({
+      name: row.name,
+      description: row.description,
+      itemType: row.category,
+      quantity: row.quantity,
+      unitPrice: row.unitPrice,
+      isTaxable: row.isTaxable,
+      sortOrder: index,
+      productCatalogId: row.productCatalogId
+    }));
+}
+
+/** Customer-facing Service Fee + total for an invoice's current balance (checkout fee rules; preview only). */
+export async function getInvoiceChargePreview(companyId: string, invoiceId: string) {
+  const invoice = await getInvoiceRecord(companyId, invoiceId, db);
+  const [company] = await db
+    .select({ settings: companies.settings })
+    .from(companies)
+    .where(eq(companies.id, companyId))
+    .limit(1);
+  return {
+    invoiceId: invoice.id,
+    invoiceTotal: invoice.total ?? "0.00",
+    ...buildChargePreview({ settings: company?.settings ?? null }, invoice.balanceDue ?? "0.00")
+  };
+}
+
 export async function createInvoice(
   companyId: string,
   actorId: string,
@@ -854,6 +904,7 @@ export async function createInvoice(
       assertEstimateBelongsToCustomer(estimate, customer.id);
     }
 
+    const dueAt = normalizedInput.dueAt ?? (await resolveDefaultDueAt(companyId, tx));
     const invoiceNumber = await generateInvoiceNumber(companyId, tx);
     const insertedInvoices = await tx
       .insert(invoices)
@@ -870,7 +921,7 @@ export async function createInvoice(
         internalNotes: normalizedInput.internalNotes,
         taxRate: normalizedInput.taxRate,
         discountAmount: normalizedInput.discountAmount,
-        dueAt: normalizedInput.dueAt,
+        dueAt,
         balanceDue: "0.00"
       })
       .returning();
@@ -881,8 +932,15 @@ export async function createInvoice(
     }
 
     const estimateRows = estimate ? await getEstimateItemRows(companyId, estimate.id, tx) : [];
-    const sourceItems = estimateRows.length > 0
-      ? estimateRows.map((item) => ({
+    // fromJobId with no estimate lines and no explicit items: copy the job's line items
+    // (unapproved upsells excluded). Same stale-catalog handling as estimate copies.
+    const jobItemRows =
+      estimateRows.length === 0 && normalizedInput.items.length === 0 && input.fromJobId && job
+        ? await getInvoiceableJobProductRows(companyId, job.id, tx)
+        : [];
+    const copiedRows = estimateRows.length > 0 ? estimateRows : jobItemRows;
+    const sourceItems = copiedRows.length > 0
+      ? copiedRows.map((item) => ({
           name: item.name,
           description: item.description,
           itemType: item.itemType,
@@ -895,7 +953,7 @@ export async function createInvoice(
       : normalizedInput.items;
 
     if (sourceItems.length > 0) {
-      if (estimateRows.length > 0) {
+      if (copiedRows.length > 0) {
         // Lines copied from the caller's own estimate: a catalog item soft-deleted since the
         // estimate was written must not block invoicing — drop the stale link instead.
         const liveIds = await findLivePriceBookItemIds(

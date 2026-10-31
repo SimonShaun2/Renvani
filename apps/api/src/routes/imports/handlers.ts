@@ -30,7 +30,8 @@ import {
   type ConfirmMappingBody,
   ImportFileBatchParamsSchema,
   type ImportSessionIdParams,
-  type StartImportBody
+  type StartImportBody,
+  UPLOADABLE_IMPORT_ENTITY_TYPES
 } from "./schemas.js";
 
 type ImportFileBatchParams = z.infer<typeof ImportFileBatchParamsSchema>;
@@ -83,16 +84,11 @@ export async function createImportHandler(
 
       if (part.fieldname === "entityType" && part.type === "field") {
         const value = String(part.value).trim();
-        if (
-          value === "customers" ||
-          value === "jobs" ||
-          value === "estimates" ||
-          value === "price_book" ||
-          value === "notes" ||
-          value === "communications" ||
-          value === "service_agreements"
-        ) {
-          entityType = value;
+        if ((UPLOADABLE_IMPORT_ENTITY_TYPES as readonly string[]).includes(value)) {
+          entityType = value as (typeof UPLOADABLE_IMPORT_ENTITY_TYPES)[number];
+        } else if (value.length > 0) {
+          // Never silently import an unknown type as customers.
+          throw new AppError(ErrorCode.VALIDATION_ERROR, `Unsupported import entity type "${value.slice(0, 40)}"`);
         }
       } else {
         await part.value;

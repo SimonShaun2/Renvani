@@ -129,3 +129,34 @@ describe("demo and growth-check pages", () => {
     }
   });
 });
+
+describe("marketing intake types (#328)", () => {
+  it("uses the shared @fsm/types contract the API validates with", async () => {
+    const shared = await import("@fsm/types");
+    const lib = await import("@/src/lib/marketing-intake");
+    expect(lib.MarketingDemoRequestBodySchema).toBe(shared.MarketingDemoRequestBodySchema);
+    expect(lib.MarketingGrowthCheckBodySchema).toBe(shared.MarketingGrowthCheckBodySchema);
+    expect(lib.MARKETING_HONEYPOT_FIELD).toBe(shared.MARKETING_HONEYPOT_FIELD);
+    expect(lib.HOME_SERVICE_TRADES).toBe(shared.HOME_SERVICE_TRADES);
+  });
+});
+
+describe("demo Team size errors", () => {
+  it("maps the API `message` error to the teamSize field on /demo only", async () => {
+    const f = vi.fn(async () => new Response(JSON.stringify({ error: "VALIDATION_ERROR", fields: { message: "Too long" } }), { status: 400 }));
+    const demo = await postMarketingIntake("demo-requests", { name: "A", email: "a@b.co", company: "C", trade: "hvac", hp: "" }, f as unknown as typeof fetch, "http://api");
+    expect(demo).toMatchObject({ status: "invalid", fields: { teamSize: "Too long" } });
+    const gc = await postMarketingIntake("growth-checks", { websiteUrl: "https://a.co", trade: "hvac", zip: "74103", email: "a@b.co", hp: "" }, f as unknown as typeof fetch, "http://api");
+    expect(gc).toMatchObject({ status: "invalid", fields: { message: "Too long" } });
+  });
+
+  it("shows a Team size error under its own select", async () => {
+    const action = vi.fn(async () => ({ status: "invalid", fields: { teamSize: "Choose team size." }, message: "Check the highlighted fields." }) as IntakeResult);
+    const { container } = render(<DemoPage action={action} />);
+    await act(async () => {
+      fireEvent.submit(container.querySelector("form")!);
+    });
+    expect(container.querySelector("#demo-team")!.getAttribute("aria-invalid")).toBe("true");
+    expect(container.querySelector("#demo-team-error")!.textContent).toBe("Choose team size.");
+  });
+});

@@ -1376,7 +1376,7 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
         customerPhone={customerDetailQuery.data?.customer.phone ?? null}
         estimateNumber={anchorTier?.estimateNumber ?? "DRAFT"}
         publicUrl={anchorPublicUrl}
-        defaultMessage={`Hi ${customerDetailQuery.data?.customer.firstName ?? ""}, here is your ServiceRev estimate. Review and approve here: {{link}}`}
+        defaultMessage={`Hi ${customerDetailQuery.data?.customer.firstName ?? ""}, here is your Renvani estimate. Review and approve here: {{link}}`}
         isPending={false}
         onSend={sendEstimateToCustomer}
       />

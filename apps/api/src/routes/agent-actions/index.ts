@@ -11,6 +11,7 @@ import {
 } from "./handlers.js";
 import {
   agentActionIdValidation,
+  agentActionStateChangeValidation,
   listAgentActionsValidation
 } from "./schemas.js";
 
@@ -29,17 +30,17 @@ const agentActionRoutes: FastifyPluginAsync = async (fastify) => {
 
   fastify.post("/agent-actions/:id/approve", {
     preHandler: [fastify.authenticate, agentActionRoles],
-    preValidation: [agentActionIdValidation]
+    preValidation: [agentActionStateChangeValidation]
   }, approveAgentActionHandler);
 
   fastify.post("/agent-actions/:id/reject", {
     preHandler: [fastify.authenticate, agentActionRoles],
-    preValidation: [agentActionIdValidation]
+    preValidation: [agentActionStateChangeValidation]
   }, rejectAgentActionHandler);
 
   fastify.post("/agent-actions/:id/execute", {
     preHandler: [fastify.authenticate, agentActionRoles],
-    preValidation: [agentActionIdValidation]
+    preValidation: [agentActionStateChangeValidation]
   }, executeAgentActionHandler);
 };
 

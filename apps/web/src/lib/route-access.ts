@@ -4,7 +4,10 @@ export type UserRole = (typeof USER_ROLES)[number];
 
 type DefaultRouteMap = Record<UserRole, string>;
 
-const EXACT_PUBLIC_ROUTES = new Set(["/", "/login", "/signup", "/verify-email", "/product-tour", "/tour", "/product", "/how-it-works", "/pricing", "/industries", "/industries/hvac", "/industries/plumbing", "/industries/electrical", "/demo", "/growth-check", "/portal", "/robots.txt", "/sitemap.xml"]);
+const EXACT_PUBLIC_ROUTES = new Set(["/", "/login", "/signup", "/verify-email", "/product-tour", "/tour", "/product", "/how-it-works", "/pricing", "/industries", "/industries/hvac", "/industries/plumbing", "/industries/electrical", "/demo", "/growth-check", "/portal", "/robots.txt", "/sitemap.xml", "/sitemap-index.xml"]);
+
+/** Split sitemaps from app/sitemap.ts generateSitemaps. */
+const SPLIT_SITEMAP_ROUTE = /^\/sitemap\/\d+\.xml$/;
 
 const MARKETING_PRODUCT_PAGES = new Set(["growth", "revenue", "operations", "retention", "command-center", "online-booking", "estimates-approvals", "scheduling-dispatch", "technician-app", "invoices-payments", "service-agreements", "ai-revenue-intelligence", "customers-properties-assets", "onboarding-data-import", "inquiry-response-follow-up", "jobs-work-orders", "time-tracking-job-photos", "reminders-win-backs", "reporting-job-sources", "websites", "price-book-service-catalog", "customer-portal"]);
 const TOUR_STEP_SLUGS = new Set(["approve-the-work", "plan-the-day", "complete-the-visit", "get-paid", "bring-them-back"]);
@@ -20,6 +23,7 @@ const ROLE_ALLOWED_PREFIXES: Record<UserRole, string[]> = {
     "/invoices",
     "/payments",
     "/service-agreements",
+    "/timesheets",
     "/ai-revenue-center",
     "/command-center",
     "/products",
@@ -39,6 +43,7 @@ const ROLE_ALLOWED_PREFIXES: Record<UserRole, string[]> = {
     "/invoices",
     "/payments",
     "/service-agreements",
+    "/timesheets",
     "/ai-revenue-center",
     "/command-center",
     "/products",
@@ -55,6 +60,7 @@ const ROLE_ALLOWED_PREFIXES: Record<UserRole, string[]> = {
     "/estimates",
     "/invoices",
     "/service-agreements",
+    "/timesheets",
     "/command-center",
     "/settings"
   ],
@@ -65,6 +71,7 @@ const ROLE_ALLOWED_PREFIXES: Record<UserRole, string[]> = {
     "/estimates",
     "/invoices",
     "/service-agreements",
+    "/timesheets",
     "/settings"
   ],
   technician: ["/mobile"]
@@ -91,7 +98,7 @@ export function getDefaultRouteForRole(role: UserRole): string {
 }
 
 export function isPublicRoute(pathname: string): boolean {
-  if (EXACT_PUBLIC_ROUTES.has(pathname)) {
+  if (EXACT_PUBLIC_ROUTES.has(pathname) || SPLIT_SITEMAP_ROUTE.test(pathname)) {
     return true;
   }
 
@@ -102,6 +109,11 @@ export function isPublicRoute(pathname: string): boolean {
   }
 
   if (segments[0] === "product" && segments.length === 2 && MARKETING_PRODUCT_PAGES.has(segments[1] ?? "")) {
+    return true;
+  }
+
+  // /industries/<slug> is marketing-only (no app routes there); unknown slugs render the 404 page instead of a login redirect.
+  if (segments[0] === "industries" && segments.length === 2) {
     return true;
   }
 
@@ -146,4 +158,14 @@ export function canRoleAccessPath(role: UserRole, pathname: string): boolean {
   const allowedPrefixes = ROLE_ALLOWED_PREFIXES[role];
 
   return allowedPrefixes.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
+}
+
+/**
+ * Routes a signed-in Clerk user may reach before any role claim exists (post-sign-up workspace
+ * setup). Clerk middleware path only; the legacy cookie path is unchanged.
+ */
+export const NO_ROLE_SETUP_ROUTES = ["/onboarding/workspace"] as const;
+
+export function isNoRoleSetupRoute(pathname: string): boolean {
+  return (NO_ROLE_SETUP_ROUTES as readonly string[]).includes(pathname);
 }

@@ -1,8 +1,8 @@
-import type { OperatorInboxItem } from "@fsm/types";
+import type { CommandCenterKpiKey, CommandCenterLoopStage, OperatorInboxItem } from "@fsm/types";
 
 /**
  * Command Center (Figma 10:2) region registry. Each region is a plug-in point: add/reorder entries here.
- * Values that no dev API serves yet render EMPTY ("—") rather than invented numbers.
+ * KPIs, loop and crews come from GET /api/v1/command-center/brief (FS-29); missing values render EMPTY ("—").
  */
 export const EMPTY = "—";
 
@@ -15,31 +15,27 @@ export const CC_REGIONS = [
 export type CcRegionKey = (typeof CC_REGIONS)[number]["key"];
 
 export interface Kpi {
-  key: string;
+  /** Key in `CommandCenterBrief.kpis` (GET /api/v1/command-center/brief). */
+  key: CommandCenterKpiKey;
   label: string;
-  /** Data adapter: returns null until an endpoint exists. */
-  value: () => string | null;
-  detail: () => string | null;
   source: string;
 }
 
-const pending = () => null;
-
-/** KPI row (10:74). Needs a period-scoped KPI aggregate endpoint; until then each shows "—". */
+/** KPI row (10:74), filled from the brief's `kpis[]` by key. Missing/null values render EMPTY ("—"). */
 export const KPIS: Kpi[] = [
-  { key: "direct", label: "Direct inquiries", value: pending, detail: pending, source: "Your branded site + app" },
-  { key: "booked", label: "Inquiry → booked", value: pending, detail: pending, source: "Revenue Agent handoffs" },
-  { key: "recurring", label: "First → recurring", value: pending, detail: pending, source: "Retention offers accepted" },
-  { key: "marketing", label: "Marketing revenue", value: pending, detail: pending, source: "Automations + win-back" }
+  { key: "direct_inquiries", label: "Direct inquiries", source: "Your branded site + app + tracked numbers" },
+  { key: "inquiry_to_booked", label: "Inquiry → booked", source: "Revenue Agent handoffs" },
+  { key: "first_to_recurring", label: "First → recurring", source: "Retention offers accepted" },
+  { key: "marketing_revenue", label: "Marketing revenue", source: "Automations + win-back" }
 ];
 
-/** This month's loop (10:172). Needs funnel/loop counts endpoint. */
+/** This month's loop (10:172), filled from the brief's `loop[]` by stage. */
 export const LOOP_STAGES = [
   { key: "discover", label: "Discover · inquiries", tone: "dark" },
   { key: "book", label: "Book · confirmed", tone: "accent" },
-  { key: "tuneup", label: "Tune-up · completed", tone: "accent" },
+  { key: "complete", label: "Tune-up · completed", tone: "accent" },
   { key: "rebook", label: "Rebook · recurring", tone: "accent" }
-] as const;
+] as const satisfies ReadonlyArray<{ key: CommandCenterLoopStage["stage"]; label: string; tone: string }>;
 
 export type StatusTone = "approval" | "escalated" | "stale" | "neutral";
 

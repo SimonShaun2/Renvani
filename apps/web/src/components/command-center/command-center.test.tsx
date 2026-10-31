@@ -16,6 +16,16 @@ vi.mock("@/src/hooks/direct-demand.hooks", () => ({
   }
 }));
 
+const brief = vi.hoisted(() => ({ calls: [] as Array<{ enabled: boolean }> }));
+vi.mock("@/src/hooks/command-center.hooks", () => ({
+  commandCenterKeys: { all: ["command-center"] },
+  isForbidden: () => false,
+  useCommandCenterBrief: (enabled: boolean) => {
+    brief.calls.push({ enabled });
+    return { isLoading: enabled, isError: false, data: undefined, error: null };
+  }
+}));
+vi.mock("@tanstack/react-query", () => ({ useQueryClient: () => ({ invalidateQueries: vi.fn() }) }));
 vi.mock("@/src/hooks/company.hooks", () => ({ useCompany: () => ({ data: undefined }) }));
 vi.mock("@/src/hooks/operator-inbox.hooks", () => ({
   useOperatorInbox: () => ({ isLoading: true, isError: false, data: undefined }),
@@ -26,7 +36,7 @@ import { CommandCenterView } from "./CommandCenterView";
 import { DirectDemandCard } from "./DirectDemandCard";
 import { canViewDirectDemand, formatUsdFromDecimal, isoDateIn, jobsLabel, last30DaysRange } from "./direct-demand.utils";
 import { hourIn } from "./LocalClock";
-import { CC_REGIONS, EMPTY, KPIS, agentLabel, greetingFor, itemStatus, needsYouCounts } from "./command-center.config";
+import { CC_REGIONS, EMPTY, KPIS, LOOP_STAGES, agentLabel, greetingFor, itemStatus, needsYouCounts } from "./command-center.config";
 
 describe("command center config", () => {
   it("registers the Figma 10:2 regions", () => {
@@ -44,8 +54,9 @@ describe("command center config", () => {
     expect(greetingFor(8)).toBe("Good morning,");
     expect(greetingFor(19)).toBe("Good evening,");
   });
-  it("KPIs have no invented numbers yet", () => {
-    expect(KPIS.every((k) => k.value() === null)).toBe(true);
+  it("KPI and loop registries map to the brief API keys", () => {
+    expect(KPIS.map((k) => k.key)).toEqual(["direct_inquiries", "inquiry_to_booked", "first_to_recurring", "marketing_revenue"]);
+    expect(LOOP_STAGES.map((s) => s.key)).toEqual(["discover", "book", "complete", "rebook"]);
   });
 });
 
@@ -58,12 +69,22 @@ describe("CommandCenterView", () => {
     // Server render is time-neutral: no server-clock greeting or date.
     expect(html).toContain("Hello,");
     expect(html).not.toMatch(/Good (morning|afternoon|evening)/);
-    expect(html).toContain("Direct inquiries · —");
-    expect(html.match(/data-testid="cc-kpi"/g)).toHaveLength(4);
-    expect(html.match(/data-testid="cc-loop"/g)).toHaveLength(4);
-    expect(html).toContain(EMPTY);
-    expect(html).toContain("Today’s crews");
+    // No signed-in owner/admin: brief regions are hidden and the brief is never requested.
+    expect(html).not.toContain("cc-kpi");
+    expect(html).not.toContain("Today’s crews");
+    expect(brief.calls.every((c) => c.enabled === false)).toBe(true);
     expect(html).not.toMatch(/\$1\.99|booking fee/i);
+  });
+  it("owner sees brief skeletons while loading", () => {
+    dd.role = "owner";
+    const owner = renderToStaticMarkup(<CommandCenterView firstName="Maya" />);
+    dd.role = null;
+    expect(owner.match(/data-testid="cc-kpi-loading"/g)).toHaveLength(4);
+    expect(owner).toContain("cc-daily-brief-loading");
+    expect(owner.match(/data-testid="cc-loop"/g)).toHaveLength(4);
+    expect(owner).toContain("Today’s crews");
+    expect(owner).toContain(EMPTY);
+    expect(owner).not.toMatch(/confidence|\$1\.99|booking fee/i);
   });
   it("omits name when Clerk user is unavailable", () => {
     const anon = renderToStaticMarkup(<CommandCenterView firstName={null} />);

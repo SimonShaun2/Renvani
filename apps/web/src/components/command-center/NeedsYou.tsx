@@ -18,7 +18,7 @@ const pill: Record<StatusTone, string> = {
   stale: "bg-[#fff4d6] text-[#7a5600]",
   neutral: "bg-[#f3eadc] text-[#2a3360]"
 };
-const btn = "flex h-9 items-center rounded-[10px] px-3.5 text-[13px] font-semibold disabled:opacity-50";
+const btn = "flex min-h-11 items-center rounded-[10px] px-3.5 text-[13px] font-semibold disabled:opacity-50";
 
 function useNeedsYouItems() {
   const query = useOperatorInbox();

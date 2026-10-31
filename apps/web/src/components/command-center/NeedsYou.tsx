@@ -7,8 +7,7 @@ import type { OperatorInboxItem } from "@fsm/types";
 import { AgentProposalCard } from "@/src/components/revenue-agent/AgentProposalCard";
 import { AgentActionPanel } from "@/src/components/agent-actions/AgentActionPanel";
 import { proposalTypeConfig } from "@/src/components/revenue-agent/proposal.config";
-import { useApproveAgentAction, useOperatorInbox } from "@/src/hooks/operator-inbox.hooks";
-import { ApiError } from "@/src/lib/api";
+import { agentActionErrorMessage, useApproveAgentAction, useOperatorInbox } from "@/src/hooks/operator-inbox.hooks";
 import { cn } from "@/src/lib/utils";
 
 import { EMPTY, NEEDS_YOU_STATES, agentLabel, itemStatus, needsYouCounts, plural, type StatusTone } from "./command-center.config";
@@ -40,7 +39,7 @@ export function HeaderSummary() {
 function NeedsYouItem({ item }: { item: OperatorInboxItem }) {
   const [open, setOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const approve = useApproveAgentAction(item.id);
+  const approve = useApproveAgentAction(item);
   const status = itemStatus(item.state);
   const canApprove = item.state === "awaiting_approval" && item.overridePaths.includes("approve");
   const evidence = item.provenance.sourceEvents.map((e) => e.summary).filter(Boolean).slice(0, 2);
@@ -50,7 +49,7 @@ function NeedsYouItem({ item }: { item: OperatorInboxItem }) {
     try {
       await approve.mutateAsync();
     } catch (e) {
-      setError(e instanceof ApiError ? e.message : "Action failed");
+      setError(agentActionErrorMessage(e));
     }
   }
 

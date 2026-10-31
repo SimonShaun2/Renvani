@@ -1,4 +1,8 @@
-import { CALL_TRACKING_DISABLED_PROVIDER_ID, CALL_TRACKING_PROVIDER_ID_PATTERN } from "@fsm/types";
+import {
+  CALL_TRACKING_DISABLED_PROVIDER_ID,
+  CALL_TRACKING_NUMBER_DEFAULT_VERIFICATION_STATUS,
+  CALL_TRACKING_PROVIDER_ID_PATTERN
+} from "@fsm/types";
 
 /**
  * FS-200 Growth: call tracking + recording adapter registry. Same plug-in pattern as the GBP and geo registries:
@@ -13,6 +17,11 @@ export interface CallTrackingWebhookInput {
   url: string;
 }
 
+export interface CallTrackingNumberOwnershipInput {
+  trackingNumber: string;
+  providerNumberId: string | null;
+}
+
 export interface CallTrackingAdapter {
   id: string;
   /** False for the disabled adapter: the webhook rejects before touching the payload. */
@@ -21,6 +30,11 @@ export interface CallTrackingAdapter {
   verifyWebhookSignature(input: CallTrackingWebhookInput): boolean;
   /** Maps the provider payload to the normalized inbound call shape (validated by the caller). */
   parseInboundCall(rawBody: string): unknown;
+  /**
+   * Confirms with the provider that this account owns the number. Returns a key of
+   * CALL_TRACKING_NUMBER_VERIFICATION_STATUS_REGISTRY; anything else is treated as unverified.
+   */
+  verifyNumberOwnership(number: CallTrackingNumberOwnershipInput): Promise<string>;
 }
 
 const adapters = new Map<string, CallTrackingAdapter>();
@@ -51,7 +65,9 @@ export const disabledCallTrackingAdapter: CallTrackingAdapter = {
   verifyWebhookSignature: () => false,
   parseInboundCall: () => {
     throw new Error("Call tracking adapter is disabled");
-  }
+  },
+  // No provider to ask: ownership can never be verified, so numbers stay unverified and receive no calls.
+  verifyNumberOwnership: () => Promise.resolve(CALL_TRACKING_NUMBER_DEFAULT_VERIFICATION_STATUS)
 };
 
 registerCallTrackingAdapter(disabledCallTrackingAdapter);

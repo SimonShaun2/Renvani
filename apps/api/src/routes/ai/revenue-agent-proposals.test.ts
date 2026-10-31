@@ -230,7 +230,9 @@ describe("revenue agent proposals", () => {
     expect(stored?.status).toBe("actioned");
     expect(stored?.actionedById).toBe(owner.user.id);
     const action = fakeDb.getTestState().agentActions.find((row) => row.id === proposal.id);
-    expect(action?.state).toBe("succeeded");
+    // Revenue proposals are outbound: no provider send yet, so the action stays executing with a queued receipt.
+    expect(action?.state).toBe("executing");
+    expect(action?.executionReceipt).toMatchObject({ outcome: "queued", deliveryState: "queued" });
     expect(JSON.stringify(action?.executionReceipt)).toContain("friendly reminder");
     expect(redisDelMock).toHaveBeenCalled();
     expect((await propose(owner.authorization, rec.id)).body.created).toBe(false);

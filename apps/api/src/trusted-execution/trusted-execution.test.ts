@@ -1,6 +1,7 @@
 /**
  * Ticket A "Trusted Execution", fix PR 1: stale-version and idempotent-replay guarantees for
- * agent-action approve/execute and operator edit (TE-STALE-*, TE-DUP-*), and auth-before-validation (TE-AUTH-*). Runs in the default suite.
+ * agent-action approve/execute and operator edit (TE-STALE-*, TE-DUP-*), auth-before-validation (TE-AUTH-*),
+ * plus failed-execution and outbound receipt states (TE-FAIL-*, TE-RCPT-*). Runs in the default suite.
  * Gap ids refer to docs/architecture/TRUSTED_EXECUTION_AUDIT.md. No network, no env reads, no provider send.
  */
 import request from "supertest";
@@ -61,11 +62,25 @@ let app: AppInstance;
 let buildAppModule: typeof import("../app.js");
 let fakeDb: typeof import("../test-support/fake-db.js");
 let tokens: typeof import("../lib/tokens.js");
+let service: typeof import("../services/agent-action.service.js");
+
+const THROWING_ACTION_TYPE = "te.adapter_throws";
+const PROVIDER_ERROR = "provider adapter unavailable (test)";
 
 beforeAll(async () => {
   buildAppModule = await import("../app.js");
   fakeDb = await import("../test-support/fake-db.js");
   tokens = await import("../lib/tokens.js");
+  service = await import("../services/agent-action.service.js");
+  const registry = await import("../services/agent-action.registry.js");
+  const executors = await import("../services/agent-action.executors.js");
+  // Test-only action type whose provider adapter throws during execute (no network).
+  registry.registerAgentActionType({ actionType: THROWING_ACTION_TYPE, agentProduct: "revenue", aiMayPropose: true });
+  executors.registerAgentActionExecutor(THROWING_ACTION_TYPE, {
+    applyInTransaction: async () => {
+      throw new Error(PROVIDER_ERROR);
+    }
+  });
 });
 
 beforeEach(async () => {
@@ -222,6 +237,104 @@ describe("Trusted Execution: duplicate operations (idempotency)", () => {
     const body = { expectedVersion: stored(action.id).updatedAt.getTime() };
     expect((await request(app.server).post(`/api/v1/agent-actions/${action.id}/approve`).set("Authorization", owner.header).send(body)).status).toBe(200);
     expect((await request(app.server).post(`/api/v1/agent-actions/${action.id}/approve`).set("Authorization", owner.header).send(body)).status).toBe(409);
+  });
+});
+
+describe("Trusted Execution: failed execution and receipt states", () => {
+  const events = (id: string, type: string) =>
+    fakeDb.getTestState().activityEvents.filter((e) => e.entityId === id && e.eventType === type);
+
+  it("TE-FAIL-01 provider/adapter throw during execute yields a persisted failed receipt, not a silent rollback to approved", async () => {
+    const { company, job } = tenant("fail1");
+    const action = seedAction(company.id, {
+      actionType: THROWING_ACTION_TYPE,
+      agentProduct: "revenue",
+      state: "approved",
+      parameters: { jobId: job.id },
+      target: { entityType: "job", entityId: job.id }
+    });
+    await expect(service.executeAgentAction(company.id, action.id, "reviewer-1")).rejects.toThrow(PROVIDER_ERROR);
+    const row = stored(action.id);
+    expect(row.state, "a failed execution must be recorded as failed").toBe("failed");
+    const receipt = row.executionReceipt as Record<string, unknown> | null;
+    expect(receipt?.outcome).toBe("failed");
+    // Non-AppError text stays out of the receipt; it is only in the audit detail.
+    expect(JSON.stringify(receipt)).not.toContain(PROVIDER_ERROR);
+    const failed = events(action.id, "agent.execution_failed");
+    expect(failed).toHaveLength(1);
+    expect(failed[0]).toMatchObject({ actorId: "reviewer-1", actorType: "user" });
+    expect(JSON.stringify(failed[0]!.payload)).toContain(PROVIDER_ERROR);
+    expect(events(action.id, "agent.execution_succeeded")).toHaveLength(0);
+  });
+
+  it("TE-FAIL-02 errors before the side effect (stale version) do not mark the action failed", async () => {
+    const { company, job } = tenant("fail2");
+    const action = seedAction(company.id, {
+      actionType: THROWING_ACTION_TYPE,
+      agentProduct: "revenue",
+      state: "approved",
+      parameters: { jobId: job.id },
+      target: { entityType: "job", entityId: job.id }
+    });
+    await expect(service.executeAgentAction(company.id, action.id, "reviewer-1", { expectedVersion: 1 })).rejects.toThrow();
+    expect(stored(action.id).state).toBe("approved");
+    expect(events(action.id, "agent.execution_failed")).toHaveLength(0);
+  });
+
+  it("TE-RCPT-01 executing message.send_proposed with no live provider must not read as done (succeeded)", async () => {
+    const t = tenant("rcpt1");
+    const customer = fakeDb.seedCustomer({ companyId: t.company.id, firstName: "Pat", lastName: "Doe" });
+    const action = seedMessageAction(t.company.id, customer.id, "approved");
+    const executed = await service.executeAgentAction(t.company.id, action.id, "reviewer-1");
+    expect(executed.state, "no provider send happened, so the action is not done").not.toBe("succeeded");
+    expect(executed.state).toBe("executing");
+    expect(stored(action.id).state).toBe("executing");
+  });
+
+  it("TE-RCPT-02 receipt for an outbound send carries a distinct delivery state (queued | provider_accepted | delivered | failed)", async () => {
+    const t = tenant("rcpt2");
+    const customer = fakeDb.seedCustomer({ companyId: t.company.id, firstName: "Pat", lastName: "Doe" });
+    const action = seedMessageAction(t.company.id, customer.id, "approved");
+    const executed = await service.executeAgentAction(t.company.id, action.id, "reviewer-1");
+    const receipt = executed.executionReceipt as Record<string, unknown> | null;
+    expect(["queued", "provider_accepted", "delivered", "failed"]).toContain(receipt?.deliveryState);
+    expect(receipt).toMatchObject({ outcome: "queued", deliveryState: "queued" });
+  });
+
+  it("TE-RCPT-03 internal actions still end succeeded with no delivery state", async () => {
+    const { company, job } = tenant("rcpt3");
+    const action = seedSchedulingAction(company.id, job.id, "approved");
+    const executed = await service.executeAgentAction(company.id, action.id, "reviewer-1");
+    expect(executed.state).toBe("succeeded");
+    const receipt = executed.executionReceipt as Record<string, unknown> | null;
+    expect(receipt?.outcome).toBe("succeeded");
+    expect(receipt).not.toHaveProperty("deliveryState");
+  });
+
+  it("TE-RCPT-04 an outbound execute replays with the same Idempotency-Key and is not re-executed without one", async () => {
+    const t = tenant("rcpt4");
+    const owner = t.auth("owner");
+    const customer = fakeDb.seedCustomer({ companyId: t.company.id, firstName: "Pat", lastName: "Doe" });
+    const action = seedMessageAction(t.company.id, customer.id, "approved");
+    const send = (body: Record<string, unknown>, key?: string) => {
+      const req = request(app.server).post(`/api/v1/agent-actions/${action.id}/execute`).set("Authorization", owner.header);
+      return (key ? req.set("Idempotency-Key", key) : req).send(body);
+    };
+    const body = { expectedVersion: stored(action.id).updatedAt.getTime() };
+    const first = await send(body, "exec-key-1");
+    expect(first.status).toBe(200);
+    expect(first.body.state).toBe("executing");
+    expect(first.body.executionReceipt).toMatchObject({ outcome: "queued", deliveryState: "queued" });
+    const replay = await send(body, "exec-key-1");
+    expect(replay.status).toBe(200);
+    expect(replay.body.state).toBe("executing");
+    expect(events(action.id, "agent.execution_succeeded")).toHaveLength(1);
+    // A fresh execute (current version, no key) on an executing row is rejected (state machine: 403 for a
+    // side-effect tool not in `approved`), not run twice.
+    const again = await send({ expectedVersion: stored(action.id).updatedAt.getTime() });
+    expect([403, 409]).toContain(again.status);
+    expect(stored(action.id).state).toBe("executing");
+    expect(events(action.id, "agent.execution_succeeded")).toHaveLength(1);
   });
 });
 

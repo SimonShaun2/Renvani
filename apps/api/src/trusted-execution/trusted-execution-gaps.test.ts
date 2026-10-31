@@ -1,7 +1,7 @@
 /**
  * Ticket A "Trusted Execution": REPRODUCIBLE FAILING TESTS for documented gaps. NO FIXES.
  *
- * TE-STALE-01/02/03 and TE-DUP-01/02 are fixed and now live in trusted-execution.test.ts (default run).
+ * TE-STALE-01/02/03, TE-DUP-01/02 and TE-AUTH-01/02 are fixed and now live in trusted-execution.test.ts (default run).
  * These remaining tests intentionally fail on dev: each one asserts the behaviour the trusted-execution contract
  * requires and that dev does not provide yet. They are excluded from the default `vitest run`
  * (see vitest.config.ts) and run only through `pnpm --filter @fsm/api test:trusted-execution-gaps`.
@@ -182,23 +182,6 @@ describe("Trusted Execution gaps: controls (pass today; prove the harness works)
       expect((await request(app.server).post(`/api/v1/agent-actions/${action.id}/${op}`).set("Authorization", ownerB.header).send(body)).status).toBe(404);
     }
     expect(stored(action.id).state).toBe("awaiting_approval");
-  });
-});
-
-describe("Trusted Execution gaps: unauthorized actions", () => {
-  it("TE-AUTH-01 unauthenticated approve with a malformed id must be 401 (auth before validation), not 400", async () => {
-    const res = await request(app.server).post("/api/v1/agent-actions/not-a-uuid/approve").send({ expectedVersion: "x" });
-    expect(res.status).toBe(401);
-  });
-
-  it("TE-AUTH-02 technician execute with a malformed body must be 403 (role before validation), not 400", async () => {
-    const { company, job, auth } = tenant("auth2");
-    const action = seedSchedulingAction(company.id, job.id, "approved");
-    const res = await request(app.server)
-      .post(`/api/v1/agent-actions/${action.id}/execute`)
-      .set("Authorization", auth("technician").header)
-      .send({ expectedVersion: "not-a-number" });
-    expect(res.status).toBe(403);
   });
 });
 

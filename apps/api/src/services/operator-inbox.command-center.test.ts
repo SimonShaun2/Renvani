@@ -197,6 +197,39 @@ describe("operator inbox command-center fields", () => {
     expect(item.proposalNumber).toBe("P-0042");
   });
 
+  it("numbers proposals whose created_at has sub-millisecond precision (Postgres microseconds)", async () => {
+    // Models a timestamp column with microseconds: comparisons (valueOf) see the fraction, while the
+    // value the driver hands back to JS (getTime) is millisecond-truncated.
+    class MicroDate extends Date {
+      constructor(ms: number, private readonly micros: number) {
+        super(ms);
+      }
+      override valueOf(): number {
+        return super.getTime() + this.micros / 1000;
+      }
+    }
+    const company = fakeDb.seedCompany({ name: "Micro Co", slug: "micro-co" });
+    const base = Date.UTC(2026, 2, 1);
+    const early = seedAction(company.id, "succeeded", {}, new MicroDate(base - 5, 900) as Date);
+    const sameMsA = seedAction(company.id, "succeeded", {}, new MicroDate(base, 100) as Date);
+    const sameMsB = seedAction(company.id, "awaiting_approval", {}, new MicroDate(base, 600) as Date);
+    const later = seedAction(company.id, "awaiting_approval", {}, new MicroDate(base + 3, 999) as Date);
+    const ordered = [sameMsA, sameMsB].sort((a, b) => (a.id < b.id ? -1 : 1));
+
+    for (const row of [early, ...ordered, later]) {
+      const single = await inbox.loadProposalSequences(company.id, [row.id]);
+      expect(single.get(row.id)).toBeDefined();
+    }
+    const all = await inbox.loadProposalSequences(company.id, [later.id, sameMsB.id, sameMsA.id, early.id]);
+    expect(all.get(early.id)).toBe(1);
+    expect(all.get(ordered[0]!.id)).toBe(2);
+    expect(all.get(ordered[1]!.id)).toBe(3);
+    expect(all.get(later.id)).toBe(4);
+    // Same-ms rows are numbered in the window (not the prefix), so single lookups agree with batch ones.
+    expect((await inbox.loadProposalSequences(company.id, [ordered[1]!.id])).get(ordered[1]!.id)).toBe(3);
+    expect((await inbox.loadProposalSequences(company.id, [later.id])).get(later.id)).toBe(4);
+  });
+
   it("never numbers another tenant's proposal", async () => {
     const a = fakeDb.seedCompany({ name: "A Co", slug: "a-co-n" });
     const b = fakeDb.seedCompany({ name: "B Co", slug: "b-co-n" });

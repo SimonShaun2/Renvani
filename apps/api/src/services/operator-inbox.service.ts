@@ -1,4 +1,4 @@
-import { and, count, eq, gte, inArray, lt, lte, or } from "drizzle-orm";
+import { and, count, eq, gte, inArray, lt } from "drizzle-orm";
 
 import { activityEvents, agentActions, db } from "@fsm/db";
 import type {
@@ -83,27 +83,24 @@ export async function loadProposalSequences(companyId: string, actionIds: string
   const sequences = new Map<string, number>();
   if (actionIds.length === 0) return sequences;
 
-  const targets: ProposalKey[] = await db
-    .select({ id: agentActions.id, createdAt: agentActions.createdAt })
-    .from(agentActions)
-    .where(and(eq(agentActions.companyId, companyId), inArray(agentActions.id, actionIds)));
+  // agent_actions.created_at has microsecond precision but JS Dates are millisecond-truncated, so every bound
+  // below is built from whole milliseconds: prefix is strictly before firstMs, the window is the half-open
+  // [firstMs, lastMs + 1ms). Ordering is (ms, id) in JS, so rows sharing a millisecond are numbered by id.
+  const targets: ProposalKey[] = (
+    await db
+      .select({ id: agentActions.id, createdAt: agentActions.createdAt })
+      .from(agentActions)
+      .where(and(eq(agentActions.companyId, companyId), inArray(agentActions.id, actionIds)))
+  ).map((row) => ({ id: row.id, createdAt: new Date(row.createdAt.getTime()) }));
   if (targets.length === 0) return sequences;
   targets.sort(compareProposalKey);
-  const first = targets[0]!;
-  const last = targets[targets.length - 1]!;
+  const firstMs = new Date(targets[0]!.createdAt.getTime());
+  const afterLastMs = new Date(targets[targets.length - 1]!.createdAt.getTime() + 1);
 
   const [prefix] = await db
     .select({ value: count() })
     .from(agentActions)
-    .where(
-      and(
-        eq(agentActions.companyId, companyId),
-        or(
-          lt(agentActions.createdAt, first.createdAt),
-          and(gte(agentActions.createdAt, first.createdAt), lte(agentActions.createdAt, first.createdAt), lt(agentActions.id, first.id))
-        )
-      )
-    );
+    .where(and(eq(agentActions.companyId, companyId), lt(agentActions.createdAt, firstMs)));
   const before = Number(prefix?.value ?? 0);
 
   const window: ProposalKey[] = (
@@ -113,12 +110,12 @@ export async function loadProposalSequences(companyId: string, actionIds: string
       .where(
         and(
           eq(agentActions.companyId, companyId),
-          gte(agentActions.createdAt, first.createdAt),
-          lte(agentActions.createdAt, last.createdAt)
+          gte(agentActions.createdAt, firstMs),
+          lt(agentActions.createdAt, afterLastMs)
         )
       )
   )
-    .filter((row) => compareProposalKey(row, first) >= 0 && compareProposalKey(row, last) <= 0)
+    .map((row) => ({ id: row.id, createdAt: new Date(row.createdAt.getTime()) }))
     .sort(compareProposalKey);
 
   const wanted = new Set(targets.map((row) => row.id));

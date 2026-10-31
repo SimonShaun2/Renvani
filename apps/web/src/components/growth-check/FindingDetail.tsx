@@ -9,6 +9,7 @@ import { useFindingDetail } from "@/src/hooks/growth-check-review.hooks";
 
 import { STATUS_LABEL, formatDateTime, ownerValidationLabel, reviewStateLabel } from "./labels";
 import { ReviewActions } from "./ReviewActions";
+import { Pill, findingKind } from "./ui";
 
 const actionLabel = (key: string) => GROWTH_CHECK_REVIEW_ACTION_REGISTRY.find((a) => a.key === key)?.label ?? key;
 const show = (field: string, value: unknown) =>
@@ -16,7 +17,7 @@ const show = (field: string, value: unknown) =>
 
 function HistoryItem({ rev }: { rev: GrowthCheckFindingRevision }) {
   return (
-    <li className="border-l-2 border-neutral-200 pl-3">
+    <li className="border-l-2 border-[#e6dccb] pl-3">
       <p className="text-xs font-medium text-neutral-800">
         {actionLabel(rev.action)} · <time dateTime={rev.createdAt}>{formatDateTime(rev.createdAt)}</time>
       </p>
@@ -42,33 +43,39 @@ export function FindingDetail({ findingId, isOwner }: { findingId: string; isOwn
   if (q.isLoading) return <SkeletonCard />;
   if (q.isError || !q.data) return <ErrorState compact title="Could not load this finding" onRetry={() => void q.refetch()} isRetrying={q.isFetching} />;
   const { finding, history } = q.data;
+  const kind = findingKind(finding.current);
   return (
-    <div className="space-y-4" aria-label="Finding detail">
+    <div className="space-y-3.5" aria-label="Finding detail">
+      <div className="flex flex-wrap items-center gap-2">
+        <Pill tone={kind.tone}>{kind.label}</Pill>
+        {finding.current.reviewState === "machine" && !finding.current.ownerConfirmedFact ? <Pill tone="warn">Needs review</Pill> : null}
+      </div>
       <div>
-        <h3 className="text-sm font-semibold text-neutral-900">{finding.checkLabel ?? finding.checkId}</h3>
-        <p className="text-xs text-neutral-500">
+        <h3 className="text-[19px] font-semibold text-[#0f1530]">{finding.checkLabel ?? finding.checkId}</h3>
+        <p className="text-[12.5px] text-[#5e6684]">
           {finding.current.ownerConfirmedFact ? "Owner-confirmed fact" : "Hypothesis — not confirmed by the owner"} · {ownerValidationLabel(finding.current.ownerValidation)}
         </p>
       </div>
-      <dl className="grid gap-2 text-xs sm:grid-cols-2">
-        <div>
-          <dt className="font-medium text-neutral-700">Machine observation (kept as found)</dt>
+      <dl className="grid gap-3 sm:grid-cols-2">
+        <div className="space-y-1.5 rounded-[10px] bg-[#eef0f5] p-3.5 text-[13px] text-[#2a3360]">
+          <dt className="text-[11px] font-medium uppercase tracking-[0.06em]">Machine observation (kept as found)</dt>
+          <dd className="text-sm">{finding.machine.summary}</dd>
           <dd>{STATUS_LABEL[finding.machine.status] ?? finding.machine.status} · {finding.machine.confidence} confidence</dd>
-          <dd className="text-neutral-600">{finding.machine.summary}</dd>
-          <dd className="text-neutral-500">Seen on {finding.sourceUrl} · {formatDateTime(finding.observedAt)}</dd>
+          <dd className="text-[#5e6684]">Seen on {finding.sourceUrl} · {formatDateTime(finding.observedAt)}</dd>
         </div>
-        <div>
-          <dt className="font-medium text-neutral-700">Current ({reviewStateLabel(finding.current.reviewState)})</dt>
+        <div className="space-y-1.5 rounded-[10px] border border-[#e6dccb] p-3.5 text-[13px] text-[#2a3360]">
+          <dt className="text-[11px] font-medium uppercase tracking-[0.06em]">Current ({reviewStateLabel(finding.current.reviewState)})</dt>
+          <dd className="text-sm">{finding.current.summary}</dd>
           <dd>{STATUS_LABEL[finding.current.status] ?? finding.current.status}</dd>
-          <dd className="text-neutral-600">{finding.current.summary}</dd>
-          {finding.current.lastNote ? <dd className="text-neutral-500">Last note: {finding.current.lastNote}</dd> : null}
+          {finding.current.lastNote ? <dd className="text-[#5e6684]">Last note: {finding.current.lastNote}</dd> : null}
         </div>
       </dl>
-      <ReviewActions finding={finding} isOwner={isOwner} />
+      <ReviewActions finding={finding} isOwner={isOwner} onReload={() => void q.refetch()} />
+      <div className="border-t border-[#e6dccb]" />
       <section aria-labelledby="gc-history">
-        <h3 id="gc-history" className="text-sm font-semibold text-neutral-900">Change history</h3>
+        <h3 id="gc-history" className="text-[15px] font-semibold text-[#0f1530]">Change history</h3>
         {history.length === 0 ? (
-          <p className="text-xs text-neutral-500">No changes yet. This is the original machine observation.</p>
+          <p className="mt-1 text-[13px] text-[#5e6684]">No changes yet. This is the original machine observation.</p>
         ) : (
           <ol className="mt-2 space-y-2">{history.map((rev) => <HistoryItem key={rev.id} rev={rev} />)}</ol>
         )}

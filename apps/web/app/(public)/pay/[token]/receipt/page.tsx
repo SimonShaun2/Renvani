@@ -8,7 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { PayInvoicePaidCard, PayInvoiceShell, type PaidDetail } from "@/src/components/pay/PayInvoiceView";
 import type { PublicInvoiceReceiptResponse } from "@fsm/types";
 
-import { buildPaidDetails, formatUsd } from "@/src/components/pay/pay-invoice.utils";
+import { buildPaidDetails, formatUsd, legacyBookingFeeDetail } from "@/src/components/pay/pay-invoice.utils";
 import { publicApi } from "@/src/lib/public-api";
 
 
@@ -41,6 +41,9 @@ export default function InvoiceReceiptPage() {
   if (receipt.serviceFeeCents > 0 && receipt.serviceFeeLabel) {
     details.push({ label: receiptFeeLabel(receipt.serviceFeeLabel), value: formatUsd(receipt.serviceFeeAmount) });
   }
+  // Booking fee was removed; only legacy receipts that were actually charged one show the row.
+  const legacyFee = legacyBookingFeeDetail(receipt);
+  if (legacyFee) details.push(legacyFee);
   details.push(...buildPaidDetails(receipt));
   const amount = receipt.paidAmount ?? (Number(receipt.totalDue) > 0 ? receipt.totalDue : null);
 

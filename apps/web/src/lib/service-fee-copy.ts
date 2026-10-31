@@ -49,6 +49,9 @@ export function payoutFeeNote(percent: number): string {
   return `On Flex, the ${pct(percent)} ${SERVICE_FEE_NAME} is paid by your customer and isn't taken from your payout.`;
 }
 
+/** Legacy receipts only: shows a booking fee that was actually charged before it was removed. */
+export const LEGACY_BOOKING_FEE_LABEL = "Online booking fee · non-refundable";
+
 /** Fee is non-refundable (API: feeRefundable=false). */
 export const NON_REFUNDABLE = "non-refundable";
 

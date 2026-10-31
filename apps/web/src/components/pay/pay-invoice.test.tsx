@@ -9,6 +9,7 @@ import {
   buildPayInvoiceSummary,
   formatServiceFeeNote,
   formatShortDate,
+  legacyBookingFeeDetail,
   resolvePayInvoiceState,
   resolvePayNotice,
   resolveServiceFeeRateBps
@@ -64,6 +65,19 @@ describe("pay invoice fee lines", () => {
     expect(buildPayInvoiceSummary(legacy as PublicPaymentLinkResponse).feeLines).toEqual([{ key: "service", label: "Service Fee (2%)", amount: "4.80" }]);
     expect(resolveServiceFeeRateBps(null)).toBe(SERVICE_FEE_RATE_BPS);
     expect(formatServiceFeeNote(150)).toContain("1.5% Service Fee");
+  });
+});
+
+describe("legacy receipt booking fee row", () => {
+  it("shows the row only when that receipt was really charged (> 0)", () => {
+    expect(legacyBookingFeeDetail({ bookingFeeCents: 199, bookingFeeAmount: "1.99" })).toEqual({ label: "Online booking fee · non-refundable", value: "$1.99" });
+  });
+  it("hides it for 0 / \"0.00\"", () => {
+    expect(legacyBookingFeeDetail({ bookingFeeCents: 0, bookingFeeAmount: "0.00" })).toBeNull();
+  });
+  it("hides it when the legacy fields are missing", () => {
+    expect(legacyBookingFeeDetail({})).toBeNull();
+    expect(legacyBookingFeeDetail({ bookingFeeCents: null, bookingFeeAmount: null })).toBeNull();
   });
 });
 

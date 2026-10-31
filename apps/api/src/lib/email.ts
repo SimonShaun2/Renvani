@@ -36,6 +36,16 @@ interface InvoiceEmailParams {
   companyName: string;
 }
 
+interface InvoicePaymentReceiptEmailParams {
+  firstName: string;
+  invoiceNumber: string;
+  amount: string;
+  balanceDue: string;
+  paidAt: string | null;
+  receiptUrl: string | null;
+  companyName: string;
+}
+
 interface InvoiceReminderEmailParams extends InvoiceEmailParams {
   balanceDue: string;
   reminderLevel: 1 | 2 | 3;
@@ -177,6 +187,28 @@ export async function sendInvoiceEmail(to: string, params: InvoiceEmailParams): 
   );
 
   logger.debug({ recipient: "[redacted]" }, "Invoice email sent");
+}
+
+export async function sendInvoicePaymentReceiptEmail(
+  to: string,
+  params: InvoicePaymentReceiptEmailParams
+): Promise<void> {
+  await sendRenderedTemplateEmail(
+    to,
+    EMAIL_TEMPLATE_IDS.invoicePaymentReceipt,
+    {
+      firstName: params.firstName,
+      invoiceNumber: params.invoiceNumber,
+      amount: params.amount,
+      balanceDue: params.balanceDue,
+      paidAtLabel: formatEmailDate(params.paidAt) ?? "",
+      receiptUrl: params.receiptUrl ?? "",
+      companyName: params.companyName
+    },
+    ["invoice.payment_receipt"]
+  );
+
+  logger.debug({ recipient: "[redacted]" }, "Invoice payment receipt email sent");
 }
 
 export async function sendInvoiceReminderEmail(
@@ -394,5 +426,17 @@ export async function sendReviewRequestEmail(
   );
 
   logger.debug({ recipient: "[redacted]" }, "Review request email sent");
+  return result;
+}
+
+export async function sendPlanReminderEmail(
+  to: string,
+  params: { firstName: string; companyName: string; planName: string; dueDateLabel: string; reminderKind: "renewal" | "tune_up" }
+): Promise<TransactionalEmailSendResult> {
+  const result = await sendRenderedTemplateEmail(to, EMAIL_TEMPLATE_IDS.planReminder, { ...params }, [
+    "plan_reminder",
+    `plan_reminder.${params.reminderKind}`
+  ]);
+  logger.debug({ recipient: "[redacted]", kind: params.reminderKind }, "Plan reminder email sent");
   return result;
 }

@@ -1,3 +1,4 @@
+import { serviceFeeNote } from "@/src/lib/service-fee-copy";
 import { formatServiceFeeLineItemName, SERVICE_FEE_RATE_BPS } from "@fsm/config/stripe-pricing";
 
 import type { PublicPaymentLinkResponse } from "@fsm/types";
@@ -67,16 +68,12 @@ export function resolveServiceFeeRateBps(platformFeePercent: number | null | und
     : SERVICE_FEE_RATE_BPS;
 }
 
-function ratePercentLabel(rateBps: number): string {
-  return `${Number((rateBps / 100).toFixed(2))}%`;
-}
-
 export function formatServiceFeeNote(rateBps: number = SERVICE_FEE_RATE_BPS): string {
-  return `A ${ratePercentLabel(rateBps)} Service Fee applies to payments made online through Renvani.`;
+  return serviceFeeNote(rateBps / 100);
 }
 
 /**
- * Builds the invoice summary lines. Flex shows "Service Fee (2%)" (non-refundable, charged at checkout);
+ * Builds the invoice summary lines. Flex shows "Service Fee (2%)" (charged at checkout);
  * Flat shows none. There is no booking fee: total due = invoice + Service Fee (Flex) or invoice only (Flat).
  * Older API payloads without split cents fall back to the combined platform fee as the Service Fee line.
  */

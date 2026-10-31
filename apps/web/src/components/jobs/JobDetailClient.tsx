@@ -18,6 +18,7 @@ import { AttachmentsPanel } from "./AttachmentsPanel";
 import { JobActivityTimeline } from "./JobActivityTimeline";
 import { JobAISuggestion } from "./JobAISuggestion";
 import { JobContextCards } from "./JobContextCards";
+import { CreateInvoiceAction } from "./create-invoice/CreateInvoiceAction";
 import { JobHeader } from "./JobHeader";
 import { JobProductsPanel } from "./JobProductsPanel";
 import { OTWPanel } from "./OTWPanel";
@@ -154,6 +155,7 @@ export function JobDetailClient({ jobId }: JobDetailClientProps) {
         job={job}
         pendingRequiredTasks={progress.pendingRequired.length}
         onOpenOTW={() => setOtwComposerOpen(true)}
+        invoiceAction={<CreateInvoiceAction job={job} products={products} taxRate={taxRate > 0 ? taxRate : null} />}
       />
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1.14fr)_minmax(0,0.86fr)]">

@@ -3,6 +3,7 @@
 import { useParams, useSearchParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
 
+import { PayHostedCheckoutButton } from "@/src/components/pay/PayHostedCheckoutButton";
 import { PayInvoiceCheckoutBody, PayInvoicePaidCard, PayInvoiceShell } from "@/src/components/pay/PayInvoiceView";
 import {
   PAY_LOAD_ERROR_COPY,
@@ -76,10 +77,12 @@ export default function PublicPaymentPage() {
           state={state}
           notice={resolvePayNotice(status)}
           checkout={
-            // Without the publishable key, fall back to the hosted Pay link instead of a blank card.
+            // Without the publishable key or a clientSecret, fall back to hosted Stripe Checkout (POST hosted-checkout, #292).
             payment.checkoutClientSecret && isEmbeddedCheckoutAvailable(payment.checkoutClientSecret) ? (
               <StripeEmbeddedInvoiceCheckout clientSecret={payment.checkoutClientSecret} />
-            ) : null
+            ) : (
+              <PayHostedCheckoutButton token={params.token} />
+            )
           }
         />
       )}

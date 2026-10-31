@@ -303,4 +303,63 @@ describe("FS-157 clerk_user_id provisioning", () => {
     expect(state.users).toHaveLength(1);
     expect(state.users[0]?.clerkUserId).toBeNull();
   });
+
+  describe("orphan guard (creator already linked elsewhere)", () => {
+    it("new user + first org still provisions company and owner", async () => {
+      const { provisionClerkOrganizationDetailed, provisionClerkMembership } = await import("./clerk-provisioning.service.js");
+      const org = await provisionClerkOrganizationDetailed({ organizationId: "org_1", name: "Acme", createdBy: "user_new" });
+      const member = await provisionClerkMembership({ ...base, email: "n@x.com", clerkUserId: "user_new" });
+      expect(org.company?.id).toBe("co_1");
+      expect(member).toMatchObject({ status: "created", role: "owner", companyId: "co_1" });
+      expect(state.companies).toHaveLength(1);
+    });
+
+    it("organization.created by an already-linked creator creates no company (replay too)", async () => {
+      const { provisionClerkOrganizationDetailed, provisionClerkOrganization } = await import("./clerk-provisioning.service.js");
+      state.users.push({ id: "u_x", companyId: "co_existing", email: "x@x.com", role: "owner", clerkUserId: "user_x" });
+      const first = await provisionClerkOrganizationDetailed({ organizationId: "org_2", name: "Second", createdBy: "user_x" });
+      const replay = await provisionClerkOrganization({ organizationId: "org_2", name: "Second", createdBy: "user_x" });
+      expect(first).toEqual({ company: null, skipReason: "creator_already_linked" });
+      expect(replay).toBeNull();
+      expect(state.companies).toHaveLength(0);
+    });
+
+    it("membership before org.created for an already-linked user: no company either way", async () => {
+      const { provisionClerkOrganization, provisionClerkMembership } = await import("./clerk-provisioning.service.js");
+      state.users.push({ id: "u_x", companyId: "co_existing", email: "x@x.com", role: "owner", clerkUserId: "user_x" });
+      const member = await provisionClerkMembership({ ...base, organizationId: "org_2", email: "x@x.com", clerkUserId: "user_x" });
+      const org = await provisionClerkOrganization({ organizationId: "org_2", name: "Second", createdBy: "user_x" });
+      const memberAfter = await provisionClerkMembership({ ...base, organizationId: "org_2", email: "x@x.com", clerkUserId: "user_x" });
+      expect(member).toEqual({ status: "skipped", companyId: null });
+      expect(org).toBeNull();
+      expect(memberAfter).toEqual({ status: "skipped", companyId: null });
+      expect(state.companies).toHaveLength(0);
+      expect(state.users).toHaveLength(1);
+    });
+
+    it("membership by email of an existing user (no Clerk id) creates no company", async () => {
+      const { provisionClerkMembership } = await import("./clerk-provisioning.service.js");
+      state.users.push({ id: "u_x", companyId: "co_existing", email: "x@x.com", role: "owner", clerkUserId: null });
+      const res = await provisionClerkMembership({ ...base, organizationId: "org_2", email: "X@x.com", clerkUserId: null });
+      expect(res).toEqual({ status: "skipped", companyId: null });
+      expect(state.companies).toHaveLength(0);
+    });
+
+    it("an already-provisioned org is unchanged when its creator is linked (replay of a real first org)", async () => {
+      const { provisionClerkOrganization, provisionClerkMembership } = await import("./clerk-provisioning.service.js");
+      await provisionClerkOrganization({ organizationId: "org_1", name: "Acme", createdBy: "user_a" });
+      await provisionClerkMembership({ ...base, email: "a@x.com", clerkUserId: "user_a" });
+      const replay = await provisionClerkOrganization({ organizationId: "org_1", name: "Acme", createdBy: "user_a" });
+      expect(replay?.id).toBe("co_1");
+      expect(state.companies).toHaveLength(1);
+    });
+
+    it("missing created_by behaves as before: company is created (membership then decides ownership)", async () => {
+      const { provisionClerkOrganization } = await import("./clerk-provisioning.service.js");
+      state.users.push({ id: "u_x", companyId: "co_existing", email: "x@x.com", role: "owner", clerkUserId: "user_x" });
+      const org = await provisionClerkOrganization({ organizationId: "org_3", name: "NoCreator" });
+      expect(org?.id).toBe("co_1");
+      expect(state.companies).toHaveLength(1);
+    });
+  });
 });

@@ -23,7 +23,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
        "k": [
         {
          "t": "div",
-         "c": "flex flex-col gap-[20px] items-start relative flex-1 min-w-0",
+         "c": "flex flex-col gap-[20px] items-start relative w-[528px] shrink-0",
          "n": "Outcome and action",
          "id": "203:9154",
          "k": [
@@ -2749,7 +2749,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
        "k": [
         {
          "t": "div",
-         "c": "flex flex-col gap-[20px] items-start relative flex-1 min-w-0",
+         "c": "flex flex-col gap-[20px] items-start relative w-[528px] shrink-0",
          "n": "Outcome and action",
          "id": "203:9623",
          "k": [
@@ -5835,7 +5835,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
        "k": [
         {
          "t": "div",
-         "c": "flex flex-col gap-[20px] items-start relative flex-1 min-w-0",
+         "c": "flex flex-col gap-[20px] items-start relative w-[528px] shrink-0",
          "n": "Outcome and action",
          "id": "203:10134",
          "k": [
@@ -8871,7 +8871,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
        "k": [
         {
          "t": "div",
-         "c": "flex flex-col gap-[20px] items-start relative flex-1 min-w-0",
+         "c": "flex flex-col gap-[20px] items-start relative w-[528px] shrink-0",
          "n": "Outcome and action",
          "id": "203:10667",
          "k": [
@@ -11679,7 +11679,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
        "k": [
         {
          "t": "div",
-         "c": "flex flex-col gap-[20px] items-start relative flex-1 min-w-0",
+         "c": "flex flex-col gap-[20px] items-start relative w-[528px] shrink-0",
          "n": "Outcome and action",
          "id": "203:12250",
          "k": [
@@ -14573,7 +14573,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
        "k": [
         {
          "t": "div",
-         "c": "flex flex-col gap-[20px] items-start relative flex-1 min-w-0",
+         "c": "flex flex-col gap-[20px] items-start relative w-[480px] shrink-0",
          "n": "Short outcome copy",
          "id": "203:8090",
          "k": [
@@ -17155,7 +17155,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
        "k": [
         {
          "t": "div",
-         "c": "flex flex-col gap-[20px] items-start relative flex-1 min-w-0",
+         "c": "flex flex-col gap-[20px] items-start relative w-[480px] shrink-0",
          "n": "Short outcome copy",
          "id": "203:11148",
          "k": [
@@ -19661,7 +19661,7 @@ export const FLAGSHIP_TREES: Record<string, { desktop: VNode; mobile: VNode }> =
        "k": [
         {
          "t": "div",
-         "c": "flex flex-col gap-[20px] items-start relative flex-1 min-w-0",
+         "c": "flex flex-col gap-[20px] items-start relative w-[480px] shrink-0",
          "n": "Short outcome copy",
          "id": "203:11427",
          "k": [

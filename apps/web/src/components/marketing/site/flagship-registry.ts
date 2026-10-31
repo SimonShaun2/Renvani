@@ -58,7 +58,7 @@ export const PRODUCT_PAGES: ProductPageEntry[] = [
     ],
     "fieldNode": "203:9320",
     "fieldHeadline": "Your name on every booking.",
-    "fieldImage": "/marketing/flagship/example-job-photo.jpg",
+    "fieldImage": null,
     "fieldCard": "growth/field",
     "ctaNode": "203:9364"
   },
@@ -108,7 +108,7 @@ export const PRODUCT_PAGES: ProductPageEntry[] = [
     ],
     "fieldNode": "203:9810",
     "fieldHeadline": "Work worth saying yes to.",
-    "fieldImage": "/marketing/flagship/illustrative-plumbing-field-use.jpg",
+    "fieldImage": null,
     "fieldCard": "revenue/field",
     "ctaNode": "203:9854"
   },
@@ -159,7 +159,7 @@ export const PRODUCT_PAGES: ProductPageEntry[] = [
     ],
     "fieldNode": "203:10330",
     "fieldHeadline": "Built for the work outside.",
-    "fieldImage": "/marketing/flagship/example-job-photo.jpg",
+    "fieldImage": null,
     "fieldCard": "operations/field",
     "ctaNode": "203:10376"
   },
@@ -209,7 +209,7 @@ export const PRODUCT_PAGES: ProductPageEntry[] = [
     ],
     "fieldNode": "203:10837",
     "fieldHeadline": "The relationship outlasts the repair.",
-    "fieldImage": "/marketing/flagship/illustrative-plumbing-field-use.jpg",
+    "fieldImage": null,
     "fieldCard": "retention/field",
     "ctaNode": "203:10883"
   },
@@ -257,7 +257,7 @@ export const PRODUCT_PAGES: ProductPageEntry[] = [
     ],
     "fieldNode": "203:12418",
     "fieldHeadline": "Your business. A clearer view.",
-    "fieldImage": "/marketing/flagship/illustrative-owner-field-use.jpg",
+    "fieldImage": null,
     "fieldCard": "command-center/field",
     "ctaNode": "203:12466"
   },

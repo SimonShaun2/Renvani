@@ -30,6 +30,7 @@ import {
   requiresHumanApproval
 } from "./agent-action.policy.js";
 import { requireAgentActionExecutor, getAgentActionExecutor } from "./agent-action.executors.js";
+import { buildAgentActionExecutionResultForType, persistAgentActionExecutionFailure } from "./agent-action-receipt.js";
 import { resolveEntityRef } from "./tenant-context.service.js";
 import {
   emitAgentActionAuditEvent,
@@ -603,6 +604,10 @@ export async function executeAgentAction(
   options: AgentActionStateChangeOptions = {}
 ) {
   let persistExpiredAfterRollback = false;
+  // Set only while the executor side effect runs. An unexpected (non-AppError) throw there, e.g. a provider or
+  // adapter error, is recorded as `failed` (TE-FAIL-01). AppError rejections from the executor (validation,
+  // cross-tenant, not found) and every check before it keep rolling back to the prior state so they can be fixed.
+  let persistFailureAfterRollback = false;
 
   try {
     const result = await runTransactionWithTenantSession(companyId, async (tx) => {
@@ -653,13 +658,14 @@ export async function executeAgentAction(
         throw agentActionVersionConflictError();
       }
 
-      // Side effects (e.g. FS-25 brief apply) commit atomically with the succeeded state.
+      // Side effects (e.g. FS-25 brief apply) commit atomically with the final state.
+      persistFailureAfterRollback = true;
       await executor.applyInTransaction?.(executionContext);
+      persistFailureAfterRollback = false;
 
-      const receipt = {
-        outcome: "succeeded" as const,
-        emittedEventIds: [] as string[],
-        note: "No outbound provider send in Batch 4 slice",
+      // Internal actions end `succeeded`; outbound actions stay `executing` with a `queued` receipt until a
+      // provider callback moves delivery on (TE-RCPT-01/02). No provider send happens here.
+      const { state: finalState, receipt } = buildAgentActionExecutionResultForType(row.actionType, {
         approvedParameters: executableParameters,
         approvedParametersHash: hashPayload({
           actionType: row.actionType,
@@ -675,12 +681,12 @@ export async function executeAgentAction(
               }
             }
           : {})
-      };
+      });
 
       const updatedRows = await tx
         .update(agentActions)
         .set({
-          state: "succeeded",
+          state: finalState,
           executionReceipt: receipt,
           updatedAt: new Date()
         })
@@ -729,6 +735,15 @@ export async function executeAgentAction(
   } catch (error) {
     if (persistExpiredAfterRollback) {
       await persistTerminalExpiredState(companyId, actionId);
+    }
+    if (persistFailureAfterRollback && !(error instanceof AppError)) {
+      // The execute tx has rolled back (no row lock held). Record failed + receipt + execution_failed audit in a
+      // fresh tenant tx; a failure to record must not mask the original error.
+      try {
+        await persistAgentActionExecutionFailure({ companyId, actionId, actorId, actorType: "user", error });
+      } catch {
+        // swallow: the original execution error below is what the caller needs
+      }
     }
     throw error;
   }

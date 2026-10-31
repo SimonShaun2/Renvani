@@ -1,7 +1,8 @@
 /**
  * Ticket A "Trusted Execution": REPRODUCIBLE FAILING TESTS for documented gaps. NO FIXES.
  *
- * TE-STALE-01/02/03 and TE-DUP-01/02 are fixed and now live in trusted-execution.test.ts (default run).
+ * TE-STALE-01/02/03, TE-DUP-01/02, TE-FAIL-01 and TE-RCPT-01/02 are fixed and now live in
+ * trusted-execution.test.ts (default run). Only TE-AUTH-01/02 remain here (fixed by #382, not yet merged).
  * These remaining tests intentionally fail on dev: each one asserts the behaviour the trusted-execution contract
  * requires and that dev does not provide yet. They are excluded from the default `vitest run`
  * (see vitest.config.ts) and run only through `pnpm --filter @fsm/api test:trusted-execution-gaps`.
@@ -67,27 +68,11 @@ let app: AppInstance;
 let buildAppModule: typeof import("../app.js");
 let fakeDb: typeof import("../test-support/fake-db.js");
 let tokens: typeof import("../lib/tokens.js");
-let service: typeof import("../services/agent-action.service.js");
-let registry: typeof import("../services/agent-action.registry.js");
-let executors: typeof import("../services/agent-action.executors.js");
-
-const THROWING_ACTION_TYPE = "te_gap.adapter_throws";
-const PROVIDER_ERROR = "provider adapter unavailable (test)";
 
 beforeAll(async () => {
   buildAppModule = await import("../app.js");
   fakeDb = await import("../test-support/fake-db.js");
   tokens = await import("../lib/tokens.js");
-  service = await import("../services/agent-action.service.js");
-  registry = await import("../services/agent-action.registry.js");
-  executors = await import("../services/agent-action.executors.js");
-  // Test-only action type whose provider adapter throws during execute (no network).
-  registry.registerAgentActionType({ actionType: THROWING_ACTION_TYPE, agentProduct: "revenue", aiMayPropose: true });
-  executors.registerAgentActionExecutor(THROWING_ACTION_TYPE, {
-    applyInTransaction: async () => {
-      throw new Error(PROVIDER_ERROR);
-    }
-  });
 });
 
 beforeEach(async () => {
@@ -142,16 +127,6 @@ function seedSchedulingAction(companyId: string, jobId: string, state: "awaiting
   });
 }
 
-function seedMessageAction(companyId: string, customerId: string, state: "awaiting_approval" | "approved") {
-  return seedAction(companyId, {
-    actionType: "message.send_proposed",
-    agentProduct: "revenue",
-    state,
-    parameters: { channel: "sms", body: "Your technician is on the way.", customerId },
-    target: { entityType: "customer", entityId: customerId }
-  });
-}
-
 describe("Trusted Execution gaps: controls (pass today; prove the harness works)", () => {
   it("CTRL-01 owner approves an awaiting action (200) and execute of an internal action succeeds", async () => {
     const { company, job, auth } = tenant("ctrl");
@@ -199,40 +174,5 @@ describe("Trusted Execution gaps: unauthorized actions", () => {
       .set("Authorization", auth("technician").header)
       .send({ expectedVersion: "not-a-number" });
     expect(res.status).toBe(403);
-  });
-});
-
-describe("Trusted Execution gaps: failed execution and receipt states", () => {
-  it("TE-FAIL-01 provider/adapter throw during execute yields a persisted failed receipt, not a silent rollback to approved", async () => {
-    const { company, job } = tenant("fail1");
-    const action = seedAction(company.id, {
-      actionType: THROWING_ACTION_TYPE,
-      agentProduct: "revenue",
-      state: "approved",
-      parameters: { jobId: job.id },
-      target: { entityType: "job", entityId: job.id }
-    });
-    await expect(service.executeAgentAction(company.id, action.id, "reviewer-1")).rejects.toThrow(PROVIDER_ERROR);
-    const row = stored(action.id);
-    expect(row.state, "a failed execution must be recorded as failed").toBe("failed");
-    expect((row.executionReceipt as Record<string, unknown> | null)?.outcome).toBe("failed");
-  });
-
-  it("TE-RCPT-01 executing message.send_proposed with no live provider must not read as done (succeeded)", async () => {
-    const t = tenant("rcpt1");
-    const customer = fakeDb.seedCustomer({ companyId: t.company.id, firstName: "Pat", lastName: "Doe" });
-    const action = seedMessageAction(t.company.id, customer.id, "approved");
-    const executed = await service.executeAgentAction(t.company.id, action.id, "reviewer-1");
-    expect(executed.state, "no provider send happened, so the action is not done").not.toBe("succeeded");
-  });
-
-  it("TE-RCPT-02 receipt for an outbound send carries a distinct delivery state (queued | provider_accepted | delivered | failed)", async () => {
-    const t = tenant("rcpt2");
-    const customer = fakeDb.seedCustomer({ companyId: t.company.id, firstName: "Pat", lastName: "Doe" });
-    const action = seedMessageAction(t.company.id, customer.id, "approved");
-    const executed = await service.executeAgentAction(t.company.id, action.id, "reviewer-1");
-    expect(["queued", "provider_accepted", "delivered", "failed"]).toContain(
-      (executed.executionReceipt as Record<string, unknown> | null)?.deliveryState
-    );
   });
 });

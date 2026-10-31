@@ -1,7 +1,7 @@
 /**
  * Ticket A (FS-256) TE-FAIL-01 / TE-RCPT-01 / TE-RCPT-02 building blocks. Pure helpers plus one post-rollback
- * writer, so `executeAgentAction` can adopt them with a few lines once #370 (which owns agent-action.service.ts)
- * merges. No provider send, no network, no env reads.
+ * writer, used by `executeAgentAction` in agent-action.service.ts (wired after #370 and #380 merged).
+ * No provider send, no network, no env reads.
  *
  * - Internal actions: execute ends `succeeded` with outcome `succeeded` (the side effect is in the same tx).
  * - Outbound actions: execute ends in `executing` with outcome `queued` + deliveryState `queued`. Only a provider

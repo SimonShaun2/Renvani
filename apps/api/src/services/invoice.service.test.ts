@@ -276,6 +276,93 @@ describe("invoice.service", () => {
     expect(fakeDb.getTestState().activityEvents.at(-1)?.eventType).toBe("invoice.created");
   });
 
+  it("createInvoice fromJobId copies job line items (skipping unapproved upsells) and applies default payment terms", async () => {
+    const company = fakeDb.seedCompany({
+      name: "Terms Co",
+      slug: "terms-co",
+      timezone: "America/Chicago",
+      settings: { invoicing: { defaultPaymentTermsDays: 15 } }
+    } as never);
+    const actor = fakeDb.seedUser({ companyId: company.id, email: "t@example.com", firstName: "T", lastName: "O", role: "owner" });
+    const customer = fakeDb.seedCustomer({ companyId: company.id, firstName: "Jo", lastName: "Lee" });
+    const job = fakeDb.seedJob({ companyId: company.id, customerId: customer.id, title: "Repair", status: "completed" });
+    fakeDb.seedJobProduct({ companyId: company.id, jobId: job.id, name: "Diagnostic", quantity: "1.000", unitPrice: "80.00", total: "80.00" });
+    fakeDb.seedJobProduct({ companyId: company.id, jobId: job.id, name: "Filter", quantity: "2.000", unitPrice: "10.00", total: "20.00" });
+    fakeDb.seedJobProduct({ companyId: company.id, jobId: job.id, name: "Pending upsell", quantity: "1.000", unitPrice: "500.00", total: "500.00", isUpsell: true, upsellApproved: false });
+
+    const before = Date.now();
+    const created = await invoiceService.createInvoice(company.id, actor.id, { customerId: customer.id, fromJobId: job.id });
+
+    const items = fakeDb.getTestState().invoiceItems.filter((row) => row.invoiceId === created.id);
+    expect(items.map((row) => row.name).sort()).toEqual(["Diagnostic", "Filter"]);
+    expect(created.subtotal).toBe("100.00");
+    const dueMs = new Date(created.dueAt as unknown as string).getTime();
+    expect(dueMs).toBeGreaterThanOrEqual(before + 15 * 86_400_000 - 1000);
+    expect(dueMs).toBeLessThanOrEqual(Date.now() + 15 * 86_400_000 + 1000);
+
+    const preview = await invoiceService.getInvoiceChargePreview(company.id, created.id);
+    expect(preview.invoiceId).toBe(created.id);
+    expect(preview.subtotal).toBe("100.00");
+  });
+
+  it("getInvoiceChargePreview: Flex adds the 2% Service Fee on balance due, Flat adds none, other tenant is NOT_FOUND", async () => {
+    const flex = fakeDb.seedCompany({ name: "Flex Co", slug: "flex-co", timezone: "America/Chicago", settings: { stripePlatformBilling: { planTier: "flex" } } } as never);
+    const flat = fakeDb.seedCompany({ name: "Flat Co", slug: "flat-co", timezone: "America/Chicago", settings: { stripePlatformBilling: { planTier: "flat" } } } as never);
+    const flexCustomer = fakeDb.seedCustomer({ companyId: flex.id, firstName: "A", lastName: "B" });
+    const flatCustomer = fakeDb.seedCustomer({ companyId: flat.id, firstName: "C", lastName: "D" });
+    const flexInvoice = fakeDb.seedInvoice({ companyId: flex.id, customerId: flexCustomer.id, total: "100.00", balanceDue: "100.00" } as never);
+    const flatInvoice = fakeDb.seedInvoice({ companyId: flat.id, customerId: flatCustomer.id, total: "100.00", balanceDue: "100.00" } as never);
+
+    await expect(invoiceService.getInvoiceChargePreview(flex.id, flexInvoice.id)).resolves.toMatchObject({
+      invoiceId: flexInvoice.id,
+      invoiceTotal: "100.00",
+      plan: "flex",
+      subtotal: "100.00",
+      serviceFeeAmount: "2.00",
+      serviceFeeRateBps: 200,
+      total: "102.00"
+    });
+    await expect(invoiceService.getInvoiceChargePreview(flat.id, flatInvoice.id)).resolves.toMatchObject({
+      plan: "flat",
+      serviceFeeAmount: "0.00",
+      serviceFeeRateBps: 0,
+      serviceFeeLabel: null,
+      total: "100.00"
+    });
+    await expect(invoiceService.getInvoiceChargePreview(flex.id, flatInvoice.id)).rejects.toMatchObject({ code: ErrorCode.NOT_FOUND });
+  });
+
+  it("updateCompany sets, keeps and clears invoicing.defaultPaymentTermsDays without touching other settings", async () => {
+    const companyService = await import("./company.service.js");
+    const company = fakeDb.seedCompany({ name: "Terms Set", slug: "terms-set", timezone: "America/Chicago", settings: { tradingName: "TS" } } as never);
+    const actor = fakeDb.seedUser({ companyId: company.id, email: "o@terms.test", firstName: "O", lastName: "W", role: "owner" });
+    const read = () => fakeDb.getTestState().companies.find((row) => row.id === company.id)?.settings as Record<string, any>;
+
+    await companyService.updateCompany(company.id, actor.id, { settings: { invoicing: { defaultPaymentTermsDays: 30 } } } as never);
+    expect(read().invoicing).toEqual({ defaultPaymentTermsDays: 30 });
+    expect(read().tradingName).toBe("TS");
+    await companyService.updateCompany(company.id, actor.id, { settings: { invoicing: {} } } as never);
+    expect(read().invoicing).toEqual({ defaultPaymentTermsDays: 30 });
+    await companyService.updateCompany(company.id, actor.id, { settings: { invoicing: { defaultPaymentTermsDays: null } } } as never);
+    expect(read().invoicing).toEqual({ defaultPaymentTermsDays: null });
+  });
+
+  it("createInvoice leaves dueAt empty without a company default and keeps explicit items over job lines", async () => {
+    const { company, actor } = createAdminContext();
+    const { customer, job } = seedInvoiceGraph(company.id);
+    fakeDb.seedJobProduct({ companyId: company.id, jobId: job.id, name: "Ignored", quantity: "1.000", unitPrice: "9.00", total: "9.00" });
+
+    const created = await invoiceService.createInvoice(company.id, actor.id, {
+      customerId: customer.id,
+      jobId: job.id,
+      items: [{ name: "Explicit", quantity: 1, unitPrice: 50 }]
+    } as never);
+
+    expect(created.dueAt ?? null).toBeNull();
+    const names = fakeDb.getTestState().invoiceItems.filter((row) => row.invoiceId === created.id).map((row) => row.name);
+    expect(names).toEqual(["Explicit"]);
+  });
+
   it("updateInvoice succeeds for drafts and rejects sent invoices", async () => {
     const { company, actor } = createAdminContext();
     const { customer } = seedInvoiceGraph(company.id);
@@ -740,8 +827,8 @@ describe("invoice.service", () => {
 
   it("getPublicInvoicePaymentLink: online-booked Flex = invoice + 2% Service Fee, Flat = invoice only; no booking fee", async () => {
     const expected = {
-      flex: { serviceFeeAmount: "2.47", platformFeeAmount: "2.47", totalDue: "125.72", serviceFeeCents: 247, totalDueCents: 12_572, platformFeePercent: 2, platformFeePaidByCustomer: true },
-      flat: { serviceFeeAmount: "0.00", platformFeeAmount: "0.00", totalDue: "123.25", serviceFeeCents: 0, totalDueCents: 12_325, platformFeePercent: null, platformFeePaidByCustomer: false }
+      flex: { serviceFeeAmount: "2.47", platformFeeAmount: "2.47", totalDue: "125.72", serviceFeeCents: 247, totalDueCents: 12_572, platformFeePercent: 2, serviceFeePercent: 2, platformFeePaidByCustomer: true },
+      flat: { serviceFeeAmount: "0.00", platformFeeAmount: "0.00", totalDue: "123.25", serviceFeeCents: 0, totalDueCents: 12_325, platformFeePercent: null, serviceFeePercent: null, platformFeePaidByCustomer: false }
     } as const;
     for (const planTier of ["flat", "flex"] as const) {
       const { company } = createAdminContext();

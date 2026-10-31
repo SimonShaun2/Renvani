@@ -314,6 +314,9 @@ export async function getPublicVipJoinPreview(joinToken: string): Promise<{
   monthlyPrice: string;
   platformFeeAmount: string | null;
   platformFeePercent: number | null;
+  /** Customer-facing name for the Flex fee (platformFee* kept for existing clients). */
+  serviceFeeAmount: string | null;
+  serviceFeePercent: number | null;
   totalDueMonthly: string;
   discountPercent: string;
 }> {
@@ -355,6 +358,8 @@ export async function getPublicVipJoinPreview(joinToken: string): Promise<{
     monthlyPrice: tier.monthlyPrice,
     platformFeeAmount: fee?.platformFeeAmount ?? null,
     platformFeePercent: fee?.platformFeePercent ?? null,
+    serviceFeeAmount: fee?.platformFeeAmount ?? null,
+    serviceFeePercent: fee?.platformFeePercent ?? null,
     totalDueMonthly: totalDue,
     discountPercent: tier.discountPercent
   };

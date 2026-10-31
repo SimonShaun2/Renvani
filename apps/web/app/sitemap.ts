@@ -1,9 +1,9 @@
 import type { MetadataRoute } from "next";
 
-import { buildPublicSitemap } from "@/src/lib/seo/public-sitemap";
+import { buildMarketingSitemap, buildPublicSitemap } from "@/src/lib/seo/public-sitemap";
 
 export const revalidate = 3600;
 
-export default function sitemap(): Promise<MetadataRoute.Sitemap> {
-  return buildPublicSitemap();
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  return [...buildMarketingSitemap(), ...(await buildPublicSitemap())];
 }

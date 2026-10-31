@@ -8,7 +8,9 @@ type Handoff = { node: string; suite: string; record: string; title: string; evi
 type Base = { slug: string; name: string; frames: { desktop: string; mobile: string }; eyebrow: string; headline: string; body: string; heroCta: string; heroVisual: string; heroNode: string; flowNode: string; flowHeadline: string; ctaNode: string };
 export type FlagshipEntry = Base & { template: "flagship"; steps: Step[]; fieldNode: string; fieldHeadline: string; fieldImage: string | null; fieldCard: string };
 export type ToolEntry = Base & { template: "tool"; caption: string; flowEyebrow: string; moments: string[]; ctaEyebrow: string; ctaHeadline: string; handoffNode: string; handoff: Handoff[] };
-export type ProductPageEntry = FlagshipEntry | ToolEntry;
+/** Tool pages whose whole layout comes from the frame trees (FLAGSHIP_TREES); registry only carries routing + metadata. */
+export type FramePageEntry = { slug: string; name: string; frames: { desktop: string; mobile: string }; template: "page"; headline: string; body: string };
+export type ProductPageEntry = FlagshipEntry | ToolEntry | FramePageEntry;
 
 export const PRODUCT_PAGES: ProductPageEntry[] = [
   {
@@ -413,6 +415,160 @@ export const PRODUCT_PAGES: ProductPageEntry[] = [
         "evidence": "Details ready for the field"
       }
     ]
+  },
+  {
+    "slug": "technician-app",
+    "name": "Technician App",
+    "frames": {
+      "desktop": "175:2294",
+      "mobile": "175:2440"
+    },
+    "template": "page",
+    "headline": "Everything for the job. Right here.",
+    "body": "Put equipment, tasks, photos, and job history in the technician’s hand."
+  },
+  {
+    "slug": "invoices-payments",
+    "name": "Invoices & Payments",
+    "frames": {
+      "desktop": "175:2580",
+      "mobile": "175:2726"
+    },
+    "template": "page",
+    "headline": "Finish the job. Send the invoice.",
+    "body": "Create the invoice from completed work and track payment."
+  },
+  {
+    "slug": "service-agreements",
+    "name": "Service Agreements",
+    "frames": {
+      "desktop": "175:2866",
+      "mobile": "175:3012"
+    },
+    "template": "page",
+    "headline": "Turn today’s visit into a relationship.",
+    "body": "Keep covered visits, agreement terms, and upcoming renewals together."
+  },
+  {
+    "slug": "ai-revenue-intelligence",
+    "name": "AI Revenue Intelligence",
+    "frames": {
+      "desktop": "175:3152",
+      "mobile": "175:3298"
+    },
+    "template": "page",
+    "headline": "See the next opportunity in your records.",
+    "body": "Review open opportunities and choose the next action using your own records."
+  },
+  {
+    "slug": "customers-properties-assets",
+    "name": "Customers, Properties & Assets",
+    "frames": {
+      "desktop": "175:3438",
+      "mobile": "175:3584"
+    },
+    "template": "page",
+    "headline": "Know the home before you arrive.",
+    "body": "Bring each customer, property, equipment record, and service visit together."
+  },
+  {
+    "slug": "onboarding-data-import",
+    "name": "Onboarding & Data Import",
+    "frames": {
+      "desktop": "175:4010",
+      "mobile": "175:4156"
+    },
+    "template": "page",
+    "headline": "Bring the business you’ve already built.",
+    "body": "Upload your export, review the mapping, and check what comes across."
+  },
+  {
+    "slug": "inquiry-response-follow-up",
+    "name": "Inquiry Response & Follow-up",
+    "frames": {
+      "desktop": "215:6308",
+      "mobile": "215:6309"
+    },
+    "template": "page",
+    "headline": "Respond while the opportunity is fresh.",
+    "body": "Review every reply and keep follow-up connected to the inquiry."
+  },
+  {
+    "slug": "jobs-work-orders",
+    "name": "Jobs & Work Orders",
+    "frames": {
+      "desktop": "215:6310",
+      "mobile": "215:6311"
+    },
+    "template": "page",
+    "headline": "One job. Every detail.",
+    "body": "Keep the approved work, crew, tasks, and files together."
+  },
+  {
+    "slug": "time-tracking-job-photos",
+    "name": "Time Tracking & Job Photos",
+    "frames": {
+      "desktop": "215:6312",
+      "mobile": "215:6313"
+    },
+    "template": "page",
+    "headline": "Show the work behind the job.",
+    "body": "Keep time entries and job photos attached to the visit."
+  },
+  {
+    "slug": "reminders-win-backs",
+    "name": "Reminders & Win-backs",
+    "frames": {
+      "desktop": "215:6314",
+      "mobile": "215:6315"
+    },
+    "template": "page",
+    "headline": "Give good customers a reason to return.",
+    "body": "Review consented reminders and make the next visit easy to request."
+  },
+  {
+    "slug": "reporting-job-sources",
+    "name": "Reporting & Job Sources",
+    "frames": {
+      "desktop": "215:6316",
+      "mobile": "215:6317"
+    },
+    "template": "page",
+    "headline": "See where the work comes from.",
+    "body": "Follow recorded sources from the booking to the paid invoice."
+  },
+  {
+    "slug": "websites",
+    "name": "Websites",
+    "frames": {
+      "desktop": "216:6308",
+      "mobile": "216:6309"
+    },
+    "template": "page",
+    "headline": "Your business. Your own website.",
+    "body": "Show your services, earn trust, and turn local visits into service requests."
+  },
+  {
+    "slug": "price-book-service-catalog",
+    "name": "Price Book & Service Catalog",
+    "frames": {
+      "desktop": "216:6310",
+      "mobile": "216:6311"
+    },
+    "template": "page",
+    "headline": "One price book. Connected work.",
+    "body": "Use your services, labor, and materials across estimates and jobs."
+  },
+  {
+    "slug": "customer-portal",
+    "name": "Customer Portal",
+    "frames": {
+      "desktop": "216:6312",
+      "mobile": "216:6313"
+    },
+    "template": "page",
+    "headline": "Give customers a clearer next step.",
+    "body": "Preview visits, approved estimates, payments, and reschedule requests in one place."
   }
 ];
 
@@ -434,10 +590,41 @@ const LINK_SLUGS: Record<string, string> = {
   estimates: "estimates-approvals",
   "scheduling & dispatch": "scheduling-dispatch",
   "scheduling & dispatch →": "scheduling-dispatch",
-  dispatch: "scheduling-dispatch"
+  dispatch: "scheduling-dispatch",
+  "websites": "websites",
+  "website": "websites",
+  "inquiry response & follow-up": "inquiry-response-follow-up",
+  "inquiry response": "inquiry-response-follow-up",
+  "jobs & work orders": "jobs-work-orders",
+  "technician app": "technician-app",
+  "technician app & on-the-way": "technician-app",
+  "invoices & payments": "invoices-payments",
+  "payments": "invoices-payments",
+  "customer portal": "customer-portal",
+  "customer portal · preview": "customer-portal",
+  "price book & service catalog": "price-book-service-catalog",
+  "price book": "price-book-service-catalog",
+  "time tracking & job photos": "time-tracking-job-photos",
+  "time & job photos": "time-tracking-job-photos",
+  "service agreements": "service-agreements",
+  "reminders & win-backs": "reminders-win-backs",
+  "reporting & job sources": "reporting-job-sources",
+  "reporting & sources": "reporting-job-sources",
+  "job sources": "reporting-job-sources",
+  "customers, properties & assets": "customers-properties-assets",
+  "customers & assets": "customers-properties-assets",
+  "onboarding & data import": "onboarding-data-import",
+  "data import": "onboarding-data-import",
+  "ai revenue intelligence": "ai-revenue-intelligence",
+  "revenue intelligence": "ai-revenue-intelligence",
+  "inquiry & follow-up": "inquiry-response-follow-up",
+  jobs: "jobs-work-orders",
+  "time & photos": "time-tracking-job-photos",
+  "reminder emails": "reminders-win-backs",
+  "job source reporting": "reporting-job-sources" // CoS: Growth card item -> Reporting & Job Sources page
 };
 
 export function productLinkFor(label: string): string | null {
-  const slug = LINK_SLUGS[label.trim().toLowerCase()];
+  const slug = LINK_SLUGS[label.trim().replace(/\s*→$/, "").toLowerCase()];
   return slug ? productHref(slug) : null;
 }

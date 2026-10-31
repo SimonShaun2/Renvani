@@ -2,6 +2,7 @@ import type { LucideIcon } from "lucide-react";
 import {
   BriefcaseBusiness,
   CalendarDays,
+  Clock,
   CreditCard,
   Wallet,
   Crown,
@@ -44,6 +45,7 @@ const ownerAdminNavigation: RoleNavigation = {
     { label: "Invoices", href: "/invoices", icon: CreditCard },
     { label: "Payments", href: "/payments", icon: Wallet },
     { label: "Service Agreements", href: "/service-agreements", icon: ShieldCheck },
+    { label: "Timesheets", href: "/timesheets", icon: Clock },
     { label: "Inventory", href: "/inventory", icon: Warehouse },
     { label: "AI Revenue Center", href: "/ai-revenue-center", icon: Sparkles },
     { label: "Command Center", href: "/command-center", icon: Inbox }
@@ -61,6 +63,7 @@ const dispatcherNavigation: RoleNavigation = {
     { label: "Jobs", href: "/jobs", icon: BriefcaseBusiness },
     { label: "Estimates", href: "/estimates", icon: FileText },
     { label: "Invoices", href: "/invoices", icon: CreditCard },
+    { label: "Timesheets", href: "/timesheets", icon: Clock },
     { label: "Command Center", href: "/command-center", icon: Inbox },
     { label: "Inventory", href: "/inventory", icon: Warehouse }
   ],

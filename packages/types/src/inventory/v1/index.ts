@@ -125,6 +125,10 @@ export interface StockLevel {
   id: string;
   locationId: string;
   productId: string;
+  /** Tenant-scoped product catalog name; null when the product is missing. Read-only label, no product permission needed. */
+  productName: string | null;
+  /** Product SKU when set, else null. */
+  productSku: string | null;
   quantity: number;
   lowStockThreshold: number | null;
   isLowStock: boolean;
@@ -136,6 +140,10 @@ export interface StockMovement {
   id: string;
   locationId: string;
   productId: string;
+  /** Tenant-scoped product catalog name; null when the product is missing. Read-only label, no product permission needed. */
+  productName: string | null;
+  /** Product SKU when set, else null. */
+  productSku: string | null;
   kind: StockMovementKind;
   quantityDelta: number;
   quantityAfter: number;

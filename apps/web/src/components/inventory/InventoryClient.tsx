@@ -17,10 +17,17 @@ import {
   useTransferStock
 } from "@/src/hooks/inventory.hooks";
 import { ApiError } from "@/src/lib/api";
-import type { InventoryConflictPayload, StockLevel, StockLocationKind } from "@/src/lib/inventory.types";
+import type { StockLevel, StockLocationKind } from "@fsm/types";
 import { useAuthStore } from "@/src/stores/auth.store";
 
 type Tab = "stock" | "low" | "locations" | "adjust" | "transfer";
+
+/** 409 body from inventory writes (route-level error shape, not part of the @fsm/types contract). */
+interface InventoryConflictPayload {
+  error: "CONFLICT";
+  reason: "stale_record_version" | "insufficient_stock" | string;
+  message: string;
+}
 
 const TABS: Array<{ id: Tab; label: string }> = [
   { id: "stock", label: "Stock" },

@@ -1,5 +1,7 @@
 /** Marketing website config. Figma jiGHTNUJNltWbHA4Il3hk7, section "11 Website" (171:2), Home / Desktop 171:3. */
 
+import { productLinkFor } from "./flagship-registry";
+
 export type SiteLink = { label: string; href: string };
 
 export const SITE_NAV: { links: SiteLink[]; cta: SiteLink; signIn: SiteLink } = {
@@ -124,36 +126,36 @@ export const HOME = {
 } as const;
 
 const p = (slug: string) => `/product/${slug}`;
-/** Header products menu (177:640). `href: null` = page not built yet (plain text). */
+/** Header products menu (177:640). Items link to their built page via productLinkFor; `null` = no frame/page (plain text). */
 export const PRODUCTS_MENU = {
   headline: "Five products. One connected business.",
   all: { label: "All products", href: "/product" },
   cta: { label: "Get a free demo", href: "/signup" },
   groups: [
-    { title: "Growth", href: p("growth"), items: [{ label: "Websites", href: null }, { label: "Online Booking", href: p("online-booking") }] },
-    { title: "Revenue", href: p("revenue"), items: [{ label: "Inquiry Response & Follow-up", href: null }, { label: "Estimates & Approvals", href: p("estimates-approvals") }] },
+    { title: "Growth", href: p("growth"), items: [{ label: "Websites", href: productLinkFor("Websites") }, { label: "Online Booking", href: p("online-booking") }] },
+    { title: "Revenue", href: p("revenue"), items: [{ label: "Inquiry Response & Follow-up", href: productLinkFor("Inquiry Response & Follow-up") }, { label: "Estimates & Approvals", href: p("estimates-approvals") }] },
     {
       title: "Operations",
       href: p("operations"),
       items: [
         { label: "Scheduling & Dispatch", href: p("scheduling-dispatch") },
-        { label: "Jobs & Work Orders", href: null },
-        { label: "Technician App", href: null },
-        { label: "Invoices & Payments", href: null },
-        { label: "Customer Portal · Preview", href: null },
-        { label: "Price Book & Service Catalog", href: null },
-        { label: "Time Tracking & Job Photos", href: null }
+        { label: "Jobs & Work Orders", href: productLinkFor("Jobs & Work Orders") },
+        { label: "Technician App", href: productLinkFor("Technician App") },
+        { label: "Invoices & Payments", href: productLinkFor("Invoices & Payments") },
+        { label: "Customer Portal · Preview", href: productLinkFor("Customer Portal · Preview") },
+        { label: "Price Book & Service Catalog", href: productLinkFor("Price Book & Service Catalog") },
+        { label: "Time Tracking & Job Photos", href: productLinkFor("Time Tracking & Job Photos") }
       ]
     },
-    { title: "Retention", href: p("retention"), items: [{ label: "Service Agreements", href: null }, { label: "Reminders & Win-backs", href: null }] },
+    { title: "Retention", href: p("retention"), items: [{ label: "Service Agreements", href: productLinkFor("Service Agreements") }, { label: "Reminders & Win-backs", href: productLinkFor("Reminders & Win-backs") }] },
     {
       title: "Command Center",
       href: p("command-center"),
       items: [
-        { label: "Reporting & Job Sources", href: null },
-        { label: "Customers, Properties & Assets", href: null },
-        { label: "Onboarding & Data Import", href: null },
-        { label: "AI Revenue Intelligence", href: null }
+        { label: "Reporting & Job Sources", href: productLinkFor("Reporting & Job Sources") },
+        { label: "Customers, Properties & Assets", href: productLinkFor("Customers, Properties & Assets") },
+        { label: "Onboarding & Data Import", href: productLinkFor("Onboarding & Data Import") },
+        { label: "AI Revenue Intelligence", href: productLinkFor("AI Revenue Intelligence") }
       ]
     }
   ] as { title: string; href: string; items: { label: string; href: string | null }[] }[]

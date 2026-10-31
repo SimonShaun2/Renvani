@@ -10,9 +10,9 @@ import type {
   StockLocation,
   StockMutationResponse,
   StockTransferBody
-} from "@/src/lib/inventory.types";
+} from "@fsm/types";
 
-/** FS-181 against FS-170 (#220) routes under /api/v1/inventory. */
+/** FS-181/FS-211: /api/v1/inventory routes (FS-170 #220 + #345 productName/productSku). */
 export const inventoryKeys = {
   all: ["inventory"] as const,
   locations: () => ["inventory", "locations"] as const,
@@ -53,17 +53,14 @@ function useInventoryMutation<TBody, TResponse>(path: string) {
 
 export const useCreateStockLocation = () =>
   useInventoryMutation<CreateStockLocationBody, { location: StockLocation }>("/api/v1/inventory/locations");
-export const useAdjustStock = () =>
-  useInventoryMutation<StockAdjustmentBody, StockMutationResponse>("/api/v1/inventory/adjustments");
-export const useTransferStock = () =>
-  useInventoryMutation<StockTransferBody, StockMutationResponse>("/api/v1/inventory/transfers");
+export const useAdjustStock = () => useInventoryMutation<StockAdjustmentBody, StockMutationResponse>("/api/v1/inventory/adjustments");
+export const useTransferStock = () => useInventoryMutation<StockTransferBody, StockMutationResponse>("/api/v1/inventory/transfers");
 
 /** Catalog names for the item picker. /api/v1/products is owner/admin only, so callers pass `enabled`. */
 export function useInventoryProductOptions(enabled: boolean) {
   return useQuery({
     queryKey: ["inventory", "product-options"],
-    queryFn: () =>
-      api.get<{ data: Array<{ id: string; name: string }> }>("/api/v1/products?isActive=true&page=1&limit=100"),
+    queryFn: () => api.get<{ data: Array<{ id: string; name: string }> }>("/api/v1/products?isActive=true&page=1&limit=100"),
     enabled
   });
 }

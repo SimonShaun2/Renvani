@@ -1,4 +1,4 @@
-import { and, eq, inArray } from "drizzle-orm";
+import { and, count, eq, gte, inArray, lt } from "drizzle-orm";
 
 import { activityEvents, agentActions, db } from "@fsm/db";
 import type {
@@ -66,22 +66,73 @@ async function loadProvenanceEvents(
   }));
 }
 
+type ProposalKey = { id: string; createdAt: Date };
+
+function compareProposalKey(a: ProposalKey, b: ProposalKey): number {
+  const byTime = a.createdAt.getTime() - b.createdAt.getTime();
+  if (byTime !== 0) return byTime;
+  return a.id < b.id ? -1 : a.id > b.id ? 1 : 0;
+}
+
 /**
- * Proposal numbers: 1-based creation order within the tenant, counting soft-deleted rows so numbers never shift.
- * Proposal version: 1 + operator edits (agent.proposal_edited audit events).
+ * Proposal numbers: 1-based (createdAt, id) order within the tenant, counting soft-deleted rows so numbers never
+ * shift. Bounded instead of scanning the tenant: one COUNT for rows before the earliest requested proposal, plus
+ * the (createdAt, id) window spanning the requested proposals. A single get reads a window of ~1 row.
  */
+export async function loadProposalSequences(companyId: string, actionIds: string[]): Promise<Map<string, number>> {
+  const sequences = new Map<string, number>();
+  if (actionIds.length === 0) return sequences;
+
+  // agent_actions.created_at has microsecond precision but JS Dates are millisecond-truncated, so every bound
+  // below is built from whole milliseconds: prefix is strictly before firstMs, the window is the half-open
+  // [firstMs, lastMs + 1ms). Ordering is (ms, id) in JS, so rows sharing a millisecond are numbered by id.
+  const targets: ProposalKey[] = (
+    await db
+      .select({ id: agentActions.id, createdAt: agentActions.createdAt })
+      .from(agentActions)
+      .where(and(eq(agentActions.companyId, companyId), inArray(agentActions.id, actionIds)))
+  ).map((row) => ({ id: row.id, createdAt: new Date(row.createdAt.getTime()) }));
+  if (targets.length === 0) return sequences;
+  targets.sort(compareProposalKey);
+  const firstMs = new Date(targets[0]!.createdAt.getTime());
+  const afterLastMs = new Date(targets[targets.length - 1]!.createdAt.getTime() + 1);
+
+  const [prefix] = await db
+    .select({ value: count() })
+    .from(agentActions)
+    .where(and(eq(agentActions.companyId, companyId), lt(agentActions.createdAt, firstMs)));
+  const before = Number(prefix?.value ?? 0);
+
+  const window: ProposalKey[] = (
+    await db
+      .select({ id: agentActions.id, createdAt: agentActions.createdAt })
+      .from(agentActions)
+      .where(
+        and(
+          eq(agentActions.companyId, companyId),
+          gte(agentActions.createdAt, firstMs),
+          lt(agentActions.createdAt, afterLastMs)
+        )
+      )
+  )
+    .map((row) => ({ id: row.id, createdAt: new Date(row.createdAt.getTime()) }))
+    .sort(compareProposalKey);
+
+  const wanted = new Set(targets.map((row) => row.id));
+  window.forEach((row, index) => {
+    if (wanted.has(row.id)) sequences.set(row.id, before + index + 1);
+  });
+  return sequences;
+}
+
+/** Proposal number (bounded lookup) + proposal version: 1 + operator edits (agent.proposal_edited audit events). */
 async function loadItemExtras(companyId: string, actionIds: string[]): Promise<Map<string, OperatorInboxItemExtras>> {
   const extras = new Map<string, OperatorInboxItemExtras>();
   if (actionIds.length === 0) {
     return extras;
   }
 
-  const allRows = await db
-    .select({ id: agentActions.id, createdAt: agentActions.createdAt })
-    .from(agentActions)
-    .where(eq(agentActions.companyId, companyId));
-  allRows.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime() || a.id.localeCompare(b.id));
-  const sequenceById = new Map(allRows.map((row, index) => [row.id, index + 1]));
+  const sequenceById = await loadProposalSequences(companyId, actionIds);
 
   const edits = await db
     .select({ entityId: activityEvents.entityId })
@@ -122,6 +173,11 @@ export async function countOperatorInbox(
   return { counts, total: actions.length };
 }
 
+function isEscalationAudit(row: { eventType: string; payload: unknown }): boolean {
+  const payload = row.payload as Record<string, unknown> | null;
+  return row.eventType === "agent.proposal_rejected" && payload?.outcome === "escalated";
+}
+
 /** Audit timeline for one proposal: agent_action activity events, oldest first, plus escalation from the receipt. */
 export async function getOperatorInboxTimeline(
   companyId: string,
@@ -135,6 +191,7 @@ export async function getOperatorInboxTimeline(
       actorId: activityEvents.actorId,
       actorType: activityEvents.actorType,
       summary: activityEvents.summary,
+      payload: activityEvents.payload,
       occurredAt: activityEvents.occurredAt
     })
     .from(activityEvents)
@@ -146,24 +203,28 @@ export async function getOperatorInboxTimeline(
       )
     );
 
+  const receipt = action.executionReceipt as Record<string, unknown> | null;
+  const escalationSummary =
+    typeof receipt?.reason === "string" ? `Escalated: ${receipt.reason}` : "Agent proposal escalated";
   const entries: OperatorInboxTimelineEntry[] = rows.map((row) => ({
     id: row.id,
     at: row.occurredAt.toISOString(),
-    kind: row.eventType,
+    // Escalation is audited as proposal_rejected + outcome "escalated" (no enum migration); show it as escalated.
+    kind: isEscalationAudit(row) ? "agent.proposal_escalated" : row.eventType,
     actorId: row.actorId ?? null,
     actorType: row.actorType ?? null,
-    summary: row.summary
+    summary: isEscalationAudit(row) ? escalationSummary : row.summary
   }));
 
-  const receipt = action.executionReceipt as Record<string, unknown> | null;
-  if (action.state === "escalated" && receipt && typeof receipt.escalatedAt === "string") {
+  const hasEscalationEvent = rows.some(isEscalationAudit);
+  if (!hasEscalationEvent && action.state === "escalated" && receipt && typeof receipt.escalatedAt === "string") {
     entries.push({
       id: `${actionId}:escalated`,
       at: receipt.escalatedAt,
       kind: "agent.proposal_escalated",
       actorId: typeof receipt.escalatedBy === "string" ? receipt.escalatedBy : null,
       actorType: "user",
-      summary: typeof receipt.reason === "string" ? `Escalated: ${receipt.reason}` : "Agent proposal escalated"
+      summary: escalationSummary
     });
   }
 

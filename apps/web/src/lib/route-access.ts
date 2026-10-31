@@ -19,6 +19,7 @@ const ROLE_ALLOWED_PREFIXES: Record<UserRole, string[]> = {
     "/invoices",
     "/payments",
     "/service-agreements",
+    "/timesheets",
     "/ai-revenue-center",
     "/command-center",
     "/products",
@@ -38,6 +39,7 @@ const ROLE_ALLOWED_PREFIXES: Record<UserRole, string[]> = {
     "/invoices",
     "/payments",
     "/service-agreements",
+    "/timesheets",
     "/ai-revenue-center",
     "/command-center",
     "/products",
@@ -54,6 +56,7 @@ const ROLE_ALLOWED_PREFIXES: Record<UserRole, string[]> = {
     "/estimates",
     "/invoices",
     "/service-agreements",
+    "/timesheets",
     "/command-center",
     "/settings"
   ],
@@ -64,6 +67,7 @@ const ROLE_ALLOWED_PREFIXES: Record<UserRole, string[]> = {
     "/estimates",
     "/invoices",
     "/service-agreements",
+    "/timesheets",
     "/settings"
   ],
   technician: ["/mobile"]

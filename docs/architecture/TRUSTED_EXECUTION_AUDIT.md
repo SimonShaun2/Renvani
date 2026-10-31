@@ -23,7 +23,7 @@ Every agent action type must satisfy all seven items:
 | C4 | Policy version | The proposal pins a policy version. It is re-checked at approve and execute and recorded on the receipt. |
 | C5 | Expected record version | State changes **require** `expectedVersion` (compare-and-set). The target record version is re-checked at execute inside the tenant transaction. |
 | C6 | Idempotency key | Create, approve, reject, edit and execute accept a key. A same-key replay returns the first result, and a different payload returns 409. |
-| C7 | Result contract | The receipt states what actually happened, using the Figma execution states (see §4): **preparation** → **approval** → **queuing** → **provider acceptance** → **delivery confirmation** → **business outcome**, or terminal **failed**. "Succeeded" is never claimed without the side effect, and a failure is persisted as `failed`. |
+| C7 | Result contract | The receipt states what actually happened, using the Figma steps (see §4): **Prepared** → **Approved** → **Queued** → **Provider accepted** → **Delivered** → **Business outcome**, or **Delivery failure**. In code tokens, delivery is `queued` \| `provider_accepted` \| `delivered` \| `failed`. "Succeeded" is never claimed without the side effect, and a failure is persisted as `failed`. |
 
 ## 2. Action types × contract
 
@@ -46,7 +46,7 @@ Every agent action type must satisfy all seven items:
 | C5 Expected record version | **FAIL** | <ul><li>`expectedVersion` is **optional** (`routes/agent-actions/schemas.ts:17-20`, `agent-action.service.ts:110-114`). The web never sends it (`apps/web/src/hooks/operator-inbox.hooks.ts:46, 68`), so approve and execute are applied blind (TE-STALE-01/02).</li><li>Edit takes no `expectedVersion` and writes without compare-and-set (`agent-action.service.ts:444-484`, update at `:483`). A stale edit overwrites (TE-STALE-03).</li><li>The target `recordVersion` check exists (`agent-action.service.ts:547-550`), but reads outside the tenant tx (B3).</li></ul> |
 | C6 Idempotency key | **PARTIAL** | <ul><li>Create only (`agent-action.service.ts:196-215`, hash match at `:209`).</li><li>Approve, reject, edit, execute and escalate accept no key. A retry gets 409 from the state machine or compare-and-set (`agent-action.service.ts:317-341, 541, 565-572`) instead of a replay (TE-DUP-01/02).</li><li>Double approve or double execute is *safe* (no double side effect), but not *idempotent*.</li></ul> |
 | C7 Failure handling | **FAIL** | <ul><li>A throw in `beforeExecute` or `applyInTransaction` rolls back the whole execute tx (`agent-action.service.ts:531-629`). The row returns to `approved` with no receipt, and `failed` (an enum value in `packages/types/src/agent-control-plane/v1/agent-action-state.ts`) is never written (TE-FAIL-01).</li><li>The catch at `:642-647` only persists `expired`.</li></ul> |
-| C7 Receipt shape | **FAIL** for outbound types | <ul><li>The receipt is a single hard-coded `outcome: "succeeded"` with `note: "No outbound provider send in Batch 4 slice"` (`agent-action.service.ts:577-596`).</li><li>State goes `executing` → `succeeded` (`:598-606`). There is no field for queuing, provider acceptance or delivery confirmation (TE-RCPT-01/02).</li></ul> |
+| C7 Receipt shape | **FAIL** for outbound types | <ul><li>The receipt is a single hard-coded `outcome: "succeeded"` with `note: "No outbound provider send in Batch 4 slice"` (`agent-action.service.ts:577-596`).</li><li>State goes `executing` → `succeeded` (`:598-606`). There is no field for Queued, Provider accepted or Delivered (`queued`/`provider_accepted`/`delivered`) (TE-RCPT-01/02).</li></ul> |
 
 ### 2b. Per-type items
 
@@ -54,7 +54,7 @@ Every agent action type must satisfy all seven items:
 |---|---|---|---|---|---|
 | `context.resolve` (registry:98) | none; auto-approved | PASS: tool schema via `assertActionTypeMatchesToolName` (service:161-162; tools/registry.ts:3-9) | PASS | N/A (not executable) | no |
 | `message.draft` (registry:99-106) | none; auto-approved | PASS: tool schema | PASS | N/A | no |
-| `message.send_proposed` (registry:107-118) | `beforeExecute: authorizeOutboundAgentActionExecution` (executors:130-132) | PASS: tool schema at create. Edit patches `body`/`channel`/`subject` through `EditAgentActionParametersSchema` (types operator-inbox.ts:76-80) without re-validating the full tool schema. | PASS | **FAIL**: `succeeded` with no send. Approval, queuing, provider acceptance and delivery confirmation all collapse into `succeeded`. | **yes** (consent read at execute) |
+| `message.send_proposed` (registry:107-118) | `beforeExecute: authorizeOutboundAgentActionExecution` (executors:130-132) | PASS: tool schema at create. Edit patches `body`/`channel`/`subject` through `EditAgentActionParametersSchema` (types operator-inbox.ts:76-80) without re-validating the full tool schema. | PASS | **FAIL**: `succeeded` with no send. Approved, Queued, Provider accepted and Delivered all collapse into `succeeded`. | **yes** (consent read at execute) |
 | `revenue.inquiry.qualify` (registry:119-125) | `internalRecordExecutor("bookingRequestId")` (executors:149, 109-122) | **FAIL**: not a tool name, so no parameter schema (service:172-177). Only `bookingRequestId` presence is checked at execute (executors:113). | PASS | PASS: internal metadata, so `succeeded` is accurate | no |
 | `loyalty.reminder.propose` (registry:126) | `beforeExecute: assertLoyaltyReminderExecutionAllowed` (executors:124-128; policy.ts:51-60) | PASS: tool schema | PASS (AI only) | **FAIL**: when the flag is on and dry-run is off, it reaches `succeeded` with no send and no `applyInTransaction`. When the flag is off, POLICY_DENIED rolls back with no failed receipt. | **yes** |
 | `service.job_brief.propose` (registry:127) | `applyApprovedJobServiceBriefInTransaction` (executors:134-143) | PASS: tool schema plus `ServiceJobBriefProposeParamsV1Schema.parse` at apply (job-service-brief.service.ts:111) | PASS (AI/system) | PASS: internal apply in the same tx | no |
@@ -80,31 +80,35 @@ All of these still filter by `companyId`, so none is a known cross-tenant leak. 
 
 ## 4. Execution and delivery states: where they collapse
 
-State names follow the Figma frame "03 Agent Execution and Delivery States" (file `jiGHTNUJNltWbHA4Il3hk7`, node `331-4230`). The six states in order are **preparation**, **approval**, **queuing**, **provider acceptance**, **delivery confirmation** and **business outcome**. **Failed** is a terminal state that can follow any of them. The Figma frame was not read for this commit; these names are used verbatim as given.
+Source: Figma frame **"AOF / 03 Action execution · Delivery states"** (file `jiGHTNUJNltWbHA4Il3hk7`). The desktop frame is node `331:4230`; the tablet (`340:4219`) and mobile (`341:4255`) frames show the same steps. The six steps are **Prepared**, **Approved**, **Queued**, **Provider accepted**, **Delivered** and **Business outcome**. The failure badge reads **"DELIVERY FAILURE"**, under "Failure & recovery": "If provider delivery fails, show a retry, escalation and evidence trail. Never silently turn approval into success." The frame label differences are:
+
+- The mobile frame labels step 6 **"OUTCOME"** rather than "BUSINESS OUTCOME".
+- The mobile frame has no "DELIVERY FAILURE" badge; it shows only the "Failure & recovery" text.
+- The tablet and mobile frames add the status pills "QUEUED · NOT SENT" and "PENDING RECEIPT" (tablet) or "NOT COMPLETE" (mobile). The desktop frame shows "Delivered" as "Not confirmed; do not mark completed".
 
 ### 4a. Name mapping
 
-| Figma state | Earlier name in this doc | Code status today (`AgentActionStateV1Schema`, `packages/types/src/agent-control-plane/v1/agent-action-state.ts:3-14`) |
-|---|---|---|
-| preparation | (none; implied by "proposed") | `proposed`, `policy_evaluated`, `awaiting_approval` |
-| approval | `approved` | `approved` |
-| queuing | `queued` | none. Execution goes `executing` → `succeeded`. |
-| provider acceptance | `provider-accepted` / `provider_accepted` | none. Collapses into `succeeded`. |
-| delivery confirmation | `delivered` | none. Collapses into `succeeded`, and the web shows it as "Completed". |
-| business outcome | (none) | none on the action. Revenue writes recommendation `actioned` at execute. |
-| failed (terminal) | `failed` | `failed` is in the enum but execute never writes it. Other terminal values are `expired`, `cancelled`, `escalated` and `reversed`. |
+| Figma step (331:4230) | Earlier name in this doc | Code token (receipt `deliveryState`, TE-RCPT-02) | Code status today (`AgentActionStateV1Schema`, `packages/types/src/agent-control-plane/v1/agent-action-state.ts:3-14`) |
+|---|---|---|---|
+| Prepared | (none; implied by "proposed") | — | `proposed`, `policy_evaluated`, `awaiting_approval` |
+| Approved | `approved` | — | `approved` |
+| Queued | `queued` | `queued` | none. Execution goes `executing` → `succeeded`. |
+| Provider accepted | `provider-accepted` / `provider_accepted` | `provider_accepted` | none. Collapses into `succeeded`. |
+| Delivered | `delivered` | `delivered` | none. Collapses into `succeeded`, and the web shows it as "Completed". |
+| Business outcome (mobile: "Outcome") | (none) | — (kept separate from delivery) | none on the action. Revenue writes recommendation `actioned` at execute. |
+| Delivery failure (badge "DELIVERY FAILURE") | `failed` | `failed` | `failed` is in the enum but execute never writes it. Other terminal values are `expired`, `cancelled`, `escalated` and `reversed`. |
 
 ### 4b. Where each state collapses
 
 | Required distinct state | Where it is represented today | Collapse |
 |---|---|---|
-| preparation | `proposed` → `policy_evaluated` → `awaiting_approval` | Distinct, so there is no gap here. |
-| approval | `agent_actions.state = "approved"` (service:330) | The Command Center button labelled **"Approve & send"** (`apps/web/src/components/command-center/NeedsYou.tsx:43-51, 82-83`; also `agent-actions.config.ts:8` and `revenue-agent/proposal.config.ts:24`) calls only `POST /agent-actions/:id/approve` (`operator-inbox.hooks.ts:46`). Execute is a separate call (`:68`) that the Command Center never makes. **Approval reads as "sent".** |
-| queuing | nowhere | Collapses into `succeeded`. |
-| provider acceptance | nowhere | Collapses into `succeeded`. |
-| delivery confirmation | nowhere | Collapses into `succeeded`. The web labels it "Completed" (`agent-actions.config.ts:29`). |
-| business outcome | nowhere on the action | Revenue marks the recommendation `actioned` at execute, before any delivery. |
-| failed (terminal) | The enum value exists, but execute never writes it. | A throw rolls back to `approved` (TE-FAIL-01). Escalate and expire are the only other terminal writes. |
+| Prepared | `proposed` → `policy_evaluated` → `awaiting_approval` | Distinct, so there is no gap here. |
+| Approved | `agent_actions.state = "approved"` (service:330) | The Command Center button labelled **"Approve & send"** (`apps/web/src/components/command-center/NeedsYou.tsx:43-51, 82-83`; also `agent-actions.config.ts:8` and `revenue-agent/proposal.config.ts:24`) calls only `POST /agent-actions/:id/approve` (`operator-inbox.hooks.ts:46`). Execute is a separate call (`:68`) that the Command Center never makes. **Approved reads as "sent".** |
+| Queued (`queued`) | nowhere | Collapses into `succeeded`. |
+| Provider accepted (`provider_accepted`) | nowhere | Collapses into `succeeded`. |
+| Delivered (`delivered`) | nowhere | Collapses into `succeeded`. The web labels it "Completed" (`agent-actions.config.ts:29`). |
+| Business outcome | nowhere on the action | Revenue marks the recommendation `actioned` at execute, before any delivery. |
+| Delivery failure (`failed`) | The enum value exists, but execute never writes it. | A throw rolls back to `approved` (TE-FAIL-01). Escalate and expire are the only other terminal writes. |
 
 ## 5. Placeholder Command Center KPIs
 
@@ -124,7 +128,7 @@ The fix is one new read-only endpoint, for example `GET /api/v1/reporting/comman
 | Order | Gap | Category | Failing test | Proposed small PR | Depends on #301 |
 |---|---|---|---|---|---|
 | 1 | G-FAIL: execute failure is not persisted | failed execution | TE-FAIL-01 | Run executor work in a savepoint. On throw, roll back the side effects and in a second tenant tx write `state=failed` plus a receipt `{outcome:"failed", error code, at}` with an audit `execution_failed`. Rethrow. | no |
-| 2 | G-RCPT: outbound "succeeded" without a send | execution and delivery states | TE-RCPT-01, TE-RCPT-02 | Add a receipt `deliveryState` covering the Figma states queuing, provider acceptance, delivery confirmation and failed; business outcome is recorded separately. Outbound executors stop at queuing (an outbox row, no provider call), and only a provider callback moves the state on to provider acceptance or delivery confirmation. No migration is needed, since the receipt is jsonb and state stays `executing` until delivery. | **yes**: outbound consent must be the #301 current-consent check before anything is queued |
+| 2 | G-RCPT: outbound "succeeded" without a send | execution and delivery states | TE-RCPT-01, TE-RCPT-02 | Add a receipt `deliveryState` with tokens `queued` \| `provider_accepted` \| `delivered` \| `failed` (Figma steps Queued, Provider accepted and Delivered, plus Delivery failure; frame 331:4230). Business outcome is recorded separately. Outbound executors stop at `queued` (an outbox row, no provider call), and only a provider callback moves the state on to `provider_accepted` or `delivered`. No migration is needed, since the receipt is jsonb and state stays `executing` until delivery. | **yes**: outbound consent must be the #301 current-consent check before anything is queued |
 | 3 | G-UI-APPROVE: "Approve & send" only approves | execution and delivery states / UX | (web; documented) | API: optional `POST /agent-actions/:id/approve-and-execute` (one tenant tx, same contract). Web (Dev C): relabel to "Approve", or call the combined endpoint. | yes (same as 2) |
 | 4 | G-VER: `expectedVersion` optional; edit has no compare-and-set | stale records | TE-STALE-01, -02, -03 | Make `expectedVersion` required on approve/reject/execute/edit/escalate (400 if missing). Edit uses compare-and-set on `updated_at`. Web sends `item.version` (Dev C, same release). | no |
 | 5 | G-IDEM: no idempotency key on state changes | duplicates | TE-DUP-01, -02 | Accept an `Idempotency-Key` header. Store `{op, key, resultVersion}` in the audit event payload (no new table) and replay the first result for the same key. | no |

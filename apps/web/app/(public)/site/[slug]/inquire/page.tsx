@@ -72,7 +72,7 @@ export default async function BrandedInquiryPage({
         <BrandedInquiryClient
           model={model}
           acquisitionSource={acquisitionSource}
-          serviceCategory={resolveSiteTrade(settings).label}
+          serviceCategory={resolveSiteTradeFromSettings(settings).label}
         />
       </main>
     </div>

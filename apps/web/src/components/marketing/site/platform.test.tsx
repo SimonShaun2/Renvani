@@ -28,6 +28,8 @@ const ROUTE_FILES: Record<string, string> = {
   "/industries/plumbing": "(marketing)/industries/[slug]/page.tsx",
   "/industries/electrical": "(marketing)/industries/[slug]/page.tsx",
   "/signup": "(auth)/signup/[[...rest]]/page.tsx",
+  "/demo": "(marketing)/demo/page.tsx",
+  "/growth-check": "(marketing)/growth-check/page.tsx",
   "/login": "(auth)/login/[[...rest]]/page.tsx"
 };
 const path = (href: string) => href.split("#")[0] || "/";

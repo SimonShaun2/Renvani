@@ -322,7 +322,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
        "label": "Get a free demo",
        "kind": "Accent",
        "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px]",
-       "href": "/signup"
+       "href": "/demo"
       }
      ]
     }
@@ -639,7 +639,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
        "label": "Get a free demo",
        "kind": "Dark",
        "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px]",
-       "href": "/signup"
+       "href": "/demo"
       }
      ]
     }
@@ -713,7 +713,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
            "label": "Get a free demo",
            "kind": "Accent",
            "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px]",
-           "href": "/signup"
+           "href": "/demo"
           }
          ]
         },
@@ -2523,7 +2523,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
            "label": "Get a free demo",
            "kind": "Accent",
            "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px]",
-           "href": "/signup"
+           "href": "/demo"
           },
           {
            "t": "p",
@@ -2607,7 +2607,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
            "label": "Get a free demo",
            "kind": "Dark",
            "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px]",
-           "href": "/signup"
+           "href": "/demo"
           }
          ]
         },
@@ -4423,7 +4423,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
            "label": "Get a free demo",
            "kind": "Dark",
            "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px]",
-           "href": "/signup"
+           "href": "/demo"
           },
           {
            "t": "p",
@@ -4509,7 +4509,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
            "label": "Get a free demo",
            "kind": "Accent",
            "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px]",
-           "href": "/signup"
+           "href": "/demo"
           }
          ]
         },
@@ -6319,7 +6319,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
            "label": "Get a free demo",
            "kind": "Accent",
            "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px]",
-           "href": "/signup"
+           "href": "/demo"
           },
           {
            "t": "p",
@@ -6403,7 +6403,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
            "label": "Get a free demo",
            "kind": "Dark",
            "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px]",
-           "href": "/signup"
+           "href": "/demo"
           }
          ]
         },
@@ -8219,7 +8219,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
            "label": "Get a free demo",
            "kind": "Dark",
            "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px]",
-           "href": "/signup"
+           "href": "/demo"
           },
           {
            "t": "p",
@@ -8305,7 +8305,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
            "label": "Get a free demo",
            "kind": "Accent",
            "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px]",
-           "href": "/signup"
+           "href": "/demo"
           }
          ]
         },
@@ -9370,7 +9370,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
            "label": "Get a free demo",
            "kind": "Accent",
            "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px]",
-           "href": "/signup"
+           "href": "/demo"
           },
           {
            "t": "p",
@@ -9454,7 +9454,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
            "label": "Get a free demo",
            "kind": "Dark",
            "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px]",
-           "href": "/signup"
+           "href": "/demo"
           }
          ]
         },
@@ -10306,7 +10306,7 @@ export const INDUSTRY_TREES: Record<string, { desktop: VNode; mobile?: VNode }> 
            "label": "Get a free demo",
            "kind": "Dark",
            "c": "bg-[#f6b400] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px]",
-           "href": "/signup"
+           "href": "/demo"
           },
           {
            "t": "p",

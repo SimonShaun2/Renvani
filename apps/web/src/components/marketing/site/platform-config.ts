@@ -80,7 +80,7 @@ export const PRODUCTS_PAGE = {
   secondary: { label: "Find your next tool ↓", href: "#tools" },
   toolsEyebrow: "THE TOOLS BEHIND THE WORK",
   toolsHeadline: "Find your next tool.",
-  cta: { headline: "See your business in Renvani.", primary: { label: "Get a free demo", href: "/signup" }, secondary: { label: "See the initial industries →", href: "/industries" as string | null } }
+  cta: { headline: "See your business in Renvani.", primary: { label: "Get a free demo", href: "/demo" }, secondary: { label: "See the initial industries →", href: "/industries" as string | null } }
 };
 
 export const HOW_PAGE = {
@@ -95,5 +95,5 @@ export const HOW_PAGE = {
     { eyebrow: "HVAC", title: "No heat. Approved repair. Next tune-up.", image: "/marketing/home/hvac-tech.jpg", link: { label: "See the full workflow →", href: "/industries/hvac" as string | null } },
     { eyebrow: "PLUMBING", title: "A leak. A repair. A customer for next time.", image: "/marketing/home/plumbing-work.jpg", link: { label: "See the full workflow →", href: "/industries/plumbing" as string | null } }
   ],
-  cta: { headline: "See your business in Renvani.", primary: { label: "Get a free demo", href: "/signup" }, secondary: { label: "Bring your existing records →", href: productLinkFor("Onboarding & Data Import") as string | null } }
+  cta: { headline: "See your business in Renvani.", primary: { label: "Get a free demo", href: "/demo" }, secondary: { label: "Bring your existing records →", href: productLinkFor("Onboarding & Data Import") as string | null } }
 };

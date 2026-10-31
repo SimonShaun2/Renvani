@@ -72,6 +72,11 @@ describe("industries (Figma 176:417/176:504, 175:4297…175:5015, menu 177:686)"
     }
   });
 
+  it("unknown industry slugs are public (404 page, not a login redirect) without opening deeper paths", () => {
+    expect(isPublicRoute("/industries/roofing")).toBe(true);
+    expect(isPublicRoute("/industries/hvac/admin")).toBe(false);
+  });
+
   it("every image exists", () => {
     const walk = (n: VNode): void => {
       if (typeof n === "string") return;

@@ -29,6 +29,8 @@ type CompanySettingsInput = {
   currency?: string | null | undefined;
   notifications?: CompanyNotificationSettingsInput | undefined;
   vipMembership?: CompanyVipMembershipSettingsInput | undefined;
+  googleBusinessProfile?: { optIn: boolean; updatedAt: string } | undefined;
+  invoicing?: { defaultPaymentTermsDays?: number | null | undefined } | undefined;
 };
 
 interface UpdateCompanyInput {
@@ -180,6 +182,20 @@ function buildCompanySettingsUpdate(
       ...(input.vipMembership.pastDueGraceDays !== undefined
         ? { pastDueGraceDays: input.vipMembership.pastDueGraceDays }
         : {})
+    };
+  }
+
+  if (input.googleBusinessProfile !== undefined) {
+    nextSettings.googleBusinessProfile = {
+      ...(nextSettings.googleBusinessProfile ?? {}),
+      ...input.googleBusinessProfile
+    };
+  }
+
+  if (input.invoicing?.defaultPaymentTermsDays !== undefined) {
+    nextSettings.invoicing = {
+      ...(nextSettings.invoicing ?? {}),
+      defaultPaymentTermsDays: input.invoicing.defaultPaymentTermsDays
     };
   }
 

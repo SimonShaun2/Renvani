@@ -77,7 +77,7 @@ describe("BrandedStorefrontNav mobile menu", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
 
-    const bookLink = screen.getByRole("link", { name: "Book a clean" });
+    const bookLink = screen.getByRole("link", { name: "Book a service" });
     bookLink.focus();
 
     fireEvent.keyDown(document, { key: "Tab" });

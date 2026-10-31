@@ -7,8 +7,17 @@ import { setupTestEnv } from "../../../api/src/test-support/env-setup.js";
 
 setupTestEnv();
 
-const { downloadFileMock, commitImportedEquipmentRowsMock, commitImportedInvoiceRowsMock, tenantSessionCalls } =
+const {
+  downloadFileMock,
+  commitImportedEquipmentRowsMock,
+  commitImportedInvoiceRowsMock,
+  commitImportedJobRowsMock,
+  commitImportedEstimateRowsMock,
+  tenantSessionCalls,
+} =
   vi.hoisted(() => ({
+    commitImportedJobRowsMock: vi.fn(),
+    commitImportedEstimateRowsMock: vi.fn(),
     downloadFileMock: vi.fn(),
     commitImportedEquipmentRowsMock: vi.fn(),
     commitImportedInvoiceRowsMock: vi.fn(),
@@ -31,6 +40,8 @@ vi.mock("@fsm/db", async () => {
     },
     commitImportedEquipmentRows: commitImportedEquipmentRowsMock,
     commitImportedInvoiceRows: commitImportedInvoiceRowsMock,
+    commitImportedJobRows: commitImportedJobRowsMock,
+    commitImportedEstimateRows: commitImportedEstimateRowsMock,
     // DB-backed lineage resolvers: only raw ids (or nothing) here; scoping is what's under test.
     createDbHistoryChunkResolver: async () => ({
       resolveCustomerId: async ({ customerId }: { customerId?: string }) => customerId ?? null,
@@ -83,6 +94,8 @@ beforeEach(() => {
   downloadFileMock.mockReset();
   commitImportedEquipmentRowsMock.mockReset();
   commitImportedInvoiceRowsMock.mockReset();
+  commitImportedJobRowsMock.mockReset();
+  commitImportedEstimateRowsMock.mockReset();
   tenantSessionCalls.length = 0;
   builtins.registerBuiltinImportChunkCommitters({ override: true });
   fakeDb.seedCustomer({ id: customerA, companyId: companyA, firstName: "Ada", lastName: "A" });
@@ -334,6 +347,59 @@ describe("import-chunk-commit built-in committers", () => {
       expect(secondRows.map((r: { sourceId: string }) => r.sourceId)).toEqual(
         firstRows.map((r: { sourceId: string }) => r.sourceId),
       );
+    });
+  });
+
+  describe.each([
+    {
+      type: "jobs",
+      mock: () => commitImportedJobRowsMock,
+      mapping: { job_id: "sourceId", number: "jobNumber", customer_id: "customerId" },
+      header: "job_id,number,customer_id",
+    },
+    {
+      type: "estimates",
+      mock: () => commitImportedEstimateRowsMock,
+      mapping: { est_id: "sourceId", number: "estimateNumber", customer_id: "customerId", total: "total" },
+      header: "est_id,number,customer_id,total",
+    },
+  ])("$type (row schema failures counted, not thrown)", ({ type, mock, mapping, header }) => {
+    const good = type === "jobs" ? `src-1,J-1,${customerA}` : `src-1,E-1,${customerA},10.00`;
+    const bad = type === "jobs" ? "src-2,J-2,not-a-uuid" : "src-2,E-2,not-a-uuid,10.00";
+
+    beforeEach(() => {
+      seedSession(type, mapping);
+      downloadFileMock.mockResolvedValue(csv([header, good, bad]));
+      mock().mockImplementation(async (_ctx: unknown, rows: unknown[]) => ({
+        rowsCommitted: rows.length,
+        rowsFailed: 0,
+        errors: [],
+      }));
+    });
+
+    it("commits valid rows under the tenant session and counts the invalid row as failed", async () => {
+      await processor.handleImportChunkCommit(job(payload(type)));
+
+      const [ctx, rows] = mock().mock.calls[0]!;
+      expect(ctx.companyId).toBe(companyA);
+      expect(rows.map((r: { sourceId: string }) => r.sourceId)).toEqual(["src-1"]);
+      expect(tenantSessionCalls).toContain(companyA);
+      expect(fakeDb.getTestState().importChunkRuns[0]).toMatchObject({ status: "completed", rowsOk: 1, rowsFailed: 1 });
+    });
+
+    it("re-runs a failed chunk with the same lineage keys (idempotent)", async () => {
+      await processor.handleImportChunkCommit(job(payload(type)));
+      resetChunkRunToFailed();
+      await processor.handleImportChunkCommit(job(payload(type)));
+
+      expect(mock()).toHaveBeenCalledTimes(2);
+      expect(mock().mock.calls[1]![1].map((r: { sourceId: string }) => r.sourceId)).toEqual(["src-1"]);
+    });
+
+    it("resolves customers only within the importing company", async () => {
+      await processor.handleImportChunkCommit(job(payload(type)));
+      const resolver = mock().mock.calls[0]![2];
+      expect(await resolver.resolveCustomerId({ customerId: customerB })).toBeNull();
     });
   });
 

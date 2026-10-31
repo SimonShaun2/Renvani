@@ -280,7 +280,7 @@ export function getAssetBadge(asset: JobAssetSummary | null): {
 }
 
 export function buildOnTheWayMessage(firstName: string, etaMinutes: number): string {
-  return `Hi! ${firstName} from ServiceRev is on the way and should arrive in about ${etaMinutes} minutes.`;
+  return `Hi! ${firstName} from Renvani is on the way and should arrive in about ${etaMinutes} minutes.`;
 }
 
 export function wasSentToday(sentAt: string | null | undefined): boolean {

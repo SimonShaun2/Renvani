@@ -5,7 +5,7 @@ export const OPERATOR_INBOX_UI_VERSION = "0.1.0";
 export const OperatorInboxRiskLevelSchema = z.enum(["low", "medium", "high"]);
 export type OperatorInboxRiskLevel = z.infer<typeof OperatorInboxRiskLevelSchema>;
 
-export const OperatorOverridePathSchema = z.enum(["approve", "reject", "edit", "execute"]);
+export const OperatorOverridePathSchema = z.enum(["approve", "reject", "edit", "execute", "escalate"]);
 export type OperatorOverridePath = z.infer<typeof OperatorOverridePathSchema>;
 
 export const OperatorInboxRecipientSchema = z.object({
@@ -60,7 +60,15 @@ export const OperatorInboxItemSchema = z.object({
   requiresApproval: z.boolean(),
   provenance: OperatorInboxProvenanceSchema,
   executionReceipt: z.record(z.unknown()).nullable().optional(),
-  reviewerId: z.string().uuid().nullable().optional()
+  reviewerId: z.string().uuid().nullable().optional(),
+  /** Optimistic-concurrency token (updatedAt ms); send back as expectedVersion. */
+  version: z.number().int().nonnegative().optional(),
+  /** Tenant-sequential display number, e.g. "P-0042" (creation order, stable). */
+  proposalNumber: z.string().optional(),
+  /** 1 + number of operator edits. */
+  proposalVersion: z.number().int().positive().optional(),
+  pricing: z.lazy(() => OperatorInboxPricingSchema).optional(),
+  checks: z.lazy(() => OperatorInboxChecksSchema).optional()
 });
 
 export type OperatorInboxItem = z.infer<typeof OperatorInboxItemSchema>;
@@ -72,3 +80,57 @@ export const EditAgentActionParametersSchema = z.object({
 });
 
 export type EditAgentActionParametersInput = z.infer<typeof EditAgentActionParametersSchema>;
+
+/**
+ * Card/detail data read from proposal parameters. Config-driven: each field lists the parameter keys
+ * it may come from (first non-empty wins). Add a field or key here, not in the mapper.
+ */
+export const OPERATOR_INBOX_DETAIL_FIELDS = {
+  pricing: {
+    amount: ["price", "amount", "estimatedRevenue"],
+    priceRule: ["priceRule"],
+    discount: ["discount"]
+  },
+  checks: {
+    serviceArea: ["serviceArea"],
+    optIn: ["optIn", "consentScope"]
+  }
+} as const;
+
+export const OperatorInboxPricingSchema = z.object({
+  amount: z.string().nullable(),
+  priceRule: z.string().nullable(),
+  discount: z.string().nullable()
+});
+export type OperatorInboxPricing = z.infer<typeof OperatorInboxPricingSchema>;
+
+export const OperatorInboxChecksSchema = z.object({
+  serviceArea: z.string().nullable(),
+  optIn: z.string().nullable()
+});
+export type OperatorInboxChecks = z.infer<typeof OperatorInboxChecksSchema>;
+
+export const OperatorInboxCountsSchema = z.object({
+  counts: z.record(z.number().int().nonnegative()),
+  total: z.number().int().nonnegative()
+});
+export type OperatorInboxCounts = z.infer<typeof OperatorInboxCountsSchema>;
+
+export const OperatorInboxTimelineEntrySchema = z.object({
+  id: z.string(),
+  at: z.string(),
+  kind: z.string(),
+  actorId: z.string().nullable(),
+  actorType: z.string().nullable(),
+  summary: z.string()
+});
+export type OperatorInboxTimelineEntry = z.infer<typeof OperatorInboxTimelineEntrySchema>;
+
+export const EscalateAgentActionBodySchema = z
+  .object({
+    reason: z.string().trim().min(1).max(500).optional(),
+    expectedVersion: z.number().int().nonnegative().optional()
+  })
+  .nullish()
+  .transform((value) => value ?? {});
+export type EscalateAgentActionBody = z.infer<typeof EscalateAgentActionBodySchema>;

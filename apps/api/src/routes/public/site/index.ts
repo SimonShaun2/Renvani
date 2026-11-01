@@ -154,7 +154,8 @@ async function submitServiceInquiryHandler(request: FastifyRequest, reply: Fasti
     throw error;
   }
 
-  if (serviceability === "out_of_area") {
+  // Inquiry acceptance must match the public serves-zip result: only a positive backend decision is serviceable.
+  if (serviceability !== "in_area") {
     return reply.status(400).send({
       error: "VALIDATION_ERROR",
       message: "Please fix the highlighted fields.",

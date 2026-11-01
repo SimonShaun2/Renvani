@@ -263,6 +263,64 @@ describe("POST /api/v1/public/site/:slug/inquiry", () => {
     expect(state.bookingRequests).toHaveLength(1);
   });
 
+  it("does not let inactive, on-leave, deleted, or cross-tenant technicians confer public ZIP coverage", async () => {
+    const state = fakeDb.getTestState();
+    state.serviceAreas.splice(
+      0,
+      state.serviceAreas.length,
+      ...state.serviceAreas.filter((row) => row.companyId !== companyId)
+    );
+    fakeDb.seedTechnician({
+      companyId,
+      firstName: "Inactive",
+      lastName: "Tech",
+      phone: "9185550101",
+      serviceZipCodes: ["74107"],
+      status: "inactive"
+    });
+    fakeDb.seedTechnician({
+      companyId,
+      firstName: "Leave",
+      lastName: "Tech",
+      phone: "9185550102",
+      serviceZipCodes: ["74108"],
+      status: "on_leave"
+    });
+    fakeDb.seedTechnician({
+      companyId,
+      firstName: "Deleted",
+      lastName: "Tech",
+      phone: "9185550103",
+      serviceZipCodes: ["74109"],
+      deletedAt: new Date("2026-10-31T00:00:00.000Z")
+    });
+    fakeDb.seedTechnician({
+      companyId: otherCompanyId,
+      firstName: "Other",
+      lastName: "Tenant",
+      phone: "9185550104",
+      serviceZipCodes: ["74110"]
+    });
+
+    for (const zip of ["74107", "74108", "74109", "74110"]) {
+      const gate = await app.inject({
+        method: "POST",
+        url: "/api/v1/public/booking/acme-hvac/serves-zip",
+        payload: { zip }
+      });
+      expect(gate.statusCode).toBe(200);
+      expect(gate.json()).toEqual({ served: false });
+
+      const inquiry = await post("acme-hvac", { ...valid, zip });
+      expect(inquiry.statusCode).toBe(400);
+      expect(inquiry.json().errors).toContainEqual({
+        field: "zip",
+        message: "We don't currently serve this ZIP code"
+      });
+    }
+    expect(state.bookingRequests).toHaveLength(0);
+  });
+
   it(`rate limits per IP (${PUBLIC_INQUIRY_IP_LIMIT}/10 min) with 429 + Retry-After`, async () => {
     for (let i = 0; i < PUBLIC_INQUIRY_IP_LIMIT; i += 1) {
       expect((await post("acme-hvac", { ...valid, zip: "bad" }, "198.51.100.7")).statusCode).toBe(400);

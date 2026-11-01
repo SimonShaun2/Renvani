@@ -22,7 +22,13 @@ export function Honeypot() {
 const control =
   "h-[52px] w-full rounded-[12px] border bg-white p-4 placeholder:text-[#2a3360] text-[14px] leading-[1.38] outline-none focus-visible:ring-2 aria-[invalid=true]:border-[#b42318] md:bg-[#fbf6ef] md:text-[15px] lg:bg-white lg:text-[14px]";
 
-export function Field({ id, label, error, className = "", children }: { id: string; label: string; error?: string | undefined; className?: string; children: ReactNode }) {
+/**
+ * Invalid-field look. `red` is the original look (Growth Check). `amber` is Figma 246:5638 / 246:5639 (/demo):
+ * amber #f6b400 outline, error text 12px Medium, line-height 1.4, ink2 #2a3360.
+ */
+export type ErrorTone = "red" | "amber";
+
+export function Field({ id, label, error, className = "", tone = "red", children }: { id: string; label: string; error?: string | undefined; className?: string; tone?: ErrorTone; children: ReactNode }) {
   return (
     <div className={`flex min-w-0 flex-col gap-2 ${className}`}>
       <label htmlFor={id} className="text-[13px] font-medium leading-[1.38] md:text-[14px] lg:text-[13px]" style={{ color: ink }}>
@@ -30,25 +36,36 @@ export function Field({ id, label, error, className = "", children }: { id: stri
       </label>
       {children}
       {error ? (
-        <p id={`${id}-error`} className="text-[12px] leading-[1.38] text-[#b42318]">
-          {error}
-        </p>
+        tone === "amber" ? (
+          <p id={`${id}-error`} data-tone="amber" className="text-[12px] font-medium leading-[1.4]" style={{ color: ink2 }}>
+            {error}
+          </p>
+        ) : (
+          <p id={`${id}-error`} className="text-[12px] leading-[1.38] text-[#b42318]">
+            {error}
+          </p>
+        )
       ) : null}
     </div>
   );
 }
 
-type InputProps = { id: string; name: string; error?: string | undefined; placeholder: string; type?: string; autoComplete?: string; inputMode?: "url" | "email" | "text" | "numeric"; defaultValue?: string; maxLength?: number };
+// Amber invalid uses a class (not an inline swap) so the outline wins over the base `line` color.
+const amberInvalid = (error: string | undefined, tone: ErrorTone) => Boolean(error) && tone === "amber";
+const controlClass = (error: string | undefined, tone: ErrorTone, extra = "") => `${control}${extra}${amberInvalid(error, tone) ? " border-[#f6b400] aria-[invalid=true]:border-[#f6b400]" : ""}`;
+const controlStyle = (error: string | undefined, tone: ErrorTone) => (amberInvalid(error, tone) ? { color: ink } : { borderColor: line, color: ink });
 
-export function TextInput({ id, name, error, type = "text", ...rest }: InputProps) {
-  return <input id={id} name={name} type={type} required aria-invalid={error ? true : undefined} aria-describedby={error ? `${id}-error` : undefined} className={control} style={{ borderColor: line, color: ink }} {...rest} />;
+type InputProps = { id: string; name: string; error?: string | undefined; tone?: ErrorTone; placeholder: string; type?: string; autoComplete?: string; inputMode?: "url" | "email" | "text" | "numeric"; defaultValue?: string; maxLength?: number };
+
+export function TextInput({ id, name, error, tone = "red", type = "text", ...rest }: InputProps) {
+  return <input id={id} name={name} type={type} required aria-invalid={error ? true : undefined} aria-describedby={error ? `${id}-error` : undefined} className={controlClass(error, tone)} style={controlStyle(error, tone)} {...rest} />;
 }
 
 /** `tabletChevron={false}`: hide the chevron at md only (the /demo tablet frame 253:6781 has none; mobile and desktop frames keep it). */
-export function SelectInput({ id, name, error, placeholder, options, required = true, tabletChevron = true, defaultValue = "" }: { defaultValue?: string; id: string; name: string; error?: string | undefined; placeholder: string; options: { value: string; label: string }[]; required?: boolean; tabletChevron?: boolean }) {
+export function SelectInput({ id, name, error, tone = "red", placeholder, options, required = true, tabletChevron = true, defaultValue = "" }: { defaultValue?: string; id: string; name: string; error?: string | undefined; tone?: ErrorTone; placeholder: string; options: { value: string; label: string }[]; required?: boolean; tabletChevron?: boolean }) {
   return (
     <div className="relative">
-      <select id={id} name={name} required={required} defaultValue={defaultValue} aria-invalid={error ? true : undefined} aria-describedby={error ? `${id}-error` : undefined} className={`${control} appearance-none pr-10`} style={{ borderColor: line, color: ink }}>
+      <select id={id} name={name} required={required} defaultValue={defaultValue} aria-invalid={error ? true : undefined} aria-describedby={error ? `${id}-error` : undefined} className={controlClass(error, tone, " appearance-none pr-10")} style={controlStyle(error, tone)}>
         <option value="" disabled>
           {placeholder}
         </option>

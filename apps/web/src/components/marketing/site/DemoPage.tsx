@@ -17,6 +17,8 @@ export const DEMO = {
   title: "Let’s see your work.",
   submit: "Request my demo",
   note: "We’ll use these details to respond to your request.",
+  /** Blank/invalid submit summary (Figma 254:5873 desktop, 254:5964 mobile). */
+  invalid: { title: "Check the highlighted details.", body: "Complete your contact details, trade, and team size before continuing." },
   teamSizes: ["Just me", "2–5", "6–15", "16–50", "50+"],
   success: { eyebrow: "YOUR DEMO", title: "Let’s look at your business.", body: "Your request is in. We’ll be in touch by email.", primary: { label: "Explore the product", href: "/product" }, emailLabel: "YOUR CONTACT EMAIL", edit: "Edit request details" }
 };
@@ -106,25 +108,35 @@ export function DemoPage({ action = submitDemoRequest, plan = null }: { action?:
                   </Link>
                 </div>
               ) : null}
+              {state?.status === "invalid" ? (
+                <div data-node-id="254:5873" data-testid="demo-invalid-summary" role="alert" className="flex w-full flex-col items-start gap-2 rounded-xl p-4 leading-[1.4]" style={{ background: "#fff4d6" }}>
+                  <p className="w-full text-[16px] font-semibold" style={{ color: ink }}>
+                    {DEMO.invalid.title}
+                  </p>
+                  <p className="w-full text-[14px]" style={{ color: ink2 }}>
+                    {DEMO.invalid.body}
+                  </p>
+                </div>
+              ) : null}
               <div className="grid grid-cols-1 gap-[14px] md:grid-cols-2 md:gap-5 xl:gap-x-4 xl:gap-y-[14px]">
-                <Field id="demo-name" label="Your name" error={errors.name} className="order-1 xl:col-span-2">
-                  <TextInput id="demo-name" name="name" defaultValue={last.name ?? ""} placeholder="First and last name" autoComplete="name" maxLength={120} error={errors.name} />
+                <Field id="demo-name" label="Your name" error={errors.name} tone="amber" className="order-1 xl:col-span-2">
+                  <TextInput id="demo-name" name="name" defaultValue={last.name ?? ""} placeholder="First and last name" autoComplete="name" maxLength={120} error={errors.name} tone="amber" />
                 </Field>
-                <Field id="demo-email" label="Work email" error={errors.email} className="order-2 md:order-3 md:col-span-2 xl:order-2">
-                  <TextInput id="demo-email" name="email" defaultValue={last.email ?? ""} type="email" inputMode="email" placeholder="you@yourbusiness.com" autoComplete="email" maxLength={254} error={errors.email} />
+                <Field id="demo-email" label="Work email" error={errors.email} tone="amber" className="order-2 md:order-3 md:col-span-2 xl:order-2">
+                  <TextInput id="demo-email" name="email" defaultValue={last.email ?? ""} type="email" inputMode="email" placeholder="you@yourbusiness.com" autoComplete="email" maxLength={254} error={errors.email} tone="amber" />
                 </Field>
-                <Field id="demo-company" label="Business name" error={errors.company} className="order-3 md:order-2 xl:order-3 xl:col-span-2">
-                  <TextInput id="demo-company" name="company" defaultValue={last.company ?? ""} placeholder="Your business" autoComplete="organization" maxLength={160} error={errors.company} />
+                <Field id="demo-company" label="Business name" error={errors.company} tone="amber" className="order-3 md:order-2 xl:order-3 xl:col-span-2">
+                  <TextInput id="demo-company" name="company" defaultValue={last.company ?? ""} placeholder="Your business" autoComplete="organization" maxLength={160} error={errors.company} tone="amber" />
                 </Field>
-                <Field id="demo-trade" label="Trade" error={errors.trade} className="order-4">
-                  <SelectInput tabletChevron={false} defaultValue={last.trade ?? ""} id="demo-trade" name="trade" placeholder="Choose your trade" error={errors.trade} options={HOME_SERVICE_TRADES.map((t) => ({ value: t, label: TRADE_LABELS[t] }))} />
+                <Field id="demo-trade" label="Trade" error={errors.trade} tone="amber" className="order-4">
+                  <SelectInput tabletChevron={false} defaultValue={last.trade ?? ""} id="demo-trade" name="trade" placeholder="Choose your trade" error={errors.trade} tone="amber" options={HOME_SERVICE_TRADES.map((t) => ({ value: t, label: TRADE_LABELS[t] }))} />
                 </Field>
-                <Field id="demo-team" label="Team size" error={errors.teamSize} className="order-5">
-                  <SelectInput tabletChevron={false} defaultValue={last.teamSize ?? ""} id="demo-team" name="teamSize" placeholder="Choose team size" error={errors.teamSize} required={false} options={DEMO.teamSizes.map((t) => ({ value: t, label: t }))} />
+                <Field id="demo-team" label="Team size" error={errors.teamSize} tone="amber" className="order-5">
+                  <SelectInput tabletChevron={false} defaultValue={last.teamSize ?? ""} id="demo-team" name="teamSize" placeholder="Choose team size" error={errors.teamSize} tone="amber" options={DEMO.teamSizes.map((t) => ({ value: t, label: t }))} />
                 </Field>
               </div>
               <Honeypot />
-              <FormAlert state={state} />
+              {state?.status === "invalid" ? null : <FormAlert state={state} />}
               <div>
                 <SubmitButton label={DEMO.submit} pendingLabel="Sending…" />
               </div>

@@ -103,6 +103,42 @@ describe("FS-192 technician job attachment upload access", () => {
     expect(uploadFileMock).not.toHaveBeenCalled();
     expect(createSignedUploadUrlMock).not.toHaveBeenCalled();
   });
+
+  it("denies an unassigned technician list, signed read, and delete before storage or mutation", async () => {
+    const company = fakeDb.seedCompany({ name: "Field read", slug: "fs192-field-read" });
+    const customer = fakeDb.seedCustomer({ companyId: company.id, firstName: "Pat", lastName: "Customer" });
+    const assignedUser = fakeDb.seedUser({ companyId: company.id, email: "assigned-read@example.test", firstName: "A", lastName: "Tech", role: "technician" });
+    const assignedTech = fakeDb.seedTechnician({ companyId: company.id, userId: assignedUser.id, firstName: "A", lastName: "Tech", phone: "+15555550201" });
+    const otherUser = fakeDb.seedUser({ companyId: company.id, email: "other-read@example.test", firstName: "B", lastName: "Tech", role: "technician" });
+    fakeDb.seedTechnician({ companyId: company.id, userId: otherUser.id, firstName: "B", lastName: "Tech", phone: "+15555550202" });
+    const job = fakeDb.seedJob({ companyId: company.id, customerId: customer.id, technicianId: assignedTech.id, title: "Assigned service", status: "dispatched" });
+    const attachment = fakeDb.seedFileAttachment({
+      companyId: company.id,
+      entityType: "job",
+      entityId: job.id,
+      jobId: job.id,
+      customerId: customer.id,
+      uploadedById: assignedUser.id,
+      fileName: "private-signature.png",
+      fileUrl: `memory-object://attachments/${company.id}/private-signature.png`,
+      mimeType: "image/png"
+    });
+
+    await expect(attachmentService.listAttachments(company.id, otherUser.id, {
+      entityType: "job",
+      entityId: job.id
+    })).rejects.toMatchObject({ code: ErrorCode.NOT_FOUND });
+    await expect(
+      attachmentService.mintAttachmentDownloadUrl(company.id, otherUser.id, attachment.id)
+    ).rejects.toMatchObject({ code: ErrorCode.NOT_FOUND });
+    await expect(
+      attachmentService.deleteAttachment(company.id, otherUser.id, attachment.id)
+    ).rejects.toMatchObject({ code: ErrorCode.FORBIDDEN });
+
+    expect(createSignedDownloadUrlMock).not.toHaveBeenCalled();
+    const stored = fakeDb.getTestState().fileAttachments.find((row) => row.id === attachment.id);
+    expect(stored?.deletedAt).toBeNull();
+  });
 });
 
 function seedTenantPair() {
@@ -159,17 +195,14 @@ describe("FS-85 attachment.service tenant access", () => {
   });
 
   it("does not list another tenant's attachments for the same entity id probe", async () => {
-    const { companyA, jobB, attachmentB } = seedTenantPair();
+    const { companyA, userA, userB, jobB, attachmentB } = seedTenantPair();
 
-    const result = await attachmentService.listAttachments(companyA.id, {
+    await expect(attachmentService.listAttachments(companyA.id, userA.id, {
       entityType: "job",
       entityId: jobB.id
-    });
+    })).rejects.toMatchObject({ code: ErrorCode.NOT_FOUND });
 
-    expect(result.data).toHaveLength(0);
-    expect(result.total).toBe(0);
-
-    const tenantBList = await attachmentService.listAttachments(attachmentB.companyId, {
+    const tenantBList = await attachmentService.listAttachments(attachmentB.companyId, userB.id, {
       entityType: "job",
       entityId: jobB.id
     });
@@ -207,7 +240,7 @@ describe("FS-85 attachment.service tenant access", () => {
     expect(attachment.companyId).toBe(companyB.id);
     expect(uploadFileMock).toHaveBeenCalled();
 
-    const listed = await attachmentService.listAttachments(companyB.id, {
+    const listed = await attachmentService.listAttachments(companyB.id, userB.id, {
       entityType: "job",
       entityId: jobB.id
     });
@@ -221,7 +254,7 @@ describe("FS-85 attachment.service tenant access", () => {
   });
 
   it("signs import-bundle object keys when listing customer attachments", async () => {
-    const { companyB, customerB } = seedTenantPair();
+    const { companyB, userB, customerB } = seedTenantPair();
     const importObjectKey = `${companyB.id}/imports/bundle-1/photos/job-photo.jpg`;
     fakeDb.seedFileAttachment({
       companyId: companyB.id,
@@ -234,7 +267,7 @@ describe("FS-85 attachment.service tenant access", () => {
       fileType: "photo"
     });
 
-    const listed = await attachmentService.listAttachments(companyB.id, {
+    const listed = await attachmentService.listAttachments(companyB.id, userB.id, {
       entityType: "customer",
       entityId: customerB.id
     });
@@ -245,7 +278,7 @@ describe("FS-85 attachment.service tenant access", () => {
   });
 
   it("fails closed (omits row, never leaks raw URL) when a stored key belongs to another tenant", async () => {
-    const { companyA, companyB, customerB } = seedTenantPair();
+    const { companyA, companyB, userB, customerB } = seedTenantPair();
     const foreignKey = `${companyA.id}/imports/bundle-x/photos/leak.jpg`;
     fakeDb.seedFileAttachment({
       companyId: companyB.id,
@@ -259,7 +292,7 @@ describe("FS-85 attachment.service tenant access", () => {
       fileType: "photo"
     });
 
-    const listed = await attachmentService.listAttachments(companyB.id, {
+    const listed = await attachmentService.listAttachments(companyB.id, userB.id, {
       entityType: "customer",
       entityId: customerB.id
     });
@@ -270,7 +303,7 @@ describe("FS-85 attachment.service tenant access", () => {
   });
 
   it("fails closed when signing throws", async () => {
-    const { companyB, customerB } = seedTenantPair();
+    const { companyB, userB, customerB } = seedTenantPair();
     const key = `${companyB.id}/imports/bundle-1/photos/ok.jpg`;
     fakeDb.seedFileAttachment({
       companyId: companyB.id,
@@ -284,7 +317,7 @@ describe("FS-85 attachment.service tenant access", () => {
     });
     createSignedDownloadUrlMock.mockRejectedValueOnce(new Error("signer down"));
 
-    const listed = await attachmentService.listAttachments(companyB.id, {
+    const listed = await attachmentService.listAttachments(companyB.id, userB.id, {
       entityType: "customer",
       entityId: customerB.id
     });
@@ -294,7 +327,7 @@ describe("FS-85 attachment.service tenant access", () => {
   });
 
   it("nulls an unsignable thumbnail while keeping a signable file", async () => {
-    const { companyA, companyB, customerB } = seedTenantPair();
+    const { companyA, companyB, userB, customerB } = seedTenantPair();
     const key = `${companyB.id}/imports/bundle-1/photos/ok.jpg`;
     const foreignThumb = `${companyA.id}/thumbs/leak.jpg`;
     fakeDb.seedFileAttachment({
@@ -309,7 +342,7 @@ describe("FS-85 attachment.service tenant access", () => {
       fileType: "photo"
     });
 
-    const listed = await attachmentService.listAttachments(companyB.id, {
+    const listed = await attachmentService.listAttachments(companyB.id, userB.id, {
       entityType: "customer",
       entityId: customerB.id
     });

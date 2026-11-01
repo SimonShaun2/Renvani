@@ -33,13 +33,7 @@ import {
   uploadFile
 } from "../lib/storage.js";
 
-type AssetRow = typeof assets.$inferSelect;
-type CustomerRow = typeof customers.$inferSelect;
-type EstimateRow = typeof estimates.$inferSelect;
 type FileAttachmentRow = typeof fileAttachments.$inferSelect;
-type InvoiceRow = typeof invoices.$inferSelect;
-type JobRow = typeof jobs.$inferSelect;
-type PropertyRow = typeof properties.$inferSelect;
 type UserRow = typeof users.$inferSelect;
 type SelectExecutor = Pick<typeof db, "select">;
 type TransactionExecutor = Pick<typeof db, "select" | "insert" | "update">;
@@ -129,6 +123,22 @@ async function assertJobUploadAccess(
     return;
   }
 
+  await assertTechnicianJobAccess(companyId, actor, jobId, executor, "upload");
+}
+
+type TechnicianJobAccessMode = "read" | "upload" | "delete";
+
+async function assertTechnicianJobAccess(
+  companyId: string,
+  actor: UserRow,
+  jobId: string | null,
+  executor: SelectExecutor,
+  mode: TechnicianJobAccessMode
+): Promise<void> {
+  if (actor.role !== "technician" || !jobId) {
+    return;
+  }
+
   const [technician] = await executor
     .select()
     .from(technicians)
@@ -139,7 +149,14 @@ async function assertJobUploadAccess(
     : [];
 
   if (!technician || !job || job.technicianId !== technician.id) {
-    throw new AppError(ErrorCode.FORBIDDEN, "You are not authorized to upload to this job");
+    if (mode === "read") {
+      throw new AppError(ErrorCode.NOT_FOUND, "Attachment not found");
+    }
+
+    const message = mode === "upload"
+      ? "You are not authorized to upload to this job"
+      : "You are not authorized to modify this job attachment";
+    throw new AppError(ErrorCode.FORBIDDEN, message);
   }
 }
 
@@ -379,10 +396,14 @@ async function withSignedMediaUrls(
 
 export async function listAttachments(
   companyId: string,
+  actorId: string,
   query: ListAttachmentsQuery
 ): Promise<AttachmentListResult> {
   const page = query.page && query.page > 0 ? query.page : DEFAULT_PAGE;
   const limit = query.limit && query.limit > 0 ? Math.min(query.limit, MAX_LIMIT) : DEFAULT_LIMIT;
+  const actor = await getActor(companyId, actorId, db);
+  const attachmentContext = await resolveAttachmentContext(companyId, query.entityType, query.entityId, db);
+  await assertTechnicianJobAccess(companyId, actor, attachmentContext.jobId, db, "read");
 
   const rows = await db
     .select()
@@ -395,6 +416,15 @@ export async function listAttachments(
         isNull(fileAttachments.deletedAt)
       )
     );
+
+  const scopedJobIds = new Set(
+    rows
+      .map((row) => row.jobId)
+      .filter((jobId): jobId is string => jobId !== null)
+  );
+  for (const jobId of scopedJobIds) {
+    await assertTechnicianJobAccess(companyId, actor, jobId, db, "read");
+  }
 
   const sortedRows = rows.slice().sort((left, right) => right.createdAt.getTime() - left.createdAt.getTime());
   const total = sortedRows.length;
@@ -424,11 +454,6 @@ function assertObjectKeyBelongsToCompany(objectKey: string, companyId: string): 
   if (!objectKey.startsWith(attachmentPrefix) && !objectKey.startsWith(importBundlePrefix)) {
     throw new AppError(ErrorCode.FORBIDDEN, "Object key is outside tenant scope");
   }
-}
-
-function redactSignedUrlForLogs(signedUrl: string): string {
-  const queryIndex = signedUrl.indexOf("?");
-  return queryIndex >= 0 ? `${signedUrl.slice(0, queryIndex)}?[redacted]` : signedUrl;
 }
 
 async function getAttachmentForCompany(
@@ -474,8 +499,21 @@ export async function mintAttachmentDownloadUrl(
   actorId: string,
   attachmentId: string
 ): Promise<AttachmentSignedUrlResult> {
-  await getActor(companyId, actorId, db);
+  const actor = await getActor(companyId, actorId, db);
   const attachment = await getAttachmentForCompany(companyId, attachmentId, db);
+  const attachmentContext = await resolveAttachmentContext(
+    companyId,
+    attachment.entityType as AttachmentEntityType,
+    attachment.entityId,
+    db
+  );
+  await assertTechnicianJobAccess(
+    companyId,
+    actor,
+    attachment.jobId ?? attachmentContext.jobId,
+    db,
+    "read"
+  );
   const objectKey = getFileKeyFromUrl(attachment.fileUrl);
   assertObjectKeyBelongsToCompany(objectKey, companyId);
   const signed = await createSignedDownloadUrl(objectKey);
@@ -484,8 +522,6 @@ export async function mintAttachmentDownloadUrl(
     {
       companyId,
       attachmentId,
-      objectKey,
-      signedUrl: redactSignedUrlForLogs(signed.url),
       expiresAt: signed.expiresAt.toISOString()
     },
     "Attachment download URL minted"
@@ -523,8 +559,6 @@ export async function createAttachmentUploadUrl(
       companyId,
       entityType: input.entityType,
       entityId: input.entityId,
-      objectKey,
-      signedUrl: redactSignedUrlForLogs(signed.url),
       expiresAt: signed.expiresAt.toISOString()
     },
     "Attachment upload URL minted"
@@ -539,7 +573,7 @@ export async function createAttachmentUploadUrl(
 
 export async function deleteAttachment(companyId: string, actorId: string, attachmentId: string): Promise<void> {
   await db.transaction(async (tx: TransactionExecutor) => {
-    await getActor(companyId, actorId, tx);
+    const actor = await getActor(companyId, actorId, tx);
     const [attachment] = await tx
       .select()
       .from(fileAttachments)
@@ -555,6 +589,20 @@ export async function deleteAttachment(companyId: string, actorId: string, attac
     if (!attachment) {
       throw new AppError(ErrorCode.NOT_FOUND, "Attachment not found");
     }
+
+    const attachmentContext = await resolveAttachmentContext(
+      companyId,
+      attachment.entityType as AttachmentEntityType,
+      attachment.entityId,
+      tx
+    );
+    await assertTechnicianJobAccess(
+      companyId,
+      actor,
+      attachment.jobId ?? attachmentContext.jobId,
+      tx,
+      "delete"
+    );
 
     await tx
       .update(fileAttachments)

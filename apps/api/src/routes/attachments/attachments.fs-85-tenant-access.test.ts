@@ -6,6 +6,7 @@ import { setupTestEnv } from "../../test-support/env-setup.js";
 setupTestEnv();
 
 const uploadFileMock = vi.hoisted(() => vi.fn());
+const createSignedDownloadUrlMock = vi.hoisted(() => vi.fn());
 
 vi.mock("drizzle-orm", async () => {
   const helper = await import("../../test-support/fake-db.js");
@@ -24,11 +25,7 @@ vi.mock("@fsm/jobs", () => ({
 
 vi.mock("../../lib/storage.js", () => ({
   uploadFile: uploadFileMock,
-  createSignedDownloadUrl: vi.fn(async (objectKey: string) => ({
-    url: `https://signed.example/${objectKey}?expires=1`,
-    expiresAt: new Date(Date.now() + 900_000),
-    objectKey
-  })),
+  createSignedDownloadUrl: createSignedDownloadUrlMock,
   getFileKeyFromUrl: (reference: string) => {
     const filesExamplePrefix = "https://files.example/";
     if (reference.startsWith(filesExamplePrefix)) {
@@ -77,6 +74,12 @@ beforeEach(async () => {
     url: `https://files.example/${key}`,
     key
   }));
+  createSignedDownloadUrlMock.mockReset();
+  createSignedDownloadUrlMock.mockImplementation(async (objectKey: string) => ({
+    url: `https://signed.example/${objectKey}?expires=1`,
+    expiresAt: new Date(Date.now() + 900_000),
+    objectKey
+  }));
   app = await buildAppModule.buildApp();
   await app.ready();
 });
@@ -85,7 +88,11 @@ afterEach(async () => {
   await app.close();
 });
 
-function authForCompany(companyId: string, userId: string, role: "owner" | "admin" | "dispatcher" = "owner") {
+function authForCompany(
+  companyId: string,
+  userId: string,
+  role: "owner" | "admin" | "dispatcher" | "technician" = "owner"
+) {
   const accessToken = tokens.generateAccessToken({
     userId,
     companyId,
@@ -140,8 +147,8 @@ describe("FS-85 attachments API tenant access", () => {
       .get(`/api/v1/attachments?entityType=job&entityId=${jobB.id}`)
       .set("Authorization", authForCompany(companyA.id, userA.id));
 
-    expect(listAsA.status).toBe(200);
-    expect(listAsA.body.data).toHaveLength(0);
+    expect(listAsA.status).toBe(404);
+    expect(listAsA.body.error).toBe("NOT_FOUND");
 
     const deleteAsA = await request(app.server)
       .delete(`/api/v1/attachments/${attachmentB.id}`)
@@ -151,6 +158,85 @@ describe("FS-85 attachments API tenant access", () => {
 
     const stillThere = fakeDb.getTestState().fileAttachments.find((row) => row.id === attachmentB.id);
     expect(stillThere?.deletedAt).toBeNull();
+  });
+
+  it("denies an unassigned technician list, signed read, and delete for another technician's job", async () => {
+    const company = fakeDb.seedCompany({ name: "Tech Co", slug: "fs192-route-tech" });
+    const customer = fakeDb.seedCustomer({
+      companyId: company.id,
+      firstName: "Pat",
+      lastName: "Customer",
+      email: "pat@fs192-route.test"
+    });
+    const assignedUser = fakeDb.seedUser({
+      companyId: company.id,
+      email: "assigned@fs192-route.test",
+      firstName: "Assigned",
+      lastName: "Tech",
+      role: "technician"
+    });
+    const assignedTechnician = fakeDb.seedTechnician({
+      companyId: company.id,
+      userId: assignedUser.id,
+      firstName: "Assigned",
+      lastName: "Tech",
+      phone: "+15555550301"
+    });
+    const otherUser = fakeDb.seedUser({
+      companyId: company.id,
+      email: "other@fs192-route.test",
+      firstName: "Other",
+      lastName: "Tech",
+      role: "technician"
+    });
+    fakeDb.seedTechnician({
+      companyId: company.id,
+      userId: otherUser.id,
+      firstName: "Other",
+      lastName: "Tech",
+      phone: "+15555550302"
+    });
+    const job = fakeDb.seedJob({
+      companyId: company.id,
+      customerId: customer.id,
+      technicianId: assignedTechnician.id,
+      title: "Assigned job",
+      status: "dispatched"
+    });
+    const attachment = fakeDb.seedFileAttachment({
+      companyId: company.id,
+      entityType: "job",
+      entityId: job.id,
+      jobId: job.id,
+      customerId: customer.id,
+      uploadedById: assignedUser.id,
+      fileName: "assigned-private.png",
+      fileUrl: `memory-object://attachments/${company.id}/assigned-private.png`,
+      mimeType: "image/png"
+    });
+    const authorization = authForCompany(company.id, otherUser.id, "technician");
+
+    const listed = await request(app.server)
+      .get(`/api/v1/attachments?entityType=job&entityId=${job.id}`)
+      .set("Authorization", authorization);
+    expect(listed.status).toBe(404);
+    expect(listed.body.error).toBe("NOT_FOUND");
+
+    const signedRead = await request(app.server)
+      .get(`/api/v1/attachments/${attachment.id}/download-url`)
+      .set("Authorization", authorization);
+    expect(signedRead.status).toBe(404);
+    expect(signedRead.body.error).toBe("NOT_FOUND");
+
+    const deleted = await request(app.server)
+      .delete(`/api/v1/attachments/${attachment.id}`)
+      .set("Authorization", authorization);
+    expect(deleted.status).toBe(403);
+    expect(deleted.body.error).toBe("FORBIDDEN");
+
+    expect(createSignedDownloadUrlMock).not.toHaveBeenCalled();
+    const stored = fakeDb.getTestState().fileAttachments.find((row) => row.id === attachment.id);
+    expect(stored?.deletedAt).toBeNull();
   });
 
   it("returns 404 when uploading against another tenant's job entity", async () => {

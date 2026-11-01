@@ -166,7 +166,8 @@ export const listAttachmentsRouteSchema = {
       }
     },
     400: errorResponseSchema,
-    401: errorResponseSchema
+    401: errorResponseSchema,
+    404: errorResponseSchema
   }
 } as const;
 
@@ -211,6 +212,7 @@ export const createAttachmentUploadUrlRouteSchema = {
     },
     400: errorResponseSchema,
     401: errorResponseSchema,
+    403: errorResponseSchema,
     404: errorResponseSchema
   }
 } as const;
@@ -227,6 +229,7 @@ export const deleteAttachmentRouteSchema = {
       }
     },
     401: errorResponseSchema,
+    403: errorResponseSchema,
     404: errorResponseSchema
   }
 } as const;

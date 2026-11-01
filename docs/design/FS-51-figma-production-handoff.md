@@ -3,7 +3,7 @@
 **Status:** Design/engineering review packet only. This document does not set the Notion ticket to Ready, authorize code implementation, establish a passed QA result, or grant permission for production customer sends, live money, deployment, or merge.
 
 **Date:** 2026-11-01  
-**Code inspected:** Renvani \`dev\` at 5baad8775cfa6a5e3c3e163ed6b384a284b12f20 (moving integration branch; recheck changed files before implementing).  
+**Code inspected:** Renvani `dev` at 5baad8775cfa6a5e3c3e163ed6b384a284b12f20 (moving integration branch; recheck changed files before implementing).  
 **Existing execution queue:** [FS-51 design system and handoff standards](https://app.notion.com/p/3ff317b92d158197b56eeacd4fbe3db2) in the [Field Service Build Board](https://app.notion.com/p/74b3a1145d3f49d586ac6cdbf174ceb2). Do **not** open duplicate FS-255–258 or FS-51 tickets.
 
 ## 1. Authority and intended outcome

@@ -2,6 +2,7 @@ import type { Queue } from "bullmq";
 
 import { UuidSchema } from "@fsm/types";
 
+import { isJobExhausted } from "./dead-letter-job.js";
 import { QUEUE_NAMES } from "./queue-names.js";
 
 export class JobReplayError extends Error {
@@ -87,9 +88,7 @@ export async function replayFailedJobById(
   // Exhausted jobs already have a retained dead-letter copy. Replaying the source
   // job as well would create a second runnable copy, so the authenticated DLQ
   // recovery path is the sole authority for exhausted work.
-  const attemptLimit = job.opts.attempts ?? 0;
-  const exhausted = attemptLimit > 0 && job.attemptsMade >= attemptLimit;
-  if (exhausted) {
+  if (isJobExhausted(job)) {
     throw new JobReplayError(
       "DEAD_LETTER_ONLY",
       "Exhausted jobs must be recovered through the dead-letter recovery endpoint"

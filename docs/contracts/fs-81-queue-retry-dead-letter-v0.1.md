@@ -47,7 +47,7 @@ Source-queue replay (failed job still in Redis) vs DLQ recovery:
 - The company ID is an equality guard, not authorization. Tenant ownership is checked before job state is read.
 - The CLI is disabled unless validated config sets `SOURCE_QUEUE_REPLAY_ENABLED=true`. Enable it only in a restricted, audited trusted-operations shell whose Redis credential is not available to application users.
 - CLI: `pnpm --filter @fsm/worker replay-failed-job -- --queue notifications --job-id <id> --company-id <uuid> --operator-id <uuid> --reason "<10-500 chars>"`.
-- Successful CLI output emits a structured `queue.source_replayed` audit record. The operations platform must retain stdout; the caller-supplied operator ID and reason provide attribution but do not replace shell authentication.
+- Successful CLI output emits a structured `queue.source_replayed` audit record. The operations platform must retain stdout; the caller-supplied operator ID and reason provide attribution but do not replace shell authentication. Reasons must contain no secrets, tokens, customer data, or other PII because they are emitted verbatim to the retained audit log.
 - Exhausted jobs return `DEAD_LETTER_ONLY`; recover them through the authenticated internal-admin DLQ endpoint. This prevents the retained source job and its DLQ copy from both becoming runnable.
 
 ## Wiring

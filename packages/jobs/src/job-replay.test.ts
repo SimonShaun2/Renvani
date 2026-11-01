@@ -75,6 +75,26 @@ describe("replayFailedJobById", () => {
     expect(retry).not.toHaveBeenCalled();
   });
 
+  it("uses DLQ exhaustion semantics when a retained job omits the attempts option", async () => {
+    const retry = vi.fn();
+    const queue = {
+      getJob: vi.fn().mockResolvedValue({
+        data: { companyId: COMPANY_ID },
+        opts: {},
+        attemptsMade: 1,
+        getState: vi.fn().mockResolvedValue("failed"),
+        retry
+      })
+    };
+
+    await expect(replayFailedJobById(queue, {
+      queueName: QUEUE_NAMES.notifications,
+      jobId: "legacy-exhausted-job",
+      ...auditInput
+    })).rejects.toMatchObject({ code: "DEAD_LETTER_ONLY" });
+    expect(retry).not.toHaveBeenCalled();
+  });
+
   it("does not report success when a competing replay already moved the job", async () => {
     const retry = vi.fn().mockRejectedValue(new Error("Job is not in the failed state"));
     const queue = {

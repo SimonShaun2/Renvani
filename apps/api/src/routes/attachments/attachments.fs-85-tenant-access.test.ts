@@ -239,6 +239,59 @@ describe("FS-85 attachments API tenant access", () => {
     expect(stored?.deletedAt).toBeNull();
   });
 
+  it("preserves same-tenant job attachment lists for owner, admin, and dispatcher", async () => {
+    const company = fakeDb.seedCompany({ name: "Office Co", slug: "fs192-route-office" });
+    const customer = fakeDb.seedCustomer({
+      companyId: company.id,
+      firstName: "Office",
+      lastName: "Customer",
+      email: "customer@fs192-office.test"
+    });
+    const job = fakeDb.seedJob({
+      companyId: company.id,
+      customerId: customer.id,
+      title: "Office-visible job",
+      status: "scheduled"
+    });
+    const owner = fakeDb.seedUser({
+      companyId: company.id,
+      email: "owner@fs192-office.test",
+      firstName: "Office",
+      lastName: "Owner",
+      role: "owner"
+    });
+    const attachment = fakeDb.seedFileAttachment({
+      companyId: company.id,
+      entityType: "job",
+      entityId: job.id,
+      jobId: job.id,
+      customerId: customer.id,
+      uploadedById: owner.id,
+      fileName: "office-visible.png",
+      fileUrl: `memory-object://attachments/${company.id}/office-visible.png`,
+      mimeType: "image/png"
+    });
+
+    for (const role of ["owner", "admin", "dispatcher"] as const) {
+      const user = role === "owner"
+        ? owner
+        : fakeDb.seedUser({
+          companyId: company.id,
+          email: `${role}@fs192-office.test`,
+          firstName: "Office",
+          lastName: role,
+          role
+        });
+      const response = await request(app.server)
+        .get(`/api/v1/attachments?entityType=job&entityId=${job.id}`)
+        .set("Authorization", authForCompany(company.id, user.id, role));
+
+      expect(response.status, role).toBe(200);
+      expect(response.body.data, role).toHaveLength(1);
+      expect(response.body.data[0]?.id, role).toBe(attachment.id);
+    }
+  });
+
   it("returns 404 when uploading against another tenant's job entity", async () => {
     const companyA = fakeDb.seedCompany({ name: "A2", slug: "fs85-route-a2" });
     const companyB = fakeDb.seedCompany({ name: "B2", slug: "fs85-route-b2" });

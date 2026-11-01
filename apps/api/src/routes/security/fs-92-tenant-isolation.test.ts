@@ -227,7 +227,8 @@ const CROSS_TENANT_READ_CASES: Array<{
     id: "FS92-XT-READ-11",
     resourceKey: "job",
     buildPath: (id) => `/api/v1/attachments?entityType=job&entityId=${id}`,
-    expectedStatus: 200
+    expectedStatus: 404,
+    expectedError: "NOT_FOUND"
   },
   {
     id: "FS92-XT-READ-12",

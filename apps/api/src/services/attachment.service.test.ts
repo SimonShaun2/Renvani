@@ -8,6 +8,7 @@ setupTestEnv();
 
 const uploadFileMock = vi.hoisted(() => vi.fn());
 const createSignedDownloadUrlMock = vi.hoisted(() => vi.fn());
+const createSignedUploadUrlMock = vi.hoisted(() => vi.fn());
 
 vi.mock("drizzle-orm", async () => {
   const helper = await import("../test-support/fake-db.js");
@@ -22,6 +23,7 @@ vi.mock("@fsm/db", async () => {
 vi.mock("../lib/storage.js", () => ({
   uploadFile: uploadFileMock,
   createSignedDownloadUrl: createSignedDownloadUrlMock,
+  createSignedUploadUrl: createSignedUploadUrlMock,
   getFileKeyFromUrl: (reference: string) => {
     if (reference.startsWith("memory-object://")) {
       return reference.slice("memory-object://".length);
@@ -62,6 +64,7 @@ beforeEach(() => {
   fakeDb.resetTestState();
   uploadFileMock.mockReset();
   createSignedDownloadUrlMock.mockReset();
+  createSignedUploadUrlMock.mockReset();
   uploadFileMock.mockImplementation(async (key: string) => ({
     url: `https://files.example/${key}`,
     key
@@ -71,6 +74,35 @@ beforeEach(() => {
     expiresAt: new Date(Date.now() + 900_000),
     objectKey
   }));
+  createSignedUploadUrlMock.mockImplementation(async (objectKey: string) => ({
+    url: `https://upload.example/${objectKey}`,
+    expiresAt: new Date(Date.now() + 900_000),
+    objectKey
+  }));
+});
+
+describe("FS-192 technician job attachment upload access", () => {
+  it("denies multipart and signed upload paths for another technician's job before storage", async () => {
+    const company = fakeDb.seedCompany({ name: "Field", slug: "fs192-field" });
+    const customer = fakeDb.seedCustomer({ companyId: company.id, firstName: "Pat", lastName: "Customer" });
+    const assignedUser = fakeDb.seedUser({ companyId: company.id, email: "assigned@example.test", firstName: "A", lastName: "Tech", role: "technician" });
+    const assignedTech = fakeDb.seedTechnician({ companyId: company.id, userId: assignedUser.id, firstName: "A", lastName: "Tech", phone: "+15555550101" });
+    const otherUser = fakeDb.seedUser({ companyId: company.id, email: "other@example.test", firstName: "B", lastName: "Tech", role: "technician" });
+    fakeDb.seedTechnician({ companyId: company.id, userId: otherUser.id, firstName: "B", lastName: "Tech", phone: "+15555550102" });
+    const job = fakeDb.seedJob({ companyId: company.id, customerId: customer.id, technicianId: assignedTech.id, title: "Service", status: "dispatched" });
+    const input = { entityType: "job" as const, entityId: job.id, fileName: "signature.png", mimeType: "image/png" };
+
+    await expect(attachmentService.uploadAttachment(company.id, otherUser.id, {
+      ...input,
+      fileBuffer: Buffer.from("signature")
+    })).rejects.toMatchObject({ code: ErrorCode.FORBIDDEN });
+    await expect(attachmentService.createAttachmentUploadUrl(company.id, otherUser.id, {
+      ...input,
+      fileSizeBytes: 9
+    })).rejects.toMatchObject({ code: ErrorCode.FORBIDDEN });
+    expect(uploadFileMock).not.toHaveBeenCalled();
+    expect(createSignedUploadUrlMock).not.toHaveBeenCalled();
+  });
 });
 
 function seedTenantPair() {

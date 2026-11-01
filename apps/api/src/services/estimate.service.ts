@@ -38,6 +38,7 @@ import {
 } from "@fsm/types";
 
 import { generateEstimateNumber } from "../lib/estimate-number.js";
+import { financingProviderReady, financingSummary } from "./financing/financing-adapter.registry.js";
 import { generateJobNumber } from "../lib/job-number.js";
 import { listItems, recalculateTotals } from "./estimate-items.service.js";
 import { assertPriceBookItemsInCompany } from "./price-book-item-scope.js";
@@ -181,9 +182,11 @@ function toPublicEstimateView(
     taxAmount: row.taxAmount,
     discountAmount: row.discountAmount,
     total: row.total,
-    financingOffered: row.financingOffered,
+    // FS-212: the customer-facing financing teaser is hidden while no financing provider is ready.
+    financingOffered: financingProviderReady() ? row.financingOffered : false,
     tierLabel: row.tierLabel,
     expiresAt: row.expiresAt,
+    ...(financingProviderReady() ? { financing: financingSummary(row.financingOffered === true) } : {}),
     items: items.map((item) => ({
       name: item.name,
       description: item.description,
@@ -194,7 +197,7 @@ function toPublicEstimateView(
   };
 }
 
-function getTierSortRank(tierLabel: string | null): number {
+export function getTierSortRank(tierLabel: string | null): number {
   switch ((tierLabel ?? "").trim().toLowerCase()) {
     case "good":
       return 0;
@@ -510,6 +513,7 @@ async function buildPublicEstimateView(
       taxAmount: tierRow.taxAmount,
       discountAmount: tierRow.discountAmount,
       total: tierRow.total,
+      recommended: tierRow.isRecommended === true,
       items: tierEstimateItems.map((item) => ({
         name: item.name,
         description: item.description,

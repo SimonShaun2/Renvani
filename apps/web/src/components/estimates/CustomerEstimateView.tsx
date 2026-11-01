@@ -1,10 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { ArrowLeft, CheckCircle2, Clock3, ShieldCheck } from "lucide-react";
 
 import { CurrencyDisplay } from "@/src/components/ui/CurrencyDisplay";
-import { StatBadge } from "@/src/components/ui/StatBadge";
 import { cn, formatDate } from "@/src/lib/utils";
 import type {
   PublicEstimateRecord,
@@ -21,46 +20,74 @@ interface CustomerEstimateViewProps {
   onDecline?: (reason?: string) => Promise<void>;
 }
 
+// Figma 363:121 / 363:198 / 363:273 "Customer / 05b Estimate options · Pick one" option card.
 function TierCard({
   tier,
+  position,
   selected,
   onSelect
 }: {
   tier: PublicEstimateTierRecord;
+  position: number;
   selected: boolean;
   onSelect: () => void;
 }) {
   return (
     <button
       type="button"
+      role="radio"
+      aria-checked={selected}
       onClick={onSelect}
       className={cn(
-        "rounded-[28px] border px-5 py-5 text-left transition",
-        selected
-          ? "border-brand-accent bg-brand-accent-light shadow-[0_18px_45px_rgba(37,122,250,0.16)]"
-          : "border-neutral-200 bg-white hover:border-brand-accent/35"
+        "flex flex-col gap-3.5 rounded-[14px] border bg-white p-5 text-left outline-none transition focus-visible:ring-2 focus-visible:ring-[#0f1530] focus-visible:ring-offset-2",
+        selected ? "border-[#0f1530]" : "border-[#e6dccb] hover:border-[#0f1530]/40"
       )}
     >
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-400">{tier.tierLabel ?? "Quote"}</p>
-          <h3 className="mt-2 text-xl font-semibold tracking-tight text-neutral-900">{tier.title ?? "Option"}</h3>
-        </div>
-        {(tier.tierLabel ?? "").trim().toLowerCase() === "better" ? (
-          <StatBadge label="Recommended" tone="purple" className="px-3 py-1.5 text-xs" />
-        ) : null}
+      <div className="flex flex-wrap items-center gap-2">
+        <span
+          aria-hidden
+          className={cn(
+            "flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full border-2",
+            selected ? "border-[#0f1530] bg-[#0f1530]" : "border-[#5e6684] bg-white"
+          )}
+        >
+          {selected ? <span className="h-2 w-2 rounded-full bg-white" /> : null}
+        </span>
+        <span className="text-[13px] font-medium text-[#2a3360]">{tierPositionLabel(tier, position)}</span>
+        {tier.recommended ? <TierPill className="bg-[#fff4d6] text-[#0f1530]">Recommended</TierPill> : null}
       </div>
-      <CurrencyDisplay value={tier.total} className="mt-4 block text-3xl font-semibold tracking-tight text-neutral-900" showCents />
-      <ul className="mt-4 space-y-2 text-sm text-neutral-600">
+      <h3 className="text-lg font-semibold text-[#0f1530]">{tier.title ?? "Option"}</h3>
+      <ul className="space-y-1 text-[13.5px] text-[#2a3360]">
         {tier.items.slice(0, 4).map((item) => (
-          <li key={`${tier.estimateNumber}-${item.name}`} className="flex items-start justify-between gap-3">
-            <span>{item.name}</span>
-            <span className="shrink-0 font-medium text-neutral-500">{item.quantity}</span>
-          </li>
+          <li key={`${tier.estimateNumber}-${item.name}`}>•  {item.name}</li>
         ))}
       </ul>
+      <div className="mt-auto flex w-full items-center justify-between gap-3 border-t border-[#e6dccb] pt-3 text-[13.5px]">
+        <span className="text-[#5e6684]">Total</span>
+        <CurrencyDisplay value={tier.total} className="font-semibold text-[#0f1530]" showCents />
+      </div>
+      {selected ? <TierPill className="self-start bg-[#0f1530] text-white">Selected option</TierPill> : null}
     </button>
   );
+}
+
+function TierPill({ className, children }: { className: string; children: ReactNode }) {
+  return <span className={cn("inline-flex items-center rounded-full px-2.5 py-1 text-[10.5px] font-medium uppercase tracking-[0.08em]", className)}>{children}</span>;
+}
+
+/** Figma 363:121: "Option 2 · Better". */
+export function tierPositionLabel(tier: Pick<PublicEstimateTierRecord, "tierLabel">, position: number): string {
+  return tier.tierLabel ? `Option ${position} · ${tier.tierLabel}` : `Option ${position}`;
+}
+
+/** FS-212: preselect the business's recommended option; otherwise the middle option as before. */
+export function defaultTierNumber(tiers: PublicEstimateTierRecord[]): string | undefined {
+  return tiers.find((tier) => tier.recommended)?.estimateNumber ?? tiers[1]?.estimateNumber ?? tiers[0]?.estimateNumber;
+}
+
+/** FS-212: financing is disabled, so the teaser only shows once the API reports a ready provider. */
+export function showFinancingTeaser(estimate: Pick<PublicEstimateRecord, "financing">): boolean {
+  return Boolean(estimate.financing?.offered && estimate.financing.providerReady);
 }
 
 export function CustomerEstimateView({
@@ -73,10 +100,11 @@ export function CustomerEstimateView({
   onDecline
 }: CustomerEstimateViewProps) {
   const tiers = estimate.tiers ?? [];
+  const tiered = tiers.length > 0;
   const [approvedByName, setApprovedByName] = useState("");
   const [declineReason, setDeclineReason] = useState("");
   const [selectedEstimateNumber, setSelectedEstimateNumber] = useState<string | undefined>(
-    tiers[1]?.estimateNumber ?? tiers[0]?.estimateNumber
+    defaultTierNumber(tiers)
   );
   const activeTier = useMemo(
     () => tiers.find((tier) => tier.estimateNumber === selectedEstimateNumber) ?? null,
@@ -98,7 +126,7 @@ export function CustomerEstimateView({
       };
 
   return (
-    <div className="min-h-screen bg-white text-neutral-900">
+    <div className={cn("min-h-screen text-neutral-900", tiered ? "bg-[#fbf6ef]" : "bg-white")}>
       <div className="mx-auto max-w-7xl px-4 py-6 md:px-8 md:py-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
@@ -121,8 +149,18 @@ export function CustomerEstimateView({
           ) : null}
         </div>
 
-        <div className="mt-8 grid gap-8 xl:grid-cols-[minmax(0,1fr)_360px]">
+        <div className={cn("mt-8 grid gap-8", tiered ? "xl:grid-cols-[minmax(0,1fr)_380px] xl:items-start" : "xl:grid-cols-[minmax(0,1fr)_360px]")}>
           <div className="space-y-6">
+            {tiered ? (
+              <div data-testid="tier-intro">
+                <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-[#2b4acb]">Your estimate</p>
+                <h1 className="mt-2 text-[28px] font-semibold tracking-tight text-[#0f1530] md:text-[32px]">Choose one option</h1>
+                <p className="mt-2 text-[15px] text-[#5e6684]">
+                  {estimate.title ? `${estimate.title.replace(/\.$/, "")}. ` : ""}Each option is its own estimate.
+                </p>
+                {estimate.messageToCustomer ? <p className="mt-3 max-w-3xl text-[15px] text-[#2a3360]">{estimate.messageToCustomer}</p> : null}
+              </div>
+            ) : (
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-accent">{estimate.estimateNumber}</p>
               <h1 className="mt-3 text-4xl font-semibold tracking-tight text-neutral-900">
@@ -132,13 +170,15 @@ export function CustomerEstimateView({
                 <p className="mt-4 max-w-3xl text-lg leading-8 text-neutral-600">{estimate.messageToCustomer}</p>
               ) : null}
             </div>
+            )}
 
-            {tiers.length > 0 ? (
-              <div className="grid gap-4 xl:grid-cols-3">
-                {tiers.map((tier) => (
+            {tiered ? (
+              <div role="radiogroup" aria-label="Estimate options" className="grid gap-4 xl:grid-cols-3">
+                {tiers.map((tier, index) => (
                   <TierCard
                     key={tier.estimateNumber}
                     tier={tier}
+                    position={index + 1}
                     selected={selectedEstimateNumber === tier.estimateNumber}
                     onSelect={() => setSelectedEstimateNumber(tier.estimateNumber)}
                   />
@@ -172,7 +212,7 @@ export function CustomerEstimateView({
             )}
           </div>
 
-          <aside className="space-y-5 rounded-[32px] border border-neutral-200 bg-neutral-50 px-5 py-5">
+          <aside className={cn("space-y-5", tiered ? "" : "rounded-[32px] border border-neutral-200 bg-neutral-50 px-5 py-5")}>
             {approvedState ? (
               <div className="rounded-[28px] border border-success/20 bg-success-light px-5 py-6 text-center">
                 <CheckCircle2 className="mx-auto h-10 w-10 text-success" />
@@ -181,6 +221,90 @@ export function CustomerEstimateView({
                   The selection has been recorded. Renvani will follow up with the next step shortly.
                 </p>
               </div>
+            ) : tiered ? (
+              <>
+                <div data-testid="tier-approve-panel" className="space-y-4 rounded-[14px] border border-[#e6dccb] bg-white p-5">
+                  <h2 className="text-[17px] font-semibold text-[#0f1530]">Approve your choice</h2>
+                  <div className="space-y-2 text-[13px]">
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-[#5e6684]">Selected option</span>
+                      <span className="font-semibold text-[#0f1530]">
+                        {activeTier ? tierPositionLabel(activeTier, tiers.indexOf(activeTier) + 1) : "None"}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between gap-3 text-[#5e6684]">
+                      <span>Subtotal</span>
+                      <CurrencyDisplay value={selectedSummary.subtotal} />
+                    </div>
+                    <div className="flex items-center justify-between gap-3 text-[#5e6684]">
+                      <span>Tax</span>
+                      <CurrencyDisplay value={selectedSummary.taxAmount} />
+                    </div>
+                    <div className="flex items-center justify-between gap-3 text-[#5e6684]">
+                      <span>Discount</span>
+                      <CurrencyDisplay value={selectedSummary.discountAmount} />
+                    </div>
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-[#5e6684]">Total</span>
+                      <CurrencyDisplay value={selectedSummary.total} className="font-semibold text-[#0f1530]" showCents />
+                    </div>
+                  </div>
+                  <label className="block text-[13px] font-semibold text-[#0f1530]">
+                    Your name
+                    <input
+                      value={approvedByName}
+                      onChange={(event) => setApprovedByName(event.target.value)}
+                      placeholder="Enter your name"
+                      className="mt-1.5 h-11 w-full rounded-[8px] border border-[#e6dccb] bg-white px-3 text-sm font-normal text-[#0f1530] outline-none focus:border-[#0f1530]"
+                    />
+                  </label>
+                  {onDecline ? (
+                    <label className="block text-[13px] font-semibold text-[#0f1530]">
+                      Decline note (optional)
+                      <textarea
+                        value={declineReason}
+                        onChange={(event) => setDeclineReason(event.target.value)}
+                        placeholder="Let us know why this isn’t the right fit."
+                        className="mt-1.5 h-[88px] w-full rounded-[8px] border border-[#e6dccb] bg-white px-3 py-2 text-sm font-normal text-[#2a3360] outline-none focus:border-[#0f1530]"
+                      />
+                    </label>
+                  ) : null}
+                  <button
+                    type="button"
+                    disabled={isSubmitting || approvedByName.trim().length === 0}
+                    onClick={() => {
+                      void onApprove({
+                        approvedByName: approvedByName.trim(),
+                        ...(selectedEstimateNumber ? { selectedEstimateNumber } : {})
+                      });
+                    }}
+                    className="inline-flex h-12 w-full items-center justify-center rounded-[10px] bg-[#0f1530] text-sm font-semibold text-white outline-none focus-visible:ring-2 focus-visible:ring-[#0f1530] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {isSubmitting ? "Saving..." : "Approve Estimate"}
+                  </button>
+                  {onDecline ? (
+                    <button
+                      type="button"
+                      disabled={isSubmitting}
+                      onClick={() => {
+                        void onDecline(declineReason.trim() || undefined);
+                      }}
+                      className="inline-flex h-11 w-full items-center justify-center rounded-[10px] border border-[#e6dccb] bg-white text-[13px] font-semibold text-[#0f1530] disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      Decline
+                    </button>
+                  ) : null}
+                  <p className="text-[12.5px] text-[#5e6684]">You pick one option. We&apos;ll confirm timing with you.</p>
+                </div>
+                {showFinancingTeaser(estimate) ? (
+                  <div className="rounded-[28px] border border-ai/20 bg-ai-light px-5 py-5 text-sm leading-6 text-neutral-700">
+                    <div className="flex items-center gap-2 text-ai">
+                      <ShieldCheck className="h-4 w-4" />
+                      Financing is available for this option.
+                    </div>
+                  </div>
+                ) : null}
+              </>
             ) : (
               <>
                 <div className="rounded-[28px] border border-neutral-200 bg-white px-5 py-5">
@@ -252,7 +376,7 @@ export function CustomerEstimateView({
                   ) : null}
                 </div>
 
-                {estimate.financingOffered ? (
+                {showFinancingTeaser(estimate) ? (
                   <div className="rounded-[28px] border border-ai/20 bg-ai-light px-5 py-5 text-sm leading-6 text-neutral-700">
                     <div className="flex items-center gap-2 text-ai">
                       <ShieldCheck className="h-4 w-4" />
@@ -264,6 +388,11 @@ export function CustomerEstimateView({
             )}
           </aside>
         </div>
+        {tiered ? (
+          <footer className="flex justify-center pb-4 pt-10">
+            <p className="font-mono text-[11px] font-medium text-[#5e6684]">Powered by Renvani</p>
+          </footer>
+        ) : null}
       </div>
     </div>
   );

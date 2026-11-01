@@ -46,6 +46,10 @@ export function getAgentActionTypeDefinition(actionType: string): AgentActionTyp
   return actionTypes.get(actionType);
 }
 
+export function listAgentActionTypeDefinitions(): AgentActionTypeDefinition[] {
+  return [...actionTypes.values()];
+}
+
 export function getAgentProductDefinition(agentProduct: string): AgentProductDefinition | undefined {
   return products.get(agentProduct);
 }

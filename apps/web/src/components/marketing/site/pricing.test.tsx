@@ -59,8 +59,8 @@ describe("pricing (Figma 203:15719 desktop / 203:15720 mobile)", () => {
       expect(text).toContain(s);
     }
     expect(container.querySelectorAll("h1")).toHaveLength(2);
-    expect(container.querySelector(".lg\\:hidden")).not.toBeNull();
-    expect(container.querySelector(".hidden.lg\\:block")).not.toBeNull();
+    expect(container.querySelector(".xl\\:hidden")).not.toBeNull();
+    expect(container.querySelector(".hidden.xl\\:block")).not.toBeNull();
   });
 
   it("every link resolves to a real route and images exist", () => {
@@ -69,11 +69,21 @@ describe("pricing (Figma 203:15719 desktop / 203:15720 mobile)", () => {
     expect(hrefs.length).toBeGreaterThanOrEqual(8);
     for (const h of hrefs) {
       const path = h.split("?")[0]!;
-      expect(existsSync(join(APP, `(auth)${path}`))).toBe(true);
+      expect(existsSync(join(APP, `(auth)${path}`)) || existsSync(join(APP, `(marketing)${path}/page.tsx`))).toBe(true);
     }
     for (const img of Array.from(container.querySelectorAll("img"))) {
       expect(existsSync(join(PUBLIC, img.getAttribute("src")!))).toBe(true);
     }
+  });
+
+  it("plan CTAs follow the Figma prototype links (204:7829 / I204:7831;204:7829 / 204:7952 / I204:7954;204:7952 / 204:7915 / 204:8038)", () => {
+    const { container } = render(<PricingFrames />);
+    const byLabel = (label: string) => Array.from(container.querySelectorAll("a")).filter((a) => a.textContent?.trim() === label).map((a) => a.getAttribute("href"));
+    expect(byLabel("Explore Flex")).toEqual(["/demo?plan=flex", "/demo?plan=flex"]);
+    expect(byLabel("Explore Flat")).toEqual(["/demo?plan=flat", "/demo?plan=flat"]);
+    expect(byLabel("Ask about programs")).toEqual(["/demo", "/demo"]);
+    expect(byLabel("Get a free demo").every((h) => h === "/demo")).toBe(true);
+    expect(Array.from(container.querySelectorAll("a")).some((a) => a.getAttribute("href")?.startsWith("/signup?plan"))).toBe(false);
   });
 
   it("copy guard: no $1.99 booking fee, no competitors, no restaurant language", () => {

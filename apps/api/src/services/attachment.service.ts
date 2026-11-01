@@ -9,6 +9,7 @@ import {
   db,
   fileAttachments,
   jobs,
+  technicians,
   properties,
   users,
   estimates,
@@ -115,6 +116,31 @@ async function getActor(companyId: string, actorId: string, executor: SelectExec
   }
 
   return actor;
+}
+
+async function assertJobUploadAccess(
+  companyId: string,
+  actor: UserRow,
+  entityType: AttachmentEntityType,
+  jobId: string | null,
+  executor: SelectExecutor
+): Promise<void> {
+  if ((entityType !== "job" && entityType !== "work_order") || actor.role !== "technician") {
+    return;
+  }
+
+  const [technician] = await executor
+    .select()
+    .from(technicians)
+    .where(and(eq(technicians.companyId, companyId), eq(technicians.userId, actor.id), isNull(technicians.deletedAt)))
+    .limit(1);
+  const [job] = jobId
+    ? await executor.select().from(jobs).where(and(eq(jobs.companyId, companyId), eq(jobs.id, jobId), isNull(jobs.deletedAt))).limit(1)
+    : [];
+
+  if (!technician || !job || job.technicianId !== technician.id) {
+    throw new AppError(ErrorCode.FORBIDDEN, "You are not authorized to upload to this job");
+  }
 }
 
 async function resolveAttachmentContext(
@@ -255,8 +281,9 @@ export async function uploadAttachment(
   const sanitizedFileName = sanitizeAttachmentFileName(input.fileName);
   const timestamp = Date.now();
   const fileKey = `attachments/${companyId}/${timestamp}-${sanitizedFileName}`;
-  await getActor(companyId, actorId, db);
+  const actor = await getActor(companyId, actorId, db);
   const attachmentContext = await resolveAttachmentContext(companyId, input.entityType, input.entityId, db);
+  await assertJobUploadAccess(companyId, actor, input.entityType, attachmentContext.jobId, db);
   const uploadedFile = await uploadFile(fileKey, input.fileBuffer, input.mimeType);
   let thumbnailUrl: string | null = null;
 
@@ -485,8 +512,9 @@ export async function createAttachmentUploadUrl(
   }
 
   const sanitizedFileName = sanitizeAttachmentFileName(input.fileName);
-  await getActor(companyId, actorId, db);
-  await resolveAttachmentContext(companyId, input.entityType, input.entityId, db);
+  const actor = await getActor(companyId, actorId, db);
+  const attachmentContext = await resolveAttachmentContext(companyId, input.entityType, input.entityId, db);
+  await assertJobUploadAccess(companyId, actor, input.entityType, attachmentContext.jobId, db);
   const objectKey = buildTenantAttachmentObjectKey(companyId, sanitizedFileName);
   const signed = await createSignedUploadUrl(objectKey, input.mimeType, getMediaSignedUrlTtlSeconds());
 

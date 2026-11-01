@@ -77,7 +77,7 @@ export const HOME_TABLET: VNode = {
        ]
       }
      ],
-     "href": "/product-tour"
+     "href": "/tour"
     },
     {
      "t": "div",
@@ -263,6 +263,13 @@ export const HOME_TABLET: VNode = {
        "kind": "Outline",
        "c": "border border-[#0f1530] border-solid flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px]",
        "href": "/industries/plumbing"
+      },
+      {
+       "t": "button",
+       "label": "Electrical",
+       "kind": "Outline",
+       "c": "border border-[#0f1530] border-solid flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px]",
+       "href": "/industries/electrical"
       }
      ]
     }
@@ -615,7 +622,7 @@ export const HOME_TABLET: VNode = {
        ]
       }
      ],
-     "href": "/product-tour"
+     "href": "/tour"
     }
    ]
   },

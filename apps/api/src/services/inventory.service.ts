@@ -8,13 +8,16 @@
  */
 import { randomUUID } from "node:crypto";
 
-import { and, desc, eq, isNull } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 
 import { db, jobs, productCatalog, stockLevels, stockLocations, stockMovements, technicians } from "@fsm/db";
 import {
   AppError,
   ErrorCode,
+  INVENTORY_LIST_DEFAULT_LIMIT,
+  INVENTORY_LIST_MAX_LIMIT,
   buildRecordVersionV1,
+  type InventoryPageV1,
   type CreateStockLocationBody,
   type JobStockUsageBody,
   type ListStockLevelsQuery,
@@ -77,6 +80,8 @@ export function toStockLevel(row: LevelRow): StockLevel {
     id: row.id,
     locationId: row.locationId,
     productId: row.productId,
+    productName: null,
+    productSku: null,
     quantity: row.quantity,
     lowStockThreshold: row.lowStockThreshold ?? null,
     isLowStock: isLowStock(row.quantity, row.lowStockThreshold),
@@ -90,6 +95,8 @@ export function toStockMovement(row: MovementRow): StockMovement {
     id: row.id,
     locationId: row.locationId,
     productId: row.productId,
+    productName: null,
+    productSku: null,
     kind: row.kind,
     quantityDelta: row.quantityDelta,
     quantityAfter: row.quantityAfter,
@@ -100,6 +107,29 @@ export function toStockMovement(row: MovementRow): StockMovement {
     actorUserId: row.actorUserId ?? null,
     createdAt: row.createdAt.toISOString()
   };
+}
+
+/**
+ * Attach catalog name/SKU labels so roles without product read access (dispatcher, office) can read
+ * inventory. Joined only within the actor's company; products of another tenant never resolve.
+ * Missing products keep null labels; soft-deleted catalog rows still resolve their historical name.
+ */
+export async function withProductLabels<T extends { productId: string; productName: string | null; productSku: string | null }>(
+  executor: Pick<typeof db, "select">,
+  companyId: string,
+  items: T[]
+): Promise<T[]> {
+  const productIds = [...new Set(items.map((item) => item.productId))];
+  if (productIds.length === 0) return items;
+  const rows = await executor
+    .select({ id: productCatalog.id, name: productCatalog.name, sku: productCatalog.sku })
+    .from(productCatalog)
+    .where(and(eq(productCatalog.companyId, companyId), inArray(productCatalog.id, productIds)));
+  const byId = new Map(rows.map((row) => [row.id, row]));
+  return items.map((item) => {
+    const product = byId.get(item.productId);
+    return { ...item, productName: product?.name ?? null, productSku: product?.sku ?? null };
+  });
 }
 
 // ── Locations ──────────────────────────────────────────────
@@ -184,7 +214,21 @@ export async function updateStockLocation(
 
 // ── Levels ─────────────────────────────────────────────────
 
-export async function listStockLevels(actor: InventoryActor, query: ListStockLevelsQuery): Promise<StockLevel[]> {
+export function inventoryPageOf(query: { limit?: number | undefined; offset?: number | undefined }): { limit: number; offset: number } {
+  const limit = Math.min(Math.max(Math.trunc(query.limit ?? INVENTORY_LIST_DEFAULT_LIMIT), 1), INVENTORY_LIST_MAX_LIMIT);
+  const offset = Math.max(Math.trunc(query.offset ?? 0), 0);
+  return { limit, offset };
+}
+
+/**
+ * Paged stock levels (stable order: id). The low-stock filter runs in SQL so the cap applies to
+ * matching rows; product labels are looked up only for the ids on this page.
+ */
+export async function listStockLevels(
+  actor: InventoryActor,
+  query: ListStockLevelsQuery
+): Promise<{ levels: StockLevel[] } & InventoryPageV1> {
+  const { limit, offset } = inventoryPageOf(query);
   const rows = await db
     .select()
     .from(stockLevels)
@@ -192,11 +236,16 @@ export async function listStockLevels(actor: InventoryActor, query: ListStockLev
       eq(stockLevels.companyId, actor.companyId),
       isNull(stockLevels.deletedAt),
       query.locationId ? eq(stockLevels.locationId, query.locationId) : undefined,
-      query.productId ? eq(stockLevels.productId, query.productId) : undefined
-    ));
-  return rows
-    .filter((r) => (query.lowStock === "true" ? isLowStock(r.quantity, r.lowStockThreshold) : true))
-    .map(toStockLevel);
+      query.productId ? eq(stockLevels.productId, query.productId) : undefined,
+      query.lowStock === "true"
+        ? sql`${stockLevels.lowStockThreshold} is not null and ${stockLevels.quantity} <= ${stockLevels.lowStockThreshold}`
+        : undefined
+    ))
+    .orderBy(asc(stockLevels.id))
+    .limit(limit + 1)
+    .offset(offset);
+  const page = rows.slice(0, limit).map(toStockLevel);
+  return { levels: await withProductLabels(db, actor.companyId, page), limit, offset, hasMore: rows.length > limit };
 }
 
 export async function updateStockLevel(actor: InventoryActor, id: string, input: UpdateStockLevelBody): Promise<StockLevel> {
@@ -214,7 +263,8 @@ export async function updateStockLevel(actor: InventoryActor, id: string, input:
       .set({ lowStockThreshold: input.lowStockThreshold, updatedAt: new Date() })
       .where(and(eq(stockLevels.companyId, actor.companyId), eq(stockLevels.id, id)))
       .returning();
-    return toStockLevel(updated!);
+    const [level] = await withProductLabels(tx, actor.companyId, [toStockLevel(updated!)]);
+    return level!;
   });
 }
 
@@ -338,7 +388,10 @@ export async function adjustStock(actor: InventoryActor, input: StockAdjustmentB
       allowNegative: input.allowNegative,
       recordVersion: input.recordVersion
     });
-    return { levels: [toStockLevel(level)], movements: [toStockMovement(movement)] };
+    return {
+      levels: await withProductLabels(tx, actor.companyId, [toStockLevel(level)]),
+      movements: await withProductLabels(tx, actor.companyId, [toStockMovement(movement)])
+    };
   });
 }
 
@@ -372,8 +425,8 @@ export async function transferStock(actor: InventoryActor, input: StockTransferB
       transferGroupId
     });
     return {
-      levels: [toStockLevel(out.level), toStockLevel(into.level)],
-      movements: [toStockMovement(out.movement), toStockMovement(into.movement)]
+      levels: await withProductLabels(tx, actor.companyId, [toStockLevel(out.level), toStockLevel(into.level)]),
+      movements: await withProductLabels(tx, actor.companyId, [toStockMovement(out.movement), toStockMovement(into.movement)])
     };
   });
 }
@@ -407,11 +460,19 @@ export async function recordJobUsage(actor: InventoryActor, input: JobStockUsage
       jobId: job.id,
       recordVersion: input.recordVersion
     });
-    return { levels: [toStockLevel(level)], movements: [toStockMovement(movement)] };
+    return {
+      levels: await withProductLabels(tx, actor.companyId, [toStockLevel(level)]),
+      movements: await withProductLabels(tx, actor.companyId, [toStockMovement(movement)])
+    };
   });
 }
 
-export async function listStockMovements(actor: InventoryActor, query: ListStockMovementsQuery): Promise<StockMovement[]> {
+/** Paged movements, newest first (stable tie-break on id). Labels only for ids on this page. */
+export async function listStockMovements(
+  actor: InventoryActor,
+  query: ListStockMovementsQuery
+): Promise<{ movements: StockMovement[] } & InventoryPageV1> {
+  const { limit, offset } = inventoryPageOf(query);
   const rows = await db
     .select()
     .from(stockMovements)
@@ -421,7 +482,9 @@ export async function listStockMovements(actor: InventoryActor, query: ListStock
       query.productId ? eq(stockMovements.productId, query.productId) : undefined,
       query.jobId ? eq(stockMovements.jobId, query.jobId) : undefined
     ))
-    .orderBy(desc(stockMovements.createdAt))
-    .limit(query.limit ?? 100);
-  return rows.map(toStockMovement);
+    .orderBy(desc(stockMovements.createdAt), desc(stockMovements.id))
+    .limit(limit + 1)
+    .offset(offset);
+  const page = rows.slice(0, limit).map(toStockMovement);
+  return { movements: await withProductLabels(db, actor.companyId, page), limit, offset, hasMore: rows.length > limit };
 }

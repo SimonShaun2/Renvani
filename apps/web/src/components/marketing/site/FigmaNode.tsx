@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { ScaleToFrame } from "./ScaleToFrame";
 
 /** Renders a Figma layer tree (flagship-visuals.ts, industry-visuals.ts). Server component. */
 export type VNode =
@@ -13,6 +14,8 @@ export type VNode =
       label?: string;
       kind?: string;
       href?: string;
+      /** Marks the link as the current page (aria-current). */
+      current?: boolean;
       /** Rendered as the element id (in-page anchor target). */
       anchor?: string;
       /** Replaced by `slots[slot]` (interactive pieces such as forms). */
@@ -38,7 +41,7 @@ export function FigmaNode({ node, className = "", inline = false, slots }: { nod
   const kids = node.k?.map((k, i) => <FigmaNode key={i} node={k} inline={childInline} slots={slots} />);
   if (node.href) {
     return (
-      <Link href={node.href} className={/(^| )(flex|grid|inline-flex)( |$)/.test(cls) ? cls : `${cls} block`} data-node-id={node.id}>
+      <Link href={node.href} aria-current={node.current ? "page" : undefined} className={/(^| )(flex|grid|inline-flex)( |$)/.test(cls) ? cls : `${cls} block`} data-node-id={node.id}>
         {kids}
       </Link>
     );
@@ -56,5 +59,41 @@ export function FigmaNode({ node, className = "", inline = false, slots }: { nod
     <div className={cls} data-node-id={node.id} id={node.anchor}>
       {kids}
     </div>
+  );
+}
+
+/**
+ * Desktop frame at xl+, the Figma mobile frame below xl. Desktop frames are laid out for 1440 and need ~1150px
+ * (only Home and Demo have tablet frames), so from md up the mobile frame sits in a centred 600px column with 32px
+ * gutters, keeping each section's full-width background.
+ */
+/** `scaleDesktop`: render the desktop tree at its 1440 frame width, zoomed to fit (product pages, review 5720582328). */
+export function FrameSwitch({
+  desktop,
+  mobile,
+  slots,
+  scaleDesktop = false
+}: {
+  desktop: VNode;
+  mobile?: VNode | undefined;
+  slots?: Record<string, ReactNode>;
+  scaleDesktop?: boolean;
+}) {
+  if (!mobile) return <FigmaNode node={desktop} className="w-full" slots={slots} />;
+  return (
+    <>
+      <div className="hidden xl:block">
+        {scaleDesktop ? (
+          <ScaleToFrame>
+            <FigmaNode node={desktop} className="w-full" slots={slots} />
+          </ScaleToFrame>
+        ) : (
+          <FigmaNode node={desktop} className="w-full" slots={slots} />
+        )}
+      </div>
+      <div className="xl:hidden md:[&>div>div]:px-8 md:[&>div>div>*]:mx-auto md:[&>div>div>*]:w-full md:[&>div>div>*]:max-w-[600px]">
+        <FigmaNode node={mobile} className="w-full" slots={slots} />
+      </div>
+    </>
   );
 }

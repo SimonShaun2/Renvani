@@ -57,3 +57,17 @@ export function pricingTokens(): Record<string, string> {
     "programs.note": "Ask about eligibility and availability."
   };
 }
+
+export type DemoPlanInterest = "flex" | "flat";
+
+/** `/demo?plan=flex|flat` → plan-interest state (Figma 246:5648 / 246:5650). Anything else → no plan context. */
+export function demoPlanInterest(v: unknown): DemoPlanInterest | null {
+  return v === "flex" || v === "flat" ? v : null;
+}
+
+/** "Flex · $399/mo + 2% customer-paid Service Fee" / "Flat · $999/mo · No customer-paid Service Fee", from pricing-config. */
+export function planInterestLine(key: DemoPlanInterest): string {
+  const p = PLANS.find((x) => x.key === key)!;
+  const base = `${p.name} · $${p.monthly}/mo`;
+  return p.serviceFeePct > 0 ? `${base} + ${p.serviceFeePct}% customer-paid Service Fee` : `${base} · No customer-paid Service Fee`;
+}

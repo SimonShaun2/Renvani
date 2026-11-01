@@ -8,7 +8,12 @@ import {
   listAgentActions,
   rejectAgentAction
 } from "../../services/agent-action.service.js";
-import type { ListAgentActionsQuery } from "./schemas.js";
+import {
+  readIdempotencyKeyHeader,
+  type AgentActionGuardedStateChangeBody,
+  type AgentActionStateChangeBody,
+  type ListAgentActionsQuery
+} from "./schemas.js";
 
 export async function listAgentActionsHandler(request: FastifyRequest, reply: FastifyReply) {
   const query = request.query as ListAgentActionsQuery;
@@ -32,18 +37,28 @@ export async function getAgentActionHandler(request: FastifyRequest, reply: Fast
 
 export async function approveAgentActionHandler(request: FastifyRequest, reply: FastifyReply) {
   const { id } = request.params as { id: string };
-  const action = await approveAgentAction(request.company.id, id, request.user.id);
+  const body = request.body as AgentActionGuardedStateChangeBody;
+  const idempotencyKey = readIdempotencyKeyHeader(request.headers);
+  const action = await approveAgentAction(request.company.id, id, request.user.id, {
+    expectedVersion: body.expectedVersion,
+    ...(idempotencyKey ? { idempotencyKey } : {})
+  });
   return reply.send(action);
 }
 
 export async function rejectAgentActionHandler(request: FastifyRequest, reply: FastifyReply) {
   const { id } = request.params as { id: string };
-  const action = await rejectAgentAction(request.company.id, id, request.user.id);
+  const action = await rejectAgentAction(request.company.id, id, request.user.id, request.body as AgentActionStateChangeBody);
   return reply.send(action);
 }
 
 export async function executeAgentActionHandler(request: FastifyRequest, reply: FastifyReply) {
   const { id } = request.params as { id: string };
-  const action = await executeAgentAction(request.company.id, id, request.user.id);
+  const body = request.body as AgentActionGuardedStateChangeBody;
+  const idempotencyKey = readIdempotencyKeyHeader(request.headers);
+  const action = await executeAgentAction(request.company.id, id, request.user.id, {
+    expectedVersion: body.expectedVersion,
+    ...(idempotencyKey ? { idempotencyKey } : {})
+  });
   return reply.send(action);
 }

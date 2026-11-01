@@ -138,6 +138,23 @@ export async function recoverDeadLetterJob(
     throw new Error("Failed to re-queue recovered job");
   }
 
-  await deadLetterJob.remove();
+  try {
+    await deadLetterJob.remove();
+  } catch (error: unknown) {
+    // A client can retry after losing the first response while the original
+    // recovery is still finishing. Both requests may observe the DLQ copy and
+    // add the same deterministic source job, but only one can remove the DLQ
+    // record. Treat the second removal failure as success only when fresh
+    // probes prove that exact transition already completed.
+    const [remainingDeadLetterJob, existingRecoveredJob] = await Promise.all([
+      dlq.getJob(request.deadLetterJobId),
+      sourceQueue.getJob(recoveredJobId)
+    ]);
+
+    if (remainingDeadLetterJob || !existingRecoveredJob?.id) {
+      throw error;
+    }
+  }
+
   return String(recovered.id);
 }

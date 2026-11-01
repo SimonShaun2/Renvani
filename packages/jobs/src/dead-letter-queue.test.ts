@@ -227,6 +227,96 @@ describe("recoverDeadLetterJob", () => {
     expect(remove).toHaveBeenCalledOnce();
   });
 
+  it("returns the same recovered job when a retry overlaps DLQ removal", async () => {
+    const recoveredJobs = new Map<string, { id: string }>();
+    let deadLetterJobPresent = true;
+    let signalSecondRemove: (() => void) | undefined;
+    let signalFirstRemoved: (() => void) | undefined;
+    const secondRemoveStarted = new Promise<void>((resolve) => {
+      signalSecondRemove = resolve;
+    });
+    const firstRemoveCompleted = new Promise<void>((resolve) => {
+      signalFirstRemoved = resolve;
+    });
+    let removeCalls = 0;
+    const remove = vi.fn(async () => {
+      removeCalls += 1;
+
+      if (removeCalls === 1) {
+        await secondRemoveStarted;
+        deadLetterJobPresent = false;
+        signalFirstRemoved?.();
+        return;
+      }
+
+      signalSecondRemove?.();
+      await firstRemoveCompleted;
+      throw new Error("Job was already removed by the overlapping recovery");
+    });
+    const deadLetterJob = { data: envelope, remove };
+    const deadLetterQueue = {
+      getJob: vi.fn(async () => deadLetterJobPresent ? deadLetterJob : undefined)
+    };
+    const sourceAdd = vi.fn(async (
+      _name: string,
+      _payload: Record<string, unknown>,
+      options: { jobId?: string }
+    ) => {
+      const id = String(options.jobId);
+      const existing = recoveredJobs.get(id);
+
+      if (existing) {
+        return existing;
+      }
+
+      const job = { id };
+      recoveredJobs.set(id, job);
+      return job;
+    });
+    const sourceGetJob = vi.fn(async (jobId: string) => recoveredJobs.get(jobId));
+    const sourceQueue = {
+      name: "imports",
+      add: sourceAdd,
+      getJob: sourceGetJob
+    } as unknown as Queue;
+    const deps = {
+      getDeadLetterQueue: () => deadLetterQueue as unknown as Pick<Queue, "getJob">
+    };
+
+    const [firstResult, overlappingRetryResult] = await Promise.all([
+      recoverDeadLetterJob(sourceQueue, request, deps),
+      recoverDeadLetterJob(sourceQueue, request, deps)
+    ]);
+
+    expect(overlappingRetryResult).toBe(firstResult);
+    expect(sourceAdd).toHaveBeenCalledTimes(2);
+    expect(recoveredJobs).toHaveLength(1);
+    expect(remove).toHaveBeenCalledTimes(2);
+    expect(sourceGetJob).toHaveBeenCalledWith(firstResult);
+  });
+
+  it("does not hide a removal failure while the DLQ copy is still present", async () => {
+    const removalError = new Error("DLQ job is still locked");
+    const remove = vi.fn(async () => {
+      throw removalError;
+    });
+    const deadLetterJob = { data: envelope, remove };
+    const deadLetterQueue = {
+      getJob: vi.fn(async () => deadLetterJob)
+    };
+    const recoveredJobId = buildDeadLetterRecoveryJobId("imports", request.deadLetterJobId);
+    const sourceAdd = vi.fn(async () => ({ id: recoveredJobId }));
+    const sourceGetJob = vi.fn(async () => ({ id: recoveredJobId }));
+
+    await expect(recoverDeadLetterJob(
+      { name: "imports", add: sourceAdd, getJob: sourceGetJob } as unknown as Queue,
+      request,
+      { getDeadLetterQueue: () => deadLetterQueue as unknown as Pick<Queue, "getJob"> }
+    )).rejects.toBe(removalError);
+    expect(deadLetterQueue.getJob).toHaveBeenCalledTimes(2);
+    expect(sourceGetJob).toHaveBeenCalledWith(recoveredJobId);
+  });
+
   it("returns explicit NOT_FOUND when neither the DLQ nor recovered job exists", async () => {
     const sourceAdd = vi.fn();
     const sourceGetJob = vi.fn(async () => undefined);

@@ -1,0 +1,11 @@
+/* FS-172: 8px slide-in for the consent panel; static with reduced motion. */
+@keyframes saved-card-consent-slide-in {
+  from { transform: translateY(8px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-saved-card-consent-reveal] {
+    animation: saved-card-consent-slide-in 220ms ease-out both;
+  }
+}

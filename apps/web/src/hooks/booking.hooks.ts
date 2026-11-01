@@ -1,6 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type { HomeServiceTrade } from "@fsm/types";
 
 import { api } from "@/src/lib/api";
 import { publicApi } from "@/src/lib/public-api";
@@ -31,6 +32,14 @@ export interface PublicBookingSettingsRecord {
   phone?: string | null;
   logoUrl?: string | null;
   serviceAreaZipCodes?: string[];
+  /** Company trade from #318 (null when not set). */
+  trade?: HomeServiceTrade | null;
+  tradeSchemaType?: string | null;
+  tradeDescription?: string | null;
+  /** Active service-area names (inquiry contract, Dev C #268). Absent until that API ships. */
+  serviceAreaNames?: string[];
+  /** Shop IANA timezone for the hours above (inquiry contract, Dev C #268). */
+  timezone?: string | null;
 }
 
 export interface ZipCoverageRecord {

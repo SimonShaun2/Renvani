@@ -527,7 +527,7 @@ describe("FS-92 tenant isolation (API boundary)", () => {
       const response = await request(app.server)
         .post(`/api/v1/agent-actions/${bundleA.agentAction.id}/approve`)
         .set("Authorization", tenantB.authorization)
-        .send();
+        .send({ expectedVersion: 0 });
 
       expect(response.status).toBe(404);
       expect(response.body.error).toBe("NOT_FOUND");
@@ -553,7 +553,7 @@ describe("FS-92 tenant isolation (API boundary)", () => {
       const response = await request(app.server)
         .post(`/api/v1/agent-actions/${bundleA.agentAction.id}/execute`)
         .set("Authorization", tenantB.authorization)
-        .send();
+        .send({ expectedVersion: 0 });
 
       expect(response.status).toBe(404);
       expect(response.body.error).toBe("NOT_FOUND");

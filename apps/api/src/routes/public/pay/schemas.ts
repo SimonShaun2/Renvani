@@ -57,6 +57,7 @@ export const getPublicPaymentLinkSchema = {
         totalDueCents: { type: "integer" },
         feeRefundable: { type: "boolean" },
         platformFeePercent: { type: ["number", "null"] },
+        serviceFeePercent: { type: ["number", "null"] },
         platformFeePaidByCustomer: { type: "boolean" },
         platformFeeDisclosure: { type: ["string", "null"] },
         ...PUBLIC_PAY_VIEW_FIELD_SCHEMA
@@ -95,5 +96,27 @@ export const getPublicInvoiceReceiptSchema = {
     400: errorResponseSchema,
     404: errorResponseSchema,
     409: errorResponseSchema
+  }
+} as const;
+
+/** POST /:token/hosted-checkout — exact allowlist; no Stripe ids, secrets, or amounts beyond what the pay view shows. */
+export const createPublicHostedCheckoutSchema = {
+  tags: ["public-payments"],
+  response: {
+    200: {
+      type: "object",
+      additionalProperties: false,
+      required: ["mode", "checkoutUrl", "expiresAt", "reused"],
+      properties: {
+        mode: { type: "string", enum: ["hosted"] },
+        checkoutUrl: { type: "string" },
+        expiresAt: { type: ["string", "null"] },
+        reused: { type: "boolean" }
+      }
+    },
+    400: errorResponseSchema,
+    404: errorResponseSchema,
+    409: errorResponseSchema,
+    429: errorResponseSchema
   }
 } as const;

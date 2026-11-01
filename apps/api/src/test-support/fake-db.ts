@@ -39,6 +39,15 @@ type TableName =
   | "stockLocations"
   | "stockLevels"
   | "stockMovements"
+  | "callTrackingSettings"
+  | "callTrackingNumbers"
+  | "callRecords"
+  | "growthCheckScans"
+  | "growthCheckFindings"
+  | "growthCheckFindingRevisions"
+  | "growthCheckReportDrafts"
+  | "growthCheckReportDraftRevisions"
+  | "growthCheckReportShares"
   | "technicians"
   | "jobTasks"
   | "jobProducts"
@@ -54,7 +63,9 @@ type TableName =
   | "bookingRequests"
   | "bookingSettings"
   | "agentActions"
+  | "crews"
   | "inquirySubmitIdempotency"
+  | "serviceAreas"
   | "growthIntakeChecks"
   | "growthIntakeIdentityCandidates"
   | "growthIntakeFindings"
@@ -312,6 +323,7 @@ export interface TestJobRecord {
   priority: JobPriority;
   status: JobStatus;
   leadSource: string | null;
+  leadAttribution: Partial<Record<string, string>> | null;
   title: string;
   description: string | null;
   scheduledStart: Date | null;
@@ -420,6 +432,8 @@ export interface TestEstimateRecord {
   tierLabel: string | null;
   tierGroupId: string | null;
   isSelectedTier: boolean | null;
+  isRecommended: boolean;
+  optionSetVersion: number;
   subtotal: string;
   taxRate: string | null;
   taxAmount: string | null;
@@ -1044,6 +1058,7 @@ export interface TestBookingRequestRecord {
   isPropertyOwner: boolean | null;
   smsConsentAppointments: boolean | null;
   smsConsentMarketing: boolean | null;
+  leadAttribution: Partial<Record<string, string>> | null;
   confirmedAt: Date | null;
   confirmedById: string | null;
   confirmationSentAt: Date | null;
@@ -1301,11 +1316,13 @@ export interface TestJobRecord {
   propertyId: string | null;
   assetId: string | null;
   technicianId: string | null;
+  crewId?: string | null;
   assignedById: string | null;
   type: JobType;
   priority: JobPriority;
   status: JobStatus;
   leadSource: string | null;
+  leadAttribution: Partial<Record<string, string>> | null;
   title: string;
   description: string | null;
   scheduledStart: Date | null;
@@ -1390,6 +1407,7 @@ export interface TestEstimateRecord {
   companyId: string;
   estimateNumber: string;
   jobId: string | null;
+  importSessionId?: string | null;
   customerId: string;
   propertyId: string | null;
   createdById: string | null;
@@ -1397,6 +1415,8 @@ export interface TestEstimateRecord {
   tierLabel: string | null;
   tierGroupId: string | null;
   isSelectedTier: boolean | null;
+  isRecommended: boolean;
+  optionSetVersion: number;
   subtotal: string;
   taxRate: string | null;
   taxAmount: string | null;
@@ -1964,6 +1984,7 @@ export interface TestBookingRequestRecord {
   isPropertyOwner: boolean | null;
   smsConsentAppointments: boolean | null;
   smsConsentMarketing: boolean | null;
+  leadAttribution: Partial<Record<string, string>> | null;
   confirmedAt: Date | null;
   confirmedById: string | null;
   confirmationSentAt: Date | null;
@@ -2030,6 +2051,18 @@ export interface TestAgentActionRecord {
   deletedAt: Date | null;
 }
 
+export interface TestServiceAreaRecord {
+  id: string;
+  companyId: string;
+  name: string;
+  zips: string[] | null;
+  notes: string | null;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date | null;
+}
+
 export interface TestInquirySubmitIdempotencyRecord {
   id: string;
   companyId: string;
@@ -2071,12 +2104,22 @@ export interface TestBookingSettingsRecord {
 }
 
 type AnyTestRecord =
+  | TestCrewRecord
   | TestTimesheetRecord
   | TestTimesheetAuditEventRecord
   | TestTechnicianPayRateRecord
   | TestStockLocationRecord
   | TestStockLevelRecord
   | TestStockMovementRecord
+  | TestCallTrackingSettingsRecord
+  | TestCallTrackingNumberRecord
+  | TestCallRecordRecord
+  | TestGrowthCheckScanRecord
+  | TestGrowthCheckFindingRecord
+  | TestGrowthCheckFindingRevisionRecord
+  | TestGrowthCheckReportDraftRecord
+  | TestGrowthCheckReportDraftRevisionRecord
+  | TestGrowthCheckReportShareRecord
   | TestCompanyRecord
   | TestUserRecord
   | TestRefreshTokenRecord
@@ -2122,6 +2165,7 @@ type AnyTestRecord =
   | TestFieldSyncBatchRecord
   | TestFieldSyncOperationRecord
   | TestInquirySubmitIdempotencyRecord
+  | TestServiceAreaRecord
   | TestGrowthIntakeCheckRecord
   | TestGrowthIntakeIdentityCandidateRecord
   | TestGrowthIntakeFindingRecord
@@ -2159,6 +2203,15 @@ type MockTable =
   | typeof stockLocationsTable
   | typeof stockLevelsTable
   | typeof stockMovementsTable
+  | typeof callTrackingSettingsTable
+  | typeof callTrackingNumbersTable
+  | typeof callRecordsTable
+  | typeof growthCheckScansTable
+  | typeof growthCheckFindingsTable
+  | typeof growthCheckFindingRevisionsTable
+  | typeof growthCheckReportDraftsTable
+  | typeof growthCheckReportDraftRevisionsTable
+  | typeof growthCheckReportSharesTable
   | typeof techniciansTable
   | typeof jobTasksTable
   | typeof jobProductsTable
@@ -2174,7 +2227,9 @@ type MockTable =
   | typeof bookingRequestsTable
   | typeof bookingSettingsTable
   | typeof agentActionsTable
+  | typeof crewsTable
   | typeof inquirySubmitIdempotencyTable
+  | typeof serviceAreasTable
   | typeof growthIntakeChecksTable
   | typeof growthIntakeIdentityCandidatesTable
   | typeof growthIntakeFindingsTable
@@ -2218,6 +2273,15 @@ interface TestState {
   stockLocations: TestStockLocationRecord[];
   stockLevels: TestStockLevelRecord[];
   stockMovements: TestStockMovementRecord[];
+  callTrackingSettings: TestCallTrackingSettingsRecord[];
+  callTrackingNumbers: TestCallTrackingNumberRecord[];
+  callRecords: TestCallRecordRecord[];
+  growthCheckScans: TestGrowthCheckScanRecord[];
+  growthCheckFindings: TestGrowthCheckFindingRecord[];
+  growthCheckFindingRevisions: TestGrowthCheckFindingRevisionRecord[];
+  growthCheckReportDrafts: TestGrowthCheckReportDraftRecord[];
+  growthCheckReportDraftRevisions: TestGrowthCheckReportDraftRevisionRecord[];
+  growthCheckReportShares: TestGrowthCheckReportShareRecord[];
   technicians: TestTechnicianRecord[];
   jobTasks: TestJobTaskRecord[];
   jobProducts: TestJobProductRecord[];
@@ -2233,7 +2297,9 @@ interface TestState {
   bookingRequests: TestBookingRequestRecord[];
   bookingSettings: TestBookingSettingsRecord[];
   agentActions: TestAgentActionRecord[];
+  crews: TestCrewRecord[];
   inquirySubmitIdempotency: TestInquirySubmitIdempotencyRecord[];
+  serviceAreas: TestServiceAreaRecord[];
   growthIntakeChecks: TestGrowthIntakeCheckRecord[];
   growthIntakeIdentityCandidates: TestGrowthIntakeIdentityCandidateRecord[];
   growthIntakeFindings: TestGrowthIntakeFindingRecord[];
@@ -2403,11 +2469,13 @@ const jobsTable = {
   propertyId: "propertyId",
   assetId: "assetId",
   technicianId: "technicianId",
+  crewId: "crewId",
   assignedById: "assignedById",
   type: "type",
   priority: "priority",
   status: "status",
   leadSource: "leadSource",
+  leadAttribution: "leadAttribution",
   title: "title",
   description: "description",
   scheduledStart: "scheduledStart",
@@ -2545,6 +2613,7 @@ const dataExportSessionsTable = {
 } as const;
 
 const estimatesTable = {
+  importSessionId: "importSessionId",
   __name: "estimates",
   id: "id",
   companyId: "companyId",
@@ -2557,6 +2626,8 @@ const estimatesTable = {
   tierLabel: "tierLabel",
   tierGroupId: "tierGroupId",
   isSelectedTier: "isSelectedTier",
+  isRecommended: "isRecommended",
+  optionSetVersion: "optionSetVersion",
   subtotal: "subtotal",
   taxRate: "taxRate",
   taxAmount: "taxAmount",
@@ -3015,6 +3086,475 @@ export interface TestStockMovementRecord {
   createdAt: Date;
 }
 
+export interface TestCallTrackingSettingsRecord {
+  id: string;
+  companyId: string;
+  provider: string;
+  enabled: boolean;
+  recordingEnabled: boolean;
+  recordingDisclosureEnabled: boolean;
+  consentMode: string;
+  recordingNoticeState: string | null;
+  version: number;
+  updatedByUserId: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const callTrackingSettingsTable = {
+  __name: "callTrackingSettings",
+  id: "id",
+  companyId: "companyId",
+  provider: "provider",
+  enabled: "enabled",
+  recordingEnabled: "recordingEnabled",
+  recordingDisclosureEnabled: "recordingDisclosureEnabled",
+  consentMode: "consentMode",
+  recordingNoticeState: "recordingNoticeState",
+  version: "version",
+  updatedByUserId: "updatedByUserId",
+  createdAt: "createdAt",
+  updatedAt: "updatedAt",
+} as const;
+
+function createCallTrackingSettingsRecord(values: Partial<TestCallTrackingSettingsRecord> & Pick<TestCallTrackingSettingsRecord, "companyId">): TestCallTrackingSettingsRecord {
+  if (state.callTrackingSettings.some((row) => row.companyId === values.companyId)) {
+    throw Object.assign(new Error("duplicate key value violates unique constraint"), { code: "23505" });
+  }
+  const now = new Date();
+  return {
+    id: values.id ?? nextId(),
+    companyId: values.companyId,
+    provider: values.provider ?? "disabled",
+    enabled: values.enabled ?? false,
+    recordingEnabled: values.recordingEnabled ?? false,
+    recordingDisclosureEnabled: values.recordingDisclosureEnabled ?? true,
+    consentMode: values.consentMode ?? "all_party",
+    recordingNoticeState: values.recordingNoticeState ?? null,
+    version: values.version ?? 1,
+    updatedByUserId: values.updatedByUserId ?? null,
+    createdAt: values.createdAt ?? now,
+    updatedAt: values.updatedAt ?? now
+  };
+}
+
+export function seedCallTrackingSettings(values: Partial<TestCallTrackingSettingsRecord> & Pick<TestCallTrackingSettingsRecord, "companyId">): TestCallTrackingSettingsRecord {
+  const record = createCallTrackingSettingsRecord(values);
+  state.callTrackingSettings.push(record);
+  return record;
+}
+
+export interface TestCallTrackingNumberRecord {
+  id: string;
+  companyId: string;
+  provider: string;
+  providerNumberId: string | null;
+  trackingNumber: string;
+  label: string;
+  marketingSource: string;
+  marketingCampaign: string | null;
+  forwardingNumber: string;
+  active: boolean;
+  version: number;
+  verifiedAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date | null;
+}
+
+const callTrackingNumbersTable = {
+  __name: "callTrackingNumbers",
+  id: "id",
+  companyId: "companyId",
+  provider: "provider",
+  providerNumberId: "providerNumberId",
+  trackingNumber: "trackingNumber",
+  label: "label",
+  marketingSource: "marketingSource",
+  marketingCampaign: "marketingCampaign",
+  forwardingNumber: "forwardingNumber",
+  active: "active",
+  version: "version",
+  verifiedAt: "verifiedAt",
+  createdAt: "createdAt",
+  updatedAt: "updatedAt",
+  deletedAt: "deletedAt",
+} as const;
+
+function createCallTrackingNumberRecord(values: Partial<TestCallTrackingNumberRecord> & Pick<TestCallTrackingNumberRecord, "companyId" | "trackingNumber">): TestCallTrackingNumberRecord {
+  if (state.callTrackingNumbers.some((row) => row.deletedAt === null && row.trackingNumber === values.trackingNumber && (values.deletedAt ?? null) === null)) {
+    throw Object.assign(new Error("duplicate key value violates unique constraint"), { code: "23505" });
+  }
+  const now = new Date();
+  return {
+    id: values.id ?? nextId(),
+    companyId: values.companyId,
+    provider: values.provider ?? "disabled",
+    providerNumberId: values.providerNumberId ?? null,
+    trackingNumber: values.trackingNumber,
+    label: values.label ?? "Main line",
+    marketingSource: values.marketingSource ?? "google",
+    marketingCampaign: values.marketingCampaign ?? null,
+    forwardingNumber: values.forwardingNumber ?? "+15125550100",
+    active: values.active ?? true,
+    version: values.version ?? 1,
+    verifiedAt: values.verifiedAt ?? null,
+    createdAt: values.createdAt ?? now,
+    updatedAt: values.updatedAt ?? now,
+    deletedAt: values.deletedAt ?? null
+  };
+}
+
+export function seedCallTrackingNumber(values: Partial<TestCallTrackingNumberRecord> & Pick<TestCallTrackingNumberRecord, "companyId" | "trackingNumber">): TestCallTrackingNumberRecord {
+  const record = createCallTrackingNumberRecord(values);
+  state.callTrackingNumbers.push(record);
+  return record;
+}
+
+export interface TestCallRecordRecord {
+  id: string;
+  companyId: string;
+  trackingNumberId: string;
+  provider: string;
+  providerCallId: string;
+  callerHash: string;
+  callerLast4: string;
+  startedAt: Date;
+  durationSeconds: number;
+  outcome: string;
+  attribution: Record<string, string> | null;
+  recordingRef: string | null;
+  recordingDisclosurePlayed: boolean;
+  callerConsent: string;
+  recordingNoticeState: string | null;
+  createdAt: Date;
+}
+
+const callRecordsTable = {
+  __name: "callRecords",
+  id: "id",
+  companyId: "companyId",
+  trackingNumberId: "trackingNumberId",
+  provider: "provider",
+  providerCallId: "providerCallId",
+  callerHash: "callerHash",
+  callerLast4: "callerLast4",
+  startedAt: "startedAt",
+  durationSeconds: "durationSeconds",
+  outcome: "outcome",
+  attribution: "attribution",
+  recordingRef: "recordingRef",
+  recordingDisclosurePlayed: "recordingDisclosurePlayed",
+  callerConsent: "callerConsent",
+  recordingNoticeState: "recordingNoticeState",
+  createdAt: "createdAt",
+} as const;
+
+function createCallRecordRecord(values: Partial<TestCallRecordRecord> & Pick<TestCallRecordRecord, "companyId" | "trackingNumberId" | "providerCallId">): TestCallRecordRecord {
+  if (state.callRecords.some((row) => row.provider === (values.provider ?? "disabled") && row.providerCallId === values.providerCallId)) {
+    throw Object.assign(new Error("duplicate key value violates unique constraint"), { code: "23505" });
+  }
+  const now = new Date();
+  return {
+    id: values.id ?? nextId(),
+    companyId: values.companyId,
+    trackingNumberId: values.trackingNumberId,
+    provider: values.provider ?? "disabled",
+    providerCallId: values.providerCallId,
+    callerHash: values.callerHash ?? "0".repeat(64),
+    callerLast4: values.callerLast4 ?? "0000",
+    startedAt: values.startedAt ?? now,
+    durationSeconds: values.durationSeconds ?? 0,
+    outcome: values.outcome ?? "answered",
+    attribution: values.attribution ?? null,
+    recordingRef: values.recordingRef ?? null,
+    recordingDisclosurePlayed: values.recordingDisclosurePlayed ?? false,
+    callerConsent: values.callerConsent ?? "unknown",
+    recordingNoticeState: values.recordingNoticeState ?? null,
+    createdAt: values.createdAt ?? now
+  };
+}
+
+export function seedCallRecord(values: Partial<TestCallRecordRecord> & Pick<TestCallRecordRecord, "companyId" | "trackingNumberId" | "providerCallId">): TestCallRecordRecord {
+  const record = createCallRecordRecord(values);
+  state.callRecords.push(record);
+  return record;
+}
+
+export interface TestGrowthCheckScanRecord {
+  id: string;
+  companyId: string;
+  requestedByUserId: string | null;
+  targetUrl: string;
+  rubricId: string;
+  rubricVersion: string;
+  status: "queued" | "running" | "completed" | "failed";
+  progress: Record<string, unknown>;
+  idempotencyKey: string;
+  failureReason: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date | null;
+}
+
+export interface TestGrowthCheckFindingRecord {
+  id: string;
+  companyId: string;
+  scanId: string;
+  areaId: string;
+  checkId: string;
+  sourceUrl: string;
+  observedAt: Date;
+  status: "pass" | "fail" | "warning" | "unknown";
+  confidence: "high" | "medium" | "low";
+  summary: string;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date | null;
+}
+
+export interface TestGrowthCheckFindingRevisionRecord {
+  id: string;
+  companyId: string;
+  findingId: string;
+  scanId: string;
+  revision: number;
+  action: string;
+  actorUserId: string | null;
+  reason: string | null;
+  note: string | null;
+  previousState: Record<string, unknown>;
+  nextState: Record<string, unknown>;
+  idempotencyKey: string;
+  payloadHash: string;
+  createdAt: Date;
+}
+
+const growthCheckScansTable = {
+  __name: "growthCheckScans",
+  id: "id", companyId: "companyId", requestedByUserId: "requestedByUserId", targetUrl: "targetUrl",
+  rubricId: "rubricId", rubricVersion: "rubricVersion", status: "status", progress: "progress",
+  idempotencyKey: "idempotencyKey", failureReason: "failureReason", createdAt: "createdAt",
+  updatedAt: "updatedAt", deletedAt: "deletedAt"
+} as const;
+
+const growthCheckFindingsTable = {
+  __name: "growthCheckFindings",
+  id: "id", companyId: "companyId", scanId: "scanId", areaId: "areaId", checkId: "checkId",
+  sourceUrl: "sourceUrl", observedAt: "observedAt", status: "status", confidence: "confidence",
+  summary: "summary", createdAt: "createdAt", updatedAt: "updatedAt", deletedAt: "deletedAt"
+} as const;
+
+const growthCheckFindingRevisionsTable = {
+  __name: "growthCheckFindingRevisions",
+  id: "id", companyId: "companyId", findingId: "findingId", scanId: "scanId", revision: "revision",
+  action: "action", actorUserId: "actorUserId", reason: "reason", note: "note",
+  previousState: "previousState", nextState: "nextState", idempotencyKey: "idempotencyKey",
+  payloadHash: "payloadHash", createdAt: "createdAt"
+} as const;
+
+function createGrowthCheckScanRecord(
+  values: Partial<TestGrowthCheckScanRecord> & Pick<TestGrowthCheckScanRecord, "companyId">
+): TestGrowthCheckScanRecord {
+  const now = new Date();
+  return {
+    id: values.id ?? nextId(), companyId: values.companyId, requestedByUserId: values.requestedByUserId ?? null,
+    targetUrl: values.targetUrl ?? "https://example.test/", rubricId: values.rubricId ?? "home-services",
+    rubricVersion: values.rubricVersion ?? "1.0.0", status: values.status ?? "completed",
+    progress: values.progress ?? {}, idempotencyKey: values.idempotencyKey ?? `gc-${nextId()}`,
+    failureReason: values.failureReason ?? null, createdAt: values.createdAt ?? now,
+    updatedAt: values.updatedAt ?? now, deletedAt: values.deletedAt ?? null
+  };
+}
+
+function createGrowthCheckFindingRecord(
+  values: Partial<TestGrowthCheckFindingRecord> & Pick<TestGrowthCheckFindingRecord, "companyId" | "scanId">
+): TestGrowthCheckFindingRecord {
+  const now = new Date();
+  return {
+    id: values.id ?? nextId(), companyId: values.companyId, scanId: values.scanId,
+    areaId: values.areaId ?? "booking_intake", checkId: values.checkId ?? "booking_cta",
+    sourceUrl: values.sourceUrl ?? "https://example.test/", observedAt: values.observedAt ?? now,
+    status: values.status ?? "fail", confidence: values.confidence ?? "medium",
+    summary: values.summary ?? "No service request call-to-action found", createdAt: values.createdAt ?? now,
+    updatedAt: values.updatedAt ?? now, deletedAt: values.deletedAt ?? null
+  };
+}
+
+function createGrowthCheckFindingRevisionRecord(
+  values: Partial<TestGrowthCheckFindingRevisionRecord> &
+    Pick<TestGrowthCheckFindingRevisionRecord, "companyId" | "findingId" | "scanId" | "revision" | "action">
+): TestGrowthCheckFindingRevisionRecord {
+  const duplicate = state.growthCheckFindingRevisions.find(
+    (row) =>
+      (row.findingId === values.findingId && row.revision === values.revision) ||
+      (row.companyId === values.companyId && row.idempotencyKey === values.idempotencyKey)
+  );
+  if (duplicate) {
+    // Mirrors the unique indexes (finding_id, revision) and (company_id, idempotency_key).
+    throw Object.assign(new Error("duplicate key value violates unique constraint"), { code: "23505" });
+  }
+  return {
+    id: values.id ?? nextId(), companyId: values.companyId, findingId: values.findingId, scanId: values.scanId,
+    revision: values.revision, action: values.action, actorUserId: values.actorUserId ?? null,
+    reason: values.reason ?? null, note: values.note ?? null, previousState: values.previousState ?? {},
+    nextState: values.nextState ?? {}, idempotencyKey: values.idempotencyKey ?? `rev-${nextId()}`,
+    payloadHash: values.payloadHash ?? "hash", createdAt: values.createdAt ?? new Date()
+  };
+}
+
+export function seedGrowthCheckScan(
+  values: Partial<TestGrowthCheckScanRecord> & Pick<TestGrowthCheckScanRecord, "companyId">
+): TestGrowthCheckScanRecord {
+  const record = createGrowthCheckScanRecord(values);
+  state.growthCheckScans.push(record);
+  return record;
+}
+
+export function seedGrowthCheckFinding(
+  values: Partial<TestGrowthCheckFindingRecord> & Pick<TestGrowthCheckFindingRecord, "companyId" | "scanId">
+): TestGrowthCheckFindingRecord {
+  const record = createGrowthCheckFindingRecord(values);
+  state.growthCheckFindings.push(record);
+  return record;
+}
+
+export function getGrowthCheckFindingRevisions(): TestGrowthCheckFindingRevisionRecord[] {
+  return state.growthCheckFindingRevisions;
+}
+
+export interface TestGrowthCheckReportDraftRecord {
+  id: string;
+  companyId: string;
+  scanId: string;
+  version: number;
+  content: Record<string, unknown>;
+  approvedVersion: number | null;
+  approvedByUserId: string | null;
+  approvedAt: Date | null;
+  createdByUserId: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface TestGrowthCheckReportDraftRevisionRecord {
+  id: string;
+  companyId: string;
+  draftId: string;
+  version: number;
+  action: string;
+  actorUserId: string | null;
+  previousContent: Record<string, unknown> | null;
+  nextContent: Record<string, unknown>;
+  idempotencyKey: string;
+  payloadHash: string;
+  createdAt: Date;
+}
+
+export interface TestGrowthCheckReportShareRecord {
+  id: string;
+  companyId: string;
+  draftId: string;
+  draftVersion: number;
+  contentHash: string;
+  snapshot: Record<string, unknown>;
+  tokenHash: string;
+  createdByUserId: string | null;
+  createdAt: Date;
+  expiresAt: Date | null;
+  revokedAt: Date | null;
+  revokedByUserId: string | null;
+  idempotencyKey: string;
+  payloadHash: string;
+}
+
+const growthCheckReportDraftsTable = {
+  __name: "growthCheckReportDrafts",
+  id: "id", companyId: "companyId", scanId: "scanId", version: "version", content: "content",
+  approvedVersion: "approvedVersion", approvedByUserId: "approvedByUserId", approvedAt: "approvedAt",
+  createdByUserId: "createdByUserId", createdAt: "createdAt", updatedAt: "updatedAt"
+} as const;
+
+const growthCheckReportDraftRevisionsTable = {
+  __name: "growthCheckReportDraftRevisions",
+  id: "id", companyId: "companyId", draftId: "draftId", version: "version", action: "action",
+  actorUserId: "actorUserId", previousContent: "previousContent", nextContent: "nextContent",
+  idempotencyKey: "idempotencyKey", payloadHash: "payloadHash", createdAt: "createdAt"
+} as const;
+
+const growthCheckReportSharesTable = {
+  __name: "growthCheckReportShares",
+  id: "id", companyId: "companyId", draftId: "draftId", draftVersion: "draftVersion", contentHash: "contentHash",
+  snapshot: "snapshot", tokenHash: "tokenHash", createdByUserId: "createdByUserId", createdAt: "createdAt",
+  expiresAt: "expiresAt", revokedAt: "revokedAt", revokedByUserId: "revokedByUserId",
+  idempotencyKey: "idempotencyKey", payloadHash: "payloadHash"
+} as const;
+
+function uniqueViolation(): Error {
+  return Object.assign(new Error("duplicate key value violates unique constraint"), { code: "23505" });
+}
+
+function createGrowthCheckReportDraftRecord(
+  values: Partial<TestGrowthCheckReportDraftRecord> & Pick<TestGrowthCheckReportDraftRecord, "companyId" | "scanId" | "content">
+): TestGrowthCheckReportDraftRecord {
+  // Mirrors the unique index (company_id, scan_id).
+  if (state.growthCheckReportDrafts.some((row) => row.companyId === values.companyId && row.scanId === values.scanId)) throw uniqueViolation();
+  const now = new Date();
+  return {
+    id: values.id ?? nextId(), companyId: values.companyId, scanId: values.scanId, version: values.version ?? 1,
+    content: values.content, approvedVersion: values.approvedVersion ?? null, approvedByUserId: values.approvedByUserId ?? null,
+    approvedAt: values.approvedAt ?? null, createdByUserId: values.createdByUserId ?? null,
+    createdAt: values.createdAt ?? now, updatedAt: values.updatedAt ?? now
+  };
+}
+
+function createGrowthCheckReportDraftRevisionRecord(
+  values: Partial<TestGrowthCheckReportDraftRevisionRecord> &
+    Pick<TestGrowthCheckReportDraftRevisionRecord, "companyId" | "draftId" | "version" | "action" | "nextContent">
+): TestGrowthCheckReportDraftRevisionRecord {
+  // Mirrors the unique indexes (draft_id, version) and (company_id, idempotency_key).
+  if (
+    state.growthCheckReportDraftRevisions.some(
+      (row) =>
+        (row.draftId === values.draftId && row.version === values.version) ||
+        (row.companyId === values.companyId && row.idempotencyKey === values.idempotencyKey)
+    )
+  ) throw uniqueViolation();
+  return {
+    id: values.id ?? nextId(), companyId: values.companyId, draftId: values.draftId, version: values.version,
+    action: values.action, actorUserId: values.actorUserId ?? null, previousContent: values.previousContent ?? null,
+    nextContent: values.nextContent, idempotencyKey: values.idempotencyKey ?? `rdr-${nextId()}`,
+    payloadHash: values.payloadHash ?? "hash", createdAt: values.createdAt ?? new Date()
+  };
+}
+
+function createGrowthCheckReportShareRecord(
+  values: Partial<TestGrowthCheckReportShareRecord> &
+    Pick<TestGrowthCheckReportShareRecord, "companyId" | "draftId" | "draftVersion" | "contentHash" | "tokenHash">
+): TestGrowthCheckReportShareRecord {
+  // Mirrors the unique indexes (token_hash) and (company_id, idempotency_key).
+  if (
+    state.growthCheckReportShares.some(
+      (row) => row.tokenHash === values.tokenHash || (row.companyId === values.companyId && row.idempotencyKey === values.idempotencyKey)
+    )
+  ) throw uniqueViolation();
+  return {
+    id: values.id ?? nextId(), companyId: values.companyId, draftId: values.draftId, draftVersion: values.draftVersion,
+    contentHash: values.contentHash, snapshot: values.snapshot ?? {}, tokenHash: values.tokenHash,
+    createdByUserId: values.createdByUserId ?? null, createdAt: values.createdAt ?? new Date(),
+    expiresAt: values.expiresAt ?? null, revokedAt: values.revokedAt ?? null, revokedByUserId: values.revokedByUserId ?? null,
+    idempotencyKey: values.idempotencyKey ?? `rsh-${nextId()}`, payloadHash: values.payloadHash ?? "hash"
+  };
+}
+
+export function getGrowthCheckReportShares(): TestGrowthCheckReportShareRecord[] {
+  return state.growthCheckReportShares;
+}
+
+export function getGrowthCheckReportDraftRevisions(): TestGrowthCheckReportDraftRevisionRecord[] {
+  return state.growthCheckReportDraftRevisions;
+}
+
 const stockLocationsTable = {
   __name: "stockLocations",
   id: "id", companyId: "companyId", name: "name", kind: "kind", technicianId: "technicianId",
@@ -3454,6 +3994,7 @@ const bookingRequestsTable = {
   isPropertyOwner: "isPropertyOwner",
   smsConsentAppointments: "smsConsentAppointments",
   smsConsentMarketing: "smsConsentMarketing",
+  leadAttribution: "leadAttribution",
   confirmedAt: "confirmedAt",
   confirmedById: "confirmedById",
   confirmationSentAt: "confirmationSentAt",
@@ -3496,6 +4037,31 @@ const fieldSyncOperationsTable = {
   deletedAt: "deletedAt"
 } as const;
 
+export interface TestCrewRecord {
+  id: string;
+  companyId: string;
+  name: string;
+  color: string | null;
+  isActive: boolean;
+  version: number;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date | null;
+}
+
+const crewsTable = {
+  __name: "crews",
+  id: "id",
+  companyId: "companyId",
+  name: "name",
+  color: "color",
+  isActive: "isActive",
+  version: "version",
+  createdAt: "createdAt",
+  updatedAt: "updatedAt",
+  deletedAt: "deletedAt"
+} as const;
+
 const agentActionsTable = {
   __name: "agentActions",
   id: "id",
@@ -3515,6 +4081,19 @@ const agentActionsTable = {
   expiresAt: "expiresAt",
   reviewerId: "reviewerId",
   executionReceipt: "executionReceipt",
+  createdAt: "createdAt",
+  updatedAt: "updatedAt",
+  deletedAt: "deletedAt"
+} as const;
+
+const serviceAreasTable = {
+  __name: "serviceAreas",
+  id: "id",
+  companyId: "companyId",
+  name: "name",
+  zips: "zips",
+  notes: "notes",
+  isActive: "isActive",
   createdAt: "createdAt",
   updatedAt: "updatedAt",
   deletedAt: "deletedAt"
@@ -3670,6 +4249,15 @@ const state: TestState = {
   stockLocations: [],
   stockLevels: [],
   stockMovements: [],
+  callTrackingSettings: [],
+  callTrackingNumbers: [],
+  callRecords: [],
+  growthCheckScans: [],
+  growthCheckFindings: [],
+  growthCheckFindingRevisions: [],
+  growthCheckReportDrafts: [],
+  growthCheckReportDraftRevisions: [],
+  growthCheckReportShares: [],
   technicians: [],
   jobTasks: [],
   jobProducts: [],
@@ -3685,7 +4273,9 @@ const state: TestState = {
   bookingRequests: [],
   bookingSettings: [],
   agentActions: [],
+  crews: [],
   inquirySubmitIdempotency: [],
+  serviceAreas: [],
   growthIntakeChecks: [],
   growthIntakeIdentityCandidates: [],
   growthIntakeFindings: [],
@@ -3733,6 +4323,15 @@ function restoreState(snapshot: TestState): void {
   state.stockLocations.splice(0, state.stockLocations.length, ...snapshot.stockLocations);
   state.stockLevels.splice(0, state.stockLevels.length, ...snapshot.stockLevels);
   state.stockMovements.splice(0, state.stockMovements.length, ...snapshot.stockMovements);
+  state.callTrackingSettings.splice(0, state.callTrackingSettings.length, ...snapshot.callTrackingSettings);
+  state.callTrackingNumbers.splice(0, state.callTrackingNumbers.length, ...snapshot.callTrackingNumbers);
+  state.callRecords.splice(0, state.callRecords.length, ...snapshot.callRecords);
+  state.growthCheckScans.splice(0, state.growthCheckScans.length, ...snapshot.growthCheckScans);
+  state.growthCheckFindings.splice(0, state.growthCheckFindings.length, ...snapshot.growthCheckFindings);
+  state.growthCheckFindingRevisions.splice(0, state.growthCheckFindingRevisions.length, ...snapshot.growthCheckFindingRevisions);
+  state.growthCheckReportDrafts.splice(0, state.growthCheckReportDrafts.length, ...snapshot.growthCheckReportDrafts);
+  state.growthCheckReportDraftRevisions.splice(0, state.growthCheckReportDraftRevisions.length, ...snapshot.growthCheckReportDraftRevisions);
+  state.growthCheckReportShares.splice(0, state.growthCheckReportShares.length, ...snapshot.growthCheckReportShares);
   state.technicians.splice(0, state.technicians.length, ...snapshot.technicians);
   state.jobTasks.splice(0, state.jobTasks.length, ...snapshot.jobTasks);
   state.jobProducts.splice(0, state.jobProducts.length, ...snapshot.jobProducts);
@@ -3752,6 +4351,8 @@ function restoreState(snapshot: TestState): void {
   state.bookingRequests.splice(0, state.bookingRequests.length, ...snapshot.bookingRequests);
   state.bookingSettings.splice(0, state.bookingSettings.length, ...snapshot.bookingSettings);
   state.agentActions.splice(0, state.agentActions.length, ...snapshot.agentActions);
+  state.crews.splice(0, state.crews.length, ...snapshot.crews);
+  state.serviceAreas.splice(0, state.serviceAreas.length, ...(snapshot.serviceAreas ?? []));
   state.inquirySubmitIdempotency.splice(
     0,
     state.inquirySubmitIdempotency.length,
@@ -3841,6 +4442,24 @@ function getRows(tableName: TableName): AnyTestRecord[] {
       return state.stockLevels;
     case "stockMovements":
       return state.stockMovements;
+    case "callTrackingSettings":
+      return state.callTrackingSettings;
+    case "callTrackingNumbers":
+      return state.callTrackingNumbers;
+    case "callRecords":
+      return state.callRecords;
+    case "growthCheckScans":
+      return state.growthCheckScans;
+    case "growthCheckFindings":
+      return state.growthCheckFindings;
+    case "growthCheckFindingRevisions":
+      return state.growthCheckFindingRevisions;
+    case "growthCheckReportDrafts":
+      return state.growthCheckReportDrafts;
+    case "growthCheckReportDraftRevisions":
+      return state.growthCheckReportDraftRevisions;
+    case "growthCheckReportShares":
+      return state.growthCheckReportShares;
     case "technicians":
       return state.technicians;
     case "jobTasks":
@@ -3871,8 +4490,12 @@ function getRows(tableName: TableName): AnyTestRecord[] {
       return state.bookingSettings;
     case "agentActions":
       return state.agentActions;
+    case "crews":
+      return state.crews;
     case "inquirySubmitIdempotency":
       return state.inquirySubmitIdempotency;
+    case "serviceAreas":
+      return state.serviceAreas;
     case "growthIntakeChecks":
       return state.growthIntakeChecks;
     case "growthIntakeIdentityCandidates":
@@ -4132,11 +4755,13 @@ function createJobRecord(
     propertyId: values.propertyId ?? null,
     assetId: values.assetId ?? null,
     technicianId: values.technicianId ?? null,
+    crewId: values.crewId ?? null,
     assignedById: values.assignedById ?? null,
     type: values.type ?? "service_call",
     priority: values.priority ?? "normal",
     status: values.status ?? "lead",
     leadSource: values.leadSource ?? null,
+    leadAttribution: values.leadAttribution ?? null,
     title: values.title ?? "Service Call",
     description: values.description ?? null,
     scheduledStart: values.scheduledStart ?? null,
@@ -4267,6 +4892,7 @@ function createEstimateRecord(
     id: values.id ?? nextId(),
     companyId: values.companyId,
     estimateNumber: values.estimateNumber ?? `EST-${String(state.estimates.length + 1).padStart(4, "0")}`,
+    importSessionId: values.importSessionId ?? null,
     jobId: values.jobId ?? null,
     customerId: values.customerId,
     propertyId: values.propertyId ?? null,
@@ -4275,6 +4901,8 @@ function createEstimateRecord(
     tierLabel: values.tierLabel ?? null,
     tierGroupId: values.tierGroupId ?? null,
     isSelectedTier: values.isSelectedTier ?? false,
+    isRecommended: values.isRecommended ?? false,
+    optionSetVersion: values.optionSetVersion ?? 1,
     subtotal: values.subtotal ?? "0.00",
     taxRate: values.taxRate ?? "0.0000",
     taxAmount: values.taxAmount ?? "0.00",
@@ -5081,6 +5709,7 @@ function createBookingRequestRecord(
     isPropertyOwner: values.isPropertyOwner ?? false,
     smsConsentAppointments: values.smsConsentAppointments ?? false,
     smsConsentMarketing: values.smsConsentMarketing ?? false,
+    leadAttribution: values.leadAttribution ?? null,
     confirmedAt: values.confirmedAt ?? null,
     confirmedById: values.confirmedById ?? null,
     confirmationSentAt: values.confirmationSentAt ?? null,
@@ -5122,6 +5751,31 @@ function createBookingSettingsRecord(
     updatedAt: values.updatedAt ?? now,
     deletedAt: values.deletedAt ?? null
   };
+}
+
+function createServiceAreaRecord(
+  values: Partial<TestServiceAreaRecord> & Pick<TestServiceAreaRecord, "companyId" | "name">
+): TestServiceAreaRecord {
+  const now = new Date();
+  return {
+    id: values.id ?? nextId(),
+    companyId: values.companyId,
+    name: values.name,
+    zips: values.zips ?? [],
+    notes: values.notes ?? null,
+    isActive: values.isActive ?? true,
+    createdAt: values.createdAt ?? now,
+    updatedAt: values.updatedAt ?? now,
+    deletedAt: values.deletedAt ?? null
+  };
+}
+
+export function seedServiceArea(
+  values: Partial<TestServiceAreaRecord> & Pick<TestServiceAreaRecord, "companyId" | "name">
+): TestServiceAreaRecord {
+  const record = createServiceAreaRecord(values);
+  state.serviceAreas.push(record);
+  return record;
 }
 
 function createInquirySubmitIdempotencyRecord(
@@ -5518,6 +6172,27 @@ function createRow(tableName: TableName, values: Record<string, unknown>): AnyTe
       return createStockLocationRecord(values as Partial<TestStockLocationRecord> & Pick<TestStockLocationRecord, "companyId" | "name" | "kind">);
     case "stockLevels":
       return createStockLevelRecord(values as Partial<TestStockLevelRecord> & Pick<TestStockLevelRecord, "companyId" | "locationId" | "productId">);
+    case "callTrackingSettings":
+      return createCallTrackingSettingsRecord(values as Partial<TestCallTrackingSettingsRecord> & Pick<TestCallTrackingSettingsRecord, "companyId">);
+    case "callTrackingNumbers":
+      return createCallTrackingNumberRecord(values as Partial<TestCallTrackingNumberRecord> & Pick<TestCallTrackingNumberRecord, "companyId" | "trackingNumber">);
+    case "callRecords":
+      return createCallRecordRecord(values as Partial<TestCallRecordRecord> & Pick<TestCallRecordRecord, "companyId" | "trackingNumberId" | "providerCallId">);
+    case "growthCheckScans":
+      return createGrowthCheckScanRecord(values as Partial<TestGrowthCheckScanRecord> & Pick<TestGrowthCheckScanRecord, "companyId">);
+    case "growthCheckFindings":
+      return createGrowthCheckFindingRecord(values as Partial<TestGrowthCheckFindingRecord> & Pick<TestGrowthCheckFindingRecord, "companyId" | "scanId">);
+    case "growthCheckFindingRevisions":
+      return createGrowthCheckFindingRevisionRecord(
+        values as Partial<TestGrowthCheckFindingRevisionRecord> &
+          Pick<TestGrowthCheckFindingRevisionRecord, "companyId" | "findingId" | "scanId" | "revision" | "action">
+      );
+    case "growthCheckReportDrafts":
+      return createGrowthCheckReportDraftRecord(values as Partial<TestGrowthCheckReportDraftRecord> & Pick<TestGrowthCheckReportDraftRecord, "companyId" | "scanId" | "content">);
+    case "growthCheckReportDraftRevisions":
+      return createGrowthCheckReportDraftRevisionRecord(values as Partial<TestGrowthCheckReportDraftRevisionRecord> & Pick<TestGrowthCheckReportDraftRevisionRecord, "companyId" | "draftId" | "version" | "action" | "nextContent">);
+    case "growthCheckReportShares":
+      return createGrowthCheckReportShareRecord(values as Partial<TestGrowthCheckReportShareRecord> & Pick<TestGrowthCheckReportShareRecord, "companyId" | "draftId" | "draftVersion" | "contentHash" | "tokenHash">);
     case "stockMovements":
       return createStockMovementRecord(values as Partial<TestStockMovementRecord> & Pick<TestStockMovementRecord, "companyId" | "locationId" | "productId" | "kind" | "quantityDelta" | "quantityAfter">);
     case "productCatalog":
@@ -5588,6 +6263,10 @@ function createRow(tableName: TableName, values: Record<string, unknown>): AnyTe
       return createBookingSettingsRecord(
         values as Partial<TestBookingSettingsRecord> & Pick<TestBookingSettingsRecord, "companyId">
       );
+    case "serviceAreas": {
+      const v = values as Partial<TestServiceAreaRecord> & Pick<TestServiceAreaRecord, "companyId" | "name">;
+      return createServiceAreaRecord(v);
+    }
     case "inquirySubmitIdempotency":
       return createInquirySubmitIdempotencyRecord(
         values as Partial<TestInquirySubmitIdempotencyRecord> &
@@ -5596,6 +6275,8 @@ function createRow(tableName: TableName, values: Record<string, unknown>): AnyTe
             "companyId" | "idempotencyKey" | "payloadHash" | "bookingRequestId" | "responseSnapshot" | "expiresAt"
           >
       );
+    case "crews":
+      throw new Error("fake-db: insert into crews is not supported; use seedCrew");
     case "agentActions":
       return createAgentActionRecord(
         values as Partial<TestAgentActionRecord> &
@@ -5836,12 +6517,20 @@ interface TestDb {
   };
 }
 
+/** drizzle-orm `count()` in a select projection: collapses the matched rows into one `{ alias: n }` row. */
+const COUNT_AGGREGATE_MARKER = { __aggregate: "count" } as const;
+
 function projectRows<T extends Record<string, unknown>>(
   rows: T[],
   projection?: Record<string, unknown>
 ): Array<Record<string, unknown>> {
   if (!projection) {
     return rows;
+  }
+
+  const countAlias = Object.entries(projection).find(([, column]) => column === COUNT_AGGREGATE_MARKER)?.[0];
+  if (countAlias) {
+    return [{ [countAlias]: rows.length }];
   }
 
   return rows.map((row) => {
@@ -5977,6 +6666,15 @@ export const productCatalog = productCatalogTable;
 export const stockLocations = stockLocationsTable;
 export const stockLevels = stockLevelsTable;
 export const stockMovements = stockMovementsTable;
+export const callTrackingSettings = callTrackingSettingsTable;
+export const callTrackingNumbers = callTrackingNumbersTable;
+export const callRecords = callRecordsTable;
+export const growthCheckScans = growthCheckScansTable;
+export const growthCheckFindings = growthCheckFindingsTable;
+export const growthCheckFindingRevisions = growthCheckFindingRevisionsTable;
+export const growthCheckReportDrafts = growthCheckReportDraftsTable;
+export const growthCheckReportDraftRevisions = growthCheckReportDraftRevisionsTable;
+export const growthCheckReportShares = growthCheckReportSharesTable;
 export const technicians = techniciansTable;
 export const jobTasks = jobTasksTable;
 export const jobProducts = jobProductsTable;
@@ -5992,9 +6690,11 @@ export const onTheWayNotifications = onTheWayNotificationsTable;
 export const bookingRequests = bookingRequestsTable;
 export const bookingSettings = bookingSettingsTable;
 export const agentActions = agentActionsTable;
+export const crews = crewsTable;
 export const fieldSyncBatches = fieldSyncBatchesTable;
 export const fieldSyncOperations = fieldSyncOperationsTable;
 export const inquirySubmitIdempotency = inquirySubmitIdempotencyTable;
+export const serviceAreas = serviceAreasTable;
 export const growthIntakeChecks = growthIntakeChecksTable;
 export const growthIntakeIdentityCandidates = growthIntakeIdentityCandidatesTable;
 export const growthIntakeFindings = growthIntakeFindingsTable;
@@ -6296,6 +6996,17 @@ export function createDrizzleModuleMock() {
       return JOB_ACTIVITY_AT_MARKER;
     }
 
+    // Column-to-column "a is not null and b <= a" (e.g. inventory low-stock: threshold vs quantity).
+    if (template.includes("is not null and") && template.includes("<=") && values.length === 3) {
+      const limitKey = resolveFieldKey(values[0]);
+      const valueKey = resolveFieldKey(values[1]);
+      return (row: Record<string, unknown>) => {
+        const bound = row[limitKey];
+        const current = row[valueKey];
+        return bound !== null && bound !== undefined && (current as number) <= (bound as number);
+      };
+    }
+
     if (template.includes("clerk") && template.includes("organizationId")) {
       const clerkOrganizationId = values.at(-1);
       if (typeof clerkOrganizationId !== "string") {
@@ -6370,7 +7081,8 @@ export function createDrizzleModuleMock() {
     inArray: <T>(field: unknown, values: Array<T[keyof T]>): Predicate<T> => (row: T) =>
       values.includes(row[resolveFieldKey(field) as keyof T]),
     isNull: <T>(field: keyof T): Predicate<T> => (row: T) => row[resolveFieldKey(field) as keyof T] === null,
-    sql: sqlTag
+    sql: sqlTag,
+    count: () => COUNT_AGGREGATE_MARKER
   };
 }
 
@@ -6425,6 +7137,15 @@ export function createDbModuleMock() {
     stockLocations,
     stockLevels,
     stockMovements,
+    callTrackingSettings,
+    callTrackingNumbers,
+    callRecords,
+    growthCheckScans,
+    growthCheckFindings,
+    growthCheckFindingRevisions,
+    growthCheckReportDrafts,
+    growthCheckReportDraftRevisions,
+    growthCheckReportShares,
     technicians,
     jobTasks,
     jobProducts,
@@ -6440,9 +7161,11 @@ export function createDbModuleMock() {
     bookingRequests,
     bookingSettings,
     agentActions,
+    crews,
     fieldSyncBatches,
     fieldSyncOperations,
     inquirySubmitIdempotency,
+    serviceAreas,
     growthIntakeChecks,
     growthIntakeIdentityCandidates,
     growthIntakeFindings,
@@ -6493,6 +7216,15 @@ export function resetTestState(): void {
   state.stockLocations.length = 0;
   state.stockLevels.length = 0;
   state.stockMovements.length = 0;
+  state.callTrackingSettings.length = 0;
+  state.callTrackingNumbers.length = 0;
+  state.callRecords.length = 0;
+  state.growthCheckScans.length = 0;
+  state.growthCheckFindings.length = 0;
+  state.growthCheckFindingRevisions.length = 0;
+  state.growthCheckReportDrafts.length = 0;
+  state.growthCheckReportDraftRevisions.length = 0;
+  state.growthCheckReportShares.length = 0;
   state.technicians.length = 0;
   state.jobTasks.length = 0;
   state.jobProducts.length = 0;
@@ -6508,9 +7240,11 @@ export function resetTestState(): void {
   state.bookingRequests.length = 0;
   state.bookingSettings.length = 0;
   state.agentActions.length = 0;
+  state.crews.length = 0;
   state.fieldSyncBatches.length = 0;
   state.fieldSyncOperations.length = 0;
   state.inquirySubmitIdempotency.length = 0;
+  state.serviceAreas.length = 0;
   state.growthIntakeChecks.length = 0;
   state.growthIntakeIdentityCandidates.length = 0;
   state.growthIntakeFindings.length = 0;
@@ -6860,6 +7594,23 @@ export function seedGrowthIntakeCheck(
   return record;
 }
 
+export function seedCrew(input: Partial<TestCrewRecord> & Pick<TestCrewRecord, "companyId" | "name">): TestCrewRecord {
+  const now = new Date();
+  const record: TestCrewRecord = {
+    id: input.id ?? randomUUID(),
+    companyId: input.companyId,
+    name: input.name,
+    color: input.color ?? null,
+    isActive: input.isActive ?? true,
+    version: input.version ?? 1,
+    createdAt: input.createdAt ?? now,
+    updatedAt: input.updatedAt ?? now,
+    deletedAt: input.deletedAt ?? null
+  };
+  state.crews.push(record);
+  return record;
+}
+
 export function seedAgentAction(
   values: Partial<TestAgentActionRecord> & Pick<TestAgentActionRecord, "companyId">
 ): TestAgentActionRecord {
@@ -6881,6 +7632,28 @@ export function seedAgentAction(
     ...values
   });
   state.agentActions.push(record);
+  return record;
+}
+
+export function seedVipMembershipTier(
+  values: Partial<TestVipMembershipTierRecord> & Pick<TestVipMembershipTierRecord, "companyId" | "name">
+): TestVipMembershipTierRecord {
+  const record: TestVipMembershipTierRecord = {
+    id: values.id ?? randomUUID(),
+    companyId: values.companyId,
+    name: values.name,
+    description: values.description ?? null,
+    monthlyPrice: values.monthlyPrice ?? "29.00",
+    discountPercent: values.discountPercent ?? "10",
+    includedVisitsPerMonth: values.includedVisitsPerMonth ?? null,
+    stripeMonthlyPriceId: values.stripeMonthlyPriceId ?? null,
+    sortOrder: values.sortOrder ?? 0,
+    isActive: values.isActive ?? true,
+    createdAt: values.createdAt ?? new Date(),
+    updatedAt: values.updatedAt ?? new Date(),
+    deletedAt: values.deletedAt ?? null
+  };
+  state.vipMembershipTiers.push(record);
   return record;
 }
 

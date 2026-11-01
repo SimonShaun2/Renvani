@@ -108,7 +108,7 @@ const serviceAgreementRoutes: FastifyPluginAsync = async (fastify) => {
   }, pauseAgreementHandler);
 
   fastify.post("/service-agreements/:id/retry-payment", {
-    preHandler: authenticate,
+    preHandler: [authenticate, requireRole(["owner", "admin", "dispatcher", "office"])],
     preValidation: retryPaymentValidation,
     schema: retryPaymentRouteSchema
   }, retryPaymentHandler);

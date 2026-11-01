@@ -5,7 +5,7 @@ import { canRoleAccessPath, getDefaultRouteForRole, type UserRole } from "@/src/
 const s = vi.hoisted(() => ({ role: "owner" as string | null }));
 vi.mock("next/headers", () => ({
   cookies: async () => ({
-    get: (_name: string) => undefined
+    get: () => undefined
   })
 }));
 vi.mock("next/navigation", () => ({

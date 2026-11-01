@@ -5,6 +5,7 @@ import { Queue as BullQueue } from "bullmq";
 
 import {
   DeadLetterJobEnvelopeV1Schema,
+  PlatformQueueNameV1Schema,
   type DeadLetterRecoveryRequestV1
 } from "@fsm/types";
 
@@ -97,7 +98,13 @@ export async function recoverDeadLetterJob(
   request: DeadLetterRecoveryRequestV1,
   deps: DeadLetterRecoveryDeps = { getDeadLetterQueue }
 ): Promise<string> {
-  const dlq = deps.getDeadLetterQueue(request.sourceQueue);
+  const sourceQueueName = PlatformQueueNameV1Schema.parse(request.sourceQueue);
+
+  if (sourceQueue.name !== sourceQueueName) {
+    throw new Error("Source queue object does not match recovery request");
+  }
+
+  const dlq = deps.getDeadLetterQueue(sourceQueueName);
   const deadLetterJob = await dlq.getJob(request.deadLetterJobId);
 
   if (!deadLetterJob) {
@@ -106,13 +113,13 @@ export async function recoverDeadLetterJob(
 
   const envelope = DeadLetterJobEnvelopeV1Schema.parse(deadLetterJob.data);
 
-  if (envelope.sourceQueue !== request.sourceQueue) {
+  if (envelope.sourceQueue !== sourceQueueName) {
     throw new Error("Dead-letter job source queue mismatch");
   }
 
   const recovered = await sourceQueue.add(envelope.jobName, envelope.payload, {
     ...platformDefaultJobOptions(),
-    jobId: buildDeadLetterRecoveryJobId(request.sourceQueue, envelope.sourceJobId)
+    jobId: buildDeadLetterRecoveryJobId(sourceQueueName, envelope.sourceJobId)
   });
 
   if (!recovered.id) {

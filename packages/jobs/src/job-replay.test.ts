@@ -1,6 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { replayFailedJobById, resolveCompanyIdFromJobData } from "./job-replay.js";
+import {
+  getQueueByName,
+  replayFailedJobById,
+  resolveCompanyIdFromJobData
+} from "./job-replay.js";
 import { QUEUE_NAMES } from "./queue-names.js";
 
 const COMPANY_ID = "22222222-2222-4222-8222-222222222222";
@@ -22,6 +26,23 @@ describe("resolveCompanyIdFromJobData", () => {
     expect(resolveCompanyIdFromJobData(null)).toBeUndefined();
     expect(resolveCompanyIdFromJobData({ companyId: 1 })).toBeUndefined();
   });
+});
+
+describe("getQueueByName", () => {
+  it("returns an own, allowed platform queue", () => {
+    const queue = { getJob: vi.fn() };
+
+    expect(getQueueByName({ [QUEUE_NAMES.imports]: queue }, QUEUE_NAMES.imports)).toBe(queue);
+  });
+
+  it.each(["constructor", "toString", "arbitrary-queue"])(
+    "rejects inherited or unknown queue name %s",
+    (queueName) => {
+      expect(() => getQueueByName({}, queueName)).toThrowError(
+        expect.objectContaining({ code: "VALIDATION_ERROR" })
+      );
+    }
+  );
 });
 
 describe("replayFailedJobById", () => {

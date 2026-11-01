@@ -1,6 +1,6 @@
 import type { Queue } from "bullmq";
 
-import { UuidSchema } from "@fsm/types";
+import { PlatformQueueNameV1Schema, UuidSchema } from "@fsm/types";
 
 import { isJobExhausted } from "./dead-letter-job.js";
 import { QUEUE_NAMES } from "./queue-names.js";
@@ -109,10 +109,16 @@ export async function replayFailedJobById(
 }
 
 export function getQueueByName(
-  queues: Record<(typeof QUEUE_NAMES)[keyof typeof QUEUE_NAMES], Pick<Queue, "getJob">>,
-  queueName: ReplayFailedJobInput["queueName"]
+  queues: Readonly<Record<string, Pick<Queue, "getJob">>>,
+  queueName: string
 ): Pick<Queue, "getJob"> {
-  const queue = queues[queueName];
+  const parsedQueueName = PlatformQueueNameV1Schema.safeParse(queueName);
+
+  if (!parsedQueueName.success || !Object.hasOwn(queues, parsedQueueName.data)) {
+    throw new JobReplayError("VALIDATION_ERROR", `Unknown queue name: ${queueName}`);
+  }
+
+  const queue = queues[parsedQueueName.data];
 
   if (!queue) {
     throw new JobReplayError("VALIDATION_ERROR", `Unknown queue name: ${queueName}`);

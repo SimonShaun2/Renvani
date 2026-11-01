@@ -176,7 +176,7 @@ describe("recoverDeadLetterJob", () => {
     };
 
     const recoveredJobId = await recoverDeadLetterJob(
-      { add: sourceAdd } as unknown as Queue,
+      { name: "imports", add: sourceAdd } as unknown as Queue,
       request,
       { getDeadLetterQueue: () => deadLetterQueue as unknown as Pick<Queue, "getJob"> }
     );
@@ -190,6 +190,19 @@ describe("recoverDeadLetterJob", () => {
     expect(remove).toHaveBeenCalledOnce();
   });
 
+  it("rejects target confusion before reading or mutating the DLQ", async () => {
+    const sourceAdd = vi.fn();
+    const getDeadLetterQueue = vi.fn();
+
+    await expect(recoverDeadLetterJob(
+      { name: "notifications", add: sourceAdd } as unknown as Queue,
+      request,
+      { getDeadLetterQueue }
+    )).rejects.toThrow("Source queue object does not match recovery request");
+    expect(getDeadLetterQueue).not.toHaveBeenCalled();
+    expect(sourceAdd).not.toHaveBeenCalled();
+  });
+
   it("fails closed when the stored envelope belongs to another source queue", async () => {
     const sourceAdd = vi.fn();
     const remove = vi.fn();
@@ -201,7 +214,7 @@ describe("recoverDeadLetterJob", () => {
     };
 
     await expect(recoverDeadLetterJob(
-      { add: sourceAdd } as unknown as Queue,
+      { name: "imports", add: sourceAdd } as unknown as Queue,
       request,
       { getDeadLetterQueue: () => deadLetterQueue as unknown as Pick<Queue, "getJob"> }
     )).rejects.toThrow("Dead-letter job source queue mismatch");
@@ -219,7 +232,7 @@ describe("recoverDeadLetterJob", () => {
     };
 
     await expect(recoverDeadLetterJob(
-      { add: sourceAdd } as unknown as Queue,
+      { name: "imports", add: sourceAdd } as unknown as Queue,
       request,
       { getDeadLetterQueue: () => deadLetterQueue as unknown as Pick<Queue, "getJob"> }
     )).rejects.toThrow("Redis unavailable");

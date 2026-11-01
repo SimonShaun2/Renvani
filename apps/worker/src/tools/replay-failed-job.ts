@@ -13,6 +13,7 @@ import {
   webhooksQueue
 } from "@fsm/jobs";
 import { env } from "@fsm/config";
+import { PlatformQueueNameV1Schema, type PlatformQueueNameV1 } from "@fsm/types";
 
 const queueRegistry = {
   [QUEUE_NAMES.imports]: importsQueue,
@@ -24,7 +25,7 @@ const queueRegistry = {
   [QUEUE_NAMES.operator]: operatorQueue,
   [QUEUE_NAMES.exports]: exportsQueue,
   [QUEUE_NAMES.growth]: growthQueue
-};
+} satisfies Record<PlatformQueueNameV1, typeof importsQueue>;
 
 function readArg(flag: string): string | undefined {
   const index = process.argv.indexOf(flag);
@@ -55,14 +56,15 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  if (!(queueName in queueRegistry)) {
+  const parsedQueueName = PlatformQueueNameV1Schema.safeParse(queueName);
+  if (!parsedQueueName.success || !Object.hasOwn(queueRegistry, parsedQueueName.data)) {
     console.error(`Unknown queue "${queueName}". Valid: ${Object.keys(queueRegistry).join(", ")}`);
     process.exit(1);
   }
 
-  const queue = getQueueByName(queueRegistry, queueName as (typeof QUEUE_NAMES)[keyof typeof QUEUE_NAMES]);
+  const queue = getQueueByName(queueRegistry, parsedQueueName.data);
   const result = await replayFailedJobById(queue, {
-    queueName: queueName as (typeof QUEUE_NAMES)[keyof typeof QUEUE_NAMES],
+    queueName: parsedQueueName.data,
     jobId,
     expectedCompanyId,
     requestedByUserId,

@@ -213,7 +213,12 @@ describe("revenue agent proposals", () => {
 
   it("approve → execute marks the recommendation actioned and records the approved draft", async () => {
     const owner = createAuthContext("owner");
-    const { rec } = seedRec(owner.company.id);
+    const { rec, customer } = seedRec(owner.company.id);
+    fakeDb.seedBookingRequest({
+      companyId: owner.company.id, customerId: customer.id, firstName: "Chris", lastName: "Pine",
+      phone: customer.phone!, addressLine1: "1 St", city: "Austin", state: "TX", zip: "78701",
+      smsConsentAppointments: true
+    });
     const { proposal } = (await propose(owner.authorization, rec.id)).body;
 
     const approved = await request(app.server)
@@ -267,6 +272,41 @@ describe("revenue agent proposals", () => {
       .send({ expectedVersion: approved.body.version });
     expect(approved.status).toBe(200);
     expect(executed.status).toBeGreaterThanOrEqual(400);
+    expect(fakeDb.getTestState().aiRecommendations.find((row) => row.id === rec.id)?.status).toBe("pending");
+  });
+
+  it("denies marketing execution for a new customer with default preferences and no grant", async () => {
+    const owner = createAuthContext("owner");
+    const { rec } = seedRec(owner.company.id, { type: "reactivation" });
+    const { proposal } = (await propose(owner.authorization, rec.id)).body;
+    await request(app.server).post(`/api/v1/agent-actions/${proposal.id}/approve`)
+      .set("Authorization", owner.authorization).send({});
+    const executed = await request(app.server).post(`/api/v1/agent-actions/${proposal.id}/execute`)
+      .set("Authorization", owner.authorization).send({});
+    expect(executed.status).toBe(409);
+    expect(executed.body.error).toBe("CONSENT_REQUIRED");
+    expect(fakeDb.getTestState().aiRecommendations.find((row) => row.id === rec.id)?.status).toBe("pending");
+  });
+
+  it("rechecks a marketing grant after proposal and keeps cross-tenant action IDs private", async () => {
+    const owner = createAuthContext("owner");
+    const other = createAuthContext("owner", "other-company");
+    const { rec, customer } = seedRec(owner.company.id, { type: "reactivation" });
+    const grant = fakeDb.seedBookingRequest({ companyId: owner.company.id, customerId: customer.id,
+      firstName: "Chris", lastName: "Pine", phone: customer.phone!, addressLine1: "1 St",
+      city: "Austin", state: "TX", zip: "78701", smsConsentMarketing: true });
+    const { proposal } = (await propose(owner.authorization, rec.id)).body;
+    expect((await request(app.server).post(`/api/v1/agent-actions/${proposal.id}/execute`)
+      .set("Authorization", other.authorization).send({})).status).toBe(404);
+    await request(app.server).post(`/api/v1/agent-actions/${proposal.id}/approve`)
+      .set("Authorization", owner.authorization).send({});
+    const currentGrant = fakeDb.getTestState().bookingRequests.find((row) => row.id === grant.id);
+    expect(currentGrant).toBeDefined();
+    currentGrant!.smsConsentMarketing = false;
+    const executed = await request(app.server).post(`/api/v1/agent-actions/${proposal.id}/execute`)
+      .set("Authorization", owner.authorization).send({});
+    expect(executed.status).toBe(409);
+    expect(executed.body.error).toBe("CONSENT_REQUIRED");
     expect(fakeDb.getTestState().aiRecommendations.find((row) => row.id === rec.id)?.status).toBe("pending");
   });
 

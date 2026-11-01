@@ -6,8 +6,15 @@ const provisionClerkMembership = vi.fn();
 
 vi.mock("../../services/clerk-provisioning.service.js", () => ({
   provisionClerkOrganization,
+  // Detailed variant delegates to the mock; a { skipReason } return from the mock is passed through as-is.
+  provisionClerkOrganizationDetailed: async (input: unknown) => {
+    const out = await provisionClerkOrganization(input);
+    return out && typeof out === "object" && "skipReason" in out ? out : { company: out ?? null };
+  },
   provisionClerkMembership
 }));
+const syncClerkUserRoleMetadata = vi.hoisted(() => vi.fn(async () => "synced"));
+vi.mock("../../lib/clerk-role-metadata.js", () => ({ syncClerkUserRoleMetadata }));
 const syncClerkUserUpdated = vi.fn();
 const deactivateClerkUser = vi.fn();
 const deactivateClerkMembership = vi.fn();
@@ -63,6 +70,14 @@ describe("Clerk webhook", () => {
     syncClerkUserUpdated.mockReset().mockResolvedValue({ status: "updated" });
     deactivateClerkUser.mockReset().mockResolvedValue({ status: "deactivated" });
     deactivateClerkMembership.mockReset().mockResolvedValue({ status: "deactivated" });
+  });
+
+  it("organization.created for an already-linked creator acks 200 with reason, no company id", async () => {
+    provisionClerkOrganization.mockResolvedValueOnce({ company: null, skipReason: "creator_already_linked" });
+    const res = await send({ type: "organization.created", data: { id: "org_o", name: "Orphan", created_by: "user_x" } });
+    expect(res.statusCode).toBe(200);
+    expect(res.json()).toEqual({ received: true, skipped: true, reason: "creator_already_linked" });
+    expect(provisionClerkOrganization).toHaveBeenCalledWith(expect.objectContaining({ createdBy: "user_x" }));
   });
 
   it("FS-158: a failed delivery releases the claim and the retry is processed", async () => {
@@ -126,7 +141,7 @@ describe("Clerk webhook", () => {
   it("provisions a company on organization.created", async () => {
     const res = await send({ type: "organization.created", data: { id: "org_1", name: "Acme" } });
     expect(res.statusCode).toBe(200);
-    expect(provisionClerkOrganization).toHaveBeenCalledWith({ organizationId: "org_1", name: "Acme" });
+    expect(provisionClerkOrganization).toHaveBeenCalledWith({ organizationId: "org_1", name: "Acme", createdBy: null });
   });
 
   it("provisions company + user on organizationMembership.created", async () => {
@@ -149,6 +164,40 @@ describe("Clerk webhook", () => {
       clerkUserId: "user_ava",
       emailVerified: false
     });
+  });
+
+  it("publishes the provisioned DB role to Clerk public_metadata (fixes /no-access for new owners)", async () => {
+    syncClerkUserRoleMetadata.mockClear();
+    provisionClerkMembership.mockResolvedValueOnce({ status: "created", companyId: "c1", role: "owner" });
+    const res = await send({
+      type: "organizationMembership.created",
+      data: {
+        role: "org:admin",
+        organization: { id: "org_1", name: "Acme" },
+        public_user_data: { identifier: "owner@acme.com", user_id: "user_ava" }
+      }
+    });
+    expect(res.statusCode).toBe(200);
+    expect(syncClerkUserRoleMetadata).toHaveBeenCalledWith("user_ava", "owner");
+    expect(res.json()).toMatchObject({ status: "created", role: "owner", roleSync: "synced" });
+  });
+
+  it("does not touch Clerk metadata when provisioning was skipped (tenant mismatch)", async () => {
+    syncClerkUserRoleMetadata.mockClear();
+    provisionClerkMembership.mockResolvedValueOnce({ status: "skipped", companyId: "c1" });
+    const res = await send({
+      type: "organizationMembership.created",
+      data: { organization: { id: "org_1" }, public_user_data: { identifier: "x@y.com", user_id: "user_x" } }
+    });
+    expect(res.statusCode).toBe(200);
+    expect(syncClerkUserRoleMetadata).not.toHaveBeenCalled();
+    expect(res.json()).toMatchObject({ roleSync: "not_needed" });
+  });
+
+  it("passes the org creator (created_by) on organization.created", async () => {
+    const res = await send({ type: "organization.created", data: { id: "org_9", name: "Nine", created_by: "user_c" } });
+    expect(res.statusCode).toBe(200);
+    expect(provisionClerkOrganization).toHaveBeenCalledWith({ organizationId: "org_9", name: "Nine", createdBy: "user_c" });
   });
 
   it("acks user.created without provisioning", async () => {

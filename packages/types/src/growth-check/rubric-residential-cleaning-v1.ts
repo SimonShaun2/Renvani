@@ -79,11 +79,3 @@ export const RESIDENTIAL_CLEANING_RUBRIC_V1: GrowthCheckRubricDefinition = {
     }
   ]
 };
-
-export function getGrowthCheckRubricById(rubricId: string): GrowthCheckRubricDefinition | null {
-  if (rubricId === RESIDENTIAL_CLEANING_RUBRIC_V1.id) {
-    return RESIDENTIAL_CLEANING_RUBRIC_V1;
-  }
-
-  return null;
-}

@@ -14,6 +14,7 @@ import {
   createConnectOnboardingLink,
   createExpressConnectedAccount,
   createExpressDashboardLink,
+  createTestProvisionedConnectedAccount,
   retrieveConnectedAccount,
   type ConnectEmbeddedComponent,
   type StripeConnectAccountSnapshot
@@ -74,6 +75,7 @@ function buildStripeConnectStatus(
       lastPayoutAmount: snapshot.lastPayoutAmount,
       lastPayoutAt: snapshot.lastPayoutAt,
       platformFeePercent: resolveCompanyServiceFeePercent(company),
+      serviceFeePercent: resolveCompanyServiceFeePercent(company),
       renvaniPlanTier: readRenvaniSubscriptionPlan(company)
     };
   }
@@ -87,6 +89,7 @@ function buildStripeConnectStatus(
     detailsSubmitted: storedSettings.detailsSubmitted ?? false,
     stripeAccountId: company.stripeAccountId,
     platformFeePercent: resolveCompanyServiceFeePercent(company),
+    serviceFeePercent: resolveCompanyServiceFeePercent(company),
     renvaniPlanTier: readRenvaniSubscriptionPlan(company)
   };
 }
@@ -306,4 +309,80 @@ export async function createDashboardLink(companyId: string): Promise<{ url: str
   }
 
   return createExpressDashboardLink(company.stripeAccountId);
+}
+
+const TEST_PROVISION_TIERS = new Set(["development", "dev", "staging", "tester"]);
+
+/** Tester/dev-only gate: explicit non-production tier AND a Stripe TEST secret key. Fails closed. */
+export function isConnectTestProvisionAllowed(
+  source: Record<string, string | undefined> = process.env
+): boolean {
+  const tier = source.RENVANI_DEPLOYMENT_TIER?.trim().toLowerCase() ?? "";
+  const key = source.STRIPE_SECRET_KEY ?? "";
+  return TEST_PROVISION_TIERS.has(tier) && key.startsWith("sk_test_");
+}
+
+export interface TestProvisionResult {
+  stripeAccountId: string;
+  status: "active" | "pending";
+}
+
+/**
+ * Create (once) a platform-onboarded Stripe TEST connected account for the caller's company and
+ * persist stripeAccountId + the stripeConnect snapshot, which is what invoice send and connect
+ * status read. Idempotent: an existing stripeAccountId is refreshed, never replaced.
+ */
+export async function provisionTestConnectAccount(
+  companyId: string,
+  tosIp: string
+): Promise<TestProvisionResult> {
+  const company = await getCompanyRecord(companyId, db);
+
+  if (company.stripeAccountId) {
+    const snapshot = await retrieveConnectedAccount(company.stripeAccountId);
+    await db.transaction(async (tx) => updateStripeConnectSnapshot(tx, company, snapshot));
+    return {
+      stripeAccountId: company.stripeAccountId,
+      status: snapshot.chargesEnabled ? "active" : "pending"
+    };
+  }
+
+  const snapshot = await createTestProvisionedConnectedAccount({
+    companyId,
+    companyName: company.name,
+    tosIp
+  });
+
+  return db.transaction(async (tx) => {
+    const updated = await tx
+      .update(companies)
+      .set({ stripeAccountId: snapshot.id, updatedAt: new Date() })
+      .where(and(eq(companies.id, companyId), isNull(companies.deletedAt), isNull(companies.stripeAccountId)))
+      .returning();
+    const row = updated[0];
+
+    if (!row) {
+      // Lost a race with another provision/onboard call: keep the stored account, never a second one.
+      const current = await getCompanyRecord(companyId, tx);
+      if (!current.stripeAccountId) {
+        throw new AppError(ErrorCode.NOT_FOUND, "Company not found");
+      }
+      return { stripeAccountId: current.stripeAccountId, status: "pending" as const };
+    }
+
+    await updateStripeConnectSnapshot(tx, row, snapshot);
+    await emitEventWithExecutor(tx, {
+      companyId,
+      eventType: "company.stripe_onboarding_started",
+      entityType: "company",
+      entityId: row.id,
+      payload: { stripeAccountId: snapshot.id, testProvisioned: true },
+      summary: `Stripe Connect TEST account provisioned for ${row.name}`
+    });
+
+    return {
+      stripeAccountId: snapshot.id,
+      status: snapshot.chargesEnabled ? ("active" as const) : ("pending" as const)
+    };
+  });
 }

@@ -50,6 +50,12 @@ function post(slug: string, payload: unknown, ip = "203.0.113.10") {
   });
 }
 
+function setConfiguredServiceArea(companyIdToUpdate: string, zips: string[]) {
+  const company = fakeDb.getTestState().companies.find((row) => row.id === companyIdToUpdate);
+  if (!company) throw new Error("test company not found");
+  company.settings = { ...company.settings, serviceArea: { zips, radiusMiles: null } };
+}
+
 describe("POST /api/v1/public/site/:slug/inquiry", () => {
   beforeAll(async () => {
     buildAppModule = await import("../../../app.js");
@@ -201,6 +207,60 @@ describe("POST /api/v1/public/site/:slug/inquiry", () => {
     const ok = await post("other-co", { ...valid, zip: "10001" });
     expect(ok.statusCode).toBe(201);
     expect(fakeDb.getTestState().bookingRequests[0]!.companyId).toBe(otherCompanyId);
+  });
+
+  it("uses the configured company ZIP list as the canonical inquiry and serves-zip boundary", async () => {
+    const state = fakeDb.getTestState();
+    state.serviceAreas.splice(
+      0,
+      state.serviceAreas.length,
+      ...state.serviceAreas.filter((row) => row.companyId !== companyId)
+    );
+    setConfiguredServiceArea(companyId, ["74103"]);
+
+    const insideGate = await app.inject({
+      method: "POST",
+      url: "/api/v1/public/booking/acme-hvac/serves-zip",
+      payload: { zip: "74103" }
+    });
+    const outsideGate = await app.inject({
+      method: "POST",
+      url: "/api/v1/public/booking/acme-hvac/serves-zip",
+      payload: { zip: "99999" }
+    });
+    expect(insideGate.statusCode).toBe(200);
+    expect(insideGate.json()).toEqual({ served: true });
+    expect(outsideGate.statusCode).toBe(200);
+    expect(outsideGate.json()).toEqual({ served: false });
+
+    expect((await post("acme-hvac", { ...valid, zip: "74103" })).statusCode).toBe(201);
+    const outsideInquiry = await post("acme-hvac", { ...valid, zip: "99999" });
+    expect(outsideInquiry.statusCode).toBe(400);
+    expect(outsideInquiry.json().errors).toContainEqual({
+      field: "zip",
+      message: "We don't currently serve this ZIP code"
+    });
+    expect(state.bookingRequests).toHaveLength(1);
+  });
+
+  it("falls back to active technician coverage when no configured or service-area ZIPs exist", async () => {
+    const state = fakeDb.getTestState();
+    state.serviceAreas.splice(
+      0,
+      state.serviceAreas.length,
+      ...state.serviceAreas.filter((row) => row.companyId !== companyId)
+    );
+    fakeDb.seedTechnician({
+      companyId,
+      firstName: "Terry",
+      lastName: "Tech",
+      phone: "9185550188",
+      serviceZipCodes: ["74105"]
+    });
+
+    expect((await post("acme-hvac", { ...valid, zip: "74105" })).statusCode).toBe(201);
+    expect((await post("acme-hvac", { ...valid, zip: "99999" })).statusCode).toBe(400);
+    expect(state.bookingRequests).toHaveLength(1);
   });
 
   it(`rate limits per IP (${PUBLIC_INQUIRY_IP_LIMIT}/10 min) with 429 + Retry-After`, async () => {

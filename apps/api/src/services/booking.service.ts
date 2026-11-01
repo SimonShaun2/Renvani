@@ -45,7 +45,8 @@ import {
   HOME_SERVICE_TRADE_REGISTRY,
   getTradeServices,
   parseHomeServiceTrade,
-  parseTradeDescription
+  parseTradeDescription,
+  readServiceAreaSettings
 } from "@fsm/types";
 
 import {
@@ -900,14 +901,25 @@ export async function listActiveServiceAreas(companyId: string): Promise<Array<{
 }
 
 /**
- * Server-side service-area gate for public inquiries: in area if a technician or an active service area covers
- * the ZIP (or the shop allows overflow). "unknown" when the shop has no coverage data at all.
+ * Canonical server-side service-area gate for every public ZIP decision.
+ *
+ * A configured company service-area ZIP list is authoritative. When it is absent, active service-area rows and
+ * technician coverage are the compatibility fallback, followed by the explicit overflow setting. "unknown" means
+ * the shop has supplied no coverage data and has not enabled overflow.
  */
 export async function resolvePublicZipServiceability(
   slug: string,
   zip: string
 ): Promise<{ companyId: string; serviceability: "in_area" | "out_of_area" | "unknown" }> {
-  const { settings } = await getCompanyByBookingSlug(slug, db);
+  const { company, settings } = await getCompanyByBookingSlug(slug, db);
+  const configuredArea = readServiceAreaSettings(company.settings);
+  if (configuredArea.zips.length > 0) {
+    return {
+      companyId: settings.companyId,
+      serviceability: configuredArea.zips.includes(zip) ? "in_area" : "out_of_area"
+    };
+  }
+
   const technicianRows = await listCompanyTechnicians(settings.companyId, db);
   const areas = await listActiveServiceAreas(settings.companyId);
   const areaZips = new Set(areas.flatMap((area) => area.zips.map((value) => value.trim())));

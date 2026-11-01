@@ -70,15 +70,21 @@ export function registerClerkSignOut(signOut: SignOut | null): void {
 }
 
 export async function getClerkSessionToken(): Promise<string | null> {
-  await waitForClerkBridge();
+  // Once the bridge is ready, capture its getter synchronously. Unconditionally awaiting here
+  // would let an already-authenticated request switch to a replacement session before the
+  // getter is selected.
+  if (clerkBridgeState === "loading") {
+    await waitForClerkBridge();
+  }
 
-  if (!clerkTokenGetter) {
+  const tokenGetter = clerkTokenGetter;
+  if (!tokenGetter) {
     return null;
   }
 
   // A provider failure must not be converted into an unauthenticated API request. Doing so would
   // turn a transient Clerk failure into a 401 + sign-out redirect loop.
-  return clerkTokenGetter();
+  return tokenGetter();
 }
 
 /** True when a Clerk session is registered (signed in with Clerk in this browser). */

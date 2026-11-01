@@ -17,7 +17,13 @@ export function ClerkTokenBridge() {
     setActive,
     userMemberships
   } = useOrganizationList({ userMemberships: { pageSize: 2 } });
-  const activationRef = useRef<{ organizationId: string; promise: Promise<void> } | null>(null);
+  const activationRef = useRef<{
+    organizationId: string;
+    promise: Promise<void>;
+    sessionGeneration: number;
+    sessionId: string;
+    userId: string;
+  } | null>(null);
   const sessionGenerationRef = useRef(0);
   const authContextRef = useRef({ isSignedIn, orgId, sessionId, userId });
 
@@ -52,14 +58,16 @@ export function ClerkTokenBridge() {
     const sessionGeneration = sessionGenerationRef.current;
     const expectedSessionId = sessionId;
     const expectedUserId = userId;
-    const assertCurrentSession = (expectedOrganizationId: string): void => {
+    const assertCurrentSession = (expectedOrganizationId: string, requireExpectedOrganization: boolean): void => {
       const current = authContextRef.current;
       if (
         sessionGenerationRef.current !== sessionGeneration ||
         !current.isSignedIn ||
         current.sessionId !== expectedSessionId ||
         current.userId !== expectedUserId ||
-        (current.orgId !== null && current.orgId !== undefined && current.orgId !== expectedOrganizationId)
+        (requireExpectedOrganization
+          ? current.orgId !== expectedOrganizationId
+          : current.orgId !== null && current.orgId !== undefined && current.orgId !== expectedOrganizationId)
       ) {
         throw new Error("Clerk session changed while resolving an organization-scoped token");
       }
@@ -69,7 +77,7 @@ export function ClerkTokenBridge() {
       activationRef.current = null;
       registerClerkTokenGetter(async () => {
         const token = await getToken();
-        assertCurrentSession(orgId);
+        assertCurrentSession(orgId, true);
         if (!token) {
           throw new Error("Clerk did not issue an organization-scoped session token");
         }
@@ -98,10 +106,18 @@ export function ClerkTokenBridge() {
     const organizationId = soleMembership.organization.id;
     registerClerkTokenGetter(async () => {
       let activation = activationRef.current;
-      if (activation?.organizationId !== organizationId) {
+      if (
+        activation?.organizationId !== organizationId ||
+        activation.sessionGeneration !== sessionGeneration ||
+        activation.sessionId !== expectedSessionId ||
+        activation.userId !== expectedUserId
+      ) {
         activation = {
           organizationId,
-          promise: setActive({ organization: organizationId }).then(() => undefined)
+          promise: setActive({ organization: organizationId }).then(() => undefined),
+          sessionGeneration,
+          sessionId: expectedSessionId,
+          userId: expectedUserId
         };
         activationRef.current = activation;
       }
@@ -115,9 +131,9 @@ export function ClerkTokenBridge() {
         throw error;
       }
 
-      assertCurrentSession(organizationId);
+      assertCurrentSession(organizationId, false);
       const token = await getToken({ skipCache: true });
-      assertCurrentSession(organizationId);
+      assertCurrentSession(organizationId, true);
       if (!token) {
         throw new Error("Clerk did not issue an organization-scoped session token");
       }

@@ -75,6 +75,13 @@ describe("ClerkTokenBridge", () => {
   });
 
   it("activates the sole organization before issuing the API token", async () => {
+    let resolveActivation: (() => void) | undefined;
+    clerk.setActive = vi.fn().mockImplementation(
+      () =>
+        new Promise<void>((resolve) => {
+          resolveActivation = resolve;
+        })
+    );
     clerk.isLoaded = true;
     clerk.isSignedIn = true;
     clerk.orgId = null;
@@ -83,9 +90,14 @@ describe("ClerkTokenBridge", () => {
     clerk.organizationListLoaded = true;
     clerk.memberships = [{ organization: { id: "org_staging" } }];
 
-    render(<ClerkTokenBridge />);
+    const view = render(<ClerkTokenBridge />);
+    const token = getClerkSessionToken();
 
-    await expect(getClerkSessionToken()).resolves.toBe("clerk.jwt");
+    clerk.orgId = "org_staging";
+    await act(async () => view.rerender(<ClerkTokenBridge />));
+    resolveActivation?.();
+
+    await expect(token).resolves.toBe("clerk.jwt");
     expect(clerk.setActive).toHaveBeenCalledWith({ organization: "org_staging" });
     expect(clerk.getToken).toHaveBeenCalledWith({ skipCache: true });
   });
@@ -155,10 +167,16 @@ describe("ClerkTokenBridge", () => {
   });
 
   it("retries organization activation after a transient failure", async () => {
+    let resolveRetry: (() => void) | undefined;
     clerk.setActive = vi
       .fn<(options: { organization: string }) => Promise<void>>()
       .mockRejectedValueOnce(new Error("temporary Clerk failure"))
-      .mockResolvedValueOnce(undefined);
+      .mockImplementationOnce(
+        () =>
+          new Promise<void>((resolve) => {
+            resolveRetry = resolve;
+          })
+      );
     clerk.isLoaded = true;
     clerk.isSignedIn = true;
     clerk.orgId = null;
@@ -167,10 +185,78 @@ describe("ClerkTokenBridge", () => {
     clerk.organizationListLoaded = true;
     clerk.memberships = [{ organization: { id: "org_staging" } }];
 
-    render(<ClerkTokenBridge />);
+    const view = render(<ClerkTokenBridge />);
 
     await expect(getClerkSessionToken()).rejects.toThrow("temporary Clerk failure");
-    await expect(getClerkSessionToken()).resolves.toBe("clerk.jwt");
+    const retry = getClerkSessionToken();
+
+    clerk.orgId = "org_staging";
+    await act(async () => view.rerender(<ClerkTokenBridge />));
+    resolveRetry?.();
+
+    await expect(retry).resolves.toBe("clerk.jwt");
     expect(clerk.setActive).toHaveBeenCalledTimes(2);
+  });
+
+  it("rejects an active-organization token if that organization is cleared in flight", async () => {
+    let resolveToken: ((token: string) => void) | undefined;
+    clerk.getToken = vi.fn().mockImplementation(
+      () =>
+        new Promise<string>((resolve) => {
+          resolveToken = resolve;
+        })
+    );
+    clerk.isLoaded = true;
+    clerk.isSignedIn = true;
+    clerk.orgId = "org_staging";
+    clerk.sessionId = "session_qa277";
+    clerk.userId = "user_qa277";
+
+    const view = render(<ClerkTokenBridge />);
+    const token = getClerkSessionToken();
+
+    clerk.orgId = null;
+    clerk.organizationListLoaded = true;
+    clerk.memberships = [{ organization: { id: "org_staging" } }];
+    await act(async () => view.rerender(<ClerkTokenBridge />));
+    resolveToken?.("stale.clerk.jwt");
+
+    await expect(token).rejects.toThrow("Clerk session changed while resolving an organization-scoped token");
+  });
+
+  it("does not reuse an activation promise across replacement sessions with the same organization", async () => {
+    const activationResolvers: Array<() => void> = [];
+    clerk.setActive = vi.fn().mockImplementation(
+      () =>
+        new Promise<void>((resolve) => {
+          activationResolvers.push(resolve);
+        })
+    );
+    clerk.isLoaded = true;
+    clerk.isSignedIn = true;
+    clerk.orgId = null;
+    clerk.sessionId = "session_original";
+    clerk.userId = "user_original";
+    clerk.organizationListLoaded = true;
+    clerk.memberships = [{ organization: { id: "org_shared" } }];
+
+    const view = render(<ClerkTokenBridge />);
+    const originalToken = getClerkSessionToken();
+
+    clerk.sessionId = "session_replacement";
+    clerk.userId = "user_replacement";
+    await act(async () => view.rerender(<ClerkTokenBridge />));
+    const replacementToken = getClerkSessionToken();
+
+    expect(clerk.setActive).toHaveBeenCalledTimes(2);
+
+    clerk.orgId = "org_shared";
+    await act(async () => view.rerender(<ClerkTokenBridge />));
+    for (const resolve of activationResolvers) resolve();
+
+    await expect(originalToken).rejects.toThrow(
+      "Clerk session changed while resolving an organization-scoped token"
+    );
+    await expect(replacementToken).resolves.toBe("clerk.jwt");
   });
 });

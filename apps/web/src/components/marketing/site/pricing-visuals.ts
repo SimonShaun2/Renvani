@@ -147,7 +147,7 @@ export const PRICING_TREES: { desktop: VNode; mobile: VNode } = {
           "label": "Explore Flex",
           "kind": "Dark",
           "c": "bg-[#0f1530] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] text-[color:#fbf6ef] whitespace-nowrap",
-          "href": "/signup?plan=flex"
+          "href": "/demo?plan=flex"
          }
         ]
        },
@@ -250,7 +250,7 @@ export const PRICING_TREES: { desktop: VNode; mobile: VNode } = {
             ]
            }
           ],
-          "href": "/signup?plan=flat"
+          "href": "/demo?plan=flat"
          }
         ]
        }
@@ -651,7 +651,7 @@ export const PRICING_TREES: { desktop: VNode; mobile: VNode } = {
         "label": "Ask about programs",
         "kind": "Dark",
         "c": "bg-[#0f1530] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] text-[color:#fbf6ef] whitespace-nowrap",
-        "href": "/signup?plan=programs"
+        "href": "/demo"
        }
       ]
      }
@@ -868,7 +868,7 @@ export const PRICING_TREES: { desktop: VNode; mobile: VNode } = {
           "label": "Explore Flex",
           "kind": "Dark",
           "c": "bg-[#0f1530] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] text-[color:#fbf6ef] whitespace-nowrap",
-          "href": "/signup?plan=flex"
+          "href": "/demo?plan=flex"
          }
         ]
        },
@@ -971,7 +971,7 @@ export const PRICING_TREES: { desktop: VNode; mobile: VNode } = {
             ]
            }
           ],
-          "href": "/signup?plan=flat"
+          "href": "/demo?plan=flat"
          }
         ]
        }
@@ -1372,7 +1372,7 @@ export const PRICING_TREES: { desktop: VNode; mobile: VNode } = {
         "label": "Ask about programs",
         "kind": "Dark",
         "c": "bg-[#0f1530] flex items-center justify-center min-h-[44px] px-[20px] py-[12px] relative rounded-[999px] font-medium leading-[1.5] text-[15px] text-[color:#fbf6ef] whitespace-nowrap",
-        "href": "/signup?plan=programs"
+        "href": "/demo"
        }
       ]
      }

@@ -425,7 +425,7 @@ function SharesPanel({ draft }: { draft: GrowthCheckReportDraft }) {
                 <span className="font-medium">{s.status === "active" ? "Active" : s.status === "revoked" ? "Revoked" : "Expired"}</span>
               </span>
               {s.status === "active" ? (
-                <button type="button" className={`text-[12.5px] font-medium text-[#b42318] hover:underline ${ring}`} onClick={() => setRevokeId(s.id)}>
+                <button type="button" className={`inline-flex min-h-11 items-center px-2 text-[12.5px] font-medium text-[#b42318] hover:underline ${ring}`} onClick={() => setRevokeId(s.id)}>
                   Revoke
                 </button>
               ) : null}

@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, isNull, sql } from "drizzle-orm";
 
 import { activityEvents, agentActions, db, runTransactionWithTenantSession } from "@fsm/db";
 import {
@@ -169,6 +169,22 @@ async function findIdempotentReplay(
   }
 
   return { ...mapRow(row), replayed: true as const };
+}
+
+/**
+ * Serialises concurrent requests that share an Idempotency-Key within one company (transaction-scoped advisory
+ * lock on company + key, taken before the row is read). The second request waits until the first commits, then
+ * reads the committed row and audit event and replays it (200, `replayed: true`) instead of losing the
+ * compare-and-set race with a 409. No key → no lock (behaviour unchanged).
+ */
+async function lockIdempotencyKey(tx: TenantTx, companyId: string, options: AgentActionStateChangeOptions): Promise<void> {
+  if (!options.idempotencyKey) {
+    return;
+  }
+  const lockable = tx as unknown as { execute?: (query: unknown) => Promise<unknown> };
+  if (typeof lockable.execute === "function") {
+    await lockable.execute(sql`select pg_advisory_xact_lock(hashtext(${`agent-action-idempotency:${companyId}:${options.idempotencyKey}`}))`);
+  }
 }
 
 function assertExpectedVersion(row: typeof agentActions.$inferSelect, options: AgentActionStateChangeOptions): void {
@@ -376,6 +392,7 @@ export async function approveAgentAction(
 
   try {
     const mapped = await runTransactionWithTenantSession(companyId, async (tx) => {
+      await lockIdempotencyKey(tx, companyId, options);
       const row = await getActionRow(companyId, actionId, tx);
 
       const replay = await findIdempotentReplay(tx, companyId, row, "approve", options);
@@ -611,6 +628,7 @@ export async function executeAgentAction(
 
   try {
     const result = await runTransactionWithTenantSession(companyId, async (tx) => {
+      await lockIdempotencyKey(tx, companyId, options);
       const row = await getActionRow(companyId, actionId, tx);
 
       const replay = await findIdempotentReplay(tx, companyId, row, "execute", options);

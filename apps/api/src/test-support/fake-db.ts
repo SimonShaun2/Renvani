@@ -4046,6 +4046,7 @@ export interface TestCrewRecord {
   version: number;
   createdAt: Date;
   updatedAt: Date;
+  deletedAt: Date | null;
 }
 
 const crewsTable = {
@@ -4057,7 +4058,8 @@ const crewsTable = {
   isActive: "isActive",
   version: "version",
   createdAt: "createdAt",
-  updatedAt: "updatedAt"
+  updatedAt: "updatedAt",
+  deletedAt: "deletedAt"
 } as const;
 
 const agentActionsTable = {
@@ -7602,7 +7604,8 @@ export function seedCrew(input: Partial<TestCrewRecord> & Pick<TestCrewRecord, "
     isActive: input.isActive ?? true,
     version: input.version ?? 1,
     createdAt: input.createdAt ?? now,
-    updatedAt: input.updatedAt ?? now
+    updatedAt: input.updatedAt ?? now,
+    deletedAt: input.deletedAt ?? null
   };
   state.crews.push(record);
   return record;

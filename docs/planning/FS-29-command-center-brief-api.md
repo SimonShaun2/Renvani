@@ -105,6 +105,7 @@ interface CommandCenterBrief {
                       status: "on_route" | "exception" | "off" | "scheduled"; sources: CommandCenterSource[] }>;
   today: { jobsToday: number; sources: CommandCenterSource[] };   // mobile 266:1165 uses the same endpoint (decision 7)
   emptyStates: { hasAnyData: boolean; missing: Array<"inquiries" | "jobs" | "agent_actions" | "crews"> };
+  limits: { jobsTruncated: boolean; jobHistoryTruncated: boolean; actionsTruncated: boolean }; // additive (review fix)
 }
 ```
 
@@ -178,7 +179,9 @@ Run the queries in parallel inside a single tenant-scoped read. The 366-day cap 
 
 ## 10. Shipped v1 notes
 - Response sends `Cache-Control: private, no-store`.
-- Reads run in one `runTransactionWithTenantSession` transaction (RLS) with explicit `company_id` filters; aggregation is in memory. The tenant's job list is read once (needed for first-booked-job and rebooking history); revisit with SQL aggregation if p95 is slow.
+- Reads run in one `runTransactionWithTenantSession` transaction (RLS) with explicit `company_id` filters; aggregation is in memory.
+- Soft deletes: every read of a table with `deleted_at` (booking_requests, jobs, invoices, maintenance_plans, crews, agent_actions) filters `deleted_at IS NULL`, so deleted records never feed KPIs, counts or source links. `call_records` has no `deleted_at`.
+- Bounded reads (review fix): jobs are read only if created since the previous period started, completed (`actual_end`) in the compare/current window, scheduled today, or linked from an in-window booking or paid invoice (cap 5,000 rows, `limits.jobsTruncated`). First-booked-job / rebooking history is a second read of earlier booked jobs for just those customers (cap 5,000, `limits.jobHistoryTruncated`). Active plans are read only for those customers. Agent actions are open states (awaiting_approval / failed / escalated) plus `succeeded` updated since the previous period started (for delivery-failed receipts), newest first, cap 500 (`limits.actionsTruncated`). When a flag is true the figures may undercount. `emptyStates.missing` "jobs" uses a separate `LIMIT 1` existence check.
 - Booked job statuses: estimate_approved, scheduled, dispatched, in_progress, on_hold, completed, invoiced, paid, closed. Completed: completed, invoiced, paid, closed (with `actualEnd` in the period).
 - Marketing revenue: invoices with status `paid` and `paidAt` in the period whose job has `maintenancePlanId`, is a repeat booking for the customer, or has `leadAttribution.utm_campaign`; summed in cents.
 - Crew status: `exception` if any of the crew's jobs today is `on_hold`; `on_route` if any is dispatched/in_progress; `off` if none today; else `scheduled`.

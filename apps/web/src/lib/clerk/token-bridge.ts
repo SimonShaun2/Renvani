@@ -6,7 +6,7 @@ const CLERK_BRIDGE_READY_TIMEOUT_MS = 10_000;
 
 let clerkTokenGetter: TokenGetter | null = null;
 let clerkSignOut: SignOut | null = null;
-let clerkBridgeReady = false;
+let clerkBridgeState: "unavailable" | "loading" | "signed-out" | "signed-in" = "unavailable";
 const clerkBridgeWaiters = new Set<{
   resolve: () => void;
   reject: (error: Error) => void;
@@ -21,8 +21,16 @@ function resolveClerkBridgeWaiters(): void {
   clerkBridgeWaiters.clear();
 }
 
+function rejectClerkBridgeWaiters(error: Error): void {
+  for (const waiter of clerkBridgeWaiters) {
+    clearTimeout(waiter.timeout);
+    waiter.reject(error);
+  }
+  clerkBridgeWaiters.clear();
+}
+
 async function waitForClerkBridge(): Promise<void> {
-  if (clerkBridgeReady || typeof window === "undefined") return;
+  if (clerkBridgeState !== "loading" || typeof window === "undefined") return;
 
   await new Promise<void>((resolve, reject) => {
     const waiter = {
@@ -37,16 +45,24 @@ async function waitForClerkBridge(): Promise<void> {
   });
 }
 
+/** Called only by the mounted Clerk provider bridge; legacy-only builds stay unavailable. */
+export function prepareClerkTokenBridge(): void {
+  if (clerkBridgeState === "unavailable") {
+    clerkBridgeState = "loading";
+  }
+}
+
 export function registerClerkTokenGetter(getter: TokenGetter | null): void {
   clerkTokenGetter = getter;
-  clerkBridgeReady = true;
+  clerkBridgeState = getter ? "signed-in" : "signed-out";
   resolveClerkBridgeWaiters();
 }
 
 /** Marks the provider as loading again without treating that state as signed out. */
 export function resetClerkTokenBridge(): void {
   clerkTokenGetter = null;
-  clerkBridgeReady = false;
+  clerkBridgeState = "unavailable";
+  rejectClerkBridgeWaiters(new Error("Clerk authentication bridge was removed"));
 }
 
 export function registerClerkSignOut(signOut: SignOut | null): void {
@@ -67,7 +83,7 @@ export async function getClerkSessionToken(): Promise<string | null> {
 
 /** True when a Clerk session is registered (signed in with Clerk in this browser). */
 export function hasClerkSession(): boolean {
-  return clerkTokenGetter !== null;
+  return clerkBridgeState === "loading" || clerkBridgeState === "signed-in";
 }
 
 /** Ends the Clerk session (if any). Returns true when Clerk handled the sign-out and redirect. */

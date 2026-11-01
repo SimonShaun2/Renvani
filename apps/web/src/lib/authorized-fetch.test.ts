@@ -1,7 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { authorizedFetch } from "./api";
-import { registerClerkSignOut, registerClerkTokenGetter, resetClerkTokenBridge } from "./clerk/token-bridge";
+import {
+  prepareClerkTokenBridge,
+  registerClerkSignOut,
+  registerClerkTokenGetter,
+  resetClerkTokenBridge
+} from "./clerk/token-bridge";
 import { uploadImportFileForMigrate } from "@/src/hooks/migrate-onboarding.hooks";
 
 const auth = vi.hoisted(() => ({ legacy: null as string | null, cleared: 0 }));
@@ -63,6 +68,15 @@ describe("authorizedFetch (shared upload auth)", () => {
     expect(sentAuthorization(fetchMock)).toBeNull();
   });
 
+  it("does not wait for Clerk when the provider bridge is absent", async () => {
+    resetClerkTokenBridge();
+
+    await authorizedFetch("/api/v1/imports", { method: "POST" });
+
+    expect(fetchMock).toHaveBeenCalledOnce();
+    expect(sentAuthorization(fetchMock)).toBeNull();
+  });
+
   it("on 401 with a Clerk session signs out of Clerk instead of bouncing to /login", async () => {
     registerClerkTokenGetter(async () => "clerk-jwt");
     const signOut = vi.fn().mockResolvedValue(undefined);
@@ -106,6 +120,7 @@ describe("authorizedFetch (shared upload auth)", () => {
 
   it("waits for Clerk hydration before starting an authenticated request", async () => {
     resetClerkTokenBridge();
+    prepareClerkTokenBridge();
     const request = authorizedFetch("/api/v1/imports", { method: "POST" });
 
     await Promise.resolve();

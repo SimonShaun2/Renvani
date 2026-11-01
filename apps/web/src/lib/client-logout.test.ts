@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { completeClientLogout } from "./client-logout";
-import { registerClerkSignOut, registerClerkTokenGetter } from "./clerk/token-bridge";
+import { prepareClerkTokenBridge, registerClerkSignOut, registerClerkTokenGetter } from "./clerk/token-bridge";
 
 afterEach(() => {
   registerClerkTokenGetter(null);
@@ -43,5 +43,18 @@ describe("completeClientLogout", () => {
 
     expect(clearAuth).toHaveBeenCalledOnce();
     expect(redirect).toHaveBeenCalledWith("/no-access");
+  });
+
+  it("treats a hydrating Clerk provider as active during logout", async () => {
+    const clearAuth = vi.fn();
+    const redirect = vi.fn();
+    const signOut = vi.fn().mockResolvedValue(undefined);
+    prepareClerkTokenBridge();
+    registerClerkSignOut(signOut);
+
+    await completeClientLogout({ clearAuth, redirect });
+
+    expect(signOut).toHaveBeenCalledWith("/login");
+    expect(redirect).not.toHaveBeenCalled();
   });
 });

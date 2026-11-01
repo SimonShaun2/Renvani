@@ -3,7 +3,11 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { canRoleAccessPath, getDefaultRouteForRole, type UserRole } from "@/src/lib/route-access";
 
 const s = vi.hoisted(() => ({ role: "owner" as string | null }));
-vi.mock("next/headers", () => ({ cookies: async () => ({}) }));
+vi.mock("next/headers", () => ({
+  cookies: async () => ({
+    get: (_name: string) => undefined
+  })
+}));
 vi.mock("next/navigation", () => ({
   redirect: (to: string) => {
     throw Object.assign(new Error(`REDIRECT:${to}`), { to });

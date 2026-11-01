@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 import type { OperatorInboxItem } from "@fsm/types";
 
 import { DeliveryStates } from "./DeliveryStates";
-import { DELIVERY_STEPS, DELIVERY_TOKENS, deliveryBadge, deliveryEvidence, deliverySteps, deliveryToken, sortApprovals } from "./delivery-states.config";
+import { DELIVERY_STEPS, DELIVERY_TOKENS, actionResultNotice, deliveryBadge, deliveryEvidence, deliverySteps, deliveryToken, isCompleted, receiptErrorMessage, sortApprovals } from "./delivery-states.config";
 
 const item = (over: Partial<OperatorInboxItem> = {}): OperatorInboxItem => ({
   contractVersion: "0.1.0",
@@ -46,10 +46,50 @@ describe("delivery states (Figma 331:4230 / 341:4255)", () => {
     expect(deliveryEvidence(delivered)).toMatchObject({ providerReceipt: "SM123", delivered: true });
   });
 
-  it("never shows a bare 'succeeded' receipt as delivered (stub until #380)", () => {
-    const legacy = item({ state: "succeeded", executionReceipt: { outcome: "succeeded", emittedEventIds: [] } });
-    expect(deliveryToken(legacy)).toBe("queued");
-    expect(deliveryEvidence(legacy).delivered).toBe(false);
+  it("reads executionReceipt.deliveryState only; an internal succeeded action is Completed, never Delivered", () => {
+    const internal = item({ state: "succeeded", executionReceipt: { outcome: "succeeded", emittedEventIds: [] } });
+    expect(deliveryToken(internal)).toBeNull();
+    expect(isCompleted(internal)).toBe(true);
+    expect(deliveryBadge(internal)).toMatchObject({ label: "Completed", tone: "green" });
+    expect(deliveryEvidence(internal).delivered).toBe(false);
+    expect(statuses(internal)).toEqual(["done", "done", "done", "done", "done", "current"]);
+    // No derivation from state/outcome: executing without a stored deliveryState is not invented as queued.
+    expect(deliveryToken(item({ state: "executing", executionReceipt: { outcome: "queued" } }))).toBeNull();
+    expect(deliveryToken(item({ state: "executing", executionReceipt: { deliveryState: "sent" } }))).toBeNull();
+  });
+
+  it("failed rows show Delivery failure with executionReceipt.error.message", () => {
+    const failed = item({
+      state: "failed",
+      executionReceipt: { outcome: "failed", deliveryState: "failed", error: { code: "EXECUTION_FAILED", message: "Execution failed" }, failedAt: "2026-10-31T00:00:00.000Z" }
+    });
+    expect(receiptErrorMessage(failed.executionReceipt)).toBe("Execution failed");
+    expect(deliveryBadge(failed)).toMatchObject({ label: "Delivery failure", note: "Execution failed" });
+    const html = renderToStaticMarkup(
+      <QueryClientProvider client={new QueryClient()}><DeliveryStates item={failed} /></QueryClientProvider>
+    );
+    expect(html).toContain('data-testid="failure-message"');
+    expect(html).toContain("Execution failed");
+    // Internal failure (no deliveryState) still reads as failed, with its AppError message.
+    const internal = item({ state: "failed", executionReceipt: { outcome: "failed", error: { code: "CONFLICT", message: "Job was cancelled" } } });
+    expect(deliveryToken(internal)).toBe("failed");
+    expect(deliveryBadge(internal).note).toBe("Job was cancelled");
+  });
+
+  it("Failure & recovery copy does not promise a retry button", () => {
+    const html = renderToStaticMarkup(
+      <QueryClientProvider client={new QueryClient()}><DeliveryStates item={item({ state: "failed" })} /></QueryClientProvider>
+    );
+    expect(html).not.toMatch(/show a retry/i);
+    expect(html).not.toMatch(/<button[^>]*>[^<]*retry/i);
+    expect(html).toContain("nothing is retried automatically");
+  });
+
+  it("notice follows the state the API returned after execute", () => {
+    expect(actionResultNotice({ state: "executing", executionReceipt: { outcome: "queued", deliveryState: "queued" } })).toEqual({ text: "Queued · not sent. Provider delivery is still unconfirmed.", tone: "pending" });
+    expect(actionResultNotice({ state: "succeeded", executionReceipt: { outcome: "succeeded" } })).toEqual({ text: "Completed.", tone: "ok" });
+    expect(actionResultNotice({ state: "failed", executionReceipt: { error: { message: "Execution failed" } } })).toEqual({ text: "Delivery failure: Execution failed", tone: "error" });
+    expect(actionResultNotice({ state: "approved", executionReceipt: null }).text).toMatch(/^Approved\. Nothing is sent/);
   });
 
   it("failed shows the failure badge", () => {

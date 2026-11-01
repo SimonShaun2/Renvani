@@ -2,13 +2,14 @@ import { useRef } from "react";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import type { EditAgentActionParametersInput, OperatorInboxItem, OperatorInboxTimelineEntry } from "@fsm/types";
+import type { EditAgentActionParametersInput, OperatorInboxCounts, OperatorInboxItem, OperatorInboxTimelineEntry } from "@fsm/types";
 
 import { ApiError, api } from "@/src/lib/api";
 
 const operatorInboxKeys = {
   all: ["operator-inbox"] as const,
   list: (state?: string) => [...operatorInboxKeys.all, "list", state ?? "all"] as const,
+  counts: () => [...operatorInboxKeys.all, "counts"] as const,
   detail: (id: string) => [...operatorInboxKeys.all, "detail", id] as const,
   timeline: (id: string) => [...operatorInboxKeys.all, "timeline", id] as const
 };
@@ -67,6 +68,14 @@ export function useOperatorInbox(state?: string) {
   });
 }
 
+/** GET /operator/inbox/counts: per-state counts for every tab. Under the inbox key, so every write refreshes it. */
+export function useOperatorInboxCounts() {
+  return useQuery({
+    queryKey: operatorInboxKeys.counts(),
+    queryFn: () => api.get<OperatorInboxCounts>("/api/v1/operator/inbox/counts")
+  });
+}
+
 export function useOperatorInboxItem(id: string | null) {
   return useQuery({
     queryKey: id ? operatorInboxKeys.detail(id) : operatorInboxKeys.detail("pending"),
@@ -88,14 +97,23 @@ export function useEditOperatorInboxItem(item: GuardedInboxItem) {
   });
 }
 
-/** Approve / execute: body `{ expectedVersion }` (required by the API) plus an `Idempotency-Key` header. */
+/** What approve / execute answer with: the agent action row (its real `state` and `executionReceipt`). */
+export type AgentActionResult = Pick<OperatorInboxItem, "id" | "state"> & {
+  executionReceipt?: Record<string, unknown> | null;
+  replayed?: boolean;
+};
+
+/**
+ * Approve / execute: body `{ expectedVersion }` (required by the API) plus an `Idempotency-Key` header.
+ * Any answer or error refetches the inbox and counts: a failed execute is written as `failed` server-side.
+ */
 function useGuardedAgentAction(item: GuardedInboxItem, op: "approve" | "execute") {
   const queryClient = useQueryClient();
   const actionKey = useActionKey();
 
   return useMutation({
     mutationFn: () =>
-      api.post<OperatorInboxItem & { replayed?: boolean }>(
+      api.post<AgentActionResult>(
         `/api/v1/agent-actions/${item.id}/${op}`,
         { expectedVersion: item.version },
         { headers: { "Idempotency-Key": actionKey.take(item.version) } }
@@ -106,9 +124,7 @@ function useGuardedAgentAction(item: GuardedInboxItem, op: "approve" | "execute"
     },
     onError: async (err) => {
       actionKey.settle(err);
-      if (err instanceof ApiError && err.status === 409) {
-        await queryClient.invalidateQueries({ queryKey: operatorInboxKeys.all });
-      }
+      await queryClient.invalidateQueries({ queryKey: operatorInboxKeys.all });
     }
   });
 }

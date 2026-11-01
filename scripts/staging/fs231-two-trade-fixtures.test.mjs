@@ -50,4 +50,3 @@ test("rejects unsupported trades and unsafe run ids", () => {
 test("normalizes a bounded run id", () => {
   assert.equal(normalizeRunId(" QA 2026/11/01 "), "qa-2026-11-01");
 });
-

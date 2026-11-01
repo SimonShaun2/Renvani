@@ -6,6 +6,8 @@ const clerk = vi.hoisted(() => ({
   isLoaded: false,
   isSignedIn: undefined as boolean | undefined,
   orgId: undefined as string | null | undefined,
+  sessionId: undefined as string | null | undefined,
+  userId: undefined as string | null | undefined,
   signOut: vi.fn<(options: { redirectUrl: string }) => Promise<void>>(),
   organizationListLoaded: false,
   memberships: [] as Array<{ organization: { id: string } }>,
@@ -20,6 +22,8 @@ vi.mock("@clerk/nextjs", () => ({
     isLoaded: clerk.isLoaded,
     isSignedIn: clerk.isSignedIn,
     orgId: clerk.orgId,
+    sessionId: clerk.sessionId,
+    userId: clerk.userId,
     signOut: clerk.signOut
   }),
   useOrganizationList: () => ({
@@ -43,6 +47,8 @@ describe("ClerkTokenBridge", () => {
     clerk.isLoaded = false;
     clerk.isSignedIn = undefined;
     clerk.orgId = undefined;
+    clerk.sessionId = undefined;
+    clerk.userId = undefined;
     clerk.signOut = vi.fn().mockResolvedValue(undefined);
     clerk.organizationListLoaded = false;
     clerk.memberships = [];
@@ -60,6 +66,8 @@ describe("ClerkTokenBridge", () => {
     clerk.isLoaded = true;
     clerk.isSignedIn = true;
     clerk.orgId = "org_staging";
+    clerk.sessionId = "session_qa277";
+    clerk.userId = "user_qa277";
     clerk.signOut = vi.fn().mockResolvedValue(undefined);
     await act(async () => view.rerender(<ClerkTokenBridge />));
 
@@ -70,6 +78,8 @@ describe("ClerkTokenBridge", () => {
     clerk.isLoaded = true;
     clerk.isSignedIn = true;
     clerk.orgId = null;
+    clerk.sessionId = "session_qa277";
+    clerk.userId = "user_qa277";
     clerk.organizationListLoaded = true;
     clerk.memberships = [{ organization: { id: "org_staging" } }];
 
@@ -84,6 +94,8 @@ describe("ClerkTokenBridge", () => {
     clerk.isLoaded = true;
     clerk.isSignedIn = true;
     clerk.orgId = null;
+    clerk.sessionId = "session_qa277";
+    clerk.userId = "user_qa277";
     clerk.organizationListLoaded = true;
     clerk.memberships = [
       { organization: { id: "org_one" } },
@@ -103,11 +115,62 @@ describe("ClerkTokenBridge", () => {
     clerk.isLoaded = true;
     clerk.isSignedIn = true;
     clerk.orgId = null;
+    clerk.sessionId = "session_qa277";
+    clerk.userId = "user_qa277";
     clerk.organizationListLoaded = true;
 
     render(<ClerkTokenBridge />);
 
     await expect(getClerkSessionToken()).rejects.toThrow("Clerk session has no organization membership");
     expect(clerk.setActive).not.toHaveBeenCalled();
+  });
+
+  it("rejects an in-flight activation after the Clerk session changes", async () => {
+    let resolveActivation: (() => void) | undefined;
+    clerk.setActive = vi.fn().mockImplementation(
+      () =>
+        new Promise<void>((resolve) => {
+          resolveActivation = resolve;
+        })
+    );
+    clerk.isLoaded = true;
+    clerk.isSignedIn = true;
+    clerk.orgId = null;
+    clerk.sessionId = "session_original";
+    clerk.userId = "user_original";
+    clerk.organizationListLoaded = true;
+    clerk.memberships = [{ organization: { id: "org_original" } }];
+
+    const view = render(<ClerkTokenBridge />);
+    const token = getClerkSessionToken();
+
+    clerk.sessionId = "session_replacement";
+    clerk.userId = "user_replacement";
+    clerk.memberships = [{ organization: { id: "org_replacement" } }];
+    await act(async () => view.rerender(<ClerkTokenBridge />));
+    resolveActivation?.();
+
+    await expect(token).rejects.toThrow("Clerk session changed while resolving an organization-scoped token");
+    expect(clerk.getToken).not.toHaveBeenCalled();
+  });
+
+  it("retries organization activation after a transient failure", async () => {
+    clerk.setActive = vi
+      .fn<(options: { organization: string }) => Promise<void>>()
+      .mockRejectedValueOnce(new Error("temporary Clerk failure"))
+      .mockResolvedValueOnce(undefined);
+    clerk.isLoaded = true;
+    clerk.isSignedIn = true;
+    clerk.orgId = null;
+    clerk.sessionId = "session_qa277";
+    clerk.userId = "user_qa277";
+    clerk.organizationListLoaded = true;
+    clerk.memberships = [{ organization: { id: "org_staging" } }];
+
+    render(<ClerkTokenBridge />);
+
+    await expect(getClerkSessionToken()).rejects.toThrow("temporary Clerk failure");
+    await expect(getClerkSessionToken()).resolves.toBe("clerk.jwt");
+    expect(clerk.setActive).toHaveBeenCalledTimes(2);
   });
 });

@@ -11,13 +11,23 @@ import {
 } from "@/src/lib/clerk/token-bridge";
 
 export function ClerkTokenBridge() {
-  const { getToken, isLoaded, isSignedIn, orgId, signOut } = useAuth();
+  const { getToken, isLoaded, isSignedIn, orgId, sessionId, signOut, userId } = useAuth();
   const {
     isLoaded: organizationListLoaded,
     setActive,
     userMemberships
   } = useOrganizationList({ userMemberships: { pageSize: 2 } });
   const activationRef = useRef<{ organizationId: string; promise: Promise<void> } | null>(null);
+  const sessionGenerationRef = useRef(0);
+  const authContextRef = useRef({ isSignedIn, orgId, sessionId, userId });
+
+  useLayoutEffect(() => {
+    sessionGenerationRef.current += 1;
+  }, [isSignedIn, sessionId, userId]);
+
+  useLayoutEffect(() => {
+    authContextRef.current = { isSignedIn, orgId, sessionId, userId };
+  }, [isSignedIn, orgId, sessionId, userId]);
 
   useLayoutEffect(() => {
     prepareClerkTokenBridge();
@@ -39,9 +49,32 @@ export function ClerkTokenBridge() {
       return;
     }
 
+    const sessionGeneration = sessionGenerationRef.current;
+    const expectedSessionId = sessionId;
+    const expectedUserId = userId;
+    const assertCurrentSession = (expectedOrganizationId: string): void => {
+      const current = authContextRef.current;
+      if (
+        sessionGenerationRef.current !== sessionGeneration ||
+        !current.isSignedIn ||
+        current.sessionId !== expectedSessionId ||
+        current.userId !== expectedUserId ||
+        (current.orgId !== null && current.orgId !== undefined && current.orgId !== expectedOrganizationId)
+      ) {
+        throw new Error("Clerk session changed while resolving an organization-scoped token");
+      }
+    };
+
     if (orgId) {
       activationRef.current = null;
-      registerClerkTokenGetter(() => getToken());
+      registerClerkTokenGetter(async () => {
+        const token = await getToken();
+        assertCurrentSession(orgId);
+        if (!token) {
+          throw new Error("Clerk did not issue an organization-scoped session token");
+        }
+        return token;
+      });
       return;
     }
 
@@ -63,17 +96,28 @@ export function ClerkTokenBridge() {
     }
 
     const organizationId = soleMembership.organization.id;
-    if (activationRef.current?.organizationId !== organizationId) {
-      activationRef.current = {
-        organizationId,
-        promise: setActive({ organization: organizationId }).then(() => undefined)
-      };
-    }
-
-    const activation = activationRef.current.promise;
     registerClerkTokenGetter(async () => {
-      await activation;
+      let activation = activationRef.current;
+      if (activation?.organizationId !== organizationId) {
+        activation = {
+          organizationId,
+          promise: setActive({ organization: organizationId }).then(() => undefined)
+        };
+        activationRef.current = activation;
+      }
+
+      try {
+        await activation.promise;
+      } catch (error) {
+        if (activationRef.current === activation) {
+          activationRef.current = null;
+        }
+        throw error;
+      }
+
+      assertCurrentSession(organizationId);
       const token = await getToken({ skipCache: true });
+      assertCurrentSession(organizationId);
       if (!token) {
         throw new Error("Clerk did not issue an organization-scoped session token");
       }
@@ -85,8 +129,10 @@ export function ClerkTokenBridge() {
     isSignedIn,
     orgId,
     organizationListLoaded,
+    sessionId,
     setActive,
     signOut,
+    userId,
     userMemberships.data,
     userMemberships.hasNextPage,
     userMemberships.isLoading

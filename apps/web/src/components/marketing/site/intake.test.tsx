@@ -209,3 +209,49 @@ describe("marketing parity: demo plan interest + tour routes (Figma 246:5648 / 2
     expect(r).toMatchObject({ status: "invalid", message: "Check the highlighted details.", fields: { name: "Enter your name.", email: "Enter a complete email address.", company: "Enter your business name.", trade: "Choose your trade." } });
   });
 });
+
+describe("/demo blank submit (Figma 246:5638 / 246:5639)", () => {
+  it("validates Team size on /demo only, including when every other field is valid", async () => {
+    const f = vi.fn();
+    const blank = await runIntake("demo-requests", demoForm({ name: "", email: "", company: "", trade: "", teamSize: "" }), f as unknown as typeof fetch);
+    expect(blank).toMatchObject({ status: "invalid", message: "Check the highlighted details." });
+    expect(blank.status === "invalid" && blank.fields).toMatchObject({ name: expect.any(String), email: expect.any(String), company: expect.any(String), trade: "Choose your trade.", teamSize: "Choose your team size." });
+    const onlyTeam = await runIntake("demo-requests", demoForm({ teamSize: "" }), f as unknown as typeof fetch);
+    expect(onlyTeam).toMatchObject({ status: "invalid", fields: { teamSize: "Choose your team size." } });
+    expect(f).not.toHaveBeenCalled();
+  });
+
+  it("shows the amber summary at the top, amber outlines and ink2 error text, and no bottom alert", async () => {
+    const action = vi.fn(async (_p: IntakeResult | null, fd: FormData) => runIntake("demo-requests", fd, vi.fn() as unknown as typeof fetch));
+    const { container } = render(<DemoPage action={action} />);
+    await act(async () => {
+      fireEvent.submit(container.querySelector("form")!);
+    });
+    const summary = screen.getByTestId("demo-invalid-summary");
+    expect(summary.textContent).toBe("Check the highlighted details.Complete your contact details, trade, and team size before continuing.");
+    expect(summary.style.background).toMatch(/#fff4d6|rgb\(255, 244, 214\)/);
+    const form = container.querySelector("form")!;
+    expect(form.querySelector("input:not([type=hidden]):not([tabindex='-1']), select")!.compareDocumentPosition(summary) & Node.DOCUMENT_POSITION_PRECEDING).toBeTruthy();
+    expect(screen.getAllByRole("alert")).toHaveLength(1);
+    for (const id of ["demo-name", "demo-email", "demo-company", "demo-trade", "demo-team"]) {
+      const el = container.querySelector<HTMLElement>(`#${id}`);
+      if (!el) continue;
+      expect(el.getAttribute("aria-invalid")).toBe("true");
+      expect(el.className).toContain("border-[#f6b400]");
+      expect(el.style.borderColor).toBe("");
+      const err = container.querySelector<HTMLElement>(`#${id}-error`)!;
+      expect(err.dataset.tone).toBe("amber");
+      expect(err.style.color).not.toBe("rgb(180, 35, 24)");
+      expect(err.className).not.toContain("b42318");
+    }
+    expect(container.querySelector("#demo-team-error")!.textContent).toBe("Choose your team size.");
+  });
+
+  it("keeps Growth Check on its existing (red) invalid look", async () => {
+    const action = vi.fn(async () => ({ status: "invalid", fields: { email: "Enter a complete email address." }, message: "Check the highlighted details." }) as IntakeResult);
+    render(<GrowthCheckPage action={action} />);
+    await act(async () => fireEvent.submit(screen.getByRole("button", { name: "Send my report" }).closest("form")!));
+    expect(screen.getByText("Enter a complete email address.").className).toContain("b42318");
+    expect(screen.queryByTestId("demo-invalid-summary")).toBeNull();
+  });
+});

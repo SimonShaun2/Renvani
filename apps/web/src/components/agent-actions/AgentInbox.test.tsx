@@ -8,7 +8,9 @@ vi.mock("@/src/lib/api", async (orig) => {
   const actual = await orig<typeof import("@/src/lib/api")>();
   const get = (path: string) => {
     m.get(path);
-    const key = Object.keys(m.routes).find((prefix) => path.startsWith(prefix));
+    const key = Object.keys(m.routes)
+      .filter((prefix) => path.startsWith(prefix))
+      .sort((a, b) => b.length - a.length)[0];
     const fn = key ? m.routes[key] : undefined;
     return fn ? fn() : Promise.reject(new Error(`unmocked ${path}`));
   };
@@ -46,6 +48,7 @@ beforeEach(() => {
   m.post.mockReset().mockResolvedValue({ created: 2, existing: 1, skipped: 0, proposals: [] });
   m.routes = {
     "/api/v1/operator/inbox": () => Promise.resolve({ items: [item] }),
+    "/api/v1/operator/inbox/counts": () => Promise.resolve({ counts: { awaiting_approval: 1, approved: 0, executing: 2, failed: 1, expired: 0, succeeded: 3, cancelled: 0 }, total: 7 }),
     [`/api/v1/ai/revenue-agent/proposals/${ID}/consent`]: () => Promise.resolve(consent(true))
   };
 });
@@ -95,5 +98,76 @@ describe("AgentInbox", () => {
     fail = false;
     fireEvent.click(screen.getByRole("button", { name: /retry/i }));
     expect(await screen.findByText("Retention · Win-back")).toBeTruthy();
+  });
+
+  it("shows Queued · not sent and Completed tabs with counts from /operator/inbox/counts", async () => {
+    renderInbox();
+    expect(await screen.findByRole("tab", { name: "Queued · not sent 2" })).toBeTruthy();
+    expect(screen.getByRole("tab", { name: "Completed 3" })).toBeTruthy();
+    fireEvent.click(screen.getByRole("tab", { name: "Queued · not sent 2" }));
+    await waitFor(() => expect(m.get).toHaveBeenCalledWith("/api/v1/operator/inbox?state=executing"));
+    fireEvent.click(screen.getByRole("tab", { name: "Completed 3" }));
+    await waitFor(() => expect(m.get).toHaveBeenCalledWith("/api/v1/operator/inbox?state=succeeded"));
+    expect(m.get.mock.calls.some(([p]) => /state=(executed|rejected)\b/.test(String(p)))).toBe(false);
+  });
+
+  it("failed rows show Delivery failure with executionReceipt.error.message", async () => {
+    const failed = { ...item, state: "failed", overridePaths: [], executionReceipt: { outcome: "failed", deliveryState: "failed", error: { code: "EXECUTION_FAILED", message: "Execution failed" } } };
+    m.routes["/api/v1/operator/inbox"] = () => Promise.resolve({ items: [failed] });
+    renderInbox();
+    const row = await screen.findByTestId("row-failure");
+    expect(row.textContent).toBe("Delivery failureExecution failed");
+  });
+
+  it("after execute, follows the returned state (executing → Queued · not sent) and refreshes counts", async () => {
+    const approved = { ...item, state: "approved", overridePaths: ["execute"], version: 3 };
+    let executed = false;
+    m.routes["/api/v1/operator/inbox"] = () => Promise.resolve({ items: [executed ? { ...approved, state: "executing" } : approved] });
+    m.routes[`/api/v1/ai/revenue-agent/proposals/${ID}/consent`] = () => Promise.resolve(consent(false));
+    renderInbox();
+    fireEvent.click(await screen.findByText("Leah Moore"));
+    const countsBefore = m.get.mock.calls.filter(([p]) => p === "/api/v1/operator/inbox/counts").length;
+    m.post.mockImplementationOnce(() => {
+      executed = true;
+      return Promise.resolve({ id: ID, state: "executing", executionReceipt: { outcome: "queued", deliveryState: "queued" } });
+    });
+    fireEvent.click(await screen.findByRole("button", { name: "Execute now" }));
+    expect((await screen.findByTestId("action-result")).textContent).toBe("Queued · not sent. Provider delivery is still unconfirmed.");
+    expect(screen.getByRole("tab", { selected: true }).textContent).toMatch(/^Queued · not sent/);
+    await waitFor(() => expect(m.get.mock.calls.filter(([p]) => p === "/api/v1/operator/inbox/counts").length).toBeGreaterThan(countsBefore));
+    expect(screen.queryByText("Completed.")).toBeNull();
+  });
+
+  it("after execute fails server-side, shows the error and refetches (no assumed success)", async () => {
+    const approved = { ...item, state: "approved", overridePaths: ["execute"], version: 3 };
+    m.routes["/api/v1/operator/inbox"] = () => Promise.resolve({ items: [approved] });
+    m.routes[`/api/v1/ai/revenue-agent/proposals/${ID}/consent`] = () => Promise.resolve(consent(false));
+    renderInbox();
+    fireEvent.click(await screen.findByText("Leah Moore"));
+    const before = m.get.mock.calls.length;
+    m.post.mockRejectedValueOnce(new Error("Execution failed"));
+    fireEvent.click(await screen.findByRole("button", { name: "Execute now" }));
+    expect(await screen.findByRole("alert")).toBeTruthy();
+    await waitFor(() => expect(m.get.mock.calls.length).toBeGreaterThan(before));
+    expect(screen.queryByTestId("action-result")).toBeNull();
+  });
+
+  it("Approve & send only approves (never calls execute)", async () => {
+    m.routes[`/api/v1/ai/revenue-agent/proposals/${ID}/consent`] = () => Promise.resolve(consent(false));
+    renderInbox();
+    fireEvent.click(await screen.findByText("Leah Moore"));
+    m.post.mockResolvedValueOnce({ id: ID, state: "approved" });
+    const buttons = await screen.findAllByRole("button", { name: "Approve & send" });
+    fireEvent.click(buttons[buttons.length - 1]!);
+    await waitFor(() => expect(m.post).toHaveBeenCalledWith(`/api/v1/agent-actions/${ID}/approve`, expect.anything(), expect.anything()));
+    expect(m.post.mock.calls.some(([p]) => String(p).endsWith("/execute"))).toBe(false);
+    expect((await screen.findByTestId("action-result")).textContent).toMatch(/^Approved\. Nothing is sent until you execute it\./);
+  });
+  it("gives tabs, the agent filter and Find new proposals a 44px minimum tap height", async () => {
+    renderInbox();
+    await screen.findByText("Consent blocked");
+    for (const el of [...screen.getAllByRole("tab"), screen.getByRole("combobox", { name: "Agent" }), screen.getByRole("button", { name: "Find new proposals" })]) {
+      expect(el.className).toContain("min-h-11");
+    }
   });
 });

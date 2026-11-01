@@ -1,5 +1,7 @@
 import type { CommandCenterKpiKey, CommandCenterLoopStage, OperatorInboxItem } from "@fsm/types";
 
+import { monthToDateRange } from "./direct-demand.utils";
+
 /**
  * Command Center (Figma 10:2) region registry. Each region is a plug-in point: add/reorder entries here.
  * KPIs, loop and crews come from GET /api/v1/command-center/brief (FS-29); missing values render EMPTY ("—").
@@ -20,6 +22,12 @@ export interface Kpi {
   label: string;
   source: string;
 }
+
+/**
+ * Period shared by the Key numbers tiles (labelled with <LocalDate month />) and the Direct demand card:
+ * the current calendar month in the shop time zone (browser fallback). Change it here only.
+ */
+export const KEY_NUMBERS_PERIOD = { caption: "This month", range: monthToDateRange } as const;
 
 /** KPI row (10:74), filled from the brief's `kpis[]` by key. Missing/null values render EMPTY ("—"). */
 export const KPIS: Kpi[] = [

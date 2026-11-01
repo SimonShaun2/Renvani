@@ -6,6 +6,7 @@ import type { OperatorInboxItem } from "@fsm/types";
 
 import { ProposalDetail } from "@/src/components/revenue-agent/ProposalDetail";
 import {
+  type AgentActionResult,
   agentActionErrorMessage,
   useApproveAgentAction,
   useEditOperatorInboxItem,
@@ -18,7 +19,11 @@ import { ACTION_TONE_CLASS, agentActionsFor, receiptRows, type AgentActionKey } 
 import "./agent-actions-motion.css";
 
 /** Detail + every allowed action for one inbox item (Figma 10:379 detail, 10:425 audit trail, 10:430–434 buttons). */
-export function AgentActionPanel({ item, onDone }: { item: OperatorInboxItem; onDone?: () => void }) {
+/**
+ * `onDone` gets the action row the API returned (approve / execute / reject), so callers show its real state
+ * (`executing` = queued, `succeeded`, `failed`) instead of assuming success. "Approve & send" only approves.
+ */
+export function AgentActionPanel({ item, onDone }: { item: OperatorInboxItem; onDone?: (result?: AgentActionResult) => void }) {
   const approve = useApproveAgentAction(item);
   const reject = useRejectAgentAction(item.id);
   const execute = useExecuteAgentAction(item);
@@ -35,8 +40,8 @@ export function AgentActionPanel({ item, onDone }: { item: OperatorInboxItem; on
   async function attempt(fn: () => Promise<unknown>, done = true) {
     setError(null);
     try {
-      await fn();
-      if (done) onDone?.();
+      const result = await fn();
+      if (done) onDone?.(isActionResult(result) ? result : undefined);
       return true;
     } catch (err) {
       setError(agentActionErrorMessage(err));
@@ -86,7 +91,7 @@ export function AgentActionPanel({ item, onDone }: { item: OperatorInboxItem; on
           {isEmail ? (
             <input
               aria-label="Email subject"
-              className="w-full rounded-lg border border-[#e6dccb] px-3 py-2 text-sm"
+              className="min-h-11 w-full rounded-lg border border-[#e6dccb] px-3 py-2 text-sm"
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
               placeholder="Subject"
@@ -99,10 +104,10 @@ export function AgentActionPanel({ item, onDone }: { item: OperatorInboxItem; on
             onChange={(e) => setBody(e.target.value)}
           />
           <div className="flex gap-2">
-            <button type="button" disabled={busy || !body.trim()} onClick={() => void save()} className={cn("h-9 rounded-[10px] px-3.5 text-[13px] font-semibold disabled:opacity-50", ACTION_TONE_CLASS.secondary)}>
+            <button type="button" disabled={busy || !body.trim()} onClick={() => void save()} className={cn("h-11 rounded-[10px] px-3.5 text-[13px] font-semibold disabled:opacity-50", ACTION_TONE_CLASS.secondary)}>
               Save edits
             </button>
-            <button type="button" onClick={() => setEditing(false)} className={cn("h-9 rounded-[10px] px-3.5 text-[13px] font-semibold", ACTION_TONE_CLASS.ghost)}>
+            <button type="button" onClick={() => setEditing(false)} className={cn("h-11 rounded-[10px] px-3.5 text-[13px] font-semibold", ACTION_TONE_CLASS.ghost)}>
               Cancel
             </button>
           </div>
@@ -129,4 +134,8 @@ export function AgentActionPanel({ item, onDone }: { item: OperatorInboxItem; on
       ) : null}
     </div>
   );
+}
+
+function isActionResult(value: unknown): value is AgentActionResult {
+  return typeof value === "object" && value !== null && typeof (value as { id?: unknown }).id === "string" && typeof (value as { state?: unknown }).state === "string";
 }

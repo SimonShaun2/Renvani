@@ -51,6 +51,7 @@ function makeBrief(over: Partial<CommandCenterBrief> = {}): CommandCenterBrief {
     crewsToday: [{ crewId: "cr1", name: "North crew", jobCount: 3, nextStartAt: "2026-10-31T19:00:00.000Z", status: "on_route", sources: [src("crew", "cr1", "CREW-cr1abcde", "/dispatch?crew=cr1")] }],
     today: { jobsToday: 2, sources: [src("job", "j1", "J-4519", "/jobs/j1")] },
     emptyStates: { hasAnyData: true, missing: [] },
+    limits: { jobsTruncated: false, jobHistoryTruncated: false, actionsTruncated: false },
     ...over
   };
 }

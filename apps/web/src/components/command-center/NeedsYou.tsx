@@ -6,6 +6,7 @@ import type { OperatorInboxItem } from "@fsm/types";
 
 import { AgentProposalCard } from "@/src/components/revenue-agent/AgentProposalCard";
 import { AgentActionPanel } from "@/src/components/agent-actions/AgentActionPanel";
+import { deliveryToken, receiptErrorMessage } from "@/src/components/agent-actions/delivery-states.config";
 import { proposalTypeConfig } from "@/src/components/revenue-agent/proposal.config";
 import { agentActionErrorMessage, useApproveAgentAction, useOperatorInbox } from "@/src/hooks/operator-inbox.hooks";
 import { cn } from "@/src/lib/utils";
@@ -87,6 +88,11 @@ function NeedsYouItem({ item }: { item: OperatorInboxItem }) {
           </a>
         ) : null}
       </div>
+      {deliveryToken(item) === "failed" ? (
+        <p data-testid="cc-failure" className="text-[13px] text-[#b42318] [overflow-wrap:anywhere]">
+          Delivery failure · {receiptErrorMessage(item.executionReceipt) ?? "Execution failed."}
+        </p>
+      ) : null}
       {error ? <p className="text-sm text-[#b42318]">{error}</p> : null}
       {open ? (
         <div className="space-y-3 pt-2">

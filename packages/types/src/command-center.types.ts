@@ -130,6 +130,8 @@ export interface CommandCenterBrief {
   crewsToday: CommandCenterCrewToday[];
   today: { jobsToday: number; sources: CommandCenterSource[] };
   emptyStates: { hasAnyData: boolean; missing: CommandCenterMissingData[] };
+  /** Additive (FS-29 review): true when a bounded read hit its row cap, so figures may undercount. */
+  limits: { jobsTruncated: boolean; jobHistoryTruncated: boolean; actionsTruncated: boolean };
 }
 
 export interface CommandCenterKpiDefinition {

@@ -254,7 +254,7 @@ function CallsCard({ providerReady }: { providerReady: boolean }) {
   const numbers = useCallTrackingNumbers(true);
   const labelFor = (id: string) => numbers.data?.numbers.find((n) => n.id === id)?.label ?? "Tracking number";
   return (
-    <section aria-labelledby="ct-calls" className={card}>
+    <section aria-labelledby="ct-calls" className={`${card} min-w-0`}>
       <h2 id="ct-calls" className={cardTitle}>Calls</h2>
       {q.isLoading ? (
         <SkeletonCard />
@@ -268,7 +268,7 @@ function CallsCard({ providerReady }: { providerReady: boolean }) {
       ) : (
         <>
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-[#0f1530]">
+            <table className="w-full min-w-[560px] text-left text-sm text-[#0f1530]">
               <thead className="text-xs text-[#5e6684]">
                 <tr><th>When</th><th>Source</th><th>Caller</th><th>Duration</th><th>Outcome</th><th>Booked from call</th></tr>
               </thead>

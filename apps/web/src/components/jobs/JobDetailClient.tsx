@@ -122,7 +122,7 @@ export function JobDetailClient({ jobId }: JobDetailClientProps) {
     return (
       <div className="space-y-6">
         <SkeletonCard className="h-[180px]" />
-        <div className="grid gap-6 xl:grid-cols-[minmax(0,1.14fr)_minmax(0,0.86fr)]">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-6 xl:grid-cols-[minmax(0,1.14fr)_minmax(0,0.86fr)]">
           <div className="space-y-6">
             <SkeletonCard className="h-[148px]" />
             <SkeletonCard className="h-[520px]" />
@@ -165,7 +165,7 @@ export function JobDetailClient({ jobId }: JobDetailClientProps) {
         onCancelVisit={canChangeSchedule ? () => setScheduleMode("cancel") : undefined}
       />
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1.14fr)_minmax(0,0.86fr)]">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-6 xl:grid-cols-[minmax(0,1.14fr)_minmax(0,0.86fr)]">
         <div className="space-y-6">
           <JobContextCards job={job} />
 

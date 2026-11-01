@@ -161,6 +161,7 @@ describe("GET /api/v1/command-center/brief — composition", () => {
     expect(body.crewsToday).toEqual([]);
     expect(body.today).toEqual({ jobsToday: 0, sources: [] });
     expect(body.emptyStates).toEqual({ hasAnyData: false, missing: ["inquiries", "jobs", "agent_actions", "crews"] });
+    expect(body.limits).toEqual({ jobsTruncated: false, jobHistoryTruncated: false, actionsTruncated: false });
     for (const k of body.kpis) expect(typeof k.definition).toBe("string");
   });
 
@@ -310,6 +311,67 @@ describe("GET /api/v1/command-center/brief — composition", () => {
     expect(json).not.toContain(SECRET_PHONE);
     expect(json).not.toContain("private.test");
     expect(json).not.toContain(theirs.company.id);
+  });
+});
+
+describe("GET /api/v1/command-center/brief — soft deletes and bounded reads", () => {
+  it("FS29-13 excludes soft-deleted bookings, jobs, invoices, plans, crews and agent actions from KPIs, sources and counts", async () => {
+    const { company, auth } = seedTenant("deleted-co");
+    const gone = OCT(1);
+    const customer = seedCustomer(company.id);
+    const other = seedCustomer(company.id);
+    // Live: one booking → booked job; first job + active plan (recurring).
+    const liveJob = fakeDb.seedJob({ companyId: company.id, customerId: customer.id, status: "scheduled", createdAt: OCT(4) } as never);
+    seedBooking(company.id, { jobId: liveJob.id });
+    // Deleted rows that would otherwise count everywhere.
+    const deletedBooking = seedBooking(company.id, { phone: "5125550000", deletedAt: gone });
+    const deletedPlan = fakeDb.seedMaintenancePlan({ companyId: company.id, customerId: customer.id, status: "active", deletedAt: gone } as never);
+    const deletedJob = fakeDb.seedJob({ companyId: company.id, customerId: other.id, status: "paid", leadAttribution: { utm_campaign: "x" }, createdAt: OCT(5), actualEnd: OCT(6), deletedAt: gone } as never);
+    const deletedInvoice = fakeDb.seedInvoice({ companyId: company.id, customerId: customer.id, jobId: liveJob.id, status: "paid", amountPaid: "40.00", paidAt: OCT(7), deletedAt: gone } as never);
+    const deletedTodayJob = fakeDb.seedJob({ companyId: company.id, customerId: customer.id, status: "scheduled", scheduledStart: new Date(), deletedAt: gone } as never);
+    const deletedCrew = fakeDb.seedCrew({ companyId: company.id, name: "Ghost", deletedAt: gone } as never);
+    const deletedAction = fakeDb.seedAgentAction({ companyId: company.id, state: "awaiting_approval", deletedAt: gone } as never);
+    const { body } = await getBrief(auth).expect(200);
+    expect(kpi(body, "direct_inquiries")).toMatchObject({ value: 1 });
+    expect(kpi(body, "inquiry_to_booked")).toMatchObject({ numerator: 1, denominator: 1 });
+    // customer: first job, deleted plan ignored, no later job → not recurring; deleted job's customer not counted.
+    expect(kpi(body, "first_to_recurring")).toMatchObject({ numerator: 0, denominator: 1 });
+    expect(kpi(body, "marketing_revenue")).toMatchObject({ value: "0.00", detail: "0 rebookings · 0 campaigns" });
+    expect(body.loop.find((s: { stage: string }) => s.stage === "complete").count).toBe(0);
+    expect(body.needsYou.counts).toEqual({ approvals: 0, exceptions: 0 });
+    expect(body.crewsToday).toEqual([]);
+    expect(body.today.jobsToday).toBe(0);
+    const text = JSON.stringify(body);
+    for (const id of [deletedBooking.id, deletedPlan.id, deletedJob.id, deletedInvoice.id, deletedTodayJob.id, deletedCrew.id, deletedAction.id]) expect(text).not.toContain(id);
+  });
+
+  it("FS29-14 bounds job and agent-action reads to the window and flags truncation when a row cap is hit", async () => {
+    const { getCommandCenterBrief } = await import("../../services/command-center/command-center-brief.service.js");
+    const { company } = seedTenant("bounded-co");
+    const customer = seedCustomer(company.id);
+    // A first booked job long before the window still makes an in-window job a rebooking (history query).
+    fakeDb.seedJob({ companyId: company.id, customerId: customer.id, status: "paid", createdAt: new Date("2025-01-10T15:00:00.000Z") } as never);
+    const rebook = fakeDb.seedJob({ companyId: company.id, customerId: customer.id, status: "scheduled", createdAt: OCT(9) } as never);
+    // Old unrelated job outside every window is not read.
+    const ancient = fakeDb.seedJob({ companyId: company.id, customerId: seedCustomer(company.id).id, status: "completed", createdAt: new Date("2024-03-01T15:00:00.000Z"), actualEnd: new Date("2024-03-02T15:00:00.000Z") } as never);
+    // Old succeeded delivery failure (before previous period) is ignored; a recent one counts.
+    const oldFail = fakeDb.seedAgentAction({ companyId: company.id, state: "succeeded", executionReceipt: { deliveryState: "failed" }, updatedAt: new Date("2026-06-01T15:00:00.000Z") } as never);
+    fakeDb.seedAgentAction({ companyId: company.id, state: "succeeded", executionReceipt: { deliveryState: "failed" }, updatedAt: OCT(8) } as never);
+    const base = { companyId: company.id, companyTimeZone: "America/Chicago", date: "2026-10-15", now: OCT(15) };
+    const full = await getCommandCenterBrief(base);
+    expect(full.limits).toEqual({ jobsTruncated: false, jobHistoryTruncated: false, actionsTruncated: false });
+    expect(full.loop.find((s) => s.stage === "rebook")?.sources.map((s) => s.id)).toEqual([rebook.id]);
+    expect(kpi(full as never, "first_to_recurring")).toMatchObject({ denominator: 0 });
+    expect(full.needsYou.counts.exceptions).toBe(1);
+    expect(JSON.stringify(full)).not.toContain(ancient.id);
+    expect(JSON.stringify(full)).not.toContain(oldFail.id);
+    expect(full.emptyStates.missing).not.toContain("jobs");
+
+    fakeDb.seedJob({ companyId: company.id, customerId: customer.id, status: "scheduled", createdAt: OCT(10) } as never);
+    fakeDb.seedAgentAction({ companyId: company.id, state: "awaiting_approval" } as never);
+    const capped = await getCommandCenterBrief({ ...base, rowCaps: { jobs: 1, jobHistory: 0, actions: 1 } });
+    expect(capped.limits).toEqual({ jobsTruncated: true, jobHistoryTruncated: true, actionsTruncated: true });
+    expect(capped.needsYou.counts.approvals + capped.needsYou.counts.exceptions).toBe(1);
   });
 });
 

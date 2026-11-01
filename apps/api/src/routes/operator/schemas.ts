@@ -18,7 +18,13 @@ export const jobProvenanceQuerySchema = z.object({
   eventIds: z.string().min(1)
 });
 
-export const editAgentActionBodySchema = EditAgentActionParametersSchema;
+/**
+ * The inbox edit PATCH must name the item `version` the operator saw (TE-STALE-03): missing → 400, mismatch → 409.
+ * The shared @fsm/types schema keeps it optional so the web input type is unchanged (#371 adds it in the hook).
+ */
+export const editAgentActionBodySchema = EditAgentActionParametersSchema.extend({
+  expectedVersion: z.number().int().nonnegative()
+});
 
 export type EditAgentActionBody = z.infer<typeof editAgentActionBodySchema>;
 

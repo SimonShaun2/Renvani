@@ -4,7 +4,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const dd = vi.hoisted(() => ({
   role: null as string | null,
   query: { isLoading: false, isError: false, data: undefined as unknown },
-  calls: [] as Array<{ range: { startDate: string; endDate: string }; enabled: boolean }>
+  calls: [] as Array<{ range: { startDate: string; endDate: string }; enabled: boolean }>,
+  inbox: { isLoading: true, isError: false, data: undefined as unknown }
 }));
 vi.mock("@/src/stores/auth.store", () => ({
   useAuthStore: (sel: (s: unknown) => unknown) => sel({ user: dd.role ? { role: dd.role } : null })
@@ -28,13 +29,14 @@ vi.mock("@/src/hooks/command-center.hooks", () => ({
 vi.mock("@tanstack/react-query", () => ({ useQueryClient: () => ({ invalidateQueries: vi.fn() }) }));
 vi.mock("@/src/hooks/company.hooks", () => ({ useCompany: () => ({ data: undefined }) }));
 vi.mock("@/src/hooks/operator-inbox.hooks", () => ({
-  useOperatorInbox: () => ({ isLoading: true, isError: false, data: undefined }),
+  useOperatorInbox: () => dd.inbox,
   useApproveAgentAction: () => ({ mutateAsync: vi.fn(), isPending: false })
 }));
 
 import { CommandCenterView } from "./CommandCenterView";
+import { NeedsYou } from "./NeedsYou";
 import { DirectDemandCard } from "./DirectDemandCard";
-import { canViewDirectDemand, formatUsdFromDecimal, isoDateIn, jobsLabel, last30DaysRange } from "./direct-demand.utils";
+import { canViewDirectDemand, formatUsdFromDecimal, isoDateIn, jobsLabel, monthToDateRange } from "./direct-demand.utils";
 import { hourIn } from "./LocalClock";
 import { CC_REGIONS, EMPTY, KPIS, LOOP_STAGES, agentLabel, greetingFor, itemStatus, needsYouCounts } from "./command-center.config";
 
@@ -125,7 +127,8 @@ describe("DirectDemandCard", () => {
     dd.query = { isLoading: false, isError: false, data: summary(12, "4830.5") };
     const html = render();
     expect(html).toContain("12 jobs, $4,830.50");
-    expect(html).toContain("Last 30 days, from online booking and lead sources");
+    expect(html).toContain("This month, from online booking and lead sources");
+    expect(html).not.toContain("Last 30 days");
     expect(html).not.toMatch(/\$1\.99|booking fee|service fee/i);
   });
   it("shows the zero state", () => {
@@ -145,11 +148,11 @@ describe("DirectDemandCard", () => {
     expect(render()).toBe("");
     expect(dd.calls.every((c) => c.enabled === false)).toBe(true);
   });
-  it("dispatcher sees it and queries the last 30 days", () => {
+  it("dispatcher sees it and queries the same calendar month as the Key numbers tiles", () => {
     dd.query = { isLoading: false, isError: false, data: summary(1, "99.999") };
     const html = render();
     expect(html).toContain("1 job, $100.00");
-    expect(dd.calls.at(-1)).toEqual({ range: { startDate: "2026-10-02", endDate: "2026-10-31" }, enabled: true });
+    expect(dd.calls.at(-1)).toEqual({ range: { startDate: "2026-10-01", endDate: "2026-10-31" }, enabled: true });
   });
 });
 
@@ -164,13 +167,33 @@ describe("direct-demand utils", () => {
   });
   it("computes the range in the shop time zone", () => {
     const late = new Date("2026-11-01T03:30:00.000Z"); // Oct 31, 10:30 PM in Chicago
-    expect(last30DaysRange(late, "America/Chicago")).toEqual({ startDate: "2026-10-02", endDate: "2026-10-31" });
-    expect(last30DaysRange(late, "Asia/Tokyo")).toEqual({ startDate: "2026-10-03", endDate: "2026-11-01" });
+    expect(monthToDateRange(late, "America/Chicago")).toEqual({ startDate: "2026-10-01", endDate: "2026-10-31" });
+    expect(monthToDateRange(late, "Asia/Tokyo")).toEqual({ startDate: "2026-11-01", endDate: "2026-11-01" });
+    expect(monthToDateRange(late, "Bad/Zone").startDate).toMatch(/^\d{4}-\d{2}-01$/);
     expect(isoDateIn(late, "Bad/Zone")).toMatch(/^\d{4}-\d{2}-\d{2}$/);
   });
   it("gates roles like the API and pluralizes jobs", () => {
     expect(["owner", "admin", "dispatcher"].every(canViewDirectDemand)).toBe(true);
     expect(["technician", "office", null].some(canViewDirectDemand)).toBe(false);
     expect(jobsLabel(1)).toBe("1 job");
+  });
+});
+
+describe("NeedsYou failed items", () => {
+  it("shows Delivery failure with executionReceipt.error.message", () => {
+    const failed = {
+      id: "f1",
+      state: "failed",
+      overridePaths: [],
+      recipient: { displayName: "J. Morgan" },
+      provenance: { agentProduct: "revenue_agent", actionType: "revenue.estimate_followup.propose", sourceEvents: [], policyVersion: "operating-v1" },
+      executionReceipt: { outcome: "failed", deliveryState: "failed", error: { code: "EXECUTION_FAILED", message: "Execution failed" } }
+    };
+    dd.inbox = { isLoading: false, isError: false, data: { items: [failed] } };
+    const html = renderToStaticMarkup(<NeedsYou />);
+    dd.inbox = { isLoading: true, isError: false, data: undefined };
+    expect(html).toContain('data-testid="cc-failure"');
+    expect(html).toContain("Delivery failure · Execution failed");
+    expect(html).not.toContain("Approve &amp; send");
   });
 });

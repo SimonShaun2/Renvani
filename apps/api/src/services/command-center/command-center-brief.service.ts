@@ -1,4 +1,4 @@
-import { and, eq, gte, inArray, lte } from "drizzle-orm";
+import { and, asc, desc, eq, gte, inArray, isNull, lt, lte, or } from "drizzle-orm";
 import { Decimal } from "decimal.js";
 import {
   agentActions,
@@ -47,6 +47,10 @@ const BOOKED = new Set<string>(BOOKED_JOB_STATUSES);
 const COMPLETED = new Set<string>(["completed", "invoiced", "paid", "closed"]);
 const CALL_DEDUPE_WINDOW_MS = 24 * 60 * 60 * 1000;
 const NEEDS_YOU_LIMIT = 20;
+/** Row caps for the bounded reads; when hit, `limits.*Truncated` is true and figures may undercount. */
+export const COMMAND_CENTER_JOB_ROW_CAP = 5000;
+export const COMMAND_CENTER_JOB_HISTORY_ROW_CAP = 5000;
+export const COMMAND_CENTER_ACTION_ROW_CAP = 500;
 
 export interface CommandCenterBriefInput {
   companyId: string;
@@ -54,6 +58,8 @@ export interface CommandCenterBriefInput {
   date?: string | undefined;
   timeZone?: string | undefined;
   now?: Date | undefined;
+  /** Test seam: override the row caps (defaults are the COMMAND_CENTER_*_ROW_CAP constants). */
+  rowCaps?: { jobs?: number; jobHistory?: number; actions?: number } | undefined;
 }
 
 interface MonthWindow {
@@ -136,6 +142,9 @@ export async function getCommandCenterBrief(input: CommandCenterBriefInput): Pro
   const previous = monthWindow(date, timeZone, -1);
   const todayWindow = resolveReportingPeriod(today, today, timeZone);
   const companyId = input.companyId;
+  const jobCap = input.rowCaps?.jobs ?? COMMAND_CENTER_JOB_ROW_CAP;
+  const jobHistoryCap = input.rowCaps?.jobHistory ?? COMMAND_CENTER_JOB_HISTORY_ROW_CAP;
+  const actionCap = input.rowCaps?.actions ?? COMMAND_CENTER_ACTION_ROW_CAP;
 
   const data = await runTransactionWithTenantSession(companyId, async (tx) => {
     const bookings = (await tx
@@ -150,6 +159,7 @@ export async function getCommandCenterBrief(input: CommandCenterBriefInput): Pro
       .where(
         and(
           eq(bookingRequests.companyId, companyId),
+          isNull(bookingRequests.deletedAt),
           gte(bookingRequests.createdAt, new Date(previous.start.getTime() - CALL_DEDUPE_WINDOW_MS)),
           lte(bookingRequests.createdAt, new Date(current.end.getTime() + CALL_DEDUPE_WINDOW_MS))
         )
@@ -160,8 +170,21 @@ export async function getCommandCenterBrief(input: CommandCenterBriefInput): Pro
       .from(callRecords)
       .where(and(eq(callRecords.companyId, companyId), gte(callRecords.startedAt, previous.start), lte(callRecords.startedAt, current.end)))) as CallRow[];
 
-    // v1: the tenant's job list is read once and aggregated in memory (first-booked-job and rebooking need history).
-    const jobRows = (await tx
+    const paidInvoices = await tx
+      .select({
+        id: invoices.id,
+        invoiceNumber: invoices.invoiceNumber,
+        jobId: invoices.jobId,
+        amountPaid: invoices.amountPaid,
+        paidAt: invoices.paidAt
+      })
+      .from(invoices)
+      .where(and(eq(invoices.companyId, companyId), isNull(invoices.deletedAt), eq(invoices.status, "paid"), gte(invoices.paidAt, previous.start), lte(invoices.paidAt, current.end)));
+
+    // Bounded job read: jobs created since the previous period started, completed in the compare/current
+    // window, scheduled today, or linked from an in-window booking/paid invoice. Capped with a truncation flag.
+    const linkedJobIds = [...new Set([...bookings, ...paidInvoices].map((row) => row.jobId).filter((id): id is string => !!id))];
+    const windowJobRows = (await tx
       .select({
         id: jobs.id,
         jobNumber: jobs.jobNumber,
@@ -175,25 +198,83 @@ export async function getCommandCenterBrief(input: CommandCenterBriefInput): Pro
         createdAt: jobs.createdAt
       })
       .from(jobs)
-      .where(eq(jobs.companyId, companyId))) as JobRow[];
+      .where(
+        and(
+          eq(jobs.companyId, companyId),
+          isNull(jobs.deletedAt),
+          or(
+            gte(jobs.createdAt, previous.start),
+            and(gte(jobs.actualEnd, previous.start), lte(jobs.actualEnd, current.end)),
+            and(gte(jobs.scheduledStart, todayWindow.start), lte(jobs.scheduledStart, todayWindow.end)),
+            ...(linkedJobIds.length > 0 ? [inArray(jobs.id, linkedJobIds)] : [])
+          )
+        )
+      )
+      .orderBy(asc(jobs.createdAt), asc(jobs.id))
+      .limit(jobCap + 1)) as JobRow[];
+    const jobsTruncated = windowJobRows.length > jobCap;
+    const windowJobs = windowJobRows.slice(0, jobCap);
 
-    const paidInvoices = await tx
-      .select({
-        id: invoices.id,
-        invoiceNumber: invoices.invoiceNumber,
-        jobId: invoices.jobId,
-        amountPaid: invoices.amountPaid,
-        paidAt: invoices.paidAt
+    // Earlier booked jobs of the same customers (first-booked-job / rebooking history), capped.
+    const windowCustomerIds = [...new Set(windowJobs.map((job) => job.customerId).filter((id): id is string => !!id))];
+    const historyRows =
+      windowCustomerIds.length === 0
+        ? []
+        : ((await tx
+            .select({
+        id: jobs.id,
+        jobNumber: jobs.jobNumber,
+        customerId: jobs.customerId,
+        status: jobs.status,
+        crewId: jobs.crewId,
+        scheduledStart: jobs.scheduledStart,
+        actualEnd: jobs.actualEnd,
+        maintenancePlanId: jobs.maintenancePlanId,
+        leadAttribution: jobs.leadAttribution,
+        createdAt: jobs.createdAt
       })
-      .from(invoices)
-      .where(and(eq(invoices.companyId, companyId), eq(invoices.status, "paid"), gte(invoices.paidAt, previous.start), lte(invoices.paidAt, current.end)));
+            .from(jobs)
+            .where(
+              and(
+                eq(jobs.companyId, companyId),
+                isNull(jobs.deletedAt),
+                inArray(jobs.customerId, windowCustomerIds),
+                inArray(jobs.status, [...BOOKED_JOB_STATUSES]),
+                lt(jobs.createdAt, previous.start)
+              )
+            )
+            .orderBy(asc(jobs.createdAt), asc(jobs.id))
+            .limit(jobHistoryCap + 1)) as JobRow[]);
+    const jobHistoryTruncated = historyRows.length > jobHistoryCap;
+    const jobRowsById = new Map<string, JobRow>();
+    for (const job of [...historyRows.slice(0, jobHistoryCap), ...windowJobs]) jobRowsById.set(job.id, job);
+    const jobRows = [...jobRowsById.values()];
 
-    const activePlans = await tx
+    const anyJob =
+      jobRows.length > 0
+        ? jobRows.slice(0, 1)
+        : await tx
+            .select({ id: jobs.id })
+            .from(jobs)
+            .where(and(eq(jobs.companyId, companyId), isNull(jobs.deletedAt)))
+            .limit(1);
+
+    const activePlans =
+      windowCustomerIds.length === 0
+        ? []
+        : await tx
       .select({ id: maintenancePlans.id, customerId: maintenancePlans.customerId })
       .from(maintenancePlans)
-      .where(and(eq(maintenancePlans.companyId, companyId), eq(maintenancePlans.status, "active")));
+      .where(
+        and(
+          eq(maintenancePlans.companyId, companyId),
+          isNull(maintenancePlans.deletedAt),
+          eq(maintenancePlans.status, "active"),
+          inArray(maintenancePlans.customerId, windowCustomerIds)
+        )
+      );
 
-    const actions = await tx
+    const actionRows = await tx
       .select({
         id: agentActions.id,
         agentProduct: agentActions.agentProduct,
@@ -205,14 +286,28 @@ export async function getCommandCenterBrief(input: CommandCenterBriefInput): Pro
         updatedAt: agentActions.updatedAt
       })
       .from(agentActions)
-      .where(and(eq(agentActions.companyId, companyId), inArray(agentActions.state, ["awaiting_approval", "failed", "escalated", "succeeded"])));
+      .where(
+        and(
+          eq(agentActions.companyId, companyId),
+          isNull(agentActions.deletedAt),
+          or(
+            inArray(agentActions.state, ["awaiting_approval", "failed", "escalated"]),
+            // delivery_failed receipts only since the previous period started
+            and(eq(agentActions.state, "succeeded"), gte(agentActions.updatedAt, previous.start))
+          )
+        )
+      )
+      .orderBy(desc(agentActions.updatedAt), asc(agentActions.id))
+      .limit(actionCap + 1);
+    const actionsTruncated = actionRows.length > actionCap;
+    const actions = actionRows.slice(0, actionCap);
 
     const crewRows = await tx
       .select({ id: crews.id, name: crews.name })
       .from(crews)
-      .where(and(eq(crews.companyId, companyId), eq(crews.isActive, true)));
+      .where(and(eq(crews.companyId, companyId), isNull(crews.deletedAt), eq(crews.isActive, true)));
 
-    return { bookings, calls, jobRows, paidInvoices, activePlans, actions, crewRows };
+    return { bookings, calls, jobRows, paidInvoices, activePlans, actions, crewRows, hasJobs: anyJob.length > 0, jobsTruncated, jobHistoryTruncated, actionsTruncated };
   });
 
   const jobsById = new Map(data.jobRows.map((job) => [job.id, job]));
@@ -443,10 +538,10 @@ export async function getCommandCenterBrief(input: CommandCenterBriefInput): Pro
 
   const missing: CommandCenterMissingData[] = [];
   if (inqNow.count === 0 && inqPrev.count === 0) missing.push("inquiries");
-  if (data.jobRows.length === 0) missing.push("jobs");
+  if (!data.hasJobs) missing.push("jobs");
   if (data.actions.length === 0) missing.push("agent_actions");
   if (data.crewRows.length === 0) missing.push("crews");
-  const hasAnyData = data.bookings.length + data.calls.length + data.jobRows.length + data.actions.length + data.crewRows.length > 0;
+  const hasAnyData = data.bookings.length + data.calls.length + (data.hasJobs ? 1 : 0) + data.actions.length + data.crewRows.length > 0;
 
   const todayCapped = capSources(jobsToday.map((job) => jobSource(job, job.scheduledStart)));
 
@@ -467,6 +562,7 @@ export async function getCommandCenterBrief(input: CommandCenterBriefInput): Pro
     loop,
     crewsToday,
     today: { jobsToday: jobsToday.length, sources: todayCapped.sources },
-    emptyStates: { hasAnyData, missing }
+    emptyStates: { hasAnyData, missing },
+    limits: { jobsTruncated: data.jobsTruncated, jobHistoryTruncated: data.jobHistoryTruncated, actionsTruncated: data.actionsTruncated }
   };
 }

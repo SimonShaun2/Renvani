@@ -7,7 +7,7 @@ import type { OperatorInboxItem } from "@fsm/types";
 import { useOperatorInboxTimeline } from "@/src/hooks/operator-inbox.hooks";
 import { cn } from "@/src/lib/utils";
 
-import { deliveryBadge, deliveryEvidence, deliverySteps, deliveryToken, isEstimateFollowUp, type DeliveryBadge, type StepStatus } from "./delivery-states.config";
+import { deliveryBadge, deliveryEvidence, deliverySteps, deliveryToken, isEstimateFollowUp, receiptErrorMessage, type DeliveryBadge, type StepStatus } from "./delivery-states.config";
 
 const BADGE_TONE: Record<DeliveryBadge["tone"], string> = {
   amber: "bg-[#fff4d6] text-[#0f1530]",
@@ -36,6 +36,7 @@ export function DeliveryStates({ item }: { item: OperatorInboxItem }) {
   const badge = deliveryBadge(item);
   const evidence = deliveryEvidence(item);
   const failed = deliveryToken(item) === "failed";
+  const failureMessage = failed ? receiptErrorMessage(item.executionReceipt) : null;
   const title = isEstimateFollowUp(item) ? "Estimate follow-up" : item.provenance.actionType.replace(/^[a-z_]+\./, "").replace(/\.propose$/, "").replace(/[._]/g, " ");
 
   return (
@@ -94,12 +95,18 @@ export function DeliveryStates({ item }: { item: OperatorInboxItem }) {
           <h3 className="text-[17px] font-semibold text-[#0f1530]">Failure &amp; recovery</h3>
           <p className="mt-[8px] text-[13px] text-[#5e6684]">Keep exceptions visible to the owner</p>
           {failed ? (
-            <span data-testid="failure-badge" className="mt-[12px] inline-flex h-[27px] items-center rounded-[14px] bg-[#fbe3dc] px-[11px] text-[11px] font-semibold uppercase text-[#b42318]">
-              Delivery failure
-            </span>
+            <>
+              <span data-testid="failure-badge" className="mt-[12px] inline-flex h-[27px] items-center rounded-[14px] bg-[#fbe3dc] px-[11px] text-[11px] font-semibold uppercase text-[#b42318]">
+                Delivery failure
+              </span>
+              <p data-testid="failure-message" className="mt-[8px] text-[13px] text-[#b42318] [overflow-wrap:anywhere]">
+                {failureMessage ?? "Execution failed."}
+              </p>
+            </>
           ) : null}
-          <p className="mt-[16px] text-[14px] text-[#0f1530]">
-            If provider delivery fails, show a retry, escalation and evidence trail. Never silently turn approval into success.
+          <p className="mt-[16px] text-[14px] text-[#0f1530]" data-testid="failure-copy">
+            A failed delivery stays in Failed with its error and event trail. Approval never turns into success on its own, and
+            nothing is retried automatically.
           </p>
           <button
             type="button"

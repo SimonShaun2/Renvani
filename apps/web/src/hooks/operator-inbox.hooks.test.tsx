@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { act, renderHook } from "@testing-library/react";
+import { act, renderHook, waitFor } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -19,7 +19,8 @@ import {
   agentActionErrorMessage,
   useApproveAgentAction,
   useEditOperatorInboxItem,
-  useExecuteAgentAction
+  useExecuteAgentAction,
+  useOperatorInboxCounts
 } from "./operator-inbox.hooks";
 
 const item = { id: "a1", version: 7 };
@@ -99,5 +100,38 @@ describe("edit hook", () => {
     invalidate.mockClear();
     await act(() => result.current.mutateAsync({ body: "x" }).catch(() => undefined));
     expect(invalidate).toHaveBeenCalledWith({ queryKey: ["operator-inbox"] });
+  });
+});
+
+describe.each([
+  ["approve", useApproveAgentAction],
+  ["execute", useExecuteAgentAction]
+] as const)("%s result", (_op, hook) => {
+  it("refetches the inbox and counts on any error, not only 409", async () => {
+    m.post.mockRejectedValue(new m.ApiError(500, { message: "Execution failed" }));
+    const { client, wrapper } = setup();
+    const invalidate = vi.spyOn(client, "invalidateQueries");
+    const { result } = renderHook(() => hook(item), { wrapper });
+    await act(() => result.current.mutateAsync().catch(() => undefined));
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: ["operator-inbox"] });
+  });
+
+  it("returns the API's state (no assumed success)", async () => {
+    m.post.mockResolvedValue({ id: "a1", state: "executing", executionReceipt: { outcome: "queued", deliveryState: "queued" } });
+    const { wrapper } = setup();
+    const { result } = renderHook(() => hook(item), { wrapper });
+    const out = await act(() => result.current.mutateAsync());
+    expect(out).toMatchObject({ state: "executing" });
+  });
+});
+
+describe("useOperatorInboxCounts", () => {
+  it("reads GET /operator/inbox/counts under the inbox key", async () => {
+    m.get.mockResolvedValue({ counts: { executing: 2 }, total: 2 });
+    const { client, wrapper } = setup();
+    const { result } = renderHook(() => useOperatorInboxCounts(), { wrapper });
+    await waitFor(() => expect(result.current.data).toEqual({ counts: { executing: 2 }, total: 2 }));
+    expect(m.get).toHaveBeenCalledWith("/api/v1/operator/inbox/counts");
+    expect(client.getQueryCache().find({ queryKey: ["operator-inbox", "counts"] })).toBeTruthy();
   });
 });

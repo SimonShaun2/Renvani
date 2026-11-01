@@ -45,6 +45,14 @@ const errorHandlerPlugin = fp(async (fastify) => {
 
     const fastifyError = error as FastifyError;
 
+    if (fastifyError.code === "FST_ERR_CTP_BODY_TOO_LARGE") {
+      return reply.status(413).send({
+        error: ErrorCode.VALIDATION_ERROR,
+        message: "Request body is too large",
+        requestId: request.id
+      });
+    }
+
     if (fastifyError.code === "FST_REQ_FILE_TOO_LARGE") {
       const isImportUpload = request.url.includes("/imports") && request.method === "POST";
       abortImportUploadRequest(request);

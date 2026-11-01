@@ -93,6 +93,7 @@ export function Step7Results({
                 Download Error Report
               </button>
             </div>
+            <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-neutral-200 text-sm">
               <thead className="bg-white text-left text-xs uppercase tracking-[0.14em] text-neutral-400">
                 <tr>
@@ -113,6 +114,7 @@ export function Step7Results({
                 ))}
               </tbody>
             </table>
+            </div>
           </div>
         ) : null}
 

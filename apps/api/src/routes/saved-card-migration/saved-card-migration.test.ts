@@ -577,4 +577,176 @@ describe("saved card migration (FS-138)", () => {
     const row = fakeDb.getTestState().savedCardMigrations.find((r) => r.companyId === company.id);
     expect(row?.offSessionConsentBatchId).toBe(secondBatchId);
   });
+
+  describe("confirm-stripe-import saves Stripe import rows as pending mappings (#224)", () => {
+    const base = (bundleId: string) => `/api/v1/migrate/onboarding/sessions/${bundleId}/saved-card-migration`;
+
+    async function realStartThenConfirm(authorization: string, bundleId: string, importedPaymentMethods: unknown[]) {
+      const start = await request(app.server)
+        .post(base(bundleId))
+        .set("Authorization", authorization)
+        .send({ priorProcessorName: "Legacy Processor" });
+      expect(start.status).toBe(201);
+      expect(start.body.customerMappings).toEqual([]);
+      return request(app.server)
+        .post(`${base(bundleId)}/confirm-stripe-import`)
+        .set("Authorization", authorization)
+        .send({ stripeImportReference: "stripe_import_job_pending", importedPaymentMethods });
+    }
+
+    it("start -> confirm yields pending rows that apply-mappings then attaches", async () => {
+      const { company, authorization } = createAuthContext("owner");
+      const bundle = fakeDb.seedImportBundle({ companyId: company.id });
+      const byId = fakeDb.seedCustomer({ companyId: company.id, firstName: "A", lastName: "One", email: "a@example.com" });
+      const byEmail = fakeDb.seedCustomer({ companyId: company.id, firstName: "B", lastName: "Two", email: "b@example.com" });
+
+      const confirm = await realStartThenConfirm(authorization, bundle.id, [
+        { stripeCustomerId: "cus_imp1", stripePaymentMethodId: "pm_imp1", renvaniCustomerId: byId.id },
+        { stripeCustomerId: "cus_imp2", stripePaymentMethodId: "pm_imp2", email: "B@Example.com" },
+        { stripeCustomerId: "cus_imp3", stripePaymentMethodId: "pm_imp3", email: "nobody@example.com" }
+      ]);
+      expect(confirm.status).toBe(200);
+      expect(confirm.body.status).toBe("mapping");
+      const pending = confirm.body.customerMappings.filter(
+        (m: { status: string; matchMethod: string }) => m.status === "pending" && m.matchMethod !== "unmatched"
+      );
+      expect(pending).toHaveLength(2);
+      expect(confirm.body.customerMappings).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ stripePaymentMethodId: "pm_imp1", renvaniCustomerId: byId.id, matchMethod: "renvani_customer_id", status: "pending" }),
+          expect.objectContaining({ stripePaymentMethodId: "pm_imp2", renvaniCustomerId: byEmail.id, matchMethod: "email", status: "pending" }),
+          expect.objectContaining({ stripePaymentMethodId: "pm_imp3", renvaniCustomerId: null, matchMethod: "unmatched", status: "pending" })
+        ])
+      );
+
+      // GET (what the panel reads) exposes the same pending rows.
+      const get = await request(app.server).get(base(bundle.id)).set("Authorization", authorization);
+      expect(get.body.migration.customerMappings).toHaveLength(3);
+
+      // Same row building as the web panel: pending + matched only.
+      const rows = pending.map((m: { stripeCustomerId: string; stripePaymentMethodId: string; renvaniCustomerId: string | null; email: string | null }) => ({
+        stripeCustomerId: m.stripeCustomerId,
+        stripePaymentMethodId: m.stripePaymentMethodId,
+        ...(m.renvaniCustomerId ? { renvaniCustomerId: m.renvaniCustomerId } : {}),
+        ...(m.email ? { email: m.email } : {})
+      }));
+      const apply = await request(app.server)
+        .post(`${base(bundle.id)}/apply-mappings`)
+        .set("Authorization", authorization)
+        .send({
+          ownerOffSessionConsentAcknowledged: true,
+          ownerOffSessionConsentVersion: SAVED_CARD_OFF_SESSION_CONSENT_ACK_VERSION,
+          rows
+        });
+      expect(apply.status).toBe(200);
+      expect(attachImportedPaymentMethodMock).toHaveBeenCalledTimes(2);
+      expect(apply.body.mappingSummary).toEqual({ matched: 2, unmatched: 1, failed: 0, total: 3 });
+      expect(apply.body.status).toBe("fallback_required");
+      expect(apply.body.customerMappings.some((m: { status: string }) => m.status === "pending")).toBe(false);
+    });
+
+    it("is idempotent on replay: no duplicates and attached rows are not reset to pending", async () => {
+      const { company, authorization } = createAuthContext("owner");
+      const bundle = fakeDb.seedImportBundle({ companyId: company.id });
+      const customer = fakeDb.seedCustomer({ companyId: company.id, firstName: "A", lastName: "One", email: "a@example.com" });
+      const rows = [
+        { stripeCustomerId: "cus_rp1", stripePaymentMethodId: "pm_rp1", renvaniCustomerId: customer.id },
+        { stripeCustomerId: "cus_rp1", stripePaymentMethodId: "pm_rp1", renvaniCustomerId: customer.id }
+      ];
+      const first = await realStartThenConfirm(authorization, bundle.id, rows);
+      expect(first.status).toBe(200);
+      expect(first.body.customerMappings).toHaveLength(1);
+
+      const replay = await request(app.server)
+        .post(`${base(bundle.id)}/confirm-stripe-import`)
+        .set("Authorization", authorization)
+        .send({ stripeImportReference: "stripe_import_job_pending", importedPaymentMethods: rows });
+      expect(replay.status).toBe(200);
+      expect(replay.body.customerMappings).toHaveLength(1);
+      expect(replay.body.customerMappings[0].status).toBe("pending");
+
+      // Apply one of two -> keep "mapping"; replay must not reset the attached row.
+      const migration = fakeDb.getTestState().savedCardMigrations.find((r) => r.companyId === company.id);
+      expect(migration).toBeDefined();
+      const apply = await request(app.server)
+        .post(`${base(bundle.id)}/apply-mappings`)
+        .set("Authorization", authorization)
+        .send({
+          ownerOffSessionConsentAcknowledged: true,
+          ownerOffSessionConsentVersion: SAVED_CARD_OFF_SESSION_CONSENT_ACK_VERSION,
+          rows: [{ stripeCustomerId: "cus_rp1", stripePaymentMethodId: "pm_rp1", renvaniCustomerId: customer.id }]
+        });
+      expect(apply.body.status).toBe("completed");
+      if (migration) migration.status = "mapping";
+      const afterApply = await request(app.server)
+        .post(`${base(bundle.id)}/confirm-stripe-import`)
+        .set("Authorization", authorization)
+        .send({ stripeImportReference: "stripe_import_job_pending", importedPaymentMethods: rows });
+      expect(afterApply.body.customerMappings).toHaveLength(1);
+      expect(afterApply.body.customerMappings[0].status).toBe("attached");
+    });
+
+    it("keeps the migration in mapping while matched imported rows are still pending", async () => {
+      const { company, authorization } = createAuthContext("owner");
+      const bundle = fakeDb.seedImportBundle({ companyId: company.id });
+      const a = fakeDb.seedCustomer({ companyId: company.id, firstName: "A", lastName: "One", email: "a@example.com" });
+      const b = fakeDb.seedCustomer({ companyId: company.id, firstName: "B", lastName: "Two", email: "b@example.com" });
+      await realStartThenConfirm(authorization, bundle.id, [
+        { stripeCustomerId: "cus_p1", stripePaymentMethodId: "pm_p1", renvaniCustomerId: a.id },
+        { stripeCustomerId: "cus_p2", stripePaymentMethodId: "pm_p2", renvaniCustomerId: b.id }
+      ]);
+      const apply = await request(app.server)
+        .post(`${base(bundle.id)}/apply-mappings`)
+        .set("Authorization", authorization)
+        .send({
+          ownerOffSessionConsentAcknowledged: true,
+          ownerOffSessionConsentVersion: SAVED_CARD_OFF_SESSION_CONSENT_ACK_VERSION,
+          rows: [{ stripeCustomerId: "cus_p1", stripePaymentMethodId: "pm_p1", renvaniCustomerId: a.id }]
+        });
+      expect(apply.status).toBe(200);
+      expect(apply.body.status).toBe("mapping");
+    });
+
+    it("never matches another company's customer and never shows its rows to another tenant", async () => {
+      const tenantA = createAuthContext("owner");
+      const tenantB = createAuthContext("owner");
+      const bundleA = fakeDb.seedImportBundle({ companyId: tenantA.company.id });
+      const bundleB = fakeDb.seedImportBundle({ companyId: tenantB.company.id });
+      const foreign = fakeDb.seedCustomer({ companyId: tenantB.company.id, firstName: "F", lastName: "B", email: "shared@example.com" });
+
+      const confirm = await realStartThenConfirm(tenantA.authorization, bundleA.id, [
+        { stripeCustomerId: "cus_x1", stripePaymentMethodId: "pm_x1", renvaniCustomerId: foreign.id },
+        { stripeCustomerId: "cus_x2", stripePaymentMethodId: "pm_x2", email: "shared@example.com" }
+      ]);
+      expect(confirm.status).toBe(200);
+      for (const m of confirm.body.customerMappings) {
+        expect(m.renvaniCustomerId).toBeNull();
+        expect(m.matchMethod).toBe("unmatched");
+      }
+
+      // Tenant B cannot read or confirm against tenant A's bundle.
+      const crossGet = await request(app.server).get(base(bundleA.id)).set("Authorization", tenantB.authorization);
+      // Scoped by company: tenant B sees no migration (and none of A's rows) for A's bundle id.
+      expect(crossGet.body.migration ?? null).toBeNull();
+      expect(JSON.stringify(crossGet.body)).not.toContain("pm_x1");
+      const crossConfirm = await request(app.server)
+        .post(`${base(bundleA.id)}/confirm-stripe-import`)
+        .set("Authorization", tenantB.authorization)
+        .send({ stripeImportReference: "x", importedPaymentMethods: [{ stripeCustomerId: "cus_y", stripePaymentMethodId: "pm_y" }] });
+      expect(crossConfirm.status).toBe(404);
+      const ownB = await request(app.server).get(base(bundleB.id)).set("Authorization", tenantB.authorization);
+      expect(ownB.body.migration ?? null).toBeNull();
+      const rowA = fakeDb.getTestState().savedCardMigrations.find((r) => r.companyId === tenantA.company.id);
+      expect((rowA?.customerMappings as unknown[]).length).toBe(2);
+    });
+
+    it("rejects malformed Stripe ids in import rows", async () => {
+      const { company, authorization } = createAuthContext("owner");
+      const bundle = fakeDb.seedImportBundle({ companyId: company.id });
+      const confirm = await realStartThenConfirm(authorization, bundle.id, [
+        { stripeCustomerId: "not-a-customer", stripePaymentMethodId: "pm_ok" }
+      ]);
+      expect(confirm.status).toBe(400);
+    });
+  });
 });

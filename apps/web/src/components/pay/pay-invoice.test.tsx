@@ -9,6 +9,7 @@ import {
   buildPayInvoiceSummary,
   formatServiceFeeNote,
   formatShortDate,
+  legacyBookingFeeDetail,
   resolvePayInvoiceState,
   resolvePayNotice,
   resolveServiceFeeRateBps
@@ -22,7 +23,7 @@ function payment(partial: Partial<PublicPaymentLinkResponse> = {}): PublicPaymen
     invoiceAmountCents: 24000, totalDueCents: 24480, serviceFeeAmount: "4.80", bookingFeeAmount: "0.00", feeRefundable: false,
     shopName: "Summit Heating & Air", shopLogoUrl: null, shopUrl: null, statementDescriptor: "SUMMIT HEATING",
     customerName: "Dana Whitfield", serviceAddress: "1840 Grape St", serviceDate: "2026-10-20", dueAt: "2026-10-30",
-    lineItems: [], invoiceStatus: "sent", paymentStatus: null, paidAmount: null, paidAt: null, receiptEmail: null, plan: "flex",
+    lineItems: [], invoiceStatus: "sent", paymentStatus: null, paidAmount: null, paidAt: null, receiptEmail: null, paid: false, receiptEmailed: false, plan: "flex",
     ...partial
   };
 }
@@ -49,6 +50,14 @@ describe("pay invoice fee lines", () => {
     expect(buildPayInvoiceSummary(payment({ bookingFeeCents: 199 })).feeLines.map((line) => line.key)).toEqual(["service"]);
   });
 
+  it("totals match invoice frames 53:3 / 53:75 / 60:543 (Flex $244.80, Flat $240.00, VIP $208.08)", () => {
+    expect(buildPayInvoiceSummary(payment()).totalDue).toBe("244.80");
+    expect(buildPayInvoiceSummary(flat()).totalDue).toBe("240.00");
+    const vip = buildPayInvoiceSummary(payment({ invoiceAmount: "204.00", invoiceAmountCents: 20400, serviceFeeCents: 408, serviceFeeAmount: "4.08", platformFeeAmount: "4.08", totalDue: "208.08", totalDueCents: 20808 }));
+    expect(vip.feeLines).toEqual([{ key: "service", label: "Service Fee (2%)", amount: "4.08" }]);
+    expect(vip.totalDue).toBe("208.08");
+  });
+
   it("falls back to the config rate and combined fee for payloads without split cents", () => {
     const legacy: Partial<PublicPaymentLinkResponse> = payment({ platformFeeAmount: "4.80" });
     delete legacy.serviceFeeCents;
@@ -56,6 +65,19 @@ describe("pay invoice fee lines", () => {
     expect(buildPayInvoiceSummary(legacy as PublicPaymentLinkResponse).feeLines).toEqual([{ key: "service", label: "Service Fee (2%)", amount: "4.80" }]);
     expect(resolveServiceFeeRateBps(null)).toBe(SERVICE_FEE_RATE_BPS);
     expect(formatServiceFeeNote(150)).toContain("1.5% Service Fee");
+  });
+});
+
+describe("legacy receipt booking fee row", () => {
+  it("shows the row only when that receipt was really charged (> 0)", () => {
+    expect(legacyBookingFeeDetail({ bookingFeeCents: 199, bookingFeeAmount: "1.99" })).toEqual({ label: "Online booking fee · non-refundable", value: "$1.99" });
+  });
+  it("hides it for 0 / \"0.00\"", () => {
+    expect(legacyBookingFeeDetail({ bookingFeeCents: 0, bookingFeeAmount: "0.00" })).toBeNull();
+  });
+  it("hides it when the legacy fields are missing", () => {
+    expect(legacyBookingFeeDetail({})).toBeNull();
+    expect(legacyBookingFeeDetail({ bookingFeeCents: null, bookingFeeAmount: null })).toBeNull();
   });
 });
 

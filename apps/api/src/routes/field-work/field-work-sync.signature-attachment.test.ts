@@ -432,3 +432,156 @@ describe("job.signature.capture with attachmentId", () => {
     expect(JSON.stringify(read.body)).not.toContain("someone-else");
   });
 });
+
+describe("job.signature.capture additive fields (#314 compatibility)", () => {
+  it("returns signedAt and defaults signerRole to customer when the client omits it", async () => {
+    const seed = seedFieldJob();
+    const attachment = seedSignatureImage(seed.company.id, seed.job.id);
+    const version = liveJobVersion(seed.job.id);
+    const response = await capture(authOf(seed), seed.job.id, { attachmentId: attachment.id, signedByName: "Pat" }, { baseRecordVersion: version });
+    expect(response.status).toBe(200);
+    const result = response.body.results[0];
+    expect(result.outcome).toBe("applied");
+    expect(result.signerRole).toBe("customer");
+    expect(new Date(result.signedAt).toISOString()).toBe(result.signedAt);
+
+    const replay = await capture(authOf(seed), seed.job.id, { attachmentId: attachment.id, signedByName: "Pat" }, {
+      baseRecordVersion: version
+    });
+    expect(replay.body.results[0].outcome).toBe("duplicate");
+    expect(replay.body.results[0].signedAt).toBe(result.signedAt);
+    expect(replay.body.results[0].signerRole).toBe("customer");
+  });
+
+  it("accepts signerRole technician and rejects unknown roles", async () => {
+    const seed = seedFieldJob();
+    const attachment = seedSignatureImage(seed.company.id, seed.job.id);
+    const bad = await capture(authOf(seed), seed.job.id, { attachmentId: attachment.id, signedByName: "T", signerRole: "manager" });
+    expect(bad.status).toBe(400);
+    const ok = await capture(authOf(seed), seed.job.id, { attachmentId: attachment.id, signedByName: "T", signerRole: "technician" });
+    expect(ok.body.results[0].signerRole).toBe("technician");
+
+    const read = await request(app.server)
+      .get(`/api/v1/jobs/${seed.job.id}`)
+      .set("Authorization", bearer(seed.company.id, seed.techUser.id, seed.techUser.role));
+    expect(read.status).toBe(200);
+    expect(read.body.job).not.toHaveProperty("signedByRole");
+  });
+});
+
+describe("POST /field-work/jobs/:jobId/signature", () => {
+  function post(auth: { companyId: string; userId: string; role: string }, jobId: string, body: Record<string, unknown>) {
+    return request(app.server)
+      .post(`/api/v1/field-work/jobs/${jobId}/signature`)
+      .set("Authorization", bearer(auth.companyId, auth.userId, auth.role))
+      .send(body);
+  }
+
+  it("captures, returns signedAt + signerRole, and is idempotent by clientOperationId", async () => {
+    const seed = seedFieldJob();
+    const attachment = seedSignatureImage(seed.company.id, seed.job.id);
+    const body = {
+      clientOperationId: "sig-ep-1",
+      baseRecordVersion: liveJobVersion(seed.job.id),
+      attachmentId: attachment.id,
+      signedByName: "Pat Customer",
+      signerRole: "customer"
+    };
+    const first = await post(authOf(seed), seed.job.id, body);
+    expect(first.status).toBe(201);
+    expect(first.body.signature.created).toBe(true);
+    expect(first.body.signature).toMatchObject({ jobId: seed.job.id, outcome: "applied", signedByName: "Pat Customer", signerRole: "customer" });
+    expect(typeof first.body.signature.signedAt).toBe("string");
+    expect(JSON.stringify(first.body)).not.toContain("renvani-object:");
+
+    const again = await post(authOf(seed), seed.job.id, body);
+    expect(again.status).toBe(200);
+    expect(again.body.signature.created).toBe(false);
+
+    // Same signature re-sent under a new clientOperationId: already captured -> 200, created false.
+    const resend = await post(authOf(seed), seed.job.id, {
+      ...body,
+      clientOperationId: "sig-ep-1b",
+      baseRecordVersion: liveJobVersion(seed.job.id)
+    });
+    expect(resend.status).toBe(200);
+    expect(resend.body.signature).toMatchObject({ created: false, outcome: "applied" });
+    expect(again.body.signature.outcome).toBe("duplicate");
+    expect(again.body.signature.signedAt).toBe(first.body.signature.signedAt);
+  });
+
+  it.each([
+    [{ signerRole: "boss" }],
+    [{ signerRole: undefined }],
+    [{ extra: true }],
+    [{ attachmentId: undefined }]
+  ])("rejects invalid body %j", async (patch) => {
+    const seed = seedFieldJob();
+    const attachment = seedSignatureImage(seed.company.id, seed.job.id);
+    const body: Record<string, unknown> = {
+      clientOperationId: "sig-ep-bad",
+      baseRecordVersion: liveJobVersion(seed.job.id),
+      attachmentId: attachment.id,
+      signedByName: "Pat",
+      signerRole: "customer",
+      ...patch
+    };
+    for (const key of Object.keys(body)) if (body[key] === undefined) delete body[key];
+    const res = await post(authOf(seed), seed.job.id, body);
+    expect(res.status).toBe(400);
+    expect(fakeDb.getTestState().jobs[0]!.signatureUrl).toBeNull();
+  });
+
+  it("returns 409 on a stale record version", async () => {
+    const seed = seedFieldJob();
+    const attachment = seedSignatureImage(seed.company.id, seed.job.id);
+    const res = await post(authOf(seed), seed.job.id, {
+      clientOperationId: "sig-ep-stale",
+      baseRecordVersion: buildRecordVersionV1("job", seed.job.id, new Date("2020-01-01T00:00:00Z")),
+      attachmentId: attachment.id,
+      signedByName: "Pat",
+      signerRole: "customer"
+    });
+    expect(res.status).toBe(409);
+  });
+
+  it("forbids a technician who is not assigned to the job", async () => {
+    const seed = seedFieldJob();
+    const otherUser = fakeDb.seedUser({ companyId: seed.company.id, email: "t2@field-co.test", firstName: "O", lastName: "T", role: "technician" });
+    fakeDb.seedTechnician({ companyId: seed.company.id, userId: otherUser.id, firstName: "O", lastName: "T", phone: "+15555550102" });
+    const attachment = seedSignatureImage(seed.company.id, seed.job.id);
+    const res = await post({ companyId: seed.company.id, userId: otherUser.id, role: "technician" }, seed.job.id, {
+      clientOperationId: "sig-ep-other",
+      baseRecordVersion: liveJobVersion(seed.job.id),
+      attachmentId: attachment.id,
+      signedByName: "Pat",
+      signerRole: "technician"
+    });
+    expect(res.status).toBe(403);
+    expect(fakeDb.getTestState().jobs[0]!.signatureUrl).toBeNull();
+  });
+
+  it("does not reach another tenant's job", async () => {
+    const seed = seedFieldJob();
+    const otherCompany = fakeDb.seedCompany({ name: "Other Co", slug: "other-co-sig" });
+    const owner = fakeDb.seedUser({ companyId: otherCompany.id, email: "o@other.test", firstName: "O", lastName: "W", role: "owner" });
+    const attachment = seedSignatureImage(seed.company.id, seed.job.id);
+    const res = await post({ companyId: otherCompany.id, userId: owner.id, role: "owner" }, seed.job.id, {
+      clientOperationId: "sig-ep-x",
+      baseRecordVersion: liveJobVersion(seed.job.id),
+      attachmentId: attachment.id,
+      signedByName: "Pat",
+      signerRole: "customer"
+    });
+    expect(res.status).toBe(404);
+    expect(fakeDb.getTestState().jobs[0]!.signatureUrl).toBeNull();
+  });
+});
+
+describe("signature route rate limiting", () => {
+  it("is covered by the global per-IP limit just like the sibling sync route", async () => {
+    const { isGlobalRateLimitExcluded } = await import("../../plugins/global-rate-limit.js");
+    expect(isGlobalRateLimitExcluded({ method: "POST", url: "/api/v1/field-work/jobs/00000000-0000-4000-8000-000000000000/signature" })).toBe(false);
+    expect(isGlobalRateLimitExcluded({ method: "POST", url: "/api/v1/field-work/sync/batches" })).toBe(false);
+  });
+});

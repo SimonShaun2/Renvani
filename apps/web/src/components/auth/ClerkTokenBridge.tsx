@@ -15,19 +15,20 @@ export function ClerkTokenBridge() {
 
   useLayoutEffect(() => {
     prepareClerkTokenBridge();
-    // Register sign-out immediately. A user can request logout while Clerk is still hydrating,
-    // and redirecting without ending that provider session would bounce straight back into the app.
-    registerClerkSignOut((redirectUrl) => signOut({ redirectUrl }));
     return () => {
       resetClerkTokenBridge();
       registerClerkSignOut(null);
     };
-  }, [signOut]);
+  }, []);
 
   useLayoutEffect(() => {
-    if (!isLoaded) return;
-    registerClerkTokenGetter(isSignedIn ? () => getToken() : null);
-  }, [getToken, isLoaded, isSignedIn]);
+    // Register sign-out immediately. A user can request logout while Clerk is still hydrating,
+    // and redirecting without ending that provider session would bounce straight back into the app.
+    registerClerkSignOut((redirectUrl) => signOut({ redirectUrl }));
+    if (isLoaded) {
+      registerClerkTokenGetter(isSignedIn ? () => getToken() : null);
+    }
+  }, [getToken, isLoaded, isSignedIn, signOut]);
 
   return null;
 }

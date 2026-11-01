@@ -36,13 +36,13 @@ describe("authorizedFetch (shared upload auth)", () => {
     vi.unstubAllGlobals();
   });
 
-  it("sends the Clerk session token when present (wins over legacy)", async () => {
+  it("keeps a mixed-session upload on the legacy tenant selected by server rendering", async () => {
     auth.legacy = "legacy-jwt";
     registerClerkTokenGetter(async () => "clerk-jwt");
 
     await authorizedFetch("/api/v1/imports", { method: "POST", body: new FormData() });
 
-    expect(sentAuthorization(fetchMock)).toBe("Bearer clerk-jwt");
+    expect(sentAuthorization(fetchMock)).toBe("Bearer legacy-jwt");
     const init = fetchMock.mock.calls[0]?.[1] as RequestInit;
     expect(init.credentials).toBe("include");
     expect(String(fetchMock.mock.calls[0]?.[0])).toMatch(/\/api\/v1\/imports$/);

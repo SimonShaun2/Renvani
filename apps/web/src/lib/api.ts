@@ -72,7 +72,7 @@ export async function handleUnauthorized(source: "clerk" | "legacy" | null): Pro
 
 /**
  * Authenticated raw fetch for requests that can't go through `api` (multipart uploads, etc.).
- * Same rules as apiFetch: Clerk token first, legacy JWT fallback, and handleUnauthorized on 401
+ * Same rules as apiFetch: legacy JWT first, Clerk fallback, and handleUnauthorized on 401
  * (Clerk sessions are signed out, never bounced to /login). Returns the Response so callers keep
  * their own error parsing.
  */

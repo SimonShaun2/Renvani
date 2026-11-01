@@ -163,8 +163,11 @@ export function growthBodyFromForm(fd: FormData) {
 export async function runIntake(kind: IntakeKind, fd: FormData, fetchImpl?: typeof fetch): Promise<IntakeResult> {
   if (str(fd, MARKETING_HONEYPOT_FIELD) !== "") return { status: "success", confirmationId: "" };
   const { raw, parsed } = kind === "demo-requests" ? demoBodyFromForm(fd) : growthBodyFromForm(fd);
-  if (!parsed.success) {
-    const fields = fieldErrors(parsed.error.issues, raw, kind);
+  // /demo asks for team size (Figma 246:5638 "Choose your team size."); the shared contract keeps `message` optional.
+  const missingTeamSize = kind === "demo-requests" && !str(fd, "teamSize").trim();
+  if (!parsed.success || missingTeamSize) {
+    const fields: Record<string, string> = parsed.success ? {} : fieldErrors(parsed.error.issues, raw, kind);
+    if (missingTeamSize) fields.teamSize ??= FIELD_MESSAGES.teamSize!.empty;
     // zod skips the object-level ZIP/city refine when a field already failed; report it together.
     if (kind === "growth-checks" && !str(fd, "location").trim()) fields.location ??= "Enter your ZIP or city.";
     return { status: "invalid", fields, message: INTAKE_MESSAGES.invalid };

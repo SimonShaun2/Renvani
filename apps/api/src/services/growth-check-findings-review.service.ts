@@ -153,6 +153,16 @@ export function applyGrowthCheckReviewAction(
   return next;
 }
 
+/**
+ * Idempotency request hash. Since #376 this uses the shared key-sorted canonicalJson (code-point order, every
+ * depth) instead of a top-level localeCompare sort. Review bodies are flat, strict objects whose keys all start
+ * with a lowercase ASCII letter, so both orderings and therefore both hashes are byte-identical: revisions stored
+ * before the change still replay (see findings-review-payload-hash.test.ts). Exported for that test.
+ */
+export function findingReviewPayloadHash(body: GrowthCheckFindingReviewBody): string {
+  return payloadHash(body);
+}
+
 function payloadHash(body: GrowthCheckFindingReviewBody): string {
   const { idempotencyKey: _ignored, ...rest } = body;
   return createHash("sha256").update(canonicalJson(rest)).digest("hex");

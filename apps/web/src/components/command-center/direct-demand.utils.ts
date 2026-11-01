@@ -13,12 +13,10 @@ export function isoDateIn(date: Date, timeZone?: string): string {
   }
 }
 
-/** Last 30 days inclusive of today, as calendar dates in the shop time zone. */
-export function last30DaysRange(now: Date, timeZone?: string) {
+/** Calendar month to date (1st of the month through today) in the shop time zone, else the browser's. */
+export function monthToDateRange(now: Date, timeZone?: string) {
   const endDate = isoDateIn(now, timeZone);
-  const [y, m, d] = endDate.split("-").map(Number);
-  const start = new Date(Date.UTC(y!, m! - 1, d! - 29));
-  return { startDate: start.toISOString().slice(0, 10), endDate };
+  return { startDate: `${endDate.slice(0, 8)}01`, endDate };
 }
 
 /** "1234.5" -> "$1,234.50" using string math only (no float drift). Rounds half up to cents. */

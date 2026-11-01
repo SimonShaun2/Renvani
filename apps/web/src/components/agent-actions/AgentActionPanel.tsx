@@ -86,7 +86,7 @@ export function AgentActionPanel({ item, onDone }: { item: OperatorInboxItem; on
           {isEmail ? (
             <input
               aria-label="Email subject"
-              className="w-full rounded-lg border border-[#e6dccb] px-3 py-2 text-sm"
+              className="min-h-11 w-full rounded-lg border border-[#e6dccb] px-3 py-2 text-sm"
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
               placeholder="Subject"
@@ -99,10 +99,10 @@ export function AgentActionPanel({ item, onDone }: { item: OperatorInboxItem; on
             onChange={(e) => setBody(e.target.value)}
           />
           <div className="flex gap-2">
-            <button type="button" disabled={busy || !body.trim()} onClick={() => void save()} className={cn("h-9 rounded-[10px] px-3.5 text-[13px] font-semibold disabled:opacity-50", ACTION_TONE_CLASS.secondary)}>
+            <button type="button" disabled={busy || !body.trim()} onClick={() => void save()} className={cn("h-11 rounded-[10px] px-3.5 text-[13px] font-semibold disabled:opacity-50", ACTION_TONE_CLASS.secondary)}>
               Save edits
             </button>
-            <button type="button" onClick={() => setEditing(false)} className={cn("h-9 rounded-[10px] px-3.5 text-[13px] font-semibold", ACTION_TONE_CLASS.ghost)}>
+            <button type="button" onClick={() => setEditing(false)} className={cn("h-11 rounded-[10px] px-3.5 text-[13px] font-semibold", ACTION_TONE_CLASS.ghost)}>
               Cancel
             </button>
           </div>

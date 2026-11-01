@@ -76,6 +76,16 @@ describe("pricing (Figma 203:15719 desktop / 203:15720 mobile)", () => {
     }
   });
 
+  it("plan CTAs follow the Figma prototype links (204:7829 / I204:7831;204:7829 / 204:7952 / I204:7954;204:7952 / 204:7915 / 204:8038)", () => {
+    const { container } = render(<PricingFrames />);
+    const byLabel = (label: string) => Array.from(container.querySelectorAll("a")).filter((a) => a.textContent?.trim() === label).map((a) => a.getAttribute("href"));
+    expect(byLabel("Explore Flex")).toEqual(["/demo?plan=flex", "/demo?plan=flex"]);
+    expect(byLabel("Explore Flat")).toEqual(["/demo?plan=flat", "/demo?plan=flat"]);
+    expect(byLabel("Ask about programs")).toEqual(["/demo", "/demo"]);
+    expect(byLabel("Get a free demo").every((h) => h === "/demo")).toBe(true);
+    expect(Array.from(container.querySelectorAll("a")).some((a) => a.getAttribute("href")?.startsWith("/signup?plan"))).toBe(false);
+  });
+
   it("copy guard: no $1.99 booking fee, no competitors, no restaurant language", () => {
     const { container } = render(<PricingFrames />);
     const src = ["pricing-config.ts", "pricing-visuals.ts", "PricingPage.tsx"].map((f) => readFileSync(join(__dirname, f), "utf8")).join("\n");

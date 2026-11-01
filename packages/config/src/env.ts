@@ -17,6 +17,8 @@ const envSchema = z.object({
   DATABASE_TRANSACTION_MAX_RETRIES: z.coerce.number().int().nonnegative().default(3),
   DATABASE_TRANSACTION_RETRY_BASE_MS: z.coerce.number().int().positive().default(25),
   REDIS_URL: z.string().min(1, "REDIS_URL is required"),
+  /** Trusted-operations break-glass gate for non-exhausted source-queue replay. */
+  SOURCE_QUEUE_REPLAY_ENABLED: z.enum(["true", "false"]).default("false"),
   /** FS-198 — geo/ETA provider id (registry in apps/api). Default needs no key and makes no calls. */
   GEO_PROVIDER: z.string().regex(/^[a-z][a-z0-9_]{0,63}$/).default("straight_line"),
   /** FS-198 — assumed average driving speed for straight-line ETAs (mph); clamped 5–80 at use. */

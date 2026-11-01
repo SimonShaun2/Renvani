@@ -12,6 +12,7 @@ import {
   replayFailedJobById,
   webhooksQueue
 } from "@fsm/jobs";
+import { env } from "@fsm/config";
 
 const queueRegistry = {
   [QUEUE_NAMES.imports]: importsQueue,
@@ -39,9 +40,18 @@ async function main(): Promise<void> {
   const queueName = readArg("--queue");
   const jobId = readArg("--job-id");
   const expectedCompanyId = readArg("--company-id");
+  const requestedByUserId = readArg("--operator-id");
+  const reason = readArg("--reason");
 
-  if (!queueName || !jobId || !expectedCompanyId) {
-    console.error("Usage: replay-failed-job --queue <name> --job-id <id> --company-id <uuid>");
+  if (env.SOURCE_QUEUE_REPLAY_ENABLED !== "true") {
+    console.error("Source-queue replay is disabled; use the authenticated dead-letter recovery endpoint for exhausted jobs");
+    process.exit(1);
+  }
+
+  if (!queueName || !jobId || !expectedCompanyId || !requestedByUserId || !reason) {
+    console.error(
+      "Usage: replay-failed-job --queue <name> --job-id <id> --company-id <uuid> --operator-id <uuid> --reason <text>"
+    );
     process.exit(1);
   }
 
@@ -54,10 +64,16 @@ async function main(): Promise<void> {
   const result = await replayFailedJobById(queue, {
     queueName: queueName as (typeof QUEUE_NAMES)[keyof typeof QUEUE_NAMES],
     jobId,
-    expectedCompanyId
+    expectedCompanyId,
+    requestedByUserId,
+    reason
   });
 
-  console.log(JSON.stringify({ ok: true, ...result }));
+  console.log(JSON.stringify({
+    ok: true,
+    eventType: "queue.source_replayed",
+    ...result
+  }));
 }
 
 main().catch((error: unknown) => {

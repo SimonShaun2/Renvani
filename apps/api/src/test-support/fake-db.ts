@@ -63,6 +63,7 @@ type TableName =
   | "bookingRequests"
   | "bookingSettings"
   | "agentActions"
+  | "crews"
   | "inquirySubmitIdempotency"
   | "serviceAreas"
   | "growthIntakeChecks"
@@ -1315,6 +1316,7 @@ export interface TestJobRecord {
   propertyId: string | null;
   assetId: string | null;
   technicianId: string | null;
+  crewId?: string | null;
   assignedById: string | null;
   type: JobType;
   priority: JobPriority;
@@ -2102,6 +2104,7 @@ export interface TestBookingSettingsRecord {
 }
 
 type AnyTestRecord =
+  | TestCrewRecord
   | TestTimesheetRecord
   | TestTimesheetAuditEventRecord
   | TestTechnicianPayRateRecord
@@ -2224,6 +2227,7 @@ type MockTable =
   | typeof bookingRequestsTable
   | typeof bookingSettingsTable
   | typeof agentActionsTable
+  | typeof crewsTable
   | typeof inquirySubmitIdempotencyTable
   | typeof serviceAreasTable
   | typeof growthIntakeChecksTable
@@ -2293,6 +2297,7 @@ interface TestState {
   bookingRequests: TestBookingRequestRecord[];
   bookingSettings: TestBookingSettingsRecord[];
   agentActions: TestAgentActionRecord[];
+  crews: TestCrewRecord[];
   inquirySubmitIdempotency: TestInquirySubmitIdempotencyRecord[];
   serviceAreas: TestServiceAreaRecord[];
   growthIntakeChecks: TestGrowthIntakeCheckRecord[];
@@ -2464,6 +2469,7 @@ const jobsTable = {
   propertyId: "propertyId",
   assetId: "assetId",
   technicianId: "technicianId",
+  crewId: "crewId",
   assignedById: "assignedById",
   type: "type",
   priority: "priority",
@@ -4031,6 +4037,31 @@ const fieldSyncOperationsTable = {
   deletedAt: "deletedAt"
 } as const;
 
+export interface TestCrewRecord {
+  id: string;
+  companyId: string;
+  name: string;
+  color: string | null;
+  isActive: boolean;
+  version: number;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date | null;
+}
+
+const crewsTable = {
+  __name: "crews",
+  id: "id",
+  companyId: "companyId",
+  name: "name",
+  color: "color",
+  isActive: "isActive",
+  version: "version",
+  createdAt: "createdAt",
+  updatedAt: "updatedAt",
+  deletedAt: "deletedAt"
+} as const;
+
 const agentActionsTable = {
   __name: "agentActions",
   id: "id",
@@ -4242,6 +4273,7 @@ const state: TestState = {
   bookingRequests: [],
   bookingSettings: [],
   agentActions: [],
+  crews: [],
   inquirySubmitIdempotency: [],
   serviceAreas: [],
   growthIntakeChecks: [],
@@ -4319,6 +4351,7 @@ function restoreState(snapshot: TestState): void {
   state.bookingRequests.splice(0, state.bookingRequests.length, ...snapshot.bookingRequests);
   state.bookingSettings.splice(0, state.bookingSettings.length, ...snapshot.bookingSettings);
   state.agentActions.splice(0, state.agentActions.length, ...snapshot.agentActions);
+  state.crews.splice(0, state.crews.length, ...snapshot.crews);
   state.serviceAreas.splice(0, state.serviceAreas.length, ...(snapshot.serviceAreas ?? []));
   state.inquirySubmitIdempotency.splice(
     0,
@@ -4457,6 +4490,8 @@ function getRows(tableName: TableName): AnyTestRecord[] {
       return state.bookingSettings;
     case "agentActions":
       return state.agentActions;
+    case "crews":
+      return state.crews;
     case "inquirySubmitIdempotency":
       return state.inquirySubmitIdempotency;
     case "serviceAreas":
@@ -4720,6 +4755,7 @@ function createJobRecord(
     propertyId: values.propertyId ?? null,
     assetId: values.assetId ?? null,
     technicianId: values.technicianId ?? null,
+    crewId: values.crewId ?? null,
     assignedById: values.assignedById ?? null,
     type: values.type ?? "service_call",
     priority: values.priority ?? "normal",
@@ -6239,6 +6275,8 @@ function createRow(tableName: TableName, values: Record<string, unknown>): AnyTe
             "companyId" | "idempotencyKey" | "payloadHash" | "bookingRequestId" | "responseSnapshot" | "expiresAt"
           >
       );
+    case "crews":
+      throw new Error("fake-db: insert into crews is not supported; use seedCrew");
     case "agentActions":
       return createAgentActionRecord(
         values as Partial<TestAgentActionRecord> &
@@ -6652,6 +6690,7 @@ export const onTheWayNotifications = onTheWayNotificationsTable;
 export const bookingRequests = bookingRequestsTable;
 export const bookingSettings = bookingSettingsTable;
 export const agentActions = agentActionsTable;
+export const crews = crewsTable;
 export const fieldSyncBatches = fieldSyncBatchesTable;
 export const fieldSyncOperations = fieldSyncOperationsTable;
 export const inquirySubmitIdempotency = inquirySubmitIdempotencyTable;
@@ -7122,6 +7161,7 @@ export function createDbModuleMock() {
     bookingRequests,
     bookingSettings,
     agentActions,
+    crews,
     fieldSyncBatches,
     fieldSyncOperations,
     inquirySubmitIdempotency,
@@ -7200,6 +7240,7 @@ export function resetTestState(): void {
   state.bookingRequests.length = 0;
   state.bookingSettings.length = 0;
   state.agentActions.length = 0;
+  state.crews.length = 0;
   state.fieldSyncBatches.length = 0;
   state.fieldSyncOperations.length = 0;
   state.inquirySubmitIdempotency.length = 0;
@@ -7550,6 +7591,23 @@ export function seedGrowthIntakeCheck(
 ): TestGrowthIntakeCheckRecord {
   const record = createGrowthIntakeCheckRecord(values);
   state.growthIntakeChecks.push(record);
+  return record;
+}
+
+export function seedCrew(input: Partial<TestCrewRecord> & Pick<TestCrewRecord, "companyId" | "name">): TestCrewRecord {
+  const now = new Date();
+  const record: TestCrewRecord = {
+    id: input.id ?? randomUUID(),
+    companyId: input.companyId,
+    name: input.name,
+    color: input.color ?? null,
+    isActive: input.isActive ?? true,
+    version: input.version ?? 1,
+    createdAt: input.createdAt ?? now,
+    updatedAt: input.updatedAt ?? now,
+    deletedAt: input.deletedAt ?? null
+  };
+  state.crews.push(record);
   return record;
 }
 

@@ -123,6 +123,8 @@ Source: Figma frame **"AOF / 03 Action execution · Delivery states"** (file `ji
 
 The fix is one new read-only endpoint, for example `GET /api/v1/reporting/command-center-kpis?period=`, composed from those queries. The web wiring belongs to Dev C. KPIs have no failing test here because the placeholder lives in `apps/web` and this ticket makes no web edits.
 
+**Status (FS-29, API side):** the endpoint now exists as `GET /api/v1/command-center/brief` (owner/admin only; `routes/command-center/index.ts`, `services/command-center/command-center-brief.service.ts`, types in `@fsm/types` `command-center.types.ts`). It returns the four KPIs for the calendar month with the previous month as comparison, each with a written definition and cited `sources[]` (record-number labels and web routes, never customer names). Direct inquiries = booking requests + tracked inbound calls not matched to a booking from the same caller within 24h. Inquiry → booked = bookings linked to a booked job ÷ bookings. First → recurring = customers whose first booked job is in the period that hold an active maintenance plan/agreement/VIP row or have a later booked job. Marketing revenue = paid invoices in the period on rebooking (plan visit or repeat customer) or `utm_campaign`-attributed jobs, summed in cents. The same response carries the Needs-you queue (awaiting approval as suggestions; failed, escalated and failed-delivery receipts as facts), the discover/book/complete/rebook loop, crews today and jobs today. Reads run in one `runTransactionWithTenantSession` transaction. The web placeholder (`command-center.config.ts`) is still to be wired by Dev C, so G-KPI stays open on the web side.
+
 ## 6. Gap list and proposed small-PR fix order
 
 | Order | Gap | Category | Failing test | Proposed small PR | Depends on #301 |
@@ -136,7 +138,7 @@ The fix is one new read-only endpoint, for example `GET /api/v1/reporting/comman
 | 7 | G-TX: tenant-session bypasses B1–B4 | tenant scope | (documented; needs Neon/RLS harness) | B1/B2 → `runTransactionWithTenantSession`. B3 → `resolveEntityRef(…, tx)`. B4 reads → tenant session. | no |
 | 8 | G-SCHEMA: no per-type parameter schema for `revenue.inquiry.qualify`, `scheduling.booking.self_service` and the 4 Revenue kinds | input schema | (documented) | Add an optional `parametersSchema` to `AgentActionTypeDefinition`, parsed at create and execute. | no |
 | 9 | G-POLICY: policy version not re-checked at approve/execute; executor actor hard-coded `"user"` | permissions / policy | (documented) | `assertPolicyVersion(row.policyVersion)` at approve/execute; pass the real actor type. | no |
-| 10 | G-KPI: Command Center KPIs are placeholders | KPIs | (web; documented) | Add `GET /reporting/command-center-kpis` (API), then wire the web (Dev C). | no |
+| 10 | G-KPI: Command Center KPIs are placeholders | KPIs | (web; documented) | API done in FS-29 as `GET /command-center/brief`; wire the web (Dev C). | no |
 
 **Gap counts by category:**
 - stale records: 1 gap (3 tests)

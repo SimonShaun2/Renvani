@@ -40,6 +40,7 @@ sequenceDiagram
 | VIP operator API | `/api/v1/vip/*` | `owner`, `admin` | `fs-42-tenant-access-audit.test.ts`, STACK-03 unauth |
 | CSV import API | `/api/v1/imports/*` | `owner`, `admin` | FS-92 list/read, FS-42 role + spoof query |
 | Migrate wizard | `/api/v1/migrate/onboarding/*` | `owner`, `admin` | STACK-03 JWT/Clerk matrix, FS-42 cross-tenant GET |
+| Owner Command Center brief (FS-29) | `GET /api/v1/command-center/brief` | `owner`, `admin` (dispatcher/technician 403 in `onRequest`, before query validation) | FS42-UNAUTH/ROLE/XT/SPOOF-COMMAND-CENTER-BRIEF; `command-center-brief.test.ts` FS29-01/FS29-10. Read-only, `runTransactionWithTenantSession` + `company_id` filters; tenant from auth only (`companyId` query rejected 400); labels never carry customer names/contacts |
 
 ## Client-supplied `companyId`
 

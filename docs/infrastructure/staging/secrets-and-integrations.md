@@ -64,4 +64,4 @@ node scripts/staging/validate-env-boundaries.mjs --tier staging path/to/.env
 ```
 
 See `packages/config/src/deployment-environment.ts` for machine-readable rules.
-The local dotenv boundary validator rejects duplicate keys, including duplicate secret names, before it evaluates the environment. Its error identifies the key only and never prints either value.
+The local dotenv boundary validator normalizes an optional `export` prefix, requires canonical uppercase environment names, and rejects duplicate keys before it evaluates the environment. Duplicate errors identify the validated key only; invalid-key errors identify only the line, and neither path prints values.

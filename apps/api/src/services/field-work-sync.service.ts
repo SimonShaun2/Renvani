@@ -41,6 +41,13 @@ import { updateTask } from "./job-tasks.service.js";
 
 type BatchRow = typeof fieldSyncBatches.$inferSelect;
 type OperationRow = typeof fieldSyncOperations.$inferSelect;
+type JobRow = typeof jobs.$inferSelect;
+
+type SignatureCaptureTransactionResult =
+  | { kind: "captured"; job: JobRow; signedAt: Date }
+  | { kind: "already_captured"; job: JobRow; recordVersion: string }
+  | { kind: "conflict"; recordVersion: string; reason: string }
+  | { kind: "rejected"; message: string };
 
 export interface FieldWorkSyncActor {
   companyId: string;
@@ -359,23 +366,6 @@ async function applyOperation(
       };
     }
     case "job.signature.capture": {
-      const [job] = await db
-        .select()
-        .from(jobs)
-        .where(
-          and(eq(jobs.companyId, actor.companyId), eq(jobs.id, operation.jobId), isNull(jobs.deletedAt))
-        )
-        .limit(1);
-
-      if (!job) {
-        return { outcome: "rejected", resultPayload: { message: "Job not found" } };
-      }
-
-      const liveVersion = buildRecordVersionV1("job", job.id, job.updatedAt);
-      if (isStaleRecordVersion(operation.baseRecordVersion, liveVersion)) {
-        return buildFieldWorkSyncVersionConflict(liveVersion, "Job recordVersion is stale");
-      }
-
       const resolvedSignature = await resolveSignatureCaptureValue(actor.companyId, operation.jobId, operation.payload);
       if (!resolvedSignature.ok) {
         return {
@@ -385,27 +375,39 @@ async function applyOperation(
       }
       const signatureValue = resolvedSignature.value;
 
-      if (job.signatureUrl && job.signatureUrl !== signatureValue) {
-        return buildFieldWorkSyncVersionConflict(
-          liveVersion,
-          "Job already has a different signature on file"
-        );
-      }
+      const captureResult: SignatureCaptureTransactionResult = await db.transaction(async (tx) => {
+        // PostgreSQL defaultNow() retains microseconds while the JS Date used in recordVersion tokens has
+        // millisecond precision. Lock and revalidate the token instead of comparing updated_at to a rounded Date.
+        const [currentJob] = await tx
+          .select()
+          .from(jobs)
+          .where(
+            and(eq(jobs.companyId, actor.companyId), eq(jobs.id, operation.jobId), isNull(jobs.deletedAt))
+          )
+          .for("update")
+          .limit(1);
 
-      if (job.signatureUrl === signatureValue) {
-        return {
-          outcome: "applied",
-          resultPayload: {
-            entityId: job.id,
-            recordVersion: liveVersion,
-            message: SIGNATURE_ALREADY_CAPTURED_MESSAGE,
-            ...(job.signedAt ? { signedAt: job.signedAt.toISOString() } : {})
-          }
-        };
-      }
+        if (!currentJob) {
+          return { kind: "rejected", message: "Job not found" };
+        }
 
-      const signedAt = new Date();
-      const updated = await db.transaction(async (tx) => {
+        const currentVersion = buildRecordVersionV1("job", currentJob.id, currentJob.updatedAt);
+        // A same-signature retry is safe even when another request won the race after our attachment lookup.
+        if (currentJob.signatureUrl === signatureValue) {
+          return { kind: "already_captured", job: currentJob, recordVersion: currentVersion };
+        }
+        if (currentJob.signatureUrl) {
+          return {
+            kind: "conflict",
+            recordVersion: currentVersion,
+            reason: "Job already has a different signature on file"
+          };
+        }
+        if (isStaleRecordVersion(operation.baseRecordVersion, currentVersion)) {
+          return { kind: "conflict", recordVersion: currentVersion, reason: "Job recordVersion is stale" };
+        }
+
+        const signedAt = new Date();
         const [captured] = await tx
           .update(jobs)
           .set({
@@ -419,69 +421,57 @@ async function applyOperation(
               eq(jobs.companyId, actor.companyId),
               eq(jobs.id, operation.jobId),
               isNull(jobs.deletedAt),
-              isNull(jobs.signatureUrl),
-              eq(jobs.updatedAt, job.updatedAt)
+              isNull(jobs.signatureUrl)
             )
           )
           .returning();
 
-        if (captured) {
-          await emitEventWithExecutor(tx, "job.updated", {
-            companyId: actor.companyId,
-            actorId: actor.userId,
-            actorType: "user",
-            entityType: "job",
-            entityId: captured.id,
-            jobId: captured.id,
-            customerId: captured.customerId,
-            summary: `Captured ${operation.payload.signerRole === "technician" ? "technician" : "customer"} signature on job ${captured.jobNumber}`,
-            // Never put the internal storage reference on the event bus.
-            payload: isJobSignatureObjectRef(captured.signatureUrl)
-              ? { signatureAttachmentId: operation.payload.attachmentId ?? null }
-              : { signatureSource: "legacy_https_url" }
-          });
+        if (!captured) {
+          return { kind: "conflict", recordVersion: currentVersion, reason: "Job changed concurrently" };
         }
 
-        return captured;
+        await emitEventWithExecutor(tx, "job.updated", {
+          companyId: actor.companyId,
+          actorId: actor.userId,
+          actorType: "user",
+          entityType: "job",
+          entityId: captured.id,
+          jobId: captured.id,
+          customerId: captured.customerId,
+          summary: `Captured ${operation.payload.signerRole === "technician" ? "technician" : "customer"} signature on job ${captured.jobNumber}`,
+          // Never put the internal storage reference on the event bus.
+          payload: isJobSignatureObjectRef(captured.signatureUrl)
+            ? { signatureAttachmentId: operation.payload.attachmentId ?? null }
+            : { signatureSource: "legacy_https_url" }
+        });
+
+        return { kind: "captured", job: captured, signedAt };
       });
 
-      if (!updated) {
-        const [currentJob] = await db
-          .select()
-          .from(jobs)
-          .where(
-            and(
-              eq(jobs.companyId, actor.companyId),
-              eq(jobs.id, operation.jobId),
-              isNull(jobs.deletedAt)
-            )
-          )
-          .limit(1);
-        const currentVersion = currentJob
-          ? buildRecordVersionV1("job", currentJob.id, currentJob.updatedAt)
-          : liveVersion;
-
-        if (currentJob?.signatureUrl === signatureValue) {
-          return {
-            outcome: "applied",
-            resultPayload: {
-              entityId: currentJob.id,
-              recordVersion: currentVersion,
-              message: SIGNATURE_ALREADY_CAPTURED_MESSAGE,
-              ...(currentJob.signedAt ? { signedAt: currentJob.signedAt.toISOString() } : {})
-            }
-          };
-        }
-
-        return buildFieldWorkSyncVersionConflict(currentVersion, "Job changed concurrently");
+      if (captureResult.kind === "rejected") {
+        return { outcome: "rejected", resultPayload: { message: captureResult.message } };
+      }
+      if (captureResult.kind === "conflict") {
+        return buildFieldWorkSyncVersionConflict(captureResult.recordVersion, captureResult.reason);
+      }
+      if (captureResult.kind === "already_captured") {
+        return {
+          outcome: "applied",
+          resultPayload: {
+            entityId: captureResult.job.id,
+            recordVersion: captureResult.recordVersion,
+            message: SIGNATURE_ALREADY_CAPTURED_MESSAGE,
+            ...(captureResult.job.signedAt ? { signedAt: captureResult.job.signedAt.toISOString() } : {})
+          }
+        };
       }
 
       return {
         outcome: "applied",
         resultPayload: {
-          entityId: updated.id,
-          recordVersion: buildRecordVersionV1("job", updated.id, updated.updatedAt),
-          signedAt: signedAt.toISOString(),
+          entityId: captureResult.job.id,
+          recordVersion: buildRecordVersionV1("job", captureResult.job.id, captureResult.job.updatedAt),
+          signedAt: captureResult.signedAt.toISOString(),
           // Signer role is persisted on the stored operation result (no jobs column / migration).
           signerRole: operation.payload.signerRole ?? "customer"
         }

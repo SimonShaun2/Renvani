@@ -217,6 +217,36 @@ describe("job.signature.capture with attachmentId", () => {
     expect(stored.signedAt).toBeInstanceOf(Date);
   });
 
+  it("captures an untouched job when persisted timestamp precision collapses to the same JS millisecond", async () => {
+    const seed = seedFieldJob();
+    const attachment = seedSignatureImage(seed.company.id, seed.job.id);
+    const originalTransaction = fakeDb.db.transaction.bind(fakeDb.db);
+    fakeDb.db.transaction = (async (
+      callback: (tx: typeof fakeDb.db) => Promise<unknown>
+    ): Promise<unknown> => {
+      const state = fakeDb.getTestState();
+      const current = state.jobs[0]!;
+      // Models PostgreSQL defaultNow() microseconds being rounded into a fresh millisecond-precision JS Date.
+      state.jobs[0] = { ...current, updatedAt: new Date(current.updatedAt.getTime()) };
+      return originalTransaction(callback);
+    }) as typeof fakeDb.db.transaction;
+
+    try {
+      const response = await capture(authOf(seed), seed.job.id, {
+        attachmentId: attachment.id,
+        signedByName: "Pat Customer"
+      });
+
+      expect(response.status).toBe(200);
+      expect(response.body.results[0].outcome).toBe("applied");
+      expect(fakeDb.getTestState().jobs[0]!.signatureUrl).toBe(
+        `renvani-object:attachments/${seed.company.id}/1-signature.png`
+      );
+    } finally {
+      fakeDb.db.transaction = originalTransaction;
+    }
+  });
+
   it("rolls back signature capture when its activity event cannot be stored", async () => {
     const seed = seedFieldJob();
     const attachment = seedSignatureImage(seed.company.id, seed.job.id);

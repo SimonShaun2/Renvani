@@ -1,13 +1,27 @@
-import type { Job } from "bullmq";
-import { describe, expect, it } from "vitest";
+import type { Job, Queue } from "bullmq";
+import { describe, expect, it, vi } from "vitest";
 
-import { QUEUE_PLATFORM_CONTRACT_VERSION } from "@fsm/types";
+import {
+  QUEUE_PLATFORM_CONTRACT_VERSION,
+  type DeadLetterJobEnvelopeV1,
+  type DeadLetterRecoveryRequestV1
+} from "@fsm/types";
 
 import {
   buildDeadLetterEnvelope,
+  buildDeadLetterForwardJobId,
   buildDeadLetterQueueName,
-  isJobExhausted
-} from "./dead-letter-job.js";
+  buildDeadLetterRecoveryJobId,
+  isJobExhausted,
+  recoverDeadLetterJob
+} from "./dead-letter-queue.js";
+
+vi.mock("./queues.js", () => ({
+  queueBaseOptions: { connection: {} }
+}));
+
+const COMPANY_ID = "11111111-1111-4111-8111-111111111111";
+const OPERATOR_ID = "22222222-2222-4222-8222-222222222222";
 
 function mockJob(partial: {
   id: string;
@@ -65,11 +79,10 @@ describe("isJobExhausted", () => {
 
 describe("buildDeadLetterEnvelope", () => {
   it("builds a contract-shaped envelope with optional companyId", () => {
-    const companyId = "11111111-1111-4111-8111-111111111111";
     const job = mockJob({
       id: "job-42",
       name: "send-sms",
-      data: { companyId, foo: "bar" },
+      data: { companyId: COMPANY_ID, foo: "bar" },
       attemptsMade: 5,
       attempts: 5
     });
@@ -80,8 +93,8 @@ describe("buildDeadLetterEnvelope", () => {
     expect(envelope.sourceQueue).toBe("fsm:notifications");
     expect(envelope.sourceJobId).toBe("job-42");
     expect(envelope.jobName).toBe("send-sms");
-    expect(envelope.companyId).toBe(companyId);
-    expect(envelope.payload).toEqual({ companyId, foo: "bar" });
+    expect(envelope.companyId).toBe(COMPANY_ID);
+    expect(envelope.payload).toEqual({ companyId: COMPANY_ID, foo: "bar" });
     expect(envelope.attemptsMade).toBe(5);
     expect(envelope.failureClass).toBe("transient");
     expect(envelope.errorMessage).toBe("timeout");
@@ -107,5 +120,109 @@ describe("buildDeadLetterEnvelope", () => {
 describe("buildDeadLetterQueueName", () => {
   it("suffixes the source queue with -dlq", () => {
     expect(buildDeadLetterQueueName("fsm:notifications")).toBe("fsm:notifications-dlq");
+  });
+});
+
+describe("dead-letter operation job ids", () => {
+  it("builds stable colon-free IDs accepted by BullMQ custom job validation", () => {
+    const forwarded = buildDeadLetterForwardJobId("imports", "fs81-smoke:source:1");
+    const recovered = buildDeadLetterRecoveryJobId("imports", "fs81-smoke:source:1");
+
+    expect(forwarded).toMatch(/^fsm-dlq-[a-f0-9]{32}$/);
+    expect(recovered).toMatch(/^fsm-recover-[a-f0-9]{32}$/);
+    expect(forwarded).not.toContain(":");
+    expect(recovered).not.toContain(":");
+    expect(buildDeadLetterRecoveryJobId("imports", "fs81-smoke:source:1")).toBe(recovered);
+    expect(buildDeadLetterRecoveryJobId("imports", "fs81-smoke:source:2")).not.toBe(recovered);
+  });
+});
+
+describe("recoverDeadLetterJob", () => {
+  const request: DeadLetterRecoveryRequestV1 = {
+    contractVersion: QUEUE_PLATFORM_CONTRACT_VERSION,
+    sourceQueue: "imports",
+    deadLetterJobId: "fs81-smoke-1793548157144",
+    requestedByUserId: OPERATOR_ID
+  };
+
+  const envelope: DeadLetterJobEnvelopeV1 = {
+    contractVersion: QUEUE_PLATFORM_CONTRACT_VERSION,
+    sourceQueue: "imports",
+    sourceJobId: "source:job:42",
+    jobName: "execute-import",
+    companyId: COMPANY_ID,
+    payload: { companyId: COMPANY_ID, importSessionId: "session-1" },
+    attemptsMade: 5,
+    failedAt: "2026-11-01T15:00:00.000Z",
+    failureClass: "transient",
+    errorMessage: "provider timeout"
+  };
+
+  it("re-enqueues with a deterministic valid ID and removes the DLQ copy", async () => {
+    const remove = vi.fn(async () => undefined);
+    const sourceAdd = vi.fn(async (
+      _name: string,
+      _payload: Record<string, unknown>,
+      options: { jobId?: string }
+    ) => {
+      if (options.jobId?.includes(":")) {
+        throw new Error("Custom Id cannot contain :");
+      }
+
+      return { id: options.jobId };
+    });
+    const deadLetterQueue = {
+      getJob: vi.fn(async () => ({ data: envelope, remove }))
+    };
+
+    const recoveredJobId = await recoverDeadLetterJob(
+      { add: sourceAdd } as unknown as Queue,
+      request,
+      { getDeadLetterQueue: () => deadLetterQueue as unknown as Pick<Queue, "getJob"> }
+    );
+
+    expect(recoveredJobId).toBe(buildDeadLetterRecoveryJobId("imports", envelope.sourceJobId));
+    expect(sourceAdd).toHaveBeenCalledWith(
+      envelope.jobName,
+      envelope.payload,
+      expect.objectContaining({ jobId: recoveredJobId })
+    );
+    expect(remove).toHaveBeenCalledOnce();
+  });
+
+  it("fails closed when the stored envelope belongs to another source queue", async () => {
+    const sourceAdd = vi.fn();
+    const remove = vi.fn();
+    const deadLetterQueue = {
+      getJob: vi.fn(async () => ({
+        data: { ...envelope, sourceQueue: "notifications" },
+        remove
+      }))
+    };
+
+    await expect(recoverDeadLetterJob(
+      { add: sourceAdd } as unknown as Queue,
+      request,
+      { getDeadLetterQueue: () => deadLetterQueue as unknown as Pick<Queue, "getJob"> }
+    )).rejects.toThrow("Dead-letter job source queue mismatch");
+    expect(sourceAdd).not.toHaveBeenCalled();
+    expect(remove).not.toHaveBeenCalled();
+  });
+
+  it("keeps the DLQ copy when re-enqueue fails", async () => {
+    const remove = vi.fn();
+    const sourceAdd = vi.fn(async () => {
+      throw new Error("Redis unavailable");
+    });
+    const deadLetterQueue = {
+      getJob: vi.fn(async () => ({ data: envelope, remove }))
+    };
+
+    await expect(recoverDeadLetterJob(
+      { add: sourceAdd } as unknown as Queue,
+      request,
+      { getDeadLetterQueue: () => deadLetterQueue as unknown as Pick<Queue, "getJob"> }
+    )).rejects.toThrow("Redis unavailable");
+    expect(remove).not.toHaveBeenCalled();
   });
 });

@@ -3,19 +3,25 @@
 import { useAuth } from "@clerk/nextjs";
 import { useEffect } from "react";
 
-import { registerClerkSignOut, registerClerkTokenGetter } from "@/src/lib/clerk/token-bridge";
+import {
+  registerClerkSignOut,
+  registerClerkTokenGetter,
+  resetClerkTokenBridge
+} from "@/src/lib/clerk/token-bridge";
 
 export function ClerkTokenBridge() {
-  const { getToken, isSignedIn, signOut } = useAuth();
+  const { getToken, isLoaded, isSignedIn, signOut } = useAuth();
 
   useEffect(() => {
+    if (!isLoaded) return;
+
     registerClerkTokenGetter(isSignedIn ? () => getToken() : null);
     registerClerkSignOut(isSignedIn ? (redirectUrl) => signOut({ redirectUrl }) : null);
     return () => {
-      registerClerkTokenGetter(null);
+      resetClerkTokenBridge();
       registerClerkSignOut(null);
     };
-  }, [getToken, isSignedIn, signOut]);
+  }, [getToken, isLoaded, isSignedIn, signOut]);
 
   return null;
 }

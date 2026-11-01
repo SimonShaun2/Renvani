@@ -12,6 +12,8 @@ import {
   replayFailedJobById,
   webhooksQueue
 } from "@fsm/jobs";
+import { env } from "@fsm/config";
+import { PlatformQueueNameV1Schema, type PlatformQueueNameV1 } from "@fsm/types";
 
 const queueRegistry = {
   [QUEUE_NAMES.imports]: importsQueue,
@@ -23,7 +25,7 @@ const queueRegistry = {
   [QUEUE_NAMES.operator]: operatorQueue,
   [QUEUE_NAMES.exports]: exportsQueue,
   [QUEUE_NAMES.growth]: growthQueue
-};
+} satisfies Record<PlatformQueueNameV1, typeof importsQueue>;
 
 function readArg(flag: string): string | undefined {
   const index = process.argv.indexOf(flag);
@@ -39,25 +41,41 @@ async function main(): Promise<void> {
   const queueName = readArg("--queue");
   const jobId = readArg("--job-id");
   const expectedCompanyId = readArg("--company-id");
+  const requestedByUserId = readArg("--operator-id");
+  const reason = readArg("--reason");
 
-  if (!queueName || !jobId) {
-    console.error("Usage: replay-failed-job --queue <name> --job-id <id> [--company-id <uuid>]");
+  if (env.SOURCE_QUEUE_REPLAY_ENABLED !== "true") {
+    console.error("Source-queue replay is disabled; use the authenticated dead-letter recovery endpoint for exhausted jobs");
     process.exit(1);
   }
 
-  if (!(queueName in queueRegistry)) {
+  if (!queueName || !jobId || !expectedCompanyId || !requestedByUserId || !reason) {
+    console.error(
+      "Usage: replay-failed-job --queue <name> --job-id <id> --company-id <uuid> --operator-id <uuid> --reason <text>"
+    );
+    process.exit(1);
+  }
+
+  const parsedQueueName = PlatformQueueNameV1Schema.safeParse(queueName);
+  if (!parsedQueueName.success || !Object.hasOwn(queueRegistry, parsedQueueName.data)) {
     console.error(`Unknown queue "${queueName}". Valid: ${Object.keys(queueRegistry).join(", ")}`);
     process.exit(1);
   }
 
-  const queue = getQueueByName(queueRegistry, queueName as (typeof QUEUE_NAMES)[keyof typeof QUEUE_NAMES]);
+  const queue = getQueueByName(queueRegistry, parsedQueueName.data);
   const result = await replayFailedJobById(queue, {
-    queueName: queueName as (typeof QUEUE_NAMES)[keyof typeof QUEUE_NAMES],
+    queueName: parsedQueueName.data,
     jobId,
-    ...(expectedCompanyId ? { expectedCompanyId } : {})
+    expectedCompanyId,
+    requestedByUserId,
+    reason
   });
 
-  console.log(JSON.stringify({ ok: true, ...result }));
+  console.log(JSON.stringify({
+    ok: true,
+    eventType: "queue.source_replayed",
+    ...result
+  }));
 }
 
 main().catch((error: unknown) => {

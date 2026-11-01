@@ -2,6 +2,8 @@ import request from "supertest";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
+  AppError,
+  ErrorCode,
   QUEUE_PLATFORM_CONTRACT_VERSION,
   type DeadLetterJobListV1,
   type FailedJobReplayListV1,
@@ -112,6 +114,7 @@ beforeAll(async () => {
 
 beforeEach(async () => {
   fakeDb.resetTestState();
+  vi.mocked(queueMonitoringService.recoverPlatformDeadLetterJob).mockReset();
   vi.mocked(queueMonitoringService.fetchPlatformQueueMonitoringSnapshot).mockResolvedValue(
     sampleSnapshot
   );
@@ -241,6 +244,38 @@ describe("POST /api/v1/internal/admin/queues/:queueName/dead-letter/:deadLetterJ
 
     expect(response.statusCode).toBe(202);
     expect(response.body.recoveredQueueJobId).toBe("recovered-1");
+  });
+
+  it("returns the same recovered job for a lost-response retry", async () => {
+    const internalAdmin = createInternalAdminContext("admin");
+    vi.mocked(queueMonitoringService.recoverPlatformDeadLetterJob).mockResolvedValue({
+      recoveredQueueJobId: "recovered-stable-1"
+    });
+
+    const first = await request(app.server)
+      .post("/api/v1/internal/admin/queues/imports/dead-letter/dlq-1/recover")
+      .set("Authorization", internalAdmin.authorization);
+    const retry = await request(app.server)
+      .post("/api/v1/internal/admin/queues/imports/dead-letter/dlq-1/recover")
+      .set("Authorization", internalAdmin.authorization);
+
+    expect(first.statusCode).toBe(202);
+    expect(retry.statusCode).toBe(202);
+    expect(retry.body).toEqual(first.body);
+  });
+
+  it("returns explicit NOT_FOUND for a genuinely missing recovery identity", async () => {
+    const internalAdmin = createInternalAdminContext("admin");
+    vi.mocked(queueMonitoringService.recoverPlatformDeadLetterJob).mockRejectedValue(
+      new AppError(ErrorCode.NOT_FOUND, "Dead-letter job was not found or recovered")
+    );
+
+    const response = await request(app.server)
+      .post("/api/v1/internal/admin/queues/imports/dead-letter/missing/recover")
+      .set("Authorization", internalAdmin.authorization);
+
+    expect(response.statusCode).toBe(404);
+    expect(response.body).toMatchObject({ error: "NOT_FOUND" });
   });
 });
 

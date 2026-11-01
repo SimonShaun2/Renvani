@@ -419,7 +419,8 @@ async function applyOperation(
               eq(jobs.companyId, actor.companyId),
               eq(jobs.id, operation.jobId),
               isNull(jobs.deletedAt),
-              isNull(jobs.signatureUrl)
+              isNull(jobs.signatureUrl),
+              eq(jobs.updatedAt, job.updatedAt)
             )
           )
           .returning();
@@ -437,7 +438,7 @@ async function applyOperation(
             // Never put the internal storage reference on the event bus.
             payload: isJobSignatureObjectRef(captured.signatureUrl)
               ? { signatureAttachmentId: operation.payload.attachmentId ?? null }
-              : { signatureUrl: captured.signatureUrl }
+              : { signatureSource: "legacy_https_url" }
           });
         }
 
@@ -445,7 +446,34 @@ async function applyOperation(
       });
 
       if (!updated) {
-        return buildFieldWorkSyncVersionConflict(liveVersion, "Job signature changed concurrently");
+        const [currentJob] = await db
+          .select()
+          .from(jobs)
+          .where(
+            and(
+              eq(jobs.companyId, actor.companyId),
+              eq(jobs.id, operation.jobId),
+              isNull(jobs.deletedAt)
+            )
+          )
+          .limit(1);
+        const currentVersion = currentJob
+          ? buildRecordVersionV1("job", currentJob.id, currentJob.updatedAt)
+          : liveVersion;
+
+        if (currentJob?.signatureUrl === signatureValue) {
+          return {
+            outcome: "applied",
+            resultPayload: {
+              entityId: currentJob.id,
+              recordVersion: currentVersion,
+              message: SIGNATURE_ALREADY_CAPTURED_MESSAGE,
+              ...(currentJob.signedAt ? { signedAt: currentJob.signedAt.toISOString() } : {})
+            }
+          };
+        }
+
+        return buildFieldWorkSyncVersionConflict(currentVersion, "Job changed concurrently");
       }
 
       return {

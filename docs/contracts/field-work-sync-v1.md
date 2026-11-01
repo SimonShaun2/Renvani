@@ -39,7 +39,7 @@ Each operation includes:
 | `job.signature.capture` | Reject stale job or differing existing signature | Job |
 | `job.media.register` | Idempotent via `clientOperationId` | Not required |
 
-`job.signature.capture` payload: `{ signedByName, attachmentId }` (preferred) or legacy `{ signedByName, signatureUrl }` — exactly one. `attachmentId` must be a PNG/JPEG/WebP attachment (≤5 MB) on the same job in the same company, otherwise the op is `rejected` with `code: "SIGNATURE_ATTACHMENT_INVALID"`. The server stores an internal object reference; job reads return a short-lived signed URL in `signatureUrl` (legacy full URLs are returned unchanged).
+`job.signature.capture` payload: `{ signedByName, attachmentId }` (preferred) or legacy `{ signedByName, signatureUrl }` — exactly one. `attachmentId` must be a PNG/JPEG/WebP attachment (≤5 MB) on the same job in the same company, otherwise the op is `rejected` with `code: "SIGNATURE_ATTACHMENT_INVALID"`. The server stores an internal object reference; job reads return a short-lived signed URL in `signatureUrl`. New legacy URL inputs are restricted to HTTPS URLs without userinfo, query parameters, or fragments; unsafe historical values fail closed on read, and activity events never include the URL.
 
 ### Technician signature flow (FS-192)
 

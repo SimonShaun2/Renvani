@@ -16,10 +16,6 @@ function createJobId(intentId: string): string {
   return `clerk-workspace-create-${intentId}`;
 }
 
-function reconcileJobId(intentId: string): string {
-  return `clerk-workspace-reconcile-${intentId}`;
-}
-
 /**
  * Enqueue the single permitted provider create attempt for one durable intent.
  * The job is deliberately non-retryable: an unknown provider outcome must be
@@ -31,7 +27,9 @@ export async function enqueueClerkWorkspaceCreateJob(input: ClerkWorkspaceJobPay
     jobId: createJobId(payload.intentId),
     attempts: 1,
     removeOnComplete: true,
-    removeOnFail: false
+    // If infrastructure fails before the CAS claim, a later POST must be able to enqueue again.
+    // Once claimed, state is never pending again, so re-enqueue cannot repeat the provider call.
+    removeOnFail: true
   });
 }
 
@@ -39,7 +37,6 @@ export async function enqueueClerkWorkspaceCreateJob(input: ClerkWorkspaceJobPay
 export async function enqueueClerkWorkspaceReconcileJob(input: ClerkWorkspaceJobPayload): Promise<void> {
   const payload = ClerkWorkspaceJobPayloadSchema.parse(input);
   await webhooksQueue.add(CLERK_WORKSPACE_RECONCILE_JOB_NAME, payload, {
-    jobId: reconcileJobId(payload.intentId),
     attempts: 5,
     backoff: { type: "exponential", delay: 2_000 },
     removeOnComplete: true,

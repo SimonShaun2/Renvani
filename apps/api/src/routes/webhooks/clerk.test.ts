@@ -88,7 +88,7 @@ describe("Clerk webhook", () => {
   });
 
   it("FS-158: a failed delivery releases the claim and the retry is processed", async () => {
-    const body = { type: "organization.created", data: { id: "org_f", name: "Acme" } };
+    const body = { type: "organization.created", data: { id: "org_f", name: "Acme", created_by: "user_f" } };
     provisionClerkOrganization.mockRejectedValueOnce(new Error("boom"));
     const first = await send(body, { id: "msg_fail" });
     expect(first.statusCode).toBe(500);
@@ -106,7 +106,7 @@ describe("Clerk webhook", () => {
     provisionClerkOrganization.mockImplementationOnce(
       () => new Promise((resolve) => (finish = () => resolve({ id: "co_1" })))
     );
-    const body = { type: "organization.created", data: { id: "org_c", name: "Acme" } };
+    const body = { type: "organization.created", data: { id: "org_c", name: "Acme", created_by: "user_c" } };
     const firstP = send(body, { id: "msg_conc" });
     await vi.waitFor(() => expect(provisionClerkOrganization).toHaveBeenCalledTimes(1));
     const second = await send(body, { id: "msg_conc" });
@@ -117,14 +117,14 @@ describe("Clerk webhook", () => {
   });
 
   it("FS-158: distinct svix-ids are processed independently", async () => {
-    const body = { type: "organization.created", data: { id: "org_d", name: "Acme" } };
+    const body = { type: "organization.created", data: { id: "org_d", name: "Acme", created_by: "user_d" } };
     await send(body, { id: "msg_d1" });
     await send(body, { id: "msg_d2" });
     expect(provisionClerkOrganization).toHaveBeenCalledTimes(2);
   });
 
   it("dedupes replays of the same svix-id", async () => {
-    const body = { type: "organization.created", data: { id: "org_r", name: "Acme" } };
+    const body = { type: "organization.created", data: { id: "org_r", name: "Acme", created_by: "user_r" } };
     const first = await send(body, { id: "msg_replay" });
     const second = await send(body, { id: "msg_replay" });
     expect(first.statusCode).toBe(200);
@@ -146,9 +146,16 @@ describe("Clerk webhook", () => {
   });
 
   it("provisions a company on organization.created", async () => {
-    const res = await send({ type: "organization.created", data: { id: "org_1", name: "Acme" } });
+    const res = await send({ type: "organization.created", data: { id: "org_1", name: "Acme", created_by: "user_1" } });
     expect(res.statusCode).toBe(200);
-    expect(provisionClerkOrganization).toHaveBeenCalledWith({ organizationId: "org_1", name: "Acme", createdBy: null });
+    expect(provisionClerkOrganization).toHaveBeenCalledWith({ organizationId: "org_1", name: "Acme", createdBy: "user_1" });
+  });
+
+  it("fails closed when organization.created omits its creator", async () => {
+    const res = await send({ type: "organization.created", data: { id: "org_missing", name: "No Owner" } });
+    expect(res.statusCode).toBe(503);
+    expect(res.json()).toMatchObject({ error: "CLERK_ORGANIZATION_CREATOR_MISSING", deferred: true });
+    expect(provisionClerkOrganization).not.toHaveBeenCalled();
   });
 
   it("provisions company + user on organizationMembership.created", async () => {

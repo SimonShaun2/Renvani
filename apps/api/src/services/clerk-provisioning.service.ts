@@ -1,7 +1,7 @@
 import { and, eq, isNull, sql } from "drizzle-orm";
 import pino from "pino";
 
-import { companies, db, users, type Database } from "@fsm/db";
+import { activityEvents, companies, db, users, type Database } from "@fsm/db";
 import type { UserRole } from "@fsm/types";
 
 import { generateUniqueCompanySlug } from "./auth.service.js";
@@ -73,6 +73,16 @@ async function findOrCreateCompany(tx: Tx, input: ClerkOrganizationInput): Promi
   if (!company) {
     throw new Error("Failed to provision company for Clerk organization");
   }
+  await tx.insert(activityEvents).values({
+    companyId: company.id,
+    eventType: "company.created",
+    actorType: "system",
+    actorName: "Clerk provisioning",
+    entityType: "company",
+    entityId: company.id,
+    payload: { source: "clerk_webhook", clerkOrganizationId: input.organizationId },
+    summary: "Company provisioned from Clerk organization"
+  });
   return company;
 }
 
@@ -267,7 +277,7 @@ export async function provisionClerkMembership(
 
       const isOwner = clerkUserId === createdBy;
       const role = mapClerkOrgRole(input.clerkOrgRole, isOwner);
-      await tx.insert(users).values({
+      const [createdUser] = await tx.insert(users).values({
         companyId: company.id,
         email,
         clerkUserId,
@@ -275,6 +285,17 @@ export async function provisionClerkMembership(
         firstName: input.firstName.trim() || "Owner",
         lastName: input.lastName.trim() || "",
         role
+      }).returning();
+      if (!createdUser) throw new Error("Failed to provision Clerk staff user");
+      await tx.insert(activityEvents).values({
+        companyId: company.id,
+        eventType: "user.registered",
+        actorType: "system",
+        actorName: "Clerk provisioning",
+        entityType: "user",
+        entityId: createdUser.id,
+        payload: { source: "clerk_webhook", clerkUserId, role },
+        summary: role === "owner" ? "Clerk organization owner provisioned" : "Clerk organization member provisioned"
       });
 
       return { status: "created" as const, companyId: company.id, role };

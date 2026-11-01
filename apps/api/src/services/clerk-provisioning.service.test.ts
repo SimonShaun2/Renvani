@@ -6,6 +6,7 @@ type User = { id?: string; companyId: string; email: string; role: string; clerk
 const state = vi.hoisted(() => ({
   companies: [] as Company[],
   users: [] as User[],
+  events: [] as Array<Record<string, unknown>>,
   lockCalls: 0,
   lockTail: Promise.resolve() as Promise<void>,
   ambiguous: false,
@@ -43,6 +44,7 @@ vi.mock("./clerk-tenant.service.js", () => {
 vi.mock("@fsm/db", () => {
   const companiesTable = { name: "companies" };
   const usersTable = { name: "users", id: "id", clerkUserId: "clerkUserId", email: "email", companyId: "companyId", deletedAt: "deletedAt", clerkUnlinkedAt: "clerkUnlinkedAt" };
+  const activityEventsTable = { name: "activityEvents" };
   const makeTx = (onLock: (release: Promise<void>) => void, release: Promise<void>) => ({
     execute: vi.fn(async () => {
       state.lockCalls += 1;
@@ -55,11 +57,20 @@ vi.mock("@fsm/db", () => {
           state.companies.push(company);
           return { returning: async () => [company] };
         }
-        if (state.failInsertUnique) {
-          return Promise.reject(Object.assign(new Error("duplicate key"), { cause: { code: "23505" } }));
+        if (table === activityEventsTable) {
+          state.events.push(values);
+          return Promise.resolve();
         }
-        state.users.push({ id: `u_${state.users.length + 1}`, clerkUserId: null, ...(values as object) } as User);
-        return Promise.resolve();
+        return {
+          returning: async () => {
+            if (state.failInsertUnique) {
+              throw Object.assign(new Error("duplicate key"), { cause: { code: "23505" } });
+            }
+            const user = { id: `u_${state.users.length + 1}`, clerkUserId: null, ...(values as object) } as User;
+            state.users.push(user);
+            return [user];
+          }
+        };
       }
     }),
     update: (_table: unknown) => ({
@@ -90,6 +101,7 @@ vi.mock("@fsm/db", () => {
     }
   });
   return {
+    activityEvents: activityEventsTable,
     companies: companiesTable,
     users: usersTable,
     db: {
@@ -120,6 +132,7 @@ describe("clerk-provisioning race safety", () => {
   beforeEach(() => {
     state.companies = [];
     state.users = [];
+    state.events = [];
     state.lockCalls = 0;
     state.lockTail = Promise.resolve();
     state.ambiguous = false;
@@ -138,6 +151,12 @@ describe("clerk-provisioning race safety", () => {
     expect(state.companies).toHaveLength(1);
     expect(state.users.filter((u) => u.role === "owner")).toHaveLength(1);
     expect(state.users.map((u) => u.role).sort()).toEqual(["admin", "office", "owner"]);
+    expect(state.events.map((event) => event.eventType)).toEqual([
+      "company.created",
+      "user.registered",
+      "user.registered",
+      "user.registered"
+    ]);
     expect(state.lockCalls).toBe(4);
   });
 });
@@ -146,6 +165,7 @@ describe("FS-157 clerk_user_id provisioning", () => {
   beforeEach(() => {
     state.companies = [{ id: "co_1", settings: { clerk: { organizationId: "org_1", createdBy: "user_a" } } }];
     state.users = [];
+    state.events = [];
     state.lockCalls = 0;
     state.lockTail = Promise.resolve();
     state.ambiguous = false;

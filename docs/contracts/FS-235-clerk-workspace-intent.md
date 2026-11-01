@@ -4,7 +4,7 @@ FS-235 gives workspace onboarding one authoritative, user-scoped create-or-resum
 
 ## API and browser flow
 
-- `POST /api/v1/onboarding/workspace-intent` accepts only `{ "name": string }`. The API derives the Clerk user ID from a verified token that may have no organization claim, reserves one active intent, and enqueues the deterministic create job.
+- `POST /api/v1/onboarding/workspace-intent` accepts only `{ "name": string }`. The API derives the Clerk user ID from a verified organization-free token and rejects sessions that already carry an active organization. A pending intent enqueues the one-shot create job; a claimed or uncertain intent enqueues reconciliation instead.
 - `GET /api/v1/onboarding/workspace-intent` returns only the caller's active intent. Neither route accepts a user, intent, organization, owner, or tenant ID from the client.
 - Intent states are `pending`, `claimed`, `uncertain`, and `reconciled`. Only a reconciled response includes `organizationId`.
 - The web step polls this record, activates only its reconciled organization, refreshes the Clerk token, and then waits for the existing company-status endpoint. Account changes cancel stale polling and activation.
@@ -19,11 +19,11 @@ The Clerk adapter creates the organization with:
 - private metadata `renvaniIntentId`
 - private metadata `renvaniAttemptId`
 
-The returned Backend API organization must match the durable user, intent, and attempt markers. A provider error or untrusted response changes the intent to `uncertain`; it never rearms creation.
+The returned Backend API organization must match the durable user, intent, and attempt markers. A provider error or untrusted response changes the intent to `uncertain` and enqueues reconciliation; it never rearms creation.
 
 ## Reconciliation and webhook ordering
 
-The retryable `clerk-workspace-reconcile` job pages through every organization membership for the verified user, fetches each organization through the secret-key Backend API, and accepts exactly one organization whose creator and private markers match. Zero or multiple matches fail closed. A matching observation compare-and-sets `claimed` or `uncertain` to `reconciled` and records `workspace.organization_reconciled`.
+The retryable `clerk-workspace-reconcile` job pages through every organization membership for the verified user, fetches each organization through the secret-key Backend API, and accepts exactly one organization whose creator and private markers match. Zero or multiple matches fail closed. Each signed retry can enqueue a fresh bounded reconciliation job after an earlier job exhausts; reconciliation itself is idempotent. A matching observation compare-and-sets `claimed` or `uncertain` to `reconciled` and records `workspace.organization_reconciled`.
 
 Signed organization and membership webhooks for an unreconciled intent are recorded by Svix ID without retaining names or email addresses, enqueue reconciliation, return `503`, and release the short webhook-dedupe claim. After reconciliation:
 
@@ -31,6 +31,8 @@ Signed organization and membership webhooks for an unreconciled intent are recor
 - a different organization is recorded as denied and acknowledged with `2xx`;
 - membership-first delivery cannot create a tenant or choose an owner;
 - only the recorded Clerk organization creator can receive the owner role.
+- an organization event without a creator fails closed and cannot create an ownerless tenant;
+- company creation and staff grants write tenant-scoped activity events in the same transaction.
 
 The existing creator-already-linked guard remains authoritative and prevents a Clerk user already attached to one company from creating an orphan second tenant.
 

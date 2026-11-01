@@ -1,11 +1,13 @@
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { ClerkWorkspaceJobPayload } from "@fsm/jobs";
 
+const enqueueClerkWorkspaceReconcileJob = vi.hoisted(() => vi.fn(async () => undefined));
 vi.mock("@fsm/jobs", () => ({
   CLERK_WORKSPACE_CREATE_JOB_NAME: "clerk-workspace-create",
   CLERK_WORKSPACE_RECONCILE_JOB_NAME: "clerk-workspace-reconcile",
-  ClerkWorkspaceJobPayloadSchema: { parse: (value: unknown) => value }
+  ClerkWorkspaceJobPayloadSchema: { parse: (value: unknown) => value },
+  enqueueClerkWorkspaceReconcileJob
 }));
 
 import {
@@ -74,6 +76,8 @@ function dependencies(input: {
 }
 
 describe("FS-235 Clerk workspace worker", () => {
+  beforeEach(() => enqueueClerkWorkspaceReconcileJob.mockClear());
+
   it("claims once, creates with immutable markers, and reconciles the verified response", async () => {
     const deps = dependencies();
 
@@ -117,6 +121,7 @@ describe("FS-235 Clerk workspace worker", () => {
       claimed.attemptId,
       "provider_outcome_unknown"
     );
+    expect(enqueueClerkWorkspaceReconcileJob).toHaveBeenCalledWith(payload);
     expect(deps.repository.reconcile).not.toHaveBeenCalled();
   });
 

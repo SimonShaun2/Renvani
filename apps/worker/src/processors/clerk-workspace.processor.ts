@@ -11,6 +11,7 @@ import {
   CLERK_WORKSPACE_CREATE_JOB_NAME,
   CLERK_WORKSPACE_RECONCILE_JOB_NAME,
   ClerkWorkspaceJobPayloadSchema,
+  enqueueClerkWorkspaceReconcileJob,
   type ClerkWorkspaceJobPayload
 } from "@fsm/jobs";
 
@@ -288,6 +289,7 @@ export async function processClerkWorkspaceCreate(
     await dependencies.repository.reconcile(intent.id, intent.clerkUserId, intent.attemptId, organization.id);
   } catch (error) {
     await dependencies.repository.markUncertain(intent.id, intent.clerkUserId, intent.attemptId, uncertainReason);
+    await enqueueClerkWorkspaceReconcileJob({ intentId: intent.id, clerkUserId: intent.clerkUserId });
     throw error;
   }
 }

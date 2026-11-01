@@ -1,6 +1,6 @@
 import type { FastifyPluginAsync, FastifyRequest } from "fastify";
 
-import { enqueueClerkWorkspaceCreateJob } from "@fsm/jobs";
+import { enqueueClerkWorkspaceCreateJob, enqueueClerkWorkspaceReconcileJob } from "@fsm/jobs";
 import { AppError, ErrorCode, ReserveClerkWorkspaceIntentBodySchema } from "@fsm/types";
 
 import { verifyClerkBearerToken } from "../../lib/clerk-auth.js";
@@ -10,6 +10,9 @@ async function clerkSubject(request: FastifyRequest): Promise<string> {
   const [scheme, token] = (request.headers.authorization ?? "").split(" ");
   if (scheme !== "Bearer" || !token) throw new AppError(ErrorCode.UNAUTHORIZED, "Missing access token");
   const session = await verifyClerkBearerToken(token, { requireOrganization: false });
+  if (session.clerkOrganizationId) {
+    throw new AppError(ErrorCode.FORBIDDEN, "Workspace bootstrap requires an organization-free session");
+  }
   return session.clerkUserId;
 }
 
@@ -25,7 +28,11 @@ const clerkWorkspaceIntentRoutes: FastifyPluginAsync = async (fastify) => {
     const userId = await clerkSubject(request);
     const body = ReserveClerkWorkspaceIntentBodySchema.parse(request.body);
     const intent = await reserveClerkWorkspaceIntent(userId, body.name);
-    await enqueueClerkWorkspaceCreateJob({ intentId: intent.id, clerkUserId: userId });
+    if (intent.status === "pending") {
+      await enqueueClerkWorkspaceCreateJob({ intentId: intent.id, clerkUserId: userId });
+    } else if (intent.status === "claimed" || intent.status === "uncertain") {
+      await enqueueClerkWorkspaceReconcileJob({ intentId: intent.id, clerkUserId: userId });
+    }
     reply.header("cache-control", "no-store");
     return reply.send({ intent });
   });

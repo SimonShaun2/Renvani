@@ -92,6 +92,9 @@ async function handleEvent(event: ClerkWebhookEvent, reply: FastifyReply, svixId
 
   if (event.type === "organization.created") {
     const createdBy = str(data.created_by);
+    if (!createdBy) {
+      return reply.status(503).send({ error: "CLERK_ORGANIZATION_CREATOR_MISSING", deferred: true });
+    }
     if (createdBy) {
       const decision = await deferClerkWorkspaceWebhook({
         kind: "organization.created",

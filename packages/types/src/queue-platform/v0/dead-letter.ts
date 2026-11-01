@@ -3,6 +3,7 @@ import { z } from "zod";
 import { UuidSchema } from "../../agent-control-plane/v1/zod-shared.js";
 
 import { QUEUE_PLATFORM_CONTRACT_VERSION } from "./constants.js";
+import { PlatformQueueNameV1Schema } from "./monitoring.js";
 import { JobFailureClassV1Schema } from "./retry-policy.js";
 
 export const DeadLetterJobEnvelopeV1Schema = z
@@ -25,7 +26,7 @@ export type DeadLetterJobEnvelopeV1 = z.infer<typeof DeadLetterJobEnvelopeV1Sche
 export const DeadLetterRecoveryRequestV1Schema = z
   .object({
     contractVersion: z.literal(QUEUE_PLATFORM_CONTRACT_VERSION),
-    sourceQueue: z.string().min(1).max(64),
+    sourceQueue: PlatformQueueNameV1Schema,
     deadLetterJobId: z.string().min(1).max(128),
     requestedByUserId: UuidSchema.optional()
   })

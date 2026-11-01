@@ -38,10 +38,18 @@ vi.mock("@fsm/db", () => {
   const intentTable = { table: "intent", id: "id", clerkUserId: "clerkUserId", status: "status", attemptId: "attemptId", clerkOrganizationId: "clerkOrganizationId", deletedAt: "deletedAt" };
   const eventTable = { table: "event" };
   const findFirst = async (options: {
-    where: (table: { clerkUserId: string }, operators: { eq: (field: string, value: string) => { value: string } }) => { value: string };
+    where: (table: typeof intentTable, operators: {
+      eq: (field: keyof Row, value: unknown) => Condition;
+      isNull: (field: keyof Row) => Condition;
+      and: (...parts: Condition[]) => Condition;
+    }) => Condition;
   }) => {
-    const condition = options.where({ clerkUserId: "clerkUserId" }, { eq: (_field, value) => ({ value }) });
-    return state.rows.find((row) => row.clerkUserId === condition.value);
+    const condition = options.where(intentTable, {
+      eq: (field, value) => ({ kind: "eq", field, value }),
+      isNull: (field) => ({ kind: "null", field }),
+      and: (...parts) => ({ kind: "and", parts })
+    });
+    return state.rows.find((row) => matches(row, condition));
   };
   const findEvents = async (options: {
     where: (table: { intentId: string }, operators: { eq: (field: string, value: string) => { value: string } }) => { value: string };
@@ -105,14 +113,8 @@ vi.mock("@fsm/db", () => {
 });
 
 import {
-  claimClerkWorkspaceCreateAttempt,
   deferClerkWorkspaceWebhook,
-  evaluateClerkWorkspaceCreatorProvisioning,
   getClerkWorkspaceIntent,
-  markClerkWorkspaceAttemptUncertain,
-  matchesClerkWorkspaceIntent,
-  type ObservedClerkWorkspaceOrganization,
-  reconcileObservedClerkWorkspaceOrganization,
   reserveClerkWorkspaceIntent
 } from "./clerk-workspace-intent.service.js";
 
@@ -150,167 +152,45 @@ describe("FS-235 Clerk workspace intent", () => {
     expect(state.events).toHaveLength(1);
   });
 
-  it("allows exactly one of two concurrent workers to claim the outbound attempt", async () => {
-    await reserveClerkWorkspaceIntent("user_a", "Acme Plumbing");
-    const [first, second] = await Promise.all([
-      claimClerkWorkspaceCreateAttempt("user_a"),
-      claimClerkWorkspaceCreateAttempt("user_a")
-    ]);
-    expect([first.newlyClaimed, second.newlyClaimed].sort()).toEqual([false, true]);
-    expect(state.rows[0]?.status).toBe("claimed");
-    expect(state.events.map((event) => event.eventType)).toEqual([
-      "workspace.intent_pending", "workspace.attempt_claimed"
-    ]);
-  });
-
-  it("does not reissue authorization after a crash or an uncertain outcome", async () => {
-    await reserveClerkWorkspaceIntent("user_a", "Acme Plumbing");
-    const first = await claimClerkWorkspaceCreateAttempt("user_a");
-    expect(first.newlyClaimed).toBe(true);
-    if (!first.newlyClaimed) throw new Error("Claim expected");
-    expect(await claimClerkWorkspaceCreateAttempt("user_a")).toEqual({ newlyClaimed: false, status: "claimed" });
-    expect(await markClerkWorkspaceAttemptUncertain("user_a", first.attemptId)).toBe(true);
-    expect(await markClerkWorkspaceAttemptUncertain("user_a", first.attemptId)).toBe(false);
-    expect(await claimClerkWorkspaceCreateAttempt("user_a")).toEqual({ newlyClaimed: false, status: "uncertain" });
-    expect(state.events.map((event) => event.eventType)).toEqual([
-      "workspace.intent_pending", "workspace.attempt_claimed", "workspace.attempt_uncertain"
-    ]);
-  });
-
-  it("rejects stale or cross-user attempt markers", async () => {
-    await reserveClerkWorkspaceIntent("user_a", "Acme Plumbing");
-    const first = await claimClerkWorkspaceCreateAttempt("user_a");
-    if (!first.newlyClaimed) throw new Error("Claim expected");
-    await expect(markClerkWorkspaceAttemptUncertain("user_b", first.attemptId))
-      .rejects.toMatchObject({ code: ErrorCode.CONFLICT });
-    await expect(markClerkWorkspaceAttemptUncertain("user_a", "00000000-0000-4000-8000-000000000099"))
-      .rejects.toMatchObject({ code: ErrorCode.CONFLICT });
-    expect(state.rows[0]?.status).toBe("claimed");
-  });
-
-  it("rejects a missing or mismatched Backend API creator and private marker", async () => {
-    const intent = await reserveClerkWorkspaceIntent("user_a", "Acme Plumbing");
-    const claim = await claimClerkWorkspaceCreateAttempt("user_a");
-    if (!claim.newlyClaimed) throw new Error("Claim expected");
-    const observed = {
-      id: "org_a",
-      createdBy: "user_a",
-      privateMetadata: { renvaniIntentId: intent.id, renvaniAttemptId: claim.attemptId }
-    };
-    expect(matchesClerkWorkspaceIntent(state.rows[0]!, observed)).toBe(true);
-    for (const changed of [
-      { ...observed, createdBy: "user_b" },
-      { ...observed, createdBy: null },
-      { ...observed, privateMetadata: { ...observed.privateMetadata, renvaniAttemptId: "wrong" } },
-      { ...observed, privateMetadata: null }
-    ]) {
-      await expect(reconcileObservedClerkWorkspaceOrganization("user_a", changed))
-        .rejects.toMatchObject({ code: ErrorCode.CONFLICT });
-    }
-    expect(state.rows[0]?.status).toBe("claimed");
-    expect(state.events).toHaveLength(2);
-  });
-
-  it("recovers an uncertain outcome only from matching backend creator and marker", async () => {
-    const intent = await reserveClerkWorkspaceIntent("user_a", "Acme Plumbing");
-    const claim = await claimClerkWorkspaceCreateAttempt("user_a");
-    if (!claim.newlyClaimed) throw new Error("Claim expected");
-    await markClerkWorkspaceAttemptUncertain("user_a", claim.attemptId);
-    const observed = {
-      id: "org_a",
-      createdBy: "user_a",
-      privateMetadata: { renvaniIntentId: intent.id, renvaniAttemptId: claim.attemptId }
-    };
-    expect(await reconcileObservedClerkWorkspaceOrganization("user_a", observed)).toBe(true);
-    expect(await reconcileObservedClerkWorkspaceOrganization("user_a", observed)).toBe(false);
-    expect(await claimClerkWorkspaceCreateAttempt("user_a")).toEqual({ newlyClaimed: false, status: "reconciled" });
-    expect(state.rows[0]?.clerkOrganizationId).toBe("org_a");
-    expect(state.events.map((event) => event.eventType)).toEqual([
-      "workspace.intent_pending", "workspace.attempt_claimed", "workspace.attempt_uncertain", "workspace.organization_reconciled"
-    ]);
-  });
-
-  it("quarantines a second org observation instead of silently choosing it", async () => {
-    const intent = await reserveClerkWorkspaceIntent("user_a", "Acme Plumbing");
-    const claim = await claimClerkWorkspaceCreateAttempt("user_a");
-    if (!claim.newlyClaimed) throw new Error("Claim expected");
-    const base = { createdBy: "user_a", privateMetadata: { renvaniIntentId: intent.id, renvaniAttemptId: claim.attemptId } };
-    expect(await reconcileObservedClerkWorkspaceOrganization("user_a", { ...base, id: "org_a" })).toBe(true);
-    await expect(reconcileObservedClerkWorkspaceOrganization("user_a", { ...base, id: "org_b" }))
-      .rejects.toMatchObject({ code: ErrorCode.CONFLICT });
-    expect(state.rows[0]?.clerkOrganizationId).toBe("org_a");
-  });
-
-  it("defers membership-first and organization-first delivery until verified reconciliation and creator membership", async () => {
-    const intent = await reserveClerkWorkspaceIntent("user_a", "Acme Plumbing");
-    const claim = await claimClerkWorkspaceCreateAttempt("user_a");
-    if (!claim.newlyClaimed) throw new Error("Claim expected");
-    const observed = {
-      id: "org_a",
-      createdBy: "user_a",
-      privateMetadata: { renvaniIntentId: intent.id, renvaniAttemptId: claim.attemptId }
-    };
-    const creatorMembership = { organizationId: "org_a", clerkUserId: "user_a" };
-    const decide = (organization: typeof observed | null, membership: typeof creatorMembership | null) =>
-      evaluateClerkWorkspaceCreatorProvisioning(state.rows[0]!, organization, membership);
-
-    expect(decide(null, creatorMembership)).toEqual({ status: "defer", reason: "organization_unobserved" });
-    expect(decide(observed, creatorMembership)).toEqual({ status: "defer", reason: "intent_not_reconciled" });
-    await reconcileObservedClerkWorkspaceOrganization("user_a", observed);
-    expect(decide(observed, null)).toEqual({ status: "defer", reason: "creator_membership_unobserved" });
-    const allowed = { status: "allow", organizationId: "org_a", clerkUserId: "user_a" };
-    expect(decide(observed, creatorMembership)).toEqual(allowed);
-    expect(decide(observed, creatorMembership)).toEqual(allowed);
-    expect(state.events.filter((event) => event.eventType === "workspace.organization_reconciled")).toHaveLength(1);
-  });
-
-  it("denies company and owner eligibility when verified organization or membership differs", async () => {
-    const intent = await reserveClerkWorkspaceIntent("user_a", "Acme Plumbing");
-    const claim = await claimClerkWorkspaceCreateAttempt("user_a");
-    if (!claim.newlyClaimed) throw new Error("Claim expected");
-    const observed = {
-      id: "org_a",
-      createdBy: "user_a",
-      privateMetadata: { renvaniIntentId: intent.id, renvaniAttemptId: claim.attemptId }
-    };
-    await reconcileObservedClerkWorkspaceOrganization("user_a", observed);
-    const decide = (organization: ObservedClerkWorkspaceOrganization, organizationId: string, clerkUserId: string) =>
-      evaluateClerkWorkspaceCreatorProvisioning(state.rows[0]!, organization, { organizationId, clerkUserId });
-
-    expect(decide({ ...observed, createdBy: "user_b" }, "org_a", "user_a"))
-      .toEqual({ status: "deny", reason: "organization_mismatch" });
-    expect(decide({ ...observed, privateMetadata: null }, "org_a", "user_a"))
-      .toEqual({ status: "deny", reason: "organization_mismatch" });
-    expect(decide({ ...observed, id: "org_b" }, "org_b", "user_a"))
-      .toEqual({ status: "deny", reason: "organization_mismatch" });
-    expect(decide(observed, "org_b", "user_a"))
-      .toEqual({ status: "deny", reason: "membership_mismatch" });
-    expect(decide(observed, "org_a", "user_b"))
-      .toEqual({ status: "deny", reason: "membership_mismatch" });
-    expect(state.events.filter((event) => event.eventType === "workspace.organization_reconciled")).toHaveLength(1);
-  });
-
   it("durably records out-of-order signed deliveries once per message for a known intent", async () => {
     const membership = {
       kind: "organizationMembership.created" as const, svixId: "msg_member", organizationId: "org_a",
       clerkUserId: "user_a", email: "creator@example.com", name: "Acme", firstName: "Ava",
       lastName: "Stone", clerkOrgRole: "org:admin"
     };
-    expect(await deferClerkWorkspaceWebhook(membership)).toBe(false);
+    expect(await deferClerkWorkspaceWebhook(membership)).toEqual({ status: "not_applicable" });
     const intent = await reserveClerkWorkspaceIntent("user_a", "Acme");
     const [first, replay] = await Promise.all([
       deferClerkWorkspaceWebhook(membership), deferClerkWorkspaceWebhook(membership)
     ]);
-    expect([first, replay]).toEqual([true, true]);
+    expect(first).toEqual({ status: "deferred", intentId: intent.id, clerkUserId: "user_a" });
+    expect(replay).toEqual({ status: "deferred", intentId: intent.id, clerkUserId: "user_a" });
     const organization = {
       kind: "organization.created" as const, svixId: "msg_org", organizationId: "org_a",
       clerkUserId: "user_a", name: "Acme"
     };
-    expect(await deferClerkWorkspaceWebhook(organization)).toBe(true);
+    expect(await deferClerkWorkspaceWebhook(organization))
+      .toEqual({ status: "deferred", intentId: intent.id, clerkUserId: "user_a" });
     expect(state.events.filter((event) => event.eventType === "workspace.webhook_deferred"))
       .toEqual([
-        expect.objectContaining({ intentId: intent.id, details: membership }),
-        expect.objectContaining({ intentId: intent.id, details: organization })
+        expect.objectContaining({
+          intentId: intent.id,
+          details: expect.objectContaining({
+            kind: membership.kind,
+            svixId: membership.svixId,
+            organizationId: membership.organizationId,
+            clerkUserId: membership.clerkUserId
+          })
+        }),
+        expect.objectContaining({
+          intentId: intent.id,
+          details: expect.objectContaining({
+            kind: organization.kind,
+            svixId: organization.svixId,
+            organizationId: organization.organizationId,
+            clerkUserId: organization.clerkUserId
+          })
+        })
       ]);
     expect(state.rows[0]?.status).toBe("pending");
     expect(state.rows[0]?.clerkOrganizationId).toBeNull();
@@ -320,9 +200,34 @@ describe("FS-235 Clerk workspace intent", () => {
     await reserveClerkWorkspaceIntent("user_a", "Acme");
     expect(await deferClerkWorkspaceWebhook({
       kind: "organizationMembership.created", svixId: "foreign", organizationId: "org_foreign",
-      clerkUserId: "user_a", email: "creator@example.com"
-    })).toBe(true);
+      clerkUserId: "user_a"
+    })).toEqual({
+      status: "deferred",
+      intentId: expect.any(String),
+      clerkUserId: "user_a"
+    });
     expect(state.events.at(-1)?.details).toMatchObject({ organizationId: "org_foreign" });
     expect(state.rows[0]?.clerkOrganizationId).toBeNull();
+  });
+
+  it("lets the reconciled organization finish and terminally denies a different organization", async () => {
+    await reserveClerkWorkspaceIntent("user_a", "Acme");
+    state.rows[0]!.status = "reconciled";
+    state.rows[0]!.clerkOrganizationId = "org_a";
+
+    expect(await deferClerkWorkspaceWebhook({
+      kind: "organization.created",
+      svixId: "ready",
+      organizationId: "org_a",
+      clerkUserId: "user_a"
+    })).toEqual({ status: "ready" });
+    expect(await deferClerkWorkspaceWebhook({
+      kind: "organization.created",
+      svixId: "foreign",
+      organizationId: "org_foreign",
+      clerkUserId: "user_a"
+    })).toEqual({ status: "denied", reason: "organization_mismatch" });
+    expect(state.events.filter((event) => event.eventType === "workspace.webhook_denied"))
+      .toHaveLength(1);
   });
 });

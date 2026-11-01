@@ -1,9 +1,9 @@
 import { randomUUID } from "node:crypto";
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, isNull, lt, sql } from "drizzle-orm";
 import type { Job, Processor } from "bullmq";
 import pino from "pino";
 
-import { resolveTransactionalEmailFromAddress, type EmailTemplateId } from "@fsm/comms";
+import { isReceiptEmailAllowed, resolveTransactionalEmailFromAddress, type EmailTemplateId } from "@fsm/comms";
 import { env } from "@fsm/config";
 import { recordTransactionalEmailMessageLog } from "./transactional-email-message-log.js";
 import {
@@ -17,6 +17,7 @@ import {
   estimates,
   invoices,
   maintenancePlans,
+  reviewRequests,
   messageLogs,
   serviceAgreementTemplates,
   users
@@ -38,6 +39,14 @@ type TransactionalEmailSendResult = {
 };
 
 interface EmailModule {
+  sendPlanReminderEmail?(
+    to: string,
+    params: { firstName: string; companyName: string; planName: string; dueDateLabel: string; reminderKind: "renewal" | "tune_up" }
+  ): Promise<unknown>;
+  sendReviewRequestEmail?(
+    to: string,
+    params: { firstName: string; companyName: string; technicianName: string | null; reviewUrl: string }
+  ): Promise<unknown>;
   sendPasswordResetEmail(to: string, resetUrl: string, firstName: string): Promise<void>;
   sendEstimateEmail(
     to: string,
@@ -59,6 +68,18 @@ interface EmailModule {
       total: string;
       dueAt: string | null;
       paymentLinkUrl: string;
+      companyName: string;
+    }
+  ): Promise<void>;
+  sendInvoicePaymentReceiptEmail(
+    to: string,
+    params: {
+      firstName: string;
+      invoiceNumber: string;
+      amount: string;
+      balanceDue: string;
+      paidAt: string | null;
+      receiptUrl: string | null;
       companyName: string;
     }
   ): Promise<void>;
@@ -210,6 +231,8 @@ interface InvoiceEmailContext {
     firstName: string;
     lastName: string;
     email: string | null;
+    doNotContact?: boolean | null;
+    prefersEmail?: boolean | null;
   };
   company: {
     name: string;
@@ -265,6 +288,122 @@ interface AutomationRuleContext {
   ruleType: AutomationRuleType;
 }
 
+export interface ReviewRequestSendContext {
+  requestStatus: string;
+  requestDeleted: boolean;
+  invoice: { status: string; total: string | number | null; deleted: boolean } | null;
+  customer: { prefersEmail: boolean | null; prefersSms: boolean | null; doNotContact: boolean | null } | null;
+  ruleEnabled: boolean;
+}
+
+export interface PlanReminderSendContext {
+  plan: { status: string; deleted: boolean; customerId: string } | null;
+  customer: { prefersEmail: boolean | null; prefersSms: boolean | null; doNotContact: boolean | null } | null;
+  ruleEnabled: boolean;
+}
+
+export type PlanReminderSendSkipReason =
+  | "plan_not_found"
+  | "plan_not_active"
+  | "rule_disabled"
+  | "customer_do_not_contact"
+  | "customer_opted_out";
+
+/** Send-time re-check for plan reminders (the #264 standard): reloaded by companyId just before sending. */
+export function planReminderSendSkipReason(
+  context: PlanReminderSendContext | null,
+  channel: "email" | "sms",
+  customerId: string | null
+): PlanReminderSendSkipReason | null {
+  if (!context?.plan || context.plan.deleted) return "plan_not_found";
+  if (context.plan.status !== "active") return "plan_not_active";
+  if (!context.ruleEnabled) return "rule_disabled";
+  if (!context.customer || (customerId && context.plan.customerId !== customerId)) return "customer_opted_out";
+  if (context.customer.doNotContact === true) return "customer_do_not_contact";
+  const consent = channel === "email" ? context.customer.prefersEmail : context.customer.prefersSms;
+  if (consent !== true) return "customer_opted_out";
+  return null;
+}
+
+export type ReviewRequestSendSkipReason =
+  | "request_not_found"
+  | "request_not_active"
+  | "invoice_not_paid"
+  | "customer_do_not_contact"
+  | "customer_opted_out"
+  | "rule_disabled";
+
+/**
+ * Send-time re-check (the review email/SMS may be delayed by hours). Invoice-originated requests also need the
+ * invoice still paid with total > 0 and the review_request rule still on. NULL channel preference = no consent.
+ */
+export function reviewRequestSendSkipReason(
+  context: ReviewRequestSendContext | null,
+  channel: "email" | "sms",
+  fromInvoice: boolean
+): ReviewRequestSendSkipReason | null {
+  if (!context || context.requestDeleted) return "request_not_found";
+  if (context.requestStatus !== "pending" && context.requestStatus !== "sent") return "request_not_active";
+  if (fromInvoice) {
+    if (!context.invoice || context.invoice.deleted) return "invoice_not_paid";
+    if (context.invoice.status !== "paid" || !(Number(context.invoice.total ?? 0) > 0)) return "invoice_not_paid";
+    if (!context.ruleEnabled) return "rule_disabled";
+  }
+  if (!context.customer) return "customer_opted_out";
+  if (context.customer.doNotContact === true) return "customer_do_not_contact";
+  const consent = channel === "email" ? context.customer.prefersEmail : context.customer.prefersSms;
+  if (consent !== true) return "customer_opted_out";
+  return null;
+}
+
+export const INVOICE_RECEIPT_SOURCE_SYSTEM = "invoice_payment_receipt";
+
+/** A 'sending' claim older than this is from a worker that died between claim and send; it may be re-claimed. */
+export const INVOICE_RECEIPT_STALE_CLAIM_MS = 10 * 60 * 1000;
+
+export interface InvoiceReceiptClaimResult {
+  claimed: boolean;
+  /** Set when a stale 'sending' claim was taken over (age of the abandoned claim in ms). */
+  staleReclaimedAgeMs?: number;
+}
+
+/** Storage operations behind the receipt claim (production: message_logs; tests: in-memory). */
+export interface InvoiceReceiptClaimStore {
+  /** INSERT ... ON CONFLICT DO NOTHING; true when this call created the claim. */
+  insertClaim(claim: InvoiceReceiptClaim): Promise<boolean>;
+  /**
+   * Single atomic UPDATE ... SET updated_at = now() WHERE status = 'sending' AND updated_at < now() - threshold
+   * RETURNING id. true = this caller won the takeover of a stale claim.
+   */
+  takeOverStaleClaim(companyId: string, paymentId: string): Promise<boolean>;
+  /** Age of the existing claim for logging only (null if unknown). */
+  readClaimAgeMs(companyId: string, paymentId: string): Promise<number | null>;
+}
+
+export function createInvoiceReceiptClaimer(
+  store: InvoiceReceiptClaimStore
+): (claim: InvoiceReceiptClaim) => Promise<InvoiceReceiptClaimResult> {
+  return async (claim) => {
+    if (await store.insertClaim(claim)) {
+      return { claimed: true };
+    }
+    // Read the age BEFORE the takeover (the takeover resets updated_at); logging only.
+    const ageMs = await store.readClaimAgeMs(claim.companyId, claim.paymentId).catch(() => null);
+    if (!(await store.takeOverStaleClaim(claim.companyId, claim.paymentId))) {
+      return { claimed: false };
+    }
+    return { claimed: true, staleReclaimedAgeMs: ageMs ?? INVOICE_RECEIPT_STALE_CLAIM_MS };
+  };
+}
+
+export interface InvoiceReceiptClaim {
+  companyId: string;
+  customerId: string;
+  paymentId: string;
+  toAddress: string;
+  fromAddress: string;
+}
+
 export interface NotificationsDependencies {
   email: EmailModule;
   sms: SmsModule;
@@ -280,11 +419,28 @@ export interface NotificationsDependencies {
     recipientId: string
   ): Promise<CampaignDeliveryContext | null>;
   loadCompanyOwner(companyId: string): Promise<CompanyOwnerContext | null>;
+  /** Fresh plan/consent/rule facts for the send-time re-check of a plan reminder. */
+  loadPlanReminderSendContext?(companyId: string, maintenancePlanId: string): Promise<PlanReminderSendContext | null>;
+  /** Fresh facts for the send-time re-check of a (possibly delayed) review request. */
+  loadReviewRequestSendContext?(
+    companyId: string,
+    reviewRequestId: string,
+    invoiceId: string | null
+  ): Promise<ReviewRequestSendContext | null>;
   findAutomationRule(
     companyId: string,
     ruleType: AutomationRuleType
   ): Promise<AutomationRuleContext | null>;
   markInvoiceReminderSent(companyId: string, invoiceId: string, reminderLevel: ReminderLevel): Promise<void>;
+  /**
+   * Atomically claims the one-time payment receipt send for (companyId, paymentId) via the message_logs
+   * (company, source_system, source_id) unique key. Not claimed when already sent or freshly 'sending'
+   * (retry/redelivery); a 'sending' claim older than INVOICE_RECEIPT_STALE_CLAIM_MS is atomically re-claimed.
+   */
+  claimInvoiceReceiptSend(claim: InvoiceReceiptClaim): Promise<InvoiceReceiptClaimResult>;
+  markInvoiceReceiptSent(companyId: string, paymentId: string): Promise<void>;
+  /** Releases a claim when the send itself failed, so a retry can send. */
+  releaseInvoiceReceiptClaim(companyId: string, paymentId: string): Promise<void>;
   markCampaignRecipientDelivered(input: {
     companyId: string;
     campaignId: string;
@@ -540,7 +696,9 @@ function createProductionDependencies(): Promise<NotificationsDependencies> {
         customer: {
           firstName: customerRecord.firstName,
           lastName: customerRecord.lastName,
-          email: customerRecord.email
+          email: customerRecord.email,
+          doNotContact: customerRecord.doNotContact,
+          prefersEmail: customerRecord.prefersEmail
         },
         company: {
           name: companyRecord.name
@@ -691,6 +849,82 @@ function createProductionDependencies(): Promise<NotificationsDependencies> {
 
       return owner ?? null;
     },
+    async loadPlanReminderSendContext(companyId, maintenancePlanId) {
+      const [plan] = await db
+        .select()
+        .from(maintenancePlans)
+        .where(and(eq(maintenancePlans.companyId, companyId), eq(maintenancePlans.id, maintenancePlanId)))
+        .limit(1);
+      if (!plan) return null;
+      const [customerRows, ruleRows] = await Promise.all([
+        db
+          .select()
+          .from(customers)
+          .where(and(eq(customers.companyId, companyId), eq(customers.id, plan.customerId), isNull(customers.deletedAt)))
+          .limit(1),
+        db
+          .select()
+          .from(automationRules)
+          .where(
+            and(
+              eq(automationRules.companyId, companyId),
+              eq(automationRules.ruleType, "service_agreement_renewal"),
+              eq(automationRules.isEnabled, true),
+              isNull(automationRules.deletedAt)
+            )
+          )
+          .limit(1)
+      ]);
+      const customer = customerRows[0];
+      return {
+        plan: { status: plan.status, deleted: plan.deletedAt !== null, customerId: plan.customerId },
+        customer: customer
+          ? { prefersEmail: customer.prefersEmail, prefersSms: customer.prefersSms, doNotContact: customer.doNotContact }
+          : null,
+        ruleEnabled: ruleRows.length > 0
+      };
+    },
+    async loadReviewRequestSendContext(companyId, reviewRequestId, invoiceId) {
+      const [request] = await db
+        .select()
+        .from(reviewRequests)
+        .where(and(eq(reviewRequests.companyId, companyId), eq(reviewRequests.id, reviewRequestId)))
+        .limit(1);
+      if (!request) return null;
+      const [customerRows, invoiceRows, ruleRows] = await Promise.all([
+        db
+          .select()
+          .from(customers)
+          .where(and(eq(customers.companyId, companyId), eq(customers.id, request.customerId), isNull(customers.deletedAt)))
+          .limit(1),
+        invoiceId
+          ? db.select().from(invoices).where(and(eq(invoices.companyId, companyId), eq(invoices.id, invoiceId))).limit(1)
+          : Promise.resolve([]),
+        db
+          .select()
+          .from(automationRules)
+          .where(
+            and(
+              eq(automationRules.companyId, companyId),
+              eq(automationRules.ruleType, "review_request"),
+              eq(automationRules.isEnabled, true),
+              isNull(automationRules.deletedAt)
+            )
+          )
+          .limit(1)
+      ]);
+      const customer = customerRows[0];
+      const invoice = invoiceRows[0];
+      return {
+        requestStatus: request.status,
+        requestDeleted: request.deletedAt !== null,
+        invoice: invoice ? { status: invoice.status, total: invoice.total, deleted: invoice.deletedAt !== null } : null,
+        customer: customer
+          ? { prefersEmail: customer.prefersEmail, prefersSms: customer.prefersSms, doNotContact: customer.doNotContact }
+          : null,
+        ruleEnabled: ruleRows.length > 0
+      };
+    },
     async findAutomationRule(companyId, ruleType) {
       const [rule] = await db
         .select({
@@ -709,6 +943,86 @@ function createProductionDependencies(): Promise<NotificationsDependencies> {
         .limit(1);
 
       return rule ?? null;
+    },
+    claimInvoiceReceiptSend: createInvoiceReceiptClaimer({
+      async insertClaim(claim) {
+        const inserted = await db
+          .insert(messageLogs)
+          .values({
+            companyId: claim.companyId,
+            customerId: claim.customerId,
+            channel: "email",
+            direction: "outbound",
+            toAddress: claim.toAddress,
+            fromAddress: claim.fromAddress,
+            subject: "Payment receipt",
+            body: "Payment receipt",
+            providerStatus: "sending",
+            sourceSystem: INVOICE_RECEIPT_SOURCE_SYSTEM,
+            sourceId: claim.paymentId
+          })
+          .onConflictDoNothing()
+          .returning({ id: messageLogs.id });
+        return inserted.length > 0;
+      },
+      async takeOverStaleClaim(companyId, paymentId) {
+        // One atomic UPDATE: the staleness test runs inside Postgres (full precision), so concurrent
+        // retries race on the row lock and exactly one gets a row back. No JS round-trip of updated_at.
+        const [won] = await db
+          .update(messageLogs)
+          .set({ updatedAt: sql`now()` })
+          .where(
+            and(
+              eq(messageLogs.companyId, companyId),
+              eq(messageLogs.sourceSystem, INVOICE_RECEIPT_SOURCE_SYSTEM),
+              eq(messageLogs.sourceId, paymentId),
+              eq(messageLogs.providerStatus, "sending"),
+              lt(messageLogs.updatedAt, sql`now() - make_interval(secs => ${INVOICE_RECEIPT_STALE_CLAIM_MS / 1000})`)
+            )
+          )
+          .returning({ id: messageLogs.id });
+        return Boolean(won);
+      },
+      async readClaimAgeMs(companyId, paymentId) {
+        // Logging only; never used for the takeover decision.
+        const [row] = await db
+          .select({ updatedAt: messageLogs.updatedAt })
+          .from(messageLogs)
+          .where(
+            and(
+              eq(messageLogs.companyId, companyId),
+              eq(messageLogs.sourceSystem, INVOICE_RECEIPT_SOURCE_SYSTEM),
+              eq(messageLogs.sourceId, paymentId)
+            )
+          )
+          .limit(1);
+        return row ? Math.max(0, Date.now() - row.updatedAt.getTime()) : null;
+      }
+    }),
+    async markInvoiceReceiptSent(companyId, paymentId) {
+      const now = new Date();
+      await db
+        .update(messageLogs)
+        .set({ providerStatus: "sent", sentAt: now, updatedAt: now })
+        .where(
+          and(
+            eq(messageLogs.companyId, companyId),
+            eq(messageLogs.sourceSystem, INVOICE_RECEIPT_SOURCE_SYSTEM),
+            eq(messageLogs.sourceId, paymentId)
+          )
+        );
+    },
+    async releaseInvoiceReceiptClaim(companyId, paymentId) {
+      await db
+        .delete(messageLogs)
+        .where(
+          and(
+            eq(messageLogs.companyId, companyId),
+            eq(messageLogs.sourceSystem, INVOICE_RECEIPT_SOURCE_SYSTEM),
+            eq(messageLogs.sourceId, paymentId),
+            eq(messageLogs.providerStatus, "sending")
+          )
+        );
     },
     async markInvoiceReminderSent(companyId, invoiceId, reminderLevel) {
       const now = new Date();
@@ -907,6 +1221,83 @@ export async function handleSendInvoiceEmail(
   });
 
   logger.info({ companyId, invoiceId, customerId }, "Invoice email sent");
+}
+
+/**
+ * Payment receipt (Resend) after a recorded Stripe payment. Enqueued once per newly inserted payment row
+ * (jobId `invoice-receipt-<paymentId>`), so Stripe webhook redelivery cannot double-send. Tenant-scoped by
+ * companyId on every read; skipped when the customer opted out (doNotContact / prefersEmail=false).
+ */
+export async function handleSendInvoicePaymentReceipt(
+  job: Job<Record<string, unknown>>,
+  dependencies: NotificationsDependencies
+): Promise<void> {
+  const companyId = getJobString(job.data, "companyId");
+  const invoiceId = getJobString(job.data, "invoiceId");
+  const customerId = getJobString(job.data, "customerId");
+  const paymentId = getJobString(job.data, "paymentId");
+  const amount = getJobString(job.data, "amount");
+
+  if (!companyId || !invoiceId || !customerId || !paymentId || !amount) {
+    logger.warn({ jobId: job.id ?? null }, "Invoice receipt job missing required identifiers");
+    return;
+  }
+
+  const context = await dependencies.loadInvoiceEmailContext(companyId, invoiceId);
+
+  if (!context || context.customerId !== customerId) {
+    logger.warn({ companyId, invoiceId, customerId }, "Invoice receipt job skipped because invoice context was not found");
+    return;
+  }
+
+  if (!isReceiptEmailAllowed(context.customer)) {
+    logger.info({ companyId, invoiceId, customerId }, "Invoice receipt job skipped (no email or customer opted out)");
+    return;
+  }
+
+  // Worker retries reuse the same job (and BullMQ may re-run a stalled job), so claim the send first.
+  const claimed = await dependencies.claimInvoiceReceiptSend({
+    companyId,
+    customerId,
+    paymentId,
+    toAddress: context.customer.email,
+    fromAddress: getOutboundEmailFromAddress()
+  });
+
+  if (!claimed.claimed) {
+    logger.info({ companyId, invoiceId, paymentId }, "Invoice receipt already sent for payment; skipping");
+    return;
+  }
+
+  if (claimed.staleReclaimedAgeMs !== undefined) {
+    logger.warn(
+      { companyId, invoiceId, paymentId, claimAgeMs: claimed.staleReclaimedAgeMs },
+      "Invoice receipt: stale 'sending' claim re-claimed (previous worker likely died before send); sending"
+    );
+  }
+
+  try {
+    await dependencies.email.sendInvoicePaymentReceiptEmail(context.customer.email, {
+      firstName: context.customer.firstName,
+      invoiceNumber: context.invoiceNumber,
+      amount,
+      balanceDue: context.balanceDue,
+      paidAt: getJobString(job.data, "paidAt"),
+      receiptUrl: context.stripePaymentLinkUrl ?? null,
+      companyName: context.company.name
+    });
+  } catch (error) {
+    // Send failed: release the claim so the BullMQ retry can send. Never let a release error mask the send error.
+    await dependencies.releaseInvoiceReceiptClaim(companyId, paymentId).catch(() => undefined);
+    throw error;
+  }
+
+  // Already sent: a failure to mark must not fail the job (a retry would then be skipped anyway by the claim).
+  await dependencies.markInvoiceReceiptSent(companyId, paymentId).catch(() => {
+    logger.warn({ companyId, paymentId }, "Failed to mark invoice receipt sent; claim row remains");
+  });
+
+  logger.info({ companyId, invoiceId, customerId, paymentId }, "Invoice payment receipt sent");
 }
 
 export async function handleSendCampaignMessage(
@@ -1183,10 +1574,92 @@ export async function handleSendOnTheWayNotification(
   });
 }
 
+/** Plan renewal / tune-up reminder (queued by the API with a fixed job id). SMS goes through the provider registry. */
+export async function handleSendPlanReminder(
+  job: Job<Record<string, unknown>>,
+  dependencies: NotificationsDependencies
+): Promise<void> {
+  const data = job.data;
+  const kind = getJobString(data, "reminderKind") === "tune_up" ? "tune_up" : "renewal";
+  const log = { jobId: job.id ?? null, companyId: getJobString(data, "companyId"), maintenancePlanId: getJobString(data, "maintenancePlanId"), kind };
+  const channel = getJobString(data, "channel") === "sms" ? "sms" : "email";
+  if (dependencies.loadPlanReminderSendContext) {
+    const companyId = getJobString(data, "companyId");
+    const maintenancePlanId = getJobString(data, "maintenancePlanId");
+    const context =
+      companyId && maintenancePlanId ? await dependencies.loadPlanReminderSendContext(companyId, maintenancePlanId) : null;
+    const skip = planReminderSendSkipReason(context, channel, getJobString(data, "customerId"));
+    if (skip) {
+      logger.info({ ...log, channel, reason: skip }, "Plan reminder skipped at send time");
+      return;
+    }
+  }
+  if (getJobString(data, "channel") === "sms") {
+    const phone = getJobString(data, "customerPhone");
+    const body = getJobString(data, "smsBody");
+    if (!phone || !body) {
+      logger.warn(log, "Plan reminder SMS job missing required data");
+      return;
+    }
+    await dependencies.sms.sendSms(phone, body);
+    logger.info(log, "Plan reminder SMS processed");
+    return;
+  }
+  const to = getJobString(data, "customerEmail");
+  if (!to || !dependencies.email.sendPlanReminderEmail) {
+    logger.warn(log, "Plan reminder email job missing required data");
+    return;
+  }
+  await dependencies.email.sendPlanReminderEmail(to, {
+    firstName: getJobString(data, "firstName") ?? "",
+    companyName: getJobString(data, "companyName") ?? "",
+    planName: getJobString(data, "planName") ?? "maintenance plan",
+    dueDateLabel: getJobString(data, "dueDateLabel") ?? "",
+    reminderKind: kind
+  });
+  logger.info(log, "Plan reminder email sent");
+}
+
 export async function handleSendReviewRequest(
   job: Job<Record<string, unknown>>,
   dependencies: NotificationsDependencies
 ): Promise<void> {
+  const companyId = getJobString(job.data, "companyId");
+  const reviewRequestId = getJobString(job.data, "reviewRequestId");
+  const invoiceId = getJobString(job.data, "invoiceId");
+  const channel = getJobString(job.data, "channel") === "email" ? "email" : "sms";
+  if (companyId && reviewRequestId && dependencies.loadReviewRequestSendContext) {
+    const context = await dependencies.loadReviewRequestSendContext(companyId, reviewRequestId, invoiceId);
+    const skip = reviewRequestSendSkipReason(context, channel, Boolean(invoiceId));
+    if (skip) {
+      logger.info(
+        { jobId: job.id ?? null, companyId, reviewRequestId, invoiceId, channel, reason: skip },
+        "Review request skipped at send time"
+      );
+      return;
+    }
+  }
+
+  if (channel === "email") {
+    const to = getJobString(job.data, "customerEmail");
+    const referenceId = getJobString(job.data, "referenceId");
+    if (!to || !referenceId || !dependencies.email.sendReviewRequestEmail) {
+      logger.warn({ jobId: job.id ?? null }, "Review request email job missing required data");
+      return;
+    }
+    await dependencies.email.sendReviewRequestEmail(to, {
+      firstName: getJobString(job.data, "customerFirstName") ?? "",
+      companyName: getJobString(job.data, "companyName") ?? "Renvani",
+      technicianName: getJobString(job.data, "technicianName"),
+      reviewUrl: `${env.APP_URL.replace(/\/$/, "")}/review/${referenceId}`
+    });
+    logger.info(
+      { companyId: getJobString(job.data, "companyId"), reviewRequestId: getJobString(job.data, "reviewRequestId") },
+      "Review request email sent"
+    );
+    return;
+  }
+
   await handleSmsNotificationJob(job, dependencies, {
     jobLabel: "Review request",
     buildBody(data) {
@@ -1435,6 +1908,9 @@ export function createNotificationsProcessor(
       case "send-invoice-email":
         await handleSendInvoiceEmail(job, dependencies);
         return;
+      case "send-invoice-receipt":
+        await handleSendInvoicePaymentReceipt(job, dependencies);
+        return;
       case "send-invoice-reminder":
         await handleSendInvoiceReminder(job, dependencies);
         return;
@@ -1447,6 +1923,9 @@ export function createNotificationsProcessor(
         return;
       case "send-review-request":
         await handleSendReviewRequest(job, dependencies);
+        return;
+      case "send-plan-reminder":
+        await handleSendPlanReminder(job, dependencies);
         return;
       case "send-booking-request-alert":
       case "send-booking-confirmation":

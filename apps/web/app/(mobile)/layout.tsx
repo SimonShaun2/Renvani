@@ -14,7 +14,8 @@ export default async function MobileLayout({ children }: { children: ReactNode }
     redirect("/login");
   }
 
-  if (session.role !== "technician") {
+  // Crew screens are for technicians; owners can open them too (e.g. capturing a signature on site).
+  if (session.role !== "technician" && session.role !== "owner") {
     notFound();
   }
 

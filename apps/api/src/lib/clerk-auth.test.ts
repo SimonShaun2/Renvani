@@ -25,7 +25,13 @@ vi.mock("@fsm/config/feature-flags", () => ({
     source.RENVANI_DEPLOYMENT_TIER?.trim() === "staging"
 }));
 
-const mockEnv = vi.hoisted(() => ({ CLERK_SECRET_KEY: "", CLERK_AUTHORIZED_PARTIES: "", NODE_ENV: "test" }));
+const mockEnv = vi.hoisted(() => ({
+  CLERK_SECRET_KEY: "",
+  CLERK_AUTHORIZED_PARTIES: "",
+  NODE_ENV: "test",
+  APP_URL: "https://app.example.com",
+  APP_URL_ALLOWED: ""
+}));
 vi.mock("@fsm/config", () => ({ env: mockEnv }));
 
 const AZP = "https://staging.example.com";
@@ -35,6 +41,7 @@ describe("clerk-auth", () => {
     mockEnv.CLERK_SECRET_KEY = "";
     delete process.env.RENVANI_DEPLOYMENT_TIER;
     mockEnv.CLERK_AUTHORIZED_PARTIES = AZP;
+    mockEnv.APP_URL_ALLOWED = "";
     flags.clerkAuthParallelJwt = true;
     vi.mocked(verifyToken).mockReset();
   });
@@ -130,6 +137,25 @@ describe("clerk-auth", () => {
       process.env.RENVANI_DEPLOYMENT_TIER = "staging";
       vi.mocked(verifyToken).mockResolvedValue({ sub: "u", org_id: "o", azp: `${AZP}/` } as never);
       await expect(verifyClerkBearerToken("t")).resolves.toMatchObject({ clerkUserId: "u" });
+    });
+
+    it("APP_URL_ALLOWED extras join authorized parties in staging only (exact match)", async () => {
+      mockEnv.CLERK_SECRET_KEY = "sk_test_mock";
+      mockEnv.APP_URL_ALLOWED = "https://tester.example.com,https://*.vercel.app";
+      process.env.RENVANI_DEPLOYMENT_TIER = "staging";
+      vi.mocked(verifyToken).mockResolvedValue({ sub: "u", org_id: "o", azp: "https://tester.example.com" } as never);
+      await expect(verifyClerkBearerToken("t")).resolves.toMatchObject({ clerkUserId: "u" });
+      expect(verifyToken).toHaveBeenLastCalledWith("t", {
+        secretKey: "sk_test_mock",
+        authorizedParties: [AZP, "https://tester.example.com"]
+      });
+
+      vi.mocked(verifyToken).mockResolvedValue({ sub: "u", org_id: "o", azp: "https://foo.vercel.app" } as never);
+      await expect(verifyClerkBearerToken("t")).rejects.toMatchObject({ code: ErrorCode.UNAUTHORIZED });
+
+      process.env.RENVANI_DEPLOYMENT_TIER = "production";
+      vi.mocked(verifyToken).mockResolvedValue({ sub: "u", org_id: "o", azp: "https://tester.example.com" } as never);
+      await expect(verifyClerkBearerToken("t")).rejects.toMatchObject({ code: ErrorCode.UNAUTHORIZED });
     });
 
     it("mismatched or missing azp rejects", async () => {

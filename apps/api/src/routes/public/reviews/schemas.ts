@@ -177,6 +177,16 @@ export const completeReviewRouteSchema = {
             updatedAt: { type: "string", format: "date-time" },
             deletedAt: nullableDateTimeSchema
           }
+        },
+        routing: {
+          type: "object",
+          additionalProperties: false,
+          required: ["kind"],
+          properties: {
+            kind: { type: "string", enum: ["public_review", "private_feedback"] },
+            platform: { type: "string", enum: ["google"] },
+            url: { type: "string" }
+          }
         }
       }
     },

@@ -1,5 +1,6 @@
 import type { FastifyPluginAsync, FastifyRequest } from "fastify";
 
+import { enqueueClerkWorkspaceCreateJob } from "@fsm/jobs";
 import { AppError, ErrorCode, ReserveClerkWorkspaceIntentBodySchema } from "@fsm/types";
 
 import { verifyClerkBearerToken } from "../../lib/clerk-auth.js";
@@ -12,7 +13,7 @@ async function clerkSubject(request: FastifyRequest): Promise<string> {
   return session.clerkUserId;
 }
 
-/** Pre-tenant bootstrap only. No Clerk creation, activation, or company provisioning. */
+/** Pre-tenant bootstrap: reserve and enqueue; the worker owns Clerk creation and reconciliation. */
 const clerkWorkspaceIntentRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.get("/workspace-intent", async (request, reply) => {
     const userId = await clerkSubject(request);
@@ -23,8 +24,10 @@ const clerkWorkspaceIntentRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.post("/workspace-intent", async (request, reply) => {
     const userId = await clerkSubject(request);
     const body = ReserveClerkWorkspaceIntentBodySchema.parse(request.body);
+    const intent = await reserveClerkWorkspaceIntent(userId, body.name);
+    await enqueueClerkWorkspaceCreateJob({ intentId: intent.id, clerkUserId: userId });
     reply.header("cache-control", "no-store");
-    return reply.send({ intent: await reserveClerkWorkspaceIntent(userId, body.name) });
+    return reply.send({ intent });
   });
 };
 

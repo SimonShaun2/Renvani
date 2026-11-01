@@ -4,9 +4,17 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const provisionClerkOrganization = vi.fn();
 const provisionClerkMembership = vi.fn();
 const deferClerkWorkspaceWebhook = vi.fn();
+const enqueueClerkWorkspaceReconcileJob = vi.fn();
+
+vi.mock("@fsm/jobs", () => ({ enqueueClerkWorkspaceReconcileJob }));
 
 vi.mock("../../services/clerk-provisioning.service.js", () => ({
   provisionClerkOrganization,
+  // Detailed variant delegates to the mock; a { skipReason } return from the mock is passed through as-is.
+  provisionClerkOrganizationDetailed: async (input: unknown) => {
+    const out = await provisionClerkOrganization(input);
+    return out && typeof out === "object" && "skipReason" in out ? out : { company: out ?? null };
+  },
   provisionClerkMembership
 }));
 vi.mock("../../services/clerk-workspace-intent.service.js", () => ({ deferClerkWorkspaceWebhook }));
@@ -64,10 +72,19 @@ describe("Clerk webhook", () => {
     mockEnv.CLERK_WEBHOOK_SECRET = SECRET;
     provisionClerkOrganization.mockReset().mockResolvedValue({ id: "co_1" });
     provisionClerkMembership.mockReset().mockResolvedValue({ status: "created", companyId: "co_1" });
-    deferClerkWorkspaceWebhook.mockReset().mockResolvedValue(false);
+    deferClerkWorkspaceWebhook.mockReset().mockResolvedValue({ status: "not_applicable" });
+    enqueueClerkWorkspaceReconcileJob.mockReset().mockResolvedValue(undefined);
     syncClerkUserUpdated.mockReset().mockResolvedValue({ status: "updated" });
     deactivateClerkUser.mockReset().mockResolvedValue({ status: "deactivated" });
     deactivateClerkMembership.mockReset().mockResolvedValue({ status: "deactivated" });
+  });
+
+  it("organization.created for an already-linked creator acks 200 with reason, no company id", async () => {
+    provisionClerkOrganization.mockResolvedValueOnce({ company: null, skipReason: "creator_already_linked" });
+    const res = await send({ type: "organization.created", data: { id: "org_o", name: "Orphan", created_by: "user_x" } });
+    expect(res.statusCode).toBe(200);
+    expect(res.json()).toEqual({ received: true, skipped: true, reason: "creator_already_linked" });
+    expect(provisionClerkOrganization).toHaveBeenCalledWith(expect.objectContaining({ createdBy: "user_x" }));
   });
 
   it("FS-158: a failed delivery releases the claim and the retry is processed", async () => {
@@ -172,7 +189,11 @@ describe("Clerk webhook", () => {
   });
 
   it("FS-235: records membership-first and replay for an intent without granting a tenant or owner", async () => {
-    deferClerkWorkspaceWebhook.mockResolvedValue(true);
+    deferClerkWorkspaceWebhook.mockResolvedValue({
+      status: "deferred",
+      intentId: "00000000-0000-4000-8000-000000000001",
+      clerkUserId: "user_creator"
+    });
     const body = {
       type: "organizationMembership.created",
       data: { role: "org:admin", organization: { id: "org_pending", name: "Acme" },
@@ -187,6 +208,10 @@ describe("Clerk webhook", () => {
     }));
     expect(provisionClerkMembership).not.toHaveBeenCalled();
     expect(syncClerkUserRoleMetadata).not.toHaveBeenCalled();
+    expect(enqueueClerkWorkspaceReconcileJob).toHaveBeenCalledWith({
+      intentId: "00000000-0000-4000-8000-000000000001",
+      clerkUserId: "user_creator"
+    });
     const replay = await send(body, { id: "msg_fs235_membership" });
     expect(replay.statusCode).toBe(503);
     expect(deferClerkWorkspaceWebhook).toHaveBeenCalledTimes(2);
@@ -194,7 +219,11 @@ describe("Clerk webhook", () => {
   });
 
   it("FS-235: records an organization event for an intent without creating a company", async () => {
-    deferClerkWorkspaceWebhook.mockResolvedValue(true);
+    deferClerkWorkspaceWebhook.mockResolvedValue({
+      status: "deferred",
+      intentId: "00000000-0000-4000-8000-000000000001",
+      clerkUserId: "user_creator"
+    });
     const res = await send({ type: "organization.created", data: {
       id: "org_pending", name: "Acme", created_by: "user_creator"
     } });
@@ -203,7 +232,11 @@ describe("Clerk webhook", () => {
   });
 
   it("FS-235: a foreign organization membership for an intent user never grants its tenant or owner", async () => {
-    deferClerkWorkspaceWebhook.mockResolvedValue(true);
+    deferClerkWorkspaceWebhook.mockResolvedValue({
+      status: "deferred",
+      intentId: "00000000-0000-4000-8000-000000000001",
+      clerkUserId: "user_creator"
+    });
     const res = await send({ type: "organizationMembership.created", data: {
       organization: { id: "org_foreign", name: "Other" },
       public_user_data: { identifier: "creator@example.com", user_id: "user_creator" }
@@ -211,6 +244,25 @@ describe("Clerk webhook", () => {
     expect(res.statusCode).toBe(503);
     expect(provisionClerkMembership).not.toHaveBeenCalled();
     expect(syncClerkUserRoleMetadata).not.toHaveBeenCalled();
+  });
+
+  it("FS-235: terminally acknowledges a provider-verified organization mismatch", async () => {
+    deferClerkWorkspaceWebhook.mockResolvedValue({
+      status: "denied",
+      reason: "organization_mismatch"
+    });
+    const res = await send({
+      type: "organization.created",
+      data: { id: "org_foreign", name: "Other", created_by: "user_creator" }
+    });
+    expect(res.statusCode).toBe(200);
+    expect(res.json()).toEqual({
+      received: true,
+      skipped: true,
+      reason: "organization_mismatch"
+    });
+    expect(enqueueClerkWorkspaceReconcileJob).not.toHaveBeenCalled();
+    expect(provisionClerkOrganization).not.toHaveBeenCalled();
   });
 
   it("publishes the provisioned DB role to Clerk public_metadata (fixes /no-access for new owners)", async () => {

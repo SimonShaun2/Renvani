@@ -1,13 +1,14 @@
 import type { FastifyPluginAsync, FastifyReply } from "fastify";
 
 import { env } from "@fsm/config";
+import { enqueueClerkWorkspaceReconcileJob } from "@fsm/jobs";
 
 import { syncClerkUserRoleMetadata } from "../../lib/clerk-role-metadata.js";
 import { verifySvixSignature } from "../../lib/svix-verify.js";
 import { claimWebhookMessage, completeWebhookMessage, releaseWebhookMessage } from "../../lib/webhook-dedupe.js";
 import {
   provisionClerkMembership,
-  provisionClerkOrganization
+  provisionClerkOrganizationDetailed
 } from "../../services/clerk-provisioning.service.js";
 import { deferClerkWorkspaceWebhook } from "../../services/clerk-workspace-intent.service.js";
 import {
@@ -91,17 +92,31 @@ async function handleEvent(event: ClerkWebhookEvent, reply: FastifyReply, svixId
 
   if (event.type === "organization.created") {
     const createdBy = str(data.created_by);
-    if (createdBy && await deferClerkWorkspaceWebhook({
-      kind: "organization.created", svixId, organizationId: str(data.id), clerkUserId: createdBy,
-      name: str(data.name)
-    })) return reply.status(503).send({ error: "WORKSPACE_INTENT_DEFERRED", deferred: true });
-    const company = await provisionClerkOrganization({
+    if (createdBy) {
+      const decision = await deferClerkWorkspaceWebhook({
+        kind: "organization.created",
+        svixId,
+        organizationId: str(data.id),
+        clerkUserId: createdBy
+      });
+      if (decision.status === "deferred") {
+        await enqueueClerkWorkspaceReconcileJob({
+          intentId: decision.intentId,
+          clerkUserId: decision.clerkUserId
+        });
+        return reply.status(503).send({ error: "WORKSPACE_INTENT_DEFERRED", deferred: true });
+      }
+      if (decision.status === "denied") {
+        return reply.send({ received: true, skipped: true, reason: decision.reason });
+      }
+    }
+    const { company, skipReason } = await provisionClerkOrganizationDetailed({
       organizationId: str(data.id),
       name: str(data.name),
       createdBy: str(data.created_by) || null
     });
     if (!company) {
-      return reply.send({ received: true, skipped: true });
+      return reply.send({ received: true, skipped: true, ...(skipReason ? { reason: skipReason } : {}) });
     }
     return reply.send({ received: true, companyId: company.id });
   }
@@ -114,13 +129,24 @@ async function handleEvent(event: ClerkWebhookEvent, reply: FastifyReply, svixId
       return reply.status(400).send({ error: "INVALID_PAYLOAD", message: "Missing organization or email" });
     }
     const clerkUserId = str(member.user_id);
-    if (clerkUserId && await deferClerkWorkspaceWebhook({
-      kind: "organizationMembership.created", svixId,
-      organizationId: str(organization.id), clerkUserId,
-      name: str(organization.name), email,
-      firstName: str(member.first_name), lastName: str(member.last_name),
-      clerkOrgRole: str(data.role)
-    })) return reply.status(503).send({ error: "WORKSPACE_INTENT_DEFERRED", deferred: true });
+    if (clerkUserId) {
+      const decision = await deferClerkWorkspaceWebhook({
+        kind: "organizationMembership.created",
+        svixId,
+        organizationId: str(organization.id),
+        clerkUserId
+      });
+      if (decision.status === "deferred") {
+        await enqueueClerkWorkspaceReconcileJob({
+          intentId: decision.intentId,
+          clerkUserId: decision.clerkUserId
+        });
+        return reply.status(503).send({ error: "WORKSPACE_INTENT_DEFERRED", deferred: true });
+      }
+      if (decision.status === "denied") {
+        return reply.send({ received: true, skipped: true, reason: decision.reason });
+      }
+    }
     const result = await provisionClerkMembership({
       organizationId: str(organization.id),
       name: str(organization.name),

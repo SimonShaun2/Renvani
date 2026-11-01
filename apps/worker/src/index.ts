@@ -2,10 +2,10 @@ import type { Worker } from "bullmq";
 import pino from "pino";
 
 import { assertStripeLiveKeyAllowed } from "@fsm/config/deployment-environment";
-import { QUEUE_NAMES, aiQueue } from "@fsm/jobs";
+import { QUEUE_NAMES, agreementsQueue, aiQueue } from "@fsm/jobs";
 
 import { createWorker } from "./lib/worker-factory.js";
-import { processAgreements } from "./processors/agreements.processor.js";
+import { PLAN_REMINDER_SCAN_JOB_NAME, processAgreements } from "./processors/agreements.processor.js";
 import { processAiRevenue } from "./processors/ai-revenue.processor.js";
 import { processCsvImport } from "./processors/csv-import.processor.js";
 import { processInvoiceReminder } from "./processors/invoice-reminder.processor.js";
@@ -13,6 +13,7 @@ import { processNotifications } from "./processors/notifications.processor.js";
 import { processDataExport } from "./processors/data-export.processor.js";
 import { processGrowthCheck } from "./processors/growth-check.processor.js";
 import { processRetentionGates } from "./processors/retention-gates.processor.js";
+import { processClerkWorkspace } from "./processors/clerk-workspace.processor.js";
 
 const logger = pino({
   name: "fsm-worker-bootstrap"
@@ -46,6 +47,18 @@ await aiQueue.add(
   }
 );
 
+// Daily plan renewal + tune-up reminder scan (14:00 UTC = 8-9am US Central). No-op for companies with the rule off.
+await agreementsQueue.add(
+  PLAN_REMINDER_SCAN_JOB_NAME,
+  {},
+  {
+    repeat: {
+      pattern: "0 14 * * *"
+    },
+    jobId: "plan-reminder-scan-cron"
+  }
+);
+
 const workers: Array<Worker<Record<string, unknown>, void, string>> = [
   createWorker(QUEUE_NAMES.imports, processCsvImport),
   createWorker(QUEUE_NAMES.ai, processAiRevenue),
@@ -54,7 +67,8 @@ const workers: Array<Worker<Record<string, unknown>, void, string>> = [
   createWorker(QUEUE_NAMES.agreements, processAgreements),
   createWorker(QUEUE_NAMES.operator, processRetentionGates),
   createWorker(QUEUE_NAMES.exports, processDataExport),
-  createWorker(QUEUE_NAMES.growth, processGrowthCheck)
+  createWorker(QUEUE_NAMES.growth, processGrowthCheck),
+  createWorker(QUEUE_NAMES.webhooks, processClerkWorkspace)
 ];
 
 logger.info(

@@ -3,6 +3,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const auth = vi.hoisted(() => ({ verify: vi.fn() }));
 const service = vi.hoisted(() => ({ get: vi.fn(), reserve: vi.fn() }));
+const enqueueClerkWorkspaceCreateJob = vi.hoisted(() => vi.fn());
+vi.mock("@fsm/jobs", () => ({ enqueueClerkWorkspaceCreateJob }));
 vi.mock("../../lib/clerk-auth.js", () => ({ verifyClerkBearerToken: auth.verify }));
 vi.mock("../../services/clerk-workspace-intent.service.js", () => ({
   getClerkWorkspaceIntent: service.get,
@@ -17,6 +19,7 @@ describe("FS-235 workspace intent route", () => {
     auth.verify.mockReset().mockResolvedValue({ clerkUserId: "user_a", clerkOrganizationId: null });
     service.get.mockReset().mockResolvedValue(null);
     service.reserve.mockReset().mockResolvedValue({ id: "00000000-0000-4000-8000-000000000001", status: "pending" });
+    enqueueClerkWorkspaceCreateJob.mockReset().mockResolvedValue(undefined);
   });
 
   async function app() {
@@ -33,6 +36,10 @@ describe("FS-235 workspace intent route", () => {
       expect(response.statusCode).toBe(200);
       expect(auth.verify).toHaveBeenCalledWith("token", { requireOrganization: false });
       expect(service.reserve).toHaveBeenCalledWith("user_a", "Acme Plumbing");
+      expect(enqueueClerkWorkspaceCreateJob).toHaveBeenCalledWith({
+        intentId: "00000000-0000-4000-8000-000000000001",
+        clerkUserId: "user_a"
+      });
     } finally { await fastify.close(); }
   });
 

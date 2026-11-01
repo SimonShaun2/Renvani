@@ -1,7 +1,6 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { publicEnv } from "@fsm/config";
 import type {
   ApplyMigrateDedupeDecisionsBody,
   LinkMigrateOnboardingFilesBody,
@@ -10,8 +9,7 @@ import type {
   WizardImportEntityType
 } from "@fsm/types";
 
-import { clearBrowserAuthSession, getAuthToken } from "@/src/lib/auth";
-import { ApiError, type ApiErrorPayload } from "@/src/lib/api";
+import { ApiError, authorizedFetch, type ApiErrorPayload } from "@/src/lib/api";
 import type { ImportSessionResponse } from "@/src/hooks/imports.hooks";
 import { migrateOnboardingRealClient } from "@/src/lib/migrate-onboarding-client";
 import { useMigrateOnboardingWizardStore } from "@/src/stores/migrate-onboarding-wizard.store";
@@ -41,20 +39,7 @@ export async function uploadImportFileForMigrate(
   formData.append("file", file);
   formData.append("entityType", entityType);
 
-  const token = getAuthToken();
-  const uploadResponse = await fetch(`${publicEnv.NEXT_PUBLIC_API_URL}/api/v1/imports`, {
-    method: "POST",
-    body: formData,
-    credentials: "include",
-    ...(token ? { headers: { Authorization: `Bearer ${token}` } } : {})
-  });
-
-  if (uploadResponse.status === 401) {
-    clearBrowserAuthSession();
-    if (typeof window !== "undefined") {
-      window.location.assign("/login");
-    }
-  }
+  const uploadResponse = await authorizedFetch("/api/v1/imports", { method: "POST", body: formData });
 
   if (!uploadResponse.ok) {
     throw new ApiError(uploadResponse.status, parseUploadError(await uploadResponse.text()));

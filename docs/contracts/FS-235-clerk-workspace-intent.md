@@ -1,29 +1,41 @@
-# FS-235 Clerk workspace intent — reservation and claim slices
+# FS-235 Clerk workspace intent contract
 
-This branch reserves one workspace creation intent per verified Clerk user and records one durable outbound-attempt claim. It does **not** create a Clerk organization, activate a session, provision a company, enqueue work, or make the existing browser creation path safe. Do not use its `pending` or `claimed` response as proof that a workspace exists.
+FS-235 gives workspace onboarding one authoritative, user-scoped create-or-resume path. The browser never creates a Clerk organization or chooses one by company name.
 
-## API
+## API and browser flow
 
-- `POST /api/v1/onboarding/workspace-intent` accepts `{ "name": string }` (trimmed, 1–80 characters). A verified Clerk session token may have no organization claim. The server derives the user ID only from the verified token. The first request reserves the name; later same-user requests with that name return the same intent, and a different name returns `409 CONFLICT`.
-- `GET /api/v1/onboarding/workspace-intent` returns `{ "intent": null }` or the caller's intent. Neither route accepts a user ID, intent ID, or tenant ID from the client. Both set `Cache-Control: no-store`.
-- The response is `{ "intent": { "id": uuid, "requestedName": string, "status": "pending" | "claimed" | "uncertain" | "reconciled", "createdAt": ISO date } }`. The response deliberately contains no organization or company ID. `reconciled` is reserved for a later verified-org implementation.
+- `POST /api/v1/onboarding/workspace-intent` accepts only `{ "name": string }`. The API derives the Clerk user ID from a verified token that may have no organization claim, reserves one active intent, and enqueues the deterministic create job.
+- `GET /api/v1/onboarding/workspace-intent` returns only the caller's active intent. Neither route accepts a user, intent, organization, owner, or tenant ID from the client.
+- Intent states are `pending`, `claimed`, `uncertain`, and `reconciled`. Only a reconciled response includes `organizationId`.
+- The web step polls this record, activates only its reconciled organization, refreshes the Clerk token, and then waits for the existing company-status endpoint. Account changes cancel stale polling and activation.
 
-## Persistence and future boundary
+## One-attempt worker boundary
 
-`clerk_workspace_intents.clerk_user_id` is unique and immutable. The service takes a transaction-scoped advisory lock keyed by the verified Clerk subject, inserts the pending intent, and writes `clerk_workspace_intent_events` in that transaction. These two tables are pre-tenant identity bootstrap records, scoped by Clerk subject because no company exists yet. The later verified-org reconciliation slice must bind a company, emit tenant `activity_events`, and document the transition before exposing authoritative tenant access.
+The `clerk-workspace-create` job runs on the existing webhooks queue with `attempts: 1`. Before any provider call, the worker atomically changes `pending` to `claimed`, stores an immutable attempt ID, and writes `workspace.attempt_claimed`. Only that successful compare-and-set permits the Clerk call.
 
-`claimClerkWorkspaceCreateAttempt` uses one atomic `UPDATE ... WHERE status = 'pending' RETURNING` and commits a unique attempt UUID and audit event before returning `newlyClaimed: true`. Only that result permits one future external create call. A second worker or a restarted worker receives `newlyClaimed: false`; `claimed` is never automatically rearmed. `markClerkWorkspaceAttemptUncertain` changes only the matching claimed attempt to `uncertain`, with one audit event. A repeated mark is idempotent. An unknown outcome therefore needs reconciliation, even if the process crashed before it actually sent the call. This conservative behavior prevents an unprovable second create.
+The Clerk adapter creates the organization with:
 
-No worker or route calls the claim function in this branch. A future adapter must create the organization with `createdBy = clerkUserId` and private metadata `{ renvaniIntentId: intent.id, renvaniAttemptId: attemptId }`. The normalized organization observation must come from Clerk's secret-key Backend API. `reconcileObservedClerkWorkspaceOrganization` checks the returned org ID, creator, and both private marker fields against the durable intent. It then compare-and-sets `claimed` or `uncertain` to `reconciled` with an audit event. A repeat observation for the same org is idempotent; a different org is an explicit conflict. `reconciled` here means only that org identity was verified and bound to the intent: no company or owner role is created by this function.
+- `createdBy = clerkUserId`
+- private metadata `renvaniIntentId`
+- private metadata `renvaniAttemptId`
 
-The later slice must reconcile webhook order, bind exactly one company, and grant owner access only to the verified creator. The current browser `createOrganization` path in #275/#300 must be replaced before this contract can prevent duplicate Clerk organizations. Real PostgreSQL concurrency and transaction rollback tests remain an integration gate; current unit tests use a transactional mock.
+The returned Backend API organization must match the durable user, intent, and attempt markers. A provider error or untrusted response changes the intent to `uncertain`; it never rearms creation.
 
-## Deferred webhook deliveries (local follow-up slice)
+## Reconciliation and webhook ordering
 
-For a signed `organization.created` delivery whose `created_by` has an intent, or a signed `organizationMembership.created` delivery whose `public_user_data.user_id` has an intent, the API stores a normalized delivery in `clerk_workspace_intent_events` as `workspace.webhook_deferred`. The record includes the Svix message ID, organization ID, user ID, and the membership fields needed for later handling. A per-intent transaction lock and recorded Svix ID suppress repeated ledger inserts. The route returns `503 WORKSPACE_INTENT_DEFERRED` and releases its short dedupe claim so the sender may retry. No company, staff user, owner role, or Clerk role metadata is written by this path. The stored webhook is a retryable input, **not** verified organization evidence.
+The retryable `clerk-workspace-reconcile` job pages through every organization membership for the verified user, fetches each organization through the secret-key Backend API, and accepts exactly one organization whose creator and private markers match. Zero or multiple matches fail closed. A matching observation compare-and-sets `claimed` or `uncertain` to `reconciled` and records `workspace.organization_reconciled`.
 
-The consumer contract is still pending: a worker must obtain a secret-key Backend API organization observation, reconcile the intent, confirm the creator's membership and markers, then atomically bind the company and grant only the creator owner access. It also needs a terminal processed record so redeliveries can receive `2xx` after successful provisioning. The provider-free `evaluateClerkWorkspaceCreatorProvisioning` function defines the allow/defer/deny decision; it does not perform a grant. Duplicate and out-of-order delivery tests are local mocks, not a real provider or PostgreSQL integration test.
+Signed organization and membership webhooks for an unreconciled intent are recorded by Svix ID without retaining names or email addresses, enqueue reconciliation, return `503`, and release the short webhook-dedupe claim. After reconciliation:
 
-The global membership guard now makes `provisionClerkMembership` return `deferred` if no company exists for the organization or the company lacks a recorded creator. The webhook returns `503` and releases its dedupe claim. This prevents a foreign first member with no intent from creating a company or becoming owner. A subsequent organization event with a creator permits a replay to create staff; only the recorded creator can receive owner. BE1B/Technical Lead still need to review the interface change (`MembershipStatus` gains `deferred`) and its compatibility with existing Clerk onboarding. The deferred path for users without an intent relies on provider retry until a generic pre-tenant inbox exists. No consumer currently turns the known-intent ledger records into a verified company/owner grant, so this remains an incomplete release gate.
+- the matching organization proceeds through the existing tenant-safe provisioning service;
+- a different organization is recorded as denied and acknowledged with `2xx`;
+- membership-first delivery cannot create a tenant or choose an owner;
+- only the recorded Clerk organization creator can receive the owner role.
 
-Migration `0055_fs235_clerk_workspace_intent.sql` intentionally avoids the `0054` filename used by open PR #271. PR #271 is still open at `7ed39d82f673ed0fb8896f99ae552c39a7804a6e`. Integrate #271 first after its gates, then merge `dev` into this branch (never rebase) and resolve the journal as `0054` at index 54 followed by `0055` at index 55. Re-run migration checks and exact-head reviews after that commit. If FS-234's consent ledger migration lands in between, coordinate a new migration index with BE1B rather than overwriting either journal entry. FS-234 owns consent tables and Revenue send policy; FS-235 owns only Clerk identity bootstrap tables and service. Drizzle Kit's normal generation hit a pre-existing snapshot parent collision; the custom migration scaffold was generated with Drizzle Kit and populated as an unapplied migration.
+The existing creator-already-linked guard remains authoritative and prevents a Clerk user already attached to one company from creating an orphan second tenant.
+
+## Persistence and verification gates
+
+Migration `0061_fs235_clerk_workspace_intent.sql` follows the integrated `0060` migration. The user, attempt, and Clerk organization identifiers are independently unique. Intent and audit queries exclude soft-deleted rows.
+
+Local unit tests cover duplicate requests, one-shot creation, uncertain recovery, paginated reconciliation, marker mismatch, unordered/replayed webhooks, cross-tenant guards, terminal mismatch acknowledgment, browser retry, and account switching. The conditional Postgres test verifies concurrent claim serialization when `NEON_CI_DATABASE_URL` is available. Live Clerk verification, exact-head independent review, Security, QA, and approved batch CI remain release gates.

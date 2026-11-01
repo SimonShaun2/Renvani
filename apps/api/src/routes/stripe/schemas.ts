@@ -40,7 +40,8 @@ const stripeConnectStatusSchema = {
     lastPayoutAt: {
       anyOf: [{ type: "string", format: "date-time" }, { type: "null" }]
     },
-    platformFeePercent: { type: "number" }
+    platformFeePercent: { type: "number" },
+    serviceFeePercent: { type: "number" }
   }
 } as const;
 
@@ -127,5 +128,23 @@ export const stripeConnectAccountSessionSchema = {
     403: errorResponseSchema,
     404: errorResponseSchema,
     409: errorResponseSchema
+  }
+} as const;
+
+export const stripeConnectTestProvisionSchema = {
+  tags: ["stripe"],
+  response: {
+    200: {
+      type: "object",
+      additionalProperties: false,
+      required: ["stripeAccountId", "status"],
+      properties: {
+        stripeAccountId: { type: "string" },
+        status: { type: "string", enum: ["active", "pending"] }
+      }
+    },
+    401: errorResponseSchema,
+    403: errorResponseSchema,
+    404: errorResponseSchema
   }
 } as const;

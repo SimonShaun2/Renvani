@@ -26,7 +26,12 @@ export async function getServerSession(): Promise<ServerSessionResult> {
       return { userId: state.userId, orgId: state.orgId ?? null, sessionClaims: state.sessionClaims, getToken: () => state.getToken() };
     },
     readClerkUser: async () => {
-      const user = await currentUser().catch(() => null);
+      let user: Awaited<ReturnType<typeof currentUser>>;
+      try {
+        user = await currentUser();
+      } catch (error) {
+        throw new Error("Clerk profile lookup failed", { cause: error });
+      }
       return user
         ? { email: user.primaryEmailAddress?.emailAddress ?? "", firstName: user.firstName ?? "", lastName: user.lastName ?? "" }
         : null;

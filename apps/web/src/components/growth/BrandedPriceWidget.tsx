@@ -21,7 +21,7 @@ export function BrandedPriceWidget({ bookingSlug, primaryClassName }: BrandedPri
 
       <dl className="mt-4 space-y-4">
         <div>
-          <dt className="text-[13px] font-medium text-[#2a3360]">Type of clean</dt>
+          <dt className="text-[13px] font-medium text-[#2a3360]">Type of service</dt>
           <dd className="mt-1.5 flex h-12 items-center rounded-lg border border-[#e6dccb] px-3.5 text-[15px] text-[#0f1530]">
             Selected in booking flow
           </dd>

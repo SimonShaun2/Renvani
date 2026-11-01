@@ -54,13 +54,33 @@ describe("resolveServerSession: Clerk on", () => {
   it("is signed-out without a Clerk user", async () => {
     expect(await resolveServerSession(deps())).toEqual({ status: "signed-out" });
   });
+
+  it("propagates a Clerk profile lookup failure", async () => {
+    const providerFailure = new Error("provider unavailable");
+    await expect(
+      resolveServerSession(
+        deps({
+          readClerk: async () => ({
+            userId: "user_1",
+            orgId: "org_1",
+            sessionClaims: { metadata: { role: "technician" } },
+            getToken: async () => "clerk.jwt"
+          }),
+          readClerkUser: async () => {
+            throw providerFailure;
+          }
+        })
+      )
+    ).rejects.toBe(providerFailure);
+  });
 });
 
 describe("resolveServerSession: legacy cookie", () => {
   it("returns the cookie session and token without calling Clerk", async () => {
     const readClerk = vi.fn();
+    const readClerkUser = vi.fn();
     const result = await resolveServerSession(
-      deps({ clerkEnabled: false, readLegacy: () => legacySession, readLegacyToken: () => "legacy.jwt", readClerk })
+      deps({ clerkEnabled: true, readLegacy: () => legacySession, readLegacyToken: () => "legacy.jwt", readClerk, readClerkUser })
     );
     expect(result.status).toBe("ok");
     if (result.status !== "ok") return;
@@ -68,6 +88,7 @@ describe("resolveServerSession: legacy cookie", () => {
     expect(result.session).toBe(legacySession);
     expect(await result.getToken()).toBe("legacy.jwt");
     expect(readClerk).not.toHaveBeenCalled();
+    expect(readClerkUser).not.toHaveBeenCalled();
   });
 
   it("is signed-out when the cookie is missing and Clerk is off", async () => {

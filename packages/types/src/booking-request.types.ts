@@ -1,3 +1,4 @@
+import type { LeadAttribution } from "./lead-attribution.types.js";
 import type { PaginatedResult } from "./customer.types.js";
 
 export type BookingRequestStatus = "pending" | "confirmed" | "cancelled" | "completed" | "no_show";
@@ -42,6 +43,8 @@ export interface BookingRequest {
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;
+  /** true when the request asked for 24/7 emergency but the shop downgraded it (detail read only; old rows false). */
+  downgraded?: boolean;
 }
 
 export interface BookingRequestListItem {
@@ -55,6 +58,10 @@ export interface BookingRequestListItem {
   zip: string;
   serviceCategory: string | null;
   serviceType: string | null;
+  /** "emergency" requests sort first in the inbox. */
+  urgency: BookingUrgency | null;
+  /** true when the request asked for 24/7 emergency but was downgraded (old rows false). */
+  downgraded: boolean;
   preferredDate: string | null;
   preferredWindow: PreferredBookingWindow | null;
   assignedTechnicianId: string | null;
@@ -76,12 +83,16 @@ export interface SubmitBookingRequestInput {
   serviceType?: string;
   serviceDetail?: string;
   urgency?: BookingUrgency;
+  /** 24/7 emergency request from the public site; downgraded when the shop has emergency service off. */
+  emergency?: boolean;
   customerNotes?: string;
   preferredDate?: string;
   preferredWindow?: PreferredBookingWindow;
   isPropertyOwner?: boolean;
   smsConsentAppointments?: boolean;
   smsConsentMarketing?: boolean;
+  /** Sanitized via sanitizeLeadAttribution before storage. */
+  leadAttribution?: LeadAttribution;
   source?: BookingSource;
 }
 

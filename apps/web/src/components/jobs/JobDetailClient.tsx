@@ -6,6 +6,7 @@ import { AlertTriangle, BriefcaseBusiness, Sparkles } from "lucide-react";
 import { EmptyState } from "@/src/components/ui/EmptyState";
 import { SkeletonCard } from "@/src/components/ui/SkeletonCard";
 import { useRecommendations } from "@/src/hooks/ai-revenue.hooks";
+import { useAuthStore } from "@/src/stores/auth.store";
 import {
   useCompany,
   useJob,
@@ -18,12 +19,15 @@ import { AttachmentsPanel } from "./AttachmentsPanel";
 import { JobActivityTimeline } from "./JobActivityTimeline";
 import { JobAISuggestion } from "./JobAISuggestion";
 import { JobContextCards } from "./JobContextCards";
+import { CreateInvoiceAction } from "./create-invoice/CreateInvoiceAction";
 import { JobHeader } from "./JobHeader";
 import { JobProductsPanel } from "./JobProductsPanel";
 import { OTWPanel } from "./OTWPanel";
 import { TaskChecklist } from "./TaskChecklist";
 import { TimeTrackingPanel } from "./TimeTrackingPanel";
 import { getCompanyTaxRate, getTaskProgress } from "./jobs.utils";
+import { JobScheduleChangesPanel, type ScheduleChangeMode } from "./schedule-changes/JobScheduleChangesPanel";
+import { canManageSchedule } from "./schedule-changes/schedule-changes.utils";
 
 interface JobDetailClientProps {
   jobId: string;
@@ -39,6 +43,8 @@ export function JobDetailClient({ jobId }: JobDetailClientProps) {
   const [noteState, setNoteState] = useState<"idle" | "saving" | "saved">("idle");
   const [noteError, setNoteError] = useState<string | null>(null);
   const [otwComposerOpen, setOtwComposerOpen] = useState(false);
+  const [scheduleMode, setScheduleMode] = useState<ScheduleChangeMode>(null);
+  const canChangeSchedule = canManageSchedule(useAuthStore((state) => state.user?.role ?? null));
 
   const job = jobQuery.data?.job;
   const tasks = tasksQuery.data?.tasks ?? [];
@@ -116,7 +122,7 @@ export function JobDetailClient({ jobId }: JobDetailClientProps) {
     return (
       <div className="space-y-6">
         <SkeletonCard className="h-[180px]" />
-        <div className="grid gap-6 xl:grid-cols-[minmax(0,1.14fr)_minmax(0,0.86fr)]">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-6 xl:grid-cols-[minmax(0,1.14fr)_minmax(0,0.86fr)]">
           <div className="space-y-6">
             <SkeletonCard className="h-[148px]" />
             <SkeletonCard className="h-[520px]" />
@@ -154,9 +160,12 @@ export function JobDetailClient({ jobId }: JobDetailClientProps) {
         job={job}
         pendingRequiredTasks={progress.pendingRequired.length}
         onOpenOTW={() => setOtwComposerOpen(true)}
+        invoiceAction={<CreateInvoiceAction job={job} products={products} taxRate={taxRate > 0 ? taxRate : null} />}
+        onReschedule={canChangeSchedule ? () => setScheduleMode("reschedule") : undefined}
+        onCancelVisit={canChangeSchedule ? () => setScheduleMode("cancel") : undefined}
       />
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1.14fr)_minmax(0,0.86fr)]">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-6 xl:grid-cols-[minmax(0,1.14fr)_minmax(0,0.86fr)]">
         <div className="space-y-6">
           <JobContextCards job={job} />
 
@@ -211,6 +220,7 @@ export function JobDetailClient({ jobId }: JobDetailClientProps) {
         </div>
 
         <div className="space-y-6 xl:border-l xl:border-neutral-200 xl:pl-6">
+          <JobScheduleChangesPanel jobId={job.id} mode={scheduleMode} onModeChange={setScheduleMode} />
           <JobProductsPanel
             jobId={job.id}
             products={products}

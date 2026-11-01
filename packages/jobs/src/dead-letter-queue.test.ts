@@ -176,18 +176,71 @@ describe("recoverDeadLetterJob", () => {
     };
 
     const recoveredJobId = await recoverDeadLetterJob(
-      { name: "imports", add: sourceAdd } as unknown as Queue,
+      { name: "imports", add: sourceAdd, getJob: vi.fn() } as unknown as Queue,
       request,
       { getDeadLetterQueue: () => deadLetterQueue as unknown as Pick<Queue, "getJob"> }
     );
 
-    expect(recoveredJobId).toBe(buildDeadLetterRecoveryJobId("imports", envelope.sourceJobId));
+    expect(recoveredJobId).toBe(buildDeadLetterRecoveryJobId("imports", request.deadLetterJobId));
     expect(sourceAdd).toHaveBeenCalledWith(
       envelope.jobName,
       envelope.payload,
       expect.objectContaining({ jobId: recoveredJobId })
     );
     expect(remove).toHaveBeenCalledOnce();
+  });
+
+  it("returns the same recovered job after a lost response without enqueueing again", async () => {
+    const recoveredJobs = new Map<string, { id: string }>();
+    const remove = vi.fn(async () => undefined);
+    const deadLetterQueue = {
+      getJob: vi.fn()
+        .mockResolvedValueOnce({ data: envelope, remove })
+        .mockResolvedValueOnce(undefined)
+    };
+    const sourceAdd = vi.fn(async (
+      _name: string,
+      _payload: Record<string, unknown>,
+      options: { jobId?: string }
+    ) => {
+      const id = String(options.jobId);
+      const job = { id };
+      recoveredJobs.set(id, job);
+      return job;
+    });
+    const sourceGetJob = vi.fn(async (jobId: string) => recoveredJobs.get(jobId));
+    const sourceQueue = {
+      name: "imports",
+      add: sourceAdd,
+      getJob: sourceGetJob
+    } as unknown as Queue;
+    const deps = {
+      getDeadLetterQueue: () => deadLetterQueue as unknown as Pick<Queue, "getJob">
+    };
+
+    const firstResult = await recoverDeadLetterJob(sourceQueue, request, deps);
+    const retryResult = await recoverDeadLetterJob(sourceQueue, request, deps);
+
+    expect(retryResult).toBe(firstResult);
+    expect(sourceAdd).toHaveBeenCalledOnce();
+    expect(sourceGetJob).toHaveBeenCalledWith(firstResult);
+    expect(remove).toHaveBeenCalledOnce();
+  });
+
+  it("returns explicit NOT_FOUND when neither the DLQ nor recovered job exists", async () => {
+    const sourceAdd = vi.fn();
+    const sourceGetJob = vi.fn(async () => undefined);
+    const deadLetterQueue = { getJob: vi.fn(async () => undefined) };
+
+    await expect(recoverDeadLetterJob(
+      { name: "imports", add: sourceAdd, getJob: sourceGetJob } as unknown as Queue,
+      request,
+      { getDeadLetterQueue: () => deadLetterQueue as unknown as Pick<Queue, "getJob"> }
+    )).rejects.toMatchObject({ name: "AppError", code: "NOT_FOUND" });
+    expect(sourceAdd).not.toHaveBeenCalled();
+    expect(sourceGetJob).toHaveBeenCalledWith(
+      buildDeadLetterRecoveryJobId("imports", request.deadLetterJobId)
+    );
   });
 
   it("rejects target confusion before reading or mutating the DLQ", async () => {
@@ -214,7 +267,7 @@ describe("recoverDeadLetterJob", () => {
     };
 
     await expect(recoverDeadLetterJob(
-      { name: "imports", add: sourceAdd } as unknown as Queue,
+      { name: "imports", add: sourceAdd, getJob: vi.fn() } as unknown as Queue,
       request,
       { getDeadLetterQueue: () => deadLetterQueue as unknown as Pick<Queue, "getJob"> }
     )).rejects.toThrow("Dead-letter job source queue mismatch");
@@ -232,7 +285,7 @@ describe("recoverDeadLetterJob", () => {
     };
 
     await expect(recoverDeadLetterJob(
-      { name: "imports", add: sourceAdd } as unknown as Queue,
+      { name: "imports", add: sourceAdd, getJob: vi.fn() } as unknown as Queue,
       request,
       { getDeadLetterQueue: () => deadLetterQueue as unknown as Pick<Queue, "getJob"> }
     )).rejects.toThrow("Redis unavailable");

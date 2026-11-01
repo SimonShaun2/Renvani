@@ -4,7 +4,9 @@ import type { Job, Queue } from "bullmq";
 import { Queue as BullQueue } from "bullmq";
 
 import {
+  AppError,
   DeadLetterJobEnvelopeV1Schema,
+  ErrorCode,
   PlatformQueueNameV1Schema,
   type DeadLetterRecoveryRequestV1
 } from "@fsm/types";
@@ -30,12 +32,12 @@ type DeadLetterRecoveryDeps = {
 function buildDeadLetterOperationJobId(
   operation: "dlq" | "recover",
   sourceQueueName: string,
-  sourceJobId: string
+  operationIdentity: string
 ): string {
   const digest = createHash("sha256")
     .update(sourceQueueName)
     .update("\0")
-    .update(sourceJobId)
+    .update(operationIdentity)
     .digest("hex")
     .slice(0, 32);
 
@@ -54,9 +56,9 @@ export function buildDeadLetterForwardJobId(
 
 export function buildDeadLetterRecoveryJobId(
   sourceQueueName: string,
-  sourceJobId: string
+  deadLetterJobId: string
 ): string {
-  return buildDeadLetterOperationJobId("recover", sourceQueueName, sourceJobId);
+  return buildDeadLetterOperationJobId("recover", sourceQueueName, deadLetterJobId);
 }
 
 export function getDeadLetterQueue(sourceQueueName: string): Queue {
@@ -104,11 +106,21 @@ export async function recoverDeadLetterJob(
     throw new Error("Source queue object does not match recovery request");
   }
 
+  const recoveredJobId = buildDeadLetterRecoveryJobId(
+    sourceQueueName,
+    request.deadLetterJobId
+  );
   const dlq = deps.getDeadLetterQueue(sourceQueueName);
   const deadLetterJob = await dlq.getJob(request.deadLetterJobId);
 
   if (!deadLetterJob) {
-    throw new Error("Dead-letter job not found");
+    const existingRecoveredJob = await sourceQueue.getJob(recoveredJobId);
+
+    if (existingRecoveredJob?.id) {
+      return String(existingRecoveredJob.id);
+    }
+
+    throw new AppError(ErrorCode.NOT_FOUND, "Dead-letter job was not found or recovered");
   }
 
   const envelope = DeadLetterJobEnvelopeV1Schema.parse(deadLetterJob.data);
@@ -119,7 +131,7 @@ export async function recoverDeadLetterJob(
 
   const recovered = await sourceQueue.add(envelope.jobName, envelope.payload, {
     ...platformDefaultJobOptions(),
-    jobId: buildDeadLetterRecoveryJobId(sourceQueueName, envelope.sourceJobId)
+    jobId: recoveredJobId
   });
 
   if (!recovered.id) {

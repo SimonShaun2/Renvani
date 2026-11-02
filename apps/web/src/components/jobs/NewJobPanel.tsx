@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
 
-import { api } from "@/src/lib/api";
 import { useCustomer, useCustomerProperties } from "@/src/hooks/customers.hooks";
 import { useCustomerSearch } from "@/src/hooks/dispatch.hooks";
 import { useCreateJob } from "@/src/hooks/jobs.hooks";
@@ -21,7 +20,6 @@ import {
   formatMoney,
   isMissingRequired,
   lineItemsSubtotal,
-  saveJobLineItems,
   newJobServiceFeeLabel,
   validateNewJob,
   type NewJobErrors,
@@ -47,9 +45,6 @@ export function NewJobPanel({ initialCustomerId = "" }: { initialCustomerId?: st
   const [items, setItems] = useState<NewJobLineItem[]>([]);
   const [itemPickerOpen, setItemPickerOpen] = useState(false);
   const [itemSearch, setItemSearch] = useState("");
-  const [createdJobId, setCreatedJobId] = useState<string | null>(null);
-  const [failedItems, setFailedItems] = useState<NewJobLineItem[]>([]);
-  const [addingItems, setAddingItems] = useState(false);
   const createJob = useCreateJob();
 
   const customer = useCustomer(values.customerId || null);
@@ -82,39 +77,20 @@ export function NewJobPanel({ initialCustomerId = "" }: { initialCustomerId?: st
     }
     setErrors(nextErrors);
     if (Object.values(nextErrors).some(Boolean)) return;
-    if (createdJobId) {
-      void saveItems(createdJobId, failedItems);
-      return;
-    }
-    createJob.mutate(buildCreateJobPayload(values), {
-      onSuccess: (data) => {
-        setCreatedJobId(data.job.id);
-        void saveItems(data.job.id, items);
-      }
+    createJob.mutate(buildCreateJobPayload(values, items), {
+      onSuccess: (data) => router.push(`/jobs/${data.job.id}`)
     });
   };
 
-  // Never re-creates the job: after create, only the failed line items are retried.
-  const saveItems = async (jobId: string, toSave: readonly NewJobLineItem[]) => {
-    if (toSave.length > 0) {
-      setAddingItems(true);
-      const failed = await saveJobLineItems(jobId, toSave, (path, body) => api.post(path, body));
-      setAddingItems(false);
-      setFailedItems(failed);
-      if (failed.length > 0) return;
-    }
-    router.push(`/jobs/${jobId}`);
-  };
-
-  const busy = createJob.isPending || addingItems;
+  const busy = createJob.isPending;
   const subtotal = lineItemsSubtotal(items);
-  const showBanner = isMissingRequired(errors);
+  const showBanner = isMissingRequired(errors) && !customerLookupError;
 
   const hint = (text: string) => <p className="mt-1 font-mono text-[11px] text-[#5e6684]">{text}</p>;
 
   const renderControl = (field: NewJobField) => {
     const id = `new-job-${field.key}`;
-    const invalid = Boolean(errors[field.key]);
+    const invalid = Boolean(fieldError(field.key));
     const describedBy = invalid ? `${id}-error` : undefined;
     const common = { id, "aria-invalid": invalid || undefined, "aria-describedby": describedBy, disabled: busy };
 
@@ -123,10 +99,20 @@ export function NewJobPanel({ initialCustomerId = "" }: { initialCustomerId?: st
         if (values.customerId) {
           return (
             <>
-              <div className="flex items-center justify-between rounded-[10px] border border-[#e6dccb] bg-white px-3.5 py-3" data-testid="new-job-customer">
+              <div
+                className="flex items-center justify-between rounded-[10px] border border-[#e6dccb] bg-white px-3.5 py-3"
+                role="group"
+                aria-labelledby="new-job-customerId-label"
+                aria-describedby={describedBy}
+                data-testid="new-job-customer"
+              >
                 <div>
-                  <p className="text-[15px] text-[#0f1530]">{record ? customerName(record) : customer.isError ? "—" : "Loading…"}</p>
-                  {record?.phone || record?.email ? <p className="text-[13px] text-[#5e6684]">{record.phone ?? record.email}</p> : null}
+                  <p className="text-[15px] text-[#0f1530]">
+                    {selectedCustomer ? customerName(selectedCustomer) : customer.isError ? "Customer unavailable" : "Loading…"}
+                  </p>
+                  {selectedCustomer?.phone || selectedCustomer?.email ? (
+                    <p className="text-[13px] text-[#5e6684]">{selectedCustomer.phone ?? selectedCustomer.email}</p>
+                  ) : null}
                 </div>
                 <button type="button" className="text-sm font-semibold text-[#2a3360] underline" onClick={() => set("customerId", "")} disabled={busy}>
                   {NEW_JOB_COPY.customerChange}
@@ -232,16 +218,21 @@ export function NewJobPanel({ initialCustomerId = "" }: { initialCustomerId?: st
           </p>
         ) : null}
 
-        {/* Once the job exists, edits here would never be saved: lock the form and only allow Retry. */}
-        <fieldset disabled={busy || Boolean(createdJobId)} className="contents" data-testid="new-job-editor">
+        <fieldset disabled={busy} className="contents" data-testid="new-job-editor">
         {visibleFields.map((field) => (
           <div key={field.key} className={field.span === 2 ? "sm:col-span-2" : undefined}>
-            <label htmlFor={`new-job-${field.key}`} className={`mb-1.5 block text-[13px] font-medium ${errors[field.key] ? "text-[#b42318]" : "text-[#2a3360]"}`}>
+            <label id={`new-job-${field.key}-label`} htmlFor={`new-job-${field.key}`} className={`mb-1.5 block text-[13px] font-medium ${fieldError(field.key) ? "text-[#b42318]" : "text-[#2a3360]"}`}>
               {field.label}
             </label>
             {renderControl(field)}
-            {errors[field.key] ? (
-              <p id={`new-job-${field.key}-error`} className="mt-1 font-mono text-[11px] text-[#b42318]">{errors[field.key]}</p>
+            {fieldError(field.key) ? (
+              <p
+                id={`new-job-${field.key}-error`}
+                className="mt-1 font-mono text-[11px] text-[#b42318]"
+                role={field.key === "customerId" && customerLookupError ? "alert" : undefined}
+              >
+                {fieldError(field.key)}
+              </p>
             ) : null}
           </div>
         ))}
@@ -338,27 +329,11 @@ export function NewJobPanel({ initialCustomerId = "" }: { initialCustomerId?: st
             {NEW_JOB_COPY.submitError}
           </p>
         ) : null}
-        {failedItems.length > 0 ? (
-          <div role="alert" className="flex items-center justify-between gap-3 rounded-[10px] bg-[#fdecea] px-3.5 py-3 text-sm font-medium text-[#b42318] sm:col-span-2">
-            <span>
-              {NEW_JOB_COPY.itemsError} {NEW_JOB_COPY.itemsLocked}
-            </span>
-            <button
-              type="button"
-              disabled={busy}
-              onClick={() => createdJobId && void saveItems(createdJobId, failedItems)}
-              className="rounded-[10px] border border-[#b42318] bg-white px-3 py-1.5 text-sm font-semibold text-[#b42318] disabled:opacity-60"
-            >
-              {NEW_JOB_COPY.itemsRetry}
-            </button>
-          </div>
-        ) : null}
-
         <div className="flex justify-end gap-3 sm:col-span-2">
           <Link href="/jobs" className="rounded-[10px] border border-[#e6dccb] bg-white px-5 py-3 text-sm font-semibold text-[#0f1530]">
             {NEW_JOB_COPY.cancel}
           </Link>
-          <button type="submit" disabled={busy || Boolean(createdJobId)} className="rounded-[10px] bg-[#0f1530] px-[18px] py-3 text-sm font-semibold text-white hover:bg-[#2a3360] disabled:opacity-60">
+          <button type="submit" disabled={busy} className="rounded-[10px] bg-[#0f1530] px-[18px] py-3 text-sm font-semibold text-white hover:bg-[#2a3360] disabled:opacity-60">
             {busy ? NEW_JOB_COPY.submitting : NEW_JOB_COPY.submit}
           </button>
         </div>

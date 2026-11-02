@@ -10,13 +10,18 @@ import {
   type JobProduct,
   type JobStatus,
   type JobTask,
+  type MobileJobResponse,
+  type MobileTodayResponse,
+  MobileReportIssueBodySchema,
+  type MobileReportIssueResponse,
   type Product,
   type TimeEntry,
   type UpdateJobInput,
   type UpdateJobProductInput,
   type UpdateTaskInput
 } from "@fsm/types";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
+import type { z } from "zod";
 
 import { api } from "@/src/lib/api";
 import { uploadFile } from "@/src/lib/upload";
@@ -234,6 +239,8 @@ const jobKeys = {
   all: ["jobs"] as const,
   list: (query: JobListQueryInput) => ["jobs", "list", query] as const,
   detail: (jobId: string) => ["jobs", "detail", jobId] as const,
+  mobileDetail: (jobId: string) => ["jobs", "mobile-detail", jobId] as const,
+  mobileToday: ["jobs", "mobile-today"] as const,
   tasks: (jobId: string) => ["jobs", "tasks", jobId] as const,
   products: (jobId: string) => ["jobs", "products", jobId] as const,
   time: (jobId: string) => ["jobs", "time", jobId] as const,
@@ -246,6 +253,8 @@ const jobKeys = {
 async function invalidateJobQueries(queryClient: ReturnType<typeof useQueryClient>, jobId: string) {
   await Promise.all([
     queryClient.invalidateQueries({ queryKey: jobKeys.detail(jobId) }),
+    queryClient.invalidateQueries({ queryKey: jobKeys.mobileDetail(jobId) }),
+    queryClient.invalidateQueries({ queryKey: jobKeys.mobileToday }),
     queryClient.invalidateQueries({ queryKey: jobKeys.tasks(jobId) }),
     queryClient.invalidateQueries({ queryKey: jobKeys.products(jobId) }),
     queryClient.invalidateQueries({ queryKey: jobKeys.time(jobId) }),
@@ -331,6 +340,45 @@ export function useJob(jobId: string | null) {
     queryKey: jobId ? jobKeys.detail(jobId) : jobKeys.detail("pending"),
     queryFn: () => api.get<JobResponse>(`/api/v1/jobs/${jobId}`),
     enabled: Boolean(jobId)
+  });
+}
+
+/** The server resolves a technician's own identity and orders the complete assigned day. */
+export function useMobileToday() {
+  return useQuery({
+    queryKey: jobKeys.mobileToday,
+    queryFn: () => api.get<MobileTodayResponse>("/api/v1/mobile/today")
+  });
+}
+
+/** Detail reads enrich cards only; the mobile/today response remains the authoritative list. */
+export function useTodayJobDetails(jobIds: string[]) {
+  return useQueries({
+    queries: jobIds.map((jobId) => ({
+      queryKey: jobKeys.detail(jobId),
+      queryFn: () => api.get<JobResponse>(`/api/v1/jobs/${jobId}`)
+    }))
+  });
+}
+
+/** FS-180: fetch the technician API's opaque version before submitting an issue. */
+export function useMobileJobVersion(jobId: string, enabled: boolean) {
+  return useQuery({
+    queryKey: jobKeys.mobileDetail(jobId),
+    queryFn: () => api.get<MobileJobResponse>(`/api/v1/mobile/jobs/${jobId}`),
+    enabled
+  });
+}
+
+export function useReportMobileIssue(jobId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (input: z.input<typeof MobileReportIssueBodySchema>) =>
+      api.post<MobileReportIssueResponse>(`/api/v1/mobile/jobs/${jobId}/issues`, input),
+    onSuccess: async () => {
+      await invalidateJobQueries(queryClient, jobId);
+    }
   });
 }
 

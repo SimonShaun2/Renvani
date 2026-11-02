@@ -57,10 +57,27 @@ export const SIGNER_ROLES = ["customer", "technician"] as const;
 export const SignerRoleSchema = z.enum(SIGNER_ROLES);
 export type SignerRole = z.infer<typeof SignerRoleSchema>;
 
+export const LegacyJobSignatureUrlSchema = z
+  .string()
+  .url()
+  .max(2048)
+  .refine((value) => {
+    try {
+      const url = new URL(value);
+      return url.protocol === "https:"
+        && url.username.length === 0
+        && url.password.length === 0
+        && url.search.length === 0
+        && url.hash.length === 0;
+    } catch {
+      return false;
+    }
+  }, "Legacy signatureUrl must be an HTTPS URL without credentials, query parameters, or fragments");
+
 export const JobSignatureCapturePayloadSchema = z
   .object({
     attachmentId: z.string().uuid().optional(),
-    signatureUrl: z.string().url().max(2048).optional(),
+    signatureUrl: LegacyJobSignatureUrlSchema.optional(),
     signedByName: z.string().trim().min(1).max(255),
     /** Additive; omitted = "customer" (pre-existing clients). */
     signerRole: SignerRoleSchema.optional()
@@ -174,7 +191,7 @@ export const CaptureJobSignatureBodySchema = z
     clientOperationId: ClientOperationIdSchema,
     baseRecordVersion: RecordVersionV1Schema,
     attachmentId: z.string().uuid().optional(),
-    signatureUrl: z.string().url().max(2048).optional(),
+    signatureUrl: LegacyJobSignatureUrlSchema.optional(),
     signedByName: z.string().trim().min(1).max(255),
     signerRole: SignerRoleSchema
   })

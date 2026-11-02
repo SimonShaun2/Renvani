@@ -5,7 +5,7 @@ import Link from "next/link";
 import { format, parseISO } from "date-fns";
 import { motion } from "framer-motion";
 import { CalendarClock, Sparkles, X } from "lucide-react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import type { AiRecommendationDetail, AiRecommendationType } from "@fsm/types";
 
 import { PageLayout } from "@/src/components/layout/PageLayout";
@@ -20,6 +20,7 @@ import {
   useSnoozeRecommendation
 } from "@/src/hooks/ai-revenue.hooks";
 import { useRevenueSummary } from "@/src/hooks/dashboard.hooks";
+import { useProposeRecommendation } from "@/src/hooks/revenue-proposals.hooks";
 import { cn } from "@/src/lib/utils";
 
 type RevenueFilter = "all" | "reactivation" | "unsold_estimate" | "unpaid_invoice" | "aging_asset" | "maintenance_plan_offer";
@@ -45,6 +46,17 @@ const categoryToneClasses: Record<CategoryCard["tone"], string> = {
   blue: "bg-brand-accent-light text-brand-accent",
   gold: "bg-[#fff1d8] text-[#d48d0f]"
 };
+
+const REVENUE_PROPOSAL_RECOMMENDATION_TYPES = new Set<AiRecommendationType>([
+  "reactivation",
+  "unsold_estimate",
+  "unpaid_invoice",
+  "maintenance_plan_offer"
+]);
+
+export function isRevenueProposalRecommendationType(type: AiRecommendationType): boolean {
+  return REVENUE_PROPOSAL_RECOMMENDATION_TYPES.has(type);
+}
 
 function getRecommendationActionLabel(type: AiRecommendationType): string {
   switch (type) {
@@ -187,7 +199,9 @@ function RecommendationRow({
     ? `${recommendation.customer.firstName} ${recommendation.customer.lastName}`.trim()
     : null;
   const urgencyTone = getUrgencyTone(recommendation.urgencyScore);
-  const actionLabel = getRecommendationActionLabel(recommendation.type);
+  const actionLabel = isRevenueProposalRecommendationType(recommendation.type)
+    ? "Create proposal"
+    : getRecommendationActionLabel(recommendation.type);
 
   return (
     <div className="rounded-[28px] border border-neutral-200 bg-white px-5 py-5 shadow-sm transition hover:shadow-[0_24px_70px_rgba(16,33,99,0.08)]">
@@ -313,6 +327,7 @@ function Overlay({
 }
 
 export function AiRevenueCenterClient() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const summaryQuery = useRevenueSummary();
   const customerIdFilter = searchParams.get("customerId");
@@ -325,7 +340,9 @@ export function AiRevenueCenterClient() {
   const [snoozeTarget, setSnoozeTarget] = useState<AiRecommendationDetail | null>(null);
   const [snoozeDate, setSnoozeDate] = useState(getTomorrowDateValue());
   const [snoozeError, setSnoozeError] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
   const actionMutation = useActionRecommendation();
+  const proposeMutation = useProposeRecommendation();
   const dismissMutation = useDismissRecommendation();
   const snoozeMutation = useSnoozeRecommendation();
 
@@ -362,12 +379,23 @@ export function AiRevenueCenterClient() {
   const recommendations = recommendationsQuery.data?.data ?? [];
 
   async function handleAction(recommendation: AiRecommendationDetail) {
-    await actionMutation.mutateAsync({
-      id: recommendation.id,
-      input: {
-        actionTaken: getRecommendationActionLabel(recommendation.type)
+    setActionError(null);
+    try {
+      if (isRevenueProposalRecommendationType(recommendation.type)) {
+        await proposeMutation.mutateAsync(recommendation.id);
+        router.push("/command-center/approvals");
+        return;
       }
-    });
+
+      await actionMutation.mutateAsync({
+        id: recommendation.id,
+        input: {
+          actionTaken: getRecommendationActionLabel(recommendation.type)
+        }
+      });
+    } catch (error: unknown) {
+      setActionError(error instanceof Error ? error.message : "The recommendation could not be updated.");
+    }
   }
 
   async function handleDismiss() {
@@ -537,6 +565,11 @@ export function AiRevenueCenterClient() {
             </section>
 
             <div className="space-y-4">
+              {actionError ? (
+                <div role="alert" className="rounded-3xl border border-error/15 bg-error-light px-5 py-4 text-sm text-error">
+                  {actionError}
+                </div>
+              ) : null}
               {recommendationsQuery.isLoading ? (
                 Array.from({ length: 5 }, (_, index) => <SkeletonCard key={index} className="h-[228px]" />)
               ) : recommendationsQuery.isError ? (
@@ -575,7 +608,10 @@ export function AiRevenueCenterClient() {
                       setSnoozeDate(getTomorrowDateValue());
                       setSnoozeError(null);
                     }}
-                    isActioning={actionMutation.isPending && actionMutation.variables?.id === recommendation.id}
+                    isActioning={
+                      (actionMutation.isPending && actionMutation.variables?.id === recommendation.id) ||
+                      (proposeMutation.isPending && proposeMutation.variables === recommendation.id)
+                    }
                   />
                 ))
               )}

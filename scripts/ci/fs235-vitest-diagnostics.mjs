@@ -3,31 +3,89 @@ import { existsSync, readFileSync, rmSync } from "node:fs";
 import { redactDatabaseUrls } from "./neon-per-pr-database.mjs";
 
 const MAX_FAILURES = 3;
-const MAX_FAILURE_MESSAGE_LENGTH = 4_000;
+const MAX_SUITES_SCANNED = 10;
+const MAX_ASSERTIONS_SCANNED_PER_SUITE = 50;
+const MAX_MESSAGES_SCANNED_PER_ASSERTION = 3;
+const MAX_MESSAGE_CHARS_SCANNED = 2_000;
+const MAX_SUMMARY_LENGTH = 2_000;
+const KNOWN_ASSERTION_TITLE = "authorizes exactly one provider create across concurrent workers";
+const KNOWN_TEST_FILE = "clerk-workspace.postgres.integration.test.ts";
 
-function cleanLogText(value) {
-  return String(value ?? "")
-    .replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, "")
-    .slice(0, MAX_FAILURE_MESSAGE_LENGTH);
+function safeCount(value) {
+  return Number.isSafeInteger(value) && value >= 0 ? value : "unknown";
+}
+
+function assertionCode(value) {
+  const title = typeof value === "string" ? value : "";
+  return title === KNOWN_ASSERTION_TITLE || title.endsWith(` ${KNOWN_ASSERTION_TITLE}`)
+    ? "fs235_concurrent_claim"
+    : "unknown";
+}
+
+function messageMetadata(messages) {
+  const reported = Array.isArray(messages) ? messages : [];
+  const scanned = reported
+    .slice(0, MAX_MESSAGES_SCANNED_PER_ASSERTION)
+    .filter((message) => typeof message === "string")
+    .map((message) => message.slice(0, MAX_MESSAGE_CHARS_SCANNED))
+    .join("\n");
+
+  const type = /\bAssertionError\b/.test(scanned)
+    ? "AssertionError"
+    : /\bPostgresError\b/.test(scanned)
+      ? "PostgresError"
+      : /\bTypeError\b/.test(scanned)
+        ? "TypeError"
+        : /\bError\b/.test(scanned)
+          ? "Error"
+          : "unknown";
+  const kind = /\b(?:timed? ?out|timeout)\b/i.test(scanned)
+    ? "timeout"
+    : /\b(?:ECONNREFUSED|connection refused)\b/i.test(scanned)
+      ? "connection_refused"
+      : /\btoHaveLength\b|\bAssertionError\b/.test(scanned)
+        ? "assertion_failure"
+        : type === "PostgresError"
+          ? "postgres_error"
+          : "unknown";
+  const locationMatch = new RegExp(`(?:^|[\\\\/])(${KNOWN_TEST_FILE.replaceAll(".", "\\.")}):(\\d{1,6}):(\\d{1,6})\\b`, "m").exec(scanned);
+  const location = locationMatch
+    ? `${KNOWN_TEST_FILE}:${locationMatch[2]}:${locationMatch[3]}`
+    : "unknown";
+
+  return {
+    type,
+    kind,
+    location,
+    messages: Math.min(reported.length, MAX_MESSAGES_SCANNED_PER_ASSERTION),
+    messagesOmitted: reported.length > MAX_MESSAGES_SCANNED_PER_ASSERTION
+  };
 }
 
 function failedAssertions(result) {
   const failures = [];
-  for (const suite of Array.isArray(result?.testResults) ? result.testResults : []) {
-    for (const assertion of Array.isArray(suite?.assertionResults) ? suite.assertionResults : []) {
+  const suites = Array.isArray(result?.testResults)
+    ? result.testResults.slice(0, MAX_SUITES_SCANNED)
+    : [];
+  for (const suite of suites) {
+    const assertions = Array.isArray(suite?.assertionResults)
+      ? suite.assertionResults.slice(0, MAX_ASSERTIONS_SCANNED_PER_SUITE)
+      : [];
+    for (const assertion of assertions) {
       if (assertion?.status !== "failed") continue;
-      const title = cleanLogText(assertion.fullName || assertion.title || "unnamed test");
-      const messages = Array.isArray(assertion.failureMessages)
-        ? assertion.failureMessages.map(cleanLogText).filter(Boolean).join("\n")
-        : "";
-      failures.push(`${title}: ${messages || "failed without a reported message"}`);
+      const metadata = messageMetadata(assertion.failureMessages);
+      failures.push(
+        `failure assertion=${assertionCode(assertion.fullName || assertion.title)}`
+        + ` type=${metadata.type} kind=${metadata.kind} location=${metadata.location}`
+        + ` messages=${metadata.messages} messages_omitted=${metadata.messagesOmitted}`
+      );
       if (failures.length === MAX_FAILURES) return failures;
     }
   }
   return failures;
 }
 
-/** Build a bounded failure summary from Vitest's JSON reporter output without exposing database URLs. */
+/** Build a bounded failure summary without emitting arbitrary Vitest reporter text. */
 export function vitestFailureSummary(outputFile) {
   if (!existsSync(outputFile)) {
     return "Vitest failed; JSON result was not produced";
@@ -41,15 +99,16 @@ export function vitestFailureSummary(outputFile) {
   }
 
   const counts = {
-    executed: result?.numTotalTests,
-    passed: result?.numPassedTests,
-    failed: result?.numFailedTests,
-    skipped: result?.numPendingTests,
-    todo: result?.numTodoTests
+    executed: safeCount(result?.numTotalTests),
+    passed: safeCount(result?.numPassedTests),
+    failed: safeCount(result?.numFailedTests),
+    skipped: safeCount(result?.numPendingTests),
+    todo: safeCount(result?.numTodoTests)
   };
   const failures = failedAssertions(result);
   const details = failures.length > 0 ? `\n${failures.join("\n")}` : "";
-  return redactDatabaseUrls(`Vitest result ${JSON.stringify(counts)}${details}`);
+  return redactDatabaseUrls(`Vitest result ${JSON.stringify(counts)}${details}`)
+    .slice(0, MAX_SUMMARY_LENGTH);
 }
 
 /** Run and verify the JSON-reported Vitest gate, logging diagnostics before deleting its temporary result. */

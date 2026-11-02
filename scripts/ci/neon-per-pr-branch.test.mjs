@@ -5,7 +5,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
 import { isApprovedFs235NeonTarget } from "./fs235-neon-target.mjs";
-import { runVitestJsonGate } from "./fs235-vitest-diagnostics.mjs";
+import { runVitestJsonGate, vitestFailureSummary } from "./fs235-vitest-diagnostics.mjs";
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 
@@ -39,7 +39,7 @@ test("batch-ci workflow includes neon per-PR matrix job", () => {
   assert.match(workflow, /FS235_PR_NUMBER: \$\{\{ github\.event\.pull_request\.number \}\}/);
 });
 
-test("FS-235 runner reports redacted Vitest JSON failures before cleaning the result", () => {
+test("FS-235 runner reports structured diagnostics without reporter credentials or PII", () => {
   const directory = mkdtempSync(join(tmpdir(), "fs235-vitest-failure-"));
   const outputFile = join(directory, "result.json");
   const databaseUrl = "postgresql://ci_user:super-secret@approved.neon.tech/ci_pr_411_2_1800000000?sslmode=require";
@@ -52,8 +52,11 @@ test("FS-235 runner reports redacted Vitest JSON failures before cleaning the re
     testResults: [{
       assertionResults: [{
         status: "failed",
-        fullName: "claims one workspace intent",
-        failureMessages: [`connection ${databaseUrl} timed out`]
+        fullName: "FS-235 Clerk workspace worker (Postgres) authorizes exactly one provider create across concurrent workers",
+        failureMessages: [
+          `AssertionError: owner@example.com used token sk_test_standalone and connection ${databaseUrl} timed out\n`
+          + "    at C:/runner/src/processors/clerk-workspace.postgres.integration.test.ts:21:7"
+        ]
       }]
     }]
   }));
@@ -66,10 +69,48 @@ test("FS-235 runner reports redacted Vitest JSON failures before cleaning the re
       verifyResult: () => { throw new Error("must not verify after a failed subprocess"); },
       log: (line) => logs.push(line)
     }), /Vitest exited 1/);
-    assert.match(logs.join("\n"), /claims one workspace intent/);
-    assert.match(logs.join("\n"), /\[REDACTED_DATABASE_URL\]/);
-    assert.doesNotMatch(logs.join("\n"), /super-secret|ci_pr_411_2_1800000000|approved\.neon\.tech/);
+    assert.match(logs.join("\n"), /assertion=fs235_concurrent_claim/);
+    assert.match(logs.join("\n"), /type=AssertionError kind=timeout/);
+    assert.match(logs.join("\n"), /location=clerk-workspace\.postgres\.integration\.test\.ts:21:7/);
+    assert.doesNotMatch(
+      logs.join("\n"),
+      /super-secret|ci_pr_411_2_1800000000|approved\.neon\.tech|owner@example\.com|sk_test_standalone/
+    );
     assert.equal(existsSync(outputFile), false);
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
+});
+
+test("FS-235 runner bounds message count and total output while suppressing arbitrary reporter text", () => {
+  const directory = mkdtempSync(join(tmpdir(), "fs235-vitest-bounds-"));
+  const outputFile = join(directory, "result.json");
+  const failureMessages = Array.from(
+    { length: 100 },
+    (_, index) => `Error: message ${index} user${index}@example.com token_${index}_${"x".repeat(5_000)}`
+  );
+  writeFileSync(outputFile, JSON.stringify({
+    numTotalTests: "attacker@example.com",
+    numPassedTests: 0,
+    numFailedTests: 1,
+    numPendingTests: 0,
+    numTodoTests: 0,
+    testResults: [{
+      assertionResults: [{
+        status: "failed",
+        fullName: "private customer name and token_unsafe",
+        failureMessages
+      }]
+    }]
+  }));
+
+  try {
+    const summary = vitestFailureSummary(outputFile);
+    assert.ok(summary.length <= 2_000);
+    assert.match(summary, /"executed":"unknown"/);
+    assert.match(summary, /assertion=unknown/);
+    assert.match(summary, /messages=3 messages_omitted=true/);
+    assert.doesNotMatch(summary, /attacker@example\.com|user0@example\.com|token_0_|private customer|token_unsafe/);
   } finally {
     rmSync(directory, { recursive: true, force: true });
   }

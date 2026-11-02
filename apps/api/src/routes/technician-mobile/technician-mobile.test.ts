@@ -187,6 +187,14 @@ describe("FS-169 technician mobile API", () => {
       .send({ status: "completed", recordVersion: v });
     expect(ok.status).toBe(200);
     expect(ok.body.item.status).toBe("completed");
+    expect(
+      fakeDb.getTestState().jobTasks.find((task) => task.id === w.task.id)?.completedById
+    ).toBe(w.me.user.id);
+    expect(fakeDb.getTestState().activityEvents.at(-1)).toMatchObject({
+      eventType: "job.task_completed",
+      actorId: w.me.user.id,
+      actorName: "T me@mobile.test"
+    });
     const conflict = await request(app.server)
       .patch(`/api/v1/mobile/jobs/${w.early.id}/checklist/${w.task.id}`).set("Authorization", w.meAuth)
       .send({ notes: "again", recordVersion: v });

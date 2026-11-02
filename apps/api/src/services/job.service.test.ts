@@ -517,6 +517,143 @@ describe("job.service", () => {
     expect(rolledBackState.customers.find((row) => row.id === customer.id)?.totalJobs).toBe(3);
   });
 
+  it("completeJob blocks open required tasks without changing state, then allows a retry after completion", async () => {
+    const { company, actor } = createAdminContext();
+    const { customer } = seedJobGraph(company.id);
+    const job = fakeDb.seedJob({ companyId: company.id, customerId: customer.id, title: "Checklist Job", status: "in_progress" });
+    const task = fakeDb.seedJobTask({ companyId: company.id, jobId: job.id, title: "Safety check", isRequired: true });
+    fakeDb.seedJobTask({ companyId: company.id, jobId: job.id, title: "Optional note" });
+
+    await expect(jobService.completeJob(company.id, actor.id, job.id, {})).rejects.toMatchObject({ code: ErrorCode.CONFLICT });
+    expect(fakeDb.getTestState().jobs.find((row) => row.id === job.id)?.status).toBe("in_progress");
+    expect(fakeDb.getTestState().activityEvents.some((event) => event.eventType === "job.completed")).toBe(false);
+    expect(addQueueJob).not.toHaveBeenCalled();
+
+    const persistedTask = fakeDb.getTestState().jobTasks.find((row) => row.id === task.id);
+    expect(persistedTask).toBeDefined();
+    if (!persistedTask) throw new Error("Expected task after rollback");
+    persistedTask.status = "completed";
+    const completed = await jobService.completeJob(company.id, actor.id, job.id, {});
+    expect(completed.status).toBe("completed");
+  });
+
+  it("completeJob blocks an in-progress required task but permits skipped required and open optional tasks", async () => {
+    const { company, actor } = createAdminContext();
+    const { customer } = seedJobGraph(company.id);
+    const job = fakeDb.seedJob({ companyId: company.id, customerId: customer.id, title: "Mixed Checklist", status: "in_progress" });
+    const required = fakeDb.seedJobTask({ companyId: company.id, jobId: job.id, title: "Active check", isRequired: true, status: "in_progress" });
+    fakeDb.seedJobTask({ companyId: company.id, jobId: job.id, title: "Optional check", isRequired: false, status: "pending" });
+
+    await expect(jobService.completeJob(company.id, actor.id, job.id, {})).rejects.toMatchObject({ code: ErrorCode.CONFLICT });
+    const persistedTask = fakeDb.getTestState().jobTasks.find((row) => row.id === required.id);
+    expect(persistedTask).toBeDefined();
+    if (!persistedTask) throw new Error("Expected task after rollback");
+    persistedTask.status = "skipped";
+
+    const completed = await jobService.completeJob(company.id, actor.id, job.id, {});
+    expect(completed.status).toBe("completed");
+  });
+
+  it("completeJob ignores open tasks from another tenant and soft-deleted tasks", async () => {
+    const { company, actor } = createAdminContext();
+    const { customer } = seedJobGraph(company.id);
+    const job = fakeDb.seedJob({ companyId: company.id, customerId: customer.id, title: "Scoped Job", status: "in_progress" });
+    fakeDb.seedJobTask({ companyId: randomUUID(), jobId: job.id, title: "Other tenant", isRequired: true });
+    fakeDb.seedJobTask({ companyId: company.id, jobId: job.id, title: "Deleted", isRequired: true, deletedAt: new Date() });
+
+    const completed = await jobService.completeJob(company.id, actor.id, job.id, {});
+    expect(completed.status).toBe("completed");
+  });
+
+  it("completeJob serializes concurrent attempts and applies completion side effects once", async () => {
+    const { company, actor } = createAdminContext();
+    const { customer, technician } = seedJobGraph(company.id);
+    const job = fakeDb.seedJob({
+      companyId: company.id,
+      customerId: customer.id,
+      technicianId: technician.id,
+      title: "Concurrent Completion",
+      status: "in_progress",
+      invoiceTotal: "50.00"
+    });
+
+    const [first, second] = await Promise.all([
+      jobService.completeJob(company.id, actor.id, job.id, { completionNotes: "Done" }),
+      jobService.completeJob(company.id, actor.id, job.id, { completionNotes: "Done" })
+    ]);
+
+    expect(first.status).toBe("completed");
+    expect(second.status).toBe("completed");
+    const state = fakeDb.getTestState();
+    expect(state.customers.find((row) => row.id === customer.id)?.totalJobs).toBe(3);
+    expect(state.customers.find((row) => row.id === customer.id)?.lifetimeValue).toBe("150.00");
+    expect(state.technicians.find((row) => row.id === technician.id)?.totalJobsCompleted).toBe(5);
+    expect(state.activityEvents.filter((event) => event.eventType === "job.completed")).toHaveLength(1);
+    expect(addQueueJob).toHaveBeenCalledTimes(1);
+  });
+
+  it("serializes completeJob against a generic status transition", async () => {
+    const { company, actor } = createAdminContext();
+    const { customer } = seedJobGraph(company.id);
+    const job = fakeDb.seedJob({
+      companyId: company.id,
+      customerId: customer.id,
+      title: "Completion Status Race",
+      status: "in_progress"
+    });
+
+    const results = await Promise.allSettled([
+      jobService.completeJob(company.id, actor.id, job.id, {}),
+      jobService.transitionStatus(company.id, actor.id, job.id, "cancelled", "Concurrent cancellation")
+    ]);
+
+    expect(results.filter((result) => result.status === "fulfilled")).toHaveLength(1);
+    const rejected = results.find((result) => result.status === "rejected");
+    expect(rejected).toMatchObject({ reason: { code: ErrorCode.CONFLICT } });
+  });
+
+  it("completeJob revalidates a technician's current linkage and assignment inside the transaction", async () => {
+    const company = fakeDb.seedCompany({ name: "Field Co", slug: "field-co" });
+    const actor = fakeDb.seedUser({
+      companyId: company.id,
+      email: "tech@example.com",
+      firstName: "Terry",
+      lastName: "Tech",
+      role: "technician"
+    });
+    const customer = fakeDb.seedCustomer({ companyId: company.id, firstName: "Casey", lastName: "Client" });
+    const linkedTechnician = fakeDb.seedTechnician({
+      companyId: company.id,
+      userId: actor.id,
+      firstName: "Terry",
+      lastName: "Tech",
+      phone: "555-0101"
+    });
+    const replacement = fakeDb.seedTechnician({
+      companyId: company.id,
+      firstName: "Riley",
+      lastName: "Replacement",
+      phone: "555-0102"
+    });
+    const job = fakeDb.seedJob({
+      companyId: company.id,
+      customerId: customer.id,
+      technicianId: linkedTechnician.id,
+      title: "Reassigned Job",
+      status: "in_progress"
+    });
+
+    // Simulate reassignment after an earlier route-level ownership check but before service execution.
+    fakeDb.getTestState().jobs.find((row) => row.id === job.id)!.technicianId = replacement.id;
+
+    await expect(jobService.completeJob(company.id, actor.id, job.id, {})).rejects.toMatchObject({
+      code: ErrorCode.FORBIDDEN
+    });
+    expect(fakeDb.getTestState().jobs.find((row) => row.id === job.id)?.status).toBe("in_progress");
+    expect(fakeDb.getTestState().activityEvents.some((event) => event.eventType === "job.completed")).toBe(false);
+    expect(addQueueJob).not.toHaveBeenCalled();
+  });
+
   it("addNote creates a note and emits job.updated", async () => {
     const { company, actor } = createAdminContext();
     const { customer } = seedJobGraph(company.id);

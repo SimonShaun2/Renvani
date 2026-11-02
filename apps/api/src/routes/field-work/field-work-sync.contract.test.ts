@@ -507,6 +507,48 @@ describe("FS-87 field work sync", () => {
     expect(fakeDb.getTestState().jobTasks[0]?.status).toBe("pending");
   });
 
+  it("attributes offline task completion to the first technician actor", async () => {
+    const { company, techUser, job } = seedFieldJob();
+    const task = fakeDb.seedJobTask({
+      companyId: company.id,
+      jobId: job.id,
+      title: "Inspect filter",
+      status: "pending"
+    });
+    const liveVersion = buildRecordVersionV1("job_task", task.id, task.updatedAt);
+
+    const response = await request(app.server)
+      .post("/api/v1/field-work/sync/batches")
+      .set("Authorization", bearer(company.id, techUser.id, techUser.role))
+      .send({
+        contractVersion: "1.0.0",
+        deviceId: "ipad-task-completion",
+        batchClientId: "task-completion-batch",
+        operations: [
+          {
+            sequence: 1,
+            clientOperationId: "task-completion-op",
+            jobId: job.id,
+            type: "job.task.update",
+            baseRecordVersion: liveVersion,
+            payload: { taskId: task.id, status: "completed" }
+          }
+        ]
+      });
+
+    expect(response.status).toBe(200);
+    expect(response.body.results[0].outcome).toBe("applied");
+    expect(fakeDb.getTestState().jobTasks[0]).toMatchObject({
+      status: "completed",
+      completedById: techUser.id
+    });
+    expect(fakeDb.getTestState().activityEvents.at(-1)).toMatchObject({
+      eventType: "job.task_completed",
+      actorId: techUser.id,
+      actorName: "T Tech"
+    });
+  });
+
   it("returns conflict when signature already differs on the job", async () => {
     const { company, techUser, job } = seedFieldJob();
     fakeDb.getTestState().jobs[0] = {

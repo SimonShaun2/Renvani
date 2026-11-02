@@ -1,4 +1,4 @@
-import { and, desc, eq, isNull } from "drizzle-orm";
+import { and, desc, eq, isNull, or } from "drizzle-orm";
 import pino from "pino";
 
 import {
@@ -10,6 +10,7 @@ import {
   emitEventWithExecutor,
   jobNotes,
   jobPhotos,
+  jobTasks,
   jobs,
   properties,
   scheduleSlots,
@@ -35,7 +36,6 @@ import {
   type JobPhoto,
   type JobPriority,
   type JobStatus,
-  type JobTechnicianSummary,
   type ListJobsQuery,
   type PaginatedResult,
   type ScheduleJobInput,
@@ -43,6 +43,8 @@ import {
 } from "@fsm/types";
 
 import { generateJobNumber } from "../lib/job-number.js";
+import { assertActiveCrewInTransaction } from "./crews/crews.service.js";
+import { insertJobProductInTransaction } from "./job-products.service.js";
 import { runTenantAwareTransaction } from "../lib/company-scoped-transaction.js";
 import { enforceJobCreationPlanLimit } from "../lib/plan-usage-limits.js";
 import {
@@ -226,6 +228,13 @@ async function invalidateDispatchDates(
   }
 }
 
+export async function invalidateJobDispatchDate(
+  companyId: string,
+  scheduledStart: Date | null | undefined
+): Promise<void> {
+  await invalidateDispatchDates(companyId, scheduledStart);
+}
+
 function addMoneyStrings(leftValue: string | null, rightValue: string | null): string {
   const leftCents = toCents(leftValue);
   const rightCents = toCents(rightValue);
@@ -304,7 +313,9 @@ function normalizeCreateJobInput(input: CreateJobInput) {
     tags: normalizeStringArray(input.tags) ?? [],
     scheduledStart,
     scheduledEnd,
-    scheduledDurationMinutes: calculateDurationMinutes(scheduledStart, scheduledEnd)
+    scheduledDurationMinutes: calculateDurationMinutes(scheduledStart, scheduledEnd),
+    products: input.products ?? [],
+    crewId: input.crewId
   };
 }
 
@@ -452,6 +463,55 @@ async function getJobRecord(companyId: string, jobId: string, executor: SelectEx
   }
 
   return job;
+}
+
+async function getJobRecordForUpdate(
+  companyId: string,
+  jobId: string,
+  executor: TransactionExecutor
+): Promise<JobRow> {
+  const [job] = await executor
+    .select()
+    .from(jobs)
+    .where(and(eq(jobs.companyId, companyId), eq(jobs.id, jobId), isNull(jobs.deletedAt)))
+    .for("update")
+    .limit(1);
+
+  if (!job) {
+    throw new AppError(ErrorCode.NOT_FOUND, "Job not found");
+  }
+
+  return job;
+}
+
+async function assertCompletionActorAuthorized(
+  companyId: string,
+  actor: UserRow | null,
+  job: JobRow,
+  executor: TransactionExecutor
+): Promise<void> {
+  if (!actor) {
+    throw new AppError(ErrorCode.NOT_FOUND, "User not found");
+  }
+  if (actor.role !== "technician") {
+    return;
+  }
+
+  const [linkedTechnician] = await executor
+    .select({ id: technicians.id })
+    .from(technicians)
+    .where(
+      and(
+        eq(technicians.companyId, companyId),
+        eq(technicians.userId, actor.id),
+        isNull(technicians.deletedAt)
+      )
+    )
+    .limit(1);
+
+  if (!linkedTechnician || linkedTechnician.id !== job.technicianId) {
+    throw new AppError(ErrorCode.FORBIDDEN, "Only the assigned technician can do this");
+  }
 }
 
 async function listCompanyJobs(companyId: string, executor: SelectExecutor): Promise<JobRow[]> {
@@ -862,6 +922,10 @@ export async function createJob(
       await getTechnicianRecord(companyId, normalizedInput.technicianId, tx);
     }
 
+    if (normalizedInput.crewId) {
+      await assertActiveCrewInTransaction(tx, companyId, normalizedInput.crewId);
+    }
+
     const jobNumber = await generateJobNumber(companyId, tx);
     const insertedJobs = await tx
       .insert(jobs)
@@ -881,6 +945,7 @@ export async function createJob(
         scheduledEnd: normalizedInput.scheduledEnd,
         scheduledDurationMinutes: normalizedInput.scheduledDurationMinutes,
         tags: normalizedInput.tags,
+        crewId: normalizedInput.crewId ?? null,
         jobNumber
       })
       .returning();
@@ -888,6 +953,10 @@ export async function createJob(
 
     if (!createdJob) {
       throw new AppError(ErrorCode.INTERNAL_ERROR, "Failed to create job");
+    }
+
+    for (const product of normalizedInput.products) {
+      await insertJobProductInTransaction(tx, companyId, createdJob, actorId, product);
     }
 
     await emitJobEvent(
@@ -1031,54 +1100,71 @@ export async function transitionStatus(
   toStatus: JobStatus,
   reason?: string
 ): Promise<Job> {
+  const updatedJob = await db.transaction((tx) =>
+    transitionStatusInTransaction(tx, companyId, actorId, jobId, toStatus, reason)
+  );
+
+  await invalidateDispatchDates(companyId, updatedJob.scheduledStart, updatedJob.scheduledStart);
+  return updatedJob;
+}
+
+export async function transitionStatusInTransaction(
+  executor: TransactionExecutor,
+  companyId: string,
+  actorId: string,
+  jobId: string,
+  toStatus: JobStatus,
+  reason?: string
+): Promise<Job> {
   if (toStatus === "completed") {
     throw new AppError(ErrorCode.CONFLICT, "Use the complete job flow to mark a job as completed");
   }
 
-  const existingJob = await getJobRecord(companyId, jobId, db);
-  const nextStatus = applyTransition(existingJob.status, toStatus);
-  const eventType = resolveTransitionEventType(existingJob.status, nextStatus);
+  const existingJob = await getJobRecordForUpdate(companyId, jobId, executor);
+  const fromStatus = existingJob.status;
+  const nextStatus = applyTransition(fromStatus, toStatus);
+  const eventType = resolveTransitionEventType(fromStatus, nextStatus);
+  const actor = await getActor(companyId, actorId, executor);
+  const updateValues: Partial<JobRow> = {
+    status: nextStatus,
+    updatedAt: new Date()
+  };
 
-  const updatedJob = await db.transaction(async (tx) => {
-    const actor = await getActor(companyId, actorId, tx);
-    const updateValues: Partial<JobRow> = {
-      status: nextStatus,
-      updatedAt: new Date()
-    };
+  if (nextStatus === "in_progress" && !existingJob.actualStart) {
+    updateValues.actualStart = new Date();
+  }
 
-    if (nextStatus === "in_progress" && !existingJob.actualStart) {
-      updateValues.actualStart = new Date();
+  const [updatedJob] = await executor
+    .update(jobs)
+    .set(updateValues)
+    .where(
+      and(
+        eq(jobs.companyId, companyId),
+        eq(jobs.id, jobId),
+        eq(jobs.status, fromStatus),
+        isNull(jobs.deletedAt)
+      )
+    )
+    .returning();
+
+  if (!updatedJob) {
+    throw new AppError(ErrorCode.NOT_FOUND, "Job not found");
+  }
+
+  await emitJobEvent(
+    executor,
+    actor,
+    actorId,
+    updatedJob,
+    eventType,
+    `Job ${updatedJob.jobNumber} moved from ${fromStatus} to ${updatedJob.status}`,
+    {
+      fromStatus,
+      toStatus: updatedJob.status,
+      ...(reason ? { reason } : {})
     }
+  );
 
-    const updatedJobs = await tx
-      .update(jobs)
-      .set(updateValues)
-      .where(and(eq(jobs.companyId, companyId), eq(jobs.id, jobId), isNull(jobs.deletedAt)))
-      .returning();
-    const updatedJob = updatedJobs[0];
-
-    if (!updatedJob) {
-      throw new AppError(ErrorCode.NOT_FOUND, "Job not found");
-    }
-
-    await emitJobEvent(
-      tx,
-      actor,
-      actorId,
-      updatedJob,
-      eventType,
-      `Job ${updatedJob.jobNumber} moved from ${existingJob.status} to ${updatedJob.status}`,
-      {
-        fromStatus: existingJob.status,
-        toStatus: updatedJob.status,
-        ...(reason ? { reason } : {})
-      }
-    );
-
-    return updatedJob;
-  });
-
-  await invalidateDispatchDates(companyId, existingJob.scheduledStart, updatedJob.scheduledStart);
   return updatedJob;
 }
 
@@ -1255,24 +1341,44 @@ export async function completeJob(
   jobId: string,
   input: CompleteJobInput
 ): Promise<Job> {
-  const existingJob = await getJobRecord(companyId, jobId, db);
-  applyTransition(existingJob.status, "completed");
-
   const normalizedInput = normalizeCompleteJobInput(input);
   const completionTimestamp = new Date();
   const signedAt =
     normalizedInput.signedAt ??
     (normalizedInput.signatureUrl || normalizedInput.signedByName ? completionTimestamp : null);
-  const completedJob = await db.transaction(async (tx) => {
+  const completion = await db.transaction(async (tx) => {
+    const lockedJob = await getJobRecordForUpdate(companyId, jobId, tx);
     const actor = await getActor(companyId, actorId, tx);
-    const customer = await getCustomerRecord(companyId, existingJob.customerId, tx);
+    await assertCompletionActorAuthorized(companyId, actor, lockedJob, tx);
+
+    if (lockedJob.status === "completed") {
+      return { job: lockedJob, completedNow: false, previousScheduledStart: lockedJob.scheduledStart };
+    }
+
+    const fromStatus = lockedJob.status;
+    applyTransition(fromStatus, "completed");
+    const [openRequiredTask] = await tx
+      .select({ id: jobTasks.id })
+      .from(jobTasks)
+      .where(and(
+        eq(jobTasks.companyId, companyId),
+        eq(jobTasks.jobId, jobId),
+        eq(jobTasks.isRequired, true),
+        or(eq(jobTasks.status, "pending"), eq(jobTasks.status, "in_progress")),
+        isNull(jobTasks.deletedAt)
+      ))
+      .limit(1);
+    if (openRequiredTask) {
+      throw new AppError(ErrorCode.CONFLICT, "Complete required checklist tasks before completing the job");
+    }
+    const customer = await getCustomerRecord(companyId, lockedJob.customerId, tx);
     const technician =
-      existingJob.technicianId !== null
-        ? await getTechnicianRecord(companyId, existingJob.technicianId, tx)
+      lockedJob.technicianId !== null
+        ? await getTechnicianRecord(companyId, lockedJob.technicianId, tx)
         : null;
     const asset =
-      existingJob.assetId !== null
-        ? await getAssetRecord(companyId, existingJob.assetId, tx)
+      lockedJob.assetId !== null
+        ? await getAssetRecord(companyId, lockedJob.assetId, tx)
         : null;
     const updatedJobs = await tx
       .update(jobs)
@@ -1285,12 +1391,23 @@ export async function completeJob(
         signedAt,
         updatedAt: completionTimestamp
       })
-      .where(and(eq(jobs.companyId, companyId), eq(jobs.id, jobId), isNull(jobs.deletedAt)))
+      .where(
+        and(
+          eq(jobs.companyId, companyId),
+          eq(jobs.id, jobId),
+          eq(jobs.status, fromStatus),
+          isNull(jobs.deletedAt)
+        )
+      )
       .returning();
     const finalizedJob = updatedJobs[0];
 
     if (!finalizedJob) {
-      throw new AppError(ErrorCode.NOT_FOUND, "Job not found");
+      const currentJob = await getJobRecordForUpdate(companyId, jobId, tx);
+      if (currentJob.status === "completed") {
+        return { job: currentJob, completedNow: false, previousScheduledStart: currentJob.scheduledStart };
+      }
+      throw new AppError(ErrorCode.CONFLICT, "Job changed while it was being completed; reload and retry");
     }
 
     const serviceDate = formatDateOnly(completionTimestamp);
@@ -1336,13 +1453,19 @@ export async function completeJob(
       "job.completed",
       `Completed job ${finalizedJob.jobNumber}`,
       {
-        fromStatus: existingJob.status,
+        fromStatus,
         toStatus: "completed"
       }
     );
 
-    return finalizedJob;
+    return { job: finalizedJob, completedNow: true, previousScheduledStart: lockedJob.scheduledStart };
   });
+
+  const completedJob = completion.job;
+
+  if (!completion.completedNow) {
+    return completedJob;
+  }
 
   try {
     await aiQueue.add(
@@ -1388,7 +1511,7 @@ export async function completeJob(
     );
   }
 
-  await invalidateDispatchDates(companyId, existingJob.scheduledStart, completedJob.scheduledStart);
+  await invalidateDispatchDates(companyId, completion.previousScheduledStart, completedJob.scheduledStart);
 
   return completedJob;
 }
@@ -1399,43 +1522,50 @@ export async function addNote(
   jobId: string,
   input: AddNoteInput
 ): Promise<JobNote> {
-  const existingJob = await getJobRecord(companyId, jobId, db);
+  return db.transaction((tx) => addNoteInTransaction(tx, companyId, actorId, jobId, input));
+}
+
+export async function addNoteInTransaction(
+  executor: TransactionExecutor,
+  companyId: string,
+  actorId: string,
+  jobId: string,
+  input: AddNoteInput
+): Promise<JobNote> {
+  const existingJob = await getJobRecord(companyId, jobId, executor);
   const normalizedInput = normalizeAddNoteInput(input);
+  const actor = await getActor(companyId, actorId, executor);
+  const insertedNotes = await executor
+    .insert(jobNotes)
+    .values({
+      companyId,
+      jobId: existingJob.id,
+      authorId: actorId,
+      content: normalizedInput.content,
+      noteKind: normalizedInput.noteKind,
+      isInternal: normalizedInput.isInternal
+    })
+    .returning();
+  const note = insertedNotes[0];
 
-  return db.transaction(async (tx) => {
-    const actor = await getActor(companyId, actorId, tx);
-    const insertedNotes = await tx
-      .insert(jobNotes)
-      .values({
-        companyId,
-        jobId: existingJob.id,
-        authorId: actorId,
-        content: normalizedInput.content,
-        noteKind: normalizedInput.noteKind,
-        isInternal: normalizedInput.isInternal
-      })
-      .returning();
-    const note = insertedNotes[0];
+  if (!note) {
+    throw new AppError(ErrorCode.INTERNAL_ERROR, "Failed to add job note");
+  }
 
-    if (!note) {
-      throw new AppError(ErrorCode.INTERNAL_ERROR, "Failed to add job note");
+  await emitJobEvent(
+    executor,
+    actor,
+    actorId,
+    existingJob,
+    "job.updated",
+    `Added note to job ${existingJob.jobNumber}`,
+    {
+      noteId: note.id,
+      isInternal: note.isInternal
     }
+  );
 
-    await emitJobEvent(
-      tx,
-      actor,
-      actorId,
-      existingJob,
-      "job.updated",
-      `Added note to job ${existingJob.jobNumber}`,
-      {
-        noteId: note.id,
-        isInternal: note.isInternal
-      }
-    );
-
-    return note;
-  });
+  return note;
 }
 
 export async function getJobNotes(companyId: string, jobId: string): Promise<JobNote[]> {
@@ -1449,48 +1579,55 @@ export async function addPhoto(
   jobId: string,
   input: AddPhotoInput
 ): Promise<JobPhoto> {
-  const existingJob = await getJobRecord(companyId, jobId, db);
+  return db.transaction((tx) => addPhotoInTransaction(tx, companyId, actorId, jobId, input));
+}
+
+export async function addPhotoInTransaction(
+  executor: TransactionExecutor,
+  companyId: string,
+  actorId: string,
+  jobId: string,
+  input: AddPhotoInput
+): Promise<JobPhoto> {
+  const existingJob = await getJobRecord(companyId, jobId, executor);
   const normalizedInput = normalizeAddPhotoInput(input);
+  const actor = await getActor(companyId, actorId, executor);
+  const insertedPhotos = await executor
+    .insert(jobPhotos)
+    .values({
+      companyId,
+      jobId: existingJob.id,
+      uploadedById: actorId,
+      url: normalizedInput.url,
+      thumbnailUrl: normalizedInput.thumbnailUrl,
+      caption: normalizedInput.caption,
+      photoType: normalizedInput.photoType,
+      takenAt: normalizedInput.takenAt
+    })
+    .returning();
+  const photo = insertedPhotos[0];
 
-  return db.transaction(async (tx) => {
-    const actor = await getActor(companyId, actorId, tx);
-    const insertedPhotos = await tx
-      .insert(jobPhotos)
-      .values({
-        companyId,
-        jobId: existingJob.id,
-        uploadedById: actorId,
-        url: normalizedInput.url,
-        thumbnailUrl: normalizedInput.thumbnailUrl,
-        caption: normalizedInput.caption,
-        photoType: normalizedInput.photoType,
-        takenAt: normalizedInput.takenAt
-      })
-      .returning();
-    const photo = insertedPhotos[0];
+  if (!photo) {
+    throw new AppError(ErrorCode.INTERNAL_ERROR, "Failed to add job photo");
+  }
 
-    if (!photo) {
-      throw new AppError(ErrorCode.INTERNAL_ERROR, "Failed to add job photo");
+  await emitJobEvent(
+    executor,
+    actor,
+    actorId,
+    existingJob,
+    "job.updated",
+    `Added photo to job ${existingJob.jobNumber}`,
+    {
+      photoId: photo.id,
+      photoType: photo.photoType
     }
+  );
 
-    await emitJobEvent(
-      tx,
-      actor,
-      actorId,
-      existingJob,
-      "job.updated",
-      `Added photo to job ${existingJob.jobNumber}`,
-      {
-        photoId: photo.id,
-        photoType: photo.photoType
-      }
-    );
-
-    return {
-      ...photo,
-      photoType: (photo.photoType ?? null) as JobPhoto["photoType"]
-    };
-  });
+  return {
+    ...photo,
+    photoType: (photo.photoType ?? null) as JobPhoto["photoType"]
+  };
 }
 
 export async function getJobPhotos(companyId: string, jobId: string): Promise<JobPhoto[]> {

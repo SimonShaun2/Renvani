@@ -492,7 +492,7 @@ export function InvoiceDetailClient({ invoiceId }: InvoiceDetailClientProps) {
                   }}
                   className="mt-3 rounded-full border border-neutral-200 px-4 py-2 text-sm font-semibold text-neutral-600 transition hover:bg-neutral-100"
                 >
-                  Copy ServiceRev Link
+                  Copy Renvani Link
                 </button>
               ) : null}
             </section>

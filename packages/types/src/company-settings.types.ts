@@ -43,6 +43,18 @@ export interface CompanyVipMembershipSettings {
   pastDueGraceDays?: number | null;
 }
 
+/** Growth: per-shop Google Business Profile sync opt-in (adapter is disabled until configured). */
+export interface CompanyGoogleBusinessProfileSettings {
+  optIn?: boolean | null;
+  updatedAt?: string | null;
+}
+
+/** Invoice defaults applied at create when the caller omits them. */
+export interface CompanyInvoicingSettings {
+  /** Net days: dueAt = created + N days when no dueAt is supplied. Null/absent = no default. */
+  defaultPaymentTermsDays?: number | null;
+}
+
 export interface CompanySettings {
   tradingName?: string | null;
   currency?: string | null;
@@ -52,4 +64,10 @@ export interface CompanySettings {
   clerk?: CompanyClerkSettings | null;
   stripePlatformBilling?: CompanyStripePlatformBillingSettings | null;
   vipMembership?: CompanyVipMembershipSettings | null;
+  googleBusinessProfile?: CompanyGoogleBusinessProfileSettings | null;
+  invoicing?: CompanyInvoicingSettings | null;
+  /** Growth: shop-selected home-services trade (`hvac|plumbing|electrical|other`), owner/admin set. */
+  trade?: string | null;
+  /** Growth: "Describe your trade" (only for trade "other", max 100 chars). */
+  tradeDescription?: string | null;
 }

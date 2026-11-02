@@ -4,6 +4,8 @@ import { env } from "@fsm/config";
 import { featureFlags, isClerkAuthParallelJwtEnabled } from "@fsm/config/feature-flags";
 import { AppError, ErrorCode, type UserRole } from "@fsm/types";
 
+import { extraAppOrigins } from "./app-origins.js";
+
 /**
  * Session-token claim carrying the Renvani staff role, shared with web (#184): `metadata.role`.
  * The Clerk session token template must map `"metadata": "{{user.public_metadata}}"` (server-controlled).
@@ -75,7 +77,16 @@ export function isClerkAzpRequired(source?: Record<string, string | undefined>):
   );
 }
 
-export async function verifyClerkBearerToken(accessToken: string): Promise<ClerkVerifiedSession> {
+export async function verifyClerkBearerToken(accessToken: string): Promise<ClerkVerifiedSession>;
+export async function verifyClerkBearerToken(
+  accessToken: string,
+  options: { requireOrganization: false }
+): Promise<Omit<ClerkVerifiedSession, "clerkOrganizationId"> & { clerkOrganizationId: string | null }>;
+export async function verifyClerkBearerToken(
+  accessToken: string,
+  options: { requireOrganization?: boolean } = {}
+): Promise<Omit<ClerkVerifiedSession, "clerkOrganizationId"> & { clerkOrganizationId: string | null }> {
+  const requireOrganization = options.requireOrganization !== false;
   if (!isClerkParallelAuthAvailable()) {
     throw new AppError(ErrorCode.FORBIDDEN, "Clerk authentication is not enabled");
   }
@@ -85,7 +96,8 @@ export async function verifyClerkBearerToken(accessToken: string): Promise<Clerk
     throw new AppError(ErrorCode.INTERNAL_ERROR, "Clerk secret is not configured");
   }
 
-  const authorizedParties = parseClerkAuthorizedParties();
+  // CLERK_AUTHORIZED_PARTIES plus APP_URL_ALLOWED extras (staging tier only; exact origins).
+  const authorizedParties = [...new Set([...parseClerkAuthorizedParties(), ...extraAppOrigins()])];
   if (authorizedParties.length === 0 && isClerkAzpRequired()) {
     // Fail closed: without an azp allow-list any Clerk frontend for this instance could mint usable tokens.
     throw new AppError(ErrorCode.UNAUTHORIZED, "Invalid Clerk session token");
@@ -115,7 +127,7 @@ export async function verifyClerkBearerToken(accessToken: string): Promise<Clerk
   }
 
   const clerkOrganizationId = extractClerkOrganizationId(payload);
-  if (!clerkOrganizationId) {
+  if (!clerkOrganizationId && requireOrganization) {
     throw new AppError(ErrorCode.UNAUTHORIZED, "Clerk session missing organization");
   }
 

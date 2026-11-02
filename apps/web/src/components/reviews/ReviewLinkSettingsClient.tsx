@@ -220,7 +220,7 @@ export function ReviewLinkSettingsClient() {
             <div className="mt-4 space-y-3 text-sm leading-6 text-neutral-500">
               <p>1. A completed job sends a review request by SMS or email.</p>
               <p>2. The customer taps the review link and leaves an internal rating first.</p>
-              <p>3. After submission, ServiceRev opens your preferred public review destination in a new tab.</p>
+              <p>3. After submission, Renvani opens your preferred public review destination in a new tab.</p>
             </div>
           </section>
 

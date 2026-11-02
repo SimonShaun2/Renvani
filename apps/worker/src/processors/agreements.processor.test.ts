@@ -138,3 +138,14 @@ describe("agreements.processor", () => {
     expect(dependencies.enqueueRenewalReminder).not.toHaveBeenCalled();
   });
 });
+
+describe("plan-reminder-scan cron job", () => {
+  it("runs the plan reminder scan", async () => {
+    const deps = createDependencies();
+    const scanPlanReminders = vi.fn(async () => ({ companies: 1, dispatched: 2 }));
+    deps.scanPlanReminders = scanPlanReminders;
+    const processor = agreementsProcessor.createAgreementsProcessor(deps);
+    await processor(createJob(agreementsProcessor.PLAN_REMINDER_SCAN_JOB_NAME, {}) as never);
+    expect(scanPlanReminders).toHaveBeenCalledTimes(1);
+  });
+});

@@ -14,6 +14,7 @@ import {
   listRecommendations,
   snoozeRecommendation
 } from "../../services/ai-revenue.service.js";
+import { checkRevenueProposalConsent } from "../../services/revenue-agent/revenue-proposal-consent.service.js";
 import type {
   ActionRecommendationBody,
   DismissRecommendationBody,
@@ -197,4 +198,12 @@ export async function generateRevenueProposalsHandler(
 ): Promise<FastifyReply> {
   const body = (request.body ?? {}) as GenerateRevenueProposalsBody;
   return reply.send(await generateRevenueProposals(request.company.id, request.user.id, body.limit));
+}
+
+export async function checkRevenueProposalConsentHandler(
+  request: FastifyRequest,
+  reply: FastifyReply
+): Promise<FastifyReply> {
+  const { id } = request.params as { id: string };
+  return reply.send(await checkRevenueProposalConsent(request.company.id, request.user.id, id));
 }

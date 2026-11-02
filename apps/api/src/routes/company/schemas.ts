@@ -27,7 +27,11 @@ const companySettingsSchema = z
   .object({
     tradingName: z.string().trim().min(1).nullable().optional(),
     currency: z.string().trim().length(3).nullable().optional(),
-    notifications: companyNotificationSettingsSchema.optional()
+    notifications: companyNotificationSettingsSchema.optional(),
+    invoicing: z
+      .object({ defaultPaymentTermsDays: z.number().int().min(0).max(365).nullable().optional() })
+      .strict()
+      .optional()
   })
   .strict()
   .refine((value) => Object.keys(value).length > 0, {

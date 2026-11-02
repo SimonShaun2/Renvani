@@ -55,4 +55,16 @@ describe.runIf(postgresIntegrationEnabled)("getJobSourceReportingSummary (Postgr
       return error instanceof AppError && error.code === ErrorCode.VALIDATION_ERROR;
     });
   });
+
+  it("runs the direct-demand query (lead_attribution jsonb + paid invoices) for an empty tenant", async () => {
+    const { getDirectDemandSummary } = await import("./job-source-reporting.service.js");
+
+    const summary = await getDirectDemandSummary(randomUUID(), "America/Chicago", {
+      startDate: "2024-01-01",
+      endDate: "2024-12-31"
+    });
+
+    expect(summary.totals).toEqual({ jobCount: 0, paidRevenue: "0.00" });
+    expect(summary.sources).toEqual([]);
+  });
 });

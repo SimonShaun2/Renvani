@@ -130,7 +130,11 @@ export const publicInquirySubmitResultSchema = z.object({
   }),
   confirmation: z.unknown(),
   holdToken: z.string().nullable(),
-  inquiry: inquiryIntakeV1Schema
+  inquiry: inquiryIntakeV1Schema,
+  /** Present when the request carried `emergency: true`; `downgraded` means the shop has emergency service off. */
+  emergency: z
+    .object({ requested: z.boolean(), accepted: z.boolean(), downgraded: z.boolean() })
+    .optional()
 });
 
 export type PublicInquirySubmitResult = z.infer<typeof publicInquirySubmitResultSchema>;

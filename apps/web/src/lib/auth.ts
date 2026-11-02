@@ -271,13 +271,13 @@ export function readServerAuthSession(cookieReader: CookieReader): AuthSessionSn
     user: {
       id: "unknown",
       email: "",
-      firstName: "ServiceRev",
+      firstName: "Renvani",
       lastName: "User",
       role
     },
     company: {
       id: "unknown",
-      name: "ServiceRev"
+      name: "Renvani"
     },
     role
   };

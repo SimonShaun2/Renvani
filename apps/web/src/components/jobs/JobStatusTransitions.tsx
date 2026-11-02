@@ -15,9 +15,12 @@ interface JobStatusTransitionsProps {
   job: JobDetail;
   pendingRequiredTasks: number;
   onOpenOTW: () => void;
+  /** FS-24: when set, scheduled-visit Reschedule/Cancel open the schedule-change forms (window policy + versioning). */
+  onReschedule?: (() => void) | undefined;
+  onCancelVisit?: (() => void) | undefined;
 }
 
-export function JobStatusTransitions({ job, pendingRequiredTasks, onOpenOTW }: JobStatusTransitionsProps) {
+export function JobStatusTransitions({ job, pendingRequiredTasks, onOpenOTW, onReschedule, onCancelVisit }: JobStatusTransitionsProps) {
   const pathname = usePathname();
   const router = useRouter();
   const transitionJob = useTransitionJob(job.id);
@@ -38,10 +41,10 @@ export function JobStatusTransitions({ job, pendingRequiredTasks, onOpenOTW }: J
         ];
       case "scheduled":
         return [
-          { key: "reschedule", label: "Reschedule", tone: "secondary" as const, onClick: () => router.push(`/dispatch?jobId=${job.id}`), icon: Clock3 },
+          { key: "reschedule", label: "Reschedule", tone: "secondary" as const, onClick: onReschedule ?? (() => router.push(`/dispatch?jobId=${job.id}`)), icon: Clock3 },
           { key: "otw", label: "On The Way", tone: "secondary" as const, onClick: onOpenOTW, icon: MapPinned },
           { key: "start", label: "Start Job", tone: "primary" as const, onClick: () => void handleStatusChange("in_progress"), icon: CheckCircle2 },
-          { key: "cancel", label: "Cancel", tone: "ghost" as const, onClick: () => void handleStatusChange("cancelled"), icon: X }
+          { key: "cancel", label: "Cancel", tone: "ghost" as const, onClick: onCancelVisit ?? (() => void handleStatusChange("cancelled")), icon: X }
         ];
       case "in_progress":
         return [
@@ -67,7 +70,7 @@ export function JobStatusTransitions({ job, pendingRequiredTasks, onOpenOTW }: J
           icon: CheckCircle2
         }));
     }
-  }, [job.availableTransitions, job.id, job.status, onOpenOTW, router]);
+  }, [job.availableTransitions, job.id, job.status, onCancelVisit, onOpenOTW, onReschedule, router]);
 
   async function handleStatusChange(status: typeof job.status) {
     setErrorMessage(null);

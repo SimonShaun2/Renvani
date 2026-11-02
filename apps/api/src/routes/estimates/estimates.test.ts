@@ -151,12 +151,12 @@ describe("estimate routes", () => {
         propertyId: property.id,
         jobId: job.id,
         title: "New Estimate",
-        taxRate: 0.1,
+        taxRate: "0.1",
         items: [
           {
             name: "Labor",
-            quantity: 2,
-            unitPrice: 50
+            quantity: "2",
+            unitPrice: "50"
           }
         ]
       });
@@ -168,8 +168,8 @@ describe("estimate routes", () => {
         items: [
           {
             name: "",
-            quantity: 1,
-            unitPrice: 50
+            quantity: "1",
+            unitPrice: "50"
           }
         ]
       });
@@ -180,11 +180,28 @@ describe("estimate routes", () => {
         customerId: randomUUID(),
         title: "Missing Customer"
       });
+    const numericMoneyResponse = await request(app.server)
+      .post("/api/v1/estimates")
+      .set("Authorization", auth.authorization)
+      .send({
+        customerId: customer.id,
+        taxRate: 0.1,
+        items: [{ name: "Legacy numeric payload", quantity: 1, unitPrice: 50 }]
+      });
+    const overflowResponse = await request(app.server)
+      .post("/api/v1/estimates")
+      .set("Authorization", auth.authorization)
+      .send({
+        customerId: customer.id,
+        items: [{ name: "Overflow", quantity: "9999999.999", unitPrice: "99999999.99" }]
+      });
 
     expect(successResponse.status).toBe(201);
     expect(successResponse.body.estimate.estimateNumber).toBe("EST-0001");
     expect(successResponse.body.estimate.total).toBe("110.00");
     expect(validationResponse.status).toBe(400);
+    expect(numericMoneyResponse.status).toBe(400);
+    expect(overflowResponse.status).toBe(400);
     expect(unknownCustomerResponse.status).toBe(404);
   });
 
@@ -421,8 +438,8 @@ describe("estimate routes", () => {
       .set("Authorization", auth.authorization)
       .send({
         name: "Labor",
-        quantity: 2,
-        unitPrice: 75
+        quantity: "2",
+        unitPrice: "75"
       });
     const itemId = addResponse.body.item.id as string;
     const listResponse = await request(app.server)
@@ -432,7 +449,7 @@ describe("estimate routes", () => {
       .patch(`/api/v1/estimates/${estimate.id}/items/${itemId}`)
       .set("Authorization", auth.authorization)
       .send({
-        quantity: 3
+        quantity: "3"
       });
     const deleteResponse = await request(app.server)
       .delete(`/api/v1/estimates/${estimate.id}/items/${itemId}`)

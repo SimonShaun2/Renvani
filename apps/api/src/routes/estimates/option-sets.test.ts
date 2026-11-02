@@ -75,10 +75,10 @@ const option = (tierLabel: string, unitPrice: number, extra: Record<string, unkn
   tierLabel,
   title: `${tierLabel} furnace replacement`,
   items: [
-    { name: "Furnace unit", quantity: 1, unitPrice },
-    { name: "Install labor", itemType: "labor", quantity: 4, unitPrice: 95.5, isTaxable: false }
+    { name: "Furnace unit", quantity: "1", unitPrice: String(unitPrice) },
+    { name: "Install labor", itemType: "labor", quantity: "4", unitPrice: "95.50", isTaxable: false }
   ],
-  taxRate: 0.0825,
+  taxRate: "0.0825",
   ...extra
 });
 

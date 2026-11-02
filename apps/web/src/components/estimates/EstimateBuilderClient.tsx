@@ -256,8 +256,8 @@ function toEstimateLineItemPayload(item: RevenueLineItemDraft, index: number) {
     name: item.name,
     ...(item.description ? { description: item.description } : {}),
     itemType: item.itemType,
-    quantity: parseMoneyValue(item.quantity),
-    unitPrice: parseMoneyValue(item.unitPrice),
+    quantity: formatQuantityInput(item.quantity),
+    unitPrice: formatMoneyInput(item.unitPrice),
     isTaxable: item.isTaxable,
     sortOrder: index,
     ...(item.priceBookItemId ? { priceBookItemId: item.priceBookItemId } : {})
@@ -276,8 +276,8 @@ function buildCreateEstimateInput(
     ...(draft.jobId ? { jobId: draft.jobId } : {}),
     ...(draft.title.trim() ? { title: draft.title.trim() } : {}),
     ...(draft.messageToCustomer.trim() ? { messageToCustomer: draft.messageToCustomer.trim() } : {}),
-    discountAmount: parseMoneyValue(draft.discountAmount),
-    taxRate,
+    discountAmount: formatMoneyInput(draft.discountAmount),
+    taxRate: taxRate.toFixed(4),
     financingOffered: draft.financingOffered,
     ...(tier.label ? { tierLabel: tier.label } : {}),
     ...(tierGroupId ? { tierGroupId } : {}),
@@ -511,8 +511,8 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
               ...(draft.title.trim() ? { title: draft.title.trim() } : {}),
               messageToCustomer: draft.messageToCustomer,
               financingOffered: draft.financingOffered,
-              discountAmount: parseMoneyValue(draft.discountAmount),
-              taxRate
+              discountAmount: formatMoneyInput(draft.discountAmount),
+              taxRate: taxRate.toFixed(4)
             });
 
             const latestDetail = await api.get<{ estimate: EstimateDetailRecord }>(
@@ -586,8 +586,8 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
                 ...(draft.title.trim() ? { title: draft.title.trim() } : {}),
                 messageToCustomer: draft.messageToCustomer,
                 financingOffered: draft.financingOffered,
-                discountAmount: parseMoneyValue(draft.discountAmount),
-                taxRate,
+                discountAmount: formatMoneyInput(draft.discountAmount),
+                taxRate: taxRate.toFixed(4),
                 tierLabel: tier.label ?? undefined,
                 tierGroupId: currentGroupId
               });

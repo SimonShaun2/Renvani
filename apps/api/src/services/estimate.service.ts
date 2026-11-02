@@ -41,6 +41,12 @@ import { generateEstimateNumber } from "../lib/estimate-number.js";
 import { financingProviderReady, financingSummary } from "./financing/financing-adapter.registry.js";
 import { generateJobNumber } from "../lib/job-number.js";
 import { listItems, recalculateTotals } from "./estimate-items.service.js";
+import {
+  assertEstimateMoneyResult,
+  normalizeEstimateMoney,
+  normalizeEstimateQuantity,
+  normalizeEstimateTaxRate
+} from "./estimate-money.js";
 import { assertPriceBookItemsInCompany } from "./price-book-item-scope.js";
 
 type EstimateRow = typeof estimates.$inferSelect;
@@ -61,14 +67,6 @@ const DEFAULT_LIST_PAGE = 1;
 const DEFAULT_LIST_LIMIT = 25;
 const MAX_LIST_LIMIT = 100;
 const MAX_RESULT_WINDOW = 10_000;
-
-function formatMoney(value: Decimal): string {
-  return value.toFixed(2);
-}
-
-function formatTaxRate(value: Decimal): string {
-  return value.toFixed(4);
-}
 
 function parseIsoDateTime(value: string | undefined): Date | null {
   if (!value) {
@@ -439,8 +437,8 @@ function normalizeCreateEstimateInput(input: CreateEstimateInput) {
     title: normalizeOptionalString(input.title) ?? null,
     messageToCustomer: normalizeOptionalString(input.messageToCustomer) ?? null,
     internalNotes: normalizeOptionalString(input.internalNotes) ?? null,
-    taxRate: formatTaxRate(new Decimal(input.taxRate ?? 0)),
-    discountAmount: formatMoney(new Decimal(input.discountAmount ?? 0)),
+    taxRate: normalizeEstimateTaxRate(input.taxRate ?? "0"),
+    discountAmount: normalizeEstimateMoney(input.discountAmount ?? "0", "discountAmount"),
     financingOffered: input.financingOffered ?? false,
     tierLabel: normalizeOptionalString(input.tierLabel) ?? null,
     tierGroupId: input.tierGroupId ?? null,
@@ -460,8 +458,10 @@ function normalizeUpdateEstimateInput(input: UpdateEstimateInput) {
         : {}
     ),
     ...(input.internalNotes !== undefined ? { internalNotes: normalizeOptionalString(input.internalNotes) ?? null } : {}),
-    ...(input.taxRate !== undefined ? { taxRate: formatTaxRate(new Decimal(input.taxRate)) } : {}),
-    ...(input.discountAmount !== undefined ? { discountAmount: formatMoney(new Decimal(input.discountAmount)) } : {}),
+    ...(input.taxRate !== undefined ? { taxRate: normalizeEstimateTaxRate(input.taxRate) } : {}),
+    ...(input.discountAmount !== undefined
+      ? { discountAmount: normalizeEstimateMoney(input.discountAmount, "discountAmount") }
+      : {}),
     ...(input.financingOffered !== undefined ? { financingOffered: input.financingOffered } : {}),
     ...(input.tierLabel !== undefined ? { tierLabel: normalizeOptionalString(input.tierLabel) ?? null } : {}),
     ...(input.tierGroupId !== undefined ? { tierGroupId: input.tierGroupId ?? null } : {})
@@ -716,8 +716,8 @@ export async function createEstimate(
         .insert(estimateItems)
         .values(
           normalizedInput.items.map((item, index) => {
-            const quantity = new Decimal(item.quantity).toFixed(3);
-            const unitPrice = formatMoney(new Decimal(item.unitPrice));
+            const quantity = normalizeEstimateQuantity(item.quantity);
+            const unitPrice = normalizeEstimateMoney(item.unitPrice, "unitPrice");
             return {
               companyId,
               estimateId: createdEstimate.id,
@@ -726,7 +726,10 @@ export async function createEstimate(
               itemType: item.itemType ?? "service",
               quantity,
               unitPrice,
-              total: formatMoney(new Decimal(quantity).mul(unitPrice)),
+              total: assertEstimateMoneyResult(
+                new Decimal(quantity).mul(unitPrice),
+                "line total"
+              ),
               isTaxable: item.isTaxable ?? true,
               sortOrder: item.sortOrder ?? index,
               ...(item.priceBookItemId ? { productCatalogId: item.priceBookItemId } : {})
@@ -736,7 +739,7 @@ export async function createEstimate(
         .returning();
     }
 
-    await recalculateTotals(createdEstimate.id, tx);
+    await recalculateTotals(companyId, createdEstimate.id, tx);
 
     const [persistedEstimate] = await tx
       .select()
@@ -801,7 +804,7 @@ export async function updateEstimate(
       throw new AppError(ErrorCode.NOT_FOUND, "Estimate not found");
     }
 
-    await recalculateTotals(updatedEstimate.id, tx);
+    await recalculateTotals(companyId, updatedEstimate.id, tx);
 
     const [persistedEstimate] = await tx
       .select()
@@ -879,8 +882,14 @@ export async function sendEstimate(
   }
 
   const sentEstimate = await db.transaction(async (tx) => {
+    await recalculateTotals(companyId, estimateId, tx);
+    const currentEstimate = await getEstimateRecord(companyId, estimateId, tx);
+    if (currentEstimate.status !== "draft") {
+      throw new AppError(ErrorCode.CONFLICT, "Only draft estimates can be sent");
+    }
+    assertEstimateMoneyResult(new Decimal(currentEstimate.total), "estimate total");
     const actor = await getUserRecord(companyId, actorId, tx);
-    const customer = await getCustomerRecord(companyId, existingEstimate.customerId, tx);
+    const customer = await getCustomerRecord(companyId, currentEstimate.customerId, tx);
 
     if (!customer.email) {
       throw new AppError(ErrorCode.CONFLICT, "Customer must have an email before sending an estimate");
@@ -898,7 +907,12 @@ export async function sendEstimate(
         status: "sent",
         updatedAt: sentAt
       })
-      .where(and(eq(estimates.companyId, companyId), eq(estimates.id, estimateId), isNull(estimates.deletedAt)))
+      .where(and(
+        eq(estimates.companyId, companyId),
+        eq(estimates.id, estimateId),
+        eq(estimates.status, "draft"),
+        isNull(estimates.deletedAt)
+      ))
       .returning();
     const updatedEstimate = updatedEstimates[0];
 
@@ -1192,7 +1206,7 @@ export async function reviseEstimate(
         .returning();
     }
 
-    await recalculateTotals(newEstimate.id, tx);
+    await recalculateTotals(companyId, newEstimate.id, tx);
 
     const updatedOriginals = await tx
       .update(estimates)

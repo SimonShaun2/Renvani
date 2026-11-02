@@ -206,18 +206,18 @@ describe("estimate.service", () => {
       propertyId: property.id,
       jobId: job.id,
       title: "New Estimate",
-      taxRate: 0.1,
-      discountAmount: 5,
+      taxRate: "0.1",
+      discountAmount: "5",
       items: [
         {
           name: "Labor",
-          quantity: 2,
-          unitPrice: 50
+          quantity: "2",
+          unitPrice: "50"
         },
         {
           name: "Material",
-          quantity: 1,
-          unitPrice: 25,
+          quantity: "1",
+          unitPrice: "25",
           isTaxable: false
         }
       ]
@@ -276,7 +276,7 @@ describe("estimate.service", () => {
 
     const updated = await estimateService.updateEstimate(company.id, actor.id, draftEstimate.id, {
       title: "Updated Draft Estimate",
-      discountAmount: 10
+      discountAmount: "10"
     });
 
     expect(updated.title).toBe("Updated Draft Estimate");
@@ -345,29 +345,30 @@ describe("estimate.service", () => {
 
     const added = await estimateItemsService.addItem(company.id, estimate.id, {
       name: "Labor",
-      quantity: 2,
-      unitPrice: 100,
+      quantity: "2",
+      unitPrice: "100",
       sortOrder: 1
     });
     const second = await estimateItemsService.addItem(company.id, estimate.id, {
       name: "Material",
-      quantity: 1,
-      unitPrice: 50,
+      quantity: "1",
+      unitPrice: "50",
       isTaxable: false,
       sortOrder: 2
     });
     const listed = await estimateItemsService.listItems(company.id, estimate.id);
     const updated = await estimateItemsService.updateItem(company.id, estimate.id, added.id, {
-      quantity: 3,
-      unitPrice: 80
+      quantity: "3",
+      unitPrice: "80"
     });
 
     expect(listed).toHaveLength(2);
     expect(updated.total).toBe("240.00");
 
     await estimateItemsService.recalculateTotals(
+      company.id,
       estimate.id,
-      fakeDb.db as unknown as Parameters<EstimateItemsServiceModule["recalculateTotals"]>[1]
+      fakeDb.db as unknown as Parameters<EstimateItemsServiceModule["recalculateTotals"]>[2]
     );
     const recalculatedEstimate = fakeDb.getTestState().estimates.find((row) => row.id === estimate.id);
     expect(recalculatedEstimate?.subtotal).toBe("290.00");
@@ -765,8 +766,8 @@ describe("estimate money contract (FS-174)", () => {
       customerId: customer.id,
       items: ["First", "Second", "Third"].map((name) => ({
         name,
-        quantity: 0.333,
-        unitPrice: 0.05
+        quantity: "0.333",
+        unitPrice: "0.05"
       }))
     });
     const detail = await estimateService.getEstimate(company.id, estimate.id);
@@ -781,9 +782,9 @@ describe("estimate money contract (FS-174)", () => {
     const { customer } = seedEstimateGraph(company.id);
     const estimate = await estimateService.createEstimate(company.id, actor.id, {
       customerId: customer.id,
-      taxRate: 0.1,
-      discountAmount: 10,
-      items: [{ name: "Service", quantity: 1, unitPrice: 100 }]
+      taxRate: "0.1",
+      discountAmount: "10",
+      items: [{ name: "Service", quantity: "1", unitPrice: "100" }]
     });
 
     expect(estimate.subtotal).toBe("100.00");
@@ -792,17 +793,81 @@ describe("estimate money contract (FS-174)", () => {
     expect(estimate.total).toBe("100.00");
   });
 
-  it("uses the normalized unit price when extending a sub-cent input", async () => {
+  it("uses normalized decimal strings when extending a line", async () => {
     const { company, actor } = createAdminContext();
     const { customer } = seedEstimateGraph(company.id);
     const estimate = await estimateService.createEstimate(company.id, actor.id, {
       customerId: customer.id,
-      items: [{ name: "Precision edge", quantity: 3, unitPrice: 1.005 }]
+      items: [{ name: "Precision edge", quantity: "3", unitPrice: "1.01" }]
     });
     const detail = await estimateService.getEstimate(company.id, estimate.id);
 
     expect(detail.items[0]?.unitPrice).toBe("1.01");
     expect(detail.items[0]?.total).toBe("3.03");
     expect(estimate.total).toBe("3.03");
+  });
+
+  it("rejects negative totals on create, update, and item removal", async () => {
+    const { company, actor } = createAdminContext();
+    const { customer } = seedEstimateGraph(company.id);
+
+    await expect(estimateService.createEstimate(company.id, actor.id, {
+      customerId: customer.id,
+      discountAmount: "0.01"
+    })).rejects.toMatchObject({ code: ErrorCode.VALIDATION_ERROR });
+
+    const estimate = await estimateService.createEstimate(company.id, actor.id, {
+      customerId: customer.id,
+      items: [{ name: "Primary", quantity: "1", unitPrice: "10.00" }]
+    });
+    await expect(estimateService.updateEstimate(company.id, actor.id, estimate.id, {
+      discountAmount: "10.01"
+    })).rejects.toMatchObject({ code: ErrorCode.VALIDATION_ERROR });
+
+    await estimateService.updateEstimate(company.id, actor.id, estimate.id, { discountAmount: "5.00" });
+    const smallItem = await estimateItemsService.addItem(company.id, estimate.id, {
+      name: "Small",
+      quantity: "1",
+      unitPrice: "2.00"
+    });
+    const primaryItem = (await estimateItemsService.listItems(company.id, estimate.id))
+      .find((item) => item.id !== smallItem.id);
+    expect(primaryItem).toBeDefined();
+    await expect(
+      estimateItemsService.removeItem(company.id, estimate.id, primaryItem!.id)
+    ).rejects.toMatchObject({ code: ErrorCode.VALIDATION_ERROR });
+    expect((await estimateItemsService.listItems(company.id, estimate.id))).toHaveLength(2);
+  });
+
+  it("rejects decimal precision and computed amounts outside database bounds", async () => {
+    const { company, actor } = createAdminContext();
+    const { customer } = seedEstimateGraph(company.id);
+
+    await expect(estimateService.createEstimate(company.id, actor.id, {
+      customerId: customer.id,
+      items: [{ name: "Too precise", quantity: "1.0000", unitPrice: "1.00" }]
+    })).rejects.toMatchObject({ code: ErrorCode.VALIDATION_ERROR });
+
+    await expect(estimateService.createEstimate(company.id, actor.id, {
+      customerId: customer.id,
+      items: [{ name: "Overflow", quantity: "9999999.999", unitPrice: "99999999.99" }]
+    })).rejects.toMatchObject({ code: ErrorCode.VALIDATION_ERROR });
+  });
+
+  it("recalculates and rejects a negative total before sending", async () => {
+    const { company, actor } = createAdminContext();
+    const { customer } = seedEstimateGraph(company.id);
+    const estimate = fakeDb.seedEstimate({
+      companyId: company.id,
+      customerId: customer.id,
+      status: "draft",
+      discountAmount: "1.00",
+      total: "0.00"
+    });
+
+    await expect(estimateService.sendEstimate(company.id, actor.id, estimate.id))
+      .rejects.toMatchObject({ code: ErrorCode.VALIDATION_ERROR });
+    expect(fakeDb.getTestState().estimates.find((row) => row.id === estimate.id)?.status).toBe("draft");
+    expect(addNotificationQueueJob).not.toHaveBeenCalled();
   });
 });

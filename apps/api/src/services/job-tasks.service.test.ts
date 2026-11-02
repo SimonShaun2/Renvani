@@ -181,4 +181,98 @@ describe("job-tasks.service", () => {
       code: ErrorCode.CONFLICT
     });
   });
+
+  it("rejects creating an open required task on a completed job but permits optional follow-up work", async () => {
+    const { company, job } = createContext();
+    fakeDb.getTestState().jobs.find((row) => row.id === job.id)!.status = "completed";
+
+    await expect(
+      jobTasksService.createTask(company.id, job.id, {
+        title: "Required after completion",
+        isRequired: true
+      })
+    ).rejects.toMatchObject({ code: ErrorCode.CONFLICT });
+
+    const optionalTask = await jobTasksService.createTask(company.id, job.id, {
+      title: "Optional follow-up",
+      isRequired: false
+    });
+
+    expect(optionalTask.isRequired).toBe(false);
+    expect(fakeDb.getTestState().jobTasks).toHaveLength(1);
+  });
+
+  it("rejects reopening or making a task required when that would violate completed-job invariants", async () => {
+    const { company, job } = createContext();
+    fakeDb.getTestState().jobs.find((row) => row.id === job.id)!.status = "completed";
+    const completedRequiredTask = fakeDb.seedJobTask({
+      companyId: company.id,
+      jobId: job.id,
+      title: "Completed requirement",
+      isRequired: true,
+      status: "completed"
+    });
+    const pendingOptionalTask = fakeDb.seedJobTask({
+      companyId: company.id,
+      jobId: job.id,
+      title: "Optional follow-up",
+      isRequired: false,
+      status: "pending"
+    });
+
+    await expect(
+      jobTasksService.updateTask(company.id, job.id, completedRequiredTask.id, { status: "in_progress" })
+    ).rejects.toMatchObject({ code: ErrorCode.CONFLICT });
+    await expect(
+      jobTasksService.updateTask(company.id, job.id, pendingOptionalTask.id, { isRequired: true })
+    ).rejects.toMatchObject({ code: ErrorCode.CONFLICT });
+
+    const tasks = fakeDb.getTestState().jobTasks;
+    expect(tasks.find((row) => row.id === completedRequiredTask.id)?.status).toBe("completed");
+    expect(tasks.find((row) => row.id === pendingOptionalTask.id)?.isRequired).toBe(false);
+  });
+
+  it("allows completion or soft deletion to repair a legacy open requirement on a completed job", async () => {
+    const { company, actor, job } = createContext();
+    fakeDb.getTestState().jobs.find((row) => row.id === job.id)!.status = "completed";
+    const completableTask = fakeDb.seedJobTask({
+      companyId: company.id,
+      jobId: job.id,
+      title: "Legacy requirement",
+      isRequired: true,
+      status: "pending"
+    });
+    const deletableTask = fakeDb.seedJobTask({
+      companyId: company.id,
+      jobId: job.id,
+      title: "Duplicate legacy requirement",
+      isRequired: true,
+      status: "pending"
+    });
+
+    const completed = await jobTasksService.completeTask(company.id, job.id, completableTask.id, actor.id);
+    await jobTasksService.deleteTask(company.id, job.id, deletableTask.id);
+
+    expect(completed.status).toBe("completed");
+    expect(fakeDb.getTestState().jobTasks.find((row) => row.id === deletableTask.id)?.deletedAt).not.toBeNull();
+  });
+
+  it("preserves tenant scope when mutating tasks on completed jobs", async () => {
+    const { company, job } = createContext();
+    const otherCompany = fakeDb.seedCompany({ name: "Other Co", slug: "other-co" });
+    fakeDb.getTestState().jobs.find((row) => row.id === job.id)!.status = "completed";
+    const task = fakeDb.seedJobTask({
+      companyId: company.id,
+      jobId: job.id,
+      title: "Tenant-owned task",
+      isRequired: false,
+      status: "pending"
+    });
+
+    await expect(
+      jobTasksService.updateTask(otherCompany.id, job.id, task.id, { title: "Cross-tenant edit" })
+    ).rejects.toMatchObject({ code: ErrorCode.NOT_FOUND });
+
+    expect(fakeDb.getTestState().jobTasks.find((row) => row.id === task.id)?.title).toBe("Tenant-owned task");
+  });
 });

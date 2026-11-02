@@ -93,6 +93,38 @@ async function getJobRow(companyId: string, jobId: string, executor: SelectExecu
   return job;
 }
 
+async function getJobRowForUpdate(
+  companyId: string,
+  jobId: string,
+  executor: TransactionExecutor
+): Promise<JobRow> {
+  const [job] = await executor
+    .select()
+    .from(jobs)
+    .where(and(eq(jobs.companyId, companyId), eq(jobs.id, jobId), isNull(jobs.deletedAt)))
+    .for("update")
+    .limit(1);
+
+  if (!job) {
+    throw new AppError(ErrorCode.NOT_FOUND, "Job not found");
+  }
+
+  return job;
+}
+
+function assertNoOpenRequiredTaskOnCompletedJob(
+  job: JobRow,
+  task: { isRequired: boolean | null; status: string }
+): void {
+  if (
+    job.status === "completed" &&
+    task.isRequired === true &&
+    (task.status === "pending" || task.status === "in_progress")
+  ) {
+    throw new AppError(ErrorCode.CONFLICT, "Completed jobs cannot have open required checklist tasks");
+  }
+}
+
 async function getTaskRow(companyId: string, jobId: string, taskId: string, executor: SelectExecutor): Promise<JobTaskRow> {
   const [task] = await executor
     .select()
@@ -193,7 +225,11 @@ export async function createTask(companyId: string, jobId: string, input: Create
   const normalizedInput = normalizeCreateTaskInput(input);
 
   return db.transaction(async (tx) => {
-    await getJobRow(companyId, jobId, tx);
+    const job = await getJobRowForUpdate(companyId, jobId, tx);
+    assertNoOpenRequiredTaskOnCompletedJob(job, {
+      isRequired: normalizedInput.isRequired,
+      status: "pending"
+    });
     await assertTechnicianBelongsToCompany(companyId, normalizedInput.assignedToId, tx);
     const existingTasks = await listTaskRows(companyId, jobId, tx);
     const nextSortOrder =
@@ -241,11 +277,13 @@ export async function updateTaskInTransaction(
   input: UpdateTaskInput
 ): Promise<JobTask> {
   const normalizedInput = normalizeUpdateTaskInput(input);
-  const job = await getJobRow(companyId, jobId, executor);
+  const job = await getJobRowForUpdate(companyId, jobId, executor);
   const existingTask = await getTaskRow(companyId, jobId, taskId, executor);
   await assertTechnicianBelongsToCompany(companyId, normalizedInput.assignedToId, executor);
 
   const nextStatus = normalizedInput.status ?? existingTask.status;
+  const nextIsRequired = normalizedInput.isRequired ?? existingTask.isRequired;
+  assertNoOpenRequiredTaskOnCompletedJob(job, { isRequired: nextIsRequired, status: nextStatus });
   const shouldMarkCompleted = existingTask.status !== "completed" && nextStatus === "completed";
   const [task] = await executor
     .update(jobTasks)
@@ -294,7 +332,7 @@ export async function completeTask(
   actorId: string
 ): Promise<JobTask> {
   return db.transaction(async (tx) => {
-    const job = await getJobRow(companyId, jobId, tx);
+    const job = await getJobRowForUpdate(companyId, jobId, tx);
     await getActor(companyId, actorId, tx);
     const existingTask = await getTaskRow(companyId, jobId, taskId, tx);
     const [task] = await tx
@@ -320,7 +358,7 @@ export async function completeTask(
 
 export async function deleteTask(companyId: string, jobId: string, taskId: string): Promise<void> {
   await db.transaction(async (tx) => {
-    await getJobRow(companyId, jobId, tx);
+    await getJobRowForUpdate(companyId, jobId, tx);
     await getTaskRow(companyId, jobId, taskId, tx);
     await tx
       .update(jobTasks)
@@ -334,9 +372,13 @@ export async function deleteTask(companyId: string, jobId: string, taskId: strin
 
 export async function reorderTasks(companyId: string, jobId: string, orderedIds: string[]): Promise<void> {
   await db.transaction(async (tx) => {
-    await getJobRow(companyId, jobId, tx);
+    const job = await getJobRowForUpdate(companyId, jobId, tx);
     const tasks = await listTaskRows(companyId, jobId, tx);
     const activeTasks = sortTasks(tasks);
+
+    for (const task of activeTasks) {
+      assertNoOpenRequiredTaskOnCompletedJob(job, task);
+    }
 
     if (activeTasks.length !== orderedIds.length) {
       throw new AppError(ErrorCode.CONFLICT, "Task reorder list does not match active tasks");

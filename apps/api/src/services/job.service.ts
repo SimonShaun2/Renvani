@@ -465,6 +465,55 @@ async function getJobRecord(companyId: string, jobId: string, executor: SelectEx
   return job;
 }
 
+async function getJobRecordForUpdate(
+  companyId: string,
+  jobId: string,
+  executor: TransactionExecutor
+): Promise<JobRow> {
+  const [job] = await executor
+    .select()
+    .from(jobs)
+    .where(and(eq(jobs.companyId, companyId), eq(jobs.id, jobId), isNull(jobs.deletedAt)))
+    .for("update")
+    .limit(1);
+
+  if (!job) {
+    throw new AppError(ErrorCode.NOT_FOUND, "Job not found");
+  }
+
+  return job;
+}
+
+async function assertCompletionActorAuthorized(
+  companyId: string,
+  actor: UserRow | null,
+  job: JobRow,
+  executor: TransactionExecutor
+): Promise<void> {
+  if (!actor) {
+    throw new AppError(ErrorCode.NOT_FOUND, "User not found");
+  }
+  if (actor.role !== "technician") {
+    return;
+  }
+
+  const [linkedTechnician] = await executor
+    .select({ id: technicians.id })
+    .from(technicians)
+    .where(
+      and(
+        eq(technicians.companyId, companyId),
+        eq(technicians.userId, actor.id),
+        isNull(technicians.deletedAt)
+      )
+    )
+    .limit(1);
+
+  if (!linkedTechnician || linkedTechnician.id !== job.technicianId) {
+    throw new AppError(ErrorCode.FORBIDDEN, "Only the assigned technician can do this");
+  }
+}
+
 async function listCompanyJobs(companyId: string, executor: SelectExecutor): Promise<JobRow[]> {
   return executor
     .select()
@@ -1284,16 +1333,22 @@ export async function completeJob(
   jobId: string,
   input: CompleteJobInput
 ): Promise<Job> {
-  const existingJob = await getJobRecord(companyId, jobId, db);
-  applyTransition(existingJob.status, "completed");
-
   const normalizedInput = normalizeCompleteJobInput(input);
   const completionTimestamp = new Date();
   const signedAt =
     normalizedInput.signedAt ??
     (normalizedInput.signatureUrl || normalizedInput.signedByName ? completionTimestamp : null);
-  const completedJob = await db.transaction(async (tx) => {
+  const completion = await db.transaction(async (tx) => {
+    const lockedJob = await getJobRecordForUpdate(companyId, jobId, tx);
     const actor = await getActor(companyId, actorId, tx);
+    await assertCompletionActorAuthorized(companyId, actor, lockedJob, tx);
+
+    if (lockedJob.status === "completed") {
+      return { job: lockedJob, completedNow: false, previousScheduledStart: lockedJob.scheduledStart };
+    }
+
+    const fromStatus = lockedJob.status;
+    applyTransition(fromStatus, "completed");
     const [openRequiredTask] = await tx
       .select({ id: jobTasks.id })
       .from(jobTasks)
@@ -1308,14 +1363,14 @@ export async function completeJob(
     if (openRequiredTask) {
       throw new AppError(ErrorCode.CONFLICT, "Complete required checklist tasks before completing the job");
     }
-    const customer = await getCustomerRecord(companyId, existingJob.customerId, tx);
+    const customer = await getCustomerRecord(companyId, lockedJob.customerId, tx);
     const technician =
-      existingJob.technicianId !== null
-        ? await getTechnicianRecord(companyId, existingJob.technicianId, tx)
+      lockedJob.technicianId !== null
+        ? await getTechnicianRecord(companyId, lockedJob.technicianId, tx)
         : null;
     const asset =
-      existingJob.assetId !== null
-        ? await getAssetRecord(companyId, existingJob.assetId, tx)
+      lockedJob.assetId !== null
+        ? await getAssetRecord(companyId, lockedJob.assetId, tx)
         : null;
     const updatedJobs = await tx
       .update(jobs)
@@ -1328,12 +1383,23 @@ export async function completeJob(
         signedAt,
         updatedAt: completionTimestamp
       })
-      .where(and(eq(jobs.companyId, companyId), eq(jobs.id, jobId), isNull(jobs.deletedAt)))
+      .where(
+        and(
+          eq(jobs.companyId, companyId),
+          eq(jobs.id, jobId),
+          eq(jobs.status, fromStatus),
+          isNull(jobs.deletedAt)
+        )
+      )
       .returning();
     const finalizedJob = updatedJobs[0];
 
     if (!finalizedJob) {
-      throw new AppError(ErrorCode.NOT_FOUND, "Job not found");
+      const currentJob = await getJobRecordForUpdate(companyId, jobId, tx);
+      if (currentJob.status === "completed") {
+        return { job: currentJob, completedNow: false, previousScheduledStart: currentJob.scheduledStart };
+      }
+      throw new AppError(ErrorCode.CONFLICT, "Job changed while it was being completed; reload and retry");
     }
 
     const serviceDate = formatDateOnly(completionTimestamp);
@@ -1379,13 +1445,19 @@ export async function completeJob(
       "job.completed",
       `Completed job ${finalizedJob.jobNumber}`,
       {
-        fromStatus: existingJob.status,
+        fromStatus,
         toStatus: "completed"
       }
     );
 
-    return finalizedJob;
+    return { job: finalizedJob, completedNow: true, previousScheduledStart: lockedJob.scheduledStart };
   });
+
+  const completedJob = completion.job;
+
+  if (!completion.completedNow) {
+    return completedJob;
+  }
 
   try {
     await aiQueue.add(
@@ -1431,7 +1503,7 @@ export async function completeJob(
     );
   }
 
-  await invalidateDispatchDates(companyId, existingJob.scheduledStart, completedJob.scheduledStart);
+  await invalidateDispatchDates(companyId, completion.previousScheduledStart, completedJob.scheduledStart);
 
   return completedJob;
 }

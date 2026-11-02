@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
-import type { JobDetail, SubmitFieldWorkSyncBatchResponse } from "@fsm/types";
+import { buildRecordVersionV1, type JobDetail, type SubmitFieldWorkSyncBatchResponse } from "@fsm/types";
 
 import { useJob } from "@/src/hooks/jobs.hooks";
 import { api } from "@/src/lib/api";
@@ -16,9 +16,13 @@ import {
   SIGNATURE_COPY,
   buildSignatureBatch,
   deriveSignatureState,
-  signatureBatchSucceeded,
+  classifySignatureError,
+  classifySignatureResponse,
+  nextSignatureOp,
   signatureJobLine,
   signatureMetaLine,
+  type SignatureAttempt,
+  type SignatureOp,
   type SignatureStroke
 } from "./crew-signature";
 
@@ -54,7 +58,7 @@ export function CrewSignatureForm({ job }: { job: JobDetail }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const activeStroke = useRef<SignatureStroke | null>(null);
   const uploadedAttachmentId = useRef<string | null>(null);
-  const operationId = useRef<string>(newOperationId());
+  const op = useRef<SignatureOp>({ id: newOperationId(), base: null });
   const defaultName = job.signedByName ?? `${job.customer.firstName} ${job.customer.lastName}`.trim();
   const [name, setName] = useState(defaultName);
   const [strokes, setStrokes] = useState<SignatureStroke[]>([]);
@@ -116,13 +120,14 @@ export function CrewSignatureForm({ job }: { job: JobDetail }) {
     activeStroke.current = null;
     if (!stroke) return;
     uploadedAttachmentId.current = null;
+    op.current = { id: newOperationId(), base: null };
     setFailed(false);
     setStrokes((list) => [...list, stroke]);
   };
 
   const clear = () => {
     uploadedAttachmentId.current = null;
-    operationId.current = newOperationId();
+    op.current = { id: newOperationId(), base: null };
     setFailed(false);
     setStrokes([]);
   };
@@ -132,28 +137,38 @@ export function CrewSignatureForm({ job }: { job: JobDetail }) {
     if (!canvas || strokes.length === 0 || !name.trim()) return;
     setSaving(true);
     setFailed(false);
+    let attempt: SignatureAttempt;
     try {
       if (!uploadedAttachmentId.current) {
         const attachment = await uploadFile({ file: await canvasToFile(canvas), entityType: "job", entityId: job.id, caption: "Customer signature" });
         uploadedAttachmentId.current = attachment.id;
       }
-      // Re-read the job so the record version is current after the upload.
-      const fresh = await api.get<{ job: JobDetail }>(`/api/v1/jobs/${job.id}`);
+      if (!op.current.base) {
+        // New op: base it on the job as it is now (after the upload).
+        const fresh = await api.get<{ job: JobDetail }>(`/api/v1/jobs/${job.id}`);
+        op.current = { ...op.current, base: buildRecordVersionV1("job", job.id, new Date(fresh.job.updatedAt)) };
+      }
       const body = buildSignatureBatch({
         jobId: job.id,
-        jobUpdatedAt: fresh.job.updatedAt,
+        baseRecordVersion: op.current.base!,
         attachmentId: uploadedAttachmentId.current,
         signedByName: name,
         deviceId: getDeviceId(),
-        operationId: operationId.current
+        operationId: op.current.id
       });
-      const response = await api.post<SubmitFieldWorkSyncBatchResponse>("/api/v1/field-work/sync/batches", body);
-      if (!signatureBatchSucceeded(response)) throw new Error("not applied");
+      attempt = classifySignatureResponse(await api.post<SubmitFieldWorkSyncBatchResponse>("/api/v1/field-work/sync/batches", body));
+    } catch (error) {
+      attempt = classifySignatureError(error);
+    }
+    try {
+      if (attempt.kind !== "saved") {
+        op.current = nextSignatureOp(op.current, attempt, newOperationId);
+        setFailed(true);
+        return;
+      }
       await queryClient.invalidateQueries({ queryKey: ["jobs", "detail", job.id] });
       const after = await api.get<{ job: JobDetail }>(`/api/v1/jobs/${job.id}`).catch(() => null);
       setSaved({ name: after?.job.signedByName ?? name.trim(), at: after?.job.signedAt ?? null, url: after?.job.signatureUrl ?? null });
-    } catch {
-      setFailed(true);
     } finally {
       setSaving(false);
     }
@@ -175,7 +190,11 @@ export function CrewSignatureForm({ job }: { job: JobDetail }) {
         <input
           id="signature-signed-by"
           value={saved ? saved.name || name : name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={(e) => {
+            // A different "Signed by" is a different payload: never replay the old op id with it.
+            if (e.target.value !== name) op.current = { id: newOperationId(), base: null };
+            setName(e.target.value);
+          }}
           readOnly={locked}
           maxLength={255}
           className={`w-full rounded-[10px] border border-[#e6dccb] py-3 pl-3.5 pr-3 text-[15px] text-[#0f1530] ${locked ? "bg-[#f7f3ec]" : "bg-white"}`}

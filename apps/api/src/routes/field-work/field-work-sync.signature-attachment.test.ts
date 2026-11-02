@@ -12,6 +12,10 @@ import { setupTestEnv } from "../../test-support/env-setup.js";
 
 setupTestEnv();
 
+// App startup otherwise attempts Stripe platform branding sync with test env credentials.
+vi.mock("../../plugins/stripe-platform-sync.js", () => ({ default: async () => {} }));
+const eventFailure = vi.hoisted(() => ({ enabled: false }));
+
 vi.mock("drizzle-orm", async () => {
   const helper = await import("../../test-support/fake-db.js");
   return helper.createDrizzleModuleMock();
@@ -19,7 +23,31 @@ vi.mock("drizzle-orm", async () => {
 
 vi.mock("@fsm/db", async () => {
   const helper = await import("../../test-support/fake-db.js");
-  return helper.createDbModuleMock();
+  return {
+    ...helper.createDbModuleMock(),
+    emitEventWithExecutor: async (
+      executor: unknown,
+      eventOrType: Parameters<typeof helper.emitEventWithExecutor>[1] | string,
+      maybeEvent?: Omit<Parameters<typeof helper.emitEventWithExecutor>[1], "eventType">
+    ) => {
+      if (eventFailure.enabled) {
+        throw new Error("activity event unavailable");
+      }
+
+      if (typeof eventOrType === "string") {
+        if (!maybeEvent) {
+          throw new Error("activity event context is required");
+        }
+
+        return helper.emitEventWithExecutor(executor, {
+          ...maybeEvent,
+          eventType: eventOrType
+        });
+      }
+
+      return helper.emitEventWithExecutor(executor, eventOrType);
+    }
+  };
 });
 
 vi.mock("../../lib/storage.js", async (importOriginal) => {
@@ -189,6 +217,54 @@ describe("job.signature.capture with attachmentId", () => {
     expect(stored.signedAt).toBeInstanceOf(Date);
   });
 
+  it("captures an untouched job when persisted timestamp precision collapses to the same JS millisecond", async () => {
+    const seed = seedFieldJob();
+    const attachment = seedSignatureImage(seed.company.id, seed.job.id);
+    const originalTransaction = fakeDb.db.transaction.bind(fakeDb.db);
+    fakeDb.db.transaction = (async (
+      callback: (tx: typeof fakeDb.db) => Promise<unknown>
+    ): Promise<unknown> => {
+      const state = fakeDb.getTestState();
+      const current = state.jobs[0]!;
+      // Models PostgreSQL defaultNow() microseconds being rounded into a fresh millisecond-precision JS Date.
+      state.jobs[0] = { ...current, updatedAt: new Date(current.updatedAt.getTime()) };
+      return originalTransaction(callback);
+    }) as typeof fakeDb.db.transaction;
+
+    try {
+      const response = await capture(authOf(seed), seed.job.id, {
+        attachmentId: attachment.id,
+        signedByName: "Pat Customer"
+      });
+
+      expect(response.status).toBe(200);
+      expect(response.body.results[0].outcome).toBe("applied");
+      expect(fakeDb.getTestState().jobs[0]!.signatureUrl).toBe(
+        `renvani-object:attachments/${seed.company.id}/1-signature.png`
+      );
+    } finally {
+      fakeDb.db.transaction = originalTransaction;
+    }
+  });
+
+  it("rolls back signature capture when its activity event cannot be stored", async () => {
+    const seed = seedFieldJob();
+    const attachment = seedSignatureImage(seed.company.id, seed.job.id);
+    eventFailure.enabled = true;
+
+    try {
+      const response = await capture(authOf(seed), seed.job.id, {
+        attachmentId: attachment.id,
+        signedByName: "Pat"
+      });
+      expect(response.status).toBe(500);
+      expect(fakeDb.getTestState().jobs[0]!.signatureUrl).toBeNull();
+      expect(fakeDb.getTestState().fieldSyncOperations).toHaveLength(0);
+    } finally {
+      eventFailure.enabled = false;
+    }
+  });
+
   it("is idempotent when the same signature is captured again", async () => {
     const seed = seedFieldJob();
     const attachment = seedSignatureImage(seed.company.id, seed.job.id);
@@ -203,6 +279,7 @@ describe("job.signature.capture with attachmentId", () => {
 
     expect(replay.body.results[0].outcome).toBe("applied");
     expect(replay.body.results[0].message).toMatch(/already captured/i);
+    expect(fakeDb.getTestState().activityEvents).toHaveLength(1);
   });
 
   it("conflicts when a different signature is already on file", async () => {
@@ -240,6 +317,169 @@ describe("job.signature.capture with attachmentId", () => {
     expect(fakeDb.getTestState().jobs[0]!.signatureUrl ?? null).toBeNull();
   });
 
+  it("atomically rejects a job update that races after version validation", async () => {
+    const seed = seedFieldJob();
+    const attachment = seedSignatureImage(seed.company.id, seed.job.id);
+    const originalTransaction = fakeDb.db.transaction.bind(fakeDb.db);
+    fakeDb.db.transaction = (async (
+      callback: (tx: typeof fakeDb.db) => Promise<unknown>
+    ): Promise<unknown> => {
+      const state = fakeDb.getTestState();
+      const current = state.jobs[0]!;
+      state.jobs[0] = {
+        ...current,
+        title: "Concurrent office edit",
+        updatedAt: new Date(current.updatedAt.getTime() + 1_000)
+      };
+      return originalTransaction(callback);
+    }) as typeof fakeDb.db.transaction;
+
+    try {
+      const response = await capture(authOf(seed), seed.job.id, {
+        attachmentId: attachment.id,
+        signedByName: "Pat"
+      });
+
+      expect(response.body.results[0].outcome).toBe("conflict");
+      expect(fakeDb.getTestState().jobs[0]!.title).toBe("Concurrent office edit");
+      expect(fakeDb.getTestState().jobs[0]!.signatureUrl).toBeNull();
+      expect(fakeDb.getTestState().activityEvents).toHaveLength(0);
+    } finally {
+      fakeDb.db.transaction = originalTransaction;
+    }
+  });
+
+  it("treats a concurrent capture of the same signature as idempotent success", async () => {
+    const seed = seedFieldJob();
+    const attachment = seedSignatureImage(seed.company.id, seed.job.id);
+    const storedRef = `renvani-object:attachments/${seed.company.id}/1-signature.png`;
+    const originalTransaction = fakeDb.db.transaction.bind(fakeDb.db);
+    fakeDb.db.transaction = (async (
+      callback: (tx: typeof fakeDb.db) => Promise<unknown>
+    ): Promise<unknown> => {
+      const state = fakeDb.getTestState();
+      const current = state.jobs[0]!;
+      state.jobs[0] = {
+        ...current,
+        signatureUrl: storedRef,
+        signedByName: "Pat",
+        signedAt: new Date(current.updatedAt.getTime() + 1_000),
+        updatedAt: new Date(current.updatedAt.getTime() + 1_000)
+      };
+      return originalTransaction(callback);
+    }) as typeof fakeDb.db.transaction;
+
+    try {
+      const response = await capture(authOf(seed), seed.job.id, {
+        attachmentId: attachment.id,
+        signedByName: "Pat"
+      });
+
+      expect(response.body.results[0]).toMatchObject({
+        outcome: "applied",
+        message: expect.stringMatching(/already captured/i)
+      });
+      expect(fakeDb.getTestState().jobs[0]!.signatureUrl).toBe(storedRef);
+      expect(fakeDb.getTestState().activityEvents).toHaveLength(0);
+    } finally {
+      fakeDb.db.transaction = originalTransaction;
+    }
+  });
+
+  it("reconciles a concurrent batch unique race without returning 500", async () => {
+    const seed = seedFieldJob();
+    const attachment = seedSignatureImage(seed.company.id, seed.job.id);
+    const originalInsert = fakeDb.db.insert.bind(fakeDb.db);
+    let raceBatchInsert = true;
+
+    fakeDb.db.insert = ((table) => {
+      const chain = originalInsert(table);
+      const tableName = (table as { __name?: string }).__name;
+      return {
+        values(values: Record<string, unknown> | Array<Record<string, unknown>>) {
+          const pending = chain.values(values);
+          return {
+            async returning() {
+              const rows = await pending.returning();
+              if (tableName === "fieldSyncBatches" && raceBatchInsert) {
+                raceBatchInsert = false;
+                throw Object.assign(new Error("concurrent batch won"), { code: "23505" });
+              }
+              return rows;
+            }
+          };
+        }
+      };
+    }) as typeof fakeDb.db.insert;
+
+    try {
+      const response = await capture(authOf(seed), seed.job.id, {
+        attachmentId: attachment.id,
+        signedByName: "Pat"
+      });
+
+      expect(response.status).toBe(200);
+      expect(response.body.results[0].outcome).toBe("applied");
+      expect(fakeDb.getTestState().fieldSyncBatches).toHaveLength(1);
+      expect(fakeDb.getTestState().fieldSyncOperations).toHaveLength(1);
+      expect(fakeDb.getTestState().activityEvents).toHaveLength(1);
+      expect(fakeDb.getTestState().jobs[0]!.signatureUrl).toBe(
+        `renvani-object:attachments/${seed.company.id}/1-signature.png`
+      );
+    } finally {
+      fakeDb.db.insert = originalInsert;
+    }
+  });
+
+  it("rechecks technician assignment under the locked signature transaction", async () => {
+    const seed = seedFieldJob();
+    const attachment = seedSignatureImage(seed.company.id, seed.job.id);
+    const replacementUser = fakeDb.seedUser({
+      companyId: seed.company.id,
+      email: "replacement-tech@field-co.test",
+      firstName: "Replacement",
+      lastName: "Tech",
+      role: "technician"
+    });
+    const replacement = fakeDb.seedTechnician({
+      companyId: seed.company.id,
+      userId: replacementUser.id,
+      firstName: "Replacement",
+      lastName: "Tech",
+      phone: "+15555550103"
+    });
+    const originalTransaction = fakeDb.db.transaction.bind(fakeDb.db);
+    fakeDb.db.transaction = (async (
+      callback: (tx: typeof fakeDb.db) => Promise<unknown>
+    ): Promise<unknown> => {
+      const state = fakeDb.getTestState();
+      const current = state.jobs[0]!;
+      state.jobs[0] = {
+        ...current,
+        technicianId: replacement.id,
+        updatedAt: new Date(current.updatedAt.getTime() + 1_000)
+      };
+      return originalTransaction(callback);
+    }) as typeof fakeDb.db.transaction;
+
+    try {
+      const response = await capture(authOf(seed), seed.job.id, {
+        attachmentId: attachment.id,
+        signedByName: "Pat"
+      });
+
+      expect(response.status).toBe(200);
+      expect(response.body.results[0]).toMatchObject({
+        outcome: "rejected",
+        message: expect.stringMatching(/not authorized/i)
+      });
+      expect(fakeDb.getTestState().jobs[0]!.signatureUrl).toBeNull();
+      expect(fakeDb.getTestState().activityEvents).toHaveLength(0);
+    } finally {
+      fakeDb.db.transaction = originalTransaction;
+    }
+  });
+
   it("rejects an attachment that belongs to another job", async () => {
     const seed = seedFieldJob();
     const otherJob = fakeDb.seedJob({
@@ -271,6 +511,35 @@ describe("job.signature.capture with attachmentId", () => {
     expect(fakeDb.getTestState().jobs[0]!.signatureUrl ?? null).toBeNull();
   });
 
+  it("rejects signature capture by a technician who is not assigned to the job", async () => {
+    const seed = seedFieldJob();
+    const otherUser = fakeDb.seedUser({
+      companyId: seed.company.id,
+      email: "other-tech@field-co.test",
+      firstName: "Other",
+      lastName: "Tech",
+      role: "technician"
+    });
+    fakeDb.seedTechnician({
+      companyId: seed.company.id,
+      userId: otherUser.id,
+      firstName: "Other",
+      lastName: "Tech",
+      phone: "+15555550102"
+    });
+    const attachment = seedSignatureImage(seed.company.id, seed.job.id);
+
+    const response = await capture(
+      { companyId: seed.company.id, userId: otherUser.id, role: "technician" },
+      seed.job.id,
+      { attachmentId: attachment.id, signedByName: "Pat" }
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.body.results[0].outcome).toBe("rejected");
+    expect(fakeDb.getTestState().jobs[0]!.signatureUrl).toBeNull();
+  });
+
   it("rejects a non-image attachment", async () => {
     const seed = seedFieldJob();
     const pdf = seedSignatureImage(seed.company.id, seed.job.id, { mimeType: "application/pdf", fileName: "a.pdf" });
@@ -279,6 +548,23 @@ describe("job.signature.capture with attachmentId", () => {
 
     expect(response.body.results[0].outcome).toBe("rejected");
     expect(response.body.results[0].message).toMatch(/PNG, JPEG, or WebP/);
+  });
+
+  it("rejects a soft-deleted signature attachment", async () => {
+    const seed = seedFieldJob();
+    const deleted = seedSignatureImage(seed.company.id, seed.job.id, {
+      deletedAt: new Date("2026-10-20T00:00:00.000Z")
+    });
+
+    const response = await capture(authOf(seed), seed.job.id, {
+      attachmentId: deleted.id,
+      signedByName: "Pat"
+    });
+
+    expect(response.body.results[0].outcome).toBe("rejected");
+    expect(response.body.results[0].code).toBe("SIGNATURE_ATTACHMENT_INVALID");
+    expect(response.body.results[0].message).toBe("Signature attachment not found on this job");
+    expect(fakeDb.getTestState().jobs[0]!.signatureUrl).toBeNull();
   });
 
   it("rejects an oversized attachment", async () => {
@@ -321,6 +607,40 @@ describe("job.signature.capture with attachmentId", () => {
       .set("Authorization", bearer(seed.company.id, seed.techUser.id, seed.techUser.role));
     expect(read.status).toBe(200);
     expect(read.body.job.signatureUrl).toBe("https://cdn.example/legacy-sig.png");
+    const eventPayload = fakeDb.getTestState().activityEvents
+      .find((event) => event.eventType === "job.updated")?.payload;
+    expect(eventPayload).toEqual({ signatureSource: "legacy_https_url" });
+    expect(JSON.stringify(eventPayload)).not.toContain("cdn.example");
+  });
+
+  it.each([
+    "javascript:alert(1)",
+    "data:image/png;base64,AAAA",
+    "file:///tmp/signature.png",
+    "https://user:password@cdn.example/signature.png",
+    "https://cdn.example/signature.png?token=secret",
+    "https://cdn.example/signature.png#private"
+  ])("rejects unsafe legacy signature URL %s", async (signatureUrl) => {
+    const seed = seedFieldJob();
+    const response = await capture(authOf(seed), seed.job.id, {
+      signatureUrl,
+      signedByName: "Pat"
+    });
+
+    expect(response.status).toBe(400);
+    expect(fakeDb.getTestState().jobs[0]!.signatureUrl).toBeNull();
+  });
+
+  it("fails closed when reading an unsafe historical legacy signature URL", async () => {
+    const seed = seedFieldJob();
+    fakeDb.getTestState().jobs[0]!.signatureUrl = "javascript:alert(1)";
+
+    const read = await request(app.server)
+      .get(`/api/v1/jobs/${seed.job.id}`)
+      .set("Authorization", bearer(seed.company.id, seed.techUser.id, seed.techUser.role));
+
+    expect(read.status).toBe(200);
+    expect(read.body.job.signatureUrl).toBeNull();
   });
 
   it("job read returns a freshly signed URL and never the raw storage key", async () => {
@@ -437,7 +757,9 @@ describe("POST /field-work/jobs/:jobId/signature", () => {
     [{ signerRole: "boss" }],
     [{ signerRole: undefined }],
     [{ extra: true }],
-    [{ attachmentId: undefined }]
+    [{ attachmentId: undefined }],
+    [{ attachmentId: undefined, signatureUrl: "javascript:alert(1)" }],
+    [{ attachmentId: undefined, signatureUrl: "https://cdn.example/signature.png?token=secret" }]
   ])("rejects invalid body %j", async (patch) => {
     const seed = seedFieldJob();
     const attachment = seedSignatureImage(seed.company.id, seed.job.id);

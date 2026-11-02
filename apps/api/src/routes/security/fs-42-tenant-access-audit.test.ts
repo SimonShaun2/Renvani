@@ -498,7 +498,7 @@ describe("FS-42 tenant access audit", () => {
     const authA = `Bearer ${tokens.generateAccessToken({ userId: ownerA.id, companyId: companyA.id, role: "owner" })}`;
     const authB = `Bearer ${tokens.generateAccessToken({ userId: ownerB.id, companyId: companyB.id, role: "owner" })}`;
     const authTechB = `Bearer ${tokens.generateAccessToken({ userId: techB.id, companyId: companyB.id, role: "technician" })}`;
-    const items = [{ name: "Panel upgrade", quantity: 1, unitPrice: 1800 }];
+    const items = [{ name: "Panel upgrade", quantity: "1", unitPrice: "1800.00" }];
     const created = await request(app.server).post("/api/v1/estimates/option-sets").set("Authorization", authB).send({
       idempotencyKey: "fs42-options-b-01", customerId: customerB.id, options: [{ tierLabel: "Good", items }, { tierLabel: "Best", items }]
     });

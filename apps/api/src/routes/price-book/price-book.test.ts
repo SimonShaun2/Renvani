@@ -158,7 +158,14 @@ describe("price-book line picker tenant scoping (FS-147)", () => {
     return { auth, customer, ownItem, foreignItem };
   }
 
-  const line = (priceBookItemId?: string) => ({
+  const estimateLine = (priceBookItemId?: string) => ({
+    name: "Line",
+    quantity: "1",
+    unitPrice: "10.00",
+    ...(priceBookItemId ? { priceBookItemId } : {})
+  });
+
+  const invoiceLine = (priceBookItemId?: string) => ({
     name: "Line",
     quantity: 1,
     unitPrice: 10,
@@ -169,7 +176,7 @@ describe("price-book line picker tenant scoping (FS-147)", () => {
     const response = await request(app.server)
       .post("/api/v1/estimates")
       .set("Authorization", auth.authorization)
-      .send({ customerId, title: "Scoped", items: [line()] });
+      .send({ customerId, title: "Scoped", items: [estimateLine()] });
     expect(response.status).toBe(201);
     return response.body.estimate as { id: string; items: Array<{ id: string }> };
   }
@@ -178,7 +185,7 @@ describe("price-book line picker tenant scoping (FS-147)", () => {
     const response = await request(app.server)
       .post("/api/v1/invoices")
       .set("Authorization", auth.authorization)
-      .send({ customerId, items: [line()] });
+      .send({ customerId, items: [invoiceLine()] });
     expect(response.status).toBe(201);
     return response.body.invoice as { id: string; items: Array<{ id: string }> };
   }
@@ -189,13 +196,13 @@ describe("price-book line picker tenant scoping (FS-147)", () => {
     const rejected = await request(app.server)
       .post("/api/v1/estimates")
       .set("Authorization", auth.authorization)
-      .send({ customerId: customer.id, title: "Cross", items: [line(foreignItem.id)] });
+      .send({ customerId: customer.id, title: "Cross", items: [estimateLine(foreignItem.id)] });
     expect(rejected.status).toBe(404);
 
     const accepted = await request(app.server)
       .post("/api/v1/estimates")
       .set("Authorization", auth.authorization)
-      .send({ customerId: customer.id, title: "Own", items: [line(ownItem.id)] });
+      .send({ customerId: customer.id, title: "Own", items: [estimateLine(ownItem.id)] });
     expect(accepted.status).toBe(201);
   });
 
@@ -208,7 +215,7 @@ describe("price-book line picker tenant scoping (FS-147)", () => {
     const add = await request(app.server)
       .post(`/api/v1/estimates/${estimate.id}/items`)
       .set("Authorization", auth.authorization)
-      .send(line(foreignItem.id));
+      .send(estimateLine(foreignItem.id));
     expect(add.status).toBe(404);
 
     const update = await request(app.server)
@@ -230,7 +237,7 @@ describe("price-book line picker tenant scoping (FS-147)", () => {
     const rejected = await request(app.server)
       .post("/api/v1/invoices")
       .set("Authorization", auth.authorization)
-      .send({ customerId: customer.id, items: [line(foreignItem.id)] });
+      .send({ customerId: customer.id, items: [invoiceLine(foreignItem.id)] });
     expect(rejected.status).toBe(404);
   });
 
@@ -243,7 +250,7 @@ describe("price-book line picker tenant scoping (FS-147)", () => {
     const add = await request(app.server)
       .post(`/api/v1/invoices/${invoice.id}/items`)
       .set("Authorization", auth.authorization)
-      .send(line(foreignItem.id));
+      .send(invoiceLine(foreignItem.id));
     expect(add.status).toBe(404);
 
     const update = await request(app.server)
@@ -255,7 +262,7 @@ describe("price-book line picker tenant scoping (FS-147)", () => {
     const ownAdd = await request(app.server)
       .post(`/api/v1/invoices/${invoice.id}/items`)
       .set("Authorization", auth.authorization)
-      .send(line(ownItem.id));
+      .send(invoiceLine(ownItem.id));
     expect(ownAdd.status).toBe(201);
   });
   it("invoicing an estimate whose catalog item was soft-deleted succeeds and drops the link", async () => {
@@ -263,7 +270,7 @@ describe("price-book line picker tenant scoping (FS-147)", () => {
     const created = await request(app.server)
       .post("/api/v1/estimates")
       .set("Authorization", auth.authorization)
-      .send({ customerId: customer.id, title: "Stale link", items: [line(ownItem.id)] });
+      .send({ customerId: customer.id, title: "Stale link", items: [estimateLine(ownItem.id)] });
     expect(created.status).toBe(201);
 
     ownItem.deletedAt = new Date();

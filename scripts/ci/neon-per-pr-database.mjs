@@ -56,6 +56,11 @@ export function maskDatabaseUrls(text) {
   return String(text ?? "").replace(/(postgres(?:ql)?:\/\/)[^@\s/]+@/gi, "$1***@");
 }
 
+/** Redact the entire connection URL, including derived disposable database names. */
+export function redactDatabaseUrls(text) {
+  return String(text ?? "").replace(/postgres(?:ql)?:\/\/[^\s"'<>]+/gi, "[REDACTED_DATABASE_URL]");
+}
+
 function quoteIdent(name) {
   if (!isSafeCiDatabaseName(name)) {
     throw new Error("refusing unsafe CI database name");
@@ -155,6 +160,40 @@ export async function withIsolatedCiDatabase({ baseUrl, sql, env, nowEpochSecond
       log(`[neon-per-pr-ci] dropped CI database ${databaseName}`);
     } catch (error) {
       log(`[neon-per-pr-ci] WARN could not drop ${databaseName} (stale cleanup will retry): ${maskDatabaseUrls(error?.message)}`);
+    }
+  }
+}
+
+/** FS-235 one-off gate: require isolation and drop only the database created by this run. */
+export async function withStrictIsolatedCiDatabase({ baseUrl, sql, env, nowEpochSeconds, runSteps, log = console.log }) {
+  if (!env.GITHUB_RUN_ID || !env.GITHUB_RUN_ATTEMPT) {
+    throw new Error("strict isolated CI requires a GitHub run ID and attempt");
+  }
+  if (!(await canCreateDatabase(sql))) {
+    throw new Error("strict isolated CI requires CREATEDB; shared staging fallback is forbidden");
+  }
+
+  const databaseName = buildCiDatabaseName({
+    prNumber: `411_${env.GITHUB_RUN_ID}`,
+    runAttempt: env.GITHUB_RUN_ATTEMPT,
+    nowEpochSeconds
+  });
+  try {
+    await sql.unsafe(`create database ${quoteIdent(databaseName)}`);
+  } catch {
+    throw new Error(`could not create strict isolated CI database ${databaseName}`);
+  }
+
+  log(`[fs235-postgres] created isolated CI database ${databaseName}`);
+  try {
+    await runSteps(buildChildDatabaseUrl(baseUrl, databaseName));
+    return { mode: "isolated", databaseName };
+  } finally {
+    try {
+      await sql.unsafe(`drop database if exists ${quoteIdent(databaseName)} with (force)`);
+      log(`[fs235-postgres] dropped isolated CI database ${databaseName}`);
+    } catch {
+      throw new Error(`failed to drop strict isolated CI database ${databaseName}`);
     }
   }
 }

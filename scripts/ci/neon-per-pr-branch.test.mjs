@@ -23,6 +23,8 @@ test("batch-ci workflow includes neon per-PR matrix job", () => {
     /@fsm\/db\.\.\./,
     "Neon job must build @fsm/db workspace dependencies (e.g. @fsm/types) before tsc"
   );
+  assert.match(workflow, /node-version: 22\.16\.0[\s\S]*fs235-clerk-workspace-postgres\.mjs/);
+  assert.match(workflow, /FS235_PR_NUMBER: \$\{\{ github\.event\.pull_request\.number \}\}/);
 });
 
 // ── Per-PR database isolation (no live DB: SQL client is a fake) ──
@@ -31,9 +33,11 @@ import {
   buildChildDatabaseUrl,
   dropStaleCiDatabases,
   maskDatabaseUrls,
+  redactDatabaseUrls,
   parseCiDatabaseEpoch,
   prNumberFromGithubRef,
-  withIsolatedCiDatabase
+  withIsolatedCiDatabase,
+  withStrictIsolatedCiDatabase
 } from "./neon-per-pr-database.mjs";
 
 const NOW = 1_800_000_000;
@@ -79,6 +83,11 @@ test("masking removes credentials from URLs in log text", () => {
   const masked = maskDatabaseUrls("connect postgres://u:s3cr%40t@host/db failed");
   assert.equal(masked, "connect postgres://***@host/db failed");
   assert.doesNotMatch(masked, /s3cr/);
+});
+
+test("strict redaction removes the entire derived connection URL", () => {
+  const masked = redactDatabaseUrls("connect postgresql://u:p@ep-staging.neon.tech/ci_pr_411_1_1800000000?sslmode=require failed");
+  assert.equal(masked, "connect [REDACTED_DATABASE_URL] failed");
 });
 
 test("isolated run: creates, runs steps against the child, drops WITH (FORCE) in finally", async () => {
@@ -138,4 +147,71 @@ test("stale drop: only ci_pr_* older than 6h (by encoded epoch); errors ignored"
   const logs = [];
   assert.deepEqual(await dropStaleCiDatabases(broken, { nowEpochSeconds: NOW, log: (l) => logs.push(l) }), []);
   assert.doesNotMatch(logs.join("\n"), /secret/);
+});
+
+test("FS-235 strict gate creates and drops only its own database, with no stale sweep", async () => {
+  const sql = fakeSql({ databases: [`ci_pr_other_1_${NOW - 7 * 3600}`] });
+  const seen = [];
+  const result = await withStrictIsolatedCiDatabase({
+    baseUrl: "postgres://u:p@ep-staging.neon.tech/neondb",
+    sql,
+    env: { GITHUB_RUN_ID: "12345", GITHUB_RUN_ATTEMPT: "2" },
+    nowEpochSeconds: NOW,
+    runSteps: async (url) => seen.push(new URL(url).pathname),
+    log: () => undefined
+  });
+  assert.equal(result.mode, "isolated");
+  assert.deepEqual(seen, [`/ci_pr_411_12345_2_${NOW}`]);
+  assert.deepEqual(sql.calls.filter((call) => /database/i.test(call)), [
+    `create database "ci_pr_411_12345_2_${NOW}"`,
+    `drop database if exists "ci_pr_411_12345_2_${NOW}" with (force)`
+  ]);
+});
+
+test("FS-235 strict gate rejects missing CREATEDB and CREATE failure without shared fallback", async () => {
+  for (const sql of [
+    fakeSql({ createdb: false }),
+    fakeSql({ createError: Object.assign(new Error("permission denied"), { code: "42501" }) })
+  ]) {
+    let ran = false;
+    await assert.rejects(withStrictIsolatedCiDatabase({
+      baseUrl: "postgres://u:p@ep-staging.neon.tech/neondb",
+      sql,
+      env: { GITHUB_RUN_ID: "12345", GITHUB_RUN_ATTEMPT: "1" },
+      nowEpochSeconds: NOW,
+      runSteps: async () => { ran = true; },
+      log: () => undefined
+    }), /CREATEDB|could not create/);
+    assert.equal(ran, false);
+    assert.ok(!sql.calls.some((call) => call.startsWith("select datname")));
+    assert.ok(!sql.calls.some((call) => call.startsWith("drop database")));
+  }
+});
+
+test("FS-235 strict gate drops its own database after test failure and fails on cleanup error", async () => {
+  const sql = fakeSql();
+  await assert.rejects(withStrictIsolatedCiDatabase({
+    baseUrl: "postgres://u:p@ep-staging.neon.tech/neondb",
+    sql,
+    env: { GITHUB_RUN_ID: "12345", GITHUB_RUN_ATTEMPT: "1" },
+    nowEpochSeconds: NOW,
+    runSteps: async () => { throw new Error("worker test failed"); },
+    log: () => undefined
+  }), /worker test failed/);
+  assert.ok(sql.calls.includes(`drop database if exists "ci_pr_411_12345_1_${NOW}" with (force)`));
+
+  const dropFailure = fakeSql();
+  const unsafe = dropFailure.unsafe;
+  dropFailure.unsafe = async (text) => {
+    if (text.startsWith("drop database")) throw new Error("cannot drop");
+    return unsafe(text);
+  };
+  await assert.rejects(withStrictIsolatedCiDatabase({
+    baseUrl: "postgres://u:p@ep-staging.neon.tech/neondb",
+    sql: dropFailure,
+    env: { GITHUB_RUN_ID: "12345", GITHUB_RUN_ATTEMPT: "1" },
+    nowEpochSeconds: NOW,
+    runSteps: async () => undefined,
+    log: () => undefined
+  }), /failed to drop strict isolated CI database/);
 });

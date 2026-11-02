@@ -27,6 +27,7 @@ import {
   text,
   varchar,
   integer,
+  bigint,
   decimal,
   boolean,
   timestamp,
@@ -388,6 +389,8 @@ export const activityEventTypeEnum = pgEnum("activity_event_type", [
   "revenue.inquiry_qualified",
   "revenue.inquiry_received",
   "revenue.inquiry_escalated",
+  "outbound_consent.granted",
+  "outbound_consent.revoked",
   // Saved card migration (FS-138)
   "payment_method_migration.requested",
   "payment_method_migration.mappings_applied",
@@ -2202,6 +2205,64 @@ export const bookingRequests = pgTable("booking_requests", {
   zipIdx: index("booking_requests_zip_idx").on(t.zip),
   sourceIdx: index("booking_requests_source_idx").on(t.source),
   phoneIdx: index("booking_requests_phone_idx").on(t.phone),
+}));
+
+// FS-234: the destination-specific authority for outbound communication. A missing row denies.
+// The 0062 migration must enable and FORCE tenant RLS on both tables after FS-235's 0061 lands.
+export const outboundConsentSubjectTypeEnum = pgEnum("outbound_consent_subject_type", ["customer", "booking_request"]);
+export const outboundConsentChannelEnum = pgEnum("outbound_consent_channel", ["email", "sms"]);
+export const outboundConsentPurposeEnum = pgEnum("outbound_consent_purpose", ["appointment", "marketing"]);
+export const outboundConsentStateEnum = pgEnum("outbound_consent_state", ["granted", "revoked"]);
+export const outboundConsentDecisionEnum = pgEnum("outbound_consent_decision", ["grant", "revoke"]);
+
+export const outboundConsentStates = pgTable("outbound_consent_states", {
+  id: id(),
+  companyId: companyId(),
+  subjectType: outboundConsentSubjectTypeEnum("subject_type").notNull(),
+  subjectId: uuid("subject_id").notNull(),
+  channel: outboundConsentChannelEnum("channel").notNull(),
+  purpose: outboundConsentPurposeEnum("purpose").notNull(),
+  contact: varchar("contact", { length: 320 }).notNull(),
+  state: outboundConsentStateEnum("state").notNull(),
+  version: bigint("version", { mode: "number" }).notNull(),
+  decidedAt: timestamp("decided_at").notNull().defaultNow(),
+  sourceKind: varchar("source_kind", { length: 64 }).notNull(),
+  sourceRecordId: uuid("source_record_id").notNull(),
+  statementVersion: varchar("statement_version", { length: 64 }).notNull(),
+  lastEventId: uuid("last_event_id").notNull(),
+  ...timestamps,
+}, (t) => ({
+  key: uniqueIndex("outbound_consent_states_key").on(t.companyId, t.subjectType, t.subjectId, t.channel, t.purpose, t.contact),
+  subjectIdx: index("outbound_consent_states_subject_idx").on(t.companyId, t.subjectType, t.subjectId),
+}));
+
+// Append-only by service contract; migration 0062 must also revoke UPDATE/DELETE from app role.
+export const outboundConsentEvents = pgTable("outbound_consent_events", {
+  id: id(),
+  companyId: companyId(),
+  subjectType: outboundConsentSubjectTypeEnum("subject_type").notNull(),
+  subjectId: uuid("subject_id").notNull(),
+  channel: outboundConsentChannelEnum("channel").notNull(),
+  purpose: outboundConsentPurposeEnum("purpose").notNull(),
+  contact: varchar("contact", { length: 320 }).notNull(),
+  decision: outboundConsentDecisionEnum("decision").notNull(),
+  version: bigint("version", { mode: "number" }).notNull(),
+  occurredAt: timestamp("occurred_at").notNull().defaultNow(),
+  sourceKind: varchar("source_kind", { length: 64 }).notNull(),
+  sourceRecordId: uuid("source_record_id").notNull(),
+  statementVersion: varchar("statement_version", { length: 64 }).notNull(),
+  actorType: varchar("actor_type", { length: 30 }).notNull(),
+  actorId: uuid("actor_id"),
+  evidenceRef: text("evidence_ref").notNull(),
+  idempotencyKey: varchar("idempotency_key", { length: 128 }).notNull(),
+  decisionFingerprint: varchar("decision_fingerprint", { length: 64 }).notNull(),
+  priorState: outboundConsentStateEnum("prior_state"),
+  currentState: outboundConsentStateEnum("current_state").notNull(),
+  ...timestamps,
+}, (t) => ({
+  keyVersion: uniqueIndex("outbound_consent_events_key_version").on(t.companyId, t.subjectType, t.subjectId, t.channel, t.purpose, t.contact, t.version),
+  idempotency: uniqueIndex("outbound_consent_events_idempotency").on(t.companyId, t.idempotencyKey),
+  subjectIdx: index("outbound_consent_events_subject_idx").on(t.companyId, t.subjectType, t.subjectId),
 }));
 
 export const inquirySubmitIdempotency = pgTable("inquiry_submit_idempotency", {

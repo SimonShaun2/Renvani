@@ -1,6 +1,6 @@
 # ADR-FS-234: Authoritative outbound consent ledger
 
-**Status:** Proposed — Technical Lead, Product Owner, and Security decision pending
+**Status:** Product and Technical Lead approved for bounded schema/service implementation; Security, migration, QA, and integration gates pending
 **Proposed by:** BE1B
 **Date:** 2026-10-28 CT
 **Ticket:** [FS-234](https://app.notion.com/p/408317b92d1581d99a23d3780264ae89)
@@ -54,4 +54,6 @@ This provides an auditable email-first grant path and removes mutable inquiry ti
 
 ## Decision and open points
 
-**No decision recorded.** Technical Lead and BE1A must settle subject linkage/transfer, approved capture copy and provenance fields, migration slot and RLS shape, and the first provider-boundary integration. Do not begin the schema migration or enable email outbound on this proposal alone. FS-235 on the current board is a separate Clerk onboarding ticket; it is not the consent contract dependency.
+Product Owner approved exact tenant/subject/destination/channel/purpose grants and retention outreach as `marketing` in [FS-234 decision](https://app.notion.com/p/408317b92d1581d99a23d3780264ae89?d=40c317b92d1581be9f71001cfae517ff&pvs=42). Technical Lead approved a tenant-scoped current row plus append-only events, locked per-key ordering, exact idempotency replay, forced RLS, atomic activity event, active-subject and provider-boundary version rechecks in the same [ticket discussion](https://app.notion.com/p/408317b92d1581d99a23d3780264ae89?d=40c317b92d1581be9f71001cfae517ff&pvs=42). Booking-to-customer transfer requires separate verified evidence and is outside this implementation. Product/Legal copy remains required before public capture or send rollout. No grant backfill or live send is approved.
+
+E.. CoS reserved generated migration `0062` only after FS-235 PR #411's `0061` integrates unchanged. This branch carries a schema model and service contract without migration or activation. After `0061` merges, merge current `dev`, generate `0062` with forced tenant RLS and append-only privileges, then run real-PostgreSQL concurrency/RLS tests and exact-head peer, QA, Security, approved CI, and E.. CoS gates. Email and unknown/conflicting SMS stay fail-closed until that work is complete.

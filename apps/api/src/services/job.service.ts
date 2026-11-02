@@ -227,6 +227,13 @@ async function invalidateDispatchDates(
   }
 }
 
+export async function invalidateJobDispatchDate(
+  companyId: string,
+  scheduledStart: Date | null | undefined
+): Promise<void> {
+  await invalidateDispatchDates(companyId, scheduledStart);
+}
+
 function addMoneyStrings(leftValue: string | null, rightValue: string | null): string {
   const leftCents = toCents(leftValue);
   const rightCents = toCents(rightValue);

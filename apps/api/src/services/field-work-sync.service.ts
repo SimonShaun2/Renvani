@@ -39,6 +39,7 @@ import {
 import {
   addNoteInTransaction,
   addPhotoInTransaction,
+  invalidateJobDispatchDate,
   transitionStatusInTransaction
 } from "./job.service.js";
 import { updateTaskInTransaction } from "./job-tasks.service.js";
@@ -47,6 +48,11 @@ type BatchRow = typeof fieldSyncBatches.$inferSelect;
 type OperationRow = typeof fieldSyncOperations.$inferSelect;
 type JobRow = typeof jobs.$inferSelect;
 type FieldSyncTransaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
+type AppliedOperation = {
+  outcome: FieldWorkSyncOperationOutcome;
+  resultPayload: Record<string, unknown>;
+  dispatchInvalidationDate?: Date | null;
+};
 
 type SignatureCaptureTransactionResult =
   | { kind: "captured"; job: JobRow; signedAt: Date }
@@ -337,10 +343,7 @@ async function applyOperation(
   tx: FieldSyncTransaction,
   actor: FieldWorkSyncActor,
   operation: FieldWorkSyncOperationInput
-): Promise<{
-  outcome: FieldWorkSyncOperationOutcome;
-  resultPayload: Record<string, unknown>;
-}> {
+): Promise<AppliedOperation> {
   await assertJobFieldAccess(actor.companyId, actor.userId, actor.role, operation.jobId);
 
   switch (operation.type) {
@@ -390,7 +393,8 @@ async function applyOperation(
         resultPayload: {
           entityId: updated.id,
           recordVersion: buildRecordVersionV1("job", updated.id, updated.updatedAt)
-        }
+        },
+        dispatchInvalidationDate: updated.scheduledStart
       };
     }
     case "job.task.update": {
@@ -641,7 +645,7 @@ export async function submitFieldWorkSyncBatch(
           };
         }
 
-        let applyResult: { outcome: FieldWorkSyncOperationOutcome; resultPayload: Record<string, unknown> };
+        let applyResult: AppliedOperation;
         try {
           applyResult = await applyOperation(tx, actor, operation);
         } catch (error: unknown) {
@@ -675,10 +679,15 @@ export async function submitFieldWorkSyncBatch(
 
         return {
           acknowledged: applyResult.outcome === "applied" || applyResult.outcome === "duplicate",
-          result: toOperationResult(stored)
+          result: toOperationResult(stored),
+          dispatchInvalidationDate: applyResult.dispatchInvalidationDate
         };
       }
     );
+
+    if (processed.dispatchInvalidationDate) {
+      await invalidateJobDispatchDate(actor.companyId, processed.dispatchInvalidationDate);
+    }
 
     results.push(processed.result);
     if (processed.acknowledged) {

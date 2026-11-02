@@ -6,6 +6,7 @@ import request from "supertest";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { buildRecordVersionV1 } from "@fsm/types";
+import { redisConnection } from "@fsm/jobs";
 
 import { closeTestApp } from "../../test-support/close-test-app.js";
 import { setupTestEnv } from "../../test-support/env-setup.js";
@@ -53,6 +54,7 @@ beforeAll(async () => {
 
 beforeEach(async () => {
   fakeDb.resetTestState();
+  vi.mocked(redisConnection.del).mockClear();
   app = await buildAppModule.buildApp();
   await app.ready();
 });
@@ -92,7 +94,8 @@ function seedFieldJob() {
     customerId: customer.id,
     technicianId: technician.id,
     status: "dispatched",
-    title: "Service call"
+    title: "Service call",
+    scheduledStart: new Date("2026-11-02T15:00:00.000Z")
   });
 
   return { company, techUser, job };
@@ -290,6 +293,74 @@ describe("FS-87 field work sync", () => {
     }
   });
 
+  it("invalidates dispatch only after a status operation and receipt commit together", async () => {
+    const { company, techUser, job } = seedFieldJob();
+    const originalInsert = fakeDb.db.insert.bind(fakeDb.db);
+    let failReceipt = true;
+    const body = {
+      contractVersion: "1.0.0",
+      deviceId: "ipad-status-receipt",
+      batchClientId: "status-receipt-batch",
+      operations: [
+        {
+          sequence: 1,
+          clientOperationId: "status-op-receipt",
+          jobId: job.id,
+          type: "job.status.update",
+          baseRecordVersion: buildRecordVersionV1("job", job.id, job.updatedAt),
+          payload: { toStatus: "in_progress" }
+        }
+      ]
+    };
+
+    fakeDb.db.insert = ((table) => {
+      const chain = originalInsert(table);
+      const tableName = (table as { __name?: string }).__name;
+      return {
+        values(values: Record<string, unknown> | Array<Record<string, unknown>>) {
+          const pending = chain.values(values);
+          return {
+            async returning() {
+              if (tableName === "fieldSyncOperations" && failReceipt) {
+                throw new Error("operation receipt unavailable");
+              }
+              return pending.returning();
+            }
+          };
+        }
+      };
+    }) as typeof fakeDb.db.insert;
+
+    const send = () =>
+      request(app.server)
+        .post("/api/v1/field-work/sync/batches")
+        .set("Authorization", bearer(company.id, techUser.id, techUser.role))
+        .send(body);
+
+    try {
+      const failed = await send();
+      expect(failed.status).toBe(500);
+      expect(fakeDb.getTestState().jobs[0]?.status).toBe("dispatched");
+      expect(fakeDb.getTestState().activityEvents).toHaveLength(0);
+      expect(redisConnection.del).not.toHaveBeenCalled();
+
+      failReceipt = false;
+      const applied = await send();
+      expect(applied.status).toBe(200);
+      expect(applied.body.results[0].outcome).toBe("applied");
+      expect(fakeDb.getTestState().jobs[0]?.status).toBe("in_progress");
+      expect(redisConnection.del).toHaveBeenCalledTimes(1);
+      expect(redisConnection.del).toHaveBeenCalledWith(`dispatch:${company.id}:2026-11-02`);
+
+      const duplicate = await send();
+      expect(duplicate.status).toBe(200);
+      expect(duplicate.body.results[0].outcome).toBe("duplicate");
+      expect(redisConnection.del).toHaveBeenCalledTimes(1);
+    } finally {
+      fakeDb.db.insert = originalInsert;
+    }
+  });
+
   it("returns conflict when job recordVersion is stale", async () => {
     const { company, techUser, job } = seedFieldJob();
     const staleVersion = buildRecordVersionV1("job", job.id, new Date("2020-01-01T00:00:00.000Z"));
@@ -317,6 +388,7 @@ describe("FS-87 field work sync", () => {
     expect(response.body.results[0].outcome).toBe("conflict");
     expect(response.body.results[0].conflict?.liveRecordVersion).toContain(job.id);
     expect(fakeDb.getTestState().jobs[0]?.status).toBe("dispatched");
+    expect(redisConnection.del).not.toHaveBeenCalled();
   });
 
   it("rejects cross-tenant job sync", async () => {

@@ -88,6 +88,17 @@ function createAuthContext() {
   };
 }
 
+function authorizationForRole(companyId: string, role: "technician" | "office" | "dispatcher") {
+  const user = fakeDb.seedUser({
+    companyId, email: `${role}-${randomUUID()}@example.com`,
+    firstName: "Route", lastName: "Tester", role
+  });
+  return {
+    user,
+    authorization: `Bearer ${tokens.generateAccessToken({ userId: user.id, companyId, role })}`
+  };
+}
+
 function seedEstimateGraph(companyId: string) {
   const customer = fakeDb.seedCustomer({
     companyId,
@@ -116,6 +127,76 @@ function seedEstimateGraph(companyId: string) {
 }
 
 describe("estimate routes", () => {
+  it("limits technician reads to a current assigned job and hides customer approval tokens", async () => {
+    const owner = createAuthContext();
+    const technicianActor = authorizationForRole(owner.company.id, "technician");
+    const otherTechnicianActor = authorizationForRole(owner.company.id, "technician");
+    const officeActor = authorizationForRole(owner.company.id, "office");
+    const technician = fakeDb.seedTechnician({ companyId: owner.company.id, userId: technicianActor.user.id,
+      firstName: "Tess", lastName: "Tech", phone: "555-0101" });
+    const { customer, job } = seedEstimateGraph(owner.company.id);
+    job.technicianId = technician.id;
+    const estimate = fakeDb.seedEstimate({ companyId: owner.company.id, customerId: customer.id,
+      jobId: job.id, approvalToken: "q".repeat(32) });
+    fakeDb.seedEstimateItem({ companyId: owner.company.id, estimateId: estimate.id,
+      name: "Diagnostic", quantity: "1.000", unitPrice: "25.00", total: "25.00" });
+    const unlinked = fakeDb.seedEstimate({ companyId: owner.company.id, customerId: customer.id });
+    const foreign = fakeDb.seedCompany({ name: "Other", slug: `other-${randomUUID()}`, timezone: "America/Chicago" });
+    const foreignCustomer = fakeDb.seedCustomer({ companyId: foreign.id, firstName: "Other", lastName: "Customer" });
+    const foreignEstimate = fakeDb.seedEstimate({ companyId: foreign.id, customerId: foreignCustomer.id });
+
+    const assigned = await request(app.server).get(`/api/v1/estimates/${estimate.id}`)
+      .set("Authorization", technicianActor.authorization);
+    const items = await request(app.server).get(`/api/v1/estimates/${estimate.id}/items`)
+      .set("Authorization", technicianActor.authorization);
+    const ownerDetail = await request(app.server).get(`/api/v1/estimates/${estimate.id}`)
+      .set("Authorization", owner.authorization);
+    expect(assigned.status).toBe(200);
+    expect(assigned.body.estimate.approvalToken).toBeNull();
+    expect(items.status).toBe(200);
+    expect(items.body.items).toHaveLength(1);
+    expect(ownerDetail.body.estimate.approvalToken).toBe("q".repeat(32));
+    expect((await request(app.server).get(`/api/v1/estimates/${estimate.id}`)).status).toBe(401);
+    expect((await request(app.server).get(`/api/v1/estimates/${estimate.id}`)
+      .set("Authorization", officeActor.authorization)).status).toBe(403);
+    expect((await request(app.server).get("/api/v1/estimates")
+      .set("Authorization", technicianActor.authorization)).status).toBe(403);
+    for (const id of [unlinked.id, foreignEstimate.id]) {
+      expect((await request(app.server).get(`/api/v1/estimates/${id}`)
+        .set("Authorization", technicianActor.authorization)).status).toBe(404);
+    }
+    expect((await request(app.server).get(`/api/v1/estimates/${estimate.id}/items`)
+      .set("Authorization", otherTechnicianActor.authorization)).status).toBe(404);
+    job.technicianId = null;
+    expect((await request(app.server).get(`/api/v1/estimates/${estimate.id}`)
+      .set("Authorization", technicianActor.authorization)).status).toBe(404);
+    job.technicianId = technician.id;
+    technician.status = "inactive";
+    expect((await request(app.server).get(`/api/v1/estimates/${estimate.id}`)
+      .set("Authorization", technicianActor.authorization)).status).toBe(404);
+  });
+
+  it("denies technician generic estimate mutations before any state change", async () => {
+    const owner = createAuthContext();
+    const actor = authorizationForRole(owner.company.id, "technician");
+    const { customer } = seedEstimateGraph(owner.company.id);
+    const estimate = fakeDb.seedEstimate({ companyId: owner.company.id, customerId: customer.id,
+      status: "draft", title: "Unchanged" });
+    const eventsBefore = fakeDb.getTestState().activityEvents.length;
+    const patch = await request(app.server).patch(`/api/v1/estimates/${estimate.id}`)
+      .set("Authorization", actor.authorization).send({ title: "Forbidden" });
+    const send = await request(app.server).post(`/api/v1/estimates/${estimate.id}/send`)
+      .set("Authorization", actor.authorization);
+    const remove = await request(app.server).delete(`/api/v1/estimates/${estimate.id}`)
+      .set("Authorization", actor.authorization);
+    const addItem = await request(app.server).post(`/api/v1/estimates/${estimate.id}/items`)
+      .set("Authorization", actor.authorization)
+      .send({ name: "Forbidden", itemType: "service", quantity: "1.000", unitPrice: "1.00" });
+    expect([patch.status, send.status, remove.status, addItem.status]).toEqual([403, 403, 403, 403]);
+    expect(estimate.title).toBe("Unchanged");
+    expect(estimate.status).toBe("draft");
+    expect(fakeDb.getTestState().activityEvents).toHaveLength(eventsBefore);
+  });
   it("GET /estimates returns paginated results and rejects missing auth", async () => {
     const auth = createAuthContext();
     const { customer } = seedEstimateGraph(auth.company.id);

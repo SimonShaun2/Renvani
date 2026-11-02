@@ -17,6 +17,7 @@ import {
   estimateItems,
   jobs,
   properties,
+  technicians,
   users
 } from "@fsm/db";
 import {
@@ -34,7 +35,8 @@ import {
   type PublicEstimateSchedulingContext,
   type PublicEstimateView,
   type UpdateEstimateInput,
-  type CreateEstimateInput
+  type CreateEstimateInput,
+  type UserRole
 } from "@fsm/types";
 
 import { generateEstimateNumber } from "../lib/estimate-number.js";
@@ -233,6 +235,9 @@ async function getUserRecord(
 
   if (!user) {
     throw new AppError(ErrorCode.NOT_FOUND, "User not found");
+  }
+  if (!user.isActive || (user.role !== "owner" && user.role !== "admin" && user.role !== "dispatcher")) {
+    throw new AppError(ErrorCode.FORBIDDEN, "You do not have access to this resource");
   }
 
   return user;
@@ -654,6 +659,45 @@ export async function listEstimates(
 export async function getEstimate(companyId: string, estimateId: string): Promise<EstimateDetail> {
   const estimate = await getEstimateRecord(companyId, estimateId, db);
   return buildEstimateDetail(companyId, estimate, db);
+}
+
+export interface EstimateReadActor {
+  companyId: string;
+  userId: string;
+  role: UserRole;
+}
+
+/** Generic staff read. A technician must still own the linked job at the time of each read. */
+export async function getEstimateForActor(actor: EstimateReadActor, estimateId: string): Promise<EstimateDetail> {
+  if (["owner", "admin", "dispatcher"].includes(actor.role)) {
+    return getEstimate(actor.companyId, estimateId);
+  }
+  if (actor.role !== "technician") {
+    throw new AppError(ErrorCode.FORBIDDEN, "You do not have access to this resource");
+  }
+  const estimate = await getEstimateRecord(actor.companyId, estimateId, db);
+  if (!estimate.jobId) {
+    throw new AppError(ErrorCode.NOT_FOUND, "Estimate not found");
+  }
+  const [job] = await db.select({ technicianId: jobs.technicianId }).from(jobs).where(and(
+    eq(jobs.companyId, actor.companyId),
+    eq(jobs.id, estimate.jobId),
+    isNull(jobs.deletedAt)
+  )).limit(1);
+  if (!job?.technicianId) {
+    throw new AppError(ErrorCode.NOT_FOUND, "Estimate not found");
+  }
+  const [technician] = await db.select({ id: technicians.id }).from(technicians).where(and(
+    eq(technicians.companyId, actor.companyId),
+    eq(technicians.id, job.technicianId),
+    eq(technicians.userId, actor.userId),
+    eq(technicians.status, "active"),
+    isNull(technicians.deletedAt)
+  )).limit(1);
+  if (!technician) {
+    throw new AppError(ErrorCode.NOT_FOUND, "Estimate not found");
+  }
+  return buildEstimateDetail(actor.companyId, estimate, db);
 }
 
 export async function createEstimate(

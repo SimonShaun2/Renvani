@@ -3,7 +3,6 @@ import type { FastifyReply, FastifyRequest } from "fastify";
 import type {
   AddEstimateItemInput,
   CreateEstimateInput,
-  Estimate,
   EstimateDetail,
   EstimateItem,
   EstimateListItem,
@@ -20,8 +19,8 @@ import {
   declineEstimate,
   deleteEstimate,
   getEstimate,
+  getEstimateForActor,
   listEstimates,
-  listItems,
   reviseEstimate,
   sendEstimate,
   updateEstimate
@@ -79,7 +78,7 @@ function toEstimateListItemResponse(estimate: EstimateListItem) {
   };
 }
 
-function toEstimateDetailResponse(estimate: EstimateDetail) {
+function toEstimateDetailResponse(estimate: EstimateDetail, redactApprovalToken = false) {
   return {
     id: estimate.id,
     companyId: estimate.companyId,
@@ -100,7 +99,7 @@ function toEstimateDetailResponse(estimate: EstimateDetail) {
     title: estimate.title,
     messageToCustomer: estimate.messageToCustomer,
     internalNotes: estimate.internalNotes,
-    approvalToken: estimate.approvalToken,
+    approvalToken: redactApprovalToken ? null : estimate.approvalToken,
     approvedAt: toIsoString(estimate.approvedAt),
     approvedByName: estimate.approvedByName,
     approvedSignatureUrl: estimate.approvedSignatureUrl,
@@ -158,10 +157,12 @@ export async function createEstimateHandler(request: FastifyRequest, reply: Fast
 
 export async function getEstimateHandler(request: FastifyRequest, reply: FastifyReply): Promise<FastifyReply> {
   const params = request.params as EstimateIdParams;
-  const estimate = await getEstimate(request.company.id, params.id);
+  const estimate = await getEstimateForActor({
+    companyId: request.company.id, userId: request.user.id, role: request.user.role
+  }, params.id);
 
   return reply.send({
-    estimate: toEstimateDetailResponse(estimate)
+    estimate: toEstimateDetailResponse(estimate, request.user.role === "technician")
   });
 }
 
@@ -233,10 +234,12 @@ export async function convertEstimateHandler(request: FastifyRequest, reply: Fas
 
 export async function listEstimateItemsHandler(request: FastifyRequest, reply: FastifyReply): Promise<FastifyReply> {
   const params = request.params as EstimateIdParams;
-  const items = await listItems(request.company.id, params.id);
+  const detail = await getEstimateForActor({
+    companyId: request.company.id, userId: request.user.id, role: request.user.role
+  }, params.id);
 
   return reply.send({
-    items: items.map((item) => toEstimateItemResponse(item))
+    items: detail.items.map((item) => toEstimateItemResponse(item))
   });
 }
 

@@ -99,6 +99,22 @@ function seedEstimateGraph(companyId: string) {
 }
 
 describe("estimate.service", () => {
+  it("rejects a technician mutation at the service boundary without a state event", async () => {
+    const { company, actor: owner } = createAdminContext();
+    const technician = fakeDb.seedUser({ companyId: company.id, email: "tech@example.com",
+      firstName: "Tess", lastName: "Tech", role: "technician" });
+    const { customer } = seedEstimateGraph(company.id);
+    const estimate = fakeDb.seedEstimate({ companyId: company.id, customerId: customer.id,
+      title: "Unchanged", status: "draft" });
+    const eventsBefore = fakeDb.getTestState().activityEvents.length;
+    await expect(estimateService.updateEstimate(company.id, technician.id, estimate.id,
+      { title: "Forbidden" })).rejects.toMatchObject({ code: ErrorCode.FORBIDDEN });
+    fakeDb.getTestState().users.find((user) => user.id === owner.id)!.isActive = false;
+    await expect(estimateService.updateEstimate(company.id, owner.id, estimate.id,
+      { title: "Also forbidden" })).rejects.toMatchObject({ code: ErrorCode.FORBIDDEN });
+    expect(fakeDb.getTestState().estimates.find((row) => row.id === estimate.id)?.title).toBe("Unchanged");
+    expect(fakeDb.getTestState().activityEvents).toHaveLength(eventsBefore);
+  });
   it("listEstimates paginates and filters by status, customer, job, and title search", async () => {
     const { company } = createAdminContext();
     const { customer, job } = seedEstimateGraph(company.id);

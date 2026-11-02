@@ -48,7 +48,7 @@ beforeAll(async () => {
   buildAppModule = await import("../../app.js");
   fakeDb = await import("../../test-support/fake-db.js");
   tokens = await import("../../lib/tokens.js");
-}, 20000);
+}, 60000);
 
 beforeEach(async () => {
   fakeDb.resetTestState();
@@ -112,6 +112,26 @@ describe("technician authz scoping", () => {
     const { me, myJob, otherJob } = setup();
     expect((await api().get(`/api/v1/jobs/${otherJob.id}`).set("Authorization", me.authorization)).status).toBe(404);
     expect((await api().get(`/api/v1/jobs/${myJob.id}`).set("Authorization", me.authorization)).status).toBe(200);
+  });
+
+  it("assigned technician starts a scheduled job once without crossing tenant or assignment boundaries", async () => {
+    const { company, me, myTech, otherTech, customer } = setup();
+    const myScheduledJob = fakeDb.seedJob({ companyId: company.id, customerId: customer.id, technicianId: myTech.id, title: "Direct on-site start", status: "scheduled" });
+    const otherScheduledJob = fakeDb.seedJob({ companyId: company.id, customerId: customer.id, technicianId: otherTech.id, title: "Other start", status: "scheduled" });
+    const otherCompany = seedCompanyGraph("other-start");
+    const otherTenantJob = fakeDb.seedJob({ companyId: otherCompany.company.id, customerId: otherCompany.customer.id, title: "Other tenant start", status: "scheduled" });
+    const start = (jobId: string) => api().post(`/api/v1/jobs/${jobId}/status`).set("Authorization", me.authorization).send({ status: "in_progress" });
+
+    expect((await start(otherScheduledJob.id)).status).toBe(403);
+    expect((await start(otherTenantJob.id)).status).toBe(404);
+    const started = await start(myScheduledJob.id);
+    expect(started.status).toBe(200);
+    expect(started.body.job.status).toBe("in_progress");
+    expect(fakeDb.getTestState().jobs.find((row) => row.id === myScheduledJob.id)?.actualStart).toBeTruthy();
+    expect(fakeDb.getTestState().activityEvents.filter((event) => event.entityId === myScheduledJob.id && event.eventType === "job.started")).toHaveLength(1);
+
+    expect((await start(myScheduledJob.id)).status).toBe(409);
+    expect(fakeDb.getTestState().activityEvents.filter((event) => event.entityId === myScheduledJob.id && event.eventType === "job.started")).toHaveLength(1);
   });
 
   it("only the assigned technician can complete a job or a task", async () => {

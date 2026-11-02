@@ -89,6 +89,7 @@ export function JobDetailClient({ jobId }: JobDetailClientProps) {
   }, [job]);
 
   const progress = getTaskProgress(tasks);
+  const checklistState = tasksQuery.isError ? "error" : tasksQuery.data ? "ready" : "loading";
   const taxRate = getCompanyTaxRate(companyQuery.data?.company.settings);
 
   async function handleNotesBlur() {
@@ -159,6 +160,9 @@ export function JobDetailClient({ jobId }: JobDetailClientProps) {
       <JobHeader
         job={job}
         pendingRequiredTasks={progress.pendingRequired.length}
+        checklistState={checklistState}
+        checklistRefreshing={tasksQuery.isFetching}
+        onRetryChecklist={() => void tasksQuery.refetch()}
         onOpenOTW={() => setOtwComposerOpen(true)}
         invoiceAction={<CreateInvoiceAction job={job} products={products} taxRate={taxRate > 0 ? taxRate : null} />}
         onReschedule={canChangeSchedule ? () => setScheduleMode("reschedule") : undefined}

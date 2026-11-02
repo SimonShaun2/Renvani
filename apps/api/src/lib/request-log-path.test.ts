@@ -35,3 +35,14 @@ describe("requestPathForLog manage token", () => {
     expect(requestPathForLog("/api/v1/public/booking/manage/tok123?a=1")).toBe("/api/v1/public/booking/manage/[REDACTED]");
   });
 });
+
+describe("VIP join token in path", () => {
+  it("redacts the segment after /public/vip/join/ in request paths and serialized URLs", () => {
+    expect(requestPathForLog("/api/v1/public/vip/join/join-tok-1")).toBe("/api/v1/public/vip/join/[REDACTED]");
+    expect(requestPathForLog("/api/v1/public/vip/join/join-tok-1?ref=x")).toBe("/api/v1/public/vip/join/[REDACTED]");
+    expect(redactAccessTokenInUrl("/api/v1/public/vip/join/join-tok-1/confirm?access_token=t")).toBe(
+      "/api/v1/public/vip/join/[REDACTED]/confirm?access_token=%5BREDACTED%5D"
+    );
+    expect(requestPathForLog("/api/v1/public/vip/plans")).toBe("/api/v1/public/vip/plans");
+  });
+});

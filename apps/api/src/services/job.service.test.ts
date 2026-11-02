@@ -118,6 +118,7 @@ describe("job state machine", () => {
 
   it("transition returns the next status or throws CONFLICT with the current status", () => {
     expect(stateMachine.transition("scheduled", "dispatched")).toBe("dispatched");
+    expect(stateMachine.transition("scheduled", "in_progress")).toBe("in_progress");
     expect(stateMachine.transition("cancelled", "lead")).toBe("lead");
 
     expect(() => stateMachine.transition("lead", "paid")).toThrowError(/lead to paid/i);
@@ -129,6 +130,7 @@ describe("job state machine", () => {
   it("getAvailableTransitions excludes the rescheduled event pseudo-status", () => {
     expect(stateMachine.getAvailableTransitions("scheduled")).toEqual([
       "dispatched",
+      "in_progress",
       "on_hold",
       "cancelled"
     ]);

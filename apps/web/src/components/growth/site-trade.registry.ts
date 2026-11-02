@@ -80,12 +80,13 @@ export function buildOpeningHours(
 }
 
 /** Trade-correct title, description and keywords for /site/[slug]. */
-export function buildSiteMetadataCopy(settings: Pick<PublicBookingSettingsRecord, "companyName" | "tagline" | "trade">) {
+export function buildSiteMetadataCopy(settings: Pick<PublicBookingSettingsRecord, "companyName" | "tagline" | "trade" | "intakeMode">) {
   const trade = settings.trade && Object.hasOwn(SITE_TRADES, settings.trade)
     ? SITE_TRADES[settings.trade]
     : SITE_TRADES.other;
   const title = `${settings.companyName} · ${trade.label}`;
-  const description =
-    settings.tagline ?? `${settings.companyName}: ${trade.label.toLowerCase()}. Review available services or send a direct inquiry.`;
+  const description = settings.tagline ?? (settings.intakeMode === "bookable"
+    ? `${settings.companyName}: ${trade.label.toLowerCase()}. Review available services or send a direct inquiry.`
+    : `${settings.companyName}: ${trade.label.toLowerCase()}. Send an inquiry and the team will confirm service availability.`);
   return { trade, title, description, keywords: [settings.companyName, ...trade.keywords] };
 }

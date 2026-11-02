@@ -83,6 +83,7 @@ describe("branded-storefront.utils", () => {
     const model = buildBrandedStorefrontViewModel(baseSettings);
 
     expect(model.serviceCards).toEqual([]);
+    expect(model.tagline).not.toContain("Review available services");
     expect(model.eyebrow).toBe("LOCAL SERVICE");
     expect(model.headline).toBe("Local service from Sparkle & Co.");
     expect(model.bookingSlug).toBe("sparkle-co");

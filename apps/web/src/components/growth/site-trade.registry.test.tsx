@@ -43,6 +43,12 @@ describe("site trade registry", () => {
     expect(JSON.stringify(SITE_TRADES).toLowerCase()).not.toMatch(/residential cleaning|maid|restaurant|menu/);
   });
 
+  it.each(["hvac", "plumbing"] as const)("does not promise available services in zero-service %s metadata", (trade) => {
+    const metadata = buildSiteMetadataCopy({ ...base, trade });
+    expect(metadata.description).toContain("confirm service availability");
+    expect(metadata.description).not.toContain("Review available services");
+  });
+
   it.each(["cleaning", "restaurant", "", 42, null])("unknown or missing trade %j falls back to other", (trade) => {
     expect(resolveSiteTrade({ trade } as never).key).toBe("other");
   });

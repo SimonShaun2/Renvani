@@ -145,7 +145,9 @@ export function buildBrandedStorefrontViewModel(
   const companyName = settings.companyName.trim() || "Your service team";
   const tagline =
     settings.tagline?.trim() ||
-    "Tell us what you need. Review available services or send an inquiry; the team will confirm the next step.";
+    (settings.intakeMode === "bookable"
+      ? "Tell us what you need. Review available services or send an inquiry; the team will confirm the next step."
+      : "Tell us what you need. Send an inquiry and the team will confirm service availability and the next step.");
   const serviceAreaZips = settings.serviceAreaZipCodes ?? [];
   const configuredTrade = settings.trade ?? null;
   const headlineCompanyName = /[.!?]$/u.test(companyName) ? companyName : `${companyName}.`;

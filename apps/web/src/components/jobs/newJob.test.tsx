@@ -9,7 +9,6 @@ import {
   lineItemsSubtotal,
   newJobServiceFeeLabel,
   parseNewJobQuery,
-  saveJobLineItems,
   toAddJobProductInput,
   validateNewJob
 } from "./newJob.config";
@@ -25,15 +24,23 @@ vi.mock("next/link", () => ({
 }));
 
 const mutate = vi.fn();
-const hooks = vi.hoisted(() => ({ createState: { isPending: false, isError: false } }));
+const hooks = vi.hoisted(() => ({
+  createState: { isPending: false, isError: false },
+  unavailableCustomerIds: new Set<string>()
+}));
 vi.mock("@/src/hooks/jobs.hooks", () => ({
   useCreateJob: () => ({ mutate, ...hooks.createState }),
   useJobsList: () => ({ data: { data: [], total: 0, totalPages: 1 }, isLoading: false, isError: false })
 }));
 vi.mock("@/src/hooks/customers.hooks", () => ({
   useCustomer: (id: string | null) => ({
-    data: id ? { customer: { id, firstName: "Dana", lastName: "Whitfield", displayName: null, phone: "555-0100", email: null } } : undefined,
-    isError: false
+    data: id && !hooks.unavailableCustomerIds.has(id)
+      ? { customer: { id, firstName: "Dana", lastName: "Whitfield", displayName: null, phone: "555-0100", email: null } }
+      : undefined,
+    isError: Boolean(id && hooks.unavailableCustomerIds.has(id)),
+    isLoading: false,
+    isPending: false,
+    isSuccess: Boolean(id && !hooks.unavailableCustomerIds.has(id))
   }),
   useCustomerProperties: (id: string | null) => ({
     data: id ? { properties: [{ id: "p1", addressLine1: "1842 Aspen Ridge Dr", city: "Denver", state: "CO" }] } : undefined,
@@ -45,8 +52,6 @@ vi.mock("@/src/hooks/dispatch.hooks", () => ({
     data: q.length >= 2 ? { customers: [{ id: "c9", firstName: "Grace", lastName: "Lin", displayName: null, email: null, phone: null }] } : undefined
   })
 }));
-const apiPost = vi.fn();
-vi.mock("@/src/lib/api", () => ({ api: { post: (...a: unknown[]) => apiPost(...a) } }));
 vi.mock("@/src/hooks/price-book.hooks", () => ({
   usePriceBookItemSearch: (q: string) => ({
     data: q ? { items: [{ priceBookItemId: "pb1", name: "Furnace tune-up", description: null, unitPrice: "129.00", isTaxable: true, itemType: "service" }, { priceBookItemId: "pb2", name: "Air filter", description: null, unitPrice: "18.00", isTaxable: true, itemType: "material" }] } : undefined
@@ -122,6 +127,24 @@ describe("buildCreateJobPayload", () => {
     expect(full.scheduledStart).toBe(new Date("2026-10-29T10:00").toISOString());
     expect(full.scheduledEnd).toBe(new Date("2026-10-29T12:00").toISOString());
   });
+
+  it("includes catalog-backed line items in the transactional create payload", () => {
+    const values = { ...emptyNewJobValues("c1"), type: "maintenance" };
+    const items = [
+      {
+        priceBookItemId: "pb1",
+        name: "Air filter",
+        description: null,
+        unitPrice: 18,
+        quantity: 2,
+        isTaxable: true
+      }
+    ];
+
+    expect(buildCreateJobPayload(values, items)).toMatchObject({
+      products: [{ productCatalogId: "pb1", quantity: 2 }]
+    });
+  });
 });
 
 describe("line items and fee", () => {
@@ -131,7 +154,7 @@ describe("line items and fee", () => {
     expect(items).toHaveLength(1);
     expect(items[0]!.quantity).toBe(2);
     expect(lineItemsSubtotal([...items, { ...items[0]!, priceBookItemId: "x", unitPrice: 129, quantity: 1 }])).toBe(165);
-    expect(toAddJobProductInput(items[0]!)).toEqual({ name: "Air filter", quantity: 2, unitPrice: 18, isTaxable: true });
+    expect(toAddJobProductInput(items[0]!)).toEqual({ productCatalogId: "pb1", quantity: 2 });
   });
   it("Service Fee label only on Flex; hidden on Flat/none", () => {
     expect(newJobServiceFeeLabel(2)).toBe("Service Fee (2%) · paid by customer at checkout");
@@ -147,6 +170,8 @@ describe("parseNewJobQuery", () => {
     expect(parseNewJobQuery({ customerId: "c1" })).toEqual({ open: false, customerId: "c1" });
     expect(parseNewJobQuery({ new: "1", customerId: "../x" })).toEqual({ open: true, customerId: "" });
     expect(parseNewJobQuery({ new: ["1"], customerId: ["c2", "c3"] })).toEqual({ open: true, customerId: "c2" });
+    expect(parseNewJobQuery({ new: "1", customerId: "x".repeat(65) })).toEqual({ open: true, customerId: "" });
+    expect(parseNewJobQuery({ new: "1", customerId: "c1?new=1" })).toEqual({ open: true, customerId: "" });
   });
 });
 
@@ -154,9 +179,9 @@ describe("NewJobPanel", () => {
   beforeEach(() => {
     mutate.mockReset();
     push.mockReset();
-    apiPost.mockReset();
     connectState.fee = 2;
     hooks.createState = { isPending: false, isError: false };
+    hooks.unavailableCustomerIds.clear();
   });
   afterEach(() => cleanup());
 
@@ -167,6 +192,25 @@ describe("NewJobPanel", () => {
     expect((screen.getByLabelText("Service address") as HTMLSelectElement).value).toBe("p1");
     expect(screen.getByText("Autofilled — customer has one address")).toBeTruthy();
     expect(screen.getByTestId("new-job-number").textContent).toBe("Job # assigned on create");
+  });
+
+  it("does not submit a stale or cross-tenant customer deep link and lets the user recover", () => {
+    hooks.unavailableCustomerIds.add("unavailable-customer");
+    render(<NewJobPanel initialCustomerId="unavailable-customer" />);
+    fireEvent.change(screen.getByLabelText("Job type / service"), { target: { value: "maintenance" } });
+    fireEvent.click(screen.getByRole("button", { name: "Create job" }));
+    expect(mutate).not.toHaveBeenCalled();
+    expect(screen.getByRole("button", { name: "Change" })).toBeTruthy();
+    expect(screen.getByRole("alert").textContent).toMatch(/customer unavailable/i);
+  });
+
+  it("keeps a pending create action from being submitted again", () => {
+    hooks.createState = { isPending: true, isError: false };
+    render(<NewJobPanel initialCustomerId="c1" />);
+    const submit = screen.getByRole("button", { name: "Creating…" }) as HTMLButtonElement;
+    expect(submit.disabled).toBe(true);
+    fireEvent.click(submit);
+    expect(mutate).not.toHaveBeenCalled();
   });
 
   it("shows the frame 160:102 error state and does not submit", () => {
@@ -186,9 +230,10 @@ describe("NewJobPanel", () => {
     expect(form.className).not.toMatch(/(^| )grid-cols-2/);
   });
 
-  it("adds price-book items, shows subtotal and fee line, posts items after create", async () => {
-    apiPost.mockResolvedValue({});
-    mutate.mockImplementation(async (_payload, opts: { onSuccess: (d: unknown) => Promise<void> }) => opts.onSuccess({ job: { id: "j42" } }));
+  it("adds price-book items and creates the job and catalog lines atomically", async () => {
+    mutate.mockImplementation((_payload, opts: { onSuccess: (d: { job: { id: string } }) => void }) =>
+      opts.onSuccess({ job: { id: "j42" } })
+    );
     render(<NewJobPanel initialCustomerId="c1" />);
     expect(screen.getByText("No items yet")).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "+ Add item from price book" }));
@@ -204,58 +249,35 @@ describe("NewJobPanel", () => {
       fireEvent.click(screen.getByRole("button", { name: "Create job" }));
     });
     expect(mutate).toHaveBeenCalledWith(
-      { customerId: "c1", propertyId: "p1", technicianId: "t1", title: "Maintenance", type: "maintenance", priority: "normal" },
+      {
+        customerId: "c1",
+        propertyId: "p1",
+        technicianId: "t1",
+        title: "Maintenance",
+        type: "maintenance",
+        priority: "normal",
+        products: [{ productCatalogId: "pb1", quantity: 1 }]
+      },
       expect.any(Object)
     );
-    expect(apiPost).toHaveBeenCalledWith("/api/v1/jobs/j42/products", { name: "Furnace tune-up", quantity: 1, unitPrice: 129, isTaxable: true });
     expect(push).toHaveBeenCalledWith("/jobs/j42");
   });
 
-  it("stays on the panel when a line item fails and retries only failed items without a second job", async () => {
-    let furnaceFails = true;
-    apiPost.mockImplementation((_path: string, body: { name: string }) => {
-      if (body.name === "Furnace tune-up" && furnaceFails) {
-        furnaceFails = false;
-        return Promise.reject(new Error("500"));
-      }
-      return Promise.resolve({});
-    });
-    mutate.mockImplementation(async (_payload, opts: { onSuccess: (d: unknown) => void }) => opts.onSuccess({ job: { id: "j42" } }));
+  it("keeps the form retryable when the atomic create rejects a line item", async () => {
+    hooks.createState = { isPending: false, isError: true };
     render(<NewJobPanel initialCustomerId="c1" />);
     fireEvent.click(screen.getByRole("button", { name: "+ Add item from price book" }));
     fireEvent.change(screen.getByLabelText("Search price book"), { target: { value: "furn" } });
     fireEvent.click(screen.getByRole("button", { name: /Furnace tune-up/ }));
-    if (!screen.queryByLabelText("Search price book")) fireEvent.click(screen.getByRole("button", { name: "+ Add item from price book" }));
-    fireEvent.change(screen.getByLabelText("Search price book"), { target: { value: "air" } });
-    fireEvent.click(screen.getByRole("button", { name: /Air filter/ }));
     fireEvent.change(screen.getByLabelText("Job type / service"), { target: { value: "maintenance" } });
     await act(async () => {
       fireEvent.click(screen.getByRole("button", { name: "Create job" }));
     });
     expect(push).not.toHaveBeenCalled();
-    expect(screen.getByRole("alert").textContent).toContain("couldn't be saved");
-    expect(screen.getByRole("alert").textContent).toContain("Job created. Retry saving the failed items.");
-    expect((screen.getByTestId("new-job-editor") as HTMLFieldSetElement).disabled).toBe(true);
-    expect((screen.getByLabelText("Job type / service").closest("fieldset") as HTMLFieldSetElement).disabled).toBe(true);
-    expect((screen.getByLabelText("Assigned crew / van (optional)").closest("fieldset") as HTMLFieldSetElement).disabled).toBe(true);
-    expect((screen.getByRole("button", { name: "Create job" }) as HTMLButtonElement).disabled).toBe(true);
-    expect((screen.getByRole("button", { name: "Retry failed items" }) as HTMLButtonElement).disabled).toBe(false);
-    await act(async () => {
-      fireEvent.click(screen.getByRole("button", { name: "Retry failed items" }));
-    });
+    expect(screen.getByRole("alert").textContent).toContain("couldn't create the job");
+    expect((screen.getByTestId("new-job-editor") as HTMLFieldSetElement).disabled).toBe(false);
+    expect((screen.getByRole("button", { name: "Create job" }) as HTMLButtonElement).disabled).toBe(false);
     expect(mutate).toHaveBeenCalledTimes(1);
-    expect(apiPost).toHaveBeenCalledTimes(3);
-    expect(apiPost.mock.calls.filter(([, b]) => (b as { name: string }).name === "Air filter")).toHaveLength(1);
-    expect(apiPost).toHaveBeenLastCalledWith("/api/v1/jobs/j42/products", { name: "Furnace tune-up", quantity: 1, unitPrice: 129, isTaxable: true });
-    expect(push).toHaveBeenCalledWith("/jobs/j42");
-  });
-
-  it("saveJobLineItems returns only the failed items", async () => {
-    const a = { priceBookItemId: "a", name: "A", description: null, unitPrice: 1, quantity: 1, isTaxable: true, itemType: "service" };
-    const b = { ...a, priceBookItemId: "b", name: "B" };
-    const post = vi.fn((_p: string, body: { name?: string }) => (body.name === "B" ? Promise.reject(new Error("x")) : Promise.resolve({})));
-    const failed = await saveJobLineItems("j1", [a, b] as never, post);
-    expect(failed.map((i) => i.name)).toEqual(["B"]);
   });
 
   it("hides the Service Fee line on Flat", () => {

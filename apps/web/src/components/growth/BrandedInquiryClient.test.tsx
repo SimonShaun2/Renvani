@@ -30,6 +30,7 @@ const baseSettings = {
   companyName: "Summit Service",
   companySlug: "summit",
   bookingSlug: "summit",
+  intakeMode: "inquiry_only" as const,
   offeredServices: [] as Array<Record<string, unknown>>,
   availableHoursStart: 8,
   availableHoursEnd: 17,
@@ -138,7 +139,7 @@ describe("BrandedInquiryClient", () => {
   it("keeps configured-service unknown coverage behind the existing positive ZIP gate", async () => {
     mocks.checkZip.mockResolvedValue({ covered: false });
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true, json: async () => ({ accepted: true }) }));
-    const model = buildBrandedStorefrontViewModel({ ...baseSettings, trade: "hvac", offeredServices: [{ label: "AC repair" }] });
+    const model = buildBrandedStorefrontViewModel({ ...baseSettings, trade: "hvac", intakeMode: "bookable", offeredServices: [{ label: "AC repair" }] });
     render(<BrandedInquiryClient model={model} acquisitionSource="website" />);
     fillRequiredFields();
 
@@ -147,6 +148,29 @@ describe("BrandedInquiryClient", () => {
     await waitFor(() => expect(screen.getByRole("alert").textContent).toContain("Your inquiry was not sent."));
     expect(mocks.checkZip).toHaveBeenCalledOnce();
     expect(mocks.submit).not.toHaveBeenCalled();
+  });
+
+  it.each(["hvac", "plumbing"] as const)("submits a zero-service %s inquiry without a positive ZIP gate", async (trade) => {
+    mocks.submit.mockResolvedValue({
+      kind: "inquiry_only",
+      bookingRequest: { id: "request-2", referenceNumber: "REF-NEW", status: "pending" },
+      serviceability: "unknown"
+    });
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true, json: async () => ({ accepted: true }) }));
+    const model = buildBrandedStorefrontViewModel({
+      ...baseSettings,
+      trade,
+      offeredServices: [{ label: "Suggested repair", source: "trade_default" }]
+    });
+    render(<BrandedInquiryClient model={model} acquisitionSource="website" />);
+    fillRequiredFields();
+
+    fireEvent.click(screen.getByRole("button", { name: "Send inquiry" }));
+
+    await waitFor(() => expect(screen.getByText("REF-NEW")).toBeTruthy());
+    expect(mocks.checkZip).not.toHaveBeenCalled();
+    expect(mocks.submit).toHaveBeenCalledOnce();
+    expect(screen.queryByRole("link", { name: "Review booking options" })).toBeNull();
   });
 
   it("keeps a spoken submit label and busy state while sending", () => {
@@ -168,7 +192,7 @@ describe("BrandedInquiryClient", () => {
     ["plumbing", "Plumbing", "Drain cleaning"],
     [undefined, "Drain inspection", "Drain inspection"]
   ] as const)("submits %s inquiry without implied SMS consent", async (trade, category, serviceType) => {
-    const settings = { ...baseSettings, ...(trade ? { trade, offeredServices: [{ label: serviceType }] } : {}) };
+    const settings = { ...baseSettings, ...(trade ? { trade, intakeMode: "bookable" as const, offeredServices: [{ label: serviceType }] } : {}) };
     const model = buildBrandedStorefrontViewModel(settings);
     mocks.checkZip.mockResolvedValue({ covered: true });
     mocks.submit.mockResolvedValue({ confirmation: { referenceNumber: "REF-1" } });

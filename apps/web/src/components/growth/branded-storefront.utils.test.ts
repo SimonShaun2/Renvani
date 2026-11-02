@@ -14,6 +14,7 @@ const baseSettings = {
   companyName: "Sparkle & Co.",
   companySlug: "sparkle-co",
   bookingSlug: "sparkle-co",
+  intakeMode: "inquiry_only" as const,
   offeredServices: [],
   availableHoursStart: 8,
   availableHoursEnd: 17,
@@ -37,6 +38,7 @@ describe("branded-storefront.utils", () => {
 
   it("summarizes service area zips for local SEO copy", () => {
     expect(buildServiceAreaSummary(["90210", "90211", "90210"])).toContain("90210");
+    expect(buildServiceAreaSummary([])).toBe("The team will confirm service availability when they review your request.");
   });
 
   it("emits LocalBusiness JSON-LD without fabricated ratings", () => {
@@ -93,5 +95,15 @@ describe("branded-storefront.utils", () => {
     const model = buildBrandedStorefrontViewModel({ ...baseSettings, trade });
     expect(model.eyebrow).toBe(eyebrow);
     expect(model.headline).toBe(headline);
+  });
+
+  it.each(["hvac", "plumbing"] as const)("does not promote %s trade suggestions into bookable services", (trade) => {
+    const model = buildBrandedStorefrontViewModel({
+      ...baseSettings,
+      trade,
+      offeredServices: [{ label: "Suggested repair", source: "trade_default" }]
+    });
+    expect(model.intakeMode).toBe("inquiry_only");
+    expect(model.serviceCards).toEqual([]);
   });
 });

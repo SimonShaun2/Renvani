@@ -8,6 +8,7 @@ const settings = {
   companyName: "Summit Service",
   companySlug: "summit",
   bookingSlug: "summit",
+  intakeMode: "inquiry_only" as const,
   offeredServices: [] as Array<Record<string, unknown>>,
   availableHoursStart: 8,
   availableHoursEnd: 17,
@@ -31,12 +32,25 @@ describe("BrandedStorefront", () => {
   });
 
   it.each(["hvac", "plumbing"] as const)("shows configured %s trade and offered services only", (trade) => {
-    const model = buildBrandedStorefrontViewModel({ ...settings, trade, offeredServices: [{ label: "Annual maintenance" }] });
+    const model = buildBrandedStorefrontViewModel({ ...settings, trade, intakeMode: "bookable", offeredServices: [{ label: "Annual maintenance" }] });
     const html = renderToStaticMarkup(<BrandedStorefront model={model} />);
     expect(html).toContain(trade === "hvac" ? "Heating and cooling service" : "Plumbing service");
     expect(html).toContain("Annual maintenance");
     expect(html).toContain("/book/summit?src=website");
     expect(html).toContain("Check service options");
     expect(html).not.toContain("$186");
+  });
+
+  it.each(["hvac", "plumbing"] as const)("routes zero-service %s trade to inquiry even if old data contains suggestions", (trade) => {
+    const model = buildBrandedStorefrontViewModel({
+      ...settings,
+      trade,
+      offeredServices: [{ label: "Suggested repair", source: "trade_default" }]
+    });
+    const html = renderToStaticMarkup(<BrandedStorefront model={model} />);
+    expect(html).toContain("/site/summit/inquire?src=website");
+    expect(html).not.toContain("/book/summit?src=website");
+    expect(html).not.toContain("Suggested repair");
+    expect(html).not.toContain("Pricing");
   });
 });

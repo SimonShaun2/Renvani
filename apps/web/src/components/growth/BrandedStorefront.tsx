@@ -19,7 +19,7 @@ export function BrandedStorefront({ model, previewBanner }: BrandedStorefrontPro
   const bookHref = buildBookPath(model.bookingSlug);
   const inquireHref = buildInquirePath(model.bookingSlug);
   const showReviewsLink = model.reviewLinks.length > 0;
-  const hasServices = model.serviceCards.length > 0;
+  const hasServices = model.intakeMode === "bookable" && model.serviceCards.length > 0;
   const primaryHref = hasServices ? bookHref : inquireHref;
   const primaryLabel = hasServices ? "Book a service" : "Send an inquiry";
 

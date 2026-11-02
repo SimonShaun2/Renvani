@@ -120,7 +120,7 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
       }
 
       // For an unconfigured shop, only the server can distinguish unknown coverage from a known out-of-area ZIP.
-      if (model.serviceCards.length > 0) {
+      if (model.intakeMode === "bookable") {
         const coverage = await zipCheckMutation.mutateAsync(zip.trim());
         if (!coverage.covered) {
           setErrorMessage("This shop has not confirmed service in that ZIP. Your inquiry was not sent.");
@@ -178,7 +178,7 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
           )}
         </p>
         <p className="mt-3 text-sm text-[#5e6684]">Reference <span className="font-mono font-medium text-[#0f1530]">{referenceNumber}</span>.</p>
-        {!inquiryOnlyReceived && model.serviceCards.length > 0 ? (
+        {!inquiryOnlyReceived && model.intakeMode === "bookable" ? (
           <Link href={bookHref} className="mt-6 inline-flex text-sm font-semibold text-[#2f7d4f] hover:underline">
             Review booking options
           </Link>

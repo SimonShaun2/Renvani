@@ -9,6 +9,7 @@ const base = {
   companyName: "Summit Heating",
   companySlug: "summit",
   bookingSlug: "summit",
+  intakeMode: "inquiry_only" as const,
   offeredServices: [] as Array<Record<string, unknown>>,
   availableHoursStart: 8,
   availableHoursEnd: 17,
@@ -21,7 +22,7 @@ const base = {
   phone: "555-0100",
   serviceAreaZipCodes: ["60601"]
 };
-const withServices = (...labels: string[]) => ({ ...base, offeredServices: labels.map((label) => ({ label })) });
+const withServices = (...labels: string[]) => ({ ...base, intakeMode: labels.length > 0 ? "bookable" as const : "inquiry_only" as const, offeredServices: labels.map((label) => ({ label })) });
 
 describe("site trade registry", () => {
   it.each([

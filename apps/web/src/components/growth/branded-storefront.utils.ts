@@ -1,6 +1,6 @@
 import { buildOpeningHours, type SiteTradeConfig } from "@/src/components/growth/site-trade.registry";
 import type { PublicBookingSettingsRecord } from "@/src/hooks/booking.hooks";
-import type { HomeServiceTrade } from "@fsm/types";
+import type { HomeServiceTrade, PublicBookingIntakeMode } from "@fsm/types";
 
 export interface BrandedServiceCard {
   id: string;
@@ -23,6 +23,7 @@ export interface BrandedStorefrontViewModel {
   eyebrow: string;
   headline: string;
   configuredTrade: HomeServiceTrade | null;
+  intakeMode: PublicBookingIntakeMode;
   phone: string | null;
   logoUrl: string | null;
   serviceCards: BrandedServiceCard[];
@@ -127,7 +128,7 @@ export function buildServiceAreaSummary(zips: string[]): string {
   const unique = Array.from(new Set(zips.map((zip) => zip.trim()).filter((zip) => zip.length > 0))).sort();
 
   if (unique.length === 0) {
-    return "Service area confirmed during booking or inquiry.";
+    return "The team will confirm service availability when they review your request.";
   }
 
   if (unique.length <= 6) {
@@ -160,11 +161,12 @@ export function buildBrandedStorefrontViewModel(
     eyebrow,
     headline,
     configuredTrade,
+    intakeMode: settings.intakeMode,
     bookingSlug: settings.bookingSlug || settings.companySlug,
     tagline,
     phone: settings.phone ?? null,
     logoUrl: settings.logoUrl ?? null,
-    serviceCards: buildServiceCards(settings.offeredServices),
+    serviceCards: settings.intakeMode === "bookable" ? buildServiceCards(settings.offeredServices) : [],
     serviceAreaSummary: buildServiceAreaSummary(serviceAreaZips),
     serviceAreaZips: serviceAreaZips,
     trustLine: options?.staffPreviewLine?.trim() || null,

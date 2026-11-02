@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { HomeServiceTrade, PublicBookingSubmitResponse } from "@fsm/types";
+import type { HomeServiceTrade, PublicBookingIntakeMode, PublicBookingSubmitResponse } from "@fsm/types";
 
 import { api } from "@/src/lib/api";
 import { publicApi } from "@/src/lib/public-api";
@@ -18,6 +18,7 @@ export interface PublicBookingSettingsRecord {
   companyName: string;
   companySlug: string;
   bookingSlug: string;
+  intakeMode: PublicBookingIntakeMode;
   offeredServices: Array<Record<string, unknown>>;
   availableHoursStart: number;
   availableHoursEnd: number;

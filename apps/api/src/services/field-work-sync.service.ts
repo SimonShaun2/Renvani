@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, isNull, sql } from "drizzle-orm";
 
 import {
   db,
@@ -16,6 +16,8 @@ import {
   AppError,
   ErrorCode,
   FIELD_WORK_SYNC_CONTRACT_VERSION,
+  type CaptureJobSignatureBody,
+  type SignerRole,
   type FieldWorkSyncOperationInput,
   type FieldWorkSyncOperationOutcome,
   type SubmitFieldWorkSyncBatchBody,
@@ -34,11 +36,29 @@ import {
   toJobSignatureObjectRef
 } from "../lib/job-signature-ref.js";
 
-import { addNote, addPhoto, transitionStatus } from "./job.service.js";
-import { updateTask } from "./job-tasks.service.js";
+import {
+  addNoteInTransaction,
+  addPhotoInTransaction,
+  invalidateJobDispatchDate,
+  transitionStatusInTransaction
+} from "./job.service.js";
+import { updateTaskInTransaction } from "./job-tasks.service.js";
 
 type BatchRow = typeof fieldSyncBatches.$inferSelect;
 type OperationRow = typeof fieldSyncOperations.$inferSelect;
+type JobRow = typeof jobs.$inferSelect;
+type FieldSyncTransaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
+type AppliedOperation = {
+  outcome: FieldWorkSyncOperationOutcome;
+  resultPayload: Record<string, unknown>;
+  dispatchInvalidationDate?: Date | null;
+};
+
+type SignatureCaptureTransactionResult =
+  | { kind: "captured"; job: JobRow; signedAt: Date }
+  | { kind: "already_captured"; job: JobRow; recordVersion: string }
+  | { kind: "conflict"; recordVersion: string; reason: string }
+  | { kind: "rejected"; message: string };
 
 export interface FieldWorkSyncActor {
   companyId: string;
@@ -50,6 +70,7 @@ export const SIGNATURE_ATTACHMENT_INVALID = "SIGNATURE_ATTACHMENT_INVALID";
 const SIGNATURE_IMAGE_MIME_TYPES = new Set(["image/png", "image/jpeg", "image/webp"]);
 /** Signatures are small line drawings; anything larger is not a signature pad export. */
 const MAX_SIGNATURE_BYTES = 5 * 1024 * 1024;
+const operationLockTails = new Map<string, Promise<void>>();
 
 type SignatureCapturePayload = {
   attachmentId?: string | undefined;
@@ -106,6 +127,15 @@ function hashPayload(value: unknown): string {
   return createHash("sha256").update(JSON.stringify(value)).digest("hex");
 }
 
+function isUniqueViolation(error: unknown): boolean {
+  let current: unknown = error;
+  for (let depth = 0; depth < 4 && current && typeof current === "object"; depth += 1) {
+    if ((current as { code?: unknown }).code === "23505") return true;
+    current = (current as { cause?: unknown }).cause;
+  }
+  return false;
+}
+
 function toOperationResult(row: OperationRow) {
   const resultPayload = row.resultPayload as Record<string, unknown>;
   return {
@@ -117,6 +147,10 @@ function toOperationResult(row: OperationRow) {
     entityId: typeof resultPayload.entityId === "string" ? resultPayload.entityId : undefined,
     message: typeof resultPayload.message === "string" ? resultPayload.message : undefined,
     code: typeof resultPayload.code === "string" ? resultPayload.code : undefined,
+    ...(typeof resultPayload.signedAt === "string" ? { signedAt: resultPayload.signedAt } : {}),
+    ...(resultPayload.signerRole === "customer" || resultPayload.signerRole === "technician"
+      ? { signerRole: resultPayload.signerRole as "customer" | "technician" }
+      : {}),
     conflict:
       resultPayload.conflict && typeof resultPayload.conflict === "object"
         ? (resultPayload.conflict as { liveRecordVersion: string; reason: string })
@@ -124,7 +158,7 @@ function toOperationResult(row: OperationRow) {
   };
 }
 
-async function assertJobFieldAccess(
+export async function assertJobFieldAccess(
   companyId: string,
   userId: string,
   role: UserRole,
@@ -164,10 +198,11 @@ async function assertJobFieldAccess(
 }
 
 async function findExistingOperation(
+  executor: Pick<FieldSyncTransaction, "select">,
   companyId: string,
   clientOperationId: string
 ): Promise<OperationRow | null> {
-  const [row] = await db
+  const [row] = await executor
     .select()
     .from(fieldSyncOperations)
     .where(
@@ -180,6 +215,37 @@ async function findExistingOperation(
     .limit(1);
 
   return row ?? null;
+}
+
+async function withSerializedOperation<T>(
+  companyId: string,
+  clientOperationId: string,
+  callback: (tx: FieldSyncTransaction) => Promise<T>
+): Promise<T> {
+  const lockKey = `${companyId}:${clientOperationId}`;
+  const previous = operationLockTails.get(lockKey) ?? Promise.resolve();
+  let release: (() => void) | undefined;
+  const current = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  const tail = previous.then(() => current);
+  operationLockTails.set(lockKey, tail);
+  await previous;
+
+  try {
+    return await db.transaction(async (tx) => {
+      // The in-process tail avoids duplicate work within one API instance. The
+      // transaction-scoped advisory lock provides the same boundary across Render
+      // instances without creating another persistence model or schema migration.
+      await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${lockKey}, 0))`);
+      return callback(tx);
+    });
+  } finally {
+    release?.();
+    if (operationLockTails.get(lockKey) === tail) {
+      operationLockTails.delete(lockKey);
+    }
+  }
 }
 
 async function resolveBatch(
@@ -229,17 +295,41 @@ async function resolveBatch(
     return existing;
   }
 
-  const inserted = await db
-    .insert(fieldSyncBatches)
-    .values({
-      companyId: actor.companyId,
-      userId: actor.userId,
-      deviceId: input.deviceId,
-      batchClientId: input.batchClientId,
-      status: "open",
-      lastAcknowledgedSequence: 0
-    })
-    .returning();
+  let inserted: BatchRow[];
+  try {
+    inserted = await db
+      .insert(fieldSyncBatches)
+      .values({
+        companyId: actor.companyId,
+        userId: actor.userId,
+        deviceId: input.deviceId,
+        batchClientId: input.batchClientId,
+        status: "open",
+        lastAcknowledgedSequence: 0
+      })
+      .returning();
+  } catch (error: unknown) {
+    if (!isUniqueViolation(error)) throw error;
+
+    // A concurrent retry can win the unique (company, device, batchClientId) insert.
+    // PostgreSQL waits for the winner before surfacing 23505, so the committed row is
+    // visible to this read under READ COMMITTED and is safe to reuse.
+    const [raced] = await db
+      .select()
+      .from(fieldSyncBatches)
+      .where(
+        and(
+          eq(fieldSyncBatches.companyId, actor.companyId),
+          eq(fieldSyncBatches.deviceId, input.deviceId),
+          eq(fieldSyncBatches.batchClientId, input.batchClientId),
+          isNull(fieldSyncBatches.deletedAt)
+        )
+      )
+      .limit(1);
+
+    if (raced) return raced;
+    throw error;
+  }
 
   const batch = inserted[0];
   if (!batch) {
@@ -250,17 +340,15 @@ async function resolveBatch(
 }
 
 async function applyOperation(
+  tx: FieldSyncTransaction,
   actor: FieldWorkSyncActor,
   operation: FieldWorkSyncOperationInput
-): Promise<{
-  outcome: FieldWorkSyncOperationOutcome;
-  resultPayload: Record<string, unknown>;
-}> {
+): Promise<AppliedOperation> {
   await assertJobFieldAccess(actor.companyId, actor.userId, actor.role, operation.jobId);
 
   switch (operation.type) {
     case "job.note.append": {
-      const note = await addNote(actor.companyId, actor.userId, operation.jobId, {
+      const note = await addNoteInTransaction(tx, actor.companyId, actor.userId, operation.jobId, {
         content: operation.payload.content,
         isInternal: operation.payload.isInternal ?? true
       });
@@ -274,7 +362,7 @@ async function applyOperation(
       };
     }
     case "job.status.update": {
-      const [job] = await db
+      const [job] = await tx
         .select()
         .from(jobs)
         .where(
@@ -291,7 +379,8 @@ async function applyOperation(
         return buildFieldWorkSyncVersionConflict(liveVersion, "Job recordVersion is stale");
       }
 
-      const updated = await transitionStatus(
+      const updated = await transitionStatusInTransaction(
+        tx,
         actor.companyId,
         actor.userId,
         operation.jobId,
@@ -304,7 +393,8 @@ async function applyOperation(
         resultPayload: {
           entityId: updated.id,
           recordVersion: buildRecordVersionV1("job", updated.id, updated.updatedAt)
-        }
+        },
+        dispatchInvalidationDate: updated.scheduledStart
       };
     }
     case "job.task.update": {
@@ -316,7 +406,7 @@ async function applyOperation(
         return { outcome: "rejected", resultPayload: { message: versionCheck.message } };
       }
 
-      const [task] = await db
+      const [task] = await tx
         .select()
         .from(jobTasks)
         .where(
@@ -342,7 +432,13 @@ async function applyOperation(
         ...(operation.payload.status !== undefined ? { status: operation.payload.status } : {}),
         ...(operation.payload.notes !== undefined ? { notes: operation.payload.notes } : {})
       };
-      const updated = await updateTask(actor.companyId, operation.jobId, operation.payload.taskId, taskUpdateInput);
+      const updated = await updateTaskInTransaction(
+        tx,
+        actor.companyId,
+        operation.jobId,
+        operation.payload.taskId,
+        taskUpdateInput
+      );
 
       return {
         outcome: "applied",
@@ -353,23 +449,6 @@ async function applyOperation(
       };
     }
     case "job.signature.capture": {
-      const [job] = await db
-        .select()
-        .from(jobs)
-        .where(
-          and(eq(jobs.companyId, actor.companyId), eq(jobs.id, operation.jobId), isNull(jobs.deletedAt))
-        )
-        .limit(1);
-
-      if (!job) {
-        return { outcome: "rejected", resultPayload: { message: "Job not found" } };
-      }
-
-      const liveVersion = buildRecordVersionV1("job", job.id, job.updatedAt);
-      if (isStaleRecordVersion(operation.baseRecordVersion, liveVersion)) {
-        return buildFieldWorkSyncVersionConflict(liveVersion, "Job recordVersion is stale");
-      }
-
       const resolvedSignature = await resolveSignatureCaptureValue(actor.companyId, operation.jobId, operation.payload);
       if (!resolvedSignature.ok) {
         return {
@@ -379,63 +458,123 @@ async function applyOperation(
       }
       const signatureValue = resolvedSignature.value;
 
-      if (job.signatureUrl && job.signatureUrl !== signatureValue) {
-        return buildFieldWorkSyncVersionConflict(
-          liveVersion,
-          "Job already has a different signature on file"
-        );
-      }
+      const captureResult: SignatureCaptureTransactionResult = await (async () => {
+        // PostgreSQL defaultNow() retains microseconds while the JS Date used in recordVersion tokens has
+        // millisecond precision. Lock and revalidate the token instead of comparing updated_at to a rounded Date.
+        const [currentJob] = await tx
+          .select()
+          .from(jobs)
+          .where(
+            and(eq(jobs.companyId, actor.companyId), eq(jobs.id, operation.jobId), isNull(jobs.deletedAt))
+          )
+          .for("update")
+          .limit(1);
 
-      if (job.signatureUrl === signatureValue) {
+        if (!currentJob) {
+          return { kind: "rejected", message: "Job not found" };
+        }
+
+        if (actor.role === "technician") {
+          const [technician] = await tx
+            .select()
+            .from(technicians)
+            .where(
+              and(
+                eq(technicians.companyId, actor.companyId),
+                eq(technicians.userId, actor.userId),
+                isNull(technicians.deletedAt)
+              )
+            )
+            .limit(1);
+
+          if (!technician || currentJob.technicianId !== technician.id) {
+            return { kind: "rejected", message: "You are not authorized to sync work for this job" };
+          }
+        }
+
+        const currentVersion = buildRecordVersionV1("job", currentJob.id, currentJob.updatedAt);
+        // A same-signature retry is safe even when another request won the race after our attachment lookup.
+        if (currentJob.signatureUrl === signatureValue) {
+          return { kind: "already_captured", job: currentJob, recordVersion: currentVersion };
+        }
+        if (currentJob.signatureUrl) {
+          return {
+            kind: "conflict",
+            recordVersion: currentVersion,
+            reason: "Job already has a different signature on file"
+          };
+        }
+        if (isStaleRecordVersion(operation.baseRecordVersion, currentVersion)) {
+          return { kind: "conflict", recordVersion: currentVersion, reason: "Job recordVersion is stale" };
+        }
+
+        const signedAt = new Date();
+        const [captured] = await tx
+          .update(jobs)
+          .set({
+            signatureUrl: signatureValue,
+            signedByName: operation.payload.signedByName.trim(),
+            signedAt,
+            updatedAt: signedAt
+          })
+          .where(
+            and(
+              eq(jobs.companyId, actor.companyId),
+              eq(jobs.id, operation.jobId),
+              isNull(jobs.deletedAt),
+              isNull(jobs.signatureUrl)
+            )
+          )
+          .returning();
+
+        if (!captured) {
+          return { kind: "conflict", recordVersion: currentVersion, reason: "Job changed concurrently" };
+        }
+
+        await emitEventWithExecutor(tx, "job.updated", {
+          companyId: actor.companyId,
+          actorId: actor.userId,
+          actorType: "user",
+          entityType: "job",
+          entityId: captured.id,
+          jobId: captured.id,
+          customerId: captured.customerId,
+          summary: `Captured ${operation.payload.signerRole === "technician" ? "technician" : "customer"} signature on job ${captured.jobNumber}`,
+          // Never put the internal storage reference on the event bus.
+          payload: isJobSignatureObjectRef(captured.signatureUrl)
+            ? { signatureAttachmentId: operation.payload.attachmentId ?? null }
+            : { signatureSource: "legacy_https_url" }
+        });
+
+        return { kind: "captured", job: captured, signedAt };
+      })();
+
+      if (captureResult.kind === "rejected") {
+        return { outcome: "rejected", resultPayload: { message: captureResult.message } };
+      }
+      if (captureResult.kind === "conflict") {
+        return buildFieldWorkSyncVersionConflict(captureResult.recordVersion, captureResult.reason);
+      }
+      if (captureResult.kind === "already_captured") {
         return {
           outcome: "applied",
           resultPayload: {
-            entityId: job.id,
-            recordVersion: liveVersion,
-            message: "Signature already captured"
+            entityId: captureResult.job.id,
+            recordVersion: captureResult.recordVersion,
+            message: SIGNATURE_ALREADY_CAPTURED_MESSAGE,
+            ...(captureResult.job.signedAt ? { signedAt: captureResult.job.signedAt.toISOString() } : {})
           }
         };
       }
 
-      const signedAt = new Date();
-      const updatedRows = await db
-        .update(jobs)
-        .set({
-          signatureUrl: signatureValue,
-          signedByName: operation.payload.signedByName.trim(),
-          signedAt,
-          updatedAt: signedAt
-        })
-        .where(
-          and(eq(jobs.companyId, actor.companyId), eq(jobs.id, operation.jobId), isNull(jobs.deletedAt))
-        )
-        .returning();
-      const updated = updatedRows[0];
-
-      if (!updated) {
-        return { outcome: "rejected", resultPayload: { message: "Failed to capture signature" } };
-      }
-
-      await emitEventWithExecutor(db, "job.updated", {
-        companyId: actor.companyId,
-        actorId: actor.userId,
-        actorType: "user",
-        entityType: "job",
-        entityId: updated.id,
-        jobId: updated.id,
-        customerId: updated.customerId,
-        summary: `Captured customer signature on job ${updated.jobNumber}`,
-        // Never put the internal storage reference on the event bus.
-        payload: isJobSignatureObjectRef(updated.signatureUrl)
-          ? { signatureAttachmentId: operation.payload.attachmentId ?? null }
-          : { signatureUrl: updated.signatureUrl }
-      });
-
       return {
         outcome: "applied",
         resultPayload: {
-          entityId: updated.id,
-          recordVersion: buildRecordVersionV1("job", updated.id, updated.updatedAt)
+          entityId: captureResult.job.id,
+          recordVersion: buildRecordVersionV1("job", captureResult.job.id, captureResult.job.updatedAt),
+          signedAt: captureResult.signedAt.toISOString(),
+          // Signer role is persisted on the stored operation result (no jobs column / migration).
+          signerRole: operation.payload.signerRole ?? "customer"
         }
       };
     }
@@ -445,7 +584,7 @@ async function applyOperation(
         photoType: operation.payload.photoType ?? "general",
         ...(operation.payload.caption !== undefined ? { caption: operation.payload.caption } : {})
       };
-      const photo = await addPhoto(actor.companyId, actor.userId, operation.jobId, photoInput);
+      const photo = await addPhotoInTransaction(tx, actor.companyId, actor.userId, operation.jobId, photoInput);
 
       return {
         outcome: "applied",
@@ -471,71 +610,87 @@ export async function submitFieldWorkSyncBatch(
   let lastAcknowledgedSequence = batch.lastAcknowledgedSequence;
 
   for (const operation of sortedOperations) {
-    const existing = await findExistingOperation(actor.companyId, operation.clientOperationId);
-    if (existing) {
-      const storedHash = existing.payloadHash;
-      const incomingHash = hashPayload(operation);
-      const replay = resolveFieldWorkSyncClientOperationReplay({
-        storedPayloadHash: storedHash,
-        incomingPayloadHash: incomingHash,
-        storedOutcome: existing.outcome as FieldWorkSyncOperationOutcome
-      });
+    const processed = await withSerializedOperation(
+      actor.companyId,
+      operation.clientOperationId,
+      async (tx) => {
+        const existing = await findExistingOperation(tx, actor.companyId, operation.clientOperationId);
+        if (existing) {
+          const replay = resolveFieldWorkSyncClientOperationReplay({
+            storedPayloadHash: existing.payloadHash,
+            incomingPayloadHash: hashPayload(operation),
+            storedOutcome: existing.outcome as FieldWorkSyncOperationOutcome
+          });
 
-      if (replay.action === "reject") {
-        results.push({
-          clientOperationId: operation.clientOperationId,
+          if (replay.action === "reject") {
+            return {
+              acknowledged: false,
+              result: {
+                clientOperationId: operation.clientOperationId,
+                sequence: operation.sequence,
+                outcome: "rejected" as const,
+                serverOperationId: existing.id,
+                message: replay.message
+              }
+            };
+          }
+
+          const mapped = toOperationResult(existing);
+          return {
+            acknowledged: true,
+            result: {
+              ...mapped,
+              outcome: replay.action === "duplicate" ? ("duplicate" as const) : replay.outcome
+            }
+          };
+        }
+
+        let applyResult: AppliedOperation;
+        try {
+          applyResult = await applyOperation(tx, actor, operation);
+        } catch (error: unknown) {
+          if (error instanceof AppError) {
+            applyResult = { outcome: "rejected", resultPayload: { message: error.message } };
+          } else {
+            throw error;
+          }
+        }
+
+        const inserted = await tx
+        .insert(fieldSyncOperations)
+        .values({
+          companyId: actor.companyId,
+          batchId: batch.id,
           sequence: operation.sequence,
-          outcome: "rejected",
-          serverOperationId: existing.id,
-          message: replay.message
-        });
-        continue;
-      }
+          clientOperationId: operation.clientOperationId,
+          jobId: operation.jobId,
+          operationType: operation.type,
+          requestPayload: operation,
+          outcome: applyResult.outcome,
+          resultPayload: applyResult.resultPayload,
+          payloadHash: hashPayload(operation)
+        })
+        .returning();
 
-      const outcome = replay.action === "duplicate" ? "duplicate" : replay.outcome;
-      const mapped = toOperationResult(existing);
-      results.push({ ...mapped, outcome });
-      lastAcknowledgedSequence = Math.max(lastAcknowledgedSequence, operation.sequence);
-      continue;
-    }
+        const stored = inserted[0];
+        if (!stored) {
+          throw new AppError(ErrorCode.INTERNAL_ERROR, "Failed to persist sync operation");
+        }
 
-    let applyResult: { outcome: FieldWorkSyncOperationOutcome; resultPayload: Record<string, unknown> };
-    try {
-      applyResult = await applyOperation(actor, operation);
-    } catch (error: unknown) {
-      if (error instanceof AppError) {
-        applyResult = {
-          outcome: error.code === ErrorCode.FORBIDDEN || error.code === ErrorCode.NOT_FOUND ? "rejected" : "rejected",
-          resultPayload: { message: error.message }
+        return {
+          acknowledged: applyResult.outcome === "applied" || applyResult.outcome === "duplicate",
+          result: toOperationResult(stored),
+          dispatchInvalidationDate: applyResult.dispatchInvalidationDate
         };
-      } else {
-        throw error;
       }
+    );
+
+    if (processed.dispatchInvalidationDate) {
+      await invalidateJobDispatchDate(actor.companyId, processed.dispatchInvalidationDate);
     }
 
-    const inserted = await db
-      .insert(fieldSyncOperations)
-      .values({
-        companyId: actor.companyId,
-        batchId: batch.id,
-        sequence: operation.sequence,
-        clientOperationId: operation.clientOperationId,
-        jobId: operation.jobId,
-        operationType: operation.type,
-        requestPayload: operation,
-        outcome: applyResult.outcome,
-        resultPayload: applyResult.resultPayload,
-        payloadHash: hashPayload(operation)
-      })
-      .returning();
-
-    const stored = inserted[0];
-    if (!stored) {
-      throw new AppError(ErrorCode.INTERNAL_ERROR, "Failed to persist sync operation");
-    }
-
-    results.push(toOperationResult(stored));
-    if (applyResult.outcome === "applied" || applyResult.outcome === "duplicate") {
+    results.push(processed.result);
+    if (processed.acknowledged) {
       lastAcknowledgedSequence = Math.max(lastAcknowledgedSequence, operation.sequence);
     }
   }
@@ -568,5 +723,81 @@ export async function submitFieldWorkSyncBatch(
     batchClientId: input.batchClientId,
     lastAcknowledgedSequence,
     results
+  };
+}
+
+const SIGNATURE_ALREADY_CAPTURED_MESSAGE = "Signature already captured";
+
+export interface CapturedJobSignature {
+  /** true only when this request stored a new signature (route answers 201); replays / already-captured answer 200. */
+  created: boolean;
+  jobId: string;
+  outcome: "applied" | "duplicate";
+  signedAt: string | null;
+  signedByName: string | null;
+  signerRole: SignerRole | null;
+  recordVersion: string | null;
+}
+
+/**
+ * Dedicated signature capture (POST /field-work/jobs/:jobId/signature). Runs as a one-operation sync batch so it
+ * shares validation, technician scope, idempotency (clientOperationId) and the stored-ref rules with the
+ * `job.signature.capture` sync path used by #314 (that path is unchanged). Real status codes, existing error shape:
+ * 201 newly captured, 200 replay or same signature already on file, 400 invalid body / rejected signature,
+ * 401 unauthenticated, 403 role or unassigned technician, 404 job not in this company, 409 stale recordVersion or a
+ * different signature already on file. No other codes (429 only from the global per-IP rate limit).
+ */
+export async function captureJobSignature(
+  actor: FieldWorkSyncActor,
+  jobId: string,
+  body: CaptureJobSignatureBody
+): Promise<CapturedJobSignature> {
+  await assertJobFieldAccess(actor.companyId, actor.userId, actor.role, jobId);
+  const payload = {
+    signedByName: body.signedByName,
+    signerRole: body.signerRole,
+    ...(body.attachmentId !== undefined ? { attachmentId: body.attachmentId } : {}),
+    ...(body.signatureUrl !== undefined ? { signatureUrl: body.signatureUrl } : {})
+  };
+  const response = await submitFieldWorkSyncBatch(actor, {
+    contractVersion: FIELD_WORK_SYNC_CONTRACT_VERSION,
+    deviceId: "signature-endpoint",
+    batchClientId: `signature-${createHash("sha256").update(body.clientOperationId).digest("hex").slice(0, 40)}`,
+    operations: [
+      {
+        sequence: 1,
+        clientOperationId: body.clientOperationId,
+        jobId,
+        type: "job.signature.capture",
+        baseRecordVersion: body.baseRecordVersion,
+        payload
+      }
+    ]
+  } as SubmitFieldWorkSyncBatchBody);
+  const result = response.results[0];
+  if (!result) throw new AppError(ErrorCode.INTERNAL_ERROR, "Signature capture returned no result");
+  if (result.outcome === "conflict") {
+    throw new AppError(ErrorCode.CONFLICT, result.conflict?.reason ?? result.message ?? "Job recordVersion is stale", {
+      ...(result.conflict?.liveRecordVersion ? { liveRecordVersion: result.conflict.liveRecordVersion } : {})
+    });
+  }
+  if (result.outcome === "rejected") {
+    throw new AppError(ErrorCode.VALIDATION_ERROR, result.message ?? "Signature rejected", {
+      ...(result.code ? { code: result.code } : {})
+    });
+  }
+  const [job] = await db
+    .select()
+    .from(jobs)
+    .where(and(eq(jobs.companyId, actor.companyId), eq(jobs.id, jobId), isNull(jobs.deletedAt)))
+    .limit(1);
+  return {
+    created: result.outcome === "applied" && result.message !== SIGNATURE_ALREADY_CAPTURED_MESSAGE,
+    jobId,
+    outcome: result.outcome,
+    signedAt: job?.signedAt ? job.signedAt.toISOString() : (result.signedAt ?? null),
+    signedByName: job?.signedByName ?? null,
+    signerRole: result.signerRole ?? null,
+    recordVersion: job ? buildRecordVersionV1("job", job.id, job.updatedAt) : (result.recordVersion ?? null)
   };
 }

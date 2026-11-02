@@ -4,7 +4,7 @@ import { format } from "date-fns";
 import { LogOut, Search } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 
-import { clearBrowserAuthSession } from "@/src/lib/auth";
+import { completeClientLogout } from "@/src/lib/client-logout";
 import { getPageMeta } from "@/src/lib/page-meta";
 import type { UserRole } from "@/src/lib/route-access";
 import { cn } from "@/src/lib/utils";
@@ -24,10 +24,8 @@ export function Header({ companyName, role, userName }: HeaderProps) {
   const isDispatchRoute = pathname === "/dispatch" || pathname.startsWith("/dispatch/");
   const isDashboardRoute = pathname === "/dashboard" || pathname.startsWith("/dashboard/");
 
-  function handleLogout() {
-    clearBrowserAuthSession();
-    clearAuth();
-    router.replace("/login");
+  async function handleLogout() {
+    await completeClientLogout({ clearAuth, redirect: (path) => router.replace(path) });
   }
 
   return (
@@ -73,7 +71,9 @@ export function Header({ companyName, role, userName }: HeaderProps) {
           </div>
           <button
             type="button"
-            onClick={handleLogout}
+            onClick={() => {
+              void handleLogout();
+            }}
             className="rounded-full p-2 text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-900"
             aria-label="Sign out"
           >

@@ -12,10 +12,25 @@ const importSessionStatusSchema = z.enum([
   "failed",
   "rolled_back"
 ]);
-const importEntityTypeSchema = z.enum([
+/** Entity types a file upload can start (worker has a writer or a registered chunk committer for each). */
+export const UPLOADABLE_IMPORT_ENTITY_TYPES = [
   "customers",
+  "properties",
   "jobs",
   "estimates",
+  "invoices",
+  "price_book",
+  "notes",
+  "communications",
+  "service_agreements"
+] as const;
+
+const importEntityTypeSchema = z.enum([
+  "customers",
+  "properties",
+  "jobs",
+  "estimates",
+  "invoices",
   "price_book",
   "notes",
   "communications",

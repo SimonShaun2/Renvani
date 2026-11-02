@@ -1,6 +1,8 @@
 "use client";
 
 import "./payments-motion.css";
+
+import { payoutFeeNote } from "@/src/lib/service-fee-copy";
 import { useState } from "react";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, CreditCard, ExternalLink, ShieldAlert } from "lucide-react";
@@ -263,7 +265,7 @@ export function PaymentsClient() {
   const feeColumn = serviceFeeColumnLabel(connect?.platformFeePercent);
   const feeNote =
     feeColumn
-      ? `On Flex, the ${connect?.platformFeePercent}% Service Fee is paid by your customer and isn't taken from your payout.`
+      ? payoutFeeNote(connect?.platformFeePercent ?? 0)
       : null;
   const UNAVAILABLE = "Not available yet";
 

@@ -44,12 +44,9 @@ export const templateCopyProvider: ServiceCopyProvider = {
     return {
       provider: "template",
       headline: `${service} in ${area}`,
-      intro: `${companyName} offers ${service.toLowerCase()} in ${area}. See open times and book online in about a minute, or send a quick question first.`,
-      bullets: [
-        priceHint && priceHint !== "Request a quote" ? `Pricing: ${priceHint}` : "Upfront quote before any work",
-        `Serving ZIP ${area}`,
-        "Book online or send an inquiry"
-      ]
+      // Figma 155:79 body copy. "licensed tech" is the frame's wording for every trade.
+      intro: `Need ${service.toLowerCase()} in ${area}? ${companyName} sends a licensed tech to homes across ${area} with clear, upfront pricing. Pick a time online and get your confirmation by email.`,
+      bullets: priceHint && priceHint !== "Request a quote" ? [`Pricing: ${priceHint}`] : []
     };
   }
 };

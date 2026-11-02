@@ -5,7 +5,7 @@ import type { OperatorInboxItem } from "@fsm/types";
 
 import { AgentProposalCard } from "./AgentProposalCard";
 import { ProposalDetail } from "./ProposalDetail";
-import { availableActions, countByCategory, isRevenueProposal, proposalTypeConfig } from "./proposal.config";
+import { availableActions, consentBlockedCopy, isRevenueProposal, proposalTypeConfig } from "./proposal.config";
 
 const item = (over: Partial<OperatorInboxItem> = {}): OperatorInboxItem => ({
   contractVersion: "0.1.0",
@@ -34,17 +34,23 @@ describe("proposal.config", () => {
   it("recognises revenue action types and maps labels", () => {
     expect(isRevenueProposal("revenue.plan_offer.propose")).toBe(true);
     expect(isRevenueProposal("dispatch.assign")).toBe(false);
-    expect(proposalTypeConfig("revenue.estimate_followup.propose").label).toBe("Revenue · Estimate");
+    expect(proposalTypeConfig("revenue.estimate_followup.propose").label).toBe("Revenue · Follow-up");
+    expect(proposalTypeConfig("revenue.plan_offer.propose").label).toBe("Retention · Recurring offer");
+    expect(proposalTypeConfig("revenue.reactivation.propose").label).toBe("Retention · Win-back");
   });
 
   it("only offers actions the API allows", () => {
     expect(availableActions(item({ overridePaths: ["reject"] })).map((a) => a.key)).toEqual(["reject"]);
   });
 
-  it("counts by category", () => {
-    const counts = countByCategory([item(), item({ provenance: { ...item().provenance, actionType: "revenue.plan_offer.propose" } })]);
-    expect(counts.find((c) => c.key === "all")?.count).toBe(2);
-    expect(counts.find((c) => c.key === "revenue.plan_offer.propose")?.count).toBe(1);
+  it("builds Figma 10:372 consent-blocked copy", () => {
+    expect(consentBlockedCopy("Leah Moore", "email")).toEqual({
+      status: "Consent blocked",
+      message: "Can’t send: Leah hasn’t opted in to email. Email opt-in missing.",
+      request: "Request email consent",
+      dismiss: "Dismiss"
+    });
+    expect(consentBlockedCopy("Tom Becker", "sms").request).toBe("Request text consent");
   });
 });
 
@@ -52,9 +58,20 @@ describe("AgentProposalCard / ProposalDetail", () => {
   it("renders Figma 10:309 card copy and actions", () => {
     const html = renderToStaticMarkup(<AgentProposalCard item={item()} onAction={() => {}} />);
     expect(html).toContain("Needs approval");
-    expect(html).toContain("Revenue · Estimate");
+    expect(html).toContain("Revenue · Follow-up");
     expect(html).toContain("Approve &amp; send");
     expect(html).toContain("Reject");
+  });
+
+  it("renders the consent-blocked state instead of approve/edit", () => {
+    const html = renderToStaticMarkup(
+      <AgentProposalCard item={item({ recipient: { displayName: "Leah Moore" } })} onAction={() => {}} consentBlocked={{ channel: "email" }} onDismiss={() => {}} />
+    );
+    expect(html).toContain("Consent blocked");
+    expect(html).toContain("Can’t send: Leah hasn’t opted in to email. Email opt-in missing.");
+    expect(html).toContain("Request email consent");
+    expect(html).toContain("Dismiss");
+    expect(html).not.toContain("Approve &amp; send");
   });
 
   it("renders — for fields with no API", () => {
@@ -62,5 +79,13 @@ describe("AgentProposalCard / ProposalDetail", () => {
     expect(html).toContain("What happens if you approve");
     expect(html).toContain("Price rule");
     expect(html).toContain("—");
+  });
+});
+
+describe("proposalStateLabel", () => {
+  it("capitalises escalated like the other state pills", async () => {
+    const { proposalStateLabel } = await import("./proposal.config");
+    expect(proposalStateLabel("escalated")).toBe("Escalated");
+    expect(proposalStateLabel("awaiting_approval")).toBe("Needs approval");
   });
 });

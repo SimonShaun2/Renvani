@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { revenueOutcomesQuerySchema } from "@fsm/types";
+
 import { withZodValidation } from "../shared/validation.js";
 
 const isoDateSchema = z
@@ -126,6 +128,208 @@ export const jobSourceReportingRouteSchema = {
           type: "array",
           items: channelSchema
         }
+      }
+    },
+    400: errorResponseSchema,
+    401: errorResponseSchema,
+    403: errorResponseSchema
+  }
+} as const;
+
+export const directDemandQuerySchema = z.object({
+  startDate: isoDateSchema,
+  endDate: isoDateSchema
+});
+
+export const directDemandValidation = withZodValidation({
+  query: directDemandQuerySchema
+});
+
+export const directDemandRouteSchema = {
+  tags: ["reporting"],
+  summary:
+    "Direct demand (Growth source tracking): booked jobs with captured lead attribution in the period, by source (utm_source, else referrer host), with paid invoice revenue via invoices.job_id. Same date rules as job-sources.",
+  querystring: {
+    type: "object",
+    additionalProperties: false,
+    required: ["startDate", "endDate"],
+    properties: {
+      startDate: { type: "string" },
+      endDate: { type: "string" }
+    }
+  },
+  response: {
+    200: {
+      type: "object",
+      additionalProperties: false,
+      required: ["period", "totals", "sources"],
+      properties: {
+        period: {
+          type: "object",
+          additionalProperties: false,
+          required: ["startDate", "endDate", "timeZone"],
+          properties: {
+            startDate: { type: "string" },
+            endDate: { type: "string" },
+            timeZone: { type: "string" }
+          }
+        },
+        totals: {
+          type: "object",
+          additionalProperties: false,
+          required: ["jobCount", "paidRevenue"],
+          properties: {
+            jobCount: { type: "integer" },
+            paidRevenue: { type: "string" }
+          }
+        },
+        sources: {
+          type: "array",
+          items: {
+            type: "object",
+            additionalProperties: false,
+            required: ["source", "jobCount", "paidRevenue"],
+            properties: {
+              source: { type: "string" },
+              jobCount: { type: "integer" },
+              paidRevenue: { type: "string" }
+            }
+          }
+        }
+      }
+    },
+    400: errorResponseSchema,
+    401: errorResponseSchema,
+    403: errorResponseSchema
+  }
+} as const;
+
+const str = { type: "string" } as const;
+const int = { type: "integer" } as const;
+const nullableNumber = { type: ["number", "null"] } as const;
+const registryEntrySchema = {
+  type: "object",
+  additionalProperties: false,
+  required: ["key", "label", "definition"],
+  properties: { key: str, label: str, definition: str }
+} as const;
+const outcomeSegmentSchema = {
+  type: "object",
+  additionalProperties: false,
+  required: ["segment", "label", "confirmedJobs", "completedJobs", "completedRevenue"],
+  properties: { segment: str, label: str, confirmedJobs: int, completedJobs: int, completedRevenue: str }
+} as const;
+
+export const revenueOutcomesValidation = withZodValidation({
+  query: revenueOutcomesQuerySchema
+});
+
+export const revenueOutcomesRouteSchema = {
+  tags: ["reporting"],
+  summary:
+    "FS-22 revenue outcomes (owner/admin): inquiry -> qualified -> estimate -> confirmed/completed job -> repeat revenue, new vs repeat and agent-assisted splits, materials contribution profit, agent guardrails. Aggregates and definitions only; max 366-day range.",
+  querystring: {
+    type: "object",
+    additionalProperties: false,
+    required: ["startDate", "endDate"],
+    properties: { startDate: str, endDate: str }
+  },
+  response: {
+    200: {
+      type: "object",
+      additionalProperties: false,
+      required: ["period", "funnel", "revenue", "segments", "profit", "guardrails", "attribution", "definitions"],
+      properties: {
+        period: {
+          type: "object",
+          additionalProperties: false,
+          required: ["startDate", "endDate", "timeZone", "dateInterpretation"],
+          properties: { startDate: str, endDate: str, timeZone: str, dateInterpretation: str }
+        },
+        funnel: {
+          type: "array",
+          items: {
+            type: "object",
+            additionalProperties: false,
+            required: ["stage", "label", "count"],
+            properties: { stage: str, label: str, count: int }
+          }
+        },
+        revenue: {
+          type: "object",
+          additionalProperties: false,
+          required: ["completedRevenue", "newCustomerRevenue", "repeatCustomerRevenue", "repeatRevenueSharePercent"],
+          properties: {
+            completedRevenue: str,
+            newCustomerRevenue: str,
+            repeatCustomerRevenue: str,
+            repeatRevenueSharePercent: { type: "number" }
+          }
+        },
+        segments: {
+          type: "object",
+          additionalProperties: false,
+          required: ["customerType", "agentAssistance"],
+          properties: {
+            customerType: { type: "array", items: outcomeSegmentSchema },
+            agentAssistance: { type: "array", items: outcomeSegmentSchema }
+          }
+        },
+        profit: {
+          type: "object",
+          additionalProperties: false,
+          required: [
+            "costBasis",
+            "completedJobCount",
+            "completedRevenue",
+            "materialCost",
+            "contributionProfit",
+            "contributionProfitPerCompletedJob",
+            "jobsWithIncompleteCostData"
+          ],
+          properties: {
+            costBasis: str,
+            completedJobCount: int,
+            completedRevenue: str,
+            materialCost: str,
+            contributionProfit: str,
+            contributionProfitPerCompletedJob: { type: ["string", "null"] },
+            jobsWithIncompleteCostData: int
+          }
+        },
+        guardrails: {
+          type: "object",
+          additionalProperties: false,
+          required: [
+            "agentProposals",
+            "accepted",
+            "rejected",
+            "escalated",
+            "failed",
+            "edited",
+            "acceptanceRatePercent",
+            "overrideRatePercent",
+            "errorRatePercent"
+          ],
+          properties: {
+            agentProposals: int,
+            accepted: int,
+            rejected: int,
+            escalated: int,
+            failed: int,
+            edited: int,
+            acceptanceRatePercent: nullableNumber,
+            overrideRatePercent: nullableNumber,
+            errorRatePercent: nullableNumber
+          }
+        },
+        attribution: {
+          type: "object",
+          additionalProperties: false,
+          required: ["unknownSourceJobCount", "unknownSourceDefinition"],
+          properties: { unknownSourceJobCount: int, unknownSourceDefinition: str }
+        },
+        definitions: { type: "array", items: registryEntrySchema }
       }
     },
     400: errorResponseSchema,

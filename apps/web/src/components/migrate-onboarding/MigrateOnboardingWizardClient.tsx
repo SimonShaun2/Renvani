@@ -23,6 +23,8 @@ import { useImportErrors } from "@/src/hooks/imports.hooks";
 import { useMigrateOnboardingWizardStore } from "@/src/stores/migrate-onboarding-wizard.store";
 import { showToast } from "@/src/stores/toast.store";
 
+import { SavedCardConsentPanel } from "@/src/components/saved-card-migration/SavedCardConsentPanel";
+
 import { MigrateAiIssuesPanel } from "./MigrateAiIssuesPanel";
 import { MigrateOnboardingStepsOneTwo } from "./MigrateOnboardingStepsOneTwo";
 
@@ -249,6 +251,7 @@ export function MigrateOnboardingWizardClient() {
           >
             {bundle.status === "committing" ? "Commit in progress…" : "Start resumable commit"}
           </button>
+          <SavedCardConsentPanel bundleId={bundle.id} />
         </div>
       ) : null}
     </PageLayout>

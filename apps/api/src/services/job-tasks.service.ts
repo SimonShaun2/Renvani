@@ -230,49 +230,61 @@ export async function updateTask(
   taskId: string,
   input: UpdateTaskInput
 ): Promise<JobTask> {
+  return db.transaction((tx) => updateTaskInTransaction(tx, companyId, jobId, taskId, input));
+}
+
+export async function updateTaskInTransaction(
+  executor: TransactionExecutor,
+  companyId: string,
+  jobId: string,
+  taskId: string,
+  input: UpdateTaskInput
+): Promise<JobTask> {
   const normalizedInput = normalizeUpdateTaskInput(input);
+  const job = await getJobRow(companyId, jobId, executor);
+  const existingTask = await getTaskRow(companyId, jobId, taskId, executor);
+  await assertTechnicianBelongsToCompany(companyId, normalizedInput.assignedToId, executor);
 
-  return db.transaction(async (tx) => {
-    const job = await getJobRow(companyId, jobId, tx);
-    const existingTask = await getTaskRow(companyId, jobId, taskId, tx);
-    await assertTechnicianBelongsToCompany(companyId, normalizedInput.assignedToId, tx);
+  const nextStatus = normalizedInput.status ?? existingTask.status;
+  const shouldMarkCompleted = existingTask.status !== "completed" && nextStatus === "completed";
+  const [task] = await executor
+    .update(jobTasks)
+    .set({
+      ...(normalizedInput.assignedToId !== undefined ? { assignedToId: normalizedInput.assignedToId } : {}),
+      ...(normalizedInput.title !== undefined ? { title: normalizedInput.title } : {}),
+      ...(normalizedInput.description !== undefined ? { description: normalizedInput.description } : {}),
+      ...(normalizedInput.status !== undefined ? { status: normalizedInput.status } : {}),
+      ...(normalizedInput.isRequired !== undefined ? { isRequired: normalizedInput.isRequired } : {}),
+      ...(normalizedInput.estimatedMinutes !== undefined ? { estimatedMinutes: normalizedInput.estimatedMinutes } : {}),
+      ...(normalizedInput.actualMinutes !== undefined ? { actualMinutes: normalizedInput.actualMinutes } : {}),
+      ...(normalizedInput.sortOrder !== undefined ? { sortOrder: normalizedInput.sortOrder } : {}),
+      ...(normalizedInput.notes !== undefined ? { notes: normalizedInput.notes } : {}),
+      ...(normalizedInput.status !== undefined
+        ? normalizedInput.status === "completed"
+          ? { completedAt: existingTask.completedAt ?? new Date() }
+          : { completedAt: null, completedById: null }
+        : {}),
+      updatedAt: new Date()
+    })
+    .where(
+      and(
+        eq(jobTasks.companyId, companyId),
+        eq(jobTasks.jobId, jobId),
+        eq(jobTasks.id, taskId),
+        isNull(jobTasks.deletedAt)
+      )
+    )
+    .returning();
 
-    const nextStatus = normalizedInput.status ?? existingTask.status;
-    const shouldMarkCompleted = existingTask.status !== "completed" && nextStatus === "completed";
-    const [task] = await tx
-      .update(jobTasks)
-      .set({
-        ...(normalizedInput.assignedToId !== undefined ? { assignedToId: normalizedInput.assignedToId } : {}),
-        ...(normalizedInput.title !== undefined ? { title: normalizedInput.title } : {}),
-        ...(normalizedInput.description !== undefined ? { description: normalizedInput.description } : {}),
-        ...(normalizedInput.status !== undefined ? { status: normalizedInput.status } : {}),
-        ...(normalizedInput.isRequired !== undefined ? { isRequired: normalizedInput.isRequired } : {}),
-        ...(normalizedInput.estimatedMinutes !== undefined
-          ? { estimatedMinutes: normalizedInput.estimatedMinutes }
-          : {}),
-        ...(normalizedInput.actualMinutes !== undefined ? { actualMinutes: normalizedInput.actualMinutes } : {}),
-        ...(normalizedInput.sortOrder !== undefined ? { sortOrder: normalizedInput.sortOrder } : {}),
-        ...(normalizedInput.notes !== undefined ? { notes: normalizedInput.notes } : {}),
-        ...(normalizedInput.status !== undefined
-          ? normalizedInput.status === "completed"
-            ? { completedAt: existingTask.completedAt ?? new Date() }
-            : { completedAt: null, completedById: null }
-          : {}),
-        updatedAt: new Date()
-      })
-      .where(and(eq(jobTasks.companyId, companyId), eq(jobTasks.jobId, jobId), eq(jobTasks.id, taskId), isNull(jobTasks.deletedAt)))
-      .returning();
+  if (!task) {
+    throw new AppError(ErrorCode.INTERNAL_ERROR, "Failed to update task");
+  }
 
-    if (!task) {
-      throw new AppError(ErrorCode.INTERNAL_ERROR, "Failed to update task");
-    }
+  if (shouldMarkCompleted) {
+    await emitTaskCompletedEvent(executor, job, task);
+  }
 
-    if (shouldMarkCompleted) {
-      await emitTaskCompletedEvent(tx, job, task);
-    }
-
-    return toJobTask(task);
-  });
+  return toJobTask(task);
 }
 
 export async function completeTask(

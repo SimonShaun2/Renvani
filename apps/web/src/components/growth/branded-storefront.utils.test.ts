@@ -1,3 +1,4 @@
+import { suggestsRecurringServiceIntent } from "@/src/lib/booking-commit.utils";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -53,12 +54,12 @@ describe("branded-storefront.utils", () => {
 
   it("maps offered services into storefront cards", () => {
     const cards = buildServiceCards([
-      { label: "Deep clean", priceHint: "from $219" },
+      { label: "AC tune-up", priceHint: "from $219" },
       { name: "Recurring", subtitle: "save 10%" }
     ]);
 
     expect(cards).toHaveLength(2);
-    expect(cards[0]?.title).toBe("Deep clean");
+    expect(cards[0]?.title).toBe("AC tune-up");
   });
 
   it("does not fabricate a public trust line", () => {
@@ -77,10 +78,14 @@ describe("branded-storefront.utils", () => {
     expect(links).toEqual([{ label: "Google reviews", href: "https://google.com/reviews/acme" }]);
   });
 
-  it("falls back to cleaning cards when settings are empty", () => {
+  it("falls back to home-services cards when settings are empty", () => {
     const model = buildBrandedStorefrontViewModel(baseSettings);
 
     expect(model.serviceCards.length).toBe(4);
+    expect(model.serviceCards.map((c) => c.id)).toEqual(["hvac", "plumbing", "electrical", "tune-up"]);
+    for (const card of model.serviceCards) {
+      expect(suggestsRecurringServiceIntent({ serviceCategory: "Home services", serviceType: card.title, serviceDetail: card.subtitle })).toBe(false);
+    }
     expect(model.bookingSlug).toBe("sparkle-co");
   });
 });

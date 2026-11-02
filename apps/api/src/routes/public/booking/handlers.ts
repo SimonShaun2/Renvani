@@ -73,7 +73,8 @@ export async function submitBookingRequestHandler(
     idempotencyKey
   );
 
-  return reply.status(created ? 201 : 200).send(result);
+  const { inquiry: _internalInquiry, ...publicResult } = result;
+  return reply.status(created ? 201 : 200).send(publicResult);
 }
 
 export async function captureBookingInterestHandler(

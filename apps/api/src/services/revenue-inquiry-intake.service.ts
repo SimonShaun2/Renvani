@@ -17,8 +17,9 @@ import {
   applyPublicEmergencyGuard,
   checkZipCoverage,
   createCompanyScopedInquiryBooking,
-  getPublicBookingCompany,
-  resolvePublicBookingCompanyId,
+  deriveSource,
+  getPublicBookingContext,
+  resolvePublicZipServiceability,
   submitBookingRequest
 } from "./booking.service.js";
 import {
@@ -131,6 +132,8 @@ async function emitInquiryLifecycleEvents(
       attributionProvenance: inquiry.attributionProvenance,
       classifiedIntent: inquiry.classifiedIntent,
       status: inquiry.status,
+      serviceability: inquiry.serviceability,
+      captureSurface: inquiry.consent.captureSurface,
       dedupeKey: inquiry.dedupeKey
     },
     summary: `Revenue inquiry received (${inquiry.channel})`
@@ -187,9 +190,6 @@ export async function submitPublicInquiryIntake(
   sourceParam: string | undefined,
   idempotencyKey: string | undefined
 ): Promise<{ created: boolean; result: PublicInquirySubmitResult }> {
-  const coverage = await checkZipCoverage(slug, body.zip);
-  const serviceability: InquiryServiceability = coverage.covered ? "in_area" : "out_of_area";
-
   const payloadForHash = {
     slug,
     body,
@@ -197,7 +197,8 @@ export async function submitPublicInquiryIntake(
   };
   const payloadHash = hashInquirySubmitPayload(payloadForHash);
 
-  const companyId = await resolvePublicBookingCompanyId(slug);
+  const { company, settings } = await getPublicBookingContext(slug);
+  const companyId = settings.companyId;
 
   if (idempotencyKey) {
     const existing = await loadIdempotencyRecord(companyId, idempotencyKey);
@@ -213,10 +214,93 @@ export async function submitPublicInquiryIntake(
     }
   }
 
+  // A new shop can receive a direct inquiry before it has configured any offered service.
+  // This path never promises coverage, chooses a slot, confirms a booking, or queues a notification.
+  const configuredServices = Array.isArray(settings.offeredServices) ? settings.offeredServices : [];
+  if (configuredServices.length === 0) {
+    const { companyId: coverageCompanyId, serviceability } = await resolvePublicZipServiceability(slug, body.zip.trim());
+    if (coverageCompanyId !== companyId) {
+      throw new AppError(ErrorCode.CONFLICT, "Public inquiry tenant changed during submission");
+    }
+    if (serviceability === "out_of_area") {
+      throw new AppError(ErrorCode.CONFLICT, "This zip code is outside the current booking area");
+    }
+
+    const actorName = `${body.firstName.trim()} ${body.lastName.trim()}`;
+    const { bookingRequest, customerId } = await createCompanyScopedInquiryBooking(
+      companyId,
+      {
+        firstName: body.firstName,
+        lastName: body.lastName,
+        phone: body.phone,
+        ...(body.email !== undefined ? { email: body.email } : {}),
+        addressLine1: body.addressLine1,
+        city: body.city,
+        state: body.state,
+        zip: body.zip,
+        customerNotes: body.customerNotes ?? null,
+        ...(body.serviceCategory !== undefined ? { serviceCategory: body.serviceCategory } : {}),
+        ...(body.serviceType !== undefined ? { serviceType: body.serviceType } : {}),
+        ...(body.serviceDetail !== undefined ? { serviceDetail: body.serviceDetail } : {}),
+        source: deriveSource(sourceParam ?? body.source),
+        smsConsentAppointments: body.smsConsentAppointments ?? false,
+        smsConsentMarketing: body.smsConsentMarketing ?? false,
+        serviceability,
+        captureSurface: "site/inquiry"
+      },
+      { id: null, type: "customer", name: actorName }
+    );
+    const [row] = await db.select().from(bookingRequests).where(and(
+      eq(bookingRequests.companyId, companyId),
+      eq(bookingRequests.id, bookingRequest.id),
+      isNull(bookingRequests.deletedAt)
+    )).limit(1);
+    if (!row) {
+      throw new AppError(ErrorCode.INTERNAL_ERROR, "Inquiry row missing after capture");
+    }
+    const priorDuplicate = await findRecentDuplicateRow(companyId, row.phone, row.email, row.id);
+    const inquiry = mapBookingRowToInquiryIntakeV1(row, {
+      channel: "web_form",
+      attributionProvenance: sourceParam || body.source ? "query_param" : "unknown",
+      sourceAttribution: row.source,
+      captureSurface: "site/inquiry",
+      serviceability,
+      classifiedIntent: classifyFromBookingRow(row),
+      status: "open",
+      ...(priorDuplicate ? { dedupeKey: buildInquiryDedupeKey(companyId, row.phone, row.email) } : {}),
+      linkedCustomerId: customerId
+    });
+    await emitInquiryLifecycleEvents(inquiry, { type: "customer", name: actorName });
+
+    const result: PublicInquirySubmitResult = {
+      kind: "inquiry_only",
+      bookingRequest: {
+        id: bookingRequest.id,
+        referenceNumber: bookingRequest.referenceNumber,
+        status: "pending"
+      },
+      serviceability,
+      inquiry
+    };
+    if (idempotencyKey) {
+      await persistIdempotencyRecord({
+        companyId,
+        idempotencyKey,
+        payloadHash,
+        bookingRequestId: bookingRequest.id,
+        responseSnapshot: result
+      });
+    }
+    return { created: true, result };
+  }
+
+  const coverage = await checkZipCoverage(slug, body.zip);
+  const serviceability: InquiryServiceability = coverage.covered ? "in_area" : "out_of_area";
+
   // 24/7 emergency: accepted only when the shop has emergency service on (and its trade is emergency-capable);
   // otherwise downgraded to a normal request and reported back as `emergency.downgraded` (never rejected).
   // Same guard submitBookingRequest applies internally; computed here only to report the resolution back.
-  const { input: effectiveBody, emergency } = applyPublicEmergencyGuard(body, (await getPublicBookingCompany(slug)).settings);
+  const { input: effectiveBody, emergency } = applyPublicEmergencyGuard(body, company.settings);
   const submitResult = await submitBookingRequest(slug, effectiveBody, sourceParam, emergency.downgraded);
   const [row] = await db
     .select()

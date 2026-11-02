@@ -284,7 +284,7 @@ function buildReferenceNumber(now: Date): string {
   return `BK-${datePart}-${entropy}`;
 }
 
-function deriveSource(value: string | undefined): BookingRequest["source"] {
+export function deriveSource(value: string | undefined): BookingRequest["source"] {
   if (!value) {
     return "direct";
   }
@@ -2202,9 +2202,14 @@ export interface CompanyInquiryBookingInput {
   state: string;
   zip: string;
   customerNotes: string | null;
+  serviceCategory?: string | null;
+  serviceType?: string | null;
+  serviceDetail?: string | null;
   source: BookingRequest["source"];
   smsConsentAppointments?: boolean;
   smsConsentMarketing?: boolean;
+  serviceability?: "unknown" | "in_area";
+  captureSurface?: string;
 }
 
 /** Staff/inbox inquiry intake — no zip gate, no outbound notification enqueue (FS-17). */
@@ -2224,9 +2229,9 @@ export async function createCompanyScopedInquiryBooking(
     state: input.state.trim(),
     zip: input.zip.trim(),
     propertyType: null,
-    serviceCategory: null,
-    serviceType: null,
-    serviceDetail: null,
+    serviceCategory: normalizeOptionalString(input.serviceCategory) ?? null,
+    serviceType: normalizeOptionalString(input.serviceType) ?? null,
+    serviceDetail: normalizeOptionalString(input.serviceDetail) ?? null,
     urgency: "flexible",
     customerNotes: normalizeOptionalString(input.customerNotes) ?? null,
     preferredDate: null,
@@ -2264,6 +2269,9 @@ export async function createCompanyScopedInquiryBooking(
         city: normalizedInput.city,
         state: normalizedInput.state,
         zip: normalizedInput.zip,
+        serviceCategory: normalizedInput.serviceCategory,
+        serviceType: normalizedInput.serviceType,
+        serviceDetail: normalizedInput.serviceDetail,
         customerNotes: normalizedInput.customerNotes,
         status: "pending",
         source: input.source,
@@ -2291,7 +2299,9 @@ export async function createCompanyScopedInquiryBooking(
       payload: {
         source: input.source,
         zip: bookingRequest.zip,
-        intakePath: "direct_inquiry"
+        intakePath: "direct_inquiry",
+        ...(input.serviceability ? { serviceability: input.serviceability } : {}),
+        ...(input.captureSurface ? { captureSurface: input.captureSurface } : {})
       },
       summary: `Inquiry ${bookingRequest.referenceNumber ?? bookingRequest.id} captured`
     });

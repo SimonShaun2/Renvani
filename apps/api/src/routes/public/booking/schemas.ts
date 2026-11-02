@@ -275,10 +275,9 @@ export const availabilityRouteSchema = {
   }
 } as const;
 
-export const submitBookingRouteSchema = {
-  tags: ["public-booking"],
-  response: {
-    201: {
+const submitBookingResponseSchema = {
+  oneOf: [
+    {
       type: "object",
       additionalProperties: false,
       required: ["bookingRequest", "confirmation", "holdToken"],
@@ -314,6 +313,33 @@ export const submitBookingRouteSchema = {
         }
       }
     },
+    {
+      type: "object",
+      additionalProperties: false,
+      required: ["kind", "bookingRequest", "serviceability"],
+      properties: {
+        kind: { type: "string", const: "inquiry_only" },
+        bookingRequest: {
+          type: "object",
+          additionalProperties: false,
+          required: ["id", "referenceNumber", "status"],
+          properties: {
+            id: { type: "string" },
+            referenceNumber: nullableStringSchema,
+            status: { type: "string", const: "pending" }
+          }
+        },
+        serviceability: { type: "string", enum: ["unknown", "in_area"] }
+      }
+    }
+  ]
+} as const;
+
+export const submitBookingRouteSchema = {
+  tags: ["public-booking"],
+  response: {
+    201: submitBookingResponseSchema,
+    200: submitBookingResponseSchema,
     400: errorResponseSchema,
     404: errorResponseSchema,
     409: errorResponseSchema,

@@ -84,6 +84,7 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
+  vi.clearAllMocks();
   fakeDb.resetTestState();
   resetPublicBookingRateLimitStateForTests();
   vi.useFakeTimers();
@@ -137,5 +138,93 @@ describe("public booking submit idempotency (FS-38)", () => {
     expect(mismatch.body.error).toBe("CONFLICT");
     expect(mismatch.body.message).toMatch(/different payload/i);
     expect(mismatch.body.fields).toEqual({ reason: "idempotency_payload_mismatch" });
+  });
+});
+
+describe("public inquiry-only intake (FS-229)", () => {
+  function seedInquiryOnlyFixture(options: { coveredZip?: string; offeredServices?: Array<Record<string, unknown>> } = {}) {
+    const company = fakeDb.seedCompany({ name: "New Plumbing", slug: "new-plumbing" });
+    fakeDb.seedBookingSettings({
+      companyId: company.id,
+      bookingSlug: "new-plumbing",
+      isEnabled: true,
+      autoConfirm: true,
+      notifyOnNewBooking: true,
+      offeredServices: options.offeredServices ?? []
+    });
+    if (options.coveredZip) {
+      fakeDb.seedServiceArea({ companyId: company.id, name: "Service area", zips: [options.coveredZip] });
+    }
+    return company;
+  }
+
+  it("captures an unqualified pending inquiry with no booking effects when coverage is unknown", async () => {
+    const company = seedInquiryOnlyFixture();
+    const body = submitBody({ serviceDetail: "Kitchen drain is slow", smsConsentAppointments: true });
+    const key = randomUUID();
+    const first = await request(app.server)
+      .post("/api/v1/public/booking/new-plumbing/submit?src=direct")
+      .set("Idempotency-Key", key)
+      .send(body);
+    const replay = await request(app.server)
+      .post("/api/v1/public/booking/new-plumbing/submit?src=direct")
+      .set("Idempotency-Key", key)
+      .send(body);
+
+    expect(first.status).toBe(201);
+    expect(first.body).toEqual({
+      kind: "inquiry_only",
+      bookingRequest: { id: expect.any(String), referenceNumber: expect.any(String), status: "pending" },
+      serviceability: "unknown"
+    });
+    expect(replay.status).toBe(200);
+    expect(replay.body).toEqual(first.body);
+    const state = fakeDb.getTestState();
+    expect(state.bookingRequests).toHaveLength(1);
+    expect(state.bookingRequests[0]).toMatchObject({ companyId: company.id, status: "pending", serviceDetail: "Kitchen drain is slow", smsConsentAppointments: true, smsConsentMarketing: false });
+    expect(state.jobs).toHaveLength(0);
+    expect(state.activityEvents.some((event) => event.eventType === "revenue.inquiry_received" && event.companyId === company.id)).toBe(true);
+    const { notificationsQueue } = await import("@fsm/jobs");
+    expect(notificationsQueue.add).not.toHaveBeenCalled();
+  });
+
+  it("captures inquiry-only for known in-area coverage without creating a job", async () => {
+    const company = seedInquiryOnlyFixture({ coveredZip: "74103" });
+    const response = await request(app.server).post("/api/v1/public/booking/new-plumbing/submit").send(submitBody());
+    expect(response.status).toBe(201);
+    expect(response.body).toMatchObject({ kind: "inquiry_only", serviceability: "in_area", bookingRequest: { status: "pending" } });
+    expect(fakeDb.getTestState().bookingRequests).toHaveLength(1);
+    expect(fakeDb.getTestState().bookingRequests[0]?.companyId).toBe(company.id);
+    expect(fakeDb.getTestState().jobs).toHaveLength(0);
+  });
+
+  it("denies known out-of-area and preserves zero write effects", async () => {
+    seedInquiryOnlyFixture({ coveredZip: "74104" });
+    const response = await request(app.server).post("/api/v1/public/booking/new-plumbing/submit").send(submitBody());
+    expect(response.status).toBe(409);
+    expect(fakeDb.getTestState().bookingRequests).toHaveLength(0);
+    expect(fakeDb.getTestState().jobs).toHaveLength(0);
+  });
+
+  it("does not capture an unknown-coverage request when a service is configured", async () => {
+    seedInquiryOnlyFixture({ offeredServices: [{ id: "drain-cleaning", name: "Drain cleaning" }] });
+    const response = await request(app.server).post("/api/v1/public/booking/new-plumbing/submit").send(submitBody());
+    expect(response.status).toBe(409);
+    expect(fakeDb.getTestState().bookingRequests).toHaveLength(0);
+  });
+
+  it("rejects a changed idempotency payload and an unrelated tenant slug", async () => {
+    const company = seedInquiryOnlyFixture();
+    const other = fakeDb.seedCompany({ name: "Other Shop", slug: "other-shop" });
+    fakeDb.seedBookingSettings({ companyId: other.id, bookingSlug: "other-shop", isEnabled: true });
+    const key = randomUUID();
+    const first = await request(app.server).post("/api/v1/public/booking/new-plumbing/submit").set("Idempotency-Key", key).send(submitBody());
+    const mismatch = await request(app.server).post("/api/v1/public/booking/new-plumbing/submit").set("Idempotency-Key", key).send(submitBody({ phone: "555-0999" }));
+    const otherResponse = await request(app.server).post("/api/v1/public/booking/missing-shop/submit").send(submitBody());
+    expect(first.status).toBe(201);
+    expect(mismatch.status).toBe(409);
+    expect(otherResponse.status).toBe(404);
+    expect(fakeDb.getTestState().bookingRequests).toHaveLength(1);
+    expect(fakeDb.getTestState().bookingRequests[0]?.companyId).toBe(company.id);
   });
 });

@@ -6547,9 +6547,46 @@ function projectRows<T extends Record<string, unknown>>(
   });
 }
 
+interface RawSqlMarker {
+  __rawSqlText: string;
+  __rawSqlValues: unknown[];
+}
+
+function isRawSqlMarker(query: unknown): query is RawSqlMarker {
+  if (query === null || typeof query !== "object") {
+    return false;
+  }
+
+  const record = query as Record<string, unknown>;
+  return typeof record.__rawSqlText === "string" && Array.isArray(record.__rawSqlValues);
+}
+
 export const db: TestDb = {
-  async execute(_query: unknown): Promise<unknown[]> {
-    void _query;
+  async execute(query: unknown): Promise<unknown[]> {
+    if (!isRawSqlMarker(query)) {
+      return [];
+    }
+
+    const companyId = query.__rawSqlValues.find((param): param is string => typeof param === "string");
+
+    if (companyId && /from\s+estimates/i.test(query.__rawSqlText)) {
+      return state.estimates
+        .filter((row) => row.companyId === companyId && row.deletedAt === null)
+        .map((row) => ({ estimateNumber: row.estimateNumber }));
+    }
+
+    if (companyId && /from\s+jobs/i.test(query.__rawSqlText)) {
+      return state.jobs
+        .filter((row) => row.companyId === companyId && row.deletedAt === null)
+        .map((row) => ({ jobNumber: row.jobNumber }));
+    }
+
+    if (companyId && /from\s+invoices/i.test(query.__rawSqlText)) {
+      return state.invoices
+        .filter((row) => row.companyId === companyId && row.deletedAt === null)
+        .map((row) => ({ invoiceNumber: row.invoiceNumber }));
+    }
+
     return [];
   },
   select(projection?: Record<string, unknown>) {
@@ -7024,7 +7061,10 @@ export function createDrizzleModuleMock() {
       };
     }
 
-    return {};
+    return {
+      __rawSqlText: template,
+      __rawSqlValues: values
+    };
   };
 
   return {

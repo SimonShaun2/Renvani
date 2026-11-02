@@ -37,6 +37,12 @@ import {
 
 import { generateEstimateNumber } from "../lib/estimate-number.js";
 import { recalculateTotals } from "./estimate-items.service.js";
+import {
+  assertEstimateMoneyResult,
+  normalizeEstimateMoney,
+  normalizeEstimateQuantity,
+  normalizeEstimateTaxRate
+} from "./estimate-money.js";
 import { financingSummary, quoteFinancing, startFinancingApplication } from "./financing/financing-adapter.registry.js";
 import { assertPriceBookItemsInCompany } from "./price-book-item-scope.js";
 
@@ -59,10 +65,6 @@ export interface EstimateOptionSetActor {
 const MAX_SET_EVENTS = 500;
 
 // ── helpers ──
-
-function money(value: Decimal.Value): string {
-  return new Decimal(value).toFixed(2);
-}
 
 function payloadHash(op: SetOp, body: object): string {
   const rest = { ...(body as Record<string, unknown>) };
@@ -334,8 +336,8 @@ async function insertOption(
       status: "draft",
       title: option.title ?? base.title,
       messageToCustomer: base.messageToCustomer,
-      taxRate: new Decimal(option.taxRate ?? 0).toFixed(4),
-      discountAmount: money(option.discountAmount ?? 0),
+      taxRate: normalizeEstimateTaxRate(option.taxRate ?? "0"),
+      discountAmount: normalizeEstimateMoney(option.discountAmount ?? "0", "discountAmount"),
       financingOffered: base.financingOffered,
       tierLabel: option.tierLabel.trim(),
       tierGroupId: base.tierGroupId,
@@ -353,16 +355,21 @@ async function insertOption(
         name: item.name.trim(),
         description: item.description?.trim() || null,
         itemType: item.itemType ?? "service",
-        quantity: new Decimal(item.quantity).toFixed(3),
-        unitPrice: money(item.unitPrice),
-        total: money(new Decimal(item.quantity).mul(item.unitPrice)),
+        quantity: normalizeEstimateQuantity(item.quantity),
+        unitPrice: normalizeEstimateMoney(item.unitPrice, "unitPrice"),
+        total: assertEstimateMoneyResult(
+          new Decimal(normalizeEstimateQuantity(item.quantity)).mul(
+            normalizeEstimateMoney(item.unitPrice, "unitPrice")
+          ),
+          "line total"
+        ),
         isTaxable: item.isTaxable ?? true,
         sortOrder: item.sortOrder ?? index,
         ...(item.priceBookItemId ? { productCatalogId: item.priceBookItemId } : {})
       }))
     )
     .returning();
-  await recalculateTotals(row.id, tx);
+  await recalculateTotals(actor.companyId, row.id, tx);
   await emitEventWithExecutor(tx, {
     companyId: actor.companyId,
     eventType: "estimate.created",
@@ -602,15 +609,23 @@ export async function sendEstimateOptionSet(
       return { response: await replayResponse(tx, actor.companyId, tierGroupId), primaryId: null as string | null };
     }
     const version = assertEditable(rows, body.expectedVersion);
+    for (const row of rows) {
+      await recalculateTotals(actor.companyId, row.id, tx);
+    }
+    const validatedRows = await loadRows(tx, actor.companyId, tierGroupId);
     const [customer] = await tx
       .select()
       .from(customers)
-      .where(and(eq(customers.companyId, actor.companyId), eq(customers.id, rows[0]!.customerId)))
+      .where(and(
+        eq(customers.companyId, actor.companyId),
+        eq(customers.id, rows[0]!.customerId),
+        isNull(customers.deletedAt)
+      ))
       .limit(1);
     if (!customer?.email) throw new AppError(ErrorCode.CONFLICT, "Customer must have an email before sending an estimate");
     const sentAt = new Date();
     const expiresAt = new Date(sentAt.getTime() + env.ESTIMATE_EXPIRY_DAYS * 24 * 60 * 60 * 1000);
-    for (const row of rows) {
+    for (const row of validatedRows) {
       const [updated] = await tx
         .update(estimates)
         .set({

@@ -1,4 +1,5 @@
 import type { EstimateStatus } from "@fsm/types";
+import Decimal from "decimal.js";
 
 export const NOT_AVAILABLE = "Not available yet";
 
@@ -42,10 +43,14 @@ export function formatValidUntil(expiresAt: string | null | undefined): string {
   return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", ...(dateOnly ? { timeZone: "UTC" } : {}) }).format(date);
 }
 
-export function formatDiscountCheck(discountAmount: string | number | null | undefined): string {
-  const value = typeof discountAmount === "number" ? discountAmount : Number.parseFloat(discountAmount ?? "0");
-  if (!Number.isFinite(value) || value <= 0) return "None";
-  return `$${value.toFixed(2)} off`;
+export function formatDiscountCheck(discountAmount: string | null | undefined): string {
+  try {
+    const value = new Decimal(discountAmount ?? "0");
+    if (!value.isFinite() || !value.greaterThan(0)) return "None";
+    return `$${value.toDecimalPlaces(2, Decimal.ROUND_HALF_UP).toFixed(2)} off`;
+  } catch {
+    return "None";
+  }
 }
 
 /** Send is allowed only when the saved server copy matches the draft (no unsaved edits, no save in flight). */

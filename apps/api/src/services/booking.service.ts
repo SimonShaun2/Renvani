@@ -2216,7 +2216,8 @@ export interface CompanyInquiryBookingInput {
 export async function createCompanyScopedInquiryBooking(
   companyId: string,
   input: CompanyInquiryBookingInput,
-  actor: BookingActor
+  actor: BookingActor,
+  executor?: TransactionExecutor
 ): Promise<{ bookingRequest: BookingRequest; customerId: string }> {
   const normalizedInput: NormalizedBookingInput = {
     firstName: input.firstName.trim(),
@@ -2241,7 +2242,7 @@ export async function createCompanyScopedInquiryBooking(
     smsConsentMarketing: input.smsConsentMarketing ?? false
   };
 
-  const result = await db.transaction(async (tx) => {
+  const write = async (tx: TransactionExecutor) => {
     const existingCustomer = await findCustomerByContact(
       companyId,
       normalizedInput.phone,
@@ -2307,7 +2308,9 @@ export async function createCompanyScopedInquiryBooking(
     });
 
     return { bookingRequest: toBookingRequest(bookingRequest), customerId: customer.id };
-  });
+  };
+
+  const result = executor ? await write(executor) : await db.transaction(write);
 
   return result;
 }

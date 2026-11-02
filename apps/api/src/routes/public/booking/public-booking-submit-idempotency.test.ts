@@ -227,4 +227,67 @@ describe("public inquiry-only intake (FS-229)", () => {
     expect(fakeDb.getTestState().bookingRequests).toHaveLength(1);
     expect(fakeDb.getTestState().bookingRequests[0]?.companyId).toBe(company.id);
   });
+
+  it("keeps the same key separate for each tenant", async () => {
+    const firstCompany = seedInquiryOnlyFixture();
+    const secondCompany = fakeDb.seedCompany({ name: "Other Plumbing", slug: "other-plumbing" });
+    fakeDb.seedBookingSettings({
+      companyId: secondCompany.id,
+      bookingSlug: "other-plumbing",
+      isEnabled: true,
+      offeredServices: []
+    });
+    const key = randomUUID();
+    const first = await request(app.server).post("/api/v1/public/booking/new-plumbing/submit")
+      .set("Idempotency-Key", key).send(submitBody());
+    const second = await request(app.server).post("/api/v1/public/booking/other-plumbing/submit")
+      .set("Idempotency-Key", key).send(submitBody());
+
+    expect([first.status, second.status]).toEqual([201, 201]);
+    expect(second.body.bookingRequest.id).not.toBe(first.body.bookingRequest.id);
+    expect(fakeDb.getTestState().bookingRequests.map((row) => row.companyId).sort())
+      .toEqual([firstCompany.id, secondCompany.id].sort());
+    expect(fakeDb.getTestState().inquirySubmitIdempotency).toHaveLength(2);
+    expect(fakeDb.getTestState().jobs).toHaveLength(0);
+    const { notificationsQueue } = await import("@fsm/jobs");
+    expect(notificationsQueue.add).not.toHaveBeenCalled();
+  });
+
+  it("rolls back every inquiry effect when the idempotency insert fails, then permits a retry", async () => {
+    seedInquiryOnlyFixture();
+    const key = randomUUID();
+    const insert = fakeDb.db.insert.bind(fakeDb.db);
+    const failInsert = vi.spyOn(fakeDb.db, "insert").mockImplementation((table) => {
+      if (table === fakeDb.inquirySubmitIdempotency) {
+        throw new Error("Simulated idempotency insert failure");
+      }
+      return insert(table);
+    });
+
+    try {
+      const failed = await request(app.server).post("/api/v1/public/booking/new-plumbing/submit")
+        .set("Idempotency-Key", key).send(submitBody());
+      expect(failed.status).toBe(500);
+      const state = fakeDb.getTestState();
+      expect(state.bookingRequests).toHaveLength(0);
+      expect(state.customers).toHaveLength(0);
+      expect(state.properties).toHaveLength(0);
+      expect(state.activityEvents).toHaveLength(0);
+      expect(state.inquirySubmitIdempotency).toHaveLength(0);
+      expect(state.jobs).toHaveLength(0);
+      const { notificationsQueue } = await import("@fsm/jobs");
+      expect(notificationsQueue.add).not.toHaveBeenCalled();
+    } finally {
+      failInsert.mockRestore();
+    }
+
+    const retry = await request(app.server).post("/api/v1/public/booking/new-plumbing/submit")
+      .set("Idempotency-Key", key).send(submitBody());
+    expect(retry.status).toBe(201);
+    expect(fakeDb.getTestState().bookingRequests).toHaveLength(1);
+    expect(fakeDb.getTestState().inquirySubmitIdempotency).toHaveLength(1);
+    expect(fakeDb.getTestState().activityEvents.filter((event) =>
+      event.eventType === "booking.requested" || event.eventType === "revenue.inquiry_received"
+    )).toHaveLength(2);
+  });
 });

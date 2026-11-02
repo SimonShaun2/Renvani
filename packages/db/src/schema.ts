@@ -2214,6 +2214,37 @@ export const outboundConsentChannelEnum = pgEnum("outbound_consent_channel", ["e
 export const outboundConsentPurposeEnum = pgEnum("outbound_consent_purpose", ["appointment", "marketing"]);
 export const outboundConsentStateEnum = pgEnum("outbound_consent_state", ["granted", "revoked"]);
 export const outboundConsentDecisionEnum = pgEnum("outbound_consent_decision", ["grant", "revoke"]);
+export const outboundConsentReceiptSurfaceEnum = pgEnum("outbound_consent_receipt_surface", [
+  "public_inquiry", "customer_portal", "operator", "signed_inbound",
+]);
+
+// Independently persisted capture evidence; only a future source-specific trusted boundary may insert.
+// Migration 0062 must FORCE tenant RLS and deny UPDATE/DELETE to the application role.
+export const outboundConsentCaptureReceipts = pgTable("outbound_consent_capture_receipts", {
+  id: id(),
+  companyId: companyId(),
+  subjectType: outboundConsentSubjectTypeEnum("subject_type").notNull(),
+  subjectId: uuid("subject_id").notNull(),
+  channel: outboundConsentChannelEnum("channel").notNull(),
+  purpose: outboundConsentPurposeEnum("purpose").notNull(),
+  contact: varchar("contact", { length: 320 }).notNull(),
+  decision: outboundConsentDecisionEnum("decision").notNull(),
+  explicitChoice: boolean("explicit_choice").notNull(),
+  statementVersion: varchar("statement_version", { length: 64 }).notNull(),
+  sourceRecordId: uuid("source_record_id").notNull(),
+  sourceSurface: outboundConsentReceiptSurfaceEnum("source_surface").notNull(),
+  actorType: varchar("actor_type", { length: 30 }).notNull(),
+  actorId: uuid("actor_id"),
+  signedInboundIdentity: varchar("signed_inbound_identity", { length: 255 }),
+  signatureVerifiedAt: timestamp("signature_verified_at"),
+  capturedAt: timestamp("captured_at").notNull().defaultNow(),
+  idempotencyKey: varchar("idempotency_key", { length: 128 }).notNull(),
+  payloadFingerprint: varchar("payload_fingerprint", { length: 64 }).notNull(),
+  ...timestamps,
+}, (t) => ({
+  idempotency: uniqueIndex("outbound_consent_capture_receipts_idempotency").on(t.companyId, t.idempotencyKey),
+  subjectIdx: index("outbound_consent_capture_receipts_subject_idx").on(t.companyId, t.subjectType, t.subjectId),
+}));
 
 export const outboundConsentStates = pgTable("outbound_consent_states", {
   id: id(),

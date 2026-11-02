@@ -6,6 +6,7 @@ import {
   bookingRequests,
   customers,
   emitEventWithExecutor,
+  outboundConsentCaptureReceipts,
   outboundConsentEvents,
   outboundConsentStates,
   runTransactionWithTenantSession,
@@ -19,24 +20,14 @@ import {
   type OutboundConsentCheck,
   type OutboundConsentKey,
   type OutboundConsentDecisionInput,
-  type OutboundConsentIntent,
 } from "@fsm/types";
 import { assertConsentReplayMatches, assertVerifiedConsentSource, fingerprintConsentDecision } from "./outbound-consent-decision.js";
+import { verifyPersistedConsentReceipt, type TrustedConsentActor } from "./outbound-consent-receipt.js";
 
 type TenantTx = Parameters<Parameters<typeof runTransactionWithTenantSession>[1]>[0];
 type ActiveSubject = { companyId: string; contact: string | null; doNotContact: boolean };
 
-/** Supplied by authentication or a trusted worker context, never parsed from a request body. */
-export interface TrustedConsentActor {
-  companyId: string;
-  actorType: "user" | "system" | "customer";
-  actorId: string | null;
-}
-
-type VerifiedConsentEvidence = Pick<
-  OutboundConsentDecisionInput,
-  "sourceKind" | "sourceRecordId" | "statementVersion" | "evidenceRef"
->;
+export type { TrustedConsentActor } from "./outbound-consent-receipt.js";
 
 function assertTrustedTenant(companyId: string, keyCompanyId: string): void {
   if (companyId !== keyCompanyId) {
@@ -44,17 +35,8 @@ function assertTrustedTenant(companyId: string, keyCompanyId: string): void {
   }
 }
 
-/**
- * No current source stores immutable, independently verifiable affirmative capture/inbound/operator
- * evidence with the full tenant/subject/contact/channel/purpose/statement/actor tuple. Until Product
- * and TL approve that source, all writes fail closed. Never promote caller-declared evidence text.
- */
-async function resolvePersistedConsentEvidence(
-  _actor: TrustedConsentActor,
-  _intent: OutboundConsentIntent,
-): Promise<VerifiedConsentEvidence | null> {
-  return null;
-}
+// Source-specific receipt writers and approved public copy are not present. Keep the generic writer inert.
+const CONSENT_RECEIPT_BOUNDARY_ACTIVE = false;
 
 function keyWhere(key: OutboundConsentKey) {
   return and(
@@ -107,17 +89,25 @@ function destinationMatches(key: OutboundConsentKey, actual: string | null): boo
 export async function recordOutboundConsentDecision(actor: TrustedConsentActor, raw: unknown) {
   const intent = outboundConsentIntentSchema.parse(raw);
   assertTrustedTenant(actor.companyId, intent.key.companyId);
-  const evidence = await resolvePersistedConsentEvidence(actor, intent);
-  if (!evidence) {
-    throw new AppError(ErrorCode.POLICY_DENIED, "Verified consent evidence source is not configured");
+  if (!CONSENT_RECEIPT_BOUNDARY_ACTIVE) {
+    throw new AppError(ErrorCode.POLICY_DENIED, "Verified consent receipt boundary is not active");
   }
-  const input: OutboundConsentDecisionInput = {
-    ...intent, ...evidence, actorType: actor.actorType, actorId: actor.actorId,
-  };
-  assertVerifiedConsentSource(input);
-  const key = input.key;
-  const fingerprint = fingerprintConsentDecision(input);
   return runTransactionWithTenantSession(actor.companyId, async (tx) => {
+    const [receipt] = await tx.select().from(outboundConsentCaptureReceipts).where(and(
+      eq(outboundConsentCaptureReceipts.companyId, actor.companyId),
+      eq(outboundConsentCaptureReceipts.id, intent.receiptId),
+      isNull(outboundConsentCaptureReceipts.deletedAt),
+    )).limit(1);
+    const currentSubject = await loadActiveSubject(tx, intent.key);
+    const evidence = verifyPersistedConsentReceipt({
+      actor, intent, receipt: receipt ?? null, currentSubject,
+    });
+    const input: OutboundConsentDecisionInput = {
+      ...intent, ...evidence, actorType: actor.actorType, actorId: actor.actorId,
+    };
+    assertVerifiedConsentSource(input);
+    const key = input.key;
+    const fingerprint = fingerprintConsentDecision(input);
     await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${JSON.stringify([key.companyId, input.idempotencyKey])}, 0))`);
     const [replay] = await tx.select().from(outboundConsentEvents).where(and(
       eq(outboundConsentEvents.companyId, actor.companyId),

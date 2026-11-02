@@ -61,7 +61,7 @@ describe("FS-234 outbound consent authority", () => {
     expect(outboundConsentDecisionInputSchema.safeParse({ ...input, evidenceRef: "" }).success).toBe(false);
     expect(outboundConsentDecisionInputSchema.safeParse({ ...input, actorId: null }).success).toBe(false);
     expect(outboundConsentDecisionInputSchema.safeParse({ ...input, idempotencyKey: "" }).success).toBe(false);
-    expect(outboundConsentIntentSchema.safeParse({ key, decision: "grant", idempotencyKey: "capture-1" }).success).toBe(true);
+    expect(outboundConsentIntentSchema.safeParse({ key, decision: "grant", receiptId: eventId, idempotencyKey: "capture-1" }).success).toBe(true);
     expect(outboundConsentIntentSchema.safeParse(input).success).toBe(false);
   });
 });

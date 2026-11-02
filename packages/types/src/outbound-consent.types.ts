@@ -28,6 +28,7 @@ export const outboundConsentKeySchema = z.object({
 export const outboundConsentIntentSchema = z.object({
   key: outboundConsentKeySchema,
   decision: outboundConsentDecisionSchema,
+  receiptId: z.string().uuid(),
   idempotencyKey: z.string().trim().min(1).max(128),
 }).strict();
 

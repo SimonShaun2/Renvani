@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const runTransactionWithTenantSession = vi.hoisted(() => vi.fn());
 vi.mock("@fsm/db", () => ({
   runTransactionWithTenantSession,
-  bookingRequests: {}, customers: {}, outboundConsentEvents: {}, outboundConsentStates: {},
+  bookingRequests: {}, customers: {}, outboundConsentEvents: {}, outboundConsentStates: {}, outboundConsentCaptureReceipts: {},
   emitEventWithExecutor: vi.fn(),
 }));
 
@@ -12,6 +12,7 @@ import { checkOutboundConsent, recordOutboundConsentDecision } from "./outbound-
 const tenantA = "11111111-1111-4111-8111-111111111111";
 const tenantB = "22222222-2222-4222-8222-222222222222";
 const subjectId = "33333333-3333-4333-8333-333333333333";
+const receiptId = "55555555-5555-4555-8555-555555555555";
 const key = {
   companyId: tenantB, subjectType: "customer", subjectId,
   channel: "email", purpose: "marketing", contact: "test@example.com",
@@ -27,7 +28,7 @@ describe("FS-234 trusted tenant and evidence boundary", () => {
   });
 
   it("denies A-authenticated/B-key writes without state, event, or activity writes", async () => {
-    await expect(recordOutboundConsentDecision(actor, { key, decision: "grant", idempotencyKey: "one" }))
+    await expect(recordOutboundConsentDecision(actor, { key, decision: "grant", receiptId, idempotencyKey: "one" }))
       .rejects.toMatchObject({ code: "FORBIDDEN" });
     expect(runTransactionWithTenantSession).not.toHaveBeenCalled();
   });
@@ -35,7 +36,7 @@ describe("FS-234 trusted tenant and evidence boundary", () => {
   it("rejects caller-forged capture evidence and actor identity before any database call", async () => {
     const sameTenantKey = { ...key, companyId: tenantA };
     await expect(recordOutboundConsentDecision(actor, {
-      key: sameTenantKey, decision: "grant", idempotencyKey: "one",
+      key: sameTenantKey, decision: "grant", receiptId, idempotencyKey: "one",
       sourceKind: "customer_capture", sourceRecordId: subjectId,
       statementVersion: "fabricated", evidenceRef: "fabricated", actorType: "customer", actorId: subjectId,
     })).rejects.toThrow();
@@ -46,7 +47,7 @@ describe("FS-234 trusted tenant and evidence boundary", () => {
     const sameTenantKey = { ...key, companyId: tenantA };
     for (const decision of ["grant", "revoke", "grant"] as const) {
       await expect(recordOutboundConsentDecision(actor, {
-        key: sameTenantKey, decision, idempotencyKey: `decision-${decision}`,
+        key: sameTenantKey, decision, receiptId, idempotencyKey: `decision-${decision}`,
       })).rejects.toMatchObject({ code: "POLICY_DENIED" });
     }
     expect(runTransactionWithTenantSession).not.toHaveBeenCalled();

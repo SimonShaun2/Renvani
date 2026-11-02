@@ -1,6 +1,6 @@
 import { randomBytes } from "node:crypto";
 
-import { and, asc, desc, eq, isNull } from "drizzle-orm";
+import { and, asc, eq, isNull } from "drizzle-orm";
 import { Decimal } from "decimal.js";
 import pino from "pino";
 

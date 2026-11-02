@@ -7,6 +7,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { BrandedInquiryClient } from "./BrandedInquiryClient";
 import { buildBrandedStorefrontViewModel } from "./branded-storefront.utils";
 import { resolveSiteTradeFromSettings } from "./site-trade.from-settings";
+import { ApiError } from "@/src/lib/api";
 
 const mocks = vi.hoisted(() => ({
   submit: vi.fn(),
@@ -19,7 +20,11 @@ vi.mock("@/src/hooks/booking.hooks", () => ({
   useCheckZipCoverage: () => ({ mutateAsync: mocks.checkZip, isPending: false })
 }));
 
-vi.mock("@/src/lib/api", () => ({ ApiError: class ApiError extends Error {} }));
+vi.mock("@/src/lib/api", () => ({
+  ApiError: class ApiError extends Error {
+    constructor(_status: number, payload: { message: string }) { super(payload.message); }
+  }
+}));
 
 const baseSettings = {
   companyName: "Summit Service",
@@ -40,6 +45,8 @@ function fillRequiredFields() {
   fireEvent.change(screen.getByLabelText("First name"), { target: { value: "Pat" } });
   fireEvent.change(screen.getByLabelText("Last name"), { target: { value: "Lee" } });
   fireEvent.change(screen.getByLabelText("Mobile phone"), { target: { value: "5550100" } });
+  const freeformService = screen.queryByRole("textbox", { name: "Service interest" });
+  if (freeformService) fireEvent.change(freeformService, { target: { value: "Drain inspection" } });
   fireEvent.change(screen.getByLabelText("Service address"), { target: { value: "1 Main St" } });
   fireEvent.change(screen.getByLabelText("City"), { target: { value: "Chicago" } });
   fireEvent.change(screen.getByLabelText("State"), { target: { value: "IL" } });
@@ -64,6 +71,7 @@ describe("BrandedInquiryClient", () => {
     const firstName = screen.getByRole("textbox", { name: /First name/ });
     expect(screen.getByRole("alert").textContent).toContain("Please correct the highlighted fields.");
     expect(screen.getByText("First name is required.")).toBeTruthy();
+    expect(screen.getByText("Service interest is required.")).toBeTruthy();
     expect(screen.getByText("ZIP code is required.")).toBeTruthy();
     expect(firstName.getAttribute("aria-invalid")).toBe("true");
     expect(firstName.getAttribute("aria-describedby")).toBeTruthy();
@@ -89,17 +97,56 @@ describe("BrandedInquiryClient", () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it("keeps an uncovered new-shop inquiry unsent and reports the actual outcome", async () => {
-    mocks.checkZip.mockResolvedValue({ covered: false });
+  it("reports a server-rejected out-of-area inquiry without claiming receipt", async () => {
+    mocks.submit.mockRejectedValue(new ApiError(409, { error: "CONFLICT", message: "We don't currently serve this ZIP code" }));
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true, json: async () => ({ accepted: true }) }));
     render(<BrandedInquiryClient model={buildBrandedStorefrontViewModel(baseSettings)} acquisitionSource="website" />);
     fillRequiredFields();
 
     fireEvent.click(screen.getByRole("button", { name: "Send inquiry" }));
 
-    await waitFor(() => expect(screen.getByRole("alert").textContent).toContain("Your inquiry was not sent."));
-    expect(mocks.submit).not.toHaveBeenCalled();
+    await waitFor(() => expect(screen.getByRole("alert").textContent).toContain("We don't currently serve this ZIP code"));
+    expect(mocks.checkZip).not.toHaveBeenCalled();
+    expect(mocks.submit).toHaveBeenCalledOnce();
     expect(screen.queryByText("Inquiry received")).toBeNull();
+  });
+
+  it("submits an unknown-coverage inquiry for a new shop without claiming a booking", async () => {
+    mocks.submit.mockResolvedValue({
+      kind: "inquiry_only",
+      bookingRequest: { id: "request-1", referenceNumber: "REF-UNKNOWN", status: "pending" },
+      serviceability: "unknown"
+    });
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true, json: async () => ({ accepted: true }) }));
+    render(<BrandedInquiryClient model={buildBrandedStorefrontViewModel(baseSettings)} acquisitionSource="website" />);
+    fillRequiredFields();
+
+    fireEvent.click(screen.getByRole("button", { name: "Send inquiry" }));
+
+    await waitFor(() => expect(screen.getByText(/We received your inquiry/)).toBeTruthy());
+    expect(screen.getByText(/Service availability has not been confirmed/)).toBeTruthy();
+    expect(screen.getByText(/No appointment has been booked/)).toBeTruthy();
+    expect(screen.getByText("REF-UNKNOWN")).toBeTruthy();
+    expect(mocks.checkZip).not.toHaveBeenCalled();
+    expect(mocks.submit).toHaveBeenCalledOnce();
+    expect(mocks.submit).toHaveBeenCalledWith(expect.objectContaining({
+      body: expect.objectContaining({ serviceType: "Drain inspection", smsConsentAppointments: false, smsConsentMarketing: false })
+    }));
+    expect(screen.queryByRole("link", { name: "Review booking options" })).toBeNull();
+  });
+
+  it("keeps configured-service unknown coverage behind the existing positive ZIP gate", async () => {
+    mocks.checkZip.mockResolvedValue({ covered: false });
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true, json: async () => ({ accepted: true }) }));
+    const model = buildBrandedStorefrontViewModel({ ...baseSettings, trade: "hvac", offeredServices: [{ label: "AC repair" }] });
+    render(<BrandedInquiryClient model={model} acquisitionSource="website" />);
+    fillRequiredFields();
+
+    fireEvent.click(screen.getByRole("button", { name: "Send inquiry" }));
+
+    await waitFor(() => expect(screen.getByRole("alert").textContent).toContain("Your inquiry was not sent."));
+    expect(mocks.checkZip).toHaveBeenCalledOnce();
+    expect(mocks.submit).not.toHaveBeenCalled();
   });
 
   it("keeps a spoken submit label and busy state while sending", () => {
@@ -117,11 +164,11 @@ describe("BrandedInquiryClient", () => {
   });
 
   it.each([
-    ["hvac", "Heating & air conditioning", "Service inquiry"],
-    ["plumbing", "Plumbing", "Service inquiry"],
-    [undefined, "Home services", "Service inquiry"]
+    ["hvac", "Heating & air conditioning", "AC repair"],
+    ["plumbing", "Plumbing", "Drain cleaning"],
+    [undefined, "Drain inspection", "Drain inspection"]
   ] as const)("submits %s inquiry without implied SMS consent", async (trade, category, serviceType) => {
-    const settings = { ...baseSettings, ...(trade ? { trade } : {}) };
+    const settings = { ...baseSettings, ...(trade ? { trade, offeredServices: [{ label: serviceType }] } : {}) };
     const model = buildBrandedStorefrontViewModel(settings);
     mocks.checkZip.mockResolvedValue({ covered: true });
     mocks.submit.mockResolvedValue({ confirmation: { referenceNumber: "REF-1" } });

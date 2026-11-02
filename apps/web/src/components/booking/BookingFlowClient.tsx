@@ -325,6 +325,7 @@ export function BookingFlowClient({
   const emergencyOn = emergencyAvailable(settingsQuery.data?.booking);
   const isEmergency = emergencyOn && urgency === "emergency";
   const [showAllTimes, setShowAllTimes] = useState(preferredWindow !== "first_available");
+  const [inquiryOnlyReference, setInquiryOnlyReference] = useState<string | null>(null);
   const availabilityDate = preferredDate || new Date().toISOString().slice(0, 10);
   const availabilityQuery = usePublicAvailability(slug, zipVerified ? zip : null, availabilityDate);
 
@@ -389,6 +390,10 @@ export function BookingFlowClient({
       });
 
       clearBookingIdempotencyKey(slug);
+      if (!("confirmation" in response)) {
+        setInquiryOnlyReference(response.bookingRequest.referenceNumber ?? "received");
+        return;
+      }
       if (emergencyWasDowngraded(response)) {
         showToast({ tone: "info", title: EMERGENCY_COPY.downgraded });
       }
@@ -466,6 +471,18 @@ export function BookingFlowClient({
   }
 
   const settings = settingsQuery.data.booking;
+
+  if (inquiryOnlyReference) {
+    return (
+      <div className="mx-auto w-full max-w-[480px] px-4 py-10">
+        <BookingCard>
+          <h1 className="text-2xl font-semibold text-neutral-950">We received your inquiry</h1>
+          <p className="mt-3 text-sm leading-6 text-neutral-600">Service availability has not been confirmed. The team will follow up. No appointment has been booked.</p>
+          <p className="mt-3 text-sm text-neutral-600">Reference {inquiryOnlyReference}.</p>
+        </BookingCard>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto w-full max-w-[480px] px-4 py-6 md:max-w-[688px] md:px-6">

@@ -22,7 +22,7 @@ interface BrandedInquiryClientProps {
   serviceCategory?: string;
 }
 
-type InquiryField = "firstName" | "lastName" | "phone" | "email" | "addressLine1" | "city" | "state" | "zip";
+type InquiryField = "firstName" | "lastName" | "phone" | "email" | "serviceInterest" | "addressLine1" | "city" | "state" | "zip";
 type InquiryFieldErrors = Partial<Record<InquiryField, string>>;
 
 function createIdempotencyKey(): string {
@@ -62,6 +62,7 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
   const [smsConsentAppointments, setSmsConsentAppointments] = useState(false);
   const [smsConsentMarketing, setSmsConsentMarketing] = useState(false);
   const [referenceNumber, setReferenceNumber] = useState<string | null>(null);
+  const [inquiryOnlyReceived, setInquiryOnlyReceived] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<InquiryFieldErrors>({});
   const [isSending, setIsSending] = useState(false);
@@ -85,6 +86,7 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
       { key: "firstName", label: "First name", value: firstName },
       { key: "lastName", label: "Last name", value: lastName },
       { key: "phone", label: "Mobile phone", value: phone },
+      ...(model.serviceCards.length === 0 ? [{ key: "serviceInterest" as const, label: "Service interest", value: serviceInterest }] : []),
       { key: "addressLine1", label: "Service address", value: addressLine1 },
       { key: "city", label: "City", value: city },
       { key: "state", label: "State", value: state },
@@ -117,10 +119,13 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
         return;
       }
 
-      const coverage = await zipCheckMutation.mutateAsync(zip.trim());
-      if (!coverage.covered) {
-        setErrorMessage("This shop has not confirmed service in that ZIP. Your inquiry was not sent.");
-        return;
+      // For an unconfigured shop, only the server can distinguish unknown coverage from a known out-of-area ZIP.
+      if (model.serviceCards.length > 0) {
+        const coverage = await zipCheckMutation.mutateAsync(zip.trim());
+        if (!coverage.covered) {
+          setErrorMessage("This shop has not confirmed service in that ZIP. Your inquiry was not sent.");
+          return;
+        }
       }
 
       const response = await submitMutation.mutateAsync({
@@ -148,7 +153,12 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
         }
       });
 
-      setReferenceNumber(response.confirmation.referenceNumber);
+      if (!("confirmation" in response)) {
+        setInquiryOnlyReceived(true);
+        setReferenceNumber(response.bookingRequest.referenceNumber ?? "received");
+      } else {
+        setReferenceNumber(response.confirmation.referenceNumber);
+      }
     } catch (error) {
       setErrorMessage(error instanceof ApiError ? error.message : "We could not send your request. Please try again.");
     } finally {
@@ -159,12 +169,16 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
   if (referenceNumber) {
     return (
       <div className="mx-auto max-w-lg rounded-[14px] border border-[#e6dccb] bg-white p-8 text-center">
-        <h1 className="text-2xl font-semibold text-[#0f1530]">Inquiry received</h1>
+        <h1 className="text-2xl font-semibold text-[#0f1530]">{inquiryOnlyReceived ? "We received your inquiry" : "Inquiry received"}</h1>
         <p className="mt-3 text-sm leading-6 text-[#5e6684]">
-          Reference <span className="font-mono font-medium text-[#0f1530]">{referenceNumber}</span>.{" "}
-          {model.companyName} will follow up — this is not a confirmed appointment until they reach out.
+          {inquiryOnlyReceived ? (
+            <>Service availability has not been confirmed. The team will follow up. No appointment has been booked.</>
+          ) : (
+            <>{model.companyName} will follow up — this is not a confirmed appointment until they reach out.</>
+          )}
         </p>
-        {model.serviceCards.length > 0 ? (
+        <p className="mt-3 text-sm text-[#5e6684]">Reference <span className="font-mono font-medium text-[#0f1530]">{referenceNumber}</span>.</p>
+        {!inquiryOnlyReceived && model.serviceCards.length > 0 ? (
           <Link href={bookHref} className="mt-6 inline-flex text-sm font-semibold text-[#2f7d4f] hover:underline">
             Review booking options
           </Link>
@@ -252,7 +266,22 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
             ))}
           </select>
         </label>
-      ) : null}
+      ) : (
+        <label className="block text-sm font-medium text-[#2a3360]">
+          Service interest
+          <input
+            required
+            name="serviceInterest"
+            value={serviceInterest}
+            onChange={(event) => { setServiceInterest(event.target.value); clearFieldError("serviceInterest"); }}
+            aria-invalid={Boolean(fieldErrors.serviceInterest)}
+            aria-describedby={fieldErrors.serviceInterest ? fieldErrorId("serviceInterest") : undefined}
+            className="mt-1.5 w-full rounded-lg border border-[#e6dccb] px-3.5 py-3 text-[15px]"
+            placeholder="Briefly describe the service you need"
+          />
+          {fieldErrors.serviceInterest ? <span id={fieldErrorId("serviceInterest")} className="mt-1 block text-red-700">{fieldErrors.serviceInterest}</span> : null}
+        </label>
+      )}
 
       <label className="block text-sm font-medium text-[#2a3360]">
         Service address

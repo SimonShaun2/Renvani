@@ -94,7 +94,10 @@ describe("Technician Today", () => {
   });
 
   it("keeps the assigned card and details link when optional enrichment fails", () => {
-    mocks.details.mockReturnValue([{ data: undefined, isError: true }]);
+    mocks.details.mockReturnValue([{ data: { job: {
+      customer: { firstName: "Stale", lastName: "Customer", phone: "555-0199" },
+      property: { addressLine1: "99 Old St", city: "Austin", state: "TX" }
+    } }, isError: true }]);
     render(<TodayJobsList />);
 
     expect(screen.getByText("J-1")).toBeTruthy();
@@ -103,16 +106,24 @@ describe("Technician Today", () => {
     expect(screen.getByText("Nav unavailable")).toBeTruthy();
     expect(screen.getByText("Call unavailable")).toBeTruthy();
     expect(screen.getByRole("link", { name: "View Details" }).getAttribute("href")).toBe("/mobile/jobs/job-1");
+    expect(document.body.textContent).not.toMatch(/Stale Customer|99 Old St/);
+    expect(document.querySelector('a[href^="tel:"], a[href^="https://maps.google.com/"]')).toBeNull();
   });
 
   it("keeps tablet cards when enrichment fails without invented values", () => {
     mocks.breakpoint.mockReturnValue({ isTablet: true });
-    mocks.details.mockReturnValue([{ data: undefined, isError: true }]);
+    mocks.details.mockReturnValue([{ data: { job: {
+      customer: { firstName: "Stale", lastName: "Customer", phone: "555-0199" },
+      property: { addressLine1: "99 Old St", city: "Austin", state: "TX" }
+    } }, isError: true }]);
     render(<TodayJobsList />);
 
     expect(screen.getByText("J-1")).toBeTruthy();
     expect(screen.getByText("Customer details unavailable")).toBeTruthy();
     expect(screen.getByText("Nav unavailable")).toBeTruthy();
+    expect(screen.getByText("Address unavailable")).toBeTruthy();
+    expect(document.body.textContent).not.toMatch(/Stale Customer|99 Old St/);
+    expect(document.querySelector('a[href^="tel:"], a[href^="https://maps.google.com/"]')).toBeNull();
     expect(document.body.textContent).not.toMatch(/Carrier HVAC Unit|Clock In|potential/i);
   });
 

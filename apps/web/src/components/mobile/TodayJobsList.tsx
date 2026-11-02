@@ -73,7 +73,9 @@ export function TodayJobsList() {
   const detailQueries = useTodayJobDetails(mobileJobs.map((job) => job.id));
   const jobs: TodayCardJob[] = mobileJobs.map((job, index) => {
     const detailQuery = detailQueries[index];
-    const detail = detailQuery?.data?.job;
+    // React Query can retain a prior response after a failed refetch. Treat the
+    // current error as authoritative so stale contact/location data is not shown.
+    const detail = detailQuery?.isError ? undefined : detailQuery?.data?.job;
     return {
       ...job,
       customer: detail?.customer ?? null,

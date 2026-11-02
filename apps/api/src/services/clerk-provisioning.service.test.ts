@@ -86,6 +86,17 @@ vi.mock("@fsm/db", () => {
     }),
     query: {
       users: {
+        findMany: vi.fn(async (opts: { where: (t: unknown, o: unknown) => Cond }) => {
+          const cond = opts.where(
+            { role: "role", companyId: "companyId", deletedAt: "deletedAt" },
+            {
+              eq: (field: keyof User, value: unknown) => ({ op: "eq", field, value }),
+              isNull: (field: keyof User) => ({ op: "isNull", field }),
+              and: (...parts: Cond[]) => ({ op: "and", parts })
+            }
+          );
+          return state.users.filter((u) => matches(u, cond));
+        }),
         findFirst: vi.fn(async (opts: { where: (t: unknown, o: unknown) => Cond }) => {
           const cond = opts.where(
             { id: "id", email: "email", role: "role", companyId: "companyId", clerkUserId: "clerkUserId", deletedAt: "deletedAt", clerkUnlinkedAt: "clerkUnlinkedAt" },
@@ -228,6 +239,32 @@ describe("FS-157 clerk_user_id provisioning", () => {
     expect(await provisionClerkMembership({ ...base, email: "a@x.com", clerkUserId: "user_a" }))
       .toEqual({ status: "deferred", companyId: "co_1" });
     expect(state.users).toHaveLength(0);
+  });
+
+  it("replays a linked member and admits only new non-owners in a legacy org with one owner", async () => {
+    const { provisionClerkMembership } = await import("./clerk-provisioning.service.js");
+    state.companies[0]!.settings.clerk = { organizationId: "org_1" };
+    state.users = [{ id: "owner", companyId: "co_1", email: "owner@x.com", role: "owner", clerkUserId: "user_owner" }];
+    expect(await provisionClerkMembership({ ...base, email: "owner@x.com", clerkUserId: "user_owner" }))
+      .toMatchObject({ status: "exists", role: "owner" });
+    expect(await provisionClerkMembership({ ...base, email: "member@x.com", clerkUserId: "user_member" }))
+      .toMatchObject({ status: "created", role: "admin" });
+    expect(state.users.filter((user) => user.role === "owner")).toHaveLength(1);
+  });
+
+  it("defers ownerless or ambiguous legacy orgs and denies cross-tenant Clerk ids", async () => {
+    const { provisionClerkMembership } = await import("./clerk-provisioning.service.js");
+    state.companies[0]!.settings.clerk = { organizationId: "org_1" };
+    const newMember = { ...base, email: "new@x.com", clerkUserId: "user_new" };
+    expect(await provisionClerkMembership(newMember)).toEqual({ status: "deferred", companyId: "co_1" });
+    state.users.push({ id: "owner", companyId: "co_1", email: "owner@x.com", role: "owner", clerkUserId: "user_owner" });
+    state.users.push({ id: "other_owner", companyId: "co_1", email: "other@x.com", role: "owner", clerkUserId: "user_other" });
+    expect(await provisionClerkMembership(newMember)).toEqual({ status: "deferred", companyId: "co_1" });
+    state.users.pop();
+    state.users.push({ id: "foreign", companyId: "co_2", email: "foreign@x.com", role: "office", clerkUserId: "user_foreign" });
+    expect(await provisionClerkMembership({ ...newMember, email: "foreign@x.com", clerkUserId: "user_foreign" }))
+      .toMatchObject({ status: "skipped" });
+    expect(state.users.filter((user) => user.companyId === "co_1")).toHaveLength(1);
   });
 
   it("cross-tenant: a creator of org_1 gains nothing in org_2", async () => {

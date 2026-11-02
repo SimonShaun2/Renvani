@@ -16,6 +16,10 @@ function createJobId(intentId: string): string {
   return `clerk-workspace-create-${intentId}`;
 }
 
+function reconcileJobId(intentId: string): string {
+  return `clerk-workspace-reconcile-${intentId}`;
+}
+
 /**
  * Enqueue the single permitted provider create attempt for one durable intent.
  * The job is deliberately non-retryable: an unknown provider outcome must be
@@ -36,7 +40,26 @@ export async function enqueueClerkWorkspaceCreateJob(input: ClerkWorkspaceJobPay
 /** Reconcile a claimed/uncertain intent from paginated, secret-key Clerk observations. */
 export async function enqueueClerkWorkspaceReconcileJob(input: ClerkWorkspaceJobPayload): Promise<void> {
   const payload = ClerkWorkspaceJobPayloadSchema.parse(input);
+  const jobId = reconcileJobId(payload.intentId);
+  const existing = await webhooksQueue.getJob(jobId);
+  if (existing) {
+    if (await existing.getState() === "failed") {
+      try {
+        // Reuse the failed job rather than removing its recorded failure. BullMQ
+        // retains its stacktrace while resetting the bounded attempt count.
+        await existing.retry("failed", { resetAttemptsMade: true });
+      } catch (error) {
+        // A concurrent request may already have moved this failed job to waiting.
+        const state = await existing.getState();
+        if (state !== "waiting" && state !== "active" && state !== "delayed" && state !== "waiting-children") {
+          throw error;
+        }
+      }
+    }
+    return;
+  }
   await webhooksQueue.add(CLERK_WORKSPACE_RECONCILE_JOB_NAME, payload, {
+    jobId,
     attempts: 5,
     backoff: { type: "exponential", delay: 2_000 },
     removeOnComplete: true,

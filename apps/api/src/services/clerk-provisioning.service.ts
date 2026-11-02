@@ -203,11 +203,6 @@ export async function provisionClerkMembership(
         }
         return { status: "deferred" as const, companyId: null };
       }
-      const createdBy = readClerkCreatedBy(company);
-      if (!createdBy) {
-        return { status: "deferred" as const, companyId: company.id };
-      }
-
       if (clerkUserId) {
         const byClerkId = await tx.query.users.findFirst({
           where: (userTable, operators) =>
@@ -219,6 +214,23 @@ export async function provisionClerkMembership(
             return { status: "skipped" as const, companyId: company.id };
           }
           return { status: "exists" as const, companyId: company.id, role: byClerkId.role };
+        }
+      }
+
+      const createdBy = readClerkCreatedBy(company);
+      if (!createdBy) {
+        // Legacy companies may predate the creator marker. Preserve an already-linked
+        // member above, and admit new non-owner members only with one established owner.
+        const owners = await tx.query.users.findMany({
+          where: (userTable, operators) =>
+            operators.and(
+              operators.eq(userTable.companyId, company.id),
+              operators.eq(userTable.role, "owner"),
+              operators.isNull(userTable.deletedAt)
+            )
+        });
+        if (!clerkUserId || owners.length !== 1) {
+          return { status: "deferred" as const, companyId: company.id };
         }
       }
 
@@ -275,7 +287,7 @@ export async function provisionClerkMembership(
         return { status: "linked" as const, companyId: company.id, role: reread.role };
       }
 
-      const isOwner = clerkUserId === createdBy;
+      const isOwner = Boolean(createdBy && clerkUserId === createdBy);
       const role = mapClerkOrgRole(input.clerkOrgRole, isOwner);
       const [createdUser] = await tx.insert(users).values({
         companyId: company.id,

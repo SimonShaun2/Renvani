@@ -121,7 +121,9 @@ async function invalidateDispatchQueries(queryClient: ReturnType<typeof useQuery
 
 export function useDispatchView(date: string) {
   const queryClient = useQueryClient();
-  const [streamLive, setStreamLiveState] = useState(true);
+  // Poll until the stream has actually opened. Starting optimistically in the live state
+  // leaves the board stale when token resolution fails before EventSource is constructed.
+  const [streamLive, setStreamLiveState] = useState(false);
   const setStreamLive = useDispatchStore((state) => state.setStreamLive);
 
   useEffect(() => {
@@ -133,25 +135,31 @@ export function useDispatchView(date: string) {
       setStreamLive(live);
     };
 
-    // Same precedence as apiFetch: Clerk session token first, legacy JWT as fallback.
-    void resolveBearerToken().then(({ token }) => {
-      if (cancelled) return;
-      if (!token || typeof EventSource === "undefined") {
-        update(false);
-        return;
-      }
+    // Same precedence as apiFetch: legacy JWT first, Clerk session token as fallback.
+    void resolveBearerToken()
+      .then(({ token }) => {
+        if (cancelled) return;
+        if (!token || typeof EventSource === "undefined") {
+          update(false);
+          return;
+        }
 
-      const params = new URLSearchParams({ date, access_token: token });
-      eventSource = new EventSource(`${API_BASE_URL}/api/v1/dispatch/stream?${params.toString()}`);
-      eventSource.onopen = () => update(true);
-      eventSource.addEventListener("ping", () => {
-        void invalidateDispatchQueries(queryClient);
-      });
-      eventSource.onerror = () => {
+        const params = new URLSearchParams({ date, access_token: token });
+        eventSource = new EventSource(`${API_BASE_URL}/api/v1/dispatch/stream?${params.toString()}`);
+        eventSource.onopen = () => update(true);
+        eventSource.addEventListener("ping", () => {
+          void invalidateDispatchQueries(queryClient);
+        });
+        eventSource.onerror = () => {
+          update(false);
+          eventSource?.close();
+        };
+      })
+      .catch(() => {
+        if (cancelled) return;
+        console.error("Dispatch stream authorization failed; falling back to polling");
         update(false);
-        eventSource?.close();
-      };
-    });
+      });
 
     return () => {
       update(false);

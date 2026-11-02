@@ -1,8 +1,8 @@
 import { createHash } from "node:crypto";
 
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, isNull, sql } from "drizzle-orm";
 
-import { agentActions, db } from "@fsm/db";
+import { activityEvents, agentActions, db, runTransactionWithTenantSession } from "@fsm/db";
 import {
   AppError,
   ErrorCode,
@@ -29,7 +29,8 @@ import {
   isAgentActionEditable,
   requiresHumanApproval
 } from "./agent-action.policy.js";
-import { getAgentActionExecutor } from "./agent-action.executors.js";
+import { requireAgentActionExecutor, getAgentActionExecutor } from "./agent-action.executors.js";
+import { buildAgentActionExecutionResultForType, persistAgentActionExecutionFailure } from "./agent-action-receipt.js";
 import { resolveEntityRef } from "./tenant-context.service.js";
 import {
   emitAgentActionAuditEvent,
@@ -90,8 +91,115 @@ function mapRow(row: typeof agentActions.$inferSelect) {
     approvedParameters: (row.approvedParameters as Record<string, unknown> | null) ?? null,
     executionReceipt: row.executionReceipt as Record<string, unknown> | null,
     createdAt: row.createdAt.toISOString(),
-    updatedAt: row.updatedAt.toISOString()
+    updatedAt: row.updatedAt.toISOString(),
+    version: agentActionVersion(row)
   };
+}
+
+/**
+ * Optimistic-concurrency token for state changes: clients echo it back as `expectedVersion`.
+ * Derived from updated_at (every state change bumps it), so no schema change is needed.
+ */
+export function agentActionVersion(row: Pick<typeof agentActions.$inferSelect, "updatedAt">): number {
+  return row.updatedAt.getTime();
+}
+
+export interface AgentActionStateChangeOptions {
+  expectedVersion?: number | undefined;
+  /** Client `Idempotency-Key` (approve/execute): same key + same request replays; different request → 409. */
+  idempotencyKey?: string | undefined;
+}
+
+type TenantTx = Parameters<Parameters<typeof runTransactionWithTenantSession>[1]>[0];
+type IdempotentOperation = "approve" | "execute";
+
+const IDEMPOTENT_OPERATION_EVENT_TYPE = {
+  approve: "agent.proposal_approved",
+  execute: "agent.execution_succeeded"
+} as const;
+
+function idempotencyRequestHash(operation: IdempotentOperation, options: AgentActionStateChangeOptions): string {
+  return hashPayload({ operation, expectedVersion: options.expectedVersion ?? null });
+}
+
+function idempotencyDetail(operation: IdempotentOperation, options: AgentActionStateChangeOptions) {
+  return options.idempotencyKey
+    ? { idempotency: { key: options.idempotencyKey, requestHash: idempotencyRequestHash(operation, options) } }
+    : {};
+}
+
+/**
+ * Replay lookup for approve/execute (TE-DUP-01/02). The key and request hash are recorded on the
+ * tenant-scoped audit event written in the same transaction as the transition, so no migration is needed.
+ * Returns the current row (marked `replayed: true`) when the same key and request were already applied;
+ * throws 409 when the key was used with a different request; returns null when the key is new.
+ */
+async function findIdempotentReplay(
+  tx: TenantTx,
+  companyId: string,
+  row: typeof agentActions.$inferSelect,
+  operation: IdempotentOperation,
+  options: AgentActionStateChangeOptions
+) {
+  if (!options.idempotencyKey) {
+    return null;
+  }
+
+  const events = await tx
+    .select()
+    .from(activityEvents)
+    .where(
+      and(
+        eq(activityEvents.companyId, companyId),
+        eq(activityEvents.entityType, "agent_action"),
+        eq(activityEvents.entityId, row.id),
+        eq(activityEvents.eventType, IDEMPOTENT_OPERATION_EVENT_TYPE[operation])
+      )
+    );
+
+  const prior = events
+    .map((event) => (event.payload as { idempotency?: { key?: unknown; requestHash?: unknown } } | null)?.idempotency)
+    .find((entry) => entry?.key === options.idempotencyKey);
+  if (!prior) {
+    return null;
+  }
+
+  if (prior.requestHash !== idempotencyRequestHash(operation, options)) {
+    throw new AppError(ErrorCode.CONFLICT, "Idempotency-Key was already used with a different request");
+  }
+
+  return { ...mapRow(row), replayed: true as const };
+}
+
+/**
+ * Serialises concurrent requests that share an Idempotency-Key within one company (transaction-scoped advisory
+ * lock on company + key, taken before the row is read). The second request waits until the first commits, then
+ * reads the committed row and audit event and replays it (200, `replayed: true`) instead of losing the
+ * compare-and-set race with a 409. No key → no lock (behaviour unchanged).
+ */
+async function lockIdempotencyKey(tx: TenantTx, companyId: string, options: AgentActionStateChangeOptions): Promise<void> {
+  if (!options.idempotencyKey) {
+    return;
+  }
+  const lockable = tx as unknown as { execute?: (query: unknown) => Promise<unknown> };
+  if (typeof lockable.execute === "function") {
+    await lockable.execute(sql`select pg_advisory_xact_lock(hashtext(${`agent-action-idempotency:${companyId}:${options.idempotencyKey}`}))`);
+  }
+}
+
+function assertExpectedVersion(row: typeof agentActions.$inferSelect, options: AgentActionStateChangeOptions): void {
+  if (options.expectedVersion !== undefined && options.expectedVersion !== agentActionVersion(row)) {
+    throw agentActionVersionConflictError();
+  }
+}
+
+function agentActionVersionConflictError(): AppError {
+  return new AppError(ErrorCode.CONFLICT, "Agent action changed since it was loaded; reload and retry");
+}
+
+/** Compare-and-set predicate: the transition only applies if the row is still in `fromState`. */
+function agentActionTransitionWhere(companyId: string, actionId: string, fromState: string) {
+  return and(agentActionScopedWhere(companyId, actionId), eq(agentActions.state, fromState as AgentActionState));
 }
 
 function toLifecycleSlice(row: typeof agentActions.$inferSelect) {
@@ -121,10 +229,12 @@ async function getActionRow(companyId: string, actionId: string, executor: Selec
 }
 
 async function persistTerminalExpiredState(companyId: string, actionId: string): Promise<void> {
-  await db
-    .update(agentActions)
-    .set({ state: "expired", updatedAt: new Date() })
-    .where(agentActionScopedWhere(companyId, actionId));
+  await runTransactionWithTenantSession(companyId, async (tx) => {
+    await tx
+      .update(agentActions)
+      .set({ state: "expired", updatedAt: new Date() })
+      .where(agentActionScopedWhere(companyId, actionId));
+  });
 }
 
 function resolveProposalPolicy(input: CreateAgentActionInput) {
@@ -272,13 +382,25 @@ export async function listAgentActions(
     .map(mapRow);
 }
 
-export async function approveAgentAction(companyId: string, actionId: string, reviewerId: string) {
+export async function approveAgentAction(
+  companyId: string,
+  actionId: string,
+  reviewerId: string,
+  options: AgentActionStateChangeOptions = {}
+) {
   let persistExpiredAfterRollback = false;
 
   try {
-    const mapped = await db.transaction(async (tx) => {
+    const mapped = await runTransactionWithTenantSession(companyId, async (tx) => {
+      await lockIdempotencyKey(tx, companyId, options);
       const row = await getActionRow(companyId, actionId, tx);
 
+      const replay = await findIdempotentReplay(tx, companyId, row, "approve", options);
+      if (replay) {
+        return { mapped: replay, row, replayed: true };
+      }
+
+      assertExpectedVersion(row, options);
       assertAgentActionApprovable(toLifecycleSlice(row));
 
       if (isAgentActionExpired(row.expiresAt)) {
@@ -296,12 +418,12 @@ export async function approveAgentAction(companyId: string, actionId: string, re
           approvedParameters,
           updatedAt: new Date()
         })
-        .where(agentActionScopedWhere(companyId, actionId))
+        .where(agentActionTransitionWhere(companyId, actionId, row.state))
         .returning();
 
       const updated = updatedRows[0];
       if (!updated) {
-        throw new AppError(ErrorCode.INTERNAL_ERROR, "Failed to approve agent action");
+        throw agentActionVersionConflictError();
       }
 
       await emitAgentActionAuditEvent(tx, {
@@ -310,11 +432,16 @@ export async function approveAgentAction(companyId: string, actionId: string, re
         row: updated,
         actorId: reviewerId,
         actorType: "user",
-        summary: "Agent proposal approved"
+        summary: "Agent proposal approved",
+        ...(options.idempotencyKey ? { detail: idempotencyDetail("approve", options) } : {})
       });
 
-      return { mapped: mapRow(updated), row: updated };
+      return { mapped: mapRow(updated), row: updated, replayed: false };
     });
+
+    if (mapped.replayed) {
+      return mapped.mapped;
+    }
 
     await mirrorAgentActionAuditToLangfuse({
       companyId,
@@ -334,9 +461,16 @@ export async function approveAgentAction(companyId: string, actionId: string, re
   }
 }
 
-export async function rejectAgentAction(companyId: string, actionId: string, reviewerId: string) {
-  const result = await db.transaction(async (tx) => {
+export async function rejectAgentAction(
+  companyId: string,
+  actionId: string,
+  reviewerId: string,
+  options: AgentActionStateChangeOptions = {}
+) {
+  const result = await runTransactionWithTenantSession(companyId, async (tx) => {
     const row = await getActionRow(companyId, actionId, tx);
+
+    assertExpectedVersion(row, options);
 
     assertAgentActionRejectable(toLifecycleSlice(row));
 
@@ -353,12 +487,12 @@ export async function rejectAgentAction(companyId: string, actionId: string, rev
     const updatedRows = await tx
       .update(agentActions)
       .set({ state: "cancelled", reviewerId, updatedAt: new Date() })
-      .where(agentActionScopedWhere(companyId, actionId))
+      .where(agentActionTransitionWhere(companyId, actionId, row.state))
       .returning();
 
     const updated = updatedRows[0];
     if (!updated) {
-      throw new AppError(ErrorCode.INTERNAL_ERROR, "Failed to reject agent action");
+      throw agentActionVersionConflictError();
     }
 
     await emitAgentActionAuditEvent(tx, {
@@ -402,10 +536,14 @@ export async function editAgentActionParameters(
   companyId: string,
   actionId: string,
   editorId: string,
-  patch: { channel?: "sms" | "email"; subject?: string | null; body: string }
+  patch: { channel?: "sms" | "email"; subject?: string | null; body: string },
+  options: AgentActionStateChangeOptions = {}
 ) {
-  const result = await db.transaction(async (tx) => {
+  const result = await runTransactionWithTenantSession(companyId, async (tx) => {
     const row = await getActionRow(companyId, actionId, tx);
+
+    // TE-STALE-03: an edit made against a stale copy must not overwrite the current body.
+    assertExpectedVersion(row, options);
 
     if (row.state !== "awaiting_approval") {
       throw new AppError(ErrorCode.CONFLICT, "Only awaiting-approval actions can be edited");
@@ -437,12 +575,12 @@ export async function editAgentActionParameters(
         approvedParameters: null,
         updatedAt: new Date()
       })
-      .where(agentActionScopedWhere(companyId, actionId))
+      .where(agentActionTransitionWhere(companyId, actionId, "awaiting_approval"))
       .returning();
 
     const updated = updatedRows[0];
     if (!updated) {
-      throw new AppError(ErrorCode.INTERNAL_ERROR, "Failed to edit agent action");
+      throw agentActionVersionConflictError();
     }
 
     const detail = {
@@ -476,12 +614,29 @@ export async function editAgentActionParameters(
   return result.mapped;
 }
 
-export async function executeAgentAction(companyId: string, actionId: string, actorId: string) {
+export async function executeAgentAction(
+  companyId: string,
+  actionId: string,
+  actorId: string,
+  options: AgentActionStateChangeOptions = {}
+) {
   let persistExpiredAfterRollback = false;
+  // Set only while the executor side effect runs. An unexpected (non-AppError) throw there, e.g. a provider or
+  // adapter error, is recorded as `failed` (TE-FAIL-01). AppError rejections from the executor (validation,
+  // cross-tenant, not found) and every check before it keep rolling back to the prior state so they can be fixed.
+  let persistFailureAfterRollback = false;
 
   try {
-    const result = await db.transaction(async (tx) => {
+    const result = await runTransactionWithTenantSession(companyId, async (tx) => {
+      await lockIdempotencyKey(tx, companyId, options);
       const row = await getActionRow(companyId, actionId, tx);
+
+      const replay = await findIdempotentReplay(tx, companyId, row, "execute", options);
+      if (replay) {
+        return { mapped: replay, row, detail: null, replayed: true };
+      }
+
+      assertExpectedVersion(row, options);
 
       if (isAgentActionExpired(row.expiresAt)) {
         persistExpiredAfterRollback = true;
@@ -489,6 +644,8 @@ export async function executeAgentAction(companyId: string, actionId: string, ac
       }
 
       assertAgentActionExecutable(toLifecycleSlice(row));
+      // Fail closed: an action type with no registered executor cannot be executed.
+      const executor = requireAgentActionExecutor(row.actionType);
 
       const executableParameters = resolveExecutableParameters(row);
       const target = row.target as CanonicalEntityRefV1;
@@ -497,7 +654,6 @@ export async function executeAgentAction(companyId: string, actionId: string, ac
         throw agentActionStaleTargetError();
       }
 
-      const executor = getAgentActionExecutor(row.actionType);
       const executionContext = {
         tx,
         companyId,
@@ -509,20 +665,25 @@ export async function executeAgentAction(companyId: string, actionId: string, ac
         requiresApproval: row.requiresApproval,
         state: row.state
       };
-      const authorizationDecision = (await executor?.beforeExecute?.(executionContext)) ?? null;
+      const authorizationDecision = (await executor.beforeExecute?.(executionContext)) ?? null;
 
-      await tx
+      const claimed = await tx
         .update(agentActions)
         .set({ state: "executing", updatedAt: new Date() })
-        .where(agentActionScopedWhere(companyId, actionId));
+        .where(agentActionTransitionWhere(companyId, actionId, row.state))
+        .returning();
+      if (!claimed[0]) {
+        throw agentActionVersionConflictError();
+      }
 
-      // Side effects (e.g. FS-25 brief apply) commit atomically with the succeeded state.
-      await executor?.applyInTransaction?.(executionContext);
+      // Side effects (e.g. FS-25 brief apply) commit atomically with the final state.
+      persistFailureAfterRollback = true;
+      await executor.applyInTransaction?.(executionContext);
+      persistFailureAfterRollback = false;
 
-      const receipt = {
-        outcome: "succeeded" as const,
-        emittedEventIds: [] as string[],
-        note: "No outbound provider send in Batch 4 slice",
+      // Internal actions end `succeeded`; outbound actions stay `executing` with a `queued` receipt until a
+      // provider callback moves delivery on (TE-RCPT-01/02). No provider send happens here.
+      const { state: finalState, receipt } = buildAgentActionExecutionResultForType(row.actionType, {
         approvedParameters: executableParameters,
         approvedParametersHash: hashPayload({
           actionType: row.actionType,
@@ -538,16 +699,16 @@ export async function executeAgentAction(companyId: string, actionId: string, ac
               }
             }
           : {})
-      };
+      });
 
       const updatedRows = await tx
         .update(agentActions)
         .set({
-          state: "succeeded",
+          state: finalState,
           executionReceipt: receipt,
           updatedAt: new Date()
         })
-        .where(agentActionScopedWhere(companyId, actionId))
+        .where(agentActionTransitionWhere(companyId, actionId, "executing"))
         .returning();
 
       const updated = updatedRows[0];
@@ -557,7 +718,8 @@ export async function executeAgentAction(companyId: string, actionId: string, ac
 
       const detail = {
         actionType: row.actionType,
-        receipt
+        receipt,
+        ...idempotencyDetail("execute", options)
       };
 
       await emitAgentActionAuditEvent(tx, {
@@ -570,8 +732,12 @@ export async function executeAgentAction(companyId: string, actionId: string, ac
         detail
       });
 
-      return { mapped: mapRow(updated), row: updated, detail };
+      return { mapped: mapRow(updated), row: updated, detail, replayed: false };
     });
+
+    if (result.replayed || !result.detail) {
+      return result.mapped;
+    }
 
     await mirrorAgentActionAuditToLangfuse({
       companyId,
@@ -587,6 +753,15 @@ export async function executeAgentAction(companyId: string, actionId: string, ac
   } catch (error) {
     if (persistExpiredAfterRollback) {
       await persistTerminalExpiredState(companyId, actionId);
+    }
+    if (persistFailureAfterRollback && !(error instanceof AppError)) {
+      // The execute tx has rolled back (no row lock held). Record failed + receipt + execution_failed audit in a
+      // fresh tenant tx; a failure to record must not mask the original error.
+      try {
+        await persistAgentActionExecutionFailure({ companyId, actionId, actorId, actorType: "user", error });
+      } catch {
+        // swallow: the original execution error below is what the caller needs
+      }
     }
     throw error;
   }

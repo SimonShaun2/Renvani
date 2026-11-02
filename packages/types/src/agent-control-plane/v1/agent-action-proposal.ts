@@ -16,9 +16,19 @@ import {
   UuidSchema
 } from "./zod-shared.js";
 
+/**
+ * Delivery states for outbound agent actions (Figma 331:4230 steps Queued, Provider accepted, Delivered, plus
+ * Delivery failure). Business outcome is tracked separately and is not a delivery state.
+ */
+export const AgentActionDeliveryStateV1Schema = z.enum(["queued", "provider_accepted", "delivered", "failed"]);
+export type AgentActionDeliveryStateV1 = z.infer<typeof AgentActionDeliveryStateV1Schema>;
+
 export const ExecutionReceiptV1Schema = z.object({
-  outcome: z.enum(["succeeded", "failed", "dry_run"]),
-  emittedEventIds: z.array(UuidSchema)
+  /** `queued`: an outbound action was accepted for sending but nothing was sent yet; never reads as done. */
+  outcome: z.enum(["succeeded", "queued", "failed", "dry_run"]),
+  emittedEventIds: z.array(UuidSchema),
+  /** Present on outbound actions only. */
+  deliveryState: AgentActionDeliveryStateV1Schema.optional()
 });
 
 export type ExecutionReceiptV1 = z.infer<typeof ExecutionReceiptV1Schema>;

@@ -8,6 +8,7 @@ import type { DispatchNextBestJob, DispatchView } from "@fsm/types";
 
 import { CurrencyDisplay } from "@/src/components/ui/CurrencyDisplay";
 import { EmptyState } from "@/src/components/ui/EmptyState";
+import { LoadErrorState } from "@/src/components/ui/LoadErrorState";
 import { SkeletonCard } from "@/src/components/ui/SkeletonCard";
 import { StatBadge } from "@/src/components/ui/StatBadge";
 import { TimeAgo } from "@/src/components/ui/TimeAgo";
@@ -39,6 +40,20 @@ interface DispatchQueuePanelProps {
   onConvertEstimate: (estimateId: string) => Promise<void>;
   autoFittingJobId: string | null;
   convertingEstimateId: string | null;
+  /** Set when the matching query failed; shows an error with Retry instead of the empty state. */
+  smartQueueError?: QueueLoadError | null;
+  bookingRequestsError?: QueueLoadError | null;
+  unscheduledError?: QueueLoadError | null;
+  approvedEstimatesError?: QueueLoadError | null;
+}
+
+export interface QueueLoadError {
+  onRetry: () => void;
+  isRetrying: boolean;
+}
+
+function QueueError({ title, error }: { title: string; error: QueueLoadError }) {
+  return <LoadErrorState compact title={title} onRetry={error.onRetry} isRetrying={error.isRetrying} />;
 }
 
 const bookingSourceFilters = [
@@ -445,7 +460,11 @@ export function DispatchQueuePanel({
   onAutoFitJob,
   onConvertEstimate,
   autoFittingJobId,
-  convertingEstimateId
+  convertingEstimateId,
+  smartQueueError = null,
+  bookingRequestsError = null,
+  unscheduledError = null,
+  approvedEstimatesError = null
 }: DispatchQueuePanelProps) {
   const [bookingSourceFilter, setBookingSourceFilter] = useState<(typeof bookingSourceFilters)[number]["id"]>("all");
   const normalizedSearch = search.trim().toLowerCase();
@@ -525,7 +544,10 @@ export function DispatchQueuePanel({
                 </div>
                 <Sparkles className="h-4 w-4 text-ai" />
               </div>
-              <NextBestJobsSection
+              {smartQueueError ? (
+                <QueueError title="Smart queue could not be loaded" error={smartQueueError} />
+              ) : (
+                <NextBestJobsSection
                 jobs={nextBestJobs}
                 isLoading={isLoading}
                 selectedJobId={selectedJobId}
@@ -533,6 +555,7 @@ export function DispatchQueuePanel({
                 onSelectJob={onSelectJob}
                 onAutoFitJob={onAutoFitJob}
               />
+              )}
             </>
           ) : null}
 
@@ -562,12 +585,16 @@ export function DispatchQueuePanel({
                   </button>
                 ))}
               </div>
-              <BookingRequestsSection
+              {bookingRequestsError ? (
+                <QueueError title="Booking requests could not be loaded" error={bookingRequestsError} />
+              ) : (
+                <BookingRequestsSection
                 requests={filteredBookingRequests}
                 isLoading={bookingRequestsLoading}
                 selectedBookingRequestId={selectedBookingRequestId}
                 onSelectBookingRequest={onSelectBookingRequest}
               />
+              )}
             </>
           ) : null}
 
@@ -580,23 +607,31 @@ export function DispatchQueuePanel({
                 </div>
                 <CalendarClock className="h-4 w-4 text-neutral-400" />
               </div>
-              <UnscheduledSection
+              {unscheduledError ? (
+                <QueueError title="Unscheduled jobs could not be loaded" error={unscheduledError} />
+              ) : (
+                <UnscheduledSection
                 jobs={filteredUnscheduledJobs}
                 isLoading={unscheduledLoading}
                 selectedJobId={selectedJobId}
                 onSelectJob={onSelectJob}
               />
+              )}
             </>
           ) : null}
         </div>
       </section>
 
-      <ApprovedEstimateSection
+      {approvedEstimatesError ? (
+                <QueueError title="Approved estimates could not be loaded" error={approvedEstimatesError} />
+              ) : (
+                <ApprovedEstimateSection
         estimates={approvedEstimates}
         isLoading={approvedEstimatesLoading}
         convertingEstimateId={convertingEstimateId}
         onConvertEstimate={onConvertEstimate}
       />
+              )}
 
       <section className="rounded-[28px] border border-neutral-200 bg-white px-4 py-4 shadow-sm">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-400">Tip</p>

@@ -30,6 +30,7 @@ import {
   payments,
   users
 } from "@fsm/db";
+import { isReceiptEmailAllowed } from "@fsm/comms";
 import { aiQueue, invoicesQueue, notificationsQueue } from "@fsm/jobs";
 import {
   AppError,
@@ -55,6 +56,7 @@ import {
 
 import { buildChargePreview } from "../lib/charge-preview.js";
 import { readRenvaniSubscriptionPlan } from "../lib/company-renvani-plan.js";
+import { dispatchEventAutomation } from "./automation/event-automation.registry.js";
 import { generateInvoiceNumber } from "../lib/invoice-number.js";
 import {
   buildPublicPayViewFields,
@@ -341,7 +343,8 @@ function applyPaymentToInvoice(invoice: InvoiceRow, paymentAmount: Decimal): {
 }
 
 function resolveStripePaymentMethod(paymentIntent: Stripe.PaymentIntent): PaymentMethod {
-  const paymentMethodType = paymentIntent.payment_method_types[0];
+  // Guard: some events/fixtures omit payment_method_types; never crash payment recording on it.
+  const paymentMethodType = paymentIntent.payment_method_types?.[0];
 
   switch (paymentMethodType) {
     case "card":
@@ -824,6 +827,7 @@ export async function loadPublicInvoicePayment(
     totalDueCents: fees.totalCents,
     feeRefundable: false,
     platformFeePercent: fees.serviceFeeCents > 0 ? fees.serviceFeeRateBps / 100 : null,
+    serviceFeePercent: fees.serviceFeeCents > 0 ? fees.serviceFeeRateBps / 100 : null,
     platformFeePaidByCustomer: totalFeeCents > 0,
     platformFeeDisclosure: disclosure.length > 0 ? disclosure : null
   };
@@ -1133,6 +1137,7 @@ export async function sendInvoice(
       invoiceId: existingInvoice.id,
       customerId: existingInvoice.customerId,
       customerEmail: customer.email,
+      receiptEmail: isReceiptEmailAllowed(customer) ? customer.email.trim() : null,
       companyStripeAccountId: company.stripeAccountId,
       companyName: company.name,
       invoiceNumber: existingInvoice.invoiceNumber,
@@ -1270,7 +1275,7 @@ export async function recordPayment(
   const normalizedInput = normalizeRecordPaymentInput(input);
   const paymentAmount = new Decimal(normalizedInput.amount);
 
-  return db.transaction(async (tx) => {
+  const result = await db.transaction(async (tx) => {
     const actor = await getUserRecord(companyId, actorId, tx);
     const customer = await getCustomerRecord(companyId, existingInvoice.customerId, tx);
     const insertedPayments = await tx
@@ -1351,8 +1356,17 @@ export async function recordPayment(
       });
     }
 
-    return toPayment(payment);
+    return {
+      payment: toPayment(payment),
+      paid: updatedInvoice.status === "paid"
+    };
   });
+
+  if (result.paid) {
+    await dispatchEventAutomation({ eventType: "invoice.paid", companyId, invoiceId });
+  }
+
+  return result.payment;
 }
 
 export async function resendInvoiceReminder(
@@ -1561,7 +1575,7 @@ export async function handleStripePaymentSuccess(
   // Only the invoice portion is applied to the balance; fees are recorded on their own columns.
   const paymentAmount = new Decimal(fees.invoiceAmountCents).div(100);
 
-  await db.transaction(async (tx) => {
+  const recorded = await db.transaction(async (tx) => {
     const customer = await getCustomerRecord(invoice.companyId, invoice.customerId, tx);
     const insertedPayments = await tx
       .insert(payments)
@@ -1642,7 +1656,53 @@ export async function handleStripePaymentSuccess(
         summary: buildInvoiceSummary(updatedInvoice.invoiceNumber, "paid")
       });
     }
+
+    return { payment, customer, paid: updatedInvoice.status === "paid" };
   });
+
+  await enqueueInvoicePaymentReceipt(invoice.companyId, invoice.id, recorded.payment, recorded.customer);
+
+  if (recorded.paid) {
+    await dispatchEventAutomation({ eventType: "invoice.paid", companyId: invoice.companyId, invoiceId: invoice.id });
+  }
+}
+
+/**
+ * Resend payment receipt. Only reached when this delivery inserted a NEW payment row (redelivery returns early on
+ * the existing intent), and the jobId makes BullMQ drop any duplicate enqueue, so receipts are at most once per payment.
+ * Opt-out is re-checked in the worker against fresh customer data; this pre-check just avoids pointless jobs.
+ * Enqueue failure is logged, never thrown: the payment is already committed and a 5xx would not re-enqueue.
+ */
+async function enqueueInvoicePaymentReceipt(
+  companyId: string,
+  invoiceId: string,
+  payment: { id: string; customerId: string; amount: string; paidAt: Date | null },
+  customer: { email: string | null; doNotContact?: boolean | null; prefersEmail?: boolean | null }
+): Promise<void> {
+  if (!isReceiptEmailAllowed(customer)) {
+    return;
+  }
+
+  try {
+    await notificationsQueue.add(
+      "send-invoice-receipt",
+      {
+        companyId,
+        invoiceId,
+        customerId: payment.customerId,
+        paymentId: payment.id,
+        amount: payment.amount,
+        paidAt: payment.paidAt ? payment.paidAt.toISOString() : null
+      },
+      {
+        jobId: `invoice-receipt-${payment.id}`,
+        attempts: 3,
+        backoff: { type: "exponential", delay: 5000 }
+      }
+    );
+  } catch (error) {
+    logger.error({ err: error, companyId, invoiceId, paymentId: payment.id }, "Failed to enqueue invoice payment receipt");
+  }
 }
 
 export async function handleStripePaymentFailed(

@@ -339,6 +339,48 @@ describe("invoice.service", () => {
     expect(created.subtotal).toBe("80.00");
   });
 
+  it("getInvoiceChargePreview: Flex adds the 2% Service Fee on balance due, Flat adds none, other tenant is NOT_FOUND", async () => {
+    const flex = fakeDb.seedCompany({ name: "Flex Co", slug: "flex-co", timezone: "America/Chicago", settings: { stripePlatformBilling: { planTier: "flex" } } } as never);
+    const flat = fakeDb.seedCompany({ name: "Flat Co", slug: "flat-co", timezone: "America/Chicago", settings: { stripePlatformBilling: { planTier: "flat" } } } as never);
+    const flexCustomer = fakeDb.seedCustomer({ companyId: flex.id, firstName: "A", lastName: "B" });
+    const flatCustomer = fakeDb.seedCustomer({ companyId: flat.id, firstName: "C", lastName: "D" });
+    const flexInvoice = fakeDb.seedInvoice({ companyId: flex.id, customerId: flexCustomer.id, total: "100.00", balanceDue: "100.00" } as never);
+    const flatInvoice = fakeDb.seedInvoice({ companyId: flat.id, customerId: flatCustomer.id, total: "100.00", balanceDue: "100.00" } as never);
+
+    await expect(invoiceService.getInvoiceChargePreview(flex.id, flexInvoice.id)).resolves.toMatchObject({
+      invoiceId: flexInvoice.id,
+      invoiceTotal: "100.00",
+      plan: "flex",
+      subtotal: "100.00",
+      serviceFeeAmount: "2.00",
+      serviceFeeRateBps: 200,
+      total: "102.00"
+    });
+    await expect(invoiceService.getInvoiceChargePreview(flat.id, flatInvoice.id)).resolves.toMatchObject({
+      plan: "flat",
+      serviceFeeAmount: "0.00",
+      serviceFeeRateBps: 0,
+      serviceFeeLabel: null,
+      total: "100.00"
+    });
+    await expect(invoiceService.getInvoiceChargePreview(flex.id, flatInvoice.id)).rejects.toMatchObject({ code: ErrorCode.NOT_FOUND });
+  });
+
+  it("updateCompany sets, keeps and clears invoicing.defaultPaymentTermsDays without touching other settings", async () => {
+    const companyService = await import("./company.service.js");
+    const company = fakeDb.seedCompany({ name: "Terms Set", slug: "terms-set", timezone: "America/Chicago", settings: { tradingName: "TS" } } as never);
+    const actor = fakeDb.seedUser({ companyId: company.id, email: "o@terms.test", firstName: "O", lastName: "W", role: "owner" });
+    const read = () => fakeDb.getTestState().companies.find((row) => row.id === company.id)?.settings as Record<string, any>;
+
+    await companyService.updateCompany(company.id, actor.id, { settings: { invoicing: { defaultPaymentTermsDays: 30 } } } as never);
+    expect(read().invoicing).toEqual({ defaultPaymentTermsDays: 30 });
+    expect(read().tradingName).toBe("TS");
+    await companyService.updateCompany(company.id, actor.id, { settings: { invoicing: {} } } as never);
+    expect(read().invoicing).toEqual({ defaultPaymentTermsDays: 30 });
+    await companyService.updateCompany(company.id, actor.id, { settings: { invoicing: { defaultPaymentTermsDays: null } } } as never);
+    expect(read().invoicing).toEqual({ defaultPaymentTermsDays: null });
+  });
+
   it("createInvoice leaves dueAt empty without a company default and keeps explicit items over job lines", async () => {
     const { company, actor } = createAdminContext();
     const { customer, job } = seedInvoiceGraph(company.id);
@@ -667,6 +709,38 @@ describe("invoice.service", () => {
     expect(updatedInvoice?.balanceDue).toBe("0.00");
   });
 
+  it("handleStripePaymentSuccess records the payment when payment_method_types is missing", async () => {
+    const { company } = createAdminContext();
+    const { customer } = seedInvoiceGraph(company.id);
+    const invoice = fakeDb.seedInvoice({
+      companyId: company.id,
+      customerId: customer.id,
+      invoiceNumber: "INV-0002",
+      status: "sent",
+      total: "100.00",
+      amountPaid: "0.00",
+      balanceDue: "100.00"
+    });
+    const event = {
+      data: {
+        object: {
+          id: "pi_no_types",
+          amount: 10000,
+          amount_received: 10000,
+          latest_charge: "ch_no_types",
+          metadata: { invoiceId: invoice.id }
+        }
+      }
+    } as unknown as Stripe.PaymentIntentSucceededEvent;
+
+    await invoiceService.handleStripePaymentSuccess(event);
+
+    const stored = fakeDb.getTestState().payments.filter((row) => row.invoiceId === invoice.id);
+    expect(stored).toHaveLength(1);
+    expect(stored[0]?.method).toBe("other");
+    expect(fakeDb.getTestState().invoices.find((row) => row.id === invoice.id)?.status).toBe("paid");
+  });
+
   it("handleStripePaymentSuccess: legacy pre-removal intent with booking fee metadata still records it separately (non-refundable)", async () => {
     const { company } = createAdminContext();
     const { customer } = seedInvoiceGraph(company.id);
@@ -787,8 +861,8 @@ describe("invoice.service", () => {
 
   it("getPublicInvoicePaymentLink: online-booked Flex = invoice + 2% Service Fee, Flat = invoice only; no booking fee", async () => {
     const expected = {
-      flex: { serviceFeeAmount: "2.47", platformFeeAmount: "2.47", totalDue: "125.72", serviceFeeCents: 247, totalDueCents: 12_572, platformFeePercent: 2, platformFeePaidByCustomer: true },
-      flat: { serviceFeeAmount: "0.00", platformFeeAmount: "0.00", totalDue: "123.25", serviceFeeCents: 0, totalDueCents: 12_325, platformFeePercent: null, platformFeePaidByCustomer: false }
+      flex: { serviceFeeAmount: "2.47", platformFeeAmount: "2.47", totalDue: "125.72", serviceFeeCents: 247, totalDueCents: 12_572, platformFeePercent: 2, serviceFeePercent: 2, platformFeePaidByCustomer: true },
+      flat: { serviceFeeAmount: "0.00", platformFeeAmount: "0.00", totalDue: "123.25", serviceFeeCents: 0, totalDueCents: 12_325, platformFeePercent: null, serviceFeePercent: null, platformFeePaidByCustomer: false }
     } as const;
     for (const planTier of ["flat", "flex"] as const) {
       const { company } = createAdminContext();
@@ -825,6 +899,90 @@ describe("invoice.service", () => {
         ...expected[planTier]
       });
     }
+  });
+
+  describe("payment receipt (Resend)", () => {
+    function seedPayable(customerOverrides: Record<string, unknown> = {}) {
+      const { company } = createAdminContext();
+      const { customer } = seedInvoiceGraph(company.id);
+      Object.assign(customer, customerOverrides);
+      const invoice = fakeDb.seedInvoice({
+        companyId: company.id,
+        customerId: customer.id,
+        invoiceNumber: "INV-0R1",
+        status: "sent",
+        total: "150.00",
+        amountPaid: "0.00",
+        balanceDue: "150.00"
+      });
+      const event = {
+        data: {
+          object: {
+            id: `pi_${randomUUID()}`,
+            amount: 15000,
+            amount_received: 15000,
+            latest_charge: "ch_r1",
+            metadata: { invoiceId: invoice.id },
+            payment_method_types: ["card"]
+          }
+        }
+      } as unknown as Stripe.PaymentIntentSucceededEvent;
+      return { company, customer, invoice, event };
+    }
+
+    const receiptCalls = () => addNotificationQueueJob.mock.calls.filter((call) => call[0] === "send-invoice-receipt");
+
+    it("enqueues exactly one tenant-scoped receipt per payment, even on webhook redelivery", async () => {
+      const { company, customer, invoice, event } = seedPayable();
+
+      await invoiceService.handleStripePaymentSuccess(event);
+      await invoiceService.handleStripePaymentSuccess(event);
+
+      const [payment] = fakeDb.getTestState().payments.filter((row) => row.invoiceId === invoice.id);
+      expect(receiptCalls()).toHaveLength(1);
+      expect(receiptCalls()[0]).toEqual([
+        "send-invoice-receipt",
+        expect.objectContaining({
+          companyId: company.id,
+          invoiceId: invoice.id,
+          customerId: customer.id,
+          paymentId: payment?.id,
+          amount: "150.00"
+        }),
+        expect.objectContaining({ jobId: `invoice-receipt-${payment?.id}` })
+      ]);
+    });
+
+    it.each([
+      ["doNotContact", { doNotContact: true }],
+      ["prefersEmail=false", { prefersEmail: false }],
+      ["no email", { email: null }]
+    ])("does not enqueue when %s (payment still recorded)", async (_label, overrides) => {
+      const { invoice, event } = seedPayable(overrides);
+      await invoiceService.handleStripePaymentSuccess(event);
+      expect(receiptCalls()).toHaveLength(0);
+      expect(fakeDb.getTestState().payments.filter((row) => row.invoiceId === invoice.id)).toHaveLength(1);
+    });
+
+    it("an enqueue failure never fails the webhook (payment already committed)", async () => {
+      addNotificationQueueJob.mockRejectedValueOnce(new Error("redis down"));
+      const { invoice, event } = seedPayable();
+      await expect(invoiceService.handleStripePaymentSuccess(event)).resolves.toBeUndefined();
+      expect(fakeDb.getTestState().invoices.find((row) => row.id === invoice.id)?.status).toBe("paid");
+    });
+  });
+
+  it("sendInvoice passes receiptEmail for opted-in customers and null for opted-out", async () => {
+    const { company, actor } = createAdminContext();
+    const { customer } = seedInvoiceGraph(company.id);
+    const optedIn = fakeDb.seedInvoice({ companyId: company.id, customerId: customer.id, status: "draft", total: "10.00", subtotal: "10.00", balanceDue: "10.00" });
+    await invoiceService.sendInvoice(company.id, actor.id, optedIn.id);
+    expect(createInvoiceCheckoutSessionMock.mock.calls.at(-1)?.[0]).toMatchObject({ receiptEmail: "chris@example.com" });
+
+    customer.doNotContact = true;
+    const optedOut = fakeDb.seedInvoice({ companyId: company.id, customerId: customer.id, status: "draft", total: "10.00", subtotal: "10.00", balanceDue: "10.00" });
+    await invoiceService.sendInvoice(company.id, actor.id, optedOut.id);
+    expect(createInvoiceCheckoutSessionMock.mock.calls.at(-1)?.[0]).toMatchObject({ receiptEmail: null });
   });
 
   it("handleStripePaymentFailed emits a payment.failed event without changing invoice status", async () => {

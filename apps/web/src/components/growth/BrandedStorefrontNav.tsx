@@ -132,7 +132,7 @@ export function BrandedStorefrontNav({
                 className={`inline-flex h-11 w-full items-center justify-center rounded-[10px] text-sm font-semibold text-white ${primaryClassName}`}
                 onClick={() => closeMenu(true)}
               >
-                Book a clean
+                Book a service
               </Link>
             </li>
           </ul>

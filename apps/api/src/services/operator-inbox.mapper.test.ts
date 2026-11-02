@@ -37,7 +37,7 @@ describe("operator-inbox.mapper", () => {
   });
 
   it("exposes edit/approve/reject while awaiting approval", () => {
-    expect(resolveOverridePaths("awaiting_approval", true)).toEqual(["reject", "edit", "approve"]);
+    expect(resolveOverridePaths("awaiting_approval", true)).toEqual(["reject", "edit", "approve", "escalate"]);
   });
 
   it("maps recipient and proposed content from parameters", () => {

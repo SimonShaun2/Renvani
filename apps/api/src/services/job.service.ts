@@ -35,7 +35,6 @@ import {
   type JobPhoto,
   type JobPriority,
   type JobStatus,
-  type JobTechnicianSummary,
   type ListJobsQuery,
   type PaginatedResult,
   type ScheduleJobInput,
@@ -1044,54 +1043,63 @@ export async function transitionStatus(
   toStatus: JobStatus,
   reason?: string
 ): Promise<Job> {
+  const updatedJob = await db.transaction((tx) =>
+    transitionStatusInTransaction(tx, companyId, actorId, jobId, toStatus, reason)
+  );
+
+  await invalidateDispatchDates(companyId, updatedJob.scheduledStart, updatedJob.scheduledStart);
+  return updatedJob;
+}
+
+export async function transitionStatusInTransaction(
+  executor: TransactionExecutor,
+  companyId: string,
+  actorId: string,
+  jobId: string,
+  toStatus: JobStatus,
+  reason?: string
+): Promise<Job> {
   if (toStatus === "completed") {
     throw new AppError(ErrorCode.CONFLICT, "Use the complete job flow to mark a job as completed");
   }
 
-  const existingJob = await getJobRecord(companyId, jobId, db);
+  const existingJob = await getJobRecord(companyId, jobId, executor);
   const nextStatus = applyTransition(existingJob.status, toStatus);
   const eventType = resolveTransitionEventType(existingJob.status, nextStatus);
+  const actor = await getActor(companyId, actorId, executor);
+  const updateValues: Partial<JobRow> = {
+    status: nextStatus,
+    updatedAt: new Date()
+  };
 
-  const updatedJob = await db.transaction(async (tx) => {
-    const actor = await getActor(companyId, actorId, tx);
-    const updateValues: Partial<JobRow> = {
-      status: nextStatus,
-      updatedAt: new Date()
-    };
+  if (nextStatus === "in_progress" && !existingJob.actualStart) {
+    updateValues.actualStart = new Date();
+  }
 
-    if (nextStatus === "in_progress" && !existingJob.actualStart) {
-      updateValues.actualStart = new Date();
+  const [updatedJob] = await executor
+    .update(jobs)
+    .set(updateValues)
+    .where(and(eq(jobs.companyId, companyId), eq(jobs.id, jobId), isNull(jobs.deletedAt)))
+    .returning();
+
+  if (!updatedJob) {
+    throw new AppError(ErrorCode.NOT_FOUND, "Job not found");
+  }
+
+  await emitJobEvent(
+    executor,
+    actor,
+    actorId,
+    updatedJob,
+    eventType,
+    `Job ${updatedJob.jobNumber} moved from ${existingJob.status} to ${updatedJob.status}`,
+    {
+      fromStatus: existingJob.status,
+      toStatus: updatedJob.status,
+      ...(reason ? { reason } : {})
     }
+  );
 
-    const updatedJobs = await tx
-      .update(jobs)
-      .set(updateValues)
-      .where(and(eq(jobs.companyId, companyId), eq(jobs.id, jobId), isNull(jobs.deletedAt)))
-      .returning();
-    const updatedJob = updatedJobs[0];
-
-    if (!updatedJob) {
-      throw new AppError(ErrorCode.NOT_FOUND, "Job not found");
-    }
-
-    await emitJobEvent(
-      tx,
-      actor,
-      actorId,
-      updatedJob,
-      eventType,
-      `Job ${updatedJob.jobNumber} moved from ${existingJob.status} to ${updatedJob.status}`,
-      {
-        fromStatus: existingJob.status,
-        toStatus: updatedJob.status,
-        ...(reason ? { reason } : {})
-      }
-    );
-
-    return updatedJob;
-  });
-
-  await invalidateDispatchDates(companyId, existingJob.scheduledStart, updatedJob.scheduledStart);
   return updatedJob;
 }
 
@@ -1412,43 +1420,50 @@ export async function addNote(
   jobId: string,
   input: AddNoteInput
 ): Promise<JobNote> {
-  const existingJob = await getJobRecord(companyId, jobId, db);
+  return db.transaction((tx) => addNoteInTransaction(tx, companyId, actorId, jobId, input));
+}
+
+export async function addNoteInTransaction(
+  executor: TransactionExecutor,
+  companyId: string,
+  actorId: string,
+  jobId: string,
+  input: AddNoteInput
+): Promise<JobNote> {
+  const existingJob = await getJobRecord(companyId, jobId, executor);
   const normalizedInput = normalizeAddNoteInput(input);
+  const actor = await getActor(companyId, actorId, executor);
+  const insertedNotes = await executor
+    .insert(jobNotes)
+    .values({
+      companyId,
+      jobId: existingJob.id,
+      authorId: actorId,
+      content: normalizedInput.content,
+      noteKind: normalizedInput.noteKind,
+      isInternal: normalizedInput.isInternal
+    })
+    .returning();
+  const note = insertedNotes[0];
 
-  return db.transaction(async (tx) => {
-    const actor = await getActor(companyId, actorId, tx);
-    const insertedNotes = await tx
-      .insert(jobNotes)
-      .values({
-        companyId,
-        jobId: existingJob.id,
-        authorId: actorId,
-        content: normalizedInput.content,
-        noteKind: normalizedInput.noteKind,
-        isInternal: normalizedInput.isInternal
-      })
-      .returning();
-    const note = insertedNotes[0];
+  if (!note) {
+    throw new AppError(ErrorCode.INTERNAL_ERROR, "Failed to add job note");
+  }
 
-    if (!note) {
-      throw new AppError(ErrorCode.INTERNAL_ERROR, "Failed to add job note");
+  await emitJobEvent(
+    executor,
+    actor,
+    actorId,
+    existingJob,
+    "job.updated",
+    `Added note to job ${existingJob.jobNumber}`,
+    {
+      noteId: note.id,
+      isInternal: note.isInternal
     }
+  );
 
-    await emitJobEvent(
-      tx,
-      actor,
-      actorId,
-      existingJob,
-      "job.updated",
-      `Added note to job ${existingJob.jobNumber}`,
-      {
-        noteId: note.id,
-        isInternal: note.isInternal
-      }
-    );
-
-    return note;
-  });
+  return note;
 }
 
 export async function getJobNotes(companyId: string, jobId: string): Promise<JobNote[]> {
@@ -1462,48 +1477,55 @@ export async function addPhoto(
   jobId: string,
   input: AddPhotoInput
 ): Promise<JobPhoto> {
-  const existingJob = await getJobRecord(companyId, jobId, db);
+  return db.transaction((tx) => addPhotoInTransaction(tx, companyId, actorId, jobId, input));
+}
+
+export async function addPhotoInTransaction(
+  executor: TransactionExecutor,
+  companyId: string,
+  actorId: string,
+  jobId: string,
+  input: AddPhotoInput
+): Promise<JobPhoto> {
+  const existingJob = await getJobRecord(companyId, jobId, executor);
   const normalizedInput = normalizeAddPhotoInput(input);
+  const actor = await getActor(companyId, actorId, executor);
+  const insertedPhotos = await executor
+    .insert(jobPhotos)
+    .values({
+      companyId,
+      jobId: existingJob.id,
+      uploadedById: actorId,
+      url: normalizedInput.url,
+      thumbnailUrl: normalizedInput.thumbnailUrl,
+      caption: normalizedInput.caption,
+      photoType: normalizedInput.photoType,
+      takenAt: normalizedInput.takenAt
+    })
+    .returning();
+  const photo = insertedPhotos[0];
 
-  return db.transaction(async (tx) => {
-    const actor = await getActor(companyId, actorId, tx);
-    const insertedPhotos = await tx
-      .insert(jobPhotos)
-      .values({
-        companyId,
-        jobId: existingJob.id,
-        uploadedById: actorId,
-        url: normalizedInput.url,
-        thumbnailUrl: normalizedInput.thumbnailUrl,
-        caption: normalizedInput.caption,
-        photoType: normalizedInput.photoType,
-        takenAt: normalizedInput.takenAt
-      })
-      .returning();
-    const photo = insertedPhotos[0];
+  if (!photo) {
+    throw new AppError(ErrorCode.INTERNAL_ERROR, "Failed to add job photo");
+  }
 
-    if (!photo) {
-      throw new AppError(ErrorCode.INTERNAL_ERROR, "Failed to add job photo");
+  await emitJobEvent(
+    executor,
+    actor,
+    actorId,
+    existingJob,
+    "job.updated",
+    `Added photo to job ${existingJob.jobNumber}`,
+    {
+      photoId: photo.id,
+      photoType: photo.photoType
     }
+  );
 
-    await emitJobEvent(
-      tx,
-      actor,
-      actorId,
-      existingJob,
-      "job.updated",
-      `Added photo to job ${existingJob.jobNumber}`,
-      {
-        photoId: photo.id,
-        photoType: photo.photoType
-      }
-    );
-
-    return {
-      ...photo,
-      photoType: (photo.photoType ?? null) as JobPhoto["photoType"]
-    };
-  });
+  return {
+    ...photo,
+    photoType: (photo.photoType ?? null) as JobPhoto["photoType"]
+  };
 }
 
 export async function getJobPhotos(companyId: string, jobId: string): Promise<JobPhoto[]> {

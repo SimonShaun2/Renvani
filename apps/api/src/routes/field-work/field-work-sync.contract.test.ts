@@ -228,6 +228,68 @@ describe("FS-87 field work sync", () => {
     expect(fakeDb.getTestState().activityEvents).toHaveLength(1);
   });
 
+  it("rolls back a note and its event when the operation receipt cannot be persisted", async () => {
+    const { company, techUser, job } = seedFieldJob();
+    const originalInsert = fakeDb.db.insert.bind(fakeDb.db);
+    let failReceipt = true;
+    const body = {
+      contractVersion: "1.0.0",
+      deviceId: "ipad-receipt-failure",
+      batchClientId: "receipt-failure-batch",
+      operations: [
+        {
+          sequence: 1,
+          clientOperationId: "note-op-receipt-failure",
+          jobId: job.id,
+          type: "job.note.append",
+          payload: { content: "Atomic note" }
+        }
+      ]
+    };
+
+    fakeDb.db.insert = ((table) => {
+      const chain = originalInsert(table);
+      const tableName = (table as { __name?: string }).__name;
+      return {
+        values(values: Record<string, unknown> | Array<Record<string, unknown>>) {
+          const pending = chain.values(values);
+          return {
+            async returning() {
+              if (tableName === "fieldSyncOperations" && failReceipt) {
+                throw new Error("operation receipt unavailable");
+              }
+              return pending.returning();
+            }
+          };
+        }
+      };
+    }) as typeof fakeDb.db.insert;
+
+    const send = () =>
+      request(app.server)
+        .post("/api/v1/field-work/sync/batches")
+        .set("Authorization", bearer(company.id, techUser.id, techUser.role))
+        .send(body);
+
+    try {
+      const failed = await send();
+      expect(failed.status).toBe(500);
+      expect(fakeDb.getTestState().jobNotes).toHaveLength(0);
+      expect(fakeDb.getTestState().activityEvents).toHaveLength(0);
+      expect(fakeDb.getTestState().fieldSyncOperations).toHaveLength(0);
+
+      failReceipt = false;
+      const retried = await send();
+      expect(retried.status).toBe(200);
+      expect(retried.body.results[0].outcome).toBe("applied");
+      expect(fakeDb.getTestState().jobNotes).toHaveLength(1);
+      expect(fakeDb.getTestState().activityEvents).toHaveLength(1);
+      expect(fakeDb.getTestState().fieldSyncOperations).toHaveLength(1);
+    } finally {
+      fakeDb.db.insert = originalInsert;
+    }
+  });
+
   it("returns conflict when job recordVersion is stale", async () => {
     const { company, techUser, job } = seedFieldJob();
     const staleVersion = buildRecordVersionV1("job", job.id, new Date("2020-01-01T00:00:00.000Z"));

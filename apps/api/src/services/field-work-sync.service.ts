@@ -36,8 +36,12 @@ import {
   toJobSignatureObjectRef
 } from "../lib/job-signature-ref.js";
 
-import { addNote, addPhoto, transitionStatus } from "./job.service.js";
-import { updateTask } from "./job-tasks.service.js";
+import {
+  addNoteInTransaction,
+  addPhotoInTransaction,
+  transitionStatusInTransaction
+} from "./job.service.js";
+import { updateTaskInTransaction } from "./job-tasks.service.js";
 
 type BatchRow = typeof fieldSyncBatches.$inferSelect;
 type OperationRow = typeof fieldSyncOperations.$inferSelect;
@@ -330,6 +334,7 @@ async function resolveBatch(
 }
 
 async function applyOperation(
+  tx: FieldSyncTransaction,
   actor: FieldWorkSyncActor,
   operation: FieldWorkSyncOperationInput
 ): Promise<{
@@ -340,7 +345,7 @@ async function applyOperation(
 
   switch (operation.type) {
     case "job.note.append": {
-      const note = await addNote(actor.companyId, actor.userId, operation.jobId, {
+      const note = await addNoteInTransaction(tx, actor.companyId, actor.userId, operation.jobId, {
         content: operation.payload.content,
         isInternal: operation.payload.isInternal ?? true
       });
@@ -354,7 +359,7 @@ async function applyOperation(
       };
     }
     case "job.status.update": {
-      const [job] = await db
+      const [job] = await tx
         .select()
         .from(jobs)
         .where(
@@ -371,7 +376,8 @@ async function applyOperation(
         return buildFieldWorkSyncVersionConflict(liveVersion, "Job recordVersion is stale");
       }
 
-      const updated = await transitionStatus(
+      const updated = await transitionStatusInTransaction(
+        tx,
         actor.companyId,
         actor.userId,
         operation.jobId,
@@ -396,7 +402,7 @@ async function applyOperation(
         return { outcome: "rejected", resultPayload: { message: versionCheck.message } };
       }
 
-      const [task] = await db
+      const [task] = await tx
         .select()
         .from(jobTasks)
         .where(
@@ -422,7 +428,13 @@ async function applyOperation(
         ...(operation.payload.status !== undefined ? { status: operation.payload.status } : {}),
         ...(operation.payload.notes !== undefined ? { notes: operation.payload.notes } : {})
       };
-      const updated = await updateTask(actor.companyId, operation.jobId, operation.payload.taskId, taskUpdateInput);
+      const updated = await updateTaskInTransaction(
+        tx,
+        actor.companyId,
+        operation.jobId,
+        operation.payload.taskId,
+        taskUpdateInput
+      );
 
       return {
         outcome: "applied",
@@ -442,7 +454,7 @@ async function applyOperation(
       }
       const signatureValue = resolvedSignature.value;
 
-      const captureResult: SignatureCaptureTransactionResult = await db.transaction(async (tx) => {
+      const captureResult: SignatureCaptureTransactionResult = await (async () => {
         // PostgreSQL defaultNow() retains microseconds while the JS Date used in recordVersion tokens has
         // millisecond precision. Lock and revalidate the token instead of comparing updated_at to a rounded Date.
         const [currentJob] = await tx
@@ -531,7 +543,7 @@ async function applyOperation(
         });
 
         return { kind: "captured", job: captured, signedAt };
-      });
+      })();
 
       if (captureResult.kind === "rejected") {
         return { outcome: "rejected", resultPayload: { message: captureResult.message } };
@@ -568,7 +580,7 @@ async function applyOperation(
         photoType: operation.payload.photoType ?? "general",
         ...(operation.payload.caption !== undefined ? { caption: operation.payload.caption } : {})
       };
-      const photo = await addPhoto(actor.companyId, actor.userId, operation.jobId, photoInput);
+      const photo = await addPhotoInTransaction(tx, actor.companyId, actor.userId, operation.jobId, photoInput);
 
       return {
         outcome: "applied",
@@ -631,7 +643,7 @@ export async function submitFieldWorkSyncBatch(
 
         let applyResult: { outcome: FieldWorkSyncOperationOutcome; resultPayload: Record<string, unknown> };
         try {
-          applyResult = await applyOperation(actor, operation);
+          applyResult = await applyOperation(tx, actor, operation);
         } catch (error: unknown) {
           if (error instanceof AppError) {
             applyResult = { outcome: "rejected", resultPayload: { message: error.message } };

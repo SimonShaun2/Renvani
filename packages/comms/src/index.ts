@@ -9,6 +9,14 @@ export type {
 export { createResendEmailChannel, type ResendEmailAdapterConfig } from "./resend-email.adapter.js";
 export { createDisabledSmsChannel, sendSmsDisabled } from "./sms-disabled.stub.js";
 export {
+  DISABLED_SMS_PROVIDER_ID,
+  registerSmsProvider,
+  resolveSmsChannel,
+  unregisterSmsProviderForTests,
+  type ResolvedSmsChannel,
+  type SmsProviderFactory
+} from "./sms-provider.registry.js";
+export {
   EMAIL_TEMPLATE_IDS,
   renderTransactionalEmail,
   type EmailTemplateId,
@@ -29,3 +37,4 @@ export {
   type TransactionalEmailProvider,
   type TransactionalEmailProviderConfig
 } from "./email-provider.js";
+export { isReceiptEmailAllowed, type ReceiptRecipient } from "./receipt-consent.js";

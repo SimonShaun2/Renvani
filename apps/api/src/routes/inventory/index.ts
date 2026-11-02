@@ -91,15 +91,13 @@ const inventoryRoutes: FastifyPluginAsync = async (fastify) => {
     onRequest: read,
     preValidation: [withZodValidation({ query: ListStockLevelsQuerySchema })]
   }, async (request, reply) =>
-    reply.send({ levels: await listStockLevels(actorOf(request), request.query as ListStockLevelsQuery) }));
+    reply.send(await listStockLevels(actorOf(request), request.query as ListStockLevelsQuery)));
 
   fastify.get("/inventory/low-stock", {
     onRequest: read,
     preValidation: [withZodValidation({ query: ListStockLevelsQuerySchema })]
   }, async (request, reply) =>
-    reply.send({
-      levels: await listStockLevels(actorOf(request), { ...(request.query as ListStockLevelsQuery), lowStock: "true" })
-    }));
+    reply.send(await listStockLevels(actorOf(request), { ...(request.query as ListStockLevelsQuery), lowStock: "true" })));
 
   fastify.patch("/inventory/levels/:id", {
     onRequest: manage,
@@ -131,7 +129,7 @@ const inventoryRoutes: FastifyPluginAsync = async (fastify) => {
     onRequest: manage,
     preValidation: [withZodValidation({ query: ListStockMovementsQuerySchema })]
   }, async (request, reply) =>
-    reply.send({ movements: await listStockMovements(actorOf(request), request.query as ListStockMovementsQuery) }));
+    reply.send(await listStockMovements(actorOf(request), request.query as ListStockMovementsQuery)));
 };
 
 export default inventoryRoutes;

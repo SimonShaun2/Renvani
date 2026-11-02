@@ -278,11 +278,11 @@ describe("ai-revenue.service", () => {
     expect(result.data.every((row) => row.status !== "snoozed")).toBe(true);
   });
 
-  it("actionRecommendation transitions status, invalidates cache, and throws CONFLICT when already actioned", async () => {
+  it("actionRecommendation preserves unsupported direct actions and requires proposals for supported types", async () => {
     const { company, actor, customer } = seedRevenueGraph();
     const recommendation = fakeDb.seedAiRecommendation({
       companyId: company.id,
-      type: "reactivation",
+      type: "aging_asset",
       customerId: customer.id,
       estimatedRevenue: "300.00",
       urgencyScore: 80,
@@ -305,7 +305,7 @@ describe("ai-revenue.service", () => {
 
     const alreadyActioned = fakeDb.seedAiRecommendation({
       companyId: company.id,
-      type: "reactivation",
+      type: "aging_asset",
       customerId: customer.id,
       status: "actioned",
       actionedAt: new Date("2026-04-28T12:00:00.000Z"),
@@ -322,6 +322,25 @@ describe("ai-revenue.service", () => {
     ).rejects.toMatchObject({
       code: ErrorCode.CONFLICT
     });
+
+    const proposalSupported = fakeDb.seedAiRecommendation({
+      companyId: company.id,
+      type: "reactivation",
+      customerId: customer.id,
+      estimatedRevenue: "400.00",
+      urgencyScore: 90,
+      headline: "Proposal required",
+      body: "Must go through approval"
+    });
+    await expect(
+      aiRevenueService.actionRecommendation(company.id, actor.id, proposalSupported.id, {
+        actionTaken: "called_customer"
+      })
+    ).rejects.toMatchObject({
+      code: ErrorCode.CONFLICT,
+      message: "This recommendation requires a Revenue Agent proposal and operator approval"
+    });
+    expect(fakeDb.getTestState().aiRecommendations.find((row) => row.id === proposalSupported.id)?.status).toBe("pending");
   });
 
   it("dismissRecommendation transitions status and invalidates cache", async () => {

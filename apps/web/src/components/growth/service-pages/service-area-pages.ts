@@ -1,12 +1,20 @@
+import type { PublicBookingIntakeMode } from "@fsm/types";
+
 import type { PublicBookingSettingsRecord } from "@/src/hooks/booking.hooks";
 
-import { buildServiceCards, type BrandedServiceCard } from "../branded-storefront.utils";
+import { buildBookPath, buildServiceCards, type BrandedServiceCard } from "../branded-storefront.utils";
 
 /**
  * Service x area page template (Growth · Rank & book). Pages are derived from existing public booking data:
  * offeredServices x serviceAreaZipCodes. The public API exposes ZIPs only (no city names), so the area key is the ZIP.
  */
 export const SERVICE_PAGE_REVALIDATE_SECONDS = 3600;
+
+export function serviceAreaCallToAction(intakeMode: PublicBookingIntakeMode, bookingSlug: string, source: string) {
+  return intakeMode === "bookable"
+    ? { href: buildBookPath(bookingSlug, source), headerLabel: "Book a service", primaryLabel: "Book" }
+    : { href: "#ask-a-question", headerLabel: "Ask a question", primaryLabel: "Ask a question" };
+}
 
 export function slugifyService(title: string): string {
   return title

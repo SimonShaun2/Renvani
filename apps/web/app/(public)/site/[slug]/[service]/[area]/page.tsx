@@ -6,7 +6,6 @@ import { notFound } from "next/navigation";
 import { BrandedInquiryClient } from "@/src/components/growth/BrandedInquiryClient";
 import { BrandedLocalSeo } from "@/src/components/growth/BrandedLocalSeo";
 import {
-  buildBookPath,
   buildBrandedStorefrontViewModel,
   buildLocalBusinessJsonLd
 } from "@/src/components/growth/branded-storefront.utils";
@@ -15,6 +14,7 @@ import {
   hoursChip,
   nearbyServicePages,
   resolveServiceAreaPage,
+  serviceAreaCallToAction,
   serviceAreaPath,
   serviceEyebrow
 } from "@/src/components/growth/service-pages/service-area-pages";
@@ -43,7 +43,8 @@ async function load(params: Params) {
     companyName: model.companyName,
     service: ref.service.title,
     area: ref.area,
-    priceHint: ref.service.subtitle
+    priceHint: ref.service.subtitle,
+    intakeMode: settings.intakeMode
   });
   return { slug, settings, ref, model, copy };
 }
@@ -73,7 +74,7 @@ export default async function ServiceAreaPage({ params }: { params: Params }) {
   if (!page) notFound();
   const { slug, settings, ref, model, copy } = page;
   const source = `service-page:${ref.serviceSlug}:${ref.area}`;
-  const bookHref = buildBookPath(model.bookingSlug, source);
+  const action = serviceAreaCallToAction(model.intakeMode, model.bookingSlug, source);
   const sitePath = `/site/${slug}`;
   const jsonLd = { ...buildLocalBusinessJsonLd(model, serviceAreaPath(slug, ref)), areaServed: [ref.area] };
   const hours = hoursChip(settings);
@@ -104,10 +105,10 @@ export default async function ServiceAreaPage({ params }: { params: Params }) {
           </Link>
         </nav>
         <Link
-          href={bookHref}
+          href={action.href}
           className="inline-flex h-11 items-center rounded-[10px] bg-[#2f7d4f] px-[18px] text-sm font-semibold text-white hover:bg-[#286b44]"
         >
-          Book a service
+          {action.headerLabel}
         </Link>
       </header>
 
@@ -130,10 +131,10 @@ export default async function ServiceAreaPage({ params }: { params: Params }) {
             </div>
           ) : null}
           <Link
-            href={bookHref}
+            href={action.href}
             className="mt-6 inline-flex h-12 items-center rounded-[10px] bg-[#2f7d4f] px-6 text-[15px] font-semibold text-white hover:bg-[#286b44]"
           >
-            Book
+            {action.primaryLabel}
           </Link>
           {nearby.length ? (
             <div className="mt-10">
@@ -154,7 +155,7 @@ export default async function ServiceAreaPage({ params }: { params: Params }) {
           ) : null}
         </section>
 
-        <aside aria-label="Ask a question" className="lg:w-[360px]">
+        <aside id="ask-a-question" aria-label="Ask a question" className="lg:w-[360px]">
           {inquiryMode === "inquiry-api" ? (
             <ServiceInquiryCard slug={model.bookingSlug} service={ref.service.title} zip={ref.area} />
           ) : (

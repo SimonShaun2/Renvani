@@ -3,11 +3,14 @@
  * `openai` is a disabled adapter: it only runs when OPENAI_API_KEY is set AND SERVICE_PAGE_AI_COPY_APPROVED="true"
  * (no human-approval API exists yet, so AI copy is never auto-published by default). Output is plain text only.
  */
+import type { PublicBookingIntakeMode } from "@fsm/types";
+
 export interface ServiceCopyInput {
   companyName: string;
   service: string;
   area: string;
   priceHint: string | null;
+  intakeMode: PublicBookingIntakeMode;
 }
 
 export interface ServiceCopy {
@@ -40,12 +43,14 @@ export function toPlainText(value: unknown, max = MAX_TEXT): string {
 export const templateCopyProvider: ServiceCopyProvider = {
   key: "template",
   enabled: () => true,
-  async generate({ companyName, service, area, priceHint }) {
+  async generate({ companyName, service, area, priceHint, intakeMode }) {
     return {
       provider: "template",
       headline: `${service} in ${area}`,
       // Figma 155:79 body copy. "licensed tech" is the frame's wording for every trade.
-      intro: `Need ${service.toLowerCase()} in ${area}? ${companyName} sends a licensed tech to homes across ${area} with clear, upfront pricing. Pick a time online and get your confirmation by email.`,
+      intro: intakeMode === "bookable"
+        ? `Need ${service.toLowerCase()} in ${area}? ${companyName} sends a licensed tech to homes across ${area} with clear, upfront pricing. Pick a time online and get your confirmation by email.`
+        : `Need ${service.toLowerCase()} in ${area}? Ask ${companyName} about your service needs. The team can review your inquiry and follow up about next steps.`,
       bullets: priceHint && priceHint !== "Request a quote" ? [`Pricing: ${priceHint}`] : []
     };
   }
@@ -95,6 +100,8 @@ export async function generateServiceCopy(
   env: NodeJS.ProcessEnv = process.env,
   providers: ServiceCopyProvider[] = SERVICE_COPY_PROVIDERS
 ): Promise<ServiceCopy> {
+  // Inquiry-only pages cannot publish AI copy that promises a booking or confirmation.
+  if (input.intakeMode === "inquiry_only") return (await templateCopyProvider.generate(input, env))!;
   for (const provider of providers) {
     if (!provider.enabled(env)) continue;
     const copy = await provider.generate(input, env);

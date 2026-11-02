@@ -119,7 +119,7 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
 
       const coverage = await zipCheckMutation.mutateAsync(zip.trim());
       if (!coverage.covered) {
-        setErrorMessage("That ZIP is outside our current service area. You can still leave your email on the booking page.");
+        setErrorMessage("This shop has not confirmed service in that ZIP. Your inquiry was not sent.");
         return;
       }
 

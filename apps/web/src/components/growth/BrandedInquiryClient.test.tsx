@@ -89,6 +89,19 @@ describe("BrandedInquiryClient", () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
+  it("keeps an uncovered new-shop inquiry unsent and reports the actual outcome", async () => {
+    mocks.checkZip.mockResolvedValue({ covered: false });
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true, json: async () => ({ accepted: true }) }));
+    render(<BrandedInquiryClient model={buildBrandedStorefrontViewModel(baseSettings)} acquisitionSource="website" />);
+    fillRequiredFields();
+
+    fireEvent.click(screen.getByRole("button", { name: "Send inquiry" }));
+
+    await waitFor(() => expect(screen.getByRole("alert").textContent).toContain("Your inquiry was not sent."));
+    expect(mocks.submit).not.toHaveBeenCalled();
+    expect(screen.queryByText("Inquiry received")).toBeNull();
+  });
+
   it("keeps a spoken submit label and busy state while sending", () => {
     mocks.pending = true;
     const { container } = render(<BrandedInquiryClient model={buildBrandedStorefrontViewModel(baseSettings)} acquisitionSource="website" />);

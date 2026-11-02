@@ -3,8 +3,18 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
+import { isApprovedFs235NeonTarget } from "./fs235-neon-target.mjs";
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
+
+test("FS-235 strict target pin accepts only the approved tester endpoint host", () => {
+  const approved = "ep-floral-forest-b5kvzc7b-pooler.c-7.us-east-2.aws.neon.tech";
+  assert.equal(isApprovedFs235NeonTarget(new URL(`postgresql://u:p@${approved}/neondb`)), true);
+  assert.equal(isApprovedFs235NeonTarget(new URL("postgresql://u:p@ep-floral-forest-b5kvzc7b.c-7.us-east-2.aws.neon.tech/neondb")), false);
+  assert.equal(isApprovedFs235NeonTarget(new URL("postgresql://u:p@ep-production-pooler.c-7.us-east-2.aws.neon.tech/neondb")), false);
+  assert.equal(isApprovedFs235NeonTarget(new URL(`postgresql://u:p@${approved}.attacker.example/neondb`)), false);
+  assert.equal(isApprovedFs235NeonTarget(null), false);
+});
 
 test("neon-per-pr-branch script documents staging-only policy", () => {
   const script = readFileSync(join(repoRoot, "scripts/ci/neon-per-pr-branch.mjs"), "utf8");

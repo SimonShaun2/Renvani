@@ -9,6 +9,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { validateNeonCiDatabaseUrl } from "../../packages/config/dist/neon-ci.js";
+import { isApprovedFs235NeonTarget } from "./fs235-neon-target.mjs";
 import { redactDatabaseUrls, withStrictIsolatedCiDatabase } from "./neon-per-pr-database.mjs";
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
@@ -31,7 +32,7 @@ if (
   validation.mode !== "staging" ||
   !parsedUrl ||
   !["postgres:", "postgresql:"].includes(parsedUrl.protocol) ||
-  !parsedUrl.hostname.endsWith(".neon.tech")
+  !isApprovedFs235NeonTarget(parsedUrl)
 ) {
   console.error("[fs235-postgres] invalid or missing approved staging Neon CI target");
   process.exit(1);

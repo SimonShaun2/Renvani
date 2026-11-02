@@ -70,6 +70,7 @@ test("approved batch workflow limits FS-229 gate to the existing PR branch", () 
   const workflow = readFileSync(new URL("../../.github/workflows/batch-ci.yml", import.meta.url), "utf8");
   assert.match(workflow, /FS-229 strict inquiry concurrency/);
   assert.match(workflow, /github\.event\.pull_request\.head\.ref == 'codex\/growth-trade-inquiry'/);
+  assert.match(workflow, /github\.event\.pull_request\.number == 414/);
   assert.match(workflow, /FS229_PR_NUMBER: \$\{\{ github\.event\.pull_request\.number \}\}/);
   assert.match(workflow, /node-version: 22\.16\.0/);
 });

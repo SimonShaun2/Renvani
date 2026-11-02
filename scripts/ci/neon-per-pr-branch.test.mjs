@@ -5,7 +5,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
 import { isApprovedFs235NeonTarget } from "./fs235-neon-target.mjs";
-import { runVitestJsonGate, vitestFailureSummary } from "./fs235-vitest-diagnostics.mjs";
+import { runSilentVitest, runVitestJsonGate, vitestFailureSummary } from "./fs235-vitest-diagnostics.mjs";
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 
@@ -76,6 +76,32 @@ test("FS-235 runner reports structured diagnostics without reporter credentials 
       logs.join("\n"),
       /super-secret|ci_pr_411_2_1800000000|approved\.neon\.tech|owner@example\.com|sk_test_standalone/
     );
+    assert.equal(existsSync(outputFile), false);
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
+});
+
+test("FS-235 Vitest subprocess never emits raw failure output", () => {
+  const directory = mkdtempSync(join(tmpdir(), "fs235-vitest-raw-output-"));
+  const outputFile = join(directory, "result.json");
+  const logs = [];
+  const secret = "sk_test_standalone_secret";
+  const email = "customer@example.com";
+  try {
+    assert.throws(() => runVitestJsonGate({
+      outputFile,
+      runTest: () => runSilentVitest(
+        process.execPath,
+        ["-e", `console.error(${JSON.stringify(`${secret} ${email}`)}); process.exit(1)`],
+        process.env,
+        directory
+      ),
+      verifyResult: () => { throw new Error("must not verify a failed subprocess"); },
+      log: (line) => logs.push(line)
+    }), /Vitest exited with status 1/);
+    assert.match(logs.join("\n"), /JSON result was not produced/);
+    assert.doesNotMatch(logs.join("\n"), /sk_test_standalone_secret|customer@example\.com/);
     assert.equal(existsSync(outputFile), false);
   } finally {
     rmSync(directory, { recursive: true, force: true });

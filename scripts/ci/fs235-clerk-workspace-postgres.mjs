@@ -10,7 +10,7 @@ import { fileURLToPath } from "node:url";
 
 import { validateNeonCiDatabaseUrl } from "../../packages/config/dist/neon-ci.js";
 import { isApprovedFs235NeonTarget } from "./fs235-neon-target.mjs";
-import { runVitestJsonGate } from "./fs235-vitest-diagnostics.mjs";
+import { runSilentVitest, runVitestJsonGate } from "./fs235-vitest-diagnostics.mjs";
 import { redactDatabaseUrls, withStrictIsolatedCiDatabase } from "./neon-per-pr-database.mjs";
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
@@ -110,10 +110,11 @@ try {
         await verifyMigration(childSql);
         runVitestJsonGate({
           outputFile,
-          runTest: () => run(
+          runTest: () => runSilentVitest(
             "corepack",
             ["pnpm", "--filter", "@fsm/worker", "exec", "vitest", "run", "src/processors/clerk-workspace.postgres.integration.test.ts", "--reporter=json", `--outputFile=${outputFile}`],
-            childEnv
+            childEnv,
+            repoRoot
           ),
           verifyResult: verifyOnePassingTest
         });

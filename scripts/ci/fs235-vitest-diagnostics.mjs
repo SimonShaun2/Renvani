@@ -1,3 +1,4 @@
+import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync, rmSync } from "node:fs";
 
 import { redactDatabaseUrls } from "./neon-per-pr-database.mjs";
@@ -10,6 +11,19 @@ const MAX_MESSAGE_CHARS_SCANNED = 2_000;
 const MAX_SUMMARY_LENGTH = 2_000;
 const KNOWN_ASSERTION_TITLE = "authorizes exactly one provider create across concurrent workers";
 const KNOWN_TEST_FILE = "clerk-workspace.postgres.integration.test.ts";
+
+/** Vitest writes a JSON result file. Its raw streams can contain credentials or customer data. */
+export function runSilentVitest(command, args, env, cwd) {
+  const result = spawnSync(command, args, {
+    cwd,
+    env,
+    stdio: "ignore",
+    shell: false
+  });
+  if (result.status !== 0) {
+    throw new Error(`Vitest exited with status ${safeCount(result.status)}`);
+  }
+}
 
 function safeCount(value) {
   return Number.isSafeInteger(value) && value >= 0 ? value : "unknown";

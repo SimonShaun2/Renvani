@@ -43,7 +43,6 @@ import {
   type EmergencyRequestResolution,
   resolveEmergencyRequest,
   HOME_SERVICE_TRADE_REGISTRY,
-  getTradeServices,
   parseHomeServiceTrade,
   parseTradeDescription,
   readServiceAreaSettings
@@ -188,23 +187,12 @@ function toPublicBookingSettings(
       : {};
   const trade = parseHomeServiceTrade(settingsObject.trade);
   const configured = Array.isArray(row.offeredServices) ? (row.offeredServices as Array<Record<string, unknown>>) : [];
-  // Shop-entered services win; with none configured, a selected trade seeds the site with its default catalog.
-  const offeredServices =
-    configured.length === 0 && trade
-      ? getTradeServices(trade).map((service) => ({
-          key: service.key,
-          name: service.label,
-          label: service.label,
-          category: service.category,
-          emergency: service.emergency,
-          source: "trade_default"
-        }))
-      : configured;
   return {
     companyName: company.name,
     companySlug: company.slug,
     bookingSlug: row.bookingSlug ?? company.slug,
-    offeredServices,
+    intakeMode: configured.length > 0 ? "bookable" : "inquiry_only",
+    offeredServices: configured,
     availableHoursStart: row.availableHoursStart ?? 8,
     availableHoursEnd: row.availableHoursEnd ?? 17,
     availableDays: row.availableDays ?? DEFAULT_AVAILABLE_DAYS,

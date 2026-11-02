@@ -98,6 +98,47 @@ afterEach(async () => {
   vi.useRealTimers();
 });
 
+describe("public booking capability (FS-229)", () => {
+  it.each(["hvac", "plumbing", "other"])("keeps a %s shop inquiry-only until it configures services", async (trade) => {
+    const slug = `empty-${trade}`;
+    const company = fakeDb.seedCompany({ name: `${trade} shop`, slug, settings: { trade } });
+    fakeDb.seedBookingSettings({ companyId: company.id, bookingSlug: slug, isEnabled: true, offeredServices: [] });
+
+    const response = await request(app.server).get(`/api/v1/public/booking/${slug}`);
+    expect(response.status).toBe(200);
+    expect(response.body.booking).toMatchObject({
+      companySlug: slug,
+      trade,
+      intakeMode: "inquiry_only",
+      offeredServices: []
+    });
+  });
+
+  it("keeps an unset trade inquiry-only without inventing services", async () => {
+    const company = fakeDb.seedCompany({ name: "Unknown Trade", slug: "unknown-trade" });
+    fakeDb.seedBookingSettings({ companyId: company.id, bookingSlug: "unknown-trade", isEnabled: true, offeredServices: [] });
+    const response = await request(app.server).get("/api/v1/public/booking/unknown-trade");
+    expect(response.status).toBe(200);
+    expect(response.body.booking).toMatchObject({ intakeMode: "inquiry_only", offeredServices: [], trade: null });
+  });
+
+  it("exposes only actual configured services as bookable", async () => {
+    const company = fakeDb.seedCompany({ name: "Configured HVAC", slug: "configured-hvac", settings: { trade: "hvac" } });
+    const configured = [{ id: "ac-repair", name: "AC repair", category: "Cooling" }];
+    fakeDb.seedBookingSettings({
+      companyId: company.id,
+      bookingSlug: "configured-hvac",
+      isEnabled: true,
+      offeredServices: configured
+    });
+
+    const response = await request(app.server).get("/api/v1/public/booking/configured-hvac");
+    expect(response.status).toBe(200);
+    expect(response.body.booking).toMatchObject({ intakeMode: "bookable", offeredServices: configured });
+    expect(response.body.booking.offeredServices).toHaveLength(1);
+  });
+});
+
 describe("public booking submit idempotency (FS-38)", () => {
   it("replays the same Idempotency-Key with 200 and the same reference number", async () => {
     seedPublicSubmitFixture();

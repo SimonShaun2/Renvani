@@ -2,7 +2,7 @@
 /** FS-235: one real-PostgreSQL worker concurrency test on a disposable staging Neon database. */
 import { spawnSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
-import { existsSync, readFileSync, rmSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
@@ -10,6 +10,7 @@ import { fileURLToPath } from "node:url";
 
 import { validateNeonCiDatabaseUrl } from "../../packages/config/dist/neon-ci.js";
 import { isApprovedFs235NeonTarget } from "./fs235-neon-target.mjs";
+import { runVitestJsonGate } from "./fs235-vitest-diagnostics.mjs";
 import { redactDatabaseUrls, withStrictIsolatedCiDatabase } from "./neon-per-pr-database.mjs";
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
@@ -107,15 +108,17 @@ try {
       try {
         run("corepack", ["pnpm", "--filter", "@fsm/db", "run", "db:migrate"], childEnv);
         await verifyMigration(childSql);
-        run(
-          "corepack",
-          ["pnpm", "--filter", "@fsm/worker", "exec", "vitest", "run", "src/processors/clerk-workspace.postgres.integration.test.ts", "--reporter=json", `--outputFile=${outputFile}`],
-          childEnv
-        );
-        verifyOnePassingTest(outputFile);
+        runVitestJsonGate({
+          outputFile,
+          runTest: () => run(
+            "corepack",
+            ["pnpm", "--filter", "@fsm/worker", "exec", "vitest", "run", "src/processors/clerk-workspace.postgres.integration.test.ts", "--reporter=json", `--outputFile=${outputFile}`],
+            childEnv
+          ),
+          verifyResult: verifyOnePassingTest
+        });
       } finally {
         await childSql.end({ timeout: 5 });
-        rmSync(outputFile, { force: true });
       }
     }
   });

@@ -1,9 +1,11 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
 import { isApprovedFs235NeonTarget } from "./fs235-neon-target.mjs";
+import { runVitestJsonGate } from "./fs235-vitest-diagnostics.mjs";
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 
@@ -35,6 +37,66 @@ test("batch-ci workflow includes neon per-PR matrix job", () => {
   );
   assert.match(workflow, /node-version: 22\.16\.0[\s\S]*fs235-clerk-workspace-postgres\.mjs/);
   assert.match(workflow, /FS235_PR_NUMBER: \$\{\{ github\.event\.pull_request\.number \}\}/);
+});
+
+test("FS-235 runner reports redacted Vitest JSON failures before cleaning the result", () => {
+  const directory = mkdtempSync(join(tmpdir(), "fs235-vitest-failure-"));
+  const outputFile = join(directory, "result.json");
+  const databaseUrl = "postgresql://ci_user:super-secret@approved.neon.tech/ci_pr_411_2_1800000000?sslmode=require";
+  writeFileSync(outputFile, JSON.stringify({
+    numTotalTests: 1,
+    numPassedTests: 0,
+    numFailedTests: 1,
+    numPendingTests: 0,
+    numTodoTests: 0,
+    testResults: [{
+      assertionResults: [{
+        status: "failed",
+        fullName: "claims one workspace intent",
+        failureMessages: [`connection ${databaseUrl} timed out`]
+      }]
+    }]
+  }));
+  const logs = [];
+
+  try {
+    assert.throws(() => runVitestJsonGate({
+      outputFile,
+      runTest: () => { throw new Error("Vitest exited 1"); },
+      verifyResult: () => { throw new Error("must not verify after a failed subprocess"); },
+      log: (line) => logs.push(line)
+    }), /Vitest exited 1/);
+    assert.match(logs.join("\n"), /claims one workspace intent/);
+    assert.match(logs.join("\n"), /\[REDACTED_DATABASE_URL\]/);
+    assert.doesNotMatch(logs.join("\n"), /super-secret|ci_pr_411_2_1800000000|approved\.neon\.tech/);
+    assert.equal(existsSync(outputFile), false);
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
+});
+
+test("FS-235 runner cleans a successful Vitest JSON result after verification", () => {
+  const directory = mkdtempSync(join(tmpdir(), "fs235-vitest-success-"));
+  const outputFile = join(directory, "result.json");
+  writeFileSync(outputFile, "{}");
+  let verified = false;
+
+  try {
+    runVitestJsonGate({
+      outputFile,
+      runTest: () => undefined,
+      verifyResult: (path) => {
+        verified = true;
+        assert.equal(path, outputFile);
+        assert.equal(existsSync(path), true);
+      },
+      log: () => { throw new Error("success must not log a failure"); }
+    });
+    assert.equal(verified, true);
+    assert.equal(existsSync(outputFile), false);
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
 });
 
 // ── Per-PR database isolation (no live DB: SQL client is a fake) ──

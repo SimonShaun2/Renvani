@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 import { BrandedInquiryClient } from "@/src/components/growth/BrandedInquiryClient";
 import { BrandedLocalSeo } from "@/src/components/growth/BrandedLocalSeo";
 import {
+  buildBookPath,
   buildBrandedStorefrontViewModel,
   buildLocalBusinessJsonLd
 } from "@/src/components/growth/branded-storefront.utils";
@@ -14,7 +15,6 @@ import {
   hoursChip,
   nearbyServicePages,
   resolveServiceAreaPage,
-  serviceAreaCallToAction,
   serviceAreaPath,
   serviceEyebrow
 } from "@/src/components/growth/service-pages/service-area-pages";
@@ -43,8 +43,7 @@ async function load(params: Params) {
     companyName: model.companyName,
     service: ref.service.title,
     area: ref.area,
-    priceHint: ref.service.subtitle,
-    intakeMode: settings.intakeMode
+    priceHint: ref.service.subtitle
   });
   return { slug, settings, ref, model, copy };
 }
@@ -74,7 +73,7 @@ export default async function ServiceAreaPage({ params }: { params: Params }) {
   if (!page) notFound();
   const { slug, settings, ref, model, copy } = page;
   const source = `service-page:${ref.serviceSlug}:${ref.area}`;
-  const action = serviceAreaCallToAction(model.intakeMode, model.bookingSlug, source);
+  const bookHref = buildBookPath(model.bookingSlug, source);
   const sitePath = `/site/${slug}`;
   const jsonLd = { ...buildLocalBusinessJsonLd(model, serviceAreaPath(slug, ref)), areaServed: [ref.area] };
   const hours = hoursChip(settings);
@@ -105,10 +104,10 @@ export default async function ServiceAreaPage({ params }: { params: Params }) {
           </Link>
         </nav>
         <Link
-          href={action.href}
+          href={bookHref}
           className="inline-flex h-11 items-center rounded-[10px] bg-[#2f7d4f] px-[18px] text-sm font-semibold text-white hover:bg-[#286b44]"
         >
-          {action.headerLabel}
+          Book a service
         </Link>
       </header>
 
@@ -131,10 +130,10 @@ export default async function ServiceAreaPage({ params }: { params: Params }) {
             </div>
           ) : null}
           <Link
-            href={action.href}
+            href={bookHref}
             className="mt-6 inline-flex h-12 items-center rounded-[10px] bg-[#2f7d4f] px-6 text-[15px] font-semibold text-white hover:bg-[#286b44]"
           >
-            {action.primaryLabel}
+            Book
           </Link>
           {nearby.length ? (
             <div className="mt-10">

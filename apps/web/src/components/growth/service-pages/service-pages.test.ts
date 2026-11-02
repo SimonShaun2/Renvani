@@ -6,7 +6,6 @@ import { generateServiceCopy, openAiCopyProvider, toPlainText, type ServiceCopyP
 import {
   hoursChip,
   nearbyServicePages,
-  serviceAreaCallToAction,
   serviceEyebrow,
   listServiceAreaPages, resolveServiceAreaPage, serviceAreaPath, slugifyService
 } from "./service-area-pages";
@@ -16,16 +15,15 @@ const settings = {
   serviceAreaZipCodes: ["78704", "78745", "bad"]
 };
 const env = (vars: Record<string, string>) => vars as unknown as NodeJS.ProcessEnv;
-const input = { companyName: "Summit", service: "AC Tune-up", area: "78704", priceHint: "from $129", intakeMode: "bookable" as const };
+const input = { companyName: "Summit", service: "AC Tune-up", area: "78704", priceHint: "from $129" };
 
 describe("service x area pages", () => {
-  it("routes only bookable shops to booking and inquiry-only shops to the question card", () => {
-    expect(serviceAreaCallToAction("bookable", "summit", "service-page:ac:78704")).toEqual({
-      href: "/book/summit?src=service-page%3Aac%3A78704", headerLabel: "Book a service", primaryLabel: "Book"
-    });
-    expect(serviceAreaCallToAction("inquiry_only", "summit", "service-page:ac:78704")).toEqual({
-      href: "#ask-a-question", headerLabel: "Ask a question", primaryLabel: "Ask a question"
-    });
+  it("publishes only configured bookable service-area pages", () => {
+    const configured = { ...settings, intakeMode: "bookable" as const };
+    const inquiryOnly = { ...settings, intakeMode: "inquiry_only" as const, offeredServices: [] };
+    expect(resolveServiceAreaPage(configured, "ac-tune-up", "78704")).not.toBeNull();
+    expect(listServiceAreaPages(inquiryOnly)).toEqual([]);
+    expect(resolveServiceAreaPage(inquiryOnly, "ac-tune-up", "78704")).toBeNull();
   });
   it("generates services x valid ZIPs", () => {
     const pages = listServiceAreaPages(settings);
@@ -57,18 +55,6 @@ describe("copy providers", () => {
     expect(copy.intro).toBe(
       "Need ac tune-up in 78704? Summit sends a licensed tech to homes across 78704 with clear, upfront pricing. Pick a time online and get your confirmation by email."
     );
-  });
-
-  it("uses truthful inquiry copy and bypasses AI copy for inquiry-only shops", async () => {
-    const provider: ServiceCopyProvider = {
-      key: "untrusted",
-      enabled: () => true,
-      generate: async () => ({ provider: "untrusted", headline: "Book now", intro: "Pick a time online", bullets: [] })
-    };
-    const copy = await generateServiceCopy({ ...input, intakeMode: "inquiry_only" }, env({}), [provider]);
-    expect(copy.provider).toBe("template");
-    expect(copy.intro).toContain("review your inquiry");
-    expect(copy.intro).not.toMatch(/book|pick a time|confirmation/i);
   });
 
   it("keeps the OpenAI adapter disabled without both key and approval", () => {

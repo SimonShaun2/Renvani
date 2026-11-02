@@ -43,7 +43,6 @@ import {
   type EmergencyRequestResolution,
   resolveEmergencyRequest,
   HOME_SERVICE_TRADE_REGISTRY,
-  getTradeServices,
   parseHomeServiceTrade,
   parseTradeDescription,
   readServiceAreaSettings
@@ -188,23 +187,12 @@ function toPublicBookingSettings(
       : {};
   const trade = parseHomeServiceTrade(settingsObject.trade);
   const configured = Array.isArray(row.offeredServices) ? (row.offeredServices as Array<Record<string, unknown>>) : [];
-  // Shop-entered services win; with none configured, a selected trade seeds the site with its default catalog.
-  const offeredServices =
-    configured.length === 0 && trade
-      ? getTradeServices(trade).map((service) => ({
-          key: service.key,
-          name: service.label,
-          label: service.label,
-          category: service.category,
-          emergency: service.emergency,
-          source: "trade_default"
-        }))
-      : configured;
   return {
     companyName: company.name,
     companySlug: company.slug,
     bookingSlug: row.bookingSlug ?? company.slug,
-    offeredServices,
+    intakeMode: configured.length > 0 ? "bookable" : "inquiry_only",
+    offeredServices: configured,
     availableHoursStart: row.availableHoursStart ?? 8,
     availableHoursEnd: row.availableHoursEnd ?? 17,
     availableDays: row.availableDays ?? DEFAULT_AVAILABLE_DAYS,
@@ -284,7 +272,7 @@ function buildReferenceNumber(now: Date): string {
   return `BK-${datePart}-${entropy}`;
 }
 
-function deriveSource(value: string | undefined): BookingRequest["source"] {
+export function deriveSource(value: string | undefined): BookingRequest["source"] {
   if (!value) {
     return "direct";
   }
@@ -2202,16 +2190,22 @@ export interface CompanyInquiryBookingInput {
   state: string;
   zip: string;
   customerNotes: string | null;
+  serviceCategory?: string | null;
+  serviceType?: string | null;
+  serviceDetail?: string | null;
   source: BookingRequest["source"];
   smsConsentAppointments?: boolean;
   smsConsentMarketing?: boolean;
+  serviceability?: "unknown" | "in_area";
+  captureSurface?: string;
 }
 
 /** Staff/inbox inquiry intake — no zip gate, no outbound notification enqueue (FS-17). */
 export async function createCompanyScopedInquiryBooking(
   companyId: string,
   input: CompanyInquiryBookingInput,
-  actor: BookingActor
+  actor: BookingActor,
+  executor?: TransactionExecutor
 ): Promise<{ bookingRequest: BookingRequest; customerId: string }> {
   const normalizedInput: NormalizedBookingInput = {
     firstName: input.firstName.trim(),
@@ -2224,9 +2218,9 @@ export async function createCompanyScopedInquiryBooking(
     state: input.state.trim(),
     zip: input.zip.trim(),
     propertyType: null,
-    serviceCategory: null,
-    serviceType: null,
-    serviceDetail: null,
+    serviceCategory: normalizeOptionalString(input.serviceCategory) ?? null,
+    serviceType: normalizeOptionalString(input.serviceType) ?? null,
+    serviceDetail: normalizeOptionalString(input.serviceDetail) ?? null,
     urgency: "flexible",
     customerNotes: normalizeOptionalString(input.customerNotes) ?? null,
     preferredDate: null,
@@ -2236,7 +2230,7 @@ export async function createCompanyScopedInquiryBooking(
     smsConsentMarketing: input.smsConsentMarketing ?? false
   };
 
-  const result = await db.transaction(async (tx) => {
+  const write = async (tx: TransactionExecutor) => {
     const existingCustomer = await findCustomerByContact(
       companyId,
       normalizedInput.phone,
@@ -2264,6 +2258,9 @@ export async function createCompanyScopedInquiryBooking(
         city: normalizedInput.city,
         state: normalizedInput.state,
         zip: normalizedInput.zip,
+        serviceCategory: normalizedInput.serviceCategory,
+        serviceType: normalizedInput.serviceType,
+        serviceDetail: normalizedInput.serviceDetail,
         customerNotes: normalizedInput.customerNotes,
         status: "pending",
         source: input.source,
@@ -2291,13 +2288,17 @@ export async function createCompanyScopedInquiryBooking(
       payload: {
         source: input.source,
         zip: bookingRequest.zip,
-        intakePath: "direct_inquiry"
+        intakePath: "direct_inquiry",
+        ...(input.serviceability ? { serviceability: input.serviceability } : {}),
+        ...(input.captureSurface ? { captureSurface: input.captureSurface } : {})
       },
       summary: `Inquiry ${bookingRequest.referenceNumber ?? bookingRequest.id} captured`
     });
 
     return { bookingRequest: toBookingRequest(bookingRequest), customerId: customer.id };
-  });
+  };
+
+  const result = executor ? await write(executor) : await db.transaction(write);
 
   return result;
 }

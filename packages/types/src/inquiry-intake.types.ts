@@ -122,7 +122,7 @@ export const inboxInquiryIntakeInputSchema = z.object({
 
 export type InboxInquiryIntakeInput = z.infer<typeof inboxInquiryIntakeInputSchema>;
 
-export const publicInquirySubmitResultSchema = z.object({
+const publicBookedInquirySubmitResultSchema = z.object({
   bookingRequest: z.object({
     id: z.string().uuid(),
     referenceNumber: z.string().nullable(),
@@ -137,4 +137,36 @@ export const publicInquirySubmitResultSchema = z.object({
     .optional()
 });
 
+export const publicInquiryOnlySubmitResultSchema = z.object({
+  kind: z.literal("inquiry_only"),
+  bookingRequest: z.object({
+    id: z.string().uuid(),
+    referenceNumber: z.string().nullable(),
+    status: z.literal("pending")
+  }),
+  serviceability: z.enum(["unknown", "in_area"]),
+  inquiry: inquiryIntakeV1Schema
+});
+
+export const publicInquirySubmitResultSchema = z.union([
+  publicBookedInquirySubmitResultSchema,
+  publicInquiryOnlySubmitResultSchema
+]);
+
 export type PublicInquirySubmitResult = z.infer<typeof publicInquirySubmitResultSchema>;
+
+/** Public submit response excludes internal inquiry/customer linkage and audit details. */
+export const publicBookingSubmitResponseSchema = z.union([
+  publicBookedInquirySubmitResultSchema.omit({ inquiry: true }).extend({
+    confirmation: z.object({
+      referenceNumber: z.string(),
+      status: z.string(),
+      companyName: z.string(),
+      scheduledStart: z.string().nullable(),
+      scheduledEnd: z.string().nullable()
+    })
+  }),
+  publicInquiryOnlySubmitResultSchema.omit({ inquiry: true })
+]);
+
+export type PublicBookingSubmitResponse = z.infer<typeof publicBookingSubmitResponseSchema>;

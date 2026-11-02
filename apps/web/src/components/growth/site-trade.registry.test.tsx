@@ -9,6 +9,7 @@ const base = {
   companyName: "Summit Heating",
   companySlug: "summit",
   bookingSlug: "summit",
+  intakeMode: "inquiry_only" as const,
   offeredServices: [] as Array<Record<string, unknown>>,
   availableHoursStart: 8,
   availableHoursEnd: 17,
@@ -21,17 +22,17 @@ const base = {
   phone: "555-0100",
   serviceAreaZipCodes: ["60601"]
 };
-const withServices = (...labels: string[]) => ({ ...base, offeredServices: labels.map((label) => ({ label })) });
+const withServices = (...labels: string[]) => ({ ...base, intakeMode: labels.length > 0 ? "bookable" as const : "inquiry_only" as const, offeredServices: labels.map((label) => ({ label })) });
 
 describe("site trade registry", () => {
   it.each([
-    [["AC repair", "Furnace tune-up"], "HVACBusiness", "Heating & air conditioning"],
-    [["Drain cleaning", "Water heater install"], "Plumber", "Plumbing"],
-    [["Panel upgrade", "EV charger install"], "Electrician", "Electrical"],
-    [["Handyman visit"], "HomeAndConstructionBusiness", "Home services"],
-    [[], "HomeAndConstructionBusiness", "Home services"]
-  ])("%j → %s", (labels, schemaType, label) => {
-    const meta = buildSiteMetadataCopy(withServices(...labels));
+    ["hvac", ["AC repair", "Furnace tune-up"], "HVACBusiness", "Heating & air conditioning"],
+    ["plumbing", ["Drain cleaning", "Water heater install"], "Plumber", "Plumbing"],
+    ["electrical", ["Panel upgrade", "EV charger install"], "Electrician", "Electrical"],
+    [undefined, ["Handyman visit"], "HomeAndConstructionBusiness", "Home services"],
+    [undefined, [], "HomeAndConstructionBusiness", "Home services"]
+  ] as const)("%s configured trade → %s metadata", (trade, labels, schemaType, label) => {
+    const meta = buildSiteMetadataCopy({ ...withServices(...labels), ...(trade ? { trade } : {}) });
     expect(meta.trade.schemaType).toBe(schemaType);
     expect(meta.title).toBe(`Summit Heating · ${label}`);
     expect(meta.keywords).toContain("Summit Heating");
@@ -42,12 +43,45 @@ describe("site trade registry", () => {
     expect(JSON.stringify(SITE_TRADES).toLowerCase()).not.toMatch(/residential cleaning|maid|restaurant|menu/);
   });
 
-  it.each(["cleaning", "restaurant", "", 42, null])("unknown or missing trade %j falls back to other", (trade) => {
-    expect(resolveSiteTrade({ ...withServices("Handyman visit"), trade } as never).key).toBe("other");
+  it.each(["hvac", "plumbing"] as const)("does not promise available services in zero-service %s metadata", (trade) => {
+    const metadata = buildSiteMetadataCopy({ ...base, trade });
+    expect(metadata.description).toContain("confirm service availability");
+    expect(metadata.description).not.toContain("Review available services");
   });
 
-  it("an old cleaning-style service list no longer resolves to a cleaning trade", () => {
-    expect(resolveSiteTrade(withServices("Deep clean", "Move-out clean")).key).toBe("other");
+  it("uses inquiry-only fallback copy for an unset trade in both hero and metadata", () => {
+    const settings = { ...base, trade: null };
+    const model = buildBrandedStorefrontViewModel(settings);
+    const metadata = buildSiteMetadataCopy(settings);
+    expect(model.tagline).toContain("Send an inquiry");
+    expect(metadata.description).toContain("Send an inquiry");
+    expect(model.tagline).not.toContain("Review available services");
+    expect(metadata.description).not.toContain("Review available services");
+  });
+
+  it("retains configured-bookable fallback copy in both hero and metadata", () => {
+    const settings = { ...withServices("AC repair"), trade: "hvac" as const };
+    const model = buildBrandedStorefrontViewModel(settings);
+    const metadata = buildSiteMetadataCopy(settings);
+    expect(model.tagline).toContain("Review available services");
+    expect(metadata.description).toContain("Review available services");
+    expect(model.serviceCards[0]?.title).toBe("AC repair");
+  });
+
+  it("preserves an operator-provided tagline in both hero and metadata", () => {
+    const tagline = "Family-owned plumbing team serving the north side.";
+    const settings = { ...base, trade: "plumbing" as const, tagline };
+    expect(buildBrandedStorefrontViewModel(settings).tagline).toBe(tagline);
+    expect(buildSiteMetadataCopy(settings).description).toBe(tagline);
+  });
+
+  it.each(["cleaning", "restaurant", "", 42, null])("unknown or missing trade %j falls back to other", (trade) => {
+    expect(resolveSiteTrade({ trade } as never).key).toBe("other");
+  });
+
+  it("does not infer trade from offered service labels", () => {
+    expect(resolveSiteTrade({ ...withServices("Deep clean", "Move-out clean"), trade: null }).key).toBe("other");
+    expect(resolveSiteTrade({ ...withServices("AC repair", "Furnace tune-up"), trade: null }).key).toBe("other");
   });
 
   it("prefers an explicit trade field when present", () => {
@@ -55,7 +89,7 @@ describe("site trade registry", () => {
   });
 
   it("emits phone, opening hours and trade @type; no rating unless real", () => {
-    const settings = withServices("AC repair");
+    const settings = { ...withServices("AC repair"), trade: "hvac" as const };
     const ld = buildLocalBusinessJsonLd(buildBrandedStorefrontViewModel(settings), "/site/summit", {
       trade: resolveSiteTrade(settings),
       openingHours: buildOpeningHours(settings)

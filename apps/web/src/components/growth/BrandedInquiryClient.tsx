@@ -1,11 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import { Loader2 } from "lucide-react";
 
 import {
-  BRANDED_ACQUISITION_SOURCE,
   buildBookPath,
   type BrandedStorefrontViewModel
 } from "@/src/components/growth/branded-storefront.utils";
@@ -19,9 +18,12 @@ interface BrandedInquiryClientProps {
   acquisitionSource: string;
   initialService?: string;
   initialZip?: string;
-  /** Trade label from `resolveSiteTrade` (#262), sent as `serviceCategory`. */
+  /** Label for the configured trade, sent as `serviceCategory`. */
   serviceCategory?: string;
 }
+
+type InquiryField = "firstName" | "lastName" | "phone" | "email" | "serviceInterest" | "addressLine1" | "city" | "state" | "zip";
+type InquiryFieldErrors = Partial<Record<InquiryField, string>>;
 
 function createIdempotencyKey(): string {
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
@@ -53,26 +55,59 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
   const [addressLine1, setAddressLine1] = useState("");
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
-  const [serviceInterest, setServiceInterest] = useState(initialService ?? model.serviceCards[0]?.title ?? "Heating & cooling repair");
+  const [serviceInterest, setServiceInterest] = useState(
+    model.serviceCards.find((card) => card.title === initialService)?.title ?? model.serviceCards[0]?.title ?? ""
+  );
   const [notes, setNotes] = useState("");
   const [smsConsentAppointments, setSmsConsentAppointments] = useState(false);
   const [smsConsentMarketing, setSmsConsentMarketing] = useState(false);
   const [referenceNumber, setReferenceNumber] = useState<string | null>(null);
+  const [inquiryOnlyReceived, setInquiryOnlyReceived] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<InquiryFieldErrors>({});
+  const [isSending, setIsSending] = useState(false);
+  const formId = useId();
 
   const idempotencyKey = useMemo(() => createIdempotencyKey(), []);
 
   const bookHref = buildBookPath(model.bookingSlug, acquisitionSource);
+  const isPending = isSending || submitMutation.isPending || zipCheckMutation.isPending;
+  const fieldErrorId = (field: InquiryField) => `${formId}-${field}-error`;
+  const clearFieldError = (field: InquiryField) => {
+    setFieldErrors((current) => ({ ...current, [field]: undefined }));
+    setErrorMessage(null);
+  };
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
+    if (isPending) return;
     setErrorMessage(null);
-
-    if (!smsConsentAppointments) {
-      setErrorMessage("Please agree to appointment updates by text so we can confirm your request.");
+    const requiredFields = [
+      { key: "firstName", label: "First name", value: firstName },
+      { key: "lastName", label: "Last name", value: lastName },
+      { key: "phone", label: "Mobile phone", value: phone },
+      ...(model.serviceCards.length === 0 ? [{ key: "serviceInterest" as const, label: "Service interest", value: serviceInterest }] : []),
+      { key: "addressLine1", label: "Service address", value: addressLine1 },
+      { key: "city", label: "City", value: city },
+      { key: "state", label: "State", value: state },
+      { key: "zip", label: "ZIP code", value: zip }
+    ] as const;
+    const errors: InquiryFieldErrors = {};
+    for (const field of requiredFields) {
+      if (!field.value.trim()) errors[field.key] = `${field.label} is required.`;
+    }
+    if (email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/u.test(email.trim())) {
+      errors.email = "Enter a valid email address.";
+    }
+    setFieldErrors(errors);
+    const firstInvalidField = [...requiredFields.map((field) => field.key), "email"].find((field) => errors[field as InquiryField]);
+    if (firstInvalidField) {
+      setErrorMessage("Please correct the highlighted fields.");
+      event.currentTarget.querySelector<HTMLInputElement>(`[name="${firstInvalidField}"]`)?.focus();
       return;
     }
 
+    setIsSending(true);
     try {
       const gate = await passInquiryGate(model.bookingSlug, honeypot);
       if (!gate.ok) {
@@ -84,10 +119,13 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
         return;
       }
 
-      const coverage = await zipCheckMutation.mutateAsync(zip.trim());
-      if (!coverage.covered) {
-        setErrorMessage("That ZIP is outside our current service area. You can still leave your email on the booking page.");
-        return;
+      // For an unconfigured shop, only the server can distinguish unknown coverage from a known out-of-area ZIP.
+      if (model.intakeMode === "bookable") {
+        const coverage = await zipCheckMutation.mutateAsync(zip.trim());
+        if (!coverage.covered) {
+          setErrorMessage("This shop has not confirmed service in that ZIP. Your inquiry was not sent.");
+          return;
+        }
       }
 
       const response = await submitMutation.mutateAsync({
@@ -103,64 +141,84 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
           state: state.trim().toUpperCase().slice(0, 2),
           zip: zip.trim(),
           propertyType: "residential",
-          serviceCategory: serviceCategory ?? SITE_TRADES.other.label,
-          serviceType: serviceInterest,
+          serviceCategory: model.configuredTrade
+            ? serviceCategory ?? SITE_TRADES[model.configuredTrade].label
+            : serviceInterest || SITE_TRADES.other.label,
+          serviceType: serviceInterest || "Service inquiry",
           customerNotes: `[Branded site inquiry] ${notes.trim()}`.trim(),
           urgency: "flexible",
           preferredWindow: "first_available",
-          smsConsentAppointments: true,
+          smsConsentAppointments,
           smsConsentMarketing
         }
       });
 
-      setReferenceNumber(response.confirmation.referenceNumber);
+      if (!("confirmation" in response)) {
+        setInquiryOnlyReceived(true);
+        setReferenceNumber(response.bookingRequest.referenceNumber ?? "received");
+      } else {
+        setReferenceNumber(response.confirmation.referenceNumber);
+      }
     } catch (error) {
       setErrorMessage(error instanceof ApiError ? error.message : "We could not send your request. Please try again.");
+    } finally {
+      setIsSending(false);
     }
   }
 
   if (referenceNumber) {
     return (
       <div className="mx-auto max-w-lg rounded-[14px] border border-[#e6dccb] bg-white p-8 text-center">
-        <h1 className="text-2xl font-semibold text-[#0f1530]">Inquiry received</h1>
+        <h1 className="text-2xl font-semibold text-[#0f1530]">{inquiryOnlyReceived ? "We received your inquiry" : "Inquiry received"}</h1>
         <p className="mt-3 text-sm leading-6 text-[#5e6684]">
-          Reference <span className="font-mono font-medium text-[#0f1530]">{referenceNumber}</span>.{" "}
-          {model.companyName} will follow up — this is not a confirmed appointment until they reach out.
+          {inquiryOnlyReceived ? (
+            <>Service availability has not been confirmed. The team will follow up. No appointment has been booked.</>
+          ) : (
+            <>{model.companyName} will follow up — this is not a confirmed appointment until they reach out.</>
+          )}
         </p>
-        <Link href={bookHref} className="mt-6 inline-flex text-sm font-semibold text-[#2f7d4f] hover:underline">
-          Prefer to pick a time now? Continue to booking
-        </Link>
+        <p className="mt-3 text-sm text-[#5e6684]">Reference <span className="font-mono font-medium text-[#0f1530]">{referenceNumber}</span>.</p>
+        {!inquiryOnlyReceived && model.intakeMode === "bookable" ? (
+          <Link href={bookHref} className="mt-6 inline-flex text-sm font-semibold text-[#2f7d4f] hover:underline">
+            Review booking options
+          </Link>
+        ) : null}
       </div>
     );
   }
 
   return (
     <form className="mx-auto max-w-lg space-y-4" onSubmit={(event) => void handleSubmit(event)} noValidate>
-      <p className="text-sm text-[#5e6684]">
-        Request a quote without leaving {model.companyName}&apos;s Renvani-powered site. This coexists with your existing
-        website — no migration required.
-      </p>
+      <p className="text-sm text-[#5e6684]">Tell {model.companyName} what you need. An inquiry is not a confirmed appointment.</p>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="block text-sm font-medium text-[#2a3360]">
           First name
           <input
             required
+            name="firstName"
             value={firstName}
-            onChange={(event) => setFirstName(event.target.value)}
+            onChange={(event) => { setFirstName(event.target.value); clearFieldError("firstName"); }}
+            aria-invalid={Boolean(fieldErrors.firstName)}
+            aria-describedby={fieldErrors.firstName ? fieldErrorId("firstName") : undefined}
             className="mt-1.5 w-full rounded-lg border border-[#e6dccb] px-3.5 py-3 text-[15px]"
             autoComplete="given-name"
           />
+          {fieldErrors.firstName ? <span id={fieldErrorId("firstName")} className="mt-1 block text-red-700">{fieldErrors.firstName}</span> : null}
         </label>
         <label className="block text-sm font-medium text-[#2a3360]">
           Last name
           <input
             required
+            name="lastName"
             value={lastName}
-            onChange={(event) => setLastName(event.target.value)}
+            onChange={(event) => { setLastName(event.target.value); clearFieldError("lastName"); }}
+            aria-invalid={Boolean(fieldErrors.lastName)}
+            aria-describedby={fieldErrors.lastName ? fieldErrorId("lastName") : undefined}
             className="mt-1.5 w-full rounded-lg border border-[#e6dccb] px-3.5 py-3 text-[15px]"
             autoComplete="family-name"
           />
+          {fieldErrors.lastName ? <span id={fieldErrorId("lastName")} className="mt-1 block text-red-700">{fieldErrors.lastName}</span> : null}
         </label>
       </div>
 
@@ -169,48 +227,75 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
         <input
           required
           type="tel"
+          name="phone"
           value={phone}
-          onChange={(event) => setPhone(event.target.value)}
+          onChange={(event) => { setPhone(event.target.value); clearFieldError("phone"); }}
+          aria-invalid={Boolean(fieldErrors.phone)}
+          aria-describedby={fieldErrors.phone ? fieldErrorId("phone") : undefined}
           className="mt-1.5 w-full rounded-lg border border-[#e6dccb] px-3.5 py-3 text-[15px]"
           autoComplete="tel"
         />
+        {fieldErrors.phone ? <span id={fieldErrorId("phone")} className="mt-1 block text-red-700">{fieldErrors.phone}</span> : null}
       </label>
 
       <label className="block text-sm font-medium text-[#2a3360]">
-        Email (optional)
+        Email (recommended for a reply)
         <input
           type="email"
+          name="email"
           value={email}
-          onChange={(event) => setEmail(event.target.value)}
+          onChange={(event) => { setEmail(event.target.value); clearFieldError("email"); }}
+          aria-invalid={Boolean(fieldErrors.email)}
+          aria-describedby={fieldErrors.email ? fieldErrorId("email") : undefined}
           className="mt-1.5 w-full rounded-lg border border-[#e6dccb] px-3.5 py-3 text-[15px]"
           autoComplete="email"
         />
+        {fieldErrors.email ? <span id={fieldErrorId("email")} className="mt-1 block text-red-700">{fieldErrors.email}</span> : null}
       </label>
 
-      <label className="block text-sm font-medium text-[#2a3360]">
-        Service interest
-        <select
-          value={serviceInterest}
-          onChange={(event) => setServiceInterest(event.target.value)}
-          className="mt-1.5 w-full rounded-lg border border-[#e6dccb] px-3.5 py-3 text-[15px]"
-        >
-          {model.serviceCards.map((card) => (
-            <option key={card.id} value={card.title}>
-              {card.title}
-            </option>
-          ))}
-        </select>
-      </label>
+      {model.serviceCards.length > 0 ? (
+        <label className="block text-sm font-medium text-[#2a3360]">
+          Service interest
+          <select
+            value={serviceInterest}
+            onChange={(event) => setServiceInterest(event.target.value)}
+            className="mt-1.5 w-full rounded-lg border border-[#e6dccb] px-3.5 py-3 text-[15px]"
+          >
+            {model.serviceCards.map((card) => (
+              <option key={card.id} value={card.title}>{card.title}</option>
+            ))}
+          </select>
+        </label>
+      ) : (
+        <label className="block text-sm font-medium text-[#2a3360]">
+          Service interest
+          <input
+            required
+            name="serviceInterest"
+            value={serviceInterest}
+            onChange={(event) => { setServiceInterest(event.target.value); clearFieldError("serviceInterest"); }}
+            aria-invalid={Boolean(fieldErrors.serviceInterest)}
+            aria-describedby={fieldErrors.serviceInterest ? fieldErrorId("serviceInterest") : undefined}
+            className="mt-1.5 w-full rounded-lg border border-[#e6dccb] px-3.5 py-3 text-[15px]"
+            placeholder="Briefly describe the service you need"
+          />
+          {fieldErrors.serviceInterest ? <span id={fieldErrorId("serviceInterest")} className="mt-1 block text-red-700">{fieldErrors.serviceInterest}</span> : null}
+        </label>
+      )}
 
       <label className="block text-sm font-medium text-[#2a3360]">
         Service address
         <input
           required
+          name="addressLine1"
           value={addressLine1}
-          onChange={(event) => setAddressLine1(event.target.value)}
+          onChange={(event) => { setAddressLine1(event.target.value); clearFieldError("addressLine1"); }}
+          aria-invalid={Boolean(fieldErrors.addressLine1)}
+          aria-describedby={fieldErrors.addressLine1 ? fieldErrorId("addressLine1") : undefined}
           className="mt-1.5 w-full rounded-lg border border-[#e6dccb] px-3.5 py-3 text-[15px]"
           autoComplete="street-address"
         />
+        {fieldErrors.addressLine1 ? <span id={fieldErrorId("addressLine1")} className="mt-1 block text-red-700">{fieldErrors.addressLine1}</span> : null}
       </label>
 
       <div className="grid gap-4 sm:grid-cols-3">
@@ -218,22 +303,30 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
           City
           <input
             required
+            name="city"
             value={city}
-            onChange={(event) => setCity(event.target.value)}
+            onChange={(event) => { setCity(event.target.value); clearFieldError("city"); }}
+            aria-invalid={Boolean(fieldErrors.city)}
+            aria-describedby={fieldErrors.city ? fieldErrorId("city") : undefined}
             className="mt-1.5 w-full rounded-lg border border-[#e6dccb] px-3.5 py-3 text-[15px]"
             autoComplete="address-level2"
           />
+          {fieldErrors.city ? <span id={fieldErrorId("city")} className="mt-1 block text-red-700">{fieldErrors.city}</span> : null}
         </label>
         <label className="block text-sm font-medium text-[#2a3360]">
           State
           <input
             required
             maxLength={2}
+            name="state"
             value={state}
-            onChange={(event) => setState(event.target.value)}
+            onChange={(event) => { setState(event.target.value); clearFieldError("state"); }}
+            aria-invalid={Boolean(fieldErrors.state)}
+            aria-describedby={fieldErrors.state ? fieldErrorId("state") : undefined}
             className="mt-1.5 w-full rounded-lg border border-[#e6dccb] px-3.5 py-3 text-[15px] uppercase"
             autoComplete="address-level1"
           />
+          {fieldErrors.state ? <span id={fieldErrorId("state")} className="mt-1 block text-red-700">{fieldErrors.state}</span> : null}
         </label>
       </div>
 
@@ -242,11 +335,15 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
         <input
           required
           inputMode="numeric"
+          name="zip"
           value={zip}
-          onChange={(event) => setZip(event.target.value)}
+          onChange={(event) => { setZip(event.target.value); clearFieldError("zip"); }}
+          aria-invalid={Boolean(fieldErrors.zip)}
+          aria-describedby={fieldErrors.zip ? fieldErrorId("zip") : undefined}
           className="mt-1.5 w-full rounded-lg border border-[#e6dccb] px-3.5 py-3 text-[15px]"
           autoComplete="postal-code"
         />
+        {fieldErrors.zip ? <span id={fieldErrorId("zip")} className="mt-1 block text-red-700">{fieldErrors.zip}</span> : null}
       </label>
 
       <label className="block text-sm font-medium text-[#2a3360]">
@@ -269,7 +366,7 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
             className="mt-0.5"
           />
           <span>
-            I agree to receive appointment-related texts from {model.companyName}. Message frequency varies. Reply STOP to
+            Optional: I agree to receive appointment-related texts from {model.companyName}. Message frequency varies. Reply STOP to
             opt out.
           </span>
         </label>
@@ -280,7 +377,7 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
             onChange={(event) => setSmsConsentMarketing(event.target.checked)}
             className="mt-0.5"
           />
-          <span>Optional: send me occasional offers and maintenance reminders by text.</span>
+          <span>Optional: I agree to receive occasional offers and maintenance reminders by text.</span>
         </label>
       </fieldset>
 
@@ -306,20 +403,16 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
 
       <button
         type="submit"
-        disabled={submitMutation.isPending || zipCheckMutation.isPending}
+        disabled={isPending}
+        aria-busy={isPending}
         className="flex h-[52px] w-full items-center justify-center rounded-[10px] bg-[#2f7d4f] text-sm font-semibold text-white hover:bg-[#286b44] disabled:opacity-60"
       >
-        {submitMutation.isPending || zipCheckMutation.isPending ? (
-          <Loader2 className="h-5 w-5 animate-spin" aria-hidden />
+        {isPending ? (
+          <><Loader2 className="mr-2 h-5 w-5 animate-spin" aria-hidden />Sending inquiry</>
         ) : (
           "Send inquiry"
         )}
       </button>
-
-      <p className="text-center text-xs text-[#5e6684]">
-        Attribution: <span className="font-mono">{acquisitionSource || BRANDED_ACQUISITION_SOURCE}</span> · Handoff to
-        Revenue (FS-17) via booking request
-      </p>
     </form>
   );
 }

@@ -386,6 +386,105 @@ describe("job.signature.capture with attachmentId", () => {
     }
   });
 
+  it("reconciles concurrent batch and operation unique races without returning 500", async () => {
+    const seed = seedFieldJob();
+    const attachment = seedSignatureImage(seed.company.id, seed.job.id);
+    const originalInsert = fakeDb.db.insert.bind(fakeDb.db);
+    let raceBatchInsert = true;
+    let raceOperationInsert = true;
+
+    fakeDb.db.insert = ((table) => {
+      const chain = originalInsert(table);
+      const tableName = (table as { __name?: string }).__name;
+      return {
+        values(values: Record<string, unknown> | Array<Record<string, unknown>>) {
+          const pending = chain.values(values);
+          return {
+            async returning() {
+              const rows = await pending.returning();
+              if (tableName === "fieldSyncBatches" && raceBatchInsert) {
+                raceBatchInsert = false;
+                throw Object.assign(new Error("concurrent batch won"), { code: "23505" });
+              }
+              if (tableName === "fieldSyncOperations" && raceOperationInsert) {
+                raceOperationInsert = false;
+                throw Object.assign(new Error("concurrent operation won"), { cause: { code: "23505" } });
+              }
+              return rows;
+            }
+          };
+        }
+      };
+    }) as typeof fakeDb.db.insert;
+
+    try {
+      const response = await capture(authOf(seed), seed.job.id, {
+        attachmentId: attachment.id,
+        signedByName: "Pat"
+      });
+
+      expect(response.status).toBe(200);
+      expect(response.body.results[0].outcome).toBe("duplicate");
+      expect(fakeDb.getTestState().fieldSyncBatches).toHaveLength(1);
+      expect(fakeDb.getTestState().fieldSyncOperations).toHaveLength(1);
+      expect(fakeDb.getTestState().activityEvents).toHaveLength(1);
+      expect(fakeDb.getTestState().jobs[0]!.signatureUrl).toBe(
+        `renvani-object:attachments/${seed.company.id}/1-signature.png`
+      );
+    } finally {
+      fakeDb.db.insert = originalInsert;
+    }
+  });
+
+  it("rechecks technician assignment under the locked signature transaction", async () => {
+    const seed = seedFieldJob();
+    const attachment = seedSignatureImage(seed.company.id, seed.job.id);
+    const replacementUser = fakeDb.seedUser({
+      companyId: seed.company.id,
+      email: "replacement-tech@field-co.test",
+      firstName: "Replacement",
+      lastName: "Tech",
+      role: "technician"
+    });
+    const replacement = fakeDb.seedTechnician({
+      companyId: seed.company.id,
+      userId: replacementUser.id,
+      firstName: "Replacement",
+      lastName: "Tech",
+      phone: "+15555550103"
+    });
+    const originalTransaction = fakeDb.db.transaction.bind(fakeDb.db);
+    fakeDb.db.transaction = (async (
+      callback: (tx: typeof fakeDb.db) => Promise<unknown>
+    ): Promise<unknown> => {
+      const state = fakeDb.getTestState();
+      const current = state.jobs[0]!;
+      state.jobs[0] = {
+        ...current,
+        technicianId: replacement.id,
+        updatedAt: new Date(current.updatedAt.getTime() + 1_000)
+      };
+      return originalTransaction(callback);
+    }) as typeof fakeDb.db.transaction;
+
+    try {
+      const response = await capture(authOf(seed), seed.job.id, {
+        attachmentId: attachment.id,
+        signedByName: "Pat"
+      });
+
+      expect(response.status).toBe(200);
+      expect(response.body.results[0]).toMatchObject({
+        outcome: "rejected",
+        message: expect.stringMatching(/not authorized/i)
+      });
+      expect(fakeDb.getTestState().jobs[0]!.signatureUrl).toBeNull();
+      expect(fakeDb.getTestState().activityEvents).toHaveLength(0);
+    } finally {
+      fakeDb.db.transaction = originalTransaction;
+    }
+  });
+
   it("rejects an attachment that belongs to another job", async () => {
     const seed = seedFieldJob();
     const otherJob = fakeDb.seedJob({

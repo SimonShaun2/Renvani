@@ -115,6 +115,15 @@ function hashPayload(value: unknown): string {
   return createHash("sha256").update(JSON.stringify(value)).digest("hex");
 }
 
+function isUniqueViolation(error: unknown): boolean {
+  let current: unknown = error;
+  for (let depth = 0; depth < 4 && current && typeof current === "object"; depth += 1) {
+    if ((current as { code?: unknown }).code === "23505") return true;
+    current = (current as { cause?: unknown }).cause;
+  }
+  return false;
+}
+
 function toOperationResult(row: OperationRow) {
   const resultPayload = row.resultPayload as Record<string, unknown>;
   return {
@@ -242,17 +251,41 @@ async function resolveBatch(
     return existing;
   }
 
-  const inserted = await db
-    .insert(fieldSyncBatches)
-    .values({
-      companyId: actor.companyId,
-      userId: actor.userId,
-      deviceId: input.deviceId,
-      batchClientId: input.batchClientId,
-      status: "open",
-      lastAcknowledgedSequence: 0
-    })
-    .returning();
+  let inserted: BatchRow[];
+  try {
+    inserted = await db
+      .insert(fieldSyncBatches)
+      .values({
+        companyId: actor.companyId,
+        userId: actor.userId,
+        deviceId: input.deviceId,
+        batchClientId: input.batchClientId,
+        status: "open",
+        lastAcknowledgedSequence: 0
+      })
+      .returning();
+  } catch (error: unknown) {
+    if (!isUniqueViolation(error)) throw error;
+
+    // A concurrent retry can win the unique (company, device, batchClientId) insert.
+    // PostgreSQL waits for the winner before surfacing 23505, so the committed row is
+    // visible to this read under READ COMMITTED and is safe to reuse.
+    const [raced] = await db
+      .select()
+      .from(fieldSyncBatches)
+      .where(
+        and(
+          eq(fieldSyncBatches.companyId, actor.companyId),
+          eq(fieldSyncBatches.deviceId, input.deviceId),
+          eq(fieldSyncBatches.batchClientId, input.batchClientId),
+          isNull(fieldSyncBatches.deletedAt)
+        )
+      )
+      .limit(1);
+
+    if (raced) return raced;
+    throw error;
+  }
 
   const batch = inserted[0];
   if (!batch) {
@@ -389,6 +422,24 @@ async function applyOperation(
 
         if (!currentJob) {
           return { kind: "rejected", message: "Job not found" };
+        }
+
+        if (actor.role === "technician") {
+          const [technician] = await tx
+            .select()
+            .from(technicians)
+            .where(
+              and(
+                eq(technicians.companyId, actor.companyId),
+                eq(technicians.userId, actor.userId),
+                isNull(technicians.deletedAt)
+              )
+            )
+            .limit(1);
+
+          if (!technician || currentJob.technicianId !== technician.id) {
+            return { kind: "rejected", message: "You are not authorized to sync work for this job" };
+          }
         }
 
         const currentVersion = buildRecordVersionV1("job", currentJob.id, currentJob.updatedAt);
@@ -551,21 +602,53 @@ export async function submitFieldWorkSyncBatch(
       }
     }
 
-    const inserted = await db
-      .insert(fieldSyncOperations)
-      .values({
-        companyId: actor.companyId,
-        batchId: batch.id,
-        sequence: operation.sequence,
-        clientOperationId: operation.clientOperationId,
-        jobId: operation.jobId,
-        operationType: operation.type,
-        requestPayload: operation,
-        outcome: applyResult.outcome,
-        resultPayload: applyResult.resultPayload,
-        payloadHash: hashPayload(operation)
-      })
-      .returning();
+    let inserted: OperationRow[];
+    try {
+      inserted = await db
+        .insert(fieldSyncOperations)
+        .values({
+          companyId: actor.companyId,
+          batchId: batch.id,
+          sequence: operation.sequence,
+          clientOperationId: operation.clientOperationId,
+          jobId: operation.jobId,
+          operationType: operation.type,
+          requestPayload: operation,
+          outcome: applyResult.outcome,
+          resultPayload: applyResult.resultPayload,
+          payloadHash: hashPayload(operation)
+        })
+        .returning();
+    } catch (error: unknown) {
+      if (!isUniqueViolation(error)) throw error;
+
+      // A simultaneous replay can pass the pre-check before the winning request
+      // persists its operation. Reconcile against the winner instead of leaking a
+      // database 500. Signature application itself is serialized by the job row lock.
+      const concurrent = await findExistingOperation(actor.companyId, operation.clientOperationId);
+      if (!concurrent) throw error;
+      const replay = resolveFieldWorkSyncClientOperationReplay({
+        storedPayloadHash: concurrent.payloadHash,
+        incomingPayloadHash: hashPayload(operation),
+        storedOutcome: concurrent.outcome as FieldWorkSyncOperationOutcome
+      });
+
+      if (replay.action === "reject") {
+        results.push({
+          clientOperationId: operation.clientOperationId,
+          sequence: operation.sequence,
+          outcome: "rejected",
+          serverOperationId: concurrent.id,
+          message: replay.message
+        });
+        continue;
+      }
+
+      const mapped = toOperationResult(concurrent);
+      results.push({ ...mapped, outcome: replay.action === "duplicate" ? "duplicate" : replay.outcome });
+      lastAcknowledgedSequence = Math.max(lastAcknowledgedSequence, operation.sequence);
+      continue;
+    }
 
     const stored = inserted[0];
     if (!stored) {

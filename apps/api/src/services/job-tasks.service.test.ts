@@ -112,6 +112,13 @@ describe("job-tasks.service", () => {
 
   it("updateTask updates editable fields and emits job.task_completed when status becomes completed", async () => {
     const { company, actor, job, technician } = createContext();
+    const secondActor = fakeDb.seedUser({
+      companyId: company.id,
+      email: "second-updater@example.com",
+      firstName: "Owen",
+      lastName: "Owner",
+      role: "owner"
+    });
     const task = fakeDb.seedJobTask({
       companyId: company.id,
       jobId: job.id,
@@ -128,7 +135,22 @@ describe("job-tasks.service", () => {
     expect(updated.title).toBe("Updated Task");
     expect(updated.status).toBe("completed");
     expect(updated.completedAt).not.toBeNull();
-    expect(fakeDb.getTestState().activityEvents.at(-1)?.eventType).toBe("job.task_completed");
+    expect(updated.completedById).toBe(actor.id);
+    expect(fakeDb.getTestState().activityEvents.at(-1)).toMatchObject({
+      eventType: "job.task_completed",
+      actorId: actor.id,
+      actorName: "Ava Stone"
+    });
+
+    const repeated = await jobTasksService.updateTask(company.id, taskActor(secondActor), job.id, task.id, {
+      status: "completed",
+      notes: "Second sync"
+    });
+    expect(repeated.completedAt).toEqual(updated.completedAt);
+    expect(repeated.completedById).toBe(actor.id);
+    expect(
+      fakeDb.getTestState().activityEvents.filter((event) => event.eventType === "job.task_completed")
+    ).toHaveLength(1);
   });
 
   it("completeTask marks the task complete, stores completedById, and emits job.task_completed", async () => {

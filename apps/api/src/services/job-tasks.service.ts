@@ -354,7 +354,10 @@ export async function updateTaskInTransaction(
       ...(normalizedInput.notes !== undefined ? { notes: normalizedInput.notes } : {}),
       ...(normalizedInput.status !== undefined
         ? normalizedInput.status === "completed"
-          ? { completedAt: existingTask.completedAt ?? new Date() }
+          ? {
+              completedAt: existingTask.completedAt ?? new Date(),
+              completedById: existingTask.completedById ?? actor.userId
+            }
           : { completedAt: null, completedById: null }
         : {}),
       updatedAt: new Date()
@@ -374,7 +377,7 @@ export async function updateTaskInTransaction(
   }
 
   if (shouldMarkCompleted) {
-    await emitTaskCompletedEvent(executor, job, task);
+    await emitTaskCompletedEvent(executor, job, task, actor.userId);
   }
 
   return toJobTask(task);

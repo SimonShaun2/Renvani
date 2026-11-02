@@ -191,6 +191,37 @@ describe("job-tasks.service", () => {
     expect(fakeDb.getTestState().activityEvents.filter((event) => event.eventType === "job.task_completed")).toHaveLength(1);
   });
 
+  it("does not let a retrying actor claim a legacy completed task with null attribution", async () => {
+    const { company, job } = createContext();
+    const retryingActor = fakeDb.seedUser({
+      companyId: company.id,
+      email: "legacy-retry@example.com",
+      firstName: "Different",
+      lastName: "Actor",
+      role: "owner"
+    });
+    const legacyTask = fakeDb.seedJobTask({
+      companyId: company.id,
+      jobId: job.id,
+      title: "Legacy completion",
+      status: "completed",
+      completedAt: null,
+      completedById: null
+    });
+
+    const retried = await jobTasksService.updateTask(company.id, taskActor(retryingActor), job.id, legacyTask.id, {
+      status: "completed",
+      notes: "Retry received"
+    });
+
+    expect(retried.completedAt).toBeNull();
+    expect(retried.completedById).toBeNull();
+    expect(retried.notes).toBe("Retry received");
+    expect(
+      fakeDb.getTestState().activityEvents.filter((event) => event.eventType === "job.task_completed")
+    ).toHaveLength(0);
+  });
+
   it("deleteTask soft deletes the task", async () => {
     const { company, actor, job } = createContext();
     const task = fakeDb.seedJobTask({

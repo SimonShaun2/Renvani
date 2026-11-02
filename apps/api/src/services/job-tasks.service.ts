@@ -335,6 +335,11 @@ export async function completeTask(
     const job = await getJobRowForUpdate(companyId, jobId, tx);
     await getActor(companyId, actorId, tx);
     const existingTask = await getTaskRow(companyId, jobId, taskId, tx);
+
+    if (existingTask.status === "completed") {
+      return toJobTask(existingTask);
+    }
+
     const [task] = await tx
       .update(jobTasks)
       .set({

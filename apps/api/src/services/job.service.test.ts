@@ -592,6 +592,26 @@ describe("job.service", () => {
     expect(addQueueJob).toHaveBeenCalledTimes(1);
   });
 
+  it("serializes completeJob against a generic status transition", async () => {
+    const { company, actor } = createAdminContext();
+    const { customer } = seedJobGraph(company.id);
+    const job = fakeDb.seedJob({
+      companyId: company.id,
+      customerId: customer.id,
+      title: "Completion Status Race",
+      status: "in_progress"
+    });
+
+    const results = await Promise.allSettled([
+      jobService.completeJob(company.id, actor.id, job.id, {}),
+      jobService.transitionStatus(company.id, actor.id, job.id, "cancelled", "Concurrent cancellation")
+    ]);
+
+    expect(results.filter((result) => result.status === "fulfilled")).toHaveLength(1);
+    const rejected = results.find((result) => result.status === "rejected");
+    expect(rejected).toMatchObject({ reason: { code: ErrorCode.CONFLICT } });
+  });
+
   it("completeJob revalidates a technician's current linkage and assignment inside the transaction", async () => {
     const company = fakeDb.seedCompany({ name: "Field Co", slug: "field-co" });
     const actor = fakeDb.seedUser({

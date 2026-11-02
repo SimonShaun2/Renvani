@@ -1120,9 +1120,10 @@ export async function transitionStatusInTransaction(
     throw new AppError(ErrorCode.CONFLICT, "Use the complete job flow to mark a job as completed");
   }
 
-  const existingJob = await getJobRecord(companyId, jobId, executor);
-  const nextStatus = applyTransition(existingJob.status, toStatus);
-  const eventType = resolveTransitionEventType(existingJob.status, nextStatus);
+  const existingJob = await getJobRecordForUpdate(companyId, jobId, executor);
+  const fromStatus = existingJob.status;
+  const nextStatus = applyTransition(fromStatus, toStatus);
+  const eventType = resolveTransitionEventType(fromStatus, nextStatus);
   const actor = await getActor(companyId, actorId, executor);
   const updateValues: Partial<JobRow> = {
     status: nextStatus,
@@ -1136,7 +1137,14 @@ export async function transitionStatusInTransaction(
   const [updatedJob] = await executor
     .update(jobs)
     .set(updateValues)
-    .where(and(eq(jobs.companyId, companyId), eq(jobs.id, jobId), isNull(jobs.deletedAt)))
+    .where(
+      and(
+        eq(jobs.companyId, companyId),
+        eq(jobs.id, jobId),
+        eq(jobs.status, fromStatus),
+        isNull(jobs.deletedAt)
+      )
+    )
     .returning();
 
   if (!updatedJob) {
@@ -1149,9 +1157,9 @@ export async function transitionStatusInTransaction(
     actorId,
     updatedJob,
     eventType,
-    `Job ${updatedJob.jobNumber} moved from ${existingJob.status} to ${updatedJob.status}`,
+    `Job ${updatedJob.jobNumber} moved from ${fromStatus} to ${updatedJob.status}`,
     {
-      fromStatus: existingJob.status,
+      fromStatus,
       toStatus: updatedJob.status,
       ...(reason ? { reason } : {})
     }

@@ -142,6 +142,29 @@ describe("job-tasks.service", () => {
     expect(fakeDb.getTestState().activityEvents.at(-1)?.eventType).toBe("job.task_completed");
   });
 
+  it("completeTask is idempotent and preserves the first completion audit fields", async () => {
+    const { company, actor, job } = createContext();
+    const secondActor = fakeDb.seedUser({
+      companyId: company.id,
+      email: "second-owner@example.com",
+      firstName: "Owen",
+      lastName: "Owner",
+      role: "owner"
+    });
+    const task = fakeDb.seedJobTask({
+      companyId: company.id,
+      jobId: job.id,
+      title: "Complete once"
+    });
+
+    const first = await jobTasksService.completeTask(company.id, job.id, task.id, actor.id);
+    const second = await jobTasksService.completeTask(company.id, job.id, task.id, secondActor.id);
+
+    expect(second.completedAt).toEqual(first.completedAt);
+    expect(second.completedById).toBe(actor.id);
+    expect(fakeDb.getTestState().activityEvents.filter((event) => event.eventType === "job.task_completed")).toHaveLength(1);
+  });
+
   it("deleteTask soft deletes the task", async () => {
     const { company, job } = createContext();
     const task = fakeDb.seedJobTask({

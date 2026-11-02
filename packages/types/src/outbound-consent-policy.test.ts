@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { evaluateCurrentOutboundConsent } from "./outbound-consent-policy.js";
-import { outboundConsentDecisionInputSchema, outboundConsentKeySchema } from "./outbound-consent.types.js";
+import { outboundConsentDecisionInputSchema, outboundConsentIntentSchema, outboundConsentKeySchema } from "./outbound-consent.types.js";
 
 const companyId = "11111111-1111-4111-8111-111111111111";
 const otherCompany = "22222222-2222-4222-8222-222222222222";
@@ -61,5 +61,7 @@ describe("FS-234 outbound consent authority", () => {
     expect(outboundConsentDecisionInputSchema.safeParse({ ...input, evidenceRef: "" }).success).toBe(false);
     expect(outboundConsentDecisionInputSchema.safeParse({ ...input, actorId: null }).success).toBe(false);
     expect(outboundConsentDecisionInputSchema.safeParse({ ...input, idempotencyKey: "" }).success).toBe(false);
+    expect(outboundConsentIntentSchema.safeParse({ key, decision: "grant", idempotencyKey: "capture-1" }).success).toBe(true);
+    expect(outboundConsentIntentSchema.safeParse(input).success).toBe(false);
   });
 });

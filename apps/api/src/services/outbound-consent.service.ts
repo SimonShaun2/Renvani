@@ -14,15 +14,47 @@ import {
   AppError,
   ErrorCode,
   evaluateCurrentOutboundConsent,
-  outboundConsentDecisionInputSchema,
+  outboundConsentIntentSchema,
   outboundConsentKeySchema,
   type OutboundConsentCheck,
   type OutboundConsentKey,
+  type OutboundConsentDecisionInput,
+  type OutboundConsentIntent,
 } from "@fsm/types";
 import { assertConsentReplayMatches, assertVerifiedConsentSource, fingerprintConsentDecision } from "./outbound-consent-decision.js";
 
 type TenantTx = Parameters<Parameters<typeof runTransactionWithTenantSession>[1]>[0];
 type ActiveSubject = { companyId: string; contact: string | null; doNotContact: boolean };
+
+/** Supplied by authentication or a trusted worker context, never parsed from a request body. */
+export interface TrustedConsentActor {
+  companyId: string;
+  actorType: "user" | "system" | "customer";
+  actorId: string | null;
+}
+
+type VerifiedConsentEvidence = Pick<
+  OutboundConsentDecisionInput,
+  "sourceKind" | "sourceRecordId" | "statementVersion" | "evidenceRef"
+>;
+
+function assertTrustedTenant(companyId: string, keyCompanyId: string): void {
+  if (companyId !== keyCompanyId) {
+    throw new AppError(ErrorCode.FORBIDDEN, "Consent key belongs to another tenant");
+  }
+}
+
+/**
+ * No current source stores immutable, independently verifiable affirmative capture/inbound/operator
+ * evidence with the full tenant/subject/contact/channel/purpose/statement/actor tuple. Until Product
+ * and TL approve that source, all writes fail closed. Never promote caller-declared evidence text.
+ */
+async function resolvePersistedConsentEvidence(
+  _actor: TrustedConsentActor,
+  _intent: OutboundConsentIntent,
+): Promise<VerifiedConsentEvidence | null> {
+  return null;
+}
 
 function keyWhere(key: OutboundConsentKey) {
   return and(
@@ -72,15 +104,23 @@ function destinationMatches(key: OutboundConsentKey, actual: string | null): boo
  * Two transaction-scoped advisory locks serialize both repeated idempotency keys and first writes
  * for a consent key. The persisted version is derived from the locked database state, never caller time.
  */
-export async function recordOutboundConsentDecision(raw: unknown) {
-  const input = outboundConsentDecisionInputSchema.parse(raw);
+export async function recordOutboundConsentDecision(actor: TrustedConsentActor, raw: unknown) {
+  const intent = outboundConsentIntentSchema.parse(raw);
+  assertTrustedTenant(actor.companyId, intent.key.companyId);
+  const evidence = await resolvePersistedConsentEvidence(actor, intent);
+  if (!evidence) {
+    throw new AppError(ErrorCode.POLICY_DENIED, "Verified consent evidence source is not configured");
+  }
+  const input: OutboundConsentDecisionInput = {
+    ...intent, ...evidence, actorType: actor.actorType, actorId: actor.actorId,
+  };
   assertVerifiedConsentSource(input);
   const key = input.key;
   const fingerprint = fingerprintConsentDecision(input);
-  return runTransactionWithTenantSession(key.companyId, async (tx) => {
+  return runTransactionWithTenantSession(actor.companyId, async (tx) => {
     await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${JSON.stringify([key.companyId, input.idempotencyKey])}, 0))`);
     const [replay] = await tx.select().from(outboundConsentEvents).where(and(
-      eq(outboundConsentEvents.companyId, key.companyId),
+      eq(outboundConsentEvents.companyId, actor.companyId),
       eq(outboundConsentEvents.idempotencyKey, input.idempotencyKey),
     )).limit(1);
     if (replay) {
@@ -89,7 +129,7 @@ export async function recordOutboundConsentDecision(raw: unknown) {
     }
 
     await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${JSON.stringify([
-      key.companyId, key.subjectType, key.subjectId, key.channel, key.purpose, key.contact,
+      actor.companyId, key.subjectType, key.subjectId, key.channel, key.purpose, key.contact,
     ])}, 0))`);
     const subject = await loadActiveSubject(tx, key);
     if (!subject || (input.decision === "grant" && !destinationMatches(key, subject.contact))) {
@@ -123,7 +163,7 @@ export async function recordOutboundConsentDecision(raw: unknown) {
       });
     }
     await emitEventWithExecutor(tx, {
-      companyId: key.companyId,
+      companyId: actor.companyId,
       eventType: input.decision === "grant" ? "outbound_consent.granted" : "outbound_consent.revoked",
       actorType: input.actorType, actorId: input.actorId,
       entityType: "outbound_consent", entityId: eventId,
@@ -137,9 +177,10 @@ export async function recordOutboundConsentDecision(raw: unknown) {
 }
 
 /** Read only current authority; use at execution and again immediately before provider handoff. */
-export async function checkOutboundConsent(rawKey: unknown, expectedVersion?: number): Promise<OutboundConsentCheck> {
+export async function checkOutboundConsent(companyId: string, rawKey: unknown, expectedVersion?: number): Promise<OutboundConsentCheck> {
   const key = outboundConsentKeySchema.parse(rawKey);
-  return runTransactionWithTenantSession(key.companyId, async (tx) => {
+  assertTrustedTenant(companyId, key.companyId);
+  return runTransactionWithTenantSession(companyId, async (tx) => {
     const checkedAt = new Date();
     const subject = await loadActiveSubject(tx, key);
     const [state] = await tx.select().from(outboundConsentStates).where(keyWhere(key)).limit(1);

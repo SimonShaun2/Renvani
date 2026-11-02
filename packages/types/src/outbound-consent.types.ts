@@ -24,6 +24,14 @@ export const outboundConsentKeySchema = z.object({
   return { ...key, contact: parsed.data };
 });
 
+/** Request intent carries no evidence or actor claims. The service must resolve those from trusted context. */
+export const outboundConsentIntentSchema = z.object({
+  key: outboundConsentKeySchema,
+  decision: outboundConsentDecisionSchema,
+  idempotencyKey: z.string().trim().min(1).max(128),
+}).strict();
+
+/** Internal, server-resolved decision shape; never parse a public request with this schema. */
 export const outboundConsentDecisionInputSchema = z.object({
   key: outboundConsentKeySchema,
   decision: outboundConsentDecisionSchema,
@@ -41,6 +49,7 @@ export const outboundConsentDecisionInputSchema = z.object({
 });
 
 export type OutboundConsentKey = z.output<typeof outboundConsentKeySchema>;
+export type OutboundConsentIntent = z.output<typeof outboundConsentIntentSchema>;
 export type OutboundConsentDecisionInput = z.output<typeof outboundConsentDecisionInputSchema>;
 
 export type OutboundConsentCheck =

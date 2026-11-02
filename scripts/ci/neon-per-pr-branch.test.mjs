@@ -5,7 +5,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
 import { isApprovedFs235NeonTarget } from "./fs235-neon-target.mjs";
-import { runSilentVitest, runVitestJsonGate, vitestFailureSummary } from "./fs235-vitest-diagnostics.mjs";
+import { assertOnePassingVitestResult, runSilentVitest, runVitestJsonGate, vitestFailureSummary } from "./fs235-vitest-diagnostics.mjs";
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 
@@ -103,6 +103,39 @@ test("FS-235 Vitest subprocess never emits raw failure output", () => {
     assert.match(logs.join("\n"), /JSON result was not produced/);
     assert.doesNotMatch(logs.join("\n"), /sk_test_standalone_secret|customer@example\.com/);
     assert.equal(existsSync(outputFile), false);
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
+});
+
+test("FS-235 rejects untrusted reporter counts and invalid JSON with fixed errors", () => {
+  const directory = mkdtempSync(join(tmpdir(), "fs235-vitest-untrusted-"));
+  const outputFile = join(directory, "result.json");
+  try {
+    writeFileSync(outputFile, JSON.stringify({
+      numTotalTests: "customer@example.com sk_test_standalone_secret",
+      numPassedTests: 1,
+      numFailedTests: 0,
+      numPendingTests: 0,
+      numTodoTests: 0
+    }));
+    assert.throws(() => assertOnePassingVitestResult(outputFile), {
+      message: "required worker concurrency result was not 1/1/0"
+    });
+
+    writeFileSync(outputFile, '{"sk_test_standalone_secret customer@example.com":');
+    assert.throws(() => assertOnePassingVitestResult(outputFile), {
+      message: "Vitest JSON result invalid"
+    });
+
+    writeFileSync(outputFile, JSON.stringify({
+      numTotalTests: 1,
+      numPassedTests: 1,
+      numFailedTests: 0,
+      numPendingTests: 0,
+      numTodoTests: 0
+    }));
+    assert.doesNotThrow(() => assertOnePassingVitestResult(outputFile));
   } finally {
     rmSync(directory, { recursive: true, force: true });
   }

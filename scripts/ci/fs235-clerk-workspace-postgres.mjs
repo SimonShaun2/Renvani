@@ -2,7 +2,6 @@
 /** FS-235: one real-PostgreSQL worker concurrency test on a disposable staging Neon database. */
 import { spawnSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
-import { existsSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
@@ -10,7 +9,7 @@ import { fileURLToPath } from "node:url";
 
 import { validateNeonCiDatabaseUrl } from "../../packages/config/dist/neon-ci.js";
 import { isApprovedFs235NeonTarget } from "./fs235-neon-target.mjs";
-import { runSilentVitest, runVitestJsonGate } from "./fs235-vitest-diagnostics.mjs";
+import { assertOnePassingVitestResult, runSilentVitest, runVitestJsonGate } from "./fs235-vitest-diagnostics.mjs";
 import { redactDatabaseUrls, withStrictIsolatedCiDatabase } from "./neon-per-pr-database.mjs";
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
@@ -72,20 +71,7 @@ async function verifyMigration(sql) {
 }
 
 function verifyOnePassingTest(outputFile) {
-  if (!existsSync(outputFile)) {
-    throw new Error("Vitest did not produce its JSON result");
-  }
-  const result = JSON.parse(readFileSync(outputFile, "utf8"));
-  const counts = {
-    executed: result.numTotalTests,
-    passed: result.numPassedTests,
-    failed: result.numFailedTests,
-    skipped: result.numPendingTests,
-    todo: result.numTodoTests
-  };
-  if (counts.executed !== 1 || counts.passed !== 1 || counts.failed !== 0 || counts.skipped !== 0 || counts.todo !== 0) {
-    throw new Error(`required worker concurrency result was not 1/1/0: ${JSON.stringify(counts)}`);
-  }
+  assertOnePassingVitestResult(outputFile);
   console.log("[fs235-postgres] worker concurrency: 1 executed / 1 passed / 0 skipped");
 }
 

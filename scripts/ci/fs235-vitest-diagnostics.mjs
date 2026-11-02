@@ -25,6 +25,28 @@ export function runSilentVitest(command, args, env, cwd) {
   }
 }
 
+/** Check the required gate without ever echoing untrusted reporter fields in an exception. */
+export function assertOnePassingVitestResult(outputFile) {
+  if (!existsSync(outputFile)) {
+    throw new Error("Vitest JSON result missing");
+  }
+  let result;
+  try {
+    result = JSON.parse(readFileSync(outputFile, "utf8"));
+  } catch {
+    throw new Error("Vitest JSON result invalid");
+  }
+  if (
+    result?.numTotalTests !== 1 ||
+    result?.numPassedTests !== 1 ||
+    result?.numFailedTests !== 0 ||
+    result?.numPendingTests !== 0 ||
+    result?.numTodoTests !== 0
+  ) {
+    throw new Error("required worker concurrency result was not 1/1/0");
+  }
+}
+
 function safeCount(value) {
   return Number.isSafeInteger(value) && value >= 0 ? value : "unknown";
 }

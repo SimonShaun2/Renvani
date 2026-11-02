@@ -1,11 +1,11 @@
-import { publicEnv } from "@fsm/config";
+import { API_BASE_URL } from "./api-base-url";
 import type { ErrorCode } from "@fsm/types";
 
 import { clearBrowserAuthSession, getAuthToken } from "./auth";
 import { CLERK_NO_ACCESS_ROUTE } from "./clerk/route-decision";
 import { getClerkSessionToken, signOutClerkSession } from "./clerk/token-bridge";
 
-const API_BASE = publicEnv.NEXT_PUBLIC_API_URL;
+const API_BASE = API_BASE_URL;
 
 export interface ApiErrorPayload {
   error: ErrorCode | "NOT_IMPLEMENTED";
@@ -38,15 +38,15 @@ async function parseError(response: Response): Promise<ApiErrorPayload> {
 }
 
 /**
- * Bearer token precedence (explicit): a live Clerk session token wins over the legacy in-repo JWT.
- * Clerk is only registered when NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY is set and the user signed in
- * with Clerk; otherwise the legacy JWT is used. Never both at once.
+ * Bearer token precedence matches middleware and server rendering: a valid legacy cookie wins,
+ * then Clerk is used when no legacy session is present. This prevents a mixed browser session
+ * from rendering one tenant while authorizing API calls as another.
  */
 export async function resolveBearerToken(): Promise<{ token: string | null; source: "clerk" | "legacy" | null }> {
-  const clerk = await getClerkSessionToken();
-  if (clerk) return { token: clerk, source: "clerk" };
   const legacy = getAuthToken();
-  return legacy ? { token: legacy, source: "legacy" } : { token: null, source: null };
+  if (legacy) return { token: legacy, source: "legacy" };
+  const clerk = await getClerkSessionToken();
+  return clerk ? { token: clerk, source: "clerk" } : { token: null, source: null };
 }
 
 /** Login URL used after an API 401. Exported for tests. */
@@ -68,6 +68,29 @@ export async function handleUnauthorized(source: "clerk" | "legacy" | null): Pro
   if (typeof window !== "undefined") {
     window.location.assign(UNAUTHORIZED_REDIRECT);
   }
+}
+
+/**
+ * Authenticated raw fetch for requests that can't go through `api` (multipart uploads, etc.).
+ * Same rules as apiFetch: legacy JWT first, Clerk fallback, and handleUnauthorized on 401
+ * (Clerk sessions are signed out, never bounced to /login). Returns the Response so callers keep
+ * their own error parsing.
+ */
+export async function authorizedFetch(path: string, init: RequestInit = {}): Promise<Response> {
+  const { token, source } = await resolveBearerToken();
+  const headers = new Headers(init.headers);
+
+  if (token && !headers.has("Authorization")) {
+    headers.set("Authorization", `Bearer ${token}`);
+  }
+
+  const response = await fetch(`${API_BASE}${path}`, { ...init, credentials: "include", headers });
+
+  if (response.status === 401) {
+    await handleUnauthorized(source);
+  }
+
+  return response;
 }
 
 async function apiFetch<TResponse>(path: string, options: RequestInit = {}): Promise<TResponse> {
@@ -125,13 +148,15 @@ export async function publicPost<TResponse>(path: string, body: unknown): Promis
 
 export const api = {
   get: <TResponse>(path: string) => apiFetch<TResponse>(path),
-  post: <TResponse>(path: string, body: unknown) =>
+  post: <TResponse>(path: string, body: unknown, init?: { headers?: HeadersInit }) =>
     apiFetch<TResponse>(path, {
+      ...init,
       method: "POST",
       body: JSON.stringify(body)
     }),
-  patch: <TResponse>(path: string, body: unknown) =>
+  patch: <TResponse>(path: string, body: unknown, init?: { headers?: HeadersInit }) =>
     apiFetch<TResponse>(path, {
+      ...init,
       method: "PATCH",
       body: JSON.stringify(body)
     }),

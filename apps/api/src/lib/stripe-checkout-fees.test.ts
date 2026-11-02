@@ -1,4 +1,4 @@
-import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { setupTestEnv } from "../test-support/env-setup.js";
 
@@ -82,10 +82,50 @@ describe("createInvoiceCheckoutSession fee lines", () => {
     expect(p.payment_intent_data.metadata).not.toHaveProperty("bookingFeeCents");
   });
 
+  it("sets receipt_email on the PaymentIntent only when a receiptEmail is provided", async () => {
+    await createInvoiceCheckoutSession(baseInput({ receiptEmail: "payer@example.com" }));
+    expect((lastCall().payment_intent_data as { receipt_email?: string }).receipt_email).toBe("payer@example.com");
+    await createInvoiceCheckoutSession(baseInput({ receiptEmail: null }));
+    expect(lastCall().payment_intent_data).not.toHaveProperty("receipt_email");
+    await createInvoiceCheckoutSession(baseInput({}));
+    expect(lastCall().payment_intent_data).not.toHaveProperty("receipt_email");
+  });
+
   it("unknown/null plan defaults to the standard Service Fee", async () => {
     await createInvoiceCheckoutSession(baseInput({ renvaniPlan: null }));
     const p = lastCall();
     expect(p.line_items.map((l) => l.price_data.product_data.name)).toEqual(["Repair", "Service Fee (2%)"]);
     expect(p.payment_intent_data.application_fee_amount).toBe(247);
+  });
+});
+
+describe("createInvoiceCheckoutSession return URL (APP_URL_ALLOWED)", () => {
+  beforeEach(() => {
+    createSessionMock.mockReset();
+    createSessionMock.mockResolvedValue({ id: "cs_1", url: "https://checkout.test/cs_1", client_secret: null });
+  });
+
+  afterEach(async () => {
+    delete process.env.APP_URL_ALLOWED;
+    delete process.env.RENVANI_DEPLOYMENT_TIER;
+    (await import("@fsm/config")).resetEnvCacheForTests();
+  });
+
+  it("uses an allowed tester origin in staging, APP_URL otherwise", async () => {
+    const { runWithRequestOrigin } = await import("./app-origins.js");
+    process.env.APP_URL_ALLOWED = "https://tester.renvani.test";
+    process.env.RENVANI_DEPLOYMENT_TIER = "staging";
+    (await import("@fsm/config")).resetEnvCacheForTests();
+    const successUrl = () => (createSessionMock.mock.calls.at(-1)?.[0] as { success_url: string }).success_url;
+
+    await runWithRequestOrigin("https://tester.renvani.test", () => createInvoiceCheckoutSession(baseInput()));
+    expect(successUrl().startsWith("https://tester.renvani.test/pay/tok_1")).toBe(true);
+
+    await runWithRequestOrigin("https://evil.renvani.test", () => createInvoiceCheckoutSession(baseInput()));
+    expect(successUrl().startsWith("http://localhost:3000/pay/tok_1")).toBe(true);
+
+    process.env.RENVANI_DEPLOYMENT_TIER = "production";
+    await runWithRequestOrigin("https://tester.renvani.test", () => createInvoiceCheckoutSession(baseInput()));
+    expect(successUrl().startsWith("http://localhost:3000/pay/tok_1")).toBe(true);
   });
 });

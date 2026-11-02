@@ -68,7 +68,7 @@ export default function SettingsNotificationsPage() {
       showToast({
         tone: "success",
         title: "Notification preferences saved",
-        description: "ServiceRev will use the updated channel preferences for future events."
+        description: "Renvani will use the updated channel preferences for future events."
       });
     } catch (error) {
       showToast({

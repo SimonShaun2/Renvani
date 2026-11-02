@@ -869,6 +869,14 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
             {isExisting ? (
               <StatBadge label={formatStatusLabel(currentStatus)} tone={getEstimateStatusTone(currentStatus)} />
             ) : null}
+            {isExisting && groupQuery.data?.primary.tierGroupId ? (
+              <Link
+                href={`/estimates/option-sets/${groupQuery.data.primary.tierGroupId}`}
+                className="rounded-[10px] border border-[#e6dccb] bg-white px-4 py-2 text-sm font-semibold text-[#0f1530]"
+              >
+                Manage options
+              </Link>
+            ) : null}
             {isEditable ? (
               <>
                 <button
@@ -1376,7 +1384,7 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
         customerPhone={customerDetailQuery.data?.customer.phone ?? null}
         estimateNumber={anchorTier?.estimateNumber ?? "DRAFT"}
         publicUrl={anchorPublicUrl}
-        defaultMessage={`Hi ${customerDetailQuery.data?.customer.firstName ?? ""}, here is your ServiceRev estimate. Review and approve here: {{link}}`}
+        defaultMessage={`Hi ${customerDetailQuery.data?.customer.firstName ?? ""}, here is your Renvani estimate. Review and approve here: {{link}}`}
         isPending={false}
         onSend={sendEstimateToCustomer}
       />

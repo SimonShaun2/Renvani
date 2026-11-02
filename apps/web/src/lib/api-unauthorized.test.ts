@@ -55,13 +55,13 @@ describe("API 401 handling", () => {
 describe("bearer token precedence", () => {
   afterEach(() => registerClerkTokenGetter(null));
 
-  it("prefers the Clerk token, then the legacy JWT, then none", async () => {
+  it("prefers the legacy JWT, then the Clerk token, then none", async () => {
     auth.legacy = "legacy.jwt";
     registerClerkTokenGetter(async () => "clerk.jwt");
-    expect(await resolveBearerToken()).toEqual({ token: "clerk.jwt", source: "clerk" });
-    registerClerkTokenGetter(null);
     expect(await resolveBearerToken()).toEqual({ token: "legacy.jwt", source: "legacy" });
     auth.legacy = null;
+    expect(await resolveBearerToken()).toEqual({ token: "clerk.jwt", source: "clerk" });
+    registerClerkTokenGetter(null);
     expect(await resolveBearerToken()).toEqual({ token: null, source: null });
   });
 });

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { publicEnv } from "@fsm/config";
+import { API_BASE_URL } from "@/src/lib/api-base-url";
 import type {
   AutoFitResponse,
   ConfirmBookingRequestInput,
@@ -142,7 +142,7 @@ export function useDispatchView(date: string) {
       }
 
       const params = new URLSearchParams({ date, access_token: token });
-      eventSource = new EventSource(`${publicEnv.NEXT_PUBLIC_API_URL}/api/v1/dispatch/stream?${params.toString()}`);
+      eventSource = new EventSource(`${API_BASE_URL}/api/v1/dispatch/stream?${params.toString()}`);
       eventSource.onopen = () => update(true);
       eventSource.addEventListener("ping", () => {
         void invalidateDispatchQueries(queryClient);

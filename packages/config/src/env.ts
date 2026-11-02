@@ -17,6 +17,8 @@ const envSchema = z.object({
   DATABASE_TRANSACTION_MAX_RETRIES: z.coerce.number().int().nonnegative().default(3),
   DATABASE_TRANSACTION_RETRY_BASE_MS: z.coerce.number().int().positive().default(25),
   REDIS_URL: z.string().min(1, "REDIS_URL is required"),
+  /** Trusted-operations break-glass gate for non-exhausted source-queue replay. */
+  SOURCE_QUEUE_REPLAY_ENABLED: z.enum(["true", "false"]).default("false"),
   /** FS-198 — geo/ETA provider id (registry in apps/api). Default needs no key and makes no calls. */
   GEO_PROVIDER: z.string().regex(/^[a-z][a-z0-9_]{0,63}$/).default("straight_line"),
   /** FS-198 — assumed average driving speed for straight-line ETAs (mph); clamped 5–80 at use. */
@@ -52,6 +54,10 @@ const envSchema = z.object({
   EMAIL_FROM: z.string().default("Renvani <hello@mail.getrenvani.com>"),
   /** Optional absolute https URL of the Renvani logo image for emails; empty renders the HTML text mark. */
   EMAIL_LOGO_URL: z.string().default(""),
+  /** Growth marketing intake: internal inbox notified of demo requests / growth checks; empty = skip notifications. */
+  MARKETING_NOTIFY_EMAIL: z.string().default(""),
+  /** Growth marketing intake: secret salt for hashing client IPs (HMAC-SHA256); empty = store no IP hash. */
+  MARKETING_IP_HASH_SALT: z.string().default(""),
   R2_ACCOUNT_ID: z.string().min(1, "R2_ACCOUNT_ID is required"),
   R2_ACCESS_KEY_ID: z.string().min(1, "R2_ACCESS_KEY_ID is required"),
   R2_SECRET_ACCESS_KEY: z.string().min(1, "R2_SECRET_ACCESS_KEY is required"),
@@ -63,6 +69,11 @@ const envSchema = z.object({
     .positive("MEDIA_SIGNED_URL_TTL_SECONDS must be greater than zero")
     .default(900),
   APP_URL: z.string().url("APP_URL must be a valid URL"),
+  /**
+   * Comma-separated extra web origins (exact match, no wildcards). APP_URL stays primary. Extras are honored only when
+   * RENVANI_DEPLOYMENT_TIER=staging (tester tier) for API CORS, Clerk authorized parties and Stripe return URLs.
+   */
+  APP_URL_ALLOWED: z.string().default(""),
   JWT_SECRET: z.string().min(1, "JWT_SECRET is required"),
   JWT_REFRESH_SECRET: z.string().min(1, "JWT_REFRESH_SECRET is required"),
   BOOKING_HOLD_TOKEN_SECRET: z.string().min(1, "BOOKING_HOLD_TOKEN_SECRET is required"),
@@ -82,6 +93,11 @@ const envSchema = z.object({
   CLERK_SECRET_KEY: z.string().default(""),
   /** Clerk webhook signing secret (whsec_…) for POST /api/v1/webhooks/clerk (svix). */
   CLERK_WEBHOOK_SECRET: z.string().default(""),
+  /**
+   * Optional shared secret the web proxy (Vercel) sends as `x-origin-secret` on /api/v1/public/* calls.
+   * Unset = off: client IP is request.ip (TRUST_PROXY_HOPS). Set on BOTH Vercel web and Render api.
+   */
+  ORIGIN_SECRET: z.string().optional(),
   /** Comma-separated web origins allowed as Clerk `azp` and for CORS (e.g. https://staging.renvani.com). */
   CLERK_AUTHORIZED_PARTIES: z.string().default(""),
   /** STACK-04 / FS-133 — optional Sentry DSN for QBO sync issue alerts */

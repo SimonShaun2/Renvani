@@ -49,6 +49,32 @@ describe("site trade registry", () => {
     expect(metadata.description).not.toContain("Review available services");
   });
 
+  it("uses inquiry-only fallback copy for an unset trade in both hero and metadata", () => {
+    const settings = { ...base, trade: null };
+    const model = buildBrandedStorefrontViewModel(settings);
+    const metadata = buildSiteMetadataCopy(settings);
+    expect(model.tagline).toContain("Send an inquiry");
+    expect(metadata.description).toContain("Send an inquiry");
+    expect(model.tagline).not.toContain("Review available services");
+    expect(metadata.description).not.toContain("Review available services");
+  });
+
+  it("retains configured-bookable fallback copy in both hero and metadata", () => {
+    const settings = { ...withServices("AC repair"), trade: "hvac" as const };
+    const model = buildBrandedStorefrontViewModel(settings);
+    const metadata = buildSiteMetadataCopy(settings);
+    expect(model.tagline).toContain("Review available services");
+    expect(metadata.description).toContain("Review available services");
+    expect(model.serviceCards[0]?.title).toBe("AC repair");
+  });
+
+  it("preserves an operator-provided tagline in both hero and metadata", () => {
+    const tagline = "Family-owned plumbing team serving the north side.";
+    const settings = { ...base, trade: "plumbing" as const, tagline };
+    expect(buildBrandedStorefrontViewModel(settings).tagline).toBe(tagline);
+    expect(buildSiteMetadataCopy(settings).description).toBe(tagline);
+  });
+
   it.each(["cleaning", "restaurant", "", 42, null])("unknown or missing trade %j falls back to other", (trade) => {
     expect(resolveSiteTrade({ trade } as never).key).toBe("other");
   });

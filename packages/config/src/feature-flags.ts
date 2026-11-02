@@ -8,7 +8,7 @@ const booleanFlagSchema = z.enum(["true", "false"]);
 export function isRevenueAgentProposalsEnabled(
   source: Record<string, string | undefined> = process.env
 ): boolean {
-  return booleanFlagSchema.parse(source.REVENUE_AGENT_PROPOSALS_ENABLED ?? "true") === "true";
+  return booleanFlagSchema.parse(source.REVENUE_AGENT_PROPOSALS_ENABLED ?? "false") === "true";
 }
 
 /** Clerk parallel auth is on only when RENVANI_DEPLOYMENT_TIER=staging (env-driven). */

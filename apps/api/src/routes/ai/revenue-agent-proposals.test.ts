@@ -266,6 +266,27 @@ describe("revenue agent proposals", () => {
     expect(
       (
         await request(app.server)
+          .post(`/api/v1/agent-actions/${rejectProposal.id}/approve`)
+          .set("Authorization", owner.authorization)
+          .send({
+            expectedVersion: fakeDb.getTestState().agentActions.find((row) => row.id === rejectProposal.id)!.updatedAt.getTime()
+          })
+      ).status
+    ).toBe(403);
+    expect(
+      (
+        await request(app.server)
+          .patch(`/api/v1/operator/inbox/${rejectProposal.id}`)
+          .set("Authorization", owner.authorization)
+          .send({
+            expectedVersion: fakeDb.getTestState().agentActions.find((row) => row.id === rejectProposal.id)!.updatedAt.getTime(),
+            body: "Updated draft"
+          })
+      ).status
+    ).toBe(403);
+    expect(
+      (
+        await request(app.server)
           .post(`/api/v1/agent-actions/${rejectProposal.id}/reject`)
           .set("Authorization", owner.authorization)
           .send({})
@@ -273,6 +294,7 @@ describe("revenue agent proposals", () => {
     ).toBe(403);
     expect(fakeDb.getTestState().aiRecommendations.find((row) => row.id === executeRec.id)?.status).toBe("pending");
     expect(fakeDb.getTestState().aiRecommendations.find((row) => row.id === rejectRec.id)?.status).toBe("pending");
+    expect(fakeDb.getTestState().agentActions.find((row) => row.id === rejectProposal.id)?.state).toBe("awaiting_approval");
   });
 
   it("approve → execute marks the recommendation actioned and records the approved draft", async () => {

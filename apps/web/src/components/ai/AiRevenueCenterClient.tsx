@@ -6,7 +6,11 @@ import { format, parseISO } from "date-fns";
 import { motion } from "framer-motion";
 import { CalendarClock, Sparkles, X } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import type { AiRecommendationDetail, AiRecommendationType } from "@fsm/types";
+import {
+  isRevenueProposalRecommendationType,
+  type AiRecommendationDetail,
+  type AiRecommendationType
+} from "@fsm/types";
 
 import { PageLayout } from "@/src/components/layout/PageLayout";
 import { CurrencyDisplay } from "@/src/components/ui/CurrencyDisplay";
@@ -46,17 +50,6 @@ const categoryToneClasses: Record<CategoryCard["tone"], string> = {
   blue: "bg-brand-accent-light text-brand-accent",
   gold: "bg-[#fff1d8] text-[#d48d0f]"
 };
-
-const REVENUE_PROPOSAL_RECOMMENDATION_TYPES = new Set<AiRecommendationType>([
-  "reactivation",
-  "unsold_estimate",
-  "unpaid_invoice",
-  "maintenance_plan_offer"
-]);
-
-export function isRevenueProposalRecommendationType(type: AiRecommendationType): boolean {
-  return REVENUE_PROPOSAL_RECOMMENDATION_TYPES.has(type);
-}
 
 function getRecommendationActionLabel(type: AiRecommendationType): string {
   switch (type) {

@@ -8,7 +8,7 @@ import { getClerkSessionToken, signOutClerkSession } from "./clerk/token-bridge"
 const API_BASE = API_BASE_URL;
 
 export interface ApiErrorPayload {
-  error: ErrorCode | "NOT_IMPLEMENTED";
+  error: ErrorCode | "NOT_IMPLEMENTED" | "CONFLICT";
   message: string;
   requestId?: string;
   fields?: Record<string, string> | null;

@@ -1,18 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { CarFront } from "lucide-react";
 
 import { EmptyState } from "@/src/components/ui/EmptyState";
 import { SkeletonCard } from "@/src/components/ui/SkeletonCard";
-import { useJob, useJobAttachments, useJobTasks, useTransitionJob, useUploadAttachment } from "@/src/hooks/jobs.hooks";
+import { useJob, useJobAttachments, useJobTasks, useMobileJobVersion, useReportMobileIssue, useTransitionJob, useUploadAttachment } from "@/src/hooks/jobs.hooks";
+import { ApiError } from "@/src/lib/api";
 import { showToast } from "@/src/stores/toast.store";
 
 import { CrewChecklist, isTaskDone } from "./CrewChecklist";
 
 export const ISSUE_CATEGORIES = ["Damage", "Access", "Safety", "Customer dispute", "Ran long"] as const;
+const REPORTABLE_ISSUES = { Access: "access", Safety: "safety" } as const;
+type ReportableIssue = keyof typeof REPORTABLE_ISSUES;
 
 export function completionHint(status: string, requiredOpen: boolean): string {
   if (status !== "in_progress") return "Only a job in progress can be marked complete.";
@@ -29,6 +32,33 @@ export function CrewFinishJob({ jobId }: { jobId: string }) {
   const fileInput = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const transitionJob = useTransitionJob(jobId);
+  const [selectedIssue, setSelectedIssue] = useState<ReportableIssue | null>(null);
+  const [issueDescription, setIssueDescription] = useState("");
+  const [issueError, setIssueError] = useState<string | null>(null);
+  const mobileJob = useMobileJobVersion(jobId, selectedIssue !== null);
+  const reportIssue = useReportMobileIssue(jobId);
+
+  async function submitIssue() {
+    if (!selectedIssue || !mobileJob.data?.job.recordVersion || !issueDescription.trim()) return;
+    setIssueError(null);
+    try {
+      await reportIssue.mutateAsync({
+        category: REPORTABLE_ISSUES[selectedIssue],
+        description: issueDescription.trim(),
+        recordVersion: mobileJob.data.job.recordVersion
+      });
+      setSelectedIssue(null);
+      setIssueDescription("");
+      showToast({ tone: "success", title: "Issue reported", description: "The office can see it now." });
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 409) {
+        void mobileJob.refetch();
+        setIssueError("This job changed. Check the latest details, then report the issue again.");
+      } else {
+        setIssueError(error instanceof Error ? error.message : "Could not report the issue. Try again.");
+      }
+    }
+  }
 
   if (jobQuery.isLoading || tasksQuery.isLoading) {
     return (
@@ -146,18 +176,54 @@ export function CrewFinishJob({ jobId }: { jobId: string }) {
         <section className="rounded-[14px] bg-[#fde4df] px-4 py-4" aria-label="Report an issue">
           <p className="text-[15px] font-semibold text-[#b3261e]">Report an issue</p>
           <div className="mt-3 flex flex-wrap gap-2">
-            {ISSUE_CATEGORIES.map((category) => (
-              <button
-                key={category}
-                type="button"
-                disabled
-                className="rounded-full bg-white px-4 py-2 text-sm font-medium text-[#0f1530] disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {category}
-              </button>
-            ))}
+            {ISSUE_CATEGORIES.map((category) => {
+              const available = category === "Access" || category === "Safety";
+              return (
+                <button
+                  key={category}
+                  type="button"
+                  disabled={!available || reportIssue.isPending}
+                  aria-pressed={available ? selectedIssue === category : undefined}
+                  aria-describedby={!available ? "unavailable-issue-categories" : undefined}
+                  onClick={available ? () => { setSelectedIssue(category); setIssueError(null); } : undefined}
+                  className="min-h-11 rounded-full bg-white px-4 py-2 text-sm font-medium text-[#0f1530] aria-pressed:bg-[#f6b400] disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {category}
+                </button>
+              );
+            })}
           </div>
-          <p className="mt-3 text-xs text-[#5e6684]">Issue reporting isn&apos;t available yet. Call the office for now.</p>
+          <p id="unavailable-issue-categories" className="mt-3 text-xs text-[#5e6684]">Damage, Customer dispute, and Ran long can&apos;t be reported in the app yet. Call the office for those issues.</p>
+          {selectedIssue ? (
+            <div className="mt-4 space-y-3">
+              <label htmlFor="mobile-issue-note" className="block text-sm font-semibold text-[#0f1530]">Describe the {selectedIssue.toLowerCase()} issue</label>
+              <textarea
+                id="mobile-issue-note"
+                value={issueDescription}
+                onChange={(event) => setIssueDescription(event.target.value)}
+                maxLength={5000}
+                rows={3}
+                required
+                className="w-full rounded-[10px] border border-[#e6dccb] bg-white p-3 text-sm text-[#0f1530] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2b4acb]"
+              />
+              {mobileJob.isLoading ? <p role="status" className="text-sm text-[#5e6684]">Checking the latest job version…</p> : null}
+              {mobileJob.isError ? (
+                <div role="alert" className="text-sm text-[#b3261e]">
+                  <p>Could not check the latest job details.</p>
+                  <button type="button" onClick={() => void mobileJob.refetch()} className="mt-2 min-h-11 rounded-[10px] bg-white px-4 font-semibold text-[#0f1530]">Retry job details</button>
+                </div>
+              ) : null}
+              {issueError ? <p role="alert" className="text-sm text-[#b3261e]">{issueError}</p> : null}
+              <button
+                type="button"
+                disabled={!issueDescription.trim() || !mobileJob.data?.job.recordVersion || mobileJob.isFetching || reportIssue.isPending}
+                onClick={() => void submitIssue()}
+                className="min-h-11 rounded-[10px] bg-[#0f1530] px-5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {reportIssue.isPending ? "Reporting…" : "Report issue"}
+              </button>
+            </div>
+          ) : null}
         </section>
       </div>
 

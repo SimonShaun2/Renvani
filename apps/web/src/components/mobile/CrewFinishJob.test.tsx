@@ -1,6 +1,7 @@
 // @vitest-environment happy-dom
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { ApiError } from "@/src/lib/api";
 
 const mocks = vi.hoisted(() => ({
   job: vi.fn(),
@@ -8,6 +9,10 @@ const mocks = vi.hoisted(() => ({
   attachments: vi.fn(),
   upload: vi.fn(),
   transition: vi.fn(),
+  mobileJob: vi.fn(),
+  reportIssue: vi.fn(),
+  submitIssue: vi.fn(),
+  retryMobileJob: vi.fn(),
   retryJob: vi.fn(),
   retryTasks: vi.fn(),
   toast: vi.fn()
@@ -19,7 +24,9 @@ vi.mock("@/src/hooks/jobs.hooks", () => ({
   useJobTasks: mocks.tasks,
   useJobAttachments: mocks.attachments,
   useUploadAttachment: mocks.upload,
-  useTransitionJob: mocks.transition
+  useTransitionJob: mocks.transition,
+  useMobileJobVersion: mocks.mobileJob,
+  useReportMobileIssue: mocks.reportIssue
 }));
 vi.mock("@/src/stores/toast.store", () => ({ showToast: mocks.toast }));
 vi.mock("./CrewChecklist", () => ({
@@ -46,6 +53,51 @@ beforeEach(() => {
   mocks.attachments.mockReturnValue({ data: { data: [] } });
   mocks.upload.mockReturnValue({ isPending: false, mutate: vi.fn() });
   mocks.transition.mockReturnValue({ isPending: false, mutate: vi.fn() });
+  mocks.mobileJob.mockReturnValue({ data: { job: { recordVersion: "version-1" } }, isLoading: false, isError: false, isFetching: false, refetch: mocks.retryMobileJob });
+  mocks.submitIssue.mockResolvedValue({ issue: { id: "issue-1" } });
+  mocks.reportIssue.mockReturnValue({ isPending: false, mutateAsync: mocks.submitIssue });
+});
+
+describe("CrewFinishJob issue reporting", () => {
+  it("submits only Product-approved Access with a note and current version", async () => {
+    render(<CrewFinishJob jobId="job-1" />);
+    for (const name of ["Damage", "Customer dispute", "Ran long"]) {
+      expect((screen.getByRole("button", { name }) as HTMLButtonElement).disabled).toBe(true);
+    }
+    expect(screen.getByText(/can.t be reported in the app yet/)).toBeTruthy();
+
+    fireEvent.click(screen.getByRole("button", { name: "Access" }));
+    fireEvent.change(screen.getByRole("textbox", { name: /Describe the access issue/ }), { target: { value: "  Gate locked  " } });
+    fireEvent.click(screen.getByRole("button", { name: "Report issue" }));
+
+    await waitFor(() => expect(mocks.submitIssue).toHaveBeenCalledWith({ category: "access", description: "Gate locked", recordVersion: "version-1" }));
+    expect(mocks.toast).toHaveBeenCalledWith(expect.objectContaining({ tone: "success", title: "Issue reported" }));
+  });
+
+  it("keeps Safety report open and refreshes the version after a conflict", async () => {
+    mocks.submitIssue.mockRejectedValue(new ApiError(409, { error: "CONFLICT", message: "stale version" }));
+    render(<CrewFinishJob jobId="job-1" />);
+    fireEvent.click(screen.getByRole("button", { name: "Safety" }));
+    fireEvent.change(screen.getByRole("textbox", { name: /Describe the safety issue/ }), { target: { value: "Gas smell" } });
+    fireEvent.click(screen.getByRole("button", { name: "Report issue" }));
+
+    await waitFor(() => expect(screen.getByText(/This job changed/)).toBeTruthy());
+    expect(mocks.retryMobileJob).toHaveBeenCalledOnce();
+    expect(screen.getByRole("textbox", { name: /Describe the safety issue/ })).toBeTruthy();
+  });
+
+  it("does not submit when the latest job version cannot be loaded", () => {
+    mocks.mobileJob.mockReturnValue({ data: undefined, isLoading: false, isError: true, isFetching: false, refetch: mocks.retryMobileJob });
+    render(<CrewFinishJob jobId="job-1" />);
+    fireEvent.click(screen.getByRole("button", { name: "Access" }));
+    fireEvent.change(screen.getByRole("textbox", { name: /Describe the access issue/ }), { target: { value: "Locked gate" } });
+
+    expect((screen.getByRole("button", { name: "Report issue" }) as HTMLButtonElement).disabled).toBe(true);
+    expect(screen.getByText("Could not check the latest job details.")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Retry job details" }));
+    expect(mocks.retryMobileJob).toHaveBeenCalledOnce();
+    expect(mocks.submitIssue).not.toHaveBeenCalled();
+  });
 });
 afterEach(cleanup);
 

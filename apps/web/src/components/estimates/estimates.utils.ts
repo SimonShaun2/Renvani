@@ -33,10 +33,10 @@ export interface RevenueLineItemDraft {
 }
 
 export interface RevenueTotals {
-  subtotal: number;
-  taxAmount: number;
-  discountAmount: number;
-  total: number;
+  subtotal: string;
+  taxAmount: string;
+  discountAmount: string;
+  total: string;
 }
 
 export interface GroupedEstimateListRow {
@@ -59,25 +59,21 @@ export interface GroupedEstimateListRow {
   tierGroupId: string | null;
 }
 
-export function parseMoneyValue(value: string | number | null | undefined): number {
-  if (typeof value === "number") {
-    return Number.isFinite(value) ? value : 0;
-  }
-
-  if (typeof value === "string") {
-    const parsed = Number.parseFloat(value);
-    return Number.isFinite(parsed) ? parsed : 0;
-  }
-
-  return 0;
-}
-
 export function formatMoneyInput(value: string | number | null | undefined): string {
   try {
     const amount = new Decimal(value ?? 0);
     return amount.isFinite() ? amount.toFixed(2) : "0.00";
   } catch {
     return "0.00";
+  }
+}
+
+export function formatTaxRateInput(value: string | number | null | undefined): string {
+  try {
+    const rate = new Decimal(value ?? 0);
+    return rate.isFinite() ? rate.toFixed(4) : "0.0000";
+  } catch {
+    return "0.0000";
   }
 }
 
@@ -117,8 +113,8 @@ export function getTierSortRank(label: string | null): number {
 
 export function computeRevenueTotals(
   items: RevenueLineItemDraft[],
-  taxRate: number,
-  discountAmount: number
+  taxRate: string,
+  discountAmount: string
 ): RevenueTotals {
   let subtotal = new Decimal(0);
   let taxableSubtotal = new Decimal(0);
@@ -127,15 +123,16 @@ export function computeRevenueTotals(
     subtotal = subtotal.add(lineTotal);
     if (item.isTaxable) taxableSubtotal = taxableSubtotal.add(lineTotal);
   }
-  const safeDiscount = new Decimal(formatMoneyInput(Math.max(0, discountAmount)));
-  const taxAmount = taxableSubtotal.mul(new Decimal(taxRate).toFixed(4));
-  const total = subtotal.add(taxAmount).sub(safeDiscount);
+  const normalizedDiscount = new Decimal(formatMoneyInput(discountAmount));
+  const normalizedTaxRate = new Decimal(formatTaxRateInput(taxRate));
+  const taxAmount = new Decimal(taxableSubtotal.mul(normalizedTaxRate).toFixed(2));
+  const total = subtotal.add(taxAmount).sub(normalizedDiscount);
 
   return {
-    subtotal: Number(subtotal.toFixed(2)),
-    taxAmount: Number(taxAmount.toFixed(2)),
-    discountAmount: Number(safeDiscount.toFixed(2)),
-    total: Number(total.toFixed(2))
+    subtotal: subtotal.toFixed(2),
+    taxAmount: taxAmount.toFixed(2),
+    discountAmount: normalizedDiscount.toFixed(2),
+    total: total.toFixed(2)
   };
 }
 

@@ -92,7 +92,7 @@ function renderTable(props: Partial<React.ComponentProps<typeof EditableLineItem
 
 describe("EditableLineItemsTable frame layout (10:676)", () => {
   it("renders Line item / Detail / Qty / Price with real values and a dash for missing detail", () => {
-    renderTable({ readOnly: true, discountAmount: 21 });
+    renderTable({ readOnly: true, discountAmount: "21.00" });
     const headers = screen.getAllByRole("columnheader").map((h) => h.textContent);
     expect(headers).toEqual(["Line item", "Detail", "Qty", "Price"]);
     expect(screen.getByText("Maintenance plan")).toBeTruthy();
@@ -113,7 +113,7 @@ describe("EditableLineItemsTable frame layout (10:676)", () => {
 
 describe("EstimateTotalsCard (10:707)", () => {
   it("shows only exact totals, no per-visit or monthly figures", () => {
-    render(<EstimateTotalsCard subtotal={187} taxAmount={15.43} taxRate={0.0825} discountAmount={21} total={181.43} />);
+    render(<EstimateTotalsCard subtotal="187.00" taxAmount="15.43" taxRate="0.0825" discountAmount="21.00" total="181.43" />);
     expect(screen.getByText("Tax (8.25%)")).toBeTruthy();
     expect(screen.getByText("−$21.00")).toBeTruthy();
     expect(screen.getByText("$181.43")).toBeTruthy();

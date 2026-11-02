@@ -42,11 +42,11 @@ import {
   formatMoneyInput,
   formatStatusLabel,
   formatQuantityInput,
+  formatTaxRateInput,
   getEstimateStatusTone,
   groupEstimateDetails,
   lineItemFromEstimateItem,
   normalizeLineItems,
-  parseMoneyValue,
   type RevenueLineItemDraft
 } from "./estimates.utils";
 
@@ -267,7 +267,7 @@ function toEstimateLineItemPayload(item: RevenueLineItemDraft, index: number) {
 function buildCreateEstimateInput(
   draft: EstimateDraftState,
   tier: EstimateTierDraft,
-  taxRate: number,
+  taxRate: string,
   tierGroupId?: string
 ): CreateEstimateInput {
   return {
@@ -277,7 +277,7 @@ function buildCreateEstimateInput(
     ...(draft.title.trim() ? { title: draft.title.trim() } : {}),
     ...(draft.messageToCustomer.trim() ? { messageToCustomer: draft.messageToCustomer.trim() } : {}),
     discountAmount: formatMoneyInput(draft.discountAmount),
-    taxRate: taxRate.toFixed(4),
+    taxRate,
     financingOffered: draft.financingOffered,
     ...(tier.label ? { tierLabel: tier.label } : {}),
     ...(tierGroupId ? { tierGroupId } : {}),
@@ -285,19 +285,19 @@ function buildCreateEstimateInput(
   };
 }
 
-function buildPublicEstimatePreview(draft: EstimateDraftState, taxRate: number): PublicEstimateRecord {
+function buildPublicEstimatePreview(draft: EstimateDraftState, taxRate: string): PublicEstimateRecord {
   if (draft.mode === "single") {
-    const totals = computeRevenueTotals(draft.single.items, taxRate, parseMoneyValue(draft.discountAmount));
+    const totals = computeRevenueTotals(draft.single.items, taxRate, draft.discountAmount);
     return {
       estimateNumber: draft.single.estimateNumber ?? "DRAFT",
       title: draft.title || "Estimate",
       status: draft.single.status,
       messageToCustomer: draft.messageToCustomer || null,
-      subtotal: formatMoneyInput(totals.subtotal),
-      taxRate: formatMoneyInput(taxRate),
-      taxAmount: formatMoneyInput(totals.taxAmount),
-      discountAmount: formatMoneyInput(totals.discountAmount),
-      total: formatMoneyInput(totals.total),
+      subtotal: totals.subtotal,
+      taxRate,
+      taxAmount: totals.taxAmount,
+      discountAmount: totals.discountAmount,
+      total: totals.total,
       financingOffered: draft.financingOffered,
       tierLabel: null,
       expiresAt: null,
@@ -313,16 +313,16 @@ function buildPublicEstimatePreview(draft: EstimateDraftState, taxRate: number):
   }
 
   const tiers = draft.tiers.map((tier) => {
-    const totals = computeRevenueTotals(tier.items, taxRate, parseMoneyValue(draft.discountAmount));
+    const totals = computeRevenueTotals(tier.items, taxRate, draft.discountAmount);
     return {
       estimateNumber: tier.estimateNumber ?? tier.key.toUpperCase(),
       title: draft.title || `Option ${tier.label ?? tier.key}`,
       tierLabel: tier.label,
-      subtotal: formatMoneyInput(totals.subtotal),
-      taxRate: formatMoneyInput(taxRate),
-      taxAmount: formatMoneyInput(totals.taxAmount),
-      discountAmount: formatMoneyInput(totals.discountAmount),
-      total: formatMoneyInput(totals.total),
+      subtotal: totals.subtotal,
+      taxRate,
+      taxAmount: totals.taxAmount,
+      discountAmount: totals.discountAmount,
+      total: totals.total,
       items: normalizeLineItems(tier.items).map((item) => ({
         name: item.name,
         description: item.description || null,
@@ -340,7 +340,7 @@ function buildPublicEstimatePreview(draft: EstimateDraftState, taxRate: number):
     status: draft.tiers.some((tier) => tier.status === "approved") ? "approved" : draft.tiers[0]?.status ?? "draft",
     messageToCustomer: draft.messageToCustomer || null,
     subtotal: selectedTier?.subtotal ?? "0.00",
-    taxRate: selectedTier?.taxRate ?? formatMoneyInput(taxRate),
+    taxRate: selectedTier?.taxRate ?? taxRate,
     taxAmount: selectedTier?.taxAmount ?? "0.00",
     discountAmount: selectedTier?.discountAmount ?? formatMoneyInput(draft.discountAmount),
     total: selectedTier?.total ?? "0.00",
@@ -431,8 +431,8 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
   const isExisting = Boolean(estimateId);
   const isEditable = !isExisting || editingOverride || currentStatus === "draft" || currentStatus === "revised";
   const taxRate = primaryEstimate?.taxRate
-    ? parseMoneyValue(primaryEstimate.taxRate)
-    : getCompanyTaxRate(companyQuery.data?.company.settings);
+    ? formatTaxRateInput(primaryEstimate.taxRate)
+    : formatTaxRateInput(getCompanyTaxRate(companyQuery.data?.company.settings));
   const preview = useMemo(() => buildPublicEstimatePreview(draft, taxRate), [draft, taxRate]);
   const activeTier =
     draft.mode === "single"
@@ -441,7 +441,7 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
         ?? draft.tiers[1]
         ?? draft.tiers[0]
         ?? createEmptyTier("better", "Better");
-  const activeTotals = computeRevenueTotals(activeTier.items, taxRate, parseMoneyValue(draft.discountAmount));
+  const activeTotals = computeRevenueTotals(activeTier.items, taxRate, draft.discountAmount);
   const anchorTier = getAnchorTier(draft);
   const anchorPublicPath = buildEstimatePublicPath(anchorTier?.approvalToken);
   const anchorPublicUrl =
@@ -512,7 +512,7 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
               messageToCustomer: draft.messageToCustomer,
               financingOffered: draft.financingOffered,
               discountAmount: formatMoneyInput(draft.discountAmount),
-              taxRate: taxRate.toFixed(4)
+              taxRate
             });
 
             const latestDetail = await api.get<{ estimate: EstimateDetailRecord }>(
@@ -587,7 +587,7 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
                 messageToCustomer: draft.messageToCustomer,
                 financingOffered: draft.financingOffered,
                 discountAmount: formatMoneyInput(draft.discountAmount),
-                taxRate: taxRate.toFixed(4),
+                taxRate,
                 tierLabel: tier.label ?? undefined,
                 tierGroupId: currentGroupId
               });
@@ -1074,7 +1074,7 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
                 ) : (
                   <div className="mt-5 space-y-4">
                     {draft.tiers.map((tier) => {
-                      const tierTotals = computeRevenueTotals(tier.items, taxRate, parseMoneyValue(draft.discountAmount));
+                      const tierTotals = computeRevenueTotals(tier.items, taxRate, draft.discountAmount);
                       const expanded = activeTierKey === tier.key;
 
                       return (
@@ -1358,7 +1358,7 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
                             <p className="text-xs text-neutral-500">{tier.items.length} items</p>
                           </div>
                           <CurrencyDisplay
-                            value={computeRevenueTotals(tier.items, taxRate, parseMoneyValue(draft.discountAmount)).total}
+                            value={computeRevenueTotals(tier.items, taxRate, draft.discountAmount).total}
                             showCents
                             className="font-semibold text-neutral-900"
                           />

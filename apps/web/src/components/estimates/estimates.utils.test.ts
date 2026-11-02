@@ -25,8 +25,8 @@ function item(quantity: string, unitPrice: string, isTaxable = true): RevenueLin
 describe("estimate decimal preview parity", () => {
   it("rounds each fractional-quantity line before summing the subtotal", () => {
     expect(calculateLineTotal("0.333", "0.05")).toBe("0.02");
-    expect(computeRevenueTotals([item("0.333", "0.05"), item("0.333", "0.05"), item("0.333", "0.05")], 0, 0))
-      .toEqual({ subtotal: 0.06, taxAmount: 0, discountAmount: 0, total: 0.06 });
+    expect(computeRevenueTotals([item("0.333", "0.05"), item("0.333", "0.05"), item("0.333", "0.05")], "0", "0.00"))
+      .toEqual({ subtotal: "0.06", taxAmount: "0.00", discountAmount: "0.00", total: "0.06" });
   });
 
   it("normalizes half-cent input to the API's three- and two-decimal fields", () => {
@@ -37,12 +37,12 @@ describe("estimate decimal preview parity", () => {
 
   it("keeps a large in-range extended price exact to cents", () => {
     expect(calculateLineTotal("999.999", "99999.99")).toBe("99999890.00");
-    expect(formatMoneyInput(computeRevenueTotals([item("999.999", "99999.99")], 0, 0).total)).toBe("99999890.00");
+    expect(computeRevenueTotals([item("999.999", "99999.99")], "0", "0.00").total).toBe("99999890.00");
   });
 
   it("calculates tax on taxable lines before the estimate discount", () => {
-    expect(computeRevenueTotals([item("1", "100.00"), item("1", "20.00", false)], 0.1, 10))
-      .toEqual({ subtotal: 120, taxAmount: 10, discountAmount: 10, total: 120 });
+    expect(computeRevenueTotals([item("1", "100.00"), item("1", "20.00", false)], "0.1", "10.00"))
+      .toEqual({ subtotal: "120.00", taxAmount: "10.00", discountAmount: "10.00", total: "120.00" });
   });
 });
 

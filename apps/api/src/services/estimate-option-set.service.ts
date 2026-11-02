@@ -616,7 +616,11 @@ export async function sendEstimateOptionSet(
     const [customer] = await tx
       .select()
       .from(customers)
-      .where(and(eq(customers.companyId, actor.companyId), eq(customers.id, rows[0]!.customerId)))
+      .where(and(
+        eq(customers.companyId, actor.companyId),
+        eq(customers.id, rows[0]!.customerId),
+        isNull(customers.deletedAt)
+      ))
       .limit(1);
     if (!customer?.email) throw new AppError(ErrorCode.CONFLICT, "Customer must have an email before sending an estimate");
     const sentAt = new Date();

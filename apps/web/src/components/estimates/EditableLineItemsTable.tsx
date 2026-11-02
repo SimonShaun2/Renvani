@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Decimal } from "decimal.js";
 import { Plus, Trash2 } from "lucide-react";
 import type { PriceBookItemPickerSeed } from "@fsm/types";
 
@@ -11,7 +12,6 @@ import {
   createLineItemDraft,
   formatMoneyInput,
   formatQuantityInput,
-  parseMoneyValue,
   type RevenueLineItemDraft
 } from "./estimates.utils";
 
@@ -24,7 +24,7 @@ interface EditableLineItemsTableProps {
   /** "frame" = Figma 10:676 Line item / Detail / Qty / Price layout (estimate builder). */
   variant?: "default" | "frame";
   /** Estimate-level discount shown as its own row in the frame layout (only when > 0). */
-  discountAmount?: number;
+  discountAmount?: string;
 }
 
 interface CustomItemFormState {
@@ -52,7 +52,7 @@ export function EditableLineItemsTable({
   readOnly = false,
   onChange,
   variant = "default",
-  discountAmount = 0
+  discountAmount = "0.00"
 }: EditableLineItemsTableProps) {
   const [catalogOpen, setCatalogOpen] = useState(false);
   const [pendingProductId, setPendingProductId] = useState<string | null>(null);
@@ -208,7 +208,7 @@ export function EditableLineItemsTable({
                             inputMode="decimal"
                             className={`${frameInput} w-24`}
                           />
-                          {parseMoneyValue(item.quantity) !== 1 ? (
+                          {!new Decimal(formatQuantityInput(item.quantity)).equals(1) ? (
                             <p className="text-xs text-[#5e6684]">${lineTotal} total</p>
                           ) : null}
                         </div>
@@ -254,7 +254,7 @@ export function EditableLineItemsTable({
                 );
               })
             )}
-            {discountAmount > 0 ? (
+            {new Decimal(discountAmount).greaterThan(0) ? (
               <tr className="border-t border-[#e6dccb]">
                 <td className="px-5 py-3.5 font-semibold text-[#0f1530]">Discount</td>
                 <td className="px-5 py-3.5 text-[#2a3360]">Applied to this estimate</td>

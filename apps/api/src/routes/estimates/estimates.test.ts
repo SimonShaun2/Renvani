@@ -168,9 +168,17 @@ describe("estimate routes", () => {
     expect((await request(app.server).get(`/api/v1/estimates/${estimate.id}/items`)
       .set("Authorization", otherTechnicianActor.authorization)).status).toBe(404);
     job.technicianId = null;
-    expect((await request(app.server).get(`/api/v1/estimates/${estimate.id}`)
+    expect((await request(app.server).get(`/api/v1/estimates/${estimate.id}?technicianId=${technician.id}`)
       .set("Authorization", technicianActor.authorization)).status).toBe(404);
     job.technicianId = technician.id;
+    job.deletedAt = new Date();
+    expect((await request(app.server).get(`/api/v1/estimates/${estimate.id}`)
+      .set("Authorization", technicianActor.authorization)).status).toBe(404);
+    job.deletedAt = null;
+    estimate.deletedAt = new Date();
+    expect((await request(app.server).get(`/api/v1/estimates/${estimate.id}`)
+      .set("Authorization", technicianActor.authorization)).status).toBe(404);
+    estimate.deletedAt = null;
     technician.status = "inactive";
     expect((await request(app.server).get(`/api/v1/estimates/${estimate.id}`)
       .set("Authorization", technicianActor.authorization)).status).toBe(404);

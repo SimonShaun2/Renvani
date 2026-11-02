@@ -13,6 +13,7 @@ import {
 } from "@fsm/types";
 
 import { assertPriceBookItemsInCompany } from "./price-book-item-scope.js";
+import { assertEstimateOfficeRole, requireCurrentEstimateOfficeActor, type EstimateStaffActor } from "./estimate-access.js";
 import {
   assertEstimateMoneyResult,
   normalizeEstimateMoney,
@@ -140,11 +141,14 @@ export async function listItems(companyId: string, estimateId: string): Promise<
 }
 
 export async function addItem(
-  companyId: string,
+  actor: EstimateStaffActor,
   estimateId: string,
   input: AddEstimateItemInput
 ): Promise<EstimateItem> {
+  assertEstimateOfficeRole(actor);
+  const companyId = actor.companyId;
   return db.transaction(async (tx) => {
+    await requireCurrentEstimateOfficeActor(actor, tx);
     const estimate = await getEstimateRecord(companyId, estimateId, tx);
     assertDraftEstimate(estimate);
 
@@ -188,12 +192,15 @@ export async function addItem(
 }
 
 export async function updateItem(
-  companyId: string,
+  actor: EstimateStaffActor,
   estimateId: string,
   itemId: string,
   input: UpdateEstimateItemInput
 ): Promise<EstimateItem> {
+  assertEstimateOfficeRole(actor);
+  const companyId = actor.companyId;
   return db.transaction(async (tx) => {
+    await requireCurrentEstimateOfficeActor(actor, tx);
     const estimate = await getEstimateRecord(companyId, estimateId, tx);
     assertDraftEstimate(estimate);
 
@@ -233,11 +240,14 @@ export async function updateItem(
 }
 
 export async function removeItem(
-  companyId: string,
+  actor: EstimateStaffActor,
   estimateId: string,
   itemId: string
 ): Promise<void> {
+  assertEstimateOfficeRole(actor);
+  const companyId = actor.companyId;
   await db.transaction(async (tx) => {
+    await requireCurrentEstimateOfficeActor(actor, tx);
     const estimate = await getEstimateRecord(companyId, estimateId, tx);
     assertDraftEstimate(estimate);
     await getEstimateItemRecord(companyId, estimateId, itemId, tx);

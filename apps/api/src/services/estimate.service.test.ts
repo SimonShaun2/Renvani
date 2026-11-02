@@ -99,6 +99,51 @@ function seedEstimateGraph(companyId: string) {
 }
 
 describe("estimate.service", () => {
+  it("denies non-office list and item service calls before any database access", async () => {
+    const { company } = createAdminContext();
+    const technician = fakeDb.seedUser({ companyId: company.id, email: "tech-direct@example.com",
+      firstName: "Tess", lastName: "Tech", role: "technician" });
+    const actor = { companyId: company.id, userId: technician.id, role: technician.role };
+    const selectSpy = vi.spyOn(fakeDb.db, "select");
+    const transactionSpy = vi.spyOn(fakeDb.db, "transaction");
+    try {
+      await expect(estimateService.listEstimates(actor, {})).rejects.toMatchObject({ code: ErrorCode.FORBIDDEN });
+      await expect(estimateItemsService.addItem(actor, randomUUID(), {
+        name: "Blocked", quantity: "1", unitPrice: "1.00"
+      })).rejects.toMatchObject({ code: ErrorCode.FORBIDDEN });
+      await expect(estimateItemsService.updateItem(actor, randomUUID(), randomUUID(), {
+        name: "Blocked"
+      })).rejects.toMatchObject({ code: ErrorCode.FORBIDDEN });
+      await expect(estimateItemsService.removeItem(actor, randomUUID(), randomUUID()))
+        .rejects.toMatchObject({ code: ErrorCode.FORBIDDEN });
+      expect(selectSpy).not.toHaveBeenCalled();
+      expect(transactionSpy).not.toHaveBeenCalled();
+    } finally {
+      selectSpy.mockRestore();
+      transactionSpy.mockRestore();
+    }
+  });
+
+  it("allows active admin and dispatcher through list and item service operations", async () => {
+    const { company } = createAdminContext();
+    const admin = fakeDb.seedUser({ companyId: company.id, email: "admin@example.com",
+      firstName: "A", lastName: "Admin", role: "admin" });
+    const dispatcher = fakeDb.seedUser({ companyId: company.id, email: "dispatch@example.com",
+      firstName: "D", lastName: "Dispatcher", role: "dispatcher" });
+    const adminActor = { companyId: company.id, userId: admin.id, role: admin.role };
+    const dispatcherActor = { companyId: company.id, userId: dispatcher.id, role: dispatcher.role };
+    const { customer } = seedEstimateGraph(company.id);
+    const estimate = fakeDb.seedEstimate({ companyId: company.id, customerId: customer.id, status: "draft" });
+    expect((await estimateService.listEstimates(adminActor, {})).total).toBe(1);
+    const item = await estimateItemsService.addItem(dispatcherActor, estimate.id, {
+      name: "Diagnostic", quantity: "1", unitPrice: "25.00"
+    });
+    expect((await estimateItemsService.updateItem(adminActor, estimate.id, item.id,
+      { quantity: "2" })).total).toBe("50.00");
+    await estimateItemsService.removeItem(dispatcherActor, estimate.id, item.id);
+    expect((await estimateItemsService.listItems(company.id, estimate.id))).toHaveLength(0);
+  });
+
   it("rejects a technician mutation at the service boundary without a state event", async () => {
     const { company, actor: owner } = createAdminContext();
     const technician = fakeDb.seedUser({ companyId: company.id, email: "tech@example.com",
@@ -116,7 +161,8 @@ describe("estimate.service", () => {
     expect(fakeDb.getTestState().activityEvents).toHaveLength(eventsBefore);
   });
   it("listEstimates paginates and filters by status, customer, job, and title search", async () => {
-    const { company } = createAdminContext();
+    const { company, actor } = createAdminContext();
+    const staff = { companyId: company.id, userId: actor.id, role: actor.role };
     const { customer, job } = seedEstimateGraph(company.id);
     const otherCustomer = fakeDb.seedCustomer({
       companyId: company.id,
@@ -144,13 +190,13 @@ describe("estimate.service", () => {
       createdAt: new Date("2026-04-28T10:00:00.000Z")
     });
 
-    const filtered = await estimateService.listEstimates(company.id, {
+    const filtered = await estimateService.listEstimates(staff, {
       status: "sent",
       customerId: customer.id,
       jobId: job.id,
       search: "gold"
     });
-    const paginated = await estimateService.listEstimates(company.id, {
+    const paginated = await estimateService.listEstimates(staff, {
       page: 2,
       limit: 1
     });
@@ -349,7 +395,8 @@ describe("estimate.service", () => {
   });
 
   it("estimate item services add, list, update, remove, and recalculate totals", async () => {
-    const { company } = createAdminContext();
+    const { company, actor } = createAdminContext();
+    const staff = { companyId: company.id, userId: actor.id, role: actor.role };
     const { customer } = seedEstimateGraph(company.id);
     const estimate = fakeDb.seedEstimate({
       companyId: company.id,
@@ -359,13 +406,13 @@ describe("estimate.service", () => {
       discountAmount: "10.00"
     });
 
-    const added = await estimateItemsService.addItem(company.id, estimate.id, {
+    const added = await estimateItemsService.addItem(staff, estimate.id, {
       name: "Labor",
       quantity: "2",
       unitPrice: "100",
       sortOrder: 1
     });
-    const second = await estimateItemsService.addItem(company.id, estimate.id, {
+    const second = await estimateItemsService.addItem(staff, estimate.id, {
       name: "Material",
       quantity: "1",
       unitPrice: "50",
@@ -373,7 +420,7 @@ describe("estimate.service", () => {
       sortOrder: 2
     });
     const listed = await estimateItemsService.listItems(company.id, estimate.id);
-    const updated = await estimateItemsService.updateItem(company.id, estimate.id, added.id, {
+    const updated = await estimateItemsService.updateItem(staff, estimate.id, added.id, {
       quantity: "3",
       unitPrice: "80"
     });
@@ -391,7 +438,7 @@ describe("estimate.service", () => {
     expect(recalculatedEstimate?.taxAmount).toBe("19.80");
     expect(recalculatedEstimate?.total).toBe("299.80");
 
-    await estimateItemsService.removeItem(company.id, estimate.id, second.id);
+    await estimateItemsService.removeItem(staff, estimate.id, second.id);
     const remainingItems = await estimateItemsService.listItems(company.id, estimate.id);
     const removedItem = fakeDb.getTestState().estimateItems.find((row) => row.id === second.id);
 
@@ -825,6 +872,7 @@ describe("estimate money contract (FS-174)", () => {
 
   it("rejects negative totals on create, update, and item removal", async () => {
     const { company, actor } = createAdminContext();
+    const staff = { companyId: company.id, userId: actor.id, role: actor.role };
     const { customer } = seedEstimateGraph(company.id);
 
     await expect(estimateService.createEstimate(company.id, actor.id, {
@@ -841,7 +889,7 @@ describe("estimate money contract (FS-174)", () => {
     })).rejects.toMatchObject({ code: ErrorCode.VALIDATION_ERROR });
 
     await estimateService.updateEstimate(company.id, actor.id, estimate.id, { discountAmount: "5.00" });
-    const smallItem = await estimateItemsService.addItem(company.id, estimate.id, {
+    const smallItem = await estimateItemsService.addItem(staff, estimate.id, {
       name: "Small",
       quantity: "1",
       unitPrice: "2.00"
@@ -850,7 +898,7 @@ describe("estimate money contract (FS-174)", () => {
       .find((item) => item.id !== smallItem.id);
     expect(primaryItem).toBeDefined();
     await expect(
-      estimateItemsService.removeItem(company.id, estimate.id, primaryItem!.id)
+      estimateItemsService.removeItem(staff, estimate.id, primaryItem!.id)
     ).rejects.toMatchObject({ code: ErrorCode.VALIDATION_ERROR });
     expect((await estimateItemsService.listItems(company.id, estimate.id))).toHaveLength(2);
   });

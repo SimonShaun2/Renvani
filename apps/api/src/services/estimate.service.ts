@@ -35,11 +35,11 @@ import {
   type PublicEstimateSchedulingContext,
   type PublicEstimateView,
   type UpdateEstimateInput,
-  type CreateEstimateInput,
-  type UserRole
+  type CreateEstimateInput
 } from "@fsm/types";
 
 import { generateEstimateNumber } from "../lib/estimate-number.js";
+import { assertEstimateOfficeRole, requireCurrentEstimateOfficeActor, type EstimateStaffActor } from "./estimate-access.js";
 import { financingProviderReady, financingSummary } from "./financing/financing-adapter.registry.js";
 import { generateJobNumber } from "../lib/job-number.js";
 import { listItems, recalculateTotals } from "./estimate-items.service.js";
@@ -559,9 +559,12 @@ async function emitEstimateEvent(
 }
 
 export async function listEstimates(
-  companyId: string,
+  actor: EstimateStaffActor,
   query: ListEstimatesQuery
 ): Promise<PaginatedResult<EstimateListItem>> {
+  assertEstimateOfficeRole(actor);
+  await requireCurrentEstimateOfficeActor(actor, db);
+  const companyId = actor.companyId;
   const createdAfter = parseIsoDateTime(query.createdAfter);
   const createdBefore = parseIsoDateTime(query.createdBefore);
   const page = query.page ?? DEFAULT_LIST_PAGE;
@@ -661,19 +664,21 @@ export async function getEstimate(companyId: string, estimateId: string): Promis
   return buildEstimateDetail(companyId, estimate, db);
 }
 
-export interface EstimateReadActor {
-  companyId: string;
-  userId: string;
-  role: UserRole;
-}
-
 /** Generic staff read. A technician must still own the linked job at the time of each read. */
-export async function getEstimateForActor(actor: EstimateReadActor, estimateId: string): Promise<EstimateDetail> {
+export async function getEstimateForActor(actor: EstimateStaffActor, estimateId: string): Promise<EstimateDetail> {
   if (["owner", "admin", "dispatcher"].includes(actor.role)) {
+    await requireCurrentEstimateOfficeActor(actor, db);
     return getEstimate(actor.companyId, estimateId);
   }
   if (actor.role !== "technician") {
     throw new AppError(ErrorCode.FORBIDDEN, "You do not have access to this resource");
+  }
+  const [user] = await db.select({ id: users.id }).from(users).where(and(
+    eq(users.companyId, actor.companyId), eq(users.id, actor.userId),
+    eq(users.role, "technician"), eq(users.isActive, true), isNull(users.deletedAt)
+  )).limit(1);
+  if (!user) {
+    throw new AppError(ErrorCode.NOT_FOUND, "Estimate not found");
   }
   const estimate = await getEstimateRecord(actor.companyId, estimateId, db);
   if (!estimate.jobId) {

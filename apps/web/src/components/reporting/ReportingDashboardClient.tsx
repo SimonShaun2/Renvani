@@ -61,15 +61,23 @@ function buildCsvRows(kpis: ReportingKpiMetric[], periodLabel: string) {
   }));
 }
 
+/** User-visible download name, e.g. "renvani-report-last-30-days.csv". */
+export function reportCsvFileName(periodLabel: string): string {
+  const safeLabel = periodLabel
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+  return `renvani-report-${safeLabel || "export"}.csv`;
+}
+
 function downloadCsv(kpis: ReportingKpiMetric[], periodLabel: string) {
   const csv = Papa.unparse(buildCsvRows(kpis, periodLabel));
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
-  const safeLabel = periodLabel.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 
   link.href = url;
-  link.download = `servicerev-report-${safeLabel || "export"}.csv`;
+  link.download = reportCsvFileName(periodLabel);
   document.body.appendChild(link);
   link.click();
   link.remove();
@@ -115,9 +123,7 @@ export function ReportingDashboardClient() {
         };
 
         if (next.startDate > next.endDate) {
-          return field === "startDate"
-            ? { ...next, endDate: value }
-            : { ...next, startDate: value };
+          return field === "startDate" ? { ...next, endDate: value } : { ...next, startDate: value };
         }
 
         return next;
@@ -180,7 +186,9 @@ export function ReportingDashboardClient() {
           <section className="surface-card flex flex-col gap-4 px-5 py-5 lg:flex-row lg:items-center lg:justify-between">
             <div>
               <p className="text-sm font-semibold text-neutral-900">Custom date range</p>
-              <p className="mt-1 text-sm text-neutral-500">Adjust the reporting window and every section will refetch for the selected range.</p>
+              <p className="mt-1 text-sm text-neutral-500">
+                Adjust the reporting window and every section will refetch for the selected range.
+              </p>
             </div>
             <div className="flex flex-col gap-3 sm:flex-row">
               <label className="flex items-center gap-3 rounded-full border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm text-neutral-600">
@@ -206,40 +214,64 @@ export function ReportingDashboardClient() {
         ) : null}
 
         {kpiQuery.isError ? (
-          <LoadErrorState title="Key metrics could not be loaded" onRetry={() => void kpiQuery.refetch()} isRetrying={kpiQuery.isFetching} />
+          <LoadErrorState
+            title="Key metrics could not be loaded"
+            onRetry={() => void kpiQuery.refetch()}
+            isRetrying={kpiQuery.isFetching}
+          />
         ) : (
           <KPIRow metrics={kpiQuery.data ?? []} isLoading={kpiQuery.isLoading} />
         )}
 
         <div className="grid gap-6 xl:grid-cols-[minmax(0,1.4fr)_minmax(320px,0.9fr)]">
           {revenueQuery.isError ? (
-          <LoadErrorState title="Revenue could not be loaded" onRetry={() => void revenueQuery.refetch()} isRetrying={revenueQuery.isFetching} />
-        ) : (
-          <RevenueChart data={revenueQuery.data ?? []} isLoading={revenueQuery.isLoading} rangeLabel={periodLabel} />
-        )}
+            <LoadErrorState
+              title="Revenue could not be loaded"
+              onRetry={() => void revenueQuery.refetch()}
+              isRetrying={revenueQuery.isFetching}
+            />
+          ) : (
+            <RevenueChart data={revenueQuery.data ?? []} isLoading={revenueQuery.isLoading} rangeLabel={periodLabel} />
+          )}
           {utilizationQuery.isError ? (
-          <LoadErrorState title="Technician utilization could not be loaded" onRetry={() => void utilizationQuery.refetch()} isRetrying={utilizationQuery.isFetching} />
-        ) : (
-          <TechUtilization rows={utilizationQuery.data ?? []} isLoading={utilizationQuery.isLoading} />
-        )}
+            <LoadErrorState
+              title="Technician utilization could not be loaded"
+              onRetry={() => void utilizationQuery.refetch()}
+              isRetrying={utilizationQuery.isFetching}
+            />
+          ) : (
+            <TechUtilization rows={utilizationQuery.data ?? []} isLoading={utilizationQuery.isLoading} />
+          )}
         </div>
 
         <div className="grid gap-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.95fr)_minmax(0,0.95fr)]">
           {pipelineQuery.isError ? (
-          <LoadErrorState title="Pipeline could not be loaded" onRetry={() => void pipelineQuery.refetch()} isRetrying={pipelineQuery.isFetching} />
-        ) : (
-          <PipelineMetrics rows={pipelineQuery.data ?? []} isLoading={pipelineQuery.isLoading} />
-        )}
+            <LoadErrorState
+              title="Pipeline could not be loaded"
+              onRetry={() => void pipelineQuery.refetch()}
+              isRetrying={pipelineQuery.isFetching}
+            />
+          ) : (
+            <PipelineMetrics rows={pipelineQuery.data ?? []} isLoading={pipelineQuery.isLoading} />
+          )}
           {conversionQuery.isError ? (
-          <LoadErrorState title="Estimate conversion could not be loaded" onRetry={() => void conversionQuery.refetch()} isRetrying={conversionQuery.isFetching} />
-        ) : (
-          <ConversionDonut summary={conversionQuery.data} isLoading={conversionQuery.isLoading} />
-        )}
+            <LoadErrorState
+              title="Estimate conversion could not be loaded"
+              onRetry={() => void conversionQuery.refetch()}
+              isRetrying={conversionQuery.isFetching}
+            />
+          ) : (
+            <ConversionDonut summary={conversionQuery.data} isLoading={conversionQuery.isLoading} />
+          )}
           {reviewScoreQuery.isError ? (
-          <LoadErrorState title="Customer reviews could not be loaded" onRetry={() => void reviewScoreQuery.refetch()} isRetrying={reviewScoreQuery.isFetching} />
-        ) : (
-          <ReviewScore summary={reviewScoreQuery.data} isLoading={reviewScoreQuery.isLoading} />
-        )}
+            <LoadErrorState
+              title="Customer reviews could not be loaded"
+              onRetry={() => void reviewScoreQuery.refetch()}
+              isRetrying={reviewScoreQuery.isFetching}
+            />
+          ) : (
+            <ReviewScore summary={reviewScoreQuery.data} isLoading={reviewScoreQuery.isLoading} />
+          )}
         </div>
 
         <JobSourceReportingSection />

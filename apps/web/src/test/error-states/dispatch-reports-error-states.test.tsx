@@ -28,7 +28,7 @@ vi.mock("@/src/lib/api", async (orig) => {
 });
 
 import { DispatchQueuePanel, type QueueLoadError } from "@/src/components/dispatch/DispatchQueuePanel";
-import { ReportingDashboardClient } from "@/src/components/reporting/ReportingDashboardClient";
+import { ReportingDashboardClient, reportCsvFileName } from "@/src/components/reporting/ReportingDashboardClient";
 
 afterEach(() => {
   cleanup();
@@ -113,5 +113,12 @@ describe("reports dashboard error states (bug 3)", () => {
     renderReports();
     expect(await screen.findByText("No active technicians")).toBeTruthy();
     expect(screen.queryByText(/could not be loaded/)).toBeNull();
+  });
+});
+
+describe("report CSV download name", () => {
+  it("uses the Renvani name", () => {
+    expect(reportCsvFileName("Last 30 days")).toBe("renvani-report-last-30-days.csv");
+    expect(reportCsvFileName("")).toBe("renvani-report-export.csv");
   });
 });

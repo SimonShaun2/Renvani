@@ -60,7 +60,7 @@ describe("useDispatchView stream fallback", () => {
   });
 
   it("keeps polling enabled and reports the failure when token resolution rejects", async () => {
-    const authError = new Error("Clerk token unavailable");
+    const authError = new Error("Clerk token sk_test_standalone for customer@example.com unavailable");
     const consoleError = vi.spyOn(console, "error").mockImplementation(() => undefined);
     m.resolveBearerToken.mockRejectedValue(authError);
 
@@ -69,10 +69,10 @@ describe("useDispatchView stream fallback", () => {
 
     await waitFor(() => {
       expect(consoleError).toHaveBeenCalledWith(
-        "Dispatch stream authorization failed; falling back to polling",
-        authError
+        "Dispatch stream authorization failed; falling back to polling"
       );
     });
+    expect(JSON.stringify(consoleError.mock.calls)).not.toMatch(/sk_test_standalone|customer@example\.com/);
     expect(FakeEventSource.instances).toHaveLength(0);
     expect(useDispatchStore.getState().streamLive).toBe(false);
     unmount();

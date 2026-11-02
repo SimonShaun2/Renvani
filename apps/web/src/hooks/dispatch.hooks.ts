@@ -155,9 +155,9 @@ export function useDispatchView(date: string) {
           eventSource?.close();
         };
       })
-      .catch((error: unknown) => {
+      .catch(() => {
         if (cancelled) return;
-        console.error("Dispatch stream authorization failed; falling back to polling", error);
+        console.error("Dispatch stream authorization failed; falling back to polling");
         update(false);
       });
 

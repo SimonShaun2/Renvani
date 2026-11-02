@@ -386,12 +386,11 @@ describe("job.signature.capture with attachmentId", () => {
     }
   });
 
-  it("reconciles concurrent batch and operation unique races without returning 500", async () => {
+  it("reconciles a concurrent batch unique race without returning 500", async () => {
     const seed = seedFieldJob();
     const attachment = seedSignatureImage(seed.company.id, seed.job.id);
     const originalInsert = fakeDb.db.insert.bind(fakeDb.db);
     let raceBatchInsert = true;
-    let raceOperationInsert = true;
 
     fakeDb.db.insert = ((table) => {
       const chain = originalInsert(table);
@@ -405,10 +404,6 @@ describe("job.signature.capture with attachmentId", () => {
               if (tableName === "fieldSyncBatches" && raceBatchInsert) {
                 raceBatchInsert = false;
                 throw Object.assign(new Error("concurrent batch won"), { code: "23505" });
-              }
-              if (tableName === "fieldSyncOperations" && raceOperationInsert) {
-                raceOperationInsert = false;
-                throw Object.assign(new Error("concurrent operation won"), { cause: { code: "23505" } });
               }
               return rows;
             }
@@ -424,7 +419,7 @@ describe("job.signature.capture with attachmentId", () => {
       });
 
       expect(response.status).toBe(200);
-      expect(response.body.results[0].outcome).toBe("duplicate");
+      expect(response.body.results[0].outcome).toBe("applied");
       expect(fakeDb.getTestState().fieldSyncBatches).toHaveLength(1);
       expect(fakeDb.getTestState().fieldSyncOperations).toHaveLength(1);
       expect(fakeDb.getTestState().activityEvents).toHaveLength(1);

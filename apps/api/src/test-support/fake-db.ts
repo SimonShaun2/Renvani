@@ -6356,6 +6356,7 @@ function createSelectChain<T extends Record<string, unknown>>(rows: T[]) {
       });
     },
     for(_lockStrength: string) {
+      void _lockStrength;
       return chain;
     },
     then<TResult1 = T[], TResult2 = never>(
@@ -6475,6 +6476,7 @@ function wrapSelectChainWithProjection<T extends Record<string, unknown>>(
 }
 
 interface TestDb {
+  execute(query: unknown): Promise<unknown[]>;
   select(projection?: Record<string, unknown>): {
     from(table: MockTable): SelectFromChain;
   };
@@ -6546,6 +6548,10 @@ function projectRows<T extends Record<string, unknown>>(
 }
 
 export const db: TestDb = {
+  async execute(_query: unknown): Promise<unknown[]> {
+    void _query;
+    return [];
+  },
   select(projection?: Record<string, unknown>) {
     return {
       from(table: MockTable) {

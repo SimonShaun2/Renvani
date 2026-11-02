@@ -157,6 +157,77 @@ describe("FS-87 field work sync", () => {
     expect(fakeDb.getTestState().jobNotes).toHaveLength(1);
   });
 
+  it("serializes simultaneous replays before applying a non-idempotent note", async () => {
+    const { company, techUser, job } = seedFieldJob();
+    const operation = {
+      sequence: 1,
+      clientOperationId: "note-op-overlap",
+      jobId: job.id,
+      type: "job.note.append",
+      payload: { content: "One field note", isInternal: true }
+    };
+    const send = (batchClientId: string) =>
+      request(app.server)
+        .post("/api/v1/field-work/sync/batches")
+        .set("Authorization", bearer(company.id, techUser.id, techUser.role))
+        .send({
+          contractVersion: "1.0.0",
+          deviceId: "ipad-overlap",
+          batchClientId,
+          operations: [operation]
+        });
+
+    const [left, right] = await Promise.all([send("overlap-a"), send("overlap-b")]);
+
+    expect(left.status).toBe(200);
+    expect(right.status).toBe(200);
+    expect([left.body.results[0].outcome, right.body.results[0].outcome].sort()).toEqual([
+      "applied",
+      "duplicate"
+    ]);
+    expect(fakeDb.getTestState().jobNotes).toHaveLength(1);
+    expect(fakeDb.getTestState().activityEvents).toHaveLength(1);
+  });
+
+  it("rejects a simultaneous same-id payload mismatch before either loser mutates", async () => {
+    const { company, techUser, job } = seedFieldJob();
+    const send = (batchClientId: string, content: string) =>
+      request(app.server)
+        .post("/api/v1/field-work/sync/batches")
+        .set("Authorization", bearer(company.id, techUser.id, techUser.role))
+        .send({
+          contractVersion: "1.0.0",
+          deviceId: "ipad-mismatch-overlap",
+          batchClientId,
+          operations: [
+            {
+              sequence: 1,
+              clientOperationId: "note-op-overlap-mismatch",
+              jobId: job.id,
+              type: "job.note.append",
+              payload: { content }
+            }
+          ]
+        });
+
+    const [left, right] = await Promise.all([
+      send("mismatch-overlap-a", "Original concurrent note"),
+      send("mismatch-overlap-b", "Different concurrent note")
+    ]);
+
+    expect(left.status).toBe(200);
+    expect(right.status).toBe(200);
+    expect([left.body.results[0].outcome, right.body.results[0].outcome].sort()).toEqual([
+      "applied",
+      "rejected"
+    ]);
+    expect(fakeDb.getTestState().jobNotes).toHaveLength(1);
+    expect(["Original concurrent note", "Different concurrent note"]).toContain(
+      fakeDb.getTestState().jobNotes[0]!.content
+    );
+    expect(fakeDb.getTestState().activityEvents).toHaveLength(1);
+  });
+
   it("returns conflict when job recordVersion is stale", async () => {
     const { company, techUser, job } = seedFieldJob();
     const staleVersion = buildRecordVersionV1("job", job.id, new Date("2020-01-01T00:00:00.000Z"));
@@ -187,7 +258,7 @@ describe("FS-87 field work sync", () => {
   });
 
   it("rejects cross-tenant job sync", async () => {
-    const { company, techUser, job } = seedFieldJob();
+    const { job } = seedFieldJob();
     const other = fakeDb.seedCompany({ name: "Other Co", slug: "other-co" });
     const intruder = fakeDb.seedUser({
       companyId: other.id,

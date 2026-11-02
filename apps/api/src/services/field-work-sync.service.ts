@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, isNull, sql } from "drizzle-orm";
 
 import {
   db,
@@ -42,6 +42,7 @@ import { updateTask } from "./job-tasks.service.js";
 type BatchRow = typeof fieldSyncBatches.$inferSelect;
 type OperationRow = typeof fieldSyncOperations.$inferSelect;
 type JobRow = typeof jobs.$inferSelect;
+type FieldSyncTransaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
 type SignatureCaptureTransactionResult =
   | { kind: "captured"; job: JobRow; signedAt: Date }
@@ -59,6 +60,7 @@ export const SIGNATURE_ATTACHMENT_INVALID = "SIGNATURE_ATTACHMENT_INVALID";
 const SIGNATURE_IMAGE_MIME_TYPES = new Set(["image/png", "image/jpeg", "image/webp"]);
 /** Signatures are small line drawings; anything larger is not a signature pad export. */
 const MAX_SIGNATURE_BYTES = 5 * 1024 * 1024;
+const operationLockTails = new Map<string, Promise<void>>();
 
 type SignatureCapturePayload = {
   attachmentId?: string | undefined;
@@ -186,10 +188,11 @@ export async function assertJobFieldAccess(
 }
 
 async function findExistingOperation(
+  executor: Pick<FieldSyncTransaction, "select">,
   companyId: string,
   clientOperationId: string
 ): Promise<OperationRow | null> {
-  const [row] = await db
+  const [row] = await executor
     .select()
     .from(fieldSyncOperations)
     .where(
@@ -202,6 +205,37 @@ async function findExistingOperation(
     .limit(1);
 
   return row ?? null;
+}
+
+async function withSerializedOperation<T>(
+  companyId: string,
+  clientOperationId: string,
+  callback: (tx: FieldSyncTransaction) => Promise<T>
+): Promise<T> {
+  const lockKey = `${companyId}:${clientOperationId}`;
+  const previous = operationLockTails.get(lockKey) ?? Promise.resolve();
+  let release: (() => void) | undefined;
+  const current = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  const tail = previous.then(() => current);
+  operationLockTails.set(lockKey, tail);
+  await previous;
+
+  try {
+    return await db.transaction(async (tx) => {
+      // The in-process tail avoids duplicate work within one API instance. The
+      // transaction-scoped advisory lock provides the same boundary across Render
+      // instances without creating another persistence model or schema migration.
+      await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${lockKey}, 0))`);
+      return callback(tx);
+    });
+  } finally {
+    release?.();
+    if (operationLockTails.get(lockKey) === tail) {
+      operationLockTails.delete(lockKey);
+    }
+  }
 }
 
 async function resolveBatch(
@@ -560,51 +594,53 @@ export async function submitFieldWorkSyncBatch(
   let lastAcknowledgedSequence = batch.lastAcknowledgedSequence;
 
   for (const operation of sortedOperations) {
-    const existing = await findExistingOperation(actor.companyId, operation.clientOperationId);
-    if (existing) {
-      const storedHash = existing.payloadHash;
-      const incomingHash = hashPayload(operation);
-      const replay = resolveFieldWorkSyncClientOperationReplay({
-        storedPayloadHash: storedHash,
-        incomingPayloadHash: incomingHash,
-        storedOutcome: existing.outcome as FieldWorkSyncOperationOutcome
-      });
+    const processed = await withSerializedOperation(
+      actor.companyId,
+      operation.clientOperationId,
+      async (tx) => {
+        const existing = await findExistingOperation(tx, actor.companyId, operation.clientOperationId);
+        if (existing) {
+          const replay = resolveFieldWorkSyncClientOperationReplay({
+            storedPayloadHash: existing.payloadHash,
+            incomingPayloadHash: hashPayload(operation),
+            storedOutcome: existing.outcome as FieldWorkSyncOperationOutcome
+          });
 
-      if (replay.action === "reject") {
-        results.push({
-          clientOperationId: operation.clientOperationId,
-          sequence: operation.sequence,
-          outcome: "rejected",
-          serverOperationId: existing.id,
-          message: replay.message
-        });
-        continue;
-      }
+          if (replay.action === "reject") {
+            return {
+              acknowledged: false,
+              result: {
+                clientOperationId: operation.clientOperationId,
+                sequence: operation.sequence,
+                outcome: "rejected" as const,
+                serverOperationId: existing.id,
+                message: replay.message
+              }
+            };
+          }
 
-      const outcome = replay.action === "duplicate" ? "duplicate" : replay.outcome;
-      const mapped = toOperationResult(existing);
-      results.push({ ...mapped, outcome });
-      lastAcknowledgedSequence = Math.max(lastAcknowledgedSequence, operation.sequence);
-      continue;
-    }
+          const mapped = toOperationResult(existing);
+          return {
+            acknowledged: true,
+            result: {
+              ...mapped,
+              outcome: replay.action === "duplicate" ? ("duplicate" as const) : replay.outcome
+            }
+          };
+        }
 
-    let applyResult: { outcome: FieldWorkSyncOperationOutcome; resultPayload: Record<string, unknown> };
-    try {
-      applyResult = await applyOperation(actor, operation);
-    } catch (error: unknown) {
-      if (error instanceof AppError) {
-        applyResult = {
-          outcome: error.code === ErrorCode.FORBIDDEN || error.code === ErrorCode.NOT_FOUND ? "rejected" : "rejected",
-          resultPayload: { message: error.message }
-        };
-      } else {
-        throw error;
-      }
-    }
+        let applyResult: { outcome: FieldWorkSyncOperationOutcome; resultPayload: Record<string, unknown> };
+        try {
+          applyResult = await applyOperation(actor, operation);
+        } catch (error: unknown) {
+          if (error instanceof AppError) {
+            applyResult = { outcome: "rejected", resultPayload: { message: error.message } };
+          } else {
+            throw error;
+          }
+        }
 
-    let inserted: OperationRow[];
-    try {
-      inserted = await db
+        const inserted = await tx
         .insert(fieldSyncOperations)
         .values({
           companyId: actor.companyId,
@@ -619,44 +655,21 @@ export async function submitFieldWorkSyncBatch(
           payloadHash: hashPayload(operation)
         })
         .returning();
-    } catch (error: unknown) {
-      if (!isUniqueViolation(error)) throw error;
 
-      // A simultaneous replay can pass the pre-check before the winning request
-      // persists its operation. Reconcile against the winner instead of leaking a
-      // database 500. Signature application itself is serialized by the job row lock.
-      const concurrent = await findExistingOperation(actor.companyId, operation.clientOperationId);
-      if (!concurrent) throw error;
-      const replay = resolveFieldWorkSyncClientOperationReplay({
-        storedPayloadHash: concurrent.payloadHash,
-        incomingPayloadHash: hashPayload(operation),
-        storedOutcome: concurrent.outcome as FieldWorkSyncOperationOutcome
-      });
+        const stored = inserted[0];
+        if (!stored) {
+          throw new AppError(ErrorCode.INTERNAL_ERROR, "Failed to persist sync operation");
+        }
 
-      if (replay.action === "reject") {
-        results.push({
-          clientOperationId: operation.clientOperationId,
-          sequence: operation.sequence,
-          outcome: "rejected",
-          serverOperationId: concurrent.id,
-          message: replay.message
-        });
-        continue;
+        return {
+          acknowledged: applyResult.outcome === "applied" || applyResult.outcome === "duplicate",
+          result: toOperationResult(stored)
+        };
       }
+    );
 
-      const mapped = toOperationResult(concurrent);
-      results.push({ ...mapped, outcome: replay.action === "duplicate" ? "duplicate" : replay.outcome });
-      lastAcknowledgedSequence = Math.max(lastAcknowledgedSequence, operation.sequence);
-      continue;
-    }
-
-    const stored = inserted[0];
-    if (!stored) {
-      throw new AppError(ErrorCode.INTERNAL_ERROR, "Failed to persist sync operation");
-    }
-
-    results.push(toOperationResult(stored));
-    if (applyResult.outcome === "applied" || applyResult.outcome === "duplicate") {
+    results.push(processed.result);
+    if (processed.acknowledged) {
       lastAcknowledgedSequence = Math.max(lastAcknowledgedSequence, operation.sequence);
     }
   }

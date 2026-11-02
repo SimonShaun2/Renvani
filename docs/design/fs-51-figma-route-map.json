@@ -1,0 +1,337 @@
+{
+  "schemaVersion": "1.0",
+  "purpose": "FS-51 reviewable Figma-to-code source map; NOT evidence of implemented parity",
+  "canonicalFigmaFile": "jiGHTNUJNltWbHA4Il3hk7",
+  "sourceDesignUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design",
+  "fullSoftwarePrototypeNode": "399:4217",
+  "fieldTechnicianPrototypeNode": "393:87",
+  "codeInspected": {
+    "ref": "dev",
+    "commit": "5baad8775cfa6a5e3c3e163ed6b384a284b12f20",
+    "date": "2026-11-01"
+  },
+  "statusDefinition": "code_surface_identified_parity_not_verified",
+  "entries": [
+    {
+      "id": "CC-01",
+      "journey": "Command Center / daily brief",
+      "area": "Command Center",
+      "figmaSourceNodeId": "10:2",
+      "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=10-2",
+      "route": "/command-center",
+      "codePaths": [
+        "apps/web/app/(app)/command-center",
+        "apps/web/src/components/command-center/CommandCenterView.tsx"
+      ],
+      "status": "code_surface_identified_parity_not_verified"
+    },
+    {
+      "id": "AG-01",
+      "journey": "Approvals inbox / agent action states",
+      "area": "Command Center",
+      "figmaSourceNodeId": "10:220",
+      "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=10-220",
+      "route": "/command-center",
+      "codePaths": [
+        "apps/web/src/components/agent-actions/AgentInbox.tsx",
+        "apps/web/src/components/agent-actions/DeliveryStates.tsx"
+      ],
+      "status": "code_surface_identified_parity_not_verified"
+    },
+    {
+      "id": "GR-01",
+      "journey": "Business website / direct demand",
+      "area": "Growth",
+      "figmaSourceNodeId": "10:2023",
+      "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=10-2023",
+      "route": "/site/[slug]",
+      "codePaths": [
+        "apps/web/app/(public)/site",
+        "apps/web/src/components/growth/BrandedStorefront.tsx"
+      ],
+      "status": "code_surface_identified_parity_not_verified"
+    },
+    {
+      "id": "GR-02",
+      "journey": "Customer direct inquiry",
+      "area": "Growth",
+      "figmaSourceNodeId": "10:1807",
+      "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=10-1807",
+      "route": "/site/[slug]",
+      "codePaths": [
+        "apps/web/src/components/growth/BrandedInquiryClient.tsx"
+      ],
+      "status": "code_surface_identified_parity_not_verified"
+    },
+    {
+      "id": "OP-01",
+      "journey": "Dispatch board",
+      "area": "Operations",
+      "figmaSourceNodeId": "10:478",
+      "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=10-478",
+      "route": "/dispatch",
+      "codePaths": [
+        "apps/web/app/(app)/dispatch",
+        "apps/web/src/components/dispatch"
+      ],
+      "status": "code_surface_identified_parity_not_verified"
+    },
+    {
+      "id": "OP-02",
+      "journey": "Customer booking / service selection",
+      "area": "Operations",
+      "figmaSourceNodeId": "1:21",
+      "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=1-21",
+      "route": "/book/[slug]",
+      "codePaths": [
+        "apps/web/app/(public)/book",
+        "apps/web/src/components/booking/BookingFlowClient.tsx"
+      ],
+      "status": "code_surface_identified_parity_not_verified"
+    },
+    {
+      "id": "OP-03",
+      "journey": "Jobs list",
+      "area": "Operations",
+      "figmaSourceNodeId": "144:567",
+      "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=144-567",
+      "route": "/jobs",
+      "codePaths": [
+        "apps/web/app/(app)/jobs"
+      ],
+      "status": "code_surface_identified_parity_not_verified"
+    },
+    {
+      "id": "OP-04",
+      "journey": "Job detail",
+      "area": "Operations",
+      "figmaSourceNodeId": "1:14",
+      "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=1-14",
+      "route": "/jobs/[id]",
+      "codePaths": [
+        "apps/web/app/(app)/jobs",
+        "apps/web/src/components/jobs"
+      ],
+      "status": "code_surface_identified_parity_not_verified"
+    },
+    {
+      "id": "FT-01",
+      "journey": "Field technician: today",
+      "area": "Operations",
+      "figmaSourceNodeId": "10:436",
+      "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=10-436",
+      "route": "/mobile/jobs",
+      "codePaths": [
+        "apps/web/app/(mobile)/mobile/jobs/page.tsx",
+        "apps/web/src/components/mobile/TodayJobsList.tsx"
+      ],
+      "status": "code_surface_identified_parity_not_verified"
+    },
+    {
+      "id": "FT-02",
+      "journey": "Field technician: job brief",
+      "area": "Operations",
+      "figmaSourceNodeId": "1:13",
+      "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=1-13",
+      "route": "/mobile/jobs/[id]",
+      "codePaths": [
+        "apps/web/src/components/mobile/MobileJobDetail.tsx"
+      ],
+      "status": "code_surface_identified_parity_not_verified"
+    },
+    {
+      "id": "FT-03",
+      "journey": "Field technician: on-site checklist",
+      "area": "Operations",
+      "figmaSourceNodeId": "247:32",
+      "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=247-32",
+      "route": "/mobile/jobs/[id]",
+      "codePaths": [
+        "apps/web/src/components/mobile/CrewChecklist.tsx"
+      ],
+      "status": "code_surface_identified_parity_not_verified"
+    },
+    {
+      "id": "FT-04",
+      "journey": "Field technician: signature",
+      "area": "Operations",
+      "figmaSourceNodeId": "303:87",
+      "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=303-87",
+      "route": "/mobile/signature",
+      "codePaths": [
+        "apps/web/src/components/mobile/CrewSignature.tsx"
+      ],
+      "status": "code_surface_identified_parity_not_verified"
+    },
+    {
+      "id": "RV-01",
+      "journey": "Operator estimate builder",
+      "area": "Revenue",
+      "figmaSourceNodeId": "10:604",
+      "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=10-604",
+      "route": "/estimates",
+      "codePaths": [
+        "apps/web/src/components/estimates/EstimateBuilderClient.tsx"
+      ],
+      "status": "code_surface_identified_parity_not_verified"
+    },
+    {
+      "id": "RV-02",
+      "journey": "Estimate options tiers",
+      "area": "Revenue",
+      "figmaSourceNodeId": "362:4217",
+      "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=362-4217",
+      "route": "/estimates",
+      "codePaths": [
+        "apps/web/src/components/estimate-option-sets"
+      ],
+      "status": "code_surface_identified_parity_not_verified"
+    },
+    {
+      "id": "RV-03",
+      "journey": "Customer estimate approval",
+      "area": "Revenue",
+      "figmaSourceNodeId": "10:1857",
+      "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=10-1857",
+      "route": "/approve/[token]",
+      "codePaths": [
+        "apps/web/app/(public)/approve",
+        "apps/web/src/components/estimates/CustomerEstimateView.tsx"
+      ],
+      "status": "code_surface_identified_parity_not_verified"
+    },
+    {
+      "id": "RV-04",
+      "journey": "Invoices",
+      "area": "Revenue",
+      "figmaSourceNodeId": "10:752",
+      "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=10-752",
+      "route": "/invoices",
+      "codePaths": [
+        "apps/web/app/(app)/invoices",
+        "apps/web/src/components/invoices"
+      ],
+      "status": "code_surface_identified_parity_not_verified"
+    },
+    {
+      "id": "RV-05",
+      "journey": "Payment processing / payouts",
+      "area": "Revenue",
+      "figmaSourceNodeId": "52:16",
+      "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=52-16",
+      "route": "/payments",
+      "codePaths": [
+        "apps/web/app/(app)/payments",
+        "apps/web/src/components/payments"
+      ],
+      "status": "code_surface_identified_parity_not_verified"
+    },
+    {
+      "id": "RV-06",
+      "journey": "Customer invoice payment",
+      "area": "Revenue",
+      "figmaSourceNodeId": "53:323",
+      "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=53-323",
+      "route": "/pay/[token]",
+      "codePaths": [
+        "apps/web/app/(public)/pay"
+      ],
+      "status": "code_surface_identified_parity_not_verified"
+    },
+    {
+      "id": "RT-01",
+      "journey": "Service agreements / recurring",
+      "area": "Retention",
+      "figmaSourceNodeId": "10:915",
+      "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=10-915",
+      "route": "/service-agreements",
+      "codePaths": [
+        "apps/web/app/(app)/service-agreements",
+        "apps/web/src/components/service-agreements"
+      ],
+      "status": "code_surface_identified_parity_not_verified"
+    },
+    {
+      "id": "GR-03",
+      "journey": "Growth Check findings review",
+      "area": "Growth",
+      "figmaSourceNodeId": "366:4217",
+      "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=366-4217",
+      "route": "/growth/growth-check",
+      "codePaths": [
+        "apps/web/app/(app)/growth",
+        "apps/web/src/components/growth-check"
+      ],
+      "status": "code_surface_identified_parity_not_verified"
+    },
+    {
+      "id": "FD-01",
+      "journey": "Import review",
+      "area": "Foundation",
+      "figmaSourceNodeId": "12:181",
+      "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=12-181",
+      "route": "/settings/import",
+      "codePaths": [
+        "apps/web/app/(app)/settings",
+        "apps/web/src/components/csv-import"
+      ],
+      "status": "code_surface_identified_parity_not_verified"
+    },
+    {
+      "id": "AOF-01",
+      "journey": "Business Operating Profile interview",
+      "area": "Foundation",
+      "figmaSourceNodeId": "331:4113",
+      "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=331-4113",
+      "route": null,
+      "codePaths": [
+        "apps/web/src/components/agent-actions"
+      ],
+      "status": "code_surface_identified_parity_not_verified"
+    },
+    {
+      "id": "AOF-02",
+      "journey": "Operating Profile approval review",
+      "area": "Foundation",
+      "figmaSourceNodeId": "331:4170",
+      "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=331-4170",
+      "route": null,
+      "codePaths": [
+        "apps/web/src/components/agent-actions"
+      ],
+      "status": "code_surface_identified_parity_not_verified"
+    },
+    {
+      "id": "AOF-03",
+      "journey": "Action delivery states",
+      "area": "Foundation",
+      "figmaSourceNodeId": "331:4230",
+      "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=331-4230",
+      "route": null,
+      "codePaths": [
+        "apps/web/src/components/agent-actions/DeliveryStates.tsx"
+      ],
+      "status": "code_surface_identified_parity_not_verified"
+    },
+    {
+      "id": "AOF-04",
+      "journey": "First hour activation",
+      "area": "Foundation",
+      "figmaSourceNodeId": "331:4300",
+      "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=331-4300",
+      "route": null,
+      "codePaths": [
+        "apps/web/src/components/command-center"
+      ],
+      "status": "code_surface_identified_parity_not_verified"
+    }
+  ],
+  "policy": {
+    "approvalNotExecution": true,
+    "noDemoMoneyAsLive": true,
+    "tenantScoped": true,
+    "consentBeforeSend": true,
+    "exactHeadReviewGate": true,
+    "requiresBoardTicketReady": true
+  }
+}

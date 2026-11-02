@@ -370,7 +370,7 @@ describe("invoice.service", () => {
     const companyService = await import("./company.service.js");
     const company = fakeDb.seedCompany({ name: "Terms Set", slug: "terms-set", timezone: "America/Chicago", settings: { tradingName: "TS" } } as never);
     const actor = fakeDb.seedUser({ companyId: company.id, email: "o@terms.test", firstName: "O", lastName: "W", role: "owner" });
-    const read = () => fakeDb.getTestState().companies.find((row) => row.id === company.id)?.settings as Record<string, any>;
+    const read = () => fakeDb.getTestState().companies.find((row) => row.id === company.id)?.settings as Record<string, unknown>;
 
     await companyService.updateCompany(company.id, actor.id, { settings: { invoicing: { defaultPaymentTermsDays: 30 } } } as never);
     expect(read().invoicing).toEqual({ defaultPaymentTermsDays: 30 });

@@ -32,9 +32,11 @@ describe("BrandedStorefrontNav mobile menu", () => {
   it("moves focus into the panel when opened", () => {
     render(
       <BrandedStorefrontNav
-        bookHref="/book/demo"
+        primaryHref="/book/demo"
+        primaryLabel="Book a service"
         inquireHref="/site/demo/inquire"
         showReviewsLink={false}
+        showPricing
         primaryClassName="bg-green"
       />
     );
@@ -49,9 +51,11 @@ describe("BrandedStorefrontNav mobile menu", () => {
   it("closes on Escape and returns focus to the toggle", () => {
     render(
       <BrandedStorefrontNav
-        bookHref="/book/demo"
+        primaryHref="/book/demo"
+        primaryLabel="Book a service"
         inquireHref="/site/demo/inquire"
         showReviewsLink={false}
+        showPricing
         primaryClassName="bg-green"
       />
     );
@@ -68,20 +72,29 @@ describe("BrandedStorefrontNav mobile menu", () => {
   it("keeps focus inside the panel when tabbing from the last item", () => {
     render(
       <BrandedStorefrontNav
-        bookHref="/book/demo"
+        primaryHref="/book/demo"
+        primaryLabel="Book a service"
         inquireHref="/site/demo/inquire"
         showReviewsLink={false}
+        showPricing
         primaryClassName="bg-green"
       />
     );
 
     fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
 
-    const bookLink = screen.getByRole("link", { name: "Book service" });
+    const bookLink = screen.getByRole("link", { name: "Book a service" });
     bookLink.focus();
 
     fireEvent.keyDown(document, { key: "Tab" });
 
     expect(document.activeElement?.textContent).toBe("Services");
+  });
+
+  it("routes unconfigured services to inquiry and hides pricing", () => {
+    render(<BrandedStorefrontNav primaryHref="/site/demo/inquire" primaryLabel="Send an inquiry" inquireHref="/site/demo/inquire" showReviewsLink={false} showPricing={false} primaryClassName="bg-green" />);
+    fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
+    expect(screen.queryByRole("link", { name: "Pricing" })).toBeNull();
+    expect(screen.getAllByRole("link", { name: "Send an inquiry" }).every((link) => link.getAttribute("href") === "/site/demo/inquire")).toBe(true);
   });
 });

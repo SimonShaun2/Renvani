@@ -6,7 +6,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { BrandedInquiryClient } from "./BrandedInquiryClient";
 import { buildBrandedStorefrontViewModel } from "./branded-storefront.utils";
-import { resolveSiteTrade } from "./site-trade.registry";
+import { resolveSiteTradeFromSettings } from "./site-trade.from-settings";
 
 const mocks = vi.hoisted(() => ({
   submit: vi.fn(),
@@ -104,17 +104,17 @@ describe("BrandedInquiryClient", () => {
   });
 
   it.each([
-    ["hvac", "Heating & air conditioning", "Heating & air conditioning inquiry"],
-    ["plumbing", "Plumbing", "Plumbing inquiry"],
-    ["unknown", "Home services", "Service inquiry"]
-  ])("submits %s inquiry without implied SMS consent", async (trade, category, serviceType) => {
-    const settings = { ...baseSettings, trade };
+    ["hvac", "Heating & air conditioning", "Service inquiry"],
+    ["plumbing", "Plumbing", "Service inquiry"],
+    [undefined, "Home services", "Service inquiry"]
+  ] as const)("submits %s inquiry without implied SMS consent", async (trade, category, serviceType) => {
+    const settings = { ...baseSettings, ...(trade ? { trade } : {}) };
     const model = buildBrandedStorefrontViewModel(settings);
     mocks.checkZip.mockResolvedValue({ covered: true });
     mocks.submit.mockResolvedValue({ confirmation: { referenceNumber: "REF-1" } });
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true, json: async () => ({ accepted: true }) }));
 
-    render(<BrandedInquiryClient model={model} acquisitionSource="website" serviceCategory={resolveSiteTrade(settings).label} />);
+    render(<BrandedInquiryClient model={model} acquisitionSource="website" serviceCategory={resolveSiteTradeFromSettings(settings).label} />);
     fillRequiredFields();
     fireEvent.click(screen.getByRole("button", { name: "Send inquiry" }));
 
@@ -130,20 +130,25 @@ describe("BrandedInquiryClient", () => {
     expect(screen.queryByRole("alert")).toBeNull();
   });
 
-  it("sends SMS consent only when each checkbox is selected", async () => {
-    const settings = { ...baseSettings, trade: "hvac" };
+  it.each([
+    [true, false],
+    [false, true],
+    [true, true]
+  ])("sends independent SMS consent: appointments=%s marketing=%s", async (appointments, marketing) => {
+    const settings = { ...baseSettings, trade: "hvac" as const };
     mocks.checkZip.mockResolvedValue({ covered: true });
     mocks.submit.mockResolvedValue({ confirmation: { referenceNumber: "REF-2" } });
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true, json: async () => ({ accepted: true }) }));
 
     render(<BrandedInquiryClient model={buildBrandedStorefrontViewModel(settings)} acquisitionSource="website" />);
     fillRequiredFields();
-    fireEvent.click(screen.getByLabelText(/Optional: I agree to receive appointment-related texts/));
+    if (appointments) fireEvent.click(screen.getByLabelText(/Optional: I agree to receive appointment-related texts/));
+    if (marketing) fireEvent.click(screen.getByLabelText(/Optional: I agree to receive occasional offers/));
     fireEvent.click(screen.getByRole("button", { name: "Send inquiry" }));
 
     await waitFor(() => expect(mocks.submit).toHaveBeenCalledOnce());
     expect(mocks.submit).toHaveBeenCalledWith(expect.objectContaining({
-      body: expect.objectContaining({ smsConsentAppointments: true, smsConsentMarketing: false })
+      body: expect.objectContaining({ smsConsentAppointments: appointments, smsConsentMarketing: marketing })
     }));
   });
 });

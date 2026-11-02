@@ -15,3 +15,17 @@
     transform: translateY(0);
   }
 }
+
+/* FS-177: New job panel reveal; none for reduced motion. */
+@media (prefers-reduced-motion: no-preference) {
+  [data-new-job-reveal] {
+    animation: jobs-slide-in 200ms ease-out both;
+  }
+}
+
+/* Frame 160:102 error banner: short fade; none for reduced motion. */
+@media (prefers-reduced-motion: no-preference) {
+  .new-job-banner {
+    animation: jobs-slide-in 160ms ease-out both;
+  }
+}

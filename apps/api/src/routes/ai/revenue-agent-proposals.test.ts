@@ -1,5 +1,3 @@
-import { randomUUID } from "node:crypto";
-
 import request from "supertest";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -84,6 +82,7 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
+  vi.stubEnv("REVENUE_AGENT_PROPOSALS_ENABLED", "true");
   fakeDb.resetTestState();
   resetRedisStore();
   redisDelMock.mockClear();
@@ -211,6 +210,93 @@ describe("revenue agent proposals", () => {
     expect(bad.status).toBe(400);
   });
 
+  it("excludes existing proposals before applying the generation limit", async () => {
+    const owner = createAuthContext("owner");
+    const high = seedRec(owner.company.id, { urgencyScore: 100 }).rec;
+    const medium = seedRec(owner.company.id, { urgencyScore: 90 }).rec;
+    const low = seedRec(owner.company.id, { urgencyScore: 80 }).rec;
+
+    expect((await propose(owner.authorization, high.id)).body.created).toBe(true);
+    expect((await propose(owner.authorization, medium.id)).body.created).toBe(true);
+
+    const generated = await request(app.server)
+      .post("/api/v1/ai/revenue-agent/proposals/generate")
+      .set("Authorization", owner.authorization)
+      .send({ limit: 1 });
+
+    expect(generated.status).toBe(200);
+    expect(generated.body).toMatchObject({ created: 1, existing: 2, skipped: 0 });
+    expect(generated.body.proposals).toHaveLength(1);
+    expect(generated.body.proposals[0].recommendationId).toBe(low.id);
+  });
+
+  it("the rollout flag blocks creation and state changes on existing proposals", async () => {
+    const owner = createAuthContext("owner");
+    const executeRec = seedRec(owner.company.id, { urgencyScore: 90 }).rec;
+    const rejectRec = seedRec(owner.company.id, { urgencyScore: 80 }).rec;
+    const executeProposal = (await propose(owner.authorization, executeRec.id)).body.proposal;
+    const rejectProposal = (await propose(owner.authorization, rejectRec.id)).body.proposal;
+    const approved = await request(app.server)
+      .post(`/api/v1/agent-actions/${executeProposal.id}/approve`)
+      .set("Authorization", owner.authorization)
+      .send({
+        expectedVersion: fakeDb.getTestState().agentActions.find((row) => row.id === executeProposal.id)!.updatedAt.getTime()
+      });
+    expect(approved.status).toBe(200);
+
+    vi.stubEnv("REVENUE_AGENT_PROPOSALS_ENABLED", "false");
+
+    expect((await propose(owner.authorization, executeRec.id)).status).toBe(403);
+    expect(
+      (
+        await request(app.server)
+          .post("/api/v1/ai/revenue-agent/proposals/generate")
+          .set("Authorization", owner.authorization)
+          .send({ limit: 1 })
+      ).status
+    ).toBe(403);
+    expect(
+      (
+        await request(app.server)
+          .post(`/api/v1/agent-actions/${executeProposal.id}/execute`)
+          .set("Authorization", owner.authorization)
+          .send({ expectedVersion: approved.body.version })
+      ).status
+    ).toBe(403);
+    expect(
+      (
+        await request(app.server)
+          .post(`/api/v1/agent-actions/${rejectProposal.id}/approve`)
+          .set("Authorization", owner.authorization)
+          .send({
+            expectedVersion: fakeDb.getTestState().agentActions.find((row) => row.id === rejectProposal.id)!.updatedAt.getTime()
+          })
+      ).status
+    ).toBe(403);
+    expect(
+      (
+        await request(app.server)
+          .patch(`/api/v1/operator/inbox/${rejectProposal.id}`)
+          .set("Authorization", owner.authorization)
+          .send({
+            expectedVersion: fakeDb.getTestState().agentActions.find((row) => row.id === rejectProposal.id)!.updatedAt.getTime(),
+            body: "Updated draft"
+          })
+      ).status
+    ).toBe(403);
+    expect(
+      (
+        await request(app.server)
+          .post(`/api/v1/agent-actions/${rejectProposal.id}/reject`)
+          .set("Authorization", owner.authorization)
+          .send({})
+      ).status
+    ).toBe(403);
+    expect(fakeDb.getTestState().aiRecommendations.find((row) => row.id === executeRec.id)?.status).toBe("pending");
+    expect(fakeDb.getTestState().aiRecommendations.find((row) => row.id === rejectRec.id)?.status).toBe("pending");
+    expect(fakeDb.getTestState().agentActions.find((row) => row.id === rejectProposal.id)?.state).toBe("awaiting_approval");
+  });
+
   it("approve → execute marks the recommendation actioned and records the approved draft", async () => {
     const owner = createAuthContext("owner");
     const { rec } = seedRec(owner.company.id);
@@ -219,18 +305,20 @@ describe("revenue agent proposals", () => {
     const approved = await request(app.server)
       .post(`/api/v1/agent-actions/${proposal.id}/approve`)
       .set("Authorization", owner.authorization)
-      .send({});
+      .send({ expectedVersion: fakeDb.getTestState().agentActions.find((row) => row.id === proposal.id)!.updatedAt.getTime() });
     expect(approved.status).toBe(200);
     const executed = await request(app.server)
       .post(`/api/v1/agent-actions/${proposal.id}/execute`)
       .set("Authorization", owner.authorization)
-      .send({});
+      .send({ expectedVersion: approved.body.version });
     expect(executed.status).toBe(200);
     const stored = fakeDb.getTestState().aiRecommendations.find((row) => row.id === rec.id);
     expect(stored?.status).toBe("actioned");
     expect(stored?.actionedById).toBe(owner.user.id);
     const action = fakeDb.getTestState().agentActions.find((row) => row.id === proposal.id);
-    expect(action?.state).toBe("succeeded");
+    // Revenue proposals are outbound: no provider send yet, so the action stays executing with a queued receipt.
+    expect(action?.state).toBe("executing");
+    expect(action?.executionReceipt).toMatchObject({ outcome: "queued", deliveryState: "queued" });
     expect(JSON.stringify(action?.executionReceipt)).toContain("friendly reminder");
     expect(redisDelMock).toHaveBeenCalled();
     expect((await propose(owner.authorization, rec.id)).body.created).toBe(false);
@@ -255,14 +343,15 @@ describe("revenue agent proposals", () => {
     const { proposal } = (await propose(owner.authorization, rec.id)).body;
     customer.doNotContact = true;
 
-    await request(app.server)
+    const approved = await request(app.server)
       .post(`/api/v1/agent-actions/${proposal.id}/approve`)
       .set("Authorization", owner.authorization)
-      .send({});
+      .send({ expectedVersion: fakeDb.getTestState().agentActions.find((row) => row.id === proposal.id)!.updatedAt.getTime() });
     const executed = await request(app.server)
       .post(`/api/v1/agent-actions/${proposal.id}/execute`)
       .set("Authorization", owner.authorization)
-      .send({});
+      .send({ expectedVersion: approved.body.version });
+    expect(approved.status).toBe(200);
     expect(executed.status).toBeGreaterThanOrEqual(400);
     expect(fakeDb.getTestState().aiRecommendations.find((row) => row.id === rec.id)?.status).toBe("pending");
   });

@@ -14,14 +14,14 @@ export function BrandedPriceWidget({ bookingSlug, primaryClassName }: BrandedPri
 
   return (
     <div className="w-full max-w-[460px] rounded-[14px] border border-[#e6dccb] bg-white p-7">
-      <h2 className="text-[22px] font-semibold text-[#0f1530]">Start a service request</h2>
+      <h2 className="text-[22px] font-semibold text-[#0f1530]">Check service options</h2>
       <p className="mt-2 text-sm text-[#5e6684]">
-        Continue to booking to share your service details and review the next step.
+        Choose a service and ZIP in the booking flow to see available times and any confirmed price.
       </p>
 
       <dl className="mt-4 space-y-4">
         <div>
-          <dt className="text-[13px] font-medium text-[#2a3360]">Service type</dt>
+          <dt className="text-[13px] font-medium text-[#2a3360]">Type of service</dt>
           <dd className="mt-1.5 flex h-12 items-center rounded-lg border border-[#e6dccb] px-3.5 text-[15px] text-[#0f1530]">
             Selected in booking flow
           </dd>
@@ -39,11 +39,6 @@ export function BrandedPriceWidget({ bookingSlug, primaryClassName }: BrandedPri
           </dd>
         </div>
       </dl>
-
-      <div className="mt-4 flex items-center justify-between rounded-[10px] bg-[#e4f1e8] p-3.5 text-[#2f7d4f]">
-        <p className="text-[22px] font-semibold">Request details</p>
-        <p className="text-[13px] font-medium">Reviewed in booking</p>
-      </div>
 
       <Link
         href={bookHref}

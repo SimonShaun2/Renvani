@@ -192,7 +192,7 @@ export default function SettingsGeneralPage() {
     );
   }
 
-  const companyDisplayName = form.tradingName.trim() || form.name.trim() || "ServiceRev";
+  const companyDisplayName = form.tradingName.trim() || form.name.trim() || "Renvani";
 
   return (
     <PageLayout

@@ -2,11 +2,12 @@ import type { FastifyPluginAsync, FastifyReply } from "fastify";
 
 import { env } from "@fsm/config";
 
+import { syncClerkUserRoleMetadata } from "../../lib/clerk-role-metadata.js";
 import { verifySvixSignature } from "../../lib/svix-verify.js";
 import { claimWebhookMessage, completeWebhookMessage, releaseWebhookMessage } from "../../lib/webhook-dedupe.js";
 import {
   provisionClerkMembership,
-  provisionClerkOrganization
+  provisionClerkOrganizationDetailed
 } from "../../services/clerk-provisioning.service.js";
 import {
   deactivateClerkMembership,
@@ -84,9 +85,13 @@ async function handleEvent(event: ClerkWebhookEvent, reply: FastifyReply) {
   const data = event.data ?? {};
 
   if (event.type === "organization.created") {
-    const company = await provisionClerkOrganization({ organizationId: str(data.id), name: str(data.name) });
+    const { company, skipReason } = await provisionClerkOrganizationDetailed({
+      organizationId: str(data.id),
+      name: str(data.name),
+      createdBy: str(data.created_by) || null
+    });
     if (!company) {
-      return reply.send({ received: true, skipped: true });
+      return reply.send({ received: true, skipped: true, ...(skipReason ? { reason: skipReason } : {}) });
     }
     return reply.send({ received: true, companyId: company.id });
   }
@@ -109,7 +114,14 @@ async function handleEvent(event: ClerkWebhookEvent, reply: FastifyReply) {
       // organizationMembership payloads carry no email-verification proof: never link existing users by email here.
       emailVerified: false
     });
-    return reply.send({ received: true, ...result });
+    // The web/API read the staff role only from the session claim metadata.role (= public_metadata.role):
+    // publish the DB role to Clerk so the new owner isn't routed to /no-access. Best effort, never throws.
+    const clerkUserId = str(member.user_id);
+    const roleSync =
+      result.role && clerkUserId && result.status !== "skipped"
+        ? await syncClerkUserRoleMetadata(clerkUserId, result.role)
+        : "not_needed";
+    return reply.send({ received: true, ...result, roleSync });
   }
 
   if (event.type === "user.updated") {

@@ -1,5 +1,6 @@
-import { buildOpeningHours, resolveSiteTrade, type SiteTradeConfig } from "@/src/components/growth/site-trade.registry";
+import { buildOpeningHours, type SiteTradeConfig } from "@/src/components/growth/site-trade.registry";
 import type { PublicBookingSettingsRecord } from "@/src/hooks/booking.hooks";
+import type { HomeServiceTrade } from "@fsm/types";
 
 export interface BrandedServiceCard {
   id: string;
@@ -19,6 +20,9 @@ export interface BrandedStorefrontViewModel {
   companyName: string;
   bookingSlug: string;
   tagline: string;
+  eyebrow: string;
+  headline: string;
+  configuredTrade: HomeServiceTrade | null;
   phone: string | null;
   logoUrl: string | null;
   serviceCards: BrandedServiceCard[];
@@ -39,14 +43,6 @@ export interface LocalBusinessJsonLd {
   areaServed: string[];
   openingHoursSpecification?: ReturnType<typeof buildOpeningHours>;
   aggregateRating?: { "@type": "AggregateRating"; ratingValue: number; reviewCount: number };
-}
-
-function fallbackServiceCard(trade: SiteTradeConfig): BrandedServiceCard {
-  return {
-    id: "service-inquiry",
-    title: trade.key === "default" ? "Service inquiry" : `${trade.label} inquiry`,
-    subtitle: "Tell us what you need to request a quote"
-  };
 }
 
 function readServiceLabel(service: Record<string, unknown>): string | null {
@@ -107,10 +103,7 @@ export function buildReviewLinks(settings: PublicBookingSettingsRecord): Branded
   return links;
 }
 
-export function buildServiceCards(
-  offeredServices: Array<Record<string, unknown>>,
-  trade: SiteTradeConfig = resolveSiteTrade({ offeredServices })
-): BrandedServiceCard[] {
+export function buildServiceCards(offeredServices: Array<Record<string, unknown>>): BrandedServiceCard[] {
   const cards: BrandedServiceCard[] = [];
 
   for (const service of offeredServices) {
@@ -125,10 +118,6 @@ export function buildServiceCards(
       title,
       subtitle: readServiceSubtitle(service)
     });
-  }
-
-  if (cards.length === 0) {
-    return [fallbackServiceCard(trade)];
   }
 
   return cards.slice(0, 4);
@@ -152,19 +141,30 @@ export function buildBrandedStorefrontViewModel(
   settings: PublicBookingSettingsRecord,
   options?: { staffPreviewLine?: string }
 ): BrandedStorefrontViewModel {
-  const companyName = settings.companyName.trim() || "Service provider";
+  const companyName = settings.companyName.trim() || "Your service team";
   const tagline =
     settings.tagline?.trim() ||
-    "Tell us what you need and request a quote from our team.";
+    "Tell us what you need. Review available services or send an inquiry; the team will confirm the next step.";
   const serviceAreaZips = settings.serviceAreaZipCodes ?? [];
+  const configuredTrade = settings.trade ?? null;
+  const headlineCompanyName = /[.!?]$/u.test(companyName) ? companyName : `${companyName}.`;
+  const eyebrow = configuredTrade === "hvac" ? "HEATING & COOLING" : configuredTrade === "plumbing" ? "PLUMBING" : "LOCAL SERVICE";
+  const headline = configuredTrade === "hvac"
+    ? `Heating and cooling service from ${headlineCompanyName}`
+    : configuredTrade === "plumbing"
+      ? `Plumbing service from ${headlineCompanyName}`
+      : `Local service from ${headlineCompanyName}`;
 
   return {
     companyName,
+    eyebrow,
+    headline,
+    configuredTrade,
     bookingSlug: settings.bookingSlug || settings.companySlug,
     tagline,
     phone: settings.phone ?? null,
     logoUrl: settings.logoUrl ?? null,
-    serviceCards: buildServiceCards(settings.offeredServices, resolveSiteTrade(settings)),
+    serviceCards: buildServiceCards(settings.offeredServices),
     serviceAreaSummary: buildServiceAreaSummary(serviceAreaZips),
     serviceAreaZips: serviceAreaZips,
     trustLine: options?.staffPreviewLine?.trim() || null,

@@ -20,7 +20,7 @@ import {
 } from "@/src/components/growth/service-pages/service-area-pages";
 import { ServiceInquiryCard } from "@/src/components/growth/service-pages/ServiceInquiryCard";
 import { resolveSiteInquiryMode } from "@/src/components/growth/service-pages/site-inquiry";
-import { resolveSiteTrade } from "@/src/components/growth/site-trade.registry";
+import { resolveSiteTradeFromSettings } from "@/src/components/growth/site-trade.from-settings";
 import { fetchPublicBookingSettingsBySlug } from "@/src/lib/public-booking-server";
 import "@/src/components/growth/service-pages/service-pages-motion.css";
 
@@ -78,7 +78,7 @@ export default async function ServiceAreaPage({ params }: { params: Params }) {
   const jsonLd = { ...buildLocalBusinessJsonLd(model, serviceAreaPath(slug, ref)), areaServed: [ref.area] };
   const hours = hoursChip(settings);
   const nearby = nearbyServicePages(settings, ref);
-  const trade = resolveSiteTrade(settings);
+  const trade = resolveSiteTradeFromSettings(settings);
   const inquiryMode = resolveSiteInquiryMode();
 
   return (

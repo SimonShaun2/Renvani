@@ -6,6 +6,7 @@ import { AppError, ErrorCode, type UserRole } from "@fsm/types";
 
 import { isClerkParallelAuthAvailable, verifyClerkBearerToken } from "../lib/clerk-auth.js";
 import { verifyAccessToken } from "../lib/tokens.js";
+import { bindRequestActorOrgLogContext } from "../lib/request-actor-context.js";
 import {
   findCompanyByClerkOrganizationId,
   resolveStaffUserForClerkSession
@@ -67,6 +68,7 @@ function attachRequestIdentity(
     slug: company.slug,
     timezone: company.timezone
   };
+  bindRequestActorOrgLogContext(request);
 }
 
 async function authenticateWithInRepoJwt(accessToken: string, request: FastifyRequest): Promise<boolean> {

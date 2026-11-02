@@ -105,7 +105,11 @@ export async function listAttachmentsHandler(
   request: FastifyRequest,
   reply: FastifyReply
 ): Promise<FastifyReply> {
-  const result = await listAttachments(request.company.id, request.query as AttachmentListQuery);
+  const result = await listAttachments(
+    request.company.id,
+    request.user.id,
+    request.query as AttachmentListQuery
+  );
 
   return reply.send({
     data: result.data.map((attachment) => toAttachmentResponse(attachment)),

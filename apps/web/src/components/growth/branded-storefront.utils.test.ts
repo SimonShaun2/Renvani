@@ -53,12 +53,12 @@ describe("branded-storefront.utils", () => {
 
   it("maps offered services into storefront cards", () => {
     const cards = buildServiceCards([
-      { label: "Deep clean", priceHint: "from $219" },
+      { label: "AC tune-up", priceHint: "from $219" },
       { name: "Recurring", subtitle: "save 10%" }
     ]);
 
     expect(cards).toHaveLength(2);
-    expect(cards[0]?.title).toBe("Deep clean");
+    expect(cards[0]?.title).toBe("AC tune-up");
   });
 
   it("does not fabricate a public trust line", () => {
@@ -77,18 +77,21 @@ describe("branded-storefront.utils", () => {
     expect(links).toEqual([{ label: "Google reviews", href: "https://google.com/reviews/acme" }]);
   });
 
-  it.each([
-    ["HVAC", "Heating & air conditioning inquiry"],
-    ["plumbing", "Plumbing inquiry"],
-    ["unknown", "Service inquiry"]
-  ])("uses a verified or neutral fallback card for %s", (trade, title) => {
-    const settings = { ...baseSettings, trade };
-    const model = buildBrandedStorefrontViewModel(settings);
+  it("does not fabricate services when settings are empty", () => {
+    const model = buildBrandedStorefrontViewModel(baseSettings);
 
-    expect(model.serviceCards).toEqual([
-      { id: "service-inquiry", title, subtitle: "Tell us what you need to request a quote" }
-    ]);
-    expect(model.tagline).toBe("Tell us what you need and request a quote from our team.");
+    expect(model.serviceCards).toEqual([]);
+    expect(model.eyebrow).toBe("LOCAL SERVICE");
+    expect(model.headline).toBe("Local service from Sparkle & Co.");
     expect(model.bookingSlug).toBe("sparkle-co");
+  });
+
+  it.each([
+    ["hvac", "HEATING & COOLING", "Heating and cooling service from Sparkle & Co."],
+    ["plumbing", "PLUMBING", "Plumbing service from Sparkle & Co."]
+  ] as const)("uses configured %s trade copy", (trade, eyebrow, headline) => {
+    const model = buildBrandedStorefrontViewModel({ ...baseSettings, trade });
+    expect(model.eyebrow).toBe(eyebrow);
+    expect(model.headline).toBe(headline);
   });
 });

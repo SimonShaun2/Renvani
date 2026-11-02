@@ -18,7 +18,7 @@ interface BrandedInquiryClientProps {
   acquisitionSource: string;
   initialService?: string;
   initialZip?: string;
-  /** Trade label from `resolveSiteTrade` (#262), sent as `serviceCategory`. */
+  /** Label for the configured trade, sent as `serviceCategory`. */
   serviceCategory?: string;
 }
 
@@ -55,19 +55,22 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
   const [addressLine1, setAddressLine1] = useState("");
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
-  const [serviceInterest, setServiceInterest] = useState(initialService ?? model.serviceCards[0]?.title ?? "Service inquiry");
+  const [serviceInterest, setServiceInterest] = useState(
+    model.serviceCards.find((card) => card.title === initialService)?.title ?? model.serviceCards[0]?.title ?? ""
+  );
   const [notes, setNotes] = useState("");
   const [smsConsentAppointments, setSmsConsentAppointments] = useState(false);
   const [smsConsentMarketing, setSmsConsentMarketing] = useState(false);
   const [referenceNumber, setReferenceNumber] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<InquiryFieldErrors>({});
+  const [isSending, setIsSending] = useState(false);
   const formId = useId();
 
   const idempotencyKey = useMemo(() => createIdempotencyKey(), []);
 
   const bookHref = buildBookPath(model.bookingSlug, acquisitionSource);
-  const isPending = submitMutation.isPending || zipCheckMutation.isPending;
+  const isPending = isSending || submitMutation.isPending || zipCheckMutation.isPending;
   const fieldErrorId = (field: InquiryField) => `${formId}-${field}-error`;
   const clearFieldError = (field: InquiryField) => {
     setFieldErrors((current) => ({ ...current, [field]: undefined }));
@@ -76,6 +79,7 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
+    if (isPending) return;
     setErrorMessage(null);
     const requiredFields = [
       { key: "firstName", label: "First name", value: firstName },
@@ -101,6 +105,7 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
       return;
     }
 
+    setIsSending(true);
     try {
       const gate = await passInquiryGate(model.bookingSlug, honeypot);
       if (!gate.ok) {
@@ -131,8 +136,10 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
           state: state.trim().toUpperCase().slice(0, 2),
           zip: zip.trim(),
           propertyType: "residential",
-          serviceCategory: serviceCategory ?? SITE_TRADES.default.label,
-          serviceType: serviceInterest,
+          serviceCategory: model.configuredTrade
+            ? serviceCategory ?? SITE_TRADES[model.configuredTrade].label
+            : serviceInterest || SITE_TRADES.other.label,
+          serviceType: serviceInterest || "Service inquiry",
           customerNotes: `[Branded site inquiry] ${notes.trim()}`.trim(),
           urgency: "flexible",
           preferredWindow: "first_available",
@@ -144,6 +151,8 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
       setReferenceNumber(response.confirmation.referenceNumber);
     } catch (error) {
       setErrorMessage(error instanceof ApiError ? error.message : "We could not send your request. Please try again.");
+    } finally {
+      setIsSending(false);
     }
   }
 
@@ -155,16 +164,18 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
           Reference <span className="font-mono font-medium text-[#0f1530]">{referenceNumber}</span>.{" "}
           {model.companyName} will follow up — this is not a confirmed appointment until they reach out.
         </p>
-        <Link href={bookHref} className="mt-6 inline-flex text-sm font-semibold text-[#2f7d4f] hover:underline">
-          Prefer to pick a time now? Continue to booking
-        </Link>
+        {model.serviceCards.length > 0 ? (
+          <Link href={bookHref} className="mt-6 inline-flex text-sm font-semibold text-[#2f7d4f] hover:underline">
+            Review booking options
+          </Link>
+        ) : null}
       </div>
     );
   }
 
   return (
     <form className="mx-auto max-w-lg space-y-4" onSubmit={(event) => void handleSubmit(event)} noValidate>
-      <p className="text-sm text-[#5e6684]">Tell {model.companyName} what service you need. An inquiry is not a confirmed appointment.</p>
+      <p className="text-sm text-[#5e6684]">Tell {model.companyName} what you need. An inquiry is not a confirmed appointment.</p>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="block text-sm font-medium text-[#2a3360]">
@@ -228,20 +239,20 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
         {fieldErrors.email ? <span id={fieldErrorId("email")} className="mt-1 block text-red-700">{fieldErrors.email}</span> : null}
       </label>
 
-      <label className="block text-sm font-medium text-[#2a3360]">
-        Service interest
-        <select
-          value={serviceInterest}
-          onChange={(event) => setServiceInterest(event.target.value)}
-          className="mt-1.5 w-full rounded-lg border border-[#e6dccb] px-3.5 py-3 text-[15px]"
-        >
-          {model.serviceCards.map((card) => (
-            <option key={card.id} value={card.title}>
-              {card.title}
-            </option>
-          ))}
-        </select>
-      </label>
+      {model.serviceCards.length > 0 ? (
+        <label className="block text-sm font-medium text-[#2a3360]">
+          Service interest
+          <select
+            value={serviceInterest}
+            onChange={(event) => setServiceInterest(event.target.value)}
+            className="mt-1.5 w-full rounded-lg border border-[#e6dccb] px-3.5 py-3 text-[15px]"
+          >
+            {model.serviceCards.map((card) => (
+              <option key={card.id} value={card.title}>{card.title}</option>
+            ))}
+          </select>
+        </label>
+      ) : null}
 
       <label className="block text-sm font-medium text-[#2a3360]">
         Service address
@@ -326,8 +337,8 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
             className="mt-0.5"
           />
           <span>
-            Optional: I agree to receive appointment-related texts from {model.companyName}. Message frequency varies.
-            Reply STOP to opt out.
+            Optional: I agree to receive appointment-related texts from {model.companyName}. Message frequency varies. Reply STOP to
+            opt out.
           </span>
         </label>
         <label className="flex gap-2 text-sm text-[#2a3360]">
@@ -337,7 +348,7 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
             onChange={(event) => setSmsConsentMarketing(event.target.checked)}
             className="mt-0.5"
           />
-          <span>Optional: send me occasional offers by text from {model.companyName}.</span>
+          <span>Optional: I agree to receive occasional offers and maintenance reminders by text.</span>
         </label>
       </fieldset>
 
@@ -365,15 +376,14 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
         type="submit"
         disabled={isPending}
         aria-busy={isPending}
-        className="flex h-[52px] w-full items-center justify-center gap-2 rounded-[10px] bg-[#2f7d4f] text-sm font-semibold text-white hover:bg-[#286b44] disabled:opacity-60"
+        className="flex h-[52px] w-full items-center justify-center rounded-[10px] bg-[#2f7d4f] text-sm font-semibold text-white hover:bg-[#286b44] disabled:opacity-60"
       >
         {isPending ? (
-          <><Loader2 className="h-5 w-5 animate-spin" aria-hidden /><span>Sending inquiry</span></>
+          <><Loader2 className="mr-2 h-5 w-5 animate-spin" aria-hidden />Sending inquiry</>
         ) : (
           "Send inquiry"
         )}
       </button>
-
     </form>
   );
 }

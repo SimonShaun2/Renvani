@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import Decimal from "decimal.js";
 import { AlertCircle, CreditCard, Printer, Send, Trash2 } from "lucide-react";
 
 import { PageLayout } from "@/src/components/layout/PageLayout";
@@ -11,10 +12,10 @@ import {
   computeRevenueTotals,
   formatMoneyInput,
   formatStatusLabel,
+  formatTaxRateInput,
   getInvoiceStatusTone,
   lineItemFromInvoiceItem,
   normalizeLineItems,
-  parseMoneyValue,
   type RevenueLineItemDraft
 } from "@/src/components/estimates/estimates.utils";
 import { CurrencyDisplay } from "@/src/components/ui/CurrencyDisplay";
@@ -52,6 +53,16 @@ interface VoidFormState {
 const defaultVoidState: VoidFormState = {
   reason: ""
 };
+
+/** Adapter for the legacy invoice mutation contract, which still accepts numeric decimals. */
+function parseMoneyValue(value: string | number | null | undefined): number {
+  try {
+    const amount = new Decimal(value ?? 0);
+    return amount.isFinite() ? amount.toNumber() : 0;
+  } catch {
+    return 0;
+  }
+}
 
 function lineItemsMatch(left: RevenueLineItemDraft, right: RevenueLineItemDraft): boolean {
   return (
@@ -91,7 +102,9 @@ export function InvoiceDetailClient({ invoiceId }: InvoiceDetailClientProps) {
   const [voidForm, setVoidForm] = useState<VoidFormState>(defaultVoidState);
 
   const invoice = invoiceQuery.data?.invoice;
-  const taxRate = invoice?.taxRate ? parseMoneyValue(invoice.taxRate) : getCompanyTaxRate(companyQuery.data?.company.settings);
+  const taxRate = invoice?.taxRate
+    ? formatTaxRateInput(invoice.taxRate)
+    : formatTaxRateInput(getCompanyTaxRate(companyQuery.data?.company.settings));
 
   useEffect(() => {
     if (!invoice) {
@@ -106,7 +119,7 @@ export function InvoiceDetailClient({ invoiceId }: InvoiceDetailClientProps) {
   }, [invoice]);
 
   const totals = useMemo(
-    () => computeRevenueTotals(items, taxRate, parseMoneyValue(discountAmount)),
+    () => computeRevenueTotals(items, taxRate, discountAmount),
     [discountAmount, items, taxRate]
   );
   const publicPaymentPath = buildInvoicePublicPath(invoice?.paymentToken);
@@ -372,7 +385,7 @@ export function InvoiceDetailClient({ invoiceId }: InvoiceDetailClientProps) {
                   <CurrencyDisplay value={isDraft ? totals.subtotal : invoice.subtotal} showCents />
                 </div>
                 <div className="flex items-center justify-between gap-3 text-neutral-500">
-                  <span>Tax ({(taxRate * 100).toFixed(2)}%)</span>
+                  <span>Tax ({new Decimal(taxRate).mul(100).toFixed(2)}%)</span>
                   <CurrencyDisplay value={isDraft ? totals.taxAmount : invoice.taxAmount} showCents />
                 </div>
                 <div className="flex items-center justify-between gap-3 text-neutral-500">

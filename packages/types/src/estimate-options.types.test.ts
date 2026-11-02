@@ -11,7 +11,7 @@ import {
 } from "./index.js";
 
 const customerId = "00000000-0000-4000-8000-000000000001";
-const opt = (tierLabel: string, extra: Record<string, unknown> = {}) => ({ tierLabel, items: [{ name: "Water heater", quantity: 1, unitPrice: 900 }], ...extra });
+const opt = (tierLabel: string, extra: Record<string, unknown> = {}) => ({ tierLabel, items: [{ name: "Water heater", quantity: "1", unitPrice: "900.00" }], ...extra });
 
 describe("FS-212 estimate option types", () => {
   it("ranks registry tiers and puts custom labels last", () => {

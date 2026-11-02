@@ -13,22 +13,17 @@ import {
 } from "@fsm/types";
 
 import { assertPriceBookItemsInCompany } from "./price-book-item-scope.js";
+import { assertEstimateOfficeRole, requireCurrentEstimateOfficeActor, type EstimateStaffActor } from "./estimate-access.js";
+import {
+  assertEstimateMoneyResult,
+  normalizeEstimateMoney,
+  normalizeEstimateQuantity,
+  normalizeEstimateTaxRate
+} from "./estimate-money.js";
 
 type EstimateRow = typeof estimates.$inferSelect;
 type EstimateItemRow = typeof estimateItems.$inferSelect;
 type EstimateExecutor = Pick<typeof db, "select" | "insert" | "update">;
-
-function formatMoney(value: Decimal): string {
-  return value.toFixed(2);
-}
-
-function formatTaxRate(value: Decimal): string {
-  return value.toFixed(4);
-}
-
-function formatQuantity(value: Decimal): string {
-  return value.toFixed(3);
-}
 
 function toEstimateItem(row: EstimateItemRow): EstimateItem {
   return {
@@ -106,9 +101,9 @@ function normalizeItemInput(input: AddEstimateItemInput | UpdateEstimateItemInpu
   productCatalogId?: string | null;
 } {
   const normalizedQuantity =
-    input.quantity !== undefined ? formatQuantity(new Decimal(input.quantity)) : undefined;
+    input.quantity !== undefined ? normalizeEstimateQuantity(input.quantity) : undefined;
   const normalizedUnitPrice =
-    input.unitPrice !== undefined ? formatMoney(new Decimal(input.unitPrice)) : undefined;
+    input.unitPrice !== undefined ? normalizeEstimateMoney(input.unitPrice, "unitPrice") : undefined;
 
   return {
     ...(input.name !== undefined ? { name: input.name.trim() } : {}),
@@ -119,7 +114,10 @@ function normalizeItemInput(input: AddEstimateItemInput | UpdateEstimateItemInpu
     ...(
       normalizedQuantity !== undefined && normalizedUnitPrice !== undefined
         ? {
-            total: formatMoney(new Decimal(normalizedQuantity).mul(normalizedUnitPrice))
+            total: assertEstimateMoneyResult(
+              new Decimal(normalizedQuantity).mul(normalizedUnitPrice),
+              "line total"
+            )
           }
         : {}
     ),
@@ -143,11 +141,14 @@ export async function listItems(companyId: string, estimateId: string): Promise<
 }
 
 export async function addItem(
-  companyId: string,
+  actor: EstimateStaffActor,
   estimateId: string,
   input: AddEstimateItemInput
 ): Promise<EstimateItem> {
+  assertEstimateOfficeRole(actor);
+  const companyId = actor.companyId;
   return db.transaction(async (tx) => {
+    await requireCurrentEstimateOfficeActor(actor, tx);
     const estimate = await getEstimateRecord(companyId, estimateId, tx);
     assertDraftEstimate(estimate);
 
@@ -161,11 +162,16 @@ export async function addItem(
         name: normalizedInput.name ?? input.name.trim(),
         description: normalizedInput.description ?? null,
         itemType: normalizedInput.itemType ?? "service",
-        quantity: normalizedInput.quantity ?? formatQuantity(new Decimal(input.quantity)),
-        unitPrice: normalizedInput.unitPrice ?? formatMoney(new Decimal(input.unitPrice)),
+        quantity: normalizedInput.quantity ?? normalizeEstimateQuantity(input.quantity),
+        unitPrice: normalizedInput.unitPrice ?? normalizeEstimateMoney(input.unitPrice, "unitPrice"),
         total:
           normalizedInput.total ??
-          formatMoney(new Decimal(input.quantity).mul(input.unitPrice)),
+          assertEstimateMoneyResult(
+            new Decimal(normalizeEstimateQuantity(input.quantity)).mul(
+              normalizeEstimateMoney(input.unitPrice, "unitPrice")
+            ),
+            "line total"
+          ),
         isTaxable: normalizedInput.isTaxable ?? true,
         sortOrder: normalizedInput.sortOrder ?? 0,
         ...(normalizedInput.productCatalogId !== undefined
@@ -179,19 +185,22 @@ export async function addItem(
       throw new AppError(ErrorCode.INTERNAL_ERROR, "Failed to create estimate item");
     }
 
-    await recalculateTotals(estimateId, tx);
+    await recalculateTotals(companyId, estimateId, tx);
 
     return toEstimateItem(item);
   });
 }
 
 export async function updateItem(
-  companyId: string,
+  actor: EstimateStaffActor,
   estimateId: string,
   itemId: string,
   input: UpdateEstimateItemInput
 ): Promise<EstimateItem> {
+  assertEstimateOfficeRole(actor);
+  const companyId = actor.companyId;
   return db.transaction(async (tx) => {
+    await requireCurrentEstimateOfficeActor(actor, tx);
     const estimate = await getEstimateRecord(companyId, estimateId, tx);
     assertDraftEstimate(estimate);
 
@@ -208,7 +217,7 @@ export async function updateItem(
         ...(normalizedInput.itemType !== undefined ? { itemType: normalizedInput.itemType } : {}),
         ...(normalizedInput.quantity !== undefined ? { quantity: normalizedInput.quantity } : {}),
         ...(normalizedInput.unitPrice !== undefined ? { unitPrice: normalizedInput.unitPrice } : {}),
-        total: formatMoney(new Decimal(nextQuantity).mul(nextUnitPrice)),
+        total: assertEstimateMoneyResult(new Decimal(nextQuantity).mul(nextUnitPrice), "line total"),
         ...(normalizedInput.isTaxable !== undefined ? { isTaxable: normalizedInput.isTaxable } : {}),
         ...(normalizedInput.sortOrder !== undefined ? { sortOrder: normalizedInput.sortOrder } : {}),
         ...(normalizedInput.productCatalogId !== undefined
@@ -224,18 +233,21 @@ export async function updateItem(
       throw new AppError(ErrorCode.NOT_FOUND, "Estimate item not found");
     }
 
-    await recalculateTotals(estimateId, tx);
+    await recalculateTotals(companyId, estimateId, tx);
 
     return toEstimateItem(item);
   });
 }
 
 export async function removeItem(
-  companyId: string,
+  actor: EstimateStaffActor,
   estimateId: string,
   itemId: string
 ): Promise<void> {
+  assertEstimateOfficeRole(actor);
+  const companyId = actor.companyId;
   await db.transaction(async (tx) => {
+    await requireCurrentEstimateOfficeActor(actor, tx);
     const estimate = await getEstimateRecord(companyId, estimateId, tx);
     assertDraftEstimate(estimate);
     await getEstimateItemRecord(companyId, estimateId, itemId, tx);
@@ -249,18 +261,19 @@ export async function removeItem(
       .where(and(eq(estimateItems.companyId, companyId), eq(estimateItems.id, itemId), isNull(estimateItems.deletedAt)))
       .returning();
 
-    await recalculateTotals(estimateId, tx);
+    await recalculateTotals(companyId, estimateId, tx);
   });
 }
 
 export async function recalculateTotals(
+  companyId: string,
   estimateId: string,
   tx: EstimateExecutor
 ): Promise<void> {
   const [estimate] = await tx
     .select()
     .from(estimates)
-    .where(and(eq(estimates.id, estimateId), isNull(estimates.deletedAt)))
+    .where(and(eq(estimates.companyId, companyId), eq(estimates.id, estimateId), isNull(estimates.deletedAt)))
     .limit(1);
 
   if (!estimate) {
@@ -270,7 +283,11 @@ export async function recalculateTotals(
   const items = await tx
     .select()
     .from(estimateItems)
-    .where(and(eq(estimateItems.estimateId, estimateId), isNull(estimateItems.deletedAt)));
+    .where(and(
+      eq(estimateItems.companyId, companyId),
+      eq(estimateItems.estimateId, estimateId),
+      isNull(estimateItems.deletedAt)
+    ));
 
   let subtotal = new Decimal(0);
   let taxableSubtotal = new Decimal(0);
@@ -284,26 +301,31 @@ export async function recalculateTotals(
     }
   }
 
-  const taxRate = new Decimal(estimate.taxRate ?? "0");
+  const taxRate = new Decimal(normalizeEstimateTaxRate(estimate.taxRate ?? "0"));
   const vipDiscount = await import("./vip-membership-discount.service.js").then((mod) =>
     mod.computeVipMembershipDiscountAmount(estimate.companyId, estimate.customerId, subtotal, tx)
   );
   const discountAmount = vipDiscount.greaterThan(0)
     ? vipDiscount
     : new Decimal(estimate.discountAmount ?? "0");
-  const taxAmount = taxableSubtotal.mul(taxRate);
-  const total = subtotal.add(taxAmount).sub(discountAmount);
+  const normalizedSubtotal = assertEstimateMoneyResult(subtotal, "estimate subtotal");
+  const normalizedTaxAmount = assertEstimateMoneyResult(taxableSubtotal.mul(taxRate), "estimate tax amount");
+  const normalizedDiscount = assertEstimateMoneyResult(discountAmount, "estimate discount amount");
+  const normalizedTotal = assertEstimateMoneyResult(
+    new Decimal(normalizedSubtotal).add(normalizedTaxAmount).sub(normalizedDiscount),
+    "estimate total"
+  );
 
   await tx
     .update(estimates)
     .set({
-      subtotal: formatMoney(subtotal),
-      taxRate: formatTaxRate(taxRate),
-      taxAmount: formatMoney(taxAmount),
-      discountAmount: formatMoney(discountAmount),
-      total: formatMoney(total),
+      subtotal: normalizedSubtotal,
+      taxRate: normalizeEstimateTaxRate(taxRate.toString()),
+      taxAmount: normalizedTaxAmount,
+      discountAmount: normalizedDiscount,
+      total: normalizedTotal,
       updatedAt: new Date()
     })
-    .where(eq(estimates.id, estimateId))
+    .where(and(eq(estimates.companyId, companyId), eq(estimates.id, estimateId), isNull(estimates.deletedAt)))
     .returning();
 }

@@ -13,13 +13,16 @@ import { formatStatusLabel, getStatusTone } from "./jobs.utils";
 interface JobHeaderProps {
   job: JobDetail;
   pendingRequiredTasks: number;
+  checklistState: "loading" | "error" | "ready";
+  checklistRefreshing: boolean;
+  onRetryChecklist: () => void;
   onOpenOTW: () => void;
   invoiceAction?: ReactNode;
   onReschedule?: (() => void) | undefined;
   onCancelVisit?: (() => void) | undefined;
 }
 
-export function JobHeader({ job, pendingRequiredTasks, onOpenOTW, invoiceAction, onReschedule, onCancelVisit }: JobHeaderProps) {
+export function JobHeader({ job, pendingRequiredTasks, checklistState, checklistRefreshing, onRetryChecklist, onOpenOTW, invoiceAction, onReschedule, onCancelVisit }: JobHeaderProps) {
   return (
     <section className="surface-card px-6 py-6">
       <Link href="/jobs" className="inline-flex items-center gap-2 text-sm font-semibold text-brand-accent">
@@ -52,7 +55,16 @@ export function JobHeader({ job, pendingRequiredTasks, onOpenOTW, invoiceAction,
 
         <div className="flex flex-col gap-3 xl:max-w-[56%] xl:items-end">
           {invoiceAction ? <div className="flex flex-wrap gap-3">{invoiceAction}</div> : null}
-          <JobStatusTransitions job={job} pendingRequiredTasks={pendingRequiredTasks} onOpenOTW={onOpenOTW} onReschedule={onReschedule} onCancelVisit={onCancelVisit} />
+          <JobStatusTransitions
+            job={job}
+            pendingRequiredTasks={pendingRequiredTasks}
+            checklistState={checklistState}
+            checklistRefreshing={checklistRefreshing}
+            onRetryChecklist={onRetryChecklist}
+            onOpenOTW={onOpenOTW}
+            onReschedule={onReschedule}
+            onCancelVisit={onCancelVisit}
+          />
         </div>
       </div>
     </section>

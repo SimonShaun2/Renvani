@@ -137,7 +137,7 @@ describe("EstimateOptionSetClient", () => {
     await act(async () => fireEvent.submit(form));
     expect(m.add.mock.calls[0]![0]).toMatchObject({
       expectedVersion: 5,
-      option: { tierLabel: "Best", items: [{ name: "Full system replacement", quantity: 1, unitPrice: 4200 }] }
+      option: { tierLabel: "Best", items: [{ name: "Full system replacement", quantity: "1", unitPrice: "4200" }] }
     });
   });
 

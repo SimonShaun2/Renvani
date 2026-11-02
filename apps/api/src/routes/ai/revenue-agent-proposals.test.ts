@@ -1,5 +1,3 @@
-import { randomUUID } from "node:crypto";
-
 import request from "supertest";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -84,6 +82,7 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
+  vi.stubEnv("REVENUE_AGENT_PROPOSALS_ENABLED", "true");
   fakeDb.resetTestState();
   resetRedisStore();
   redisDelMock.mockClear();
@@ -209,6 +208,93 @@ describe("revenue agent proposals", () => {
       .set("Authorization", owner.authorization)
       .send({ limit: 500, extra: true });
     expect(bad.status).toBe(400);
+  });
+
+  it("excludes existing proposals before applying the generation limit", async () => {
+    const owner = createAuthContext("owner");
+    const high = seedRec(owner.company.id, { urgencyScore: 100 }).rec;
+    const medium = seedRec(owner.company.id, { urgencyScore: 90 }).rec;
+    const low = seedRec(owner.company.id, { urgencyScore: 80 }).rec;
+
+    expect((await propose(owner.authorization, high.id)).body.created).toBe(true);
+    expect((await propose(owner.authorization, medium.id)).body.created).toBe(true);
+
+    const generated = await request(app.server)
+      .post("/api/v1/ai/revenue-agent/proposals/generate")
+      .set("Authorization", owner.authorization)
+      .send({ limit: 1 });
+
+    expect(generated.status).toBe(200);
+    expect(generated.body).toMatchObject({ created: 1, existing: 2, skipped: 0 });
+    expect(generated.body.proposals).toHaveLength(1);
+    expect(generated.body.proposals[0].recommendationId).toBe(low.id);
+  });
+
+  it("the rollout flag blocks creation and state changes on existing proposals", async () => {
+    const owner = createAuthContext("owner");
+    const executeRec = seedRec(owner.company.id, { urgencyScore: 90 }).rec;
+    const rejectRec = seedRec(owner.company.id, { urgencyScore: 80 }).rec;
+    const executeProposal = (await propose(owner.authorization, executeRec.id)).body.proposal;
+    const rejectProposal = (await propose(owner.authorization, rejectRec.id)).body.proposal;
+    const approved = await request(app.server)
+      .post(`/api/v1/agent-actions/${executeProposal.id}/approve`)
+      .set("Authorization", owner.authorization)
+      .send({
+        expectedVersion: fakeDb.getTestState().agentActions.find((row) => row.id === executeProposal.id)!.updatedAt.getTime()
+      });
+    expect(approved.status).toBe(200);
+
+    vi.stubEnv("REVENUE_AGENT_PROPOSALS_ENABLED", "false");
+
+    expect((await propose(owner.authorization, executeRec.id)).status).toBe(403);
+    expect(
+      (
+        await request(app.server)
+          .post("/api/v1/ai/revenue-agent/proposals/generate")
+          .set("Authorization", owner.authorization)
+          .send({ limit: 1 })
+      ).status
+    ).toBe(403);
+    expect(
+      (
+        await request(app.server)
+          .post(`/api/v1/agent-actions/${executeProposal.id}/execute`)
+          .set("Authorization", owner.authorization)
+          .send({ expectedVersion: approved.body.version })
+      ).status
+    ).toBe(403);
+    expect(
+      (
+        await request(app.server)
+          .post(`/api/v1/agent-actions/${rejectProposal.id}/approve`)
+          .set("Authorization", owner.authorization)
+          .send({
+            expectedVersion: fakeDb.getTestState().agentActions.find((row) => row.id === rejectProposal.id)!.updatedAt.getTime()
+          })
+      ).status
+    ).toBe(403);
+    expect(
+      (
+        await request(app.server)
+          .patch(`/api/v1/operator/inbox/${rejectProposal.id}`)
+          .set("Authorization", owner.authorization)
+          .send({
+            expectedVersion: fakeDb.getTestState().agentActions.find((row) => row.id === rejectProposal.id)!.updatedAt.getTime(),
+            body: "Updated draft"
+          })
+      ).status
+    ).toBe(403);
+    expect(
+      (
+        await request(app.server)
+          .post(`/api/v1/agent-actions/${rejectProposal.id}/reject`)
+          .set("Authorization", owner.authorization)
+          .send({})
+      ).status
+    ).toBe(403);
+    expect(fakeDb.getTestState().aiRecommendations.find((row) => row.id === executeRec.id)?.status).toBe("pending");
+    expect(fakeDb.getTestState().aiRecommendations.find((row) => row.id === rejectRec.id)?.status).toBe("pending");
+    expect(fakeDb.getTestState().agentActions.find((row) => row.id === rejectProposal.id)?.state).toBe("awaiting_approval");
   });
 
   it("approve → execute marks the recommendation actioned and records the approved draft", async () => {

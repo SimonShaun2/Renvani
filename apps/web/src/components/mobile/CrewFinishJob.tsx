@@ -39,7 +39,7 @@ export function CrewFinishJob({ jobId }: { jobId: string }) {
   const reportIssue = useReportMobileIssue(jobId);
 
   async function submitIssue() {
-    if (!selectedIssue || !mobileJob.data?.job.recordVersion || !issueDescription.trim()) return;
+    if (!selectedIssue || mobileJob.isError || !mobileJob.data?.job.recordVersion || !issueDescription.trim()) return;
     setIssueError(null);
     try {
       await reportIssue.mutateAsync({
@@ -216,7 +216,7 @@ export function CrewFinishJob({ jobId }: { jobId: string }) {
               {issueError ? <p role="alert" className="text-sm text-[#b3261e]">{issueError}</p> : null}
               <button
                 type="button"
-                disabled={!issueDescription.trim() || !mobileJob.data?.job.recordVersion || mobileJob.isFetching || reportIssue.isPending}
+                disabled={!issueDescription.trim() || mobileJob.isError || !mobileJob.data?.job.recordVersion || mobileJob.isFetching || reportIssue.isPending}
                 onClick={() => void submitIssue()}
                 className="min-h-11 rounded-[10px] bg-[#0f1530] px-5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
               >

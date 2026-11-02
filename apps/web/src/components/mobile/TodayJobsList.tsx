@@ -36,12 +36,25 @@ function getInitials(firstName: string, lastName: string) {
 function getStatusClasses(status: string) {
   switch (status) {
     case "in_progress":
+    case "dispatched":
       return "bg-brand-accent-light text-brand-accent";
+    case "on_hold":
+      return "bg-[#fff4d6] text-[#7a5600]";
     case "completed":
     case "paid":
       return "bg-success-light text-success";
     default:
       return "bg-mint-100 text-mint-700";
+  }
+}
+
+function jobStatusLabel(status: string) {
+  switch (status) {
+    case "dispatched": return "Dispatched";
+    case "in_progress": return "In progress";
+    case "on_hold": return "On hold";
+    case "scheduled": return "Scheduled";
+    default: return status.replaceAll("_", " ");
   }
 }
 
@@ -202,10 +215,10 @@ export function TodayJobsList() {
                       <p className="text-sm font-semibold text-brand-accent">{formatTimeWindow(job)}</p>
                       <div className="mt-2 flex flex-wrap items-center gap-2">
                         <span className={cn("rounded-full px-2.5 py-1 text-xs font-semibold", getStatusClasses(job.status))}>
-                          {job.status === "in_progress" ? "In Progress" : "Scheduled"}
+                          {jobStatusLabel(job.status)}
                         </span>
                         <span className="rounded-full bg-neutral-100 px-2.5 py-1 text-xs font-semibold text-neutral-500">
-                          {job.assetId ? "Carrier HVAC Unit · Aging" : job.priority.replaceAll("_", " ")}
+                          Priority: {job.priority.replaceAll("_", " ")}
                         </span>
                       </div>
                     </div>

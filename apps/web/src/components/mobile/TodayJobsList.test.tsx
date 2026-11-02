@@ -64,6 +64,24 @@ describe("Today jobs summary", () => {
     expect(document.body.textContent).not.toMatch(/\$|potential|technician app live/i);
   });
 
+  it("labels dispatched and on-hold jobs honestly without inventing asset details", () => {
+    useBreakpoint.mockReturnValue({ isTablet: false });
+    useJobsList.mockReturnValue({
+      data: { data: [
+        { ...job, id: "dispatched", status: "dispatched", assetId: "asset-1" },
+        { ...job, id: "on-hold", status: "on_hold", assetId: "asset-2" }
+      ] },
+      isLoading: false,
+      isError: false
+    });
+    render(<TodayJobsList />);
+
+    expect(screen.getByText("Dispatched")).toBeTruthy();
+    expect(screen.getByText("On hold")).toBeTruthy();
+    expect(screen.getAllByText("Priority: normal")).toHaveLength(2);
+    expect(document.body.textContent).not.toContain("Carrier HVAC Unit");
+  });
+
   it("shows the visible count on tablet without claiming the page is the full day", () => {
     useBreakpoint.mockReturnValue({ isTablet: true });
     render(<TodayJobsList />);

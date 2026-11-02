@@ -98,6 +98,24 @@ describe("CrewFinishJob issue reporting", () => {
     expect(mocks.retryMobileJob).toHaveBeenCalledOnce();
     expect(mocks.submitIssue).not.toHaveBeenCalled();
   });
+
+  it("keeps issue reporting blocked when a failed refresh leaves a cached version", () => {
+    mocks.mobileJob.mockReturnValue({
+      data: { job: { recordVersion: "stale-version" } },
+      isLoading: false,
+      isError: true,
+      isFetching: false,
+      refetch: mocks.retryMobileJob
+    });
+    render(<CrewFinishJob jobId="job-1" />);
+    fireEvent.click(screen.getByRole("button", { name: "Safety" }));
+    fireEvent.change(screen.getByRole("textbox", { name: /Describe the safety issue/ }), { target: { value: "Gas smell" } });
+
+    expect((screen.getByRole("button", { name: "Report issue" }) as HTMLButtonElement).disabled).toBe(true);
+    expect(screen.getByText("Could not check the latest job details.")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Report issue" }));
+    expect(mocks.submitIssue).not.toHaveBeenCalled();
+  });
 });
 afterEach(cleanup);
 

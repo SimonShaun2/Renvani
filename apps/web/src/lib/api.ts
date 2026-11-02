@@ -38,15 +38,15 @@ async function parseError(response: Response): Promise<ApiErrorPayload> {
 }
 
 /**
- * Bearer token precedence (explicit): a live Clerk session token wins over the legacy in-repo JWT.
- * Clerk is only registered when NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY is set and the user signed in
- * with Clerk; otherwise the legacy JWT is used. Never both at once.
+ * Bearer token precedence matches middleware and server rendering: a valid legacy cookie wins,
+ * then Clerk is used when no legacy session is present. This prevents a mixed browser session
+ * from rendering one tenant while authorizing API calls as another.
  */
 export async function resolveBearerToken(): Promise<{ token: string | null; source: "clerk" | "legacy" | null }> {
-  const clerk = await getClerkSessionToken();
-  if (clerk) return { token: clerk, source: "clerk" };
   const legacy = getAuthToken();
-  return legacy ? { token: legacy, source: "legacy" } : { token: null, source: null };
+  if (legacy) return { token: legacy, source: "legacy" };
+  const clerk = await getClerkSessionToken();
+  return clerk ? { token: clerk, source: "clerk" } : { token: null, source: null };
 }
 
 /** Login URL used after an API 401. Exported for tests. */
@@ -72,7 +72,7 @@ export async function handleUnauthorized(source: "clerk" | "legacy" | null): Pro
 
 /**
  * Authenticated raw fetch for requests that can't go through `api` (multipart uploads, etc.).
- * Same rules as apiFetch: Clerk token first, legacy JWT fallback, and handleUnauthorized on 401
+ * Same rules as apiFetch: legacy JWT first, Clerk fallback, and handleUnauthorized on 401
  * (Clerk sessions are signed out, never bounced to /login). Returns the Response so callers keep
  * their own error parsing.
  */

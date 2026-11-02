@@ -15,6 +15,7 @@ import {
   buildDefaultRevenueProposalParameters,
   registerRevenueProposalBuilder
 } from "./revenue-proposal-builders.registry.js";
+import { assertRevenueAgentProposalsEnabled } from "./revenue-agent-proposal-gate.js";
 
 /**
  * Built-in Revenue Agent proposal kinds. One entry per kind: agent-action type (registry),
@@ -107,9 +108,15 @@ export function registerRevenueProposalKind(kind: RevenueProposalKind): void {
   });
   registerAgentActionExecutor(kind.actionType, {
     delivery: "outbound",
-    beforeExecute: authorizeOutboundAgentActionExecution,
+    beforeExecute: async (ctx) => {
+      assertRevenueAgentProposalsEnabled();
+      return authorizeOutboundAgentActionExecution(ctx);
+    },
     applyInTransaction: (ctx) => transitionRecommendation(ctx, "actioned", { required: true }),
-    onRejectInTransaction: (ctx) => transitionRecommendation(ctx, "dismissed", { required: false })
+    onRejectInTransaction: (ctx) => {
+      assertRevenueAgentProposalsEnabled();
+      return transitionRecommendation(ctx, "dismissed", { required: false });
+    }
   });
 }
 

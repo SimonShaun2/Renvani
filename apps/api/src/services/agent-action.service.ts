@@ -32,6 +32,7 @@ import {
 import { requireAgentActionExecutor, getAgentActionExecutor } from "./agent-action.executors.js";
 import { buildAgentActionExecutionResultForType, persistAgentActionExecutionFailure } from "./agent-action-receipt.js";
 import { resolveEntityRef } from "./tenant-context.service.js";
+import { assertRevenueAgentProposalActionEnabled } from "./revenue-agent/revenue-agent-proposal-gate.js";
 import {
   emitAgentActionAuditEvent,
   mirrorAgentActionAuditToLangfuse
@@ -394,6 +395,7 @@ export async function approveAgentAction(
     const mapped = await runTransactionWithTenantSession(companyId, async (tx) => {
       await lockIdempotencyKey(tx, companyId, options);
       const row = await getActionRow(companyId, actionId, tx);
+      assertRevenueAgentProposalActionEnabled(row.actionType);
 
       const replay = await findIdempotentReplay(tx, companyId, row, "approve", options);
       if (replay) {
@@ -541,6 +543,7 @@ export async function editAgentActionParameters(
 ) {
   const result = await runTransactionWithTenantSession(companyId, async (tx) => {
     const row = await getActionRow(companyId, actionId, tx);
+    assertRevenueAgentProposalActionEnabled(row.actionType);
 
     // TE-STALE-03: an edit made against a stale copy must not overwrite the current body.
     assertExpectedVersion(row, options);

@@ -1,7 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { authorizedFetch } from "./api";
-import { registerClerkSignOut, registerClerkTokenGetter } from "./clerk/token-bridge";
+import {
+  prepareClerkTokenBridge,
+  registerClerkSignOut,
+  registerClerkTokenGetter,
+  resetClerkTokenBridge
+} from "./clerk/token-bridge";
 import { uploadImportFileForMigrate } from "@/src/hooks/migrate-onboarding.hooks";
 
 const auth = vi.hoisted(() => ({ legacy: null as string | null, cleared: 0 }));
@@ -24,6 +29,7 @@ describe("authorizedFetch (shared upload auth)", () => {
   beforeEach(() => {
     auth.legacy = null;
     auth.cleared = 0;
+    registerClerkTokenGetter(null);
     assign.mockReset();
     fetchMock = vi.fn().mockResolvedValue(new Response("{}", { status: 200 }));
     vi.stubGlobal("fetch", fetchMock);
@@ -36,13 +42,13 @@ describe("authorizedFetch (shared upload auth)", () => {
     vi.unstubAllGlobals();
   });
 
-  it("sends the Clerk session token when present (wins over legacy)", async () => {
+  it("keeps a mixed-session upload on the legacy tenant selected by server rendering", async () => {
     auth.legacy = "legacy-jwt";
     registerClerkTokenGetter(async () => "clerk-jwt");
 
     await authorizedFetch("/api/v1/imports", { method: "POST", body: new FormData() });
 
-    expect(sentAuthorization(fetchMock)).toBe("Bearer clerk-jwt");
+    expect(sentAuthorization(fetchMock)).toBe("Bearer legacy-jwt");
     const init = fetchMock.mock.calls[0]?.[1] as RequestInit;
     expect(init.credentials).toBe("include");
     expect(String(fetchMock.mock.calls[0]?.[0])).toMatch(/\/api\/v1\/imports$/);
@@ -59,6 +65,15 @@ describe("authorizedFetch (shared upload auth)", () => {
   it("sends no Authorization header when signed out", async () => {
     await authorizedFetch("/api/v1/imports", { method: "POST" });
 
+    expect(sentAuthorization(fetchMock)).toBeNull();
+  });
+
+  it("does not wait for Clerk when the provider bridge is absent", async () => {
+    resetClerkTokenBridge();
+
+    await authorizedFetch("/api/v1/imports", { method: "POST" });
+
+    expect(fetchMock).toHaveBeenCalledOnce();
     expect(sentAuthorization(fetchMock)).toBeNull();
   });
 
@@ -92,5 +107,28 @@ describe("authorizedFetch (shared upload auth)", () => {
     await uploadImportFileForMigrate(new File(["a,b"], "c.csv", { type: "text/csv" }), "customers").catch(() => undefined);
 
     expect(sentAuthorization(fetchMock)).toBe("Bearer clerk-jwt");
+  });
+
+  it("does not downgrade a Clerk token failure into an unauthenticated request", async () => {
+    registerClerkTokenGetter(async () => {
+      throw new Error("Clerk unavailable");
+    });
+
+    await expect(authorizedFetch("/api/v1/imports", { method: "POST" })).rejects.toThrow("Clerk unavailable");
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("waits for Clerk hydration before starting an authenticated request", async () => {
+    resetClerkTokenBridge();
+    prepareClerkTokenBridge();
+    const request = authorizedFetch("/api/v1/imports", { method: "POST" });
+
+    await Promise.resolve();
+    expect(fetchMock).not.toHaveBeenCalled();
+
+    registerClerkTokenGetter(async () => "hydrated-clerk-jwt");
+    await request;
+
+    expect(sentAuthorization(fetchMock)).toBe("Bearer hydrated-clerk-jwt");
   });
 });

@@ -6,6 +6,7 @@ import { ApiError } from "@/src/lib/api";
 const mocks = vi.hoisted(() => ({
   job: vi.fn(),
   tasks: vi.fn(),
+  timeEntries: vi.fn(),
   attachments: vi.fn(),
   upload: vi.fn(),
   transition: vi.fn(),
@@ -22,6 +23,7 @@ vi.mock("next/navigation", () => ({ useRouter: () => ({ push: vi.fn() }) }));
 vi.mock("@/src/hooks/jobs.hooks", () => ({
   useJob: mocks.job,
   useJobTasks: mocks.tasks,
+  useJobTimeEntries: mocks.timeEntries,
   useJobAttachments: mocks.attachments,
   useUploadAttachment: mocks.upload,
   useTransitionJob: mocks.transition,
@@ -39,7 +41,7 @@ import { CrewFinishJob } from "./CrewFinishJob";
 beforeEach(() => {
   vi.clearAllMocks();
   mocks.job.mockReturnValue({
-    data: { job: { id: "job-1", jobNumber: "J-1", status: "in_progress", property: null } },
+    data: { job: { id: "job-1", jobNumber: "J-1", status: "in_progress", customer: { firstName: "Dana", lastName: "Hill" }, property: null, completionNotes: "Replaced the filter.", techNotes: null } },
     isLoading: false,
     isError: false,
     refetch: mocks.retryJob
@@ -51,6 +53,7 @@ beforeEach(() => {
     refetch: mocks.retryTasks
   });
   mocks.attachments.mockReturnValue({ data: { data: [] } });
+  mocks.timeEntries.mockReturnValue({ data: { timeEntries: [{ endedAt: new Date(), durationMinutes: 70 }] }, isLoading: false, isError: false });
   mocks.upload.mockReturnValue({ isPending: false, mutate: vi.fn() });
   mocks.transition.mockReturnValue({ isPending: false, mutate: vi.fn() });
   mocks.mobileJob.mockReturnValue({ data: { job: { recordVersion: "version-1" } }, isLoading: false, isError: false, isFetching: false, refetch: mocks.retryMobileJob });
@@ -61,6 +64,12 @@ beforeEach(() => {
 describe("CrewFinishJob issue reporting", () => {
   it("submits only Product-approved Access with a note and current version", async () => {
     render(<CrewFinishJob jobId="job-1" />);
+    expect(screen.getByText("Review this job")).toBeTruthy();
+    expect(screen.getByText("Work record")).toBeTruthy();
+    expect(screen.getByText("1h 10m")).toBeTruthy();
+    expect(screen.getByText("Replaced the filter.")).toBeTruthy();
+    expect(screen.getByText("Completion sends the work record to the office.")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Report an issue" }));
     for (const name of ["Damage", "Customer dispute", "Ran long"]) {
       expect((screen.getByRole("button", { name }) as HTMLButtonElement).disabled).toBe(true);
     }
@@ -74,9 +83,25 @@ describe("CrewFinishJob issue reporting", () => {
     expect(mocks.toast).toHaveBeenCalledWith(expect.objectContaining({ tone: "success", title: "Issue reported" }));
   });
 
+  it("shows only source-backed work record values and explicit unavailable states", () => {
+    mocks.tasks.mockReturnValue({ data: { tasks: [{ status: "completed" }, { status: "pending" }] }, isLoading: false, isError: false });
+    mocks.attachments.mockReturnValue({ data: { data: [{ id: "photo-1", fileType: "photo", fileUrl: "/photo.jpg", fileName: "After photo" }] }, isLoading: false, isError: false });
+    mocks.timeEntries.mockReturnValue({ data: { timeEntries: [{ endedAt: new Date(), durationMinutes: 70 }] }, isLoading: false, isError: true });
+    render(<CrewFinishJob jobId="job-1" />);
+
+    expect(screen.getByText("1 of 2")).toBeTruthy();
+    expect(screen.getByText("1 saved")).toBeTruthy();
+    expect(screen.getByText("Unavailable")).toBeTruthy();
+    expect(screen.queryByText(/Approved total/)).toBeNull();
+    expect(screen.queryByText(/\$238/)).toBeNull();
+    expect(screen.queryByRole("button", { name: "Access" })).toBeNull();
+    expect(screen.getByRole("button", { name: "Complete job" })).toBeTruthy();
+  });
+
   it("keeps Safety report open and refreshes the version after a conflict", async () => {
     mocks.submitIssue.mockRejectedValue(new ApiError(409, { error: "CONFLICT", message: "stale version" }));
     render(<CrewFinishJob jobId="job-1" />);
+    fireEvent.click(screen.getByRole("button", { name: "Report an issue" }));
     fireEvent.click(screen.getByRole("button", { name: "Safety" }));
     fireEvent.change(screen.getByRole("textbox", { name: /Describe the safety issue/ }), { target: { value: "Gas smell" } });
     fireEvent.click(screen.getByRole("button", { name: "Report issue" }));
@@ -89,6 +114,7 @@ describe("CrewFinishJob issue reporting", () => {
   it("does not submit when the latest job version cannot be loaded", () => {
     mocks.mobileJob.mockReturnValue({ data: undefined, isLoading: false, isError: true, isFetching: false, refetch: mocks.retryMobileJob });
     render(<CrewFinishJob jobId="job-1" />);
+    fireEvent.click(screen.getByRole("button", { name: "Report an issue" }));
     fireEvent.click(screen.getByRole("button", { name: "Access" }));
     fireEvent.change(screen.getByRole("textbox", { name: /Describe the access issue/ }), { target: { value: "Locked gate" } });
 
@@ -108,6 +134,7 @@ describe("CrewFinishJob issue reporting", () => {
       refetch: mocks.retryMobileJob
     });
     render(<CrewFinishJob jobId="job-1" />);
+    fireEvent.click(screen.getByRole("button", { name: "Report an issue" }));
     fireEvent.click(screen.getByRole("button", { name: "Safety" }));
     fireEvent.change(screen.getByRole("textbox", { name: /Describe the safety issue/ }), { target: { value: "Gas smell" } });
 
@@ -125,7 +152,7 @@ describe("CrewFinishJob loading failures", () => {
     render(<CrewFinishJob jobId="job-1" />);
 
     expect(screen.getByText(/Could not load the checklist/)).toBeTruthy();
-    expect(screen.queryByRole("button", { name: "Mark complete" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Complete job" })).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: "Retry checklist" }));
     expect(mocks.retryTasks).toHaveBeenCalledOnce();
   });
@@ -145,7 +172,7 @@ describe("CrewFinishJob loading failures", () => {
     mocks.transition.mockReturnValue({ isPending: false, mutate });
     render(<CrewFinishJob jobId="job-1" />);
 
-    fireEvent.click(screen.getByRole("button", { name: "Mark complete" }));
+    fireEvent.click(screen.getByRole("button", { name: "Complete job" }));
     expect(mutate).toHaveBeenCalledOnce();
     const [, options] = mutate.mock.calls[0] as [unknown, { onError: (error: Error) => void }];
     options.onError(Object.assign(new Error("Complete required checklist tasks before completing the job"), { status: 409 }));

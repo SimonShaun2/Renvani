@@ -7,7 +7,8 @@ import { CarFront } from "lucide-react";
 
 import { EmptyState } from "@/src/components/ui/EmptyState";
 import { SkeletonCard } from "@/src/components/ui/SkeletonCard";
-import { useJob, useJobAttachments, useJobTasks, useMobileJobVersion, useReportMobileIssue, useTransitionJob, useUploadAttachment } from "@/src/hooks/jobs.hooks";
+import { formatDurationMinutes } from "@/src/components/jobs/jobs.utils";
+import { useJob, useJobAttachments, useJobTasks, useJobTimeEntries, useMobileJobVersion, useReportMobileIssue, useTransitionJob, useUploadAttachment } from "@/src/hooks/jobs.hooks";
 import { ApiError } from "@/src/lib/api";
 import { showToast } from "@/src/stores/toast.store";
 
@@ -23,16 +24,18 @@ export function completionHint(status: string, requiredOpen: boolean): string {
   return "The office sees the job as completed right away.";
 }
 
-/** Figma 10:1917 "Crew / 04 Complete or report issue". */
+/** Figma 10:1917 "Crew / 09 Review completed work". */
 export function CrewFinishJob({ jobId }: { jobId: string }) {
   const jobQuery = useJob(jobId);
   const tasksQuery = useJobTasks(jobId);
   const attachmentsQuery = useJobAttachments(jobId);
+  const timeEntriesQuery = useJobTimeEntries(jobId);
   const upload = useUploadAttachment(jobId);
   const fileInput = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const transitionJob = useTransitionJob(jobId);
   const [selectedIssue, setSelectedIssue] = useState<ReportableIssue | null>(null);
+  const [showIssueForm, setShowIssueForm] = useState(false);
   const [issueDescription, setIssueDescription] = useState("");
   const [issueError, setIssueError] = useState<string | null>(null);
   const mobileJob = useMobileJobVersion(jobId, selectedIssue !== null);
@@ -49,6 +52,7 @@ export function CrewFinishJob({ jobId }: { jobId: string }) {
       });
       setSelectedIssue(null);
       setIssueDescription("");
+      setShowIssueForm(false);
       showToast({ tone: "success", title: "Issue reported", description: "The office can see it now." });
     } catch (error) {
       if (error instanceof ApiError && error.status === 409) {
@@ -113,6 +117,18 @@ export function CrewFinishJob({ jobId }: { jobId: string }) {
 
   const tasks = tasksQuery.data?.tasks ?? [];
   const photos = (attachmentsQuery.data?.data ?? []).filter((file) => file.fileType === "photo");
+  const completedTaskCount = tasks.filter(isTaskDone).length;
+  const timeEntries = timeEntriesQuery.data?.timeEntries ?? [];
+  const recordedMinutes = timeEntries.reduce((sum, entry) => sum + (entry.endedAt ? (entry.durationMinutes ?? 0) : 0), 0);
+  const timeLabel = timeEntriesQuery.isError
+    ? "Unavailable"
+    : timeEntriesQuery.isLoading
+      ? "Loading…"
+      : timeEntries.some((entry) => !entry.endedAt)
+        ? `${formatDurationMinutes(recordedMinutes)} recorded · timer running`
+        : formatDurationMinutes(recordedMinutes);
+  const photoLabel = attachmentsQuery.isError ? "Unavailable" : attachmentsQuery.isLoading ? "Loading…" : `${photos.length} saved`;
+  const completionNote = job.completionNotes?.trim() || job.techNotes?.trim() || null;
   const canComplete = job.status === "in_progress";
   const requiredOpen = tasks.some((task) => task.isRequired && !isTaskDone(task));
 
@@ -122,59 +138,34 @@ export function CrewFinishJob({ jobId }: { jobId: string }) {
         <Link href={`/mobile/jobs/${job.id}`} className="font-mono text-[11px] uppercase tracking-[0.12em] text-[#5e6684]">
           Job {job.jobNumber} · {job.property?.addressLine1 ?? "Address pending"}
         </Link>
-        <h1 className="text-[28px] font-semibold tracking-tight text-[#0f1530]">Finish this job</h1>
+        <div className="space-y-1">
+          <h1 className="text-[28px] font-semibold tracking-tight text-[#0f1530]">Review this job</h1>
+          <p className="text-xs text-[#2a3360]">{job.jobNumber} · {job.customer.firstName} {job.customer.lastName}</p>
+        </div>
 
-        <CrewChecklist jobId={job.id} tasks={tasks} emptyText="No checklist items on this job." />
-
-        <section>
-          <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.12em] text-[#5e6684]">Photos</p>
-          <div className="grid grid-cols-4 gap-2">
-            {photos.slice(0, 3).map((photo) => (
-              <img
-                key={photo.id}
-                src={photo.thumbnailUrl ?? photo.fileUrl}
-                alt={photo.caption ?? photo.fileName}
-                className="aspect-square w-full rounded-[10px] bg-[#f1e7d8] object-cover"
-              />
-            ))}
-            <button
-              type="button"
-              aria-label="Add photo"
-              disabled={upload.isPending}
-              onClick={() => fileInput.current?.click()}
-              className="flex aspect-square w-full items-center justify-center rounded-[10px] border border-[#e6dccb] text-2xl text-[#5e6684] disabled:opacity-60"
-            >
-              +
-            </button>
-          </div>
-          {photos.length > 3 ? <p className="mt-2 text-xs text-[#5e6684]">+{photos.length - 3} more in Files</p> : null}
-          <input
-            ref={fileInput}
-            type="file"
-            accept="image/*"
-            capture="environment"
-            hidden
-            onChange={(event) => {
-              const file = event.target.files?.[0];
-              event.target.value = "";
-              if (!file) return;
-              upload.mutate(
-                { file, photoType: "after" },
-                {
-                  onError: (error) =>
-                    showToast({
-                      tone: "error",
-                      title: "Photo could not upload",
-                      description: error instanceof Error ? error.message : "Try again."
-                    })
-                }
-              );
-            }}
-          />
+        <section aria-label="Work record" className="space-y-3 rounded-[16px] border border-[#e6dccb] bg-white p-4">
+          <h2 className="text-xs font-medium uppercase tracking-[0.08em] text-[#2a3360]">Work record</h2>
+          <dl className="space-y-2 text-sm text-[#0f1530]">
+            <div className="flex items-center justify-between gap-3"><dt>Checklist</dt><dd className="font-medium">{completedTaskCount} of {tasks.length}</dd></div>
+            <div className="flex items-center justify-between gap-3"><dt>Time recorded</dt><dd className="text-right font-medium">{timeLabel}</dd></div>
+            <div className="flex items-center justify-between gap-3"><dt>Job photos</dt><dd className="font-medium">{photoLabel}</dd></div>
+          </dl>
+          {completionNote ? <p className="border-t border-[#e6dccb] pt-3 text-sm text-[#0f1530]">{completionNote}</p> : null}
         </section>
 
-        <section className="rounded-[14px] bg-[#fde4df] px-4 py-4" aria-label="Report an issue">
-          <p className="text-[15px] font-semibold text-[#b3261e]">Report an issue</p>
+        <p className="rounded-[12px] bg-[#e4f1e8] p-3 text-sm font-medium text-[#0f1530]">Completion sends the work record to the office.</p>
+        <button
+          type="button"
+          aria-expanded={showIssueForm}
+          aria-controls={showIssueForm ? "mobile-report-issue" : undefined}
+          onClick={() => setShowIssueForm((open) => !open)}
+          className="min-h-11 w-full rounded-[10px] border border-[#e6dccb] bg-white px-4 text-sm font-semibold text-[#0f1530]"
+        >
+          Report an issue
+        </button>
+
+        {showIssueForm ? <section id="mobile-report-issue" className="rounded-[14px] bg-[#fde4df] px-4 py-4" aria-label="Issue details">
+          <p className="text-[15px] font-semibold text-[#b3261e]">Issue details</p>
           <div className="mt-3 flex flex-wrap gap-2">
             {ISSUE_CATEGORIES.map((category) => {
               const available = category === "Access" || category === "Safety";
@@ -224,7 +215,56 @@ export function CrewFinishJob({ jobId }: { jobId: string }) {
               </button>
             </div>
           ) : null}
+        </section> : null}
+        <CrewChecklist jobId={job.id} tasks={tasks} emptyText="No checklist items on this job." />
+
+        <section>
+          <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.12em] text-[#5e6684]">Photos</p>
+          <div className="grid grid-cols-4 gap-2">
+            {photos.slice(0, 3).map((photo) => (
+              <img
+                key={photo.id}
+                src={photo.thumbnailUrl ?? photo.fileUrl}
+                alt={photo.caption ?? photo.fileName}
+                className="aspect-square w-full rounded-[10px] bg-[#f1e7d8] object-cover"
+              />
+            ))}
+            <button
+              type="button"
+              aria-label="Add photo"
+              disabled={upload.isPending}
+              onClick={() => fileInput.current?.click()}
+              className="flex aspect-square w-full items-center justify-center rounded-[10px] border border-[#e6dccb] text-2xl text-[#5e6684] disabled:opacity-60"
+            >
+              +
+            </button>
+          </div>
+          {photos.length > 3 ? <p className="mt-2 text-xs text-[#5e6684]">+{photos.length - 3} more in Files</p> : null}
+          <input
+            ref={fileInput}
+            type="file"
+            accept="image/*"
+            capture="environment"
+            hidden
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              event.target.value = "";
+              if (!file) return;
+              upload.mutate(
+                { file, photoType: "after" },
+                {
+                  onError: (error) =>
+                    showToast({
+                      tone: "error",
+                      title: "Photo could not upload",
+                      description: error instanceof Error ? error.message : "Try again."
+                    })
+                }
+              );
+            }}
+          />
         </section>
+
       </div>
 
       <div className="fixed inset-x-0 bottom-0 z-20 bg-[#fbf6ef] px-6 pb-4 pt-3 md:bottom-0">
@@ -261,7 +301,7 @@ export function CrewFinishJob({ jobId }: { jobId: string }) {
             }}
             className="min-h-[52px] w-full rounded-[12px] bg-[#f6b400] text-[15px] font-semibold text-[#0f1530] disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {transitionJob.isPending ? "Completing..." : "Mark complete"}
+            {transitionJob.isPending ? "Completing..." : "Complete job"}
           </button>
           <p className="mt-3 text-xs text-[#5e6684]">
             {tasksQuery.isFetching ? "Checking checklist..." : completionHint(job.status, requiredOpen)}

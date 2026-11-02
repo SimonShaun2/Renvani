@@ -44,6 +44,12 @@ type Fixture = {
   jobId: string;
 };
 
+type TechnicianFixture = Fixture & {
+  ownerId: string;
+  technicianId: string;
+  replacementTechnicianId: string;
+};
+
 type Deferred<T> = {
   promise: Promise<T>;
   resolve: (value: T | PromiseLike<T>) => void;
@@ -58,6 +64,10 @@ function deferred<T>(): Deferred<T> {
     reject = rejectPromise;
   });
   return { promise, resolve, reject };
+}
+
+function taskActor(fixture: Fixture, role: "owner" | "technician" = "owner") {
+  return { userId: fixture.actorId, role };
 }
 
 describe.runIf(enabled)("FS-237 job completion serialization (Postgres)", { timeout: 30_000 }, () => {
@@ -81,11 +91,12 @@ describe.runIf(enabled)("FS-237 job completion serialization (Postgres)", { time
       return;
     }
 
-    const { activityEvents, companies, customers, jobs, jobTasks, users } = dbModule;
+    const { activityEvents, companies, customers, jobs, jobTasks, technicians, users } = dbModule;
     for (const companyId of createdCompanyIds) {
       await dbModule.db.delete(activityEvents).where(eq(activityEvents.companyId, companyId));
       await dbModule.db.delete(jobTasks).where(eq(jobTasks.companyId, companyId));
       await dbModule.db.delete(jobs).where(eq(jobs.companyId, companyId));
+      await dbModule.db.delete(technicians).where(eq(technicians.companyId, companyId));
       await dbModule.db.delete(customers).where(eq(customers.companyId, companyId));
       await dbModule.db.delete(users).where(eq(users.companyId, companyId));
       await dbModule.db.delete(companies).where(eq(companies.id, companyId));
@@ -129,6 +140,83 @@ describe.runIf(enabled)("FS-237 job completion serialization (Postgres)", { time
     });
 
     return { companyId, actorId, customerId, jobId };
+  }
+
+  async function seedTechnicianFixture(label: string): Promise<TechnicianFixture> {
+    const companyId = randomUUID();
+    const actorId = randomUUID();
+    const ownerId = randomUUID();
+    const customerId = randomUUID();
+    const technicianId = randomUUID();
+    const replacementTechnicianId = randomUUID();
+    const jobId = randomUUID();
+    createdCompanyIds.push(companyId);
+
+    await dbModule.db.insert(dbModule.companies).values({
+      id: companyId,
+      name: `FS-237 ${label}`,
+      slug: `fs-237-${label.toLowerCase()}-${companyId}`
+    });
+    await dbModule.db.insert(dbModule.users).values([
+      {
+        id: actorId,
+        companyId,
+        email: `fs-237-tech-${actorId}@example.com`,
+        firstName: "Field",
+        lastName: "Technician",
+        role: "technician"
+      },
+      {
+        id: ownerId,
+        companyId,
+        email: `fs-237-owner-${ownerId}@example.com`,
+        firstName: "Office",
+        lastName: "Owner",
+        role: "owner"
+      }
+    ]);
+    await dbModule.db.insert(dbModule.customers).values({
+      id: customerId,
+      companyId,
+      firstName: "Race",
+      lastName: "Customer"
+    });
+    await dbModule.db.insert(dbModule.technicians).values([
+      {
+        id: technicianId,
+        companyId,
+        userId: actorId,
+        firstName: "Field",
+        lastName: "Technician",
+        phone: "555-0101"
+      },
+      {
+        id: replacementTechnicianId,
+        companyId,
+        firstName: "Replacement",
+        lastName: "Technician",
+        phone: "555-0102"
+      }
+    ]);
+    await dbModule.db.insert(dbModule.jobs).values({
+      id: jobId,
+      companyId,
+      customerId,
+      technicianId,
+      jobNumber: `FS237-${jobId.slice(0, 8)}`,
+      title: label,
+      status: "in_progress"
+    });
+
+    return {
+      companyId,
+      actorId,
+      ownerId,
+      customerId,
+      technicianId,
+      replacementTechnicianId,
+      jobId
+    };
   }
 
   async function blockedJobWaiterCount(): Promise<number> {
@@ -186,6 +274,42 @@ describe.runIf(enabled)("FS-237 job completion serialization (Postgres)", { time
     }
 
     return Promise.allSettled(operations) as Promise<{ [K in keyof T]: PromiseSettledResult<Awaited<T[K]>> }>;
+  }
+
+  async function runOrderedBehindJobBarrier(
+    fixture: Fixture,
+    contenders: readonly [() => Promise<unknown>, () => Promise<unknown>]
+  ): Promise<PromiseSettledResult<unknown>[]> {
+    const lockAcquired = deferred<void>();
+    const releaseLock = deferred<void>();
+    const blocker = dbModule.db.transaction(async (tx) => {
+      await tx
+        .select({ id: dbModule.jobs.id })
+        .from(dbModule.jobs)
+        .where(
+          and(
+            eq(dbModule.jobs.companyId, fixture.companyId),
+            eq(dbModule.jobs.id, fixture.jobId),
+            isNull(dbModule.jobs.deletedAt)
+          )
+        )
+        .for("update");
+      lockAcquired.resolve(undefined);
+      await releaseLock.promise;
+    });
+
+    await lockAcquired.promise;
+    const first = contenders[0]();
+    await waitForBlockedJobWaiters(1);
+    const second = contenders[1]();
+    try {
+      await waitForBlockedJobWaiters(2);
+    } finally {
+      releaseLock.resolve(undefined);
+      await blocker;
+    }
+
+    return Promise.allSettled([first, second]);
   }
 
   async function readInvariant(fixture: Fixture) {
@@ -249,7 +373,7 @@ describe.runIf(enabled)("FS-237 job completion serialization (Postgres)", { time
 
     const results = await runBehindJobBarrier(fixture, () => [
       jobService.completeJob(fixture.companyId, fixture.actorId, fixture.jobId, {}),
-      jobTasksService.createTask(fixture.companyId, fixture.jobId, {
+      jobTasksService.createTask(fixture.companyId, taskActor(fixture), fixture.jobId, {
         title: "Required safety check",
         isRequired: true
       })
@@ -265,15 +389,15 @@ describe.runIf(enabled)("FS-237 job completion serialization (Postgres)", { time
 
   it("serializes completion against reopening a required task", async () => {
     const fixture = await seedFixture("Complete Reopen");
-    const task = await jobTasksService.createTask(fixture.companyId, fixture.jobId, {
+    const task = await jobTasksService.createTask(fixture.companyId, taskActor(fixture), fixture.jobId, {
       title: "Required commissioning check",
       isRequired: true
     });
-    await jobTasksService.completeTask(fixture.companyId, fixture.jobId, task.id, fixture.actorId);
+    await jobTasksService.completeTask(fixture.companyId, taskActor(fixture), fixture.jobId, task.id);
 
     const results = await runBehindJobBarrier(fixture, () => [
       jobService.completeJob(fixture.companyId, fixture.actorId, fixture.jobId, {}),
-      jobTasksService.updateTask(fixture.companyId, fixture.jobId, task.id, { status: "pending" })
+      jobTasksService.updateTask(fixture.companyId, taskActor(fixture), fixture.jobId, task.id, { status: "pending" })
     ] as const);
 
     expect(results.filter((result) => result.status === "fulfilled")).toHaveLength(1);
@@ -305,5 +429,88 @@ describe.runIf(enabled)("FS-237 job completion serialization (Postgres)", { time
         )
       );
     expect(events).toHaveLength(1);
+  });
+
+  it("rejects a technician task mutation queued behind reassignment", async () => {
+    const fixture = await seedTechnicianFixture("Reassignment Task");
+    const task = await jobTasksService.createTask(
+      fixture.companyId,
+      { userId: fixture.ownerId, role: "owner" },
+      fixture.jobId,
+      { title: "Original task" }
+    );
+
+    const results = await runOrderedBehindJobBarrier(fixture, [
+      () => jobService.assignTechnician(
+        fixture.companyId,
+        fixture.ownerId,
+        fixture.jobId,
+        fixture.replacementTechnicianId
+      ),
+      () => jobTasksService.updateTask(
+        fixture.companyId,
+        taskActor(fixture, "technician"),
+        fixture.jobId,
+        task.id,
+        { title: "Stale technician mutation" }
+      )
+    ]);
+
+    expect(results[0]?.status).toBe("fulfilled");
+    expect(results[1]).toMatchObject({ status: "rejected", reason: { code: "FORBIDDEN" } });
+    const [job] = await dbModule.db
+      .select({ technicianId: dbModule.jobs.technicianId })
+      .from(dbModule.jobs)
+      .where(eq(dbModule.jobs.id, fixture.jobId));
+    const [persistedTask] = await dbModule.db
+      .select({ title: dbModule.jobTasks.title })
+      .from(dbModule.jobTasks)
+      .where(eq(dbModule.jobTasks.id, task.id));
+    expect(job?.technicianId).toBe(fixture.replacementTechnicianId);
+    expect(persistedTask?.title).toBe("Original task");
+  });
+
+  it("serializes duplicate task completion without duplicate audit events", async () => {
+    const fixture = await seedTechnicianFixture("Duplicate Task Completion");
+    const task = await jobTasksService.createTask(
+      fixture.companyId,
+      { userId: fixture.ownerId, role: "owner" },
+      fixture.jobId,
+      { title: "Complete once" }
+    );
+
+    const results = await runBehindJobBarrier(fixture, () => [
+      jobTasksService.completeTask(
+        fixture.companyId,
+        taskActor(fixture, "technician"),
+        fixture.jobId,
+        task.id
+      ),
+      jobTasksService.completeTask(
+        fixture.companyId,
+        taskActor(fixture, "technician"),
+        fixture.jobId,
+        task.id
+      )
+    ] as const);
+
+    expect(results.every((result) => result.status === "fulfilled")).toBe(true);
+    const events = await dbModule.db
+      .select({ id: dbModule.activityEvents.id })
+      .from(dbModule.activityEvents)
+      .where(
+        and(
+          eq(dbModule.activityEvents.companyId, fixture.companyId),
+          eq(dbModule.activityEvents.jobId, fixture.jobId),
+          eq(dbModule.activityEvents.eventType, "job.task_completed")
+        )
+      );
+    const [persistedTask] = await dbModule.db
+      .select({ completedAt: dbModule.jobTasks.completedAt, completedById: dbModule.jobTasks.completedById })
+      .from(dbModule.jobTasks)
+      .where(eq(dbModule.jobTasks.id, task.id));
+    expect(events).toHaveLength(1);
+    expect(persistedTask?.completedAt).not.toBeNull();
+    expect(persistedTask?.completedById).toBe(fixture.actorId);
   });
 });

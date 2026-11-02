@@ -434,6 +434,7 @@ async function applyOperation(
       };
       const updated = await updateTaskInTransaction(
         tx,
+        actor,
         actor.companyId,
         operation.jobId,
         operation.payload.taskId,

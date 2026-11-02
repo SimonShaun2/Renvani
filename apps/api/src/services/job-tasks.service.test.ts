@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { ErrorCode } from "@fsm/types";
+import { ErrorCode, type UserRole } from "@fsm/types";
 
 import { setupTestEnv } from "../test-support/env-setup.js";
 
@@ -65,6 +65,10 @@ function createContext() {
   return { company, actor, customer, technician, job };
 }
 
+function taskActor(actor: { id: string; role: UserRole }) {
+  return { userId: actor.id, role: actor.role };
+}
+
 describe("job-tasks.service", () => {
   it("listTasks returns tasks sorted by sortOrder", async () => {
     const { company, job } = createContext();
@@ -88,7 +92,7 @@ describe("job-tasks.service", () => {
   });
 
   it("createTask creates a task and assigns the next sort order by default", async () => {
-    const { company, job, technician } = createContext();
+    const { company, actor, job, technician } = createContext();
 
     fakeDb.seedJobTask({
       companyId: company.id,
@@ -97,7 +101,7 @@ describe("job-tasks.service", () => {
       sortOrder: 1
     });
 
-    const task = await jobTasksService.createTask(company.id, job.id, {
+    const task = await jobTasksService.createTask(company.id, taskActor(actor), job.id, {
       assignedToId: technician.id,
       title: "New Task"
     });
@@ -107,14 +111,14 @@ describe("job-tasks.service", () => {
   });
 
   it("updateTask updates editable fields and emits job.task_completed when status becomes completed", async () => {
-    const { company, job, technician } = createContext();
+    const { company, actor, job, technician } = createContext();
     const task = fakeDb.seedJobTask({
       companyId: company.id,
       jobId: job.id,
       title: "Original Task"
     });
 
-    const updated = await jobTasksService.updateTask(company.id, job.id, task.id, {
+    const updated = await jobTasksService.updateTask(company.id, taskActor(actor), job.id, task.id, {
       assignedToId: technician.id,
       title: "Updated Task",
       status: "completed",
@@ -135,7 +139,7 @@ describe("job-tasks.service", () => {
       title: "Checklist Item"
     });
 
-    const completed = await jobTasksService.completeTask(company.id, job.id, task.id, actor.id);
+    const completed = await jobTasksService.completeTask(company.id, taskActor(actor), job.id, task.id);
 
     expect(completed.status).toBe("completed");
     expect(completed.completedById).toBe(actor.id);
@@ -157,8 +161,8 @@ describe("job-tasks.service", () => {
       title: "Complete once"
     });
 
-    const first = await jobTasksService.completeTask(company.id, job.id, task.id, actor.id);
-    const second = await jobTasksService.completeTask(company.id, job.id, task.id, secondActor.id);
+    const first = await jobTasksService.completeTask(company.id, taskActor(actor), job.id, task.id);
+    const second = await jobTasksService.completeTask(company.id, taskActor(secondActor), job.id, task.id);
 
     expect(second.completedAt).toEqual(first.completedAt);
     expect(second.completedById).toBe(actor.id);
@@ -166,20 +170,20 @@ describe("job-tasks.service", () => {
   });
 
   it("deleteTask soft deletes the task", async () => {
-    const { company, job } = createContext();
+    const { company, actor, job } = createContext();
     const task = fakeDb.seedJobTask({
       companyId: company.id,
       jobId: job.id,
       title: "Delete Me"
     });
 
-    await jobTasksService.deleteTask(company.id, job.id, task.id);
+    await jobTasksService.deleteTask(company.id, taskActor(actor), job.id, task.id);
 
     expect(fakeDb.getTestState().jobTasks.find((row) => row.id === task.id)?.deletedAt).not.toBeNull();
   });
 
   it("reorderTasks updates task sort order and rejects unknown ids", async () => {
-    const { company, job } = createContext();
+    const { company, actor, job } = createContext();
     const first = fakeDb.seedJobTask({
       companyId: company.id,
       jobId: job.id,
@@ -193,30 +197,30 @@ describe("job-tasks.service", () => {
       sortOrder: 1
     });
 
-    await jobTasksService.reorderTasks(company.id, job.id, [second.id, first.id]);
+    await jobTasksService.reorderTasks(company.id, taskActor(actor), job.id, [second.id, first.id]);
 
     expect(fakeDb.getTestState().jobTasks.find((row) => row.id === second.id)?.sortOrder).toBe(0);
     expect(fakeDb.getTestState().jobTasks.find((row) => row.id === first.id)?.sortOrder).toBe(1);
 
     await expect(
-      jobTasksService.reorderTasks(company.id, job.id, [randomUUID(), first.id])
+      jobTasksService.reorderTasks(company.id, taskActor(actor), job.id, [randomUUID(), first.id])
     ).rejects.toMatchObject({
       code: ErrorCode.CONFLICT
     });
   });
 
   it("rejects creating an open required task on a completed job but permits optional follow-up work", async () => {
-    const { company, job } = createContext();
+    const { company, actor, job } = createContext();
     fakeDb.getTestState().jobs.find((row) => row.id === job.id)!.status = "completed";
 
     await expect(
-      jobTasksService.createTask(company.id, job.id, {
+      jobTasksService.createTask(company.id, taskActor(actor), job.id, {
         title: "Required after completion",
         isRequired: true
       })
     ).rejects.toMatchObject({ code: ErrorCode.CONFLICT });
 
-    const optionalTask = await jobTasksService.createTask(company.id, job.id, {
+    const optionalTask = await jobTasksService.createTask(company.id, taskActor(actor), job.id, {
       title: "Optional follow-up",
       isRequired: false
     });
@@ -226,7 +230,7 @@ describe("job-tasks.service", () => {
   });
 
   it("rejects reopening or making a task required when that would violate completed-job invariants", async () => {
-    const { company, job } = createContext();
+    const { company, actor, job } = createContext();
     fakeDb.getTestState().jobs.find((row) => row.id === job.id)!.status = "completed";
     const completedRequiredTask = fakeDb.seedJobTask({
       companyId: company.id,
@@ -244,10 +248,10 @@ describe("job-tasks.service", () => {
     });
 
     await expect(
-      jobTasksService.updateTask(company.id, job.id, completedRequiredTask.id, { status: "in_progress" })
+      jobTasksService.updateTask(company.id, taskActor(actor), job.id, completedRequiredTask.id, { status: "in_progress" })
     ).rejects.toMatchObject({ code: ErrorCode.CONFLICT });
     await expect(
-      jobTasksService.updateTask(company.id, job.id, pendingOptionalTask.id, { isRequired: true })
+      jobTasksService.updateTask(company.id, taskActor(actor), job.id, pendingOptionalTask.id, { isRequired: true })
     ).rejects.toMatchObject({ code: ErrorCode.CONFLICT });
 
     const tasks = fakeDb.getTestState().jobTasks;
@@ -273,15 +277,15 @@ describe("job-tasks.service", () => {
       status: "pending"
     });
 
-    const completed = await jobTasksService.completeTask(company.id, job.id, completableTask.id, actor.id);
-    await jobTasksService.deleteTask(company.id, job.id, deletableTask.id);
+    const completed = await jobTasksService.completeTask(company.id, taskActor(actor), job.id, completableTask.id);
+    await jobTasksService.deleteTask(company.id, taskActor(actor), job.id, deletableTask.id);
 
     expect(completed.status).toBe("completed");
     expect(fakeDb.getTestState().jobTasks.find((row) => row.id === deletableTask.id)?.deletedAt).not.toBeNull();
   });
 
   it("preserves tenant scope when mutating tasks on completed jobs", async () => {
-    const { company, job } = createContext();
+    const { company, actor, job } = createContext();
     const otherCompany = fakeDb.seedCompany({ name: "Other Co", slug: "other-co" });
     fakeDb.getTestState().jobs.find((row) => row.id === job.id)!.status = "completed";
     const task = fakeDb.seedJobTask({
@@ -293,9 +297,73 @@ describe("job-tasks.service", () => {
     });
 
     await expect(
-      jobTasksService.updateTask(otherCompany.id, job.id, task.id, { title: "Cross-tenant edit" })
+      jobTasksService.updateTask(otherCompany.id, taskActor(actor), job.id, task.id, { title: "Cross-tenant edit" })
     ).rejects.toMatchObject({ code: ErrorCode.NOT_FOUND });
 
     expect(fakeDb.getTestState().jobTasks.find((row) => row.id === task.id)?.title).toBe("Tenant-owned task");
+  });
+
+  it("revalidates technician linkage and current assignment for every task mutation", async () => {
+    const company = fakeDb.seedCompany({ name: "Field Co", slug: "field-co" });
+    const technicianUser = fakeDb.seedUser({
+      companyId: company.id,
+      email: "field-tech@example.com",
+      firstName: "Terry",
+      lastName: "Tech",
+      role: "technician"
+    });
+    const customer = fakeDb.seedCustomer({ companyId: company.id, firstName: "Casey", lastName: "Client" });
+    const originalTechnician = fakeDb.seedTechnician({
+      companyId: company.id,
+      userId: technicianUser.id,
+      firstName: "Terry",
+      lastName: "Tech",
+      phone: "555-0101"
+    });
+    const replacement = fakeDb.seedTechnician({
+      companyId: company.id,
+      firstName: "Riley",
+      lastName: "Replacement",
+      phone: "555-0102"
+    });
+    const job = fakeDb.seedJob({
+      companyId: company.id,
+      customerId: customer.id,
+      technicianId: originalTechnician.id,
+      title: "Reassigned checklist"
+    });
+    const first = fakeDb.seedJobTask({ companyId: company.id, jobId: job.id, title: "First", sortOrder: 0 });
+    const second = fakeDb.seedJobTask({ companyId: company.id, jobId: job.id, title: "Second", sortOrder: 1 });
+
+    // Simulate reassignment after route prehandlers accepted the technician's stale request.
+    fakeDb.getTestState().jobs.find((row) => row.id === job.id)!.technicianId = replacement.id;
+    const staleActor = { userId: technicianUser.id, role: "owner" as const };
+
+    await expect(
+      jobTasksService.createTask(company.id, staleActor, job.id, { title: "Unauthorized create" })
+    ).rejects.toMatchObject({ code: ErrorCode.FORBIDDEN });
+    await expect(
+      jobTasksService.updateTask(company.id, staleActor, job.id, first.id, { title: "Unauthorized update" })
+    ).rejects.toMatchObject({ code: ErrorCode.FORBIDDEN });
+    await expect(
+      jobTasksService.completeTask(company.id, staleActor, job.id, first.id)
+    ).rejects.toMatchObject({ code: ErrorCode.FORBIDDEN });
+    await expect(
+      jobTasksService.deleteTask(company.id, staleActor, job.id, first.id)
+    ).rejects.toMatchObject({ code: ErrorCode.FORBIDDEN });
+    await expect(
+      jobTasksService.reorderTasks(company.id, staleActor, job.id, [second.id, first.id])
+    ).rejects.toMatchObject({ code: ErrorCode.FORBIDDEN });
+
+    const state = fakeDb.getTestState();
+    expect(state.jobTasks).toHaveLength(2);
+    expect(state.jobTasks.find((row) => row.id === first.id)).toMatchObject({
+      title: "First",
+      status: "pending",
+      sortOrder: 0,
+      deletedAt: null
+    });
+    expect(state.jobTasks.find((row) => row.id === second.id)?.sortOrder).toBe(1);
+    expect(state.activityEvents).toHaveLength(0);
   });
 });

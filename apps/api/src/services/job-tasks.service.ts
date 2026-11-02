@@ -13,7 +13,8 @@ import {
   ErrorCode,
   type CreateTaskInput,
   type JobTask,
-  type UpdateTaskInput
+  type UpdateTaskInput,
+  type UserRole
 } from "@fsm/types";
 
 const MAX_RESULT_WINDOW = 10_000;
@@ -24,6 +25,11 @@ type TechnicianRow = typeof technicians.$inferSelect;
 type UserRow = typeof users.$inferSelect;
 type SelectExecutor = Pick<typeof db, "select">;
 type TransactionExecutor = Pick<typeof db, "select" | "insert" | "update">;
+
+export interface JobTaskActor {
+  userId: string;
+  role: UserRole;
+}
 
 function normalizeOptionalString(value: string | undefined): string | null | undefined {
   if (value === undefined) {
@@ -77,6 +83,46 @@ async function getActor(companyId: string, actorId: string, executor: SelectExec
     .limit(1);
 
   return actor ?? null;
+}
+
+async function assertTaskMutationAuthorized(
+  companyId: string,
+  actor: JobTaskActor,
+  job: JobRow,
+  executor: TransactionExecutor
+): Promise<UserRow> {
+  const [currentUser] = await executor
+    .select()
+    .from(users)
+    .where(and(eq(users.companyId, companyId), eq(users.id, actor.userId), isNull(users.deletedAt)))
+    .for("update")
+    .limit(1);
+
+  if (!currentUser) {
+    throw new AppError(ErrorCode.NOT_FOUND, "User not found");
+  }
+  if (currentUser.role !== "technician") {
+    return currentUser;
+  }
+
+  const [linkedTechnician] = await executor
+    .select({ id: technicians.id })
+    .from(technicians)
+    .where(
+      and(
+        eq(technicians.companyId, companyId),
+        eq(technicians.userId, currentUser.id),
+        isNull(technicians.deletedAt)
+      )
+    )
+    .for("update")
+    .limit(1);
+
+  if (!linkedTechnician || linkedTechnician.id !== job.technicianId) {
+    throw new AppError(ErrorCode.FORBIDDEN, "Only the assigned technician can modify this job's checklist");
+  }
+
+  return currentUser;
 }
 
 async function getJobRow(companyId: string, jobId: string, executor: SelectExecutor): Promise<JobRow> {
@@ -221,11 +267,17 @@ export async function listTasks(companyId: string, jobId: string): Promise<JobTa
   return sortTasks(rows).map((row) => toJobTask(row));
 }
 
-export async function createTask(companyId: string, jobId: string, input: CreateTaskInput): Promise<JobTask> {
+export async function createTask(
+  companyId: string,
+  actor: JobTaskActor,
+  jobId: string,
+  input: CreateTaskInput
+): Promise<JobTask> {
   const normalizedInput = normalizeCreateTaskInput(input);
 
   return db.transaction(async (tx) => {
     const job = await getJobRowForUpdate(companyId, jobId, tx);
+    await assertTaskMutationAuthorized(companyId, actor, job, tx);
     assertNoOpenRequiredTaskOnCompletedJob(job, {
       isRequired: normalizedInput.isRequired,
       status: "pending"
@@ -262,15 +314,17 @@ export async function createTask(companyId: string, jobId: string, input: Create
 
 export async function updateTask(
   companyId: string,
+  actor: JobTaskActor,
   jobId: string,
   taskId: string,
   input: UpdateTaskInput
 ): Promise<JobTask> {
-  return db.transaction((tx) => updateTaskInTransaction(tx, companyId, jobId, taskId, input));
+  return db.transaction((tx) => updateTaskInTransaction(tx, actor, companyId, jobId, taskId, input));
 }
 
 export async function updateTaskInTransaction(
   executor: TransactionExecutor,
+  actor: JobTaskActor,
   companyId: string,
   jobId: string,
   taskId: string,
@@ -278,6 +332,7 @@ export async function updateTaskInTransaction(
 ): Promise<JobTask> {
   const normalizedInput = normalizeUpdateTaskInput(input);
   const job = await getJobRowForUpdate(companyId, jobId, executor);
+  await assertTaskMutationAuthorized(companyId, actor, job, executor);
   const existingTask = await getTaskRow(companyId, jobId, taskId, executor);
   await assertTechnicianBelongsToCompany(companyId, normalizedInput.assignedToId, executor);
 
@@ -327,13 +382,13 @@ export async function updateTaskInTransaction(
 
 export async function completeTask(
   companyId: string,
+  actor: JobTaskActor,
   jobId: string,
-  taskId: string,
-  actorId: string
+  taskId: string
 ): Promise<JobTask> {
   return db.transaction(async (tx) => {
     const job = await getJobRowForUpdate(companyId, jobId, tx);
-    await getActor(companyId, actorId, tx);
+    await assertTaskMutationAuthorized(companyId, actor, job, tx);
     const existingTask = await getTaskRow(companyId, jobId, taskId, tx);
 
     if (existingTask.status === "completed") {
@@ -345,7 +400,7 @@ export async function completeTask(
       .set({
         status: "completed",
         completedAt: existingTask.completedAt ?? new Date(),
-        completedById: actorId,
+        completedById: actor.userId,
         updatedAt: new Date()
       })
       .where(and(eq(jobTasks.companyId, companyId), eq(jobTasks.jobId, jobId), eq(jobTasks.id, taskId), isNull(jobTasks.deletedAt)))
@@ -355,15 +410,21 @@ export async function completeTask(
       throw new AppError(ErrorCode.INTERNAL_ERROR, "Failed to complete task");
     }
 
-    await emitTaskCompletedEvent(tx, job, task, actorId);
+    await emitTaskCompletedEvent(tx, job, task, actor.userId);
 
     return toJobTask(task);
   });
 }
 
-export async function deleteTask(companyId: string, jobId: string, taskId: string): Promise<void> {
+export async function deleteTask(
+  companyId: string,
+  actor: JobTaskActor,
+  jobId: string,
+  taskId: string
+): Promise<void> {
   await db.transaction(async (tx) => {
-    await getJobRowForUpdate(companyId, jobId, tx);
+    const job = await getJobRowForUpdate(companyId, jobId, tx);
+    await assertTaskMutationAuthorized(companyId, actor, job, tx);
     await getTaskRow(companyId, jobId, taskId, tx);
     await tx
       .update(jobTasks)
@@ -375,9 +436,15 @@ export async function deleteTask(companyId: string, jobId: string, taskId: strin
   });
 }
 
-export async function reorderTasks(companyId: string, jobId: string, orderedIds: string[]): Promise<void> {
+export async function reorderTasks(
+  companyId: string,
+  actor: JobTaskActor,
+  jobId: string,
+  orderedIds: string[]
+): Promise<void> {
   await db.transaction(async (tx) => {
     const job = await getJobRowForUpdate(companyId, jobId, tx);
+    await assertTaskMutationAuthorized(companyId, actor, job, tx);
     const tasks = await listTaskRows(companyId, jobId, tx);
     const activeTasks = sortTasks(tasks);
 

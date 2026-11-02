@@ -313,7 +313,7 @@ export async function updateMobileChecklistItem(
   if (input.recordVersion !== undefined && input.recordVersion !== buildRecordVersionV1("job_task", task.id, task.updatedAt)) {
     throw new MobileVersionConflictError(toMobileChecklistItem(task));
   }
-  await updateTask(actor.companyId, jobId, taskId, {
+  await updateTask(actor.companyId, actor, jobId, taskId, {
     ...(input.status !== undefined ? { status: input.status } : {}),
     ...(input.notes !== undefined ? { notes: input.notes } : {}),
     ...(input.actualMinutes !== undefined ? { actualMinutes: input.actualMinutes } : {})

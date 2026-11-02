@@ -73,34 +73,6 @@ export function TabletJobsList({ jobs, technicianName, jobCountLabel }: TabletJo
         </header>
 
         <div className="rounded-[32px] border border-neutral-200 bg-white px-6 py-6 shadow-[0_24px_80px_rgba(16,33,99,0.08)]">
-          <div className="mb-6 flex items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              {["Clock In", "On The Way", "Job Started", "Complete", "Invoice"].map((step, index) => {
-                const active = index < 3;
-                const current = index === 2;
-
-                return (
-                  <div key={step} className="flex items-center gap-3">
-                    <div
-                      className={cn(
-                        "flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold",
-                        active ? "bg-success text-white" : "bg-neutral-100 text-neutral-400",
-                        current && "bg-brand-accent text-white"
-                      )}
-                    >
-                      {index + 1}
-                    </div>
-                    <span className={cn("text-xs font-medium", active ? "text-neutral-900" : "text-neutral-400")}>
-                      {step}
-                    </span>
-                    {index < 4 ? <span className="h-px w-8 bg-neutral-200" /> : null}
-                  </div>
-                );
-              })}
-            </div>
-            <p className="text-sm font-semibold text-success">{jobCountLabel}</p>
-          </div>
-
           <div className="grid gap-4 md:grid-cols-2">
             {jobs.map((job) => (
               <article
@@ -119,7 +91,7 @@ export function TabletJobsList({ jobs, technicianName, jobCountLabel }: TabletJo
                         {getStatusLabel(job.status)}
                       </span>
                       <span className="rounded-full bg-brand-accent-light px-2.5 py-1 text-xs font-semibold text-brand-accent">
-                        {job.assetId ? "Carrier HVAC Unit · Aging" : job.priority.replaceAll("_", " ")}
+                        Priority: {job.priority.replaceAll("_", " ")}
                       </span>
                     </div>
                     <p className="text-xs font-semibold uppercase tracking-[0.24em] text-neutral-400">

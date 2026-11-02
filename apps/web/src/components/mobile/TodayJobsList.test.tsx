@@ -84,10 +84,14 @@ describe("Today jobs summary", () => {
 
   it("shows the visible count on tablet without claiming the page is the full day", () => {
     useBreakpoint.mockReturnValue({ isTablet: true });
+    useJobsList.mockReturnValue({ data: { data: [{ ...job, assetId: "asset-1" }] }, isLoading: false, isError: false });
     render(<TodayJobsList />);
 
     expect(screen.getAllByText("1 job shown").length).toBeGreaterThan(0);
     expect(document.body.textContent).not.toMatch(/\$|potential|scheduled stops/i);
+    expect(screen.getByText("Priority: normal")).toBeTruthy();
+    expect(document.body.textContent).not.toContain("Carrier HVAC Unit");
+    expect(document.body.textContent).not.toContain("Clock In");
   });
 
   it("shows an actionable profile state when no technician is found", () => {

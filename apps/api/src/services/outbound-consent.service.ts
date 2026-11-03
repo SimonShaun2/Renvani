@@ -145,7 +145,9 @@ async function recordVerifiedDecisionInTransaction(
     if (input.decision === "grant" && subject.doNotContact) {
       throw new AppError(ErrorCode.CONSENT_REQUIRED, "Current contact restriction blocks grant");
     }
-    const [prior] = await tx.select().from(outboundConsentStates).where(keyWhere(key)).limit(1).for("update");
+    const [prior] = await tx.select().from(outboundConsentStates).where(and(
+      eq(outboundConsentStates.companyId, actor.companyId), keyWhere(key),
+    )).limit(1).for("update");
     const version = (prior?.version ?? 0) + 1;
     const state = input.decision === "grant" ? "granted" : "revoked";
     const eventId = randomUUID();
@@ -162,7 +164,7 @@ async function recordVerifiedDecisionInTransaction(
         state, version, decidedAt: event.occurredAt, sourceKind: input.sourceKind,
         sourceRecordId: input.sourceRecordId, statementVersion: input.statementVersion,
         lastEventId: eventId, updatedAt: event.occurredAt,
-      }).where(keyWhere(key));
+      }).where(and(eq(outboundConsentStates.companyId, actor.companyId), keyWhere(key)));
     } else {
       await tx.insert(outboundConsentStates).values({
         ...key, state, version, decidedAt: event.occurredAt, sourceKind: input.sourceKind,
@@ -236,7 +238,9 @@ export async function checkOutboundConsent(companyId: string, rawKey: unknown, e
   return runTransactionWithTenantSession(companyId, async (tx) => {
     const checkedAt = new Date();
     const subject = await loadActiveSubject(tx, key);
-    const [state] = await tx.select().from(outboundConsentStates).where(keyWhere(key)).limit(1);
+    const [state] = await tx.select().from(outboundConsentStates).where(and(
+      eq(outboundConsentStates.companyId, companyId), keyWhere(key),
+    )).limit(1);
     return evaluateCurrentOutboundConsent({
       key, subject, state: state ?? null, checkedAt,
       ...(expectedVersion === undefined ? {} : { expectedVersion }),

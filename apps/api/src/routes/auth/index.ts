@@ -1,4 +1,12 @@
-import type { FastifyPluginAsync } from "fastify";
+import type { FastifyPluginAsync, FastifyReply, FastifyRequest } from "fastify";
+
+import {
+  checkAuthForgotPasswordIpRateLimit,
+  checkAuthLoginIpRateLimit,
+  checkAuthLoginRateLimit,
+  checkAuthRefreshIpRateLimit,
+  checkAuthRegisterIpRateLimit
+} from "../../lib/public-booking-rate-limit.js";
 
 import {
   forgotPasswordHandler,
@@ -6,7 +14,8 @@ import {
   logoutHandler,
   refreshHandler,
   registerHandler,
-  resetPasswordHandler
+  resetPasswordHandler,
+  verifyEmailHandler
 } from "./handlers.js";
 import {
   forgotPasswordRouteSchema,
@@ -20,18 +29,65 @@ import {
   registerRouteSchema,
   registerValidation,
   resetPasswordRouteSchema,
-  resetPasswordValidation
+  resetPasswordValidation,
+  verifyEmailRouteSchema,
+  verifyEmailValidation
 } from "./schemas.js";
 
+async function sendRateLimited(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+  await reply.status(429).send({
+    error: "RATE_LIMITED",
+    message: "Too many attempts. Please try again later.",
+    requestId: request.id
+  });
+}
+
+async function registerRateLimit(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+  if (!(await checkAuthRegisterIpRateLimit(request.ip))) {
+    await sendRateLimited(request, reply);
+  }
+}
+
+async function loginRateLimit(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+  const body = request.body as { email?: unknown } | undefined;
+  const email = typeof body?.email === "string" ? body.email : "";
+  if (!(await checkAuthLoginIpRateLimit(request.ip)) || !(await checkAuthLoginRateLimit(request.ip, email))) {
+    await sendRateLimited(request, reply);
+  }
+}
+
+async function refreshRateLimit(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+  if (!(await checkAuthRefreshIpRateLimit(request.ip))) {
+    await sendRateLimited(request, reply);
+  }
+}
+
+async function forgotPasswordRateLimit(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+  if (!(await checkAuthForgotPasswordIpRateLimit(request.ip))) {
+    await sendRateLimited(request, reply);
+  }
+}
+
+async function verifyEmailRateLimit(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+  if (!(await checkAuthLoginIpRateLimit(request.ip))) {
+    await sendRateLimited(request, reply);
+  }
+}
+
 const authRoutes: FastifyPluginAsync = async (fastify) => {
-  fastify.post("/register", { preValidation: [registerValidation], schema: registerRouteSchema }, registerHandler);
-  fastify.post("/login", { preValidation: [loginValidation], schema: loginRouteSchema }, loginHandler);
-  fastify.post("/refresh", { preValidation: [refreshValidation], schema: refreshRouteSchema }, refreshHandler);
+  fastify.post("/register", { onRequest: [registerRateLimit], preValidation: [registerValidation], schema: registerRouteSchema }, registerHandler);
+  fastify.post("/login", { preValidation: [loginRateLimit, loginValidation], schema: loginRouteSchema }, loginHandler);
+  fastify.post("/refresh", { onRequest: [refreshRateLimit], preValidation: [refreshValidation], schema: refreshRouteSchema }, refreshHandler);
   fastify.post("/logout", { preValidation: [logoutValidation], schema: logoutRouteSchema }, logoutHandler);
   fastify.post(
     "/forgot-password",
-    { preValidation: [forgotPasswordValidation], schema: forgotPasswordRouteSchema },
+    { onRequest: [forgotPasswordRateLimit], preValidation: [forgotPasswordValidation], schema: forgotPasswordRouteSchema },
     forgotPasswordHandler
+  );
+  fastify.post(
+    "/verify-email",
+    { onRequest: [verifyEmailRateLimit], preValidation: [verifyEmailValidation], schema: verifyEmailRouteSchema },
+    verifyEmailHandler
   );
   fastify.post(
     "/reset-password",

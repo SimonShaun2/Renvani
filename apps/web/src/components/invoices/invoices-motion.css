@@ -1,0 +1,15 @@
+/* Feature-scoped motion for the invoices list (frame 10:752). */
+@keyframes invoice-row-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.invoice-row-in {
+  animation: invoice-row-in 220ms ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .invoice-row-in {
+    animation: none;
+  }
+}

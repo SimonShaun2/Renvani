@@ -1,5 +1,6 @@
 "use client";
 
+import { SETTINGS_FEE_COPY, serviceFeePercentLabel } from "@/src/lib/service-fee-copy";
 import { CreditCard, ExternalLink, Loader2 } from "lucide-react";
 
 import { PageLayout } from "@/src/components/layout/PageLayout";
@@ -7,6 +8,7 @@ import { SkeletonCard } from "@/src/components/ui/SkeletonCard";
 import { StatBadge } from "@/src/components/ui/StatBadge";
 import { getStoredSession } from "@/src/lib/auth";
 import { ApiError } from "@/src/lib/api";
+import { StripeConnectEmbedded } from "@/src/components/stripe/StripeConnectEmbedded";
 import {
   useStartStripeConnect,
   useStripeConnectStatus,
@@ -79,7 +81,7 @@ export default function SettingsPaymentsPage() {
     return (
       <PageLayout
         title="Payments"
-        subtitle="Monitor Stripe Connect onboarding, payouts, and the ServiceRev transaction fee."
+        subtitle="Connect payouts and payments inside Renvani — Stripe appears only for required verification."
       >
         <section className="rounded-[30px] border border-neutral-200 bg-white px-6 py-12 text-center shadow-sm">
           <h2 className="text-xl font-semibold tracking-tight text-neutral-900">Payments unavailable</h2>
@@ -91,11 +93,13 @@ export default function SettingsPaymentsPage() {
 
   const status = statusQuery.data;
   const actionPending = startConnect.isPending || dashboardLink.isPending;
+  const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? "";
+  const preferEmbeddedConnect = publishableKey.length > 0;
 
   return (
     <PageLayout
       title="Payments"
-      subtitle="Monitor Stripe Connect onboarding, payouts, and the ServiceRev transaction fee."
+      subtitle="Connect payouts and payments inside Renvani — Stripe appears only for required verification."
       actions={
         status.connected ? (
           <button
@@ -109,7 +113,7 @@ export default function SettingsPaymentsPage() {
             {dashboardLink.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <ExternalLink className="h-4 w-4" />}
             Stripe Dashboard
           </button>
-        ) : (
+        ) : preferEmbeddedConnect ? null : (
           <button
             type="button"
             onClick={() => {
@@ -119,7 +123,7 @@ export default function SettingsPaymentsPage() {
             className="inline-flex min-h-11 items-center gap-2 rounded-full bg-brand-accent px-5 text-sm font-semibold text-white transition hover:bg-brand-primary disabled:cursor-not-allowed disabled:opacity-60"
           >
             {startConnect.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <CreditCard className="h-4 w-4" />}
-            Connect Stripe
+            Connect payouts
           </button>
         )
       }
@@ -135,8 +139,8 @@ export default function SettingsPaymentsPage() {
                 </div>
                 <p className="mt-2 text-sm text-neutral-500">
                   {status.connected
-                    ? "Customer payments flow through your connected Stripe account."
-                    : "Connect Stripe to accept payments, create payout schedules, and settle invoices online."}
+                    ? "Customer payments are collected in Renvani and settled to your connected account."
+                    : "Complete verification below to accept payments and payouts without leaving Renvani."}
                 </p>
               </div>
               {!canManagePayments ? (
@@ -159,17 +163,33 @@ export default function SettingsPaymentsPage() {
                 <p className="mt-1 text-xs text-neutral-500">{status.lastPayoutAt ? new Date(status.lastPayoutAt).toLocaleDateString("en-US") : "No payout recorded yet"}</p>
               </div>
               <div className="rounded-[24px] border border-neutral-200 bg-neutral-50 px-4 py-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-400">Platform fee</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-400">{SETTINGS_FEE_COPY.heading}</p>
                 <p className="mt-2 text-lg font-semibold text-neutral-950">
-                  {status.platformFeePercent != null ? `${status.platformFeePercent.toFixed(1)}%` : "Unavailable"}
+                  {status.platformFeePercent != null && status.platformFeePercent > 0
+                    ? serviceFeePercentLabel(status.platformFeePercent)
+                    : status.renvaniPlanTier === "flat"
+                      ? SETTINGS_FEE_COPY.flatValue
+                      : SETTINGS_FEE_COPY.unsetValue}
                 </p>
                 <p className="mt-1 text-xs text-neutral-500">
-                  {status.platformFeePercent != null
-                    ? "ServiceRev charges this percentage per transaction."
-                    : "Platform fee details will appear after payments are configured."}
+                  {status.platformFeePercent != null && status.platformFeePercent > 0
+                    ? SETTINGS_FEE_COPY.flexHint
+                    : status.renvaniPlanTier === "flat"
+                      ? SETTINGS_FEE_COPY.flatHint
+                      : SETTINGS_FEE_COPY.unsetHint}
                 </p>
               </div>
             </div>
+
+            {!status.connected && preferEmbeddedConnect && canManagePayments ? (
+              <div className="mt-6">
+                <StripeConnectEmbedded
+                  onComplete={() => {
+                    void statusQuery.refetch();
+                  }}
+                />
+              </div>
+            ) : null}
           </section>
 
           <section className="rounded-[30px] border border-neutral-200 bg-white px-6 py-6 shadow-sm">

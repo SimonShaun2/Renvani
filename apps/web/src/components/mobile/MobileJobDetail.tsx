@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { ArrowLeft, CarFront, MapPinned, Phone, Sparkles } from "lucide-react";
+import { CarFront, Sparkles } from "lucide-react";
 
 import { EmptyState } from "@/src/components/ui/EmptyState";
 import { SkeletonCard } from "@/src/components/ui/SkeletonCard";
@@ -27,12 +27,14 @@ import {
   buildTimeSummary,
   formatDurationMinutes,
   formatElapsedSeconds,
-  formatStatusLabel,
   getAssetBadge,
   getCompanyTaxRate
 } from "@/src/components/jobs/jobs.utils";
 
+import { CrewChecklist } from "./CrewChecklist";
+import { getCrewStatusLabel, getCrewStatusTone } from "./crew-job.utils";
 import { JobActionBar } from "./JobActionBar";
+import { MobileJobNoteComposer } from "./MobileJobNoteComposer";
 import { TabletJobDetail } from "./tablet/TabletJobDetail";
 
 type MobileJobTab = "details" | "tasks" | "products" | "files";
@@ -50,19 +52,6 @@ function getTabFromSearchParam(value: string | null): MobileJobTab {
   }
 
   return "details";
-}
-
-function getAssetTone(tone: "green" | "orange" | "red" | "gray") {
-  switch (tone) {
-    case "red":
-      return "bg-error-light text-error";
-    case "orange":
-      return "bg-warning-light text-warning";
-    case "green":
-      return "bg-success-light text-success";
-    default:
-      return "bg-neutral-100 text-neutral-500";
-  }
 }
 
 function MobileTimeCard({
@@ -247,24 +236,22 @@ export function MobileJobDetail({ jobId }: { jobId: string }) {
   }
 
   return (
-    <div className="min-h-[100svh] overflow-x-hidden bg-[#F5F7FB] px-4 py-4 pb-32">
+    <div className="min-h-[100svh] overflow-x-hidden bg-[#fbf6ef] px-4 py-4 pb-32">
       <div className="mx-auto w-full max-w-[390px] space-y-4">
-        <header className="rounded-[28px] bg-brand-primary px-4 py-4 text-white shadow-[0_22px_60px_rgba(16,33,99,0.18)]">
-          <Link href="/mobile/jobs" className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-white/80">
-            <ArrowLeft className="h-4 w-4" />
-            Back to Jobs
-          </Link>
-          <div className="mt-2 flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <h1 className="truncate text-[1.75rem] font-semibold tracking-tight text-white">{job.title}</h1>
-              <p className="mt-1 text-sm text-white/70">
-                {job.customer.firstName} {job.customer.lastName} · {job.property?.addressLine1 ?? "Property pending"}
-              </p>
-            </div>
-            <span className="shrink-0 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white">
-              {formatStatusLabel(job.status)}
+        <header className="space-y-3">
+          <div className="flex items-center gap-3">
+            <Link href="/mobile/jobs" className="inline-flex min-h-11 items-center text-sm text-[#5e6684]">
+              ‹ Today
+            </Link>
+            <span className={cn("inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold", getCrewStatusTone(job.status))}>
+              <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-current" />
+              {getCrewStatusLabel(job.status)}
             </span>
           </div>
+          <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-[#0f1530]">{job.title}</h1>
+          <p className="text-sm text-[#5e6684]">
+            {[job.jobNumber, `${job.customer.firstName} ${job.customer.lastName}`.trim(), job.property?.addressLine1 ?? "Address pending"].join(" · ")}
+          </p>
         </header>
 
         <nav className="sticky top-3 z-10 -mx-1 overflow-x-auto px-1">
@@ -289,63 +276,34 @@ export function MobileJobDetail({ jobId }: { jobId: string }) {
         <div className="space-y-4">
           <div className={cn(activeTab === "details" ? "block" : "hidden")}>
             <div className="space-y-4">
-              <section className="rounded-[28px] border border-neutral-200 bg-white px-4 py-4 shadow-sm">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-400">Customer</p>
-                <h2 className="mt-2 text-xl font-semibold tracking-tight text-neutral-950">
-                  {job.customer.firstName} {job.customer.lastName}
-                </h2>
-                <p className="mt-1 text-sm text-neutral-500">
-                  {job.property?.addressLine1 ?? "Address pending"}{job.property ? `, ${job.property.city}, ${job.property.state}` : ""}
+              <section className="rounded-[14px] bg-[#0f1530] px-5 py-5 text-white">
+                <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-[#f6b400]">Work order</p>
+                <p className="mt-3 text-[17px] font-semibold leading-snug">
+                  {job.description ?? "No work order description yet."}
                 </p>
-                <div className="mt-4 grid grid-cols-2 gap-2">
-                  <a
-                    href={job.customer.phone ? `tel:${job.customer.phone}` : undefined}
-                    className={cn(
-                      "inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl text-sm font-semibold",
-                      job.customer.phone ? "bg-brand-accent text-white" : "bg-neutral-100 text-neutral-400"
-                    )}
-                  >
-                    <Phone className="h-4 w-4" />
-                    Call
-                  </a>
-                  <a
-                    href={`https://maps.google.com/?q=${encodeURIComponent(
-                      `${job.property?.addressLine1 ?? ""}, ${job.property?.city ?? ""}, ${job.property?.state ?? ""}`
-                    )}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl bg-white text-sm font-semibold text-neutral-700 ring-1 ring-neutral-200"
-                  >
-                    <MapPinned className="h-4 w-4" />
-                    Map
-                  </a>
-                </div>
+                <ul className="mt-3 space-y-2 text-sm text-white/85">
+                  {job.asset ? (
+                    <li>• {[job.asset.name, job.asset.model, assetBadge.installYear].filter(Boolean).join(" · ")}</li>
+                  ) : null}
+                  {job.property ? (
+                    <li>• {job.property.addressLine1}, {job.property.city}, {job.property.state}</li>
+                  ) : null}
+                </ul>
               </section>
 
-              <section className="rounded-[28px] border border-neutral-200 bg-white px-4 py-4 shadow-sm">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-400">Asset</p>
-                <div className="mt-2 flex items-start justify-between gap-3">
-                  <div>
-                    <h2 className="text-lg font-semibold text-neutral-950">{job.asset?.name ?? "Equipment"}</h2>
-                    <p className="mt-1 text-sm text-neutral-500">
-                      {(job.asset?.model ?? "Model pending")} · {assetBadge.installYear}
-                    </p>
-                  </div>
-                  <span className={cn("rounded-full px-3 py-1 text-xs font-semibold", getAssetTone(assetBadge.tone))}>
-                    {assetBadge.label}
-                  </span>
-                </div>
-              </section>
+              <CrewChecklist jobId={job.id} tasks={tasks} label="Checklist" emptyText="No checklist items on this job." />
 
-              <section className="rounded-[28px] border border-neutral-200 bg-white px-4 py-4 shadow-sm">
-                <div className="flex items-center justify-between gap-3">
-                  <p className="text-sm font-semibold text-neutral-950">Notes</p>
-                  <span className="text-xs font-semibold text-brand-accent">✎ Edit</span>
-                </div>
-                <p className="mt-3 text-sm leading-6 text-neutral-600">
-                  {job.description ?? "Customer reported issue and technician notes will show here as the job progresses."}
-                </p>
-                {job.techNotes ? <p className="mt-3 rounded-[20px] bg-neutral-50 px-3 py-3 text-sm text-neutral-500">{job.techNotes}</p> : null}
+              <section className="rounded-[14px] border border-[#e6dccb] bg-white px-5 py-5">
+                <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-[#5e6684]">Notes · visible to office</p>
+                {job.techNotes ? <p className="mt-3 text-[15px] text-[#0f1530]">{job.techNotes}</p> : null}
+                <MobileJobNoteComposer jobId={job.id} />
+                <button
+                  type="button"
+                  onClick={() => handleTabChange("files")}
+                  className="mt-2 inline-flex min-h-11 items-center text-sm font-semibold text-[#2d4bd8]"
+                >
+                  + Add photo or note
+                </button>
               </section>
 
               <MobileTimeCard jobId={job.id} technicianId={job.technicianId} />
@@ -382,7 +340,7 @@ export function MobileJobDetail({ jobId }: { jobId: string }) {
         </div>
       </div>
 
-      <JobActionBar jobId={job.id} status={job.status} />
+      <JobActionBar jobId={job.id} status={job.status} onAddParts={() => handleTabChange("products")} />
     </div>
   );
 }

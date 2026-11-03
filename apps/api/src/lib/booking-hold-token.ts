@@ -45,6 +45,61 @@ export function verifyBookingHoldToken(token: string): BookingHoldTokenPayload {
   }
 }
 
+export type BookingHoldTokenInspectionStatus = "valid" | "expired" | "invalid";
+
+export interface BookingHoldTokenInspection {
+  status: BookingHoldTokenInspectionStatus;
+  referenceNumber: string | null;
+  bookingRequestId: string | null;
+  companyId: string | null;
+  expiresAt: string | null;
+}
+
+export function inspectBookingHoldToken(token: string): BookingHoldTokenInspection {
+  try {
+    const decoded = jwt.verify(token, env.BOOKING_HOLD_TOKEN_SECRET);
+    const claims = bookingHoldTokenPayloadSchema.parse(decoded);
+    return {
+      status: "valid",
+      referenceNumber: claims.referenceNumber,
+      bookingRequestId: claims.bookingRequestId,
+      companyId: claims.companyId,
+      expiresAt: null
+    };
+  } catch (error) {
+    if (error instanceof jwt.TokenExpiredError) {
+      const decoded = jwt.decode(token);
+      const parsed = bookingHoldTokenPayloadSchema.safeParse(decoded);
+
+      if (!parsed.success) {
+        return {
+          status: "invalid",
+          referenceNumber: null,
+          bookingRequestId: null,
+          companyId: null,
+          expiresAt: null
+        };
+      }
+
+      return {
+        status: "expired",
+        referenceNumber: parsed.data.referenceNumber,
+        bookingRequestId: parsed.data.bookingRequestId,
+        companyId: parsed.data.companyId,
+        expiresAt: error.expiredAt.toISOString()
+      };
+    }
+
+    return {
+      status: "invalid",
+      referenceNumber: null,
+      bookingRequestId: null,
+      companyId: null,
+      expiresAt: null
+    };
+  }
+}
+
 function shouldReleaseHoldTokenClaim(error: unknown): boolean {
   if (!(error instanceof AppError)) {
     return true;

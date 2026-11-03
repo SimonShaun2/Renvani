@@ -9,17 +9,32 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./enqueue-migrate-file-batch": {
+      "types": "./dist/enqueue-migrate-file-batch.d.ts",
+      "import": "./dist/enqueue-migrate-file-batch.js"
+    },
+    "./enqueue-import-chunk-commit": {
+      "types": "./dist/enqueue-import-chunk-commit.d.ts",
+      "import": "./dist/enqueue-import-chunk-commit.js"
+    },
+    "./migrate-file-batch-trace-log": {
+      "types": "./dist/migrate-file-batch-trace-log.d.ts",
+      "import": "./dist/migrate-file-batch-trace-log.js"
     }
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "lint": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:import-contracts": "vitest run src/import-pipeline.contract.test.ts"
   },
   "dependencies": {
     "@fsm/config": "workspace:*",
     "@fsm/types": "workspace:*",
     "bullmq": "^5.0.0",
+    "pino": "^9.4.0",
+    "zod": "^3.25.76",
     "ioredis": "^5.4.0"
   },
   "devDependencies": {

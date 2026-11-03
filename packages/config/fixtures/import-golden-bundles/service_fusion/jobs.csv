@@ -1,0 +1,4 @@
+Job ID,Customer ID,Completed Date,Description,Status
+SF-JOB-001,SF-CUST-001,2024-03-15,Furnace tune-up,Completed
+SF-JOB-002,SF-CUST-001,2025-08-20,AC repair,Completed
+SF-JOB-003,SF-CUST-002,2026-07-01,Heat pump install,Completed

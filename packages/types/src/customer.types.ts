@@ -1,3 +1,16 @@
+export interface CustomerNote {
+  id: string;
+  companyId: string;
+  customerId: string;
+  authorId: string | null;
+  content: string;
+  isInternal: boolean;
+  notedAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date | null;
+}
+
 export interface Customer {
   id: string;
   companyId: string;

@@ -49,3 +49,4 @@ Use [ADR-TEMPLATE.md](ADR-TEMPLATE.md) for new records.
 | [ADR-FS-41](ADR-FS-41-renvani-sor-integrations-addendum.md) | Renvani SoR, CSV/import-only, integration non-goals | **Proposed** | Tech Lead | FS-41 |
 | [ADR-FS-93](ADR-FS-93-managed-platform-boundaries.md) | Managed platform boundaries (Option A) | **Accepted** (founder); PO + Security ACK pending | Tech Lead | FS-93 |
 | [ADR-FS-MIGRATE](ADR-FS-MIGRATE-import-lineage.md) | Import lineage (`source_system`/`source_id`), business timestamps, chunk idempotency | **Accepted** | Tech Lead | FS-MIGRATE |
+| [ADR-FS-STACK](ADR-FS-STACK-renvani-official-platform.md) | Official platform stack (Neon, Clerk, Resend, Sentry, PostHog, Langfuse) | **Proposed** | Tech Lead | STACK |

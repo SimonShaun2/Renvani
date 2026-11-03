@@ -1,6 +1,6 @@
 # Environment boundary matrix
 
-**FS-75** · Provider-neutral · Physical mapping **blocked on FS-93**.
+**FS-75** · Updated for [official stack](../../OFFICIAL-OPERATIONAL-STACK.md) · Neon + Render + Vercel (STACK-11).
 
 ## Deployment tiers
 
@@ -16,7 +16,7 @@
 
 | Dimension | Development | Staging | Production |
 |-----------|-------------|---------|------------|
-| `DATABASE_URL` | Local or disposable | **Unique** URL; never prod | Prod URL |
+| `DATABASE_URL` | Local or disposable | **Neon staging branch**; never prod; optional **per-PR** Neon branch in CI | **Neon prod** branch |
 | `REDIS_URL` | Local or disposable | **Unique** URL | Prod URL |
 | `R2_BUCKET_NAME` (or equivalent) | Dev bucket | **Staging-only** bucket | Prod bucket |
 | JWT / refresh secrets | Local | **Rotate independently** | Prod secrets |
@@ -51,6 +51,10 @@
 - Validator: `@fsm/config/deployment-environment` + `scripts/staging/validate-env-boundaries.mjs`
 - Full `env.ts` optional-field split for partial stacks: **FS-76 / env controls ticket** — not required to merge FS-75 doc slice.
 
-## FS-93 gate
+## FS-93 / ADR-FS-STACK gate
 
-Rows that name a **hosting provider**, **project ID**, or **IaC module** stay blank until FS-93 ADR assigns ownership. FS-75 may only add provider-neutral templates and validation rules.
+[ADR-FS-93](../../adr/ADR-FS-93-managed-platform-boundaries.md) is **Accepted** for Render compute, Vercel web, Render Key Value (BullMQ), and R2. [ADR-FS-STACK](../../adr/ADR-FS-STACK-renvani-official-platform.md) **partially supersedes** FS-93 for **PostgreSQL → Neon** and **staff identity → Clerk** (JWT remains in parallel until STACK-02 cutover).
+
+This matrix therefore **may name** those official providers in row labels and notes (Neon, Render, Vercel, R2, Clerk) — as this document already does for staging tiers.
+
+**Still out of scope for doc commits (founder / STACK provisioning):** live **project IDs**, **branch names**, **service IDs**, **DNS hostnames**, **IaC module paths**, and any **secret or connection string value**. Templates (`config/env/staging.env.example`, validators) stay placeholder-only with no real credentials.

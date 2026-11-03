@@ -17,7 +17,38 @@
 | FS-38 / FS-21 / FS-58 | Discover/Book hardening | [#88](https://github.com/SimonShaun2/Renvani/pull/88)–[#90](https://github.com/SimonShaun2/Renvani/pull/90) |
 | FS-72 | Repeat dry-run | [#91](https://github.com/SimonShaun2/Renvani/pull/91) |
 | Dispatch SSE | Serve | **#86 merged** → `9313130` on `dev` |
-| Planning | Shortest path + epic | [#93](https://github.com/SimonShaun2/Renvani/pull/93) |
+| Planning | Shortest path + epic | **#93 merged** → `c5fb3de` |
+| **STACK** | Official operational stack | [#97](https://github.com/SimonShaun2/Renvani/pull/97) |
+
+---
+
+## Official stack — migration tickets (prioritized for **2026-12-05 CT**)
+
+**Canonical:** [`docs/OFFICIAL-OPERATIONAL-STACK.md`](../OFFICIAL-OPERATIONAL-STACK.md) · **Gaps:** [`docs/platform/OFFICIAL-STACK-GAP-ANALYSIS.md`](../platform/OFFICIAL-STACK-GAP-ANALYSIS.md)  
+**Accounts:** Shaun creates (gap doc § accounts); agents wire env names only.  
+**FS-MIGRATE M1 (#92):** **not blocked** — ship presets on existing `DATABASE_URL`; Neon/Clerk run **in parallel**.  
+**Sequencing:** [gap doc § founder notes](../platform/OFFICIAL-STACK-GAP-ANALYSIS.md#founder-sequencing-notes-approved--include-in-tickets).
+
+| Priority | ID | Dev | Deliverable | Branch |
+| --- | --- | --- | --- | --- |
+| **P0** | **STACK-11** | **Ezra** | Staging matrix; Neon **per-PR branches** + region = Render API region | `cursor/stack-staging-env-1f27` |
+| **P0** | **STACK-12** | **Iris** | Render deploy/runbook (API region drives Neon region choice) | `cursor/stack-render-deploy-1f27` |
+| **P0** | **STACK-01** | **Iris** | Neon dev/staging URLs; co-located region; FS-80 pools (**no M1 gate**) | `cursor/stack-neon-env-1f27` |
+| **P0** | **STACK-02** | **Noah** | Clerk + **DB session tenant context** (`company_id` per request); JWT flag parallel | `cursor/stack-clerk-auth-1f27` |
+| **P0** | **STACK-03** | **Sam** | **Day-one** automated cross-tenant tests (CI); Clerk + app matrix (Sofia implements with Sam spec) | `cursor/stack-cross-tenant-ci-1f27` |
+| **P0** | **STACK-10** | **Sam** | RLS policies using session `company_id`; pairs with STACK-02 | `cursor/stack-rls-design-1f27` |
+| **P0** | **STACK-13** | **Aria** | **Stripe Billing** MVP subscriptions (test mode); Connect explicitly **deferred** | `cursor/stack-stripe-billing-mvp-1f27` |
+| **P0** | **STACK-05** | **Hana** | BullMQ queue monitoring + DLQ | `cursor/fs-migrate-queue-hardening-1f27` |
+| **P0** | **STACK-08** | **Leo** | `@fsm/comms` Resend adapter + channel-agnostic templates (email-first MVP); SMS stub only — **no Twilio/A2P** | `cursor/stack-email-first-comms-1f27` |
+| **P1** | **STACK-14** | **Aria** | Stripe **Connect** onboarding/payouts (after Billing unless Elena 12-05 escalation) | `cursor/stack-stripe-connect-1f27` |
+| **P1** | **STACK-04** | **Ezra** | Sentry + PostHog SDK | `cursor/stack-observability-1f27` |
+| **P1** | **STACK-07** | **Marcus** | Langfuse + eval hooks | `cursor/stack-langfuse-eval-1f27` |
+| **P1** | **STACK-06** | **Diego** | R2 per-env buckets | with file batch PR |
+| **P1** | **STACK-00** | **Ezra** | Doc sweep post-accept | `cursor/stack-doc-reconcile-1f27` |
+| — | **STACK-09** | **Shaun** | Stripe test keys; **Billing** live when approved; **A2P 10DLC** registration **start now**; HubSpot **free** tier | Founder only |
+| — | **Elena** | PO | Accept stack PR #97; confirm P0 fits **12-05** | Sign-off |
+
+*Grace:* **#92 M1** merges on its own train; stack **P0** in parallel — no rebase fights with FS-MIGRATE branches.
 
 ---
 
@@ -87,7 +118,8 @@
 | --- | --- |
 | [#88](https://github.com/SimonShaun2/Renvani/pull/88)–[#91](https://github.com/SimonShaun2/Renvani/pull/91) | Triple sign → `batch-ci` |
 | [#92](https://github.com/SimonShaun2/Renvani/pull/92) | Preset **catalog** for generic engine @ **`6268e44`** (re-sign after dev merge) |
-| [#93](https://github.com/SimonShaun2/Renvani/pull/93) | Epic + assignments |
+| [#95](https://github.com/SimonShaun2/Renvani/pull/95)–[#96](https://github.com/SimonShaun2/Renvani/pull/96) | ADR Accepted + 0026 lineage |
+| [#97](https://github.com/SimonShaun2/Renvani/pull/97) | Official operational stack + gap analysis |
 
 ---
 

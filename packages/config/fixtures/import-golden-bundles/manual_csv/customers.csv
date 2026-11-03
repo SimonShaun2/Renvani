@@ -1,0 +1,2 @@
+customer_id,firstname,lastname,email,phone,address,city,state,zip
+GEN-C-001,Alex,Generic,alex@example.test,(555) 070-7001,1 Template St,Columbus,OH,43004

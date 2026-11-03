@@ -2,14 +2,14 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Loader2, Plus, Search } from "lucide-react";
-import type { ProductCategory } from "@fsm/types";
+import type { PriceBookItemPickerSeed, ProductCategory } from "@fsm/types";
 
 import { Sheet } from "@/src/components/ui/Sheet";
 import { CurrencyDisplay } from "@/src/components/ui/CurrencyDisplay";
 import { EmptyState } from "@/src/components/ui/EmptyState";
 import { SkeletonCard } from "@/src/components/ui/SkeletonCard";
 import { StatBadge } from "@/src/components/ui/StatBadge";
-import { useProductSearch } from "@/src/hooks/jobs.hooks";
+import { usePriceBookItemSearch } from "@/src/hooks/price-book.hooks";
 
 const categoryOptions: Array<{ value: "all" | ProductCategory; label: string }> = [
   { value: "all", label: "All" },
@@ -24,20 +24,20 @@ const categoryOptions: Array<{ value: "all" | ProductCategory; label: string }> 
 interface ProductCatalogPickerProps {
   open: boolean;
   onClose: () => void;
-  onAddProduct: (productId: string) => Promise<void>;
+  onAddPriceBookItem: (item: PriceBookItemPickerSeed) => Promise<void>;
   pendingProductId: string | null;
 }
 
 export function ProductCatalogPicker({
   open,
   onClose,
-  onAddProduct,
+  onAddPriceBookItem,
   pendingProductId
 }: ProductCatalogPickerProps) {
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [category, setCategory] = useState<"all" | ProductCategory>("all");
-  const productSearch = useProductSearch(debouncedSearch);
+  const productSearch = usePriceBookItemSearch(debouncedSearch);
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
@@ -56,17 +56,27 @@ export function ProductCatalogPicker({
   }, [open]);
 
   const results = useMemo(() => {
-    const items = productSearch.data?.products ?? [];
+    const items = productSearch.data?.items ?? [];
 
-    return items.filter((product) => category === "all" || product.category === category);
-  }, [category, productSearch.data?.products]);
+    if (category === "all") {
+      return items;
+    }
+
+    return items.filter((product) => {
+      if (category === "service") {
+        return product.itemType === "service";
+      }
+
+      return product.itemType === category;
+    });
+  }, [category, productSearch.data?.items]);
 
   return (
     <Sheet
       open={open}
       onClose={onClose}
-      title="Product Catalog"
-      description="Search the catalog, filter by category, and add multiple products before you close the picker."
+      title="Price book"
+      description="Search imported price book items and add lines with description, price, and tax defaults."
     >
       <div className="space-y-5 px-6 py-6">
         <label className="flex items-center gap-2 rounded-full border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm text-neutral-500">
@@ -74,7 +84,7 @@ export function ProductCatalogPicker({
           <input
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="Search products"
+            placeholder="Search price book"
             className="w-full bg-transparent outline-none placeholder:text-neutral-400"
           />
         </label>
@@ -109,14 +119,14 @@ export function ProductCatalogPicker({
         ) : debouncedSearch.length < 2 ? (
           <EmptyState
             icon={Search}
-            title="Search the catalog"
-            subtitle="Type at least two characters to find pre-built services, labor, materials, and fees."
+            title="Search the price book"
+            subtitle="Type at least two characters to find imported services, labor, materials, and fees."
             compact
           />
         ) : results.length === 0 ? (
           <EmptyState
             icon={Search}
-            title="No matching products"
+            title="No matching price book items"
             subtitle="Try a different search or switch categories to widen the result set."
             compact
           />
@@ -124,14 +134,13 @@ export function ProductCatalogPicker({
           <div className="space-y-3">
             {results.map((product) => (
               <div
-                key={product.id}
+                key={product.priceBookItemId}
                 className="flex flex-col gap-3 rounded-[24px] border border-neutral-200 bg-white px-4 py-4 shadow-sm md:flex-row md:items-center md:justify-between"
               >
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <p className="text-sm font-semibold text-neutral-900">{product.name}</p>
-                    <StatBadge label={product.category} tone="neutral" />
-                    {product.unit ? <span className="text-xs text-neutral-400">{product.unit}</span> : null}
+                    <StatBadge label={product.itemType} tone="neutral" />
                   </div>
                   {product.description ? <p className="mt-1 text-sm text-neutral-500">{product.description}</p> : null}
                 </div>
@@ -140,13 +149,13 @@ export function ProductCatalogPicker({
                   <CurrencyDisplay value={product.unitPrice} className="text-sm font-semibold text-neutral-900" showCents />
                   <button
                     type="button"
-                    disabled={pendingProductId === product.id}
+                    disabled={pendingProductId === product.priceBookItemId}
                     onClick={() => {
-                      void onAddProduct(product.id);
+                      void onAddPriceBookItem(product);
                     }}
                     className="inline-flex items-center gap-2 rounded-full bg-brand-accent px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary disabled:cursor-not-allowed disabled:opacity-70"
                   >
-                    {pendingProductId === product.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                    {pendingProductId === product.priceBookItemId ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
                     Add
                   </button>
                 </div>

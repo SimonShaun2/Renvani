@@ -10,8 +10,5 @@ export async function getPublicPaymentLinkHandler(
   const params = request.params as TokenParams;
   const paymentLink = await getPublicInvoicePaymentLink(params.token);
 
-  return reply.send({
-    invoiceNumber: paymentLink.invoiceNumber,
-    paymentLinkUrl: paymentLink.paymentLinkUrl
-  });
+  return reply.send(paymentLink);
 }

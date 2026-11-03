@@ -1,0 +1,21 @@
+/* Estimate builder (Figma 10:604) – scoped motion; no globals. */
+[data-estimate-reveal] {
+  animation: estimate-reveal 220ms ease-out both;
+}
+
+@keyframes estimate-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-estimate-reveal] {
+    animation: none;
+  }
+}

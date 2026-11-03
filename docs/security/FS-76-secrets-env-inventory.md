@@ -43,7 +43,7 @@ Templates: `docs/env/templates/`. Least-privilege target matrix: § below.
 | `STRIPE_SECRET_KEY` | secret | — | `apps/api/src/lib/stripe.ts`; webhook Stripe middleware |
 | `STRIPE_WEBHOOK_SECRET` | secret | — | `apps/webhook/src/middleware/stripe-verify.ts` |
 | `STRIPE_CONNECT_CLIENT_ID` | secret | — | Schema + test fixtures; no app read site yet |
-| `STRIPE_PLATFORM_FEE_PERCENT` | config | — | `stripe.ts`, `stripe-connect.service.ts` |
+| `STRIPE_PLATFORM_FEE_PERCENT` | config | — | Legacy, required by `env.ts`; read only by `resolveConnectApplicationFeeFraction` (no customer-facing use; Service Fee = `SERVICE_FEE_RATE_BPS`) |
 | `OPENAI_API_KEY` | secret | — | `packages/ai`; worker `csv-import`, `ai-revenue` |
 | `TWILIO_ACCOUNT_SID` | secret | — | `apps/api/src/lib/sms.ts`; worker via API dist SMS |
 | `TWILIO_AUTH_TOKEN` | secret | — | `sms.ts`, `twilio-verify.ts` |
@@ -79,15 +79,16 @@ Templates: `docs/env/templates/`. Least-privilege target matrix: § below.
 | `REDIS_URL` | R | R | R | — | Distinct instance |
 | `JWT_*` / `BOOKING_HOLD_TOKEN_SECRET` | R | — | —¹ | — | Distinct per env |
 | `STRIPE_*` | R | R² | —¹ | — | Test vs live keys |
-| `OPENAI_API_KEY` | R | — | R | — | Separate keys recommended |
-| `TWILIO_*` | R | R³ | R¹ | — | Staging subaccount/test |
-| `SENDGRID_*` | R | — | R¹ | — | Per-env API keys |
+| `OPENAI_API_KEY` | O⁴ | — | O⁴ | — | Separate keys recommended |
+| `TWILIO_*` | O⁴ | O³⁴ | O¹⁴ | — | Staging subaccount/test |
+| `SENDGRID_*` | O⁴ | — | O¹⁴ | — | Per-env API keys |
 | `R2_*` | R | — | R | — | Separate buckets |
 | `NEXT_PUBLIC_API_URL` | — | — | — | R | Public URL per env |
 
 ¹ Worker still loads full schema today (technical debt).  
 ² Webhook: verify + `TWILIO_AUTH_TOKEN`; no outbound SMS.  
-³ Inbound signature only.
+³ Inbound signature only.  
+⁴ Optional (non-core): services boot without it and the feature is disabled. OpenAI unset → AI calls fail fast with `OPENAI_NOT_CONFIGURED` (import mapping falls back to presets; campaign drafting returns 409). Twilio is all-or-none (`TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM_NUMBER`); unset → `/twilio` webhook returns 503 and never trusts a signature. SendGrid: `SENDGRID_FROM_EMAIL` is required only when `SENDGRID_API_KEY` is set. Core stays required: `DATABASE_URL`, `REDIS_URL`, `STRIPE_*`.
 
 ## FS-93 Option A — per-host injection (approved)
 

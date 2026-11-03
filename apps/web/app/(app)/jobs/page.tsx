@@ -1,11 +1,11 @@
-import { ScaffoldPage } from "@/src/components/layout/ScaffoldPage";
+import { JobsListClient } from "@/src/components/jobs/JobsListClient";
+import { parseNewJobQuery } from "@/src/components/jobs/newJob.config";
 
-export default function JobsPage() {
-  return (
-    <ScaffoldPage
-      title="Jobs"
-      subtitle="Lifecycle views, technician execution, and upsell surfaces anchor here next."
-      ticket="018"
-    />
-  );
+interface JobsPageProps {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}
+
+export default async function JobsPage({ searchParams }: JobsPageProps) {
+  const newJob = parseNewJobQuery(await searchParams);
+  return <JobsListClient newJob={newJob} />;
 }

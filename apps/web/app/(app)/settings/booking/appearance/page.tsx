@@ -97,7 +97,7 @@ export default function BookingAppearanceSettingsPage() {
         <aside className="rounded-[28px] border border-neutral-200 bg-white px-5 py-5 shadow-sm">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-400">Preview</p>
           <div className="mt-4 rounded-[24px] border border-neutral-200 bg-brand-primary px-5 py-5 text-white">
-            <p className="text-sm font-semibold">ServiceRev online booking</p>
+            <p className="text-sm font-semibold">Renvani online booking</p>
             <p className="mt-2 text-sm text-white/75">{tagline.trim() || "Your tagline will appear here once saved."}</p>
           </div>
         </aside>

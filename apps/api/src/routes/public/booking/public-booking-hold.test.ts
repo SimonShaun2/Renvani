@@ -110,6 +110,117 @@ afterEach(async () => {
   vi.useRealTimers();
 });
 
+describe("POST /public/booking/:slug/hold-token/inspect", () => {
+  it("returns valid inspection for a matching hold token without claiming it", async () => {
+    const { holdToken, referenceNumber } = seedPublicHoldFixture();
+
+    const response = await request(app.server)
+      .post("/api/v1/public/booking/acme-hvac/hold-token/inspect")
+      .send({ holdToken });
+
+    expect(response.status).toBe(200);
+    expect(response.body.inspection).toMatchObject({
+      status: "valid",
+      referenceNumber,
+      slugMatches: true
+    });
+  });
+
+  it("does not consume the hold token jti so slot-hold still works after inspect (resume)", async () => {
+    const { technician, holdToken, referenceNumber } = seedPublicHoldFixture();
+
+    const inspectResponse = await request(app.server)
+      .post("/api/v1/public/booking/acme-hvac/hold-token/inspect")
+      .send({ holdToken });
+    expect(inspectResponse.status).toBe(200);
+    expect(inspectResponse.body.inspection.status).toBe("valid");
+
+    const holdResponse = await request(app.server)
+      .post(slotHoldPath("acme-hvac", referenceNumber))
+      .send({
+        holdToken,
+        technicianId: technician.id,
+        scheduledStart: AFTERNOON_START,
+        scheduledEnd: AFTERNOON_END
+      });
+
+    expect(holdResponse.status).toBe(200);
+    expect(holdResponse.body.hold.scheduledStart).toBe(AFTERNOON_START);
+  });
+
+  it("returns slugMatches false when the token belongs to another booking page", async () => {
+    const otherCompany = fakeDb.seedCompany({
+      name: "Other Co",
+      slug: "other-co",
+      timezone: "America/Chicago"
+    });
+    fakeDb.seedBookingSettings({
+      companyId: otherCompany.id,
+      bookingSlug: "other-co",
+      isEnabled: true,
+      availableDays: ["tue"],
+      availableHoursStart: 8,
+      availableHoursEnd: 17
+    });
+    const { holdToken, referenceNumber } = seedPublicHoldFixture();
+
+    const response = await request(app.server)
+      .post("/api/v1/public/booking/other-co/hold-token/inspect")
+      .send({ holdToken });
+
+    expect(response.status).toBe(200);
+    expect(response.body.inspection).toMatchObject({
+      status: "valid",
+      referenceNumber,
+      slugMatches: false
+    });
+  });
+
+  it("returns expired inspection with reference for resume messaging", async () => {
+    const { booking, referenceNumber } = seedPublicHoldFixture();
+    const expiredToken = jwt.sign(
+      {
+        companyId: booking.companyId,
+        bookingRequestId: booking.id,
+        referenceNumber,
+        jti: "550e8400-e29b-41d4-a716-446655440099",
+        tokenType: "booking_hold"
+      },
+      env.BOOKING_HOLD_TOKEN_SECRET,
+      { expiresIn: -60 }
+    );
+
+    const response = await request(app.server)
+      .post("/api/v1/public/booking/acme-hvac/hold-token/inspect")
+      .send({ holdToken: expiredToken });
+
+    expect(response.status).toBe(200);
+    expect(response.body.inspection).toMatchObject({
+      status: "expired",
+      referenceNumber,
+      slugMatches: true
+    });
+    expect(response.body.inspection.expiresAt).toMatch(/^\d{4}-\d{2}-\d{2}T/u);
+  });
+
+  it("returns invalid inspection without error for tampered tokens", async () => {
+    const { holdToken } = seedPublicHoldFixture();
+    const tampered =
+      holdToken.slice(0, -1) + (holdToken.endsWith("a") ? "b" : "a");
+
+    const response = await request(app.server)
+      .post("/api/v1/public/booking/acme-hvac/hold-token/inspect")
+      .send({ holdToken: tampered });
+
+    expect(response.status).toBe(200);
+    expect(response.body.inspection).toMatchObject({
+      status: "invalid",
+      referenceNumber: null,
+      slugMatches: false
+    });
+  });
+});
+
 describe("public booking slot-hold security", () => {
   it("returns 400 when holdToken is missing", async () => {
     const { technician, referenceNumber } = seedPublicHoldFixture();

@@ -92,6 +92,7 @@ export function evaluateAgentActionPolicyDecision(
 
   const requiresApproval =
     context.actionType === "message.send_proposed" ||
+    context.actionType === "loyalty.reminder.propose" ||
     (!AUTO_APPROVED_TOOLS_V1.has(context.actionType) && context.requiresApproval);
 
   const initialState: AgentActionStateV1 = requiresApproval ? "awaiting_approval" : "policy_evaluated";

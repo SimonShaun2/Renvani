@@ -3,12 +3,17 @@
 import Link from "next/link";
 import { AlertTriangle, CheckCircle2, RotateCcw, SkipForward } from "lucide-react";
 
+import type { ImportSessionReconciliationReport } from "@fsm/types";
+
+import { ImportReconciliationSummary } from "@/src/components/csv-import/ImportReconciliationSummary";
 import type { ImportErrorRecord } from "@/src/hooks/imports.hooks";
 import type { ImportResults } from "@/src/stores/csv-import.store";
 
 interface Step7ResultsProps {
   results: ImportResults;
   errorRecords: ImportErrorRecord[];
+  reconciliationReport: ImportSessionReconciliationReport | null;
+  skippedRowsDownloadUrl: string | null;
   onDownloadErrorReport: () => void;
   onImportAnother: () => void;
 }
@@ -16,6 +21,8 @@ interface Step7ResultsProps {
 export function Step7Results({
   results,
   errorRecords,
+  reconciliationReport,
+  skippedRowsDownloadUrl,
   onDownloadErrorReport,
   onImportAnother
 }: Step7ResultsProps) {
@@ -64,6 +71,13 @@ export function Step7Results({
           </div>
         </div>
 
+        {reconciliationReport ? (
+          <ImportReconciliationSummary
+            report={reconciliationReport}
+            skippedRowsDownloadUrl={skippedRowsDownloadUrl}
+          />
+        ) : null}
+
         {errorRecords.length > 0 ? (
           <div className="mt-6 overflow-hidden rounded-[24px] border border-neutral-200">
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-neutral-200 bg-neutral-50 px-4 py-4">
@@ -79,6 +93,7 @@ export function Step7Results({
                 Download Error Report
               </button>
             </div>
+            <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-neutral-200 text-sm">
               <thead className="bg-white text-left text-xs uppercase tracking-[0.14em] text-neutral-400">
                 <tr>
@@ -99,6 +114,7 @@ export function Step7Results({
                 ))}
               </tbody>
             </table>
+            </div>
           </div>
         ) : null}
 

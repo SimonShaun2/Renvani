@@ -73,7 +73,8 @@ beforeEach(async () => {
   expireInvoiceCheckoutSessionMock.mockReset();
   createInvoiceCheckoutSessionMock.mockResolvedValue({
     id: "cs_test_123",
-    url: "https://checkout.stripe.com/pay/cs_test_123"
+    url: null,
+    clientSecret: "cs_test_client_secret"
   });
   app = await buildAppModule.buildApp();
   await app.ready();
@@ -354,7 +355,7 @@ describe("invoice routes", () => {
       .send();
 
     expect(response.status).toBe(200);
-    expect(response.body.invoice.stripePaymentLinkUrl).toBe("https://checkout.stripe.com/pay/cs_test_123");
+    expect(response.body.invoice.stripePaymentLinkUrl).toContain("/pay/");
     expect(createInvoiceCheckoutSessionMock).toHaveBeenCalledTimes(1);
     expect(addNotificationQueueJob).toHaveBeenCalledTimes(1);
     expect(addInvoiceQueueJob).toHaveBeenCalledTimes(1);
@@ -466,5 +467,39 @@ describe("invoice routes", () => {
     expect(response.status).toBe(200);
     expect(response.body.data).toHaveLength(1);
     expect(response.body.data[0].amount).toBe("100.00");
+  });
+
+  it("GET /payments exposes fee fields; refunds leave the non-refundable fees", async () => {
+    const auth = createAuthContext();
+    const { customer } = seedInvoiceGraph(auth.company.id);
+    const invoice = fakeDb.seedInvoice({
+      companyId: auth.company.id,
+      customerId: customer.id
+    });
+    fakeDb.seedPayment({
+      companyId: auth.company.id,
+      invoiceId: invoice.id,
+      customerId: customer.id,
+      amount: "100.00",
+      serviceFeeAmount: "2.00",
+      bookingFeeAmount: "1.99",
+      amountRefunded: "100.00",
+      method: "card",
+      status: "refunded"
+    });
+
+    const response = await request(app.server)
+      .get("/api/v1/payments")
+      .set("Authorization", auth.authorization);
+
+    expect(response.status).toBe(200);
+    expect(response.body.data[0]).toMatchObject({
+      amount: "100.00",
+      serviceFeeAmount: "2.00",
+      bookingFeeAmount: "1.99",
+      feeRefundable: false,
+      amountRefunded: "100.00",
+      refundableAmount: "0.00"
+    });
   });
 });

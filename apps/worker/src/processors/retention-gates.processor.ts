@@ -8,10 +8,13 @@ import {
   type ProposalCreateCustomerMessageJobData,
   type RetentionGatesAfterCompletionConfirmJobData,
   type RetentionGatesWinBackEvaluateJobData,
+  type ServiceBuildJobBriefJobData,
   type RetentionGatesEvaluationInput,
   buildProposalCreateCustomerMessageJob,
   evaluateRetentionGates
 } from "@fsm/types";
+
+import { processServiceBuildJobBrief } from "./service-job-brief.processor.js";
 
 const logger = pino({
   name: "retention-gates-processor"
@@ -174,10 +177,20 @@ export async function processRetentionGatesWinBackEvaluate(
   await dependencies.enqueueProposalCreate(payload);
 }
 
+import { processQboSyncJob } from "./qbo-sync.processor.js";
+
 export function createRetentionGatesProcessor(
   dependencies?: RetentionGatesDependencies
 ): Processor<Record<string, unknown>, void, string> {
   return async (job) => {
+    if (
+      job.name === OPERATOR_QUEUE_JOB_NAMES.qboSyncPush ||
+      job.name === OPERATOR_QUEUE_JOB_NAMES.qboSyncPull
+    ) {
+      await processQboSyncJob(job);
+      return;
+    }
+
     switch (job.name) {
       case OPERATOR_QUEUE_JOB_NAMES.retentionGatesAfterCompletionConfirm:
         await processRetentionGatesAfterCompletionConfirm(
@@ -190,6 +203,9 @@ export function createRetentionGatesProcessor(
           job as unknown as Job<RetentionGatesWinBackEvaluateJobData>,
           dependencies
         );
+        return;
+      case OPERATOR_QUEUE_JOB_NAMES.serviceBuildJobBrief:
+        await processServiceBuildJobBrief(job as unknown as Job<ServiceBuildJobBriefJobData>);
         return;
       default:
         return;

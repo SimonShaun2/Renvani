@@ -321,6 +321,28 @@ describe("imports routes", () => {
     expect(conflictResponse.status).toBe(409);
   });
 
+  it("STACK03-JWT-02/03: cross-tenant import session read returns 404", async () => {
+    const tenantA = createAuthContext("owner");
+    const tenantB = createAuthContext("owner");
+    const sessionA = fakeDb.seedImportSession({
+      companyId: tenantA.company.id,
+      fileName: "customers-a.csv",
+      fileUrl: "https://r2.test/a",
+      status: "preview",
+      validationErrors: [{ row: 1, field: "email", message: "bad", value: "x" }]
+    });
+
+    const getSession = await request(app.server)
+      .get(`/api/v1/imports/${sessionA.id}`)
+      .set("Authorization", tenantB.authorization);
+    const getErrors = await request(app.server)
+      .get(`/api/v1/imports/${sessionA.id}/errors`)
+      .set("Authorization", tenantB.authorization);
+
+    expect(getSession.status).toBe(404);
+    expect(getErrors.status).toBe(404);
+  });
+
   it("GET /imports/:id/errors returns the validation errors array", async () => {
     const auth = createAuthContext("owner");
     const importSession = fakeDb.seedImportSession({

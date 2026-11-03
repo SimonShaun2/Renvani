@@ -4,15 +4,39 @@ import { UuidSchema } from "../../agent-control-plane/v1/zod-shared.js";
 
 import { AttributionV1Schema } from "./attribution.js";
 
-export const AdapterOperationKindV1Schema = z.enum([
+/**
+ * Adapter operation kinds are an app-level registry (stored as varchar since 0051), so an add-on
+ * registers its kind instead of shipping an enum migration.
+ */
+export const BUILTIN_ADAPTER_OPERATION_KINDS = [
   "csv_import",
   "public_booking",
   "sms_outbound",
   "email_outbound",
   "stripe_connect"
-]);
+] as const;
 
-export type AdapterOperationKindV1 = z.infer<typeof AdapterOperationKindV1Schema>;
+export const ADAPTER_OPERATION_KIND_PATTERN = /^[a-z][a-z0-9_]{0,63}$/;
+
+const registeredAdapterOperationKinds = new Set<string>(BUILTIN_ADAPTER_OPERATION_KINDS);
+
+export function registerAdapterOperationKind(kind: string): void {
+  if (!ADAPTER_OPERATION_KIND_PATTERN.test(kind)) {
+    throw new Error(`Invalid adapter operation kind: ${kind}`);
+  }
+  registeredAdapterOperationKinds.add(kind);
+}
+
+export function isRegisteredAdapterOperationKind(kind: string): boolean {
+  return registeredAdapterOperationKinds.has(kind);
+}
+
+export const AdapterOperationKindV1Schema = z
+  .string()
+  .regex(ADAPTER_OPERATION_KIND_PATTERN)
+  .refine(isRegisteredAdapterOperationKind, { message: "Unknown adapter operation kind" });
+
+export type AdapterOperationKindV1 = (typeof BUILTIN_ADAPTER_OPERATION_KINDS)[number] | (string & {});
 
 export const AdapterOperationStatusV1Schema = z.enum(["pending", "processing", "succeeded", "dead"]);
 

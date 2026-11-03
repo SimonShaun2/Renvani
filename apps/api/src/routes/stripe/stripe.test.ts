@@ -9,6 +9,7 @@ const {
   addAiQueueJob,
   addInvoiceQueueJob,
   addNotificationQueueJob,
+  applyConnectAccountBrandingMock,
   createConnectOnboardingLinkMock,
   createExpressConnectedAccountMock,
   createExpressDashboardLinkMock,
@@ -19,6 +20,7 @@ const {
   addAiQueueJob: vi.fn(),
   addInvoiceQueueJob: vi.fn(),
   addNotificationQueueJob: vi.fn(),
+  applyConnectAccountBrandingMock: vi.fn(),
   createConnectOnboardingLinkMock: vi.fn(),
   createExpressConnectedAccountMock: vi.fn(),
   createExpressDashboardLinkMock: vi.fn(),
@@ -52,6 +54,7 @@ vi.mock("@fsm/jobs", () => ({
 vi.mock("../../lib/stripe.js", () => ({
   createInvoiceCheckoutSession: createInvoiceCheckoutSessionMock,
   expireInvoiceCheckoutSession: expireInvoiceCheckoutSessionMock,
+  applyConnectAccountBranding: applyConnectAccountBrandingMock,
   createConnectOnboardingLink: createConnectOnboardingLinkMock,
   createExpressConnectedAccount: createExpressConnectedAccountMock,
   createExpressDashboardLink: createExpressDashboardLinkMock,
@@ -79,11 +82,13 @@ beforeEach(async () => {
   addAiQueueJob.mockReset();
   addInvoiceQueueJob.mockReset();
   addNotificationQueueJob.mockReset();
+  applyConnectAccountBrandingMock.mockReset();
   createConnectOnboardingLinkMock.mockReset();
   createExpressConnectedAccountMock.mockReset();
   createExpressDashboardLinkMock.mockReset();
   retrieveConnectedAccountMock.mockReset();
   createExpressConnectedAccountMock.mockResolvedValue({ id: "acct_new_123" });
+  applyConnectAccountBrandingMock.mockResolvedValue(undefined);
   createConnectOnboardingLinkMock.mockResolvedValue({ url: "https://stripe.test/onboard" });
   createExpressDashboardLinkMock.mockResolvedValue({ url: "https://stripe.test/dashboard" });
   retrieveConnectedAccountMock.mockResolvedValue({
@@ -182,7 +187,8 @@ describe("stripe connect routes", () => {
       payoutSchedule: "Daily",
       lastPayoutAmount: "4800.00",
       lastPayoutAt: "2026-04-29T15:00:00.000Z",
-      platformFeePercent: expect.any(Number)
+      platformFeePercent: expect.any(Number),
+      serviceFeePercent: expect.any(Number)
     });
   });
 

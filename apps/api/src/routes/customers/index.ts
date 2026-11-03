@@ -1,14 +1,21 @@
 import type { FastifyPluginAsync } from "fastify";
 
+import { requireRole } from "../../lib/authorize.js";
+import { issueCustomerPortalLink } from "../../services/customer-portal.service.js";
+
 import {
   createAssetHandler,
   createCustomerHandler,
+  createCustomerNoteHandler,
   createPropertyHandler,
   deleteAssetHandler,
   deleteCustomerHandler,
   deletePropertyHandler,
   getAssetHandler,
   getCustomerHandler,
+  getCustomerImportedHistoryHandler,
+  getCustomerHistoryTimelineHandler,
+  getCustomerNotesHandler,
   getPropertyHandler,
   listCustomersHandler,
   listPropertiesHandler,
@@ -21,6 +28,8 @@ import {
   assetIdValidation,
   createAssetRouteSchema,
   createAssetValidation,
+  createCustomerNoteRouteSchema,
+  createCustomerNoteValidation,
   createCustomerRouteSchema,
   createCustomerValidation,
   createPropertyRouteSchema,
@@ -31,6 +40,10 @@ import {
   deletePropertyRouteSchema,
   getAssetRouteSchema,
   getCustomerRouteSchema,
+  getCustomerImportedHistoryRouteSchema,
+  getCustomerHistoryTimelineRouteSchema,
+  listCustomerHistoryTimelineValidation,
+  getCustomerNotesRouteSchema,
   getPropertyRouteSchema,
   listCustomersRouteSchema,
   listCustomersValidation,
@@ -67,6 +80,48 @@ const customerRoutes: FastifyPluginAsync = async (fastify) => {
     "/:id",
     { preValidation: [customerIdValidation], preHandler: [fastify.authenticate], schema: getCustomerRouteSchema },
     getCustomerHandler
+  );
+  fastify.get(
+    "/:id/notes",
+    { preValidation: [customerIdValidation], preHandler: [fastify.authenticate], schema: getCustomerNotesRouteSchema },
+    getCustomerNotesHandler
+  );
+  // Technicians cannot author CRM notes (they use job notes); office staff and above can.
+  fastify.post(
+    "/:id/notes",
+    {
+      preValidation: [createCustomerNoteValidation],
+      preHandler: [fastify.authenticate, requireRole(["owner", "admin", "dispatcher", "office"])],
+      schema: createCustomerNoteRouteSchema
+    },
+    createCustomerNoteHandler
+  );
+  // FS-168: staff issue a customer portal magic link (delivery by email/SMS is a follow-up).
+  fastify.post(
+    "/:id/portal-link",
+    {
+      preValidation: [customerIdValidation],
+      preHandler: [fastify.authenticate, requireRole(["owner", "admin", "dispatcher", "office"])]
+    },
+    async (request, reply) => {
+      const { id } = request.params as { id: string };
+      const link = await issueCustomerPortalLink(request.company.id, id);
+      return reply.status(201).send({ link });
+    }
+  );
+  fastify.get(
+    "/:id/imported-history",
+    { preValidation: [customerIdValidation], preHandler: [fastify.authenticate], schema: getCustomerImportedHistoryRouteSchema },
+    getCustomerImportedHistoryHandler
+  );
+  fastify.get(
+    "/:id/history-timeline",
+    {
+      preValidation: [listCustomerHistoryTimelineValidation],
+      preHandler: [fastify.authenticate],
+      schema: getCustomerHistoryTimelineRouteSchema
+    },
+    getCustomerHistoryTimelineHandler
   );
   fastify.patch(
     "/:id",

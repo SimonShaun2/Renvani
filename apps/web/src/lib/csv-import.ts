@@ -1,3 +1,4 @@
+import { normalizeImportPhone } from "@fsm/import-normalize";
 import Papa from "papaparse";
 import type { ColumnMapping } from "@fsm/types";
 
@@ -82,17 +83,6 @@ function normalizeTextValue(value: string | null | undefined): string | null {
 function normalizeEmailValue(value: string | null | undefined): string | null {
   const normalizedValue = normalizeTextValue(value);
   return normalizedValue ? normalizedValue.toLowerCase() : null;
-}
-
-function normalizePhoneValue(value: string | null | undefined): string | null {
-  const normalizedValue = normalizeTextValue(value);
-
-  if (!normalizedValue) {
-    return null;
-  }
-
-  const digitsOnly = normalizedValue.replace(/\D+/gu, "");
-  return digitsOnly.length > 0 ? digitsOnly : null;
 }
 
 function normalizeNameValue(value: string | null | undefined): string | null {
@@ -277,7 +267,7 @@ export function buildDuplicateMatches(
 
   for (const row of rows) {
     const email = normalizeEmailValue(getMappedRowFieldValue(row, mappings, "email"));
-    const phone = normalizePhoneValue(getMappedRowFieldValue(row, mappings, "phone"));
+    const phone = normalizeImportPhone(getMappedRowFieldValue(row, mappings, "phone"));
     const mappedName = getMappedRowName(row, mappings);
     const normalizedName = normalizeNameValue(mappedName);
 
@@ -301,7 +291,7 @@ export function buildDuplicateMatches(
     }
 
     const phoneMatch = phone
-      ? customers.find((customer) => normalizePhoneValue(customer.phone) === phone)
+      ? customers.find((customer) => normalizeImportPhone(customer.phone) === phone)
       : undefined;
     if (phoneMatch) {
       matches.push({

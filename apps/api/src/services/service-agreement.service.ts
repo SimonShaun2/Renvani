@@ -38,8 +38,10 @@ import {
   type UpdateAgreementInput
 } from "@fsm/types";
 
+import { computeRecurringServiceFee } from "../lib/recurring-service-fee.js";
 import {
   cancelServiceAgreementSubscription,
+  createServiceAgreementPrice,
   createServiceAgreementSubscription,
   createStripeCustomer,
   pauseServiceAgreementSubscription,
@@ -198,7 +200,10 @@ async function loadAgreementStripeSnapshot(plan: MaintenancePlanRow): Promise<Ag
   }
 
   try {
-    const snapshot = await retrieveServiceAgreementSubscriptionSnapshot(plan.stripeSubscriptionId);
+    const snapshot = await retrieveServiceAgreementSubscriptionSnapshot(plan.stripeSubscriptionId, {
+      companyId: plan.companyId,
+      agreementId: plan.id
+    });
 
     return {
       stripeStatus: toStripeStatus(snapshot.status),
@@ -881,13 +886,32 @@ export async function createAgreement(
       })).id;
     }
 
+    const serviceFee = resolvedPrice ? computeRecurringServiceFee(company, resolvedPrice) : null;
+    let stripePlatformFeePriceId: string | null = null;
+
+    if (serviceFee && serviceFee.serviceFeeCents > 0) {
+      const interval = billingCycle === "monthly" ? "month" : "year";
+      stripePlatformFeePriceId = (
+        await createServiceAgreementPrice({
+          companyId,
+          templateId: template.id,
+          name: template.name,
+          productName: serviceFee.lineItemName,
+          amount: serviceFee.serviceFeeAmount,
+          interval
+        })
+      ).id;
+    }
+
     const subscription = await createServiceAgreementSubscription({
       companyId,
       planId,
       customerId: customer.id,
       stripeCustomerId,
       stripePriceId,
-      companyStripeAccountId: company.stripeAccountId
+      stripePlatformFeePriceId,
+      companyStripeAccountId: company.stripeAccountId,
+      applicationFeePercent: stripePlatformFeePriceId ? serviceFee?.applicationFeePercent ?? null : null
     });
     stripeSubscriptionId = subscription.id;
     stripeCurrentPeriodStart = subscription.currentPeriodStart;
@@ -1221,7 +1245,10 @@ export async function retryAgreementPayment(
     throw new AppError(ErrorCode.CONFLICT, "Retry payment is unavailable for this agreement");
   }
 
-  const stripeSnapshot = await retrieveServiceAgreementSubscriptionSnapshot(agreement.stripeSubscriptionId);
+  const stripeSnapshot = await retrieveServiceAgreementSubscriptionSnapshot(agreement.stripeSubscriptionId, {
+    companyId: agreement.companyId,
+    agreementId: agreement.id
+  });
 
   if (!stripeSnapshot.retryPaymentUrl) {
     throw new AppError(ErrorCode.CONFLICT, "No retry payment link is currently available");

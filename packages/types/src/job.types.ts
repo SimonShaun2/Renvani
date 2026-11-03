@@ -1,3 +1,5 @@
+import type { AddJobProductInput } from "./job-product.types.js";
+
 export type JobStatus =
   | "lead"
   | "estimate_requested"
@@ -35,6 +37,8 @@ export interface Job {
   propertyId: string | null;
   assetId: string | null;
   technicianId: string | null;
+  /** FS-195 crew assigned at create (null when none). */
+  crewId?: string | null;
   assignedById: string | null;
   type: JobType;
   priority: JobPriority;
@@ -122,12 +126,15 @@ export interface JobDetail extends Job {
   availableTransitions: JobStatus[];
 }
 
+export type JobNoteKind = "internal" | "field";
+
 export interface JobNote {
   id: string;
   companyId: string;
   jobId: string;
   authorId: string | null;
   content: string;
+  noteKind: JobNoteKind;
   isInternal: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -180,6 +187,10 @@ export interface CreateJobInput {
   tags?: string[];
   scheduledStart?: string;
   scheduledEnd?: string;
+  /** Line items added in the same transaction as the job (price-book productCatalogId or manual). */
+  products?: AddJobProductInput[];
+  /** Existing crew (GET /crews); validated active in the same transaction. */
+  crewId?: string;
 }
 
 export interface UpdateJobInput {
@@ -209,6 +220,7 @@ export interface CompleteJobInput {
 export interface AddNoteInput {
   content: string;
   isInternal?: boolean;
+  noteKind?: "internal" | "field";
 }
 
 export interface AddPhotoInput {
@@ -234,4 +246,27 @@ export interface ListJobsQuery {
   sortOrder?: "asc" | "desc";
   page?: number;
   limit?: number;
+}
+
+/** Fee/total preview at checkout rules (Service Fee on Flex, none on Flat). Shared by job-create and invoice previews. */
+export interface ChargePreview {
+  plan: "flex" | "flat" | null;
+  subtotal: string;
+  serviceFeeAmount: string;
+  serviceFeeRateBps: number;
+  serviceFeeLabel: string | null;
+  total: string;
+}
+
+export interface JobCreatePreviewInput {
+  customerId?: string;
+  products?: AddJobProductInput[];
+}
+
+export interface JobCreatePreview extends ChargePreview {
+  /** Next number at preview time; not reserved (assigned on create). */
+  jobNumberPreview: string;
+  lines: Array<{ name: string; quantity: string; unitPrice: string; total: string }>;
+  /** Customer has a saved card on file (Stripe customer linked). Null when no customerId was given. */
+  cardOnFile: boolean | null;
 }

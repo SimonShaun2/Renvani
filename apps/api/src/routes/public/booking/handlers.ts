@@ -1,14 +1,16 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 
-import type { PublicHoldBookingSlotInput, SubmitBookingRequestInput } from "@fsm/types";
+import type { ConfirmBookingRequestInput, PublicHoldBookingSlotInput, SubmitBookingRequestInput } from "@fsm/types";
 
 import {
   captureBookingInterest,
   checkZipCoverage,
+  confirmPublicBookingSlot,
   getBookingAvailability,
   getBookingConfirmation,
   getPublicBookingSettingsBySlug,
-  holdPublicBookingSlot
+  holdPublicBookingSlot,
+  inspectPublicBookingHoldToken
 } from "../../../services/booking.service.js";
 import { submitPublicInquiryIntake } from "../../../services/revenue-inquiry-intake.service.js";
 import type {
@@ -71,7 +73,8 @@ export async function submitBookingRequestHandler(
     idempotencyKey
   );
 
-  return reply.status(created ? 201 : 200).send(result);
+  const { inquiry: _internalInquiry, ...publicResult } = result;
+  return reply.status(created ? 201 : 200).send(publicResult);
 }
 
 export async function captureBookingInterestHandler(
@@ -97,6 +100,19 @@ export async function getBookingConfirmationHandler(
   });
 }
 
+export async function inspectPublicBookingHoldTokenHandler(
+  request: FastifyRequest,
+  reply: FastifyReply
+): Promise<FastifyReply> {
+  const params = request.params as BookingSlugParams;
+  const body = request.body as { holdToken: string };
+  const inspection = await inspectPublicBookingHoldToken(params.slug, body.holdToken);
+
+  return reply.send({
+    inspection
+  });
+}
+
 export async function holdPublicBookingSlotHandler(
   request: FastifyRequest,
   reply: FastifyReply
@@ -116,5 +132,25 @@ export async function holdPublicBookingSlotHandler(
       assignedTechnicianId: result.bookingRequest.assignedTechnicianId
     },
     hold: result.hold
+  });
+}
+
+export async function confirmPublicBookingSlotHandler(
+  request: FastifyRequest,
+  reply: FastifyReply
+): Promise<FastifyReply> {
+  const params = request.params as BookingConfirmationParams;
+  const result = await confirmPublicBookingSlot(params.slug, params.ref, request.body as ConfirmBookingRequestInput);
+
+  return reply.send({
+    bookingRequest: {
+      id: result.bookingRequest.id,
+      referenceNumber: result.bookingRequest.referenceNumber,
+      status: result.bookingRequest.status,
+      jobId: result.jobId
+    },
+    jobId: result.jobId,
+    recurringSchedule: result.recurringSchedule,
+    manageToken: result.manageToken
   });
 }

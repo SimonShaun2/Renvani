@@ -22,6 +22,8 @@ export interface Estimate {
   tierLabel: string | null;
   tierGroupId: string | null;
   isSelectedTier: boolean | null;
+  isRecommended?: boolean;
+  optionSetVersion?: number;
   subtotal: string;
   taxRate: string | null;
   taxAmount: string | null;
@@ -50,6 +52,7 @@ export interface EstimateItem {
   id: string;
   estimateId: string;
   companyId: string;
+  priceBookItemId: string | null;
   name: string;
   description: string | null;
   itemType: EstimateItemType;
@@ -134,6 +137,8 @@ export interface PublicEstimateView {
     taxAmount: string | null;
     discountAmount: string | null;
     total: string;
+    /** FS-212: the business's recommended option in the set. */
+    recommended?: boolean;
     items: Array<{
       name: string;
       description: string | null;
@@ -142,6 +147,8 @@ export interface PublicEstimateView {
       total: string;
     }>;
   }>;
+  /** FS-212: present only when a financing provider is ready; omitted while financing is disabled. */
+  financing?: import("./estimate-options.types.js").EstimateFinancingSummary;
   items: Array<{
     name: string;
     description: string | null;
@@ -178,8 +185,8 @@ export interface CreateEstimateInput {
   title?: string;
   messageToCustomer?: string;
   internalNotes?: string;
-  taxRate?: number;
-  discountAmount?: number;
+  taxRate?: string;
+  discountAmount?: string;
   financingOffered?: boolean;
   tierLabel?: string;
   tierGroupId?: string;
@@ -193,8 +200,8 @@ export interface UpdateEstimateInput {
   title?: string;
   messageToCustomer?: string;
   internalNotes?: string;
-  taxRate?: number;
-  discountAmount?: number;
+  taxRate?: string;
+  discountAmount?: string;
   financingOffered?: boolean;
   tierLabel?: string;
   tierGroupId?: string;
@@ -204,20 +211,22 @@ export interface AddEstimateItemInput {
   name: string;
   description?: string;
   itemType?: EstimateItemType;
-  quantity: number;
-  unitPrice: number;
+  quantity: string;
+  unitPrice: string;
   isTaxable?: boolean;
   sortOrder?: number;
+  priceBookItemId?: string;
 }
 
 export interface UpdateEstimateItemInput {
   name?: string;
   description?: string;
   itemType?: EstimateItemType;
-  quantity?: number;
-  unitPrice?: number;
+  quantity?: string;
+  unitPrice?: string;
   isTaxable?: boolean;
   sortOrder?: number;
+  priceBookItemId?: string | null;
 }
 
 export interface ListEstimatesQuery {

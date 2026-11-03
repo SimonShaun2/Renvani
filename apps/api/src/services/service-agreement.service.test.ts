@@ -11,12 +11,14 @@ setupTestEnv();
 const {
   addAiQueueJob,
   cancelServiceAgreementSubscriptionMock,
+  createServiceAgreementPriceMock,
   createServiceAgreementSubscriptionMock,
   createStripeCustomerMock,
   updateServiceAgreementSubscriptionCancelAtPeriodEndMock
 } = vi.hoisted(() => ({
   addAiQueueJob: vi.fn(),
   cancelServiceAgreementSubscriptionMock: vi.fn(),
+  createServiceAgreementPriceMock: vi.fn(),
   createServiceAgreementSubscriptionMock: vi.fn(),
   createStripeCustomerMock: vi.fn(),
   updateServiceAgreementSubscriptionCancelAtPeriodEndMock: vi.fn()
@@ -43,6 +45,7 @@ vi.mock("../lib/stripe.js", async () => {
   return {
     ...actual,
     cancelServiceAgreementSubscription: cancelServiceAgreementSubscriptionMock,
+    createServiceAgreementPrice: createServiceAgreementPriceMock,
     createServiceAgreementSubscription: createServiceAgreementSubscriptionMock,
     createStripeCustomer: createStripeCustomerMock,
     updateServiceAgreementSubscriptionCancelAtPeriodEnd: updateServiceAgreementSubscriptionCancelAtPeriodEndMock
@@ -67,11 +70,13 @@ beforeEach(() => {
   fakeDb.resetTestState();
   addAiQueueJob.mockReset();
   cancelServiceAgreementSubscriptionMock.mockReset();
+  createServiceAgreementPriceMock.mockReset();
   createServiceAgreementSubscriptionMock.mockReset();
   createStripeCustomerMock.mockReset();
   updateServiceAgreementSubscriptionCancelAtPeriodEndMock.mockReset();
 
   createStripeCustomerMock.mockResolvedValue({ id: "cus_123" });
+  createServiceAgreementPriceMock.mockResolvedValue({ id: "price_platform_fee_123" });
   createServiceAgreementSubscriptionMock.mockResolvedValue({
     id: "sub_123",
     currentPeriodStart: new Date("2026-04-01T00:00:00.000Z"),
@@ -169,6 +174,7 @@ describe("service-agreement.service", () => {
 
   it("createAgreement with billing creates a Stripe customer and subscription", async () => {
     const { company, actor } = createAdminContext();
+    company.settings = { stripePlatformBilling: { planTier: "flex" } };
     const { customer, property, asset, template } = seedAgreementGraph(company.id);
 
     const agreement = await agreementService.createAgreement(company.id, actor.id, {
@@ -189,18 +195,54 @@ describe("service-agreement.service", () => {
       email: customer.email,
       name: "Chris Pine"
     });
-    expect(createServiceAgreementSubscriptionMock).toHaveBeenCalledWith({
-      companyId: company.id,
-      planId: agreement.id,
-      customerId: customer.id,
-      stripeCustomerId: "cus_123",
-      stripePriceId: "price_monthly_123",
-      companyStripeAccountId: company.stripeAccountId ?? ""
-    });
+    expect(createServiceAgreementPriceMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        companyId: company.id,
+        templateId: template.id,
+        productName: "Service Fee (2%)",
+        amount: "0.60",
+        interval: "month"
+      })
+    );
+    expect(createServiceAgreementSubscriptionMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        companyId: company.id,
+        planId: agreement.id,
+        customerId: customer.id,
+        stripeCustomerId: "cus_123",
+        stripePriceId: "price_monthly_123",
+        stripePlatformFeePriceId: "price_platform_fee_123",
+        companyStripeAccountId: company.stripeAccountId ?? "",
+        applicationFeePercent: 1.96
+      })
+    );
     expect(agreement.stripeSubscriptionId).toBe("sub_123");
     expect(agreement.stripePriceId).toBe("price_monthly_123");
     expect(agreement.price).toBe("29.99");
     expect(fakeDb.getTestState().customers.find((row) => row.id === customer.id)?.stripeCustomerId).toBe("cus_123");
+  });
+
+  it("createAgreement on Flat sends no Service Fee line and no application fee", async () => {
+    const { company, actor } = createAdminContext();
+    company.settings = { stripePlatformBilling: { planTier: "flat" } };
+    const { customer, property, asset, template } = seedAgreementGraph(company.id);
+
+    await agreementService.createAgreement(company.id, actor.id, {
+      customerId: customer.id,
+      serviceAgreementTemplateId: template.id,
+      propertyId: property.id,
+      name: "Flat Plan",
+      frequency: "bi_annual",
+      startDate: "2026-04-28",
+      billingEnabled: true,
+      billingCycle: "monthly",
+      assetIds: [asset.id]
+    });
+
+    expect(createServiceAgreementPriceMock).not.toHaveBeenCalled();
+    expect(createServiceAgreementSubscriptionMock).toHaveBeenCalledWith(
+      expect.objectContaining({ stripePlatformFeePriceId: null, applicationFeePercent: null })
+    );
   });
 
   it("createAgreement throws NOT_FOUND for cross-tenant customers", async () => {

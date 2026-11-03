@@ -1,8 +1,11 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  assertSafePublicBookingSlug,
   hasPublicApiPathTraversal,
   hasPublicApiPathTraversalInRequest,
+  hasUnsafePublicPathSegment,
+  isAllowedPublicApiProxyMethod,
   isPublicApiProxyPath
 } from "@/src/lib/public-api-path-security";
 
@@ -30,5 +33,22 @@ describe("public-api-path-security", () => {
 
   it("allows normal public booking paths", () => {
     expect(hasPublicApiPathTraversal("/api/v1/public/booking/acme-hvac")).toBe(false);
+  });
+
+  it("allowlists safe HTTP methods on the public API proxy", () => {
+    expect(isAllowedPublicApiProxyMethod("GET")).toBe(true);
+    expect(isAllowedPublicApiProxyMethod("head")).toBe(true);
+    expect(isAllowedPublicApiProxyMethod("POST")).toBe(true);
+    expect(isAllowedPublicApiProxyMethod("DELETE")).toBe(false);
+    expect(isAllowedPublicApiProxyMethod("PUT")).toBe(false);
+  });
+
+  it("rejects unsafe booking slug segments", () => {
+    expect(hasUnsafePublicPathSegment("acme-hvac")).toBe(false);
+    expect(hasUnsafePublicPathSegment("../admin")).toBe(true);
+    expect(hasUnsafePublicPathSegment("acme%2fhvac")).toBe(true);
+
+    expect(() => assertSafePublicBookingSlug("acme-hvac")).not.toThrow();
+    expect(() => assertSafePublicBookingSlug("..%2fsecrets")).toThrow();
   });
 });

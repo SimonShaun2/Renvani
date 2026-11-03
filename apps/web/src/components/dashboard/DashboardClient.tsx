@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { addDays, endOfMonth, format, isAfter, isBefore, parseISO, startOfMonth, subDays } from "date-fns";
 import { motion } from "framer-motion";
 import {
@@ -19,11 +20,12 @@ import {
   Sparkles,
   Users
 } from "lucide-react";
-import type {
-  AiRecommendationDetail,
-  AiRecommendationType,
-  DispatchTechnicianDay,
-  RevenueSummary
+import {
+  isRevenueProposalRecommendationType,
+  type AiRecommendationDetail,
+  type AiRecommendationType,
+  type DispatchTechnicianDay,
+  type RevenueSummary
 } from "@fsm/types";
 import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
 
@@ -51,6 +53,7 @@ import {
   type UnscheduledJobListItem
 } from "@/src/hooks/dashboard.hooks";
 import { useActionRecommendation, useRecommendations } from "@/src/hooks/ai-revenue.hooks";
+import { useProposeRecommendation } from "@/src/hooks/revenue-proposals.hooks";
 import { cn } from "@/src/lib/utils";
 import { useAuthStore } from "@/src/stores/auth.store";
 
@@ -983,7 +986,9 @@ function SuggestedActionsCard({
   const customerName = recommendation.customer
     ? `${recommendation.customer.firstName} ${recommendation.customer.lastName}`.trim()
     : recommendation.headline;
-  const actionLabel = getRecommendationActionLabel(recommendation.type);
+  const actionLabel = isRevenueProposalRecommendationType(recommendation.type)
+    ? "Create proposal"
+    : getRecommendationActionLabel(recommendation.type);
   const urgencyTone = getUrgencyTone(recommendation.urgencyScore);
 
   return (
@@ -1048,9 +1053,11 @@ function SuggestedActionsCard({
   );
 }
 
-function SuggestedActions() {
+export function SuggestedActions() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<"suggestions" | "watchlist">("suggestions");
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
   const pendingQuery = useRecommendations({
     status: "pending",
     limit: 3,
@@ -1062,17 +1069,29 @@ function SuggestedActions() {
     page: 1
   });
   const actionMutation = useActionRecommendation();
+  const proposeMutation = useProposeRecommendation();
 
   const activeQuery = activeTab === "suggestions" ? pendingQuery : watchlistQuery;
   const recommendations = activeQuery.data?.data ?? [];
 
   async function handleAction(recommendation: AiRecommendationDetail) {
-    await actionMutation.mutateAsync({
-      id: recommendation.id,
-      input: {
-        actionTaken: getRecommendationActionLabel(recommendation.type)
+    setActionError(null);
+    try {
+      if (isRevenueProposalRecommendationType(recommendation.type)) {
+        await proposeMutation.mutateAsync(recommendation.id);
+        router.push("/command-center/approvals");
+        return;
       }
-    });
+
+      await actionMutation.mutateAsync({
+        id: recommendation.id,
+        input: {
+          actionTaken: getRecommendationActionLabel(recommendation.type)
+        }
+      });
+    } catch (error: unknown) {
+      setActionError(error instanceof Error ? error.message : "The recommendation could not be updated.");
+    }
   }
 
   return (
@@ -1111,6 +1130,12 @@ function SuggestedActions() {
         </button>
       </div>
 
+      {actionError ? (
+        <div role="alert" className="mt-4 rounded-2xl border border-error/15 bg-error-light px-4 py-3 text-sm text-error">
+          {actionError}
+        </div>
+      ) : null}
+
       <div className="mt-4 space-y-4">
         {activeQuery.isLoading ? (
           Array.from({ length: 3 }, (_, index) => <SkeletonCard key={index} className="h-[192px]" />)
@@ -1137,7 +1162,10 @@ function SuggestedActions() {
               expandedId={expandedId}
               onToggleWhy={(id) => setExpandedId((current) => (current === id ? null : id))}
               onAction={handleAction}
-              isSubmitting={actionMutation.isPending && actionMutation.variables?.id === recommendation.id}
+              isSubmitting={
+                (actionMutation.isPending && actionMutation.variables?.id === recommendation.id) ||
+                (proposeMutation.isPending && proposeMutation.variables === recommendation.id)
+              }
             />
           ))
         )}

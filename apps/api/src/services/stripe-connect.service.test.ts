@@ -7,14 +7,18 @@ import { setupTestEnv } from "../test-support/env-setup.js";
 setupTestEnv();
 
 const {
+  applyConnectAccountBrandingMock,
   createConnectOnboardingLinkMock,
+  createConnectAccountSessionMock,
   createExpressConnectedAccountMock,
   createExpressDashboardLinkMock,
   retrieveConnectedAccountMock,
   createInvoiceCheckoutSessionMock,
   expireInvoiceCheckoutSessionMock
 } = vi.hoisted(() => ({
+  applyConnectAccountBrandingMock: vi.fn(),
   createConnectOnboardingLinkMock: vi.fn(),
+  createConnectAccountSessionMock: vi.fn(),
   createExpressConnectedAccountMock: vi.fn(),
   createExpressDashboardLinkMock: vi.fn(),
   retrieveConnectedAccountMock: vi.fn(),
@@ -35,7 +39,9 @@ vi.mock("@fsm/db", async () => {
 vi.mock("../lib/stripe.js", () => ({
   createInvoiceCheckoutSession: createInvoiceCheckoutSessionMock,
   expireInvoiceCheckoutSession: expireInvoiceCheckoutSessionMock,
+  applyConnectAccountBranding: applyConnectAccountBrandingMock,
   createConnectOnboardingLink: createConnectOnboardingLinkMock,
+  createConnectAccountSession: createConnectAccountSessionMock,
   createExpressConnectedAccount: createExpressConnectedAccountMock,
   createExpressDashboardLink: createExpressDashboardLinkMock,
   retrieveConnectedAccount: retrieveConnectedAccountMock
@@ -54,11 +60,14 @@ beforeAll(async () => {
 
 beforeEach(() => {
   fakeDb.resetTestState();
+  applyConnectAccountBrandingMock.mockReset();
   createConnectOnboardingLinkMock.mockReset();
+  createConnectAccountSessionMock.mockReset();
   createExpressConnectedAccountMock.mockReset();
   createExpressDashboardLinkMock.mockReset();
   retrieveConnectedAccountMock.mockReset();
   createExpressConnectedAccountMock.mockResolvedValue({ id: "acct_new_123" });
+  applyConnectAccountBrandingMock.mockResolvedValue(undefined);
   createConnectOnboardingLinkMock.mockResolvedValue({ url: "https://stripe.test/onboard" });
   createExpressDashboardLinkMock.mockResolvedValue({ url: "https://stripe.test/dashboard" });
   retrieveConnectedAccountMock.mockResolvedValue({
@@ -89,7 +98,8 @@ describe("stripe-connect.service", () => {
 
     const persistedCompany = fakeDb.getTestState().companies.find((row) => row.id === company.id);
     expect(result.url).toBe("https://stripe.test/onboard");
-    expect(createExpressConnectedAccountMock).toHaveBeenCalledWith(company.id);
+    expect(createExpressConnectedAccountMock).toHaveBeenCalledWith(company.id, company.name);
+    expect(applyConnectAccountBrandingMock).toHaveBeenCalledWith("acct_new_123", "Acme HVAC");
     expect(createConnectOnboardingLinkMock).toHaveBeenCalledWith("acct_new_123");
     expect(persistedCompany?.stripeAccountId).toBe("acct_new_123");
     expect(fakeDb.getTestState().activityEvents.at(-1)?.eventType).toBe("company.stripe_onboarding_started");
@@ -136,7 +146,9 @@ describe("stripe-connect.service", () => {
       payoutSchedule: "Daily",
       lastPayoutAmount: "4800.00",
       lastPayoutAt: "2026-04-29T15:00:00.000Z",
-      platformFeePercent: expect.any(Number)
+      platformFeePercent: 2,
+      serviceFeePercent: 2,
+      renvaniPlanTier: null
     });
     expect(persistedCompany?.settings).toEqual({
       stripeConnect: {
@@ -188,7 +200,9 @@ describe("stripe-connect.service", () => {
       payoutSchedule: "Daily",
       lastPayoutAmount: "4800.00",
       lastPayoutAt: "2026-04-29T15:00:00.000Z",
-      platformFeePercent: expect.any(Number)
+      platformFeePercent: 2,
+      serviceFeePercent: 2,
+      renvaniPlanTier: null
     });
   });
 

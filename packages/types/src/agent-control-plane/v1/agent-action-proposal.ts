@@ -6,6 +6,8 @@ import { AgentProductV1Schema } from "./tenant-context.js";
 import { ContextResolveParamsV1Schema } from "./tools/context-resolve.params.js";
 import { MessageDraftParamsV1Schema } from "./tools/message-draft.params.js";
 import { MessageSendProposedParamsV1Schema } from "./tools/message-send-proposed.params.js";
+import { LoyaltyReminderProposeParamsV1Schema } from "./tools/loyalty-reminder-propose.params.js";
+import { ServiceJobBriefProposeParamsV1Schema } from "./tools/service-job-brief-propose.params.js";
 import { AgentToolNameV1Schema } from "./tools/registry.js";
 import {
   ContractVersionV1Schema,
@@ -14,9 +16,19 @@ import {
   UuidSchema
 } from "./zod-shared.js";
 
+/**
+ * Delivery states for outbound agent actions (Figma 331:4230 steps Queued, Provider accepted, Delivered, plus
+ * Delivery failure). Business outcome is tracked separately and is not a delivery state.
+ */
+export const AgentActionDeliveryStateV1Schema = z.enum(["queued", "provider_accepted", "delivered", "failed"]);
+export type AgentActionDeliveryStateV1 = z.infer<typeof AgentActionDeliveryStateV1Schema>;
+
 export const ExecutionReceiptV1Schema = z.object({
-  outcome: z.enum(["succeeded", "failed", "dry_run"]),
-  emittedEventIds: z.array(UuidSchema)
+  /** `queued`: an outbound action was accepted for sending but nothing was sent yet; never reads as done. */
+  outcome: z.enum(["succeeded", "queued", "failed", "dry_run"]),
+  emittedEventIds: z.array(UuidSchema),
+  /** Present on outbound actions only. */
+  deliveryState: AgentActionDeliveryStateV1Schema.optional()
 });
 
 export type ExecutionReceiptV1 = z.infer<typeof ExecutionReceiptV1Schema>;
@@ -54,10 +66,22 @@ export const MessageSendProposedProposalV1Schema = AgentActionProposalBaseV1Sche
   parameters: MessageSendProposedParamsV1Schema
 });
 
+export const LoyaltyReminderProposeProposalV1Schema = AgentActionProposalBaseV1Schema.extend({
+  actionType: z.literal("loyalty.reminder.propose"),
+  parameters: LoyaltyReminderProposeParamsV1Schema
+});
+
+export const ServiceJobBriefProposeProposalV1Schema = AgentActionProposalBaseV1Schema.extend({
+  actionType: z.literal("service.job_brief.propose"),
+  parameters: ServiceJobBriefProposeParamsV1Schema
+});
+
 export const AgentActionProposalV1Schema = z.discriminatedUnion("actionType", [
   ContextResolveProposalV1Schema,
   MessageDraftProposalV1Schema,
-  MessageSendProposedProposalV1Schema
+  MessageSendProposedProposalV1Schema,
+  LoyaltyReminderProposeProposalV1Schema,
+  ServiceJobBriefProposeProposalV1Schema
 ]);
 
 export type AgentActionProposalV1 = z.infer<typeof AgentActionProposalV1Schema>;
@@ -75,6 +99,14 @@ export const CreateAgentActionProposalV1Schema = z.discriminatedUnion("actionTyp
   AgentActionProposalBaseV1Schema.omit({ id: true, state: true }).extend({
     actionType: z.literal("message.send_proposed"),
     parameters: MessageSendProposedParamsV1Schema
+  }),
+  AgentActionProposalBaseV1Schema.omit({ id: true, state: true }).extend({
+    actionType: z.literal("loyalty.reminder.propose"),
+    parameters: LoyaltyReminderProposeParamsV1Schema
+  }),
+  AgentActionProposalBaseV1Schema.omit({ id: true, state: true }).extend({
+    actionType: z.literal("service.job_brief.propose"),
+    parameters: ServiceJobBriefProposeParamsV1Schema
   })
 ]);
 
@@ -83,7 +115,9 @@ export type CreateAgentActionProposalV1 = z.infer<typeof CreateAgentActionPropos
 export const AgentToolParametersV1Schema = z.union([
   ContextResolveParamsV1Schema,
   MessageDraftParamsV1Schema,
-  MessageSendProposedParamsV1Schema
+  MessageSendProposedParamsV1Schema,
+  LoyaltyReminderProposeParamsV1Schema,
+  ServiceJobBriefProposeParamsV1Schema
 ]);
 
 export function parseAgentActionProposalV1(input: unknown): AgentActionProposalV1 {
@@ -107,6 +141,12 @@ export function assertActionTypeMatchesToolName(
       return;
     case "message.send_proposed":
       MessageSendProposedParamsV1Schema.parse(parameters);
+      return;
+    case "loyalty.reminder.propose":
+      LoyaltyReminderProposeParamsV1Schema.parse(parameters);
+      return;
+    case "service.job_brief.propose":
+      ServiceJobBriefProposeParamsV1Schema.parse(parameters);
       return;
   }
 }

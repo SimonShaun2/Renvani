@@ -1,9 +1,11 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 
 import type {
+  CustomerNote,
   CreateAssetInput,
   CreateCustomerInput,
   CreatePropertyInput,
+  ListCustomerHistoryTimelineQuery,
   ListCustomersQuery,
   UpdateAssetInput,
   UpdateCustomerInput,
@@ -20,10 +22,14 @@ import {
   createCustomer,
   deleteCustomer,
   getCustomer,
+  createCustomerNote,
+  getCustomerNotes,
   listCustomers,
   searchCustomers,
   updateCustomer
 } from "../../services/customer.service.js";
+import { getCustomerImportedHistory } from "../../services/customer-imported-history.service.js";
+import { listCustomerHistoryTimeline } from "../../services/customer-history-timeline.service.js";
 import {
   createProperty,
   deleteProperty,
@@ -33,6 +39,7 @@ import {
 } from "../../services/property.service.js";
 import type {
   AssetIdParams,
+  CreateCustomerNoteBody,
   CustomerIdParams,
   PropertyIdParams,
   SearchCustomersQuery,
@@ -303,6 +310,78 @@ export async function getCustomerHandler(
       ...toCustomerResponse(customer),
       properties: customer.properties.map((property) => toPropertyWithAssetsResponse(property))
     }
+  });
+}
+
+export async function getCustomerImportedHistoryHandler(
+  request: FastifyRequest,
+  reply: FastifyReply
+): Promise<FastifyReply> {
+  const params = request.params as CustomerIdParams;
+  const history = await getCustomerImportedHistory(request.company.id, params.id);
+  return reply.send(history);
+}
+
+export async function getCustomerHistoryTimelineHandler(
+  request: FastifyRequest,
+  reply: FastifyReply
+): Promise<FastifyReply> {
+  const params = request.params as CustomerIdParams;
+  const query = request.query as ListCustomerHistoryTimelineQuery;
+  const timeline = await listCustomerHistoryTimeline(request.company.id, params.id, query);
+  return reply.send(timeline);
+}
+
+function serializeCustomerNote(note: CustomerNote) {
+  return {
+    id: note.id,
+    companyId: note.companyId,
+    customerId: note.customerId,
+    authorId: note.authorId,
+    content: note.content,
+    isInternal: note.isInternal,
+    notedAt: note.notedAt?.toISOString() ?? null,
+    createdAt: note.createdAt.toISOString(),
+    updatedAt: note.updatedAt.toISOString(),
+    deletedAt: note.deletedAt?.toISOString() ?? null
+  };
+}
+
+export async function createCustomerNoteHandler(
+  request: FastifyRequest,
+  reply: FastifyReply
+): Promise<FastifyReply> {
+  const params = request.params as CustomerIdParams;
+  const note = await createCustomerNote(
+    request.company.id,
+    request.user.id,
+    params.id,
+    request.body as CreateCustomerNoteBody
+  );
+
+  return reply.status(201).send({ note: serializeCustomerNote(note) });
+}
+
+export async function getCustomerNotesHandler(
+  request: FastifyRequest,
+  reply: FastifyReply
+): Promise<FastifyReply> {
+  const params = request.params as CustomerIdParams;
+  const notes = await getCustomerNotes(request.company.id, params.id);
+
+  return reply.send({
+    notes: notes.map((note) => ({
+      id: note.id,
+      companyId: note.companyId,
+      customerId: note.customerId,
+      authorId: note.authorId,
+      content: note.content,
+      isInternal: note.isInternal,
+      notedAt: note.notedAt?.toISOString() ?? null,
+      createdAt: note.createdAt.toISOString(),
+      updatedAt: note.updatedAt.toISOString(),
+      deletedAt: note.deletedAt?.toISOString() ?? null
+    }))
   });
 }
 

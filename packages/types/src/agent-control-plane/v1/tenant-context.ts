@@ -9,7 +9,8 @@ export const AgentProductV1Schema = z.enum([
   "scheduling",
   "service",
   "retention",
-  "owner"
+  "owner",
+  "loyalty"
 ]);
 
 export const ActorV1Schema = z.object({

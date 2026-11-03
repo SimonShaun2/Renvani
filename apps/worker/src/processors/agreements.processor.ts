@@ -13,6 +13,9 @@ import {
   serviceAgreementTemplates
 } from "@fsm/db";
 import { notificationsQueue } from "@fsm/jobs";
+import { LOYALTY_AGREEMENTS_JOB_NAMES } from "@fsm/types";
+
+import { processEvaluateLoyaltyReminderCandidates } from "./loyalty-reminder-candidates.processor.js";
 
 const logger = pino({
   name: "agreements-processor"
@@ -55,6 +58,8 @@ interface AgreementAutomationRule {
 }
 
 export interface AgreementsDependencies {
+  /** Test hook; production loads the API's scanAllPlanReminders from api/dist. */
+  scanPlanReminders?: () => Promise<{ companies: number; dispatched: number }>;
   loadPlan(companyId: string, maintenancePlanId: string): Promise<AgreementPlanContext | null>;
   findAutomationRule(
     companyId: string,
@@ -288,6 +293,14 @@ const productionDependencies: AgreementsDependencies = {
   }
 };
 
+export const PLAN_REMINDER_SCAN_JOB_NAME = "plan-reminder-scan";
+
+async function loadAndScanPlanReminders(): Promise<{ companies: number; dispatched: number }> {
+  const moduleUrl = new URL("../../../api/dist/services/plan-reminders/plan-reminder.service.js", import.meta.url);
+  const mod = (await import(moduleUrl.href)) as { scanAllPlanReminders(): Promise<{ companies: number; dispatched: number }> };
+  return mod.scanAllPlanReminders();
+}
+
 export async function handleServiceAgreementRenewalCheck(
   job: Job<Record<string, unknown>>,
   dependencies: AgreementsDependencies
@@ -359,6 +372,21 @@ export function createAgreementsProcessor(
   dependencies: AgreementsDependencies = productionDependencies
 ): Processor<Record<string, unknown>, void, string> {
   return async (job) => {
+    if (job.name === LOYALTY_AGREEMENTS_JOB_NAMES.evaluateReminderCandidates) {
+      await processEvaluateLoyaltyReminderCandidates(
+        job as unknown as import("bullmq").Job<
+          import("@fsm/types").EvaluateLoyaltyReminderCandidatesJobData
+        >
+      );
+      return;
+    }
+
+    if (job.name === PLAN_REMINDER_SCAN_JOB_NAME) {
+      const result = await (dependencies.scanPlanReminders ?? loadAndScanPlanReminders)();
+      logger.info(result, "Plan reminder scan finished");
+      return;
+    }
+
     if (job.name !== "service-agreement-renewal-check") {
       logger.warn({ jobId: job.id ?? null, jobName: job.name }, "Unknown agreements job received");
       return;

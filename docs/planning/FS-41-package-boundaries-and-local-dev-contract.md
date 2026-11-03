@@ -90,7 +90,7 @@ REDIS_URL=redis://localhost:6379
 STRIPE_SECRET_KEY=sk_test_local_only
 STRIPE_WEBHOOK_SECRET=whsec_local_only
 STRIPE_CONNECT_CLIENT_ID=ca_test_local_only
-STRIPE_PLATFORM_FEE_PERCENT=0.05
+STRIPE_PLATFORM_FEE_PERCENT=0.02  # legacy, not customer-facing (Service Fee = SERVICE_FEE_RATE_BPS)
 OPENAI_API_KEY=openai_local_only
 TWILIO_ACCOUNT_SID=AC_local_only
 TWILIO_AUTH_TOKEN=twilio_local_only

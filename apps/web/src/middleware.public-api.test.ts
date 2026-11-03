@@ -35,4 +35,14 @@ describe("middleware public API proxy", () => {
 
     expect(response.status).toBe(400);
   });
+
+  it("returns 405 for unsupported methods on public API proxy paths", async () => {
+    const request = new NextRequest("http://localhost:3000/api/v1/public/booking/acme-hvac", {
+      method: "DELETE"
+    });
+
+    const response = await middleware(request);
+
+    expect(response.status).toBe(405);
+  });
 });

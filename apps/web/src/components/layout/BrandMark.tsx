@@ -14,14 +14,14 @@ export function BrandMark({ compact = false, light = false }: BrandMarkProps) {
           compact && "h-9 w-9 rounded-xl text-sm"
         )}
       >
-        SR
+        R
       </div>
       <div className="space-y-0.5">
         <p className={cn("text-lg font-semibold tracking-tight", light ? "text-white" : "text-neutral-900")}>
-          ServiceRev
+          Renvani
         </p>
         <p className={cn("text-xs", light ? "text-neutral-400" : "text-neutral-500")}>
-          Thinner system. Smarter brain.
+          Grow your shop. Renvani runs the rest.
         </p>
       </div>
     </div>

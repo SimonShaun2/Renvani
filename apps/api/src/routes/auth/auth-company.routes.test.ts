@@ -6,7 +6,7 @@ import { setupTestEnv } from "../../test-support/env-setup.js";
 
 const JWT_SECRET = "jwt_secret";
 const JWT_REFRESH_SECRET = "jwt_refresh_secret";
-const sendPasswordResetEmailMock = vi.hoisted(() => vi.fn());
+const notificationsQueueAddMock = vi.hoisted(() => vi.fn());
 
 setupTestEnv();
 
@@ -23,11 +23,10 @@ vi.mock("@fsm/db", async () => {
 vi.mock("@fsm/jobs", () => ({
   aiQueue: {
     add: vi.fn()
+  },
+  notificationsQueue: {
+    add: notificationsQueueAddMock
   }
-}));
-
-vi.mock("../../lib/email.js", () => ({
-  sendPasswordResetEmail: sendPasswordResetEmailMock
 }));
 
 type BuildAppModule = typeof import("../../app.js");
@@ -48,8 +47,10 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
+  const { resetPublicBookingRateLimitStateForTests } = await import("../../lib/public-booking-rate-limit.js");
+  resetPublicBookingRateLimitStateForTests();
   fakeDb.resetTestState();
-  sendPasswordResetEmailMock.mockReset();
+  notificationsQueueAddMock.mockReset();
   app = await buildAppModule.buildApp();
   await app.ready();
 });
@@ -68,8 +69,12 @@ async function registerUser() {
     phone: "555-0100"
   });
 
-  expect(response.status).toBe(201);
-  return response.body as {
+  expect(response.status).toBe(202);
+  const loginResponse = await request(app.server)
+    .post("/api/v1/auth/login")
+    .send({ email: "owner@example.com", password: "password123" });
+  expect(loginResponse.status).toBe(200);
+  return loginResponse.body as {
     user: { id: string };
     company: { id: string; name: string; slug: string };
     tokens: { accessToken: string; refreshToken: string; expiresIn: number };
@@ -77,7 +82,7 @@ async function registerUser() {
 }
 
 describe("auth and company routes", () => {
-  it("POST /auth/register returns 201 on success", async () => {
+  it("POST /auth/register returns 202 on success and creates the account", async () => {
     const response = await request(app.server).post("/api/v1/auth/register").send({
       companyName: "Tulsa HVAC Pro",
       firstName: "Ava",
@@ -86,9 +91,13 @@ describe("auth and company routes", () => {
       password: "password123"
     });
 
-    expect(response.status).toBe(201);
-    expect(response.body.company.slug).toBe("tulsa-hvac-pro");
-    expect(response.body.tokens.accessToken).toBeTruthy();
+    expect(response.status).toBe(202);
+    expect(response.body).toEqual({ message: "Check your email" });
+    const loginResponse = await request(app.server)
+      .post("/api/v1/auth/login")
+      .send({ email: "owner@example.com", password: "password123" });
+    expect(loginResponse.status).toBe(200);
+    expect(loginResponse.body.company.name).toBe("Tulsa HVAC Pro");
   });
 
   it("POST /auth/register returns 400 on validation failure", async () => {
@@ -104,7 +113,7 @@ describe("auth and company routes", () => {
     expect(response.body.error).toBe("VALIDATION_ERROR");
   });
 
-  it("POST /auth/register returns 409 for duplicate email", async () => {
+  it("POST /auth/register returns the same 202 for an existing email (no enumeration)", async () => {
     await registerUser();
 
     const response = await request(app.server).post("/api/v1/auth/register").send({
@@ -115,7 +124,8 @@ describe("auth and company routes", () => {
       password: "password123"
     });
 
-    expect(response.status).toBe(409);
+    expect(response.status).toBe(202);
+    expect(response.body).toEqual({ message: "Check your email" });
   });
 
   it("POST /auth/login returns 200 on success", async () => {
@@ -198,7 +208,7 @@ describe("auth and company routes", () => {
 
   it("POST /auth/forgot-password returns 200 for existing and nonexistent email", async () => {
     await registerUser();
-    sendPasswordResetEmailMock.mockRejectedValueOnce(new Error("SendGrid down"));
+    notificationsQueueAddMock.mockRejectedValueOnce(new Error("Redis down"));
 
     const existingResponse = await request(app.server).post("/api/v1/auth/forgot-password").send({
       email: "owner@example.com"
@@ -258,12 +268,15 @@ describe("auth and company routes", () => {
       password: "password123"
     });
 
-    expect(secondUser.status).toBe(201);
+    expect(secondUser.status).toBe(202);
+    const secondLogin = await request(app.server)
+      .post("/api/v1/auth/login")
+      .send({ email: "owner-b@example.com", password: "password123" });
 
     const mismatchedAccessToken = jwt.sign(
       {
         userId: firstUser.user.id,
-        companyId: secondUser.body.company.id,
+        companyId: secondLogin.body.company.id,
         role: "owner",
         tokenType: "access"
       },

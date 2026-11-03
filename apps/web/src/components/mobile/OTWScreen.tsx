@@ -3,7 +3,10 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
-import { ArrowLeft, CarFront, MapPinned, Phone } from "lucide-react";
+import { CarFront, MapPinned, Phone } from "lucide-react";
+
+import { cn } from "@/src/lib/utils";
+import { formatArrival, getCrewStatusTone } from "./crew-job.utils";
 
 import { EmptyState } from "@/src/components/ui/EmptyState";
 import { SkeletonCard } from "@/src/components/ui/SkeletonCard";
@@ -22,6 +25,7 @@ export function OTWScreen() {
   const [message, setMessage] = useState("");
 
   const job = jobQuery.data?.job;
+  const latest = otwQuery.data?.notification ?? null;
   const notifications = useMemo(() => (otwQuery.data?.notification ? [otwQuery.data.notification] : []), [otwQuery.data?.notification]);
 
   useEffect(() => {
@@ -85,25 +89,33 @@ export function OTWScreen() {
   )}`;
 
   return (
-    <div className="min-h-[100svh] bg-[#F5F7FB] px-4 py-4">
+    <div className="min-h-[100svh] bg-[#fbf6ef] px-4 py-4">
       <div className="mx-auto w-full max-w-[390px] space-y-4">
-        <header className="rounded-[28px] bg-brand-primary px-4 py-4 text-white">
-          <Link href={`/mobile/jobs/${job.id}`} className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-white/80">
-            <ArrowLeft className="h-4 w-4" />
-            HVAC Repair
-          </Link>
-          <h1 className="mt-2 text-2xl font-semibold tracking-tight text-white">On My Way</h1>
+        <header className="space-y-3">
+          <div className="flex items-center gap-3">
+            <Link href="/mobile/jobs" className="inline-flex min-h-11 items-center text-sm text-[#5e6684]">
+              ‹ Today
+            </Link>
+            <span className={cn("inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold", getCrewStatusTone("dispatched"))}>
+              <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-current" />
+              On the way
+            </span>
+          </div>
+          <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-[#0f1530]">
+            Heading to {job.customer.firstName} {job.customer.lastName.charAt(0)}{job.customer.lastName ? "." : ""}
+          </h1>
+          <p className="text-sm text-[#5e6684]">
+            {[job.jobNumber, job.title, job.property?.addressLine1 ?? "Address pending"].join(" · ")}
+          </p>
         </header>
 
-        <section className="rounded-[28px] border border-neutral-200 bg-white px-4 py-4 shadow-sm">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-400">Next Job</p>
-          <h2 className="mt-2 text-xl font-semibold tracking-tight text-neutral-950">{job.title}</h2>
-          <p className="mt-1 text-sm text-neutral-500">{job.property?.addressLine1 ?? "Address pending"}</p>
-          <p className="mt-1 text-sm text-neutral-500">
-            {job.scheduledStart ? formatDateTime(job.scheduledStart) : "Time TBD"}
-            {job.scheduledEnd ? ` - ${formatDateTime(job.scheduledEnd)}` : ""}
-          </p>
-        </section>
+        {latest?.sentAt && latest.estimatedArrivalMinutes != null ? (
+          <section className="rounded-[14px] bg-[#0f1530] px-5 py-5 text-white">
+            <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-[#f6b400]">ETA sent to customer</p>
+            <p className="mt-3 text-[22px] font-semibold">Arriving {formatArrival(latest.sentAt, latest.estimatedArrivalMinutes)}</p>
+            <p className="mt-2 text-sm text-white/85">{job.customer.firstName} got a text with your ETA.</p>
+          </section>
+        ) : null}
 
         <section className="space-y-3 rounded-[28px] border border-neutral-200 bg-white px-4 py-4 shadow-sm">
           <div>

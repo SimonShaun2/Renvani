@@ -9,12 +9,16 @@ const {
   addAiQueueJob,
   downloadFileMock,
   getFileKeyFromUrlMock,
-  mapCsvColumnsMock
+  uploadFileMock,
+  mapCsvColumnsMock,
+  recordImportAiObservationMock
 } = vi.hoisted(() => ({
   addAiQueueJob: vi.fn(),
   downloadFileMock: vi.fn(),
   getFileKeyFromUrlMock: vi.fn(),
-  mapCsvColumnsMock: vi.fn()
+  uploadFileMock: vi.fn(async (key: string) => ({ key, url: `https://r2.test/${key}` })),
+  mapCsvColumnsMock: vi.fn(),
+  recordImportAiObservationMock: vi.fn(async () => undefined)
 }));
 
 vi.mock("drizzle-orm", async () => {
@@ -24,7 +28,10 @@ vi.mock("drizzle-orm", async () => {
 
 vi.mock("@fsm/db", async () => {
   const helper = await import("../../../api/src/test-support/fake-db.js");
-  return helper.createDbModuleMock();
+  return {
+    ...helper.createDbModuleMock(),
+    resolveSourceSystemForPriceBookImport: () => "manual_csv",
+  };
 });
 
 vi.mock("@fsm/jobs", () => ({
@@ -35,11 +42,13 @@ vi.mock("@fsm/jobs", () => ({
 
 vi.mock("@fsm/config/storage", () => ({
   downloadFile: downloadFileMock,
-  getFileKeyFromUrl: getFileKeyFromUrlMock
+  getFileKeyFromUrl: getFileKeyFromUrlMock,
+  uploadFile: uploadFileMock
 }));
 
 vi.mock("@fsm/ai", () => ({
-  mapCsvColumns: mapCsvColumnsMock
+  mapCsvColumns: mapCsvColumnsMock,
+  recordImportAiObservation: recordImportAiObservationMock
 }));
 
 type CsvImportProcessorModule = typeof import("./csv-import.processor.js");
@@ -110,6 +119,36 @@ describe("csv-import.processor", () => {
     });
   });
 
+  it("map-csv-columns dedupes when the session already left uploaded state", async () => {
+    const company = fakeDb.seedCompany({
+      name: "Acme HVAC",
+      slug: "acme-hvac-dedupe"
+    });
+    const importSession = fakeDb.seedImportSession({
+      companyId: company.id,
+      fileName: "customers.csv",
+      fileUrl: "imports/company/customers.csv",
+      status: "mapping",
+      columnMappings: { Email: "email" }
+    });
+
+    const { job } = createJob("map-csv-columns", {
+      companyId: company.id,
+      importSessionId: importSession.id,
+      idempotencyKey: `${importSession.id}:map-csv-columns`
+    });
+
+    await csvImportProcessor.handleMapCsvColumns(job);
+
+    expect(mapCsvColumnsMock).not.toHaveBeenCalled();
+    expect(downloadFileMock).not.toHaveBeenCalled();
+    const receipt = fakeDb.getTestState().activityEvents.at(-1);
+    expect(receipt?.payload).toMatchObject({
+      stepKind: "map-csv-columns",
+      state: "deduped_completed"
+    });
+  });
+
   it("validate-csv-rows collects all errors and detects duplicates without aborting", async () => {
     const company = fakeDb.seedCompany({
       name: "Acme HVAC",
@@ -164,6 +203,124 @@ describe("csv-import.processor", () => {
       }
     ]);
     expect(updateProgress).toHaveBeenCalledWith(100);
+  });
+
+  it("validate-csv-rows parses xlsx uploads and stores chunk commit manifest when sourceId is mapped", async () => {
+    const XLSX = await import("xlsx");
+    const workbook = XLSX.utils.book_new();
+    const sheet = XLSX.utils.aoa_to_sheet([
+      ["Customer ID", "First Name", "Last Name"],
+      ["c1", "Chris", "Pine"],
+      ["c2", "Jamie", "Lee"]
+    ]);
+    XLSX.utils.book_append_sheet(workbook, sheet, "Customers");
+    const buffer = Buffer.from(XLSX.write(workbook, { type: "array", bookType: "xlsx" }) as ArrayBuffer);
+
+    const company = fakeDb.seedCompany({
+      name: "Acme HVAC",
+      slug: "acme-hvac-xlsx"
+    });
+    const importSession = fakeDb.seedImportSession({
+      companyId: company.id,
+      fileName: "customers.xlsx",
+      fileUrl: "imports/company/customers.xlsx",
+      status: "preview",
+      entityType: "customers",
+      aiInferences: { sourceSystem: "jobber" },
+      columnMappings: {
+        "Customer ID": "sourceId",
+        "First Name": "firstName",
+        "Last Name": "lastName"
+      }
+    });
+    downloadFileMock.mockResolvedValue(buffer);
+
+    const { job } = createJob("validate-csv-rows", {
+      companyId: company.id,
+      importSessionId: importSession.id
+    });
+
+    await csvImportProcessor.handleValidateCsvRows(job);
+
+    const storedSession = fakeDb.getTestState().importSessions.find((row) => row.id === importSession.id);
+    const manifest = storedSession?.aiInferences.importChunkCommitManifest as {
+      entityType?: string;
+      chunks?: Array<{ chunksTotal: number }>;
+    };
+
+    expect(storedSession?.totalRows).toBe(2);
+    expect(manifest?.entityType).toBe("customers");
+    expect(manifest?.chunks?.[0]?.chunksTotal).toBe(1);
+    expect(storedSession?.progress).toMatchObject({
+      entityType: "customers",
+      chunksTotal: 1,
+      chunksDone: 0,
+      rowsOk: 0,
+      rowsFailed: 0
+    });
+  });
+
+  it("execute-import rejects a payments file as unsupported instead of committing it as customers", async () => {
+    const company = fakeDb.seedCompany({ name: "Pay Co", slug: "pay-co" });
+    const importSession = fakeDb.seedImportSession({
+      companyId: company.id,
+      entityType: "payments" as never,
+      fileName: "payments.csv",
+      fileUrl: "imports/company/payments.csv",
+      status: "importing",
+      columnMappings: { "First Name": "firstName", "Last Name": "lastName", Amount: "amount" }
+    });
+    downloadFileMock.mockResolvedValue(Buffer.from("First Name,Last Name,Amount\nPat,Payer,50.00"));
+
+    const { job } = createJob("execute-import", { companyId: company.id, importSessionId: importSession.id });
+    await expect(csvImportProcessor.handleExecuteImport(job)).resolves.toBeUndefined();
+
+    const stored = fakeDb.getTestState().importSessions.find((row) => row.id === importSession.id);
+    expect(stored?.status).toBe("failed");
+    expect(stored?.errorMessage).toContain("UNSUPPORTED_ENTITY_TYPE");
+    expect(stored?.errorMessage).toContain("payments");
+    expect(fakeDb.getTestState().customers.filter((row) => row.companyId === company.id)).toHaveLength(0);
+  });
+
+  it("execute-import does not write properties without a chunk plan as customers", async () => {
+    const company = fakeDb.seedCompany({ name: "Prop Co", slug: "prop-co" });
+    const importSession = fakeDb.seedImportSession({
+      companyId: company.id,
+      entityType: "properties" as never,
+      fileName: "properties.csv",
+      fileUrl: "imports/company/properties.csv",
+      status: "importing",
+      columnMappings: { "First Name": "firstName", Street: "addressLine1" }
+    });
+    downloadFileMock.mockResolvedValue(Buffer.from("First Name,Street\nPat,1 Main St"));
+
+    const { job } = createJob("execute-import", { companyId: company.id, importSessionId: importSession.id });
+    await csvImportProcessor.handleExecuteImport(job);
+
+    const stored = fakeDb.getTestState().importSessions.find((row) => row.id === importSession.id);
+    expect(stored?.status).toBe("failed");
+    expect(stored?.errorMessage).toContain("UNSUPPORTED_ENTITY_TYPE");
+    expect(fakeDb.getTestState().customers.filter((row) => row.companyId === company.id)).toHaveLength(0);
+  });
+
+  it("execute-import leaves assets with an equipment chunk plan to the equipment chunks", async () => {
+    const company = fakeDb.seedCompany({ name: "Asset Co", slug: "asset-co" });
+    const importSession = fakeDb.seedImportSession({
+      companyId: company.id,
+      entityType: "assets" as never,
+      fileName: "assets.csv",
+      fileUrl: "imports/company/assets.csv",
+      status: "importing",
+      columnMappings: { Serial: "serialNumber" },
+      aiInferences: { equipmentChunkPlan: { chunksTotal: 1 } }
+    });
+
+    const { job } = createJob("execute-import", { companyId: company.id, importSessionId: importSession.id });
+    await csvImportProcessor.handleExecuteImport(job);
+
+    const stored = fakeDb.getTestState().importSessions.find((row) => row.id === importSession.id);
+    expect(stored?.status).toBe("importing");
+    expect(downloadFileMock).not.toHaveBeenCalled();
   });
 
   it("execute-import inserts valid rows with importSessionId, skips duplicates and errors, and enqueues dormant scan", async () => {

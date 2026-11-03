@@ -1,0 +1,325 @@
+import { and, eq, isNull, sql } from "drizzle-orm";
+import pino from "pino";
+
+import { activityEvents, companies, db, users, type Database } from "@fsm/db";
+import type { UserRole } from "@fsm/types";
+
+import { generateUniqueCompanySlug } from "./auth.service.js";
+import { ClerkOrganizationAmbiguousError, findCompanyByClerkOrganizationId } from "./clerk-tenant.service.js";
+
+const logger = pino({ name: "clerk-provisioning" });
+
+type CompanyRow = typeof companies.$inferSelect;
+
+export interface ClerkOrganizationInput {
+  organizationId: string;
+  name: string;
+  /** Clerk user id of the org creator (organization.created `created_by`); only known from that event. */
+  createdBy?: string | null;
+}
+
+/** Creator recorded at provisioning (settings.clerk.createdBy), or null if the provider supplied no creator. */
+function readClerkCreatedBy(company: CompanyRow): string | null {
+  const clerk = (company.settings as { clerk?: { createdBy?: unknown } } | null)?.clerk;
+  return typeof clerk?.createdBy === "string" && clerk.createdBy.length > 0 ? clerk.createdBy : null;
+}
+
+export interface ClerkMembershipInput extends ClerkOrganizationInput {
+  email: string;
+  firstName: string;
+  lastName: string;
+  clerkOrgRole: string | null;
+  /** Clerk user id (`public_user_data.user_id`); stored on users.clerk_user_id. */
+  clerkUserId: string | null;
+  /**
+   * True only when the Clerk payload itself proves the email is verified. organizationMembership payloads
+   * do not carry verification, so the webhook passes false and existing users are NOT linked by email here;
+   * they link on first login via the Clerk-verified session email (resolveStaffUserForClerkSession).
+   */
+  emailVerified: boolean;
+}
+
+type Tx = Parameters<Parameters<Database["transaction"]>[0]>[0];
+
+/**
+ * Serialises provisioning for one Clerk org (transaction-scoped advisory lock), so concurrent
+ * organization.created / organizationMembership.created deliveries cannot assign two owners.
+ * FS-157: companies_clerk_organization_id_idx is the DB-level guarantee behind this lock.
+ */
+async function lockClerkOrganization(tx: Tx, organizationId: string): Promise<void> {
+  await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${`clerk-org:${organizationId}`}))`);
+}
+
+async function findOrCreateCompany(tx: Tx, input: ClerkOrganizationInput): Promise<CompanyRow> {
+  const existing = await findCompanyByClerkOrganizationId(input.organizationId, tx);
+  if (existing) {
+    return existing;
+  }
+
+  const name = input.name.trim() || "New company";
+  // FS-157: slug lookup runs inside the provisioning transaction (after the org lock).
+  const slug = await generateUniqueCompanySlug(name, tx);
+  const [company] = await tx
+    .insert(companies)
+    .values({ name, slug, timezone: "America/Chicago", settings: {
+        clerk: {
+          organizationId: input.organizationId,
+          ...(input.createdBy?.trim() ? { createdBy: input.createdBy.trim() } : {})
+        }
+      }
+    })
+    .returning();
+
+  if (!company) {
+    throw new Error("Failed to provision company for Clerk organization");
+  }
+  await tx.insert(activityEvents).values({
+    companyId: company.id,
+    eventType: "company.created",
+    actorType: "system",
+    actorName: "Clerk provisioning",
+    entityType: "company",
+    entityId: company.id,
+    payload: { source: "clerk_webhook", clerkOrganizationId: input.organizationId },
+    summary: "Company provisioned from Clerk organization"
+  });
+  return company;
+}
+
+/** Active staff user already holding this Clerk user id (global lookup on the existing clerk_user_id link). */
+async function findActiveUserByClerkId(tx: Tx, clerkUserId: string) {
+  return tx.query.users.findFirst({
+    where: (userTable, operators) =>
+      operators.and(operators.eq(userTable.clerkUserId, clerkUserId), operators.isNull(userTable.deletedAt))
+  });
+}
+
+function isUniqueViolation(error: unknown): boolean {
+  let current: unknown = error;
+  for (let depth = 0; depth < 4 && current && typeof current === "object"; depth += 1) {
+    if ((current as { code?: unknown }).code === "23505") return true;
+    current = (current as { cause?: unknown }).cause;
+  }
+  return false;
+}
+
+/**
+ * Idempotent and race-safe: returns the existing company for the Clerk org, or creates it.
+ * Returns null (and logs) when the org id is ambiguous or a unique constraint clashes, so the webhook
+ * acks with 2xx instead of a 500 that Svix would retry forever.
+ */
+export type ClerkOrganizationSkipReason = "creator_already_linked" | "ambiguous_org" | "unique_violation";
+
+export async function provisionClerkOrganization(input: ClerkOrganizationInput): Promise<CompanyRow | null> {
+  return (await provisionClerkOrganizationDetailed(input)).company;
+}
+
+/** Same as provisionClerkOrganization, plus why it skipped (for the webhook ack). */
+export async function provisionClerkOrganizationDetailed(
+  input: ClerkOrganizationInput
+): Promise<{ company: CompanyRow | null; skipReason?: ClerkOrganizationSkipReason }> {
+  try {
+    return await db.transaction(async (tx) => {
+      await lockClerkOrganization(tx, input.organizationId);
+      const createdBy = input.createdBy?.trim();
+      const existing = await findCompanyByClerkOrganizationId(input.organizationId, tx);
+      if (!existing && createdBy && (await findActiveUserByClerkId(tx, createdBy))) {
+        // Orphan guard: the creator already belongs to a company, so the membership for this org would be
+        // skipped and the new company would have no members. Don't create it; ack so Clerk doesn't retry.
+        logger.warn({ clerkOrganizationId: input.organizationId }, "Clerk org creator already linked to a company; org not provisioned");
+        return { company: null, skipReason: "creator_already_linked" as const };
+      }
+      const company = existing ?? (await findOrCreateCompany(tx, input));
+      if (createdBy && !readClerkCreatedBy(company)) {
+        // An older company may lack a creator; never retroactively assign ownership.
+        const owner = await tx.query.users.findFirst({
+          where: (userTable, operators) =>
+            operators.and(
+              operators.eq(userTable.companyId, company.id),
+              operators.eq(userTable.role, "owner"),
+              operators.isNull(userTable.deletedAt)
+            )
+        });
+        if (owner && owner.clerkUserId !== createdBy) {
+          logger.warn({ companyId: company.id }, "Clerk org creator is not the provisioned owner (out-of-order events); not changed");
+        }
+      }
+      return { company };
+    });
+  } catch (error) {
+    if (error instanceof ClerkOrganizationAmbiguousError) return { company: null, skipReason: "ambiguous_org" };
+    if (isUniqueViolation(error)) {
+      logger.warn({ clerkOrganizationId: input.organizationId }, "Clerk organization provisioning hit a unique constraint; skipped");
+      return { company: null, skipReason: "unique_violation" };
+    }
+    throw error;
+  }
+}
+
+/**
+ * Owner = the recorded Clerk org creator. Membership order cannot select an owner.
+ */
+function mapClerkOrgRole(clerkOrgRole: string | null, isOwner: boolean): UserRole {
+  if (isOwner) {
+    return "owner";
+  }
+  return clerkOrgRole === "org:admin" ? "admin" : "office";
+}
+
+type MembershipStatus = "created" | "exists" | "linked" | "skipped" | "deferred";
+
+/**
+ * Idempotent: ensures a staff user only after an organization event established the
+ * company and its creator. A membership-first delivery is deferred for provider retry.
+ * - Stores clerk_user_id on create; never re-points a user linked to a different Clerk id or reuses a Clerk id
+ *   held by another user. Soft-deleted users are ignored in every lookup.
+ * - Links an existing (same-company, unlinked) user by email ONLY when input.emailVerified is true.
+ * - Reports "linked" only after re-reading the row and confirming it carries this clerk_user_id.
+ * - Ambiguous org ids and unique-constraint clashes return "skipped" (logged), never throw.
+ */
+export async function provisionClerkMembership(
+  input: ClerkMembershipInput
+): Promise<{ status: MembershipStatus; companyId: string | null; role?: UserRole }> {
+  const email = input.email.trim().toLowerCase();
+  const clerkUserId = input.clerkUserId?.trim() || null;
+
+  try {
+    return await db.transaction(async (tx) => {
+      await lockClerkOrganization(tx, input.organizationId);
+      const company = await findCompanyByClerkOrganizationId(input.organizationId, tx);
+      if (!company) {
+        const linked = clerkUserId ? await findActiveUserByClerkId(tx, clerkUserId) : undefined;
+        const emailTaken = linked
+          ? undefined
+          : await tx.query.users.findFirst({
+              where: (userTable, operators) => operators.eq(userTable.email, email)
+            });
+        if (linked || emailTaken) {
+          logger.warn(
+            { clerkOrganizationId: input.organizationId },
+            "Clerk member already linked to a company; org not provisioned"
+          );
+          return { status: "skipped" as const, companyId: null };
+        }
+        return { status: "deferred" as const, companyId: null };
+      }
+      if (clerkUserId) {
+        const byClerkId = await tx.query.users.findFirst({
+          where: (userTable, operators) =>
+            operators.and(operators.eq(userTable.clerkUserId, clerkUserId), operators.isNull(userTable.deletedAt))
+        });
+        if (byClerkId) {
+          if (byClerkId.companyId !== company.id || byClerkId.email !== email) {
+            logger.warn({ companyId: company.id }, "Clerk user id already linked to a different staff user; skipped");
+            return { status: "skipped" as const, companyId: company.id };
+          }
+          return { status: "exists" as const, companyId: company.id, role: byClerkId.role };
+        }
+      }
+
+      const createdBy = readClerkCreatedBy(company);
+      if (!createdBy) {
+        // Legacy companies may predate the creator marker. Preserve an already-linked
+        // member above, and admit new non-owner members only with one established owner.
+        const owners = await tx.query.users.findMany({
+          where: (userTable, operators) =>
+            operators.and(
+              operators.eq(userTable.companyId, company.id),
+              operators.eq(userTable.role, "owner"),
+              operators.isNull(userTable.deletedAt)
+            )
+        });
+        if (!clerkUserId || owners.length !== 1) {
+          return { status: "deferred" as const, companyId: company.id };
+        }
+      }
+
+      // users_email_idx is global and includes soft-deleted rows, so look at any row with this email.
+      const sameEmail = await tx.query.users.findFirst({
+        where: (userTable, operators) => operators.eq(userTable.email, email)
+      });
+
+      if (sameEmail) {
+        if (sameEmail.deletedAt) {
+          logger.warn({ companyId: company.id }, "Clerk membership email belongs to a soft-deleted user; not linked");
+          return { status: "skipped" as const, companyId: company.id };
+        }
+        if (sameEmail.companyId !== company.id) {
+          logger.warn({ companyId: company.id }, "Clerk membership email belongs to another company; skipped");
+          return { status: "skipped" as const, companyId: company.id };
+        }
+        if (!clerkUserId) {
+          return { status: "exists" as const, companyId: company.id };
+        }
+        if (sameEmail.clerkUserId && sameEmail.clerkUserId !== clerkUserId) {
+          logger.warn({ companyId: company.id }, "Staff user already linked to another Clerk user; skipped");
+          return { status: "skipped" as const, companyId: company.id };
+        }
+        if (sameEmail.clerkUnlinkedAt) {
+          logger.warn({ companyId: company.id, userId: sameEmail.id }, "Clerk membership matches a tombstoned user; not auto-linking");
+          return { status: "skipped" as const, companyId: company.id };
+        }
+        if (!input.emailVerified) {
+          logger.warn(
+            { companyId: company.id },
+            "Clerk membership payload does not prove email verification; not linking by email (links on verified login)"
+          );
+          return { status: "skipped" as const, companyId: company.id };
+        }
+        await tx
+          .update(users)
+          .set({ clerkUserId, updatedAt: new Date() })
+          .where(
+            and(
+              eq(users.id, sameEmail.id),
+              isNull(users.clerkUserId),
+              isNull(users.deletedAt),
+              isNull(users.clerkUnlinkedAt)
+            )
+          );
+        const reread = await tx.query.users.findFirst({
+          where: (userTable, operators) => operators.eq(userTable.id, sameEmail.id)
+        });
+        if (reread?.clerkUserId !== clerkUserId) {
+          logger.warn({ companyId: company.id }, "Clerk link lost a race (row linked elsewhere); skipped");
+          return { status: "skipped" as const, companyId: company.id };
+        }
+        return { status: "linked" as const, companyId: company.id, role: reread.role };
+      }
+
+      const isOwner = Boolean(createdBy && clerkUserId === createdBy);
+      const role = mapClerkOrgRole(input.clerkOrgRole, isOwner);
+      const [createdUser] = await tx.insert(users).values({
+        companyId: company.id,
+        email,
+        clerkUserId,
+        passwordHash: null,
+        firstName: input.firstName.trim() || "Owner",
+        lastName: input.lastName.trim() || "",
+        role
+      }).returning();
+      if (!createdUser) throw new Error("Failed to provision Clerk staff user");
+      await tx.insert(activityEvents).values({
+        companyId: company.id,
+        eventType: "user.registered",
+        actorType: "system",
+        actorName: "Clerk provisioning",
+        entityType: "user",
+        entityId: createdUser.id,
+        payload: { source: "clerk_webhook", clerkUserId, role },
+        summary: role === "owner" ? "Clerk organization owner provisioned" : "Clerk organization member provisioned"
+      });
+
+      return { status: "created" as const, companyId: company.id, role };
+    });
+  } catch (error) {
+    if (error instanceof ClerkOrganizationAmbiguousError) {
+      return { status: "skipped", companyId: null };
+    }
+    if (isUniqueViolation(error)) {
+      logger.warn({ clerkOrganizationId: input.organizationId }, "Clerk membership hit a unique constraint (concurrent link/create); skipped");
+      return { status: "skipped", companyId: null };
+    }
+    throw error;
+  }
+}

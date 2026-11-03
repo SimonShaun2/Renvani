@@ -17,6 +17,21 @@ import {
   forwardStripePaymentFailed,
   forwardStripePaymentSuccess
 } from "../lib/invoice-service-bridge.js";
+import { provisionVipMembershipFromSubscription } from "../lib/vip-membership-provision.js";
+import { stripe } from "../lib/stripe-client.js";
+import {
+  handlePlatformSubscriptionDeleted,
+  handlePlatformSubscriptionUpsert,
+  isPlatformMvpBillingMetadata,
+  shouldIgnoreMaintenancePlanSubscriptionInvoice
+} from "./stripe-platform-billing.handler.js";
+import { isVipMembershipBillingMetadata } from "@fsm/types";
+import {
+  handleVipInvoicePaymentFailed,
+  handleVipInvoicePaymentSucceeded,
+  handleVipSubscriptionCreated
+} from "./stripe-vip-membership.handler.js";
+import { handleStripeDisputeEvent, isStripeDisputeEventType } from "./stripe-dispute.handler.js";
 import {
   claimEventProcessing,
   clearEventProcessingClaim,
@@ -156,17 +171,41 @@ export async function handleSubscriptionUpdated(
   logContext: FastifyRequest["log"]
 ): Promise<void> {
   const subscription = event.data.object;
+
+  if (isPlatformMvpBillingMetadata(subscription.metadata)) {
+    await handlePlatformSubscriptionUpsert(event, logContext);
+    return;
+  }
+
+  if (isVipMembershipBillingMetadata(subscription.metadata)) {
+    if (event.type === "customer.subscription.created") {
+      await handleVipSubscriptionCreated(
+        event as Stripe.CustomerSubscriptionCreatedEvent,
+        logContext
+      );
+    }
+
+    return;
+  }
+
   const companyId = extractStripeCompanyId(subscription.metadata, logContext, event.type);
 
   if (!companyId) {
     return;
   }
 
-  const plan = await getMaintenancePlanBySubscription(companyId, subscription.id, db);
+  let plan = await getMaintenancePlanBySubscription(companyId, subscription.id, db);
 
   if (!plan) {
-    logContext.warn({ eventId: event.id, eventType: event.type, companyId }, "Maintenance plan not found for Stripe subscription");
-    return;
+    if (getMetadataString(subscription.metadata, "billingKind") === "vip_membership") {
+      await provisionVipMembershipFromSubscription(subscription, companyId);
+      plan = await getMaintenancePlanBySubscription(companyId, subscription.id, db);
+    }
+
+    if (!plan) {
+      logContext.warn({ eventId: event.id, eventType: event.type, companyId }, "Maintenance plan not found for Stripe subscription");
+      return;
+    }
   }
 
   const periodStart = subscription.current_period_start
@@ -222,6 +261,16 @@ export async function handleSubscriptionDeleted(
   logContext: FastifyRequest["log"]
 ): Promise<void> {
   const subscription = event.data.object;
+
+  if (isPlatformMvpBillingMetadata(subscription.metadata)) {
+    await handlePlatformSubscriptionDeleted(event, logContext);
+    return;
+  }
+
+  if (isVipMembershipBillingMetadata(subscription.metadata)) {
+    return;
+  }
+
   const companyId = extractStripeCompanyId(subscription.metadata, logContext, event.type);
 
   if (!companyId) {
@@ -266,6 +315,82 @@ export async function handleSubscriptionDeleted(
   });
 }
 
+function sumInvoiceLineAmountForPrice(invoice: Stripe.Invoice, priceId: string): number {
+  let total = 0;
+
+  for (const line of invoice.lines?.data ?? []) {
+    const linePriceId = typeof line.price === "string" ? line.price : line.price?.id ?? null;
+
+    if (linePriceId === priceId) {
+      total += line.amount ?? 0;
+    }
+  }
+
+  return total;
+}
+
+export async function handleInvoiceCreated(
+  event: Stripe.InvoiceCreatedEvent,
+  logContext: FastifyRequest["log"]
+): Promise<void> {
+  const stripeInvoice = event.data.object;
+
+  if (!stripeInvoice.subscription || stripeInvoice.status !== "draft") {
+    return;
+  }
+
+  const stripeSubscriptionId =
+    typeof stripeInvoice.subscription === "string"
+      ? stripeInvoice.subscription
+      : stripeInvoice.subscription.id;
+
+  const subscription = await stripe.subscriptions.retrieve(stripeSubscriptionId);
+
+  if (isPlatformMvpBillingMetadata(subscription.metadata)) {
+    return;
+  }
+
+  const companyId = getMetadataString(subscription.metadata, "companyId");
+
+  if (!companyId) {
+    return;
+  }
+
+  if (await shouldIgnoreMaintenancePlanSubscriptionInvoice(companyId, stripeSubscriptionId)) {
+    return;
+  }
+
+  const platformFeePriceId = getMetadataString(subscription.metadata, "platformFeePriceId");
+
+  if (!platformFeePriceId) {
+    return;
+  }
+
+  if ((stripeInvoice.application_fee_amount ?? 0) > 0) {
+    return;
+  }
+
+  const applicationFeeAmount = sumInvoiceLineAmountForPrice(stripeInvoice, platformFeePriceId);
+
+  if (applicationFeeAmount <= 0) {
+    logContext.warn(
+      {
+        eventId: event.id,
+        eventType: event.type,
+        companyId,
+        stripeInvoiceId: stripeInvoice.id,
+        platformFeePriceId
+      },
+      "Maintenance subscription invoice missing platform fee line item"
+    );
+    return;
+  }
+
+  await stripe.invoices.update(stripeInvoice.id, {
+    application_fee_amount: applicationFeeAmount
+  });
+}
+
 export async function handleInvoicePaymentSucceeded(
   event: Stripe.InvoicePaymentSucceededEvent,
   logContext: FastifyRequest["log"]
@@ -276,6 +401,10 @@ export async function handleInvoicePaymentSucceeded(
     return;
   }
 
+  if (await handleVipInvoicePaymentSucceeded(event, logContext)) {
+    return;
+  }
+
   const companyId = extractStripeCompanyId(stripeInvoice.metadata, logContext, event.type);
 
   if (!companyId) {
@@ -283,6 +412,15 @@ export async function handleInvoicePaymentSucceeded(
   }
 
   const stripeSubscriptionId = String(stripeInvoice.subscription);
+
+  if (isPlatformMvpBillingMetadata(stripeInvoice.metadata)) {
+    return;
+  }
+
+  if (await shouldIgnoreMaintenancePlanSubscriptionInvoice(companyId, stripeSubscriptionId)) {
+    return;
+  }
+
   const plan = await getMaintenancePlanBySubscription(companyId, stripeSubscriptionId, db);
 
   if (!plan) {
@@ -335,6 +473,10 @@ export async function handleInvoicePaymentFailed(
     return;
   }
 
+  if (await handleVipInvoicePaymentFailed(event, logContext)) {
+    return;
+  }
+
   const companyId = extractStripeCompanyId(stripeInvoice.metadata, logContext, event.type);
 
   if (!companyId) {
@@ -342,6 +484,15 @@ export async function handleInvoicePaymentFailed(
   }
 
   const stripeSubscriptionId = String(stripeInvoice.subscription);
+
+  if (isPlatformMvpBillingMetadata(stripeInvoice.metadata)) {
+    return;
+  }
+
+  if (await shouldIgnoreMaintenancePlanSubscriptionInvoice(companyId, stripeSubscriptionId)) {
+    return;
+  }
+
   const plan = await getMaintenancePlanBySubscription(companyId, stripeSubscriptionId, db);
 
   if (!plan) {
@@ -513,6 +664,9 @@ export async function stripeHandler(
       case "customer.subscription.deleted":
         await handleSubscriptionDeleted(event, request.log);
         break;
+      case "invoice.created":
+        await handleInvoiceCreated(event, request.log);
+        break;
       case "invoice.payment_succeeded":
         await handleInvoicePaymentSucceeded(event, request.log);
         break;
@@ -523,6 +677,10 @@ export async function stripeHandler(
         await handleAccountUpdated(event, request.log);
         break;
       default:
+        if (isStripeDisputeEventType(event.type)) {
+          await handleStripeDisputeEvent(event, request.log);
+          break;
+        }
         request.log.warn(
           {
             eventId: event.id,
@@ -544,6 +702,12 @@ export async function stripeHandler(
       "Stripe webhook handler error"
     );
     await clearEventProcessingClaim(event.id);
+
+    // Non-2xx so Stripe redelivers; the claim is cleared and payment recording is idempotent per intent.
+    return reply.code(500).send({
+      error: "STRIPE_WEBHOOK_PROCESSING_FAILED",
+      message: "Stripe event processing failed; retry"
+    });
   }
 
   return reply.code(200).send({

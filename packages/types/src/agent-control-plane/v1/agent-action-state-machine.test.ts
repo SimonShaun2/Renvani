@@ -44,6 +44,18 @@ describe("agent-action-state-machine (FS-12)", () => {
     }
   });
 
+  it("requires manual approval for loyalty.reminder.propose", () => {
+    const decision = evaluateAgentActionPolicyDecision({
+      agentProduct: "loyalty",
+      actionType: "loyalty.reminder.propose",
+      actorType: "ai",
+      policyVersion: "agent-policy-v1",
+      requiresApproval: false
+    });
+    expect(decision.requiresApproval).toBe(true);
+    expect(decision.initialState).toBe("awaiting_approval");
+  });
+
   it("requires manual approval for message.send_proposed", () => {
     const decision = evaluateAgentActionPolicyDecision({
       agentProduct: "revenue",

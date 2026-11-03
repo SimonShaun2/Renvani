@@ -120,6 +120,15 @@ export const ResetPasswordSchema = z
   })
   .strict();
 
+export const VerifyEmailSchema = z
+  .object({
+    token: z.string().trim().min(1).max(512)
+  })
+  .strict();
+
+export type VerifyEmailInput = z.infer<typeof VerifyEmailSchema>;
+export const verifyEmailValidation = withZodValidation({ body: VerifyEmailSchema });
+
 export type RegisterInput = z.infer<typeof RegisterSchema>;
 export type LoginInput = z.infer<typeof LoginSchema>;
 export type RefreshInput = z.infer<typeof RefreshSchema>;
@@ -137,18 +146,16 @@ export const resetPasswordValidation = withZodValidation({ body: ResetPasswordSc
 export const registerRouteSchema = {
   tags: ["auth"],
   response: {
-    201: {
+    202: {
       type: "object",
       additionalProperties: false,
-      required: ["user", "company", "tokens"],
+      required: ["message"],
       properties: {
-        user: registeredUserResponseSchema,
-        company: registeredCompanyResponseSchema,
-        tokens: tokenPairResponseSchema
+        message: { type: "string" }
       }
     },
     400: errorResponseSchema,
-    409: errorResponseSchema
+    429: errorResponseSchema
   }
 } as const;
 
@@ -208,5 +215,15 @@ export const resetPasswordRouteSchema = {
     200: successMessageResponseSchema,
     400: errorResponseSchema,
     401: errorResponseSchema
+  }
+} as const;
+
+export const verifyEmailRouteSchema = {
+  tags: ["auth"],
+  response: {
+    200: loginRouteSchema.response[200],
+    400: errorResponseSchema,
+    401: errorResponseSchema,
+    429: errorResponseSchema
   }
 } as const;

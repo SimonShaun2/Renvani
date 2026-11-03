@@ -315,4 +315,92 @@ describe("public booking slot hold security (FS-21)", () => {
       })
     ).rejects.toMatchObject({ code: ErrorCode.CONFLICT });
   });
+
+  it("confirmPublicBookingSlot requires an active slot hold matching the selection", async () => {
+    const { technician, booking } = seedPublicBookingFixture();
+
+    await expect(
+      bookingService.confirmPublicBookingSlot("acme-hvac", booking.referenceNumber ?? "", {
+        technicianId: technician.id,
+        scheduledStart: SLOT_START,
+        scheduledEnd: SLOT_END
+      })
+    ).rejects.toMatchObject({ code: ErrorCode.CONFLICT });
+  });
+
+  it("confirmPublicBookingSlot creates a job after a public hold", async () => {
+    const { company, technician, booking } = seedPublicBookingFixture();
+    const holdToken = generateBookingHoldToken({
+      companyId: company.id,
+      bookingRequestId: booking.id,
+      referenceNumber: booking.referenceNumber ?? booking.id
+    });
+    const availability = await bookingService.getBookingAvailability("acme-hvac", "78701", "2026-05-12");
+    const afternoon = availability.find((window) => window.window === "afternoon");
+
+    expect(afternoon).toBeDefined();
+
+    await bookingService.holdPublicBookingSlot("acme-hvac", booking.referenceNumber ?? "", {
+      holdToken,
+      technicianId: technician.id,
+      scheduledStart: afternoon!.start,
+      scheduledEnd: afternoon!.end
+    });
+
+    const confirmed = await bookingService.confirmPublicBookingSlot("acme-hvac", booking.referenceNumber ?? "", {
+      technicianId: technician.id,
+      scheduledStart: afternoon!.start,
+      scheduledEnd: afternoon!.end
+    });
+
+    expect(confirmed.bookingRequest.status).toBe("confirmed");
+    expect(confirmed.jobId).toBeTruthy();
+    expect(confirmed.recurringSchedule.linked).toBe(false);
+
+    const events = fakeDb.getTestState().activityEvents.filter((event) => event.eventType === "booking.confirmed");
+    expect(events).toHaveLength(1);
+  });
+
+  it("confirmPublicBookingSlot links maintenance visits when a plan exists", async () => {
+    const { company, technician, booking } = seedPublicBookingFixture();
+    const customer = fakeDb.seedCustomer({
+      companyId: company.id,
+      firstName: booking.firstName,
+      lastName: booking.lastName,
+      phone: booking.phone
+    });
+    booking.customerId = customer.id;
+    booking.serviceType = "recurring maintenance";
+    fakeDb.seedMaintenancePlan({
+      companyId: company.id,
+      customerId: customer.id,
+      status: "active"
+    });
+
+    const holdToken = generateBookingHoldToken({
+      companyId: company.id,
+      bookingRequestId: booking.id,
+      referenceNumber: booking.referenceNumber ?? booking.id
+    });
+    const availability = await bookingService.getBookingAvailability("acme-hvac", "78701", "2026-05-12");
+    const afternoon = availability.find((window) => window.window === "afternoon");
+
+    expect(afternoon).toBeDefined();
+
+    await bookingService.holdPublicBookingSlot("acme-hvac", booking.referenceNumber ?? "", {
+      holdToken,
+      technicianId: technician.id,
+      scheduledStart: afternoon!.start,
+      scheduledEnd: afternoon!.end
+    });
+
+    const confirmed = await bookingService.confirmPublicBookingSlot("acme-hvac", booking.referenceNumber ?? "", {
+      technicianId: technician.id,
+      scheduledStart: afternoon!.start,
+      scheduledEnd: afternoon!.end
+    });
+
+    expect(confirmed.recurringSchedule.linked).toBe(true);
+    expect(confirmed.recurringSchedule.maintenanceVisitId).not.toBeNull();
+  });
 });

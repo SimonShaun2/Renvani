@@ -1,7 +1,8 @@
-import { and, eq, isNull } from "drizzle-orm";
+import { and, desc, eq, isNull } from "drizzle-orm";
 
 import {
   assets,
+  customerNotes,
   customers,
   db,
   emitEventWithExecutor,
@@ -15,11 +16,14 @@ import {
   ErrorCode,
   type CreateCustomerInput,
   type Customer,
+  type CustomerNote,
   type CustomerWithGraph,
   type ListCustomersQuery,
   type PaginatedResult,
   type UpdateCustomerInput
 } from "@fsm/types";
+
+import { runTenantAwareTransaction } from "../lib/company-scoped-transaction.js";
 
 const MAX_RESULT_WINDOW = 10_000;
 const DEFAULT_LIST_PAGE = 1;
@@ -383,7 +387,7 @@ export async function createCustomer(
 ): Promise<Customer> {
   const normalizedTags = normalizeTags(input.tags) ?? [];
 
-  return db.transaction(async (tx) => {
+  return runTenantAwareTransaction(companyId, async (tx) => {
     const actor = await getActor(companyId, actorId, tx);
     const insertedCustomers = await tx
       .insert(customers)
@@ -566,4 +570,69 @@ export async function deleteCustomer(companyId: string, actorId: string, custome
       summary: `Customer ${existingCustomer.firstName} ${existingCustomer.lastName} deleted`
     });
   });
+}
+
+type CustomerNoteRow = typeof customerNotes.$inferSelect;
+
+function toCustomerNote(row: CustomerNoteRow): CustomerNote {
+  return {
+    id: row.id,
+    companyId: row.companyId,
+    customerId: row.customerId,
+    authorId: row.authorId,
+    content: row.content,
+    isInternal: row.isInternal,
+    notedAt: row.notedAt,
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
+    deletedAt: row.deletedAt
+  };
+}
+
+export interface CreateCustomerNoteInput {
+  content: string;
+  isInternal?: boolean | undefined;
+  notedAt?: string | undefined;
+}
+
+/** Create a native (non-imported) note on a tenant-owned customer. 404 when the customer is not in this company. */
+export async function createCustomerNote(
+  companyId: string,
+  actorId: string,
+  customerId: string,
+  input: CreateCustomerNoteInput
+): Promise<CustomerNote> {
+  await getCustomerRecord(companyId, customerId, db);
+
+  const [row] = await db
+    .insert(customerNotes)
+    .values({
+      companyId,
+      customerId,
+      authorId: actorId,
+      content: input.content.trim(),
+      isInternal: input.isInternal ?? true,
+      notedAt: input.notedAt ? new Date(input.notedAt) : new Date()
+    })
+    .returning();
+
+  if (!row) {
+    throw new AppError(ErrorCode.INTERNAL_ERROR, "Failed to create customer note");
+  }
+
+  return toCustomerNote(row);
+}
+
+export async function getCustomerNotes(companyId: string, customerId: string): Promise<CustomerNote[]> {
+  await getCustomerRecord(companyId, customerId, db);
+
+  const rows = await db
+    .select()
+    .from(customerNotes)
+    .where(
+      and(eq(customerNotes.companyId, companyId), eq(customerNotes.customerId, customerId), isNull(customerNotes.deletedAt))
+    )
+    .orderBy(desc(customerNotes.notedAt), desc(customerNotes.createdAt));
+
+  return rows.map(toCustomerNote);
 }

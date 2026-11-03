@@ -34,8 +34,10 @@ import {
   jsonb,
   index,
   uniqueIndex,
+  type AnyPgColumn,
+  check,
 } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 
 // ─────────────────────────────────────────────
 // SHARED HELPERS
@@ -191,6 +193,13 @@ export const importSessionStatusEnum = pgEnum("import_session_status", [
   "rolled_back",
 ]);
 
+export const importChunkRunStatusEnum = pgEnum("import_chunk_run_status", [
+  "pending",
+  "running",
+  "completed",
+  "failed",
+]);
+
 export const dataExportStatusEnum = pgEnum("data_export_status", [
   "pending",
   "processing",
@@ -208,6 +217,18 @@ export const importEntityTypeEnum = pgEnum("import_entity_type", [
   "jobs",
   "estimates",
   "invoices",
+  "price_book",
+  "payments",
+  "notes",
+  "communications",
+  "service_agreements",
+]);
+
+export const importBundleStatusEnum = pgEnum("import_bundle_status", [
+  "active",
+  "committing",
+  "completed",
+  "abandoned",
 ]);
 
 export const technicianStatusEnum = pgEnum("technician_status", [
@@ -255,6 +276,8 @@ export const activityEventTypeEnum = pgEnum("activity_event_type", [
   "job.time_started",
   "job.time_stopped",
   "job.task_completed",
+  "job.service_brief.proposed",
+  "job.service_brief.approved",
   "job.product_added",
   "job.product_removed",
   "job.upsell_approved",
@@ -282,6 +305,10 @@ export const activityEventTypeEnum = pgEnum("activity_event_type", [
   "payment.partial",
   "payment.failed",
   "payment.refunded",
+  "integration.qbo_connected",
+  "integration.qbo_disconnected",
+  "integration.qbo_sync_completed",
+  "integration.qbo_sync_failed",
   // Product catalog
   "product.created",
   "product.updated",
@@ -296,6 +323,10 @@ export const activityEventTypeEnum = pgEnum("activity_event_type", [
   "service_agreement_template.created",
   "service_agreement_template.updated",
   "service_agreement_template.deleted",
+  // VIP membership (FS-132)
+  "vip.tier.created",
+  "vip.tier.updated",
+  "vip.tier.deleted",
   // Maintenance plan
   "maintenance_plan.created",
   "maintenance_plan.updated",
@@ -324,6 +355,14 @@ export const activityEventTypeEnum = pgEnum("activity_event_type", [
   "import.completed",
   "import.rolled_back",
   "import.failed",
+  "import.bundle.created",
+  "import.bundle.step_advanced",
+  "import.bundle.commit_started",
+  "import.bundle.completed",
+  "import.bundle.abandoned",
+  // QuickBooks ongoing sync (FS-133)
+  "integration.qbo_mapping_updated",
+  "integration.qbo_sync_retry_requested",
   // Data export (FS-89)
   "export.requested",
   "export.completed",
@@ -349,6 +388,12 @@ export const activityEventTypeEnum = pgEnum("activity_event_type", [
   "revenue.inquiry_qualified",
   "revenue.inquiry_received",
   "revenue.inquiry_escalated",
+  // Saved card migration (FS-138)
+  "payment_method_migration.requested",
+  "payment_method_migration.mappings_applied",
+  "payment_method_migration.stripe_import_confirmed",
+  "payment_method_migration.completed",
+  "payment_method_migration.fallback_sent",
 ]);
 
 export const aiRecommendationTypeEnum = pgEnum("ai_recommendation_type", [
@@ -478,6 +523,44 @@ export const companies = pgTable("companies", {
   ...timestamps,
 }, (t) => ({
   slugIdx: uniqueIndex("companies_slug_idx").on(t.slug),
+  // FS-157: at most one live company per Clerk organization (DB-level guarantee behind the advisory lock).
+  clerkOrganizationIdIdx: uniqueIndex("companies_clerk_organization_id_idx")
+    .on(sql`(${t.settings} -> 'clerk' ->> 'organizationId')`)
+    .where(sql`${t.deletedAt} IS NULL AND (${t.settings} -> 'clerk' ->> 'organizationId') IS NOT NULL`),
+}));
+
+/** FS-235 pre-tenant identity boundary; only the verified Clerk subject can read it. */
+export const clerkWorkspaceIntents = pgTable("clerk_workspace_intents", {
+  id: id(),
+  clerkUserId: varchar("clerk_user_id", { length: 255 }).notNull(),
+  requestedName: varchar("requested_name", { length: 80 }).notNull(),
+  status: varchar("status", { length: 32 }).notNull().default("pending"),
+  attemptId: uuid("attempt_id"),
+  claimedAt: timestamp("claimed_at"),
+  uncertainAt: timestamp("uncertain_at"),
+  clerkOrganizationId: varchar("clerk_organization_id", { length: 255 }),
+  ...timestamps,
+}, (t) => ({
+  clerkUserIdx: uniqueIndex("clerk_workspace_intents_clerk_user_idx").on(t.clerkUserId),
+  attemptIdx: uniqueIndex("clerk_workspace_intents_attempt_idx")
+    .on(t.attemptId)
+    .where(sql`${t.attemptId} IS NOT NULL`),
+  clerkOrgIdx: uniqueIndex("clerk_workspace_intents_clerk_org_idx")
+    .on(t.clerkOrganizationId)
+    .where(sql`${t.clerkOrganizationId} IS NOT NULL`),
+}));
+
+/** Pre-tenant audit. Reconciliation later emits tenant activity_events after company binding. */
+export const clerkWorkspaceIntentEvents = pgTable("clerk_workspace_intent_events", {
+  id: id(),
+  intentId: uuid("intent_id").notNull().references(() => clerkWorkspaceIntents.id),
+  clerkUserId: varchar("clerk_user_id", { length: 255 }).notNull(),
+  eventType: varchar("event_type", { length: 64 }).notNull(),
+  details: jsonb("details").notNull().default({}),
+  ...timestamps,
+}, (t) => ({
+  intentIdx: index("clerk_workspace_intent_events_intent_idx").on(t.intentId),
+  clerkUserIdx: index("clerk_workspace_intent_events_clerk_user_idx").on(t.clerkUserId),
 }));
 
 export const users = pgTable("users", {
@@ -493,6 +576,15 @@ export const users = pgTable("users", {
   avatarUrl: text("avatar_url"),
   isActive: boolean("is_active").notNull().default(true),
   lastLoginAt: timestamp("last_login_at"),
+  emailVerifiedAt: timestamp("email_verified_at"),
+  // sha256 of the single-use verify-email token (raw token is never stored)
+  emailVerificationTokenHash: text("email_verification_token_hash"),
+  emailVerificationExpiresAt: timestamp("email_verification_expires_at"),
+  // FS-157: stable Clerk user id (`sub`); logins map by this first. Nullable until linked/backfilled.
+  clerkUserId: varchar("clerk_user_id", { length: 255 }),
+  // FS-160b: tombstone set by Clerk user.deleted. A tombstoned user is never auto-linked (verified email /
+  // membership webhook / first-login fallback); clearing it is a manual DB step until FS-165.
+  clerkUnlinkedAt: timestamp("clerk_unlinked_at", { withTimezone: true }),
   // If this user is also a technician
   technicianId: uuid("technician_id"),
   ...timestamps,
@@ -500,6 +592,8 @@ export const users = pgTable("users", {
   emailIdx: uniqueIndex("users_email_idx").on(t.email),
   emailCompanyIdx: uniqueIndex("users_email_company_idx").on(t.email, t.companyId),
   companyIdx: index("users_company_idx").on(t.companyId),
+  emailVerificationTokenIdx: index("users_email_verification_token_idx").on(t.emailVerificationTokenHash),
+  clerkUserIdIdx: uniqueIndex("users_clerk_user_id_idx").on(t.clerkUserId).where(sql`${t.clerkUserId} IS NOT NULL`),
 }));
 
 export const refreshTokens = pgTable("refresh_tokens", {
@@ -557,12 +651,19 @@ export const customers = pgTable("customers", {
   doNotContact: boolean("do_not_contact").default(false),
   // Stripe
   stripeCustomerId: varchar("stripe_customer_id", { length: 100 }),
+  sourceSystem: varchar("source_system", { length: 64 }),
+  sourceId: varchar("source_id", { length: 256 }),
   importSessionId: uuid("import_session_id").references(() => importSessions.id),
   ...timestamps,
 }, (t) => ({
   companyIdx: index("customers_company_idx").on(t.companyId),
   emailIdx: index("customers_email_idx").on(t.email),
   lastServiceIdx: index("customers_last_service_idx").on(t.lastServiceDate),
+  importLineageIdx: uniqueIndex("customers_import_lineage_idx").on(
+    t.companyId,
+    t.sourceSystem,
+    t.sourceId,
+  ),
 }));
 
 export const properties = pgTable("properties", {
@@ -587,12 +688,19 @@ export const properties = pgTable("properties", {
   notes: text("notes"),
   isPrimary: boolean("is_primary").notNull().default(false),
   isActive: boolean("is_active").notNull().default(true),
+  sourceSystem: varchar("source_system", { length: 64 }),
+  sourceId: varchar("source_id", { length: 256 }),
   importSessionId: uuid("import_session_id").references(() => importSessions.id),
   ...timestamps,
 }, (t) => ({
   customerIdx: index("properties_customer_idx").on(t.customerId),
   companyIdx: index("properties_company_idx").on(t.companyId),
   zipIdx: index("properties_zip_idx").on(t.zip),
+  importLineageIdx: uniqueIndex("properties_import_lineage_idx").on(
+    t.companyId,
+    t.sourceSystem,
+    t.sourceId,
+  ),
 }));
 
 export const assets = pgTable("assets", {
@@ -621,6 +729,8 @@ export const assets = pgTable("assets", {
   photoUrls: text("photo_urls").array().default([]),
   notes: text("notes"),
   isActive: boolean("is_active").notNull().default(true),
+  sourceSystem: varchar("source_system", { length: 64 }),
+  sourceId: varchar("source_id", { length: 256 }),
   importSessionId: uuid("import_session_id").references(() => importSessions.id),
   ...timestamps,
 }, (t) => ({
@@ -630,6 +740,11 @@ export const assets = pgTable("assets", {
   typeIdx: index("assets_type_idx").on(t.assetType),
   warrantyIdx: index("assets_warranty_idx").on(t.warrantyExpiration),
   installIdx: index("assets_install_idx").on(t.installDate),
+  importLineageIdx: uniqueIndex("assets_import_lineage_idx").on(
+    t.companyId,
+    t.sourceSystem,
+    t.sourceId,
+  ),
 }));
 
 // ─────────────────────────────────────────────
@@ -680,6 +795,8 @@ export const jobs = pgTable("jobs", {
   propertyId: uuid("property_id").references(() => properties.id),
   assetId: uuid("asset_id").references(() => assets.id), // primary asset
   technicianId: uuid("technician_id").references(() => technicians.id),
+  /** FS-195 — optional crew assignment (dispatch lanes stay keyed by technicianId). */
+  crewId: uuid("crew_id").references((): AnyPgColumn => crews.id),
   assignedById: uuid("assigned_by_id").references(() => users.id),
   // Classification
   type: jobTypeEnum("type").notNull().default("service_call"),
@@ -687,6 +804,8 @@ export const jobs = pgTable("jobs", {
   status: jobStatusEnum("status").notNull().default("lead"),
   // Source
   leadSource: varchar("lead_source", { length: 100 }),
+  /** Growth source tracking: whitelisted UTM/referrer attribution (LeadAttribution, packages/types). */
+  leadAttribution: jsonb("lead_attribution").$type<Partial<Record<string, string>>>(),
   // Description
   title: varchar("title", { length: 255 }).notNull(),
   description: text("description"),
@@ -712,16 +831,48 @@ export const jobs = pgTable("jobs", {
   parentJobId: uuid("parent_job_id"), // for return visits / follow-up jobs
   // Tags
   tags: text("tags").array().default([]),
+  sourceSystem: varchar("source_system", { length: 64 }),
+  sourceId: varchar("source_id", { length: 256 }),
   importSessionId: uuid("import_session_id").references(() => importSessions.id),
   ...timestamps,
 }, (t) => ({
   companyIdx: index("jobs_company_idx").on(t.companyId),
   customerIdx: index("jobs_customer_idx").on(t.customerId),
   technicianIdx: index("jobs_technician_idx").on(t.technicianId),
+  crewIdx: index("jobs_crew_idx").on(t.crewId),
   statusIdx: index("jobs_status_idx").on(t.status),
   scheduledStartIdx: index("jobs_scheduled_start_idx").on(t.scheduledStart),
   jobNumberIdx: uniqueIndex("jobs_job_number_company_idx").on(t.jobNumber, t.companyId),
+  importLineageIdx: uniqueIndex("jobs_import_lineage_idx").on(
+    t.companyId,
+    t.sourceSystem,
+    t.sourceId,
+  ),
 }));
+
+export const customerNotes = pgTable("customer_notes", {
+  id: id(),
+  companyId: companyId(),
+  customerId: uuid("customer_id").notNull().references(() => customers.id, { onDelete: "cascade" }),
+  authorId: uuid("author_id").references(() => users.id),
+  content: text("content").notNull(),
+  isInternal: boolean("is_internal").notNull().default(true),
+  notedAt: timestamp("noted_at"),
+  sourceSystem: varchar("source_system", { length: 64 }),
+  sourceId: varchar("source_id", { length: 256 }),
+  importSessionId: uuid("import_session_id").references(() => importSessions.id),
+  ...timestamps,
+}, (t) => ({
+  companyIdx: index("customer_notes_company_idx").on(t.companyId),
+  customerIdx: index("customer_notes_customer_idx").on(t.customerId),
+  importLineageIdx: uniqueIndex("customer_notes_import_lineage_idx").on(
+    t.companyId,
+    t.sourceSystem,
+    t.sourceId,
+  ),
+}));
+
+export const jobNoteKindEnum = pgEnum("job_note_kind", ["internal", "field"]);
 
 export const jobNotes = pgTable("job_notes", {
   id: id(),
@@ -730,9 +881,41 @@ export const jobNotes = pgTable("job_notes", {
   authorId: uuid("author_id").references(() => users.id),
   // null authorId = system/AI note
   content: text("content").notNull(),
+  noteKind: jobNoteKindEnum("note_kind").notNull().default("internal"),
   isInternal: boolean("is_internal").notNull().default(true),
+  notedAt: timestamp("noted_at"),
+  sourceSystem: varchar("source_system", { length: 64 }),
+  sourceId: varchar("source_id", { length: 256 }),
+  importSessionId: uuid("import_session_id").references(() => importSessions.id),
   ...timestamps,
-});
+}, (t) => ({
+  importLineageIdx: uniqueIndex("job_notes_import_lineage_idx").on(
+    t.companyId,
+    t.sourceSystem,
+    t.sourceId,
+  ),
+}));
+
+export const jobServiceBriefs = pgTable(
+  "job_service_briefs",
+  {
+    id: id(),
+    companyId: companyId(),
+    jobId: uuid("job_id")
+      .notNull()
+      .references(() => jobs.id, { onDelete: "cascade" }),
+    sections: jsonb("sections").notNull().default([]),
+    checklistSummary: jsonb("checklist_summary").notNull().default({}),
+    resourceVersion: varchar("resource_version", { length: 128 }).notNull(),
+    approvedAgentActionId: uuid("approved_agent_action_id"),
+    approvedById: uuid("approved_by_id").references(() => users.id),
+    approvedAt: timestamp("approved_at"),
+    ...timestamps
+  },
+  (t) => ({
+    companyJobUnique: uniqueIndex("job_service_briefs_company_job_idx").on(t.companyId, t.jobId).where(sql`"deleted_at" IS NULL`)
+  })
+);
 
 export const jobPhotos = pgTable("job_photos", {
   id: id(),
@@ -766,6 +949,9 @@ export const estimates = pgTable("estimates", {
   tierLabel: varchar("tier_label", { length: 50 }), // "Good", "Better", "Best", null if single
   tierGroupId: uuid("tier_group_id"), // groups the 3 tiers together
   isSelectedTier: boolean("is_selected_tier").default(false),
+  // FS-212: at most one recommended option per tier group (partial unique index); set-level version on every row
+  isRecommended: boolean("is_recommended").notNull().default(false),
+  optionSetVersion: integer("option_set_version").notNull().default(1),
   // Totals (computed from items)
   subtotal: decimal("subtotal", { precision: 10, scale: 2 }).notNull().default("0"),
   taxRate: decimal("tax_rate", { precision: 5, scale: 4 }).default("0"),
@@ -790,19 +976,31 @@ export const estimates = pgTable("estimates", {
   followUpSentAt: timestamp("follow_up_sent_at"),
   // Financing
   financingOffered: boolean("financing_offered").default(false),
+  sourceSystem: varchar("source_system", { length: 64 }),
+  sourceId: varchar("source_id", { length: 256 }),
+  importSessionId: uuid("import_session_id").references(() => importSessions.id),
   ...timestamps,
 }, (t) => ({
   companyIdx: index("estimates_company_idx").on(t.companyId),
   customerIdx: index("estimates_customer_idx").on(t.customerId),
   statusIdx: index("estimates_status_idx").on(t.status),
   tokenIdx: uniqueIndex("estimates_approval_token_idx").on(t.approvalToken),
+  tierGroupRecommendedIdx: uniqueIndex("estimates_tier_group_recommended_idx")
+    .on(t.companyId, t.tierGroupId)
+    .where(sql`${t.isRecommended} = true AND ${t.deletedAt} IS NULL AND ${t.tierGroupId} IS NOT NULL`),
   numberIdx: uniqueIndex("estimates_number_company_idx").on(t.estimateNumber, t.companyId),
+  importLineageIdx: uniqueIndex("estimates_import_lineage_idx").on(
+    t.companyId,
+    t.sourceSystem,
+    t.sourceId,
+  ),
 }));
 
 export const estimateItems = pgTable("estimate_items", {
   id: id(),
   estimateId: uuid("estimate_id").notNull().references(() => estimates.id, { onDelete: "cascade" }),
   companyId: companyId(),
+  productCatalogId: uuid("product_catalog_id").references(() => productCatalog.id, { onDelete: "set null" }),
   // Item
   name: varchar("name", { length: 255 }).notNull(),
   description: text("description"),
@@ -836,6 +1034,9 @@ export const invoices = pgTable("invoices", {
   total: decimal("total", { precision: 10, scale: 2 }).notNull().default("0"),
   amountPaid: decimal("amount_paid", { precision: 10, scale: 2 }).default("0"),
   balanceDue: decimal("balance_due", { precision: 10, scale: 2 }).notNull().default("0"),
+  // Customer-paid checkout fees collected (separate lines; never part of total/tax/balance). 0043.
+  serviceFeeAmount: decimal("service_fee_amount", { precision: 10, scale: 2 }).notNull().default("0"),
+  bookingFeeAmount: decimal("booking_fee_amount", { precision: 10, scale: 2 }).notNull().default("0"),
   // Dates
   issuedAt: timestamp("issued_at"),
   dueAt: timestamp("due_at"),
@@ -854,6 +1055,9 @@ export const invoices = pgTable("invoices", {
   title: varchar("title", { length: 255 }),
   messageToCustomer: text("message_to_customer"),
   internalNotes: text("internal_notes"),
+  sourceSystem: varchar("source_system", { length: 64 }),
+  sourceId: varchar("source_id", { length: 256 }),
+  importSessionId: uuid("import_session_id").references(() => importSessions.id),
   ...timestamps,
 }, (t) => ({
   companyIdx: index("invoices_company_idx").on(t.companyId),
@@ -861,12 +1065,18 @@ export const invoices = pgTable("invoices", {
   statusIdx: index("invoices_status_idx").on(t.status),
   dueIdx: index("invoices_due_idx").on(t.dueAt),
   numberIdx: uniqueIndex("invoices_number_company_idx").on(t.invoiceNumber, t.companyId),
+  importLineageIdx: uniqueIndex("invoices_import_lineage_idx").on(
+    t.companyId,
+    t.sourceSystem,
+    t.sourceId,
+  ),
 }));
 
 export const invoiceItems = pgTable("invoice_items", {
   id: id(),
   invoiceId: uuid("invoice_id").notNull().references(() => invoices.id, { onDelete: "cascade" }),
   companyId: companyId(),
+  productCatalogId: uuid("product_catalog_id").references(() => productCatalog.id),
   name: varchar("name", { length: 255 }).notNull(),
   description: text("description"),
   itemType: varchar("item_type", { length: 30 }).notNull().default("service"),
@@ -886,6 +1096,12 @@ export const payments = pgTable("payments", {
   collectedById: uuid("collected_by_id").references(() => users.id),
   // Amounts
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  // Customer-paid fees on top of `amount` (checkout only). Non-refundable. 0043.
+  serviceFeeAmount: decimal("service_fee_amount", { precision: 10, scale: 2 }).notNull().default("0"),
+  bookingFeeAmount: decimal("booking_fee_amount", { precision: 10, scale: 2 }).notNull().default("0"),
+  feeRefundable: boolean("fee_refundable").notNull().default(false),
+  /** Refunded portion of `amount` only; fees are never refunded. */
+  amountRefunded: decimal("amount_refunded", { precision: 10, scale: 2 }).notNull().default("0"),
   method: paymentMethodEnum("method").notNull(),
   status: paymentStatusEnum("status").notNull().default("pending"),
   // Stripe
@@ -896,11 +1112,19 @@ export const payments = pgTable("payments", {
   referenceNumber: varchar("reference_number", { length: 100 }),
   notes: text("notes"),
   paidAt: timestamp("paid_at"),
+  sourceSystem: varchar("source_system", { length: 64 }),
+  sourceId: varchar("source_id", { length: 256 }),
+  importSessionId: uuid("import_session_id").references(() => importSessions.id),
   ...timestamps,
 }, (t) => ({
   companyIdx: index("payments_company_idx").on(t.companyId),
   invoiceIdx: index("payments_invoice_idx").on(t.invoiceId),
   stripeIntentIdx: index("payments_stripe_intent_idx").on(t.stripePaymentIntentId),
+  importLineageIdx: uniqueIndex("payments_import_lineage_idx").on(
+    t.companyId,
+    t.sourceSystem,
+    t.sourceId,
+  ),
 }));
 
 // ─────────────────────────────────────────────
@@ -910,6 +1134,23 @@ export const payments = pgTable("payments", {
 // Service Agreement Templates — the plan products the company sells
 // e.g. "Silver Plan", "Gold Plan", "Platinum Plan"
 // Company defines these once; customers are enrolled into instances (maintenancePlans)
+export const vipMembershipTiers = pgTable("vip_membership_tiers", {
+  id: id(),
+  companyId: companyId(),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  monthlyPrice: decimal("monthly_price", { precision: 10, scale: 2 }).notNull(),
+  discountPercent: decimal("discount_percent", { precision: 5, scale: 2 }).notNull().default("0"),
+  includedVisitsPerMonth: integer("included_visits_per_month"),
+  stripeMonthlyPriceId: varchar("stripe_monthly_price_id", { length: 100 }),
+  sortOrder: integer("sort_order").default(0),
+  isActive: boolean("is_active").notNull().default(true),
+  ...timestamps,
+}, (t) => ({
+  companyIdx: index("vip_membership_tiers_company_idx").on(t.companyId),
+  activeIdx: index("vip_membership_tiers_active_idx").on(t.isActive),
+}));
+
 export const serviceAgreementTemplates = pgTable("service_agreement_templates", {
   id: id(),
   companyId: companyId(),
@@ -944,6 +1185,7 @@ export const maintenancePlans = pgTable("maintenance_plans", {
   // Template this plan was created from (nullable — plan may be one-off custom)
   serviceAgreementTemplateId: uuid("service_agreement_template_id")
     .references(() => serviceAgreementTemplates.id),
+  vipTierId: uuid("vip_tier_id").references(() => vipMembershipTiers.id),
   // Plan definition
   name: varchar("name", { length: 255 }).notNull(),
   description: text("description"),
@@ -969,6 +1211,9 @@ export const maintenancePlans = pgTable("maintenance_plans", {
   // Assets covered under this plan
   assetIds: uuid("asset_ids").array().default([]),
   notes: text("notes"),
+  sourceSystem: varchar("source_system", { length: 64 }),
+  sourceId: varchar("source_id", { length: 256 }),
+  importSessionId: uuid("import_session_id").references(() => importSessions.id),
   ...timestamps,
 }, (t) => ({
   companyIdx: index("maintenance_plans_company_idx").on(t.companyId),
@@ -976,6 +1221,11 @@ export const maintenancePlans = pgTable("maintenance_plans", {
   nextServiceIdx: index("maintenance_plans_next_service_idx").on(t.nextServiceDate),
   statusIdx: index("maintenance_plans_status_idx").on(t.status),
   stripeSubIdx: index("maintenance_plans_stripe_sub_idx").on(t.stripeSubscriptionId),
+  importLineageIdx: uniqueIndex("maintenance_plans_import_lineage_idx").on(
+    t.companyId,
+    t.sourceSystem,
+    t.sourceId,
+  ),
 }));
 
 export const maintenanceVisits = pgTable("maintenance_visits", {
@@ -988,6 +1238,74 @@ export const maintenanceVisits = pgTable("maintenance_visits", {
   notes: text("notes"),
   ...timestamps,
 });
+
+export const recurringVisitSeriesStatusEnum = pgEnum("recurring_visit_series_status", [
+  "active",
+  "paused",
+  "cancelled"
+]);
+
+export const recurringVisitOccurrenceStatusEnum = pgEnum("recurring_visit_occurrence_status", [
+  "scheduled",
+  "completed",
+  "cancelled",
+  "skipped"
+]);
+
+export const recurringVisitSeries = pgTable(
+  "recurring_visit_series",
+  {
+    id: id(),
+    companyId: companyId(),
+    customerId: uuid("customer_id")
+      .notNull()
+      .references(() => customers.id),
+    propertyId: uuid("property_id").references(() => properties.id),
+    maintenancePlanId: uuid("maintenance_plan_id").references(() => maintenancePlans.id),
+    anchorMaintenanceVisitId: uuid("anchor_maintenance_visit_id").references(() => maintenanceVisits.id),
+    timeZone: varchar("time_zone", { length: 64 }).notNull(),
+    frequency: maintenancePlanFrequencyEnum("frequency").notNull(),
+    anchorLocalDate: date("anchor_local_date").notNull(),
+    localTime: varchar("local_time", { length: 8 }).notNull().default("09:00"),
+    status: recurringVisitSeriesStatusEnum("status").notNull().default("active"),
+    externalSchedulerAuthoritative: boolean("external_scheduler_authoritative").notNull().default(false),
+    notes: text("notes"),
+    ...timestamps
+  },
+  (t) => ({
+    companyIdx: index("recurring_visit_series_company_idx").on(t.companyId),
+    // FS-59 (0048): at most one active, non-deleted series per maintenance plan.
+    activePlanUid: uniqueIndex("recurring_visit_series_active_plan_uidx")
+      .on(t.companyId, t.maintenancePlanId)
+      .where(sql`"status" = 'active' AND "deleted_at" IS NULL AND "maintenance_plan_id" IS NOT NULL`)
+  })
+);
+
+export const recurringVisitOccurrences = pgTable(
+  "recurring_visit_occurrences",
+  {
+    id: id(),
+    companyId: companyId(),
+    seriesId: uuid("series_id")
+      .notNull()
+      .references(() => recurringVisitSeries.id, { onDelete: "cascade" }),
+    occurrenceIndex: integer("occurrence_index").notNull(),
+    scheduledLocalDate: date("scheduled_local_date").notNull(),
+    scheduledAtUtc: timestamp("scheduled_at_utc").notNull(),
+    status: recurringVisitOccurrenceStatusEnum("status").notNull().default("scheduled"),
+    overrideScheduledLocalDate: date("override_scheduled_local_date"),
+    overrideNotes: text("override_notes"),
+    maintenanceVisitId: uuid("maintenance_visit_id").references(() => maintenanceVisits.id),
+    jobId: uuid("job_id").references(() => jobs.id),
+    ...timestamps
+  },
+  (t) => ({
+    seriesIndexUid: uniqueIndex("recurring_visit_occurrences_series_index_uidx")
+      .on(t.seriesId, t.occurrenceIndex)
+      .where(sql`"deleted_at" IS NULL`),
+    companySeriesIdx: index("recurring_visit_occurrences_company_series_idx").on(t.companyId, t.seriesId)
+  })
+);
 
 // ─────────────────────────────────────────────
 // 8. SCHEDULING
@@ -1170,11 +1488,19 @@ export const messageLogs = pgTable("message_logs", {
   deliveredAt: timestamp("delivered_at"),
   failedAt: timestamp("failed_at"),
   failureReason: text("failure_reason"),
+  sourceSystem: varchar("source_system", { length: 64 }),
+  sourceId: varchar("source_id", { length: 256 }),
+  importSessionId: uuid("import_session_id").references(() => importSessions.id),
   ...timestamps,
 }, (t) => ({
   companyIdx: index("message_logs_company_idx").on(t.companyId),
   customerIdx: index("message_logs_customer_idx").on(t.customerId),
   jobIdx: index("message_logs_job_idx").on(t.jobId),
+  importLineageIdx: uniqueIndex("message_logs_import_lineage_idx").on(
+    t.companyId,
+    t.sourceSystem,
+    t.sourceId,
+  ),
 }));
 
 // ─────────────────────────────────────────────
@@ -1233,12 +1559,74 @@ export const formSubmissions = pgTable("form_submissions", {
 // 13. ONBOARDING / IMPORT
 // ─────────────────────────────────────────────
 
+// Multi-file onboarding bundle (FS-MIGRATE); many import_sessions may share one bundle.
+export const importBundles = pgTable("import_bundles", {
+  id: id(),
+  companyId: companyId(),
+  createdById: uuid("created_by_id").references(() => users.id),
+  sourceSystem: varchar("source_system", { length: 64 }).notNull().default("manual_csv"),
+  label: varchar("label", { length: 255 }),
+  status: importBundleStatusEnum("status").notNull().default("active"),
+  wizardStep: integer("wizard_step").notNull().default(1),
+  stepState: jsonb("step_state").notNull().default({}),
+  dedupeDecisions: jsonb("dedupe_decisions").notNull().default({}),
+  completedAt: timestamp("completed_at"),
+  abandonedAt: timestamp("abandoned_at"),
+  ...timestamps,
+}, (t) => ({
+  companyIdx: index("import_bundles_company_idx").on(t.companyId),
+}));
+
+export const savedCardMigrationStatusEnum = pgEnum("saved_card_migration_status", [
+  "requested",
+  "awaiting_stripe_import",
+  "mapping",
+  "completed",
+  "failed",
+  "fallback_required"
+]);
+
+/** Stripe PAN import orchestration (FS-138); no raw card data stored. */
+export const savedCardMigrations = pgTable("saved_card_migrations", {
+  id: id(),
+  companyId: companyId(),
+  importBundleId: uuid("import_bundle_id").references(() => importBundles.id),
+  createdById: uuid("created_by_id").references(() => users.id),
+  status: savedCardMigrationStatusEnum("status").notNull().default("requested"),
+  priorProcessorName: varchar("prior_processor_name", { length: 120 }).notNull(),
+  /** Stripe-side import reference (job/file id); never PAN or full card numbers. */
+  stripeImportReference: varchar("stripe_import_reference", { length: 255 }),
+  mappingSummary: jsonb("mapping_summary")
+    .notNull()
+    .default({ matched: 0, unmatched: 0, failed: 0, total: 0 }),
+  customerMappings: jsonb("customer_mappings").notNull().default([]),
+  lastError: text("last_error"),
+  fallbackEmailSentAt: timestamp("fallback_email_sent_at"),
+  /** Renvani customer ids already sent the re-enter-card fallback email (per-customer dedupe). */
+  fallbackEmailCustomerIds: jsonb("fallback_email_customer_ids").notNull().default([]),
+  /** Owner acknowledgment that customers consented to off-session charges (required before apply-mappings). */
+  offSessionConsentAcknowledgedAt: timestamp("off_session_consent_acknowledged_at"),
+  offSessionConsentAcknowledgedById: uuid("off_session_consent_acknowledged_by_id").references(() => users.id),
+  /** Version of SAVED_CARD_OFF_SESSION_CONSENT_ACK_TEXT the owner acknowledged. */
+  offSessionConsentTextVersion: varchar("off_session_consent_text_version", { length: 64 }),
+  /** Mapping batch (apply-mappings request) the acknowledgment was recorded for. */
+  offSessionConsentBatchId: uuid("off_session_consent_batch_id"),
+  completedAt: timestamp("completed_at"),
+  ...timestamps,
+}, (t) => ({
+  companyIdx: index("saved_card_migrations_company_idx").on(t.companyId),
+  bundleIdx: index("saved_card_migrations_bundle_idx").on(t.importBundleId),
+  statusIdx: index("saved_card_migrations_status_idx").on(t.status),
+}));
+
 // Tracks a single CSV import session from upload through completion
 // Supports rollback: all records created by an import are tagged with import_session_id
 export const importSessions = pgTable("import_sessions", {
   id: id(),
   companyId: companyId(),
   createdById: uuid("created_by_id").references(() => users.id),
+  importBundleId: uuid("import_bundle_id").references(() => importBundles.id),
+  sourceSystem: varchar("source_system", { length: 64 }),
   entityType: importEntityTypeEnum("entity_type").notNull(), // what is being imported
   status: importSessionStatusEnum("status").notNull().default("uploaded"),
   // Source file
@@ -1258,6 +1646,8 @@ export const importSessions = pgTable("import_sessions", {
   validationErrors: jsonb("validation_errors").default([]),
   // AI-inferred values (e.g. asset types inferred from job description text)
   aiInferences: jsonb("ai_inferences").default({}),
+  // Chunked ingest progress (FS-MIGRATE ADR): chunksTotal, chunksDone, rowsOk, lastCursor, …
+  progress: jsonb("progress").default({}),
   // Rollback
   rolledBackAt: timestamp("rolled_back_at"),
   rolledBackById: uuid("rolled_back_by_id").references(() => users.id),
@@ -1269,6 +1659,196 @@ export const importSessions = pgTable("import_sessions", {
   companyIdx: index("import_sessions_company_idx").on(t.companyId),
   statusIdx: index("import_sessions_status_idx").on(t.status),
   entityTypeIdx: index("import_sessions_entity_type_idx").on(t.entityType),
+  bundleIdx: index("import_sessions_bundle_idx").on(t.importBundleId),
+}));
+
+// Idempotent chunk commits for large imports (ADR-FS-MIGRATE §3).
+export const importChunkRuns = pgTable("import_chunk_runs", {
+  id: id(),
+  companyId: companyId(),
+  importSessionId: uuid("import_session_id")
+    .notNull()
+    .references(() => importSessions.id),
+  entityType: importEntityTypeEnum("entity_type").notNull(),
+  chunkIndex: integer("chunk_index").notNull(),
+  chunksTotal: integer("chunks_total").notNull(),
+  idempotencyKey: varchar("idempotency_key", { length: 255 }).notNull(),
+  status: importChunkRunStatusEnum("status").notNull().default("pending"),
+  cursor: jsonb("cursor").default({}),
+  rowsOk: integer("rows_ok").default(0),
+  rowsFailed: integer("rows_failed").default(0),
+  errorMessage: text("error_message"),
+  completedAt: timestamp("completed_at"),
+  ...timestamps,
+}, (t) => ({
+  companyIdx: index("import_chunk_runs_company_idx").on(t.companyId),
+  sessionIdx: index("import_chunk_runs_session_idx").on(t.importSessionId),
+  idempotencyUnique: uniqueIndex("import_chunk_runs_idempotency_key_idx").on(t.idempotencyKey),
+}));
+
+export const integrationOutboxStatusEnum = pgEnum("integration_outbox_status", [
+  "pending",
+  "processing",
+  "succeeded",
+  "dead",
+]);
+
+export const integrationOutboxAuditEventTypeEnum = pgEnum("integration_outbox_audit_event_type", [
+  "created",
+  "processing",
+  "retry_receipt",
+  "succeeded",
+  "dead",
+  "duplicate_suppressed",
+]);
+
+/** FS-40 / FS-15 — durable internal outbox row (no live vendor sends in this slice). */
+export const integrationOutboxOperations = pgTable(
+  "integration_outbox_operations",
+  {
+    id: id(),
+    companyId: companyId(),
+    // varchar + app-level kind registry (@fsm/types registerAdapterOperationKind) since 0051.
+    kind: varchar("kind", { length: 64 }).notNull(),
+    adapterId: varchar("adapter_id", { length: 64 }).notNull(),
+    idempotencyKey: varchar("idempotency_key", { length: 255 }).notNull(),
+    correlationId: uuid("correlation_id").notNull(),
+    attribution: jsonb("attribution").notNull(),
+    payload: jsonb("payload").notNull().default({}),
+    status: integrationOutboxStatusEnum("status").notNull().default("pending"),
+    attemptCount: integer("attempt_count").notNull().default(0),
+    lastError: text("last_error"),
+    ...timestamps,
+  },
+  (t) => ({
+    companyKindIdempotencyIdx: uniqueIndex("integration_outbox_operations_company_kind_idempotency_idx")
+      .on(t.companyId, t.kind, t.idempotencyKey)
+      .where(sql`"deleted_at" IS NULL`),
+    companyCorrelationIdx: index("integration_outbox_operations_company_correlation_idx").on(
+      t.companyId,
+      t.correlationId
+    ),
+    // Worker claim query: pending/processing rows ordered by staleness.
+    statusUpdatedIdx: index("integration_outbox_operations_status_updated_idx").on(t.status, t.updatedAt),
+    kindFormatChk: check("integration_outbox_operations_kind_format_chk", sql`"kind" ~ '^[a-z][a-z0-9_]{0,63}$'`),
+  })
+);
+
+/** Append-only comms / outbox audit trail with idempotent retry receipts. */
+export const integrationOutboxAuditEvents = pgTable(
+  "integration_outbox_audit_events",
+  {
+    id: id(),
+    companyId: companyId(),
+    outboxOperationId: uuid("outbox_operation_id")
+      .notNull()
+      .references(() => integrationOutboxOperations.id, { onDelete: "cascade" }),
+    eventType: integrationOutboxAuditEventTypeEnum("event_type").notNull(),
+    retryReceiptKey: varchar("retry_receipt_key", { length: 255 }),
+    receipt: jsonb("receipt").notNull().default({}),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+  },
+  (t) => ({
+    companyOperationIdx: index("integration_outbox_audit_events_company_operation_idx").on(
+      t.companyId,
+      t.outboxOperationId,
+      t.createdAt
+    ),
+    retryReceiptKeyIdx: uniqueIndex("integration_outbox_audit_events_retry_receipt_key_idx")
+      .on(t.companyId, t.retryReceiptKey)
+      .where(sql`"retry_receipt_key" IS NOT NULL`),
+  })
+);
+
+/**
+ * FS-199 — Stripe disputes mirrored from platform `charge.dispute.*` webhooks (destination
+ * charges, so disputes live on the platform account). Read-only for tenants; status/reason are
+ * text validated by the app registry in @fsm/types (no pgEnum). `resource_version` orders
+ * webhook deliveries so replays/out-of-order events never regress state.
+ */
+export const stripeDisputes = pgTable(
+  "stripe_disputes",
+  {
+    id: id(),
+    companyId: companyId(),
+    stripeDisputeId: varchar("stripe_dispute_id", { length: 100 }).notNull(),
+    stripeChargeId: varchar("stripe_charge_id", { length: 100 }),
+    stripePaymentIntentId: varchar("stripe_payment_intent_id", { length: 100 }),
+    paymentId: uuid("payment_id").references(() => payments.id, { onDelete: "set null" }),
+    amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+    currency: varchar("currency", { length: 3 }).notNull(),
+    status: varchar("status", { length: 64 }).notNull(),
+    reason: varchar("reason", { length: 64 }).notNull(),
+    evidenceDueBy: timestamp("evidence_due_by"),
+    disputedAt: timestamp("disputed_at").notNull(),
+    resourceVersion: varchar("resource_version", { length: 128 }).notNull(),
+    ...timestamps,
+  },
+  (t) => ({
+    companyDisputeIdx: uniqueIndex("stripe_disputes_company_dispute_idx")
+      .on(t.companyId, t.stripeDisputeId)
+      .where(sql`"deleted_at" IS NULL`),
+    companyStatusIdx: index("stripe_disputes_company_status_disputed_idx").on(t.companyId, t.status, t.disputedAt),
+    statusFormatChk: check("stripe_disputes_status_format_chk", sql`"status" ~ '^[a-z][a-z0-9_]{0,63}$'`),
+    reasonFormatChk: check("stripe_disputes_reason_format_chk", sql`"reason" ~ '^[a-z][a-z0-9_]{0,63}$'`),
+  })
+);
+
+export const qboConnectionStatusEnum = pgEnum("qbo_connection_status", [
+  "pending",
+  "connected",
+  "error",
+  "disconnected"
+]);
+
+export const qboSyncIssueKindEnum = pgEnum("qbo_sync_issue_kind", ["conflict", "error"]);
+
+export const qboSyncDirectionEnum = pgEnum("qbo_sync_direction", ["push", "pull"]);
+
+export const qboSyncEntityTypeEnum = pgEnum("qbo_sync_entity_type", [
+  "customer",
+  "invoice",
+  "payment"
+]);
+
+export const qboConnections = pgTable("qbo_connections", {
+  id: id(),
+  companyId: companyId(),
+  realmId: varchar("realm_id", { length: 64 }).notNull(),
+  environment: varchar("environment", { length: 16 }).notNull().default("sandbox"),
+  status: qboConnectionStatusEnum("status").notNull().default("pending"),
+  accessTokenEnc: text("access_token_enc").notNull(),
+  refreshTokenEnc: text("refresh_token_enc").notNull(),
+  accessTokenExpiresAt: timestamp("access_token_expires_at").notNull(),
+  pullCursor: varchar("pull_cursor", { length: 128 }),
+  lastSyncAt: timestamp("last_sync_at"),
+  lastErrorMessage: text("last_error_message"),
+  ...timestamps
+}, (t) => ({
+  companyUnique: uniqueIndex("qbo_connections_company_idx").on(t.companyId),
+  realmIdx: index("qbo_connections_realm_idx").on(t.realmId)
+}));
+
+export const qboSyncIssues = pgTable("qbo_sync_issues", {
+  id: id(),
+  companyId: companyId(),
+  connectionId: uuid("connection_id")
+    .notNull()
+    .references(() => qboConnections.id),
+  direction: qboSyncDirectionEnum("direction").notNull(),
+  entityType: qboSyncEntityTypeEnum("entity_type").notNull(),
+  renvaniEntityId: uuid("renvani_entity_id"),
+  qboEntityId: varchar("qbo_entity_id", { length: 64 }),
+  kind: qboSyncIssueKindEnum("kind").notNull(),
+  code: varchar("code", { length: 64 }).notNull(),
+  message: text("message").notNull(),
+  payload: jsonb("payload").notNull().default({}),
+  resolvedAt: timestamp("resolved_at"),
+  resolvedById: uuid("resolved_by_id").references(() => users.id),
+  ...timestamps
+}, (t) => ({
+  companyIdx: index("qbo_sync_issues_company_idx").on(t.companyId),
+  openIdx: index("qbo_sync_issues_open_idx").on(t.companyId, t.resolvedAt)
 }));
 
 export const dataExportSessions = pgTable("data_export_sessions", {
@@ -1332,10 +1912,43 @@ export const productCatalog = pgTable("product_catalog", {
   isActive: boolean("is_active").notNull().default(true),
   applicableAssetTypes: text("applicable_asset_types").array().default([]),
   sortOrder: integer("sort_order").default(0),
+  sourceSystem: varchar("source_system", { length: 64 }),
+  sourceId: varchar("source_id", { length: 256 }),
+  importSessionId: uuid("import_session_id").references(() => importSessions.id),
   ...timestamps,
 }, (t) => ({
   companyIdx: index("product_catalog_company_idx").on(t.companyId),
   activeIdx: index("product_catalog_active_idx").on(t.isActive),
+  lineageIdx: uniqueIndex("product_catalog_lineage_company_idx").on(
+    t.companyId,
+    t.sourceSystem,
+    t.sourceId
+  ),
+}));
+
+/** Maps vendor price-book ids to catalog rows for invoice line resolution during FS-MIGRATE. */
+export const importInvoiceLineSeeds = pgTable("import_invoice_line_seeds", {
+  id: id(),
+  companyId: companyId(),
+  importSessionId: uuid("import_session_id")
+    .notNull()
+    .references(() => importSessions.id),
+  sourceSystem: varchar("source_system", { length: 64 }).notNull(),
+  sourceId: varchar("source_id", { length: 256 }).notNull(),
+  productCatalogId: uuid("product_catalog_id")
+    .notNull()
+    .references(() => productCatalog.id),
+  sku: varchar("sku", { length: 100 }),
+  name: varchar("name", { length: 255 }).notNull(),
+  ...timestamps,
+}, (t) => ({
+  companyIdx: index("import_invoice_line_seeds_company_idx").on(t.companyId),
+  sessionIdx: index("import_invoice_line_seeds_session_idx").on(t.importSessionId),
+  lookupIdx: uniqueIndex("import_invoice_line_seeds_lookup_idx").on(
+    t.companyId,
+    t.sourceSystem,
+    t.sourceId
+  ),
 }));
 
 export const jobTasks = pgTable("job_tasks", {
@@ -1382,6 +1995,65 @@ export const jobProducts = pgTable("job_products", {
   jobIdx: index("job_products_job_idx").on(t.jobId),
 }));
 
+// FS-170 inventory: stock locations, per-location levels, append-only movements.
+export const stockLocationKindEnum = pgEnum("stock_location_kind", ["warehouse", "van"]);
+export const stockMovementKindEnum = pgEnum("stock_movement_kind", [
+  "adjustment",
+  "transfer_out",
+  "transfer_in",
+  "job_usage",
+]);
+
+export const stockLocations = pgTable("stock_locations", {
+  id: id(),
+  companyId: companyId(),
+  name: varchar("name", { length: 255 }).notNull(),
+  kind: stockLocationKindEnum("kind").notNull(),
+  technicianId: uuid("technician_id").references(() => technicians.id, { onDelete: "set null" }),
+  isActive: boolean("is_active").notNull().default(true),
+  ...timestamps,
+}, (t) => ({
+  companyIdx: index("stock_locations_company_idx").on(t.companyId),
+}));
+
+export const stockLevels = pgTable("stock_levels", {
+  id: id(),
+  companyId: companyId(),
+  locationId: uuid("location_id").notNull().references(() => stockLocations.id, { onDelete: "cascade" }),
+  productId: uuid("product_id").notNull().references(() => productCatalog.id, { onDelete: "cascade" }),
+  quantity: integer("quantity").notNull().default(0),
+  lowStockThreshold: integer("low_stock_threshold"),
+  ...timestamps,
+}, (t) => ({
+  companyIdx: index("stock_levels_company_idx").on(t.companyId),
+  locationProductIdx: uniqueIndex("stock_levels_company_location_product_idx").on(
+    t.companyId,
+    t.locationId,
+    t.productId
+  ),
+}));
+
+/** Append-only audit trail; UPDATE/DELETE are rejected by a trigger (migration 0044). */
+export const stockMovements = pgTable("stock_movements", {
+  id: id(),
+  companyId: companyId(),
+  locationId: uuid("location_id").notNull().references(() => stockLocations.id, { onDelete: "cascade" }),
+  productId: uuid("product_id").notNull().references(() => productCatalog.id, { onDelete: "cascade" }),
+  kind: stockMovementKindEnum("kind").notNull(),
+  quantityDelta: integer("quantity_delta").notNull(),
+  quantityAfter: integer("quantity_after").notNull(),
+  reason: text("reason"),
+  jobId: uuid("job_id").references(() => jobs.id, { onDelete: "set null" }),
+  transferGroupId: uuid("transfer_group_id"),
+  allowNegative: boolean("allow_negative").notNull().default(false),
+  actorUserId: uuid("actor_user_id").references(() => users.id, { onDelete: "set null" }),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+}, (t) => ({
+  companyIdx: index("stock_movements_company_idx").on(t.companyId),
+  locationProductIdx: index("stock_movements_location_product_idx").on(t.locationId, t.productId),
+  jobIdx: index("stock_movements_job_idx").on(t.jobId),
+}));
+
 export const timeEntries = pgTable("time_entries", {
   id: id(),
   companyId: companyId(),
@@ -1398,6 +2070,60 @@ export const timeEntries = pgTable("time_entries", {
   companyIdx: index("time_entries_company_idx").on(t.companyId),
   jobIdx: index("time_entries_job_idx").on(t.jobId),
   technicianIdx: index("time_entries_technician_idx").on(t.technicianId),
+  // FS-171 (migration 0046): one open entry per technician.
+  openTechnicianIdx: uniqueIndex("time_entries_open_technician_idx")
+    .on(t.companyId, t.technicianId)
+    .where(sql`${t.endedAt} IS NULL AND ${t.deletedAt} IS NULL`),
+}));
+
+// FS-171: pay-period timesheets, audit trail and technician pay rates (migration 0045).
+export const timesheets = pgTable("timesheets", {
+  id: id(),
+  companyId: companyId(),
+  technicianId: uuid("technician_id").notNull().references(() => technicians.id, { onDelete: "cascade" }),
+  periodStart: date("period_start", { mode: "string" }).notNull(),
+  periodEnd: date("period_end", { mode: "string" }).notNull(),
+  status: varchar("status", { length: 20 }).notNull().default("open"),
+  submittedAt: timestamp("submitted_at"),
+  submittedById: uuid("submitted_by_id").references(() => users.id, { onDelete: "set null" }),
+  approvedAt: timestamp("approved_at"),
+  approvedById: uuid("approved_by_id").references(() => users.id, { onDelete: "set null" }),
+  rejectedAt: timestamp("rejected_at"),
+  rejectedById: uuid("rejected_by_id").references(() => users.id, { onDelete: "set null" }),
+  rejectionReason: text("rejection_reason"),
+  ...timestamps,
+}, (t) => ({
+  companyIdx: index("timesheets_company_idx").on(t.companyId),
+  companyTechnicianPeriodIdx: uniqueIndex("timesheets_company_technician_period_idx").on(t.companyId, t.technicianId, t.periodStart),
+}));
+
+export const timesheetAuditEvents = pgTable("timesheet_audit_events", {
+  id: id(),
+  companyId: companyId(),
+  timesheetId: uuid("timesheet_id").references(() => timesheets.id, { onDelete: "cascade" }),
+  timeEntryId: uuid("time_entry_id").references(() => timeEntries.id, { onDelete: "cascade" }),
+  action: varchar("action", { length: 40 }).notNull(),
+  actorUserId: uuid("actor_user_id").references(() => users.id, { onDelete: "set null" }),
+  reason: text("reason"),
+  before: jsonb("before"),
+  after: jsonb("after"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+}, (t) => ({
+  companyIdx: index("timesheet_audit_events_company_idx").on(t.companyId),
+  timesheetIdx: index("timesheet_audit_events_timesheet_idx").on(t.timesheetId),
+}));
+
+export const technicianPayRates = pgTable("technician_pay_rates", {
+  id: id(),
+  companyId: companyId(),
+  technicianId: uuid("technician_id").notNull().references(() => technicians.id, { onDelete: "cascade" }),
+  hourlyRateCents: integer("hourly_rate_cents").notNull(),
+  effectiveFrom: date("effective_from", { mode: "string" }).notNull(),
+  createdById: uuid("created_by_id").references(() => users.id, { onDelete: "set null" }),
+  ...timestamps,
+}, (t) => ({
+  companyIdx: index("technician_pay_rates_company_idx").on(t.companyId),
+  companyTechnicianEffectiveIdx: uniqueIndex("technician_pay_rates_company_technician_effective_idx").on(t.companyId, t.technicianId, t.effectiveFrom),
 }));
 
 export const reviewRequests = pgTable("review_requests", {
@@ -1492,6 +2218,8 @@ export const bookingRequests = pgTable("booking_requests", {
   preferredWindow: varchar("preferred_window", { length: 50 }),
   status: bookingRequestStatusEnum("status").notNull().default("pending"),
   source: bookingSourceEnum("source").notNull().default("direct"),
+  /** Growth source tracking: whitelisted UTM/referrer attribution (LeadAttribution, packages/types). */
+  leadAttribution: jsonb("lead_attribution").$type<Partial<Record<string, string>>>(),
   referenceNumber: varchar("reference_number", { length: 50 }),
   isPropertyOwner: boolean("is_property_owner").default(false),
   smsConsentAppointments: boolean("sms_consent_appointments").default(false),
@@ -1549,6 +2277,7 @@ export const agentProductEnum = pgEnum("agent_product", [
   "service",
   "retention",
   "owner",
+  "loyalty",
 ]);
 
 export const fieldSyncBatchStatusEnum = pgEnum("field_sync_batch_status", ["open", "completed"]);
@@ -1800,6 +2529,29 @@ export const growthIntakeAuditEvents = pgTable(
   })
 );
 
+export const qboMappingKindEnum = pgEnum("qbo_mapping_kind", [
+  "price_book_item",
+  "tax_code",
+  "payment_method",
+]);
+
+export const qboEntityMappings = pgTable(
+  "qbo_entity_mappings",
+  {
+    id: id(),
+    companyId: companyId(),
+    kind: qboMappingKindEnum("kind").notNull(),
+    localKey: varchar("local_key", { length: 128 }).notNull(),
+    qboId: varchar("qbo_id", { length: 64 }),
+    qboName: varchar("qbo_name", { length: 255 }),
+    ...timestamps,
+  },
+  (t) => ({
+    companyIdx: index("qbo_entity_mappings_company_idx").on(t.companyId),
+    lookupIdx: uniqueIndex("qbo_entity_mappings_lookup_idx").on(t.companyId, t.kind, t.localKey),
+  })
+);
+
 export const bookingSettings = pgTable("booking_settings", {
   id: id(),
   companyId: companyId(),
@@ -1895,6 +2647,209 @@ export const growthCheckFindings = pgTable(
   })
 );
 
+/** FS-200 Growth: per-tenant call tracking settings (provider id from the adapter registry, not an enum). */
+export const callTrackingSettings = pgTable(
+  "call_tracking_settings",
+  {
+    id: id(),
+    companyId: companyId(),
+    provider: varchar("provider", { length: 64 }).notNull().default("disabled"),
+    enabled: boolean("enabled").notNull().default(false),
+    recordingEnabled: boolean("recording_enabled").notNull().default(false),
+    recordingDisclosureEnabled: boolean("recording_disclosure_enabled").notNull().default(true),
+    consentMode: varchar("consent_mode", { length: 32 }).notNull().default("all_party"),
+    recordingNoticeState: varchar("recording_notice_state", { length: 2 }),
+    version: integer("version").notNull().default(1),
+    updatedByUserId: uuid("updated_by_user_id").references(() => users.id, { onDelete: "set null" }),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at").notNull().defaultNow()
+  },
+  (t) => ({
+    companyUnique: uniqueIndex("call_tracking_settings_company_idx").on(t.companyId)
+  })
+);
+
+/** FS-200: tracking number -> marketing source/campaign mapping and forwarding target (business numbers only). */
+export const callTrackingNumbers = pgTable(
+  "call_tracking_numbers",
+  {
+    id: id(),
+    companyId: companyId(),
+    provider: varchar("provider", { length: 64 }).notNull(),
+    providerNumberId: varchar("provider_number_id", { length: 128 }),
+    trackingNumber: varchar("tracking_number", { length: 20 }).notNull(),
+    label: varchar("label", { length: 100 }).notNull(),
+    marketingSource: varchar("marketing_source", { length: 64 }).notNull(),
+    marketingCampaign: varchar("marketing_campaign", { length: 100 }),
+    forwardingNumber: varchar("forwarding_number", { length: 20 }).notNull(),
+    active: boolean("active").notNull().default(true),
+    version: integer("version").notNull().default(1),
+    /** FS-200 (0060): last time the provider adapter confirmed ownership. Null = never verified. */
+    verifiedAt: timestamp("verified_at", { withTimezone: true }),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
+    deletedAt: timestamp("deleted_at")
+  },
+  (t) => ({
+    companyIdx: index("call_tracking_numbers_company_idx").on(t.companyId),
+    trackingNumberUnique: uniqueIndex("call_tracking_numbers_tracking_number_idx")
+      .on(t.trackingNumber)
+      .where(sql`${t.deletedAt} IS NULL`)
+  })
+);
+
+/** FS-200: inbound call records. Caller stored as tenant-scoped hash + last 4 only; recording by reference only. */
+export const callRecords = pgTable(
+  "call_records",
+  {
+    id: id(),
+    companyId: companyId(),
+    trackingNumberId: uuid("tracking_number_id")
+      .notNull()
+      .references(() => callTrackingNumbers.id, { onDelete: "cascade" }),
+    provider: varchar("provider", { length: 64 }).notNull(),
+    providerCallId: varchar("provider_call_id", { length: 128 }).notNull(),
+    callerHash: varchar("caller_hash", { length: 64 }).notNull(),
+    callerLast4: varchar("caller_last4", { length: 4 }).notNull(),
+    startedAt: timestamp("started_at").notNull(),
+    durationSeconds: integer("duration_seconds").notNull(),
+    outcome: varchar("outcome", { length: 32 }).notNull(),
+    /** Lead attribution (#271 whitelist) derived from the tracking number mapping. */
+    attribution: jsonb("lead_attribution").$type<Partial<Record<string, string>>>(),
+    recordingRef: varchar("recording_ref", { length: 512 }),
+    recordingDisclosurePlayed: boolean("recording_disclosure_played").notNull().default(false),
+    callerConsent: varchar("caller_consent", { length: 32 }).notNull().default("unknown"),
+    recordingNoticeState: varchar("recording_notice_state", { length: 2 }),
+    createdAt: timestamp("created_at").notNull().defaultNow()
+  },
+  (t) => ({
+    companyStartedIdx: index("call_records_company_started_idx").on(t.companyId, t.startedAt),
+    trackingNumberIdx: index("call_records_tracking_number_idx").on(t.trackingNumberId),
+    providerCallUnique: uniqueIndex("call_records_provider_call_idx").on(t.provider, t.providerCallId)
+  })
+);
+
+/** FS-56: append-only review history for Growth Check findings (machine observation stays untouched). */
+export const growthCheckFindingRevisions = pgTable(
+  "growth_check_finding_revisions",
+  {
+    id: id(),
+    companyId: companyId(),
+    findingId: uuid("finding_id")
+      .notNull()
+      .references(() => growthCheckFindings.id, { onDelete: "cascade" }),
+    scanId: uuid("scan_id")
+      .notNull()
+      .references(() => growthCheckScans.id, { onDelete: "cascade" }),
+    revision: integer("revision").notNull(),
+    action: varchar("action", { length: 64 }).notNull(),
+    actorUserId: uuid("actor_user_id").references(() => users.id, { onDelete: "set null" }),
+    reason: text("reason"),
+    note: text("note"),
+    previousState: jsonb("previous_state").notNull(),
+    nextState: jsonb("next_state").notNull(),
+    idempotencyKey: varchar("idempotency_key", { length: 128 }).notNull(),
+    payloadHash: varchar("payload_hash", { length: 64 }).notNull(),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+  },
+  (t) => ({
+    companyIdx: index("growth_check_finding_revisions_company_idx").on(t.companyId),
+    findingIdx: index("growth_check_finding_revisions_finding_idx").on(t.findingId),
+    scanIdx: index("growth_check_finding_revisions_scan_idx").on(t.scanId),
+    findingRevisionUnique: uniqueIndex("growth_check_finding_revisions_finding_revision_idx").on(
+      t.findingId,
+      t.revision
+    ),
+    companyIdempotencyUnique: uniqueIndex("growth_check_finding_revisions_company_idempotency_idx").on(
+      t.companyId,
+      t.idempotencyKey
+    ),
+  })
+);
+
+/** FS-57 Growth Check owner report drafts (one per scan; content versioned via append-only revisions). */
+export const growthCheckReportDrafts = pgTable(
+  "growth_check_report_drafts",
+  {
+    id: id(),
+    companyId: companyId(),
+    scanId: uuid("scan_id")
+      .notNull()
+      .references(() => growthCheckScans.id, { onDelete: "cascade" }),
+    version: integer("version").notNull().default(1),
+    content: jsonb("content").notNull(),
+    approvedVersion: integer("approved_version"),
+    approvedByUserId: uuid("approved_by_user_id").references(() => users.id, { onDelete: "set null" }),
+    approvedAt: timestamp("approved_at"),
+    createdByUserId: uuid("created_by_user_id").references(() => users.id, { onDelete: "set null" }),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  },
+  (t) => ({
+    companyIdx: index("growth_check_report_drafts_company_idx").on(t.companyId),
+    companyScanUnique: uniqueIndex("growth_check_report_drafts_company_scan_idx").on(t.companyId, t.scanId),
+  })
+);
+
+export const growthCheckReportDraftRevisions = pgTable(
+  "growth_check_report_draft_revisions",
+  {
+    id: id(),
+    companyId: companyId(),
+    draftId: uuid("draft_id")
+      .notNull()
+      .references(() => growthCheckReportDrafts.id, { onDelete: "cascade" }),
+    version: integer("version").notNull(),
+    action: varchar("action", { length: 64 }).notNull(),
+    actorUserId: uuid("actor_user_id").references(() => users.id, { onDelete: "set null" }),
+    previousContent: jsonb("previous_content"),
+    nextContent: jsonb("next_content").notNull(),
+    idempotencyKey: varchar("idempotency_key", { length: 128 }).notNull(),
+    payloadHash: varchar("payload_hash", { length: 64 }).notNull(),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+  },
+  (t) => ({
+    companyIdx: index("growth_check_report_draft_revisions_company_idx").on(t.companyId),
+    draftVersionUnique: uniqueIndex("growth_check_report_draft_revisions_draft_version_idx").on(t.draftId, t.version),
+    companyIdempotencyUnique: uniqueIndex("growth_check_report_draft_revisions_company_idempotency_idx").on(
+      t.companyId,
+      t.idempotencyKey
+    ),
+  })
+);
+
+/** FS-57 share snapshots: frozen approved content + hash; raw token never stored (sha256 only). */
+export const growthCheckReportShares = pgTable(
+  "growth_check_report_shares",
+  {
+    id: id(),
+    companyId: companyId(),
+    draftId: uuid("draft_id")
+      .notNull()
+      .references(() => growthCheckReportDrafts.id, { onDelete: "cascade" }),
+    draftVersion: integer("draft_version").notNull(),
+    contentHash: varchar("content_hash", { length: 64 }).notNull(),
+    snapshot: jsonb("snapshot").notNull(),
+    tokenHash: varchar("token_hash", { length: 64 }).notNull(),
+    createdByUserId: uuid("created_by_user_id").references(() => users.id, { onDelete: "set null" }),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    expiresAt: timestamp("expires_at"),
+    revokedAt: timestamp("revoked_at"),
+    revokedByUserId: uuid("revoked_by_user_id").references(() => users.id, { onDelete: "set null" }),
+    idempotencyKey: varchar("idempotency_key", { length: 128 }).notNull(),
+    payloadHash: varchar("payload_hash", { length: 64 }).notNull(),
+  },
+  (t) => ({
+    companyIdx: index("growth_check_report_shares_company_idx").on(t.companyId),
+    draftIdx: index("growth_check_report_shares_draft_idx").on(t.draftId),
+    tokenHashUnique: uniqueIndex("growth_check_report_shares_token_hash_idx").on(t.tokenHash),
+    companyIdempotencyUnique: uniqueIndex("growth_check_report_shares_company_idempotency_idx").on(
+      t.companyId,
+      t.idempotencyKey
+    ),
+  })
+);
+
 // ─────────────────────────────────────────────
 // RELATIONS
 // ─────────────────────────────────────────────
@@ -1917,6 +2872,7 @@ export const customersRelations = relations(customers, ({ one, many }) => ({
   properties: many(properties),
   assets: many(assets),
   jobs: many(jobs),
+  notes: many(customerNotes),
   estimates: many(estimates),
   invoices: many(invoices),
   payments: many(payments),
@@ -2020,9 +2976,28 @@ export const formSubmissionsRelations = relations(formSubmissions, ({ one }) => 
   asset: one(assets, { fields: [formSubmissions.assetId], references: [assets.id] }),
 }));
 
-export const importSessionsRelations = relations(importSessions, ({ one }) => ({
+export const importBundlesRelations = relations(importBundles, ({ one, many }) => ({
+  company: one(companies, { fields: [importBundles.companyId], references: [companies.id] }),
+  createdBy: one(users, { fields: [importBundles.createdById], references: [users.id] }),
+  sessions: many(importSessions),
+}));
+
+export const importSessionsRelations = relations(importSessions, ({ one, many }) => ({
   company: one(companies, { fields: [importSessions.companyId], references: [companies.id] }),
   createdBy: one(users, { fields: [importSessions.createdById], references: [users.id] }),
+  bundle: one(importBundles, {
+    fields: [importSessions.importBundleId],
+    references: [importBundles.id],
+  }),
+  chunkRuns: many(importChunkRuns),
+}));
+
+export const importChunkRunsRelations = relations(importChunkRuns, ({ one }) => ({
+  company: one(companies, { fields: [importChunkRuns.companyId], references: [companies.id] }),
+  importSession: one(importSessions, {
+    fields: [importChunkRuns.importSessionId],
+    references: [importSessions.id],
+  }),
 }));
 
 export const automationRulesRelations = relations(automationRules, ({ one }) => ({
@@ -2049,4 +3024,72 @@ export const jobProductsRelations = relations(jobProducts, ({ one }) => ({
     references: [productCatalog.id],
   }),
   addedBy: one(users, { fields: [jobProducts.addedById], references: [users.id] }),
+}));
+
+// ─────────────────────────────────────────────
+// FS-195 — Crews / teams (role is text + app-level registry, no pgEnum)
+// ─────────────────────────────────────────────
+
+export const crews = pgTable("crews", {
+  id: id(),
+  companyId: companyId(),
+  name: varchar("name", { length: 100 }).notNull(),
+  color: varchar("color", { length: 16 }),
+  isActive: boolean("is_active").notNull().default(true),
+  /** Optimistic-concurrency version; bumped on every crew or membership change. */
+  version: integer("version").notNull().default(1),
+  ...timestamps,
+}, (t) => ({
+  companyIdx: index("crews_company_idx").on(t.companyId),
+  companyNameIdx: uniqueIndex("crews_company_name_idx").on(t.companyId, t.name).where(sql`"deleted_at" IS NULL`),
+}));
+
+export const crewMembers = pgTable("crew_members", {
+  id: id(),
+  companyId: companyId(),
+  crewId: uuid("crew_id").notNull().references(() => crews.id, { onDelete: "cascade" }),
+  technicianId: uuid("technician_id").notNull().references(() => technicians.id),
+  role: varchar("role", { length: 32 }).notNull().default("member"),
+  ...timestamps,
+}, (t) => ({
+  companyIdx: index("crew_members_company_idx").on(t.companyId),
+  technicianIdx: index("crew_members_technician_idx").on(t.technicianId),
+  crewTechnicianIdx: uniqueIndex("crew_members_crew_technician_idx").on(t.crewId, t.technicianId).where(sql`"deleted_at" IS NULL`),
+}));
+
+// ─────────────────────────────────────────────
+// Growth — marketing-site intake (platform-level, NOT tenant-scoped: no company_id, no tenant RLS).
+// trade/status are varchar + app-level registry (HOME_SERVICE_TRADES / MARKETING_INTAKE_STATUSES), no pgEnum.
+// ─────────────────────────────────────────────
+
+export const marketingDemoRequests = pgTable("marketing_demo_requests", {
+  id: id(),
+  name: varchar("name", { length: 120 }).notNull(),
+  email: varchar("email", { length: 254 }).notNull(),
+  phone: varchar("phone", { length: 20 }),
+  company: varchar("company", { length: 160 }).notNull(),
+  trade: varchar("trade", { length: 32 }).notNull(),
+  message: text("message"),
+  status: varchar("status", { length: 32 }).notNull().default("new"),
+  /** Salted SHA-256 of the client IP (never the raw IP); null when no salt is configured. */
+  ipHash: varchar("ip_hash", { length: 64 }),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+}, (t) => ({
+  createdAtIdx: index("marketing_demo_requests_created_at_idx").on(t.createdAt),
+  emailIdx: index("marketing_demo_requests_email_idx").on(t.email),
+}));
+
+export const marketingGrowthChecks = pgTable("marketing_growth_checks", {
+  id: id(),
+  websiteUrl: varchar("website_url", { length: 2048 }).notNull(),
+  trade: varchar("trade", { length: 32 }).notNull(),
+  zip: varchar("zip", { length: 5 }),
+  city: varchar("city", { length: 100 }),
+  email: varchar("email", { length: 254 }).notNull(),
+  status: varchar("status", { length: 32 }).notNull().default("new"),
+  ipHash: varchar("ip_hash", { length: 64 }),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+}, (t) => ({
+  createdAtIdx: index("marketing_growth_checks_created_at_idx").on(t.createdAt),
+  emailIdx: index("marketing_growth_checks_email_idx").on(t.email),
 }));

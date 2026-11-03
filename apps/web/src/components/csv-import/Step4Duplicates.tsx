@@ -76,7 +76,7 @@ export function Step4Duplicates({
                 Select all: Skip duplicates
               </button>
             </div>
-            <div className="mt-4 overflow-hidden rounded-[24px] border border-neutral-200">
+            <div className="mt-4 overflow-x-auto rounded-[24px] border border-neutral-200">
               <table className="min-w-full divide-y divide-neutral-200 text-sm">
                 <thead className="bg-neutral-50 text-left text-xs uppercase tracking-[0.14em] text-neutral-400">
                   <tr>
@@ -142,7 +142,7 @@ export function Step4Duplicates({
       <aside className="rounded-[30px] border border-neutral-200 bg-white px-5 py-5 shadow-sm">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-400">Recommended default</p>
         <p className="mt-4 text-sm leading-6 text-neutral-500">
-          Skip is the safest action when a customer is already in ServiceRev. Use update existing when
+          Skip is the safest action when a customer is already in Renvani. Use update existing when
           the file fills in missing details, and import as new only when the match is a false positive.
         </p>
       </aside>

@@ -1,0 +1,96 @@
+import { describe, expect, it } from "vitest";
+
+import { getClerkPublishableKey, isClerkEnabled } from "./config";
+import { resolveClerkRole, resolveClerkRouteDecision } from "./route-decision";
+import { getDefaultRouteForRole } from "../route-access";
+
+const PUBLIC_TOKEN_ROUTES = [
+  "/",
+  "/pay/tok_1/receipt",
+  "/pay/tok_1",
+  "/vip/join/tok_1",
+  "/portal/agreements/tok_1",
+  "/book/sparkle-co",
+  "/book/sparkle-co/schedule",
+  "/approve/tok_1",
+  "/review/tok_1",
+  "/site/sparkle-co"
+];
+
+describe("resolveClerkRouteDecision", () => {
+  it.each(PUBLIC_TOKEN_ROUTES)("keeps %s public for signed-out visitors", (path) => {
+    expect(resolveClerkRouteDecision(path, null)).toEqual({ action: "next" });
+  });
+
+  it("lets Clerk sign-in/sign-up sub-steps through when signed out", () => {
+    expect(resolveClerkRouteDecision("/login", null)).toEqual({ action: "next" });
+    expect(resolveClerkRouteDecision("/login/factor-one", null)).toEqual({ action: "next" });
+    expect(resolveClerkRouteDecision("/signup/verify-email-address", null)).toEqual({ action: "next" });
+  });
+
+  it("redirects signed-out visitors on staff routes to /login", () => {
+    expect(resolveClerkRouteDecision("/dashboard", null)).toEqual({ action: "redirect", to: "/login" });
+    expect(resolveClerkRouteDecision("/portal/settings/x", null)).toEqual({ action: "redirect", to: "/login" });
+  });
+
+  it("sends signed-in users to their role default route and gates staff pages by role", () => {
+    expect(resolveClerkRouteDecision("/login", "user_1", "owner")).toEqual({ action: "redirect", to: "/dashboard" });
+    expect(resolveClerkRouteDecision("/login", "user_1", "technician")).toEqual({ action: "redirect", to: "/mobile/jobs" });
+    expect(resolveClerkRouteDecision("/dashboard", "user_1", "owner")).toEqual({ action: "next" });
+    expect(resolveClerkRouteDecision("/dashboard", "user_1", "office")).toEqual({ action: "redirect", to: "/dispatch" });
+    expect(resolveClerkRouteDecision("/pay/tok_1/receipt", "user_1", "technician")).toEqual({ action: "next" });
+  });
+
+  it("keeps /verify-email public for signed-out and signed-in Clerk users", () => {
+    expect(resolveClerkRouteDecision("/verify-email", null)).toEqual({ action: "next" });
+    expect(resolveClerkRouteDecision("/verify-email", "user_1")).toEqual({ action: "next" });
+    expect(resolveClerkRouteDecision("/verify-email", "user_1", "technician")).toEqual({ action: "next" });
+  });
+
+  it("denies staff pages to a Clerk session with no role", () => {
+    expect(resolveClerkRouteDecision("/dashboard", "user_1")).toEqual({ action: "redirect", to: "/no-access" });
+    expect(resolveClerkRouteDecision("/login", "user_1")).toEqual({ action: "redirect", to: "/no-access" });
+    expect(resolveClerkRouteDecision("/no-access", "user_1")).toEqual({ action: "next" });
+    expect(resolveClerkRouteDecision("/pay/tok_1/receipt", "user_1")).toEqual({ action: "next" });
+  });
+
+  it("resolves the role only from the metadata.role claim (matches the API)", () => {
+    expect(resolveClerkRole({ metadata: { role: "admin" } })).toBe("admin");
+    expect(resolveClerkRole({ metadata: { role: "office" } })).toBe("office");
+    expect(resolveClerkRole({ public_metadata: { role: "office" } })).toBeNull();
+    expect(resolveClerkRole({ publicMetadata: { role: "office" } })).toBeNull();
+    expect(resolveClerkRole({ role: "dispatcher" })).toBeNull();
+    expect(resolveClerkRole({ metadata: { role: "superuser" } })).toBeNull();
+    expect(resolveClerkRole({ org_role: "org:admin" })).toBeNull();
+    expect(resolveClerkRole(null)).toBeNull();
+  });
+});
+
+describe("clerk config", () => {
+  it("is disabled without a publishable key and enabled with one", () => {
+    expect(isClerkEnabled({})).toBe(false);
+    expect(isClerkEnabled({ NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: "  " })).toBe(false);
+    expect(isClerkEnabled({ NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: "pk_test_x" })).toBe(true);
+    expect(getClerkPublishableKey({ NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: " pk_test_x " })).toBe("pk_test_x");
+  });
+});
+
+describe("post-sign-up workspace step access", () => {
+  it("sends a user who already has a role away from /onboarding/workspace to their home", () => {
+    expect(resolveClerkRouteDecision("/onboarding/workspace", "user_1", "owner")).toEqual({ action: "redirect", to: getDefaultRouteForRole("owner") });
+    expect(resolveClerkRouteDecision("/onboarding/workspace", "user_1", "technician")).toEqual({ action: "redirect", to: getDefaultRouteForRole("technician") });
+  });
+
+  it("lets a signed-in user with no role reach /onboarding/workspace", () => {
+    expect(resolveClerkRouteDecision("/onboarding/workspace", "user_1", null)).toEqual({ action: "next" });
+  });
+  it("still bounces no-role users from other onboarding pages", () => {
+    expect(resolveClerkRouteDecision("/onboarding/import", "user_1", null)).toEqual({ action: "redirect", to: "/no-access" });
+  });
+  it("lets an owner continue to /onboarding/import", () => {
+    expect(resolveClerkRouteDecision("/onboarding/import", "user_1", "owner")).toEqual({ action: "next" });
+  });
+  it("sends signed-out users to /login", () => {
+    expect(resolveClerkRouteDecision("/onboarding/workspace", null, null)).toEqual({ action: "redirect", to: "/login" });
+  });
+});

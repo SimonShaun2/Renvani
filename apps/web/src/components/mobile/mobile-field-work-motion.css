@@ -1,0 +1,11 @@
+/* FS-180: 8px slide-in for offline sync status; static with reduced motion. */
+@keyframes field-work-slide-in {
+  from { transform: translateY(8px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-field-work-reveal] {
+    animation: field-work-slide-in 200ms ease-out both;
+  }
+}

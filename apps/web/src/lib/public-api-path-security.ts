@@ -1,5 +1,7 @@
 const PUBLIC_API_PREFIX = "/api/v1/public";
 
+const PUBLIC_API_PROXY_METHODS = new Set(["GET", "HEAD", "POST"]);
+
 const ENCODED_DOT_SEGMENT = /^(?:\.|%2e|%2E)$/i;
 const ENCODED_DOT_DOT_SEGMENT = /^(?:\.{2}|%2e%2e|%2E%2E|%2e%2E|%2E%2e)$/i;
 const DOUBLE_ENCODED_DOT_ARTIFACT = /%25(?:2e|2E)/i;
@@ -28,6 +30,29 @@ function decodePathRounds(value: string): string[] {
 
 export function isPublicApiProxyPath(pathname: string): boolean {
   return pathname === PUBLIC_API_PREFIX || pathname.startsWith(`${PUBLIC_API_PREFIX}/`);
+}
+
+export function isAllowedPublicApiProxyMethod(method: string): boolean {
+  return PUBLIC_API_PROXY_METHODS.has(method.toUpperCase());
+}
+
+/** Reject path metacharacters in a single URL segment (booking slug, token, etc.). */
+export function hasUnsafePublicPathSegment(segment: string): boolean {
+  const trimmed = segment.trim();
+
+  if (trimmed.length === 0 || trimmed.length > 100) {
+    return true;
+  }
+
+  if (trimmed.includes("/") || trimmed.includes("\\") || trimmed.includes("%")) {
+    return true;
+  }
+
+  if (trimmed.includes("..")) {
+    return true;
+  }
+
+  return ENCODED_DOT_DOT_SEGMENT.test(trimmed) || ENCODED_DOT_SEGMENT.test(trimmed);
 }
 
 function segmentIsTraversal(segment: string): boolean {
@@ -101,5 +126,11 @@ export function assertSafePublicApiRequestPath(path: string): void {
 
   if (hasPublicApiPathTraversal(path)) {
     throw new Error("Invalid public API path");
+  }
+}
+
+export function assertSafePublicBookingSlug(slug: string): void {
+  if (hasUnsafePublicPathSegment(slug)) {
+    throw new Error("Invalid public booking slug");
   }
 }

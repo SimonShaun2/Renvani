@@ -10,6 +10,19 @@ const JWT_SECRET = "jwt_secret";
 
 setupTestEnv();
 
+vi.mock("../lib/clerk-auth.js", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../lib/clerk-auth.js")>();
+  return {
+    ...actual,
+    isClerkParallelAuthAvailable: vi.fn(() => true),
+    verifyClerkBearerToken: vi.fn(async () => ({
+      clerkUserId: "clerk_user_1",
+      clerkOrganizationId: "org_mapped",
+      email: "clerk-staff@example.com"
+    }))
+  };
+});
+
 vi.mock("drizzle-orm", async () => {
   const helper = await import("../test-support/fake-db.js");
   return helper.createDrizzleModuleMock();
@@ -115,5 +128,36 @@ describe("authenticate plugin", () => {
     await app.authenticate(request, {} as never);
 
     expect(request.user.role).toBe("technician");
+  });
+
+  it("authenticates via Clerk when JWT fails and parallel auth is enabled", async () => {
+    const company = fakeDb.seedCompany({
+      name: "Clerk Co",
+      slug: "clerk-co",
+      settings: { clerk: { organizationId: "org_mapped" } }
+    });
+    fakeDb.seedUser({
+      companyId: company.id,
+      email: "clerk-staff@example.com",
+      firstName: "Clerk",
+      lastName: "Staff",
+      role: "admin"
+    });
+
+    const request = buildRequest("Bearer not-a-jwt-token");
+    await app.authenticate(request, {} as never);
+
+    expect(request.authProvider).toBe("clerk");
+    expect(request.company.id).toBe(company.id);
+    expect(request.user.email).toBe("clerk-staff@example.com");
+    expect(request.user.role).toBe("admin");
+  });
+
+  it("rejects Clerk token when organization is not linked to a company", async () => {
+    const request = buildRequest("Bearer orphan-clerk-token");
+
+    await expect(app.authenticate(request, {} as never)).rejects.toMatchObject({
+      code: ErrorCode.UNAUTHORIZED
+    });
   });
 });

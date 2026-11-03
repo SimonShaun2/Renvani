@@ -1,6 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type { HomeServiceTrade, PublicBookingIntakeMode, PublicBookingSubmitResponse } from "@fsm/types";
 
 import { api } from "@/src/lib/api";
 import { publicApi } from "@/src/lib/public-api";
@@ -17,6 +18,7 @@ export interface PublicBookingSettingsRecord {
   companyName: string;
   companySlug: string;
   bookingSlug: string;
+  intakeMode: PublicBookingIntakeMode;
   offeredServices: Array<Record<string, unknown>>;
   availableHoursStart: number;
   availableHoursEnd: number;
@@ -31,6 +33,14 @@ export interface PublicBookingSettingsRecord {
   phone?: string | null;
   logoUrl?: string | null;
   serviceAreaZipCodes?: string[];
+  /** Company trade from #318 (null when not set). */
+  trade?: HomeServiceTrade | null;
+  tradeSchemaType?: string | null;
+  tradeDescription?: string | null;
+  /** Active service-area names (inquiry contract, Dev C #268). Absent until that API ships. */
+  serviceAreaNames?: string[];
+  /** Shop IANA timezone for the hours above (inquiry contract, Dev C #268). */
+  timezone?: string | null;
 }
 
 export interface ZipCoverageRecord {
@@ -52,6 +62,26 @@ export interface BookingConfirmationRecord {
   companyName: string;
   scheduledStart: string | null;
   scheduledEnd: string | null;
+}
+
+export interface PublicRecurringScheduleRecord {
+  linked: boolean;
+  scheduleKind: "vip" | "maintenance" | "none";
+  maintenancePlanId: string | null;
+  maintenanceVisitId: string | null;
+}
+
+export interface PublicSlotHoldInput {
+  holdToken: string;
+  technicianId: string;
+  scheduledStart: string;
+  scheduledEnd: string;
+}
+
+export interface PublicConfirmBookingInput {
+  technicianId: string;
+  scheduledStart: string;
+  scheduledEnd: string;
 }
 
 export interface BookingSettingsRecord {
@@ -108,13 +138,41 @@ interface PublicAvailabilityResponse {
   availability: BookingAvailabilityRecord[];
 }
 
-interface SubmitBookingResponse {
+interface PublicSlotHoldResponse {
   bookingRequest: {
     id: string;
     referenceNumber: string | null;
     status: string;
+    assignedTechnicianId: string | null;
   };
+  hold: {
+    technicianId: string;
+    scheduledStart: string;
+    scheduledEnd: string;
+  };
+}
+
+export interface PublicConfirmBookingResponse {
+  bookingRequest: {
+    id: string;
+    referenceNumber: string | null;
+    status: string;
+    jobId: string;
+  };
+  jobId: string;
+  recurringSchedule: PublicRecurringScheduleRecord;
+  manageToken: string | null;
+}
+
+export interface BookingSelfServiceViewRecord {
+  bookingSlug: string;
+  referenceNumber: string;
+  companyName: string;
   confirmation: BookingConfirmationRecord;
+  canReschedule: boolean;
+  canCancel: boolean;
+  cutoffHours: number;
+  expiresAt: string;
 }
 
 interface ConfirmationResponse {
@@ -202,11 +260,38 @@ export function useSubmitBookingRequest(slug: string) {
       body: Record<string, unknown>;
       idempotencyKey?: string;
     }) =>
-      publicApi.post<SubmitBookingResponse>(
+      publicApi.post<PublicBookingSubmitResponse>(
         `/api/v1/public/booking/${slug}/submit${source ? `?src=${encodeURIComponent(source)}` : ""}`,
         body,
         idempotencyKey ? { headers: { "Idempotency-Key": idempotencyKey } } : undefined
       )
+  });
+}
+
+export function usePublicSlotHold(slug: string, referenceNumber: string) {
+  return useMutation({
+    mutationFn: (input: PublicSlotHoldInput) =>
+      publicApi.post<PublicSlotHoldResponse>(
+        `/api/v1/public/booking/${slug}/requests/${encodeURIComponent(referenceNumber)}/slot-hold`,
+        input
+      )
+  });
+}
+
+export function usePublicConfirmBooking(slug: string, referenceNumber: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (input: PublicConfirmBookingInput) =>
+      publicApi.post<PublicConfirmBookingResponse>(
+        `/api/v1/public/booking/${slug}/requests/${encodeURIComponent(referenceNumber)}/confirm`,
+        input
+      ),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: bookingKeys.confirmation(slug, referenceNumber)
+      });
+    }
   });
 }
 
@@ -267,5 +352,26 @@ export function useBookingDemandByZip(days = 30) {
     queryKey: bookingKeys.demand(days),
     queryFn: () => api.get<BookingDemandByZipResponse>(`/api/v1/booking-requests/demand-by-zip?days=${days}`),
     staleTime: 60 * 1000
+  });
+}
+
+export function useBookingSelfService(manageToken: string | null) {
+  return useQuery({
+    queryKey: ["booking", "self-service", manageToken],
+    queryFn: () =>
+      publicApi.get<{ selfService: BookingSelfServiceViewRecord }>(
+        `/api/v1/public/booking/manage/${encodeURIComponent(manageToken ?? "")}`
+      ),
+    enabled: Boolean(manageToken)
+  });
+}
+
+export function useBookingSelfServiceCancel(manageToken: string) {
+  return useMutation({
+    mutationFn: () =>
+      publicApi.post<{ result: { status: string } }>(
+        `/api/v1/public/booking/manage/${encodeURIComponent(manageToken)}/cancel`,
+        {}
+      )
   });
 }

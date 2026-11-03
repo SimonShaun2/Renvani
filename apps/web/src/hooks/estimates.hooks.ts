@@ -1,5 +1,7 @@
 "use client";
 
+import type { EstimateFinancingSummary } from "@fsm/types";
+
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type {
   AddEstimateItemInput,
@@ -25,6 +27,7 @@ export interface EstimateItemRecord {
   id: string;
   estimateId: string;
   companyId: string;
+  priceBookItemId: string | null;
   name: string;
   description: string | null;
   itemType: "service" | "labor" | "material" | "fee";
@@ -120,6 +123,8 @@ export interface EstimateGroupRecord {
 }
 
 export interface PublicEstimateTierRecord {
+  /** FS-212: the business marked this option as its recommendation. */
+  recommended?: boolean | undefined;
   estimateNumber: string;
   title: string | null;
   tierLabel: string | null;
@@ -170,6 +175,8 @@ export interface PublicEstimateRecord {
   tierLabel: string | null;
   expiresAt: string | null;
   tiers: PublicEstimateTierRecord[] | null;
+  /** FS-212: only present once a financing provider is ready (omitted while financing is disabled). */
+  financing?: EstimateFinancingSummary | undefined;
   items: Array<{
     name: string;
     description: string | null;

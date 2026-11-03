@@ -1,0 +1,23 @@
+/* FS-173 dispatch: 8px slide-in for header/banner; static on mobile and with reduced motion. */
+@keyframes dispatch-slide-in {
+  from { transform: translateY(8px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+  [data-dispatch-reveal] {
+    animation: dispatch-slide-in 220ms ease-out both;
+  }
+}
+
+/* Newly scheduled block: brief ring settle; skipped entirely with reduced motion. */
+@keyframes dispatch-block-settle {
+  from { box-shadow: 0 0 0 4px rgba(47, 125, 79, 0.35); }
+  to { box-shadow: 0 0 0 0 rgba(47, 125, 79, 0); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .dispatch-block-settle {
+    animation: dispatch-block-settle 900ms ease-out both;
+  }
+}

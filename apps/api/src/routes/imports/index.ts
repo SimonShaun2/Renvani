@@ -9,7 +9,11 @@ import {
   createImportHandler,
   getImportErrorsHandler,
   getImportHandler,
+  getImportIngestStatusHandler,
+  getImportIngestProgressHandler,
+  getMigrateFileBatchStatusHandler,
   listImportsHandler,
+  retryMigrateFileBatchHandler,
   rollbackImportHandler,
   startImportHandler
 } from "./handlers.js";
@@ -18,10 +22,15 @@ import {
   confirmMappingValidation,
   createImportRouteSchema,
   getImportRouteSchema,
+  getImportIngestStatusRouteSchema,
   importErrorsRouteSchema,
+  importFileBatchValidation,
+  importIngestProgressRouteSchema,
   importSessionIdValidation,
   listImportsRouteSchema,
   listImportsValidation,
+  migrateFileBatchRetryRouteSchema,
+  migrateFileBatchStatusRouteSchema,
   rollbackImportRouteSchema,
   startImportValidation,
   startImportRouteSchema
@@ -53,6 +62,12 @@ const importRoutes: FastifyPluginAsync = async (fastify) => {
     schema: getImportRouteSchema
   }, getImportHandler);
 
+  fastify.get("/imports/:id/ingest-status", {
+    preHandler: [authenticate, requireOwnerOrAdmin],
+    preValidation: importSessionIdValidation,
+    schema: getImportIngestStatusRouteSchema
+  }, getImportIngestStatusHandler);
+
   fastify.post("/imports/:id/confirm-mapping", {
     preHandler: [authenticate, requireOwnerOrAdmin],
     preValidation: confirmMappingValidation,
@@ -76,6 +91,24 @@ const importRoutes: FastifyPluginAsync = async (fastify) => {
     preValidation: importSessionIdValidation,
     schema: importErrorsRouteSchema
   }, getImportErrorsHandler);
+
+  fastify.get("/imports/:id/ingest-progress", {
+    preHandler: [authenticate, requireOwnerOrAdmin],
+    preValidation: importSessionIdValidation,
+    schema: importIngestProgressRouteSchema
+  }, getImportIngestProgressHandler);
+
+  fastify.get("/imports/:id/file-batches/:batchIndex", {
+    preHandler: [authenticate, requireOwnerOrAdmin],
+    preValidation: importFileBatchValidation,
+    schema: migrateFileBatchStatusRouteSchema
+  }, getMigrateFileBatchStatusHandler);
+
+  fastify.post("/imports/:id/file-batches/:batchIndex/retry-failed", {
+    preHandler: [authenticate, requireOwnerOrAdmin],
+    preValidation: importFileBatchValidation,
+    schema: migrateFileBatchRetryRouteSchema
+  }, retryMigrateFileBatchHandler);
 };
 
 export default importRoutes;

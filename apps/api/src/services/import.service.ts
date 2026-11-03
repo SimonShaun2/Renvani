@@ -5,15 +5,24 @@ import {
   assets,
   customers,
   db,
+  emitEvent,
   emitEventWithExecutor,
   importSessions,
   jobs,
-  properties
+  properties,
+  softDeleteCommunicationsImport,
+  softDeleteNotesImport,
+  softDeleteServiceAgreementsImport,
+  softDeletePriceBookImport
 } from "@fsm/db";
 import { importsQueue } from "@fsm/jobs";
 import {
   AppError,
   ErrorCode,
+  IMPORT_QUEUE_JOB_NAMES,
+  buildImportWorkflowAuditPayloadV1,
+  buildMapCsvColumnsIdempotencyKey,
+  buildMapCsvColumnsJobId,
   sanitizeSpreadsheetCell,
   type ColumnMapping,
   type ImportCustomerUpdateSnapshotV1,
@@ -25,6 +34,10 @@ import {
   type ValidationError
 } from "@fsm/types";
 
+import { scheduleEquipmentImportChunksFromSessionAiInferences } from "./import-equipment-commit.service.js";
+import { scheduleMigrateFileBatchesFromSessionAiInferences } from "./import-migrate-file-batch.service.js";
+import { rollbackImportedBilling } from "./import-rollback-billing.js";
+import { scheduleImportChunkCommitsFromSessionAiInferences } from "./import-workflow-runtime.service.js";
 import { uploadCsvToR2 } from "./file-upload.service.js";
 
 type ImportSessionRow = typeof importSessions.$inferSelect;
@@ -309,11 +322,15 @@ export async function createImportSession(
   });
 
   try {
+    const mapJobId = buildMapCsvColumnsJobId(importSession.id);
+    const mapIdempotencyKey = buildMapCsvColumnsIdempotencyKey(importSession.id);
+
     await importsQueue.add(
-      "map-csv-columns",
+      IMPORT_QUEUE_JOB_NAMES.mapCsvColumns,
       {
         companyId,
-        importSessionId: importSession.id
+        importSessionId: importSession.id,
+        idempotencyKey: mapIdempotencyKey,
       },
       {
         attempts: 3,
@@ -321,9 +338,26 @@ export async function createImportSession(
           type: "exponential",
           delay: 5000
         },
-        jobId: `map-csv-columns-${importSession.id}`
+        jobId: mapJobId
       }
     );
+
+    await emitEvent({
+      companyId,
+      actorId,
+      actorType: "system",
+      eventType: "import.started",
+      entityType: "import_session",
+      entityId: importSession.id,
+      payload: buildImportWorkflowAuditPayloadV1({
+        stepKind: IMPORT_QUEUE_JOB_NAMES.mapCsvColumns,
+        idempotencyKey: mapIdempotencyKey,
+        state: "scheduled",
+        importSessionId: importSession.id,
+        jobId: mapJobId,
+      }),
+      summary: `CSV column mapping scheduled for ${fileName}`,
+    });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Failed to enqueue column mapping job";
     await markImportSessionFailed(companyId, importSession.id, message);
@@ -482,21 +516,32 @@ export async function startImport(
   }
 
   try {
-    await importsQueue.add(
-      "execute-import",
-      {
-        companyId,
-        importSessionId
-      },
-      {
-        attempts: 3,
-        backoff: {
-          type: "exponential",
-          delay: 5000
-        },
-        jobId: `execute-import-${importSessionId}-${now.getTime()}`
-      }
+    const chunkedSteps = await scheduleImportChunkCommitsFromSessionAiInferences(
+      companyId,
+      _actorId,
+      importSessionId
     );
+
+    if (chunkedSteps === 0) {
+      await importsQueue.add(
+        "execute-import",
+        {
+          companyId,
+          importSessionId
+        },
+        {
+          attempts: 3,
+          backoff: {
+            type: "exponential",
+            delay: 5000
+          },
+          jobId: `execute-import-${importSessionId}-${now.getTime()}`
+        }
+      );
+    }
+
+    await scheduleMigrateFileBatchesFromSessionAiInferences(companyId, importSessionId);
+    await scheduleEquipmentImportChunksFromSessionAiInferences(companyId, importSessionId);
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Failed to enqueue import execution job";
     await markImportSessionFailed(companyId, importSessionId, message);
@@ -521,6 +566,9 @@ export async function rollbackImport(
 
   return db.transaction(async (tx) => {
     const now = new Date();
+
+    // Billing first: refuses (no writes) when imported invoices have payments or estimates were accepted.
+    await rollbackImportedBilling(tx, companyId, importSessionId, now);
 
     for (const snapshot of customerUpdateSnapshots) {
       await tx
@@ -621,6 +669,22 @@ export async function rollbackImport(
         )
       )
       .returning();
+
+    if (importSession.entityType === "price_book") {
+      await softDeletePriceBookImport(companyId, importSessionId);
+    }
+
+    if (importSession.entityType === "notes") {
+      await softDeleteNotesImport(companyId, importSessionId);
+    }
+
+    if (importSession.entityType === "communications") {
+      await softDeleteCommunicationsImport(companyId, importSessionId);
+    }
+
+    if (importSession.entityType === "service_agreements") {
+      await softDeleteServiceAgreementsImport(companyId, importSessionId);
+    }
 
     const updatedSessions = await tx
       .update(importSessions)

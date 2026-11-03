@@ -1,9 +1,10 @@
 import { randomBytes } from "node:crypto";
 
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, inArray, isNull } from "drizzle-orm";
 import { Decimal } from "decimal.js";
 
 import {
+  activityEvents,
   bookingRequests,
   bookingSettings,
   companies,
@@ -13,9 +14,11 @@ import {
   jobs,
   properties,
   scheduleSlots,
+  serviceAreas,
   technicians,
   users
 } from "@fsm/db";
+import { normalizeImportBusinessDate, normalizeImportPhone } from "@fsm/import-normalize";
 import { notificationsQueue } from "@fsm/jobs";
 import {
   AppError,
@@ -32,19 +35,31 @@ import {
   type ListBookingRequestsQuery,
   type PublicBookingSettings,
   type SubmitBookingRequestInput,
+  sanitizeLeadAttribution,
   type UpdateBookingSettingsInput,
   type BookingRequestStatus,
-  ErrorCode
+  ErrorCode,
+  readEmergencyServiceSettings,
+  type EmergencyRequestResolution,
+  resolveEmergencyRequest,
+  HOME_SERVICE_TRADE_REGISTRY,
+  parseHomeServiceTrade,
+  parseTradeDescription,
+  readServiceAreaSettings
 } from "@fsm/types";
 
 import {
   finalizeBookingHoldTokenClaim,
   generateBookingHoldToken,
+  inspectBookingHoldToken,
+  type BookingHoldTokenInspection,
   verifyAndClaimBookingHoldToken
 } from "../lib/booking-hold-token.js";
 import { generateJobNumber } from "../lib/job-number.js";
+import { attachConfirmedBookingToRecurringSchedules } from "./booking-recurring-schedule.service.js";
 import { assertNonTerminalBookingRequest } from "./booking-request-guards.js";
 import { invalidateDispatchCache } from "./dispatch.service.js";
+import { issueBookingManageTokenIfEligible } from "../lib/booking-manage-token.js";
 
 type BookingRequestRow = typeof bookingRequests.$inferSelect;
 type BookingSettingsRow = typeof bookingSettings.$inferSelect;
@@ -122,7 +137,8 @@ function normalizeBookingSlug(value: string): string {
 }
 
 function normalizePhone(value: string): string {
-  return value.trim();
+  const normalizedDigits = normalizeImportPhone(value);
+  return normalizedDigits ?? value.trim();
 }
 
 /** Phone used only for matching/creating customers — not placeholder inbox values. */
@@ -162,13 +178,21 @@ function toBookingSettings(row: BookingSettingsRow): BookingSettings {
 function toPublicBookingSettings(
   company: CompanyRow,
   row: BookingSettingsRow,
-  serviceAreaZipCodes: string[]
+  serviceAreaZipCodes: string[],
+  serviceAreaNames: string[] = []
 ): PublicBookingSettings {
+  const settingsObject =
+    company.settings && typeof company.settings === "object" && !Array.isArray(company.settings)
+      ? (company.settings as Record<string, unknown>)
+      : {};
+  const trade = parseHomeServiceTrade(settingsObject.trade);
+  const configured = Array.isArray(row.offeredServices) ? (row.offeredServices as Array<Record<string, unknown>>) : [];
   return {
     companyName: company.name,
     companySlug: company.slug,
     bookingSlug: row.bookingSlug ?? company.slug,
-    offeredServices: Array.isArray(row.offeredServices) ? (row.offeredServices as Array<Record<string, unknown>>) : [],
+    intakeMode: configured.length > 0 ? "bookable" : "inquiry_only",
+    offeredServices: configured,
     availableHoursStart: row.availableHoursStart ?? 8,
     availableHoursEnd: row.availableHoursEnd ?? 17,
     availableDays: row.availableDays ?? DEFAULT_AVAILABLE_DAYS,
@@ -179,9 +203,15 @@ function toPublicBookingSettings(
     facebookReviewUrl: row.facebookReviewUrl,
     customReviewUrl: row.customReviewUrl,
     tagline: row.tagline,
+    emergencyService: readEmergencyServiceSettings(company.settings),
     phone: company.phone,
     logoUrl: company.logoUrl,
-    serviceAreaZipCodes
+    serviceAreaZipCodes,
+    serviceAreaNames,
+    timezone: company.timezone,
+    trade,
+    tradeSchemaType: trade ? HOME_SERVICE_TRADE_REGISTRY[trade].schemaType : null,
+    tradeDescription: parseTradeDescription(trade, settingsObject.tradeDescription)
   };
 }
 
@@ -208,11 +238,13 @@ function parseDateOnly(value: string | undefined): string | null {
     return null;
   }
 
-  if (!/^\d{4}-\d{2}-\d{2}$/u.test(value)) {
-    throw new AppError(ErrorCode.VALIDATION_ERROR, "preferredDate must be in YYYY-MM-DD format");
+  const normalized = normalizeImportBusinessDate(value);
+
+  if (!normalized) {
+    throw new AppError(ErrorCode.VALIDATION_ERROR, "preferredDate must be a valid date");
   }
 
-  return value;
+  return normalized;
 }
 
 function minutesBetween(start: Date, end: Date): number {
@@ -240,7 +272,7 @@ function buildReferenceNumber(now: Date): string {
   return `BK-${datePart}-${entropy}`;
 }
 
-function deriveSource(value: string | undefined): BookingRequest["source"] {
+export function deriveSource(value: string | undefined): BookingRequest["source"] {
   if (!value) {
     return "direct";
   }
@@ -292,6 +324,50 @@ function buildDeclinedCustomerMessage(
   return reason
     ? `${companyName}: booking ${referenceNumber} was declined. ${reason}`
     : `${companyName}: booking ${referenceNumber} was declined. Please contact our office to reschedule.`;
+}
+
+function formatBookingScheduledLabel(scheduledStart: Date): string {
+  return scheduledStart.toLocaleString("en-US", {
+    timeZone: BOOKING_TIME_ZONE,
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit"
+  });
+}
+
+type BookingNotificationContact = {
+  id: string;
+  referenceNumber: string | null;
+  firstName: string;
+  email: string | null;
+  phone: string;
+};
+
+function buildBookingCustomerNotificationJobData(input: {
+  companyId: string;
+  bookingRequest: BookingNotificationContact;
+  customerId: string;
+  companyName: string;
+  body: string;
+  scheduledStart?: Date | null;
+  reason?: string | null;
+}): Record<string, unknown> {
+  const referenceNumber = input.bookingRequest.referenceNumber ?? input.bookingRequest.id;
+
+  return {
+    companyId: input.companyId,
+    bookingRequestId: input.bookingRequest.id,
+    customerId: input.customerId,
+    toEmail: input.bookingRequest.email ?? null,
+    firstName: input.bookingRequest.firstName,
+    companyName: input.companyName,
+    referenceNumber,
+    scheduledLabel: input.scheduledStart ? formatBookingScheduledLabel(input.scheduledStart) : null,
+    reason: input.reason ?? null,
+    toPhone: input.bookingRequest.phone,
+    body: input.body
+  };
 }
 
 function buildDispatcherAlertMessage(companyName: string, request: BookingRequestRow): string {
@@ -457,6 +533,15 @@ async function listCompanyTechnicians(companyId: string, executor: SelectExecuto
     .where(and(eq(technicians.companyId, companyId), isNull(technicians.deletedAt)));
 }
 
+async function listActiveCompanyTechnicians(companyId: string, executor: SelectExecutor): Promise<TechnicianRow[]> {
+  return executor
+    .select()
+    .from(technicians)
+    .where(
+      and(eq(technicians.companyId, companyId), eq(technicians.status, "active"), isNull(technicians.deletedAt))
+    );
+}
+
 async function findCustomerByContact(
   companyId: string,
   phone: string,
@@ -612,6 +697,7 @@ async function createJobFromBooking(
       priority: bookingRequest.urgency === "emergency" ? "urgent" : "normal",
       status: "scheduled",
       leadSource: bookingRequest.source,
+      leadAttribution: bookingRequest.leadAttribution ?? null,
       title: buildJobTitle(bookingRequest),
       description: bookingRequest.customerNotes,
       scheduledStart,
@@ -769,6 +855,17 @@ function buildAvailabilityWindowsForDay(
   });
 }
 
+/** Company behind an enabled public booking slug (404 otherwise). */
+export async function getPublicBookingCompany(slug: string): Promise<CompanyRow> {
+  const { company } = await getCompanyByBookingSlug(slug, db);
+  return company;
+}
+
+/** Company + booking settings for a public slug in one lookup (404 when unknown/disabled). */
+export async function getPublicBookingContext(slug: string) {
+  return getCompanyByBookingSlug(slug, db);
+}
+
 export async function resolvePublicBookingCompanyId(slug: string): Promise<string> {
   const { settings } = await getCompanyByBookingSlug(slug, db);
   return settings.companyId;
@@ -783,7 +880,54 @@ export async function getPublicBookingSettingsBySlug(slug: string): Promise<Publ
     )
   ).sort((left, right) => left.localeCompare(right));
 
-  return toPublicBookingSettings(company, settings, serviceAreaZipCodes);
+  const areas = await listActiveServiceAreas(settings.companyId);
+  const serviceAreaNames = Array.from(new Set(areas.map((area) => area.name.trim()).filter((name) => name.length > 0))).sort(
+    (left, right) => left.localeCompare(right)
+  );
+
+  return toPublicBookingSettings(company, settings, serviceAreaZipCodes, serviceAreaNames);
+}
+
+/** Active service areas (name + ZIPs) for a company; tenant-scoped. */
+export async function listActiveServiceAreas(companyId: string): Promise<Array<{ name: string; zips: string[] }>> {
+  const rows = await db
+    .select()
+    .from(serviceAreas)
+    .where(and(eq(serviceAreas.companyId, companyId), eq(serviceAreas.isActive, true), isNull(serviceAreas.deletedAt)));
+  return rows.map((row) => ({ name: row.name, zips: row.zips ?? [] }));
+}
+
+/**
+ * Canonical server-side service-area gate for every public ZIP decision.
+ *
+ * A configured company service-area ZIP list is authoritative. When it is absent, active service-area rows and
+ * active, non-deleted technician coverage are the compatibility fallback, followed by the explicit overflow setting.
+ * Inactive, on-leave, deleted, and cross-tenant technicians never confer public ZIP coverage. "unknown" means the
+ * shop has supplied no coverage data and has not enabled overflow.
+ */
+export async function resolvePublicZipServiceability(
+  slug: string,
+  zip: string
+): Promise<{ companyId: string; serviceability: "in_area" | "out_of_area" | "unknown" }> {
+  const { company, settings } = await getCompanyByBookingSlug(slug, db);
+  const configuredArea = readServiceAreaSettings(company.settings);
+  if (configuredArea.zips.length > 0) {
+    return {
+      companyId: settings.companyId,
+      serviceability: configuredArea.zips.includes(zip) ? "in_area" : "out_of_area"
+    };
+  }
+
+  const technicianRows = await listActiveCompanyTechnicians(settings.companyId, db);
+  const areas = await listActiveServiceAreas(settings.companyId);
+  const areaZips = new Set(areas.flatMap((area) => area.zips.map((value) => value.trim())));
+  const hasCoverageData = areaZips.size > 0 || technicianRows.some((row) => (row.serviceZipCodes ?? []).length > 0);
+  if (!hasCoverageData) {
+    return { companyId: settings.companyId, serviceability: settings.allowZipOverflow ? "in_area" : "unknown" };
+  }
+  const covered =
+    filterTechniciansByZip(technicianRows, zip).length > 0 || areaZips.has(zip) || Boolean(settings.allowZipOverflow);
+  return { companyId: settings.companyId, serviceability: covered ? "in_area" : "out_of_area" };
 }
 
 export async function checkZipCoverage(slug: string, zip: string): Promise<CheckZipCoverageResult> {
@@ -794,6 +938,14 @@ export async function checkZipCoverage(slug: string, zip: string): Promise<Check
   }
 
   const { settings } = await getCompanyByBookingSlug(slug, db);
+  return checkZipCoverageForBookingSettings(settings, normalizedZip);
+}
+
+/** ZIP coverage for an already-resolved booking settings row (no second slug lookup). */
+export async function checkZipCoverageForBookingSettings(
+  settings: { companyId: string; allowZipOverflow: boolean | null },
+  normalizedZip: string
+): Promise<CheckZipCoverageResult> {
   const technicianRows = await listCompanyTechnicians(settings.companyId, db);
   const coveredTechnicians = filterTechniciansByZip(technicianRows, normalizedZip);
   const covered = coveredTechnicians.length > 0 || Boolean(settings.allowZipOverflow);
@@ -861,6 +1013,29 @@ async function assertHoldSlotMatchesPublishedAvailability(
   }
 }
 
+/** Booking request ids whose `booking.requested` event recorded an emergency downgrade (old rows: none). */
+async function loadEmergencyDowngradedIds(companyId: string, bookingRequestIds: string[]): Promise<Set<string>> {
+  if (bookingRequestIds.length === 0) return new Set();
+  const events = await db
+    .select()
+    .from(activityEvents)
+    .where(
+      and(
+        eq(activityEvents.companyId, companyId),
+        eq(activityEvents.eventType, "booking.requested"),
+        inArray(activityEvents.entityId, bookingRequestIds)
+      )
+    );
+  return new Set(
+    events
+      .filter((event) => {
+        const payload = event.payload as Record<string, unknown> | null;
+        return Boolean(payload && payload.emergencyDowngraded === true);
+      })
+      .map((event) => event.entityId as string)
+  );
+}
+
 export async function listBookingRequests(
   companyId: string,
   query: ListBookingRequestsQuery
@@ -873,13 +1048,23 @@ export async function listBookingRequests(
   const filteredRows = rows
     .filter((row) => (query.status ? row.status === query.status : true))
     .filter((row) => (query.source ? row.source === query.source : true))
-    .sort((left, right) => right.createdAt.getTime() - left.createdAt.getTime());
+    // Lead inbox: emergency (24/7) requests first, then newest first.
+    .sort(
+      (left, right) =>
+        Number(right.urgency === "emergency") - Number(left.urgency === "emergency") ||
+        right.createdAt.getTime() - left.createdAt.getTime()
+    );
   const total = filteredRows.length;
   const totalPages = total === 0 ? 1 : Math.ceil(total / limit);
   const offset = (page - 1) * limit;
+  const pageRows = filteredRows.slice(offset, offset + limit);
+  const downgradedIds = await loadEmergencyDowngradedIds(
+    companyId,
+    pageRows.map((row) => row.id)
+  );
 
   return {
-    data: filteredRows.slice(offset, offset + limit).map((row) => ({
+    data: pageRows.map((row) => ({
       id: row.id,
       referenceNumber: row.referenceNumber,
       status: row.status as BookingRequest["status"],
@@ -890,6 +1075,8 @@ export async function listBookingRequests(
       zip: row.zip,
       serviceCategory: row.serviceCategory,
       serviceType: row.serviceType,
+      urgency: row.urgency as BookingRequest["urgency"],
+      downgraded: downgradedIds.has(row.id),
       preferredDate: row.preferredDate,
       preferredWindow: row.preferredWindow as BookingRequest["preferredWindow"],
       assignedTechnicianId: row.assignedTechnicianId,
@@ -904,11 +1091,54 @@ export async function listBookingRequests(
 
 export async function getBookingRequest(companyId: string, bookingRequestId: string): Promise<BookingRequest> {
   const bookingRequest = await getBookingRequestRecord(companyId, bookingRequestId, db);
-  return toBookingRequest(bookingRequest);
+  const downgradedIds = await loadEmergencyDowngradedIds(companyId, [bookingRequest.id]);
+  return { ...toBookingRequest(bookingRequest), downgraded: downgradedIds.has(bookingRequest.id) };
 }
 
 function buildBookingSlotHoldNote(bookingRequestId: string): string {
   return `${BOOKING_SLOT_HOLD_NOTE_PREFIX}${bookingRequestId}`;
+}
+
+async function assertActiveHoldMatchesSelection(
+  companyId: string,
+  bookingRequestId: string,
+  input: ConfirmBookingRequestInput,
+  executor: TransactionExecutor
+): Promise<void> {
+  const holdNote = buildBookingSlotHoldNote(bookingRequestId);
+  const holds = await executor
+    .select()
+    .from(scheduleSlots)
+    .where(
+      and(
+        eq(scheduleSlots.companyId, companyId),
+        eq(scheduleSlots.notes, holdNote),
+        isNull(scheduleSlots.deletedAt)
+      )
+    );
+
+  const activeHold = holds.find((slot) => !slot.isConfirmed);
+
+  if (!activeHold) {
+    throw new AppError(
+      ErrorCode.CONFLICT,
+      "Booking confirmation requires an active in-platform slot hold before commitment"
+    );
+  }
+
+  const scheduledStart = parseIsoDateTime(input.scheduledStart, "scheduledStart");
+  const scheduledEnd = parseIsoDateTime(input.scheduledEnd, "scheduledEnd");
+
+  if (
+    activeHold.technicianId !== input.technicianId ||
+    activeHold.startTime.getTime() !== scheduledStart.getTime() ||
+    activeHold.endTime.getTime() !== scheduledEnd.getTime()
+  ) {
+    throw new AppError(
+      ErrorCode.CONFLICT,
+      "Confirmation must match the active slot hold"
+    );
+  }
 }
 
 async function clearBookingSlotHolds(
@@ -1059,6 +1289,27 @@ async function holdBookingSlot(
   });
 }
 
+export async function inspectPublicBookingHoldToken(
+  slug: string,
+  holdToken: string
+): Promise<BookingHoldTokenInspection & { slugMatches: boolean }> {
+  const inspection = inspectBookingHoldToken(holdToken);
+
+  if (inspection.status === "invalid" || !inspection.companyId) {
+    return {
+      ...inspection,
+      slugMatches: false
+    };
+  }
+
+  const { settings } = await getCompanyByBookingSlug(slug, db);
+
+  return {
+    ...inspection,
+    slugMatches: settings.companyId === inspection.companyId
+  };
+}
+
 export async function holdPublicBookingSlot(
   slug: string,
   referenceNumber: string,
@@ -1112,6 +1363,69 @@ export async function holdPublicBookingSlot(
     await finalizeBookingHoldTokenClaim(claims, error);
     throw error;
   }
+}
+
+export async function confirmPublicBookingSlot(
+  slug: string,
+  referenceNumber: string,
+  input: ConfirmBookingRequestInput
+): Promise<{
+  bookingRequest: BookingRequest;
+  jobId: string;
+  recurringSchedule: Awaited<ReturnType<typeof attachConfirmedBookingToRecurringSchedules>>;
+  manageToken: string | null;
+}> {
+  const normalizedRef = referenceNumber.trim();
+  const { settings } = await getCompanyByBookingSlug(slug, db);
+  const bookingRows = await db
+    .select()
+    .from(bookingRequests)
+    .where(
+      and(
+        eq(bookingRequests.companyId, settings.companyId),
+        eq(bookingRequests.referenceNumber, normalizedRef),
+        isNull(bookingRequests.deletedAt)
+      )
+    )
+    .limit(1);
+  const bookingRow = bookingRows[0];
+
+  if (!bookingRow) {
+    throw new AppError(ErrorCode.NOT_FOUND, "Booking request not found");
+  }
+
+  const actor: BookingActor = {
+    id: null,
+    type: "customer",
+    name: `${bookingRow.firstName} ${bookingRow.lastName}`.trim()
+  };
+
+  const confirmed = await confirmBookingWithActor(settings.companyId, bookingRow.id, input, actor, {
+    confirmedById: null,
+    requireActiveHold: true
+  });
+
+  if (!confirmed.jobId) {
+    throw new AppError(ErrorCode.INTERNAL_ERROR, "Confirmed booking is missing job linkage");
+  }
+
+  const manageToken = issueBookingManageTokenIfEligible(
+    {
+      companyId: settings.companyId,
+      bookingRequestId: confirmed.bookingRequest.id,
+      jobId: confirmed.jobId,
+      bookingSlug: slug,
+      referenceNumber: normalizedRef
+    },
+    { linked: confirmed.recurringSchedule.linked, scheduleKind: confirmed.recurringSchedule.scheduleKind }
+  );
+
+  return {
+    bookingRequest: confirmed.bookingRequest,
+    jobId: confirmed.jobId,
+    recurringSchedule: confirmed.recurringSchedule,
+    manageToken
+  };
 }
 
 export async function holdBookingSlotForOperator(
@@ -1211,12 +1525,41 @@ export async function updateBookingSettings(
   });
 }
 
+/**
+ * Single emergency guard for every public booking submit: a request is treated as an emergency request when
+ * `emergency === true` OR `urgency === "emergency"`. It is accepted only if the shop has 24/7 emergency service on
+ * and its trade is emergency-capable; otherwise it is downgraded to "this_week" (never rejected).
+ */
+export function applyPublicEmergencyGuard(
+  input: SubmitBookingRequestInput,
+  companySettings: unknown
+): { input: SubmitBookingRequestInput; emergency: EmergencyRequestResolution } {
+  const settings = companySettings && typeof companySettings === "object" ? (companySettings as Record<string, unknown>) : {};
+  const trade = typeof settings.trade === "string" ? settings.trade : null;
+  const emergency = resolveEmergencyRequest(
+    input.emergency === true || input.urgency === "emergency",
+    readEmergencyServiceSettings(settings),
+    trade
+  );
+  const { emergency: _flag, ...rest } = input;
+  const urgency: SubmitBookingRequestInput["urgency"] = emergency.accepted
+    ? "emergency"
+    : rest.urgency === "emergency"
+      ? "this_week"
+      : rest.urgency;
+  return { input: { ...rest, ...(urgency !== undefined ? { urgency } : {}) }, emergency };
+}
+
 export async function submitBookingRequest(
   slug: string,
   input: SubmitBookingRequestInput,
-  sourceParam?: string
+  sourceParam?: string,
+  /** Set by callers that already ran applyPublicEmergencyGuard (public intake) so the downgrade is still recorded. */
+  emergencyAlreadyDowngraded = false
 ): Promise<{ bookingRequest: BookingRequest; confirmation: BookingConfirmationView; holdToken: string | null }> {
   const { company, settings } = await getCompanyByBookingSlug(slug, db);
+  const emergencyGuard = applyPublicEmergencyGuard(input, company.settings);
+  input = emergencyGuard.input;
   const normalizedInput: NormalizedBookingInput = {
     firstName: input.firstName.trim(),
     lastName: input.lastName.trim(),
@@ -1287,6 +1630,7 @@ export async function submitBookingRequest(
         isPropertyOwner: input.isPropertyOwner ?? false,
         smsConsentAppointments: input.smsConsentAppointments ?? false,
         smsConsentMarketing: input.smsConsentMarketing ?? false,
+        leadAttribution: sanitizeLeadAttribution(input.leadAttribution),
         confirmedAt: settings.autoConfirm ? new Date() : null,
         confirmationSentAt: new Date()
       })
@@ -1307,7 +1651,10 @@ export async function submitBookingRequest(
       customerId: customer.id,
       payload: {
         source,
-        zip: bookingRequest.zip
+        zip: bookingRequest.zip,
+        ...(bookingRequest.urgency === "emergency" ? { emergency: true } : {}),
+        // Persisted (no migration) so the inbox can badge requests that asked for emergency but were downgraded.
+        ...(emergencyGuard.emergency.downgraded || emergencyAlreadyDowngraded ? { emergencyDowngraded: true } : {})
       },
       summary: `Booking request ${bookingRequest.referenceNumber ?? bookingRequest.id} submitted`
     });
@@ -1374,13 +1721,14 @@ export async function submitBookingRequest(
 
       queueJobs.push({
         name: "send-booking-confirmation",
-        data: {
+        data: buildBookingCustomerNotificationJobData({
           companyId: company.id,
-          bookingRequestId: bookingRequest.id,
+          bookingRequest,
           customerId: customer.id,
-          toPhone: bookingRequest.phone,
-          body: buildConfirmedCustomerMessage(company.name, bookingRequest.referenceNumber ?? bookingRequest.id, scheduledStart)
-        }
+          companyName: company.name,
+          body: buildConfirmedCustomerMessage(company.name, bookingRequest.referenceNumber ?? bookingRequest.id, scheduledStart),
+          scheduledStart
+        })
       });
     } else {
       if (settings.notifyOnNewBooking) {
@@ -1401,13 +1749,13 @@ export async function submitBookingRequest(
 
       queueJobs.push({
         name: "send-booking-confirmation",
-        data: {
+        data: buildBookingCustomerNotificationJobData({
           companyId: company.id,
-          bookingRequestId: bookingRequest.id,
+          bookingRequest,
           customerId: customer.id,
-          toPhone: bookingRequest.phone,
+          companyName: company.name,
           body: buildPendingCustomerMessage(company.name, bookingRequest.referenceNumber ?? bookingRequest.id)
-        }
+        })
       });
     }
 
@@ -1443,12 +1791,19 @@ export async function submitBookingRequest(
   };
 }
 
-export async function confirmBookingRequest(
+async function confirmBookingWithActor(
   companyId: string,
-  actorId: string,
   bookingRequestId: string,
-  input: ConfirmBookingRequestInput
-): Promise<BookingRequest> {
+  input: ConfirmBookingRequestInput,
+  actor: BookingActor,
+  options: { confirmedById: string | null; requireActiveHold?: boolean }
+): Promise<{
+  bookingRequest: BookingRequest;
+  jobId: string;
+  companyName: string;
+  scheduledStart: Date;
+  recurringSchedule: Awaited<ReturnType<typeof attachConfirmedBookingToRecurringSchedules>>;
+}> {
   const scheduledStart = parseIsoDateTime(input.scheduledStart, "scheduledStart");
   const scheduledEnd = parseIsoDateTime(input.scheduledEnd, "scheduledEnd");
 
@@ -1457,15 +1812,13 @@ export async function confirmBookingRequest(
   }
 
   const result = await db.transaction(async (tx) => {
-    const actorUser = await getActor(companyId, actorId, tx);
-    const actor: BookingActor = {
-      id: actorUser.id,
-      type: "user",
-      name: buildActorName(actorUser.firstName, actorUser.lastName)
-    };
     const bookingRequest = await getBookingRequestRecord(companyId, bookingRequestId, tx);
 
     assertNonTerminalBookingRequest(bookingRequest.status as BookingRequestStatus, "confirmed");
+
+    if (options.requireActiveHold) {
+      await assertActiveHoldMatchesSelection(companyId, bookingRequestId, input, tx);
+    }
 
     await assertTechnicianScheduleSlotAvailable(
       companyId,
@@ -1520,6 +1873,14 @@ export async function confirmBookingRequest(
       tx,
       actor
     );
+    const recurringSchedule = await attachConfirmedBookingToRecurringSchedules(
+      companyId,
+      bookingRequest,
+      customer.id,
+      job,
+      tx,
+      actor
+    );
     const updatedRows = await tx
       .update(bookingRequests)
       .set({
@@ -1528,7 +1889,7 @@ export async function confirmBookingRequest(
         assignedTechnicianId: input.technicianId,
         status: "confirmed",
         confirmedAt: new Date(),
-        confirmedById: actorId,
+        confirmedById: options.confirmedById,
         confirmationSentAt: new Date(),
         updatedAt: new Date()
       })
@@ -1545,8 +1906,8 @@ export async function confirmBookingRequest(
     await emitEventWithExecutor(tx, {
       companyId,
       eventType: "booking.confirmed",
-      actorId,
-      actorType: "user",
+      actorId: actor.id ?? undefined,
+      actorType: actor.type,
       actorName: actor.name,
       entityType: "booking_request",
       entityId: updatedRequest.id,
@@ -1555,30 +1916,57 @@ export async function confirmBookingRequest(
       payload: {
         technicianId: input.technicianId,
         scheduledStart: scheduledStart.toISOString(),
-        scheduledEnd: scheduledEnd.toISOString()
+        scheduledEnd: scheduledEnd.toISOString(),
+        recurringSchedule
       },
       summary: `Booking ${updatedRequest.referenceNumber ?? updatedRequest.id} confirmed`
     });
 
     return {
       bookingRequest: toBookingRequest(updatedRequest),
+      jobId: job.id,
       companyName: company.name,
-      scheduledStart
+      scheduledStart,
+      recurringSchedule
     };
   });
 
-  await notificationsQueue.add("send-booking-confirmation", {
-    companyId,
-    bookingRequestId: result.bookingRequest.id,
-    customerId: result.bookingRequest.customerId,
-    toPhone: result.bookingRequest.phone,
-    body: buildConfirmedCustomerMessage(
-      result.companyName,
-      result.bookingRequest.referenceNumber ?? result.bookingRequest.id,
-      result.scheduledStart
-    )
-  });
+  await notificationsQueue.add(
+    "send-booking-confirmation",
+    buildBookingCustomerNotificationJobData({
+      companyId,
+      bookingRequest: result.bookingRequest,
+      customerId: result.bookingRequest.customerId ?? "",
+      companyName: result.companyName,
+      body: buildConfirmedCustomerMessage(
+        result.companyName,
+        result.bookingRequest.referenceNumber ?? result.bookingRequest.id,
+        result.scheduledStart
+      ),
+      scheduledStart: result.scheduledStart
+    })
+  );
   await invalidateDispatchCache(companyId, formatDateOnly(result.scheduledStart));
+  return result;
+}
+
+export async function confirmBookingRequest(
+  companyId: string,
+  actorId: string,
+  bookingRequestId: string,
+  input: ConfirmBookingRequestInput
+): Promise<BookingRequest> {
+  const actorUser = await getActor(companyId, actorId, db);
+  const actor: BookingActor = {
+    id: actorUser.id,
+    type: "user",
+    name: buildActorName(actorUser.firstName, actorUser.lastName)
+  };
+
+  const result = await confirmBookingWithActor(companyId, bookingRequestId, input, actor, {
+    confirmedById: actorId
+  });
+
   return result.bookingRequest;
 }
 
@@ -1639,17 +2027,21 @@ export async function declineBookingRequest(
     };
   });
 
-  await notificationsQueue.add("send-booking-decline", {
-    companyId,
-    bookingRequestId: result.bookingRequest.id,
-    customerId: result.bookingRequest.customerId,
-    toPhone: result.bookingRequest.phone,
-    body: buildDeclinedCustomerMessage(
-      result.companyName,
-      result.bookingRequest.referenceNumber ?? result.bookingRequest.id,
-      normalizeOptionalString(reason) ?? null
-    )
-  });
+  await notificationsQueue.add(
+    "send-booking-decline",
+    buildBookingCustomerNotificationJobData({
+      companyId,
+      bookingRequest: result.bookingRequest,
+      customerId: result.bookingRequest.customerId ?? "",
+      companyName: result.companyName,
+      body: buildDeclinedCustomerMessage(
+        result.companyName,
+        result.bookingRequest.referenceNumber ?? result.bookingRequest.id,
+        normalizeOptionalString(reason) ?? null
+      ),
+      reason: normalizeOptionalString(reason) ?? null
+    })
+  );
 
   return result.bookingRequest;
 }
@@ -1798,16 +2190,22 @@ export interface CompanyInquiryBookingInput {
   state: string;
   zip: string;
   customerNotes: string | null;
+  serviceCategory?: string | null;
+  serviceType?: string | null;
+  serviceDetail?: string | null;
   source: BookingRequest["source"];
   smsConsentAppointments?: boolean;
   smsConsentMarketing?: boolean;
+  serviceability?: "unknown" | "in_area" | "out_of_area";
+  captureSurface?: string;
 }
 
 /** Staff/inbox inquiry intake — no zip gate, no outbound notification enqueue (FS-17). */
 export async function createCompanyScopedInquiryBooking(
   companyId: string,
   input: CompanyInquiryBookingInput,
-  actor: BookingActor
+  actor: BookingActor,
+  executor?: TransactionExecutor
 ): Promise<{ bookingRequest: BookingRequest; customerId: string }> {
   const normalizedInput: NormalizedBookingInput = {
     firstName: input.firstName.trim(),
@@ -1820,9 +2218,9 @@ export async function createCompanyScopedInquiryBooking(
     state: input.state.trim(),
     zip: input.zip.trim(),
     propertyType: null,
-    serviceCategory: null,
-    serviceType: null,
-    serviceDetail: null,
+    serviceCategory: normalizeOptionalString(input.serviceCategory) ?? null,
+    serviceType: normalizeOptionalString(input.serviceType) ?? null,
+    serviceDetail: normalizeOptionalString(input.serviceDetail) ?? null,
     urgency: "flexible",
     customerNotes: normalizeOptionalString(input.customerNotes) ?? null,
     preferredDate: null,
@@ -1832,7 +2230,7 @@ export async function createCompanyScopedInquiryBooking(
     smsConsentMarketing: input.smsConsentMarketing ?? false
   };
 
-  const result = await db.transaction(async (tx) => {
+  const write = async (tx: TransactionExecutor) => {
     const existingCustomer = await findCustomerByContact(
       companyId,
       normalizedInput.phone,
@@ -1860,6 +2258,9 @@ export async function createCompanyScopedInquiryBooking(
         city: normalizedInput.city,
         state: normalizedInput.state,
         zip: normalizedInput.zip,
+        serviceCategory: normalizedInput.serviceCategory,
+        serviceType: normalizedInput.serviceType,
+        serviceDetail: normalizedInput.serviceDetail,
         customerNotes: normalizedInput.customerNotes,
         status: "pending",
         source: input.source,
@@ -1887,13 +2288,17 @@ export async function createCompanyScopedInquiryBooking(
       payload: {
         source: input.source,
         zip: bookingRequest.zip,
-        intakePath: "direct_inquiry"
+        intakePath: "direct_inquiry",
+        ...(input.serviceability ? { serviceability: input.serviceability } : {}),
+        ...(input.captureSurface ? { captureSurface: input.captureSurface } : {})
       },
       summary: `Inquiry ${bookingRequest.referenceNumber ?? bookingRequest.id} captured`
     });
 
     return { bookingRequest: toBookingRequest(bookingRequest), customerId: customer.id };
-  });
+  };
+
+  const result = executor ? await write(executor) : await db.transaction(write);
 
   return result;
 }

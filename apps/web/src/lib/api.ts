@@ -1,12 +1,14 @@
-import { publicEnv } from "@fsm/config";
+import { API_BASE_URL } from "./api-base-url";
 import type { ErrorCode } from "@fsm/types";
 
 import { clearBrowserAuthSession, getAuthToken } from "./auth";
+import { CLERK_NO_ACCESS_ROUTE } from "./clerk/route-decision";
+import { getClerkSessionToken, signOutClerkSession } from "./clerk/token-bridge";
 
-const API_BASE = publicEnv.NEXT_PUBLIC_API_URL;
+const API_BASE = API_BASE_URL;
 
 export interface ApiErrorPayload {
-  error: ErrorCode | "NOT_IMPLEMENTED";
+  error: ErrorCode | "NOT_IMPLEMENTED" | "CONFLICT";
   message: string;
   requestId?: string;
   fields?: Record<string, string> | null;
@@ -35,8 +37,64 @@ async function parseError(response: Response): Promise<ApiErrorPayload> {
   }
 }
 
+/**
+ * Bearer token precedence matches middleware and server rendering: a valid legacy cookie wins,
+ * then Clerk is used when no legacy session is present. This prevents a mixed browser session
+ * from rendering one tenant while authorizing API calls as another.
+ */
+export async function resolveBearerToken(): Promise<{ token: string | null; source: "clerk" | "legacy" | null }> {
+  const legacy = getAuthToken();
+  if (legacy) return { token: legacy, source: "legacy" };
+  const clerk = await getClerkSessionToken();
+  return clerk ? { token: clerk, source: "clerk" } : { token: null, source: null };
+}
+
+/** Login URL used after an API 401. Exported for tests. */
+export const UNAUTHORIZED_REDIRECT = "/login";
+
+/**
+ * On API 401: clear the legacy session and, for Clerk sessions, sign out of Clerk too.
+ * Otherwise middleware would see the Clerk user on /login, send it back to the app,
+ * and the same 401 would repeat forever.
+ */
+export async function handleUnauthorized(source: "clerk" | "legacy" | null): Promise<void> {
+  clearBrowserAuthSession();
+  if (source === "clerk") {
+    if (await signOutClerkSession(UNAUTHORIZED_REDIRECT)) return;
+    // signOut failed: the Clerk session still exists, so /login would bounce back. Use the no-access page.
+    if (typeof window !== "undefined") window.location.assign(CLERK_NO_ACCESS_ROUTE);
+    return;
+  }
+  if (typeof window !== "undefined") {
+    window.location.assign(UNAUTHORIZED_REDIRECT);
+  }
+}
+
+/**
+ * Authenticated raw fetch for requests that can't go through `api` (multipart uploads, etc.).
+ * Same rules as apiFetch: legacy JWT first, Clerk fallback, and handleUnauthorized on 401
+ * (Clerk sessions are signed out, never bounced to /login). Returns the Response so callers keep
+ * their own error parsing.
+ */
+export async function authorizedFetch(path: string, init: RequestInit = {}): Promise<Response> {
+  const { token, source } = await resolveBearerToken();
+  const headers = new Headers(init.headers);
+
+  if (token && !headers.has("Authorization")) {
+    headers.set("Authorization", `Bearer ${token}`);
+  }
+
+  const response = await fetch(`${API_BASE}${path}`, { ...init, credentials: "include", headers });
+
+  if (response.status === 401) {
+    await handleUnauthorized(source);
+  }
+
+  return response;
+}
+
 async function apiFetch<TResponse>(path: string, options: RequestInit = {}): Promise<TResponse> {
-  const token = getAuthToken();
+  const { token, source } = await resolveBearerToken();
   const headers = new Headers(options.headers);
 
   if (!headers.has("Content-Type") && options.body) {
@@ -54,11 +112,7 @@ async function apiFetch<TResponse>(path: string, options: RequestInit = {}): Pro
   });
 
   if (response.status === 401) {
-    clearBrowserAuthSession();
-
-    if (typeof window !== "undefined") {
-      window.location.assign("/login");
-    }
+    await handleUnauthorized(source);
   }
 
   if (!response.ok) {
@@ -72,16 +126,43 @@ async function apiFetch<TResponse>(path: string, options: RequestInit = {}): Pro
   return (await response.json()) as TResponse;
 }
 
+/**
+ * POST for unauthenticated, token-in-body endpoints (e.g. /auth/verify-email).
+ * Sends NO bearer token (neither Clerk nor legacy) and does NOT run the 401 session handler,
+ * so an invalid/expired link surfaces as an ApiError instead of logging the user out.
+ */
+export async function publicPost<TResponse>(path: string, body: unknown): Promise<TResponse> {
+  const response = await fetch(`${API_BASE}${path}`, {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body)
+  });
+
+  if (!response.ok) {
+    throw new ApiError(response.status, await parseError(response));
+  }
+
+  return (await response.json()) as TResponse;
+}
+
 export const api = {
   get: <TResponse>(path: string) => apiFetch<TResponse>(path),
-  post: <TResponse>(path: string, body: unknown) =>
+  post: <TResponse>(path: string, body: unknown, init?: { headers?: HeadersInit }) =>
     apiFetch<TResponse>(path, {
+      ...init,
       method: "POST",
       body: JSON.stringify(body)
     }),
-  patch: <TResponse>(path: string, body: unknown) =>
+  patch: <TResponse>(path: string, body: unknown, init?: { headers?: HeadersInit }) =>
     apiFetch<TResponse>(path, {
+      ...init,
       method: "PATCH",
+      body: JSON.stringify(body)
+    }),
+  put: <TResponse>(path: string, body: unknown) =>
+    apiFetch<TResponse>(path, {
+      method: "PUT",
       body: JSON.stringify(body)
     }),
   delete: <TResponse>(path: string) =>

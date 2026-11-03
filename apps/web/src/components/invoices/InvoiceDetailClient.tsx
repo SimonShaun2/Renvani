@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import Decimal from "decimal.js";
 import { AlertCircle, CreditCard, Printer, Send, Trash2 } from "lucide-react";
 
 import { PageLayout } from "@/src/components/layout/PageLayout";
@@ -11,14 +12,16 @@ import {
   computeRevenueTotals,
   formatMoneyInput,
   formatStatusLabel,
+  formatTaxRateInput,
   getInvoiceStatusTone,
   lineItemFromInvoiceItem,
   normalizeLineItems,
-  parseMoneyValue,
   type RevenueLineItemDraft
 } from "@/src/components/estimates/estimates.utils";
 import { CurrencyDisplay } from "@/src/components/ui/CurrencyDisplay";
 import { EmptyState } from "@/src/components/ui/EmptyState";
+import { ConfirmDialog } from "@/src/components/ui/ConfirmDialog";
+import { invoiceConfirmDescription } from "@/src/components/invoices/invoice-confirm.utils";
 import { Sheet } from "@/src/components/ui/Sheet";
 import { SkeletonCard } from "@/src/components/ui/SkeletonCard";
 import { StatBadge } from "@/src/components/ui/StatBadge";
@@ -51,6 +54,16 @@ const defaultVoidState: VoidFormState = {
   reason: ""
 };
 
+/** Adapter for the legacy invoice mutation contract, which still accepts numeric decimals. */
+function parseMoneyValue(value: string | number | null | undefined): number {
+  try {
+    const amount = new Decimal(value ?? 0);
+    return amount.isFinite() ? amount.toNumber() : 0;
+  } catch {
+    return 0;
+  }
+}
+
 function lineItemsMatch(left: RevenueLineItemDraft, right: RevenueLineItemDraft): boolean {
   return (
     left.name === right.name &&
@@ -59,7 +72,8 @@ function lineItemsMatch(left: RevenueLineItemDraft, right: RevenueLineItemDraft)
     formatMoneyInput(left.quantity) === formatMoneyInput(right.quantity) &&
     formatMoneyInput(left.unitPrice) === formatMoneyInput(right.unitPrice) &&
     left.isTaxable === right.isTaxable &&
-    left.sortOrder === right.sortOrder
+    left.sortOrder === right.sortOrder &&
+    (left.priceBookItemId ?? null) === (right.priceBookItemId ?? null)
   );
 }
 
@@ -84,10 +98,13 @@ export function InvoiceDetailClient({ invoiceId }: InvoiceDetailClientProps) {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [recordPaymentOpen, setRecordPaymentOpen] = useState(false);
   const [voidOpen, setVoidOpen] = useState(false);
+  const [confirmAction, setConfirmAction] = useState<"send" | "remind" | null>(null);
   const [voidForm, setVoidForm] = useState<VoidFormState>(defaultVoidState);
 
   const invoice = invoiceQuery.data?.invoice;
-  const taxRate = invoice?.taxRate ? parseMoneyValue(invoice.taxRate) : getCompanyTaxRate(companyQuery.data?.company.settings);
+  const taxRate = invoice?.taxRate
+    ? formatTaxRateInput(invoice.taxRate)
+    : formatTaxRateInput(getCompanyTaxRate(companyQuery.data?.company.settings));
 
   useEffect(() => {
     if (!invoice) {
@@ -102,7 +119,7 @@ export function InvoiceDetailClient({ invoiceId }: InvoiceDetailClientProps) {
   }, [invoice]);
 
   const totals = useMemo(
-    () => computeRevenueTotals(items, taxRate, parseMoneyValue(discountAmount)),
+    () => computeRevenueTotals(items, taxRate, discountAmount),
     [discountAmount, items, taxRate]
   );
   const publicPaymentPath = buildInvoicePublicPath(invoice?.paymentToken);
@@ -137,7 +154,8 @@ export function InvoiceDetailClient({ invoiceId }: InvoiceDetailClientProps) {
             quantity: parseMoneyValue(item.quantity),
             unitPrice: parseMoneyValue(item.unitPrice),
             isTaxable: item.isTaxable,
-            sortOrder: item.sortOrder
+            sortOrder: item.sortOrder,
+            ...(item.priceBookItemId ? { priceBookItemId: item.priceBookItemId } : {})
           });
           continue;
         }
@@ -161,7 +179,8 @@ export function InvoiceDetailClient({ invoiceId }: InvoiceDetailClientProps) {
             quantity: parseMoneyValue(item.quantity),
             unitPrice: parseMoneyValue(item.unitPrice),
             isTaxable: item.isTaxable,
-            sortOrder: item.sortOrder
+            sortOrder: item.sortOrder,
+            ...(item.priceBookItemId !== undefined ? { priceBookItemId: item.priceBookItemId } : {})
           }
         });
       }
@@ -366,7 +385,7 @@ export function InvoiceDetailClient({ invoiceId }: InvoiceDetailClientProps) {
                   <CurrencyDisplay value={isDraft ? totals.subtotal : invoice.subtotal} showCents />
                 </div>
                 <div className="flex items-center justify-between gap-3 text-neutral-500">
-                  <span>Tax ({(taxRate * 100).toFixed(2)}%)</span>
+                  <span>Tax ({new Decimal(taxRate).mul(100).toFixed(2)}%)</span>
                   <CurrencyDisplay value={isDraft ? totals.taxAmount : invoice.taxAmount} showCents />
                 </div>
                 <div className="flex items-center justify-between gap-3 text-neutral-500">
@@ -414,11 +433,7 @@ export function InvoiceDetailClient({ invoiceId }: InvoiceDetailClientProps) {
                     <button
                       type="button"
                       disabled={sendInvoice.isPending}
-                      onClick={() => {
-                        void sendInvoice.mutateAsync().then(() => invoiceQuery.refetch()).catch((error: unknown) => {
-                          setErrorMessage(error instanceof Error ? error.message : "Invoice could not be sent.");
-                        });
-                      }}
+                      onClick={() => setConfirmAction("send")}
                       className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-neutral-200 px-5 py-3 text-sm font-semibold text-neutral-700 transition hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-70"
                     >
                       <Send className="h-4 w-4" />
@@ -430,11 +445,7 @@ export function InvoiceDetailClient({ invoiceId }: InvoiceDetailClientProps) {
                     <button
                       type="button"
                       disabled={sendInvoice.isPending}
-                      onClick={() => {
-                        void sendInvoice.mutateAsync().then(() => invoiceQuery.refetch()).catch((error: unknown) => {
-                          setErrorMessage(error instanceof Error ? error.message : "Payment link could not be sent.");
-                        });
-                      }}
+                      onClick={() => setConfirmAction("send")}
                       className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-brand-accent px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-primary disabled:cursor-not-allowed disabled:opacity-70"
                     >
                       <Send className="h-4 w-4" />
@@ -453,11 +464,7 @@ export function InvoiceDetailClient({ invoiceId }: InvoiceDetailClientProps) {
                       <button
                         type="button"
                         disabled={resendReminder.isPending}
-                        onClick={() => {
-                          void resendReminder.mutateAsync().then(() => invoiceQuery.refetch()).catch((error: unknown) => {
-                            setErrorMessage(error instanceof Error ? error.message : "Reminder could not be sent.");
-                          });
-                        }}
+                        onClick={() => setConfirmAction("remind")}
                         className="w-full rounded-full border border-error/25 px-5 py-3 text-sm font-semibold text-error transition hover:bg-error-light disabled:cursor-not-allowed disabled:opacity-70"
                       >
                         {resendReminder.isPending ? "Sending..." : "Send Reminder"}
@@ -498,7 +505,7 @@ export function InvoiceDetailClient({ invoiceId }: InvoiceDetailClientProps) {
                   }}
                   className="mt-3 rounded-full border border-neutral-200 px-4 py-2 text-sm font-semibold text-neutral-600 transition hover:bg-neutral-100"
                 >
-                  Copy ServiceRev Link
+                  Copy Renvani Link
                 </button>
               ) : null}
             </section>
@@ -541,6 +548,33 @@ export function InvoiceDetailClient({ invoiceId }: InvoiceDetailClientProps) {
           } catch (error) {
             setErrorMessage(error instanceof Error ? error.message : "Payment could not be recorded.");
           }
+        }}
+      />
+
+      <ConfirmDialog
+        open={confirmAction !== null}
+        title={confirmAction === "remind" ? "Send payment reminder?" : "Send payment link?"}
+        description={invoiceConfirmDescription(confirmAction ?? "send", invoice.customer, invoice.balanceDue)}
+        confirmLabel={confirmAction === "remind" ? "Send reminder" : "Send invoice"}
+        isPending={sendInvoice.isPending || resendReminder.isPending}
+        onCancel={() => {
+          if (sendInvoice.isPending || resendReminder.isPending) {
+            return;
+          }
+          setConfirmAction(null);
+        }}
+        onConfirm={() => {
+          const action = confirmAction;
+          const mutation = action === "remind" ? resendReminder : sendInvoice;
+          void mutation
+            .mutateAsync()
+            .then(() => invoiceQuery.refetch())
+            .catch((error: unknown) => {
+              setErrorMessage(
+                error instanceof Error ? error.message : action === "remind" ? "Reminder could not be sent." : "Invoice could not be sent."
+              );
+            })
+            .finally(() => setConfirmAction(null));
         }}
       />
 

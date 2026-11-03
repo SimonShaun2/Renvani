@@ -1,3 +1,4 @@
+import type { HomeServiceTrade } from "./home-services/trade.js";
 export interface BookingSettings {
   id: string;
   companyId: string;
@@ -45,10 +46,14 @@ export interface UpdateBookingSettingsInput {
   notificationEmail?: string | null;
 }
 
+export type PublicBookingIntakeMode = "bookable" | "inquiry_only";
+
 export interface PublicBookingSettings {
   companyName: string;
   companySlug: string;
   bookingSlug: string;
+  /** Authoritative capability from configured services; trade suggestions do not enable booking. */
+  intakeMode: PublicBookingIntakeMode;
   offeredServices: Array<Record<string, unknown>>;
   availableHoursStart: number;
   availableHoursEnd: number;
@@ -60,6 +65,8 @@ export interface PublicBookingSettings {
   facebookReviewUrl: string | null;
   customReviewUrl: string | null;
   tagline: string | null;
+  /** Read-only 24/7 emergency availability (company settings). */
+  emergencyService?: { enabled: boolean; hoursText: string | null };
   phone: string | null;
   logoUrl: string | null;
   serviceAreaZipCodes: string[];
@@ -67,4 +74,10 @@ export interface PublicBookingSettings {
   serviceAreaNames: string[];
   /** IANA timezone for availableHoursStart/End + availableDays. */
   timezone: string;
+  /** Shop-selected trade (company settings), or null when unset. */
+  trade?: HomeServiceTrade | null;
+  /** schema.org @type for the site JSON-LD derived from `trade`, or null when unset. */
+  tradeSchemaType?: string | null;
+  /** "Describe your trade" when trade is "other", else null. */
+  tradeDescription?: string | null;
 }

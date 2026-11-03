@@ -40,7 +40,7 @@ describe("middleware with Clerk enabled", () => {
     }
   );
 
-  it.each(["/robots.txt", "/sitemap.xml"])("serves %s to signed-out crawlers (no /login redirect)", async (path) => {
+  it.each(["/robots.txt", "/sitemap.xml", "/sitemap-index.xml", "/sitemap/0.xml"])("serves %s to signed-out crawlers (no /login redirect)", async (path) => {
     const middleware = await loadMiddleware();
     const response = await middleware(new NextRequest(`http://localhost:3000${path}`, { method: "GET" }));
     expect(response.headers.get("location")).toBeNull();

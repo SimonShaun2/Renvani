@@ -11,6 +11,7 @@ import { EmptyState } from "../ui/EmptyState";
 import { SkeletonCard } from "../ui/SkeletonCard";
 import { CHIP_TONE_CLASS, JOB_COLUMNS, JOB_FILTER_CHIPS, COUNTS_PAGE_LIMIT, chipFilters, currentWeek, deriveWeekCounts, type JobFilterChip } from "./jobsList.config";
 import { buildJobListQuery } from "./jobsList.utils";
+import { NewJobPanel } from "./NewJobPanel";
 
 function Kpi({ label, value, caption }: { label: string; value: string; caption: string }) {
   return (
@@ -24,7 +25,12 @@ function Kpi({ label, value, caption }: { label: string; value: string; caption:
 
 const count = (n: number | undefined) => (n === undefined ? "—" : String(n));
 
-export function JobsListClient() {
+export interface JobsListClientProps {
+  /** From `/jobs?new=1&customerId=<id>` (parsed in the server page). */
+  newJob?: { open: boolean; customerId: string };
+}
+
+export function JobsListClient({ newJob }: JobsListClientProps = {}) {
   const now = useMemo(() => new Date(), []);
   const [chip, setChip] = useState<JobFilterChip["key"]>("all");
   const [search, setSearch] = useState("");
@@ -63,10 +69,12 @@ export function JobsListClient() {
           <h1 className="text-[32px] font-semibold tracking-tight text-[#0f1530]">Jobs</h1>
           <p className="mt-1 text-sm text-[#5e6684]">All jobs across your company</p>
         </div>
-        <Link href="/dispatch" className="rounded-[10px] bg-[#0f1530] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#2a3360]">
+        <Link href="/jobs?new=1" className="rounded-[10px] bg-[#0f1530] px-[18px] py-3 text-sm font-semibold text-white hover:bg-[#2a3360]">
           New job
         </Link>
       </header>
+
+      {newJob?.open ? <NewJobPanel key={newJob.customerId || "new"} initialCustomerId={newJob.customerId} /> : null}
 
       <section aria-label="Job stats" className="flex flex-wrap gap-4">
         <Kpi label="Jobs this week" value={count(week)} caption="Scheduled Mon–Sun" />

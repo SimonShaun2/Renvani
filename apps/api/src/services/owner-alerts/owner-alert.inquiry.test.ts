@@ -6,7 +6,11 @@ import { setupTestEnv } from "../../test-support/env-setup.js";
 
 setupTestEnv();
 
-const { addQueueJob } = vi.hoisted(() => ({ addQueueJob: vi.fn(async () => undefined) }));
+const { addQueueJob, txProbe } = vi.hoisted(() => ({
+  addQueueJob: vi.fn(async () => undefined),
+  // Observes the tenant transaction: alerts queued while the callback ran, and an optional forced rollback.
+  txProbe: { failCommit: false, alertsQueuedInsideTx: 0 }
+}));
 
 vi.mock("drizzle-orm", async () => {
   const helper = await import("../../test-support/fake-db.js");
@@ -14,7 +18,18 @@ vi.mock("drizzle-orm", async () => {
 });
 vi.mock("@fsm/db", async () => {
   const helper = await import("../../test-support/fake-db.js");
-  return helper.createDbModuleMock();
+  const mod = helper.createDbModuleMock();
+  const original = mod.runTransactionWithTenantSession;
+  return {
+    ...mod,
+    runTransactionWithTenantSession: (async (companyId: string, callback: (tx: unknown) => Promise<unknown>) =>
+      original(companyId, async (tx: unknown) => {
+        const value = await callback(tx);
+        txProbe.alertsQueuedInsideTx += addQueueJob.mock.calls.filter((call) => (call as unknown[])[0] === "send-owner-alert").length;
+        if (txProbe.failCommit) throw new Error("simulated commit failure (rollback)");
+        return value;
+      })) as typeof original
+  };
 });
 vi.mock("@fsm/jobs", () => ({
   notificationsQueue: { add: addQueueJob },
@@ -43,6 +58,8 @@ beforeEach(() => {
   resetPublicBookingRateLimitStateForTests();
   alerts.resetOwnerAlertStateForTests();
   addQueueJob.mockClear();
+  txProbe.failCommit = false;
+  txProbe.alertsQueuedInsideTx = 0;
 });
 
 function seedShop(settings: Record<string, unknown> = {}) {
@@ -174,6 +191,33 @@ describe("public inquiry -> owner alert", () => {
     expect(serialized).not.toContain("0200");
     expect(serialized).not.toContain("Stone");
     expect(calls[0]![2].jobId).toBe(`owner-alert-new_inquiry-${fakeDb.getTestState().bookingRequests[0]!.id}`);
+  });
+
+  it("inquiry-only (tenant transaction) path alerts only after commit, never inside the transaction", async () => {
+    seedShop({ offeredServices: [] });
+    const response = await request(app.server).post("/api/v1/public/booking/acme-hvac/submit").send(body);
+    expect(response.status).toBe(201);
+    expect(txProbe.alertsQueuedInsideTx).toBe(0);
+    expect(ownerAlertCalls()).toHaveLength(1);
+  });
+
+  it("does not alert when the inquiry transaction rolls back", async () => {
+    seedShop({ offeredServices: [] });
+    txProbe.failCommit = true;
+    const response = await request(app.server).post("/api/v1/public/booking/acme-hvac/submit").send(body);
+    expect(response.status).toBeGreaterThanOrEqual(500);
+    expect(txProbe.alertsQueuedInsideTx).toBe(0);
+    expect(ownerAlertCalls()).toHaveLength(0);
+  });
+
+  it("an alert failure after commit does not fail the inquiry", async () => {
+    seedShop({ offeredServices: [] });
+    addQueueJob.mockImplementationOnce(async () => {
+      throw new Error("queue down");
+    });
+    const response = await request(app.server).post("/api/v1/public/booking/acme-hvac/submit").send(body);
+    expect(response.status).toBe(201);
+    expect(fakeDb.getTestState().bookingRequests).toHaveLength(1);
   });
 
   it("respects notify_on_new_booking = false", async () => {

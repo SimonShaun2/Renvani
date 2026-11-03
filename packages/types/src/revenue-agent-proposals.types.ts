@@ -6,6 +6,19 @@ import { z } from "zod";
  */
 export const RevenueProposalChannelSchema = z.enum(["sms", "email"]);
 
+export const RevenueProposalRecommendationTypeSchema = z.enum([
+  "reactivation",
+  "unsold_estimate",
+  "unpaid_invoice",
+  "maintenance_plan_offer"
+]);
+
+export type RevenueProposalRecommendationType = z.infer<typeof RevenueProposalRecommendationTypeSchema>;
+
+export function isRevenueProposalRecommendationType(value: string): value is RevenueProposalRecommendationType {
+  return RevenueProposalRecommendationTypeSchema.safeParse(value).success;
+}
+
 export const RevenueProposalParametersSchema = z
   .object({
     recommendationId: z.string().uuid(),

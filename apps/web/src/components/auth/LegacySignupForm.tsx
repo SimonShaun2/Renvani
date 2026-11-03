@@ -10,7 +10,6 @@ import { BrandMark } from "@/src/components/layout/BrandMark";
 import { api } from "@/src/lib/api";
 import {
   SIGNUP_CHECK_EMAIL_MESSAGE,
-  SIGNUP_GENERIC_ERROR,
   submitSignup,
 } from "@/src/lib/signup-submit";
 
@@ -90,7 +89,7 @@ export function LegacySignupForm() {
       return;
     }
 
-    setFormError(SIGNUP_GENERIC_ERROR);
+    setFormError(outcome.message);
   }
 
   return (

@@ -2,7 +2,7 @@
 
 import type { ColumnMapping } from "@fsm/types";
 import type { MigrateOnboardingBundle, MigrateOnboardingSourceCatalogEntry, MigrateSourceSystemId } from "@fsm/types";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { SkeletonCard } from "@/src/components/ui/SkeletonCard";
 import { useImportSession } from "@/src/hooks/imports.hooks";
@@ -33,6 +33,20 @@ function formatError(error: unknown): string {
   return "Something went wrong.";
 }
 
+/** Automatic retries after the first failed start (network / 5xx only), then one inline error. */
+export const START_SESSION_MAX_AUTO_RETRIES = 2;
+const START_SESSION_BACKOFF_MS = [1000, 3000];
+
+export function shouldAutoRetryStart(error: unknown, retriesSoFar: number): boolean {
+  if (retriesSoFar >= START_SESSION_MAX_AUTO_RETRIES) return false;
+  if (error instanceof ApiError) return error.status >= 500 || error.status === 0;
+  return true;
+}
+
+export function startRetryDelayMs(retriesSoFar: number): number {
+  return START_SESSION_BACKOFF_MS[Math.min(retriesSoFar, START_SESSION_BACKOFF_MS.length - 1)]!;
+}
+
 interface MigrateOnboardingStepsOneTwoProps {
   bundle: MigrateOnboardingBundle | null;
   onRefresh: () => void;
@@ -54,16 +68,41 @@ export function MigrateOnboardingStepsOneTwo({ bundle, onRefresh }: MigrateOnboa
 
   const wizardStep = bundle?.wizardStep ?? 1;
 
+  const [startError, setStartError] = useState<string | null>(null);
+  const [startAttempt, setStartAttempt] = useState(0);
+  const retriesRef = useRef(0);
+  const retryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => () => {
+    if (retryTimerRef.current) clearTimeout(retryTimerRef.current);
+  }, []);
+
   useEffect(() => {
-    if (!bundle && !createSession.isPending && !createSession.isSuccess) {
-      createSession.mutate(true, {
-        onSuccess: () => onRefresh(),
-        onError: (error) => {
-          showToast({ tone: "error", title: "Could not start migration", description: formatError(error) });
+    if (bundle || startError || createSession.isPending || createSession.isSuccess || createSession.isError) return;
+    createSession.mutate(true, {
+      onSuccess: () => onRefresh(),
+      onError: (error) => {
+        if (shouldAutoRetryStart(error, retriesRef.current)) {
+          const delay = startRetryDelayMs(retriesRef.current);
+          retriesRef.current += 1;
+          retryTimerRef.current = setTimeout(() => {
+            createSession.reset();
+            setStartAttempt((n) => n + 1);
+          }, delay);
+          return;
         }
-      });
-    }
-  }, [bundle, createSession, onRefresh]);
+        setStartError(formatError(error));
+      }
+    });
+    // startAttempt re-runs this effect after a scheduled retry.
+  }, [bundle, createSession, onRefresh, startError, startAttempt]);
+
+  const retryStart = () => {
+    retriesRef.current = 0;
+    setStartError(null);
+    createSession.reset();
+    setStartAttempt((n) => n + 1);
+  };
 
   useEffect(() => {
     if (bundle?.stepState.sourceSystem) {
@@ -199,6 +238,20 @@ export function MigrateOnboardingStepsOneTwo({ bundle, onRefresh }: MigrateOnboa
     } catch (error: unknown) {
       showToast({ tone: "error", title: "Could not finish upload step", description: formatError(error) });
     }
+  }
+
+  if (!bundle && startError) {
+    return (
+      <div role="alert" className="surface-card flex flex-col gap-3 px-5 py-5 sm:flex-row sm:items-center sm:justify-between" data-testid="migrate-start-error">
+        <div className="min-w-0">
+          <p className="text-sm font-semibold text-neutral-900">Could not start migration</p>
+          <p className="mt-1 break-words text-sm text-neutral-500">{startError}</p>
+        </div>
+        <button type="button" onClick={retryStart} className="min-h-[44px] w-full rounded-full bg-brand-primary px-5 text-sm font-semibold text-white sm:w-auto">
+          Retry
+        </button>
+      </div>
+    );
   }
 
   if (!bundle || sourcesQuery.isLoading || createSession.isPending) {

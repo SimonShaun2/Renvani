@@ -6,6 +6,11 @@ const provisionClerkMembership = vi.fn();
 
 vi.mock("../../services/clerk-provisioning.service.js", () => ({
   provisionClerkOrganization,
+  // Detailed variant delegates to the mock; a { skipReason } return from the mock is passed through as-is.
+  provisionClerkOrganizationDetailed: async (input: unknown) => {
+    const out = await provisionClerkOrganization(input);
+    return out && typeof out === "object" && "skipReason" in out ? out : { company: out ?? null };
+  },
   provisionClerkMembership
 }));
 const syncClerkUserRoleMetadata = vi.hoisted(() => vi.fn(async () => "synced"));
@@ -65,6 +70,14 @@ describe("Clerk webhook", () => {
     syncClerkUserUpdated.mockReset().mockResolvedValue({ status: "updated" });
     deactivateClerkUser.mockReset().mockResolvedValue({ status: "deactivated" });
     deactivateClerkMembership.mockReset().mockResolvedValue({ status: "deactivated" });
+  });
+
+  it("organization.created for an already-linked creator acks 200 with reason, no company id", async () => {
+    provisionClerkOrganization.mockResolvedValueOnce({ company: null, skipReason: "creator_already_linked" });
+    const res = await send({ type: "organization.created", data: { id: "org_o", name: "Orphan", created_by: "user_x" } });
+    expect(res.statusCode).toBe(200);
+    expect(res.json()).toEqual({ received: true, skipped: true, reason: "creator_already_linked" });
+    expect(provisionClerkOrganization).toHaveBeenCalledWith(expect.objectContaining({ createdBy: "user_x" }));
   });
 
   it("FS-158: a failed delivery releases the claim and the retry is processed", async () => {

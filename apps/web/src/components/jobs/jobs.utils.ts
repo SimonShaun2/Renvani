@@ -72,7 +72,7 @@ export function formatTaskMinutes(value: number | null): string {
 export function getTaskProgress(tasks: JobTask[]) {
   const total = tasks.length;
   const completed = tasks.filter((task) => task.status === "completed").length;
-  const pendingRequired = tasks.filter((task) => task.isRequired && task.status !== "completed");
+  const pendingRequired = tasks.filter((task) => task.isRequired && (task.status === "pending" || task.status === "in_progress"));
   const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
 
   return {
@@ -280,7 +280,7 @@ export function getAssetBadge(asset: JobAssetSummary | null): {
 }
 
 export function buildOnTheWayMessage(firstName: string, etaMinutes: number): string {
-  return `Hi! ${firstName} from ServiceRev is on the way and should arrive in about ${etaMinutes} minutes.`;
+  return `Hi! ${firstName} from Renvani is on the way and should arrive in about ${etaMinutes} minutes.`;
 }
 
 export function wasSentToday(sentAt: string | null | undefined): boolean {

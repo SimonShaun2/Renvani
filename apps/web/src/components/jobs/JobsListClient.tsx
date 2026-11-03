@@ -1,26 +1,38 @@
 "use client";
 
 import "./jobs-motion.css";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Briefcase, ChevronLeft, ChevronRight, Search } from "lucide-react";
 
-import type { JobStatus } from "@fsm/types";
 import { useJobsList } from "@/src/hooks/jobs.hooks";
 
 import { EmptyState } from "../ui/EmptyState";
 import { SkeletonCard } from "../ui/SkeletonCard";
-import { StatBadge } from "../ui/StatBadge";
-import { formatDateTime, formatStatusLabel, getStatusTone } from "./jobs.utils";
-import { JOB_STATUS_OPTIONS, buildJobListQuery } from "./jobsList.utils";
+import { CHIP_TONE_CLASS, JOB_COLUMNS, JOB_FILTER_CHIPS, COUNTS_PAGE_LIMIT, chipFilters, currentWeek, deriveWeekCounts, type JobFilterChip } from "./jobsList.config";
+import { buildJobListQuery } from "./jobsList.utils";
+import { NewJobPanel } from "./NewJobPanel";
 
-const inputClass =
-  "h-10 rounded-xl border border-[#e6dccb] bg-white px-3 text-sm text-[#0f1530] outline-none focus:border-[#f6b400] focus:ring-2 focus:ring-[#fff4d6]";
+function Kpi({ label, value, caption }: { label: string; value: string; caption: string }) {
+  return (
+    <div className="flex min-w-0 flex-1 flex-col gap-1.5 rounded-[14px] border border-[#e6dccb] bg-white p-5">
+      <p className="font-mono text-[10px] font-medium uppercase tracking-[0.8px] text-[#5e6684]">{label}</p>
+      <p className="text-[30px] font-semibold leading-none text-[#0f1530]">{value}</p>
+      <p className="text-xs text-[#5e6684]">{caption}</p>
+    </div>
+  );
+}
 
-export function JobsListClient() {
-  const [status, setStatus] = useState("all");
-  const [from, setFrom] = useState("");
-  const [to, setTo] = useState("");
+const count = (n: number | undefined) => (n === undefined ? "—" : String(n));
+
+export interface JobsListClientProps {
+  /** From `/jobs?new=1&customerId=<id>` (parsed in the server page). */
+  newJob?: { open: boolean; customerId: string };
+}
+
+export function JobsListClient({ newJob }: JobsListClientProps = {}) {
+  const now = useMemo(() => new Date(), []);
+  const [chip, setChip] = useState<JobFilterChip["key"]>("all");
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [page, setPage] = useState(1);
@@ -32,69 +44,71 @@ export function JobsListClient() {
 
   useEffect(() => {
     setPage(1);
-  }, [status, from, to, debouncedSearch]);
+  }, [chip, debouncedSearch]);
 
-  const query = useJobsList(buildJobListQuery({ status, from, to, search: debouncedSearch, page }));
+  // One counts request (current week); chip totals come from the list query itself and are remembered per chip.
+  const weekQuery = useJobsList(
+    buildJobListQuery({ status: "all", ...currentWeek(now), search: "", page: 1 }, COUNTS_PAGE_LIMIT)
+  );
+  const { week, today } = deriveWeekCounts(weekQuery.data, now);
+  const query = useJobsList(buildJobListQuery({ ...chipFilters(chip, now), search: debouncedSearch, page }));
+  const [seen, setSeen] = useState<Partial<Record<JobFilterChip["key"], number>>>({});
+  const listTotal = query.data?.total;
+  useEffect(() => {
+    if (listTotal !== undefined && !debouncedSearch) setSeen((s) => (s[chip] === listTotal ? s : { ...s, [chip]: listTotal }));
+  }, [chip, debouncedSearch, listTotal]);
+  const counts: Record<JobFilterChip["key"], number | undefined> = { all: seen.all, unpaid: seen.unpaid, today: today ?? seen.today };
   const jobs = query.data?.data ?? [];
   const totalPages = Math.max(1, query.data?.totalPages ?? 1);
-  const hasFilters = status !== "all" || Boolean(from || to || debouncedSearch);
+  const hasFilters = chip !== "all" || Boolean(debouncedSearch);
 
   return (
     <div className="space-y-6" data-jobs-reveal>
-      <header>
-        <h1 className="text-[32px] font-semibold tracking-tight text-[#0f1530]">Jobs</h1>
-        <p className="mt-1 text-sm text-[#5e6684]">
-          {query.data ? `${query.data.total} work orders` : "Work orders across your crew"}
-        </p>
+      <header className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="text-[32px] font-semibold tracking-tight text-[#0f1530]">Jobs</h1>
+          <p className="mt-1 text-sm text-[#5e6684]">All jobs across your company</p>
+        </div>
+        <Link href="/jobs?new=1" className="rounded-[10px] bg-[#0f1530] px-[18px] py-3 text-sm font-semibold text-white hover:bg-[#2a3360]">
+          New job
+        </Link>
       </header>
 
-      <div className="flex flex-wrap items-end gap-3 rounded-2xl border border-[#e6dccb] bg-white p-4">
-        <label className="flex min-w-[220px] flex-1 flex-col gap-1 text-xs font-medium text-[#5e6684]">
-          Search
-          <span className="relative">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5e6684]" />
-            <input
-              aria-label="Search jobs"
-              className={`${inputClass} w-full pl-9`}
-              placeholder="Job #, title, customer"
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-            />
-          </span>
-        </label>
-        <label className="flex flex-col gap-1 text-xs font-medium text-[#5e6684]">
-          Status
-          <select aria-label="Status" className={inputClass} value={status} onChange={(e) => setStatus(e.target.value)}>
-            <option value="all">All statuses</option>
-            {JOB_STATUS_OPTIONS.map((option) => (
-              <option key={option} value={option}>
-                {formatStatusLabel(option)}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="flex flex-col gap-1 text-xs font-medium text-[#5e6684]">
-          Scheduled from
-          <input aria-label="Scheduled from" type="date" className={inputClass} value={from} max={to || undefined} onChange={(e) => setFrom(e.target.value)} />
-        </label>
-        <label className="flex flex-col gap-1 text-xs font-medium text-[#5e6684]">
-          Scheduled to
-          <input aria-label="Scheduled to" type="date" className={inputClass} value={to} min={from || undefined} onChange={(e) => setTo(e.target.value)} />
-        </label>
-        {hasFilters ? (
+      {newJob?.open ? <NewJobPanel key={newJob.customerId || "new"} initialCustomerId={newJob.customerId} /> : null}
+
+      <section aria-label="Job stats" className="flex flex-wrap gap-4">
+        <Kpi label="Jobs this week" value={count(week)} caption="Scheduled Mon–Sun" />
+        <Kpi label="Scheduled today" value={count(today)} caption="On today's schedule" />
+        <Kpi label="Unpaid" value="—" caption={counts.unpaid === undefined ? "Not available yet" : `${counts.unpaid} jobs · amount not available yet`} />
+        <Kpi label="Avg ticket" value="—" caption="Not available yet" />
+      </section>
+
+      <div className="flex flex-wrap items-center gap-2">
+        {JOB_FILTER_CHIPS.map((c) => (
           <button
+            key={c.key}
             type="button"
-            className="h-10 rounded-xl px-3 text-sm font-medium text-[#2a3360] hover:bg-[#fff4d6]"
-            onClick={() => {
-              setStatus("all");
-              setFrom("");
-              setTo("");
-              setSearch("");
-            }}
+            aria-pressed={chip === c.key}
+            onClick={() => setChip(c.key)}
+            className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${CHIP_TONE_CLASS[c.tone]} ${
+              chip === c.key ? "ring-2 ring-[#0f1530]" : "opacity-80 hover:opacity-100"
+            }`}
           >
-            Clear
+            <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-current" />
+            {c.label} · {count(counts[c.key])}
           </button>
-        ) : null}
+        ))}
+        <span className="flex-1" />
+        <label className="relative w-full sm:w-[260px]">
+          <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5e6684]" />
+          <input
+            aria-label="Search jobs"
+            className="h-10 w-full rounded-[10px] border border-[#e6dccb] bg-white pl-9 pr-3 text-[13px] text-[#0f1530] outline-none focus:border-[#f6b400] focus:ring-2 focus:ring-[#fff4d6]"
+            placeholder="Search jobs, customers…"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+          />
+        </label>
       </div>
 
       {query.isLoading ? (
@@ -118,45 +132,33 @@ export function JobsListClient() {
         <EmptyState
           icon={Briefcase}
           title={hasFilters ? "No jobs match these filters" : "No jobs yet"}
-          subtitle={hasFilters ? "Try another status or date range." : "New work orders will show up here."}
+          subtitle={hasFilters ? "Try another filter or search." : "New work orders will show up here."}
         />
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-[#e6dccb] bg-white">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-[#faf6ee] text-xs uppercase tracking-wide text-[#5e6684]">
+        <div className="overflow-x-auto rounded-[14px] border border-[#e6dccb] bg-white">
+          <table className="w-full text-left text-[13px]">
+            <thead className="bg-[#fbf6ef] font-mono text-[10px] uppercase tracking-[0.8px] text-[#5e6684]">
               <tr>
-                <th className="px-4 py-3 font-medium">Job</th>
-                <th className="hidden px-4 py-3 font-medium md:table-cell">Customer</th>
-                <th className="hidden px-4 py-3 font-medium lg:table-cell">Technician</th>
-                <th className="px-4 py-3 font-medium">Scheduled</th>
-                <th className="px-4 py-3 font-medium">Status</th>
+                {JOB_COLUMNS.map((col) => (
+                  <th key={col.key} className="px-5 py-2.5 font-medium">
+                    {col.header}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
               {jobs.map((job) => (
-                <tr key={job.id} className="border-t border-[#e6dccb] hover:bg-[#fff4d6]/50">
-                  <td className="px-4 py-3">
-                    <Link href={`/jobs/${job.id}`} className="font-semibold text-[#0f1530] hover:underline">
-                      {job.title}
-                    </Link>
-                    <div className="text-xs text-[#5e6684]">#{job.jobNumber} · {formatStatusLabel(job.type)}</div>
-                  </td>
-                  <td className="hidden px-4 py-3 text-[#2a3360] md:table-cell">
-                    {job.customer.firstName} {job.customer.lastName}
-                    {job.property ? <div className="text-xs text-[#5e6684]">{job.property.addressLine1}</div> : null}
-                  </td>
-                  <td className="hidden px-4 py-3 text-[#2a3360] lg:table-cell">
-                    {job.technician ? `${job.technician.firstName} ${job.technician.lastName}` : "Unassigned"}
-                  </td>
-                  <td className="px-4 py-3 text-[#2a3360]">{job.scheduledStart ? formatDateTime(job.scheduledStart) : "Not scheduled"}</td>
-                  <td className="px-4 py-3">
-                    <StatBadge label={formatStatusLabel(job.status)} tone={getStatusTone(job.status as JobStatus)} />
-                  </td>
+                <tr key={job.id} className="border-t border-[#e6dccb] text-[#2a3360] hover:bg-[#fff4d6]/50">
+                  {JOB_COLUMNS.map((col) => (
+                    <td key={col.key} className="px-5 py-3.5">
+                      {col.cell(job, now)}
+                    </td>
+                  ))}
                 </tr>
               ))}
             </tbody>
           </table>
-          <div className="flex items-center justify-between border-t border-[#e6dccb] px-4 py-3 text-sm text-[#5e6684]">
+          <div className="flex items-center justify-between border-t border-[#e6dccb] px-5 py-3 text-sm text-[#5e6684]">
             <span>
               Page {page} of {totalPages}
             </span>

@@ -260,6 +260,69 @@ describe("csv-import.processor", () => {
     });
   });
 
+  it("execute-import rejects a payments file as unsupported instead of committing it as customers", async () => {
+    const company = fakeDb.seedCompany({ name: "Pay Co", slug: "pay-co" });
+    const importSession = fakeDb.seedImportSession({
+      companyId: company.id,
+      entityType: "payments" as never,
+      fileName: "payments.csv",
+      fileUrl: "imports/company/payments.csv",
+      status: "importing",
+      columnMappings: { "First Name": "firstName", "Last Name": "lastName", Amount: "amount" }
+    });
+    downloadFileMock.mockResolvedValue(Buffer.from("First Name,Last Name,Amount\nPat,Payer,50.00"));
+
+    const { job } = createJob("execute-import", { companyId: company.id, importSessionId: importSession.id });
+    await expect(csvImportProcessor.handleExecuteImport(job)).resolves.toBeUndefined();
+
+    const stored = fakeDb.getTestState().importSessions.find((row) => row.id === importSession.id);
+    expect(stored?.status).toBe("failed");
+    expect(stored?.errorMessage).toContain("UNSUPPORTED_ENTITY_TYPE");
+    expect(stored?.errorMessage).toContain("payments");
+    expect(fakeDb.getTestState().customers.filter((row) => row.companyId === company.id)).toHaveLength(0);
+  });
+
+  it("execute-import does not write properties without a chunk plan as customers", async () => {
+    const company = fakeDb.seedCompany({ name: "Prop Co", slug: "prop-co" });
+    const importSession = fakeDb.seedImportSession({
+      companyId: company.id,
+      entityType: "properties" as never,
+      fileName: "properties.csv",
+      fileUrl: "imports/company/properties.csv",
+      status: "importing",
+      columnMappings: { "First Name": "firstName", Street: "addressLine1" }
+    });
+    downloadFileMock.mockResolvedValue(Buffer.from("First Name,Street\nPat,1 Main St"));
+
+    const { job } = createJob("execute-import", { companyId: company.id, importSessionId: importSession.id });
+    await csvImportProcessor.handleExecuteImport(job);
+
+    const stored = fakeDb.getTestState().importSessions.find((row) => row.id === importSession.id);
+    expect(stored?.status).toBe("failed");
+    expect(stored?.errorMessage).toContain("UNSUPPORTED_ENTITY_TYPE");
+    expect(fakeDb.getTestState().customers.filter((row) => row.companyId === company.id)).toHaveLength(0);
+  });
+
+  it("execute-import leaves assets with an equipment chunk plan to the equipment chunks", async () => {
+    const company = fakeDb.seedCompany({ name: "Asset Co", slug: "asset-co" });
+    const importSession = fakeDb.seedImportSession({
+      companyId: company.id,
+      entityType: "assets" as never,
+      fileName: "assets.csv",
+      fileUrl: "imports/company/assets.csv",
+      status: "importing",
+      columnMappings: { Serial: "serialNumber" },
+      aiInferences: { equipmentChunkPlan: { chunksTotal: 1 } }
+    });
+
+    const { job } = createJob("execute-import", { companyId: company.id, importSessionId: importSession.id });
+    await csvImportProcessor.handleExecuteImport(job);
+
+    const stored = fakeDb.getTestState().importSessions.find((row) => row.id === importSession.id);
+    expect(stored?.status).toBe("importing");
+    expect(downloadFileMock).not.toHaveBeenCalled();
+  });
+
   it("execute-import inserts valid rows with importSessionId, skips duplicates and errors, and enqueues dormant scan", async () => {
     const company = fakeDb.seedCompany({
       name: "Acme HVAC",

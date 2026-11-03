@@ -10,6 +10,7 @@
     "build": "tsc -p tsconfig.json",
     "lint": "tsc --noEmit",
     "test": "vitest run",
+    "test:trusted-execution-gaps": "vitest run --config vitest.trusted-execution-gaps.config.ts",
     "test:cross-tenant": "vitest run src/routes/security/stack03-cross-tenant-ci.test.ts src/routes/security/stack03-fs-migrate-tenant-matrix.test.ts src/routes/imports/imports.test.ts -t \"STACK03|STACK03-JWT-02/03\" src/services/clerk-tenant.service.test.ts",
     "start": "node dist/server.js"
   },
@@ -28,6 +29,7 @@
     "@fsm/import-normalize": "workspace:*",
     "@fsm/jobs": "workspace:*",
     "@fsm/types": "workspace:*",
+    "@js-temporal/polyfill": "^0.5.1",
     "@sendgrid/mail": "^8.1.5",
     "bcryptjs": "^3.0.2",
     "date-fns": "^4.1.0",

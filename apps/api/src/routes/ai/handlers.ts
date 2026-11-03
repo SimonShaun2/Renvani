@@ -1,3 +1,8 @@
+import type { GenerateRevenueProposalsBody } from "@fsm/types";
+import {
+  generateRevenueProposals,
+  proposeFromRecommendation
+} from "../../services/revenue-agent/revenue-agent-proposals.service.js";
 import type { FastifyReply, FastifyRequest } from "fastify";
 import type { ActionRecommendationInput, ListRecommendationsQuery } from "@fsm/types";
 
@@ -9,6 +14,7 @@ import {
   listRecommendations,
   snoozeRecommendation
 } from "../../services/ai-revenue.service.js";
+import { checkRevenueProposalConsent } from "../../services/revenue-agent/revenue-proposal-consent.service.js";
 import type {
   ActionRecommendationBody,
   DismissRecommendationBody,
@@ -176,4 +182,28 @@ export async function labelPhotoHandler(
     label,
     caption
   });
+}
+
+export async function proposeRecommendationHandler(
+  request: FastifyRequest,
+  reply: FastifyReply
+): Promise<FastifyReply> {
+  const params = request.params as RecommendationIdParams;
+  return reply.send(await proposeFromRecommendation(request.company.id, request.user.id, params.id));
+}
+
+export async function generateRevenueProposalsHandler(
+  request: FastifyRequest,
+  reply: FastifyReply
+): Promise<FastifyReply> {
+  const body = (request.body ?? {}) as GenerateRevenueProposalsBody;
+  return reply.send(await generateRevenueProposals(request.company.id, request.user.id, body.limit));
+}
+
+export async function checkRevenueProposalConsentHandler(
+  request: FastifyRequest,
+  reply: FastifyReply
+): Promise<FastifyReply> {
+  const { id } = request.params as { id: string };
+  return reply.send(await checkRevenueProposalConsent(request.company.id, request.user.id, id));
 }

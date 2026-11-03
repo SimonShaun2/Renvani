@@ -19,10 +19,10 @@ vi.mock("next/link", () => ({
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import { PaymentsClient } from "./PaymentsClient";
-import { buildPaymentsQuery, paymentStatusTone, serviceFeeLabel } from "./payments.utils";
+import { buildPaymentsQuery, paymentStatusLabel, paymentStatusTone, serviceFeeColumnLabel, serviceFeeLabel } from "./payments.utils";
 
 const payment = {
-  id: "p1", invoiceId: "inv-1", customerId: "c1", amount: "240.00", method: "card", status: "succeeded",
+  id: "p1", invoiceId: "inv-1", customerId: "c1", amount: "240.00", serviceFeeAmount: "4.80", method: "card", status: "succeeded",
   checkNumber: null, referenceNumber: null, paidAt: "2026-10-22T15:00:00.000Z", createdAt: "2026-10-22T15:00:00.000Z"
 };
 
@@ -62,27 +62,53 @@ describe("payments utils", () => {
   });
 
   it("labels the Service Fee from the API percent only", () => {
-    expect(serviceFeeLabel(2)).toBe("Service Fee 2% · paid by customer at checkout");
+    expect(serviceFeeLabel(2)).toBe("Service Fee (2%) · paid by customer at checkout");
     expect(serviceFeeLabel(0)).toBeNull();
     expect(serviceFeeLabel(undefined)).toBeNull();
     expect(paymentStatusTone("disputed")).toBe("red");
+    expect(serviceFeeColumnLabel(2)).toBe("Service Fee (2%)");
+    expect(serviceFeeColumnLabel(0)).toBeNull();
+    expect(paymentStatusLabel("pending")).toBe("Processing");
   });
 });
 
 describe("PaymentsClient", () => {
   it("shows overview totals, payout and recent transactions from the API", async () => {
     wrap();
-    expect(await screen.findByText("12")).toBeTruthy();
-    expect(await screen.findByText("3")).toBeTruthy();
     expect(await screen.findByText("$4,218.40")).toBeTruthy();
-    expect(screen.getByText(/Service Fee 2%/)).toBeTruthy();
+    expect(screen.getAllByText("—").length).toBeGreaterThanOrEqual(3);
+    expect(await screen.findByText("Respond in Stripe")).toBeTruthy();
+    expect(screen.queryByText(/Flex plan|Flat plan/)).toBeNull();
+    expect(screen.getByText(/Service Fee \(2%\) · paid by customer/)).toBeTruthy();
+    expect(await screen.findByRole("columnheader", { name: "Service Fee (2%)" })).toBeTruthy();
+    expect(screen.getByText("$4.80")).toBeTruthy();
     expect((await screen.findAllByRole("link", { name: "View invoice" }))[0]?.getAttribute("href")).toBe("/invoices/inv-1");
+  });
+
+  it("hides the Service Fee column and Flex note when platformFeePercent is 0 (Flat)", async () => {
+    apiGet.mockImplementation(async (path: string) => {
+      if (path.includes("stripe/connect/status")) return { connected: true, platformFeePercent: 0 };
+      return page([{ ...payment, serviceFeeAmount: "0.00" }]);
+    });
+    wrap();
+    await screen.findAllByRole("link", { name: "View invoice" });
+    expect(screen.queryByRole("columnheader", { name: /Service Fee/ })).toBeNull();
+    expect(screen.queryByText(/5%/)).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Transactions" }));
+    await screen.findAllByRole("link", { name: "View invoice" });
+    expect(screen.queryByText(/On Flex/)).toBeNull();
+  });
+
+  it("shows the Flex footnote from platformFeePercent", async () => {
+    wrap();
+    fireEvent.click(screen.getByRole("button", { name: "Transactions" }));
+    expect(await screen.findByText(/On Flex, the 2% Service Fee is paid by your customer/)).toBeTruthy();
   });
 
   it("filters transactions by status", async () => {
     wrap();
     fireEvent.click(screen.getByRole("button", { name: "Transactions" }));
-    fireEvent.change(await screen.findByLabelText("Status"), { target: { value: "refunded" } });
+    fireEvent.click(await screen.findByRole("button", { name: "Refunded" }));
     await waitFor(() => expect(apiGet).toHaveBeenCalledWith(expect.stringMatching(/status=refunded.*page=1&limit=25/)));
   });
 

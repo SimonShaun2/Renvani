@@ -1,4 +1,6 @@
+import { buildOpeningHours, type SiteTradeConfig } from "@/src/components/growth/site-trade.registry";
 import type { PublicBookingSettingsRecord } from "@/src/hooks/booking.hooks";
+import type { HomeServiceTrade, PublicBookingIntakeMode } from "@fsm/types";
 
 export interface BrandedServiceCard {
   id: string;
@@ -18,6 +20,10 @@ export interface BrandedStorefrontViewModel {
   companyName: string;
   bookingSlug: string;
   tagline: string;
+  eyebrow: string;
+  headline: string;
+  configuredTrade: HomeServiceTrade | null;
+  intakeMode: PublicBookingIntakeMode;
   phone: string | null;
   logoUrl: string | null;
   serviceCards: BrandedServiceCard[];
@@ -30,20 +36,15 @@ export interface BrandedStorefrontViewModel {
 
 export interface LocalBusinessJsonLd {
   "@context": "https://schema.org";
-  "@type": "LocalBusiness";
+  "@type": string;
   name: string;
   description: string;
   url: string;
   telephone?: string;
   areaServed: string[];
+  openingHoursSpecification?: ReturnType<typeof buildOpeningHours>;
+  aggregateRating?: { "@type": "AggregateRating"; ratingValue: number; reviewCount: number };
 }
-
-const CLEANING_FALLBACK_CARDS: BrandedServiceCard[] = [
-  { id: "standard", title: "Standard clean", subtitle: "from $129" },
-  { id: "deep", title: "Deep clean", subtitle: "from $219" },
-  { id: "move", title: "Move-in / move-out", subtitle: "from $289" },
-  { id: "recurring", title: "Recurring", subtitle: "save 10%" }
-];
 
 function readServiceLabel(service: Record<string, unknown>): string | null {
   if (typeof service.label === "string" && service.label.trim()) {
@@ -120,10 +121,6 @@ export function buildServiceCards(offeredServices: Array<Record<string, unknown>
     });
   }
 
-  if (cards.length === 0) {
-    return CLEANING_FALLBACK_CARDS;
-  }
-
   return cards.slice(0, 4);
 }
 
@@ -131,7 +128,7 @@ export function buildServiceAreaSummary(zips: string[]): string {
   const unique = Array.from(new Set(zips.map((zip) => zip.trim()).filter((zip) => zip.length > 0))).sort();
 
   if (unique.length === 0) {
-    return "Service area confirmed during booking or inquiry.";
+    return "The team will confirm service availability when they review your request.";
   }
 
   if (unique.length <= 6) {
@@ -145,19 +142,33 @@ export function buildBrandedStorefrontViewModel(
   settings: PublicBookingSettingsRecord,
   options?: { staffPreviewLine?: string }
 ): BrandedStorefrontViewModel {
-  const companyName = settings.companyName.trim() || "Your cleaning team";
+  const companyName = settings.companyName.trim() || "Your service team";
   const tagline =
     settings.tagline?.trim() ||
-    "Instant prices, real crew availability, and booking in under a minute. Same trusted crew every visit.";
+    (settings.intakeMode === "bookable"
+      ? "Tell us what you need. Review available services or send an inquiry; the team will confirm the next step."
+      : "Tell us what you need. Send an inquiry and the team will confirm service availability and the next step.");
   const serviceAreaZips = settings.serviceAreaZipCodes ?? [];
+  const configuredTrade = settings.trade ?? null;
+  const headlineCompanyName = /[.!?]$/u.test(companyName) ? companyName : `${companyName}.`;
+  const eyebrow = configuredTrade === "hvac" ? "HEATING & COOLING" : configuredTrade === "plumbing" ? "PLUMBING" : "LOCAL SERVICE";
+  const headline = configuredTrade === "hvac"
+    ? `Heating and cooling service from ${headlineCompanyName}`
+    : configuredTrade === "plumbing"
+      ? `Plumbing service from ${headlineCompanyName}`
+      : `Local service from ${headlineCompanyName}`;
 
   return {
     companyName,
+    eyebrow,
+    headline,
+    configuredTrade,
+    intakeMode: settings.intakeMode,
     bookingSlug: settings.bookingSlug || settings.companySlug,
     tagline,
     phone: settings.phone ?? null,
     logoUrl: settings.logoUrl ?? null,
-    serviceCards: buildServiceCards(settings.offeredServices),
+    serviceCards: settings.intakeMode === "bookable" ? buildServiceCards(settings.offeredServices) : [],
     serviceAreaSummary: buildServiceAreaSummary(serviceAreaZips),
     serviceAreaZips: serviceAreaZips,
     trustLine: options?.staffPreviewLine?.trim() || null,
@@ -175,17 +186,30 @@ export function buildInquirePath(slug: string, source = BRANDED_ACQUISITION_SOUR
   return `/site/${encodeURIComponent(slug)}/inquire?${query.toString()}`;
 }
 
+export interface LocalBusinessExtras {
+  trade?: SiteTradeConfig;
+  openingHours?: ReturnType<typeof buildOpeningHours>;
+  /** Only real review data; never fabricated. The public API does not expose a rating yet. */
+  rating?: { value: number; count: number } | null;
+}
+
 export function buildLocalBusinessJsonLd(
   model: BrandedStorefrontViewModel,
-  sitePath: string
+  sitePath: string,
+  extras: LocalBusinessExtras = {}
 ): LocalBusinessJsonLd {
+  const { trade, openingHours, rating } = extras;
   return {
     "@context": "https://schema.org",
-    "@type": "LocalBusiness",
+    "@type": trade?.schemaType ?? "LocalBusiness",
     name: model.companyName,
     description: model.tagline,
     url: sitePath,
     ...(model.phone ? { telephone: model.phone } : {}),
-    areaServed: model.serviceAreaZips.length > 0 ? model.serviceAreaZips : ["Local service area"]
+    areaServed: model.serviceAreaZips.length > 0 ? model.serviceAreaZips : ["Local service area"],
+    ...(openingHours ? { openingHoursSpecification: openingHours } : {}),
+    ...(rating && rating.count > 0
+      ? { aggregateRating: { "@type": "AggregateRating" as const, ratingValue: rating.value, reviewCount: rating.count } }
+      : {})
   };
 }

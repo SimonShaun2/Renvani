@@ -9,7 +9,7 @@ const TEST_ENV_VALUES = {
   STRIPE_SECRET_KEY: "sk_test_dummy",
   STRIPE_WEBHOOK_SECRET: "whsec_dummy",
   STRIPE_CONNECT_CLIENT_ID: "ca_test_dummy",
-  STRIPE_PLATFORM_FEE_PERCENT: "0.05",
+  STRIPE_PLATFORM_FEE_PERCENT: "0.02",
   OPENAI_API_KEY: "openai_dummy",
   TWILIO_ACCOUNT_SID: "twilio_sid",
   TWILIO_AUTH_TOKEN: "twilio_token",

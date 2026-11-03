@@ -5,43 +5,36 @@ import {
   planImportRowChunks,
 } from "./chunk-ingest.js";
 
-const CHUNK_COMMIT_ENTITY_TYPES = new Set<ImportChunkCommitManifest["entityType"]>([
-  "customers",
-  "jobs",
-  "estimates",
-]);
-
 function columnMappingIncludesField(columnMapping: ColumnMapping, fieldName: string): boolean {
   return Object.values(columnMapping).some((mappedField) => mappedField === fieldName);
 }
+
+function includesAny(columnMapping: ColumnMapping, fieldNames: readonly string[]): boolean {
+  return fieldNames.some((fieldName) => columnMappingIncludesField(columnMapping, fieldName));
+}
+
+/**
+ * One entry per chunk-committable entity type: the mapped fields a file needs before its rows
+ * can be committed by the lineage-keyed worker committer. String-keyed so new types are one line.
+ */
+const CHUNK_COMMIT_ELIGIBILITY: Readonly<Record<string, (columnMapping: ColumnMapping) => boolean>> = {
+  customers: (mapping) => columnMappingIncludesField(mapping, "sourceId"),
+  properties: (mapping) =>
+    columnMappingIncludesField(mapping, "sourceId") && includesAny(mapping, ["customerSourceId", "customerId"]),
+  jobs: (mapping) => includesAny(mapping, ["sourceId", "jobNumber"]),
+  estimates: (mapping) => includesAny(mapping, ["sourceId", "estimateNumber"]),
+  invoices: (mapping) =>
+    includesAny(mapping, ["sourceId", "invoiceNumber"]) && includesAny(mapping, ["customerSourceId", "customerId"]),
+};
 
 export function isChunkCommitEligibleEntity(
   entityType: string,
   columnMapping: ColumnMapping,
 ): entityType is ImportChunkCommitManifest["entityType"] {
-  if (!CHUNK_COMMIT_ENTITY_TYPES.has(entityType as ImportChunkCommitManifest["entityType"])) {
-    return false;
-  }
-
-  if (entityType === "customers") {
-    return columnMappingIncludesField(columnMapping, "sourceId");
-  }
-
-  if (entityType === "jobs") {
-    return (
-      columnMappingIncludesField(columnMapping, "sourceId") ||
-      columnMappingIncludesField(columnMapping, "jobNumber")
-    );
-  }
-
-  if (entityType === "estimates") {
-    return (
-      columnMappingIncludesField(columnMapping, "sourceId") ||
-      columnMappingIncludesField(columnMapping, "estimateNumber")
-    );
-  }
-
-  return false;
+  const isEligible = Object.prototype.hasOwnProperty.call(CHUNK_COMMIT_ELIGIBILITY, entityType)
+    ? CHUNK_COMMIT_ELIGIBILITY[entityType]
+    : undefined;
+  return isEligible ? isEligible(columnMapping) : false;
 }
 
 export function buildImportChunkCommitManifest(input: {

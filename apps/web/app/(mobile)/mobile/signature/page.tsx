@@ -1,11 +1,8 @@
-import { ScaffoldPage } from "@/src/components/layout/ScaffoldPage";
+import { CrewSignature } from "@/src/components/mobile/CrewSignature";
 
-export default function MobileSignaturePage() {
-  return (
-    <ScaffoldPage
-      title="Signature"
-      subtitle="Customer approval and completion signatures plug into this route next."
-      ticket="028"
-    />
-  );
+/** Legacy entry (`/mobile/signature?jobId=`), used by JobStatusTransitions. Same screen as /mobile/jobs/[id]/signature. */
+export default async function MobileSignaturePage({ searchParams }: { searchParams: Promise<{ jobId?: string | string[] }> }) {
+  const { jobId } = await searchParams;
+  const id = Array.isArray(jobId) ? jobId[0] : jobId;
+  return <CrewSignature jobId={id ?? null} />;
 }

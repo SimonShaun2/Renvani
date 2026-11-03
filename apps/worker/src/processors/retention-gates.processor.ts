@@ -8,10 +8,13 @@ import {
   type ProposalCreateCustomerMessageJobData,
   type RetentionGatesAfterCompletionConfirmJobData,
   type RetentionGatesWinBackEvaluateJobData,
+  type ServiceBuildJobBriefJobData,
   type RetentionGatesEvaluationInput,
   buildProposalCreateCustomerMessageJob,
   evaluateRetentionGates
 } from "@fsm/types";
+
+import { processServiceBuildJobBrief } from "./service-job-brief.processor.js";
 
 const logger = pino({
   name: "retention-gates-processor"
@@ -200,6 +203,9 @@ export function createRetentionGatesProcessor(
           job as unknown as Job<RetentionGatesWinBackEvaluateJobData>,
           dependencies
         );
+        return;
+      case OPERATOR_QUEUE_JOB_NAMES.serviceBuildJobBrief:
+        await processServiceBuildJobBrief(job as unknown as Job<ServiceBuildJobBriefJobData>);
         return;
       default:
         return;

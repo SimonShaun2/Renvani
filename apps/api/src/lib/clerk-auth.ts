@@ -1,7 +1,10 @@
 import { verifyToken } from "@clerk/backend";
 
+import { env } from "@fsm/config";
 import { featureFlags, isClerkAuthParallelJwtEnabled } from "@fsm/config/feature-flags";
 import { AppError, ErrorCode, type UserRole } from "@fsm/types";
+
+import { extraAppOrigins } from "./app-origins.js";
 
 /**
  * Session-token claim carrying the Renvani staff role, shared with web (#184): `metadata.role`.
@@ -19,7 +22,7 @@ export interface ClerkVerifiedSession {
   role: UserRole | null;
 }
 
-export function parseClerkAuthorizedParties(raw: string | undefined = process.env.CLERK_AUTHORIZED_PARTIES): string[] {
+export function parseClerkAuthorizedParties(raw: string | undefined = env.CLERK_AUTHORIZED_PARTIES): string[] {
   return (raw ?? "")
     .split(",")
     .map((entry) => entry.trim().replace(/\/$/, ""))
@@ -36,7 +39,8 @@ export function extractClerkRoleClaim(payload: Record<string, unknown>): UserRol
 }
 
 function readClerkSecretKey(): string | null {
-  const secret = process.env.CLERK_SECRET_KEY?.trim();
+  // Validated config only (packages/config); blank means Clerk verify is off (fail closed).
+  const secret = env.CLERK_SECRET_KEY.trim();
   return secret && secret.length > 0 ? secret : null;
 }
 
@@ -64,16 +68,25 @@ export function extractClerkOrganizationId(payload: Record<string, unknown>): st
  * FS-156: azp (CLERK_AUTHORIZED_PARTIES) is mandatory whenever Clerk login can be used:
  * deployment tier "staging" (where Clerk login is on) or NODE_ENV=production, or the Clerk flag is on.
  */
-export function isClerkAzpRequired(source: Record<string, string | undefined> = process.env): boolean {
+export function isClerkAzpRequired(source?: Record<string, string | undefined>): boolean {
   // FEATURE FLAG: clerk-auth-parallel-jwt
   return (
     featureFlags.clerkAuthParallelJwt ||
     isClerkAuthParallelJwtEnabled(source) ||
-    source.NODE_ENV === "production"
+    (source ? source.NODE_ENV : env.NODE_ENV) === "production"
   );
 }
 
-export async function verifyClerkBearerToken(accessToken: string): Promise<ClerkVerifiedSession> {
+export async function verifyClerkBearerToken(accessToken: string): Promise<ClerkVerifiedSession>;
+export async function verifyClerkBearerToken(
+  accessToken: string,
+  options: { requireOrganization: false }
+): Promise<Omit<ClerkVerifiedSession, "clerkOrganizationId"> & { clerkOrganizationId: string | null }>;
+export async function verifyClerkBearerToken(
+  accessToken: string,
+  options: { requireOrganization?: boolean } = {}
+): Promise<Omit<ClerkVerifiedSession, "clerkOrganizationId"> & { clerkOrganizationId: string | null }> {
+  const requireOrganization = options.requireOrganization !== false;
   if (!isClerkParallelAuthAvailable()) {
     throw new AppError(ErrorCode.FORBIDDEN, "Clerk authentication is not enabled");
   }
@@ -83,7 +96,8 @@ export async function verifyClerkBearerToken(accessToken: string): Promise<Clerk
     throw new AppError(ErrorCode.INTERNAL_ERROR, "Clerk secret is not configured");
   }
 
-  const authorizedParties = parseClerkAuthorizedParties();
+  // CLERK_AUTHORIZED_PARTIES plus APP_URL_ALLOWED extras (staging tier only; exact origins).
+  const authorizedParties = [...new Set([...parseClerkAuthorizedParties(), ...extraAppOrigins()])];
   if (authorizedParties.length === 0 && isClerkAzpRequired()) {
     // Fail closed: without an azp allow-list any Clerk frontend for this instance could mint usable tokens.
     throw new AppError(ErrorCode.UNAUTHORIZED, "Invalid Clerk session token");
@@ -113,7 +127,7 @@ export async function verifyClerkBearerToken(accessToken: string): Promise<Clerk
   }
 
   const clerkOrganizationId = extractClerkOrganizationId(payload);
-  if (!clerkOrganizationId) {
+  if (!clerkOrganizationId && requireOrganization) {
     throw new AppError(ErrorCode.UNAUTHORIZED, "Clerk session missing organization");
   }
 

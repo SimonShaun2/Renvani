@@ -37,17 +37,10 @@ export type PageSection = {
 
 type CmsItem = { isArchived?: boolean; isDraft?: boolean; fieldData: Record<string, unknown> };
 
-const FEE_RULES: Array<[RegExp, string]> = [
-  [/Platform fee \(5%, paid by customer\)/gi, "Service Fee (2%, paid by customer)"],
-  [/Platform fee \(5%\)/gi, "Service Fee (2%, paid by customer)"]
-];
-
 /** Copy rules applied to every rendered CMS/static string. */
 export function applyCopyRules(text: string): string {
-  let out = text;
-  for (const [re, to] of FEE_RULES) out = out.replace(re, to);
   // Editorial "[confirm: …]" notes are never shown publicly.
-  out = out.replace(/\s*\[confirm:[^\]]*\]/gi, "");
+  const out = text.replace(/\s*\[confirm:[^\]]*\]/gi, "");
   return out.trim();
 }
 
@@ -77,7 +70,6 @@ function parseData(raw: unknown): unknown {
   }
 }
 
-export const DEFAULT_BOOKING_FEE = "+ $1.99 booking fee on online bookings, paid at checkout";
 
 export const DEFAULT_CTA_HREF = "/demo";
 
@@ -159,12 +151,12 @@ export const STATIC_HOME_PRICING: PageSection[] = [
   {
     page: "home", sectionKey: "pricing", items: [], sortOrder: 2,
     headline: "Simple pricing. Everything included.",
-    data: { plans: STATIC_PLANS, defaultBilling: "annual", annualLabel: "Annual (2 months free)", bookingFee: DEFAULT_BOOKING_FEE }
+    data: { plans: STATIC_PLANS, defaultBilling: "annual", annualLabel: "Annual (2 months free)" }
   },
   {
     page: "pricing", sectionKey: "plans", items: [], sortOrder: 1,
     headline: "Simple pricing. Everything included.",
-    data: { plans: STATIC_PLANS, defaultBilling: "annual", annualLabel: "Annual (2 months free)", bookingFee: DEFAULT_BOOKING_FEE }
+    data: { plans: STATIC_PLANS, defaultBilling: "annual", annualLabel: "Annual (2 months free)" }
   }
 ];
 
@@ -222,7 +214,6 @@ export type PricingData = {
   defaultBilling: "monthly" | "annual";
   annualLabel: string;
   saveBadge?: string | undefined;
-  bookingFee?: string | undefined;
 };
 
 
@@ -235,8 +226,7 @@ export function pricingFromSection(section: PageSection | undefined): PricingDat
     plans: Object.entries(plans).map(([id, p]) => ({ id, ...p })),
     defaultBilling: d?.defaultBilling === "monthly" ? "monthly" : "annual",
     annualLabel: typeof d?.annualLabel === "string" ? d.annualLabel : "Annual (2 months free)",
-    saveBadge: typeof d?.saveBadge === "string" ? d.saveBadge : undefined,
-    bookingFee: typeof d?.bookingFee === "string" ? d.bookingFee : undefined
+    saveBadge: typeof d?.saveBadge === "string" ? d.saveBadge : undefined
   };
 }
 

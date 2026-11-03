@@ -651,4 +651,47 @@ describe("phase2 operations routes", () => {
     expect(serviceAreasResponse.status).toBe(200);
     expect(serviceAreasResponse.body.technician.serviceZipCodes).toEqual(["74103", "74133"]);
   });
+  it("FS-171: starting a second job while clocked in returns 409 open_entry_exists, not 500", async () => {
+    const auth = createAuthContext("owner");
+    const { technician, job, customer, property } = seedFieldGraph(auth.company.id);
+    const job2 = fakeDb.seedJob({
+      companyId: auth.company.id,
+      customerId: customer.id,
+      propertyId: property.id,
+      technicianId: technician.id,
+      title: "Second call",
+      status: "scheduled",
+      scheduledStart: new Date("2026-04-28T17:00:00.000Z"),
+      scheduledEnd: new Date("2026-04-28T18:00:00.000Z")
+    });
+
+    const first = await request(app.server)
+      .post(`/api/v1/jobs/${job.id}/time/start`)
+      .set("Authorization", auth.authorization)
+      .send({ technicianId: technician.id, entryType: "on_site" });
+    expect(first.status).toBe(201);
+
+    const second = await request(app.server)
+      .post(`/api/v1/jobs/${job2.id}/time/start`)
+      .set("Authorization", auth.authorization)
+      .send({ technicianId: technician.id, entryType: "on_site" });
+    expect(second.status).toBe(409);
+    expect(second.body).toMatchObject({ error: "CONFLICT", reason: "open_entry_exists" });
+  });
+
+  it("FS-171: a start racing past the pre-check (23505 on the open-entry index) returns 409", async () => {
+    const auth = createAuthContext("owner");
+    const { technician, job } = seedFieldGraph(auth.company.id);
+    const dbModule = await import("@fsm/db");
+    vi.spyOn(dbModule.db, "transaction").mockRejectedValueOnce(
+      Object.assign(new Error("dup"), { cause: { code: "23505", constraint: "time_entries_open_technician_idx" } })
+    );
+
+    const response = await request(app.server)
+      .post(`/api/v1/jobs/${job.id}/time/start`)
+      .set("Authorization", auth.authorization)
+      .send({ technicianId: technician.id, entryType: "on_site" });
+    expect(response.status).toBe(409);
+    expect(response.body).toMatchObject({ error: "CONFLICT", reason: "open_entry_exists" });
+  });
 });

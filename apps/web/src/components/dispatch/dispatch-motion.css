@@ -9,3 +9,15 @@
     animation: dispatch-slide-in 220ms ease-out both;
   }
 }
+
+/* Newly scheduled block: brief ring settle; skipped entirely with reduced motion. */
+@keyframes dispatch-block-settle {
+  from { box-shadow: 0 0 0 4px rgba(47, 125, 79, 0.35); }
+  to { box-shadow: 0 0 0 0 rgba(47, 125, 79, 0); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .dispatch-block-settle {
+    animation: dispatch-block-settle 900ms ease-out both;
+  }
+}

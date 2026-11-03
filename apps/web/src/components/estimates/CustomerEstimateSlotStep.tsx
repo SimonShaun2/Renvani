@@ -80,6 +80,7 @@ function SlotButton({
 
 export function CustomerEstimateSlotStep({ estimate, scheduling, onRequested }: CustomerEstimateSlotStepProps) {
   const submitMutation = useSubmitBookingRequest(scheduling.bookingSlug);
+  const [inquiryOnlyReference, setInquiryOnlyReference] = useState<string | null>(null);
   const upcomingDates = useMemo(() => buildUpcomingIsoDates(7), []);
   const availabilityQueries = useQueries({
     queries: upcomingDates.map((date) => ({
@@ -134,7 +135,23 @@ export function CustomerEstimateSlotStep({ estimate, scheduling, onRequested }: 
       }
     });
 
+    if (!("confirmation" in response)) {
+      setInquiryOnlyReference(response.bookingRequest.referenceNumber ?? "received");
+      return;
+    }
     onRequested({ referenceNumber: response.confirmation.referenceNumber });
+  }
+
+  if (inquiryOnlyReference) {
+    return (
+      <div className="min-h-screen bg-[#fbf6ef] px-5 py-10 text-neutral-900">
+        <div className="mx-auto max-w-md rounded-[14px] border border-[#e6dccb] bg-white p-6">
+          <h1 className="text-2xl font-semibold">We received your inquiry</h1>
+          <p className="mt-3 text-sm leading-6">Service availability has not been confirmed. The team will follow up. No appointment has been booked.</p>
+          <p className="mt-3 text-sm">Reference {inquiryOnlyReference}.</p>
+        </div>
+      </div>
+    );
   }
 
   return (

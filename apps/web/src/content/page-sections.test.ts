@@ -14,13 +14,14 @@ import {
 } from "./page-sections";
 
 describe("copy rules", () => {
-  it("renders Platform fee (5%) as Service Fee (2%, paid by customer)", () => {
-    expect(applyCopyRules("Platform fee (5%)")).toBe("Service Fee (2%, paid by customer)");
-    expect(applyCopyRules("Platform fee (5%, paid by customer) $7.95")).toBe("Service Fee (2%, paid by customer) $7.95");
+  it("strips editorial [confirm: …] notes and leaves fee copy untouched", () => {
+    expect(applyCopyRules("Service Fee (2%, paid by customer) [confirm: rate]")).toBe("Service Fee (2%, paid by customer)");
   });
 
-  it("applies to static product sections", () => {
-    expect(JSON.stringify(STATIC_PRODUCT_SECTIONS)).not.toMatch(/Platform fee/);
+  it("bundled sections carry no legacy platform fee / 5% copy", () => {
+    const all = JSON.stringify([...FALLBACK_HOME_PRICING, ...STATIC_PRODUCT_SECTIONS]);
+    expect(all).not.toMatch(/platform fee/i);
+    expect(all).not.toMatch(/\b5% (fee|service)/i);
   });
 });
 
@@ -38,7 +39,7 @@ describe("page sections", () => {
     expect(Object.fromEntries(pricing.plans.map((p) => [p.id, [p.monthly, p.annual]]))).toEqual({
       flex: [399, 3990], flat: [999, 9990], founding: [199, 1990], startup: [99, 990]
     });
-    expect(pricing.bookingFee).toContain("$1.99");
+    expect(JSON.stringify(pricing)).not.toMatch(/1\.99|booking fee/i);
   });
 
   it("falls back to the full snapshot on preview without env", async () => {

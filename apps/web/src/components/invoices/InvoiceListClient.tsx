@@ -6,25 +6,27 @@ import { useRouter } from "next/navigation";
 import { FileText, Plus, Search } from "lucide-react";
 
 import { PageLayout } from "@/src/components/layout/PageLayout";
-import { CurrencyDisplay } from "@/src/components/ui/CurrencyDisplay";
 import { EmptyState } from "@/src/components/ui/EmptyState";
 import { ErrorState } from "@/src/components/ui/ErrorState";
 import { Sheet } from "@/src/components/ui/Sheet";
 import { SkeletonCard } from "@/src/components/ui/SkeletonCard";
-import { StatBadge } from "@/src/components/ui/StatBadge";
 import { useCustomers, useCustomerJobs } from "@/src/hooks/customers.hooks";
 import { useEstimates } from "@/src/hooks/estimates.hooks";
 import {
   useCreateInvoice,
   useInvoices,
+  useSucceededPaymentsSince,
   type InvoiceListRecord
 } from "@/src/hooks/invoices.hooks";
 import { cn, formatDate } from "@/src/lib/utils";
 import {
-  formatStatusLabel,
-  getInvoiceStatusTone,
-  parseMoneyValue
-} from "@/src/components/estimates/estimates.utils";
+  buildInvoiceKpis,
+  getInvoiceRowState,
+  isCompletePage,
+  sumSucceededPayments,
+  type InvoiceRowTone
+} from "@/src/components/invoices/invoice-list.utils";
+import "@/src/components/invoices/invoices-motion.css";
 
 type InvoiceFilter = "all" | "draft" | "sent" | "partially_paid" | "overdue" | "paid";
 
@@ -51,50 +53,6 @@ const defaultCreateState: CreateInvoiceFormState = {
   title: ""
 };
 
-function buildInvoiceSummary(records: InvoiceListRecord[]) {
-  const outstanding = records.filter((invoice) =>
-    ["sent", "viewed", "partially_paid", "overdue"].includes(invoice.status)
-  );
-  const overdue = records.filter((invoice) => invoice.status === "overdue");
-  const paidThisMonth = records.filter((invoice) => {
-    if (invoice.status !== "paid" || !invoice.paidAt) {
-      return false;
-    }
-
-    const paidAt = new Date(invoice.paidAt);
-    const now = new Date();
-    return paidAt.getMonth() === now.getMonth() && paidAt.getFullYear() === now.getFullYear();
-  });
-  const drafts = records.filter((invoice) => invoice.status === "draft");
-
-  return [
-    {
-      label: "Outstanding",
-      tone: "orange" as const,
-      total: outstanding.reduce((sum, invoice) => sum + parseMoneyValue(invoice.balanceDue), 0),
-      count: outstanding.length
-    },
-    {
-      label: "Overdue",
-      tone: "red" as const,
-      total: overdue.reduce((sum, invoice) => sum + parseMoneyValue(invoice.balanceDue), 0),
-      count: overdue.length
-    },
-    {
-      label: "Paid This Month",
-      tone: "green" as const,
-      total: paidThisMonth.reduce((sum, invoice) => sum + parseMoneyValue(invoice.amountPaid), 0),
-      count: paidThisMonth.length
-    },
-    {
-      label: "Draft",
-      tone: "gray" as const,
-      total: drafts.reduce((sum, invoice) => sum + parseMoneyValue(invoice.total), 0),
-      count: drafts.length
-    }
-  ];
-}
-
 function filterInvoices(records: InvoiceListRecord[], search: string, filter: InvoiceFilter) {
   const normalizedSearch = search.trim().toLowerCase();
 
@@ -116,34 +74,69 @@ function filterInvoices(records: InvoiceListRecord[], search: string, filter: In
   });
 }
 
-function InvoiceSummaryCards({ records }: { records: InvoiceListRecord[] }) {
-  const summary = buildInvoiceSummary(records);
+const MONTH_LABEL = new Intl.DateTimeFormat("en-US", { month: "short" });
+const usd = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
 
+function KpiCard({ label, value, caption }: { label: string; value: string; caption: string }) {
   return (
-    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-      {summary.map((card) => (
-        <div key={card.label} className="surface-card px-5 py-5">
-          <div className="flex items-center gap-3">
-            <span
-              className={cn(
-                "h-10 w-10 rounded-2xl",
-                card.tone === "orange" && "bg-warning-light",
-                card.tone === "red" && "bg-error-light",
-                card.tone === "green" && "bg-success-light",
-                card.tone === "gray" && "bg-neutral-100"
-              )}
-            />
-            <div>
-              <p className="text-sm font-medium text-neutral-500">{card.label}</p>
-              <CurrencyDisplay value={card.total} className="mt-1 block text-3xl font-semibold tracking-tight text-neutral-900" showCents />
-            </div>
-          </div>
-          <p className="mt-3 text-sm text-neutral-500">
-            {card.count} {card.count === 1 ? "invoice" : "invoices"}
-          </p>
-        </div>
-      ))}
+    <div className="rounded-[14px] border border-[#e6dccb] bg-white px-5 py-5">
+      <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-[#5e6684]">{label}</p>
+      <p className="mt-2 text-[28px] font-semibold leading-none tracking-tight text-[#0f1530]">{value}</p>
+      <p className="mt-2 text-xs text-[#5e6684]">{caption}</p>
     </div>
+  );
+}
+
+const UNAVAILABLE = "Not available yet";
+const plural = (count: number) => `${count} ${count === 1 ? "invoice" : "invoices"}`;
+
+export function InvoiceKpiCards({
+  invoices,
+  invoicesComplete,
+  collected,
+  now
+}: {
+  invoices: InvoiceListRecord[];
+  invoicesComplete: boolean;
+  collected: { total: number; count: number } | null;
+  now: Date;
+}) {
+  const kpis = invoicesComplete ? buildInvoiceKpis(invoices, now) : null;
+  return (
+    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4" data-testid="invoice-kpis">
+      <KpiCard
+        label={`Collected · ${MONTH_LABEL.format(now)}`}
+        value={collected ? usd.format(collected.total) : "—"}
+        caption={collected ? `${collected.count} ${collected.count === 1 ? "payment" : "payments"}` : UNAVAILABLE}
+      />
+      <KpiCard
+        label="Outstanding"
+        value={kpis ? usd.format(kpis.outstanding.total) : "—"}
+        caption={kpis ? plural(kpis.outstanding.count) : UNAVAILABLE}
+      />
+      <KpiCard
+        label="Overdue > 7 days"
+        value={kpis ? usd.format(kpis.overdue7.total) : "—"}
+        caption={kpis ? plural(kpis.overdue7.count) : UNAVAILABLE}
+      />
+      <KpiCard label="Avg. days to pay" value="—" caption={UNAVAILABLE} />
+    </div>
+  );
+}
+
+const rowToneClass: Record<InvoiceRowTone, string> = {
+  green: "bg-[#e5f4ea] text-[#1f6b3a]",
+  amber: "bg-[#fff4d6] text-[#7a5600]",
+  red: "bg-[#fde4df] text-[#a3261a]",
+  neutral: "bg-[#efe9df] text-[#5e6684]"
+};
+
+export function InvoiceStatePill({ state }: { state: { label: string; tone: InvoiceRowTone } }) {
+  return (
+    <span className={cn("inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold", rowToneClass[state.tone])}>
+      <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-current" />
+      {state.label}
+    </span>
   );
 }
 
@@ -159,7 +152,7 @@ export function InvoiceListClient() {
 
   const invoicesQuery = useInvoices({
     page: 1,
-    limit: 200,
+    limit: 100,
     sortBy: "createdAt",
     sortOrder: "desc"
   });
@@ -184,6 +177,12 @@ export function InvoiceListClient() {
     sortOrder: "desc"
   });
   const createInvoice = useCreateInvoice();
+  const now = useMemo(() => new Date(), []);
+  const monthStart = useMemo(() => new Date(now.getFullYear(), now.getMonth(), 1).toISOString(), [now]);
+  const paymentsQuery = useSucceededPaymentsSince(monthStart);
+  const collected = isCompletePage(paymentsQuery.data)
+    ? { total: sumSucceededPayments(paymentsQuery.data!.data), count: paymentsQuery.data!.data.length }
+    : null;
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
@@ -226,22 +225,37 @@ export function InvoiceListClient() {
     <>
       <PageLayout
         title="Invoices"
-        subtitle="Track payment state, resend payment links, and keep collections moving."
+        subtitle={`${new Intl.DateTimeFormat("en-US", { month: "long" }).format(now)} · paid by card on file after each visit`}
         actions={(
+          <div className="flex items-center gap-3">
+          <button
+            type="button"
+            disabled
+            title="Invoice export isn't available yet"
+            className="rounded-[10px] border border-[#e6dccb] bg-white px-5 py-3 text-sm font-semibold text-[#0f1530] disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Export
+          </button>
           <button
             type="button"
             onClick={() => setCreateOpen(true)}
-            className="inline-flex items-center gap-2 rounded-full bg-brand-accent px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-primary"
+            className="inline-flex items-center gap-2 rounded-[10px] bg-[#0f1530] px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90"
           >
             <Plus className="h-4 w-4" />
-            New Invoice
+            New invoice
           </button>
+          </div>
         )}
       >
         <div className="space-y-6">
-          <InvoiceSummaryCards records={allInvoices} />
+          <InvoiceKpiCards
+            invoices={allInvoices}
+            invoicesComplete={isCompletePage(invoicesQuery.data)}
+            collected={collected}
+            now={now}
+          />
 
-          <section className="surface-card overflow-hidden">
+          <section className="overflow-hidden rounded-[14px] border border-[#e6dccb] bg-white">
             <div className="flex flex-col gap-4 border-b border-neutral-200 px-5 py-5 lg:flex-row lg:items-center lg:justify-between">
               <div className="flex flex-wrap items-center gap-2">
                 {invoiceFilterOptions.map((option) => (
@@ -294,54 +308,34 @@ export function InvoiceListClient() {
             ) : (
               <div className="overflow-x-auto">
                 <table className="min-w-full text-sm">
-                  <thead className="border-b border-neutral-200 bg-neutral-50 text-left text-xs font-semibold uppercase tracking-[0.18em] text-neutral-400">
+                  <thead className="border-b border-[#e6dccb] bg-[#fbf6ef] text-left font-mono text-[10px] uppercase tracking-[0.12em] text-[#5e6684]">
                     <tr>
-                      <th className="px-5 py-4">Invoice #</th>
+                      <th className="px-5 py-4">Invoice</th>
                       <th className="px-5 py-4">Customer</th>
-                      <th className="px-5 py-4">Job</th>
-                      <th className="px-5 py-4">Total</th>
-                      <th className="px-5 py-4">Amount Due</th>
-                      <th className="px-5 py-4">Status</th>
-                      <th className="px-5 py-4">Due Date</th>
-                      <th className="px-5 py-4 text-right">Action</th>
+                      <th className="px-5 py-4">Details</th>
+                      <th className="px-5 py-4">Amount</th>
+                      <th className="px-5 py-4">State</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-neutral-100">
                     {visibleInvoices.map((invoice) => (
-                      <tr
-                        key={invoice.id}
-                        className={cn(
-                          "transition hover:bg-brand-accent-light/40",
-                          invoice.status === "overdue" && "bg-error-light/35"
-                        )}
-                      >
-                        <td className="px-5 py-4 font-semibold text-brand-accent">{invoice.invoiceNumber}</td>
-                        <td className="px-5 py-4 text-neutral-700">
+                      <tr key={invoice.id} className="invoice-row-in transition hover:bg-[#fbf6ef]">
+                        <td className="px-5 py-4 font-semibold text-[#0f1530]">
+                          <Link href={`/invoices/${invoice.id}`} className="underline-offset-2 hover:underline">
+                            {invoice.invoiceNumber}
+                          </Link>
+                        </td>
+                        <td className="px-5 py-4 text-[#0f1530]">
                           {invoice.customer.firstName} {invoice.customer.lastName}
                         </td>
-                        <td className="px-5 py-4 text-neutral-500">{invoice.title ?? "General invoice"}</td>
-                        <td className="px-5 py-4 text-neutral-700">
-                          <CurrencyDisplay value={invoice.total} showCents />
+                        <td className="px-5 py-4 text-[#5e6684]">
+                          {formatDate(invoice.createdAt)} · {invoice.title ?? "General invoice"}
                         </td>
-                        <td className="px-5 py-4 font-semibold text-neutral-900">
-                          <CurrencyDisplay value={invoice.balanceDue} showCents />
+                        <td className="px-5 py-4 text-[#0f1530]">
+                          {usd.format(parseFloat(invoice.total) || 0)}
                         </td>
                         <td className="px-5 py-4">
-                          <StatBadge
-                            label={formatStatusLabel(invoice.status)}
-                            tone={getInvoiceStatusTone(invoice.status)}
-                          />
-                        </td>
-                        <td className="px-5 py-4 text-neutral-500">
-                          {invoice.dueAt ? formatDate(invoice.dueAt) : "—"}
-                        </td>
-                        <td className="px-5 py-4 text-right">
-                          <Link
-                            href={`/invoices/${invoice.id}`}
-                            className="inline-flex rounded-full bg-neutral-100 px-4 py-2 text-sm font-semibold text-brand-accent transition hover:bg-brand-accent-light"
-                          >
-                            View →
-                          </Link>
+                          <InvoiceStatePill state={getInvoiceRowState(invoice, now)} />
                         </td>
                       </tr>
                     ))}

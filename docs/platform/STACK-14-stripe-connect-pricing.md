@@ -4,14 +4,14 @@
 
 - **Flex ($299/mo):** Customers pay a **5% platform fee on top of** the invoice/service amount at checkout. Renvani collects it as the Stripe Connect **application fee**. The shop receives the **full invoice amount** (fee is not deducted from the shop).
 - **Flat ($799/mo):** **No** customer platform fee on invoice payments.
-- **No fee cap.** Single config: `STRIPE_PLATFORM_FEE_PERCENT` (decimal `0.05`).
+- **Service Fee:** customer-paid 2% from `SERVICE_FEE_RATE_BPS` (Flex/Founding/Startup; none on Flat). `STRIPE_PLATFORM_FEE_PERCENT` is legacy and no longer customer-facing.
 - **Test mode only.** Customer fee disclosure is configurable via `CUSTOMER_PLATFORM_FEE_DISCLOSURE` (Terms-owned copy; no hard-coded legal text in app).
 
 ## Configuration
 
 | Env | Purpose |
 | --- | --- |
-| `STRIPE_PLATFORM_FEE_PERCENT` | Decimal fraction for **Flex** customer-paid platform fee (e.g. `0.05` = 5%). **0** effective on Flat. |
+| `STRIPE_PLATFORM_FEE_PERCENT` | Legacy decimal (use `0.02`), still required by `env.ts`; no longer customer-facing; the customer Service Fee is SERVICE_FEE_RATE_BPS (2%) in @fsm/config/stripe-pricing. Connect status `platformFeePercent` is derived from the rate too. |
 | `CUSTOMER_PLATFORM_FEE_DISCLOSURE` | Optional copy shown on public pay surfaces; empty omits disclosure block. |
 | `STRIPE_PLATFORM_BILLING_PRICE_ID_FLEX` | Stripe Price id — Flex subscription |
 | `STRIPE_PLATFORM_BILLING_PRICE_ID_FLAT` | Stripe Price id — Flat subscription |

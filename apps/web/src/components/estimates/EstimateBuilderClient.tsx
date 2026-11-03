@@ -11,6 +11,7 @@ import type { CreateEstimateInput, EstimateStatus } from "@fsm/types";
 import { PageLayout } from "@/src/components/layout/PageLayout";
 import { CurrencyDisplay } from "@/src/components/ui/CurrencyDisplay";
 import { EmptyState } from "@/src/components/ui/EmptyState";
+import { ErrorState } from "@/src/components/ui/ErrorState";
 import { Sheet } from "@/src/components/ui/Sheet";
 import { SkeletonCard } from "@/src/components/ui/SkeletonCard";
 import { StatBadge } from "@/src/components/ui/StatBadge";
@@ -32,17 +33,20 @@ import { getCompanyTaxRate } from "@/src/components/jobs/jobs.utils";
 import { CustomerEstimateView } from "./CustomerEstimateView";
 import { EditableLineItemsTable } from "./EditableLineItemsTable";
 import { EstimateSendModal } from "./EstimateSendModal";
+import { EstimateChecksPanel, EstimateFrequencyOptions, EstimateTotalsCard } from "./EstimateFigmaPanels";
+import { buildEstimateSubtitle, canSendEstimate } from "./estimate-builder.utils";
 import {
   buildEstimatePublicPath,
   computeRevenueTotals,
+  calculateLineTotal,
   formatMoneyInput,
   formatStatusLabel,
   formatQuantityInput,
+  formatTaxRateInput,
   getEstimateStatusTone,
   groupEstimateDetails,
   lineItemFromEstimateItem,
   normalizeLineItems,
-  parseMoneyValue,
   type RevenueLineItemDraft
 } from "./estimates.utils";
 
@@ -252,8 +256,8 @@ function toEstimateLineItemPayload(item: RevenueLineItemDraft, index: number) {
     name: item.name,
     ...(item.description ? { description: item.description } : {}),
     itemType: item.itemType,
-    quantity: parseMoneyValue(item.quantity),
-    unitPrice: parseMoneyValue(item.unitPrice),
+    quantity: formatQuantityInput(item.quantity),
+    unitPrice: formatMoneyInput(item.unitPrice),
     isTaxable: item.isTaxable,
     sortOrder: index,
     ...(item.priceBookItemId ? { priceBookItemId: item.priceBookItemId } : {})
@@ -263,7 +267,7 @@ function toEstimateLineItemPayload(item: RevenueLineItemDraft, index: number) {
 function buildCreateEstimateInput(
   draft: EstimateDraftState,
   tier: EstimateTierDraft,
-  taxRate: number,
+  taxRate: string,
   tierGroupId?: string
 ): CreateEstimateInput {
   return {
@@ -272,7 +276,7 @@ function buildCreateEstimateInput(
     ...(draft.jobId ? { jobId: draft.jobId } : {}),
     ...(draft.title.trim() ? { title: draft.title.trim() } : {}),
     ...(draft.messageToCustomer.trim() ? { messageToCustomer: draft.messageToCustomer.trim() } : {}),
-    discountAmount: parseMoneyValue(draft.discountAmount),
+    discountAmount: formatMoneyInput(draft.discountAmount),
     taxRate,
     financingOffered: draft.financingOffered,
     ...(tier.label ? { tierLabel: tier.label } : {}),
@@ -281,19 +285,19 @@ function buildCreateEstimateInput(
   };
 }
 
-function buildPublicEstimatePreview(draft: EstimateDraftState, taxRate: number): PublicEstimateRecord {
+function buildPublicEstimatePreview(draft: EstimateDraftState, taxRate: string): PublicEstimateRecord {
   if (draft.mode === "single") {
-    const totals = computeRevenueTotals(draft.single.items, taxRate, parseMoneyValue(draft.discountAmount));
+    const totals = computeRevenueTotals(draft.single.items, taxRate, draft.discountAmount);
     return {
       estimateNumber: draft.single.estimateNumber ?? "DRAFT",
       title: draft.title || "Estimate",
       status: draft.single.status,
       messageToCustomer: draft.messageToCustomer || null,
-      subtotal: formatMoneyInput(totals.subtotal),
-      taxRate: formatMoneyInput(taxRate),
-      taxAmount: formatMoneyInput(totals.taxAmount),
-      discountAmount: formatMoneyInput(totals.discountAmount),
-      total: formatMoneyInput(totals.total),
+      subtotal: totals.subtotal,
+      taxRate,
+      taxAmount: totals.taxAmount,
+      discountAmount: totals.discountAmount,
+      total: totals.total,
       financingOffered: draft.financingOffered,
       tierLabel: null,
       expiresAt: null,
@@ -303,28 +307,28 @@ function buildPublicEstimatePreview(draft: EstimateDraftState, taxRate: number):
         description: item.description || null,
         quantity: formatQuantityInput(item.quantity),
         unitPrice: formatMoneyInput(item.unitPrice),
-        total: formatMoneyInput(parseMoneyValue(item.quantity) * parseMoneyValue(item.unitPrice))
+        total: calculateLineTotal(item.quantity, item.unitPrice)
       }))
     };
   }
 
   const tiers = draft.tiers.map((tier) => {
-    const totals = computeRevenueTotals(tier.items, taxRate, parseMoneyValue(draft.discountAmount));
+    const totals = computeRevenueTotals(tier.items, taxRate, draft.discountAmount);
     return {
       estimateNumber: tier.estimateNumber ?? tier.key.toUpperCase(),
       title: draft.title || `Option ${tier.label ?? tier.key}`,
       tierLabel: tier.label,
-      subtotal: formatMoneyInput(totals.subtotal),
-      taxRate: formatMoneyInput(taxRate),
-      taxAmount: formatMoneyInput(totals.taxAmount),
-      discountAmount: formatMoneyInput(totals.discountAmount),
-      total: formatMoneyInput(totals.total),
+      subtotal: totals.subtotal,
+      taxRate,
+      taxAmount: totals.taxAmount,
+      discountAmount: totals.discountAmount,
+      total: totals.total,
       items: normalizeLineItems(tier.items).map((item) => ({
         name: item.name,
         description: item.description || null,
         quantity: formatQuantityInput(item.quantity),
         unitPrice: formatMoneyInput(item.unitPrice),
-        total: formatMoneyInput(parseMoneyValue(item.quantity) * parseMoneyValue(item.unitPrice))
+        total: calculateLineTotal(item.quantity, item.unitPrice)
       }))
     };
   });
@@ -336,7 +340,7 @@ function buildPublicEstimatePreview(draft: EstimateDraftState, taxRate: number):
     status: draft.tiers.some((tier) => tier.status === "approved") ? "approved" : draft.tiers[0]?.status ?? "draft",
     messageToCustomer: draft.messageToCustomer || null,
     subtotal: selectedTier?.subtotal ?? "0.00",
-    taxRate: selectedTier?.taxRate ?? formatMoneyInput(taxRate),
+    taxRate: selectedTier?.taxRate ?? taxRate,
     taxAmount: selectedTier?.taxAmount ?? "0.00",
     discountAmount: selectedTier?.discountAmount ?? formatMoneyInput(draft.discountAmount),
     total: selectedTier?.total ?? "0.00",
@@ -402,10 +406,13 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
   const [declineOpen, setDeclineOpen] = useState(false);
   const [declineForm, setDeclineForm] = useState<DeclineFormState>(emptyDeclineForm);
   const [editingOverride, setEditingOverride] = useState(false);
+  const [saveNow, setSaveNow] = useState(0);
+  const saveNowRef = useRef(false);
 
   const hydratedEstimateIdRef = useRef<string | null>(null);
   const savedSignatureRef = useRef<string>(getDraftSignature(createDefaultDraft()));
   const draftSignature = getDraftSignature(draft);
+  const isDirty = draftSignature !== savedSignatureRef.current;
 
   const selectedCustomerId = draft.customerId || null;
   const customerDetailQuery = useCustomer(selectedCustomerId);
@@ -424,8 +431,8 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
   const isExisting = Boolean(estimateId);
   const isEditable = !isExisting || editingOverride || currentStatus === "draft" || currentStatus === "revised";
   const taxRate = primaryEstimate?.taxRate
-    ? parseMoneyValue(primaryEstimate.taxRate)
-    : getCompanyTaxRate(companyQuery.data?.company.settings);
+    ? formatTaxRateInput(primaryEstimate.taxRate)
+    : formatTaxRateInput(getCompanyTaxRate(companyQuery.data?.company.settings));
   const preview = useMemo(() => buildPublicEstimatePreview(draft, taxRate), [draft, taxRate]);
   const activeTier =
     draft.mode === "single"
@@ -434,7 +441,7 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
         ?? draft.tiers[1]
         ?? draft.tiers[0]
         ?? createEmptyTier("better", "Better");
-  const activeTotals = computeRevenueTotals(activeTier.items, taxRate, parseMoneyValue(draft.discountAmount));
+  const activeTotals = computeRevenueTotals(activeTier.items, taxRate, draft.discountAmount);
   const anchorTier = getAnchorTier(draft);
   const anchorPublicPath = buildEstimatePublicPath(anchorTier?.approvalToken);
   const anchorPublicUrl =
@@ -462,7 +469,9 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
       return;
     }
 
+    const delay = saveNowRef.current ? 0 : 2000;
     const timeoutId = window.setTimeout(() => {
+      saveNowRef.current = false;
       void (async () => {
         setSaveState("saving");
         setErrorMessage(null);
@@ -502,7 +511,7 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
               ...(draft.title.trim() ? { title: draft.title.trim() } : {}),
               messageToCustomer: draft.messageToCustomer,
               financingOffered: draft.financingOffered,
-              discountAmount: parseMoneyValue(draft.discountAmount),
+              discountAmount: formatMoneyInput(draft.discountAmount),
               taxRate
             });
 
@@ -577,7 +586,7 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
                 ...(draft.title.trim() ? { title: draft.title.trim() } : {}),
                 messageToCustomer: draft.messageToCustomer,
                 financingOffered: draft.financingOffered,
-                discountAmount: parseMoneyValue(draft.discountAmount),
+                discountAmount: formatMoneyInput(draft.discountAmount),
                 taxRate,
                 tierLabel: tier.label ?? undefined,
                 tierGroupId: currentGroupId
@@ -656,7 +665,7 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
           setErrorMessage(error instanceof Error ? error.message : "Estimate draft could not be saved.");
         }
       })();
-    }, 2000);
+    }, delay);
 
     return () => window.clearTimeout(timeoutId);
   }, [
@@ -668,6 +677,7 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
     isExisting,
     queryClient,
     router,
+    saveNow,
     taxRate
   ]);
 
@@ -814,7 +824,17 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
     );
   }
 
-  if (isExisting && (groupQuery.isError || !groupQuery.data)) {
+  if (isExisting && groupQuery.isError) {
+    return (
+      <ErrorState
+        title="Estimate couldn't load"
+        onRetry={() => void groupQuery.refetch()}
+        isRetrying={groupQuery.isFetching}
+      />
+    );
+  }
+
+  if (isExisting && !groupQuery.data) {
     return (
       <EmptyState
         icon={WandSparkles}
@@ -832,8 +852,16 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
   return (
     <>
       <PageLayout
-        title={isExisting ? draft.title || "Estimate Detail" : "New Estimate"}
-        subtitle={isExisting ? `${draft.customerId ? "Saved draft and approval state" : "Build the scope, send it out, and capture approval."}` : "Build a single quote or a Good / Better / Best option set."}
+        title={isExisting ? "Estimate" : "New estimate"}
+        subtitle={
+          (isExisting
+            ? buildEstimateSubtitle({
+                estimateNumber: primaryEstimate?.estimateNumber ?? null,
+                customerName: primaryEstimate ? `${primaryEstimate.customer.firstName} ${primaryEstimate.customer.lastName}` : null,
+                address: primaryEstimate?.property?.addressLine1 ?? null
+              })
+            : null) ?? "Build a single quote or a Good / Better / Best option set."
+        }
         actions={(
           <div className="flex flex-wrap items-center gap-2">
             <Link href="/estimates" className="text-sm font-semibold text-brand-accent">
@@ -841,6 +869,37 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
             </Link>
             {isExisting ? (
               <StatBadge label={formatStatusLabel(currentStatus)} tone={getEstimateStatusTone(currentStatus)} />
+            ) : null}
+            {isExisting && groupQuery.data?.primary.tierGroupId ? (
+              <Link
+                href={`/estimates/option-sets/${groupQuery.data.primary.tierGroupId}`}
+                className="rounded-[10px] border border-[#e6dccb] bg-white px-4 py-2 text-sm font-semibold text-[#0f1530]"
+              >
+                Manage options
+              </Link>
+            ) : null}
+            {isEditable ? (
+              <>
+                <button
+                  type="button"
+                  disabled={!draft.customerId || saveState === "saving" || draftSignature === savedSignatureRef.current}
+                  onClick={() => {
+                    saveNowRef.current = true;
+                    setSaveNow((n) => n + 1);
+                  }}
+                  className="rounded-[10px] border border-[#e6dccb] bg-white px-4 py-2 text-sm font-semibold text-[#0f1530] disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {saveState === "saving" ? "Saving…" : "Save draft"}
+                </button>
+                <button
+                  type="button"
+                  disabled={!canSendEstimate({ hasEstimateId: Boolean(anchorTier?.estimateId), isDirty, saveState })}
+                  onClick={() => setSendModalOpen(true)}
+                  className="rounded-[10px] bg-[#f6b400] px-4 py-2 text-sm font-semibold text-[#0f1530] disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Approve &amp; send
+                </button>
+              </>
             ) : null}
           </div>
         )}
@@ -999,6 +1058,8 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
                       subtitle="Add products, labor, fees, or materials from the catalog and keep the estimate draft current."
                       items={draft.single.items}
                       readOnly={!isEditable}
+                      variant="frame"
+                      discountAmount={activeTotals.discountAmount}
                       onChange={(items) =>
                         setDraft((current) => ({
                           ...current,
@@ -1013,7 +1074,7 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
                 ) : (
                   <div className="mt-5 space-y-4">
                     {draft.tiers.map((tier) => {
-                      const tierTotals = computeRevenueTotals(tier.items, taxRate, parseMoneyValue(draft.discountAmount));
+                      const tierTotals = computeRevenueTotals(tier.items, taxRate, draft.discountAmount);
                       const expanded = activeTierKey === tier.key;
 
                       return (
@@ -1046,6 +1107,8 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
                                 subtitle={`Scope and pricing for the ${tier.label?.toLowerCase()} option.`}
                                 items={tier.items}
                                 readOnly={!isEditable}
+                                variant="frame"
+                                discountAmount={tierTotals.discountAmount}
                                 onChange={(items) =>
                                   setDraft((current) => ({
                                     ...current,
@@ -1069,6 +1132,17 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
                 )}
               </section>
 
+              <EstimateTotalsCard
+                label={draft.mode === "tiers" ? activeTier.label : null}
+                subtotal={activeTotals.subtotal}
+                taxAmount={activeTotals.taxAmount}
+                taxRate={taxRate}
+                discountAmount={activeTotals.discountAmount}
+                total={activeTotals.total}
+              />
+
+              <EstimateFrequencyOptions />
+
               {errorMessage ? (
                 <section className="rounded-[28px] border border-error/20 bg-error-light px-5 py-4 text-sm text-error">
                   {errorMessage}
@@ -1077,6 +1151,11 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
             </div>
 
             <aside className="space-y-6">
+              <EstimateChecksPanel
+                status={currentStatus}
+                discountAmount={activeTotals.discountAmount}
+                expiresAt={primaryEstimate?.expiresAt ?? null}
+              />
               <section className="surface-card px-5 py-5">
                 <div className="space-y-2">
                   <label className="text-sm font-semibold text-neutral-700">Notes to customer</label>
@@ -1138,14 +1217,6 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
                   ) : null}
 
                   <div className="flex items-center justify-between gap-3 text-neutral-500">
-                    <span>Subtotal</span>
-                    <CurrencyDisplay value={activeTotals.subtotal} showCents />
-                  </div>
-                  <div className="mt-2 flex items-center justify-between gap-3 text-neutral-500">
-                    <span>Tax ({(taxRate * 100).toFixed(2)}%)</span>
-                    <CurrencyDisplay value={activeTotals.taxAmount} showCents />
-                  </div>
-                  <div className="mt-2 flex items-center justify-between gap-3 text-neutral-500">
                     <span>Discount</span>
                     {isEditable ? (
                       <input
@@ -1164,19 +1235,12 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
                   </div>
                 </div>
 
-                <div className="mt-4 border-t border-neutral-200 pt-4">
-                  <div className="flex items-center justify-between gap-3 text-base font-semibold text-neutral-900">
-                    <span>Total</span>
-                    <CurrencyDisplay value={activeTotals.total} showCents className="text-2xl" />
-                  </div>
-                </div>
-
                 <div className="mt-5 space-y-3">
                   {isEditable ? (
                     <>
                       <button
                         type="button"
-                        disabled={!anchorTier?.estimateId || saveState === "saving"}
+                        disabled={!canSendEstimate({ hasEstimateId: Boolean(anchorTier?.estimateId), isDirty, saveState })}
                         onClick={() => setSendModalOpen(true)}
                         className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-brand-accent px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-primary disabled:cursor-not-allowed disabled:opacity-50"
                       >
@@ -1294,7 +1358,7 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
                             <p className="text-xs text-neutral-500">{tier.items.length} items</p>
                           </div>
                           <CurrencyDisplay
-                            value={computeRevenueTotals(tier.items, taxRate, parseMoneyValue(draft.discountAmount)).total}
+                            value={computeRevenueTotals(tier.items, taxRate, draft.discountAmount).total}
                             showCents
                             className="font-semibold text-neutral-900"
                           />
@@ -1321,7 +1385,7 @@ export function EstimateBuilderClient({ estimateId }: { estimateId?: string }) {
         customerPhone={customerDetailQuery.data?.customer.phone ?? null}
         estimateNumber={anchorTier?.estimateNumber ?? "DRAFT"}
         publicUrl={anchorPublicUrl}
-        defaultMessage={`Hi ${customerDetailQuery.data?.customer.firstName ?? ""}, here is your ServiceRev estimate. Review and approve here: {{link}}`}
+        defaultMessage={`Hi ${customerDetailQuery.data?.customer.firstName ?? ""}, here is your Renvani estimate. Review and approve here: {{link}}`}
         isPending={false}
         onSend={sendEstimateToCustomer}
       />

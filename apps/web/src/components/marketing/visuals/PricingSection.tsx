@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 import { formatUsd } from "@/src/content/marketing-content";
-import { DEFAULT_BOOKING_FEE, type PricingData } from "@/src/content/page-sections";
+import { type PricingData } from "@/src/content/page-sections";
 
 export type BillingPeriod = "monthly" | "annual";
 
@@ -75,9 +75,6 @@ export function PricingSection({
             </article>
           ))}
         </div>
-        <p data-testid="booking-fee" className="mt-6 text-sm" style={{ color: "var(--color-mkt-muted)" }}>
-          {pricing.bookingFee ?? DEFAULT_BOOKING_FEE}
-        </p>
       </div>
     </section>
   );

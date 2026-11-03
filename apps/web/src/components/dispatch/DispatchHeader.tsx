@@ -8,6 +8,15 @@ import { cn } from "@/src/lib/utils";
 export interface DispatchUnassignedJob {
   id: string;
   label: string;
+  /** Pill text (10:550). Defaults to "Unassigned"; "Reschedule" when proposing for an already-scheduled job. */
+  statusLabel?: string;
+}
+
+/** Top auto-fit proposal for the banner job (10:555 copy + 10:557 Approve). Nothing is applied until Approve. */
+export interface DispatchBannerSuggestion {
+  technicianName: string;
+  rangeLabel: string;
+  jobMeta?: string;
 }
 
 interface DispatchHeaderProps {
@@ -16,7 +25,10 @@ interface DispatchHeaderProps {
   unassignedJob: DispatchUnassignedJob | null;
   autoFitPending: boolean;
   canAddVisit: boolean;
+  suggestion?: DispatchBannerSuggestion | null;
+  approvePending?: boolean;
   onAutoAssign: (jobId: string) => void;
+  onApprove?: () => void;
   onAddVisit: () => void;
 }
 
@@ -27,7 +39,10 @@ export function DispatchHeader({
   unassignedJob,
   autoFitPending,
   canAddVisit,
+  suggestion = null,
+  approvePending = false,
   onAutoAssign,
+  onApprove,
   onAddVisit
 }: DispatchHeaderProps) {
   return (
@@ -72,23 +87,40 @@ export function DispatchHeader({
       {unassignedJob ? (
         <section
           data-dispatch-reveal
-          aria-label="Unassigned job"
+          aria-label={unassignedJob.statusLabel === "Reschedule" ? "Proposed reschedule" : "Unassigned job"}
           className="flex flex-col gap-3 rounded-[14px] bg-[#fff4d6] px-[18px] py-[14px] md:flex-row md:items-center"
         >
           <span className="inline-flex shrink-0 items-center gap-[6px] rounded-full px-[10px] py-1 text-xs font-semibold text-[#7a5600]">
             <img src="/dispatch/status-unassigned-dot.svg" alt="" width={6} height={6} />
-            Unassigned
+            {unassignedJob.statusLabel ?? "Unassigned"}
           </span>
-          <p className="min-w-0 flex-1 truncate text-sm font-semibold text-[#0f1530]">{unassignedJob.label}</p>
-          <p className="text-[13px] text-[#2a3360]">Scheduling Agent can propose a crew and time. Nothing changes until you accept.</p>
-          <button
-            type="button"
-            disabled={autoFitPending}
-            onClick={() => onAutoAssign(unassignedJob.id)}
-            className="h-9 shrink-0 rounded-[10px] bg-[#f6b400] px-[14px] text-[13px] font-semibold text-[#0f1530] transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {autoFitPending ? "Finding fit..." : "Review proposal"}
-          </button>
+          <p className="min-w-0 flex-1 truncate text-sm font-semibold text-[#0f1530]">{unassignedJob.label}
+            {suggestion?.jobMeta ? ` · ${suggestion.jobMeta}` : ""}
+          </p>
+          <p className="text-[13px] text-[#2a3360]">
+            {suggestion
+              ? `Scheduling Agent suggests ${suggestion.technicianName} (fits ${suggestion.rangeLabel})`
+              : "Scheduling Agent can propose a crew and time. Nothing changes until you accept."}
+          </p>
+          {suggestion && onApprove ? (
+            <button
+              type="button"
+              disabled={approvePending}
+              onClick={onApprove}
+              className="h-9 shrink-0 rounded-[10px] bg-[#f6b400] px-[14px] text-[13px] font-semibold text-[#0f1530] transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {approvePending ? "Approving..." : "Approve"}
+            </button>
+          ) : (
+            <button
+              type="button"
+              disabled={autoFitPending}
+              onClick={() => onAutoAssign(unassignedJob.id)}
+              className="h-9 shrink-0 rounded-[10px] bg-[#f6b400] px-[14px] text-[13px] font-semibold text-[#0f1530] transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {autoFitPending ? "Finding fit..." : "Review proposal"}
+            </button>
+          )}
         </section>
       ) : null}
     </div>

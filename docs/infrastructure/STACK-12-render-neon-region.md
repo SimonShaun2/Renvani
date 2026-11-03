@@ -9,7 +9,7 @@ Neon PostgreSQL must be provisioned in the **same cloud region** as the Render *
 
 ## Checklist (staging / prod)
 
-1. Note Render API service region (e.g. Oregon `oregon`).
+1. Render region is Ohio `ohio` (Neon project is US East (Ohio)); all four Blueprint entries use it.
 2. Create or select Neon project in the matching region.
 3. Set `DATABASE_URL` on Render API, worker, and webhook from Neon (prefer pooler endpoint for web/worker).
 4. Set Vercel `NEXT_PUBLIC_API_URL` to the Render API hostname for that environment.
@@ -30,3 +30,5 @@ When `batch-ci` uses Neon **per-PR branches**, preview Render services (if any) 
 - [FS-93 Render runbook](../platform/FS-93-render-runbook.md)
 - [OFFICIAL-OPERATIONAL-STACK.md](../OFFICIAL-OPERATIONAL-STACK.md)
 - [OFFICIAL-STACK-GAP-ANALYSIS.md](../platform/OFFICIAL-STACK-GAP-ANALYSIS.md)
+
+**Blueprint:** canonical file is `/render.yaml` (identical reference copy: `docs/infrastructure/render-blueprint.render.yaml`). Apply steps: `docs/infrastructure/RENDER-DEPLOY-RUNBOOK.md` (FS-93).

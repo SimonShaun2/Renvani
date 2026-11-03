@@ -15,14 +15,14 @@ describe("stripe-pricing", () => {
   });
 
   it("computes customer-paid platform fee on top of invoice total", async () => {
-    const { computeCustomerPaidPlatformFee } = await import("./stripe-pricing.js");
+    const { computeCustomerPaidPlatformFee, SERVICE_FEE_RATE_BPS } = await import("./stripe-pricing.js");
 
-    const breakdown = computeCustomerPaidPlatformFee("100.00", 0.05);
+    const breakdown = computeCustomerPaidPlatformFee("100.00", SERVICE_FEE_RATE_BPS / 10_000);
     expect(breakdown).toEqual({
       invoiceAmount: "100.00",
-      platformFeeAmount: "5.00",
-      totalDue: "105.00",
-      platformFeePercent: 5
+      platformFeeAmount: "2.00",
+      totalDue: "102.00",
+      platformFeePercent: 2
     });
 
     const flat = computeCustomerPaidPlatformFee("250.50", 0);
@@ -32,14 +32,14 @@ describe("stripe-pricing", () => {
   });
 
   it("applies configured flex shop fee fraction", async () => {
-    vi.stubEnv("STRIPE_PLATFORM_FEE_PERCENT", "0.05");
+    const { flexConnectApplicationFeeFraction, resolveConnectApplicationFeeFraction, SERVICE_FEE_RATE_BPS } =
+      await import("./stripe-pricing.js");
+    const fraction = SERVICE_FEE_RATE_BPS / 10_000;
+    vi.stubEnv("STRIPE_PLATFORM_FEE_PERCENT", String(fraction));
     resetEnvCacheForTests();
-    const { flexConnectApplicationFeeFraction, resolveConnectApplicationFeeFraction } = await import(
-      "./stripe-pricing.js"
-    );
 
-    expect(flexConnectApplicationFeeFraction()).toBe(0.05);
-    expect(resolveConnectApplicationFeeFraction("flex")).toBe(0.05);
+    expect(flexConnectApplicationFeeFraction()).toBe(fraction);
+    expect(resolveConnectApplicationFeeFraction("flex")).toBe(fraction);
     expect(resolveConnectApplicationFeeFraction("flat")).toBe(0);
     expect(resolveConnectApplicationFeeFraction(null)).toBe(0);
   });

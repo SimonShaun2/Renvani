@@ -25,6 +25,33 @@ describe("FS-93 render blueprint reference", () => {
     expect(result).toEqual({ ok: true });
   });
 
+  it("root render.yaml is byte-identical to the reference copy and passes the same rules", () => {
+    const root = readFileSync(join(repoRoot, FS93_RENDER_BLUEPRINT_REF.rootPath), "utf8");
+    expect(root).toBe(readFileSync(blueprintPath, "utf8"));
+    expect(validateFs93RenderBlueprintYaml(root)).toEqual({ ok: true });
+  });
+
+  it("rejects literal secret values, free plans, a Render Postgres block, and missing proxy hops", () => {
+    const yaml = readFileSync(blueprintPath, "utf8");
+    const withLiteral = yaml.replace(
+      /- key: JWT_SECRET\n\s*sync: false/,
+      "- key: JWT_SECRET\n        value: not-a-real-secret"
+    );
+    expect(validateFs93RenderBlueprintYaml(withLiteral)).toMatchObject({ ok: false });
+    expect(validateFs93RenderBlueprintYaml(yaml.replace("plan: 256mb", "plan: free"))).toMatchObject({ ok: false });
+    expect(validateFs93RenderBlueprintYaml(`${yaml}\ndatabases:\n  - name: pg\n`)).toMatchObject({ ok: false });
+    expect(
+      validateFs93RenderBlueprintYaml(yaml.replace(/TRUST_PROXY_HOPS\n(\s*)value: "1"/g, 'TRUST_PROXY_HOPS\n$1value: "0"'))
+    ).toMatchObject({ ok: false });
+  });
+
+  it("requires region: ohio on all four entries (STACK-12, Neon US East Ohio)", () => {
+    const yaml = readFileSync(blueprintPath, "utf8");
+    expect(FS93_RENDER_BLUEPRINT_REF.region).toBe("ohio");
+    expect([...yaml.matchAll(/^\s+region:\s*(\S+)\s*$/gm)].map((m) => m[1])).toEqual(["ohio", "ohio", "ohio", "ohio"]);
+    expect(validateFs93RenderBlueprintYaml(yaml.replace("    region: ohio", "    region: oregon"))).toMatchObject({ ok: false });
+  });
+
   it("STACK-12 runbook links FS-93 runbook and Neon region rule", () => {
     const doc = readFileSync(
       join(repoRoot, "docs/infrastructure/STACK-12-render-neon-region.md"),
@@ -33,5 +60,6 @@ describe("FS-93 render blueprint reference", () => {
     expect(doc).toContain("Neon");
     expect(doc).toContain("FS-93");
     expect(doc).toContain("render-blueprint.render.yaml");
+    expect(doc).toContain("`ohio`");
   });
 });

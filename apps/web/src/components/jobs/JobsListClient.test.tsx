@@ -14,6 +14,7 @@ vi.mock("next/link", () => ({
 }));
 
 import { JobsListClient } from "./JobsListClient";
+import { chipFilters, currentWeek, deriveWeekCounts, formatWhen, jobStateChip } from "./jobsList.config";
 
 const job = {
   id: "j1",
@@ -58,20 +59,27 @@ describe("JobsListClient", () => {
   beforeEach(() => useJobsList.mockReset());
   afterEach(() => cleanup());
 
-  it("renders rows linking to job detail", () => {
-    useJobsList.mockReturnValue({ data: { data: [job], total: 1, page: 1, limit: 25, totalPages: 1 }, isLoading: false, isError: false });
+  it("renders frame columns with job number, short tech and state chip", () => {
+    useJobsList.mockReturnValue({ data: { data: [{ ...job, technician: { id: "t1", firstName: "Marco", lastName: "Ruiz", phone: null, calendarColor: null } }], total: 1, totalPages: 1 }, isLoading: false, isError: false });
     render(<JobsListClient />);
+    expect(screen.getByRole("link", { name: "2041" }).getAttribute("href")).toBe("/jobs/j1");
     expect(screen.getByRole("link", { name: "Water heater replacement" }).getAttribute("href")).toBe("/jobs/j1");
-    expect(screen.getByRole("table").textContent).toContain("In Progress");
-    expect(screen.getByText("Unassigned")).toBeTruthy();
+    const table = screen.getByRole("table").textContent ?? "";
+    expect(table).toContain("Marco R.");
+    expect(table).toContain("In progress");
+    expect(table).not.toMatch(/Total/i);
+    expect(screen.getByRole("button", { name: "All · 1" })).toBeTruthy();
+    expect(screen.getAllByText("—").length).toBeGreaterThan(0);
+    expect(screen.getByPlaceholderText("Search jobs, customers…")).toBeTruthy();
+    expect(new Set(useJobsList.mock.calls.map((c) => c[0].limit))).toEqual(new Set([100, 25]));
   });
 
-  it("passes status filter to the query", () => {
-    useJobsList.mockReturnValue({ data: { data: [], total: 0, page: 1, limit: 25, totalPages: 1 }, isLoading: false, isError: false });
+  it("unpaid chip filters by invoiced status", () => {
+    useJobsList.mockReturnValue({ data: { data: [], total: 0, totalPages: 1 }, isLoading: false, isError: false });
     render(<JobsListClient />);
     expect(screen.getByText("No jobs yet")).toBeTruthy();
-    fireEvent.change(screen.getByLabelText("Status"), { target: { value: "completed" } });
-    expect(useJobsList).toHaveBeenLastCalledWith(expect.objectContaining({ status: "completed", page: 1 }));
+    fireEvent.click(screen.getByRole("button", { name: /^Unpaid/ }));
+    expect(useJobsList).toHaveBeenLastCalledWith(expect.objectContaining({ status: "invoiced", limit: 25 }));
     expect(screen.getByText("No jobs match these filters")).toBeTruthy();
   });
 
@@ -81,5 +89,24 @@ describe("JobsListClient", () => {
     render(<JobsListClient />);
     fireEvent.click(screen.getByRole("button", { name: "Retry" }));
     expect(refetch).toHaveBeenCalled();
+  });
+});
+
+describe("jobsList.config", () => {
+  const now = new Date(2026, 9, 27, 9, 0);
+  it("formats When like the frame", () => {
+    expect(formatWhen(new Date(2026, 9, 27, 10, 30).toISOString(), now)).toBe("Today 10:30a");
+    expect(formatWhen(new Date(2026, 9, 26, 10, 30).toISOString(), now)).toBe("Yesterday");
+    expect(formatWhen(new Date(2026, 9, 20, 10, 30).toISOString(), now)).toBe("Oct 20");
+    expect(formatWhen(null, now)).toBe("—");
+  });
+  it("maps state chips and week range", () => {
+    expect(jobStateChip("dispatched")).toEqual({ label: "On the way", tone: "blue" });
+    expect(jobStateChip("invoiced").label).toBe("Unpaid");
+    expect(currentWeek(now)).toEqual({ from: "2026-10-26", to: "2026-11-01" });
+    expect(deriveWeekCounts({ data: [{ scheduledStart: new Date(2026, 9, 27, 8).toISOString() }, { scheduledStart: null }], total: 2 }, now)).toEqual({ week: 2, today: 1 });
+    expect(deriveWeekCounts({ data: [], total: 150 }, now)).toEqual({ week: 150, today: undefined });
+    expect(deriveWeekCounts(undefined, now)).toEqual({ week: undefined, today: undefined });
+    expect(chipFilters("today", now)).toEqual({ status: "all", from: "2026-10-27", to: "2026-10-27" });
   });
 });

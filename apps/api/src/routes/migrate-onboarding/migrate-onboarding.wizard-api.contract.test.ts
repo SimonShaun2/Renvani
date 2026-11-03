@@ -7,6 +7,10 @@ import { describe, expect, it } from "vitest";
 import { MIGRATE_ONBOARDING_WIZARD_API_ROUTES } from "@fsm/types";
 
 const routeModulePath = join(dirname(fileURLToPath(import.meta.url)), "index.ts");
+const savedCardRouteModulePath = join(
+  dirname(fileURLToPath(import.meta.url)),
+  "../saved-card-migration/index.ts"
+);
 
 function extractRegisteredRoutes(source: string): Array<{ method: string; path: string }> {
   const routes: Array<{ method: string; path: string }> = [];
@@ -32,7 +36,8 @@ function extractRegisteredRoutes(source: string): Array<{ method: string; path: 
 describe("migrate onboarding wizard API route registration contract", () => {
   it("matches the shared wizard API contract manifest", () => {
     const source = readFileSync(routeModulePath, "utf8");
-    const registered = extractRegisteredRoutes(source);
+    const savedCardSource = readFileSync(savedCardRouteModulePath, "utf8");
+    const registered = [...extractRegisteredRoutes(source), ...extractRegisteredRoutes(savedCardSource)];
     const expected = MIGRATE_ONBOARDING_WIZARD_API_ROUTES.map((route) => ({
       method: route.method,
       path: route.path

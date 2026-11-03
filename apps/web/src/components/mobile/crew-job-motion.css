@@ -1,0 +1,16 @@
+/* Feature-scoped motion for Crew job frames (1:13, 1:23, 10:1917). */
+@keyframes crew-check-pop {
+  0% { transform: scale(0.85); }
+  60% { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
+.crew-check-done {
+  animation: crew-check-pop 200ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .crew-check-done {
+    animation: none;
+  }
+}

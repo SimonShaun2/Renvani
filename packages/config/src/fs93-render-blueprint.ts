@@ -3,13 +3,16 @@
  * Validates design intent only; no live Render deploy.
  */
 export const FS93_RENDER_BLUEPRINT_REF = {
+  /** Canonical Blueprint Render reads from the repo root. */
+  rootPath: "render.yaml",
+  /** Reference copy kept byte-identical to rootPath. */
   relativePath: "docs/infrastructure/render-blueprint.render.yaml",
   keyValue: {
     name: "renvani-bullmq-kv",
     maxmemoryPolicy: "noeviction"
   },
   renderServices: {
-    api: { name: "renvani-api", type: "web", healthCheckPath: "/health" },
+    api: { name: "renvani-api", type: "web", healthCheckPath: "/health/live" },
     worker: { name: "renvani-worker", type: "worker" },
     webhook: { name: "renvani-webhook", type: "web", healthCheckPath: "/health" }
   },
@@ -17,7 +20,31 @@ export const FS93_RENDER_BLUEPRINT_REF = {
     provider: "neon",
     connectionEnvVar: "DATABASE_URL"
   },
-  webHost: "vercel"
+  webHost: "vercel",
+  /** STACK-12: Neon project is US East (Ohio); every Render entry must use the same region. */
+  region: "ohio",
+  /** Env names that hold credentials: must never carry a literal `value:` in the Blueprint. */
+  secretEnvVars: [
+    "DATABASE_URL",
+    "STRIPE_SECRET_KEY",
+    "STRIPE_WEBHOOK_SECRET",
+    "STRIPE_CONNECT_CLIENT_ID",
+    "OPENAI_API_KEY",
+    "TWILIO_ACCOUNT_SID",
+    "TWILIO_AUTH_TOKEN",
+    "SENDGRID_API_KEY",
+    "RESEND_API_KEY",
+    "R2_ACCESS_KEY_ID",
+    "R2_SECRET_ACCESS_KEY",
+    "JWT_SECRET",
+    "JWT_REFRESH_SECRET",
+    "BOOKING_HOLD_TOKEN_SECRET",
+    "CLERK_SECRET_KEY",
+    "CLERK_WEBHOOK_SECRET",
+    "SENTRY_DSN",
+    "QUICKBOOKS_CLIENT_SECRET",
+    "QUICKBOOKS_TOKEN_ENCRYPTION_KEY"
+  ]
 } as const;
 
 export type Fs93RenderBlueprintRef = typeof FS93_RENDER_BLUEPRINT_REF;
@@ -31,6 +58,13 @@ export function validateFs93RenderBlueprintYaml(yaml: string): Fs93BlueprintVali
 
   if (!/STATUS:\s*NOT APPLIED/i.test(yaml)) {
     violations.push("blueprint header must mark STATUS: NOT APPLIED");
+  }
+
+  const regions = [...yaml.matchAll(/^\s+region:\s*(\S+)\s*$/gm)].map((m) => m[1]);
+  if (regions.length !== 4 || regions.some((r) => r !== FS93_RENDER_BLUEPRINT_REF.region)) {
+    violations.push(
+      `all four entries (api, worker, webhook, Key Value) must set region: ${FS93_RENDER_BLUEPRINT_REF.region} (STACK-12, Neon US East Ohio)`
+    );
   }
 
   if (/^databases:/m.test(yaml)) {
@@ -82,6 +116,21 @@ export function validateFs93RenderBlueprintYaml(yaml: string): Fs93BlueprintVali
 
   if (!yaml.includes("preDeployCommand:") || !yaml.includes("db:migrate")) {
     violations.push("API preDeployCommand must run Drizzle migrations (db:migrate)");
+  }
+
+  for (const name of FS93_RENDER_BLUEPRINT_REF.secretEnvVars) {
+    const literal = new RegExp(`- key: ${name}\\s*\\n\\s*value:`, "m");
+    if (literal.test(yaml)) {
+      violations.push(`${name} must be sync: false (no literal value in the Blueprint)`);
+    }
+  }
+
+  if (/^\s*plan:\s*free\s*$/m.test(yaml)) {
+    violations.push("free plan is not viable (no free background workers; free Key Value has no persistence; free web spins down)");
+  }
+
+  if (!/- key: TRUST_PROXY_HOPS\s*\n\s*value: "?[1-9]/m.test(yaml)) {
+    violations.push("API must set TRUST_PROXY_HOPS >= 1 behind Render's proxy (FS-66 rate limiter)");
   }
 
   if (yaml.includes("type: web") && yaml.match(/type: web/g)?.length !== 2) {

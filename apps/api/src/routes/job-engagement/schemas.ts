@@ -26,6 +26,8 @@ const errorResponseSchema = {
     error: { type: "string" },
     message: { type: "string" },
     requestId: { type: "string" },
+    reason: { type: "string" },
+    current: {},
     fields: {
       anyOf: [
         {

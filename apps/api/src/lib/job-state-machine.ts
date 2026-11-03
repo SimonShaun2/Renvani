@@ -7,7 +7,7 @@ export const ALLOWED_TRANSITIONS: Record<JobStatus, readonly JobTransitionTarget
   estimate_requested: ["estimate_sent", "scheduled", "cancelled"],
   estimate_sent: ["estimate_approved", "estimate_requested", "cancelled"],
   estimate_approved: ["scheduled", "cancelled"],
-  scheduled: ["dispatched", "on_hold", "rescheduled", "cancelled"],
+  scheduled: ["dispatched", "in_progress", "on_hold", "rescheduled", "cancelled"],
   dispatched: ["in_progress", "on_hold", "cancelled"],
   in_progress: ["completed", "on_hold", "cancelled"],
   on_hold: ["scheduled", "dispatched", "in_progress", "cancelled"],

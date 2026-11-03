@@ -212,6 +212,7 @@ const jobDetailSchema = {
     "deletedAt"
   ],
   properties: {
+    crewId: { type: ["string", "null"] },
     id: { type: "string" },
     companyId: { type: "string" },
     jobNumber: { type: "string" },
@@ -491,8 +492,39 @@ export const JobIdParamsSchema = z
   })
   .strict();
 
+/** Line-item description cap (create, preview, add product). */
+export const JOB_LINE_ITEM_DESCRIPTION_MAX = 2000;
+
+const jobLineItemInputSchema = z
+  .object({
+    productCatalogId: uuidSchema.optional(),
+    name: z.string().trim().min(1).max(255).optional(),
+    description: z.string().trim().max(JOB_LINE_ITEM_DESCRIPTION_MAX).optional(),
+    category: productCategorySchema.optional().default("service"),
+    quantity: z.coerce.number().positive().optional().default(1),
+    unitPrice: z.coerce.number().positive().optional(),
+    isTaxable: z.boolean().optional().default(true),
+    isUpsell: z.boolean().optional().default(false)
+  })
+  .strict()
+  .refine((input) => input.productCatalogId !== undefined || (input.name !== undefined && input.unitPrice !== undefined), {
+    message: "name and unitPrice are required when productCatalogId is not provided",
+    path: ["name"]
+  });
+
+export const MAX_JOB_LINE_ITEMS_AT_CREATE = 50;
+
+export const JobCreatePreviewSchema = z
+  .object({
+    customerId: uuidSchema.optional(),
+    products: z.array(jobLineItemInputSchema).max(MAX_JOB_LINE_ITEMS_AT_CREATE).optional()
+  })
+  .strict();
+
 export const CreateJobSchema = z
   .object({
+    products: z.array(jobLineItemInputSchema).max(MAX_JOB_LINE_ITEMS_AT_CREATE).optional(),
+    crewId: uuidSchema.optional(),
     customerId: uuidSchema,
     propertyId: uuidSchema.optional(),
     assetId: uuidSchema.optional(),
@@ -595,7 +627,8 @@ export const CompleteJobSchema = z
 export const AddNoteSchema = z
   .object({
     content: z.string().trim().min(1),
-    isInternal: z.boolean().optional().default(true)
+    isInternal: z.boolean().optional().default(true),
+    noteKind: z.enum(["internal", "field"]).optional()
   })
   .strict();
 
@@ -654,22 +687,7 @@ export const ReorderTasksSchema = z
   })
   .strict();
 
-export const AddJobProductSchema = z
-  .object({
-    productCatalogId: uuidSchema.optional(),
-    name: z.string().trim().min(1).max(255).optional(),
-    description: z.string().trim().optional(),
-    category: productCategorySchema.optional().default("service"),
-    quantity: z.coerce.number().positive().optional().default(1),
-    unitPrice: z.coerce.number().positive().optional(),
-    isTaxable: z.boolean().optional().default(true),
-    isUpsell: z.boolean().optional().default(false)
-  })
-  .strict()
-  .refine((input) => input.productCatalogId !== undefined || (input.name !== undefined && input.unitPrice !== undefined), {
-    message: "name and unitPrice are required when productCatalogId is not provided",
-    path: ["name"]
-  });
+export const AddJobProductSchema = jobLineItemInputSchema;
 
 export const UpdateJobProductSchema = buildUpdateSchema({
   name: z.string().trim().min(1).max(255).optional(),
@@ -712,6 +730,7 @@ export type ReorderTasksBody = z.infer<typeof ReorderTasksSchema>;
 
 export const listJobsValidation = withZodValidation({ query: ListJobsQuerySchema });
 export const createJobValidation = withZodValidation({ body: CreateJobSchema });
+export const jobCreatePreviewValidation = withZodValidation({ body: JobCreatePreviewSchema });
 export const jobIdValidation = withZodValidation({ params: JobIdParamsSchema });
 export const updateJobValidation = withZodValidation({
   params: JobIdParamsSchema,
@@ -885,6 +904,82 @@ export const addNoteRouteSchema = {
     404: errorResponseSchema
   }
 } as const;
+
+// Params are validated by jobIdValidation (zod); a zod object here is not valid JSON Schema.
+export const getJobServiceBriefRouteSchema = {
+  tags: ["jobs"],
+  response: {
+    200: {
+      type: "object",
+      additionalProperties: false,
+      required: ["brief"],
+      properties: {
+        brief: {
+          anyOf: [
+            { type: "null" },
+            {
+              type: "object",
+              // Unknown keys are dropped by the serializer (no additionalProperties:false inside anyOf, which would fail the branch match instead of stripping).
+              required: ["contractVersion", "jobId", "companyId", "resourceVersion", "sections", "checklistSummary"],
+              properties: {
+                contractVersion: { type: "string" },
+                jobId: { type: "string", format: "uuid" },
+                companyId: { type: "string", format: "uuid" },
+                resourceVersion: { type: "string" },
+                sections: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    required: ["id", "title", "body", "sourceKind"],
+                    properties: {
+                      id: { type: "string" },
+                      title: { type: "string" },
+                      body: { type: "string" },
+                      sourceKind: { type: "string" },
+                      confidence: { type: "number" },
+                      policyRef: { type: "string" }
+                    }
+                  }
+                },
+                checklistSummary: {
+                  type: "object",
+                  required: ["total", "requiredPending"],
+                  properties: {
+                    total: { type: "integer" },
+                    requiredPending: { type: "integer" }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+};
+
+// Params are validated by jobIdValidation (zod); a zod object here is not valid JSON Schema.
+export const getJobPreparationStatusRouteSchema = {
+  tags: ["jobs"],
+  response: {
+    200: {
+      type: "object",
+      additionalProperties: false,
+      required: ["preparation"],
+      properties: {
+        preparation: {
+          type: "object",
+          additionalProperties: false,
+          required: ["readyForField", "blockers"],
+          properties: {
+            readyForField: { type: "boolean" },
+            blockers: { type: "array", items: { type: "string" } }
+          }
+        }
+      }
+    }
+  }
+};
 
 export const getNotesSchema = {
   tags: ["jobs"],

@@ -1,4 +1,4 @@
-import { redirect } from "next/navigation";
+import { CrewFinishJob } from "@/src/components/mobile/CrewFinishJob";
 
 export default async function MobileJobCompletePage({
   params
@@ -7,5 +7,5 @@ export default async function MobileJobCompletePage({
 }) {
   const { id } = await params;
 
-  redirect(`/mobile/signature?jobId=${id}`);
+  return <CrewFinishJob jobId={id} />;
 }

@@ -199,7 +199,8 @@ describe("service-agreement.service", () => {
       expect.objectContaining({
         companyId: company.id,
         templateId: template.id,
-        amount: expect.any(String),
+        productName: "Service Fee (2%)",
+        amount: "0.60",
         interval: "month"
       })
     );
@@ -212,13 +213,36 @@ describe("service-agreement.service", () => {
         stripePriceId: "price_monthly_123",
         stripePlatformFeePriceId: "price_platform_fee_123",
         companyStripeAccountId: company.stripeAccountId ?? "",
-        connectApplicationFeeFraction: expect.any(Number)
+        applicationFeePercent: 1.96
       })
     );
     expect(agreement.stripeSubscriptionId).toBe("sub_123");
     expect(agreement.stripePriceId).toBe("price_monthly_123");
     expect(agreement.price).toBe("29.99");
     expect(fakeDb.getTestState().customers.find((row) => row.id === customer.id)?.stripeCustomerId).toBe("cus_123");
+  });
+
+  it("createAgreement on Flat sends no Service Fee line and no application fee", async () => {
+    const { company, actor } = createAdminContext();
+    company.settings = { stripePlatformBilling: { planTier: "flat" } };
+    const { customer, property, asset, template } = seedAgreementGraph(company.id);
+
+    await agreementService.createAgreement(company.id, actor.id, {
+      customerId: customer.id,
+      serviceAgreementTemplateId: template.id,
+      propertyId: property.id,
+      name: "Flat Plan",
+      frequency: "bi_annual",
+      startDate: "2026-04-28",
+      billingEnabled: true,
+      billingCycle: "monthly",
+      assetIds: [asset.id]
+    });
+
+    expect(createServiceAgreementPriceMock).not.toHaveBeenCalled();
+    expect(createServiceAgreementSubscriptionMock).toHaveBeenCalledWith(
+      expect.objectContaining({ stripePlatformFeePriceId: null, applicationFeePercent: null })
+    );
   });
 
   it("createAgreement throws NOT_FOUND for cross-tenant customers", async () => {

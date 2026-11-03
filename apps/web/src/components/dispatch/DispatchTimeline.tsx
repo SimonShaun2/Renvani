@@ -2,7 +2,7 @@
 
 import { useDroppable } from "@dnd-kit/core";
 import type { ReactNode } from "react";
-import { CalendarPlus2, CalendarRange } from "lucide-react";
+import { CalendarRange } from "lucide-react";
 import type { DispatchGap, DispatchJobCard, DispatchTechnicianDay } from "@fsm/types";
 
 import { EmptyState } from "@/src/components/ui/EmptyState";
@@ -17,13 +17,44 @@ import {
   DISPATCH_DAY_START_HOUR,
   formatDispatchRange,
   formatTimelineHour,
-  getInitials,
   getTimelineStyle,
-  getStatusTone,
   buildDispatchSlotFromGap
 } from "./dispatch.utils";
 
-const timelineWidthClass = "min-w-[880px]";
+const timelineWidthClass = "min-w-[1000px]";
+const laneGridClass = "grid grid-cols-[180px_minmax(0,1fr)]";
+
+/** Proposed placement from auto-fit, drawn as the dashed "Suggested" block (Figma 10:590). */
+export interface DispatchTimelineSuggestion {
+  technicianId: string;
+  label: string;
+  scheduledStart: string;
+  scheduledEnd: string;
+}
+
+/** Figma 10:575/10:587/10:599 block tones: blue scheduled, green on site, red needs attention. */
+export function getTimelineBlockTone(status: string) {
+  switch (status) {
+    case "dispatched":
+    case "in_progress":
+    case "completed":
+    case "paid":
+    case "closed":
+      return "bg-[#e4f1e8] text-[#2f7d4f]";
+    case "on_hold":
+    case "cancelled":
+      return "bg-[#fbe3dc] text-[#b42318]";
+    default:
+      return "bg-[#e5eafb] text-[#2b4acb]";
+  }
+}
+
+/** "2.5 h" style duration (Figma 10:574). */
+export function formatBlockHours(start: string | Date, end: string | Date): string {
+  const minutes = (new Date(end).getTime() - new Date(start).getTime()) / 60000;
+  if (!Number.isFinite(minutes) || minutes <= 0) return "";
+  return `${Math.round((minutes / 60) * 10) / 10} h`;
+}
 
 interface DispatchTimelineProps {
   technicians: DispatchTechnicianDay[];
@@ -34,13 +65,15 @@ interface DispatchTimelineProps {
   createQuickJobPending: boolean;
   createQuickJobError: string | null;
   activeDragJobId: string | null;
-  overlay: ReactNode;
+  overlay?: ReactNode;
+  suggestion?: DispatchTimelineSuggestion | null;
   onSelectJob: (jobId: string) => void;
   onOpenQuickCreate: (slot: DispatchDropSlot) => void;
   onCloseQuickCreate: () => void;
   onCreateQuickJob: (input: CreateQuickJobInput) => Promise<void>;
 }
 
+/** Figma 10:559: mono uppercase header, "Crew" column + hour labels 8 … 5. */
 function TimelineHeader() {
   const hours = Array.from(
     { length: DISPATCH_DAY_END_HOUR - DISPATCH_DAY_START_HOUR },
@@ -48,15 +81,17 @@ function TimelineHeader() {
   );
 
   return (
-    <div className={cn("grid grid-cols-[220px_minmax(0,1fr)] gap-4", timelineWidthClass)}>
-      <div className="px-4">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-400">Technician</p>
-      </div>
-      <div className="grid grid-cols-10 gap-0 rounded-[24px] border border-neutral-200 bg-neutral-50 px-3 py-3">
+    <div
+      className={cn(
+        laneGridClass,
+        timelineWidthClass,
+        "bg-[#fbf6ef] px-5 py-[10px] font-mono text-[10px] font-medium uppercase tracking-[0.8px] text-[#5e6684]"
+      )}
+    >
+      <p>Crew</p>
+      <div className="grid grid-cols-10">
         {hours.map((hour) => (
-          <div key={hour} className="border-l border-neutral-200 px-3 first:border-l-0">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-400">{formatTimelineHour(hour)}</p>
-          </div>
+          <p key={hour}>{formatTimelineHour(hour)}</p>
         ))}
       </div>
     </div>
@@ -88,16 +123,17 @@ function TimelineGap({
     <button
       ref={setNodeRef}
       type="button"
+      aria-label={`Add visit for ${technician.name} at ${formatDispatchRange(gap.start, gap.end)}`}
       onClick={() => onOpenQuickCreate(slot)}
       style={getTimelineStyle(gap.start, gap.end)}
       className={cn(
-        "absolute top-2 z-0 flex h-[72px] items-center justify-center rounded-[22px] border border-dashed text-xs font-semibold uppercase tracking-[0.18em] transition",
-        "border-warning/50 bg-warning-light/80 text-warning",
-        isDragging && "opacity-100",
-        isOver && "border-brand-accent bg-brand-accent-light text-brand-accent shadow-[0_18px_40px_rgba(37,122,250,0.2)]"
+        "absolute top-3 z-0 flex h-[72px] items-center justify-center rounded-[10px] border border-dashed text-[11px] font-semibold text-[#7a5600] transition",
+        isDragging || isOver
+          ? "border-[#f6b400] bg-[#fff4d6]/70 opacity-100"
+          : "border-transparent opacity-0 hover:border-[#e6dccb] hover:opacity-100 focus-visible:opacity-100"
       )}
     >
-      drop here
+      {isDragging ? "Drop here" : "Add visit"}
     </button>
   );
 }
@@ -117,20 +153,33 @@ function TimelineJobBlock({
     <button
       type="button"
       onClick={() => onSelectJob(job.id)}
+      title={formatDispatchRange(job.scheduledStart, job.scheduledEnd)}
       style={getTimelineStyle(job.scheduledStart, job.scheduledEnd)}
       className={cn(
-        "absolute top-2 z-10 flex h-[72px] flex-col items-start justify-between rounded-[22px] px-4 py-3 text-left shadow-sm transition",
-        getStatusTone(job.status),
-        isSelected && "ring-2 ring-brand-accent ring-offset-2 ring-offset-white",
-        isAnimated && "animate-pulse ring-2 ring-success ring-offset-2 ring-offset-white shadow-[0_24px_72px_rgba(36,190,145,0.24)]"
+        "absolute top-3 z-10 flex h-[72px] flex-col items-start gap-[2px] overflow-hidden rounded-[10px] px-3 py-[10px] text-left transition",
+        getTimelineBlockTone(job.status),
+        isSelected && "ring-2 ring-[#0f1530] ring-offset-1 ring-offset-white",
+        isAnimated && "dispatch-block-settle"
       )}
     >
-      <div className="min-w-0">
-        <p className="truncate text-sm font-semibold">{job.customer.firstName} {job.customer.lastName}</p>
-        <p className="mt-1 truncate text-xs opacity-85">{job.title}</p>
-      </div>
-      <p className="text-[11px] font-medium opacity-80">{formatDispatchRange(job.scheduledStart, job.scheduledEnd)}</p>
+      <p className="w-full truncate text-xs font-semibold">
+        {[job.title, job.customer.lastName].filter(Boolean).join(" · ")}
+      </p>
+      <p className="text-[11px]">{formatBlockHours(job.scheduledStart, job.scheduledEnd)}</p>
     </button>
+  );
+}
+
+function SuggestedBlock({ suggestion }: { suggestion: DispatchTimelineSuggestion }) {
+  return (
+    <div
+      data-testid="dispatch-suggested-block"
+      style={getTimelineStyle(suggestion.scheduledStart, suggestion.scheduledEnd)}
+      className="absolute top-3 z-20 flex h-[72px] flex-col items-start gap-[2px] overflow-hidden rounded-[10px] border-2 border-dashed border-[#f6b400] bg-[#fff4d6] px-3 py-[10px] text-[#7a5600]"
+    >
+      <p className="w-full truncate text-xs font-semibold">Suggested · {suggestion.label}</p>
+      <p className="text-[11px]">{formatBlockHours(suggestion.scheduledStart, suggestion.scheduledEnd)}</p>
+    </div>
   );
 }
 
@@ -142,6 +191,7 @@ function TechnicianRow({
   createQuickJobPending,
   createQuickJobError,
   activeDragJobId,
+  suggestion,
   onSelectJob,
   onOpenQuickCreate,
   onCloseQuickCreate,
@@ -154,6 +204,7 @@ function TechnicianRow({
   createQuickJobPending: boolean;
   createQuickJobError: string | null;
   activeDragJobId: string | null;
+  suggestion: DispatchTimelineSuggestion | null;
   onSelectJob: (jobId: string) => void;
   onOpenQuickCreate: (slot: DispatchDropSlot) => void;
   onCloseQuickCreate: () => void;
@@ -166,35 +217,15 @@ function TechnicianRow({
   );
 
   return (
-    <div className={cn("grid grid-cols-[220px_minmax(0,1fr)] gap-4", timelineWidthClass)}>
-      <div className="rounded-[24px] border border-neutral-200 bg-white px-4 py-4 shadow-sm">
-        <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-full bg-brand-accent-light text-sm font-semibold text-brand-accent">
-            {getInitials(technician.name)}
-          </div>
-          <div className="min-w-0">
-            <p className="truncate text-sm font-semibold text-neutral-900">{technician.name}</p>
-            <p className="text-xs text-neutral-500">
-              {technician.hoursScheduled}h / {technician.hoursAvailable}h scheduled
-            </p>
-          </div>
-        </div>
-        <div className="mt-4 flex items-center justify-between text-xs font-medium text-neutral-500">
-          <span>{technician.jobs.length} jobs</span>
-          <span>{Math.round(technician.utilization)}% utilized</span>
-        </div>
-      </div>
+    <div
+      data-testid="dispatch-lane"
+      className={cn(laneGridClass, timelineWidthClass, "relative h-[96px] border-t border-[#e6dccb] px-5")}
+    >
+      <p className="self-center truncate pr-3 text-sm font-semibold text-[#0f1530]">{technician.name}</p>
 
-      <div className="relative overflow-visible rounded-[26px] border border-neutral-200 bg-white px-3 py-3 shadow-sm">
-        <div className="absolute inset-y-3 left-3 right-3 rounded-[22px] bg-neutral-50" />
-        <div className="pointer-events-none absolute inset-y-3 left-3 right-3 grid grid-cols-10 rounded-[22px]">
-          {Array.from({ length: 10 }, (_, index) => (
-            <div key={index} className="border-l border-neutral-200 first:border-l-0" />
-          ))}
-        </div>
-
+      <div className="relative">
         {technician.hoursAvailable <= 0 && technician.jobs.length === 0 ? (
-          <div className="absolute inset-x-6 top-5 z-10 flex h-[72px] items-center justify-center rounded-[22px] bg-neutral-300/80 text-sm font-semibold uppercase tracking-[0.18em] text-neutral-600">
+          <div className="absolute inset-x-0 top-3 z-10 flex h-[72px] items-center justify-center rounded-[10px] bg-neutral-100 text-xs font-semibold uppercase tracking-[0.8px] text-neutral-500">
             Out
           </div>
         ) : null}
@@ -219,6 +250,8 @@ function TechnicianRow({
           />
         ))}
 
+        {suggestion ? <SuggestedBlock suggestion={suggestion} /> : null}
+
         {rowHasQuickCreate && quickCreateSlot ? (
           <DispatchInlineJobForm
             slot={quickCreateSlot}
@@ -228,19 +261,6 @@ function TechnicianRow({
             onSubmit={onCreateQuickJob}
           />
         ) : null}
-
-        <button
-          type="button"
-          onClick={() => {
-            if (technician.gaps[0]) {
-              onOpenQuickCreate(buildDispatchSlotFromGap(technician.id, technician.name, technician.gaps[0]));
-            }
-          }}
-          className="absolute bottom-3 right-3 z-20 inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-white/90 px-3 py-2 text-xs font-semibold text-neutral-600 transition hover:border-brand-accent/30 hover:text-brand-accent"
-        >
-          <CalendarPlus2 className="h-4 w-4" />
-          Quick add
-        </button>
       </div>
     </div>
   );
@@ -248,15 +268,15 @@ function TechnicianRow({
 
 function TimelineLoading() {
   return (
-    <div className="space-y-3">
+    <section className="overflow-hidden rounded-[14px] border border-[#e6dccb] bg-white">
       <TimelineHeader />
-      {Array.from({ length: 6 }, (_, index) => (
-        <div key={index} className={cn("grid grid-cols-[220px_minmax(0,1fr)] gap-4", timelineWidthClass)}>
-          <SkeletonCard className="h-[104px]" />
-          <SkeletonCard className="h-[104px]" />
+      {Array.from({ length: 3 }, (_, index) => (
+        <div key={index} className={cn(laneGridClass, timelineWidthClass, "h-[96px] items-center border-t border-[#e6dccb] px-5")}>
+          <SkeletonCard className="h-4 w-28" />
+          <SkeletonCard className="h-[72px]" />
         </div>
       ))}
-    </div>
+    </section>
   );
 }
 
@@ -270,6 +290,7 @@ export function DispatchTimeline({
   createQuickJobError,
   activeDragJobId,
   overlay,
+  suggestion = null,
   onSelectJob,
   onOpenQuickCreate,
   onCloseQuickCreate,
@@ -292,9 +313,12 @@ export function DispatchTimeline({
   }
 
   return (
-    <section className="surface-card relative overflow-x-auto px-4 py-4">
+    <section
+      data-dispatch-reveal
+      className="relative overflow-x-auto rounded-[14px] border border-[#e6dccb] bg-white"
+    >
       {overlay}
-      <div className="space-y-3">
+      <div>
         <TimelineHeader />
         {technicians.map((technician) => (
           <TechnicianRow
@@ -306,6 +330,7 @@ export function DispatchTimeline({
             createQuickJobPending={createQuickJobPending}
             createQuickJobError={createQuickJobError}
             activeDragJobId={activeDragJobId}
+            suggestion={suggestion?.technicianId === technician.id ? suggestion : null}
             onSelectJob={onSelectJob}
             onOpenQuickCreate={onOpenQuickCreate}
             onCloseQuickCreate={onCloseQuickCreate}

@@ -1,6 +1,6 @@
 # CODEX.md
 
-> **FOUNDER OPERATING OVERRIDE — NOVEMBER 3, 2026 (takes precedence over older approval/agent-status language below).** See [GitHub founder directive #420](https://github.com/SimonShaun2/Renvani/issues/420). **Codex is the currently active builder.** Do not assume named GrokBot or Cursor roles are running; GrokBot/E.. CoS can perform an on-demand independent batch review when invoked. Independent peer, QA, and Security-by-risk reviews must be performed by actual separately identified reviewers or qualified humans, with exact-head evidence; a role name alone is not a review. The **founder gives final authorization for EVERY outstanding and future PR merge**, including into `dev`; E.. CoS technical recommendations are not merge permission. Group compatible outstanding PRs into bounded, dependency-ordered review/CI/merge batches; each named PR and exact head requires founder authorization. Continue original Phase A implementation on independently authorized work without waiting for idle named agents or a blocked PR; Phase B remains founder-gated. Do not repeat completed CI or repository-wide audits. Reuse existing secrets where appropriate; no automatic credential creation/rotation and no false least-privilege or revocation PASS. Do not weaken real security, consent, tenant, migration, reviewer, or release gates.
+> **FOUNDER EXECUTION & MERGE AUTHORITY — NOVEMBER 3, 2026 (current).** See [founder directive #420](https://github.com/SimonShaun2/Renvani/issues/420). **Codex is the active builder and coordinator. No E.. CoS approval, dispatch, CI authorization, review recommendation, or signature is required for any ticket or PR.** GrokBot/E.. CoS is optional advice when the founder independently chooses to use it; never a gate. Codex Lead/Technical Lead and actual Platform owners coordinate Ready/WIP and authorize appropriately scoped CI batches; independent Peer, QA, and Security-by-risk reviews with exact-head evidence remain mandatory. **The founder alone approves EVERY outstanding and future PR merge**, including `dev`, by named PR and exact reviewed head. Compatible PRs may be reviewed and validated in batches, then merged sequentially only after explicit founder approvals; no unsafe big-bang merge. Continue authorized Phase A work without stopping for idle roles or blocked PRs. No Phase B before original Phase A acceptance and founder permission. Preserve genuine security, tenant, consent, migration and release gates. Reuse existing credentials when appropriate, but never claim unproven least privilege or rotation/revocation PASS.
 
 # FSM Platform V2 — Implementation Execution Standard
 
@@ -212,7 +212,7 @@ with `FastifyRequest` / `FastifyReply` · row types via `typeof table.$inferSele
 
 ## 6. Review and Merge
 
-Approval follows the risk matrix in `TEAM.md` §3. The V1 "Agent 4 APPROVED" gate is retired. Pair cross-review does not replace peer review, QA, Security by risk, approved batch CI, or E.. CoS merge approval into `dev`. A changed head invalidates affected sign-offs.
+Approval follows the risk matrix in `TEAM.md` §3. The V1 "Agent 4 APPROVED" gate is retired. Pair cross-review does not replace peer review, QA, Security by risk, approved batch CI, or explicit founder merge approval into `dev` for the named PR and exact head. A changed head invalidates affected sign-offs.
 
 **Self-review is required before requesting peer review.** Confirm:
 
@@ -236,7 +236,7 @@ contracts, webhook handling, integration boundaries and downstream risk.
 **QA** verifies against ticket acceptance criteria and required tests. You may not mark your
 own work QA-approved. A QA failure blocks the ticket; engineering remediates.
 
-If a fix changes the reviewed head, collect fresh QA, peer reviewer, Security, and batch CI evidence before E.. CoS merge. A failed gate returns a bounded fix card to the original pair. CI is approved-batch only; local tests are not CI. Keep open drafts In Progress; do not merge to `dev` or mark Done without every gate.
+If a fix changes the reviewed head, collect fresh QA, peer reviewer, Security, and batch CI evidence before founder-authorized merge. A failed gate returns a bounded fix card to the original pair. CI is approved-batch only; local tests are not CI. Keep open drafts In Progress; do not merge to `dev` or mark Done without every gate.
 
 ---
 

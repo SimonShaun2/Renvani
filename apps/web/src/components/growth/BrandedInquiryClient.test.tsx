@@ -12,8 +12,11 @@ import { ApiError } from "@/src/lib/api";
 const mocks = vi.hoisted(() => ({
   submit: vi.fn(),
   checkZip: vi.fn(),
+  assistantPost: vi.fn(),
   pending: false
 }));
+
+vi.mock("@/src/lib/public-api", () => ({ publicApi: { post: mocks.assistantPost } }));
 
 vi.mock("@/src/hooks/booking.hooks", () => ({
   useSubmitBookingRequest: () => ({ mutateAsync: mocks.submit, isPending: mocks.pending }),
@@ -62,6 +65,45 @@ afterEach(() => {
 });
 
 describe("BrandedInquiryClient", () => {
+  it("keeps the assistant hidden until its default-off flag is enabled", () => {
+    render(<BrandedInquiryClient model={buildBrandedStorefrontViewModel(baseSettings)} acquisitionSource="website" />);
+    expect(screen.queryByRole("region", { name: "Ask about this business" })).toBeNull();
+  });
+
+  it("speaks the server-owned verified answer without implying a booking", async () => {
+    mocks.assistantPost.mockResolvedValue({ kind: "answer", verified: true, answer: "Summit Service lists AC repair.", source: "public_booking_settings" });
+    render(<BrandedInquiryClient model={buildBrandedStorefrontViewModel(baseSettings)} acquisitionSource="website" assistantEnabled />);
+    fireEvent.click(screen.getByRole("button", { name: "Check published details" }));
+    await waitFor(() => expect(screen.getByRole("status").textContent).toBe("Summit Service lists AC repair."));
+    expect(mocks.assistantPost).toHaveBeenCalledWith("/api/v1/public/site/summit/assistant", { action: "answer", topic: "services" });
+    expect(screen.getByText(/An inquiry is not a confirmed appointment/)).toBeTruthy();
+  });
+
+  it("uses the existing consented inquiry form for a pending server handoff, with retry key", async () => {
+    mocks.assistantPost
+      .mockResolvedValueOnce({ kind: "handoff_required", reason: "pricing_review", message: "Staff must review pricing. No price is confirmed." })
+      .mockRejectedValueOnce(new ApiError(503, { error: "NOT_IMPLEMENTED", message: "Try again" }))
+      .mockResolvedValueOnce({ kind: "handoff", status: "pending", reason: "pricing_review", referenceNumber: "ASSIST-1", message: "Your request is pending staff review. No appointment has been confirmed." });
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true, json: async () => ({ accepted: true }) }));
+    render(<BrandedInquiryClient model={buildBrandedStorefrontViewModel(baseSettings)} acquisitionSource="website" assistantEnabled />);
+    fireEvent.change(screen.getByRole("combobox", { name: "Question topic" }), { target: { value: "pricing" } });
+    fireEvent.click(screen.getByRole("button", { name: "Check published details" }));
+    await waitFor(() => expect(screen.getByRole("status").textContent).toContain("No price is confirmed"));
+    fillRequiredFields();
+    fireEvent.click(screen.getByRole("button", { name: "Request staff review" }));
+    expect(screen.getByRole("alert").textContent).toContain("Agree to send your contact details");
+    expect(mocks.assistantPost).toHaveBeenCalledTimes(1);
+    fireEvent.click(screen.getByLabelText(/I agree to send these contact details/));
+    fireEvent.click(screen.getByRole("button", { name: "Request staff review" }));
+    await waitFor(() => expect(screen.getByRole("alert").textContent).toContain("Try again"));
+    const firstKey = mocks.assistantPost.mock.calls[1]?.[2]?.headers?.["Idempotency-Key"];
+    fireEvent.click(screen.getByRole("button", { name: "Request staff review" }));
+    await waitFor(() => expect(screen.getByRole("status").textContent).toContain("No appointment has been confirmed"));
+    expect(screen.getByText("ASSIST-1")).toBeTruthy();
+    expect(mocks.assistantPost.mock.calls[2]?.[2]?.headers?.["Idempotency-Key"]).toBe(firstKey);
+    expect(mocks.assistantPost.mock.calls[2]?.[1]).toMatchObject({ action: "handoff", topic: "pricing", contactConsent: true, smsConsentAppointments: false, smsConsentMarketing: false });
+    expect(mocks.submit).not.toHaveBeenCalled();
+  });
   it("stops an empty request before network calls and identifies fields to correct", () => {
     const fetchMock = vi.fn();
     vi.stubGlobal("fetch", fetchMock);

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useId, useMemo, useState } from "react";
 import { Loader2 } from "lucide-react";
+import { webAssistantResponseSchema, type WebAssistantResponse, type WebAssistantRequest } from "@fsm/types";
 
 import {
   buildBookPath,
@@ -12,6 +13,7 @@ import { useCheckZipCoverage, useSubmitBookingRequest } from "@/src/hooks/bookin
 import { ApiError } from "@/src/lib/api";
 import { SITE_TRADES } from "@/src/components/growth/site-trade.registry";
 import { HONEYPOT_FIELD } from "@/src/lib/inquiry-rate-limit";
+import { publicApi } from "@/src/lib/public-api";
 
 interface BrandedInquiryClientProps {
   model: BrandedStorefrontViewModel;
@@ -20,6 +22,7 @@ interface BrandedInquiryClientProps {
   initialZip?: string;
   /** Label for the configured trade, sent as `serviceCategory`. */
   serviceCategory?: string;
+  assistantEnabled?: boolean;
 }
 
 type InquiryField = "firstName" | "lastName" | "phone" | "email" | "serviceInterest" | "addressLine1" | "city" | "state" | "zip";
@@ -43,7 +46,7 @@ async function passInquiryGate(slug: string, honeypot: string): Promise<{ ok: bo
   return { ok: response.ok, accepted: payload.accepted !== false, ...(payload.message ? { message: payload.message } : {}) };
 }
 
-export function BrandedInquiryClient({ model, acquisitionSource, initialService, initialZip, serviceCategory }: BrandedInquiryClientProps) {
+export function BrandedInquiryClient({ model, acquisitionSource, initialService, initialZip, serviceCategory, assistantEnabled = false }: BrandedInquiryClientProps) {
   const submitMutation = useSubmitBookingRequest(model.bookingSlug);
   const zipCheckMutation = useCheckZipCoverage(model.bookingSlug);
   const [firstName, setFirstName] = useState("");
@@ -66,17 +69,53 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<InquiryFieldErrors>({});
   const [isSending, setIsSending] = useState(false);
+  const [assistantTopic, setAssistantTopic] = useState<Extract<WebAssistantRequest, { action: "answer" }>["topic"]>("services");
+  const [assistantService, setAssistantService] = useState("");
+  const [assistantZip, setAssistantZip] = useState("");
+  const [assistantResponse, setAssistantResponse] = useState<WebAssistantResponse | null>(null);
+  const [assistantPending, setAssistantPending] = useState(false);
+  const [assistantError, setAssistantError] = useState<string | null>(null);
+  const [contactConsent, setContactConsent] = useState(false);
+  const [handoffIdempotencyKey, setHandoffIdempotencyKey] = useState(createIdempotencyKey);
   const formId = useId();
 
   const idempotencyKey = useMemo(() => createIdempotencyKey(), []);
 
   const bookHref = buildBookPath(model.bookingSlug, acquisitionSource);
-  const isPending = isSending || submitMutation.isPending || zipCheckMutation.isPending;
+  const isPending = isSending || assistantPending || submitMutation.isPending || zipCheckMutation.isPending;
+  const handoffRequired = assistantResponse?.kind === "handoff_required";
   const fieldErrorId = (field: InquiryField) => `${formId}-${field}-error`;
   const clearFieldError = (field: InquiryField) => {
     setFieldErrors((current) => ({ ...current, [field]: undefined }));
     setErrorMessage(null);
   };
+
+  async function askAssistant() {
+    if (assistantPending) return;
+    setAssistantError(null);
+    setAssistantResponse(null);
+    setAssistantPending(true);
+    try {
+      const request: Extract<WebAssistantRequest, { action: "answer" }> = {
+        action: "answer",
+        topic: assistantTopic,
+        ...(assistantService.trim() ? { service: assistantService.trim() } : {}),
+        ...(assistantTopic === "service_area" && assistantZip.trim() ? { zip: assistantZip.trim() } : {})
+      };
+      const response = await publicApi.post<WebAssistantResponse>(
+        `/api/v1/public/site/${encodeURIComponent(model.bookingSlug)}/assistant`, request
+      );
+      setAssistantResponse(webAssistantResponseSchema.parse(response));
+      if (assistantService.trim() && (model.serviceCards.length === 0 || model.serviceCards.some((card) => card.title === assistantService.trim()))) {
+        setServiceInterest(assistantService.trim());
+      }
+      if (assistantZip.trim()) setZip(assistantZip.trim());
+    } catch (error) {
+      setAssistantError(error instanceof ApiError ? error.message : "We could not check that right now. Please try again.");
+    } finally {
+      setAssistantPending(false);
+    }
+  }
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -106,6 +145,11 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
       event.currentTarget.querySelector<HTMLInputElement>(`[name="${firstInvalidField}"]`)?.focus();
       return;
     }
+    if (handoffRequired && !contactConsent) {
+      setErrorMessage("Agree to send your contact details for staff review.");
+      event.currentTarget.querySelector<HTMLInputElement>("[name=contactConsent]")?.focus();
+      return;
+    }
 
     setIsSending(true);
     try {
@@ -116,6 +160,33 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
       }
       if (!gate.accepted) {
         setReferenceNumber("received");
+        return;
+      }
+
+      if (handoffRequired) {
+        const request: Extract<WebAssistantRequest, { action: "handoff" }> = {
+          action: "handoff",
+          topic: assistantTopic,
+          ...(serviceInterest.trim() ? { service: serviceInterest.trim() } : {}),
+          message: notes.trim() || assistantResponse.message,
+          contact: {
+            firstName: firstName.trim(), lastName: lastName.trim(), phone: phone.trim(),
+            ...(email.trim() ? { email: email.trim() } : {}),
+            addressLine1: addressLine1.trim(), city: city.trim(),
+            state: state.trim(), zip: zip.trim()
+          },
+          contactConsent: true,
+          smsConsentAppointments,
+          smsConsentMarketing,
+          source: "website"
+        };
+        const response = await publicApi.post<WebAssistantResponse>(
+          `/api/v1/public/site/${encodeURIComponent(model.bookingSlug)}/assistant`, request,
+          { headers: { "Idempotency-Key": handoffIdempotencyKey } }
+        );
+        const parsed = webAssistantResponseSchema.parse(response);
+        if (parsed.kind !== "handoff") throw new Error("Unexpected handoff response");
+        setAssistantResponse(parsed);
         return;
       }
 
@@ -166,6 +237,14 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
     }
   }
 
+  if (assistantResponse?.kind === "handoff") {
+    return <div className="mx-auto max-w-lg rounded-[14px] border border-[#e6dccb] bg-white p-8 text-center" role="status">
+      <h1 className="text-2xl font-semibold text-[#0f1530]">Request pending staff review</h1>
+      <p className="mt-3 text-sm leading-6 text-[#5e6684]">{assistantResponse.message}</p>
+      <p className="mt-3 text-sm text-[#5e6684]">Reference <span className="font-mono font-medium text-[#0f1530]">{assistantResponse.referenceNumber}</span>.</p>
+    </div>;
+  }
+
   if (referenceNumber) {
     return (
       <div className="mx-auto max-w-lg rounded-[14px] border border-[#e6dccb] bg-white p-8 text-center">
@@ -188,7 +267,37 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
   }
 
   return (
-    <form className="mx-auto max-w-lg space-y-4" onSubmit={(event) => void handleSubmit(event)} noValidate>
+    <form className="mx-auto max-w-lg space-y-4" onSubmit={(event) => void handleSubmit(event)} onChangeCapture={() => setHandoffIdempotencyKey(createIdempotencyKey())} noValidate>
+      {assistantEnabled ? (
+        <section aria-label="Ask about this business" className="rounded-[14px] border border-[#e6dccb] bg-white p-5" onKeyDown={(event) => {
+          if (event.key === "Enter" && event.target instanceof HTMLInputElement) {
+            event.preventDefault();
+            void askAssistant();
+          }
+        }}>
+          <h2 className="text-lg font-semibold">Ask about this business</h2>
+          <p className="mt-1 text-sm text-[#5e6684]">Answers use published business details. Staff must confirm appointments, prices, and availability.</p>
+          <label className="mt-4 block text-sm font-medium text-[#2a3360]">Question topic
+            <select value={assistantTopic} onChange={(event) => { setAssistantTopic(event.target.value as typeof assistantTopic); setAssistantResponse(null); }} className="mt-1.5 w-full rounded-lg border border-[#e6dccb] px-3.5 py-3">
+              <option value="services">Services</option><option value="service_area">Service area</option>
+              <option value="booking_hours">Published request hours</option><option value="emergency">Emergency service</option>
+              <option value="contact">Contact</option><option value="availability">Appointment availability</option>
+              <option value="pricing">Pricing</option><option value="human">Speak with staff</option>
+              <option value="other">Other question</option>
+            </select>
+          </label>
+          <label className="mt-3 block text-sm font-medium text-[#2a3360]">Service (optional)
+            <input value={assistantService} onChange={(event) => { setAssistantService(event.target.value); setAssistantResponse(null); }} maxLength={100} className="mt-1.5 w-full rounded-lg border border-[#e6dccb] px-3.5 py-3" />
+          </label>
+          {assistantTopic === "service_area" ? <label className="mt-3 block text-sm font-medium text-[#2a3360]">ZIP to check
+            <input value={assistantZip} onChange={(event) => { setAssistantZip(event.target.value); setAssistantResponse(null); }} inputMode="numeric" autoComplete="postal-code" className="mt-1.5 w-full rounded-lg border border-[#e6dccb] px-3.5 py-3" />
+          </label> : null}
+          <button type="button" disabled={isPending} aria-busy={assistantPending} onClick={() => void askAssistant()} className="mt-4 rounded-lg bg-[#2f7d4f] px-5 py-3 text-sm font-semibold text-white disabled:opacity-60">{assistantPending ? "Checking published details" : "Check published details"}</button>
+          {assistantError ? <p role="alert" className="mt-3 text-sm text-red-700">{assistantError}</p> : null}
+          {assistantResponse?.kind === "answer" ? <p role="status" className="mt-3 text-sm text-[#2a3360]">{assistantResponse.answer}</p> : null}
+          {assistantResponse?.kind === "handoff_required" ? <p role="status" className="mt-3 text-sm text-[#2a3360]">{assistantResponse.message} Use the form below to request staff review.</p> : null}
+        </section>
+      ) : null}
       <p className="text-sm text-[#5e6684]">Tell {model.companyName} what you need. An inquiry is not a confirmed appointment.</p>
 
       <div className="grid gap-4 sm:grid-cols-2">
@@ -381,6 +490,11 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
         </label>
       </fieldset>
 
+      {handoffRequired ? <label className="flex gap-2 text-sm text-[#2a3360]">
+        <input type="checkbox" name="contactConsent" checked={contactConsent} onChange={(event) => { setContactConsent(event.target.checked); setErrorMessage(null); }} className="mt-0.5" />
+        <span>I agree to send these contact details and my request to staff for review. No appointment has been confirmed.</span>
+      </label> : null}
+
       {errorMessage ? (
         <p className="text-sm text-red-700" role="alert">
           {errorMessage}
@@ -410,7 +524,7 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
         {isPending ? (
           <><Loader2 className="mr-2 h-5 w-5 animate-spin" aria-hidden />Sending inquiry</>
         ) : (
-          "Send inquiry"
+          handoffRequired ? "Request staff review" : "Send inquiry"
         )}
       </button>
     </form>

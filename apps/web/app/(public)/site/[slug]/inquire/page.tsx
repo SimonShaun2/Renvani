@@ -12,6 +12,7 @@ import {
 import { buildOpeningHours } from "@/src/components/growth/site-trade.registry";
 import { resolveSiteTradeFromSettings } from "@/src/components/growth/site-trade.from-settings";
 import { fetchPublicBookingSettingsBySlug } from "@/src/lib/public-booking-server";
+import { isWebAssistantEnabled } from "@fsm/config/feature-flags";
 
 export async function generateMetadata({
   params
@@ -73,6 +74,7 @@ export default async function BrandedInquiryPage({
           model={model}
           acquisitionSource={acquisitionSource}
           serviceCategory={resolveSiteTradeFromSettings(settings).label}
+          assistantEnabled={isWebAssistantEnabled()}
         />
       </main>
     </div>

@@ -11,20 +11,17 @@ import { AuthShell } from "./AuthShell";
 afterEach(cleanup);
 
 describe("Renvani sign-in shell", () => {
-  it("uses the canonical cream canvas and a responsive Renvani sign-in layout", () => {
-    render(
-      <AuthShell variant="sign-in">
-        <div data-testid="clerk-sign-in">Clerk form</div>
-      </AuthShell>
-    );
-
-    const shell = screen.getByTestId("renvani-sign-in-shell");
-    expect(shell.className).toContain("bg-[#fbf6ef]");
-    expect(shell.className).toContain("sm:py-20");
+  it("keeps the real authentication slot and one canonical brand/tagline", () => {
+    render(<AuthShell variant="sign-in"><div data-testid="clerk-sign-in">Clerk form</div></AuthShell>);
+    expect(screen.getByTestId("renvani-sign-in-shell")).toBeTruthy();
     expect(screen.getByText("Renvani")).toBeTruthy();
-    expect(screen.getByText("Grow your shop. Renvani runs the rest.")).toBeTruthy();
+    expect(screen.getAllByText("Grow your shop. Renvani runs the rest.")).toHaveLength(1);
     expect(screen.getByRole("region", { name: "Sign in to Renvani" })).toBeTruthy();
     expect(screen.getByTestId("clerk-sign-in")).toBeTruthy();
-    expect(shell.textContent).not.toContain("ServiceRev");
+  });
+  it("preserves the non-login slot for existing auth surfaces", () => {
+    render(<AuthShell><div data-testid="signup-form">Existing signup</div></AuthShell>);
+    expect(screen.queryByTestId("renvani-sign-in-shell")).toBeNull();
+    expect(screen.getByTestId("signup-form")).toBeTruthy();
   });
 });

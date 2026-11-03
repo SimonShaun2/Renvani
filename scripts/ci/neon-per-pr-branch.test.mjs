@@ -175,6 +175,30 @@ test("FS-235 runner bounds message count and total output while suppressing arbi
   }
 });
 
+test("FS-235 runner reports a fixed PostgreSQL test phase without leaking the error", () => {
+  const directory = mkdtempSync(join(tmpdir(), "fs235-vitest-phase-"));
+  const outputFile = join(directory, "result.json");
+  writeFileSync(outputFile, JSON.stringify({
+    numTotalTests: 1,
+    numPassedTests: 0,
+    numFailedTests: 1,
+    numPendingTests: 0,
+    numTodoTests: 0,
+    testResults: [{ assertionResults: [{
+      status: "failed",
+      fullName: "authorizes exactly one provider create across concurrent workers",
+      failureMessages: ["Error: FS235_PG_PHASE_claims secret_value_should_not_appear"]
+    }] }]
+  }));
+  try {
+    const summary = vitestFailureSummary(outputFile);
+    assert.match(summary, /phase=claims/);
+    assert.doesNotMatch(summary, /secret_value_should_not_appear/);
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
+});
+
 test("FS-235 runner cleans a successful Vitest JSON result after verification", () => {
   const directory = mkdtempSync(join(tmpdir(), "fs235-vitest-success-"));
   const outputFile = join(directory, "result.json");

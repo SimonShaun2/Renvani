@@ -88,11 +88,13 @@ function messageMetadata(messages) {
   const location = locationMatch
     ? `${KNOWN_TEST_FILE}:${locationMatch[2]}:${locationMatch[3]}`
     : "unknown";
+  const phase = /\bFS235_PG_PHASE_(db_import|processor_import|intent_insert|claims|archive)\b/.exec(scanned)?.[1] ?? "unknown";
 
   return {
     type,
     kind,
     location,
+    phase,
     messages: Math.min(reported.length, MAX_MESSAGES_SCANNED_PER_ASSERTION),
     messagesOmitted: reported.length > MAX_MESSAGES_SCANNED_PER_ASSERTION
   };
@@ -112,7 +114,7 @@ function failedAssertions(result) {
       const metadata = messageMetadata(assertion.failureMessages);
       failures.push(
         `failure assertion=${assertionCode(assertion.fullName || assertion.title)}`
-        + ` type=${metadata.type} kind=${metadata.kind} location=${metadata.location}`
+        + ` type=${metadata.type} kind=${metadata.kind} location=${metadata.location} phase=${metadata.phase}`
         + ` messages=${metadata.messages} messages_omitted=${metadata.messagesOmitted}`
       );
       if (failures.length === MAX_FAILURES) return failures;

@@ -15,10 +15,20 @@ const rules = Object.freeze({
   synthetic_canary: /FS76_SCANNER_CANARY_[A-Z0-9]{16,}/u
 });
 
-const requiredBuildRoots = Object.freeze([
-  "apps/api/dist", "apps/worker/dist", "apps/webhook/dist",
-  "apps/web/.next/server", "apps/web/.next/static"
+const buildGroups = Object.freeze([
+  ["API", "apps/api/dist"], ["WORKER", "apps/worker/dist"],
+  ["WEBHOOK", "apps/webhook/dist"], ["WEB_SERVER", "apps/web/.next/server"],
+  ["WEB_STATIC", "apps/web/.next/static"],
+  ...["ai", "comms", "config", "db", "import-engine", "import-normalize", "jobs", "types"]
+    .map((name) => [`PACKAGE_${name.replaceAll("-", "_").toUpperCase()}`, `packages/${name}/dist`])
 ]);
+
+class ScannerError extends Error {
+  constructor(code) {
+    super(code);
+    this.code = code;
+  }
+}
 
 /** Return rule names only: matched credentials must never appear in scanner logs. */
 export function scanText(contents) {
@@ -28,16 +38,28 @@ export function scanText(contents) {
 }
 
 function trackedFiles(root) {
-  const output = execFileSync("git", ["ls-files", "-z"], { cwd: root });
-  return output.toString("utf8").split("\0").filter(Boolean).map((path) => join(root, path));
+  try {
+    const output = execFileSync("git", ["ls-files", "-z"], { cwd: root, stdio: ["ignore", "pipe", "ignore"] });
+    return output.toString("utf8").split("\0").filter(Boolean).map((path) => join(root, path));
+  } catch {
+    throw new ScannerError("FS76_SCAN_GIT_FAILED");
+  }
 }
 
 function walkFiles(root) {
   if (!existsSync(root)) return [];
   const files = [];
-  for (const entry of readdirSync(root, { withFileTypes: true })) {
+  let entries;
+  try {
+    if (lstatSync(root).isSymbolicLink()) throw new ScannerError("FS76_SCAN_SYMLINK_REFUSED");
+    entries = readdirSync(root, { withFileTypes: true });
+  } catch (cause) {
+    if (cause instanceof ScannerError) throw cause;
+    throw new ScannerError("FS76_SCAN_WALK_FAILED");
+  }
+  for (const entry of entries) {
     const path = join(root, entry.name);
-    if (entry.isSymbolicLink()) throw new Error("Secret scan refused a symbolic link");
+    if (entry.isSymbolicLink()) throw new ScannerError("FS76_SCAN_SYMLINK_REFUSED");
     if (entry.isDirectory()) files.push(...walkFiles(path));
     else if (entry.isFile()) files.push(path);
   }
@@ -45,43 +67,60 @@ function walkFiles(root) {
 }
 
 function builtFiles(root) {
-  const roots = [...requiredBuildRoots];
-  for (const packageName of ["ai", "comms", "config", "db", "import-engine", "import-normalize", "jobs", "types"]) {
-    roots.push(`packages/${packageName}/dist`);
-  }
-  const byRoot = roots.map((path) => ({ files: walkFiles(join(root, path)), required: requiredBuildRoots.includes(path) }));
-  return {
-    files: byRoot.flatMap((entry) => entry.files),
-    allRequiredPresent: byRoot.every((entry) => !entry.required || entry.files.length > 0)
-  };
+  return buildGroups.map(([group, path]) => ({ group, files: walkFiles(join(root, path)) }));
 }
 
 export function scanRepository(root, { requireBuilt = false } = {}) {
   const source = trackedFiles(root);
   const built = builtFiles(root);
-  if (requireBuilt && !built.allRequiredPresent) throw new Error("Secret scan requires all server and client build artifacts");
-  const violations = [];
-  for (const path of new Set([...source, ...built.files])) {
-    if (!existsSync(path) || !lstatSync(path).isFile()) continue;
-    const contents = readFileSync(path).toString("utf8");
-    violations.push(...scanText(contents));
+  if (requireBuilt) {
+    const missing = built.find(({ files }) => files.length === 0);
+    if (missing) throw new ScannerError(`FS76_SCAN_BUILD_${missing.group}_MISSING`);
   }
-  return { scannedSource: source.length, scannedBuilt: built.files.length, violations };
+  const counts = new Map();
+  for (const { group, files } of [{ group: "SOURCE", files: source }, ...built]) {
+    for (const path of new Set(files)) {
+      let contents;
+      try {
+        if (!existsSync(path)) continue;
+        const status = lstatSync(path);
+        if (status.isSymbolicLink()) throw new ScannerError("FS76_SCAN_SYMLINK_REFUSED");
+        if (!status.isFile()) continue;
+        contents = readFileSync(path).toString("utf8");
+      } catch (cause) {
+        if (cause instanceof ScannerError) throw cause;
+        throw new ScannerError("FS76_SCAN_READ_FAILED");
+      }
+      for (const rule of scanText(contents)) {
+        const key = `${group}:${rule}`;
+        counts.set(key, (counts.get(key) ?? 0) + 1);
+      }
+    }
+  }
+  const violations = [...counts].map(([key, count]) => {
+    const [group, rule] = key.split(":");
+    return { group, rule, count };
+  });
+  return { scannedSource: source.length, scannedBuilt: built.reduce((sum, entry) => sum + entry.files.length, 0), violations };
+}
+
+export function runScan(root, { requireBuilt = false, log = console.log, error = console.error } = {}) {
+  try {
+    const result = scanRepository(root, { requireBuilt });
+    if (result.violations.length > 0) {
+      for (const { group, rule, count } of result.violations) error(`FS76_SCAN_FINDING ${group} ${rule} ${count}`);
+      return false;
+    }
+    log(`FS76_SCAN_PASS ${SECRET_SCAN_POLICY_VERSION} ${result.scannedSource} ${result.scannedBuilt}`);
+    return true;
+  } catch (cause) {
+    error(cause instanceof ScannerError ? cause.code : "FS76_SCAN_INTERNAL_FAILED");
+    return false;
+  }
 }
 
 const invokedPath = process.argv[1] ? resolve(process.argv[1]) : "";
 if (invokedPath === fileURLToPath(import.meta.url)) {
-  try {
-    const root = resolve(import.meta.dirname, "../..");
-    const result = scanRepository(root, { requireBuilt: process.argv.includes("--require-built") });
-    if (result.violations.length > 0) {
-      console.error(`FS-76 secret scan failed (${result.violations.length} findings; details redacted)`);
-      process.exitCode = 1;
-    } else {
-      console.log(`FS-76 secret scan ${SECRET_SCAN_POLICY_VERSION} passed (${result.scannedSource} tracked, ${result.scannedBuilt} built files)`);
-    }
-  } catch {
-    console.error("FS-76 secret scan could not complete (details redacted)");
-    process.exitCode = 1;
-  }
+  const root = resolve(import.meta.dirname, "../..");
+  if (!runScan(root, { requireBuilt: process.argv.includes("--require-built") })) process.exitCode = 1;
 }

@@ -11,7 +11,7 @@ import {
   type CustomerPortalVisit,
   type CustomerPortalVisits
 } from "@fsm/types";
-import { env } from "@fsm/config";
+import { apiEnv as env } from "@fsm/config/runtime-env";
 
 import {
   generateCustomerPortalToken,

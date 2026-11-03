@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import { describe, expect, it } from "vitest";
 
-import { env } from "@fsm/config";
+import { apiEnv as env } from "@fsm/config/runtime-env";
 import { ErrorCode } from "@fsm/types";
 
 import { setupTestEnv } from "../test-support/env-setup.js";

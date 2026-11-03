@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const state = vi.hoisted(() => ({ row: null as Record<string, unknown> | null, companyIds: [] as string[] }));
-vi.mock("@fsm/config", () => ({ env: { GEO_PROVIDER: "straight_line", ETA_ASSUMED_SPEED_MPH: 999 } }));
+vi.mock("@fsm/config/runtime-env", () => ({ apiEnv: { GEO_PROVIDER: "straight_line", ETA_ASSUMED_SPEED_MPH: 999 } }));
 vi.mock("@fsm/db", () => {
   const chain = { select: () => chain, from: () => chain, leftJoin: () => chain, where: () => chain, limit: async () => (state.row ? [state.row] : []) };
   return {

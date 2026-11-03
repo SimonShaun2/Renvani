@@ -1,4 +1,4 @@
-import { env } from "@fsm/config";
+import { apiEnv as env } from "@fsm/config/runtime-env";
 import type { FastifyRequest } from "fastify";
 import fp from "fastify-plugin";
 

@@ -1,6 +1,6 @@
 import pino from "pino";
 
-import { env } from "@fsm/config";
+import { apiEnv as env } from "@fsm/config/runtime-env";
 import type { UserRole } from "@fsm/types";
 
 const logger = pino({ name: "clerk-role-metadata" });

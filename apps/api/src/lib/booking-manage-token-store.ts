@@ -1,4 +1,4 @@
-import { env } from "@fsm/config";
+import { apiEnv as env } from "@fsm/config/runtime-env";
 import { AppError, ErrorCode } from "@fsm/types";
 
 const MANAGE_STORE_UNAVAILABLE = "Manage link service is temporarily unavailable. Please try again.";

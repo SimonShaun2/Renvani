@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 
-import { env } from "@fsm/config";
+import { apiEnv as env } from "@fsm/config/runtime-env";
 
 /**
  * FS-158 — two-phase webhook dedupe (claim → complete | release).

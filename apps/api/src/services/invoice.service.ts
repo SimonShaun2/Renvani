@@ -5,7 +5,7 @@ import { Decimal } from "decimal.js";
 import pino from "pino";
 import type Stripe from "stripe";
 
-import { env } from "@fsm/config";
+import { apiEnv as env } from "@fsm/config/runtime-env";
 import {
   centsToMoneyString,
   computeCheckoutFees,

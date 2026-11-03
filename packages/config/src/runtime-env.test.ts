@@ -61,6 +61,12 @@ describe("parseRuntimeEnv runtime boundaries", () => {
       JWT_SECRET: "synthetic-jwt-private",
       JWT_REFRESH_SECRET: "synthetic-refresh-private",
       BOOKING_HOLD_TOKEN_SECRET: "synthetic-booking-private",
+      ACCESS_TOKEN_TTL_SECONDS: "900",
+      REFRESH_TOKEN_TTL_SECONDS: "604800",
+      RESET_TOKEN_TTL_SECONDS: "900",
+      STRIPE_SECRET_KEY: ["sk", "test", "synthetic"].join("_"),
+      SENDGRID_API_KEY: "synthetic-sendgrid-private",
+      SENDGRID_FROM_EMAIL: "sender@example.test",
       OPENAI_API_KEY: "synthetic-openai-private",
       R2_SECRET_ACCESS_KEY: "synthetic-storage-private"
     };

@@ -1,6 +1,6 @@
 import { and, eq, isNull } from "drizzle-orm";
 
-import { env } from "@fsm/config";
+import { apiEnv as env } from "@fsm/config/runtime-env";
 import { jobs, properties, runTransactionWithTenantSession } from "@fsm/db";
 import { AppError, ErrorCode, clampEtaSpeedMph, toGeoPoint, type GeoPoint } from "@fsm/types";
 

@@ -8,7 +8,7 @@ import {
   properties,
   runTransactionWithTenantSession
 } from "@fsm/db";
-import { env } from "@fsm/config";
+import { apiEnv as env } from "@fsm/config/runtime-env";
 import {
   customerPortalHistorySectionSchema,
   customerPortalInvoicesSectionSchema,

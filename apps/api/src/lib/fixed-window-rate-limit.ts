@@ -1,6 +1,6 @@
 import { isIP } from "node:net";
 
-import { env } from "@fsm/config";
+import { apiEnv as env } from "@fsm/config/runtime-env";
 
 /**
  * FS-66 — atomic fixed-window rate limiter.

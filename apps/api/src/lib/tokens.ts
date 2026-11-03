@@ -2,7 +2,7 @@ import { compare, hash } from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { z } from "zod";
 
-import { env } from "@fsm/config";
+import { apiEnv as env } from "@fsm/config/runtime-env";
 import { AppError, ErrorCode } from "@fsm/types";
 
 const accessTokenPayloadSchema = z.object({

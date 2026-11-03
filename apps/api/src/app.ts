@@ -7,7 +7,7 @@ import callTrackingWebhookRoutes from "./routes/webhooks/call-tracking.js";
 import Fastify from "fastify";
 import pino from "pino";
 
-import { env } from "@fsm/config";
+import { apiEnv as env } from "@fsm/config/runtime-env";
 
 import { redactAccessTokenInUrl } from "./lib/request-log-path.js";
 import authenticatePlugin from "./plugins/authenticate.js";

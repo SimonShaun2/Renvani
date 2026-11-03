@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("@fsm/config", () => ({ env: { ORIGIN_SECRET: undefined } }));
+vi.mock("@fsm/config/runtime-env", () => ({ apiEnv: { ORIGIN_SECRET: undefined } }));
 
 import { originSecretMatches, resolveClientIp } from "./client-ip.js";
 

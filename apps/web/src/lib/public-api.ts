@@ -1,4 +1,3 @@
-import { publicEnv } from "@fsm/config";
 import { ErrorCode } from "@fsm/types";
 
 import { ApiError, type ApiErrorPayload } from "@/src/lib/api";
@@ -13,7 +12,7 @@ export function resolvePublicApiBase(): string {
     return "";
   }
 
-  const serverBase = process.env.API_URL ?? process.env.NEXT_PUBLIC_API_URL ?? publicEnv.NEXT_PUBLIC_API_URL;
+  const serverBase = process.env.API_URL ?? process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
 
   return serverBase.replace(/\/$/, "");
 }

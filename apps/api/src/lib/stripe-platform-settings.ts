@@ -1,6 +1,6 @@
 import Stripe from "stripe";
 
-import { env } from "@fsm/config";
+import { apiEnv as env } from "@fsm/config/runtime-env";
 import { buildStripeAccountBrandingPatch, RENVANI_STRIPE_BRAND } from "@fsm/config/stripe-branding";
 
 const stripe = new Stripe(env.STRIPE_SECRET_KEY);

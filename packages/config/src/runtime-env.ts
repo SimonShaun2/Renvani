@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { assertStripeLiveKeyAllowed } from "./deployment-environment.js";
-import { envSchema } from "./env.js";
+import { envSchema } from "./env-schema.js";
 
 /** Shared database and queue fields contain no payment, messaging, AI, or storage credentials. */
 const coreSchema = envSchema.pick({
@@ -100,12 +100,15 @@ const aiSchema = envSchema.pick({ OPENAI_API_KEY: true });
 const apiSchema = coreSchema.merge(envSchema.pick({
   ACCESS_TOKEN_TTL_SECONDS: true,
   API_PORT: true,
+  PORT: true,
   APP_URL: true,
   APP_URL_ALLOWED: true,
   BOOKING_HOLD_TOKEN_SECRET: true,
   CLERK_AUTHORIZED_PARTIES: true,
   CLERK_SECRET_KEY: true,
   CLERK_WEBHOOK_SECRET: true,
+  DRIVE_TIME_ASSUMED_SPEED_MPH: true,
+  DRIVE_TIME_ESTIMATOR: true,
   EMAIL_FROM: true,
   EMAIL_LOGO_URL: true,
   ESTIMATE_EXPIRY_DAYS: true,
@@ -133,7 +136,7 @@ const apiSchema = coreSchema.merge(envSchema.pick({
   SENTRY_DSN: true,
   STRIPE_SECRET_KEY: true,
   TRUST_PROXY_HOPS: true
-}).partial()).extend({
+})).extend({
   API_PORT: envSchema.shape.API_PORT,
   APP_URL: envSchema.shape.APP_URL,
   JWT_SECRET: envSchema.shape.JWT_SECRET,

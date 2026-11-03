@@ -1,6 +1,6 @@
 import { and, asc, eq, gte, inArray, isNull, lt, sql } from "drizzle-orm";
 
-import { env } from "@fsm/config";
+import { apiEnv as env } from "@fsm/config/runtime-env";
 import { companies, crewMembers, crews, jobs, properties, runTransactionWithTenantSession, technicians } from "@fsm/db";
 import { AppError, ErrorCode } from "@fsm/types";
 

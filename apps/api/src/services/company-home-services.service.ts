@@ -15,7 +15,7 @@ import {
   type UpdateServiceAreaBody
 } from "@fsm/types";
 
-import { env } from "@fsm/config";
+import { apiEnv as env } from "@fsm/config/runtime-env";
 
 import { runTenantAwareTransaction } from "../lib/company-scoped-transaction.js";
 import {

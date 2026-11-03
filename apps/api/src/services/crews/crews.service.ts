@@ -4,7 +4,7 @@ import { env } from "@fsm/config";
 import { companies, crewMembers, crews, jobs, properties, runTransactionWithTenantSession, technicians } from "@fsm/db";
 import { AppError, ErrorCode } from "@fsm/types";
 
-import { createTimeZoneDate } from "../dispatch-intelligence.service.js";
+import { createTimeZoneDate, getNextTimeZoneDayStart } from "../dispatch-intelligence.service.js";
 import { isCrewMemberRole } from "./crew-roles.registry.js";
 import { resolveDriveTimeEstimator } from "./drive-time.registry.js";
 
@@ -226,7 +226,7 @@ export async function getTechnicianDriveTime(companyId: string, technicianId: st
     const [company] = await tx.select({ timezone: companies.timezone }).from(companies).where(eq(companies.id, companyId)).limit(1);
     const timeZone = company?.timezone?.trim() || "America/Chicago";
     const dayStart = createTimeZoneDate(date, 0, timeZone);
-    const nextDay = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000);
+    const nextDay = getNextTimeZoneDayStart(date, timeZone);
     return tx
       .select({ jobId: jobs.id, status: jobs.status, lat: properties.lat, lng: properties.lng })
       .from(jobs)

@@ -31,7 +31,10 @@ vi.mock("drizzle-orm", () => {
   const f = () => ({});
   return { and: f, asc: f, eq: f, gte: f, inArray: f, isNull: f, lt: f, sql: Object.assign(() => ({}), { raw: f }) };
 });
-vi.mock("../dispatch-intelligence.service.js", () => ({ createTimeZoneDate: () => new Date("2026-10-28T05:00:00Z") }));
+vi.mock("../dispatch-intelligence.service.js", () => ({
+  createTimeZoneDate: () => new Date("2026-10-28T05:00:00Z"),
+  getNextTimeZoneDayStart: () => new Date("2026-10-29T05:00:00Z")
+}));
 
 import { isCrewMemberRole, listCrewMemberRoles, registerCrewMemberRole } from "./crew-roles.registry.js";
 import { createCrew, getTechnicianDriveTime, replaceCrewMembers, updateCrew } from "./crews.service.js";

@@ -166,7 +166,7 @@ interface TechnicianRecord {
   createdAt: string;
 }
 
-interface ReportingDataset {
+export interface ReportingDataset {
   range: ResolvedReportingRange;
   jobs: JobRecord[];
   estimates: EstimateRecord[];
@@ -666,7 +666,8 @@ function buildKpiMetrics(dataset: ReportingDataset): ReportingKpiMetric[] {
   ];
 }
 
-function buildRevenueChartData(dataset: ReportingDataset): RevenueChartPoint[] {
+/** Exported for DST regression tests. */
+export function buildRevenueChartData(dataset: ReportingDataset): RevenueChartPoint[] {
   const points: RevenueChartPoint[] = [];
   const paymentsByDay = new Map<string, number>();
   let cursor = new Date(dataset.range.start);
@@ -705,7 +706,8 @@ function buildRevenueChartData(dataset: ReportingDataset): RevenueChartPoint[] {
   return points;
 }
 
-function getWorkingDaysBetween(start: Date, end: Date, availableDays: TechnicianRecord["availableDays"]) {
+/** Exported for DST regression tests. */
+export function getWorkingDaysBetween(start: Date, end: Date, availableDays: TechnicianRecord["availableDays"]) {
   const allowedDays = new Set(availableDays);
   let count = 0;
   let cursor = new Date(start);

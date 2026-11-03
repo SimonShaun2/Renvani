@@ -95,28 +95,26 @@ async function handleEvent(event: ClerkWebhookEvent, reply: FastifyReply, svixId
     if (!createdBy) {
       return reply.status(503).send({ error: "CLERK_ORGANIZATION_CREATOR_MISSING", deferred: true });
     }
-    if (createdBy) {
-      const decision = await deferClerkWorkspaceWebhook({
-        kind: "organization.created",
-        svixId,
-        organizationId: str(data.id),
-        clerkUserId: createdBy
+    const decision = await deferClerkWorkspaceWebhook({
+      kind: "organization.created",
+      svixId,
+      organizationId: str(data.id),
+      clerkUserId: createdBy
+    });
+    if (decision.status === "deferred") {
+      await enqueueClerkWorkspaceReconcileJob({
+        intentId: decision.intentId,
+        clerkUserId: decision.clerkUserId
       });
-      if (decision.status === "deferred") {
-        await enqueueClerkWorkspaceReconcileJob({
-          intentId: decision.intentId,
-          clerkUserId: decision.clerkUserId
-        });
-        return reply.status(503).send({ error: "WORKSPACE_INTENT_DEFERRED", deferred: true });
-      }
-      if (decision.status === "denied") {
-        return reply.send({ received: true, skipped: true, reason: decision.reason });
-      }
+      return reply.status(503).send({ error: "WORKSPACE_INTENT_DEFERRED", deferred: true });
+    }
+    if (decision.status === "denied") {
+      return reply.send({ received: true, skipped: true, reason: decision.reason });
     }
     const { company, skipReason } = await provisionClerkOrganizationDetailed({
       organizationId: str(data.id),
       name: str(data.name),
-      createdBy: str(data.created_by) || null
+      createdBy
     });
     if (!company) {
       return reply.send({ received: true, skipped: true, ...(skipReason ? { reason: skipReason } : {}) });

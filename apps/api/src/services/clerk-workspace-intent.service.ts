@@ -26,6 +26,8 @@ export type ClerkWorkspaceWebhookDecision =
  * reconcile the intent, and check creator membership before consuming it. The intent
  * lock makes a repeated svix id idempotent even across API instances.
  */
+const DEFERRED_EVENT_LOOKUP_LIMIT = 10;
+
 export async function deferClerkWorkspaceWebhook(
   input: DeferredClerkWorkspaceWebhook
 ): Promise<ClerkWorkspaceWebhookDecision> {
@@ -39,8 +41,14 @@ export async function deferClerkWorkspaceWebhook(
       )
     });
     if (!intent) return { status: "not_applicable" };
+    // Bounded: only this delivery's events (same intent + svix id), newest first.
     const previous = await tx.query.clerkWorkspaceIntentEvents.findMany({
-      where: (table, operators) => operators.eq(table.intentId, intent.id)
+      where: (table, operators) => operators.and(
+        operators.eq(table.intentId, intent.id),
+        sql`${table.details}->>'svixId' = ${delivery.svixId}`
+      ),
+      orderBy: (table, operators) => [operators.desc(table.createdAt)],
+      limit: DEFERRED_EVENT_LOOKUP_LIMIT
     });
     const wasRecorded = (eventType: string): boolean => previous.some((event) => {
       const details = event.details;

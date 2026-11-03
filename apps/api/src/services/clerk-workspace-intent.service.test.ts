@@ -24,11 +24,12 @@ function matches(row: Row, condition: Condition): boolean {
 const state = vi.hoisted(() => ({
   rows: [] as Row[],
   events: [] as Array<{ intentId: string; clerkUserId: string; eventType: string; details?: Record<string, unknown> }>,
-  lockTail: Promise.resolve() as Promise<void>
+  lockTail: Promise.resolve() as Promise<void>,
+  eventLookups: [] as Array<{ limit: number | undefined; ordered: boolean; bySvixId: boolean }>
 }));
 
 vi.mock("drizzle-orm", () => ({
-  sql: () => ({}),
+  sql: (_strings: TemplateStringsArray, ...values: unknown[]) => ({ kind: "sql", values }),
   eq: (field: keyof Row, value: unknown) => ({ kind: "eq", field, value }),
   inArray: (field: keyof Row, values: unknown[]) => ({ kind: "in", field, values }),
   isNull: (field: keyof Row) => ({ kind: "null", field }),
@@ -51,11 +52,29 @@ vi.mock("@fsm/db", () => {
     });
     return state.rows.find((row) => matches(row, condition));
   };
+  type EventCondition = { kind: "eq"; value: unknown } | { kind: "and"; parts: EventCondition[] } | { kind: "sql"; values: unknown[] };
+  const eventLookups: Array<{ limit: number | undefined; ordered: boolean; bySvixId: boolean }> = [];
+  state.eventLookups = eventLookups;
   const findEvents = async (options: {
-    where: (table: { intentId: string }, operators: { eq: (field: string, value: string) => { value: string } }) => { value: string };
+    where: (table: { intentId: string; details: string; createdAt: string }, operators: {
+      eq: (field: string, value: unknown) => EventCondition;
+      and: (...parts: EventCondition[]) => EventCondition;
+    }) => EventCondition;
+    orderBy?: (table: { createdAt: string }, operators: { desc: (field: string) => unknown }) => unknown[];
+    limit?: number;
   }) => {
-    const condition = options.where({ intentId: "intentId" }, { eq: (_field, value) => ({ value }) });
-    return state.events.filter((event) => event.intentId === condition.value);
+    const condition = options.where(
+      { intentId: "intentId", details: "details", createdAt: "createdAt" },
+      { eq: (_field, value) => ({ kind: "eq", value }), and: (...parts) => ({ kind: "and", parts }) }
+    );
+    const parts = condition.kind === "and" ? condition.parts : [condition];
+    const intentId = parts.find((part) => part.kind === "eq")?.value;
+    const svix = parts.find((part) => part.kind === "sql");
+    const svixId = svix?.kind === "sql" ? svix.values[1] : undefined;
+    eventLookups.push({ limit: options.limit, ordered: Boolean(options.orderBy?.({ createdAt: "createdAt" }, { desc: (field) => field }).length), bySvixId: svixId !== undefined });
+    return state.events
+      .filter((event) => event.intentId === intentId && (svixId === undefined || event.details?.svixId === svixId))
+      .slice(0, options.limit ?? Infinity);
   };
   return {
     clerkWorkspaceIntents: intentTable,
@@ -121,6 +140,7 @@ import {
 describe("FS-235 Clerk workspace intent", () => {
   beforeEach(() => {
     state.rows.length = 0;
+    state.eventLookups.length = 0;
     state.events.length = 0;
     state.lockTail = Promise.resolve();
   });
@@ -202,6 +222,8 @@ describe("FS-235 Clerk workspace intent", () => {
           })
         })
       ]);
+    expect(state.eventLookups.length).toBeGreaterThan(0);
+    for (const lookup of state.eventLookups) expect(lookup).toEqual({ limit: 10, ordered: true, bySvixId: true });
     expect(state.rows[0]?.status).toBe("pending");
     expect(state.rows[0]?.clerkOrganizationId).toBeNull();
   });

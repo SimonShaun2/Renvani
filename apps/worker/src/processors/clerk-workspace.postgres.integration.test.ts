@@ -35,11 +35,27 @@ describe.runIf(Boolean(neonCiUrl))("FS-235 Clerk workspace worker (Postgres)", (
     await db.update(clerkWorkspaceIntents)
       .set({ deletedAt: new Date() })
       .where(eq(clerkWorkspaceIntents.id, intentId));
-    await expect(db.insert(clerkWorkspaceIntents).values({
-      id: randomUUID(),
-      clerkUserId,
-      requestedName: "FS-235 duplicate after archived intent",
-      status: "pending"
-    })).rejects.toMatchObject({ code: "23505" });
+    let duplicateError: unknown;
+    try {
+      await db.insert(clerkWorkspaceIntents).values({
+        id: randomUUID(),
+        clerkUserId,
+        requestedName: "FS-235 duplicate after archived intent",
+        status: "pending"
+      });
+    } catch (error) {
+      duplicateError = error;
+    }
+    // Drizzle may wrap the Postgres error in a query error; inspect the cause chain.
+    let current = duplicateError;
+    let uniqueViolation = false;
+    for (let depth = 0; depth < 4 && current && typeof current === "object"; depth += 1) {
+      if ((current as { code?: unknown }).code === "23505") {
+        uniqueViolation = true;
+        break;
+      }
+      current = (current as { cause?: unknown }).cause;
+    }
+    expect(uniqueViolation).toBe(true);
   });
 });

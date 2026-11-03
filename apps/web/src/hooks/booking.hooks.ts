@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { HomeServiceTrade } from "@fsm/types";
+import type { HomeServiceTrade, PublicBookingIntakeMode, PublicBookingSubmitResponse } from "@fsm/types";
 
 import { api } from "@/src/lib/api";
 import { publicApi } from "@/src/lib/public-api";
@@ -18,6 +18,7 @@ export interface PublicBookingSettingsRecord {
   companyName: string;
   companySlug: string;
   bookingSlug: string;
+  intakeMode: PublicBookingIntakeMode;
   offeredServices: Array<Record<string, unknown>>;
   availableHoursStart: number;
   availableHoursEnd: number;
@@ -135,16 +136,6 @@ interface PublicBookingResponse {
 
 interface PublicAvailabilityResponse {
   availability: BookingAvailabilityRecord[];
-}
-
-interface SubmitBookingResponse {
-  bookingRequest: {
-    id: string;
-    referenceNumber: string | null;
-    status: string;
-  };
-  confirmation: BookingConfirmationRecord;
-  holdToken?: string | null;
 }
 
 interface PublicSlotHoldResponse {
@@ -269,7 +260,7 @@ export function useSubmitBookingRequest(slug: string) {
       body: Record<string, unknown>;
       idempotencyKey?: string;
     }) =>
-      publicApi.post<SubmitBookingResponse>(
+      publicApi.post<PublicBookingSubmitResponse>(
         `/api/v1/public/booking/${slug}/submit${source ? `?src=${encodeURIComponent(source)}` : ""}`,
         body,
         idempotencyKey ? { headers: { "Idempotency-Key": idempotencyKey } } : undefined

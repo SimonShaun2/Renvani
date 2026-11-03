@@ -1,4 +1,5 @@
 export * from "./errors.js";
+export * from "./clerk-workspace-intent.contract.js";
 export * from "./queue-platform/v0/index.js";
 export * from "./error-http.js";
 export * from "./staff-identity/v0/index.js";

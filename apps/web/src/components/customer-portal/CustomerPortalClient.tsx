@@ -14,7 +14,12 @@ import {
   useCustomerPortalInvoices,
   useCustomerPortalVisits
 } from "@/src/hooks/customer-portal.hooks";
-import { captureCustomerPortalToken, clearCustomerPortalToken, isPortalLinkExpired } from "@/src/lib/customer-portal-session";
+import {
+  captureCustomerPortalToken,
+  clearCustomerPortalToken,
+  customerPortalScope,
+  isPortalLinkExpired
+} from "@/src/lib/customer-portal-session";
 
 const money = (value: string) => {
   const n = Number(value);
@@ -94,13 +99,7 @@ export function CustomerPortalClient() {
   useEffect(() => {
     const capture = () => {
       const next = captureCustomerPortalToken();
-      setToken((previous) => {
-        if (previous && previous !== next) {
-          // Drop the previous customer's cached portal data.
-          queryClient.removeQueries({ queryKey: ["customer-portal"] });
-        }
-        return next;
-      });
+      setToken(next);
     };
     capture();
     setReady(true);
@@ -113,10 +112,21 @@ export function CustomerPortalClient() {
   const visits = useCustomerPortalVisits(token);
   const estimates = useCustomerPortalEstimates(token);
   const invoices = useCustomerPortalInvoices(token);
+  const activePortalScope = customerPortalScope(token);
+
+  useEffect(() => {
+    // Query observers move to the new credential scope during render. Remove every
+    // now-inactive prior scope afterward so another customer's data is not retained.
+    queryClient.removeQueries({
+      predicate: (query) => query.queryKey[0] === "customer-portal" && query.queryKey[1] !== activePortalScope
+    });
+  }, [activePortalScope, queryClient]);
 
   const expired = [account, visits, estimates, invoices].some((q) => q.isError && isPortalLinkExpired(q.error));
   useEffect(() => {
-    if (expired) clearCustomerPortalToken();
+    if (!expired) return;
+    clearCustomerPortalToken();
+    setToken(null);
   }, [expired]);
 
   if (!ready) return null;

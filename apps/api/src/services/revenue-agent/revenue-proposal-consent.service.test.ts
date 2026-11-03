@@ -1,3 +1,4 @@
+import { AppError, ErrorCode } from "@fsm/types";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const { getAgentActionMock, authorizeMock } = vi.hoisted(() => ({
@@ -51,6 +52,21 @@ describe("checkRevenueProposalConsent", () => {
     const result = await checkRevenueProposalConsent(companyId, "u1", actionId);
 
     expect(result).toMatchObject({ allowed: true, blocked: false, channel: "email", consentScope: "appointment", failureCode: null });
+  });
+
+  it("reports a channel/scope policy rejection as consent-blocked instead of throwing", async () => {
+    getAgentActionMock.mockResolvedValue(action({ parameters: { channel: "sms", consentScope: "appointment" } }));
+    authorizeMock.mockRejectedValue(new AppError(ErrorCode.CONSENT_REQUIRED, "Proposal consent scope does not match the action policy"));
+
+    const result = await checkRevenueProposalConsent(companyId, "u1", actionId);
+
+    expect(result).toMatchObject({ allowed: false, blocked: true, failureCode: "CONSENT_REQUIRED" });
+  });
+
+  it("still surfaces non-consent errors", async () => {
+    getAgentActionMock.mockResolvedValue(action());
+    authorizeMock.mockRejectedValue(new AppError(ErrorCode.NOT_FOUND, "Customer not found for outbound authorization"));
+    await expect(checkRevenueProposalConsent(companyId, "u1", actionId)).rejects.toMatchObject({ code: "NOT_FOUND" });
   });
 
   it("does not expose non-revenue actions", async () => {

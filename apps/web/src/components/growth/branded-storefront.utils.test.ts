@@ -1,4 +1,3 @@
-import { suggestsRecurringServiceIntent } from "@/src/lib/booking-commit.utils";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -15,6 +14,7 @@ const baseSettings = {
   companyName: "Sparkle & Co.",
   companySlug: "sparkle-co",
   bookingSlug: "sparkle-co",
+  intakeMode: "inquiry_only" as const,
   offeredServices: [],
   availableHoursStart: 8,
   availableHoursEnd: 17,
@@ -38,6 +38,7 @@ describe("branded-storefront.utils", () => {
 
   it("summarizes service area zips for local SEO copy", () => {
     expect(buildServiceAreaSummary(["90210", "90211", "90210"])).toContain("90210");
+    expect(buildServiceAreaSummary([])).toBe("The team will confirm service availability when they review your request.");
   });
 
   it("emits LocalBusiness JSON-LD without fabricated ratings", () => {
@@ -78,14 +79,32 @@ describe("branded-storefront.utils", () => {
     expect(links).toEqual([{ label: "Google reviews", href: "https://google.com/reviews/acme" }]);
   });
 
-  it("falls back to home-services cards when settings are empty", () => {
+  it("does not fabricate services when settings are empty", () => {
     const model = buildBrandedStorefrontViewModel(baseSettings);
 
-    expect(model.serviceCards.length).toBe(4);
-    expect(model.serviceCards.map((c) => c.id)).toEqual(["hvac", "plumbing", "electrical", "tune-up"]);
-    for (const card of model.serviceCards) {
-      expect(suggestsRecurringServiceIntent({ serviceCategory: "Home services", serviceType: card.title, serviceDetail: card.subtitle })).toBe(false);
-    }
+    expect(model.serviceCards).toEqual([]);
+    expect(model.tagline).not.toContain("Review available services");
+    expect(model.eyebrow).toBe("LOCAL SERVICE");
+    expect(model.headline).toBe("Local service from Sparkle & Co.");
     expect(model.bookingSlug).toBe("sparkle-co");
+  });
+
+  it.each([
+    ["hvac", "HEATING & COOLING", "Heating and cooling service from Sparkle & Co."],
+    ["plumbing", "PLUMBING", "Plumbing service from Sparkle & Co."]
+  ] as const)("uses configured %s trade copy", (trade, eyebrow, headline) => {
+    const model = buildBrandedStorefrontViewModel({ ...baseSettings, trade });
+    expect(model.eyebrow).toBe(eyebrow);
+    expect(model.headline).toBe(headline);
+  });
+
+  it.each(["hvac", "plumbing"] as const)("does not promote %s trade suggestions into bookable services", (trade) => {
+    const model = buildBrandedStorefrontViewModel({
+      ...baseSettings,
+      trade,
+      offeredServices: [{ label: "Suggested repair", source: "trade_default" }]
+    });
+    expect(model.intakeMode).toBe("inquiry_only");
+    expect(model.serviceCards).toEqual([]);
   });
 });

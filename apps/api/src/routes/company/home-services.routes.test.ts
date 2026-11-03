@@ -155,6 +155,13 @@ describe("public serves-zip", () => {
 });
 
 describe("24/7 emergency requests", () => {
+  const bookableShop = (slug: string, settings?: Record<string, unknown>) => {
+    const seeded = shop(slug, settings);
+    const bookingSettings = fakeDb.getTestState().bookingSettings.find((row) => row.companyId === seeded.company.id);
+    if (!bookingSettings) throw new Error("bookable test fixture missing settings");
+    bookingSettings.offeredServices = [{ name: "General service" }];
+    return seeded;
+  };
   const lead = (extra: Record<string, unknown>, phone: string) => ({
     firstName: "Sam",
     lastName: "Lee",
@@ -177,7 +184,7 @@ describe("24/7 emergency requests", () => {
   });
 
   it("accepts emergency when enabled, tags the lead, and sorts emergency leads first", async () => {
-    const a = shop("em-a", { emergencyService: { enabled: true, hoursText: null }, trade: "plumbing" });
+    const a = bookableShop("em-a", { emergencyService: { enabled: true, hoursText: null }, trade: "plumbing" });
     const normal = await request(app.server).post("/api/v1/public/booking/em-a/submit").send(lead({}, "555-0301"));
     expect(normal.status).toBe(201);
     expect(normal.body.emergency).toBeUndefined();
@@ -203,7 +210,7 @@ describe("24/7 emergency requests", () => {
   });
 
   it("downgrades (not rejects) emergency when the shop has it off, and documents it in the response", async () => {
-    shop("em-off");
+    bookableShop("em-off");
     const res = await request(app.server)
       .post("/api/v1/public/booking/em-off/submit")
       .send(lead({ emergency: true, urgency: "emergency" }, "555-0310"));
@@ -214,7 +221,7 @@ describe("24/7 emergency requests", () => {
   });
 
   it("urgency 'emergency' WITHOUT emergency:true is still downgraded when the shop has it off (not tagged, not first)", async () => {
-    const a = shop("em-u");
+    const a = bookableShop("em-u");
     const first = await request(app.server).post("/api/v1/public/booking/em-u/submit").send(lead({}, "555-0320"));
     const res = await request(app.server).post("/api/v1/public/booking/em-u/submit").send(lead({ urgency: "emergency" }, "555-0321"));
     expect(res.status).toBe(201);
@@ -238,7 +245,7 @@ describe("24/7 emergency requests", () => {
   });
 
   it("urgency 'emergency' alone is accepted when the shop has it on", async () => {
-    shop("em-u2", { emergencyService: { enabled: true, hoursText: null }, trade: "hvac" });
+    bookableShop("em-u2", { emergencyService: { enabled: true, hoursText: null }, trade: "hvac" });
     const res = await request(app.server).post("/api/v1/public/booking/em-u2/submit").send(lead({ urgency: "emergency" }, "555-0323"));
     expect(res.body.emergency).toEqual({ requested: true, accepted: true, downgraded: false });
     expect(fakeDb.getTestState().bookingRequests.find((r) => r.id === res.body.bookingRequest.id)!.urgency).toBe("emergency");

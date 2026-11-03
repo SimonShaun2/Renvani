@@ -1,12 +1,13 @@
 "use client";
 
-import { useAuth, useOrganizationList, useUser } from "@clerk/nextjs";
+import { useAuth, useOrganizationList } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 
 import { publicEnv } from "@fsm/config";
 
 import { waitForWorkspace } from "./wait-for-workspace";
+import { getWorkspaceIntent, waitForWorkspaceIntent } from "./workspace-intent";
 import {
   WORKSPACE_COPY,
   WORKSPACE_NAME_MAX_LENGTH,
@@ -43,8 +44,7 @@ const ERROR_DETAIL: Record<ErrorKind, string> = {
 export function CreateWorkspaceStep() {
   const router = useRouter();
   const { getToken, orgId, userId } = useAuth();
-  const { user } = useUser();
-  const { isLoaded, createOrganization, setActive } = useOrganizationList();
+  const { isLoaded, setActive } = useOrganizationList();
   const [name, setName] = useState("");
   const [status, setStatus] = useState<Status>("default");
   const [errorKind, setErrorKind] = useState<ErrorKind | null>(null);
@@ -56,6 +56,7 @@ export function CreateWorkspaceStep() {
   const previousUserId = useRef(userId);
 
   useEffect(() => {
+    let cancelled = false;
     if (previousUserId.current !== userId) {
       previousUserId.current = userId;
       inFlight.current = false;
@@ -66,9 +67,25 @@ export function CreateWorkspaceStep() {
       setPendingOrgId(null);
     }
     if (userId && !orgId) {
-      setPendingOrgId(sessionStorage.getItem(pendingOrgStorageKey(userId)));
+      const storedOrganizationId = sessionStorage.getItem(pendingOrgStorageKey(userId));
+      setPendingOrgId(storedOrganizationId);
+      if (!storedOrganizationId) {
+        const recoveryUserId = userId;
+        void (async () => {
+          const token = await getToken({ skipCache: true }).catch(() => null);
+          if (!token || cancelled || currentUserId.current !== recoveryUserId) return;
+          const intent = await getWorkspaceIntent(token).catch(() => null);
+          if (!intent || cancelled || currentUserId.current !== recoveryUserId) return;
+          setName(intent.requestedName);
+          if (intent.status === "reconciled" && intent.organizationId) {
+            sessionStorage.setItem(pendingOrgStorageKey(recoveryUserId), intent.organizationId);
+            setPendingOrgId(intent.organizationId);
+          }
+        })();
+      }
     }
-  }, [orgId, userId]);
+    return () => { cancelled = true; };
+  }, [getToken, orgId, userId]);
 
   const poll = useCallback(async () => {
     const pollingUserId = userId;
@@ -88,38 +105,27 @@ export function CreateWorkspaceStep() {
 
   const create = async () => {
     const trimmed = name.trim();
-    if ((!trimmed && !pendingOrgId) || !isLoaded || !user || !createOrganization || !setActive || inFlight.current) return;
+    if ((!trimmed && !pendingOrgId) || !isLoaded || !setActive || inFlight.current) return;
     const requestUserId = userId;
     inFlight.current = true;
     setStatus("progress");
     setErrorKind(null);
     let activationPending = false;
-    let lookupPending = false;
     try {
       let organizationId = pendingOrgId;
       if (!organizationId) {
-        lookupPending = true;
-        const matches: string[] = [];
-        let pageNumber = 1;
-        for (;;) {
-          const page = await user.getOrganizationMemberships({ pageSize: 100, initialPage: pageNumber });
-          if (currentUserId.current !== requestUserId) return;
-          matches.push(...page.data.filter((membership) => membership.organization.name.trim().toLocaleLowerCase() === trimmed.toLocaleLowerCase()).map((membership) => membership.organization.id));
-          if (pageNumber * 100 >= page.total_count || page.data.length === 0) break;
-          pageNumber += 1;
-        }
-        lookupPending = false;
-        if (matches.length > 1) {
-          setErrorKind("reconcile");
+        const intent = await waitForWorkspaceIntent({
+          name: trimmed,
+          getFreshToken: () => getToken({ skipCache: true }),
+          isCurrent: () => currentUserId.current === requestUserId
+        });
+        if (!intent.ok) {
+          if (intent.reason === "cancelled") return;
+          setErrorKind("create");
           setStatus("error");
           return;
         }
-        organizationId = matches[0] ?? null;
-        if (!organizationId) {
-          if (currentUserId.current !== requestUserId) return;
-          const organization = await createOrganization({ name: trimmed });
-          organizationId = organization.id;
-        }
+        organizationId = intent.organizationId;
         if (requestUserId) sessionStorage.setItem(pendingOrgStorageKey(requestUserId), organizationId);
         if (currentUserId.current !== requestUserId) return;
         setPendingOrgId(organizationId);
@@ -131,7 +137,7 @@ export function CreateWorkspaceStep() {
       await poll();
     } catch {
       if (currentUserId.current !== requestUserId) return;
-      setErrorKind(activationPending ? "activate" : lookupPending ? "lookup" : "create");
+      setErrorKind(activationPending ? "activate" : "create");
       setStatus("error");
       return;
     } finally {
@@ -191,7 +197,7 @@ export function CreateWorkspaceStep() {
               <p className="ws-error__detail">{ERROR_DETAIL[errorKind]}</p>
             </div>
           ) : null}
-          <button type="submit" className="ws-button" disabled={!isLoaded || (!orgReady && !user) || (!orgReady && !pendingOrgId && !name.trim())}>
+          <button type="submit" className="ws-button" disabled={!isLoaded || (!orgReady && !userId) || (!orgReady && !pendingOrgId && !name.trim())}>
             {buttonLabel}
           </button>
         </>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { endOfDay, endOfMonth, format, isSameDay, parseISO, startOfDay, startOfMonth, subDays, subMonths } from "date-fns";
+import { addDays, endOfDay, endOfMonth, format, isSameDay, parseISO, startOfDay, startOfMonth, subDays, subMonths } from "date-fns";
 
 import { api } from "@/src/lib/api";
 
@@ -166,7 +166,7 @@ interface TechnicianRecord {
   createdAt: string;
 }
 
-interface ReportingDataset {
+export interface ReportingDataset {
   range: ResolvedReportingRange;
   jobs: JobRecord[];
   estimates: EstimateRecord[];
@@ -666,7 +666,8 @@ function buildKpiMetrics(dataset: ReportingDataset): ReportingKpiMetric[] {
   ];
 }
 
-function buildRevenueChartData(dataset: ReportingDataset): RevenueChartPoint[] {
+/** Exported for DST regression tests. */
+export function buildRevenueChartData(dataset: ReportingDataset): RevenueChartPoint[] {
   const points: RevenueChartPoint[] = [];
   const paymentsByDay = new Map<string, number>();
   let cursor = new Date(dataset.range.start);
@@ -698,13 +699,15 @@ function buildRevenueChartData(dataset: ReportingDataset): RevenueChartPoint[] {
       isToday: isSameDay(cursor, new Date())
     });
 
-    cursor = startOfDay(new Date(cursor.getTime() + 24 * 60 * 60 * 1000));
+    // Calendar-day step: a fixed 24h step stalls on 25-hour DST fall-back days (infinite loop).
+    cursor = startOfDay(addDays(cursor, 1));
   }
 
   return points;
 }
 
-function getWorkingDaysBetween(start: Date, end: Date, availableDays: TechnicianRecord["availableDays"]) {
+/** Exported for DST regression tests. */
+export function getWorkingDaysBetween(start: Date, end: Date, availableDays: TechnicianRecord["availableDays"]) {
   const allowedDays = new Set(availableDays);
   let count = 0;
   let cursor = new Date(start);
@@ -716,7 +719,8 @@ function getWorkingDaysBetween(start: Date, end: Date, availableDays: Technician
       count += 1;
     }
 
-    cursor = startOfDay(new Date(cursor.getTime() + 24 * 60 * 60 * 1000));
+    // Calendar-day step: a fixed 24h step stalls on 25-hour DST fall-back days (infinite loop).
+    cursor = startOfDay(addDays(cursor, 1));
   }
 
   return count;

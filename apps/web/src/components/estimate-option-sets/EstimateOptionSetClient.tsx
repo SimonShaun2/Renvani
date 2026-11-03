@@ -344,16 +344,18 @@ function AddOptionForm({
   defaultLabel: string;
   pending: boolean;
   onCancel: () => void;
-  onSubmit: (option: { tierLabel: string; title?: string; items: { name: string; quantity: number; unitPrice: number }[] }) => Promise<void>;
+  onSubmit: (option: { tierLabel: string; title?: string; items: { name: string; quantity: string; unitPrice: string }[] }) => Promise<void>;
 }) {
   const [tierLabel, setTierLabel] = useState(defaultLabel);
   const [title, setTitle] = useState("");
   const [itemName, setItemName] = useState("");
   const [quantity, setQuantity] = useState("1");
   const [unitPrice, setUnitPrice] = useState("");
-  const qty = Number(quantity);
-  const price = Number(unitPrice);
-  const valid = tierLabel.trim().length > 0 && itemName.trim().length > 0 && qty > 0 && unitPrice !== "" && price >= 0;
+  const quantityValid = /^(?:0|[1-9]\d{0,6})(?:\.\d{1,3})?$/.test(quantity)
+    && quantity !== "0"
+    && !/^0\.0+$/.test(quantity);
+  const unitPriceValid = /^(?:0|[1-9]\d{0,7})(?:\.\d{1,2})?$/.test(unitPrice);
+  const valid = tierLabel.trim().length > 0 && itemName.trim().length > 0 && quantityValid && unitPriceValid;
 
   return (
     <form
@@ -365,7 +367,7 @@ function AddOptionForm({
         void onSubmit({
           tierLabel: tierLabel.trim(),
           ...(title.trim() ? { title: title.trim() } : {}),
-          items: [{ name: itemName.trim(), quantity: qty, unitPrice: price }]
+          items: [{ name: itemName.trim(), quantity, unitPrice }]
         });
       }}
     >

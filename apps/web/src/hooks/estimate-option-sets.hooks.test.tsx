@@ -53,7 +53,7 @@ describe("estimate option set hooks", () => {
   it("add POSTs to /options, send POSTs to /send", async () => {
     const { wrapper } = setup();
     const add = renderHook(() => useAddEstimateOption("g1"), { wrapper });
-    const option = { tierLabel: "Best", items: [{ name: "Install", quantity: 1, unitPrice: 100 }] };
+    const option = { tierLabel: "Best", items: [{ name: "Install", quantity: "1", unitPrice: "100" }] };
     await act(() => add.result.current.mutateAsync({ ...v, option }));
     expect(m.post).toHaveBeenCalledWith(`${base}/options`, { ...v, option });
     const send = renderHook(() => useSendOptionSet("g1"), { wrapper });

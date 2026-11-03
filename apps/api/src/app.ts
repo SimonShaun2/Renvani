@@ -75,11 +75,15 @@ import stripeRoutes from "./routes/stripe/index.js";
 import technicianExtensionRoutes from "./routes/technician-extensions/index.js";
 import technicianRoutes from "./routes/technicians/index.js";
 import meRoutes from "./routes/me/index.js";
+import clerkWorkspaceIntentRoutes from "./routes/clerk-workspace-intent/index.js";
 import userRoutes from "./routes/users/index.js";
 import timeRoutes from "./routes/time/index.js";
 import timesheetRoutes from "./routes/timesheets/index.js";
 
 /** FS-66 — TRUST_PROXY_HOPS → Fastify trustProxy (0 = false; N = trust N hops of X-Forwarded-For). */
+/** Fastify route-param length cap (see buildApp). */
+export const API_MAX_PARAM_LENGTH = 512;
+
 export function resolveTrustProxySetting(hops: number): false | number {
   return Number.isInteger(hops) && hops > 0 ? hops : false;
 }
@@ -102,6 +106,9 @@ export async function buildApp() {
 
   const app = Fastify({
     loggerInstance: logger,
+    // Default is 100; signed public tokens (e.g. VIP join, ~165 chars) exceed it and 404'd before the handler.
+    // Route schemas still cap each token (VIP: 256), so oversized-but-<512 values get the handler's 404.
+    maxParamLength: API_MAX_PARAM_LENGTH,
     trustProxy: resolveTrustProxySetting(env.TRUST_PROXY_HOPS)
   });
 
@@ -164,6 +171,7 @@ export async function buildApp() {
   await app.register(technicianRoutes, { prefix: "/api/v1/technicians" });
   await app.register(userRoutes, { prefix: "/api/v1/users" });
   await app.register(meRoutes, { prefix: "/api/v1/me" });
+  await app.register(clerkWorkspaceIntentRoutes, { prefix: "/api/v1/onboarding" });
   await app.register(technicianExtensionRoutes, { prefix: "/api/v1/technicians" });
   await app.register(timeRoutes, { prefix: "/api/v1/time" });
   await app.register(timesheetRoutes, { prefix: "/api/v1" });

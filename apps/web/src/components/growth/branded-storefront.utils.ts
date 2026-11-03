@@ -1,5 +1,6 @@
 import { buildOpeningHours, type SiteTradeConfig } from "@/src/components/growth/site-trade.registry";
 import type { PublicBookingSettingsRecord } from "@/src/hooks/booking.hooks";
+import type { HomeServiceTrade, PublicBookingIntakeMode } from "@fsm/types";
 
 export interface BrandedServiceCard {
   id: string;
@@ -19,6 +20,10 @@ export interface BrandedStorefrontViewModel {
   companyName: string;
   bookingSlug: string;
   tagline: string;
+  eyebrow: string;
+  headline: string;
+  configuredTrade: HomeServiceTrade | null;
+  intakeMode: PublicBookingIntakeMode;
   phone: string | null;
   logoUrl: string | null;
   serviceCards: BrandedServiceCard[];
@@ -40,14 +45,6 @@ export interface LocalBusinessJsonLd {
   openingHoursSpecification?: ReturnType<typeof buildOpeningHours>;
   aggregateRating?: { "@type": "AggregateRating"; ratingValue: number; reviewCount: number };
 }
-
-/** Generic home-services cards (HVAC, plumbing, electrical) shown until the shop lists its services. */
-const HOME_SERVICES_FALLBACK_CARDS: BrandedServiceCard[] = [
-  { id: "hvac", title: "Heating & cooling repair", subtitle: "Diagnostic visit" },
-  { id: "plumbing", title: "Plumbing repair", subtitle: "Diagnostic visit" },
-  { id: "electrical", title: "Electrical repair", subtitle: "Diagnostic visit" },
-  { id: "tune-up", title: "Seasonal tune-up", subtitle: "Tune-up visit" }
-];
 
 function readServiceLabel(service: Record<string, unknown>): string | null {
   if (typeof service.label === "string" && service.label.trim()) {
@@ -124,10 +121,6 @@ export function buildServiceCards(offeredServices: Array<Record<string, unknown>
     });
   }
 
-  if (cards.length === 0) {
-    return HOME_SERVICES_FALLBACK_CARDS;
-  }
-
   return cards.slice(0, 4);
 }
 
@@ -135,7 +128,7 @@ export function buildServiceAreaSummary(zips: string[]): string {
   const unique = Array.from(new Set(zips.map((zip) => zip.trim()).filter((zip) => zip.length > 0))).sort();
 
   if (unique.length === 0) {
-    return "Service area confirmed during booking or inquiry.";
+    return "The team will confirm service availability when they review your request.";
   }
 
   if (unique.length <= 6) {
@@ -152,16 +145,30 @@ export function buildBrandedStorefrontViewModel(
   const companyName = settings.companyName.trim() || "Your service team";
   const tagline =
     settings.tagline?.trim() ||
-    "Instant prices, real tech availability, and booking in under a minute. Same trusted tech every visit.";
+    (settings.intakeMode === "bookable"
+      ? "Tell us what you need. Review available services or send an inquiry; the team will confirm the next step."
+      : "Tell us what you need. Send an inquiry and the team will confirm service availability and the next step.");
   const serviceAreaZips = settings.serviceAreaZipCodes ?? [];
+  const configuredTrade = settings.trade ?? null;
+  const headlineCompanyName = /[.!?]$/u.test(companyName) ? companyName : `${companyName}.`;
+  const eyebrow = configuredTrade === "hvac" ? "HEATING & COOLING" : configuredTrade === "plumbing" ? "PLUMBING" : "LOCAL SERVICE";
+  const headline = configuredTrade === "hvac"
+    ? `Heating and cooling service from ${headlineCompanyName}`
+    : configuredTrade === "plumbing"
+      ? `Plumbing service from ${headlineCompanyName}`
+      : `Local service from ${headlineCompanyName}`;
 
   return {
     companyName,
+    eyebrow,
+    headline,
+    configuredTrade,
+    intakeMode: settings.intakeMode,
     bookingSlug: settings.bookingSlug || settings.companySlug,
     tagline,
     phone: settings.phone ?? null,
     logoUrl: settings.logoUrl ?? null,
-    serviceCards: buildServiceCards(settings.offeredServices),
+    serviceCards: settings.intakeMode === "bookable" ? buildServiceCards(settings.offeredServices) : [],
     serviceAreaSummary: buildServiceAreaSummary(serviceAreaZips),
     serviceAreaZips: serviceAreaZips,
     trustLine: options?.staffPreviewLine?.trim() || null,

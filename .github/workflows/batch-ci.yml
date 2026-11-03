@@ -70,3 +70,34 @@ jobs:
         run: node scripts/ci/golden-import-e2e.mjs
       - name: Neon CI wiring contract test
         run: node --test scripts/ci/neon-per-pr-branch.test.mjs
+      - name: FS-235 worker PostgreSQL gate runtime
+        if: github.event_name == 'pull_request' && github.event.pull_request.number == 411
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.16.0
+          cache: pnpm
+      - name: FS-235 build worker dependencies
+        if: github.event_name == 'pull_request' && github.event.pull_request.number == 411
+        run: corepack pnpm --filter "@fsm/worker..." build
+      - name: FS-235 strict isolated worker PostgreSQL concurrency
+        if: github.event_name == 'pull_request' && github.event.pull_request.number == 411
+        env:
+          NEON_CI_DATABASE_URL: ${{ secrets.NEON_CI_STAGING_DATABASE_URL }}
+          RENVANI_DEPLOYMENT_TIER: staging
+          FS235_PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: node scripts/ci/fs235-clerk-workspace-postgres.mjs
+      - uses: actions/setup-node@v4
+        if: github.event_name == 'pull_request' && github.event.pull_request.number == 414 && github.event.pull_request.head.ref == 'codex/growth-trade-inquiry' && github.event.pull_request.base.ref == 'dev' && github.event.pull_request.head.repo.full_name == github.repository
+        with:
+          node-version: 22.16.0
+          cache: pnpm
+      - name: FS-229 strict inquiry concurrency (isolated staging PostgreSQL)
+        if: github.event_name == 'pull_request' && github.event.pull_request.number == 414 && github.event.pull_request.head.ref == 'codex/growth-trade-inquiry' && github.event.pull_request.base.ref == 'dev' && github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          NEON_CI_DATABASE_URL: ${{ secrets.NEON_CI_STAGING_DATABASE_URL }}
+          RENVANI_DEPLOYMENT_TIER: staging
+          FS229_PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          node --test scripts/ci/fs229-revenue-inquiry-postgres.test.mjs
+          pnpm --filter @fsm/api... build
+          node scripts/ci/fs229-revenue-inquiry-postgres.mjs

@@ -1,6 +1,7 @@
 import pino from "pino";
 
 import { env } from "@fsm/config";
+import { assertOpenAiConfigured } from "./openai-config.js";
 
 export interface ColumnMapping {
   [csvColumn: string]: string | null;
@@ -87,6 +88,7 @@ export async function mapCsvColumns(
   sampleRows: Record<string, string>[],
   entityType: string
 ): Promise<ColumnMapping> {
+  assertOpenAiConfigured();
   const response = await fetch("https://api.openai.com/v1/responses", {
     method: "POST",
     headers: {

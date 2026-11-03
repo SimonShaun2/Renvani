@@ -18,10 +18,16 @@ import {
   serviceAreaSitemapPaths, buildPublicRobots, buildPublicSitemap, optInSlugs, publicSiteUrl } from "./public-sitemap";
 
 const env = (vars: Record<string, string>) => vars as unknown as NodeJS.ProcessEnv;
+const publishedBooking = (slug: string, offeredServices: Array<Record<string, unknown>> = [], serviceAreaZipCodes: string[] = []) => ({
+  bookingSlug: slug,
+  companyName: "Summit",
+  offeredServices,
+  serviceAreaZipCodes
+});
 
 describe("public sitemap", () => {
   it("lists only opted-in slugs that are published", async () => {
-    const fetcher = vi.fn(async (slug: string) => (slug === "summit" ? { companyName: "Summit" } : null));
+    const fetcher = vi.fn(async (slug: string) => (slug === "summit" ? publishedBooking(slug) : null));
     const map = await buildPublicSitemap(env({ PUBLIC_SITE_URL: "https://shops.example/x", PUBLIC_SITE_SLUGS: "summit, draft-shop" }), fetcher);
     expect(map.map((e) => e.url)).toEqual([
       "https://shops.example/site/summit",
@@ -46,7 +52,7 @@ describe("public sitemap", () => {
     const log = vi.spyOn(console, "error").mockImplementation(() => {});
     const fetcher = vi.fn(async (slug: string) => {
       if (slug === "down") throw new Error("503");
-      return slug === "ok" ? {} : null;
+      return slug === "ok" ? publishedBooking(slug) : null;
     });
     await expect(
       buildPublicSitemap(env({ PUBLIC_SITE_URL: "https://s.example", PUBLIC_SITE_SLUGS: "ok,down,draft" }), fetcher)
@@ -57,6 +63,23 @@ describe("public sitemap", () => {
 
   it("rejects non-http base URLs", () => {
     expect(publicSiteUrl(env({ PUBLIC_SITE_URL: "javascript:alert(1)" }))).toBeNull();
+  });
+
+  it("fails visibly for malformed or cross-shop publish responses", async () => {
+    const log = vi.spyOn(console, "error").mockImplementation(() => {});
+    try {
+      const fetcher = vi.fn(async (slug: string) => {
+        if (slug === "missing") return undefined;
+        if (slug === "malformed") return { bookingSlug: slug, companyName: "Summit" };
+        return publishedBooking("another-shop");
+      });
+      await expect(buildPublicSitemap(
+        env({ PUBLIC_SITE_URL: "https://s.example", PUBLIC_SITE_SLUGS: "missing,malformed,mismatch" }), fetcher
+      )).rejects.toMatchObject({ slugs: expect.arrayContaining(["missing", "malformed", "mismatch"]) });
+      expect(log).toHaveBeenCalledTimes(3);
+    } finally {
+      log.mockRestore();
+    }
   });
 });
 
@@ -101,6 +124,7 @@ describe("robots", () => {
 
 describe("service x area sitemap entries", () => {
   const settings = {
+    bookingSlug: "summit",
     companyName: "Summit",
     offeredServices: [{ name: "AC Repair" }, { label: "Furnace Tune-Up" }, { name: "ac repair" }, { price: 5 }],
     serviceAreaZipCodes: ["78701", "78702", "78701", "bad"]
@@ -155,7 +179,7 @@ describe("split sitemaps at 500-shop scale", () => {
       serviceAreaZipCodes: zips
     };
     const e = env({ PUBLIC_SITE_URL: "https://s.example", PUBLIC_SITE_SLUGS: slugs.join(",") });
-    const all = await buildFullSitemap(e, async () => settings);
+    const all = await buildFullSitemap(e, async (slug) => ({ ...settings, bookingSlug: slug, companyName: "Summit" }));
     const perShop = serviceAreaSitemapPaths("shop-0", settings).length;
     expect(perShop).toBe(Math.min(4 * 125, MAX_SERVICE_AREA_URLS_PER_SHOP));
     expect(all.length).toBeGreaterThan(SITEMAP_URL_LIMIT);

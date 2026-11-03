@@ -6,7 +6,9 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import {
   OutboundUrlBlockedError,
   assertOutboundUrlShape,
+  assertRedirectTarget,
   fetchPublicUrl,
+  isAllowedPageContentType,
   isPublicIpAddress,
   resolvePublicAddress
 } from "./outbound-url-guard.js";
@@ -129,6 +131,12 @@ describe("fetchPublicUrl (pinned connection, redirects, limits)", () => {
         res.writeHead(200);
         const interval = setInterval(() => res.write("x"), 10);
         res.on("close", () => clearInterval(interval));
+      } else if (req.url === "/binary") {
+        res.writeHead(200, { "content-type": "application/octet-stream" }).end("x".repeat(100));
+      } else if (req.url === "/json") {
+        res.writeHead(200, { "content-type": "application/json; charset=utf-8" }).end("{}");
+      } else if (req.url === "/xhtml") {
+        res.writeHead(200, { "content-type": "application/xhtml+xml; charset=utf-8" }).end("<html>ok</html>");
       } else if (req.url === "/big") {
         res.writeHead(200).end("x".repeat(5000));
       } else {
@@ -159,6 +167,16 @@ describe("fetchPublicUrl (pinned connection, redirects, limits)", () => {
     expect(res.statusCode).toBe(200);
     expect(res.body).toContain("ok");
     expect(hits.at(-1)).toBe(`public.test:${port}/ok`);
+  });
+
+  it("refuses a non-HTML/text content type without returning the body", async () => {
+    await expect(fetchPublicUrl(`http://public.test:${port}/binary`, opts())).rejects.toThrow("unsupported content type");
+    await expect(fetchPublicUrl(`http://public.test:${port}/json`, opts())).rejects.toThrow("unsupported content type");
+  });
+
+  it("accepts XHTML", async () => {
+    const res = await fetchPublicUrl(`http://public.test:${port}/xhtml`, opts());
+    expect(res.body).toContain("ok");
   });
 
   it("follows a same-site redirect", async () => {
@@ -230,5 +248,36 @@ describe("fetchPublicUrl (pinned connection, redirects, limits)", () => {
     await expect(fetchPublicUrl(`http://127.0.0.1:${port}/ok`, { allowedPorts: [port] })).rejects.toBeInstanceOf(
       OutboundUrlBlockedError
     );
+  });
+});
+
+describe("assertRedirectTarget", () => {
+  it("refuses an https -> http downgrade", () => {
+    expect(() => assertRedirectTarget(new URL("https://example.com/a"), "http://example.com/b")).toThrow(
+      "https to http redirect downgrade"
+    );
+  });
+
+  it("allows https -> https, http -> https and http -> http, resolving relative locations", () => {
+    expect(assertRedirectTarget(new URL("https://example.com/a"), "/b").toString()).toBe("https://example.com/b");
+    expect(assertRedirectTarget(new URL("http://example.com/a"), "https://example.com/b").protocol).toBe("https:");
+    expect(assertRedirectTarget(new URL("http://example.com/a"), "http://example.org/").protocol).toBe("http:");
+  });
+
+  it("still re-validates the target shape", () => {
+    expect(() => assertRedirectTarget(new URL("https://example.com/a"), "https://127.0.0.1/")).toThrow(OutboundUrlBlockedError);
+  });
+});
+
+describe("isAllowedPageContentType", () => {
+  it.each([undefined, "", "text/html", "text/html; charset=utf-8", "TEXT/PLAIN", "application/xhtml+xml", "application/xml"])(
+    "allows %s",
+    (value) => {
+      expect(isAllowedPageContentType(value)).toBe(true);
+    }
+  );
+
+  it.each(["application/json", "application/octet-stream", "image/png", "application/pdf", "video/mp4"])("rejects %s", (value) => {
+    expect(isAllowedPageContentType(value)).toBe(false);
   });
 });

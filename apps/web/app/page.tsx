@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { HomePage } from "@/src/components/marketing/site/HomePage";
 import { MarketingShell } from "@/src/components/marketing/site/MarketingShell";
 import { HOME_META } from "@/src/components/marketing/site/site-config";
 import { getDefaultRouteForRole } from "@/src/lib/route-access";
-import { readServerAuthSession } from "@/src/lib/auth";
+import { getServerSession } from "@/src/lib/server-session";
 
 export const metadata: Metadata = {
   title: HOME_META.title,
@@ -21,11 +20,10 @@ export const metadata: Metadata = {
 };
 
 export default async function Home() {
-  const cookieStore = await cookies();
-  const session = readServerAuthSession(cookieStore);
+  const result = await getServerSession();
 
-  if (session?.role) {
-    redirect(getDefaultRouteForRole(session.role));
+  if (result.status === "ok") {
+    redirect(getDefaultRouteForRole(result.session.role));
   }
 
   return (

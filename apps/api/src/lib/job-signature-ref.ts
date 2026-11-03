@@ -1,3 +1,5 @@
+import { LegacyJobSignatureUrlSchema } from "@fsm/types";
+
 import { createSignedDownloadUrl, getFileKeyFromUrl, getMediaSignedUrlTtlSeconds } from "./storage.js";
 
 /**
@@ -35,7 +37,7 @@ export async function resolveJobSignatureUrl(
     return null;
   }
   if (!isJobSignatureObjectRef(stored)) {
-    return stored;
+    return LegacyJobSignatureUrlSchema.safeParse(stored).success ? stored : null;
   }
   const objectKey = stored.slice(JOB_SIGNATURE_OBJECT_REF_PREFIX.length);
   if (!objectKey.startsWith(`attachments/${companyId}/`)) {

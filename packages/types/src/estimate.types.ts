@@ -185,8 +185,8 @@ export interface CreateEstimateInput {
   title?: string;
   messageToCustomer?: string;
   internalNotes?: string;
-  taxRate?: number;
-  discountAmount?: number;
+  taxRate?: string;
+  discountAmount?: string;
   financingOffered?: boolean;
   tierLabel?: string;
   tierGroupId?: string;
@@ -200,8 +200,8 @@ export interface UpdateEstimateInput {
   title?: string;
   messageToCustomer?: string;
   internalNotes?: string;
-  taxRate?: number;
-  discountAmount?: number;
+  taxRate?: string;
+  discountAmount?: string;
   financingOffered?: boolean;
   tierLabel?: string;
   tierGroupId?: string;
@@ -211,8 +211,8 @@ export interface AddEstimateItemInput {
   name: string;
   description?: string;
   itemType?: EstimateItemType;
-  quantity: number;
-  unitPrice: number;
+  quantity: string;
+  unitPrice: string;
   isTaxable?: boolean;
   sortOrder?: number;
   priceBookItemId?: string;
@@ -222,8 +222,8 @@ export interface UpdateEstimateItemInput {
   name?: string;
   description?: string;
   itemType?: EstimateItemType;
-  quantity?: number;
-  unitPrice?: number;
+  quantity?: string;
+  unitPrice?: string;
   isTaxable?: boolean;
   sortOrder?: number;
   priceBookItemId?: string | null;

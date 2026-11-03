@@ -119,7 +119,7 @@ describe("payload + registry consumer", () => {
   it("uses the configured trade over service inference", () => {
     const services = [{ name: "Water heater repair", category: "Plumbing" }];
     expect(resolveSiteTradeFromSettings({ offeredServices: services, trade: "electrical" }).key).toBe("electrical");
-    expect(resolveSiteTradeFromSettings({ offeredServices: services, trade: null }).key).toBe("plumbing");
+    expect(resolveSiteTradeFromSettings({ offeredServices: services, trade: null }).key).toBe("other");
     expect(resolveSiteTradeFromSettings({ offeredServices: services, trade: "other" }).key).toBe("other");
   });
 

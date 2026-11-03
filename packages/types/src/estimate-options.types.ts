@@ -29,14 +29,20 @@ export function estimateOptionTierRank(label: string | null | undefined): number
 const idempotencyKeySchema = z.string().trim().min(8).max(128);
 const expectedVersionSchema = z.number().int().min(1);
 const tierLabelSchema = z.string().trim().min(1).max(50);
+const moneyInputSchema = z.string().regex(/^(?:0|[1-9]\d{0,7})(?:\.\d{1,2})?$/);
+const quantityInputSchema = z
+  .string()
+  .regex(/^(?:0|[1-9]\d{0,6})(?:\.\d{1,3})?$/)
+  .refine((value) => value !== "0" && !/^0\.0+$/.test(value), "Quantity must be greater than zero");
+const taxRateInputSchema = z.string().regex(/^(?:0(?:\.\d{1,4})?|1(?:\.0{1,4})?)$/);
 
 export const estimateOptionItemInputSchema = z
   .object({
     name: z.string().trim().min(1).max(255),
     description: z.string().trim().max(2000).optional(),
     itemType: z.enum(["service", "labor", "material", "fee"]).optional(),
-    quantity: z.number().min(0.001).max(1_000_000),
-    unitPrice: z.number().min(0).max(10_000_000),
+    quantity: quantityInputSchema,
+    unitPrice: moneyInputSchema,
     isTaxable: z.boolean().optional(),
     sortOrder: z.number().int().min(0).max(10_000).optional(),
     priceBookItemId: z.string().uuid().optional()
@@ -49,8 +55,8 @@ export const estimateOptionInputSchema = z
     title: z.string().trim().min(1).max(255).optional(),
     recommended: z.boolean().optional(),
     items: z.array(estimateOptionItemInputSchema).min(1).max(100),
-    taxRate: z.number().min(0).max(1).optional(),
-    discountAmount: z.number().min(0).max(10_000_000).optional()
+    taxRate: taxRateInputSchema.optional(),
+    discountAmount: moneyInputSchema.optional()
   })
   .strict();
 export type EstimateOptionInput = z.infer<typeof estimateOptionInputSchema>;

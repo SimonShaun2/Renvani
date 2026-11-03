@@ -853,7 +853,7 @@ async function getInvoiceableJobProductRows(companyId: string, jobId: string, ex
   const rows = await executor
     .select()
     .from(jobProducts)
-    .where(and(eq(jobProducts.companyId, companyId), eq(jobProducts.jobId, jobId)));
+    .where(and(eq(jobProducts.companyId, companyId), eq(jobProducts.jobId, jobId), isNull(jobProducts.deletedAt)));
   return rows
     .filter((row) => !row.isUpsell || row.upsellApproved === true)
     .map((row, index) => ({

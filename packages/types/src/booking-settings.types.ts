@@ -46,10 +46,14 @@ export interface UpdateBookingSettingsInput {
   notificationEmail?: string | null;
 }
 
+export type PublicBookingIntakeMode = "bookable" | "inquiry_only";
+
 export interface PublicBookingSettings {
   companyName: string;
   companySlug: string;
   bookingSlug: string;
+  /** Authoritative capability from configured services; trade suggestions do not enable booking. */
+  intakeMode: PublicBookingIntakeMode;
   offeredServices: Array<Record<string, unknown>>;
   availableHoursStart: number;
   availableHoursEnd: number;

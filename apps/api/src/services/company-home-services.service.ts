@@ -19,10 +19,9 @@ import { env } from "@fsm/config";
 
 import { runTenantAwareTransaction } from "../lib/company-scoped-transaction.js";
 import {
-  checkZipCoverageForBookingSettings,
   getPublicBookingCompany,
-  getPublicBookingContext,
-  getPublicBookingSettingsBySlug
+  getPublicBookingSettingsBySlug,
+  resolvePublicZipServiceability
 } from "./booking.service.js";
 
 /**
@@ -106,15 +105,12 @@ export async function setEmergencyService(
 
 /**
  * Public "do you serve this ZIP?": answers only in/out. Unknown or disabled shop -> 404 (same as the booking page).
- * Uses the shop's configured ZIP list; with no list configured it falls back to existing coverage (service areas,
- * technician ZIPs, allowZipOverflow). Never returns the ZIP list, counts or technician data.
+ * Delegates to the same backend-owned serviceability invariant as inquiry intake. Never returns the ZIP list,
+ * counts or technician data.
  */
 export async function publicServesZip(slug: string, zip: string): Promise<{ served: boolean }> {
-  const { company, settings } = await getPublicBookingContext(slug);
-  const area = readServiceAreaSettings(company.settings);
-  if (area.zips.length > 0) return { served: area.zips.includes(zip) };
-  const coverage = await checkZipCoverageForBookingSettings(settings, zip);
-  return { served: coverage.covered };
+  const { serviceability } = await resolvePublicZipServiceability(slug, zip);
+  return { served: serviceability === "in_area" };
 }
 
 function readTrade(settings: unknown): string | null {

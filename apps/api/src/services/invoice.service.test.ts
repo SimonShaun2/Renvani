@@ -305,6 +305,40 @@ describe("invoice.service", () => {
     expect(preview.subtotal).toBe("100.00");
   });
 
+  it("createInvoice fromJobId excludes removed job products from lines and subtotal", async () => {
+    const { company, actor } = createAdminContext();
+    const customer = fakeDb.seedCustomer({ companyId: company.id, firstName: "Jo", lastName: "Lee" });
+    const job = fakeDb.seedJob({ companyId: company.id, customerId: customer.id, title: "Repair", status: "completed" });
+    fakeDb.seedJobProduct({
+      companyId: company.id,
+      jobId: job.id,
+      name: "Active repair",
+      quantity: "2.000",
+      unitPrice: "40.00",
+      total: "80.00"
+    });
+    fakeDb.seedJobProduct({
+      companyId: company.id,
+      jobId: job.id,
+      name: "Removed part",
+      quantity: "1.000",
+      unitPrice: "125.00",
+      total: "125.00",
+      deletedAt: new Date("2026-04-28T10:00:00.000Z")
+    });
+
+    const created = await invoiceService.createInvoice(company.id, actor.id, {
+      customerId: customer.id,
+      fromJobId: job.id
+    });
+
+    const items = fakeDb.getTestState().invoiceItems.filter((row) => row.invoiceId === created.id);
+    expect(items).toHaveLength(1);
+    expect(items[0]?.name).toBe("Active repair");
+    expect(items[0]?.total).toBe("80.00");
+    expect(created.subtotal).toBe("80.00");
+  });
+
   it("getInvoiceChargePreview: Flex adds the 2% Service Fee on balance due, Flat adds none, other tenant is NOT_FOUND", async () => {
     const flex = fakeDb.seedCompany({ name: "Flex Co", slug: "flex-co", timezone: "America/Chicago", settings: { stripePlatformBilling: { planTier: "flex" } } } as never);
     const flat = fakeDb.seedCompany({ name: "Flat Co", slug: "flat-co", timezone: "America/Chicago", settings: { stripePlatformBilling: { planTier: "flat" } } } as never);
@@ -336,7 +370,7 @@ describe("invoice.service", () => {
     const companyService = await import("./company.service.js");
     const company = fakeDb.seedCompany({ name: "Terms Set", slug: "terms-set", timezone: "America/Chicago", settings: { tradingName: "TS" } } as never);
     const actor = fakeDb.seedUser({ companyId: company.id, email: "o@terms.test", firstName: "O", lastName: "W", role: "owner" });
-    const read = () => fakeDb.getTestState().companies.find((row) => row.id === company.id)?.settings as Record<string, any>;
+    const read = () => fakeDb.getTestState().companies.find((row) => row.id === company.id)?.settings as Record<string, unknown>;
 
     await companyService.updateCompany(company.id, actor.id, { settings: { invoicing: { defaultPaymentTermsDays: 30 } } } as never);
     expect(read().invoicing).toEqual({ defaultPaymentTermsDays: 30 });

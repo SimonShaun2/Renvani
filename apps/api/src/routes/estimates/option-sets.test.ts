@@ -75,10 +75,10 @@ const option = (tierLabel: string, unitPrice: number, extra: Record<string, unkn
   tierLabel,
   title: `${tierLabel} furnace replacement`,
   items: [
-    { name: "Furnace unit", quantity: 1, unitPrice },
-    { name: "Install labor", itemType: "labor", quantity: 4, unitPrice: 95.5, isTaxable: false }
+    { name: "Furnace unit", quantity: "1", unitPrice: String(unitPrice) },
+    { name: "Install labor", itemType: "labor", quantity: "4", unitPrice: "95.50", isTaxable: false }
   ],
-  taxRate: 0.0825,
+  taxRate: "0.0825",
   ...extra
 });
 
@@ -256,6 +256,24 @@ describe("FS-212 estimate option sets", () => {
     expect(after.body.optionSet.selectedEstimateId).toBe(best.id);
     expect(after.body.optionSet.options.filter((o: { isSelectedTier: boolean }) => o.isSelectedTier)).toHaveLength(1);
     expect(after.body.optionSet.status).toBe("approved");
+  });
+
+  it("rejects sending an option set for a soft-deleted customer", async () => {
+    const w = world();
+    const created = await create(w.owner, createBody(w.customer.id));
+    const id = created.body.optionSet.tierGroupId as string;
+    fakeDb.getTestState().customers.find((customer) => customer.id === w.customer.id)!.deletedAt = new Date();
+
+    const response = await api()
+      .post(`${base}/${id}/send`)
+      .set("Authorization", w.owner)
+      .send({ idempotencyKey: "fs212-deleted-customer", expectedVersion: 1 });
+
+    expect(response.status).toBe(409);
+    expect(response.body.message).toMatch(/customer must have an email/i);
+    expect(fakeDb.getTestState().estimates.filter((row) => row.tierGroupId === id)
+      .every((row) => row.status === "draft")).toBe(true);
+    expect(addNotificationQueueJob).not.toHaveBeenCalled();
   });
 
   describe("compare-and-set on optionSetVersion (concurrent writer between read and write)", () => {

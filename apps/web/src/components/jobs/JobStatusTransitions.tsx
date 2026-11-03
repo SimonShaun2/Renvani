@@ -14,19 +14,21 @@ import { formatStatusLabel } from "./jobs.utils";
 interface JobStatusTransitionsProps {
   job: JobDetail;
   pendingRequiredTasks: number;
+  checklistState: "loading" | "error" | "ready";
+  checklistRefreshing: boolean;
+  onRetryChecklist: () => void;
   onOpenOTW: () => void;
   /** FS-24: when set, scheduled-visit Reschedule/Cancel open the schedule-change forms (window policy + versioning). */
   onReschedule?: (() => void) | undefined;
   onCancelVisit?: (() => void) | undefined;
 }
 
-export function JobStatusTransitions({ job, pendingRequiredTasks, onOpenOTW, onReschedule, onCancelVisit }: JobStatusTransitionsProps) {
+export function JobStatusTransitions({ job, pendingRequiredTasks, checklistState, checklistRefreshing, onRetryChecklist, onOpenOTW, onReschedule, onCancelVisit }: JobStatusTransitionsProps) {
   const pathname = usePathname();
   const router = useRouter();
   const transitionJob = useTransitionJob(job.id);
   const createReviewRequest = useCreateReviewRequest(job.id);
   const [completeDialogOpen, setCompleteDialogOpen] = useState(false);
-  const [overrideRequiredTasks, setOverrideRequiredTasks] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const isMobileRoute = pathname.startsWith("/mobile");
@@ -48,7 +50,7 @@ export function JobStatusTransitions({ job, pendingRequiredTasks, onOpenOTW, onR
         ];
       case "in_progress":
         return [
-          { key: "complete", label: "Complete Job", tone: "secondary" as const, onClick: () => setCompleteDialogOpen(true), icon: CheckCircle2 },
+          { key: "complete", label: "Complete Job", tone: "secondary" as const, onClick: () => { setErrorMessage(null); setCompleteDialogOpen(true); }, icon: CheckCircle2 },
           { key: "invoice", label: "Create Invoice", tone: "primary" as const, onClick: () => router.push(`/invoices?jobId=${job.id}`), icon: FileText },
           { key: "reschedule", label: "Reschedule", tone: "ghost" as const, onClick: () => router.push(`/dispatch?jobId=${job.id}`), icon: Clock3 }
         ];
@@ -98,7 +100,6 @@ export function JobStatusTransitions({ job, pendingRequiredTasks, onOpenOTW, onR
     try {
       await transitionJob.mutateAsync({ status: "completed" });
       setCompleteDialogOpen(false);
-      setOverrideRequiredTasks(false);
 
       if (isMobileRoute) {
         router.push(`/mobile/signature?jobId=${job.id}`);
@@ -108,6 +109,9 @@ export function JobStatusTransitions({ job, pendingRequiredTasks, onOpenOTW, onR
       router.push(`/invoices?jobId=${job.id}`);
     } catch (error) {
       setErrorMessage(error instanceof ApiError ? error.message : "Job could not be completed.");
+      if (error instanceof ApiError && error.status === 409) {
+        onRetryChecklist();
+      }
     }
   }
 
@@ -138,7 +142,7 @@ export function JobStatusTransitions({ job, pendingRequiredTasks, onOpenOTW, onR
         })}
       </div>
 
-      {errorMessage ? (
+      {errorMessage && !completeDialogOpen ? (
         <p className="mt-4 rounded-3xl border border-error/15 bg-error-light px-4 py-3 text-sm text-error">{errorMessage}</p>
       ) : null}
 
@@ -167,29 +171,32 @@ export function JobStatusTransitions({ job, pendingRequiredTasks, onOpenOTW, onR
                 Completing the job will lock the checklist and move the desktop flow straight into invoice creation.
               </p>
 
-              {pendingRequiredTasks > 0 ? (
+              {checklistState === "error" ? (
+                <div role="alert" className="mt-5 rounded-[24px] border border-warning/25 bg-warning-light px-4 py-4 text-sm text-neutral-700">
+                  <p className="font-semibold text-neutral-900">Checklist unavailable</p>
+                  <p className="mt-2">The checklist must load before this job can be completed.</p>
+                  <button type="button" disabled={checklistRefreshing} onClick={onRetryChecklist} className="mt-3 min-h-11 rounded-full border border-neutral-300 bg-white px-4 text-sm font-semibold text-neutral-700 disabled:opacity-60">
+                    {checklistRefreshing ? "Retrying..." : "Retry checklist"}
+                  </button>
+                </div>
+              ) : checklistState === "loading" ? (
+                <p role="status" className="mt-5 text-sm text-neutral-600">Checking the required checklist tasks...</p>
+              ) : pendingRequiredTasks > 0 ? (
                 <div className="mt-5 rounded-[24px] border border-warning/25 bg-warning-light px-4 py-4 text-sm text-neutral-700">
-                  <p className="font-semibold text-neutral-900">Are all required tasks complete?</p>
+                  <p className="font-semibold text-neutral-900">Complete required tasks first</p>
                   <p className="mt-2">
-                    {pendingRequiredTasks} required {pendingRequiredTasks === 1 ? "task is" : "tasks are"} still open.
+                    {pendingRequiredTasks} required {pendingRequiredTasks === 1 ? "task is" : "tasks are"} still open. Finish {pendingRequiredTasks === 1 ? "it" : "them"} in the checklist before completing this job.
                   </p>
-                  <label className="mt-4 inline-flex items-center gap-2 font-medium text-neutral-700">
-                    <input
-                      type="checkbox"
-                      checked={overrideRequiredTasks}
-                      onChange={(event) => setOverrideRequiredTasks(event.target.checked)}
-                    />
-                    Complete anyway
-                  </label>
                 </div>
               ) : null}
+
+              {errorMessage ? <p role="alert" className="mt-4 rounded-2xl border border-error/15 bg-error-light px-4 py-3 text-sm text-error">{errorMessage}</p> : null}
 
               <div className="mt-6 flex justify-end gap-3">
                 <button
                   type="button"
                   onClick={() => {
                     setCompleteDialogOpen(false);
-                    setOverrideRequiredTasks(false);
                   }}
                   className="rounded-full border border-neutral-200 px-4 py-2 text-sm font-semibold text-neutral-600"
                 >
@@ -197,7 +204,7 @@ export function JobStatusTransitions({ job, pendingRequiredTasks, onOpenOTW, onR
                 </button>
                 <button
                   type="button"
-                  disabled={transitionJob.isPending || (pendingRequiredTasks > 0 && !overrideRequiredTasks)}
+                  disabled={transitionJob.isPending || checklistState !== "ready" || checklistRefreshing || pendingRequiredTasks > 0}
                   onClick={() => {
                     void handleComplete();
                   }}

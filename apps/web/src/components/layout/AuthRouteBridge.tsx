@@ -17,18 +17,20 @@ export function AuthRouteBridge({ session, children }: AuthRouteBridgeProps) {
   const pathname = usePathname();
   const router = useRouter();
   const role = useAuthStore((state) => state.user?.role ?? session.role);
-  const token = useAuthStore((state) => state.token);
+  const hydrateSession = useAuthStore((state) => state.hydrateSession);
   const setAuth = useAuthStore((state) => state.setAuth);
 
   useEffect(() => {
-    const nextToken = token ?? getAuthToken();
+    hydrateSession(session.user, session.company);
 
-    if (!nextToken) {
+    const legacyToken = getAuthToken();
+
+    if (!legacyToken) {
       return;
     }
 
-    setAuth(session.user, session.company, nextToken);
-  }, [session, setAuth, token]);
+    setAuth(session.user, session.company, legacyToken);
+  }, [hydrateSession, session, setAuth]);
 
   useEffect(() => {
     const isOwnerSurface =

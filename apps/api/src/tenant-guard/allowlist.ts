@@ -6,6 +6,8 @@
  * `companyId` filter, and prefer adding the filter instead. Categories:
  *   public-token   unauthenticated lookup by an unguessable token/slug; tenant then comes from the row
  *   stripe-signed  ids taken from Stripe-signed webhook metadata / PaymentIntent ids
+ *   provider-signed  lookup inside a webhook whose provider signature was verified first; keys are provider-global ids
+ *   global-uniqueness  existence-only check that a value is unique platform-wide (returns no row data)
  *   auth-global    login identity / refresh tokens / Clerk linking are global by design
  *   scoped-parent  the row was already loaded (or just written) with a companyId filter in the same flow;
  *                  defense-in-depth companyId is H1 PR 3
@@ -13,17 +15,23 @@
  *   admin-global   platform-admin (cross-tenant by design)
  *   pending-pr     fixed by an open PR; remove the entry when it merges
  */
+export const TENANT_GUARD_ALLOWLIST_CATEGORIES = [
+  "public-token",
+  "stripe-signed",
+  "provider-signed",
+  "global-uniqueness",
+  "auth-global",
+  "scoped-parent",
+  "worker-payload",
+  "admin-global",
+  "pending-pr"
+] as const;
+export type TenantGuardAllowlistCategory = (typeof TENANT_GUARD_ALLOWLIST_CATEGORIES)[number];
+
 export interface TenantGuardAllowlistEntry {
   file: string;
   pattern: string;
-  category:
-    | "public-token"
-    | "stripe-signed"
-    | "auth-global"
-    | "scoped-parent"
-    | "worker-payload"
-    | "admin-global"
-    | "pending-pr";
+  category: TenantGuardAllowlistCategory;
   reason: string;
 }
 
@@ -86,7 +94,7 @@ export const TENANT_GUARD_ALLOWLIST: TenantGuardAllowlistEntry[] = [
   { file: "apps/webhook/src/handlers/twilio.handler.ts", pattern: "eq(customers.phone, fromNumber), isNull(customers.deletedAt)", category: "pending-pr", reason: "Today: cross-tenant guess (fixed by #295). After #295: intentional platform-wide STOP lookup (consent withdrawal only)." },
   { file: "apps/webhook/src/handlers/twilio.handler.ts", pattern: "eq(customers.id, companyContext.customerId)", category: "pending-pr", reason: "Fixed by #295 (update scoped by companyId); remove when it merges." },
   { file: "apps/webhook/src/handlers/twilio.handler.ts", pattern: "eq(messageLogs.toAddress, phone)", category: "public-token", reason: "#295 routing: most recent outbound SMS to the signed inbound From phone decides the tenant." },
-  { file: "apps/api/src/services/growth/call-tracking.service.ts", pattern: "eq(callTrackingNumbers.trackingNumber, input.trackingNumber), isNull(callTrackingNumbers.deletedAt)", category: "auth-global", reason: "Create-time uniqueness check: a tracking number may belong to only one tenant platform-wide; returns only an id for a 409, no row data." },
-  { file: "apps/api/src/services/growth/call-tracking.service.ts", pattern: "eq(callRecords.provider, adapter.id), eq(callRecords.providerCallId, event.providerCallId)", category: "public-token", reason: "Signed provider webhook idempotency: provider call ids are global per provider; returns only 'duplicate', no row data." },
+  { file: "apps/api/src/services/growth/call-tracking.service.ts", pattern: "eq(callTrackingNumbers.trackingNumber, input.trackingNumber), isNull(callTrackingNumbers.deletedAt)", category: "global-uniqueness", reason: "Create-time uniqueness check (authenticated tenant user): a tracking number may belong to only one tenant platform-wide; returns only an id to raise a 409, no row data." },
+  { file: "apps/api/src/services/growth/call-tracking.service.ts", pattern: "eq(callRecords.provider, adapter.id), eq(callRecords.providerCallId, event.providerCallId)", category: "provider-signed", reason: "Webhook idempotency after the provider signature check: provider call ids are global per provider; returns only 'duplicate', no row data." },
   { file: "apps/api/src/services/growth/call-tracking.service.ts", pattern: "eq(callTrackingNumbers.trackingNumber, event.trackingNumber)", category: "public-token", reason: "Signed provider webhook resolves the tenant from the active (globally unique) tracking number it was sent to." }
 ];

@@ -143,6 +143,22 @@ export function createTimeZoneDate(date: string, hour: number, timeZone: string)
   return new Date(utcGuess.getTime() - offsetMinutes * 60_000);
 }
 
+/**
+ * Adds whole calendar days to a YYYY-MM-DD string (no time-of-day math, DST-safe).
+ */
+export function addCalendarDays(date: string, days: number): string {
+  const [year, month, day] = date.split("-").map(Number);
+  return new Date(Date.UTC(year ?? 0, (month ?? 1) - 1, (day ?? 1) + days)).toISOString().slice(0, 10);
+}
+
+/**
+ * Start (local midnight) of the calendar day after `date` in `timeZone`.
+ * Unlike `dayStart + 24h`, this is correct on 23h/25h DST transition days.
+ */
+export function getNextTimeZoneDayStart(date: string, timeZone: string): Date {
+  return createTimeZoneDate(addCalendarDays(date, 1), 0, timeZone);
+}
+
 function getWeekdayKey(date: string, timeZone: string): string {
   return new Intl.DateTimeFormat("en-US", {
     timeZone,
@@ -553,7 +569,7 @@ export async function getAutoFitSuggestions(input: AutoFitInput): Promise<AutoFi
   }
 
   const dayStart = createTimeZoneDate(normalizedDate, 0, timeZone);
-  const nextDayStart = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000);
+  const nextDayStart = getNextTimeZoneDayStart(normalizedDate, timeZone);
   const companyDayJobs = companyJobs.filter((scheduledJob) => {
     if (!scheduledJob.technicianId || !scheduledJob.scheduledStart || !scheduledJob.scheduledEnd) {
       return false;

@@ -34,7 +34,7 @@
 - QA evidence URL:
 - Independent reviewer evidence URL:
 - Security and Design evidence URLs when required:
-- E.. CoS merge approval evidence (after peer review, QA, Security, batch CI):
+- Founder merge approval for this named PR and exact reviewed head (founder-only; after independent peer review, QA, Security-by-risk, and approved batch CI):
 - Approved batch CI run URL and conclusion:
 
 ## Risk and observability

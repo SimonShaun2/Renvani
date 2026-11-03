@@ -25,6 +25,7 @@ import {
 import { useRevenueSummary } from "@/src/hooks/dashboard.hooks";
 import { useProposeRecommendation } from "@/src/hooks/revenue-proposals.hooks";
 import { cn } from "@/src/lib/utils";
+import { revenueActionButtonLabel, revenueDataState } from "./revenue-center-state";
 
 type RevenueFilter = "all" | "reactivation" | "unsold_estimate" | "unpaid_invoice" | "aging_asset" | "maintenance_plan_offer";
 type SortOption = "urgencyScore" | "estimatedRevenue" | "createdAt";
@@ -169,9 +170,7 @@ function RecommendationRow({
     ? `${recommendation.customer.firstName} ${recommendation.customer.lastName}`.trim()
     : null;
   const urgencyTone = getUrgencyTone(recommendation.urgencyScore);
-  const actionLabel = isRevenueProposalRecommendationType(recommendation.type)
-    ? "Create proposal"
-    : "Mark handled";
+  const actionLabel = revenueActionButtonLabel(isRevenueProposalRecommendationType(recommendation.type));
 
   return (
     <div className="rounded-[14px] border border-[#e6dccb] bg-white px-5 py-5 transition hover:border-[#f6b400]">
@@ -420,7 +419,8 @@ export function AiRevenueCenterClient() {
     setSnoozeError(null);
   }
 
-  const categoryCards = !summaryQuery.isError && summaryQuery.data ? buildCategoryCards(summaryQuery.data) : [];
+  const summaryState = revenueDataState(summaryQuery);
+  const categoryCards = summaryState === "ready" && summaryQuery.data ? buildCategoryCards(summaryQuery.data) : [];
 
   return (
     <div className="space-y-6 text-[#0f1530]">
@@ -457,13 +457,13 @@ export function AiRevenueCenterClient() {
               <div className="flex flex-col gap-6 px-6 py-6 lg:flex-row lg:items-end lg:justify-between">
                 <div>
                   <p className="font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-[#c3c8da]">Identified revenue opportunity</p>
-                  {summaryQuery.isLoading ? <p role="status" className="mt-3 text-xl text-[#c3c8da]">Loading saved figures…</p> :
-                   summaryQuery.isError || !summaryQuery.data ? <p className="mt-3 text-5xl font-semibold">—</p> :
+                  {summaryState === "loading" ? <p role="status" className="mt-3 text-xl text-[#c3c8da]">Loading saved figures…</p> :
+                   summaryState !== "ready" || !summaryQuery.data ? <p className="mt-3 text-5xl font-semibold">—</p> :
                    <CurrencyDisplay value={summaryQuery.data.totalOpportunityValue} fallback="—" className="mt-3 block text-5xl font-semibold tracking-tight text-white" />}
                   <p className="mt-3 text-xs leading-5 text-[#c3c8da]">Potential identified in recorded opportunities, not booked revenue.</p>
                 </div>
                 <div className="text-sm text-white/70">
-                  {summaryQuery.data && !summaryQuery.isError ? (
+                  {summaryState === "ready" && summaryQuery.data ? (
                     <div className="flex items-center gap-2">
                       <CalendarClock className="h-4 w-4" />
                       <span>Summary calculated: {format(parseISO(summaryQuery.data.generatedAt), "MMM d, h:mm a")}</span>

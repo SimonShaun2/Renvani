@@ -57,6 +57,12 @@ const companyId = () =>
     .notNull()
     .references(() => companies.id, { onDelete: "cascade" });
 
+// Consent evidence must block a company hard delete rather than cascade it.
+const consentCompanyId = () =>
+  uuid("company_id")
+    .notNull()
+    .references(() => companies.id, { onDelete: "no action" });
+
 // ─────────────────────────────────────────────
 // ENUMS
 // ─────────────────────────────────────────────
@@ -2253,10 +2259,10 @@ export const outboundConsentReceiptSurfaceEnum = pgEnum("outbound_consent_receip
 ]);
 
 // Independently persisted capture evidence; only a future source-specific trusted boundary may insert.
-// Migration 0062 must FORCE tenant RLS and deny UPDATE/DELETE to the application role.
+// Migration 0062 forces tenant RLS and rejects evidence UPDATE/DELETE with triggers.
 export const outboundConsentCaptureReceipts = pgTable("outbound_consent_capture_receipts", {
   id: id(),
-  companyId: companyId(),
+  companyId: consentCompanyId(),
   subjectType: outboundConsentSubjectTypeEnum("subject_type").notNull(),
   subjectId: uuid("subject_id").notNull(),
   channel: outboundConsentChannelEnum("channel").notNull(),
@@ -2282,7 +2288,7 @@ export const outboundConsentCaptureReceipts = pgTable("outbound_consent_capture_
 
 export const outboundConsentStates = pgTable("outbound_consent_states", {
   id: id(),
-  companyId: companyId(),
+  companyId: consentCompanyId(),
   subjectType: outboundConsentSubjectTypeEnum("subject_type").notNull(),
   subjectId: uuid("subject_id").notNull(),
   channel: outboundConsentChannelEnum("channel").notNull(),
@@ -2301,10 +2307,10 @@ export const outboundConsentStates = pgTable("outbound_consent_states", {
   subjectIdx: index("outbound_consent_states_subject_idx").on(t.companyId, t.subjectType, t.subjectId),
 }));
 
-// Append-only by service contract; migration 0062 must also revoke UPDATE/DELETE from app role.
+// Append-only by service contract and migration 0062 trigger enforcement.
 export const outboundConsentEvents = pgTable("outbound_consent_events", {
   id: id(),
-  companyId: companyId(),
+  companyId: consentCompanyId(),
   subjectType: outboundConsentSubjectTypeEnum("subject_type").notNull(),
   subjectId: uuid("subject_id").notNull(),
   channel: outboundConsentChannelEnum("channel").notNull(),

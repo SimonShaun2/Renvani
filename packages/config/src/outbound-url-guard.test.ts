@@ -104,6 +104,7 @@ describe("fetchPublicUrl (pinned connection, redirects, limits)", () => {
   let server: http.Server;
   let port = 0;
   const hits: string[] = [];
+  let redirectStreamClosed = false;
 
   beforeAll(async () => {
     server = http.createServer((req, res) => {
@@ -114,8 +115,20 @@ describe("fetchPublicUrl (pinned connection, redirects, limits)", () => {
         res.writeHead(302, { location: `http://evil.test:${port}/` }).end();
       } else if (req.url === "/to-ok") {
         res.writeHead(301, { location: "/ok" }).end();
+      } else if (req.url === "/redirect-stream") {
+        res.writeHead(302, { location: "/ok" });
+        res.write("x");
+        const interval = setInterval(() => res.write("x"), 10);
+        res.on("close", () => {
+          redirectStreamClosed = true;
+          clearInterval(interval);
+        });
       } else if (req.url === "/loop") {
         res.writeHead(302, { location: "/loop" }).end();
+      } else if (req.url === "/slow-stream") {
+        res.writeHead(200);
+        const interval = setInterval(() => res.write("x"), 10);
+        res.on("close", () => clearInterval(interval));
       } else if (req.url === "/big") {
         res.writeHead(200).end("x".repeat(5000));
       } else {
@@ -127,6 +140,7 @@ describe("fetchPublicUrl (pinned connection, redirects, limits)", () => {
   });
 
   afterAll(async () => {
+    server.closeAllConnections();
     await new Promise<void>((resolve) => server.close(() => resolve()));
   });
 
@@ -150,6 +164,40 @@ describe("fetchPublicUrl (pinned connection, redirects, limits)", () => {
   it("follows a same-site redirect", async () => {
     const res = await fetchPublicUrl(`http://public.test:${port}/to-ok`, opts());
     expect(res.finalUrl).toBe(`http://public.test:${port}/ok`);
+  });
+
+  it("closes a streaming redirect body before following the next hop", async () => {
+    redirectStreamClosed = false;
+    const res = await fetchPublicUrl(`http://public.test:${port}/redirect-stream`, { ...opts(), maxBytes: 100 });
+    expect(res.finalUrl).toBe(`http://public.test:${port}/ok`);
+    const closed = await new Promise<boolean>((resolve) => {
+      const timeout = setTimeout(() => {
+        clearInterval(check);
+        resolve(false);
+      }, 200);
+      const check = setInterval(() => {
+        if (redirectStreamClosed) {
+          clearTimeout(timeout);
+          clearInterval(check);
+          resolve(true);
+        }
+      }, 5);
+    });
+    expect(closed).toBe(true);
+  });
+
+  it("bounds a stalled DNS lookup with the overall deadline", async () => {
+    const neverResolves = async (): Promise<Array<{ address: string; family: number }>> =>
+      new Promise<Array<{ address: string; family: number }>>(() => undefined);
+    await expect(
+      fetchPublicUrl(`http://public.test:${port}/ok`, { ...opts(), resolver: neverResolves, timeoutMs: 40 })
+    ).rejects.toThrow(/timeout/u);
+  });
+
+  it("enforces the wall-clock deadline while a response keeps streaming", async () => {
+    await expect(fetchPublicUrl(`http://public.test:${port}/slow-stream`, { ...opts(), timeoutMs: 70 })).rejects.toThrow(
+      /timeout/u
+    );
   });
 
   it("blocks redirect to a private IP literal", async () => {

@@ -161,15 +161,26 @@ function requestOnce(
   }) as LookupFunction;
   const transport = url.protocol === "https:" ? https : http;
   return new Promise((resolve, reject) => {
+    let deadlineTimer: ReturnType<typeof setTimeout> | undefined;
+    let response: http.IncomingMessage | undefined;
+    const finish = (result: { statusCode: number; location: string | null; body: string }) => {
+      if (deadlineTimer) clearTimeout(deadlineTimer);
+      resolve(result);
+    };
+    const fail = (error: Error) => {
+      if (deadlineTimer) clearTimeout(deadlineTimer);
+      reject(error);
+    };
     const req = transport.request(
       url,
-      { method: "GET", headers: options.headers, lookup: pinnedLookup, timeout: options.timeoutMs },
+      { method: "GET", headers: options.headers, lookup: pinnedLookup },
       (res) => {
+        response = res;
         const statusCode = res.statusCode ?? 0;
         const location = typeof res.headers.location === "string" ? res.headers.location : null;
         if (statusCode >= 300 && statusCode < 400 && location) {
-          res.resume();
-          resolve({ statusCode, location, body: "" });
+          res.destroy();
+          finish({ statusCode, location, body: "" });
           return;
         }
         const chunks: Buffer[] = [];
@@ -181,19 +192,44 @@ function requestOnce(
             tooLarge = true;
             res.destroy();
             req.destroy();
-            reject(new OutboundUrlBlockedError("response too large"));
+            fail(new OutboundUrlBlockedError("response too large"));
             return;
           }
           chunks.push(chunk);
         });
-        res.on("end", () => !tooLarge && resolve({ statusCode, location: null, body: Buffer.concat(chunks).toString("utf8") }));
-        res.on("error", reject);
+        res.on("end", () => !tooLarge && finish({ statusCode, location: null, body: Buffer.concat(chunks).toString("utf8") }));
+        res.on("error", fail);
       }
     );
-    req.on("timeout", () => req.destroy(new OutboundUrlBlockedError("timeout")));
-    req.on("error", (error) => reject(error));
+    deadlineTimer = setTimeout(() => {
+      response?.destroy();
+      req.destroy();
+      fail(new OutboundUrlBlockedError("timeout"));
+    }, options.timeoutMs);
+    req.on("error", fail);
     req.end();
   });
+}
+
+async function resolveBeforeDeadline(
+  hostname: string,
+  deadline: number,
+  resolver?: OutboundResolver,
+  isAllowedAddress?: (address: string) => boolean
+): Promise<{ address: string; family: number }> {
+  const remaining = deadline - Date.now();
+  if (remaining <= 0) throw new OutboundUrlBlockedError("timeout");
+  let deadlineTimer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      resolvePublicAddress(hostname, resolver, isAllowedAddress),
+      new Promise<never>((_resolve, reject) => {
+        deadlineTimer = setTimeout(() => reject(new OutboundUrlBlockedError("timeout")), remaining);
+      })
+    ]);
+  } finally {
+    if (deadlineTimer) clearTimeout(deadlineTimer);
+  }
 }
 
 /** GET a user-supplied URL safely (see module comment). Throws OutboundUrlBlockedError on policy violations. */
@@ -206,9 +242,9 @@ export async function fetchPublicUrl(raw: string | URL, options: FetchPublicUrlO
   const deadline = Date.now() + timeoutMs;
 
   for (let hop = 0; ; hop += 1) {
+    const pinned = await resolveBeforeDeadline(current.hostname, deadline, options.resolver, options.isAllowedAddress);
     const remaining = deadline - Date.now();
     if (remaining <= 0) throw new OutboundUrlBlockedError("timeout");
-    const pinned = await resolvePublicAddress(current.hostname, options.resolver, options.isAllowedAddress);
     const response = await requestOnce(current, pinned, { timeoutMs: remaining, maxBytes, headers });
     if (response.location === null) {
       return { statusCode: response.statusCode, body: response.body, finalUrl: current.toString() };

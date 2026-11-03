@@ -10,7 +10,8 @@ import https from "node:https";
  * - IP literals (WHATWG URL already canonicalises decimal/hex/octal IPv4) must be public;
  * - hostnames are resolved and EVERY address must be public; the connection is pinned to the
  *   validated address via a custom `lookup`, so there is no TOCTOU/DNS-rebinding window;
- * - redirects are followed manually (each hop re-validated), capped; timeout and body size are capped.
+ * - redirects are followed manually (each hop re-validated), capped; an https -> http downgrade is refused;
+ * - timeout and body size are capped; a final response whose Content-Type is not HTML/text/XML is refused.
  */
 
 const BLOCKED_IPV4_CIDRS: ReadonlyArray<readonly [string, number]> = [
@@ -132,6 +133,27 @@ export async function resolvePublicAddress(
   return records[0] as { address: string; family: number };
 }
 
+/**
+ * Resolve a redirect Location against the current URL and re-validate it. Refuses an https -> http
+ * downgrade so a TLS-protected fetch cannot be bounced onto plaintext.
+ */
+export function assertRedirectTarget(current: URL, location: string, policy: OutboundUrlPolicy = {}): URL {
+  const next = assertOutboundUrlShape(new URL(location, current), policy);
+  if (current.protocol === "https:" && next.protocol !== "https:") {
+    throw new OutboundUrlBlockedError("https to http redirect downgrade");
+  }
+  return next;
+}
+
+/** Media types a fetched page may have. A missing Content-Type is tolerated (common on small sites). */
+const ALLOWED_CONTENT_TYPE = /^(?:text\/[a-z0-9.+-]+|application\/(?:xhtml\+xml|xml))$/u;
+
+export function isAllowedPageContentType(header: string | undefined): boolean {
+  if (header === undefined || header.trim() === "") return true;
+  const mediaType = header.split(";")[0]?.trim().toLowerCase() ?? "";
+  return ALLOWED_CONTENT_TYPE.test(mediaType);
+}
+
 export interface FetchPublicUrlOptions extends OutboundUrlPolicy {
   timeoutMs?: number;
   maxRedirects?: number;
@@ -181,6 +203,12 @@ function requestOnce(
         if (statusCode >= 300 && statusCode < 400 && location) {
           res.destroy();
           finish({ statusCode, location, body: "" });
+          return;
+        }
+        if (!isAllowedPageContentType(res.headers["content-type"])) {
+          res.destroy();
+          req.destroy();
+          fail(new OutboundUrlBlockedError("unsupported content type"));
           return;
         }
         const chunks: Buffer[] = [];
@@ -250,6 +278,6 @@ export async function fetchPublicUrl(raw: string | URL, options: FetchPublicUrlO
       return { statusCode: response.statusCode, body: response.body, finalUrl: current.toString() };
     }
     if (hop >= maxRedirects) throw new OutboundUrlBlockedError("too many redirects");
-    current = assertOutboundUrlShape(new URL(response.location, current), options);
+    current = assertRedirectTarget(current, response.location, options);
   }
 }

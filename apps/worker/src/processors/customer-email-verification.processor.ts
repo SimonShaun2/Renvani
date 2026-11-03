@@ -1,0 +1,133 @@
+/** FS-234: transactional proof-of-email delivery. Disabled until the capture contract is approved. */
+import { and, eq, isNull, sql } from "drizzle-orm";
+
+import { resolveTransactionalEmailFromAddress } from "@fsm/comms";
+import { env } from "@fsm/config";
+import { featureFlags } from "@fsm/config/feature-flags";
+import {
+  customers,
+  emitEventWithExecutor,
+  messageLogs,
+  outboundConsentEmailChallenges,
+  runTransactionWithTenantSession,
+} from "@fsm/db";
+import { customerEmailVerificationJobSchema, type CustomerEmailVerificationJob } from "@fsm/jobs";
+
+const SUBJECT = "Verify your email for Renvani";
+const SOURCE_SYSTEM = "customer_email_verification";
+
+type DeliveryFacts = { companyId: string; customerId: string; challengeId: string; email: string };
+type SendResult = { providerMessageId: string | null };
+
+export interface CustomerEmailVerificationDeliveryDependencies {
+  enabled: boolean;
+  load(payload: CustomerEmailVerificationJob): Promise<DeliveryFacts | null>;
+  buildToken(companyId: string, challengeId: string): Promise<string> | string;
+  send(input: { to: string; subject: string; html: string; text: string }): Promise<SendResult>;
+  record(facts: DeliveryFacts, result: SendResult): Promise<void>;
+  appUrl: string;
+}
+
+/** No token or destination is accepted from the queued payload. */
+export async function processCustomerEmailVerificationDelivery(
+  raw: unknown,
+  deps: CustomerEmailVerificationDeliveryDependencies,
+): Promise<"disabled" | "skipped" | "accepted"> {
+  const payload = customerEmailVerificationJobSchema.parse(raw);
+  if (!deps.enabled) return "disabled";
+  const facts = await deps.load(payload);
+  if (!facts || facts.companyId !== payload.companyId || facts.customerId !== payload.customerId ||
+      facts.challengeId !== payload.challengeId) return "skipped";
+  const token = await deps.buildToken(facts.companyId, facts.challengeId);
+  const portalUrl = new URL("/portal", deps.appUrl);
+  portalUrl.hash = `verify-email=${encodeURIComponent(token)}`;
+  const url = portalUrl.toString();
+  const result = await deps.send({
+    to: facts.email,
+    subject: SUBJECT,
+    text: `Use this link to verify your email address for Renvani. The link expires in 10 minutes: ${url}`,
+    html: `<p>Use this link to verify your email address for Renvani. The link expires in 10 minutes.</p><p><a href="${url}">Verify email</a></p>`,
+  });
+  if (!result.providerMessageId) throw new Error("Verification email provider did not accept delivery");
+  await deps.record(facts, result);
+  return "accepted";
+}
+
+async function loadCurrent(payload: CustomerEmailVerificationJob): Promise<DeliveryFacts | null> {
+  return runTransactionWithTenantSession(payload.companyId, async (tx) => {
+    const [challenge] = await tx.select({
+      companyId: outboundConsentEmailChallenges.companyId,
+      customerId: outboundConsentEmailChallenges.customerId,
+      challengeId: outboundConsentEmailChallenges.id,
+      email: outboundConsentEmailChallenges.email,
+    }).from(outboundConsentEmailChallenges).where(and(
+      eq(outboundConsentEmailChallenges.companyId, payload.companyId),
+      eq(outboundConsentEmailChallenges.customerId, payload.customerId),
+      eq(outboundConsentEmailChallenges.id, payload.challengeId),
+      isNull(outboundConsentEmailChallenges.consumedAt),
+      isNull(outboundConsentEmailChallenges.deletedAt),
+      sql`${outboundConsentEmailChallenges.expiresAt} > now()`,
+    )).limit(1);
+    if (!challenge) return null;
+    const [customer] = await tx.select({ email: customers.email, doNotContact: customers.doNotContact })
+      .from(customers).where(and(
+        eq(customers.companyId, payload.companyId), eq(customers.id, payload.customerId), isNull(customers.deletedAt),
+      )).limit(1);
+    if (!customer?.email || customer.doNotContact || customer.email.trim().toLowerCase() !== challenge.email) return null;
+    const [prior] = await tx.select({ id: messageLogs.id }).from(messageLogs).where(and(
+      eq(messageLogs.companyId, payload.companyId), eq(messageLogs.sourceSystem, SOURCE_SYSTEM),
+      eq(messageLogs.sourceId, payload.challengeId),
+    )).limit(1);
+    return prior ? null : challenge;
+  });
+}
+
+async function recordAccepted(facts: DeliveryFacts, result: SendResult): Promise<void> {
+  const fromAddress = resolveTransactionalEmailFromAddress({
+    resendApiKey: env.RESEND_API_KEY,
+    sendgridApiKey: env.SENDGRID_API_KEY,
+    nodeEnv: env.NODE_ENV,
+    resendFromEmail: env.RESEND_FROM_EMAIL,
+    emailFrom: env.EMAIL_FROM,
+    sendgridFromEmail: env.SENDGRID_FROM_EMAIL,
+  });
+  await runTransactionWithTenantSession(facts.companyId, async (tx) => {
+    const [logged] = await tx.insert(messageLogs).values({
+      companyId: facts.companyId, customerId: facts.customerId,
+      channel: "email", direction: "outbound", toAddress: facts.email,
+      fromAddress, subject: SUBJECT, body: SUBJECT,
+      providerMessageId: result.providerMessageId, providerStatus: "accepted", sentAt: new Date(),
+      sourceSystem: SOURCE_SYSTEM, sourceId: facts.challengeId,
+    }).onConflictDoNothing().returning({ id: messageLogs.id });
+    if (!logged) return;
+    await emitEventWithExecutor(tx, {
+      companyId: facts.companyId,
+      eventType: "outbound_consent.email_verification_sent",
+      actorType: "system", entityType: "outbound_consent_email_challenge", entityId: facts.challengeId,
+      customerId: facts.customerId,
+      payload: { challengeId: facts.challengeId, providerMessageId: result.providerMessageId },
+      summary: "Customer email verification delivery accepted by provider",
+    });
+  });
+}
+
+/** Kept behind the shared feature flag; no caller route currently enqueues this job. */
+export async function processCustomerEmailVerificationDeliveryJob(raw: unknown): Promise<"disabled" | "skipped" | "accepted"> {
+  if (!featureFlags.customerEmailVerificationDeliveryEnabled) return "disabled";
+  const tokenModuleUrl = new URL("../../../api/dist/services/outbound-consent-email-verification.service.js", import.meta.url);
+  const emailModuleUrl = new URL("../../../api/dist/lib/outbound-email.js", import.meta.url);
+  const [{ buildCustomerEmailChallengeToken }, { deliverTransactionalEmail }] = await Promise.all([
+    import(tokenModuleUrl.href) as Promise<{ buildCustomerEmailChallengeToken(companyId: string, challengeId: string): string }>,
+    import(emailModuleUrl.href) as Promise<{ deliverTransactionalEmail(input: {
+      to: string; subject: string; html: string; text: string;
+    }): Promise<SendResult> }>,
+  ]);
+  return processCustomerEmailVerificationDelivery(raw, {
+    enabled: true,
+    load: loadCurrent,
+    buildToken: buildCustomerEmailChallengeToken,
+    send: deliverTransactionalEmail,
+    record: recordAccepted,
+    appUrl: env.APP_URL,
+  });
+}

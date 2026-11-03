@@ -71,6 +71,12 @@ export {
 export type { ImportEquipmentCommitPayload } from "./import-equipment-commit.js";
 export { enqueueImportEquipmentCommitJob } from "./enqueue-import-equipment-commit.js";
 export {
+  SEND_CUSTOMER_EMAIL_VERIFICATION_JOB_NAME,
+  customerEmailVerificationJobSchema,
+  enqueueCustomerEmailVerificationJob,
+} from "./customer-email-verification.js";
+export type { CustomerEmailVerificationJob } from "./customer-email-verification.js";
+export {
   SEND_VIP_MEMBERSHIP_EMAIL_JOB_NAME,
   buildVipDunningEmailJobId,
   buildVipRenewalEmailJobId,

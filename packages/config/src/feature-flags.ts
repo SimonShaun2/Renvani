@@ -37,6 +37,8 @@ export const featureFlags = {
   loyaltyRemindersEnabled: false,
   // FEATURE FLAG: loyalty-reminders-dry-run — FS-72 blocks customer send until founder gate
   loyaltyRemindersDryRun: true,
+  // FEATURE FLAG: FS-234 customer email control challenge delivery; remains off until capture review.
+  customerEmailVerificationDeliveryEnabled: false,
   // FEATURE FLAG: service-job-brief-worker — FS-25 worker-built job brief proposals (no inline API AI)
   serviceJobBriefWorkerEnabled: false,
   // FEATURE FLAG: clerk-auth-parallel-jwt — STACK-02: accept Clerk session JWT alongside in-repo JWT

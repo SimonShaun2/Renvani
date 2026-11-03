@@ -5,6 +5,14 @@
 # FSM Platform V2 — Implementation Execution Standard
 
 **Read `AGENTS.md` first.** This file extends it with concrete implementation patterns.
+
+## Mandatory design-to-code acceptance for every UI ticket
+
+Read [Renvani Figma parity contract](docs/design/RENVANI_FIGMA_PARITY.md) **before implementing user-facing changes**. Current Figma file `jiGHTNUJNltWbHA4Il3hk7` is the only approved design source; retire old files and styling as authority. Pull exact screen and interaction nodes (desktop, tablet, mobile, error/empty/loading). Match the existing route to those nodes; never infer a login frame from the full-platform demo or claim that Figma has been implemented because a prompt links it. Do not replace working backend/Clerk auth with static prototype components.
+
+For each UI PR include exact node IDs, browser screenshot comparisons at the reviewed head, a list of deviations, working interaction/accessibility verification, and independent Design/Product + QA results. Any missing visual check is `HOLD`, not `PASS`; green TypeScript/CI alone cannot make the screen design-complete. Correct legacy product branding only on active user-facing surfaces; treat historical data and migration identifiers as compatibility-sensitive. Founder explicitly approves each PR merge.
+
+
 **Version:** 2.0 — supersedes all prior versions.
 
 ---

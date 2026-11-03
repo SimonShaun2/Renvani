@@ -152,6 +152,16 @@ describe("FS-235 Clerk workspace intent", () => {
     expect(state.events).toHaveLength(1);
   });
 
+  it("rejects an archived intent instead of creating another organization while an old attempt may be in flight", async () => {
+    await reserveClerkWorkspaceIntent("user_a", "Acme Plumbing");
+    state.rows[0]!.deletedAt = new Date();
+    expect(await getClerkWorkspaceIntent("user_a")).toBeNull();
+    await expect(reserveClerkWorkspaceIntent("user_a", "Acme Plumbing"))
+      .rejects.toMatchObject({ code: ErrorCode.CONFLICT });
+    expect(state.rows).toHaveLength(1);
+    expect(state.events).toHaveLength(1);
+  });
+
   it("durably records out-of-order signed deliveries once per message for a known intent", async () => {
     const membership = {
       kind: "organizationMembership.created" as const, svixId: "msg_member", organizationId: "org_a",

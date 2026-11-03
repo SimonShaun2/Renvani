@@ -100,7 +100,8 @@ export async function getClerkWorkspaceIntent(clerkUserId: string): Promise<Cler
 
 /**
  * Serializes requests for one verified Clerk user across API instances. The durable unique
- * index is the final guard; this reservation does not call Clerk or enqueue a worker.
+ * index spans archived intents too: a claimed create may still be in flight after archive.
+ * This reservation does not call Clerk or enqueue a worker.
  */
 export async function reserveClerkWorkspaceIntent(
   clerkUserId: string,
@@ -109,12 +110,12 @@ export async function reserveClerkWorkspaceIntent(
   return db.transaction(async (tx) => {
     await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${`clerk-workspace-intent:${clerkUserId}`}))`);
     const existing = await tx.query.clerkWorkspaceIntents.findFirst({
-      where: (table, operators) => operators.and(
-        operators.eq(table.clerkUserId, clerkUserId),
-        operators.isNull(table.deletedAt)
-      )
+      where: (table, operators) => operators.eq(table.clerkUserId, clerkUserId)
     });
     if (existing) {
+      if (existing.deletedAt) {
+        throw new AppError(ErrorCode.CONFLICT, "Archived workspace intent requires support review");
+      }
       if (existing.requestedName !== requestedName) {
         throw new AppError(ErrorCode.CONFLICT, "Workspace name differs from the existing reservation");
       }

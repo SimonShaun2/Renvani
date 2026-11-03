@@ -35,13 +35,11 @@ describe.runIf(Boolean(neonCiUrl))("FS-235 Clerk workspace worker (Postgres)", (
     await db.update(clerkWorkspaceIntents)
       .set({ deletedAt: new Date() })
       .where(eq(clerkWorkspaceIntents.id, intentId));
-    const replacementId = randomUUID();
-    const [replacement] = await db.insert(clerkWorkspaceIntents).values({
-      id: replacementId,
+    await expect(db.insert(clerkWorkspaceIntents).values({
+      id: randomUUID(),
       clerkUserId,
-      requestedName: "FS-235 replacement after archived intent",
+      requestedName: "FS-235 duplicate after archived intent",
       status: "pending"
-    }).returning();
-    expect(replacement?.id).toBe(replacementId);
+    })).rejects.toMatchObject({ code: "23505" });
   });
 });

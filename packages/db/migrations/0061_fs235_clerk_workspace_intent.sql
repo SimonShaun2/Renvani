@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS "clerk_workspace_intents" (
   "deleted_at" timestamp
 );
 --> statement-breakpoint
-CREATE UNIQUE INDEX IF NOT EXISTS "clerk_workspace_intents_clerk_user_idx" ON "clerk_workspace_intents" USING btree ("clerk_user_id") WHERE "deleted_at" IS NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS "clerk_workspace_intents_clerk_user_idx" ON "clerk_workspace_intents" USING btree ("clerk_user_id");
 --> statement-breakpoint
 CREATE UNIQUE INDEX IF NOT EXISTS "clerk_workspace_intents_attempt_idx" ON "clerk_workspace_intents" USING btree ("attempt_id") WHERE "attempt_id" IS NOT NULL;
 --> statement-breakpoint

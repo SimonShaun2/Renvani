@@ -89,12 +89,101 @@ async function tenant(sql, companyId, work) {
   });
 }
 
+async function probeEmailChallenges(sql, a, b) {
+  const ca = randomUUID();
+  const cb = randomUUID();
+  const ha = randomUUID();
+  const hb = randomUUID();
+  await tenant(sql, a, (tx) => tx`insert into customers
+    (id, company_id, first_name, last_name, email)
+    values (${ca}, ${a}, 'FS234', 'A', 'fs234-a@example.test')`);
+  await tenant(sql, b, (tx) => tx`insert into customers
+    (id, company_id, first_name, last_name, email)
+    values (${cb}, ${b}, 'FS234', 'B', 'fs234-b@example.test')`);
+  for (const [companyId, customerId, challengeId, email, hash] of [
+    [a, ca, ha, "fs234-a@example.test", "c".repeat(64)],
+    [b, cb, hb, "fs234-b@example.test", "d".repeat(64)]
+  ]) {
+    await tenant(sql, companyId, (tx) => tx`
+      insert into outbound_consent_email_challenges
+      (id, company_id, customer_id, email, token_hash, idempotency_key,
+       created_at, updated_at, expires_at)
+      values (${challengeId}, ${companyId}, ${customerId}, ${email},
+        ${hash}, ${`challenge-${challengeId}`},
+        '2099-01-01'::timestamp, '2099-01-01'::timestamp, '2099-01-01'::timestamp)`);
+  }
+  const noSession = await sql`select id from outbound_consent_email_challenges`;
+  assert.equal(noSession.length, 0, "no-session challenge read leaked");
+  const visibleA = await tenant(sql, a, (tx) => tx`select id from outbound_consent_email_challenges`);
+  const visibleB = await tenant(sql, b, (tx) => tx`select id from outbound_consent_email_challenges`);
+  assert.deepEqual(visibleA.map((row) => row.id), [ha]);
+  assert.deepEqual(visibleB.map((row) => row.id), [hb]);
+  const [issued] = await tenant(sql, a, (tx) => tx`
+    select created_at < '2099-01-01'::timestamp as issue_time_overridden,
+      created_at between clock_timestamp() - interval '30 seconds' and clock_timestamp() + interval '30 seconds' as db_clock_issue,
+      expires_at = created_at + interval '10 minutes' as db_clock_expiry,
+      consumed_at is null as unconsumed
+    from outbound_consent_email_challenges where id = ${ha}`);
+  assert.ok(issued?.issue_time_overridden && issued.db_clock_issue && issued.db_clock_expiry && issued.unconsumed,
+    "caller timestamps must not control challenge issuance or expiry");
+
+  await rejected(() => tenant(sql, a, (tx) => tx`
+    insert into outbound_consent_email_challenges
+    (company_id, customer_id, email, token_hash, idempotency_key, expires_at)
+    values (${a}, ${cb}, 'fs234-b@example.test', ${"e".repeat(64)}, 'foreign-customer', now())`),
+  "23503", "outbound_consent_email_challenges_tenant_customer_fk");
+  await rejected(() => sql`
+    insert into outbound_consent_email_challenges
+    (company_id, customer_id, email, token_hash, idempotency_key, expires_at)
+    values (${a}, ${ca}, 'fs234-a@example.test', ${"e".repeat(64)}, 'no-session', now())`, "42501");
+  const foreignUpdate = await tenant(sql, a, (tx) => tx`
+    update outbound_consent_email_challenges set consumed_at = now() where id = ${hb} returning id`);
+  assert.equal(foreignUpdate.length, 0, "cross-tenant challenge was consumed");
+  await rejected(() => tenant(sql, a, (tx) => tx`
+    update outbound_consent_email_challenges set token_hash = ${"f".repeat(64)} where id = ${ha}`), "P0001");
+  await rejected(() => tenant(sql, a, (tx) => tx`
+    update outbound_consent_email_challenges set email = 'forged@example.test' where id = ${ha}`), "P0001");
+  await rejected(() => tenant(sql, a, (tx) => tx`
+    update outbound_consent_email_challenges set expires_at = '2099-01-01'::timestamp where id = ${ha}`), "P0001");
+
+  // The issue trigger is disabled only inside a transaction that must roll back.
+  await rejected(() => tenant(sql, a, async (tx) => {
+    await tx`alter table outbound_consent_email_challenges disable trigger outbound_consent_email_challenge_issue_trg`;
+    const expiredId = randomUUID();
+    await tx`insert into outbound_consent_email_challenges
+      (id, company_id, customer_id, email, token_hash, idempotency_key, created_at, expires_at)
+      values (${expiredId}, ${a}, ${ca}, 'fs234-a@example.test', ${"e".repeat(64)},
+        'expired-challenge', '2020-01-01'::timestamp, '2020-01-01 00:05:00'::timestamp)`;
+    await tx`update outbound_consent_email_challenges
+      set consumed_at = '2020-01-01 00:01:00'::timestamp where id = ${expiredId}`;
+  }), "P0001");
+  const [issueTrigger] = await sql`select tgenabled from pg_trigger
+    where tgname = 'outbound_consent_email_challenge_issue_trg' and not tgisinternal`;
+  assert.equal(issueTrigger?.tgenabled, "O", "expired probe did not restore issue trigger");
+
+  const consumed = await tenant(sql, a, (tx) => tx`
+    update outbound_consent_email_challenges set consumed_at = '2099-01-01'::timestamp
+    where id = ${ha} and consumed_at is null
+    returning consumed_at, consumed_at <= expires_at as within_expiry,
+      consumed_at < '2099-01-01'::timestamp as consume_time_overridden`);
+  assert.equal(consumed.length, 1, "first challenge consume failed");
+  assert.ok(consumed[0].within_expiry && consumed[0].consume_time_overridden,
+    "database clock did not constrain challenge consumption");
+  await rejected(() => tenant(sql, a, (tx) => tx`
+    update outbound_consent_email_challenges set consumed_at = now() where id = ${ha}`), "P0001");
+  const [afterReplay] = await tenant(sql, a, (tx) => tx`
+    select consumed_at from outbound_consent_email_challenges where id = ${ha}`);
+  assert.equal(new Date(afterReplay.consumed_at).getTime(), new Date(consumed[0].consumed_at).getTime(),
+    "challenge replay changed the consumed timestamp");
+  console.log("[fs234-postgres] email challenge tenant, FK, DB clock, expiry and single-use probes passed");
+}
+
 async function inspectAndExercise(sql) {
   const [role] = await sql`select rolbypassrls, rolsuper from pg_roles where rolname = current_user`;
   if (!role || role.rolbypassrls || role.rolsuper) {
     throw new Error("CI application role must be NOBYPASSRLS and non-superuser");
   }
-  const tables = ["outbound_consent_capture_receipts", "outbound_consent_events", "outbound_consent_states"];
+  const tables = ["outbound_consent_capture_receipts", "outbound_consent_events", "outbound_consent_states", "outbound_consent_email_challenges"];
   for (const name of tables) {
     const [row] = await sql`
       select c.relrowsecurity, c.relforcerowsecurity,
@@ -106,7 +195,7 @@ async function inspectAndExercise(sql) {
       select confdeltype from pg_constraint where conname = ${`${name}_company_id_companies_id_fk`}`;
     assert.equal(fk?.confdeltype, "a", `consent company FK must be NO ACTION on ${name}`);
   }
-  const triggers = ["outbound_consent_receipts_append_only_trg", "outbound_consent_events_append_only_trg", "outbound_consent_state_no_delete_trg"];
+  const triggers = ["outbound_consent_receipts_append_only_trg", "outbound_consent_events_append_only_trg", "outbound_consent_state_no_delete_trg", "outbound_consent_email_challenge_issue_trg", "outbound_consent_email_challenge_consume_once_trg"];
   for (const name of triggers) {
     const [trigger] = await sql`select tgenabled from pg_trigger where tgname = ${name} and not tgisinternal`;
     assert.equal(trigger?.tgenabled, "O", `missing evidence trigger ${name}`);
@@ -121,6 +210,7 @@ async function inspectAndExercise(sql) {
   const eb = randomUUID();
   await sql`insert into companies (id, name, slug) values
     (${a}, 'FS234 CI A', ${`fs234-ci-${a}`}), (${b}, 'FS234 CI B', ${`fs234-ci-${b}`})`;
+  await probeEmailChallenges(sql, a, b);
   for (const [companyId, receiptId, eventId] of [[a, ra, ea], [b, rb, eb]]) {
     await tenant(sql, companyId, async (tx) => {
       await tx`

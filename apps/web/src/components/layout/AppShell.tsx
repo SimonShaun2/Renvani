@@ -16,7 +16,8 @@ interface AppShellProps { children: ReactNode; companyName: string; role: UserRo
 export function AppShell({ children, companyName, role, userName }: AppShellProps) {
   const pathname = usePathname();
   const isMobileRoute = pathname === "/mobile" || pathname.startsWith("/mobile/");
-  const isOwnerHome = isOwnerHomePath(pathname);
+  // Dedicated owner overview screens provide their own Renvani page heading.
+  const usesOwnPageHeading = isOwnerHomePath(pathname) || pathname === "/ai-revenue-center";
   const menuButton = useRef<HTMLButtonElement>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   useEffect(() => { setMenuOpen(false); }, [pathname]);
@@ -25,7 +26,7 @@ export function AppShell({ children, companyName, role, userName }: AppShellProp
       {!isMobileRoute ? <aside className={styles.rail}><Sidebar companyName={companyName} role={role} userName={userName} /></aside> : null}
       <div className={isMobileRoute ? "flex min-h-screen flex-col" : styles.body}>
         {/* The owner home supplies its own Figma header, avoiding the old duplicate Dashboard strip. */}
-        {!isOwnerHome || isMobileRoute ? <Header companyName={companyName} role={role} userName={userName} /> : null}
+        {!usesOwnPageHeading || isMobileRoute ? <Header companyName={companyName} role={role} userName={userName} /> : null}
         {!isMobileRoute ? <div className={styles.mobileNavigation}>
           <div className={styles.mobileBar}><span>{companyName}</span><button ref={menuButton} type="button" aria-expanded={menuOpen} aria-controls="office-mobile-navigation" onClick={() => setMenuOpen((value) => !value)}>{menuOpen ? "Close navigation" : "Navigation"}</button></div>
           {menuOpen ? <div id="office-mobile-navigation" className={styles.mobilePanel} onKeyDown={(event) => { if (event.key === "Escape") { setMenuOpen(false); menuButton.current?.focus(); } }}><Sidebar companyName={companyName} role={role} userName={userName} onNavigate={() => setMenuOpen(false)} /></div> : null}

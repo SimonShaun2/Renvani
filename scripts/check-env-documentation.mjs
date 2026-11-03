@@ -48,7 +48,8 @@ export const REQUIRED_SERVICE_KEYS = Object.freeze({
   "webhook.env.example": [
     "DATABASE_URL", "REDIS_URL", "APP_URL", "STRIPE_SECRET_KEY",
     "STRIPE_WEBHOOK_SECRET", "TWILIO_AUTH_TOKEN", "TWILIO_FROM_NUMBER"
-  ]
+  ],
+  "web.env.example": ["RENVANI_DEPLOYMENT_TIER", "NODE_ENV", "NEXT_PUBLIC_API_URL", "APP_URL"]
 });
 
 export function requiredServiceTemplateErrors(file, source) {
@@ -120,8 +121,9 @@ function main() {
   const errors = [];
   errors.push(...diff("required local boot keys versus canonical schema", [],
     [...REQUIRED_LOCAL_KEYS].filter((k) => !schemaKeys.has(k)).sort()));
-  errors.push(...diff("service boot keys versus canonical schema", [],
-    [...new Set(Object.values(REQUIRED_SERVICE_KEYS).flat())].filter((k) => !schemaKeys.has(k)).sort()));
+  errors.push(...diff("service boot keys versus canonical schema or host metadata", [],
+    [...new Set(Object.values(REQUIRED_SERVICE_KEYS).flat())]
+      .filter((k) => !schemaKeys.has(k) && !DOCUMENTED_EXTERNAL_KEYS.has(k)).sort()));
 
   const rootKeys = parseDotEnvKeys(readFileSync(ROOT_EXAMPLE, "utf8"));
   errors.push(
@@ -156,7 +158,9 @@ function main() {
     }
   }
 
-  const webKeys = parseDotEnvKeys(readFileSync(join(TEMPLATE_DIR, "web.env.example"), "utf8"));
+  const webSource = readFileSync(join(TEMPLATE_DIR, "web.env.example"), "utf8");
+  const webKeys = parseDotEnvKeys(webSource);
+  errors.push(...requiredServiceTemplateErrors("web.env.example", webSource));
   const allowedWeb = new Set([
     "NODE_ENV", "RENVANI_DEPLOYMENT_TIER", "NEXT_PUBLIC_API_URL",
     "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY", "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY",

@@ -18,6 +18,13 @@ const env = (vars: Record<string, string>) => vars as unknown as NodeJS.ProcessE
 const input = { companyName: "Summit", service: "AC Tune-up", area: "78704", priceHint: "from $129" };
 
 describe("service x area pages", () => {
+  it("publishes only configured bookable service-area pages", () => {
+    const configured = { ...settings, intakeMode: "bookable" as const };
+    const inquiryOnly = { ...settings, intakeMode: "inquiry_only" as const, offeredServices: [] };
+    expect(resolveServiceAreaPage(configured, "ac-tune-up", "78704")).not.toBeNull();
+    expect(listServiceAreaPages(inquiryOnly)).toEqual([]);
+    expect(resolveServiceAreaPage(inquiryOnly, "ac-tune-up", "78704")).toBeNull();
+  });
   it("generates services x valid ZIPs", () => {
     const pages = listServiceAreaPages(settings);
     expect(pages).toHaveLength(4);
@@ -29,6 +36,14 @@ describe("service x area pages", () => {
     expect(resolveServiceAreaPage(settings, "ac-tune-up", "10001")).toBeNull();
     expect(resolveServiceAreaPage(settings, "roofing", "78704")).toBeNull();
     expect(slugifyService("Move-in / Move-out!")).toBe("move-in-move-out");
+  });
+
+  it("does not create SEO pages from storefront fallback cards", () => {
+    for (const offeredServices of [[], [{}], [{ label: "  " }]]) {
+      const shop = { offeredServices, serviceAreaZipCodes: ["78704"] };
+      expect(listServiceAreaPages(shop)).toEqual([]);
+      expect(resolveServiceAreaPage(shop, "standard-clean", "78704")).toBeNull();
+    }
   });
 });
 

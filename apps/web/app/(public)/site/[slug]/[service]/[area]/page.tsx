@@ -154,7 +154,7 @@ export default async function ServiceAreaPage({ params }: { params: Params }) {
           ) : null}
         </section>
 
-        <aside aria-label="Ask a question" className="lg:w-[360px]">
+        <aside id="ask-a-question" aria-label="Ask a question" className="lg:w-[360px]">
           {inquiryMode === "inquiry-api" ? (
             <ServiceInquiryCard slug={model.bookingSlug} service={ref.service.title} zip={ref.area} />
           ) : (

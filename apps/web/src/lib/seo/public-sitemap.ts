@@ -72,6 +72,18 @@ export class SitemapPublishCheckError extends Error {
 }
 
 type Fetcher = (slug: string) => Promise<unknown | null>;
+type PublishedShopSettings = Pick<PublicBookingSettingsRecord, "bookingSlug" | "companyName" | "offeredServices" | "serviceAreaZipCodes">;
+
+function isPublishedBookingSettings(value: unknown, slug: string): value is PublishedShopSettings {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) return false;
+  const settings = value as Record<string, unknown>;
+  return settings.bookingSlug === slug &&
+    typeof settings.companyName === "string" && settings.companyName.trim().length > 0 &&
+    Array.isArray(settings.offeredServices) &&
+    settings.offeredServices.every((service: unknown) => typeof service === "object" && service !== null && !Array.isArray(service)) &&
+    (settings.serviceAreaZipCodes === undefined ||
+      (Array.isArray(settings.serviceAreaZipCodes) && settings.serviceAreaZipCodes.every((zip: unknown) => typeof zip === "string")));
+}
 
 /** Per-shop cap on service x area URLs (offered services x ZIPs can grow fast). */
 export const MAX_SERVICE_AREA_URLS_PER_SHOP = 500;
@@ -111,7 +123,11 @@ export async function buildPublicSitemap(
       try {
         // null = genuinely unpublished (API 404); a throw = outage/bad response, never treated as unpublished.
         const settings = await fetchSettings(slug);
-        return settings ? { slug, settings } : null;
+        if (settings === null) return null;
+        if (!isPublishedBookingSettings(settings, slug)) {
+          throw new Error("Invalid public booking settings response");
+        }
+        return { slug, settings };
       } catch (error) {
         failures.push({ slug, error });
         return null;
@@ -126,7 +142,7 @@ export async function buildPublicSitemap(
     throw new SitemapPublishCheckError(failures.map((f) => f.slug));
   }
   return published
-    .filter((shop): shop is { slug: string; settings: NonNullable<typeof shop>["settings"] } => shop !== null)
+    .filter((shop): shop is { slug: string; settings: PublishedShopSettings } => shop !== null)
     .flatMap(({ slug, settings }) => [
       ...SHOP_PAGE_TYPES.map((type) => ({
         url: `${base}${type.path(encodeURIComponent(slug))}`,

@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 
 import React from "react";
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { BrandedInquiryClient } from "./BrandedInquiryClient";
@@ -77,6 +77,51 @@ describe("BrandedInquiryClient", () => {
     await waitFor(() => expect(screen.getByRole("status").textContent).toBe("Summit Service lists AC repair."));
     expect(mocks.assistantPost).toHaveBeenCalledWith("/api/v1/public/site/summit/assistant", { action: "answer", topic: "services" });
     expect(screen.getByText(/An inquiry is not a confirmed appointment/)).toBeTruthy();
+  });
+
+  it("ignores an obsolete answer after the question or form ZIP changes", async () => {
+    let resolveAnswer: (value: unknown) => void = () => undefined;
+    mocks.assistantPost.mockImplementationOnce(() => new Promise((resolve) => { resolveAnswer = resolve; }));
+    render(<BrandedInquiryClient model={buildBrandedStorefrontViewModel(baseSettings)} acquisitionSource="website" assistantEnabled />);
+    fireEvent.change(screen.getByRole("combobox", { name: "Question topic" }), { target: { value: "service_area" } });
+    fireEvent.change(screen.getByRole("textbox", { name: "ZIP to check" }), { target: { value: "60601" } });
+    fireEvent.click(screen.getByRole("button", { name: "Check published details" }));
+    fireEvent.change(screen.getByRole("textbox", { name: "ZIP code" }), { target: { value: "60602" } });
+    fireEvent.change(screen.getByRole("combobox", { name: "Question topic" }), { target: { value: "pricing" } });
+    await act(async () => { resolveAnswer({ kind: "handoff_required", reason: "unknown_service_area", message: "Staff must check this ZIP." }); });
+    expect(screen.getByRole("textbox", { name: "ZIP code" })).toHaveProperty("value", "60602");
+    expect(screen.queryByText(/Staff must check this ZIP/)).toBeNull();
+    expect(screen.getByRole("button", { name: "Check published details" }).hasAttribute("disabled")).toBe(false);
+  });
+
+  it("preserves an unsupported requested service and approved acquisition source in staff handoff", async () => {
+    mocks.assistantPost
+      .mockResolvedValueOnce({ kind: "handoff_required", reason: "unsupported_service", message: "Staff must review this request." })
+      .mockResolvedValueOnce({ kind: "handoff", status: "pending", reason: "unsupported_service", referenceNumber: "ASSIST-2", message: "Pending staff review." });
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true, json: async () => ({ accepted: true }) }));
+    const model = buildBrandedStorefrontViewModel({ ...baseSettings, trade: "hvac", intakeMode: "bookable", offeredServices: [{ label: "AC Repair" }] });
+    render(<BrandedInquiryClient model={model} acquisitionSource="google" assistantEnabled />);
+    fireEvent.change(screen.getByRole("textbox", { name: "Service (optional)" }), { target: { value: "Roof repair" } });
+    fireEvent.click(screen.getByRole("button", { name: "Check published details" }));
+    await waitFor(() => expect(screen.getByText(/Requested service for staff review:/).textContent).toContain("Roof repair"));
+    expect(screen.queryByRole("combobox", { name: "Service interest" })).toBeNull();
+    fillRequiredFields();
+    fireEvent.click(screen.getByLabelText(/I agree to send these contact details/));
+    fireEvent.click(screen.getByRole("button", { name: "Request staff review" }));
+    await waitFor(() => expect(mocks.assistantPost).toHaveBeenCalledTimes(2));
+    expect(mocks.assistantPost.mock.calls[1]?.[1]).toMatchObject({ action: "handoff", service: "Roof repair", source: "google" });
+  });
+
+  it("requires fresh contact consent after an assistant question changes", async () => {
+    mocks.assistantPost.mockResolvedValue({ kind: "handoff_required", reason: "pricing_review", message: "Staff must review pricing." });
+    render(<BrandedInquiryClient model={buildBrandedStorefrontViewModel(baseSettings)} acquisitionSource="website" assistantEnabled />);
+    fireEvent.change(screen.getByRole("combobox", { name: "Question topic" }), { target: { value: "pricing" } });
+    fireEvent.click(screen.getByRole("button", { name: "Check published details" }));
+    await waitFor(() => expect(screen.getByLabelText(/I agree to send these contact details/)).toBeTruthy());
+    fireEvent.click(screen.getByLabelText(/I agree to send these contact details/));
+    fireEvent.change(screen.getByRole("combobox", { name: "Question topic" }), { target: { value: "availability" } });
+    fireEvent.click(screen.getByRole("button", { name: "Check published details" }));
+    await waitFor(() => expect(screen.getByLabelText(/I agree to send these contact details/)).toHaveProperty("checked", false));
   });
 
   it("uses the existing consented inquiry form for a pending server handoff, with retry key", async () => {

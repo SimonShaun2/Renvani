@@ -6,6 +6,8 @@ CREATE TYPE "public"."outbound_consent_state" AS ENUM('granted', 'revoked');--> 
 CREATE TYPE "public"."outbound_consent_subject_type" AS ENUM('customer', 'booking_request');--> statement-breakpoint
 ALTER TYPE "public"."activity_event_type" ADD VALUE 'outbound_consent.granted' BEFORE 'payment_method_migration.requested';--> statement-breakpoint
 ALTER TYPE "public"."activity_event_type" ADD VALUE 'outbound_consent.revoked' BEFORE 'payment_method_migration.requested';--> statement-breakpoint
+ALTER TYPE "public"."activity_event_type" ADD VALUE 'outbound_consent.email_challenge_issued' BEFORE 'payment_method_migration.requested';--> statement-breakpoint
+ALTER TYPE "public"."activity_event_type" ADD VALUE 'outbound_consent.email_verified' BEFORE 'payment_method_migration.requested';--> statement-breakpoint
 CREATE TABLE "outbound_consent_capture_receipts" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"company_id" uuid NOT NULL,
@@ -137,6 +139,8 @@ CREATE POLICY "tenant_insert_outbound_consent_states" ON "outbound_consent_state
 --> statement-breakpoint
 CREATE POLICY "tenant_update_outbound_consent_states" ON "outbound_consent_states" FOR UPDATE USING (company_id::text = current_setting('app.current_company_id', true)) WITH CHECK (company_id::text = current_setting('app.current_company_id', true));
 --> statement-breakpoint
+CREATE UNIQUE INDEX "customers_company_id_id_unique" ON "customers" USING btree ("company_id","id");
+--> statement-breakpoint
 CREATE TABLE "outbound_consent_email_challenges" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"company_id" uuid NOT NULL,
@@ -153,7 +157,7 @@ CREATE TABLE "outbound_consent_email_challenges" (
 --> statement-breakpoint
 ALTER TABLE "outbound_consent_email_challenges" ADD CONSTRAINT "outbound_consent_email_challenges_company_id_companies_id_fk" FOREIGN KEY ("company_id") REFERENCES "public"."companies"("id") ON DELETE no action ON UPDATE no action;
 --> statement-breakpoint
-ALTER TABLE "outbound_consent_email_challenges" ADD CONSTRAINT "outbound_consent_email_challenges_customer_id_customers_id_fk" FOREIGN KEY ("customer_id") REFERENCES "public"."customers"("id") ON DELETE no action ON UPDATE no action;
+ALTER TABLE "outbound_consent_email_challenges" ADD CONSTRAINT "outbound_consent_email_challenges_tenant_customer_fk" FOREIGN KEY ("company_id","customer_id") REFERENCES "public"."customers"("company_id","id") ON DELETE no action ON UPDATE no action;
 --> statement-breakpoint
 CREATE UNIQUE INDEX "outbound_consent_email_challenges_token_hash_idx" ON "outbound_consent_email_challenges" USING btree ("token_hash");
 --> statement-breakpoint
@@ -176,6 +180,12 @@ BEGIN
      (to_jsonb(OLD) - 'consumed_at' - 'updated_at') THEN
     RAISE EXCEPTION 'outbound consent email challenge issuance is immutable';
   END IF;
+  -- A caller cannot backdate consumption to redeem an expired challenge.
+  IF clock_timestamp()::timestamp >= OLD.expires_at THEN
+    RAISE EXCEPTION 'outbound consent email challenge expired';
+  END IF;
+  NEW.consumed_at := clock_timestamp()::timestamp;
+  NEW.updated_at := NEW.consumed_at;
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;

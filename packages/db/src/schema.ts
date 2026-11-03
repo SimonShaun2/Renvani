@@ -35,6 +35,7 @@ import {
   jsonb,
   index,
   uniqueIndex,
+  foreignKey,
   type AnyPgColumn,
   check,
 } from "drizzle-orm/pg-core";
@@ -397,6 +398,8 @@ export const activityEventTypeEnum = pgEnum("activity_event_type", [
   "revenue.inquiry_escalated",
   "outbound_consent.granted",
   "outbound_consent.revoked",
+  "outbound_consent.email_challenge_issued",
+  "outbound_consent.email_verified",
   // Saved card migration (FS-138)
   "payment_method_migration.requested",
   "payment_method_migration.mappings_applied",
@@ -666,6 +669,7 @@ export const customers = pgTable("customers", {
   ...timestamps,
 }, (t) => ({
   companyIdx: index("customers_company_idx").on(t.companyId),
+  tenantCustomerUnique: uniqueIndex("customers_company_id_id_unique").on(t.companyId, t.id),
   emailIdx: index("customers_email_idx").on(t.email),
   lastServiceIdx: index("customers_last_service_idx").on(t.lastServiceDate),
   importLineageIdx: uniqueIndex("customers_import_lineage_idx").on(
@@ -2291,7 +2295,7 @@ export const outboundConsentCaptureReceipts = pgTable("outbound_consent_capture_
 export const outboundConsentEmailChallenges = pgTable("outbound_consent_email_challenges", {
   id: id(),
   companyId: consentCompanyId(),
-  customerId: uuid("customer_id").notNull().references(() => customers.id, { onDelete: "no action" }),
+  customerId: uuid("customer_id").notNull(),
   email: varchar("email", { length: 320 }).notNull(),
   tokenHash: varchar("token_hash", { length: 64 }).notNull(),
   idempotencyKey: varchar("idempotency_key", { length: 128 }).notNull(),
@@ -2299,6 +2303,11 @@ export const outboundConsentEmailChallenges = pgTable("outbound_consent_email_ch
   consumedAt: timestamp("consumed_at"),
   ...timestamps,
 }, (t) => ({
+  tenantCustomer: foreignKey({
+    name: "outbound_consent_email_challenges_tenant_customer_fk",
+    columns: [t.companyId, t.customerId],
+    foreignColumns: [customers.companyId, customers.id],
+  }).onDelete("no action").onUpdate("no action"),
   tokenUnique: uniqueIndex("outbound_consent_email_challenges_token_hash_idx").on(t.tokenHash),
   tenantIdempotency: uniqueIndex("outbound_consent_email_challenges_idempotency_idx").on(t.companyId, t.idempotencyKey),
   customerIssued: index("outbound_consent_email_challenges_customer_issued_idx").on(t.companyId, t.customerId, t.createdAt),

@@ -51,7 +51,8 @@ function migrate(env) {
 async function rejected(work, code, constraintPrefix) {
   try { await work(); } catch (error) {
     if (code) assert.equal(error.code, code);
-    if (constraintPrefix) assert.ok(error.constraint?.startsWith(constraintPrefix));
+    if (constraintPrefix) assert.ok(error.constraint_name?.startsWith(constraintPrefix),
+      `expected PostgreSQL constraint prefix ${constraintPrefix}, got ${error.constraint_name ?? "none"}`);
     return;
   }
   throw new Error(`expected PostgreSQL rejection ${code ?? ""}`);

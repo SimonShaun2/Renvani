@@ -1,6 +1,6 @@
 # AGENTS.md
 
-> **FOUNDER OPERATING OVERRIDE — NOVEMBER 3, 2026 (takes precedence over older approval/agent-status language below).** See [GitHub founder directive #420](https://github.com/SimonShaun2/Renvani/issues/420). **Codex is the currently active builder.** Do not assume named GrokBot or Cursor roles are running; GrokBot/E.. CoS can perform an on-demand independent batch review when invoked. Independent peer, QA, and Security-by-risk reviews must be performed by actual separately identified reviewers or qualified humans, with exact-head evidence; a role name alone is not a review. The **founder gives final authorization for EVERY outstanding and future PR merge**, including into `dev`; E.. CoS technical recommendations are not merge permission. Group compatible outstanding PRs into bounded, dependency-ordered review/CI/merge batches; each named PR and exact head requires founder authorization. Continue original Phase A implementation on independently authorized work without waiting for idle named agents or a blocked PR; Phase B remains founder-gated. Do not repeat completed CI or repository-wide audits. Reuse existing secrets where appropriate; no automatic credential creation/rotation and no false least-privilege or revocation PASS. Do not weaken real security, consent, tenant, migration, reviewer, or release gates.
+> **FOUNDER EXECUTION & MERGE AUTHORITY — NOVEMBER 3, 2026 (current).** See [founder directive #420](https://github.com/SimonShaun2/Renvani/issues/420). **Codex is the active builder and coordinator. No E.. CoS approval, dispatch, CI authorization, review recommendation, or signature is required for any ticket or PR.** GrokBot/E.. CoS is optional advice when the founder independently chooses to use it; never a gate. Codex Lead/Technical Lead and actual Platform owners coordinate Ready/WIP and authorize appropriately scoped CI batches; independent Peer, QA, and Security-by-risk reviews with exact-head evidence remain mandatory. **The founder alone approves EVERY outstanding and future PR merge**, including `dev`, by named PR and exact reviewed head. Compatible PRs may be reviewed and validated in batches, then merged sequentially only after explicit founder approvals; no unsafe big-bang merge. Continue authorized Phase A work without stopping for idle roles or blocked PRs. No Phase B before original Phase A acceptance and founder permission. Preserve genuine security, tenant, consent, migration and release gates. Reuse existing credentials when appropriate, but never claim unproven least privilege or rotation/revocation PASS.
 
 # FSM Platform V2 — Controlling Operating Document
 
@@ -20,7 +20,7 @@ If you have prior context on this repository, the following is **retired**. Do n
 |---|---|
 | "Thinner system, smarter brain" | **"Complete when needed. Simple by default."** |
 | Agent 1 / 2 / 3 / 4 model | 26 permanent role-named agents; ten senior developers in five pairs — `TEAM.md` |
-| Agent 4 sole-approval gate | Exact-head peer review, QA, Security-by-risk, approved batch CI, E.. CoS merge approval into `dev` — `TEAM.md` §3 |
+| Agent 4 sole-approval gate | Actual independent peer review, QA, Security-by-risk, approved batch CI, and founder-only merge approval into `dev` — `TEAM.md` §3 |
 | Phase 1A / 1B / 1C / 2 / 3 | Agent-first FS board now; historical full-suite sprints are deferred |
 | `TICKET-NNN` | FS-* board tickets now; legacy `FSM-NNNN` issues require explicit mapping |
 | "That's v2" as a scope refusal | Product Owner sequences the current agent-first loop and later suite by evidence |
@@ -317,7 +317,7 @@ Diagnosing a production problem must not require guessing.
 
 ## 14. How Work Flows
 
-Read `TEAM.md` for roles, tandem process, WIP and exact-head gates. The Notion Field Service Build Board governs FS-* priority; `SPRINT_ROADMAP.md` and `tickets/INDEX.md` are legacy references. Integration branch: **`dev`** (E.. CoS final merge approver). **`main`:** Shaun promotion-only. Every change on a draft PR; CI only in an approved batch; a new commit invalidates sign-offs. Never merge to `dev` or mark Done without peer review, QA, Security-as-risk, batch CI, and E.. CoS approval.
+Read `TEAM.md` for roles, tandem process, WIP and exact-head gates. The Notion Field Service Build Board governs FS-* priority; `SPRINT_ROADMAP.md` and `tickets/INDEX.md` are legacy references. Integration branch: **`dev`** (founder final merge approval for each PR). **`main`:** founder promotion-only. Every change on a draft PR; CI only in an approved batch; a new commit invalidates sign-offs. Never merge to `dev` or mark Done without peer review, QA, Security-as-risk, batch CI, and explicit founder approval for the named PR and exact head.
 
 ---
 

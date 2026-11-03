@@ -118,9 +118,9 @@ export function InventoryClient() {
   const activeTab: Tab = tabs.some((t) => t.id === tab) ? tab : "stock";
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 text-[#0f1530]">
       <header className="space-y-2">
-        <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-[#2b4acb]">Inventory</p>
+        <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-[#7a5600]">Inventory</p>
         <h2 className="text-2xl font-semibold tracking-tight text-[#0f1530] md:text-[28px] lg:text-[30px]">Inventory</h2>
         <p className="text-[15px] text-[#5e6684]">
           Track parts in your warehouse and service trucks. Low stock shows parts at or under their reorder point.

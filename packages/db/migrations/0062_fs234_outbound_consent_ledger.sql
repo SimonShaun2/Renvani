@@ -7,6 +7,7 @@ CREATE TYPE "public"."outbound_consent_subject_type" AS ENUM('customer', 'bookin
 ALTER TYPE "public"."activity_event_type" ADD VALUE 'outbound_consent.granted' BEFORE 'payment_method_migration.requested';--> statement-breakpoint
 ALTER TYPE "public"."activity_event_type" ADD VALUE 'outbound_consent.revoked' BEFORE 'payment_method_migration.requested';--> statement-breakpoint
 ALTER TYPE "public"."activity_event_type" ADD VALUE 'outbound_consent.email_challenge_issued' BEFORE 'payment_method_migration.requested';--> statement-breakpoint
+ALTER TYPE "public"."activity_event_type" ADD VALUE 'outbound_consent.email_verification_attempted' BEFORE 'payment_method_migration.requested';--> statement-breakpoint
 ALTER TYPE "public"."activity_event_type" ADD VALUE 'outbound_consent.email_verification_sent' BEFORE 'payment_method_migration.requested';--> statement-breakpoint
 ALTER TYPE "public"."activity_event_type" ADD VALUE 'outbound_consent.email_verified' BEFORE 'payment_method_migration.requested';--> statement-breakpoint
 CREATE TABLE "outbound_consent_capture_receipts" (

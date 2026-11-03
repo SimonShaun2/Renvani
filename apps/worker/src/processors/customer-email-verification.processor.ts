@@ -74,32 +74,42 @@ async function loadCurrent(payload: CustomerEmailVerificationJob): Promise<Deliv
         eq(customers.companyId, payload.companyId), eq(customers.id, payload.customerId), isNull(customers.deletedAt),
       )).limit(1);
     if (!customer?.email || customer.doNotContact || customer.email.trim().toLowerCase() !== challenge.email) return null;
-    const [prior] = await tx.select({ id: messageLogs.id }).from(messageLogs).where(and(
-      eq(messageLogs.companyId, payload.companyId), eq(messageLogs.sourceSystem, SOURCE_SYSTEM),
-      eq(messageLogs.sourceId, payload.challengeId),
-    )).limit(1);
-    return prior ? null : challenge;
+    // Claim before provider handoff. An uncertain send stays "attempting" and requires
+    // reconciliation; a retry must never send a second verification link automatically.
+    const [claimed] = await tx.insert(messageLogs).values({
+      companyId: payload.companyId, customerId: payload.customerId,
+      channel: "email", direction: "outbound", toAddress: challenge.email,
+      fromAddress: resolveTransactionalEmailFromAddress({
+        resendApiKey: env.RESEND_API_KEY, sendgridApiKey: env.SENDGRID_API_KEY,
+        nodeEnv: env.NODE_ENV, resendFromEmail: env.RESEND_FROM_EMAIL,
+        emailFrom: env.EMAIL_FROM, sendgridFromEmail: env.SENDGRID_FROM_EMAIL,
+      }),
+      subject: SUBJECT, body: SUBJECT, providerStatus: "attempting",
+      sourceSystem: SOURCE_SYSTEM, sourceId: payload.challengeId,
+    }).onConflictDoNothing().returning({ id: messageLogs.id });
+    if (!claimed) return null;
+    await emitEventWithExecutor(tx, {
+      companyId: payload.companyId,
+      eventType: "outbound_consent.email_verification_attempted",
+      actorType: "system", entityType: "outbound_consent_email_challenge", entityId: payload.challengeId,
+      customerId: payload.customerId, payload: { challengeId: payload.challengeId },
+      summary: "Customer email verification delivery attempted",
+    });
+    return challenge;
   });
 }
 
 async function recordAccepted(facts: DeliveryFacts, result: SendResult): Promise<void> {
-  const fromAddress = resolveTransactionalEmailFromAddress({
-    resendApiKey: env.RESEND_API_KEY,
-    sendgridApiKey: env.SENDGRID_API_KEY,
-    nodeEnv: env.NODE_ENV,
-    resendFromEmail: env.RESEND_FROM_EMAIL,
-    emailFrom: env.EMAIL_FROM,
-    sendgridFromEmail: env.SENDGRID_FROM_EMAIL,
-  });
   await runTransactionWithTenantSession(facts.companyId, async (tx) => {
-    const [logged] = await tx.insert(messageLogs).values({
-      companyId: facts.companyId, customerId: facts.customerId,
-      channel: "email", direction: "outbound", toAddress: facts.email,
-      fromAddress, subject: SUBJECT, body: SUBJECT,
+    const [logged] = await tx.update(messageLogs).set({
       providerMessageId: result.providerMessageId, providerStatus: "accepted", sentAt: new Date(),
-      sourceSystem: SOURCE_SYSTEM, sourceId: facts.challengeId,
-    }).onConflictDoNothing().returning({ id: messageLogs.id });
-    if (!logged) return;
+      updatedAt: new Date(),
+    }).where(and(
+      eq(messageLogs.companyId, facts.companyId), eq(messageLogs.customerId, facts.customerId),
+      eq(messageLogs.sourceSystem, SOURCE_SYSTEM), eq(messageLogs.sourceId, facts.challengeId),
+      eq(messageLogs.toAddress, facts.email), eq(messageLogs.providerStatus, "attempting"),
+    )).returning({ id: messageLogs.id });
+    if (!logged) throw new Error("Verification delivery claim was not available for acceptance");
     await emitEventWithExecutor(tx, {
       companyId: facts.companyId,
       eventType: "outbound_consent.email_verification_sent",

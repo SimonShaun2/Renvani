@@ -63,7 +63,7 @@ Templates: `docs/env/templates/`. Least-privilege target matrix: § below.
 | `RESET_TOKEN_TTL_SECONDS` | config | — | `tokens.ts` |
 | `ESTIMATE_EXPIRY_DAYS` | config | `30` | `estimate.service.ts` |
 | `INVOICE_DUE_DAYS` | config | `30` | `invoice.service.ts` |
-| `NEXT_PUBLIC_API_URL` | public | `http://localhost:3001` | `apps/web` via `publicEnv` |
+| `NEXT_PUBLIC_API_URL` | public | `http://localhost:3001` | `apps/web` app-local public config; browser may use same-origin, while server `API_URL` stays server-only |
 
 ## Web-only (outside the canonical schema)
 

@@ -28,7 +28,7 @@ Names match the canonical `env-schema.ts` and scoped views in `packages/config/s
 | **Payments (config)** | `STRIPE_PLATFORM_FEE_PERCENT` | API / billing | Shaun (policy) | Non-secret numeric; still environment-specific. |
 | **AI** | `OPENAI_API_KEY` | Enabled worker AI adapter | Shaun | Validate on use; outside worker boot view. |
 | **SMS** | `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM_NUMBER` | Webhook verification; enabled outbound SMS adapter | Shaun | Webhook boot view needs token and sender number; account SID is conditional. |
-| **Email** | `SENDGRID_API_KEY`, `SENDGRID_FROM_EMAIL` | Notifications worker | Shaun | |
+| **Email** | `SENDGRID_API_KEY`, `SENDGRID_FROM_EMAIL` | API boot/email; worker notifications when enabled | Shaun | API view requires both; worker sender fields are conditional. |
 | **Object storage** | `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET_NAME` | Enabled import/upload adapters | Shaun | Storage view validates R2 fields when R2 is enabled. Access key pair is secret. |
 | **Auth / session** | `JWT_SECRET`, `JWT_REFRESH_SECRET` | `apps/api` auth | Shaun | Rotation invalidates active sessions — planned window required. |
 | **Auth / public holds** | `BOOKING_HOLD_TOKEN_SECRET` | `apps/api` booking holds | Shaun | Distinct from session JWT; rotate on API only. |

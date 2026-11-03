@@ -20,7 +20,7 @@
 ## General rotation pattern
 
 ```text
-1. Issue new credential in provider console (Shaun for prod; Pair 5 + Shaun for staging).
+1. Issue new credential in provider console (Shaun for prod; Platform for the exact approved staging target, with founder access only when provider administration requires it).
 2. Write new value to approved secret store for target environment — never to git.
 3. Redeploy only the scoped consumers; order depends on the credential class.
 4. Verify: health checks, send test SMS/email in staging only, Stripe test webhook, login smoke.

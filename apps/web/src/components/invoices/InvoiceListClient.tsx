@@ -226,7 +226,7 @@ export function InvoiceListClient() {
       <PageLayout
         variant="operator"
         title="Invoices"
-        subtitle={`${new Intl.DateTimeFormat("en-US", { month: "long" }).format(now)} · paid by card on file after each visit`}
+        subtitle="Manage invoices, outstanding balances and recorded payments."
         actions={(
           <div className="flex items-center gap-3">
           <button

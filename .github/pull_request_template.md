@@ -16,7 +16,7 @@
 - Branch and merge order:
 - Self-review and partner cross-review:
 - Independent reviewer (not an implementer):
-- Design owner if UX changes:
+- Design owner and exact canonical Figma file / page / desktop-tablet-mobile and state frame node IDs for every UI change (or `N/A: no UI changed`):
 - QA owner and negative cases:
 - Security required? Why:
 - Technical Lead contract decision if architecture changes:
@@ -31,6 +31,9 @@
 ## Evidence at this exact head
 
 - Local commands/results and relevant UI evidence:
+- **UI parity evidence (mandatory for UI changes):** actual preview URL at exact head; browser screenshots at desktop/tablet/mobile, plus relevant loading/empty/error states; Figma screenshots/frames; list each mismatch and approved exception:
+- **Actual interaction QA:** keyboard/accessibility, authenticated role/tenant, active services, links/buttons, responsive layout; do not substitute demo/static markup:
+- **Independent visual sign-off:** Designer/Product reviewer and evidence URL at reviewed head (or documented explicit Design exception):
 - QA evidence URL:
 - Independent reviewer evidence URL:
 - Security and Design evidence URLs when required:
@@ -42,5 +45,7 @@
 - Tenant/consent/authorization negatives:
 - Logs, metrics, audit events and rollback:
 - Blockers and fix cards:
+
+**Canonical design contract:** [docs/design/RENVANI_FIGMA_PARITY.md](../docs/design/RENVANI_FIGMA_PARITY.md), [founder parity tracker #433](https://github.com/SimonShaun2/Renvani/issues/433). Renvani is the only current brand; old design files and historic UI copy are not authoritative. An attached Figma link or green CI alone is NOT visual parity.
 
 Open drafts remain In Progress. A changed head requires fresh affected sign-offs. No standalone CI, auto-merge, production promotion, Vercel/website setup or live payment changes from this PR. Do not mark Done until approved integration merge and acceptance evidence.

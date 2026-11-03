@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import type { UserRole } from "@/src/lib/route-access";
 import { isOwnerHomePath } from "@/src/lib/owner-home";
+import { hasDedicatedOperatorHeading } from "./operator-screen-headings";
 import { cn } from "@/src/lib/utils";
 import { geist, newsreader } from "@/src/components/marketing/site/fonts";
 import { Header } from "./Header";
@@ -17,7 +18,7 @@ export function AppShell({ children, companyName, role, userName }: AppShellProp
   const pathname = usePathname();
   const isMobileRoute = pathname === "/mobile" || pathname.startsWith("/mobile/");
   // Dedicated owner overview screens provide their own Renvani page heading.
-  const usesOwnPageHeading = isOwnerHomePath(pathname) || pathname === "/ai-revenue-center";
+  const usesOwnPageHeading = isOwnerHomePath(pathname) || hasDedicatedOperatorHeading(pathname);
   const menuButton = useRef<HTMLButtonElement>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   useEffect(() => { setMenuOpen(false); }, [pathname]);

@@ -145,6 +145,12 @@ export function InventoryClient() {
         ))}
       </div>
 
+      {canManage && !locations.isLoading && !locations.isError && (locations.data?.locations ?? []).length === 0 ? (
+        <section className="flex flex-wrap items-center justify-between gap-3 rounded-[14px] border border-[#e6dccb] bg-white p-4" aria-label="Inventory setup">
+          <p className="text-sm text-[#2a3360]">No stock locations yet. Add a warehouse or truck before recording parts on hand.</p>
+          <button type="button" onClick={() => setTab("locations")} className="inline-flex min-h-11 items-center justify-center rounded-[10px] bg-[#f6b400] px-4 text-sm font-semibold text-[#0f1530] hover:bg-[#e0a400]">Add location</button>
+        </section>
+      ) : null}
       {canManage ? null : (
         <p data-testid="inventory-read-only" className="text-[13px] text-[#5e6684]">
           View only. Ask the office or dispatch to adjust or move parts.

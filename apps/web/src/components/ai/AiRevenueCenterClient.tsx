@@ -597,8 +597,8 @@ export function AiRevenueCenterClient() {
                 selectedType === "all" && !customerIdFilter ? (
                   <section className="rounded-[14px] border border-[#e6dccb] bg-white px-6 py-10 text-center" aria-label="No identified opportunities">
                     <div className="mx-auto flex size-12 items-center justify-center rounded-[12px] bg-[#fff4d6] text-[#7a5600]"><Sparkles aria-hidden="true" className="size-6" /></div>
-                    <h2 className="mt-5 text-xl font-semibold text-[#0f1530]">No active opportunities identified yet</h2>
-                    <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-[#5e6684]">Renvani uses connected records to evaluate past customers, unsold estimates, unpaid invoices, aging equipment, and agreements. A recorded zero does not mean your business has no potential.</p>
+                    <h2 className="mt-5 text-xl font-semibold text-[#0f1530]">No recommendations awaiting review</h2>
+                    <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-[#5e6684]">Renvani has no pending recommendations in this view. Opportunity totals use your recorded customer, estimate, invoice, equipment, and agreement data. A recorded zero does not mean your business has no potential.</p>
                     <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
                       <Link href="/onboarding/import" className="inline-flex min-h-11 items-center justify-center rounded-[10px] bg-[#f6b400] px-5 text-sm font-semibold text-[#0f1530] hover:bg-[#e0a400]">Import business records</Link>
                       <Link href="/customers" className="inline-flex min-h-11 items-center justify-center rounded-[10px] border border-[#e6dccb] bg-white px-5 text-sm font-semibold text-[#0f1530]">View customers</Link>

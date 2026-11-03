@@ -70,3 +70,13 @@ export const renvaniClerkSignInAppearance = {
     footerActionLink: "!font-semibold !text-[#0f1530] !underline hover:!text-[#2a3360]"
   }
 };
+
+/** Keep the prebuilt Clerk sign-in title independent of the Clerk instance's legacy display name. */
+export const renvaniClerkSignInLocalization = {
+  signIn: {
+    start: {
+      title: "Sign in to Renvani",
+      subtitle: "Welcome back. Sign in to run your shop."
+    }
+  }
+} as const;

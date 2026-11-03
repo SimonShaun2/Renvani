@@ -1,6 +1,8 @@
 import { ErrorCode } from "@fsm/types";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+vi.mock("server-only", () => ({}));
+
 import { publicApi, resolvePublicApiBase } from "@/src/lib/public-api";
 import { resolvePublicApiServerBase } from "@/src/lib/public-api-server";
 

@@ -1,4 +1,4 @@
-import { AppError, ErrorCode } from "@fsm/types";
+import { AppError, ErrorCode, OUTBOUND_AUTHORIZATION_POLICY_V1 } from "@fsm/types";
 
 import { getAgentAction } from "../agent-action.service.js";
 import { authorizeAgentActionExecution } from "../outbound-policy-engine.service.js";
@@ -34,16 +34,30 @@ export async function checkRevenueProposalConsent(
   }
 
   const parameters = action.approvedParameters ?? action.parameters;
-  const decision = await authorizeAgentActionExecution({
-    companyId,
-    actorId,
-    actorType: "user",
-    actionType: action.actionType,
-    parameters,
-    target: action.target,
-    requiresApproval: action.requiresApproval,
-    state: "approved"
-  });
+  let decision: Awaited<ReturnType<typeof authorizeAgentActionExecution>>;
+  try {
+    decision = await authorizeAgentActionExecution({
+      companyId,
+      actorId,
+      actorType: "user",
+      actionType: action.actionType,
+      parameters,
+      target: action.target,
+      requiresApproval: action.requiresApproval,
+      state: "approved"
+    });
+  } catch (error) {
+    // Execute rejects an unsupported channel or a scope that disagrees with the action policy (#301).
+    // The read-only check reports that as consent-blocked instead of failing the card request.
+    if (!(error instanceof AppError) || error.code !== ErrorCode.CONSENT_REQUIRED) throw error;
+    decision = {
+      allowed: false,
+      policyVersion: OUTBOUND_AUTHORIZATION_POLICY_V1,
+      reason: error.message,
+      failureCode: "CONSENT_REQUIRED",
+      errorCode: ErrorCode.CONSENT_REQUIRED
+    };
+  }
 
   return {
     actionId: action.id,

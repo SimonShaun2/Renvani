@@ -365,10 +365,11 @@ describe("revenue agent proposals", () => {
     const owner = createAuthContext("owner");
     const { rec } = seedRec(owner.company.id, { type: "reactivation" });
     const { proposal } = (await propose(owner.authorization, rec.id)).body;
-    await request(app.server).post(`/api/v1/agent-actions/${proposal.id}/approve`)
-      .set("Authorization", owner.authorization).send({});
+    const approved = await request(app.server).post(`/api/v1/agent-actions/${proposal.id}/approve`)
+      .set("Authorization", owner.authorization)
+      .send({ expectedVersion: fakeDb.getTestState().agentActions.find((row) => row.id === proposal.id)!.updatedAt.getTime() });
     const executed = await request(app.server).post(`/api/v1/agent-actions/${proposal.id}/execute`)
-      .set("Authorization", owner.authorization).send({});
+      .set("Authorization", owner.authorization).send({ expectedVersion: approved.body.version });
     expect(executed.status).toBe(409);
     expect(executed.body.error).toBe("CONSENT_REQUIRED");
     expect(fakeDb.getTestState().aiRecommendations.find((row) => row.id === rec.id)?.status).toBe("pending");
@@ -383,14 +384,15 @@ describe("revenue agent proposals", () => {
       city: "Austin", state: "TX", zip: "78701", smsConsentMarketing: true });
     const { proposal } = (await propose(owner.authorization, rec.id)).body;
     expect((await request(app.server).post(`/api/v1/agent-actions/${proposal.id}/execute`)
-      .set("Authorization", other.authorization).send({})).status).toBe(404);
-    await request(app.server).post(`/api/v1/agent-actions/${proposal.id}/approve`)
-      .set("Authorization", owner.authorization).send({});
+      .set("Authorization", other.authorization).send({ expectedVersion: 1 })).status).toBe(404);
+    const approved = await request(app.server).post(`/api/v1/agent-actions/${proposal.id}/approve`)
+      .set("Authorization", owner.authorization)
+      .send({ expectedVersion: fakeDb.getTestState().agentActions.find((row) => row.id === proposal.id)!.updatedAt.getTime() });
     const currentGrant = fakeDb.getTestState().bookingRequests.find((row) => row.id === grant.id);
     expect(currentGrant).toBeDefined();
     currentGrant!.smsConsentMarketing = false;
     const executed = await request(app.server).post(`/api/v1/agent-actions/${proposal.id}/execute`)
-      .set("Authorization", owner.authorization).send({});
+      .set("Authorization", owner.authorization).send({ expectedVersion: approved.body.version });
     expect(executed.status).toBe(409);
     expect(executed.body.error).toBe("CONSENT_REQUIRED");
     expect(fakeDb.getTestState().aiRecommendations.find((row) => row.id === rec.id)?.status).toBe("pending");

@@ -90,7 +90,7 @@ export function GrowthCheckReviewClient() {
       ) : scans.isError || !scans.data ? (
         <ErrorState title="Could not load Growth Checks" onRetry={() => void scans.refetch()} isRetrying={scans.isFetching} />
       ) : scans.data.scans.length === 0 ? (
-        <EmptyState icon={ClipboardCheck} title="No Growth Checks yet" subtitle="Once your HVAC, plumbing or electrical shop's website is checked, findings show up here for review." />
+        <EmptyState variant="operator" icon={ClipboardCheck} title="No Growth Checks yet" subtitle="Once your HVAC, plumbing or electrical shop's website is checked, findings show up here for review." />
       ) : (
         <div className="space-y-6">
           <section aria-labelledby="gc-scans" className={`${cardClass} space-y-3.5`}>

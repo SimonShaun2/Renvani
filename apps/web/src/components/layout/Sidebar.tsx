@@ -29,7 +29,7 @@ export function Sidebar({ companyName, role, userName, onNavigate }: SidebarProp
           {group.items.map((item) => {
             const Icon = item.icon;
             const active = activeHref === item.href;
-            return <Link key={item.href} href={item.href} onClick={onNavigate} className={cn(styles.navItem, active && styles.active)} aria-current={active ? "page" : undefined}><Icon aria-hidden="true" /><span>{item.label}</span></Link>;
+            return <Link key={item.href} href={item.href} {...(onNavigate ? { onClick: onNavigate } : {})} className={cn(styles.navItem, active && styles.active)} aria-current={active ? "page" : undefined}><Icon aria-hidden="true" /><span>{item.label}</span></Link>;
           })}
         </div>)}
       </nav>

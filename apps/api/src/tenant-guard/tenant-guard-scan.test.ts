@@ -1,9 +1,10 @@
+import { readFileSync } from "node:fs";
 import path from "node:path";
 
 import * as schema from "@fsm/db/schema";
 import { describe, expect, it } from "vitest";
 
-import { TENANT_GUARD_ALLOWLIST } from "./allowlist.js";
+import { TENANT_GUARD_ALLOWLIST, TENANT_GUARD_ALLOWLIST_CATEGORIES } from "./allowlist.js";
 import { scanTenantGuards, tenantTableVariables, type TenantGuardFinding } from "./scan.js";
 
 const REPO_ROOT = path.resolve(__dirname, "../../../..");
@@ -44,6 +45,13 @@ describe("H1 tenant-guard static scan", () => {
       expect(entry.pattern.length).toBeGreaterThan(3);
       expect(entry.reason.length).toBeGreaterThan(10);
     }
+  });
+
+  it("allowlist categories are from the documented set", () => {
+    const allowed = new Set<string>(TENANT_GUARD_ALLOWLIST_CATEGORIES);
+    for (const entry of TENANT_GUARD_ALLOWLIST) expect(allowed.has(entry.category), `${entry.file}: ${entry.category}`).toBe(true);
+    const doc = readFileSync(path.join(REPO_ROOT, ALLOWLIST_PATH), "utf8");
+    for (const category of TENANT_GUARD_ALLOWLIST_CATEGORIES) expect(doc).toContain(` *   ${category} `);
   });
 
   it("detects a synthetic unscoped query (scanner self-test)", async () => {

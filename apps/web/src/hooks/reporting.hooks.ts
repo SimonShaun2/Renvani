@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { endOfDay, endOfMonth, format, isSameDay, parseISO, startOfDay, startOfMonth, subDays, subMonths } from "date-fns";
+import { addDays, endOfDay, endOfMonth, format, isSameDay, parseISO, startOfDay, startOfMonth, subDays, subMonths } from "date-fns";
 
 import { api } from "@/src/lib/api";
 
@@ -698,7 +698,8 @@ function buildRevenueChartData(dataset: ReportingDataset): RevenueChartPoint[] {
       isToday: isSameDay(cursor, new Date())
     });
 
-    cursor = startOfDay(new Date(cursor.getTime() + 24 * 60 * 60 * 1000));
+    // Calendar-day step: a fixed 24h step stalls on 25-hour DST fall-back days (infinite loop).
+    cursor = startOfDay(addDays(cursor, 1));
   }
 
   return points;
@@ -716,7 +717,8 @@ function getWorkingDaysBetween(start: Date, end: Date, availableDays: Technician
       count += 1;
     }
 
-    cursor = startOfDay(new Date(cursor.getTime() + 24 * 60 * 60 * 1000));
+    // Calendar-day step: a fixed 24h step stalls on 25-hour DST fall-back days (infinite loop).
+    cursor = startOfDay(addDays(cursor, 1));
   }
 
   return count;

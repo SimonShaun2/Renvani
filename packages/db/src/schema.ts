@@ -541,7 +541,9 @@ export const clerkWorkspaceIntents = pgTable("clerk_workspace_intents", {
   clerkOrganizationId: varchar("clerk_organization_id", { length: 255 }),
   ...timestamps,
 }, (t) => ({
-  clerkUserIdx: uniqueIndex("clerk_workspace_intents_clerk_user_idx").on(t.clerkUserId),
+  clerkUserIdx: uniqueIndex("clerk_workspace_intents_clerk_user_idx")
+    .on(t.clerkUserId)
+    .where(sql`${t.deletedAt} IS NULL`),
   attemptIdx: uniqueIndex("clerk_workspace_intents_attempt_idx")
     .on(t.attemptId)
     .where(sql`${t.attemptId} IS NOT NULL`),

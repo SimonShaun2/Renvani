@@ -140,14 +140,15 @@ describe("trade service catalog", () => {
 });
 
 describe("public site uses the trade", () => {
-  it("exposes trade + schema type and seeds default services only when the shop has none", async () => {
+  it("exposes trade + schema type but keeps an unconfigured shop inquiry-only", async () => {
     const a = shop("p-a", { trade: "hvac" });
     fakeDb.seedBookingSettings({ companyId: a.company.id, bookingSlug: "p-a", isEnabled: true } as never);
     const res = await request(app.server).get("/api/v1/public/booking/p-a");
     expect(res.status).toBe(200);
     expect(res.body.booking.trade).toBe("hvac");
     expect(res.body.booking.tradeSchemaType).toBe("HVACBusiness");
-    expect(res.body.booking.offeredServices.map((s: { key: string }) => s.key)).toContain("hvac.ac_repair");
+    expect(res.body.booking.intakeMode).toBe("inquiry_only");
+    expect(res.body.booking.offeredServices).toEqual([]);
 
     const b = shop("p-b", { trade: "plumbing" });
     fakeDb.seedBookingSettings({
@@ -157,6 +158,7 @@ describe("public site uses the trade", () => {
       offeredServices: [{ name: "Custom repipe" }]
     } as never);
     const custom = await request(app.server).get("/api/v1/public/booking/p-b");
+    expect(custom.body.booking.intakeMode).toBe("bookable");
     expect(custom.body.booking.offeredServices).toEqual([{ name: "Custom repipe" }]);
     expect(custom.body.booking.tradeSchemaType).toBe("Plumber");
 

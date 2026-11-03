@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 
+import { eq } from "drizzle-orm";
 import { beforeAll, describe, expect, it } from "vitest";
 
 const neonCiUrl = process.env.NEON_CI_DATABASE_URL?.trim();
@@ -30,5 +31,17 @@ describe.runIf(Boolean(neonCiUrl))("FS-235 Clerk workspace worker (Postgres)", (
     expect(claims.filter((claim) => claim !== null)).toHaveLength(1);
     expect(claims.filter((claim) => claim === null)).toHaveLength(7);
     expect(claims.find((claim) => claim !== null)?.status).toBe("claimed");
+
+    await db.update(clerkWorkspaceIntents)
+      .set({ deletedAt: new Date() })
+      .where(eq(clerkWorkspaceIntents.id, intentId));
+    const replacementId = randomUUID();
+    const [replacement] = await db.insert(clerkWorkspaceIntents).values({
+      id: replacementId,
+      clerkUserId,
+      requestedName: "FS-235 replacement after archived intent",
+      status: "pending"
+    }).returning();
+    expect(replacement?.id).toBe(replacementId);
   });
 });

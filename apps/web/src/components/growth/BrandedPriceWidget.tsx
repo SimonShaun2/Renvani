@@ -14,9 +14,9 @@ export function BrandedPriceWidget({ bookingSlug, primaryClassName }: BrandedPri
 
   return (
     <div className="w-full max-w-[460px] rounded-[14px] border border-[#e6dccb] bg-white p-7">
-      <h2 className="text-[22px] font-semibold text-[#0f1530]">Get your price</h2>
+      <h2 className="text-[22px] font-semibold text-[#0f1530]">Check service options</h2>
       <p className="mt-2 text-sm text-[#5e6684]">
-        Continue to our secure booking flow for live availability and verified pricing.
+        Choose a service and ZIP in the booking flow to see available times and any confirmed price.
       </p>
 
       <dl className="mt-4 space-y-4">
@@ -40,16 +40,11 @@ export function BrandedPriceWidget({ bookingSlug, primaryClassName }: BrandedPri
         </div>
       </dl>
 
-      <div className="mt-4 flex items-center justify-between rounded-[10px] bg-[#e4f1e8] p-3.5 text-[#2f7d4f]">
-        <p className="text-[22px] font-semibold">Price at checkout</p>
-        <p className="text-[13px] font-medium">Verified in Renvani</p>
-      </div>
-
       <Link
         href={bookHref}
         className={`mt-4 flex h-[52px] w-full items-center justify-center rounded-[10px] text-sm font-semibold text-white ${primaryClassName}`}
       >
-        Book this time
+        Continue to booking
       </Link>
     </div>
   );

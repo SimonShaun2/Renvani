@@ -81,6 +81,7 @@ try {
     baseUrl,
     sql: baseSql,
     env: process.env,
+    prNumber: process.env.FS235_PR_NUMBER,
     nowEpochSeconds: Math.floor(Date.now() / 1000),
     runSteps: async (childUrl) => {
       const childEnv = {

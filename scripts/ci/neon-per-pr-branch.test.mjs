@@ -328,6 +328,7 @@ test("FS-235 strict gate creates and drops only its own database, with no stale 
     baseUrl: "postgres://u:p@ep-staging.neon.tech/neondb",
     sql,
     env: { GITHUB_RUN_ID: "12345", GITHUB_RUN_ATTEMPT: "2" },
+    prNumber: "411",
     nowEpochSeconds: NOW,
     runSteps: async (url) => seen.push(new URL(url).pathname),
     log: () => undefined
@@ -350,6 +351,7 @@ test("FS-235 strict gate rejects missing CREATEDB and CREATE failure without sha
       baseUrl: "postgres://u:p@ep-staging.neon.tech/neondb",
       sql,
       env: { GITHUB_RUN_ID: "12345", GITHUB_RUN_ATTEMPT: "1" },
+      prNumber: "411",
       nowEpochSeconds: NOW,
       runSteps: async () => { ran = true; },
       log: () => undefined
@@ -366,6 +368,7 @@ test("FS-235 strict gate drops its own database after test failure and fails on 
     baseUrl: "postgres://u:p@ep-staging.neon.tech/neondb",
     sql,
     env: { GITHUB_RUN_ID: "12345", GITHUB_RUN_ATTEMPT: "1" },
+    prNumber: "411",
     nowEpochSeconds: NOW,
     runSteps: async () => { throw new Error("worker test failed"); },
     log: () => undefined
@@ -382,6 +385,7 @@ test("FS-235 strict gate drops its own database after test failure and fails on 
     baseUrl: "postgres://u:p@ep-staging.neon.tech/neondb",
     sql: dropFailure,
     env: { GITHUB_RUN_ID: "12345", GITHUB_RUN_ATTEMPT: "1" },
+    prNumber: "411",
     nowEpochSeconds: NOW,
     runSteps: async () => undefined,
     log: () => undefined

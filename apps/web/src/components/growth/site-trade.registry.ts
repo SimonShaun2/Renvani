@@ -6,7 +6,7 @@ export interface SiteTradeConfig {
   label: string;
   schemaType: string;
   keywords: string[];
-  /** Lower-case words that identify this trade in offered service labels (until the API exposes the trade). */
+  /** Legacy keywords retained for registry compatibility; never infer the shop's trade from service labels. */
   match: string[];
 }
 
@@ -44,34 +44,13 @@ export const SITE_TRADES = {
 
 export type SiteTradeKey = keyof typeof SITE_TRADES;
 
-function serviceText(settings: Pick<PublicBookingSettingsRecord, "offeredServices">): string {
-  return settings.offeredServices
-    .flatMap((s) => [s.label, s.name, s.category, ...(Array.isArray(s.types) ? s.types : [])])
-    .filter((v): v is string => typeof v === "string")
-    .join(" ")
-    .toLowerCase();
-}
-
 /**
- * Resolves the trade: an explicit `trade`/`industry` field if the API ever sends one, otherwise the trade whose
- * words appear most in the offered services, otherwise `other`.
+ * Resolves only the configured company trade; service labels are not proof of shop identity.
  */
-export function resolveSiteTrade(settings: Pick<PublicBookingSettingsRecord, "offeredServices">): SiteTradeConfig {
-  const explicit = (settings as { trade?: unknown; industry?: unknown }).trade ?? (settings as { industry?: unknown }).industry;
-  if (typeof explicit === "string" && explicit.toLowerCase() in SITE_TRADES) {
-    return SITE_TRADES[explicit.toLowerCase() as SiteTradeKey];
-  }
-  const text = ` ${serviceText(settings)} `;
-  let best: SiteTradeConfig = SITE_TRADES.other;
-  let bestScore = 0;
-  for (const trade of Object.values(SITE_TRADES)) {
-    const score = trade.match.filter((word) => text.includes(word)).length;
-    if (score > bestScore) {
-      best = trade;
-      bestScore = score;
-    }
-  }
-  return best;
+export function resolveSiteTrade(settings: Pick<PublicBookingSettingsRecord, "trade">): SiteTradeConfig {
+  return settings.trade && Object.hasOwn(SITE_TRADES, settings.trade)
+    ? SITE_TRADES[settings.trade]
+    : SITE_TRADES.other;
 }
 
 const DAY_NAMES: Record<string, string> = {
@@ -82,7 +61,7 @@ function hour(value: number): string {
   return `${String(Math.max(0, Math.min(24, Math.trunc(value)))).padStart(2, "0")}:00`;
 }
 
-/** schema.org openingHoursSpecification from the public booking hours (booking window = advertised hours). */
+/** Online booking window only. Do not publish this as business opening hours in LocalBusiness JSON-LD. */
 export function buildOpeningHours(
   settings: Pick<PublicBookingSettingsRecord, "availableDays" | "availableHoursStart" | "availableHoursEnd">
 ) {
@@ -101,10 +80,13 @@ export function buildOpeningHours(
 }
 
 /** Trade-correct title, description and keywords for /site/[slug]. */
-export function buildSiteMetadataCopy(settings: Pick<PublicBookingSettingsRecord, "companyName" | "tagline" | "offeredServices">) {
-  const trade = resolveSiteTrade(settings);
+export function buildSiteMetadataCopy(settings: Pick<PublicBookingSettingsRecord, "companyName" | "tagline" | "trade" | "intakeMode">) {
+  const trade = settings.trade && Object.hasOwn(SITE_TRADES, settings.trade)
+    ? SITE_TRADES[settings.trade]
+    : SITE_TRADES.other;
   const title = `${settings.companyName} · ${trade.label}`;
-  const description =
-    settings.tagline ?? `${settings.companyName}: ${trade.label.toLowerCase()}. Book online or send a direct inquiry.`;
+  const description = settings.tagline ?? (settings.intakeMode === "bookable"
+    ? `${settings.companyName}: ${trade.label.toLowerCase()}. Review available services or send a direct inquiry.`
+    : `${settings.companyName}: ${trade.label.toLowerCase()}. Send an inquiry and the team will confirm service availability.`);
   return { trade, title, description, keywords: [settings.companyName, ...trade.keywords] };
 }

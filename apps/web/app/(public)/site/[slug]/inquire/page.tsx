@@ -9,7 +9,6 @@ import {
   buildBrandedStorefrontViewModel,
   buildLocalBusinessJsonLd
 } from "@/src/components/growth/branded-storefront.utils";
-import { buildOpeningHours } from "@/src/components/growth/site-trade.registry";
 import { resolveSiteTradeFromSettings } from "@/src/components/growth/site-trade.from-settings";
 import { fetchPublicBookingSettingsBySlug } from "@/src/lib/public-booking-server";
 
@@ -25,7 +24,7 @@ export async function generateMetadata({
     return { title: "Business not found" };
   }
 
-  const title = `Request a quote · ${settings.companyName}`;
+  const title = `Tell us what you need · ${settings.companyName}`;
   const description = `Send a direct ${resolveSiteTradeFromSettings(settings).label.toLowerCase()} inquiry to ${settings.companyName}. Local service, transparent consent, no account required.`;
 
   return {
@@ -55,8 +54,7 @@ export default async function BrandedInquiryPage({
   const acquisitionSource = query.src?.trim() || BRANDED_ACQUISITION_SOURCE;
   const sitePath = `/site/${slug}`;
   const jsonLd = buildLocalBusinessJsonLd(model, sitePath, {
-    trade: resolveSiteTradeFromSettings(settings),
-    openingHours: buildOpeningHours(settings)
+    trade: resolveSiteTradeFromSettings(settings)
   });
 
   return (
@@ -66,7 +64,7 @@ export default async function BrandedInquiryPage({
         <Link href={sitePath} className="text-sm font-semibold text-[#2f7d4f] hover:underline">
           ← Back to {model.companyName}
         </Link>
-        <h1 className="mt-4 text-3xl font-semibold tracking-tight">Request a quote</h1>
+        <h1 className="mt-4 text-3xl font-semibold tracking-tight">Tell us what you need</h1>
       </header>
       <main className="px-6 py-10 md:px-16">
         <BrandedInquiryClient

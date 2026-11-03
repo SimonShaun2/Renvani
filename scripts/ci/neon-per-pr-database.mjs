@@ -56,7 +56,7 @@ export function maskDatabaseUrls(text) {
   return String(text ?? "").replace(/(postgres(?:ql)?:\/\/)[^@\s/]+@/gi, "$1***@");
 }
 
-/** Redact the entire connection URL, including derived disposable database names. */
+/** Redact the full URL, including disposable database names and query parameters. */
 export function redactDatabaseUrls(text) {
   return String(text ?? "").replace(/postgres(?:ql)?:\/\/[^\s"'<>]+/gi, "[REDACTED_DATABASE_URL]");
 }
@@ -164,17 +164,16 @@ export async function withIsolatedCiDatabase({ baseUrl, sql, env, nowEpochSecond
   }
 }
 
-/** FS-235 one-off gate: require isolation and drop only the database created by this run. */
-export async function withStrictIsolatedCiDatabase({ baseUrl, sql, env, nowEpochSeconds, runSteps, log = console.log }) {
-  if (!env.GITHUB_RUN_ID || !env.GITHUB_RUN_ATTEMPT) {
-    throw new Error("strict isolated CI requires a GitHub run ID and attempt");
+/** Strict gate for an explicitly authorized PR: no shared fallback or stale-database sweep. */
+export async function withStrictIsolatedCiDatabase({ baseUrl, sql, env, prNumber, nowEpochSeconds, runSteps, log = console.log }) {
+  if (!/^\d+$/.test(String(prNumber ?? "")) || !env.GITHUB_RUN_ID || !env.GITHUB_RUN_ATTEMPT) {
+    throw new Error("strict isolated CI requires an exact PR number, GitHub run ID and attempt");
   }
   if (!(await canCreateDatabase(sql))) {
     throw new Error("strict isolated CI requires CREATEDB; shared staging fallback is forbidden");
   }
-
   const databaseName = buildCiDatabaseName({
-    prNumber: `411_${env.GITHUB_RUN_ID}`,
+    prNumber: `${prNumber}_${env.GITHUB_RUN_ID}`,
     runAttempt: env.GITHUB_RUN_ATTEMPT,
     nowEpochSeconds
   });
@@ -183,15 +182,14 @@ export async function withStrictIsolatedCiDatabase({ baseUrl, sql, env, nowEpoch
   } catch {
     throw new Error(`could not create strict isolated CI database ${databaseName}`);
   }
-
-  log(`[fs235-postgres] created isolated CI database ${databaseName}`);
+  log(`[strict-postgres] created isolated CI database ${databaseName}`);
   try {
     await runSteps(buildChildDatabaseUrl(baseUrl, databaseName));
     return { mode: "isolated", databaseName };
   } finally {
     try {
       await sql.unsafe(`drop database if exists ${quoteIdent(databaseName)} with (force)`);
-      log(`[fs235-postgres] dropped isolated CI database ${databaseName}`);
+      log(`[strict-postgres] dropped isolated CI database ${databaseName}`);
     } catch {
       throw new Error(`failed to drop strict isolated CI database ${databaseName}`);
     }

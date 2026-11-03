@@ -328,6 +328,10 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
           {assistantResponse?.kind === "answer" ? <div role="status" aria-live="polite" className="mt-3 text-sm text-[#2a3360]">
             <p>{assistantResponse.answer}</p>
             <p className="mt-1 text-[#5e6684]">Verified source: {answerSourceLabels[assistantResponse.source]}.</p>
+            {assistantTopic === "services" && assistantResponse.source === "public_booking_settings" &&
+              model.intakeMode === "bookable" && (model.configuredTrade === "hvac" || model.configuredTrade === "plumbing") ? (
+                <p className="mt-3"><Link href={bookHref} className="font-semibold text-[#2f7d4f] underline">Check real booking availability</Link></p>
+              ) : null}
           </div> : null}
           {assistantResponse?.kind === "handoff_required" ? <div role="status" aria-live="polite" className="mt-3 text-sm text-[#2a3360]">
             <p>{assistantResponse.message} Use the form below to request staff review.</p>

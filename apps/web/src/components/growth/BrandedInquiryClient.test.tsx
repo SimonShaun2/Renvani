@@ -81,6 +81,28 @@ describe("BrandedInquiryClient", () => {
     expect(screen.getByText(/An inquiry is not a confirmed appointment/)).toBeTruthy();
   });
 
+  it("links a verified offered HVAC service to the existing live booking flow before another inquiry write", async () => {
+    mocks.assistantPost.mockResolvedValue({ kind: "answer", verified: true, answer: "Summit Service lists AC Repair.", source: "public_booking_settings" });
+    const model = buildBrandedStorefrontViewModel({ ...baseSettings, trade: "hvac", intakeMode: "bookable", offeredServices: [{ label: "AC Repair" }] });
+    render(<BrandedInquiryClient model={model} acquisitionSource="google" assistantEnabled />);
+    fireEvent.change(screen.getByRole("textbox", { name: "Service (optional)" }), { target: { value: "AC Repair" } });
+    fireEvent.click(screen.getByRole("button", { name: "Check published details" }));
+    const link = await screen.findByRole("link", { name: "Check real booking availability" });
+    expect(link.getAttribute("href")).toBe("/book/summit?src=google");
+    expect(mocks.submit).not.toHaveBeenCalled();
+    expect(mocks.checkZip).not.toHaveBeenCalled();
+  });
+
+  it("does not route an unverified service to booking", async () => {
+    mocks.assistantPost.mockResolvedValue({ kind: "handoff_required", reason: "unsupported_service", message: "Staff must review this request." });
+    const model = buildBrandedStorefrontViewModel({ ...baseSettings, trade: "plumbing", intakeMode: "bookable", offeredServices: [{ label: "Drain Repair" }] });
+    render(<BrandedInquiryClient model={model} acquisitionSource="website" assistantEnabled />);
+    fireEvent.change(screen.getByRole("textbox", { name: "Service (optional)" }), { target: { value: "Roof repair" } });
+    fireEvent.click(screen.getByRole("button", { name: "Check published details" }));
+    await waitFor(() => expect(screen.getByRole("status").textContent).toContain("Staff must review"));
+    expect(screen.queryByRole("link", { name: "Check real booking availability" })).toBeNull();
+  });
+
   it("supports keyboard questions and exposes the server handoff reason in a live region", async () => {
     mocks.assistantPost.mockResolvedValue({ kind: "handoff_required", reason: "availability_review", message: "Staff must check availability." });
     render(<BrandedInquiryClient model={buildBrandedStorefrontViewModel(baseSettings)} acquisitionSource="website" assistantEnabled />);

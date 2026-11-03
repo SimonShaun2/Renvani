@@ -145,6 +145,8 @@ async function probeEmailChallenges(sql, a, b) {
     update outbound_consent_email_challenges set email = 'forged@example.test' where id = ${ha}`), "P0001");
   await rejected(() => tenant(sql, a, (tx) => tx`
     update outbound_consent_email_challenges set expires_at = '2099-01-01'::timestamp where id = ${ha}`), "P0001");
+  await rejected(() => tenant(sql, a, (tx) => tx`
+    delete from outbound_consent_email_challenges where id = ${ha}`), "P0001");
 
   // The issue trigger is disabled only inside a transaction that must roll back.
   await rejected(() => tenant(sql, a, async (tx) => {

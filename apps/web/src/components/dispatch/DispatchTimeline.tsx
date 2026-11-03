@@ -303,7 +303,7 @@ export function DispatchTimeline({
   if (technicians.length === 0) {
     return (
       <section className="surface-card p-8">
-        <EmptyState
+        <EmptyState variant="operator"
           icon={CalendarRange}
           title="No technicians match these filters"
           subtitle="Try widening the date or technician filters. Once jobs and techs line up, the dispatch canvas will populate here."

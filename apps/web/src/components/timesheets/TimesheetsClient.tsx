@@ -354,6 +354,7 @@ export function TimesheetsClient() {
   const field = "rounded-xl border border-neutral-300 bg-white px-3 py-2 text-sm";
   return (
     <PageLayout
+      variant="operator"
       title="Timesheets"
       subtitle="Review technician time, approve pay periods, and export payroll."
       actions={

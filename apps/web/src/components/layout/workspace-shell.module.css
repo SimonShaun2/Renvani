@@ -22,5 +22,12 @@
 .userCopy { min-width:0; }
 .userName { margin:0; font-size:13px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .role { margin:0; color:#c3c8da; font-size:12px; text-transform:capitalize; }
-@media (min-width:768px) { .rail { display:flex; } .office .body { margin-left:248px; } .main { padding:32px 36px; } }
+.mobileNavigation { display:block; }
+.mobileBar { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:8px 16px; border-bottom:1px solid #e6dccb; color:#0f1530; background:#fbf6ef; font-size:13px; }
+.mobileBar span { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.mobileBar button { flex:none; min-height:44px; border:1px solid #e6dccb; border-radius:10px; padding:8px 12px; background:white; cursor:pointer; }
+.mobileBar button:focus-visible { outline:2px solid #0f1530; outline-offset:2px; }
+.mobilePanel { padding:0 16px 12px; background:#fbf6ef; }
+.mobilePanel .sidebar { width:100%; max-height:70dvh; min-height:320px; border-radius:12px; }
+@media (min-width:768px) { .rail { display:flex; } .office .body { margin-left:248px; } .main { padding:32px 36px; } .mobileNavigation { display:none; } }
 @media (prefers-reduced-motion:reduce) { .navItem { transition:none; } }

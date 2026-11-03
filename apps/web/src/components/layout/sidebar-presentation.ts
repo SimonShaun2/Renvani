@@ -1,6 +1,13 @@
-/** Presentation only: retain the exact destinations supplied by role navigation. */
+/** Presentation only: retain role-supplied destinations except the duplicate owner-home alias. */
 export interface SidebarDestination { href: string }
 export type SidebarGroupLabel = "Workspace" | "Grow" | "Run" | "Manage";
+
+export function withoutOwnerHomeAlias<T extends SidebarDestination>(items: readonly T[], role: string): T[] {
+  if ((role === "owner" || role === "admin") && items.some((item) => item.href === "/command-center")) {
+    return items.filter((item) => item.href !== "/dashboard");
+  }
+  return [...items];
+}
 
 export function groupSidebarItems<T extends SidebarDestination>(items: readonly T[]): Array<{ label: SidebarGroupLabel; items: T[] }> {
   const groups: Array<{ label: SidebarGroupLabel; items: T[] }> = [
@@ -25,6 +32,7 @@ export function groupSidebarItems<T extends SidebarDestination>(items: readonly 
 
 /** Longest route match avoids two active items and false prefixes such as /jobs-old. */
 export function getActiveSidebarHref(pathname: string, items: readonly SidebarDestination[]): string | null {
-  return items.filter(({ href }) => pathname === href || pathname.startsWith(`${href}/`))
+  const path = pathname === "/dashboard" && !items.some((item) => item.href === "/dashboard") && items.some((item) => item.href === "/command-center") ? "/command-center" : pathname;
+  return items.filter(({ href }) => path === href || path.startsWith(`${href}/`))
     .sort((a, b) => b.href.length - a.href.length)[0]?.href ?? null;
 }

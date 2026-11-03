@@ -48,12 +48,38 @@ function migrate(env) {
   if (result.status !== 0) throw new Error(`migration failed with exit status ${Number.isSafeInteger(result.status) ? result.status : "unknown"}`);
 }
 
-async function rejected(work, code) {
+async function rejected(work, code, constraintPrefix) {
   try { await work(); } catch (error) {
     if (code) assert.equal(error.code, code);
+    if (constraintPrefix) assert.ok(error.constraint?.startsWith(constraintPrefix));
     return;
   }
   throw new Error(`expected PostgreSQL rejection ${code ?? ""}`);
+}
+
+/** A denied RLS mutation may affect zero rows without reaching the trigger. */
+async function deniedOrNoop(work) {
+  try {
+    const rows = await work();
+    assert.equal(rows.length, 0, "protected evidence was mutated");
+  } catch (error) {
+    if (error.code !== "42501" && error.code !== "P0001") throw error;
+  }
+}
+
+/** Temporarily remove RLS only inside a rolled-back transaction to prove the trigger itself. */
+async function triggerRejects(sql, table, mutation) {
+  let observed;
+  try {
+    await sql.begin(async (tx) => {
+      await tx.unsafe(`alter table ${table} disable row level security`);
+      await mutation(tx);
+      throw Object.assign(new Error("evidence trigger did not reject mutation"), { code: "FS234_TRIGGER_MISSING" });
+    });
+  } catch (error) {
+    observed = error;
+  }
+  assert.equal(observed?.code, "P0001", `evidence trigger did not reject mutation on ${table}`);
 }
 
 async function tenant(sql, companyId, work) {
@@ -143,17 +169,38 @@ async function inspectAndExercise(sql) {
      idempotency_key, payload_fingerprint)
     values (${a}, 'customer', ${sa}, 'email', 'marketing', 'fs234-ci@example.test',
       'revoke', true, 'ci-v1', ${sa}, 'operator', 'user', 'no-session', ${"a".repeat(64)})`, "42501");
-  await rejected(() => tenant(sql, a, (tx) => tx`update outbound_consent_capture_receipts
-    set statement_version = 'forged' where id = ${ra}`), "P0001");
-  await rejected(() => tenant(sql, a, (tx) => tx`delete from outbound_consent_capture_receipts
-    where id = ${ra}`), "P0001");
-  await rejected(() => tenant(sql, a, (tx) => tx`update outbound_consent_events
-    set statement_version = 'forged' where id = ${ea}`), "P0001");
-  await rejected(() => tenant(sql, a, (tx) => tx`delete from outbound_consent_events
-    where id = ${ea}`), "P0001");
-  await rejected(() => tenant(sql, a, (tx) => tx`delete from outbound_consent_states
-    where company_id = ${a}`), "P0001");
-  await rejected(() => sql`delete from companies where id = ${a}`, "23503");
+  await deniedOrNoop(() => tenant(sql, a, (tx) => tx`update outbound_consent_capture_receipts
+    set statement_version = 'forged' where id = ${ra} returning id`));
+  await deniedOrNoop(() => tenant(sql, a, (tx) => tx`delete from outbound_consent_capture_receipts
+    where id = ${ra} returning id`));
+  await deniedOrNoop(() => tenant(sql, a, (tx) => tx`update outbound_consent_events
+    set statement_version = 'forged' where id = ${ea} returning id`));
+  await deniedOrNoop(() => tenant(sql, a, (tx) => tx`delete from outbound_consent_events
+    where id = ${ea} returning id`));
+  await deniedOrNoop(() => tenant(sql, a, (tx) => tx`delete from outbound_consent_states
+    where company_id = ${a} returning id`));
+  const afterDenied = await tenant(sql, a, async (tx) => ({
+    receipts: await tx`select statement_version from outbound_consent_capture_receipts where id = ${ra}`,
+    events: await tx`select statement_version from outbound_consent_events where id = ${ea}`,
+    states: await tx`select id from outbound_consent_states where company_id = ${a}`
+  }));
+  assert.equal(afterDenied.receipts.length, 1);
+  assert.equal(afterDenied.receipts[0].statement_version, "ci-v1");
+  assert.equal(afterDenied.events.length, 1);
+  assert.equal(afterDenied.events[0].statement_version, "ci-v1");
+  assert.equal(afterDenied.states.length, 1);
+
+  await triggerRejects(sql, "outbound_consent_capture_receipts", (tx) => tx`
+    update outbound_consent_capture_receipts set statement_version = 'forged' where id = ${ra}`);
+  await triggerRejects(sql, "outbound_consent_capture_receipts", (tx) => tx`
+    delete from outbound_consent_capture_receipts where id = ${ra}`);
+  await triggerRejects(sql, "outbound_consent_events", (tx) => tx`
+    update outbound_consent_events set statement_version = 'forged' where id = ${ea}`);
+  await triggerRejects(sql, "outbound_consent_events", (tx) => tx`
+    delete from outbound_consent_events where id = ${ea}`);
+  await triggerRejects(sql, "outbound_consent_states", (tx) => tx`
+    delete from outbound_consent_states where company_id = ${a}`);
+  await rejected(() => sql`delete from companies where id = ${a}`, "23503", "outbound_consent_");
   const rollbackId = randomUUID();
   await rejected(() => tenant(sql, a, async (tx) => {
     await tx`insert into outbound_consent_capture_receipts
@@ -167,7 +214,7 @@ async function inspectAndExercise(sql) {
   }), "FS234_ROLLBACK");
   const afterRollback = await tenant(sql, a, (tx) => tx`select id from outbound_consent_capture_receipts where id = ${rollbackId}`);
   assert.equal(afterRollback.length, 0, "consent insert survived transaction rollback");
-  console.log("[fs234-postgres] migration order, forced RLS, tenant denial, evidence immutability, FK and rollback probes passed");
+  console.log("[fs234-postgres] migration order, forced RLS, tenant denial, evidence immutability, FK and transaction rollback probes passed");
 }
 
 function verifySix(outputFile) {

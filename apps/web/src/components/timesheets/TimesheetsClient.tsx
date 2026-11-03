@@ -287,7 +287,7 @@ function PayrollSection({ period }: { period: PeriodInput }) {
       ) : summary.isError ? (
         <ErrorState compact title="Couldn't load payroll" onRetry={() => void summary.refetch()} isRetrying={summary.isFetching} />
       ) : !summary.data || summary.data.summary.lines.length === 0 ? (
-        <EmptyState compact icon={FileClock} title="No approved hours" subtitle="Approve timesheets for this period to see payroll totals." />
+        <EmptyState variant="operator" compact icon={FileClock} title="No approved hours" subtitle="Approve timesheets for this period to see payroll totals." />
       ) : (
         <table className="w-full text-left text-sm">
           <thead className="text-xs uppercase text-neutral-500">
@@ -379,7 +379,7 @@ export function TimesheetsClient() {
       ) : technicians.isError ? (
         <ErrorState title="Couldn't load technicians" onRetry={() => void technicians.refetch()} isRetrying={technicians.isFetching} />
       ) : techList.length === 0 ? (
-        <EmptyState icon={Users} title="No active technicians" subtitle="Add a technician to start tracking time." />
+        <EmptyState variant="operator" icon={Users} title="No active technicians" subtitle="Add a technician to start tracking time." />
       ) : (
         <div className="grid gap-6 lg:grid-cols-2">
           {techTotal > techList.length ? (
@@ -394,7 +394,7 @@ export function TimesheetsClient() {
             ) : entries.isError ? (
               <ErrorState compact title="Couldn't load time entries" onRetry={() => void entries.refetch()} isRetrying={entries.isFetching} />
             ) : (entries.data?.entries ?? []).length === 0 ? (
-              <EmptyState compact icon={Clock} title="No time entries" subtitle="No time was logged for this technician in this period." />
+              <EmptyState variant="operator" compact icon={Clock} title="No time entries" subtitle="No time was logged for this technician in this period." />
             ) : (
               <>
                 {entries.data!.hasMore ? (
@@ -424,7 +424,7 @@ export function TimesheetsClient() {
             ) : sheets.isError ? (
               <ErrorState compact title="Couldn't load timesheets" onRetry={() => void sheets.refetch()} isRetrying={sheets.isFetching} />
             ) : (sheets.data?.timesheets ?? []).length === 0 ? (
-              <EmptyState compact icon={FileClock} title="No timesheets" subtitle="Start a timesheet for this period to submit it for approval." />
+              <EmptyState variant="operator" compact icon={FileClock} title="No timesheets" subtitle="Start a timesheet for this period to submit it for approval." />
             ) : (
               <ul className="space-y-2">
                 {sheets.data!.timesheets.map((sheet) => (

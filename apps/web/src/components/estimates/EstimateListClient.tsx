@@ -13,6 +13,8 @@ import { StatBadge } from "@/src/components/ui/StatBadge";
 import { useEstimates } from "@/src/hooks/estimates.hooks";
 import { cn, formatDate } from "@/src/lib/utils";
 
+import { ESTIMATE_LIST_LIMIT, estimateListIsPartial } from "./estimate-list-limit";
+
 import {
   formatStatusLabel,
   getEstimateStatusTone,
@@ -32,8 +34,7 @@ const filterOptions: Array<{ value: EstimateFilter; label: string }> = [
   { value: "converted", label: "Converted" }
 ];
 
-/** Maximum supported by GET /api/v1/estimates; server rejects 200 with HTTP 400. */
-const LIST_LIMIT = 100;
+const LIST_LIMIT = ESTIMATE_LIST_LIMIT;
 
 export function EstimateListClient() {
   const [filter, setFilter] = useState<EstimateFilter>("all");
@@ -112,7 +113,7 @@ export function EstimateListClient() {
         </Link>
       )}
     >
-      {(estimatesQuery.data?.total ?? 0) > LIST_LIMIT ? (
+      {estimateListIsPartial(estimatesQuery.data) ? (
         <p className="mb-3 text-sm text-neutral-500" role="status">
           Showing the {LIST_LIMIT} most recent estimates. Filters and search here apply to those records; older records are not included in this view.
         </p>

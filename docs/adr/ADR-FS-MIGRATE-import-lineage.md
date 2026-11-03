@@ -3,7 +3,7 @@
 **Status:** **Accepted** (merged to `dev` with PR #94; acceptance recorded PR follow-up @ `dev`)  
 **Owner:** Tech Lead (Grace) · **PO:** Elena  
 **Date:** 2026-10-23  
-**Base SHA:** `5e62102b33cb6e240fd072c565f8f9391caeb012` (`dev` post-#93/#94)  
+**Base SHA:** `9313130f536f24cbc914add1f000a2c0728db035` (`dev` post-#86)  
 **Evidence:** [MVP-MIGRATION-EPIC-FS-MIGRATE](../planning/MVP-MIGRATION-EPIC-FS-MIGRATE.md) (PR #93); [MVP-PLATFORM-P0-INFRA](../planning/MVP-PLATFORM-P0-INFRA.md); [ADR-FS-41](ADR-FS-41-renvani-sor-integrations-addendum.md)  
 **Supersedes:** None (extends FS-11 `import_sessions` rollback model)  
 **Superseded by:** None
@@ -99,7 +99,7 @@ Large files **must not** parse inside API handlers. Chunk work is **child jobs**
 
 | idx | Tag | Owner | Status |
 | --- | --- | --- | --- |
-| **26** | `0026_fs_migrate_import_lineage` | Grace / FS-MIGRATE | **In implementation** — `cursor/fs-migrate-0026-lineage-1f27` |
+| **26** | `0026_fs_migrate_import_lineage` | Grace / FS-MIGRATE | **Reserved** — implement tables/columns/indexes per §1–§3. Request from Tech Lead before `drizzle-kit generate`. |
 
 No implementation branch may allocate **0026** for unrelated work. See [MIGRATION_NUMBERING_REGISTRY](../platform/MIGRATION_NUMBERING_REGISTRY.md).
 
@@ -126,7 +126,7 @@ No implementation branch may allocate **0026** for unrelated work. See [MIGRATIO
 | Product Owner (Elena) | **ACK** (PR #94) |
 | Security (Sam) | **PASS** (PR #94) |
 | Architecture (Chloe) | **PASS** (PR #94) |
-| E.. CoS | ADR text on `dev` via #94; status **Accepted** via follow-up PR |
+| Founder (Shaun) | Merge approval to `dev` — founder-only, exact head (#420) |
 
 ## Consequences
 

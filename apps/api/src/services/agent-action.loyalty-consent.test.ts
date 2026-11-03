@@ -32,10 +32,12 @@ vi.mock("@fsm/ai/langfuse", () => ({ recordAgentAuditObservation: vi.fn(async ()
 type FakeDbModule = typeof import("../test-support/fake-db.js");
 let fakeDb: FakeDbModule;
 let executors: typeof import("./agent-action.executors.js");
+let createLoyaltyReminderProposal: typeof import("./loyalty-reminder-propose.service.js").createLoyaltyReminderProposal;
 
 beforeAll(async () => {
   fakeDb = await import("../test-support/fake-db.js");
   executors = await import("./agent-action.executors.js");
+  ({ createLoyaltyReminderProposal } = await import("./loyalty-reminder-propose.service.js"));
 });
 
 beforeEach(() => {
@@ -70,6 +72,37 @@ function runGate(companyId: string, customerId: string, opts: { targetCompanyId?
 }
 
 describe("loyalty.reminder.propose outbound consent gate", () => {
+  it("executes the real persisted proposal under current consent, then denies revocation and another tenant", async () => {
+    const { company, customer, booking } = seedConsentingCustomer("real-proposal");
+    const proposal = await createLoyaltyReminderProposal({
+      companyId: company.id,
+      actorId: "ai-actor",
+      idempotencyKey: "loyalty:real-proposal",
+      parameters: { customerId: customer.id, ruleFamily: "lapsed_reactivation", summary: "Service reminder" }
+    });
+    const stored = fakeDb.getTestState().agentActions.find((action) => action.id === proposal.id);
+    expect(stored?.parameters).toMatchObject({ channel: "sms", consentScope: "marketing" });
+    const executor = executors.requireAgentActionExecutor("loyalty.reminder.propose");
+    const context = {
+      tx: {} as never,
+      companyId: company.id,
+      actorId: "user-1",
+      actionId: proposal.id,
+      actionType: "loyalty.reminder.propose",
+      parameters: stored!.parameters,
+      target: proposal.target,
+      requiresApproval: true,
+      state: "approved"
+    };
+    await expect(executor.beforeExecute!(context as never)).resolves.toMatchObject({ allowed: true });
+    booking.smsConsentMarketing = false;
+    await expect(executor.beforeExecute!(context as never)).rejects.toMatchObject({ code: ErrorCode.CONSENT_REQUIRED });
+    booking.smsConsentMarketing = true;
+    const other = seedConsentingCustomer("real-proposal-other-tenant");
+    await expect(executor.beforeExecute!({ ...context, companyId: other.company.id } as never))
+      .rejects.toMatchObject({ code: ErrorCode.NOT_FOUND });
+  });
+
   it("is blocked without an affirmative marketing consent", async () => {
     const { company, customer } = seedConsentingCustomer("no-consent", false);
     await expect(runGate(company.id, customer.id)).rejects.toMatchObject({ code: ErrorCode.CONSENT_REQUIRED });

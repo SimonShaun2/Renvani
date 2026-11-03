@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useId, useMemo, useRef, useState } from "react";
 import { Loader2 } from "lucide-react";
-import { webAssistantResponseSchema, type WebAssistantResponse, type WebAssistantRequest } from "@fsm/types";
+import { webAssistantResponseSchema, type WebAssistantResponse, type WebAssistantRequest, type WebAssistantHandoffReason } from "@fsm/types";
 
 import {
   buildBookPath,
@@ -28,6 +28,20 @@ interface BrandedInquiryClientProps {
 type InquiryField = "firstName" | "lastName" | "phone" | "email" | "serviceInterest" | "addressLine1" | "city" | "state" | "zip";
 type InquiryFieldErrors = Partial<Record<InquiryField, string>>;
 type AssistantHandoff = Extract<WebAssistantRequest, { action: "handoff" }>;
+const answerSourceLabels: Record<Extract<WebAssistantResponse, { kind: "answer" }>["source"], string> = {
+  public_booking_settings: "Published business settings",
+  zip_serviceability: "Checked service-area coverage"
+};
+const handoffReasonLabels: Record<WebAssistantHandoffReason, string> = {
+  human_requested: "Staff contact requested",
+  out_of_area: "Outside the listed service area",
+  unknown_serviceability: "Service-area coverage needs verification",
+  unsupported_service: "Requested service is not listed",
+  emergency_review: "Emergency request needs staff review",
+  pricing_review: "Pricing needs staff review",
+  availability_review: "Availability needs staff review",
+  unverified_answer: "Published details do not verify this answer"
+};
 
 function handoffSource(source: string): NonNullable<AssistantHandoff["source"]> {
   const approved = ["google", "facebook", "instagram", "yelp", "direct", "website", "qr_code"] as const;
@@ -311,8 +325,14 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
           </label> : null}
           <button type="button" disabled={isPending} aria-busy={assistantPending} onClick={() => void askAssistant()} className="mt-4 rounded-lg bg-[#2f7d4f] px-5 py-3 text-sm font-semibold text-white disabled:opacity-60">{assistantPending ? "Checking published details" : "Check published details"}</button>
           {assistantError ? <p role="alert" className="mt-3 text-sm text-red-700">{assistantError}</p> : null}
-          {assistantResponse?.kind === "answer" ? <p role="status" className="mt-3 text-sm text-[#2a3360]">{assistantResponse.answer}</p> : null}
-          {assistantResponse?.kind === "handoff_required" ? <p role="status" className="mt-3 text-sm text-[#2a3360]">{assistantResponse.message} Use the form below to request staff review.</p> : null}
+          {assistantResponse?.kind === "answer" ? <div role="status" aria-live="polite" className="mt-3 text-sm text-[#2a3360]">
+            <p>{assistantResponse.answer}</p>
+            <p className="mt-1 text-[#5e6684]">Verified source: {answerSourceLabels[assistantResponse.source]}.</p>
+          </div> : null}
+          {assistantResponse?.kind === "handoff_required" ? <div role="status" aria-live="polite" className="mt-3 text-sm text-[#2a3360]">
+            <p>{assistantResponse.message} Use the form below to request staff review.</p>
+            <p className="mt-1 text-[#5e6684]">Reason: {handoffReasonLabels[assistantResponse.reason]}.</p>
+          </div> : null}
         </section>
       ) : null}
       <p className="text-sm text-[#5e6684]">Tell {model.companyName} what you need. An inquiry is not a confirmed appointment.</p>

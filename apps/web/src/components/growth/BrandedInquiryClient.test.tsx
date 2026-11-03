@@ -74,9 +74,21 @@ describe("BrandedInquiryClient", () => {
     mocks.assistantPost.mockResolvedValue({ kind: "answer", verified: true, answer: "Summit Service lists AC repair.", source: "public_booking_settings" });
     render(<BrandedInquiryClient model={buildBrandedStorefrontViewModel(baseSettings)} acquisitionSource="website" assistantEnabled />);
     fireEvent.click(screen.getByRole("button", { name: "Check published details" }));
-    await waitFor(() => expect(screen.getByRole("status").textContent).toBe("Summit Service lists AC repair."));
+    await waitFor(() => expect(screen.getByRole("status").textContent).toContain("Summit Service lists AC repair."));
+    expect(screen.getByRole("status").textContent).toContain("Verified source: Published business settings.");
+    expect(screen.getByRole("status").getAttribute("aria-live")).toBe("polite");
     expect(mocks.assistantPost).toHaveBeenCalledWith("/api/v1/public/site/summit/assistant", { action: "answer", topic: "services" });
     expect(screen.getByText(/An inquiry is not a confirmed appointment/)).toBeTruthy();
+  });
+
+  it("supports keyboard questions and exposes the server handoff reason in a live region", async () => {
+    mocks.assistantPost.mockResolvedValue({ kind: "handoff_required", reason: "availability_review", message: "Staff must check availability." });
+    render(<BrandedInquiryClient model={buildBrandedStorefrontViewModel(baseSettings)} acquisitionSource="website" assistantEnabled />);
+    fireEvent.change(screen.getByRole("combobox", { name: "Question topic" }), { target: { value: "availability" } });
+    fireEvent.keyDown(screen.getByRole("textbox", { name: "Service (optional)" }), { key: "Enter", code: "Enter" });
+    await waitFor(() => expect(screen.getByRole("status").textContent).toContain("Reason: Availability needs staff review."));
+    expect(screen.getByRole("status").getAttribute("aria-live")).toBe("polite");
+    expect(mocks.assistantPost).toHaveBeenCalledWith("/api/v1/public/site/summit/assistant", { action: "answer", topic: "availability" });
   });
 
   it("ignores an obsolete answer after the question or form ZIP changes", async () => {

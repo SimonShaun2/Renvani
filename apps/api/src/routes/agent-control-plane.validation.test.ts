@@ -209,9 +209,11 @@ describe("agent control plane API happy paths", () => {
       expect.arrayContaining([expect.objectContaining({ id: proposalId, state: "awaiting_approval" })])
     );
 
+    const listed = (listResponse.body.items as Array<{ id: string; version: number }>).find((item) => item.id === proposalId);
     const approveResponse = await request(app.server)
       .post(`/api/v1/agent-actions/${proposalId}/approve`)
-      .set("Authorization", `Bearer ${ownerToken(company.id, user.id, user.role)}`);
+      .set("Authorization", `Bearer ${ownerToken(company.id, user.id, user.role)}`)
+      .send({ expectedVersion: listed?.version });
 
     expect(approveResponse.status).toBe(200);
     expect(approveResponse.body).toMatchObject({

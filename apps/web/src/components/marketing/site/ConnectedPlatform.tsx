@@ -46,11 +46,16 @@ function Flagship({ title, href, tools, children, node }: { title: string; href:
         <img src="/marketing/platform/icon-arrow.svg" alt="" width={22} height={22} />
       </Link>
       <div className="flex flex-col gap-3 rounded-xl bg-white p-[14px]">{children}</div>
-      <div className="flex flex-wrap gap-x-6 gap-y-4">
-        {tools.map((tl) => (
-          <MaybeLink key={tl.label} href={tl.href} className="text-[12px] font-medium" style={{ color: ink2 }}>
-            {tl.label}
-          </MaybeLink>
+      {/* First tool on its own line, the rest share the next one (218:41/42, 218:87 + 224:11; same on mobile). */}
+      <div className="flex flex-col gap-4 text-[12px] font-medium" style={{ color: ink2 }}>
+        {[tools.slice(0, 1), tools.slice(1)].filter((row) => row.length).map((row) => (
+          <div key={row[0]!.label} className="flex flex-wrap gap-x-3 gap-y-4">
+            {row.map((tl) => (
+              <MaybeLink key={tl.label} href={tl.href}>
+                {tl.label}
+              </MaybeLink>
+            ))}
+          </div>
         ))}
       </div>
     </div>
@@ -61,7 +66,7 @@ function Flagship({ title, href, tools, children, node }: { title: string; href:
 export function ConnectedPlatform() {
   const { command, flagships: f, record, caption } = PLATFORM;
   return (
-    <div className="flex flex-col gap-5" style={{ color: ink }}>
+    <div className="flex flex-col gap-5 leading-[1.38]" style={{ color: ink }}>
       <div data-node-id="218:12" className="flex flex-col gap-6 rounded-2xl p-5 text-white lg:flex-row lg:items-center" style={{ background: ink }}>
         <div className="flex flex-col gap-[6px] lg:w-[240px]">
           <Link href={command.open.href} className="text-[22px] font-semibold">{command.title}</Link>

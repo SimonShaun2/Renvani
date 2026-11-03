@@ -20,17 +20,26 @@ export function agentActionsFor(item: Pick<OperatorInboxItem, "overridePaths" | 
   );
 }
 
-/** Inbox tabs (Figma 10:289–10:304). `state` is passed to GET /operator/inbox?state=. */
+/**
+ * Inbox tabs (Figma 10:289–10:304, 331:4230 "Queued · not sent"). `key` is an AgentActionStateV1 passed to
+ * GET /operator/inbox?state= and read from /operator/inbox/counts. Outbound execute ends in `executing`
+ * (queued, nothing sent yet); internal execute ends in `succeeded` (shown as Completed). There is no `executed` or `rejected` state: reject writes `cancelled`.
+ */
 export const INBOX_TABS = [
   { key: "awaiting_approval", label: "Needs approval" },
   { key: "approved", label: "Ready to execute" },
+  { key: "executing", label: "Queued · not sent" },
   { key: "failed", label: "Failed" },
   { key: "expired", label: "Expired" },
-  { key: "executed", label: "Completed" },
-  { key: "rejected", label: "Rejected" }
+  { key: "succeeded", label: "Completed" },
+  { key: "cancelled", label: "Rejected" }
 ] as const;
 
 export type InboxTabKey = (typeof INBOX_TABS)[number]["key"];
+
+export function isInboxTab(state: string): state is InboxTabKey {
+  return INBOX_TABS.some((t) => t.key === state);
+}
 
 export const ACTION_TONE_CLASS: Record<AgentActionTone, string> = {
   primary: "bg-[#f6b400] text-[#0f1530] hover:bg-[#e0a400]",

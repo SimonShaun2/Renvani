@@ -1,4 +1,4 @@
-import { serviceFeeNote } from "@/src/lib/service-fee-copy";
+import { LEGACY_BOOKING_FEE_LABEL, serviceFeeNote } from "@/src/lib/service-fee-copy";
 import { formatServiceFeeLineItemName, SERVICE_FEE_RATE_BPS } from "@fsm/config/stripe-pricing";
 
 import type { PublicPaymentLinkResponse } from "@fsm/types";
@@ -169,3 +169,18 @@ export const PAY_LOAD_ERROR_COPY: Record<PayLoadErrorKind, { title: string; subt
     subtitle: "This payment link may have expired. Contact your service provider to request a new invoice link."
   }
 };
+
+/**
+ * Legacy receipts only: returns the "Online booking fee" row when that receipt was actually charged one
+ * (stored amount/cents > 0). "0.00", 0 or missing fields return null, so new receipts never show it.
+ */
+export function legacyBookingFeeDetail(receipt: {
+  bookingFeeCents?: number | null;
+  bookingFeeAmount?: string | number | null;
+}): { label: string; value: string } | null {
+  const cents = Number(receipt.bookingFeeCents ?? 0);
+  const amount = Number(receipt.bookingFeeAmount ?? 0);
+  if (!(Number.isFinite(cents) && cents > 0) && !(Number.isFinite(amount) && amount > 0)) return null;
+  const value = Number.isFinite(amount) && amount > 0 ? amount : cents / 100;
+  return { label: LEGACY_BOOKING_FEE_LABEL, value: formatUsd(value.toFixed(2)) };
+}

@@ -45,6 +45,7 @@ import {
   reorderTasks,
   updateTask
 } from "../../services/job-tasks.service.js";
+import type { JobTaskActor } from "../../services/job-tasks.service.js";
 import {
   getJobPreparationStatus,
   getJobServiceBrief
@@ -75,6 +76,10 @@ import type {
 
 function toIsoString(value: Date | null): string | null {
   return value ? value.toISOString() : null;
+}
+
+function toJobTaskActor(request: FastifyRequest): JobTaskActor {
+  return { userId: request.user.id, role: request.user.role };
 }
 
 function toJobListItemResponse(job: JobListItem) {
@@ -458,7 +463,7 @@ export async function listTasksHandler(request: FastifyRequest, reply: FastifyRe
 
 export async function createTaskHandler(request: FastifyRequest, reply: FastifyReply): Promise<FastifyReply> {
   const params = request.params as JobIdParams;
-  const task = await createTask(request.company.id, params.id, request.body as CreateTaskInput);
+  const task = await createTask(request.company.id, toJobTaskActor(request), params.id, request.body as CreateTaskInput);
 
   return reply.status(201).send({
     task: toJobTaskResponse(task)
@@ -469,6 +474,7 @@ export async function updateTaskHandler(request: FastifyRequest, reply: FastifyR
   const params = request.params as TaskIdParams;
   const task = await updateTask(
     request.company.id,
+    toJobTaskActor(request),
     params.id,
     params.taskId,
     request.body as UpdateTaskInput
@@ -482,7 +488,7 @@ export async function updateTaskHandler(request: FastifyRequest, reply: FastifyR
 export async function completeTaskHandler(request: FastifyRequest, reply: FastifyReply): Promise<FastifyReply> {
   const params = request.params as TaskIdParams;
   await assertTechnicianAssignedToJob(request, params.id);
-  const task = await completeTask(request.company.id, params.id, params.taskId, request.user.id);
+  const task = await completeTask(request.company.id, toJobTaskActor(request), params.id, params.taskId);
 
   return reply.send({
     task: toJobTaskResponse(task)
@@ -491,7 +497,7 @@ export async function completeTaskHandler(request: FastifyRequest, reply: Fastif
 
 export async function deleteTaskHandler(request: FastifyRequest, reply: FastifyReply): Promise<FastifyReply> {
   const params = request.params as TaskIdParams;
-  await deleteTask(request.company.id, params.id, params.taskId);
+  await deleteTask(request.company.id, toJobTaskActor(request), params.id, params.taskId);
 
   return reply.send({
     success: true
@@ -501,7 +507,7 @@ export async function deleteTaskHandler(request: FastifyRequest, reply: FastifyR
 export async function reorderTasksHandler(request: FastifyRequest, reply: FastifyReply): Promise<FastifyReply> {
   const params = request.params as JobIdParams;
   const body = request.body as ReorderTasksBody;
-  await reorderTasks(request.company.id, params.id, body.orderedIds);
+  await reorderTasks(request.company.id, toJobTaskActor(request), params.id, body.orderedIds);
 
   return reply.send({
     success: true

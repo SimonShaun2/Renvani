@@ -2,13 +2,17 @@ import type { LucideIcon } from "lucide-react";
 import {
   BriefcaseBusiness,
   CalendarDays,
+  Clock,
   CreditCard,
   Wallet,
   Crown,
   FileText,
+  ClipboardCheck,
   Gauge,
   MessageSquareText,
   Package,
+  Warehouse,
+  PhoneCall,
   Settings,
   ShieldCheck,
   Inbox,
@@ -43,11 +47,15 @@ const ownerAdminNavigation: RoleNavigation = {
     { label: "Invoices", href: "/invoices", icon: CreditCard },
     { label: "Payments", href: "/payments", icon: Wallet },
     { label: "Service Agreements", href: "/service-agreements", icon: ShieldCheck },
+    { label: "Timesheets", href: "/timesheets", icon: Clock },
+    { label: "Inventory", href: "/inventory", icon: Warehouse },
     { label: "AI Revenue Center", href: "/ai-revenue-center", icon: Sparkles },
     { label: "Command Center", href: "/command-center", icon: Inbox }
   ],
   growth: [
+    { label: "Growth Check", href: "/growth/growth-check", icon: ClipboardCheck },
     { label: "Booking requests", href: "/booking-requests", icon: Inbox },
+    { label: "Call tracking", href: "/growth/call-tracking", icon: PhoneCall },
     { label: "Settings", href: "/settings", icon: Settings }
   ]
 };
@@ -59,7 +67,9 @@ const dispatcherNavigation: RoleNavigation = {
     { label: "Jobs", href: "/jobs", icon: BriefcaseBusiness },
     { label: "Estimates", href: "/estimates", icon: FileText },
     { label: "Invoices", href: "/invoices", icon: CreditCard },
-    { label: "Command Center", href: "/command-center", icon: Inbox }
+    { label: "Timesheets", href: "/timesheets", icon: Clock },
+    { label: "Command Center", href: "/command-center", icon: Inbox },
+    { label: "Inventory", href: "/inventory", icon: Warehouse }
   ],
   growth: [
     { label: "Booking requests", href: "/booking-requests", icon: Inbox },
@@ -94,6 +104,7 @@ export const settingsNavigation: NavItem[] = [
   { label: "Notifications", href: "/settings/notifications", icon: MessageSquareText },
   { label: "Booking", href: "/settings/booking/general", icon: CalendarDays },
   { label: "Review Links", href: "/settings/review-links", icon: MessageSquareText },
+  { label: "Google Business", href: "/settings/google-business", icon: MessageSquareText },
   { label: "Users", href: "/settings/users", icon: Users },
   { label: "Billing", href: "/settings/billing", icon: Package }
 ];

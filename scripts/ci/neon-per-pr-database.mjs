@@ -56,6 +56,11 @@ export function maskDatabaseUrls(text) {
   return String(text ?? "").replace(/(postgres(?:ql)?:\/\/)[^@\s/]+@/gi, "$1***@");
 }
 
+/** Redact the full URL, including disposable database names and query parameters. */
+export function redactDatabaseUrls(text) {
+  return String(text ?? "").replace(/postgres(?:ql)?:\/\/[^\s"'<>]+/gi, "[REDACTED_DATABASE_URL]");
+}
+
 function quoteIdent(name) {
   if (!isSafeCiDatabaseName(name)) {
     throw new Error("refusing unsafe CI database name");
@@ -155,6 +160,38 @@ export async function withIsolatedCiDatabase({ baseUrl, sql, env, nowEpochSecond
       log(`[neon-per-pr-ci] dropped CI database ${databaseName}`);
     } catch (error) {
       log(`[neon-per-pr-ci] WARN could not drop ${databaseName} (stale cleanup will retry): ${maskDatabaseUrls(error?.message)}`);
+    }
+  }
+}
+
+/** Strict gate for an explicitly authorized PR: no shared fallback or stale-database sweep. */
+export async function withStrictIsolatedCiDatabase({ baseUrl, sql, env, prNumber, nowEpochSeconds, runSteps, log = console.log }) {
+  if (!/^\d+$/.test(String(prNumber ?? "")) || !env.GITHUB_RUN_ID || !env.GITHUB_RUN_ATTEMPT) {
+    throw new Error("strict isolated CI requires an exact PR number, GitHub run ID and attempt");
+  }
+  if (!(await canCreateDatabase(sql))) {
+    throw new Error("strict isolated CI requires CREATEDB; shared staging fallback is forbidden");
+  }
+  const databaseName = buildCiDatabaseName({
+    prNumber: `${prNumber}_${env.GITHUB_RUN_ID}`,
+    runAttempt: env.GITHUB_RUN_ATTEMPT,
+    nowEpochSeconds
+  });
+  try {
+    await sql.unsafe(`create database ${quoteIdent(databaseName)}`);
+  } catch {
+    throw new Error(`could not create strict isolated CI database ${databaseName}`);
+  }
+  log(`[strict-postgres] created isolated CI database ${databaseName}`);
+  try {
+    await runSteps(buildChildDatabaseUrl(baseUrl, databaseName));
+    return { mode: "isolated", databaseName };
+  } finally {
+    try {
+      await sql.unsafe(`drop database if exists ${quoteIdent(databaseName)} with (force)`);
+      log(`[strict-postgres] dropped isolated CI database ${databaseName}`);
+    } catch {
+      throw new Error(`failed to drop strict isolated CI database ${databaseName}`);
     }
   }
 }

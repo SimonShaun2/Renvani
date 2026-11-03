@@ -8,6 +8,7 @@ import {
 
 import { requireRole } from "../../lib/authorize.js";
 import {
+  getCompanyGbpCategories,
   getEmergencyService,
   getServiceArea,
   setEmergencyService,
@@ -36,6 +37,14 @@ const companyHomeServicesRoutes: FastifyPluginAsync = async (fastify) => {
       reply.send({
         serviceArea: await setServiceArea(request.company.id, request.user.id, request.body as UpdateServiceAreaBody)
       })
+  );
+
+  // Google Business Profile category mapping for the shop's trade (data only; GBP adapter stays not_configured).
+  fastify.get(
+    "/gbp-categories",
+    { preHandler: [fastify.authenticate, requireOwnerOrAdmin] },
+    async (request: FastifyRequest, reply: FastifyReply) =>
+      reply.send({ gbpCategories: await getCompanyGbpCategories(request.company.id) })
   );
 
   fastify.get("/emergency-service", { preHandler: [fastify.authenticate] }, async (request: FastifyRequest, reply: FastifyReply) =>

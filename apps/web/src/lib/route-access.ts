@@ -4,9 +4,13 @@ export type UserRole = (typeof USER_ROLES)[number];
 
 type DefaultRouteMap = Record<UserRole, string>;
 
-const EXACT_PUBLIC_ROUTES = new Set(["/", "/login", "/signup", "/verify-email", "/product-tour", "/product", "/how-it-works", "/pricing", "/industries", "/industries/hvac", "/industries/plumbing", "/industries/electrical", "/portal", "/robots.txt", "/sitemap.xml"]);
+const EXACT_PUBLIC_ROUTES = new Set(["/", "/login", "/signup", "/verify-email", "/product-tour", "/tour", "/product", "/how-it-works", "/pricing", "/industries", "/industries/hvac", "/industries/plumbing", "/industries/electrical", "/demo", "/growth-check", "/portal", "/robots.txt", "/sitemap.xml", "/sitemap-index.xml"]);
 
-const MARKETING_PRODUCT_PAGES = new Set(["growth", "revenue", "operations", "retention", "command-center", "online-booking", "estimates-approvals", "scheduling-dispatch"]);
+/** Split sitemaps from app/sitemap.ts generateSitemaps. */
+const SPLIT_SITEMAP_ROUTE = /^\/sitemap\/\d+\.xml$/;
+
+const MARKETING_PRODUCT_PAGES = new Set(["growth", "revenue", "operations", "retention", "command-center", "online-booking", "estimates-approvals", "scheduling-dispatch", "technician-app", "invoices-payments", "service-agreements", "ai-revenue-intelligence", "customers-properties-assets", "onboarding-data-import", "inquiry-response-follow-up", "jobs-work-orders", "time-tracking-job-photos", "reminders-win-backs", "reporting-job-sources", "websites", "price-book-service-catalog", "customer-portal"]);
+const TOUR_STEP_SLUGS = new Set(["approve-the-work", "plan-the-day", "complete-the-visit", "get-paid", "bring-them-back"]);
 
 const ROLE_ALLOWED_PREFIXES: Record<UserRole, string[]> = {
   owner: [
@@ -19,9 +23,11 @@ const ROLE_ALLOWED_PREFIXES: Record<UserRole, string[]> = {
     "/invoices",
     "/payments",
     "/service-agreements",
+    "/timesheets",
     "/ai-revenue-center",
     "/command-center",
     "/products",
+    "/inventory",
     "/review-requests",
     "/reporting",
     "/settings",
@@ -38,9 +44,11 @@ const ROLE_ALLOWED_PREFIXES: Record<UserRole, string[]> = {
     "/invoices",
     "/payments",
     "/service-agreements",
+    "/timesheets",
     "/ai-revenue-center",
     "/command-center",
     "/products",
+    "/inventory",
     "/review-requests",
     "/reporting",
     "/settings",
@@ -54,6 +62,8 @@ const ROLE_ALLOWED_PREFIXES: Record<UserRole, string[]> = {
     "/estimates",
     "/invoices",
     "/service-agreements",
+    "/timesheets",
+    "/inventory",
     "/command-center",
     "/settings"
   ],
@@ -64,9 +74,11 @@ const ROLE_ALLOWED_PREFIXES: Record<UserRole, string[]> = {
     "/estimates",
     "/invoices",
     "/service-agreements",
+    "/timesheets",
+    "/inventory",
     "/settings"
   ],
-  technician: ["/mobile"]
+  technician: ["/mobile", "/inventory"]
 };
 
 export const ROLE_DEFAULT_ROUTES: DefaultRouteMap = {
@@ -90,11 +102,15 @@ export function getDefaultRouteForRole(role: UserRole): string {
 }
 
 export function isPublicRoute(pathname: string): boolean {
-  if (EXACT_PUBLIC_ROUTES.has(pathname)) {
+  if (EXACT_PUBLIC_ROUTES.has(pathname) || SPLIT_SITEMAP_ROUTE.test(pathname)) {
     return true;
   }
 
   const segments = pathname.split("/").filter(Boolean);
+
+  if (segments[0] === "tour" && segments.length === 2 && TOUR_STEP_SLUGS.has(segments[1] ?? "")) {
+    return true;
+  }
 
   if (segments[0] === "product" && segments.length === 2 && MARKETING_PRODUCT_PAGES.has(segments[1] ?? "")) {
     return true;

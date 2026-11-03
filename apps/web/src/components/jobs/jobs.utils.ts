@@ -72,7 +72,7 @@ export function formatTaskMinutes(value: number | null): string {
 export function getTaskProgress(tasks: JobTask[]) {
   const total = tasks.length;
   const completed = tasks.filter((task) => task.status === "completed").length;
-  const pendingRequired = tasks.filter((task) => task.isRequired && task.status !== "completed");
+  const pendingRequired = tasks.filter((task) => task.isRequired && (task.status === "pending" || task.status === "in_progress"));
   const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
 
   return {

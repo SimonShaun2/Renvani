@@ -84,10 +84,7 @@ export const NEW_JOB_COPY = {
   subtotal: "Subtotal",
   customerPays: "Customer pays",
   totalAfterTax: "Calculated after tax at checkout",
-  submitError: "We couldn't create the job. Check the details and try again.",
-  itemsError: "Job created, but some line items couldn't be saved.",
-  itemsRetry: "Retry failed items",
-  itemsLocked: "Job created. Retry saving the failed items."
+  submitError: "We couldn't create the job. Check the details and try again."
 } as const;
 
 /** "Service Fee (2%) · paid by customer at checkout"; null hides the line (Flat plan / no fee from the API). */
@@ -128,9 +125,7 @@ export function lineItemsSubtotal(items: readonly NewJobLineItem[]): number {
 }
 
 export function toAddJobProductInput(item: NewJobLineItem): AddJobProductInput {
-  const input: AddJobProductInput = { name: item.name, quantity: item.quantity, unitPrice: item.unitPrice, isTaxable: item.isTaxable };
-  if (item.description) input.description = item.description;
-  return input;
+  return { productCatalogId: item.priceBookItemId, quantity: item.quantity };
 }
 
 export function formatMoney(value: number): string {
@@ -187,7 +182,10 @@ function toIso(value: string): string {
   return new Date(value).toISOString();
 }
 
-export function buildCreateJobPayload(values: NewJobValues): CreateJobInput {
+export function buildCreateJobPayload(
+  values: NewJobValues,
+  lineItems: readonly NewJobLineItem[] = []
+): CreateJobInput {
   const payload: CreateJobInput = {
     customerId: values.customerId.trim(),
     // No title field in frame 160:32: the API's required title is the description's first line, else the job type label.
@@ -203,6 +201,7 @@ export function buildCreateJobPayload(values: NewJobValues): CreateJobInput {
   }
   const description = values.description.trim();
   if (description) payload.description = description;
+  if (lineItems.length > 0) payload.products = lineItems.map(toAddJobProductInput);
   return payload;
 }
 
@@ -211,14 +210,4 @@ export function parseNewJobQuery(params: Record<string, string | string[] | unde
   const first = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v) ?? "";
   const customerId = first(params.customerId).trim();
   return { open: first(params.new) === "1", customerId: /^[A-Za-z0-9_-]{1,64}$/.test(customerId) ? customerId : "" };
-}
-
-/** Posts line items to a created job; resolves to the items that failed (empty = all saved). */
-export async function saveJobLineItems(
-  jobId: string,
-  items: readonly NewJobLineItem[],
-  post: (path: string, body: AddJobProductInput) => Promise<unknown>
-): Promise<NewJobLineItem[]> {
-  const results = await Promise.allSettled(items.map((item) => post(`/api/v1/jobs/${jobId}/products`, toAddJobProductInput(item))));
-  return items.filter((_, i) => results[i]!.status === "rejected");
 }

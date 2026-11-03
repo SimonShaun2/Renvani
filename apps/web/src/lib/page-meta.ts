@@ -59,6 +59,13 @@ const STATIC_PAGE_META: Array<{ prefix: string; meta: PageMeta }> = [
     }
   },
   {
+    prefix: "/timesheets",
+    meta: {
+      title: "Timesheets",
+      subtitle: "Technician time, pay-period approval, and payroll export."
+    }
+  },
+  {
     prefix: "/service-agreements",
     meta: {
       title: "Service Agreements",
@@ -77,6 +84,13 @@ const STATIC_PAGE_META: Array<{ prefix: string; meta: PageMeta }> = [
     meta: {
       title: "Product Catalog",
       subtitle: "Control the catalog behind every quote, job, and invoice."
+    }
+  },
+  {
+    prefix: "/inventory",
+    meta: {
+      title: "Inventory",
+      subtitle: "Parts on hand across your warehouse and service trucks."
     }
   },
   {

@@ -14,6 +14,7 @@ import { AGENT_POLICY_V1 } from "../agent-action.policy.js";
 import { createAgentActionProposal } from "../agent-action.service.js";
 import { resolveEntityRef } from "../tenant-context.service.js";
 import { getRevenueProposalBuilder, listRevenueProposalBuilderTypes } from "./revenue-proposal-builders.registry.js";
+import { assertRevenueAgentProposalsEnabled } from "./revenue-agent-proposal-gate.js";
 import "./revenue-proposal.kinds.js";
 
 const DEFAULT_GENERATE_LIMIT = 10;
@@ -150,6 +151,7 @@ export async function proposeFromRecommendation(
   actorId: string,
   recommendationId: string
 ): Promise<ProposeRecommendationResponse> {
+  assertRevenueAgentProposalsEnabled();
   const { action, created } = await runTransactionWithTenantSession(companyId, (tx) =>
     proposeInTransaction(tx as Tx, companyId, actorId, recommendationId)
   );
@@ -161,10 +163,11 @@ export async function generateRevenueProposals(
   actorId: string,
   limit: number = DEFAULT_GENERATE_LIMIT
 ): Promise<GenerateRevenueProposalsResponse> {
+  assertRevenueAgentProposalsEnabled();
   const supported = new Set(listRevenueProposalBuilderTypes());
   const now = Date.now();
-  const candidates = await runTransactionWithTenantSession(companyId, async (tx) =>
-    (
+  const { candidates, existingProposalKeys } = await runTransactionWithTenantSession(companyId, async (tx) => {
+    const recommendationRows = (
       await tx
         .select()
         .from(aiRecommendations)
@@ -178,18 +181,32 @@ export async function generateRevenueProposals(
     )
       .filter((row) => row.companyId === companyId && row.status === "pending")
       .filter((row) => !row.snoozedUntil || row.snoozedUntil.getTime() <= now)
-      .filter((row) => !row.expiresAt || row.expiresAt.getTime() > now)
-  );
+      .filter((row) => !row.expiresAt || row.expiresAt.getTime() > now);
+    const actionRows = await tx
+      .select({ idempotencyKey: agentActions.idempotencyKey })
+      .from(agentActions)
+      .where(and(eq(agentActions.companyId, companyId), isNull(agentActions.deletedAt)));
 
-  const eligible = candidates
+    return {
+      candidates: recommendationRows,
+      existingProposalKeys: new Set(actionRows.map((row) => row.idempotencyKey))
+    };
+  });
+
+  const supportedCandidates = candidates
     .filter((row) => supported.has(row.type) && row.customerId)
-    .sort((a, b) => (b.urgencyScore ?? 0) - (a.urgencyScore ?? 0))
+    .sort((a, b) => (b.urgencyScore ?? 0) - (a.urgencyScore ?? 0));
+  const existing = supportedCandidates.filter((row) =>
+    existingProposalKeys.has(recommendationIdempotencyKey(row.id))
+  );
+  const eligible = supportedCandidates
+    .filter((row) => !existingProposalKeys.has(recommendationIdempotencyKey(row.id)))
     .slice(0, limit);
 
   const result: GenerateRevenueProposalsResponse = {
     created: 0,
-    existing: 0,
-    skipped: candidates.length - eligible.length,
+    existing: existing.length,
+    skipped: candidates.length - existing.length - eligible.length,
     proposals: []
   };
   for (const row of eligible) {

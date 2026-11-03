@@ -48,7 +48,8 @@ function seedTenant(slug: string) {
     autoConfirm: false,
     availableDays: ["tue"],
     availableHoursStart: 8,
-    availableHoursEnd: 17
+    availableHoursEnd: 17,
+    offeredServices: [{ name: "Configured service" }]
   });
   const technician = fakeDb.seedTechnician({
     companyId: company.id,

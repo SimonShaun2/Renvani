@@ -3,7 +3,6 @@ import type { FastifyReply, FastifyRequest } from "fastify";
 import type {
   AddEstimateItemInput,
   CreateEstimateInput,
-  Estimate,
   EstimateDetail,
   EstimateItem,
   EstimateListItem,
@@ -20,8 +19,8 @@ import {
   declineEstimate,
   deleteEstimate,
   getEstimate,
+  getEstimateForActor,
   listEstimates,
-  listItems,
   reviseEstimate,
   sendEstimate,
   updateEstimate
@@ -31,6 +30,7 @@ import {
   removeItem,
   updateItem
 } from "../../services/estimate-items.service.js";
+import type { EstimateStaffActor } from "../../services/estimate-access.js";
 import type {
   DeclineEstimateBody,
   EstimateIdParams,
@@ -39,6 +39,10 @@ import type {
 
 function toIsoString(value: Date | null): string | null {
   return value ? value.toISOString() : null;
+}
+
+function estimateActor(request: FastifyRequest): EstimateStaffActor {
+  return { companyId: request.company.id, userId: request.user.id, role: request.user.role };
 }
 
 function toEstimateItemResponse(item: EstimateItem) {
@@ -79,7 +83,7 @@ function toEstimateListItemResponse(estimate: EstimateListItem) {
   };
 }
 
-function toEstimateDetailResponse(estimate: EstimateDetail) {
+function toEstimateDetailResponse(estimate: EstimateDetail, redactApprovalToken = false) {
   return {
     id: estimate.id,
     companyId: estimate.companyId,
@@ -100,7 +104,7 @@ function toEstimateDetailResponse(estimate: EstimateDetail) {
     title: estimate.title,
     messageToCustomer: estimate.messageToCustomer,
     internalNotes: estimate.internalNotes,
-    approvalToken: estimate.approvalToken,
+    approvalToken: redactApprovalToken ? null : estimate.approvalToken,
     approvedAt: toIsoString(estimate.approvedAt),
     approvedByName: estimate.approvedByName,
     approvedSignatureUrl: estimate.approvedSignatureUrl,
@@ -136,7 +140,7 @@ function toJobResponse(job: Job) {
 }
 
 export async function listEstimatesHandler(request: FastifyRequest, reply: FastifyReply): Promise<FastifyReply> {
-  const result = await listEstimates(request.company.id, request.query as ListEstimatesQuery);
+  const result = await listEstimates(estimateActor(request), request.query as ListEstimatesQuery);
 
   return reply.send({
     data: result.data.map((estimate) => toEstimateListItemResponse(estimate)),
@@ -158,10 +162,10 @@ export async function createEstimateHandler(request: FastifyRequest, reply: Fast
 
 export async function getEstimateHandler(request: FastifyRequest, reply: FastifyReply): Promise<FastifyReply> {
   const params = request.params as EstimateIdParams;
-  const estimate = await getEstimate(request.company.id, params.id);
+  const estimate = await getEstimateForActor(estimateActor(request), params.id);
 
   return reply.send({
-    estimate: toEstimateDetailResponse(estimate)
+    estimate: toEstimateDetailResponse(estimate, request.user.role === "technician")
   });
 }
 
@@ -233,16 +237,16 @@ export async function convertEstimateHandler(request: FastifyRequest, reply: Fas
 
 export async function listEstimateItemsHandler(request: FastifyRequest, reply: FastifyReply): Promise<FastifyReply> {
   const params = request.params as EstimateIdParams;
-  const items = await listItems(request.company.id, params.id);
+  const detail = await getEstimateForActor(estimateActor(request), params.id);
 
   return reply.send({
-    items: items.map((item) => toEstimateItemResponse(item))
+    items: detail.items.map((item) => toEstimateItemResponse(item))
   });
 }
 
 export async function addEstimateItemHandler(request: FastifyRequest, reply: FastifyReply): Promise<FastifyReply> {
   const params = request.params as EstimateIdParams;
-  const item = await addItem(request.company.id, params.id, request.body as AddEstimateItemInput);
+  const item = await addItem(estimateActor(request), params.id, request.body as AddEstimateItemInput);
 
   return reply.status(201).send({
     item: toEstimateItemResponse(item)
@@ -251,7 +255,7 @@ export async function addEstimateItemHandler(request: FastifyRequest, reply: Fas
 
 export async function updateEstimateItemHandler(request: FastifyRequest, reply: FastifyReply): Promise<FastifyReply> {
   const params = request.params as EstimateItemIdParams;
-  const item = await updateItem(request.company.id, params.id, params.itemId, request.body as UpdateEstimateItemInput);
+  const item = await updateItem(estimateActor(request), params.id, params.itemId, request.body as UpdateEstimateItemInput);
 
   return reply.send({
     item: toEstimateItemResponse(item)
@@ -260,7 +264,7 @@ export async function updateEstimateItemHandler(request: FastifyRequest, reply: 
 
 export async function deleteEstimateItemHandler(request: FastifyRequest, reply: FastifyReply): Promise<FastifyReply> {
   const params = request.params as EstimateItemIdParams;
-  await removeItem(request.company.id, params.id, params.itemId);
+  await removeItem(estimateActor(request), params.id, params.itemId);
 
   return reply.status(204).send();
 }

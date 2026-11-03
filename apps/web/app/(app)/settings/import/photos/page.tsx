@@ -1,9 +1,8 @@
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { MigratePhotoLinkPreviewClient } from "@/src/components/migrate-photo/MigratePhotoLinkPreviewClient";
-import { readServerAuthSession } from "@/src/lib/auth";
 import { getDefaultRouteForRole } from "@/src/lib/route-access";
+import { requireServerSession } from "@/src/lib/server-session";
 
 export const metadata = {
   title: "Photo import link preview"
@@ -14,13 +13,8 @@ interface PhotosImportPageProps {
 }
 
 export default async function PhotosImportPage({ searchParams }: PhotosImportPageProps) {
-  const cookieStore = await cookies();
-  const session = readServerAuthSession(cookieStore);
+  const session = await requireServerSession();
   const params = await searchParams;
-
-  if (!session) {
-    redirect("/login");
-  }
 
   if (session.role !== "owner" && session.role !== "admin") {
     redirect(getDefaultRouteForRole(session.role));

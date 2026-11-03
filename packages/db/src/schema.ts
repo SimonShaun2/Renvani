@@ -915,6 +915,9 @@ export const estimates = pgTable("estimates", {
   tierLabel: varchar("tier_label", { length: 50 }), // "Good", "Better", "Best", null if single
   tierGroupId: uuid("tier_group_id"), // groups the 3 tiers together
   isSelectedTier: boolean("is_selected_tier").default(false),
+  // FS-212: at most one recommended option per tier group (partial unique index); set-level version on every row
+  isRecommended: boolean("is_recommended").notNull().default(false),
+  optionSetVersion: integer("option_set_version").notNull().default(1),
   // Totals (computed from items)
   subtotal: decimal("subtotal", { precision: 10, scale: 2 }).notNull().default("0"),
   taxRate: decimal("tax_rate", { precision: 5, scale: 4 }).default("0"),
@@ -948,6 +951,9 @@ export const estimates = pgTable("estimates", {
   customerIdx: index("estimates_customer_idx").on(t.customerId),
   statusIdx: index("estimates_status_idx").on(t.status),
   tokenIdx: uniqueIndex("estimates_approval_token_idx").on(t.approvalToken),
+  tierGroupRecommendedIdx: uniqueIndex("estimates_tier_group_recommended_idx")
+    .on(t.companyId, t.tierGroupId)
+    .where(sql`${t.isRecommended} = true AND ${t.deletedAt} IS NULL AND ${t.tierGroupId} IS NOT NULL`),
   numberIdx: uniqueIndex("estimates_number_company_idx").on(t.estimateNumber, t.companyId),
   importLineageIdx: uniqueIndex("estimates_import_lineage_idx").on(
     t.companyId,
@@ -2604,6 +2610,209 @@ export const growthCheckFindings = pgTable(
     companyIdx: index("growth_check_findings_company_idx").on(t.companyId),
     scanIdx: index("growth_check_findings_scan_idx").on(t.scanId),
     scanCheckUnique: uniqueIndex("growth_check_findings_scan_check_idx").on(t.scanId, t.checkId),
+  })
+);
+
+/** FS-200 Growth: per-tenant call tracking settings (provider id from the adapter registry, not an enum). */
+export const callTrackingSettings = pgTable(
+  "call_tracking_settings",
+  {
+    id: id(),
+    companyId: companyId(),
+    provider: varchar("provider", { length: 64 }).notNull().default("disabled"),
+    enabled: boolean("enabled").notNull().default(false),
+    recordingEnabled: boolean("recording_enabled").notNull().default(false),
+    recordingDisclosureEnabled: boolean("recording_disclosure_enabled").notNull().default(true),
+    consentMode: varchar("consent_mode", { length: 32 }).notNull().default("all_party"),
+    recordingNoticeState: varchar("recording_notice_state", { length: 2 }),
+    version: integer("version").notNull().default(1),
+    updatedByUserId: uuid("updated_by_user_id").references(() => users.id, { onDelete: "set null" }),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at").notNull().defaultNow()
+  },
+  (t) => ({
+    companyUnique: uniqueIndex("call_tracking_settings_company_idx").on(t.companyId)
+  })
+);
+
+/** FS-200: tracking number -> marketing source/campaign mapping and forwarding target (business numbers only). */
+export const callTrackingNumbers = pgTable(
+  "call_tracking_numbers",
+  {
+    id: id(),
+    companyId: companyId(),
+    provider: varchar("provider", { length: 64 }).notNull(),
+    providerNumberId: varchar("provider_number_id", { length: 128 }),
+    trackingNumber: varchar("tracking_number", { length: 20 }).notNull(),
+    label: varchar("label", { length: 100 }).notNull(),
+    marketingSource: varchar("marketing_source", { length: 64 }).notNull(),
+    marketingCampaign: varchar("marketing_campaign", { length: 100 }),
+    forwardingNumber: varchar("forwarding_number", { length: 20 }).notNull(),
+    active: boolean("active").notNull().default(true),
+    version: integer("version").notNull().default(1),
+    /** FS-200 (0060): last time the provider adapter confirmed ownership. Null = never verified. */
+    verifiedAt: timestamp("verified_at", { withTimezone: true }),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
+    deletedAt: timestamp("deleted_at")
+  },
+  (t) => ({
+    companyIdx: index("call_tracking_numbers_company_idx").on(t.companyId),
+    trackingNumberUnique: uniqueIndex("call_tracking_numbers_tracking_number_idx")
+      .on(t.trackingNumber)
+      .where(sql`${t.deletedAt} IS NULL`)
+  })
+);
+
+/** FS-200: inbound call records. Caller stored as tenant-scoped hash + last 4 only; recording by reference only. */
+export const callRecords = pgTable(
+  "call_records",
+  {
+    id: id(),
+    companyId: companyId(),
+    trackingNumberId: uuid("tracking_number_id")
+      .notNull()
+      .references(() => callTrackingNumbers.id, { onDelete: "cascade" }),
+    provider: varchar("provider", { length: 64 }).notNull(),
+    providerCallId: varchar("provider_call_id", { length: 128 }).notNull(),
+    callerHash: varchar("caller_hash", { length: 64 }).notNull(),
+    callerLast4: varchar("caller_last4", { length: 4 }).notNull(),
+    startedAt: timestamp("started_at").notNull(),
+    durationSeconds: integer("duration_seconds").notNull(),
+    outcome: varchar("outcome", { length: 32 }).notNull(),
+    /** Lead attribution (#271 whitelist) derived from the tracking number mapping. */
+    attribution: jsonb("lead_attribution").$type<Partial<Record<string, string>>>(),
+    recordingRef: varchar("recording_ref", { length: 512 }),
+    recordingDisclosurePlayed: boolean("recording_disclosure_played").notNull().default(false),
+    callerConsent: varchar("caller_consent", { length: 32 }).notNull().default("unknown"),
+    recordingNoticeState: varchar("recording_notice_state", { length: 2 }),
+    createdAt: timestamp("created_at").notNull().defaultNow()
+  },
+  (t) => ({
+    companyStartedIdx: index("call_records_company_started_idx").on(t.companyId, t.startedAt),
+    trackingNumberIdx: index("call_records_tracking_number_idx").on(t.trackingNumberId),
+    providerCallUnique: uniqueIndex("call_records_provider_call_idx").on(t.provider, t.providerCallId)
+  })
+);
+
+/** FS-56: append-only review history for Growth Check findings (machine observation stays untouched). */
+export const growthCheckFindingRevisions = pgTable(
+  "growth_check_finding_revisions",
+  {
+    id: id(),
+    companyId: companyId(),
+    findingId: uuid("finding_id")
+      .notNull()
+      .references(() => growthCheckFindings.id, { onDelete: "cascade" }),
+    scanId: uuid("scan_id")
+      .notNull()
+      .references(() => growthCheckScans.id, { onDelete: "cascade" }),
+    revision: integer("revision").notNull(),
+    action: varchar("action", { length: 64 }).notNull(),
+    actorUserId: uuid("actor_user_id").references(() => users.id, { onDelete: "set null" }),
+    reason: text("reason"),
+    note: text("note"),
+    previousState: jsonb("previous_state").notNull(),
+    nextState: jsonb("next_state").notNull(),
+    idempotencyKey: varchar("idempotency_key", { length: 128 }).notNull(),
+    payloadHash: varchar("payload_hash", { length: 64 }).notNull(),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+  },
+  (t) => ({
+    companyIdx: index("growth_check_finding_revisions_company_idx").on(t.companyId),
+    findingIdx: index("growth_check_finding_revisions_finding_idx").on(t.findingId),
+    scanIdx: index("growth_check_finding_revisions_scan_idx").on(t.scanId),
+    findingRevisionUnique: uniqueIndex("growth_check_finding_revisions_finding_revision_idx").on(
+      t.findingId,
+      t.revision
+    ),
+    companyIdempotencyUnique: uniqueIndex("growth_check_finding_revisions_company_idempotency_idx").on(
+      t.companyId,
+      t.idempotencyKey
+    ),
+  })
+);
+
+/** FS-57 Growth Check owner report drafts (one per scan; content versioned via append-only revisions). */
+export const growthCheckReportDrafts = pgTable(
+  "growth_check_report_drafts",
+  {
+    id: id(),
+    companyId: companyId(),
+    scanId: uuid("scan_id")
+      .notNull()
+      .references(() => growthCheckScans.id, { onDelete: "cascade" }),
+    version: integer("version").notNull().default(1),
+    content: jsonb("content").notNull(),
+    approvedVersion: integer("approved_version"),
+    approvedByUserId: uuid("approved_by_user_id").references(() => users.id, { onDelete: "set null" }),
+    approvedAt: timestamp("approved_at"),
+    createdByUserId: uuid("created_by_user_id").references(() => users.id, { onDelete: "set null" }),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  },
+  (t) => ({
+    companyIdx: index("growth_check_report_drafts_company_idx").on(t.companyId),
+    companyScanUnique: uniqueIndex("growth_check_report_drafts_company_scan_idx").on(t.companyId, t.scanId),
+  })
+);
+
+export const growthCheckReportDraftRevisions = pgTable(
+  "growth_check_report_draft_revisions",
+  {
+    id: id(),
+    companyId: companyId(),
+    draftId: uuid("draft_id")
+      .notNull()
+      .references(() => growthCheckReportDrafts.id, { onDelete: "cascade" }),
+    version: integer("version").notNull(),
+    action: varchar("action", { length: 64 }).notNull(),
+    actorUserId: uuid("actor_user_id").references(() => users.id, { onDelete: "set null" }),
+    previousContent: jsonb("previous_content"),
+    nextContent: jsonb("next_content").notNull(),
+    idempotencyKey: varchar("idempotency_key", { length: 128 }).notNull(),
+    payloadHash: varchar("payload_hash", { length: 64 }).notNull(),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+  },
+  (t) => ({
+    companyIdx: index("growth_check_report_draft_revisions_company_idx").on(t.companyId),
+    draftVersionUnique: uniqueIndex("growth_check_report_draft_revisions_draft_version_idx").on(t.draftId, t.version),
+    companyIdempotencyUnique: uniqueIndex("growth_check_report_draft_revisions_company_idempotency_idx").on(
+      t.companyId,
+      t.idempotencyKey
+    ),
+  })
+);
+
+/** FS-57 share snapshots: frozen approved content + hash; raw token never stored (sha256 only). */
+export const growthCheckReportShares = pgTable(
+  "growth_check_report_shares",
+  {
+    id: id(),
+    companyId: companyId(),
+    draftId: uuid("draft_id")
+      .notNull()
+      .references(() => growthCheckReportDrafts.id, { onDelete: "cascade" }),
+    draftVersion: integer("draft_version").notNull(),
+    contentHash: varchar("content_hash", { length: 64 }).notNull(),
+    snapshot: jsonb("snapshot").notNull(),
+    tokenHash: varchar("token_hash", { length: 64 }).notNull(),
+    createdByUserId: uuid("created_by_user_id").references(() => users.id, { onDelete: "set null" }),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    expiresAt: timestamp("expires_at"),
+    revokedAt: timestamp("revoked_at"),
+    revokedByUserId: uuid("revoked_by_user_id").references(() => users.id, { onDelete: "set null" }),
+    idempotencyKey: varchar("idempotency_key", { length: 128 }).notNull(),
+    payloadHash: varchar("payload_hash", { length: 64 }).notNull(),
+  },
+  (t) => ({
+    companyIdx: index("growth_check_report_shares_company_idx").on(t.companyId),
+    draftIdx: index("growth_check_report_shares_draft_idx").on(t.draftId),
+    tokenHashUnique: uniqueIndex("growth_check_report_shares_token_hash_idx").on(t.tokenHash),
+    companyIdempotencyUnique: uniqueIndex("growth_check_report_shares_company_idempotency_idx").on(
+      t.companyId,
+      t.idempotencyKey
+    ),
   })
 );
 

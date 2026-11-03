@@ -33,14 +33,14 @@ describe("marketing site (Figma 171:2)", () => {
     const container = root.querySelector(".md\\:hidden.lg\\:block")!;
     expect(container.querySelector('[data-node-id="219:9474"]')!.className).toContain("md:hidden");
     expect(container.querySelector('[data-node-id="253:6779"]')!.className).toContain("md:hidden");
-    expect(container.querySelector('[data-node-id="200:46"]')!.parentElement!.className).toContain("hidden md:block");
+    expect(container.querySelector('[data-node-id="200:46"]')!.closest(".hidden")!.className).toContain("hidden md:block");
   });
 
   it("tablet 768 renders its own frame (253:6780) between md and lg with real links and forms", () => {
     const { container } = render(<HomePage />);
     const tablet = container.querySelector('[data-node-id="253:6780"]')!;
     expect(tablet.parentElement!.className).toBe("hidden md:block lg:hidden");
-    expect(tablet.parentElement!.nextElementSibling!.className).toBe("md:hidden lg:block");
+    expect(tablet.parentElement!.nextElementSibling!.className).toBe("leading-[1.38] md:hidden lg:block");
     expect(tablet.querySelectorAll("form")).toHaveLength(2);
     expect(tablet.textContent).not.toMatch(/Oct 29/);
     expect(tablet.textContent).toContain("Next available day");

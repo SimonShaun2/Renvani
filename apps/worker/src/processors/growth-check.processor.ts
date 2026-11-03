@@ -3,6 +3,7 @@ import { and, eq } from "drizzle-orm";
 import pino from "pino";
 
 import { featureFlags } from "@fsm/config/feature-flags";
+import { fetchPublicUrl } from "@fsm/config/outbound-url-guard";
 import { db, emitEvent, growthCheckFindings, growthCheckScans } from "@fsm/db";
 import {
   GROWTH_QUEUE_JOB_NAMES,
@@ -32,26 +33,21 @@ export interface GrowthCheckProcessorDependencies {
   fetchPage: GrowthCheckPageFetcher;
 }
 
+const MAX_REDIRECTS = 3;
+const MAX_RESPONSE_BYTES = 2 * 1024 * 1024;
+
+/** Audit H2: DNS-pinned, private-address-blocking fetch (shared guard in @fsm/config/outbound-url-guard). */
 async function defaultFetchPage(url: URL): Promise<GrowthCheckFetchResult> {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
-
-  try {
-    const response = await fetch(url.toString(), {
-      method: "GET",
-      redirect: "error",
-      signal: controller.signal,
-      headers: {
-        "User-Agent": "FSM-GrowthCheck/1.0",
-        Accept: "text/html,application/xhtml+xml"
-      }
-    });
-
-    const body = await response.text();
-    return { statusCode: response.status, body };
-  } finally {
-    clearTimeout(timeout);
-  }
+  const { statusCode, body } = await fetchPublicUrl(url, {
+    timeoutMs: FETCH_TIMEOUT_MS,
+    maxRedirects: MAX_REDIRECTS,
+    maxBytes: MAX_RESPONSE_BYTES,
+    headers: {
+      "User-Agent": "FSM-GrowthCheck/1.0",
+      Accept: "text/html,application/xhtml+xml"
+    }
+  });
+  return { statusCode, body };
 }
 
 const defaultDependencies: GrowthCheckProcessorDependencies = {

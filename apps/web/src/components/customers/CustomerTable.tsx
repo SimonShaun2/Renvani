@@ -84,6 +84,8 @@ export function CustomerTable() {
       }>("/api/v1/invoices?status=overdue&page=1&limit=100")
   });
 
+  const noCustomerRecords = filter === "all" && debouncedSearch.length === 0 && customersQuery.data?.total === 0;
+
   const activePlanCustomerIds = new Set(
     (agreementSnapshotQuery.data?.data ?? []).map((agreement) => agreement.customer.id)
   );
@@ -95,18 +97,18 @@ export function CustomerTable() {
 
   return (
     <motion.div {...cardMotion} transition={{ duration: 0.3 }} className="space-y-6">
-      <section className="surface-card px-6 py-5">
+      <section className="space-y-4 border-b border-[#e6dccb] pb-5">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">Customers</h1>
-            <p className="mt-1 text-sm text-neutral-500">
+            <h1 className="text-[30px] font-semibold leading-tight tracking-[-0.03em] text-[#0f1530]">Customers</h1>
+            <p className="mt-1 text-sm leading-6 text-[#5e6684]">
               Search the account base, spot service risk, and move into the full customer profile in one click.
             </p>
           </div>
           <button
             type="button"
             onClick={() => setCustomerFormOpen(true)}
-            className="inline-flex items-center gap-2 rounded-full bg-brand-accent px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-primary"
+            className="inline-flex min-h-11 items-center gap-2 rounded-[10px] bg-[#f6b400] px-5 py-2.5 text-sm font-semibold text-[#0f1530] transition hover:bg-[#e0a400]"
           >
             <Plus className="h-4 w-4" />
             New Customer
@@ -114,7 +116,7 @@ export function CustomerTable() {
         </div>
 
         <div className="mt-5 flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-          <label className="flex min-w-0 flex-1 items-center gap-2 rounded-full border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm text-neutral-500">
+          <label className="flex min-w-0 flex-1 items-center gap-2 rounded-[10px] border border-[#e6dccb] bg-white px-4 py-3 text-sm text-[#5e6684]">
             <Search className="h-4 w-4" />
             <input
               value={search}
@@ -138,8 +140,8 @@ export function CustomerTable() {
                 onClick={() => setFilter(chip.key as CustomerFilter)}
                 className={
                   filter === chip.key
-                    ? "rounded-full bg-brand-accent px-4 py-2 text-sm font-semibold text-white"
-                    : "rounded-full bg-neutral-100 px-4 py-2 text-sm font-semibold text-neutral-500 transition hover:text-neutral-900"
+                    ? "rounded-[10px] bg-[#f6b400] px-4 py-2 text-sm font-semibold text-[#0f1530]"
+                    : "rounded-[10px] bg-[#f3eadc] px-4 py-2 text-sm font-semibold text-[#2a3360] transition hover:bg-[#fff4d6]"
                 }
               >
                 {chip.label}
@@ -149,7 +151,7 @@ export function CustomerTable() {
             <select
               value={sortBy}
               onChange={(event) => setSortBy(event.target.value as CustomerSort)}
-              className="rounded-full border border-neutral-200 bg-white px-4 py-2 text-sm font-semibold text-neutral-700 outline-none"
+              className="min-h-11 rounded-[10px] border border-[#e6dccb] bg-white px-4 py-2 text-sm font-semibold text-[#0f1530] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f1530]"
             >
               <option value="lastServiceDate">Last service date</option>
               <option value="lastName">Name</option>
@@ -162,18 +164,22 @@ export function CustomerTable() {
       {customersQuery.isLoading ? (
         <SkeletonCard className="h-[620px]" />
       ) : customersQuery.isError || !customersQuery.data ? (
-        <section className="rounded-3xl border border-error/15 bg-error-light px-5 py-5 text-sm text-error">
-          Customer records could not be loaded.
+        <section role="alert" className="rounded-[14px] border border-[#f1b3a7] bg-[#fbe3dc] px-5 py-5 text-sm text-[#b42318]">
+          <p>Customer records could not be loaded. This does not mean there are no customers.</p>
+          <button type="button" disabled={customersQuery.isFetching} onClick={() => { void customersQuery.refetch(); }} className="mt-3 rounded-[10px] border border-[#e6dccb] bg-white px-4 py-2 font-semibold text-[#0f1530] disabled:opacity-50">Retry</button>
         </section>
       ) : customersQuery.data.data.length === 0 ? (
         <EmptyState variant="operator"
           icon={Users}
-          title="No customers match this view"
-          subtitle="Try another search term or switch filters to widen the customer set."
+          title={noCustomerRecords ? "No customers recorded yet" : "No customers match this view"}
+          subtitle={noCustomerRecords ? "Add your first customer or import existing business records to build your customer history." : "Try another search term or switch filters to widen the customer set."}
+          action={noCustomerRecords ? (
+            <button type="button" onClick={() => setCustomerFormOpen(true)} className="inline-flex min-h-11 items-center justify-center rounded-[10px] bg-[#f6b400] px-5 text-sm font-semibold text-[#0f1530] hover:bg-[#e0a400]">Add first customer</button>
+          ) : null}
         />
       ) : (
         <>
-          <section className="overflow-hidden rounded-[28px] border border-neutral-200 bg-white shadow-sm">
+          <section className="overflow-hidden rounded-[14px] border border-[#e6dccb] bg-white">
             <table className="min-w-full divide-y divide-neutral-200 text-sm">
               <thead className="bg-neutral-50 text-left text-neutral-500">
                 <tr>

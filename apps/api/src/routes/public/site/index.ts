@@ -39,8 +39,11 @@ export const webAssistantRouteSchema = {
     200: {
       oneOf: [
         { type: "object", additionalProperties: false, required: ["kind", "verified", "answer", "source"], properties: {
-          kind: { type: "string", enum: ["answer"] }, verified: { type: "boolean" },
-          answer: { type: "string" }, source: { type: "string", enum: ["public_booking_settings", "zip_serviceability", "unverified"] }
+          kind: { type: "string", enum: ["answer"] }, verified: { type: "boolean", enum: [true] },
+          answer: { type: "string" }, source: { type: "string", enum: ["public_booking_settings", "zip_serviceability"] }
+        } },
+        { type: "object", additionalProperties: false, required: ["kind", "reason", "message"], properties: {
+          kind: { type: "string", enum: ["handoff_required"] }, reason: { type: "string" }, message: { type: "string" }
         } },
         { type: "object", additionalProperties: false, required: ["kind", "status", "referenceNumber", "reason", "message"], properties: {
           kind: { type: "string", enum: ["handoff"] }, status: { type: "string", enum: ["pending"] },

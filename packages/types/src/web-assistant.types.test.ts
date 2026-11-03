@@ -27,4 +27,13 @@ describe("FS-197 public web assistant contract", () => {
     expect(webAssistantResponseSchema.safeParse({ kind: "handoff", status: "confirmed", referenceNumber: "BK-1",
       reason: "human_requested", message: "Your request is pending staff review. No appointment has been confirmed." }).success).toBe(false);
   });
+
+  it("distinguishes verified facts from a typed read-only handoff decision", () => {
+    expect(webAssistantResponseSchema.safeParse({ kind: "answer", verified: false,
+      answer: "Maybe available", source: "unverified" }).success).toBe(false);
+    expect(webAssistantResponseSchema.parse({ kind: "handoff_required", reason: "availability_review",
+      message: "Staff can review availability; no appointment is confirmed." })).toMatchObject({
+      kind: "handoff_required", reason: "availability_review"
+    });
+  });
 });

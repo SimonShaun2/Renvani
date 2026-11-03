@@ -26,8 +26,11 @@ function serviceLabels(settings: PublicBookingSettings): string[] {
   })));
 }
 
-function unverified(answer = "I can't verify that from this business's published information. Staff can review your request."): WebAssistantResponse {
-  return { kind: "answer", verified: false, answer, source: "unverified" };
+function handoffRequired(
+  reason: WebAssistantHandoffReason,
+  message = "I can't verify that from this business's published information. Submit your request for staff review; no appointment is confirmed."
+): WebAssistantResponse {
+  return { kind: "handoff_required", reason, message };
 }
 
 function formatHour(hour: number): string {
@@ -43,30 +46,29 @@ export function answerVerifiedWebQuestion(
   settings: PublicBookingSettings,
   serviceability?: Serviceability
 ): WebAssistantResponse {
-  if (settings.trade !== "hvac" && settings.trade !== "plumbing") return unverified();
+  if (settings.trade !== "hvac" && settings.trade !== "plumbing") return handoffRequired("unsupported_service");
   switch (input.topic) {
     case "services": {
       const labels = serviceLabels(settings);
-      if (labels.length === 0) return unverified("This business hasn't published a verified service list yet. Staff can confirm your request.");
+      if (labels.length === 0) return handoffRequired("unverified_answer", "This business hasn't published a verified service list yet. Submit your request for staff review; no appointment is confirmed.");
       if (input.service) {
         const matched = labels.find((label) => label.toLowerCase() === input.service?.toLowerCase());
         return matched
           ? { kind: "answer", verified: true, answer: `${settings.companyName} lists ${matched} as an offered service. Staff will confirm the next step.`, source: "public_booking_settings" }
-          : unverified("I can't verify that service in the published service list. Staff can review your request.");
+          : handoffRequired("unsupported_service", "I can't verify that service in the published service list. Submit your request for staff review; no appointment is confirmed.");
       }
       return { kind: "answer", verified: true, answer: `${settings.companyName} lists these services: ${labels.join(", ")}. Staff will confirm your request.`, source: "public_booking_settings" };
     }
     case "service_area":
-      if (!input.zip || !serviceability || serviceability === "unknown") return unverified("Service coverage for that ZIP isn't verified. Staff can review your request.");
+      if (!input.zip || !serviceability || serviceability === "unknown") return handoffRequired("unknown_serviceability", "Service coverage for that ZIP isn't verified. Submit your request for staff review; no appointment is confirmed.");
+      if (serviceability === "out_of_area") return handoffRequired("out_of_area", `${settings.companyName} does not currently list ${input.zip} in its service area. Staff can review your request; no appointment is confirmed.`);
       return {
         kind: "answer", verified: true,
-        answer: serviceability === "in_area"
-          ? `${settings.companyName} currently lists ${input.zip} in its service area. Staff will confirm availability.`
-          : `${settings.companyName} does not currently list ${input.zip} in its service area. Staff can review your request.`,
+        answer: `${settings.companyName} currently lists ${input.zip} in its service area. Staff will confirm availability.`,
         source: "zip_serviceability"
       };
     case "booking_hours":
-      if (settings.availableDays.length === 0 || settings.availableHoursEnd <= settings.availableHoursStart) return unverified();
+      if (settings.availableDays.length === 0 || settings.availableHoursEnd <= settings.availableHoursStart) return handoffRequired("unverified_answer");
       return {
         kind: "answer", verified: true,
         answer: `Published booking request windows: ${settings.availableDays.join(", ")}, ${formatHour(settings.availableHoursStart)} to ${formatHour(settings.availableHoursEnd)} (${settings.timezone}). These are request windows, not a confirmed appointment.`,
@@ -76,20 +78,20 @@ export function answerVerifiedWebQuestion(
       const resolution = resolveEmergencyRequest(true, settings.emergencyService ?? { enabled: false, hoursText: null }, settings.trade);
       return resolution.accepted
         ? { kind: "answer", verified: true, answer: `${settings.companyName} has emergency service enabled. Staff must confirm coverage and response time for your request.`, source: "public_booking_settings" }
-        : unverified("Emergency coverage is not verified for this business. Staff can review an urgent request.");
+        : handoffRequired("emergency_review", "Emergency coverage is not verified for this business. Submit an urgent request for staff review; no response time or appointment is confirmed.");
     }
     case "contact":
       return settings.phone
         ? { kind: "answer", verified: true, answer: `The published contact number for ${settings.companyName} is ${settings.phone}.`, source: "public_booking_settings" }
-        : unverified("This business has not published a verified contact number. Staff can review your request.");
+        : handoffRequired("unverified_answer", "This business has not published a verified contact number. Submit your request for staff review; no appointment is confirmed.");
     case "availability":
-      return unverified("I can't confirm a live appointment from published settings. Staff can review available slots and your request.");
+      return handoffRequired("availability_review", "I can't confirm a live appointment from published settings. Submit your request for staff review; no appointment is confirmed.");
     case "pricing":
-      return unverified("I can't approve or verify a price here. Staff can provide a quote for your request.");
+      return handoffRequired("pricing_review", "I can't approve or verify a price here. Submit your request for a staff quote; no price is confirmed.");
     case "human":
-      return unverified("Staff can review your request when you submit the handoff form. No appointment has been confirmed.");
+      return handoffRequired("human_requested", "Submit the handoff form to reach staff. No appointment has been confirmed.");
     case "other":
-      return unverified();
+      return handoffRequired("unverified_answer");
   }
 }
 

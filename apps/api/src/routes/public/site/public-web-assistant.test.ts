@@ -100,10 +100,13 @@ describe("FS-197 public web assistant first slice", () => {
     expect((await post("acme-hvac", { action: "answer", topic: "service_area", zip: "74103" }, { ip: "203.0.113.42" })).json())
       .toMatchObject({ verified: true, source: "zip_serviceability" });
     expect((await post("acme-hvac", { action: "answer", topic: "service_area", zip: "10001" }, { ip: "203.0.113.43" })).json())
-      .toMatchObject({ verified: true, source: "zip_serviceability" });
-    for (const topic of ["pricing", "availability", "emergency", "human"] as const) {
+      .toMatchObject({ kind: "handoff_required", reason: "out_of_area" });
+    for (const [topic, reason] of [
+      ["pricing", "pricing_review"], ["availability", "availability_review"],
+      ["emergency", "emergency_review"], ["human", "human_requested"]
+    ] as const) {
       expect((await post("acme-hvac", { action: "answer", topic }, { ip: `203.0.113.${50 + topic.length}` })).json())
-        .toMatchObject({ verified: false, source: "unverified" });
+        .toMatchObject({ kind: "handoff_required", reason });
     }
     expect(fakeDb.getTestState().bookingRequests).toHaveLength(0);
   });
@@ -166,6 +169,9 @@ describe("FS-197 public web assistant first slice", () => {
       settings: { trade: "hvac" } });
     fakeDb.seedBookingSettings({ companyId: unknown.id, bookingSlug: "new-hvac", isEnabled: true,
       offeredServices: [{ label: "AC Repair" }] });
+    const unknownAnswer = await post("new-hvac", { action: "answer", topic: "service_area", zip: "74103" },
+      { ip: "203.0.113.89" });
+    expect(unknownAnswer.json()).toMatchObject({ kind: "handoff_required", reason: "unknown_serviceability" });
     const cases = [
       { slug: "new-hvac", topic: "service_area", reason: "unknown_serviceability" },
       { slug: "acme-hvac", topic: "pricing", reason: "pricing_review" },
@@ -189,7 +195,7 @@ describe("FS-197 public web assistant first slice", () => {
       offeredServices: [{ label: "General Service" }] });
     const answer = await post("general-shop", { action: "answer", topic: "services" }, { ip: "203.0.113.95" });
     expect(answer.statusCode).toBe(200);
-    expect(answer.json()).toMatchObject({ verified: false, source: "unverified" });
+    expect(answer.json()).toMatchObject({ kind: "handoff_required", reason: "unsupported_service" });
     const handoff = await post("general-shop", { action: "handoff", topic: "services", service: "General Service",
       message: "Please review", contact, contactConsent: true }, { key: "unsupported-trade", ip: "203.0.113.96" });
     expect(handoff.statusCode).toBe(201);

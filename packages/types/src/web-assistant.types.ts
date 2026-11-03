@@ -47,9 +47,14 @@ export type WebAssistantRequest = z.infer<typeof webAssistantRequestSchema>;
 export const webAssistantResponseSchema = z.discriminatedUnion("kind", [
   z.object({
     kind: z.literal("answer"),
-    verified: z.boolean(),
+    verified: z.literal(true),
     answer: z.string(),
-    source: z.enum(["public_booking_settings", "zip_serviceability", "unverified"])
+    source: z.enum(["public_booking_settings", "zip_serviceability"])
+  }).strict(),
+  z.object({
+    kind: z.literal("handoff_required"),
+    reason: webAssistantHandoffReasonSchema,
+    message: z.string()
   }).strict(),
   z.object({
     kind: z.literal("handoff"),

@@ -15,6 +15,17 @@ function signingSecret(): string {
 
 export const VIP_MEMBERSHIP_JOIN_TOKEN_TTL_SECONDS = 30 * 24 * 60 * 60;
 
+/** Upper bound for a join token (3 UUIDs + exp payload, "." and a 43-char base64url HMAC is ~170 chars). */
+export const VIP_MEMBERSHIP_JOIN_TOKEN_MAX_LENGTH = 256;
+
+/** Shape of `${payload}.${base64url(hmac-sha256)}`; payload is `companyId:customerId:vipTierId[:exp]`. */
+export const VIP_MEMBERSHIP_JOIN_TOKEN_PATTERN = /^[A-Za-z0-9-]+(?::[A-Za-z0-9-]+){2,3}\.[A-Za-z0-9_-]{43}$/u;
+
+/** Cheap pre-check before HMAC verification: rejects malformed or oversized tokens. */
+export function isWellFormedVipMembershipJoinToken(token: string): boolean {
+  return token.length <= VIP_MEMBERSHIP_JOIN_TOKEN_MAX_LENGTH && VIP_MEMBERSHIP_JOIN_TOKEN_PATTERN.test(token);
+}
+
 function encodePayload(companyId: string, customerId: string, vipTierId: string, expiresAt: number): string {
   return `${companyId}:${customerId}:${vipTierId}:${expiresAt}`;
 }

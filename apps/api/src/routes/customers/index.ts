@@ -118,7 +118,8 @@ const customerRoutes: FastifyPluginAsync = async (fastify) => {
       const { id } = z.object({ id: z.string().uuid() }).parse(request.params);
       const body = operatorRevokeSchema.omit({ customerId: true }).parse(request.body);
       const event = await revokeOperatorOutboundConsent(
-        { companyId: request.company.id, actorType: "user", actorId: request.user.id },
+        { companyId: request.company.id, actorType: "user", actorId: request.user.id,
+          role: z.enum(["owner", "admin"]).parse(request.user.role) },
         { ...body, customerId: id },
       );
       return reply.status(200).send({ id: event.id, version: event.version, state: event.currentState });

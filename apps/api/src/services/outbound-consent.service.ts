@@ -183,9 +183,9 @@ async function recordVerifiedDecisionInTransaction(
 }
 
 /** Office staff may revoke a current customer's destination; never use this path to grant. */
-export async function revokeOperatorOutboundConsent(actor: TrustedConsentActor, raw: unknown) {
+export async function revokeOperatorOutboundConsent(actor: TrustedConsentActor & { role: "owner" | "admin" }, raw: unknown) {
   const input = operatorRevokeSchema.parse(raw);
-  if (actor.actorType !== "user" || !actor.actorId) {
+  if (actor.actorType !== "user" || !actor.actorId || !["owner", "admin"].includes(actor.role)) {
     throw new AppError(ErrorCode.FORBIDDEN, "Authenticated operator required for consent revocation");
   }
   const operatorId = actor.actorId;

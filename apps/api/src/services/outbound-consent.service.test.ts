@@ -61,7 +61,7 @@ describe("FS-234 trusted tenant and evidence boundary", () => {
 });
 
 describe("FS-234 source-specific operator revocation", () => {
-  const operator = { ...actor, companyId: tenantB };
+  const operator = { ...actor, companyId: tenantB, role: "owner" as const };
   const input = { customerId: subjectId, channel: "email", purpose: "marketing", idempotencyKey: "revoke-one" };
 
   beforeEach(() => {
@@ -71,6 +71,8 @@ describe("FS-234 source-specific operator revocation", () => {
 
   it("rejects unauthenticated actors, grants and forged evidence before a transaction", async () => {
     await expect(revokeOperatorOutboundConsent({ ...operator, actorType: "system", actorId: null }, input))
+      .rejects.toMatchObject({ code: "FORBIDDEN" });
+    await expect(revokeOperatorOutboundConsent({ ...operator, role: "technician" as "owner" }, input))
       .rejects.toMatchObject({ code: "FORBIDDEN" });
     await expect(revokeOperatorOutboundConsent(operator, { ...input, decision: "grant" })).rejects.toThrow();
     await expect(revokeOperatorOutboundConsent(operator, { ...input, contact: "forged@example.com" })).rejects.toThrow();

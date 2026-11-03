@@ -14,6 +14,7 @@ export type ImportEntityType =
   | "properties"
   | "jobs"
   | "estimates"
+  | "invoices"
   | "price_book"
   | "notes"
   | "communications"

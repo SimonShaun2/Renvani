@@ -227,7 +227,8 @@ const CROSS_TENANT_READ_CASES: Array<{
     id: "FS92-XT-READ-11",
     resourceKey: "job",
     buildPath: (id) => `/api/v1/attachments?entityType=job&entityId=${id}`,
-    expectedStatus: 200
+    expectedStatus: 404,
+    expectedError: "NOT_FOUND"
   },
   {
     id: "FS92-XT-READ-12",
@@ -527,7 +528,7 @@ describe("FS-92 tenant isolation (API boundary)", () => {
       const response = await request(app.server)
         .post(`/api/v1/agent-actions/${bundleA.agentAction.id}/approve`)
         .set("Authorization", tenantB.authorization)
-        .send();
+        .send({ expectedVersion: 0 });
 
       expect(response.status).toBe(404);
       expect(response.body.error).toBe("NOT_FOUND");
@@ -553,7 +554,7 @@ describe("FS-92 tenant isolation (API boundary)", () => {
       const response = await request(app.server)
         .post(`/api/v1/agent-actions/${bundleA.agentAction.id}/execute`)
         .set("Authorization", tenantB.authorization)
-        .send();
+        .send({ expectedVersion: 0 });
 
       expect(response.status).toBe(404);
       expect(response.body.error).toBe("NOT_FOUND");

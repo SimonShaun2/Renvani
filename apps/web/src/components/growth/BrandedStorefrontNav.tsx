@@ -10,9 +10,11 @@ import {
 } from "@/src/components/growth/branded-storefront-nav.a11y";
 
 interface BrandedStorefrontNavProps {
-  bookHref: string;
+  primaryHref: string;
+  primaryLabel: string;
   inquireHref: string;
   showReviewsLink: boolean;
+  showPricing: boolean;
   primaryClassName: string;
 }
 
@@ -23,9 +25,11 @@ const NAV_LINKS = [
 ] as const;
 
 export function BrandedStorefrontNav({
-  bookHref,
+  primaryHref,
+  primaryLabel,
   inquireHref,
   showReviewsLink,
+  showPricing,
   primaryClassName
 }: BrandedStorefrontNavProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -34,7 +38,10 @@ export function BrandedStorefrontNav({
   const restoreFocusRef = useRef(false);
   const mobileNavId = useId().replace(/:/g, "");
 
-  const links = showReviewsLink ? [...NAV_LINKS, { href: "#reviews", label: "Reviews" }] : [...NAV_LINKS];
+  const links = [
+    ...NAV_LINKS.filter((link) => showPricing || link.href !== "#pricing"),
+    ...(showReviewsLink ? [{ href: "#reviews", label: "Reviews" }] : [])
+  ];
 
   const closeMenu = useCallback((restoreFocus = true) => {
     restoreFocusRef.current = restoreFocus;
@@ -84,7 +91,7 @@ export function BrandedStorefrontNav({
           </a>
         ))}
         <Link href={inquireHref} className="text-[#2f7d4f] hover:underline">
-          Request a quote
+          Send an inquiry
         </Link>
       </nav>
 
@@ -123,16 +130,16 @@ export function BrandedStorefrontNav({
             ))}
             <li>
               <Link href={inquireHref} className="block py-1" onClick={() => closeMenu(true)}>
-                Request a quote
+                Send an inquiry
               </Link>
             </li>
             <li>
               <Link
-                href={bookHref}
+                href={primaryHref}
                 className={`inline-flex h-11 w-full items-center justify-center rounded-[10px] text-sm font-semibold text-white ${primaryClassName}`}
                 onClick={() => closeMenu(true)}
               >
-                Book a clean
+                {primaryLabel}
               </Link>
             </li>
           </ul>

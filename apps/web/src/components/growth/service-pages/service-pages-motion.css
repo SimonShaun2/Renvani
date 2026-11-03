@@ -1,0 +1,17 @@
+/* Service x area page: hero reveal, disabled for reduced motion. */
+@media (prefers-reduced-motion: no-preference) {
+  [data-service-page-reveal] {
+    animation: service-page-in 240ms ease-out both;
+  }
+}
+
+@keyframes service-page-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

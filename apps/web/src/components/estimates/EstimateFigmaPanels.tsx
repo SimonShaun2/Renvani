@@ -1,5 +1,6 @@
 "use client";
 
+import { Decimal } from "decimal.js";
 import type { EstimateStatus } from "@fsm/types";
 import { cn } from "@/src/lib/utils";
 import { NOT_AVAILABLE, estimateApprovalPill, formatDiscountCheck, formatValidUntil } from "./estimate-builder.utils";
@@ -28,7 +29,7 @@ export function EstimateChecksPanel({
   expiresAt
 }: {
   status: EstimateStatus;
-  discountAmount: number | string | null | undefined;
+  discountAmount: string | null | undefined;
   expiresAt: string | null | undefined;
 }) {
   const pill = estimateApprovalPill(status);
@@ -66,8 +67,10 @@ export function EstimateFrequencyOptions() {
   );
 }
 
-function money(value: number): string {
-  return `$${value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+function money(value: string): string {
+  const [whole = "0", fraction = "00"] = new Decimal(value).toFixed(2).split(".");
+  const groupedWhole = whole.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  return `$${groupedWhole}.${fraction}`;
 }
 
 /**
@@ -83,17 +86,19 @@ export function EstimateTotalsCard({
   total
 }: {
   label?: string | null;
-  subtotal: number;
-  taxAmount: number;
-  taxRate: number;
-  discountAmount: number;
-  total: number;
+  subtotal: string;
+  taxAmount: string;
+  taxRate: string;
+  discountAmount: string;
+  total: string;
 }) {
   const rows: Array<{ label: string; value: string; strong?: boolean }> = [
     { label: "Subtotal", value: money(subtotal) },
-    { label: `Tax (${(taxRate * 100).toFixed(2)}%)`, value: money(taxAmount) }
+    { label: `Tax (${new Decimal(taxRate).mul(100).toFixed(2)}%)`, value: money(taxAmount) }
   ];
-  if (discountAmount > 0) rows.push({ label: "Discount", value: `−${money(discountAmount)}` });
+  if (new Decimal(discountAmount).greaterThan(0)) {
+    rows.push({ label: "Discount", value: `−${money(discountAmount)}` });
+  }
   rows.push({ label: label ? `Total · ${label}` : "Total", value: money(total), strong: true });
   return (
     <section aria-label="Estimate totals" className="space-y-2.5 rounded-[14px] border border-[#e6dccb] bg-white p-5 text-[13px]">

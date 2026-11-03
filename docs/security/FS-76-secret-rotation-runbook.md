@@ -7,9 +7,9 @@
 ## Scope
 
 - **In scope:** Documented steps for **non-production** rotation drills and production **process** (executed by Shaun).
-- **Out of scope:** Creating or rotating **production** credentials in this ticket; automated secret scanning CI (follow-up); automated host secret sync.
+- **Out of scope:** Creating or rotating **production** credentials in this ticket; automated host secret sync. The FS-76 scanner is included only in an authorized batch CI run.
 
-**Injection (FS-93 Option A):** Vercel (web) + Railway (api, worker, webhook, Postgres, Redis) + Cloudflare R2 — see [PRODUCTION-DEPLOYMENT.md](../planning/PRODUCTION-DEPLOYMENT.md) and [owner map § Option A](./FS-76-secret-owner-map.md#fs-93-option-a--approved-injection-model-documentation-only).
+**Injection (official stack):** Vercel web, Render API/worker/webhook and Key Value, Neon PostgreSQL, Clerk development identity for tester tier, Cloudflare R2 — see the [owner map](./FS-76-secret-owner-map.md#fs-93--official-stack-injection-model-documentation-only).
 
 ## Preconditions
 
@@ -20,12 +20,12 @@
 ## General rotation pattern
 
 ```text
-1. Issue new credential in provider console (Shaun for prod; Pair 5 + Shaun for staging).
+1. Issue new credential in provider console (Shaun for prod; Platform for the exact approved staging target, with founder access only when provider administration requires it).
 2. Write new value to approved secret store for target environment — never to git.
-3. Rolling deploy: api → worker → webhook → web (order may vary; all must read new value).
+3. Redeploy only the scoped consumers; order depends on the credential class.
 4. Verify: health checks, send test SMS/email in staging only, Stripe test webhook, login smoke.
-5. Revoke old credential at provider after verification window.
-6. Record: date, env, credential class, executor (name), ticket link — no secret values.
+5. Revoke old credential at provider after verification window; verify a harmless request using the old credential is denied while the replacement remains valid.
+6. Record: date, exact non-production target, credential class, executor, smoke outcome, old-key-denied outcome and ticket link — no credential values or payloads.
 ```
 
 ## Per-class notes
@@ -45,20 +45,19 @@
 
 ## Non-production drill (acceptance evidence for FS-76)
 
-**Goal:** Demonstrate rotation **process** without production impact.
+**Goal:** Demonstrate a completed staging-only credential issue → inject → smoke → replace → revoke → old-key-denied sequence without production impact. Local-only drills do not satisfy FS-76 acceptance.
 
-1. **Staging only** (or local): Shaun or delegate issues a **new** test credential for one non-critical class (e.g. SendGrid subuser or Stripe test key).
-2. Pair 5 updates **staging** values in the approved hosts: **Railway** service variables (api/worker/webhook), **Vercel** (web), **Cloudflare** (R2 keys) — per [PRODUCTION-DEPLOYMENT.md](../planning/PRODUCTION-DEPLOYMENT.md).
-3. Redeploy one service; confirm startup passes Zod env validation (`packages/config/src/env.ts`).
-4. Run smoke: API `GET /health` (if present), one queued notification job in **test** mode.
-5. Revoke previous staging key.
-6. Attach evidence to FS-76 Notion: executor, timestamp, env, class rotated — **no values**.
+1. Identify an **isolated staging-only, harmless, least-privilege** credential class with a safe validation call. Exclude live payment, production, real customer messaging and tenant data. Record the exact tester resource and target-specific authorization before issue.
+2. Platform issues a new tester credential and injects it only into its scoped staging consumers in approved **Render** or **Vercel** secret settings. Neon, Render Key Value, Clerk and Cloudflare R2 are touched only when that class requires them.
+3. Redeploy the scoped consumer; confirm startup passes its `@fsm/config/runtime-env` view and enabled adapter checks. Run the safe staging smoke with the new credential and record its outcome without request or credential contents.
+4. Replace the old active credential at the provider, then revoke it. Run a harmless provider validation with the old credential and verify denial; repeat the safe smoke with the replacement and verify success. Do not log or publish either credential.
+5. Attach FS-76 evidence: executor, time, exact staging target, credential class, scoped consumer, deployment SHA, new-key smoke outcome, provider revocation confirmation, old-key-denied result and replacement success — **no values, tokens or payloads**.
 
 ## Incident — exposed credential
 
 1. **Contain:** Revoke compromised credential at provider immediately (**Shaun** for prod).
 2. **Rotate:** Issue replacement; inject via secret store; deploy all consumers.
-3. **Audit:** Git history, CI logs, recent PRs for accidental commit (manual review + future scanner).
+3. **Audit:** Git history, approved CI scanner logs and recent PRs for accidental commit.
 4. **Notify:** Security + E.. CoS; FS-8 threat model cross-reference.
 5. **Post-incident:** Update inventory and owner map if scope changed.
 
@@ -76,4 +75,5 @@
 - [ ] All dependent services redeployed
 - [ ] Verification completed
 - [ ] Old secret revoked
+- [ ] Old credential denied in staging; replacement still succeeds
 - [ ] Evidence recorded without values

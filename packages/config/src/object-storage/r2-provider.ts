@@ -7,7 +7,7 @@ import {
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
-import { env } from "../env.js";
+import { storageEnv as env } from "../runtime-env.js";
 import type { ObjectStorageProvider, SignedObjectUrl, StoredObjectReference } from "./types.js";
 
 interface ByteArrayBody {

@@ -10,6 +10,10 @@
       "types": "./dist/env.d.ts",
       "import": "./dist/env.js"
     },
+    "./runtime-env": {
+      "types": "./dist/runtime-env.d.ts",
+      "import": "./dist/runtime-env.js"
+    },
     "./storage": {
       "types": "./dist/storage.d.ts",
       "import": "./dist/storage.js"
@@ -73,6 +77,10 @@
     "./stripe-pricing": {
       "types": "./dist/stripe-pricing.d.ts",
       "import": "./dist/stripe-pricing.js"
+    },
+    "./stripe-public": {
+      "types": "./dist/stripe-public.d.ts",
+      "import": "./dist/stripe-public.js"
     },
     "./renvani-plan-entitlements": {
       "types": "./dist/renvani-plan-entitlements.d.ts",

@@ -12,7 +12,7 @@ import {
   replayFailedJobById,
   webhooksQueue
 } from "@fsm/jobs";
-import { env } from "@fsm/config";
+import { workerEnv as env } from "@fsm/config/runtime-env";
 import { PlatformQueueNameV1Schema, type PlatformQueueNameV1 } from "@fsm/types";
 
 const queueRegistry = {

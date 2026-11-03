@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 
-import { env } from "@fsm/config";
+import { apiEnv as env } from "@fsm/config/runtime-env";
 
 import {
   evalRateLimitScript,

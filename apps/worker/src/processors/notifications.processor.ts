@@ -4,7 +4,7 @@ import type { Job, Processor } from "bullmq";
 import pino from "pino";
 
 import { isReceiptEmailAllowed, resolveTransactionalEmailFromAddress, type EmailTemplateId } from "@fsm/comms";
-import { env } from "@fsm/config";
+import { workerEnv as env } from "@fsm/config/runtime-env";
 import { recordTransactionalEmailMessageLog } from "./transactional-email-message-log.js";
 import {
   automationRules,

@@ -20,11 +20,11 @@ vi.mock("@fsm/jobs", () => ({
 }));
 
 const envOverrides = vi.hoisted(() => ({ MARKETING_NOTIFY_EMAIL: "", MARKETING_IP_HASH_SALT: "" } as Record<string, string>));
-vi.mock("@fsm/config", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@fsm/config")>();
+vi.mock("@fsm/config/runtime-env", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@fsm/config/runtime-env")>();
   return {
     ...actual,
-    env: new Proxy(actual.env, {
+    apiEnv: new Proxy(actual.apiEnv, {
       get: (target, key) => (typeof key === "string" && key in envOverrides ? envOverrides[key] : Reflect.get(target, key))
     })
   };

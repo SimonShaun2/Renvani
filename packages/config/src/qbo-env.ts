@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { env } from "./env.js";
+import { tokenEnv as env } from "./runtime-env.js";
 
 const qboEnvironmentSchema = z.enum(["sandbox"]);
 

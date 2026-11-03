@@ -13,7 +13,7 @@ import { and, eq, isNull } from "drizzle-orm";
 import { Decimal } from "decimal.js";
 import pino from "pino";
 
-import { env } from "@fsm/config";
+import { apiEnv as env } from "@fsm/config/runtime-env";
 import { activityEvents, customers, db, emitEventWithExecutor, estimateItems, estimates, jobs, properties, users } from "@fsm/db";
 import {
   AppError,

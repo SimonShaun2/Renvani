@@ -1,6 +1,6 @@
 import type { Options } from "postgres";
 
-import { env } from "@fsm/config";
+import { coreEnv as env } from "@fsm/config/runtime-env";
 
 export interface ProcessConnectionRole {
   role: "api" | "worker" | "webhook" | "migration";

@@ -7,7 +7,7 @@ import {
   buildVipMembershipJoinUrl,
   signVipMembershipJoinToken
 } from "@fsm/config/vip-membership-portal-token";
-import { env } from "@fsm/config";
+import { apiEnv as env } from "@fsm/config/runtime-env";
 import {
   companies,
   customers,

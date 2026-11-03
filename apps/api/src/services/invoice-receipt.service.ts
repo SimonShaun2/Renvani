@@ -1,6 +1,6 @@
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 
-import { env } from "@fsm/config";
+import { apiEnv as env } from "@fsm/config/runtime-env";
 import { buildInvoiceReceiptPortalUrl } from "@fsm/config/agreement-portal-token";
 import { RENVANI_STRIPE_BRAND } from "@fsm/config/stripe-branding";
 import { AppError, ErrorCode, type PublicPayReceiptFees, type PublicPayViewFields } from "@fsm/types";

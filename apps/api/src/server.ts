@@ -1,4 +1,4 @@
-import { env, resolveApiListenPort } from "@fsm/config";
+import { apiEnv as env, resolveApiListenPort } from "@fsm/config/runtime-env";
 
 import { buildApp } from "./app.js";
 

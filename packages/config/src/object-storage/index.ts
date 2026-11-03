@@ -1,4 +1,4 @@
-import { env } from "../env.js";
+import { storageEnv as env } from "../runtime-env.js";
 import { MemoryObjectStorageProvider } from "./memory-provider.js";
 import { R2ObjectStorageProvider } from "./r2-provider.js";
 import type { ObjectStorageProvider } from "./types.js";

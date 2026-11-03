@@ -78,6 +78,57 @@ STRIPE_SECRET_KEY="sk_test_x"
     expect(parsed.RENVANI_DEPLOYMENT_TIER).toBe("staging");
     expect(parsed.STRIPE_SECRET_KEY).toBe("sk_test_x");
   });
+
+  it("rejects duplicate keys without exposing either value", () => {
+    const first = ["sk", "test", "first-private-value"].join("_");
+    const second = ["sk", "live", "second-private-value"].join("_");
+    let message = "";
+    try {
+      parseEnvFile(`STRIPE_SECRET_KEY=${first}\nSTRIPE_SECRET_KEY=${second}\n`);
+    } catch (error) {
+      message = (error as Error).message;
+    }
+    expect(message).toBe("Duplicate environment key: STRIPE_SECRET_KEY");
+    expect(message).not.toContain(first);
+    expect(message).not.toContain(second);
+  });
+
+  it("normalizes an optional export prefix before duplicate detection", () => {
+    const first = ["sk", "test", "first-private-value"].join("_");
+    const second = ["sk", "live", "second-private-value"].join("_");
+    expect(() => parseEnvFile(
+      `STRIPE_SECRET_KEY=${first}\nexport   STRIPE_SECRET_KEY=${second}\n`
+    )).toThrow("Duplicate environment key: STRIPE_SECRET_KEY");
+  });
+
+  it("uses null-prototype storage while preserving inherited-name-like uppercase keys", () => {
+    const parsed = parseEnvFile("CONSTRUCTOR=one\nTOSTRING=two\n");
+    expect(Object.getPrototypeOf(parsed)).toBeNull();
+    expect(parsed.CONSTRUCTOR).toBe("one");
+    expect(parsed.TOSTRING).toBe("two");
+    expect(() => parseEnvFile("CONSTRUCTOR=one\nCONSTRUCTOR=two\n"))
+      .toThrow("Duplicate environment key: CONSTRUCTOR");
+  });
+
+  it.each([
+    "stripe_secret_key",
+    "__proto__",
+    "constructor",
+    "BAD-KEY",
+    "BAD KEY",
+    "BAD\u001b[31mKEY"
+  ])("rejects non-canonical key %j without echoing it", (key) => {
+    const privateValue = ["private", "value"].join("-");
+    let message = "";
+    try {
+      parseEnvFile(`${key}=${privateValue}\n`);
+    } catch (error) {
+      message = (error as Error).message;
+    }
+    expect(message).toBe("Invalid environment key on line 1");
+    expect(message).not.toContain(key);
+    expect(message).not.toContain(privateValue);
+  });
 });
 
 describe("assertStripeLiveKeyAllowed (boot guard)", () => {

@@ -32,7 +32,7 @@ const mockEnv = vi.hoisted(() => ({
   APP_URL: "https://app.example.com",
   APP_URL_ALLOWED: ""
 }));
-vi.mock("@fsm/config", () => ({ env: mockEnv }));
+vi.mock("@fsm/config/runtime-env", () => ({ apiEnv: mockEnv }));
 
 const AZP = "https://staging.example.com";
 

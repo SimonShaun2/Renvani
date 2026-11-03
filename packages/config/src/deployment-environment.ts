@@ -142,21 +142,28 @@ export function validateDeploymentBoundaries(
 }
 
 export function parseEnvFile(contents: string): Record<string, string> {
-  const result: Record<string, string> = {};
+  const result = Object.create(null) as Record<string, string>;
 
-  for (const line of contents.split(/\r?\n/u)) {
+  for (const [lineIndex, line] of contents.split(/\r?\n/u).entries()) {
     const trimmed = line.trim();
     if (trimmed.length === 0 || trimmed.startsWith("#")) {
       continue;
     }
 
-    const eq = trimmed.indexOf("=");
+    const assignment = trimmed.replace(/^export[ \t]+/u, "");
+    const eq = assignment.indexOf("=");
     if (eq <= 0) {
       continue;
     }
 
-    const key = trimmed.slice(0, eq).trim();
-    let value = trimmed.slice(eq + 1).trim();
+    const key = assignment.slice(0, eq).trim();
+    if (!/^[A-Z_][A-Z0-9_]*$/u.test(key)) {
+      throw new Error(`Invalid environment key on line ${lineIndex + 1}`);
+    }
+    if (Object.prototype.hasOwnProperty.call(result, key)) {
+      throw new Error(`Duplicate environment key: ${key}`);
+    }
+    let value = assignment.slice(eq + 1).trim();
 
     if (
       (value.startsWith('"') && value.endsWith('"')) ||

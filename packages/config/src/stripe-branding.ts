@@ -1,13 +1,7 @@
-import { env } from "./env.js";
+import { paymentEnv as env } from "./runtime-env.js";
+import { RENVANI_STRIPE_BRAND } from "./stripe-public.js";
 
-/** Customer-visible brand; Stripe surfaces only where legally required (Connect KYC, card network). */
-export const RENVANI_STRIPE_BRAND = {
-  platformName: "Renvani",
-  defaultStatementPrefix: "RENVANI",
-  /** Connect embedded components + Checkout appearance (matches web brand-accent family). */
-  primaryColor: "#2563eb",
-  secondaryColor: "#102163"
-} as const;
+export { RENVANI_STRIPE_BRAND, buildConnectJsAppearance } from "./stripe-public.js";
 
 const STATEMENT_DESCRIPTOR_MAX = 22;
 const STATEMENT_PREFIX_MAX = 10;
@@ -49,20 +43,6 @@ export function resolveStripeBrandingLogoUrl(): string | undefined {
 export function resolveStripeBrandingIconUrl(): string | undefined {
   const url = env.STRIPE_BRANDING_ICON_URL.trim();
   return url.length > 0 ? url : undefined;
-}
-
-export function buildConnectJsAppearance(): {
-  overlays: "dialog";
-  variables: { colorPrimary: string; colorText: string; fontFamily: string };
-} {
-  return {
-    overlays: "dialog",
-    variables: {
-      colorPrimary: RENVANI_STRIPE_BRAND.primaryColor,
-      colorText: RENVANI_STRIPE_BRAND.secondaryColor,
-      fontFamily: "Inter, system-ui, sans-serif"
-    }
-  };
 }
 
 export function buildStripeAccountBrandingPatch(): {

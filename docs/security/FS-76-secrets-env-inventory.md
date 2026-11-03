@@ -2,7 +2,7 @@
 
 **Ticket:** [FS-76](https://app.notion.com/p/401317b92d1581c49195d4cff55672fe) (Pair 5 — Ezra / env inventory)  
 **Companion:** `FS-76-secret-owner-map.md` (Hana), `FS-76-secret-rotation-runbook.md` (Hana)  
-**Schema authority:** `packages/config/src/env.ts` — **names only; never values.**
+**Schema authority:** `packages/config/src/env-schema.ts`; service picks in `runtime-env.ts` — **names only; never values.**
 
 Re-run after schema changes:
 
@@ -23,11 +23,11 @@ pnpm check:env-docs
 
 | Runtime | Required at startup today | Notes |
 | --- | --- | --- |
-| **api** | Full `@fsm/config` schema | Stripe, auth, email/SMS, R2, queues |
-| **webhook** | Full schema | Stripe + Twilio verify; DB/Redis |
-| **worker** | Full schema | Monolithic Zod today; notifications import `apps/api/dist/lib/email.js` / `sms.js` |
-| **web** | `NEXT_PUBLIC_API_URL`; optional `API_URL` | `publicEnv` only from `@fsm/config` |
-| **migrations** | `DATABASE_URL` (+ full schema if `env` loads) | `packages/db/drizzle.config.ts` |
+| **api** | Core + `APP_URL`, auth signing keys/TTLs, `STRIPE_SECRET_KEY`, SendGrid key/from | Payment view separately requires platform fee; enabled adapters validate own fields |
+| **webhook** | Core + `APP_URL`, Stripe secret/signing and inbound Twilio verification | No outbound email/AI/R2 keys |
+| **worker** | Core + `APP_URL` | Sender settings optional; AI/R2 adapter keys validated when enabled; no Stripe/session keys |
+| **web** | Public `NEXT_PUBLIC_API_URL`; server `APP_URL` | Server `API_URL` resolves in a `server-only` module; no secret in client bundle |
+| **migrations** | `DATABASE_URL` | Database scope only |
 
 Templates: `docs/env/templates/`. Least-privilege target matrix: § below.
 
@@ -43,7 +43,7 @@ Templates: `docs/env/templates/`. Least-privilege target matrix: § below.
 | `STRIPE_SECRET_KEY` | secret | — | `apps/api/src/lib/stripe.ts`; webhook Stripe middleware |
 | `STRIPE_WEBHOOK_SECRET` | secret | — | `apps/webhook/src/middleware/stripe-verify.ts` |
 | `STRIPE_CONNECT_CLIENT_ID` | secret | — | Schema + test fixtures; no app read site yet |
-| `STRIPE_PLATFORM_FEE_PERCENT` | config | — | Legacy, required by `env.ts`; read only by `resolveConnectApplicationFeeFraction` (no customer-facing use; Service Fee = `SERVICE_FEE_RATE_BPS`) |
+| `STRIPE_PLATFORM_FEE_PERCENT` | config | — | Required in the payment view; read by `resolveConnectApplicationFeeFraction` (customer Service Fee remains `SERVICE_FEE_RATE_BPS`) |
 | `OPENAI_API_KEY` | secret | — | `packages/ai`; worker `csv-import`, `ai-revenue` |
 | `TWILIO_ACCOUNT_SID` | secret | — | `apps/api/src/lib/sms.ts`; worker via API dist SMS |
 | `TWILIO_AUTH_TOKEN` | secret | — | `sms.ts`, `twilio-verify.ts` |
@@ -63,13 +63,13 @@ Templates: `docs/env/templates/`. Least-privilege target matrix: § below.
 | `RESET_TOKEN_TTL_SECONDS` | config | — | `tokens.ts` |
 | `ESTIMATE_EXPIRY_DAYS` | config | `30` | `estimate.service.ts` |
 | `INVOICE_DUE_DAYS` | config | `30` | `invoice.service.ts` |
-| `NEXT_PUBLIC_API_URL` | public | `http://localhost:3001` | `apps/web` via `publicEnv` |
+| `NEXT_PUBLIC_API_URL` | public | `http://localhost:3001` | `apps/web` app-local public config; browser may use same-origin, while server `API_URL` stays server-only |
 
-## Web-only (not in `env.ts`)
+## Web-only (outside the canonical schema)
 
 | Variable | Class | Consumers |
 | --- | --- | --- |
-| `API_URL` | web-server | `apps/web/next.config.ts`, `public-api.ts` |
+| `API_URL` | web-server | `apps/web/next.config.ts`, `public-api-server.ts` (`server-only`) |
 
 ## Least-privilege matrix (staging ≠ production secrets)
 
@@ -77,36 +77,36 @@ Templates: `docs/env/templates/`. Least-privilege target matrix: § below.
 | --- | --- | --- | --- | --- | --- |
 | `DATABASE_URL` | R | R | R | — | Distinct DB per env |
 | `REDIS_URL` | R | R | R | — | Distinct instance |
-| `JWT_*` / `BOOKING_HOLD_TOKEN_SECRET` | R | — | —¹ | — | Distinct per env |
-| `STRIPE_*` | R | R² | —¹ | — | Test vs live keys |
-| `OPENAI_API_KEY` | R | — | R | — | Separate keys recommended |
-| `TWILIO_*` | R | R³ | R¹ | — | Staging subaccount/test |
-| `SENDGRID_*` | R | — | R¹ | — | Per-env API keys |
-| `R2_*` | R | — | R | — | Separate buckets |
+| `JWT_*` / `BOOKING_HOLD_TOKEN_SECRET` | R | — | — | — | Distinct signing keys per env |
+| `STRIPE_SECRET_KEY` | R | R | — | — | Test key in staging; API boot is eager |
+| `STRIPE_WEBHOOK_SECRET` | — | R | — | — | Exact test endpoint signing secret |
+| `STRIPE_PLATFORM_FEE_PERCENT` | Payment view | — | — | — | Required numeric policy field |
+| `OPENAI_API_KEY` | — | — | Conditional AI adapter | — | No worker boot requirement |
+| `TWILIO_AUTH_TOKEN` / `TWILIO_FROM_NUMBER` | Conditional outbound adapter | R | Sender only | — | Webhook inbound signature and number |
+| `SENDGRID_API_KEY` / `SENDGRID_FROM_EMAIL` | R | — | Conditional sender | — | API boot required; worker sender optional |
+| `R2_*` | Conditional storage adapter | — | Conditional storage adapter | — | Separate bucket/keys when R2 enabled |
 | `NEXT_PUBLIC_API_URL` | — | — | — | R | Public URL per env |
+| `CLERK_SECRET_KEY` | Optional Clerk path | — | — | Optional server-only path | Development instance for tester tier |
 
-¹ Worker still loads full schema today (technical debt).  
-² Webhook: verify + `TWILIO_AUTH_TOKEN`; no outbound SMS.  
-³ Inbound signature only.
+## Official stack — per-host injection
 
-## FS-93 Option A — per-host injection (approved)
-
-Documented deployment split: [PRODUCTION-DEPLOYMENT.md](../planning/PRODUCTION-DEPLOYMENT.md). Values are injected manually via host consoles until automated sync exists; **no live wiring in FS-76.**
+The [official stack](../OFFICIAL-OPERATIONAL-STACK.md) uses Vercel, Render, Neon, Render Key Value, Clerk and R2. Values are injected through approved host settings; **no host mutation in this local FS-76 slice.**
 
 | Surface | Host | Variables (representative) |
 | --- | --- | --- |
-| `apps/web` | **Vercel** | `NEXT_PUBLIC_API_URL`, `API_URL` |
-| `apps/api` | **Railway** | Full schema — `docs/env/templates/api.env.example` |
-| `apps/worker` | **Railway** | Full schema — `docs/env/templates/worker.env.example` |
-| `apps/webhook` | **Railway** | `docs/env/templates/webhook.env.example` |
-| Postgres | **Railway** | `DATABASE_URL` on DB-connected services |
-| Redis | **Railway** | `REDIS_URL` on API, worker, webhook |
-| R2 | **Cloudflare** | `R2_*` on API + worker |
+| `apps/web` | **Vercel** | Public `NEXT_PUBLIC_API_URL`; server `API_URL`/`APP_URL`; conditional Clerk |
+| `apps/api` | **Render** | Scoped API boot and enabled adapters — `docs/env/templates/api.env.example` |
+| `apps/worker` | **Render** | Scoped worker boot and enabled adapters — `docs/env/templates/worker.env.example` |
+| `apps/webhook` | **Render** | Inbound verification view — `docs/env/templates/webhook.env.example` |
+| Postgres | **Neon** | `DATABASE_URL` for data-plane services |
+| Queues/cache | **Render Key Value** | `REDIS_URL` for API, worker and webhook |
+| Identity | **Clerk development instance** | Tester-only keys on enabled paths |
+| R2 | **Cloudflare** | `R2_*` on enabled storage adapters |
 
 ## Deployment doc drift
 
-`docs/planning/PRODUCTION-DEPLOYMENT.md` may list keys not in `env.ts` (`CORS_ORIGINS`, VAPID, PostHog, etc.). `check:env-docs` warns; reconcile under FS-93.
+`docs/planning/PRODUCTION-DEPLOYMENT.md` is historical and may list keys not in `env-schema.ts` (`CORS_ORIGINS`, VAPID, PostHog, etc.). Reconcile under FS-93; do not use it as current host injection instruction.
 
 ## Client bundle
 
-Only `NEXT_PUBLIC_API_URL` is in the public schema. No signing secrets in `apps/web` client bundles.
+Only `NEXT_PUBLIC_API_URL` and `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` are in the browser runtime view. No signing secrets in `apps/web` client bundles.

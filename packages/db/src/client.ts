@@ -1,7 +1,7 @@
 import postgres from "postgres";
 import { drizzle } from "drizzle-orm/postgres-js";
 
-import { env } from "@fsm/config";
+import { coreEnv as env } from "@fsm/config/runtime-env";
 
 import { buildPostgresClientOptions } from "./connection-config.js";
 import * as schema from "./schema.js";

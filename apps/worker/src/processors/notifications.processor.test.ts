@@ -33,6 +33,24 @@ vi.mock("@fsm/config", () => ({
   }
 }));
 
+vi.mock("@fsm/config/runtime-env", () => ({
+  coreEnv: {
+    NODE_ENV: "test",
+    DATABASE_URL: "postgres://test:test@localhost:5432/test",
+    REDIS_URL: "redis://localhost:6379"
+  },
+  workerEnv: {
+    APP_URL: "http://localhost:3000",
+    NODE_ENV: "test",
+    RESEND_API_KEY: "",
+    RESEND_FROM_EMAIL: "",
+    EMAIL_FROM: "",
+    SENDGRID_API_KEY: "",
+    SENDGRID_FROM_EMAIL: "noreply@example.com",
+    TWILIO_FROM_NUMBER: "+15555555555"
+  }
+}));
+
 vi.mock("pino", () => ({
   default: () => ({
     debug: debugLogMock,

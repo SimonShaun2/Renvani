@@ -1,5 +1,5 @@
 import { LEGACY_BOOKING_FEE_LABEL, serviceFeeNote } from "@/src/lib/service-fee-copy";
-import { formatServiceFeeLineItemName, SERVICE_FEE_RATE_BPS } from "@fsm/config/stripe-pricing";
+import { formatServiceFeeLineItemName, SERVICE_FEE_RATE_BPS } from "@fsm/config/stripe-public";
 
 import type { PublicPaymentLinkResponse } from "@fsm/types";
 

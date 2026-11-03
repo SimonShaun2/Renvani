@@ -1,6 +1,6 @@
 import type { FastifyRequest, preHandlerHookHandler } from "fastify";
 
-import { env } from "@fsm/config";
+import { apiEnv as env } from "@fsm/config/runtime-env";
 import { AppError, ErrorCode, type UserRole } from "@fsm/types";
 
 import { requireRole } from "./authorize.js";

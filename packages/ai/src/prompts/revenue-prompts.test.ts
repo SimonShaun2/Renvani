@@ -2,8 +2,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const fetchMock = vi.fn();
 
-vi.mock("@fsm/config", () => ({
-  env: {
+vi.mock("@fsm/config/runtime-env", () => ({
+  aiEnv: {
     OPENAI_API_KEY: "openai_test_key"
   }
 }));

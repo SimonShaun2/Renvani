@@ -3,7 +3,7 @@ import { and, eq, isNull } from "drizzle-orm";
 import { Decimal } from "decimal.js";
 import type Stripe from "stripe";
 
-import { env } from "@fsm/config";
+import { webhookEnv as env } from "@fsm/config/runtime-env";
 import {
   companies,
   customers,

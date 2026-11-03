@@ -28,6 +28,8 @@ jobs:
         run: corepack enable && pnpm install --frozen-lockfile
       - name: Build
         run: pnpm build
+      - name: FS-76 secret scan (tracked and built artifacts)
+        run: node --test scripts/ci/secret-scan.test.mjs && node scripts/ci/secret-scan.mjs --require-built
       - name: Lint
         run: pnpm lint
       - name: Cross-tenant matrix (STACK-03)

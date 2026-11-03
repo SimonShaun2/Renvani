@@ -1,21 +1,11 @@
-import { publicEnv } from "@fsm/config";
 import { ErrorCode } from "@fsm/types";
 
 import { ApiError, type ApiErrorPayload } from "@/src/lib/api";
 import { assertSafePublicApiRequestPath } from "@/src/lib/public-api-path-security";
 
-/**
- * Browser: same-origin `/api/v1/public/*` (Next.js rewrite → API).
- * SSR: direct server-to-server call to the API host (no CORS).
- */
+/** Browser public requests stay same-origin through the Next.js rewrite. */
 export function resolvePublicApiBase(): string {
-  if (typeof window !== "undefined") {
-    return "";
-  }
-
-  const serverBase = process.env.API_URL ?? process.env.NEXT_PUBLIC_API_URL ?? publicEnv.NEXT_PUBLIC_API_URL;
-
-  return serverBase.replace(/\/$/, "");
+  return "";
 }
 
 async function parseError(response: Response): Promise<ApiErrorPayload> {

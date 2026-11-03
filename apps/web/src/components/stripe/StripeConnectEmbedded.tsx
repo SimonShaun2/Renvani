@@ -3,7 +3,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { ConnectAccountOnboarding, ConnectComponentsProvider } from "@stripe/react-connect-js";
 import { loadConnectAndInitialize, type StripeConnectInstance } from "@stripe/connect-js";
-import { buildConnectJsAppearance } from "@fsm/config/stripe-branding";
+import { buildConnectJsAppearance } from "@fsm/config/stripe-public";
 
 import { api } from "@/src/lib/api";
 

@@ -2,7 +2,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 /** FS-155 follow-up: the worker's message_logs from-address must match the API sender's key-based selection. */
 const mutableEnv = vi.hoisted(() => ({}) as Record<string, string>);
-vi.mock("@fsm/config", () => ({ env: mutableEnv }));
+vi.mock("@fsm/config/runtime-env", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@fsm/config/runtime-env")>()),
+  workerEnv: mutableEnv
+}));
 vi.mock("pino", () => ({ default: () => ({ debug: vi.fn(), error: vi.fn(), info: vi.fn(), warn: vi.fn() }) }));
 
 /** Same table as packages/comms/src/email-provider.test.ts and apps/api/src/lib/outbound-email.test.ts. */

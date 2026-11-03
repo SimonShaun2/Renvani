@@ -1,6 +1,6 @@
 import type { FastifyPluginAsync, FastifyReply } from "fastify";
 
-import { env } from "@fsm/config";
+import { apiEnv as env } from "@fsm/config/runtime-env";
 
 import { syncClerkUserRoleMetadata } from "../../lib/clerk-role-metadata.js";
 import { verifySvixSignature } from "../../lib/svix-verify.js";

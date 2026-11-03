@@ -6,7 +6,7 @@ import { createHmac, randomUUID } from "node:crypto";
 
 import pino from "pino";
 
-import { env } from "@fsm/config";
+import { apiEnv as env } from "@fsm/config/runtime-env";
 import type { MarketingDemoRequestInput, MarketingGrowthCheckInput, MarketingIntakeResponse } from "@fsm/types";
 
 import { getEmailChannel } from "../lib/outbound-email.js";

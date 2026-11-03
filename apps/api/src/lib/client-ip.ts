@@ -3,7 +3,7 @@ import { isIP } from "node:net";
 
 import type { FastifyRequest } from "fastify";
 
-import { env } from "@fsm/config";
+import { apiEnv as env } from "@fsm/config/runtime-env";
 
 export const ORIGIN_SECRET_HEADER = "x-origin-secret";
 

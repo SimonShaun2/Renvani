@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockEnv = vi.hoisted(() => ({ CLERK_SECRET_KEY: "" }));
-vi.mock("@fsm/config", () => ({ env: mockEnv }));
+vi.mock("@fsm/config/runtime-env", () => ({ apiEnv: mockEnv }));
 
 import { syncClerkUserRoleMetadata } from "./clerk-role-metadata.js";
 

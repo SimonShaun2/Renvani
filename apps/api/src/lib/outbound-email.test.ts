@@ -14,7 +14,7 @@ const baseEnv = {
   EMAIL_FROM: "",
   EMAIL_LOGO_URL: ""
 };
-vi.mock("@fsm/config", () => ({ env: { ...baseEnv } }));
+vi.mock("@fsm/config/runtime-env", () => ({ apiEnv: { ...baseEnv } }));
 
 /** FS-155 follow-up: same table as packages/comms/src/email-provider.test.ts and the worker parity test. */
 const CASES = [
@@ -32,7 +32,7 @@ describe("API provider/from selection matches the shared @fsm/comms helper (work
   });
 
   it.each(CASES)("$name", async ({ env, provider, from }) => {
-    vi.doMock("@fsm/config", () => ({ env: { ...baseEnv, ...env, SENDGRID_FROM_EMAIL: "noreply@sendgrid.test" } }));
+    vi.doMock("@fsm/config/runtime-env", () => ({ apiEnv: { ...baseEnv, ...env, SENDGRID_FROM_EMAIL: "noreply@sendgrid.test" } }));
     const mod = await import("./outbound-email.js");
     expect(mod.resolveEmailProvider()).toBe(provider);
     expect(mod.getTransactionalEmailFromAddress()).toBe(from);
@@ -47,7 +47,7 @@ describe("deliverTransactionalEmail", () => {
   });
 
   it("throws loudly in production when no provider key is configured", async () => {
-    vi.doMock("@fsm/config", () => ({ env: { ...baseEnv, NODE_ENV: "production" } }));
+    vi.doMock("@fsm/config/runtime-env", () => ({ apiEnv: { ...baseEnv, NODE_ENV: "production" } }));
     const mod = await import("./outbound-email.js");
     mod.setEmailChannelForTests(null);
     expect(mod.resolveEmailProvider()).toBe("none");
@@ -57,8 +57,8 @@ describe("deliverTransactionalEmail", () => {
   });
 
   it("falls back to SendGrid (SENDGRID_FROM_EMAIL) when RESEND_API_KEY is unset outside tests", async () => {
-    vi.doMock("@fsm/config", () => ({
-      env: { ...baseEnv, NODE_ENV: "production", SENDGRID_API_KEY: "sg_test" }
+    vi.doMock("@fsm/config/runtime-env", () => ({
+      apiEnv: { ...baseEnv, NODE_ENV: "production", SENDGRID_API_KEY: "sg_test" }
     }));
     sgSend.mockResolvedValue([{ headers: { "x-message-id": "sg_1" } }]);
     const mod = await import("./outbound-email.js");
@@ -71,8 +71,8 @@ describe("deliverTransactionalEmail", () => {
   });
 
   it("prefers Resend and uses RESEND_FROM_EMAIL when set", async () => {
-    vi.doMock("@fsm/config", () => ({
-      env: { ...baseEnv, RESEND_API_KEY: "re_test", RESEND_FROM_EMAIL: "Renvani <r@mail.getrenvani.com>", SENDGRID_API_KEY: "sg" }
+    vi.doMock("@fsm/config/runtime-env", () => ({
+      apiEnv: { ...baseEnv, RESEND_API_KEY: "re_test", RESEND_FROM_EMAIL: "Renvani <r@mail.getrenvani.com>", SENDGRID_API_KEY: "sg" }
     }));
     const mod = await import("./outbound-email.js");
     expect(mod.resolveEmailProvider()).toBe("resend");
@@ -80,7 +80,7 @@ describe("deliverTransactionalEmail", () => {
   });
 
   it("no-ops outside production (tests never reach a live provider) when no provider is configured", async () => {
-    vi.doMock("@fsm/config", () => ({ env: { ...baseEnv } }));
+    vi.doMock("@fsm/config/runtime-env", () => ({ apiEnv: { ...baseEnv } }));
     const mod = await import("./outbound-email.js");
     mod.setEmailChannelForTests(null);
     await expect(mod.deliverTransactionalEmail({ to: "u@example.com", subject: "s", html: "h" })).resolves.toEqual({
@@ -91,8 +91,8 @@ describe("deliverTransactionalEmail", () => {
   });
 
   it("sends via the Resend SDK with EMAIL_FROM and a plain-text fallback", async () => {
-    vi.doMock("@fsm/config", () => ({
-      env: { ...baseEnv, RESEND_API_KEY: "re_test", EMAIL_FROM: "Renvani <hello@mail.getrenvani.com>", EMAIL_LOGO_URL: "" }
+    vi.doMock("@fsm/config/runtime-env", () => ({
+      apiEnv: { ...baseEnv, RESEND_API_KEY: "re_test", EMAIL_FROM: "Renvani <hello@mail.getrenvani.com>", EMAIL_LOGO_URL: "" }
     }));
     resendSend.mockResolvedValue({ data: { id: "msg_1" }, error: null });
     const mod = await import("./outbound-email.js");

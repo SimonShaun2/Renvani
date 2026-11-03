@@ -1,6 +1,6 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 
-import { env } from "./env.js";
+import { tokenEnv as env } from "./runtime-env.js";
 
 /**
  * Legacy grace period: tokens issued before expiry was added carry no exp segment.

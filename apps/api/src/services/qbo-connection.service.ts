@@ -1,6 +1,6 @@
 import { and, eq, isNull } from "drizzle-orm";
 
-import { env } from "@fsm/config";
+import { apiEnv as env } from "@fsm/config/runtime-env";
 import { readQboRuntimeConfig } from "@fsm/config/qbo-env";
 import { QUICKBOOKS_ONGOING_SYNC_OAUTH_ENABLED } from "@fsm/config/quickbooks-oauth-gate";
 import {

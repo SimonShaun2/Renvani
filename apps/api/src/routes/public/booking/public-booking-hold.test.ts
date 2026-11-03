@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import request from "supertest";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { env } from "@fsm/config";
+import { apiEnv as env } from "@fsm/config/runtime-env";
 
 import { generateBookingHoldToken } from "../../../lib/booking-hold-token.js";
 import { resetBookingHoldTokenJtiStateForTests } from "../../../lib/booking-hold-token-store.js";

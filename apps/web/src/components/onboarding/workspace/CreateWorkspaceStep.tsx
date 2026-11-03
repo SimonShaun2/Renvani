@@ -4,7 +4,7 @@ import { useAuth, useOrganizationList, useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 
-import { publicEnv } from "@fsm/config";
+import { API_BASE_URL } from "@/src/lib/api-base-url";
 
 import { waitForWorkspace } from "./wait-for-workspace";
 import {
@@ -23,7 +23,7 @@ function pendingOrgStorageKey(userId: string): string {
 }
 
 async function checkCompany(token: string): Promise<number> {
-  const response = await fetch(`${publicEnv.NEXT_PUBLIC_API_URL}${WORKSPACE_READY_ENDPOINT}`, {
+  const response = await fetch(`${API_BASE_URL}${WORKSPACE_READY_ENDPOINT}`, {
     headers: { Authorization: `Bearer ${token}` },
     credentials: "include",
     cache: "no-store"

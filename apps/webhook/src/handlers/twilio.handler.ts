@@ -1,7 +1,7 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 import { and, eq, isNull } from "drizzle-orm";
 
-import { env } from "@fsm/config";
+import { webhookEnv as env } from "@fsm/config/runtime-env";
 import {
   companies,
   customers,

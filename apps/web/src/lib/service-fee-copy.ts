@@ -1,4 +1,4 @@
-import { SERVICE_FEE_RATE_BPS, formatServiceFeeLineItemName } from "@fsm/config/stripe-pricing";
+import { SERVICE_FEE_RATE_BPS, formatServiceFeeLineItemName } from "@fsm/config/stripe-public";
 
 /**
  * Single source for customer/operator "Service Fee" copy (Figma 53:3–53:465, 60:184/60:543, 52:16).

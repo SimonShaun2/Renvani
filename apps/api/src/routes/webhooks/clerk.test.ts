@@ -30,7 +30,17 @@ vi.mock("../../services/clerk-user-sync.service.js", async () => {
   };
 });
 const mockEnv = vi.hoisted(() => ({ CLERK_WEBHOOK_SECRET: "", NODE_ENV: "test" }));
-vi.mock("@fsm/config", () => ({ env: mockEnv }));
+vi.mock("@fsm/config/runtime-env", () => ({
+  apiEnv: mockEnv,
+  coreEnv: {
+    NODE_ENV: "test",
+    DATABASE_URL: "postgres://test:test@localhost:5432/test",
+    DATABASE_IDLE_TIMEOUT_SECONDS: 20,
+    DATABASE_CONNECT_TIMEOUT_SECONDS: 10,
+    DATABASE_TRANSACTION_MAX_RETRIES: 3,
+    DATABASE_TRANSACTION_RETRY_BASE_MS: 25
+  }
+}));
 
 const SECRET = `whsec_${Buffer.from("test-secret-0123456789").toString("base64")}`;
 

@@ -1,4 +1,4 @@
-import { env, resolveWebhookListenPort } from "@fsm/config";
+import { webhookEnv as env, resolveWebhookListenPort } from "@fsm/config/runtime-env";
 
 import { buildWebhookApp } from "./app.js";
 

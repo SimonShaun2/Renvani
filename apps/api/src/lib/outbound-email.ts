@@ -12,7 +12,7 @@ import {
   selectTransactionalEmailProvider,
   type TransactionalEmailProvider
 } from "@fsm/comms";
-import { env } from "@fsm/config";
+import { apiEnv as env } from "@fsm/config/runtime-env";
 
 const logger = pino({
   name: "outbound-email"

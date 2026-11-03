@@ -3,7 +3,7 @@ import { randomUUID } from "node:crypto";
 import jwt from "jsonwebtoken";
 import { z } from "zod";
 
-import { env } from "@fsm/config";
+import { apiEnv as env } from "@fsm/config/runtime-env";
 import { AppError, ErrorCode } from "@fsm/types";
 
 /** Magic-link validity for the customer portal. */

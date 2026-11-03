@@ -4,7 +4,7 @@ import { compare as comparePassword, hash as hashPassword } from "bcryptjs";
 import { and, desc, eq, gt, isNull } from "drizzle-orm";
 import pino from "pino";
 
-import { env } from "@fsm/config";
+import { apiEnv as env } from "@fsm/config/runtime-env";
 import {
   companies,
   db,

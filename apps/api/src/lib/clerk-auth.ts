@@ -1,6 +1,6 @@
 import { verifyToken } from "@clerk/backend";
 
-import { env } from "@fsm/config";
+import { apiEnv as env } from "@fsm/config/runtime-env";
 import { featureFlags, isClerkAuthParallelJwtEnabled } from "@fsm/config/feature-flags";
 import { AppError, ErrorCode, type UserRole } from "@fsm/types";
 

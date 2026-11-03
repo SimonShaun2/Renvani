@@ -5,7 +5,7 @@ const state = vi.hoisted(() => ({
   companyIds: [] as string[],
   insertError: null as unknown
 }));
-vi.mock("@fsm/config", () => ({ env: { DRIVE_TIME_ESTIMATOR: "straight_line", DRIVE_TIME_ASSUMED_SPEED_MPH: 30 } }));
+vi.mock("@fsm/config/runtime-env", () => ({ apiEnv: { DRIVE_TIME_ESTIMATOR: "straight_line", DRIVE_TIME_ASSUMED_SPEED_MPH: 30 } }));
 vi.mock("@fsm/db", () => {
   const next = async () => state.queue.shift() ?? [];
   const chain: Record<string, unknown> = {};

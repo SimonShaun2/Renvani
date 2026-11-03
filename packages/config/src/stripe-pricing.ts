@@ -1,4 +1,7 @@
-import { env } from "./env.js";
+import { paymentEnv as env } from "./runtime-env.js";
+import { SERVICE_FEE_RATE_BPS } from "./stripe-public.js";
+
+export { SERVICE_FEE_RATE_BPS, formatServiceFeeLineItemName } from "./stripe-public.js";
 
 /** Renvani SaaS subscription tier (founder pricing 2026-10-23). */
 export type RenvaniSubscriptionPlan = "flex" | "flat";
@@ -127,9 +130,6 @@ export function renvaniPlanAnnualPriceCents(plan: RenvaniPlanId): number {
   return RENVANI_PLAN_MONTHLY_PRICE_CENTS[plan] * 10;
 }
 
-/** Customer-paid Service Fee rate in basis points (200 bps = 2%). Applies on Flex, Founding, Startup (not Flat). */
-export const SERVICE_FEE_RATE_BPS = 200;
-
 /** Plans whose customers pay NO Service Fee (published pricing: Flat is fee-free). */
 export const SERVICE_FEE_EXEMPT_PLANS: ReadonlySet<RenvaniPlanId> = new Set<RenvaniPlanId>(["flat"]);
 
@@ -139,12 +139,6 @@ export const SERVICE_FEE_EXEMPT_PLANS: ReadonlySet<RenvaniPlanId> = new Set<Renv
  */
 export function serviceFeeRateBpsForPlan(plan: RenvaniPlanId | null | undefined): number {
   return plan && SERVICE_FEE_EXEMPT_PLANS.has(plan) ? 0 : SERVICE_FEE_RATE_BPS;
-}
-
-/** Customer-facing Service Fee line label derived from the rate, e.g. 200 -> "Service Fee (2%)". */
-export function formatServiceFeeLineItemName(rateBps: number = SERVICE_FEE_RATE_BPS): string {
-  const pct = Number((rateBps / 100).toFixed(2));
-  return `Service Fee (${pct}%)`;
 }
 
 /**

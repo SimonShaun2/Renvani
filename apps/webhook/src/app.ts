@@ -1,7 +1,7 @@
 import Fastify from "fastify";
 import pino from "pino";
 
-import { env } from "@fsm/config";
+import { webhookEnv as env } from "@fsm/config/runtime-env";
 
 import { stripeHandler } from "./handlers/stripe.handler.js";
 import { twilioHandler } from "./handlers/twilio.handler.js";

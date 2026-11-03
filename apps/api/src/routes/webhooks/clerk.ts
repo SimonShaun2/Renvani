@@ -1,6 +1,7 @@
 import type { FastifyPluginAsync, FastifyReply } from "fastify";
 
 import { env } from "@fsm/config";
+import { enqueueClerkWorkspaceReconcileJob } from "@fsm/jobs";
 
 import { syncClerkUserRoleMetadata } from "../../lib/clerk-role-metadata.js";
 import { verifySvixSignature } from "../../lib/svix-verify.js";
@@ -9,6 +10,7 @@ import {
   provisionClerkMembership,
   provisionClerkOrganizationDetailed
 } from "../../services/clerk-provisioning.service.js";
+import { deferClerkWorkspaceWebhook } from "../../services/clerk-workspace-intent.service.js";
 import {
   deactivateClerkMembership,
   deactivateClerkUser,
@@ -71,7 +73,11 @@ const clerkWebhookRoutes: FastifyPluginAsync = async (fastify) => {
     }
     const token = claim.token;
     try {
-      const result = await handleEvent(event, reply);
+      const result = await handleEvent(event, reply, svixId);
+      if (reply.statusCode >= 500) {
+        await releaseWebhookMessage("clerk", svixId, token);
+        return result;
+      }
       await completeWebhookMessage("clerk", svixId, token);
       return result;
     } catch (error) {
@@ -81,14 +87,34 @@ const clerkWebhookRoutes: FastifyPluginAsync = async (fastify) => {
   });
 };
 
-async function handleEvent(event: ClerkWebhookEvent, reply: FastifyReply) {
+async function handleEvent(event: ClerkWebhookEvent, reply: FastifyReply, svixId: string) {
   const data = event.data ?? {};
 
   if (event.type === "organization.created") {
+    const createdBy = str(data.created_by);
+    if (!createdBy) {
+      return reply.status(503).send({ error: "CLERK_ORGANIZATION_CREATOR_MISSING", deferred: true });
+    }
+    const decision = await deferClerkWorkspaceWebhook({
+      kind: "organization.created",
+      svixId,
+      organizationId: str(data.id),
+      clerkUserId: createdBy
+    });
+    if (decision.status === "deferred") {
+      await enqueueClerkWorkspaceReconcileJob({
+        intentId: decision.intentId,
+        clerkUserId: decision.clerkUserId
+      });
+      return reply.status(503).send({ error: "WORKSPACE_INTENT_DEFERRED", deferred: true });
+    }
+    if (decision.status === "denied") {
+      return reply.send({ received: true, skipped: true, reason: decision.reason });
+    }
     const { company, skipReason } = await provisionClerkOrganizationDetailed({
       organizationId: str(data.id),
       name: str(data.name),
-      createdBy: str(data.created_by) || null
+      createdBy
     });
     if (!company) {
       return reply.send({ received: true, skipped: true, ...(skipReason ? { reason: skipReason } : {}) });
@@ -103,6 +129,25 @@ async function handleEvent(event: ClerkWebhookEvent, reply: FastifyReply) {
     if (!str(organization.id) || !email) {
       return reply.status(400).send({ error: "INVALID_PAYLOAD", message: "Missing organization or email" });
     }
+    const clerkUserId = str(member.user_id);
+    if (clerkUserId) {
+      const decision = await deferClerkWorkspaceWebhook({
+        kind: "organizationMembership.created",
+        svixId,
+        organizationId: str(organization.id),
+        clerkUserId
+      });
+      if (decision.status === "deferred") {
+        await enqueueClerkWorkspaceReconcileJob({
+          intentId: decision.intentId,
+          clerkUserId: decision.clerkUserId
+        });
+        return reply.status(503).send({ error: "WORKSPACE_INTENT_DEFERRED", deferred: true });
+      }
+      if (decision.status === "denied") {
+        return reply.send({ received: true, skipped: true, reason: decision.reason });
+      }
+    }
     const result = await provisionClerkMembership({
       organizationId: str(organization.id),
       name: str(organization.name),
@@ -114,9 +159,11 @@ async function handleEvent(event: ClerkWebhookEvent, reply: FastifyReply) {
       // organizationMembership payloads carry no email-verification proof: never link existing users by email here.
       emailVerified: false
     });
+    if (result.status === "deferred") {
+      return reply.status(503).send({ error: "CLERK_ORGANIZATION_UNVERIFIED", deferred: true });
+    }
     // The web/API read the staff role only from the session claim metadata.role (= public_metadata.role):
     // publish the DB role to Clerk so the new owner isn't routed to /no-access. Best effort, never throws.
-    const clerkUserId = str(member.user_id);
     const roleSync =
       result.role && clerkUserId && result.status !== "skipped"
         ? await syncClerkUserRoleMetadata(clerkUserId, result.role)

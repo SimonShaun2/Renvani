@@ -1,4 +1,7 @@
 # CODEX.md
+
+> **FOUNDER EXECUTION & MERGE AUTHORITY — NOVEMBER 3, 2026 (current).** See [founder directive #420](https://github.com/SimonShaun2/Renvani/issues/420). **Codex is the active builder and coordinator. No E.. CoS approval, dispatch, CI authorization, review recommendation, or signature is required for any ticket or PR.** GrokBot/E.. CoS is optional advice when the founder independently chooses to use it; never a gate. Codex Lead/Technical Lead and actual Platform owners coordinate Ready/WIP and authorize appropriately scoped CI batches; independent Peer, QA, and Security-by-risk reviews with exact-head evidence remain mandatory. **The founder alone approves EVERY outstanding and future PR merge**, including `dev`, by named PR and exact reviewed head. Compatible PRs may be reviewed and validated in batches, then merged sequentially only after explicit founder approvals; no unsafe big-bang merge. Continue authorized Phase A work without stopping for idle roles or blocked PRs. No Phase B before original Phase A acceptance and founder permission. Preserve genuine security, tenant, consent, migration and release gates. Reuse existing credentials when appropriate, but never claim unproven least privilege or rotation/revocation PASS.
+
 # FSM Platform V2 — Implementation Execution Standard
 
 **Read `AGENTS.md` first.** This file extends it with concrete implementation patterns.
@@ -209,7 +212,7 @@ with `FastifyRequest` / `FastifyReply` · row types via `typeof table.$inferSele
 
 ## 6. Review and Merge
 
-Approval follows the risk matrix in `TEAM.md` §3. The V1 "Agent 4 APPROVED" gate is retired. Pair cross-review does not replace peer review, QA, Security by risk, approved batch CI, or E.. CoS merge approval into `dev`. A changed head invalidates affected sign-offs.
+Approval follows the risk matrix in `TEAM.md` §3. The V1 "Agent 4 APPROVED" gate is retired. Pair cross-review does not replace peer review, QA, Security by risk, approved batch CI, or explicit founder merge approval into `dev` for the named PR and exact head. A changed head invalidates affected sign-offs.
 
 **Self-review is required before requesting peer review.** Confirm:
 
@@ -233,7 +236,7 @@ contracts, webhook handling, integration boundaries and downstream risk.
 **QA** verifies against ticket acceptance criteria and required tests. You may not mark your
 own work QA-approved. A QA failure blocks the ticket; engineering remediates.
 
-If a fix changes the reviewed head, collect fresh QA, peer reviewer, Security, and batch CI evidence before E.. CoS merge. A failed gate returns a bounded fix card to the original pair. CI is approved-batch only; local tests are not CI. Keep open drafts In Progress; do not merge to `dev` or mark Done without every gate.
+If a fix changes the reviewed head, collect fresh QA, peer reviewer, Security, and batch CI evidence before founder-authorized merge. A failed gate returns a bounded fix card to the original pair. CI is approved-batch only; local tests are not CI. Keep open drafts In Progress; do not merge to `dev` or mark Done without every gate.
 
 ---
 

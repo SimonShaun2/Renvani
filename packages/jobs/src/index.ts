@@ -22,6 +22,14 @@ export { enqueueImportChunkCommitJob } from "./enqueue-import-chunk-commit.js";
 export { enqueueQboSyncPushJob, enqueueQboSyncPullJob } from "./enqueue-qbo-sync.js";
 export { enqueueEvaluateLoyaltyReminderCandidatesJob } from "./enqueue-evaluate-loyalty-reminder-candidates.js";
 export { enqueueBuildJobServiceBriefJob } from "./enqueue-build-job-service-brief.js";
+export {
+  CLERK_WORKSPACE_CREATE_JOB_NAME,
+  CLERK_WORKSPACE_RECONCILE_JOB_NAME,
+  ClerkWorkspaceJobPayloadSchema,
+  enqueueClerkWorkspaceCreateJob,
+  enqueueClerkWorkspaceReconcileJob
+} from "./clerk-workspace.js";
+export type { ClerkWorkspaceJobPayload } from "./clerk-workspace.js";
 export { logMigrateFileBatchTrace } from "./migrate-file-batch-trace-log.js";
 export type { LogMigrateFileBatchTraceInput } from "./migrate-file-batch-trace-log.js";
 export { redisConnection } from "./connection.js";

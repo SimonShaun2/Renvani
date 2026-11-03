@@ -13,7 +13,7 @@
 | [FS-14 PR #55](https://github.com/SimonShaun2/Renvani/pull/55), [FS-23 PR #50](https://github.com/SimonShaun2/Renvani/pull/50) | Command Center and scheduling | Integrate approval and booking evidence after underlying contracts |
 | [FSM-0010 issue #11](https://github.com/SimonShaun2/Renvani/issues/11), [FSM-0013 issue #14](https://github.com/SimonShaun2/Renvani/issues/14) | Historical foundation audit | Explicitly map or retire in FS board; their old tiered CI/roster assumptions do not override current batch policy |
 
-**Review decisions:** Product Owner confirms multi-industry/full-FSM product scope and first two acceptance scenarios; Technical Lead signs domain boundaries and dependencies; Platform checks environment/release details; Security and QA check gates. E.. CoS schedules accepted work within WIP limits. Founder retains `main`, production and live-money approval.
+**Review decisions:** Product Owner confirms multi-industry/full-FSM product scope and first two acceptance scenarios; Technical Lead signs domain boundaries and dependencies; Platform checks environment/release details; Security and QA check gates. Codex Lead / Technical Lead schedules accepted work within WIP limits. Founder retains `main`, production and live-money approval.
 
 Software construction blueprint from foundation to scale
 
@@ -66,7 +66,7 @@ Define four distinct places: local development, short-lived preview where useful
 |---|---|---|
 | Feature PR | Two-developer pair and traceable FS ticket | Local checks, contracts, independent review and risk-specific QA |
 | Approved batch CI | Authorized label and exact PR head | Install, build, lint, test; add integration/security checks by risk |
-| Merge to `dev` | E.. CoS after established gates | Exact-head approvals and green authorized batch |
+| Merge to `dev` | Founder only, for the named PR and exact reviewed head, after established gates | Exact-head approvals and green authorized batch |
 | Staging | Automatic after an approved integration merge | Build provenance, migration, smoke tests, rollback path |
 | `main` promotion | Founder | Staging acceptance, QA release review, change summary |
 | Production deployment | Founder-authorized release action | Same artifact, controlled migration, health check, monitored rollout |
@@ -372,7 +372,7 @@ Every floor has four gates: structural correctness, usable experience, safe fail
 | Experience | Office/field task and accessibility review |
 | Business | One defined result, accurate measurement, buyer acceptance |
 
-The team roles already documented in `TEAM.md` should carry the work: E.. CoS governs WIP and dev merges; Product Owner owns scope/acceptance; Technical Lead owns architecture; five senior developer pairs own domains; two designers own office and field; reviewers and four QA roles test independently; Platform 1/2 own release/reliability; Security owns risk review. Founder controls `main` and production. The team document says 26 roles but its own enumeration totals 25 active gate roles; reconcile the roster rather than silently inventing a person. [G3]
+The team roles already documented in `TEAM.md` should carry the work: Codex Lead / Technical Lead coordinates Ready/WIP; the founder alone approves every PR merge, including `dev`, by named PR and exact reviewed head; Product Owner owns scope/acceptance; Technical Lead owns architecture; five senior developer pairs own domains; two designers own office and field; reviewers and four QA roles test independently; Platform 1/2 own release/reliability; Security owns risk review. Founder controls `main` and production. The team document says 26 roles but its own enumeration totals 25 active gate roles; reconcile the roster rather than silently inventing a person. [G3]
 
 Use ADRs for material changes, including infrastructure/provider choices, money model, data boundary and critical contract changes. Keep existing successful code and refactor it where evidence supports it. Avoid rewriting for a perfect diagram. Avoid launching unverified features to satisfy a marketing deadline.
 

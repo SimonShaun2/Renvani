@@ -7,7 +7,7 @@ import { verifySvixSignature } from "../../lib/svix-verify.js";
 import { claimWebhookMessage, completeWebhookMessage, releaseWebhookMessage } from "../../lib/webhook-dedupe.js";
 import {
   provisionClerkMembership,
-  provisionClerkOrganization
+  provisionClerkOrganizationDetailed
 } from "../../services/clerk-provisioning.service.js";
 import {
   deactivateClerkMembership,
@@ -85,13 +85,13 @@ async function handleEvent(event: ClerkWebhookEvent, reply: FastifyReply) {
   const data = event.data ?? {};
 
   if (event.type === "organization.created") {
-    const company = await provisionClerkOrganization({
+    const { company, skipReason } = await provisionClerkOrganizationDetailed({
       organizationId: str(data.id),
       name: str(data.name),
       createdBy: str(data.created_by) || null
     });
     if (!company) {
-      return reply.send({ received: true, skipped: true });
+      return reply.send({ received: true, skipped: true, ...(skipReason ? { reason: skipReason } : {}) });
     }
     return reply.send({ received: true, companyId: company.id });
   }

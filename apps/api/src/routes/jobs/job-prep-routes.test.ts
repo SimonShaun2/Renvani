@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 const handlerNames = vi.hoisted(() => [
   "addJobProductHandler", "addNoteHandler", "addPhotoHandler", "assignTechnicianHandler",
   "approveUpsellHandler", "completeJobHandler", "completeTaskHandler", "createTaskHandler",
-  "createJobHandler", "deleteTaskHandler", "getJobHandler", "getJobPreparationStatusHandler",
+  "createJobHandler", "previewJobCreateHandler", "deleteTaskHandler", "getJobHandler", "getJobPreparationStatusHandler",
   "getJobServiceBriefHandler", "listJobProductsHandler", "getJobTimelineHandler", "getNotesHandler",
   "getPhotosHandler", "listTasksHandler", "removeJobProductHandler", "reorderTasksHandler",
   "listJobsHandler", "scheduleJobHandler", "transitionStatusHandler", "updateJobProductHandler",

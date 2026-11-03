@@ -658,6 +658,10 @@ export function DispatchBoardClient() {
             unscheduledLoading={unscheduledJobsQuery.isLoading}
             approvedEstimates={approvedEstimatesQuery.data?.estimates ?? []}
             approvedEstimatesLoading={approvedEstimatesQuery.isLoading}
+            smartQueueError={dispatchQuery.isError ? { onRetry: () => void dispatchQuery.refetch(), isRetrying: dispatchQuery.isFetching } : null}
+            bookingRequestsError={bookingRequestsQuery.isError ? { onRetry: () => void bookingRequestsQuery.refetch(), isRetrying: bookingRequestsQuery.isFetching } : null}
+            unscheduledError={unscheduledJobsQuery.isError ? { onRetry: () => void unscheduledJobsQuery.refetch(), isRetrying: unscheduledJobsQuery.isFetching } : null}
+            approvedEstimatesError={approvedEstimatesQuery.isError ? { onRetry: () => void approvedEstimatesQuery.refetch(), isRetrying: approvedEstimatesQuery.isFetching } : null}
             search={deferredSearch}
             onSelectTab={selectTab}
             onSelectJob={(jobId) => {

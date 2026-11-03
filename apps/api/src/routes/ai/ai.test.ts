@@ -345,12 +345,12 @@ describe("ai routes", () => {
     expect(response.body.error).toBe("NOT_FOUND");
   });
 
-  it("POST /ai/recommendations/:id/action succeeds and returns 409 if already actioned", async () => {
+  it("POST /ai/recommendations/:id/action preserves unsupported actions and rejects proposal-supported types", async () => {
     const auth = createAuthContext("owner");
     const { customer } = seedRevenueGraph(auth.company.id);
     const pendingRecommendation = fakeDb.seedAiRecommendation({
       companyId: auth.company.id,
-      type: "reactivation",
+      type: "aging_asset",
       customerId: customer.id,
       estimatedRevenue: "300.00",
       urgencyScore: 85,
@@ -359,7 +359,7 @@ describe("ai routes", () => {
     });
     const actionedRecommendation = fakeDb.seedAiRecommendation({
       companyId: auth.company.id,
-      type: "reactivation",
+      type: "aging_asset",
       customerId: customer.id,
       status: "actioned",
       actionedAt: new Date("2026-04-28T12:00:00.000Z"),
@@ -367,6 +367,15 @@ describe("ai routes", () => {
       urgencyScore: 60,
       headline: "Already actioned",
       body: "Actioned body"
+    });
+    const proposalSupported = fakeDb.seedAiRecommendation({
+      companyId: auth.company.id,
+      type: "reactivation",
+      customerId: customer.id,
+      estimatedRevenue: "400.00",
+      urgencyScore: 90,
+      headline: "Proposal required",
+      body: "Must go through approval"
     });
 
     const successResponse = await request(app.server)
@@ -381,10 +390,21 @@ describe("ai routes", () => {
       .send({
         actionTaken: "called_customer"
       });
+    const proposalRequiredResponse = await request(app.server)
+      .post(`/api/v1/ai/recommendations/${proposalSupported.id}/action`)
+      .set("Authorization", auth.authorization)
+      .send({
+        actionTaken: "called_customer"
+      });
 
     expect(successResponse.status).toBe(200);
     expect(successResponse.body.recommendation.status).toBe("actioned");
     expect(conflictResponse.status).toBe(409);
+    expect(proposalRequiredResponse.status).toBe(409);
+    expect(proposalRequiredResponse.body.message).toBe(
+      "This recommendation requires a Revenue Agent proposal and operator approval"
+    );
+    expect(fakeDb.getTestState().aiRecommendations.find((row) => row.id === proposalSupported.id)?.status).toBe("pending");
   });
 
   it("POST /ai/recommendations/:id/dismiss succeeds", async () => {

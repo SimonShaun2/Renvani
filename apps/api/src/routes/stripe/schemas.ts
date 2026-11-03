@@ -40,7 +40,8 @@ const stripeConnectStatusSchema = {
     lastPayoutAt: {
       anyOf: [{ type: "string", format: "date-time" }, { type: "null" }]
     },
-    platformFeePercent: { type: "number" }
+    platformFeePercent: { type: "number" },
+    serviceFeePercent: { type: "number" }
   }
 } as const;
 

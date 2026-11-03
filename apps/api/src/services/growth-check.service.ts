@@ -12,18 +12,19 @@ import {
   AppError,
   ErrorCode,
   GROWTH_QUEUE_JOB_NAMES,
-  RESIDENTIAL_CLEANING_RUBRIC_V1,
   type EnqueueGrowthCheckPublicScanInput,
   type GrowthCheckFindingRecord,
   type GrowthCheckScanProgress,
   buildGrowthCheckScanProgress,
   getGrowthCheckRubricById,
+  resolveGrowthCheckRubricIdForTrade,
   growthCheckPublicScanJobId,
   normalizeGrowthCheckTargetUrl
 } from "@fsm/types";
 import { and, eq } from "drizzle-orm";
 
 import { checkGrowthCheckEnqueueRateLimits } from "../lib/growth-check/enqueue-rate-limit.js";
+import { getCompanyTrade } from "./company-trade.service.js";
 
 export interface GrowthCheckScanResponse {
   id: string;
@@ -72,6 +73,19 @@ function toScanResponse(
   };
 }
 
+/**
+ * Default rubric for a new scan: picked from the shop trade (companies.settings.trade) through the
+ * trade->rubric registry, falling back to the home-services rubric when the trade is unset or unreadable.
+ */
+async function resolveDefaultRubricIdForCompany(companyId: string): Promise<string> {
+  try {
+    const { trade } = await getCompanyTrade(companyId);
+    return resolveGrowthCheckRubricIdForTrade(trade);
+  } catch {
+    return resolveGrowthCheckRubricIdForTrade(null);
+  }
+}
+
 export async function enqueueGrowthCheckPublicScan(
   companyId: string,
   actorUserId: string,
@@ -93,7 +107,7 @@ export async function enqueueGrowthCheckPublicScan(
   }
 
   const targetUrl = normalizeGrowthCheckTargetUrl(input.targetUrl).toString();
-  const rubricId = input.rubricId ?? RESIDENTIAL_CLEANING_RUBRIC_V1.id;
+  const rubricId = input.rubricId ?? (await resolveDefaultRubricIdForCompany(companyId));
   const rubric = getGrowthCheckRubricById(rubricId);
 
   if (!rubric) {

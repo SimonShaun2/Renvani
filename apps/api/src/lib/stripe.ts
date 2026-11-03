@@ -20,6 +20,8 @@ import {
   SERVICE_FEE_RATE_BPS
 } from "@fsm/config/stripe-pricing";
 
+import { currentAppBaseUrl } from "./app-origins.js";
+
 const stripe = new Stripe(env.STRIPE_SECRET_KEY);
 
 export interface InvoiceCheckoutLineItem {
@@ -36,6 +38,8 @@ export interface CreateInvoiceCheckoutSessionInput {
   invoiceId: string;
   customerId: string;
   customerEmail: string | null;
+  /** PaymentIntent receipt_email; null when the customer opted out of email (see isReceiptEmailAllowed). */
+  receiptEmail?: string | null;
   companyStripeAccountId: string;
   companyName: string;
   invoiceNumber: string;
@@ -45,6 +49,10 @@ export interface CreateInvoiceCheckoutSessionInput {
   paymentToken: string;
   /** Tenant's Renvani plan; Flat pays no Service Fee (no Service Fee line is sent to Stripe). */
   renvaniPlan: RenvaniPlanId | null;
+  /** Force Stripe-hosted Checkout (public pay fallback) regardless of the embedded-checkout flag. */
+  forceHosted?: boolean;
+  /** Stripe idempotency key for the session create (concurrent identical requests reuse one session). */
+  idempotencyKey?: string;
 }
 
 export interface InvoiceCheckoutSessionResult {
@@ -188,7 +196,7 @@ export async function createInvoiceCheckoutSession(
 ): Promise<InvoiceCheckoutSessionResult> {
   const fees = computeCheckoutFees({ chargeCents: toCents(input.total), plan: input.renvaniPlan });
   const applicationFeeAmount = fees.serviceFeeCents;
-  const appBaseUrl = env.APP_URL.replace(/\/$/, "");
+  const appBaseUrl = currentAppBaseUrl();
   const statementDescriptor = buildCardStatementDescriptor(input.companyName);
   const useEmbeddedCheckout = featureFlags.stripeRenvaniEmbeddedCheckout;
   const paymentIntentData: Stripe.Checkout.SessionCreateParams.PaymentIntentData = {
@@ -205,6 +213,10 @@ export async function createInvoiceCheckoutSession(
       serviceFeeCents: String(fees.serviceFeeCents)
     }
   };
+
+  if (input.receiptEmail) {
+    paymentIntentData.receipt_email = input.receiptEmail;
+  }
 
   if (applicationFeeAmount > 0) {
     paymentIntentData.application_fee_amount = applicationFeeAmount;
@@ -247,8 +259,9 @@ export async function createInvoiceCheckoutSession(
     invoiceNumber: input.invoiceNumber
   };
 
+  const embedded = useEmbeddedCheckout && input.forceHosted !== true;
   const session = await stripe.checkout.sessions.create(
-    useEmbeddedCheckout
+    embedded
       ? {
           mode: "payment",
           ui_mode: "embedded",
@@ -275,10 +288,11 @@ export async function createInvoiceCheckoutSession(
               message: `Secure payment processed by ${RENVANI_STRIPE_BRAND.platformName}.`
             }
           }
-        }
+        },
+    input.idempotencyKey ? { idempotencyKey: input.idempotencyKey } : undefined
   );
 
-  if (useEmbeddedCheckout) {
+  if (embedded) {
     if (!session.client_secret) {
       throw new Error("Stripe embedded checkout session did not return client_secret");
     }
@@ -313,6 +327,32 @@ export async function retrieveInvoiceCheckoutClientSecret(sessionId: string): Pr
 
 export async function expireInvoiceCheckoutSession(sessionId: string): Promise<void> {
   await stripe.checkout.sessions.expire(sessionId);
+}
+
+export interface InvoiceCheckoutSessionSnapshot {
+  id: string;
+  uiMode: "hosted" | "embedded" | string | null;
+  /** open | complete | expired */
+  status: string | null;
+  paymentStatus: string | null;
+  url: string | null;
+  expiresAt: Date | null;
+  invoiceId: string | null;
+  companyId: string | null;
+}
+
+export async function retrieveInvoiceCheckoutSession(sessionId: string): Promise<InvoiceCheckoutSessionSnapshot> {
+  const session = await stripe.checkout.sessions.retrieve(sessionId);
+  return {
+    id: session.id,
+    uiMode: session.ui_mode ?? null,
+    status: session.status ?? null,
+    paymentStatus: session.payment_status ?? null,
+    url: session.url ?? null,
+    expiresAt: typeof session.expires_at === "number" ? new Date(session.expires_at * 1000) : null,
+    invoiceId: session.metadata?.invoiceId ?? null,
+    companyId: session.metadata?.companyId ?? null
+  };
 }
 
 export async function createServiceAgreementPrice(
@@ -636,7 +676,7 @@ export async function createConnectAccountSession(
 }
 
 export async function createConnectOnboardingLink(accountId: string): Promise<{ url: string }> {
-  const appBaseUrl = env.APP_URL.replace(/\/$/, "");
+  const appBaseUrl = currentAppBaseUrl();
   const accountLink = await stripe.accountLinks.create({
     account: accountId,
     refresh_url: `${appBaseUrl}/settings/payments/onboard?refresh=true`,

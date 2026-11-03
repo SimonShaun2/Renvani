@@ -1,4 +1,4 @@
-import { env } from "./env.js";
+import { paymentEnv as env } from "./runtime-env.js";
 
 /** Renvani SaaS subscription tier (founder pricing 2026-10-23). */
 export type RenvaniSubscriptionPlan = "flex" | "flat";

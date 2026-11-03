@@ -34,7 +34,7 @@
 | `web` | No | No | No* | No | No | No | No |
 | `api` | Yes | Yes (enqueue) | Yes | Yes | Yes | Yes | Yes |
 | `webhook` | Yes | Yes | Yes | Yes | No | No | No |
-| `worker` | Yes | Yes | Optional | Yes | Yes | Yes | Yes |
+| `worker` | Yes | Yes | No | Sender only | When email is enabled | When storage is enabled | When AI is enabled |
 
 \* Web may use publishable Stripe keys in UI only when payment surfaces exist; never `sk_*` on web.
 
@@ -45,11 +45,24 @@
 3. No copy of production tenant rows into staging without a dedicated, reviewed migration procedure (out of FS-75 scope).
 4. Secrets never committed to git, logs, traces, or AI prompts.
 
+## FS-76 runtime permission boundary
+
+| Runtime view | Required at startup | Denied from parsed view | Conditional adapter fields |
+|--------------|---------------------|-------------------------|----------------------------|
+| `core` (DB and Redis) | Database and Redis URLs | Payment, messaging, AI, object-storage keys | None |
+| `webhook` (Render) | Core, Stripe test signing/verification, Twilio verification, application URL | SendGrid, OpenAI, R2 and Clerk secrets | No outbound messaging key |
+| `worker` (Render) | Core and application URL | Stripe secret, Clerk secret and webhook signing secrets | Email, SMS sender, R2 and AI validated at use |
+| `web-server` (Vercel) | Application and public API URLs | Stripe secret, database, Redis, Twilio, SendGrid, OpenAI and R2 | Clerk server key when auth is enabled |
+| `browser` (Vercel bundle) | Public API URL | **Every secret** | Publishable Stripe key only |
+| `api` (Render) | Core, application URL and auth signing keys | No browser exposure | Provider keys validated by enabled adapters |
+
+The typed views in `@fsm/config/runtime-env` pick from the canonical schema and return only their listed fields. Missing/invalid field errors name fields, not values. `@fsm/db` and `@fsm/jobs` consume the core view so a worker or webhook cannot acquire broad API credentials through those packages. The FS-76 approved batch hook scans tracked source and generated server/client artifacts with a pinned local ruleset and synthetic canary; it emits path and rule names only.
+
 ## Enforcement in repo (this slice)
 
 - Template: `config/env/staging.env.example`
 - Validator: `@fsm/config/deployment-environment` + `scripts/staging/validate-env-boundaries.mjs`
-- Full `env.ts` optional-field split for partial stacks: **FS-76 / env controls ticket** — not required to merge FS-75 doc slice.
+- Runtime-specific environment views and secret scanner: **FS-76 / env controls ticket**. Until its reviewed head merges, these are local implementation evidence, not a deployed staging claim.
 
 ## FS-93 / ADR-FS-STACK gate
 

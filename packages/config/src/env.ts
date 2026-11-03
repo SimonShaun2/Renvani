@@ -2,7 +2,8 @@ import { z } from "zod";
 
 import { assertStripeLiveKeyAllowed } from "./deployment-environment.js";
 
-const envSchema = z.object({
+/** Canonical field catalog; runtime views select only the fields a process actually uses. */
+export const envSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   /** Injected by Render (and similar hosts); prefer over service-specific ports when set. */
   PORT: z.coerce.number().int().positive().optional(),
@@ -137,7 +138,7 @@ export function resolveApiListenPort(config: Env): number {
 }
 
 /** Render sets `PORT`; local dev uses `WEBHOOK_PORT`. */
-export function resolveWebhookListenPort(config: Env): number {
+export function resolveWebhookListenPort(config: Pick<Env, "PORT" | "WEBHOOK_PORT">): number {
   return config.PORT ?? config.WEBHOOK_PORT;
 }
 

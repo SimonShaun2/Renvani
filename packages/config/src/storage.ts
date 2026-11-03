@@ -1,4 +1,4 @@
-import { env } from "./env.js";
+import { storageEnv as env } from "./runtime-env.js";
 import { getObjectStorageProvider } from "./object-storage/index.js";
 import { R2ObjectStorageProvider } from "./object-storage/r2-provider.js";
 import type { SignedObjectUrl } from "./object-storage/types.js";

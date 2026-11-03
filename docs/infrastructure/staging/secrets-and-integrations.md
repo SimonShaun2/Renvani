@@ -6,10 +6,12 @@
 
 | Rule | Staging requirement |
 |------|---------------------|
-| Storage | Host secret manager only (vendor TBD, FS-93); never git |
+| Storage | Render service secret settings for API, worker and webhook; Vercel environment secret settings for web; GitHub approved CI secrets for isolated tests. Never git. |
 | Scope | Per-service credentials per [environment-boundary-matrix.md](./environment-boundary-matrix.md) |
 | Rotation | Staging keys rotated independently of production |
 | Injection | CI and operators use short-lived access; no secrets in batch CI logs |
+
+Current isolated staging uses Render compute and Key Value, Neon PostgreSQL, Vercel web, Clerk development identity, and R2 object storage. This does not authorize production changes or an account-wide secret rotation. FS-76 requires a separate, approved staging-only issue → inject → smoke → replace → old-key-denied drill using one harmless storage credential. Record credential identifiers and outcomes only, never values.
 
 ## Data isolation
 

@@ -10,6 +10,10 @@
       "types": "./dist/env.d.ts",
       "import": "./dist/env.js"
     },
+    "./runtime-env": {
+      "types": "./dist/runtime-env.d.ts",
+      "import": "./dist/runtime-env.js"
+    },
     "./storage": {
       "types": "./dist/storage.d.ts",
       "import": "./dist/storage.js"

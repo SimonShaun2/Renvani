@@ -1,24 +1,24 @@
-# Staging runbook (provider-neutral)
+# Staging runbook (Render, Neon, Vercel, Clerk)
 
-**FS-75** · **Owner:** Platform 1 (Infrastructure Dev 1) · **Blocked steps** require FS-93 ADR approval.
+**FS-75 / FS-76** · **Owner:** Platform 1. FS-93 and the official operational stack name Render compute/Key Value, Neon PostgreSQL, Vercel web, Clerk development identity and R2 storage. Provider actions still require the ticket's specific authorization.
 
 ## 1. Preconditions
 
-- [ ] FS-93 ADR approved (hosting, secrets store, DNS, observability owner)
+- [x] FS-93 and official-stack decisions recorded; verify the isolated tester target before a new action
 - [ ] Staging env template reviewed: `config/env/staging.env.example`
 - [ ] Boundary validator passes locally (see below)
 - [ ] Backend health endpoints available for smoke (coordinate Pair 1 / API — separate PR if not on `dev`)
 
-## 2. Provision (do not execute until FS-93)
+## 2. Isolated staging target (operator action requires ticket authorization)
 
-> **Stop:** Provider account creation, credential issuance, and deploy hooks are **out of scope** for FS-75 and forbidden until FS-93 is approved and founder/Platform authorizes spend.
+> **Stop:** This local FS-76 slice does not create accounts, issue credentials, deploy, or change production. Platform records the exact authorized tester target before any staging action.
 
-Checklist to complete **after** FS-93 names the provider:
+Current provider checklist (existing isolated resources are preserved):
 
-1. Create isolated `postgres`, `redis`, and object storage resources (staging names).
-2. Deploy four services: `web`, `api`, `webhook`, `worker` (see [service-inventory.md](./service-inventory.md)).
+1. Verify the isolated Neon branch, Render Key Value instance and R2 bucket/prefix are tester-only.
+2. Verify four service targets: Vercel `web`, Render `api`, `webhook`, `worker` (see [service-inventory.md](./service-inventory.md)).
 3. Inject secrets per service scope; set `RENVANI_DEPLOYMENT_TIER=staging`.
-4. Run migrations once per deploy: `pnpm --filter @fsm/db db:migrate` (exact job owner TBD in FS-93 ADR).
+4. Apply migrations through the approved deployment migration gate, not from this FS-76 slice.
 5. Register Stripe **test** webhooks to staging `webhook` URL.
 
 Record provision evidence (project IDs, URLs, SHA) on FS-75 board Evidence field.
@@ -81,9 +81,9 @@ Never run reset against production identifiers.
 3. Revoke staging API keys in Stripe/Twilio/SendGrid/OpenAI dashboards.
 4. Archive Evidence on FS-75.
 
-## 7. CI integration (future)
+## 7. CI integration
 
-Staging smoke in **approved batch** or post-merge workflow requires E.. CoS authorization per `GITHUB_WORKFLOW.md`. FS-75 does not add GitHub Actions workflows.
+Staging smoke in an **approved batch** or post-merge workflow requires E.. CoS authorization per `GITHUB_WORKFLOW.md`. FS-76 adds a source-and-built-artifact secret scan to the existing approved batch; the workflow remains label gated. A passing local scan is not approved CI.
 
 ## Handoff
 

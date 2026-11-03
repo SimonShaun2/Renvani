@@ -2,7 +2,7 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 
 import type { FastifyReply, FastifyRequest } from "fastify";
 
-import { env } from "@fsm/config";
+import { webhookEnv as env } from "@fsm/config/runtime-env";
 
 function toTwilioParams(body: Buffer): Record<string, string> {
   const params = new URLSearchParams(body.toString("utf8"));

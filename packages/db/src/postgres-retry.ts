@@ -1,4 +1,4 @@
-import { env } from "@fsm/config";
+import { coreEnv as env } from "@fsm/config/runtime-env";
 
 import { isRetryablePostgresError } from "./postgres-errors.js";
 

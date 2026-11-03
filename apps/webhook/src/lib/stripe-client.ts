@@ -1,5 +1,5 @@
 import Stripe from "stripe";
 
-import { env } from "@fsm/config";
+import { webhookEnv as env } from "@fsm/config/runtime-env";
 
 export const stripe = new Stripe(env.STRIPE_SECRET_KEY);

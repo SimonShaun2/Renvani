@@ -1,6 +1,6 @@
 import pino from "pino";
 
-import { env } from "@fsm/config";
+import { aiEnv as env } from "@fsm/config/runtime-env";
 
 const logger = pino({
   name: "campaign-prompts"

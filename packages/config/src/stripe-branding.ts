@@ -1,4 +1,4 @@
-import { env } from "./env.js";
+import { paymentEnv as env } from "./runtime-env.js";
 
 /** Customer-visible brand; Stripe surfaces only where legally required (Connect KYC, card network). */
 export const RENVANI_STRIPE_BRAND = {

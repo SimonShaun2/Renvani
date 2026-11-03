@@ -270,7 +270,7 @@ export function PaymentsClient() {
   const UNAVAILABLE = "Not available yet";
 
   return (
-    <div className="space-y-6" data-payments-reveal>
+    <div className="space-y-6 text-[#0f1530]" data-payments-reveal>
       <header className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-[32px] font-semibold tracking-tight text-[#0f1530]">Payments</h1>
@@ -311,7 +311,7 @@ export function PaymentsClient() {
       {connect && !connect.connected ? (
         <div className={`${card} flex flex-wrap items-center justify-between gap-3`}>
           <p className="text-sm text-[#2a3360]">Stripe isn&apos;t connected yet, so online payments and payouts are off.</p>
-          <Link href="/settings/payments" className="rounded-xl bg-[#f6b400] px-4 py-2 text-sm font-semibold text-[#0f1530]">
+          <Link href="/settings/payments" className="rounded-[10px] bg-[#f6b400] px-4 py-2 text-sm font-semibold text-[#0f1530]">
             Connect Stripe
           </Link>
         </div>
@@ -349,7 +349,7 @@ export function PaymentsClient() {
               ) : (
                 <p className="text-sm text-[#5e6684]">No payouts yet.</p>
               )}
-              <button type="button" onClick={() => setTab("payouts")} className="text-sm text-[#2d4bd8]">
+              <button type="button" onClick={() => setTab("payouts")} className="text-sm font-semibold text-[#2a3360] underline decoration-[#f6b400] underline-offset-4">
                 View all payouts
               </button>
             </section>

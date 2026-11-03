@@ -241,6 +241,54 @@ describe("import.service", () => {
     ).not.toBeNull();
   });
 
+  it("rollbackImport deletes draft and voids sent imported invoices, deletes draft and expires sent estimates", async () => {
+    const { company, actor } = createAuthContext();
+    const importSession = fakeDb.seedImportSession({
+      companyId: company.id, createdById: actor.id, fileName: "invoices.csv",
+      fileUrl: "https://r2.test/fsm-bucket/imports/company-1/invoices.csv", status: "completed"
+    });
+    const customer = fakeDb.seedCustomer({ companyId: company.id, firstName: "A", lastName: "B" });
+    const tag = { companyId: company.id, customerId: customer.id, importSessionId: importSession.id };
+    const draftInvoice = fakeDb.seedInvoice({ ...tag, status: "draft" } as never);
+    const sentInvoice = fakeDb.seedInvoice({ ...tag, status: "sent", balanceDue: "40.00" } as never);
+    const draftEstimate = fakeDb.seedEstimate({ ...tag, status: "draft" } as never);
+    const sentEstimate = fakeDb.seedEstimate({ ...tag, status: "sent" } as never);
+
+    await importService.rollbackImport(company.id, actor.id, importSession.id);
+
+    const state = fakeDb.getTestState();
+    expect(state.invoices.find((row) => row.id === draftInvoice.id)?.deletedAt).not.toBeNull();
+    expect(state.invoices.find((row) => row.id === sentInvoice.id)).toMatchObject({ status: "void", deletedAt: null });
+    expect(state.estimates.find((row) => row.id === draftEstimate.id)?.deletedAt).not.toBeNull();
+    expect(state.estimates.find((row) => row.id === sentEstimate.id)?.status).toBe("expired");
+  });
+
+  it("rollbackImport refuses with counts and ids when imported billing has payments or accepted estimates", async () => {
+    const { company, actor } = createAuthContext();
+    const importSession = fakeDb.seedImportSession({
+      companyId: company.id, createdById: actor.id, fileName: "invoices.csv",
+      fileUrl: "https://r2.test/fsm-bucket/imports/company-1/invoices.csv", status: "completed"
+    });
+    const customer = fakeDb.seedCustomer({ companyId: company.id, firstName: "A", lastName: "B", importSessionId: importSession.id });
+    const tag = { companyId: company.id, customerId: customer.id, importSessionId: importSession.id };
+    const paidInvoice = fakeDb.seedInvoice({ ...tag, status: "sent" } as never);
+    const payment = fakeDb.seedPayment({ companyId: company.id, invoiceId: paidInvoice.id, customerId: customer.id, amount: "10.00" });
+    const approved = fakeDb.seedEstimate({ ...tag, status: "approved" } as never);
+
+    const error = await importService.rollbackImport(company.id, actor.id, importSession.id).catch((caught: unknown) => caught);
+
+    expect(error).toMatchObject({
+      code: ErrorCode.CONFLICT,
+      fields: { invoiceIds: paidInvoice.id, estimateIds: approved.id }
+    });
+    expect((error as Error).message).toContain("1 invoice(s)");
+    const state = fakeDb.getTestState();
+    expect(state.invoices.find((row) => row.id === paidInvoice.id)?.status).toBe("sent");
+    expect(state.payments.find((row) => row.id === payment.id)).toBeDefined();
+    expect(state.customers.find((row) => row.id === customer.id)?.deletedAt ?? null).toBeNull();
+    expect(state.importSessions.find((row) => row.id === importSession.id)?.status).toBe("completed");
+  });
+
   it("rollbackImport throws CONFLICT when the session is not completed", async () => {
     const { company, actor } = createAuthContext();
     const importSession = fakeDb.seedImportSession({

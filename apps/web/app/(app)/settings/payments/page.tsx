@@ -1,5 +1,6 @@
 "use client";
 
+import { SETTINGS_FEE_COPY, serviceFeePercentLabel } from "@/src/lib/service-fee-copy";
 import { CreditCard, ExternalLink, Loader2 } from "lucide-react";
 
 import { PageLayout } from "@/src/components/layout/PageLayout";
@@ -162,20 +163,20 @@ export default function SettingsPaymentsPage() {
                 <p className="mt-1 text-xs text-neutral-500">{status.lastPayoutAt ? new Date(status.lastPayoutAt).toLocaleDateString("en-US") : "No payout recorded yet"}</p>
               </div>
               <div className="rounded-[24px] border border-neutral-200 bg-neutral-50 px-4 py-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-400">Service Fee</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-400">{SETTINGS_FEE_COPY.heading}</p>
                 <p className="mt-2 text-lg font-semibold text-neutral-950">
                   {status.platformFeePercent != null && status.platformFeePercent > 0
-                    ? `${status.platformFeePercent.toFixed(1)}%`
+                    ? serviceFeePercentLabel(status.platformFeePercent)
                     : status.renvaniPlanTier === "flat"
-                      ? "None"
-                      : "Not set"}
+                      ? SETTINGS_FEE_COPY.flatValue
+                      : SETTINGS_FEE_COPY.unsetValue}
                 </p>
                 <p className="mt-1 text-xs text-neutral-500">
                   {status.platformFeePercent != null && status.platformFeePercent > 0
-                    ? "Paid by your customer at checkout and non-refundable. You receive the full invoice amount."
+                    ? SETTINGS_FEE_COPY.flexHint
                     : status.renvaniPlanTier === "flat"
-                      ? "Flat plan: no Service Fee. Your customers pay the invoice amount only."
-                      : "No billing plan set yet. Your Service Fee will show here once a plan is chosen."}
+                      ? SETTINGS_FEE_COPY.flatHint
+                      : SETTINGS_FEE_COPY.unsetHint}
                 </p>
               </div>
             </div>

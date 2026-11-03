@@ -1,5 +1,12 @@
 import type { NextConfig } from "next";
 
+import { checkApiUrlEnv } from "./src/lib/api-url-env-guard";
+
+const apiUrlCheck = checkApiUrlEnv(process.env);
+if (apiUrlCheck.level === "error") {
+  throw new Error(`[env guard] ${apiUrlCheck.message}`);
+}
+
 const apiOrigin = (process.env.API_URL ?? process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001").replace(
   /\/$/,
   ""

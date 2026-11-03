@@ -240,11 +240,24 @@ export async function addProduct(
   actorId: string,
   input: AddJobProductInput
 ): Promise<JobProduct> {
-  const normalizedInput = normalizeAddJobProductInput(input);
-  assertPositiveNumber(normalizedInput.quantity, "quantity");
-
   return db.transaction(async (tx) => {
     const job = await getJobRow(companyId, jobId, tx);
+    return insertJobProductInTransaction(tx, companyId, job, actorId, input);
+  });
+}
+
+/** Adds one line item inside the caller's transaction (used by addProduct and job create). */
+export async function insertJobProductInTransaction(
+  tx: Parameters<Parameters<typeof db.transaction>[0]>[0],
+  companyId: string,
+  job: JobRow,
+  actorId: string,
+  input: AddJobProductInput
+): Promise<JobProduct> {
+  const jobId = job.id;
+  const normalizedInput = normalizeAddJobProductInput(input);
+  assertPositiveNumber(normalizedInput.quantity, "quantity");
+  {
     const actor = await getActor(companyId, actorId, tx);
     let snapshot: JobProductSnapshot;
 
@@ -305,7 +318,7 @@ export async function addProduct(
     await emitJobProductEvent(tx, job, jobProduct, "job.product_added", `Added product ${jobProduct.name}`, actorId);
 
     return toJobProduct(jobProduct);
-  });
+  }
 }
 
 export async function updateJobProduct(
@@ -439,4 +452,35 @@ export async function approveUpsell(
 
     return toJobProduct(updatedJobProduct);
   });
+}
+
+/** Prices line-item inputs without writing (catalog price wins, else manual unitPrice). Used by create/invoice previews. */
+export async function priceJobProductInputs(
+  companyId: string,
+  inputs: AddJobProductInput[],
+  executor: SelectExecutor = db
+): Promise<{ lines: Array<{ name: string; quantity: string; unitPrice: string; total: string }>; subtotal: string }> {
+  const lines: Array<{ name: string; quantity: string; unitPrice: string; total: string }> = [];
+  let subtotal = new Decimal(0);
+  for (const input of inputs) {
+    const normalizedInput = normalizeAddJobProductInput(input);
+    assertPositiveNumber(normalizedInput.quantity, "quantity");
+    let line: { name: string; quantity: string; unitPrice: string; total: string };
+    if (normalizedInput.productCatalogId) {
+      const row = await getCatalogProductRow(companyId, normalizedInput.productCatalogId, executor);
+      const snapshot = buildSnapshotFromCatalogRow(row, normalizedInput.quantity, normalizedInput.isUpsell);
+      line = { name: snapshot.name, quantity: snapshot.quantity, unitPrice: snapshot.unitPrice, total: snapshot.total };
+    } else {
+      if (!normalizedInput.name || normalizedInput.unitPrice === undefined) {
+        throw new AppError(ErrorCode.VALIDATION_ERROR, "Manual job products require name and unitPrice");
+      }
+      assertPositiveNumber(normalizedInput.unitPrice, "unitPrice");
+      const quantity = toQuantityString(normalizedInput.quantity);
+      const unitPrice = toMoneyString(normalizedInput.unitPrice);
+      line = { name: normalizedInput.name, quantity, unitPrice, total: new Decimal(quantity).mul(unitPrice).toFixed(2) };
+    }
+    subtotal = subtotal.plus(line.total);
+    lines.push(line);
+  }
+  return { lines, subtotal: subtotal.toFixed(2) };
 }

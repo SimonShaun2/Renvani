@@ -27,6 +27,14 @@ export function createFixedWindowLimiter(limit: number, windowMs: number, maxKey
 
 export const HONEYPOT_FIELD = "website";
 
+/**
+ * Client IP for the limiter key. Prefers headers the edge sets itself (`x-vercel-forwarded-for`, `x-real-ip`), which
+ * a client cannot spoof behind Vercel. Raw `x-forwarded-for` is only a fallback and uses the RIGHT-most value (the hop
+ * appended by the nearest proxy); the left-most value is client-controlled when no trusted proxy rewrites the header.
+ */
 export function clientKey(headers: Headers): string {
-  return headers.get("x-forwarded-for")?.split(",")[0]?.trim() || headers.get("x-real-ip") || "unknown";
+  const trusted = headers.get("x-vercel-forwarded-for")?.split(",")[0]?.trim() || headers.get("x-real-ip")?.trim();
+  if (trusted) return trusted;
+  const hops = (headers.get("x-forwarded-for") ?? "").split(",").map((v) => v.trim()).filter(Boolean);
+  return hops[hops.length - 1] ?? "unknown";
 }

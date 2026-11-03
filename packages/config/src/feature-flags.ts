@@ -1,4 +1,15 @@
+import { z } from "zod";
+
 import { DEPLOYMENT_TIER_ENV } from "./deployment-environment.js";
+
+const booleanFlagSchema = z.enum(["true", "false"]);
+
+/** Validated runtime gate so an operator can stop proposal creation and existing-proposal execution. */
+export function isRevenueAgentProposalsEnabled(
+  source: Record<string, string | undefined> = process.env
+): boolean {
+  return booleanFlagSchema.parse(source.REVENUE_AGENT_PROPOSALS_ENABLED ?? "false") === "true";
+}
 
 /** Clerk parallel auth is on only when RENVANI_DEPLOYMENT_TIER=staging (env-driven). */
 export function isClerkAuthParallelJwtEnabled(
@@ -12,6 +23,10 @@ export function isClerkAuthParallelJwtEnabled(
  * Toggle without migrations; gate call sites with explicit comments.
  */
 export const featureFlags = {
+  // FEATURE FLAG: revenue-agent-proposals — FS-194 creation + existing proposal execution/rejection
+  get revenueAgentProposalsEnabled() {
+    return isRevenueAgentProposalsEnabled();
+  },
   // FEATURE FLAG: retention-gates-enqueue — FS-28 Pair 4 (enqueue-only; no Twilio/SendGrid)
   retentionGatesEnqueue: false,
   // FEATURE FLAG: retention-win-back-enqueue — lapse rebook / win-back proposals (FS-28 batch 2)

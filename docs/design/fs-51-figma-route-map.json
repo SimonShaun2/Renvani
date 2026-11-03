@@ -7,8 +7,8 @@
   "fieldTechnicianPrototypeNode": "393:87",
   "codeInspected": {
     "ref": "dev",
-    "commit": "5baad8775cfa6a5e3c3e163ed6b384a284b12f20",
-    "date": "2026-11-01"
+    "commit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+    "date": "2026-11-03"
   },
   "statusDefinition": "code_surface_identified_parity_not_verified",
   "entries": [
@@ -31,7 +31,7 @@
       "area": "Command Center",
       "figmaSourceNodeId": "10:220",
       "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=10-220",
-      "route": "/command-center",
+      "route": "/command-center/approvals",
       "codePaths": [
         "apps/web/src/components/agent-actions/AgentInbox.tsx",
         "apps/web/src/components/agent-actions/DeliveryStates.tsx"
@@ -57,7 +57,8 @@
       "area": "Growth",
       "figmaSourceNodeId": "10:1807",
       "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=10-1807",
-      "route": "/site/[slug]",
+      "route": "/site/[slug]/inquire",
+      "additionalRoutes": ["/site/[slug]/[service]/[area]"],
       "codePaths": [
         "apps/web/src/components/growth/BrandedInquiryClient.tsx"
       ],
@@ -146,6 +147,7 @@
       "figmaSourceNodeId": "247:32",
       "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=247-32",
       "route": "/mobile/jobs/[id]",
+      "additionalRoutes": ["/mobile/jobs/[id]/complete"],
       "codePaths": [
         "apps/web/src/components/mobile/CrewChecklist.tsx"
       ],
@@ -157,7 +159,8 @@
       "area": "Operations",
       "figmaSourceNodeId": "303:87",
       "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=303-87",
-      "route": "/mobile/signature",
+      "route": "/mobile/jobs/[id]/signature",
+      "additionalRoutes": ["/mobile/signature"],
       "codePaths": [
         "apps/web/src/components/mobile/CrewSignature.tsx"
       ],
@@ -169,7 +172,8 @@
       "area": "Revenue",
       "figmaSourceNodeId": "10:604",
       "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=10-604",
-      "route": "/estimates",
+      "route": "/estimates/new",
+      "additionalRoutes": ["/estimates/[id]"],
       "codePaths": [
         "apps/web/src/components/estimates/EstimateBuilderClient.tsx"
       ],
@@ -181,7 +185,7 @@
       "area": "Revenue",
       "figmaSourceNodeId": "362:4217",
       "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=362-4217",
-      "route": "/estimates",
+      "route": "/estimates/option-sets/[tierGroupId]",
       "codePaths": [
         "apps/web/src/components/estimate-option-sets"
       ],

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { Clock, Download, FileClock, Lock, Users } from "lucide-react";
 import type { TimeEntryV1, TimesheetV1, UpdateTimeEntryBody } from "@fsm/types";
 
@@ -165,7 +166,7 @@ function EntryRow({ entry }: { entry: TimeEntryV1 }) {
               type="button"
               onClick={save}
               disabled={update.isPending || endBeforeStart}
-              className="rounded-full bg-neutral-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+              className="rounded-[10px] bg-[#0f1530] px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
             >
               {update.isPending ? "Saving…" : "Save"}
             </button>
@@ -266,7 +267,7 @@ function PayrollSection({ period }: { period: PeriodInput }) {
   };
 
   return (
-    <section className="space-y-3 rounded-[28px] border border-neutral-200 bg-white p-6 shadow-sm" aria-label="Payroll">
+    <section className="space-y-3 rounded-[14px] border border-[#e6dccb] bg-white p-5" aria-label="Payroll">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-base font-semibold text-neutral-900">Payroll</h2>
@@ -276,7 +277,7 @@ function PayrollSection({ period }: { period: PeriodInput }) {
           type="button"
           onClick={() => void exportCsv()}
           disabled={exporting || !summary.data}
-          className="inline-flex items-center gap-2 rounded-full bg-neutral-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+          className="inline-flex items-center gap-2 rounded-[10px] bg-[#0f1530] px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
         >
           <Download className="h-4 w-4" aria-hidden="true" />
           {exporting ? "Exporting…" : "Export CSV"}
@@ -351,7 +352,7 @@ export function TimesheetsClient() {
     );
   };
 
-  const field = "rounded-xl border border-neutral-300 bg-white px-3 py-2 text-sm";
+  const field = "min-h-11 rounded-[10px] border border-[#e6dccb] bg-white px-3 py-2 text-sm text-[#0f1530] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f1530]";
   return (
     <PageLayout
       variant="operator"
@@ -379,7 +380,7 @@ export function TimesheetsClient() {
       ) : technicians.isError ? (
         <ErrorState title="Couldn't load technicians" onRetry={() => void technicians.refetch()} isRetrying={technicians.isFetching} />
       ) : techList.length === 0 ? (
-        <EmptyState variant="operator" icon={Users} title="No active technicians" subtitle="Add a technician to start tracking time." />
+        <EmptyState variant="operator" icon={Users} title="No active technicians" subtitle="Add an active technician to start tracking time and submitting timesheets." action={canPayroll ? <Link href="/settings/users" className="inline-flex min-h-11 items-center justify-center rounded-[10px] bg-[#f6b400] px-5 text-sm font-semibold text-[#0f1530] hover:bg-[#e0a400]">Manage team</Link> : null} />
       ) : (
         <div className="grid gap-6 lg:grid-cols-2">
           {techTotal > techList.length ? (
@@ -387,7 +388,7 @@ export function TimesheetsClient() {
               Showing the first {techList.length} of {techTotal} active technicians in the picker.
             </p>
           ) : null}
-          <section className="space-y-3 rounded-[28px] border border-neutral-200 bg-white p-6 shadow-sm" aria-label="Time entries">
+          <section className="space-y-3 rounded-[14px] border border-[#e6dccb] bg-white p-5" aria-label="Time entries">
             <h2 className="text-base font-semibold text-neutral-900">Time entries</h2>
             {entries.isLoading ? (
               <SkeletonCard className="h-32" />
@@ -410,7 +411,7 @@ export function TimesheetsClient() {
               </>
             )}
           </section>
-          <section className="space-y-3 rounded-[28px] border border-neutral-200 bg-white p-6 shadow-sm" aria-label="Pay periods">
+          <section className="space-y-3 rounded-[14px] border border-[#e6dccb] bg-white p-5" aria-label="Pay periods">
             <div className="flex items-center justify-between gap-3">
               <h2 className="text-base font-semibold text-neutral-900">Pay periods</h2>
               {!sheets.isLoading && !sheets.isError && !hasSheetForPeriod ? (

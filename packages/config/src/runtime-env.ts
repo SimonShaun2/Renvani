@@ -85,8 +85,6 @@ const paymentSchema = envSchema.pick({
   STRIPE_RENVANI_STATEMENT_PREFIX: true,
   STRIPE_BRANDING_LOGO_URL: true,
   STRIPE_BRANDING_ICON_URL: true
-}).extend({
-  STRIPE_PLATFORM_FEE_PERCENT: z.coerce.number().nonnegative().default(0)
 });
 
 const tokenSchema = envSchema.pick({
@@ -201,6 +199,10 @@ export const storageEnv = lazyRuntimeEnv("storage");
 export const paymentEnv = lazyRuntimeEnv("payment");
 export const tokenEnv = lazyRuntimeEnv("token");
 export const aiEnv = lazyRuntimeEnv("ai");
+
+export function resolveApiListenPort(config: Pick<RuntimeEnv<"api">, "PORT" | "API_PORT">): number {
+  return config.PORT ?? config.API_PORT;
+}
 
 export function resolveWebhookListenPort(config: Pick<RuntimeEnv<"webhook">, "PORT" | "WEBHOOK_PORT">): number {
   return config.PORT ?? config.WEBHOOK_PORT;

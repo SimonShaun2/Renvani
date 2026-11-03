@@ -1,5 +1,5 @@
 import type { PublicBookingSettingsRecord } from "@/src/hooks/booking.hooks";
-import { resolvePublicApiBase } from "@/src/lib/public-api";
+import { resolvePublicApiServerBase } from "@/src/lib/public-api-server";
 import { assertSafePublicBookingSlug } from "@/src/lib/public-api-path-security";
 
 interface PublicBookingResponse {
@@ -16,7 +16,7 @@ export async function fetchPublicBookingSettingsBySlug(
   }
 
   const response = await fetch(
-    `${resolvePublicApiBase()}/api/v1/public/booking/${encodeURIComponent(slug)}`,
+    `${resolvePublicApiServerBase()}/api/v1/public/booking/${encodeURIComponent(slug)}`,
     {
       method: "GET",
       headers: { Accept: "application/json" },

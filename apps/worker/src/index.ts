@@ -4,6 +4,7 @@ import pino from "pino";
 import { assertStripeLiveKeyAllowed } from "@fsm/config/deployment-environment";
 import { QUEUE_NAMES, agreementsQueue, aiQueue } from "@fsm/jobs";
 
+import { assertWorkerBootEnvironment } from "./boot-env.js";
 import { createWorker } from "./lib/worker-factory.js";
 import { PLAN_REMINDER_SCAN_JOB_NAME, processAgreements } from "./processors/agreements.processor.js";
 import { processAiRevenue } from "./processors/ai-revenue.processor.js";
@@ -20,6 +21,7 @@ const logger = pino({
 
 // Boot guard: never run with a Stripe live key outside production (also enforced when env parses).
 assertStripeLiveKeyAllowed(process.env);
+assertWorkerBootEnvironment();
 
 const dormantCustomerCronPattern = "0 2 * * *";
 const revenueSummaryPrewarmEveryMs = 30 * 60 * 1000;

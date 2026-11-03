@@ -2,6 +2,7 @@ import { ErrorCode } from "@fsm/types";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { publicApi, resolvePublicApiBase } from "@/src/lib/public-api";
+import { resolvePublicApiServerBase } from "@/src/lib/public-api-server";
 
 describe("resolvePublicApiBase", () => {
   afterEach(() => {
@@ -14,11 +15,12 @@ describe("resolvePublicApiBase", () => {
     expect(resolvePublicApiBase()).toBe("");
   });
 
-  it("returns API_URL on the server for direct API fetch", () => {
+  it("keeps client-reachable API calls same-origin even during server rendering", () => {
     vi.stubGlobal("window", undefined);
     vi.stubEnv("API_URL", "http://api.internal:3001/");
 
-    expect(resolvePublicApiBase()).toBe("http://api.internal:3001");
+    expect(resolvePublicApiBase()).toBe("");
+    expect(resolvePublicApiServerBase()).toBe("http://api.internal:3001");
   });
 });
 

@@ -10,7 +10,9 @@ import {
   rejectAgentActionHandler
 } from "./handlers.js";
 import {
+  agentActionGuardedStateChangeValidation,
   agentActionIdValidation,
+  agentActionStateChangeValidation,
   listAgentActionsValidation
 } from "./schemas.js";
 
@@ -18,28 +20,28 @@ const agentActionRoles = requireRole(["owner", "admin", "dispatcher"]);
 
 const agentActionRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.get("/agent-actions", {
-    preHandler: [fastify.authenticate, agentActionRoles],
+    onRequest: [fastify.authenticate, agentActionRoles],
     preValidation: [listAgentActionsValidation]
   }, listAgentActionsHandler);
 
   fastify.get("/agent-actions/:id", {
-    preHandler: [fastify.authenticate, agentActionRoles],
+    onRequest: [fastify.authenticate, agentActionRoles],
     preValidation: [agentActionIdValidation]
   }, getAgentActionHandler);
 
   fastify.post("/agent-actions/:id/approve", {
-    preHandler: [fastify.authenticate, agentActionRoles],
-    preValidation: [agentActionIdValidation]
+    onRequest: [fastify.authenticate, agentActionRoles],
+    preValidation: [agentActionGuardedStateChangeValidation]
   }, approveAgentActionHandler);
 
   fastify.post("/agent-actions/:id/reject", {
-    preHandler: [fastify.authenticate, agentActionRoles],
-    preValidation: [agentActionIdValidation]
+    onRequest: [fastify.authenticate, agentActionRoles],
+    preValidation: [agentActionStateChangeValidation]
   }, rejectAgentActionHandler);
 
   fastify.post("/agent-actions/:id/execute", {
-    preHandler: [fastify.authenticate, agentActionRoles],
-    preValidation: [agentActionIdValidation]
+    onRequest: [fastify.authenticate, agentActionRoles],
+    preValidation: [agentActionGuardedStateChangeValidation]
   }, executeAgentActionHandler);
 };
 

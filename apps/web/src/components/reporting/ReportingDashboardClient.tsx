@@ -5,6 +5,7 @@ import Papa from "papaparse";
 import { CalendarRange, Download, SlidersHorizontal } from "lucide-react";
 
 import { PageLayout } from "@/src/components/layout/PageLayout";
+import { LoadErrorState } from "@/src/components/ui/LoadErrorState";
 import {
   describeReportingPeriod,
   useEstimateConversion,
@@ -204,17 +205,41 @@ export function ReportingDashboardClient() {
           </section>
         ) : null}
 
-        <KPIRow metrics={kpiQuery.data ?? []} isLoading={kpiQuery.isLoading} />
+        {kpiQuery.isError ? (
+          <LoadErrorState title="Key metrics could not be loaded" onRetry={() => void kpiQuery.refetch()} isRetrying={kpiQuery.isFetching} />
+        ) : (
+          <KPIRow metrics={kpiQuery.data ?? []} isLoading={kpiQuery.isLoading} />
+        )}
 
         <div className="grid gap-6 xl:grid-cols-[minmax(0,1.4fr)_minmax(320px,0.9fr)]">
+          {revenueQuery.isError ? (
+          <LoadErrorState title="Revenue could not be loaded" onRetry={() => void revenueQuery.refetch()} isRetrying={revenueQuery.isFetching} />
+        ) : (
           <RevenueChart data={revenueQuery.data ?? []} isLoading={revenueQuery.isLoading} rangeLabel={periodLabel} />
+        )}
+          {utilizationQuery.isError ? (
+          <LoadErrorState title="Technician utilization could not be loaded" onRetry={() => void utilizationQuery.refetch()} isRetrying={utilizationQuery.isFetching} />
+        ) : (
           <TechUtilization rows={utilizationQuery.data ?? []} isLoading={utilizationQuery.isLoading} />
+        )}
         </div>
 
         <div className="grid gap-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.95fr)_minmax(0,0.95fr)]">
+          {pipelineQuery.isError ? (
+          <LoadErrorState title="Pipeline could not be loaded" onRetry={() => void pipelineQuery.refetch()} isRetrying={pipelineQuery.isFetching} />
+        ) : (
           <PipelineMetrics rows={pipelineQuery.data ?? []} isLoading={pipelineQuery.isLoading} />
+        )}
+          {conversionQuery.isError ? (
+          <LoadErrorState title="Estimate conversion could not be loaded" onRetry={() => void conversionQuery.refetch()} isRetrying={conversionQuery.isFetching} />
+        ) : (
           <ConversionDonut summary={conversionQuery.data} isLoading={conversionQuery.isLoading} />
+        )}
+          {reviewScoreQuery.isError ? (
+          <LoadErrorState title="Customer reviews could not be loaded" onRetry={() => void reviewScoreQuery.refetch()} isRetrying={reviewScoreQuery.isFetching} />
+        ) : (
           <ReviewScore summary={reviewScoreQuery.data} isLoading={reviewScoreQuery.isLoading} />
+        )}
         </div>
 
         <JobSourceReportingSection />

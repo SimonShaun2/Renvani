@@ -1,6 +1,6 @@
-import { and, eq, gte, isNull } from "drizzle-orm";
+import { and, eq, gte, isNull, sql } from "drizzle-orm";
 
-import { bookingRequests, db, emitEvent, inquirySubmitIdempotency } from "@fsm/db";
+import { bookingRequests, customers, db, emitEventWithExecutor, inquirySubmitIdempotency, runTransactionWithTenantSession } from "@fsm/db";
 import {
   AppError,
   ErrorCode,
@@ -14,9 +14,12 @@ import {
 } from "@fsm/types";
 
 import {
+  applyPublicEmergencyGuard,
   checkZipCoverage,
   createCompanyScopedInquiryBooking,
-  resolvePublicBookingCompanyId,
+  deriveSource,
+  getPublicBookingContext,
+  resolvePublicZipServiceability,
   submitBookingRequest
 } from "./booking.service.js";
 import {
@@ -40,15 +43,18 @@ const IDEMPOTENCY_TTL_MS = 24 * 60 * 60 * 1000;
 const DEDUPE_WINDOW_MS = 60 * 1000;
 
 type BookingRequestRow = typeof bookingRequests.$inferSelect;
+type SelectExecutor = Pick<typeof db, "select">;
+type InsertExecutor = Pick<typeof db, "insert">;
 
 async function findRecentDuplicateRow(
   companyId: string,
   phone: string,
   email: string | null,
-  excludeBookingRequestId?: string
+  excludeBookingRequestId?: string,
+  executor: SelectExecutor = db
 ): Promise<BookingRequestRow | null> {
   const since = new Date(Date.now() - DEDUPE_WINDOW_MS);
-  const rows = await db
+  const rows = await executor
     .select()
     .from(bookingRequests)
     .where(
@@ -76,8 +82,8 @@ async function findRecentDuplicateRow(
   return candidates.find((row) => row.email === email) ?? candidates[0] ?? null;
 }
 
-async function loadIdempotencyRecord(companyId: string, idempotencyKey: string) {
-  const [record] = await db
+async function loadIdempotencyRecord(companyId: string, idempotencyKey: string, executor: SelectExecutor = db) {
+  const [record] = await executor
     .select()
     .from(inquirySubmitIdempotency)
     .where(
@@ -98,9 +104,9 @@ async function persistIdempotencyRecord(input: {
   payloadHash: string;
   bookingRequestId: string;
   responseSnapshot: PublicInquirySubmitResult;
-}): Promise<void> {
+}, executor: InsertExecutor = db): Promise<void> {
   const expiresAt = new Date(Date.now() + IDEMPOTENCY_TTL_MS);
-  await db.insert(inquirySubmitIdempotency).values({
+  await executor.insert(inquirySubmitIdempotency).values({
     companyId: input.companyId,
     idempotencyKey: input.idempotencyKey,
     payloadHash: input.payloadHash,
@@ -112,9 +118,10 @@ async function persistIdempotencyRecord(input: {
 
 async function emitInquiryLifecycleEvents(
   inquiry: InquiryIntakeV1,
-  actor: { id?: string; type: "user" | "system" | "customer"; name?: string }
+  actor: { id?: string; type: "user" | "system" | "customer"; name?: string },
+  executor: InsertExecutor = db
 ): Promise<void> {
-  await emitEvent({
+  await emitEventWithExecutor(executor, {
     companyId: inquiry.companyId,
     eventType: "revenue.inquiry_received",
     actorId: actor.id,
@@ -129,13 +136,15 @@ async function emitInquiryLifecycleEvents(
       attributionProvenance: inquiry.attributionProvenance,
       classifiedIntent: inquiry.classifiedIntent,
       status: inquiry.status,
+      serviceability: inquiry.serviceability,
+      captureSurface: inquiry.consent.captureSurface,
       dedupeKey: inquiry.dedupeKey
     },
     summary: `Revenue inquiry received (${inquiry.channel})`
   });
 
   if (inquiry.status === "escalated") {
-    await emitEvent({
+    await emitEventWithExecutor(executor, {
       companyId: inquiry.companyId,
       eventType: "revenue.inquiry_escalated",
       actorId: actor.id,
@@ -185,9 +194,6 @@ export async function submitPublicInquiryIntake(
   sourceParam: string | undefined,
   idempotencyKey: string | undefined
 ): Promise<{ created: boolean; result: PublicInquirySubmitResult }> {
-  const coverage = await checkZipCoverage(slug, body.zip);
-  const serviceability: InquiryServiceability = coverage.covered ? "in_area" : "out_of_area";
-
   const payloadForHash = {
     slug,
     body,
@@ -195,7 +201,8 @@ export async function submitPublicInquiryIntake(
   };
   const payloadHash = hashInquirySubmitPayload(payloadForHash);
 
-  const companyId = await resolvePublicBookingCompanyId(slug);
+  const { company, settings } = await getPublicBookingContext(slug);
+  const companyId = settings.companyId;
 
   if (idempotencyKey) {
     const existing = await loadIdempotencyRecord(companyId, idempotencyKey);
@@ -211,7 +218,110 @@ export async function submitPublicInquiryIntake(
     }
   }
 
-  const submitResult = await submitBookingRequest(slug, body, sourceParam);
+  // A new shop can receive a direct inquiry before it has configured any offered service.
+  // This path never promises coverage, chooses a slot, confirms a booking, or queues a notification.
+  const configuredServices = Array.isArray(settings.offeredServices) ? settings.offeredServices : [];
+  if (configuredServices.length === 0) {
+    const { companyId: coverageCompanyId, serviceability } = await resolvePublicZipServiceability(slug, body.zip.trim());
+    if (coverageCompanyId !== companyId) {
+      throw new AppError(ErrorCode.CONFLICT, "Public inquiry tenant changed during submission");
+    }
+    if (serviceability === "out_of_area") {
+      throw new AppError(ErrorCode.CONFLICT, "This zip code is outside the current booking area");
+    }
+
+    return runTransactionWithTenantSession(companyId, async (tx) => {
+      if (idempotencyKey) {
+        await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${JSON.stringify([companyId, idempotencyKey])}, 0))`);
+        const existing = await loadIdempotencyRecord(companyId, idempotencyKey, tx);
+        if (existing) {
+          if (existing.payloadHash !== payloadHash) {
+            throw new AppError(ErrorCode.CONFLICT, "Idempotency key was already used with a different payload", {
+              reason: "idempotency_payload_mismatch"
+            });
+          }
+          return { created: false, result: existing.responseSnapshot as PublicInquirySubmitResult };
+        }
+      }
+
+      const actorName = `${body.firstName.trim()} ${body.lastName.trim()}`;
+      const { bookingRequest, customerId } = await createCompanyScopedInquiryBooking(
+        companyId,
+        {
+          firstName: body.firstName,
+          lastName: body.lastName,
+          phone: body.phone,
+          ...(body.email !== undefined ? { email: body.email } : {}),
+          addressLine1: body.addressLine1,
+          city: body.city,
+          state: body.state,
+          zip: body.zip,
+          customerNotes: body.customerNotes ?? null,
+          ...(body.serviceCategory !== undefined ? { serviceCategory: body.serviceCategory } : {}),
+          ...(body.serviceType !== undefined ? { serviceType: body.serviceType } : {}),
+          ...(body.serviceDetail !== undefined ? { serviceDetail: body.serviceDetail } : {}),
+          source: deriveSource(sourceParam ?? body.source),
+          smsConsentAppointments: body.smsConsentAppointments ?? false,
+          smsConsentMarketing: body.smsConsentMarketing ?? false,
+          serviceability,
+          captureSurface: "site/inquiry"
+        },
+        { id: null, type: "customer", name: actorName },
+        tx
+      );
+      const [row] = await tx.select().from(bookingRequests).where(and(
+        eq(bookingRequests.companyId, companyId),
+        eq(bookingRequests.id, bookingRequest.id),
+        isNull(bookingRequests.deletedAt)
+      )).limit(1);
+      if (!row) {
+        throw new AppError(ErrorCode.INTERNAL_ERROR, "Inquiry row missing after capture");
+      }
+      const priorDuplicate = await findRecentDuplicateRow(companyId, row.phone, row.email, row.id, tx);
+      const inquiry = mapBookingRowToInquiryIntakeV1(row, {
+        channel: "web_form",
+        attributionProvenance: sourceParam || body.source ? "query_param" : "unknown",
+        sourceAttribution: row.source,
+        captureSurface: "site/inquiry",
+        serviceability,
+        classifiedIntent: classifyFromBookingRow(row),
+        status: "open",
+        ...(priorDuplicate ? { dedupeKey: buildInquiryDedupeKey(companyId, row.phone, row.email) } : {}),
+        linkedCustomerId: customerId
+      });
+      await emitInquiryLifecycleEvents(inquiry, { type: "customer", name: actorName }, tx);
+
+      const result: PublicInquirySubmitResult = {
+        kind: "inquiry_only",
+        bookingRequest: {
+          id: bookingRequest.id,
+          referenceNumber: bookingRequest.referenceNumber,
+          status: "pending"
+        },
+        serviceability,
+        inquiry
+      };
+      if (idempotencyKey) {
+        await persistIdempotencyRecord({
+          companyId,
+          idempotencyKey,
+          payloadHash,
+          bookingRequestId: bookingRequest.id,
+          responseSnapshot: result
+        }, tx);
+      }
+      return { created: true, result };
+    });
+  }
+
+  const coverage = await checkZipCoverage(slug, body.zip);
+  const serviceability: InquiryServiceability = coverage.covered ? "in_area" : "out_of_area";
+
+  // 24/7 emergency: accepted only when the shop has emergency service on (and its trade is emergency-capable);
+  // otherwise downgraded to a normal request and reported back as `emergency.downgraded` (never rejected).
+  // Same guard submitBookingRequest applies internally; computed here only to report the resolution back.
+  const { input: effectiveBody, emergency } = applyPublicEmergencyGuard(body, company.settings);
+  const submitResult = await submitBookingRequest(slug, effectiveBody, sourceParam, emergency.downgraded);
   const [row] = await db
     .select()
     .from(bookingRequests)
@@ -253,7 +363,8 @@ export async function submitPublicInquiryIntake(
     },
     confirmation: submitResult.confirmation,
     holdToken: submitResult.holdToken,
-    inquiry
+    inquiry,
+    ...(emergency.requested ? { emergency } : {})
   };
 
   if (idempotencyKey) {
@@ -411,6 +522,76 @@ export async function intakeInboxInquiry(
   });
 
   return inquiry;
+}
+
+/**
+ * Growth — public service-by-ZIP page inquiry (no address). Reuses the FS-17 company-scoped inquiry booking
+ * (customer match/create + booking_requests row + booking.requested event) and the revenue inquiry lifecycle
+ * events. booking_requests.source is a closed enum without "service_page", so the row is stored as "website" and
+ * the precise lead source goes on customers.lead_source (varchar, only when unset) and the inquiry attribution.
+ */
+export async function intakeServicePageInquiry(
+  companyId: string,
+  input: {
+    firstName: string;
+    lastName: string;
+    phone: string;
+    email: string | null;
+    zip: string;
+    customerNotes: string | null;
+    leadSource: string;
+    serviceability: InquiryServiceability;
+  }
+): Promise<{ referenceNumber: string; inquiry: InquiryIntakeV1 }> {
+  const actorName = `${input.firstName} ${input.lastName}`.trim();
+  const { bookingRequest, customerId } = await createCompanyScopedInquiryBooking(
+    companyId,
+    {
+      firstName: input.firstName,
+      lastName: input.lastName,
+      phone: input.phone,
+      email: input.email,
+      addressLine1: "Not provided (service page inquiry)",
+      city: "Pending",
+      state: "XX",
+      zip: input.zip,
+      customerNotes: input.customerNotes,
+      source: "website"
+    },
+    { id: null, type: "customer", name: actorName }
+  );
+
+  await db
+    .update(customers)
+    .set({ leadSource: input.leadSource })
+    .where(and(eq(customers.id, customerId), eq(customers.companyId, companyId), isNull(customers.leadSource)));
+
+  const [row] = await db
+    .select()
+    .from(bookingRequests)
+    .where(and(eq(bookingRequests.id, bookingRequest.id), eq(bookingRequests.companyId, companyId)))
+    .limit(1);
+
+  if (!row) {
+    throw new AppError(ErrorCode.INTERNAL_ERROR, "Inquiry booking row missing after service page intake");
+  }
+
+  const priorDuplicate = await findRecentDuplicateRow(companyId, row.phone, row.email, row.id);
+  const inquiry = await buildInquiryFromRow(
+    row,
+    {
+      channel: "web_form",
+      attributionProvenance: "query_param",
+      sourceAttribution: input.leadSource,
+      captureSurface: "site/service_page",
+      serviceability: input.serviceability
+    },
+    priorDuplicate,
+    customerId
+  );
+
+  await emitInquiryLifecycleEvents(inquiry, { type: "customer", name: actorName });
+  return { referenceNumber: bookingRequest.referenceNumber ?? bookingRequest.id, inquiry };
 }
 
 export async function getInquiryIntakeForBookingRequest(

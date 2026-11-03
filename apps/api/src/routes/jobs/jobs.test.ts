@@ -385,6 +385,33 @@ describe("job routes", () => {
     expect(addQueueJob).toHaveBeenCalledTimes(1);
   });
 
+  it("POST /jobs/:id/complete rejects a stale client while a required task remains open", async () => {
+    const auth = createAuthContext();
+    const { customer } = seedJobGraph(auth.company.id);
+    const job = fakeDb.seedJob({ companyId: auth.company.id, customerId: customer.id, title: "Required Check", status: "in_progress" });
+    const task = fakeDb.seedJobTask({ companyId: auth.company.id, jobId: job.id, title: "Confirm safe shutdown", isRequired: true });
+
+    const blocked = await request(app.server)
+      .post(`/api/v1/jobs/${job.id}/complete`)
+      .set("Authorization", auth.authorization)
+      .send({});
+    expect(blocked.status).toBe(409);
+    expect(blocked.body.error).toBe("CONFLICT");
+    expect(blocked.body.message).toMatch(/required checklist/i);
+    expect(fakeDb.getTestState().jobs.find((row) => row.id === job.id)?.status).toBe("in_progress");
+    expect(addQueueJob).not.toHaveBeenCalled();
+
+    const taskDone = await request(app.server)
+      .post(`/api/v1/jobs/${job.id}/tasks/${task.id}/complete`)
+      .set("Authorization", auth.authorization);
+    expect(taskDone.status).toBe(200);
+    const retried = await request(app.server)
+      .post(`/api/v1/jobs/${job.id}/complete`)
+      .set("Authorization", auth.authorization)
+      .send({});
+    expect(retried.status).toBe(200);
+  });
+
   it("notes and photos endpoints create and list job artifacts", async () => {
     const auth = createAuthContext();
     const { customer } = seedJobGraph(auth.company.id);

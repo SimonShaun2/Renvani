@@ -7,7 +7,7 @@ import {
   buildBrandedStorefrontViewModel,
   buildLocalBusinessJsonLd
 } from "@/src/components/growth/branded-storefront.utils";
-import { buildOpeningHours, buildSiteMetadataCopy } from "@/src/components/growth/site-trade.registry";
+import { buildSiteMetadataCopy } from "@/src/components/growth/site-trade.registry";
 import { resolveSiteTradeFromSettings } from "@/src/components/growth/site-trade.from-settings";
 import { fetchPublicBookingSettingsBySlug } from "@/src/lib/public-booking-server";
 
@@ -45,8 +45,7 @@ export default async function BrandedWebsitePage({ params }: { params: Promise<{
   const model = buildBrandedStorefrontViewModel(settings);
   const sitePath = `/site/${slug}`;
   const jsonLd = buildLocalBusinessJsonLd(model, sitePath, {
-    trade: resolveSiteTradeFromSettings(settings),
-    openingHours: buildOpeningHours(settings)
+    trade: resolveSiteTradeFromSettings(settings)
   });
 
   return (

@@ -78,7 +78,14 @@ export async function escalateAgentAction(
         },
         updatedAt: now
       })
-      .where(and(scoped, inArray(agentActions.state, [...ESCALATABLE_AGENT_ACTION_STATES])))
+      .where(
+        and(
+          eq(agentActions.companyId, companyId),
+          eq(agentActions.id, actionId),
+          isNull(agentActions.deletedAt),
+          inArray(agentActions.state, [...ESCALATABLE_AGENT_ACTION_STATES])
+        )
+      )
       .returning();
     const [updatedRow] = updated;
     if (!updatedRow) {

@@ -9,7 +9,6 @@ import {
   buildBrandedStorefrontViewModel,
   buildLocalBusinessJsonLd
 } from "@/src/components/growth/branded-storefront.utils";
-import { buildOpeningHours } from "@/src/components/growth/site-trade.registry";
 import { resolveSiteTradeFromSettings } from "@/src/components/growth/site-trade.from-settings";
 import { fetchPublicBookingSettingsBySlug } from "@/src/lib/public-booking-server";
 import { isWebAssistantEnabled } from "@fsm/config/feature-flags";
@@ -56,8 +55,7 @@ export default async function BrandedInquiryPage({
   const acquisitionSource = query.src?.trim() || BRANDED_ACQUISITION_SOURCE;
   const sitePath = `/site/${slug}`;
   const jsonLd = buildLocalBusinessJsonLd(model, sitePath, {
-    trade: resolveSiteTradeFromSettings(settings),
-    openingHours: buildOpeningHours(settings)
+    trade: resolveSiteTradeFromSettings(settings)
   });
 
   return (

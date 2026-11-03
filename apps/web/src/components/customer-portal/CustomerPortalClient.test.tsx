@@ -25,8 +25,9 @@ const EMPTY: Record<string, unknown> = {
   "/me/invoices": { invoices: [] }
 };
 
-function renderPortal() {
-  const client = new QueryClient({ defaultOptions: { queries: { retry: false, gcTime: 0 } } });
+function renderPortal(
+  client = new QueryClient({ defaultOptions: { queries: { retry: false, gcTime: 0 } } })
+) {
   return render(
     <QueryClientProvider client={client}>
       <CustomerPortalClient />
@@ -113,6 +114,24 @@ describe("CustomerPortalClient", () => {
     await waitFor(() => expect(window.sessionStorage.getItem("renvani.customer-portal.token")).toBeNull());
   });
 
+  it("drops the previous customer's cached data when a loaded credential expires", async () => {
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false, gcTime: 60_000 } } });
+    renderPortal(client);
+    expect(await screen.findByText("AC tune-up")).toBeTruthy();
+    expect(client.getQueryCache().findAll({ queryKey: ["customer-portal"] }).length).toBeGreaterThan(0);
+
+    mode = "expired";
+    await client.refetchQueries({ queryKey: ["customer-portal"] });
+
+    expect(await screen.findByText("This link has expired")).toBeTruthy();
+    await waitFor(() => {
+      const retained = client.getQueryCache().findAll({ queryKey: ["customer-portal"] });
+      expect(retained.every((query) => query.queryKey[1] === "none")).toBe(true);
+      expect(retained.every((query) => query.state.data === undefined)).toBe(true);
+      expect(window.sessionStorage.getItem("renvani.customer-portal.token")).toBeNull();
+    });
+  });
+
   it("shows link expired when no token is present", async () => {
     window.history.replaceState(null, "", "/portal");
     renderPortal();
@@ -160,5 +179,16 @@ describe("customer portal credential changes (Bugbot #222)", () => {
     await waitFor(() => expect(seenHeaders.filter((h) => h === "replacement.token").length).toBeGreaterThanOrEqual(4));
     expect(seenHeaders).not.toContain("jwt.portal.token");
     expect(window.location.hash).toBe("");
+  });
+
+  it.each(["#token=", "#token=%20"])("clears the previous customer's session for an empty link (%s)", async (fragment) => {
+    renderPortal();
+    await screen.findByText("AC tune-up");
+    window.history.replaceState(null, "", `/portal${fragment}`);
+    window.dispatchEvent(new HashChangeEvent("hashchange"));
+    expect(await screen.findByText("This link has expired")).toBeTruthy();
+    expect(screen.queryByText("AC tune-up")).toBeNull();
+    expect(window.location.hash).toBe("");
+    expect(window.sessionStorage.getItem("renvani.customer-portal.token")).toBeNull();
   });
 });

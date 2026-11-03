@@ -1,6 +1,7 @@
 /** FS-234 consent authority. Not wired to outbound execution until migration 0062 and review gates land. */
 import { randomUUID } from "node:crypto";
 import { and, eq, isNull, sql } from "drizzle-orm";
+import { z } from "zod";
 
 import {
   bookingRequests,
@@ -17,12 +18,14 @@ import {
   evaluateCurrentOutboundConsent,
   outboundConsentIntentSchema,
   outboundConsentKeySchema,
+  outboundConsentChannelSchema,
+  outboundConsentPurposeSchema,
   type OutboundConsentCheck,
   type OutboundConsentKey,
   type OutboundConsentDecisionInput,
 } from "@fsm/types";
 import { assertConsentReplayMatches, assertVerifiedConsentSource, fingerprintConsentDecision } from "./outbound-consent-decision.js";
-import { verifyPersistedConsentReceipt, type TrustedConsentActor } from "./outbound-consent-receipt.js";
+import { fingerprintConsentCaptureReceipt, verifyPersistedConsentReceipt, type ConsentCaptureReceiptFacts, type TrustedConsentActor } from "./outbound-consent-receipt.js";
 
 type TenantTx = Parameters<Parameters<typeof runTransactionWithTenantSession>[1]>[0];
 type ActiveSubject = { companyId: string; contact: string | null; doNotContact: boolean };
@@ -37,6 +40,13 @@ function assertTrustedTenant(companyId: string, keyCompanyId: string): void {
 
 // Source-specific receipt writers and approved public copy are not present. Keep the generic writer inert.
 const CONSENT_RECEIPT_BOUNDARY_ACTIVE = false;
+
+export const operatorRevokeSchema = z.object({
+  customerId: z.string().uuid(),
+  channel: outboundConsentChannelSchema,
+  purpose: outboundConsentPurposeSchema,
+  idempotencyKey: z.string().trim().min(1).max(128),
+}).strict();
 
 function keyWhere(key: OutboundConsentKey) {
   return and(
@@ -92,7 +102,14 @@ export async function recordOutboundConsentDecision(actor: TrustedConsentActor, 
   if (!CONSENT_RECEIPT_BOUNDARY_ACTIVE) {
     throw new AppError(ErrorCode.POLICY_DENIED, "Verified consent receipt boundary is not active");
   }
-  return runTransactionWithTenantSession(actor.companyId, async (tx) => {
+  return runTransactionWithTenantSession(actor.companyId, (tx) => recordVerifiedDecisionInTransaction(tx, actor, intent));
+}
+
+async function recordVerifiedDecisionInTransaction(
+  tx: TenantTx,
+  actor: TrustedConsentActor,
+  intent: z.output<typeof outboundConsentIntentSchema>,
+) {
     const [receipt] = await tx.select().from(outboundConsentCaptureReceipts).where(and(
       eq(outboundConsentCaptureReceipts.companyId, actor.companyId),
       eq(outboundConsentCaptureReceipts.id, intent.receiptId),
@@ -163,6 +180,52 @@ export async function recordOutboundConsentDecision(actor: TrustedConsentActor, 
       summary: input.decision === "grant" ? "Outbound consent granted" : "Outbound consent revoked",
     });
     return event;
+}
+
+/** Office staff may revoke a current customer's destination; never use this path to grant. */
+export async function revokeOperatorOutboundConsent(actor: TrustedConsentActor, raw: unknown) {
+  const input = operatorRevokeSchema.parse(raw);
+  if (actor.actorType !== "user" || !actor.actorId) {
+    throw new AppError(ErrorCode.FORBIDDEN, "Authenticated operator required for consent revocation");
+  }
+  const operatorId = actor.actorId;
+  return runTransactionWithTenantSession(actor.companyId, async (tx) => {
+    await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${JSON.stringify([actor.companyId, input.idempotencyKey])}, 0))`);
+    const [customer] = await tx.select({ email: customers.email, phone: customers.phone }).from(customers).where(and(
+      eq(customers.companyId, actor.companyId), eq(customers.id, input.customerId), isNull(customers.deletedAt),
+    )).limit(1);
+    if (!customer) throw new AppError(ErrorCode.NOT_FOUND, "Active customer unavailable");
+    const contact = input.channel === "email" ? customer.email : customer.phone;
+    if (!contact) throw new AppError(ErrorCode.NOT_FOUND, "Customer destination unavailable");
+    const key = outboundConsentKeySchema.parse({
+      companyId: actor.companyId, subjectType: "customer", subjectId: input.customerId,
+      channel: input.channel, purpose: input.purpose, contact,
+    });
+    const [existing] = await tx.select().from(outboundConsentCaptureReceipts).where(and(
+      eq(outboundConsentCaptureReceipts.companyId, actor.companyId),
+      eq(outboundConsentCaptureReceipts.idempotencyKey, input.idempotencyKey),
+    )).limit(1);
+    const receiptId = existing?.id ?? randomUUID();
+    const receiptFacts: Omit<ConsentCaptureReceiptFacts, "payloadFingerprint"> = {
+      id: receiptId, ...key, decision: "revoke", explicitChoice: true,
+      statementVersion: "operator-revoke-v1", sourceRecordId: operatorId,
+      sourceSurface: "operator", actorType: "user", actorId: operatorId,
+      signedInboundIdentity: null, signatureVerifiedAt: null,
+      capturedAt: existing?.capturedAt ?? new Date(), idempotencyKey: input.idempotencyKey,
+      deletedAt: null,
+    };
+    const payloadFingerprint = fingerprintConsentCaptureReceipt(receiptFacts);
+    if (existing) {
+      if (existing.deletedAt || existing.payloadFingerprint !== payloadFingerprint) {
+        throw new AppError(ErrorCode.CONFLICT, "Consent idempotency key has a different decision");
+      }
+    } else {
+      await tx.insert(outboundConsentCaptureReceipts).values({ ...receiptFacts, payloadFingerprint });
+    }
+    const intent = outboundConsentIntentSchema.parse({
+      key, decision: "revoke", receiptId, idempotencyKey: input.idempotencyKey,
+    });
+    return recordVerifiedDecisionInTransaction(tx, actor, intent);
   });
 }
 

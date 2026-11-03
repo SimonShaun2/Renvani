@@ -1,7 +1,9 @@
 import type { FastifyPluginAsync } from "fastify";
+import { z } from "zod";
 
 import { requireRole } from "../../lib/authorize.js";
 import { issueCustomerPortalLink } from "../../services/customer-portal.service.js";
+import { operatorRevokeSchema, revokeOperatorOutboundConsent } from "../../services/outbound-consent.service.js";
 
 import {
   createAssetHandler,
@@ -108,6 +110,19 @@ const customerRoutes: FastifyPluginAsync = async (fastify) => {
       const link = await issueCustomerPortalLink(request.company.id, id);
       return reply.status(201).send({ link });
     }
+  );
+  fastify.post(
+    "/:id/outbound-consent/revoke",
+    { preHandler: [fastify.authenticate, requireRole(["owner", "admin"])] },
+    async (request, reply) => {
+      const { id } = z.object({ id: z.string().uuid() }).parse(request.params);
+      const body = operatorRevokeSchema.omit({ customerId: true }).parse(request.body);
+      const event = await revokeOperatorOutboundConsent(
+        { companyId: request.company.id, actorType: "user", actorId: request.user.id },
+        { ...body, customerId: id },
+      );
+      return reply.status(200).send({ id: event.id, version: event.version, state: event.currentState });
+    },
   );
   fastify.get(
     "/:id/imported-history",

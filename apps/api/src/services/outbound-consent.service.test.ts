@@ -1,13 +1,19 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const runTransactionWithTenantSession = vi.hoisted(() => vi.fn());
+const tables = vi.hoisted(() => ({
+  bookingRequests: { kind: "bookingRequests" }, customers: { kind: "customers" },
+  outboundConsentEvents: { kind: "events" }, outboundConsentStates: { kind: "states" },
+  outboundConsentCaptureReceipts: { kind: "receipts" },
+}));
+const emitEventWithExecutor = vi.hoisted(() => vi.fn());
 vi.mock("@fsm/db", () => ({
   runTransactionWithTenantSession,
-  bookingRequests: {}, customers: {}, outboundConsentEvents: {}, outboundConsentStates: {}, outboundConsentCaptureReceipts: {},
-  emitEventWithExecutor: vi.fn(),
+  ...tables,
+  emitEventWithExecutor,
 }));
 
-import { checkOutboundConsent, recordOutboundConsentDecision } from "./outbound-consent.service.js";
+import { checkOutboundConsent, recordOutboundConsentDecision, revokeOperatorOutboundConsent } from "./outbound-consent.service.js";
 
 const tenantA = "11111111-1111-4111-8111-111111111111";
 const tenantB = "22222222-2222-4222-8222-222222222222";
@@ -51,5 +57,68 @@ describe("FS-234 trusted tenant and evidence boundary", () => {
       })).rejects.toMatchObject({ code: "POLICY_DENIED" });
     }
     expect(runTransactionWithTenantSession).not.toHaveBeenCalled();
+  });
+});
+
+describe("FS-234 source-specific operator revocation", () => {
+  const operator = { ...actor, companyId: tenantB };
+  const input = { customerId: subjectId, channel: "email", purpose: "marketing", idempotencyKey: "revoke-one" };
+
+  beforeEach(() => {
+    runTransactionWithTenantSession.mockReset();
+    emitEventWithExecutor.mockReset();
+  });
+
+  it("rejects unauthenticated actors, grants and forged evidence before a transaction", async () => {
+    await expect(revokeOperatorOutboundConsent({ ...operator, actorType: "system", actorId: null }, input))
+      .rejects.toMatchObject({ code: "FORBIDDEN" });
+    await expect(revokeOperatorOutboundConsent(operator, { ...input, decision: "grant" })).rejects.toThrow();
+    await expect(revokeOperatorOutboundConsent(operator, { ...input, contact: "forged@example.com" })).rejects.toThrow();
+    expect(runTransactionWithTenantSession).not.toHaveBeenCalled();
+  });
+
+  it("writes a server-derived receipt, revocation and activity in one tenant transaction and replays idempotently", async () => {
+    const receipts: Record<string, unknown>[] = [];
+    const events: Record<string, unknown>[] = [];
+    const states: Record<string, unknown>[] = [];
+    const tx = {
+      execute: vi.fn().mockResolvedValue(undefined),
+      select: vi.fn().mockImplementation(() => ({
+        from: (table: { kind: string }) => ({
+          where: () => ({ limit: () => {
+            const rows = table === tables.customers ? [{ email: "Test@Example.com", phone: null, doNotContact: false }]
+              : table === tables.outboundConsentCaptureReceipts ? receipts
+              : table === tables.outboundConsentEvents ? events
+                : table === tables.outboundConsentStates ? states : [];
+            return { then: (resolve: (value: unknown) => void) => resolve(rows.slice(0, 1)),
+              for: () => Promise.resolve(rows.slice(0, 1)) };
+          } }),
+        }),
+      })),
+      insert: vi.fn().mockImplementation((table: { kind: string }) => ({
+        values: (value: Record<string, unknown>) => {
+          const rows = table === tables.outboundConsentCaptureReceipts ? receipts
+            : table === tables.outboundConsentStates ? states : events;
+          const saved = { ...value, occurredAt: new Date("2026-11-03T00:00:00Z") };
+          rows.push(saved);
+          return { then: (resolve: (value: unknown) => void) => resolve(undefined),
+            returning: () => Promise.resolve([saved]) };
+        },
+      })),
+      update: vi.fn().mockImplementation(() => ({ set: () => ({ where: () => Promise.resolve() }) })),
+    };
+    runTransactionWithTenantSession.mockImplementation(async (_companyId: string, work: (transaction: typeof tx) => Promise<unknown>) => work(tx));
+    const first = await revokeOperatorOutboundConsent(operator, input);
+    const second = await revokeOperatorOutboundConsent(operator, input);
+    expect(first).toEqual(second);
+    await expect(revokeOperatorOutboundConsent(operator, { ...input, purpose: "appointment" }))
+      .rejects.toMatchObject({ code: "CONFLICT" });
+    expect(runTransactionWithTenantSession).toHaveBeenCalledWith(tenantB, expect.any(Function));
+    expect(receipts).toHaveLength(1);
+    expect(receipts[0]).toMatchObject({ companyId: tenantB, contact: "test@example.com", decision: "revoke",
+      sourceSurface: "operator", actorId: operator.actorId, explicitChoice: true });
+    expect(events).toHaveLength(1);
+    expect(events[0]).toMatchObject({ companyId: tenantB, currentState: "revoked", sourceKind: "operator_revoke" });
+    expect(emitEventWithExecutor).toHaveBeenCalledTimes(1);
   });
 });

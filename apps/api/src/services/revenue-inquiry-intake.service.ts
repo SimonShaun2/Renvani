@@ -10,7 +10,8 @@ import {
   type InquiryServiceability,
   type PublicInquirySubmitResult,
   type StaffInquiryIntakeInput,
-  type SubmitBookingRequestInput
+  type SubmitBookingRequestInput,
+  type WebAssistantHandoffReason
 } from "@fsm/types";
 
 import {
@@ -103,7 +104,7 @@ async function persistIdempotencyRecord(input: {
   idempotencyKey: string;
   payloadHash: string;
   bookingRequestId: string;
-  responseSnapshot: PublicInquirySubmitResult;
+  responseSnapshot: PublicInquirySubmitResult | AssistantHandoffSnapshot;
 }, executor: InsertExecutor = db): Promise<void> {
   const expiresAt = new Date(Date.now() + IDEMPOTENCY_TTL_MS);
   await executor.insert(inquirySubmitIdempotency).values({
@@ -116,10 +117,107 @@ async function persistIdempotencyRecord(input: {
   });
 }
 
+type AssistantHandoffSnapshot = {
+  bookingRequestId: string;
+  referenceNumber: string;
+  reason: WebAssistantHandoffReason;
+};
+
+/**
+ * FS-197 web assistant handoff. This is the existing Revenue inquiry write boundary: a pending booking_request,
+ * customer match, consent, source, and lifecycle events are committed with a tenant-scoped idempotency record.
+ * No slot, job, outbound notification, or auto-confirm path is reachable here.
+ */
+export async function intakeWebAssistantHandoff(companyId: string, input: {
+  firstName: string;
+  lastName: string;
+  phone: string;
+  email: string | null;
+  addressLine1: string;
+  city: string;
+  state: string;
+  zip: string;
+  service: string | null;
+  message: string;
+  source: "google" | "facebook" | "instagram" | "yelp" | "direct" | "website" | "qr_code";
+  serviceability: InquiryServiceability;
+  reason: WebAssistantHandoffReason;
+  smsConsentAppointments: boolean;
+  smsConsentMarketing: boolean;
+  idempotencyKey: string;
+}): Promise<{ created: boolean; result: AssistantHandoffSnapshot }> {
+  const key = `web-assistant:${input.idempotencyKey}`;
+  const payloadHash = hashInquirySubmitPayload({ companyId, input });
+  return runTransactionWithTenantSession(companyId, async (tx) => {
+    await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${JSON.stringify([companyId, key])}, 0))`);
+    const existing = await loadIdempotencyRecord(companyId, key, tx);
+    if (existing) {
+      if (existing.payloadHash !== payloadHash) {
+        throw new AppError(ErrorCode.CONFLICT, "Idempotency key was already used with a different payload", {
+          reason: "idempotency_payload_mismatch"
+        });
+      }
+      return { created: false, result: existing.responseSnapshot as AssistantHandoffSnapshot };
+    }
+
+    const actorName = `${input.firstName} ${input.lastName}`.trim();
+    const { bookingRequest, customerId } = await createCompanyScopedInquiryBooking(companyId, {
+      firstName: input.firstName,
+      lastName: input.lastName,
+      phone: input.phone,
+      email: input.email,
+      addressLine1: input.addressLine1,
+      city: input.city,
+      state: input.state,
+      zip: input.zip,
+      customerNotes: `Assistant handoff (${input.reason})${input.service ? `\nService: ${input.service}` : ""}\n${input.message}`,
+      source: input.source,
+      smsConsentAppointments: input.smsConsentAppointments,
+      smsConsentMarketing: input.smsConsentMarketing,
+      serviceability: input.serviceability,
+      captureSurface: "site/web_assistant"
+    }, { id: null, type: "customer", name: actorName }, tx);
+
+    const [row] = await tx.select().from(bookingRequests).where(and(
+      eq(bookingRequests.companyId, companyId),
+      eq(bookingRequests.id, bookingRequest.id),
+      isNull(bookingRequests.deletedAt)
+    )).limit(1);
+    if (!row) throw new AppError(ErrorCode.INTERNAL_ERROR, "Assistant inquiry missing after capture");
+    const priorDuplicate = await findRecentDuplicateRow(companyId, row.phone, row.email, row.id, tx);
+    const inquiry = mapBookingRowToInquiryIntakeV1(row, {
+      channel: "web_form",
+      attributionProvenance: "query_param",
+      sourceAttribution: `web_assistant:${input.source}`,
+      captureSurface: "site/web_assistant",
+      serviceability: input.serviceability,
+      classifiedIntent: classifyFromBookingRow(row),
+      status: "escalated",
+      escalationReason: input.reason,
+      ...(priorDuplicate ? { dedupeKey: buildInquiryDedupeKey(companyId, row.phone, row.email) } : {}),
+      linkedCustomerId: customerId
+    });
+    await emitInquiryLifecycleEvents(inquiry, { type: "customer", name: actorName }, tx, {
+      contactConsent: true,
+      smsConsentAppointments: input.smsConsentAppointments,
+      smsConsentMarketing: input.smsConsentMarketing
+    });
+    const result = {
+      bookingRequestId: bookingRequest.id,
+      referenceNumber: bookingRequest.referenceNumber ?? bookingRequest.id,
+      reason: input.reason
+    };
+    await persistIdempotencyRecord({ companyId, idempotencyKey: key, payloadHash,
+      bookingRequestId: bookingRequest.id, responseSnapshot: result }, tx);
+    return { created: true, result };
+  });
+}
+
 async function emitInquiryLifecycleEvents(
   inquiry: InquiryIntakeV1,
   actor: { id?: string; type: "user" | "system" | "customer"; name?: string },
-  executor: InsertExecutor = db
+  executor: InsertExecutor = db,
+  consentAudit?: { contactConsent: true; smsConsentAppointments: boolean; smsConsentMarketing: boolean }
 ): Promise<void> {
   await emitEventWithExecutor(executor, {
     companyId: inquiry.companyId,
@@ -138,7 +236,8 @@ async function emitInquiryLifecycleEvents(
       status: inquiry.status,
       serviceability: inquiry.serviceability,
       captureSurface: inquiry.consent.captureSurface,
-      dedupeKey: inquiry.dedupeKey
+      dedupeKey: inquiry.dedupeKey,
+      ...(consentAudit ? { consentAudit } : {})
     },
     summary: `Revenue inquiry received (${inquiry.channel})`
   });

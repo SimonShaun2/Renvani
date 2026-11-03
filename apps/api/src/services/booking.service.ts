@@ -2196,7 +2196,7 @@ export interface CompanyInquiryBookingInput {
   source: BookingRequest["source"];
   smsConsentAppointments?: boolean;
   smsConsentMarketing?: boolean;
-  serviceability?: "unknown" | "in_area";
+  serviceability?: "unknown" | "in_area" | "out_of_area";
   captureSurface?: string;
 }
 

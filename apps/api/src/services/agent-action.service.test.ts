@@ -1,6 +1,6 @@
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { ErrorCode } from "@fsm/types";
+import { AppError, ErrorCode } from "@fsm/types";
 
 import { AGENT_POLICY_V1 } from "./agent-action.policy.js";
 import { setupTestEnv } from "../test-support/env-setup.js";
@@ -183,7 +183,7 @@ describe("executeAgentAction service.job_brief.propose apply (FS-25 follow-up)",
     return record;
   }
 
-  it("rolls back to approved (not succeeded) when the brief apply fails", async () => {
+  it("records failed (not succeeded, not a silent rollback) when the brief apply throws unexpectedly (TE-FAIL-01)", async () => {
     const tenant = fakeDb.seedCompany({ name: "Tenant S", slug: "tenant-s-fail" });
     const action = seedApprovedBriefAction(tenant.id);
     briefApply.applyApprovedJobServiceBriefInTransaction.mockRejectedValueOnce(new Error("apply failed"));
@@ -191,6 +191,21 @@ describe("executeAgentAction service.job_brief.propose apply (FS-25 follow-up)",
     await expect(
       agentActionService.executeAgentAction(tenant.id, action.id, "reviewer-1")
     ).rejects.toThrow("apply failed");
+
+    const stored = fakeDb.getTestState().agentActions.find((row) => row.id === action.id);
+    // The apply's writes rolled back with the execute tx; the failure itself is recorded afterwards.
+    expect(stored?.state).toBe("failed");
+    expect(stored?.executionReceipt).toMatchObject({ outcome: "failed", error: { code: "EXECUTION_FAILED" } });
+  });
+
+  it("rolls back to approved (no failed record) when the brief apply rejects with an AppError", async () => {
+    const tenant = fakeDb.seedCompany({ name: "Tenant S", slug: "tenant-s-apperr" });
+    const action = seedApprovedBriefAction(tenant.id);
+    briefApply.applyApprovedJobServiceBriefInTransaction.mockRejectedValueOnce(new AppError(ErrorCode.CONFLICT, "brief stale"));
+
+    await expect(
+      agentActionService.executeAgentAction(tenant.id, action.id, "reviewer-1")
+    ).rejects.toThrow("brief stale");
 
     const stored = fakeDb.getTestState().agentActions.find((row) => row.id === action.id);
     expect(stored?.state).toBe("approved");

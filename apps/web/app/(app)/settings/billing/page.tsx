@@ -37,7 +37,7 @@ export default function SettingsBillingPage() {
   return (
     <PageLayout
       title="Billing"
-      subtitle="Review the current ServiceRev subscription plan and any available usage details."
+      subtitle="Review the current Renvani subscription plan and any available usage details."
     >
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
         <section className="rounded-[30px] border border-neutral-200 bg-white px-6 py-6 shadow-sm">
@@ -73,7 +73,7 @@ export default function SettingsBillingPage() {
             <div className="rounded-[24px] border border-dashed border-neutral-300 bg-neutral-50 px-6 py-10 text-center">
               <h2 className="text-lg font-semibold text-neutral-900">Billing details are not available yet</h2>
               <p className="mt-3 text-sm text-neutral-500">
-                ServiceRev subscription plan metadata has not been synced into the company settings record for this account yet.
+                Renvani subscription plan metadata has not been synced into the company settings record for this account yet.
               </p>
             </div>
           )}

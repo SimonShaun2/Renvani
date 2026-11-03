@@ -1,4 +1,5 @@
 import type { FastifyPluginAsync } from "fastify";
+import { requireRole } from "../../lib/authorize.js";
 
 import {
   addEstimateItemHandler,
@@ -16,6 +17,7 @@ import {
   updateEstimateHandler,
   updateEstimateItemHandler
 } from "./handlers.js";
+import { registerEstimateOptionSetRoutes } from "./option-sets.js";
 import {
   addEstimateItemSchema,
   addEstimateItemValidation,
@@ -43,93 +45,98 @@ import {
 
 const estimateRoutes: FastifyPluginAsync = async (fastify) => {
   const authenticate = fastify.authenticate;
+  const officeOnly = [authenticate, requireRole(["owner", "admin", "dispatcher"])];
+  const officeOrTechnician = [authenticate, requireRole(["owner", "admin", "dispatcher", "technician"])];
+
+  // FS-212 option sets (registered first; static "option-sets" segment wins over "/:id").
+  registerEstimateOptionSetRoutes(fastify);
 
   fastify.get("/", {
-    preHandler: authenticate,
+    preHandler: officeOnly,
     preValidation: listEstimatesValidation,
     schema: listEstimatesSchema
   }, listEstimatesHandler);
 
   fastify.post("/", {
-    preHandler: authenticate,
+    preHandler: officeOnly,
     preValidation: createEstimateValidation,
     schema: createEstimateSchema
   }, createEstimateHandler);
 
   fastify.get("/:id", {
-    preHandler: authenticate,
+    preHandler: officeOrTechnician,
     preValidation: estimateIdValidation,
     schema: getEstimateSchema
   }, getEstimateHandler);
 
   fastify.patch("/:id", {
-    preHandler: authenticate,
+    preHandler: officeOnly,
     preValidation: updateEstimateValidation,
     schema: updateEstimateSchema
   }, updateEstimateHandler);
 
   fastify.delete("/:id", {
-    preHandler: authenticate,
+    preHandler: officeOnly,
     preValidation: estimateIdValidation,
     schema: deleteEstimateSchema
   }, deleteEstimateHandler);
 
   fastify.post("/:id/send", {
-    preHandler: authenticate,
+    preHandler: officeOnly,
     preValidation: estimateIdValidation,
     schema: sendEstimateSchema
   }, sendEstimateHandler);
 
   fastify.post("/:id/approve", {
-    preHandler: authenticate,
+    preHandler: officeOnly,
     preValidation: estimateIdValidation,
     schema: approveEstimateSchema
   }, approveEstimateHandler);
 
   fastify.post("/:id/decline", {
-    preHandler: authenticate,
+    preHandler: officeOnly,
     preValidation: declineEstimateValidation,
     schema: declineEstimateRouteSchema
   }, declineEstimateHandler);
 
   fastify.post("/:id/revise", {
-    preHandler: authenticate,
+    preHandler: officeOnly,
     preValidation: estimateIdValidation,
     schema: reviseEstimateSchema
   }, reviseEstimateHandler);
 
   fastify.post("/:id/convert", {
-    preHandler: authenticate,
+    preHandler: officeOnly,
     preValidation: estimateIdValidation,
     schema: convertEstimateSchema
   }, convertEstimateHandler);
 
   fastify.post("/:id/convert-to-job", {
-    preHandler: authenticate,
+    preHandler: officeOnly,
     preValidation: estimateIdValidation,
     schema: convertEstimateSchema
   }, convertEstimateHandler);
 
   fastify.get("/:id/items", {
-    preHandler: authenticate,
+    preHandler: officeOrTechnician,
     preValidation: estimateIdValidation,
     schema: listEstimateItemsSchema
   }, listEstimateItemsHandler);
 
   fastify.post("/:id/items", {
-    preHandler: authenticate,
+    preHandler: officeOnly,
     preValidation: addEstimateItemValidation,
     schema: addEstimateItemSchema
   }, addEstimateItemHandler);
 
   fastify.patch("/:id/items/:itemId", {
-    preHandler: authenticate,
+    preHandler: officeOnly,
     preValidation: updateEstimateItemValidation,
     schema: updateEstimateItemRouteSchema
   }, updateEstimateItemHandler);
 
   fastify.delete("/:id/items/:itemId", {
-    preHandler: authenticate,
+    preHandler: officeOnly,
     preValidation: estimateItemIdValidation,
     schema: deleteEstimateItemSchema
   }, deleteEstimateItemHandler);

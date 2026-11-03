@@ -8,6 +8,7 @@ const TEST_ENV_VALUES = {
   WEBHOOK_PORT: "3002",
   DATABASE_URL: "postgres://postgres:postgres@localhost:5432/fsm",
   REDIS_URL: "redis://localhost:6379",
+  REVENUE_AGENT_PROPOSALS_ENABLED: "true",
   STRIPE_SECRET_KEY: "sk_test_dummy",
   STRIPE_WEBHOOK_SECRET: "whsec_dummy",
   STRIPE_CONNECT_CLIENT_ID: "ca_test_dummy",

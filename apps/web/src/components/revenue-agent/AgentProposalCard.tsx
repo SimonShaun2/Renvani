@@ -2,7 +2,7 @@ import type { OperatorInboxItem } from "@fsm/types";
 
 import { cn } from "@/src/lib/utils";
 
-import { availableActions, proposalStateLabel, proposalTypeConfig, type ProposalActionKey } from "./proposal.config";
+import { availableActions, consentBlockedCopy, proposalStateLabel, proposalTypeConfig, type ProposalActionKey } from "./proposal.config";
 
 const toneClass = {
   primary: "bg-brand-accent text-white hover:bg-brand-primary",
@@ -16,12 +16,27 @@ export interface AgentProposalCardProps {
   busy?: boolean;
   onSelect?: (id: string) => void;
   onAction?: (id: string, action: ProposalActionKey) => void;
+  /** When set, the card shows the consent-blocked state (Figma 10:363) instead of approve/edit. */
+  consentBlocked?: { channel: "sms" | "email"; reason?: string } | null;
+  /** Request consent. Omitted when no API exists: the button renders disabled. */
+  onRequestConsent?: ((id: string) => void) | undefined;
+  onDismiss?: ((id: string) => void) | undefined;
 }
 
 /** Reusable, config-driven proposal card (Figma 10:309). No hooks: works anywhere a proposal is listed. */
-export function AgentProposalCard({ item, selected = false, busy = false, onSelect, onAction }: AgentProposalCardProps) {
+export function AgentProposalCard({
+  item,
+  selected = false,
+  busy = false,
+  onSelect,
+  onAction,
+  consentBlocked = null,
+  onRequestConsent,
+  onDismiss
+}: AgentProposalCardProps) {
   const type = proposalTypeConfig(item.provenance.actionType);
   const actions = availableActions(item);
+  const blocked = consentBlocked ? consentBlockedCopy(item.recipient.displayName, consentBlocked.channel) : null;
 
   return (
     <article
@@ -35,7 +50,9 @@ export function AgentProposalCard({ item, selected = false, busy = false, onSele
     >
       <button type="button" className="block w-full text-left" onClick={() => onSelect?.(item.id)}>
         <div className="flex flex-wrap items-center gap-2 text-xs font-semibold">
-          <span className="rounded-full bg-amber-100 px-2 py-0.5 text-amber-900">{proposalStateLabel(item.state)}</span>
+          <span className={cn("rounded-full px-2 py-0.5", blocked ? "bg-red-100 text-red-800" : "bg-amber-100 text-amber-900")}>
+            {blocked ? blocked.status : proposalStateLabel(item.state)}
+          </span>
           <span className="text-neutral-500">{type.label}</span>
         </div>
         <p className="mt-2 font-semibold text-neutral-900">{item.recipient.displayName}</p>
@@ -44,7 +61,34 @@ export function AgentProposalCard({ item, selected = false, busy = false, onSele
           “{item.proposedContent.body}”
         </blockquote>
       </button>
-      {actions.length > 0 && onAction ? (
+      {blocked ? (
+        <div className="mt-3 space-y-2">
+          <p role="alert" className="text-sm text-red-800" title={consentBlocked?.reason}>
+            {blocked.message}
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              disabled={busy || !onRequestConsent}
+              title={onRequestConsent ? undefined : "Consent requests aren’t available yet. Ask the customer to opt in."}
+              className={cn("rounded-lg px-3 py-1.5 text-sm font-semibold disabled:opacity-50", toneClass.secondary)}
+              onClick={() => onRequestConsent?.(item.id)}
+            >
+              {blocked.request}
+            </button>
+            {onDismiss ? (
+              <button
+                type="button"
+                disabled={busy}
+                className="rounded-lg px-3 py-1.5 text-sm font-semibold text-neutral-700 hover:bg-neutral-100 disabled:opacity-50"
+                onClick={() => onDismiss(item.id)}
+              >
+                {blocked.dismiss}
+              </button>
+            ) : null}
+          </div>
+        </div>
+      ) : actions.length > 0 && onAction ? (
         <div className="mt-3 flex flex-wrap gap-2">
           {actions.map((action) => (
             <button

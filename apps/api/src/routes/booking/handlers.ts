@@ -51,6 +51,7 @@ function toBookingRequestResponse(request: Awaited<ReturnType<typeof getBookingR
     serviceType: request.serviceType,
     serviceDetail: request.serviceDetail,
     urgency: request.urgency,
+    ...(request.downgraded !== undefined ? { downgraded: request.downgraded } : {}),
     customerNotes: request.customerNotes,
     preferredDate: request.preferredDate,
     preferredWindow: request.preferredWindow,

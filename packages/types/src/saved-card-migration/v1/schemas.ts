@@ -75,8 +75,25 @@ export const startSavedCardMigrationBodySchema = z.object({
 
 export type StartSavedCardMigrationBody = z.infer<typeof startSavedCardMigrationBodySchema>;
 
+/** One row of the Stripe PAN-import result (old processor card -> Stripe customer + payment method). */
+export const savedCardStripeImportRowSchema = z
+  .object({
+    stripeCustomerId: z.string().regex(/^cus_[A-Za-z0-9]{1,250}$/),
+    stripePaymentMethodId: z.string().regex(/^(pm|card|src)_[A-Za-z0-9]{1,250}$/),
+    renvaniCustomerId: z.string().uuid().optional(),
+    email: z.string().email().max(320).optional()
+  })
+  .strict();
+
+export type SavedCardStripeImportRow = z.infer<typeof savedCardStripeImportRowSchema>;
+
 export const confirmStripeImportBodySchema = z.object({
-  stripeImportReference: z.string().min(1).max(255)
+  stripeImportReference: z.string().min(1).max(255),
+  /**
+   * Stripe import result rows. Each is saved as a `pending` customer mapping (matched to a customer of
+   * this company by id or email), which apply-mappings then attaches. Replays upsert by payment method.
+   */
+  importedPaymentMethods: z.array(savedCardStripeImportRowSchema).max(200).optional()
 });
 
 export type ConfirmStripeImportBody = z.infer<typeof confirmStripeImportBodySchema>;

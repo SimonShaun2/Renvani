@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 
 import { db, vipMembershipTiers } from "@fsm/db";
 import { AppError, ErrorCode } from "@fsm/types";
@@ -11,6 +11,23 @@ export async function ensureVipTierStripeMonthlyPrice(
   tierName: string,
   monthlyPrice: string
 ): Promise<string> {
+  // Tenant guard: the tier must belong to companyId before any Stripe side effect (no orphan prices).
+  const [tier] = await db
+    .select({ id: vipMembershipTiers.id })
+    .from(vipMembershipTiers)
+    .where(
+      and(
+        eq(vipMembershipTiers.id, tierId),
+        eq(vipMembershipTiers.companyId, companyId),
+        isNull(vipMembershipTiers.deletedAt)
+      )
+    )
+    .limit(1);
+
+  if (!tier) {
+    throw new AppError(ErrorCode.NOT_FOUND, "VIP tier not found");
+  }
+
   const price = await createServiceAgreementPrice({
     companyId,
     templateId: tierId,
@@ -26,7 +43,7 @@ export async function ensureVipTierStripeMonthlyPrice(
       stripeMonthlyPriceId: price.id,
       updatedAt: new Date()
     })
-    .where(eq(vipMembershipTiers.id, tierId));
+    .where(and(eq(vipMembershipTiers.id, tierId), eq(vipMembershipTiers.companyId, companyId)));
 
   return price.id;
 }
@@ -44,7 +61,10 @@ export async function requireVipTierStripePrice(
 
   try {
     return await ensureVipTierStripeMonthlyPrice(companyId, tierId, tierName, monthlyPrice);
-  } catch {
+  } catch (error) {
+    if (error instanceof AppError && error.code === ErrorCode.NOT_FOUND) {
+      throw error;
+    }
     throw new AppError(ErrorCode.INTERNAL_ERROR, "Failed to provision Stripe price for VIP tier");
   }
 }

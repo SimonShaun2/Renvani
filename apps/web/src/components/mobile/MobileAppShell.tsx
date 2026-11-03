@@ -15,7 +15,7 @@ interface MobileAppShellProps {
 }
 
 function shouldHideNavigation(pathname: string) {
-  return pathname.includes("/complete") || pathname.startsWith("/mobile/signature");
+  return pathname.includes("/complete") || pathname.includes("/signature");
 }
 
 export function MobileAppShell({ session, children }: MobileAppShellProps) {

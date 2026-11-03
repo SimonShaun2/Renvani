@@ -1,4 +1,6 @@
-import type { db } from "@fsm/db";
+import { and, eq, isNull } from "drizzle-orm";
+
+import { bookingRequests, jobs, type db } from "@fsm/db";
 import { AppError, ErrorCode, type CanonicalEntityRefV1 } from "@fsm/types";
 
 import { assertLoyaltyReminderExecutionAllowed } from "./agent-action.policy.js";
@@ -27,6 +29,11 @@ export interface AgentActionExecutionContext {
  * so a failure rolls the whole execute back.
  */
 export interface AgentActionExecutor {
+  /**
+   * `outbound`: the action contacts a customer, so a successful execute only means it was queued (receipt
+   * deliveryState `queued`); it must not read as done until a provider confirms. Default `internal`.
+   */
+  delivery?: AgentActionDeliveryKind;
   beforeExecute?: (ctx: AgentActionExecutionContext) => Promise<AuthorizationDecision | void> | void;
   applyInTransaction?: (ctx: AgentActionExecutionContext) => Promise<void>;
   /** Optional side effect when an operator rejects the proposal (runs inside the reject transaction). */
@@ -61,7 +68,14 @@ export async function authorizeOutboundAgentActionExecution(ctx: AgentActionExec
   return decision;
 }
 
+export type AgentActionDeliveryKind = "internal" | "outbound";
+
 const executors = new Map<string, AgentActionExecutor>();
+
+/** Delivery kind for an action type; unknown types read as internal (they also fail closed at execute). */
+export function getAgentActionDeliveryKind(actionType: string): AgentActionDeliveryKind {
+  return executors.get(actionType)?.delivery ?? "internal";
+}
 
 export function registerAgentActionExecutor(actionType: string, executor: AgentActionExecutor): void {
   executors.set(actionType, executor);
@@ -71,13 +85,63 @@ export function getAgentActionExecutor(actionType: string): AgentActionExecutor 
   return executors.get(actionType);
 }
 
+/** Execute fails closed for action types with no registered executor (no silent no-op "success"). */
+export function requireAgentActionExecutor(actionType: string): AgentActionExecutor {
+  const executor = executors.get(actionType);
+  if (!executor) {
+    throw new AppError(ErrorCode.VALIDATION_ERROR, `No executor is registered for action type ${actionType}`);
+  }
+  return executor;
+}
+
+export function listAgentActionExecutorTypes(): string[] {
+  return [...executors.keys()];
+}
+
+/**
+ * Internal (non-outbound) executors re-check, inside the tenant-scoped execute transaction, that the
+ * record the proposal is about still exists in this tenant. Nothing is sent to a customer; the
+ * execution receipt + audit event are the outcome. Registry of target lookups keyed by parameter.
+ */
+const INTERNAL_TARGET_LOOKUPS = {
+  jobId: async (ctx: AgentActionExecutionContext, id: string) =>
+    ctx.tx
+      .select({ id: jobs.id })
+      .from(jobs)
+      .where(and(eq(jobs.companyId, ctx.companyId), eq(jobs.id, id), isNull(jobs.deletedAt)))
+      .limit(1),
+  bookingRequestId: async (ctx: AgentActionExecutionContext, id: string) =>
+    ctx.tx
+      .select({ id: bookingRequests.id })
+      .from(bookingRequests)
+      .where(and(eq(bookingRequests.companyId, ctx.companyId), eq(bookingRequests.id, id), isNull(bookingRequests.deletedAt)))
+      .limit(1)
+} as const;
+
+export function internalRecordExecutor(parameterKey: keyof typeof INTERNAL_TARGET_LOOKUPS): AgentActionExecutor {
+  return {
+    applyInTransaction: async (ctx) => {
+      const id = ctx.parameters[parameterKey] ?? (parameterKey === "jobId" && ctx.target.entityType === "job" ? ctx.target.entityId : undefined);
+      if (typeof id !== "string" || id.length === 0) {
+        throw new AppError(ErrorCode.VALIDATION_ERROR, `Proposal is missing ${parameterKey}`);
+      }
+      const [found] = await INTERNAL_TARGET_LOOKUPS[parameterKey](ctx, id);
+      if (!found) {
+        throw new AppError(ErrorCode.CONFLICT, "The record this proposal is about no longer exists");
+      }
+    }
+  };
+}
+
 registerAgentActionExecutor("loyalty.reminder.propose", {
+  delivery: "outbound",
   beforeExecute: () => {
     assertLoyaltyReminderExecutionAllowed();
   }
 });
 
 registerAgentActionExecutor("message.send_proposed", {
+  delivery: "outbound",
   beforeExecute: authorizeOutboundAgentActionExecution
 });
 
@@ -91,3 +155,9 @@ registerAgentActionExecutor("service.job_brief.propose", {
       parameters: ctx.parameters
     })
 });
+
+// Scheduling: operator acknowledges a customer self-service reschedule/cancel notice (internal only).
+registerAgentActionExecutor("scheduling.booking.self_service", internalRecordExecutor("jobId"));
+
+// Revenue: inquiry qualification metadata (internal only; no customer contact).
+registerAgentActionExecutor("revenue.inquiry.qualify", internalRecordExecutor("bookingRequestId"));

@@ -26,8 +26,8 @@ Neon blip would make Render restart a healthy API. The smoke script checks `/hea
 
 ## Before the first apply
 
-1. **Region.** Set `region:` on all four entries to the region of the Neon project (STACK-12). The file says
-   `oregon` as a placeholder. Region can't be changed after creation.
+1. **Region.** All four entries use `region: ohio` because the Neon project is US East (Ohio) (STACK-12).
+   The validator enforces this. Region can't be changed after creation.
 2. **Branch.** `branch: dev` matches what Vercel production builds today. Switch to `main` when releases move there.
    `autoDeployTrigger: "off"`: deploys are manual until the smoke test passes once.
 3. Have every **prompt** value from `RENDER-ENV-INVENTORY.md` ready in the password manager.

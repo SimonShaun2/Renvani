@@ -59,10 +59,25 @@ const publicEstimateTierSchema = {
     taxAmount: nullableStringSchema,
     discountAmount: nullableStringSchema,
     total: { type: "string" },
+    recommended: { type: "boolean" },
     items: {
       type: "array",
       items: publicEstimateItemSchema
     }
+  }
+} as const;
+
+/** FS-212: only sent when a financing provider is ready (never while financing is disabled). */
+const publicEstimateFinancingSchema = {
+  type: "object",
+  additionalProperties: false,
+  required: ["offered", "provider", "providerReady", "monthlyFrom"],
+  properties: {
+    offered: { type: "boolean" },
+    provider: { type: "string" },
+    providerReady: { type: "boolean" },
+    monthlyFrom: nullableStringSchema,
+    reason: { type: "string" }
   }
 } as const;
 
@@ -139,6 +154,7 @@ const publicEstimateSchema = {
     },
     tierLabel: nullableStringSchema,
     expiresAt: nullableDateTimeSchema,
+    financing: publicEstimateFinancingSchema,
     tiers: {
       anyOf: [
         {

@@ -135,8 +135,10 @@ export function internalRecordExecutor(parameterKey: keyof typeof INTERNAL_TARGE
 
 registerAgentActionExecutor("loyalty.reminder.propose", {
   delivery: "outbound",
-  beforeExecute: () => {
+  beforeExecute: async (ctx) => {
+    // FS-72 founder gate first, then the shared fail-closed outbound consent gate.
     assertLoyaltyReminderExecutionAllowed();
+    return authorizeOutboundAgentActionExecution(ctx);
   }
 });
 

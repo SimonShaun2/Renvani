@@ -61,6 +61,14 @@ describe("H1 tenant-guard static scan", () => {
         "await db.select().from(companies).where(eq(companies.id, id));",
         "const unsafePredicate = eq(invoices.id, id); const unrelated = eq(jobs.companyId, companyId);",
         "await db.select().from(invoices).where(unsafePredicate);",
+        "const multiPredicate = eq(invoices.id, id), unrelatedMulti = eq(jobs.companyId, companyId);",
+        "await db.select().from(invoices).where(multiPredicate);",
+        "const asiPredicate = eq(invoices.id, id)",
+        "const later = eq(jobs.companyId, companyId)",
+        "await db.select().from(invoices).where(asiPredicate)",
+        "{ const shadowed = eq(invoices.companyId, companyId); }",
+        "const shadowed = eq(invoices.id, id);",
+        "await db.select().from(invoices).where(shadowed);",
         "const safePredicate = and(eq(invoices.companyId, companyId), eq(invoices.id, id));",
         "await db.select().from(invoices).where(safePredicate);"
       ].join("\n")
@@ -70,6 +78,9 @@ describe("H1 tenant-guard static scan", () => {
       "from:invoices:where-without-companyId",
       "update:jobs:where-without-companyId",
       "delete:payments:no-where",
+      "from:invoices:where-without-companyId",
+      "from:invoices:where-without-companyId",
+      "from:invoices:where-without-companyId",
       "from:invoices:where-without-companyId"
     ]);
   });

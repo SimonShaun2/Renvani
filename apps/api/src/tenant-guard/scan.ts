@@ -8,6 +8,7 @@
  */
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
+import ts from "typescript";
 
 import { getTableConfig, PgTable } from "drizzle-orm/pg-core";
 import { is } from "drizzle-orm";
@@ -92,11 +93,33 @@ function whereArgs(chain: string): string[] {
   return args;
 }
 
-/** A bare identifier where (e.g. `.where(conditions)`) counts as guarded when that name is built with companyId. */
-function identifierIsCompanyScoped(source: string, name: string): boolean {
-  const re = new RegExp(`\\b(?:const|let)\\s+${name}\\b[^;]*?(?:;|$)`, "gs");
-  for (const match of source.matchAll(re)) {
-    if (COMPANY_GUARD.test(match[0])) return true;
+function nodeAt(sourceFile: ts.SourceFile, position: number): ts.Node {
+  let node: ts.Node = sourceFile;
+  while (true) {
+    let child: ts.Node | undefined;
+    ts.forEachChild(node, (candidate) => {
+      if (candidate.pos <= position && position < candidate.end) child = candidate;
+    });
+    if (!child) return node;
+    node = child;
+  }
+}
+
+/** A bare `.where(conditions)` is guarded only when the visible declaration's initializer is scoped. */
+function identifierIsCompanyScoped(sourceFile: ts.SourceFile, name: string, position: number): boolean {
+  let node: ts.Node | undefined = nodeAt(sourceFile, position);
+  while (node) {
+    if (ts.isBlock(node) || ts.isSourceFile(node)) {
+      for (let i = node.statements.length - 1; i >= 0; i -= 1) {
+        const statement = node.statements[i]!;
+        if (statement.getStart(sourceFile) >= position || !ts.isVariableStatement(statement)) continue;
+        for (const declaration of statement.declarationList.declarations) {
+          if (!ts.isIdentifier(declaration.name) || declaration.name.text !== name) continue;
+          return declaration.initializer ? COMPANY_GUARD.test(declaration.initializer.getText(sourceFile)) : false;
+        }
+      }
+    }
+    node = node.parent;
   }
   return false;
 }
@@ -108,6 +131,7 @@ export function scanTenantGuards(repoRoot: string, tenantVars: Map<string, strin
     const absDir = path.join(repoRoot, appDir);
     for (const absFile of listSourceFiles(absDir)) {
       const source = readFileSync(absFile, "utf8");
+      const sourceFile = ts.createSourceFile(absFile, source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
       const rel = path.relative(repoRoot, absFile).split(path.sep).join("/");
       for (const match of source.matchAll(callRe)) {
         const [, op, variable] = match;
@@ -119,7 +143,7 @@ export function scanTenantGuards(repoRoot: string, tenantVars: Map<string, strin
         const guarded = wheres.some((arg) => {
           if (COMPANY_GUARD.test(arg)) return true;
           const bare = arg.trim().match(/^(?:and\(\s*\.\.\.)?(\w+)\)?$/);
-          return bare ? identifierIsCompanyScoped(source, bare[1]!) : false;
+          return bare ? identifierIsCompanyScoped(sourceFile, bare[1]!, start) : false;
         });
         if (guarded) continue;
         findings.push({

@@ -1,7 +1,9 @@
 import { randomUUID } from "node:crypto";
 
 import { and, eq, sql } from "drizzle-orm";
-import { beforeAll, describe, expect, it, vi } from "vitest";
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
 import { resetEnvCacheForTests } from "@fsm/config";
 import { setupTestEnv } from "../test-support/env-setup.js";
@@ -9,7 +11,9 @@ import { setupTestEnv } from "../test-support/env-setup.js";
 // The CI runner supplies an isolated, disposable database after applying 0061 and 0062.
 // An ordinary local test run must visibly skip rather than touch shared staging.
 const isolatedUrl = process.env.NEON_CI_DATABASE_URL?.trim();
-const enabled = Boolean(isolatedUrl?.startsWith("postgres")) && process.env.FS234_ISOLATED_DATABASE === "1";
+const provisionUrl = process.env.FS234_PROVISION_DATABASE_URL?.trim();
+const enabled = Boolean(isolatedUrl?.startsWith("postgres") && provisionUrl?.startsWith("postgres")) &&
+  process.env.FS234_ISOLATED_DATABASE === "1";
 setupTestEnv();
 if (enabled) {
   vi.stubEnv("DATABASE_URL", isolatedUrl!);
@@ -20,6 +24,8 @@ if (enabled) {
 type Db = typeof import("@fsm/db");
 type Service = typeof import("./outbound-consent.service.js");
 type Fixture = { companyId: string; ownerId: string; customerId: string; email: string };
+const provisionSql = enabled ? postgres(provisionUrl!, { max: 2, onnotice: () => undefined }) : null;
+const provisionDb = provisionSql ? drizzle(provisionSql) : null;
 
 describe.runIf(enabled)("FS-234 operator consent revocation (isolated PostgreSQL)", { timeout: 30_000 }, () => {
   let dbModule: Db;
@@ -28,21 +34,26 @@ describe.runIf(enabled)("FS-234 operator consent revocation (isolated PostgreSQL
   beforeAll(async () => {
     dbModule = await import("@fsm/db");
     service = await import("./outbound-consent.service.js");
+    const [role] = await dbModule.db.execute(sql`select rolbypassrls, rolsuper from pg_roles where rolname = current_user`) as
+      unknown as Array<{ rolbypassrls: boolean; rolsuper: boolean }>;
+    expect(role).toMatchObject({ rolbypassrls: false, rolsuper: false });
   });
+
+  afterAll(async () => { await provisionSql?.end({ timeout: 5 }); });
 
   async function fixture(): Promise<Fixture> {
     const companyId = randomUUID();
     const ownerId = randomUUID();
     const customerId = randomUUID();
     const email = `customer-${customerId}@example.test`;
-    await dbModule.db.insert(dbModule.companies).values({
+    await provisionDb!.insert(dbModule.companies).values({
       id: companyId, name: "FS234 isolated test", slug: `fs234-${companyId}`,
     });
-    await dbModule.db.insert(dbModule.users).values({
+    await provisionDb!.insert(dbModule.users).values({
       id: ownerId, companyId, email: `owner-${ownerId}@example.test`,
       firstName: "Isolated", lastName: "Owner", role: "owner",
     });
-    await dbModule.db.insert(dbModule.customers).values({
+    await provisionDb!.insert(dbModule.customers).values({
       id: customerId, companyId, firstName: "Synthetic", lastName: "Customer", email,
     });
     return { companyId, ownerId, customerId, email };
@@ -122,7 +133,7 @@ describe.runIf(enabled)("FS-234 operator consent revocation (isolated PostgreSQL
   it("fails closed when the customer's destination changes after a decision", async () => {
     const f = await fixture();
     await service.revokeOperatorOutboundConsent(actor(f), request(f));
-    await dbModule.db.update(dbModule.customers).set({ email: `changed-${f.customerId}@example.test` })
+    await provisionDb!.update(dbModule.customers).set({ email: `changed-${f.customerId}@example.test` })
       .where(and(eq(dbModule.customers.companyId, f.companyId), eq(dbModule.customers.id, f.customerId)));
     const check = await service.checkOutboundConsent(f.companyId, {
       companyId: f.companyId, subjectType: "customer", subjectId: f.customerId,
@@ -138,18 +149,18 @@ describe.runIf(enabled)("FS-234 operator consent revocation (isolated PostgreSQL
 
   it("rolls back receipt, ledger and state when audit activity insertion fails", async () => {
     const f = await fixture();
-    await dbModule.db.execute(sql.raw(`CREATE FUNCTION fs234_reject_activity() RETURNS trigger LANGUAGE plpgsql AS $$
+    await provisionDb!.execute(sql.raw(`CREATE FUNCTION fs234_reject_activity() RETURNS trigger LANGUAGE plpgsql AS $$
       BEGIN IF NEW.event_type = 'outbound_consent.revoked' THEN RAISE EXCEPTION 'FS234 isolated audit failure'; END IF;
       RETURN NEW; END $$`));
-    await dbModule.db.execute(sql.raw(`CREATE TRIGGER fs234_reject_activity_trg BEFORE INSERT ON activity_events
+    await provisionDb!.execute(sql.raw(`CREATE TRIGGER fs234_reject_activity_trg BEFORE INSERT ON activity_events
       FOR EACH ROW EXECUTE FUNCTION fs234_reject_activity()`));
     try {
       await expect(service.revokeOperatorOutboundConsent(actor(f), request(f)))
         .rejects.toThrow("FS234 isolated audit failure");
       expect(await evidence(f)).toMatchObject({ receipts: [], events: [], states: [], activity: [] });
     } finally {
-      await dbModule.db.execute(sql.raw("DROP TRIGGER IF EXISTS fs234_reject_activity_trg ON activity_events"));
-      await dbModule.db.execute(sql.raw("DROP FUNCTION IF EXISTS fs234_reject_activity()"));
+      await provisionDb!.execute(sql.raw("DROP TRIGGER IF EXISTS fs234_reject_activity_trg ON activity_events"));
+      await provisionDb!.execute(sql.raw("DROP FUNCTION IF EXISTS fs234_reject_activity()"));
     }
   });
 });

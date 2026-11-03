@@ -2,7 +2,7 @@
 /** FS-234: strict, disposable PostgreSQL acceptance for migration 0062 and consent authority. */
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { randomUUID } from "node:crypto";
+import { randomBytes, randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
@@ -89,15 +89,15 @@ async function tenant(sql, companyId, work) {
   });
 }
 
-async function probeEmailChallenges(sql, a, b) {
+async function probeEmailChallenges(sql, provisionSql, a, b) {
   const ca = randomUUID();
   const cb = randomUUID();
   const ha = randomUUID();
   const hb = randomUUID();
-  await tenant(sql, a, (tx) => tx`insert into customers
+  await tenant(provisionSql, a, (tx) => tx`insert into customers
     (id, company_id, first_name, last_name, email)
     values (${ca}, ${a}, 'FS234', 'A', 'fs234-a@example.test')`);
-  await tenant(sql, b, (tx) => tx`insert into customers
+  await tenant(provisionSql, b, (tx) => tx`insert into customers
     (id, company_id, first_name, last_name, email)
     values (${cb}, ${b}, 'FS234', 'B', 'fs234-b@example.test')`);
   for (const [companyId, customerId, challengeId, email, hash] of [
@@ -152,7 +152,7 @@ async function probeEmailChallenges(sql, a, b) {
   assert.equal(afterDeniedDelete?.id, ha, "challenge DELETE removed protected evidence");
 
   // The issue trigger is disabled only inside a transaction that must roll back.
-  await rejected(() => tenant(sql, a, async (tx) => {
+  await rejected(() => tenant(provisionSql, a, async (tx) => {
     await tx`alter table outbound_consent_email_challenges disable trigger outbound_consent_email_challenge_issue_trg`;
     const expiredId = randomUUID();
     await tx`insert into outbound_consent_email_challenges
@@ -183,7 +183,7 @@ async function probeEmailChallenges(sql, a, b) {
   console.log("[fs234-postgres] email challenge tenant, FK, DB clock, expiry and single-use probes passed");
 }
 
-async function inspectAndExercise(sql) {
+async function inspectAndExercise(sql, provisionSql) {
   const [role] = await sql`select rolbypassrls, rolsuper from pg_roles where rolname = current_user`;
   if (!role || role.rolbypassrls || role.rolsuper) {
     throw new Error("CI application role must be NOBYPASSRLS and non-superuser");
@@ -213,9 +213,9 @@ async function inspectAndExercise(sql) {
   const sa = randomUUID();
   const ea = randomUUID();
   const eb = randomUUID();
-  await sql`insert into companies (id, name, slug) values
+  await provisionSql`insert into companies (id, name, slug) values
     (${a}, 'FS234 CI A', ${`fs234-ci-${a}`}), (${b}, 'FS234 CI B', ${`fs234-ci-${b}`})`;
-  await probeEmailChallenges(sql, a, b);
+  await probeEmailChallenges(sql, provisionSql, a, b);
   for (const [companyId, receiptId, eventId] of [[a, ra, ea], [b, rb, eb]]) {
     await tenant(sql, companyId, async (tx) => {
       await tx`
@@ -285,17 +285,30 @@ async function inspectAndExercise(sql) {
   assert.equal(afterDenied.events[0].statement_version, "ci-v1");
   assert.equal(afterDenied.states.length, 1);
 
-  await triggerRejects(sql, "outbound_consent_capture_receipts", (tx) => tx`
+  await triggerRejects(provisionSql, "outbound_consent_capture_receipts", (tx) => tx`
     update outbound_consent_capture_receipts set statement_version = 'forged' where id = ${ra}`);
-  await triggerRejects(sql, "outbound_consent_capture_receipts", (tx) => tx`
+  await triggerRejects(provisionSql, "outbound_consent_capture_receipts", (tx) => tx`
     delete from outbound_consent_capture_receipts where id = ${ra}`);
-  await triggerRejects(sql, "outbound_consent_events", (tx) => tx`
+  await triggerRejects(provisionSql, "outbound_consent_events", (tx) => tx`
     update outbound_consent_events set statement_version = 'forged' where id = ${ea}`);
-  await triggerRejects(sql, "outbound_consent_events", (tx) => tx`
+  await triggerRejects(provisionSql, "outbound_consent_events", (tx) => tx`
     delete from outbound_consent_events where id = ${ea}`);
-  await triggerRejects(sql, "outbound_consent_states", (tx) => tx`
+  await triggerRejects(provisionSql, "outbound_consent_states", (tx) => tx`
     delete from outbound_consent_states where company_id = ${a}`);
-  await rejected(() => sql`delete from companies where id = ${a}`, "23503", "outbound_consent_");
+  // Use a company without customer rows so the protected consent FK, rather
+  // than an unrelated customer FK, is the reason hard deletion is rejected.
+  const fkCompany = randomUUID();
+  await provisionSql`insert into companies (id, name, slug) values
+    (${fkCompany}, 'FS234 FK', ${`fs234-fk-${fkCompany}`})`;
+  await tenant(sql, fkCompany, (tx) => tx`insert into outbound_consent_capture_receipts
+    (company_id, subject_type, subject_id, channel, purpose, contact, decision,
+     explicit_choice, statement_version, source_record_id, source_surface, actor_type,
+     idempotency_key, payload_fingerprint)
+    values (${fkCompany}, 'customer', ${randomUUID()}, 'email', 'marketing',
+      'fs234-fk@example.test', 'revoke', true, 'ci-v1', ${randomUUID()},
+      'operator', 'user', ${`fs234-fk-${fkCompany}`}, ${"a".repeat(64)})`);
+  await rejected(() => provisionSql`delete from companies where id = ${fkCompany}`,
+    "23503", "outbound_consent_");
   const rollbackId = randomUUID();
   await rejected(() => tenant(sql, a, async (tx) => {
     await tx`insert into outbound_consent_capture_receipts
@@ -322,30 +335,61 @@ function verifySix(outputFile) {
 }
 
 const baseSql = postgres(baseUrl, { max: 1, onnotice: () => undefined });
+let roleNameToDrop;
 try {
   const outcome = await withStrictIsolatedCiDatabase({
     baseUrl, sql: baseSql, env: process.env, prNumber: "430",
     nowEpochSeconds: Math.floor(Date.now() / 1000),
     runSteps: async (childUrl) => {
-      const env = {
+      const provisionEnv = {
         ...process.env,
         DATABASE_URL: childUrl,
         NEON_CI_DATABASE_URL: childUrl,
         FS234_ISOLATED_DATABASE: "1"
       };
-      const childSql = postgres(childUrl, { max: 4, onnotice: () => undefined });
+      const provisionSql = postgres(childUrl, { max: 2, onnotice: () => undefined });
+      const roleName = `fs234_ci_${randomBytes(10).toString("hex")}`;
+      const rolePassword = randomBytes(32).toString("hex");
+      const quotedRole = `"${roleName}"`;
+      let appSql;
       const outputFile = join(tmpdir(), `renvani-fs234-pg-${randomUUID()}.json`);
       try {
-        migrate(env);
-        await inspectAndExercise(childSql);
+        migrate(provisionEnv);
+        // The migration principal may own/bypass RLS. The disposable application
+        // principal has no cluster privileges and grants only in this child DB.
+        try {
+          await provisionSql.unsafe(`create role ${quotedRole} login noinherit nosuperuser nocreatedb nocreaterole noreplication nobypassrls password '${rolePassword}'`);
+          roleNameToDrop = roleName;
+          await provisionSql.unsafe(`grant connect on database "${new URL(childUrl).pathname.slice(1)}" to ${quotedRole}`);
+          await provisionSql.unsafe(`grant usage on schema public to ${quotedRole}`);
+          await provisionSql.unsafe(`grant select, insert, update, delete on table customers, booking_requests, activity_events, outbound_consent_capture_receipts, outbound_consent_events, outbound_consent_states, outbound_consent_email_challenges to ${quotedRole}`);
+          await provisionSql.unsafe(`grant usage, select on all sequences in schema public to ${quotedRole}`);
+        } catch {
+          throw new Error("isolated application-role provisioning failed");
+        }
+        const appUrl = new URL(childUrl);
+        appUrl.username = roleName;
+        appUrl.password = rolePassword;
+        appSql = postgres(appUrl.toString(), { max: 4, onnotice: () => undefined });
+        const [appRole] = await appSql`select rolbypassrls, rolsuper, rolcreatedb, rolcreaterole from pg_roles where rolname = current_user`;
+        assert.ok(appRole && !appRole.rolbypassrls && !appRole.rolsuper && !appRole.rolcreatedb && !appRole.rolcreaterole,
+          "isolated application role is privileged");
+        await inspectAndExercise(appSql, provisionSql);
+        const testEnv = {
+          ...provisionEnv,
+          DATABASE_URL: appUrl.toString(),
+          NEON_CI_DATABASE_URL: appUrl.toString(),
+          FS234_PROVISION_DATABASE_URL: childUrl
+        };
         runVitestJsonGate({
           outputFile,
           runTest: () => runSilentVitest("corepack", ["pnpm", "--filter", "@fsm/api", "exec", "vitest", "run",
-            "src/services/outbound-consent.postgres.integration.test.ts", "--reporter=json", `--outputFile=${outputFile}`], env, root),
+            "src/services/outbound-consent.postgres.integration.test.ts", "--reporter=json", `--outputFile=${outputFile}`], testEnv, root),
           verifyResult: verifySix
         });
       } finally {
-        await childSql.end({ timeout: 5 });
+        if (appSql) await appSql.end({ timeout: 5 });
+        await provisionSql.end({ timeout: 5 });
       }
     }
   });
@@ -355,6 +399,12 @@ try {
   console.error(`[fs234-postgres] FAIL: ${redactDatabaseUrls(error?.message)}`);
   process.exitCode = 1;
 } finally {
+  // The child database is dropped by withStrictIsolatedCiDatabase first; only
+  // then can its disposable cluster role be removed without orphaned grants.
+  if (roleNameToDrop) await baseSql.unsafe(`drop role if exists "${roleNameToDrop}"`).catch(() => {
+    console.error("[fs234-postgres] FAIL: isolated application role cleanup failed");
+    process.exitCode = 1;
+  });
   await baseSql.end({ timeout: 5 }).catch(() => {
     console.error("[fs234-postgres] FAIL: base connection cleanup failed");
     process.exitCode = 1;

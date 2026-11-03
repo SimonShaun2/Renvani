@@ -43,7 +43,7 @@ function RecordLinks({ sources }: { sources: CommandCenterSource[] }) {
   );
 }
 
-function Metric({ kpi, index, previousMonth }: { kpi?: CommandCenterKpi; index: number; previousMonth: string }) {
+function Metric({ kpi, index, previousMonth }: { kpi: CommandCenterKpi | undefined; index: number; previousMonth: string }) {
   const definition = KPIS[index]!;
   const known = Boolean(kpi && isKnownMetric(kpi.value, kpi.unit));
   const value = known && kpi ? formatKpiValue(kpi) : EMPTY;
@@ -88,7 +88,7 @@ export function OwnerKeyNumbers() {
   );
 }
 
-function Loop({ brief, state }: { brief?: CommandCenterBrief; state: OwnerPanelState }) {
+function Loop({ brief, state }: { brief: CommandCenterBrief | undefined; state: OwnerPanelState }) {
   const maximum = Math.max(1, ...(brief?.loop.map((stage) => stage.count) ?? []));
   return <div className={styles.loop}>
     {LOOP_STAGES.map((definition) => {

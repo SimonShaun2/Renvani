@@ -670,6 +670,7 @@ export function DispatchBoardClient() {
           {viewMode === "day" ? (
             <DispatchTimeline
               technicians={filteredTechnicians}
+              totalTechnicians={technicians.length}
               isLoading={dispatchQuery.isLoading}
               selectedJobId={selectedJobId}
               animatedJobId={animatedJobId}

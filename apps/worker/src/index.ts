@@ -13,6 +13,7 @@ import { processNotifications } from "./processors/notifications.processor.js";
 import { processDataExport } from "./processors/data-export.processor.js";
 import { processGrowthCheck } from "./processors/growth-check.processor.js";
 import { processRetentionGates } from "./processors/retention-gates.processor.js";
+import { processClerkWorkspace } from "./processors/clerk-workspace.processor.js";
 
 const logger = pino({
   name: "fsm-worker-bootstrap"
@@ -66,7 +67,8 @@ const workers: Array<Worker<Record<string, unknown>, void, string>> = [
   createWorker(QUEUE_NAMES.agreements, processAgreements),
   createWorker(QUEUE_NAMES.operator, processRetentionGates),
   createWorker(QUEUE_NAMES.exports, processDataExport),
-  createWorker(QUEUE_NAMES.growth, processGrowthCheck)
+  createWorker(QUEUE_NAMES.growth, processGrowthCheck),
+  createWorker(QUEUE_NAMES.webhooks, processClerkWorkspace)
 ];
 
 logger.info(

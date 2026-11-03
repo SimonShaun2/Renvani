@@ -187,7 +187,7 @@ export async function intakeWebAssistantHandoff(companyId: string, input: {
     const priorDuplicate = await findRecentDuplicateRow(companyId, row.phone, row.email, row.id, tx);
     const inquiry = mapBookingRowToInquiryIntakeV1(row, {
       channel: "web_form",
-      attributionProvenance: "query_param",
+      attributionProvenance: "unknown",
       sourceAttribution: `web_assistant:${input.source}`,
       captureSurface: "site/web_assistant",
       serviceability: input.serviceability,

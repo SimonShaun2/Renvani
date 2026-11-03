@@ -5,7 +5,7 @@ import { isWebAssistantEnabled } from "@fsm/config/feature-flags";
 import type { FastifyPluginAsync, FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
 
-import { checkPublicInquiryRateLimit } from "../../../lib/public-inquiry-rate-limit.js";
+import { checkPublicAssistantAnswerRateLimit, checkPublicInquiryRateLimit } from "../../../lib/public-inquiry-rate-limit.js";
 import { resolvePublicZipServiceability } from "../../../services/booking.service.js";
 import {
   buildServiceInquiryNotes,
@@ -218,7 +218,9 @@ async function webAssistantHandler(request: FastifyRequest, reply: FastifyReply)
   }
   const params = publicSiteSlugParamsSchema.safeParse(request.params);
   if (!params.success) return notFound(request, reply);
-  const limit = await checkPublicInquiryRateLimit(request.ip, params.data.slug);
+  const claimedHandoff = request.body !== null && typeof request.body === "object" && !Array.isArray(request.body)
+    && (request.body as { action?: unknown }).action === "handoff";
+  const limit = await (claimedHandoff ? checkPublicInquiryRateLimit : checkPublicAssistantAnswerRateLimit)(request.ip, params.data.slug);
   if (!limit.allowed) {
     reply.header("Retry-After", String(limit.retryAfterSeconds));
     return reply.status(429).send({ error: "RATE_LIMITED", message: "Too many requests. Please try again later.", requestId: request.id });

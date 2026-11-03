@@ -32,6 +32,7 @@ function unverified(answer = "I can't verify that from this business's published
 
 function formatHour(hour: number): string {
   const whole = Math.trunc(hour);
+  if (whole === 24) return "12:00 AM (next day)";
   const suffix = whole < 12 ? "AM" : "PM";
   return `${whole % 12 || 12}:00 ${suffix}`;
 }

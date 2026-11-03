@@ -1,6 +1,20 @@
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import type pino from "pino";
 
-import { PUBLIC_INQUIRY_IP_LIMIT } from "../../../lib/public-inquiry-rate-limit.js";
+const capturedLogs = vi.hoisted(() => ({ lines: [] as string[] }));
+vi.mock("pino", async (importOriginal) => {
+  const actual = await importOriginal<{ default: typeof pino }>();
+  const { Writable } = await import("node:stream");
+  const stream = new Writable({
+    write(chunk, _encoding, callback) {
+      capturedLogs.lines.push(String(chunk));
+      callback();
+    }
+  });
+  return { ...actual, default: (options: Parameters<typeof actual.default>[0]) => actual.default(options, stream) };
+});
+
+import { PUBLIC_ASSISTANT_ANSWER_IP_LIMIT } from "../../../lib/public-inquiry-rate-limit.js";
 import { resetPublicBookingRateLimitStateForTests } from "../../../lib/public-booking-rate-limit.js";
 import { setupTestEnv } from "../../../test-support/env-setup.js";
 
@@ -50,6 +64,7 @@ describe("FS-197 public web assistant first slice", () => {
     fakeDb.resetTestState();
     resetPublicBookingRateLimitStateForTests();
     queueAdd.mockClear();
+    capturedLogs.lines.length = 0;
     const hvac = fakeDb.seedCompany({ name: "Acme HVAC", slug: "acme-hvac", timezone: "America/Chicago",
       settings: { trade: "hvac", serviceArea: { zips: ["74103"], radiusMiles: null }, emergencyService: { enabled: false, hoursText: null } } });
     hvacCompanyId = hvac.id;
@@ -91,6 +106,17 @@ describe("FS-197 public web assistant first slice", () => {
         .toMatchObject({ verified: false, source: "unverified" });
     }
     expect(fakeDb.getTestState().bookingRequests).toHaveLength(0);
+  });
+
+  it("labels midnight correctly when the published booking window ends at hour 24", async () => {
+    const shop = fakeDb.seedCompany({ name: "Night Pipe", slug: "night-pipe", timezone: "America/Chicago",
+      settings: { trade: "plumbing", serviceArea: { zips: ["74103"], radiusMiles: null } } });
+    fakeDb.seedBookingSettings({ companyId: shop.id, bookingSlug: "night-pipe", isEnabled: true,
+      offeredServices: [{ label: "Drain Repair" }], availableHoursStart: 18, availableHoursEnd: 24 });
+    const response = await post("night-pipe", { action: "answer", topic: "booking_hours" }, { ip: "203.0.113.44" });
+    expect(response.statusCode).toBe(200);
+    expect(response.json().answer).toContain("12:00 AM (next day)");
+    expect(response.json().answer).not.toContain("12:00 PM");
   });
 
   it("creates one pending tenant-scoped staff handoff with consent and activity, never a job or outbound notification", async () => {
@@ -135,6 +161,41 @@ describe("FS-197 public web assistant first slice", () => {
       (event.payload as { serviceability?: string }).serviceability === "out_of_area")).toBe(true);
   });
 
+  it("keeps unknown coverage, pricing, and unknown capacity requests pending for staff", async () => {
+    const unknown = fakeDb.seedCompany({ name: "New HVAC", slug: "new-hvac", timezone: "America/Chicago",
+      settings: { trade: "hvac" } });
+    fakeDb.seedBookingSettings({ companyId: unknown.id, bookingSlug: "new-hvac", isEnabled: true,
+      offeredServices: [{ label: "AC Repair" }] });
+    const cases = [
+      { slug: "new-hvac", topic: "service_area", reason: "unknown_serviceability" },
+      { slug: "acme-hvac", topic: "pricing", reason: "pricing_review" },
+      { slug: "acme-hvac", topic: "availability", reason: "availability_review" }
+    ] as const;
+    for (const [index, item] of cases.entries()) {
+      const response = await post(item.slug, { action: "handoff", topic: item.topic, service: "AC Repair",
+        message: "Please review", contact, contactConsent: true },
+        { key: `unknown-${index}`, ip: `203.0.113.${90 + index}` });
+      expect(response.statusCode).toBe(201);
+      expect(response.json()).toMatchObject({ kind: "handoff", status: "pending", reason: item.reason });
+    }
+    expect(fakeDb.getTestState().bookingRequests).toHaveLength(3);
+    expect(queueAdd).not.toHaveBeenCalled();
+  });
+
+  it("does not verify unsupported-trade facts and sends that request to staff", async () => {
+    const shop = fakeDb.seedCompany({ name: "General Shop", slug: "general-shop", timezone: "America/Chicago",
+      settings: { serviceArea: { zips: ["74103"], radiusMiles: null } } });
+    fakeDb.seedBookingSettings({ companyId: shop.id, bookingSlug: "general-shop", isEnabled: true,
+      offeredServices: [{ label: "General Service" }] });
+    const answer = await post("general-shop", { action: "answer", topic: "services" }, { ip: "203.0.113.95" });
+    expect(answer.statusCode).toBe(200);
+    expect(answer.json()).toMatchObject({ verified: false, source: "unverified" });
+    const handoff = await post("general-shop", { action: "handoff", topic: "services", service: "General Service",
+      message: "Please review", contact, contactConsent: true }, { key: "unsupported-trade", ip: "203.0.113.96" });
+    expect(handoff.statusCode).toBe(201);
+    expect(handoff.json()).toMatchObject({ status: "pending", reason: "unsupported_service" });
+  });
+
   it("scopes the same handoff idempotency key to each published tenant", async () => {
     const body = { action: "handoff", topic: "human", message: "Please call", contact, contactConsent: true };
     const first = await post("acme-hvac", body, { key: "shared-public-key", ip: "203.0.113.81" });
@@ -152,11 +213,36 @@ describe("FS-197 public web assistant first slice", () => {
     expect((await post("acme-hvac", { ...body, contactConsent: true, companyId: plumbingCompanyId }, { key: "invalid-2" })).statusCode).toBe(400);
     expect((await post("missing-shop", { action: "answer", topic: "services" })).statusCode).toBe(404);
     expect(fakeDb.getTestState().bookingRequests).toHaveLength(0);
-    for (let i = 0; i < PUBLIC_INQUIRY_IP_LIMIT; i += 1) {
+    for (let i = 0; i < PUBLIC_ASSISTANT_ANSWER_IP_LIMIT; i += 1) {
       await post("acme-hvac", { action: "answer", topic: "services" }, { ip: "198.51.100.20" });
     }
     const limited = await post("acme-hvac", { action: "answer", topic: "services" }, { ip: "198.51.100.20" });
     expect(limited.statusCode).toBe(429);
     expect(Number(limited.headers["retry-after"])).toBeGreaterThan(0);
+  });
+
+  it("does not let FAQ traffic consume the real inquiry and staff handoff budget", async () => {
+    const ip = "198.51.100.21";
+    for (let i = 0; i < PUBLIC_ASSISTANT_ANSWER_IP_LIMIT; i += 1) {
+      expect((await post("acme-hvac", { action: "answer", topic: "services" }, { ip })).statusCode).toBe(200);
+    }
+    expect((await post("acme-hvac", { action: "answer", topic: "services" }, { ip })).statusCode).toBe(429);
+    const handoff = await post("acme-hvac", { action: "handoff", topic: "human", message: "Please call",
+      contact, contactConsent: true }, { key: "after-faq", ip });
+    expect(handoff.statusCode).toBe(201);
+    expect(handoff.json()).toMatchObject({ status: "pending" });
+  });
+
+  it("does not log submitted contact details or message", async () => {
+    const response = await post("acme-hvac", { action: "handoff", topic: "human",
+      message: "Private compressor concern", contact, contactConsent: true },
+      { key: "private-contact", ip: "203.0.113.97" });
+    expect(response.statusCode).toBe(201);
+    const logged = capturedLogs.lines.join(" ");
+    expect(logged).toContain("/api/v1/public/site/acme-hvac/assistant");
+    expect(logged).not.toContain(contact.email);
+    expect(logged).not.toContain(contact.phone);
+    expect(logged).not.toContain(contact.addressLine1);
+    expect(logged).not.toContain("Private compressor concern");
   });
 });

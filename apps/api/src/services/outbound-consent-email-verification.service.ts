@@ -72,6 +72,7 @@ export async function issueCustomerEmailChallenge(
       id: outboundConsentEmailChallenges.id,
       customerId: outboundConsentEmailChallenges.customerId,
       email: outboundConsentEmailChallenges.email,
+      tokenHash: outboundConsentEmailChallenges.tokenHash,
       consumedAt: outboundConsentEmailChallenges.consumedAt,
       deletedAt: outboundConsentEmailChallenges.deletedAt,
       active: sql<boolean>`${outboundConsentEmailChallenges.expiresAt} > now()`,
@@ -80,7 +81,10 @@ export async function issueCustomerEmailChallenge(
       eq(outboundConsentEmailChallenges.idempotencyKey, idempotencyKey),
     )).limit(1);
     if (prior) {
-      if (prior.customerId !== customerId || prior.email !== email || prior.deletedAt || prior.consumedAt || !prior.active) {
+      const expectedHash = createHash("sha256")
+        .update(buildCustomerEmailChallengeToken(companyId, prior.id)).digest("hex");
+      if (prior.customerId !== customerId || prior.email !== email || prior.tokenHash !== expectedHash ||
+          prior.deletedAt || prior.consumedAt || !prior.active) {
         throw new AppError(ErrorCode.CONFLICT, "Verification request cannot be replayed");
       }
       return { companyId, customerId, challengeId: prior.id };

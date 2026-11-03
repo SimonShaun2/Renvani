@@ -335,6 +335,18 @@ function verifySix(outputFile) {
   console.log("[fs234-postgres] service acceptance: 6 executed / 6 passed / 0 skipped");
 }
 
+/** Report only ordinal positions; Vitest failure messages can contain query data. */
+function reportFailedTestPositions(outputFile) {
+  try {
+    const result = JSON.parse(readFileSync(outputFile, "utf8"));
+    const assertions = result.testResults.flatMap((file) => file.assertionResults);
+    const failed = assertions.flatMap((assertion, index) => assertion.status === "failed" ? [index + 1] : []);
+    console.error(`[fs234-postgres] failed service test position(s): ${failed.join(",") || "unavailable"}`);
+  } catch {
+    console.error("[fs234-postgres] failed service test positions unavailable");
+  }
+}
+
 const baseSql = postgres(baseUrl, { max: 1, onnotice: () => undefined });
 let roleNameToDrop;
 try {
@@ -384,8 +396,15 @@ try {
         };
         runVitestJsonGate({
           outputFile,
-          runTest: () => runSilentVitest("corepack", ["pnpm", "--filter", "@fsm/api", "exec", "vitest", "run",
-            "src/services/outbound-consent.postgres.integration.test.ts", "--reporter=json", `--outputFile=${outputFile}`], testEnv, root),
+          runTest: () => {
+            try {
+              runSilentVitest("corepack", ["pnpm", "--filter", "@fsm/api", "exec", "vitest", "run",
+                "src/services/outbound-consent.postgres.integration.test.ts", "--reporter=json", `--outputFile=${outputFile}`], testEnv, root);
+            } catch (error) {
+              reportFailedTestPositions(outputFile);
+              throw error;
+            }
+          },
           verifyResult: verifySix
         });
       } finally {

@@ -161,7 +161,7 @@ export function EstimateListClient() {
           </div>
         ) : visibleRows.length === 0 ? (
           <div className="px-5 py-10">
-            <EmptyState
+            <EmptyState variant="operator"
               icon={FileText}
               title="No estimates match this view"
               subtitle="Try a different filter or create a new estimate to get a quote moving."

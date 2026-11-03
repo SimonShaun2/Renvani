@@ -179,7 +179,7 @@ function NextBestJobsSection({
 
   if (jobs.length === 0) {
     return (
-      <EmptyState
+      <EmptyState variant="operator"
         icon={Sparkles}
         title="No smart queue items"
         subtitle="Fresh AI-prioritized jobs will appear here as they become schedule-ready."
@@ -270,7 +270,7 @@ function UnscheduledSection({
 
   if (jobs.length === 0) {
     return (
-      <EmptyState
+      <EmptyState variant="operator"
         icon={CalendarClock}
         title="No unscheduled jobs"
         subtitle="Everything that needs attention is already placed or converted into the smart queue."
@@ -327,7 +327,7 @@ function BookingRequestsSection({
 
   if (requests.length === 0) {
     return (
-      <EmptyState
+      <EmptyState variant="operator"
         icon={CalendarClock}
         title="No pending booking requests"
         subtitle="Incoming online booking requests will auto-refresh here every 30 seconds."

@@ -26,7 +26,13 @@ export function isKnownMetric(value: unknown, unit: "money" | "count" | "percent
 
 /** Never generate links to another host, control characters or backslash URL variants. */
 export function ownerSourceHref(route: string): string | null {
-  return route.startsWith("/") && !route.startsWith("//") && !/[\\\x00-\x20]/.test(route) ? route : null;
+  if (!route.startsWith("/") || route.startsWith("//")) return null;
+  // Preserve the ASCII-control/space and backslash rejection without a control-character regex.
+  for (let index = 0; index < route.length; index += 1) {
+    const code = route.charCodeAt(index);
+    if (code <= 0x20 || code === 0x5c) return null;
+  }
+  return route;
 }
 
 export function loopWidth(count: number | undefined, maximum: number): number {

@@ -34,6 +34,24 @@ describe("owner home truthful state boundaries", () => {
     for (const href of ["https://elsewhere.test", "//elsewhere.test", "/\\elsewhere.test", "javascript:alert(1)", "/\n/elsewhere.test"]) expect(ownerSourceHref(href)).toBeNull();
   });
 
+  it("rejects every ASCII control character and space without weakening source-link safety", () => {
+    for (let code = 0; code <= 0x20; code += 1) {
+      const character = String.fromCharCode(code);
+      for (const route of [
+        `${character}/jobs/123`,
+        `/${character}elsewhere.test`,
+        `/jobs/${character}123`,
+        `/jobs/123${character}`
+      ]) expect(ownerSourceHref(route)).toBeNull();
+    }
+    for (const route of ["/\\elsewhere.test", "/jobs\\123", "/jobs/123\\"]) {
+      expect(ownerSourceHref(route)).toBeNull();
+    }
+    for (const route of ["/", "/jobs/123", "/jobs/hello%20world", "/customers/caf\u00e9", "/jobs?id=123#details"]) {
+      expect(ownerSourceHref(route)).toBe(route);
+    }
+  });
+
   it("never creates invalid or overflowing progress bars", () => {
     expect(loopWidth(3, 10)).toBe(30);
     expect(loopWidth(12, 10)).toBe(100);

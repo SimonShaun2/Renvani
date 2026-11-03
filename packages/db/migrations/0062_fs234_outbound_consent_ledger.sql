@@ -7,6 +7,7 @@ CREATE TYPE "public"."outbound_consent_subject_type" AS ENUM('customer', 'bookin
 ALTER TYPE "public"."activity_event_type" ADD VALUE 'outbound_consent.granted' BEFORE 'payment_method_migration.requested';--> statement-breakpoint
 ALTER TYPE "public"."activity_event_type" ADD VALUE 'outbound_consent.revoked' BEFORE 'payment_method_migration.requested';--> statement-breakpoint
 ALTER TYPE "public"."activity_event_type" ADD VALUE 'outbound_consent.email_challenge_issued' BEFORE 'payment_method_migration.requested';--> statement-breakpoint
+ALTER TYPE "public"."activity_event_type" ADD VALUE 'outbound_consent.email_verification_sent' BEFORE 'payment_method_migration.requested';--> statement-breakpoint
 ALTER TYPE "public"."activity_event_type" ADD VALUE 'outbound_consent.email_verified' BEFORE 'payment_method_migration.requested';--> statement-breakpoint
 CREATE TABLE "outbound_consent_capture_receipts" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
@@ -168,6 +169,21 @@ CREATE INDEX "outbound_consent_email_challenges_customer_issued_idx" ON "outboun
 ALTER TABLE "outbound_consent_email_challenges" ADD CONSTRAINT "outbound_consent_email_challenges_short_expiry_chk" CHECK ("outbound_consent_email_challenges"."expires_at" > "outbound_consent_email_challenges"."created_at" AND "outbound_consent_email_challenges"."expires_at" <= "outbound_consent_email_challenges"."created_at" + interval '20 minutes');
 --> statement-breakpoint
 ALTER TABLE "outbound_consent_email_challenges" ADD CONSTRAINT "outbound_consent_email_challenges_consume_within_expiry_chk" CHECK ("outbound_consent_email_challenges"."consumed_at" IS NULL OR ("outbound_consent_email_challenges"."consumed_at" >= "outbound_consent_email_challenges"."created_at" AND "outbound_consent_email_challenges"."consumed_at" <= "outbound_consent_email_challenges"."expires_at"));
+--> statement-breakpoint
+-- The database fixes issue time and lifetime; callers cannot extend a challenge by supplying timestamps.
+CREATE OR REPLACE FUNCTION "outbound_consent_email_challenge_issue"() RETURNS trigger AS $$
+BEGIN
+  IF NEW.consumed_at IS NOT NULL OR NEW.deleted_at IS NOT NULL THEN
+    RAISE EXCEPTION 'outbound consent email challenge must be issued unconsumed';
+  END IF;
+  NEW.created_at := clock_timestamp()::timestamp;
+  NEW.updated_at := NEW.created_at;
+  NEW.expires_at := NEW.created_at + interval '10 minutes';
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+--> statement-breakpoint
+CREATE TRIGGER "outbound_consent_email_challenge_issue_trg" BEFORE INSERT ON "outbound_consent_email_challenges" FOR EACH ROW EXECUTE FUNCTION "outbound_consent_email_challenge_issue"();
 --> statement-breakpoint
 -- Issued challenge facts cannot be changed; only first successful consumption is mutable.
 CREATE OR REPLACE FUNCTION "outbound_consent_email_challenge_consume_once"() RETURNS trigger AS $$

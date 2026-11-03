@@ -399,6 +399,7 @@ export const activityEventTypeEnum = pgEnum("activity_event_type", [
   "outbound_consent.granted",
   "outbound_consent.revoked",
   "outbound_consent.email_challenge_issued",
+  "outbound_consent.email_verification_sent",
   "outbound_consent.email_verified",
   // Saved card migration (FS-138)
   "payment_method_migration.requested",

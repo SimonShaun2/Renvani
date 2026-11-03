@@ -13,7 +13,7 @@ Renvani is **one agent-native operating platform** with Growth, Revenue, Operati
 Authority order for implementation:
 
 1. Current founder-approved product decisions and [FS-255 Autonomous Operating Foundation](https://app.notion.com/p/40a317b92d1581ceaef7e2d4a2f82bb7), including FS-256 (trusted execution), FS-257 (Business Operating Profile), FS-258 (confirmed follow-up outcome), and current board dependencies.
-2. **TEAM.md**, **GITHUB_WORKFLOW.md**, and **CODEX.md**, including pair WIP, exact-head review/CI, E.. CoS integration authority and founder production authority. Historic comments in AGENTS.md and WORKFLOW.md are not authorization to resurrect retired agent/process rules.
+2. **TEAM.md**, **GITHUB_WORKFLOW.md**, and **CODEX.md**, including pair WIP, exact-head review/CI, founder (Shaun) final merge authority for every PR at exact head (#420/#421), with E.. CoS and reviewers giving technical recommendations only. Historic comments in AGENTS.md and WORKFLOW.md are not authorization to resurrect retired agent/process rules.
 3. **Canonical editable product Figma file:** [FSM Agent — Product Design](https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design). Use an exact source node for each implemented screen.
 4. **Click-path reference only:** [Full Software Clickable Prototype, 89 demo frames](https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=399-4217) and [Field Technician Workflow Prototype, 18 demo frames](https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=393-87). These show suggested navigation, not production data, rights, rules, provider sends or payment outcomes.
 5. Code on the **current dev head** and versioned API contracts are the implementation baseline. Do not reproduce mock numbers, demo messages, example customers, fake payment completions, or the prototype's hard-coded links as real behavior.
@@ -26,7 +26,7 @@ The Figma document's *03 Operator App – Desktop*, *04 Crew App – Mobile*, *0
 - **Route/component present:** a code surface exists; no claim of design, data, or business-process parity.
 - **Parity verified:** a reviewed implementation has screenshots and behavior tests at agreed breakpoints, including non-happy states.
 - **Workflow verified:** an actual validated API/worker/result chain has passed tests; this is distinct from clicking a Figma prototype.
-- **Done:** the board ticket's specified peer review, QA, Security by risk, approved batch CI at exact head, and integration merge into dev are evidenced. Promotion to main remains founder-controlled.
+- **Done:** the board ticket's specified peer review, QA, Security by risk, approved batch CI at exact head, and the founder's (Shaun's) merge into dev at that exact head (#420/#421) are evidenced. Promotion to main remains founder-controlled.
 
 ## 2. Design → implementation crosswalk
 
@@ -84,7 +84,7 @@ Treat these as implementation guidance for existing assigned work, **not** new R
 - **Field and customer journeys:** align 390px mobile field flows, public booking, estimate approval, invoice and signature with actual job status and API/write outcomes, including error paths.
 - **Cross-system QA:** demonstrate Discover → Book → Dispatch → Serve → Invoice → Collect → Retain with tenant/policy/consent controls and recorded evidence.
 
-Proposed review roles (not assigned work): Designer 1 Office UX, Designer 2 Field UX, a designated pair for each existing domain ticket, Reviewer 2 UI/accessibility, QA 4 E2E/release, Security for consent/tenant/payments/agent changes, and E.. CoS for the dev integration gate.
+Proposed review roles (not assigned work): Designer 1 Office UX, Designer 2 Field UX, a designated pair for each existing domain ticket, Reviewer 2 UI/accessibility, QA 4 E2E/release, Security for consent/tenant/payments/agent changes, and E.. CoS for technical integration recommendations (merge authority stays with the founder).
 
 ## 5. Ticket/PR acceptance evidence checklist
 
@@ -97,7 +97,7 @@ For **each** implementation PR, include:
 - Loading/empty/error/permission-denied/conflict/stale/approval-pending/success states. Do not use color alone to convey state. Verify keyboard navigation, semantic labels, focus visibility, validation announcements, reduced motion.
 - Functional evidence: jobs and monetary totals from tenant-scoped data; duplicate submission/replay; missing consent; provider fail; payment declined; out-of-date booking availability; tenant cross-read denied.
 - Evidence at exact PR head: local commands/results, UI visual QA, relevant unit/integration/E2E, reviewed screenshot links, regression concerns. Run CI only by the authorized batch process.
-- No "implemented" or "Done" claim before the designated independent peer, QA, Security by risk, approved batch CI and E.. CoS merge into dev. Main/production only by founder release process.
+- No "implemented" or "Done" claim before the designated independent peer, QA, Security by risk, approved batch CI and the founder's (Shaun's) exact-head merge approval into dev (#420/#421); E.. CoS and reviewers recommend only. Main/production only by founder release process.
 
 **Minimum journey tests:** (a) Growth → public inquiry/booking with "request pending" semantics; (b) owner approve estimate with accurate public URL and accepted scope; (c) dispatch a live eligible technician with current availability; (d) field OTW → start → tasks/photos/time → signature → job completion; (e) invoice → customer pay → Stripe-confirmed paid; (f) retention automation after opted-in job event; (g) agent-approved proposal → queued provider action → failure/retry or verified delivery; (h) restricted/other-tenant users denied throughout.
 

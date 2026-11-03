@@ -150,7 +150,7 @@ function ListState({
   if (query.isLoading) return <SkeletonCard className="h-[200px]" />;
   if (query.isError)
     return (
-      <EmptyState
+      <EmptyState variant="operator"
         icon={CreditCard}
         title="Couldn't load payments"
         subtitle="The payments service didn't respond."
@@ -163,7 +163,7 @@ function ListState({
       />
     );
   const rows = query.data?.data ?? [];
-  if (rows.length === 0) return <EmptyState icon={CreditCard} title={emptyTitle} subtitle={emptySubtitle} compact />;
+  if (rows.length === 0) return <EmptyState variant="operator" icon={CreditCard} title={emptyTitle} subtitle={emptySubtitle} compact />;
   return <>{children(rows)}</>;
 }
 
@@ -254,7 +254,7 @@ export function PaymentsClient() {
 
   if (!canManagePayments) {
     return (
-      <EmptyState icon={ShieldAlert} title="Owners and admins only" subtitle="Ask an owner or admin for access to payments." />
+      <EmptyState variant="operator" icon={ShieldAlert} title="Owners and admins only" subtitle="Ask an owner or admin for access to payments." />
     );
   }
 

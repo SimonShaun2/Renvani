@@ -18,7 +18,7 @@ export function AuthShell({ children, variant = "default" }: AuthShellProps) {
   if (variant === "sign-in") {
     return (
       <main
-        className={`${geist.className} flex min-h-dvh flex-col items-center gap-6 bg-[#fbf6ef] px-4 py-10 text-[#0f1530] sm:py-20`}
+        className={`${geist.className} ${geist.variable} ${newsreader.variable} flex min-h-dvh flex-col items-center gap-6 bg-[#fbf6ef] px-4 py-10 text-[#0f1530] sm:py-20`}
         data-testid="renvani-sign-in-shell"
       >
         <div className="flex w-full flex-col items-center gap-[10px] text-center">

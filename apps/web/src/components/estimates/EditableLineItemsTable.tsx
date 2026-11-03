@@ -1,16 +1,17 @@
 "use client";
 
 import { useState } from "react";
+import { Decimal } from "decimal.js";
 import { Plus, Trash2 } from "lucide-react";
 import type { PriceBookItemPickerSeed } from "@fsm/types";
 
 import { ProductCatalogPicker } from "@/src/components/jobs/ProductCatalogPicker";
 import { Sheet } from "@/src/components/ui/Sheet";
 import {
+  calculateLineTotal,
   createLineItemDraft,
   formatMoneyInput,
   formatQuantityInput,
-  parseMoneyValue,
   type RevenueLineItemDraft
 } from "./estimates.utils";
 
@@ -23,7 +24,7 @@ interface EditableLineItemsTableProps {
   /** "frame" = Figma 10:676 Line item / Detail / Qty / Price layout (estimate builder). */
   variant?: "default" | "frame";
   /** Estimate-level discount shown as its own row in the frame layout (only when > 0). */
-  discountAmount?: number;
+  discountAmount?: string;
 }
 
 interface CustomItemFormState {
@@ -51,7 +52,7 @@ export function EditableLineItemsTable({
   readOnly = false,
   onChange,
   variant = "default",
-  discountAmount = 0
+  discountAmount = "0.00"
 }: EditableLineItemsTableProps) {
   const [catalogOpen, setCatalogOpen] = useState(false);
   const [pendingProductId, setPendingProductId] = useState<string | null>(null);
@@ -151,7 +152,7 @@ export function EditableLineItemsTable({
               </tr>
             ) : (
               items.map((item) => {
-                const lineTotal = parseMoneyValue(item.quantity) * parseMoneyValue(item.unitPrice);
+                const lineTotal = calculateLineTotal(item.quantity, item.unitPrice);
                 return (
                   <tr key={item.localId} className="border-t border-[#e6dccb] align-middle">
                     <td className="px-5 py-3.5 font-semibold text-[#0f1530]">
@@ -196,7 +197,7 @@ export function EditableLineItemsTable({
                     </td>
                     <td className="px-5 py-3.5 text-[#2a3360]">
                       {readOnly ? (
-                        `$${formatMoneyInput(lineTotal)}`
+                        `$${lineTotal}`
                       ) : (
                         <div className="space-y-1">
                           <input
@@ -207,8 +208,8 @@ export function EditableLineItemsTable({
                             inputMode="decimal"
                             className={`${frameInput} w-24`}
                           />
-                          {parseMoneyValue(item.quantity) !== 1 ? (
-                            <p className="text-xs text-[#5e6684]">${formatMoneyInput(lineTotal)} total</p>
+                          {!new Decimal(formatQuantityInput(item.quantity)).equals(1) ? (
+                            <p className="text-xs text-[#5e6684]">${lineTotal} total</p>
                           ) : null}
                         </div>
                       )}
@@ -253,7 +254,7 @@ export function EditableLineItemsTable({
                 );
               })
             )}
-            {discountAmount > 0 ? (
+            {new Decimal(discountAmount).greaterThan(0) ? (
               <tr className="border-t border-[#e6dccb]">
                 <td className="px-5 py-3.5 font-semibold text-[#0f1530]">Discount</td>
                 <td className="px-5 py-3.5 text-[#2a3360]">Applied to this estimate</td>
@@ -341,7 +342,7 @@ export function EditableLineItemsTable({
                 </tr>
               ) : (
                 items.map((item) => {
-                  const lineTotal = parseMoneyValue(item.quantity) * parseMoneyValue(item.unitPrice);
+                  const lineTotal = calculateLineTotal(item.quantity, item.unitPrice);
 
                   return (
                     <tr key={item.localId} className="align-top">
@@ -417,7 +418,7 @@ export function EditableLineItemsTable({
                           />
                         )}
                       </td>
-                      <td className="py-4 pr-3 text-right font-semibold text-neutral-900">${formatMoneyInput(lineTotal)}</td>
+                      <td className="py-4 pr-3 text-right font-semibold text-neutral-900">${lineTotal}</td>
                       {!readOnly ? (
                         <td className="py-4 pl-3 text-right">
                           <div className="flex items-center justify-end gap-3">

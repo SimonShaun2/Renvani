@@ -306,13 +306,33 @@ export const EstimateItemIdParamsSchema = z
   })
   .strict();
 
+const estimateMoneyInputSchema = z
+  .string()
+  .regex(
+    /^(?:0|[1-9]\d{0,7})(?:\.\d{1,2})?$/,
+    "Must be a non-negative decimal string with at most 8 integer digits and 2 decimal places"
+  );
+const estimateQuantityInputSchema = z
+  .string()
+  .regex(
+    /^(?:0|[1-9]\d{0,6})(?:\.\d{1,3})?$/,
+    "Must be a positive decimal string with at most 7 integer digits and 3 decimal places"
+  )
+  .refine((value) => value !== "0" && !/^0\.0+$/.test(value), "Must be greater than zero");
+const estimateTaxRateInputSchema = z
+  .string()
+  .regex(
+    /^(?:0(?:\.\d{1,4})?|1(?:\.0{1,4})?)$/,
+    "Must be a decimal string between 0 and 1 with at most 4 decimal places"
+  );
+
 export const CreateEstimateItemSchema = z
   .object({
     name: z.string().trim().min(1).max(255),
     description: z.string().trim().optional(),
     itemType: estimateItemTypeSchema.optional().default("service"),
-    quantity: z.number().min(0.001),
-    unitPrice: z.number().min(0),
+    quantity: estimateQuantityInputSchema,
+    unitPrice: estimateMoneyInputSchema,
     isTaxable: z.boolean().optional().default(true),
     sortOrder: z.number().int().optional().default(0),
     priceBookItemId: uuidSchema.optional()
@@ -323,8 +343,8 @@ export const UpdateEstimateItemSchema = buildUpdateSchema({
   name: z.string().trim().min(1).max(255).optional(),
   description: z.string().trim().optional(),
   itemType: estimateItemTypeSchema.optional(),
-  quantity: z.number().min(0.001).optional(),
-  unitPrice: z.number().min(0).optional(),
+  quantity: estimateQuantityInputSchema.optional(),
+  unitPrice: estimateMoneyInputSchema.optional(),
   isTaxable: z.boolean().optional(),
   sortOrder: z.number().int().optional(),
   priceBookItemId: uuidSchema.nullable().optional()
@@ -338,8 +358,8 @@ export const CreateEstimateSchema = z
     title: z.string().trim().min(1).max(255).optional(),
     messageToCustomer: z.string().trim().optional(),
     internalNotes: z.string().trim().optional(),
-    taxRate: z.number().min(0).max(1).optional().default(0),
-    discountAmount: z.number().min(0).optional().default(0),
+    taxRate: estimateTaxRateInputSchema.optional().default("0"),
+    discountAmount: estimateMoneyInputSchema.optional().default("0"),
     financingOffered: z.boolean().optional().default(false),
     tierLabel: z.string().trim().max(255).optional(),
     tierGroupId: uuidSchema.optional(),
@@ -354,8 +374,8 @@ export const UpdateEstimateSchema = buildUpdateSchema({
   title: z.string().trim().min(1).max(255).optional(),
   messageToCustomer: z.string().trim().optional(),
   internalNotes: z.string().trim().optional(),
-  taxRate: z.number().min(0).max(1).optional(),
-  discountAmount: z.number().min(0).optional(),
+  taxRate: estimateTaxRateInputSchema.optional(),
+  discountAmount: estimateMoneyInputSchema.optional(),
   financingOffered: z.boolean().optional(),
   tierLabel: z.string().trim().max(255).optional(),
   tierGroupId: uuidSchema.optional()

@@ -30,7 +30,8 @@ import {
   type AiRecommendationStatus,
   type ListRecommendationsQuery,
   type PaginatedResult,
-  type RevenueSummary
+  type RevenueSummary,
+  isRevenueProposalRecommendationType
 } from "@fsm/types";
 
 type AiRecommendationRow = typeof aiRecommendations.$inferSelect;
@@ -392,6 +393,13 @@ export async function actionRecommendation(
 ): Promise<AiRecommendation> {
   const now = new Date();
   const recommendation = await getRecommendationRowOrThrow(companyId, recommendationId);
+
+  if (isRevenueProposalRecommendationType(recommendation.type)) {
+    throw new AppError(
+      ErrorCode.CONFLICT,
+      "This recommendation requires a Revenue Agent proposal and operator approval"
+    );
+  }
 
   if (recommendation.status !== "pending") {
     throw new AppError(ErrorCode.CONFLICT, "Recommendation has already been actioned");

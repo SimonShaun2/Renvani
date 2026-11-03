@@ -17,6 +17,7 @@ import type {
 import {
   createInvoice,
   getInvoice,
+  getInvoiceChargePreview,
   listInvoices,
   recordPayment,
   resendInvoiceReminder,
@@ -161,6 +162,11 @@ export async function createInvoiceHandler(request: FastifyRequest, reply: Fasti
   return reply.status(201).send({
     invoice: toInvoiceDetailResponse(detail)
   });
+}
+
+export async function getInvoiceChargePreviewHandler(request: FastifyRequest, reply: FastifyReply): Promise<FastifyReply> {
+  const params = request.params as InvoiceIdParams;
+  return reply.send(await getInvoiceChargePreview(request.company.id, params.id));
 }
 
 export async function getInvoiceHandler(request: FastifyRequest, reply: FastifyReply): Promise<FastifyReply> {

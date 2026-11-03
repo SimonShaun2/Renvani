@@ -83,7 +83,7 @@ function getErrorMessage(error: unknown): string {
 function WeekStub({ onReset }: { onReset: () => void }) {
   return (
     <section className="surface-card p-8">
-      <EmptyState
+      <EmptyState variant="operator"
         icon={Sparkles}
         title="Week view is staged next"
         subtitle="Ticket 016 delivers the full day board first. Switch back to day mode to drag jobs, confirm bookings, and quick-create directly on the timeline."

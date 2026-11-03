@@ -166,7 +166,7 @@ export function CustomerTable() {
           Customer records could not be loaded.
         </section>
       ) : customersQuery.data.data.length === 0 ? (
-        <EmptyState
+        <EmptyState variant="operator"
           icon={Users}
           title="No customers match this view"
           subtitle="Try another search term or switch filters to widen the customer set."

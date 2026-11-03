@@ -145,6 +145,10 @@ describe("BrandedInquiryClient", () => {
     await waitFor(() => expect(mocks.assistantPost).toHaveBeenCalledTimes(2));
     expect(mocks.assistantPost.mock.calls[1]?.[1]).toMatchObject({ action: "handoff", service: "Roof repair", source: "google" });
     expect(await screen.findByText("ASSIST-2")).toBeTruthy();
+    const pending = screen.getByRole("status");
+    expect(pending.className).toContain("rounded-[16px]");
+    expect(pending.className).toContain("max-w-[560px]");
+    expect(screen.getByText("ASSIST-2").className).toContain("font-mono");
   });
 
   it("keeps an unknown service-area request in the consented staff handoff path", async () => {
@@ -375,5 +379,37 @@ describe("BrandedInquiryClient", () => {
     expect(mocks.submit).toHaveBeenCalledWith(expect.objectContaining({
       body: expect.objectContaining({ smsConsentAppointments: appointments, smsConsentMarketing: marketing })
     }));
+  });
+
+  it("applies Nadia's FS-197 design tokens (Figma 433:122/202/282/365/767)", async () => {
+    const { container } = render(<BrandedInquiryClient model={buildBrandedStorefrontViewModel(baseSettings)} acquisitionSource="website" assistantEnabled />);
+    const card = screen.getByRole("region", { name: "Ask about this business" });
+    expect(card.className).toContain("rounded-[16px]");
+    expect(card.className).toContain("p-6");
+    const ask = screen.getByRole("button", { name: "Check published details" });
+    expect(ask.className).toContain("bg-[#f6b400]");
+    expect(ask.className).toContain("rounded-full");
+    expect(ask.className).toContain("h-12");
+    expect(ask.className).toContain("text-[#0f1530]");
+    const topic = screen.getByRole("combobox", { name: "Question topic" });
+    expect(topic.className).toContain("h-[52px]");
+    expect(topic.className).toContain("rounded-[12px]");
+    expect(topic.className).toContain("px-4");
+    expect(container.innerHTML).not.toContain("#2f7d4f");
+    expect(container.innerHTML).not.toContain("red-700");
+
+    mocks.assistantPost.mockRejectedValueOnce(new ApiError(503, { error: "NOT_IMPLEMENTED", message: "We could not check that right now. Please try again." }));
+    fireEvent.click(ask);
+    const alert = await screen.findByRole("alert");
+    expect(alert.className).toContain("bg-[#fbe3dc]");
+    expect(alert.className).toContain("text-[#b42318]");
+
+    mocks.assistantPost.mockResolvedValueOnce({ kind: "answer", verified: true, answer: "Summit Service lists AC repair.", source: "public_booking_settings" });
+    fireEvent.click(ask);
+    await waitFor(() => expect(screen.getByRole("status").className).toContain("bg-[#e4f1e8]"));
+
+    mocks.assistantPost.mockResolvedValueOnce({ kind: "handoff_required", reason: "pricing_review", message: "Staff must review pricing." });
+    fireEvent.click(ask);
+    await waitFor(() => expect(screen.getByRole("status").className).toContain("bg-[#fff4d6]"));
   });
 });

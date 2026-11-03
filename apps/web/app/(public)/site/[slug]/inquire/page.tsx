@@ -59,15 +59,15 @@ export default async function BrandedInquiryPage({
   });
 
   return (
-    <div className="min-h-screen bg-[#f7faf8] text-[#0f1530]">
+    <div className="min-h-screen bg-[#fbf6ef] text-[#0f1530]">
       <BrandedLocalSeo jsonLd={jsonLd} />
-      <header className="border-b border-[#e6dccb] px-6 py-5 md:px-16">
-        <Link href={sitePath} className="text-sm font-semibold text-[#2f7d4f] hover:underline">
+      <header className="mx-auto w-full max-w-[592px] px-4 pt-6 md:pt-14">
+        <Link href={sitePath} className="text-sm font-semibold text-[#0f1530] underline">
           ← Back to {model.companyName}
         </Link>
-        <h1 className="mt-4 text-3xl font-semibold tracking-tight">Tell us what you need</h1>
+        <h1 className="mt-4 text-[32px] font-semibold leading-[1.45]">Tell us what you need</h1>
       </header>
-      <main className="px-6 py-10 md:px-16">
+      <main className="px-4 pb-12 pt-5">
         <BrandedInquiryClient
           model={model}
           acquisitionSource={acquisitionSource}

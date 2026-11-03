@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { format, parseISO } from "date-fns";
 import { motion } from "framer-motion";
-import { CalendarClock, Sparkles, X } from "lucide-react";
+import { CalendarClock, RefreshCw, Sparkles, X } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   isRevenueProposalRecommendationType,
@@ -12,7 +12,6 @@ import {
   type AiRecommendationType
 } from "@fsm/types";
 
-import { PageLayout } from "@/src/components/layout/PageLayout";
 import { CurrencyDisplay } from "@/src/components/ui/CurrencyDisplay";
 import { EmptyState } from "@/src/components/ui/EmptyState";
 import { SkeletonCard } from "@/src/components/ui/SkeletonCard";
@@ -44,35 +43,12 @@ const cardMotion = {
 };
 
 const categoryToneClasses: Record<CategoryCard["tone"], string> = {
-  purple: "bg-ai-light text-ai",
-  orange: "bg-warning-light text-warning",
-  red: "bg-error-light text-error",
-  blue: "bg-brand-accent-light text-brand-accent",
-  gold: "bg-[#fff1d8] text-[#d48d0f]"
+  purple: "bg-[#e9ecf8] text-[#2a3360]",
+  orange: "bg-[#fff4d6] text-[#7a5600]",
+  red: "bg-[#fbe3dc] text-[#b42318]",
+  blue: "bg-[#e6eef8] text-[#2a3360]",
+  gold: "bg-[#fff4d6] text-[#7a5600]"
 };
-
-function getRecommendationActionLabel(type: AiRecommendationType): string {
-  switch (type) {
-    case "reactivation":
-      return "Schedule Now";
-    case "unsold_estimate":
-      return "Send Follow Up";
-    case "unpaid_invoice":
-      return "Send Payment Link";
-    case "aging_asset":
-      return "Create Estimate";
-    case "maintenance_plan_offer":
-      return "Offer Plan";
-    case "upsell_opportunity":
-      return "Approve Upsell";
-    case "maintenance_due":
-      return "Book Service";
-    case "seasonal_campaign":
-      return "Send Campaign";
-    default:
-      return "Take Action";
-  }
-}
 
 function getTypeLabel(type: AiRecommendationType): string {
   switch (type) {
@@ -110,7 +86,8 @@ function getUrgencyTone(score: number | null): "red" | "orange" | "gray" {
 }
 
 function getUrgencyLabel(score: number | null): string {
-  if ((score ?? 0) >= 85) {
+  if (score === null) return "Unrated";
+  if (score >= 85) {
     return "Urgent";
   }
 
@@ -194,10 +171,10 @@ function RecommendationRow({
   const urgencyTone = getUrgencyTone(recommendation.urgencyScore);
   const actionLabel = isRevenueProposalRecommendationType(recommendation.type)
     ? "Create proposal"
-    : getRecommendationActionLabel(recommendation.type);
+    : "Mark handled";
 
   return (
-    <div className="rounded-[28px] border border-neutral-200 bg-white px-5 py-5 shadow-sm transition hover:shadow-[0_24px_70px_rgba(16,33,99,0.08)]">
+    <div className="rounded-[14px] border border-[#e6dccb] bg-white px-5 py-5 transition hover:border-[#f6b400]">
       <div className="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-3">
@@ -209,7 +186,7 @@ function RecommendationRow({
                 urgencyTone === "gray" && "bg-neutral-100 text-neutral-500"
               )}
             >
-              {recommendation.urgencyScore ?? 0}
+              {recommendation.urgencyScore ?? "—"}
             </div>
             <StatBadge label={getTypeLabel(recommendation.type)} tone="gray" />
             <StatBadge
@@ -232,7 +209,7 @@ function RecommendationRow({
             {recommendation.asset ? <span>{recommendation.asset.name}</span> : null}
             <span>
               Est. value:{" "}
-              <CurrencyDisplay value={recommendation.estimatedRevenue} className="font-semibold text-neutral-900" />
+              <CurrencyDisplay value={recommendation.estimatedRevenue} fallback="—" className="font-semibold text-[#0f1530]" />
             </span>
           </div>
         </div>
@@ -245,8 +222,8 @@ function RecommendationRow({
             }}
             disabled={isActioning}
             className={cn(
-              "inline-flex min-w-[164px] items-center justify-center rounded-2xl px-4 py-3 text-sm font-semibold text-white transition",
-              recommendation.type === "maintenance_plan_offer" ? "bg-ai hover:bg-brand-primary" : "bg-brand-accent hover:bg-brand-primary",
+              "inline-flex min-w-[164px] items-center justify-center rounded-[10px] px-4 py-3 text-sm font-semibold transition",
+              isRevenueProposalRecommendationType(recommendation.type) ? "bg-[#f6b400] text-[#0f1530] hover:bg-[#e0a400]" : "border border-[#0f1530] bg-white text-[#0f1530] hover:bg-[#f3eadc]",
               isActioning && "cursor-not-allowed opacity-70"
             )}
           >
@@ -334,6 +311,8 @@ export function AiRevenueCenterClient() {
   const [snoozeDate, setSnoozeDate] = useState(getTomorrowDateValue());
   const [snoozeError, setSnoozeError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+  const [refreshNotice, setRefreshNotice] = useState<{ type: "error" | "success"; message: string } | null>(null);
   const actionMutation = useActionRecommendation();
   const proposeMutation = useProposeRecommendation();
   const dismissMutation = useDismissRecommendation();
@@ -369,7 +348,25 @@ export function AiRevenueCenterClient() {
     ...(selectedType !== "all" ? { type: selectedType } : {})
   });
 
-  const recommendations = recommendationsQuery.data?.data ?? [];
+  const recommendations = recommendationsQuery.isError ? [] : recommendationsQuery.data?.data ?? [];
+
+  // This refreshes stored results; a new background scan requires a separate authorized job.
+  async function handleRefreshView() {
+    setRefreshing(true);
+    setRefreshNotice(null);
+    try {
+      const [summary, list] = await Promise.all([summaryQuery.refetch(), recommendationsQuery.refetch()]);
+      if (summary.isError || list.isError || !summary.data || !list.data) {
+        setRefreshNotice({ type: "error", message: "Revenue data could not be refreshed. The previous view may be out of date." });
+      } else {
+        setRefreshNotice({ type: "success", message: "Saved opportunity results refreshed. Automated opportunity checks run separately." });
+      }
+    } catch {
+      setRefreshNotice({ type: "error", message: "Revenue data could not be refreshed. Try again." });
+    } finally {
+      setRefreshing(false);
+    }
+  }
 
   async function handleAction(recommendation: AiRecommendationDetail) {
     setActionError(null);
@@ -383,7 +380,7 @@ export function AiRevenueCenterClient() {
       await actionMutation.mutateAsync({
         id: recommendation.id,
         input: {
-          actionTaken: getRecommendationActionLabel(recommendation.type)
+          actionTaken: "marked_handled_in_revenue_center"
         }
       });
     } catch (error: unknown) {
@@ -423,38 +420,56 @@ export function AiRevenueCenterClient() {
     setSnoozeError(null);
   }
 
-  const categoryCards = summaryQuery.data ? buildCategoryCards(summaryQuery.data) : [];
+  const categoryCards = !summaryQuery.isError && summaryQuery.data ? buildCategoryCards(summaryQuery.data) : [];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 text-[#0f1530]">
       <motion.div {...cardMotion} transition={{ duration: 0.32 }}>
-        <PageLayout
-          title="AI Revenue Center"
-          subtitle="Your revenue opportunities updated continuously."
-          actions={
+        <div className="space-y-6">
+          <header className="flex flex-wrap items-start justify-between gap-5">
+            <div className="min-w-0 flex-1">
+              <p className="font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-[#5e6684]">Renvani / Revenue</p>
+              <h1 className="mt-2 text-[32px] font-semibold leading-tight tracking-[-0.03em] sm:text-[36px]">
+                Find the <span className="font-[family-name:var(--font-mkt-serif)] font-normal italic text-[#2a3360]">hidden revenue.</span>
+              </h1>
+              <p className="mt-2 max-w-[740px] text-sm leading-6 text-[#5e6684]">
+                Review opportunities identified from connected customers, estimates, invoices, equipment, and agreements.
+              </p>
+            </div>
             <button
               type="button"
-              className="rounded-2xl border border-ai/20 bg-ai-light px-4 py-2 text-sm font-semibold text-ai transition hover:bg-white"
+              onClick={() => { void handleRefreshView(); }}
+              disabled={refreshing}
+              aria-label="Refresh saved revenue opportunities"
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[10px] border border-[#0f1530] bg-[#0f1530] px-[18px] text-sm font-semibold text-white transition hover:bg-[#2a3360] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f1530] disabled:cursor-not-allowed disabled:opacity-60"
             >
-              Run AI Scan
+              <RefreshCw aria-hidden="true" className={cn("h-4 w-4", refreshing && "animate-spin")} />
+              {refreshing ? "Refreshing…" : "Refresh view"}
             </button>
-          }
-        >
+          </header>
+          {refreshNotice ? (
+            <p role={refreshNotice.type === "error" ? "alert" : "status"} className={cn("rounded-[10px] border px-4 py-3 text-[13px]", refreshNotice.type === "error" ? "border-[#f1b3a7] bg-[#fbe3dc] text-[#b42318]" : "border-[#e6dccb] bg-[#fff4d6] text-[#7a5600]")}>
+              {refreshNotice.message}
+            </p>
+          ) : null}
           <div className="space-y-6">
-            <section className="overflow-hidden rounded-[30px] bg-brand-primary text-white shadow-[0_28px_90px_rgba(16,33,99,0.24)]">
+            <section className="overflow-hidden rounded-[16px] border border-[#2a3360] bg-[#0f1530] text-white">
               <div className="flex flex-col gap-6 px-6 py-6 lg:flex-row lg:items-end lg:justify-between">
                 <div>
-                  <p className="text-sm font-semibold uppercase tracking-[0.24em] text-white/60">Total Revenue Opportunity</p>
-                  <CurrencyDisplay value={summaryQuery.data?.totalOpportunityValue} className="mt-3 block text-5xl font-semibold tracking-tight text-white" />
+                  <p className="font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-[#c3c8da]">Identified revenue opportunity</p>
+                  {summaryQuery.isLoading ? <p role="status" className="mt-3 text-xl text-[#c3c8da]">Loading saved figures…</p> :
+                   summaryQuery.isError || !summaryQuery.data ? <p className="mt-3 text-5xl font-semibold">—</p> :
+                   <CurrencyDisplay value={summaryQuery.data.totalOpportunityValue} fallback="—" className="mt-3 block text-5xl font-semibold tracking-tight text-white" />}
+                  <p className="mt-3 text-xs leading-5 text-[#c3c8da]">Potential identified in recorded opportunities, not booked revenue.</p>
                 </div>
                 <div className="text-sm text-white/70">
-                  {summaryQuery.data ? (
+                  {summaryQuery.data && !summaryQuery.isError ? (
                     <div className="flex items-center gap-2">
                       <CalendarClock className="h-4 w-4" />
-                      <span>Last scanned: {format(parseISO(summaryQuery.data.generatedAt), "MMM d, h:mm a")}</span>
+                      <span>Summary calculated: {format(parseISO(summaryQuery.data.generatedAt), "MMM d, h:mm a")}</span>
                     </div>
                   ) : (
-                    <span>Last scanned: waiting for summary</span>
+                    <span>Summary unavailable</span>
                   )}
                 </div>
               </div>
@@ -490,22 +505,22 @@ export function AiRevenueCenterClient() {
                       setPage(1);
                     }}
                     className={cn(
-                      "rounded-[28px] border bg-white px-5 py-5 text-left shadow-sm transition",
-                      selectedType === card.id ? "border-brand-accent shadow-[0_18px_40px_rgba(37,122,250,0.18)]" : "border-neutral-200 hover:border-brand-accent/30"
+                      "rounded-[14px] border bg-white px-5 py-5 text-left transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f1530]",
+                      selectedType === card.id ? "border-[#f6b400] ring-2 ring-[#fff4d6]" : "border-[#e6dccb] hover:border-[#f6b400]"
                     )}
                   >
                     <div className={cn("flex h-11 w-11 items-center justify-center rounded-2xl", categoryToneClasses[card.tone])}>
                       <Sparkles className="h-5 w-5" />
                     </div>
-                    <p className="mt-4 text-sm font-medium text-neutral-500">{card.label}</p>
-                    <CurrencyDisplay value={card.value} className="mt-1 block text-3xl font-semibold tracking-tight text-neutral-900" />
-                    <p className="mt-2 text-sm text-neutral-500">{card.count} active opportunities</p>
+                    <p className="mt-4 text-[13px] font-semibold text-[#2a3360]">{card.label}</p>
+                    <CurrencyDisplay value={card.value} fallback="—" className="mt-1 block text-[30px] font-semibold tracking-tight text-[#0f1530]" />
+                    <p className="mt-2 text-xs text-[#5e6684]">{card.count} recorded opportunities</p>
                   </button>
                 ))}
               </div>
             )}
 
-            <section className="surface-card p-5">
+            <section className="rounded-[14px] border border-[#e6dccb] bg-white p-5">
               <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                 <div className="flex flex-wrap items-center gap-3">
                   <span className="text-sm font-medium text-neutral-500">Filter:</span>
@@ -526,7 +541,7 @@ export function AiRevenueCenterClient() {
                       }}
                       className={cn(
                         "rounded-full px-4 py-2 text-sm font-semibold transition",
-                        selectedType === filter.id ? "bg-brand-accent text-white" : "bg-neutral-100 text-neutral-500 hover:text-neutral-800"
+                        selectedType === filter.id ? "bg-[#f6b400] text-[#0f1530]" : "bg-[#f3eadc] text-[#2a3360] hover:bg-[#fff4d6]"
                       )}
                     >
                       {filter.label}
@@ -542,7 +557,7 @@ export function AiRevenueCenterClient() {
                       setSortBy(event.target.value as SortOption);
                       setPage(1);
                     }}
-                    className="rounded-full border border-neutral-200 bg-white px-4 py-2 text-sm font-semibold text-neutral-700 outline-none"
+                    className="min-h-11 rounded-[10px] border border-[#e6dccb] bg-white px-4 py-2 text-sm font-semibold text-[#0f1530] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f1530]"
                   >
                     <option value="urgencyScore">Urgency Score</option>
                     <option value="estimatedRevenue">Estimated Revenue</option>
@@ -579,11 +594,19 @@ export function AiRevenueCenterClient() {
                   </button>
                 </div>
               ) : recommendations.length === 0 ? (
-                <EmptyState
-                  icon={Sparkles}
-                  title="No recommendations in this view"
-                  subtitle="Try a different filter or come back after the next AI revenue scan."
-                />
+                selectedType === "all" && !customerIdFilter ? (
+                  <section className="rounded-[14px] border border-[#e6dccb] bg-white px-6 py-10 text-center" aria-label="No identified opportunities">
+                    <div className="mx-auto flex size-12 items-center justify-center rounded-[12px] bg-[#fff4d6] text-[#7a5600]"><Sparkles aria-hidden="true" className="size-6" /></div>
+                    <h2 className="mt-5 text-xl font-semibold text-[#0f1530]">No active opportunities identified yet</h2>
+                    <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-[#5e6684]">Renvani uses connected records to evaluate past customers, unsold estimates, unpaid invoices, aging equipment, and agreements. A recorded zero does not mean your business has no potential.</p>
+                    <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+                      <Link href="/onboarding/import" className="inline-flex min-h-11 items-center justify-center rounded-[10px] bg-[#f6b400] px-5 text-sm font-semibold text-[#0f1530] hover:bg-[#e0a400]">Import business records</Link>
+                      <Link href="/customers" className="inline-flex min-h-11 items-center justify-center rounded-[10px] border border-[#e6dccb] bg-white px-5 text-sm font-semibold text-[#0f1530]">View customers</Link>
+                    </div>
+                  </section>
+                ) : (
+                  <EmptyState icon={Sparkles} title="No matching opportunities" subtitle="Try another filter or customer." />
+                )
               ) : (
                 recommendations.map((recommendation) => (
                   <RecommendationRow
@@ -636,7 +659,7 @@ export function AiRevenueCenterClient() {
               </section>
             ) : null}
           </div>
-        </PageLayout>
+        </div>
       </motion.div>
 
       {dismissTarget ? (

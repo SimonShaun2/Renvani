@@ -105,10 +105,22 @@ function nodeAt(sourceFile: ts.SourceFile, position: number): ts.Node {
   }
 }
 
+function bindsName(binding: ts.BindingName, name: string): boolean {
+  if (ts.isIdentifier(binding)) return binding.text === name;
+  return binding.elements.some((element) => ts.isBindingElement(element) && bindsName(element.name, name));
+}
+
 /** A bare `.where(conditions)` is guarded only when the visible declaration's initializer is scoped. */
 function identifierIsCompanyScoped(sourceFile: ts.SourceFile, name: string, position: number): boolean {
   let node: ts.Node | undefined = nodeAt(sourceFile, position);
   while (node) {
+    if (ts.isFunctionLike(node) && node.parameters.some((parameter) => bindsName(parameter.name, name))) return false;
+    if (ts.isCatchClause(node) && node.variableDeclaration && bindsName(node.variableDeclaration.name, name)) return false;
+    const loopInitializer = ts.isForStatement(node) || ts.isForInStatement(node) || ts.isForOfStatement(node)
+      ? node.initializer
+      : undefined;
+    if (loopInitializer && ts.isVariableDeclarationList(loopInitializer) &&
+      loopInitializer.declarations.some((declaration) => bindsName(declaration.name, name))) return false;
     if (ts.isBlock(node) || ts.isSourceFile(node)) {
       for (let i = node.statements.length - 1; i >= 0; i -= 1) {
         const statement = node.statements[i]!;

@@ -69,6 +69,12 @@ describe("H1 tenant-guard static scan", () => {
         "{ const shadowed = eq(invoices.companyId, companyId); }",
         "const shadowed = eq(invoices.id, id);",
         "await db.select().from(invoices).where(shadowed);",
+        "const parameterPredicate = eq(invoices.companyId, companyId);",
+        "function run(parameterPredicate: unknown) { return db.select().from(invoices).where(parameterPredicate); }",
+        "const catchPredicate = eq(invoices.companyId, companyId);",
+        "try { throw new Error('x'); } catch (catchPredicate) { db.select().from(invoices).where(catchPredicate); }",
+        "const loopPredicate = eq(invoices.companyId, companyId);",
+        "for (const loopPredicate of [eq(invoices.id, id)]) { db.select().from(invoices).where(loopPredicate); }",
         "const safePredicate = and(eq(invoices.companyId, companyId), eq(invoices.id, id));",
         "await db.select().from(invoices).where(safePredicate);"
       ].join("\n")
@@ -78,6 +84,9 @@ describe("H1 tenant-guard static scan", () => {
       "from:invoices:where-without-companyId",
       "update:jobs:where-without-companyId",
       "delete:payments:no-where",
+      "from:invoices:where-without-companyId",
+      "from:invoices:where-without-companyId",
+      "from:invoices:where-without-companyId",
       "from:invoices:where-without-companyId",
       "from:invoices:where-without-companyId",
       "from:invoices:where-without-companyId",

@@ -24,8 +24,8 @@
 2. Write new value to approved secret store for target environment — never to git.
 3. Redeploy only the scoped consumers; order depends on the credential class.
 4. Verify: health checks, send test SMS/email in staging only, Stripe test webhook, login smoke.
-5. Revoke old credential at provider after verification window.
-6. Record: date, env, credential class, executor (name), ticket link — no secret values.
+5. Revoke old credential at provider after verification window; verify a harmless request using the old credential is denied while the replacement remains valid.
+6. Record: date, exact non-production target, credential class, executor, smoke outcome, old-key-denied outcome and ticket link — no credential values or payloads.
 ```
 
 ## Per-class notes
@@ -45,14 +45,13 @@
 
 ## Non-production drill (acceptance evidence for FS-76)
 
-**Goal:** Demonstrate rotation **process** without production impact.
+**Goal:** Demonstrate a completed staging-only credential issue → inject → smoke → replace → revoke → old-key-denied sequence without production impact. Local-only drills do not satisfy FS-76 acceptance.
 
-1. **Staging only** (or local): the authorized Platform owner issues a **new** test credential for one scoped class after target-specific approval.
-2. Platform updates only its actual staging consumers in approved **Render** or **Vercel** secret settings; Neon, Render Key Value, Clerk and Cloudflare R2 are touched only when that class requires them.
-3. Redeploy the scoped service; confirm startup passes its `@fsm/config/runtime-env` view and enabled adapter checks.
-4. Run smoke: API `GET /health` (if present), one queued notification job in **test** mode.
-5. Revoke previous staging key.
-6. Attach evidence to FS-76 Notion: executor, timestamp, env, class rotated — **no values**.
+1. Identify an **isolated staging-only, harmless, least-privilege** credential class with a safe validation call. Exclude live payment, production, real customer messaging and tenant data. Record the exact tester resource and target-specific authorization before issue.
+2. Platform issues a new tester credential and injects it only into its scoped staging consumers in approved **Render** or **Vercel** secret settings. Neon, Render Key Value, Clerk and Cloudflare R2 are touched only when that class requires them.
+3. Redeploy the scoped consumer; confirm startup passes its `@fsm/config/runtime-env` view and enabled adapter checks. Run the safe staging smoke with the new credential and record its outcome without request or credential contents.
+4. Replace the old active credential at the provider, then revoke it. Run a harmless provider validation with the old credential and verify denial; repeat the safe smoke with the replacement and verify success. Do not log or publish either credential.
+5. Attach FS-76 evidence: executor, time, exact staging target, credential class, scoped consumer, deployment SHA, new-key smoke outcome, provider revocation confirmation, old-key-denied result and replacement success — **no values, tokens or payloads**.
 
 ## Incident — exposed credential
 
@@ -76,4 +75,5 @@
 - [ ] All dependent services redeployed
 - [ ] Verification completed
 - [ ] Old secret revoked
+- [ ] Old credential denied in staging; replacement still succeeds
 - [ ] Evidence recorded without values

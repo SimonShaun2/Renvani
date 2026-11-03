@@ -4,7 +4,7 @@
  * Provider-neutral; safe to run locally without credentials.
  */
 import { readFileSync, readdirSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -34,6 +34,29 @@ const REQUIRED_LOCAL_KEYS = new Set([
   "TWILIO_AUTH_TOKEN", "TWILIO_FROM_NUMBER", "SENDGRID_API_KEY",
   "SENDGRID_FROM_EMAIL", "STRIPE_PLATFORM_FEE_PERCENT", "NEXT_PUBLIC_API_URL"
 ]);
+
+/** Required fields in the scoped boot views in packages/config/src/runtime-env.ts.
+ * Optional sender/provider fields are intentionally excluded. */
+export const REQUIRED_SERVICE_KEYS = Object.freeze({
+  "api.env.example": [
+    "DATABASE_URL", "REDIS_URL", "APP_URL", "JWT_SECRET", "JWT_REFRESH_SECRET",
+    "BOOKING_HOLD_TOKEN_SECRET", "ACCESS_TOKEN_TTL_SECONDS", "REFRESH_TOKEN_TTL_SECONDS",
+    "RESET_TOKEN_TTL_SECONDS", "STRIPE_SECRET_KEY", "SENDGRID_API_KEY",
+    "SENDGRID_FROM_EMAIL", "STRIPE_PLATFORM_FEE_PERCENT"
+  ],
+  "worker.env.example": ["DATABASE_URL", "REDIS_URL", "APP_URL"],
+  "webhook.env.example": [
+    "DATABASE_URL", "REDIS_URL", "APP_URL", "STRIPE_SECRET_KEY",
+    "STRIPE_WEBHOOK_SECRET", "TWILIO_AUTH_TOKEN", "TWILIO_FROM_NUMBER"
+  ]
+});
+
+export function requiredServiceTemplateErrors(file, source) {
+  const required = REQUIRED_SERVICE_KEYS[file];
+  if (!required) return [];
+  const keys = parseDotEnvKeys(source);
+  return diff(file, required.filter((key) => !keys.has(key)).sort(), []);
+}
 
 /** Keys referenced in historical PRODUCTION-DEPLOYMENT.md (informational). */
 const KNOWN_STALE_DEPLOYMENT_KEYS = new Set([
@@ -97,6 +120,8 @@ function main() {
   const errors = [];
   errors.push(...diff("required local boot keys versus canonical schema", [],
     [...REQUIRED_LOCAL_KEYS].filter((k) => !schemaKeys.has(k)).sort()));
+  errors.push(...diff("service boot keys versus canonical schema", [],
+    [...new Set(Object.values(REQUIRED_SERVICE_KEYS).flat())].filter((k) => !schemaKeys.has(k)).sort()));
 
   const rootKeys = parseDotEnvKeys(readFileSync(ROOT_EXAMPLE, "utf8"));
   errors.push(
@@ -122,7 +147,9 @@ function main() {
     if (file === "local-dev.env.example" || file === "web.env.example" || file === "migrations.env.example") {
       continue;
     }
-    const keys = parseDotEnvKeys(readFileSync(join(TEMPLATE_DIR, file), "utf8"));
+    const source = readFileSync(join(TEMPLATE_DIR, file), "utf8");
+    const keys = parseDotEnvKeys(source);
+    errors.push(...requiredServiceTemplateErrors(file, source));
     const unexpected = [...keys].filter((k) => !schemaKeys.has(k) && !DOCUMENTED_EXTERNAL_KEYS.has(k));
     if (unexpected.length > 0) {
       errors.push(`${file}: keys not in canonical schema or documented host keys: ${unexpected.sort().join(", ")}`);
@@ -178,4 +205,6 @@ function main() {
   );
 }
 
-main();
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  main();
+}

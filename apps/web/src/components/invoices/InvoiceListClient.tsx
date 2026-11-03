@@ -300,7 +300,7 @@ export function InvoiceListClient() {
           </div>
         ) : visibleInvoices.length === 0 ? (
               <div className="px-5 py-10">
-                <EmptyState
+                <EmptyState variant="operator"
                   icon={FileText}
                   title="No invoices match this view"
                   subtitle="Try a different filter or create a new invoice to start tracking payments."

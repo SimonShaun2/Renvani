@@ -136,3 +136,60 @@ CREATE POLICY "tenant_select_outbound_consent_states" ON "outbound_consent_state
 CREATE POLICY "tenant_insert_outbound_consent_states" ON "outbound_consent_states" FOR INSERT WITH CHECK (company_id::text = current_setting('app.current_company_id', true));
 --> statement-breakpoint
 CREATE POLICY "tenant_update_outbound_consent_states" ON "outbound_consent_states" FOR UPDATE USING (company_id::text = current_setting('app.current_company_id', true)) WITH CHECK (company_id::text = current_setting('app.current_company_id', true));
+--> statement-breakpoint
+CREATE TABLE "outbound_consent_email_challenges" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"company_id" uuid NOT NULL,
+	"customer_id" uuid NOT NULL,
+	"email" varchar(320) NOT NULL,
+	"token_hash" varchar(64) NOT NULL,
+	"idempotency_key" varchar(128) NOT NULL,
+	"expires_at" timestamp NOT NULL,
+	"consumed_at" timestamp,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL,
+	"deleted_at" timestamp
+);
+--> statement-breakpoint
+ALTER TABLE "outbound_consent_email_challenges" ADD CONSTRAINT "outbound_consent_email_challenges_company_id_companies_id_fk" FOREIGN KEY ("company_id") REFERENCES "public"."companies"("id") ON DELETE no action ON UPDATE no action;
+--> statement-breakpoint
+ALTER TABLE "outbound_consent_email_challenges" ADD CONSTRAINT "outbound_consent_email_challenges_customer_id_customers_id_fk" FOREIGN KEY ("customer_id") REFERENCES "public"."customers"("id") ON DELETE no action ON UPDATE no action;
+--> statement-breakpoint
+CREATE UNIQUE INDEX "outbound_consent_email_challenges_token_hash_idx" ON "outbound_consent_email_challenges" USING btree ("token_hash");
+--> statement-breakpoint
+CREATE UNIQUE INDEX "outbound_consent_email_challenges_idempotency_idx" ON "outbound_consent_email_challenges" USING btree ("company_id","idempotency_key");
+--> statement-breakpoint
+CREATE INDEX "outbound_consent_email_challenges_customer_issued_idx" ON "outbound_consent_email_challenges" USING btree ("company_id","customer_id","created_at");
+--> statement-breakpoint
+ALTER TABLE "outbound_consent_email_challenges" ADD CONSTRAINT "outbound_consent_email_challenges_short_expiry_chk" CHECK ("outbound_consent_email_challenges"."expires_at" > "outbound_consent_email_challenges"."created_at" AND "outbound_consent_email_challenges"."expires_at" <= "outbound_consent_email_challenges"."created_at" + interval '20 minutes');
+--> statement-breakpoint
+ALTER TABLE "outbound_consent_email_challenges" ADD CONSTRAINT "outbound_consent_email_challenges_consume_within_expiry_chk" CHECK ("outbound_consent_email_challenges"."consumed_at" IS NULL OR ("outbound_consent_email_challenges"."consumed_at" >= "outbound_consent_email_challenges"."created_at" AND "outbound_consent_email_challenges"."consumed_at" <= "outbound_consent_email_challenges"."expires_at"));
+--> statement-breakpoint
+-- Issued challenge facts cannot be changed; only first successful consumption is mutable.
+CREATE OR REPLACE FUNCTION "outbound_consent_email_challenge_consume_once"() RETURNS trigger AS $$
+BEGIN
+  IF TG_OP = 'DELETE' THEN
+    RAISE EXCEPTION 'outbound consent email challenge cannot be deleted';
+  END IF;
+  IF OLD.consumed_at IS NOT NULL OR NEW.consumed_at IS NULL OR
+     (to_jsonb(NEW) - 'consumed_at' - 'updated_at') IS DISTINCT FROM
+     (to_jsonb(OLD) - 'consumed_at' - 'updated_at') THEN
+    RAISE EXCEPTION 'outbound consent email challenge issuance is immutable';
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+--> statement-breakpoint
+CREATE TRIGGER "outbound_consent_email_challenge_consume_once_trg" BEFORE UPDATE OR DELETE ON "outbound_consent_email_challenges" FOR EACH ROW EXECUTE FUNCTION "outbound_consent_email_challenge_consume_once"();
+--> statement-breakpoint
+REVOKE DELETE ON "outbound_consent_email_challenges" FROM PUBLIC;
+--> statement-breakpoint
+ALTER TABLE "outbound_consent_email_challenges" ENABLE ROW LEVEL SECURITY;
+--> statement-breakpoint
+ALTER TABLE "outbound_consent_email_challenges" FORCE ROW LEVEL SECURITY;
+--> statement-breakpoint
+CREATE POLICY "tenant_select_outbound_consent_email_challenges" ON "outbound_consent_email_challenges" FOR SELECT USING (company_id::text = current_setting('app.current_company_id', true));
+--> statement-breakpoint
+CREATE POLICY "tenant_insert_outbound_consent_email_challenges" ON "outbound_consent_email_challenges" FOR INSERT WITH CHECK (company_id::text = current_setting('app.current_company_id', true));
+--> statement-breakpoint
+CREATE POLICY "tenant_update_outbound_consent_email_challenges" ON "outbound_consent_email_challenges" FOR UPDATE USING (company_id::text = current_setting('app.current_company_id', true)) WITH CHECK (company_id::text = current_setting('app.current_company_id', true));

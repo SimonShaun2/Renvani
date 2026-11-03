@@ -2286,6 +2286,28 @@ export const outboundConsentCaptureReceipts = pgTable("outbound_consent_capture_
   subjectIdx: index("outbound_consent_capture_receipts_subject_idx").on(t.companyId, t.subjectType, t.subjectId),
 }));
 
+// A customer email challenge proves destination control only after a single successful consume.
+// Issuance facts and token hash are immutable; migration 0062 permits only the first consumedAt write.
+export const outboundConsentEmailChallenges = pgTable("outbound_consent_email_challenges", {
+  id: id(),
+  companyId: consentCompanyId(),
+  customerId: uuid("customer_id").notNull().references(() => customers.id, { onDelete: "no action" }),
+  email: varchar("email", { length: 320 }).notNull(),
+  tokenHash: varchar("token_hash", { length: 64 }).notNull(),
+  idempotencyKey: varchar("idempotency_key", { length: 128 }).notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
+  consumedAt: timestamp("consumed_at"),
+  ...timestamps,
+}, (t) => ({
+  tokenUnique: uniqueIndex("outbound_consent_email_challenges_token_hash_idx").on(t.tokenHash),
+  tenantIdempotency: uniqueIndex("outbound_consent_email_challenges_idempotency_idx").on(t.companyId, t.idempotencyKey),
+  customerIssued: index("outbound_consent_email_challenges_customer_issued_idx").on(t.companyId, t.customerId, t.createdAt),
+  shortExpiry: check("outbound_consent_email_challenges_short_expiry_chk",
+    sql`${t.expiresAt} > ${t.createdAt} AND ${t.expiresAt} <= ${t.createdAt} + interval '20 minutes'`),
+  consumeWithinExpiry: check("outbound_consent_email_challenges_consume_within_expiry_chk",
+    sql`${t.consumedAt} IS NULL OR (${t.consumedAt} >= ${t.createdAt} AND ${t.consumedAt} <= ${t.expiresAt})`),
+}));
+
 export const outboundConsentStates = pgTable("outbound_consent_states", {
   id: id(),
   companyId: consentCompanyId(),

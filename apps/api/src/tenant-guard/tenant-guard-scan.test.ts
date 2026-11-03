@@ -58,14 +58,19 @@ describe("H1 tenant-guard static scan", () => {
         "await db.select().from(invoices).where(and(eq(invoices.companyId, c), eq(invoices.id, id)));",
         "await db.update(jobs).set({ title }).where(eq(jobs.id, id));",
         "await db.delete(payments);",
-        "await db.select().from(companies).where(eq(companies.id, id));"
+        "await db.select().from(companies).where(eq(companies.id, id));",
+        "const unsafePredicate = eq(invoices.id, id); const unrelated = eq(jobs.companyId, companyId);",
+        "await db.select().from(invoices).where(unsafePredicate);",
+        "const safePredicate = and(eq(invoices.companyId, companyId), eq(invoices.id, id));",
+        "await db.select().from(invoices).where(safePredicate);"
       ].join("\n")
     );
     const found = scanTenantGuards(root, tenantVars).map((f) => `${f.op}:${f.table}:${f.reason}`);
     expect(found).toEqual([
       "from:invoices:where-without-companyId",
       "update:jobs:where-without-companyId",
-      "delete:payments:no-where"
+      "delete:payments:no-where",
+      "from:invoices:where-without-companyId"
     ]);
   });
 });

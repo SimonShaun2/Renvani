@@ -96,7 +96,7 @@ function whereArgs(chain: string): string[] {
 function identifierIsCompanyScoped(source: string, name: string): boolean {
   const re = new RegExp(`\\b(?:const|let)\\s+${name}\\b[^;]*?(?:;|$)`, "gs");
   for (const match of source.matchAll(re)) {
-    if (COMPANY_GUARD.test(source.slice(match.index ?? 0, (match.index ?? 0) + 1200))) return true;
+    if (COMPANY_GUARD.test(match[0])) return true;
   }
   return false;
 }

@@ -577,6 +577,7 @@ export function ServiceAgreementsClient() {
   return (
     <>
       <PageLayout
+        variant="operator"
         title="Service Agreements"
         subtitle="Track active plans, billing health, and upcoming renewals across your customer base."
         actions={(
@@ -584,7 +585,7 @@ export function ServiceAgreementsClient() {
             <button
               type="button"
               onClick={openEnrollSheet}
-              className="inline-flex items-center gap-2 rounded-full bg-brand-accent px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-primary"
+              className="inline-flex min-h-11 items-center gap-2 rounded-[10px] bg-[#f6b400] px-5 py-3 text-sm font-semibold text-[#0f1530] transition hover:bg-[#e0a400]"
             >
               <Plus className="h-4 w-4" />
               Enroll Customer

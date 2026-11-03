@@ -1,6 +1,7 @@
 import pino from "pino";
 
 import { env } from "@fsm/config";
+import { assertOpenAiConfigured } from "./openai-config.js";
 
 const logger = pino({
   name: "campaign-prompts"
@@ -150,6 +151,7 @@ export async function generateCampaignMessage(ctx: CampaignMessageContext): Prom
     "Return ONLY the message text, nothing else."
   ].join("\n");
 
+  assertOpenAiConfigured();
   const response = await fetch("https://api.openai.com/v1/responses", {
     method: "POST",
     headers: {

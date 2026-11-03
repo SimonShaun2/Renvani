@@ -3,6 +3,7 @@ import { Decimal } from "decimal.js";
 import pino from "pino";
 
 import { generateCampaignMessage } from "@fsm/ai";
+import { isOpenAiConfigured } from "@fsm/config";
 import {
   aiRecommendations,
   assets,
@@ -507,6 +508,10 @@ export async function generateDraft(
   const assetAgeInDays = calculateDaysSince(relatedAsset?.installDate ?? null);
   const assetAgeYears =
     assetAgeInDays !== undefined ? Math.floor(assetAgeInDays / 365) : undefined;
+
+  if (!isOpenAiConfigured()) {
+    throw new AppError(ErrorCode.CONFLICT, "AI message drafting is disabled: OpenAI is not configured");
+  }
 
   const draftBody = await generateCampaignMessage({
     customerFirstName: customer.firstName,

@@ -88,7 +88,7 @@ describe("BrandedInquiryClient", () => {
     fireEvent.click(screen.getByRole("button", { name: "Check published details" }));
     fireEvent.change(screen.getByRole("textbox", { name: "ZIP code" }), { target: { value: "60602" } });
     fireEvent.change(screen.getByRole("combobox", { name: "Question topic" }), { target: { value: "pricing" } });
-    await act(async () => { resolveAnswer({ kind: "handoff_required", reason: "unknown_service_area", message: "Staff must check this ZIP." }); });
+    await act(async () => { resolveAnswer({ kind: "handoff_required", reason: "unknown_serviceability", message: "Staff must check this ZIP." }); });
     expect(screen.getByRole("textbox", { name: "ZIP code" })).toHaveProperty("value", "60602");
     expect(screen.queryByText(/Staff must check this ZIP/)).toBeNull();
     expect(screen.getByRole("button", { name: "Check published details" }).hasAttribute("disabled")).toBe(false);
@@ -97,7 +97,7 @@ describe("BrandedInquiryClient", () => {
   it("preserves an unsupported requested service and approved acquisition source in staff handoff", async () => {
     mocks.assistantPost
       .mockResolvedValueOnce({ kind: "handoff_required", reason: "unsupported_service", message: "Staff must review this request." })
-      .mockResolvedValueOnce({ kind: "handoff", status: "pending", reason: "unsupported_service", referenceNumber: "ASSIST-2", message: "Pending staff review." });
+      .mockResolvedValueOnce({ kind: "handoff", status: "pending", reason: "unsupported_service", referenceNumber: "ASSIST-2", message: "Your request is pending staff review. No appointment has been confirmed." });
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true, json: async () => ({ accepted: true }) }));
     const model = buildBrandedStorefrontViewModel({ ...baseSettings, trade: "hvac", intakeMode: "bookable", offeredServices: [{ label: "AC Repair" }] });
     render(<BrandedInquiryClient model={model} acquisitionSource="google" assistantEnabled />);
@@ -110,6 +110,26 @@ describe("BrandedInquiryClient", () => {
     fireEvent.click(screen.getByRole("button", { name: "Request staff review" }));
     await waitFor(() => expect(mocks.assistantPost).toHaveBeenCalledTimes(2));
     expect(mocks.assistantPost.mock.calls[1]?.[1]).toMatchObject({ action: "handoff", service: "Roof repair", source: "google" });
+    expect(await screen.findByText("ASSIST-2")).toBeTruthy();
+  });
+
+  it("keeps an unknown service-area request in the consented staff handoff path", async () => {
+    mocks.assistantPost
+      .mockResolvedValueOnce({ kind: "handoff_required", reason: "unknown_serviceability", message: "Staff must verify this ZIP." })
+      .mockResolvedValueOnce({ kind: "handoff", status: "pending", reason: "unknown_serviceability", referenceNumber: "ASSIST-3", message: "Your request is pending staff review. No appointment has been confirmed." });
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true, json: async () => ({ accepted: true }) }));
+    render(<BrandedInquiryClient model={buildBrandedStorefrontViewModel(baseSettings)} acquisitionSource="website" assistantEnabled />);
+    fillRequiredFields();
+    fireEvent.change(screen.getByRole("combobox", { name: "Question topic" }), { target: { value: "service_area" } });
+    fireEvent.change(screen.getByRole("textbox", { name: "ZIP to check" }), { target: { value: "10001" } });
+    fireEvent.click(screen.getByRole("button", { name: "Check published details" }));
+    await waitFor(() => expect(screen.getByRole("textbox", { name: "ZIP code" })).toHaveProperty("value", "10001"));
+    expect(screen.getByLabelText(/I agree to send these contact details/)).toBeTruthy();
+    fireEvent.click(screen.getByLabelText(/I agree to send these contact details/));
+    fireEvent.click(screen.getByRole("button", { name: "Request staff review" }));
+    expect(await screen.findByText("ASSIST-3")).toBeTruthy();
+    expect(mocks.assistantPost.mock.calls[1]?.[1]).toMatchObject({ action: "handoff", topic: "service_area", contact: { zip: "10001" } });
+    expect(mocks.submit).not.toHaveBeenCalled();
   });
 
   it("requires fresh contact consent after an assistant question changes", async () => {

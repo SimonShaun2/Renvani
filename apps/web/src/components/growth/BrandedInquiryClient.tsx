@@ -121,7 +121,10 @@ export function BrandedInquiryClient({ model, acquisitionSource, initialService,
         `/api/v1/public/site/${encodeURIComponent(model.bookingSlug)}/assistant`, request
       );
       const parsed = webAssistantResponseSchema.parse(response);
-      if (requestVersion === assistantRequestVersion.current) setAssistantResponse(parsed);
+      if (requestVersion === assistantRequestVersion.current) {
+        if (assistantTopic === "service_area" && assistantZip.trim()) setZip(assistantZip.trim());
+        setAssistantResponse(parsed);
+      }
     } catch (error) {
       if (requestVersion === assistantRequestVersion.current) {
         setAssistantError(error instanceof ApiError ? error.message : "We could not check that right now. Please try again.");

@@ -32,5 +32,14 @@ export const STATUS_LABEL: Record<string, string> = {
 };
 
 export function sourceLabel(source: string): string {
-  return source === "website" ? "Website" : "Booking";
+  const labels: Record<string, string> = {
+    google: "Google",
+    facebook: "Facebook",
+    instagram: "Instagram",
+    yelp: "Yelp",
+    direct: "Direct",
+    website: "Website",
+    qr_code: "QR code"
+  };
+  return labels[source] ?? "Unknown";
 }

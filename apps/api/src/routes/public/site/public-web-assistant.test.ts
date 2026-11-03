@@ -36,6 +36,7 @@ type FakeDbModule = typeof import("../../../test-support/fake-db.js");
 type AppInstance = Awaited<ReturnType<BuildAppModule["buildApp"]>>;
 let buildAppModule: BuildAppModule;
 let fakeDb: FakeDbModule;
+let tokens: typeof import("../../../lib/tokens.js");
 let app: AppInstance;
 let hvacCompanyId: string;
 let plumbingCompanyId: string;
@@ -58,6 +59,7 @@ describe("FS-197 public web assistant first slice", () => {
   beforeAll(async () => {
     buildAppModule = await import("../../../app.js");
     fakeDb = await import("../../../test-support/fake-db.js");
+    tokens = await import("../../../lib/tokens.js");
   });
   beforeEach(async () => {
     process.env.FS197_WEB_ASSISTANT_ENABLED = "true";
@@ -131,8 +133,23 @@ describe("FS-197 public web assistant first slice", () => {
     expect(first.json().message).toContain("No appointment has been confirmed");
     const state = fakeDb.getTestState();
     expect(state.bookingRequests).toHaveLength(1);
-    expect(state.bookingRequests[0]).toMatchObject({ companyId: hvacCompanyId, status: "pending", jobId: null,
-      source: "website", smsConsentAppointments: false, smsConsentMarketing: false });
+    const handoffRow = state.bookingRequests[0]!;
+    expect(handoffRow).toMatchObject({ companyId: hvacCompanyId, status: "pending", jobId: null,
+      source: "website", serviceType: "AC Repair", smsConsentAppointments: false, smsConsentMarketing: false });
+    const owner = fakeDb.seedUser({ companyId: hvacCompanyId, email: "owner@acme.test", firstName: "Shop", lastName: "Owner", role: "owner" });
+    const auth = `Bearer ${tokens.generateAccessToken({ userId: owner.id, companyId: hvacCompanyId, role: "owner" })}`;
+    const inbox = await app.inject({ method: "GET", url: "/api/v1/booking-requests?status=pending", headers: { authorization: auth } });
+    expect(inbox.statusCode).toBe(200);
+    expect(inbox.json().data).toContainEqual(expect.objectContaining({ id: handoffRow.id,
+      referenceNumber: first.json().referenceNumber, serviceType: "AC Repair", source: "website", zip: "74103" }));
+    const detail = await app.inject({ method: "GET", url: `/api/v1/booking-requests/${handoffRow.id}`, headers: { authorization: auth } });
+    expect(detail.statusCode).toBe(200);
+    expect(detail.json().bookingRequest).toMatchObject({ companyId: hvacCompanyId, status: "pending", smsConsentAppointments: false,
+      smsConsentMarketing: false, customerNotes: expect.stringContaining("Assistant handoff (human_requested)\nContact details: consented for staff review") });
+    const otherOwner = fakeDb.seedUser({ companyId: plumbingCompanyId, email: "owner@pipe.test", firstName: "Pipe", lastName: "Owner", role: "owner" });
+    const otherAuth = `Bearer ${tokens.generateAccessToken({ userId: otherOwner.id, companyId: plumbingCompanyId, role: "owner" })}`;
+    const otherDetail = await app.inject({ method: "GET", url: `/api/v1/booking-requests/${handoffRow.id}`, headers: { authorization: otherAuth } });
+    expect(otherDetail.statusCode).toBe(404);
     expect(state.activityEvents.some((event) => event.eventType === "booking.requested" && event.companyId === hvacCompanyId)).toBe(true);
     expect(state.activityEvents.some((event) => event.eventType === "revenue.inquiry_escalated" && event.companyId === hvacCompanyId)).toBe(true);
     expect(state.activityEvents.some((event) => event.eventType === "revenue.inquiry_received" &&

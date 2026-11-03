@@ -31,6 +31,7 @@ import {
 } from "@fsm/types";
 
 import { isOutboundSmsLive } from "../lib/sms.js";
+import { queueOwnerAlert, shortCustomerName } from "./owner-alerts/owner-alert.service.js";
 import {
   customerCooldownDays,
   decideInvoicePaidReviewRequest,
@@ -785,6 +786,52 @@ export async function getPublicReviewLanding(referenceId: string): Promise<Publi
 }
 
 export async function completePublicReviewRequest(
+  referenceId: string,
+  input: CompleteReviewRequestInput
+): Promise<ReviewRequest & { routing: ReviewRatingRoute }> {
+  const completed = await completePublicReviewRequestInTransaction(referenceId, input);
+  // Queue only after commit so a rolled-back completion never alerts.
+  await alertOwnerOfLowRating(completed);
+  return completed;
+}
+
+/** Owner opt-out lives in the review_request automation rule config (`notifyOwnerOnLowRating`, default on). */
+export const LOW_RATING_ALERT_MAX_RATING = 3;
+
+export async function alertOwnerOfLowRating(completed: ReviewRequest & { routing: ReviewRatingRoute }): Promise<void> {
+  const rating = completed.rating;
+  if (completed.routing.kind !== "private_feedback" || typeof rating !== "number" || rating > LOW_RATING_ALERT_MAX_RATING) {
+    return;
+  }
+  try {
+    const [rule] = await db
+      .select()
+      .from(automationRules)
+      .where(and(eq(automationRules.companyId, completed.companyId), eq(automationRules.ruleType, "review_request")))
+      .limit(1);
+    const config = rule?.config && typeof rule.config === "object" && !Array.isArray(rule.config) ? (rule.config as Record<string, unknown>) : {};
+    const [customer] = await db
+      .select({ firstName: customers.firstName, lastName: customers.lastName })
+      .from(customers)
+      .where(and(eq(customers.companyId, completed.companyId), eq(customers.id, completed.customerId)))
+      .limit(1);
+    await queueOwnerAlert({
+      companyId: completed.companyId,
+      kind: "low_rating",
+      entityId: completed.id,
+      enabled: config.notifyOwnerOnLowRating !== false,
+      headline: `${rating}-star private feedback`,
+      summary: `${shortCustomerName(customer?.firstName, customer?.lastName)} rated you ${rating}/5. Open Review requests to read it and follow up.`,
+      actionPath: "/review-requests",
+      actionLabel: "Open review requests",
+      sms: true
+    });
+  } catch (error) {
+    logger.warn({ err: error, reviewRequestId: completed.id }, "Low-rating owner alert failed");
+  }
+}
+
+async function completePublicReviewRequestInTransaction(
   referenceId: string,
   input: CompleteReviewRequestInput
 ): Promise<ReviewRequest & { routing: ReviewRatingRoute }> {

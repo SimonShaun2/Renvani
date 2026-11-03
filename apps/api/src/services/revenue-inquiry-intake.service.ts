@@ -1,6 +1,7 @@
 import { and, eq, gte, isNull, sql } from "drizzle-orm";
+import pino from "pino";
 
-import { bookingRequests, customers, db, emitEventWithExecutor, inquirySubmitIdempotency, runTransactionWithTenantSession } from "@fsm/db";
+import { bookingRequests, bookingSettings, customers, db, emitEventWithExecutor, inquirySubmitIdempotency, runTransactionWithTenantSession } from "@fsm/db";
 import {
   AppError,
   ErrorCode,
@@ -25,12 +26,12 @@ import {
 import {
   buildInquiryDedupeKey,
   classifyFromBookingRow,
-  classifyInquiryIntent,
   hashInquirySubmitPayload,
   mapBookingRowToInquiryIntakeV1,
   resolveAmbiguityEscalation,
   type IntakeBuildContext
 } from "./revenue-inquiry-intake.logic.js";
+import { queueOwnerAlert, shortCustomerName } from "./owner-alerts/owner-alert.service.js";
 
 export {
   buildInquiryDedupeKey,
@@ -38,6 +39,8 @@ export {
   hashInquirySubmitPayload,
   mapBookingRowToInquiryIntakeV1
 } from "./revenue-inquiry-intake.logic.js";
+
+const logger = pino({ name: "revenue-inquiry-intake" });
 
 const IDEMPOTENCY_TTL_MS = 24 * 60 * 60 * 1000;
 const DEDUPE_WINDOW_MS = 60 * 1000;
@@ -162,6 +165,45 @@ async function emitInquiryLifecycleEvents(
   }
 }
 
+/**
+ * Fire the owner alert only AFTER the inquiry is durably committed (never inside a tenant transaction).
+ * Best-effort: a failure here is logged and never fails or rolls back the inquiry.
+ */
+async function alertOwnerAfterCommit(inquiry: InquiryIntakeV1): Promise<void> {
+  try {
+    await alertOwnerOfPublicInquiry(inquiry);
+  } catch (error) {
+    logger.error({ companyId: inquiry.companyId, err: error }, "New-inquiry owner alert failed after commit");
+  }
+}
+
+/**
+ * Owner alert for a new PUBLIC inquiry (booking form, service pages). Setting: booking_settings.notify_on_new_booking
+ * (existing owner-notification switch, default on). The booking form already texts dispatchers, so SMS here is only
+ * for other public surfaces. Summary is inbox-level only (short name, ZIP, source) - never the message/phone/email.
+ */
+export async function alertOwnerOfPublicInquiry(inquiry: InquiryIntakeV1): Promise<void> {
+  const [settings] = await db
+    .select()
+    .from(bookingSettings)
+    .where(and(eq(bookingSettings.companyId, inquiry.companyId), isNull(bookingSettings.deletedAt)))
+    .limit(1);
+  const who = shortCustomerName(inquiry.contact.firstName, inquiry.contact.lastName);
+  const zip = inquiry.property?.zip && inquiry.property.zip !== "00000" ? ` · ZIP ${inquiry.property.zip}` : "";
+  const source = inquiry.sourceAttribution ? ` · via ${inquiry.sourceAttribution.replace(/_/gu, " ")}` : "";
+  await queueOwnerAlert({
+    companyId: inquiry.companyId,
+    kind: "new_inquiry",
+    entityId: inquiry.linkedBookingRequestId ?? inquiry.id,
+    enabled: settings?.notifyOnNewBooking ?? true,
+    headline: "New inquiry",
+    summary: `${who}${zip}${source}. Open your inbox to reply.`,
+    actionPath: "/dispatch/bookings",
+    actionLabel: "Open inbox",
+    sms: inquiry.consent.captureSurface !== "book/confirm"
+  });
+}
+
 async function buildInquiryFromRow(
   row: BookingRequestRow,
   baseContext: Omit<IntakeBuildContext, "classifiedIntent" | "status" | "dedupeKey" | "escalationReason">,
@@ -230,7 +272,7 @@ export async function submitPublicInquiryIntake(
       throw new AppError(ErrorCode.CONFLICT, "This zip code is outside the current booking area");
     }
 
-    return runTransactionWithTenantSession(companyId, async (tx) => {
+    const outcome = await runTransactionWithTenantSession(companyId, async (tx): Promise<{ created: boolean; result: PublicInquirySubmitResult }> => {
       if (idempotencyKey) {
         await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${JSON.stringify([companyId, idempotencyKey])}, 0))`);
         const existing = await loadIdempotencyRecord(companyId, idempotencyKey, tx);
@@ -312,6 +354,11 @@ export async function submitPublicInquiryIntake(
       }
       return { created: true, result };
     });
+    // Committed: alert now. Idempotent replays (created=false) never re-alert.
+    if (outcome.created && outcome.result.inquiry) {
+      await alertOwnerAfterCommit(outcome.result.inquiry);
+    }
+    return outcome;
   }
 
   const coverage = await checkZipCoverage(slug, body.zip);
@@ -354,6 +401,7 @@ export async function submitPublicInquiryIntake(
   );
 
   await emitInquiryLifecycleEvents(inquiry, { type: "customer", name: `${row.firstName} ${row.lastName}` });
+  await alertOwnerAfterCommit(inquiry);
 
   const result: PublicInquirySubmitResult = {
     bookingRequest: {
@@ -591,6 +639,7 @@ export async function intakeServicePageInquiry(
   );
 
   await emitInquiryLifecycleEvents(inquiry, { type: "customer", name: actorName });
+  await alertOwnerAfterCommit(inquiry);
   return { referenceNumber: bookingRequest.referenceNumber ?? bookingRequest.id, inquiry };
 }
 

@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { Decimal } from "decimal.js";
+import { normalizePhoneE164 } from "@fsm/import-normalize";
 
 type Predicate<T> = (row: T) => boolean;
 
@@ -7023,6 +7024,42 @@ function readClerkOrganizationIdFromCompanySettings(settings: Record<string, unk
   return typeof orgId === "string" && orgId.length > 0 ? orgId : null;
 }
 
+// FS-281: platform-level phone opt-outs (sms_opt_outs). Modeled as a Set of E.164 phones.
+const smsOptOutPhones = new Set<string>();
+let smsOptOutLookupFailure = false;
+
+export function getSmsOptOutPhones(): string[] {
+  return [...smsOptOutPhones];
+}
+
+export function seedSmsOptOut(phoneE164: string): void {
+  smsOptOutPhones.add(phoneE164);
+}
+
+export function setSmsOptOutLookupFailure(fail: boolean): void {
+  smsOptOutLookupFailure = fail;
+}
+
+function phoneMatchesE164(column: unknown, phoneE164: string) {
+  // Mirrors the SQL in @fsm/db phoneMatchesE164: digits-only compare (with/without the US leading 1).
+  const key = resolveFieldKey(column);
+  const digits = phoneE164.replace(/\D/gu, "");
+  const candidates = digits.length === 11 && digits.startsWith("1") ? [digits, digits.slice(1)] : [digits];
+  return (row: Record<string, unknown>) => candidates.includes(String(row[key] ?? "").replace(/[^0-9]/gu, ""));
+}
+
+async function recordSmsOptOut(
+  _executor: unknown,
+  input: { phoneE164: string; source: string; providerMessageId: string | null }
+): Promise<void> {
+  smsOptOutPhones.add(input.phoneE164);
+}
+
+async function isPhoneSmsOptedOut(phoneE164: string): Promise<boolean> {
+  if (smsOptOutLookupFailure) throw new Error("sms_opt_outs lookup failed (test)");
+  return smsOptOutPhones.has(phoneE164);
+}
+
 export function createDrizzleModuleMock() {
   const sqlTag = (strings: TemplateStringsArray, ...values: unknown[]) => {
     const template = strings.join("");
@@ -7218,6 +7255,10 @@ export function createDbModuleMock() {
     growthIntakeAuditEvents,
     emitEvent,
     emitEventWithExecutor,
+    normalizePhoneE164,
+    phoneMatchesE164,
+    recordSmsOptOut,
+    isPhoneSmsOptedOut,
     markInvoiceOverdueIfNeeded,
     REVENUE_SUMMARY_CACHE_TTL_SECONDS,
     buildRevenueSummaryCacheKey,
@@ -7227,6 +7268,8 @@ export function createDbModuleMock() {
 }
 
 export function resetTestState(): void {
+  smsOptOutPhones.clear();
+  smsOptOutLookupFailure = false;
   state.companies.length = 0;
   state.users.length = 0;
   state.refreshTokens.length = 0;

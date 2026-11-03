@@ -23,7 +23,16 @@ import {
   type UpdateCustomerInput
 } from "@fsm/types";
 
+import { normalizePhoneE164 } from "@fsm/import-normalize";
+
 import { runTenantAwareTransaction } from "../lib/company-scoped-transaction.js";
+
+/** FS-281: store customer phones as E.164 when recognisable; keep the trimmed input otherwise (never dropped). */
+function normalizeCustomerPhone(value: string | undefined): string | null {
+  const trimmed = normalizeOptionalString(value);
+  if (!trimmed) return null;
+  return normalizePhoneE164(trimmed) ?? trimmed;
+}
 
 const MAX_RESULT_WINDOW = 10_000;
 const DEFAULT_LIST_PAGE = 1;
@@ -397,8 +406,8 @@ export async function createCustomer(
         lastName: input.lastName.trim(),
         displayName: normalizeOptionalString(input.displayName) ?? null,
         email: normalizeOptionalEmail(input.email) ?? null,
-        phone: normalizeOptionalString(input.phone) ?? null,
-        altPhone: normalizeOptionalString(input.altPhone) ?? null,
+        phone: normalizeCustomerPhone(input.phone),
+        altPhone: normalizeCustomerPhone(input.altPhone),
         leadSource: normalizeOptionalString(input.leadSource) ?? null,
         tags: normalizedTags,
         internalNotes: normalizeOptionalString(input.internalNotes) ?? null,
@@ -446,8 +455,8 @@ export async function updateCustomer(
     ...(input.lastName !== undefined ? { lastName: input.lastName.trim() } : {}),
     ...(input.displayName !== undefined ? { displayName: normalizeOptionalString(input.displayName) ?? null } : {}),
     ...(input.email !== undefined ? { email: normalizeOptionalEmail(input.email) ?? null } : {}),
-    ...(input.phone !== undefined ? { phone: normalizeOptionalString(input.phone) ?? null } : {}),
-    ...(input.altPhone !== undefined ? { altPhone: normalizeOptionalString(input.altPhone) ?? null } : {}),
+    ...(input.phone !== undefined ? { phone: normalizeCustomerPhone(input.phone) } : {}),
+    ...(input.altPhone !== undefined ? { altPhone: normalizeCustomerPhone(input.altPhone) } : {}),
     ...(input.leadSource !== undefined ? { leadSource: normalizeOptionalString(input.leadSource) ?? null } : {}),
     ...(normalizedTags !== undefined ? { tags: normalizedTags } : {}),
     ...(input.internalNotes !== undefined ? { internalNotes: normalizeOptionalString(input.internalNotes) ?? null } : {}),

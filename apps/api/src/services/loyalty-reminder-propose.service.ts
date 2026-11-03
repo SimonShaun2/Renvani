@@ -95,6 +95,8 @@ export async function createLoyaltyReminderProposal(input: CreateLoyaltyReminder
     reason: input.parameters.summary,
     parameters: {
       ...input.parameters,
+      channel: "sms",
+      consentScope: "marketing",
       consentSnapshot,
       dryRun: true
     }

@@ -1,9 +1,11 @@
 import { randomBytes } from "node:crypto";
 
-import { AppError, ErrorCode } from "@fsm/types";
+import { AppError, ErrorCode, webAssistantRequestSchema, webAssistantResponseSchema } from "@fsm/types";
+import { isWebAssistantEnabled } from "@fsm/config/feature-flags";
 import type { FastifyPluginAsync, FastifyReply, FastifyRequest } from "fastify";
+import { z } from "zod";
 
-import { checkPublicInquiryRateLimit } from "../../../lib/public-inquiry-rate-limit.js";
+import { checkPublicAssistantAnswerRateLimit, checkPublicInquiryRateLimit } from "../../../lib/public-inquiry-rate-limit.js";
 import { resolvePublicZipServiceability } from "../../../services/booking.service.js";
 import {
   buildServiceInquiryNotes,
@@ -13,6 +15,7 @@ import {
 import { hitFixedWindowRateLimit, normalizeRateLimitIp } from "../../../lib/fixed-window-rate-limit.js";
 import { getPublicStructuredData } from "../../../services/company-home-services.service.js";
 import { intakeServicePageInquiry } from "../../../services/revenue-inquiry-intake.service.js";
+import { decidePublicWebAssistant } from "../../../services/public-web-assistant.service.js";
 
 import { publicSiteSlugParamsSchema, serviceInquiryBodySchema, zodIssuesToFieldErrors } from "./schemas.js";
 
@@ -24,6 +27,39 @@ const errorBody = {
     error: { type: "string" },
     message: { type: "string" },
     requestId: { type: "string" }
+  }
+} as const;
+
+// The existing inquiry idempotency column is varchar(128); reserve 14 chars for `web-assistant:`.
+const assistantIdempotencyKeySchema = z.string().regex(/^[A-Za-z0-9._:-]{1,114}$/u);
+
+export const webAssistantRouteSchema = {
+  tags: ["public-site"],
+  response: {
+    200: {
+      oneOf: [
+        { type: "object", additionalProperties: false, required: ["kind", "verified", "answer", "source"], properties: {
+          kind: { type: "string", enum: ["answer"] }, verified: { type: "boolean", enum: [true] },
+          answer: { type: "string" }, source: { type: "string", enum: ["public_booking_settings", "zip_serviceability"] }
+        } },
+        { type: "object", additionalProperties: false, required: ["kind", "reason", "message"], properties: {
+          kind: { type: "string", enum: ["handoff_required"] }, reason: { type: "string" }, message: { type: "string" }
+        } },
+        { type: "object", additionalProperties: false, required: ["kind", "status", "referenceNumber", "reason", "message"], properties: {
+          kind: { type: "string", enum: ["handoff"] }, status: { type: "string", enum: ["pending"] },
+          referenceNumber: { type: "string" }, reason: { type: "string" }, message: { type: "string" }
+        } }
+      ]
+    },
+    201: { type: "object", additionalProperties: false, required: ["kind", "status", "referenceNumber", "reason", "message"], properties: {
+      kind: { type: "string", enum: ["handoff"] }, status: { type: "string", enum: ["pending"] },
+      referenceNumber: { type: "string" }, reason: { type: "string" }, message: { type: "string" }
+    } },
+    400: errorBody,
+    404: errorBody,
+    409: errorBody,
+    429: errorBody,
+    503: errorBody
   }
 } as const;
 
@@ -179,6 +215,31 @@ async function submitServiceInquiryHandler(request: FastifyRequest, reply: Fasti
   return reply.status(201).send({ inquiry: { status: "received", referenceNumber } });
 }
 
+async function webAssistantHandler(request: FastifyRequest, reply: FastifyReply): Promise<FastifyReply> {
+  if (!isWebAssistantEnabled()) {
+    return reply.status(503).send({ error: "FEATURE_DISABLED", message: "Web assistant is not available", requestId: request.id });
+  }
+  const params = publicSiteSlugParamsSchema.safeParse(request.params);
+  if (!params.success) return notFound(request, reply);
+  const claimedHandoff = request.body !== null && typeof request.body === "object" && !Array.isArray(request.body)
+    && (request.body as { action?: unknown }).action === "handoff";
+  const limit = await (claimedHandoff ? checkPublicInquiryRateLimit : checkPublicAssistantAnswerRateLimit)(request.ip, params.data.slug);
+  if (!limit.allowed) {
+    reply.header("Retry-After", String(limit.retryAfterSeconds));
+    return reply.status(429).send({ error: "RATE_LIMITED", message: "Too many requests. Please try again later.", requestId: request.id });
+  }
+  const body = webAssistantRequestSchema.safeParse(request.body);
+  if (!body.success) return reply.status(400).send({ error: "VALIDATION_ERROR", message: "Invalid assistant request", requestId: request.id });
+  const key = request.headers["idempotency-key"];
+  const idempotencyKey = typeof key === "string" ? assistantIdempotencyKeySchema.safeParse(key) : null;
+  if (body.data.action === "handoff" && (!idempotencyKey || !idempotencyKey.success)) {
+    return reply.status(400).send({ error: "VALIDATION_ERROR", message: "Valid Idempotency-Key header required", requestId: request.id });
+  }
+  const { created, response } = await decidePublicWebAssistant(params.data.slug, body.data,
+    idempotencyKey?.success ? idempotencyKey.data : undefined);
+  return reply.status(created ? 201 : 200).send(webAssistantResponseSchema.parse(response));
+}
+
 const publicSiteRoutes: FastifyPluginAsync = async (fastify) => {
   // schema.org LocalBusiness JSON-LD (public data only). `script` is pre-escaped for a <script type="application/ld+json">.
   fastify.get("/:slug/structured-data", { preHandler: [structuredDataRateLimit] }, async (request: FastifyRequest, reply: FastifyReply) => {
@@ -192,6 +253,12 @@ const publicSiteRoutes: FastifyPluginAsync = async (fastify) => {
     schema: serviceInquiryRouteSchema,
     bodyLimit: 16 * 1024,
     handler: submitServiceInquiryHandler
+  });
+
+  fastify.post("/:slug/assistant", {
+    schema: webAssistantRouteSchema,
+    bodyLimit: 16 * 1024,
+    handler: webAssistantHandler
   });
 };
 

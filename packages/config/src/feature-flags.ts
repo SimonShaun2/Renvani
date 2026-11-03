@@ -11,6 +11,11 @@ export function isRevenueAgentProposalsEnabled(
   return booleanFlagSchema.parse(source.REVENUE_AGENT_PROPOSALS_ENABLED ?? "false") === "true";
 }
 
+/** FS-197 public web assistant rollout gate; disabled by default while the UI and E2E remain incomplete. */
+export function isWebAssistantEnabled(source: Record<string, string | undefined> = process.env): boolean {
+  return booleanFlagSchema.parse(source.FS197_WEB_ASSISTANT_ENABLED ?? "false") === "true";
+}
+
 /** Clerk parallel auth is on only when RENVANI_DEPLOYMENT_TIER=staging (env-driven). */
 export function isClerkAuthParallelJwtEnabled(
   source: Record<string, string | undefined> = process.env
@@ -23,6 +28,10 @@ export function isClerkAuthParallelJwtEnabled(
  * Toggle without migrations; gate call sites with explicit comments.
  */
 export const featureFlags = {
+  // FEATURE FLAG: fs197-web-assistant — deterministic public FAQ and staff handoff only
+  get webAssistantEnabled() {
+    return isWebAssistantEnabled();
+  },
   // FEATURE FLAG: revenue-agent-proposals — FS-194 creation + existing proposal execution/rejection
   get revenueAgentProposalsEnabled() {
     return isRevenueAgentProposalsEnabled();

@@ -25,6 +25,7 @@ export interface CustomerEmailVerificationDeliveryDependencies {
   buildToken(companyId: string, challengeId: string): Promise<string> | string;
   send(input: { to: string; subject: string; html: string; text: string }): Promise<SendResult>;
   record(facts: DeliveryFacts, result: SendResult): Promise<void>;
+  markUncertain(facts: DeliveryFacts): Promise<void>;
   appUrl: string;
 }
 
@@ -38,19 +39,30 @@ export async function processCustomerEmailVerificationDelivery(
   const facts = await deps.load(payload);
   if (!facts || facts.companyId !== payload.companyId || facts.customerId !== payload.customerId ||
       facts.challengeId !== payload.challengeId) return "skipped";
-  const token = await deps.buildToken(facts.companyId, facts.challengeId);
-  const portalUrl = new URL("/portal", deps.appUrl);
-  portalUrl.hash = `verify-email=${encodeURIComponent(token)}`;
-  const url = portalUrl.toString();
-  const result = await deps.send({
-    to: facts.email,
-    subject: SUBJECT,
-    text: `Use this link to verify your email address for Renvani. The link expires in 10 minutes: ${url}`,
-    html: `<p>Use this link to verify your email address for Renvani. The link expires in 10 minutes.</p><p><a href="${url}">Verify email</a></p>`,
-  });
-  if (!result.providerMessageId) throw new Error("Verification email provider did not accept delivery");
-  await deps.record(facts, result);
-  return "accepted";
+  try {
+    const token = await deps.buildToken(facts.companyId, facts.challengeId);
+    const portalUrl = new URL("/portal", deps.appUrl);
+    portalUrl.hash = `verify-email=${encodeURIComponent(token)}`;
+    const url = portalUrl.toString();
+    const result = await deps.send({
+      to: facts.email,
+      subject: SUBJECT,
+      text: `Use this link to verify your email address for Renvani. The link expires in 10 minutes: ${url}`,
+      html: `<p>Use this link to verify your email address for Renvani. The link expires in 10 minutes.</p><p><a href="${url}">Verify email</a></p>`,
+    });
+    if (!result.providerMessageId) throw new Error("Verification email provider did not confirm acceptance");
+    await deps.record(facts, result);
+    return "accepted";
+  } catch (error) {
+    // Provider acceptance may be unknowable after a timeout or DB failure. Preserve
+    // the claim and require reconciliation; never allow an automatic duplicate send.
+    try {
+      await deps.markUncertain(facts);
+    } catch {
+      throw new Error("Verification delivery reconciliation failed; claim remains attempting");
+    }
+    throw error;
+  }
 }
 
 async function loadCurrent(payload: CustomerEmailVerificationJob): Promise<DeliveryFacts | null> {
@@ -121,6 +133,27 @@ async function recordAccepted(facts: DeliveryFacts, result: SendResult): Promise
   });
 }
 
+async function recordUncertain(facts: DeliveryFacts): Promise<void> {
+  await runTransactionWithTenantSession(facts.companyId, async (tx) => {
+    const [logged] = await tx.update(messageLogs).set({
+      providerStatus: "uncertain", failureReason: "Provider outcome requires reconciliation",
+      updatedAt: new Date(),
+    }).where(and(
+      eq(messageLogs.companyId, facts.companyId), eq(messageLogs.customerId, facts.customerId),
+      eq(messageLogs.sourceSystem, SOURCE_SYSTEM), eq(messageLogs.sourceId, facts.challengeId),
+      eq(messageLogs.toAddress, facts.email), eq(messageLogs.providerStatus, "attempting"),
+    )).returning({ id: messageLogs.id });
+    if (!logged) return;
+    await emitEventWithExecutor(tx, {
+      companyId: facts.companyId,
+      eventType: "outbound_consent.email_verification_uncertain",
+      actorType: "system", entityType: "outbound_consent_email_challenge", entityId: facts.challengeId,
+      customerId: facts.customerId, payload: { challengeId: facts.challengeId },
+      summary: "Customer email verification delivery requires reconciliation",
+    });
+  });
+}
+
 /** Kept behind the shared feature flag; no caller route currently enqueues this job. */
 export async function processCustomerEmailVerificationDeliveryJob(raw: unknown): Promise<"disabled" | "skipped" | "accepted"> {
   if (!featureFlags.customerEmailVerificationDeliveryEnabled) return "disabled";
@@ -138,6 +171,7 @@ export async function processCustomerEmailVerificationDeliveryJob(raw: unknown):
     buildToken: buildCustomerEmailChallengeToken,
     send: deliverTransactionalEmail,
     record: recordAccepted,
+    markUncertain: recordUncertain,
     appUrl: env.APP_URL,
   });
 }

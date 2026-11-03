@@ -9,6 +9,7 @@ ALTER TYPE "public"."activity_event_type" ADD VALUE 'outbound_consent.revoked' B
 ALTER TYPE "public"."activity_event_type" ADD VALUE 'outbound_consent.email_challenge_issued' BEFORE 'payment_method_migration.requested';--> statement-breakpoint
 ALTER TYPE "public"."activity_event_type" ADD VALUE 'outbound_consent.email_verification_attempted' BEFORE 'payment_method_migration.requested';--> statement-breakpoint
 ALTER TYPE "public"."activity_event_type" ADD VALUE 'outbound_consent.email_verification_sent' BEFORE 'payment_method_migration.requested';--> statement-breakpoint
+ALTER TYPE "public"."activity_event_type" ADD VALUE 'outbound_consent.email_verification_uncertain' BEFORE 'payment_method_migration.requested';--> statement-breakpoint
 ALTER TYPE "public"."activity_event_type" ADD VALUE 'outbound_consent.email_verified' BEFORE 'payment_method_migration.requested';--> statement-breakpoint
 CREATE TABLE "outbound_consent_capture_receipts" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,

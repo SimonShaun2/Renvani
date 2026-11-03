@@ -19,6 +19,9 @@ export function BrandedStorefront({ model, previewBanner }: BrandedStorefrontPro
   const bookHref = buildBookPath(model.bookingSlug);
   const inquireHref = buildInquirePath(model.bookingSlug);
   const showReviewsLink = model.reviewLinks.length > 0;
+  const hasServices = model.intakeMode === "bookable" && model.serviceCards.length > 0;
+  const primaryHref = hasServices ? bookHref : inquireHref;
+  const primaryLabel = hasServices ? "Book a service" : "Send an inquiry";
 
   return (
     <div className="min-h-screen bg-[#f7faf8] text-[#0f1530]">
@@ -39,65 +42,65 @@ export function BrandedStorefront({ model, previewBanner }: BrandedStorefrontPro
         </div>
 
         <BrandedStorefrontNav
-          bookHref={bookHref}
+          primaryHref={primaryHref}
+          primaryLabel={primaryLabel}
           inquireHref={inquireHref}
           showReviewsLink={showReviewsLink}
+          showPricing={hasServices}
           primaryClassName={PRIMARY}
         />
 
         <Link
-          href={bookHref}
+          href={primaryHref}
           className={`hidden h-11 items-center justify-center rounded-[10px] px-[18px] text-sm font-semibold text-white lg:inline-flex ${PRIMARY}`}
         >
-          Book a clean
+          {primaryLabel}
         </Link>
       </header>
 
       <section className="flex flex-col gap-10 px-6 py-10 md:flex-row md:items-center md:gap-12 md:px-16 md:py-14">
         <div className="max-w-[620px] flex-1">
           <p className="font-mono text-xs font-medium uppercase tracking-[0.08em] text-[#2f7d4f]">
-            {model.trustLine ? model.trustLine : "Local service"}
+            {model.eyebrow}
           </p>
           <h1 className="mt-5 text-4xl font-semibold leading-tight tracking-tight md:text-[56px] md:leading-[62px]">
-            A spotless home, on your schedule.
+            {model.headline}
           </h1>
           <p className="mt-5 max-w-[560px] text-lg leading-7 text-[#2a3360]">{model.tagline}</p>
-          <ul className="mt-5 flex flex-wrap gap-3" aria-label="Trust badges">
-            {["Insured & background-checked", "Same crew every visit", "Pause anytime"].map((badge) => (
-              <li
-                key={badge}
-                className="rounded-md bg-[#e4f1e8] px-2 py-0.5 text-[11px] font-medium text-[#2f7d4f]"
-              >
-                {badge}
-              </li>
-            ))}
-          </ul>
         </div>
-        <div id="pricing" className="flex w-full justify-center md:justify-end">
-          <BrandedPriceWidget bookingSlug={model.bookingSlug} primaryClassName={PRIMARY} />
+        <div id={hasServices ? "pricing" : undefined} className="flex w-full justify-center md:justify-end">
+          {hasServices ? (
+            <BrandedPriceWidget bookingSlug={model.bookingSlug} primaryClassName={PRIMARY} />
+          ) : (
+            <div className="w-full max-w-[460px] rounded-[14px] border border-[#e6dccb] bg-white p-7">
+              <h2 className="text-[22px] font-semibold text-[#0f1530]">Tell us what you need</h2>
+              <p className="mt-2 text-sm text-[#5e6684]">The team will confirm available services and the next step.</p>
+              <Link href={inquireHref} className={`mt-5 inline-flex h-[52px] w-full items-center justify-center rounded-[10px] text-sm font-semibold text-white ${PRIMARY}`}>
+                Send an inquiry
+              </Link>
+            </div>
+          )}
         </div>
       </section>
 
       <section id="services" className="grid gap-4 px-6 pb-4 md:grid-cols-2 md:px-16 lg:grid-cols-4">
-        {model.serviceCards.map((card) => (
-          <article
-            key={card.id}
-            className="rounded-[14px] border border-[#e6dccb] bg-white p-5"
-          >
+        {hasServices ? model.serviceCards.map((card) => (
+          <article key={card.id} className="rounded-[14px] border border-[#e6dccb] bg-white p-5">
             <h3 className="text-[17px] font-semibold">{card.title}</h3>
             <p className="mt-1.5 text-sm text-[#5e6684]">{card.subtitle}</p>
           </article>
-        ))}
+        )) : (
+          <p className="text-sm text-[#5e6684]">Services are confirmed after you send an inquiry.</p>
+        )}
       </section>
 
       <section id="areas" className="px-6 py-8 md:px-16">
         <h2 className="text-xl font-semibold text-[#0f1530]">Areas we serve</h2>
         <p className="mt-2 text-sm leading-6 text-[#5e6684]">{model.serviceAreaSummary}</p>
         <p className="mt-3 text-sm text-[#5e6684]">
-          Live slot availability is confirmed in the booking flow — we never show unverified appointments. Prefer a
-          callback?{" "}
+          {hasServices ? "Available times and any confirmed price appear in the booking flow. Prefer a callback? " : "Need help with a service request? "}
           <Link href={inquireHref} className="font-medium text-[#2f7d4f] hover:underline">
-            Send a direct inquiry
+            Send an inquiry
           </Link>
           .
         </p>
@@ -110,17 +113,16 @@ export function BrandedStorefront({ model, previewBanner }: BrandedStorefrontPro
       <section id="inquire" className="border-t border-[#e6dccb] bg-white px-6 py-10 md:px-16">
         <div className="mx-auto flex max-w-4xl flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <h2 className="text-2xl font-semibold text-[#0f1530]">Not ready to book online?</h2>
+            <h2 className="text-2xl font-semibold text-[#0f1530]">Have a question about service?</h2>
             <p className="mt-2 max-w-xl text-sm text-[#5e6684]">
-              Send a direct inquiry to the Revenue Agent queue. Your team reviews every request before anything is
-              scheduled.
+              Send an inquiry. The team will review it and confirm the next step before anything is scheduled.
             </p>
           </div>
           <Link
             href={inquireHref}
             className="inline-flex h-12 shrink-0 items-center justify-center rounded-[10px] border border-[#2f7d4f] px-6 text-sm font-semibold text-[#2f7d4f] hover:bg-[#e4f1e8]"
           >
-            Request a quote
+            Send an inquiry
           </Link>
         </div>
       </section>

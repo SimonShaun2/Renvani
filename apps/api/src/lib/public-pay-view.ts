@@ -1,5 +1,6 @@
 import { and, desc, eq, isNull } from "drizzle-orm";
 
+import { isReceiptEmailAllowed } from "@fsm/comms";
 import { buildCardStatementDescriptor } from "@fsm/config/stripe-branding";
 import {
   centsToMoneyString,
@@ -190,6 +191,8 @@ const FIELD_BUILDERS: { [K in keyof PublicPayViewFields]: (ctx: PublicPayContext
   paidAmount: (ctx) => (isSucceeded(ctx.latestPayment) ? centsToMoneyString(paidCents(ctx.latestPayment)) : null),
   paidAt: (ctx) => (isSucceeded(ctx.latestPayment) ? iso(ctx.latestPayment.paidAt ?? ctx.invoice.paidAt) : null),
   receiptEmail: (ctx) => maskEmail(ctx.customer?.email),
+  paid: (ctx) => ctx.invoice.status === "paid",
+  receiptEmailed: (ctx) => isSucceeded(ctx.latestPayment) && isReceiptEmailAllowed(ctx.customer),
   plan: (ctx) => ctx.plan
 };
 
@@ -229,5 +232,7 @@ export const PUBLIC_PAY_VIEW_FIELD_SCHEMA = {
   paidAmount: { type: ["string", "null"] },
   paidAt: { type: ["string", "null"] },
   receiptEmail: { type: ["string", "null"] },
+  paid: { type: "boolean" },
+  receiptEmailed: { type: "boolean" },
   plan: { type: ["string", "null"] }
 } as const satisfies Record<keyof PublicPayViewFields, unknown>;

@@ -9,6 +9,7 @@ export const EMAIL_TEMPLATE_IDS = {
   estimateSent: "estimate.sent",
   invoiceSent: "invoice.sent",
   invoiceReminder: "invoice.reminder",
+  invoicePaymentReceipt: "invoice.payment_receipt",
   invoiceReminderOwnerAlert: "invoice.reminder_owner_alert",
   serviceAgreementRenewal: "service_agreement.renewal_reminder",
   serviceAgreementPaymentFailed: "service_agreement.payment_failed",
@@ -18,7 +19,9 @@ export const EMAIL_TEMPLATE_IDS = {
   vipMembershipWelcome: "vip_membership.welcome",
   vipMembershipRenewal: "vip_membership.renewal_receipt",
   vipMembershipPaymentFailed: "vip_membership.payment_failed_dunning",
-  savedCardMigrationReenterCard: "saved_card_migration.reenter_card"
+  savedCardMigrationReenterCard: "saved_card_migration.reenter_card",
+  reviewRequest: "review_request.sent",
+  planReminder: "plan_reminder.notice"
 } as const;
 
 export type EmailTemplateId = (typeof EMAIL_TEMPLATE_IDS)[keyof typeof EMAIL_TEMPLATE_IDS];
@@ -174,6 +177,25 @@ function renderTemplateBody(templateId: EmailTemplateId, variables: Record<strin
           ${dueBlock}
           ${button(variables.paymentLinkUrl ?? "#", "Pay invoice")}
           <p>If you've already paid, you can ignore this message.</p>
+        `)
+      };
+    }
+    case EMAIL_TEMPLATE_IDS.invoicePaymentReceipt: {
+      const name = greetingName(variables.firstName ?? "");
+      const paidBlock = e.paidAtLabel ? `<p><strong>Paid on:</strong> ${e.paidAtLabel}</p>` : "";
+      const balanceBlock = e.balanceDue && e.balanceDue !== "0.00" ? `<p><strong>Remaining balance:</strong> $${e.balanceDue}</p>` : "";
+      const receiptLink = variables.receiptUrl ? button(variables.receiptUrl, "View receipt") : "";
+      return {
+        templateId,
+        subject: `Receipt for invoice ${variables.invoiceNumber ?? ""} from ${variables.companyName ?? ""}`,
+        html: emailShell(`
+          <p>Hi ${name},</p>
+          <p>Thanks for your payment to ${e.companyName ?? ""}.</p>
+          <p><strong>Invoice:</strong> ${e.invoiceNumber ?? ""}</p>
+          <p><strong>Amount paid:</strong> $${e.amount ?? "0.00"}</p>
+          ${paidBlock}
+          ${balanceBlock}
+          ${receiptLink}
         `)
       };
     }
@@ -366,6 +388,41 @@ function renderTemplateBody(templateId: EmailTemplateId, variables: Record<strin
           <p>We could not automatically move your saved card from your prior processor. Please add your card again the next time you receive an invoice — it only takes a moment.</p>
           ${button(variables.paymentPortalUrl ?? "#", "Add payment method")}
           <p>If you have questions, contact ${variables.companyName ?? "our office"}.</p>
+        `)
+      };
+    }
+    case EMAIL_TEMPLATE_IDS.reviewRequest: {
+      const name = greetingName(variables.firstName ?? "");
+      const fromTech = e.technicianName ? ` with ${e.technicianName}` : "";
+      return {
+        templateId,
+        subject: `How did we do? — ${variables.companyName ?? "Renvani"}`,
+        html: emailShell(`
+          <p>Hi ${name},</p>
+          <p>Thanks for choosing ${e.companyName ?? "us"}. How was your recent visit${fromTech}?</p>
+          <p>It takes about 30 seconds and helps a local business a lot.</p>
+          ${button(variables.reviewUrl ?? "#", "Rate your visit")}
+        `)
+      };
+    }
+    case EMAIL_TEMPLATE_IDS.planReminder: {
+      const name = greetingName(variables.firstName ?? "");
+      const isTuneUp = variables.reminderKind === "tune_up";
+      const company = variables.companyName ?? "Renvani";
+      return {
+        templateId,
+        subject: isTuneUp
+          ? `Time for your ${variables.planName ?? "plan"} tune-up — ${company}`
+          : `Your ${variables.planName ?? "plan"} renews soon — ${company}`,
+        html: emailShell(`
+          <p>Hi ${name},</p>
+          ${
+            isTuneUp
+              ? `<p>Your ${e.planName ?? "maintenance plan"} includes a seasonal tune-up, and it's due around <strong>${e.dueDateLabel ?? "soon"}</strong>.</p>
+          <p>Reply to this email or give ${e.companyName ?? "us"} a call to pick a time.</p>`
+              : `<p>Your ${e.planName ?? "maintenance plan"} with ${e.companyName ?? "us"} is up for renewal on <strong>${e.dueDateLabel ?? "soon"}</strong>.</p>
+          <p>Reply to this email or give us a call if you'd like to renew or have questions about your plan.</p>`
+          }
         `)
       };
     }

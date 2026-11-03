@@ -5,7 +5,10 @@ import {
   DEFAULT_PLATFORM_QUEUE_RETRY_POLICY_V1,
   PlatformQueueRetryPolicyV1Schema
 } from "./retry-policy.js";
-import { DeadLetterJobEnvelopeV1Schema } from "./dead-letter.js";
+import {
+  DeadLetterJobEnvelopeV1Schema,
+  DeadLetterRecoveryRequestV1Schema
+} from "./dead-letter.js";
 import { DeadLetterJobListV1Schema } from "./dead-letter-visibility.js";
 import { PlatformQueueMonitoringSnapshotV1Schema } from "./monitoring.js";
 import { QUEUE_PLATFORM_CONTRACT_VERSION } from "./constants.js";
@@ -36,6 +39,17 @@ describe("queue-platform v0.1", () => {
 
     expect(parsed.sourceQueue).toBe("notifications");
   });
+
+  it.each(["constructor", "toString", "arbitrary-queue"])(
+    "rejects unknown recovery source queue %s",
+    (sourceQueue) => {
+      expect(DeadLetterRecoveryRequestV1Schema.safeParse({
+        contractVersion: QUEUE_PLATFORM_CONTRACT_VERSION,
+        sourceQueue,
+        deadLetterJobId: "dead-letter-job-1"
+      }).success).toBe(false);
+    }
+  );
 
   it("parses queue monitoring snapshot", () => {
     const parsed = PlatformQueueMonitoringSnapshotV1Schema.parse({

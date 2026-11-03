@@ -17,7 +17,8 @@ import {
 } from "lucide-react";
 
 import { api } from "@/src/lib/api";
-import { clearBrowserAuthSession, getRefreshToken } from "@/src/lib/auth";
+import { getRefreshToken } from "@/src/lib/auth";
+import { completeClientLogout } from "@/src/lib/client-logout";
 import { useCurrentTechnician, useTechnicianDetail, useTechnicianTime } from "@/src/hooks/technicians.hooks";
 import { useAuthStore } from "@/src/stores/auth.store";
 import { showToast } from "@/src/stores/toast.store";
@@ -72,14 +73,12 @@ export function MobileProfileScreen() {
     } catch {
       // Best-effort logout; local auth is still cleared below.
     } finally {
-      clearBrowserAuthSession();
-      clearAuth();
+      await completeClientLogout({ clearAuth, redirect: (path) => router.replace(path) });
       showToast({
         tone: "success",
         title: "Signed out",
         description: "You have been signed out of the technician workspace."
       });
-      router.replace("/login");
       setIsSigningOut(false);
     }
   }

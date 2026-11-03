@@ -564,7 +564,7 @@ export function ServiceAgreementsClient() {
 
   if (agreementsQuery.isError) {
     return (
-      <EmptyState
+      <EmptyState variant="operator"
         icon={ShieldCheck}
         title="Service agreements unavailable"
         subtitle="The agreement dashboard could not be loaded right now. Refresh and try again."
@@ -668,7 +668,7 @@ export function ServiceAgreementsClient() {
 
             {agreements.length === 0 ? (
               <div className="px-6 py-12">
-                <EmptyState
+                <EmptyState variant="operator"
                   icon={ShieldCheck}
                   title="No agreements match this view"
                   subtitle="Try a different filter or broaden the search to see more plan enrollments."
@@ -768,7 +768,7 @@ export function ServiceAgreementsClient() {
 
             <div className="mt-5 space-y-4">
               {templates.length === 0 ? (
-                <EmptyState
+                <EmptyState variant="operator"
                   icon={FileClock}
                   title="No active templates"
                   subtitle="Create or reactivate a template before enrolling customers into a new plan."

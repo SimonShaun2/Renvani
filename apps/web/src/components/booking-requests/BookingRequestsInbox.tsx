@@ -27,6 +27,10 @@ function formatWhen(value: string | Date) {
   return new Date(value).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
 }
 
+function consentLabel(value: boolean | null | undefined): string {
+  return value === true ? "Consented" : value === false ? "Not consented" : "Not recorded";
+}
+
 /** Booking requests inbox with EMERGENCY badge (Figma 309:3791, detail panel 309:3792). */
 export function BookingRequestsInbox() {
   const listQuery = useBookingRequests();
@@ -101,6 +105,13 @@ export function BookingRequestsInbox() {
             <p className="mt-2 font-mono text-[11px] text-[#5e6684]">
               {[active.referenceNumber, active.serviceType ?? active.serviceCategory].filter(Boolean).join(" · ")}
             </p>
+            {detail ? <div className="mt-3 space-y-1 text-[12px] text-[#5e6684]">
+              <p>Service ZIP: {detail.zip}</p>
+              <p>Recorded source: {sourceLabel(detail.source)}</p>
+              <p>Appointment texts: {consentLabel(detail.smsConsentAppointments)}</p>
+              <p>Marketing texts: {consentLabel(detail.smsConsentMarketing)}</p>
+              <p className="font-mono">Request ID: {detail.id}</p>
+            </div> : null}
             {detail?.customerNotes ? <p className="mt-3 text-[13px] text-[#2a3360]">{detail.customerNotes}</p> : null}
             {activeEmergency ? <p className="mt-3 text-[12px] text-[#5e6684]">{COPY.emergencyHelp}</p> : null}
             {!activeEmergency && (wasDowngraded(detail) || wasDowngraded(active)) ? (

@@ -55,6 +55,7 @@ export * from "./job-task.types.js";
 export * from "./booking-request.types.js";
 export * from "./booking-self-service.types.js";
 export * from "./inquiry-intake.types.js";
+export * from "./web-assistant.types.js";
 export * from "./growth-check/index.js";
 export * from "./booking-settings.types.js";
 export * from "./scheduling-agent.types.js";

@@ -77,13 +77,3 @@ Candidates: **#96**, **#107**, **#117**, **#102**, **#114**, **#113**, **#115**,
 | 2026-10-23 | **0026** reserved for FS-MIGRATE import lineage per ADR-FS-MIGRATE |
 | 2026-10-23 | **Central assign 0026–0030** for #96, #102, #114, #113, #115; #110 migration stripped; lineage-only-in-0026 rule |
 | 2026-10-23 | Founder batch policy: 8–10 PRs per merge batch; auto CI at PR head |
-| 2026-10-23 | **0031** → Priya **#128** (comms history); **0032** → Ben **#129** (notes). If both land same batch, merge **#128** before **#129**; Ben renames notes migration off `0031` to **0032** on rebase. |
-
----
-
-## Pending allocations (batch 2 — post-`0030`)
-
-| idx | SQL tag (provisional) | Owner | PR | Scope |
-| --- | --- | --- | --- | --- |
-| **31** | `0031_fs_migrate_comms_history` | **Priya** | [#128](https://github.com/SimonShaun2/Renvani/pull/128) | `message_logs` lineage + `communications` import entity |
-| **32** | `0032_fs_migrate_notes_import` | **Ben** | [#129](https://github.com/SimonShaun2/Renvani/pull/129) | `customer_notes`, job note lineage — **not** `0031` (collision with #128) |

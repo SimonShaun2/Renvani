@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "next dev --port 3000",
-    "build": "pnpm --dir ../.. --filter @fsm/config --filter @fsm/types run build && next build",
+    "build": "next build",
     "lint": "tsc --noEmit",
     "test": "vitest run",
     "start": "next start --port 3000"

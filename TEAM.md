@@ -1,6 +1,6 @@
 # TEAM.md
 
-> **FOUNDER OPERATING OVERRIDE — NOVEMBER 3, 2026 (takes precedence over older approval/agent-status language below).** See [GitHub founder directive #420](https://github.com/SimonShaun2/Renvani/issues/420). **Codex is the currently active builder.** Do not assume named GrokBot or Cursor roles are running; GrokBot/E.. CoS can perform an on-demand independent batch review when invoked. Independent peer, QA, and Security-by-risk reviews must be performed by actual separately identified reviewers or qualified humans, with exact-head evidence; a role name alone is not a review. The **founder gives final authorization for EVERY outstanding and future PR merge**, including into `dev`; E.. CoS technical recommendations are not merge permission. Group compatible outstanding PRs into bounded, dependency-ordered review/CI/merge batches; each named PR and exact head requires founder authorization. Continue original Phase A implementation on independently authorized work without waiting for idle named agents or a blocked PR; Phase B remains founder-gated. Do not repeat completed CI or repository-wide audits. Reuse existing secrets where appropriate; no automatic credential creation/rotation and no false least-privilege or revocation PASS. Do not weaken real security, consent, tenant, migration, reviewer, or release gates.
+> **FOUNDER EXECUTION & MERGE AUTHORITY — NOVEMBER 3, 2026 (current).** See [founder directive #420](https://github.com/SimonShaun2/Renvani/issues/420). **Codex is the active builder and coordinator. No E.. CoS approval, dispatch, CI authorization, review recommendation, or signature is required for any ticket or PR.** GrokBot/E.. CoS is optional advice when the founder independently chooses to use it; never a gate. Codex Lead/Technical Lead and actual Platform owners coordinate Ready/WIP and authorize appropriately scoped CI batches; independent Peer, QA, and Security-by-risk reviews with exact-head evidence remain mandatory. **The founder alone approves EVERY outstanding and future PR merge**, including `dev`, by named PR and exact reviewed head. Compatible PRs may be reviewed and validated in batches, then merged sequentially only after explicit founder approvals; no unsafe big-bang merge. Continue authorized Phase A work without stopping for idle roles or blocked PRs. No Phase B before original Phase A acceptance and founder permission. Preserve genuine security, tenant, consent, migration and release gates. Reuse existing credentials when appropriate, but never claim unproven least privilege or rotation/revocation PASS.
 
 
 **Authority:** Founder FSM direction, 2026-10-20; [Field Service Agents — Team & Operating Rules](https://app.notion.com/p/3ff317b92d15817b9f64dda55cddb97e). This document supersedes the 15-member staffing draft in this PR. Product sequencing is agent-first, with a full FSM suite as a later optional product offering. Shaun is founder and is not counted among the 26 agent roles.
@@ -11,7 +11,7 @@ Role names describe durable responsibility, not the current ticket. Assignments 
 
 | Role | Durable responsibility | Current pairing |
 |---|---|---|
-| E.. CoS (Grok Bot) — PM | Board, WIP, dependencies, evidence; **final merge approver into `dev`** | Leadership |
+| E.. CoS (GrokBot) — optional advisor | Can provide nonbinding review on founder request; **no approval, CI, dispatch, or merge authority** | Not active by default |
 | Product Owner | Acceptance, scope and direct-job outcomes | Leadership |
 | Technical Lead | Architecture, contracts and safe sequencing | Leadership |
 | Senior Dev A — Agent Backend | Tenant and agent control plane | Pair 1 with B |
@@ -36,7 +36,7 @@ Role names describe durable responsibility, not the current ticket. Assignments 
 | Platform 1 — CI & Environments | Batch CI and local environment | Platform |
 | Platform 2 — Reliability & Observability | Monitoring and recovery | Platform |
 | Security | Tenant, consent, auth and agent authority | Security |
-Totals: 3 leadership, 10 senior developers in five pairs, 2 designers, 3 reviewers, 4 QA, 2 platform, 1 Security = **25** active gate roles (+ founder). **Retired:** Gayle merge gate, Cursor Chief of Staff — superseded by **E.. CoS** final approval. Founder (Shaun) retains **`main`** promotion and exceptional live-money, legal and destructive operations.
+The historical roster describes 25 role slots; actual available agents must be verified when dispatched. Optional E.. CoS advice does not create an active role or approval requirement. **Retired:** Gayle, Cursor Chief of Staff, and mandatory E.. CoS gates. Founder approves **every PR merge**, including `dev` and `main`, and retains all production, spending, live-money, legal and destructive authority. Listed agent roles are staffing definitions, not proof of active agent sessions.
 
 ## 2. Ticket and tandem process
 
@@ -46,7 +46,7 @@ The five active P0 pair tickets are FS-37, FS-38, FS-36, FS-39 and FS-40 respect
 
 ## 3. Risk and approval matrix
 
-| Change | Required evidence before E.. CoS merge into `dev` |
+| Change | Required evidence before founder-authorized merge into `dev` |
 |---|---|
 | Standard | Pair self-review and cross-review, distinct peer reviewer, assigned QA, approved batch CI at exact head |
 | UX | Above, plus relevant design acceptance and accessibility checks |
@@ -55,16 +55,16 @@ The five active P0 pair tickets are FS-37, FS-38, FS-36, FS-39 and FS-40 respect
 | Platform/CI | Second platform or Technical Lead review, Security for gate authority, QA where behavior changes |
 | Release | QA 4, Platform, Security by risk; then founder promotion **`main`** from `dev` |
 
-The implementer cannot approve their own work as QA, peer reviewer, Security, or E.. CoS merge. A changed PR head invalidates affected sign-offs. A failed gate returns a bounded fix card to the original pair and requires fresh evidence.
+The implementer cannot approve their own work as independent QA, peer reviewer, or Security. Final merge authorization belongs exclusively to the founder. A changed PR head invalidates affected sign-offs. A failed gate returns a bounded fix card to the original pair and requires fresh evidence.
 
 ## 4. Branches, CI and release
 
-No direct push to **`dev`** or **`main`**; no rebase or force-push of reviewed heads. Feature branches and **draft PRs** are traceable to the board ticket. **`dev`** is the protected integration branch; **E.. CoS** is the final merge approver into `dev`. **`main`** is promotion-only (Shaun). **F2 decided by Shaun 2026-10-21:** PR #1 base is **`dev`** @ `12b23226c0e0c199626940117fc7f0fa89f87375`.
+No direct push to **`dev`** or **`main`**; no rebase or force-push of reviewed heads. Feature branches and **draft PRs** are traceable to the board ticket. **`dev`** is the protected integration branch; **The founder** is the final merge approver into `dev`, for each named PR at its reviewed head. **`main`** is promotion-only (Shaun). **F2 decided by Shaun 2026-10-21:** PR #1 base is **`dev`** @ `12b23226c0e0c199626940117fc7f0fa89f87375`.
 
 CI runs **only through approved batches** with enumerated membership, exact head SHA, one authorized run and recorded result. No standalone per-commit or per-PR CI, and local green tests are not CI. No merge or Done without the risk matrix and batch evidence. No deployment, public website or Vercel setup from this process. Stripe and live payment changes remain at the end of the roadmap and need separate founder authority.
 
 ## 5. Operating loop and sources
 
-**E.. CoS** maintains the Notion build board, sets Ready, reconciles Cursor and GitHub evidence, assigns dependency-cleared tickets within WIP, and approves merges into `dev` after gates. Product Owner and Technical Lead decide acceptance and architecture. The founder's current product direction and Notion board outrank stale V2 sprint prose in this unmerged draft until reconciled in a separate change.
+**Codex Lead/Technical Lead** maintains the existing Notion build board, sets Ready upon dependency clearance, reconciles actual GitHub/reviewer evidence, and assigns work within WIP. Product Owner decides scope and acceptance, Technical Lead architecture, Platform coordinates approved CI, and **the founder alone authorizes merges** after independent gates. E.. CoS input is optional and nonbinding. The founder's current product direction and Notion board outrank stale V2 sprint prose in this unmerged draft until reconciled in a separate change.
 
 Adapted process sources from the paused TrayLoop project: [team README](https://github.com/SimonShaun2/SimonShaun2/blob/dev/trayloop/docs/team/README.md), [tandem process](https://github.com/SimonShaun2/SimonShaun2/blob/dev/trayloop/docs/team/process.md), [ticket template](https://github.com/SimonShaun2/SimonShaun2/blob/dev/trayloop/docs/team/ticket-template.md), [split plan](https://github.com/SimonShaun2/SimonShaun2/blob/dev/trayloop/docs/team/split-plan-template.md). Copy the process, not TrayLoop-specific labels, prices, Stripe implementation or branch names.

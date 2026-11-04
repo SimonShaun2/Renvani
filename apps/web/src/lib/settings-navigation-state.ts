@@ -3,7 +3,7 @@
  */
 export function isSettingsNavigationActive(pathname: string, href: string): boolean {
   if (href === "/settings/booking/general") {
-    return pathname.startsWith("/settings/booking/");
+    return pathname === "/settings/booking" || pathname.startsWith("/settings/booking/");
   }
   return pathname === href || pathname.startsWith(`${href}/`);
 }

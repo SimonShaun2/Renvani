@@ -6,6 +6,7 @@ import type { ReactNode } from "react";
 
 import { settingsNavigation } from "@/src/lib/navigation";
 import { cn } from "@/src/lib/utils";
+import { isSettingsNavigationActive } from "@/src/lib/settings-navigation-state";
 
 /** Renvani operator design: ink #0f1530, cream #fbf6ef, amber #f6b400.
  * The main AppShell hides its generic heading on /settings/* so these screens
@@ -32,10 +33,7 @@ export default function SettingsLayout({ children }: { children: ReactNode }) {
           <p className="px-3 pb-3 pt-1 font-mono text-[10px] font-medium uppercase tracking-[0.12em] text-[#5e6684]">Workspace settings</p>
           <nav aria-label="Settings sections" className="flex min-w-0 gap-1 overflow-x-auto pb-1 xl:flex-col xl:overflow-visible xl:pb-0">
             {settingsNavigation.map((item) => {
-              const isBookingRoot = item.href === "/settings/booking/general";
-              const isActive = isBookingRoot
-                ? pathname.startsWith("/settings/booking")
-                : pathname === item.href || pathname.startsWith(`${item.href}/`);
+              const isActive = isSettingsNavigationActive(pathname, item.href);
 
               return (
                 <Link

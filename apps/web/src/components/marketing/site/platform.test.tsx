@@ -37,19 +37,19 @@ const path = (href: string) => href.split("#")[0] || "/";
 describe("Products + How it works (Figma 176:204/176:313, 176:585/176:664)", () => {
   it("renders the Products page with the connected platform and the tool directory", () => {
     render(<ProductsPage />);
-    expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("Five products.Every part of the job.");
-    expect(screen.getByRole("heading", { name: "Find your next tool." })).toBeTruthy();
-    expect(screen.getByText("YOUR RULES ACROSS THE WORK")).toBeTruthy();
+    expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("Five products. One connected business.");
+    expect(screen.getByRole("heading", { name: "Everything behind a great service business." })).toBeTruthy();
+    expect(screen.getByText("FIELD SERVICE TOOLS")).toBeTruthy();
     expect(document.querySelectorAll("[data-tool-group]")).toHaveLength(5);
-    expect(screen.getByRole("link", { name: "Find your next tool ↓" }).getAttribute("href")).toBe("#tools");
+    expect(screen.getByRole("link", { name: "Explore the platform" }).getAttribute("href")).toBe("#flagships");
     expect(document.getElementById("tools")).toBeTruthy();
   });
 
   it("renders the How it works page", () => {
     render(<HowItWorksPage />);
-    expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("One business.Every handoff connected.");
-    expect(screen.getByRole("heading", { name: "No heat. Approved repair. Next tune-up." })).toBeTruthy();
-    expect(screen.getByRole("link", { name: "Explore the tools →" }).getAttribute("href")).toBe("/product#tools");
+    expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("Set the goal. Keep the work moving.");
+    expect(screen.getByRole("heading", { name: "One job. Connected from start to finish." })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Explore Command Center" }).getAttribute("href")).toBe("/product/command-center");
   });
 
   it("header and footer link to the real pages, each with a route file and public access", () => {

@@ -45,10 +45,10 @@ describe("flagship + product-detail + tool pages (Figma 175:3…175:4156, 215:63
     it(`renders ${page.slug} with real links only`, () => {
       const { container } = render(<FlagshipPage page={page} />);
       const h1s = screen.getAllByRole("heading", { level: 1 });
-      expect(h1s).toHaveLength(2); // desktop (md+) and mobile frame; only one is displayed
+      expect(h1s).toHaveLength(1); // one native responsive heading, not duplicated breakpoint frames
       if (page.template === "page") for (const h of h1s) expect(h.textContent?.replace(/\s+/g, "")).toBe(page.headline.replace(/\s+/g, "")); // multi-line headings render as block lines
       expect(container.querySelector("#workflow")).toBeTruthy();
-      expect(container.querySelector("#workflow-m")).toBeTruthy();
+      expect(container.querySelectorAll("[data-subpage-journey]")).toHaveLength(1);
       expect(FLAGSHIP_TREES[page.slug]!.desktop).toMatchObject({ id: page.frames.desktop });
       expect(FLAGSHIP_TREES[page.slug]!.mobile).toMatchObject({ id: page.frames.mobile });
       for (const a of Array.from(container.querySelectorAll("a"))) expect(resolves(a.getAttribute("href")!), a.getAttribute("href")!).toBe(true);

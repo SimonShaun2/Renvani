@@ -4,6 +4,16 @@
 
 # FSM Platform V2 — Controlling Operating Document
 
+## Founder-required Renvani Figma parity — applies to ALL UI work
+
+**Renvani is the only current product identity.** The single authoritative design file for operator, field, customer and marketing UI is [FSM Agent – Product Design](https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-%E2%80%93-Product-Design). Follow [docs/design/RENVANI_FIGMA_PARITY.md](docs/design/RENVANI_FIGMA_PARITY.md) and [founder tracker #433](https://github.com/SimonShaun2/Renvani/issues/433).
+
+**Before writing UI code:** locate and inspect the **exact Figma nodes** for that route (not merely a file/prototype link), including desktop, tablet, mobile and error/loading/empty states as applicable. Implement with actual components, Clerk/session rules, domain services and tenant policies. The prototype's sample data is not real app data.
+
+**Before calling any UI work Done or merge-ready:** compare screenshots of the real deployed browser UI at the reviewed head against those Figma frames at each applicable breakpoint, record discrepancies and explicit independent Design/Product and QA acceptance, and attach evidence to the PR. **Green CI and a pasted Figma URL alone are not a design pass.** Existing legacy styling cannot silently override the canonical designs. No retired brand/customer-facing copy or links in current application UI. Preserve compatibility when touching historical data identifiers. Founder alone approves merge after all required gates.
+
+
+
 **This file governs how every team member operates in this repository. Read it in full
 before changing anything.**
 

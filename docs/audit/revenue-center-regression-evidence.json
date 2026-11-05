@@ -1,0 +1,334 @@
+{
+  "schemaVersion": 1,
+  "recordedAtUtc": "2026-11-05T03:35:24+00:00",
+  "pr": "https://github.com/SimonShaun2/Renvani/pull/435",
+  "publishedCommit": "47e5b0dd4237903e5bc5437a74280812bcf692f5",
+  "publishedTree": "c4997d60323e88189c21c790579f1637248922dc",
+  "parentCommit": "1cc6ecda63e4acdede8cdc6d0bd6b3ecbe115d4f",
+  "scope": "Revenue Center component/helper checks with mocked query hooks; not authenticated API/browser, responsive or whole-stack acceptance.",
+  "sourceFiles": [
+    {
+      "path": "apps/web/src/components/ai/AiRevenueCenterClient.tsx",
+      "gitBlob": "1c1cb65749195917c4381f53432d432c2c235723",
+      "source": "https://github.com/SimonShaun2/Renvani/blob/47e5b0dd4237903e5bc5437a74280812bcf692f5/apps/web/src/components/ai/AiRevenueCenterClient.tsx"
+    },
+    {
+      "path": "apps/web/src/components/ai/AiRevenueCenterClient.test.tsx",
+      "gitBlob": "2006eb1af14a8d00cbb05b218ea083a1f296874b",
+      "source": "https://github.com/SimonShaun2/Renvani/blob/47e5b0dd4237903e5bc5437a74280812bcf692f5/apps/web/src/components/ai/AiRevenueCenterClient.test.tsx"
+    },
+    {
+      "path": "apps/web/src/components/ai/revenue-center-state.ts",
+      "gitBlob": "dac6a47ca637e6ebd92f30fcd38469077d389f86",
+      "source": "https://github.com/SimonShaun2/Renvani/blob/47e5b0dd4237903e5bc5437a74280812bcf692f5/apps/web/src/components/ai/revenue-center-state.ts"
+    },
+    {
+      "path": "apps/web/src/components/ai/revenue-center-state.test.ts",
+      "gitBlob": "44c8912d531b86f2835849612f07bb028f81439c",
+      "source": "https://github.com/SimonShaun2/Renvani/blob/47e5b0dd4237903e5bc5437a74280812bcf692f5/apps/web/src/components/ai/revenue-center-state.test.ts"
+    }
+  ],
+  "intermediateAuthorReports": [
+    {
+      "stage": "Expanded suite before runtime fix",
+      "originalReportSha256": "4bf5ca6728d8ff3fd9810dba27c33f5df42eea8177f29b673582d030df3b1762",
+      "startTimeEpochMilliseconds": 1793848435241,
+      "testFiles": 2,
+      "total": 25,
+      "passed": 18,
+      "failed": 7,
+      "pending": 0,
+      "success": false,
+      "cases": [
+        {
+          "path": "apps/web/src/components/ai/AiRevenueCenterClient.test.tsx",
+          "name": "AiRevenueCenterClient action boundaries navigates to approvals only after a supported proposal succeeds",
+          "status": "passed"
+        },
+        {
+          "path": "apps/web/src/components/ai/AiRevenueCenterClient.test.tsx",
+          "name": "AiRevenueCenterClient action boundaries records Mark handled without creating a proposal or navigating",
+          "status": "passed"
+        },
+        {
+          "path": "apps/web/src/components/ai/AiRevenueCenterClient.test.tsx",
+          "name": "AiRevenueCenterClient action boundaries shows proposal failures and does not navigate",
+          "status": "passed"
+        },
+        {
+          "path": "apps/web/src/components/ai/AiRevenueCenterClient.test.tsx",
+          "name": "AiRevenueCenterClient action boundaries preserves a record-action error until a successful retry",
+          "status": "passed"
+        },
+        {
+          "path": "apps/web/src/components/ai/AiRevenueCenterClient.test.tsx",
+          "name": "AiRevenueCenterClient saved-result refresh refetches both queries once and stays disabled until both finish",
+          "status": "passed"
+        },
+        {
+          "path": "apps/web/src/components/ai/AiRevenueCenterClient.test.tsx",
+          "name": "AiRevenueCenterClient saved-result refresh reports a partial summary query failure",
+          "status": "passed"
+        },
+        {
+          "path": "apps/web/src/components/ai/AiRevenueCenterClient.test.tsx",
+          "name": "AiRevenueCenterClient saved-result refresh reports a partial recommendations query failure",
+          "status": "passed"
+        },
+        {
+          "path": "apps/web/src/components/ai/AiRevenueCenterClient.test.tsx",
+          "name": "AiRevenueCenterClient saved-result refresh does not call a missing summary refresh result successful",
+          "status": "passed"
+        },
+        {
+          "path": "apps/web/src/components/ai/AiRevenueCenterClient.test.tsx",
+          "name": "AiRevenueCenterClient saved-result refresh does not call a missing recommendations refresh result successful",
+          "status": "passed"
+        },
+        {
+          "path": "apps/web/src/components/ai/AiRevenueCenterClient.test.tsx",
+          "name": "AiRevenueCenterClient saved-result refresh keeps Refresh disabled after summary rejects while its sibling is pending",
+          "status": "failed"
+        },
+        {
+          "path": "apps/web/src/components/ai/AiRevenueCenterClient.test.tsx",
+          "name": "AiRevenueCenterClient saved-result refresh keeps Refresh disabled after recommendations rejects while its sibling is pending",
+          "status": "failed"
+        },
+        {
+          "path": "apps/web/src/components/ai/AiRevenueCenterClient.test.tsx",
+          "name": "AiRevenueCenterClient saved-result refresh clears a failed refresh notice when retry succeeds",
+          "status": "passed"
+        },
+        {
+          "path": "apps/web/src/components/ai/AiRevenueCenterClient.test.tsx",
+          "name": "AiRevenueCenterClient truthful rendered data states renders a real zero and a successful empty result with useful destinations",
+          "status": "passed"
+        },
+        {
+          "path": "apps/web/src/components/ai/AiRevenueCenterClient.test.tsx",
+          "name": "AiRevenueCenterClient truthful rendered data states distinguishes an empty type filter from an unfiltered empty result",
+          "status": "passed"
+        },
+        {
+          "path": "apps/web/src/components/ai/AiRevenueCenterClient.test.tsx",
+          "name": "AiRevenueCenterClient truthful rendered data states distinguishes an empty customer filter from an unfiltered empty result",
+          "status": "passed"
+        },
+        {
+          "path": "apps/web/src/components/ai/AiRevenueCenterClient.test.tsx",
+          "name": "AiRevenueCenterClient truthful rendered data states shows unavailable summary and Retry when data is undefined",
+          "status": "failed"
+        },
+        {
+          "path": "apps/web/src/components/ai/AiRevenueCenterClient.test.tsx",
+          "name": "AiRevenueCenterClient truthful rendered data states shows unavailable summary and Retry when data is null",
+          "status": "failed"
+        },
+        {
+          "path": "apps/web/src/components/ai/AiRevenueCenterClient.test.tsx",
+          "name": "AiRevenueCenterClient truthful rendered data states shows unavailable recommendations instead of false emptiness when data is undefined",
+          "status": "failed"
+        },
+        {
+          "path": "apps/web/src/components/ai/AiRevenueCenterClient.test.tsx",
+          "name": "AiRevenueCenterClient truthful rendered data states shows unavailable recommendations instead of false emptiness when data is null",
+          "status": "failed"
+        },
+        {
+          "path": "apps/web/src/components/ai/AiRevenueCenterClient.test.tsx",
+          "name": "AiRevenueCenterClient truthful rendered data states hides a failed cached summary without hiding healthy recommendation actions",
+          "status": "passed"
+        },
+        {
+          "path": "apps/web/src/components/ai/AiRevenueCenterClient.test.tsx",
+          "name": "AiRevenueCenterClient truthful rendered data states hides failed cached rows and pagination, then restores them after a successful retry",
+          "status": "failed"
+        },
+        {
+          "path": "apps/web/src/components/ai/AiRevenueCenterClient.test.tsx",
+          "name": "AiRevenueCenterClient truthful rendered data states does not show zero or empty-result claims while queries are loading",
+          "status": "passed"
+        },
+        {
+          "path": "apps/web/src/components/ai/revenue-center-state.test.ts",
+          "name": "AI Revenue Center truthful UI states treats a successful zero-valued response as real data",
+          "status": "passed"
+        },
+        {
+          "path": "apps/web/src/components/ai/revenue-center-state.test.ts",
+          "name": "AI Revenue Center truthful UI states never turns an error or absent response into a zero",
+          "status": "passed"
+        },
+        {
+          "path": "apps/web/src/components/ai/revenue-center-state.test.ts",
+          "name": "AI Revenue Center truthful UI states does not imply delivery for a recorded manual action",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "stage": "Expanded suite after runtime fix, before final test type-annotation adjustment",
+      "originalReportSha256": "2499427aff2230e5c0afa5dec31fea0ef886e49fe5ff62081383afb7e905fc17",
+      "startTimeEpochMilliseconds": 1793848467489,
+      "testFiles": 2,
+      "total": 25,
+      "passed": 25,
+      "failed": 0,
+      "pending": 0,
+      "success": true,
+      "cases": [
+        {
+          "path": "apps/web/src/components/ai/AiRevenueCenterClient.test.tsx",
+          "name": "AiRevenueCenterClient action boundaries navigates to approvals only after a supported proposal succeeds",
+          "status": "passed"
+        },
+        {
+          "path": "apps/web/src/components/ai/AiRevenueCenterClient.test.tsx",
+          "name": "AiRevenueCenterClient action boundaries records Mark handled without creating a proposal or navigating",
+          "status": "passed"
+        },
+        {
+          "path": "apps/web/src/components/ai/AiRevenueCenterClient.test.tsx",
+          "name": "AiRevenueCenterClient action boundaries shows proposal failures and does not navigate",
+          "status": "passed"
+        },
+        {
+          "path": "apps/web/src/components/ai/AiRevenueCenterClient.test.tsx",
+          "name": "AiRevenueCenterClient action boundaries preserves a record-action error until a successful retry",
+          "status": "passed"
+        },
+        {
+          "path": "apps/web/src/components/ai/AiRevenueCenterClient.test.tsx",
+          "name": "AiRevenueCenterClient saved-result refresh refetches both queries once and stays disabled until both finish",
+          "status": "passed"
+        },
+        {
+          "path": "apps/web/src/components/ai/AiRevenueCenterClient.test.tsx",
+          "name": "AiRevenueCenterClient saved-result refresh reports a partial summary query failure",
+          "status": "passed"
+        },
+        {
+          "path": "apps/web/src/components/ai/AiRevenueCenterClient.test.tsx",
+          "name": "AiRevenueCenterClient saved-result refresh reports a partial recommendations query failure",
+          "status": "passed"
+        },
+        {
+          "path": "apps/web/src/components/ai/AiRevenueCenterClient.test.tsx",
+          "name": "AiRevenueCenterClient saved-result refresh does not call a missing summary refresh result successful",
+          "status": "passed"
+        },
+        {
+          "path": "apps/web/src/components/ai/AiRevenueCenterClient.test.tsx",
+          "name": "AiRevenueCenterClient saved-result refresh does not call a missing recommendations refresh result successful",
+          "status": "passed"
+        },
+        {
+          "path": "apps/web/src/components/ai/AiRevenueCenterClient.test.tsx",
+          "name": "AiRevenueCenterClient saved-result refresh keeps Refresh disabled after summary rejects while its sibling is pending",
+          "status": "passed"
+        },
+        {
+          "path": "apps/web/src/components/ai/AiRevenueCenterClient.test.tsx",
+          "name": "AiRevenueCenterClient saved-result refresh keeps Refresh disabled after recommendations rejects while its sibling is pending",
+          "status": "passed"
+        },
+        {
+          "path": "apps/web/src/components/ai/AiRevenueCenterClient.test.tsx",
+          "name": "AiRevenueCenterClient saved-result refresh clears a failed refresh notice when retry succeeds",
+          "status": "passed"
+        },
+        {
+          "path": "apps/web/src/components/ai/AiRevenueCenterClient.test.tsx",
+          "name": "AiRevenueCenterClient truthful rendered data states renders a real zero and a successful empty result with useful destinations",
+          "status": "passed"
+        },
+        {
+          "path": "apps/web/src/components/ai/AiRevenueCenterClient.test.tsx",
+          "name": "AiRevenueCenterClient truthful rendered data states distinguishes an empty type filter from an unfiltered empty result",
+          "status": "passed"
+        },
+        {
+          "path": "apps/web/src/components/ai/AiRevenueCenterClient.test.tsx",
+          "name": "AiRevenueCenterClient truthful rendered data states distinguishes an empty customer filter from an unfiltered empty result",
+          "status": "passed"
+        },
+        {
+          "path": "apps/web/src/components/ai/AiRevenueCenterClient.test.tsx",
+          "name": "AiRevenueCenterClient truthful rendered data states shows unavailable summary and Retry when data is undefined",
+          "status": "passed"
+        },
+        {
+          "path": "apps/web/src/components/ai/AiRevenueCenterClient.test.tsx",
+          "name": "AiRevenueCenterClient truthful rendered data states shows unavailable summary and Retry when data is null",
+          "status": "passed"
+        },
+        {
+          "path": "apps/web/src/components/ai/AiRevenueCenterClient.test.tsx",
+          "name": "AiRevenueCenterClient truthful rendered data states shows unavailable recommendations instead of false emptiness when data is undefined",
+          "status": "passed"
+        },
+        {
+          "path": "apps/web/src/components/ai/AiRevenueCenterClient.test.tsx",
+          "name": "AiRevenueCenterClient truthful rendered data states shows unavailable recommendations instead of false emptiness when data is null",
+          "status": "passed"
+        },
+        {
+          "path": "apps/web/src/components/ai/AiRevenueCenterClient.test.tsx",
+          "name": "AiRevenueCenterClient truthful rendered data states hides a failed cached summary without hiding healthy recommendation actions",
+          "status": "passed"
+        },
+        {
+          "path": "apps/web/src/components/ai/AiRevenueCenterClient.test.tsx",
+          "name": "AiRevenueCenterClient truthful rendered data states hides failed cached rows and pagination, then restores them after a successful retry",
+          "status": "passed"
+        },
+        {
+          "path": "apps/web/src/components/ai/AiRevenueCenterClient.test.tsx",
+          "name": "AiRevenueCenterClient truthful rendered data states does not show zero or empty-result claims while queries are loading",
+          "status": "passed"
+        },
+        {
+          "path": "apps/web/src/components/ai/revenue-center-state.test.ts",
+          "name": "AI Revenue Center truthful UI states treats a successful zero-valued response as real data",
+          "status": "passed"
+        },
+        {
+          "path": "apps/web/src/components/ai/revenue-center-state.test.ts",
+          "name": "AI Revenue Center truthful UI states never turns an error or absent response into a zero",
+          "status": "passed"
+        },
+        {
+          "path": "apps/web/src/components/ai/revenue-center-state.test.ts",
+          "name": "AI Revenue Center truthful UI states does not imply delivery for a recorded manual action",
+          "status": "passed"
+        }
+      ]
+    }
+  ],
+  "finalPublishedEvidence": {
+    "source": "PR #435 validation record inspected through GitHub on 2026-11-05 UTC; independent QA and peer acknowledgments recorded at this exact published head.",
+    "node": "22.16.0",
+    "pnpm": "10.0.0",
+    "vitest": "3.2.4",
+    "command": "corepack pnpm --filter @fsm/web exec vitest run src/components/ai/AiRevenueCenterClient.test.tsx src/components/ai/revenue-center-state.test.ts",
+    "testFiles": 2,
+    "componentCases": 22,
+    "helperCases": 3,
+    "total": 25,
+    "passed": 25,
+    "failed": 0,
+    "skipped": 0,
+    "completeWebTypescript": "PASS, recorded by implementing coordinator",
+    "targetedEslint": "PASS, recorded by implementing coordinator",
+    "independentPeer": "/root/ui_keyboard_check: scoped PASS, exact-head acknowledgment",
+    "independentQa": "/root/revenue_qa: independent 25/25 rerun and exact-head acknowledgment",
+    "currentInventoryAgentReranTests": false,
+    "coverage": "NOT MEASURED",
+    "authenticatedBrowser": "NOT RUN",
+    "responsiveAcceptance": "NOT RUN",
+    "combinedStack": "NOT RUN",
+    "batchCi": "NOT RUN for this follow-up"
+  },
+  "interpretation": "Intermediate JSON report hashes preserve the red/green behavior evidence; they are not presented as a reporter artifact of the later exact-head independent run. The final published revision is supported by the separate independent QA acknowledgment and PR record."
+}

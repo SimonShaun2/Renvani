@@ -21,6 +21,10 @@ A ticket carries acceptance, dependencies, risk, pair ownership, split, contract
 
 The Product Owner specifies acceptance and non-goals; Codex Lead / Technical Lead coordinates the assigned engineering work. Two senior developers on the same ticket agree contract, consumers, file ownership, test ownership, and merge order before code. Partners cross-review and report combined local commands/results. Every PR states ticket, base/head SHA, contracts/migrations, self-review, observability, independent peer reviewer, assigned QA, Security need, and batch membership. The peer reviewer cannot be an implementer.
 
+## UI changes — mandatory Figma visual acceptance
+
+Every frontend/UI PR must follow [docs/design/RENVANI_FIGMA_PARITY.md](docs/design/RENVANI_FIGMA_PARITY.md). It must identify the canonical Renvani Figma file and precise desktop/tablet/mobile/state node IDs, actual browser preview URL and exact head, screenshots of the rendered route compared to those frames, actual interactive/auth/accessibility checks, and an independent Design/Product PASS or bounded documented exception plus QA evidence. **No Figma node IDs or no browser comparison means visual acceptance is HOLD, regardless of CI.** Use no retired project brand in active UI. Do not imply historical screenshots represent working staging software.
+
 ## 4. CI batches and exact-head gate
 
 CI runs only through an **approved batch** recorded by Platform with Codex Lead / Technical Lead authorization. No standalone per-commit, per-PR, or draft CI. Platform records run URL and conclusion at the exact head. Local green tests are not CI.

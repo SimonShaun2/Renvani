@@ -235,14 +235,14 @@ export default function SettingsGeneralPage() {
                 <p className="text-lg font-semibold text-neutral-900">{companyDisplayName}</p>
                 <p className="mt-1 text-sm text-neutral-500">Upload a square PNG or JPG logo to brand customer-facing screens.</p>
               </div>
-              <label className="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-[10px] border border-[#e6dccb] bg-white px-4 py-2 text-sm font-semibold text-[#0f1530] transition hover:bg-[#f3eadc]">
-                {isUploadingLogo ? <Loader2 className="h-4 w-4 animate-spin" /> : <UploadCloud className="h-4 w-4" />}
+              <label className="relative inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-[10px] border border-[#e6dccb] bg-white px-4 py-2 text-sm font-semibold text-[#0f1530] transition hover:bg-[#f3eadc] focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-[#0f1530]">
+                {isUploadingLogo ? <Loader2 aria-hidden="true" className="h-4 w-4 animate-spin" /> : <UploadCloud aria-hidden="true" className="h-4 w-4" />}
                 {isUploadingLogo ? "Uploading..." : "Upload Logo"}
                 <input
                   type="file"
                   accept="image/png,image/jpeg,image/jpg"
                   disabled={isUploadingLogo}
-                  className="hidden"
+                  className="sr-only"
                   onChange={(event) => {
                     void handleLogoSelect(event.target.files?.[0] ?? null);
                     event.currentTarget.value = "";
@@ -435,7 +435,7 @@ export default function SettingsGeneralPage() {
             <p className="font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-[#5e6684]">Tips</p>
             <ul className="mt-4 space-y-3 text-sm leading-6 text-neutral-500">
               <li>Use your trading name when the brand customers recognize differs from the legal business name.</li>
-              <li>Your logo upload goes through the attachment API and is stored alongside other company assets.</li>
+              <li>Choose a clear, square PNG or JPG logo that customers will recognize.</li>
               <li>Timezone and currency control estimate, invoice, and booking defaults throughout the app.</li>
             </ul>
           </section>

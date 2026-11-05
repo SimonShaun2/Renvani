@@ -10,7 +10,8 @@ import styles from "./site.module.css";
 const ink = "var(--color-mkt-ink)";
 const ink2 = "var(--color-mkt-ink2)";
 const line = "var(--color-mkt-line)";
-const eyebrow = "text-[11px] font-medium leading-[1.38] tracking-[1.1px]";
+const inter = "[font-family:var(--font-mkt-ui),system-ui,sans-serif]";
+const eyebrow = "[font-family:var(--font-mkt-sans),system-ui,sans-serif] text-[11px] font-medium leading-[1.38] tracking-[1.1px]";
 const h2 = "text-[36px] font-semibold leading-[1.08] tracking-[-0.9px] md:text-[48px] md:tracking-[-1.2px]";
 const section = "mx-auto flex max-w-[1440px] flex-col gap-8 px-6 py-6 md:px-20 md:py-20";
 const card = "flex flex-col gap-4 rounded-2xl border bg-white p-5";
@@ -28,19 +29,19 @@ function Lines({ lines }: { lines: readonly string[] }) {
   );
 }
 
-function Chip({ children, tone = "white" }: { children: React.ReactNode; tone?: "white" | "ink" | "cream" | "amber" | "ambersoft" | "green" }) {
+function Chip({ children, tone = "white", className = "" }: { children: React.ReactNode; tone?: "white" | "ink" | "cream" | "amber" | "ambersoft" | "green"; className?: string }) {
   const bg = { white: "#fff", ink, cream: "var(--color-mkt-cream)", amber: "var(--color-mkt-amber)", ambersoft: "var(--color-mkt-amber-soft)", green: "var(--color-mkt-green-soft)" }[tone];
   return (
-    <span className="inline-flex h-[27px] items-center rounded-xl px-[10px] text-[10px] font-medium" style={{ background: bg, color: tone === "ink" ? "#fff" : ink }}>
+    <span className={`inline-flex h-[27px] shrink-0 items-center rounded-xl px-[10px] text-[10px] font-medium ${className}`} style={{ background: bg, color: tone === "ink" ? "#fff" : ink }}>
       {children}
     </span>
   );
 }
 
-function UiAction({ children, tone = "ink", wide = true }: { children: React.ReactNode; tone?: "ink" | "amber" | "cream"; wide?: boolean }) {
+function UiAction({ children, tone = "ink", wide = true, className = "" }: { children: React.ReactNode; tone?: "ink" | "amber" | "cream"; wide?: boolean; className?: string }) {
   const bg = { ink, amber: "var(--color-mkt-amber)", cream: "var(--color-mkt-cream)" }[tone];
   return (
-    <span className={`flex h-[38px] items-center justify-center rounded-xl px-[14px] text-[12px] font-medium ${wide ? "w-full" : ""}`} style={{ background: bg, color: tone === "ink" ? "#fff" : ink }}>
+    <span className={`flex h-[38px] items-center justify-center rounded-xl px-[14px] text-[12px] font-medium ${wide ? "w-full" : ""} ${className}`} style={{ background: bg, color: tone === "ink" ? "#fff" : ink }}>
       {children}
     </span>
   );
@@ -49,17 +50,17 @@ function UiAction({ children, tone = "ink", wide = true }: { children: React.Rea
 function ProductChrome({ title }: { title: string }) {
   return (
     <div className="flex h-[54px] items-center gap-4 px-4" style={{ background: ink, color: "#fff" }}>
-      <span className="w-[120px] text-[17px] font-bold">Renvani</span>
+      <span className="w-[140px] shrink-0 text-[17px] font-bold">Renvani</span>
       <span className="flex-1 text-[12px] font-medium">{title}</span>
-      <Chip tone="amber">EXAMPLE</Chip>
+      <Chip tone="amber" className="w-[102px]">EXAMPLE</Chip>
     </div>
   );
 }
 
 /** Website input + Growth Check CTA (203:4410 / 203:4569). No intake endpoint yet; posts to sign-up. */
-export function GrowthCheckEntry({ id }: { id: string }) {
+export function GrowthCheckEntry({ id, className = "" }: { id: string; className?: string }) {
   return (
-    <form action={GROWTH_CHECK_ENTRY.action} method="get" className="flex w-full max-w-[480px] flex-col items-start gap-3" aria-labelledby={`${id}-label`}>
+    <form action={GROWTH_CHECK_ENTRY.action} method="get" className={`flex w-full max-w-[480px] flex-col items-start gap-3 ${className}`} aria-labelledby={`${id}-label`}>
       <label id={`${id}-label`} htmlFor={id} className={eyebrow} style={{ color: ink2 }}>
         {GROWTH_CHECK_ENTRY.label}
       </label>
@@ -86,12 +87,12 @@ export function GrowthCheckEntry({ id }: { id: string }) {
 function SiteVisual() {
   const s = HOME.site;
   return (
-    <div data-node-id="200:46" className="w-[720px] shrink-0 overflow-hidden rounded-2xl border" style={{ background: "var(--color-mkt-panel)", borderColor: line }} aria-label="Example: website and booking" role="img">
+    <div data-node-id="200:46" className={`${inter} h-[488px] w-[720px] shrink-0 overflow-hidden rounded-2xl border`} style={{ background: "var(--color-mkt-panel)", borderColor: line }} aria-label="Example: website and booking" role="img">
       <ProductChrome title="Website + booking" />
       <div className="flex flex-col gap-4 p-6">
-        <div className="flex items-start justify-between gap-4">
-          <p className="text-[23px] font-semibold">Website + booking</p>
-          <Chip>Your business</Chip>
+        <div className="flex items-start gap-4">
+          <p className="w-[460px] text-[23px] font-semibold">Website + booking</p>
+          <Chip className="w-[180px]">Your business</Chip>
         </div>
         <div className="grid gap-5 sm:grid-cols-[286fr_366fr]">
           <div className="flex flex-col gap-3">
@@ -99,7 +100,7 @@ function SiteVisual() {
             <p className="text-[26px] font-bold">{s.business}</p>
             <p className="text-[12px]" style={{ color: ink2 }}>{s.trade}</p>
             <p className="text-[20px] font-semibold">{s.tagline}</p>
-            <Chip>{s.area}</Chip>
+            <Chip className="w-[220px]">{s.area}</Chip>
           </div>
           <div className="flex flex-col gap-[14px] rounded-2xl border bg-white p-5" style={{ borderColor: line }}>
             <p className="text-[21px] font-semibold">Book a visit</p>
@@ -122,8 +123,6 @@ function SiteVisual() {
     </div>
   );
 }
-
-const inter = "[font-family:Inter,system-ui,sans-serif]";
 
 /** Mobile-only hero visual: "Readable mobile booking preview" (Figma 219:9474, 342px). */
 function MobileSiteVisual() {
@@ -180,12 +179,12 @@ function MobileIntelligenceVisual() {
 function IntelligenceVisual() {
   const v = HOME.intelligence;
   return (
-    <div data-node-id="200:386" className="w-[720px] shrink-0 overflow-hidden rounded-2xl border" style={{ background: "var(--color-mkt-panel)", borderColor: line, color: ink }} aria-label="Example: revenue opportunities" role="img">
+    <div data-node-id="200:386" className={`${inter} h-[426px] w-[720px] shrink-0 overflow-hidden rounded-2xl border`} style={{ background: "var(--color-mkt-panel)", borderColor: line, color: ink }} aria-label="Example: revenue opportunities" role="img">
       <ProductChrome title="Revenue opportunities" />
       <div className="flex flex-col gap-4 p-6">
-        <div className="flex items-start justify-between gap-4">
-          <p className="text-[23px] font-semibold">Revenue opportunities</p>
-          <Chip>Your business</Chip>
+        <div className="flex items-start gap-4">
+          <p className="w-[460px] text-[23px] font-semibold">Revenue opportunities</p>
+          <Chip className="w-[180px]">Your business</Chip>
         </div>
         <div className="grid grid-cols-3 gap-3">
           {v.stats.map((st) => (
@@ -198,13 +197,13 @@ function IntelligenceVisual() {
         <div className="flex flex-col gap-[14px] rounded-2xl border bg-white p-5" style={{ borderColor: line }}>
           <div className="flex items-start justify-between gap-4">
             <p className="text-[18px] font-semibold">{v.decision.title}</p>
-            <Chip tone="ambersoft">{v.decision.status}</Chip>
+            <Chip tone="ambersoft" className="w-[120px]">{v.decision.status}</Chip>
           </div>
           <p className="text-[12px]" style={{ color: ink2 }}>{v.decision.detail}</p>
           <div className="flex flex-wrap gap-3">
             {v.decision.actions.map((a, i) => (
-              <UiAction key={a} tone={i === 0 ? "ink" : "cream"} wide={false}>
-                <span className="px-4">{a}</span>
+              <UiAction key={a} tone={i === 0 ? "ink" : "cream"} wide={false} className={["w-[200px]", "w-[100px]", "w-[110px]"][i] ?? ""}>
+                {a}
               </UiAction>
             ))}
           </div>
@@ -216,7 +215,7 @@ function IntelligenceVisual() {
 
 function JourneyCards() {
   return (
-    <div data-node-id="203:4462" className="grid gap-6 lg:grid-cols-3">
+    <div data-node-id="203:4462" className={`${inter} grid items-start gap-6 xl:grid-cols-3`}>
       <div className={`${card} ${styles.lift}`} style={{ borderColor: line }}>
         <p className={eyebrow} style={{ color: ink2 }}>01 / WEBSITE BOOKING</p>
         <p className="text-[22px] font-semibold">A direct path to your next job.</p>
@@ -233,7 +232,7 @@ function JourneyCards() {
         <p className="text-[22px] font-semibold">The details travel with the job.</p>
         <Image src="/marketing/home/tech-job-context.jpg" alt="" width={740} height={264} className="h-[132px] w-full rounded-2xl object-cover" />
         <div className="flex items-start gap-3">
-          <Chip tone="ink">MR</Chip>
+          <Chip tone="ink" className="w-10">MR</Chip>
           <p className="text-[12px] font-medium leading-[1.38]">
             <span className="block">Maya R.</span>
             <span className="block">AC diagnostic · 10–12</span>
@@ -255,11 +254,11 @@ function JourneyCards() {
               <span className="block">NOV</span>
               <span className="block">12</span>
             </p>
-            <p className="text-[15px] font-medium">Fall heating tune-up</p>
+            <p className="text-[15px] font-medium"><span className="block">Fall heating</span><span className="block">tune-up</span></p>
           </div>
         </div>
         <div>
-          <Chip tone="green">Reminder email ready</Chip>
+          <Chip tone="green" className="w-[220px] max-w-full">Reminder email ready</Chip>
         </div>
         <UiAction>Review reminder</UiAction>
       </div>
@@ -294,23 +293,23 @@ export function HomePage() {
   const { hero, trades, journey, intelligence, work, capture } = HOME;
   return (
     <>
-      {/* Tablet 768 (253:6780): its own layout from layer data, between md and lg. */}
-      <div className="hidden md:block lg:hidden">
-        <FigmaNode node={HOME_TABLET} slots={{ capture: <TabletCapture id="growth-check-tablet" />, "capture-end": <TabletCapture id="growth-check-tablet-end" /> }} />
+      {/* Tablet 768 (253:6780): keep its readable layout until the desktop columns fit. */}
+      <div className="hidden md:block xl:hidden">
+        <FigmaNode node={HOME_TABLET} className="[&>div>*]:mx-auto [&>div>*]:w-full [&>div>*]:max-w-[704px]" slots={{ capture: <TabletCapture id="growth-check-tablet" />, "capture-end": <TabletCapture id="growth-check-tablet-end" /> }} />
       </div>
-      <div className="leading-[1.38] md:hidden lg:block">
+      <div className="leading-[1.38] md:hidden xl:block">
       <section data-node-id="203:4403" className={section} aria-labelledby="home-hero">
-        <div className="grid items-start gap-8 lg:grid-cols-[480px_minmax(0,1fr)] lg:gap-16">
-          <div className="flex flex-col gap-6">
+        <div className="grid items-start gap-8 xl:grid-cols-[480px_minmax(0,720px)] xl:gap-16">
+          <div className="flex flex-col gap-5 md:gap-6">
             <p className={eyebrow} style={{ color: ink2 }}>{hero.eyebrow}</p>
-            <h1 id="home-hero" className="flex flex-col gap-2">
+            <h1 id="home-hero" className="flex flex-col gap-5 md:gap-6">
               <span className="text-[43px] font-semibold leading-[1.08] tracking-[-1.075px] md:text-[61px] md:tracking-[-1.525px]">{hero.headline}</span>
               <span className="text-[44px] leading-[1.08] tracking-[-1.1px] md:text-[64px] md:tracking-[-1.6px]" style={{ fontFamily: "var(--font-mkt-serif), Georgia, serif", fontStyle: "italic", fontWeight: 400 }}>
                 <Lines lines={hero.accent} />
               </span>
             </h1>
-            <p className="text-[17px]" style={{ color: ink2 }}>{hero.body}</p>
-            <GrowthCheckEntry id="growth-check-hero" />
+            <p className="max-w-[470px] text-[17px]" style={{ color: ink2 }}>{hero.body}</p>
+            <GrowthCheckEntry id="growth-check-hero" className="md:!max-w-[470px]" />
           </div>
           <figure className="flex flex-col gap-3">
             <div className="hidden md:block">
@@ -329,7 +328,7 @@ export function HomePage() {
           <p className={`${eyebrow} md:w-[300px]`} style={{ color: ink2 }}>{trades.eyebrow}</p>
           <div className="flex gap-6 text-[15px] font-medium leading-[1.38]">
             {trades.links.map((l) => (
-              <Link key={l.label} href={l.href} className="md:w-[170px]">{l.label}</Link>
+              <Link key={l.label} href={l.href} className="w-[120px] last:w-[170px] md:w-[170px] md:last:w-[190px]">{l.label}</Link>
             ))}
           </div>
         </div>

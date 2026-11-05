@@ -4,16 +4,16 @@ import { MaybeLink } from "./MaybeLink";
 import { PRODUCTS_MENU, SITE_NAV } from "./site-config";
 
 const ink = { color: "var(--color-mkt-ink)" } as const;
-const Arrow = ({ size }: { size: 16 | 20 }) => <img src="/marketing/menu/arrow.svg" alt="" width={size} height={size} className="shrink-0" style={{ width: size, height: size }} />;
-const row = "flex w-full items-center gap-2 rounded-[12px] bg-white p-3 text-left text-[14px] font-medium leading-[1.38]";
+const Arrow = ({ size }: { size: 16 | 20 }) => <img src={`/marketing/menu/arrow-${size}.svg`} alt="" width={size} height={size} className="shrink-0" />;
+const row = "flex min-h-11 w-full items-center gap-2 rounded-[12px] bg-white p-3 text-left text-[14px] font-medium leading-[1.38]";
 
 /** Product menu content: desktop 226:7154 (in 177:640) and mobile 226:7296 (in 177:737). Server component. */
 export function ProductsMenuPanel({ variant }: { variant: "desktop" | "mobile" }) {
   const m = variant === "mobile";
   return (
-    <div data-node-id={m ? "226:7296" : "226:7154"} className={m ? "flex flex-col items-center gap-7 p-6" : "flex w-[1440px] flex-col gap-9 p-16"} style={{ background: "var(--color-mkt-cream)" }}>
-      <div data-node-id={m ? "226:7297" : "226:7155"} className={m ? "flex w-[342px] shrink-0 flex-col items-center gap-5" : "flex w-[1312px] shrink-0 items-center gap-5"}>
-        <p className={`${m ? "w-full text-[28px]" : "flex-1 text-[32px]"} font-semibold leading-[1.38]`} style={ink}>
+    <div data-node-id={m ? "226:7296" : "226:7154"} className={m ? "flex w-full flex-col items-center gap-7 p-6" : "flex w-full flex-col gap-9 p-[clamp(32px,4.444vw,64px)]"} style={{ background: "var(--color-mkt-cream)" }}>
+      <div data-node-id={m ? "226:7297" : "226:7155"} className={m ? "flex w-full max-w-[342px] flex-col items-center gap-5" : "grid w-full grid-cols-[minmax(0,1062px)_max-content] items-center gap-5"}>
+        <p className={`${m ? "text-[28px]" : "text-[32px]"} w-full font-semibold leading-[1.38]`} style={ink}>
           {m ? MOBILE_HEADLINE : PRODUCTS_MENU.headline}
         </p>
         <Link href={PRODUCTS_MENU.all.href} className="inline-flex min-h-[44px] shrink-0 items-center justify-center rounded-full px-5 py-3 text-[15px] font-medium leading-[1.5]" style={{ background: "var(--color-mkt-ink)", color: "var(--color-mkt-cream)" }}>
@@ -21,7 +21,7 @@ export function ProductsMenuPanel({ variant }: { variant: "desktop" | "mobile" }
         </Link>
       </div>
       {m ? (
-        <nav data-node-id="226:7302" aria-label="Explore the website" className="flex w-[342px] shrink-0 flex-col gap-2">
+        <nav data-node-id="226:7302" aria-label="Explore the website" className="flex w-full max-w-[342px] flex-col gap-2">
           {[...MOBILE_EXPLORE, SITE_NAV.signIn].map((l) => (
             <Link key={l.label} href={l.href} className={row} style={ink}>
               <span className="flex-1">{l.label}</span>
@@ -30,9 +30,9 @@ export function ProductsMenuPanel({ variant }: { variant: "desktop" | "mobile" }
           ))}
         </nav>
       ) : null}
-      <div data-node-id={m ? "226:7323" : "226:7160"} className={m ? "flex w-[342px] shrink-0 flex-col gap-7" : "flex w-[1312px] shrink-0 items-start gap-6"}>
+      <div data-node-id={m ? "226:7323" : "226:7160"} className={m ? "flex w-full max-w-[342px] flex-col gap-7" : "grid w-full grid-cols-5 items-start gap-6"}>
         {PRODUCTS_MENU.groups.map((g, gi) => (
-          <div key={g.title} data-node-id={(m ? GROUPS_MOBILE : GROUPS_DESKTOP)[gi]} className={`flex shrink-0 flex-col gap-[10px] ${m ? "w-[342px]" : "w-[243.2px]"}`}>
+          <div key={g.title} data-node-id={(m ? GROUPS_MOBILE : GROUPS_DESKTOP)[gi]} className="flex min-w-0 flex-col gap-[10px]">
             <Link href={g.href} className="flex w-full items-start gap-2 text-left text-[20px] font-semibold leading-[1.38]" style={ink}>
               <span className="flex-1">{g.title}</span>
               <Arrow size={20} />
@@ -46,7 +46,7 @@ export function ProductsMenuPanel({ variant }: { variant: "desktop" | "mobile" }
           </div>
         ))}
       </div>
-      <div data-node-id={m ? "226:7444" : "226:7281"} className={m ? "flex w-[342px] shrink-0 flex-col items-center gap-4" : "flex w-[1312px] shrink-0 items-center gap-4"}>
+      <div data-node-id={m ? "226:7444" : "226:7281"} className={m ? "flex w-full max-w-[342px] flex-col items-center gap-4" : "flex w-full items-center gap-4"}>
         <Link href={PRODUCTS_MENU.cta.href} className="inline-flex min-h-[44px] items-center justify-center rounded-full px-5 py-3 text-[15px] font-medium leading-[1.5]" style={{ background: "var(--color-mkt-amber)", color: "var(--color-mkt-ink)" }}>
           {PRODUCTS_MENU.cta.label}
         </Link>

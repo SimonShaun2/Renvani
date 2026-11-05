@@ -17,5 +17,5 @@ export const OPERATOR_HEADING_ROUTES = new Set([
 ]);
 
 export function hasDedicatedOperatorHeading(pathname: string): boolean {
-  return OPERATOR_HEADING_ROUTES.has(pathname);
+  return pathname === "/settings" || pathname.startsWith("/settings/") || OPERATOR_HEADING_ROUTES.has(pathname);
 }

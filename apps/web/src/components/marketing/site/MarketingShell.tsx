@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ChevronDown } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { geist, inter, newsreader } from "./fonts";
@@ -26,7 +27,7 @@ export function MarketingShell({ children }: { children: ReactNode }) {
         <nav aria-label="Main" className="hidden flex-1 items-center justify-between gap-10 text-[14px] font-medium xl:ml-10 xl:flex" style={{ color: "var(--color-mkt-ink2)" }}>
           {SITE_NAV.links.map((l) =>
             l.href === "/product" ? (
-              <HeaderDisclosure key={l.label} nodeId="177:640" className="w-[90px] shrink-0" summary={l.label} summaryClassName="hover:underline" panelClassName="absolute inset-x-0 top-[88px] z-30 max-h-[calc(100dvh-88px)] overflow-y-auto">
+              <HeaderDisclosure key={l.label} nodeId="177:640" className="group/products w-[90px] shrink-0" summary={<>{l.label}<ChevronDown size={12} aria-hidden="true" className="transition-transform group-open/products:rotate-180 motion-reduce:transition-none" /></>} summaryClassName="flex items-center gap-1.5 hover:underline" panelClassName="absolute inset-x-8 top-[96px] z-30 mx-auto max-h-[calc(100dvh-112px)] max-w-[1184px] overflow-y-auto rounded-[24px] shadow-[0_20px_70px_rgba(15,21,48,0.16)]">
                 <ProductsMenuPanel variant="desktop" />
               </HeaderDisclosure>
             ) : l.href === "/industries" ? (
@@ -59,7 +60,7 @@ export function MarketingShell({ children }: { children: ReactNode }) {
           summaryClassName="flex size-11 items-center justify-center"
           summaryLabel={{ open: "Close menu", closed: "Open menu" }}
           summary={<img src="/marketing/home/tablet/icon-menu-fb31084f.svg" alt="" width={24} height={24} />}
-          panelClassName="absolute inset-x-0 top-[76px] z-30 max-h-[calc(100dvh-76px)] overflow-y-auto"
+          panelClassName="absolute inset-x-3 top-[80px] z-30 max-h-[calc(100dvh-92px)] overflow-y-auto rounded-[20px] shadow-[0_20px_70px_rgba(15,21,48,0.16)]"
         >
           <nav aria-label="Mobile">
             <ProductsMenuPanel variant="mobile" />

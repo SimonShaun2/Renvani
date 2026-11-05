@@ -31,6 +31,27 @@ const openMenu = (details: HTMLDetailsElement) => {
   details.open = true;
   fireEvent(details, new Event("toggle"));
 };
+const expectProductInventory = (menu: HTMLElement) => {
+  const products = menu.querySelector<HTMLElement>('nav[aria-label="Renvani products"]');
+  const tools = menu.querySelector<HTMLElement>('nav[aria-label="Product tools"]');
+  expect(products).not.toBeNull();
+  expect(tools).not.toBeNull();
+  const productLinks = [...products!.querySelectorAll("a")];
+  const toolLinks = [...tools!.querySelectorAll("a")];
+  const expectedTools = PRODUCTS_MENU.groups.flatMap((group) => group.items);
+
+  expect(productLinks).toHaveLength(5);
+  expect(toolLinks).toHaveLength(17);
+  expect(productLinks.map((link) => link.getAttribute("href")).sort()).toEqual(PRODUCTS_MENU.groups.map((group) => group.href).sort());
+  expect(toolLinks.map((link) => link.getAttribute("href")).sort()).toEqual(expectedTools.map((tool) => tool.href).sort());
+  for (const group of PRODUCTS_MENU.groups) {
+    expect(productLinks.find((link) => link.getAttribute("href") === group.href)?.textContent, group.title).toContain(group.title);
+  }
+  for (const tool of expectedTools) {
+    expect(toolLinks.find((link) => link.getAttribute("href") === tool.href)?.textContent, tool.label).toContain(tool.label);
+  }
+  expect(menu.querySelector("a a")).toBeNull();
+};
 
 describe("header menus (177:640, 177:686, 177:737)", () => {
   it("every menu link resolves to a real page; only agreed items are plain text", () => {
@@ -43,26 +64,62 @@ describe("header menus (177:640, 177:686, 177:737)", () => {
     for (const g of PRODUCTS_MENU.groups) for (const i of g.items) expect(i.href, i.label).toBeTruthy();
   });
 
-  it("product menu matches the frame: heading, All products, 5 groups / 17 tool rows with arrows, demo CTA + Close menu", () => {
+  it("desktop menu offers five direct product links, all 17 tools, the directory and next-step links", () => {
     const { container } = render(<MarketingShell><p>x</p></MarketingShell>);
     const p = menus(container).product;
-    expect(p.textContent).toContain("Five products. One connected business.");
-    expect(PRODUCTS_MENU.groups.map((g) => g.title)).toEqual(["Growth", "Revenue", "Operations", "Retention", "Command Center"]);
-    expect(PRODUCTS_MENU.groups.flatMap((g) => g.items)).toHaveLength(17);
-    expect(p.querySelectorAll('img[src="/marketing/menu/arrow-16.svg"]')).toHaveLength(17);
-    expect(p.querySelectorAll('img[src="/marketing/menu/arrow-20.svg"]')).toHaveLength(5);
+    expectProductInventory(p);
+    expect(p.querySelector('a[href="/product"]')!.textContent).toContain("All products");
+    expect(p.querySelector('a[href="/growth-check"]')).not.toBeNull();
     expect(p.querySelector('a[href="/demo"]')).not.toBeNull();
     expect(p.querySelector("button[data-menu-close]")!.textContent).toBe("Close menu");
   });
 
-  it("mobile menu matches 177:737: heading, All products, explore rows, groups, CTA, Close menu", () => {
+  it("mobile menu preserves the full product inventory, website navigation, sign-in and demo access", () => {
     const { container } = render(<MarketingShell><p>x</p></MarketingShell>);
     const mob = menus(container).mobile;
-    expect(mob.className).toContain("xl:hidden");
-    expect(mob.textContent).toContain("Find your next step.");
+    expect(mob.textContent).toContain("Explore Renvani.");
+    expectProductInventory(mob);
+    expect(mob.querySelector('a[href="/product"]')!.textContent).toContain("All products");
     for (const e of MOBILE_EXPLORE) expect(mob.querySelector(`a[href="${e.href}"]`)).not.toBeNull();
-    for (const g of PRODUCTS_MENU.groups) expect(mob.querySelector(`a[href="${g.href}"]`)).not.toBeNull();
+    expect(mob.querySelector('a[href="/login"]')).not.toBeNull();
+    expect(mob.querySelector('a[href="/demo"]')).not.toBeNull();
     expect(mob.querySelector("button[data-menu-close]")).not.toBeNull();
+  });
+
+  it("mobile tools expand without closing the header menu, then following a tool closes the header", () => {
+    const { container } = render(<MarketingShell><p>x</p></MarketingShell>);
+    const mobile = menus(container).mobile;
+    const outerSummary = mobile.querySelector("summary")!;
+    const tools = mobile.querySelector<HTMLDetailsElement>("details[data-product-tools]")!;
+    expect(tools).not.toBeNull();
+    expect(tools.hasAttribute("name")).toBe(false);
+    const toolSummary = tools.querySelector("summary")!;
+    expect(toolSummary.textContent).toContain("Explore all tools");
+    openMenu(mobile);
+    expect(tools.open).toBe(false);
+
+    fireEvent.click(toolSummary);
+    fireEvent(tools, new Event("toggle"));
+    expect(tools.open).toBe(true);
+    expect(mobile.open).toBe(true);
+    expect(outerSummary.getAttribute("aria-expanded")).toBe("true");
+
+    fireEvent.click(toolSummary);
+    fireEvent(tools, new Event("toggle"));
+    expect(tools.open).toBe(false);
+    expect(mobile.open).toBe(true);
+    expect(outerSummary.getAttribute("aria-expanded")).toBe("true");
+
+    fireEvent.click(toolSummary);
+    fireEvent(tools, new Event("toggle"));
+    expect(tools.open).toBe(true);
+    const link = tools.querySelector<HTMLAnchorElement>('a[href="/product/websites"]')!;
+    link.addEventListener("click", (event) => event.preventDefault());
+    act(() => link.focus());
+    expect(mobile.open).toBe(true);
+    fireEvent.click(link);
+    expect(mobile.open).toBe(false);
+    expect(outerSummary.getAttribute("aria-expanded")).toBe("false");
   });
 
   it.each(["product", "industry", "mobile"] as const)("%s menu: aria-expanded tracks open state; Escape and Close menu close it and return focus", (k) => {

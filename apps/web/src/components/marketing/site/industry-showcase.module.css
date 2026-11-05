@@ -1,0 +1,95 @@
+.showcase { display: flex; flex-direction: column; align-items: stretch; gap: 32px; padding: 80px; border-radius: 72px; background: white; color: var(--color-mkt-ink); }
+.eyebrow { margin: 0; color: var(--color-mkt-ink2); font-size: 12px; font-weight: 500; line-height: 18px; }
+.heading { margin: 0; font-size: 52px; font-weight: 600; line-height: 58px; }
+.introduction { margin: 0; color: var(--color-mkt-ink2); font-size: 20px; line-height: 30px; }
+.controls, .footer { display: flex; align-items: center; justify-content: space-between; gap: 24px; min-height: 49px; }
+.outlineButton { display: inline-flex; flex: 0 0 auto; align-items: center; justify-content: center; gap: 4px; min-height: 49px; padding: 12px 20px; border: 1px solid var(--color-mkt-ink); border-radius: 999px; background: transparent; color: var(--color-mkt-ink); font: inherit; font-size: 15px; font-weight: 500; line-height: 23px; text-decoration: none; cursor: pointer; }
+.outlineButton:hover { background: var(--color-mkt-cream); }
+.outlineButton:focus-visible, .card:focus-visible { outline: 3px solid #b67500; outline-offset: 4px; }
+.motionNote { margin: 0 0 0 auto; color: var(--color-mkt-ink2); font-size: 14px; line-height: 22px; text-align: right; }
+.footerNote { margin: 0; color: var(--color-mkt-ink2); font-size: 16px; line-height: 24px; }
+.cardNavigation { min-width: 0; }
+.cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+.card { position: relative; isolation: isolate; display: flex; min-width: 0; height: 480px; flex-direction: column; align-items: stretch; justify-content: space-between; gap: 24px; overflow: hidden; padding: 24px; border-radius: 32px; background: var(--color-mkt-ink); color: white; text-decoration: none; }
+.photo { z-index: -2; object-fit: cover; }
+.photoShade { position: absolute; z-index: -1; inset: 0; pointer-events: none; background: linear-gradient(180deg, rgb(15 21 48 / 0) 0%, rgb(15 21 48 / .05) 42%, rgb(15 21 48 / .48) 66%, rgb(15 21 48 / .98) 100%); }
+.badge { display: flex; flex: 0 0 auto; align-items: center; gap: 12px; min-width: 0; padding: 12px; border-radius: 18px; background: white; color: var(--color-mkt-ink); box-shadow: 0 8px 24px rgb(15 21 48 / .14); }
+.badgeCopy { display: flex; min-width: 0; flex: 1; flex-direction: column; gap: 5px; }
+.qualifier { margin: 0; color: var(--color-mkt-ink2); font-size: 9px; font-weight: 500; line-height: 12px; }
+.statusStack { display: grid; min-width: 0; }
+.status { grid-area: 1 / 1; margin: 0; font-size: 14px; font-weight: 600; line-height: 18px; visibility: hidden; }
+.status[data-active="true"] { visibility: visible; }
+.showcase[data-playing="true"] .status[data-active="true"] { animation: statusEnter 320ms ease-out both; }
+.tradeContent { display: flex; flex-direction: column; gap: 10px; }
+.titleRow { display: flex; align-items: center; gap: 12px; }
+.cardTitle { flex: 1; min-width: 0; margin: 0; font-size: 26px; font-weight: 600; line-height: 32px; }
+.destinationArrow { flex: 0 0 24px; font-size: 24px; font-weight: 400; line-height: 32px; }
+.outcome { margin: 0; font-size: 16px; line-height: 24px; }
+.card:hover .cardTitle { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 5px; }
+
+/* Native editable mini-UIs from the six Figma components. All motion is phase-driven. */
+.miniUI { position: relative; flex: 0 0 56px; width: 56px; height: 56px; border-radius: 12px; background: var(--color-mkt-amber-soft); font-weight: 500; }
+.calendarLabel, .jobLabel { position: absolute; left: 8px; width: 40px; color: var(--color-mkt-ink2); font-size: 8px; line-height: 10px; }
+.calendarLabel { top: 6px; }
+.calendarSlots { position: absolute; top: 22px; left: 8px; display: grid; grid-template-columns: repeat(3, 11px); gap: 3px; }
+.calendarSlot { position: relative; width: 11px; height: 11px; border-radius: 3px; background: white; }
+.calendarSlot[data-selected="true"], .returnSlot[data-selected="true"], .taskBox[data-ready="true"] { background: var(--color-mkt-amber); }
+.checkMark { position: absolute; top: -1px; left: 1px; width: 10px; color: var(--color-mkt-ink); font-size: 8px; font-weight: 700; line-height: 10px; opacity: 0; transform: scale(.7); transition: opacity 320ms ease-out, transform 320ms ease-out; }
+.checkMark[data-ready="true"] { opacity: 1; transform: scale(1); }
+.dispatchStop { position: absolute; width: 8px; height: 8px; opacity: .2; transition: opacity 320ms ease-out; }
+.dispatchStop[data-ready="true"] { opacity: 1; }
+.routeSegment { position: absolute; width: 12px; height: 3px; border-radius: 2px; background: var(--color-mkt-amber); transform-origin: left; transform: scaleX(0); transition: transform 320ms ease-out; }
+.routeSegment[data-ready="true"] { transform: scaleX(1); }
+.dispatchLabel { position: absolute; top: 43px; left: 8px; width: 42px; color: var(--color-mkt-ink2); font-size: 7px; line-height: 9px; opacity: 0; }
+.dispatchLabel[data-ready="true"] { opacity: 1; }
+.tasks { position: absolute; top: 9px; left: 8px; display: flex; flex-direction: column; gap: 5px; }
+.task { display: flex; height: 9px; align-items: center; gap: 5px; }
+.taskBox { position: relative; width: 9px; height: 9px; border-radius: 2px; background: white; }
+.taskLine { height: 3px; border-radius: 2px; background: var(--color-mkt-ink2); }
+.jobLabel { top: 7px; }
+.jobProgress { position: absolute; top: 23px; left: 8px; display: flex; flex-direction: column; gap: 5px; }
+.progressTrack { display: block; width: 40px; height: 4px; border-radius: 2px; background: white; }
+.progressFill { display: block; height: 4px; border-radius: 2px; background: var(--color-mkt-amber); transform-origin: left; transform: scaleX(0); transition: transform 320ms ease-out; }
+.progressFill[data-ready="true"] { transform: scaleX(1); }
+.returnLabel { position: absolute; top: 6px; left: 6px; width: 45px; color: var(--color-mkt-ink2); font-size: 7px; line-height: 10px; }
+.returnSlots { position: absolute; top: 23px; left: 7px; display: flex; gap: 3px; }
+.returnSlot { display: flex; width: 12px; height: 17px; align-items: flex-start; justify-content: center; padding-top: 3px; border-radius: 3px; background: white; color: var(--color-mkt-ink); font-size: 8px; line-height: 10px; }
+.returnProgress, .crewProgress { position: absolute; left: 8px; width: 40px; border-radius: 2px; background: var(--color-mkt-amber); transform-origin: left; transition: transform 320ms ease-out; }
+.returnProgress { top: 45px; height: 3px; }
+.crewAssignment { position: absolute; top: 12px; width: 15px; height: 15px; opacity: .2; transform: translateY(3px); transition: opacity 320ms ease-out, transform 320ms ease-out; }
+.crewAssignment[data-ready="true"] { opacity: 1; transform: translateY(0); }
+.crewNumber { position: absolute; top: 3px; left: 5px; width: 10px; color: var(--color-mkt-ink); font-size: 8px; line-height: 10px; }
+.crewProgress { top: 36px; height: 4px; }
+.crewLabel { position: absolute; top: 44px; left: 7px; width: 42px; color: var(--color-mkt-ink2); font-size: 6px; line-height: 8px; opacity: 0; }
+.crewLabel[data-ready="true"] { opacity: 1; }
+.showcase[data-playing="false"] .miniUI * { transition: none; }
+
+@keyframes statusEnter {
+  from { opacity: 0; transform: translateY(3px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 1199px) {
+  .showcase { padding: 64px 40px; }
+}
+@media (max-width: 959px) {
+  .showcase { gap: 24px; border-radius: 56px; }
+  .heading { font-size: 44px; line-height: 50px; }
+  .heading span { display: block; }
+  .introduction { font-size: 18px; line-height: 27px; }
+  .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .card { height: 460px; border-radius: 28px; }
+}
+@media (max-width: 599px) {
+  .showcase { padding: 48px 20px; border-radius: 36px; }
+  .heading { font-size: 36px; line-height: 42px; }
+  .motionNote, .footerNote { display: none; }
+  .cards { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+  .card { height: 440px; padding: 20px; border-radius: 24px; }
+  .cardTitle { font-size: 24px; line-height: 30px; }
+  .showcase[data-reduced-motion="true"] .controls { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .showcase .status[data-active="true"] { animation: none; }
+  .miniUI * { transition: none; }
+}

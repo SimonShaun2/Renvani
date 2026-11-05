@@ -15,7 +15,6 @@ import { buildMarketingSitemap } from "@/src/lib/seo/public-sitemap";
 
 import type { VNode } from "./FigmaNode";
 import { PRODUCT_PAGES } from "./flagship-registry";
-import { HomeIndustriesSection } from "./IndustryDirectory";
 import { IndustryFrames } from "./IndustryPage";
 import { INDUSTRIES_OVERVIEW, INDUSTRY_PAGES } from "./industry-registry";
 import { INDUSTRY_TREES } from "./industry-visuals";
@@ -80,18 +79,12 @@ describe("expanded marketing industries", () => {
     await expect(generateMetadata({ params: Promise.resolve({ slug }) })).resolves.toEqual({});
   });
 
-  it("overview and homepage directory each offer all fourteen destinations without a second homepage h1", () => {
-    const { container, unmount } = render(<IndustryFrames tree="industries" />);
+  it("the industry directory offers all fourteen destinations with one h1", () => {
+    const { container } = render(<IndustryFrames tree="industries" />);
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
     const hrefs = anchors(container);
     for (const [slug, name] of EXPECTED) {
       expect(hrefs).toContain(`/industries/${slug}`);
-      expect(screen.getByRole("link", { name }).getAttribute("href")).toBe(`/industries/${slug}`);
-    }
-    unmount();
-    render(<HomeIndustriesSection />);
-    expect(screen.queryByRole("heading", { level: 1 })).toBeNull();
-    for (const [slug, name] of EXPECTED) {
       expect(screen.getByRole("link", { name }).getAttribute("href")).toBe(`/industries/${slug}`);
     }
   });

@@ -18,7 +18,7 @@ const RESTAURANT = /restaurant|menu|diner|reservation|table/i;
 
 describe("marketing site (Figma 171:2)", () => {
   it("competitor guard scans homepage, workflow, shared navigation and footer copy", () => {
-    const src = ["HomePage.tsx", "HomepageWorkflows.tsx", "home-workflows.ts", "site-config.ts", "MarketingShell.tsx"].map((f) => readFileSync(join(__dirname, f), "utf8")).join("\n");
+    const src = ["HomePage.tsx", "HomepageWorkflows.tsx", "home-workflows.ts", "IndustryShowcase.tsx", "site-config.ts", "MarketingShell.tsx"].map((f) => readFileSync(join(__dirname, f), "utf8")).join("\n");
     expect(src + JSON.stringify(SITE_FOOTER)).not.toMatch(COMPETITORS);
     expect(COMPETITORS.test("Owner.com")).toBe(true);
     expect(COMPETITORS.test("Broccoli")).toBe(true);
@@ -33,7 +33,8 @@ describe("marketing site (Figma 171:2)", () => {
     const { container } = render(<HomePage />);
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
     expect(screen.getByRole("heading", { name: "More jobs. Less on your shoulders." })).toBeTruthy();
-    const heroImages = [...container.querySelectorAll("img")].filter((image) => image.getAttribute("src")?.includes("f1266660"));
+    const hero = screen.getByRole("region", { name: "More jobs. Less on your shoulders." });
+    const heroImages = [...hero.querySelectorAll("img")].filter((image) => image.getAttribute("src")?.includes("f1266660"));
     expect(heroImages).toHaveLength(1);
     expect(container.querySelector("a a")).toBeNull();
   });

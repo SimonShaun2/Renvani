@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 
 import { HomepageWorkflows } from "./HomepageWorkflows";
-import { HomeIndustriesSection } from "./IndustryDirectory";
+import { IndustryShowcase } from "./IndustryShowcase";
 import { GROWTH_CHECK_ENTRY } from "./site-config";
 import styles from "./homepage.module.css";
 
@@ -70,7 +70,7 @@ export function HomePage() {
         </figure>
       </section>
 
-      <HomeIndustriesSection />
+      <IndustryShowcase />
 
       <section className={styles.growthSection} aria-labelledby="home-growth-check" data-node-id="586:5761">
         <div className={styles.growthIntroduction}>

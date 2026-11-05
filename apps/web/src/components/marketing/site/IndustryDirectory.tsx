@@ -1,31 +1,21 @@
 import Link from "next/link";
-import { ArrowUpRight, Zap } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 
 import { ADDITIONAL_INDUSTRIES, FEATURED_INDUSTRIES, INDUSTRY_PAGES, type IndustryEntry, type FeaturedIndustrySlug } from "./industry-registry";
+import { INDUSTRY_PHOTOS } from "./industry-photos";
 import styles from "./industry-pages.module.css";
-
-/** Existing illustrative source assets, reused by the exact Figma featured-card components. */
-const FEATURED_IMAGES: Partial<Record<FeaturedIndustrySlug, string>> = {
-  hvac: "/marketing/industries/illustrative-hvac-field-work-f1266660.jpg",
-  plumbing: "/marketing/industries/illustrative-plumbing-field-work-5d7f94f5.jpg"
-};
 
 export function FeaturedIndustryCards({ compact = false }: { compact?: boolean }) {
   return (
     <div className={`${styles.featuredGrid} ${compact ? styles.compactFeatured : ""}`}>
       {FEATURED_INDUSTRIES.map((industry) => {
-        const image = FEATURED_IMAGES[industry.slug as FeaturedIndustrySlug];
+        const photo = INDUSTRY_PHOTOS[industry.slug as FeaturedIndustrySlug];
         return (
-          <Link key={industry.slug} href={industry.href} aria-label={industry.name} className={`${styles.featuredCard} ${industry.slug === "electrical" ? styles.electrical : ""}`}>
-            {image ? (
-              <img src={image} alt="" width={520} height={320} className={styles.featuredMedia} />
-            ) : (
-              <span className={`${styles.featuredMedia} ${styles.electricalVisual}`} aria-hidden="true"><Zap size={56} strokeWidth={1.5} /></span>
-            )}
+          <Link key={industry.slug} href={industry.href} aria-label={industry.name} className={styles.featuredCard}>
+            <img src={photo.src} alt="" width={520} height={320} className={styles.featuredMedia} style={{ objectPosition: photo.objectPosition }} />
             <span className={styles.featuredCopy}>
               <span className={styles.featuredName}>{industry.name}</span>
               <span className={styles.featuredDescription}>{industry.tagline}</span>
-              {industry.slug === "electrical" ? <span className={styles.featuredQualifier}>Workflow example</span> : null}
             </span>
             {compact ? <ArrowUpRight size={16} aria-hidden="true" className={styles.featuredArrow} /> : null}
           </Link>
@@ -67,17 +57,5 @@ export function IndustryDirectory() {
         <Link href="/demo" className={styles.primaryButton}>See Renvani in action</Link>
       </section>
     </div>
-  );
-}
-
-/** Compact homepage directory: 580:6036 (desktop), 586:5867 (tablet), 586:6029 (mobile). */
-export function HomeIndustriesSection() {
-  return (
-    <section className={styles.homeSection} aria-labelledby="home-industries-heading" data-node-id="580:6036">
-      <p className={styles.eyebrow}>Built around your work</p>
-      <h2 id="home-industries-heading" className={styles.homeHeading}><span>Your trade.</span>{" "}<span>Your next good job.</span></h2>
-      <p className={styles.lead}>Explore a connected service workflow for the work you do.</p>
-      <nav aria-label="Find your industry"><IndustryLinkGrid /></nav>
-    </section>
   );
 }

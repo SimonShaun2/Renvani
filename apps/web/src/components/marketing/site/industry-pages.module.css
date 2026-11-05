@@ -1,5 +1,4 @@
-.page,
-.homeSection {
+.page {
   width: 100%;
   max-width: 1440px;
   margin-inline: auto;
@@ -9,7 +8,6 @@
 
 .directoryIntro,
 .directoryContent,
-.homeSection,
 .heroCopy,
 .workflowSection {
   display: flex;
@@ -32,10 +30,6 @@
 .featuredCopy { display: flex; min-width: 0; flex-direction: column; gap: 8px; padding: 20px; }
 .featuredName { font-size: 23px; font-weight: 600; line-height: 29px; }
 .featuredDescription { color: var(--color-mkt-ink2); font-size: 15px; line-height: 23px; }
-.featuredQualifier { font-size: 10px; font-weight: 500; line-height: 15px; text-transform: uppercase; }
-.electrical { color: #fff; background: var(--color-mkt-ink); }
-.electricalVisual { display: grid; place-items: center; color: var(--color-mkt-amber); }
-.electrical .featuredDescription { color: #fff; }
 .featuredArrow { flex-shrink: 0; }
 
 .linkGrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
@@ -52,18 +46,10 @@
 
 .compactFeatured { grid-template-columns: minmax(0, 1fr); gap: 6px; }
 .compactFeatured .featuredCard { display: grid; grid-template-columns: 48px minmax(0, 1fr) 16px; align-items: center; gap: 10px; padding: 12px; border: 1px solid var(--color-mkt-line); border-radius: 12px; }
-.compactFeatured .featuredMedia { width: 48px; height: 56px; border-radius: 8px; object-position: 45% center; }
-.compactFeatured .electricalVisual svg { width: 28px; height: 28px; }
+.compactFeatured .featuredMedia { width: 48px; height: 56px; border-radius: 8px; }
 .compactFeatured .featuredCopy { gap: 3px; padding: 0; }
 .compactFeatured .featuredName { font-size: 15px; line-height: 20px; }
 .compactFeatured .featuredDescription { font-size: 12px; line-height: 18px; }
-.compactFeatured .featuredQualifier { font-size: 9px; line-height: 14px; }
-.compactFeatured .electrical { border-color: var(--color-mkt-ink); }
-
-.homeSection { gap: 32px; padding: 80px; border-radius: 72px; background: #fff; }
-.homeSection nav { width: 100%; }
-.homeHeading { font-size: 52px; font-weight: 600; line-height: 58px; }
-.homeSection .lead { max-width: none; }
 
 .closing { display: flex; align-items: center; justify-content: space-between; gap: 32px; padding: 64px; border-radius: 72px; color: #fff; background: var(--color-mkt-ink); }
 .closing h2 { min-width: 0; font-size: 44px; font-weight: 600; line-height: 50px; }
@@ -106,10 +92,6 @@
   .directoryTitle { font-size: 56px; line-height: 60px; }
   .directoryContent { padding-inline: 40px; }
   .linkGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .homeSection { gap: 24px; padding: 64px 40px; border-radius: 56px; }
-  .homeHeading { font-size: 44px; line-height: 50px; }
-  .homeHeading span { display: block; }
-  .homeSection .lead { font-size: 18px; line-height: 27px; }
   .tradeHero { grid-template-columns: minmax(0, 1fr); gap: 32px; padding-inline: 40px; border-radius: 0 0 56px 56px; }
   .tradeTitle { font-size: 56px; line-height: 60px; }
   .workflowSection { padding-inline: 40px; }
@@ -129,9 +111,6 @@
   .directoryHeading { font-size: 28px; line-height: 34px; }
   .featuredGrid:not(.compactFeatured) { grid-template-columns: minmax(0, 1fr); }
   .linkGrid { grid-template-columns: minmax(0, 1fr); }
-  .homeSection { padding: 48px 20px; border-radius: 36px; }
-  .homeHeading { font-size: 36px; line-height: 42px; }
-  .homeSection .industryLink { min-height: 56px; padding-block: 15px; }
   .closing { flex-direction: column; align-items: stretch; padding: 24px; border-radius: 36px; }
   .closing h2 { font-size: 32px; line-height: 38px; }
   .tradeHero { padding: 40px 20px 48px; border-radius: 0 0 36px 36px; }

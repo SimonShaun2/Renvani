@@ -8,7 +8,7 @@ export const WORKFLOW_STEP_MS = 2600;
 export const WORKFLOW_LAST_STEP_MS = 4400;
 
 /** Playback state for an illustrative sequence only. No product or customer actions are performed. */
-export function useWorkflowPlayback(sequenceKey: string, stepCount: number) {
+export function useWorkflowPlayback(sequenceKey: string, stepCount: number, intersectionThreshold = 0.15) {
   const viewportRef = useRef<HTMLDivElement>(null);
   const [position, setPosition] = useState({ key: sequenceKey, index: 0, manual: false });
   const [paused, setPaused] = useState(false);
@@ -35,11 +35,11 @@ export function useWorkflowPlayback(sequenceKey: string, stepCount: number) {
     }
     const observer = new IntersectionObserver(
       ([entry]) => setInView(Boolean(entry?.isIntersecting)),
-      { threshold: 0.15 }
+      { threshold: intersectionThreshold }
     );
     observer.observe(element);
     return () => observer.disconnect();
-  }, []);
+  }, [intersectionThreshold]);
 
   useEffect(() => {
     const updateVisibility = () => setPageVisible(document.visibilityState === "visible");

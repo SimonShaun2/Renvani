@@ -3,7 +3,6 @@ import { z } from "zod";
 import { withZodValidation } from "../shared/validation.js";
 
 const uuidSchema = z.string().uuid();
-const isoDatePattern = /^\d{4}-\d{2}-\d{2}$/u;
 const bookingSlugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/u;
 const bookingStatusSchema = z.enum(["pending", "confirmed", "cancelled", "completed", "no_show"]);
 const bookingSourceSchema = z.enum(["google", "facebook", "instagram", "yelp", "direct", "website", "qr_code"]);
@@ -206,10 +205,6 @@ function buildUpdateSchema<T extends z.ZodRawShape>(shape: T) {
     .refine((input) => Object.keys(input).length > 0, {
       message: "At least one field is required"
     });
-}
-
-function isValidIsoDate(value: string): boolean {
-  return !Number.isNaN(new Date(`${value}T00:00:00.000Z`).getTime());
 }
 
 export const BookingRequestIdParamsSchema = z.object({

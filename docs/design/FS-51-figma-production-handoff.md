@@ -2,8 +2,8 @@
 
 **Status:** Design/engineering review packet only. This document does not set the Notion ticket to Ready, authorize code implementation, establish a passed QA result, or grant permission for production customer sends, live money, deployment, or merge.
 
-**Date:** 2026-11-01  
-**Code inspected:** Renvani `dev` at 5baad8775cfa6a5e3c3e163ed6b384a284b12f20; route map rechecked against `apps/web/app` at b45b4996b64b16859e44a79b171b11cbe52c3e6a on 2026-11-03 (moving integration branch; recheck changed files before implementing).  
+**Original handoff:** 2026-11-01; source/evidence reconciliation 2026-11-05 UTC
+**Code inspected:** Renvani `dev` at 5baad8775cfa6a5e3c3e163ed6b384a284b12f20; route map rechecked against `apps/web/app` at b45b4996b64b16859e44a79b171b11cbe52c3e6a on 2026-11-03 (moving integration branch; recheck changed files before implementing).
 **Existing execution queue:** [FS-51 design system and handoff standards](https://app.notion.com/p/3ff317b92d158197b56eeacd4fbe3db2) in the [Field Service Build Board](https://app.notion.com/p/74b3a1145d3f49d586ac6cdbf174ceb2). Do **not** open duplicate FS-255–258 or FS-51 tickets.
 
 ## 1. Authority and intended outcome
@@ -13,7 +13,7 @@ Renvani is **one agent-native operating platform** with Growth, Revenue, Operati
 Authority order for implementation:
 
 1. Current founder-approved product decisions and [FS-255 Autonomous Operating Foundation](https://app.notion.com/p/40a317b92d1581ceaef7e2d4a2f82bb7), including FS-256 (trusted execution), FS-257 (Business Operating Profile), FS-258 (confirmed follow-up outcome), and current board dependencies.
-2. **TEAM.md**, **GITHUB_WORKFLOW.md**, and **CODEX.md**, including pair WIP, exact-head review/CI, founder (Shaun) final merge authority for every PR at exact head (#420/#421), with E.. CoS and reviewers giving technical recommendations only. Historic comments in AGENTS.md and WORKFLOW.md are not authorization to resurrect retired agent/process rules.
+2. **TEAM.md**, **GITHUB_WORKFLOW.md**, and **CODEX.md**, including pair WIP, exact-head review/CI, founder (Shaun) final merge authority for every PR at exact head (#420/#421), with independent reviewers supplying the required risk-based evidence and E.. CoS advice optional only when requested by the founder. Historic comments in AGENTS.md and WORKFLOW.md are not authorization to resurrect retired agent/process rules.
 3. **Canonical editable product Figma file:** [FSM Agent — Product Design](https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design). Use an exact source node for each implemented screen.
 4. **Click-path reference only:** [Full Software Clickable Prototype, 89 demo frames](https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=399-4217) and [Field Technician Workflow Prototype, 18 demo frames](https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=393-87). These show suggested navigation, not production data, rights, rules, provider sends or payment outcomes.
 5. Code on the **current dev head** and versioned API contracts are the implementation baseline. Do not reproduce mock numbers, demo messages, example customers, fake payment completions, or the prototype's hard-coded links as real behavior.
@@ -57,7 +57,7 @@ Each row identifies an **existing code surface**, not a claim that it is finishe
 
 **Known execution-gap requirement (existing FS-255):** the Command Center's "Approve & send" treatment has historically only approved a proposal while a Revenue action executor did not perform a provider send. FS-256/258 own the correction; the UX must not claim delivered, completed or revenue generated after approval. Confirm current dev implementation before remediation.
 
-**Documentation drift:** docs/README.md on dev still points to separate historic App/Marketing Figma files, while the current approved product/design source is the single canonical jiGHTNUJNltWbHA4Il3hk7 file. An existing [canonical-Figma documentation PR #131](https://github.com/SimonShaun2/Renvani/pull/131) addresses that area. Reconcile in its established review path rather than independently rewriting docs/README.md in this PR.
+**Documentation reconciliation:** merged #131's unique Phase 3 reference corrections, #434's contract/template and root-governance requirements, and this merged #404 map are preserved in the reconciled documentation tree based on `dev` at `4daf6b46980fe335ad965dd910c3837fe2182ec1`. The [reconciliation ledger](../audit/DESIGN-DOCS-RECONCILIATION.md) records reviewed heads, merge commits and file ownership. #440's expanded evidence still requires its own final-head review and CI. Original design/source observations remain tied to the recorded `b45b4996` and PR input heads; integration does not revalidate them.
 
 **Not established by this review:** full runtime parity of all 89 clickable screens, passing UI E2E, production deployment, or live provider/Stripe outcomes. Never infer those from Figma navigation or from file presence.
 
@@ -84,7 +84,7 @@ Treat these as implementation guidance for existing assigned work, **not** new R
 - **Field and customer journeys:** align 390px mobile field flows, public booking, estimate approval, invoice and signature with actual job status and API/write outcomes, including error paths.
 - **Cross-system QA:** demonstrate Discover → Book → Dispatch → Serve → Invoice → Collect → Retain with tenant/policy/consent controls and recorded evidence.
 
-Proposed review roles (not assigned work): Designer 1 Office UX, Designer 2 Field UX, a designated pair for each existing domain ticket, Reviewer 2 UI/accessibility, QA 4 E2E/release, Security for consent/tenant/payments/agent changes, and E.. CoS for technical integration recommendations (merge authority stays with the founder).
+Proposed review roles (not assigned work): Designer 1 Office UX, Designer 2 Field UX, a designated pair for each existing domain ticket, Reviewer 2 UI/accessibility, QA 4 E2E/release, Security for consent/tenant/payments/agent changes, and Codex Lead / Technical Lead for integration coordination (merge authority stays with the founder). E.. CoS advice is optional, not a required role or gate.
 
 ## 5. Ticket/PR acceptance evidence checklist
 
@@ -97,12 +97,49 @@ For **each** implementation PR, include:
 - Loading/empty/error/permission-denied/conflict/stale/approval-pending/success states. Do not use color alone to convey state. Verify keyboard navigation, semantic labels, focus visibility, validation announcements, reduced motion.
 - Functional evidence: jobs and monetary totals from tenant-scoped data; duplicate submission/replay; missing consent; provider fail; payment declined; out-of-date booking availability; tenant cross-read denied.
 - Evidence at exact PR head: local commands/results, UI visual QA, relevant unit/integration/E2E, reviewed screenshot links, regression concerns. Run CI only by the authorized batch process.
-- No "implemented" or "Done" claim before the designated independent peer, QA, Security by risk, approved batch CI and the founder's (Shaun's) exact-head merge approval into dev (#420/#421); E.. CoS and reviewers recommend only. Main/production only by founder release process.
+- No "Done" or merge-ready claim before the designated independent peer, QA, Security by risk, approved batch CI and the founder's (Shaun's) exact-head merge approval into dev (#420/#421); E.. CoS and reviewers recommend only. Main/production only by founder release process.
 
 **Minimum journey tests:** (a) Growth → public inquiry/booking with "request pending" semantics; (b) owner approve estimate with accurate public URL and accepted scope; (c) dispatch a live eligible technician with current availability; (d) field OTW → start → tasks/photos/time → signature → job completion; (e) invoice → customer pay → Stripe-confirmed paid; (f) retention automation after opted-in job event; (g) agent-approved proposal → queued provider action → failure/retry or verified delivery; (h) restricted/other-tenant users denied throughout.
 
 ## 6. Next authorized action
 
-FS-51 Product Owner/Design should review this handoff against canonical frames and reconcile status with E.. CoS. Only when a current board ticket is Ready and the assigned pair has a file split/contract should production code change. Do **not** promote this document into an implicit mandate to rewrite the frontend. Keep existing working route/API code and use small, testable, reviewable deltas.
+FS-51 Product Owner/Design should review this handoff against canonical frames; Codex Lead / Technical Lead reconciles readiness and evidence with the current board. No E.. CoS approval or reconciliation step is required. Only when a current board ticket is Ready and the assigned pair has a file split/contract should production code change. Do **not** promote this document into an implicit mandate to rewrite the frontend. Keep existing working route/API code and use small, testable, reviewable deltas.
 
 Related sources: [FS-51](https://app.notion.com/p/3ff317b92d158197b56eeacd4fbe3db2) · [FS-255](https://app.notion.com/p/40a317b92d1581ceaef7e2d4a2f82bb7) · [FS-52 code-to-area map](https://app.notion.com/p/400317b92d1581cc9bd4c84cb83c830f) · [TEAM.md](https://github.com/SimonShaun2/Renvani/blob/dev/TEAM.md) · [GITHUB_WORKFLOW.md](https://github.com/SimonShaun2/Renvani/blob/dev/GITHUB_WORKFLOW.md).
+
+
+## 7. Current source inventory and evidence manifest
+
+The [frontend source appendix](../audit/FRONTEND-INVENTORY.md) accounts for **112 tracked `page.tsx` files** at `dev` `b45b4996b64b16859e44a79b171b11cbe52c3e6a`, with route groups removed from URL patterns, dynamic segments retained, principal imports, reachable hook/API modules, and source role/state boundaries. The [machine-readable source appendix](../audit/frontend-source-inventory.json) preserves exact file/line references. These are source-file counts and observations, not executed-case, screen, route-instance, accessibility or workflow-pass counts. The existing **25 design surfaces** remain in the single [FS-51 map](fs-51-figma-route-map.json).
+
+| Evidence layer | Current disposition |
+| --- | --- |
+| Source path and code boundary | Rechecked at the full dev SHA and separately identified PR heads below. |
+| Exact approved frame | Existing FS-51 references retained with provenance; no new Figma inspection or acceptance claimed. Missing specific frames remain explicit. |
+| Preview build | Preserve only a deployment's actual SHA/status; build success does not establish its route behavior. |
+| Browser and role observation | Record actual session, role, API origin, route, viewport, screenshots and outcome in the acceptance packet. |
+| Accepted workflow / Done | Requires the applicable independent gates, approved batch CI and founder-approved integration; not established by this map. |
+
+### Separate implementation heads
+
+| PR | Source head | PR-only changes to validate in context |
+| --- | --- | --- |
+| [#432](https://github.com/SimonShaun2/Renvani/pull/432) | `98e5e935db39fb2108a67c2268b65f23989ac95f` | Login 52px input correction, immediate Escape dismissal, owner/Command Center shell. |
+| [#435](https://github.com/SimonShaun2/Renvani/pull/435) | `47e5b0dd4237903e5bc5437a74280812bcf692f5` | Revenue Center refresh/record-only action semantics; missing results, stale pagination and pending-refresh fixes. Build spec 1 records 25/25 local tests at this head. This is not a backend AI scan. |
+| [#437](https://github.com/SimonShaun2/Renvani/pull/437) | `cf133f9353803e1e8d664c23932a845f80160bbc` | Operator surface adaptation and Estimates request-limit correction. |
+| [#438](https://github.com/SimonShaun2/Renvani/pull/438) | `e7b416f21b460c115eafa8726b940951702c4577` | Settings/Company Profile styling and keyboard-reachable logo input. Whitespace-normalization and overlapping-save concerns are inherited source findings in baseline dev and #438; no authenticated runtime failure or new #438 persistence regression has been established. Retain S05 for runtime acceptance. |
+| [#439](https://github.com/SimonShaun2/Renvani/pull/439) | `935d37b0fa54f68b2ec88eb76ef6e4e30823c161` | Homepage and founder-requested alternative Products menu. Follow the separate marketing verification record for actual Node/browser evidence. |
+
+The operator PRs form **#432 → #435 → #437 → #438**. Later fixes on an ancestor are not assumed present in a descendant. Every screenshot/test record must name the full source SHA it actually covered. None of these PR-only changes is presented as merged to the dev snapshot above.
+
+### Exact-frame and acceptance gaps
+
+| Surface | Code entry | Evidence still required |
+| --- | --- | --- |
+| AI Revenue Center | `/ai-revenue-center` | Exact approved frame or bounded Design adaptation decision; authenticated nonempty/empty/error/retry behavior. Command Center visual language is a reference, not an exact dedicated frame. |
+| Customers list | `/customers` | Exact list frame; the existing customer-detail frame does not establish list parity. |
+| Estimates list | `/estimates` | Exact list frame; estimate builder/option frames do not establish list parity. |
+| Timesheets | `/timesheets` | Exact approved desktop/tablet/mobile frame and role/permission observations. |
+| General / Company Profile | `/settings/general`, `/settings/company` | Exact approved frames, native file-picker keyboard behavior, and save/error/loading/concurrent-edit observations. |
+
+Use the [operator acceptance packet](../audit/OPERATOR-ACCEPTANCE.md) for owner, office and technician scenarios. Missing credentials, fixtures, screenshots, viewport support, role observations and measured accessibility remain **missing evidence**, not passing checks. This source update does not execute the journeys, accept visual parity, change an API, or advance Operating Missions / Part II beyond the original-build acceptance and founder-permission boundary.

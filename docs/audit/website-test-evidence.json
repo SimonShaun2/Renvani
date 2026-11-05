@@ -1,0 +1,511 @@
+{
+  "observedDateUtc": "2026-11-05",
+  "sourceHead": "935d37b0fa54f68b2ec88eb76ef6e4e30823c161",
+  "sourceTree": "166bb48b0701abb892b04fe3a8a1b06313e04da9",
+  "node": "22.16.0",
+  "pnpm": "10.0.0",
+  "command": "pnpm --filter @fsm/web exec vitest run src/components/marketing/site --reporter=json",
+  "total": 108,
+  "passed": 108,
+  "failed": 0,
+  "pending": 0,
+  "success": true,
+  "typecheck": {
+    "command": "pnpm --filter @fsm/web exec tsc --noEmit",
+    "exitCode": 0
+  },
+  "suites": [
+    {
+      "sourcePath": "apps/web/src/components/marketing/site/flagship.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "flagship + product-detail + tool pages (Figma 175:3\u2026175:4156, 215:6308\u2026216:6313) registry covers every built frame with desktop + mobile ids",
+          "status": "passed"
+        },
+        {
+          "name": "flagship + product-detail + tool pages (Figma 175:3\u2026175:4156, 215:6308\u2026216:6313) renders growth with real links only",
+          "status": "passed"
+        },
+        {
+          "name": "flagship + product-detail + tool pages (Figma 175:3\u2026175:4156, 215:6308\u2026216:6313) renders revenue with real links only",
+          "status": "passed"
+        },
+        {
+          "name": "flagship + product-detail + tool pages (Figma 175:3\u2026175:4156, 215:6308\u2026216:6313) renders operations with real links only",
+          "status": "passed"
+        },
+        {
+          "name": "flagship + product-detail + tool pages (Figma 175:3\u2026175:4156, 215:6308\u2026216:6313) renders retention with real links only",
+          "status": "passed"
+        },
+        {
+          "name": "flagship + product-detail + tool pages (Figma 175:3\u2026175:4156, 215:6308\u2026216:6313) renders command-center with real links only",
+          "status": "passed"
+        },
+        {
+          "name": "flagship + product-detail + tool pages (Figma 175:3\u2026175:4156, 215:6308\u2026216:6313) renders online-booking with real links only",
+          "status": "passed"
+        },
+        {
+          "name": "flagship + product-detail + tool pages (Figma 175:3\u2026175:4156, 215:6308\u2026216:6313) renders estimates-approvals with real links only",
+          "status": "passed"
+        },
+        {
+          "name": "flagship + product-detail + tool pages (Figma 175:3\u2026175:4156, 215:6308\u2026216:6313) renders scheduling-dispatch with real links only",
+          "status": "passed"
+        },
+        {
+          "name": "flagship + product-detail + tool pages (Figma 175:3\u2026175:4156, 215:6308\u2026216:6313) renders technician-app with real links only",
+          "status": "passed"
+        },
+        {
+          "name": "flagship + product-detail + tool pages (Figma 175:3\u2026175:4156, 215:6308\u2026216:6313) renders invoices-payments with real links only",
+          "status": "passed"
+        },
+        {
+          "name": "flagship + product-detail + tool pages (Figma 175:3\u2026175:4156, 215:6308\u2026216:6313) renders service-agreements with real links only",
+          "status": "passed"
+        },
+        {
+          "name": "flagship + product-detail + tool pages (Figma 175:3\u2026175:4156, 215:6308\u2026216:6313) renders ai-revenue-intelligence with real links only",
+          "status": "passed"
+        },
+        {
+          "name": "flagship + product-detail + tool pages (Figma 175:3\u2026175:4156, 215:6308\u2026216:6313) renders customers-properties-assets with real links only",
+          "status": "passed"
+        },
+        {
+          "name": "flagship + product-detail + tool pages (Figma 175:3\u2026175:4156, 215:6308\u2026216:6313) renders onboarding-data-import with real links only",
+          "status": "passed"
+        },
+        {
+          "name": "flagship + product-detail + tool pages (Figma 175:3\u2026175:4156, 215:6308\u2026216:6313) renders inquiry-response-follow-up with real links only",
+          "status": "passed"
+        },
+        {
+          "name": "flagship + product-detail + tool pages (Figma 175:3\u2026175:4156, 215:6308\u2026216:6313) renders jobs-work-orders with real links only",
+          "status": "passed"
+        },
+        {
+          "name": "flagship + product-detail + tool pages (Figma 175:3\u2026175:4156, 215:6308\u2026216:6313) renders time-tracking-job-photos with real links only",
+          "status": "passed"
+        },
+        {
+          "name": "flagship + product-detail + tool pages (Figma 175:3\u2026175:4156, 215:6308\u2026216:6313) renders reminders-win-backs with real links only",
+          "status": "passed"
+        },
+        {
+          "name": "flagship + product-detail + tool pages (Figma 175:3\u2026175:4156, 215:6308\u2026216:6313) renders reporting-job-sources with real links only",
+          "status": "passed"
+        },
+        {
+          "name": "flagship + product-detail + tool pages (Figma 175:3\u2026175:4156, 215:6308\u2026216:6313) renders websites with real links only",
+          "status": "passed"
+        },
+        {
+          "name": "flagship + product-detail + tool pages (Figma 175:3\u2026175:4156, 215:6308\u2026216:6313) renders price-book-service-catalog with real links only",
+          "status": "passed"
+        },
+        {
+          "name": "flagship + product-detail + tool pages (Figma 175:3\u2026175:4156, 215:6308\u2026216:6313) renders customer-portal with real links only",
+          "status": "passed"
+        },
+        {
+          "name": "flagship + product-detail + tool pages (Figma 175:3\u2026175:4156, 215:6308\u2026216:6313) every illustration and image asset exists",
+          "status": "passed"
+        },
+        {
+          "name": "flagship + product-detail + tool pages (Figma 175:3\u2026175:4156, 215:6308\u2026216:6313) header products menu links built pages and keeps the rest as text",
+          "status": "passed"
+        },
+        {
+          "name": "flagship + product-detail + tool pages (Figma 175:3\u2026175:4156, 215:6308\u2026216:6313) tool items without a Current-page frame stay plain text (no dead links)",
+          "status": "passed"
+        },
+        {
+          "name": "flagship + product-detail + tool pages (Figma 175:3\u2026175:4156, 215:6308\u2026216:6313) sitemap lists every product page",
+          "status": "passed"
+        },
+        {
+          "name": "flagship + product-detail + tool pages (Figma 175:3\u2026175:4156, 215:6308\u2026216:6313) copy guard: home services only, no competitors, Service Fee wording",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "sourcePath": "apps/web/src/components/marketing/site/industry.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "industries (Figma 176:417/176:504, 175:4297\u2026175:5015, menu 177:686) route files exist for the overview and every trade",
+          "status": "passed"
+        },
+        {
+          "name": "industries (Figma 176:417/176:504, 175:4297\u2026175:5015, menu 177:686) renders industries desktop + mobile frames with real links",
+          "status": "passed"
+        },
+        {
+          "name": "industries (Figma 176:417/176:504, 175:4297\u2026175:5015, menu 177:686) renders hvac desktop + mobile frames with real links",
+          "status": "passed"
+        },
+        {
+          "name": "industries (Figma 176:417/176:504, 175:4297\u2026175:5015, menu 177:686) renders plumbing desktop + mobile frames with real links",
+          "status": "passed"
+        },
+        {
+          "name": "industries (Figma 176:417/176:504, 175:4297\u2026175:5015, menu 177:686) renders electrical desktop + mobile frames with real links",
+          "status": "passed"
+        },
+        {
+          "name": "industries (Figma 176:417/176:504, 175:4297\u2026175:5015, menu 177:686) overview cards link every trade page",
+          "status": "passed"
+        },
+        {
+          "name": "industries (Figma 176:417/176:504, 175:4297\u2026175:5015, menu 177:686) header industry menu, footer and home link the real pages",
+          "status": "passed"
+        },
+        {
+          "name": "industries (Figma 176:417/176:504, 175:4297\u2026175:5015, menu 177:686) pages are public and in the sitemap",
+          "status": "passed"
+        },
+        {
+          "name": "industries (Figma 176:417/176:504, 175:4297\u2026175:5015, menu 177:686) unknown industry slugs are public (404 page, not a login redirect) without opening deeper paths",
+          "status": "passed"
+        },
+        {
+          "name": "industries (Figma 176:417/176:504, 175:4297\u2026175:5015, menu 177:686) every image exists",
+          "status": "passed"
+        },
+        {
+          "name": "industries (Figma 176:417/176:504, 175:4297\u2026175:5015, menu 177:686) copy guard: home services only, no competitors, no off-list prices",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "sourcePath": "apps/web/src/components/marketing/site/intake.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "marketing intake (server-side POST) posts the contract body to the API and returns the confirmation",
+          "status": "passed"
+        },
+        {
+          "name": "marketing intake (server-side POST) builds the growth-check body (https added, ZIP split from city)",
+          "status": "passed"
+        },
+        {
+          "name": "marketing intake (server-side POST) validates before calling the API",
+          "status": "passed"
+        },
+        {
+          "name": "marketing intake (server-side POST) maps 400 VALIDATION_ERROR fields to inline errors",
+          "status": "passed"
+        },
+        {
+          "name": "marketing intake (server-side POST) forwards Retry-After on 429",
+          "status": "passed"
+        },
+        {
+          "name": "marketing intake (server-side POST) returns a friendly error on 413, 500 and network failure, without logging PII",
+          "status": "passed"
+        },
+        {
+          "name": "marketing intake (server-side POST) drops honeypot submissions without calling the API",
+          "status": "passed"
+        },
+        {
+          "name": "demo and growth-check pages renders the demo form with contract fields and an off-screen honeypot",
+          "status": "passed"
+        },
+        {
+          "name": "demo and growth-check pages shows inline errors, then the success state",
+          "status": "passed"
+        },
+        {
+          "name": "demo and growth-check pages shows Retry-After and a retry button on 429",
+          "status": "passed"
+        },
+        {
+          "name": "demo and growth-check pages is public, in the sitemap, and no marketing CTA still points a demo at /signup",
+          "status": "passed"
+        },
+        {
+          "name": "marketing intake types (#328) uses the shared @fsm/types contract the API validates with",
+          "status": "passed"
+        },
+        {
+          "name": "demo Team size errors maps the API `message` error to the teamSize field on /demo only",
+          "status": "passed"
+        },
+        {
+          "name": "demo Team size errors shows a Team size error under its own select",
+          "status": "passed"
+        },
+        {
+          "name": "marketing parity: demo plan interest + tour routes (Figma 246:5648 / 246:5650, 217:6308 \u2192 /tour) shows the Flex/Flat plan-interest panel only for ?plan=flex|flat, with Service Fee wording",
+          "status": "passed"
+        },
+        {
+          "name": "marketing parity: demo plan interest + tour routes (Figma 246:5648 / 246:5650, 217:6308 \u2192 /tour) every tour step is public and in the sitemap (Book direct = /tour)",
+          "status": "passed"
+        },
+        {
+          "name": "marketing parity: demo plan interest + tour routes (Figma 246:5648 / 246:5650, 217:6308 \u2192 /tour) demo done state matches Figma 204:9214 and Edit request details restores the filled form",
+          "status": "passed"
+        },
+        {
+          "name": "marketing parity: demo plan interest + tour routes (Figma 246:5648 / 246:5650, 217:6308 \u2192 /tour) validation copy matches Figma 246:5638",
+          "status": "passed"
+        },
+        {
+          "name": "/demo blank submit (Figma 246:5638 / 246:5639) validates Team size on /demo only, including when every other field is valid",
+          "status": "passed"
+        },
+        {
+          "name": "/demo blank submit (Figma 246:5638 / 246:5639) shows the amber summary at the top, amber outlines and ink2 error text, and no bottom alert",
+          "status": "passed"
+        },
+        {
+          "name": "/demo blank submit (Figma 246:5638 / 246:5639) keeps Growth Check on its existing (red) invalid look",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "sourcePath": "apps/web/src/components/marketing/site/menus.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "header menus (177:640, 177:686, 177:737) every menu link resolves to a real page; only agreed items are plain text",
+          "status": "passed"
+        },
+        {
+          "name": "header menus (177:640, 177:686, 177:737) desktop menu offers five direct product links, all 17 tools, the directory and next-step links",
+          "status": "passed"
+        },
+        {
+          "name": "header menus (177:640, 177:686, 177:737) mobile menu preserves the full product inventory, website navigation, sign-in and demo access",
+          "status": "passed"
+        },
+        {
+          "name": "header menus (177:640, 177:686, 177:737) mobile tools expand without closing the header menu, then following a tool closes the header",
+          "status": "passed"
+        },
+        {
+          "name": "header menus (177:640, 177:686, 177:737) product menu: aria-expanded tracks open state; Escape and Close menu close it and return focus",
+          "status": "passed"
+        },
+        {
+          "name": "header menus (177:640, 177:686, 177:737) industry menu: aria-expanded tracks open state; Escape and Close menu close it and return focus",
+          "status": "passed"
+        },
+        {
+          "name": "header menus (177:640, 177:686, 177:737) mobile menu: aria-expanded tracks open state; Escape and Close menu close it and return focus",
+          "status": "passed"
+        },
+        {
+          "name": "header menus (177:640, 177:686, 177:737) opening a sibling menu closes the previous menu and updates both toggles without moving focus",
+          "status": "passed"
+        },
+        {
+          "name": "header menus (177:640, 177:686, 177:737) clicking another summary closes the previous panel and opens the requested menu",
+          "status": "passed"
+        },
+        {
+          "name": "header disclosure dismissal an outside pointer click closes the panel without taking focus from the clicked control",
+          "status": "passed"
+        },
+        {
+          "name": "header disclosure dismissal an outside click without a pointer event also closes the panel and preserves focus",
+          "status": "passed"
+        },
+        {
+          "name": "header disclosure dismissal Tab moving focus outside closes the panel and leaves focus on the destination control",
+          "status": "passed"
+        },
+        {
+          "name": "header disclosure dismissal Escape while focus is inside the open panel closes it and restores its toggle",
+          "status": "passed"
+        },
+        {
+          "name": "header disclosure dismissal a route change closes the panel without moving focus back to the header",
+          "status": "passed"
+        },
+        {
+          "name": "header menus close when a link is followed mobile menu closes on link click",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "sourcePath": "apps/web/src/components/marketing/site/platform.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Products + How it works (Figma 176:204/176:313, 176:585/176:664) renders the Products page with the connected platform and the tool directory",
+          "status": "passed"
+        },
+        {
+          "name": "Products + How it works (Figma 176:204/176:313, 176:585/176:664) renders the How it works page",
+          "status": "passed"
+        },
+        {
+          "name": "Products + How it works (Figma 176:204/176:313, 176:585/176:664) header and footer link to the real pages, each with a route file and public access",
+          "status": "passed"
+        },
+        {
+          "name": "Products + How it works (Figma 176:204/176:313, 176:585/176:664) every rendered page link resolves to a route file (no dead links)",
+          "status": "passed"
+        },
+        {
+          "name": "Products + How it works (Figma 176:204/176:313, 176:585/176:664) mobile menu carries the same links",
+          "status": "passed"
+        },
+        {
+          "name": "Products + How it works (Figma 176:204/176:313, 176:585/176:664) sitemap and robots include both pages",
+          "status": "passed"
+        },
+        {
+          "name": "Products + How it works (Figma 176:204/176:313, 176:585/176:664) copy stays home-services with no competitors or plan pricing",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "sourcePath": "apps/web/src/components/marketing/site/pricing.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "pricing (Figma 203:15719 desktop / 203:15720 mobile) every button label has a text color that contrasts with its pill (review 5721672368)",
+          "status": "passed"
+        },
+        {
+          "name": "pricing (Figma 203:15719 desktop / 203:15720 mobile) plans follow the pricing rulings",
+          "status": "passed"
+        },
+        {
+          "name": "pricing (Figma 203:15719 desktop / 203:15720 mobile) renders desktop and mobile frames with resolved figures and one h1 each",
+          "status": "passed"
+        },
+        {
+          "name": "pricing (Figma 203:15719 desktop / 203:15720 mobile) every link resolves to a real route and images exist",
+          "status": "passed"
+        },
+        {
+          "name": "pricing (Figma 203:15719 desktop / 203:15720 mobile) plan CTAs follow the Figma prototype links (204:7829 / I204:7831;204:7829 / 204:7952 / I204:7954;204:7952 / 204:7915 / 204:8038)",
+          "status": "passed"
+        },
+        {
+          "name": "pricing (Figma 203:15719 desktop / 203:15720 mobile) copy guard: no $1.99 booking fee, no competitors, no restaurant language",
+          "status": "passed"
+        },
+        {
+          "name": "pricing (Figma 203:15719 desktop / 203:15720 mobile) route is real, public, in the sitemap, and linked from nav and footer",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "sourcePath": "apps/web/src/components/marketing/site/site.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "marketing site (Figma 171:2) competitor guard scans HomePage.tsx, site-config and footer copy",
+          "status": "passed"
+        },
+        {
+          "name": "marketing site (Figma 171:2) footer year is computed and the example has no fixed calendar date",
+          "status": "passed"
+        },
+        {
+          "name": "marketing site (Figma 171:2) mobile hero and intelligence use the mobile-only Figma components",
+          "status": "passed"
+        },
+        {
+          "name": "marketing site (Figma 171:2) tablet 768 renders its own frame (253:6780) between md and xl with real links and forms",
+          "status": "passed"
+        },
+        {
+          "name": "marketing site (Figma 171:2) nav collapses to the hamburger icon below xl; mobile footer and area links are one column",
+          "status": "passed"
+        },
+        {
+          "name": "marketing site (Figma 171:2) renders the shared nav with the Figma links and demo CTA",
+          "status": "passed"
+        },
+        {
+          "name": "marketing site (Figma 171:2) renders the home hero, sections and two growth check entries",
+          "status": "passed"
+        },
+        {
+          "name": "marketing site (Figma 171:2) uses home-services copy only and no competitor names",
+          "status": "passed"
+        },
+        {
+          "name": "marketing site (Figma 171:2) keeps motion CSS out of globals.css and honours reduced motion",
+          "status": "passed"
+        },
+        {
+          "name": "marketing assets are public serves /public/marketing files without sign-in",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "sourcePath": "apps/web/src/components/marketing/site/tour.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "workflow tour renders step book-direct on desktop + mobile with real links",
+          "status": "passed"
+        },
+        {
+          "name": "workflow tour renders step approve-the-work on desktop + mobile with real links",
+          "status": "passed"
+        },
+        {
+          "name": "workflow tour renders step plan-the-day on desktop + mobile with real links",
+          "status": "passed"
+        },
+        {
+          "name": "workflow tour renders step complete-the-visit on desktop + mobile with real links",
+          "status": "passed"
+        },
+        {
+          "name": "workflow tour renders step get-paid on desktop + mobile with real links",
+          "status": "passed"
+        },
+        {
+          "name": "workflow tour renders step bring-them-back on desktop + mobile with real links",
+          "status": "passed"
+        },
+        {
+          "name": "workflow tour every step has a route, is public and is in the sitemap; /product-tour is only a legacy redirect",
+          "status": "passed"
+        },
+        {
+          "name": "workflow tour no site link points at /product-tour any more",
+          "status": "passed"
+        },
+        {
+          "name": "workflow tour copy guard: home-services only, rulings pricing, no competitors, no restaurant language",
+          "status": "passed"
+        }
+      ]
+    }
+  ],
+  "executionReceipt": {
+    "evidenceClass": "coordinator_observed_tool_completion",
+    "runtimeLauncher": "npm exec --yes --package=node@22.16.0 -c",
+    "workingTreeHead": "935d37b0fa54f68b2ec88eb76ef6e4e30823c161",
+    "commandChain": "node --version && corepack pnpm --filter @fsm/import-normalize build && corepack pnpm --filter @fsm/types build && corepack pnpm --filter @fsm/import-engine build && corepack pnpm --filter @fsm/config build && corepack pnpm --filter @fsm/web exec vitest run src/components/marketing/site --reporter=json --outputFile=/workspace/scratch/20e58c1edc1c/inventory/spec11-tests.json && corepack pnpm --filter @fsm/web exec tsc --noEmit",
+    "completionTool": "write_stdin",
+    "execSessionId": 45307,
+    "completionChunkId": "302fe9",
+    "exitCode": 0,
+    "completed": true,
+    "note": "The final command is web tsc --noEmit. The tool returned exit_code 0 with no continuing session; this receipt preserves the coordinator-observed completion. The raw reporter was independently matched by peer review and QA; neither reran these commands."
+  }
+}

@@ -27,7 +27,11 @@
 | Customer | Figma page `19:18`, exact customer frame per flow | Public booking, inquiry, customer portal and approvals |
 | Marketing | Figma page `171:2` (current visual redesign) | `apps/web/app/(marketing)/` and marketing shared components |
 
-The **existing FS-51 Figma-to-production handoff** and merged PR #404 are the shared mapping work; do not create a competing full application route map. [Login implementation PR #432](https://github.com/SimonShaun2/Renvani/pull/432) is *in review*, not visual-parity accepted.
+The [FS-51 handoff](FS-51-figma-production-handoff.md) and [single route map](fs-51-figma-route-map.json), originating in [PR #404](https://github.com/SimonShaun2/Renvani/pull/404), own the design mapping. Its linked frontend inventory is a source appendix, not a second design map. The node IDs above are recorded references, not a fresh inspection or new acceptance of those frames. Record actual current-frame inspection in each UI review.
+
+The [operator acceptance packet](../audit/OPERATOR-ACCEPTANCE.md) separates source evidence, preview builds, observed browser outcomes and accepted journeys. Existing UI PRs #432/#435/#437/#438 and marketing #439 are separate heads until integration. Do not use a screenshot from one as acceptance of the others.
+
+**Missing-frame rule:** Revenue Center, Customers list, Estimates list, Timesheets and General/Company Profile have no exact approved frame established in the current evidence manifest. Record `HOLD: exact frame/Design decision missing`, or attach a bounded Product/Design exception with authorizer, date, affected route/state/width and approved adaptation. Do not relabel the Command Center reference or an estimate-builder frame as a verified frame for these routes. The founder-requested alternate Products menu in #439 is an existing approved direction; preserve its separate design/evidence record rather than silently reverting it to an older dropdown.
 
 ## PR evidence template (complete fields, not just links)
 

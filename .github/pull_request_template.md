@@ -33,7 +33,9 @@
 - Local commands/results and relevant UI evidence:
 - **UI parity evidence (mandatory for UI changes):** actual preview URL at exact head; browser screenshots at desktop/tablet/mobile, plus relevant loading/empty/error states; Figma screenshots/frames; list each mismatch and approved exception:
 - **Actual interaction QA:** keyboard/accessibility, authenticated role/tenant, active services, links/buttons, responsive layout; do not substitute demo/static markup:
-- **Independent visual sign-off:** Designer/Product reviewer and evidence URL at reviewed head (or documented explicit Design exception):
+- **Evidence classification:** source present / preview build / browser observed / workflow accepted; record actual roles, viewport widths and states tested, plus missing evidence:
+- **Independent visual sign-off:** Designer/Product PASS/HOLD, reviewer and evidence URL at reviewed head; for an exception name the authorizer, date, route/state/width and bounded adaptation:
+- **FS-51 crosswalk:** existing route-map IDs or explicitly unmapped surface; use its linked source inventory and operator acceptance packet:
 - QA evidence URL:
 - Independent reviewer evidence URL:
 - Security and Design evidence URLs when required:

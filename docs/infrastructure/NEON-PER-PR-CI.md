@@ -5,7 +5,7 @@
 ## Policy
 
 1. **Staging-only** — CI uses Neon **staging project** per-PR branches. **No production** Neon URLs, branches, or data.
-2. **PR-head** — `batch-ci` matrix job runs at the **pull request head SHA** (same as primary batch job).
+2. **Record the actual checkout** — Both jobs use `actions/checkout@v4` without an explicit `ref` at the reviewed dev source. Record the workflow run's associated PR head and the commit actually checked out; do not infer they are identical from the job name. [CICD-STATE.md](../audit/CICD-STATE.md) records this source limitation and the exact-head policy.
 3. **Optional until wired** — Without `NEON_CI_STAGING_DATABASE_URL`, the job **skips** migration/DB tests gracefully; unit tests still enforce wiring contracts.
 
 ## GitHub Actions

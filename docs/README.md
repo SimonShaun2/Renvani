@@ -1,10 +1,26 @@
-# Renvani — Build Documentation (Historical Foundation)
+# Renvani — Build Documentation
 
 **Repo:** [SimonShaun2/Renvani](https://github.com/SimonShaun2/Renvani) (formerly `FSM-Platform`)
 **Canonical current Figma (ALL UI):** [FSM Agent – Product Design](https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-%E2%80%93-Product-Design) (`jiGHTNUJNltWbHA4Il3hk7`). UI PRs must cite the implemented frame (`node-id`). Retired: `tAteqeUfdi4GCtZVeaF4DJ`, `LNTOsgJ7D4blaFaTepQt3J`.
 **Design-to-code acceptance:** [docs/design/RENVANI_FIGMA_PARITY.md](design/RENVANI_FIGMA_PARITY.md) — exact node IDs and screenshot-based QA required.
 
-> **Archive notice:** Sections below document earlier software milestones and may contain retired wording and design references. They are historical evidence, **not current brand/design/implementation instructions**. Follow AGENTS.md, CODEX.md, the current FS board and canonical Figma file instead.
+**Current execution:** [AGENTS.md](../AGENTS.md), [TEAM.md](../TEAM.md), [GITHUB_WORKFLOW.md](../GITHUB_WORKFLOW.md), [CODEX.md](../CODEX.md), and the [Field Service Build Board](https://app.notion.com/p/74b3a1145d3f49d586ac6cdbf174ceb2).
+
+## Current reference entry points
+
+| Need | Source |
+| --- | --- |
+| Design-to-code acceptance and brand boundary | [Renvani Figma parity contract](design/RENVANI_FIGMA_PARITY.md) |
+| Design surfaces and implementation evidence | [FS-51 handoff](design/FS-51-figma-production-handoff.md) and its [single route map](design/fs-51-figma-route-map.json) |
+| Every current page file | [Frontend source inventory](audit/FRONTEND-INVENTORY.md); 112 page files at its recorded dev head, not 112 accepted journeys |
+| Operator execution checks | [Operator acceptance packet](audit/OPERATOR-ACCEPTANCE.md) |
+| Architecture records and status | [ADR index](adr/README.md) |
+| Current platform/environment references | [Official operational stack](OFFICIAL-OPERATIONAL-STACK.md) and [CI/environment evidence](audit/CICD-STATE.md) |
+| Ownership of overlapping documentation PRs | [Documentation reconciliation ledger](audit/DESIGN-DOCS-RECONCILIATION.md) |
+
+The only current design file is `jiGHTNUJNltWbHA4Il3hk7`. The earlier separate app/marketing file IDs are retired. Exact source frames, actual browser evidence and independent design acceptance are required; file links and CI success alone establish neither parity nor working journeys.
+
+> **Archive boundary:** The Phase 1/2/3, deployment, migration and test-count sections below preserve earlier milestone claims. They are not current completion evidence. `docs/planning/PHASE2-MASTER-PLAN.md`, both `PHASE3-*.md` plans and legacy `docs/tickets/TICKET-*.md` are historical instruction snapshots. Their retired brand, Figma IDs, agents, schema copies, proposed domains and acceptance text do not authorize current work. Use the current board and governing documents above. Preserve persisted keys and migration history unless a separately reviewed compatibility change requires otherwise.
 
 ---
 
@@ -14,14 +30,18 @@
 2. TEAM.md
 3. GITHUB_WORKFLOW.md
 4. CODEX.md
-5. WORKFLOW.md (historical product-flow reference only — not operative build instructions)
-6. planning/PHASE2-MASTER-PLAN.md (legacy planning)
-7. FS-* board ticket / mapped GitHub issue
-8. docs/fsm-schema.ts
-9. Figma PNGs (design sessions only)
+5. Current FS-* board ticket / explicitly mapped GitHub issue
+6. packages/db/src/schema.ts (sole authoritative schema)
+7. Versioned contracts and current runbooks relevant to the ticket
+8. docs/design/RENVANI_FIGMA_PARITY.md and exact canonical frames for UI work
+9. Historical plans only when needed for traceability; never as current instructions
 ```
 
 ---
+
+## Historical milestone record
+
+The following claims are preserved as originally recorded and are not revalidated by this documentation update.
 
 ## Phase 1 — Backend (v1.0.0) ✅
 | Ticket | Description |

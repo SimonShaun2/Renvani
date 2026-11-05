@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "1.0",
+  "schemaVersion": "1.1",
   "purpose": "FS-51 reviewable Figma-to-code source map; NOT evidence of implemented parity",
   "canonicalFigmaFile": "jiGHTNUJNltWbHA4Il3hk7",
   "sourceDesignUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design",
@@ -8,7 +8,7 @@
   "codeInspected": {
     "ref": "dev",
     "commit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
-    "date": "2026-11-03"
+    "date": "2026-11-05"
   },
   "statusDefinition": "code_surface_identified_parity_not_verified",
   "entries": [
@@ -23,7 +23,20 @@
         "apps/web/app/(app)/command-center",
         "apps/web/src/components/command-center/CommandCenterView.tsx"
       ],
-      "status": "code_surface_identified_parity_not_verified"
+      "status": "code_surface_identified_parity_not_verified",
+      "sourceCommit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+      "designEvidence": {
+        "source": "PR #404 at 8af8bd4bf415c0e185d2112dd382c6a7200227f8",
+        "inspectionReperformed": false,
+        "parityVerdict": "NOT_VERIFIED"
+      },
+      "browserEvidence": {
+        "status": "NOT_EXECUTED_IN_THIS_SOURCE_RECONCILIATION",
+        "screenshots": [],
+        "roles": [],
+        "viewports": [],
+        "measuredAccessibility": null
+      }
     },
     {
       "id": "AG-01",
@@ -36,7 +49,20 @@
         "apps/web/src/components/agent-actions/AgentInbox.tsx",
         "apps/web/src/components/agent-actions/DeliveryStates.tsx"
       ],
-      "status": "code_surface_identified_parity_not_verified"
+      "status": "code_surface_identified_parity_not_verified",
+      "sourceCommit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+      "designEvidence": {
+        "source": "PR #404 at 8af8bd4bf415c0e185d2112dd382c6a7200227f8",
+        "inspectionReperformed": false,
+        "parityVerdict": "NOT_VERIFIED"
+      },
+      "browserEvidence": {
+        "status": "NOT_EXECUTED_IN_THIS_SOURCE_RECONCILIATION",
+        "screenshots": [],
+        "roles": [],
+        "viewports": [],
+        "measuredAccessibility": null
+      }
     },
     {
       "id": "GR-01",
@@ -49,7 +75,20 @@
         "apps/web/app/(public)/site",
         "apps/web/src/components/growth/BrandedStorefront.tsx"
       ],
-      "status": "code_surface_identified_parity_not_verified"
+      "status": "code_surface_identified_parity_not_verified",
+      "sourceCommit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+      "designEvidence": {
+        "source": "PR #404 at 8af8bd4bf415c0e185d2112dd382c6a7200227f8",
+        "inspectionReperformed": false,
+        "parityVerdict": "NOT_VERIFIED"
+      },
+      "browserEvidence": {
+        "status": "NOT_EXECUTED_IN_THIS_SOURCE_RECONCILIATION",
+        "screenshots": [],
+        "roles": [],
+        "viewports": [],
+        "measuredAccessibility": null
+      }
     },
     {
       "id": "GR-02",
@@ -58,11 +97,26 @@
       "figmaSourceNodeId": "10:1807",
       "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=10-1807",
       "route": "/site/[slug]/inquire",
-      "additionalRoutes": ["/site/[slug]/[service]/[area]"],
+      "additionalRoutes": [
+        "/site/[slug]/[service]/[area]"
+      ],
       "codePaths": [
         "apps/web/src/components/growth/BrandedInquiryClient.tsx"
       ],
-      "status": "code_surface_identified_parity_not_verified"
+      "status": "code_surface_identified_parity_not_verified",
+      "sourceCommit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+      "designEvidence": {
+        "source": "PR #404 at 8af8bd4bf415c0e185d2112dd382c6a7200227f8",
+        "inspectionReperformed": false,
+        "parityVerdict": "NOT_VERIFIED"
+      },
+      "browserEvidence": {
+        "status": "NOT_EXECUTED_IN_THIS_SOURCE_RECONCILIATION",
+        "screenshots": [],
+        "roles": [],
+        "viewports": [],
+        "measuredAccessibility": null
+      }
     },
     {
       "id": "OP-01",
@@ -75,7 +129,20 @@
         "apps/web/app/(app)/dispatch",
         "apps/web/src/components/dispatch"
       ],
-      "status": "code_surface_identified_parity_not_verified"
+      "status": "code_surface_identified_parity_not_verified",
+      "sourceCommit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+      "designEvidence": {
+        "source": "PR #404 at 8af8bd4bf415c0e185d2112dd382c6a7200227f8",
+        "inspectionReperformed": false,
+        "parityVerdict": "NOT_VERIFIED"
+      },
+      "browserEvidence": {
+        "status": "NOT_EXECUTED_IN_THIS_SOURCE_RECONCILIATION",
+        "screenshots": [],
+        "roles": [],
+        "viewports": [],
+        "measuredAccessibility": null
+      }
     },
     {
       "id": "OP-02",
@@ -88,7 +155,20 @@
         "apps/web/app/(public)/book",
         "apps/web/src/components/booking/BookingFlowClient.tsx"
       ],
-      "status": "code_surface_identified_parity_not_verified"
+      "status": "code_surface_identified_parity_not_verified",
+      "sourceCommit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+      "designEvidence": {
+        "source": "PR #404 at 8af8bd4bf415c0e185d2112dd382c6a7200227f8",
+        "inspectionReperformed": false,
+        "parityVerdict": "NOT_VERIFIED"
+      },
+      "browserEvidence": {
+        "status": "NOT_EXECUTED_IN_THIS_SOURCE_RECONCILIATION",
+        "screenshots": [],
+        "roles": [],
+        "viewports": [],
+        "measuredAccessibility": null
+      }
     },
     {
       "id": "OP-03",
@@ -100,7 +180,20 @@
       "codePaths": [
         "apps/web/app/(app)/jobs"
       ],
-      "status": "code_surface_identified_parity_not_verified"
+      "status": "code_surface_identified_parity_not_verified",
+      "sourceCommit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+      "designEvidence": {
+        "source": "PR #404 at 8af8bd4bf415c0e185d2112dd382c6a7200227f8",
+        "inspectionReperformed": false,
+        "parityVerdict": "NOT_VERIFIED"
+      },
+      "browserEvidence": {
+        "status": "NOT_EXECUTED_IN_THIS_SOURCE_RECONCILIATION",
+        "screenshots": [],
+        "roles": [],
+        "viewports": [],
+        "measuredAccessibility": null
+      }
     },
     {
       "id": "OP-04",
@@ -113,7 +206,20 @@
         "apps/web/app/(app)/jobs",
         "apps/web/src/components/jobs"
       ],
-      "status": "code_surface_identified_parity_not_verified"
+      "status": "code_surface_identified_parity_not_verified",
+      "sourceCommit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+      "designEvidence": {
+        "source": "PR #404 at 8af8bd4bf415c0e185d2112dd382c6a7200227f8",
+        "inspectionReperformed": false,
+        "parityVerdict": "NOT_VERIFIED"
+      },
+      "browserEvidence": {
+        "status": "NOT_EXECUTED_IN_THIS_SOURCE_RECONCILIATION",
+        "screenshots": [],
+        "roles": [],
+        "viewports": [],
+        "measuredAccessibility": null
+      }
     },
     {
       "id": "FT-01",
@@ -126,7 +232,20 @@
         "apps/web/app/(mobile)/mobile/jobs/page.tsx",
         "apps/web/src/components/mobile/TodayJobsList.tsx"
       ],
-      "status": "code_surface_identified_parity_not_verified"
+      "status": "code_surface_identified_parity_not_verified",
+      "sourceCommit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+      "designEvidence": {
+        "source": "PR #404 at 8af8bd4bf415c0e185d2112dd382c6a7200227f8",
+        "inspectionReperformed": false,
+        "parityVerdict": "NOT_VERIFIED"
+      },
+      "browserEvidence": {
+        "status": "NOT_EXECUTED_IN_THIS_SOURCE_RECONCILIATION",
+        "screenshots": [],
+        "roles": [],
+        "viewports": [],
+        "measuredAccessibility": null
+      }
     },
     {
       "id": "FT-02",
@@ -138,7 +257,20 @@
       "codePaths": [
         "apps/web/src/components/mobile/MobileJobDetail.tsx"
       ],
-      "status": "code_surface_identified_parity_not_verified"
+      "status": "code_surface_identified_parity_not_verified",
+      "sourceCommit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+      "designEvidence": {
+        "source": "PR #404 at 8af8bd4bf415c0e185d2112dd382c6a7200227f8",
+        "inspectionReperformed": false,
+        "parityVerdict": "NOT_VERIFIED"
+      },
+      "browserEvidence": {
+        "status": "NOT_EXECUTED_IN_THIS_SOURCE_RECONCILIATION",
+        "screenshots": [],
+        "roles": [],
+        "viewports": [],
+        "measuredAccessibility": null
+      }
     },
     {
       "id": "FT-03",
@@ -147,11 +279,26 @@
       "figmaSourceNodeId": "247:32",
       "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=247-32",
       "route": "/mobile/jobs/[id]",
-      "additionalRoutes": ["/mobile/jobs/[id]/complete"],
+      "additionalRoutes": [
+        "/mobile/jobs/[id]/complete"
+      ],
       "codePaths": [
         "apps/web/src/components/mobile/CrewChecklist.tsx"
       ],
-      "status": "code_surface_identified_parity_not_verified"
+      "status": "code_surface_identified_parity_not_verified",
+      "sourceCommit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+      "designEvidence": {
+        "source": "PR #404 at 8af8bd4bf415c0e185d2112dd382c6a7200227f8",
+        "inspectionReperformed": false,
+        "parityVerdict": "NOT_VERIFIED"
+      },
+      "browserEvidence": {
+        "status": "NOT_EXECUTED_IN_THIS_SOURCE_RECONCILIATION",
+        "screenshots": [],
+        "roles": [],
+        "viewports": [],
+        "measuredAccessibility": null
+      }
     },
     {
       "id": "FT-04",
@@ -160,11 +307,26 @@
       "figmaSourceNodeId": "303:87",
       "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=303-87",
       "route": "/mobile/jobs/[id]/signature",
-      "additionalRoutes": ["/mobile/signature"],
+      "additionalRoutes": [
+        "/mobile/signature"
+      ],
       "codePaths": [
         "apps/web/src/components/mobile/CrewSignature.tsx"
       ],
-      "status": "code_surface_identified_parity_not_verified"
+      "status": "code_surface_identified_parity_not_verified",
+      "sourceCommit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+      "designEvidence": {
+        "source": "PR #404 at 8af8bd4bf415c0e185d2112dd382c6a7200227f8",
+        "inspectionReperformed": false,
+        "parityVerdict": "NOT_VERIFIED"
+      },
+      "browserEvidence": {
+        "status": "NOT_EXECUTED_IN_THIS_SOURCE_RECONCILIATION",
+        "screenshots": [],
+        "roles": [],
+        "viewports": [],
+        "measuredAccessibility": null
+      }
     },
     {
       "id": "RV-01",
@@ -173,11 +335,26 @@
       "figmaSourceNodeId": "10:604",
       "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=10-604",
       "route": "/estimates/new",
-      "additionalRoutes": ["/estimates/[id]"],
+      "additionalRoutes": [
+        "/estimates/[id]"
+      ],
       "codePaths": [
         "apps/web/src/components/estimates/EstimateBuilderClient.tsx"
       ],
-      "status": "code_surface_identified_parity_not_verified"
+      "status": "code_surface_identified_parity_not_verified",
+      "sourceCommit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+      "designEvidence": {
+        "source": "PR #404 at 8af8bd4bf415c0e185d2112dd382c6a7200227f8",
+        "inspectionReperformed": false,
+        "parityVerdict": "NOT_VERIFIED"
+      },
+      "browserEvidence": {
+        "status": "NOT_EXECUTED_IN_THIS_SOURCE_RECONCILIATION",
+        "screenshots": [],
+        "roles": [],
+        "viewports": [],
+        "measuredAccessibility": null
+      }
     },
     {
       "id": "RV-02",
@@ -189,7 +366,20 @@
       "codePaths": [
         "apps/web/src/components/estimate-option-sets"
       ],
-      "status": "code_surface_identified_parity_not_verified"
+      "status": "code_surface_identified_parity_not_verified",
+      "sourceCommit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+      "designEvidence": {
+        "source": "PR #404 at 8af8bd4bf415c0e185d2112dd382c6a7200227f8",
+        "inspectionReperformed": false,
+        "parityVerdict": "NOT_VERIFIED"
+      },
+      "browserEvidence": {
+        "status": "NOT_EXECUTED_IN_THIS_SOURCE_RECONCILIATION",
+        "screenshots": [],
+        "roles": [],
+        "viewports": [],
+        "measuredAccessibility": null
+      }
     },
     {
       "id": "RV-03",
@@ -202,7 +392,20 @@
         "apps/web/app/(public)/approve",
         "apps/web/src/components/estimates/CustomerEstimateView.tsx"
       ],
-      "status": "code_surface_identified_parity_not_verified"
+      "status": "code_surface_identified_parity_not_verified",
+      "sourceCommit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+      "designEvidence": {
+        "source": "PR #404 at 8af8bd4bf415c0e185d2112dd382c6a7200227f8",
+        "inspectionReperformed": false,
+        "parityVerdict": "NOT_VERIFIED"
+      },
+      "browserEvidence": {
+        "status": "NOT_EXECUTED_IN_THIS_SOURCE_RECONCILIATION",
+        "screenshots": [],
+        "roles": [],
+        "viewports": [],
+        "measuredAccessibility": null
+      }
     },
     {
       "id": "RV-04",
@@ -215,7 +418,20 @@
         "apps/web/app/(app)/invoices",
         "apps/web/src/components/invoices"
       ],
-      "status": "code_surface_identified_parity_not_verified"
+      "status": "code_surface_identified_parity_not_verified",
+      "sourceCommit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+      "designEvidence": {
+        "source": "PR #404 at 8af8bd4bf415c0e185d2112dd382c6a7200227f8",
+        "inspectionReperformed": false,
+        "parityVerdict": "NOT_VERIFIED"
+      },
+      "browserEvidence": {
+        "status": "NOT_EXECUTED_IN_THIS_SOURCE_RECONCILIATION",
+        "screenshots": [],
+        "roles": [],
+        "viewports": [],
+        "measuredAccessibility": null
+      }
     },
     {
       "id": "RV-05",
@@ -228,7 +444,20 @@
         "apps/web/app/(app)/payments",
         "apps/web/src/components/payments"
       ],
-      "status": "code_surface_identified_parity_not_verified"
+      "status": "code_surface_identified_parity_not_verified",
+      "sourceCommit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+      "designEvidence": {
+        "source": "PR #404 at 8af8bd4bf415c0e185d2112dd382c6a7200227f8",
+        "inspectionReperformed": false,
+        "parityVerdict": "NOT_VERIFIED"
+      },
+      "browserEvidence": {
+        "status": "NOT_EXECUTED_IN_THIS_SOURCE_RECONCILIATION",
+        "screenshots": [],
+        "roles": [],
+        "viewports": [],
+        "measuredAccessibility": null
+      }
     },
     {
       "id": "RV-06",
@@ -240,7 +469,20 @@
       "codePaths": [
         "apps/web/app/(public)/pay"
       ],
-      "status": "code_surface_identified_parity_not_verified"
+      "status": "code_surface_identified_parity_not_verified",
+      "sourceCommit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+      "designEvidence": {
+        "source": "PR #404 at 8af8bd4bf415c0e185d2112dd382c6a7200227f8",
+        "inspectionReperformed": false,
+        "parityVerdict": "NOT_VERIFIED"
+      },
+      "browserEvidence": {
+        "status": "NOT_EXECUTED_IN_THIS_SOURCE_RECONCILIATION",
+        "screenshots": [],
+        "roles": [],
+        "viewports": [],
+        "measuredAccessibility": null
+      }
     },
     {
       "id": "RT-01",
@@ -253,7 +495,20 @@
         "apps/web/app/(app)/service-agreements",
         "apps/web/src/components/service-agreements"
       ],
-      "status": "code_surface_identified_parity_not_verified"
+      "status": "code_surface_identified_parity_not_verified",
+      "sourceCommit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+      "designEvidence": {
+        "source": "PR #404 at 8af8bd4bf415c0e185d2112dd382c6a7200227f8",
+        "inspectionReperformed": false,
+        "parityVerdict": "NOT_VERIFIED"
+      },
+      "browserEvidence": {
+        "status": "NOT_EXECUTED_IN_THIS_SOURCE_RECONCILIATION",
+        "screenshots": [],
+        "roles": [],
+        "viewports": [],
+        "measuredAccessibility": null
+      }
     },
     {
       "id": "GR-03",
@@ -266,7 +521,20 @@
         "apps/web/app/(app)/growth",
         "apps/web/src/components/growth-check"
       ],
-      "status": "code_surface_identified_parity_not_verified"
+      "status": "code_surface_identified_parity_not_verified",
+      "sourceCommit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+      "designEvidence": {
+        "source": "PR #404 at 8af8bd4bf415c0e185d2112dd382c6a7200227f8",
+        "inspectionReperformed": false,
+        "parityVerdict": "NOT_VERIFIED"
+      },
+      "browserEvidence": {
+        "status": "NOT_EXECUTED_IN_THIS_SOURCE_RECONCILIATION",
+        "screenshots": [],
+        "roles": [],
+        "viewports": [],
+        "measuredAccessibility": null
+      }
     },
     {
       "id": "FD-01",
@@ -279,7 +547,20 @@
         "apps/web/app/(app)/settings",
         "apps/web/src/components/csv-import"
       ],
-      "status": "code_surface_identified_parity_not_verified"
+      "status": "code_surface_identified_parity_not_verified",
+      "sourceCommit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+      "designEvidence": {
+        "source": "PR #404 at 8af8bd4bf415c0e185d2112dd382c6a7200227f8",
+        "inspectionReperformed": false,
+        "parityVerdict": "NOT_VERIFIED"
+      },
+      "browserEvidence": {
+        "status": "NOT_EXECUTED_IN_THIS_SOURCE_RECONCILIATION",
+        "screenshots": [],
+        "roles": [],
+        "viewports": [],
+        "measuredAccessibility": null
+      }
     },
     {
       "id": "AOF-01",
@@ -291,7 +572,20 @@
       "codePaths": [
         "apps/web/src/components/agent-actions"
       ],
-      "status": "code_surface_identified_parity_not_verified"
+      "status": "code_surface_identified_parity_not_verified",
+      "sourceCommit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+      "designEvidence": {
+        "source": "PR #404 at 8af8bd4bf415c0e185d2112dd382c6a7200227f8",
+        "inspectionReperformed": false,
+        "parityVerdict": "NOT_VERIFIED"
+      },
+      "browserEvidence": {
+        "status": "NOT_EXECUTED_IN_THIS_SOURCE_RECONCILIATION",
+        "screenshots": [],
+        "roles": [],
+        "viewports": [],
+        "measuredAccessibility": null
+      }
     },
     {
       "id": "AOF-02",
@@ -303,7 +597,20 @@
       "codePaths": [
         "apps/web/src/components/agent-actions"
       ],
-      "status": "code_surface_identified_parity_not_verified"
+      "status": "code_surface_identified_parity_not_verified",
+      "sourceCommit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+      "designEvidence": {
+        "source": "PR #404 at 8af8bd4bf415c0e185d2112dd382c6a7200227f8",
+        "inspectionReperformed": false,
+        "parityVerdict": "NOT_VERIFIED"
+      },
+      "browserEvidence": {
+        "status": "NOT_EXECUTED_IN_THIS_SOURCE_RECONCILIATION",
+        "screenshots": [],
+        "roles": [],
+        "viewports": [],
+        "measuredAccessibility": null
+      }
     },
     {
       "id": "AOF-03",
@@ -315,7 +622,20 @@
       "codePaths": [
         "apps/web/src/components/agent-actions/DeliveryStates.tsx"
       ],
-      "status": "code_surface_identified_parity_not_verified"
+      "status": "code_surface_identified_parity_not_verified",
+      "sourceCommit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+      "designEvidence": {
+        "source": "PR #404 at 8af8bd4bf415c0e185d2112dd382c6a7200227f8",
+        "inspectionReperformed": false,
+        "parityVerdict": "NOT_VERIFIED"
+      },
+      "browserEvidence": {
+        "status": "NOT_EXECUTED_IN_THIS_SOURCE_RECONCILIATION",
+        "screenshots": [],
+        "roles": [],
+        "viewports": [],
+        "measuredAccessibility": null
+      }
     },
     {
       "id": "AOF-04",
@@ -327,7 +647,20 @@
       "codePaths": [
         "apps/web/src/components/command-center"
       ],
-      "status": "code_surface_identified_parity_not_verified"
+      "status": "code_surface_identified_parity_not_verified",
+      "sourceCommit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+      "designEvidence": {
+        "source": "PR #404 at 8af8bd4bf415c0e185d2112dd382c6a7200227f8",
+        "inspectionReperformed": false,
+        "parityVerdict": "NOT_VERIFIED"
+      },
+      "browserEvidence": {
+        "status": "NOT_EXECUTED_IN_THIS_SOURCE_RECONCILIATION",
+        "screenshots": [],
+        "roles": [],
+        "viewports": [],
+        "measuredAccessibility": null
+      }
     }
   ],
   "policy": {
@@ -337,5 +670,92 @@
     "consentBeforeSend": true,
     "exactHeadReviewGate": true,
     "requiresBoardTicketReady": true
-  }
+  },
+  "sourceMapProvenance": {
+    "pullRequest": 404,
+    "commit": "8af8bd4bf415c0e185d2112dd382c6a7200227f8",
+    "preservedDesignSurfaceCount": 25,
+    "newDesignInspectionClaimed": false
+  },
+  "sourceInventory": {
+    "document": "docs/audit/FRONTEND-INVENTORY.md",
+    "data": "docs/audit/frontend-source-inventory.json",
+    "pageFileCount": 112,
+    "commit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+    "purpose": "Code source appendix only; not a second design map or accepted-journey count"
+  },
+  "acceptancePacket": "docs/audit/OPERATOR-ACCEPTANCE.md",
+  "evidenceDefinitions": {
+    "sourceObserved": "File exists at recorded SHA; logic identified by source only",
+    "previewBuild": "Deployment build at a specified SHA; no route acceptance implied",
+    "browserObserved": "Actual role/session/route/viewport/state/artifact recorded",
+    "workflowAccepted": "Required independent evidence and founder-authorized integration; not established by this map"
+  },
+  "implementationHeads": [
+    {
+      "pr": 432,
+      "commit": "98e5e935db39fb2108a67c2268b65f23989ac95f",
+      "mergedIntoInspectedDev": false,
+      "scope": "Login, owner dashboard, shared navigation"
+    },
+    {
+      "pr": 435,
+      "commit": "47e5b0dd4237903e5bc5437a74280812bcf692f5",
+      "mergedIntoInspectedDev": false,
+      "scope": "Revenue Center"
+    },
+    {
+      "pr": 437,
+      "commit": "cf133f9353803e1e8d664c23932a845f80160bbc",
+      "mergedIntoInspectedDev": false,
+      "scope": "Operator surfaces / Estimates"
+    },
+    {
+      "pr": 438,
+      "commit": "e7b416f21b460c115eafa8726b940951702c4577",
+      "mergedIntoInspectedDev": false,
+      "scope": "Settings / Company Profile"
+    },
+    {
+      "pr": 439,
+      "commit": "935d37b0fa54f68b2ec88eb76ef6e4e30823c161",
+      "mergedIntoInspectedDev": false,
+      "scope": "Marketing homepage / Products menu"
+    }
+  ],
+  "unverifiedFrameRequirements": [
+    {
+      "route": "/ai-revenue-center",
+      "surface": "AI Revenue Center",
+      "approvedExactFrame": null,
+      "status": "missing_exact_frame_or_bounded_design_exception"
+    },
+    {
+      "route": "/customers",
+      "surface": "Customers list",
+      "approvedExactFrame": null,
+      "status": "missing_exact_list_frame"
+    },
+    {
+      "route": "/estimates",
+      "surface": "Estimates list",
+      "approvedExactFrame": null,
+      "status": "missing_exact_list_frame"
+    },
+    {
+      "route": "/timesheets",
+      "surface": "Timesheets",
+      "approvedExactFrame": null,
+      "status": "missing_exact_frame"
+    },
+    {
+      "route": "/settings/general",
+      "additionalRoutes": [
+        "/settings/company"
+      ],
+      "surface": "General / Company Profile",
+      "approvedExactFrame": null,
+      "status": "missing_exact_frames"
+    }
+  ]
 }

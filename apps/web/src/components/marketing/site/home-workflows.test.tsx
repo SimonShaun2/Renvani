@@ -82,6 +82,30 @@ describe("homepage workflow content", () => {
 });
 
 describe("workflow playback", () => {
+  it.each([
+    { state: "visible", queued: [false, true], shouldPlay: true },
+    { state: "offscreen", queued: [true, false], shouldPlay: false }
+  ])("uses the latest queued visibility entry when the target ends $state", ({ queued, shouldPlay }) => {
+    render(<Harness />);
+    enterViewport(queued[0]!);
+    const target = screen.getByTestId("playback");
+    const bounds = new DOMRectReadOnly(0, 0, 100, 100);
+    act(() => intersectionCallback(
+      queued.map((isIntersecting, time) => ({
+        target, isIntersecting, time,
+        boundingClientRect: bounds,
+        intersectionRatio: isIntersecting ? 1 : 0,
+        intersectionRect: isIntersecting ? bounds : new DOMRectReadOnly(),
+        rootBounds: bounds
+      })),
+      {} as IntersectionObserver
+    ));
+    expect(target.getAttribute("data-playing")).toBe(String(shouldPlay));
+    expect(vi.getTimerCount()).toBe(shouldPlay ? 1 : 0);
+    advance(WORKFLOW_STEP_MS);
+    expect(currentStep()).toBe(shouldPlay ? 1 : 0);
+  });
+
   it("runs only in view, preserves its step offscreen and loops after the final dwell", () => {
     render(<Harness />);
     advance(WORKFLOW_STEP_MS * 10);

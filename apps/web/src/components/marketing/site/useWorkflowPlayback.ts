@@ -34,7 +34,11 @@ export function useWorkflowPlayback(sequenceKey: string, stepCount: number, inte
       return;
     }
     const observer = new IntersectionObserver(
-      ([entry]) => setInView(Boolean(entry?.isIntersecting)),
+      (entries) => {
+        // This observer has one target; queued crossings can include an older visibility state.
+        const latestEntry = entries.at(-1);
+        if (latestEntry) setInView(latestEntry.isIntersecting);
+      },
       { threshold: intersectionThreshold }
     );
     observer.observe(element);

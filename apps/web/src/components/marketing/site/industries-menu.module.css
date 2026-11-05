@@ -1,0 +1,54 @@
+.cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.card {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid rgb(15 21 48 / 0.07);
+  border-radius: 14px;
+  background: #f6f3ed;
+  transition: background 160ms ease, border-color 160ms ease;
+}
+.card:hover { background: #eee9df; border-color: rgb(15 21 48 / 0.18); }
+.photo { width: 100%; aspect-ratio: 13 / 8; height: auto; object-fit: cover; }
+.copy { display: flex; min-width: 0; flex-direction: column; gap: 5px; padding: 18px 44px 18px 18px; }
+.name { font-size: 19px; font-weight: 600; line-height: 1.35; letter-spacing: -0.025em; }
+.description { color: var(--color-mkt-ink2); font-size: 13px; font-weight: 400; line-height: 1.5; }
+.arrow { position: absolute; right: 18px; bottom: 56px; opacity: 0.6; }
+.electrical { color: #fffdf9; border-color: var(--color-mkt-ink); background: var(--color-mkt-ink); }
+.electrical:hover { border-color: var(--color-mkt-ink2); background: var(--color-mkt-ink2); }
+.workflowVisual { display: flex; flex: 1; min-height: 120px; align-items: center; justify-content: center; }
+.electricalIcon { display: grid; width: 72px; height: 72px; place-items: center; border: 1px solid rgb(255 255 255 / 0.16); border-radius: 20px; color: var(--color-mkt-amber); background: rgb(255 255 255 / 0.06); }
+.electrical .description { color: #d5d8e4; }
+.electrical .arrow { bottom: 79px; color: var(--color-mkt-amber); opacity: 1; }
+.qualifier { margin-top: 6px; color: #b9bfd0; font-size: 10px; font-weight: 500; letter-spacing: 0.07em; text-transform: uppercase; }
+
+.disclosure { border-bottom: 1px solid rgb(15 21 48 / 0.1); }
+.summary { display: flex; min-height: 52px; align-items: center; justify-content: space-between; gap: 12px; border-radius: 4px; font-size: 13px; font-weight: 600; list-style: none; cursor: pointer; }
+.summary::-webkit-details-marker { display: none; }
+.summary svg { transition: transform 160ms ease; }
+.disclosure[open] > .summary svg { transform: rotate(180deg); }
+.mobileContent { padding-bottom: 8px; }
+.allIndustries { display: flex; min-height: 44px; align-items: center; justify-content: space-between; gap: 8px; margin-top: 4px; border-radius: 6px; font-size: 12px; font-weight: 600; }
+.allIndustries:hover { text-decoration: underline; text-underline-offset: 4px; }
+.mobileCards { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+.mobileCards .card { display: grid; grid-template-columns: 48px minmax(0, 1fr) 16px; align-items: center; gap: 10px; padding: 12px; border-radius: 12px; }
+.mobileCards .photo { width: 48px; height: 56px; aspect-ratio: auto; border-radius: 8px; object-position: 45% center; }
+.mobileCards .copy { gap: 3px; padding: 0; }
+.mobileCards .name { font-size: 15px; }
+.mobileCards .description { font-size: 12px; line-height: 1.45; }
+.mobileCards .arrow { position: static; width: 16px; height: 16px; }
+.mobileCards .workflowVisual { min-height: 56px; }
+.mobileCards .electricalIcon { width: 44px; height: 44px; border-radius: 12px; }
+.mobileCards .electricalIcon svg { width: 24px; height: 24px; }
+.mobileCards .qualifier { margin-top: 3px; font-size: 9px; letter-spacing: 0.03em; }
+
+@media (min-width: 640px) {
+  .mobileCards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .mobileCards .card:last-child { grid-column: 1 / -1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card, .summary svg { transition: none; }
+}

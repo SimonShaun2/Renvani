@@ -1,7 +1,9 @@
 import Link from "next/link";
-import { ArrowRight, ArrowUpRight, CalendarDays, ChevronDown, Layers, LayoutDashboard, Megaphone, Repeat2, TrendingUp, X, type LucideIcon } from "lucide-react";
+import { ArrowRight, ArrowUpRight, CalendarDays, ChevronDown, Layers, LayoutDashboard, Megaphone, Repeat2, TrendingUp, type LucideIcon } from "lucide-react";
 
 import { MaybeLink } from "./MaybeLink";
+import { MobileIndustriesMenu } from "./IndustriesMenuPanel";
+import { MenuFooter } from "./MenuFooter";
 import { PRODUCTS_MENU, SITE_NAV } from "./site-config";
 import styles from "./products-menu.module.css";
 
@@ -74,6 +76,7 @@ export function ProductsMenuPanel({ variant }: { variant: "desktop" | "mobile" }
             <ProductTools />
           </section>
         )}
+        {mobile ? <MobileIndustriesMenu /> : null}
         {mobile ? (
           <nav aria-label="Explore the website" className={styles.explore}>
             {[...MOBILE_EXPLORE, SITE_NAV.signIn].map((link) => (
@@ -84,29 +87,13 @@ export function ProductsMenuPanel({ variant }: { variant: "desktop" | "mobile" }
           </nav>
         ) : null}
       </div>
-      <div className={styles.footer}>
-        {!mobile ? (
-          <Link href="/growth-check" className={styles.growthCheck}>
-            <span className={styles.growthDot} aria-hidden="true" />
-            Find your next opportunity<span className={styles.growthCheckLabel}>Growth Check<ArrowUpRight size={14} aria-hidden="true" /></span>
-          </Link>
-        ) : null}
-        <div className={styles.footerActions}>
-          <button type="button" data-menu-close="" className={styles.closeButton}>
-            <X size={14} aria-hidden="true" />Close menu
-          </button>
-          <Link href={PRODUCTS_MENU.cta.href} className={styles.demoButton}>
-            {PRODUCTS_MENU.cta.label}<ArrowRight size={15} aria-hidden="true" />
-          </Link>
-        </div>
-      </div>
+      <MenuFooter mobile={mobile} />
     </div>
   );
 }
 
 export const MOBILE_HEADLINE = "Explore Renvani.";
 export const MOBILE_EXPLORE = [
-  { label: "Industries", href: "/industries" },
   { label: "How it works", href: "/how-it-works" },
   { label: "Pricing", href: "/pricing" },
   { label: "Growth Check", href: "/growth-check" }

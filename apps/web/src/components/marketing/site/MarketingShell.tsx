@@ -3,9 +3,7 @@ import { ChevronDown } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { geist, inter, newsreader } from "./fonts";
-import { FigmaNode } from "./FigmaNode";
 import { IndustryMenu } from "./IndustryMenu";
-import { INDUSTRY_TREES } from "./industry-visuals";
 import { HeaderDisclosure } from "./HeaderDisclosure";
 import { ProductsMenuPanel } from "./ProductsMenuPanel";
 import { SITE_FOOTER, SITE_NAV } from "./site-config";
@@ -31,9 +29,7 @@ export function MarketingShell({ children }: { children: ReactNode }) {
                 <ProductsMenuPanel variant="desktop" />
               </HeaderDisclosure>
             ) : l.href === "/industries" ? (
-              <IndustryMenu key={l.label} label={l.label}>
-                <FigmaNode node={INDUSTRY_TREES.menu!.desktop} className="w-full" />
-              </IndustryMenu>
+              <IndustryMenu key={l.label} label={l.label} />
             ) : (
               <Link key={l.label} href={l.href} className={`${l.href === "/how-it-works" ? "w-[112px]" : "w-[90px]"} shrink-0 hover:underline`}>
                 {l.label}

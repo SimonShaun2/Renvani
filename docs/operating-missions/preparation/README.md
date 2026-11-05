@@ -6,6 +6,16 @@ This package turns the agreed ten-item preparation sequence into bounded inputs 
 
 Preparation does not record Part I release acceptance, launch a mission, connect a provider, create live campaigns, grant business authority or execute application acceptance. Runtime implementation remains gated by Part I acceptance and founder permission. None of the synthetic values is a real tenant policy.
 
+## Read first: product doctrine and connected operations
+
+The founder-requested [Operating Missions Product Doctrine and End-to-End Experience Contract](00-product-doctrine-and-experience-contract.md) is the cross-cutting guide for the ten packets below. The default owner experience is outcome-first; Operating Missions remains a coordination layer within the broader Renvani platform, not a replacement for its FSM or authorized manual workflows.
+
+**Profile/outcome → approved acquisition → inquiry/work-order request → emailed estimate OR scheduled and dispatched on-site assessment → confirmed scope/customer acceptance → work-order conversion → service scheduling and dispatch → field execution → completion/invoice → mobile payment/reconciliation → reviews, memberships and future service → outcome review and next bounded plan.**
+
+Operations explicitly includes work queues, scheduling/capacity, technician/crew assignment and dispatch, rescheduling/reassignment, job readiness, inventory/materials, field status/time/photos/checklists, disruptions/unfinished work, quality closeout and ongoing operational review. The on-site estimate and the resulting service work have distinct scheduling/dispatch and acceptance boundaries; do not collapse them into one premature job confirmation.
+
+The contract adds **13 supplemental experience assertions, OM-X01 through OM-X13**, mapped to the existing core criteria and package anchors. They supplement, not replace, the 34 core acceptance cases. They are documentation requirements, not executed tests. The original ten packets and their JSON companions remain intact. Use this cross-cutting contract when reviewing the source, authority, acceptance, detector, Command Center and acquisition packets; detailed gaps still belong in OM-D01 through OM-D13.
+
 ## The ten deliverables
 
 | Order | Deliverable | Concrete output | Codex consumers |
@@ -31,7 +41,7 @@ A missing mandatory rule cannot default to passing. Every proposed value must be
 
 ## Start here in Codex
 
-1. Read this index, the crosswalk, decisions and source map. Confirm the current branch base and inherited repository instructions. Use the existing FS-262–269 initiative, preserving FS-257/258 as Part I predecessors. No duplicate initiative or automatic new ticket per OM package.
+1. Read the product doctrine and connected-operations contract above, then this index, the crosswalk, decisions and source map. Confirm the current branch base and inherited repository instructions. Use the existing FS-262–269 initiative, preserving FS-257/258 as Part I predecessors. No duplicate initiative or automatic new ticket per OM package.
 2. For OM-01, reconcile current authorization and finalize strict shared contracts, identity, error/event semantics and named consumers. FS-263 is a contract anchor, not blanket runtime ownership.
 3. After the runtime gate is actually met, isolate OM-02 action/version/claim/authority work from OM-03 outbox/provider/reconciliation work with explicit central-file ownership. Use the prepared race/failure cases to prove real database behavior.
 4. Implement OM-04 projections against the accounting fixtures, then OM-05 snapshot/registry/plan/shared-resource integration. The complete source plan/crosswalk governs exact dependencies and allowed parallelism.
@@ -51,7 +61,7 @@ git diff --check
 
 The preparation checker validates cross-file identifiers, coverage, references and source paths. The Decimal oracle validates synthetic expected results, replay/order invariance and deliberate invalid mutations. Neither script calls a provider, uses a database, runs a model or proves the application implements these semantics.
 
-All production/API/concurrency/browser/provider/mission-pilot acceptance is **not executed by this package**. The draft PR records the exact published head/tree, independent reviews and actual offline results. Existing Part I pending PRs and operational gates are tracked separately.
+All production/API/concurrency/browser/provider/mission-pilot acceptance is **not executed by this package**. The draft PR records the applicable published head/tree, reviews and actual offline results. Earlier validation and independent sign-offs apply only to their recorded head; the product-doctrine addition needs its own affected review. The existing structural checker covers its enumerated original packet set; supplemental OM-X assertions require the separate document review described in the contract. Existing Part I pending PRs and operational gates are tracked separately.
 
 ## Compatibility constraints to keep visible
 

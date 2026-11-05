@@ -216,8 +216,10 @@ function WorkflowScene({ product, step }: { product: HomeWorkflowId; step: numbe
   }
 }
 
-export function HomepageWorkflows() {
-  const [activeId, setActiveId] = useState<HomeWorkflowId>("growth");
+export function HomepageWorkflows({ product, embedded = false }: { product?: HomeWorkflowId; embedded?: boolean } = {}) {
+  const workflows = product ? HOME_WORKFLOWS.filter((workflow) => workflow.id === product) : HOME_WORKFLOWS;
+  const [selectedId, setActiveId] = useState<HomeWorkflowId>(product ?? "growth");
+  const activeId = product ?? selectedId;
   const activeWorkflow = HOME_WORKFLOWS.find((workflow) => workflow.id === activeId)!;
   const playback = useWorkflowPlayback(activeId, activeWorkflow.steps.length);
   const instanceId = useId();
@@ -227,23 +229,23 @@ export function HomepageWorkflows() {
   const onTabKeyDown = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
     let nextIndex: number;
     switch (event.key) {
-      case "ArrowRight": nextIndex = (index + 1) % HOME_WORKFLOWS.length; break;
-      case "ArrowLeft": nextIndex = (index - 1 + HOME_WORKFLOWS.length) % HOME_WORKFLOWS.length; break;
+      case "ArrowRight": nextIndex = (index + 1) % workflows.length; break;
+      case "ArrowLeft": nextIndex = (index - 1 + workflows.length) % workflows.length; break;
       case "Home": nextIndex = 0; break;
-      case "End": nextIndex = HOME_WORKFLOWS.length - 1; break;
+      case "End": nextIndex = workflows.length - 1; break;
       default: return;
     }
     event.preventDefault();
-    setActiveId(HOME_WORKFLOWS[nextIndex]!.id);
+    setActiveId(workflows[nextIndex]!.id);
     tabRefs.current[nextIndex]?.focus();
   };
 
   return (
-    <section id="product-workflows" className={styles.showcase} data-node-id="584:5654" aria-labelledby={`${instanceId}-title`}>
-      <p className={styles.eyebrow}>Five products. One connected business.</p>
-      <h2 id={`${instanceId}-title`} className={styles.heading}>See the work move forward.</h2>
-      <div className={styles.tabs} role="tablist" aria-label="Explore Renvani products">
-        {HOME_WORKFLOWS.map((workflow, index) => (
+    <section id={product ? `${product}-workflow-player` : "product-workflows"} className={styles.showcase} style={embedded ? { padding: 0, background: "transparent" } : undefined} data-node-id="584:5654" data-subpage-journey={product ? activeWorkflow.name : undefined} aria-labelledby={`${instanceId}-title`}>
+      {!embedded && <p className={styles.eyebrow}>Five products. One connected business.</p>}
+      <h2 id={`${instanceId}-title`} className={embedded ? styles.srOnly : styles.heading}>{product ? `${activeWorkflow.name} workflow` : "See the work move forward."}</h2>
+      {!product && <div className={styles.tabs} role="tablist" aria-label="Explore Renvani products">
+        {workflows.map((workflow, index) => (
           <button
             key={workflow.id}
             ref={(element) => { tabRefs.current[index] = element; }}
@@ -260,10 +262,10 @@ export function HomepageWorkflows() {
             {workflow.name}
           </button>
         ))}
-      </div>
+      </div>}
       <div ref={playback.viewportRef} className={styles.panelViewport}>
-        {HOME_WORKFLOWS.map((workflow) => (
-          <div key={workflow.id} id={`${instanceId}-panel-${workflow.id}`} role="tabpanel" aria-labelledby={`${instanceId}-tab-${workflow.id}`} hidden={activeId !== workflow.id} tabIndex={0} className={styles.panel}>
+        {workflows.map((workflow) => (
+          <div key={workflow.id} id={`${instanceId}-panel-${workflow.id}`} role={product ? "region" : "tabpanel"} aria-labelledby={product ? `${instanceId}-title` : `${instanceId}-tab-${workflow.id}`} hidden={activeId !== workflow.id} tabIndex={0} className={styles.panel}>
             {activeId === workflow.id && (
               <>
                 <div className={styles.introduction}>
@@ -281,7 +283,7 @@ export function HomepageWorkflows() {
                       </li>
                     ))}
                   </ol>
-                  <Link className={styles.exploreLink} href={workflow.href}>Explore {workflow.name}<ArrowRight size={17} aria-hidden="true" /></Link>
+                  {!product && <Link className={styles.exploreLink} href={workflow.href}>Explore {workflow.name}<ArrowRight size={17} aria-hidden="true" /></Link>}
                 </div>
                 <div className={styles.scene} data-node-id={SCENE_NODES[workflow.id]} data-product={workflow.id} data-step={playback.step} data-playing={playback.playing} data-reduced-motion={playback.reducedMotion}>
                   <div role="img" aria-label={`Illustrative ${workflow.name} workflow. Step ${playback.step + 1} of ${workflow.steps.length}: ${activeStep.title}. ${activeStep.description}`}>

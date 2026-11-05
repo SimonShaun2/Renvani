@@ -56,6 +56,19 @@ describe("unified responsive marketing subpages",()=>{
     expect(within(industries).getAllByRole("link")).toHaveLength(14);
     expect(container.querySelector('[data-menu-design="shared-product-cards"]')).toBeTruthy();
   });
+  it.each(PRODUCT_PAGES.filter(page=>page.template==="flagship"))("$slug uses its own animated workflow rather than the generic static canvas",page=>{
+    const {container}=render(<FlagshipPage page={page}/>);
+    const workflow=container.querySelector('[data-subpage-journey]');
+    expect(workflow?.querySelector('[data-product="'+page.slug+'"]')).toBeTruthy();
+    expect(workflow?.querySelector('[role="tablist"]')).toBeNull();
+    expect(workflow?.querySelector('a[href="/product/'+page.slug+'"]')).toBeNull();
+    expect(screen.getByRole("button",{name:"Pause "+page.name+" animation"})).toBeTruthy();
+    expect(container.querySelectorAll('[data-product-artwork][inert]')).toHaveLength(1);
+  });
+  it("static demonstration artwork cannot capture keyboard focus",()=>{
+    const {container}=render(<FlagshipPage page={PRODUCT_PAGES.find(page=>page.slug==="scheduling-dispatch")!}/>);
+    for(const art of container.querySelectorAll('[data-product-artwork]'))expect(art.hasAttribute("inert")).toBe(true);
+  });
   it("allows manual workflow selection without executing business actions",()=>{
     const steps=[{title:"Request",body:"Capture the need",record:{title:"A request",fields:["Electrical repair"],status:"Review request"}},{title:"Approved",body:"Confirm scope",record:{title:"Approved scope",fields:["Scope confirmed"],status:"Ready for scheduling"}}];
     const {container}=render(<SubpageJourney name="Test trade" steps={steps}/>);

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import type { ProductPageEntry } from "./flagship-registry";
 import { ProductArtwork } from "./ProductArtwork";
+import { HomepageWorkflows } from "./HomepageWorkflows";
 import { PRODUCT_STORIES, SUBPAGE_FRAMES, SUITE_NAMES } from "./subpage-content";
 import { Benefits, FinalCta, FlagshipCards, RelatedTools, SectionHeading, SubpageFaq, SubpageHero } from "./SubpageShared";
 import { SubpageJourney } from "./SubpageJourney";
@@ -20,7 +21,7 @@ export function FlagshipPage({ page }: { page: ProductPageEntry }) {
     <Benefits items={story.benefits} />
     <section id="workflow" className={`${styles.section} ${styles.white}`}>
       <SectionHeading eyebrow={flagship ? "FROM DIRECTION TO THE NEXT STEP" : "THE WORK, WITHOUT THE GAPS"} title={flagship ? `${page.name}, in the flow of your business.` : `See ${page.name.toLowerCase()} in the flow of a job.`} description="Follow one connected example. Choose a step to take a closer look." />
-      <SubpageJourney name={page.name} steps={story.steps.map((title,index) => ({title,body:story.details[index]!}))} artwork={<ProductArtwork slug={page.slug} />} />
+      {flagship ? <HomepageWorkflows key={story.suite} product={story.suite} embedded /> : <SubpageJourney name={page.name} steps={story.steps.map((title,index) => ({title,body:story.details[index]!}))} artwork={<ProductArtwork slug={page.slug} />} />}
     </section>
     <section className={styles.section} aria-labelledby="connected-products-title">
       <div className={styles.copy}>{!flagship ? <Link className={styles.parentBadge} href={`/product/${story.suite}`}>Part of Renvani {suiteName}<ArrowRight size={14} aria-hidden="true" /></Link> : null}<p className={styles.eyebrow}>ONE CONNECTED PLATFORM</p><h2 className={styles.h2} id="connected-products-title">{flagship ? "Strong on its own. Better connected." : "The tool supports the outcome."}</h2><p className={styles.body}>{flagship ? "Growth, Revenue, Operations and Retention keep the work connected. Command Center keeps the owner in control." : `${page.name} supports ${suiteName}. Your field service tools carry the work through the five flagship products, rather than creating another disconnected workflow.`}</p></div>

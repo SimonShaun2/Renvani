@@ -25,7 +25,7 @@ export function productArtwork(slug: string, variant: "desktop" | "mobile") {
 export function ProductArtwork({ slug }: { slug: string }) {
   const desktop = productArtwork(slug, "desktop");
   const mobile = productArtwork(slug, "mobile");
-  return <div className={styles.artwork} aria-hidden="true" data-product-artwork={slug}>
+  return <div className={styles.artwork} inert aria-hidden="true" data-product-artwork={slug}>
     <div className={styles.artworkDesktop}><ScaleToFrame width={desktop.width}><FigmaNode node={desktop.node} /></ScaleToFrame></div>
     <div className={styles.artworkMobile}><ScaleToFrame width={mobile.width}><FigmaNode node={mobile.node} /></ScaleToFrame></div>
   </div>;

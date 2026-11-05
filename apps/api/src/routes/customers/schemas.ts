@@ -12,10 +12,6 @@ const nullableStringSchema = {
   anyOf: [{ type: "string" }, { type: "null" }]
 } as const;
 
-const nullableNumberSchema = {
-  anyOf: [{ type: "number" }, { type: "null" }]
-} as const;
-
 const nullableIntegerSchema = {
   anyOf: [{ type: "integer" }, { type: "null" }]
 } as const;

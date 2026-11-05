@@ -1,7 +1,7 @@
 # Renvani — Build Documentation
 
 **Repo:** [SimonShaun2/Renvani](https://github.com/SimonShaun2/Renvani) (formerly `FSM-Platform`)
-**Canonical current Figma (ALL UI):** [FSM Agent – Product Design](https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-%E2%80%93-Product-Design)
+**Canonical current Figma (ALL UI):** [FSM Agent – Product Design](https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-%E2%80%93-Product-Design) (`jiGHTNUJNltWbHA4Il3hk7`). UI PRs must cite the implemented frame (`node-id`). Retired: `tAteqeUfdi4GCtZVeaF4DJ`, `LNTOsgJ7D4blaFaTepQt3J`.
 **Design-to-code acceptance:** [docs/design/RENVANI_FIGMA_PARITY.md](design/RENVANI_FIGMA_PARITY.md) — exact node IDs and screenshot-based QA required.
 
 **Current execution:** [AGENTS.md](../AGENTS.md), [TEAM.md](../TEAM.md), [GITHUB_WORKFLOW.md](../GITHUB_WORKFLOW.md), [CODEX.md](../CODEX.md), and the [Field Service Build Board](https://app.notion.com/p/74b3a1145d3f49d586ac6cdbf174ceb2).

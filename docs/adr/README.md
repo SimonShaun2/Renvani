@@ -3,7 +3,8 @@
 **Owner:** Technical Lead and architecture owners, with independent reviewers. Historical owner names below are evidence from the records, not current assignments.
 **Authority:** Current founder direction, [AGENTS.md](../../AGENTS.md), [TEAM.md](../../TEAM.md), [GITHUB_WORKFLOW.md](../../GITHUB_WORKFLOW.md), and [founder directive #420](https://github.com/SimonShaun2/Renvani/issues/420).
 **Bootstrapped by:** FSM-0014 / [issue #15](https://github.com/SimonShaun2/Renvani/issues/15).
-**Index reconciled:** 2026-11-05 UTC against `dev` at `b45b4996b64b16859e44a79b171b11cbe52c3e6a`; ten decision records. This index update makes no new architecture decision.
+**Original index baseline:** 2026-11-05 UTC against `dev` at `b45b4996b64b16859e44a79b171b11cbe52c3e6a`; ten decision records.
+**Current index reconciliation:** 2026-11-05 UTC against merged `dev` at `4daf6b46980fe335ad965dd910c3837fe2182ec1`; eleven decision records, including ADR-FS-234 from [#430](https://github.com/SimonShaun2/Renvani/pull/430). This index update makes no new architecture decision.
 
 An ADR records a decision that constrains future work, together with the reasoning behind it.
 
@@ -36,13 +37,13 @@ Two established conventions coexist. Preserve every existing identifier and file
 | Convention | Existing examples | Use |
 | --- | --- | --- |
 | Zero-padded sequence | `ADR-0001` through `ADR-0004` | Original repository-wide decision sequence; never reuse a number. |
-| Board-linked or named record | `ADR-FS-3`, `ADR-FS-41`, `ADR-FS-59`, `ADR-FS-93`, `ADR-FS-MIGRATE`, `ADR-FS-STACK` | Decisions attached to FS work or a named cross-cutting topic. `FS-3` is not renamed to `0003`. |
+| Board-linked or named record | `ADR-FS-3`, `ADR-FS-41`, `ADR-FS-59`, `ADR-FS-93`, `ADR-FS-234`, `ADR-FS-MIGRATE`, `ADR-FS-STACK` | Decisions attached to FS work or a named cross-cutting topic. `FS-3` is not renamed to `0003`. |
 
 Use [ADR-TEMPLATE.md](ADR-TEMPLATE.md), choose an unused identifier with the Technical Lead, and identify the actual current role owners. Legacy `TL-01` / `QA-02` names and sprint labels in existing records are historical, not operating assignments.
 
 ## Index
 
-Status is copied from the decision file at the recorded source head. **Proposed remains Proposed unless the actual acceptance record is reconciled.**
+Status is copied from each decision file at the current integration head recorded above. The original ten-record audit remains tied to its earlier baseline. **Proposed remains Proposed unless the actual acceptance record is reconciled.**
 
 | ADR | Title | Status in this source tree | Recorded owner | Scope |
 | --- | --- | --- | --- | --- |
@@ -54,13 +55,18 @@ Status is copied from the decision file at the recorded source head. **Proposed 
 | [ADR-FS-41](ADR-FS-41-renvani-sor-integrations-addendum.md) | Renvani system of record and integration boundaries | **Proposed**; PO + Security ACK required in record | Tech Lead; Product Owner; Security | FS-41 |
 | [ADR-FS-59](ADR-FS-59-recurring-visit-series.md) | Recurring visit series and occurrence model | **Proposed** | Felix (Pair 3) | FS-59 |
 | [ADR-FS-93](ADR-FS-93-managed-platform-boundaries.md) | Managed platform boundaries | **Accepted** by founder; PO + Security ACK pending for ticket completion | Tech Lead | FS-93 |
-| [ADR-FS-MIGRATE](ADR-FS-MIGRATE-import-lineage.md) | Import lineage, business timestamps and chunked ingest | **Proposed in this tree**; #95 carries an Accepted-status follow-up | Tech Lead (Grace); PO (Elena) | FS-MIGRATE |
+| [ADR-FS-234](ADR-FS-234-authoritative-outbound-consent.md) | Authoritative outbound consent ledger | Product and Technical Lead approved for bounded schema/service implementation; Security, migration, QA, and integration gates pending | BE1B (proposer); BE1A and Technical Lead (contract/schema) | FS-234 |
+| [ADR-FS-MIGRATE](ADR-FS-MIGRATE-import-lineage.md) | Import lineage, business timestamps and chunked ingest | **Accepted** | Tech Lead (Grace); PO (Elena) | FS-MIGRATE |
 | [ADR-FS-STACK](ADR-FS-STACK-renvani-official-platform.md) | Official platform stack | **Proposed** | Tech Lead (Grace); PO (Elena) | STACK |
 
-## Pending status reconciliation and historical process text
+## Integrated status reconciliation and historical process text
 
-**PR #95 is preserved, not overwritten.** At `1ea9d4432195c88bcbaacf923d1474de0685cfe7`, [#95](https://github.com/SimonShaun2/Renvani/pull/95) changes both the import-lineage record and its index row to Accepted and records review assertions tied to #94. Its [record](https://github.com/SimonShaun2/Renvani/blob/1ea9d4432195c88bcbaacf923d1474de0685cfe7/docs/adr/ADR-FS-MIGRATE-import-lineage.md), [later independent review](https://github.com/SimonShaun2/Renvani/pull/95#pullrequestreview-5757051288), and [recorded CI run](https://github.com/SimonShaun2/Renvani/actions/runs/41681574822) remain evidence at that head. This branch updates the index/process only and leaves the decision file unchanged, so it records the dev status and the pending delta separately. When #95 is integrated with this index, retain its decision-file changes and reconcile this single row and note against the resulting file; do not replace the expanded index with the old eight-row version. Review assertions are not new founder merge approval.
+**PR #95 is integrated with its corrected provenance.** [#95](https://github.com/SimonShaun2/Renvani/pull/95) merged to `dev` as `a4456a2cb6e9729d9bf34ab1e505b8aaa2e73280` from reviewed head `a0ca0393ce72f0286bed830cffd28883a3ae47e0`. Its decision file is inherited unchanged from the current integration head. The Accepted header cites merged #94 and the Product Owner's acceptance-on-merge ACK; the Tech Lead row accurately records Proposed in that PO record and does not invent a separate Grace acceptance. The expanded index retains its original ten records and adds the newly integrated FS-234 record.
 
-**Dated process clarification, 2026-11-05 UTC:** ADR-FS-3 and ADR-FS-MIGRATE still contain historical E.. CoS gate language. It does not override #420 or the current authoring/merge process above. ADR-FS-MIGRATE's old “blocks 0026” sequencing text is historical: migration 0026 is already present at the recorded dev head. No accepted decision history, tenant/payment proposal, migration, or recorded ACK is rewritten by this index repair.
+**Historical #95 input:** The original delivery inspected `1ea9d4432195c88bcbaacf923d1474de0685cfe7`. Its [record](https://github.com/SimonShaun2/Renvani/blob/1ea9d4432195c88bcbaacf923d1474de0685cfe7/docs/adr/ADR-FS-MIGRATE-import-lineage.md), [independent review](https://github.com/SimonShaun2/Renvani/pull/95#pullrequestreview-5757051288), and [CI run](https://github.com/SimonShaun2/Renvani/actions/runs/41681574822) remain evidence at that original head. They are not relabeled as approval of a later head or this reconciliation.
+
+**FS-234 coverage:** [#430](https://github.com/SimonShaun2/Renvani/pull/430) merged as `4daf6b46980fe335ad965dd910c3837fe2182ec1` from `d6560815408450bd8e88c892f417d3a1a28571be`. The index copies the ADR's qualified status exactly, including its recorded pending gates; it does not promote or rewrite the ADR because a bounded implementation merged. Current implementation review/CI evidence belongs to #430. Full affirmative capture, approved copy and provider-boundary acceptance remain separate from indexing this decision.
+
+**Dated process clarification, 2026-11-05 UTC:** ADR-FS-3 still contains historical E.. CoS gate language. It does not override #420 or the current authoring/merge process above. Merged #95 replaces that gate in ADR-FS-MIGRATE with founder merge authority. The import-lineage record's 0026 reservation/sequencing prose is historical: migration 0026 was already present at the original baseline. This reconciliation edits no decision file, tenant/payment proposal, migration or recorded ACK; the corrected #95 and new #430 records are inherited from `dev`.
 
 The [documentation reconciliation ledger](../audit/DESIGN-DOCS-RECONCILIATION.md) records source heads, file ownership, integration order and link/status validation.

@@ -6,6 +6,7 @@ import pino from "pino";
 import { isReceiptEmailAllowed, resolveTransactionalEmailFromAddress, type EmailTemplateId } from "@fsm/comms";
 import { env } from "@fsm/config";
 import { recordTransactionalEmailMessageLog } from "./transactional-email-message-log.js";
+import { processCustomerEmailVerificationDeliveryJob } from "./customer-email-verification.processor.js";
 import {
   automationRules,
   campaignRecipients,
@@ -1974,6 +1975,9 @@ export function createNotificationsProcessor(
         return;
       case "send-password-reset-email":
         await handleSendPasswordResetEmail(job, dependencies);
+        return;
+      case "send-customer-email-verification":
+        await processCustomerEmailVerificationDeliveryJob(job.data);
         return;
       case "send-vip-membership-email":
         await handleSendVipMembershipEmail(job, dependencies);

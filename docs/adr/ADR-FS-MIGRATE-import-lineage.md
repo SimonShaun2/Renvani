@@ -1,6 +1,6 @@
 # ADR-FS-MIGRATE: Import lineage, business timestamps, and chunked ingest contract
 
-**Status:** **Accepted** (merged to `dev` with PR #94; acceptance recorded PR follow-up @ `dev`)  
+**Status:** **Accepted** ([PR #94](https://github.com/SimonShaun2/Renvani/pull/94) merged to `dev`; [PO ACK](https://github.com/SimonShaun2/Renvani/pull/94#issuecomment-6354477665) permits acceptance on merge)\
 **Owner:** Tech Lead (Grace) · **PO:** Elena  
 **Date:** 2026-10-23  
 **Base SHA:** `9313130f536f24cbc914add1f000a2c0728db035` (`dev` post-#86)  
@@ -122,7 +122,7 @@ No implementation branch may allocate **0026** for unrelated work. See [MIGRATIO
 
 | Party | Status |
 | --- | --- |
-| Tech Lead (Grace) | **Accepted** |
+| Tech Lead (Grace) | **Proposed** in [PR #94's PO record](https://github.com/SimonShaun2/Renvani/pull/94#issuecomment-6354477665); separate acceptance by Grace is not recorded in #94. |
 | Product Owner (Elena) | **ACK** (PR #94) |
 | Security (Sam) | **PASS** (PR #94) |
 | Architecture (Chloe) | **PASS** (PR #94) |

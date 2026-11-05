@@ -2,11 +2,13 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { CarFront, CheckCircle2, CreditCard, Play } from "lucide-react";
+import { CarFront, CheckCircle2, Play } from "lucide-react";
 import type { JobStatus } from "@fsm/types";
 
 import { useTransitionJob } from "@/src/hooks/jobs.hooks";
 import { showToast } from "@/src/stores/toast.store";
+
+import { mobileCloseoutMessage } from "./mobile-closeout";
 
 interface JobActionBarProps {
   jobId: string;
@@ -17,6 +19,7 @@ interface JobActionBarProps {
 export function JobActionBar({ jobId, status, onAddParts }: JobActionBarProps) {
   const router = useRouter();
   const transitionJob = useTransitionJob(jobId);
+  const closeoutMessage = mobileCloseoutMessage(status);
 
   async function handleStartJob() {
     try {
@@ -83,14 +86,17 @@ export function JobActionBar({ jobId, status, onAddParts }: JobActionBarProps) {
           </>
         ) : null}
 
-        {(status === "completed" || status === "invoiced" || status === "paid") ? (
-          <Link
-            href="/invoices"
-            className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl bg-brand-primary px-4 text-sm font-semibold text-white"
-          >
-            <CreditCard className="h-4 w-4" />
-            Create Invoice
-          </Link>
+        {closeoutMessage ? (
+          <div className="w-full space-y-2">
+            <p role="status" className="text-sm text-[#2a3360]">{closeoutMessage}</p>
+            <Link
+              href="/mobile/jobs"
+              className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-[10px] bg-[#f6b400] px-4 text-sm font-semibold text-[#0f1530]"
+            >
+              <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
+              Back to today
+            </Link>
+          </div>
         ) : null}
       </div>
     </div>

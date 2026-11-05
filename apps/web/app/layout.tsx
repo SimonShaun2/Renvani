@@ -4,7 +4,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { Inter } from "next/font/google";
 
 import { ClerkTokenBridge } from "@/src/components/auth/ClerkTokenBridge";
-import { renvaniClerkAppearance } from "@/src/lib/clerk/appearance";
+import { renvaniClerkAppearance, renvaniClerkSignInLocalization } from "@/src/lib/clerk/appearance";
 import { CLERK_SIGN_IN_PATH, CLERK_SIGN_UP_PATH, getClerkPublishableKey, isClerkEnabled } from "@/src/lib/clerk/config";
 import { ToastViewport } from "@/src/components/ui/ToastViewport";
 import { QueryProvider } from "@/src/providers/query-provider";
@@ -38,6 +38,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       signInUrl={CLERK_SIGN_IN_PATH}
       signUpUrl={CLERK_SIGN_UP_PATH}
       appearance={renvaniClerkAppearance}
+      localization={renvaniClerkSignInLocalization}
     >
       {page}
     </ClerkProvider>

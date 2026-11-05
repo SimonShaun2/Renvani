@@ -1,0 +1,33 @@
+/* Operator sidebar 399:4219; scope visual changes to the office shell, not field screens. */
+.office { --sidebar-width:248px; min-height:100vh; min-height:100dvh; background:var(--color-mkt-cream,#fbf6ef); color:var(--color-mkt-ink,#0f1530); font-family:var(--font-mkt-sans),sans-serif; }
+.rail { position:fixed; inset:0 auto 0 0; z-index:30; display:none; width:248px; height:100dvh; }
+.body { min-width:0; min-height:100vh; display:flex; flex-direction:column; }
+.main { min-width:0; flex:1; padding:24px 16px; }
+.sidebar { box-sizing:border-box; display:flex; flex-direction:column; gap:4px; width:248px; height:100%; min-height:0; padding:20px 14px; background:#0f1530; color:white; }
+.logo { flex:none; padding:4px 8px 16px; }
+.workspace { flex:none; display:flex; flex-direction:column; gap:2px; border:1px solid #2a3360; border-radius:10px; background:#18204a; padding:12px; margin-bottom:10px; }
+.workspaceLabel { margin:0; color:#c3c8da; font-family:ui-monospace,monospace; font-size:10px; font-weight:500; letter-spacing:.8px; text-transform:uppercase; }
+.company { margin:0; font-size:14px; font-weight:600; line-height:1.4; overflow-wrap:anywhere; }
+.navigation { flex:1; min-height:0; overflow-y:auto; overscroll-behavior:contain; scrollbar-width:thin; scrollbar-color:#2a3360 #0f1530; }
+.section { display:flex; flex-direction:column; gap:4px; }
+.sectionLabel { margin:0; padding:14px 10px 6px; color:#9aa3bd; font-family:ui-monospace,monospace; font-size:10px; font-weight:500; letter-spacing:.8px; text-transform:uppercase; }
+.navItem { display:flex; align-items:center; gap:12px; box-sizing:border-box; min-height:40px; padding:9px 12px; border-radius:10px; font-size:14px; font-weight:500; line-height:1.4; text-decoration:none; color:white; }
+.navItem svg { width:16px; height:16px; flex:none; color:#c3c8da; }
+.navItem:hover { background:#18204a; }
+.navItem:focus-visible { outline:2px solid #f6b400; outline-offset:-2px; }
+.active, .active:hover { background:#f6b400; color:#0f1530; }
+.active svg { color:#0f1530; }
+.user { display:flex; flex:none; gap:10px; align-items:center; padding:12px 8px 0; }
+.avatar { width:32px; height:32px; display:flex; align-items:center; justify-content:center; flex:none; border-radius:999px; background:#f6b400; color:#0f1530; font-size:12px; font-weight:700; }
+.userCopy { min-width:0; }
+.userName { margin:0; font-size:13px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.role { margin:0; color:#c3c8da; font-size:12px; text-transform:capitalize; }
+.mobileNavigation { display:block; }
+.mobileBar { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:8px 16px; border-bottom:1px solid #e6dccb; color:#0f1530; background:#fbf6ef; font-size:13px; }
+.mobileBar span { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.mobileBar button { flex:none; min-height:44px; border:1px solid #e6dccb; border-radius:10px; padding:8px 12px; background:white; cursor:pointer; }
+.mobileBar button:focus-visible { outline:2px solid #0f1530; outline-offset:2px; }
+.mobilePanel { padding:0 16px 12px; background:#fbf6ef; }
+.mobilePanel .sidebar { width:100%; max-height:70dvh; min-height:320px; border-radius:12px; }
+@media (min-width:768px) { .rail { display:flex; } .office .body { margin-left:248px; } .main { padding:32px 36px; } .mobileNavigation { display:none; } }
+@media (prefers-reduced-motion:reduce) { .navItem { transition:none; } }

@@ -71,7 +71,7 @@ describe("CrewFinishJob issue reporting", () => {
     expect(screen.getByText("Completion sends the work record to the office.")).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Report an issue" }));
     for (const name of ["Access", "Customer not home", "Safety", "Parts needed", "Equipment", "Scope change", "Other"]) {
-      expect((screen.getByRole("button", { name, exact: true }) as HTMLButtonElement).disabled).toBe(false);
+      expect((screen.getByRole("button", { name }) as HTMLButtonElement).disabled).toBe(false);
     }
     expect(screen.getByText(/does not approve extra work/)).toBeTruthy();
 
@@ -192,7 +192,7 @@ describe("CrewFinishJob supported issue contract", () => {
   ])("submits %s with explicit high severity and no implicit job hold", async (label, category) => {
     render(<CrewFinishJob jobId="job-1" />);
     fireEvent.click(screen.getByRole("button", { name: "Report an issue" }));
-    fireEvent.click(screen.getByRole("button", { name: label, exact: true }));
+    fireEvent.click(screen.getByRole("button", { name: label }));
     fireEvent.change(screen.getByRole("textbox"), { target: { value: "  Needs office review  " } });
     fireEvent.click(screen.getByRole("radio", { name: "High" }));
     fireEvent.click(screen.getByRole("button", { name: "Report issue" }));
@@ -218,7 +218,7 @@ describe("CrewFinishJob supported issue contract", () => {
     mocks.submitIssue.mockReturnValue(new Promise((done) => { resolve = done; }));
     render(<CrewFinishJob jobId="job-1" />);
     fireEvent.click(screen.getByRole("button", { name: "Report an issue" }));
-    fireEvent.click(screen.getByRole("button", { name: "Access", exact: true }));
+    fireEvent.click(screen.getByRole("button", { name: "Access" }));
     fireEvent.change(screen.getByRole("textbox"), { target: { value: "Locked gate" } });
     const submit = screen.getByRole("button", { name: "Report issue" });
     fireEvent.click(submit);

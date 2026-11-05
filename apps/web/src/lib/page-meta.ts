@@ -5,7 +5,7 @@ export interface PageMeta {
 
 const DEFAULT_META: PageMeta = {
   title: "Renvani",
-  subtitle: "Thinner system. Smarter brain."
+  subtitle: "Grow your shop. Renvani runs the rest."
 };
 
 const STATIC_PAGE_META: Array<{ prefix: string; meta: PageMeta }> = [

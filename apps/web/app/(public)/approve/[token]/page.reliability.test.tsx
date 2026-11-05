@@ -57,14 +57,14 @@ describe("public estimate response recovery", () => {
     mocks.approve.mockRejectedValue(new Error("Network failed"));
     render(<PublicEstimatePage />);
     fireEvent.change(screen.getByLabelText("Your name"), { target: { value: "Customer name" } });
-    fireEvent.click(screen.getByRole("button", { name: "Approve", exact: true }));
+    fireEvent.click(screen.getByRole("button", { name: "Approve" }));
     await waitFor(() => expect(screen.getByRole("alert").textContent).toContain("could not confirm your approval"));
     expect((screen.getByLabelText("Your name") as HTMLInputElement).value).toBe("Customer name");
     expect(mocks.refetch).not.toHaveBeenCalled();
-    expect((screen.getByRole("button", { name: "Approve", exact: true }) as HTMLButtonElement).disabled).toBe(true);
+    expect((screen.getByRole("button", { name: "Approve" }) as HTMLButtonElement).disabled).toBe(true);
     mocks.refetch.mockResolvedValue({ data: queryState("sent").data, isError: false });
     fireEvent.click(screen.getByRole("button", { name: "Check latest status" }));
-    await waitFor(() => expect((screen.getByRole("button", { name: "Approve", exact: true }) as HTMLButtonElement).disabled).toBe(false));
+    await waitFor(() => expect((screen.getByRole("button", { name: "Approve" }) as HTMLButtonElement).disabled).toBe(false));
     expect(mocks.approve).toHaveBeenCalledOnce();
   });
 
@@ -72,7 +72,7 @@ describe("public estimate response recovery", () => {
     mocks.decline.mockRejectedValue(new Error("Network failed"));
     render(<PublicEstimatePage />);
     fireEvent.change(screen.getByLabelText("Decline reason"), { target: { value: "Please revise scope" } });
-    fireEvent.click(screen.getByRole("button", { name: "Decline", exact: true }));
+    fireEvent.click(screen.getByRole("button", { name: "Decline" }));
     await waitFor(() => expect(screen.getByRole("alert").textContent).toContain("could not confirm your decline"));
     expect((screen.getByLabelText("Decline reason") as HTMLInputElement).value).toBe("Please revise scope");
   });
@@ -80,9 +80,9 @@ describe("public estimate response recovery", () => {
   it("keeps acknowledgement and retries only GET after approval succeeds and refresh fails", async () => {
     mocks.refetch.mockRejectedValueOnce(new Error("Read unavailable"));
     render(<PublicEstimatePage />);
-    fireEvent.click(screen.getByRole("button", { name: "Approve", exact: true }));
+    fireEvent.click(screen.getByRole("button", { name: "Approve" }));
     await waitFor(() => expect(screen.getByRole("heading", { name: "Approval recorded" })).toBeTruthy());
-    expect(screen.queryByRole("button", { name: "Approve", exact: true })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Approve" })).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: "Check latest status" }));
     await waitFor(() => expect(mocks.refetch).toHaveBeenCalledTimes(2));
     expect(mocks.approve).toHaveBeenCalledOnce();
@@ -91,19 +91,19 @@ describe("public estimate response recovery", () => {
 
   it("does not show approval controls after a confirmed decline", async () => {
     render(<PublicEstimatePage />);
-    fireEvent.click(screen.getByRole("button", { name: "Decline", exact: true }));
+    fireEvent.click(screen.getByRole("button", { name: "Decline" }));
     await waitFor(() => expect(screen.getByRole("heading", { name: "Decline recorded" })).toBeTruthy());
-    expect(screen.queryByRole("button", { name: "Approve", exact: true })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Approve" })).toBeNull();
   });
 
   it("blocks a second write until the first attempt settles", async () => {
     let resolve: (value: unknown) => void = () => undefined;
     mocks.approve.mockReturnValue(new Promise((done) => { resolve = done; }));
     render(<PublicEstimatePage />);
-    const button = screen.getByRole("button", { name: "Approve", exact: true });
+    const button = screen.getByRole("button", { name: "Approve" });
     fireEvent.click(button); fireEvent.click(button);
     expect(mocks.approve).toHaveBeenCalledOnce();
-    expect((screen.getByRole("button", { name: "Decline", exact: true }) as HTMLButtonElement).disabled).toBe(true);
+    expect((screen.getByRole("button", { name: "Decline" }) as HTMLButtonElement).disabled).toBe(true);
     resolve({ success: true });
     await waitFor(() => expect(screen.getByText("Approved view")).toBeTruthy());
   });
@@ -111,17 +111,17 @@ describe("public estimate response recovery", () => {
   it.each(["draft", "declined", "expired", "converted", "revised"])("does not offer a fresh decision for %s", (status) => {
     mocks.query.mockReturnValue(queryState(status));
     render(<PublicEstimatePage />);
-    expect(screen.queryByRole("button", { name: "Approve", exact: true })).toBeNull();
-    expect(screen.queryByRole("button", { name: "Decline", exact: true })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Approve" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Decline" })).toBeNull();
   });
 
   it("does not carry an acknowledgement into a different token", async () => {
     const rendered = render(<PublicEstimatePage />);
-    fireEvent.click(screen.getByRole("button", { name: "Approve", exact: true }));
+    fireEvent.click(screen.getByRole("button", { name: "Approve" }));
     await waitFor(() => expect(screen.getByText("Approved view")).toBeTruthy());
     mocks.params.token = "second";
     rendered.rerender(<PublicEstimatePage />);
-    expect(screen.getByRole("button", { name: "Approve", exact: true })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Approve" })).toBeTruthy();
   });
 
   it("preserves request-received rather than jumping back to slot selection on rerender", async () => {

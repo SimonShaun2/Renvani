@@ -29,7 +29,7 @@ describe("crew job frames", () => {
     expect(completionHint("in_progress", false)).toMatch(/completed/);
   });
 
-  it("lists the frame's issue categories", () => {
-    expect(ISSUE_CATEGORIES).toEqual(["Damage", "Access", "Safety", "Customer dispute", "Ran long"]);
+  it("lists the seven supported issue categories", () => {
+    expect(ISSUE_CATEGORIES).toEqual(["access", "customer_not_home", "safety", "parts_needed", "equipment", "scope_change", "other"]);
   });
 });

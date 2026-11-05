@@ -83,7 +83,7 @@ function getErrorMessage(error: unknown): string {
 function WeekStub({ onReset }: { onReset: () => void }) {
   return (
     <section className="surface-card p-8">
-      <EmptyState
+      <EmptyState variant="operator"
         icon={Sparkles}
         title="Week view is staged next"
         subtitle="Ticket 016 delivers the full day board first. Switch back to day mode to drag jobs, confirm bookings, and quick-create directly on the timeline."
@@ -91,7 +91,7 @@ function WeekStub({ onReset }: { onReset: () => void }) {
           <button
             type="button"
             onClick={onReset}
-            className="rounded-full bg-brand-accent px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary"
+            className="rounded-[10px] bg-[#f6b400] px-4 py-2 text-sm font-semibold text-[#0f1530] transition hover:bg-[#e0a400]"
           >
             Return to day view
           </button>
@@ -489,7 +489,7 @@ export function DispatchBoardClient() {
       <section className="surface-card px-5 py-4">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
           <div className="flex flex-1 flex-col gap-4 lg:flex-row lg:items-center">
-            <label className="flex min-w-0 flex-1 items-center gap-2 rounded-full border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm text-neutral-500">
+            <label className="flex min-w-0 flex-1 items-center gap-2 rounded-[10px] border border-[#e6dccb] bg-white px-4 py-3 text-sm text-[#5e6684]">
               <Search className="h-4 w-4" />
               <input
                 value={search}
@@ -499,13 +499,13 @@ export function DispatchBoardClient() {
               />
             </label>
 
-            <div className="inline-flex rounded-full border border-neutral-200 bg-neutral-100 p-1">
+            <div className="inline-flex rounded-[10px] border border-[#e6dccb] bg-[#f3eadc] p-1">
               <button
                 type="button"
                 onClick={() => setMode("day")}
                 className={cn(
                   "rounded-full px-4 py-2 text-sm font-semibold transition",
-                  viewMode === "day" ? "bg-brand-accent text-white shadow-sm" : "text-neutral-500 hover:text-neutral-800"
+                  viewMode === "day" ? "bg-[#f6b400] text-[#0f1530]" : "text-[#2a3360] hover:bg-[#fff4d6]"
                 )}
               >
                 Day
@@ -515,7 +515,7 @@ export function DispatchBoardClient() {
                 onClick={() => setMode("week")}
                 className={cn(
                   "rounded-full px-4 py-2 text-sm font-semibold transition",
-                  viewMode === "week" ? "bg-white text-neutral-900 shadow-sm" : "text-neutral-500 hover:text-neutral-800"
+                  viewMode === "week" ? "bg-white text-[#0f1530]" : "text-[#2a3360] hover:bg-[#fff4d6]"
                 )}
               >
                 Week
@@ -524,7 +524,7 @@ export function DispatchBoardClient() {
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
-            <div className="inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-3 py-2 shadow-sm">
+            <div className="inline-flex items-center gap-2 rounded-[10px] border border-[#e6dccb] bg-white px-3 py-2">
               <button
                 type="button"
                 onClick={() => shiftDate("prev")}
@@ -549,7 +549,7 @@ export function DispatchBoardClient() {
             <select
               value={technicianFilter}
               onChange={(event) => setTechnicianFilter(event.target.value)}
-              className="rounded-full border border-neutral-200 bg-white px-4 py-2 text-sm font-medium text-neutral-600 outline-none transition focus:border-brand-accent"
+              className="min-h-11 rounded-[10px] border border-[#e6dccb] bg-white px-4 py-2 text-sm font-medium text-[#0f1530] outline-none transition focus:border-[#f6b400]"
             >
               <option value="all">All Techs</option>
               {technicianOptions.map((technician) => (
@@ -562,7 +562,7 @@ export function DispatchBoardClient() {
             <select
               value={statusFilter}
               onChange={(event) => setStatusFilter(event.target.value)}
-              className="rounded-full border border-neutral-200 bg-white px-4 py-2 text-sm font-medium text-neutral-600 outline-none transition focus:border-brand-accent"
+              className="min-h-11 rounded-[10px] border border-[#e6dccb] bg-white px-4 py-2 text-sm font-medium text-[#0f1530] outline-none transition focus:border-[#f6b400]"
             >
               <option value="all">Status</option>
               {statusOptions.map((status) => (
@@ -575,7 +575,7 @@ export function DispatchBoardClient() {
             <button
               type="button"
               disabled
-              className="rounded-full border border-neutral-200 bg-neutral-50 px-4 py-2 text-sm font-medium text-neutral-400"
+              className="rounded-[10px] border border-[#e6dccb] bg-[#f3eadc] px-4 py-2 text-sm font-medium text-[#5e6684] disabled:cursor-not-allowed"
               title="Job type filtering lands in the next dispatch pass."
             >
               Job Type
@@ -599,7 +599,7 @@ export function DispatchBoardClient() {
       </section>
 
       {boardMessage ? (
-        <section className="rounded-[28px] border border-warning/30 bg-warning-light px-4 py-3 text-sm text-neutral-700 shadow-sm">
+        <section className="rounded-[14px] border border-[#e6dccb] bg-[#fff4d6] px-4 py-3 text-sm text-[#7a5600]">
           <div className="flex items-start gap-3">
             <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-warning" />
             <p>{boardMessage}</p>
@@ -670,6 +670,7 @@ export function DispatchBoardClient() {
           {viewMode === "day" ? (
             <DispatchTimeline
               technicians={filteredTechnicians}
+              totalTechnicians={technicians.length}
               isLoading={dispatchQuery.isLoading}
               selectedJobId={selectedJobId}
               animatedJobId={animatedJobId}
@@ -721,7 +722,7 @@ export function DispatchBoardClient() {
 
         <DragOverlay>
           {activeDragJob ? (
-            <div className="rounded-[24px] border border-brand-accent/20 bg-white px-4 py-4 shadow-[0_26px_80px_rgba(37,122,250,0.18)]">
+            <div className="rounded-[14px] border border-[#f6b400] bg-white px-4 py-4 shadow-sm">
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-400">Scheduling</p>
               <p className="mt-2 text-base font-semibold text-neutral-900">{activeDragJob.label}</p>
               <p className="mt-1 text-sm text-neutral-500">{activeDragJob.subtitle}</p>

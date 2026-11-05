@@ -1,0 +1,185 @@
+{
+  "schemaVersion": "1.0.0-preparation",
+  "artifactKind": "compute_policy_proposal",
+  "status": "proposed_not_enforced",
+  "baseCommit": "7840884d346ca95788e2668cc78148afa3b6a843",
+  "runtimeImportAllowed": false,
+  "runtimeEnabled": false,
+  "activation": "not_authorized",
+  "executionEvidence": [],
+  "source": {
+    "specVersion": "1.1",
+    "sections": [
+      "§3",
+      "§4",
+      "§18",
+      "§18.1",
+      "§20",
+      "§21"
+    ],
+    "notionUrl": "https://app.notion.com/p/40e317b92d1581188031e8a0a4c847c9"
+  },
+  "limits": {
+    "routineScanEligibilityAccountingModelCalls": 0,
+    "independentlySelectedStrategiesPerPlan": 2,
+    "paidAcquisitionChannelsPerPlan": 1,
+    "executionReviewDays": 14,
+    "operationalCheckDays": 7,
+    "outcomeMaturation": "separate_method_and_outcome_window",
+    "specialist": {
+      "maximumModelCallsTotal": 2,
+      "includesRepairAndEscalation": true,
+      "maximumInputTokensPerCall": 8000,
+      "maximumOutputTokensPerCall": 1500,
+      "maximumAllowlistedReadToolCallsTotal": 6,
+      "maximumMutationToolCalls": 0,
+      "totalDeadlineSeconds": 60,
+      "recursiveInvocationAllowed": false,
+      "arbitraryCodeOrTenantSelectionAllowed": false
+    },
+    "tenantModelCost": {
+      "currency": "USD",
+      "rollingWindowHours": 24,
+      "proposedAdmissionCeiling": "1.00",
+      "status": "proposed_platform_policy_not_approved_rate_or_tenant_budget",
+      "globalCeiling": null,
+      "globalCeilingStatus": "required_platform_policy",
+      "rateCardVersion": null,
+      "rateCardStatus": "required_verified_version",
+      "modelVersion": null,
+      "modelStatus": "requires_capability_evaluation",
+      "decisionRefs": [
+        "OM-D10"
+      ]
+    },
+    "scan": {
+      "recordsPerPage": 250,
+      "recordsPerPageMeaning": "Proposed generic ceiling; each domain adapter's current limit may be lower.",
+      "effectivePageSizeRule": "min(proposed generic page size, current source adapter limit)",
+      "knownSourceLimits": { "inventoryMaximumPageSize": 200, "evidence": "Pinned source-map.json inventory source contract" },
+      "maximumRecordsPerRun": 10000,
+      "checkpointRequired": true,
+      "coverageRequired": true
+    },
+    "ordinaryEventCoalescingMaximumSeconds": 300,
+    "urgentCommittedWorkPath": "separate_immediate_deterministic_path",
+    "snapshotPlanningCacheMaximumMinutes": 15,
+    "executionRechecksRequired": true,
+    "publicAggregateRefreshDefaultHours": 24,
+    "sourceSpecificFreshnessOverrides": true,
+    "proposalMaximumHours": 72,
+    "timeSensitiveExpiry": "shorter_when_required_by_current_facts_and_policy",
+    "contact": {
+      "maximumFollowupAttemptsPerIntent": 2,
+      "rollingDays": 7,
+      "sharedAcrossMissions": true,
+      "essentialNoticeExemptions": null,
+      "exemptionsStatus": "unresolved_no_blanket_exemption",
+      "decisionRefs": [
+        "OM-D05"
+      ]
+    },
+    "dispatch": {
+      "maximumAutomaticAttempts": 3,
+      "onlyAcceptedRetrySafeAdapters": true,
+      "uncertainEffect": "needs_reconciliation_before_retry"
+    },
+    "optionalExecutionEvaluation": {
+      "enabled": false,
+      "requiresSeparateAuthorization": true,
+      "defaultBackend": "existing_worker_BullMQ",
+      "sandboxMaximumInstancesPerTask": 1,
+      "sandboxMaximumConcurrentPerPilotTenant": 1,
+      "sandboxMaximumLifetimeSeconds": 300,
+      "recursiveTaskSpawningAllowed": false,
+      "inputByteLimit": null,
+      "outputByteLimit": null,
+      "resourceSizes": null,
+      "infrastructureRateCard": null,
+      "infrastructureAllowance": null,
+      "workflowTimeoutSeconds": null,
+      "missingLimitBehavior": "Block optional-backend dispatch; do not invent defaults or run untrusted work inside trusted application.",
+      "modelAllowanceIncreaseAllowed": false,
+      "decisionRefs": [
+        "OM-D09",
+        "OM-D10",
+        "OM-D12"
+      ]
+    }
+  },
+  "admissionPolicy": {
+    "serverDerivedTenantRequired": true,
+    "modelSelection": "Least expensive evaluated model accepted for this registered capability; no provider/model selected by untrusted input.",
+    "requiredBeforeCall": [
+      "Accepted capability/model/evaluation versions",
+      "Versioned current rate card and bounded token/tool/deadline estimate",
+      "Current tenant and global allowance",
+      "Atomic reservation of worst-case incremental cost before dispatch"
+    ],
+    "reservationIdentity": "Tenant + specialist invocation + call attempt; retry/replay cannot reserve or charge twice.",
+    "costRepresentation": "Currency-qualified decimal strings with Decimal-compatible arithmetic; no binary floating-point money.",
+    "availableAllowance": "Ceiling minus actual settled charge exposure and outstanding reservations within the rolling window, with unresolved liabilities retained until reconciled.",
+    "raceRule": "One atomic admission checks both tenant and global limits. Concurrent workers cannot both consume the same remaining allowance.",
+    "repairAndEscalation": "The single optional second model call is shared by repair or evaluated escalation, never one of each in addition to two calls. Reserve enough cost before each call; total invocation deadline/read-tool caps remain shared.",
+    "settle": "Record actual provider usage and immutable model/rate-card versions; settle once and release only demonstrably unused reservation.",
+    "unknownUsage": "Mark usage/cost reconciliation pending and retain conservative reserved exposure; missing usage never becomes free or a fabricated zero.",
+    "cancellation": "Stop new calls and preserve in-flight usage/liability reconciliation. Human/event/timer waits consume no model calls.",
+    "prohibitedCostMixing": "Track model, advertising/media/provider and optional infrastructure cost categories and allowances separately in accepted usage/audit storage; do not create new ledgers or hide transfers from the model allowance.",
+    "decisionRefs": [
+      "OM-D10"
+    ]
+  },
+  "fallbackPolicy": {
+    "budgetExhausted": "Stop new model-dependent work. Use only an existing preapproved deterministic template where its independent eligibility/authority checks pass, otherwise show human review or needs_input.",
+    "timeoutOrInvalidOutput": "Return explicit fallback/handoff; do not silently accept partial or malformed output, loop, exceed the same deadline or invent missing source facts.",
+    "routineWorkContinues": [
+      "Domain receipts",
+      "Payment/spend reconciliation",
+      "Existing booked work and commitments",
+      "Deterministic source updates and allowed scans",
+      "Pause/cancel/cleanup obligations"
+    ],
+    "authorityPreserved": true,
+    "commitmentsErased": false
+  },
+  "cachePolicy": {
+    "keyParts": [
+      "server_company_id",
+      "capability_and_prompt_version",
+      "accepted_model_and_policy_version",
+      "evidence_reference_and_source_version_hashes",
+      "schema_version",
+      "field_specific_freshness"
+    ],
+    "crossTenantPrivateReuseAllowed": false,
+    "staleResultAllowed": false,
+    "cacheHitBehavior": "Reuse only still-valid evidence-linked draft within matching versions/freshness; action authority and mutable facts are rechecked independently.",
+    "publicAggregateReuse": "Only permitted genuinely public/aggregate source summaries with their own provenance/allowed use; no tenant-private campaign/customer data."
+  },
+  "evaluationPolicy": {
+    "artifactsStatus": "prepared_not_executed",
+    "requireAllFourCapabilityGroups": true,
+    "requireAllFourCapabilityGroupsMeaning": "Preparation evaluation-packet coverage/full agreed release scope only. Runtime admission is per selected registered capability and accepted method graph; an unrelated unavailable group does not block a complete selected route.",
+    "gate": "Structured schema, allowed-read boundary, correct tenant, evidence support, uncertainty handling, authority separation, valid cost/usage recording and bounded repair must all pass accepted offline/adversarial evaluation before runtime enablement.",
+    "numericalConfidence": "Do not accept LLM self-rating as calibrated confidence; any numeric estimator needs evaluated version/evidence.",
+    "promotion": "Offline evaluation then shadow/recommendation comparison then separately authorized limited rollout; policy promotion never expands owner/customer authority.",
+    "evaluatedDatasetVersion": null,
+    "capabilityEvaluationVersion": null,
+    "approvedModelRateCard": null,
+    "decisionRefs": [
+      "OM-D10",
+      "OM-D11"
+    ]
+  },
+  "openDecisions": [
+    "OM-D01",
+    "OM-D04",
+    "OM-D05",
+    "OM-D06",
+    "OM-D09",
+    "OM-D10",
+    "OM-D11",
+    "OM-D12",
+    "OM-D13"
+  ]
+}

@@ -1,0 +1,773 @@
+{
+  "schemaVersion": "om-preparation.contracts/1.0",
+  "baseCommit": "7840884d346ca95788e2668cc78148afa3b6a843",
+  "sourceNotionUrl": "https://app.notion.com/p/40e317b92d1581188031e8a0a4c847c9",
+  "sourceSections": [
+    4,
+    6,
+    8,
+    19
+  ],
+  "status": "proposed_contract_preparation",
+  "implementationStatus": "not_started",
+  "runtimeAcceptance": "not_executed",
+  "apiPrefix": "/api/v1/operating-missions",
+  "endpoints": [
+    {
+      "method": "GET",
+      "path": "/catalog",
+      "requiredFieldsOrChecks": [
+        "trustedTenant"
+      ],
+      "successResponse": "200",
+      "result": "Definitions, supported methods, readiness and blockers.",
+      "contractStatus": "proposed",
+      "implemented": false
+    },
+    {
+      "method": "POST",
+      "path": "/runs",
+      "requiredFieldsOrChecks": [
+        "missionType",
+        "scope",
+        "targetPolicy",
+        "mode",
+        "idempotencyKey"
+      ],
+      "successResponse": "202",
+      "result": "Assessment accepted; no model/provider call inline.",
+      "contractStatus": "proposed",
+      "implemented": false
+    },
+    {
+      "method": "GET",
+      "path": "/runs/:id",
+      "requiredFieldsOrChecks": [
+        "ownedRunId"
+      ],
+      "successResponse": "200",
+      "result": "State/version, active plan, progress, coverage, decisions and outcome dimensions.",
+      "contractStatus": "proposed",
+      "implemented": false
+    },
+    {
+      "method": "GET",
+      "path": "/runs/:id/findings",
+      "requiredFieldsOrChecks": [
+        "ownedRunId",
+        "cursor"
+      ],
+      "successResponse": "200",
+      "result": "Tenant-scoped cursor page with linked existing work and coverage.",
+      "contractStatus": "proposed",
+      "implemented": false
+    },
+    {
+      "method": "POST",
+      "path": "/runs/:id/plans",
+      "requiredFieldsOrChecks": [
+        "ownedRunId",
+        "expectedRunVersion",
+        "idempotencyKey",
+        "requestedRevisionScope"
+      ],
+      "successResponse": "202",
+      "result": "Bounded asynchronous draft/revision; current approved plan remains active until replacement activation.",
+      "contractStatus": "proposed",
+      "implemented": false
+    },
+    {
+      "method": "GET",
+      "path": "/plans/:id",
+      "requiredFieldsOrChecks": [
+        "ownedPlanId"
+      ],
+      "successResponse": "200",
+      "result": "Immutable content/hash, resources, authority needs and evidence.",
+      "contractStatus": "proposed",
+      "implemented": false
+    },
+    {
+      "method": "POST",
+      "path": "/plans/:id/approve",
+      "requiredFieldsOrChecks": [
+        "ownedPlanId",
+        "expectedVersion",
+        "payloadHash",
+        "explicitScope",
+        "idempotencyKey"
+      ],
+      "successResponse": "to_align_with_existing_response_convention",
+      "result": "Transactional approval/grant/action intent; no provider call inside transaction.",
+      "contractStatus": "proposed",
+      "implemented": false
+    },
+    {
+      "method": "POST",
+      "path": "/runs/:id/pause",
+      "requiredFieldsOrChecks": [
+        "ownedRunId",
+        "expectedVersion",
+        "reason",
+        "idempotencyKey"
+      ],
+      "successResponse": "to_align_with_existing_response_convention",
+      "result": "Prevent new dispatch; preserve reconciliation and actual effects.",
+      "contractStatus": "proposed",
+      "implemented": false
+    },
+    {
+      "method": "POST",
+      "path": "/runs/:id/resume",
+      "requiredFieldsOrChecks": [
+        "ownedRunId",
+        "expectedVersion",
+        "idempotencyKey"
+      ],
+      "successResponse": "to_align_with_existing_response_convention",
+      "result": "Revalidate active plan, authority, source versions and resources before dispatch.",
+      "contractStatus": "proposed",
+      "implemented": false
+    },
+    {
+      "method": "POST",
+      "path": "/runs/:id/cancel",
+      "requiredFieldsOrChecks": [
+        "ownedRunId",
+        "expectedVersion",
+        "reason",
+        "idempotencyKey"
+      ],
+      "successResponse": "to_align_with_existing_response_convention",
+      "result": "Release unused claims; retain shared valid sponsorship and in-flight reconciliation.",
+      "contractStatus": "proposed",
+      "implemented": false
+    },
+    {
+      "method": "GET",
+      "path": "/runs/:id/outcomes",
+      "requiredFieldsOrChecks": [
+        "ownedRunId"
+      ],
+      "successResponse": "200",
+      "result": "Activity, observed outcomes, estimated effects, accounting basis and completeness separately.",
+      "contractStatus": "proposed",
+      "implemented": false
+    },
+    {
+      "method": "POST",
+      "path": "/grants",
+      "requiredFieldsOrChecks": [
+        "explicitCapabilityScope",
+        "scopeAndLimitPolicy",
+        "validity",
+        "idempotencyKey"
+      ],
+      "successResponse": "to_align_with_existing_response_convention",
+      "result": "Authorized capability-specific grant; server derives grantor and company.",
+      "contractStatus": "proposed",
+      "implemented": false
+    },
+    {
+      "method": "POST",
+      "path": "/grants/:id/revoke",
+      "requiredFieldsOrChecks": [
+        "ownedGrantId",
+        "expectedGrantVersion",
+        "reason",
+        "idempotencyKey"
+      ],
+      "successResponse": "to_align_with_existing_response_convention",
+      "result": "Versioned revocation immediately affects new consequential dispatch.",
+      "contractStatus": "proposed",
+      "implemented": false
+    }
+  ],
+  "authority": [
+    {
+      "capability": "read_and_calculate",
+      "action": "Permitted scoped reads, scans and deterministic calculation",
+      "requiredAuthority": "Existing authenticated read authority; no business write or new contact.",
+      "consequential": false,
+      "roleMappingStatus": "OM-D04 unresolved",
+      "runtimePermissionGranted": false
+    },
+    {
+      "capability": "internal_draft",
+      "action": "Internal findings, task suggestions and content drafts",
+      "requiredAuthority": "Permitted draft authority; output is untrusted until validated.",
+      "consequential": false,
+      "roleMappingStatus": "OM-D04 unresolved",
+      "runtimePermissionGranted": false
+    },
+    {
+      "capability": "customer_contact",
+      "action": "Send message, estimate or invoice",
+      "requiredAuthority": "Exact purpose/channel/destination consent, current entity/eligibility, approved content and capability scope.",
+      "consequential": true,
+      "roleMappingStatus": "OM-D04 unresolved",
+      "runtimePermissionGranted": false
+    },
+    {
+      "capability": "ads.launch",
+      "action": "Create/activate bounded campaign",
+      "requiredAuthority": "Explicit owner or authorized financial capability; exact plan/content/area/dates and reserved supported exposure.",
+      "consequential": true,
+      "roleMappingStatus": "OM-D04 unresolved",
+      "runtimePermissionGranted": false
+    },
+    {
+      "capability": "offer.publish",
+      "action": "Publish offer or customer-facing page",
+      "requiredAuthority": "Approved truthful scope/content and applicable publication/price authority.",
+      "consequential": true,
+      "roleMappingStatus": "OM-D04 unresolved",
+      "runtimePermissionGranted": false
+    },
+    {
+      "capability": "price_change",
+      "action": "Change price or discount",
+      "requiredAuthority": "Separate explicit pricing authority. Mission selection and generic admin access do not supply it.",
+      "consequential": true,
+      "roleMappingStatus": "OM-D04 unresolved",
+      "runtimePermissionGranted": false
+    },
+    {
+      "capability": "schedule.reassign",
+      "action": "Change confirmed schedule",
+      "requiredAuthority": "Applicable operational grant, customer commitments, qualifications and atomic live resource feasibility.",
+      "consequential": true,
+      "roleMappingStatus": "OM-D04 unresolved",
+      "runtimePermissionGranted": false
+    },
+    {
+      "capability": "inventory.transfer",
+      "action": "Transfer inventory",
+      "requiredAuthority": "Applicable grant, verified physical stock, current version and supported domain movement.",
+      "consequential": true,
+      "roleMappingStatus": "OM-D04 unresolved",
+      "runtimePermissionGranted": false
+    },
+    {
+      "capability": "agreement_enrollment",
+      "action": "Create accepted agreement obligation",
+      "requiredAuthority": "Supported enrollment capability, customer-accepted exact terms and supported billing state. Do not infer autopay.",
+      "consequential": true,
+      "roleMappingStatus": "OM-D04 unresolved",
+      "runtimePermissionGranted": false
+    },
+    {
+      "capability": "disabled_actions",
+      "action": "Supplier purchase, settlement, automatic charge, hiring commitment or uncertain technical scope",
+      "requiredAuthority": "Recommend-only until separately enabled and authorized. No generic agent/tool access confers these powers.",
+      "consequential": true,
+      "roleMappingStatus": "OM-D04 unresolved",
+      "runtimePermissionGranted": false
+    }
+  ],
+  "authorityCases": [
+    {
+      "caseId": "OM-AUTH-01",
+      "id": "selected_mission_not_grant",
+      "input": {
+        "actorRole": "owner",
+        "missionSelected": "more_bookings",
+        "grant": null
+      },
+      "expected": "Allow permitted assessment only; no contact, ad launch, pricing or booking mutation.",
+      "acceptanceRefs": [
+        "OM-A09"
+      ],
+      "status": "prepared",
+      "runtimeAcceptance": "not_executed"
+    },
+    {
+      "caseId": "OM-AUTH-02",
+      "id": "dispatcher_generic_access",
+      "input": {
+        "actorRole": "dispatcher",
+        "legacyApproveRouteAccessible": true,
+        "requestedCapability": "ads.launch",
+        "explicitFinancialGrant": false
+      },
+      "expected": "Deny requested spending capability without inferring it from generic action route access.",
+      "acceptanceRefs": [
+        "OM-A09"
+      ],
+      "status": "prepared",
+      "runtimeAcceptance": "not_executed"
+    },
+    {
+      "caseId": "OM-AUTH-03",
+      "id": "tenant_mismatch",
+      "input": {
+        "trustedCompany": "fixture-company-a",
+        "targetCompany": "fixture-company-b"
+      },
+      "expected": "Return the established non-disclosing not-found behavior before mutation; no cross-tenant data.",
+      "acceptanceRefs": [
+        "OM-A05"
+      ],
+      "status": "prepared",
+      "runtimeAcceptance": "not_executed"
+    },
+    {
+      "caseId": "OM-AUTH-04",
+      "id": "expired_grant",
+      "input": {
+        "grantExpiresAt": "2026-11-05T18:00:00Z",
+        "dispatchAt": "2026-11-05T18:00:01Z"
+      },
+      "expected": "Block new dispatch with GRANT_EXPIRED; preserve prior real effects and reconciliation.",
+      "acceptanceRefs": [
+        "OM-A09"
+      ],
+      "status": "prepared",
+      "runtimeAcceptance": "not_executed"
+    },
+    {
+      "caseId": "OM-AUTH-05",
+      "id": "consent_changed",
+      "input": {
+        "approvedContactVersion": 3,
+        "currentContactVersion": 4,
+        "currentConsent": "revoked"
+      },
+      "expected": "Block send with CONSENT_CHANGED and no provider call; old approval cannot overrule current revocation.",
+      "acceptanceRefs": [
+        "OM-A09"
+      ],
+      "status": "prepared",
+      "runtimeAcceptance": "not_executed"
+    },
+    {
+      "caseId": "OM-AUTH-06",
+      "id": "hash_changed",
+      "input": {
+        "approvedPayloadHash": "fixture-hash-v1",
+        "requestedPayloadHash": "fixture-hash-v2",
+        "change": "increase exposure"
+      },
+      "expected": "Reject stale/material approval; require a newly reviewed exact version/scope.",
+      "acceptanceRefs": [
+        "OM-A27"
+      ],
+      "status": "prepared",
+      "runtimeAcceptance": "not_executed"
+    },
+    {
+      "caseId": "OM-AUTH-07",
+      "id": "missing_mutation_key",
+      "input": {
+        "endpoint": "POST /plans/:id/approve",
+        "expectedVersion": 2,
+        "idempotencyKey": null
+      },
+      "expected": "Reject validation before any grant/action creation. Legacy optional idempotency is not copied into OM.",
+      "acceptanceRefs": [
+        "OM-A07"
+      ],
+      "status": "prepared",
+      "runtimeAcceptance": "not_executed"
+    },
+    {
+      "caseId": "OM-AUTH-08",
+      "id": "reused_key_changed_request",
+      "input": {
+        "idempotencyKey": "fixture-approve-01",
+        "firstRequestHash": "fixture-hash-1",
+        "secondRequestHash": "fixture-hash-2"
+      },
+      "expected": "Return conflict and preserve the original result; do not create a second grant or broaden exposure.",
+      "acceptanceRefs": [
+        "OM-A07"
+      ],
+      "status": "prepared",
+      "runtimeAcceptance": "not_executed"
+    },
+    {
+      "caseId": "OM-AUTH-09",
+      "id": "valid_narrow_substitution",
+      "input": {
+        "fixtureOnly": true,
+        "grantAllowsEquivalentEligibleSlots": true,
+        "newSlotWithinApprovedScope": true,
+        "currentFeasibility": true
+      },
+      "expected": "Permit only a substitution expressly bounded by the actual grant and domain checks; it grants no new content, spending or service scope.",
+      "acceptanceRefs": [
+        "OM-A11"
+      ],
+      "status": "prepared",
+      "runtimeAcceptance": "not_executed"
+    },
+    {
+      "caseId": "OM-AUTH-10",
+      "id": "shared_intent_different_recipient",
+      "input": {
+        "intentIdentityOtherwiseEqual": true,
+        "recipientA": "fixture-recipient-a",
+        "recipientB": "fixture-recipient-b"
+      },
+      "expected": "Treat incompatible recipient/content/exposure as a conflict requiring coordinated review, not a silent merge.",
+      "acceptanceRefs": [
+        "OM-A10"
+      ],
+      "status": "prepared",
+      "runtimeAcceptance": "not_executed"
+    },
+    {
+      "caseId": "OM-AUTH-11",
+      "id": "unverified_stock",
+      "input": {
+        "requestedCapability": "inventory.transfer",
+        "physicalVerification": null,
+        "recordVersion": 7
+      },
+      "expected": "Return DATA_UNVERIFIED or supported readiness task; no movement from guessed stock.",
+      "acceptanceRefs": [
+        "OM-A11"
+      ],
+      "status": "prepared",
+      "runtimeAcceptance": "not_executed"
+    },
+    {
+      "caseId": "OM-AUTH-12",
+      "id": "agreement_no_accepted_terms",
+      "input": {
+        "customerAgreementAcceptance": null,
+        "requestedAutomaticCharge": true
+      },
+      "expected": "No enrollment/charge; request supported accepted terms and separate billing authority.",
+      "acceptanceRefs": [
+        "OM-A32"
+      ],
+      "status": "prepared",
+      "runtimeAcceptance": "not_executed"
+    }
+  ],
+  "lifecycleCases": [
+    {
+      "caseId": "OM-LIFE-01",
+      "id": "same_state_edit_race",
+      "given": "Two writers read version 5, state awaiting_approval, then edit parameters without changing state.",
+      "expected": "Exactly one commits version 6; other receives conflict. State-only WHERE is insufficient.",
+      "acceptanceRefs": [
+        "OM-A06"
+      ],
+      "status": "prepared",
+      "runtimeAcceptance": "not_executed"
+    },
+    {
+      "caseId": "OM-LIFE-02",
+      "id": "expiry_race",
+      "given": "Expiry reads an eligible nonterminal action; approval/dispatch commits a newer version before expiry update.",
+      "expected": "Expiry uses matching source state/version and cannot overwrite newer action. Audit records only the actual successful transition.",
+      "acceptanceRefs": [
+        "OM-A06"
+      ],
+      "status": "prepared",
+      "runtimeAcceptance": "not_executed"
+    },
+    {
+      "caseId": "OM-LIFE-03",
+      "id": "single_step_claim",
+      "given": "Two workers claim the same ready step with the same run/step revision.",
+      "expected": "One valid lease and one reservation/outbox intent. The losing worker cannot call the provider.",
+      "acceptanceRefs": [
+        "OM-A07"
+      ],
+      "status": "prepared",
+      "runtimeAcceptance": "not_executed"
+    },
+    {
+      "caseId": "OM-LIFE-04",
+      "id": "transaction_rollback",
+      "given": "Failure occurs after reservation but before action/outbox/audit transaction commit.",
+      "expected": "All related database changes roll back together; no detached reservation or dispatchable intent.",
+      "acceptanceRefs": [
+        "OM-A07"
+      ],
+      "status": "prepared",
+      "runtimeAcceptance": "not_executed"
+    },
+    {
+      "caseId": "OM-LIFE-05",
+      "id": "provider_accept_then_crash",
+      "given": "Provider accepts the request; process dies before persisting acknowledgment.",
+      "expected": "Recover original attempt/key, reconcile provider state, record existing effect once. No new write before resolving uncertain effect.",
+      "acceptanceRefs": [
+        "OM-A08"
+      ],
+      "status": "prepared",
+      "runtimeAcceptance": "not_executed"
+    },
+    {
+      "caseId": "OM-LIFE-06",
+      "id": "duplicate_out_of_order",
+      "given": "Authenticated source events repeat or a lower version arrives after a higher version.",
+      "expected": "Preserve audit receipt once per unique event, apply source ordering/corrections, and do not regress terminal facts or double-count.",
+      "acceptanceRefs": [
+        "OM-A14"
+      ],
+      "status": "prepared",
+      "runtimeAcceptance": "not_executed"
+    },
+    {
+      "caseId": "OM-LIFE-07",
+      "id": "new_draft_preserves_active",
+      "given": "An approved plan is running when a replacement draft is proposed.",
+      "expected": "Draft does not revoke active approval. Only activating an approved replacement changes the active pointer.",
+      "acceptanceRefs": [
+        "OM-A27"
+      ],
+      "status": "prepared",
+      "runtimeAcceptance": "not_executed"
+    },
+    {
+      "caseId": "OM-LIFE-08",
+      "id": "replacement_activation",
+      "given": "An approved replacement is activated while old unstarted and in-flight steps exist.",
+      "expected": "Atomic pointer/revision change invalidates obsolete unstarted approvals; expressly retained actions require valid authority; in-flight effects reconcile.",
+      "acceptanceRefs": [
+        "OM-A27"
+      ],
+      "status": "prepared",
+      "runtimeAcceptance": "not_executed"
+    },
+    {
+      "caseId": "OM-LIFE-09",
+      "id": "pause_during_dispatch",
+      "given": "Pause/cancel races a not-yet-claimed step, an already-claimed but undispatched worker, and an already dispatched provider request.",
+      "expected": "Serialize pause/cancel against final dispatch authorization and recheck current run state at that boundary. A claimed but undispatched worker must not start a new provider request under paused/cancelled state. An effect already across the dispatch boundary remains visible and reconciles; pause cannot reverse it.",
+      "acceptanceRefs": [
+        "OM-A24"
+      ],
+      "status": "prepared",
+      "runtimeAcceptance": "not_executed"
+    },
+    {
+      "caseId": "OM-LIFE-10",
+      "id": "cancel_one_sponsor",
+      "given": "Two valid mission sponsors share one compatible action; one mission cancels.",
+      "expected": "Detach only cancelled sponsorship, retain execution if remaining authority/resources suffice, release unused claims once, count outcome once.",
+      "acceptanceRefs": [
+        "OM-A28"
+      ],
+      "status": "prepared",
+      "runtimeAcceptance": "not_executed"
+    },
+    {
+      "caseId": "OM-LIFE-11",
+      "id": "proposal_holds",
+      "given": "A plan draft mentions a slot, then a customer chooses it after availability changes.",
+      "expected": "Draft holds no indefinite reservation. Recheck and reserve live through domain rules or offer a valid alternative.",
+      "acceptanceRefs": [
+        "OM-A11"
+      ],
+      "status": "prepared",
+      "runtimeAcceptance": "not_executed"
+    },
+    {
+      "caseId": "OM-LIFE-12",
+      "id": "legacy_queued_receipt",
+      "given": "Legacy agent.execution_succeeded contains queued/no-provider-send evidence.",
+      "expected": "Record dispatch activity only; delivered messages, bookings, collected cash and mission wins all remain unchanged.",
+      "acceptanceRefs": [
+        "OM-A30"
+      ],
+      "status": "prepared",
+      "runtimeAcceptance": "not_executed"
+    },
+    {
+      "caseId": "OM-LIFE-13",
+      "id": "workflow_vs_target",
+      "given": "Workflow finishes with headline target reached but a mandatory matured guardrail failed.",
+      "expected": "Workflow completed; outcome target_not_met; actual outcomes visible; causal status unchanged.",
+      "acceptanceRefs": [
+        "OM-A34"
+      ],
+      "status": "prepared",
+      "runtimeAcceptance": "not_executed"
+    },
+    {
+      "caseId": "OM-LIFE-14",
+      "id": "missing_evidence_end",
+      "given": "Review cycle finishes with necessary evidence missing beyond recoverable maturation.",
+      "expected": "Workflow completed; outcome not_evaluable with reason and partial verified results; not automatic success or zero.",
+      "acceptanceRefs": [
+        "OM-A34"
+      ],
+      "status": "prepared",
+      "runtimeAcceptance": "not_executed"
+    },
+    {
+      "caseId": "OM-LIFE-15",
+      "id": "callback_tenant_spoof",
+      "given": "Unauthenticated callback claims known campaign and company IDs.",
+      "expected": "Reject before trusted event normalization; tenant comes only from independently verified account/resource binding.",
+      "acceptanceRefs": [
+        "OM-A29"
+      ],
+      "status": "prepared",
+      "runtimeAcceptance": "not_executed"
+    }
+  ],
+  "errors": [
+    {
+      "code": "MISSION_NOT_READY",
+      "meaning": "Required inputs or accepted policy are missing.",
+      "userNextStep": "Review the missing requirements.",
+      "httpMapping": "map to current shared error conventions during OM-01; do not add a conflicting second mapping"
+    },
+    {
+      "code": "CAPABILITY_UNAVAILABLE",
+      "meaning": "Required provider/method is unsupported or unverified.",
+      "userNextStep": "Use an available assessment or supported next step.",
+      "httpMapping": "map to current shared error conventions during OM-01; do not add a conflicting second mapping"
+    },
+    {
+      "code": "APPROVAL_STALE",
+      "meaning": "Approved version/hash is no longer valid.",
+      "userNextStep": "Review the changed plan.",
+      "httpMapping": "map to current shared error conventions during OM-01; do not add a conflicting second mapping"
+    },
+    {
+      "code": "GRANT_EXPIRED",
+      "meaning": "Current scoped grant expired.",
+      "userNextStep": "Review and renew the applicable authority.",
+      "httpMapping": "map to current shared error conventions during OM-01; do not add a conflicting second mapping"
+    },
+    {
+      "code": "SOURCE_CHANGED",
+      "meaning": "A referenced mutable source changed.",
+      "userNextStep": "Reassess against current facts.",
+      "httpMapping": "map to current shared error conventions during OM-01; do not add a conflicting second mapping"
+    },
+    {
+      "code": "RESOURCE_CONFLICT",
+      "meaning": "Required domain resource cannot be reserved.",
+      "userNextStep": "Select another feasible option.",
+      "httpMapping": "map to current shared error conventions during OM-01; do not add a conflicting second mapping"
+    },
+    {
+      "code": "CONSENT_CHANGED",
+      "meaning": "Current contact authorization is missing/changed/revoked.",
+      "userNextStep": "Stop contact and review permitted next steps.",
+      "httpMapping": "map to current shared error conventions during OM-01; do not add a conflicting second mapping"
+    },
+    {
+      "code": "BUDGET_EXHAUSTED",
+      "meaning": "Approved exposure is unavailable.",
+      "userNextStep": "Stop new discretionary dispatch; preserve required reconciliation.",
+      "httpMapping": "map to current shared error conventions during OM-01; do not add a conflicting second mapping"
+    },
+    {
+      "code": "PROVIDER_OUTCOME_UNKNOWN",
+      "meaning": "A provider effect is uncertain.",
+      "userNextStep": "Reconcile the original request before another write.",
+      "httpMapping": "map to current shared error conventions during OM-01; do not add a conflicting second mapping"
+    },
+    {
+      "code": "DATA_UNVERIFIED",
+      "meaning": "Required source evidence is unreliable or missing.",
+      "userNextStep": "Request the specific verification.",
+      "httpMapping": "map to current shared error conventions during OM-01; do not add a conflicting second mapping"
+    },
+    {
+      "code": "MODEL_BUDGET_EXHAUSTED",
+      "meaning": "No safe model allowance remains.",
+      "userNextStep": "Continue deterministic processing and existing commitments.",
+      "httpMapping": "map to current shared error conventions during OM-01; do not add a conflicting second mapping"
+    }
+  ],
+  "missionStates": [
+    "assessing",
+    "needs_input",
+    "ready_for_review",
+    "approved",
+    "running",
+    "monitoring",
+    "completed",
+    "paused",
+    "blocked",
+    "cancelled",
+    "failed"
+  ],
+  "stepStates": [
+    "planned",
+    "awaiting_approval",
+    "ready",
+    "executing",
+    "waiting_event",
+    "verifying",
+    "succeeded",
+    "blocked",
+    "needs_reconciliation",
+    "failed",
+    "cancelled",
+    "skipped"
+  ],
+  "outcomeVerdicts": [
+    "pending",
+    "target_met",
+    "target_not_met",
+    "not_evaluable"
+  ],
+  "effectStatusLabels": [
+    "no estimate",
+    "observational evidence",
+    "analysis pending",
+    "reported effect estimate with uncertainty and decision"
+  ],
+  "eventNames": [
+    "mission.assessed",
+    "plan.proposed",
+    "plan.approved",
+    "step.ready",
+    "step.dispatched",
+    "step.awaiting_event",
+    "step.verified",
+    "mission.paused",
+    "finding.resolved",
+    "outcome.projected"
+  ],
+  "eventEnvelopeRequiredFields": [
+    "serverTrustedCompanyId",
+    "eventId",
+    "sourceId",
+    "sourceVersion",
+    "correlationId",
+    "schemaVersion",
+    "occurredAt",
+    "receivedAt",
+    "payloadRef",
+    "processingReceipt"
+  ],
+  "grantRequiredFields": [
+    "grantId",
+    "companyId",
+    "grantedByUserId",
+    "authorizedActorOrRole",
+    "missionScope",
+    "capabilityScopes",
+    "serviceScope",
+    "customerScope",
+    "contentTemplateVersions",
+    "allowedChannels",
+    "spendingLimits",
+    "scheduleConstraints",
+    "validFrom",
+    "expiresAt",
+    "revokedAt",
+    "grantVersion"
+  ],
+  "compatibilityRules": [
+    "Keep existing agent action terminal states; OM step state is not a replacement lifecycle.",
+    "Keep stored legacy agent product identifiers unless explicitly migrated with all consumers.",
+    "Keep legacy event consumers; version dispatch-stage evidence rather than reinterpret event names as outcomes.",
+    "Server derives company/actor; all referenced entities and provider bindings require ownership validation.",
+    "Mutation keys and version/hash predicates are mandatory for consequential OM commands even where legacy endpoints are looser.",
+    "No production types, routes, migrations, permissions or event consumers are added by this preparation."
+  ]
+}

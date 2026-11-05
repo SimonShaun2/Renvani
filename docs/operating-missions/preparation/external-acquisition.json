@@ -1,0 +1,446 @@
+{
+  "schemaVersion": "om-preparation.acquisition/1.0",
+  "baseCommit": "7840884d346ca95788e2668cc78148afa3b6a843",
+  "sourceNotionUrl": "https://app.notion.com/p/40e317b92d1581188031e8a0a4c847c9",
+  "sourceSections": [
+    10,
+    16,
+    17,
+    21
+  ],
+  "implementationStatus": "not_started",
+  "realAccountReadiness": "not_verified",
+  "gates": [
+    {
+      "gateId": "OM-EXT-G01",
+      "id": "account_binding",
+      "label": "Authorized account and trusted tenant binding",
+      "requiredEvidence": "Verified provider account/resource ownership and required account access; server mapping to company, never a public companyId.",
+      "currentEvidence": "not_verified_for_customer_account",
+      "activationStatus": "blocked_until_evidenced",
+      "decisionRefs": [
+        "OM-D09"
+      ]
+    },
+    {
+      "gateId": "OM-EXT-G02",
+      "id": "api_support",
+      "label": "Pinned supported API and adapter",
+      "requiredEvidence": "Pinned API/client version, supported Search resource operations, test evidence and adapter revision. Public documentation alone does not pass this gate.",
+      "currentEvidence": "not_verified_for_customer_account",
+      "activationStatus": "blocked_until_evidenced",
+      "decisionRefs": [
+        "OM-D09"
+      ]
+    },
+    {
+      "gateId": "OM-EXT-G03",
+      "id": "credentials",
+      "label": "Credential boundary",
+      "requiredEvidence": "Existing trusted adapter secret references and scopes verified; no secret or authenticated browser session in model/fixture/Notion context.",
+      "currentEvidence": "not_verified_for_customer_account",
+      "activationStatus": "blocked_until_evidenced",
+      "decisionRefs": [
+        "OM-D09"
+      ]
+    },
+    {
+      "gateId": "OM-EXT-G04",
+      "id": "billing",
+      "label": "Billing and currency",
+      "requiredEvidence": "Usable billing state, account currency, approved tax/fee treatment and current account restrictions.",
+      "currentEvidence": "not_verified_for_customer_account",
+      "activationStatus": "blocked_until_evidenced",
+      "decisionRefs": [
+        "OM-D09"
+      ]
+    },
+    {
+      "gateId": "OM-EXT-G05",
+      "id": "service_and_area",
+      "label": "Truthful offering and fulfillment",
+      "requiredEvidence": "Approved current service/area, qualifications, duration, customer windows and available fulfillment path.",
+      "currentEvidence": "not_verified_for_customer_account",
+      "activationStatus": "blocked_until_evidenced",
+      "decisionRefs": [
+        "OM-D06"
+      ]
+    },
+    {
+      "gateId": "OM-EXT-G06",
+      "id": "content_and_authority",
+      "label": "Exact approved plan and content",
+      "requiredEvidence": "Plan version/hash, approved service page and creative, recipients where applicable, capability-specific grant, dates and exposure.",
+      "currentEvidence": "not_verified_for_customer_account",
+      "activationStatus": "blocked_until_evidenced",
+      "decisionRefs": [
+        "OM-D04"
+      ]
+    },
+    {
+      "gateId": "OM-EXT-G07",
+      "id": "native_budget",
+      "label": "Enforceable total exposure",
+      "requiredEvidence": "Provider-native CUSTOM_PERIOD total budget, finite dates and non-shared budget; decimal conversion; full exposure reserved once.",
+      "currentEvidence": "not_verified_for_customer_account",
+      "activationStatus": "blocked_until_evidenced",
+      "decisionRefs": [
+        "OM-D09"
+      ]
+    },
+    {
+      "gateId": "OM-EXT-G08",
+      "id": "daily_constraint",
+      "label": "Any daily hard limit",
+      "requiredEvidence": "Explicit owner requirement. If required, independently verified compatible enforcement; total budget, average daily budget and polling do not establish this.",
+      "currentEvidence": "not_verified_for_customer_account",
+      "activationStatus": "blocked_until_evidenced",
+      "decisionRefs": [
+        "OM-D09"
+      ]
+    },
+    {
+      "gateId": "OM-EXT-G09",
+      "id": "owned_intake",
+      "label": "Owned page and form",
+      "requiredEvidence": "Exact approved page/version, successful validated form submission, rate limiting, trusted site binding and source preservation.",
+      "currentEvidence": "not_verified_for_customer_account",
+      "activationStatus": "blocked_until_evidenced",
+      "decisionRefs": [
+        "OM-D09"
+      ]
+    },
+    {
+      "gateId": "OM-EXT-G10",
+      "id": "canonical_lineage",
+      "label": "Canonical opportunity and attribution",
+      "requiredEvidence": "Conservative deduplication, ambiguous match handling, allowed source identifiers and stable canonical stage identities.",
+      "currentEvidence": "not_verified_for_customer_account",
+      "activationStatus": "blocked_until_evidenced",
+      "decisionRefs": [
+        "OM-D07"
+      ]
+    },
+    {
+      "gateId": "OM-EXT-G11",
+      "id": "booking_path",
+      "label": "Verified supported booking handoff",
+      "requiredEvidence": "Authorized controlled proof that the supported intake-to-booking path can preserve identity, obtain acceptance and enforce live domain checks. No pre-existing customer or booking is required to launch. Each later real confirmation independently requires current customer acceptance, qualification, slot/resource checks and the declared booking type.",
+      "currentEvidence": "not_verified_for_customer_account",
+      "activationStatus": "blocked_until_evidenced",
+      "decisionRefs": [
+        "OM-D06"
+      ]
+    },
+    {
+      "gateId": "OM-EXT-G12",
+      "id": "receipts_and_recovery",
+      "label": "Authenticated receipts and recovery",
+      "requiredEvidence": "Verified callbacks/account binding, request IDs, dedupe/source order, cost cursor, uncertain-effect reconciliation, pause and late-result handling.",
+      "currentEvidence": "not_verified_for_customer_account",
+      "activationStatus": "blocked_until_evidenced",
+      "decisionRefs": [
+        "OM-D09"
+      ]
+    },
+    {
+      "gateId": "OM-EXT-G13",
+      "id": "measurement",
+      "label": "Defined result and economic evidence",
+      "requiredEvidence": "Declared booking type, fixed cohort, accounting/adjustment definitions, maturation, coverage and approved experiment exposure. Unknown return inputs remain unknown.",
+      "currentEvidence": "not_verified_for_customer_account",
+      "activationStatus": "blocked_until_evidenced",
+      "decisionRefs": [
+        "OM-D01"
+      ]
+    }
+  ],
+  "cases": [
+    {
+      "caseId": "OM-EXT-01",
+      "id": "no_history_external_route",
+      "input": {
+        "localHistoryCount": 0,
+        "recoveryBacklogCount": 0,
+        "service": "fixture_hvac_diagnostic",
+        "documentedDemandHypothesis": true
+      },
+      "expected": "Assess Search using labeled assumptions; do not require an estimate backlog. Paid activation still needs every applicable gate.",
+      "acceptanceRefs": [
+        "OM-A02",
+        "OM-A03"
+      ],
+      "status": "prepared",
+      "runtimeAcceptance": "not_executed",
+      "allInputValuesSynthetic": true
+    },
+    {
+      "caseId": "OM-EXT-02",
+      "id": "provider_unavailable",
+      "input": {
+        "providerReadiness": "unverified",
+        "draftContentPrepared": true
+      },
+      "expected": "Return assessment_only with missing account/API/billing/control evidence. Do not expose an executable launch or report a provider resource.",
+      "acceptanceRefs": [
+        "OM-A04"
+      ],
+      "status": "prepared",
+      "runtimeAcceptance": "not_executed",
+      "allInputValuesSynthetic": true
+    },
+    {
+      "caseId": "OM-EXT-03",
+      "id": "paused_before_activation",
+      "input": {
+        "fixtureAuthority": "exact campaign/content/exposure only",
+        "requestedInitialProviderStatus": "PAUSED"
+      },
+      "expected": "Create only paused resources under valid authority; independently verify exact page/form/source path and native budget before any approved activation.",
+      "acceptanceRefs": [
+        "OM-A12"
+      ],
+      "status": "prepared",
+      "runtimeAcceptance": "not_executed",
+      "allInputValuesSynthetic": true
+    },
+    {
+      "caseId": "OM-EXT-04",
+      "id": "decimal_exposure",
+      "input": {
+        "currency": "USD",
+        "fixtureOnly": true,
+        "approvedMedia": "100.00",
+        "knownAdditionalCharges": "10.00",
+        "approvedTotalExposure": "110.00",
+        "sharedBudgetReserved": "110.00"
+      },
+      "expected": "Convert media to exactly 100000000 provider micros. Reserve 110.00 once across mission sponsors; do not treat fees as media or use floating-point rounding.",
+      "acceptanceRefs": [
+        "OM-A10",
+        "OM-A12"
+      ],
+      "status": "prepared",
+      "runtimeAcceptance": "not_executed",
+      "allInputValuesSynthetic": true
+    },
+    {
+      "caseId": "OM-EXT-05",
+      "id": "unknown_fees",
+      "input": {
+        "approvedMedia": "100.00",
+        "taxFeeTreatment": null
+      },
+      "expected": "Block activation until the approved exposure envelope accounts for applicable additional charges or a supported reviewed bound; unknown is not zero.",
+      "acceptanceRefs": [
+        "OM-A12"
+      ],
+      "status": "prepared",
+      "runtimeAcceptance": "not_executed",
+      "allInputValuesSynthetic": true
+    },
+    {
+      "caseId": "OM-EXT-06",
+      "id": "hard_daily_ceiling",
+      "input": {
+        "ownerRequiresHardDailyLimit": true,
+        "verifiedControl": "total_campaign_budget_only"
+      },
+      "expected": "Leave campaign drafted. Do not claim that total budget or average daily budget enforces a daily hard maximum.",
+      "acceptanceRefs": [
+        "OM-A12"
+      ],
+      "status": "prepared",
+      "runtimeAcceptance": "not_executed",
+      "allInputValuesSynthetic": true
+    },
+    {
+      "caseId": "OM-EXT-07",
+      "id": "public_tenant_spoof",
+      "input": {
+        "trustedSiteBinding": "fixture-company-a",
+        "submittedCompanyId": "fixture-company-b"
+      },
+      "expected": "Resolve only company A from verified binding, reject/ignore untrusted override according to public API contract, and never read or create company B records.",
+      "acceptanceRefs": [
+        "OM-A05",
+        "OM-A29"
+      ],
+      "status": "prepared",
+      "runtimeAcceptance": "not_executed",
+      "allInputValuesSynthetic": true
+    },
+    {
+      "caseId": "OM-EXT-08",
+      "id": "duplicate_and_ambiguous_intake",
+      "input": {
+        "sameProviderEventRepeated": 2,
+        "ambiguousContactMatches": 2
+      },
+      "expected": "Deduplicate exact verified replay; preserve two ambiguous customer matches for review. Do not merge distinct people or create a second opportunity from replay.",
+      "acceptanceRefs": [
+        "OM-A14"
+      ],
+      "status": "prepared",
+      "runtimeAcceptance": "not_executed",
+      "allInputValuesSynthetic": true
+    },
+    {
+      "caseId": "OM-EXT-09",
+      "id": "email_estimate_path",
+      "input": {
+        "opportunityId": "fixture-opp-email-01",
+        "estimateId": "fixture-estimate-01",
+        "estimateVersion": 2,
+        "customerAcceptedVersion": 2,
+        "liveSlotAvailable": true
+      },
+      "expected": "Keep one underlying opportunity through inquiry, estimate acceptance, canonical job/work order and confirmed service. Only customer-accepted current scope plus live feasibility can confirm the declared service type.",
+      "acceptanceRefs": [
+        "OM-A11",
+        "OM-A13"
+      ],
+      "status": "prepared",
+      "runtimeAcceptance": "not_executed",
+      "allInputValuesSynthetic": true
+    },
+    {
+      "caseId": "OM-EXT-10",
+      "id": "onsite_assessment_then_work",
+      "input": {
+        "opportunityId": "fixture-opp-site-01",
+        "assessmentBookingId": "fixture-assessment-01",
+        "assessmentType": "diagnostic",
+        "repairAccepted": false
+      },
+      "expected": "Count only the confirmed assessment in its declared assessment cohort. Technician findings and a proposed repair estimate are not accepted repair work. Customer acceptance and valid domain conversion are separate required facts.",
+      "acceptanceRefs": [
+        "OM-A13",
+        "OM-A15"
+      ],
+      "status": "prepared",
+      "runtimeAcceptance": "not_executed",
+      "allInputValuesSynthetic": true
+    },
+    {
+      "caseId": "OM-EXT-11",
+      "id": "unknown_provider_effect",
+      "input": {
+        "requestId": "fixture-request-01",
+        "providerTimeoutAfterPossibleAcceptance": true
+      },
+      "expected": "Mark needs_reconciliation; query by original request/provider identity. Do not create a second campaign or resend on an assumed failure.",
+      "acceptanceRefs": [
+        "OM-A08"
+      ],
+      "status": "prepared",
+      "runtimeAcceptance": "not_executed",
+      "allInputValuesSynthetic": true
+    },
+    {
+      "caseId": "OM-EXT-12",
+      "id": "spoofed_callback",
+      "input": {
+        "signatureValid": false,
+        "claimedCampaignId": "fixture-campaign-01",
+        "claimedCompanyId": "fixture-company-a"
+      },
+      "expected": "Reject before normalization and tenant outcome mutation. Matching payload identifiers cannot replace verified provider/account binding.",
+      "acceptanceRefs": [
+        "OM-A29"
+      ],
+      "status": "prepared",
+      "runtimeAcceptance": "not_executed",
+      "allInputValuesSynthetic": true
+    },
+    {
+      "caseId": "OM-EXT-13",
+      "id": "late_cancelled_result",
+      "input": {
+        "planState": "cancelled",
+        "validLatePaymentReceipt": true
+      },
+      "expected": "Preserve real financial evidence and reconcile it into the correct projection; do not restart cancelled steps or describe already incurred spend as reversed.",
+      "acceptanceRefs": [
+        "OM-A14",
+        "OM-A24"
+      ],
+      "status": "prepared",
+      "runtimeAcceptance": "not_executed",
+      "allInputValuesSynthetic": true
+    },
+    {
+      "caseId": "OM-EXT-14",
+      "id": "untracked_call",
+      "input": {
+        "staffRecordedInquiry": true,
+        "callTrackingAdapterActive": false,
+        "advertisingSourceClaim": "unverified"
+      },
+      "expected": "Use supported staff intake, preserve unknown/unverified attribution, and do not credit the campaign without permitted reliable linkage.",
+      "acceptanceRefs": [
+        "OM-A13"
+      ],
+      "status": "prepared",
+      "runtimeAcceptance": "not_executed",
+      "allInputValuesSynthetic": true
+    },
+    {
+      "caseId": "OM-EXT-15",
+      "id": "lead_volume_no_expansion",
+      "input": {
+        "inquiries": 20,
+        "maturedCompletedAcquiredJobs": 0,
+        "verifiedCostsComplete": false
+      },
+      "expected": "Report observed inquiries only. Do not increase budget or claim profitable growth; apply approved maturation and economic evidence rules.",
+      "acceptanceRefs": [
+        "OM-A23"
+      ],
+      "status": "prepared",
+      "runtimeAcceptance": "not_executed",
+      "allInputValuesSynthetic": true
+    }
+  ],
+  "requiredLineageFields": [
+    "companyId_from_verified_binding",
+    "opportunityId",
+    "inquiryId",
+    "customerRef_or_ambiguous_match",
+    "serviceNeedType",
+    "servicePageVersion",
+    "approvedSourceIdentifiers",
+    "consentEvidenceRef",
+    "estimateId_and_acceptedVersion",
+    "bookingId_and_declaredType",
+    "jobId_and_relationship",
+    "performedServiceAllocationRefs",
+    "invoiceAndCreditRefs",
+    "settledPaymentAndRefundRefs",
+    "agreementTermsAndObligationRefs",
+    "sourceEventId_and_version",
+    "occurredAt",
+    "receivedAt",
+    "planAndCampaignBindingRefs"
+  ],
+  "externalDocumentation": [
+    {
+      "url": "https://developers.google.com/google-ads/api/docs/campaigns/budgets/create-budgets",
+      "checkedOn": "2026-11-05",
+      "supports": "CUSTOM_PERIOD, total_amount_micros, explicitly_shared=false and finite dates for the documented total-budget route.",
+      "provesCustomerAccess": false
+    },
+    {
+      "url": "https://developers.google.com/google-ads/api/docs/campaigns/budgets/overview",
+      "checkedOn": "2026-11-05",
+      "supports": "Search is included among documented total-budget campaign types; supported account/API behavior still requires test evidence.",
+      "provesCustomerAccess": false
+    },
+    {
+      "url": "https://support.google.com/google-ads/answer/10486938/about-campaign-total-budgets",
+      "checkedOn": "2026-11-05",
+      "supports": "Total budget has no daily spending limit and existing campaigns cannot switch budget type.",
+      "provesCustomerAccess": false
+    }
+  ]
+}

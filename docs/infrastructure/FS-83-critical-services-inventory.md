@@ -1,5 +1,7 @@
 # FS-83 — Critical services, data, and recovery order
 
+> **Historical source inventory, annotated 2026-11-05.** The tables below preserve FS-83's earlier snapshot. Its seven-queue denominator, `packages/ui`, custom-JWT-only assertion and legacy-domain examples are not a current inventory or deployment instruction. Use the [official stack](../OFFICIAL-OPERATIONAL-STACK.md), [current queue map](../audit/WORKER-INVENTORY.md), [schema inventory](../audit/SCHEMA-INVENTORY.md), and [CI/environment assessment](../audit/CICD-STATE.md) for the newer source baseline. Existing recovery guidance remains subject to the actual target's independently verified configuration and approved drill scope; no drill or recovery is certified here.
+
 **Scope:** Provider-neutral inventory from repository layout, `@fsm/config` env schema, and `docs/planning/PRODUCTION-DEPLOYMENT.md` (treat deployment doc as **planning hypothesis** until FS-93 verifies live accounts).
 
 **Evidence class:** `repo-derived` unless marked `account-unknown`.

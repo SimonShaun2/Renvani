@@ -46,6 +46,65 @@ describe("middleware with Clerk enabled", () => {
     expect(response.headers.get("location")).toBeNull();
   });
 
+  it("exempts exact favicon metadata paths, not lookalike protected routes", async () => {
+    const { config } = await import("../middleware");
+    const matcher = new RegExp(`^${config.matcher[0]}import { NextRequest } from "next/server";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+// Fake Clerk: no real keys or network. `auth()` reports the mocked user id.
+let mockUserId: string | null = null;
+let mockClaims: Record<string, unknown> | null = null;
+vi.mock("@clerk/nextjs/server", () => ({
+  clerkMiddleware:
+    (handler: (auth: () => Promise<{ userId: string | null; sessionClaims: unknown }>, req: NextRequest) => unknown) =>
+    (req: NextRequest) =>
+      handler(async () => ({ userId: mockUserId, sessionClaims: mockClaims }), req)
+}));
+
+async function loadMiddleware() {
+  vi.resetModules();
+  return (await import("../middleware")).middleware as (req: NextRequest) => Promise<Response>;
+}
+
+function req(path: string) {
+  return new NextRequest(`http://localhost:3000${path}`, { method: "POST" });
+}
+
+describe("middleware with Clerk enabled", () => {
+  beforeEach(() => {
+    vi.stubEnv("NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY", "pk_test_fake");
+    mockUserId = null;
+    mockClaims = null;
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it.each(["/pay/tok_1/receipt", "/vip/join/tok_1", "/portal/agreements/tok_1", "/book/acme", "/book/acme/schedule"])(
+    "keeps %s public when signed out",
+    async (path) => {
+      const middleware = await loadMiddleware();
+      const response = await middleware(req(path));
+      expect(response.headers.get("location")).toBeNull();
+    }
+  );
+
+  it.each(["/robots.txt", "/sitemap.xml", "/sitemap-index.xml", "/sitemap/0.xml"])("serves %s to signed-out crawlers (no /login redirect)", async (path) => {
+    const middleware = await loadMiddleware();
+    const response = await middleware(new NextRequest(`http://localhost:3000${path}`, { method: "GET" }));
+    expect(response.headers.get("location")).toBeNull();
+  });
+
+);
+    for (const path of ["/favicon.ico", "/icon.svg", "/apple-icon.png", "/_next/static/main.js", "/_next/image"]) {
+      expect(matcher.test(path), path).toBe(false);
+    }
+    for (const path of ["/dashboard", "/settings", "/icon.svg/secure", "/apple-icon.png/secure", "/favicon.ico/secure"]) {
+      expect(matcher.test(path), path).toBe(true);
+    }
+  });
+
   it("redirects signed-out staff routes to /login", async () => {
     const middleware = await loadMiddleware();
     const response = await middleware(req("/dashboard"));

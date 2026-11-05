@@ -8,10 +8,6 @@ const nullableStringSchema = {
   anyOf: [{ type: "string" }, { type: "null" }]
 } as const;
 
-const nullableDateTimeSchema = {
-  anyOf: [{ type: "string", format: "date-time" }, { type: "null" }]
-} as const;
-
 const errorResponseSchema = {
   type: "object",
   additionalProperties: false,

@@ -89,15 +89,6 @@ async function findMessageByLineage(
   return rows[0]?.id ?? null;
 }
 
-function pushRowError(
-  errors: ImportCommunicationsCommitRowError[],
-  rowNumber: number,
-  field: string,
-  message: string,
-): void {
-  errors.push({ rowNumber, field, message });
-}
-
 export async function commitImportedCommunicationRows(
   ctx: ImportCommunicationsCommitContext,
   rows: ImportCommunicationCommitRow[],

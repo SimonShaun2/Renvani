@@ -1,0 +1,1250 @@
+{
+  "sourceSha": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+  "extraction": "TypeScript AST: production .ts files under apps/packages; direct named <queue>Queue.add calls only. Helper aliases and indirect dispatch are resolved in the human report, not claimed exhaustive here.",
+  "registeredQueueNames": [
+    "imports",
+    "ai",
+    "notifications",
+    "invoices",
+    "agreements",
+    "webhooks",
+    "operator",
+    "exports",
+    "growth"
+  ],
+  "observedDirectNamedProducerCalls": [
+    {
+      "queue": "agreements",
+      "file": "apps/worker/src/index.ts",
+      "line": 51,
+      "context": null,
+      "jobNameExpression": "PLAN_REMINDER_SCAN_JOB_NAME",
+      "literalJobName": null,
+      "payloadExpression": "{}",
+      "optionsExpression": "{\n    repeat: {\n      pattern: \"0 14 * * *\"\n    },\n    jobId: \"plan-reminder-scan-cron\"\n  }",
+      "sourceUrl": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/worker/src/index.ts#L51"
+    },
+    {
+      "queue": "agreements",
+      "file": "packages/jobs/src/enqueue-evaluate-loyalty-reminder-candidates.ts",
+      "line": 20,
+      "context": "enqueueEvaluateLoyaltyReminderCandidatesJob",
+      "jobNameExpression": "LOYALTY_AGREEMENTS_JOB_NAMES.evaluateReminderCandidates",
+      "literalJobName": null,
+      "payloadExpression": "payload",
+      "optionsExpression": "buildDefaultEnqueueJobOptions({ jobId })",
+      "sourceUrl": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/jobs/src/enqueue-evaluate-loyalty-reminder-candidates.ts#L20"
+    },
+    {
+      "queue": "ai",
+      "file": "apps/api/src/services/estimate.service.ts",
+      "line": 1018,
+      "context": "sendEstimate",
+      "jobNameExpression": "\"estimate-follow-up-check\"",
+      "literalJobName": "estimate-follow-up-check",
+      "payloadExpression": "{\n          companyId,\n          estimateId: sentEstimate.id,\n          customerId: sentEstimate.customerId\n        }",
+      "optionsExpression": "{\n          attempts: 3,\n          delay: delayMs,\n          backoff: {\n            type: \"exponential\",\n            delay: 5000\n          }\n        }",
+      "sourceUrl": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/src/services/estimate.service.ts#L1018"
+    },
+    {
+      "queue": "ai",
+      "file": "apps/api/src/services/estimate.service.ts",
+      "line": 1162,
+      "context": "declineEstimate",
+      "jobNameExpression": "\"evaluate-revenue-opportunities\"",
+      "literalJobName": "evaluate-revenue-opportunities",
+      "payloadExpression": "{\n          companyId,\n          estimateId: declinedEstimate.id,\n          customerId: declinedEstimate.customerId,\n          trigger: \"estimate.declined\"\n        }",
+      "optionsExpression": "{\n          attempts: 3,\n          backoff: {\n            type: \"exponential\",\n            delay: 5000\n          }\n        }",
+      "sourceUrl": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/src/services/estimate.service.ts#L1162"
+    },
+    {
+      "queue": "ai",
+      "file": "apps/api/src/services/estimate.service.ts",
+      "line": 1639,
+      "context": "customerDeclineEstimate",
+      "jobNameExpression": "\"evaluate-revenue-opportunities\"",
+      "literalJobName": "evaluate-revenue-opportunities",
+      "payloadExpression": "{\n          companyId: declinedEstimate.companyId,\n          estimateId: declinedEstimate.id,\n          customerId: declinedEstimate.customerId,\n          trigger: \"estimate.declined\"\n        }",
+      "optionsExpression": "{\n          attempts: 3,\n          backoff: {\n            type: \"exponential\",\n            delay: 5000\n          }\n        }",
+      "sourceUrl": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/src/services/estimate.service.ts#L1639"
+    },
+    {
+      "queue": "ai",
+      "file": "apps/api/src/services/invoice.service.ts",
+      "line": 1493,
+      "context": "markOverdue",
+      "jobNameExpression": "\"invoice-recovery-check\"",
+      "literalJobName": "invoice-recovery-check",
+      "payloadExpression": "{\n          companyId,\n          invoiceId: overdueInvoice.id,\n          customerId: overdueInvoice.customerId\n        }",
+      "optionsExpression": "{\n          attempts: 3,\n          backoff: {\n            type: \"exponential\",\n            delay: 5000\n          }\n        }",
+      "sourceUrl": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/src/services/invoice.service.ts#L1493"
+    },
+    {
+      "queue": "ai",
+      "file": "apps/api/src/services/job.service.ts",
+      "line": 1471,
+      "context": "completeJob",
+      "jobNameExpression": "\"evaluate-revenue-opportunities\"",
+      "literalJobName": "evaluate-revenue-opportunities",
+      "payloadExpression": "{\n        companyId,\n        jobId: completedJob.id,\n        customerId: completedJob.customerId\n      }",
+      "optionsExpression": "{\n        attempts: 3,\n        backoff: {\n          type: \"exponential\",\n          delay: 5000\n        }\n      }",
+      "sourceUrl": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/src/services/job.service.ts#L1471"
+    },
+    {
+      "queue": "ai",
+      "file": "apps/api/src/services/service-agreement.service.ts",
+      "line": 1152,
+      "context": "cancelAgreement",
+      "jobNameExpression": "\"evaluate-revenue-opportunities\"",
+      "literalJobName": "evaluate-revenue-opportunities",
+      "payloadExpression": "{\n          companyId,\n          planId: cancelledAgreement.id,\n          customerId: cancelledAgreement.customerId,\n          trigger: \"plan.cancelled\"\n        }",
+      "optionsExpression": "{\n          attempts: 3,\n          backoff: {\n            type: \"exponential\",\n            delay: 5000\n          }\n        }",
+      "sourceUrl": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/src/services/service-agreement.service.ts#L1152"
+    },
+    {
+      "queue": "ai",
+      "file": "apps/worker/src/index.ts",
+      "line": 28,
+      "context": null,
+      "jobNameExpression": "\"dormant-customer-scan\"",
+      "literalJobName": "dormant-customer-scan",
+      "payloadExpression": "{}",
+      "optionsExpression": "{\n    repeat: {\n      pattern: dormantCustomerCronPattern\n    },\n    jobId: \"dormant-customer-scan-cron\"\n  }",
+      "sourceUrl": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/worker/src/index.ts#L28"
+    },
+    {
+      "queue": "ai",
+      "file": "apps/worker/src/index.ts",
+      "line": 39,
+      "context": null,
+      "jobNameExpression": "\"compute-revenue-summary-batch\"",
+      "literalJobName": "compute-revenue-summary-batch",
+      "payloadExpression": "{}",
+      "optionsExpression": "{\n    repeat: {\n      every: revenueSummaryPrewarmEveryMs\n    },\n    jobId: \"compute-revenue-summary-batch-cron\"\n  }",
+      "sourceUrl": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/worker/src/index.ts#L39"
+    },
+    {
+      "queue": "ai",
+      "file": "apps/worker/src/processors/ai-revenue.processor.ts",
+      "line": 810,
+      "context": "enqueueRevenueSummary",
+      "jobNameExpression": "\"compute-revenue-summary\"",
+      "literalJobName": "compute-revenue-summary",
+      "payloadExpression": "{\n        companyId\n      }",
+      "optionsExpression": "{\n        attempts: 3,\n        backoff: {\n          type: \"exponential\",\n          delay: 5000\n        },\n        jobId: `compute-revenue-summary-${companyId}`\n      }",
+      "sourceUrl": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/worker/src/processors/ai-revenue.processor.ts#L810"
+    },
+    {
+      "queue": "ai",
+      "file": "apps/worker/src/processors/csv-import.processor.ts",
+      "line": 1288,
+      "context": "handleExecuteImport",
+      "jobNameExpression": "\"dormant-customer-scan\"",
+      "literalJobName": "dormant-customer-scan",
+      "payloadExpression": "{\n        companyId,\n        triggeredBy: \"import\"\n      }",
+      "optionsExpression": "{\n        delay: 5000,\n        attempts: 3,\n        backoff: {\n          type: \"exponential\",\n          delay: 5000\n        }\n      }",
+      "sourceUrl": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/worker/src/processors/csv-import.processor.ts#L1288"
+    },
+    {
+      "queue": "ai",
+      "file": "packages/jobs/src/enqueue-import-file-link.ts",
+      "line": 15,
+      "context": "enqueueImportFileLinkJob",
+      "jobNameExpression": "AI_QUEUE_JOB_NAMES.importFileLink",
+      "literalJobName": null,
+      "payloadExpression": "payload",
+      "optionsExpression": "buildDefaultEnqueueJobOptions({\n      jobId: bullJobId\n    })",
+      "sourceUrl": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/jobs/src/enqueue-import-file-link.ts#L15"
+    },
+    {
+      "queue": "exports",
+      "file": "apps/api/src/services/data-export.service.ts",
+      "line": 125,
+      "context": "createDataExportSession",
+      "jobNameExpression": "EXPORT_QUEUE_JOB_NAMES.tenantDataExport",
+      "literalJobName": null,
+      "payloadExpression": "jobData",
+      "optionsExpression": "{\n    jobId: `tenant-export:${session.id}`,\n    removeOnComplete: true,\n    removeOnFail: false\n  }",
+      "sourceUrl": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/src/services/data-export.service.ts#L125"
+    },
+    {
+      "queue": "exports",
+      "file": "apps/api/src/services/data-export.service.ts",
+      "line": 203,
+      "context": "retryDataExportSession",
+      "jobNameExpression": "EXPORT_QUEUE_JOB_NAMES.tenantDataExport",
+      "literalJobName": null,
+      "payloadExpression": "jobData",
+      "optionsExpression": "{\n    jobId: `tenant-export:${updated.id}`,\n    removeOnComplete: true,\n    removeOnFail: false\n  }",
+      "sourceUrl": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/src/services/data-export.service.ts#L203"
+    },
+    {
+      "queue": "growth",
+      "file": "apps/api/src/services/growth-check.service.ts",
+      "line": 180,
+      "context": "enqueueGrowthCheckPublicScan",
+      "jobNameExpression": "GROWTH_QUEUE_JOB_NAMES.publicScan",
+      "literalJobName": null,
+      "payloadExpression": "jobPayload",
+      "optionsExpression": "{\n      jobId: growthCheckPublicScanJobId(companyId, idempotencyKey),\n      attempts: 3,\n      backoff: { type: \"exponential\", delay: 5000 }\n    }",
+      "sourceUrl": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/src/services/growth-check.service.ts#L180"
+    },
+    {
+      "queue": "imports",
+      "file": "apps/api/src/services/import.service.ts",
+      "line": 328,
+      "context": "createImportSession",
+      "jobNameExpression": "IMPORT_QUEUE_JOB_NAMES.mapCsvColumns",
+      "literalJobName": null,
+      "payloadExpression": "{\n        companyId,\n        importSessionId: importSession.id,\n        idempotencyKey: mapIdempotencyKey,\n      }",
+      "optionsExpression": "{\n        attempts: 3,\n        backoff: {\n          type: \"exponential\",\n          delay: 5000\n        },\n        jobId: mapJobId\n      }",
+      "sourceUrl": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/src/services/import.service.ts#L328"
+    },
+    {
+      "queue": "imports",
+      "file": "apps/api/src/services/import.service.ts",
+      "line": 458,
+      "context": "confirmMapping",
+      "jobNameExpression": "\"validate-csv-rows\"",
+      "literalJobName": "validate-csv-rows",
+      "payloadExpression": "{\n        companyId,\n        importSessionId\n      }",
+      "optionsExpression": "{\n        attempts: 3,\n        backoff: {\n          type: \"exponential\",\n          delay: 5000\n        },\n        jobId: `validate-csv-rows-${importSessionId}-${now.getTime()}`\n      }",
+      "sourceUrl": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/src/services/import.service.ts#L458"
+    },
+    {
+      "queue": "imports",
+      "file": "apps/api/src/services/import.service.ts",
+      "line": 526,
+      "context": "startImport",
+      "jobNameExpression": "\"execute-import\"",
+      "literalJobName": "execute-import",
+      "payloadExpression": "{\n          companyId,\n          importSessionId\n        }",
+      "optionsExpression": "{\n          attempts: 3,\n          backoff: {\n            type: \"exponential\",\n            delay: 5000\n          },\n          jobId: `execute-import-${importSessionId}-${now.getTime()}`\n        }",
+      "sourceUrl": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/src/services/import.service.ts#L526"
+    },
+    {
+      "queue": "imports",
+      "file": "packages/jobs/src/enqueue-import-chunk-commit.ts",
+      "line": 15,
+      "context": "enqueueImportChunkCommitJob",
+      "jobNameExpression": "IMPORT_QUEUE_JOB_NAMES.importChunkCommit",
+      "literalJobName": null,
+      "payloadExpression": "payload",
+      "optionsExpression": "buildDefaultEnqueueJobOptions({\n      jobId: buildImportChunkCommitJobId(payload.importSessionId, payload.chunkIndex),\n    })",
+      "sourceUrl": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/jobs/src/enqueue-import-chunk-commit.ts#L15"
+    },
+    {
+      "queue": "imports",
+      "file": "packages/jobs/src/enqueue-import-equipment-commit.ts",
+      "line": 13,
+      "context": "enqueueImportEquipmentCommitJob",
+      "jobNameExpression": "IMPORT_EQUIPMENT_COMMIT_JOB_NAME",
+      "literalJobName": null,
+      "payloadExpression": "payload",
+      "optionsExpression": "buildDefaultEnqueueJobOptions({\n      jobId: buildImportEquipmentCommitJobId(payload.importSessionId, payload.chunkIndex),\n    })",
+      "sourceUrl": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/jobs/src/enqueue-import-equipment-commit.ts#L13"
+    },
+    {
+      "queue": "imports",
+      "file": "packages/jobs/src/enqueue-migrate-file-batch-retry.ts",
+      "line": 32,
+      "context": "enqueueMigrateFileBatchFailedObjectsRetry",
+      "jobNameExpression": "IMPORT_QUEUE_JOB_NAMES.migrateFileBatch",
+      "literalJobName": null,
+      "payloadExpression": "retryPayload",
+      "optionsExpression": "buildDefaultEnqueueJobOptions({ jobId })",
+      "sourceUrl": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/jobs/src/enqueue-migrate-file-batch-retry.ts#L32"
+    },
+    {
+      "queue": "imports",
+      "file": "packages/jobs/src/enqueue-migrate-file-batch.ts",
+      "line": 21,
+      "context": "enqueueMigrateFileBatchJob",
+      "jobNameExpression": "IMPORT_QUEUE_JOB_NAMES.migrateFileBatch",
+      "literalJobName": null,
+      "payloadExpression": "payload",
+      "optionsExpression": "buildDefaultEnqueueJobOptions({\n      jobId: bullJobId\n    })",
+      "sourceUrl": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/jobs/src/enqueue-migrate-file-batch.ts#L21"
+    },
+    {
+      "queue": "invoices",
+      "file": "apps/api/src/services/invoice.service.ts",
+      "line": 1220,
+      "context": "sendInvoice",
+      "jobNameExpression": "\"check-invoice-overdue\"",
+      "literalJobName": "check-invoice-overdue",
+      "payloadExpression": "{\n          companyId,\n          invoiceId: sentInvoice.id\n        }",
+      "optionsExpression": "{\n          delay: overdueDelay,\n          attempts: 3\n        }",
+      "sourceUrl": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/src/services/invoice.service.ts#L1220"
+    },
+    {
+      "queue": "invoices",
+      "file": "apps/worker/src/processors/invoice-reminder.processor.ts",
+      "line": 124,
+      "context": "enqueueReminderJob",
+      "jobNameExpression": "jobName",
+      "literalJobName": null,
+      "payloadExpression": "data",
+      "optionsExpression": "{\n        delay,\n        attempts: 3,\n        backoff: {\n          type: \"exponential\",\n          delay: 5000\n        },\n        jobId: `${jobName}-${data.invoiceId}`\n      }",
+      "sourceUrl": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/worker/src/processors/invoice-reminder.processor.ts#L124"
+    },
+    {
+      "queue": "notifications",
+      "file": "apps/api/src/services/auth.service.ts",
+      "line": 488,
+      "context": "forgotPassword",
+      "jobNameExpression": "\"send-password-reset-email\"",
+      "literalJobName": "send-password-reset-email",
+      "payloadExpression": "{\n      companyId: user.companyId,\n      toEmail: user.email,\n      firstName: user.firstName,\n      resetUrl\n    }",
+      "optionsExpression": null,
+      "sourceUrl": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/src/services/auth.service.ts#L488"
+    },
+    {
+      "queue": "notifications",
+      "file": "apps/api/src/services/booking-self-service.service.ts",
+      "line": 640,
+      "context": "cancelBookingSelfService",
+      "jobNameExpression": "\"send-booking-request-alert\"",
+      "literalJobName": "send-booking-request-alert",
+      "payloadExpression": "{\n      companyId: claims.companyId,\n      bookingRequestId: bookingRequest.id,\n      body: summary\n    }",
+      "optionsExpression": null,
+      "sourceUrl": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/src/services/booking-self-service.service.ts#L640"
+    },
+    {
+      "queue": "notifications",
+      "file": "apps/api/src/services/booking.service.ts",
+      "line": 1771,
+      "context": "submitBookingRequest",
+      "jobNameExpression": "queueJob.name",
+      "literalJobName": null,
+      "payloadExpression": "queueJob.data",
+      "optionsExpression": null,
+      "sourceUrl": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/src/services/booking.service.ts#L1771"
+    },
+    {
+      "queue": "notifications",
+      "file": "apps/api/src/services/booking.service.ts",
+      "line": 1934,
+      "context": "confirmBookingWithActor",
+      "jobNameExpression": "\"send-booking-confirmation\"",
+      "literalJobName": "send-booking-confirmation",
+      "payloadExpression": "buildBookingCustomerNotificationJobData({\n      companyId,\n      bookingRequest: result.bookingRequest,\n      customerId: result.bookingRequest.customerId ?? \"\",\n      companyName: result.companyName,\n      body: buildConfirmedCustomerMessage(\n        result.companyName,\n        result.bookingRequest.referenceNumber ?? result.bookingRequest.id,\n        result.scheduledStart\n      ),\n      scheduledStart: result.scheduledStart\n    })",
+      "optionsExpression": null,
+      "sourceUrl": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/src/services/booking.service.ts#L1934"
+    },
+    {
+      "queue": "notifications",
+      "file": "apps/api/src/services/booking.service.ts",
+      "line": 2030,
+      "context": "declineBookingRequest",
+      "jobNameExpression": "\"send-booking-decline\"",
+      "literalJobName": "send-booking-decline",
+      "payloadExpression": "buildBookingCustomerNotificationJobData({\n      companyId,\n      bookingRequest: result.bookingRequest,\n      customerId: result.bookingRequest.customerId ?? \"\",\n      companyName: result.companyName,\n      body: buildDeclinedCustomerMessage(\n        result.companyName,\n        result.bookingRequest.referenceNumber ?? result.bookingRequest.id,\n        normalizeOptionalString(reason) ?? null\n      ),\n      reason: normalizeOptionalString(reason) ?? null\n    })",
+      "optionsExpression": null,
+      "sourceUrl": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/src/services/booking.service.ts#L2030"
+    },
+    {
+      "queue": "notifications",
+      "file": "apps/api/src/services/campaign.service.ts",
+      "line": 672,
+      "context": "sendCampaign",
+      "jobNameExpression": "\"send-campaign-message\"",
+      "literalJobName": "send-campaign-message",
+      "payloadExpression": "{\n        companyId,\n        campaignId,\n        recipientId: recipient.recipientId,\n        customerId: recipient.customerId,\n        channel,\n        body,\n        subject: campaign.subject,\n        toAddress: recipient.toAddress\n      }",
+      "optionsExpression": "{\n        jobId: `campaign:${campaignId}:recipient:${recipient.recipientId}`\n      }",
+      "sourceUrl": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/src/services/campaign.service.ts#L672"
+    },
+    {
+      "queue": "notifications",
+      "file": "apps/api/src/services/estimate-option-set.service.ts",
+      "line": 675,
+      "context": "sendEstimateOptionSet",
+      "jobNameExpression": "\"send-estimate-email\"",
+      "literalJobName": "send-estimate-email",
+      "payloadExpression": "{ companyId: actor.companyId, estimateId: result.primaryId, customerId: result.response.optionSet.customerId }",
+      "optionsExpression": "{ attempts: 3, backoff: { type: \"exponential\", delay: 5000 } }",
+      "sourceUrl": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/src/services/estimate-option-set.service.ts#L675"
+    },
+    {
+      "queue": "notifications",
+      "file": "apps/api/src/services/estimate.service.ts",
+      "line": 985,
+      "context": "sendEstimate",
+      "jobNameExpression": "\"send-estimate-email\"",
+      "literalJobName": "send-estimate-email",
+      "payloadExpression": "{\n        companyId,\n        estimateId: sentEstimate.id,\n        customerId: sentEstimate.customerId\n      }",
+      "optionsExpression": "{\n        attempts: 3,\n        backoff: {\n          type: \"exponential\",\n          delay: 5000\n        }\n      }",
+      "sourceUrl": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/src/services/estimate.service.ts#L985"
+    },
+    {
+      "queue": "notifications",
+      "file": "apps/api/src/services/invoice.service.ts",
+      "line": 1193,
+      "context": "sendInvoice",
+      "jobNameExpression": "\"send-invoice-email\"",
+      "literalJobName": "send-invoice-email",
+      "payloadExpression": "{\n          companyId,\n          invoiceId: sentInvoice.id,\n          customerId: sentInvoice.customerId\n        }",
+      "optionsExpression": "{\n          attempts: 3,\n          backoff: {\n            type: \"exponential\",\n            delay: 5000\n          }\n        }",
+      "sourceUrl": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/src/services/invoice.service.ts#L1193"
+    },
+    {
+      "queue": "notifications",
+      "file": "apps/api/src/services/invoice.service.ts",
+      "line": 1406,
+      "context": "resendInvoiceReminder",
+      "jobNameExpression": "\"send-invoice-reminder\"",
+      "literalJobName": "send-invoice-reminder",
+      "payloadExpression": "{\n      companyId,\n      invoiceId: existingInvoice.id,\n      customerId: existingInvoice.customerId,\n      reminderLevel\n    }",
+      "optionsExpression": "{\n      attempts: 3,\n      backoff: {\n        type: \"exponential\",\n        delay: 5000\n      },\n      jobId: `manual-send-invoice-reminder-${existingInvoice.id}-${reminderLevel}-${Date.now()}`\n    }",
+      "sourceUrl": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/src/services/invoice.service.ts#L1406"
+    },
+    {
+      "queue": "notifications",
+      "file": "apps/api/src/services/invoice.service.ts",
+      "line": 1687,
+      "context": "enqueueInvoicePaymentReceipt",
+      "jobNameExpression": "\"send-invoice-receipt\"",
+      "literalJobName": "send-invoice-receipt",
+      "payloadExpression": "{\n        companyId,\n        invoiceId,\n        customerId: payment.customerId,\n        paymentId: payment.id,\n        amount: payment.amount,\n        paidAt: payment.paidAt ? payment.paidAt.toISOString() : null\n      }",
+      "optionsExpression": "{\n        jobId: `invoice-receipt-${payment.id}`,\n        attempts: 3,\n        backoff: { type: \"exponential\", delay: 5000 }\n      }",
+      "sourceUrl": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/src/services/invoice.service.ts#L1687"
+    },
+    {
+      "queue": "notifications",
+      "file": "apps/api/src/services/owner-alerts/owner-alert.service.ts",
+      "line": 152,
+      "context": "queueOwnerAlert",
+      "jobNameExpression": "OWNER_ALERT_JOB_NAME",
+      "literalJobName": null,
+      "payloadExpression": "{\n        companyId: input.companyId,\n        kind: input.kind,\n        entityId: input.entityId,\n        companyName: recipients.companyName,\n        headline: input.headline,\n        summary: input.summary,\n        actionUrl,\n        actionLabel: input.actionLabel,\n        toEmail: recipients.email,\n        toPhones: recipients.phones,\n        smsBody: `${input.headline}: ${input.summary} ${actionUrl}`.slice(0, 320)\n      }",
+      "optionsExpression": "{ jobId }",
+      "sourceUrl": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/src/services/owner-alerts/owner-alert.service.ts#L152"
+    },
+    {
+      "queue": "notifications",
+      "file": "apps/api/src/services/plan-reminders/plan-reminder.service.ts",
+      "line": 176,
+      "context": "requestPlanReminder",
+      "jobNameExpression": "PLAN_REMINDER_JOB_NAME",
+      "literalJobName": null,
+      "payloadExpression": "{\n        companyId: event.companyId,\n        maintenancePlanId: plan.id,\n        customerId: customer.id,\n        reminderKind: event.reminderKind,\n        dueDate: event.dueDate,\n        channel,\n        customerEmail: channel === \"email\" ? customer.email : null,\n        customerPhone: channel === \"sms\" ? customer.phone : null,\n        firstName: customer.firstName,\n        companyName: company.name,\n        planName: plan.name,\n        dueDateLabel,\n        smsBody: smsBody.slice(0, 320)\n      }",
+      "optionsExpression": "{ jobId }",
+      "sourceUrl": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/src/services/plan-reminders/plan-reminder.service.ts#L176"
+    },
+    {
+      "queue": "notifications",
+      "file": "apps/api/src/services/review-request.service.ts",
+      "line": 121,
+      "context": "queueReviewRequestNotification",
+      "jobNameExpression": "\"send-review-request\"",
+      "literalJobName": "send-review-request",
+      "payloadExpression": "{\n    companyId,\n    reviewRequestId: reviewRequest.id,\n    customerId: reviewRequest.customerId,\n    customerPhone: customer.phone,\n    referenceId: reviewRequest.referenceId,\n    companyName: company.name,\n    technicianName: technician ? `${technician.firstName} ${technician.lastName}`.trim() : null\n  }",
+      "optionsExpression": null,
+      "sourceUrl": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/src/services/review-request.service.ts#L121"
+    },
+    {
+      "queue": "notifications",
+      "file": "apps/api/src/services/review-request.service.ts",
+      "line": 332,
+      "context": "createReviewRequest",
+      "jobNameExpression": "\"send-review-request\"",
+      "literalJobName": "send-review-request",
+      "payloadExpression": "result.queueData",
+      "optionsExpression": null,
+      "sourceUrl": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/src/services/review-request.service.ts#L332"
+    },
+    {
+      "queue": "notifications",
+      "file": "apps/api/src/services/review-request.service.ts",
+      "line": 517,
+      "context": "requestReviewForPaidInvoice",
+      "jobNameExpression": "\"send-review-request\"",
+      "literalJobName": "send-review-request",
+      "payloadExpression": "result.queueData",
+      "optionsExpression": "{\n      jobId: invoiceReviewRequestQueueJobId(invoiceId),\n      delay: result.delayMs ?? 0\n    }",
+      "sourceUrl": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/src/services/review-request.service.ts#L517"
+    },
+    {
+      "queue": "notifications",
+      "file": "apps/api/src/services/time-tracking.service.ts",
+      "line": 603,
+      "context": "sendOnTheWayNotification",
+      "jobNameExpression": "\"send-otw-notification\"",
+      "literalJobName": "send-otw-notification",
+      "payloadExpression": "result.queueData",
+      "optionsExpression": null,
+      "sourceUrl": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/src/services/time-tracking.service.ts#L603"
+    },
+    {
+      "queue": "notifications",
+      "file": "apps/webhook/src/handlers/stripe.handler.ts",
+      "line": 529,
+      "context": "handleInvoicePaymentFailed",
+      "jobNameExpression": "\"send-service-agreement-email\"",
+      "literalJobName": "send-service-agreement-email",
+      "payloadExpression": "{\n        companyId,\n        maintenancePlanId: plan.id,\n        emailType: \"payment_failed\",\n        manageUrl: `${env.APP_URL.replace(/\\/$/, \"\")}/settings/service-agreements`\n      }",
+      "optionsExpression": "{\n        attempts: 3,\n        backoff: {\n          type: \"exponential\",\n          delay: 5000\n        }\n      }",
+      "sourceUrl": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/webhook/src/handlers/stripe.handler.ts#L529"
+    },
+    {
+      "queue": "notifications",
+      "file": "apps/worker/src/processors/agreements.processor.ts",
+      "line": 277,
+      "context": "enqueueRenewalReminder",
+      "jobNameExpression": "\"send-service-agreement-email\"",
+      "literalJobName": "send-service-agreement-email",
+      "payloadExpression": "{\n        companyId: input.companyId,\n        maintenancePlanId: input.maintenancePlanId,\n        emailType: \"renewal_reminder\"\n      }",
+      "optionsExpression": "{\n        attempts: 3,\n        backoff: {\n          type: \"exponential\",\n          delay: 5000\n        },\n        jobId: `service-agreement-renewal-email-${input.maintenancePlanId}`\n      }",
+      "sourceUrl": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/worker/src/processors/agreements.processor.ts#L277"
+    },
+    {
+      "queue": "notifications",
+      "file": "apps/worker/src/processors/invoice-reminder.processor.ts",
+      "line": 135,
+      "context": "enqueueNotificationReminder",
+      "jobNameExpression": "\"send-invoice-reminder\"",
+      "literalJobName": "send-invoice-reminder",
+      "payloadExpression": "data",
+      "optionsExpression": "{\n        attempts: 3,\n        backoff: {\n          type: \"exponential\",\n          delay: 5000\n        },\n        jobId: `send-invoice-reminder-${data.invoiceId}-${data.reminderLevel}`\n      }",
+      "sourceUrl": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/worker/src/processors/invoice-reminder.processor.ts#L135"
+    },
+    {
+      "queue": "notifications",
+      "file": "packages/jobs/src/vip-membership-email.ts",
+      "line": 48,
+      "context": "enqueueVipMembershipEmail",
+      "jobNameExpression": "SEND_VIP_MEMBERSHIP_EMAIL_JOB_NAME",
+      "literalJobName": null,
+      "payloadExpression": "parsed",
+      "optionsExpression": "jobOptions",
+      "sourceUrl": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/jobs/src/vip-membership-email.ts#L48"
+    },
+    {
+      "queue": "operator",
+      "file": "apps/worker/src/processors/retention-gates.processor.ts",
+      "line": 33,
+      "context": null,
+      "jobNameExpression": "OPERATOR_QUEUE_JOB_NAMES.proposalCreateCustomerMessage",
+      "literalJobName": null,
+      "payloadExpression": "payload",
+      "optionsExpression": "{\n      jobId: payload.idempotencyKey\n    }",
+      "sourceUrl": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/worker/src/processors/retention-gates.processor.ts#L33"
+    },
+    {
+      "queue": "operator",
+      "file": "packages/jobs/src/enqueue-build-job-service-brief.ts",
+      "line": 34,
+      "context": "enqueueBuildJobServiceBriefJob",
+      "jobNameExpression": "OPERATOR_QUEUE_JOB_NAMES.serviceBuildJobBrief",
+      "literalJobName": null,
+      "payloadExpression": "payload",
+      "optionsExpression": "{ jobId }",
+      "sourceUrl": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/jobs/src/enqueue-build-job-service-brief.ts#L34"
+    },
+    {
+      "queue": "operator",
+      "file": "packages/jobs/src/enqueue-qbo-sync.ts",
+      "line": 16,
+      "context": "enqueueQboSyncPushJob",
+      "jobNameExpression": "OPERATOR_QUEUE_JOB_NAMES.qboSyncPush",
+      "literalJobName": null,
+      "payloadExpression": "payload",
+      "optionsExpression": "buildDefaultEnqueueJobOptions({\n    jobId: buildQboSyncPushJobId(payload.idempotencyKey)\n  })",
+      "sourceUrl": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/jobs/src/enqueue-qbo-sync.ts#L16"
+    },
+    {
+      "queue": "operator",
+      "file": "packages/jobs/src/enqueue-qbo-sync.ts",
+      "line": 24,
+      "context": "enqueueQboSyncPullJob",
+      "jobNameExpression": "OPERATOR_QUEUE_JOB_NAMES.qboSyncPull",
+      "literalJobName": null,
+      "payloadExpression": "payload",
+      "optionsExpression": "buildDefaultEnqueueJobOptions({\n    jobId: buildQboSyncPullJobId(payload.companyId, windowKey)\n  })",
+      "sourceUrl": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/jobs/src/enqueue-qbo-sync.ts#L24"
+    },
+    {
+      "queue": "webhooks",
+      "file": "packages/jobs/src/clerk-workspace.ts",
+      "line": 30,
+      "context": "enqueueClerkWorkspaceCreateJob",
+      "jobNameExpression": "CLERK_WORKSPACE_CREATE_JOB_NAME",
+      "literalJobName": null,
+      "payloadExpression": "payload",
+      "optionsExpression": "{\n    jobId: createJobId(payload.intentId),\n    attempts: 1,\n    removeOnComplete: true,\n    // If infrastructure fails before the CAS claim, a later POST must be able to enqueue again.\n    // Once claimed, state is never pending again, so re-enqueue cannot repeat the provider call.\n    removeOnFail: true\n  }",
+      "sourceUrl": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/jobs/src/clerk-workspace.ts#L30"
+    },
+    {
+      "queue": "webhooks",
+      "file": "packages/jobs/src/clerk-workspace.ts",
+      "line": 61,
+      "context": "enqueueClerkWorkspaceReconcileJob",
+      "jobNameExpression": "CLERK_WORKSPACE_RECONCILE_JOB_NAME",
+      "literalJobName": null,
+      "payloadExpression": "payload",
+      "optionsExpression": "{\n    jobId,\n    attempts: 5,\n    backoff: { type: \"exponential\", delay: 2_000 },\n    removeOnComplete: true,\n    removeOnFail: false\n  }",
+      "sourceUrl": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/jobs/src/clerk-workspace.ts#L61"
+    }
+  ],
+  "notificationDispatchNames": [
+    {
+      "name": "send-estimate-email",
+      "line": 1939
+    },
+    {
+      "name": "send-campaign-message",
+      "line": 1942
+    },
+    {
+      "name": "send-invoice-email",
+      "line": 1945
+    },
+    {
+      "name": "send-invoice-receipt",
+      "line": 1948
+    },
+    {
+      "name": "send-invoice-reminder",
+      "line": 1951
+    },
+    {
+      "name": "send-service-agreement-email",
+      "line": 1954
+    },
+    {
+      "name": "send-service-agreement-payment-failed-email",
+      "line": 1955
+    },
+    {
+      "name": "send-otw-notification",
+      "line": 1958
+    },
+    {
+      "name": "send-review-request",
+      "line": 1961
+    },
+    {
+      "name": "send-owner-alert",
+      "line": 1964
+    },
+    {
+      "name": "send-plan-reminder",
+      "line": 1967
+    },
+    {
+      "name": "send-booking-request-alert",
+      "line": 1970
+    },
+    {
+      "name": "send-booking-confirmation",
+      "line": 1971
+    },
+    {
+      "name": "send-booking-decline",
+      "line": 1972
+    },
+    {
+      "name": "send-password-reset-email",
+      "line": 1975
+    },
+    {
+      "name": "send-vip-membership-email",
+      "line": 1978
+    }
+  ],
+  "runtimeVerified": false,
+  "testsRun": [],
+  "queueBindings": [
+    {
+      "queue": "imports",
+      "processor": "processCsvImport",
+      "file": "apps/worker/src/processors/csv-import.processor.ts",
+      "producerSummary": "Import API and import chunk/equipment/file-batch helpers. Seven direct calls.",
+      "tenantBinding": "companyId + importSessionId; session lookup checks both. Child commit payloads carry tenant and lineage identifiers.",
+      "behavior": "CSV mapping/validation/execution plus four chunk commit handlers. AI/storage dependencies are outside this outbound subset. `migrate-file-batch` producers have an unwired standalone processor (W1).",
+      "runtimeVerified": false
+    },
+    {
+      "queue": "ai",
+      "processor": "processAiRevenue",
+      "file": "apps/worker/src/processors/ai-revenue.processor.ts",
+      "producerSummary": "Estimate, invoice, job, agreement and import services; worker fan-out; import-file-link helper. Eleven direct calls.",
+      "tenantBinding": "Per-entity jobs use companyId. Scheduled summary/dormant jobs intentionally accept `{}` and enumerate tenants internally.",
+      "behavior": "Opportunity evaluation, follow-up/recovery checks, summary computation, batch/dormant scans and file linking; no direct customer send in this dispatcher. Global dormant scan is not the tenant-only #436 button contract.",
+      "runtimeVerified": false
+    },
+    {
+      "queue": "notifications",
+      "processor": "processNotifications",
+      "file": "apps/worker/src/processors/notifications.processor.ts",
+      "producerSummary": "API services, invoice/agreement workers, Stripe handler and VIP helper. Twenty-one direct calls.",
+      "tenantBinding": "Most jobs carry companyId and entity IDs; some handlers consume queued recipient/template fields without reloading the customer. Per-path boundaries below.",
+      "behavior": "Sixteen recognized job names reach email/SMS seams. Actual delivery requires a configured provider; disabled/no-op paths still resolve successfully.",
+      "runtimeVerified": false
+    },
+    {
+      "queue": "invoices",
+      "processor": "processInvoiceReminder",
+      "file": "apps/worker/src/processors/invoice-reminder.processor.ts",
+      "producerSummary": "Invoice send service and reminder processor. Two direct calls.",
+      "tenantBinding": "Invoice lookup uses companyId + invoiceId; automation rule lookup is tenant-scoped.",
+      "behavior": "Overdue check and reminder levels 1\u20133 enqueue notification jobs. No direct provider handoff; unpaid state/rule/timestamps rechecked.",
+      "runtimeVerified": false
+    },
+    {
+      "queue": "agreements",
+      "processor": "processAgreements",
+      "file": "apps/worker/src/processors/agreements.processor.ts",
+      "producerSummary": "Bootstrap reminder scan and loyalty candidate helper. Two direct calls.",
+      "tenantBinding": "Per-plan/loyalty jobs carry companyId. Global plan-reminder scan enumerates companies internally.",
+      "behavior": "Loyalty candidates, plan-reminder scan and service-agreement-renewal-check dispatch. No direct named enqueue of renewal-check found in the 52-call set; its handler can enqueue renewal email. API compiled service import is required.",
+      "runtimeVerified": false
+    },
+    {
+      "queue": "webhooks",
+      "processor": "processClerkWorkspace",
+      "file": "apps/worker/src/processors/clerk-workspace.processor.ts",
+      "producerSummary": "Clerk workspace create/reconcile helpers. Two direct calls.",
+      "tenantBinding": "Pretenant exception: strict intentId + clerkUserId payload; intent claim verifies that identity. No company exists yet.",
+      "behavior": "Clerk organization provision/reconcile state machine. This queue is separate from HTTP Twilio/Stripe webhook ingestion. Unknown provider outcomes reconcile rather than blindly repeat organization creation.",
+      "runtimeVerified": false
+    },
+    {
+      "queue": "operator",
+      "processor": "processRetentionGates",
+      "file": "apps/worker/src/processors/retention-gates.processor.ts",
+      "producerSummary": "QBO push/pull helpers, service-brief helper and retention proposal enqueue. Four direct calls.",
+      "tenantBinding": "Payloads include companyId; delegated QBO/service-brief processors own scoped data access. Retention defaults to no evaluation input.",
+      "behavior": "QBO sync, job service brief and retention gate dispatch. Retention default dormancy and missing proposal-create dispatcher case are W2; no customer-send completion is inferred.",
+      "runtimeVerified": false
+    },
+    {
+      "queue": "exports",
+      "processor": "processDataExport",
+      "file": "apps/worker/src/processors/data-export.processor.ts",
+      "producerSummary": "Tenant export create/retry API. Two direct calls.",
+      "tenantBinding": "Loads export session, checks session.companyId equals payload companyId, then gathers tenant data.",
+      "behavior": "Completed session skips; progress/status/event updates and storage upload to company-prefixed key. Initial check is not an atomic execution claim; export runtime isolation was not run.",
+      "runtimeVerified": false
+    },
+    {
+      "queue": "growth",
+      "processor": "processGrowthCheck",
+      "file": "apps/worker/src/processors/growth-check.processor.ts",
+      "producerSummary": "Growth-check service. One direct call.",
+      "tenantBinding": "companyId + scanId lookup; completed scan skips; public-scan feature flag gates work.",
+      "behavior": "Bounded public URL fetch through shared outbound URL guard, rubric findings and progress/events. Public target URL does not mean tenant-free scan state.",
+      "runtimeVerified": false
+    }
+  ],
+  "outboundPaths": [
+    {
+      "jobName": "send-estimate-email",
+      "producers": [
+        [
+          "apps/api/src/services/estimate.service.ts",
+          985
+        ],
+        [
+          "apps/api/src/services/estimate-option-set.service.ts",
+          675
+        ]
+      ],
+      "handler": "handleSendEstimateEmail",
+      "providerBoundary": "E",
+      "tenantAndRecipientBinding": "companyId + estimateId + customerId; tenant reload, matching customer, sent status, email and approval token.",
+      "consentObservation": "No fresh preference/ledger check in this handler.",
+      "idempotencyAndVisibility": "Three attempts; no stable jobId at these enqueue sites; no pre-send delivery claim observed.",
+      "runtimeVerified": false
+    },
+    {
+      "jobName": "send-campaign-message",
+      "producers": [
+        [
+          "apps/api/src/services/campaign.service.ts",
+          672
+        ]
+      ],
+      "handler": "handleSendCampaignMessage",
+      "providerBoundary": "E or S",
+      "tenantAndRecipientBinding": "Reload campaign recipient under companyId; verify customerId and recipient.sentAt; destination/body come from job.",
+      "consentObservation": "Producer excludes doNotContact; worker does not recheck full customer consent/global phone opt-out before its provider call.",
+      "idempotencyAndVisibility": "Stable campaign/recipient queue ID plus sentAt check; mark-delivered occurs after provider result. Check-before-send is not an atomic exactly-once guarantee; failures rethrow.",
+      "runtimeVerified": false
+    },
+    {
+      "jobName": "send-invoice-email",
+      "producers": [
+        [
+          "apps/api/src/services/invoice.service.ts",
+          1193
+        ]
+      ],
+      "handler": "handleSendInvoiceEmail",
+      "providerBoundary": "E",
+      "tenantAndRecipientBinding": "companyId/invoice/customer reload; sent, partially_paid or overdue status; payment link and email required.",
+      "consentObservation": "No fresh preference/ledger check in this handler.",
+      "idempotencyAndVisibility": "Three attempts; no stable queue ID at this call; no pre-send delivery claim observed.",
+      "runtimeVerified": false
+    },
+    {
+      "jobName": "send-invoice-receipt",
+      "producers": [
+        [
+          "apps/api/src/services/invoice.service.ts",
+          1687
+        ]
+      ],
+      "handler": "handleSendInvoicePaymentReceipt",
+      "providerBoundary": "E",
+      "tenantAndRecipientBinding": "Tenant invoice/customer context plus paymentId/amount. Receipt claim keyed by company/payment.",
+      "consentObservation": "isReceiptEmailAllowed checked by producer and worker: address present, doNotContact not true, prefersEmail not false; null preference is allowed by this receipt policy.",
+      "idempotencyAndVisibility": "Stable payment jobId, three attempts, durable sending claim with 10-minute stale takeover; release on send failure. Mark-sent failure logs. Provider timeout/claim expiry still prevents an exactly-once claim.",
+      "runtimeVerified": false
+    },
+    {
+      "jobName": "send-invoice-reminder",
+      "producers": [
+        [
+          "apps/api/src/services/invoice.service.ts",
+          1406
+        ],
+        [
+          "apps/worker/src/processors/invoice-reminder.processor.ts",
+          135
+        ]
+      ],
+      "handler": "handleSendInvoiceReminder",
+      "providerBoundary": "E",
+      "tenantAndRecipientBinding": "Tenant invoice/customer reload, enabled rule, unpaid state, payment link and reminder-level timestamp. Level 3 also resolves company owner.",
+      "consentObservation": "No full customer preference/ledger decision observed in reminder handler.",
+      "idempotencyAndVisibility": "Automatic stage ID stable; manual ID timestamped. Email then optional owner alert then reminder timestamp. A later failure can permit a prior side effect to repeat.",
+      "runtimeVerified": false
+    },
+    {
+      "jobName": "send-service-agreement-email",
+      "producers": [
+        [
+          "apps/worker/src/processors/agreements.processor.ts",
+          277
+        ],
+        [
+          "apps/webhook/src/handlers/stripe.handler.ts",
+          529
+        ]
+      ],
+      "handler": "handleSendServiceAgreementEmail",
+      "providerBoundary": "E",
+      "tenantAndRecipientBinding": "Tenant maintenance-plan/customer/company reload; renewal requires enabled rule; payment-failure path loads owner.",
+      "consentObservation": "Renewal requires email/rule; no fresh full preference/ledger gate observed. Owner operational alert has a different recipient/purpose.",
+      "idempotencyAndVisibility": "Three attempts. Renewal ID fixed per plan, webhook payment-failure call lacks stable ID here; send-time exactly-once not established.",
+      "runtimeVerified": false
+    },
+    {
+      "jobName": "send-service-agreement-payment-failed-email",
+      "producers": [],
+      "handler": "handleSendServiceAgreementEmail",
+      "providerBoundary": "E",
+      "tenantAndRecipientBinding": "Alias to same handler; payload must still supply supported emailType and maintenancePlanId/companyId.",
+      "consentObservation": "Same observed handler checks; not a separate integrated consent mechanism.",
+      "idempotencyAndVisibility": "Recognized dispatch alias; no production literal producer found in the inspected source search. Do not claim this name executes in production.",
+      "runtimeVerified": false
+    },
+    {
+      "jobName": "send-otw-notification",
+      "producers": [
+        [
+          "apps/api/src/services/time-tracking.service.ts",
+          603
+        ]
+      ],
+      "handler": "handleSendOnTheWayNotification",
+      "providerBoundary": "S",
+      "tenantAndRecipientBinding": "Producer loads tenant job/technician/customer; worker uses queued companyId, customerPhone and message.",
+      "consentObservation": "Generic SMS helper has no fresh customer/preference/global-opt-out lookup.",
+      "idempotencyAndVisibility": "Producer rejects another same-day recorded notification, and records sentAt/event before enqueue; that is not a provider receipt. No stable jobId supplied here.",
+      "runtimeVerified": false
+    },
+    {
+      "jobName": "send-review-request",
+      "producers": [
+        [
+          "apps/api/src/services/review-request.service.ts",
+          121
+        ],
+        [
+          "apps/api/src/services/review-request.service.ts",
+          332
+        ],
+        [
+          "apps/api/src/services/review-request.service.ts",
+          517
+        ]
+      ],
+      "handler": "handleSendReviewRequest",
+      "providerBoundary": "E or S",
+      "tenantAndRecipientBinding": "When companyId/reviewRequestId are present, production dependency reloads request/customer and invoice context. Destination/template remains partly queued.",
+      "consentObservation": "Fresh doNotContact and preference===true; invoice-originated path also requires paid positive invoice and enabled rule. Missing identifier legacy shape can bypass contextual recheck and take generic SMS helper; preserve as coverage follow-up.",
+      "idempotencyAndVisibility": "Paid-invoice producer has per-invoice lock/event guard and stable jobId/delay; other producers do not pass a stable ID here. Existing request-state checks do not prove provider deduplication.",
+      "runtimeVerified": false
+    },
+    {
+      "jobName": "send-owner-alert",
+      "producers": [
+        [
+          "apps/api/src/services/owner-alerts/owner-alert.service.ts",
+          152
+        ]
+      ],
+      "handler": "handleSendOwnerAlert",
+      "providerBoundary": "E and optional S",
+      "tenantAndRecipientBinding": "Producer resolves company owner/staff recipients; worker uses queued email/phones/template.",
+      "consentObservation": "Operational recipients; producer SMS decision uses configured flag, not a confirmed live registry channel. No customer-consent claim is appropriate.",
+      "idempotencyAndVisibility": "Once claim + hourly company rate limit + stable entity ID; per-phone loop can partially succeed before failure. Default retries do not prove one delivery each.",
+      "runtimeVerified": false
+    },
+    {
+      "jobName": "send-plan-reminder",
+      "producers": [
+        [
+          "apps/api/src/services/plan-reminders/plan-reminder.service.ts",
+          176
+        ]
+      ],
+      "handler": "handleSendPlanReminder",
+      "providerBoundary": "E or S",
+      "tenantAndRecipientBinding": "Tenant plan/customer/rule reload in production; matching customer and active, nondeleted plan required.",
+      "consentObservation": "Fresh doNotContact and channel preference===true. This is the observed preference policy, not the proposed authoritative contact/purpose ledger.",
+      "idempotencyAndVisibility": "Fixed reminder jobId at producer; rule/active checks repeated. Payload destination/template plus provider result remains outside an atomic consent/send transaction.",
+      "runtimeVerified": false
+    },
+    {
+      "jobName": "send-booking-request-alert",
+      "producers": [
+        [
+          "apps/api/src/services/booking.service.ts",
+          1771
+        ],
+        [
+          "apps/api/src/services/booking-self-service.service.ts",
+          640
+        ]
+      ],
+      "handler": "handleSendBookingNotification",
+      "providerBoundary": "S for normal staff alert; E if email-shaped payload",
+      "tenantAndRecipientBinding": "Booking producer builds tenant staff phone payloads; generic helper requires companyId, phone, body. Self-service cancellation producer supplies companyId/bookingRequestId/body without recipient.",
+      "consentObservation": "No fresh booking/customer lookup in this handler; staff alert purpose differs from customer appointment consent.",
+      "idempotencyAndVisibility": "Source self-service alert shape will take missing-recipient skip path in the inspected handler; record as W3. No stable jobId at these call sites.",
+      "runtimeVerified": false
+    },
+    {
+      "jobName": "send-booking-confirmation",
+      "producers": [
+        [
+          "apps/api/src/services/booking.service.ts",
+          1771
+        ],
+        [
+          "apps/api/src/services/booking.service.ts",
+          1934
+        ]
+      ],
+      "handler": "handleSendBookingNotification",
+      "providerBoundary": "E",
+      "tenantAndRecipientBinding": "Queued toEmail/companyName/referenceNumber determine email; companyId/bookingRequestId used for optional post-send message log, not a fresh context lookup.",
+      "consentObservation": "Email-first; missing email-shaped fields skip. No fresh booking consent/recipient lookup in handler.",
+      "idempotencyAndVisibility": "Message-log source tuple dedupes logging after send; it does not prevent resend. Default retry applies.",
+      "runtimeVerified": false
+    },
+    {
+      "jobName": "send-booking-decline",
+      "producers": [
+        [
+          "apps/api/src/services/booking.service.ts",
+          2030
+        ]
+      ],
+      "handler": "handleSendBookingNotification",
+      "providerBoundary": "E",
+      "tenantAndRecipientBinding": "Same queued booking email shape; decline template selected by job name.",
+      "consentObservation": "Email-first; no fresh booking consent/recipient lookup in handler.",
+      "idempotencyAndVisibility": "Post-send log dedupe only; default retry; missing email shape skips.",
+      "runtimeVerified": false
+    },
+    {
+      "jobName": "send-password-reset-email",
+      "producers": [
+        [
+          "apps/api/src/services/auth.service.ts",
+          488
+        ]
+      ],
+      "handler": "handleSendPasswordResetEmail",
+      "providerBoundary": "E",
+      "tenantAndRecipientBinding": "Auth producer creates reset token and queues companyId/toEmail/resetUrl; worker validates presence and uses payload.",
+      "consentObservation": "Authentication message; not evidence of marketing opt-in. No tenant reload inside handler.",
+      "idempotencyAndVisibility": "No stable jobId/pre-send claim here. Enqueue error is caught/logged by auth service; successful request flow is not proof of delivery. Queue payload includes sensitive reset link.",
+      "runtimeVerified": false
+    },
+    {
+      "jobName": "send-vip-membership-email",
+      "producers": [
+        [
+          "packages/jobs/src/vip-membership-email.ts",
+          48
+        ]
+      ],
+      "handler": "handleSendVipMembershipEmail",
+      "providerBoundary": "E",
+      "tenantAndRecipientBinding": "Worker reloads live customer by company/id and company; requires email. Stripe subscription/invoice or stable job fallback supplies log source key.",
+      "consentObservation": "No fresh customer preference/ledger check observed in welcome, renewal or dunning handler. Purpose-specific owner decision remains required.",
+      "idempotencyAndVisibility": "Helper stable subscription/invoice/step IDs; post-send conflict-safe message log, not pre-send claim. Stripe VIP handler is the upstream caller; default retries/delays do not prove exactly once.",
+      "runtimeVerified": false
+    }
+  ],
+  "testEvidence": [
+    {
+      "area": "Queue defaults, failure and recovery",
+      "files": [
+        "packages/jobs/src/queue-policy.test.ts",
+        "packages/jobs/src/queue-retry-policy.test.ts",
+        "packages/jobs/src/worker-terminal-failure.test.ts",
+        "packages/jobs/src/dead-letter-queue.test.ts",
+        "packages/jobs/src/queue-monitoring.test.ts"
+      ],
+      "status": "exists; not run in this inventory"
+    },
+    {
+      "area": "Queue monitoring API",
+      "files": [
+        "apps/api/src/routes/internal-admin/queues/queue-monitoring.test.ts",
+        "apps/api/src/services/queue-monitoring.service.test.ts"
+      ],
+      "status": "exists; not run in this inventory"
+    },
+    {
+      "area": "Imports",
+      "files": [
+        "apps/worker/src/processors/csv-import.processor.test.ts",
+        "apps/worker/src/processors/import-chunk-commit.processor.test.ts",
+        "apps/worker/src/processors/migrate-file-batch.processor.test.ts",
+        "apps/worker/src/processors/import-equipment-chunk.processor.test.ts"
+      ],
+      "status": "exists; not run in this inventory"
+    },
+    {
+      "area": "AI and agreements",
+      "files": [
+        "apps/worker/src/processors/ai-revenue.processor.test.ts",
+        "apps/worker/src/processors/agreements.processor.test.ts",
+        "apps/worker/src/processors/loyalty-reminder-candidates.processor.test.ts"
+      ],
+      "status": "exists; not run in this inventory"
+    },
+    {
+      "area": "Invoices/notifications",
+      "files": [
+        "apps/worker/src/processors/invoice-reminder.processor.test.ts",
+        "apps/worker/src/processors/notifications.processor.test.ts"
+      ],
+      "status": "exists; not run in this inventory"
+    },
+    {
+      "area": "Clerk workspace",
+      "files": [
+        "apps/worker/src/processors/clerk-workspace.processor.test.ts",
+        "apps/worker/src/processors/clerk-workspace.postgres.integration.test.ts"
+      ],
+      "status": "exists; not run in this inventory"
+    },
+    {
+      "area": "Operator and growth",
+      "files": [
+        "apps/worker/src/processors/retention-gates.processor.test.ts",
+        "apps/worker/src/processors/service-job-brief.processor.test.ts",
+        "apps/worker/src/processors/growth-check.processor.test.ts"
+      ],
+      "status": "exists; not run in this inventory"
+    },
+    {
+      "area": "Provider boundaries",
+      "files": [
+        "packages/comms/src/email-provider.test.ts",
+        "packages/comms/src/resend-email.adapter.test.ts",
+        "packages/comms/src/sms-provider.registry.test.ts",
+        "packages/comms/src/sms-disabled.stub.test.ts",
+        "apps/api/src/lib/outbound-email.test.ts"
+      ],
+      "status": "exists; not run in this inventory"
+    },
+    {
+      "area": "Receipt, plan/review and owner policy",
+      "files": [
+        "packages/comms/src/receipt-consent.test.ts",
+        "apps/api/src/services/plan-reminders/plan-reminder.test.ts",
+        "apps/api/src/services/review-request.invoice-paid.test.ts",
+        "apps/api/src/services/automation/review-request-policy.test.ts"
+      ],
+      "status": "exists; not run in this inventory"
+    },
+    {
+      "area": "Message logs and VIP IDs",
+      "files": [
+        "apps/worker/src/processors/transactional-email-message-log.test.ts",
+        "apps/worker/src/processors/email-from-parity.test.ts",
+        "apps/worker/src/processors/vip-membership-email-source-id.test.ts",
+        "packages/jobs/src/vip-membership-email.test.ts"
+      ],
+      "status": "exists; not run in this inventory"
+    },
+    {
+      "area": "Twilio ingress",
+      "files": [
+        "apps/webhook/src/middleware/twilio-verify.test.ts",
+        "apps/webhook/src/handlers/twilio.handler.test.ts"
+      ],
+      "status": "exists; not run in this inventory"
+    }
+  ],
+  "sourceReferenceChecks": {
+    "allReferencedFilesExist": true,
+    "allReferencedLineBoundsValid": true,
+    "registeredQueues": 9,
+    "directNamedQueueAddCallSites": 52,
+    "notificationDispatchNames": 16
+  },
+  "findings": [
+    {
+      "id": "W1",
+      "title": "produced file-batch job is not routed by registered imports consumer",
+      "evidence": "[producer](https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/jobs/src/enqueue-migrate-file-batch.ts#L21) and [retry producer](https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/jobs/src/enqueue-migrate-file-batch-retry.ts#L32) enqueue `migrate-file-batch`. [standalone processor](https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/worker/src/processors/migrate-file-batch.processor.ts#L195) exists, but [registered dispatcher](https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/worker/src/processors/csv-import.processor.ts#L1319) has no matching case/import, and bootstrap registers processCsvImport.",
+      "followUpAcceptance": "Existing import/file-migration owners should wire the intended processor once. Acceptance: a representative produced job passes through the actual bootstrap-selected dispatcher to the file-batch processor; tenant/idempotency payload validation remains intact; unexpected names fail or emit an explicit observable unsupported outcome. No live lost-job incident is claimed."
+    },
+    {
+      "id": "W2",
+      "title": "retention is dormant by default and its proposal target is not handled",
+      "evidence": "[default dependencies](https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/worker/src/processors/retention-gates.processor.ts#L30) returns null evaluation input and enqueues `proposal.create.customer_message` at line 33. [dispatcher](https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/worker/src/processors/retention-gates.processor.ts#L182) handles QBO, two retention gates and job brief, with default return; it has no proposal-create case.",
+      "followUpAcceptance": "Existing retention/operator contract owners should choose explicit dormant behavior or supply approved evaluation input and the intended proposal consumer. Acceptance: test default null input as no-op; enabled valid input reaches exactly the intended proposal handler; unknown names are visibly rejected/recorded; no provider send is introduced by proposal creation."
+    },
+    {
+      "id": "W3",
+      "title": "self-service cancellation alert lacks a recipient in the observed producer",
+      "evidence": "[producer](https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/src/services/booking-self-service.service.ts#L640) supplies companyId, bookingRequestId and body. [booking handler](https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/worker/src/processors/notifications.processor.ts#L1858) falls back to [SMS helper](https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/worker/src/processors/notifications.processor.ts#L525), which requires a phone and skips otherwise.",
+      "followUpAcceptance": "Booking owner should confirm intended staff notification and supply/reload its authorized recipient or emit an explicit suppressed outcome. Acceptance: cancellation alert has a bounded recipient contract and test proving queue-to-handler outcome; avoid labeling skipped work delivered."
+    },
+    {
+      "id": "W4",
+      "title": "consent/opt-out coverage differs across outbound paths",
+      "evidence": "The complete 16-row register separates fresh checks, producer-only checks and payload-only handlers. Current SMS provider seam is disabled; #430/#431 proposed controls are not integrated.",
+      "followUpAcceptance": "Use these rows as coverage inputs for the existing consent/STOP work. Acceptance: exact tenant/contact/channel/purpose policy where required, changed/revoked recipient before handoff, global STOP, replay and concurrent send boundary; each refusal has an observable non-delivery result. Preserve purpose distinctions for owner/security/transactional messages."
+    },
+    {
+      "id": "W5",
+      "title": "retry and sent records are weaker than exactly-once delivery",
+      "evidence": "[receipt claim/send](https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/worker/src/processors/notifications.processor.ts#L1268) provides a stronger pre-send claim for receipts; campaign timestamps and booking/VIP logs are checked/written at different times. No general provider idempotency token was observed at E/S.",
+      "followUpAcceptance": "Processor/outbox owners retain FS-15/FS-81 responsibility. Acceptance: defined duplicate semantics for provider timeout, worker crash, stale claim and partial multi-recipient success; prove provider result versus stub/no-op and reconcile uncertain sends. Do not infer exactly-once from stable queue ID."
+    },
+    {
+      "id": "W6",
+      "title": "worker relies on compiled API modules",
+      "evidence": "Notification and plan-reminder loaders import API dist modules at runtime.",
+      "followUpAcceptance": "Worker/build owner should verify the actual deployment artifact resolves those imports and runtime dependencies, then execute isolated provider-stub smoke checks. No deployment was changed here."
+    }
+  ],
+  "relatedUnmergedPullRequestHeads": {
+    "430": "ed129b74ca483465cbfbea92f3e7f506f75f21b0",
+    "431": "4959cb9921ba741bccc77e00187d625c3ca2a67b"
+  },
+  "referenceFiles": [
+    "apps/api/src/lib/email.ts",
+    "apps/api/src/lib/outbound-email.test.ts",
+    "apps/api/src/lib/outbound-email.ts",
+    "apps/api/src/lib/sms.ts",
+    "apps/api/src/routes/internal-admin/queues/index.ts",
+    "apps/api/src/routes/internal-admin/queues/queue-monitoring.test.ts",
+    "apps/api/src/services/auth.service.ts",
+    "apps/api/src/services/automation/review-request-policy.test.ts",
+    "apps/api/src/services/booking-self-service.service.ts",
+    "apps/api/src/services/booking.service.ts",
+    "apps/api/src/services/campaign.service.ts",
+    "apps/api/src/services/data-export.service.ts",
+    "apps/api/src/services/estimate-option-set.service.ts",
+    "apps/api/src/services/estimate.service.ts",
+    "apps/api/src/services/invoice.service.ts",
+    "apps/api/src/services/owner-alerts/owner-alert.service.ts",
+    "apps/api/src/services/plan-reminders/plan-reminder.service.ts",
+    "apps/api/src/services/plan-reminders/plan-reminder.test.ts",
+    "apps/api/src/services/queue-monitoring.service.test.ts",
+    "apps/api/src/services/review-request.invoice-paid.test.ts",
+    "apps/api/src/services/review-request.service.ts",
+    "apps/api/src/services/time-tracking.service.ts",
+    "apps/webhook/src/app.ts",
+    "apps/webhook/src/handlers/stripe-vip-membership.handler.ts",
+    "apps/webhook/src/handlers/stripe.handler.ts",
+    "apps/webhook/src/handlers/twilio.handler.test.ts",
+    "apps/webhook/src/handlers/twilio.handler.ts",
+    "apps/webhook/src/middleware/twilio-verify.test.ts",
+    "apps/webhook/src/middleware/twilio-verify.ts",
+    "apps/worker/src/index.ts",
+    "apps/worker/src/lib/worker-factory.ts",
+    "apps/worker/src/processors/agreements.processor.test.ts",
+    "apps/worker/src/processors/agreements.processor.ts",
+    "apps/worker/src/processors/ai-revenue.processor.test.ts",
+    "apps/worker/src/processors/ai-revenue.processor.ts",
+    "apps/worker/src/processors/clerk-workspace.postgres.integration.test.ts",
+    "apps/worker/src/processors/clerk-workspace.processor.test.ts",
+    "apps/worker/src/processors/clerk-workspace.processor.ts",
+    "apps/worker/src/processors/csv-import.processor.test.ts",
+    "apps/worker/src/processors/csv-import.processor.ts",
+    "apps/worker/src/processors/data-export.processor.ts",
+    "apps/worker/src/processors/email-from-parity.test.ts",
+    "apps/worker/src/processors/growth-check.processor.test.ts",
+    "apps/worker/src/processors/growth-check.processor.ts",
+    "apps/worker/src/processors/import-chunk-commit.processor.test.ts",
+    "apps/worker/src/processors/import-equipment-chunk.processor.test.ts",
+    "apps/worker/src/processors/invoice-reminder.processor.test.ts",
+    "apps/worker/src/processors/invoice-reminder.processor.ts",
+    "apps/worker/src/processors/loyalty-reminder-candidates.processor.test.ts",
+    "apps/worker/src/processors/migrate-file-batch.processor.test.ts",
+    "apps/worker/src/processors/migrate-file-batch.processor.ts",
+    "apps/worker/src/processors/notifications.processor.test.ts",
+    "apps/worker/src/processors/notifications.processor.ts",
+    "apps/worker/src/processors/retention-gates.processor.test.ts",
+    "apps/worker/src/processors/retention-gates.processor.ts",
+    "apps/worker/src/processors/service-job-brief.processor.test.ts",
+    "apps/worker/src/processors/transactional-email-message-log.test.ts",
+    "apps/worker/src/processors/transactional-email-message-log.ts",
+    "apps/worker/src/processors/vip-membership-email-source-id.test.ts",
+    "docs/contracts/fs-81-queue-retry-dead-letter-v0.1.md",
+    "packages/comms/src/email-provider.test.ts",
+    "packages/comms/src/email-provider.ts",
+    "packages/comms/src/receipt-consent.test.ts",
+    "packages/comms/src/receipt-consent.ts",
+    "packages/comms/src/resend-email.adapter.test.ts",
+    "packages/comms/src/resend-email.adapter.ts",
+    "packages/comms/src/sms-disabled.stub.test.ts",
+    "packages/comms/src/sms-disabled.stub.ts",
+    "packages/comms/src/sms-provider.registry.test.ts",
+    "packages/comms/src/sms-provider.registry.ts",
+    "packages/jobs/src/clerk-workspace.ts",
+    "packages/jobs/src/dead-letter-job.ts",
+    "packages/jobs/src/dead-letter-queue.test.ts",
+    "packages/jobs/src/dead-letter-queue.ts",
+    "packages/jobs/src/enqueue-migrate-file-batch-retry.ts",
+    "packages/jobs/src/enqueue-migrate-file-batch.ts",
+    "packages/jobs/src/job-replay.ts",
+    "packages/jobs/src/platform-queue-registry.ts",
+    "packages/jobs/src/queue-monitoring.test.ts",
+    "packages/jobs/src/queue-names.ts",
+    "packages/jobs/src/queue-policy.test.ts",
+    "packages/jobs/src/queue-policy.ts",
+    "packages/jobs/src/queue-retry-policy.test.ts",
+    "packages/jobs/src/queue-retry-policy.ts",
+    "packages/jobs/src/queues.ts",
+    "packages/jobs/src/vip-membership-email.test.ts",
+    "packages/jobs/src/vip-membership-email.ts",
+    "packages/jobs/src/worker-terminal-failure.test.ts",
+    "packages/jobs/src/worker-terminal-failure.ts",
+    "packages/types/src/queue-platform/v0/retry-policy.ts"
+  ]
+}

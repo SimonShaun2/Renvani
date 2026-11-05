@@ -347,15 +347,19 @@ export function AiRevenueCenterClient() {
     ...(selectedType !== "all" ? { type: selectedType } : {})
   });
 
-  const recommendations = recommendationsQuery.isError ? [] : recommendationsQuery.data?.data ?? [];
+  const recommendationsState = revenueDataState(recommendationsQuery);
+  const recommendations = recommendationsState === "ready" ? recommendationsQuery.data?.data ?? [] : [];
 
   // This refreshes stored results; a new background scan requires a separate authorized job.
   async function handleRefreshView() {
     setRefreshing(true);
     setRefreshNotice(null);
     try {
-      const [summary, list] = await Promise.all([summaryQuery.refetch(), recommendationsQuery.refetch()]);
-      if (summary.isError || list.isError || !summary.data || !list.data) {
+      // Keep the control pending until both requests settle, even if one rejects.
+      const [summary, list] = await Promise.allSettled([summaryQuery.refetch(), recommendationsQuery.refetch()]);
+      if (summary.status === "rejected" || list.status === "rejected") {
+        setRefreshNotice({ type: "error", message: "Revenue data could not be refreshed. Try again." });
+      } else if (summary.value.isError || list.value.isError || !summary.value.data || !list.value.data) {
         setRefreshNotice({ type: "error", message: "Revenue data could not be refreshed. The previous view may be out of date." });
       } else {
         setRefreshNotice({ type: "success", message: "Saved opportunity results refreshed. Automated opportunity checks run separately." });
@@ -475,13 +479,13 @@ export function AiRevenueCenterClient() {
               </div>
             </section>
 
-            {summaryQuery.isLoading ? (
+            {summaryState === "loading" ? (
               <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
                 {Array.from({ length: 5 }, (_, index) => (
                   <SkeletonCard key={index} className="h-[146px]" />
                 ))}
               </div>
-            ) : summaryQuery.isError ? (
+            ) : summaryState === "unavailable" ? (
               <div className="rounded-3xl border border-error/15 bg-error-light px-5 py-5 text-sm text-error">
                 <p>Revenue categories could not be loaded.</p>
                 <button
@@ -578,9 +582,9 @@ export function AiRevenueCenterClient() {
                   {actionError}
                 </div>
               ) : null}
-              {recommendationsQuery.isLoading ? (
+              {recommendationsState === "loading" ? (
                 Array.from({ length: 5 }, (_, index) => <SkeletonCard key={index} className="h-[228px]" />)
-              ) : recommendationsQuery.isError ? (
+              ) : recommendationsState === "unavailable" ? (
                 <div className="rounded-3xl border border-error/15 bg-error-light px-5 py-5 text-sm text-error">
                   <p>Recommendations could not be loaded.</p>
                   <button
@@ -633,7 +637,7 @@ export function AiRevenueCenterClient() {
               )}
             </div>
 
-            {recommendationsQuery.data && recommendationsQuery.data.totalPages > 1 ? (
+            {recommendationsState === "ready" && recommendationsQuery.data && recommendationsQuery.data.totalPages > 1 ? (
               <section className="surface-card flex flex-col gap-4 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
                 <p className="text-sm text-neutral-500">
                   Page {recommendationsQuery.data.page} of {recommendationsQuery.data.totalPages}

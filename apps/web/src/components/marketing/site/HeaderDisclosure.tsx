@@ -1,12 +1,14 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useEffect, useId, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useId, useRef, useState, type ReactNode } from "react";
+
+const HEADER_MENU_GROUP = "marketing-header";
 
 /**
- * Header menu disclosure (product 177:640, industry 177:686, mobile 177:737). A <details> element so it opens without JS;
- * with JS: aria-expanded/aria-controls on the toggle, Escape closes and returns focus to the toggle, any "Close menu"
- * button inside ([data-menu-close]) closes, and following a link (or any route change) closes the menu.
+ * Header menu disclosure (product 177:640, industry 177:686, mobile 177:737). Native <details> opens without JS,
+ * and a shared name keeps the menus exclusive. With JS, sibling toggles, outside clicks, and leaving focus close it;
+ * Escape and any "Close menu" button ([data-menu-close]) return focus to its toggle, and links or route changes close it.
  */
 export function HeaderDisclosure({
   nodeId,
@@ -29,27 +31,61 @@ export function HeaderDisclosure({
   const [open, setOpen] = useState(false);
   const id = useId();
   const pathname = usePathname();
-  const close = (focus: boolean) => {
+  const close = useCallback((focus: boolean) => {
     if (!ref.current) return;
     ref.current.open = false;
     setOpen(false);
     if (focus) ref.current.querySelector("summary")?.focus();
-  };
-  useEffect(() => close(false), [pathname]);
+  }, []);
+
+  useEffect(() => close(false), [pathname, close]);
+
+  useEffect(() => {
+    const details = ref.current;
+    if (!details) return;
+    const ownerDocument = details.ownerDocument;
+    const onToggle = (event: Event) => {
+      const target = event.target;
+      // Also synchronize React state and support browsers without native details grouping.
+      if (target instanceof HTMLDetailsElement && target !== details && target.getAttribute("name") === HEADER_MENU_GROUP && target.open) {
+        close(false);
+      }
+    };
+    const onOutsideInteraction = (event: Event) => {
+      if (details.open && event.target instanceof Node && !details.contains(event.target)) close(false);
+    };
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && details.open) {
+        event.preventDefault();
+        close(true);
+      }
+    };
+
+    // Toggle does not bubble. Capture observes sibling menus before React handles their state.
+    ownerDocument.addEventListener("toggle", onToggle, true);
+    ownerDocument.addEventListener("pointerdown", onOutsideInteraction, true);
+    ownerDocument.addEventListener("click", onOutsideInteraction, true);
+    ownerDocument.addEventListener("focusin", onOutsideInteraction, true);
+    ownerDocument.addEventListener("keydown", onKeyDown);
+    return () => {
+      ownerDocument.removeEventListener("toggle", onToggle, true);
+      ownerDocument.removeEventListener("pointerdown", onOutsideInteraction, true);
+      ownerDocument.removeEventListener("click", onOutsideInteraction, true);
+      ownerDocument.removeEventListener("focusin", onOutsideInteraction, true);
+      ownerDocument.removeEventListener("keydown", onKeyDown);
+    };
+  }, [close]);
+
   return (
     <details
       ref={ref}
+      name={HEADER_MENU_GROUP}
       data-node-id={nodeId}
       className={className}
-      onToggle={(e) => setOpen((e.currentTarget as HTMLDetailsElement).open)}
-      onKeyDown={(e) => {
-        if (e.key === "Escape" && ref.current?.open) {
-          e.preventDefault();
-          close(true);
-        }
-      }}
+      onToggle={(e) => setOpen(e.currentTarget.open)}
       onClick={(e) => {
-        const t = e.target as HTMLElement;
+        const t = e.target;
+        if (!(t instanceof Element)) return;
         if (t.closest("[data-menu-close]")) close(true);
         else if (t.closest("a")) close(false);
       }}

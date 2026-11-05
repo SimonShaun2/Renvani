@@ -26,9 +26,9 @@ export const SITE_FOOTER = {
 };
 
 export const HOME_META = {
-  title: "Renvani — More direct jobs. More repeat customers.",
+  title: "Renvani | More jobs. Less on your shoulders.",
   description:
-    "Website booking, job details and repeat-visit reminders for HVAC, plumbing and electrical businesses. Win the job. Run the work. Bring customers back."
+    "Connect getting found, booking work, running the job and bringing customers back. Explore Renvani for home and field service businesses."
 };
 
 export const GROWTH_CHECK_ENTRY = {

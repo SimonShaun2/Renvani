@@ -101,3 +101,20 @@ jobs:
           node --test scripts/ci/fs229-revenue-inquiry-postgres.test.mjs
           pnpm --filter @fsm/api... build
           node scripts/ci/fs229-revenue-inquiry-postgres.mjs
+      - name: FS-234 consent PostgreSQL gate runtime
+        if: github.event_name == 'pull_request' && github.event.pull_request.number == 430 && github.event.pull_request.head.ref == 'codex/consent-ledger-contract' && github.event.pull_request.base.ref == 'dev' && github.event.pull_request.head.repo.full_name == github.repository
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.16.0
+          cache: pnpm
+      - name: FS-234 build API dependencies
+        if: github.event_name == 'pull_request' && github.event.pull_request.number == 430 && github.event.pull_request.head.ref == 'codex/consent-ledger-contract' && github.event.pull_request.base.ref == 'dev' && github.event.pull_request.head.repo.full_name == github.repository
+        run: corepack pnpm --filter "@fsm/api..." build
+      - name: FS-234 strict isolated consent PostgreSQL acceptance
+        if: github.event_name == 'pull_request' && github.event.pull_request.number == 430 && github.event.pull_request.head.ref == 'codex/consent-ledger-contract' && github.event.pull_request.base.ref == 'dev' && github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          NEON_CI_DATABASE_URL: ${{ secrets.NEON_CI_STAGING_DATABASE_URL }}
+          RENVANI_DEPLOYMENT_TIER: staging
+          FS234_PR_NUMBER: ${{ github.event.pull_request.number }}
+          FS234_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: node scripts/ci/fs234-consent-postgres.mjs

@@ -27,6 +27,7 @@ import {
   text,
   varchar,
   integer,
+  bigint,
   decimal,
   boolean,
   timestamp,
@@ -34,6 +35,7 @@ import {
   jsonb,
   index,
   uniqueIndex,
+  foreignKey,
   type AnyPgColumn,
   check,
 } from "drizzle-orm/pg-core";
@@ -55,6 +57,12 @@ const companyId = () =>
   uuid("company_id")
     .notNull()
     .references(() => companies.id, { onDelete: "cascade" });
+
+// Consent evidence must block a company hard delete rather than cascade it.
+const consentCompanyId = () =>
+  uuid("company_id")
+    .notNull()
+    .references(() => companies.id, { onDelete: "no action" });
 
 // ─────────────────────────────────────────────
 // ENUMS
@@ -388,6 +396,13 @@ export const activityEventTypeEnum = pgEnum("activity_event_type", [
   "revenue.inquiry_qualified",
   "revenue.inquiry_received",
   "revenue.inquiry_escalated",
+  "outbound_consent.granted",
+  "outbound_consent.revoked",
+  "outbound_consent.email_challenge_issued",
+  "outbound_consent.email_verification_attempted",
+  "outbound_consent.email_verification_sent",
+  "outbound_consent.email_verification_uncertain",
+  "outbound_consent.email_verified",
   // Saved card migration (FS-138)
   "payment_method_migration.requested",
   "payment_method_migration.mappings_applied",
@@ -657,6 +672,7 @@ export const customers = pgTable("customers", {
   ...timestamps,
 }, (t) => ({
   companyIdx: index("customers_company_idx").on(t.companyId),
+  tenantCustomerUnique: uniqueIndex("customers_company_id_id_unique").on(t.companyId, t.id),
   emailIdx: index("customers_email_idx").on(t.email),
   lastServiceIdx: index("customers_last_service_idx").on(t.lastServiceDate),
   importLineageIdx: uniqueIndex("customers_import_lineage_idx").on(
@@ -2236,6 +2252,122 @@ export const bookingRequests = pgTable("booking_requests", {
   zipIdx: index("booking_requests_zip_idx").on(t.zip),
   sourceIdx: index("booking_requests_source_idx").on(t.source),
   phoneIdx: index("booking_requests_phone_idx").on(t.phone),
+}));
+
+// FS-234: the destination-specific authority for outbound communication. A missing row denies.
+// The 0062 migration must enable and FORCE tenant RLS on both tables after FS-235's 0061 lands.
+export const outboundConsentSubjectTypeEnum = pgEnum("outbound_consent_subject_type", ["customer", "booking_request"]);
+export const outboundConsentChannelEnum = pgEnum("outbound_consent_channel", ["email", "sms"]);
+export const outboundConsentPurposeEnum = pgEnum("outbound_consent_purpose", ["appointment", "marketing"]);
+export const outboundConsentStateEnum = pgEnum("outbound_consent_state", ["granted", "revoked"]);
+export const outboundConsentDecisionEnum = pgEnum("outbound_consent_decision", ["grant", "revoke"]);
+export const outboundConsentReceiptSurfaceEnum = pgEnum("outbound_consent_receipt_surface", [
+  "public_inquiry", "customer_portal", "operator", "signed_inbound",
+]);
+
+// Independently persisted capture evidence; only a future source-specific trusted boundary may insert.
+// Migration 0062 forces tenant RLS and rejects evidence UPDATE/DELETE with triggers.
+export const outboundConsentCaptureReceipts = pgTable("outbound_consent_capture_receipts", {
+  id: id(),
+  companyId: consentCompanyId(),
+  subjectType: outboundConsentSubjectTypeEnum("subject_type").notNull(),
+  subjectId: uuid("subject_id").notNull(),
+  channel: outboundConsentChannelEnum("channel").notNull(),
+  purpose: outboundConsentPurposeEnum("purpose").notNull(),
+  contact: varchar("contact", { length: 320 }).notNull(),
+  decision: outboundConsentDecisionEnum("decision").notNull(),
+  explicitChoice: boolean("explicit_choice").notNull(),
+  statementVersion: varchar("statement_version", { length: 64 }).notNull(),
+  sourceRecordId: uuid("source_record_id").notNull(),
+  sourceSurface: outboundConsentReceiptSurfaceEnum("source_surface").notNull(),
+  actorType: varchar("actor_type", { length: 30 }).notNull(),
+  actorId: uuid("actor_id"),
+  signedInboundIdentity: varchar("signed_inbound_identity", { length: 255 }),
+  signatureVerifiedAt: timestamp("signature_verified_at"),
+  capturedAt: timestamp("captured_at").notNull().defaultNow(),
+  idempotencyKey: varchar("idempotency_key", { length: 128 }).notNull(),
+  payloadFingerprint: varchar("payload_fingerprint", { length: 64 }).notNull(),
+  ...timestamps,
+}, (t) => ({
+  idempotency: uniqueIndex("outbound_consent_capture_receipts_idempotency").on(t.companyId, t.idempotencyKey),
+  subjectIdx: index("outbound_consent_capture_receipts_subject_idx").on(t.companyId, t.subjectType, t.subjectId),
+}));
+
+// A customer email challenge proves destination control only after a single successful consume.
+// Issuance facts and token hash are immutable; migration 0062 permits only the first consumedAt write.
+export const outboundConsentEmailChallenges = pgTable("outbound_consent_email_challenges", {
+  id: id(),
+  companyId: consentCompanyId(),
+  customerId: uuid("customer_id").notNull(),
+  email: varchar("email", { length: 320 }).notNull(),
+  tokenHash: varchar("token_hash", { length: 64 }).notNull(),
+  idempotencyKey: varchar("idempotency_key", { length: 128 }).notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
+  consumedAt: timestamp("consumed_at"),
+  ...timestamps,
+}, (t) => ({
+  tenantCustomer: foreignKey({
+    name: "outbound_consent_email_challenges_tenant_customer_fk",
+    columns: [t.companyId, t.customerId],
+    foreignColumns: [customers.companyId, customers.id],
+  }).onDelete("no action").onUpdate("no action"),
+  tokenUnique: uniqueIndex("outbound_consent_email_challenges_token_hash_idx").on(t.tokenHash),
+  tenantIdempotency: uniqueIndex("outbound_consent_email_challenges_idempotency_idx").on(t.companyId, t.idempotencyKey),
+  customerIssued: index("outbound_consent_email_challenges_customer_issued_idx").on(t.companyId, t.customerId, t.createdAt),
+  shortExpiry: check("outbound_consent_email_challenges_short_expiry_chk",
+    sql`${t.expiresAt} > ${t.createdAt} AND ${t.expiresAt} <= ${t.createdAt} + interval '20 minutes'`),
+  consumeWithinExpiry: check("outbound_consent_email_challenges_consume_within_expiry_chk",
+    sql`${t.consumedAt} IS NULL OR (${t.consumedAt} >= ${t.createdAt} AND ${t.consumedAt} <= ${t.expiresAt})`),
+}));
+
+export const outboundConsentStates = pgTable("outbound_consent_states", {
+  id: id(),
+  companyId: consentCompanyId(),
+  subjectType: outboundConsentSubjectTypeEnum("subject_type").notNull(),
+  subjectId: uuid("subject_id").notNull(),
+  channel: outboundConsentChannelEnum("channel").notNull(),
+  purpose: outboundConsentPurposeEnum("purpose").notNull(),
+  contact: varchar("contact", { length: 320 }).notNull(),
+  state: outboundConsentStateEnum("state").notNull(),
+  version: bigint("version", { mode: "number" }).notNull(),
+  decidedAt: timestamp("decided_at").notNull().defaultNow(),
+  sourceKind: varchar("source_kind", { length: 64 }).notNull(),
+  sourceRecordId: uuid("source_record_id").notNull(),
+  statementVersion: varchar("statement_version", { length: 64 }).notNull(),
+  lastEventId: uuid("last_event_id").notNull(),
+  ...timestamps,
+}, (t) => ({
+  key: uniqueIndex("outbound_consent_states_key").on(t.companyId, t.subjectType, t.subjectId, t.channel, t.purpose, t.contact),
+  subjectIdx: index("outbound_consent_states_subject_idx").on(t.companyId, t.subjectType, t.subjectId),
+}));
+
+// Append-only by service contract and migration 0062 trigger enforcement.
+export const outboundConsentEvents = pgTable("outbound_consent_events", {
+  id: id(),
+  companyId: consentCompanyId(),
+  subjectType: outboundConsentSubjectTypeEnum("subject_type").notNull(),
+  subjectId: uuid("subject_id").notNull(),
+  channel: outboundConsentChannelEnum("channel").notNull(),
+  purpose: outboundConsentPurposeEnum("purpose").notNull(),
+  contact: varchar("contact", { length: 320 }).notNull(),
+  decision: outboundConsentDecisionEnum("decision").notNull(),
+  version: bigint("version", { mode: "number" }).notNull(),
+  occurredAt: timestamp("occurred_at").notNull().defaultNow(),
+  sourceKind: varchar("source_kind", { length: 64 }).notNull(),
+  sourceRecordId: uuid("source_record_id").notNull(),
+  statementVersion: varchar("statement_version", { length: 64 }).notNull(),
+  actorType: varchar("actor_type", { length: 30 }).notNull(),
+  actorId: uuid("actor_id"),
+  evidenceRef: text("evidence_ref").notNull(),
+  idempotencyKey: varchar("idempotency_key", { length: 128 }).notNull(),
+  decisionFingerprint: varchar("decision_fingerprint", { length: 64 }).notNull(),
+  priorState: outboundConsentStateEnum("prior_state"),
+  currentState: outboundConsentStateEnum("current_state").notNull(),
+  ...timestamps,
+}, (t) => ({
+  keyVersion: uniqueIndex("outbound_consent_events_key_version").on(t.companyId, t.subjectType, t.subjectId, t.channel, t.purpose, t.contact, t.version),
+  idempotency: uniqueIndex("outbound_consent_events_idempotency").on(t.companyId, t.idempotencyKey),
+  subjectIdx: index("outbound_consent_events_subject_idx").on(t.companyId, t.subjectType, t.subjectId),
 }));
 
 export const inquirySubmitIdempotency = pgTable("inquiry_submit_idempotency", {

@@ -25,6 +25,11 @@ const resolves = (h: string) =>
   PRODUCT_PAGES.some((p) => `/product/${p.slug}` === h) ||
   INDUSTRY_PAGES.some((p) => `/industries/${p.slug}` === h);
 const PLAIN_OK = ["Local Search · Preview", "Owner App & Approval Rules", "Owner rules"];
+const INDUSTRY_LINKS = [
+  { label: "HVAC", href: "/industries/hvac" },
+  { label: "Plumbing", href: "/industries/plumbing" },
+  { label: "Electrical", href: "/industries/electrical" }
+];
 
 const menus = (c: HTMLElement) => ({ product: c.querySelector<HTMLDetailsElement>('[data-node-id="177:640"]')!, industry: c.querySelector<HTMLDetailsElement>('[data-node-id="177:686"]')!, mobile: c.querySelector<HTMLDetailsElement>('[data-node-id="177:737"]')! });
 const openMenu = (details: HTMLDetailsElement) => {
@@ -52,6 +57,20 @@ const expectProductInventory = (menu: HTMLElement) => {
   }
   expect(menu.querySelector("a a")).toBeNull();
 };
+const expectIndustryInventory = (menu: HTMLElement) => {
+  const industries = menu.querySelector<HTMLElement>('nav[aria-label="Renvani industries"]');
+  expect(industries).not.toBeNull();
+  const links = [...industries!.querySelectorAll("a")];
+  expect(links).toHaveLength(3);
+  expect(links.map((link) => link.getAttribute("href")).sort()).toEqual(INDUSTRY_LINKS.map((industry) => industry.href).sort());
+  for (const industry of INDUSTRY_LINKS) {
+    const link = links.find((item) => item.getAttribute("href") === industry.href)!;
+    expect(link.getAttribute("aria-label")).toBe(industry.label);
+    expect(link.textContent).toContain(industry.label);
+  }
+  expect(industries!.querySelector("a a")).toBeNull();
+  expect(menu.querySelector('a[href="/industries"]')!.textContent).toContain("All industries");
+};
 
 describe("header menus (177:640, 177:686, 177:737)", () => {
   it("every menu link resolves to a real page; only agreed items are plain text", () => {
@@ -74,11 +93,20 @@ describe("header menus (177:640, 177:686, 177:737)", () => {
     expect(p.querySelector("button[data-menu-close]")!.textContent).toBe("Close menu");
   });
 
+  it("desktop Industries offers the three active trades, their directory and demo access", () => {
+    const { container } = render(<MarketingShell><p>x</p></MarketingShell>);
+    const industry = menus(container).industry;
+    expectIndustryInventory(industry);
+    expect(industry.querySelector('a[href="/demo"]')).not.toBeNull();
+    expect(industry.querySelector("button[data-menu-close]")!.textContent).toBe("Close menu");
+  });
+
   it("mobile menu preserves the full product inventory, website navigation, sign-in and demo access", () => {
     const { container } = render(<MarketingShell><p>x</p></MarketingShell>);
     const mob = menus(container).mobile;
     expect(mob.textContent).toContain("Explore Renvani.");
     expectProductInventory(mob);
+    expectIndustryInventory(mob);
     expect(mob.querySelector('a[href="/product"]')!.textContent).toContain("All products");
     for (const e of MOBILE_EXPLORE) expect(mob.querySelector(`a[href="${e.href}"]`)).not.toBeNull();
     expect(mob.querySelector('a[href="/login"]')).not.toBeNull();
@@ -122,6 +150,60 @@ describe("header menus (177:640, 177:686, 177:737)", () => {
     expect(outerSummary.getAttribute("aria-expanded")).toBe("false");
   });
 
+  it("mobile Industries expands without closing the header, and its trade links dismiss the header without stealing focus", () => {
+    const { container } = render(<MarketingShell><p>x</p></MarketingShell>);
+    const mobile = menus(container).mobile;
+    const outerSummary = mobile.querySelector("summary")!;
+    const industries = mobile.querySelector<HTMLDetailsElement>("details[data-industry-menu]")!;
+    expect(industries).not.toBeNull();
+    expect(industries.hasAttribute("name")).toBe(false);
+    const summary = industries.querySelector("summary")!;
+    expect(summary.textContent).toContain("Industries");
+    openMenu(mobile);
+    expect(industries.open).toBe(false);
+
+    fireEvent.click(summary);
+    fireEvent(industries, new Event("toggle"));
+    expect(industries.open).toBe(true);
+    expect(mobile.open).toBe(true);
+    expect(outerSummary.getAttribute("aria-expanded")).toBe("true");
+
+    fireEvent.click(summary);
+    fireEvent(industries, new Event("toggle"));
+    expect(industries.open).toBe(false);
+    expect(mobile.open).toBe(true);
+
+    fireEvent.click(summary);
+    fireEvent(industries, new Event("toggle"));
+    const link = industries.querySelector<HTMLAnchorElement>('a[href="/industries/electrical"]')!;
+    link.addEventListener("click", (event) => event.preventDefault());
+    act(() => link.focus());
+    expect(mobile.open).toBe(true);
+    fireEvent.click(link);
+    expect(mobile.open).toBe(false);
+    expect(outerSummary.getAttribute("aria-expanded")).toBe("false");
+    expect(document.activeElement).not.toBe(outerSummary);
+  });
+
+  it("Tab can leave the nested Industries links and dismiss the mobile menu without returning focus to the header", () => {
+    const { container, getByRole } = render(<MarketingShell><button type="button">Outside action</button></MarketingShell>);
+    const mobile = menus(container).mobile;
+    const industries = mobile.querySelector<HTMLDetailsElement>("details[data-industry-menu]")!;
+    const outside = getByRole("button", { name: "Outside action" });
+    openMenu(mobile);
+    openMenu(industries);
+    const link = industries.querySelector<HTMLAnchorElement>('a[href="/industries/electrical"]')!;
+    act(() => link.focus());
+    const tab = new KeyboardEvent("keydown", { key: "Tab", bubbles: true, cancelable: true });
+    fireEvent(link, tab);
+    expect(tab.defaultPrevented).toBe(false);
+    // Supply the browser's native focus movement; this DOM environment does not perform Tab traversal.
+    act(() => outside.focus());
+    expect(mobile.open).toBe(false);
+    expect(mobile.querySelector("summary")!.getAttribute("aria-expanded")).toBe("false");
+    expect(document.activeElement).toBe(outside);
+  });
+
   it.each(["product", "industry", "mobile"] as const)("%s menu: aria-expanded tracks open state; Escape and Close menu close it and return focus", (k) => {
     const { container } = render(<MarketingShell><p>x</p></MarketingShell>);
     const d = menus(container)[k];
@@ -132,17 +214,21 @@ describe("header menus (177:640, 177:686, 177:737)", () => {
     fireEvent(d, new Event("toggle"));
     expect(s.getAttribute("aria-expanded")).toBe("true");
     if (k === "mobile") expect(s.getAttribute("aria-label")).toBe("Close menu");
-    fireEvent.keyDown(d.querySelector("a")!, { key: "Escape" });
+    if (k === "mobile") openMenu(d.querySelector<HTMLDetailsElement>("details[data-industry-menu]")!);
+    const link = k === "mobile" ? d.querySelector<HTMLAnchorElement>('[data-industry-menu] a[href="/industries/hvac"]')! : d.querySelector("a")!;
+    act(() => link.focus());
+    fireEvent.keyDown(link, { key: "Escape" });
     expect(d.open).toBe(false);
     expect(s.getAttribute("aria-expanded")).toBe("false");
     expect(document.activeElement).toBe(s);
-    const close = d.querySelector<HTMLButtonElement>("button[data-menu-close]");
-    if (close) {
-      d.open = true;
-      fireEvent(d, new Event("toggle"));
-      fireEvent.click(close);
-      expect(d.open).toBe(false);
-    }
+    const close = d.querySelector<HTMLButtonElement>("button[data-menu-close]")!;
+    expect(close).not.toBeNull();
+    openMenu(d);
+    act(() => close.focus());
+    fireEvent.click(close);
+    expect(d.open).toBe(false);
+    expect(s.getAttribute("aria-expanded")).toBe("false");
+    expect(document.activeElement).toBe(s);
   });
 
   it("opening a sibling menu closes the previous menu and updates both toggles without moving focus", () => {
@@ -292,12 +378,15 @@ describe("header disclosure dismissal", () => {
 });
 
 describe("header menus close when a link is followed", () => {
-  it("mobile menu closes on link click", () => {
+  it.each([
+    { menu: "industry" as const, href: "/industries/hvac" },
+    { menu: "mobile" as const, href: "/growth-check" }
+  ])("$menu menu closes on link click", ({ menu, href }) => {
     const { container } = render(<MarketingShell><p>x</p></MarketingShell>);
-    const d = menus(container).mobile;
+    const d = menus(container)[menu];
     d.open = true;
     fireEvent(d, new Event("toggle"));
-    const a = d.querySelector<HTMLAnchorElement>('a[href="/growth-check"]')!;
+    const a = d.querySelector<HTMLAnchorElement>(`a[href="${href}"]`)!;
     a.addEventListener("click", (e) => e.preventDefault());
     fireEvent.click(a);
     expect(d.open).toBe(false);

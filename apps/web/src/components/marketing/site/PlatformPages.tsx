@@ -1,43 +1,104 @@
 import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
-import type { HomeWorkflowId } from "./home-workflows";
-import { HomepageWorkflows } from "./HomepageWorkflows";
-import { ProductArtwork } from "./ProductArtwork";
-import { PRODUCT_PAGES } from "./flagship-registry";
-import { PRODUCT_STORIES, SUBPAGE_FRAMES, SUITE_NAMES } from "./subpage-content";
-import { Benefits, FinalCta, FlagshipCards, SectionHeading, SubpageFaq, SubpageHero } from "./SubpageShared";
-import styles from "./subpage.module.css";
 
-export function ProductsPage() {
-  return <div className={styles.page} data-marketing-template="product-directory">
-    <SubpageHero eyebrow="THE RENVANI PLATFORM" title="Five products. One connected business." description="Grow the demand. Win the work. Run the job. Bring customers back. Keep the owner in control." secondary={{label:"Explore the platform",href:"#flagships"}} />
-    <section className={styles.section} id="flagships"><SectionHeading eyebrow="START WITH THE OUTCOME" title="The products that move your business forward." /><FlagshipCards /></section>
-    <section className={`${styles.section} ${styles.white}`} id="tools"><SectionHeading eyebrow="FIELD SERVICE TOOLS" title="Everything behind a great service business." description="The FSM tools are the supporting layer. Each one helps the flagship products carry the work from one step to the next." />
-      <div className={styles.toolGroups}>{(Object.keys(SUITE_NAMES) as HomeWorkflowId[]).map(suite => <section className={styles.toolGroup} data-tool-group={suite} key={suite} aria-labelledby={`tools-${suite}`}><h3 id={`tools-${suite}`}>{SUITE_NAMES[suite]}</h3>{PRODUCT_PAGES.filter(page => page.template!=="flagship"&&PRODUCT_STORIES[page.slug]?.suite===suite).map(page=><Link key={page.slug} href={`/product/${page.slug}`}>{page.name}{page.slug==="customer-portal"?" · Preview":""}<ArrowUpRight size={16} aria-hidden="true" /></Link>)}</section>)}</div>
-    </section><FinalCta />
-  </div>;
+import { ConnectedPlatform } from "./ConnectedPlatform";
+import { MaybeLink } from "./MaybeLink";
+import { HOW_PAGE, PRODUCTS_PAGE } from "./platform-config";
+import styles from "./site.module.css";
+import { ToolDirectory } from "./ToolDirectory";
+
+const ink = "var(--color-mkt-ink)";
+const ink2 = "var(--color-mkt-ink2)";
+const eyebrow = "text-[11px] font-medium leading-[1.38] tracking-[1.1px]";
+const section = "mx-auto flex max-w-[1440px] flex-col gap-6 px-6 py-6 md:px-20 md:py-20";
+const h1 = "text-[42px] font-semibold leading-[1.08] tracking-[-1.05px] md:text-[64px] md:tracking-[-1.6px]";
+const h2 = "text-[34px] font-semibold leading-[1.08] tracking-[-0.85px] md:text-[48px] md:tracking-[-1.2px]";
+const pill = `${styles.press} inline-flex min-h-[44px] items-center rounded-full px-5 py-3 text-[15px] font-medium leading-[1.5]`;
+
+function Lines({ lines }: { lines: readonly string[] }) {
+  return <>{lines.map((l) => <span key={l} className="block">{l}</span>)}</>;
 }
 
-const howSteps = [
-  ["Choose the business goal", "Set your profile and an Operating Mission, such as getting more bookings. Your services and service area provide the starting point."],
-  ["Get found. Receive the request.", "Connect discovery to a clear service request. The inquiry brings its source and customer details with it."],
-  ["Prepare the estimate", "Use an email estimate or schedule an onsite estimate. Keep the proposed work and your prices clear."],
-  ["Confirm the scope. Create the job.", "Confirm and approve the work before converting the estimate into the work order and assigning the visit."],
-  ["Run the visit. Complete payment.", "The technician follows the job, records photos and materials, then completes the invoice and configured payment workflow."],
-  ["Build the next visit", "Use the completed record for a review invitation, membership or maintenance follow-up. Review and consent requirements stay in place."]
-] as const;
+function Cta({ cta, node }: { cta: typeof PRODUCTS_PAGE.cta; node: string }) {
+  return (
+    <section data-node-id={node} style={{ background: ink }} aria-labelledby={`${node}-h`}>
+      <div className={section}>
+        <h2 id={`${node}-h`} className="text-[34px] font-semibold leading-[1.08] text-white md:text-[48px]">{cta.headline}</h2>
+        {/* 225:7776: button above the link on mobile, 24px apart. */}
+        <div className="flex flex-col items-start gap-6 md:flex-row md:flex-wrap md:items-center md:gap-5">
+          <Link href={cta.primary.href} className={pill} style={{ background: "var(--color-mkt-amber)", color: ink }}>{cta.primary.label}</Link>
+          <MaybeLink href={cta.secondary.href} className="text-[14px] font-medium leading-[1.38] text-white">{cta.secondary.label}</MaybeLink>
+        </div>
+      </div>
+    </section>
+  );
+}
 
+/** products / Desktop 176:204, products / Mobile 176:313. */
+export function ProductsPage() {
+  const p = PRODUCTS_PAGE;
+  return (
+    <>
+      <section data-node-id="225:7335" aria-labelledby="products-h">
+        <div className={section}>
+          <p className={eyebrow} style={{ color: ink2 }}>{p.eyebrow}</p>
+          <h1 id="products-h" className={h1}><Lines lines={p.headline} /></h1>
+          {/* 225:7568: button above the link on mobile, 20px apart. */}
+          <div className="flex flex-col items-start gap-5 md:flex-row md:flex-wrap md:items-center">
+            <Link href={p.primary.href} className={pill} style={{ background: "var(--color-mkt-amber)", color: ink }}>{p.primary.label}</Link>
+            <Link href={p.secondary.href} className="text-[14px] font-medium leading-[1.38]" style={{ color: ink2 }}>{p.secondary.label}</Link>
+          </div>
+        </div>
+      </section>
+      <section data-node-id="225:7342" className="bg-white" aria-label="One job across Renvani">
+        <div className={section}><ConnectedPlatform /></div>
+      </section>
+      <section id="tools" data-node-id="225:7464" className="scroll-mt-24 bg-white" aria-labelledby="tools-h">
+        <div className={`${section} gap-8`}>
+          <p className={eyebrow} style={{ color: ink2 }}>{p.toolsEyebrow}</p>
+          <h2 id="tools-h" className={`${h2} max-md:text-[36px] max-md:tracking-[-0.9px]`}>{p.toolsHeadline}</h2>
+          <ToolDirectory />
+        </div>
+      </section>
+      <Cta cta={p.cta} node="225:7547" />
+    </>
+  );
+}
+
+/** how-it-works / Desktop 176:585, how-it-works / Mobile 176:664. */
 export function HowItWorksPage() {
-  return <div className={styles.page} data-marketing-template="how-it-works" data-node-id={SUBPAGE_FRAMES.how.desktop}>
-    <SubpageHero eyebrow="ONE CONNECTED BUSINESS" title="Set the goal. Keep the work moving." description="From getting found to getting paid and bringing customers back. Five products keep the handoffs connected, with you in control." secondary={{label:"Follow a job",href:"#workflow"}}><figure><ProductArtwork slug="command-center" /><figcaption className={styles.caption}>Illustrative owner workflow · Example business and data</figcaption></figure></SubpageHero>
-    <Benefits items={["Choose your mission", "Review the next move", "Follow the job through"]} />
-    <section id="workflow" className={`${styles.section} ${styles.white}`}><SectionHeading eyebrow="A REAL-WORLD SERVICE JOURNEY" title="One job. Connected from start to finish." description="An illustrative journey through your business, not a set of isolated screens." /><div className={styles.howSteps}>{howSteps.map(([title,body],index)=><article key={title} className={styles.howStep}><span>0{index+1}</span><h3>{title}</h3><p>{body}</p></article>)}</div></section>
-    <HomepageWorkflows />
-    <section className={`${styles.section} ${styles.dark}`}><div className={styles.copy}><p className={styles.eyebrow}>YOU SET THE DIRECTION</p><h2 className={styles.h2}>The business moves. You stay in control.</h2><p className={styles.body}>Command Center brings the proposed next move, the record behind it and the approval together. The system does not skip your policies, permissions or customer consent.</p><Link href="/product/command-center" className={`${styles.button} ${styles.outlineButton}`}>Explore Command Center<ArrowUpRight size={17} aria-hidden="true" /></Link></div></section>
-    <SubpageFaq items={[
-      {question:"Where does a new business start?",answer:"Start with your business profile, services, service area and goal. Review the available records and opportunities with the team so your first workflow has useful context."},
-      {question:"Is every action automatic?",answer:"No. Renvani follows business policies and approval requirements. The owner reviews the actions and exceptions that need a decision; messages and financial actions keep their separate controls."},
-      {question:"Does this replace the field service tools?",answer:"No. Scheduling, estimates, job records, field workflows and invoicing support the five flagship products. They are the tools that carry out and record the work."}
-    ]} /><FinalCta />
-  </div>;
+  const p = HOW_PAGE;
+  return (
+    <>
+      <section data-node-id="219:9320" aria-labelledby="how-h">
+        <div className={section}>
+          <p className={eyebrow} style={{ color: ink2 }}>{p.eyebrow}</p>
+          <h1 id="how-h" className={h1}><Lines lines={p.headline} /></h1>
+          <p className="text-[17px]" style={{ color: ink2 }}>{p.body}</p>
+          <div className="flex flex-wrap items-center gap-5">
+            <Link href={p.primary.href} className={pill} style={{ background: "var(--color-mkt-amber)", color: ink }}>{p.primary.label}</Link>
+            <Link href={p.secondary.href} className="text-[14px] font-medium" style={{ color: ink2 }}>{p.secondary.label}</Link>
+          </div>
+        </div>
+      </section>
+      <section data-node-id="219:9328" className="bg-white" aria-label="Five flagship products working together">
+        <div className={section}><ConnectedPlatform /></div>
+      </section>
+      <section data-node-id="219:9447" aria-labelledby="how-trades-h">
+        <div className={`${section} gap-8`}>
+          <h2 id="how-trades-h" className={h2}><Lines lines={p.tradesHeadline} /></h2>
+          <div className="grid gap-8 md:grid-cols-2">
+            {p.trades.map((t) => (
+              <div key={t.eyebrow} className="flex flex-col gap-4">
+                <img src={t.image} alt="" width={1248} height={660} className="h-[200px] w-full rounded-2xl object-cover md:h-[280px]" />
+                <p className={eyebrow} style={{ color: ink2 }}>{t.eyebrow}</p>
+                <h3 className="text-[24px] font-semibold md:text-[30px] md:leading-[1.38]">{t.title}</h3>
+                <MaybeLink href={t.link.href} className="text-[14px] font-medium md:leading-[1.38]" style={{ color: ink2 }}>{t.link.label}</MaybeLink>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+      <Cta cta={p.cta} node="219:9460" />
+    </>
+  );
 }

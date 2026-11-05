@@ -51,14 +51,16 @@ describe("pricing (Figma 203:15719 desktop / 203:15720 mobile)", () => {
     expect(t["ex.flatTotal"]).toBe("$274.00");
   });
 
-  it("renders one responsive page with resolved pricing figures", () => {
+  it("renders desktop and mobile frames with resolved figures and one h1 each", () => {
     const { container } = render(<PricingFrames />);
     const text = container.textContent ?? "";
     expect(text).not.toMatch(/\{\{/);
-    for (const s of ["$399", "$999", "2% customer-paid Service Fee", "No customer-paid Service Fee", "Startup $99/mo · Founding $199/mo", "$279.48", "$274.00"]) {
+    for (const s of ["$399", "$999", "2% customer-paid Service Fee", "No customer-paid Service Fee", "Startup $99/mo · Founding $199/mo", "Pay $279.48", "Pay $274.00"]) {
       expect(text).toContain(s);
     }
-    expect(container.querySelectorAll("h1")).toHaveLength(1);
+    expect(container.querySelectorAll("h1")).toHaveLength(2);
+    expect(container.querySelector(".xl\\:hidden")).not.toBeNull();
+    expect(container.querySelector(".hidden.xl\\:block")).not.toBeNull();
   });
 
   it("every link resolves to a real route and images exist", () => {
@@ -66,9 +68,7 @@ describe("pricing (Figma 203:15719 desktop / 203:15720 mobile)", () => {
     const hrefs = Array.from(container.querySelectorAll("a")).map((a) => a.getAttribute("href")!);
     expect(hrefs.length).toBeGreaterThanOrEqual(8);
     for (const h of hrefs) {
-      if (h.startsWith("#")) { expect(container.querySelector(h)).toBeTruthy(); continue; }
       const path = h.split("?")[0]!;
-      if (path.startsWith("/product/")) { expect(existsSync(join(APP, "(marketing)/product/[slug]/page.tsx"))).toBe(true); continue; }
       expect(existsSync(join(APP, `(auth)${path}`)) || existsSync(join(APP, `(marketing)${path}/page.tsx`))).toBe(true);
     }
     for (const img of Array.from(container.querySelectorAll("img"))) {
@@ -79,9 +79,9 @@ describe("pricing (Figma 203:15719 desktop / 203:15720 mobile)", () => {
   it("plan CTAs follow the Figma prototype links (204:7829 / I204:7831;204:7829 / 204:7952 / I204:7954;204:7952 / 204:7915 / 204:8038)", () => {
     const { container } = render(<PricingFrames />);
     const byLabel = (label: string) => Array.from(container.querySelectorAll("a")).filter((a) => a.textContent?.trim() === label).map((a) => a.getAttribute("href"));
-    expect(byLabel("Explore Flex")).toEqual(["/demo?plan=flex"]);
-    expect(byLabel("Explore Flat")).toEqual(["/demo?plan=flat"]);
-    expect(byLabel("Ask about eligibility")).toEqual(["/demo"]);
+    expect(byLabel("Explore Flex")).toEqual(["/demo?plan=flex", "/demo?plan=flex"]);
+    expect(byLabel("Explore Flat")).toEqual(["/demo?plan=flat", "/demo?plan=flat"]);
+    expect(byLabel("Ask about programs")).toEqual(["/demo", "/demo"]);
     expect(byLabel("Get a free demo").every((h) => h === "/demo")).toBe(true);
     expect(Array.from(container.querySelectorAll("a")).some((a) => a.getAttribute("href")?.startsWith("/signup?plan"))).toBe(false);
   });

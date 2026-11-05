@@ -124,7 +124,8 @@ function createAuthContext(role: "owner" | "admin" | "dispatcher" | "technician"
 
 
 function seedRec(companyId: string, overrides: Record<string, unknown> = {}) {
-  const customer = fakeDb.seedCustomer({ companyId, firstName: "Chris", lastName: "Pine", phone: "555-0100" });
+  // FS-281: SMS execute fails closed on phones that cannot be normalised to E.164, so use a full 10-digit number.
+  const customer = fakeDb.seedCustomer({ companyId, firstName: "Chris", lastName: "Pine", phone: "555-010-0100" });
   const rec = fakeDb.seedAiRecommendation({
     companyId,
     type: "unpaid_invoice",
@@ -163,7 +164,7 @@ describe("revenue agent proposals", () => {
     expect(second.body.created).toBe(false);
     expect(second.body.proposal.id).toBe(first.body.proposal.id);
     const raw = JSON.stringify(first.body);
-    for (const leaked of ["companyId", owner.company.id, "idempotencyKey", "payloadHash", "phone", "555-0100"]) {
+    for (const leaked of ["companyId", owner.company.id, "idempotencyKey", "payloadHash", "phone", "555-010-0100"]) {
       expect(raw).not.toContain(leaked);
     }
   });

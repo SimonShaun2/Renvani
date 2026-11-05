@@ -1,6 +1,6 @@
 import { and, eq, isNull } from "drizzle-orm";
 
-import { bookingRequests, customers, db } from "@fsm/db";
+import { bookingRequests, customers, db, isPhoneSmsOptedOut, normalizePhoneE164 } from "@fsm/db";
 import {
   AppError,
   ErrorCode,
@@ -50,6 +50,7 @@ async function loadConsentSnapshotForTarget(
 
     const consentVersion = row.updatedAt.getTime();
     return {
+      targetPhone: row.phone,
       consentScope,
       capturedAt: row.updatedAt.toISOString(),
       consentVersion,
@@ -76,16 +77,16 @@ async function loadConsentSnapshotForTarget(
     // Customer preferences have no opt-in fields. Inquiry updatedAt can change for scheduling,
     // so it cannot order consent decisions. Conflicting records for the current phone deny.
     // Include soft-deleted inquiries so deleting a decline cannot revive an older grant.
-    const inquiries = await db
+    // FS-281: phones are compared in normalised E.164 form (customer phones are stored E.164, booking phones as
+    // 10 digits). A phone that cannot be normalised never matches, so it yields no consent evidence (fail closed).
+    const customerPhoneE164 = normalizePhoneE164(row.phone);
+    const customerInquiries = await db
       .select()
       .from(bookingRequests)
-      .where(
-        and(
-          eq(bookingRequests.companyId, companyId),
-          eq(bookingRequests.customerId, row.id),
-          eq(bookingRequests.phone, row.phone ?? "")
-        )
-      );
+      .where(and(eq(bookingRequests.companyId, companyId), eq(bookingRequests.customerId, row.id)));
+    const inquiries = customerPhoneE164
+      ? customerInquiries.filter((inquiry) => normalizePhoneE164(inquiry.phone) === customerPhoneE164)
+      : [];
     const consentVersion = inquiries.reduce(
       (latest, inquiry) => Math.max(latest, inquiry.updatedAt.getTime()),
       row.updatedAt.getTime()
@@ -93,6 +94,7 @@ async function loadConsentSnapshotForTarget(
     const capturedAt = new Date(consentVersion).toISOString();
     const hasMatchingSmsEvidence = channel === "sms" && !!row.phone && inquiries.length > 0;
     return {
+      targetPhone: row.phone,
       consentScope,
       capturedAt,
       consentVersion,
@@ -154,6 +156,26 @@ async function loadCustomerChannelPrefs(
   };
 }
 
+/**
+ * FS-281: platform-wide phone-level opt-out (`sms_opt_outs`, written by every inbound STOP).
+ *
+ * Tenant isolation: this is a plain-db read of a platform table with no company_id. It is safe because Renvani
+ * sends every tenant's SMS from one shared Twilio number (#295 ruling): a STOP withdraws consent for that phone
+ * for every tenant, the query is keyed only by the target's own phone, and it returns a yes/no, no row data.
+ * Fail closed: a phone that cannot be normalised, or a failed lookup, counts as opted out. The caller folds that
+ * into `consent.revokedAt` so the shared policy evaluator still applies its tenant/approval checks first and
+ * then denies with CONSENT_REQUIRED.
+ */
+async function isTargetPhoneSmsOptedOut(phone: string | null): Promise<boolean> {
+  const phoneE164 = normalizePhoneE164(phone);
+  if (!phoneE164) return true;
+  try {
+    return await isPhoneSmsOptedOut(phoneE164);
+  } catch {
+    return true;
+  }
+}
+
 function resolveConsentScope(actionType: string, target: CanonicalEntityRefV1): ConsentScope {
   if (actionType === "message.send_proposed" && target.entityType === "booking_request") return "appointment";
   if (actionType === "revenue.invoice_reminder.propose" || actionType === "revenue.estimate_followup.propose") {
@@ -174,7 +196,15 @@ export async function authorizeAgentActionExecution(
     throw new AppError(ErrorCode.CONSENT_REQUIRED, "Proposal consent scope does not match the action policy");
   }
   // Proposal snapshots are historical evidence. Execute always reads current tenant-owned consent.
-  const consent = await loadConsentSnapshotForTarget(input.companyId, input.target, consentScope, channel);
+  const { targetPhone, ...consent } = await loadConsentSnapshotForTarget(
+    input.companyId,
+    input.target,
+    consentScope,
+    channel
+  );
+  if (channel === "sms" && (await isTargetPhoneSmsOptedOut(targetPhone))) {
+    consent.revokedAt = consent.capturedAt;
+  }
   const customer = await loadCustomerChannelPrefs(input.companyId, input.target);
 
   const decision = evaluateOutboundAuthorization({

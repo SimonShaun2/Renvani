@@ -3093,3 +3093,20 @@ export const marketingGrowthChecks = pgTable("marketing_growth_checks", {
   createdAtIdx: index("marketing_growth_checks_created_at_idx").on(t.createdAt),
   emailIdx: index("marketing_growth_checks_email_idx").on(t.email),
 }));
+
+// ─────────────────────────────────────────────
+// FS-281 — phone-level SMS opt-out (platform-level, NOT tenant-scoped: no company_id, no tenant RLS).
+// Renvani sends every tenant's SMS from ONE shared Twilio number (#295 ruling), so a carrier STOP withdraws
+// consent for that phone across every tenant. Rows are consent-withdrawal only (START/UNSTOP is FS-270) and
+// app reads return only an opted-out yes/no for a phone; no tenant data lives here.
+// ─────────────────────────────────────────────
+
+export const smsOptOuts = pgTable("sms_opt_outs", {
+  id: id(),
+  phoneE164: varchar("phone_e164", { length: 16 }).notNull(),
+  source: varchar("source", { length: 32 }).notNull().default("twilio_stop"),
+  providerMessageId: varchar("provider_message_id", { length: 64 }),
+  ...timestamps,
+}, (t) => ({
+  phoneIdx: uniqueIndex("sms_opt_outs_phone_e164_idx").on(t.phoneE164),
+}));

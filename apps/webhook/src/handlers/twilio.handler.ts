@@ -5,10 +5,13 @@ import {
   customers,
   db,
   emitEventWithExecutor,
-  messageLogs
+  messageLogs,
+  normalizePhoneE164,
+  phoneMatchesE164,
+  recordSmsOptOut
 } from "@fsm/db";
 
-type TransactionExecutor = Pick<typeof db, "insert" | "update">;
+type TransactionExecutor = Pick<typeof db, "insert" | "update" | "select">;
 
 function buildTwimlResponse(): string {
   return '<?xml version="1.0" encoding="UTF-8"?><Response></Response>';
@@ -41,20 +44,27 @@ function getTwilioParam(params: Record<string, string> | undefined, key: string)
  */
 const ROUTING_LOOKBACK_ROWS = 5;
 
-function isConsentWithdrawal(messageBody: string): boolean {
-  return messageBody.trim().toUpperCase() === "STOP";
+/** FS-281: carrier opt-out keywords (case/whitespace-insensitive). START/UNSTOP (opt back in) is FS-270, not handled here. */
+const STOP_KEYWORDS = new Set(["STOP", "STOPALL", "UNSUBSCRIBE", "CANCEL", "END", "QUIT"]);
+
+export function isConsentWithdrawal(messageBody: string): boolean {
+  return STOP_KEYWORDS.has(messageBody.replace(/\s+/gu, "").toUpperCase());
 }
 
 type CustomerRow = typeof customers.$inferSelect;
 
-async function findLiveCustomersByPhone(phone: string, companyId?: string): Promise<CustomerRow[]> {
+/**
+ * Live customers whose stored phone matches `phoneE164` by digits (FS-281: legacy formats such as
+ * "(555) 010-0100" or "5550100100" match the Twilio E.164 `From` without a backfill).
+ */
+async function findLiveCustomersByPhone(phoneE164: string, companyId?: string): Promise<CustomerRow[]> {
   return db
     .select()
     .from(customers)
     .where(
       companyId
-        ? and(eq(customers.companyId, companyId), eq(customers.phone, phone), isNull(customers.deletedAt))
-        : and(eq(customers.phone, phone), isNull(customers.deletedAt))
+        ? and(eq(customers.companyId, companyId), phoneMatchesE164(customers.phone, phoneE164), isNull(customers.deletedAt))
+        : and(phoneMatchesE164(customers.phone, phoneE164), isNull(customers.deletedAt))
     )
     .limit(500);
 }
@@ -151,15 +161,17 @@ export async function twilioHandler(request: FastifyRequest, reply: FastifyReply
     return reply.code(200).type("text/xml").send(buildTwimlResponse());
   }
 
-  if (isConsentWithdrawal(messageBody)) {
-    const matches = await findLiveCustomersByPhone(fromNumber);
+  // Twilio sends E.164; normalise defensively so matching and the opt-out key are canonical.
+  const fromE164 = normalizePhoneE164(fromNumber) ?? fromNumber;
 
-    if (matches.length === 0) {
-      request.log.warn({ hasProviderMessageId: !!providerMessageId }, "Inbound SMS STOP from unknown phone; no-op");
-      return emptyTwiml(reply);
-    }
+  if (isConsentWithdrawal(messageBody)) {
+    const matches = await findLiveCustomersByPhone(fromE164);
 
     await db.transaction(async (tx: TransactionExecutor) => {
+      // FS-281: phone-level, platform-wide opt-out (no company_id; #295 shared-number ruling). Written on EVERY
+      // STOP, including phones with no customer row, so later sends to that phone are denied (fail closed).
+      await recordSmsOptOut(tx, { phoneE164: fromE164, source: "twilio_stop", providerMessageId });
+
       for (const match of matches) {
         await logInbound(tx, {
           companyId: match.companyId,
@@ -194,7 +206,7 @@ export async function twilioHandler(request: FastifyRequest, reply: FastifyReply
     });
 
     request.log.info(
-      { tenantCount: new Set(matches.map((m) => m.companyId)).size, customerCount: matches.length },
+      { tenantCount: new Set(matches.map((m) => m.companyId)).size, customerCount: matches.length, phoneOptOutRecorded: true },
       "Inbound SMS STOP applied platform-wide"
     );
     return emptyTwiml(reply);
@@ -210,7 +222,7 @@ export async function twilioHandler(request: FastifyRequest, reply: FastifyReply
     return emptyTwiml(reply);
   }
 
-  const [routedCustomer] = await findLiveCustomersByPhone(fromNumber, routedCompanyId);
+  const [routedCustomer] = await findLiveCustomersByPhone(fromE164, routedCompanyId);
 
   await db.transaction(async (tx: TransactionExecutor) => {
     await logInbound(tx, {

@@ -51,6 +51,8 @@ type ActivityEventRecord = {
 
 type Predicate<T> = (row: T) => boolean;
 
+const STORED_PHONE = "(555) 010-0100";
+
 interface MockTable {
   __name: string;
 }
@@ -74,8 +76,27 @@ const state = {
   companies: [] as CompanyRecord[],
   customers: [] as CustomerRecord[],
   messageLogs: [] as MessageLogRecord[],
-  activityEvents: [] as ActivityEventRecord[]
+  activityEvents: [] as ActivityEventRecord[],
+  smsOptOuts: [] as Array<{ phoneE164: string; source: string; providerMessageId: string | null }>
 };
+
+// Mirrors @fsm/import-normalize normalizePhoneE164 (the webhook package does not depend on it directly).
+function normalizePhoneE164(value: string | null | undefined): string | null {
+  if (typeof value !== "string" || !value.trim()) return null;
+  const trimmed = value.trim();
+  const digits = trimmed.replace(/\D/gu, "");
+  if (trimmed.startsWith("+")) return digits.length >= 8 && digits.length <= 15 ? `+${digits}` : null;
+  if (digits.length === 10) return `+1${digits}`;
+  if (digits.length === 11 && digits.startsWith("1")) return `+${digits}`;
+  return null;
+}
+
+// Mirrors the SQL in @fsm/db phoneMatchesE164: digits-only compare (with/without the US leading 1).
+function phoneMatchesE164(field: string, phoneE164: string) {
+  const digits = phoneE164.replace(/\D/gu, "");
+  const candidates = digits.length === 11 && digits.startsWith("1") ? [digits, digits.slice(1)] : [digits];
+  return (row: Record<string, unknown>) => candidates.includes(String(row[field] ?? "").replace(/[^0-9]/gu, ""));
+}
 
 const companiesTable = {
   __name: "companies",
@@ -119,6 +140,7 @@ function resetState(): void {
   state.customers.length = 0;
   state.messageLogs.length = 0;
   state.activityEvents.length = 0;
+  state.smsOptOuts.length = 0;
 }
 
 function seedCompany(values: Partial<CompanyRecord> = {}): CompanyRecord {
@@ -137,7 +159,7 @@ function seedCustomer(values: Partial<CustomerRecord> & Pick<CustomerRecord, "co
     companyId: values.companyId,
     firstName: values.firstName ?? "Chris",
     lastName: values.lastName ?? "Pine",
-    phone: values.phone ?? "555-0100",
+    phone: values.phone ?? STORED_PHONE,
     doNotContact: values.doNotContact ?? false,
     deletedAt: values.deletedAt ?? null,
     updatedAt: values.updatedAt ?? new Date()
@@ -157,6 +179,16 @@ vi.mock("@fsm/db", () => ({
   companies: companiesTable,
   customers: customersTable,
   messageLogs: messageLogsTable,
+  normalizePhoneE164,
+  phoneMatchesE164,
+  recordSmsOptOut: async (
+    _executor: unknown,
+    input: { phoneE164: string; source: string; providerMessageId: string | null }
+  ) => {
+    const existing = state.smsOptOuts.find((row) => row.phoneE164 === input.phoneE164);
+    if (existing) Object.assign(existing, input);
+    else state.smsOptOuts.push({ ...input });
+  },
   db: {
     select() {
       return {
@@ -311,7 +343,8 @@ function seedOutbound(companyId: string, toAddress: string, createdAt: Date): vo
   });
 }
 
-const PHONE = "555-0100";
+/** Twilio always sends E.164; stored customer phones may be legacy formats (FS-281: no backfill). */
+const PHONE = "+15550100100";
 
 async function inbound(body: string, from = PHONE) {
   const reply = createReply();
@@ -349,7 +382,7 @@ describe("twilio.handler", () => {
     const b = seedCompany({ name: "B" });
     const ca = seedCustomer({ companyId: a.id, phone: PHONE });
     const cb = seedCustomer({ companyId: b.id, phone: PHONE });
-    const other = seedCustomer({ companyId: b.id, phone: "555-0199" });
+    const other = seedCustomer({ companyId: b.id, phone: "555-019-9999" });
     expectEmptyTwiml(await inbound(" stop "));
     expect(state.customers.find((r) => r.id === ca.id)?.doNotContact).toBe(true);
     expect(state.customers.find((r) => r.id === cb.id)?.doNotContact).toBe(true);
@@ -401,15 +434,59 @@ describe("twilio.handler", () => {
     expect(state.activityEvents).toHaveLength(0);
   });
 
-  it("unknown phone: STOP and non-STOP are both no-ops", async () => {
+  it("unknown phone: STOP records a phone-level opt-out only; non-STOP is a no-op (FS-281)", async () => {
     const a = seedCompany();
-    seedCustomer({ companyId: a.id, phone: PHONE });
-    expectEmptyTwiml(await inbound("STOP", "555-0999"));
-    expectEmptyTwiml(await inbound("hello", "555-0999"));
+    seedCustomer({ companyId: a.id });
+    expectEmptyTwiml(await inbound("STOP", "+15550999999"));
+    expectEmptyTwiml(await inbound("hello", "+15550999999"));
     expect(state.customers[0]?.doNotContact).toBe(false);
     expect(inboundLogs()).toHaveLength(0);
     expect(state.activityEvents).toHaveLength(0);
+    expect(state.smsOptOuts).toEqual([
+      expect.objectContaining({ phoneE164: "+15550999999", source: "twilio_stop" })
+    ]);
   });
+
+  it("every STOP writes the phone-level opt-out, also when customers match", async () => {
+    const a = seedCompany();
+    seedCustomer({ companyId: a.id });
+    expectEmptyTwiml(await inbound("STOP"));
+    expect(state.smsOptOuts.map((row) => row.phoneE164)).toEqual([PHONE]);
+    expectEmptyTwiml(await inbound("STOP"));
+    expect(state.smsOptOuts).toHaveLength(1);
+  });
+
+  it.each(["STOP", "stop", " Stop ", "STOPALL", "stop all", "UNSUBSCRIBE", "unsubscribe", "CANCEL", "End", "quit", "\tQUIT\n"])(
+    "keyword %j withdraws consent (case/whitespace-insensitive)",
+    async (body) => {
+      const a = seedCompany();
+      const customer = seedCustomer({ companyId: a.id });
+      expectEmptyTwiml(await inbound(body));
+      expect(state.customers.find((row) => row.id === customer.id)?.doNotContact).toBe(true);
+      expect(state.smsOptOuts.map((row) => row.phoneE164)).toEqual([PHONE]);
+    }
+  );
+
+  it.each(["START", "UNSTOP", "stop texting me so much", "please cancel my appointment", "YES"])(
+    "%j is not a STOP keyword (START/UNSTOP stay FS-270)",
+    async (body) => {
+      const a = seedCompany();
+      const customer = seedCustomer({ companyId: a.id });
+      expectEmptyTwiml(await inbound(body));
+      expect(state.customers.find((row) => row.id === customer.id)?.doNotContact).toBe(false);
+      expect(state.smsOptOuts).toHaveLength(0);
+    }
+  );
+
+  it.each(["5550100100", "555.010.0100", "+1 (555) 010-0100", "15550100100", "+15550100100"])(
+    "stored legacy phone %j matches the E.164 From without a backfill",
+    async (stored) => {
+      const a = seedCompany();
+      const customer = seedCustomer({ companyId: a.id, phone: stored });
+      expectEmptyTwiml(await inbound("STOP"));
+      expect(state.customers.find((row) => row.id === customer.id)?.doNotContact).toBe(true);
+    }
+  );
 
   it("routed tenant without a matching customer logs with customerId null", async () => {
     const a = seedCompany();

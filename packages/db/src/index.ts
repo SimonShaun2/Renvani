@@ -1,5 +1,7 @@
 export { db } from "./client.js";
 export type { Database } from "./client.js";
+export { isPhoneSmsOptedOut, phoneMatchesE164, recordSmsOptOut } from "./sms-opt-out.js";
+export { normalizePhoneE164 } from "@fsm/import-normalize";
 export {
   buildPostgresClientOptions,
   computeConnectionBudget,

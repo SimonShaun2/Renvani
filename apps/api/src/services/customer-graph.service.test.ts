@@ -156,6 +156,25 @@ describe("customer.service", () => {
     expect(state.activityEvents.at(-1)?.eventType).toBe("customer.created");
   });
 
+  it("FS-281: createCustomer and updateCustomer store phones as E.164 (unrecognised input kept trimmed)", async () => {
+    const { company, actor } = createGraphFixture();
+
+    const created = await customerService.createCustomer(company.id, actor.id, {
+      firstName: "Pat",
+      lastName: "Lee",
+      phone: " (555) 111-2222 ",
+      altPhone: "1-555-333-4444"
+    });
+    expect(created.phone).toBe("+15551112222");
+    expect(created.altPhone).toBe("+15553334444");
+
+    const updated = await customerService.updateCustomer(company.id, actor.id, created.id, { phone: "555.999.8888" });
+    expect(updated.phone).toBe("+15559998888");
+
+    const unrecognised = await customerService.updateCustomer(company.id, actor.id, created.id, { phone: " ext 12 " });
+    expect(unrecognised.phone).toBe("ext 12");
+  });
+
   it("updateCustomer updates allowed fields and emits an event", async () => {
     const { company, actor, customer } = createGraphFixture();
 

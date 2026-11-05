@@ -1,69 +1,110 @@
 import Link from "next/link";
+import { ArrowRight, ArrowUpRight, CalendarDays, ChevronDown, Layers, LayoutDashboard, Megaphone, Repeat2, TrendingUp, X, type LucideIcon } from "lucide-react";
 
 import { MaybeLink } from "./MaybeLink";
 import { PRODUCTS_MENU, SITE_NAV } from "./site-config";
+import styles from "./products-menu.module.css";
 
-const ink = { color: "var(--color-mkt-ink)" } as const;
-const Arrow = ({ size }: { size: 16 | 20 }) => <img src="/marketing/menu/arrow.svg" alt="" width={size} height={size} className="shrink-0" style={{ width: size, height: size }} />;
-const row = "flex w-full items-center gap-2 rounded-[12px] bg-white p-3 text-left text-[14px] font-medium leading-[1.38]";
+const PRODUCT_DETAILS: Record<string, { description: string; Icon: LucideIcon }> = {
+  "/product/growth": { description: "Book more direct jobs.", Icon: Megaphone },
+  "/product/revenue": { description: "Turn inquiries into approved work.", Icon: TrendingUp },
+  "/product/operations": { description: "Keep every job moving.", Icon: CalendarDays },
+  "/product/retention": { description: "Keep customers coming back.", Icon: Repeat2 },
+  "/product/command-center": { description: "See what needs your attention.", Icon: LayoutDashboard }
+};
 
-/** Product menu content: desktop 226:7154 (in 177:640) and mobile 226:7296 (in 177:737). Server component. */
-export function ProductsMenuPanel({ variant }: { variant: "desktop" | "mobile" }) {
-  const m = variant === "mobile";
+function ProductCards() {
   return (
-    <div data-node-id={m ? "226:7296" : "226:7154"} className={m ? "flex flex-col items-center gap-7 p-6" : "flex w-[1440px] flex-col gap-9 p-16"} style={{ background: "var(--color-mkt-cream)" }}>
-      <div data-node-id={m ? "226:7297" : "226:7155"} className={m ? "flex w-[342px] shrink-0 flex-col items-center gap-5" : "flex w-[1312px] shrink-0 items-center gap-5"}>
-        <p className={`${m ? "w-full text-[28px]" : "flex-1 text-[32px]"} font-semibold leading-[1.38]`} style={ink}>
-          {m ? MOBILE_HEADLINE : PRODUCTS_MENU.headline}
-        </p>
-        <Link href={PRODUCTS_MENU.all.href} className="inline-flex min-h-[44px] shrink-0 items-center justify-center rounded-full px-5 py-3 text-[15px] font-medium leading-[1.5]" style={{ background: "var(--color-mkt-ink)", color: "var(--color-mkt-cream)" }}>
-          {PRODUCTS_MENU.all.label}
-        </Link>
-      </div>
-      {m ? (
-        <nav data-node-id="226:7302" aria-label="Explore the website" className="flex w-[342px] shrink-0 flex-col gap-2">
-          {[...MOBILE_EXPLORE, SITE_NAV.signIn].map((l) => (
-            <Link key={l.label} href={l.href} className={row} style={ink}>
-              <span className="flex-1">{l.label}</span>
-              <Arrow size={16} />
-            </Link>
-          ))}
-        </nav>
-      ) : null}
-      <div data-node-id={m ? "226:7323" : "226:7160"} className={m ? "flex w-[342px] shrink-0 flex-col gap-7" : "flex w-[1312px] shrink-0 items-start gap-6"}>
-        {PRODUCTS_MENU.groups.map((g, gi) => (
-          <div key={g.title} data-node-id={(m ? GROUPS_MOBILE : GROUPS_DESKTOP)[gi]} className={`flex shrink-0 flex-col gap-[10px] ${m ? "w-[342px]" : "w-[243.2px]"}`}>
-            <Link href={g.href} className="flex w-full items-start gap-2 text-left text-[20px] font-semibold leading-[1.38]" style={ink}>
-              <span className="flex-1">{g.title}</span>
-              <Arrow size={20} />
-            </Link>
-            {g.items.map((i) => (
-              <MaybeLink key={i.label} href={i.href} className={row} style={ink}>
-                <span className="flex-1">{i.label}</span>
-                <Arrow size={16} />
-              </MaybeLink>
+    <nav aria-label="Renvani products" className={styles.productCards}>
+      {PRODUCTS_MENU.groups.map((product) => {
+        const { description, Icon } = PRODUCT_DETAILS[product.href] ?? { description: "Explore this product.", Icon: Layers };
+        return (
+          <Link
+            key={product.href}
+            href={product.href}
+            aria-label={product.title}
+            className={`${styles.productCard} ${product.href === "/product/command-center" ? styles.commandCard : ""}`}
+          >
+            <span className={styles.productIcon}><Icon size={20} strokeWidth={1.7} aria-hidden="true" /></span>
+            <span className={styles.productCopy}>
+              <span className={styles.productName}>{product.title}</span>
+              <span className={styles.productDescription}>{description}</span>
+            </span>
+            <ArrowUpRight size={16} strokeWidth={1.7} aria-hidden="true" className={styles.productArrow} />
+          </Link>
+        );
+      })}
+    </nav>
+  );
+}
+
+function ProductTools() {
+  return (
+    <nav aria-label="Product tools" className={styles.toolsGrid}>
+      {PRODUCTS_MENU.groups.flatMap((group) => group.items).map((tool) => (
+        <MaybeLink key={tool.label} href={tool.href} className={styles.toolLink ?? ""}>{tool.label}</MaybeLink>
+      ))}
+    </nav>
+  );
+}
+
+/** Founder-requested alternative to the original Figma menu. Native navigation, with no hover-only content. */
+export function ProductsMenuPanel({ variant }: { variant: "desktop" | "mobile" }) {
+  const mobile = variant === "mobile";
+  return (
+    <div className={`${styles.panel} ${mobile ? styles.mobile : ""}`}>
+      <div className={styles.content}>
+        <div className={styles.heading}>
+          <p className={styles.headingLabel}>{mobile ? MOBILE_HEADLINE : "The Renvani platform"}</p>
+          <Link href={PRODUCTS_MENU.all.href} className={styles.allProducts}>
+            {PRODUCTS_MENU.all.label}<ArrowRight size={15} aria-hidden="true" />
+          </Link>
+        </div>
+        <ProductCards />
+        {mobile ? (
+          <details data-product-tools="" className={styles.toolsDisclosure}>
+            <summary className={styles.toolsSummary}>
+              Explore all tools<ChevronDown size={16} aria-hidden="true" />
+            </summary>
+            <ProductTools />
+          </details>
+        ) : (
+          <section aria-label="Everyday tools" className={styles.toolsSection}>
+            <p className={styles.sectionLabel}>Everything behind a great service business</p>
+            <ProductTools />
+          </section>
+        )}
+        {mobile ? (
+          <nav aria-label="Explore the website" className={styles.explore}>
+            {[...MOBILE_EXPLORE, SITE_NAV.signIn].map((link) => (
+              <Link key={link.href} href={link.href} className={styles.exploreLink}>
+                {link.label}<ArrowUpRight size={14} aria-hidden="true" />
+              </Link>
             ))}
-          </div>
-        ))}
+          </nav>
+        ) : null}
       </div>
-      <div data-node-id={m ? "226:7444" : "226:7281"} className={m ? "flex w-[342px] shrink-0 flex-col items-center gap-4" : "flex w-[1312px] shrink-0 items-center gap-4"}>
-        <Link href={PRODUCTS_MENU.cta.href} className="inline-flex min-h-[44px] items-center justify-center rounded-full px-5 py-3 text-[15px] font-medium leading-[1.5]" style={{ background: "var(--color-mkt-amber)", color: "var(--color-mkt-ink)" }}>
-          {PRODUCTS_MENU.cta.label}
-        </Link>
-        <button type="button" data-menu-close="" className={`${m ? "w-full" : "w-[160px]"} cursor-pointer text-left text-[13px] font-medium leading-[1.38]`} style={{ color: "var(--color-mkt-ink2)" }}>
-          Close menu
-        </button>
+      <div className={styles.footer}>
+        {!mobile ? (
+          <Link href="/growth-check" className={styles.growthCheck}>
+            <span className={styles.growthDot} aria-hidden="true" />
+            Find your next opportunity<span className={styles.growthCheckLabel}>Growth Check<ArrowUpRight size={14} aria-hidden="true" /></span>
+          </Link>
+        ) : null}
+        <div className={styles.footerActions}>
+          <button type="button" data-menu-close="" className={styles.closeButton}>
+            <X size={14} aria-hidden="true" />Close menu
+          </button>
+          <Link href={PRODUCTS_MENU.cta.href} className={styles.demoButton}>
+            {PRODUCTS_MENU.cta.label}<ArrowRight size={15} aria-hidden="true" />
+          </Link>
+        </div>
       </div>
     </div>
   );
 }
 
-/** Figma group node ids (Growth, Revenue, Operations, Retention, Command Center). */
-const GROUPS_DESKTOP = ["226:7161", "226:7177", "226:7193", "226:7234", "226:7255"];
-const GROUPS_MOBILE = ["226:7324", "226:7340", "226:7356", "226:7397", "226:7418"];
-
-/** Mobile menu (177:737) heading and "Explore the website" rows. */
-export const MOBILE_HEADLINE = "Find your next step.";
+export const MOBILE_HEADLINE = "Explore Renvani.";
 export const MOBILE_EXPLORE = [
   { label: "Industries", href: "/industries" },
   { label: "How it works", href: "/how-it-works" },

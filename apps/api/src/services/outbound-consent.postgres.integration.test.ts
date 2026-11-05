@@ -156,7 +156,9 @@ describe.runIf(enabled)("FS-234 operator consent revocation (isolated PostgreSQL
       FOR EACH ROW EXECUTE FUNCTION fs234_reject_activity()`));
     try {
       await expect(service.revokeOperatorOutboundConsent(actor(f), request(f)))
-        .rejects.toThrow("FS234 isolated audit failure");
+        .rejects.toMatchObject({
+          cause: { code: "P0001", message: "FS234 isolated audit failure" },
+        });
       expect(await evidence(f)).toMatchObject({ receipts: [], events: [], states: [], activity: [] });
     } finally {
       await provisionDb!.execute(sql.raw("DROP TRIGGER IF EXISTS fs234_reject_activity_trg ON activity_events"));

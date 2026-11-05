@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 
 import type { PublicBookingSettingsRecord } from "@/src/hooks/booking.hooks";
+import { INDUSTRY_PAGES } from "@/src/components/marketing/site/industry-registry";
 import { listServiceAreaPages, serviceAreaPath } from "@/src/components/growth/service-pages/service-area-pages";
 import { fetchPublicBookingSettingsBySlug } from "@/src/lib/public-booking-server";
 
@@ -153,7 +154,7 @@ export const MARKETING_SITEMAP_PATHS = [
   { path: "/industries", priority: 0.8 },
   { path: "/demo", priority: 0.8 },
   { path: "/growth-check", priority: 0.7 },
-  ...["hvac", "plumbing", "electrical"].map((slug) => ({ path: `/industries/${slug}`, priority: 0.7 }))
+  ...INDUSTRY_PAGES.map((industry) => ({ path: industry.href, priority: 0.7 }))
 ] as const;
 
 export function buildMarketingSitemap(env: NodeJS.ProcessEnv = process.env): MetadataRoute.Sitemap {

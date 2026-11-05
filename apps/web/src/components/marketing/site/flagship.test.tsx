@@ -15,6 +15,7 @@ import { buildMarketingSitemap } from "@/src/lib/seo/public-sitemap";
 import { FlagshipPage } from "./FlagshipPage";
 import { PRODUCT_PAGES, productLinkFor } from "./flagship-registry";
 import { FLAGSHIP_TREES } from "./flagship-visuals";
+import { INDUSTRY_PAGES } from "./industry-registry";
 import { MarketingShell } from "./MarketingShell";
 import { TOOL_GROUPS } from "./platform-config";
 import { PRODUCTS_MENU } from "./site-config";
@@ -25,6 +26,7 @@ const resolves = (h: string) => {
   const path = h.split("#")[0] || "/";
   if (h.startsWith("#")) return true;
   if (path.startsWith("/product/")) return SLUGS.includes(path.slice(9));
+  if (path.startsWith("/industries/")) return INDUSTRY_PAGES.some((industry) => industry.href === path);
   return ["/", "/product", "/how-it-works", "/pricing", "/industries", "/industries/hvac", "/industries/plumbing", "/industries/electrical", "/signup", "/demo", "/growth-check", "/login", "/tour"].includes(path);
 };
 

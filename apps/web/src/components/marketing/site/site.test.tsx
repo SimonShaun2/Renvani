@@ -10,14 +10,15 @@ vi.mock("./fonts", () => ({ geist: { variable: "g" }, inter: { variable: "i", cl
 
 import { HomePage } from "./HomePage";
 import { MarketingShell } from "./MarketingShell";
-import { HOME, SITE_FOOTER, SITE_NAV } from "./site-config";
+import { HOME_WORKFLOWS } from "./home-workflows";
+import { GROWTH_CHECK_ENTRY, HOME, SITE_FOOTER, SITE_NAV } from "./site-config";
 
 const COMPETITORS = /jobber|servicetitan|housecall|service fusion|fieldedge|owner\.com|\bowner com\b|broccoli/i;
 const RESTAURANT = /restaurant|menu|diner|reservation|table/i;
 
 describe("marketing site (Figma 171:2)", () => {
-  it("competitor guard scans HomePage.tsx, site-config and footer copy", () => {
-    const src = ["HomePage.tsx", "site-config.ts", "MarketingShell.tsx"].map((f) => readFileSync(join(__dirname, f), "utf8")).join("\n");
+  it("competitor guard scans homepage, workflow, shared navigation and footer copy", () => {
+    const src = ["HomePage.tsx", "HomepageWorkflows.tsx", "home-workflows.ts", "site-config.ts", "MarketingShell.tsx"].map((f) => readFileSync(join(__dirname, f), "utf8")).join("\n");
     expect(src + JSON.stringify(SITE_FOOTER)).not.toMatch(COMPETITORS);
     expect(COMPETITORS.test("Owner.com")).toBe(true);
     expect(COMPETITORS.test("Broccoli")).toBe(true);
@@ -28,35 +29,22 @@ describe("marketing site (Figma 171:2)", () => {
     expect(JSON.stringify(HOME)).not.toMatch(/(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday), (January|February|March|April|May|June|July|August|September|October|November|December) \d/);
   });
 
-  it("mobile hero and intelligence use the mobile-only Figma components", () => {
-    const { container: root } = render(<HomePage />);
-    const container = root.querySelector(".md\\:hidden.xl\\:block")!;
-    expect(container.querySelector('[data-node-id="219:9474"]')!.className).toContain("md:hidden");
-    expect(container.querySelector('[data-node-id="253:6779"]')!.className).toContain("md:hidden");
-    expect(container.querySelector('[data-node-id="200:46"]')!.closest(".hidden")!.className).toContain("hidden md:block");
-  });
-
-  it("tablet 768 renders its own frame (253:6780) between md and xl with real links and forms", () => {
+  it("uses one responsive hero and one photograph across breakpoints", () => {
     const { container } = render(<HomePage />);
-    const tablet = container.querySelector('[data-node-id="253:6780"]')!;
-    expect(tablet.parentElement!.className).toBe("hidden md:block xl:hidden");
-    expect(tablet.parentElement!.nextElementSibling!.className).toBe("leading-[1.38] md:hidden xl:block");
-    expect(tablet.querySelectorAll("form")).toHaveLength(2);
-    expect(tablet.textContent).not.toMatch(/Oct 29/);
-    expect(tablet.textContent).toContain("Next available day");
-    const hrefs = [...tablet.querySelectorAll("a")].map((a) => a.getAttribute("href"));
-    for (const h of [HOME.journey.more.href, ...HOME.work.trades.map((t) => t.href), HOME.intelligence.cta.href, ...HOME.intelligence.areas.map((a) => a.href)]) expect(hrefs).toContain(h);
-    expect(tablet.querySelector("a a")).toBeNull();
+    expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
+    expect(screen.getByRole("heading", { name: "More jobs. Less on your shoulders." })).toBeTruthy();
+    const heroImages = [...container.querySelectorAll("img")].filter((image) => image.getAttribute("src")?.includes("f1266660"));
+    expect(heroImages).toHaveLength(1);
+    expect(container.querySelector("a a")).toBeNull();
   });
 
-  it("nav collapses to the hamburger icon below xl; mobile footer and area links are one column", () => {
+  it("keeps the shared mobile navigation and footer", () => {
     const { container } = render(<MarketingShell><HomePage /></MarketingShell>);
     expect(screen.getByRole("navigation", { name: "Main" }).className).toContain("xl:flex");
     const menu = container.querySelector('[data-node-id="177:737"]')!;
     expect(menu.className).toContain("xl:hidden");
     expect(menu.querySelector("summary img")).toBeTruthy();
     expect(screen.getByRole("navigation", { name: "Footer" }).className).toMatch(/^flex flex-col /);
-    expect(screen.getByRole("navigation", { name: "Product areas" }).className).toMatch(/^flex flex-col /);
   });
 
   it("renders the shared nav with the Figma links and demo CTA", () => {
@@ -67,16 +55,27 @@ describe("marketing site (Figma 171:2)", () => {
     expect(screen.getByRole("navigation", { name: "Footer" })).toBeTruthy();
   });
 
-  it("renders the home hero, sections and two growth check entries", () => {
+  it("makes each flagship discoverable and keeps the website capture handoff working", () => {
+    const { container } = render(<HomePage />);
+    for (const workflow of HOME_WORKFLOWS) expect(screen.getByRole("tab", { name: workflow.name })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "See Renvani in action" }).getAttribute("href")).toBe("#product-workflows");
+    expect(container.querySelector("#product-workflows")).not.toBeNull();
+    expect(screen.getByRole("link", { name: "Get my growth report" }).getAttribute("href")).toBe("/growth-check");
+    expect(screen.getAllByRole("textbox")).toHaveLength(1);
+    const input = screen.getByRole("textbox", { name: GROWTH_CHECK_ENTRY.label });
+    expect(input.getAttribute("name")).toBe("website");
+    expect(input.closest("form")!.getAttribute("action")).toBe("/growth-check");
+    expect(input.closest("form")!.getAttribute("method")).toBe("get");
+    expect(screen.getByRole("button", { name: "Get my growth report" })).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "See what your website could do better." })).toBeTruthy();
+  });
+
+  it("labels the mission as an illustrative owner-reviewed external-growth proposal", () => {
     render(<HomePage />);
-    const h1s = screen.getAllByRole("heading", { level: 1 });
-    expect(h1s).toHaveLength(2); // xl+/mobile hero and the tablet (253:6780) hero; only one is ever displayed
-    for (const h of h1s) expect(h.textContent).toContain("More direct jobs.");
-    expect(screen.getByRole("heading", { name: /The first click is/ })).toBeTruthy();
-    expect(screen.getByRole("heading", { name: /Good work/ })).toBeTruthy();
-    expect(screen.getByRole("heading", { name: /Built around/ })).toBeTruthy();
-    expect(screen.getAllByRole("button", { name: "Get my growth report" })).toHaveLength(4);
-    expect(screen.getAllByRole("textbox")).toHaveLength(4);
+    expect(screen.getByRole("heading", { name: /Set the goal.*See the next move/ })).toBeTruthy();
+    expect(screen.getByRole("img", { name: /Illustrative mission.*local outreach campaign.*Owner review/ })).toBeTruthy();
+    expect(screen.getByText("Proposed experience · Illustrative workflow")).toBeTruthy();
+    expect(screen.getByRole("link", { name: /See how Operating Missions could work/ }).getAttribute("href")).toBe("/product/command-center");
   });
 
   it("uses home-services copy only and no competitor names", () => {

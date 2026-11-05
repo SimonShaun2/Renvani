@@ -110,7 +110,7 @@ type Case = {
 
 const CASES: Case[] = [
   { name: "dispatch", Comp: DispatchBoardClient, routes: ROUTES.dispatch!, empty: /No smart queue items/, data: /Tess Tech/ },
-  { name: "customers/CRM", Comp: CustomerTable, routes: ROUTES.customers!, empty: /No customers match this view/, data: /Dana Smoke/, error: /Customer records could not be loaded/ },
+  { name: "customers/CRM", Comp: CustomerTable, routes: ROUTES.customers!, empty: /No customers recorded yet/, data: /Dana Smoke/, error: /Customer records could not be loaded/ },
   { name: "estimates", Comp: EstimateListClient, routes: ROUTES.estimates!, empty: /No estimates match this view/, data: /EST-1/ },
   { name: "invoices", Comp: InvoiceListClient, routes: ROUTES.invoices!, empty: /No invoices match this view/, data: /INV-1/ },
   { name: "reports", Comp: ReportingDashboardClient, routes: ROUTES.reporting!, empty: /No recent activity/, data: /\$1234\.00/, error: /Unable to load job source summary/ }

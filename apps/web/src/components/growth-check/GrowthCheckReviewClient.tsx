@@ -70,10 +70,10 @@ export function GrowthCheckReviewClient() {
   const selected = scans.data?.scans.find((s) => s.id === scanId) ?? null;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 text-[#0f1530]">
       {/* Figma 366:4217 page header + context row. */}
       <header className="space-y-2">
-        <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-[#2b4acb]">Growth Check</p>
+        <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-[#7a5600]">Growth Check</p>
         <h1 className="text-2xl font-semibold tracking-tight text-[#0f1530] md:text-[28px] lg:text-[30px]">Growth Check findings</h1>
         <p className="text-[15px] text-[#5e6684]">Check what the Growth Check found on your shop. Confirm, reject or keep each finding.</p>
         <div className="!mt-4 border-t border-[#e6dccb]" />
@@ -90,7 +90,7 @@ export function GrowthCheckReviewClient() {
       ) : scans.isError || !scans.data ? (
         <ErrorState title="Could not load Growth Checks" onRetry={() => void scans.refetch()} isRetrying={scans.isFetching} />
       ) : scans.data.scans.length === 0 ? (
-        <EmptyState icon={ClipboardCheck} title="No Growth Checks yet" subtitle="Once your HVAC, plumbing or electrical shop's website is checked, findings show up here for review." />
+        <EmptyState variant="operator" icon={ClipboardCheck} title="No Growth Checks yet" subtitle="Once your HVAC, plumbing or electrical shop's website is checked, findings show up here for review." />
       ) : (
         <div className="space-y-6">
           <section aria-labelledby="gc-scans" className={`${cardClass} space-y-3.5`}>

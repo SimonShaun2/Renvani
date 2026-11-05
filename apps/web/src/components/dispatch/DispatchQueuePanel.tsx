@@ -89,7 +89,7 @@ function QueueTabButton({ isActive, label, count, onClick }: QueueTabButtonProps
       onClick={onClick}
       className={cn(
         "inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-semibold uppercase tracking-[0.14em] transition",
-        isActive ? "bg-brand-accent text-white shadow-sm" : "bg-neutral-100 text-neutral-500 hover:text-neutral-800"
+        isActive ? "bg-[#f6b400] text-[#0f1530]" : "bg-[#f3eadc] text-[#2a3360] hover:bg-[#fff4d6]"
       )}
     >
       <span>{label}</span>
@@ -129,9 +129,9 @@ function DraggableJobCard({ id, label, subtitle, meta, tone, isSelected, preferr
           : undefined
       }
       className={cn(
-        "w-full rounded-[24px] border bg-white px-4 py-4 text-left shadow-sm transition",
+        "w-full rounded-[14px] border bg-white px-4 py-4 text-left transition",
         isDragging && "opacity-60 shadow-[0_24px_70px_rgba(37,122,250,0.18)]",
-        isSelected ? "border-brand-accent shadow-[0_20px_48px_rgba(37,122,250,0.18)]" : "border-neutral-200 hover:border-brand-accent/30",
+        isSelected ? "border-[#f6b400] ring-2 ring-[#fff4d6]" : "border-[#e6dccb] hover:border-[#f6b400]",
         tone === "purple" && "before:bg-ai",
         tone === "orange" && "before:bg-warning",
         tone === "blue" && "before:bg-brand-accent",
@@ -179,7 +179,7 @@ function NextBestJobsSection({
 
   if (jobs.length === 0) {
     return (
-      <EmptyState
+      <EmptyState variant="operator"
         icon={Sparkles}
         title="No smart queue items"
         subtitle="Fresh AI-prioritized jobs will appear here as they become schedule-ready."
@@ -191,7 +191,7 @@ function NextBestJobsSection({
   return (
     <div className="space-y-3">
       {jobs.map((job) => (
-        <div key={job.jobId} className="rounded-[24px] border border-neutral-200 bg-white px-4 py-4 shadow-sm">
+        <div key={job.jobId} className="rounded-[14px] border border-[#e6dccb] bg-white px-4 py-4">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
@@ -270,7 +270,7 @@ function UnscheduledSection({
 
   if (jobs.length === 0) {
     return (
-      <EmptyState
+      <EmptyState variant="operator"
         icon={CalendarClock}
         title="No unscheduled jobs"
         subtitle="Everything that needs attention is already placed or converted into the smart queue."
@@ -327,7 +327,7 @@ function BookingRequestsSection({
 
   if (requests.length === 0) {
     return (
-      <EmptyState
+      <EmptyState variant="operator"
         icon={CalendarClock}
         title="No pending booking requests"
         subtitle="Incoming online booking requests will auto-refresh here every 30 seconds."
@@ -344,7 +344,7 @@ function BookingRequestsSection({
           type="button"
           onClick={() => onSelectBookingRequest(request.id)}
           className={cn(
-            "w-full rounded-[24px] border bg-white px-4 py-4 text-left shadow-sm transition",
+            "w-full rounded-[14px] border bg-white px-4 py-4 text-left transition",
             selectedBookingRequestId === request.id
               ? "border-brand-accent shadow-[0_20px_48px_rgba(37,122,250,0.18)]"
               : "border-neutral-200 hover:border-brand-accent/30"

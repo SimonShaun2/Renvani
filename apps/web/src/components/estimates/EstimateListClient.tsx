@@ -13,6 +13,8 @@ import { StatBadge } from "@/src/components/ui/StatBadge";
 import { useEstimates } from "@/src/hooks/estimates.hooks";
 import { cn, formatDate } from "@/src/lib/utils";
 
+import { ESTIMATE_LIST_LIMIT, estimateListIsPartial } from "./estimate-list-limit";
+
 import {
   formatStatusLabel,
   getEstimateStatusTone,
@@ -32,7 +34,7 @@ const filterOptions: Array<{ value: EstimateFilter; label: string }> = [
   { value: "converted", label: "Converted" }
 ];
 
-const LIST_LIMIT = 200;
+const LIST_LIMIT = ESTIMATE_LIST_LIMIT;
 
 export function EstimateListClient() {
   const [filter, setFilter] = useState<EstimateFilter>("all");
@@ -98,21 +100,22 @@ export function EstimateListClient() {
 
   return (
     <PageLayout
+      variant="operator"
       title="Estimates"
       subtitle="Build single quotes or Good / Better / Best options and keep approvals moving."
       actions={(
         <Link
           href="/estimates/new"
-          className="inline-flex items-center gap-2 rounded-full bg-brand-accent px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-primary"
+          className="inline-flex min-h-11 items-center gap-2 rounded-[10px] bg-[#f6b400] px-5 py-3 text-sm font-semibold text-[#0f1530] transition hover:bg-[#e0a400]"
         >
           <Plus className="h-4 w-4" />
           New Estimate
         </Link>
       )}
     >
-      {(estimatesQuery.data?.total ?? 0) > LIST_LIMIT ? (
+      {estimateListIsPartial(estimatesQuery.data) ? (
         <p className="mb-3 text-sm text-neutral-500" role="status">
-          Showing the {LIST_LIMIT} most recent estimates. Use search to find older quotes.
+          Showing the {LIST_LIMIT} most recent estimates. Filters and search here apply to those records; older records are not included in this view.
         </p>
       ) : null}
       <section className="surface-card overflow-hidden" data-estimates-reveal>
@@ -129,8 +132,8 @@ export function EstimateListClient() {
                 className={cn(
                   "rounded-full px-4 py-2 text-sm font-semibold transition",
                   filter === option.value
-                    ? "bg-brand-accent text-white"
-                    : "bg-neutral-100 text-neutral-500 hover:bg-neutral-200 hover:text-neutral-700"
+                    ? "bg-[#f6b400] text-[#0f1530]"
+                    : "bg-[#f3eadc] text-[#2a3360] hover:bg-[#fff4d6]"
                 )}
               >
                 {option.label}
@@ -138,7 +141,7 @@ export function EstimateListClient() {
             ))}
           </div>
 
-          <label className="flex min-w-0 items-center gap-3 rounded-full border border-neutral-200 bg-neutral-50 px-4 py-3 lg:w-[320px]">
+          <label className="flex min-w-0 items-center gap-3 rounded-[10px] border border-[#e6dccb] bg-white px-4 py-3 lg:w-[320px]">
             <Search className="h-4 w-4 text-neutral-400" />
             <input
               value={searchDraft}
@@ -159,7 +162,7 @@ export function EstimateListClient() {
           </div>
         ) : visibleRows.length === 0 ? (
           <div className="px-5 py-10">
-            <EmptyState
+            <EmptyState variant="operator"
               icon={FileText}
               title="No estimates match this view"
               subtitle="Try a different filter or create a new estimate to get a quote moving."
@@ -182,10 +185,10 @@ export function EstimateListClient() {
               </thead>
               <tbody className="divide-y divide-neutral-100">
                 {visibleRows.map((estimate) => (
-                  <tr key={estimate.id} className="transition hover:bg-brand-accent-light/35">
+                  <tr key={estimate.id} className="transition hover:bg-[#fff4d6]/45">
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-2">
-                        <span className="font-semibold text-brand-accent">{estimate.estimateNumber}</span>
+                        <span className="font-semibold text-[#2a3360]">{estimate.estimateNumber}</span>
                         {estimate.tierCount > 1 ? (
                           <StatBadge label={`${estimate.tierCount} tiers`} tone="purple" />
                         ) : null}
@@ -213,7 +216,7 @@ export function EstimateListClient() {
                     <td className="px-5 py-4 text-right">
                       <Link
                         href={`/estimates/${estimate.estimateId}`}
-                        className="inline-flex rounded-full bg-neutral-100 px-4 py-2 text-sm font-semibold text-brand-accent transition hover:bg-brand-accent-light"
+                        className="inline-flex rounded-[10px] bg-[#f3eadc] px-4 py-2 text-sm font-semibold text-[#2a3360] transition hover:bg-[#fff4d6]"
                       >
                         View →
                       </Link>

@@ -58,6 +58,8 @@ export function formatBlockHours(start: string | Date, end: string | Date): stri
 
 interface DispatchTimelineProps {
   technicians: DispatchTechnicianDay[];
+  /** Unfiltered count distinguishes an empty business from a restrictive filter. */
+  totalTechnicians?: number;
   isLoading: boolean;
   selectedJobId: string | null;
   animatedJobId: string | null;
@@ -282,6 +284,7 @@ function TimelineLoading() {
 
 export function DispatchTimeline({
   technicians,
+  totalTechnicians,
   isLoading,
   selectedJobId,
   animatedJobId,
@@ -303,10 +306,10 @@ export function DispatchTimeline({
   if (technicians.length === 0) {
     return (
       <section className="surface-card p-8">
-        <EmptyState
+        <EmptyState variant="operator"
           icon={CalendarRange}
-          title="No technicians match these filters"
-          subtitle="Try widening the date or technician filters. Once jobs and techs line up, the dispatch canvas will populate here."
+          title={totalTechnicians === 0 ? "No technicians scheduled" : "No technicians match these filters"}
+          subtitle={totalTechnicians === 0 ? "Add technicians and service jobs to start building the dispatch schedule." : "Try widening the date or technician filters to see matching schedules."}
         />
       </section>
     );

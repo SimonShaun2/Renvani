@@ -6,7 +6,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 afterEach(cleanup);
 
-vi.mock("./fonts", () => ({ geist: { variable: "g" }, newsreader: { variable: "n" } }));
+vi.mock("./fonts", () => ({ geist: { variable: "g" }, inter: { variable: "i", className: "inter" }, newsreader: { variable: "n" } }));
 
 import { HomePage } from "./HomePage";
 import { MarketingShell } from "./MarketingShell";
@@ -30,17 +30,17 @@ describe("marketing site (Figma 171:2)", () => {
 
   it("mobile hero and intelligence use the mobile-only Figma components", () => {
     const { container: root } = render(<HomePage />);
-    const container = root.querySelector(".md\\:hidden.lg\\:block")!;
+    const container = root.querySelector(".md\\:hidden.xl\\:block")!;
     expect(container.querySelector('[data-node-id="219:9474"]')!.className).toContain("md:hidden");
     expect(container.querySelector('[data-node-id="253:6779"]')!.className).toContain("md:hidden");
     expect(container.querySelector('[data-node-id="200:46"]')!.closest(".hidden")!.className).toContain("hidden md:block");
   });
 
-  it("tablet 768 renders its own frame (253:6780) between md and lg with real links and forms", () => {
+  it("tablet 768 renders its own frame (253:6780) between md and xl with real links and forms", () => {
     const { container } = render(<HomePage />);
     const tablet = container.querySelector('[data-node-id="253:6780"]')!;
-    expect(tablet.parentElement!.className).toBe("hidden md:block lg:hidden");
-    expect(tablet.parentElement!.nextElementSibling!.className).toBe("leading-[1.38] md:hidden lg:block");
+    expect(tablet.parentElement!.className).toBe("hidden md:block xl:hidden");
+    expect(tablet.parentElement!.nextElementSibling!.className).toBe("leading-[1.38] md:hidden xl:block");
     expect(tablet.querySelectorAll("form")).toHaveLength(2);
     expect(tablet.textContent).not.toMatch(/Oct 29/);
     expect(tablet.textContent).toContain("Next available day");
@@ -49,11 +49,11 @@ describe("marketing site (Figma 171:2)", () => {
     expect(tablet.querySelector("a a")).toBeNull();
   });
 
-  it("nav collapses to the hamburger icon below lg; mobile footer and area links are one column", () => {
+  it("nav collapses to the hamburger icon below xl; mobile footer and area links are one column", () => {
     const { container } = render(<MarketingShell><HomePage /></MarketingShell>);
-    expect(screen.getByRole("navigation", { name: "Main" }).className).toContain("lg:flex");
+    expect(screen.getByRole("navigation", { name: "Main" }).className).toContain("xl:flex");
     const menu = container.querySelector('[data-node-id="177:737"]')!;
-    expect(menu.className).toContain("lg:hidden");
+    expect(menu.className).toContain("xl:hidden");
     expect(menu.querySelector("summary img")).toBeTruthy();
     expect(screen.getByRole("navigation", { name: "Footer" }).className).toMatch(/^flex flex-col /);
     expect(screen.getByRole("navigation", { name: "Product areas" }).className).toMatch(/^flex flex-col /);
@@ -70,7 +70,7 @@ describe("marketing site (Figma 171:2)", () => {
   it("renders the home hero, sections and two growth check entries", () => {
     render(<HomePage />);
     const h1s = screen.getAllByRole("heading", { level: 1 });
-    expect(h1s).toHaveLength(2); // lg+/mobile hero and the tablet (253:6780) hero; only one is ever displayed
+    expect(h1s).toHaveLength(2); // xl+/mobile hero and the tablet (253:6780) hero; only one is ever displayed
     for (const h of h1s) expect(h.textContent).toContain("More direct jobs.");
     expect(screen.getByRole("heading", { name: /The first click is/ })).toBeTruthy();
     expect(screen.getByRole("heading", { name: /Good work/ })).toBeTruthy();

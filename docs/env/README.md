@@ -13,14 +13,17 @@ Redacted examples for planning injection per runtime. **Do not commit filled-in 
 
 **Inventory:** [FS-76-secrets-env-inventory.md](../security/FS-76-secrets-env-inventory.md)  
 
-**FS-93 Option A (approved):** Vercel (`apps/web`) + Railway (`apps/api`, `apps/worker`, `apps/webhook`, Postgres, Redis) + Cloudflare R2. See [PRODUCTION-DEPLOYMENT.md](../planning/PRODUCTION-DEPLOYMENT.md) and the per-host table in the [owner map](../security/FS-76-secret-owner-map.md#fs-93-option-a--approved-injection-model-documentation-only). No live secret wiring in this ticket.
+**Current operational direction, reconciled 2026-11-05:** Vercel (`apps/web`), Render (`apps/api`, `apps/worker`, `apps/webhook` and Key Value), Neon PostgreSQL, and Cloudflare R2. See the [official operational stack](../OFFICIAL-OPERATIONAL-STACK.md), [Render deployment runbook](../infrastructure/RENDER-DEPLOY-RUNBOOK.md), [Neon operations](../infrastructure/NEON-OPERATIONS.md), and [Render environment inventory](../infrastructure/RENDER-ENV-INVENTORY.md). This is source/documentation evidence; it does not certify account configuration, credential scope or rotation. The former Railway injection model and [production deployment plan](../planning/PRODUCTION-DEPLOYMENT.md) are historical references.
 
 | Surface | Host |
 | --- | --- |
 | `apps/web` | Vercel project env |
-| `apps/api`, `apps/worker`, `apps/webhook` | Railway service variables |
-| Postgres / Redis | Railway connect strings → `DATABASE_URL`, `REDIS_URL` |
-| Files | R2 keys → Railway services that import `@fsm/config/storage` |
+| `apps/api`, `apps/worker`, `apps/webhook` | Render service environment |
+| PostgreSQL | Neon connection → `DATABASE_URL` |
+| Redis-compatible queues | Render Key Value connection → `REDIS_URL` |
+| Files | R2 configuration for services using the storage adapter |
+
+**Template status:** These example files are an older FS-76 baseline. At dev `b45b4996b64b16859e44a79b171b11cbe52c3e6a`, the existing documentation validator reports missing and extra names. Do not treat a template as a complete current service allowlist. [CICD-STATE.md](../audit/CICD-STATE.md) records the discrepancies and the separate [PR #419](https://github.com/SimonShaun2/Renvani/pull/419) environment-boundary work. No secret values, provider settings or templates are changed by this documentation reconciliation.
 
 Validate templates against schema:
 

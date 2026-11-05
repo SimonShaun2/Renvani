@@ -1,4 +1,6 @@
-# ServiceRev — Production Deployment
+# Renvani — Historical Production Deployment Plan
+
+> **Historical reference, annotated 2026-11-05.** This document preserves an earlier deployment proposal, including retired brand/domain examples, provider pricing, custom JWT assumptions and Render Postgres instructions. Those examples are not current configuration instructions. Current direction is Vercel, Render, Neon PostgreSQL, Clerk, Resend/Twilio and R2: use [OFFICIAL-OPERATIONAL-STACK.md](../OFFICIAL-OPERATIONAL-STACK.md), the [Render runbook](../infrastructure/RENDER-DEPLOY-RUNBOOK.md), [Neon operations](../infrastructure/NEON-OPERATIONS.md), [environment guide](../env/README.md) and [current assessment](../audit/CICD-STATE.md). Do not provision resources, rename persisted keys, use historical credential examples, or infer deployed equivalence from this archived plan. Founder production and spending approval remains required.
 
 **Version:** v3.1.0 (Render reconciliation — docs only; aligns with FS-93 / ADR-FS-93 on PR #59)  
 **Repo:** SimonShaun2/Renvani (formerly FSM-Platform)  

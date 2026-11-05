@@ -6,7 +6,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 afterEach(cleanup);
 
-vi.mock("./fonts", () => ({ geist: { variable: "g" }, newsreader: { variable: "n" } }));
+vi.mock("./fonts", () => ({ geist: { variable: "g" }, inter: { variable: "i", className: "inter" }, newsreader: { variable: "n" } }));
 
 import { PRODUCT_PAGES } from "./flagship-registry";
 import { isPublicRoute } from "@/src/lib/route-access";

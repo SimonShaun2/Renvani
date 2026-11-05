@@ -1,7 +1,7 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 
-import { cleanup, fireEvent, render } from "@testing-library/react";
+import { act, cleanup, fireEvent, render } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const navigation = vi.hoisted(() => ({ pathname: "/" }));
@@ -92,16 +92,37 @@ describe("header menus (177:640, 177:686, 177:737)", () => {
     const { container } = render(<MarketingShell><p>x</p></MarketingShell>);
     const m = menus(container);
     const disclosures = [m.product, m.industry, m.mobile];
+    const focusedSummary = m.product.querySelector("summary")!;
+    focusedSummary.focus();
     for (const current of [...disclosures, m.product]) {
-      const summary = current.querySelector("summary")!;
-      summary.focus();
       openMenu(current);
       for (const menu of disclosures) {
         expect(menu.open).toBe(menu === current);
         expect(menu.querySelector("summary")!.getAttribute("aria-expanded")).toBe(String(menu === current));
       }
-      expect(document.activeElement).toBe(summary);
+      expect(document.activeElement).toBe(focusedSummary);
     }
+  });
+
+  it("clicking another summary closes the previous panel and opens the requested menu", () => {
+    const { container } = render(<MarketingShell><p>x</p></MarketingShell>);
+    const { product, industry } = menus(container);
+    const nextSummary = industry.querySelector("summary")!;
+    openMenu(product);
+    product.querySelector("a")!.focus();
+
+    fireEvent.pointerDown(nextSummary);
+    act(() => nextSummary.focus());
+    fireEvent.click(nextSummary);
+    expect(product.open).toBe(false);
+    expect(product.querySelector("summary")!.getAttribute("aria-expanded")).toBe("false");
+    expect(industry.open).toBe(true);
+    expect(nextSummary.getAttribute("aria-expanded")).toBe("true");
+    expect(document.activeElement).toBe(nextSummary);
+
+    fireEvent.click(nextSummary);
+    expect(industry.open).toBe(false);
+    expect(document.activeElement).toBe(nextSummary);
   });
 });
 
@@ -140,8 +161,9 @@ describe("header disclosure dismissal", () => {
     const details = container.querySelector("details")!;
     const outside = getByRole("button", { name: "Outside action" });
     outside.addEventListener("click", (event) => event.stopPropagation());
-    openMenu(details);
     outside.focus();
+    openMenu(details);
+    expect(details.open).toBe(true);
 
     fireEvent.click(outside);
     expect(details.open).toBe(false);
@@ -149,31 +171,40 @@ describe("header disclosure dismissal", () => {
     expect(document.activeElement).toBe(outside);
   });
 
-  it("interacting with panel content keeps it open, and focus can leave without being trapped", () => {
+  it("Tab moving focus outside closes the panel and leaves focus on the destination control", () => {
     const { container, getByRole, getByText } = renderDisclosure();
     const details = container.querySelector("details")!;
     const outside = getByRole("button", { name: "Outside action" });
+    const link = details.querySelector("a")!;
+    outside.addEventListener("focusin", (event) => event.stopPropagation());
     openMenu(details);
+    link.focus();
 
     fireEvent.pointerDown(getByText("Explore products"));
     fireEvent.click(getByText("Explore products"));
     expect(details.open).toBe(true);
     const tab = new KeyboardEvent("keydown", { key: "Tab", bubbles: true, cancelable: true });
-    fireEvent(details.querySelector("a")!, tab);
+    fireEvent(link, tab);
     expect(tab.defaultPrevented).toBe(false);
-    outside.focus();
+    // fireEvent does not perform Tab's native focus movement.
+    act(() => outside.focus());
     expect(document.activeElement).toBe(outside);
-    expect(details.open).toBe(true);
-  });
-
-  it("Escape after focus leaves the panel closes it and restores its toggle", () => {
-    const { container, getByRole } = renderDisclosure();
-    const details = container.querySelector("details")!;
-    const outside = getByRole("button", { name: "Outside action" });
-    openMenu(details);
-    outside.focus();
+    expect(details.open).toBe(false);
+    expect(details.querySelector("summary")!.getAttribute("aria-expanded")).toBe("false");
 
     fireEvent.keyDown(outside, { key: "Escape" });
+    expect(document.activeElement).toBe(outside);
+  });
+
+  it("Escape while focus is inside the open panel closes it and restores its toggle", () => {
+    const { container } = renderDisclosure();
+    const details = container.querySelector("details")!;
+    const link = details.querySelector("a")!;
+    openMenu(details);
+    link.focus();
+    expect(details.open).toBe(true);
+
+    fireEvent.keyDown(link, { key: "Escape" });
     expect(details.open).toBe(false);
     expect(details.querySelector("summary")!.getAttribute("aria-expanded")).toBe("false");
     expect(document.activeElement).toBe(details.querySelector("summary"));
@@ -183,8 +214,9 @@ describe("header disclosure dismissal", () => {
     const { container, rerender, getByRole } = renderDisclosure();
     const details = container.querySelector("details")!;
     const outside = getByRole("button", { name: "Outside action" });
-    openMenu(details);
     outside.focus();
+    openMenu(details);
+    expect(details.open).toBe(true);
     navigation.pathname = "/pricing";
 
     rerender(

@@ -19,14 +19,14 @@ export function MarketingShell({ children }: { children: ReactNode }) {
       className={`${geist.variable} ${inter.variable} ${newsreader.variable} min-h-screen`}
       style={{ background: "var(--color-mkt-cream)", color: "var(--color-mkt-ink)", fontFamily: "var(--font-mkt-sans), system-ui, sans-serif" }}
     >
-      <header data-node-id="203:4394" className="relative mx-auto flex h-[76px] max-w-[1440px] items-center justify-between gap-10 px-5 md:px-8 xl:h-[88px] xl:px-16">
-        <Link href="/" className="text-[26px] xl:text-[30px]" style={serif}>
+      <header data-node-id="203:4394" className="relative mx-auto flex h-[76px] max-w-[1440px] items-center justify-between gap-10 px-5 leading-[1.38] md:px-8 xl:h-[88px] xl:gap-0 xl:px-16">
+        <Link href="/" className="text-[26px] xl:w-[clamp(300px,calc(50vw_-_340px),380px)] xl:shrink-0 xl:text-[30px]" style={serif}>
           Renvani
         </Link>
-        <nav aria-label="Main" className="hidden items-center gap-10 text-[14px] font-medium xl:flex" style={{ color: "var(--color-mkt-ink2)" }}>
+        <nav aria-label="Main" className="hidden flex-1 items-center justify-between gap-10 text-[14px] font-medium xl:ml-10 xl:flex" style={{ color: "var(--color-mkt-ink2)" }}>
           {SITE_NAV.links.map((l) =>
             l.href === "/product" ? (
-              <HeaderDisclosure key={l.label} nodeId="177:640" summary={l.label} summaryClassName="hover:underline" panelClassName="absolute inset-x-0 top-[88px] z-30 max-h-[calc(100dvh-88px)] overflow-y-auto">
+              <HeaderDisclosure key={l.label} nodeId="177:640" className="w-[90px] shrink-0" summary={l.label} summaryClassName="hover:underline" panelClassName="absolute inset-x-0 top-[88px] z-30 max-h-[calc(100dvh-88px)] overflow-y-auto">
                 <ProductsMenuPanel variant="desktop" />
               </HeaderDisclosure>
             ) : l.href === "/industries" ? (
@@ -34,19 +34,19 @@ export function MarketingShell({ children }: { children: ReactNode }) {
                 <FigmaNode node={INDUSTRY_TREES.menu!.desktop} className="w-full" />
               </IndustryMenu>
             ) : (
-              <Link key={l.label} href={l.href} className="hover:underline">
+              <Link key={l.label} href={l.href} className={`${l.href === "/how-it-works" ? "w-[112px]" : "w-[90px]"} shrink-0 hover:underline`}>
                 {l.label}
               </Link>
             )
           )}
         </nav>
-        <div className="hidden items-center gap-4 xl:flex">
-          <Link href={SITE_NAV.signIn.href} className="text-[14px] font-medium" style={{ color: "var(--color-mkt-ink2)" }}>
+        <div className="hidden shrink-0 items-center gap-4 xl:ml-4 xl:flex">
+          <Link href={SITE_NAV.signIn.href} className="whitespace-nowrap text-[14px] font-medium" style={{ color: "var(--color-mkt-ink2)" }}>
             {SITE_NAV.signIn.label}
           </Link>
           <Link
             href={SITE_NAV.cta.href}
-            className={`${styles.press} inline-flex min-h-[44px] items-center rounded-full px-5 text-[15px] font-medium`}
+            className={`${styles.press} inline-flex min-h-[44px] items-center rounded-full px-5 py-3 text-[15px] font-medium leading-[1.5]`}
             style={{ background: "var(--color-mkt-ink)", color: "var(--color-mkt-cream)" }}
           >
             {SITE_NAV.cta.label}

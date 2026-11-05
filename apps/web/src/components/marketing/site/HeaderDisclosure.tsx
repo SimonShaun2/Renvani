@@ -7,7 +7,7 @@ const HEADER_MENU_GROUP = "marketing-header";
 
 /**
  * Header menu disclosure (product 177:640, industry 177:686, mobile 177:737). Native <details> opens without JS,
- * and a shared name keeps the menus exclusive. With JS, sibling toggles and outside interactions close the menu,
+ * and a shared name keeps the menus exclusive. With JS, sibling toggles, outside clicks, and leaving focus close it;
  * Escape and any "Close menu" button ([data-menu-close]) return focus to its toggle, and links or route changes close it.
  */
 export function HeaderDisclosure({
@@ -65,11 +65,13 @@ export function HeaderDisclosure({
     ownerDocument.addEventListener("toggle", onToggle, true);
     ownerDocument.addEventListener("pointerdown", onOutsideInteraction, true);
     ownerDocument.addEventListener("click", onOutsideInteraction, true);
+    ownerDocument.addEventListener("focusin", onOutsideInteraction, true);
     ownerDocument.addEventListener("keydown", onKeyDown);
     return () => {
       ownerDocument.removeEventListener("toggle", onToggle, true);
       ownerDocument.removeEventListener("pointerdown", onOutsideInteraction, true);
       ownerDocument.removeEventListener("click", onOutsideInteraction, true);
+      ownerDocument.removeEventListener("focusin", onOutsideInteraction, true);
       ownerDocument.removeEventListener("keydown", onKeyDown);
     };
   }, [close]);

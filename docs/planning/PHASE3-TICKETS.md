@@ -482,8 +482,7 @@ Follow all rules. Commit and push. Output TASK COMPLETE when done.
 
 ## Figma Reference
 
-**Export from figma.com/design/tAteqeUfdi4GCtZVeaF4DJ:**
-(This is the marketing landing page file — separate from the app file)
+**Canonical file (product + marketing):** [FSM Agent – Product Design](https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-%E2%80%93-Product-Design) — **Marketing site** section. (Retired: `tAteqeUfdi4GCtZVeaF4DJ`.)
 - 🏠 Landing Page — Desktop (full page)
 
 Export all sections as individual PNGs:

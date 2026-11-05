@@ -1,8 +1,7 @@
 # ServiceRev — Build Documentation
 
 **Repo:** [SimonShaun2/Renvani](https://github.com/SimonShaun2/Renvani) (formerly `FSM-Platform`)
-**Figma (App):** figma.com/design/LNTOsgJ7D4blaFaTepQt3J
-**Figma (Marketing):** figma.com/design/tAteqeUfdi4GCtZVeaF4DJ
+**Figma (canonical — product + marketing):** [FSM Agent – Product Design](https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-%E2%80%93-Product-Design) (`jiGHTNUJNltWbHA4Il3hk7`). UI PRs must cite the implemented frame (`node-id`). Retired: `tAteqeUfdi4GCtZVeaF4DJ`, `LNTOsgJ7D4blaFaTepQt3J`.
 
 ---
 

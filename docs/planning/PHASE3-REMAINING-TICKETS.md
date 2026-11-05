@@ -251,7 +251,7 @@ No commit — output TASK COMPLETE when done.
 
 ## Figma Reference
 
-**Export from the MARKETING file: figma.com/design/tAteqeUfdi4GCtZVeaF4DJ**
+**Canonical Figma (Marketing site section):** https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-%E2%80%93-Product-Design (retired: `tAteqeUfdi4GCtZVeaF4DJ`)
 Export the full landing page as individual PNGs per section:
 - Nav
 - Hero (with AI widget)

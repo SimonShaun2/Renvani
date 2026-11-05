@@ -27,7 +27,7 @@
 | Customer | Figma page `19:18`, exact customer frame per flow | Public booking, inquiry, customer portal and approvals |
 | Marketing | Figma page `171:2` (current visual redesign) | `apps/web/app/(marketing)/` and marketing shared components |
 
-The **existing FS-51 Figma-to-production handoff** and draft PR #404 are the shared mapping work; do not create a competing full application route map. [Login implementation PR #432](https://github.com/SimonShaun2/Renvani/pull/432) is *in review*, not visual-parity accepted.
+The **existing FS-51 Figma-to-production handoff** and merged PR #404 are the shared mapping work; do not create a competing full application route map. [Login implementation PR #432](https://github.com/SimonShaun2/Renvani/pull/432) is *in review*, not visual-parity accepted.
 
 ## PR evidence template (complete fields, not just links)
 

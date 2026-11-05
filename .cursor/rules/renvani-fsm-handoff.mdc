@@ -1,0 +1,9 @@
+---
+description: Renvani FSM WF-01 to WF-06 continuation and review handoff for estimates, technician closeout and weekly dispatch
+globs: "apps/web/**,apps/api/**,packages/types/**"
+alwaysApply: false
+---
+
+For work touching the existing FSM workflow completion packages WF-01–WF-06, read `AGENTS.md`, `CODEX.md`, and `docs/handoffs/RENVANI-FSM-CODEX-CURSOR-START-HERE-2026-11-05.md` before proposing code.
+Current work is on `feat/fsm-workflow-reliability-20261105` / PR #445. The packages are implemented, not merged or released. Verify the latest remote head; do not rebuild existing slices or assume old PR descriptions prove source state.
+Run focused isolated validation and authenticated preview, obtain independent exact-head peer/QA/security/design acceptance, and do not merge without explicit founder authorization.

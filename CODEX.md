@@ -304,3 +304,8 @@ Known gaps:          [anything deferred, with the ticket that will carry it]
 ```
 
 Then follow the operating loop in `TEAM.md` §5 and pick up the next dependency-cleared ticket within pair WIP. Production promotion stays with the founder.
+
+
+## November 5, 2026 — FSM continuity marker for Codex and Cursor
+
+For the six completed but **unmerged** FSM workflow packages WF-01–WF-06, start with [`docs/handoffs/RENVANI-FSM-CODEX-CURSOR-START-HERE-2026-11-05.md`](docs/handoffs/RENVANI-FSM-CODEX-CURSOR-START-HERE-2026-11-05.md), [the completion record](docs/build-specs/FSM-WORKFLOW-COMPLETION-2026-11-05.md), and [PR #445](https://github.com/SimonShaun2/Renvani/pull/445). The code lives on `feat/fsm-workflow-reliability-20261105`, **not** merged `dev`. Do not rebuild completed features. Next: approved exact-head verification, authenticated preview and independent review. This pointer does not override any founder/merge/security/Phase II rule above.

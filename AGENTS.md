@@ -343,3 +343,8 @@ The Cloud Agent `start` script boots local Postgres, Redis, migrations, a browse
 - `pnpm dev` builds `@fsm/config`, `@fsm/types`, `@fsm/db`, `@fsm/jobs`, and `@fsm/ai`, then runs the API, worker, webhook, and web app.
 - The signup page is still a placeholder. Create the first company with `POST /api/v1/auth/register`, then sign in at `/login`.
 - Checks: `pnpm lint` and `pnpm test`. `pnpm build` compiles the workspace, including the Next.js app.
+
+
+## November 5, 2026 — FSM continuity marker for Codex and Cursor
+
+For the six completed but **unmerged** FSM workflow packages WF-01–WF-06, start with [`docs/handoffs/RENVANI-FSM-CODEX-CURSOR-START-HERE-2026-11-05.md`](docs/handoffs/RENVANI-FSM-CODEX-CURSOR-START-HERE-2026-11-05.md), [the completion record](docs/build-specs/FSM-WORKFLOW-COMPLETION-2026-11-05.md), and [PR #445](https://github.com/SimonShaun2/Renvani/pull/445). The code lives on `feat/fsm-workflow-reliability-20261105`, **not** merged `dev`. Do not rebuild completed features. Next: approved exact-head verification, authenticated preview and independent review. This pointer does not override any founder/merge/security/Phase II rule above.

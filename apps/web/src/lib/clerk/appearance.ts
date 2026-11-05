@@ -59,7 +59,8 @@ export const renvaniClerkSignInAppearance = {
     headerSubtitle: "!text-center !text-sm !text-[#5e6684]",
     main: "!px-5 !pb-8 sm:!px-7",
     formFieldLabel: "!text-[13px] !font-medium !text-[#0f1530]",
-    formFieldInput: "!h-[52px] !rounded-xl !border-[#e6dccb] !bg-white !px-4 !text-sm !text-[#0f1530] focus:!border-[#f6b400]",
+    // Clerk also sets max-height; remove that cap so the 52px Figma control can render.
+    formFieldInput: "!h-[52px] !max-h-none !rounded-xl !border-[#e6dccb] !bg-white !px-4 !text-sm !text-[#0f1530] focus:!border-[#f6b400]",
     formFieldAction: "!text-[#2a3360]",
     formButtonPrimary: "!h-12 !rounded-full !bg-[#f6b400] !font-medium !text-[#0f1530] !shadow-none hover:!bg-[#e9aa00]",
     socialButtonsBlockButton: "!h-12 !rounded-full !border !border-[#e6dccb] !bg-white !text-[#0f1530] !shadow-none hover:!bg-[#fbf6ef]",

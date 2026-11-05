@@ -1,0 +1,4596 @@
+{
+  "schemaVersion": 1,
+  "generatedAtUtc": "2026-11-05T03:35:24+00:00",
+  "sourceCommit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+  "scope": "Build specification 9: complete direct-declaration/source-lockfile baseline; not a current advisory or license clearance.",
+  "sourceBaseUrl": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/",
+  "nodeRequirement": "22.16.0",
+  "packageManager": "pnpm@10.0.0",
+  "lockfile": {
+    "path": "pnpm-lock.yaml",
+    "formatVersion": "9.0",
+    "gitBlob": "90d7e997af7979a85363e8cc92af37a5f4713b49",
+    "sha256": "7c23b0bcb57c3a7f8844ff3253a2b2fe6473a3e3a35cdd3cb1e2b703a6daac59",
+    "source": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/pnpm-lock.yaml"
+  },
+  "externalEvidence": {
+    "licenseScan": "NOT RUN",
+    "registryAudit": "NOT RUN",
+    "independentOsvScan": "NOT RUN",
+    "latestVersionLookup": "NOT RUN",
+    "exploitabilityAssessment": "NOT PERFORMED"
+  },
+  "summary": {
+    "manifestCount": 13,
+    "childWorkspaceCount": 12,
+    "appCount": 4,
+    "packageCount": 8,
+    "directDeclarationCount": 176,
+    "classCounts": {
+      "dependencies": 112,
+      "devDependencies": 64,
+      "optionalDependencies": 0,
+      "peerDependencies": 0
+    },
+    "externalDeclarationCount": 139,
+    "workspaceLinkCount": 37,
+    "uniqueDirectNames": 79,
+    "uniqueExternalDirectNames": 71,
+    "uniqueExternalDirectNameVersions": 72,
+    "externalNamesDeclaredMoreThanOnce": 17,
+    "lockPackageRecords": 818,
+    "lockSnapshotRecords": 818,
+    "lockUniquePackageNames": 735,
+    "lockMultiVersionPackageNames": 59,
+    "lockDeprecationMetadataRecords": 16,
+    "unmatchedManifestOrImporterEntries": 0
+  },
+  "manifestInputs": [
+    {
+      "path": "package.json",
+      "gitBlob": "579ae1c96adbcbac959f0097c22311cb511c4568",
+      "sha256": "a3a760d8643597f809aa92c07698c627f12dda0390163711da3d0061ed79e8f1"
+    },
+    {
+      "path": "apps/api/package.json",
+      "gitBlob": "578cda3da6598d7f67312899ffee6ac8146f2439",
+      "sha256": "987cd93c17ecec97092dfa008ce8b7552cd55e941eb8c84f5473cc27182414bf"
+    },
+    {
+      "path": "apps/web/package.json",
+      "gitBlob": "70d9b239b9cf4ebc043b99fc1227f4cd97493333",
+      "sha256": "e26311a5190ae5812d7469da3ed6aa7eac9df9cc7840f367bc42bea6e35ef637"
+    },
+    {
+      "path": "apps/webhook/package.json",
+      "gitBlob": "b9f777ce9fd66d57dc3f8321ed13d02bf7df2586",
+      "sha256": "a2f3d66771b490a4e85cc6aa1f4c8569c4e95f960c99b84272a67d3813712556"
+    },
+    {
+      "path": "apps/worker/package.json",
+      "gitBlob": "3fa72cbceb151406ab5ea8555aa800311261f671",
+      "sha256": "e50a735b68d8ff7ca94c6e2270365dedda6be8919ff14e81b2a8972e06ae9da3"
+    },
+    {
+      "path": "packages/ai/package.json",
+      "gitBlob": "ba20b92f97246fcbdf9b63c4e25b72695e66149c",
+      "sha256": "a5cfa161b7f8280cb3f179e7a4db4e769efd7d8aab1d2e82e4f05498e9d43894"
+    },
+    {
+      "path": "packages/comms/package.json",
+      "gitBlob": "285ca06661db99b7317f94434ea1a660369446c7",
+      "sha256": "c47a7ad0174c835931962b41b8a2e323d5407fd79c858ef23f01754a6044b817"
+    },
+    {
+      "path": "packages/config/package.json",
+      "gitBlob": "a375fe6c188675c2499666861458c1a3c1b03e33",
+      "sha256": "3427a35f151a4b35471426271c68dc47b849eb6b04b8464abc5d63d4203a0205"
+    },
+    {
+      "path": "packages/db/package.json",
+      "gitBlob": "b28cc90c2f678770de0a71a469cebe42c592cf72",
+      "sha256": "0804233b9e38f10130feab2a4f77235fe3639a80d27a22773ac06c3c298d2970"
+    },
+    {
+      "path": "packages/import-engine/package.json",
+      "gitBlob": "c1d1ba6a582b7d6ec6462de154775870a79d5e9d",
+      "sha256": "7a72213f64b7c680712f472537e8df2c71797903f707615e8fa914cb974ddb18"
+    },
+    {
+      "path": "packages/import-normalize/package.json",
+      "gitBlob": "129b864748cdec4c919a2c29fd3bed1889af2320",
+      "sha256": "38e85e35f491d0f302ac1ec084474fbb1247eb4338a4b3e4a7ed78fbe0b35343"
+    },
+    {
+      "path": "packages/jobs/package.json",
+      "gitBlob": "ad55d5a336caa69963d7b15e0989338dfe1a5532",
+      "sha256": "dffd4658cd0575e60cdde288710451ec7aee996cc37a95bdb151ec3ea7f80770"
+    },
+    {
+      "path": "packages/types/package.json",
+      "gitBlob": "78eb58eac18b21bc9e78a4e99c987a5babd9ba06",
+      "sha256": "89937be4de1035aeccbe37573b88d4a4e26d4e5c3fae607db0829c1765970296"
+    }
+  ],
+  "workspaces": [
+    {
+      "path": ".",
+      "manifest": "package.json",
+      "name": "fsm-platform",
+      "version": null,
+      "source": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/package.json",
+      "counts": {
+        "dependencies": 0,
+        "devDependencies": 6,
+        "optionalDependencies": 0,
+        "peerDependencies": 0
+      }
+    },
+    {
+      "path": "apps/api",
+      "manifest": "apps/api/package.json",
+      "name": "@fsm/api",
+      "version": "0.0.0",
+      "source": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/package.json",
+      "counts": {
+        "dependencies": 30,
+        "devDependencies": 8,
+        "optionalDependencies": 0,
+        "peerDependencies": 0
+      }
+    },
+    {
+      "path": "apps/web",
+      "manifest": "apps/web/package.json",
+      "name": "@fsm/web",
+      "version": "0.0.0",
+      "source": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/package.json",
+      "counts": {
+        "dependencies": 30,
+        "devDependencies": 12,
+        "optionalDependencies": 0,
+        "peerDependencies": 0
+      }
+    },
+    {
+      "path": "apps/webhook",
+      "manifest": "apps/webhook/package.json",
+      "name": "@fsm/webhook",
+      "version": "0.0.0",
+      "source": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/webhook/package.json",
+      "counts": {
+        "dependencies": 9,
+        "devDependencies": 4,
+        "optionalDependencies": 0,
+        "peerDependencies": 0
+      }
+    },
+    {
+      "path": "apps/worker",
+      "manifest": "apps/worker/package.json",
+      "name": "@fsm/worker",
+      "version": "0.0.0",
+      "source": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/worker/package.json",
+      "counts": {
+        "dependencies": 15,
+        "devDependencies": 6,
+        "optionalDependencies": 0,
+        "peerDependencies": 0
+      }
+    },
+    {
+      "path": "packages/ai",
+      "manifest": "packages/ai/package.json",
+      "name": "@fsm/ai",
+      "version": "0.0.0",
+      "source": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/ai/package.json",
+      "counts": {
+        "dependencies": 3,
+        "devDependencies": 3,
+        "optionalDependencies": 0,
+        "peerDependencies": 0
+      }
+    },
+    {
+      "path": "packages/comms",
+      "manifest": "packages/comms/package.json",
+      "name": "@fsm/comms",
+      "version": "0.0.0",
+      "source": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/comms/package.json",
+      "counts": {
+        "dependencies": 1,
+        "devDependencies": 3,
+        "optionalDependencies": 0,
+        "peerDependencies": 0
+      }
+    },
+    {
+      "path": "packages/config",
+      "manifest": "packages/config/package.json",
+      "name": "@fsm/config",
+      "version": "0.0.0",
+      "source": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/config/package.json",
+      "counts": {
+        "dependencies": 6,
+        "devDependencies": 3,
+        "optionalDependencies": 0,
+        "peerDependencies": 0
+      }
+    },
+    {
+      "path": "packages/db",
+      "manifest": "packages/db/package.json",
+      "name": "@fsm/db",
+      "version": "0.0.0",
+      "source": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/db/package.json",
+      "counts": {
+        "dependencies": 6,
+        "devDependencies": 4,
+        "optionalDependencies": 0,
+        "peerDependencies": 0
+      }
+    },
+    {
+      "path": "packages/import-engine",
+      "manifest": "packages/import-engine/package.json",
+      "name": "@fsm/import-engine",
+      "version": "0.0.0",
+      "source": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/import-engine/package.json",
+      "counts": {
+        "dependencies": 3,
+        "devDependencies": 4,
+        "optionalDependencies": 0,
+        "peerDependencies": 0
+      }
+    },
+    {
+      "path": "packages/import-normalize",
+      "manifest": "packages/import-normalize/package.json",
+      "name": "@fsm/import-normalize",
+      "version": "0.0.0",
+      "source": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/import-normalize/package.json",
+      "counts": {
+        "dependencies": 2,
+        "devDependencies": 3,
+        "optionalDependencies": 0,
+        "peerDependencies": 0
+      }
+    },
+    {
+      "path": "packages/jobs",
+      "manifest": "packages/jobs/package.json",
+      "name": "@fsm/jobs",
+      "version": "0.0.0",
+      "source": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/jobs/package.json",
+      "counts": {
+        "dependencies": 6,
+        "devDependencies": 3,
+        "optionalDependencies": 0,
+        "peerDependencies": 0
+      }
+    },
+    {
+      "path": "packages/types",
+      "manifest": "packages/types/package.json",
+      "name": "@fsm/types",
+      "version": "0.0.0",
+      "source": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/types/package.json",
+      "counts": {
+        "dependencies": 1,
+        "devDependencies": 5,
+        "optionalDependencies": 0,
+        "peerDependencies": 0
+      }
+    }
+  ],
+  "declarations": [
+    {
+      "workspace": ".",
+      "workspaceName": "fsm-platform",
+      "manifest": "package.json",
+      "name": "@types/node",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^24.3.0",
+      "lockedSpecifier": "^24.3.0",
+      "lockedResolution": "24.12.2",
+      "resolvedVersion": "24.12.2",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "@types/node@24.12.2",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": ".",
+      "workspaceName": "fsm-platform",
+      "manifest": "package.json",
+      "name": "@typescript-eslint/eslint-plugin",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^7.0.0",
+      "lockedSpecifier": "^7.0.0",
+      "lockedResolution": "7.18.0(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.9.3))(eslint@8.57.1)(typescript@5.9.3)",
+      "resolvedVersion": "7.18.0",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "@typescript-eslint/eslint-plugin@7.18.0",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": ".",
+      "workspaceName": "fsm-platform",
+      "manifest": "package.json",
+      "name": "@typescript-eslint/parser",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^7.0.0",
+      "lockedSpecifier": "^7.0.0",
+      "lockedResolution": "7.18.0(eslint@8.57.1)(typescript@5.9.3)",
+      "resolvedVersion": "7.18.0",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "@typescript-eslint/parser@7.18.0",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": ".",
+      "workspaceName": "fsm-platform",
+      "manifest": "package.json",
+      "name": "eslint",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^8.57.0",
+      "lockedSpecifier": "^8.57.0",
+      "lockedResolution": "8.57.1",
+      "resolvedVersion": "8.57.1",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "eslint@8.57.1",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": ".",
+      "workspaceName": "fsm-platform",
+      "manifest": "package.json",
+      "name": "turbo",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^2.0.0",
+      "lockedSpecifier": "^2.0.0",
+      "lockedResolution": "2.9.6",
+      "resolvedVersion": "2.9.6",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "turbo@2.9.6",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": ".",
+      "workspaceName": "fsm-platform",
+      "manifest": "package.json",
+      "name": "typescript",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^5.9.2",
+      "lockedSpecifier": "^5.9.2",
+      "lockedResolution": "5.9.3",
+      "resolvedVersion": "5.9.3",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "typescript@5.9.3",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/api",
+      "workspaceName": "@fsm/api",
+      "manifest": "apps/api/package.json",
+      "name": "@aws-sdk/client-s3",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^3.931.0",
+      "lockedSpecifier": "^3.931.0",
+      "lockedResolution": "3.1038.0",
+      "resolvedVersion": "3.1038.0",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "@aws-sdk/client-s3@3.1038.0",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/api",
+      "workspaceName": "@fsm/api",
+      "manifest": "apps/api/package.json",
+      "name": "@clerk/backend",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^1.34.0",
+      "lockedSpecifier": "^1.34.0",
+      "lockedResolution": "1.34.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)",
+      "resolvedVersion": "1.34.0",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "@clerk/backend@1.34.0",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/api",
+      "workspaceName": "@fsm/api",
+      "manifest": "apps/api/package.json",
+      "name": "@fastify/cors",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "11.0.0",
+      "lockedSpecifier": "11.0.0",
+      "lockedResolution": "11.0.0",
+      "resolvedVersion": "11.0.0",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "@fastify/cors@11.0.0",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/api",
+      "workspaceName": "@fsm/api",
+      "manifest": "apps/api/package.json",
+      "name": "@fastify/jwt",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^9.0.0",
+      "lockedSpecifier": "^9.0.0",
+      "lockedResolution": "9.1.0",
+      "resolvedVersion": "9.1.0",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "@fastify/jwt@9.1.0",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/api",
+      "workspaceName": "@fsm/api",
+      "manifest": "apps/api/package.json",
+      "name": "@fastify/multipart",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^9.2.1",
+      "lockedSpecifier": "^9.2.1",
+      "lockedResolution": "9.4.0",
+      "resolvedVersion": "9.4.0",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "@fastify/multipart@9.4.0",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/api",
+      "workspaceName": "@fsm/api",
+      "manifest": "apps/api/package.json",
+      "name": "@fastify/rate-limit",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^10.3.0",
+      "lockedSpecifier": "^10.3.0",
+      "lockedResolution": "10.3.0",
+      "resolvedVersion": "10.3.0",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "@fastify/rate-limit@10.3.0",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/api",
+      "workspaceName": "@fsm/api",
+      "manifest": "apps/api/package.json",
+      "name": "@fsm/ai",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "workspace:*",
+      "lockedSpecifier": "workspace:*",
+      "lockedResolution": "link:../../packages/ai",
+      "resolvedVersion": "0.0.0",
+      "resolutionKind": "workspace link",
+      "workspaceTarget": "packages/ai",
+      "lockPackageKey": null,
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/api",
+      "workspaceName": "@fsm/api",
+      "manifest": "apps/api/package.json",
+      "name": "@fsm/comms",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "workspace:*",
+      "lockedSpecifier": "workspace:*",
+      "lockedResolution": "link:../../packages/comms",
+      "resolvedVersion": "0.0.0",
+      "resolutionKind": "workspace link",
+      "workspaceTarget": "packages/comms",
+      "lockPackageKey": null,
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/api",
+      "workspaceName": "@fsm/api",
+      "manifest": "apps/api/package.json",
+      "name": "@fsm/config",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "workspace:*",
+      "lockedSpecifier": "workspace:*",
+      "lockedResolution": "link:../../packages/config",
+      "resolvedVersion": "0.0.0",
+      "resolutionKind": "workspace link",
+      "workspaceTarget": "packages/config",
+      "lockPackageKey": null,
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/api",
+      "workspaceName": "@fsm/api",
+      "manifest": "apps/api/package.json",
+      "name": "@fsm/db",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "workspace:*",
+      "lockedSpecifier": "workspace:*",
+      "lockedResolution": "link:../../packages/db",
+      "resolvedVersion": "0.0.0",
+      "resolutionKind": "workspace link",
+      "workspaceTarget": "packages/db",
+      "lockPackageKey": null,
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/api",
+      "workspaceName": "@fsm/api",
+      "manifest": "apps/api/package.json",
+      "name": "@fsm/import-engine",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "workspace:*",
+      "lockedSpecifier": "workspace:*",
+      "lockedResolution": "link:../../packages/import-engine",
+      "resolvedVersion": "0.0.0",
+      "resolutionKind": "workspace link",
+      "workspaceTarget": "packages/import-engine",
+      "lockPackageKey": null,
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/api",
+      "workspaceName": "@fsm/api",
+      "manifest": "apps/api/package.json",
+      "name": "@fsm/import-normalize",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "workspace:*",
+      "lockedSpecifier": "workspace:*",
+      "lockedResolution": "link:../../packages/import-normalize",
+      "resolvedVersion": "0.0.0",
+      "resolutionKind": "workspace link",
+      "workspaceTarget": "packages/import-normalize",
+      "lockPackageKey": null,
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/api",
+      "workspaceName": "@fsm/api",
+      "manifest": "apps/api/package.json",
+      "name": "@fsm/jobs",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "workspace:*",
+      "lockedSpecifier": "workspace:*",
+      "lockedResolution": "link:../../packages/jobs",
+      "resolvedVersion": "0.0.0",
+      "resolutionKind": "workspace link",
+      "workspaceTarget": "packages/jobs",
+      "lockPackageKey": null,
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/api",
+      "workspaceName": "@fsm/api",
+      "manifest": "apps/api/package.json",
+      "name": "@fsm/types",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "workspace:*",
+      "lockedSpecifier": "workspace:*",
+      "lockedResolution": "link:../../packages/types",
+      "resolvedVersion": "0.0.0",
+      "resolutionKind": "workspace link",
+      "workspaceTarget": "packages/types",
+      "lockPackageKey": null,
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/api",
+      "workspaceName": "@fsm/api",
+      "manifest": "apps/api/package.json",
+      "name": "@js-temporal/polyfill",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^0.5.1",
+      "lockedSpecifier": "^0.5.1",
+      "lockedResolution": "0.5.1",
+      "resolvedVersion": "0.5.1",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "@js-temporal/polyfill@0.5.1",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/api",
+      "workspaceName": "@fsm/api",
+      "manifest": "apps/api/package.json",
+      "name": "@sendgrid/mail",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^8.1.5",
+      "lockedSpecifier": "^8.1.5",
+      "lockedResolution": "8.1.6",
+      "resolvedVersion": "8.1.6",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "@sendgrid/mail@8.1.6",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/api",
+      "workspaceName": "@fsm/api",
+      "manifest": "apps/api/package.json",
+      "name": "bcryptjs",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^3.0.2",
+      "lockedSpecifier": "^3.0.2",
+      "lockedResolution": "3.0.3",
+      "resolvedVersion": "3.0.3",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "bcryptjs@3.0.3",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/api",
+      "workspaceName": "@fsm/api",
+      "manifest": "apps/api/package.json",
+      "name": "date-fns",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^4.1.0",
+      "lockedSpecifier": "^4.1.0",
+      "lockedResolution": "4.1.0",
+      "resolvedVersion": "4.1.0",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "date-fns@4.1.0",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/api",
+      "workspaceName": "@fsm/api",
+      "manifest": "apps/api/package.json",
+      "name": "decimal.js",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^10.5.0",
+      "lockedSpecifier": "^10.5.0",
+      "lockedResolution": "10.6.0",
+      "resolvedVersion": "10.6.0",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "decimal.js@10.6.0",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/api",
+      "workspaceName": "@fsm/api",
+      "manifest": "apps/api/package.json",
+      "name": "drizzle-orm",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "0.44.2",
+      "lockedSpecifier": "0.44.2",
+      "lockedResolution": "0.44.2(@opentelemetry/api@1.10.0)(@types/pg@8.6.1)(postgres@3.4.5)",
+      "resolvedVersion": "0.44.2",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "drizzle-orm@0.44.2",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/api",
+      "workspaceName": "@fsm/api",
+      "manifest": "apps/api/package.json",
+      "name": "fastify",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^5.5.0",
+      "lockedSpecifier": "^5.5.0",
+      "lockedResolution": "5.8.5",
+      "resolvedVersion": "5.8.5",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "fastify@5.8.5",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/api",
+      "workspaceName": "@fsm/api",
+      "manifest": "apps/api/package.json",
+      "name": "fastify-plugin",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^5.0.1",
+      "lockedSpecifier": "^5.0.1",
+      "lockedResolution": "5.1.0",
+      "resolvedVersion": "5.1.0",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "fastify-plugin@5.1.0",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/api",
+      "workspaceName": "@fsm/api",
+      "manifest": "apps/api/package.json",
+      "name": "jsonwebtoken",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^9.0.2",
+      "lockedSpecifier": "^9.0.2",
+      "lockedResolution": "9.0.3",
+      "resolvedVersion": "9.0.3",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "jsonwebtoken@9.0.3",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/api",
+      "workspaceName": "@fsm/api",
+      "manifest": "apps/api/package.json",
+      "name": "papaparse",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^5.5.3",
+      "lockedSpecifier": "^5.5.3",
+      "lockedResolution": "5.5.3",
+      "resolvedVersion": "5.5.3",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "papaparse@5.5.3",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/api",
+      "workspaceName": "@fsm/api",
+      "manifest": "apps/api/package.json",
+      "name": "pdf-lib",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^1.17.1",
+      "lockedSpecifier": "^1.17.1",
+      "lockedResolution": "1.17.1",
+      "resolvedVersion": "1.17.1",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "pdf-lib@1.17.1",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/api",
+      "workspaceName": "@fsm/api",
+      "manifest": "apps/api/package.json",
+      "name": "pino",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^9.4.0",
+      "lockedSpecifier": "^9.4.0",
+      "lockedResolution": "9.14.0",
+      "resolvedVersion": "9.14.0",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "pino@9.14.0",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/api",
+      "workspaceName": "@fsm/api",
+      "manifest": "apps/api/package.json",
+      "name": "sharp",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^0.34.5",
+      "lockedSpecifier": "^0.34.5",
+      "lockedResolution": "0.34.5",
+      "resolvedVersion": "0.34.5",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "sharp@0.34.5",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/api",
+      "workspaceName": "@fsm/api",
+      "manifest": "apps/api/package.json",
+      "name": "stripe",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^17.0.0",
+      "lockedSpecifier": "^17.0.0",
+      "lockedResolution": "17.7.0",
+      "resolvedVersion": "17.7.0",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "stripe@17.7.0",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/api",
+      "workspaceName": "@fsm/api",
+      "manifest": "apps/api/package.json",
+      "name": "twilio",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^5.9.0",
+      "lockedSpecifier": "^5.9.0",
+      "lockedResolution": "5.13.1",
+      "resolvedVersion": "5.13.1",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "twilio@5.13.1",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/api",
+      "workspaceName": "@fsm/api",
+      "manifest": "apps/api/package.json",
+      "name": "zod",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^3.25.76",
+      "lockedSpecifier": "^3.25.76",
+      "lockedResolution": "3.25.76",
+      "resolvedVersion": "3.25.76",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "zod@3.25.76",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/api",
+      "workspaceName": "@fsm/api",
+      "manifest": "apps/api/package.json",
+      "name": "@types/jsonwebtoken",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^9.0.10",
+      "lockedSpecifier": "^9.0.10",
+      "lockedResolution": "9.0.10",
+      "resolvedVersion": "9.0.10",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "@types/jsonwebtoken@9.0.10",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/api",
+      "workspaceName": "@fsm/api",
+      "manifest": "apps/api/package.json",
+      "name": "@types/node",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^24.3.0",
+      "lockedSpecifier": "^24.3.0",
+      "lockedResolution": "24.12.2",
+      "resolvedVersion": "24.12.2",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "@types/node@24.12.2",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/api",
+      "workspaceName": "@fsm/api",
+      "manifest": "apps/api/package.json",
+      "name": "@types/papaparse",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^5.5.0",
+      "lockedSpecifier": "^5.5.0",
+      "lockedResolution": "5.5.2",
+      "resolvedVersion": "5.5.2",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "@types/papaparse@5.5.2",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/api",
+      "workspaceName": "@fsm/api",
+      "manifest": "apps/api/package.json",
+      "name": "@types/supertest",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^6.0.3",
+      "lockedSpecifier": "^6.0.3",
+      "lockedResolution": "6.0.3",
+      "resolvedVersion": "6.0.3",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "@types/supertest@6.0.3",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/api",
+      "workspaceName": "@fsm/api",
+      "manifest": "apps/api/package.json",
+      "name": "supertest",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^7.1.1",
+      "lockedSpecifier": "^7.1.1",
+      "lockedResolution": "7.2.2",
+      "resolvedVersion": "7.2.2",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "supertest@7.2.2",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/api",
+      "workspaceName": "@fsm/api",
+      "manifest": "apps/api/package.json",
+      "name": "tsx",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^4.19.1",
+      "lockedSpecifier": "^4.19.1",
+      "lockedResolution": "4.21.0",
+      "resolvedVersion": "4.21.0",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "tsx@4.21.0",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/api",
+      "workspaceName": "@fsm/api",
+      "manifest": "apps/api/package.json",
+      "name": "typescript",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^5.9.2",
+      "lockedSpecifier": "^5.9.2",
+      "lockedResolution": "5.9.3",
+      "resolvedVersion": "5.9.3",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "typescript@5.9.3",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/api",
+      "workspaceName": "@fsm/api",
+      "manifest": "apps/api/package.json",
+      "name": "vitest",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^3.2.4",
+      "lockedSpecifier": "^3.2.4",
+      "lockedResolution": "3.2.4(@types/node@24.12.2)(happy-dom@21.0.4)(jiti@1.21.7)(tsx@4.21.0)",
+      "resolvedVersion": "3.2.4",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "vitest@3.2.4",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/web",
+      "workspaceName": "@fsm/web",
+      "manifest": "apps/web/package.json",
+      "name": "@clerk/nextjs",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^6",
+      "lockedSpecifier": "^6",
+      "lockedResolution": "6.39.8(next@15.5.15(@opentelemetry/api@1.10.0)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)",
+      "resolvedVersion": "6.39.8",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "@clerk/nextjs@6.39.8",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/web",
+      "workspaceName": "@fsm/web",
+      "manifest": "apps/web/package.json",
+      "name": "@dnd-kit/core",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^6.1.0",
+      "lockedSpecifier": "^6.1.0",
+      "lockedResolution": "6.3.1(react-dom@19.2.5(react@19.2.5))(react@19.2.5)",
+      "resolvedVersion": "6.3.1",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "@dnd-kit/core@6.3.1",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/web",
+      "workspaceName": "@fsm/web",
+      "manifest": "apps/web/package.json",
+      "name": "@dnd-kit/sortable",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^8.0.0",
+      "lockedSpecifier": "^8.0.0",
+      "lockedResolution": "8.0.0(@dnd-kit/core@6.3.1(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(react@19.2.5)",
+      "resolvedVersion": "8.0.0",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "@dnd-kit/sortable@8.0.0",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/web",
+      "workspaceName": "@fsm/web",
+      "manifest": "apps/web/package.json",
+      "name": "@fsm/config",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "workspace:*",
+      "lockedSpecifier": "workspace:*",
+      "lockedResolution": "link:../../packages/config",
+      "resolvedVersion": "0.0.0",
+      "resolutionKind": "workspace link",
+      "workspaceTarget": "packages/config",
+      "lockPackageKey": null,
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/web",
+      "workspaceName": "@fsm/web",
+      "manifest": "apps/web/package.json",
+      "name": "@fsm/import-normalize",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "workspace:*",
+      "lockedSpecifier": "workspace:*",
+      "lockedResolution": "link:../../packages/import-normalize",
+      "resolvedVersion": "0.0.0",
+      "resolutionKind": "workspace link",
+      "workspaceTarget": "packages/import-normalize",
+      "lockPackageKey": null,
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/web",
+      "workspaceName": "@fsm/web",
+      "manifest": "apps/web/package.json",
+      "name": "@fsm/types",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "workspace:*",
+      "lockedSpecifier": "workspace:*",
+      "lockedResolution": "link:../../packages/types",
+      "resolvedVersion": "0.0.0",
+      "resolutionKind": "workspace link",
+      "workspaceTarget": "packages/types",
+      "lockPackageKey": null,
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/web",
+      "workspaceName": "@fsm/web",
+      "manifest": "apps/web/package.json",
+      "name": "@hookform/resolvers",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^3.3.4",
+      "lockedSpecifier": "^3.3.4",
+      "lockedResolution": "3.10.0(react-hook-form@7.74.0(react@19.2.5))",
+      "resolvedVersion": "3.10.0",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "@hookform/resolvers@3.10.0",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/web",
+      "workspaceName": "@fsm/web",
+      "manifest": "apps/web/package.json",
+      "name": "@stripe/connect-js",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^3.4.6",
+      "lockedSpecifier": "^3.4.6",
+      "lockedResolution": "3.4.6",
+      "resolvedVersion": "3.4.6",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "@stripe/connect-js@3.4.6",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/web",
+      "workspaceName": "@fsm/web",
+      "manifest": "apps/web/package.json",
+      "name": "@stripe/react-connect-js",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^3.4.4",
+      "lockedSpecifier": "^3.4.4",
+      "lockedResolution": "3.4.4(@stripe/connect-js@3.4.6)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)",
+      "resolvedVersion": "3.4.4",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "@stripe/react-connect-js@3.4.4",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/web",
+      "workspaceName": "@fsm/web",
+      "manifest": "apps/web/package.json",
+      "name": "@stripe/react-stripe-js",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^7.0.0",
+      "lockedSpecifier": "^7.0.0",
+      "lockedResolution": "7.0.0(@stripe/stripe-js@10.1.0)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)",
+      "resolvedVersion": "7.0.0",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "@stripe/react-stripe-js@7.0.0",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/web",
+      "workspaceName": "@fsm/web",
+      "manifest": "apps/web/package.json",
+      "name": "@stripe/stripe-js",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^10.1.0",
+      "lockedSpecifier": "^10.1.0",
+      "lockedResolution": "10.1.0",
+      "resolvedVersion": "10.1.0",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "@stripe/stripe-js@10.1.0",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/web",
+      "workspaceName": "@fsm/web",
+      "manifest": "apps/web/package.json",
+      "name": "@tanstack/react-query",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^5.0.0",
+      "lockedSpecifier": "^5.0.0",
+      "lockedResolution": "5.100.6(react@19.2.5)",
+      "resolvedVersion": "5.100.6",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "@tanstack/react-query@5.100.6",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/web",
+      "workspaceName": "@fsm/web",
+      "manifest": "apps/web/package.json",
+      "name": "class-variance-authority",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^0.7.0",
+      "lockedSpecifier": "^0.7.0",
+      "lockedResolution": "0.7.1",
+      "resolvedVersion": "0.7.1",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "class-variance-authority@0.7.1",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/web",
+      "workspaceName": "@fsm/web",
+      "manifest": "apps/web/package.json",
+      "name": "clsx",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^2.1.0",
+      "lockedSpecifier": "^2.1.0",
+      "lockedResolution": "2.1.1",
+      "resolvedVersion": "2.1.1",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "clsx@2.1.1",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/web",
+      "workspaceName": "@fsm/web",
+      "manifest": "apps/web/package.json",
+      "name": "date-fns",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^3.6.0",
+      "lockedSpecifier": "^3.6.0",
+      "lockedResolution": "3.6.0",
+      "resolvedVersion": "3.6.0",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "date-fns@3.6.0",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/web",
+      "workspaceName": "@fsm/web",
+      "manifest": "apps/web/package.json",
+      "name": "decimal.js",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^10.5.0",
+      "lockedSpecifier": "^10.5.0",
+      "lockedResolution": "10.6.0",
+      "resolvedVersion": "10.6.0",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "decimal.js@10.6.0",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/web",
+      "workspaceName": "@fsm/web",
+      "manifest": "apps/web/package.json",
+      "name": "framer-motion",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^11.0.0",
+      "lockedSpecifier": "^11.0.0",
+      "lockedResolution": "11.18.2(react-dom@19.2.5(react@19.2.5))(react@19.2.5)",
+      "resolvedVersion": "11.18.2",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "framer-motion@11.18.2",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/web",
+      "workspaceName": "@fsm/web",
+      "manifest": "apps/web/package.json",
+      "name": "lucide-react",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^0.368.0",
+      "lockedSpecifier": "^0.368.0",
+      "lockedResolution": "0.368.0(react@19.2.5)",
+      "resolvedVersion": "0.368.0",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "lucide-react@0.368.0",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/web",
+      "workspaceName": "@fsm/web",
+      "manifest": "apps/web/package.json",
+      "name": "next",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^15.0.0",
+      "lockedSpecifier": "^15.0.0",
+      "lockedResolution": "15.5.15(@opentelemetry/api@1.10.0)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)",
+      "resolvedVersion": "15.5.15",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "next@15.5.15",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/web",
+      "workspaceName": "@fsm/web",
+      "manifest": "apps/web/package.json",
+      "name": "papaparse",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^5.5.3",
+      "lockedSpecifier": "^5.5.3",
+      "lockedResolution": "5.5.3",
+      "resolvedVersion": "5.5.3",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "papaparse@5.5.3",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/web",
+      "workspaceName": "@fsm/web",
+      "manifest": "apps/web/package.json",
+      "name": "qrcode.react",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^4.2.0",
+      "lockedSpecifier": "^4.2.0",
+      "lockedResolution": "4.2.0(react@19.2.5)",
+      "resolvedVersion": "4.2.0",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "qrcode.react@4.2.0",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/web",
+      "workspaceName": "@fsm/web",
+      "manifest": "apps/web/package.json",
+      "name": "react",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^19.0.0",
+      "lockedSpecifier": "^19.0.0",
+      "lockedResolution": "19.2.5",
+      "resolvedVersion": "19.2.5",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "react@19.2.5",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/web",
+      "workspaceName": "@fsm/web",
+      "manifest": "apps/web/package.json",
+      "name": "react-dom",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^19.0.0",
+      "lockedSpecifier": "^19.0.0",
+      "lockedResolution": "19.2.5(react@19.2.5)",
+      "resolvedVersion": "19.2.5",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "react-dom@19.2.5",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/web",
+      "workspaceName": "@fsm/web",
+      "manifest": "apps/web/package.json",
+      "name": "react-hook-form",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^7.51.0",
+      "lockedSpecifier": "^7.51.0",
+      "lockedResolution": "7.74.0(react@19.2.5)",
+      "resolvedVersion": "7.74.0",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "react-hook-form@7.74.0",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/web",
+      "workspaceName": "@fsm/web",
+      "manifest": "apps/web/package.json",
+      "name": "react-signature-canvas",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "1.1.0-alpha.2",
+      "lockedSpecifier": "1.1.0-alpha.2",
+      "lockedResolution": "1.1.0-alpha.2(@types/react@19.2.14)(prop-types@15.8.1)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)",
+      "resolvedVersion": "1.1.0-alpha.2",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "react-signature-canvas@1.1.0-alpha.2",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/web",
+      "workspaceName": "@fsm/web",
+      "manifest": "apps/web/package.json",
+      "name": "recharts",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^2.12.0",
+      "lockedSpecifier": "^2.12.0",
+      "lockedResolution": "2.15.4(react-dom@19.2.5(react@19.2.5))(react@19.2.5)",
+      "resolvedVersion": "2.15.4",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "recharts@2.15.4",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/web",
+      "workspaceName": "@fsm/web",
+      "manifest": "apps/web/package.json",
+      "name": "tailwind-merge",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^2.2.0",
+      "lockedSpecifier": "^2.2.0",
+      "lockedResolution": "2.6.1",
+      "resolvedVersion": "2.6.1",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "tailwind-merge@2.6.1",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/web",
+      "workspaceName": "@fsm/web",
+      "manifest": "apps/web/package.json",
+      "name": "xlsx",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^0.18.5",
+      "lockedSpecifier": "^0.18.5",
+      "lockedResolution": "0.18.5",
+      "resolvedVersion": "0.18.5",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "xlsx@0.18.5",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/web",
+      "workspaceName": "@fsm/web",
+      "manifest": "apps/web/package.json",
+      "name": "zod",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^3.24.1",
+      "lockedSpecifier": "^3.24.1",
+      "lockedResolution": "3.25.76",
+      "resolvedVersion": "3.25.76",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "zod@3.25.76",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/web",
+      "workspaceName": "@fsm/web",
+      "manifest": "apps/web/package.json",
+      "name": "zustand",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^4.5.0",
+      "lockedSpecifier": "^4.5.0",
+      "lockedResolution": "4.5.7(@types/react@19.2.14)(react@19.2.5)",
+      "resolvedVersion": "4.5.7",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "zustand@4.5.7",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/web",
+      "workspaceName": "@fsm/web",
+      "manifest": "apps/web/package.json",
+      "name": "@testing-library/dom",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^10.4.2",
+      "lockedSpecifier": "^10.4.2",
+      "lockedResolution": "10.4.2",
+      "resolvedVersion": "10.4.2",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "@testing-library/dom@10.4.2",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/web",
+      "workspaceName": "@fsm/web",
+      "manifest": "apps/web/package.json",
+      "name": "@testing-library/react",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^16.3.3",
+      "lockedSpecifier": "^16.3.3",
+      "lockedResolution": "16.3.3(@testing-library/dom@10.4.2)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)",
+      "resolvedVersion": "16.3.3",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "@testing-library/react@16.3.3",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/web",
+      "workspaceName": "@fsm/web",
+      "manifest": "apps/web/package.json",
+      "name": "@types/node",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^24.3.0",
+      "lockedSpecifier": "^24.3.0",
+      "lockedResolution": "24.12.2",
+      "resolvedVersion": "24.12.2",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "@types/node@24.12.2",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/web",
+      "workspaceName": "@fsm/web",
+      "manifest": "apps/web/package.json",
+      "name": "@types/papaparse",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^5.5.0",
+      "lockedSpecifier": "^5.5.0",
+      "lockedResolution": "5.5.2",
+      "resolvedVersion": "5.5.2",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "@types/papaparse@5.5.2",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/web",
+      "workspaceName": "@fsm/web",
+      "manifest": "apps/web/package.json",
+      "name": "@types/react",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^19.0.0",
+      "lockedSpecifier": "^19.0.0",
+      "lockedResolution": "19.2.14",
+      "resolvedVersion": "19.2.14",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "@types/react@19.2.14",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/web",
+      "workspaceName": "@fsm/web",
+      "manifest": "apps/web/package.json",
+      "name": "@types/react-dom",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^19.0.0",
+      "lockedSpecifier": "^19.0.0",
+      "lockedResolution": "19.2.3(@types/react@19.2.14)",
+      "resolvedVersion": "19.2.3",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "@types/react-dom@19.2.3",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/web",
+      "workspaceName": "@fsm/web",
+      "manifest": "apps/web/package.json",
+      "name": "autoprefixer",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^10.4.21",
+      "lockedSpecifier": "^10.4.21",
+      "lockedResolution": "10.5.0(postcss@8.5.12)",
+      "resolvedVersion": "10.5.0",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "autoprefixer@10.5.0",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/web",
+      "workspaceName": "@fsm/web",
+      "manifest": "apps/web/package.json",
+      "name": "happy-dom",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^21.0.4",
+      "lockedSpecifier": "^21.0.4",
+      "lockedResolution": "21.0.4",
+      "resolvedVersion": "21.0.4",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "happy-dom@21.0.4",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/web",
+      "workspaceName": "@fsm/web",
+      "manifest": "apps/web/package.json",
+      "name": "postcss",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^8.5.6",
+      "lockedSpecifier": "^8.5.6",
+      "lockedResolution": "8.5.12",
+      "resolvedVersion": "8.5.12",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "postcss@8.5.12",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/web",
+      "workspaceName": "@fsm/web",
+      "manifest": "apps/web/package.json",
+      "name": "tailwindcss",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^3.4.17",
+      "lockedSpecifier": "^3.4.17",
+      "lockedResolution": "3.4.19(tsx@4.21.0)",
+      "resolvedVersion": "3.4.19",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "tailwindcss@3.4.19",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/web",
+      "workspaceName": "@fsm/web",
+      "manifest": "apps/web/package.json",
+      "name": "typescript",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^5.9.2",
+      "lockedSpecifier": "^5.9.2",
+      "lockedResolution": "5.9.3",
+      "resolvedVersion": "5.9.3",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "typescript@5.9.3",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/web",
+      "workspaceName": "@fsm/web",
+      "manifest": "apps/web/package.json",
+      "name": "vitest",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^3.2.4",
+      "lockedSpecifier": "^3.2.4",
+      "lockedResolution": "3.2.4(@types/node@24.12.2)(happy-dom@21.0.4)(jiti@1.21.7)(tsx@4.21.0)",
+      "resolvedVersion": "3.2.4",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "vitest@3.2.4",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/webhook",
+      "workspaceName": "@fsm/webhook",
+      "manifest": "apps/webhook/package.json",
+      "name": "@fsm/config",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "workspace:*",
+      "lockedSpecifier": "workspace:*",
+      "lockedResolution": "link:../../packages/config",
+      "resolvedVersion": "0.0.0",
+      "resolutionKind": "workspace link",
+      "workspaceTarget": "packages/config",
+      "lockPackageKey": null,
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/webhook/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/webhook",
+      "workspaceName": "@fsm/webhook",
+      "manifest": "apps/webhook/package.json",
+      "name": "@fsm/db",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "workspace:*",
+      "lockedSpecifier": "workspace:*",
+      "lockedResolution": "link:../../packages/db",
+      "resolvedVersion": "0.0.0",
+      "resolutionKind": "workspace link",
+      "workspaceTarget": "packages/db",
+      "lockPackageKey": null,
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/webhook/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/webhook",
+      "workspaceName": "@fsm/webhook",
+      "manifest": "apps/webhook/package.json",
+      "name": "@fsm/jobs",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "workspace:*",
+      "lockedSpecifier": "workspace:*",
+      "lockedResolution": "link:../../packages/jobs",
+      "resolvedVersion": "0.0.0",
+      "resolutionKind": "workspace link",
+      "workspaceTarget": "packages/jobs",
+      "lockPackageKey": null,
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/webhook/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/webhook",
+      "workspaceName": "@fsm/webhook",
+      "manifest": "apps/webhook/package.json",
+      "name": "@fsm/types",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "workspace:*",
+      "lockedSpecifier": "workspace:*",
+      "lockedResolution": "link:../../packages/types",
+      "resolvedVersion": "0.0.0",
+      "resolutionKind": "workspace link",
+      "workspaceTarget": "packages/types",
+      "lockPackageKey": null,
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/webhook/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/webhook",
+      "workspaceName": "@fsm/webhook",
+      "manifest": "apps/webhook/package.json",
+      "name": "decimal.js",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^10.5.0",
+      "lockedSpecifier": "^10.5.0",
+      "lockedResolution": "10.6.0",
+      "resolvedVersion": "10.6.0",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "decimal.js@10.6.0",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/webhook/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/webhook",
+      "workspaceName": "@fsm/webhook",
+      "manifest": "apps/webhook/package.json",
+      "name": "drizzle-orm",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "0.44.2",
+      "lockedSpecifier": "0.44.2",
+      "lockedResolution": "0.44.2(@opentelemetry/api@1.10.0)(@types/pg@8.6.1)(postgres@3.4.5)",
+      "resolvedVersion": "0.44.2",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "drizzle-orm@0.44.2",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/webhook/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/webhook",
+      "workspaceName": "@fsm/webhook",
+      "manifest": "apps/webhook/package.json",
+      "name": "fastify",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^5.5.0",
+      "lockedSpecifier": "^5.5.0",
+      "lockedResolution": "5.8.5",
+      "resolvedVersion": "5.8.5",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "fastify@5.8.5",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/webhook/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/webhook",
+      "workspaceName": "@fsm/webhook",
+      "manifest": "apps/webhook/package.json",
+      "name": "pino",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^9.4.0",
+      "lockedSpecifier": "^9.4.0",
+      "lockedResolution": "9.14.0",
+      "resolvedVersion": "9.14.0",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "pino@9.14.0",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/webhook/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/webhook",
+      "workspaceName": "@fsm/webhook",
+      "manifest": "apps/webhook/package.json",
+      "name": "stripe",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^17.0.0",
+      "lockedSpecifier": "^17.0.0",
+      "lockedResolution": "17.7.0",
+      "resolvedVersion": "17.7.0",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "stripe@17.7.0",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/webhook/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/webhook",
+      "workspaceName": "@fsm/webhook",
+      "manifest": "apps/webhook/package.json",
+      "name": "@types/node",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^24.3.0",
+      "lockedSpecifier": "^24.3.0",
+      "lockedResolution": "24.12.2",
+      "resolvedVersion": "24.12.2",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "@types/node@24.12.2",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/webhook/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/webhook",
+      "workspaceName": "@fsm/webhook",
+      "manifest": "apps/webhook/package.json",
+      "name": "tsx",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^4.19.1",
+      "lockedSpecifier": "^4.19.1",
+      "lockedResolution": "4.21.0",
+      "resolvedVersion": "4.21.0",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "tsx@4.21.0",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/webhook/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/webhook",
+      "workspaceName": "@fsm/webhook",
+      "manifest": "apps/webhook/package.json",
+      "name": "typescript",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^5.9.2",
+      "lockedSpecifier": "^5.9.2",
+      "lockedResolution": "5.9.3",
+      "resolvedVersion": "5.9.3",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "typescript@5.9.3",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/webhook/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/webhook",
+      "workspaceName": "@fsm/webhook",
+      "manifest": "apps/webhook/package.json",
+      "name": "vitest",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^3.2.4",
+      "lockedSpecifier": "^3.2.4",
+      "lockedResolution": "3.2.4(@types/node@24.12.2)(happy-dom@21.0.4)(jiti@1.21.7)(tsx@4.21.0)",
+      "resolvedVersion": "3.2.4",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "vitest@3.2.4",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/webhook/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/worker",
+      "workspaceName": "@fsm/worker",
+      "manifest": "apps/worker/package.json",
+      "name": "@aws-sdk/client-s3",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^3.931.0",
+      "lockedSpecifier": "^3.931.0",
+      "lockedResolution": "3.1038.0",
+      "resolvedVersion": "3.1038.0",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "@aws-sdk/client-s3@3.1038.0",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/worker/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/worker",
+      "workspaceName": "@fsm/worker",
+      "manifest": "apps/worker/package.json",
+      "name": "@clerk/backend",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^1.34.0",
+      "lockedSpecifier": "^1.34.0",
+      "lockedResolution": "1.34.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)",
+      "resolvedVersion": "1.34.0",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "@clerk/backend@1.34.0",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/worker/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/worker",
+      "workspaceName": "@fsm/worker",
+      "manifest": "apps/worker/package.json",
+      "name": "@fsm/ai",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "workspace:*",
+      "lockedSpecifier": "workspace:*",
+      "lockedResolution": "link:../../packages/ai",
+      "resolvedVersion": "0.0.0",
+      "resolutionKind": "workspace link",
+      "workspaceTarget": "packages/ai",
+      "lockPackageKey": null,
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/worker/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/worker",
+      "workspaceName": "@fsm/worker",
+      "manifest": "apps/worker/package.json",
+      "name": "@fsm/comms",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "workspace:*",
+      "lockedSpecifier": "workspace:*",
+      "lockedResolution": "link:../../packages/comms",
+      "resolvedVersion": "0.0.0",
+      "resolutionKind": "workspace link",
+      "workspaceTarget": "packages/comms",
+      "lockPackageKey": null,
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/worker/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/worker",
+      "workspaceName": "@fsm/worker",
+      "manifest": "apps/worker/package.json",
+      "name": "@fsm/config",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "workspace:*",
+      "lockedSpecifier": "workspace:*",
+      "lockedResolution": "link:../../packages/config",
+      "resolvedVersion": "0.0.0",
+      "resolutionKind": "workspace link",
+      "workspaceTarget": "packages/config",
+      "lockPackageKey": null,
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/worker/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/worker",
+      "workspaceName": "@fsm/worker",
+      "manifest": "apps/worker/package.json",
+      "name": "@fsm/db",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "workspace:*",
+      "lockedSpecifier": "workspace:*",
+      "lockedResolution": "link:../../packages/db",
+      "resolvedVersion": "0.0.0",
+      "resolutionKind": "workspace link",
+      "workspaceTarget": "packages/db",
+      "lockPackageKey": null,
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/worker/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/worker",
+      "workspaceName": "@fsm/worker",
+      "manifest": "apps/worker/package.json",
+      "name": "@fsm/import-engine",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "workspace:*",
+      "lockedSpecifier": "workspace:*",
+      "lockedResolution": "link:../../packages/import-engine",
+      "resolvedVersion": "0.0.0",
+      "resolutionKind": "workspace link",
+      "workspaceTarget": "packages/import-engine",
+      "lockPackageKey": null,
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/worker/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/worker",
+      "workspaceName": "@fsm/worker",
+      "manifest": "apps/worker/package.json",
+      "name": "@fsm/import-normalize",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "workspace:*",
+      "lockedSpecifier": "workspace:*",
+      "lockedResolution": "link:../../packages/import-normalize",
+      "resolvedVersion": "0.0.0",
+      "resolutionKind": "workspace link",
+      "workspaceTarget": "packages/import-normalize",
+      "lockPackageKey": null,
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/worker/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/worker",
+      "workspaceName": "@fsm/worker",
+      "manifest": "apps/worker/package.json",
+      "name": "@fsm/jobs",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "workspace:*",
+      "lockedSpecifier": "workspace:*",
+      "lockedResolution": "link:../../packages/jobs",
+      "resolvedVersion": "0.0.0",
+      "resolutionKind": "workspace link",
+      "workspaceTarget": "packages/jobs",
+      "lockPackageKey": null,
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/worker/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/worker",
+      "workspaceName": "@fsm/worker",
+      "manifest": "apps/worker/package.json",
+      "name": "@fsm/types",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "workspace:*",
+      "lockedSpecifier": "workspace:*",
+      "lockedResolution": "link:../../packages/types",
+      "resolvedVersion": "0.0.0",
+      "resolutionKind": "workspace link",
+      "workspaceTarget": "packages/types",
+      "lockPackageKey": null,
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/worker/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/worker",
+      "workspaceName": "@fsm/worker",
+      "manifest": "apps/worker/package.json",
+      "name": "bullmq",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^5.0.0",
+      "lockedSpecifier": "^5.0.0",
+      "lockedResolution": "5.76.2",
+      "resolvedVersion": "5.76.2",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "bullmq@5.76.2",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/worker/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/worker",
+      "workspaceName": "@fsm/worker",
+      "manifest": "apps/worker/package.json",
+      "name": "decimal.js",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^10.5.0",
+      "lockedSpecifier": "^10.5.0",
+      "lockedResolution": "10.6.0",
+      "resolvedVersion": "10.6.0",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "decimal.js@10.6.0",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/worker/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/worker",
+      "workspaceName": "@fsm/worker",
+      "manifest": "apps/worker/package.json",
+      "name": "drizzle-orm",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "0.44.2",
+      "lockedSpecifier": "0.44.2",
+      "lockedResolution": "0.44.2(@opentelemetry/api@1.10.0)(@types/pg@8.6.1)(postgres@3.4.5)",
+      "resolvedVersion": "0.44.2",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "drizzle-orm@0.44.2",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/worker/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/worker",
+      "workspaceName": "@fsm/worker",
+      "manifest": "apps/worker/package.json",
+      "name": "papaparse",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^5.5.3",
+      "lockedSpecifier": "^5.5.3",
+      "lockedResolution": "5.5.3",
+      "resolvedVersion": "5.5.3",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "papaparse@5.5.3",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/worker/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/worker",
+      "workspaceName": "@fsm/worker",
+      "manifest": "apps/worker/package.json",
+      "name": "pino",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^9.4.0",
+      "lockedSpecifier": "^9.4.0",
+      "lockedResolution": "9.14.0",
+      "resolvedVersion": "9.14.0",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "pino@9.14.0",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/worker/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/worker",
+      "workspaceName": "@fsm/worker",
+      "manifest": "apps/worker/package.json",
+      "name": "@types/node",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^24.3.0",
+      "lockedSpecifier": "^24.3.0",
+      "lockedResolution": "24.12.2",
+      "resolvedVersion": "24.12.2",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "@types/node@24.12.2",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/worker/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/worker",
+      "workspaceName": "@fsm/worker",
+      "manifest": "apps/worker/package.json",
+      "name": "@types/papaparse",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^5.3.16",
+      "lockedSpecifier": "^5.3.16",
+      "lockedResolution": "5.5.2",
+      "resolvedVersion": "5.5.2",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "@types/papaparse@5.5.2",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/worker/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/worker",
+      "workspaceName": "@fsm/worker",
+      "manifest": "apps/worker/package.json",
+      "name": "tsx",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^4.19.1",
+      "lockedSpecifier": "^4.19.1",
+      "lockedResolution": "4.21.0",
+      "resolvedVersion": "4.21.0",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "tsx@4.21.0",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/worker/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/worker",
+      "workspaceName": "@fsm/worker",
+      "manifest": "apps/worker/package.json",
+      "name": "typescript",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^5.9.2",
+      "lockedSpecifier": "^5.9.2",
+      "lockedResolution": "5.9.3",
+      "resolvedVersion": "5.9.3",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "typescript@5.9.3",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/worker/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/worker",
+      "workspaceName": "@fsm/worker",
+      "manifest": "apps/worker/package.json",
+      "name": "vitest",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^3.2.4",
+      "lockedSpecifier": "^3.2.4",
+      "lockedResolution": "3.2.4(@types/node@24.12.2)(happy-dom@21.0.4)(jiti@1.21.7)(tsx@4.21.0)",
+      "resolvedVersion": "3.2.4",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "vitest@3.2.4",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/worker/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "apps/worker",
+      "workspaceName": "@fsm/worker",
+      "manifest": "apps/worker/package.json",
+      "name": "xlsx",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^0.18.5",
+      "lockedSpecifier": "^0.18.5",
+      "lockedResolution": "0.18.5",
+      "resolvedVersion": "0.18.5",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "xlsx@0.18.5",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/worker/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/ai",
+      "workspaceName": "@fsm/ai",
+      "manifest": "packages/ai/package.json",
+      "name": "@fsm/config",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "workspace:*",
+      "lockedSpecifier": "workspace:*",
+      "lockedResolution": "link:../config",
+      "resolvedVersion": "0.0.0",
+      "resolutionKind": "workspace link",
+      "workspaceTarget": "packages/config",
+      "lockPackageKey": null,
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/ai/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/ai",
+      "workspaceName": "@fsm/ai",
+      "manifest": "packages/ai/package.json",
+      "name": "@fsm/types",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "workspace:*",
+      "lockedSpecifier": "workspace:*",
+      "lockedResolution": "link:../types",
+      "resolvedVersion": "0.0.0",
+      "resolutionKind": "workspace link",
+      "workspaceTarget": "packages/types",
+      "lockPackageKey": null,
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/ai/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/ai",
+      "workspaceName": "@fsm/ai",
+      "manifest": "packages/ai/package.json",
+      "name": "pino",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^9.4.0",
+      "lockedSpecifier": "^9.4.0",
+      "lockedResolution": "9.14.0",
+      "resolvedVersion": "9.14.0",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "pino@9.14.0",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/ai/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/ai",
+      "workspaceName": "@fsm/ai",
+      "manifest": "packages/ai/package.json",
+      "name": "@types/node",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^24.3.0",
+      "lockedSpecifier": "^24.3.0",
+      "lockedResolution": "24.12.2",
+      "resolvedVersion": "24.12.2",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "@types/node@24.12.2",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/ai/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/ai",
+      "workspaceName": "@fsm/ai",
+      "manifest": "packages/ai/package.json",
+      "name": "typescript",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^5.9.2",
+      "lockedSpecifier": "^5.9.2",
+      "lockedResolution": "5.9.3",
+      "resolvedVersion": "5.9.3",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "typescript@5.9.3",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/ai/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/ai",
+      "workspaceName": "@fsm/ai",
+      "manifest": "packages/ai/package.json",
+      "name": "vitest",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^3.2.4",
+      "lockedSpecifier": "^3.2.4",
+      "lockedResolution": "3.2.4(@types/node@24.12.2)(happy-dom@21.0.4)(jiti@1.21.7)(tsx@4.21.0)",
+      "resolvedVersion": "3.2.4",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "vitest@3.2.4",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/ai/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/comms",
+      "workspaceName": "@fsm/comms",
+      "manifest": "packages/comms/package.json",
+      "name": "resend",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^4.8.0",
+      "lockedSpecifier": "^4.8.0",
+      "lockedResolution": "4.8.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)",
+      "resolvedVersion": "4.8.0",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "resend@4.8.0",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/comms/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/comms",
+      "workspaceName": "@fsm/comms",
+      "manifest": "packages/comms/package.json",
+      "name": "@types/node",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^24.3.0",
+      "lockedSpecifier": "^24.3.0",
+      "lockedResolution": "24.12.2",
+      "resolvedVersion": "24.12.2",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "@types/node@24.12.2",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/comms/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/comms",
+      "workspaceName": "@fsm/comms",
+      "manifest": "packages/comms/package.json",
+      "name": "typescript",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^5.9.2",
+      "lockedSpecifier": "^5.9.2",
+      "lockedResolution": "5.9.3",
+      "resolvedVersion": "5.9.3",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "typescript@5.9.3",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/comms/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/comms",
+      "workspaceName": "@fsm/comms",
+      "manifest": "packages/comms/package.json",
+      "name": "vitest",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^3.2.4",
+      "lockedSpecifier": "^3.2.4",
+      "lockedResolution": "3.2.4(@types/node@24.12.2)(happy-dom@21.0.4)(jiti@1.21.7)(tsx@4.21.0)",
+      "resolvedVersion": "3.2.4",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "vitest@3.2.4",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/comms/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/config",
+      "workspaceName": "@fsm/config",
+      "manifest": "packages/config/package.json",
+      "name": "@aws-sdk/client-s3",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^3.931.0",
+      "lockedSpecifier": "^3.931.0",
+      "lockedResolution": "3.1038.0",
+      "resolvedVersion": "3.1038.0",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "@aws-sdk/client-s3@3.1038.0",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/config/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/config",
+      "workspaceName": "@fsm/config",
+      "manifest": "packages/config/package.json",
+      "name": "@aws-sdk/s3-request-presigner",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "3.1038.0",
+      "lockedSpecifier": "3.1038.0",
+      "lockedResolution": "3.1038.0",
+      "resolvedVersion": "3.1038.0",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "@aws-sdk/s3-request-presigner@3.1038.0",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/config/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/config",
+      "workspaceName": "@fsm/config",
+      "manifest": "packages/config/package.json",
+      "name": "@fsm/import-engine",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "workspace:*",
+      "lockedSpecifier": "workspace:*",
+      "lockedResolution": "link:../import-engine",
+      "resolvedVersion": "0.0.0",
+      "resolutionKind": "workspace link",
+      "workspaceTarget": "packages/import-engine",
+      "lockPackageKey": null,
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/config/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/config",
+      "workspaceName": "@fsm/config",
+      "manifest": "packages/config/package.json",
+      "name": "@fsm/import-normalize",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "workspace:*",
+      "lockedSpecifier": "workspace:*",
+      "lockedResolution": "link:../import-normalize",
+      "resolvedVersion": "0.0.0",
+      "resolutionKind": "workspace link",
+      "workspaceTarget": "packages/import-normalize",
+      "lockPackageKey": null,
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/config/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/config",
+      "workspaceName": "@fsm/config",
+      "manifest": "packages/config/package.json",
+      "name": "@fsm/types",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "workspace:*",
+      "lockedSpecifier": "workspace:*",
+      "lockedResolution": "link:../types",
+      "resolvedVersion": "0.0.0",
+      "resolutionKind": "workspace link",
+      "workspaceTarget": "packages/types",
+      "lockPackageKey": null,
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/config/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/config",
+      "workspaceName": "@fsm/config",
+      "manifest": "packages/config/package.json",
+      "name": "zod",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^3.25.76",
+      "lockedSpecifier": "^3.25.76",
+      "lockedResolution": "3.25.76",
+      "resolvedVersion": "3.25.76",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "zod@3.25.76",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/config/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/config",
+      "workspaceName": "@fsm/config",
+      "manifest": "packages/config/package.json",
+      "name": "@types/node",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^24.3.0",
+      "lockedSpecifier": "^24.3.0",
+      "lockedResolution": "24.12.2",
+      "resolvedVersion": "24.12.2",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "@types/node@24.12.2",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/config/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/config",
+      "workspaceName": "@fsm/config",
+      "manifest": "packages/config/package.json",
+      "name": "typescript",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^5.9.2",
+      "lockedSpecifier": "^5.9.2",
+      "lockedResolution": "5.9.3",
+      "resolvedVersion": "5.9.3",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "typescript@5.9.3",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/config/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/config",
+      "workspaceName": "@fsm/config",
+      "manifest": "packages/config/package.json",
+      "name": "vitest",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^3.2.4",
+      "lockedSpecifier": "^3.2.4",
+      "lockedResolution": "3.2.4(@types/node@24.12.2)(happy-dom@21.0.4)(jiti@1.21.7)(tsx@4.21.0)",
+      "resolvedVersion": "3.2.4",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "vitest@3.2.4",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/config/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/db",
+      "workspaceName": "@fsm/db",
+      "manifest": "packages/db/package.json",
+      "name": "@fsm/config",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "workspace:*",
+      "lockedSpecifier": "workspace:*",
+      "lockedResolution": "link:../config",
+      "resolvedVersion": "0.0.0",
+      "resolutionKind": "workspace link",
+      "workspaceTarget": "packages/config",
+      "lockPackageKey": null,
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/db/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/db",
+      "workspaceName": "@fsm/db",
+      "manifest": "packages/db/package.json",
+      "name": "@fsm/import-normalize",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "workspace:*",
+      "lockedSpecifier": "workspace:*",
+      "lockedResolution": "link:../import-normalize",
+      "resolvedVersion": "0.0.0",
+      "resolutionKind": "workspace link",
+      "workspaceTarget": "packages/import-normalize",
+      "lockPackageKey": null,
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/db/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/db",
+      "workspaceName": "@fsm/db",
+      "manifest": "packages/db/package.json",
+      "name": "@fsm/types",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "workspace:*",
+      "lockedSpecifier": "workspace:*",
+      "lockedResolution": "link:../types",
+      "resolvedVersion": "0.0.0",
+      "resolutionKind": "workspace link",
+      "workspaceTarget": "packages/types",
+      "lockPackageKey": null,
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/db/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/db",
+      "workspaceName": "@fsm/db",
+      "manifest": "packages/db/package.json",
+      "name": "decimal.js",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^10.5.0",
+      "lockedSpecifier": "^10.5.0",
+      "lockedResolution": "10.6.0",
+      "resolvedVersion": "10.6.0",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "decimal.js@10.6.0",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/db/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/db",
+      "workspaceName": "@fsm/db",
+      "manifest": "packages/db/package.json",
+      "name": "drizzle-orm",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "0.44.2",
+      "lockedSpecifier": "0.44.2",
+      "lockedResolution": "0.44.2(@opentelemetry/api@1.10.0)(@types/pg@8.6.1)(postgres@3.4.5)",
+      "resolvedVersion": "0.44.2",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "drizzle-orm@0.44.2",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/db/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/db",
+      "workspaceName": "@fsm/db",
+      "manifest": "packages/db/package.json",
+      "name": "postgres",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "3.4.5",
+      "lockedSpecifier": "3.4.5",
+      "lockedResolution": "3.4.5",
+      "resolvedVersion": "3.4.5",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "postgres@3.4.5",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/db/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/db",
+      "workspaceName": "@fsm/db",
+      "manifest": "packages/db/package.json",
+      "name": "@types/node",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^24.3.0",
+      "lockedSpecifier": "^24.3.0",
+      "lockedResolution": "24.12.2",
+      "resolvedVersion": "24.12.2",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "@types/node@24.12.2",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/db/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/db",
+      "workspaceName": "@fsm/db",
+      "manifest": "packages/db/package.json",
+      "name": "drizzle-kit",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "0.31.1",
+      "lockedSpecifier": "0.31.1",
+      "lockedResolution": "0.31.1",
+      "resolvedVersion": "0.31.1",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "drizzle-kit@0.31.1",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/db/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/db",
+      "workspaceName": "@fsm/db",
+      "manifest": "packages/db/package.json",
+      "name": "typescript",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^5.9.2",
+      "lockedSpecifier": "^5.9.2",
+      "lockedResolution": "5.9.3",
+      "resolvedVersion": "5.9.3",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "typescript@5.9.3",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/db/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/db",
+      "workspaceName": "@fsm/db",
+      "manifest": "packages/db/package.json",
+      "name": "vitest",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^3.2.4",
+      "lockedSpecifier": "^3.2.4",
+      "lockedResolution": "3.2.4(@types/node@24.12.2)(happy-dom@21.0.4)(jiti@1.21.7)(tsx@4.21.0)",
+      "resolvedVersion": "3.2.4",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "vitest@3.2.4",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/db/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/import-engine",
+      "workspaceName": "@fsm/import-engine",
+      "manifest": "packages/import-engine/package.json",
+      "name": "@fsm/types",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "workspace:*",
+      "lockedSpecifier": "workspace:*",
+      "lockedResolution": "link:../types",
+      "resolvedVersion": "0.0.0",
+      "resolutionKind": "workspace link",
+      "workspaceTarget": "packages/types",
+      "lockPackageKey": null,
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/import-engine/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/import-engine",
+      "workspaceName": "@fsm/import-engine",
+      "manifest": "packages/import-engine/package.json",
+      "name": "papaparse",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^5.5.3",
+      "lockedSpecifier": "^5.5.3",
+      "lockedResolution": "5.5.3",
+      "resolvedVersion": "5.5.3",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "papaparse@5.5.3",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/import-engine/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/import-engine",
+      "workspaceName": "@fsm/import-engine",
+      "manifest": "packages/import-engine/package.json",
+      "name": "xlsx",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^0.18.5",
+      "lockedSpecifier": "^0.18.5",
+      "lockedResolution": "0.18.5",
+      "resolvedVersion": "0.18.5",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "xlsx@0.18.5",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/import-engine/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/import-engine",
+      "workspaceName": "@fsm/import-engine",
+      "manifest": "packages/import-engine/package.json",
+      "name": "@types/node",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^24.3.0",
+      "lockedSpecifier": "^24.3.0",
+      "lockedResolution": "24.12.2",
+      "resolvedVersion": "24.12.2",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "@types/node@24.12.2",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/import-engine/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/import-engine",
+      "workspaceName": "@fsm/import-engine",
+      "manifest": "packages/import-engine/package.json",
+      "name": "@types/papaparse",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^5.3.16",
+      "lockedSpecifier": "^5.3.16",
+      "lockedResolution": "5.5.2",
+      "resolvedVersion": "5.5.2",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "@types/papaparse@5.5.2",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/import-engine/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/import-engine",
+      "workspaceName": "@fsm/import-engine",
+      "manifest": "packages/import-engine/package.json",
+      "name": "typescript",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^5.9.2",
+      "lockedSpecifier": "^5.9.2",
+      "lockedResolution": "5.9.3",
+      "resolvedVersion": "5.9.3",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "typescript@5.9.3",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/import-engine/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/import-engine",
+      "workspaceName": "@fsm/import-engine",
+      "manifest": "packages/import-engine/package.json",
+      "name": "vitest",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^3.2.4",
+      "lockedSpecifier": "^3.2.4",
+      "lockedResolution": "3.2.4(@types/node@24.12.2)(happy-dom@21.0.4)(jiti@1.21.7)(tsx@4.21.0)",
+      "resolvedVersion": "3.2.4",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "vitest@3.2.4",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/import-engine/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/import-normalize",
+      "workspaceName": "@fsm/import-normalize",
+      "manifest": "packages/import-normalize/package.json",
+      "name": "@fsm/types",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "workspace:*",
+      "lockedSpecifier": "workspace:*",
+      "lockedResolution": "link:../types",
+      "resolvedVersion": "0.0.0",
+      "resolutionKind": "workspace link",
+      "workspaceTarget": "packages/types",
+      "lockPackageKey": null,
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/import-normalize/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/import-normalize",
+      "workspaceName": "@fsm/import-normalize",
+      "manifest": "packages/import-normalize/package.json",
+      "name": "decimal.js",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^10.5.0",
+      "lockedSpecifier": "^10.5.0",
+      "lockedResolution": "10.6.0",
+      "resolvedVersion": "10.6.0",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "decimal.js@10.6.0",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/import-normalize/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/import-normalize",
+      "workspaceName": "@fsm/import-normalize",
+      "manifest": "packages/import-normalize/package.json",
+      "name": "@types/node",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^24.3.0",
+      "lockedSpecifier": "^24.3.0",
+      "lockedResolution": "24.12.2",
+      "resolvedVersion": "24.12.2",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "@types/node@24.12.2",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/import-normalize/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/import-normalize",
+      "workspaceName": "@fsm/import-normalize",
+      "manifest": "packages/import-normalize/package.json",
+      "name": "typescript",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^5.9.2",
+      "lockedSpecifier": "^5.9.2",
+      "lockedResolution": "5.9.3",
+      "resolvedVersion": "5.9.3",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "typescript@5.9.3",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/import-normalize/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/import-normalize",
+      "workspaceName": "@fsm/import-normalize",
+      "manifest": "packages/import-normalize/package.json",
+      "name": "vitest",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^3.2.4",
+      "lockedSpecifier": "^3.2.4",
+      "lockedResolution": "3.2.4(@types/node@24.12.2)(happy-dom@21.0.4)(jiti@1.21.7)(tsx@4.21.0)",
+      "resolvedVersion": "3.2.4",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "vitest@3.2.4",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/import-normalize/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/jobs",
+      "workspaceName": "@fsm/jobs",
+      "manifest": "packages/jobs/package.json",
+      "name": "@fsm/config",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "workspace:*",
+      "lockedSpecifier": "workspace:*",
+      "lockedResolution": "link:../config",
+      "resolvedVersion": "0.0.0",
+      "resolutionKind": "workspace link",
+      "workspaceTarget": "packages/config",
+      "lockPackageKey": null,
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/jobs/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/jobs",
+      "workspaceName": "@fsm/jobs",
+      "manifest": "packages/jobs/package.json",
+      "name": "@fsm/types",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "workspace:*",
+      "lockedSpecifier": "workspace:*",
+      "lockedResolution": "link:../types",
+      "resolvedVersion": "0.0.0",
+      "resolutionKind": "workspace link",
+      "workspaceTarget": "packages/types",
+      "lockPackageKey": null,
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/jobs/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/jobs",
+      "workspaceName": "@fsm/jobs",
+      "manifest": "packages/jobs/package.json",
+      "name": "bullmq",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^5.0.0",
+      "lockedSpecifier": "^5.0.0",
+      "lockedResolution": "5.76.2",
+      "resolvedVersion": "5.76.2",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "bullmq@5.76.2",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/jobs/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/jobs",
+      "workspaceName": "@fsm/jobs",
+      "manifest": "packages/jobs/package.json",
+      "name": "ioredis",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^5.4.0",
+      "lockedSpecifier": "^5.4.0",
+      "lockedResolution": "5.10.1",
+      "resolvedVersion": "5.10.1",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "ioredis@5.10.1",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/jobs/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/jobs",
+      "workspaceName": "@fsm/jobs",
+      "manifest": "packages/jobs/package.json",
+      "name": "pino",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^9.4.0",
+      "lockedSpecifier": "^9.4.0",
+      "lockedResolution": "9.14.0",
+      "resolvedVersion": "9.14.0",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "pino@9.14.0",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/jobs/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/jobs",
+      "workspaceName": "@fsm/jobs",
+      "manifest": "packages/jobs/package.json",
+      "name": "zod",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^3.25.76",
+      "lockedSpecifier": "^3.25.76",
+      "lockedResolution": "3.25.76",
+      "resolvedVersion": "3.25.76",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "zod@3.25.76",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/jobs/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/jobs",
+      "workspaceName": "@fsm/jobs",
+      "manifest": "packages/jobs/package.json",
+      "name": "@types/node",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^24.3.0",
+      "lockedSpecifier": "^24.3.0",
+      "lockedResolution": "24.12.2",
+      "resolvedVersion": "24.12.2",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "@types/node@24.12.2",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/jobs/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/jobs",
+      "workspaceName": "@fsm/jobs",
+      "manifest": "packages/jobs/package.json",
+      "name": "typescript",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^5.9.2",
+      "lockedSpecifier": "^5.9.2",
+      "lockedResolution": "5.9.3",
+      "resolvedVersion": "5.9.3",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "typescript@5.9.3",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/jobs/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/jobs",
+      "workspaceName": "@fsm/jobs",
+      "manifest": "packages/jobs/package.json",
+      "name": "vitest",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^3.2.4",
+      "lockedSpecifier": "^3.2.4",
+      "lockedResolution": "3.2.4(@types/node@24.12.2)(happy-dom@21.0.4)(jiti@1.21.7)(tsx@4.21.0)",
+      "resolvedVersion": "3.2.4",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "vitest@3.2.4",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/jobs/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/types",
+      "workspaceName": "@fsm/types",
+      "manifest": "packages/types/package.json",
+      "name": "zod",
+      "class": "dependencies",
+      "usageClass": "runtime",
+      "requestedRange": "^3.25.76",
+      "lockedSpecifier": "^3.25.76",
+      "lockedResolution": "3.25.76",
+      "resolvedVersion": "3.25.76",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "zod@3.25.76",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/types/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/types",
+      "workspaceName": "@fsm/types",
+      "manifest": "packages/types/package.json",
+      "name": "@fsm/config",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "workspace:*",
+      "lockedSpecifier": "workspace:*",
+      "lockedResolution": "link:../config",
+      "resolvedVersion": "0.0.0",
+      "resolutionKind": "workspace link",
+      "workspaceTarget": "packages/config",
+      "lockPackageKey": null,
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/types/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/types",
+      "workspaceName": "@fsm/types",
+      "manifest": "packages/types/package.json",
+      "name": "@fsm/import-normalize",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "workspace:*",
+      "lockedSpecifier": "workspace:*",
+      "lockedResolution": "link:../import-normalize",
+      "resolvedVersion": "0.0.0",
+      "resolutionKind": "workspace link",
+      "workspaceTarget": "packages/import-normalize",
+      "lockPackageKey": null,
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/types/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/types",
+      "workspaceName": "@fsm/types",
+      "manifest": "packages/types/package.json",
+      "name": "@types/node",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^24.3.0",
+      "lockedSpecifier": "^24.3.0",
+      "lockedResolution": "24.12.2",
+      "resolvedVersion": "24.12.2",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "@types/node@24.12.2",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/types/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/types",
+      "workspaceName": "@fsm/types",
+      "manifest": "packages/types/package.json",
+      "name": "typescript",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^5.9.2",
+      "lockedSpecifier": "^5.9.2",
+      "lockedResolution": "5.9.3",
+      "resolvedVersion": "5.9.3",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "typescript@5.9.3",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/types/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    },
+    {
+      "workspace": "packages/types",
+      "workspaceName": "@fsm/types",
+      "manifest": "packages/types/package.json",
+      "name": "vitest",
+      "class": "devDependencies",
+      "usageClass": "development",
+      "requestedRange": "^3.2.4",
+      "lockedSpecifier": "^3.2.4",
+      "lockedResolution": "3.2.4(@types/node@24.12.2)(happy-dom@21.0.4)(jiti@1.21.7)(tsx@4.21.0)",
+      "resolvedVersion": "3.2.4",
+      "resolutionKind": "registry package",
+      "workspaceTarget": null,
+      "lockPackageKey": "vitest@3.2.4",
+      "manifestSource": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/types/package.json",
+      "license": "UNVERIFIED",
+      "currentAdvisories": "UNVERIFIED",
+      "latestVersion": "UNVERIFIED"
+    }
+  ],
+  "directMultipleVersions": [
+    {
+      "name": "date-fns",
+      "declarations": [
+        {
+          "workspace": "apps/api",
+          "class": "dependencies",
+          "range": "^4.1.0",
+          "version": "4.1.0"
+        },
+        {
+          "workspace": "apps/web",
+          "class": "dependencies",
+          "range": "^3.6.0",
+          "version": "3.6.0"
+        }
+      ]
+    }
+  ],
+  "directDifferentRanges": [
+    {
+      "name": "@types/papaparse",
+      "declarations": [
+        {
+          "workspace": "apps/api",
+          "class": "devDependencies",
+          "range": "^5.5.0",
+          "version": "5.5.2"
+        },
+        {
+          "workspace": "apps/web",
+          "class": "devDependencies",
+          "range": "^5.5.0",
+          "version": "5.5.2"
+        },
+        {
+          "workspace": "apps/worker",
+          "class": "devDependencies",
+          "range": "^5.3.16",
+          "version": "5.5.2"
+        },
+        {
+          "workspace": "packages/import-engine",
+          "class": "devDependencies",
+          "range": "^5.3.16",
+          "version": "5.5.2"
+        }
+      ]
+    },
+    {
+      "name": "date-fns",
+      "declarations": [
+        {
+          "workspace": "apps/api",
+          "class": "dependencies",
+          "range": "^4.1.0",
+          "version": "4.1.0"
+        },
+        {
+          "workspace": "apps/web",
+          "class": "dependencies",
+          "range": "^3.6.0",
+          "version": "3.6.0"
+        }
+      ]
+    },
+    {
+      "name": "zod",
+      "declarations": [
+        {
+          "workspace": "apps/api",
+          "class": "dependencies",
+          "range": "^3.25.76",
+          "version": "3.25.76"
+        },
+        {
+          "workspace": "apps/web",
+          "class": "dependencies",
+          "range": "^3.24.1",
+          "version": "3.25.76"
+        },
+        {
+          "workspace": "packages/config",
+          "class": "dependencies",
+          "range": "^3.25.76",
+          "version": "3.25.76"
+        },
+        {
+          "workspace": "packages/jobs",
+          "class": "dependencies",
+          "range": "^3.25.76",
+          "version": "3.25.76"
+        },
+        {
+          "workspace": "packages/types",
+          "class": "dependencies",
+          "range": "^3.25.76",
+          "version": "3.25.76"
+        }
+      ]
+    }
+  ],
+  "lockfileMultipleVersions": [
+    {
+      "name": "@aws-sdk/core",
+      "versions": [
+        "3.974.6",
+        "3.978.5"
+      ]
+    },
+    {
+      "name": "@aws-sdk/signature-v4-multi-region",
+      "versions": [
+        "3.996.23",
+        "3.996.49"
+      ]
+    },
+    {
+      "name": "@aws-sdk/types",
+      "versions": [
+        "3.973.8",
+        "3.975.0"
+      ]
+    },
+    {
+      "name": "@aws-sdk/xml-builder",
+      "versions": [
+        "3.972.21",
+        "3.972.41"
+      ]
+    },
+    {
+      "name": "@aws/lambda-invoke-store",
+      "versions": [
+        "0.2.4",
+        "0.3.0"
+      ]
+    },
+    {
+      "name": "@clerk/backend",
+      "versions": [
+        "1.34.0",
+        "2.33.8"
+      ]
+    },
+    {
+      "name": "@clerk/types",
+      "versions": [
+        "4.101.20",
+        "4.101.28"
+      ]
+    },
+    {
+      "name": "@esbuild/aix-ppc64",
+      "versions": [
+        "0.25.12",
+        "0.27.7"
+      ]
+    },
+    {
+      "name": "@esbuild/android-arm",
+      "versions": [
+        "0.18.20",
+        "0.25.12",
+        "0.27.7"
+      ]
+    },
+    {
+      "name": "@esbuild/android-arm64",
+      "versions": [
+        "0.18.20",
+        "0.25.12",
+        "0.27.7"
+      ]
+    },
+    {
+      "name": "@esbuild/android-x64",
+      "versions": [
+        "0.18.20",
+        "0.25.12",
+        "0.27.7"
+      ]
+    },
+    {
+      "name": "@esbuild/darwin-arm64",
+      "versions": [
+        "0.18.20",
+        "0.25.12",
+        "0.27.7"
+      ]
+    },
+    {
+      "name": "@esbuild/darwin-x64",
+      "versions": [
+        "0.18.20",
+        "0.25.12",
+        "0.27.7"
+      ]
+    },
+    {
+      "name": "@esbuild/freebsd-arm64",
+      "versions": [
+        "0.18.20",
+        "0.25.12",
+        "0.27.7"
+      ]
+    },
+    {
+      "name": "@esbuild/freebsd-x64",
+      "versions": [
+        "0.18.20",
+        "0.25.12",
+        "0.27.7"
+      ]
+    },
+    {
+      "name": "@esbuild/linux-arm",
+      "versions": [
+        "0.18.20",
+        "0.25.12",
+        "0.27.7"
+      ]
+    },
+    {
+      "name": "@esbuild/linux-arm64",
+      "versions": [
+        "0.18.20",
+        "0.25.12",
+        "0.27.7"
+      ]
+    },
+    {
+      "name": "@esbuild/linux-ia32",
+      "versions": [
+        "0.18.20",
+        "0.25.12",
+        "0.27.7"
+      ]
+    },
+    {
+      "name": "@esbuild/linux-loong64",
+      "versions": [
+        "0.18.20",
+        "0.25.12",
+        "0.27.7"
+      ]
+    },
+    {
+      "name": "@esbuild/linux-mips64el",
+      "versions": [
+        "0.18.20",
+        "0.25.12",
+        "0.27.7"
+      ]
+    },
+    {
+      "name": "@esbuild/linux-ppc64",
+      "versions": [
+        "0.18.20",
+        "0.25.12",
+        "0.27.7"
+      ]
+    },
+    {
+      "name": "@esbuild/linux-riscv64",
+      "versions": [
+        "0.18.20",
+        "0.25.12",
+        "0.27.7"
+      ]
+    },
+    {
+      "name": "@esbuild/linux-s390x",
+      "versions": [
+        "0.18.20",
+        "0.25.12",
+        "0.27.7"
+      ]
+    },
+    {
+      "name": "@esbuild/linux-x64",
+      "versions": [
+        "0.18.20",
+        "0.25.12",
+        "0.27.7"
+      ]
+    },
+    {
+      "name": "@esbuild/netbsd-arm64",
+      "versions": [
+        "0.25.12",
+        "0.27.7"
+      ]
+    },
+    {
+      "name": "@esbuild/netbsd-x64",
+      "versions": [
+        "0.18.20",
+        "0.25.12",
+        "0.27.7"
+      ]
+    },
+    {
+      "name": "@esbuild/openbsd-arm64",
+      "versions": [
+        "0.25.12",
+        "0.27.7"
+      ]
+    },
+    {
+      "name": "@esbuild/openbsd-x64",
+      "versions": [
+        "0.18.20",
+        "0.25.12",
+        "0.27.7"
+      ]
+    },
+    {
+      "name": "@esbuild/openharmony-arm64",
+      "versions": [
+        "0.25.12",
+        "0.27.7"
+      ]
+    },
+    {
+      "name": "@esbuild/sunos-x64",
+      "versions": [
+        "0.18.20",
+        "0.25.12",
+        "0.27.7"
+      ]
+    },
+    {
+      "name": "@esbuild/win32-arm64",
+      "versions": [
+        "0.18.20",
+        "0.25.12",
+        "0.27.7"
+      ]
+    },
+    {
+      "name": "@esbuild/win32-ia32",
+      "versions": [
+        "0.18.20",
+        "0.25.12",
+        "0.27.7"
+      ]
+    },
+    {
+      "name": "@esbuild/win32-x64",
+      "versions": [
+        "0.18.20",
+        "0.25.12",
+        "0.27.7"
+      ]
+    },
+    {
+      "name": "@smithy/core",
+      "versions": [
+        "3.23.17",
+        "3.36.2"
+      ]
+    },
+    {
+      "name": "@smithy/is-array-buffer",
+      "versions": [
+        "2.2.0",
+        "4.2.2"
+      ]
+    },
+    {
+      "name": "@smithy/signature-v4",
+      "versions": [
+        "5.3.14",
+        "5.7.4"
+      ]
+    },
+    {
+      "name": "@smithy/types",
+      "versions": [
+        "4.14.1",
+        "4.19.0"
+      ]
+    },
+    {
+      "name": "@smithy/util-buffer-from",
+      "versions": [
+        "2.2.0",
+        "4.2.2"
+      ]
+    },
+    {
+      "name": "@smithy/util-utf8",
+      "versions": [
+        "2.3.0",
+        "4.2.2"
+      ]
+    },
+    {
+      "name": "ajv",
+      "versions": [
+        "6.15.0",
+        "8.20.0"
+      ]
+    },
+    {
+      "name": "ansi-styles",
+      "versions": [
+        "4.3.0",
+        "5.2.0"
+      ]
+    },
+    {
+      "name": "brace-expansion",
+      "versions": [
+        "1.1.14",
+        "2.1.0"
+      ]
+    },
+    {
+      "name": "cookie",
+      "versions": [
+        "1.0.2",
+        "1.1.1"
+      ]
+    },
+    {
+      "name": "csstype",
+      "versions": [
+        "3.1.3",
+        "3.2.3"
+      ]
+    },
+    {
+      "name": "date-fns",
+      "versions": [
+        "3.6.0",
+        "4.1.0"
+      ]
+    },
+    {
+      "name": "entities",
+      "versions": [
+        "4.5.0",
+        "7.0.1"
+      ]
+    },
+    {
+      "name": "esbuild",
+      "versions": [
+        "0.18.20",
+        "0.25.12",
+        "0.27.7"
+      ]
+    },
+    {
+      "name": "fast-deep-equal",
+      "versions": [
+        "2.0.1",
+        "3.1.3"
+      ]
+    },
+    {
+      "name": "glob-parent",
+      "versions": [
+        "5.1.2",
+        "6.0.2"
+      ]
+    },
+    {
+      "name": "js-tokens",
+      "versions": [
+        "4.0.0",
+        "9.0.1"
+      ]
+    },
+    {
+      "name": "json-schema-traverse",
+      "versions": [
+        "0.4.1",
+        "1.0.0"
+      ]
+    },
+    {
+      "name": "minimatch",
+      "versions": [
+        "3.1.5",
+        "9.0.9"
+      ]
+    },
+    {
+      "name": "mnemonist",
+      "versions": [
+        "0.40.0",
+        "0.40.3"
+      ]
+    },
+    {
+      "name": "picomatch",
+      "versions": [
+        "2.3.2",
+        "4.0.4"
+      ]
+    },
+    {
+      "name": "postcss",
+      "versions": [
+        "8.4.31",
+        "8.5.12"
+      ]
+    },
+    {
+      "name": "process-warning",
+      "versions": [
+        "4.0.1",
+        "5.0.0"
+      ]
+    },
+    {
+      "name": "react-is",
+      "versions": [
+        "16.13.1",
+        "17.0.2",
+        "18.3.1"
+      ]
+    },
+    {
+      "name": "tslib",
+      "versions": [
+        "1.14.1",
+        "2.8.1"
+      ]
+    },
+    {
+      "name": "type-fest",
+      "versions": [
+        "0.20.2",
+        "4.41.0"
+      ]
+    }
+  ],
+  "lockfileDeprecations": [
+    {
+      "package": "@clerk/clerk-react@5.61.11",
+      "recordedMessage": "This package is no longer supported. Please use @clerk/react instead. See the upgrade guide for more info: https://clerk.com/docs/guides/development/upgrading/upgrade-guides/core-3",
+      "evidenceState": "lockfile metadata only; current upstream status unverified"
+    },
+    {
+      "package": "@clerk/types@4.101.20",
+      "recordedMessage": "This package is no longer supported. Please import types from @clerk/shared/types instead. See the upgrade guide for more info: https://clerk.com/docs/guides/development/upgrading/upgrade-guides/core-3",
+      "evidenceState": "lockfile metadata only; current upstream status unverified"
+    },
+    {
+      "package": "@clerk/types@4.101.28",
+      "recordedMessage": "This package is no longer supported. Please import types from @clerk/shared/types instead. See the upgrade guide for more info: https://clerk.com/docs/guides/development/upgrading/upgrade-guides/core-3",
+      "evidenceState": "lockfile metadata only; current upstream status unverified"
+    },
+    {
+      "package": "@esbuild-kit/core-utils@3.3.2",
+      "recordedMessage": "Merged into tsx: https://tsx.is",
+      "evidenceState": "lockfile metadata only; current upstream status unverified"
+    },
+    {
+      "package": "@esbuild-kit/esm-loader@2.6.5",
+      "recordedMessage": "Merged into tsx: https://tsx.is",
+      "evidenceState": "lockfile metadata only; current upstream status unverified"
+    },
+    {
+      "package": "@humanwhocodes/config-array@0.13.0",
+      "recordedMessage": "Use @eslint/config-array instead",
+      "evidenceState": "lockfile metadata only; current upstream status unverified"
+    },
+    {
+      "package": "@humanwhocodes/object-schema@2.0.3",
+      "recordedMessage": "Use @eslint/object-schema instead",
+      "evidenceState": "lockfile metadata only; current upstream status unverified"
+    },
+    {
+      "package": "@smithy/util-retry@4.3.6",
+      "recordedMessage": "@smithy/util-retry v4.3.6 contains a bug in Adaptive Retry, see https://github.com/smithy-lang/smithy-typescript/issues/1993. Upgrade to 4.3.7+",
+      "evidenceState": "lockfile metadata only; current upstream status unverified"
+    },
+    {
+      "package": "@ungap/structured-clone@1.3.0",
+      "recordedMessage": "Potential CWE-502 - Update to 1.3.1 or higher",
+      "evidenceState": "lockfile metadata only; current upstream status unverified"
+    },
+    {
+      "package": "cron-parser@4.9.0",
+      "recordedMessage": "v4 is no longer maintained, upgrade to v5",
+      "evidenceState": "lockfile metadata only; current upstream status unverified"
+    },
+    {
+      "package": "eslint@8.57.1",
+      "recordedMessage": "This version is no longer supported. Please see https://eslint.org/version-support for other options.",
+      "evidenceState": "lockfile metadata only; current upstream status unverified"
+    },
+    {
+      "package": "glob@7.2.3",
+      "recordedMessage": "Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me",
+      "evidenceState": "lockfile metadata only; current upstream status unverified"
+    },
+    {
+      "package": "inflight@1.0.6",
+      "recordedMessage": "This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.",
+      "evidenceState": "lockfile metadata only; current upstream status unverified"
+    },
+    {
+      "package": "recharts@2.15.4",
+      "recordedMessage": "1.x and 2.x branches are no longer active. Bump to Recharts v3 to receive latest features and bugfixes. See https://github.com/recharts/recharts/wiki/3.0-migration-guide",
+      "evidenceState": "lockfile metadata only; current upstream status unverified"
+    },
+    {
+      "package": "rimraf@3.0.2",
+      "recordedMessage": "Rimraf versions prior to v4 are no longer supported",
+      "evidenceState": "lockfile metadata only; current upstream status unverified"
+    },
+    {
+      "package": "scmp@2.1.0",
+      "recordedMessage": "Just use Node.js's crypto.timingSafeEqual()",
+      "evidenceState": "lockfile metadata only; current upstream status unverified"
+    }
+  ],
+  "vendorSdkConsumers": [
+    {
+      "name": "@aws-sdk/client-s3",
+      "declaredBy": [
+        "apps/api",
+        "apps/worker",
+        "packages/config"
+      ],
+      "lockedDirectVersions": [
+        "3.1038.0"
+      ],
+      "literalSourceImports": [
+        {
+          "path": "packages/config/src/object-storage/r2-provider.ts",
+          "line": 7,
+          "module": "@aws-sdk/client-s3",
+          "source": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/config/src/object-storage/r2-provider.ts#L7"
+        }
+      ],
+      "method": "Literal from/import()/require() search, tests excluded; not a complete call graph or runtime proof."
+    },
+    {
+      "name": "@aws-sdk/s3-request-presigner",
+      "declaredBy": [
+        "packages/config"
+      ],
+      "lockedDirectVersions": [
+        "3.1038.0"
+      ],
+      "literalSourceImports": [
+        {
+          "path": "packages/config/src/object-storage/r2-provider.ts",
+          "line": 8,
+          "module": "@aws-sdk/s3-request-presigner",
+          "source": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/config/src/object-storage/r2-provider.ts#L8"
+        }
+      ],
+      "method": "Literal from/import()/require() search, tests excluded; not a complete call graph or runtime proof."
+    },
+    {
+      "name": "@clerk/backend",
+      "declaredBy": [
+        "apps/api",
+        "apps/worker"
+      ],
+      "lockedDirectVersions": [
+        "1.34.0"
+      ],
+      "literalSourceImports": [
+        {
+          "path": "apps/api/src/lib/clerk-auth.ts",
+          "line": 1,
+          "module": "@clerk/backend",
+          "source": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/src/lib/clerk-auth.ts#L1"
+        },
+        {
+          "path": "apps/worker/src/processors/clerk-workspace.processor.ts",
+          "line": 3,
+          "module": "@clerk/backend",
+          "source": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/worker/src/processors/clerk-workspace.processor.ts#L3"
+        }
+      ],
+      "method": "Literal from/import()/require() search, tests excluded; not a complete call graph or runtime proof."
+    },
+    {
+      "name": "@clerk/nextjs",
+      "declaredBy": [
+        "apps/web"
+      ],
+      "lockedDirectVersions": [
+        "6.39.8"
+      ],
+      "literalSourceImports": [
+        {
+          "path": "apps/web/app/(app)/command-center/page.tsx",
+          "line": 1,
+          "module": "@clerk/nextjs/server",
+          "source": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/app/%28app%29/command-center/page.tsx#L1"
+        },
+        {
+          "path": "apps/web/app/(auth)/login/[[...rest]]/page.tsx",
+          "line": 1,
+          "module": "@clerk/nextjs",
+          "source": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/app/%28auth%29/login/%5B%5B...rest%5D%5D/page.tsx#L1"
+        },
+        {
+          "path": "apps/web/app/(auth)/no-access/page.tsx",
+          "line": 1,
+          "module": "@clerk/nextjs",
+          "source": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/app/%28auth%29/no-access/page.tsx#L1"
+        },
+        {
+          "path": "apps/web/app/(auth)/signup/[[...rest]]/page.tsx",
+          "line": 1,
+          "module": "@clerk/nextjs",
+          "source": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/app/%28auth%29/signup/%5B%5B...rest%5D%5D/page.tsx#L1"
+        },
+        {
+          "path": "apps/web/app/layout.tsx",
+          "line": 3,
+          "module": "@clerk/nextjs",
+          "source": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/app/layout.tsx#L3"
+        },
+        {
+          "path": "apps/web/middleware.ts",
+          "line": 1,
+          "module": "@clerk/nextjs/server",
+          "source": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/middleware.ts#L1"
+        },
+        {
+          "path": "apps/web/src/components/auth/ClerkTokenBridge.tsx",
+          "line": 3,
+          "module": "@clerk/nextjs",
+          "source": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/src/components/auth/ClerkTokenBridge.tsx#L3"
+        },
+        {
+          "path": "apps/web/src/components/auth/NoAccessCreateWorkspace.tsx",
+          "line": 3,
+          "module": "@clerk/nextjs",
+          "source": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/src/components/auth/NoAccessCreateWorkspace.tsx#L3"
+        },
+        {
+          "path": "apps/web/src/components/onboarding/workspace/CreateWorkspaceStep.tsx",
+          "line": 3,
+          "module": "@clerk/nextjs",
+          "source": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/src/components/onboarding/workspace/CreateWorkspaceStep.tsx#L3"
+        },
+        {
+          "path": "apps/web/src/lib/server-session.ts",
+          "line": 2,
+          "module": "@clerk/nextjs/server",
+          "source": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/src/lib/server-session.ts#L2"
+        }
+      ],
+      "method": "Literal from/import()/require() search, tests excluded; not a complete call graph or runtime proof."
+    },
+    {
+      "name": "@sendgrid/mail",
+      "declaredBy": [
+        "apps/api"
+      ],
+      "lockedDirectVersions": [
+        "8.1.6"
+      ],
+      "literalSourceImports": [
+        {
+          "path": "apps/api/src/lib/outbound-email.ts",
+          "line": 1,
+          "module": "@sendgrid/mail",
+          "source": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/src/lib/outbound-email.ts#L1"
+        }
+      ],
+      "method": "Literal from/import()/require() search, tests excluded; not a complete call graph or runtime proof."
+    },
+    {
+      "name": "resend",
+      "declaredBy": [
+        "packages/comms"
+      ],
+      "lockedDirectVersions": [
+        "4.8.0"
+      ],
+      "literalSourceImports": [
+        {
+          "path": "packages/comms/src/resend-email.adapter.ts",
+          "line": 1,
+          "module": "resend",
+          "source": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/packages/comms/src/resend-email.adapter.ts#L1"
+        }
+      ],
+      "method": "Literal from/import()/require() search, tests excluded; not a complete call graph or runtime proof."
+    },
+    {
+      "name": "stripe",
+      "declaredBy": [
+        "apps/api",
+        "apps/webhook"
+      ],
+      "lockedDirectVersions": [
+        "17.7.0"
+      ],
+      "literalSourceImports": [
+        {
+          "path": "apps/api/src/lib/stripe-platform-settings.ts",
+          "line": 1,
+          "module": "stripe",
+          "source": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/src/lib/stripe-platform-settings.ts#L1"
+        },
+        {
+          "path": "apps/api/src/lib/stripe-saved-card-import.adapter.ts",
+          "line": 1,
+          "module": "stripe",
+          "source": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/src/lib/stripe-saved-card-import.adapter.ts#L1"
+        },
+        {
+          "path": "apps/api/src/lib/stripe.ts",
+          "line": 2,
+          "module": "stripe",
+          "source": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/src/lib/stripe.ts#L2"
+        },
+        {
+          "path": "apps/api/src/services/invoice.service.ts",
+          "line": 6,
+          "module": "stripe",
+          "source": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/api/src/services/invoice.service.ts#L6"
+        },
+        {
+          "path": "apps/webhook/src/handlers/stripe-dispute.handler.ts",
+          "line": 3,
+          "module": "stripe",
+          "source": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/webhook/src/handlers/stripe-dispute.handler.ts#L3"
+        },
+        {
+          "path": "apps/webhook/src/handlers/stripe-platform-billing.handler.ts",
+          "line": 3,
+          "module": "stripe",
+          "source": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/webhook/src/handlers/stripe-platform-billing.handler.ts#L3"
+        },
+        {
+          "path": "apps/webhook/src/handlers/stripe-vip-membership.handler.ts",
+          "line": 4,
+          "module": "stripe",
+          "source": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/webhook/src/handlers/stripe-vip-membership.handler.ts#L4"
+        },
+        {
+          "path": "apps/webhook/src/handlers/stripe.handler.ts",
+          "line": 4,
+          "module": "stripe",
+          "source": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/webhook/src/handlers/stripe.handler.ts#L4"
+        },
+        {
+          "path": "apps/webhook/src/lib/invoice-service-bridge.ts",
+          "line": 1,
+          "module": "stripe",
+          "source": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/webhook/src/lib/invoice-service-bridge.ts#L1"
+        },
+        {
+          "path": "apps/webhook/src/lib/stripe-client.ts",
+          "line": 1,
+          "module": "stripe",
+          "source": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/webhook/src/lib/stripe-client.ts#L1"
+        },
+        {
+          "path": "apps/webhook/src/lib/vip-membership-provision.ts",
+          "line": 2,
+          "module": "stripe",
+          "source": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/webhook/src/lib/vip-membership-provision.ts#L2"
+        },
+        {
+          "path": "apps/webhook/src/middleware/stripe-verify.ts",
+          "line": 2,
+          "module": "stripe",
+          "source": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/webhook/src/middleware/stripe-verify.ts#L2"
+        }
+      ],
+      "method": "Literal from/import()/require() search, tests excluded; not a complete call graph or runtime proof."
+    },
+    {
+      "name": "@stripe/connect-js",
+      "declaredBy": [
+        "apps/web"
+      ],
+      "lockedDirectVersions": [
+        "3.4.6"
+      ],
+      "literalSourceImports": [
+        {
+          "path": "apps/web/src/components/stripe/StripeConnectEmbedded.tsx",
+          "line": 5,
+          "module": "@stripe/connect-js",
+          "source": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/src/components/stripe/StripeConnectEmbedded.tsx#L5"
+        }
+      ],
+      "method": "Literal from/import()/require() search, tests excluded; not a complete call graph or runtime proof."
+    },
+    {
+      "name": "@stripe/react-connect-js",
+      "declaredBy": [
+        "apps/web"
+      ],
+      "lockedDirectVersions": [
+        "3.4.4"
+      ],
+      "literalSourceImports": [
+        {
+          "path": "apps/web/src/components/stripe/StripeConnectEmbedded.tsx",
+          "line": 4,
+          "module": "@stripe/react-connect-js",
+          "source": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/src/components/stripe/StripeConnectEmbedded.tsx#L4"
+        }
+      ],
+      "method": "Literal from/import()/require() search, tests excluded; not a complete call graph or runtime proof."
+    },
+    {
+      "name": "@stripe/react-stripe-js",
+      "declaredBy": [
+        "apps/web"
+      ],
+      "lockedDirectVersions": [
+        "7.0.0"
+      ],
+      "literalSourceImports": [
+        {
+          "path": "apps/web/src/components/stripe/StripeEmbeddedInvoiceCheckout.tsx",
+          "line": 3,
+          "module": "@stripe/react-stripe-js",
+          "source": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/src/components/stripe/StripeEmbeddedInvoiceCheckout.tsx#L3"
+        }
+      ],
+      "method": "Literal from/import()/require() search, tests excluded; not a complete call graph or runtime proof."
+    },
+    {
+      "name": "@stripe/stripe-js",
+      "declaredBy": [
+        "apps/web"
+      ],
+      "lockedDirectVersions": [
+        "10.1.0"
+      ],
+      "literalSourceImports": [
+        {
+          "path": "apps/web/src/components/stripe/StripeEmbeddedInvoiceCheckout.tsx",
+          "line": 4,
+          "module": "@stripe/stripe-js",
+          "source": "https://github.com/SimonShaun2/Renvani/blob/b45b4996b64b16859e44a79b171b11cbe52c3e6a/apps/web/src/components/stripe/StripeEmbeddedInvoiceCheckout.tsx#L4"
+        }
+      ],
+      "method": "Literal from/import()/require() search, tests excluded; not a complete call graph or runtime proof."
+    },
+    {
+      "name": "twilio",
+      "declaredBy": [
+        "apps/api"
+      ],
+      "lockedDirectVersions": [
+        "5.13.1"
+      ],
+      "literalSourceImports": [],
+      "method": "Literal from/import()/require() search, tests excluded; not a complete call graph or runtime proof."
+    }
+  ]
+}

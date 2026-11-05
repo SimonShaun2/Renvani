@@ -68,8 +68,7 @@ export const HOME = {
     eyebrow: "BUILT AROUND YOUR WORK",
     links: [
       { label: "HVAC →", href: "/industries/hvac" },
-      { label: "Plumbing →", href: "/industries/plumbing" },
-      { label: "Electrical →", href: "/industries/electrical" }
+      { label: "Plumbing →", href: "/industries/plumbing" }
     ]
   },
   journey: {

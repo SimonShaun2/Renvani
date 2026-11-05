@@ -1,0 +1,761 @@
+{
+  "schemaVersion": "1.1",
+  "purpose": "FS-51 reviewable Figma-to-code source map; NOT evidence of implemented parity",
+  "canonicalFigmaFile": "jiGHTNUJNltWbHA4Il3hk7",
+  "sourceDesignUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design",
+  "fullSoftwarePrototypeNode": "399:4217",
+  "fieldTechnicianPrototypeNode": "393:87",
+  "codeInspected": {
+    "ref": "dev",
+    "commit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+    "date": "2026-11-05"
+  },
+  "statusDefinition": "code_surface_identified_parity_not_verified",
+  "entries": [
+    {
+      "id": "CC-01",
+      "journey": "Command Center / daily brief",
+      "area": "Command Center",
+      "figmaSourceNodeId": "10:2",
+      "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=10-2",
+      "route": "/command-center",
+      "codePaths": [
+        "apps/web/app/(app)/command-center",
+        "apps/web/src/components/command-center/CommandCenterView.tsx"
+      ],
+      "status": "code_surface_identified_parity_not_verified",
+      "sourceCommit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+      "designEvidence": {
+        "source": "PR #404 at 8af8bd4bf415c0e185d2112dd382c6a7200227f8",
+        "inspectionReperformed": false,
+        "parityVerdict": "NOT_VERIFIED"
+      },
+      "browserEvidence": {
+        "status": "NOT_EXECUTED_IN_THIS_SOURCE_RECONCILIATION",
+        "screenshots": [],
+        "roles": [],
+        "viewports": [],
+        "measuredAccessibility": null
+      }
+    },
+    {
+      "id": "AG-01",
+      "journey": "Approvals inbox / agent action states",
+      "area": "Command Center",
+      "figmaSourceNodeId": "10:220",
+      "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=10-220",
+      "route": "/command-center/approvals",
+      "codePaths": [
+        "apps/web/src/components/agent-actions/AgentInbox.tsx",
+        "apps/web/src/components/agent-actions/DeliveryStates.tsx"
+      ],
+      "status": "code_surface_identified_parity_not_verified",
+      "sourceCommit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+      "designEvidence": {
+        "source": "PR #404 at 8af8bd4bf415c0e185d2112dd382c6a7200227f8",
+        "inspectionReperformed": false,
+        "parityVerdict": "NOT_VERIFIED"
+      },
+      "browserEvidence": {
+        "status": "NOT_EXECUTED_IN_THIS_SOURCE_RECONCILIATION",
+        "screenshots": [],
+        "roles": [],
+        "viewports": [],
+        "measuredAccessibility": null
+      }
+    },
+    {
+      "id": "GR-01",
+      "journey": "Business website / direct demand",
+      "area": "Growth",
+      "figmaSourceNodeId": "10:2023",
+      "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=10-2023",
+      "route": "/site/[slug]",
+      "codePaths": [
+        "apps/web/app/(public)/site",
+        "apps/web/src/components/growth/BrandedStorefront.tsx"
+      ],
+      "status": "code_surface_identified_parity_not_verified",
+      "sourceCommit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+      "designEvidence": {
+        "source": "PR #404 at 8af8bd4bf415c0e185d2112dd382c6a7200227f8",
+        "inspectionReperformed": false,
+        "parityVerdict": "NOT_VERIFIED"
+      },
+      "browserEvidence": {
+        "status": "NOT_EXECUTED_IN_THIS_SOURCE_RECONCILIATION",
+        "screenshots": [],
+        "roles": [],
+        "viewports": [],
+        "measuredAccessibility": null
+      }
+    },
+    {
+      "id": "GR-02",
+      "journey": "Customer direct inquiry",
+      "area": "Growth",
+      "figmaSourceNodeId": "10:1807",
+      "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=10-1807",
+      "route": "/site/[slug]/inquire",
+      "additionalRoutes": [
+        "/site/[slug]/[service]/[area]"
+      ],
+      "codePaths": [
+        "apps/web/src/components/growth/BrandedInquiryClient.tsx"
+      ],
+      "status": "code_surface_identified_parity_not_verified",
+      "sourceCommit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+      "designEvidence": {
+        "source": "PR #404 at 8af8bd4bf415c0e185d2112dd382c6a7200227f8",
+        "inspectionReperformed": false,
+        "parityVerdict": "NOT_VERIFIED"
+      },
+      "browserEvidence": {
+        "status": "NOT_EXECUTED_IN_THIS_SOURCE_RECONCILIATION",
+        "screenshots": [],
+        "roles": [],
+        "viewports": [],
+        "measuredAccessibility": null
+      }
+    },
+    {
+      "id": "OP-01",
+      "journey": "Dispatch board",
+      "area": "Operations",
+      "figmaSourceNodeId": "10:478",
+      "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=10-478",
+      "route": "/dispatch",
+      "codePaths": [
+        "apps/web/app/(app)/dispatch",
+        "apps/web/src/components/dispatch"
+      ],
+      "status": "code_surface_identified_parity_not_verified",
+      "sourceCommit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+      "designEvidence": {
+        "source": "PR #404 at 8af8bd4bf415c0e185d2112dd382c6a7200227f8",
+        "inspectionReperformed": false,
+        "parityVerdict": "NOT_VERIFIED"
+      },
+      "browserEvidence": {
+        "status": "NOT_EXECUTED_IN_THIS_SOURCE_RECONCILIATION",
+        "screenshots": [],
+        "roles": [],
+        "viewports": [],
+        "measuredAccessibility": null
+      }
+    },
+    {
+      "id": "OP-02",
+      "journey": "Customer booking / service selection",
+      "area": "Operations",
+      "figmaSourceNodeId": "1:21",
+      "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=1-21",
+      "route": "/book/[slug]",
+      "codePaths": [
+        "apps/web/app/(public)/book",
+        "apps/web/src/components/booking/BookingFlowClient.tsx"
+      ],
+      "status": "code_surface_identified_parity_not_verified",
+      "sourceCommit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+      "designEvidence": {
+        "source": "PR #404 at 8af8bd4bf415c0e185d2112dd382c6a7200227f8",
+        "inspectionReperformed": false,
+        "parityVerdict": "NOT_VERIFIED"
+      },
+      "browserEvidence": {
+        "status": "NOT_EXECUTED_IN_THIS_SOURCE_RECONCILIATION",
+        "screenshots": [],
+        "roles": [],
+        "viewports": [],
+        "measuredAccessibility": null
+      }
+    },
+    {
+      "id": "OP-03",
+      "journey": "Jobs list",
+      "area": "Operations",
+      "figmaSourceNodeId": "144:567",
+      "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=144-567",
+      "route": "/jobs",
+      "codePaths": [
+        "apps/web/app/(app)/jobs"
+      ],
+      "status": "code_surface_identified_parity_not_verified",
+      "sourceCommit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+      "designEvidence": {
+        "source": "PR #404 at 8af8bd4bf415c0e185d2112dd382c6a7200227f8",
+        "inspectionReperformed": false,
+        "parityVerdict": "NOT_VERIFIED"
+      },
+      "browserEvidence": {
+        "status": "NOT_EXECUTED_IN_THIS_SOURCE_RECONCILIATION",
+        "screenshots": [],
+        "roles": [],
+        "viewports": [],
+        "measuredAccessibility": null
+      }
+    },
+    {
+      "id": "OP-04",
+      "journey": "Job detail",
+      "area": "Operations",
+      "figmaSourceNodeId": "1:14",
+      "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=1-14",
+      "route": "/jobs/[id]",
+      "codePaths": [
+        "apps/web/app/(app)/jobs",
+        "apps/web/src/components/jobs"
+      ],
+      "status": "code_surface_identified_parity_not_verified",
+      "sourceCommit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+      "designEvidence": {
+        "source": "PR #404 at 8af8bd4bf415c0e185d2112dd382c6a7200227f8",
+        "inspectionReperformed": false,
+        "parityVerdict": "NOT_VERIFIED"
+      },
+      "browserEvidence": {
+        "status": "NOT_EXECUTED_IN_THIS_SOURCE_RECONCILIATION",
+        "screenshots": [],
+        "roles": [],
+        "viewports": [],
+        "measuredAccessibility": null
+      }
+    },
+    {
+      "id": "FT-01",
+      "journey": "Field technician: today",
+      "area": "Operations",
+      "figmaSourceNodeId": "10:436",
+      "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=10-436",
+      "route": "/mobile/jobs",
+      "codePaths": [
+        "apps/web/app/(mobile)/mobile/jobs/page.tsx",
+        "apps/web/src/components/mobile/TodayJobsList.tsx"
+      ],
+      "status": "code_surface_identified_parity_not_verified",
+      "sourceCommit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+      "designEvidence": {
+        "source": "PR #404 at 8af8bd4bf415c0e185d2112dd382c6a7200227f8",
+        "inspectionReperformed": false,
+        "parityVerdict": "NOT_VERIFIED"
+      },
+      "browserEvidence": {
+        "status": "NOT_EXECUTED_IN_THIS_SOURCE_RECONCILIATION",
+        "screenshots": [],
+        "roles": [],
+        "viewports": [],
+        "measuredAccessibility": null
+      }
+    },
+    {
+      "id": "FT-02",
+      "journey": "Field technician: job brief",
+      "area": "Operations",
+      "figmaSourceNodeId": "1:13",
+      "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=1-13",
+      "route": "/mobile/jobs/[id]",
+      "codePaths": [
+        "apps/web/src/components/mobile/MobileJobDetail.tsx"
+      ],
+      "status": "code_surface_identified_parity_not_verified",
+      "sourceCommit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+      "designEvidence": {
+        "source": "PR #404 at 8af8bd4bf415c0e185d2112dd382c6a7200227f8",
+        "inspectionReperformed": false,
+        "parityVerdict": "NOT_VERIFIED"
+      },
+      "browserEvidence": {
+        "status": "NOT_EXECUTED_IN_THIS_SOURCE_RECONCILIATION",
+        "screenshots": [],
+        "roles": [],
+        "viewports": [],
+        "measuredAccessibility": null
+      }
+    },
+    {
+      "id": "FT-03",
+      "journey": "Field technician: on-site checklist",
+      "area": "Operations",
+      "figmaSourceNodeId": "247:32",
+      "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=247-32",
+      "route": "/mobile/jobs/[id]",
+      "additionalRoutes": [
+        "/mobile/jobs/[id]/complete"
+      ],
+      "codePaths": [
+        "apps/web/src/components/mobile/CrewChecklist.tsx"
+      ],
+      "status": "code_surface_identified_parity_not_verified",
+      "sourceCommit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+      "designEvidence": {
+        "source": "PR #404 at 8af8bd4bf415c0e185d2112dd382c6a7200227f8",
+        "inspectionReperformed": false,
+        "parityVerdict": "NOT_VERIFIED"
+      },
+      "browserEvidence": {
+        "status": "NOT_EXECUTED_IN_THIS_SOURCE_RECONCILIATION",
+        "screenshots": [],
+        "roles": [],
+        "viewports": [],
+        "measuredAccessibility": null
+      }
+    },
+    {
+      "id": "FT-04",
+      "journey": "Field technician: signature",
+      "area": "Operations",
+      "figmaSourceNodeId": "303:87",
+      "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=303-87",
+      "route": "/mobile/jobs/[id]/signature",
+      "additionalRoutes": [
+        "/mobile/signature"
+      ],
+      "codePaths": [
+        "apps/web/src/components/mobile/CrewSignature.tsx"
+      ],
+      "status": "code_surface_identified_parity_not_verified",
+      "sourceCommit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+      "designEvidence": {
+        "source": "PR #404 at 8af8bd4bf415c0e185d2112dd382c6a7200227f8",
+        "inspectionReperformed": false,
+        "parityVerdict": "NOT_VERIFIED"
+      },
+      "browserEvidence": {
+        "status": "NOT_EXECUTED_IN_THIS_SOURCE_RECONCILIATION",
+        "screenshots": [],
+        "roles": [],
+        "viewports": [],
+        "measuredAccessibility": null
+      }
+    },
+    {
+      "id": "RV-01",
+      "journey": "Operator estimate builder",
+      "area": "Revenue",
+      "figmaSourceNodeId": "10:604",
+      "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=10-604",
+      "route": "/estimates/new",
+      "additionalRoutes": [
+        "/estimates/[id]"
+      ],
+      "codePaths": [
+        "apps/web/src/components/estimates/EstimateBuilderClient.tsx"
+      ],
+      "status": "code_surface_identified_parity_not_verified",
+      "sourceCommit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+      "designEvidence": {
+        "source": "PR #404 at 8af8bd4bf415c0e185d2112dd382c6a7200227f8",
+        "inspectionReperformed": false,
+        "parityVerdict": "NOT_VERIFIED"
+      },
+      "browserEvidence": {
+        "status": "NOT_EXECUTED_IN_THIS_SOURCE_RECONCILIATION",
+        "screenshots": [],
+        "roles": [],
+        "viewports": [],
+        "measuredAccessibility": null
+      }
+    },
+    {
+      "id": "RV-02",
+      "journey": "Estimate options tiers",
+      "area": "Revenue",
+      "figmaSourceNodeId": "362:4217",
+      "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=362-4217",
+      "route": "/estimates/option-sets/[tierGroupId]",
+      "codePaths": [
+        "apps/web/src/components/estimate-option-sets"
+      ],
+      "status": "code_surface_identified_parity_not_verified",
+      "sourceCommit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+      "designEvidence": {
+        "source": "PR #404 at 8af8bd4bf415c0e185d2112dd382c6a7200227f8",
+        "inspectionReperformed": false,
+        "parityVerdict": "NOT_VERIFIED"
+      },
+      "browserEvidence": {
+        "status": "NOT_EXECUTED_IN_THIS_SOURCE_RECONCILIATION",
+        "screenshots": [],
+        "roles": [],
+        "viewports": [],
+        "measuredAccessibility": null
+      }
+    },
+    {
+      "id": "RV-03",
+      "journey": "Customer estimate approval",
+      "area": "Revenue",
+      "figmaSourceNodeId": "10:1857",
+      "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=10-1857",
+      "route": "/approve/[token]",
+      "codePaths": [
+        "apps/web/app/(public)/approve",
+        "apps/web/src/components/estimates/CustomerEstimateView.tsx"
+      ],
+      "status": "code_surface_identified_parity_not_verified",
+      "sourceCommit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+      "designEvidence": {
+        "source": "PR #404 at 8af8bd4bf415c0e185d2112dd382c6a7200227f8",
+        "inspectionReperformed": false,
+        "parityVerdict": "NOT_VERIFIED"
+      },
+      "browserEvidence": {
+        "status": "NOT_EXECUTED_IN_THIS_SOURCE_RECONCILIATION",
+        "screenshots": [],
+        "roles": [],
+        "viewports": [],
+        "measuredAccessibility": null
+      }
+    },
+    {
+      "id": "RV-04",
+      "journey": "Invoices",
+      "area": "Revenue",
+      "figmaSourceNodeId": "10:752",
+      "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=10-752",
+      "route": "/invoices",
+      "codePaths": [
+        "apps/web/app/(app)/invoices",
+        "apps/web/src/components/invoices"
+      ],
+      "status": "code_surface_identified_parity_not_verified",
+      "sourceCommit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+      "designEvidence": {
+        "source": "PR #404 at 8af8bd4bf415c0e185d2112dd382c6a7200227f8",
+        "inspectionReperformed": false,
+        "parityVerdict": "NOT_VERIFIED"
+      },
+      "browserEvidence": {
+        "status": "NOT_EXECUTED_IN_THIS_SOURCE_RECONCILIATION",
+        "screenshots": [],
+        "roles": [],
+        "viewports": [],
+        "measuredAccessibility": null
+      }
+    },
+    {
+      "id": "RV-05",
+      "journey": "Payment processing / payouts",
+      "area": "Revenue",
+      "figmaSourceNodeId": "52:16",
+      "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=52-16",
+      "route": "/payments",
+      "codePaths": [
+        "apps/web/app/(app)/payments",
+        "apps/web/src/components/payments"
+      ],
+      "status": "code_surface_identified_parity_not_verified",
+      "sourceCommit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+      "designEvidence": {
+        "source": "PR #404 at 8af8bd4bf415c0e185d2112dd382c6a7200227f8",
+        "inspectionReperformed": false,
+        "parityVerdict": "NOT_VERIFIED"
+      },
+      "browserEvidence": {
+        "status": "NOT_EXECUTED_IN_THIS_SOURCE_RECONCILIATION",
+        "screenshots": [],
+        "roles": [],
+        "viewports": [],
+        "measuredAccessibility": null
+      }
+    },
+    {
+      "id": "RV-06",
+      "journey": "Customer invoice payment",
+      "area": "Revenue",
+      "figmaSourceNodeId": "53:323",
+      "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=53-323",
+      "route": "/pay/[token]",
+      "codePaths": [
+        "apps/web/app/(public)/pay"
+      ],
+      "status": "code_surface_identified_parity_not_verified",
+      "sourceCommit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+      "designEvidence": {
+        "source": "PR #404 at 8af8bd4bf415c0e185d2112dd382c6a7200227f8",
+        "inspectionReperformed": false,
+        "parityVerdict": "NOT_VERIFIED"
+      },
+      "browserEvidence": {
+        "status": "NOT_EXECUTED_IN_THIS_SOURCE_RECONCILIATION",
+        "screenshots": [],
+        "roles": [],
+        "viewports": [],
+        "measuredAccessibility": null
+      }
+    },
+    {
+      "id": "RT-01",
+      "journey": "Service agreements / recurring",
+      "area": "Retention",
+      "figmaSourceNodeId": "10:915",
+      "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=10-915",
+      "route": "/service-agreements",
+      "codePaths": [
+        "apps/web/app/(app)/service-agreements",
+        "apps/web/src/components/service-agreements"
+      ],
+      "status": "code_surface_identified_parity_not_verified",
+      "sourceCommit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+      "designEvidence": {
+        "source": "PR #404 at 8af8bd4bf415c0e185d2112dd382c6a7200227f8",
+        "inspectionReperformed": false,
+        "parityVerdict": "NOT_VERIFIED"
+      },
+      "browserEvidence": {
+        "status": "NOT_EXECUTED_IN_THIS_SOURCE_RECONCILIATION",
+        "screenshots": [],
+        "roles": [],
+        "viewports": [],
+        "measuredAccessibility": null
+      }
+    },
+    {
+      "id": "GR-03",
+      "journey": "Growth Check findings review",
+      "area": "Growth",
+      "figmaSourceNodeId": "366:4217",
+      "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=366-4217",
+      "route": "/growth/growth-check",
+      "codePaths": [
+        "apps/web/app/(app)/growth",
+        "apps/web/src/components/growth-check"
+      ],
+      "status": "code_surface_identified_parity_not_verified",
+      "sourceCommit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+      "designEvidence": {
+        "source": "PR #404 at 8af8bd4bf415c0e185d2112dd382c6a7200227f8",
+        "inspectionReperformed": false,
+        "parityVerdict": "NOT_VERIFIED"
+      },
+      "browserEvidence": {
+        "status": "NOT_EXECUTED_IN_THIS_SOURCE_RECONCILIATION",
+        "screenshots": [],
+        "roles": [],
+        "viewports": [],
+        "measuredAccessibility": null
+      }
+    },
+    {
+      "id": "FD-01",
+      "journey": "Import review",
+      "area": "Foundation",
+      "figmaSourceNodeId": "12:181",
+      "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=12-181",
+      "route": "/settings/import",
+      "codePaths": [
+        "apps/web/app/(app)/settings",
+        "apps/web/src/components/csv-import"
+      ],
+      "status": "code_surface_identified_parity_not_verified",
+      "sourceCommit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+      "designEvidence": {
+        "source": "PR #404 at 8af8bd4bf415c0e185d2112dd382c6a7200227f8",
+        "inspectionReperformed": false,
+        "parityVerdict": "NOT_VERIFIED"
+      },
+      "browserEvidence": {
+        "status": "NOT_EXECUTED_IN_THIS_SOURCE_RECONCILIATION",
+        "screenshots": [],
+        "roles": [],
+        "viewports": [],
+        "measuredAccessibility": null
+      }
+    },
+    {
+      "id": "AOF-01",
+      "journey": "Business Operating Profile interview",
+      "area": "Foundation",
+      "figmaSourceNodeId": "331:4113",
+      "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=331-4113",
+      "route": null,
+      "codePaths": [
+        "apps/web/src/components/agent-actions"
+      ],
+      "status": "code_surface_identified_parity_not_verified",
+      "sourceCommit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+      "designEvidence": {
+        "source": "PR #404 at 8af8bd4bf415c0e185d2112dd382c6a7200227f8",
+        "inspectionReperformed": false,
+        "parityVerdict": "NOT_VERIFIED"
+      },
+      "browserEvidence": {
+        "status": "NOT_EXECUTED_IN_THIS_SOURCE_RECONCILIATION",
+        "screenshots": [],
+        "roles": [],
+        "viewports": [],
+        "measuredAccessibility": null
+      }
+    },
+    {
+      "id": "AOF-02",
+      "journey": "Operating Profile approval review",
+      "area": "Foundation",
+      "figmaSourceNodeId": "331:4170",
+      "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=331-4170",
+      "route": null,
+      "codePaths": [
+        "apps/web/src/components/agent-actions"
+      ],
+      "status": "code_surface_identified_parity_not_verified",
+      "sourceCommit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+      "designEvidence": {
+        "source": "PR #404 at 8af8bd4bf415c0e185d2112dd382c6a7200227f8",
+        "inspectionReperformed": false,
+        "parityVerdict": "NOT_VERIFIED"
+      },
+      "browserEvidence": {
+        "status": "NOT_EXECUTED_IN_THIS_SOURCE_RECONCILIATION",
+        "screenshots": [],
+        "roles": [],
+        "viewports": [],
+        "measuredAccessibility": null
+      }
+    },
+    {
+      "id": "AOF-03",
+      "journey": "Action delivery states",
+      "area": "Foundation",
+      "figmaSourceNodeId": "331:4230",
+      "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=331-4230",
+      "route": null,
+      "codePaths": [
+        "apps/web/src/components/agent-actions/DeliveryStates.tsx"
+      ],
+      "status": "code_surface_identified_parity_not_verified",
+      "sourceCommit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+      "designEvidence": {
+        "source": "PR #404 at 8af8bd4bf415c0e185d2112dd382c6a7200227f8",
+        "inspectionReperformed": false,
+        "parityVerdict": "NOT_VERIFIED"
+      },
+      "browserEvidence": {
+        "status": "NOT_EXECUTED_IN_THIS_SOURCE_RECONCILIATION",
+        "screenshots": [],
+        "roles": [],
+        "viewports": [],
+        "measuredAccessibility": null
+      }
+    },
+    {
+      "id": "AOF-04",
+      "journey": "First hour activation",
+      "area": "Foundation",
+      "figmaSourceNodeId": "331:4300",
+      "figmaSourceUrl": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=331-4300",
+      "route": null,
+      "codePaths": [
+        "apps/web/src/components/command-center"
+      ],
+      "status": "code_surface_identified_parity_not_verified",
+      "sourceCommit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+      "designEvidence": {
+        "source": "PR #404 at 8af8bd4bf415c0e185d2112dd382c6a7200227f8",
+        "inspectionReperformed": false,
+        "parityVerdict": "NOT_VERIFIED"
+      },
+      "browserEvidence": {
+        "status": "NOT_EXECUTED_IN_THIS_SOURCE_RECONCILIATION",
+        "screenshots": [],
+        "roles": [],
+        "viewports": [],
+        "measuredAccessibility": null
+      }
+    }
+  ],
+  "policy": {
+    "approvalNotExecution": true,
+    "noDemoMoneyAsLive": true,
+    "tenantScoped": true,
+    "consentBeforeSend": true,
+    "exactHeadReviewGate": true,
+    "requiresBoardTicketReady": true
+  },
+  "sourceMapProvenance": {
+    "pullRequest": 404,
+    "commit": "8af8bd4bf415c0e185d2112dd382c6a7200227f8",
+    "preservedDesignSurfaceCount": 25,
+    "newDesignInspectionClaimed": false
+  },
+  "sourceInventory": {
+    "document": "docs/audit/FRONTEND-INVENTORY.md",
+    "data": "docs/audit/frontend-source-inventory.json",
+    "pageFileCount": 112,
+    "commit": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+    "purpose": "Code source appendix only; not a second design map or accepted-journey count"
+  },
+  "acceptancePacket": "docs/audit/OPERATOR-ACCEPTANCE.md",
+  "evidenceDefinitions": {
+    "sourceObserved": "File exists at recorded SHA; logic identified by source only",
+    "previewBuild": "Deployment build at a specified SHA; no route acceptance implied",
+    "browserObserved": "Actual role/session/route/viewport/state/artifact recorded",
+    "workflowAccepted": "Required independent evidence and founder-authorized integration; not established by this map"
+  },
+  "implementationHeads": [
+    {
+      "pr": 432,
+      "commit": "98e5e935db39fb2108a67c2268b65f23989ac95f",
+      "mergedIntoInspectedDev": false,
+      "scope": "Login, owner dashboard, shared navigation"
+    },
+    {
+      "pr": 435,
+      "commit": "47e5b0dd4237903e5bc5437a74280812bcf692f5",
+      "mergedIntoInspectedDev": false,
+      "scope": "Revenue Center"
+    },
+    {
+      "pr": 437,
+      "commit": "cf133f9353803e1e8d664c23932a845f80160bbc",
+      "mergedIntoInspectedDev": false,
+      "scope": "Operator surfaces / Estimates"
+    },
+    {
+      "pr": 438,
+      "commit": "e7b416f21b460c115eafa8726b940951702c4577",
+      "mergedIntoInspectedDev": false,
+      "scope": "Settings / Company Profile"
+    },
+    {
+      "pr": 439,
+      "commit": "935d37b0fa54f68b2ec88eb76ef6e4e30823c161",
+      "mergedIntoInspectedDev": false,
+      "scope": "Marketing homepage / Products menu"
+    }
+  ],
+  "unverifiedFrameRequirements": [
+    {
+      "route": "/ai-revenue-center",
+      "surface": "AI Revenue Center",
+      "approvedExactFrame": null,
+      "status": "missing_exact_frame_or_bounded_design_exception"
+    },
+    {
+      "route": "/customers",
+      "surface": "Customers list",
+      "approvedExactFrame": null,
+      "status": "missing_exact_list_frame"
+    },
+    {
+      "route": "/estimates",
+      "surface": "Estimates list",
+      "approvedExactFrame": null,
+      "status": "missing_exact_list_frame"
+    },
+    {
+      "route": "/timesheets",
+      "surface": "Timesheets",
+      "approvedExactFrame": null,
+      "status": "missing_exact_frame"
+    },
+    {
+      "route": "/settings/general",
+      "additionalRoutes": [
+        "/settings/company"
+      ],
+      "surface": "General / Company Profile",
+      "approvedExactFrame": null,
+      "status": "missing_exact_frames"
+    }
+  ]
+}

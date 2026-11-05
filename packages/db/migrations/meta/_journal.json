@@ -435,6 +435,13 @@
       "when": 1793241794043,
       "tag": "0061_fs235_clerk_workspace_intent",
       "breakpoints": true
+    },
+    {
+      "idx": 62,
+      "version": "7",
+      "when": 1793712733207,
+      "tag": "0062_fs234_outbound_consent_ledger",
+      "breakpoints": true
     }
   ]
 }

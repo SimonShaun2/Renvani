@@ -1,4 +1,12 @@
-# Sprint 0 Audit Outputs
+# Renvani audit and build evidence
+
+## Current bounded work
+
+The [build specifications 2–12 delivery index](BUILD-SPECS-02-12.md) records the current documentation, source inventories, focused validation and explicit runtime blockers. Its source baseline is dev `b45b4996b64b16859e44a79b171b11cbe52c3e6a`; PR-only results identify their own heads. Current authority is the FS board, [TEAM.md](../../TEAM.md), [GITHUB_WORKFLOW.md](../../GITHUB_WORKFLOW.md) and founder directive #420. These scoped packages do not reactivate the historical Sprint 0 program or certify a whole-repository security/coverage audit.
+
+## Historical Sprint 0 output plan
+
+The following original output list and classification rules are retained as historical context. They do not establish current assignments, mandatory global gates or completion of files named in the old plan.
 
 Every document in this directory is produced by a Sprint 0 ticket and consolidated by
 FSM-0012 into `EXISTING_CODE_AUDIT.md` at the repository root.

@@ -39,16 +39,6 @@ function envelopeToSummary(
   };
 }
 
-function parseCursor(cursor: string | undefined): number {
-  if (!cursor) {
-    return 0;
-  }
-
-  const parsed = Number.parseInt(cursor, 10);
-
-  return Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
-}
-
 export async function listDeadLetterJobs(
   sourceQueue: PlatformQueueNameV1,
   deadLetterQueue: DeadLetterListProbe,

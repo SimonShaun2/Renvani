@@ -169,10 +169,10 @@ describe("marketing parity: demo plan interest + tour routes (Figma 246:5648 / 2
     expect(demoPlanInterest("flat")).toBe("flat");
     expect(demoPlanInterest("vip")).toBeNull();
     expect(demoPlanInterest(["flex"])).toBeNull();
-    expect(planInterestLine("flex")).toBe("Flex · $399/mo + 2% customer-paid Service Fee");
+    expect(planInterestLine("flex")).toBe("Flex · $399/mo + 5% customer-paid Service Fee");
     expect(planInterestLine("flat")).toBe("Flat · $999/mo · No customer-paid Service Fee");
     const { rerender } = render(<DemoPage action={vi.fn()} plan="flex" />);
-    expect(screen.getByTestId("demo-plan-interest").textContent).toContain("Flex · $399/mo + 2% customer-paid Service Fee");
+    expect(screen.getByTestId("demo-plan-interest").textContent).toContain("Flex · $399/mo + 5% customer-paid Service Fee");
     expect(screen.getByRole("link", { name: "Change plan" }).getAttribute("href")).toBe("/pricing");
     expect(document.body.textContent).not.toMatch(/booking fee|\$1\.99/i);
     rerender(<DemoPage action={vi.fn()} />);
@@ -248,7 +248,7 @@ describe("/demo blank submit (Figma 246:5638 / 246:5639)", () => {
   });
 
   it("keeps Growth Check on its existing (red) invalid look", async () => {
-    const action = vi.fn(async () => ({ status: "invalid", fields: { email: "Enter a complete email address." }, message: "Check the highlighted details." }) as IntakeResult);
+    const action = vi.fn(async () => ({ status: "invalid", fields: { email: "Enter a complete email address." }, message: "Check the highlighted fields." }) as IntakeResult);
     render(<GrowthCheckPage action={action} />);
     await act(async () => fireEvent.submit(screen.getByRole("button", { name: "Send my report" }).closest("form")!));
     expect(screen.getByText("Enter a complete email address.").className).toContain("b42318");

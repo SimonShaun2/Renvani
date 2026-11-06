@@ -36,7 +36,7 @@ describe("industry value stories within the approved design", () => {
     for (const name of ["Operating Missions", "Growth", "Revenue", "Operations", "Retention", "Command Center"]) expect(features.textContent).toContain(name);
     expect(features.textContent).toContain("Get more bookings");
     expect(features.textContent).toContain(journey.focus);
-    expect(features.textContent).toContain(journey.ownerOutcome);
+    expect(container.textContent).toContain(journey.ownerOutcome);
     expect(features.querySelectorAll("[data-detail-feature]")).toHaveLength(3);
     for (const section of features.querySelectorAll("[data-detail-feature]")) {
       expect(section.querySelectorAll("li")).toHaveLength(3);
@@ -65,7 +65,7 @@ describe("industry value stories within the approved design", () => {
     const hvac = INDUSTRY_JOURNEYS.hvac;
     const door = INDUSTRY_JOURNEYS["garage-doors"];
     expect(hvac.retain.body).toContain("maintenance");
-    expect(hvac.tools.map(t => t.slug)).toEqual(["scheduling-dispatch", "service-agreements"]);
+    expect(hvac.tools.map(t => t.slug)).toEqual(["technician-app", "scheduling-dispatch"]);
     expect(door.discover.body).toContain("opener");
     expect(door.deliver.body).toContain("mobile payment");
     expect(door.tools.map(t => t.slug)).toEqual(["estimates-approvals", "technician-app"]);

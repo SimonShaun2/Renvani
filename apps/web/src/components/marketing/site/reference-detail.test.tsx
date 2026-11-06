@@ -21,7 +21,7 @@ const FROZEN = {
   "site-config.ts":"29e69e270059b06b8a07f6c726bfc21451af21f01b9643f164d9bffe1acd6d9b",
   "flagship-registry.ts":"f1515ce921e22f2e57c3fa63e44c417f9a705a3bbd80dbe59f269eadf9f2e27a",
   "platform-config.ts":"4a6f3a7e41d750150def8404fd1231148baf5a36548d04f2e4e4532983f759dd",
-  "pricing-config.ts":"a6620e22d340bb1615da8146e406fe128a7ace99c86ab097bbe8bc485e7c8748",
+  "pricing-config.ts":"67f4f92a1c12a32e12c81f275231d4c4b69a17a5f5772cabdf2a9f62b9a03ae6",
   "industry-registry.ts":"9bcc6dc13d1d55bad2e4ae35fc3a22a69a58f6062f0fd69d9a2e768a610156e8",
   "PlatformPages.tsx":"5cbb19b276bf98a28a8e7ae1768cb31657c2622419e72d4a32347b97f6de4154"
 };
@@ -72,7 +72,7 @@ describe("reference-led detail pages, not a product reclassification",()=>{
   });
   it("the pricing redesign preserves every amount and plan destination",()=>{
     const {container}=render(<ReferencePricingPage/>);
-    for(const text of ["$399","$999","2% customer-paid Service Fee","Startup $99/mo · Founding $199/mo","$279.48","$274.00"])expect(container.textContent).toContain(text);
+    for(const text of ["$399","$999","5% customer-paid Service Fee","Startup $99/mo","$287.70","$274.00"])expect(container.textContent).toContain(text);
     expect(screen.getByRole("link",{name:"Explore Flex"}).getAttribute("href")).toBe("/demo?plan=flex");
     expect(screen.getByRole("link",{name:"Explore Flat"}).getAttribute("href")).toBe("/demo?plan=flat");
     expect(container.querySelector("form")).toBeNull();

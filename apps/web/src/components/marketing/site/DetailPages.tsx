@@ -99,14 +99,16 @@ const TRADE_IMAGES: Record<string, string> = { hvac: "/marketing/industries/illu
 function TradeScene({ industry, kind }: { industry: IndustryEntry; kind: "estimate" | "field" | "history" }) {
   const ex = industry.example;
   const journey = INDUSTRY_JOURNEYS[industry.slug];
-  const title = kind === "estimate" ? "Mission + Growth" : kind === "field" ? "Revenue + Operations" : "Retention + Command Center";
+  const retentionTool = PRODUCT_PAGE_BY_SLUG[journey.retain.tool];
+  if (!retentionTool || retentionTool.template === "flagship") throw new Error(`Invalid retention tool: ${journey.retain.tool}`);
+  const title = kind === "estimate" ? "Mission + Growth" : kind === "field" ? "Revenue + Operations" : `Retention + ${retentionTool.name}`;
   return <figure className={styles.visualStage} data-tone={kind === "estimate" ? 0 : kind === "field" ? 1 : 2} data-trade-scene={kind}>
     <div className={styles.tradeScreen}><div className={styles.screenTop}><strong>Renvani</strong><span>{title}</span><small>EXAMPLE</small></div><div className={styles.screenBody}><p className={styles.screenEyebrow}>{industry.name}</p><h3>{kind === "estimate" ? "Get more bookings" : ex.request}</h3>
       {kind === "estimate" ? <><div className={styles.scopeRows}>{[`Operating Mission: ${journey.focus}`, `Growth: ${journey.discover.action}`, `New request: ${ex.request}`].map((detail, index) => <div key={detail}><span>0{index + 1}</span><span>{detail}</span><Check size={16} aria-hidden="true" /></div>)}</div><div className={styles.screenHighlight}><FileText size={20} aria-hidden="true" /><span>Command Center: Review the growth plan before action.</span></div><div className={styles.screenFooter}>Next: Revenue<span>Request with context</span></div></> : kind === "field" ? <><div className={styles.visitSlot}><CalendarDays size={22} aria-hidden="true" /><div><strong>Revenue → Operations</strong><span>{journey.deliver.scope}</span></div></div><div className={styles.checklist}>{["Estimate approved · Work order ready", "Field work and job photos recorded", "Mobile payment recorded"].map(label => <div key={label}><CheckCircle2 size={20} aria-hidden="true" />{label}</div>)}</div><div className={styles.screenHighlight}>{ex.fieldWork}</div></> : <><div className={styles.history}>{[
-        { label: "Growth → Revenue", detail: "Service request and approved estimate" },
-        { label: "Operations", detail: "Completed visit · Payment recorded" },
-        { label: "Retention", detail: journey.retain.nextVisit }
-      ].map((step, index) => <div key={step.label}><span>{index + 1}</span><div><strong>{step.label}</strong><p>{step.detail}</p></div></div>)}</div><div className={styles.screenHighlight}><Repeat2 size={20} aria-hidden="true" /><span>Command Center: {journey.ownerOutcome}</span></div></>}
+        { label: "Operations", detail: "Previous visit completed · Payment recorded" },
+        { label: "Retention", detail: journey.retain.nextVisit },
+        { label: retentionTool.name, detail: journey.retain.handoff }
+      ].map((step, index) => <div key={step.label}><span>{index + 1}</span><div><strong>{index === 2 ? <Link href={`/product/${journey.retain.tool}`}>{step.label}</Link> : step.label}</strong><p>{step.detail}</p></div></div>)}</div><div className={styles.screenHighlight}><Repeat2 size={20} aria-hidden="true" /><span>{journey.retain.action}</span></div></>}
     </div></div><figcaption>Illustrative workflow · Example service record</figcaption>
   </figure>;
 }
@@ -123,7 +125,7 @@ export function IndustryDetailPage({ industry }: { industry: IndustryEntry }) {
   const features: DetailFeature[] = [
     { label: "Operating Missions + Growth", title: journey.discover.title, body: `Choose “Get more bookings” in Operating Missions, focused on ${journey.focus}. ${journey.discover.body}`, points: [journey.discover.action, "Revenue receives the request with context.", "Command Center keeps owner review in the loop."], visual: tools[0]!.slug, part: 0 },
     { label: "Revenue + Operations", title: journey.deliver.title, body: journey.deliver.body, points: ["Confirm the estimate before creating the work order.", "Complete the field work and collect mobile payment.", `${tools[0]!.name}: ${tools[0]!.value}`], visual: tools[0]!.slug, part: 0 },
-    { label: "Retention + Command Center", title: journey.retain.title, body: journey.retain.body, points: [journey.retain.nextVisit, journey.ownerOutcome, "Keep review requests and follow-up subject to consent and owner approval."], visual: tools[1]!.slug, part: 0 }
+    { label: `Retention + ${tools[1]!.name}`, title: journey.retain.title, body: journey.retain.body, points: [journey.retain.handoff, journey.retain.action, "Keep follow-up subject to customer consent and owner approval."], visual: journey.retain.tool, part: 0 }
   ];
   return <div className={styles.page} data-detail-page={industry.slug} data-page-kind="industry">
     <nav className={styles.breadcrumb} aria-label="Breadcrumb"><Link href="/industries">Industries</Link><span>/</span><span>{industry.name}</span></nav>

@@ -28,7 +28,7 @@ export function HowItWorksPage() {
   </div>;
 }
 
-/** Presentation only. All prices and example totals come from the unchanged pricing configuration. */
+/** Presentation only. All prices and example totals come from the central public pricing configuration. */
 export function ReferencePricingPage() {
   const t = pricingTokens();
   return <div className={styles.page} data-overview-page="pricing">
@@ -38,7 +38,7 @@ export function ReferencePricingPage() {
       <p className={styles.eyebrow}>{plan.key === "flex" ? "LOWER MONTHLY SUBSCRIPTION" : "NO CUSTOMER-PAID SERVICE FEE"}</p><h2 id={`plan-${plan.key}`}>{plan.name}</h2><p className={styles.price}>{t[`${plan.key}.price`]}<span> / month</span></p><p>{t[`${plan.key}.fee`]}</p><small>{t[`${plan.key}.annual`]}<br />{t.annualNote}</small>
       <ul>{[t.features!,"Growth, Revenue, Operations and Retention","Command Center and supporting field service tools"].map(item => <li key={item}><Check size={17} aria-hidden="true" /><span>{item}</span></li>)}</ul><DetailAction href={`/demo?plan=${plan.key}`}>Explore {plan.name}</DetailAction>
     </article>)}</div><p className={styles.pricingNote}>{t.annualFeeNote} The customer-paid Service Fee is disclosed at checkout and is non-refundable. Payment processing fees are separate.</p>
-      <div className={styles.programs}><div><strong>{t["programs.title"]}</strong><p>{t["programs.note"]} Both are Flex-based programs.</p></div><Link href="/demo" className={styles.textLink}>Ask about programs<ArrowRight size={17} aria-hidden="true" /></Link></div>
+      <div className={styles.programs}><div><strong>{t["programs.title"]}</strong><p>{t["programs.note"]} Startup uses Flex-based billing.</p></div><Link href="/demo" className={styles.textLink}>Ask about programs<ArrowRight size={17} aria-hidden="true" /></Link></div>
     </section>
     <section className={styles.feature}><div className={styles.featureCopy}><p className={styles.eyebrow}>A LITERAL CHECKOUT EXAMPLE</p><h2>See exactly what changes.</h2><p>The same service subtotal, with the customer-paid Service Fee shown separately. The examples below are illustrations, not payment forms.</p><p className={styles.pricingNote}>Tax and optional tips are not shown. Subscription charges, processing costs and any legally permitted surcharge remain separate.</p></div><div className={styles.featureMedia}><div className={styles.receipts}>{(["flex","flat"] as const).map(key => <div className={styles.receipt} key={key}><h3>{t[`${key}.name`]}</h3><dl><div><dt>Service subtotal</dt><dd>{t["ex.subtotal"]}</dd></div><div><dt>{key === "flex" ? t["ex.flexFeeLabel"] : "Service Fee"}</dt><dd>{t[key === "flex" ? "ex.flexFee" : "ex.flatFee"]}</dd></div><div><dt>Customer total</dt><dd>{t[key === "flex" ? "ex.flexTotal" : "ex.flatTotal"]}</dd></div></dl></div>)}</div><p className={styles.pricingNote}>Illustrative checkout only. No payment is collected on this page.</p></div></section>
     <DemoBand title="Choose a plan. Keep the whole platform." body="The five flagship products and their supporting field service tools stay connected. The billing model changes, not the parts of your business you can see." />
@@ -46,7 +46,7 @@ export function ReferencePricingPage() {
       {question:"What is included in each plan?",answer:"Both Flex and Flat include every feature and unlimited users. The five flagship products and supporting FSM tools remain part of the connected platform. Ask about the availability of preview capabilities during your demo."},
       {question:"How does the customer-paid Service Fee work?",answer:`${t["flex.fee"]} applies to the service subtotal on Flex and is non-refundable. Flat has no customer-paid Service Fee. Payment processing, taxes, optional tips and legally permitted surcharges remain separate.`},
       {question:"What changes with annual billing?",answer:`Flex is ${t["flex.annual"]}; Flat is ${t["flat.annual"]}. ${t.annualNote}. ${t.annualFeeNote}`},
-      {question:"Who qualifies for the Startup and Founding programs?",answer:`${t["programs.title"]}. ${t["programs.note"]} Both programs use Flex-based billing.`}
+      {question:"Who qualifies for Startup pricing?",answer:`${t["programs.title"]}. ${t["programs.note"]} Startup uses Flex-based billing.`}
     ]} />
     <DemoBand title="Find the right fit for your business." body="See your workflow, compare the plans and get clear on the details before you decide." />
   </div>;

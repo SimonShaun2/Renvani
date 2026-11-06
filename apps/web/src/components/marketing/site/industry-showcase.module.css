@@ -12,6 +12,8 @@
 .cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
 .card { position: relative; isolation: isolate; display: flex; min-width: 0; height: 480px; flex-direction: column; align-items: stretch; justify-content: flex-end; gap: 24px; overflow: hidden; padding: 24px; border-radius: 32px; background: var(--color-mkt-ink); color: white; text-decoration: none; }
 .photo { z-index: -2; object-fit: cover; }
+/* Loop frame (LoopVideo wrapper) fills the card exactly like dev's fill photo. */
+.card > .photo { position: absolute; inset: 0; width: 100%; height: 100%; aspect-ratio: auto !important; }
 .photoShade { position: absolute; z-index: -1; inset: 0; pointer-events: none; background: linear-gradient(180deg, rgb(15 21 48 / 0) 0%, rgb(15 21 48 / .05) 42%, rgb(15 21 48 / .48) 66%, rgb(15 21 48 / .98) 100%); }
 .tradeContent { display: flex; flex-direction: column; gap: 10px; }
 .titleRow { display: flex; align-items: center; gap: 12px; }

@@ -7,7 +7,8 @@ import { ScaleToFrame } from "./ScaleToFrame";
 import { FLAGSHIP_TREES } from "./flagship-visuals";
 import { PRODUCT_PAGE_BY_SLUG, type ProductPageEntry } from "./flagship-registry";
 import type { IndustryEntry } from "./industry-registry";
-import { DETAIL_FEATURES, TRADE_HEADINGS, type DetailFeature } from "./detail-content";
+import { DETAIL_FEATURES, type DetailFeature } from "./detail-content";
+import { INDUSTRY_JOURNEYS } from "./industry-journeys";
 import styles from "./detail-pages.module.css";
 
 type Layer = Exclude<VNode, string>;
@@ -97,36 +98,46 @@ const TRADE_IMAGES: Record<string, string> = { hvac: "/marketing/industries/illu
 
 function TradeScene({ industry, kind }: { industry: IndustryEntry; kind: "estimate" | "field" | "history" }) {
   const ex = industry.example;
-  const title = kind === "estimate" ? "Service estimate" : kind === "field" ? "Today’s visit" : "Customer history";
+  const journey = INDUSTRY_JOURNEYS[industry.slug];
+  const title = kind === "estimate" ? "Mission + Growth" : kind === "field" ? "Revenue + Operations" : "Retention + Command Center";
   return <figure className={styles.visualStage} data-tone={kind === "estimate" ? 0 : kind === "field" ? 1 : 2} data-trade-scene={kind}>
-    <div className={styles.tradeScreen}><div className={styles.screenTop}><strong>Renvani</strong><span>{title}</span><small>EXAMPLE</small></div><div className={styles.screenBody}><p className={styles.screenEyebrow}>{industry.name}</p><h3>{ex.request}</h3>
-      {kind === "estimate" ? <><div className={styles.scopeRows}>{ex.requestDetails.map((detail, index) => <div key={detail}><span>0{index + 1}</span><span>{detail}</span><Check size={16} aria-hidden="true" /></div>)}</div><div className={styles.screenHighlight}><FileText size={20} aria-hidden="true" /><span>{ex.estimate}</span></div><div className={styles.screenFooter}>Draft scope<span>Ready for review</span></div></> : kind === "field" ? <><div className={styles.visitSlot}><CalendarDays size={22} aria-hidden="true" /><div><strong>Assigned service visit</strong><span>Customer · Property · Approved scope</span></div></div><div className={styles.checklist}>{["Review the approved scope", "Keep the job notes together", "Add relevant job photos"].map(label => <div key={label}><CheckCircle2 size={20} aria-hidden="true" />{label}</div>)}</div><div className={styles.screenHighlight}>{ex.fieldWork}</div></> : <><div className={styles.history}>{["Original service request", "Estimate and approved work", "Completed visit and notes"].map((label, index) => <div key={label}><span>{index + 1}</span><div><strong>{label}</strong><p>{index === 0 ? ex.requestDetails[0] : index === 1 ? ex.estimate : ex.fieldWork}</p></div></div>)}</div><div className={styles.screenHighlight}><Repeat2 size={20} aria-hidden="true" /><span>{ex.nextVisit}</span></div></>}
+    <div className={styles.tradeScreen}><div className={styles.screenTop}><strong>Renvani</strong><span>{title}</span><small>EXAMPLE</small></div><div className={styles.screenBody}><p className={styles.screenEyebrow}>{industry.name}</p><h3>{kind === "estimate" ? "Get more bookings" : ex.request}</h3>
+      {kind === "estimate" ? <><div className={styles.scopeRows}>{[`Operating Mission: ${journey.focus}`, `Growth: ${journey.discover.action}`, `New request: ${ex.request}`].map((detail, index) => <div key={detail}><span>0{index + 1}</span><span>{detail}</span><Check size={16} aria-hidden="true" /></div>)}</div><div className={styles.screenHighlight}><FileText size={20} aria-hidden="true" /><span>Command Center: Review the growth plan before action.</span></div><div className={styles.screenFooter}>Next: Revenue<span>Request with context</span></div></> : kind === "field" ? <><div className={styles.visitSlot}><CalendarDays size={22} aria-hidden="true" /><div><strong>Revenue → Operations</strong><span>{journey.deliver.scope}</span></div></div><div className={styles.checklist}>{["Estimate approved · Work order ready", "Field work and job photos recorded", "Mobile payment recorded"].map(label => <div key={label}><CheckCircle2 size={20} aria-hidden="true" />{label}</div>)}</div><div className={styles.screenHighlight}>{ex.fieldWork}</div></> : <><div className={styles.history}>{[
+        { label: "Growth → Revenue", detail: "Service request and approved estimate" },
+        { label: "Operations", detail: "Completed visit · Payment recorded" },
+        { label: "Retention", detail: journey.retain.nextVisit }
+      ].map((step, index) => <div key={step.label}><span>{index + 1}</span><div><strong>{step.label}</strong><p>{step.detail}</p></div></div>)}</div><div className={styles.screenHighlight}><Repeat2 size={20} aria-hidden="true" /><span>Command Center: {journey.ownerOutcome}</span></div></>}
     </div></div><figcaption>Illustrative workflow · Example service record</figcaption>
   </figure>;
 }
 
 export function IndustryDetailPage({ industry }: { industry: IndustryEntry }) {
-  const headings = TRADE_HEADINGS[industry.slug];
-  if (!headings) throw new Error(`Missing trade detail content: ${industry.slug}`);
+  const journey = INDUSTRY_JOURNEYS[industry.slug];
+  if (!journey) throw new Error(`Missing industry journey: ${industry.slug}`);
   const ex = industry.example;
-  const features = [
-    { label: "Estimates and customer details", title: headings[0], body: `${ex.capture} ${ex.estimate}`, points: [...ex.requestDetails], visual: "estimates-approvals", part: 0 },
-    { label: "Scheduling and field work", title: headings[1], body: `${ex.fieldWork} Give the team a shared visit record instead of a separate trail of messages.`, points: ["Keep the approved scope with the visit", "Connect the office and field", "Document the work as it happens"], visual: "technician-app", part: 0 },
-    { label: "Service history and repeat business", title: headings[2], body: `${ex.nextVisit} Keep customer details and completed work ready for the next appropriate conversation.`, points: ["Keep the property’s service record", "Review the next follow-up", "Respect customer preferences and consent"], visual: "service-agreements", part: 0 }
+  const tools = journey.tools.map(tool => {
+    const page = PRODUCT_PAGE_BY_SLUG[tool.slug];
+    if (!page || page.template === "flagship") throw new Error(`Invalid supporting tool: ${tool.slug}`);
+    return { ...tool, name: page.name };
+  });
+  const features: DetailFeature[] = [
+    { label: "Operating Missions + Growth", title: journey.discover.title, body: `Choose “Get more bookings” in Operating Missions, focused on ${journey.focus}. ${journey.discover.body}`, points: [journey.discover.action, "Revenue receives the request with context.", "Command Center keeps owner review in the loop."], visual: tools[0]!.slug, part: 0 },
+    { label: "Revenue + Operations", title: journey.deliver.title, body: journey.deliver.body, points: ["Confirm the estimate before creating the work order.", "Complete the field work and collect mobile payment.", `${tools[0]!.name}: ${tools[0]!.value}`], visual: tools[0]!.slug, part: 0 },
+    { label: "Retention + Command Center", title: journey.retain.title, body: journey.retain.body, points: [journey.retain.nextVisit, journey.ownerOutcome, "Keep review requests and follow-up subject to consent and owner approval."], visual: tools[1]!.slug, part: 0 }
   ];
   return <div className={styles.page} data-detail-page={industry.slug} data-page-kind="industry">
     <nav className={styles.breadcrumb} aria-label="Breadcrumb"><Link href="/industries">Industries</Link><span>/</span><span>{industry.name}</span></nav>
-    <DetailHero category={`${industry.name} SOFTWARE`} title={industry.headline} body={industry.description}>{TRADE_IMAGES[industry.slug] ? <figure className={styles.tradeHeroPhoto}><Image src={TRADE_IMAGES[industry.slug]!} alt={`Illustrative ${industry.name.toLowerCase()} field work`} fill priority sizes="(min-width: 1440px) 660px, (min-width: 960px) 48vw, 100vw" /><div className={styles.photoOverlay}><span className={styles.statusDot} /><div><small>YOUR NEXT GOOD JOB</small><strong>{ex.request}</strong></div><ArrowUpRight size={22} aria-hidden="true" /></div><figcaption>Illustrative field-work image</figcaption></figure> : <TradeScene industry={industry} kind="estimate" />}</DetailHero>
-    <BenefitStrip items={["Make the scope clear", "Keep the crew connected", "Build on every visit"]} />
-    <nav className={styles.pageNav} aria-label={`${industry.name} page sections`}><a href="#features">Built for your trade</a><a href="#tools">Your tools</a><a href="#questions">FAQs</a></nav>
-    <div id="features"><header className={styles.sectionHeading}><p className={styles.eyebrow}>SOFTWARE FOR {industry.name}</p><h2>More time on the work.<br />Less time piecing it together.</h2><p>The details of {industry.name.toLowerCase()} work, connected from the first request to the next visit.</p></header>{features.map((feature, index) => <FeatureSection feature={feature} index={index} key={feature.title}><TradeScene industry={industry} kind={(["estimate", "field", "history"] as const)[index]!} /></FeatureSection>)}</div>
-    <DemoBand title={`See ${industry.name.toLowerCase()} work from start to finish.`} body="Start with a service request. Prepare an email or onsite estimate. Confirm the work, complete the visit, collect payment and review the next follow-up." />
-    <div id="tools"><RelatedFeatures title="The tools behind your next good job." slugs={["estimates-approvals", "scheduling-dispatch", "technician-app", "invoices-payments", "customers-properties-assets", "service-agreements"]} /></div>
+    <DetailHero category={`${industry.name} SOFTWARE`} title={industry.headline} body={journey.value}>{TRADE_IMAGES[industry.slug] ? <figure className={styles.tradeHeroPhoto}><Image src={TRADE_IMAGES[industry.slug]!} alt={`Illustrative ${industry.name.toLowerCase()} field work`} fill priority sizes="(min-width: 1440px) 660px, (min-width: 960px) 48vw, 100vw" /><div className={styles.photoOverlay}><span className={styles.statusDot} /><div><small>YOUR NEXT GOOD JOB</small><strong>{ex.request}</strong></div><ArrowUpRight size={22} aria-hidden="true" /></div><figcaption>Illustrative field-work image</figcaption></figure> : <TradeScene industry={industry} kind="estimate" />}</DetailHero>
+    <BenefitStrip items={journey.benefits} />
+    <nav className={styles.pageNav} aria-label={`${industry.name} page sections`}><a href="#features">Mission to repeat business</a><a href="#tools">Supporting tools</a><a href="#questions">FAQs</a></nav>
+    <div id="features"><header className={styles.sectionHeading}><p className={styles.eyebrow}>ONE CONNECTED {industry.name.toUpperCase()} BUSINESS</p><h2>Your goal sets the direction.<br />The whole business follows through.</h2><p>Operating Missions connects Growth, Revenue, Operations and Retention, with Command Center keeping the owner in control from the first opportunity to the next visit.</p></header>{features.map((feature, index) => <FeatureSection feature={feature} index={index} key={feature.title}><TradeScene industry={industry} kind={(["estimate", "field", "history"] as const)[index]!} /></FeatureSection>)}</div>
+    <DemoBand title={`See ${industry.name.toLowerCase()} work from start to finish.`} body={`The goal is more than another inquiry. ${journey.ownerOutcome} Command Center helps you review the next move against your Operating Mission.`} />
+    <div id="tools"><section className={styles.related}><p className={styles.eyebrow}>SUPPORTING FIELD SERVICE TOOLS</p><h2>Two practical tools.<br />One connected outcome.</h2><div className={styles.relatedGrid}>{tools.map(tool => <Link href={`/product/${tool.slug}`} key={tool.slug}><span><strong>{tool.name}</strong><small>{tool.value}</small></span><ArrowUpRight size={22} aria-hidden="true" /></Link>)}</div></section></div>
     <div id="questions"><DetailFaq items={[
-      { question: `How does Renvani support ${industry.name.toLowerCase()} work?`, answer: `The example on this page follows ${ex.request.toLowerCase()}. ${ex.capture} ${ex.fieldWork}` },
-      { question: "Can we estimate by email or onsite?", answer: "Either can be the starting point. Keep the proposed work clear, capture the approval, and confirm the scope before converting the estimate into the work order." },
+      { question: `How does Renvani bring value to ${industry.name.toLowerCase()}?`, answer: `${journey.value} The example follows ${ex.request.toLowerCase()}. ${ex.capture} ${ex.fieldWork} ${ex.nextVisit}` },
+      { question: "Can we estimate by email or onsite?", answer: "Either can be the starting point. Revenue supports the estimate and approval. Confirm the scope before converting the estimate into a work order; Operations then carries the field visit, documentation and payment forward." },
       { question: "What about our specialized trade requirements?", answer: "Confirm required forms, certifications, equipment records, regulatory steps and integrations in your demo. These shared workflow examples are not a claim that every specialized trade capability is available." },
-      { question: "How does this connect to the five flagship products?", answer: "Growth helps bring in the request, Revenue supports the estimate, Operations carries the visit, and Retention supports the relationship after the work. Command Center keeps the owner’s direction and review visible. The FSM tools support that journey." }
-    ]} /></div><div className={styles.moreLinks}><Link href="/industries">All industries<ArrowRight size={16} aria-hidden="true" /></Link><Link href="/tour">Explore the product tour<ArrowRight size={16} aria-hidden="true" /></Link></div><DemoBand title="See your business in Renvani." />
+      { question: "How do Operating Missions and the five products work together?", answer: `Choose a business goal such as “Get more bookings,” then focus it on ${journey.focus}. Growth supports discovery and requests, Revenue moves the estimate toward approval, Operations carries out the job and payment, and Retention prepares the next appropriate touchpoint. Command Center supports owner review throughout and helps connect outcomes back to the goal. ${tools.map(tool => tool.name).join(" and ")} support that journey; they do not replace the five flagship products. Proposed outreach still respects approval requirements and customer consent.` }
+    ]} /></div><div className={styles.moreLinks}><Link href="/industries">All industries<ArrowRight size={16} aria-hidden="true" /></Link><Link href="/tour">Explore the product tour<ArrowRight size={16} aria-hidden="true" /></Link></div><DemoBand title="See your business in Renvani." body="Start with your goal. Follow one customer through all five products and the tools that help your team deliver." />
   </div>;
 }

@@ -2,13 +2,14 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 
 import { submitGrowthCheck } from "@/app/(marketing)/growth-check/actions";
-import { HOME_SERVICE_TRADES, TRADE_LABELS, type IntakeResult } from "@/src/lib/marketing-intake";
+import { type IntakeResult } from "@/src/lib/marketing-intake";
 
 import { ScaleToFrame } from "./ScaleToFrame";
-import { Field, FormAlert, Honeypot, SelectInput, SubmitButton, TextInput, ink, ink2, line } from "./IntakeFields";
+import { LeadContactFields, LEAD_FIELD_NAMES } from "./LeadContactFields";
+import { Field, FormAlert, Honeypot, SubmitButton, TextInput, ink, ink2, line } from "./IntakeFields";
 
 export const GROWTH_CHECK = {
   eyebrow: "RENVANI GROWTH CHECK",
@@ -23,7 +24,11 @@ export const GROWTH_CHECK = {
  * confirmation from "done" 204:9213 / 204:9219.
  */
 export function GrowthCheckPage({ website = "", action = submitGrowthCheck }: { website?: string; action?: (prev: IntakeResult | null, fd: FormData) => Promise<IntakeResult> }) {
-  const [state, formAction] = useActionState(action, null);
+  const [last, setLast] = useState<Record<string, string>>({ websiteUrl: website });
+  const [state, formAction] = useActionState(async (prev: IntakeResult | null, fd: FormData) => {
+    setLast(Object.fromEntries([...LEAD_FIELD_NAMES, "websiteUrl", "location"].map(key => [key, String(fd.get(key) ?? "").trim()])));
+    return action(prev, fd);
+  }, null);
   const errors = state?.status === "invalid" ? state.fields : {};
   return (
     <ScaleToFrame width={1440} from={1024}>
@@ -61,19 +66,12 @@ export function GrowthCheckPage({ website = "", action = submitGrowthCheck }: { 
           </h1>
           <div className="flex flex-col gap-8 lg:flex-row lg:gap-12">
             <form data-node-id="204:9519" action={formAction} noValidate className="relative flex w-full flex-col gap-[14px] rounded-2xl border bg-white p-5 lg:w-[600px] lg:shrink-0" style={{ borderColor: line }}>
+              <LeadContactFields prefix="gc" values={last} errors={errors} />
               <Field id="gc-website" label="Business website" error={errors.websiteUrl}>
-                <TextInput id="gc-website" name="websiteUrl" inputMode="url" autoComplete="url" placeholder="yourbusiness.com" defaultValue={website} maxLength={2048} error={errors.websiteUrl} />
+                <TextInput id="gc-website" name="websiteUrl" inputMode="url" autoComplete="url" placeholder="yourbusiness.com" defaultValue={last.websiteUrl ?? website} maxLength={2048} error={errors.websiteUrl} />
               </Field>
-              <div className="grid grid-cols-1 gap-[14px] md:grid-cols-2 md:gap-4">
-                <Field id="gc-trade" label="Trade" error={errors.trade}>
-                  <SelectInput id="gc-trade" name="trade" placeholder="Choose your trade" error={errors.trade} options={HOME_SERVICE_TRADES.map((t) => ({ value: t, label: TRADE_LABELS[t] }))} />
-                </Field>
-                <Field id="gc-location" label="ZIP or city" error={errors.location}>
-                  <TextInput id="gc-location" name="location" placeholder="74103 or Tulsa" autoComplete="postal-code" maxLength={100} error={errors.location} />
-                </Field>
-              </div>
-              <Field id="gc-email" label="Email address" error={errors.email}>
-                <TextInput id="gc-email" name="email" type="email" inputMode="email" placeholder="you@yourbusiness.com" autoComplete="email" maxLength={254} error={errors.email} />
+              <Field id="gc-location" label="ZIP or city" error={errors.location}>
+                <TextInput id="gc-location" name="location" placeholder="74103 or Tulsa" autoComplete="postal-code" defaultValue={last.location ?? ""} maxLength={100} error={errors.location} />
               </Field>
               <Honeypot />
               <FormAlert state={state} />

@@ -9,6 +9,7 @@ import { PRODUCT_PAGE_BY_SLUG, type ProductPageEntry } from "./flagship-registry
 import type { IndustryEntry } from "./industry-registry";
 import { DETAIL_FEATURES, type DetailFeature } from "./detail-content";
 import { INDUSTRY_JOURNEYS } from "./industry-journeys";
+import { IndustryProductScreen } from "./IndustryProductScreen";
 import styles from "./detail-pages.module.css";
 
 type Layer = Exclude<VNode, string>;
@@ -101,6 +102,7 @@ function TradeScene({ industry, kind }: { industry: IndustryEntry; kind: "estima
   const journey = INDUSTRY_JOURNEYS[industry.slug];
   const retentionTool = PRODUCT_PAGE_BY_SLUG[journey.retain.tool];
   if (!retentionTool || retentionTool.template === "flagship") throw new Error(`Invalid retention tool: ${journey.retain.tool}`);
+  if (kind === "history") return <IndustryProductScreen tool={journey.retain.tool} />;
   const title = kind === "estimate" ? "Mission + Growth" : kind === "field" ? "Revenue + Operations" : `Retention + ${retentionTool.name}`;
   return <figure className={styles.visualStage} data-tone={kind === "estimate" ? 0 : kind === "field" ? 1 : 2} data-trade-scene={kind}>
     <div className={styles.tradeScreen}><div className={styles.screenTop}><strong>Renvani</strong><span>{title}</span><small>EXAMPLE</small></div><div className={styles.screenBody}><p className={styles.screenEyebrow}>{industry.name}</p><h3>{kind === "estimate" ? "Get more bookings" : ex.request}</h3>

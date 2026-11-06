@@ -177,6 +177,22 @@ describe("POST /public/marketing/demo-requests", () => {
 });
 
 describe("POST /public/marketing/growth-checks", () => {
+  it("persists the seven-field website contact extension and includes it in notification", async () => {
+    envOverrides.MARKETING_NOTIFY_EMAIL = "growth@renvani.test";
+    const contact = { firstName: " Ann ", lastName: "Lee", phone: "(918) 555-0100", company: "Lee Heating", teamSize: "2–5" };
+    const res = await post(GC, { ...gc, contact });
+    expect(res.statusCode).toBe(201);
+    expect(repo.growth[0]).toMatchObject({contactDetails: {firstName:"Ann",lastName:"Lee",phone:"+19185550100",company:"Lee Heating",teamSize:"2–5"}});
+    expect(res.body).not.toMatch(/Ann|Lee|555/);
+    expect(mail.send).toHaveBeenCalledTimes(1);
+    const payload=(mail.send.mock.calls[0] as unknown as [{html:string}])[0];
+    expect(payload.html).toContain("First Name");expect(payload.html).toContain("Team Size");
+  });
+  it("rejects malformed nested contact without saving a partial Growth Check", async () => {
+    const res = await post(GC, { ...gc, contact: { firstName:"Ann",lastName:"Lee",phone:"123",company:"Lee Heating",teamSize:"bogus" } });
+    expect(res.statusCode).toBe(400);expect(repo.growth).toHaveLength(0);
+  });
+
   it("persists normalized row with zip; returns only { ok, confirmationId }", async () => {
     const res = await post(GC, gc);
     expect(res.statusCode).toBe(201);

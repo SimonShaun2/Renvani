@@ -3213,6 +3213,7 @@ export const marketingDemoRequests = pgTable("marketing_demo_requests", {
 
 export const marketingGrowthChecks = pgTable("marketing_growth_checks", {
   id: id(),
+  contactDetails: jsonb("contact_details").$type<{ firstName: string; lastName: string; phone: string; company: string; teamSize: string }>(),
   websiteUrl: varchar("website_url", { length: 2048 }).notNull(),
   trade: varchar("trade", { length: 32 }).notNull(),
   zip: varchar("zip", { length: 5 }),

@@ -34,6 +34,7 @@ const INDUSTRY_HREFS = [INDUSTRIES_OVERVIEW.href, ...EXPECTED.map(([slug]) => `/
 const resolves = (h: string) => {
   const path = h.split("#")[0] || "/";
   if (h.startsWith("#")) return true;
+  if (path.startsWith("/marketing/product-screens/")) return existsSync(join(PUBLIC, path));
   if (path.startsWith("/product/")) return PRODUCT_PAGES.some((p) => `/product/${p.slug}` === path);
   if (INDUSTRY_HREFS.includes(path)) return true;
   return ["/", "/product", "/how-it-works", "/pricing", "/signup", "/demo", "/growth-check", "/login", "/tour"].includes(path);

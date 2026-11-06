@@ -5,11 +5,12 @@ import Link from "next/link";
 import { useActionState, useState } from "react";
 
 import { submitDemoRequest } from "@/app/(marketing)/demo/actions";
-import { HOME_SERVICE_TRADES, TRADE_LABELS, type IntakeResult } from "@/src/lib/marketing-intake";
+import { type IntakeResult } from "@/src/lib/marketing-intake";
 
 import { planInterestLine, type DemoPlanInterest } from "./pricing-config";
 import { ScaleToFrame } from "./ScaleToFrame";
-import { Field, FormAlert, Honeypot, SelectInput, SubmitButton, TextInput, ink, ink2, line } from "./IntakeFields";
+import { LeadContactFields, LEAD_FIELD_NAMES } from "./LeadContactFields";
+import { FormAlert, Honeypot, SubmitButton, ink, ink2, line } from "./IntakeFields";
 
 export const DEMO = {
   eyebrow: "SEE IT WITH YOUR OWN WORKFLOW",
@@ -29,7 +30,7 @@ export function DemoPage({ action = submitDemoRequest, plan = null }: { action?:
   const email = last.email ?? "";
   const [editing, setEditing] = useState(false);
   const [state, formAction] = useActionState(async (prev: IntakeResult | null, fd: FormData) => {
-    setLast(Object.fromEntries(["name", "email", "company", "trade", "teamSize"].map((k) => [k, String(fd.get(k) ?? "").trim()])));
+    setLast(Object.fromEntries(LEAD_FIELD_NAMES.map((k) => [k, String(fd.get(k) ?? "").trim()])));
     setEditing(false);
     return action(prev, fd);
   }, null);
@@ -118,23 +119,7 @@ export function DemoPage({ action = submitDemoRequest, plan = null }: { action?:
                   </p>
                 </div>
               ) : null}
-              <div className="grid grid-cols-1 gap-[14px] md:grid-cols-2 md:gap-5 xl:gap-x-4 xl:gap-y-[14px]">
-                <Field id="demo-name" label="Your name" error={errors.name} tone="amber" className="order-1 xl:col-span-2">
-                  <TextInput id="demo-name" name="name" defaultValue={last.name ?? ""} placeholder="First and last name" autoComplete="name" maxLength={120} error={errors.name} tone="amber" />
-                </Field>
-                <Field id="demo-email" label="Work email" error={errors.email} tone="amber" className="order-2 md:order-3 md:col-span-2 xl:order-2">
-                  <TextInput id="demo-email" name="email" defaultValue={last.email ?? ""} type="email" inputMode="email" placeholder="you@yourbusiness.com" autoComplete="email" maxLength={254} error={errors.email} tone="amber" />
-                </Field>
-                <Field id="demo-company" label="Business name" error={errors.company} tone="amber" className="order-3 md:order-2 xl:order-3 xl:col-span-2">
-                  <TextInput id="demo-company" name="company" defaultValue={last.company ?? ""} placeholder="Your business" autoComplete="organization" maxLength={160} error={errors.company} tone="amber" />
-                </Field>
-                <Field id="demo-trade" label="Trade" error={errors.trade} tone="amber" className="order-4">
-                  <SelectInput tabletChevron={false} defaultValue={last.trade ?? ""} id="demo-trade" name="trade" placeholder="Choose your trade" error={errors.trade} tone="amber" options={HOME_SERVICE_TRADES.map((t) => ({ value: t, label: TRADE_LABELS[t] }))} />
-                </Field>
-                <Field id="demo-team" label="Team size" error={errors.teamSize} tone="amber" className="order-5">
-                  <SelectInput tabletChevron={false} defaultValue={last.teamSize ?? ""} id="demo-team" name="teamSize" placeholder="Choose team size" error={errors.teamSize} tone="amber" options={DEMO.teamSizes.map((t) => ({ value: t, label: t }))} />
-                </Field>
-              </div>
+              <LeadContactFields prefix="demo" values={last} errors={errors} tone="amber" />
               <Honeypot />
               {state?.status === "invalid" ? null : <FormAlert state={state} />}
               <div>

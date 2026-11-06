@@ -22,13 +22,13 @@ const json = (status: number, body: unknown, headers: Record<string, string> = {
 
 function demoForm(over: Record<string, string> = {}) {
   const fd = new FormData();
-  const v = { name: "Alex Rivera", email: "alex@example.com", company: "Rivera Heating", trade: "hvac", teamSize: "2–5", hp: "", ...over };
+  const v = { firstName: "Alex", lastName: "Rivera", phone: "9185550100", email: "alex@example.com", company: "Rivera Heating", trade: "hvac", teamSize: "2–5", hp: "", ...over };
   for (const [k, val] of Object.entries(v)) fd.set(k, val);
   return fd;
 }
 function growthForm(over: Record<string, string> = {}) {
   const fd = new FormData();
-  const v = { websiteUrl: "riveraheating.com", trade: "plumbing", location: "74103", email: "alex@example.com", hp: "", ...over };
+  const v = { firstName: "Alex", lastName: "Rivera", phone: "9185550100", company: "Rivera Heating", teamSize: "2–5", websiteUrl: "riveraheating.com", trade: "plumbing", location: "74103", email: "alex@example.com", hp: "", ...over };
   for (const [k, val] of Object.entries(v)) fd.set(k, val);
   return fd;
 }
@@ -40,13 +40,13 @@ describe("marketing intake (server-side POST)", () => {
     expect(r).toEqual({ status: "success", confirmationId: "c_123" });
     const [url, init] = f.mock.calls[0] as unknown as [string, RequestInit];
     expect(url).toMatch(/\/api\/v1\/public\/marketing\/demo-requests$/);
-    expect(JSON.parse(String(init.body))).toEqual({ name: "Alex Rivera", email: "alex@example.com", company: "Rivera Heating", trade: "hvac", message: "Team size: 2–5", hp: "" });
+    expect(JSON.parse(String(init.body))).toEqual({ name: "Alex Rivera", phone: "+19185550100", email: "alex@example.com", company: "Rivera Heating", trade: "hvac", message: "First name: Alex\nLast name: Rivera\nTeam size: 2–5", hp: "" });
   });
 
   it("builds the growth-check body (https added, ZIP split from city)", async () => {
     const f = vi.fn(async () => json(201, { ok: true, confirmationId: "g_1" }));
     await runIntake("growth-checks", growthForm(), f as unknown as typeof fetch);
-    expect(JSON.parse(String((f.mock.calls[0] as unknown as [string, RequestInit])[1].body))).toEqual({ websiteUrl: "https://riveraheating.com", trade: "plumbing", zip: "74103", email: "alex@example.com", hp: "" });
+    expect(JSON.parse(String((f.mock.calls[0] as unknown as [string, RequestInit])[1].body))).toEqual({ websiteUrl: "https://riveraheating.com", contact: { firstName: "Alex", lastName: "Rivera", phone: "+19185550100", company: "Rivera Heating", teamSize: "2–5" }, trade: "plumbing", zip: "74103", email: "alex@example.com", hp: "" });
     await runIntake("growth-checks", growthForm({ location: "Tulsa" }), f as unknown as typeof fetch);
     expect(JSON.parse(String((f.mock.calls[1] as unknown as [string, RequestInit])[1].body))).toMatchObject({ city: "Tulsa" });
   });
@@ -92,7 +92,7 @@ describe("demo and growth-check pages", () => {
   it("renders the demo form with contract fields and an off-screen honeypot", () => {
     const { container } = render(<DemoPage action={vi.fn()} />);
     expect(screen.getByRole("heading", { level: 1 }).textContent).toContain("Your business.");
-    for (const l of ["Your name", "Work email", "Business name", "Trade", "Team size"]) expect(screen.getByLabelText(l)).toBeTruthy();
+    for (const l of ["First Name", "Last Name", "Work Email", "Contact Number", "Business Name", "Trade", "Team Size"]) expect(screen.getByLabelText(l)).toBeTruthy();
     const hp = container.querySelector('input[name="hp"]') as HTMLInputElement;
     expect(hp.type).toBe("text");
     expect(hp.tabIndex).toBe(-1);
@@ -107,7 +107,7 @@ describe("demo and growth-check pages", () => {
     render(<DemoPage action={action} />);
     await act(async () => fireEvent.submit(screen.getByRole("button", { name: "Request my demo" }).closest("form")!));
     expect(screen.getByText("Enter a valid email.")).toBeTruthy();
-    expect(screen.getByLabelText("Work email").getAttribute("aria-invalid")).toBe("true");
+    expect(screen.getByLabelText("Work Email").getAttribute("aria-invalid")).toBe("true");
     await act(async () => fireEvent.submit(screen.getByRole("button", { name: "Request my demo" }).closest("form")!));
     expect(screen.getByRole("status").textContent).toContain("c_9");
   });
@@ -192,30 +192,30 @@ describe("marketing parity: demo plan interest + tour routes (Figma 246:5648 / 2
   it("demo done state matches Figma 204:9214 and Edit request details restores the filled form", async () => {
     const action = vi.fn(async () => ({ status: "success", confirmationId: "c_7" }) as IntakeResult);
     const { container } = render(<DemoPage action={action} />);
-    fireEvent.change(screen.getByLabelText("Your name"), { target: { value: "Alex Rivera" } });
-    fireEvent.change(screen.getByLabelText("Work email"), { target: { value: "alex@example.com" } });
+    fireEvent.change(screen.getByLabelText("First Name"), { target: { value: "Alex Rivera" } });
+    fireEvent.change(screen.getByLabelText("Work Email"), { target: { value: "alex@example.com" } });
     await act(async () => fireEvent.submit(container.querySelector("form")!));
     expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("Let’s look at your business.");
     const status = screen.getByRole("status").textContent ?? "";
     for (const t of ["Your request is in. We’ll be in touch by email.", "YOUR CONTACT EMAIL", "alex@example.com", "c_7"]) expect(status).toContain(t);
     expect(screen.getByRole("link", { name: "Explore the product" }).getAttribute("href")).toBe("/product");
     fireEvent.click(screen.getByRole("button", { name: "Edit request details" }));
-    expect((screen.getByLabelText("Your name") as HTMLInputElement).value).toBe("Alex Rivera");
-    expect((screen.getByLabelText("Work email") as HTMLInputElement).value).toBe("alex@example.com");
+    expect((screen.getByLabelText("First Name") as HTMLInputElement).value).toBe("Alex Rivera");
+    expect((screen.getByLabelText("Work Email") as HTMLInputElement).value).toBe("alex@example.com");
   });
 
   it("validation copy matches Figma 246:5638", async () => {
-    const r = await runIntake("demo-requests", demoForm({ name: "", email: "", company: "", trade: "", teamSize: "" }), vi.fn() as unknown as typeof fetch);
-    expect(r).toMatchObject({ status: "invalid", message: "Check the highlighted details.", fields: { name: "Enter your name.", email: "Enter a complete email address.", company: "Enter your business name.", trade: "Choose your trade." } });
+    const r = await runIntake("demo-requests", demoForm({ firstName: "", lastName: "", phone: "", email: "", company: "", trade: "", teamSize: "" }), vi.fn() as unknown as typeof fetch);
+    expect(r).toMatchObject({ status: "invalid", message: "Check the highlighted details.", fields: { firstName: "Enter your first name.", lastName: "Enter your last name.", phone: "Enter a contact number.", email: "Enter a complete email address.", company: "Enter your business name.", trade: "Choose your trade." } });
   });
 });
 
 describe("/demo blank submit (Figma 246:5638 / 246:5639)", () => {
-  it("validates Team size on /demo only, including when every other field is valid", async () => {
+  it("validates Team Size on both public lead forms, including when every other field is valid", async () => {
     const f = vi.fn();
-    const blank = await runIntake("demo-requests", demoForm({ name: "", email: "", company: "", trade: "", teamSize: "" }), f as unknown as typeof fetch);
+    const blank = await runIntake("demo-requests", demoForm({ firstName: "", lastName: "", phone: "", email: "", company: "", trade: "", teamSize: "" }), f as unknown as typeof fetch);
     expect(blank).toMatchObject({ status: "invalid", message: "Check the highlighted details." });
-    expect(blank.status === "invalid" && blank.fields).toMatchObject({ name: expect.any(String), email: expect.any(String), company: expect.any(String), trade: "Choose your trade.", teamSize: "Choose your team size." });
+    expect(blank.status === "invalid" && blank.fields).toMatchObject({ firstName: expect.any(String), lastName: expect.any(String), phone: expect.any(String), email: expect.any(String), company: expect.any(String), trade: "Choose your trade.", teamSize: "Choose your team size." });
     const onlyTeam = await runIntake("demo-requests", demoForm({ teamSize: "" }), f as unknown as typeof fetch);
     expect(onlyTeam).toMatchObject({ status: "invalid", fields: { teamSize: "Choose your team size." } });
     expect(f).not.toHaveBeenCalled();
@@ -233,7 +233,7 @@ describe("/demo blank submit (Figma 246:5638 / 246:5639)", () => {
     const form = container.querySelector("form")!;
     expect(form.querySelector("input:not([type=hidden]):not([tabindex='-1']), select")!.compareDocumentPosition(summary) & Node.DOCUMENT_POSITION_PRECEDING).toBeTruthy();
     expect(screen.getAllByRole("alert")).toHaveLength(1);
-    for (const id of ["demo-name", "demo-email", "demo-company", "demo-trade", "demo-team"]) {
+    for (const id of ["demo-firstName", "demo-lastName", "demo-phone", "demo-email", "demo-company", "demo-trade", "demo-team"]) {
       const el = container.querySelector<HTMLElement>(`#${id}`);
       if (!el) continue;
       expect(el.getAttribute("aria-invalid")).toBe("true");

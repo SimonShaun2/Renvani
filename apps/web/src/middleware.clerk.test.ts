@@ -40,7 +40,7 @@ describe("middleware with Clerk enabled", () => {
     }
   );
 
-  it("serves only exact About without exposing lookalike private paths", async () => {
+  it("keeps the retired About URL as a public 404, not a login redirect", async () => {
     const middleware = await loadMiddleware();
     expect((await middleware(new NextRequest("http://localhost:3000/about"))).headers.get("location")).toBeNull();
     expect((await middleware(new NextRequest("http://localhost:3000/about/admin"))).headers.get("location")).toContain("/login");

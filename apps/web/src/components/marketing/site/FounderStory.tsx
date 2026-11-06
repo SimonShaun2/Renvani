@@ -1,5 +1,3 @@
-import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
 import { FOUNDER_STORY } from "./launch-content";
 import styles from "./founder-story.module.css";
 
@@ -11,7 +9,6 @@ export function FounderStory() {
       <h2 id="founder-story-title" className={styles.title}>{FOUNDER_STORY.title[0]}<br />{FOUNDER_STORY.title[1]}</h2>
       <p className={styles.body}>{FOUNDER_STORY.lead}</p>
       <p className={styles.body}>{FOUNDER_STORY.summary}</p>
-      <Link className={styles.storyLink} href="/about">Why we built Renvani<ArrowUpRight size={18} aria-hidden="true" /></Link>
     </div>
     <aside className={styles.credibility} aria-label="Founder field service experience">
       <p className={styles.cardEyebrow}>SERVICE FUSION EXPERIENCE</p>

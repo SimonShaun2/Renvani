@@ -1,0 +1,30 @@
+{
+  "recordedDate":"2026-11-06",
+  "scope":"Document 1 H1-H4, RCI-H01-H16",
+  "implementationCommit":"4bdf4573e5f6bf660323f0791aad2f1fed739a49",
+  "sourceDigest":"354f6dd3e49493ee328c88a0a2b98f5750dcb247ebbd362fd80caaa0eb19b934",
+  "implementationLead":"ChatGPT task",
+  "independentReviewers":[],
+  "reviewStatus":"pending",
+  "boardTicketsCreated":false,
+  "merged":false,
+  "runtimeEnabled":false,
+  "tickets":[
+    {"id":"RCI-H01","sprint":"H1","state":"delivered_for_review","artifacts":["docs/connected-intelligence/foundation/source-register.json"],"consumers":["C01","C02"],"remainingGate":"Actual current FS owner reconciliation before integration; no assignment fabricated"},
+    {"id":"RCI-H02","sprint":"H1","state":"implemented_locally_validated","artifacts":["packages/types/src/connected-intelligence/v1/catalog.ts","apps/api/src/services/connected-intelligence/foundation-math.ts"],"consumers":["C02","C13","C18"],"remainingGate":"Financial/metric policy approval"},
+    {"id":"RCI-H03","sprint":"H1","state":"delivered_for_review","artifacts":["docs/connected-intelligence/foundation/POLICY-AND-IDENTITY.md","packages/types/src/connected-intelligence/v1/quality.ts"],"consumers":["C04","C08"],"remainingGate":"Independent Security and real permission/anti-inference enforcement"},
+    {"id":"RCI-H04","sprint":"H2","state":"implemented_locally_validated","artifacts":["packages/types/src/connected-intelligence/v1/contracts.ts"],"consumers":["C02","C04"],"remainingGate":"Shared-contract adoption review"},
+    {"id":"RCI-H05","sprint":"H2","state":"implemented_locally_validated","artifacts":["packages/types/src/connected-intelligence/v1/catalog.ts","packages/types/src/connected-intelligence/v1/recipes.ts"],"consumers":["C05","C11-C23"],"remainingGate":"Real reader capability validation; foundation descriptors stay disabled"},
+    {"id":"RCI-H06","sprint":"H2","state":"implemented_locally_validated","artifacts":["packages/types/src/connected-intelligence/v1/recipes.ts"],"consumers":["C04","C07"],"remainingGate":"Real recipe/source meaning acceptance and bounded model routing"},
+    {"id":"RCI-H07","sprint":"H2","state":"implemented_locally_validated","artifacts":["packages/types/src/connected-intelligence/v1/quality.ts","apps/api/src/services/connected-intelligence/foundation-math.ts"],"consumers":["C05","C13"],"remainingGate":"Actual source completeness and policy validation"},
+    {"id":"RCI-H08","sprint":"H3","state":"implemented_locally_validated","artifacts":["packages/types/src/connected-intelligence/v1/claims.ts"],"consumers":["C07","C24"],"remainingGate":"Live model and held-out semantic evaluation"},
+    {"id":"RCI-H09","sprint":"H3","state":"implemented_locally_validated","artifacts":["packages/types/src/connected-intelligence/v1/brief-adapter.ts"],"consumers":["C05","C06"],"remainingGate":"Authenticated real-brief integration"},
+    {"id":"RCI-H10","sprint":"H3","state":"implemented_locally_validated","artifacts":["packages/types/test-fixtures/connected-intelligence.ts","packages/types/src/connected-intelligence/v1/workforce.ts","apps/api/src/services/connected-intelligence/foundation-math.test.ts"],"consumers":["C11-C13","C16-C21"],"remainingGate":"Domain financial/provider tests; synthetic inputs are not approved policies"},
+    {"id":"RCI-H11","sprint":"H3","state":"implemented_locally_validated","artifacts":["packages/types/src/connected-intelligence/v1/readiness.ts","packages/types/src/connected-intelligence/v1/readiness-attention.test.ts"],"consumers":["C14","C15","C22","C23"],"remainingGate":"Actual field/migration/go-live workflow acceptance"},
+    {"id":"RCI-H12","sprint":"H4","state":"implemented_locally_validated","artifacts":["scripts/connected-intelligence/validate-foundation.mjs","docs/connected-intelligence/foundation/ACCEPTANCE-COVERAGE.md"],"consumers":["C10","C27"],"remainingGate":"Runtime acceptance for all CI-A01-CI-A24 remains not executed"},
+    {"id":"RCI-H13","sprint":"H4","state":"implemented_locally_validated","artifacts":["packages/types/src/connected-intelligence/v1/attention.ts","packages/types/src/connected-intelligence/v1/quality.ts"],"consumers":["C09","C25"],"remainingGate":"Actual worker/event/report-delivery integration"},
+    {"id":"RCI-H14","sprint":"H4","state":"preparation_delivered_design_gaps_recorded","artifacts":["packages/types/src/connected-intelligence/v1/presentation.ts","docs/connected-intelligence/foundation/UI-STATE-CONTRACT.md"],"consumers":["C06","C15","C23"],"remainingGate":"New answer/evidence responsive Figma frames and independent visual acceptance"},
+    {"id":"RCI-H15","sprint":"H4","state":"portable_validation_delivered","artifacts":["scripts/connected-intelligence/validate-foundation.mjs","packages/types/tsconfig.connected-intelligence.json","apps/api/tsconfig.connected-intelligence.json"],"consumers":["C02","C04"],"remainingGate":"Reviewed package-export adoption; no production export in foundation"},
+    {"id":"RCI-H16","sprint":"H4","state":"handoff_delivered","artifacts":["docs/connected-intelligence/foundation/START-HERE.md","docs/connected-intelligence/foundation/validation-summary.json","docs/connected-intelligence/foundation/ticket-ledger.json"],"consumers":["C01-C28"],"remainingGate":"Independent reviews, approved exact-head CI, founder merge/activation"}
+  ]
+}

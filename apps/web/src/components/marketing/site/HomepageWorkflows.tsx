@@ -5,7 +5,6 @@ import { ArrowRight, ChevronRight } from "lucide-react";
 import { useId, useRef, useState, type KeyboardEvent } from "react";
 
 import { HOME_WORKFLOWS, type HomeWorkflowId } from "./home-workflows";
-import { LoopPauseButton } from "./LoopPauseButton";
 import { LoopVideo } from "./LoopVideo";
 import { workLoop } from "./media-loops";
 import { useWorkflowPlayback } from "./useWorkflowPlayback";
@@ -88,9 +87,6 @@ export function HomepageWorkflows() {
                 <div className={styles.scene} data-node-id={SCENE_NODES[workflow.id]} data-product={workflow.id}>
                   <div role="img" aria-label={`Illustrative ${workflow.name} product loop`} className={styles.loopStage}>
                     <LoopVideo key={workflow.id} {...workLoop(workflow.id)} alt="" objectFit="contain" frameClassName={styles.loopFrame} sizes="(min-width: 960px) 640px, 90vw" />
-                  </div>
-                  <div className={styles.loopControls}>
-                    <LoopPauseButton label={`${workflow.name} product`} />
                   </div>
                   <p className={styles.illustrationLabel}>Illustrative workflow · Example data</p>
                 </div>

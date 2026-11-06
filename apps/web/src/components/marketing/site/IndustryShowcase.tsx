@@ -5,10 +5,8 @@ import Link from "next/link";
 
 import { INDUSTRY_PHOTOS, type IndustryPhotoSlug } from "./industry-photos";
 import { INDUSTRY_PAGE_BY_SLUG } from "./industry-registry";
-import { LoopPauseButton } from "./LoopPauseButton";
 import { LoopVideo } from "./LoopVideo";
 import { tradeLoop } from "./media-loops";
-import { useLoopsPaused } from "./useLoopsPaused";
 import { usePrefersReducedMotion } from "../visuals/motion";
 import styles from "./industry-showcase.module.css";
 
@@ -43,11 +41,10 @@ const FEATURED_INDUSTRIES = [
   outcome: string;
 }[];
 
-/** Figma 586:5737, 586:5867 and 586:6029: six photo cards with muted trade loops and one shared Pause. */
+/** Figma 586:5737, 586:5867 and 586:6029: six photo cards with muted trade loops that autoplay at load. */
 export function IndustryShowcase() {
-  const [loopsPaused] = useLoopsPaused();
   const reducedMotion = usePrefersReducedMotion();
-  const playing = !loopsPaused && !reducedMotion;
+  const playing = !reducedMotion;
 
   return (
     <section className={styles.showcase} aria-labelledby="home-industries-heading" data-node-id="586:5737" data-industry-gallery data-playing={playing} data-reduced-motion={reducedMotion}>
@@ -55,9 +52,6 @@ export function IndustryShowcase() {
       <h2 id="home-industries-heading" className={styles.heading}><span>Your trade.</span>{" "}<span>Your next good job.</span></h2>
       <p className={styles.introduction}>See how Renvani fits the work you do.</p>
       <div className={styles.controls}>
-        {!reducedMotion ? (
-          <LoopPauseButton label="trade section" className={styles.outlineButton} hideWhenReducedMotion={false} playLabel="Play" pauseLabel="Pause" />
-        ) : null}
         <p className={styles.motionNote}>Small moments. A smoother working day.</p>
       </div>
       <nav aria-label="Featured industries" className={styles.cardNavigation}>
@@ -73,7 +67,7 @@ export function IndustryShowcase() {
             return (
               <Link key={card.slug} href={industry.href} className={styles.card} aria-labelledby={titleId} aria-describedby={outcomeId} data-node-id={card.nodeId} data-industry-card={card.slug}>
                 {loop ? (
-                  <LoopVideo {...loop} alt="" frameClassName={`absolute inset-0 ${styles.photo}`} className={styles.photo} sizes={sizes} />
+                  <LoopVideo {...loop} attachOnLoad alt="" frameClassName={`absolute inset-0 ${styles.photo}`} className={styles.photo} sizes={sizes} />
                 ) : (
                   <Image src={photo.src} alt="" fill sizes={sizes} className={styles.photo} style={{ objectPosition: photo.objectPosition }} data-industry-photo={card.slug} />
                 )}

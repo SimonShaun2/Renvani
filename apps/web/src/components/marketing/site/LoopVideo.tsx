@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 
 import type { PosterSet } from "./media-loops";
-import { useLoopsPaused } from "./useLoopsPaused";
 
 export type LoopVideoProps = {
   webm: string;
@@ -15,11 +14,13 @@ export type LoopVideoProps = {
   /** Applied to the outer frame (aspect + overflow). */
   frameClassName?: string | undefined;
   alt?: string | undefined;
-  /**
-   * Hero / LCP: eager poster; attach video sources only after
-   * load+idle(~3s) OR first scroll OR first pointer — whichever comes first.
-   */
+  /** Hero / LCP: eager, high-priority poster. Sources still attach at window load. */
   priority?: boolean | undefined;
+  /**
+   * Attach sources at the window load event and autoplay regardless of viewport
+   * (hero + trade cards). Otherwise sources attach when the frame nears the viewport.
+   */
+  attachOnLoad?: boolean | undefined;
   sizes?: string | undefined;
   /** Object-fit for the video/poster. */
   objectFit?: "cover" | "contain" | undefined;
@@ -27,8 +28,8 @@ export type LoopVideoProps = {
 
 /**
  * Autoplaying muted loop. Poster always renders (no JS required).
- * Sources attach only when near the viewport (and after deferral for priority).
- * Shared pause preference (localStorage) + reduced-motion → poster / frozen frame.
+ * Sources attach at window load (attachOnLoad / priority) or when near the viewport,
+ * never gated on user input. Reduced motion → still poster only.
  */
 export function LoopVideo({
   webm,
@@ -40,16 +41,17 @@ export function LoopVideo({
   frameClassName = "",
   alt = "",
   priority = false,
+  attachOnLoad = false,
   sizes = "(max-width: 390px) 390px, (max-width: 768px) 768px, 1440px",
   objectFit = "cover"
 }: LoopVideoProps) {
   const frameRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const eager = attachOnLoad || priority;
   const [near, setNear] = useState(false);
-  const [pageReady, setPageReady] = useState(!priority);
+  const [loaded, setLoaded] = useState(false);
   const [videoReady, setVideoReady] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
-  const [userPaused] = useLoopsPaused();
 
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -59,97 +61,49 @@ export function LoopVideo({
     return () => mq.removeEventListener("change", sync);
   }, []);
 
+  // Window load (keeps the poster as LCP); no idle/scroll/pointer gate.
   useEffect(() => {
-    if (!priority) return;
-    let cancelled = false;
-    let idleHandle: number | undefined;
-    let timeoutHandle: number | undefined;
-
-    const markReady = () => {
-      if (cancelled) return;
-      cancelled = true;
-      setPageReady(true);
-      cleanup();
-    };
-
-    const onScroll = () => markReady();
-    const onPointer = () => markReady();
-
-    const cleanup = () => {
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("pointerdown", onPointer);
-      window.removeEventListener("pointermove", onPointer);
-      if (idleHandle !== undefined && "cancelIdleCallback" in window) {
-        window.cancelIdleCallback(idleHandle);
-      }
-      if (timeoutHandle !== undefined) window.clearTimeout(timeoutHandle);
-    };
-
-    window.addEventListener("scroll", onScroll, { once: true, passive: true });
-    window.addEventListener("pointerdown", onPointer, { once: true, passive: true });
-    window.addEventListener("pointermove", onPointer, { once: true, passive: true });
-
-    const startIdleClock = () => {
-      timeoutHandle = window.setTimeout(() => {
-        if (typeof window.requestIdleCallback === "function") {
-          idleHandle = window.requestIdleCallback(() => markReady(), { timeout: 1000 });
-        } else {
-          markReady();
-        }
-      }, 3000);
-    };
-
+    if (!eager) return;
     if (document.readyState === "complete") {
-      startIdleClock();
-    } else {
-      window.addEventListener("load", startIdleClock, { once: true });
+      setLoaded(true);
+      return;
     }
-
-    return () => {
-      cancelled = true;
-      cleanup();
-      window.removeEventListener("load", startIdleClock);
-    };
-  }, [priority]);
+    const onLoad = () => setLoaded(true);
+    window.addEventListener("load", onLoad, { once: true });
+    return () => window.removeEventListener("load", onLoad);
+  }, [eager]);
 
   useEffect(() => {
-    if (reducedMotion) return;
+    if (eager || reducedMotion) return;
     const node = frameRef.current;
     if (!node) return;
     const io = new IntersectionObserver(
       (entries) => {
-        for (const entry of entries) {
-          setNear(entry.isIntersecting);
-        }
+        for (const entry of entries) setNear(entry.isIntersecting);
       },
       { rootMargin: "0px 0px", threshold: 0.01 }
     );
     io.observe(node);
     return () => io.disconnect();
-  }, [reducedMotion]);
+  }, [eager, reducedMotion]);
 
-  const shouldAttach = near && pageReady && !reducedMotion;
-  const shouldPlay = shouldAttach && !userPaused;
+  const shouldAttach = !reducedMotion && (eager ? loaded : near);
 
+  // Load the attached sources, then start playback programmatically (load() first so play() is not aborted).
   useEffect(() => {
     const video = videoRef.current;
     if (!video || reducedMotion) return;
-    if (shouldAttach) {
-      if (shouldPlay) {
-        void Promise.resolve(video.play()).catch(() => undefined);
-      } else {
-        video.pause();
-      }
-    } else {
+    if (!shouldAttach) {
       video.pause();
       setVideoReady(false);
+      return;
     }
-  }, [shouldAttach, shouldPlay, reducedMotion, webm, mp4]);
-
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video || reducedMotion || !shouldAttach) return;
+    video.muted = true;
+    video.defaultMuted = true;
     video.load();
+    void Promise.resolve(video.play()).catch((error: unknown) => {
+      console.warn("[LoopVideo] play() rejected", webm, error);
+    });
   }, [shouldAttach, reducedMotion, webm, mp4]);
 
   const fitClass = objectFit === "contain" ? "object-contain" : "object-cover";
@@ -160,7 +114,6 @@ export function LoopVideo({
       ref={frameRef}
       className={`relative overflow-hidden ${frameClassName}`}
       style={{ aspectRatio: `${width} / ${height}` }}
-      data-loop-paused={userPaused || undefined}
     >
       <picture>
         <source type="image/avif" srcSet={poster.avifSrcSet} sizes={sizes} />
@@ -194,7 +147,7 @@ export function LoopVideo({
           playsInline
           preload={shouldAttach ? "metadata" : "none"}
           aria-hidden="true"
-          autoPlay={shouldPlay}
+          autoPlay
           onPlaying={() => setVideoReady(true)}
           onCanPlay={() => {
             if (videoRef.current && !videoRef.current.paused) setVideoReady(true);

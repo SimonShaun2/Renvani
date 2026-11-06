@@ -231,8 +231,3 @@
 .loopFrame { width: 100%; background: #0f1530; }
 .scene > .illustrationLabel { margin: 0; padding: 16px 20px 20px; }
 
-.loopControls {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 12px;
-}

@@ -1,0 +1,403 @@
+{
+  "schemaVersion": "om-preparation.command-center/1.0",
+  "baseCommit": "7840884d346ca95788e2668cc78148afa3b6a843",
+  "sourceNotionUrl": "https://app.notion.com/p/40e317b92d1581188031e8a0a4c847c9",
+  "sourceSections": [
+    4,
+    6,
+    8,
+    16,
+    17,
+    21
+  ],
+  "implementationStatus": "not_started",
+  "policyStatus": "proposed_preparation",
+  "cards": [
+    {
+      "missionType": "more_bookings",
+      "label": "Get more bookings",
+      "description": "Find a supported way to turn eligible demand into confirmed service.",
+      "resultDescription": "Net confirmed bookings, with cancellations, completed work and economic safeguards shown.",
+      "assessmentEnabledWhen": "Authenticated permitted read scope and supported mission definition are present.",
+      "activation": "not_implemented",
+      "exactApprovedMissionFrame": null
+    },
+    {
+      "missionType": "monthly_revenue",
+      "label": "Increase my monthly revenue",
+      "description": "Choose a bounded plan around the main revenue constraint.",
+      "resultDescription": "Earned service revenue for the declared business period; cash and unbilled work shown separately.",
+      "assessmentEnabledWhen": "Authenticated permitted read scope and supported mission definition are present.",
+      "activation": "not_implemented",
+      "exactApprovedMissionFrame": null
+    },
+    {
+      "missionType": "average_job_value",
+      "label": "Increase my average job value",
+      "description": "Offer appropriate service options using approved scope and pricing.",
+      "resultDescription": "Net value per eligible completed job, with revenue per eligible opportunity and acceptance safeguards.",
+      "assessmentEnabledWhen": "Authenticated permitted read scope and supported mission definition are present.",
+      "activation": "not_implemented",
+      "exactApprovedMissionFrame": null
+    },
+    {
+      "missionType": "repeat_business",
+      "label": "Get more repeat business",
+      "description": "Identify supported due service and agreement opportunities.",
+      "resultDescription": "Eligible completed repeat service; callbacks, warranty work and included benefits remain distinct.",
+      "assessmentEnabledWhen": "Authenticated permitted read scope and supported mission definition are present.",
+      "activation": "not_implemented",
+      "exactApprovedMissionFrame": null
+    },
+    {
+      "missionType": "faster_payment",
+      "label": "Get paid faster",
+      "description": "Resolve the delay between completed work, invoicing and payment.",
+      "resultDescription": "Choose the relevant delay measure before approval; show open invoices and recovered cash separately.",
+      "assessmentEnabledWhen": "Authenticated permitted read scope and supported mission definition are present.",
+      "activation": "not_implemented",
+      "exactApprovedMissionFrame": null
+    },
+    {
+      "missionType": "organize_business",
+      "label": "Organize my business",
+      "description": "Check unfinished work, scheduling, materials and service opportunities.",
+      "resultDescription": "Verified issue resolutions plus scan coverage, unknowns and reopened findings.",
+      "assessmentEnabledWhen": "Authenticated permitted read scope and supported mission definition are present.",
+      "activation": "not_implemented",
+      "exactApprovedMissionFrame": null
+    }
+  ],
+  "states": [
+    {
+      "caseId": "OM-UI-01",
+      "state": "assessment_available",
+      "title": "Start assessment",
+      "body": "We can review the available records and prepare a plan.",
+      "primaryActionLabel": "Assess and recommend",
+      "invariants": [
+        "No consequential action or customer contact is authorized by selection."
+      ],
+      "behavior": "Inspect the existing account data and show missing inputs.",
+      "status": "prepared",
+      "browserAcceptance": "not_executed",
+      "designAcceptance": "not_verified"
+    },
+    {
+      "caseId": "OM-UI-02",
+      "state": "assessing",
+      "title": "Review in progress",
+      "body": "We are checking the relevant records. Covered: 120 of 200 records; more remain.",
+      "primaryActionLabel": "View progress",
+      "invariants": [
+        "Do not show a complete scan or ready-to-run plan before the scoped read finishes."
+      ],
+      "behavior": "Show deterministic progress, continuation and coverage.",
+      "status": "prepared",
+      "browserAcceptance": "not_executed",
+      "designAcceptance": "not_verified"
+    },
+    {
+      "caseId": "OM-UI-03",
+      "state": "needs_input",
+      "title": "A decision is needed",
+      "body": "Choose a target and review period so this plan has a clear result.",
+      "primaryActionLabel": "Set target and limits",
+      "invariants": [
+        "Do not invent a target, margin floor or business policy."
+      ],
+      "behavior": "Prefill known information; ask only for missing decisions.",
+      "status": "prepared",
+      "browserAcceptance": "not_executed",
+      "designAcceptance": "not_verified"
+    },
+    {
+      "caseId": "OM-UI-04",
+      "state": "assessment_only",
+      "title": "This method is available for planning",
+      "body": "The ad account and spending controls have not been verified.",
+      "primaryActionLabel": "Review connection requirements",
+      "invariants": [
+        "No executable campaign launch or claimed live readiness."
+      ],
+      "behavior": "Keep useful drafts and available internal methods visible.",
+      "status": "prepared",
+      "browserAcceptance": "not_executed",
+      "designAcceptance": "not_verified"
+    },
+    {
+      "caseId": "OM-UI-05",
+      "state": "ready_for_review",
+      "title": "Review your plan",
+      "body": "Review the approach, scope, limits and unresolved assumptions before approving.",
+      "primaryActionLabel": "Review plan",
+      "invariants": [
+        "The button opens a bounded plan review; it does not approve unspecified future actions."
+      ],
+      "behavior": "Show reasons, source age, two-strategy ceiling, recipients, content and next review.",
+      "status": "prepared",
+      "browserAcceptance": "not_executed",
+      "designAcceptance": "not_verified"
+    },
+    {
+      "caseId": "OM-UI-06",
+      "state": "approval_missing_policy",
+      "title": "Approval needs a limit",
+      "body": "A required completion safeguard has no accepted threshold.",
+      "primaryActionLabel": "Set the missing safeguard",
+      "invariants": [
+        "Do not enable approval by treating missing mandatory policy as passing."
+      ],
+      "behavior": "Link the specific unresolved target/guardrail field.",
+      "status": "prepared",
+      "browserAcceptance": "not_executed",
+      "designAcceptance": "not_verified"
+    },
+    {
+      "caseId": "OM-UI-07",
+      "state": "approved_waiting",
+      "title": "Approved within these limits",
+      "body": "This exact plan is approved. Its actions still check current consent, resources and limits.",
+      "primaryActionLabel": "View approved scope",
+      "invariants": [
+        "Approval is not provider delivery or business success."
+      ],
+      "behavior": "Show approved version, human-readable exposure, expiry and applicable capability scopes.",
+      "status": "prepared",
+      "browserAcceptance": "not_executed",
+      "designAcceptance": "not_verified"
+    },
+    {
+      "caseId": "OM-UI-08",
+      "state": "source_changed",
+      "title": "Plan needs another review",
+      "body": "The schedule or source record changed after this plan was prepared.",
+      "primaryActionLabel": "Review updated plan",
+      "invariants": [
+        "Do not reuse stale approval for material changes."
+      ],
+      "behavior": "Explain the changed field and preserve the previous plan as history.",
+      "status": "prepared",
+      "browserAcceptance": "not_executed",
+      "designAcceptance": "not_verified"
+    },
+    {
+      "caseId": "OM-UI-09",
+      "state": "running_queued",
+      "title": "Action queued",
+      "body": "The request is queued. Delivery has not been confirmed.",
+      "primaryActionLabel": "View activity",
+      "invariants": [
+        "Never show 'message sent', 'customer reached' or a booking from a queued receipt."
+      ],
+      "behavior": "Separate requested, dispatched, provider-acknowledged and verified stages.",
+      "status": "prepared",
+      "browserAcceptance": "not_executed",
+      "designAcceptance": "not_verified"
+    },
+    {
+      "caseId": "OM-UI-10",
+      "state": "provider_unknown",
+      "title": "Delivery needs checking",
+      "body": "The provider may have received the request. We are checking before trying again.",
+      "primaryActionLabel": "View reconciliation",
+      "invariants": [
+        "No blind resend and no assertion that the side effect failed or succeeded."
+      ],
+      "behavior": "Preserve request identity and show the accountable follow-up when automated checking cannot resolve it.",
+      "status": "prepared",
+      "browserAcceptance": "not_executed",
+      "designAcceptance": "not_verified"
+    },
+    {
+      "caseId": "OM-UI-11",
+      "state": "waiting_customer",
+      "title": "Waiting for the customer",
+      "body": "The customer has not accepted the proposed next step.",
+      "primaryActionLabel": "View next check",
+      "invariants": [
+        "Do not count an assessment offer or unanswered estimate as a booking."
+      ],
+      "behavior": "Show cadence and expiry without a running model or blocked worker.",
+      "status": "prepared",
+      "browserAcceptance": "not_executed",
+      "designAcceptance": "not_verified"
+    },
+    {
+      "caseId": "OM-UI-12",
+      "state": "monitoring_maturation",
+      "title": "Work is still maturing",
+      "body": "The review period ended, but an accepted job or payment result is still pending.",
+      "primaryActionLabel": "View observed results",
+      "invariants": [
+        "Do not force immature outcomes into wins or losses."
+      ],
+      "behavior": "Show next verification condition, timeframe and separately known results.",
+      "status": "prepared",
+      "browserAcceptance": "not_executed",
+      "designAcceptance": "not_verified"
+    },
+    {
+      "caseId": "OM-UI-13",
+      "state": "completed_target_met",
+      "title": "Review complete; target met",
+      "body": "The declared target and required safeguards passed using matured evidence.",
+      "primaryActionLabel": "View evidence",
+      "invariants": [
+        "No claim of causal lift unless a separate evaluated analysis supports it."
+      ],
+      "behavior": "Show the target comparison, safeguards and accounting basis.",
+      "status": "prepared",
+      "browserAcceptance": "not_executed",
+      "designAcceptance": "not_verified"
+    },
+    {
+      "caseId": "OM-UI-14",
+      "state": "completed_guardrail_failed",
+      "title": "Review complete; target not met",
+      "body": "The booking target was reached, but a required completion safeguard failed.",
+      "primaryActionLabel": "Review results",
+      "invariants": [
+        "Do not label the mission successful just because the headline count passed."
+      ],
+      "behavior": "Show both the observed booking gain and failed safeguard.",
+      "status": "prepared",
+      "browserAcceptance": "not_executed",
+      "designAcceptance": "not_verified"
+    },
+    {
+      "caseId": "OM-UI-15",
+      "state": "completed_not_evaluable",
+      "title": "Review complete; result cannot be evaluated",
+      "body": "Required evidence is missing and cannot be recovered for this review.",
+      "primaryActionLabel": "See missing evidence",
+      "invariants": [
+        "Do not replace unknown with zero or hide verified partial results."
+      ],
+      "behavior": "Show evidence gap, affected scope and useful next action.",
+      "status": "prepared",
+      "browserAcceptance": "not_executed",
+      "designAcceptance": "not_verified"
+    },
+    {
+      "caseId": "OM-UI-16",
+      "state": "paused_inflight",
+      "title": "Paused; earlier actions still being checked",
+      "body": "New dispatches are paused. An earlier provider request is still being reconciled.",
+      "primaryActionLabel": "Review or resume",
+      "invariants": [
+        "Pause does not unsend messages or reverse payments."
+      ],
+      "behavior": "Resume requires current plan, authority and resource checks.",
+      "status": "prepared",
+      "browserAcceptance": "not_executed",
+      "designAcceptance": "not_verified"
+    },
+    {
+      "caseId": "OM-UI-17",
+      "state": "cancelled_shared_work",
+      "title": "Cancelled for this mission",
+      "body": "Unused claims were released. Shared work covered by another valid plan may continue.",
+      "primaryActionLabel": "View retained work",
+      "invariants": [
+        "Do not cancel another mission's authorized shared action or claim an existing effect was reversed."
+      ],
+      "behavior": "Explain contributor and sponsorship state in plain language.",
+      "status": "prepared",
+      "browserAcceptance": "not_executed",
+      "designAcceptance": "not_verified"
+    },
+    {
+      "caseId": "OM-UI-18",
+      "state": "organize_partial_and_critical",
+      "title": "Business review needs attention",
+      "body": "Three routine decisions are shown first. Two critical issues and incomplete coverage also need review.",
+      "primaryActionLabel": "Review issues",
+      "invariants": [
+        "Critical exceptions are never hidden by the three-routine-decision display limit."
+      ],
+      "behavior": "Expose all scoped findings, covered ranges, deduplicated linked work and verification requests.",
+      "status": "prepared",
+      "browserAcceptance": "not_executed",
+      "designAcceptance": "not_verified"
+    },
+    {
+      "caseId": "OM-UI-19",
+      "state": "no_history",
+      "title": "A small first test is possible",
+      "body": "There is not enough local history to estimate a reliable return.",
+      "primaryActionLabel": "Review a bounded test",
+      "invariants": [
+        "No fabricated recovery backlog, industry certainty or automatic spending expansion."
+      ],
+      "behavior": "Show assumptions, unknown costs and required owner-approved exposure.",
+      "status": "prepared",
+      "browserAcceptance": "not_executed",
+      "designAcceptance": "not_verified"
+    },
+    {
+      "caseId": "OM-UI-20",
+      "state": "hard_daily_limit_unavailable",
+      "title": "This spending limit is not supported",
+      "body": "The verified campaign control caps the total, but does not enforce your required daily ceiling.",
+      "primaryActionLabel": "Review other options",
+      "invariants": [
+        "An average daily budget or polling does not satisfy a daily hard limit."
+      ],
+      "behavior": "Keep the method drafted until a separately verified compatible control exists.",
+      "status": "prepared",
+      "browserAcceptance": "not_executed",
+      "designAcceptance": "not_verified"
+    }
+  ],
+  "designEvidence": {
+    "canonicalFile": "jiGHTNUJNltWbHA4Il3hk7",
+    "referenceOnly": [
+      {
+        "mapId": "CC-01",
+        "nodeId": "10:2",
+        "surface": "Existing Command Center",
+        "url": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=10-2"
+      },
+      {
+        "mapId": "AG-01",
+        "nodeId": "10:220",
+        "surface": "Existing approval states",
+        "url": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=10-220"
+      },
+      {
+        "mapId": "AOF-01",
+        "nodeId": "331:4113",
+        "surface": "Operating Profile interview reference",
+        "url": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=331-4113"
+      },
+      {
+        "mapId": "AOF-02",
+        "nodeId": "331:4170",
+        "surface": "Operating Profile approval reference",
+        "url": "https://www.figma.com/design/jiGHTNUJNltWbHA4Il3hk7/FSM-Agent-Product-Design?node-id=331-4170"
+      }
+    ],
+    "sourceMap": "docs/design/fs-51-figma-route-map.json",
+    "sourceMapBaseline": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+    "inspectedAgain": false,
+    "newMissionFrames": [],
+    "parityVerdict": "NOT_VERIFIED",
+    "decisionRef": "OM-D08"
+  },
+  "suggestedQaViewports": [
+    {
+      "width": 390,
+      "height": 844
+    },
+    {
+      "width": 834,
+      "height": 1112
+    },
+    {
+      "width": 1440,
+      "height": 900
+    }
+  ],
+  "viewportStatus": "suggested_qa_inputs_not_approved_design_breakpoints"
+}

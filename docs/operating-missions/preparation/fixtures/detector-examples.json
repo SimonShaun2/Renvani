@@ -1,0 +1,1723 @@
+{
+  "schemaVersion": "1.0.0-preparation",
+  "artifactKind": "organize_detector_fixtures",
+  "status": "prepared_not_executed",
+  "runtimeEnabled": false,
+  "executionEvidence": [],
+  "source": {
+    "specVersion": "1.1",
+    "sections": [
+      "§9.1",
+      "§15",
+      "§18",
+      "§21"
+    ],
+    "notionUrl": "https://app.notion.com/p/40e317b92d1581188031e8a0a4c847c9",
+    "baseCommit": "7840884d346ca95788e2668cc78148afa3b6a843"
+  },
+  "syntheticContext": {
+    "allDataSynthetic": true,
+    "tenantTimeZone": "America/Chicago",
+    "timeZoneIsFixtureInputNotDefault": true,
+    "operatingCalendar": {
+      "weekdays": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "openLocal": "09:00",
+      "closeLocal": "17:00",
+      "holidays": [],
+      "status": "explicit_synthetic_calendar_not_business_policy"
+    },
+    "asOf": "2026-11-05T16:00:00Z",
+    "freshness": "Fixture declares current/stale status; real field TTLs require OM-D06.",
+    "identity": "Conservative continuity examples retain same tenant/entity/condition episode on invalidated resolution; production identity/split/merge policy remains OM-D07.",
+    "authority": "Only read/draft permission is assumed unless a fixture explicitly supplies an existing exact approved domain action; the fixture is never an actual grant."
+  },
+  "detectors": [
+    {
+      "id": "OM-DET-R01",
+      "area": "unfinished_work",
+      "condition": "no_valid_next_action",
+      "authoritativeSources": [
+        "estimate",
+        "growth_intake"
+      ],
+      "positiveCondition": "Eligible open estimate/inquiry lacks a valid owned next action after the applicable operating-calendar interval.",
+      "negativeConditions": [
+        "Accepted/declined/expired scope",
+        "New customer reply awaiting staff",
+        "Existing valid next action or active compatible action"
+      ],
+      "unknownBehavior": "Request current status/contact/action evidence; no contact from age alone.",
+      "resolutionEvidence": "A valid accountable next action with due date resolves this condition only; the estimate's business outcome stays pending.",
+      "methodIds": [
+        "operations_review.v1",
+        "estimate_recovery.v1"
+      ],
+      "decisionRefs": [
+        "OM-D05",
+        "OM-D06",
+        "OM-D07"
+      ]
+    },
+    {
+      "id": "OM-DET-R02",
+      "area": "unfinished_work",
+      "condition": "missing_invoice_documentation",
+      "authoritativeSources": [
+        "job",
+        "invoice"
+      ],
+      "positiveCondition": "Verified billable completion lacks an accepted required document and is unfinalized at least one business day, with no later contractual milestone.",
+      "negativeConditions": [
+        "Not billable/completed",
+        "Later contract milestone",
+        "Documentation already accepted",
+        "Invoice task active"
+      ],
+      "unknownBehavior": "Verify completion/milestone/document authority before issue; do not fabricate documentation.",
+      "resolutionEvidence": "Authoritative acceptance of the required document; invoicing and payment remain separate outcomes.",
+      "methodIds": [
+        "operations_review.v1",
+        "invoice_readiness.v1"
+      ],
+      "decisionRefs": [
+        "OM-D06",
+        "OM-D07"
+      ]
+    },
+    {
+      "id": "OM-DET-R03",
+      "area": "unfinished_work",
+      "condition": "unfulfilled_benefit",
+      "authoritativeSources": [
+        "agreement",
+        "job"
+      ],
+      "positiveCondition": "An authoritative included benefit is due in thirty days/overdue and no fulfilled or active fulfillment record covers the obligation.",
+      "negativeConditions": [
+        "Benefit already fulfilled",
+        "Due outside configured window",
+        "Valid active fulfillment action"
+      ],
+      "unknownBehavior": "Verify agreement/benefit due rule and obligation; do not invent an interval.",
+      "resolutionEvidence": "Authoritative fulfillment linked to the obligation, not a reminder or duplicate paid-service record.",
+      "methodIds": [
+        "operations_review.v1",
+        "due_service.v1"
+      ],
+      "decisionRefs": [
+        "OM-D02",
+        "OM-D06",
+        "OM-D07"
+      ]
+    },
+    {
+      "id": "OM-DET-R04",
+      "area": "scheduling_and_job_readiness",
+      "condition": "infeasible_commitment",
+      "authoritativeSources": [
+        "booking",
+        "dispatch",
+        "job"
+      ],
+      "positiveCondition": "Committed work within fourteen days has a verified qualification/window/travel/time conflict or missing required job prerequisite; verified risk within forty-eight hours is urgent.",
+      "negativeConditions": [
+        "All hard constraints feasible",
+        "Only unequal technician job counts",
+        "Speculative opportunity without committed work"
+      ],
+      "unknownBehavior": "Create scoped verification for unknown required facts; do not equate uncertainty with a proven infeasible assignment.",
+      "resolutionEvidence": "Authoritative feasible committed schedule and accepted required prerequisites; a proposal is not correction.",
+      "methodIds": [
+        "operations_review.v1",
+        "schedule_correction.v1"
+      ],
+      "decisionRefs": [
+        "OM-D06",
+        "OM-D07"
+      ]
+    },
+    {
+      "id": "OM-DET-R05",
+      "area": "inventory_and_materials",
+      "condition": "unverified_or_short_required_stock",
+      "authoritativeSources": [
+        "inventory",
+        "job"
+      ],
+      "positiveCondition": "Known requirements for committed work exceed verified on-hand minus committed reservations, or required stock is stale/unverified.",
+      "negativeConditions": [
+        "Verified available-to-promise stock sufficient without counting unreceived orders",
+        "Unknown repair part for a diagnostic visit is not an invented requirement"
+      ],
+      "unknownBehavior": "Request accountable stock verification with checker, timestamp, location, item and quantity; keep available quantity null. Never count unreceived orders as available stock or use them to suppress a verified shortage.",
+      "resolutionEvidence": "Required stock verified and reserved or a supported approved transfer verified; purchase recommendation/order alone cannot resolve.",
+      "methodIds": [
+        "operations_review.v1",
+        "material_readiness.v1"
+      ],
+      "decisionRefs": [
+        "OM-D06",
+        "OM-D07",
+        "OM-D09"
+      ]
+    },
+    {
+      "id": "OM-DET-R06",
+      "area": "relevant_product_and_service_opportunities",
+      "condition": "documented_suitable_need_absent_from_estimate",
+      "authoritativeSources": [
+        "job",
+        "product_catalog",
+        "estimate"
+      ],
+      "positiveCondition": "Documented customer need or qualified finding maps to compatible approved catalog option absent from the current estimate.",
+      "negativeConditions": [
+        "No documented need/qualified finding",
+        "Incompatible/unapproved option",
+        "Current option already present",
+        "Customer declined this option/scope"
+      ],
+      "unknownBehavior": "Verify need, compatibility, catalog/price version and feasibility; no invented technical claim, price or recommendation.",
+      "resolutionEvidence": "Current suitable option added to a permitted draft or accepted appropriate disposition; presenting it does not prove sale, completed work or earned revenue.",
+      "methodIds": [
+        "operations_review.v1",
+        "service_options.v1"
+      ],
+      "decisionRefs": [
+        "OM-D03",
+        "OM-D06",
+        "OM-D07"
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "id": "OM-DET-01",
+      "area": "unfinished_work",
+      "scenario": "positive",
+      "status": "prepared_not_executed",
+      "detectorId": "OM-DET-R01",
+      "description": "Open estimate without valid next action.",
+      "inputs": {
+        "companyId": "fixture-company-a",
+        "asOf": "2026-11-05T16:00:00Z",
+        "facts": {
+          "estimateId": "estimate-01",
+          "version": 4,
+          "status": "sent",
+          "validScope": true,
+          "lastMeaningfulContact": "2026-11-02T15:00:00Z",
+          "customerReplyAwaitingStaff": false,
+          "currentAction": null,
+          "currentPermission": "read_and_draft_only"
+        }
+      },
+      "expected": {
+        "disposition": "create_finding",
+        "identity": {
+          "companyId": "fixture-company-a",
+          "entityId": "estimate-01",
+          "condition": "no_valid_next_action",
+          "episodeId": "fixture-episode-1",
+          "missionIdExcluded": true,
+          "policyStatus": "synthetic_identity_pending_OM-D07"
+        },
+        "findingState": "open",
+        "priority": "operational_delay",
+        "allowed": [
+          "Create an internal draft with an accountable next action and proposed due date"
+        ],
+        "refused": [
+          "Send follow-up without exact current approval/consent",
+          "Claim recovered booking/revenue"
+        ],
+        "customerOutcome": "pending",
+        "modelCalls": 0,
+        "financialClaim": null,
+        "actualExecutionAuthorized": false
+      },
+      "acceptanceIds": [
+        "OM-A09",
+        "OM-A20"
+      ],
+      "decisionRefs": [
+        "OM-D06",
+        "OM-D07"
+      ]
+    },
+    {
+      "id": "OM-DET-02",
+      "area": "unfinished_work",
+      "scenario": "negative",
+      "status": "prepared_not_executed",
+      "detectorId": "OM-DET-R01",
+      "description": "Explicitly declined estimate is not stale recovery work.",
+      "inputs": {
+        "companyId": "fixture-company-a",
+        "asOf": "2026-11-05T16:00:00Z",
+        "facts": {
+          "estimateId": "estimate-02",
+          "version": 3,
+          "status": "declined",
+          "lastMeaningfulContact": "2026-10-01T15:00:00Z",
+          "nextAction": null
+        }
+      },
+      "expected": {
+        "disposition": "no_finding",
+        "reason": "Decline makes recovery ineligible regardless of age.",
+        "allowed": [
+          "Preserve declined status"
+        ],
+        "refused": [
+          "Create age-only recovery task",
+          "Send follow-up"
+        ],
+        "modelCalls": 0,
+        "financialClaim": null,
+        "actualExecutionAuthorized": false
+      },
+      "acceptanceIds": [
+        "OM-A09",
+        "OM-A20"
+      ],
+      "decisionRefs": [
+        "OM-D06",
+        "OM-D07"
+      ]
+    },
+    {
+      "id": "OM-DET-03",
+      "area": "unfinished_work",
+      "scenario": "stale",
+      "status": "prepared_not_executed",
+      "detectorId": "OM-DET-R01",
+      "description": "Snapshot misses a newer customer reply awaiting staff.",
+      "inputs": {
+        "companyId": "fixture-company-a",
+        "asOf": "2026-11-05T16:00:00Z",
+        "facts": {
+          "estimateId": "estimate-03",
+          "snapshotVersion": 4,
+          "currentVersion": 5,
+          "snapshotReplyAwaitingStaff": false,
+          "currentReplyAwaitingStaff": true,
+          "previousDraft": "draft-reminder-03"
+        }
+      },
+      "expected": {
+        "disposition": "needs_verification",
+        "findingState": "verification_required",
+        "allowed": [
+          "Refresh current source and route the reply to staff"
+        ],
+        "refused": [
+          "Dispatch stale reminder",
+          "Close pending estimate outcome"
+        ],
+        "invalidatedDraft": "draft-reminder-03",
+        "modelCalls": 0,
+        "financialClaim": null,
+        "actualExecutionAuthorized": false
+      },
+      "acceptanceIds": [
+        "OM-A09",
+        "OM-A20"
+      ],
+      "decisionRefs": [
+        "OM-D06",
+        "OM-D07"
+      ]
+    },
+    {
+      "id": "OM-DET-04",
+      "area": "unfinished_work",
+      "scenario": "duplicate",
+      "status": "prepared_not_executed",
+      "detectorId": "OM-DET-R01",
+      "description": "Two missions find the same episode with work already active.",
+      "inputs": {
+        "companyId": "fixture-company-a",
+        "asOf": "2026-11-05T16:00:00Z",
+        "facts": {
+          "estimateId": "estimate-04",
+          "version": 3,
+          "missionIds": [
+            "fixture-organize",
+            "fixture-revenue"
+          ],
+          "existingFinding": "finding-04",
+          "existingEpisode": "fixture-episode-1",
+          "activeAction": {
+            "id": "action-04",
+            "intent": "estimate_next_action",
+            "state": "approved"
+          }
+        }
+      },
+      "expected": {
+        "disposition": "link_existing",
+        "identity": {
+          "companyId": "fixture-company-a",
+          "entityId": "estimate-04",
+          "condition": "no_valid_next_action",
+          "episodeId": "fixture-episode-1",
+          "missionIdExcluded": true,
+          "policyStatus": "synthetic_identity_pending_OM-D07"
+        },
+        "canonicalFindingCount": 1,
+        "canonicalActiveActionCount": 1,
+        "allowed": [
+          "Link both contributor missions to existing finding/action"
+        ],
+        "refused": [
+          "Create a duplicate reminder",
+          "Use a separate mission contact budget"
+        ],
+        "modelCalls": 0,
+        "financialClaim": null,
+        "actualExecutionAuthorized": false
+      },
+      "acceptanceIds": [
+        "OM-A10",
+        "OM-A20"
+      ],
+      "decisionRefs": [
+        "OM-D06",
+        "OM-D07"
+      ]
+    },
+    {
+      "id": "OM-DET-05",
+      "area": "unfinished_work",
+      "scenario": "reopen",
+      "status": "prepared_not_executed",
+      "detectorId": "OM-DET-R01",
+      "description": "The sole scheduled next action was cancelled without replacement.",
+      "inputs": {
+        "companyId": "fixture-company-a",
+        "asOf": "2026-11-05T16:00:00Z",
+        "facts": {
+          "estimateId": "estimate-05",
+          "currentVersion": 7,
+          "previousFindingState": "resolved",
+          "priorResolution": {
+            "id": "event-next-action-05",
+            "kind": "next_action_assigned"
+          },
+          "newEvent": {
+            "id": "event-next-action-cancel-05",
+            "kind": "next_action_cancelled"
+          },
+          "replacementNextAction": null,
+          "sameConditionContinuity": true
+        }
+      },
+      "expected": {
+        "disposition": "reopen_finding",
+        "identity": {
+          "companyId": "fixture-company-a",
+          "entityId": "estimate-05",
+          "condition": "no_valid_next_action",
+          "episodeId": "fixture-episode-1",
+          "missionIdExcluded": true,
+          "policyStatus": "synthetic_identity_pending_OM-D07"
+        },
+        "findingState": "open",
+        "allowed": [
+          "Preserve prior closure and reopen event in the same fixture episode",
+          "Assign accountable review"
+        ],
+        "refused": [
+          "Erase resolution history",
+          "Count reopened issue as a newly recovered sale"
+        ],
+        "modelCalls": 0,
+        "financialClaim": null,
+        "actualExecutionAuthorized": false
+      },
+      "acceptanceIds": [
+        "OM-A14",
+        "OM-A20"
+      ],
+      "decisionRefs": [
+        "OM-D06",
+        "OM-D07"
+      ]
+    },
+    {
+      "id": "OM-DET-06",
+      "area": "unfinished_work",
+      "scenario": "resolution",
+      "status": "prepared_not_executed",
+      "detectorId": "OM-DET-R01",
+      "description": "Valid next action resolves its condition but not the estimate outcome.",
+      "inputs": {
+        "companyId": "fixture-company-a",
+        "asOf": "2026-11-05T16:00:00Z",
+        "facts": {
+          "estimateId": "estimate-06",
+          "version": 9,
+          "status": "sent",
+          "findingState": "open",
+          "acceptedNextAction": {
+            "id": "next-action-06",
+            "ownerId": "fixture-staff-1",
+            "dueAt": "2026-11-06T16:00:00Z",
+            "scope": "staff_review_customer_reply",
+            "acceptedEventId": "next-action-accepted-06"
+          }
+        }
+      },
+      "expected": {
+        "disposition": "resolve_finding",
+        "findingState": "resolved",
+        "resolutionEvidenceRefs": [
+          "next-action-accepted-06"
+        ],
+        "allowed": [
+          "Report one verified missing-next-action resolution"
+        ],
+        "refused": [
+          "Report estimate accepted",
+          "Report recovered booking/revenue"
+        ],
+        "customerOutcome": "pending",
+        "modelCalls": 0,
+        "financialClaim": null,
+        "actualExecutionAuthorized": false
+      },
+      "acceptanceIds": [
+        "OM-A15",
+        "OM-A20"
+      ],
+      "decisionRefs": [
+        "OM-D06",
+        "OM-D07"
+      ]
+    },
+    {
+      "id": "OM-DET-07",
+      "area": "scheduling_and_job_readiness",
+      "scenario": "positive",
+      "status": "prepared_not_executed",
+      "detectorId": "OM-DET-R04",
+      "description": "Committed assignment violates a verified required qualification.",
+      "inputs": {
+        "companyId": "fixture-company-a",
+        "asOf": "2026-11-05T16:00:00Z",
+        "facts": {
+          "jobId": "job-07",
+          "version": 2,
+          "startAt": "2026-11-06T16:00:00Z",
+          "requiredSkill": "fixture-approved-skill-a",
+          "assignedTechnicianSkills": [
+            "fixture-skill-b"
+          ],
+          "requirementSource": "fixture-approved-job-requirements-v2",
+          "customerWindowVerified": true
+        }
+      },
+      "expected": {
+        "disposition": "create_finding",
+        "identity": {
+          "companyId": "fixture-company-a",
+          "entityId": "job-07",
+          "condition": "infeasible_commitment",
+          "episodeId": "fixture-episode-1",
+          "missionIdExcluded": true,
+          "policyStatus": "synthetic_identity_pending_OM-D07"
+        },
+        "findingState": "open",
+        "priority": "urgent_committed_work",
+        "allowed": [
+          "Flag verified risk and draft only feasible qualified alternatives"
+        ],
+        "refused": [
+          "Rank unqualified technician as acceptable",
+          "Commit reassignment without authority"
+        ],
+        "modelCalls": 0,
+        "financialClaim": null,
+        "actualExecutionAuthorized": false
+      },
+      "acceptanceIds": [
+        "OM-A11",
+        "OM-A20"
+      ],
+      "decisionRefs": [
+        "OM-D06",
+        "OM-D07"
+      ]
+    },
+    {
+      "id": "OM-DET-08",
+      "area": "scheduling_and_job_readiness",
+      "scenario": "negative",
+      "status": "prepared_not_executed",
+      "detectorId": "OM-DET-R04",
+      "description": "Unequal job counts with feasible work are not a defect.",
+      "inputs": {
+        "companyId": "fixture-company-a",
+        "asOf": "2026-11-05T16:00:00Z",
+        "facts": {
+          "technicianJobCounts": {
+            "fixture-tech-a": 2,
+            "fixture-tech-b": 5
+          },
+          "allRequiredSkillsPass": true,
+          "allCustomerWindowsPass": true,
+          "travelAndDurationFeasible": true,
+          "allCommitmentsSatisfied": true
+        }
+      },
+      "expected": {
+        "disposition": "no_finding",
+        "reason": "Counts alone are not an operational defect.",
+        "allowed": [
+          "Report scoped feasible coverage"
+        ],
+        "refused": [
+          "Invent balancing correction",
+          "Disrupt committed work to equalize counts"
+        ],
+        "modelCalls": 0,
+        "financialClaim": null,
+        "actualExecutionAuthorized": false
+      },
+      "acceptanceIds": [
+        "OM-A11",
+        "OM-A20"
+      ],
+      "decisionRefs": [
+        "OM-D06",
+        "OM-D07"
+      ]
+    },
+    {
+      "id": "OM-DET-09",
+      "area": "scheduling_and_job_readiness",
+      "scenario": "stale",
+      "status": "prepared_not_executed",
+      "detectorId": "OM-DET-R04",
+      "description": "Stale calendar cannot prove a proposed alternative is feasible.",
+      "inputs": {
+        "companyId": "fixture-company-a",
+        "asOf": "2026-11-05T16:00:00Z",
+        "facts": {
+          "jobId": "job-09",
+          "snapshotScheduleVersion": 10,
+          "currentScheduleVersion": 11,
+          "proposedTechnician": "fixture-tech-c",
+          "newConcurrentCommitmentPresent": true,
+          "oldProposal": "schedule-proposal-09"
+        }
+      },
+      "expected": {
+        "disposition": "needs_verification",
+        "findingState": "verification_required",
+        "allowed": [
+          "Reload current domain-owned availability and re-evaluate hard constraints"
+        ],
+        "refused": [
+          "Commit old proposal",
+          "Claim resolved schedule"
+        ],
+        "invalidatedDraft": "schedule-proposal-09",
+        "modelCalls": 0,
+        "financialClaim": null,
+        "actualExecutionAuthorized": false
+      },
+      "acceptanceIds": [
+        "OM-A09",
+        "OM-A11",
+        "OM-A20"
+      ],
+      "decisionRefs": [
+        "OM-D06",
+        "OM-D07"
+      ]
+    },
+    {
+      "id": "OM-DET-10",
+      "area": "scheduling_and_job_readiness",
+      "scenario": "duplicate",
+      "status": "prepared_not_executed",
+      "detectorId": "OM-DET-R04",
+      "description": "Repeat scan finds the same committed risk and approved correction.",
+      "inputs": {
+        "companyId": "fixture-company-a",
+        "asOf": "2026-11-05T16:00:00Z",
+        "facts": {
+          "jobId": "job-10",
+          "version": 4,
+          "existingFinding": "finding-10",
+          "existingEpisode": "fixture-episode-1",
+          "existingCorrection": {
+            "id": "schedule-action-10",
+            "state": "approved",
+            "payloadVersion": 2
+          }
+        }
+      },
+      "expected": {
+        "disposition": "link_existing",
+        "identity": {
+          "companyId": "fixture-company-a",
+          "entityId": "job-10",
+          "condition": "infeasible_commitment",
+          "episodeId": "fixture-episode-1",
+          "missionIdExcluded": true,
+          "policyStatus": "synthetic_identity_pending_OM-D07"
+        },
+        "canonicalFindingCount": 1,
+        "canonicalActiveActionCount": 1,
+        "allowed": [
+          "Update evidence and link existing correction"
+        ],
+        "refused": [
+          "Create second reassignment",
+          "Reserve duplicate capacity"
+        ],
+        "modelCalls": 0,
+        "financialClaim": null,
+        "actualExecutionAuthorized": false
+      },
+      "acceptanceIds": [
+        "OM-A10",
+        "OM-A11",
+        "OM-A20"
+      ],
+      "decisionRefs": [
+        "OM-D06",
+        "OM-D07"
+      ]
+    },
+    {
+      "id": "OM-DET-11",
+      "area": "scheduling_and_job_readiness",
+      "scenario": "reopen",
+      "status": "prepared_not_executed",
+      "detectorId": "OM-DET-R04",
+      "description": "New source event invalidates previously feasible commitment.",
+      "inputs": {
+        "companyId": "fixture-company-a",
+        "asOf": "2026-11-05T16:00:00Z",
+        "facts": {
+          "jobId": "job-11",
+          "previousFindingState": "resolved",
+          "priorScheduleCommitEvent": "schedule-commit-11",
+          "newAvailabilityEvent": "availability-revoked-11",
+          "currentVersion": 8,
+          "requiredWindowNowInfeasible": true,
+          "sameCommittedWork": true
+        }
+      },
+      "expected": {
+        "disposition": "reopen_finding",
+        "identity": {
+          "companyId": "fixture-company-a",
+          "entityId": "job-11",
+          "condition": "infeasible_commitment",
+          "episodeId": "fixture-episode-1",
+          "missionIdExcluded": true,
+          "policyStatus": "synthetic_identity_pending_OM-D07"
+        },
+        "findingState": "open",
+        "priority": "urgent_committed_work",
+        "allowed": [
+          "Preserve prior verification and show new risk cause"
+        ],
+        "refused": [
+          "Retain a false resolved state",
+          "Undo authoritative schedule without approval"
+        ],
+        "modelCalls": 0,
+        "financialClaim": null,
+        "actualExecutionAuthorized": false
+      },
+      "acceptanceIds": [
+        "OM-A11",
+        "OM-A14",
+        "OM-A20"
+      ],
+      "decisionRefs": [
+        "OM-D06",
+        "OM-D07"
+      ]
+    },
+    {
+      "id": "OM-DET-12",
+      "area": "scheduling_and_job_readiness",
+      "scenario": "resolution",
+      "status": "prepared_not_executed",
+      "detectorId": "OM-DET-R04",
+      "description": "Accepted domain commit passes all hard constraints.",
+      "inputs": {
+        "companyId": "fixture-company-a",
+        "asOf": "2026-11-05T16:00:00Z",
+        "facts": {
+          "jobId": "job-12",
+          "requiredSkillsPass": true,
+          "customerWindowPass": true,
+          "travelDurationBuffersPass": true,
+          "currentCommitmentAndMaterialChecksPass": true,
+          "acceptedDomainEvent": {
+            "id": "schedule-commit-12",
+            "version": 6
+          },
+          "appropriateGrantMatched": true
+        }
+      },
+      "expected": {
+        "disposition": "resolve_finding",
+        "findingState": "resolved",
+        "resolutionEvidenceRefs": [
+          "schedule-commit-12"
+        ],
+        "allowed": [
+          "Report one verified feasible-schedule correction"
+        ],
+        "refused": [
+          "Claim completed job or revenue"
+        ],
+        "workOutcome": "pending",
+        "modelCalls": 0,
+        "financialClaim": null,
+        "actualExecutionAuthorized": false
+      },
+      "acceptanceIds": [
+        "OM-A11",
+        "OM-A15",
+        "OM-A20"
+      ],
+      "decisionRefs": [
+        "OM-D06",
+        "OM-D07"
+      ]
+    },
+    {
+      "id": "OM-DET-13",
+      "area": "inventory_and_materials",
+      "scenario": "positive",
+      "status": "prepared_not_executed",
+      "detectorId": "OM-DET-R05",
+      "description": "Known required part has verified shortage after reservations.",
+      "inputs": {
+        "companyId": "fixture-company-a",
+        "asOf": "2026-11-05T16:00:00Z",
+        "facts": {
+          "jobId": "job-13",
+          "startAt": "2026-11-06T16:00:00Z",
+          "knownRequirement": {
+            "itemId": "fixture-part-a",
+            "quantity": 2
+          },
+          "stock": {
+            "locationId": "fixture-van-a",
+            "verifiedOnHand": 5,
+            "committedReservations": 4,
+            "sourceVersion": 8,
+            "verifiedAt": "2026-11-05T15:30:00Z"
+          },
+          "unreceivedOrderQuantity": 10
+        }
+      },
+      "expected": {
+        "disposition": "create_finding",
+        "identity": {
+          "companyId": "fixture-company-a",
+          "entityId": "job-13",
+          "condition": "short_required_stock",
+          "episodeId": "fixture-episode-1",
+          "missionIdExcluded": true,
+          "policyStatus": "synthetic_identity_pending_OM-D07"
+        },
+        "findingState": "open",
+        "priority": "urgent_committed_work",
+        "availableToPromise": 1,
+        "shortQuantity": 1,
+        "allowed": [
+          "Draft supported transfer or purchase recommendation under current scope"
+        ],
+        "refused": [
+          "Count unreceived order as stock",
+          "Autonomously purchase",
+          "Claim materials ready"
+        ],
+        "modelCalls": 0,
+        "financialClaim": null,
+        "actualExecutionAuthorized": false
+      },
+      "acceptanceIds": [
+        "OM-A11",
+        "OM-A20"
+      ],
+      "decisionRefs": [
+        "OM-D06",
+        "OM-D07"
+      ]
+    },
+    {
+      "id": "OM-DET-14",
+      "area": "inventory_and_materials",
+      "scenario": "negative",
+      "status": "prepared_not_executed",
+      "detectorId": "OM-DET-R05",
+      "description": "Diagnostic visit has no invented repair-part requirement.",
+      "inputs": {
+        "companyId": "fixture-company-a",
+        "asOf": "2026-11-05T16:00:00Z",
+        "facts": {
+          "jobId": "job-14",
+          "serviceSituation": "diagnostic/repair",
+          "stage": "diagnostic",
+          "approvedKnownRequirements": [
+            "fixture-diagnostic-kit"
+          ],
+          "verifiedKnownRequirementsAvailable": true,
+          "repairDiagnosis": null,
+          "repairPartRequirement": null
+        }
+      },
+      "expected": {
+        "disposition": "no_finding",
+        "reason": "Actual known diagnostic requirements are ready; future repair requirements are unknown, not missing committed stock.",
+        "allowed": [
+          "Retain diagnostic readiness and later diagnosis handoff"
+        ],
+        "refused": [
+          "Invent a replacement part requirement",
+          "Block diagnostic visit for speculative repair inventory"
+        ],
+        "modelCalls": 0,
+        "financialClaim": null,
+        "actualExecutionAuthorized": false
+      },
+      "acceptanceIds": [
+        "OM-A11",
+        "OM-A20"
+      ],
+      "decisionRefs": [
+        "OM-D06",
+        "OM-D07"
+      ]
+    },
+    {
+      "id": "OM-DET-15",
+      "area": "inventory_and_materials",
+      "scenario": "stale",
+      "status": "prepared_not_executed",
+      "detectorId": "OM-DET-R05",
+      "description": "Stale on-hand count requires a real check.",
+      "inputs": {
+        "companyId": "fixture-company-a",
+        "asOf": "2026-11-05T16:00:00Z",
+        "facts": {
+          "jobId": "job-15",
+          "knownRequirement": {
+            "itemId": "fixture-part-b",
+            "quantity": 1
+          },
+          "stock": {
+            "observedOnHand": 3,
+            "observedAt": "2026-09-01T12:00:00Z",
+            "freshnessStatus": "stale",
+            "sourceVersion": 2
+          },
+          "activeStockCheck": null
+        }
+      },
+      "expected": {
+        "disposition": "create_verification_finding",
+        "identity": {
+          "companyId": "fixture-company-a",
+          "entityId": "job-15",
+          "condition": "unverified_required_stock",
+          "episodeId": "fixture-episode-1",
+          "missionIdExcluded": true,
+          "policyStatus": "synthetic_identity_pending_OM-D07"
+        },
+        "findingState": "verification_required",
+        "availableToPromise": null,
+        "shortQuantity": null,
+        "allowed": [
+          "Request checker, time, location, item and verified quantity"
+        ],
+        "refused": [
+          "Treat stale three units as available",
+          "Treat unknown stock as zero",
+          "Close readiness as resolved"
+        ],
+        "modelCalls": 0,
+        "financialClaim": null,
+        "actualExecutionAuthorized": false
+      },
+      "acceptanceIds": [
+        "OM-A11",
+        "OM-A20"
+      ],
+      "decisionRefs": [
+        "OM-D06",
+        "OM-D07"
+      ]
+    },
+    {
+      "id": "OM-DET-16",
+      "area": "inventory_and_materials",
+      "scenario": "duplicate",
+      "status": "prepared_not_executed",
+      "detectorId": "OM-DET-R05",
+      "description": "Repeated shortage event links one existing stock-check task.",
+      "inputs": {
+        "companyId": "fixture-company-a",
+        "asOf": "2026-11-05T16:00:00Z",
+        "facts": {
+          "jobId": "job-16",
+          "itemId": "fixture-part-c",
+          "locationId": "fixture-van-b",
+          "replayedEventId": "stock-risk-16",
+          "existingFinding": "finding-16",
+          "existingEpisode": "fixture-episode-1",
+          "activeStockCheck": "stock-check-16"
+        }
+      },
+      "expected": {
+        "disposition": "link_existing",
+        "identity": {
+          "companyId": "fixture-company-a",
+          "entityId": "job-16",
+          "condition": "unverified_required_stock",
+          "episodeId": "fixture-episode-1",
+          "missionIdExcluded": true,
+          "policyStatus": "synthetic_identity_pending_OM-D07"
+        },
+        "canonicalFindingCount": 1,
+        "canonicalActiveActionCount": 1,
+        "allowed": [
+          "Link event and existing accountable stock check"
+        ],
+        "refused": [
+          "Create another reservation/transfer/stock-check",
+          "Count repeat scan as a new resolution"
+        ],
+        "modelCalls": 0,
+        "financialClaim": null,
+        "actualExecutionAuthorized": false
+      },
+      "acceptanceIds": [
+        "OM-A10",
+        "OM-A14",
+        "OM-A20"
+      ],
+      "decisionRefs": [
+        "OM-D06",
+        "OM-D07"
+      ]
+    },
+    {
+      "id": "OM-DET-17",
+      "area": "inventory_and_materials",
+      "scenario": "reopen",
+      "status": "prepared_not_executed",
+      "detectorId": "OM-DET-R05",
+      "description": "An authoritative reservation change reopens the same readiness risk.",
+      "inputs": {
+        "companyId": "fixture-company-a",
+        "asOf": "2026-11-05T16:00:00Z",
+        "facts": {
+          "jobId": "job-17",
+          "previousFindingState": "resolved",
+          "priorReservationEvent": "reservation-17-v1",
+          "newEvent": "reservation-invalidated-17-v2",
+          "knownRequiredQuantity": 2,
+          "verifiedAvailableForThisJob": 1,
+          "sameCommittedJob": true
+        }
+      },
+      "expected": {
+        "disposition": "reopen_finding",
+        "identity": {
+          "companyId": "fixture-company-a",
+          "entityId": "job-17",
+          "condition": "short_required_stock",
+          "episodeId": "fixture-episode-1",
+          "missionIdExcluded": true,
+          "policyStatus": "synthetic_identity_pending_OM-D07"
+        },
+        "findingState": "open",
+        "allowed": [
+          "Preserve prior resolution and record current reservation evidence"
+        ],
+        "refused": [
+          "Keep resolved because a historical stock check passed",
+          "Use a mission-local reservation to override domain truth"
+        ],
+        "modelCalls": 0,
+        "financialClaim": null,
+        "actualExecutionAuthorized": false
+      },
+      "acceptanceIds": [
+        "OM-A11",
+        "OM-A14",
+        "OM-A20"
+      ],
+      "decisionRefs": [
+        "OM-D06",
+        "OM-D07"
+      ]
+    },
+    {
+      "id": "OM-DET-18",
+      "area": "inventory_and_materials",
+      "scenario": "resolution",
+      "status": "prepared_not_executed",
+      "detectorId": "OM-DET-R05",
+      "description": "Accountable physical check and accepted reservation prove readiness.",
+      "inputs": {
+        "companyId": "fixture-company-a",
+        "asOf": "2026-11-05T16:00:00Z",
+        "facts": {
+          "jobId": "job-18",
+          "knownRequirement": {
+            "itemId": "fixture-part-d",
+            "quantity": 2
+          },
+          "physicalCheck": {
+            "id": "stock-check-18",
+            "checkedBy": "fixture-tech-a",
+            "checkedAt": "2026-11-05T15:45:00Z",
+            "locationId": "fixture-van-a",
+            "itemId": "fixture-part-d",
+            "quantity": 3
+          },
+          "reservation": {
+            "eventId": "reservation-18",
+            "quantity": 2,
+            "jobId": "job-18",
+            "accepted": true,
+            "domainVersion": 9
+          }
+        }
+      },
+      "expected": {
+        "disposition": "resolve_finding",
+        "findingState": "resolved",
+        "resolutionEvidenceRefs": [
+          "stock-check-18",
+          "reservation-18"
+        ],
+        "allowed": [
+          "Report one verified required-material readiness resolution"
+        ],
+        "refused": [
+          "Claim work complete",
+          "Claim supplier purchase executed"
+        ],
+        "modelCalls": 0,
+        "financialClaim": null,
+        "actualExecutionAuthorized": false
+      },
+      "acceptanceIds": [
+        "OM-A11",
+        "OM-A20"
+      ],
+      "decisionRefs": [
+        "OM-D06",
+        "OM-D07"
+      ]
+    },
+    {
+      "id": "OM-DET-19",
+      "area": "relevant_product_and_service_opportunities",
+      "scenario": "positive",
+      "status": "prepared_not_executed",
+      "detectorId": "OM-DET-R06",
+      "description": "Documented compatible option is missing at estimate stage.",
+      "inputs": {
+        "companyId": "fixture-company-a",
+        "asOf": "2026-11-05T16:00:00Z",
+        "facts": {
+          "estimateId": "estimate-19",
+          "version": 3,
+          "stage": "draft",
+          "documentedNeed": {
+            "ref": "qualified-finding-19",
+            "qualifiedSource": true
+          },
+          "option": {
+            "catalogId": "fixture-option-a",
+            "catalogVersion": 4,
+            "approved": true,
+            "compatible": true,
+            "currentPriceKnown": true
+          },
+          "optionAlreadyPresent": false,
+          "customerDeclined": false,
+          "incrementalFeasibilityVerified": true
+        }
+      },
+      "expected": {
+        "disposition": "create_finding",
+        "identity": {
+          "companyId": "fixture-company-a",
+          "entityId": "estimate-19",
+          "condition": "documented_suitable_need_absent_from_estimate",
+          "episodeId": "fixture-episode-1",
+          "missionIdExcluded": true,
+          "policyStatus": "synthetic_identity_pending_OM-D07"
+        },
+        "findingState": "open",
+        "priority": "suitable_opportunity",
+        "allowed": [
+          "Prepare internal option draft linked to qualified finding and approved catalog"
+        ],
+        "refused": [
+          "Publish/send without authority",
+          "Invent savings or technical claims",
+          "Claim sale/earned revenue"
+        ],
+        "modelCalls": 0,
+        "financialClaim": null,
+        "actualExecutionAuthorized": false
+      },
+      "acceptanceIds": [
+        "OM-A17",
+        "OM-A20"
+      ],
+      "decisionRefs": [
+        "OM-D06",
+        "OM-D07"
+      ]
+    },
+    {
+      "id": "OM-DET-20",
+      "area": "relevant_product_and_service_opportunities",
+      "scenario": "negative",
+      "status": "prepared_not_executed",
+      "detectorId": "OM-DET-R06",
+      "description": "Popularity alone is not documented customer need.",
+      "inputs": {
+        "companyId": "fixture-company-a",
+        "asOf": "2026-11-05T16:00:00Z",
+        "facts": {
+          "estimateId": "estimate-20",
+          "documentedNeed": null,
+          "qualifiedFinding": null,
+          "catalogItemPopular": true,
+          "modelSuggestedUpsell": true
+        }
+      },
+      "expected": {
+        "disposition": "no_finding",
+        "reason": "No documented need or qualified compatible finding.",
+        "allowed": [
+          "Retain no-op result for scoped check"
+        ],
+        "refused": [
+          "Invent a defect/need",
+          "Produce unsolicited option because it is popular",
+          "Report missed revenue"
+        ],
+        "modelCalls": 0,
+        "financialClaim": null,
+        "actualExecutionAuthorized": false
+      },
+      "acceptanceIds": [
+        "OM-A17",
+        "OM-A20"
+      ],
+      "decisionRefs": [
+        "OM-D06",
+        "OM-D07"
+      ]
+    },
+    {
+      "id": "OM-DET-21",
+      "area": "relevant_product_and_service_opportunities",
+      "scenario": "stale",
+      "status": "prepared_not_executed",
+      "detectorId": "OM-DET-R06",
+      "description": "Catalog change invalidates old option compatibility/price.",
+      "inputs": {
+        "companyId": "fixture-company-a",
+        "asOf": "2026-11-05T16:00:00Z",
+        "facts": {
+          "estimateId": "estimate-21",
+          "draftCatalogVersion": 2,
+          "currentCatalogVersion": 3,
+          "compatibilityCurrent": null,
+          "currentPrice": null,
+          "previousDraft": "option-draft-21"
+        }
+      },
+      "expected": {
+        "disposition": "needs_verification",
+        "findingState": "verification_required",
+        "allowed": [
+          "Refresh approved catalog and qualified compatibility evidence"
+        ],
+        "refused": [
+          "Use stale price/compatibility",
+          "Send old option",
+          "Close a finding from stale evidence"
+        ],
+        "invalidatedDraft": "option-draft-21",
+        "modelCalls": 0,
+        "financialClaim": null,
+        "actualExecutionAuthorized": false
+      },
+      "acceptanceIds": [
+        "OM-A09",
+        "OM-A17",
+        "OM-A20"
+      ],
+      "decisionRefs": [
+        "OM-D06",
+        "OM-D07"
+      ]
+    },
+    {
+      "id": "OM-DET-22",
+      "area": "relevant_product_and_service_opportunities",
+      "scenario": "duplicate",
+      "status": "prepared_not_executed",
+      "detectorId": "OM-DET-R06",
+      "description": "The same option draft is shared across job-value and Organize.",
+      "inputs": {
+        "companyId": "fixture-company-a",
+        "asOf": "2026-11-05T16:00:00Z",
+        "facts": {
+          "estimateId": "estimate-22",
+          "optionId": "fixture-option-b",
+          "offerVersion": 4,
+          "missionIds": [
+            "fixture-job-value",
+            "fixture-organize"
+          ],
+          "existingFinding": "finding-22",
+          "existingEpisode": "fixture-episode-1",
+          "activeOptionDraft": "option-draft-22"
+        }
+      },
+      "expected": {
+        "disposition": "link_existing",
+        "identity": {
+          "companyId": "fixture-company-a",
+          "entityId": "estimate-22",
+          "condition": "documented_suitable_need_absent_from_estimate",
+          "episodeId": "fixture-episode-1",
+          "missionIdExcluded": true,
+          "policyStatus": "synthetic_identity_pending_OM-D07"
+        },
+        "canonicalFindingCount": 1,
+        "canonicalActiveActionCount": 1,
+        "allowed": [
+          "Link contributor missions to current compatible option draft"
+        ],
+        "refused": [
+          "Duplicate offer",
+          "Count its value once per mission"
+        ],
+        "modelCalls": 0,
+        "financialClaim": null,
+        "actualExecutionAuthorized": false
+      },
+      "acceptanceIds": [
+        "OM-A10",
+        "OM-A17",
+        "OM-A20"
+      ],
+      "decisionRefs": [
+        "OM-D06",
+        "OM-D07"
+      ]
+    },
+    {
+      "id": "OM-DET-23",
+      "area": "relevant_product_and_service_opportunities",
+      "scenario": "reopen",
+      "status": "prepared_not_executed",
+      "detectorId": "OM-DET-R06",
+      "description": "Current draft removes a still-relevant option without disposition.",
+      "inputs": {
+        "companyId": "fixture-company-a",
+        "asOf": "2026-11-05T16:00:00Z",
+        "facts": {
+          "estimateId": "estimate-23",
+          "priorFindingState": "resolved",
+          "priorOptionAddedEvent": "option-added-23",
+          "currentEstimateVersion": 7,
+          "optionRemovedEvent": "option-removed-23",
+          "documentedNeedStillValid": true,
+          "currentCompatibilityVerified": true,
+          "customerDeclineOrDisposition": null
+        }
+      },
+      "expected": {
+        "disposition": "reopen_finding",
+        "identity": {
+          "companyId": "fixture-company-a",
+          "entityId": "estimate-23",
+          "condition": "documented_suitable_need_absent_from_estimate",
+          "episodeId": "fixture-episode-1",
+          "missionIdExcluded": true,
+          "policyStatus": "synthetic_identity_pending_OM-D07"
+        },
+        "findingState": "open",
+        "allowed": [
+          "Review the same missing-option episode with preserved history"
+        ],
+        "refused": [
+          "Re-add automatically",
+          "Override later customer decline if it appears",
+          "Claim lost revenue from removal"
+        ],
+        "modelCalls": 0,
+        "financialClaim": null,
+        "actualExecutionAuthorized": false
+      },
+      "acceptanceIds": [
+        "OM-A14",
+        "OM-A17",
+        "OM-A20"
+      ],
+      "decisionRefs": [
+        "OM-D06",
+        "OM-D07"
+      ]
+    },
+    {
+      "id": "OM-DET-24",
+      "area": "relevant_product_and_service_opportunities",
+      "scenario": "resolution",
+      "status": "prepared_not_executed",
+      "detectorId": "OM-DET-R06",
+      "description": "Correct permitted draft resolves missing-option condition only.",
+      "inputs": {
+        "companyId": "fixture-company-a",
+        "asOf": "2026-11-05T16:00:00Z",
+        "facts": {
+          "estimateId": "estimate-24",
+          "version": 8,
+          "needRef": "qualified-finding-24",
+          "catalogVersion": 4,
+          "compatibleOptionNowPresent": true,
+          "permittedDraftEvent": "option-draft-accepted-24",
+          "customerAcceptance": null,
+          "jobCompletion": null
+        }
+      },
+      "expected": {
+        "disposition": "resolve_finding",
+        "findingState": "resolved",
+        "resolutionEvidenceRefs": [
+          "option-draft-accepted-24"
+        ],
+        "allowed": [
+          "Report one verified missing-option correction"
+        ],
+        "refused": [
+          "Report accepted sale/completed work/revenue",
+          "Treat draft content as customer approval"
+        ],
+        "businessOutcome": "pending",
+        "modelCalls": 0,
+        "financialClaim": null,
+        "actualExecutionAuthorized": false
+      },
+      "acceptanceIds": [
+        "OM-A15",
+        "OM-A17",
+        "OM-A20"
+      ],
+      "decisionRefs": [
+        "OM-D06",
+        "OM-D07"
+      ]
+    },
+    {
+      "id": "OM-DET-25",
+      "area": "unfinished_work",
+      "scenario": "positive_documentation",
+      "status": "prepared_not_executed",
+      "detectorId": "OM-DET-R02",
+      "description": "Missing completion document blocks invoice readiness.",
+      "inputs": {
+        "companyId": "fixture-company-a",
+        "asOf": "2026-11-05T16:00:00Z",
+        "facts": {
+          "jobId": "job-25",
+          "verifiedBillableCompletionAt": "2026-11-03T16:00:00Z",
+          "asOf": "2026-11-05T16:00:00Z",
+          "laterBillingMilestone": false,
+          "requiredDocument": "fixture-completion-record",
+          "documentAccepted": false,
+          "existingInvoiceTask": null
+        }
+      },
+      "expected": {
+        "disposition": "create_finding",
+        "identity": {
+          "companyId": "fixture-company-a",
+          "entityId": "job-25",
+          "condition": "missing_invoice_documentation",
+          "episodeId": "fixture-episode-1",
+          "missionIdExcluded": true,
+          "policyStatus": "synthetic_identity_pending_OM-D07"
+        },
+        "findingState": "open",
+        "allowed": [
+          "Assign missing-document task before proposing invoice issue"
+        ],
+        "refused": [
+          "Invent document contents",
+          "Issue/send unsupported invoice",
+          "Claim cash recovered"
+        ],
+        "modelCalls": 0,
+        "financialClaim": null,
+        "actualExecutionAuthorized": false
+      },
+      "acceptanceIds": [
+        "OM-A15",
+        "OM-A19",
+        "OM-A20",
+        "OM-A30"
+      ],
+      "decisionRefs": [
+        "OM-D06",
+        "OM-D07"
+      ]
+    },
+    {
+      "id": "OM-DET-26",
+      "area": "unfinished_work",
+      "scenario": "positive_benefit",
+      "status": "prepared_not_executed",
+      "detectorId": "OM-DET-R03",
+      "description": "Contractual included benefit is due and unfulfilled.",
+      "inputs": {
+        "companyId": "fixture-company-a",
+        "asOf": "2026-11-05T16:00:00Z",
+        "facts": {
+          "agreementId": "agreement-26",
+          "obligationId": "benefit-26",
+          "dueAt": "2026-11-20T16:00:00Z",
+          "dueRuleSource": "fixture-accepted-contract-v1",
+          "fulfilled": false,
+          "activeFulfillmentAction": null,
+          "includedInRecognizedAgreement": true
+        }
+      },
+      "expected": {
+        "disposition": "create_finding",
+        "identity": {
+          "companyId": "fixture-company-a",
+          "entityId": "benefit-26",
+          "condition": "unfulfilled_benefit",
+          "episodeId": "fixture-episode-1",
+          "missionIdExcluded": true,
+          "policyStatus": "synthetic_identity_pending_OM-D07"
+        },
+        "findingState": "open",
+        "allowed": [
+          "Prepare legitimate benefit fulfillment next step"
+        ],
+        "refused": [
+          "Withhold benefit to create a sales experiment",
+          "Double count included service as new paid revenue"
+        ],
+        "modelCalls": 0,
+        "financialClaim": null,
+        "actualExecutionAuthorized": false
+      },
+      "acceptanceIds": [
+        "OM-A18",
+        "OM-A20",
+        "OM-A32"
+      ],
+      "decisionRefs": [
+        "OM-D02",
+        "OM-D06",
+        "OM-D07"
+      ]
+    },
+    {
+      "id": "OM-DET-27",
+      "area": "scheduling_and_job_readiness",
+      "scenario": "partial_scan",
+      "status": "prepared_not_executed",
+      "detectorId": "OM-DET-R04",
+      "description": "Run hits the source scan budget before all four areas complete.",
+      "inputs": {
+        "companyId": "fixture-company-a",
+        "asOf": "2026-11-05T16:00:00Z",
+        "facts": {
+          "scanRunId": "scan-27",
+          "genericPageSize": 250,
+          "effectivePageSizeRule": "min(genericPageSize, sourceAdapterLimit)",
+          "effectiveSourcePageSizes": { "unfinished_work": 250, "scheduling_and_job_readiness": 250, "inventory_and_materials": 200, "relevant_product_and_service_opportunities": 250 },
+          "runLimit": 10000,
+          "knownTotal": 12420,
+          "scanned": 10000,
+          "remaining": 2420,
+          "continuationCursor": "synthetic-run-checkpoint-27",
+          "areaCoverage": {
+            "unfinished_work": {
+              "scanned": 4000,
+              "knownTotal": 4000,
+              "status": "complete"
+            },
+            "scheduling_and_job_readiness": {
+              "scanned": 3000,
+              "knownTotal": 3000,
+              "status": "complete"
+            },
+            "inventory_and_materials": {
+              "scanned": 3000,
+              "knownTotal": 4420,
+              "status": "partial"
+            },
+            "relevant_product_and_service_opportunities": {
+              "scanned": 0,
+              "knownTotal": 1000,
+              "status": "not_started"
+            }
+          },
+          "verifiedUrgentRiskIds": [
+            "job-urgent-27"
+          ]
+        }
+      },
+      "expected": {
+        "disposition": "checkpoint_partial",
+        "coverageState": "partial",
+        "scanned": 10000,
+        "knownTotal": 12420,
+        "remaining": 2420,
+        "continuationRequired": true,
+        "allowed": [
+          "Persist cursor/source versions and per-area coverage",
+          "Surface verified urgent risk immediately",
+          "Continue later under another bounded run"
+        ],
+        "refused": [
+          "Claim full four-area review",
+          "Infer no findings from unscanned records",
+          "Use extra model calls to bypass pagination"
+        ],
+        "modelCalls": 0,
+        "financialClaim": null,
+        "actualExecutionAuthorized": false
+      },
+      "acceptanceIds": [
+        "OM-A20",
+        "OM-A25",
+        "OM-A34"
+      ],
+      "decisionRefs": [
+        "OM-D06",
+        "OM-D07"
+      ]
+    },
+    {
+      "id": "OM-DET-28",
+      "area": "inventory_and_materials",
+      "scenario": "blocked_independent_work",
+      "status": "prepared_not_executed",
+      "detectorId": "OM-DET-R05",
+      "description": "Unknown stock does not block unrelated approved estimate work.",
+      "inputs": {
+        "companyId": "fixture-company-a",
+        "asOf": "2026-11-05T16:00:00Z",
+        "facts": {
+          "jobId": "job-28",
+          "stockState": "unverified",
+          "stockVerificationOwner": "fixture-tech-b",
+          "unrelatedEstimateId": "estimate-28",
+          "unrelatedCurrentApprovalValid": true,
+          "unrelatedCurrentConsentValid": true,
+          "noSharedResourceOrIntentConflict": true
+        }
+      },
+      "expected": {
+        "disposition": "retain_blocked_and_continue_independent",
+        "findingState": "verification_required",
+        "allowed": [
+          "Keep stock verification owned and visible",
+          "Let independent estimate step proceed through its existing current approval and domain checks"
+        ],
+        "refused": [
+          "Block all mission work because of one dependency",
+          "Mark stock resolved",
+          "Grant authority to unrelated unapproved work"
+        ],
+        "modelCalls": 0,
+        "financialClaim": null,
+        "actualExecutionAuthorized": false
+      },
+      "acceptanceIds": [
+        "OM-A10",
+        "OM-A20",
+        "OM-A34"
+      ],
+      "decisionRefs": [
+        "OM-D06",
+        "OM-D07"
+      ]
+    }
+  ],
+  "coverage": {
+    "areas": [
+      "unfinished_work",
+      "scheduling_and_job_readiness",
+      "inventory_and_materials",
+      "relevant_product_and_service_opportunities"
+    ],
+    "coreScenarios": [
+      "positive",
+      "negative",
+      "stale",
+      "duplicate",
+      "reopen",
+      "resolution"
+    ],
+    "requiredCoreExamplesPerArea": 6,
+    "additionalScenarios": [
+      "positive_documentation",
+      "positive_benefit",
+      "partial_scan",
+      "blocked_independent_work"
+    ],
+    "totalExamples": 28
+  },
+  "acceptanceIds": [
+    "OM-A10",
+    "OM-A11",
+    "OM-A14",
+    "OM-A15",
+    "OM-A17",
+    "OM-A18",
+    "OM-A19",
+    "OM-A20",
+    "OM-A25",
+    "OM-A30",
+    "OM-A32",
+    "OM-A34"
+  ],
+  "decisionRefs": [
+    "OM-D01",
+    "OM-D02",
+    "OM-D05",
+    "OM-D06",
+    "OM-D07",
+    "OM-D13"
+  ]
+}

@@ -1,0 +1,4394 @@
+{
+  "schemaVersion": "1.0.0",
+  "artifactKind": "synthetic_accounting_examples",
+  "sourceSpecVersion": "1.1",
+  "baseCommit": "7840884d346ca95788e2668cc78148afa3b6a843",
+  "sourceNotionUrl": "https://app.notion.com/p/40e317b92d1581188031e8a0a4c847c9",
+  "preparationStatus": "prepared",
+  "implementationStatus": "not_started",
+  "runtimeAcceptance": "not_executed",
+  "containsRealCustomerData": false,
+  "contractBoundary": "Normalized local fixture facts only; not a production schema, API, source event declaration or accounting-policy approval.",
+  "moneyRepresentation": "Unsigned scale-2 USD decimal strings for amounts; calculations use Decimal; signed computed totals remain decimal strings. No FX.",
+  "roundingPolicy": {
+    "status": "fixture_only",
+    "display": "ROUND_HALF_UP to 0.01 only for division/display; exact arithmetic retained before display",
+    "productionDecisionRef": "OM-D03"
+  },
+  "deduplicationExample": "One current sourceVersion per company/canonicalFactId; exact replay or same source content with a new transport eventId does not add value. Conflicting same-version content is rejected.",
+  "scenarios": [
+    {
+      "id": "OM-FIN-01",
+      "title": "Completed service, credit and linked cash refund",
+      "companyId": "10000000-0000-4000-8000-000000000001",
+      "currency": "USD",
+      "view": "financial",
+      "acceptanceRefs": [
+        "OM-A14",
+        "OM-A15",
+        "OM-A16",
+        "OM-A33"
+      ],
+      "decisionRefs": [
+        "OM-D03",
+        "OM-D07"
+      ],
+      "policyInputs": {
+        "status": "fixture_only",
+        "approval": "not_approved_business_policy",
+        "timeZone": "America/Chicago",
+        "asOf": "2026-11-30T23:59:59Z",
+        "serviceMonth": null,
+        "cashMonth": null,
+        "coverage": "Closed synthetic facts for the declared view; no real source completeness is inferred."
+      },
+      "events": [
+        {
+          "eventId": "OM-FIN-01.event.001",
+          "canonicalFactId": "completion.job.01",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "service_completion",
+            "id": "completion.job.01"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-01T15:00:00Z",
+          "receivedAt": "2026-10-01T15:01:00Z",
+          "kind": "service_completion",
+          "data": {
+            "jobId": "job.01",
+            "performedAt": "2026-10-01T15:00:00Z",
+            "billable": true
+          }
+        },
+        {
+          "eventId": "OM-FIN-01.event.002",
+          "canonicalFactId": "allocation.01",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "service_allocation",
+            "id": "allocation.01"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-01T16:00:00Z",
+          "receivedAt": "2026-10-01T16:01:00Z",
+          "kind": "service_allocation",
+          "data": {
+            "jobId": "job.01",
+            "invoiceId": "invoice.01",
+            "amount": "1000.00",
+            "basis": "gross",
+            "includedAdjustmentIds": [],
+            "finalizedAt": "2026-10-01T16:00:00Z",
+            "allocationScope": "Performed service only; tax, tips and separately identified fees excluded."
+          }
+        },
+        {
+          "eventId": "OM-FIN-01.event.003",
+          "canonicalFactId": "invoice.01",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "invoice_finalized",
+            "id": "invoice.01"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-01T16:00:00Z",
+          "receivedAt": "2026-10-01T16:01:00Z",
+          "kind": "invoice_finalized",
+          "data": {
+            "totalDue": "1000.00",
+            "issuedAt": "2026-10-01T16:00:00Z",
+            "completedAt": "2026-10-01T15:00:00Z",
+            "dueAt": "2026-10-15T16:00:00Z",
+            "disputed": false
+          }
+        },
+        {
+          "eventId": "OM-FIN-01.event.004",
+          "canonicalFactId": "payment.01",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "settled_payment",
+            "id": "payment.01"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-02T16:00:00Z",
+          "receivedAt": "2026-10-02T16:01:00Z",
+          "kind": "settled_payment",
+          "data": {
+            "amount": "1000.00",
+            "invoiceId": "invoice.01",
+            "allocationClass": "service",
+            "settledAt": "2026-10-02T16:00:00Z",
+            "settlementEvidence": "synthetic authoritative final settlement"
+          }
+        },
+        {
+          "eventId": "OM-FIN-01.event.005",
+          "canonicalFactId": "credit.01",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "revenue_credit",
+            "id": "credit.01"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-03T16:00:00Z",
+          "receivedAt": "2026-10-03T16:01:00Z",
+          "kind": "revenue_credit",
+          "data": {
+            "amount": "100.00",
+            "allocationId": "allocation.01",
+            "invoiceId": "invoice.01"
+          }
+        },
+        {
+          "eventId": "OM-FIN-01.event.006",
+          "canonicalFactId": "refund.01",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cash_refund",
+            "id": "refund.01"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-04T16:00:00Z",
+          "receivedAt": "2026-10-04T16:01:00Z",
+          "kind": "cash_refund",
+          "data": {
+            "amount": "100.00",
+            "paymentId": "payment.01",
+            "linkedCreditId": "credit.01",
+            "refundedAt": "2026-10-04T16:00:00Z"
+          }
+        }
+      ],
+      "checkpoints": [
+        {
+          "id": "finalized_unpaid",
+          "afterEventCount": 3,
+          "expected": {
+            "net_earned_service_revenue": "1000.00",
+            "net_collected_cash": "0.00",
+            "open_invoice_balance": "1000.00"
+          }
+        },
+        {
+          "id": "fully_collected",
+          "afterEventCount": 4,
+          "expected": {
+            "net_earned_service_revenue": "1000.00",
+            "net_collected_cash": "1000.00",
+            "open_invoice_balance": "0.00"
+          }
+        },
+        {
+          "id": "credited_and_refunded",
+          "afterEventCount": 6,
+          "expected": {
+            "performed_service_revenue": "900.00",
+            "net_earned_service_revenue": "900.00",
+            "net_collected_cash": "900.00",
+            "settled_cash_before_refunds": "1000.00",
+            "cash_refunds": "100.00",
+            "open_invoice_balance": "0.00"
+          }
+        }
+      ],
+      "claimLimits": [
+        "Arithmetic is a synthetic example, not production acceptance or causal evidence.",
+        "The credit changes earned revenue once; its linked refund changes cash once. Earned revenue and cash are never added into one economic total.",
+        "A credit-before-refund customer overpayment is not modeled as a negative open receivable by this oracle; production needs its own credit-balance contract."
+      ]
+    },
+    {
+      "id": "OM-FIN-02",
+      "title": "Already-net allocation embeds the same canonical credit",
+      "companyId": "10000000-0000-4000-8000-000000000001",
+      "currency": "USD",
+      "view": "financial",
+      "acceptanceRefs": [
+        "OM-A14",
+        "OM-A16",
+        "OM-A33"
+      ],
+      "decisionRefs": [
+        "OM-D03",
+        "OM-D07"
+      ],
+      "policyInputs": {
+        "status": "fixture_only",
+        "approval": "not_approved_business_policy",
+        "timeZone": "America/Chicago",
+        "asOf": "2026-11-30T23:59:59Z",
+        "serviceMonth": null,
+        "cashMonth": null,
+        "coverage": "Closed synthetic facts for the declared view; no real source completeness is inferred."
+      },
+      "events": [
+        {
+          "eventId": "OM-FIN-02.event.001",
+          "canonicalFactId": "completion.job.02",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "service_completion",
+            "id": "completion.job.02"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-01T15:00:00Z",
+          "receivedAt": "2026-10-01T15:01:00Z",
+          "kind": "service_completion",
+          "data": {
+            "jobId": "job.02",
+            "performedAt": "2026-10-01T15:00:00Z",
+            "billable": true
+          }
+        },
+        {
+          "eventId": "OM-FIN-02.event.002",
+          "canonicalFactId": "allocation.02",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "service_allocation",
+            "id": "allocation.02"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-01T16:00:00Z",
+          "receivedAt": "2026-10-01T16:01:00Z",
+          "kind": "service_allocation",
+          "data": {
+            "jobId": "job.02",
+            "invoiceId": null,
+            "amount": "1000.00",
+            "basis": "gross",
+            "includedAdjustmentIds": [],
+            "finalizedAt": "2026-10-01T16:00:00Z",
+            "allocationScope": "Performed service only; tax, tips and separately identified fees excluded."
+          }
+        },
+        {
+          "eventId": "OM-FIN-02.event.003",
+          "canonicalFactId": "payment.02",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "settled_payment",
+            "id": "payment.02"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-02T16:00:00Z",
+          "receivedAt": "2026-10-02T16:01:00Z",
+          "kind": "settled_payment",
+          "data": {
+            "amount": "1000.00",
+            "invoiceId": null,
+            "allocationClass": "service",
+            "settledAt": "2026-10-02T16:00:00Z",
+            "settlementEvidence": "synthetic authoritative final settlement"
+          }
+        },
+        {
+          "eventId": "OM-FIN-02.event.004",
+          "canonicalFactId": "credit.02",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "revenue_credit",
+            "id": "credit.02"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-03T16:00:00Z",
+          "receivedAt": "2026-10-03T16:01:00Z",
+          "kind": "revenue_credit",
+          "data": {
+            "amount": "100.00",
+            "allocationId": "allocation.02",
+            "invoiceId": null
+          }
+        },
+        {
+          "eventId": "OM-FIN-02.event.005",
+          "canonicalFactId": "refund.02",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cash_refund",
+            "id": "refund.02"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-04T16:00:00Z",
+          "receivedAt": "2026-10-04T16:01:00Z",
+          "kind": "cash_refund",
+          "data": {
+            "amount": "100.00",
+            "paymentId": "payment.02",
+            "linkedCreditId": "credit.02",
+            "refundedAt": "2026-10-04T16:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-02.event.006",
+          "canonicalFactId": "allocation.02",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "service_allocation",
+            "id": "allocation.02"
+          },
+          "sourceVersion": 2,
+          "occurredAt": "2026-10-05T16:00:00Z",
+          "receivedAt": "2026-10-05T16:01:00Z",
+          "kind": "service_allocation",
+          "data": {
+            "jobId": "job.02",
+            "invoiceId": null,
+            "amount": "900.00",
+            "basis": "already_net",
+            "includedAdjustmentIds": [
+              "credit.02"
+            ],
+            "finalizedAt": "2026-10-05T16:00:00Z",
+            "allocationScope": "Performed service only; tax, tips and separately identified fees excluded."
+          }
+        }
+      ],
+      "checkpoints": [
+        {
+          "id": "gross_source",
+          "afterEventCount": 3,
+          "expected": {
+            "net_earned_service_revenue": "1000.00",
+            "net_collected_cash": "1000.00"
+          }
+        },
+        {
+          "id": "gross_plus_adjustment",
+          "afterEventCount": 5,
+          "expected": {
+            "net_earned_service_revenue": "900.00",
+            "net_collected_cash": "900.00"
+          }
+        },
+        {
+          "id": "net_source_revision",
+          "afterEventCount": 6,
+          "expected": {
+            "performed_service_revenue": "900.00",
+            "net_earned_service_revenue": "900.00",
+            "net_collected_cash": "900.00"
+          }
+        }
+      ],
+      "claimLimits": [
+        "Arithmetic is a synthetic example, not production acceptance or causal evidence.",
+        "Source version 2 replaces version 1 in the current projection. The embedded credit is preserved as provenance and is not subtracted again."
+      ]
+    },
+    {
+      "id": "OM-FIN-03",
+      "title": "Late old source revision and duplicate transport receipt",
+      "companyId": "10000000-0000-4000-8000-000000000001",
+      "currency": "USD",
+      "view": "financial",
+      "acceptanceRefs": [
+        "OM-A14",
+        "OM-A33"
+      ],
+      "decisionRefs": [
+        "OM-D03",
+        "OM-D07"
+      ],
+      "policyInputs": {
+        "status": "fixture_only",
+        "approval": "not_approved_business_policy",
+        "timeZone": "America/Chicago",
+        "asOf": "2026-11-30T23:59:59Z",
+        "serviceMonth": null,
+        "cashMonth": null,
+        "coverage": "Closed synthetic facts for the declared view; no real source completeness is inferred."
+      },
+      "events": [
+        {
+          "eventId": "OM-FIN-03.event.001",
+          "canonicalFactId": "completion.job.03",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "service_completion",
+            "id": "completion.job.03"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-01T15:00:00Z",
+          "receivedAt": "2026-10-01T15:01:00Z",
+          "kind": "service_completion",
+          "data": {
+            "jobId": "job.03",
+            "performedAt": "2026-10-01T15:00:00Z",
+            "billable": true
+          }
+        },
+        {
+          "eventId": "OM-FIN-03.event.002",
+          "canonicalFactId": "allocation.03",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "service_allocation",
+            "id": "allocation.03"
+          },
+          "sourceVersion": 2,
+          "occurredAt": "2026-10-01T16:00:00Z",
+          "receivedAt": "2026-10-01T16:01:00Z",
+          "kind": "service_allocation",
+          "data": {
+            "jobId": "job.03",
+            "invoiceId": null,
+            "amount": "1000.00",
+            "basis": "gross",
+            "includedAdjustmentIds": [],
+            "finalizedAt": "2026-10-01T16:00:00Z",
+            "allocationScope": "Performed service only; tax, tips and separately identified fees excluded."
+          }
+        },
+        {
+          "eventId": "OM-FIN-03.event.003",
+          "canonicalFactId": "payment.03",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "settled_payment",
+            "id": "payment.03"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-02T16:00:00Z",
+          "receivedAt": "2026-10-02T16:01:00Z",
+          "kind": "settled_payment",
+          "data": {
+            "amount": "1000.00",
+            "invoiceId": null,
+            "allocationClass": "service",
+            "settledAt": "2026-10-02T16:00:00Z",
+            "settlementEvidence": "synthetic authoritative final settlement"
+          }
+        },
+        {
+          "eventId": "OM-FIN-03.event.004",
+          "canonicalFactId": "credit.03",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "revenue_credit",
+            "id": "credit.03"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-03T16:00:00Z",
+          "receivedAt": "2026-10-03T16:01:00Z",
+          "kind": "revenue_credit",
+          "data": {
+            "amount": "100.00",
+            "allocationId": "allocation.03",
+            "invoiceId": null
+          }
+        },
+        {
+          "eventId": "OM-FIN-03.event.005",
+          "canonicalFactId": "refund.03",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cash_refund",
+            "id": "refund.03"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-04T16:00:00Z",
+          "receivedAt": "2026-10-04T16:01:00Z",
+          "kind": "cash_refund",
+          "data": {
+            "amount": "100.00",
+            "paymentId": "payment.03",
+            "linkedCreditId": "credit.03",
+            "refundedAt": "2026-10-04T16:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-03.event.006",
+          "canonicalFactId": "allocation.03",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "service_allocation",
+            "id": "allocation.03"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-01T15:30:00Z",
+          "receivedAt": "2026-10-10T16:00:00Z",
+          "kind": "service_allocation",
+          "data": {
+            "jobId": "job.03",
+            "invoiceId": null,
+            "amount": "950.00",
+            "basis": "gross",
+            "includedAdjustmentIds": [],
+            "finalizedAt": "2026-10-01T15:30:00Z",
+            "allocationScope": "Performed service only; tax, tips and separately identified fees excluded."
+          }
+        },
+        {
+          "eventId": "OM-FIN-03.event.payment.redelivery",
+          "canonicalFactId": "payment.03",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "settled_payment",
+            "id": "payment.03"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-02T16:00:00Z",
+          "receivedAt": "2026-10-11T16:00:00Z",
+          "kind": "settled_payment",
+          "data": {
+            "amount": "1000.00",
+            "invoiceId": null,
+            "allocationClass": "service",
+            "settledAt": "2026-10-02T16:00:00Z",
+            "settlementEvidence": "synthetic authoritative final settlement"
+          }
+        }
+      ],
+      "checkpoints": [
+        {
+          "id": "current_revision_complete",
+          "afterEventCount": 5,
+          "expected": {
+            "net_earned_service_revenue": "900.00",
+            "net_collected_cash": "900.00"
+          }
+        },
+        {
+          "id": "late_old_revision_and_duplicate",
+          "afterEventCount": 7,
+          "expected": {
+            "net_earned_service_revenue": "900.00",
+            "net_collected_cash": "900.00",
+            "cash_refunds": "100.00"
+          }
+        }
+      ],
+      "claimLimits": [
+        "Arithmetic is a synthetic example, not production acceptance or causal evidence.",
+        "All linked facts are present at evaluated checkpoints. This tests final fixture arithmetic, not runtime orphan buffering, retries, locking or durable ordering."
+      ]
+    },
+    {
+      "id": "OM-FIN-04",
+      "title": "Late invoice revises the local service month; cash stays in settlement month",
+      "companyId": "10000000-0000-4000-8000-000000000001",
+      "currency": "USD",
+      "view": "financial",
+      "acceptanceRefs": [
+        "OM-A15",
+        "OM-A16"
+      ],
+      "decisionRefs": [
+        "OM-D03",
+        "OM-D07"
+      ],
+      "policyInputs": {
+        "status": "fixture_only",
+        "approval": "not_approved_business_policy",
+        "timeZone": "America/Chicago",
+        "asOf": "2026-11-30T23:59:59Z",
+        "serviceMonth": "2026-10",
+        "cashMonth": "2026-10",
+        "coverage": "Closed synthetic facts for the declared view; no real source completeness is inferred."
+      },
+      "events": [
+        {
+          "eventId": "OM-FIN-04.event.001",
+          "canonicalFactId": "completion.job.04",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "service_completion",
+            "id": "completion.job.04"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-11-01T04:30:00Z",
+          "receivedAt": "2026-11-01T04:31:00Z",
+          "kind": "service_completion",
+          "data": {
+            "jobId": "job.04",
+            "performedAt": "2026-11-01T04:30:00Z",
+            "billable": true
+          }
+        },
+        {
+          "eventId": "OM-FIN-04.event.002",
+          "canonicalFactId": "allocation.04",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "service_allocation",
+            "id": "allocation.04"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-11-03T15:00:00Z",
+          "receivedAt": "2026-11-03T15:01:00Z",
+          "kind": "service_allocation",
+          "data": {
+            "jobId": "job.04",
+            "invoiceId": null,
+            "amount": "600.00",
+            "basis": "gross",
+            "includedAdjustmentIds": [],
+            "finalizedAt": "2026-11-03T15:00:00Z",
+            "allocationScope": "Performed service only; tax, tips and separately identified fees excluded."
+          }
+        },
+        {
+          "eventId": "OM-FIN-04.event.003",
+          "canonicalFactId": "payment.04",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "settled_payment",
+            "id": "payment.04"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-11-04T15:00:00Z",
+          "receivedAt": "2026-11-04T15:01:00Z",
+          "kind": "settled_payment",
+          "data": {
+            "amount": "600.00",
+            "invoiceId": null,
+            "allocationClass": "service",
+            "settledAt": "2026-11-04T15:00:00Z",
+            "settlementEvidence": "synthetic authoritative final settlement"
+          }
+        }
+      ],
+      "checkpoints": [
+        {
+          "id": "october_service_unbilled",
+          "afterEventCount": 1,
+          "expected": {
+            "performed_service_revenue": "0.00",
+            "pending_unbilled_completed_work_count": 1,
+            "net_collected_cash": "0.00"
+          }
+        },
+        {
+          "id": "late_invoice_revises_october",
+          "afterEventCount": 2,
+          "expected": {
+            "performed_service_revenue": "600.00",
+            "net_earned_service_revenue": "600.00",
+            "pending_unbilled_completed_work_count": 0,
+            "net_collected_cash": "0.00"
+          }
+        },
+        {
+          "id": "november_cash_excluded_from_october",
+          "afterEventCount": 3,
+          "expected": {
+            "net_earned_service_revenue": "600.00",
+            "net_collected_cash": "0.00",
+            "settled_cash_before_refunds": "0.00"
+          }
+        }
+      ],
+      "claimLimits": [
+        "Arithmetic is a synthetic example, not production acceptance or causal evidence.",
+        "The original snapshot is superseded with revision provenance, not silently overwritten. Local October includes the service even though its UTC date is November 1.",
+        "The supplemental November-cash query is checked by the validator; no invoice issue-date allocation into November earned revenue is implied."
+      ],
+      "periodChecks": [
+        {
+          "timeZone": "America/Chicago",
+          "utcInstant": "2026-11-01T04:30:00Z",
+          "expectedLocalDateTime": "2026-10-31T23:30:00-05:00",
+          "expectedServiceMonth": "2026-10"
+        },
+        {
+          "cashMonth": "2026-11",
+          "expectedNetCollectedCash": "600.00"
+        }
+      ]
+    },
+    {
+      "id": "OM-FIN-05",
+      "title": "Accepted future work and completed unbilled work never substitute estimates",
+      "companyId": "10000000-0000-4000-8000-000000000001",
+      "currency": "USD",
+      "view": "financial",
+      "acceptanceRefs": [
+        "OM-A15",
+        "OM-A16",
+        "OM-A30"
+      ],
+      "decisionRefs": [
+        "OM-D03",
+        "OM-D07"
+      ],
+      "policyInputs": {
+        "status": "fixture_only",
+        "approval": "not_approved_business_policy",
+        "timeZone": "America/Chicago",
+        "asOf": "2026-11-30T23:59:59Z",
+        "serviceMonth": null,
+        "cashMonth": null,
+        "coverage": "Closed synthetic facts for the declared view; no real source completeness is inferred."
+      },
+      "events": [
+        {
+          "eventId": "OM-FIN-05.event.001",
+          "canonicalFactId": "estimate.05.completed",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "estimate_accepted",
+            "id": "estimate.05.completed"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-01T12:00:00Z",
+          "receivedAt": "2026-10-01T12:01:00Z",
+          "kind": "estimate_accepted",
+          "data": {
+            "amount": "800.00",
+            "jobId": "job.05",
+            "acceptedAt": "2026-10-01T12:00:00Z",
+            "workState": "awaiting_fulfillment"
+          }
+        },
+        {
+          "eventId": "OM-FIN-05.event.002",
+          "canonicalFactId": "estimate.05.future",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "estimate_accepted",
+            "id": "estimate.05.future"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-01T13:00:00Z",
+          "receivedAt": "2026-10-01T13:01:00Z",
+          "kind": "estimate_accepted",
+          "data": {
+            "amount": "5000.00",
+            "jobId": "job.05.future",
+            "acceptedAt": "2026-10-01T13:00:00Z",
+            "workState": "scheduled_future",
+            "scheduledAt": "2026-12-01T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-05.event.003",
+          "canonicalFactId": "completion.job.05",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "service_completion",
+            "id": "completion.job.05"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-03T15:00:00Z",
+          "receivedAt": "2026-10-03T15:01:00Z",
+          "kind": "service_completion",
+          "data": {
+            "jobId": "job.05",
+            "performedAt": "2026-10-03T15:00:00Z",
+            "billable": true
+          }
+        },
+        {
+          "eventId": "OM-FIN-05.event.004",
+          "canonicalFactId": "payment.05.ack",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "payment_acknowledged",
+            "id": "payment.05.ack"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-03T16:00:00Z",
+          "receivedAt": "2026-10-03T16:01:00Z",
+          "kind": "payment_acknowledged",
+          "data": {
+            "amount": "800.00",
+            "providerState": "accepted_pending_settlement",
+            "jobId": "job.05"
+          }
+        }
+      ],
+      "checkpoints": [
+        {
+          "id": "accepted_scope_only",
+          "afterEventCount": 2,
+          "expected": {
+            "accepted_work_value": "5800.00",
+            "net_earned_service_revenue": "0.00",
+            "net_collected_cash": "0.00",
+            "pending_unbilled_completed_work_count": 0
+          }
+        },
+        {
+          "id": "completed_without_finalized_invoice",
+          "afterEventCount": 4,
+          "expected": {
+            "accepted_work_value": "5800.00",
+            "net_earned_service_revenue": "0.00",
+            "net_collected_cash": "0.00",
+            "pending_unbilled_completed_work_count": 1,
+            "completed_job_count": 1
+          }
+        }
+      ],
+      "claimLimits": [
+        "Arithmetic is a synthetic example, not production acceptance or causal evidence.",
+        "Zero recognized amount is accompanied by one pending/unbilled completed job; it is not a claim that the completed job has zero economic value. The unknown unbilled amount is never replaced by the accepted estimate."
+      ]
+    },
+    {
+      "id": "OM-FIN-06",
+      "title": "Unearned deposit is returned before any service",
+      "companyId": "10000000-0000-4000-8000-000000000001",
+      "currency": "USD",
+      "view": "financial",
+      "acceptanceRefs": [
+        "OM-A16",
+        "OM-A33"
+      ],
+      "decisionRefs": [
+        "OM-D03",
+        "OM-D07"
+      ],
+      "policyInputs": {
+        "status": "fixture_only",
+        "approval": "not_approved_business_policy",
+        "timeZone": "America/Chicago",
+        "asOf": "2026-11-30T23:59:59Z",
+        "serviceMonth": null,
+        "cashMonth": null,
+        "coverage": "Closed synthetic facts for the declared view; no real source completeness is inferred."
+      },
+      "events": [
+        {
+          "eventId": "OM-FIN-06.event.001",
+          "canonicalFactId": "deposit.06",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "settled_payment",
+            "id": "deposit.06"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-02T16:00:00Z",
+          "receivedAt": "2026-10-02T16:01:00Z",
+          "kind": "settled_payment",
+          "data": {
+            "amount": "250.00",
+            "invoiceId": null,
+            "allocationClass": "unearned_deposit",
+            "settledAt": "2026-10-02T16:00:00Z",
+            "settlementEvidence": "synthetic authoritative final settlement"
+          }
+        },
+        {
+          "eventId": "OM-FIN-06.event.002",
+          "canonicalFactId": "refund.06",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cash_refund",
+            "id": "refund.06"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-04T16:00:00Z",
+          "receivedAt": "2026-10-04T16:01:00Z",
+          "kind": "cash_refund",
+          "data": {
+            "amount": "250.00",
+            "paymentId": "deposit.06",
+            "linkedCreditId": null,
+            "refundedAt": "2026-10-04T16:00:00Z"
+          }
+        }
+      ],
+      "checkpoints": [
+        {
+          "id": "deposit_held",
+          "afterEventCount": 1,
+          "expected": {
+            "net_collected_cash": "250.00",
+            "net_earned_service_revenue": "0.00"
+          }
+        },
+        {
+          "id": "deposit_returned",
+          "afterEventCount": 2,
+          "expected": {
+            "net_collected_cash": "0.00",
+            "net_earned_service_revenue": "0.00",
+            "cash_refunds": "250.00"
+          }
+        }
+      ],
+      "claimLimits": [
+        "Arithmetic is a synthetic example, not production acceptance or causal evidence.",
+        "The deposit has no performed-service allocation. Refunding it cannot manufacture negative earned service revenue."
+      ]
+    },
+    {
+      "id": "OM-FIN-07",
+      "title": "Partial payment plus credit leaves an open receivable",
+      "companyId": "10000000-0000-4000-8000-000000000001",
+      "currency": "USD",
+      "view": "financial",
+      "acceptanceRefs": [
+        "OM-A16",
+        "OM-A19"
+      ],
+      "decisionRefs": [
+        "OM-D03",
+        "OM-D07"
+      ],
+      "policyInputs": {
+        "status": "fixture_only",
+        "approval": "not_approved_business_policy",
+        "timeZone": "America/Chicago",
+        "asOf": "2026-11-30T23:59:59Z",
+        "serviceMonth": null,
+        "cashMonth": null,
+        "coverage": "Closed synthetic facts for the declared view; no real source completeness is inferred."
+      },
+      "events": [
+        {
+          "eventId": "OM-FIN-07.event.001",
+          "canonicalFactId": "completion.job.07",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "service_completion",
+            "id": "completion.job.07"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-01T15:00:00Z",
+          "receivedAt": "2026-10-01T15:01:00Z",
+          "kind": "service_completion",
+          "data": {
+            "jobId": "job.07",
+            "performedAt": "2026-10-01T15:00:00Z",
+            "billable": true
+          }
+        },
+        {
+          "eventId": "OM-FIN-07.event.002",
+          "canonicalFactId": "allocation.07",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "service_allocation",
+            "id": "allocation.07"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-01T16:00:00Z",
+          "receivedAt": "2026-10-01T16:01:00Z",
+          "kind": "service_allocation",
+          "data": {
+            "jobId": "job.07",
+            "invoiceId": "invoice.07",
+            "amount": "1000.00",
+            "basis": "gross",
+            "includedAdjustmentIds": [],
+            "finalizedAt": "2026-10-01T16:00:00Z",
+            "allocationScope": "Performed service only; tax, tips and separately identified fees excluded."
+          }
+        },
+        {
+          "eventId": "OM-FIN-07.event.003",
+          "canonicalFactId": "invoice.07",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "invoice_finalized",
+            "id": "invoice.07"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-01T16:00:00Z",
+          "receivedAt": "2026-10-01T16:01:00Z",
+          "kind": "invoice_finalized",
+          "data": {
+            "totalDue": "1000.00",
+            "issuedAt": "2026-10-01T16:00:00Z",
+            "completedAt": "2026-10-01T15:00:00Z",
+            "dueAt": "2026-10-15T16:00:00Z",
+            "disputed": false
+          }
+        },
+        {
+          "eventId": "OM-FIN-07.event.004",
+          "canonicalFactId": "payment.07",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "settled_payment",
+            "id": "payment.07"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-02T16:00:00Z",
+          "receivedAt": "2026-10-02T16:01:00Z",
+          "kind": "settled_payment",
+          "data": {
+            "amount": "300.00",
+            "invoiceId": "invoice.07",
+            "allocationClass": "service",
+            "settledAt": "2026-10-02T16:00:00Z",
+            "settlementEvidence": "synthetic authoritative final settlement"
+          }
+        },
+        {
+          "eventId": "OM-FIN-07.event.005",
+          "canonicalFactId": "credit.07",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "revenue_credit",
+            "id": "credit.07"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-03T16:00:00Z",
+          "receivedAt": "2026-10-03T16:01:00Z",
+          "kind": "revenue_credit",
+          "data": {
+            "amount": "200.00",
+            "allocationId": "allocation.07",
+            "invoiceId": "invoice.07"
+          }
+        }
+      ],
+      "checkpoints": [
+        {
+          "id": "partially_paid",
+          "afterEventCount": 4,
+          "expected": {
+            "net_earned_service_revenue": "1000.00",
+            "net_collected_cash": "300.00",
+            "open_invoice_balance": "700.00"
+          }
+        },
+        {
+          "id": "credit_reduces_receivable_without_cash",
+          "afterEventCount": 5,
+          "expected": {
+            "net_earned_service_revenue": "800.00",
+            "net_collected_cash": "300.00",
+            "open_invoice_balance": "500.00",
+            "invoice_balances": {
+              "invoice.07": "500.00"
+            }
+          }
+        }
+      ],
+      "claimLimits": [
+        "Arithmetic is a synthetic example, not production acceptance or causal evidence."
+      ]
+    },
+    {
+      "id": "OM-FIN-08",
+      "title": "Annual agreement collected without reliable recognition policy",
+      "companyId": "10000000-0000-4000-8000-000000000001",
+      "currency": "USD",
+      "view": "financial",
+      "acceptanceRefs": [
+        "OM-A16",
+        "OM-A32"
+      ],
+      "decisionRefs": [
+        "OM-D02",
+        "OM-D03"
+      ],
+      "policyInputs": {
+        "status": "fixture_only",
+        "approval": "not_approved_business_policy",
+        "timeZone": "America/Chicago",
+        "asOf": "2026-11-30T23:59:59Z",
+        "serviceMonth": null,
+        "cashMonth": null,
+        "coverage": "Closed synthetic facts for the declared view; no real source completeness is inferred."
+      },
+      "events": [
+        {
+          "eventId": "OM-FIN-08.event.001",
+          "canonicalFactId": "agreement.08",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "agreement_terms",
+            "id": "agreement.08"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-01T12:00:00Z",
+          "receivedAt": "2026-10-01T12:01:00Z",
+          "kind": "agreement_terms",
+          "data": {
+            "contractValue": "1200.00",
+            "recognitionPolicyId": null,
+            "obligationIds": [
+              "fall.08",
+              "spring.08"
+            ],
+            "acceptedTermsRef": "synthetic-accepted-terms.08",
+            "billingAuthorityRef": "synthetic-authorized-billing.08"
+          }
+        },
+        {
+          "eventId": "OM-FIN-08.event.002",
+          "canonicalFactId": "payment.08",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "settled_payment",
+            "id": "payment.08"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-02T16:00:00Z",
+          "receivedAt": "2026-10-02T16:01:00Z",
+          "kind": "settled_payment",
+          "data": {
+            "amount": "1200.00",
+            "invoiceId": null,
+            "allocationClass": "agreement",
+            "settledAt": "2026-10-02T16:00:00Z",
+            "settlementEvidence": "synthetic authoritative final settlement"
+          }
+        }
+      ],
+      "checkpoints": [
+        {
+          "id": "terms_without_recognition_policy",
+          "afterEventCount": 1,
+          "expected": {
+            "agreement_contract_value": "1200.00",
+            "earned_agreement_revenue": null,
+            "net_earned_service_revenue": null,
+            "known_earned_subtotal": "0.00",
+            "net_collected_cash": "0.00",
+            "agreement_revenue_unavailable_ids": [
+              "agreement.08"
+            ]
+          }
+        },
+        {
+          "id": "annual_cash_received",
+          "afterEventCount": 2,
+          "expected": {
+            "agreement_contract_value": "1200.00",
+            "earned_agreement_revenue": null,
+            "net_earned_service_revenue": null,
+            "known_earned_subtotal": "0.00",
+            "net_collected_cash": "1200.00",
+            "agreement_revenue_unavailable_ids": [
+              "agreement.08"
+            ]
+          }
+        }
+      ],
+      "claimLimits": [
+        "Arithmetic is a synthetic example, not production acceptance or causal evidence.",
+        "Terms and a synthetic authorized payment do not establish an active OM enrollment or approved recognition. Monthly earned total is unavailable where its included agreement component is unknown."
+      ]
+    },
+    {
+      "id": "OM-FIN-09",
+      "title": "Fixture-only agreement milestone and included-benefit recognition",
+      "companyId": "10000000-0000-4000-8000-000000000001",
+      "currency": "USD",
+      "view": "financial",
+      "acceptanceRefs": [
+        "OM-A16",
+        "OM-A32"
+      ],
+      "decisionRefs": [
+        "OM-D02",
+        "OM-D03"
+      ],
+      "policyInputs": {
+        "status": "fixture_only",
+        "approval": "not_approved_business_policy",
+        "timeZone": "America/Chicago",
+        "asOf": "2026-11-30T23:59:59Z",
+        "serviceMonth": "2026-10",
+        "cashMonth": null,
+        "coverage": "Closed synthetic facts for the declared view; no real source completeness is inferred.",
+        "agreementRecognition": {
+          "id": "fixture.milestones.09.v1",
+          "status": "fixture_only",
+          "obligationAmounts": {
+            "fall.09": "300.00",
+            "spring.09": "900.00"
+          },
+          "rule": "Recognize the assigned obligation amount only when that obligation is verifiably fulfilled; do not also book an included-benefit service allocation."
+        }
+      },
+      "events": [
+        {
+          "eventId": "OM-FIN-09.event.001",
+          "canonicalFactId": "agreement.09",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "agreement_terms",
+            "id": "agreement.09"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-01T12:00:00Z",
+          "receivedAt": "2026-10-01T12:01:00Z",
+          "kind": "agreement_terms",
+          "data": {
+            "contractValue": "1200.00",
+            "recognitionPolicyId": "fixture.milestones.09.v1",
+            "obligationIds": [
+              "fall.09",
+              "spring.09"
+            ],
+            "acceptedTermsRef": "synthetic-accepted-terms.09",
+            "billingAuthorityRef": "synthetic-authorized-billing.09"
+          }
+        },
+        {
+          "eventId": "OM-FIN-09.event.002",
+          "canonicalFactId": "payment.09",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "settled_payment",
+            "id": "payment.09"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-02T16:00:00Z",
+          "receivedAt": "2026-10-02T16:01:00Z",
+          "kind": "settled_payment",
+          "data": {
+            "amount": "1200.00",
+            "invoiceId": null,
+            "allocationClass": "agreement",
+            "settledAt": "2026-10-02T16:00:00Z",
+            "settlementEvidence": "synthetic authoritative final settlement"
+          }
+        },
+        {
+          "eventId": "OM-FIN-09.event.003",
+          "canonicalFactId": "benefit.09.fall",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "agreement_benefit_fulfilled",
+            "id": "benefit.09.fall"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-15T15:00:00Z",
+          "receivedAt": "2026-10-15T15:01:00Z",
+          "kind": "agreement_benefit_fulfilled",
+          "data": {
+            "agreementId": "agreement.09",
+            "obligationId": "fall.09",
+            "performedAt": "2026-10-15T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-09.event.004",
+          "canonicalFactId": "recognition.09.fall",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "agreement_recognition",
+            "id": "recognition.09.fall"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-15T16:00:00Z",
+          "receivedAt": "2026-10-15T16:01:00Z",
+          "kind": "agreement_recognition",
+          "data": {
+            "agreementId": "agreement.09",
+            "obligationId": "fall.09",
+            "amount": "300.00",
+            "earnedAt": "2026-10-15T15:00:00Z",
+            "fulfillmentVerified": true,
+            "fulfillmentFactId": "benefit.09.fall"
+          }
+        }
+      ],
+      "checkpoints": [
+        {
+          "id": "cash_before_any_obligation_fulfilled",
+          "afterEventCount": 2,
+          "expected": {
+            "agreement_contract_value": "1200.00",
+            "earned_agreement_revenue": "0.00",
+            "net_earned_service_revenue": "0.00",
+            "net_collected_cash": "1200.00"
+          }
+        },
+        {
+          "id": "first_obligation_recognized_once",
+          "afterEventCount": 4,
+          "expected": {
+            "performed_service_revenue": "0.00",
+            "earned_agreement_revenue": "300.00",
+            "net_earned_service_revenue": "300.00",
+            "known_earned_subtotal": "300.00",
+            "net_collected_cash": "1200.00",
+            "agreement_contract_value": "1200.00"
+          }
+        }
+      ],
+      "claimLimits": [
+        "Arithmetic is a synthetic example, not production acceptance or causal evidence.",
+        "USD 300/900 milestone allocation is arbitrary fixture policy awaiting OM-D02, not an approved rule, pricing recommendation, straight-line schedule or financial-accounting advice. The included benefit produces no second service-allocation revenue."
+      ]
+    },
+    {
+      "id": "OM-FIN-10",
+      "title": "Known materials and fees leave incomplete contribution",
+      "companyId": "10000000-0000-4000-8000-000000000001",
+      "currency": "USD",
+      "view": "financial",
+      "acceptanceRefs": [
+        "OM-A16",
+        "OM-A17"
+      ],
+      "decisionRefs": [
+        "OM-D03"
+      ],
+      "policyInputs": {
+        "status": "fixture_only",
+        "approval": "not_approved_business_policy",
+        "timeZone": "America/Chicago",
+        "asOf": "2026-11-30T23:59:59Z",
+        "serviceMonth": null,
+        "cashMonth": null,
+        "coverage": "Closed synthetic facts for the declared view; no real source completeness is inferred.",
+        "requiredCostComponents": [
+          "labor",
+          "materials",
+          "travel_fulfillment",
+          "transaction_fees",
+          "acquisition"
+        ]
+      },
+      "events": [
+        {
+          "eventId": "OM-FIN-10.event.001",
+          "canonicalFactId": "completion.job.10",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "service_completion",
+            "id": "completion.job.10"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-01T15:00:00Z",
+          "receivedAt": "2026-10-01T15:01:00Z",
+          "kind": "service_completion",
+          "data": {
+            "jobId": "job.10",
+            "performedAt": "2026-10-01T15:00:00Z",
+            "billable": true
+          }
+        },
+        {
+          "eventId": "OM-FIN-10.event.002",
+          "canonicalFactId": "allocation.10",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "service_allocation",
+            "id": "allocation.10"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-01T16:00:00Z",
+          "receivedAt": "2026-10-01T16:01:00Z",
+          "kind": "service_allocation",
+          "data": {
+            "jobId": "job.10",
+            "invoiceId": null,
+            "amount": "1000.00",
+            "basis": "gross",
+            "includedAdjustmentIds": [],
+            "finalizedAt": "2026-10-01T16:00:00Z",
+            "allocationScope": "Performed service only; tax, tips and separately identified fees excluded."
+          }
+        },
+        {
+          "eventId": "OM-FIN-10.event.003",
+          "canonicalFactId": "cost.10.materials",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "variable_cost",
+            "id": "cost.10.materials"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-05T15:00:00Z",
+          "receivedAt": "2026-10-05T15:01:00Z",
+          "kind": "variable_cost",
+          "data": {
+            "component": "materials",
+            "amount": "150.00",
+            "jobId": "job.10",
+            "historicalSourceRef": "synthetic-cost-snapshot:cost.10.materials:v1",
+            "incurredAt": "2026-10-05T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-10.event.004",
+          "canonicalFactId": "cost.10.fees",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "variable_cost",
+            "id": "cost.10.fees"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-05T15:00:00Z",
+          "receivedAt": "2026-10-05T15:01:00Z",
+          "kind": "variable_cost",
+          "data": {
+            "component": "transaction_fees",
+            "amount": "30.00",
+            "jobId": "job.10",
+            "historicalSourceRef": "synthetic-cost-snapshot:cost.10.fees:v1",
+            "incurredAt": "2026-10-05T15:00:00Z"
+          }
+        }
+      ],
+      "checkpoints": [
+        {
+          "id": "materials_only",
+          "afterEventCount": 3,
+          "expected": {
+            "net_earned_service_revenue": "1000.00",
+            "known_variable_cost_total": "150.00",
+            "known_cost_remainder": "850.00",
+            "contribution_before_fixed_overhead": null,
+            "missing_cost_components": [
+              "acquisition",
+              "labor",
+              "transaction_fees",
+              "travel_fulfillment"
+            ],
+            "contribution_status": "incomplete"
+          }
+        },
+        {
+          "id": "materials_and_fees_only",
+          "afterEventCount": 4,
+          "expected": {
+            "net_earned_service_revenue": "1000.00",
+            "known_variable_cost_total": "180.00",
+            "known_cost_remainder": "820.00",
+            "contribution_before_fixed_overhead": null,
+            "missing_cost_components": [
+              "acquisition",
+              "labor",
+              "travel_fulfillment"
+            ],
+            "contribution_status": "incomplete"
+          }
+        }
+      ],
+      "claimLimits": [
+        "Arithmetic is a synthetic example, not production acceptance or causal evidence.",
+        "USD 820 is earned revenue less the two known costs. It is not complete contribution, profit, an economic floor pass or permission to scale acquisition."
+      ]
+    },
+    {
+      "id": "OM-FIN-11",
+      "title": "Complete fixture variable-cost scope uses historical evidence",
+      "companyId": "10000000-0000-4000-8000-000000000001",
+      "currency": "USD",
+      "view": "financial",
+      "acceptanceRefs": [
+        "OM-A16",
+        "OM-A17"
+      ],
+      "decisionRefs": [
+        "OM-D03"
+      ],
+      "policyInputs": {
+        "status": "fixture_only",
+        "approval": "not_approved_business_policy",
+        "timeZone": "America/Chicago",
+        "asOf": "2026-11-30T23:59:59Z",
+        "serviceMonth": null,
+        "cashMonth": null,
+        "coverage": "Closed synthetic facts for the declared view; no real source completeness is inferred.",
+        "requiredCostComponents": [
+          "labor",
+          "materials",
+          "travel_fulfillment",
+          "transaction_fees",
+          "acquisition"
+        ]
+      },
+      "events": [
+        {
+          "eventId": "OM-FIN-11.event.001",
+          "canonicalFactId": "completion.job.11",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "service_completion",
+            "id": "completion.job.11"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-01T15:00:00Z",
+          "receivedAt": "2026-10-01T15:01:00Z",
+          "kind": "service_completion",
+          "data": {
+            "jobId": "job.11",
+            "performedAt": "2026-10-01T15:00:00Z",
+            "billable": true
+          }
+        },
+        {
+          "eventId": "OM-FIN-11.event.002",
+          "canonicalFactId": "allocation.11",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "service_allocation",
+            "id": "allocation.11"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-01T16:00:00Z",
+          "receivedAt": "2026-10-01T16:01:00Z",
+          "kind": "service_allocation",
+          "data": {
+            "jobId": "job.11",
+            "invoiceId": null,
+            "amount": "1000.00",
+            "basis": "gross",
+            "includedAdjustmentIds": [],
+            "finalizedAt": "2026-10-01T16:00:00Z",
+            "allocationScope": "Performed service only; tax, tips and separately identified fees excluded."
+          }
+        },
+        {
+          "eventId": "OM-FIN-11.event.003",
+          "canonicalFactId": "cost.11.labor",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "variable_cost",
+            "id": "cost.11.labor"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-05T15:00:00Z",
+          "receivedAt": "2026-10-05T15:01:00Z",
+          "kind": "variable_cost",
+          "data": {
+            "component": "labor",
+            "amount": "200.00",
+            "jobId": "job.11",
+            "historicalSourceRef": "synthetic-cost-snapshot:cost.11.labor:v1",
+            "incurredAt": "2026-10-05T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-11.event.004",
+          "canonicalFactId": "cost.11.materials",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "variable_cost",
+            "id": "cost.11.materials"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-05T15:00:00Z",
+          "receivedAt": "2026-10-05T15:01:00Z",
+          "kind": "variable_cost",
+          "data": {
+            "component": "materials",
+            "amount": "150.00",
+            "jobId": "job.11",
+            "historicalSourceRef": "synthetic-cost-snapshot:cost.11.materials:v1",
+            "incurredAt": "2026-10-05T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-11.event.005",
+          "canonicalFactId": "cost.11.travel_fulfillment",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "variable_cost",
+            "id": "cost.11.travel_fulfillment"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-05T15:00:00Z",
+          "receivedAt": "2026-10-05T15:01:00Z",
+          "kind": "variable_cost",
+          "data": {
+            "component": "travel_fulfillment",
+            "amount": "50.00",
+            "jobId": "job.11",
+            "historicalSourceRef": "synthetic-cost-snapshot:cost.11.travel_fulfillment:v1",
+            "incurredAt": "2026-10-05T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-11.event.006",
+          "canonicalFactId": "cost.11.transaction_fees",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "variable_cost",
+            "id": "cost.11.transaction_fees"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-05T15:00:00Z",
+          "receivedAt": "2026-10-05T15:01:00Z",
+          "kind": "variable_cost",
+          "data": {
+            "component": "transaction_fees",
+            "amount": "30.00",
+            "jobId": "job.11",
+            "historicalSourceRef": "synthetic-cost-snapshot:cost.11.transaction_fees:v1",
+            "incurredAt": "2026-10-05T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-11.event.007",
+          "canonicalFactId": "cost.11.acquisition",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "variable_cost",
+            "id": "cost.11.acquisition"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-05T15:00:00Z",
+          "receivedAt": "2026-10-05T15:01:00Z",
+          "kind": "variable_cost",
+          "data": {
+            "component": "acquisition",
+            "amount": "70.00",
+            "jobId": "job.11",
+            "historicalSourceRef": "synthetic-cost-snapshot:cost.11.acquisition:v1",
+            "incurredAt": "2026-10-05T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-11.event.008",
+          "canonicalFactId": "catalog.11.current",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "later_catalog_price",
+            "id": "catalog.11.current"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-11-01T15:00:00Z",
+          "receivedAt": "2026-11-01T15:01:00Z",
+          "kind": "later_catalog_price",
+          "data": {
+            "amount": "999.00",
+            "purpose": "Current catalog price is irrelevant to this historical material cost snapshot."
+          }
+        }
+      ],
+      "checkpoints": [
+        {
+          "id": "acquisition_allocation_pending",
+          "afterEventCount": 6,
+          "expected": {
+            "known_variable_cost_total": "430.00",
+            "known_cost_remainder": "570.00",
+            "contribution_before_fixed_overhead": null,
+            "missing_cost_components": [
+              "acquisition"
+            ]
+          }
+        },
+        {
+          "id": "historical_cost_scope_complete",
+          "afterEventCount": 8,
+          "expected": {
+            "known_variable_cost_total": "500.00",
+            "known_cost_remainder": "500.00",
+            "contribution_before_fixed_overhead": "500.00",
+            "missing_cost_components": [],
+            "contribution_status": "complete_for_fixture_scope"
+          }
+        }
+      ],
+      "claimLimits": [
+        "Arithmetic is a synthetic example, not production acceptance or causal evidence.",
+        "The explicitly closed five-component fixture scope is complete; that does not approve the same cost scope or acquisition allocation in a real business. Fixed overhead and tax are not modeled, so this is not net profit."
+      ]
+    },
+    {
+      "id": "OM-FIN-12",
+      "title": "Rescheduling preserves booking identity; cancellation changes net count",
+      "companyId": "10000000-0000-4000-8000-000000000001",
+      "currency": "USD",
+      "view": "financial",
+      "acceptanceRefs": [
+        "OM-A14",
+        "OM-A15"
+      ],
+      "decisionRefs": [
+        "OM-D01",
+        "OM-D06",
+        "OM-D07"
+      ],
+      "policyInputs": {
+        "status": "fixture_only",
+        "approval": "not_approved_business_policy",
+        "timeZone": "America/Chicago",
+        "asOf": "2026-11-30T23:59:59Z",
+        "serviceMonth": null,
+        "cashMonth": null,
+        "coverage": "Closed synthetic facts for the declared view; no real source completeness is inferred."
+      },
+      "events": [
+        {
+          "eventId": "OM-FIN-12.event.001",
+          "canonicalFactId": "booking.12.installation",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "booking_state",
+            "id": "booking.12.installation"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-01T15:00:00Z",
+          "receivedAt": "2026-10-01T15:01:00Z",
+          "kind": "booking_state",
+          "data": {
+            "opportunityId": "opportunity.12.installation",
+            "bookingType": "installation",
+            "status": "confirmed",
+            "scheduledAt": "2026-10-15T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-12.event.002",
+          "canonicalFactId": "booking.12.installation",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "booking_state",
+            "id": "booking.12.installation"
+          },
+          "sourceVersion": 2,
+          "occurredAt": "2026-10-02T15:00:00Z",
+          "receivedAt": "2026-10-02T15:01:00Z",
+          "kind": "booking_state",
+          "data": {
+            "opportunityId": "opportunity.12.installation",
+            "bookingType": "installation",
+            "status": "confirmed",
+            "scheduledAt": "2026-10-18T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-12.event.003",
+          "canonicalFactId": "booking.12.assessment",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "booking_state",
+            "id": "booking.12.assessment"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-03T15:00:00Z",
+          "receivedAt": "2026-10-03T15:01:00Z",
+          "kind": "booking_state",
+          "data": {
+            "opportunityId": "opportunity.12.separate_need",
+            "bookingType": "replacement_assessment",
+            "status": "confirmed",
+            "scheduledAt": "2026-10-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-12.event.004",
+          "canonicalFactId": "booking.12.installation",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "booking_state",
+            "id": "booking.12.installation"
+          },
+          "sourceVersion": 3,
+          "occurredAt": "2026-10-04T15:00:00Z",
+          "receivedAt": "2026-10-04T15:01:00Z",
+          "kind": "booking_state",
+          "data": {
+            "opportunityId": "opportunity.12.installation",
+            "bookingType": "installation",
+            "status": "cancelled",
+            "scheduledAt": "2026-10-18T15:00:00Z"
+          }
+        }
+      ],
+      "checkpoints": [
+        {
+          "id": "installation_confirmed",
+          "afterEventCount": 1,
+          "expected": {
+            "net_confirmed_bookings": 1,
+            "confirmed_bookings_by_type": {
+              "installation": 1
+            },
+            "net_earned_service_revenue": "0.00"
+          }
+        },
+        {
+          "id": "reschedule_plus_distinct_assessment",
+          "afterEventCount": 3,
+          "expected": {
+            "net_confirmed_bookings": 2,
+            "confirmed_bookings_by_type": {
+              "installation": 1,
+              "replacement_assessment": 1
+            },
+            "net_earned_service_revenue": "0.00"
+          }
+        },
+        {
+          "id": "installation_cancelled_assessment_remains",
+          "afterEventCount": 4,
+          "expected": {
+            "net_confirmed_bookings": 1,
+            "confirmed_bookings_by_type": {
+              "installation": 0,
+              "replacement_assessment": 1
+            },
+            "net_earned_service_revenue": "0.00",
+            "net_collected_cash": "0.00"
+          }
+        }
+      ],
+      "claimLimits": [
+        "Arithmetic is a synthetic example, not production acceptance or causal evidence.",
+        "The overall count must be displayed with its declared booking-type breakdown. An assessment is not installation revenue or a completed installation. Real opportunity merge/split rules remain OM-D07."
+      ]
+    },
+    {
+      "id": "OM-FIN-13",
+      "title": "Shared contributors link to one canonical outcome",
+      "companyId": "10000000-0000-4000-8000-000000000001",
+      "currency": "USD",
+      "view": "financial",
+      "acceptanceRefs": [
+        "OM-A14",
+        "OM-A15"
+      ],
+      "decisionRefs": [
+        "OM-D07",
+        "OM-D11"
+      ],
+      "policyInputs": {
+        "status": "fixture_only",
+        "approval": "not_approved_business_policy",
+        "timeZone": "America/Chicago",
+        "asOf": "2026-11-30T23:59:59Z",
+        "serviceMonth": null,
+        "cashMonth": null,
+        "coverage": "Closed synthetic facts for the declared view; no real source completeness is inferred."
+      },
+      "events": [
+        {
+          "eventId": "OM-FIN-13.event.001",
+          "canonicalFactId": "completion.job.13",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "service_completion",
+            "id": "completion.job.13"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-01T15:00:00Z",
+          "receivedAt": "2026-10-01T15:01:00Z",
+          "kind": "service_completion",
+          "data": {
+            "jobId": "job.13",
+            "performedAt": "2026-10-01T15:00:00Z",
+            "billable": true
+          }
+        },
+        {
+          "eventId": "OM-FIN-13.event.002",
+          "canonicalFactId": "allocation.13",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "service_allocation",
+            "id": "allocation.13"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-01T16:00:00Z",
+          "receivedAt": "2026-10-01T16:01:00Z",
+          "kind": "service_allocation",
+          "data": {
+            "jobId": "job.13",
+            "invoiceId": null,
+            "amount": "800.00",
+            "basis": "gross",
+            "includedAdjustmentIds": [],
+            "finalizedAt": "2026-10-01T16:00:00Z",
+            "allocationScope": "Performed service only; tax, tips and separately identified fees excluded."
+          }
+        },
+        {
+          "eventId": "OM-FIN-13.event.003",
+          "canonicalFactId": "contributor.13.bookings",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "outcome_contributor",
+            "id": "contributor.13.bookings"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-02T15:00:00Z",
+          "receivedAt": "2026-10-02T15:01:00Z",
+          "kind": "outcome_contributor",
+          "data": {
+            "outcomeFactId": "allocation.13",
+            "missionRunId": "mission.13.bookings",
+            "relationship": "descriptive_contributor"
+          }
+        },
+        {
+          "eventId": "OM-FIN-13.event.004",
+          "canonicalFactId": "contributor.13.revenue",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "outcome_contributor",
+            "id": "contributor.13.revenue"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-02T16:00:00Z",
+          "receivedAt": "2026-10-02T16:01:00Z",
+          "kind": "outcome_contributor",
+          "data": {
+            "outcomeFactId": "allocation.13",
+            "missionRunId": "mission.13.revenue",
+            "relationship": "descriptive_contributor"
+          }
+        }
+      ],
+      "checkpoints": [
+        {
+          "id": "first_contributor",
+          "afterEventCount": 3,
+          "expected": {
+            "net_earned_service_revenue": "800.00",
+            "outcome_contributor_count": 1
+          }
+        },
+        {
+          "id": "second_contributor_same_outcome",
+          "afterEventCount": 4,
+          "expected": {
+            "net_earned_service_revenue": "800.00",
+            "outcome_contributor_count": 2,
+            "net_collected_cash": "0.00"
+          }
+        }
+      ],
+      "claimLimits": [
+        "Arithmetic is a synthetic example, not production acceptance or causal evidence.",
+        "The two contributor records contain no copied revenue amount. Do not sum mission-attributed subtotals or claim either mission caused all/part of this outcome."
+      ]
+    },
+    {
+      "id": "OM-FIN-14",
+      "title": "Average job value increases while fixed-cohort revenue per opportunity falls",
+      "companyId": "10000000-0000-4000-8000-000000000001",
+      "currency": "USD",
+      "view": "job_value",
+      "acceptanceRefs": [
+        "OM-A17",
+        "OM-A23",
+        "OM-A34"
+      ],
+      "decisionRefs": [
+        "OM-D01",
+        "OM-D07",
+        "OM-D11"
+      ],
+      "policyInputs": {
+        "status": "fixture_only",
+        "approval": "not_approved_business_policy",
+        "timeZone": "America/Chicago",
+        "asOf": "2026-11-30T23:59:59Z",
+        "serviceMonth": null,
+        "cashMonth": null,
+        "coverage": "Closed synthetic facts for the declared view; no real source completeness is inferred.",
+        "comparisonCohortId": "cohort.14.comparison",
+        "averageTarget": "300.00",
+        "revenuePerOpportunityFloor": "80.00",
+        "comparisonDesign": "Descriptive nonrandomized synthetic cohorts; no causal estimator."
+      },
+      "events": [
+        {
+          "eventId": "OM-FIN-14.event.001",
+          "canonicalFactId": "cohort.14.baseline",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_frozen",
+            "id": "cohort.14.baseline"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-09-01T00:00:00Z",
+          "receivedAt": "2026-09-01T00:01:00Z",
+          "kind": "cohort_frozen",
+          "data": {
+            "memberIds": [
+              "opportunity.14.baseline.001",
+              "opportunity.14.baseline.002",
+              "opportunity.14.baseline.003",
+              "opportunity.14.baseline.004",
+              "opportunity.14.baseline.005",
+              "opportunity.14.baseline.006",
+              "opportunity.14.baseline.007",
+              "opportunity.14.baseline.008",
+              "opportunity.14.baseline.009",
+              "opportunity.14.baseline.010",
+              "opportunity.14.baseline.011",
+              "opportunity.14.baseline.012",
+              "opportunity.14.baseline.013",
+              "opportunity.14.baseline.014",
+              "opportunity.14.baseline.015",
+              "opportunity.14.baseline.016",
+              "opportunity.14.baseline.017",
+              "opportunity.14.baseline.018",
+              "opportunity.14.baseline.019",
+              "opportunity.14.baseline.020",
+              "opportunity.14.baseline.021",
+              "opportunity.14.baseline.022",
+              "opportunity.14.baseline.023",
+              "opportunity.14.baseline.024",
+              "opportunity.14.baseline.025",
+              "opportunity.14.baseline.026",
+              "opportunity.14.baseline.027",
+              "opportunity.14.baseline.028",
+              "opportunity.14.baseline.029",
+              "opportunity.14.baseline.030",
+              "opportunity.14.baseline.031",
+              "opportunity.14.baseline.032",
+              "opportunity.14.baseline.033",
+              "opportunity.14.baseline.034",
+              "opportunity.14.baseline.035",
+              "opportunity.14.baseline.036",
+              "opportunity.14.baseline.037",
+              "opportunity.14.baseline.038",
+              "opportunity.14.baseline.039",
+              "opportunity.14.baseline.040",
+              "opportunity.14.baseline.041",
+              "opportunity.14.baseline.042",
+              "opportunity.14.baseline.043",
+              "opportunity.14.baseline.044",
+              "opportunity.14.baseline.045",
+              "opportunity.14.baseline.046",
+              "opportunity.14.baseline.047",
+              "opportunity.14.baseline.048",
+              "opportunity.14.baseline.049",
+              "opportunity.14.baseline.050",
+              "opportunity.14.baseline.051",
+              "opportunity.14.baseline.052",
+              "opportunity.14.baseline.053",
+              "opportunity.14.baseline.054",
+              "opportunity.14.baseline.055",
+              "opportunity.14.baseline.056",
+              "opportunity.14.baseline.057",
+              "opportunity.14.baseline.058",
+              "opportunity.14.baseline.059",
+              "opportunity.14.baseline.060",
+              "opportunity.14.baseline.061",
+              "opportunity.14.baseline.062",
+              "opportunity.14.baseline.063",
+              "opportunity.14.baseline.064",
+              "opportunity.14.baseline.065",
+              "opportunity.14.baseline.066",
+              "opportunity.14.baseline.067",
+              "opportunity.14.baseline.068",
+              "opportunity.14.baseline.069",
+              "opportunity.14.baseline.070",
+              "opportunity.14.baseline.071",
+              "opportunity.14.baseline.072",
+              "opportunity.14.baseline.073",
+              "opportunity.14.baseline.074",
+              "opportunity.14.baseline.075",
+              "opportunity.14.baseline.076",
+              "opportunity.14.baseline.077",
+              "opportunity.14.baseline.078",
+              "opportunity.14.baseline.079",
+              "opportunity.14.baseline.080",
+              "opportunity.14.baseline.081",
+              "opportunity.14.baseline.082",
+              "opportunity.14.baseline.083",
+              "opportunity.14.baseline.084",
+              "opportunity.14.baseline.085",
+              "opportunity.14.baseline.086",
+              "opportunity.14.baseline.087",
+              "opportunity.14.baseline.088",
+              "opportunity.14.baseline.089",
+              "opportunity.14.baseline.090",
+              "opportunity.14.baseline.091",
+              "opportunity.14.baseline.092",
+              "opportunity.14.baseline.093",
+              "opportunity.14.baseline.094",
+              "opportunity.14.baseline.095",
+              "opportunity.14.baseline.096",
+              "opportunity.14.baseline.097",
+              "opportunity.14.baseline.098",
+              "opportunity.14.baseline.099",
+              "opportunity.14.baseline.100"
+            ],
+            "declaredSize": 100,
+            "eligibilityRuleVersion": "fixture.eligible-service-need.v1",
+            "frozenAt": "2026-09-01T00:00:00Z",
+            "includedNonconverters": true
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.002",
+          "canonicalFactId": "cohort.14.comparison",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_frozen",
+            "id": "cohort.14.comparison"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-01T00:00:00Z",
+          "receivedAt": "2026-10-01T00:01:00Z",
+          "kind": "cohort_frozen",
+          "data": {
+            "memberIds": [
+              "opportunity.14.comparison.001",
+              "opportunity.14.comparison.002",
+              "opportunity.14.comparison.003",
+              "opportunity.14.comparison.004",
+              "opportunity.14.comparison.005",
+              "opportunity.14.comparison.006",
+              "opportunity.14.comparison.007",
+              "opportunity.14.comparison.008",
+              "opportunity.14.comparison.009",
+              "opportunity.14.comparison.010",
+              "opportunity.14.comparison.011",
+              "opportunity.14.comparison.012",
+              "opportunity.14.comparison.013",
+              "opportunity.14.comparison.014",
+              "opportunity.14.comparison.015",
+              "opportunity.14.comparison.016",
+              "opportunity.14.comparison.017",
+              "opportunity.14.comparison.018",
+              "opportunity.14.comparison.019",
+              "opportunity.14.comparison.020",
+              "opportunity.14.comparison.021",
+              "opportunity.14.comparison.022",
+              "opportunity.14.comparison.023",
+              "opportunity.14.comparison.024",
+              "opportunity.14.comparison.025",
+              "opportunity.14.comparison.026",
+              "opportunity.14.comparison.027",
+              "opportunity.14.comparison.028",
+              "opportunity.14.comparison.029",
+              "opportunity.14.comparison.030",
+              "opportunity.14.comparison.031",
+              "opportunity.14.comparison.032",
+              "opportunity.14.comparison.033",
+              "opportunity.14.comparison.034",
+              "opportunity.14.comparison.035",
+              "opportunity.14.comparison.036",
+              "opportunity.14.comparison.037",
+              "opportunity.14.comparison.038",
+              "opportunity.14.comparison.039",
+              "opportunity.14.comparison.040",
+              "opportunity.14.comparison.041",
+              "opportunity.14.comparison.042",
+              "opportunity.14.comparison.043",
+              "opportunity.14.comparison.044",
+              "opportunity.14.comparison.045",
+              "opportunity.14.comparison.046",
+              "opportunity.14.comparison.047",
+              "opportunity.14.comparison.048",
+              "opportunity.14.comparison.049",
+              "opportunity.14.comparison.050",
+              "opportunity.14.comparison.051",
+              "opportunity.14.comparison.052",
+              "opportunity.14.comparison.053",
+              "opportunity.14.comparison.054",
+              "opportunity.14.comparison.055",
+              "opportunity.14.comparison.056",
+              "opportunity.14.comparison.057",
+              "opportunity.14.comparison.058",
+              "opportunity.14.comparison.059",
+              "opportunity.14.comparison.060",
+              "opportunity.14.comparison.061",
+              "opportunity.14.comparison.062",
+              "opportunity.14.comparison.063",
+              "opportunity.14.comparison.064",
+              "opportunity.14.comparison.065",
+              "opportunity.14.comparison.066",
+              "opportunity.14.comparison.067",
+              "opportunity.14.comparison.068",
+              "opportunity.14.comparison.069",
+              "opportunity.14.comparison.070",
+              "opportunity.14.comparison.071",
+              "opportunity.14.comparison.072",
+              "opportunity.14.comparison.073",
+              "opportunity.14.comparison.074",
+              "opportunity.14.comparison.075",
+              "opportunity.14.comparison.076",
+              "opportunity.14.comparison.077",
+              "opportunity.14.comparison.078",
+              "opportunity.14.comparison.079",
+              "opportunity.14.comparison.080",
+              "opportunity.14.comparison.081",
+              "opportunity.14.comparison.082",
+              "opportunity.14.comparison.083",
+              "opportunity.14.comparison.084",
+              "opportunity.14.comparison.085",
+              "opportunity.14.comparison.086",
+              "opportunity.14.comparison.087",
+              "opportunity.14.comparison.088",
+              "opportunity.14.comparison.089",
+              "opportunity.14.comparison.090",
+              "opportunity.14.comparison.091",
+              "opportunity.14.comparison.092",
+              "opportunity.14.comparison.093",
+              "opportunity.14.comparison.094",
+              "opportunity.14.comparison.095",
+              "opportunity.14.comparison.096",
+              "opportunity.14.comparison.097",
+              "opportunity.14.comparison.098",
+              "opportunity.14.comparison.099",
+              "opportunity.14.comparison.100"
+            ],
+            "declaredSize": 100,
+            "eligibilityRuleVersion": "fixture.eligible-service-need.v1",
+            "frozenAt": "2026-10-01T00:00:00Z",
+            "includedNonconverters": true
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.003",
+          "canonicalFactId": "job.14.baseline.001",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.baseline.001"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-09-20T15:00:00Z",
+          "receivedAt": "2026-09-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.baseline",
+            "jobId": "job.14.baseline.001",
+            "opportunityId": "opportunity.14.baseline.001",
+            "netEarnedAmount": "100.00",
+            "serviceSituation": "preventive_maintenance",
+            "completedAt": "2026-09-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.004",
+          "canonicalFactId": "job.14.baseline.002",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.baseline.002"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-09-20T15:00:00Z",
+          "receivedAt": "2026-09-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.baseline",
+            "jobId": "job.14.baseline.002",
+            "opportunityId": "opportunity.14.baseline.002",
+            "netEarnedAmount": "100.00",
+            "serviceSituation": "preventive_maintenance",
+            "completedAt": "2026-09-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.005",
+          "canonicalFactId": "job.14.baseline.003",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.baseline.003"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-09-20T15:00:00Z",
+          "receivedAt": "2026-09-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.baseline",
+            "jobId": "job.14.baseline.003",
+            "opportunityId": "opportunity.14.baseline.003",
+            "netEarnedAmount": "100.00",
+            "serviceSituation": "preventive_maintenance",
+            "completedAt": "2026-09-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.006",
+          "canonicalFactId": "job.14.baseline.004",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.baseline.004"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-09-20T15:00:00Z",
+          "receivedAt": "2026-09-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.baseline",
+            "jobId": "job.14.baseline.004",
+            "opportunityId": "opportunity.14.baseline.004",
+            "netEarnedAmount": "100.00",
+            "serviceSituation": "preventive_maintenance",
+            "completedAt": "2026-09-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.007",
+          "canonicalFactId": "job.14.baseline.005",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.baseline.005"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-09-20T15:00:00Z",
+          "receivedAt": "2026-09-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.baseline",
+            "jobId": "job.14.baseline.005",
+            "opportunityId": "opportunity.14.baseline.005",
+            "netEarnedAmount": "100.00",
+            "serviceSituation": "preventive_maintenance",
+            "completedAt": "2026-09-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.008",
+          "canonicalFactId": "job.14.baseline.006",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.baseline.006"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-09-20T15:00:00Z",
+          "receivedAt": "2026-09-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.baseline",
+            "jobId": "job.14.baseline.006",
+            "opportunityId": "opportunity.14.baseline.006",
+            "netEarnedAmount": "100.00",
+            "serviceSituation": "preventive_maintenance",
+            "completedAt": "2026-09-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.009",
+          "canonicalFactId": "job.14.baseline.007",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.baseline.007"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-09-20T15:00:00Z",
+          "receivedAt": "2026-09-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.baseline",
+            "jobId": "job.14.baseline.007",
+            "opportunityId": "opportunity.14.baseline.007",
+            "netEarnedAmount": "100.00",
+            "serviceSituation": "preventive_maintenance",
+            "completedAt": "2026-09-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.010",
+          "canonicalFactId": "job.14.baseline.008",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.baseline.008"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-09-20T15:00:00Z",
+          "receivedAt": "2026-09-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.baseline",
+            "jobId": "job.14.baseline.008",
+            "opportunityId": "opportunity.14.baseline.008",
+            "netEarnedAmount": "100.00",
+            "serviceSituation": "preventive_maintenance",
+            "completedAt": "2026-09-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.011",
+          "canonicalFactId": "job.14.baseline.009",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.baseline.009"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-09-20T15:00:00Z",
+          "receivedAt": "2026-09-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.baseline",
+            "jobId": "job.14.baseline.009",
+            "opportunityId": "opportunity.14.baseline.009",
+            "netEarnedAmount": "100.00",
+            "serviceSituation": "preventive_maintenance",
+            "completedAt": "2026-09-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.012",
+          "canonicalFactId": "job.14.baseline.010",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.baseline.010"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-09-20T15:00:00Z",
+          "receivedAt": "2026-09-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.baseline",
+            "jobId": "job.14.baseline.010",
+            "opportunityId": "opportunity.14.baseline.010",
+            "netEarnedAmount": "100.00",
+            "serviceSituation": "preventive_maintenance",
+            "completedAt": "2026-09-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.013",
+          "canonicalFactId": "job.14.baseline.011",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.baseline.011"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-09-20T15:00:00Z",
+          "receivedAt": "2026-09-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.baseline",
+            "jobId": "job.14.baseline.011",
+            "opportunityId": "opportunity.14.baseline.011",
+            "netEarnedAmount": "100.00",
+            "serviceSituation": "preventive_maintenance",
+            "completedAt": "2026-09-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.014",
+          "canonicalFactId": "job.14.baseline.012",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.baseline.012"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-09-20T15:00:00Z",
+          "receivedAt": "2026-09-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.baseline",
+            "jobId": "job.14.baseline.012",
+            "opportunityId": "opportunity.14.baseline.012",
+            "netEarnedAmount": "100.00",
+            "serviceSituation": "preventive_maintenance",
+            "completedAt": "2026-09-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.015",
+          "canonicalFactId": "job.14.baseline.013",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.baseline.013"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-09-20T15:00:00Z",
+          "receivedAt": "2026-09-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.baseline",
+            "jobId": "job.14.baseline.013",
+            "opportunityId": "opportunity.14.baseline.013",
+            "netEarnedAmount": "100.00",
+            "serviceSituation": "preventive_maintenance",
+            "completedAt": "2026-09-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.016",
+          "canonicalFactId": "job.14.baseline.014",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.baseline.014"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-09-20T15:00:00Z",
+          "receivedAt": "2026-09-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.baseline",
+            "jobId": "job.14.baseline.014",
+            "opportunityId": "opportunity.14.baseline.014",
+            "netEarnedAmount": "100.00",
+            "serviceSituation": "preventive_maintenance",
+            "completedAt": "2026-09-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.017",
+          "canonicalFactId": "job.14.baseline.015",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.baseline.015"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-09-20T15:00:00Z",
+          "receivedAt": "2026-09-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.baseline",
+            "jobId": "job.14.baseline.015",
+            "opportunityId": "opportunity.14.baseline.015",
+            "netEarnedAmount": "100.00",
+            "serviceSituation": "preventive_maintenance",
+            "completedAt": "2026-09-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.018",
+          "canonicalFactId": "job.14.baseline.016",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.baseline.016"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-09-20T15:00:00Z",
+          "receivedAt": "2026-09-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.baseline",
+            "jobId": "job.14.baseline.016",
+            "opportunityId": "opportunity.14.baseline.016",
+            "netEarnedAmount": "100.00",
+            "serviceSituation": "preventive_maintenance",
+            "completedAt": "2026-09-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.019",
+          "canonicalFactId": "job.14.baseline.017",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.baseline.017"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-09-20T15:00:00Z",
+          "receivedAt": "2026-09-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.baseline",
+            "jobId": "job.14.baseline.017",
+            "opportunityId": "opportunity.14.baseline.017",
+            "netEarnedAmount": "100.00",
+            "serviceSituation": "preventive_maintenance",
+            "completedAt": "2026-09-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.020",
+          "canonicalFactId": "job.14.baseline.018",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.baseline.018"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-09-20T15:00:00Z",
+          "receivedAt": "2026-09-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.baseline",
+            "jobId": "job.14.baseline.018",
+            "opportunityId": "opportunity.14.baseline.018",
+            "netEarnedAmount": "100.00",
+            "serviceSituation": "preventive_maintenance",
+            "completedAt": "2026-09-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.021",
+          "canonicalFactId": "job.14.baseline.019",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.baseline.019"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-09-20T15:00:00Z",
+          "receivedAt": "2026-09-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.baseline",
+            "jobId": "job.14.baseline.019",
+            "opportunityId": "opportunity.14.baseline.019",
+            "netEarnedAmount": "100.00",
+            "serviceSituation": "preventive_maintenance",
+            "completedAt": "2026-09-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.022",
+          "canonicalFactId": "job.14.baseline.020",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.baseline.020"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-09-20T15:00:00Z",
+          "receivedAt": "2026-09-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.baseline",
+            "jobId": "job.14.baseline.020",
+            "opportunityId": "opportunity.14.baseline.020",
+            "netEarnedAmount": "100.00",
+            "serviceSituation": "preventive_maintenance",
+            "completedAt": "2026-09-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.023",
+          "canonicalFactId": "job.14.baseline.021",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.baseline.021"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-09-20T15:00:00Z",
+          "receivedAt": "2026-09-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.baseline",
+            "jobId": "job.14.baseline.021",
+            "opportunityId": "opportunity.14.baseline.021",
+            "netEarnedAmount": "300.00",
+            "serviceSituation": "diagnostic_repair",
+            "completedAt": "2026-09-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.024",
+          "canonicalFactId": "job.14.baseline.022",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.baseline.022"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-09-20T15:00:00Z",
+          "receivedAt": "2026-09-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.baseline",
+            "jobId": "job.14.baseline.022",
+            "opportunityId": "opportunity.14.baseline.022",
+            "netEarnedAmount": "300.00",
+            "serviceSituation": "diagnostic_repair",
+            "completedAt": "2026-09-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.025",
+          "canonicalFactId": "job.14.baseline.023",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.baseline.023"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-09-20T15:00:00Z",
+          "receivedAt": "2026-09-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.baseline",
+            "jobId": "job.14.baseline.023",
+            "opportunityId": "opportunity.14.baseline.023",
+            "netEarnedAmount": "300.00",
+            "serviceSituation": "diagnostic_repair",
+            "completedAt": "2026-09-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.026",
+          "canonicalFactId": "job.14.baseline.024",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.baseline.024"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-09-20T15:00:00Z",
+          "receivedAt": "2026-09-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.baseline",
+            "jobId": "job.14.baseline.024",
+            "opportunityId": "opportunity.14.baseline.024",
+            "netEarnedAmount": "300.00",
+            "serviceSituation": "diagnostic_repair",
+            "completedAt": "2026-09-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.027",
+          "canonicalFactId": "job.14.baseline.025",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.baseline.025"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-09-20T15:00:00Z",
+          "receivedAt": "2026-09-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.baseline",
+            "jobId": "job.14.baseline.025",
+            "opportunityId": "opportunity.14.baseline.025",
+            "netEarnedAmount": "300.00",
+            "serviceSituation": "diagnostic_repair",
+            "completedAt": "2026-09-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.028",
+          "canonicalFactId": "job.14.baseline.026",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.baseline.026"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-09-20T15:00:00Z",
+          "receivedAt": "2026-09-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.baseline",
+            "jobId": "job.14.baseline.026",
+            "opportunityId": "opportunity.14.baseline.026",
+            "netEarnedAmount": "300.00",
+            "serviceSituation": "diagnostic_repair",
+            "completedAt": "2026-09-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.029",
+          "canonicalFactId": "job.14.baseline.027",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.baseline.027"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-09-20T15:00:00Z",
+          "receivedAt": "2026-09-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.baseline",
+            "jobId": "job.14.baseline.027",
+            "opportunityId": "opportunity.14.baseline.027",
+            "netEarnedAmount": "300.00",
+            "serviceSituation": "diagnostic_repair",
+            "completedAt": "2026-09-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.030",
+          "canonicalFactId": "job.14.baseline.028",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.baseline.028"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-09-20T15:00:00Z",
+          "receivedAt": "2026-09-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.baseline",
+            "jobId": "job.14.baseline.028",
+            "opportunityId": "opportunity.14.baseline.028",
+            "netEarnedAmount": "300.00",
+            "serviceSituation": "diagnostic_repair",
+            "completedAt": "2026-09-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.031",
+          "canonicalFactId": "job.14.baseline.029",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.baseline.029"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-09-20T15:00:00Z",
+          "receivedAt": "2026-09-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.baseline",
+            "jobId": "job.14.baseline.029",
+            "opportunityId": "opportunity.14.baseline.029",
+            "netEarnedAmount": "300.00",
+            "serviceSituation": "diagnostic_repair",
+            "completedAt": "2026-09-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.032",
+          "canonicalFactId": "job.14.baseline.030",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.baseline.030"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-09-20T15:00:00Z",
+          "receivedAt": "2026-09-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.baseline",
+            "jobId": "job.14.baseline.030",
+            "opportunityId": "opportunity.14.baseline.030",
+            "netEarnedAmount": "300.00",
+            "serviceSituation": "diagnostic_repair",
+            "completedAt": "2026-09-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.033",
+          "canonicalFactId": "job.14.baseline.031",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.baseline.031"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-09-20T15:00:00Z",
+          "receivedAt": "2026-09-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.baseline",
+            "jobId": "job.14.baseline.031",
+            "opportunityId": "opportunity.14.baseline.031",
+            "netEarnedAmount": "300.00",
+            "serviceSituation": "diagnostic_repair",
+            "completedAt": "2026-09-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.034",
+          "canonicalFactId": "job.14.baseline.032",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.baseline.032"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-09-20T15:00:00Z",
+          "receivedAt": "2026-09-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.baseline",
+            "jobId": "job.14.baseline.032",
+            "opportunityId": "opportunity.14.baseline.032",
+            "netEarnedAmount": "300.00",
+            "serviceSituation": "diagnostic_repair",
+            "completedAt": "2026-09-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.035",
+          "canonicalFactId": "job.14.baseline.033",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.baseline.033"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-09-20T15:00:00Z",
+          "receivedAt": "2026-09-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.baseline",
+            "jobId": "job.14.baseline.033",
+            "opportunityId": "opportunity.14.baseline.033",
+            "netEarnedAmount": "300.00",
+            "serviceSituation": "diagnostic_repair",
+            "completedAt": "2026-09-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.036",
+          "canonicalFactId": "job.14.baseline.034",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.baseline.034"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-09-20T15:00:00Z",
+          "receivedAt": "2026-09-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.baseline",
+            "jobId": "job.14.baseline.034",
+            "opportunityId": "opportunity.14.baseline.034",
+            "netEarnedAmount": "300.00",
+            "serviceSituation": "diagnostic_repair",
+            "completedAt": "2026-09-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.037",
+          "canonicalFactId": "job.14.baseline.035",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.baseline.035"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-09-20T15:00:00Z",
+          "receivedAt": "2026-09-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.baseline",
+            "jobId": "job.14.baseline.035",
+            "opportunityId": "opportunity.14.baseline.035",
+            "netEarnedAmount": "300.00",
+            "serviceSituation": "diagnostic_repair",
+            "completedAt": "2026-09-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.038",
+          "canonicalFactId": "job.14.baseline.036",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.baseline.036"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-09-20T15:00:00Z",
+          "receivedAt": "2026-09-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.baseline",
+            "jobId": "job.14.baseline.036",
+            "opportunityId": "opportunity.14.baseline.036",
+            "netEarnedAmount": "300.00",
+            "serviceSituation": "diagnostic_repair",
+            "completedAt": "2026-09-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.039",
+          "canonicalFactId": "job.14.baseline.037",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.baseline.037"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-09-20T15:00:00Z",
+          "receivedAt": "2026-09-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.baseline",
+            "jobId": "job.14.baseline.037",
+            "opportunityId": "opportunity.14.baseline.037",
+            "netEarnedAmount": "300.00",
+            "serviceSituation": "diagnostic_repair",
+            "completedAt": "2026-09-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.040",
+          "canonicalFactId": "job.14.baseline.038",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.baseline.038"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-09-20T15:00:00Z",
+          "receivedAt": "2026-09-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.baseline",
+            "jobId": "job.14.baseline.038",
+            "opportunityId": "opportunity.14.baseline.038",
+            "netEarnedAmount": "300.00",
+            "serviceSituation": "diagnostic_repair",
+            "completedAt": "2026-09-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.041",
+          "canonicalFactId": "job.14.baseline.039",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.baseline.039"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-09-20T15:00:00Z",
+          "receivedAt": "2026-09-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.baseline",
+            "jobId": "job.14.baseline.039",
+            "opportunityId": "opportunity.14.baseline.039",
+            "netEarnedAmount": "300.00",
+            "serviceSituation": "diagnostic_repair",
+            "completedAt": "2026-09-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.042",
+          "canonicalFactId": "job.14.baseline.040",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.baseline.040"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-09-20T15:00:00Z",
+          "receivedAt": "2026-09-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.baseline",
+            "jobId": "job.14.baseline.040",
+            "opportunityId": "opportunity.14.baseline.040",
+            "netEarnedAmount": "300.00",
+            "serviceSituation": "diagnostic_repair",
+            "completedAt": "2026-09-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.043",
+          "canonicalFactId": "job.14.comparison.001",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.comparison.001"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-20T15:00:00Z",
+          "receivedAt": "2026-10-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.comparison",
+            "jobId": "job.14.comparison.001",
+            "opportunityId": "opportunity.14.comparison.001",
+            "netEarnedAmount": "300.00",
+            "serviceSituation": "diagnostic_repair",
+            "completedAt": "2026-10-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.044",
+          "canonicalFactId": "job.14.comparison.002",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.comparison.002"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-20T15:00:00Z",
+          "receivedAt": "2026-10-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.comparison",
+            "jobId": "job.14.comparison.002",
+            "opportunityId": "opportunity.14.comparison.002",
+            "netEarnedAmount": "300.00",
+            "serviceSituation": "diagnostic_repair",
+            "completedAt": "2026-10-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.045",
+          "canonicalFactId": "job.14.comparison.003",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.comparison.003"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-20T15:00:00Z",
+          "receivedAt": "2026-10-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.comparison",
+            "jobId": "job.14.comparison.003",
+            "opportunityId": "opportunity.14.comparison.003",
+            "netEarnedAmount": "300.00",
+            "serviceSituation": "diagnostic_repair",
+            "completedAt": "2026-10-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.046",
+          "canonicalFactId": "job.14.comparison.004",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.comparison.004"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-20T15:00:00Z",
+          "receivedAt": "2026-10-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.comparison",
+            "jobId": "job.14.comparison.004",
+            "opportunityId": "opportunity.14.comparison.004",
+            "netEarnedAmount": "300.00",
+            "serviceSituation": "diagnostic_repair",
+            "completedAt": "2026-10-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.047",
+          "canonicalFactId": "job.14.comparison.005",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.comparison.005"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-20T15:00:00Z",
+          "receivedAt": "2026-10-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.comparison",
+            "jobId": "job.14.comparison.005",
+            "opportunityId": "opportunity.14.comparison.005",
+            "netEarnedAmount": "300.00",
+            "serviceSituation": "diagnostic_repair",
+            "completedAt": "2026-10-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.048",
+          "canonicalFactId": "job.14.comparison.006",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.comparison.006"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-20T15:00:00Z",
+          "receivedAt": "2026-10-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.comparison",
+            "jobId": "job.14.comparison.006",
+            "opportunityId": "opportunity.14.comparison.006",
+            "netEarnedAmount": "300.00",
+            "serviceSituation": "diagnostic_repair",
+            "completedAt": "2026-10-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.049",
+          "canonicalFactId": "job.14.comparison.007",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.comparison.007"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-20T15:00:00Z",
+          "receivedAt": "2026-10-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.comparison",
+            "jobId": "job.14.comparison.007",
+            "opportunityId": "opportunity.14.comparison.007",
+            "netEarnedAmount": "300.00",
+            "serviceSituation": "diagnostic_repair",
+            "completedAt": "2026-10-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.050",
+          "canonicalFactId": "job.14.comparison.008",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.comparison.008"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-20T15:00:00Z",
+          "receivedAt": "2026-10-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.comparison",
+            "jobId": "job.14.comparison.008",
+            "opportunityId": "opportunity.14.comparison.008",
+            "netEarnedAmount": "300.00",
+            "serviceSituation": "diagnostic_repair",
+            "completedAt": "2026-10-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.051",
+          "canonicalFactId": "job.14.comparison.009",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.comparison.009"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-20T15:00:00Z",
+          "receivedAt": "2026-10-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.comparison",
+            "jobId": "job.14.comparison.009",
+            "opportunityId": "opportunity.14.comparison.009",
+            "netEarnedAmount": "300.00",
+            "serviceSituation": "diagnostic_repair",
+            "completedAt": "2026-10-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.052",
+          "canonicalFactId": "job.14.comparison.010",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.comparison.010"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-20T15:00:00Z",
+          "receivedAt": "2026-10-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.comparison",
+            "jobId": "job.14.comparison.010",
+            "opportunityId": "opportunity.14.comparison.010",
+            "netEarnedAmount": "300.00",
+            "serviceSituation": "diagnostic_repair",
+            "completedAt": "2026-10-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.053",
+          "canonicalFactId": "job.14.comparison.011",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.comparison.011"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-20T15:00:00Z",
+          "receivedAt": "2026-10-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.comparison",
+            "jobId": "job.14.comparison.011",
+            "opportunityId": "opportunity.14.comparison.011",
+            "netEarnedAmount": "300.00",
+            "serviceSituation": "diagnostic_repair",
+            "completedAt": "2026-10-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.054",
+          "canonicalFactId": "job.14.comparison.012",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.comparison.012"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-20T15:00:00Z",
+          "receivedAt": "2026-10-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.comparison",
+            "jobId": "job.14.comparison.012",
+            "opportunityId": "opportunity.14.comparison.012",
+            "netEarnedAmount": "300.00",
+            "serviceSituation": "diagnostic_repair",
+            "completedAt": "2026-10-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.055",
+          "canonicalFactId": "job.14.comparison.013",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.comparison.013"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-20T15:00:00Z",
+          "receivedAt": "2026-10-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.comparison",
+            "jobId": "job.14.comparison.013",
+            "opportunityId": "opportunity.14.comparison.013",
+            "netEarnedAmount": "300.00",
+            "serviceSituation": "diagnostic_repair",
+            "completedAt": "2026-10-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.056",
+          "canonicalFactId": "job.14.comparison.014",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.comparison.014"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-20T15:00:00Z",
+          "receivedAt": "2026-10-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.comparison",
+            "jobId": "job.14.comparison.014",
+            "opportunityId": "opportunity.14.comparison.014",
+            "netEarnedAmount": "300.00",
+            "serviceSituation": "diagnostic_repair",
+            "completedAt": "2026-10-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.057",
+          "canonicalFactId": "job.14.comparison.015",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.comparison.015"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-20T15:00:00Z",
+          "receivedAt": "2026-10-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.comparison",
+            "jobId": "job.14.comparison.015",
+            "opportunityId": "opportunity.14.comparison.015",
+            "netEarnedAmount": "300.00",
+            "serviceSituation": "diagnostic_repair",
+            "completedAt": "2026-10-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.058",
+          "canonicalFactId": "job.14.comparison.016",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.comparison.016"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-20T15:00:00Z",
+          "receivedAt": "2026-10-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.comparison",
+            "jobId": "job.14.comparison.016",
+            "opportunityId": "opportunity.14.comparison.016",
+            "netEarnedAmount": "300.00",
+            "serviceSituation": "diagnostic_repair",
+            "completedAt": "2026-10-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.059",
+          "canonicalFactId": "job.14.comparison.017",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.comparison.017"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-20T15:00:00Z",
+          "receivedAt": "2026-10-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.comparison",
+            "jobId": "job.14.comparison.017",
+            "opportunityId": "opportunity.14.comparison.017",
+            "netEarnedAmount": "300.00",
+            "serviceSituation": "diagnostic_repair",
+            "completedAt": "2026-10-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.060",
+          "canonicalFactId": "job.14.comparison.018",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.comparison.018"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-20T15:00:00Z",
+          "receivedAt": "2026-10-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.comparison",
+            "jobId": "job.14.comparison.018",
+            "opportunityId": "opportunity.14.comparison.018",
+            "netEarnedAmount": "300.00",
+            "serviceSituation": "diagnostic_repair",
+            "completedAt": "2026-10-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.061",
+          "canonicalFactId": "job.14.comparison.019",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.comparison.019"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-20T15:00:00Z",
+          "receivedAt": "2026-10-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.comparison",
+            "jobId": "job.14.comparison.019",
+            "opportunityId": "opportunity.14.comparison.019",
+            "netEarnedAmount": "300.00",
+            "serviceSituation": "diagnostic_repair",
+            "completedAt": "2026-10-20T15:00:00Z"
+          }
+        },
+        {
+          "eventId": "OM-FIN-14.event.062",
+          "canonicalFactId": "job.14.comparison.020",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_completed_job",
+            "id": "job.14.comparison.020"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-20T15:00:00Z",
+          "receivedAt": "2026-10-20T15:01:00Z",
+          "kind": "cohort_completed_job",
+          "data": {
+            "cohortId": "cohort.14.comparison",
+            "jobId": "job.14.comparison.020",
+            "opportunityId": "opportunity.14.comparison.020",
+            "netEarnedAmount": "300.00",
+            "serviceSituation": "diagnostic_repair",
+            "completedAt": "2026-10-20T15:00:00Z"
+          }
+        }
+      ],
+      "checkpoints": [
+        {
+          "id": "one_comparison_completion_known",
+          "afterEventCount": 43,
+          "expected": {
+            "numeric_target_met": true,
+            "opportunity_guardrail_passed": false,
+            "outcome_verdict": "target_not_met",
+            "causal_effect_status": "not_estimated"
+          }
+        },
+        {
+          "id": "matured_fixture_comparison",
+          "afterEventCount": 62,
+          "expected": {
+            "cohorts": {
+              "cohort.14.baseline": {
+                "eligible_opportunities": 100,
+                "completed_jobs": 40,
+                "unconverted_opportunities": 60,
+                "net_earned_service_revenue": "8000.00",
+                "average_net_completed_job_value": "200.00",
+                "revenue_per_eligible_opportunity": "80.00",
+                "completed_opportunity_rate": {
+                  "numerator": 40,
+                  "denominator": 100
+                },
+                "service_mix": {
+                  "diagnostic_repair": {
+                    "completed_jobs": 20,
+                    "net_earned_service_revenue": "6000.00",
+                    "average_net_completed_job_value": "300.00"
+                  },
+                  "preventive_maintenance": {
+                    "completed_jobs": 20,
+                    "net_earned_service_revenue": "2000.00",
+                    "average_net_completed_job_value": "100.00"
+                  }
+                }
+              },
+              "cohort.14.comparison": {
+                "eligible_opportunities": 100,
+                "completed_jobs": 20,
+                "unconverted_opportunities": 80,
+                "net_earned_service_revenue": "6000.00",
+                "average_net_completed_job_value": "300.00",
+                "revenue_per_eligible_opportunity": "60.00",
+                "completed_opportunity_rate": {
+                  "numerator": 20,
+                  "denominator": 100
+                },
+                "service_mix": {
+                  "diagnostic_repair": {
+                    "completed_jobs": 20,
+                    "net_earned_service_revenue": "6000.00",
+                    "average_net_completed_job_value": "300.00"
+                  }
+                }
+              }
+            },
+            "numeric_target_met": true,
+            "opportunity_guardrail_passed": false,
+            "outcome_verdict": "target_not_met",
+            "causal_effect_status": "not_estimated"
+          }
+        }
+      ],
+      "claimLimits": [
+        "Arithmetic is a synthetic example, not production acceptance or causal evidence.",
+        "Average rises 200 to 300 while cohort revenue falls 8000 to 6000 and revenue/opportunity falls 80 to 60. All 100 eligible opportunities remain in each denominator.",
+        "The shared diagnostic/repair service stays at 300 per completed job; the average rise is service mix, not demonstrated within-service improvement. The 300 target and 80 guardrail are fixture-only.",
+        "Checkpoint verdicts are arithmetic evaluations under the closed fixture policy, not a live mission decision before its observation window matures."
+      ]
+    },
+    {
+      "id": "OM-FIN-15",
+      "title": "Payment speed includes partial and still-open invoices",
+      "companyId": "10000000-0000-4000-8000-000000000001",
+      "currency": "USD",
+      "view": "payment_cohort",
+      "acceptanceRefs": [
+        "OM-A19",
+        "OM-A23"
+      ],
+      "decisionRefs": [
+        "OM-D01",
+        "OM-D03"
+      ],
+      "policyInputs": {
+        "status": "fixture_only",
+        "approval": "not_approved_business_policy",
+        "timeZone": "America/Chicago",
+        "asOf": "2026-10-17T00:00:00Z",
+        "serviceMonth": null,
+        "cashMonth": null,
+        "coverage": "Closed synthetic facts for the declared view; no real source completeness is inferred.",
+        "paymentCohortId": "cohort.15.invoices",
+        "paymentHorizonSeconds": 604800
+      },
+      "events": [
+        {
+          "eventId": "OM-FIN-15.event.001",
+          "canonicalFactId": "cohort.15.invoices",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_frozen",
+            "id": "cohort.15.invoices"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-04T00:01:00Z",
+          "receivedAt": "2026-10-04T00:02:00Z",
+          "kind": "cohort_frozen",
+          "data": {
+            "memberIds": [
+              "invoice.15.a",
+              "invoice.15.b",
+              "invoice.15.c"
+            ],
+            "declaredSize": 3,
+            "eligibilityRuleVersion": "fixture.finalized-invoices.v1",
+            "frozenAt": "2026-10-04T00:01:00Z",
+            "includedNonconverters": true
+          }
+        },
+        {
+          "eventId": "OM-FIN-15.event.002",
+          "canonicalFactId": "invoice.15.a",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "invoice_finalized",
+            "id": "invoice.15.a"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-02T00:00:00Z",
+          "receivedAt": "2026-10-02T00:01:00Z",
+          "kind": "invoice_finalized",
+          "data": {
+            "totalDue": "100.00",
+            "issuedAt": "2026-10-02T00:00:00Z",
+            "completedAt": "2026-10-01T00:00:00Z",
+            "dueAt": "2026-10-10T00:00:00Z",
+            "disputed": false
+          }
+        },
+        {
+          "eventId": "OM-FIN-15.event.003",
+          "canonicalFactId": "invoice.15.b",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "invoice_finalized",
+            "id": "invoice.15.b"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-04T00:00:00Z",
+          "receivedAt": "2026-10-04T00:01:00Z",
+          "kind": "invoice_finalized",
+          "data": {
+            "totalDue": "200.00",
+            "issuedAt": "2026-10-04T00:00:00Z",
+            "completedAt": "2026-10-02T00:00:00Z",
+            "dueAt": "2026-10-12T00:00:00Z",
+            "disputed": false
+          }
+        },
+        {
+          "eventId": "OM-FIN-15.event.004",
+          "canonicalFactId": "invoice.15.c",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "invoice_finalized",
+            "id": "invoice.15.c"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-03T00:00:00Z",
+          "receivedAt": "2026-10-03T00:01:00Z",
+          "kind": "invoice_finalized",
+          "data": {
+            "totalDue": "300.00",
+            "issuedAt": "2026-10-03T00:00:00Z",
+            "completedAt": "2026-10-03T00:00:00Z",
+            "dueAt": "2026-10-10T00:00:00Z",
+            "disputed": true
+          }
+        },
+        {
+          "eventId": "OM-FIN-15.event.005",
+          "canonicalFactId": "payment.15.a",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "settled_payment",
+            "id": "payment.15.a"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-07T00:00:00Z",
+          "receivedAt": "2026-10-07T00:01:00Z",
+          "kind": "settled_payment",
+          "data": {
+            "amount": "100.00",
+            "invoiceId": "invoice.15.a",
+            "allocationClass": "service",
+            "settledAt": "2026-10-07T00:00:00Z",
+            "settlementEvidence": "synthetic authoritative final settlement"
+          }
+        },
+        {
+          "eventId": "OM-FIN-15.event.006",
+          "canonicalFactId": "payment.15.b",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "settled_payment",
+            "id": "payment.15.b"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-09T00:00:00Z",
+          "receivedAt": "2026-10-09T00:01:00Z",
+          "kind": "settled_payment",
+          "data": {
+            "amount": "50.00",
+            "invoiceId": "invoice.15.b",
+            "allocationClass": "service",
+            "settledAt": "2026-10-09T00:00:00Z",
+            "settlementEvidence": "synthetic authoritative final settlement"
+          }
+        }
+      ],
+      "checkpoints": [
+        {
+          "id": "no_settlement_observations",
+          "afterEventCount": 4,
+          "expected": {
+            "eligible_invoice_count": 3,
+            "open_invoice_balance": "600.00",
+            "still_open_invoice_count": 3,
+            "paid_by_horizon_rate": {
+              "numerator": 0,
+              "denominator": 3,
+              "horizon_seconds": 604800
+            },
+            "net_collected_cash": "0.00"
+          }
+        },
+        {
+          "id": "fixed_horizon_with_open_observations",
+          "afterEventCount": 6,
+          "expected": {
+            "eligible_invoice_count": 3,
+            "completion_to_invoice_delay_seconds": {
+              "invoice.15.a": 86400,
+              "invoice.15.b": 172800,
+              "invoice.15.c": 0
+            },
+            "invoice_to_payment_delay_seconds_paid_only": {
+              "invoice.15.a": 432000
+            },
+            "open_observation_age_seconds": {
+              "invoice.15.b": 1123200,
+              "invoice.15.c": 1209600
+            },
+            "paid_by_horizon_rate": {
+              "numerator": 1,
+              "denominator": 3,
+              "horizon_seconds": 604800
+            },
+            "open_invoice_balance": "450.00",
+            "still_open_invoice_count": 2,
+            "net_collected_cash": "150.00",
+            "causal_effect_status": "not_estimated",
+            "overdue_undisputed_balance_candidate_ids": [
+              "invoice.15.b"
+            ]
+          }
+        }
+      ],
+      "claimLimits": [
+        "Arithmetic is a synthetic example, not production acceptance or causal evidence.",
+        "The paid-only five-day observation describes one invoice; it is not the payment time of all three invoices. Open balances are 150 and 300.",
+        "The disputed invoice remains in the cohort while follow-up is suppressed. The paid invoice is also excluded from follow-up. The candidate ID is only an overdue/non-disputed/positive-balance arithmetic filter, NOT send eligibility. The due-plus-one-business-day rule, verified business calendar and every authority/contact/consent gate remain untested.",
+        "This timing example has no credits, reversals, reopened invoices or competing events; those production timing semantics remain OM-D01/OM-D03."
+      ]
+    },
+    {
+      "id": "OM-FIN-16",
+      "title": "Repeat service, warranty rework and agreement decisions stay distinct",
+      "companyId": "10000000-0000-4000-8000-000000000001",
+      "currency": "USD",
+      "view": "repeat_service",
+      "acceptanceRefs": [
+        "OM-A18"
+      ],
+      "decisionRefs": [
+        "OM-D01",
+        "OM-D06",
+        "OM-D07"
+      ],
+      "policyInputs": {
+        "status": "fixture_only",
+        "approval": "not_approved_business_policy",
+        "timeZone": "America/Chicago",
+        "asOf": "2026-11-30T23:59:59Z",
+        "serviceMonth": null,
+        "cashMonth": null,
+        "coverage": "Closed synthetic facts for the declared view; no real source completeness is inferred.",
+        "repeatCohortId": "cohort.16.repeat"
+      },
+      "events": [
+        {
+          "eventId": "OM-FIN-16.event.001",
+          "canonicalFactId": "cohort.16.repeat",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "cohort_frozen",
+            "id": "cohort.16.repeat"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-01T00:00:00Z",
+          "receivedAt": "2026-10-01T00:01:00Z",
+          "kind": "cohort_frozen",
+          "data": {
+            "memberIds": [
+              "opportunity.16.1",
+              "opportunity.16.2",
+              "opportunity.16.3",
+              "opportunity.16.4"
+            ],
+            "declaredSize": 4,
+            "eligibilityRuleVersion": "fixture.authorized-due-service.v1",
+            "frozenAt": "2026-10-01T00:00:00Z",
+            "includedNonconverters": true
+          }
+        },
+        {
+          "eventId": "OM-FIN-16.event.002",
+          "canonicalFactId": "repeat.16.1",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "repeat_completion",
+            "id": "repeat.16.1"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-11T15:00:00Z",
+          "receivedAt": "2026-10-11T15:01:00Z",
+          "kind": "repeat_completion",
+          "data": {
+            "opportunityId": "opportunity.16.1",
+            "jobId": "job.16.1",
+            "classification": "appropriate_repeat_service",
+            "variableCost": "0.00",
+            "capacityMinutes": 60,
+            "classificationPolicyVersion": "fixture.service-classification.v1"
+          }
+        },
+        {
+          "eventId": "OM-FIN-16.event.003",
+          "canonicalFactId": "repeat.16.2",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "repeat_completion",
+            "id": "repeat.16.2"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-12T15:00:00Z",
+          "receivedAt": "2026-10-12T15:01:00Z",
+          "kind": "repeat_completion",
+          "data": {
+            "opportunityId": "opportunity.16.2",
+            "jobId": "job.16.2",
+            "classification": "appropriate_repeat_service",
+            "variableCost": "0.00",
+            "capacityMinutes": 60,
+            "classificationPolicyVersion": "fixture.service-classification.v1"
+          }
+        },
+        {
+          "eventId": "OM-FIN-16.event.004",
+          "canonicalFactId": "repeat.16.3",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "repeat_completion",
+            "id": "repeat.16.3"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-13T15:00:00Z",
+          "receivedAt": "2026-10-13T15:01:00Z",
+          "kind": "repeat_completion",
+          "data": {
+            "opportunityId": "opportunity.16.3",
+            "jobId": "job.16.3",
+            "classification": "warranty",
+            "variableCost": "125.00",
+            "capacityMinutes": 90,
+            "classificationPolicyVersion": "fixture.service-classification.v1"
+          }
+        },
+        {
+          "eventId": "OM-FIN-16.event.005",
+          "canonicalFactId": "decision.16.renewed",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "agreement_decision",
+            "id": "decision.16.renewed"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-15T15:00:00Z",
+          "receivedAt": "2026-10-15T15:01:00Z",
+          "kind": "agreement_decision",
+          "data": {
+            "agreementId": "agreement.16.existing",
+            "decision": "renewed",
+            "existingAtCohortFreeze": true
+          }
+        },
+        {
+          "eventId": "OM-FIN-16.event.006",
+          "canonicalFactId": "decision.16.new",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "agreement_decision",
+            "id": "decision.16.new"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-15T16:00:00Z",
+          "receivedAt": "2026-10-15T16:01:00Z",
+          "kind": "agreement_decision",
+          "data": {
+            "agreementId": "agreement.16.new",
+            "decision": "newly_acquired",
+            "existingAtCohortFreeze": false
+          }
+        }
+      ],
+      "checkpoints": [
+        {
+          "id": "service_classifications",
+          "afterEventCount": 4,
+          "expected": {
+            "eligible_repeat_service_completions": 2,
+            "warranty_rework_completion_count": 1,
+            "eligible_opportunity_count": 4,
+            "warranty_rework_variable_cost": "125.00",
+            "warranty_rework_capacity_minutes": 90,
+            "existing_agreement_renewals": 0,
+            "new_agreement_acquisitions": 0,
+            "without_eligible_repeat_completion_count": 2,
+            "without_any_completed_work_count": 1
+          }
+        },
+        {
+          "id": "renewal_and_acquisition_separate",
+          "afterEventCount": 6,
+          "expected": {
+            "eligible_repeat_service_completions": 2,
+            "warranty_rework_completion_count": 1,
+            "eligible_opportunity_count": 4,
+            "warranty_rework_variable_cost": "125.00",
+            "warranty_rework_capacity_minutes": 90,
+            "existing_agreement_renewals": 1,
+            "new_agreement_acquisitions": 1,
+            "causal_effect_status": "not_estimated",
+            "without_eligible_repeat_completion_count": 2,
+            "without_any_completed_work_count": 1
+          }
+        }
+      ],
+      "claimLimits": [
+        "Arithmetic is a synthetic example, not production acceptance or causal evidence.",
+        "This view covers classification/count/cost arithmetic only. It supplies no revenue allocation for the repeat jobs, and therefore does not assert their revenue is zero.",
+        "The example does not decide real service due dates, warranty classification, customer authority or agreement charging. Those require authoritative business rules.",
+        "Two of the four frozen opportunities have no eligible repeat-service completion: the warranty job and the opportunity with no completed work. Warranty completion does not count as a successful repeat conversion."
+      ]
+    },
+    {
+      "id": "OM-FIN-17",
+      "title": "Legacy execution success, provider acceptance and delivery are separate",
+      "companyId": "10000000-0000-4000-8000-000000000001",
+      "currency": "USD",
+      "view": "financial",
+      "acceptanceRefs": [
+        "OM-A30"
+      ],
+      "decisionRefs": [
+        "OM-D11"
+      ],
+      "policyInputs": {
+        "status": "fixture_only",
+        "approval": "not_approved_business_policy",
+        "timeZone": "America/Chicago",
+        "asOf": "2026-11-30T23:59:59Z",
+        "serviceMonth": null,
+        "cashMonth": null,
+        "coverage": "Closed synthetic facts for the declared view; no real source completeness is inferred."
+      },
+      "events": [
+        {
+          "eventId": "OM-FIN-17.event.001",
+          "canonicalFactId": "message.17",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "message_receipt",
+            "id": "message.17"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-01T15:00:00Z",
+          "receivedAt": "2026-10-01T15:01:00Z",
+          "kind": "message_receipt",
+          "data": {
+            "stage": "queued",
+            "legacyEventName": "agent.execution_succeeded",
+            "deliveryEvidenceRef": null
+          }
+        },
+        {
+          "eventId": "OM-FIN-17.event.002",
+          "canonicalFactId": "message.17",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "message_receipt",
+            "id": "message.17"
+          },
+          "sourceVersion": 2,
+          "occurredAt": "2026-10-01T15:01:00Z",
+          "receivedAt": "2026-10-01T15:02:00Z",
+          "kind": "message_receipt",
+          "data": {
+            "stage": "provider_accepted",
+            "legacyEventName": "agent.execution_succeeded",
+            "deliveryEvidenceRef": null
+          }
+        },
+        {
+          "eventId": "OM-FIN-17.event.003",
+          "canonicalFactId": "message.17",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "message_receipt",
+            "id": "message.17"
+          },
+          "sourceVersion": 3,
+          "occurredAt": "2026-10-01T15:02:00Z",
+          "receivedAt": "2026-10-01T15:03:00Z",
+          "kind": "message_receipt",
+          "data": {
+            "stage": "delivered",
+            "legacyEventName": "agent.execution_succeeded",
+            "deliveryEvidenceRef": "synthetic-provider-delivery.17"
+          }
+        }
+      ],
+      "checkpoints": [
+        {
+          "id": "queued",
+          "afterEventCount": 1,
+          "expected": {
+            "queued_message_count": 1,
+            "provider_accepted_message_count": 0,
+            "delivered_message_count": 0,
+            "net_confirmed_bookings": 0,
+            "net_earned_service_revenue": "0.00",
+            "net_collected_cash": "0.00"
+          }
+        },
+        {
+          "id": "provider_accepted",
+          "afterEventCount": 2,
+          "expected": {
+            "queued_message_count": 0,
+            "provider_accepted_message_count": 1,
+            "delivered_message_count": 0,
+            "net_confirmed_bookings": 0,
+            "net_earned_service_revenue": "0.00",
+            "net_collected_cash": "0.00"
+          }
+        },
+        {
+          "id": "delivered",
+          "afterEventCount": 3,
+          "expected": {
+            "queued_message_count": 0,
+            "provider_accepted_message_count": 0,
+            "delivered_message_count": 1,
+            "net_confirmed_bookings": 0,
+            "net_earned_service_revenue": "0.00",
+            "net_collected_cash": "0.00"
+          }
+        }
+      ],
+      "claimLimits": [
+        "Arithmetic is a synthetic example, not production acceptance or causal evidence.",
+        "Even verified delivery supplies no booking, service, settlement or mission target evidence. This fixture does not exercise the real outbox/provider path."
+      ]
+    },
+    {
+      "id": "OM-FIN-18",
+      "title": "Completed workflow can be pending, not met, not evaluable or target met",
+      "companyId": "10000000-0000-4000-8000-000000000001",
+      "currency": "USD",
+      "view": "lifecycle",
+      "acceptanceRefs": [
+        "OM-A23",
+        "OM-A34"
+      ],
+      "decisionRefs": [
+        "OM-D01",
+        "OM-D11"
+      ],
+      "policyInputs": {
+        "status": "fixture_only",
+        "approval": "not_approved_business_policy",
+        "timeZone": "America/Chicago",
+        "asOf": "2026-10-20T00:00:00Z",
+        "serviceMonth": null,
+        "cashMonth": null,
+        "coverage": "Closed synthetic facts for the declared view; no real source completeness is inferred."
+      },
+      "events": [
+        {
+          "eventId": "OM-FIN-18.event.001",
+          "canonicalFactId": "evaluation.18.pending",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "mission_evaluation",
+            "id": "evaluation.18.pending"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-19T00:00:00Z",
+          "receivedAt": "2026-10-19T00:01:00Z",
+          "kind": "mission_evaluation",
+          "data": {
+            "missionRunId": "mission.18.pending",
+            "workflowState": "completed",
+            "maturesAt": "2026-10-31T00:00:00Z",
+            "observedValue": "300.00",
+            "target": "300.00",
+            "guardrails": [
+              {
+                "metricId": "revenue_per_eligible_opportunity",
+                "floor": "80.00",
+                "observedValue": "80.00"
+              }
+            ],
+            "effectDesign": null
+          }
+        },
+        {
+          "eventId": "OM-FIN-18.event.002",
+          "canonicalFactId": "evaluation.18.guardrail_failed",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "mission_evaluation",
+            "id": "evaluation.18.guardrail_failed"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-19T00:00:00Z",
+          "receivedAt": "2026-10-19T00:01:00Z",
+          "kind": "mission_evaluation",
+          "data": {
+            "missionRunId": "mission.18.guardrail_failed",
+            "workflowState": "completed",
+            "maturesAt": "2026-10-19T00:00:00Z",
+            "observedValue": "300.00",
+            "target": "300.00",
+            "guardrails": [
+              {
+                "metricId": "revenue_per_eligible_opportunity",
+                "floor": "80.00",
+                "observedValue": "60.00"
+              }
+            ],
+            "effectDesign": null
+          }
+        },
+        {
+          "eventId": "OM-FIN-18.event.003",
+          "canonicalFactId": "evaluation.18.missing_evidence",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "mission_evaluation",
+            "id": "evaluation.18.missing_evidence"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-19T00:00:00Z",
+          "receivedAt": "2026-10-19T00:01:00Z",
+          "kind": "mission_evaluation",
+          "data": {
+            "missionRunId": "mission.18.missing_evidence",
+            "workflowState": "completed",
+            "maturesAt": "2026-10-19T00:00:00Z",
+            "observedValue": null,
+            "target": "300.00",
+            "guardrails": [
+              {
+                "metricId": "revenue_per_eligible_opportunity",
+                "floor": "80.00",
+                "observedValue": "80.00"
+              }
+            ],
+            "effectDesign": null
+          }
+        },
+        {
+          "eventId": "OM-FIN-18.event.004",
+          "canonicalFactId": "evaluation.18.observed_target_met",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "mission_evaluation",
+            "id": "evaluation.18.observed_target_met"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-19T00:00:00Z",
+          "receivedAt": "2026-10-19T00:01:00Z",
+          "kind": "mission_evaluation",
+          "data": {
+            "missionRunId": "mission.18.observed_target_met",
+            "workflowState": "completed",
+            "maturesAt": "2026-10-19T00:00:00Z",
+            "observedValue": "300.00",
+            "target": "300.00",
+            "guardrails": [
+              {
+                "metricId": "revenue_per_eligible_opportunity",
+                "floor": "80.00",
+                "observedValue": "80.00"
+              }
+            ],
+            "effectDesign": null
+          }
+        }
+      ],
+      "checkpoints": [
+        {
+          "id": "workflow_finished_before_maturity",
+          "afterEventCount": 1,
+          "expected": {
+            "mission_results": {
+              "mission.18.pending": {
+                "workflow_state": "completed",
+                "outcome_verdict": "pending",
+                "causal_effect_status": "not_estimated"
+              }
+            },
+            "net_earned_service_revenue": "0.00",
+            "net_collected_cash": "0.00"
+          }
+        },
+        {
+          "id": "four_independent_outcome_states",
+          "afterEventCount": 4,
+          "expected": {
+            "mission_results": {
+              "mission.18.pending": {
+                "workflow_state": "completed",
+                "outcome_verdict": "pending",
+                "causal_effect_status": "not_estimated"
+              },
+              "mission.18.guardrail_failed": {
+                "workflow_state": "completed",
+                "outcome_verdict": "target_not_met",
+                "causal_effect_status": "not_estimated"
+              },
+              "mission.18.missing_evidence": {
+                "workflow_state": "completed",
+                "outcome_verdict": "not_evaluable",
+                "causal_effect_status": "not_estimated"
+              },
+              "mission.18.observed_target_met": {
+                "workflow_state": "completed",
+                "outcome_verdict": "target_met",
+                "causal_effect_status": "not_estimated"
+              }
+            },
+            "net_earned_service_revenue": "0.00",
+            "net_collected_cash": "0.00",
+            "net_confirmed_bookings": 0
+          }
+        }
+      ],
+      "claimLimits": [
+        "Arithmetic is a synthetic example, not production acceptance or causal evidence.",
+        "Evaluation observations are synthetic input measurements, not new economic facts. Completing a review writes no revenue or cash.",
+        "All four cases lack a causal design/effect estimate. Even target_met permits only an observed-outcome claim, never that a mission caused the improvement.",
+        "The numeric target, guardrail floor and maturity timestamps are fixture-only; missing required evidence cannot pass."
+      ]
+    },
+    {
+      "id": "OM-FIN-19",
+      "title": "Verified next-action assignment resolves one issue while stock stays unknown",
+      "companyId": "10000000-0000-4000-8000-000000000001",
+      "currency": "USD",
+      "view": "organization",
+      "acceptanceRefs": [
+        "OM-A20"
+      ],
+      "decisionRefs": [
+        "OM-D01",
+        "OM-D06"
+      ],
+      "policyInputs": {
+        "status": "fixture_only",
+        "approval": "not_approved_business_policy",
+        "timeZone": "America/Chicago",
+        "asOf": "2026-11-30T23:59:59Z",
+        "serviceMonth": null,
+        "cashMonth": null,
+        "coverage": "Closed synthetic facts for the declared view; no real source completeness is inferred."
+      },
+      "events": [
+        {
+          "eventId": "OM-FIN-19.event.001",
+          "canonicalFactId": "finding.19.estimate",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "operational_finding",
+            "id": "finding.19.estimate"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-01T15:00:00Z",
+          "receivedAt": "2026-10-01T15:01:00Z",
+          "kind": "operational_finding",
+          "data": {
+            "findingType": "estimate_missing_next_action",
+            "assignedActionId": null,
+            "assignedOwnerId": null,
+            "validDueAt": null,
+            "underlyingBusinessOutcome": "estimate_pending_customer_decision"
+          }
+        },
+        {
+          "eventId": "OM-FIN-19.event.002",
+          "canonicalFactId": "finding.19.inventory",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "operational_finding",
+            "id": "finding.19.inventory"
+          },
+          "sourceVersion": 1,
+          "occurredAt": "2026-10-01T15:01:00Z",
+          "receivedAt": "2026-10-01T15:02:00Z",
+          "kind": "operational_finding",
+          "data": {
+            "findingType": "inventory_unknown",
+            "verifiedQuantity": null,
+            "verificationSourceRef": null,
+            "underlyingBusinessOutcome": "awaiting_stock_verification"
+          }
+        },
+        {
+          "eventId": "OM-FIN-19.event.003",
+          "canonicalFactId": "finding.19.estimate",
+          "companyId": "10000000-0000-4000-8000-000000000001",
+          "sourceEntity": {
+            "type": "operational_finding",
+            "id": "finding.19.estimate"
+          },
+          "sourceVersion": 2,
+          "occurredAt": "2026-10-02T15:00:00Z",
+          "receivedAt": "2026-10-02T15:01:00Z",
+          "kind": "operational_finding",
+          "data": {
+            "findingType": "estimate_missing_next_action",
+            "assignedActionId": "action.19.confirm_scope",
+            "assignedOwnerId": "synthetic-office-user.19",
+            "validDueAt": "2026-10-05T15:00:00Z",
+            "underlyingBusinessOutcome": "estimate_pending_customer_decision"
+          }
+        }
+      ],
+      "checkpoints": [
+        {
+          "id": "two_unresolved_findings",
+          "afterEventCount": 2,
+          "expected": {
+            "verified_issue_resolutions": 0,
+            "unresolved_issue_count": 2,
+            "unknown_inventory_count": 1,
+            "net_confirmed_bookings": 0
+          }
+        },
+        {
+          "id": "specific_issue_resolved",
+          "afterEventCount": 3,
+          "expected": {
+            "verified_issue_resolutions": 1,
+            "unresolved_issue_count": 1,
+            "unknown_inventory_count": 1,
+            "findings": {
+              "finding.19.estimate": {
+                "resolution_verified": true,
+                "underlying_business_outcome": "estimate_pending_customer_decision"
+              },
+              "finding.19.inventory": {
+                "resolution_verified": false,
+                "underlying_business_outcome": "awaiting_stock_verification"
+              }
+            },
+            "net_confirmed_bookings": 0,
+            "net_earned_service_revenue": "0.00",
+            "net_collected_cash": "0.00"
+          }
+        }
+      ],
+      "claimLimits": [
+        "Arithmetic is a synthetic example, not production acceptance or causal evidence.",
+        "A valid assigned action resolves the missing-next-action issue, not the customer estimate decision. Unknown stock requires verification and is not a zero quantity. No organization score is calculated."
+      ]
+    }
+  ]
+}

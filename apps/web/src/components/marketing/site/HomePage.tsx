@@ -23,19 +23,8 @@ export function GrowthCheckEntry({ id, className = "" }: { id: string; className
 
 /** Canonical revised proposal578:5186; responsive, semantic adaptation of its editable sections. */
 export function HomePage() {
-  const heroPoster = MEDIA.hero.poster;
-  const heroSizes = "(min-width: 1440px) 960px, (min-width: 960px) 67vw, 100vw";
   return (
     <div className={styles.home} data-node-id="578:5186">
-      {/* LCP: preload the hero poster (webp preferred via imageSrcSet). */}
-      <link
-        rel="preload"
-        as="image"
-        href={heroPoster.src}
-        imageSrcSet={heroPoster.webpSrcSet}
-        imageSizes={heroSizes}
-        fetchPriority="high"
-      />
       <section className={styles.hero} aria-labelledby="home-hero" data-node-id="578:5188">
         <div className={styles.heroPhoto} data-node-id="578:5189">
           <LoopVideo {...MEDIA.hero} alt="" priority sizes="(min-width: 1440px) 960px, (min-width: 960px) 67vw, 100vw" className={styles.heroImage} frameClassName="absolute inset-0 h-full w-full" />

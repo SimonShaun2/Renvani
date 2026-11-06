@@ -14,7 +14,10 @@ export type LoopVideoProps = {
   /** Applied to the outer frame (aspect + overflow). */
   frameClassName?: string | undefined;
   alt?: string | undefined;
-  /** Hero / LCP: eager poster + delay video until after window load. */
+  /**
+   * Hero / LCP: eager poster; attach video sources only after
+   * load+idle(~3s) OR first scroll OR first pointer — whichever comes first.
+   */
   priority?: boolean | undefined;
   sizes?: string | undefined;
   /** Object-fit for the video/poster. */
@@ -23,7 +26,7 @@ export type LoopVideoProps = {
 
 /**
  * Autoplaying muted loop. Poster always renders (no JS required).
- * Sources attach only when near the viewport (and after load for priority).
+ * Sources attach only when near the viewport (and after deferral for priority).
  * Reduced-motion → poster only.
  */
 export function LoopVideo({
@@ -43,6 +46,7 @@ export function LoopVideo({
   const videoRef = useRef<HTMLVideoElement>(null);
   const [near, setNear] = useState(false);
   const [pageReady, setPageReady] = useState(!priority);
+  const [videoReady, setVideoReady] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
 
   useEffect(() => {
@@ -55,14 +59,54 @@ export function LoopVideo({
 
   useEffect(() => {
     if (!priority) return;
-    const markReady = () => setPageReady(true);
+    let cancelled = false;
+    let idleHandle: number | undefined;
+    let timeoutHandle: number | undefined;
+
+    const markReady = () => {
+      if (cancelled) return;
+      cancelled = true;
+      setPageReady(true);
+      cleanup();
+    };
+
+    const onScroll = () => markReady();
+    const onPointer = () => markReady();
+
+    const cleanup = () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("pointerdown", onPointer);
+      window.removeEventListener("pointermove", onPointer);
+      if (idleHandle !== undefined && "cancelIdleCallback" in window) {
+        window.cancelIdleCallback(idleHandle);
+      }
+      if (timeoutHandle !== undefined) window.clearTimeout(timeoutHandle);
+    };
+
+    window.addEventListener("scroll", onScroll, { once: true, passive: true });
+    window.addEventListener("pointerdown", onPointer, { once: true, passive: true });
+    window.addEventListener("pointermove", onPointer, { once: true, passive: true });
+
+    const startIdleClock = () => {
+      // ~3s after load via rIC (timeout) or setTimeout fallback.
+      if (typeof window.requestIdleCallback === "function") {
+        idleHandle = window.requestIdleCallback(() => markReady(), { timeout: 3000 });
+      } else {
+        timeoutHandle = window.setTimeout(markReady, 3000);
+      }
+    };
+
     if (document.readyState === "complete") {
-      // Defer one tick so the LCP poster can paint first.
-      const t = window.setTimeout(markReady, 0);
-      return () => window.clearTimeout(t);
+      startIdleClock();
+    } else {
+      window.addEventListener("load", startIdleClock, { once: true });
     }
-    window.addEventListener("load", markReady, { once: true });
-    return () => window.removeEventListener("load", markReady);
+
+    return () => {
+      cancelled = true;
+      cleanup();
+      window.removeEventListener("load", startIdleClock);
+    };
   }, [priority]);
 
   useEffect(() => {
@@ -92,11 +136,12 @@ export function LoopVideo({
       void video.play().catch(() => undefined);
     } else {
       video.pause();
+      setVideoReady(false);
     }
   }, [activate, reducedMotion, webm, mp4]);
 
   const fitClass = objectFit === "contain" ? "object-contain" : "object-cover";
-  const imgClass = `absolute inset-0 h-full w-full ${fitClass} ${className}`;
+  const mediaClass = `absolute inset-0 h-full w-full ${fitClass} ${className}`;
 
   return (
     <div
@@ -116,20 +161,32 @@ export function LoopVideo({
           decoding={priority ? "sync" : "async"}
           loading={priority ? "eager" : "lazy"}
           fetchPriority={priority ? "high" : "auto"}
-          className={imgClass}
+          className={mediaClass}
+          style={{
+            opacity: videoReady ? 0 : 1,
+            transition: "opacity 280ms ease",
+            zIndex: 1,
+            pointerEvents: "none"
+          }}
         />
       </picture>
       {!reducedMotion ? (
         <video
           key={`${webm}|${mp4}`}
           ref={videoRef}
-          className={`absolute inset-0 h-full w-full ${fitClass} ${className}`}
+          className={mediaClass}
+          style={{ zIndex: 0 }}
           muted
           loop
           playsInline
           preload={activate ? "metadata" : "none"}
           aria-label={alt || undefined}
           autoPlay={activate}
+          onPlaying={() => setVideoReady(true)}
+          onCanPlay={() => {
+            // Prefer playing for the swap, but canplay is enough if already decoding.
+            if (videoRef.current && !videoRef.current.paused) setVideoReady(true);
+          }}
         >
           {activate ? (
             <>

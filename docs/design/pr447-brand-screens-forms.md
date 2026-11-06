@@ -21,3 +21,10 @@ Demo preserves split names and team size in the existing message field, combined
 Migration `0063_marketing_growth_contact` and the API must be released before publishing the new Growth Check form to production. The current production API is not silently sent a fallback that discards contact data. No production migration, API release, merge or promotion is performed in this preview task. Local route/service tests validate the new payload and persistence boundary using the existing test repository doubles; this is not proof of production DB migration.
 
 Independent review and approved exact-head release checks remain required. Screenshots, forms and asset routes are checked on the new preview before handoff.
+
+The additional PWA manifest and opaque installation icons follow the supplied v2 manifest structure and derive their geometry from the approved v2 symbol. These are rendered derivatives of the supplied symbol, not byte-identical copies of the separate PNG exports in the ZIP.
+
+## Final polish
+- The actual Crew Job Brief tablet adaptation `643:87` now contains garage-door work, an opener issue, safety-sensor adjustment and roller replacement. It preserves the approved Technician App layout and example-only labeling.
+- Public assets `/brand/logo-horizontal.svg`, `/manifest.webmanifest`, `/icon-192.png`, `/icon-512.png` and `/icon-maskable-512.png` are exempted from Clerk middleware only by exact path. Protected lookalike paths and all operator/tenant routes remain gated. Matcher tests guard both cases.
+- PWA manifest and installation icon variants derive from the supplied v2 symbol. The favicon.ico and original SVG symbol/wordmark were byte-verified against the user's ZIP; the PWA/Apple PNG derivatives are not byte-identical to the pre-rendered PNGs in that ZIP.

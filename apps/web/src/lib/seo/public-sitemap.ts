@@ -1,3 +1,4 @@
+import { publicSiteUrl } from "./public-site-origin";
 import type { MetadataRoute } from "next";
 
 import type { PublicBookingSettingsRecord } from "@/src/hooks/booking.hooks";
@@ -44,16 +45,7 @@ export const ROBOTS_DISALLOW = [
   "/book/*/commit"
 ] as const;
 
-export function publicSiteUrl(env: NodeJS.ProcessEnv = process.env): string | null {
-  const raw = env.PUBLIC_SITE_URL?.trim();
-  if (!raw) return null;
-  try {
-    const url = new URL(raw);
-    return url.protocol === "https:" || url.protocol === "http:" ? url.origin : null;
-  } catch {
-    return null;
-  }
-}
+export { publicSiteUrl } from "./public-site-origin";
 
 const SLUG_PATTERN = /^[a-z0-9][a-z0-9-]{0,62}$/;
 

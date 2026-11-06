@@ -1,3 +1,4 @@
+import { withMarketingSeo } from "@/src/lib/seo/marketing-metadata";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
@@ -13,7 +14,7 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const page = INDUSTRY_PAGE_BY_SLUG[slug];
-  return page ? { title: page.title, description: page.description } : {};
+  return page ? withMarketingSeo(page.href, { title: page.title, description: page.description }) : {};
 }
 
 export default async function IndustryPage({ params }: { params: Promise<{ slug: string }> }) {

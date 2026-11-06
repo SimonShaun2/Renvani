@@ -1,3 +1,5 @@
+import { MarketingStructuredData } from "@/src/components/marketing/site/MarketingStructuredData";
+import { withMarketingSeo } from "@/src/lib/seo/marketing-metadata";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
@@ -7,7 +9,7 @@ import { HOME_META } from "@/src/components/marketing/site/site-config";
 import { getDefaultRouteForRole } from "@/src/lib/route-access";
 import { getServerSession } from "@/src/lib/server-session";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withMarketingSeo("/", {
   title: HOME_META.title,
   description: HOME_META.description,
   openGraph: {
@@ -17,7 +19,7 @@ export const metadata: Metadata = {
     siteName: "Renvani",
     type: "website"
   }
-};
+});
 
 export default async function Home() {
   const result = await getServerSession();
@@ -28,6 +30,7 @@ export default async function Home() {
 
   return (
     <MarketingShell>
+      <MarketingStructuredData />
       <HomePage />
     </MarketingShell>
   );

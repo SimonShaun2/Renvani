@@ -10,6 +10,7 @@ import { dirname, join } from "node:path";
 
 import { validateNeonCiDatabaseUrl } from "../../packages/config/dist/neon-ci.js";
 import { maskDatabaseUrls, prNumberFromGithubRef, withIsolatedCiDatabase } from "./neon-per-pr-database.mjs";
+import { runWorkflowReadsSuites } from "./workflow-reads-postgres.mjs";
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 
@@ -52,6 +53,8 @@ function stepsAgainst(databaseUrl) {
   run("corepack", ["pnpm", "--filter", "@fsm/db", "run", "db:check-migrations"], childEnv);
   run("corepack", ["pnpm", "--filter", "@fsm/db", "run", "db:migrate"], childEnv);
   run("corepack", ["pnpm", "--filter", "@fsm/db", "test"], childEnv);
+  // PR #445: workflow-read PostgreSQL suites on the same migrated per-PR database (isolated mode only).
+  runWorkflowReadsSuites({ repoRoot, databaseUrl, isolated: databaseUrl !== baseUrl, env: childEnv });
 }
 
 console.log(

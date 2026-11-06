@@ -415,3 +415,21 @@ test("FS-235 strict gate drops its own database after test failure and fails on 
     log: () => undefined
   }), /failed to drop strict isolated CI database/);
 });
+
+test("PR #445: Neon per-PR gate runs the workflow-read PostgreSQL suites with WORKFLOW_* env, isolated only, skips fail", async () => {
+  const script = readFileSync(join(repoRoot, "scripts/ci/neon-per-pr-branch.mjs"), "utf8");
+  assert.match(script, /runWorkflowReadsSuites\(\{ repoRoot, databaseUrl, isolated: databaseUrl !== baseUrl/);
+  const mod = await import("./workflow-reads-postgres.mjs");
+  assert.equal(mod.WORKFLOW_READ_SUITES.length, 3);
+  const env = mod.workflowReadsEnv({ KEEP: "1" }, "postgres://synthetic/db");
+  assert.equal(env.WORKFLOW_TEST_DATABASE_URL, "postgres://synthetic/db");
+  assert.equal(env.WORKFLOW_FULL_DATABASE_URL, "postgres://synthetic/db");
+  assert.equal(env.KEEP, "1");
+  const counts = (c) => () => c;
+  assert.throws(() => mod.assertAllExecuted("x", counts({ total: 43, passed: 0, failed: 0, skipped: 43, todo: 0 })));
+  assert.throws(() => mod.assertAllExecuted("x", counts({ total: 0, passed: 0, failed: 0, skipped: 0, todo: 0 })));
+  assert.deepEqual(mod.assertAllExecuted("x", counts({ total: 43, passed: 43, failed: 0, skipped: 0, todo: 0 })).passed, 43);
+  const logs = [];
+  assert.deepEqual(mod.runWorkflowReadsSuites({ repoRoot, databaseUrl: "u", isolated: false, log: (m) => logs.push(m) }), { ran: false });
+  assert.match(logs[0], /NOT PROVEN/);
+});

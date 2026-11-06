@@ -8,11 +8,12 @@ export const dispatchWeekRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.get(
     "/dispatch/week",
     {
+      // Auth -> role -> query validation, so signed-out/disallowed callers get 401/403, never 400.
       preHandler: [
         fastify.authenticate,
         requireRole(["owner", "admin", "dispatcher", "office"]),
+        withZodValidation({ query: DispatchWeekQuerySchema }),
       ],
-      preValidation: [withZodValidation({ query: DispatchWeekQuerySchema })],
     },
     async (request, reply) =>
       reply.send(

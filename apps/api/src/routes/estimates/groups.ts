@@ -11,11 +11,12 @@ export const estimateGroupRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.get(
     "/groups",
     {
+      // Auth -> role -> query validation, so signed-out/disallowed callers get 401/403, never 400.
       preHandler: [
         fastify.authenticate,
         requireRole(["owner", "admin", "dispatcher"]),
+        withZodValidation({ query: EstimateGroupsQuerySchema }),
       ],
-      preValidation: [withZodValidation({ query: EstimateGroupsQuerySchema })],
     },
     async (request, reply) =>
       reply.send(

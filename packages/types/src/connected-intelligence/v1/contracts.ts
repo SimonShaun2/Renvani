@@ -24,9 +24,9 @@ export const qualitySchema = z.object({ completeness: z.enum(["complete", "parti
 export const SOURCE_KINDS = ["booking_request", "call_record", "job", "invoice", "customer", "agent_action", "maintenance_plan", "crew", "campaign", "time_entry", "timesheet", "stock_level", "stock_movement", "purchase_order", "cost_posting", "form_submission", "import_batch", "implementation", "query_manifest"] as const;
 export const sourceSchema = z.object({ id: token, kind: z.enum(SOURCE_KINDS), entityId: z.string().uuid().nullable(),
   recordVersion: token, observedAt: instantSchema, effectiveAt: instantSchema.nullable(),
-  sensitivity: z.enum(SENSITIVITIES), origin: z.enum(["native", "imported", "aggregate"]), importBatchId: z.string().uuid().nullable(),
+  sensitivity: z.enum(SENSITIVITIES), origin: z.enum(["native", "imported", "aggregate", "unknown"]), importBatchId: z.string().uuid().nullable(),
   queryManifest: z.object({ queryId: token, definitionVersion: token, filterKey: token, cohortKey: token,
-    matchedCount: z.number().int().min(0).max(Number.MAX_SAFE_INTEGER), complete: z.boolean() }).strict().nullable() }).strict().superRefine((s, ctx) => {
+    matchedCount: z.number().int().min(0).max(Number.MAX_SAFE_INTEGER).nullable(), complete: z.boolean() }).strict().nullable() }).strict().superRefine((s, ctx) => {
     if ((s.kind === "query_manifest") !== (s.queryManifest !== null)) ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Manifest reference mismatch" });
     if (s.kind !== "query_manifest" && s.entityId === null) ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Record identity required" });
     if (s.origin === "imported" && !s.importBatchId) ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Imported lineage required" });
@@ -34,8 +34,9 @@ export const sourceSchema = z.object({ id: token, kind: z.enum(SOURCE_KINDS), en
 export const factSchema = z.object({ id: token, metricId: token, definitionVersion: token, value: decimalSchema.nullable(),
   unit: z.enum(["count", "money", "percent", "quantity"]), currency: z.string().regex(/^[A-Z]{3}$/u).nullable(),
   quantityUnit: token.nullable(), basis: token, grain: token, sensitivity: z.enum(SENSITIVITIES), sourceIds: z.array(token).min(1).max(500),
-  periodRef: z.enum(["current", "comparison"]), finality: z.enum(["final", "provisional", "not_applicable"]),
+  periodRef: z.enum(["current", "comparison", "today"]), finality: z.enum(["final", "provisional", "not_applicable"]),
   displaySourcesTruncated: z.boolean() }).strict().superRefine((f, ctx) => {
+    if (new Set(f.sourceIds).size !== f.sourceIds.length) ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Duplicate fact source" });
     const m = getMetric(f.metricId);
     if (!m || m.version !== f.definitionVersion || m.unit !== f.unit || m.basis !== f.basis || m.grain !== f.grain || m.sensitivity !== f.sensitivity)
       ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Unknown or incompatible metric contract" });
@@ -45,7 +46,8 @@ export const factSchema = z.object({ id: token, metricId: token, definitionVersi
     if ((f.unit === "quantity") !== (f.quantityUnit !== null)) ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Quantity unit mismatch" });
     if (f.unit === "count" && f.value !== null && !/^(?:0|[1-9]\d*)$/u.test(f.value)) ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Count must be nonnegative integer" });
   });
-const successfulRead = z.object({ capabilityId: z.enum(CAPABILITY_IDS), status: z.literal("ok"), asOf: instantSchema,
+export const scopeBindingSchema = scopeSchema.pick({ tenantId: true, actorId: true, scopeKey: true, authorizationVersion: true }).strict();
+const successfulRead = z.object({ scopeBinding: scopeBindingSchema, capabilityId: z.enum(CAPABILITY_IDS), status: z.literal("ok"), asOf: instantSchema,
   quality: qualitySchema, sources: z.array(sourceSchema).max(2000), facts: z.array(factSchema).max(500),
   nextCursor: token.nullable() }).strict().superRefine((r, ctx) => {
     const ids = new Set(r.sources.map((s) => s.id));
@@ -59,12 +61,28 @@ const deniedRead = z.object({ capabilityId: z.enum(CAPABILITY_IDS), status: z.li
 const unavailableRead = z.object({ capabilityId: z.enum(CAPABILITY_IDS), status: z.literal("unavailable"),
   reason: z.enum(["unsupported", "not_configured", "not_validated", "timeout", "source_failed", "missing_policy"]) }).strict();
 export const readResultSchema = z.union([successfulRead, deniedRead, unavailableRead]);
+export const calculationSchema = z.object({ id: token, formulaId: z.enum(["direct_cost_sum", "direct_margin", "direct_margin_percent", "weighted_percent", "stock_available"]),
+  version: z.literal("1.0.0"), inputFactIds: z.array(token).min(1).max(100), resultFactId: token,
+  rounding: z.enum(["exact", "half_up_2"]), verification: z.enum(["unchecked", "verified_by_reader"]) }).strict();
 export const packetSchema = z.object({ version: z.literal(EVIDENCE_VERSION), packetId: token, requestId: token, scope: scopeSchema,
-  generatedAt: instantSchema, period: periodSchema, comparison: periodSchema.nullable(),
-  requiredCapabilities: z.array(z.enum(CAPABILITY_IDS)).min(1).max(16), reads: z.array(readResultSchema).max(16) }).strict().superRefine((p, ctx) => {
+  generatedAt: instantSchema, period: periodSchema, comparison: periodSchema.nullable(), today: periodSchema.nullable(),
+  calculations: z.array(calculationSchema).max(100).default([]), requiredCapabilities: z.array(z.enum(CAPABILITY_IDS)).min(1).max(16), reads: z.array(readResultSchema).max(16) }).strict().superRefine((p, ctx) => {
     if (new Set(p.reads.map((r) => r.capabilityId)).size !== p.reads.length) ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Duplicate capability read" });
+    if (new Set(p.requiredCapabilities).size !== p.requiredCapabilities.length) ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Duplicate required capability" });
     const facts = p.reads.flatMap((r) => r.status === "ok" ? r.facts : []);
     if (new Set(facts.map((f) => f.id)).size !== facts.length) ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Duplicate cross-read fact ID" });
+    const factIds = new Set(facts.map((f) => f.id));
+    if (new Set(p.calculations.map((c) => c.id)).size !== p.calculations.length || new Set(p.calculations.map((c) => c.resultFactId)).size !== p.calculations.length)
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Duplicate calculation identity or result" });
+    const futureResults = new Set(p.calculations.map((c) => c.resultFactId));
+    for (const c of p.calculations) {
+      if (!factIds.has(c.resultFactId) || c.inputFactIds.some((id) => !factIds.has(id) || futureResults.has(id)))
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Unbound or cyclic calculation lineage" });
+      futureResults.delete(c.resultFactId);
+    }
+    for (const r of p.reads) if (r.status === "ok" && (r.scopeBinding.tenantId !== p.scope.tenantId || r.scopeBinding.actorId !== p.scope.actorId || r.scopeBinding.scopeKey !== p.scope.scopeKey || r.scopeBinding.authorizationVersion !== p.scope.authorizationVersion))
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Read scope does not match evidence assembly" });
+    if (!p.today && facts.some((f) => f.periodRef === "today")) ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Unbound daily period" });
     if (!p.comparison && facts.some((f) => f.periodRef === "comparison")) ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Unbound comparison period" });
     for (const r of p.reads) if (r.status === "ok" && Date.parse(r.asOf) > Date.parse(p.generatedAt)) ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Source cutoff after generation" });
   });
@@ -78,7 +96,7 @@ export const proposalReferenceSchema = z.object({ proposalId: token, actionType:
   policyVersion: token, expectedVersion: token, requiredPermission: token, state: z.literal("proposed"), executable: z.literal(false) }).strict();
 export const answerSchema = z.object({ version: z.literal(EVIDENCE_VERSION), packetId: token,
   state: z.enum(["complete", "partial", "unavailable"]), claims: z.array(claimSchema).max(100),
-  limitations: z.array(z.enum(["limited_coverage", "stale_or_unknown_freshness", "unreconciled", "provisional", "unavailable_evidence", "invalid_narrative"])).max(6),
+  limitations: z.array(z.enum(["limited_coverage", "stale_or_unknown_freshness", "unreconciled", "provisional", "unavailable_evidence", "invalid_narrative", "display_truncated"])).max(7),
   nextStep: z.enum(["inspect_sources", "refresh_or_review", "verify_access_or_sources"]), writesPerformed: z.literal(false) }).strict();
 export type EvidenceScope = z.infer<typeof scopeSchema>;
 export type InsightQuery = z.infer<typeof querySchema>;

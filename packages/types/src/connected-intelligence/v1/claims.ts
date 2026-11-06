@@ -32,6 +32,7 @@ export function validateClaims(input: readonly unknown[], assessment: EvidenceAs
 export function factualFallback(assessment: EvidenceAssessment, invalidNarrative = false): InsightAnswer {
   const limitations = [...assessment.limitations];
   if (invalidNarrative && !limitations.includes("invalid_narrative")) limitations.push("invalid_narrative");
+  if (assessment.view.facts.filter((fact) => fact.value !== null).length > 100) limitations.push("display_truncated");
   return answerSchema.parse({ version: EVIDENCE_VERSION, packetId: assessment.view.packetId, state: assessment.state,
     claims: assessment.view.facts.filter((f) => f.value !== null).slice(0, 100).map((f, i): NarrativeClaim => ({
       id: `fallback.${i}`, kind: "fact", factIds: [f.id], assertedValues: [{ factId: f.id, value: f.value }],

@@ -29,14 +29,14 @@ export function adaptCommandCenterBrief(brief: CommandCenterBrief, scopeInput: E
     for (const source of items) {
       const id = `legacy.ref.${source.kind}.${source.id}`;
       sourceMap.set(id, { id, kind: source.kind, entityId: source.id, recordVersion: "legacy.row_version_unavailable",
-        observedAt: brief.generatedAt, effectiveAt: source.occurredAt, sensitivity: "operational", origin: "native", importBatchId: null, queryManifest: null });
+        observedAt: brief.generatedAt, effectiveAt: source.occurredAt, sensitivity: "operational", origin: "unknown", importBatchId: null, queryManifest: null });
       ids.push(id);
     }
     return [...new Set(ids)];
   };
   const computationalCap = brief.limits.jobsTruncated || brief.limits.jobHistoryTruncated || brief.limits.actionsTruncated;
   const facts: EvidenceFact[] = [];
-  const makeFact = (metricId: string, value: string | number | null, sourceIds: string[], periodRef: "current" | "comparison", displayTruncated: boolean): EvidenceFact => {
+  const makeFact = (metricId: string, value: string | number | null, sourceIds: string[], periodRef: "current" | "comparison" | "today", displayTruncated: boolean): EvidenceFact => {
     const metric = getMetric(metricId); if (!metric) throw new Error("Unknown legacy metric");
     return { id: `${metricId}.${periodRef}`, metricId, definitionVersion: metric.version, unit: metric.unit,
       value: valueString(value, metric.unit === "money"), currency: metric.unit === "money" ? currency : null, quantityUnit: null,
@@ -53,13 +53,15 @@ export function adaptCommandCenterBrief(brief: CommandCenterBrief, scopeInput: E
   facts.push(makeFact("attention.approvals", brief.header.approvalsWaiting, sourcesFor([], "approvals", !brief.limits.actionsTruncated), "current", brief.needsYou.truncated));
   facts.push(makeFact("attention.exceptions", brief.header.exceptions, sourcesFor([], "exceptions", !brief.limits.actionsTruncated), "current", brief.needsYou.truncated));
   // Daily jobs retain their own grain/basis, rather than becoming a monthly financial observation.
-  facts.push(makeFact("jobs.today", brief.today.jobsToday, sourcesFor(brief.today.sources, "jobs_today", !brief.limits.jobsTruncated), "current", false));
+  facts.push(makeFact("jobs.today", brief.today.jobsToday, sourcesFor(brief.today.sources, "jobs_today", !brief.limits.jobsTruncated), "today", false));
   const period = { startDate: brief.period.startDate, endDate: brief.period.endDate, timeZone: brief.period.timeZone,
     cohortKey: "legacy.company", filterKey: "legacy.default", comparisonMode: "complete_periods" as const };
+  const dateParts = new Intl.DateTimeFormat("en-CA", { timeZone: brief.period.timeZone, year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date(brief.generatedAt));
+  const localDay = ["year", "month", "day"].map((type) => dateParts.find((part) => part.type === type)?.value ?? "").join("-");
   const packet = packetSchema.parse({ version: EVIDENCE_VERSION, packetId: `legacy.${suffix}`, requestId: `legacy.request.${suffix}`,
-    scope, generatedAt: brief.generatedAt, period,
+    scope, generatedAt: brief.generatedAt, period, today: { ...period, startDate: localDay, endDate: localDay, comparisonMode: "none" },
     comparison: { ...period, startDate: brief.period.compareStartDate, endDate: brief.period.compareEndDate }, requiredCapabilities: ["brief"],
-    reads: [{ capabilityId: "brief", status: "ok", asOf: brief.generatedAt,
+    reads: [{ scopeBinding: { tenantId: scope.tenantId, actorId: scope.actorId, scopeKey: scope.scopeKey, authorizationVersion: scope.authorizationVersion }, capabilityId: "brief", status: "ok", asOf: brief.generatedAt,
       quality: { completeness: computationalCap ? "partial" : "complete", freshness: "fresh", reconciliation: "not_applicable", finality: "not_applicable", computationTruncated: computationalCap },
       sources: [...sourceMap.values()], facts, nextCursor: null }] });
   return { packet, legacySnapshot: structuredClone(brief),

@@ -17,7 +17,7 @@ export function factFixture(metricId = "jobs.today", value: string | null = "2")
     sourceIds: ["s.test"], periodRef: "current", finality: "not_applicable", displaySourcesTruncated: false };
 }
 export function readFixture(capabilityId: CapabilityId = "jobs", metricId = "jobs.today", value: string | null = "2"): Extract<ReadResult, { status: "ok" }> {
-  return { capabilityId, status: "ok", asOf: NOW, quality: { completeness: "complete", freshness: "fresh", reconciliation: "not_applicable", finality: "not_applicable", computationTruncated: false },
+  return { scopeBinding: { tenantId: TENANT, actorId: ACTOR, scopeKey: "scope.synthetic.owner", authorizationVersion: "v1" }, capabilityId, status: "ok", asOf: NOW, quality: { completeness: "complete", freshness: "fresh", reconciliation: "not_applicable", finality: "not_applicable", computationTruncated: false },
     sources: [{ id: "s.test", kind: "query_manifest", entityId: null, recordVersion: "snapshot.v1", observedAt: NOW, effectiveAt: NOW,
       sensitivity: getMetric(metricId)?.sensitivity ?? "operational", origin: "aggregate", importBatchId: null,
       queryManifest: { queryId: "synthetic.query", definitionVersion: "v1", filterKey: "all", cohortKey: "shop", matchedCount: 2, complete: true } }],
@@ -46,6 +46,6 @@ export function launchFixture() { return { freshStart: false, ownerAccepted: tru
   { id: "configuration", mandatory: true, accepted: true, evidenceVersion: "v1", currentVersion: "v1" },
   { id: "migration", mandatory: true, accepted: true, evidenceVersion: "v1", currentVersion: "v1" }] }; }
 export function payrollFixture() { return { period: { start: "2026-11-01T05:00:00.000Z", end: "2026-11-08T06:00:00.000Z" }, policyVersion: "synthetic.policy.v1",
-  paidActivityKinds: ["on_site", "travel"], inputsVersion: "inputs.v1", exportedInputsVersion: null as string | null,
+  paidActivityKinds: ["on_site", "travel"], unpaidActivityKinds: ["break"], inputsVersion: "inputs.v1", exportedInputsVersion: null as string | null,
   entries: [{ id: "time.1", employeeId: "employee.1", jobId: "job.1", interval: { start: "2026-11-06T14:00:00.000Z", end: "2026-11-06T16:00:00.000Z" }, activityKind: "on_site", approval: "approved", rateVersion: "rate.v1" }],
   rates: [{ employeeId: "employee.1", version: "rate.v1", effectiveFrom: "2026-01-01T00:00:00.000Z", effectiveUntil: null as string | null, hourlyRate: "30.00" as string | null }] }; }

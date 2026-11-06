@@ -18,19 +18,23 @@ export const migrationReadinessSchema = z.object({ status: z.enum(["uploaded", "
   rejected: z.number().int().min(0).max(Number.MAX_SAFE_INTEGER), duplicates: z.number().int().min(0).max(Number.MAX_SAFE_INTEGER),
   relationshipsReconciled: z.boolean(), amountsReconciled: z.boolean(), unsupportedDisclosed: z.boolean(),
   exceptionsAccepted: z.boolean(), downstreamChanged: z.boolean() }).strict();
-export function migrationReadiness(input: unknown): { accepted: boolean; safeIsolatedRollback: boolean; blockers: string[] } {
+export function migrationReadiness(input: unknown): { accepted: boolean; rollbackEligibleForReview: boolean; blockers: string[] } {
   const m = migrationReadinessSchema.parse(input); const blockers: string[] = [];
   if (m.status !== "completed") blockers.push("commit_not_completed");
   if (BigInt(m.sourceCount) !== BigInt(m.accepted) + BigInt(m.rejected) + BigInt(m.duplicates)) blockers.push("count_mismatch");
   if (!m.relationshipsReconciled || !m.amountsReconciled) blockers.push("unreconciled");
   if (!m.unsupportedDisclosed || !m.exceptionsAccepted) blockers.push("scope_or_exceptions_unaccepted");
-  return { accepted: blockers.length === 0, safeIsolatedRollback: m.status === "completed" && !m.downstreamChanged, blockers };
+  return { accepted: blockers.length === 0, rollbackEligibleForReview: m.status === "completed" && !m.downstreamChanged, blockers };
 }
-export const launchReadinessSchema = z.object({ freshStart: z.boolean(), ownerAccepted: z.boolean(),
+export const launchReadinessSchema = z.object({ freshStart: z.boolean(), ownerAccepted: z.boolean(), requiredGateIds: z.array(token).min(1).max(100),
   gates: z.array(z.object({ id: token, mandatory: z.boolean(), accepted: z.boolean(), evidenceVersion: token.nullable(), currentVersion: token }).strict()).max(100) }).strict();
 export function launchReadiness(input: unknown): { ready: boolean; blockers: string[] } {
   const launch = launchReadinessSchema.parse(input); const blockers: string[] = [];
   if (new Set(launch.gates.map((g) => g.id)).size !== launch.gates.length) throw new Error("Duplicate readiness gate");
+  for (const requiredId of launch.requiredGateIds) {
+    if (requiredId === "migration" && launch.freshStart) continue;
+    if (!launch.gates.some((g) => g.id === requiredId && g.mandatory)) blockers.push(`missing_requirement:${requiredId}`);
+  }
   for (const gate of launch.gates) {
     if (gate.id === "migration" && launch.freshStart) continue;
     if (gate.mandatory && (!gate.accepted || gate.evidenceVersion === null || gate.evidenceVersion !== gate.currentVersion)) blockers.push(gate.id);
@@ -38,4 +42,12 @@ export function launchReadiness(input: unknown): { ready: boolean; blockers: str
   if (!launch.ownerAccepted) blockers.push("owner_cutover_not_accepted");
   if (launch.gates.length === 0) blockers.push("requirements_missing");
   return { ready: blockers.length === 0, blockers };
+}
+
+/** Pure sync-state classification. No provider retry or accounting mutation is performed. */
+export const accountingObservationSchema = z.object({ state: z.enum(["not_connected", "pending", "acknowledged", "uncertain", "failed", "reconciled"]), remoteId: token.nullable(), comparedTotals: z.boolean() }).strict();
+export function accountingReadiness(input: unknown): { reconciled: boolean; nextStep: "verify_connection" | "reconcile" | "inspect_receipt"; automaticRetry: false } {
+  const x = accountingObservationSchema.parse(input);
+  const reconciled = x.state === "reconciled" && x.remoteId !== null && x.comparedTotals;
+  return { reconciled, nextStep: reconciled ? "inspect_receipt" : x.state === "not_connected" ? "verify_connection" : "reconcile", automaticRetry: false };
 }

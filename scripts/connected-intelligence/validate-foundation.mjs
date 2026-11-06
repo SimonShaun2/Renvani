@@ -71,7 +71,7 @@ try {
   run("types-strict", ["--filter", "@fsm/types", "exec", "tsc", "-p", "tsconfig.connected-intelligence.json"]);
   run("math-strict", ["--filter", "@fsm/api", "exec", "tsc", "-p", "tsconfig.connected-intelligence.json"]);
   run("types-build", ["--filter", "@fsm/types", "build"]);
-  run("scoped-lint", ["exec", "eslint", "packages/types/src/connected-intelligence", "packages/types/test-fixtures/connected-intelligence.ts", "apps/api/src/services/connected-intelligence", "scripts/connected-intelligence"]);
+  run("scoped-lint", ["exec", "eslint", "--ext", ".ts,.tsx,.mjs", "packages/types/src/connected-intelligence", "packages/types/test-fixtures/connected-intelligence.ts", "apps/api/src/services/connected-intelligence", "scripts/connected-intelligence"]);
   const typesReport = join(output, "foundation-types.json");
   const mathReport = join(output, "foundation-math.json");
   run("foundation-types", ["--filter", "@fsm/types", "exec", "vitest", "run", "src/connected-intelligence", "--reporter=json", `--outputFile=${typesReport}`]);

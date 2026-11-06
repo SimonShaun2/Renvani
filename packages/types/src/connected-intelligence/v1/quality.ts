@@ -10,7 +10,7 @@ export function sameScope(left: EvidenceScope, right: EvidenceScope): boolean {
     sorted(left.permissions) === sorted(right.permissions) && sorted(left.sensitivities) === sorted(right.sensitivities);
 }
 export interface SafeEvidenceView {
-  packetId: string; generatedAt: string; period: EvidencePeriod; comparison: EvidencePeriod | null;
+  packetId: string; generatedAt: string; period: EvidencePeriod | null; comparison: EvidencePeriod | null; today: EvidencePeriod | null;
   facts: EvidenceFact[]; sources: EvidenceSource[]; limited: boolean;
 }
 export interface EvidenceAssessment { state: InsightAnswer["state"]; canConcludeRequired: boolean; limitations: Limitation[]; view: SafeEvidenceView; }
@@ -20,10 +20,21 @@ export type FreshnessPolicy = Partial<Record<CapabilityId, number>>;
 export function assessEvidence(packetInput: unknown, currentScopeInput: unknown, nowInput: string, maxAgeMs: FreshnessPolicy): EvidenceAssessment {
   const packet = packetSchema.parse(packetInput); const scope = scopeSchema.parse(currentScopeInput);
   const now = Date.parse(instantSchema.parse(nowInput));
-  const empty: SafeEvidenceView = { packetId: packet.packetId, generatedAt: packet.generatedAt, period: packet.period, comparison: packet.comparison, facts: [], sources: [], limited: true };
+  const empty: SafeEvidenceView = { packetId: "unavailable", generatedAt: nowInput, period: null, comparison: null, today: null, facts: [], sources: [], limited: true };
   if (!sameScope(packet.scope, scope)) return { state: "unavailable", canConcludeRequired: false, limitations: ["unavailable_evidence"], view: empty };
   const facts: EvidenceFact[] = []; const sources: EvidenceSource[] = []; const issues = new Set<Limitation>();
   const validRequired = new Set<CapabilityId>();
+  const potentiallyVisible = new Set(packet.reads.flatMap((read) => {
+    const capability = getCapability(read.capabilityId);
+    if (read.status !== "ok" || !scope.permissions.includes(capability.permission) || !scope.sensitivities.includes(capability.sensitivity)) return [];
+    const sourceIds = new Set(read.sources.filter((source) => scope.sensitivities.includes(source.sensitivity)).map((source) => source.id));
+    return read.facts.filter((fact) => scope.sensitivities.includes(fact.sensitivity) && fact.sourceIds.every((id) => sourceIds.has(id))).map((fact) => fact.id);
+  }));
+  const blockedDerived = new Set<string>();
+  for (const calculation of packet.calculations) {
+    if (calculation.verification !== "verified_by_reader" || calculation.inputFactIds.some((id) => blockedDerived.has(id) || !potentiallyVisible.has(id))) blockedDerived.add(calculation.resultFactId);
+  }
+  if (blockedDerived.size > 0) issues.add("unavailable_evidence");
   for (const read of packet.reads) {
     const descriptor = getCapability(read.capabilityId);
     if (!scope.permissions.includes(descriptor.permission) || !scope.sensitivities.includes(descriptor.sensitivity) || read.status !== "ok") {
@@ -31,12 +42,12 @@ export function assessEvidence(packetInput: unknown, currentScopeInput: unknown,
     }
     const visibleSources = read.sources.filter((s) => scope.sensitivities.includes(s.sensitivity));
     const sourceIds = new Set(visibleSources.map((s) => s.id));
-    const visibleFacts = read.facts.filter((f) => scope.sensitivities.includes(f.sensitivity) && f.sourceIds.every((id) => sourceIds.has(id)));
+    const visibleFacts = read.facts.filter((f) => !blockedDerived.has(f.id) && scope.sensitivities.includes(f.sensitivity) && f.sourceIds.every((id) => sourceIds.has(id)));
     if (visibleFacts.length !== read.facts.length) issues.add("unavailable_evidence");
     const policy = maxAgeMs[read.capabilityId];
     const age = now - Date.parse(read.asOf);
     const freshnessValid = policy !== undefined && Number.isFinite(policy) && policy >= 0 && age >= 0 && age <= policy &&
-      read.quality.freshness === "fresh" && visibleSources.every((s) => Date.parse(s.observedAt) <= Date.parse(read.asOf));
+      read.quality.freshness === "fresh" && visibleSources.every((s) => Date.parse(s.observedAt) <= Date.parse(read.asOf) && now - Date.parse(s.observedAt) <= policy);
     if (!freshnessValid) issues.add("stale_or_unknown_freshness");
     const complete = read.quality.completeness === "complete" && !read.quality.computationTruncated && read.nextCursor === null &&
       read.sources.every((s) => s.queryManifest === null || s.queryManifest.complete);
@@ -62,7 +73,7 @@ export function assessEvidence(packetInput: unknown, currentScopeInput: unknown,
   }
   const state = facts.some((f) => f.value !== null) ? canConcludeRequired && issues.size === 0 ? "complete" : "partial" : "unavailable";
   return { state, canConcludeRequired, limitations: [...issues].sort(),
-    view: { packetId: packet.packetId, generatedAt: packet.generatedAt, period: packet.period, comparison: packet.comparison,
+    view: { packetId: packet.packetId, generatedAt: packet.generatedAt, period: packet.period, comparison: packet.comparison, today: packet.today,
       facts, sources: [...uniqueSources.values()], limited: issues.size > 0 } };
 }
 
@@ -115,9 +126,9 @@ export function safeFactLabel(fact: EvidenceFact): string { return getMetric(fac
 export function reportParity(aInput: unknown, bInput: unknown): "equal" | "different_values" | "different_snapshot" {
   const a = packetSchema.parse(aInput); const b = packetSchema.parse(bInput);
   const signature = (p: EvidencePacket): string => JSON.stringify({ scope: { ...p.scope, permissions: [...p.scope.permissions].sort(), sensitivities: [...p.scope.sensitivities].sort(), locationIds: [...p.scope.locationIds].sort() },
-    generatedAt: p.generatedAt, period: p.period, comparison: p.comparison, required: [...p.requiredCapabilities].sort(),
+    generatedAt: p.generatedAt, period: p.period, comparison: p.comparison, today: p.today, calculations: p.calculations, required: [...p.requiredCapabilities].sort(),
     reads: [...p.reads].sort((l, r) => l.capabilityId.localeCompare(r.capabilityId)).map((r) => r.status !== "ok" ? r : ({ capabilityId: r.capabilityId, status: r.status, asOf: r.asOf, quality: r.quality, nextCursor: r.nextCursor,
-      sources: [...r.sources].sort((l, s) => l.id.localeCompare(s.id)), facts: [...r.facts].sort((l, f) => l.id.localeCompare(f.id)).map(({ value: _value, ...metadata }) => metadata) })) });
+      sources: [...r.sources].sort((l, s) => l.id.localeCompare(s.id)), facts: [...r.facts].sort((l, f) => l.id.localeCompare(f.id)).map((fact) => ({ ...fact, value: null, sourceIds: [...fact.sourceIds].sort() })) })) });
   if (signature(a) !== signature(b)) return "different_snapshot";
   const values = (p: EvidencePacket): string => JSON.stringify(p.reads.flatMap((r) => r.status === "ok" ? r.facts.map((f) => [f.id, f.value]) : []).sort((l, r) => String(l[0]).localeCompare(String(r[0]))));
   return values(a) === values(b) ? "equal" : "different_values";

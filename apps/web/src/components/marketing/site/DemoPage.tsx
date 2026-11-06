@@ -92,7 +92,7 @@ export function DemoPage({ action = submitDemoRequest, plan = null }: { action?:
           <Image src="/marketing/demo/demo-hero.png" alt="Home service business owner using a tablet beside his open work van" width={1200} height={760} priority className="h-[230px] w-full rounded-2xl object-cover md:hidden xl:block xl:h-[380px]" />
         </div>
         <div data-node-id="204:9235" className="flex w-full flex-col gap-[14px] rounded-2xl border bg-white p-5 md:gap-5 md:p-6 xl:w-[616px] xl:shrink-0 xl:gap-[14px] xl:p-5" style={{ borderColor: line }}>
-            <form action={formAction} noValidate className="relative flex flex-col gap-[14px] md:gap-5 xl:gap-[14px]">
+            <form action={formAction} onReset={(event) => event.preventDefault()} noValidate className="relative flex flex-col gap-[14px] md:gap-5 xl:gap-[14px]">
               <h2 className="text-[27px] font-semibold leading-[1.38] md:text-[28px] xl:text-[32px]" style={{ color: ink }}>
                 {DEMO.title}
               </h2>

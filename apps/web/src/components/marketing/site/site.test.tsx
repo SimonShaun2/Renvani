@@ -99,6 +99,9 @@ describe("marketing assets are public", () => {
     expect(isPublicRoute("/marketing")).toBe(false);
     expect(isPublicRoute("/media/why-renvani/rafael-v4-poster-fallback.jpg")).toBe(true);
     expect(isPublicRoute("/media/loops/work-growth-poster-fallback.jpg")).toBe(true);
+    expect(isPublicRoute("/media/loops/hero-hvac-tech-loop.webm")).toBe(true);
     expect(isPublicRoute("/media")).toBe(false);
+    expect(isPublicRoute("/media/foo")).toBe(false);
+    expect(isPublicRoute("/media/foo.exe")).toBe(false);
   });
 });

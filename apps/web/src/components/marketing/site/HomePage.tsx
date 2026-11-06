@@ -3,7 +3,7 @@ import { ArrowRight, ArrowUpRight } from "lucide-react";
 
 import { ClickToPlayVideo } from "./ClickToPlayVideo";
 import { HomepageWorkflows } from "./HomepageWorkflows";
-import { LoopVideo } from "./LoopVideo";
+import { HeroLoop } from "./HeroLoop";
 import { MEDIA } from "./media-loops";
 import { IndustryShowcase } from "./IndustryShowcase";
 import { GROWTH_CHECK_ENTRY } from "./site-config";
@@ -27,7 +27,7 @@ export function HomePage() {
     <div className={styles.home} data-node-id="578:5186">
       <section className={styles.hero} aria-labelledby="home-hero" data-node-id="578:5188">
         <div className={styles.heroPhoto} data-node-id="578:5189">
-          <LoopVideo {...MEDIA.hero} alt="" priority sizes="(min-width: 1440px) 960px, (min-width: 960px) 67vw, 100vw" className={styles.heroImage} frameClassName="absolute inset-0 h-full w-full" />
+          <HeroLoop />
         </div>
         <div className={styles.heroShade} aria-hidden="true" />
         <div className={styles.heroContent}>

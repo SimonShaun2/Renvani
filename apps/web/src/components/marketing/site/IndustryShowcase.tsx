@@ -5,6 +5,7 @@ import Link from "next/link";
 
 import { INDUSTRY_PHOTOS, type IndustryPhotoSlug } from "./industry-photos";
 import { INDUSTRY_PAGE_BY_SLUG } from "./industry-registry";
+import { LoopPauseButton } from "./LoopPauseButton";
 import { LoopVideo } from "./LoopVideo";
 import { tradeLoop } from "./media-loops";
 import { useWorkflowPlayback } from "./useWorkflowPlayback";
@@ -149,6 +150,7 @@ export function IndustryShowcase() {
             {playback.paused ? "Play animations" : "Pause animations"}
           </button>
         )}
+        <LoopPauseButton label="trade card" />
         <p className={styles.motionNote}>Small moments. A smoother working day.</p>
       </div>
       <nav aria-label="Featured industries" className={styles.cardNavigation}>

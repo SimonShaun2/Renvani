@@ -49,10 +49,24 @@ describe("middleware with Clerk enabled", () => {
   it("exempts exact favicon metadata paths, not lookalike protected routes", async () => {
     const { config } = await import("../middleware");
     const matcher = new RegExp("^" + config.matcher[0] + "$");
-    for (const path of ["/favicon.ico", "/icon.svg", "/apple-icon.png", "/brand/logo-horizontal.svg", "/icon-192.png", "/icon-512.png", "/icon-maskable-512.png", "/manifest.webmanifest", "/_next/static/main.js", "/_next/image", "/media/why-renvani/rafael-v4-poster-fallback.jpg", "/media/loops/work-growth-poster-fallback.jpg"]) {
+    for (const path of ["/favicon.ico", "/icon.svg", "/apple-icon.png", "/brand/logo-horizontal.svg", "/icon-192.png", "/icon-512.png", "/icon-maskable-512.png", "/manifest.webmanifest", "/_next/static/main.js", "/_next/image", "/media/why-renvani/rafael-v4-poster-fallback.jpg", "/media/loops/work-growth-poster-fallback.jpg", "/media/loops/hero-hvac-tech-loop.webm"]) {
       expect(matcher.test(path)).toBe(false);
     }
-    for (const path of ["/dashboard", "/settings", "/icon.svg/secure", "/apple-icon.png/secure", "/favicon.ico/secure", "/brand/logo-horizontal.svg/admin", "/icon-192.png/admin", "/manifest.webmanifest/admin"]) {
+    for (const path of [
+      "/dashboard",
+      "/settings",
+      "/icon.svg/secure",
+      "/apple-icon.png/secure",
+      "/favicon.ico/secure",
+      "/brand/logo-horizontal.svg/admin",
+      "/icon-192.png/admin",
+      "/manifest.webmanifest/admin",
+      "/faviconXico",
+      "/iconXsvg",
+      "/brand/logo-horizontalXsvg",
+      "/media/foo",
+      "/media/foo.exe"
+    ]) {
       expect(matcher.test(path)).toBe(true);
     }
   });

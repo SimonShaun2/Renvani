@@ -1,4 +1,4 @@
-/** Founder-provided biography and approved positioning. No other ventures or inferred exit details. */
+/** Founder-provided biography and approved positioning. Repeat-founder only; no past company names. */
 export const LAUNCH_HOME = {
   title: "Renvani | More direct jobs. More repeat customers.",
   headline: ["More direct jobs.", "More repeat", "customers."],
@@ -9,10 +9,12 @@ export const LAUNCH_HOME = {
 export const FOUNDER_STORY = {
   eyebrow: "WHY WE BUILT RENVANI",
   title: ["Built on experience.", "Focused on your next job."],
-  lead: "Renvani founder Shaun Simon was part of Service Fusion’s early team and remained with the company through its exit.",
+  lead: "A repeat founder, Shaun built Renvani around one connected platform that helps home service businesses win and keep more direct jobs, without piecing together separate tools.",
   summary: "That experience shaped a simple idea: connect getting found, winning the job, running the work and bringing customers back.",
   context: "Working closely with service businesses gave Shaun a firsthand view of the challenges owners face: winning the next job, keeping the office and field connected, and getting customers to come back.",
   purpose: "A repeat founder, Shaun built Renvani around one connected platform that helps home service businesses win and keep more direct jobs, without piecing together separate tools.",
+  cardEyebrow: "REPEAT FOUNDER",
+  cardTitle: ["A repeat founder.", "One connected platform."],
   principles: [
     { title: "Start with the outcome.", body: "Operating Missions turns the owner’s direction into a clear starting point." },
     { title: "Keep the work connected.", body: "Growth, Revenue, Operations and Retention connect the opportunity to the job and the next visit." },

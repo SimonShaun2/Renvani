@@ -6,8 +6,8 @@ Continues PR #451 from checkpoint `0dec4240ee9c13229a1b44057b43e7452a58e1b6` aft
 
 - Homepage headline: More direct jobs. More repeat customers.
 - One connected platform explanation in the hero and page metadata; no implied add-on to another platform.
-- Founder section leads with the founder-provided account: Shaun Simon was part of Service Fusion's early team and remained with the company through its exit. Other ventures stay generic and unnamed. No invented acquisition date, price, executive title, endorsement or customer proof.
-- The standalone About page is deferred by founder request. Keep the homepage founder section; no secondary About CTA.
+- Founder section leads with the approved repeat-founder account only: Shaun Simon is a repeat founder who built Renvani around one connected platform for home service businesses. Past ventures stay unnamed. No invented acquisition date, price, executive title, endorsement or customer proof.
+- The standalone About page is deferred by founder request. Keep the homepage founder section (repeat-founder wording only); no secondary About CTA. The homepage founder block is planned to be replaced by the Why video in PR #453.
 - Footer remains at the approved pre-About layout and links; no About footer item.
 - The About page and its sitemap/robots entry are removed from this release. The old URL returns a public 404 instead of redirecting to sign-in.
 
@@ -31,4 +31,4 @@ Remaining launch tickets are not claimed complete. Privacy/Terms copy needs actu
 
 ## November 6 founder scope change
 
-The standalone About page is not needed right now. Keep the Service Fusion early-team-through-exit statement in the existing homepage section. Remove the page, footer link, linked CTA, and crawler references from the preview. Preserve Figma About designs as deferred assets. Production remains unchanged.
+The standalone About page is not needed right now. Keep the existing homepage founder section on repeat-founder-only wording (no past company names). Remove the page, footer link, linked CTA, and crawler references from the preview. Preserve Figma About designs as deferred assets. Production remains unchanged. The homepage founder block is planned to be replaced by the Why video in PR #453.

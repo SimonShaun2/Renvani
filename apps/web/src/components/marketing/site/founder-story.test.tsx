@@ -8,16 +8,25 @@ import { MarketingShell } from "./MarketingShell";
 import { FOUNDER_STORY, LAUNCH_HOME } from "./launch-content";
 import { isPublicRoute } from "@/src/lib/route-access";
 import { MARKETING_SITEMAP_PATHS, buildPublicRobots } from "@/src/lib/seo/public-sitemap";
+
+const PAST_COMPANY = /Service Fusion|ServiceGanja|STACS/i;
+
 afterEach(cleanup);
 
 describe("homepage founder credibility without a separate About page",()=>{
-  it("retains the Service Fusion early-team-through-exit statement",()=>{
+  it("renders compliant repeat-founder copy with no past company names",()=>{
     const {container}=render(<FounderStory/>);
     expect(container.textContent).toContain(FOUNDER_STORY.lead);
-    expect(FOUNDER_STORY.lead).toContain("Service Fusion’s early team");
-    expect(FOUNDER_STORY.lead).toContain("through its exit");
+    expect(FOUNDER_STORY.lead).toContain("A repeat founder");
+    expect(FOUNDER_STORY.lead).toContain("one connected platform");
+    expect(container.textContent).toContain(FOUNDER_STORY.cardEyebrow);
+    expect(container.textContent).toContain(FOUNDER_STORY.cardTitle[0]);
+    expect(container.textContent).toContain(FOUNDER_STORY.cardTitle[1]);
     expect(container.querySelector('[data-founder-story]')).toBeTruthy();
     expect(container.querySelectorAll('a[href="/about"],img,blockquote')).toHaveLength(0);
+    expect(container.textContent).not.toMatch(PAST_COMPANY);
+    expect(JSON.stringify(FOUNDER_STORY)).not.toMatch(PAST_COMPANY);
+    expect(FOUNDER_STORY.lead).not.toMatch(/early team|through (its )?exit/i);
   });
   it("preserves the approved homepage hero, workflows, missions, gallery and Growth Check",()=>{
     const {container}=render(<HomePage/>);

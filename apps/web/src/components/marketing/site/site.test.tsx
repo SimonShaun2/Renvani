@@ -17,11 +17,17 @@ const COMPETITORS = /jobber|servicetitan|housecall|service fusion|fieldedge|owne
 const RESTAURANT = /restaurant|menu|diner|reservation|table/i;
 
 describe("marketing site (Figma 171:2)", () => {
-  it("competitor guard scans homepage, workflow, shared navigation and footer copy", () => {
-    const src = ["HomePage.tsx", "HomepageWorkflows.tsx", "home-workflows.ts", "IndustryShowcase.tsx", "site-config.ts", "MarketingShell.tsx"].map((f) => readFileSync(join(__dirname, f), "utf8")).join("\n");
+  it("competitor guard scans homepage, workflow, shared navigation, footer and founder copy", () => {
+    const src = ["HomePage.tsx", "HomepageWorkflows.tsx", "home-workflows.ts", "IndustryShowcase.tsx", "site-config.ts", "MarketingShell.tsx", "FounderStory.tsx", "launch-content.ts"].map((f) => readFileSync(join(__dirname, f), "utf8")).join("\n");
     expect(src + JSON.stringify(SITE_FOOTER)).not.toMatch(COMPETITORS);
     expect(COMPETITORS.test("Owner.com")).toBe(true);
     expect(COMPETITORS.test("Broccoli")).toBe(true);
+  });
+
+  it("founder copy names no past companies", () => {
+    const founder = ["FounderStory.tsx", "launch-content.ts"].map((f) => readFileSync(join(__dirname, f), "utf8")).join("\n");
+    expect(founder).not.toMatch(/Service Fusion|ServiceGanja|STACS/i);
+    expect(founder).not.toMatch(/early team|through the exit|through its exit/i);
   });
 
   it("footer year is computed and the example has no fixed calendar date", () => {

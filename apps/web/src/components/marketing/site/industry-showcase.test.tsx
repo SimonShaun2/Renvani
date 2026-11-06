@@ -1,7 +1,8 @@
-import { cleanup, render, screen, within } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { IndustryShowcase } from "./IndustryShowcase";
+import { LOOP_MOTION_STORAGE_KEY } from "./loop-motion-preference";
 
 let reducedMotion = false;
 
@@ -62,32 +63,24 @@ describe("homepage industry gallery", () => {
     expect(container.querySelector("a a, a button")).toBeNull();
   });
 
-  it("autoplays muted, inline, looping trade videos at load with no pause control or localStorage", () => {
-    const setItem = vi.spyOn(Storage.prototype, "setItem");
-    const getItem = vi.spyOn(Storage.prototype, "getItem");
+  it("exposes one pause/play control outside card links that persists", () => {
     const { container } = render(<IndustryShowcase />);
-    expect(screen.queryAllByRole("button")).toHaveLength(0);
-    const videos = [...container.querySelectorAll("video")];
-    expect(videos).toHaveLength(6);
-    for (const video of videos) {
-      expect(video.autoplay).toBe(true);
-      expect(video.muted).toBe(true);
-      expect(video.hasAttribute("playsinline")).toBe(true);
-      expect(video.loop).toBe(true);
-      expect(video.querySelectorAll("source")).toHaveLength(2);
-    }
-    expect(window.HTMLMediaElement.prototype.play).toHaveBeenCalledTimes(6);
+    expect(screen.getAllByRole("button")).toHaveLength(1);
+    const pause = screen.getByRole("button", { name: /pause trade section/i });
+    expect(pause.closest("a")).toBeNull();
+    expect(pause.getAttribute("aria-pressed")).toBe("false");
     expect(container.querySelector("[data-industry-gallery]")!.getAttribute("data-playing")).toBe("true");
-    expect(setItem).not.toHaveBeenCalled();
-    expect(getItem).not.toHaveBeenCalled();
+
+    fireEvent.click(pause);
+    expect(localStorage.getItem(LOOP_MOTION_STORAGE_KEY)).toBe("1");
+    expect(screen.getByRole("button", { name: /play trade section/i }).getAttribute("aria-pressed")).toBe("true");
+    expect(container.querySelector("[data-industry-gallery]")!.getAttribute("data-playing")).toBe("false");
   });
 
-  it("shows still posters only, with no button, under reduced motion", () => {
+  it("hides the pause control under reduced motion", () => {
     reducedMotion = true;
     const { container } = render(<IndustryShowcase />);
-    expect(screen.queryAllByRole("button")).toHaveLength(0);
-    expect(container.querySelectorAll("video")).toHaveLength(0);
-    expect(container.querySelectorAll("img")).toHaveLength(6);
+    expect(screen.queryByRole("button", { name: /trade section/i })).toBeNull();
     expect(container.querySelector("[data-industry-gallery]")!.getAttribute("data-playing")).toBe("false");
   });
 });

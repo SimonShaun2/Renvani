@@ -85,8 +85,8 @@ export function HomepageWorkflows() {
                   <Link className={styles.exploreLink} href={workflow.href}>Explore {workflow.name}<ArrowRight size={17} aria-hidden="true" /></Link>
                 </div>
                 <div className={styles.scene} data-node-id={SCENE_NODES[workflow.id]} data-product={workflow.id}>
-                  <div role="img" aria-label={`Illustrative ${workflow.name} product loop`}>
-                    <LoopVideo {...workLoop(workflow.id)} alt="" objectFit="contain" frameClassName={styles.loopFrame} sizes="(min-width: 960px) 640px, 90vw" />
+                  <div role="img" aria-label={`Illustrative ${workflow.name} product loop`} className={styles.loopStage}>
+                    <LoopVideo key={workflow.id} {...workLoop(workflow.id)} alt="" objectFit="contain" frameClassName={styles.loopFrame} sizes="(min-width: 960px) 640px, 90vw" />
                   </div>
                   <p className={styles.illustrationLabel}>Illustrative workflow · Example data</p>
                 </div>

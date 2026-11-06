@@ -226,8 +226,7 @@
   .showcase *, .showcase *::before, .showcase *::after { animation: none !important; transition: none !important; }
 }
 
-.loopFrame {
-  width: 100%;
-  border-radius: 16px;
-  background: #0b1020;
-}
+
+.loopStage { min-width: 0; background: #0f1530; }
+.loopFrame { width: 100%; background: #0f1530; }
+.scene > .illustrationLabel { margin: 0; padding: 16px 20px 20px; }

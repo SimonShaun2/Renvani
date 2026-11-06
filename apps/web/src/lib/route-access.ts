@@ -126,6 +126,11 @@ export function isPublicRoute(pathname: string): boolean {
     return true;
   }
 
+  // Marketing media loops / Why-we-built video under /public/media.
+  if (segments[0] === "media" && segments.length >= 2) {
+    return true;
+  }
+
   if (segments[0] === "book" && segments.length >= 2) {
     return true;
   }

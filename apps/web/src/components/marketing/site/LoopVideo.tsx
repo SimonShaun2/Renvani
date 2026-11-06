@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
 export type LoopVideoProps = {
@@ -20,8 +19,8 @@ export type LoopVideoProps = {
 };
 
 /**
- * Autoplaying muted loop. Loads sources only when near the viewport.
- * Under prefers-reduced-motion, renders the poster still only.
+ * Autoplaying muted loop. Poster always renders (no JS required).
+ * Sources attach only when near the viewport. Reduced-motion → poster only.
  */
 export function LoopVideo({
   webm,
@@ -32,13 +31,11 @@ export function LoopVideo({
   className = "",
   frameClassName = "",
   alt = "",
-  priority = false,
-  sizes,
   objectFit = "cover"
 }: LoopVideoProps) {
   const frameRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [active, setActive] = useState(false);
+  const [near, setNear] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
 
   useEffect(() => {
@@ -56,10 +53,10 @@ export function LoopVideo({
     const io = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          setActive(entry.isIntersecting);
+          setNear(entry.isIntersecting);
         }
       },
-      { rootMargin: "200px 0px", threshold: 0.01 }
+      { rootMargin: "240px 0px", threshold: 0.01 }
     );
     io.observe(node);
     return () => io.disconnect();
@@ -68,12 +65,14 @@ export function LoopVideo({
   useEffect(() => {
     const video = videoRef.current;
     if (!video || reducedMotion) return;
-    if (active) {
+    if (near) {
+      // Reload when sources appear / swap so the new tab's file actually loads.
+      video.load();
       void video.play().catch(() => undefined);
     } else {
       video.pause();
     }
-  }, [active, reducedMotion]);
+  }, [near, reducedMotion, webm, mp4]);
 
   const fitClass = objectFit === "contain" ? "object-contain" : "object-cover";
 
@@ -83,31 +82,29 @@ export function LoopVideo({
       className={`relative overflow-hidden ${frameClassName}`}
       style={{ aspectRatio: `${width} / ${height}` }}
     >
-      {reducedMotion || !active ? (
-        <Image
-          src={poster}
-          alt={alt}
-          width={width}
-          height={height}
-          priority={priority}
-          sizes={sizes}
-          className={`absolute inset-0 h-full w-full ${fitClass} ${className}`}
-        />
-      ) : null}
+      {/* Always-visible poster — must render even if IO/lazy JS never fires. */}
+      <img
+        src={poster}
+        alt={alt}
+        width={width}
+        height={height}
+        decoding="async"
+        className={`absolute inset-0 h-full w-full ${fitClass} ${className}`}
+      />
       {!reducedMotion ? (
         <video
+          key={`${webm}|${mp4}`}
           ref={videoRef}
           className={`absolute inset-0 h-full w-full ${fitClass} ${className}`}
           muted
           loop
           playsInline
-          preload={active ? "metadata" : "none"}
+          preload={near ? "metadata" : "none"}
           poster={poster}
           aria-label={alt || undefined}
-          autoPlay={active}
-          style={{ opacity: active ? 1 : 0 }}
+          autoPlay={near}
         >
-          {active ? (
+          {near ? (
             <>
               <source src={webm} type="video/webm" />
               <source src={mp4} type="video/mp4" />

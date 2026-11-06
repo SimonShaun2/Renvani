@@ -11,7 +11,7 @@ export type ClickToPlayVideoProps = {
   className?: string | undefined;
 };
 
-/** Inline video with poster + large play overlay. Plays with sound on click; shows native controls after start. */
+/** Inline video with always-visible poster + large play overlay. Plays with sound on click. */
 export function ClickToPlayVideo({ src, poster, captionsSrc, title, className = "" }: ClickToPlayVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [started, setStarted] = useState(false);
@@ -29,10 +29,21 @@ export function ClickToPlayVideo({ src, poster, captionsSrc, title, className = 
   };
 
   return (
-    <div className={`relative overflow-hidden rounded-2xl bg-black ${className}`} style={{ aspectRatio: "16 / 9" }}>
+    <div className={`relative overflow-hidden rounded-2xl bg-[#0f1530] ${className}`} style={{ aspectRatio: "16 / 9" }}>
+      {/* Explicit poster img so a black frame never shows if the video poster attribute lags. */}
+      {!started ? (
+        <img
+          src={poster}
+          alt=""
+          width={1920}
+          height={1080}
+          decoding="async"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+      ) : null}
       <video
         ref={videoRef}
-        className="h-full w-full object-cover"
+        className="relative z-[1] h-full w-full object-cover"
         poster={poster}
         preload="none"
         playsInline
@@ -47,7 +58,7 @@ export function ClickToPlayVideo({ src, poster, captionsSrc, title, className = 
         <button
           type="button"
           onClick={() => void start()}
-          className="absolute inset-0 flex items-center justify-center bg-black/25 transition hover:bg-black/35 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+          className="absolute inset-0 z-[2] flex items-center justify-center bg-black/20 transition hover:bg-black/30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
           aria-label={`Play ${title}`}
         >
           <span className="inline-flex h-20 w-20 items-center justify-center rounded-full bg-white/95 text-[var(--color-mkt-ink)] shadow-lg">

@@ -1,29 +1,16 @@
-import { statSync } from "node:fs";
-import { join } from "node:path";
-
-import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { IndustryShowcase } from "./IndustryShowcase";
-import { WORKFLOW_STEP_MS } from "./useWorkflowPlayback";
+import { IndustryShowcase, TRADE_CARD_EXAMPLES } from "./IndustryShowcase";
+import { LOOP_MOTION_STORAGE_KEY } from "./loop-motion-preference";
 
-let intersectionCallback: IntersectionObserverCallback;
-let observedThreshold: IntersectionObserverInit["threshold"];
-let reducedMotion = false;
 const observe = vi.fn();
-
-function setInView(isIntersecting: boolean) {
-  act(() => intersectionCallback([{ isIntersecting, intersectionRatio: isIntersecting ? 0.01 : 0 } as IntersectionObserverEntry], {} as IntersectionObserver));
-}
-
-function advance(milliseconds: number) {
-  act(() => { vi.advanceTimersByTime(milliseconds); });
-}
+let reducedMotion = false;
 
 beforeEach(() => {
-  vi.useFakeTimers();
   reducedMotion = false;
   observe.mockClear();
+  localStorage.clear();
   vi.spyOn(window, "matchMedia").mockImplementation((query) => ({
     matches: query.includes("prefers-reduced-motion") && reducedMotion,
     media: query,
@@ -35,109 +22,83 @@ beforeEach(() => {
     dispatchEvent: vi.fn(() => true)
   }));
   vi.spyOn(document, "visibilityState", "get").mockReturnValue("visible");
-  vi.stubGlobal("IntersectionObserver", class {
-    constructor(callback: IntersectionObserverCallback, options?: IntersectionObserverInit) {
-      if (options?.threshold === 0) {
-        intersectionCallback = callback;
-        observedThreshold = options.threshold;
-      }
+  vi.stubGlobal(
+    "IntersectionObserver",
+    class {
+      observe = observe;
+      unobserve() {}
+      disconnect() {}
     }
-    observe = observe;
-    unobserve() {}
-    disconnect() {}
-  });
+  );
+  vi.spyOn(window.HTMLMediaElement.prototype, "play").mockResolvedValue(undefined);
+  vi.spyOn(window.HTMLMediaElement.prototype, "pause").mockImplementation(() => undefined);
+  vi.spyOn(window.HTMLMediaElement.prototype, "load").mockImplementation(() => undefined);
 });
 
 afterEach(() => {
   cleanup();
-  vi.useRealTimers();
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
+  localStorage.clear();
 });
 
 describe("homepage industry gallery", () => {
-  it("offers six named whole-card destinations and the full directory, using the approved local photos", () => {
+  it("offers six named whole-card destinations with standalone trade chips and icons", () => {
     const { container } = render(<IndustryShowcase />);
     const destinations = [
-      ["HVAC & Refrigeration", "hvac"],
-      ["Plumbing", "plumbing"],
-      ["Electrical", "electrical"],
-      ["Appliance Repair", "appliance-repair"],
-      ["Pest Control", "pest-control"],
-      ["Tree Care", "tree-care"]
+      ["HVAC & Refrigeration", "hvac", "Spring tune-ups · 18 booked", "RETENTION · EXAMPLE"],
+      ["Plumbing", "plumbing", "Water heater estimate · Option B approved", "REVENUE · EXAMPLE"],
+      ["Electrical", "electrical", "Panel upgrade · permit checklist ready", "OPERATIONS · EXAMPLE"],
+      ["Appliance Repair", "appliance-repair", "Part on order · customer notified", "OPERATIONS · EXAMPLE"],
+      ["Pest Control", "pest-control", "Quarterly service · auto-scheduled", "RETENTION · EXAMPLE"],
+      ["Tree Care", "tree-care", "Storm cleanup request · from Google", "GROWTH · EXAMPLE"]
     ] as const;
 
     expect(screen.getByRole("heading", { level: 2, name: "Your trade. Your next good job." })).toBeTruthy();
     expect(screen.getAllByRole("link")).toHaveLength(7);
     expect(screen.getByRole("link", { name: "All industries" }).getAttribute("href")).toBe("/industries");
-    for (const [name, slug] of destinations) {
+    expect(TRADE_CARD_EXAMPLES).toHaveLength(6);
+
+    for (const [name, slug, chip, qualifier] of destinations) {
       const link = screen.getByRole("link", { name });
       expect(link.getAttribute("href")).toBe(`/industries/${slug}`);
       expect(within(link).getByRole("heading", { level: 3, name })).toBeTruthy();
+      expect(within(link).getByText(chip)).toBeTruthy();
+      expect(within(link).getByText(qualifier)).toBeTruthy();
+      expect(link.querySelector(`[data-chip-icon="${slug}"]`)).toBeTruthy();
       const photo = link.querySelector<HTMLImageElement>("img");
       expect(photo).toBeTruthy();
-      const src = decodeURIComponent(photo!.getAttribute("src") || "");
-      expect(src).toMatch(/trade-|industry|illustrative|media\/loops/);
       expect(photo!.getAttribute("alt")).toBe("");
-      expect(link.querySelector('[aria-hidden="true"] [data-mini-workflow]')).toBeTruthy();
     }
+
     expect(container.querySelector("a a, a button")).toBeNull();
-    expect(screen.getByRole("button", { name: "Pause animations" }).closest("a")).toBeNull();
-
-    const vectorImages = [...container.querySelectorAll<HTMLImageElement>('img[src$=".svg"]')];
-    expect(new Set(vectorImages.map((image) => image.getAttribute("src"))).size).toBe(4);
-    for (const image of vectorImages) {
-      expect(statSync(join(process.cwd(), "public", image.getAttribute("src")!)).size).toBeGreaterThan(0);
-      const dimension = image.getAttribute("src")!.includes("dispatch") ? "8" : "15";
-      expect(image.getAttribute("width")).toBe(dimension);
-      expect(image.getAttribute("height")).toBe(dimension);
-    }
+    expect(container.querySelectorAll("[data-mini-workflow]")).toHaveLength(0);
   });
 
-  it("advances six distinct mini-operations with one Pause control even when a small part of the mobile gallery is visible", () => {
+  it("exposes one pause/play control outside card links that persists and pauses section motion", () => {
     const { container } = render(<IndustryShowcase />);
-    const grid = container.querySelector("#home-industry-cards")!;
-    const miniUIs = [...container.querySelectorAll("[data-mini-workflow]")];
-    expect(miniUIs.map((miniUI) => miniUI.getAttribute("data-mini-workflow"))).toEqual(["schedule", "dispatch", "tasks", "progress", "return-visit", "crew"]);
-    expect(observedThreshold).toBe(0);
-    expect(observe).toHaveBeenCalledWith(grid);
-    expect(vi.getTimerCount()).toBe(0);
+    const pause = screen.getByRole("button", { name: /pause trade section/i });
+    expect(pause.closest("a")).toBeNull();
+    expect(screen.queryByRole("button", { name: /pause animations/i })).toBeNull();
+    expect(screen.queryByRole("button", { name: /pause video/i })).toBeNull();
+    expect(pause.getAttribute("aria-pressed")).toBe("false");
+    expect(container.querySelector("[data-industry-gallery]")!.getAttribute("data-playing")).toBe("true");
 
-    setInView(true);
-    expect(vi.getTimerCount()).toBe(1);
-    advance(WORKFLOW_STEP_MS);
-    expect(miniUIs.every((miniUI) => miniUI.getAttribute("data-phase") === "1")).toBe(true);
-    expect(container.querySelector('[data-mini-workflow="schedule"] [data-selected="true"]')).toBeTruthy();
-    expect(container.querySelectorAll('[data-mini-workflow="tasks"] [data-ready="true"]')).toHaveLength(4);
-    expect(container.querySelectorAll('[data-mini-workflow="dispatch"] [data-ready="true"]')).toHaveLength(3);
-
-    fireEvent.click(screen.getByRole("button", { name: "Pause animations" }));
-    advance(WORKFLOW_STEP_MS * 5);
-    expect(grid.getAttribute("data-phase")).toBe("1");
+    fireEvent.click(pause);
+    expect(localStorage.getItem(LOOP_MOTION_STORAGE_KEY)).toBe("1");
+    expect(screen.getByRole("button", { name: /play trade section/i }).getAttribute("aria-pressed")).toBe("true");
     expect(container.querySelector("[data-industry-gallery]")!.getAttribute("data-playing")).toBe("false");
-    fireEvent.click(screen.getByRole("button", { name: "Play animations" }));
-    advance(WORKFLOW_STEP_MS);
-    expect(grid.getAttribute("data-phase")).toBe("2");
-    expect([...container.querySelectorAll('[data-active="true"]')].map((status) => status.textContent)).toEqual([
-      "Visit confirmed", "Dispatch ready", "Job checks recorded", "Job photos saved", "Return visit planned", "Crew plan ready"
-    ]);
 
-    setInView(false);
-    advance(WORKFLOW_STEP_MS * 5);
-    expect(grid.getAttribute("data-phase")).toBe("2");
-    expect(vi.getTimerCount()).toBe(0);
+    cleanup();
+    const again = render(<IndustryShowcase />);
+    expect(screen.getByRole("button", { name: /play trade section/i }).getAttribute("aria-pressed")).toBe("true");
+    expect(again.container.querySelector("[data-industry-gallery]")!.getAttribute("data-playing")).toBe("false");
   });
 
-  it("shows the six final static examples with reduced motion and no unnecessary playback control or scheduled work", () => {
+  it("hides the pause control under reduced motion", () => {
     reducedMotion = true;
     const { container } = render(<IndustryShowcase />);
-    setInView(true);
-    expect(screen.queryByRole("button", { name: /animations/ })).toBeNull();
+    expect(screen.queryByRole("button", { name: /trade section/i })).toBeNull();
     expect(container.querySelector("[data-industry-gallery]")!.getAttribute("data-playing")).toBe("false");
-    expect(container.querySelectorAll('[data-mini-workflow][data-phase="2"]')).toHaveLength(6);
-    expect(container.querySelectorAll('[data-active="true"]')).toHaveLength(6);
-    expect(vi.getTimerCount()).toBe(0);
-    advance(WORKFLOW_STEP_MS * 10);
-    expect(container.querySelector("#home-industry-cards")!.getAttribute("data-phase")).toBe("2");
   });
 });

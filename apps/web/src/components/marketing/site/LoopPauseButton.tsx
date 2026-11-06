@@ -6,18 +6,28 @@ import { useEffect, useState } from "react";
 import { useLoopsPaused } from "./useLoopsPaused";
 
 export type LoopPauseButtonProps = {
-  /** Short name for aria-label, e.g. "hero", "Growth product", "trade card". */
+  /** Short name for aria-label, e.g. "hero", "Growth product", "trade section". */
   label: string;
   className?: string | undefined;
   /** When true, hide the control under reduced motion (nothing to pause). */
   hideWhenReducedMotion?: boolean | undefined;
+  /** Visible label while playing (default "Pause video"). */
+  pauseLabel?: string | undefined;
+  /** Visible label while paused (default "Play video"). */
+  playLabel?: string | undefined;
 };
 
 /**
- * Keyboard-operable pause/play for decorative marketing loops.
+ * Keyboard-operable pause/play for decorative marketing loops (and section motion).
  * Preference is shared via localStorage across sections, reloads, and tabs.
  */
-export function LoopPauseButton({ label, className = "", hideWhenReducedMotion = true }: LoopPauseButtonProps) {
+export function LoopPauseButton({
+  label,
+  className = "",
+  hideWhenReducedMotion = true,
+  pauseLabel = "Pause video",
+  playLabel = "Play video"
+}: LoopPauseButtonProps) {
   const [paused, setPaused] = useLoopsPaused();
   const [reducedMotion, setReducedMotion] = useState(false);
 
@@ -36,11 +46,11 @@ export function LoopPauseButton({ label, className = "", hideWhenReducedMotion =
       type="button"
       className={`inline-flex items-center justify-center gap-2 min-h-[44px] px-4 py-2 rounded-full border border-[var(--color-mkt-ink)] bg-white/95 text-[var(--color-mkt-ink)] text-[14px] font-medium shadow-sm transition hover:bg-[var(--color-mkt-cream)] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-[#b67500] ${className}`}
       aria-pressed={paused}
-      aria-label={paused ? `Play ${label} video` : `Pause ${label} video`}
+      aria-label={paused ? `Play ${label}` : `Pause ${label}`}
       onClick={() => setPaused(!paused)}
     >
       {paused ? <Play size={16} aria-hidden="true" className="ml-0.5" /> : <Pause size={16} aria-hidden="true" />}
-      <span>{paused ? "Play video" : "Pause video"}</span>
+      <span>{paused ? playLabel : pauseLabel}</span>
     </button>
   );
 }

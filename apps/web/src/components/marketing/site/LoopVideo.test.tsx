@@ -74,14 +74,14 @@ describe("LoopVideo pause control (WCAG 2.2.2)", () => {
     expect(video.getAttribute("aria-hidden")).toBe("true");
     expect(play).toHaveBeenCalled();
 
-    const button = screen.getByRole("button", { name: /pause test video/i });
+    const button = screen.getByRole("button", { name: /pause test/i });
     expect(button.getAttribute("aria-pressed")).toBe("false");
     fireEvent.click(button);
     expect(localStorage.getItem(LOOP_MOTION_STORAGE_KEY)).toBe("1");
-    expect(screen.getByRole("button", { name: /play test video/i }).getAttribute("aria-pressed")).toBe("true");
+    expect(screen.getByRole("button", { name: /play test/i }).getAttribute("aria-pressed")).toBe("true");
     expect(pause).toHaveBeenCalled();
 
-    fireEvent.click(screen.getByRole("button", { name: /play test video/i }));
+    fireEvent.click(screen.getByRole("button", { name: /play test/i }));
     expect(localStorage.getItem(LOOP_MOTION_STORAGE_KEY)).toBe("0");
     expect(play).toHaveBeenCalled();
   });
@@ -90,7 +90,7 @@ describe("LoopVideo pause control (WCAG 2.2.2)", () => {
     writeLoopsPaused(true);
     const { unmount } = renderLoop();
     enterViewport(true);
-    expect(screen.getByRole("button", { name: /play test video/i }).getAttribute("aria-pressed")).toBe("true");
+    expect(screen.getByRole("button", { name: /play test/i }).getAttribute("aria-pressed")).toBe("true");
     // Should not autoplay while preference is paused
     const playCallsBefore = play.mock.calls.length;
     enterViewport(true);
@@ -99,19 +99,19 @@ describe("LoopVideo pause control (WCAG 2.2.2)", () => {
 
     renderLoop();
     enterViewport(true);
-    expect(screen.getByRole("button", { name: /play test video/i }).getAttribute("aria-pressed")).toBe("true");
+    expect(screen.getByRole("button", { name: /play test/i }).getAttribute("aria-pressed")).toBe("true");
     expect(document.querySelector("video")?.getAttribute("aria-hidden")).toBe("true");
   });
 
   it("supports keyboard Enter and Space on the pause control", () => {
     renderLoop();
-    const button = screen.getByRole("button", { name: /pause test video/i });
+    const button = screen.getByRole("button", { name: /pause test/i });
     button.focus();
     fireEvent.keyDown(button, { key: "Enter", code: "Enter", charCode: 13 });
     fireEvent.click(button); // jsdom activates buttons via click from key in real browsers; click covers activation
     expect(localStorage.getItem(LOOP_MOTION_STORAGE_KEY)).toBe("1");
 
-    const playBtn = screen.getByRole("button", { name: /play test video/i });
+    const playBtn = screen.getByRole("button", { name: /play test/i });
     fireEvent.keyDown(playBtn, { key: " ", code: "Space", charCode: 32 });
     fireEvent.click(playBtn);
     expect(localStorage.getItem(LOOP_MOTION_STORAGE_KEY)).toBe("0");

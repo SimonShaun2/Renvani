@@ -50,9 +50,9 @@ describe("expanded marketing industries", () => {
   });
 
   for (const tree of ["hvac", "plumbing", "electrical"] as const) {
-    it(`preserves the current ${tree} desktop and mobile frames`, () => {
+    it(`renders the ${tree} detail page with one responsive heading`, () => {
       const { container } = render(<IndustryFrames tree={tree} />);
-      expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(2);
+      expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
       const hrefs = anchors(container);
       expect(hrefs).toContain("/demo");
       for (const h of hrefs) expect(resolves(h), h).toBe(true);

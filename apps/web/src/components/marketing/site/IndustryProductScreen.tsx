@@ -2,6 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { PRODUCT_PAGE_BY_SLUG } from "./flagship-registry";
+import { LoopVideo } from "./LoopVideo";
+import { productScreenLoop } from "./media-loops";
 import styles from "./detail-pages.module.css";
 
 /** Actual app frames exported from the canonical Figma file, not workflow placeholder graphics. */
@@ -24,10 +26,15 @@ export function IndustryProductScreen({ tool }: { tool: string }) {
   const product = PRODUCT_PAGE_BY_SLUG[tool];
   if (!screen || !product) throw new Error(`No product screen for ${tool}`);
   const src = `/marketing/product-screens/${tool}.avif`;
+  const loop = productScreenLoop(tool);
   return <figure className={styles.visualStage} data-tone={2} data-trade-scene="history" data-product-screen={tool} data-figma-node={screen.node}>
+    {loop ? (
+      <LoopVideo {...loop} width={screen.width} height={screen.height} alt={`Renvani ${screen.label}, illustrative product loop`} objectFit="contain" frameClassName={styles.productLoopFrame} sizes="(min-width: 960px) 650px, 90vw" />
+    ) : (
     <a href={src} target="_blank" rel="noopener noreferrer" aria-label={`View full-size ${product.name} screen`} style={{ display: "block", width: "100%" }}>
       <Image src={src} alt={`Renvani ${screen.label}, exported from the product design with illustrative data`} width={screen.width} height={screen.height} sizes="(min-width: 960px) 650px, 90vw" unoptimized style={{ display: "block", width: "100%", height: "auto", maxHeight: screen.width < screen.height ? 520 : undefined, objectFit: "contain", borderRadius: 14 }} />
     </a>
+    )}
     <figcaption>{screen.label} · Product design preview · Example data</figcaption>
     <Link href={`/product/${tool}`} className={styles.textLink}>{product.name}<ArrowUpRight size={16} aria-hidden="true" /></Link>
   </figure>;

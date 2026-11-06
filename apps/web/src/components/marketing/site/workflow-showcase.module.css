@@ -225,3 +225,9 @@
 @media (prefers-reduced-motion: reduce) {
   .showcase *, .showcase *::before, .showcase *::after { animation: none !important; transition: none !important; }
 }
+
+.loopFrame {
+  width: 100%;
+  border-radius: 16px;
+  background: #0b1020;
+}

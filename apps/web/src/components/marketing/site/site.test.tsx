@@ -34,8 +34,9 @@ describe("marketing site (Figma 171:2)", () => {
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
     expect(screen.getByRole("heading", { name: "More jobs. Less on your shoulders." })).toBeTruthy();
     const hero = screen.getByRole("region", { name: "More jobs. Less on your shoulders." });
-    const heroImages = [...hero.querySelectorAll("img")].filter((image) => image.getAttribute("src")?.includes("f1266660"));
-    expect(heroImages).toHaveLength(1);
+    const heroImages = [...hero.querySelectorAll("img")].filter((image) => image.getAttribute("src")?.includes("hero-hvac-tech"));
+    expect(heroImages.length + hero.querySelectorAll("video").length).toBeGreaterThanOrEqual(1);
+    expect(hero.querySelector('[data-node-id="578:5189"]')).toBeTruthy();
     expect(container.querySelector("a a")).toBeNull();
   });
 

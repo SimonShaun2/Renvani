@@ -5,6 +5,8 @@ import Link from "next/link";
 
 import { INDUSTRY_PHOTOS, type IndustryPhotoSlug } from "./industry-photos";
 import { INDUSTRY_PAGE_BY_SLUG } from "./industry-registry";
+import { LoopVideo } from "./LoopVideo";
+import { tradeLoop } from "./media-loops";
 import { useWorkflowPlayback } from "./useWorkflowPlayback";
 import styles from "./industry-showcase.module.css";
 
@@ -159,7 +161,14 @@ export function IndustryShowcase() {
 
             return (
               <Link key={card.slug} href={industry.href} className={styles.card} aria-labelledby={titleId} aria-describedby={outcomeId} data-node-id={card.nodeId} data-industry-card={card.slug} data-phase={playback.step}>
-                <Image src={photo.src} alt="" fill sizes="(min-width: 1440px) 411px, (min-width: 1200px) calc((100vw - 208px) / 3), (min-width: 960px) calc((100vw - 128px) / 3), (min-width: 600px) calc((100vw - 104px) / 2), calc(100vw - 40px)" className={styles.photo} style={{ objectPosition: photo.objectPosition }} data-industry-photo={card.slug} />
+                {(() => {
+                  const loop = tradeLoop(card.slug);
+                  return loop ? (
+                    <LoopVideo {...loop} alt="" frameClassName={`absolute inset-0 ${styles.photo}`} className={styles.photo} sizes="(min-width: 1440px) 411px, (min-width: 1200px) calc((100vw - 208px) / 3), (min-width: 960px) calc((100vw - 128px) / 3), (min-width: 600px) calc((100vw - 104px) / 2), calc(100vw - 40px)" />
+                  ) : (
+                    <Image src={photo.src} alt="" fill sizes="(min-width: 1440px) 411px, (min-width: 1200px) calc((100vw - 208px) / 3), (min-width: 960px) calc((100vw - 128px) / 3), (min-width: 600px) calc((100vw - 104px) / 2), calc(100vw - 40px)" className={styles.photo} style={{ objectPosition: photo.objectPosition }} data-industry-photo={card.slug} />
+                  );
+                })()}
                 <div className={styles.photoShade} aria-hidden="true" />
                 <div className={styles.badge} data-node-id={card.badgeNodeId} aria-hidden="true">
                   <MiniOperation workflow={card.workflow} phase={playback.step} />

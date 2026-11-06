@@ -1,0 +1,46 @@
+{
+  "version":"1.0.0",
+  "recordedDate":"2026-11-06",
+  "sourceBaseline":"8d01e752377d2401cb2c6cdf235aa8dcbdde0aeb",
+  "sourceTree":"8586b7c8b51c3191c96183509d16f16019edb5c0",
+  "planningHead":"443dc8a3f2b33f0f6560ce37819d67f1327311ce",
+  "runtimeEnabled":false,
+  "ownershipNote":"Board values are observed metadata, not reassignment or proof that broader financial capability is accepted. Empty owners remain unassigned. Founder directive #420 overrides stale E.. CoS text.",
+  "preservePullRequests":[
+    {"number":445,"head":"29e95a9bf3f90c7a5a60ced710e581d33b76ea1b","draft":true,"merged":false,"purpose":"Six-package FSM integration; do not recreate its work"},
+    {"number":442,"head":"30dcc1f2d46cd11d73a69c058a98f744fcf539f5","draft":true,"merged":false,"purpose":"OM preparation and source map, not mission runtime"},
+    {"number":449,"head":"443dc8a3f2b33f0f6560ce37819d67f1327311ce","draft":true,"merged":false,"purpose":"Two-track specifications; remains documentation only"}
+  ],
+  "existingTickets":[
+    {"id":"FS-29","status":"Done","ownerRole":"Pair 5","codexOwner":null,"pr":"401","page":"3ff317b92d158155bbf6e43f43690eb5","limitation":"Existing deterministic owner brief, not general questioning"},
+    {"id":"FS-95","status":"In Progress","ownerRole":"Tech Lead","codexOwner":null,"pr":"257","page":"402317b92d158171803ec6326cf197bd","limitation":"Current per-entrypoint migration acceptance still separate"},
+    {"id":"FS-133","status":"Done","ownerRole":null,"codexOwner":null,"pr":"158/159","page":"402317b92d15810295d4de70c626c15d","limitation":"Board Done does not establish unfinished invoice/payment sync or production enablement"},
+    {"id":"FS-170","status":"In Review","ownerRole":null,"codexOwner":null,"pr":"220","page":"406317b92d15819d9b92e891d80ac2a0","limitation":"Quantity stock foundation; valuation is separate"},
+    {"id":"FS-171","status":"In Review","ownerRole":null,"codexOwner":null,"pr":"221","page":"406317b92d158113a638fd1b51e5e198","limitation":"Preparation, not tax filing or wages paid"},
+    {"id":"FS-222","status":"Blocked","ownerRole":null,"codexOwner":"FE6B local fix; R1 independent review","pr":"275/300","page":"407317b92d1581e385ecf8e17c743363","limitation":"Reconcile older blockers against merged provisioning; do not declare full onboarding accepted"},
+    {"id":"FS-235","status":"Done","ownerRole":null,"codexOwner":"BE1A — senior backend developer on current bounded ticket; R4 independent review","pr":"411","page":"408317b92d1581fa9ddef82588124898","limitation":"Provisioning foundation, not full customer go-live"},
+    {"id":"FS-257","status":"Backlog","ownerRole":null,"codexOwner":null,"pr":null,"page":"40a317b92d1581d89515d171ffaad95c","limitation":"Operating-profile authority remains a separate implementation"},
+    {"id":"FS-258","status":"Backlog","ownerRole":null,"codexOwner":null,"pr":null,"page":"40a317b92d158145aa0fdfbb44f926ed","limitation":"First completed estimate-recovery workflow remains separately gated"},
+    {"id":"FS-262","status":"Backlog","ownerRole":"Product Owner","codexOwner":null,"pr":null,"page":"40c317b92d15811e9d6ed98d950b2bce","limitation":"Reuse the existing initiative"},
+    {"id":"FS-263","status":"Backlog","ownerRole":"Product Owner","codexOwner":null,"pr":null,"page":"40c317b92d15817da2e1ec7d67cc67ff","limitation":"Shared intent/readiness/authority anchor, not blanket runtime ownership"},
+    {"id":"FS-268","status":"Backlog","ownerRole":null,"codexOwner":null,"pr":null,"page":"40c317b92d158136b32ceff431b2cddb","limitation":"Owner outcome presentation anchor"}
+  ],
+  "sources":[
+    {"capability":"brief","path":"apps/api/src/services/command-center/command-center-brief.service.ts","symbols":["getCommandCenterBrief"],"ticket":"FS-29","maturity":"source_present","limit":"Jobs/history/actions bounded; retain truncation and legacy basis","consumer":"C05"},
+    {"capability":"jobs","path":"apps/api/src/services/job.service.ts","symbols":[],"ticket":null,"maturity":"source_present","limit":"Read-only adapter acceptance not performed here","consumer":"C05"},
+    {"capability":"estimates","path":"apps/api/src/services/estimate.service.ts","symbols":[],"ticket":null,"maturity":"source_present","limit":"Preserve #445 grouping and public decision recovery","consumer":"C05"},
+    {"capability":"invoices","path":"apps/api/src/services/invoice.service.ts","symbols":[],"ticket":null,"maturity":"source_present","limit":"Invoice value is not cash or automatically earned revenue","consumer":"C05"},
+    {"capability":"workforce","path":"apps/api/src/services/timesheets.service.ts","symbols":["listTimeEntries","rateForDate","splitWeeklyOvertime"],"ticket":"FS-171","maturity":"partial_source","limit":"Effective dates, missing rates and period policy require real C11 acceptance","consumer":"C11"},
+    {"capability":"inventory","path":"apps/api/src/services/inventory.service.ts","symbols":["listStockLevels","transferStock","recordJobUsage"],"ticket":"FS-170","maturity":"partial_source","limit":"Whole-unit stock without complete valuation; API page cap 200","consumer":"C12/C18"},
+    {"capability":"costing","path":"apps/api/src/services/job-products.service.ts","symbols":[],"ticket":null,"maturity":"new_domain","limit":"Selling-price snapshot is not actual historical cost","consumer":"C13/C18"},
+    {"capability":"purchasing","path":"packages/db/src/schema.ts","symbols":[],"ticket":null,"maturity":"new_domain","limit":"Operational PO/vendor/receipt/bill lifecycle not established by inspected foundation","consumer":"C16/C17"},
+    {"capability":"forms","path":"packages/db/src/schema.ts","symbols":["formTemplates","formSubmissions"],"ticket":null,"maturity":"partial_source","limit":"Tables are not a complete versioned forms runtime","consumer":"C14/C15"},
+    {"capability":"qbo","path":"apps/api/src/services/qbo-sync.service.ts","symbols":["getQboSyncStatus","getQboMappingBoard"],"ticket":"FS-133","maturity":"partial_source","limit":"Sandbox scaffolding; financial export completion and production reconciliation separate","consumer":"C19"},
+    {"capability":"qbd","path":"packages/types/src/migrate-onboarding/v1/source-catalog.ts","symbols":["MIGRATE_ONBOARDING_SOURCE_CATALOG"],"ticket":"FS-95","maturity":"new_domain","limit":"File import is not Windows recurring synchronization","consumer":"C20"},
+    {"capability":"migration","path":"apps/api/src/services/import.service.ts","symbols":["getImportSession","startImport","rollbackImport"],"ticket":"FS-95","maturity":"partial_source","limit":"Entity/entrypoint/recovery and cutover certification required","consumer":"C22"},
+    {"capability":"implementation","path":"apps/api/src/services/migrate-onboarding.service.ts","symbols":["getMigrateOnboardingBundle","commitMigrateOnboardingBundle"],"ticket":"FS-222","maturity":"partial_source","limit":"Wizard status is not accepted business readiness","consumer":"C23"},
+    {"capability":"retention","path":"apps/api/src/services/service-agreement.service.ts","symbols":[],"ticket":null,"maturity":"partial_source","limit":"Contact, recognition and obligations require accepted policy","consumer":"C24"},
+    {"capability":"attribution","path":"apps/api/src/services/revenue-outcomes.service.ts","symbols":[],"ticket":null,"maturity":"partial_source","limit":"Legacy materials-only contribution and fallback basis are not final margin or causal effect","consumer":"C24"},
+    {"capability":"goals","path":"apps/api/src/services/agent-action.service.ts","symbols":["createAgentActionProposal","approveAgentAction","executeAgentAction"],"ticket":"FS-263","maturity":"partial_source","limit":"Action services are reusable boundaries, not evidence of an implemented mission goal reader","consumer":"C24/C26"}
+  ]
+}

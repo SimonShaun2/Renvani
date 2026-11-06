@@ -1,0 +1,824 @@
+{
+  "schemaVersion": "om-preparation.source-map/1.0",
+  "baseCommit": "7840884d346ca95788e2668cc78148afa3b6a843",
+  "sourceNotionUrl": "https://app.notion.com/p/40e317b92d1581188031e8a0a4c847c9",
+  "status": "prepared_source_mapping",
+  "implementationStatus": "not_started",
+  "snapshotFieldsRequired": [
+    "snapshotId",
+    "companyId",
+    "asOf",
+    "timeZone",
+    "serviceCatalogVersion",
+    "serviceAreas",
+    "serviceSituations",
+    "capacitySummary",
+    "economicInputs",
+    "funnelSummary",
+    "agreementsSummary",
+    "inventoryReadiness",
+    "connectionReadiness",
+    "permissionSummary",
+    "sourceRefs",
+    "completeness",
+    "staleFields"
+  ],
+  "rules": {
+    "planningCache": "Spec proposes up to fifteen minutes only where field-specific freshness permits.",
+    "execution": "Always recheck consequential mutable facts through trusted domain boundaries.",
+    "pagination": "Respect each existing API limit; inventory limit is at most 200 even though generic OM scan page default is 250. No blanket limit change.",
+    "evidence": "Source inspection is not deployment, connector or end-to-end acceptance."
+  },
+  "fields": [
+    {
+      "id": "SRC-01",
+      "snapshotFields": [
+        "companyId",
+        "permissionSummary.actor"
+      ],
+      "label": "Authenticated tenant and actor",
+      "sourceRefs": [
+        {
+          "path": "apps/api/src/plugins/authenticate.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/plugins/authenticate.ts"
+        },
+        {
+          "path": "apps/api/src/lib/clerk-auth.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/lib/clerk-auth.ts"
+        },
+        {
+          "path": "packages/types/src/agent-control-plane/v1/tenant-context.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/packages/types/src/agent-control-plane/v1/tenant-context.ts"
+        }
+      ],
+      "symbols": [
+        "authenticated request tenant/actor",
+        "TenantContextV1"
+      ],
+      "planningRule": "Server-derived tenant; never accept an arbitrary body/queue companyId as authority.",
+      "executionRecheck": "Reload session/tenant and applicable capability at each consequential boundary.",
+      "missingDataBehavior": "Missing authentication denies access; cross-tenant entity existence is not disclosed.",
+      "currentEvidence": "source_inspected_only",
+      "runtimeAcceptance": "not_executed",
+      "currentLimit": "Existing identity primitives; no OM permission grant consumer.",
+      "decisionRefs": [
+        "OM-D04"
+      ]
+    },
+    {
+      "id": "SRC-02",
+      "snapshotFields": [
+        "timeZone",
+        "economicInputs.currency"
+      ],
+      "label": "Business period and currency",
+      "sourceRefs": [
+        {
+          "path": "apps/api/src/services/company.service.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/company.service.ts"
+        },
+        {
+          "path": "packages/types/src/company-settings.types.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/packages/types/src/company-settings.types.ts"
+        },
+        {
+          "path": "packages/db/src/schema.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/packages/db/src/schema.ts"
+        }
+      ],
+      "symbols": [
+        "getCompany",
+        "companies.timezone",
+        "companies.settings.currency"
+      ],
+      "planningRule": "Use company IANA time zone and explicit currency; proposed snapshot preserves source version.",
+      "executionRecheck": "Recheck if period/financial scope changes; store UTC events and derive local business periods.",
+      "missingDataBehavior": "Invalid/missing configuration prevents unsupported period/currency arithmetic.",
+      "currentEvidence": "source_inspected_only",
+      "runtimeAcceptance": "not_executed",
+      "currentLimit": "Source fields exist; immutable policy/time-zone binding still needed.",
+      "decisionRefs": [
+        "OM-D01"
+      ]
+    },
+    {
+      "id": "SRC-03",
+      "snapshotFields": [
+        "serviceSituations",
+        "serviceCatalogVersion"
+      ],
+      "label": "Verified trade and configured service offering",
+      "sourceRefs": [
+        {
+          "path": "apps/api/src/services/company-trade.service.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/company-trade.service.ts"
+        },
+        {
+          "path": "apps/api/src/services/booking.service.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/booking.service.ts"
+        },
+        {
+          "path": "packages/types/src/booking-settings.types.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/packages/types/src/booking-settings.types.ts"
+        }
+      ],
+      "symbols": [
+        "getCompanyTrade",
+        "listCompanyTradeServices",
+        "getBookingSettings",
+        "offeredServices",
+        "intakeMode"
+      ],
+      "planningRule": "Trade suggestions are not configured bookable services; catalog/version must identify the actual approved offer.",
+      "executionRecheck": "Recheck current offer, duration, scope and intake capability before publication/confirmation.",
+      "missingDataBehavior": "Unknown trade remains unknown; inquiry_only cannot become a confirmed service promise.",
+      "currentEvidence": "source_inspected_only",
+      "runtimeAcceptance": "not_executed",
+      "currentLimit": "Trade/service readers exist; OM service-situation/compatibility mapping is unresolved.",
+      "decisionRefs": [
+        "OM-D06"
+      ]
+    },
+    {
+      "id": "SRC-04",
+      "snapshotFields": [
+        "serviceAreas"
+      ],
+      "label": "Service geography and emergency claims",
+      "sourceRefs": [
+        {
+          "path": "apps/api/src/services/company-home-services.service.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/company-home-services.service.ts"
+        },
+        {
+          "path": "apps/api/src/services/booking.service.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/booking.service.ts"
+        },
+        {
+          "path": "packages/types/src/home-services/service-area.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/packages/types/src/home-services/service-area.ts"
+        }
+      ],
+      "symbols": [
+        "getServiceArea",
+        "getEmergencyService",
+        "resolvePublicZipServiceability",
+        "listActiveServiceAreas"
+      ],
+      "planningRule": "Trusted company/site binding, actual approved ZIP coverage and emergency setting.",
+      "executionRecheck": "Recheck current location/coverage/emergency settings before any commitment.",
+      "missingDataBehavior": "Unserved area or unverified emergency capability yields an honest staff/inquiry next step.",
+      "currentEvidence": "source_inspected_only",
+      "runtimeAcceptance": "not_executed",
+      "currentLimit": "Existing serviceability sources; no inferred emergency response time.",
+      "decisionRefs": [
+        "OM-D06"
+      ]
+    },
+    {
+      "id": "SRC-05",
+      "snapshotFields": [
+        "capacitySummary.operatingCalendar"
+      ],
+      "label": "Operating hours and business days",
+      "sourceRefs": [
+        {
+          "path": "apps/api/src/services/booking.service.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/booking.service.ts"
+        },
+        {
+          "path": "packages/types/src/booking-settings.types.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/packages/types/src/booking-settings.types.ts"
+        }
+      ],
+      "symbols": [
+        "getBookingSettings",
+        "availableDays",
+        "availableHoursStart",
+        "availableHoursEnd"
+      ],
+      "planningRule": "Use business time zone and supported operating calendar; preserve holiday/exception gaps.",
+      "executionRecheck": "Recheck actual hours and customer-selected window before scheduling.",
+      "missingDataBehavior": "Missing calendar means timing-sensitive eligibility is unverified; do not substitute elapsed calendar hours.",
+      "currentEvidence": "source_inspected_only",
+      "runtimeAcceptance": "not_executed",
+      "currentLimit": "Configured weekly hours exist; business-day holiday/exception policy needs explicit handling.",
+      "decisionRefs": [
+        "OM-D06"
+      ]
+    },
+    {
+      "id": "SRC-06",
+      "snapshotFields": [
+        "capacitySummary.qualifications"
+      ],
+      "label": "Technician skills and service fit",
+      "sourceRefs": [
+        {
+          "path": "apps/api/src/services/technician.service.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/technician.service.ts"
+        },
+        {
+          "path": "apps/api/src/services/dispatch-intelligence.service.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/dispatch-intelligence.service.ts"
+        },
+        {
+          "path": "packages/types/src/technician.types.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/packages/types/src/technician.types.ts"
+        }
+      ],
+      "symbols": [
+        "listTechnicians",
+        "getTechnicianAvailability",
+        "calculateSkillsMatchScore",
+        "technicians.skills"
+      ],
+      "planningRule": "Required qualification is a hard filter before ranking; a skill score is not proof of eligibility.",
+      "executionRecheck": "Recheck active status, qualification and service area at reservation/commit.",
+      "missingDataBehavior": "Missing verified requirement or qualification blocks the affected assignment and requests review.",
+      "currentEvidence": "source_inspected_only",
+      "runtimeAcceptance": "not_executed",
+      "currentLimit": "Skills/availability sources exist; mission feasibility proof is not established.",
+      "decisionRefs": [
+        "OM-D06"
+      ]
+    },
+    {
+      "id": "SRC-07",
+      "snapshotFields": [
+        "capacitySummary.availability",
+        "capacitySummary.customerWindows"
+      ],
+      "label": "Booking slots, travel and existing commitments",
+      "sourceRefs": [
+        {
+          "path": "apps/api/src/services/booking.service.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/booking.service.ts"
+        },
+        {
+          "path": "apps/api/src/services/dispatch-intelligence.service.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/dispatch-intelligence.service.ts"
+        },
+        {
+          "path": "apps/api/src/services/job.service.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/job.service.ts"
+        },
+        {
+          "path": "packages/types/src/technician.types.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/packages/types/src/technician.types.ts"
+        }
+      ],
+      "symbols": [
+        "getBookingAvailability",
+        "holdPublicBookingSlot",
+        "confirmPublicBookingSlot",
+        "getAutoFitSuggestions",
+        "scheduleJob"
+      ],
+      "planningRule": "Planning snapshot is advisory; domain service owns calendar truth, customer acceptance and expiring hold.",
+      "executionRecheck": "Authoritative live conflict/window/travel/material checks inside the consequential command.",
+      "missingDataBehavior": "No valid slot yields inquiry/assessment or staff handoff; never fabricate a confirmation.",
+      "currentEvidence": "source_inspected_only",
+      "runtimeAcceptance": "not_executed",
+      "currentLimit": "Existing scheduler/booking methods; shared OM/manual/self-service atomic constraints need Codex evidence.",
+      "decisionRefs": [
+        "OM-D06",
+        "OM-D13"
+      ]
+    },
+    {
+      "id": "SRC-08",
+      "snapshotFields": [
+        "funnelSummary.inquiries",
+        "sourceRefs.attribution"
+      ],
+      "label": "First-party inquiry and acquisition lineage",
+      "sourceRefs": [
+        {
+          "path": "apps/api/src/services/booking.service.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/booking.service.ts"
+        },
+        {
+          "path": "packages/types/src/lead-attribution.types.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/packages/types/src/lead-attribution.types.ts"
+        },
+        {
+          "path": "apps/api/src/services/job-source-reporting.service.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/job-source-reporting.service.ts"
+        }
+      ],
+      "symbols": [
+        "submitBookingRequest",
+        "createCompanyScopedInquiryBooking",
+        "sanitizeLeadAttribution",
+        "getJobSourceReportingSummary"
+      ],
+      "planningRule": "Use actual trusted site/account binding and preserved source references; sanitize allowed attribution fields.",
+      "executionRecheck": "Recheck canonical opportunity and duplicates before conversion or outcome projection.",
+      "missingDataBehavior": "Unknown/unverified attribution remains explicit; legacy source fallback cannot establish paid campaign credit.",
+      "currentEvidence": "source_inspected_only",
+      "runtimeAcceptance": "not_executed",
+      "currentLimit": "UTM/referrer/link/ad whitelist exists; campaign/click identity additions need compatibility and permitted-use review.",
+      "decisionRefs": [
+        "OM-D07",
+        "OM-D09"
+      ]
+    },
+    {
+      "id": "SRC-09",
+      "snapshotFields": [
+        "funnelSummary.estimates",
+        "economicInputs.acceptedWork"
+      ],
+      "label": "Estimate versions, acceptance and conversion",
+      "sourceRefs": [
+        {
+          "path": "apps/api/src/services/estimate.service.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/estimate.service.ts"
+        },
+        {
+          "path": "packages/db/src/schema.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/packages/db/src/schema.ts"
+        }
+      ],
+      "symbols": [
+        "getEstimateForActor",
+        "reviseEstimate",
+        "customerApproveEstimate",
+        "convertToJob",
+        "estimates"
+      ],
+      "planningRule": "Current estimate/version and customer decision determine eligible next steps; accepted value is not earned revenue.",
+      "executionRecheck": "Recheck decline/expiry/new reply/accepted scope and linked job before action.",
+      "missingDataBehavior": "Missing current decision or ambiguity goes to staff; avoid duplicate estimate-to-job conversion.",
+      "currentEvidence": "source_inspected_only",
+      "runtimeAcceptance": "not_executed",
+      "currentLimit": "Existing estimate lifecycle; mission cohort/intent links are extensions.",
+      "decisionRefs": [
+        "OM-D07"
+      ]
+    },
+    {
+      "id": "SRC-10",
+      "snapshotFields": [
+        "economicInputs.performedServices",
+        "funnelSummary.fulfillment"
+      ],
+      "label": "Verified work and field evidence",
+      "sourceRefs": [
+        {
+          "path": "apps/api/src/services/job.service.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/job.service.ts"
+        },
+        {
+          "path": "apps/api/src/services/technician-mobile.service.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/technician-mobile.service.ts"
+        },
+        {
+          "path": "packages/db/src/schema.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/packages/db/src/schema.ts"
+        }
+      ],
+      "symbols": [
+        "getJob",
+        "completeJob",
+        "getJobTimeline",
+        "jobs.actualStart",
+        "jobs.actualEnd"
+      ],
+      "planningRule": "Domain completion and required checklist/customer evidence establish performed work; use actual service period.",
+      "executionRecheck": "Recheck status/evidence/source version before earning projection; retain later corrections.",
+      "missingDataBehavior": "Incomplete mandatory work remains unfinished; no completion from a model or message receipt.",
+      "currentEvidence": "source_inspected_only",
+      "runtimeAcceptance": "not_executed",
+      "currentLimit": "Existing job/field services remain authoritative; no duplicate mission job system.",
+      "decisionRefs": [
+        "OM-D06",
+        "OM-D07"
+      ]
+    },
+    {
+      "id": "SRC-11",
+      "snapshotFields": [
+        "economicInputs.invoiceAllocations",
+        "economicInputs.openBalances"
+      ],
+      "label": "Invoices, adjustments and billing readiness",
+      "sourceRefs": [
+        {
+          "path": "apps/api/src/services/invoice.service.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/invoice.service.ts"
+        },
+        {
+          "path": "apps/api/src/services/invoice-items.service.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/invoice-items.service.ts"
+        },
+        {
+          "path": "packages/db/src/schema.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/packages/db/src/schema.ts"
+        }
+      ],
+      "symbols": [
+        "getInvoice",
+        "sendInvoice",
+        "invoices.issuedAt",
+        "invoiceItems",
+        "invoices.balanceDue"
+      ],
+      "planningRule": "Finalized service allocations and canonical adjustments; keep tax/tips/fees distinct.",
+      "executionRecheck": "Recheck source balances, disputes and adjustments before contact or projection.",
+      "missingDataBehavior": "Unfinalized billing is pending/unbilled; unsigned estimates never fill earned revenue.",
+      "currentEvidence": "source_inspected_only",
+      "runtimeAcceptance": "not_executed",
+      "currentLimit": "Invoice state exists; complete service-period/adjustment normalization must be implemented.",
+      "decisionRefs": [
+        "OM-D02",
+        "OM-D03"
+      ]
+    },
+    {
+      "id": "SRC-12",
+      "snapshotFields": [
+        "economicInputs.settledCash"
+      ],
+      "label": "Payment and refund evidence",
+      "sourceRefs": [
+        {
+          "path": "apps/api/src/services/payment.service.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/payment.service.ts"
+        },
+        {
+          "path": "apps/api/src/services/invoice.service.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/invoice.service.ts"
+        },
+        {
+          "path": "packages/db/src/schema.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/packages/db/src/schema.ts"
+        }
+      ],
+      "symbols": [
+        "listPayments",
+        "handleStripePaymentSuccess",
+        "payments.status",
+        "payments.amountRefunded"
+      ],
+      "planningRule": "Settled allocations and unique reversals/refunds drive cash; provider acknowledgment alone is insufficient.",
+      "executionRecheck": "Reconcile authoritative source/version and linked credit/refund identity before reporting or reminders.",
+      "missingDataBehavior": "Uncertain provider state remains pending reconciliation; zero and unknown are distinct.",
+      "currentEvidence": "source_inspected_only",
+      "runtimeAcceptance": "not_executed",
+      "currentLimit": "Payment/refund fields exist; OM settlement/reversal projection and provider evidence still need acceptance.",
+      "decisionRefs": [
+        "OM-D03",
+        "OM-D07"
+      ]
+    },
+    {
+      "id": "SRC-13",
+      "snapshotFields": [
+        "economicInputs.variableCosts"
+      ],
+      "label": "Historical costs and contribution completeness",
+      "sourceRefs": [
+        {
+          "path": "apps/api/src/services/revenue-outcomes.service.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/revenue-outcomes.service.ts"
+        },
+        {
+          "path": "apps/api/src/services/product-catalog.service.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/product-catalog.service.ts"
+        },
+        {
+          "path": "packages/db/src/schema.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/packages/db/src/schema.ts"
+        }
+      ],
+      "symbols": [
+        "getProduct",
+        "productCatalog",
+        "jobProducts",
+        "materials_only reporting basis"
+      ],
+      "planningRule": "Use historical labor/material/travel/transaction/acquisition costs with explicit completeness.",
+      "executionRecheck": "Resolve applicable service-period cost revision; never substitute later catalog cost silently.",
+      "missingDataBehavior": "Missing components produce incomplete contribution, not full margin or net profit.",
+      "currentEvidence": "source_inspected_only",
+      "runtimeAcceptance": "not_executed",
+      "currentLimit": "Existing report is materials-only and has paid/invoice/estimate revenue fallback; not OM economic truth.",
+      "decisionRefs": [
+        "OM-D03"
+      ]
+    },
+    {
+      "id": "SRC-14",
+      "snapshotFields": [
+        "agreementsSummary"
+      ],
+      "label": "Agreement terms, due benefits and renewals",
+      "sourceRefs": [
+        {
+          "path": "apps/api/src/services/service-agreement.service.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/service-agreement.service.ts"
+        },
+        {
+          "path": "packages/types/src/service-agreement.types.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/packages/types/src/service-agreement.types.ts"
+        },
+        {
+          "path": "packages/db/src/schema.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/packages/db/src/schema.ts"
+        }
+      ],
+      "symbols": [
+        "listAgreements",
+        "getAgreement",
+        "listVisits",
+        "maintenancePlans",
+        "maintenanceVisits"
+      ],
+      "planningRule": "Use accepted terms and actual due/fulfilled benefits; do not infer recognition from cash or annual label.",
+      "executionRecheck": "Recheck renewal state, customer decision, unresolved obligation and fulfillment capacity.",
+      "missingDataBehavior": "Unknown recognition schedule means earned agreement revenue unavailable; service obligations remain owed.",
+      "currentEvidence": "source_inspected_only",
+      "runtimeAcceptance": "not_executed",
+      "currentLimit": "Existing agreement/visit services; recognition policy and new enrollment enablement are unresolved.",
+      "decisionRefs": [
+        "OM-D02",
+        "OM-D06"
+      ]
+    },
+    {
+      "id": "SRC-15",
+      "snapshotFields": [
+        "inventoryReadiness"
+      ],
+      "label": "Physical stock, movements and reservations",
+      "sourceRefs": [
+        {
+          "path": "apps/api/src/services/inventory.service.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/inventory.service.ts"
+        },
+        {
+          "path": "packages/types/src/inventory/v1/index.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/packages/types/src/inventory/v1/index.ts"
+        },
+        {
+          "path": "packages/db/src/schema.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/packages/db/src/schema.ts"
+        }
+      ],
+      "symbols": [
+        "listStockLevels",
+        "listStockMovements",
+        "transferStock",
+        "recordJobUsage",
+        "stockLevels"
+      ],
+      "planningRule": "Verified on-hand minus committed domain reservations; verification needs accountable source, place, time and quantity.",
+      "executionRecheck": "Recheck live version, verification and all domain reservations before a promise/transfer.",
+      "missingDataBehavior": "Stale/missing stock is unverified; create a stock-check next step; unreceived supplier stock is not available.",
+      "currentEvidence": "source_inspected_only",
+      "runtimeAcceptance": "not_executed",
+      "currentLimit": "Integer stock, movement and optional stale-write controls exist; verified provenance/OM reservation integration needs extension.",
+      "decisionRefs": [
+        "OM-D06"
+      ]
+    },
+    {
+      "id": "SRC-16",
+      "snapshotFields": [
+        "permissionSummary.consent"
+      ],
+      "label": "Purpose and destination-specific consent",
+      "sourceRefs": [
+        {
+          "path": "apps/api/src/services/outbound-consent.service.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/outbound-consent.service.ts"
+        },
+        {
+          "path": "apps/api/src/services/revenue-agent/revenue-proposal-consent.service.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/revenue-agent/revenue-proposal-consent.service.ts"
+        },
+        {
+          "path": "packages/types/src/outbound-consent.types.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/packages/types/src/outbound-consent.types.ts"
+        }
+      ],
+      "symbols": [
+        "checkOutboundConsent",
+        "revokeOperatorOutboundConsent",
+        "OutboundConsentKey"
+      ],
+      "planningRule": "Company, subject type/id, channel, purpose and actual normalized destination must match current evidence.",
+      "executionRecheck": "Recheck before execute and immediately before provider handoff; integrate STOP/current legacy paths explicitly.",
+      "missingDataBehavior": "Missing/unknown/revoked/mismatched consent blocks affected contact; no snapshot grant.",
+      "currentEvidence": "source_inspected_only",
+      "runtimeAcceptance": "not_executed",
+      "currentLimit": "#430 foundation merged; generic grant writes and verification delivery remain disabled; universal send-path enforcement incomplete.",
+      "decisionRefs": [
+        "OM-D04",
+        "OM-D05"
+      ]
+    },
+    {
+      "id": "SRC-17",
+      "snapshotFields": [
+        "permissionSummary.grants",
+        "permissionSummary.policyVersion"
+      ],
+      "label": "Business policy and exact action authority",
+      "sourceRefs": [
+        {
+          "path": "apps/api/src/services/agent-action.service.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/agent-action.service.ts"
+        },
+        {
+          "path": "apps/api/src/services/agent-action.policy.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/agent-action.policy.ts"
+        },
+        {
+          "path": "packages/types/src/agent-control-plane/v1/agent-action-proposal.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/packages/types/src/agent-control-plane/v1/agent-action-proposal.ts"
+        },
+        {
+          "path": "packages/types/src/company-settings.types.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/packages/types/src/company-settings.types.ts"
+        }
+      ],
+      "symbols": [
+        "approvedParameters",
+        "approvedParametersHash",
+        "policyVersion",
+        "companies.settings"
+      ],
+      "planningRule": "Existing role/policy is input, not a standing mission grant; FS-257 profile remains Part I work.",
+      "executionRecheck": "Recheck actor/capability, active plan, payload hash, source versions, grant version/expiry/revocation and remaining exposure.",
+      "missingDataBehavior": "Unmapped capability or missing grant denies consequential execution.",
+      "currentEvidence": "source_inspected_only",
+      "runtimeAcceptance": "not_executed",
+      "currentLimit": "Existing approved payload snapshots; mission grants and full operating-profile version contract not implemented here.",
+      "decisionRefs": [
+        "OM-D04"
+      ]
+    },
+    {
+      "id": "SRC-18",
+      "snapshotFields": [
+        "connectionReadiness"
+      ],
+      "label": "Provider capability evidence",
+      "sourceRefs": [
+        {
+          "path": "apps/api/src/services/growth/gbp-provider.registry.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/growth/gbp-provider.registry.ts"
+        },
+        {
+          "path": "apps/api/src/services/growth/call-tracking-adapter.registry.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/growth/call-tracking-adapter.registry.ts"
+        },
+        {
+          "path": "apps/api/src/services/agent-action-receipt.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/agent-action-receipt.ts"
+        },
+        {
+          "path": "packages/config/src/feature-flags.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/packages/config/src/feature-flags.ts"
+        }
+      ],
+      "symbols": [
+        "provider registry defaults",
+        "AGENT_ACTION_QUEUED_NOTE",
+        "source feature defaults"
+      ],
+      "planningRule": "Track implemented/configured/authorized/runtime-proven separately at a dated environment/account binding.",
+      "executionRecheck": "Check current account access, supported operation, verified limits and receipt/reconciliation readiness before dispatch.",
+      "missingDataBehavior": "Unavailable capability stays draft/assessment or human task; no live success from a flag/registry.",
+      "currentEvidence": "source_inspected_only",
+      "runtimeAcceptance": "not_executed",
+      "currentLimit": "Source extension points are present; current deployment/account readiness is not established.",
+      "decisionRefs": [
+        "OM-D09"
+      ]
+    },
+    {
+      "id": "SRC-19",
+      "snapshotFields": [
+        "sourceRefs",
+        "completeness",
+        "staleFields"
+      ],
+      "label": "Provenance and coverage",
+      "sourceRefs": [
+        {
+          "path": "packages/types/src/agent-control-plane/v1/entity-ref.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/packages/types/src/agent-control-plane/v1/entity-ref.ts"
+        },
+        {
+          "path": "packages/types/src/agent-control-plane/v1/entity-ref.schema.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/packages/types/src/agent-control-plane/v1/entity-ref.schema.ts"
+        },
+        {
+          "path": "apps/api/src/services/tenant-context.service.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/tenant-context.service.ts"
+        }
+      ],
+      "symbols": [
+        "CanonicalEntityRefV1",
+        "buildRecordVersionV1",
+        "resolveEntityRef"
+      ],
+      "planningRule": "Record field-level observed/source timestamps, source record/version, covered range and unknown/stale reason.",
+      "executionRecheck": "Mutable facts are resolved again under the final trusted transaction/context.",
+      "missingDataBehavior": "Incomplete scan reports covered scope and checkpoint; omitted fields remain unknown.",
+      "currentEvidence": "source_inspected_only",
+      "runtimeAcceptance": "not_executed",
+      "currentLimit": "Existing entity/version shapes; OM snapshot and completeness persistence are new contracts.",
+      "decisionRefs": []
+    },
+    {
+      "id": "SRC-20",
+      "snapshotFields": [
+        "snapshotId",
+        "asOf"
+      ],
+      "label": "Snapshot identity and immutable planning record",
+      "sourceRefs": [
+        {
+          "path": "packages/types/src/agent-control-plane/v1/entity-ref.ts",
+          "commit": "7840884d346ca95788e2668cc78148afa3b6a843",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/packages/types/src/agent-control-plane/v1/entity-ref.ts"
+        }
+      ],
+      "symbols": [
+        "existing source references only"
+      ],
+      "planningRule": "Proposed OM snapshot identifier/asOf comes from a future trusted builder and immutable versioned source set.",
+      "executionRecheck": "Snapshot freshness never replaces action-time revalidation.",
+      "missingDataBehavior": "No persisted snapshot means no approved executable plan; documentation examples are synthetic.",
+      "currentEvidence": "source_inspected_only",
+      "runtimeAcceptance": "not_executed",
+      "currentLimit": "No OM snapshot implementation in this preparation; reuse references rather than full customer histories.",
+      "decisionRefs": [
+        "OM-D13"
+      ]
+    }
+  ]
+}

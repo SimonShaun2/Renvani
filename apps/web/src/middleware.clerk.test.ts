@@ -46,6 +46,17 @@ describe("middleware with Clerk enabled", () => {
     expect(response.headers.get("location")).toBeNull();
   });
 
+  it("exempts exact favicon metadata paths, not lookalike protected routes", async () => {
+    const { config } = await import("../middleware");
+    const matcher = new RegExp("^" + config.matcher[0] + "$");
+    for (const path of ["/favicon.ico", "/icon.svg", "/apple-icon.png", "/brand/logo-horizontal.svg", "/icon-192.png", "/icon-512.png", "/icon-maskable-512.png", "/manifest.webmanifest", "/_next/static/main.js", "/_next/image"]) {
+      expect(matcher.test(path)).toBe(false);
+    }
+    for (const path of ["/dashboard", "/settings", "/icon.svg/secure", "/apple-icon.png/secure", "/favicon.ico/secure", "/brand/logo-horizontal.svg/admin", "/icon-192.png/admin", "/manifest.webmanifest/admin"]) {
+      expect(matcher.test(path)).toBe(true);
+    }
+  });
+
   it("redirects signed-out staff routes to /login", async () => {
     const middleware = await loadMiddleware();
     const response = await middleware(req("/dashboard"));

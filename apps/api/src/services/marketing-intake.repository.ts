@@ -12,6 +12,7 @@ export interface MarketingDemoRequestRow {
 }
 
 export interface MarketingGrowthCheckRow {
+  contactDetails?: { firstName: string; lastName: string; phone: string; company: string; teamSize: string } | null;
   websiteUrl: string;
   trade: string;
   zip: string | null;

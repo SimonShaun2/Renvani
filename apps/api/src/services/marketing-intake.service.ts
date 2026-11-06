@@ -91,6 +91,7 @@ export async function submitMarketingGrowthCheck(
 ): Promise<MarketingIntakeResponse> {
   if (isHoneypotHit(body)) return { ok: true, confirmationId: randomUUID() };
   const id = await insertMarketingGrowthCheck({
+    ...(body.contact ? { contactDetails: body.contact } : {}),
     websiteUrl: body.websiteUrl,
     trade: body.trade,
     zip: body.zip ?? null,
@@ -100,6 +101,11 @@ export async function submitMarketingGrowthCheck(
   });
   await notify("growth_check", "New Growth Check request", [
     ["Confirmation", id],
+    ["First Name", body.contact?.firstName],
+    ["Last Name", body.contact?.lastName],
+    ["Contact Number", body.contact?.phone],
+    ["Business Name", body.contact?.company],
+    ["Team Size", body.contact?.teamSize],
     ["Website", body.websiteUrl],
     ["Trade", body.trade],
     ["ZIP", body.zip],

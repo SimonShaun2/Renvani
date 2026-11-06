@@ -15,6 +15,7 @@ import { buildMarketingSitemap } from "@/src/lib/seo/public-sitemap";
 import { FlagshipPage } from "./FlagshipPage";
 import { PRODUCT_PAGES, productLinkFor } from "./flagship-registry";
 import { FLAGSHIP_TREES } from "./flagship-visuals";
+import { INDUSTRY_PAGES } from "./industry-registry";
 import { MarketingShell } from "./MarketingShell";
 import { TOOL_GROUPS } from "./platform-config";
 import { PRODUCTS_MENU } from "./site-config";
@@ -25,6 +26,7 @@ const resolves = (h: string) => {
   const path = h.split("#")[0] || "/";
   if (h.startsWith("#")) return true;
   if (path.startsWith("/product/")) return SLUGS.includes(path.slice(9));
+  if (path.startsWith("/industries/")) return INDUSTRY_PAGES.some((industry) => industry.href === path);
   return ["/", "/product", "/how-it-works", "/pricing", "/industries", "/industries/hvac", "/industries/plumbing", "/industries/electrical", "/signup", "/demo", "/growth-check", "/login", "/tour"].includes(path);
 };
 
@@ -43,7 +45,7 @@ describe("flagship + product-detail + tool pages (Figma 175:3…175:4156, 215:63
     it(`renders ${page.slug} with real links only`, () => {
       const { container } = render(<FlagshipPage page={page} />);
       const h1s = screen.getAllByRole("heading", { level: 1 });
-      expect(h1s).toHaveLength(2); // desktop (md+) and mobile frame; only one is displayed
+      expect(h1s).toHaveLength(1); // Native responsive page: one semantic heading at every breakpoint.
       if (page.template === "page") for (const h of h1s) expect(h.textContent?.replace(/\s+/g, "")).toBe(page.headline.replace(/\s+/g, "")); // multi-line headings render as block lines
       expect(container.querySelector("#workflow")).toBeTruthy();
       expect(container.querySelector("#workflow-m")).toBeTruthy();
@@ -92,7 +94,6 @@ describe("flagship + product-detail + tool pages (Figma 175:3…175:4156, 215:63
   });
 
   it("copy guard: home services only, no competitors, Service Fee wording", () => {
-    // Rendered copy only (text + button labels); layer names like "Icon / menu" and asset paths are not copy.
     const copy: string[] = [];
     const grab = (n: unknown): void => {
       if (typeof n === "string") return void copy.push(n);

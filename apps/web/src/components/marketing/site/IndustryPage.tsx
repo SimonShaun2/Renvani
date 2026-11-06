@@ -1,8 +1,11 @@
-import { FrameSwitch } from "./FigmaNode";
-import { INDUSTRY_TREES } from "./industry-visuals";
+import { IndustryDirectory } from "./IndustryDirectory";
+import { IndustryDetailPage } from "./DetailPages";
+import { INDUSTRY_PAGE_BY_SLUG, type IndustrySlug } from "./industry-registry";
 
-/** Renders an Industries frame via FrameSwitch: the 1440 desktop frame scaled to fit at xl+ (CSS zoom, max 1), the Figma mobile frame below xl. Server component. */
-export function IndustryFrames({ tree }: { tree: "industries" | "hvac" | "plumbing" | "electrical" }) {
-  const t = INDUSTRY_TREES[tree]!;
-  return <FrameSwitch desktop={t.desktop} mobile={t.mobile} scaleDesktop />;
+/** The existing directory and every existing trade destination remain intact. */
+export function IndustryFrames({ tree }: { tree: "industries" | IndustrySlug }) {
+  if (tree === "industries") return <IndustryDirectory />;
+  const industry = INDUSTRY_PAGE_BY_SLUG[tree];
+  if (!industry) throw new Error(`Unregistered marketing industry: ${tree}`);
+  return <IndustryDetailPage industry={industry} />;
 }

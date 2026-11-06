@@ -55,7 +55,7 @@ const amberInvalid = (error: string | undefined, tone: ErrorTone) => Boolean(err
 const controlClass = (error: string | undefined, tone: ErrorTone, extra = "") => `${control}${extra}${amberInvalid(error, tone) ? " border-[#f6b400] aria-[invalid=true]:border-[#f6b400]" : ""}`;
 const controlStyle = (error: string | undefined, tone: ErrorTone) => (amberInvalid(error, tone) ? { color: ink } : { borderColor: line, color: ink });
 
-type InputProps = { id: string; name: string; error?: string | undefined; tone?: ErrorTone; placeholder: string; type?: string; autoComplete?: string; inputMode?: "url" | "email" | "text" | "numeric"; defaultValue?: string; maxLength?: number };
+type InputProps = { id: string; name: string; error?: string | undefined; tone?: ErrorTone; placeholder: string; type?: string; autoComplete?: string; inputMode?: "url" | "email" | "text" | "numeric" | "tel"; defaultValue?: string; maxLength?: number };
 
 export function TextInput({ id, name, error, tone = "red", type = "text", ...rest }: InputProps) {
   return <input id={id} name={name} type={type} required aria-invalid={error ? true : undefined} aria-describedby={error ? `${id}-error` : undefined} className={controlClass(error, tone)} style={controlStyle(error, tone)} {...rest} />;

@@ -26,9 +26,20 @@ const resolves = (h: string) =>
   INDUSTRY_PAGES.some((p) => `/industries/${p.slug}` === h);
 const PLAIN_OK = ["Local Search · Preview", "Owner App & Approval Rules", "Owner rules"];
 const INDUSTRY_LINKS = [
-  { label: "HVAC", href: "/industries/hvac" },
+  { label: "HVAC & Refrigeration", href: "/industries/hvac" },
   { label: "Plumbing", href: "/industries/plumbing" },
-  { label: "Electrical", href: "/industries/electrical" }
+  { label: "Electrical", href: "/industries/electrical" },
+  { label: "Appliance Repair", href: "/industries/appliance-repair" },
+  { label: "Overhead & Garage Door", href: "/industries/garage-doors" },
+  { label: "Locksmith", href: "/industries/locksmith" },
+  { label: "Cleaning", href: "/industries/cleaning" },
+  { label: "Pest Control", href: "/industries/pest-control" },
+  { label: "Chimney", href: "/industries/chimney" },
+  { label: "Pressure Washing", href: "/industries/pressure-washing" },
+  { label: "Tree Care", href: "/industries/tree-care" },
+  { label: "Alarm", href: "/industries/alarm" },
+  { label: "Air Duct", href: "/industries/air-duct" },
+  { label: "Carpet Cleaning", href: "/industries/carpet-cleaning" }
 ];
 
 const menus = (c: HTMLElement) => ({ product: c.querySelector<HTMLDetailsElement>('[data-node-id="177:640"]')!, industry: c.querySelector<HTMLDetailsElement>('[data-node-id="177:686"]')!, mobile: c.querySelector<HTMLDetailsElement>('[data-node-id="177:737"]')! });
@@ -61,7 +72,7 @@ const expectIndustryInventory = (menu: HTMLElement) => {
   const industries = menu.querySelector<HTMLElement>('nav[aria-label="Renvani industries"]');
   expect(industries).not.toBeNull();
   const links = [...industries!.querySelectorAll("a")];
-  expect(links).toHaveLength(3);
+  expect(links).toHaveLength(14);
   expect(links.map((link) => link.getAttribute("href")).sort()).toEqual(INDUSTRY_LINKS.map((industry) => industry.href).sort());
   for (const industry of INDUSTRY_LINKS) {
     const link = links.find((item) => item.getAttribute("href") === industry.href)!;
@@ -93,7 +104,7 @@ describe("header menus (177:640, 177:686, 177:737)", () => {
     expect(p.querySelector("button[data-menu-close]")!.textContent).toBe("Close menu");
   });
 
-  it("desktop Industries offers the three active trades, their directory and demo access", () => {
+  it("desktop Industries offers all fourteen requested trades, their directory and demo access", () => {
     const { container } = render(<MarketingShell><p>x</p></MarketingShell>);
     const industry = menus(container).industry;
     expectIndustryInventory(industry);
@@ -150,7 +161,7 @@ describe("header menus (177:640, 177:686, 177:737)", () => {
     expect(outerSummary.getAttribute("aria-expanded")).toBe("false");
   });
 
-  it("mobile Industries expands without closing the header, and its trade links dismiss the header without stealing focus", () => {
+  it.each(["electrical", "carpet-cleaning"])("mobile Industries expands without closing the header, and its %s link dismisses the header without stealing focus", (slug) => {
     const { container } = render(<MarketingShell><p>x</p></MarketingShell>);
     const mobile = menus(container).mobile;
     const outerSummary = mobile.querySelector("summary")!;
@@ -175,7 +186,7 @@ describe("header menus (177:640, 177:686, 177:737)", () => {
 
     fireEvent.click(summary);
     fireEvent(industries, new Event("toggle"));
-    const link = industries.querySelector<HTMLAnchorElement>('a[href="/industries/electrical"]')!;
+    const link = industries.querySelector<HTMLAnchorElement>(`a[href="/industries/${slug}"]`)!;
     link.addEventListener("click", (event) => event.preventDefault());
     act(() => link.focus());
     expect(mobile.open).toBe(true);

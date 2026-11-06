@@ -22,6 +22,7 @@ export const SHOP_PAGE_TYPES = [
  * signed-in route under app/(app), app/(auth) and app/(mobile), stays disallowed. Add a public surface here to expose it.
  */
 export const ROBOTS_ALLOW = [
+  { key: "about", prefix: "/about$" },
   { key: "home", prefix: "/$" }, // marketing home (exact)
   { key: "pricing", prefix: "/pricing" },
   { key: "product", prefix: "/product/" },
@@ -153,6 +154,7 @@ export async function buildPublicSitemap(
 /** Marketing website pages (Figma 171:2) listed in the sitemap. Add a page here when its route ships. */
 export const MARKETING_SITEMAP_PATHS = [
   { path: "/", priority: 1 },
+  { path: "/about", priority: 0.6 },
   { path: "/product", priority: 0.9 },
   { path: "/how-it-works", priority: 0.9 },
   ...["growth", "revenue", "operations", "retention", "command-center", "online-booking", "estimates-approvals", "scheduling-dispatch", "technician-app", "invoices-payments", "service-agreements", "ai-revenue-intelligence", "customers-properties-assets", "onboarding-data-import", "inquiry-response-follow-up", "jobs-work-orders", "time-tracking-job-photos", "reminders-win-backs", "reporting-job-sources", "websites", "price-book-service-catalog", "customer-portal"].map((slug) => ({ path: `/product/${slug}`, priority: 0.8 })),

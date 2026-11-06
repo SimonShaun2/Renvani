@@ -40,6 +40,12 @@ describe("middleware with Clerk enabled", () => {
     }
   );
 
+  it("serves only exact About without exposing lookalike private paths", async () => {
+    const middleware = await loadMiddleware();
+    expect((await middleware(new NextRequest("http://localhost:3000/about"))).headers.get("location")).toBeNull();
+    expect((await middleware(new NextRequest("http://localhost:3000/about/admin"))).headers.get("location")).toContain("/login");
+  });
+
   it.each(["/robots.txt", "/sitemap.xml", "/sitemap-index.xml", "/sitemap/0.xml"])("serves %s to signed-out crawlers (no /login redirect)", async (path) => {
     const middleware = await loadMiddleware();
     const response = await middleware(new NextRequest(`http://localhost:3000${path}`, { method: "GET" }));

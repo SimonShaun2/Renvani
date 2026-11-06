@@ -5,16 +5,16 @@ import { redirect } from "next/navigation";
 
 import { HomePage } from "@/src/components/marketing/site/HomePage";
 import { MarketingShell } from "@/src/components/marketing/site/MarketingShell";
-import { HOME_META } from "@/src/components/marketing/site/site-config";
+import { LAUNCH_HOME } from "@/src/components/marketing/site/launch-content";
 import { getDefaultRouteForRole } from "@/src/lib/route-access";
 import { getServerSession } from "@/src/lib/server-session";
 
 export const metadata: Metadata = withMarketingSeo("/", {
-  title: HOME_META.title,
-  description: HOME_META.description,
+  title: LAUNCH_HOME.title,
+  description: LAUNCH_HOME.description,
   openGraph: {
-    title: HOME_META.title,
-    description: HOME_META.description,
+    title: LAUNCH_HOME.title,
+    description: LAUNCH_HOME.description,
     url: "https://getrenvani.com",
     siteName: "Renvani",
     type: "website"

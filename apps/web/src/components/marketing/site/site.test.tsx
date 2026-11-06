@@ -32,8 +32,8 @@ describe("marketing site (Figma 171:2)", () => {
   it("uses one responsive hero and one photograph across breakpoints", () => {
     const { container } = render(<HomePage />);
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
-    expect(screen.getByRole("heading", { name: "More jobs. Less on your shoulders." })).toBeTruthy();
-    const hero = screen.getByRole("region", { name: "More jobs. Less on your shoulders." });
+    expect(screen.getByRole("heading", { name: "More direct jobs. More repeat customers." })).toBeTruthy();
+    const hero = screen.getByRole("region", { name: "More direct jobs. More repeat customers." });
     const heroImages = [...hero.querySelectorAll("img")].filter((image) => image.getAttribute("src")?.includes("f1266660"));
     expect(heroImages).toHaveLength(1);
     expect(container.querySelector("a a")).toBeNull();

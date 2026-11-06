@@ -68,8 +68,8 @@ export function MarketingShell({ children }: { children: ReactNode }) {
         <p className="text-[28px] md:order-1 md:leading-[1.4] lg:w-[350px] lg:leading-[inherit]" >
           <img src="/brand/logo-horizontal.svg" width={152} height={35} alt="Renvani" style={{ display: "block", width: 152, height: "auto" }} />
         </p>
-        <nav aria-label="Footer" className="flex flex-col gap-4 md:order-3 md:col-span-2 md:w-[704px] md:flex-row md:text-[14px] md:leading-[1.4] text-[12px] lg:order-2 lg:col-auto lg:w-[510px] lg:flex-wrap lg:text-[12px] lg:leading-[inherit]" style={{ color: "var(--color-mkt-ink2)" }}>
-          {SITE_FOOTER.links.map((l) => (
+        <nav aria-label="Footer" className="flex flex-col gap-4 md:order-3 md:col-span-2 md:w-[704px] md:flex-row md:flex-wrap md:text-[14px] md:leading-[1.4] text-[12px] lg:order-2 lg:col-auto lg:w-[510px] lg:flex-wrap lg:text-[12px] lg:leading-[inherit]" style={{ color: "var(--color-mkt-ink2)" }}>
+          {[...SITE_FOOTER.links, { label: "About", href: "/about" }].map((l) => (
             <Link key={l.label} href={l.href} className="min-w-[112px] md:w-[164px] md:shrink-0 lg:w-auto lg:shrink">
               {l.label}
             </Link>

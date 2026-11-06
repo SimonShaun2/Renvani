@@ -97,8 +97,8 @@ describe("marketing assets are public", () => {
     const { isPublicRoute } = await import("@/src/lib/route-access");
     expect(isPublicRoute("/marketing/home/hvac-tech.jpg")).toBe(true);
     expect(isPublicRoute("/marketing")).toBe(false);
-    expect(isPublicRoute("/media/why-renvani/rafael-v4-poster.jpg")).toBe(true);
-    expect(isPublicRoute("/media/loops/work-growth-poster.png")).toBe(true);
+    expect(isPublicRoute("/media/why-renvani/rafael-v4-poster-fallback.jpg")).toBe(true);
+    expect(isPublicRoute("/media/loops/work-growth-poster-fallback.jpg")).toBe(true);
     expect(isPublicRoute("/media")).toBe(false);
   });
 });

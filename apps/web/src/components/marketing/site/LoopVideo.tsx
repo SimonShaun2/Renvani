@@ -2,16 +2,19 @@
 
 import { useEffect, useRef, useState } from "react";
 
+import type { PosterSet } from "./media-loops";
+
 export type LoopVideoProps = {
   webm: string;
   mp4: string;
-  poster: string;
+  poster: PosterSet;
   width: number;
   height: number;
   className?: string | undefined;
   /** Applied to the outer frame (aspect + overflow). */
   frameClassName?: string | undefined;
   alt?: string | undefined;
+  /** Hero / LCP: eager poster + delay video until after window load. */
   priority?: boolean | undefined;
   sizes?: string | undefined;
   /** Object-fit for the video/poster. */
@@ -20,7 +23,8 @@ export type LoopVideoProps = {
 
 /**
  * Autoplaying muted loop. Poster always renders (no JS required).
- * Sources attach only when near the viewport. Reduced-motion → poster only.
+ * Sources attach only when near the viewport (and after load for priority).
+ * Reduced-motion → poster only.
  */
 export function LoopVideo({
   webm,
@@ -31,11 +35,14 @@ export function LoopVideo({
   className = "",
   frameClassName = "",
   alt = "",
+  priority = false,
+  sizes = "(max-width: 390px) 390px, (max-width: 768px) 768px, 1440px",
   objectFit = "cover"
 }: LoopVideoProps) {
   const frameRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [near, setNear] = useState(false);
+  const [pageReady, setPageReady] = useState(!priority);
   const [reducedMotion, setReducedMotion] = useState(false);
 
   useEffect(() => {
@@ -47,6 +54,18 @@ export function LoopVideo({
   }, []);
 
   useEffect(() => {
+    if (!priority) return;
+    const markReady = () => setPageReady(true);
+    if (document.readyState === "complete") {
+      // Defer one tick so the LCP poster can paint first.
+      const t = window.setTimeout(markReady, 0);
+      return () => window.clearTimeout(t);
+    }
+    window.addEventListener("load", markReady, { once: true });
+    return () => window.removeEventListener("load", markReady);
+  }, [priority]);
+
+  useEffect(() => {
     if (reducedMotion) return;
     const node = frameRef.current;
     if (!node) return;
@@ -56,25 +75,28 @@ export function LoopVideo({
           setNear(entry.isIntersecting);
         }
       },
-      { rootMargin: "240px 0px", threshold: 0.01 }
+      // Tight margin so below-fold loops do not request media on initial load.
+      { rootMargin: "0px 0px", threshold: 0.01 }
     );
     io.observe(node);
     return () => io.disconnect();
   }, [reducedMotion]);
 
+  const activate = near && pageReady && !reducedMotion;
+
   useEffect(() => {
     const video = videoRef.current;
     if (!video || reducedMotion) return;
-    if (near) {
-      // Reload when sources appear / swap so the new tab's file actually loads.
+    if (activate) {
       video.load();
       void video.play().catch(() => undefined);
     } else {
       video.pause();
     }
-  }, [near, reducedMotion, webm, mp4]);
+  }, [activate, reducedMotion, webm, mp4]);
 
   const fitClass = objectFit === "contain" ? "object-contain" : "object-cover";
+  const imgClass = `absolute inset-0 h-full w-full ${fitClass} ${className}`;
 
   return (
     <div
@@ -82,15 +104,21 @@ export function LoopVideo({
       className={`relative overflow-hidden ${frameClassName}`}
       style={{ aspectRatio: `${width} / ${height}` }}
     >
-      {/* Always-visible poster — must render even if IO/lazy JS never fires. */}
-      <img
-        src={poster}
-        alt={alt}
-        width={width}
-        height={height}
-        decoding="async"
-        className={`absolute inset-0 h-full w-full ${fitClass} ${className}`}
-      />
+      <picture>
+        <source type="image/avif" srcSet={poster.avifSrcSet} sizes={sizes} />
+        <source type="image/webp" srcSet={poster.webpSrcSet} sizes={sizes} />
+        <img
+          src={poster.src}
+          alt={alt}
+          width={width}
+          height={height}
+          sizes={sizes}
+          decoding={priority ? "sync" : "async"}
+          loading={priority ? "eager" : "lazy"}
+          fetchPriority={priority ? "high" : "auto"}
+          className={imgClass}
+        />
+      </picture>
       {!reducedMotion ? (
         <video
           key={`${webm}|${mp4}`}
@@ -99,12 +127,11 @@ export function LoopVideo({
           muted
           loop
           playsInline
-          preload={near ? "metadata" : "none"}
-          poster={poster}
+          preload={activate ? "metadata" : "none"}
           aria-label={alt || undefined}
-          autoPlay={near}
+          autoPlay={activate}
         >
-          {near ? (
+          {activate ? (
             <>
               <source src={webm} type="video/webm" />
               <source src={mp4} type="video/mp4" />

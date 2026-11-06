@@ -88,12 +88,14 @@ export function LoopVideo({
     window.addEventListener("pointermove", onPointer, { once: true, passive: true });
 
     const startIdleClock = () => {
-      // ~3s after load via rIC (timeout) or setTimeout fallback.
-      if (typeof window.requestIdleCallback === "function") {
-        idleHandle = window.requestIdleCallback(() => markReady(), { timeout: 3000 });
-      } else {
-        timeoutHandle = window.setTimeout(markReady, 3000);
-      }
+      // ~3s after load, then idle (rIC) if available; setTimeout-only where rIC isn't supported.
+      timeoutHandle = window.setTimeout(() => {
+        if (typeof window.requestIdleCallback === "function") {
+          idleHandle = window.requestIdleCallback(() => markReady(), { timeout: 1000 });
+        } else {
+          markReady();
+        }
+      }, 3000);
     };
 
     if (document.readyState === "complete") {

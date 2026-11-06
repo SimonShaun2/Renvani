@@ -65,7 +65,7 @@ export function GrowthCheckPage({ website = "", action = submitGrowthCheck }: { 
             {GROWTH_CHECK.headline}
           </h1>
           <div className="flex flex-col gap-8 lg:flex-row lg:gap-12">
-            <form data-node-id="204:9519" action={formAction} onReset={(event) => event.preventDefault()} noValidate className="relative flex w-full flex-col gap-[14px] rounded-2xl border bg-white p-5 lg:w-[600px] lg:shrink-0" style={{ borderColor: line }}>
+            <form data-node-id="204:9519" action={formAction} noValidate className="relative flex w-full flex-col gap-[14px] rounded-2xl border bg-white p-5 lg:w-[600px] lg:shrink-0" style={{ borderColor: line }}>
               <LeadContactFields prefix="gc" values={last} errors={errors} />
               <Field id="gc-website" label="Business website" error={errors.websiteUrl}>
                 <TextInput id="gc-website" name="websiteUrl" inputMode="url" autoComplete="url" placeholder="yourbusiness.com" defaultValue={last.websiteUrl ?? website} maxLength={2048} error={errors.websiteUrl} />

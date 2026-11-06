@@ -14,7 +14,7 @@ The branch may have a later documentation-only handoff commit. Re-fetch the actu
 | Sprint / ticket | Actual artifact | Local state and boundary |
 | --- | --- | --- |
 | H1 / H01 | `source-register.json`; current PR/FS crosswalk; 16 source-path checks | Delivered. Board status and source capability deliberately distinguished; missing owners remain unassigned. |
-| H1 / H02 | `catalog.ts`; exact arithmetic helper/tests; identity policy | Delivered. 25 metric definitions including the four existing KPI meanings. Proposed financial policies are not silently approved. |
+| H1 / H02 | `catalog.ts`; exact arithmetic helper/tests; identity policy | Delivered. 24 metric definitions including the four existing KPI meanings. Proposed financial policies are not silently approved. |
 | H1 / H03 | `POLICY-AND-IDENTITY.md`; scope/read binding and projection rules/tests | Delivered. Shape/equality checks are not authentication or real RLS acceptance. |
 | H2 / H04 | `contracts.ts` and strict schemas/tests | Implemented: scopes, periods, source manifests, facts, quality, calculation lineage, claims, answers and non-executing proposals. |
 | H2 / H05 | 16 capability descriptors, typed readers and explicit unavailable reader | Implemented. All configured/validated/enabled flags remain false in the foundation catalog. |

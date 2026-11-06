@@ -4,7 +4,7 @@ Recorded November 6, 2026. Foundation artifacts implemented for review; no tenan
 
 ## Canonical artifacts
 
-The machine-readable source/FS register is `source-register.json`. Executable internal catalogs are `packages/types/src/connected-intelligence/v1/catalog.ts`: 25 metric definitions, 16 disabled capability descriptors and existing legacy meanings imported from the current registry. `recipes.ts` maps all 12 reviewed question IDs to required/optional sources. Both files remain outside public package exports and production consumers.
+The machine-readable source/FS register is `source-register.json`. Executable internal catalogs are `packages/types/src/connected-intelligence/v1/catalog.ts`: 24 metric definitions, 16 disabled capability descriptors and existing legacy meanings imported from the current registry. `recipes.ts` maps all 12 reviewed question IDs to required/optional sources. Both files remain outside public package exports and production consumers.
 
 The live board snapshot is metadata, not proof of a complete product. In particular FS-133 is marked Done while its inspected financial sync foundation remains narrower; FS-222's older Blocked record coexists with Done FS-235 provisioning. No board state or owner was changed. Null ownership means unassigned, not an invented team member. The current implementation lead is this ChatGPT task; independent reviewers remain unassigned.
 

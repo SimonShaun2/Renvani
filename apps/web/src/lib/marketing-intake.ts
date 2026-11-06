@@ -4,6 +4,7 @@ import {
   HOME_SERVICE_TRADES,
   MARKETING_HONEYPOT_FIELD,
   MARKETING_INTAKE_LIMITS,
+  MARKETING_TEAM_SIZES,
   MarketingDemoRequestBodySchema,
   MarketingGrowthCheckBodySchema,
   type HomeServiceTrade,
@@ -24,9 +25,11 @@ const L = MARKETING_INTAKE_LIMITS;
 
 /** Visitor-facing copy per field; the shared schemas carry developer messages. */
 const FIELD_MESSAGES: Record<string, { empty: string; invalid: string }> = {
+  firstName: { empty: "Enter your first name.", invalid: "Use 60 characters or fewer." },
+  lastName: { empty: "Enter your last name.", invalid: "Use 60 characters or fewer." },
   name: { empty: "Enter your name.", invalid: `Use ${L.name} characters or fewer.` },
   email: { empty: "Enter a complete email address.", invalid: "Enter a complete email address." },
-  phone: { empty: "Enter a 10-digit US phone number.", invalid: "Enter a 10-digit US phone number." },
+  phone: { empty: "Enter a contact number.", invalid: "Enter a 10-digit US phone number." },
   company: { empty: "Enter your business name.", invalid: `Use ${L.company} characters or fewer.` },
   trade: { empty: "Choose your trade.", invalid: "Choose your trade." },
   teamSize: { empty: "Choose your team size.", invalid: "Choose your team size." },
@@ -68,6 +71,8 @@ export function splitLocation(raw: string): { zip?: string; city?: string } {
  * only carries the Team size choice, so its errors belong to the "teamSize" select.
  */
 export function formFieldKey(kind: IntakeKind | undefined, apiField: string): string {
+  if (apiField === "name") return "lastName";
+  if (apiField.startsWith("contact.")) return apiField.slice(8);
   if (apiField === "zip" || apiField === "city") return "location";
   if (kind === "demo-requests" && apiField === "message") return "teamSize";
   return apiField;
@@ -77,7 +82,7 @@ export function formFieldKey(kind: IntakeKind | undefined, apiField: string): st
 export function fieldErrors(issues: z.ZodIssue[], raw: Record<string, unknown> = {}, kind?: IntakeKind): Record<string, string> {
   const out: Record<string, string> = {};
   for (const i of issues) {
-    const p = String(i.path[0] ?? "form");
+    const p = i.path[0] === "contact" ? String(i.path[1] ?? "form") : String(i.path[0] ?? "form");
     const key = formFieldKey(kind, p);
     const m = FIELD_MESSAGES[key];
     const v = key === "location" ? (raw.zip ?? raw.city) : raw[p];
@@ -138,11 +143,12 @@ const str = (fd: FormData, k: string) => {
 export function demoBodyFromForm(fd: FormData) {
   const teamSize = str(fd, "teamSize").trim();
   const raw = {
-    name: str(fd, "name").trim(),
+    name: `${str(fd, "firstName").trim()} ${str(fd, "lastName").trim()}`.trim(),
+    phone: str(fd, "phone").trim(),
     email: str(fd, "email").trim(),
     company: str(fd, "company").trim(),
     trade: str(fd, "trade"),
-    ...(teamSize ? { message: `Team size: ${teamSize}` } : {}),
+    ...(teamSize ? { message: `First name: ${str(fd, "firstName").trim()}\nLast name: ${str(fd, "lastName").trim()}\nTeam size: ${teamSize}` } : {}),
     hp: str(fd, MARKETING_HONEYPOT_FIELD)
   };
   return { raw, parsed: MarketingDemoRequestBodySchema.safeParse(raw) };
@@ -151,6 +157,7 @@ export function demoBodyFromForm(fd: FormData) {
 export function growthBodyFromForm(fd: FormData) {
   const raw = {
     websiteUrl: normalizeWebsite(str(fd, "websiteUrl")),
+    contact: { firstName: str(fd, "firstName").trim(), lastName: str(fd, "lastName").trim(), phone: str(fd, "phone").trim(), company: str(fd, "company").trim(), teamSize: str(fd, "teamSize").trim() },
     trade: str(fd, "trade"),
     ...splitLocation(str(fd, "location")),
     email: str(fd, "email").trim(),
@@ -163,15 +170,21 @@ export function growthBodyFromForm(fd: FormData) {
 export async function runIntake(kind: IntakeKind, fd: FormData, fetchImpl?: typeof fetch): Promise<IntakeResult> {
   if (str(fd, MARKETING_HONEYPOT_FIELD) !== "") return { status: "success", confirmationId: "" };
   const { raw, parsed } = kind === "demo-requests" ? demoBodyFromForm(fd) : growthBodyFromForm(fd);
-  // /demo asks for team size (Figma 246:5638 "Choose your team size."); the shared contract keeps `message` optional.
-  const missingTeamSize = kind === "demo-requests" && !str(fd, "teamSize").trim();
-  if (!parsed.success || missingTeamSize) {
-    const fields: Record<string, string> = parsed.success ? {} : fieldErrors(parsed.error.issues, raw, kind);
+  // Both public forms require all seven core fields; legacy API clients remain supported.
+  const contactErrors: Record<string, string> = {};
+  for (const key of ["firstName", "lastName", "phone", "company"] as const) {
+    const value = str(fd, key).trim();
+    if (!value) contactErrors[key] = FIELD_MESSAGES[key]!.empty;
+    else if ((key === "firstName" || key === "lastName") && value.length > 60) contactErrors[key] = FIELD_MESSAGES[key]!.invalid;
+  }
+  const missingTeamSize = !MARKETING_TEAM_SIZES.some(size => size === str(fd, "teamSize").trim());
+  if (!parsed.success || missingTeamSize || Object.keys(contactErrors).length > 0) {
+    const fields: Record<string, string> = { ...(parsed.success ? {} : fieldErrors(parsed.error.issues, raw, kind)), ...contactErrors };
     if (missingTeamSize) fields.teamSize ??= FIELD_MESSAGES.teamSize!.empty;
     // zod skips the object-level ZIP/city refine when a field already failed; report it together.
     if (kind === "growth-checks" && !str(fd, "location").trim()) fields.location ??= "Enter your ZIP or city.";
     return { status: "invalid", fields, message: INTAKE_MESSAGES.invalid };
   }
   // Send the validated input as typed (the API re-parses and normalizes it).
-  return postMarketingIntake(kind, raw as MarketingDemoRequestBody | MarketingGrowthCheckBody, fetchImpl);
+  return postMarketingIntake(kind, parsed.data, fetchImpl);
 }

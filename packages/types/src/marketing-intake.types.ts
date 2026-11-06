@@ -37,6 +37,16 @@ const phoneSchema = z
   .refine((d) => d.length === 10 || (d.length === 11 && d.startsWith("1")), "Invalid phone number")
   .transform((d) => `+1${d.slice(-10)}`);
 
+export const MARKETING_TEAM_SIZES = ["Just me", "2–5", "6–15", "16–50", "50+"] as const;
+export const MarketingLeadContactSchema = z.object({
+  firstName: z.string().trim().min(1).max(60),
+  lastName: z.string().trim().min(1).max(60),
+  phone: phoneSchema,
+  company: z.string().trim().min(1).max(L.company),
+  teamSize: z.enum(MARKETING_TEAM_SIZES)
+}).strict();
+export type MarketingLeadContact = z.output<typeof MarketingLeadContactSchema>;
+
 const honeypotSchema = z.string().max(L.honeypot).optional();
 
 export const MarketingDemoRequestBodySchema = z
@@ -70,6 +80,7 @@ const websiteUrlSchema = z
 export const MarketingGrowthCheckBodySchema = z
   .object({
     websiteUrl: websiteUrlSchema,
+    contact: MarketingLeadContactSchema.optional(),
     trade: HomeServiceTradeSchema,
     zip: z.string().trim().regex(/^\d{5}$/, "ZIP must be 5 digits").optional(),
     city: z.string().trim().min(1).max(L.city).optional(),

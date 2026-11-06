@@ -34,6 +34,7 @@ const INDUSTRY_HREFS = [INDUSTRIES_OVERVIEW.href, ...EXPECTED.map(([slug]) => `/
 const resolves = (h: string) => {
   const path = h.split("#")[0] || "/";
   if (h.startsWith("#")) return true;
+  if (path.startsWith("/marketing/product-screens/")) return existsSync(join(PUBLIC, path));
   if (path.startsWith("/product/")) return PRODUCT_PAGES.some((p) => `/product/${p.slug}` === path);
   if (INDUSTRY_HREFS.includes(path)) return true;
   return ["/", "/product", "/how-it-works", "/pricing", "/signup", "/demo", "/growth-check", "/login", "/tour"].includes(path);
@@ -50,9 +51,9 @@ describe("expanded marketing industries", () => {
   });
 
   for (const tree of ["hvac", "plumbing", "electrical"] as const) {
-    it(`preserves the current ${tree} desktop and mobile frames`, () => {
+    it(`renders the ${tree} detail page with one responsive heading`, () => {
       const { container } = render(<IndustryFrames tree={tree} />);
-      expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(2);
+      expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
       const hrefs = anchors(container);
       expect(hrefs).toContain("/demo");
       for (const h of hrefs) expect(resolves(h), h).toBe(true);

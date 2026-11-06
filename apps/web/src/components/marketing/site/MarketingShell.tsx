@@ -9,7 +9,7 @@ import { ProductsMenuPanel } from "./ProductsMenuPanel";
 import { SITE_FOOTER, SITE_NAV } from "./site-config";
 import styles from "./site.module.css";
 
-const serif = { fontFamily: "var(--font-mkt-serif), Georgia, serif", fontStyle: "italic" } as const;
+
 
 /** Shared marketing nav (200:521) and footer (200:530; tablet 768 per 253:6918 / 253:6961, md to below lg only). Server component. */
 export function MarketingShell({ children }: { children: ReactNode }) {
@@ -19,8 +19,8 @@ export function MarketingShell({ children }: { children: ReactNode }) {
       style={{ background: "var(--color-mkt-cream)", color: "var(--color-mkt-ink)", fontFamily: "var(--font-mkt-sans), system-ui, sans-serif" }}
     >
       <header data-node-id="203:4394" className="relative mx-auto flex h-[76px] max-w-[1440px] items-center justify-between gap-10 px-5 leading-[1.38] md:px-8 xl:h-[88px] xl:gap-0 xl:px-16">
-        <Link href="/" className="text-[26px] xl:w-[clamp(300px,calc(50vw_-_340px),380px)] xl:shrink-0 xl:text-[30px]" style={serif}>
-          Renvani
+        <Link href="/" className="text-[26px] xl:w-[clamp(300px,calc(50vw_-_340px),380px)] xl:shrink-0 xl:text-[30px]" >
+          <img src="/brand/logo-horizontal.svg" width={152} height={35} alt="Renvani" style={{ display: "block", width: 152, height: "auto" }} />
         </Link>
         <nav aria-label="Main" className="hidden flex-1 items-center justify-between gap-10 text-[14px] font-medium xl:ml-10 xl:flex" style={{ color: "var(--color-mkt-ink2)" }}>
           {SITE_NAV.links.map((l) =>
@@ -65,8 +65,8 @@ export function MarketingShell({ children }: { children: ReactNode }) {
       </header>
       <main>{children}</main>
       <footer data-node-id="203:4576" className="mx-auto flex max-w-[1440px] flex-col gap-6 leading-[1.38] px-6 py-6 md:grid md:grid-cols-[484px_204px] md:gap-x-4 md:gap-y-6 md:p-8 lg:flex lg:flex-row lg:flex-nowrap lg:items-start lg:justify-start lg:gap-6 lg:px-16 lg:py-16">
-        <p className="text-[28px] md:order-1 md:leading-[1.4] lg:w-[350px] lg:leading-[inherit]" style={serif}>
-          Renvani
+        <p className="text-[28px] md:order-1 md:leading-[1.4] lg:w-[350px] lg:leading-[inherit]" >
+          <img src="/brand/logo-horizontal.svg" width={152} height={35} alt="Renvani" style={{ display: "block", width: 152, height: "auto" }} />
         </p>
         <nav aria-label="Footer" className="flex flex-col gap-4 md:order-3 md:col-span-2 md:w-[704px] md:flex-row md:text-[14px] md:leading-[1.4] text-[12px] lg:order-2 lg:col-auto lg:w-[510px] lg:flex-wrap lg:text-[12px] lg:leading-[inherit]" style={{ color: "var(--color-mkt-ink2)" }}>
           {SITE_FOOTER.links.map((l) => (

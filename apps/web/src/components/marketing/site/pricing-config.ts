@@ -1,6 +1,6 @@
 /** Pricing plans (Figma 203:15719 / 203:15720). Single source for every figure on /pricing. */
 export type Plan = {
-  key: "flex" | "flat" | "founding" | "startup";
+  key: "flex" | "flat" | "startup";
   name: string;
   monthly: number;
   /** Customer-paid Service Fee, percent of the service subtotal, charged only at checkout and non-refundable. 0 = none. */
@@ -10,11 +10,13 @@ export type Plan = {
   program?: boolean;
 };
 
+/** Public website rate only. Actual billing is controlled by backend policy. */
+export const FLEX_SERVICE_FEE_PCT = 5;
+
 export const PLANS: Plan[] = [
-  { key: "flex", name: "Flex", monthly: 399, serviceFeePct: 2 },
+  { key: "flex", name: "Flex", monthly: 399, serviceFeePct: FLEX_SERVICE_FEE_PCT },
   { key: "flat", name: "Flat", monthly: 999, serviceFeePct: 0 },
-  { key: "founding", name: "Founding", monthly: 199, serviceFeePct: 2, basedOn: "flex", program: true },
-  { key: "startup", name: "Startup", monthly: 99, serviceFeePct: 2, basedOn: "flex", program: true }
+  { key: "startup", name: "Startup", monthly: 99, serviceFeePct: FLEX_SERVICE_FEE_PCT, basedOn: "flex", program: true }
 ];
 
 /** Annual billing = 10 × monthly ("2 months free annually"). */
@@ -65,7 +67,7 @@ export function demoPlanInterest(v: unknown): DemoPlanInterest | null {
   return v === "flex" || v === "flat" ? v : null;
 }
 
-/** "Flex · $399/mo + 2% customer-paid Service Fee" / "Flat · $999/mo · No customer-paid Service Fee", from pricing-config. */
+/** "Flex · $399/mo + 5% customer-paid Service Fee" / "Flat · $999/mo · No customer-paid Service Fee", from pricing-config. */
 export function planInterestLine(key: DemoPlanInterest): string {
   const p = PLANS.find((x) => x.key === key)!;
   const base = `${p.name} · $${p.monthly}/mo`;

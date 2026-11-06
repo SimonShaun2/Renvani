@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 
 import { cleanup, render, screen } from "@testing-library/react";
@@ -17,9 +17,14 @@ const COMPETITORS = /jobber|servicetitan|housecall|service fusion|fieldedge|owne
 const RESTAURANT = /restaurant|menu|diner|reservation|table/i;
 
 describe("marketing site (Figma 171:2)", () => {
-  it("competitor guard scans homepage, workflow, shared navigation, footer and founder copy", () => {
+  it("competitor guard scans homepage, workflow, shared navigation, footer, founder copy and content JSON", () => {
     const src = ["HomePage.tsx", "HomepageWorkflows.tsx", "home-workflows.ts", "IndustryShowcase.tsx", "site-config.ts", "MarketingShell.tsx", "FounderStory.tsx", "launch-content.ts"].map((f) => readFileSync(join(__dirname, f), "utf8")).join("\n");
-    expect(src + JSON.stringify(SITE_FOOTER)).not.toMatch(COMPETITORS);
+    const contentJsonDir = join(__dirname, "../../../content/data");
+    const json = readdirSync(contentJsonDir)
+      .filter((name: string) => name.endsWith(".json"))
+      .map((name: string) => readFileSync(join(contentJsonDir, name), "utf8"))
+      .join("\n");
+    expect(src + JSON.stringify(SITE_FOOTER) + json).not.toMatch(COMPETITORS);
     expect(COMPETITORS.test("Owner.com")).toBe(true);
     expect(COMPETITORS.test("Broccoli")).toBe(true);
   });

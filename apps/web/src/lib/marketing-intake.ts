@@ -2,12 +2,13 @@ import type { z } from "zod";
 
 import {
   HOME_SERVICE_TRADES,
+  MARKETING_TRADES,
   MARKETING_HONEYPOT_FIELD,
   MARKETING_INTAKE_LIMITS,
   MARKETING_TEAM_SIZES,
   MarketingDemoRequestBodySchema,
   MarketingGrowthCheckBodySchema,
-  type HomeServiceTrade,
+  MARKETING_TRADE_LABELS,
   type MarketingDemoRequestBody,
   type MarketingGrowthCheckBody,
   type MarketingIntakeResponse
@@ -16,10 +17,10 @@ import {
 import { API_BASE_URL } from "@/src/lib/api-base-url";
 
 /** Marketing intake contract (#328): schemas, limits, honeypot field and trades come from @fsm/types (the same ones the API validates with). */
-export { HOME_SERVICE_TRADES, MARKETING_HONEYPOT_FIELD, MarketingDemoRequestBodySchema, MarketingGrowthCheckBodySchema };
+export { HOME_SERVICE_TRADES, MARKETING_TRADES, MARKETING_HONEYPOT_FIELD, MarketingDemoRequestBodySchema, MarketingGrowthCheckBodySchema };
 export type { MarketingDemoRequestBody, MarketingGrowthCheckBody, MarketingIntakeResponse };
 
-export const TRADE_LABELS: Record<HomeServiceTrade, string> = { hvac: "HVAC", plumbing: "Plumbing", electrical: "Electrical", other: "Other home service" };
+export const TRADE_LABELS = MARKETING_TRADE_LABELS;
 
 const L = MARKETING_INTAKE_LIMITS;
 

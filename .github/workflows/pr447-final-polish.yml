@@ -1,0 +1,56 @@
+name: PR 447 verified asset polish
+on:
+  push:
+    branches: [design/reference-led-subpages-v2]
+    paths: [.github/workflows/pr447-final-polish.yml]
+permissions:
+  contents: write
+jobs:
+  apply-polish:
+    if: github.repository == 'SimonShaun2/Renvani' && github.event.head_commit.message == 'Stage PR 447 final asset corrections'
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 2
+      - name: Apply pinned verified preview patch
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD^)" = "8ef8539cc051617436d213f5e23f825ba156a4a7"
+          curl --fail --silent --show-error --location --max-time 60 --retry 2 'https://sb-6ruxbbn71rpn.vercel.run/pr447/brand-screens-forms.tar.gz' -o /tmp/pr447-polish.tar.gz
+          echo 'c910bf146bdab7f945e96b32349bbe3dfea3bce039796080ccb5c9d3eb60360e  /tmp/pr447-polish.tar.gz' | sha256sum --check
+          python3 - <<'PY'
+          import pathlib,tarfile
+          root=pathlib.Path.cwd().resolve()
+          allowed={
+             'apps/web/app/manifest.webmanifest',
+             'apps/web/middleware.ts',
+             'apps/web/public/icon-192.png',
+             'apps/web/public/icon-512.png',
+             'apps/web/public/icon-maskable-512.png',
+             'apps/web/public/marketing/product-screens/technician-app.avif',
+             'apps/web/src/middleware.clerk.test.ts',
+             'docs/design/pr447-brand-screens-forms.md'
+          }
+          with tarfile.open('/tmp/pr447-polish.tar.gz') as archive:
+              members=archive.getmembers()
+              assert len(members)==len(allowed), 'Unexpected file count'
+              assert {m.name.removeprefix('./') for m in members}==allowed, 'Unexpected file set'
+              for m in members:
+                  assert m.isfile() and m.size < 120000 and not m.issym() and not m.islnk()
+                  path=pathlib.PurePosixPath(m.name)
+                  assert not path.is_absolute() and '..' not in path.parts
+                  target=root/path
+                  assert target.resolve().is_relative_to(root)
+                  target.parent.mkdir(parents=True,exist_ok=True)
+                  target.write_bytes(archive.extractfile(m).read())
+                  target.chmod(0o644)
+          PY
+          git diff --check
+          git add -- apps/web/app/manifest.webmanifest apps/web/middleware.ts apps/web/public/icon-192.png apps/web/public/icon-512.png apps/web/public/icon-maskable-512.png apps/web/public/marketing/product-screens/technician-app.avif apps/web/src/middleware.clerk.test.ts docs/design/pr447-brand-screens-forms.md
+          git config user.name 'Renvani Build Assistant'
+          git config user.email 'renvani-build@users.noreply.github.com'
+          git commit -m 'Finish public brand assets and garage-door tablet illustration'
+          git push origin HEAD:refs/heads/design/reference-led-subpages-v2

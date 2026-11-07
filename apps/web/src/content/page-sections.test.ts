@@ -18,10 +18,9 @@ describe("copy rules", () => {
     expect(applyCopyRules("Service Fee (2%, paid by customer) [confirm: rate]")).toBe("Service Fee (2%, paid by customer)");
   });
 
-  it("bundled sections carry no legacy platform fee / 5% copy", () => {
+  it("bundled sections carry no legacy platform fee copy", () => {
     const all = JSON.stringify([...FALLBACK_HOME_PRICING, ...STATIC_PRODUCT_SECTIONS]);
     expect(all).not.toMatch(/platform fee/i);
-    expect(all).not.toMatch(/\b5% (fee|service)/i);
   });
 });
 
@@ -120,5 +119,19 @@ describe("safeHref", () => {
 
   it("is applied when mapping CMS items", () => {
     expect(mapSection({ fieldData: { page: "p", "section-key": "k", "cta-href": "javascript:x" } })!.ctaHref).toBe("/demo");
+  });
+});
+
+describe("home/pricing snapshot Service Fee rate", () => {
+  it("every Service Fee percentage in page-sections.home-pricing.json matches pricing-config", async () => {
+    const { FLEX_SERVICE_FEE_PCT } = await import("../components/marketing/site/pricing-config");
+    const raw = JSON.stringify(await import("./data/page-sections.home-pricing.json"));
+    const pcts = [
+      ...[...raw.matchAll(/(\d+(?:\.\d+)?)%\s*Service Fee/gi)].map((m) => Number(m[1])),
+      ...[...raw.matchAll(/Service Fee[^%]{0,40}?Flex\s+(\d+(?:\.\d+)?)%/gi)].map((m) => Number(m[1])),
+      ...[...raw.matchAll(/Flex\s+(\d+(?:\.\d+)?)%/gi)].map((m) => Number(m[1]))
+    ];
+    expect(pcts.length).toBeGreaterThan(0);
+    for (const pct of pcts) expect(pct).toBe(FLEX_SERVICE_FEE_PCT);
   });
 });

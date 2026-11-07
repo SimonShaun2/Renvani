@@ -4,7 +4,19 @@
  */
 import { z } from "zod";
 
-import { HomeServiceTradeSchema } from "./home-services/trade.js";
+/** Public lead classification only; this does not enable trade-specific app workflows. */
+export const MARKETING_TRADES = [
+  "hvac", "plumbing", "electrical", "appliance-repair", "garage-doors", "locksmith", "cleaning",
+  "pest-control", "chimney", "pressure-washing", "tree-care", "alarm", "air-duct", "carpet-cleaning", "other"
+] as const;
+export const MarketingTradeSchema = z.enum(MARKETING_TRADES);
+export type MarketingTrade = z.infer<typeof MarketingTradeSchema>;
+export const MARKETING_TRADE_LABELS: Record<MarketingTrade, string> = {
+  hvac: "HVAC & Refrigeration", plumbing: "Plumbing", electrical: "Electrical",
+  "appliance-repair": "Appliance Repair", "garage-doors": "Overhead & Garage Door", locksmith: "Locksmith",
+  cleaning: "Cleaning", "pest-control": "Pest Control", chimney: "Chimney", "pressure-washing": "Pressure Washing",
+  "tree-care": "Tree Care", alarm: "Alarm", "air-duct": "Air Duct", "carpet-cleaning": "Carpet Cleaning", other: "Other home service"
+};
 
 /** Honeypot field: real users never fill it (hide it with CSS). When non-empty the API returns the normal success shape and persists nothing. */
 export const MARKETING_HONEYPOT_FIELD = "hp" as const;
@@ -55,7 +67,7 @@ export const MarketingDemoRequestBodySchema = z
     email: emailSchema,
     phone: z.union([phoneSchema, z.literal("").transform(() => undefined)]).optional(),
     company: z.string().trim().min(1).max(L.company),
-    trade: HomeServiceTradeSchema,
+    trade: MarketingTradeSchema,
     message: z.string().trim().max(L.message).optional(),
     hp: honeypotSchema
   })
@@ -81,7 +93,7 @@ export const MarketingGrowthCheckBodySchema = z
   .object({
     websiteUrl: websiteUrlSchema,
     contact: MarketingLeadContactSchema.optional(),
-    trade: HomeServiceTradeSchema,
+    trade: MarketingTradeSchema,
     zip: z.string().trim().regex(/^\d{5}$/, "ZIP must be 5 digits").optional(),
     city: z.string().trim().min(1).max(L.city).optional(),
     email: emailSchema,

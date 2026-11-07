@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 
 import { cleanup, render, screen } from "@testing-library/react";
@@ -17,11 +17,22 @@ const COMPETITORS = /jobber|servicetitan|housecall|service fusion|fieldedge|owne
 const RESTAURANT = /restaurant|menu|diner|reservation|table/i;
 
 describe("marketing site (Figma 171:2)", () => {
-  it("competitor guard scans homepage, workflow, shared navigation and footer copy", () => {
-    const src = ["HomePage.tsx", "HomepageWorkflows.tsx", "home-workflows.ts", "IndustryShowcase.tsx", "site-config.ts", "MarketingShell.tsx"].map((f) => readFileSync(join(__dirname, f), "utf8")).join("\n");
-    expect(src + JSON.stringify(SITE_FOOTER)).not.toMatch(COMPETITORS);
+  it("competitor guard scans homepage, workflow, shared navigation, footer, founder copy and content JSON", () => {
+    const src = ["HomePage.tsx", "HomepageWorkflows.tsx", "home-workflows.ts", "IndustryShowcase.tsx", "site-config.ts", "MarketingShell.tsx", "FounderStory.tsx", "launch-content.ts"].map((f) => readFileSync(join(__dirname, f), "utf8")).join("\n");
+    const contentJsonDir = join(__dirname, "../../../content/data");
+    const json = readdirSync(contentJsonDir)
+      .filter((name: string) => name.endsWith(".json"))
+      .map((name: string) => readFileSync(join(contentJsonDir, name), "utf8"))
+      .join("\n");
+    expect(src + JSON.stringify(SITE_FOOTER) + json).not.toMatch(COMPETITORS);
     expect(COMPETITORS.test("Owner.com")).toBe(true);
     expect(COMPETITORS.test("Broccoli")).toBe(true);
+  });
+
+  it("founder copy names no past companies", () => {
+    const founder = ["FounderStory.tsx", "launch-content.ts"].map((f) => readFileSync(join(__dirname, f), "utf8")).join("\n");
+    expect(founder).not.toMatch(/Service Fusion|ServiceGanja|STACS/i);
+    expect(founder).not.toMatch(/early team|through the exit|through its exit/i);
   });
 
   it("footer year is computed and the example has no fixed calendar date", () => {
@@ -32,8 +43,8 @@ describe("marketing site (Figma 171:2)", () => {
   it("uses one responsive hero and one photograph across breakpoints", () => {
     const { container } = render(<HomePage />);
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
-    expect(screen.getByRole("heading", { name: "More jobs. Less on your shoulders." })).toBeTruthy();
-    const hero = screen.getByRole("region", { name: "More jobs. Less on your shoulders." });
+    expect(screen.getByRole("heading", { name: "More direct jobs. More repeat customers." })).toBeTruthy();
+    const hero = screen.getByRole("region", { name: "More direct jobs. More repeat customers." });
     const heroImages = [...hero.querySelectorAll("img")].filter((image) => image.getAttribute("src")?.includes("f1266660"));
     expect(heroImages).toHaveLength(1);
     expect(container.querySelector("a a")).toBeNull();

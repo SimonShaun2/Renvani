@@ -2,13 +2,13 @@ import type { Metadata } from "next";
 
 import type { CmsDoc } from "@/src/sanity/fetch";
 import { CMS_TYPES, type CmsType } from "@/src/sanity/env";
-import { publicSiteUrl } from "./public-sitemap";
+import { publicSiteUrl } from "./public-site-origin";
 
 export function cmsPath(type: CmsType, slug: string): string {
   return `${CMS_TYPES[type]}/${encodeURIComponent(slug)}`;
 }
 
-/** Absolute when PUBLIC_SITE_URL is set; otherwise the site-relative path. */
+/** Absolute on an explicitly configured production deployment; otherwise site-relative. */
 export function canonicalUrl(path: string, env: NodeJS.ProcessEnv = process.env): string {
   const base = publicSiteUrl(env);
   return base ? `${base}${path}` : path;
@@ -19,9 +19,11 @@ export function cmsMetadata(type: CmsType, doc: CmsDoc, env: NodeJS.ProcessEnv =
   const description = doc.metaDescription || doc.excerpt || undefined;
   const image = doc.featuredImage?.url;
   const url = canonicalUrl(cmsPath(type, doc.slug), env);
+  const indexable = publicSiteUrl(env) !== null;
   return {
     title,
     description,
+    robots: { index: indexable, follow: indexable },
     alternates: { canonical: url },
     openGraph: {
       type: "article",

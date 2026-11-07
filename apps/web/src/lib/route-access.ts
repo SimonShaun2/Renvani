@@ -127,6 +127,15 @@ export function isPublicRoute(pathname: string): boolean {
     return true;
   }
 
+  // Marketing media under /public/media — known static extensions only.
+  if (
+    segments[0] === "media" &&
+    segments.length >= 2 &&
+    /\.(?:webm|mp4|jpe?g|png|webp|avif|gif|vtt)$/i.test(segments[segments.length - 1] ?? "")
+  ) {
+    return true;
+  }
+
   if (segments[0] === "book" && segments.length >= 2) {
     return true;
   }

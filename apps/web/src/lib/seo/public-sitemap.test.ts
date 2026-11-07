@@ -100,7 +100,7 @@ describe("robots", () => {
       expect(list(rule?.allow)).toEqual(ROBOTS_ALLOW.map((a) => a.prefix));
       expect(list(rule?.allow)).toEqual(expect.arrayContaining(["/", "/sitemap.xml", "/sitemap-index.xml", "/sitemap/"]));
       expect(list(rule?.disallow)).not.toContain("/");
-      expect(list(rule?.disallow)).toEqual(expect.arrayContaining(["/studio", "/api/", "/book/*/manage"]));
+      expect(list(rule?.disallow)).toEqual(expect.arrayContaining(["/studio$", "/studio?", "/studio/", "/api$", "/api?", "/api/", "/book/*/manage$"]));
       for (const path of ["/site/summit", "/site/summit/ac-repair/78701", "/book/summit"]) expect(isCrawlable(robots, path), path).toBe(true);
       expect(isCrawlable(robots, "/book/summit/manage")).toBe(false);
       expect(robots.sitemap).toEqual(["https://s.example/sitemap.xml", "https://s.example/sitemap-index.xml"]);
@@ -145,7 +145,7 @@ describe("robots", () => {
     for (const prefix of [...APP_ROUTE_PREFIXES, ...AUTH_ROUTES, "/booking-requests"]) {
       for (const path of [prefix, `${prefix}?q=1`, `${prefix}/x`]) expect(isCrawlable(robots, path), path).toBe(false);
     }
-    for (const path of ["/growth-check", "/growth-check?ref=x", "/approve", "/applications", "/products-guide", "/product?x=1", "/pricing?plan=pro",
+    for (const path of ["/growth-check", "/growth-check?ref=x", "/approve-guide", "/applications", "/products-guide", "/product?x=1", "/pricing?plan=pro",
       "/blog?page=2", "/industries/hvac?x=1", "/settings-help", "/authors", "/sign-installers"]) {
       expect(isCrawlable(robots, path), path).toBe(true);
     }

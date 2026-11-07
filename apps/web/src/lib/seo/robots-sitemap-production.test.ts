@@ -28,7 +28,7 @@ describe("production robots.txt", () => {
 
   it("disallows /studio, /api, auth pages and every signed-in route from route-access", () => {
     const robots = buildPublicRobots(PROD);
-    expect(ROBOTS_DISALLOW).toEqual(expect.arrayContaining(["/studio", "/api/", "/login$", "/login/"]));
+    expect(ROBOTS_DISALLOW).toEqual(expect.arrayContaining(["/studio$", "/studio?", "/studio/", "/api$", "/api?", "/api/", "/login$", "/login?", "/login/"]));
     for (const path of ["/studio", "/studio/structure", "/api/revalidate", "/api/v1/x", "/login", "/signup", "/verify-email", "/onboarding/workspace"]) {
       expect(crawlable(robots, path), path).toBe(false);
     }

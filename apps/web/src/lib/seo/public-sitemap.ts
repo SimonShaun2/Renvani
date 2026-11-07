@@ -36,7 +36,10 @@ export const ROBOTS_ALLOW = [
  * Exact path, any query on it, and everything below it, without catching siblings (/growth must not block
  * /growth-check). `$` anchors the end of the full URL including the query, so `/x?` is needed for `/x?a=b`.
  */
-const pathAndBelow = (prefix: string) => [`${prefix}$`, `${prefix}?`, `${prefix}/`];
+const pathAndBelow = (prefix: string) => {
+  const path = prefix.replace(/\/+$/, "");
+  return [`${path}$`, `${path}?`, `${path}/`];
+};
 
 /** Reserved private aliases with no routes today; kept out of the index if they are ever added. */
 const RESERVED_PRIVATE_PREFIXES = ["/app", "/auth", "/sign-in", "/sign-up"] as const;
@@ -49,21 +52,24 @@ const TOKEN_PREFIXES = ["/pay/", "/approve/", "/portal", "/review/", "/vip/"] as
 
 /**
  * Explicit disallows: CMS Studio, every API route, auth pages, onboarding, every signed-in app route from route-access,
- * token-scoped customer pages and transactional booking steps.
+ * token-scoped customer pages and transactional booking steps. Normalize trailing slashes before generating the
+ * same exact/query/directory boundaries for every prefix; dedupe overlaps between the route registries.
  */
-export const ROBOTS_DISALLOW = [
+export const ROBOTS_DISALLOW = [...new Set([
   "/studio",
-  "/api/",
-  ...AUTH_ROUTES.flatMap(pathAndBelow),
-  ...NO_ROLE_SETUP_ROUTES.flatMap(pathAndBelow),
-  ...[...APP_ROUTE_PREFIXES.filter((p) => p !== "/studio"), ...EXTRA_PRIVATE_PREFIXES].flatMap(pathAndBelow),
-  ...RESERVED_PRIVATE_PREFIXES.flatMap(pathAndBelow),
+  "/api",
+  "/onboarding",
+  ...AUTH_ROUTES,
+  ...NO_ROLE_SETUP_ROUTES,
+  ...APP_ROUTE_PREFIXES,
+  ...EXTRA_PRIVATE_PREFIXES,
+  ...RESERVED_PRIVATE_PREFIXES,
   ...TOKEN_PREFIXES,
   "/book/*/manage",
   "/book/*/confirm",
   "/book/*/confirmed",
   "/book/*/commit"
-] as const;
+].flatMap(pathAndBelow))];
 
 /** The flat sitemap crawlers and robots.txt point at (marketing, industries, blog, compare). */
 export const SITEMAP_PATH = "/sitemap.xml";

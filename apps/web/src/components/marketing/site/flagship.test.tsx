@@ -89,7 +89,7 @@ describe("flagship + product-detail + tool pages (Figma 175:3…175:4156, 215:63
   });
 
   it("sitemap lists every product page", () => {
-    const urls = buildMarketingSitemap({ PUBLIC_SITE_URL: "https://x.test" } as unknown as NodeJS.ProcessEnv).map((e) => e.url);
+    const urls = buildMarketingSitemap({ VERCEL_ENV: "production", PUBLIC_SITE_URL: "https://x.test" } as unknown as NodeJS.ProcessEnv).map((e) => e.url);
     for (const s of SLUGS) expect(urls).toContain(`https://x.test/product/${s}`);
   });
 

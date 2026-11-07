@@ -186,7 +186,7 @@ describe("CMS routes", () => {
 
 describe("CMS metadata and JSON-LD", () => {
   it("sets title, description, absolute canonical and OG article fields", () => {
-    const md = cmsMetadata("comparisonPage", doc, { PUBLIC_SITE_URL: "https://getrenvani.com" } as unknown as NodeJS.ProcessEnv);
+    const md = cmsMetadata("comparisonPage", doc, { VERCEL_ENV: "production", PUBLIC_SITE_URL: "https://getrenvani.com" } as unknown as NodeJS.ProcessEnv);
     expect(md.title).toBe(doc.metaTitle);
     expect(md.description).toBe(doc.metaDescription);
     expect(md.alternates?.canonical).toBe("https://getrenvani.com/compare/booking-tips");
@@ -316,7 +316,7 @@ describe("Studio page gate (verified Clerk auth only)", () => {
 
 describe("CMS sitemap entries", () => {
   it("lists /blog plus every published post and comparison slug", async () => {
-    const entries = await buildCmsSitemap({ PUBLIC_SITE_URL: "https://getrenvani.com" } as unknown as NodeJS.ProcessEnv, async () => [
+    const entries = await buildCmsSitemap({ VERCEL_ENV: "production", PUBLIC_SITE_URL: "https://getrenvani.com" } as unknown as NodeJS.ProcessEnv, async () => [
       { _type: "post", slug: "booking-tips", _updatedAt: "2026-11-02T00:00:00Z" },
       { _type: "comparisonPage", slug: "switching-guide" }
     ]);
@@ -329,6 +329,6 @@ describe("CMS sitemap entries", () => {
 
   it("is empty without PUBLIC_SITE_URL and only /blog without CMS content", async () => {
     expect(await buildCmsSitemap({} as unknown as NodeJS.ProcessEnv, async () => [{ _type: "post", slug: "x" }])).toEqual([]);
-    expect((await buildCmsSitemap({ PUBLIC_SITE_URL: "https://getrenvani.com" } as unknown as NodeJS.ProcessEnv, async () => [])).map((e) => e.url)).toEqual(["https://getrenvani.com/blog"]);
+    expect((await buildCmsSitemap({ VERCEL_ENV: "production", PUBLIC_SITE_URL: "https://getrenvani.com" } as unknown as NodeJS.ProcessEnv, async () => [])).map((e) => e.url)).toEqual(["https://getrenvani.com/blog"]);
   });
 });

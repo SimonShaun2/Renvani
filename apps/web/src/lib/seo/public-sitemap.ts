@@ -21,45 +21,55 @@ export const SHOP_PAGE_TYPES = [
 ] as const;
 
 /**
- * Robots is deny-by-default: `Disallow: /` plus explicit allows from this registry. Everything else, including every
- * signed-in route under app/(app), app/(auth) and app/(mobile), stays disallowed. Add a public surface here to expose it.
+ * Production robots is allow-by-default (`Allow: /`) so every public page, including ones added later (marketing,
+ * industries, blog, compare, legal, sitemaps), is crawlable without a registry edit. Private surfaces are blocked
+ * explicitly below; the longest matching rule wins, so these disallows beat `Allow: /`.
  */
 export const ROBOTS_ALLOW = [
-  { key: "home", prefix: "/$" }, // marketing home (exact)
-  { key: "pricing", prefix: "/pricing" },
-  { key: "product", prefix: "/product/" },
-  { key: "tour", prefix: "/tour" },
-  { key: "products", prefix: "/product$" }, // products directory (exact)
-  { key: "how-it-works", prefix: "/how-it-works" },
-  { key: "industries", prefix: "/industries" },
-  { key: "demo", prefix: "/demo" },
-  { key: "growth-check", prefix: "/growth-check" },
-  { key: "shop-site", prefix: "/site/" }, // shop sites + /site/:slug/inquire
-  { key: "service-area", prefix: "/site/*/*/" }, // /site/:slug/:service/:area (explicit; also under /site/)
-  { key: "public-booking", prefix: "/book/" },
-  { key: "blog", prefix: "/blog" },
-  { key: "compare", prefix: "/compare/" }
+  { key: "site", prefix: "/" },
+  { key: "sitemap", prefix: "/sitemap.xml" },
+  { key: "sitemap-index", prefix: "/sitemap-index.xml" },
+  { key: "sitemap-chunks", prefix: "/sitemap/" }
 ] as const;
 
-/** Exact path and everything below it, without catching siblings (e.g. /growth must not block /growth-check). */
-const pathAndBelow = (prefix: string) => [`${prefix}$`, `${prefix}/`];
+/**
+ * Exact path, any query on it, and everything below it, without catching siblings (/growth must not block
+ * /growth-check). `$` anchors the end of the full URL including the query, so `/x?` is needed for `/x?a=b`.
+ */
+const pathAndBelow = (prefix: string) => {
+  const path = prefix.replace(/\/+$/, "");
+  return [`${path}$`, `${path}?`, `${path}/`];
+};
+
+/** Reserved private aliases with no routes today; kept out of the index if they are ever added. */
+const RESERVED_PRIVATE_PREFIXES = ["/app", "/auth", "/sign-in", "/sign-up"] as const;
+
+/** Signed-in pages that exist under app/(app) but are not in any role list (kept out of the index regardless). */
+const EXTRA_PRIVATE_PREFIXES = ["/booking-requests"] as const;
+
+/** Token-scoped customer pages (payment links, approvals, portal, reviews, VIP invites): reachable, never indexed. */
+const TOKEN_PREFIXES = ["/pay/", "/approve/", "/portal", "/review/", "/vip/"] as const;
 
 /**
- * Explicit disallows (longest rule wins over an allow): tokenized/transactional paths under allowed prefixes, the
- * CMS Studio, every API route, auth pages and every signed-in app route from route-access.
+ * Explicit disallows: CMS Studio, every API route, auth pages, onboarding, every signed-in app route from route-access,
+ * token-scoped customer pages and transactional booking steps. Normalize trailing slashes before generating the
+ * same exact/query/directory boundaries for every prefix; dedupe overlaps between the route registries.
  */
-export const ROBOTS_DISALLOW = [
-  "/",
+export const ROBOTS_DISALLOW = [...new Set([
+  "/studio",
+  "/api",
+  "/onboarding",
+  ...AUTH_ROUTES,
+  ...NO_ROLE_SETUP_ROUTES,
+  ...APP_ROUTE_PREFIXES,
+  ...EXTRA_PRIVATE_PREFIXES,
+  ...RESERVED_PRIVATE_PREFIXES,
+  ...TOKEN_PREFIXES,
   "/book/*/manage",
   "/book/*/confirm",
   "/book/*/confirmed",
-  "/book/*/commit",
-  "/studio",
-  "/api/",
-  ...AUTH_ROUTES.flatMap(pathAndBelow),
-  ...NO_ROLE_SETUP_ROUTES.flatMap(pathAndBelow),
-  ...APP_ROUTE_PREFIXES.filter((p) => p !== "/studio").flatMap(pathAndBelow)
-] as const;
+  "/book/*/commit"
+].flatMap(pathAndBelow))];
 
 /** The flat sitemap crawlers and robots.txt point at (marketing, industries, blog, compare). */
 export const SITEMAP_PATH = "/sitemap.xml";
@@ -237,7 +247,8 @@ export async function buildSiteSitemapXml(
 
 export function buildPublicRobots(env: NodeJS.ProcessEnv = process.env): MetadataRoute.Robots {
   const base = publicSiteUrl(env);
-  // Previews / unconfigured deploys: block everything and advertise no sitemap.
+  // Anything but an explicitly identified production deployment (see isProductionDeployment): block everything and
+  // advertise no sitemap, even when PUBLIC_SITE_URL names production.
   if (!base) return { rules: [{ userAgent: "*", disallow: "/" }] };
   return {
     rules: [{ userAgent: "*", allow: ROBOTS_ALLOW.map((a) => a.prefix), disallow: [...ROBOTS_DISALLOW] }],

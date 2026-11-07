@@ -100,7 +100,7 @@ describe("expanded marketing industries", () => {
   });
 
   it("every advertised industry is public and appears once in the sitemap", () => {
-    const urls = buildMarketingSitemap({ PUBLIC_SITE_URL: "https://x.test" } as unknown as NodeJS.ProcessEnv).map((e) => e.url);
+    const urls = buildMarketingSitemap({ VERCEL_ENV: "production", PUBLIC_SITE_URL: "https://x.test" } as unknown as NodeJS.ProcessEnv).map((e) => e.url);
     for (const h of INDUSTRY_HREFS) {
       expect(isPublicRoute(h)).toBe(true);
       expect(urls.filter((url) => url === `https://x.test${h}`)).toHaveLength(1);

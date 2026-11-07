@@ -27,7 +27,7 @@ export default async function BlogIndex() {
           {posts.map((p) => (
             <li key={p.slug}>
               <Link href={cmsPath("post", p.slug)} className="text-[24px] font-semibold hover:underline">{p.title}</Link>
-              {p.metaDescription ? <p className="mt-2 text-[16px]" style={{ color: "var(--color-mkt-ink2)" }}>{p.metaDescription}</p> : null}
+              {p.excerpt || p.metaDescription ? <p className="mt-2 text-[16px]" style={{ color: "var(--color-mkt-ink2)" }}>{p.excerpt || p.metaDescription}</p> : null}
             </li>
           ))}
         </ul>

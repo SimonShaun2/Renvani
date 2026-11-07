@@ -2,20 +2,29 @@ import { createClient } from "next-sanity";
 import type { PortableTextBlock } from "@portabletext/react";
 
 import { SANITY_API_VERSION, cmsTag, readSanityEnv, type CmsType } from "./env";
-import { DOC_QUERY, LIST_QUERY, SLUGS_QUERY } from "./queries";
+import { COMPARISON_QUERY, LIST_QUERY, POST_QUERY, SLUGS_QUERY } from "./queries";
 
 export type CmsFaq = { question: string; answer: string };
+export type CmsImage = { url?: string | null; alt?: string | null };
+export type CmsCta = { label?: string | null; href?: string | null };
+export type CmsRelated = { title: string; slug: string; excerpt?: string | null };
 export type CmsDoc = {
   title: string;
   slug: string;
-  seoTitle?: string | null;
+  metaTitle?: string | null;
   metaDescription?: string | null;
-  ogImageUrl?: string | null;
+  targetKeyword?: string | null;
+  excerpt?: string | null;
+  featuredImage?: CmsImage | null;
+  author?: string | null;
   publishedAt?: string | null;
+  updatedAt?: string | null;
   body?: PortableTextBlock[] | null;
+  relatedPosts?: CmsRelated[] | null;
+  cta?: CmsCta | null;
   faq?: CmsFaq[] | null;
 };
-export type CmsListItem = Pick<CmsDoc, "title" | "slug" | "metaDescription" | "publishedAt">;
+export type CmsListItem = Pick<CmsDoc, "title" | "slug" | "metaDescription" | "excerpt" | "publishedAt">;
 export type CmsSlug = { _type: CmsType; slug: string; _updatedAt?: string };
 
 /** ISR fallback; publishes go live sooner via /api/revalidate tags. */
@@ -46,7 +55,7 @@ export function fetchCmsList(type: CmsType): Promise<CmsListItem[]> {
 }
 
 export function fetchCmsDoc(type: CmsType, slug: string): Promise<CmsDoc | null> {
-  return safeFetch<CmsDoc | null>(DOC_QUERY, { type, slug }, [cmsTag(type), cmsTag(type, slug)], null);
+  return safeFetch<CmsDoc | null>(type === "post" ? POST_QUERY : COMPARISON_QUERY, { slug }, [cmsTag(type), cmsTag(type, slug)], null);
 }
 
 export function fetchCmsSlugs(): Promise<CmsSlug[]> {

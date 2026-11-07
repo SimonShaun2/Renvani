@@ -3,9 +3,17 @@ export const SANITY_API_VERSION = "2025-01-01";
 
 export type SanityEnv = { projectId: string; dataset: string };
 
-export function readSanityEnv(env: NodeJS.ProcessEnv = process.env): SanityEnv | null {
-  const projectId = env.NEXT_PUBLIC_SANITY_PROJECT_ID?.trim();
-  const dataset = env.NEXT_PUBLIC_SANITY_DATASET?.trim();
+/**
+ * Literal `process.env.NEXT_PUBLIC_*` reads so Next.js inlines them into the client Studio bundle.
+ * Do not alias, destructure or index process.env here.
+ */
+export function readSanityEnv(): SanityEnv | null {
+  return validateSanityEnv(process.env.NEXT_PUBLIC_SANITY_PROJECT_ID, process.env.NEXT_PUBLIC_SANITY_DATASET);
+}
+
+export function validateSanityEnv(rawProjectId: string | undefined, rawDataset: string | undefined): SanityEnv | null {
+  const projectId = rawProjectId?.trim();
+  const dataset = rawDataset?.trim();
   if (!projectId || !dataset || !/^[a-z0-9-]+$/.test(projectId) || !/^[a-z0-9_-]+$/.test(dataset)) return null;
   return { projectId, dataset };
 }

@@ -15,8 +15,9 @@ export function canonicalUrl(path: string, env: NodeJS.ProcessEnv = process.env)
 }
 
 export function cmsMetadata(type: CmsType, doc: CmsDoc, env: NodeJS.ProcessEnv = process.env): Metadata {
-  const title = doc.seoTitle || `${doc.title} · Renvani`;
-  const description = doc.metaDescription ?? undefined;
+  const title = doc.metaTitle || `${doc.title} · Renvani`;
+  const description = doc.metaDescription || doc.excerpt || undefined;
+  const image = doc.featuredImage?.url;
   const url = canonicalUrl(cmsPath(type, doc.slug), env);
   return {
     title,
@@ -29,7 +30,9 @@ export function cmsMetadata(type: CmsType, doc: CmsDoc, env: NodeJS.ProcessEnv =
       url,
       siteName: "Renvani",
       ...(doc.publishedAt ? { publishedTime: doc.publishedAt } : {}),
-      ...(doc.ogImageUrl ? { images: [{ url: doc.ogImageUrl }] } : {})
+      ...(doc.updatedAt ? { modifiedTime: doc.updatedAt } : {}),
+      ...(doc.author ? { authors: [doc.author] } : {}),
+      ...(image ? { images: [{ url: image, ...(doc.featuredImage?.alt ? { alt: doc.featuredImage.alt } : {}) }] } : {})
     }
   };
 }
@@ -42,10 +45,13 @@ export function cmsJsonLd(type: CmsType, doc: CmsDoc, env: NodeJS.ProcessEnv = p
   const article: JsonLd = {
     "@context": "https://schema.org",
     "@type": "Article",
-    headline: doc.seoTitle || doc.title,
-    ...(doc.metaDescription ? { description: doc.metaDescription } : {}),
+    headline: doc.metaTitle || doc.title,
+    ...(doc.metaDescription || doc.excerpt ? { description: doc.metaDescription || doc.excerpt } : {}),
     ...(doc.publishedAt ? { datePublished: doc.publishedAt } : {}),
-    ...(doc.ogImageUrl ? { image: [doc.ogImageUrl] } : {}),
+    ...(doc.updatedAt || doc.publishedAt ? { dateModified: doc.updatedAt || doc.publishedAt } : {}),
+    ...(doc.featuredImage?.url ? { image: [doc.featuredImage.url] } : {}),
+    ...(doc.author ? { author: { "@type": "Person", name: doc.author } } : {}),
+    ...(doc.targetKeyword ? { keywords: doc.targetKeyword } : {}),
     mainEntityOfPage: url,
     publisher: { "@type": "Organization", name: "Renvani" }
   };

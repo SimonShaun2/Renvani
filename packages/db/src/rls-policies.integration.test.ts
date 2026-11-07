@@ -3,6 +3,8 @@ import { randomUUID } from "node:crypto";
 import { eq, inArray, sql } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
+import { runSerializedRoleGrants } from "./test-support/serialized-role-grants.js";
+
 import { FS_MIGRATE_RLS_POLICY_CATALOG } from "./rls-policy-catalog.js";
 
 const neonCiUrl = process.env.NEON_CI_DATABASE_URL?.trim();
@@ -43,16 +45,14 @@ describe.runIf(postgresIntegrationEnabled)("STACK-10 RLS policies (Postgres / Ne
     )) as unknown as { rolbypassrls: boolean }[];
     useProbeRole = self?.rolbypassrls === true;
     if (!useProbeRole) return;
-    await db.execute(
-      sql.raw(`DO $$ BEGIN
+    await runSerializedRoleGrants(db, [
+      `DO $$ BEGIN
         CREATE ROLE ${RLS_PROBE_ROLE} NOLOGIN NOSUPERUSER NOBYPASSRLS;
-      EXCEPTION WHEN duplicate_object OR unique_violation THEN NULL; END $$`)
-    );
-    await db.execute(sql.raw(`GRANT ${RLS_PROBE_ROLE} TO CURRENT_USER`));
-    await db.execute(sql.raw(`GRANT USAGE ON SCHEMA public TO ${RLS_PROBE_ROLE}`));
-    await db.execute(
-      sql.raw(`GRANT SELECT ON customers, import_sessions, jobs TO ${RLS_PROBE_ROLE}`)
-    );
+      EXCEPTION WHEN duplicate_object OR unique_violation THEN NULL; END $$`,
+      `GRANT ${RLS_PROBE_ROLE} TO CURRENT_USER`,
+      `GRANT USAGE ON SCHEMA public TO ${RLS_PROBE_ROLE}`,
+      `GRANT SELECT ON customers, import_sessions, jobs TO ${RLS_PROBE_ROLE}`
+    ]);
   });
 
   async function readAsTenant<T>(

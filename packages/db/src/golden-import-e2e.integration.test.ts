@@ -2,6 +2,8 @@ import { randomUUID } from "node:crypto";
 
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
+import { runSerializedRoleGrants } from "./test-support/serialized-role-grants.js";
+
 import {
   GOLDEN_IMPORT_E2E_EXPECTATIONS,
   GOLDEN_IMPORT_E2E_INVOICE_BALANCES,
@@ -42,20 +44,19 @@ describe.runIf(postgresIntegrationEnabled)("FS-152 golden import e2e (Neon CI)",
   const RLS_READER_ROLE = "golden_e2e_rls_reader";
 
   async function ensureRlsReaderRole(): Promise<void> {
-    const { sql } = await import("drizzle-orm");
     const { db } = await import("./client.js");
-    await db.execute(
-      sql.raw(`DO $$
+    await runSerializedRoleGrants(db, [
+      `DO $$
 BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = '${RLS_READER_ROLE}') THEN
     CREATE ROLE ${RLS_READER_ROLE} NOLOGIN NOSUPERUSER NOBYPASSRLS;
   END IF;
 END
-$$`)
-    );
-    await db.execute(sql.raw(`GRANT USAGE ON SCHEMA public TO ${RLS_READER_ROLE}`));
-    await db.execute(sql.raw(`GRANT SELECT ON TABLE customers TO ${RLS_READER_ROLE}`));
-    await db.execute(sql.raw(`GRANT ${RLS_READER_ROLE} TO CURRENT_USER`));
+$$`,
+      `GRANT USAGE ON SCHEMA public TO ${RLS_READER_ROLE}`,
+      `GRANT SELECT ON TABLE customers TO ${RLS_READER_ROLE}`,
+      `GRANT ${RLS_READER_ROLE} TO CURRENT_USER`
+    ]);
   }
 
   afterAll(async () => {

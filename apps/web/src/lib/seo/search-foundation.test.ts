@@ -6,7 +6,7 @@ import { serializeJsonLd, withMarketingSeo } from "./marketing-metadata";
 import { HOME_SEARCH_COPY, INDUSTRY_SEARCH_COPY, PRODUCT_SEARCH_TITLES, industrySearchCopy, productSearchCopy,
   breadcrumbStructuredData, websiteStructuredData } from "./search-foundation";
 
-const prod = { VERCEL_ENV: "production", VERCEL_TARGET_ENV: "production", PUBLIC_SITE_URL: "https://getrenvani.com" } as NodeJS.ProcessEnv;
+const prod = { VERCEL_ENV: "production", VERCEL_TARGET_ENV: "production", PUBLIC_SITE_URL: "https://getrenvani.com" } as unknown as NodeJS.ProcessEnv;
 describe("search foundation route integration", () => {
   it("covers exactly the shipped route inventories", () => {
     expect(Object.keys(INDUSTRY_SEARCH_COPY).sort()).toEqual(INDUSTRY_PAGES.map(p => p.slug).sort());

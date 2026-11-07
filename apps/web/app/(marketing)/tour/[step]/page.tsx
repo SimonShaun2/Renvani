@@ -1,3 +1,4 @@
+import { withMarketingSeo } from "@/src/lib/seo/marketing-metadata";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
@@ -14,7 +15,7 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ step: string }> }): Promise<Metadata> {
   const { step } = await params;
   const s = TOUR_STEP_BY_SLUG[step];
-  return s ? tourMeta(s) : {};
+  return s && s !== TOUR_STEPS[0] ? withMarketingSeo(`/tour/${s.slug}`, tourMeta(s)) : {};
 }
 
 export default async function Page({ params }: { params: Promise<{ step: string }> }) {

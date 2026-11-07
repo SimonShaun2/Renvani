@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 
 import { ClickToPlayVideo } from "./ClickToPlayVideo";
+import { LAUNCH_HOME } from "./launch-content";
 import { HomepageWorkflows } from "./HomepageWorkflows";
 import { HeroLoop } from "./HeroLoop";
 import { MEDIA } from "./media-loops";
@@ -25,15 +26,15 @@ export function GrowthCheckEntry({ id, className = "" }: { id: string; className
 export function HomePage() {
   return (
     <div className={styles.home} data-node-id="578:5186">
-      <section className={styles.hero} aria-labelledby="home-hero" data-node-id="578:5188">
+      <section className={styles.hero} aria-labelledby="home-hero" data-node-id={LAUNCH_HOME.heroNode}>
         <div className={styles.heroPhoto} data-node-id="578:5189">
           <HeroLoop />
         </div>
         <div className={styles.heroShade} aria-hidden="true" />
         <div className={styles.heroContent}>
           <p className={styles.eyebrow}>FOR HOME &amp; FIELD SERVICE BUSINESSES</p>
-          <h1 id="home-hero" className={styles.heroTitle}><span>More jobs.</span>{" "}<span>Less on your</span>{" "}<span>shoulders.</span></h1>
-          <p className={styles.heroDescription}>Renvani connects getting found, booking work, running the job and bringing customers back.</p>
+          <h1 id="home-hero" className={styles.heroTitle}>{LAUNCH_HOME.headline.map((line, index) => <span key={line}>{index > 0 ? " " : ""}{line}</span>)}</h1>
+          <p className={styles.heroDescription}>{LAUNCH_HOME.description}</p>
           <div className={styles.heroActions}>
             <Link href="#product-workflows" className={`${styles.button} ${styles.amberButton}`}>See Renvani in action</Link>
             <Link href="/growth-check" className={`${styles.button} ${styles.lightButton}`}>Get my growth report</Link>

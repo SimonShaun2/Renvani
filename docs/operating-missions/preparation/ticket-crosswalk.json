@@ -1,0 +1,2985 @@
+{
+  "schemaVersion": "1.0.0",
+  "documentId": "OM-PREP-01",
+  "preparedOn": "2026-11-05",
+  "baseCommit": "7840884d346ca95788e2668cc78148afa3b6a843",
+  "repositoryUrl": "https://github.com/SimonShaun2/Renvani",
+  "sourceNotionUrl": "https://app.notion.com/p/40e317b92d1581188031e8a0a4c847c9",
+  "preparationStatus": "complete",
+  "implementationStatus": "not_started",
+  "runtimeAcceptanceStatus": "not_executed",
+  "implementationOwner": null,
+  "scope": "Read-only source/ticket reconciliation and local documentation. No application code, migration, CI, provider execution, remote ticket mutation, assignment or status promotion.",
+  "reviewCoverage": "Ten named tickets only: FS-257/258 and FS-262–269. Ownership gaps are gaps in the reviewed ticket scope, not a claim that the entire board was inventoried.",
+  "sources": [
+    {
+      "id": "OM-PLAN",
+      "fileName": "Renvani_Operating_Missions_Build_Plan_v1.md",
+      "documentVersion": "1.1",
+      "documentDate": "2026-11-04",
+      "sha256": "a7cc3bb379db8de032c4d3442ba53426bc8175f62bb506a905d7ae0a02a15d71",
+      "sections": [
+        "§3 source starting point",
+        "§6 delivery waves",
+        "§7 work packages",
+        "§4.1 optional evaluation"
+      ]
+    },
+    {
+      "id": "OM-SPEC",
+      "fileName": "Renvani_Operating_Missions_Build_Spec_v1.md",
+      "documentVersion": "1.1",
+      "documentDate": "2026-11-04",
+      "sha256": "ef54c1d4c5d5b3d0f769c563ac1f1443fcb68d6b0ed27f518ee7d64e5603dd68",
+      "sections": [
+        "§4 shared contracts",
+        "§5 persistence",
+        "§19 API/event/source layout",
+        "§20 release controls",
+        "§21 acceptance matrix"
+      ]
+    }
+  ],
+  "revisionInterpretation": "The older FS tickets describe a four-choice direct-bookings scope. The current v1.1 source baseline has six missions and thirteen core work packages. The plan's specific revision-1.1 change adds optional Render evaluation; it does not newly introduce or change the six-mission core, delivery order or release authority.",
+  "historicalSourceBaseline": "b45b4996b64b16859e44a79b171b11cbe52c3e6a",
+  "globalImplementationGates": [
+    "Original Part I acceptance and founder permission for Part II implementation remain required. This preparation does not assert that they have occurred.",
+    "Codex Lead/Technical Lead coordinates dependency-cleared work. Mandatory E.. CoS dispatch/CI/review/merge gates are superseded by the current repository directive.",
+    "Independent peer, QA and Security-by-risk review, authorized scoped CI and exact-head founder merge approval remain required for later changes.",
+    "Production rollout, provider spending, customer contact and live payment behavior require their existing explicit authority; no such execution is part of this preparation."
+  ],
+  "baselineReconciliation": {
+    "currentDevCommit": "7840884d346ca95788e2668cc78148afa3b6a843",
+    "observationDate": "2026-11-05",
+    "mergedRelevantPrs": [
+      {
+        "number": 430,
+        "url": "https://github.com/SimonShaun2/Renvani/pull/430",
+        "meaning": "Bounded consent foundation is merged; full capture/provider delivery acceptance is not implied."
+      },
+      {
+        "number": 440,
+        "url": "https://github.com/SimonShaun2/Renvani/pull/440",
+        "meaning": "Inventory/preparation documentation is merged; not runtime mission implementation."
+      }
+    ],
+    "pendingHolds": [
+      {
+        "number": 419,
+        "url": "https://github.com/SimonShaun2/Renvani/pull/419",
+        "headSha": "b2093ae9abe81f70ead48dea07fba69f2fc365ff",
+        "area": "Environment/security",
+        "disposition": "HOLD",
+        "implementationOrMergeChangeMade": false
+      },
+      {
+        "number": 431,
+        "url": "https://github.com/SimonShaun2/Renvani/pull/431",
+        "headSha": "4959cb9921ba741bccc77e00187d625c3ca2a67b",
+        "area": "STOP",
+        "disposition": "HOLD",
+        "implementationOrMergeChangeMade": false
+      },
+      {
+        "number": 432,
+        "url": "https://github.com/SimonShaun2/Renvani/pull/432",
+        "headSha": "98e5e935db39fb2108a67c2268b65f23989ac95f",
+        "area": "Owner UI/login",
+        "disposition": "HOLD",
+        "implementationOrMergeChangeMade": false
+      },
+      {
+        "number": 435,
+        "url": "https://github.com/SimonShaun2/Renvani/pull/435",
+        "headSha": "47e5b0dd4237903e5bc5437a74280812bcf692f5",
+        "area": "Revenue UI",
+        "disposition": "HOLD",
+        "implementationOrMergeChangeMade": false
+      },
+      {
+        "number": 437,
+        "url": "https://github.com/SimonShaun2/Renvani/pull/437",
+        "headSha": "cf133f9353803e1e8d664c23932a845f80160bbc",
+        "area": "Operator screens",
+        "disposition": "HOLD",
+        "implementationOrMergeChangeMade": false
+      },
+      {
+        "number": 438,
+        "url": "https://github.com/SimonShaun2/Renvani/pull/438",
+        "headSha": "e7b416f21b460c115eafa8726b940951702c4577",
+        "area": "Settings",
+        "disposition": "HOLD",
+        "implementationOrMergeChangeMade": false
+      },
+      {
+        "number": 439,
+        "url": "https://github.com/SimonShaun2/Renvani/pull/439",
+        "headSha": "935d37b0fa54f68b2ec88eb76ef6e4e30823c161",
+        "area": "Marketing",
+        "disposition": "HOLD",
+        "implementationOrMergeChangeMade": false
+      }
+    ],
+    "uiIntegrationOrder": [
+      432,
+      435,
+      437,
+      438
+    ],
+    "statusEvidence": "Parent task's current-head handoff, plus targeted source review in this preparation. No CI or deployed behavior was retested here."
+  },
+  "missionCatalog": [
+    {
+      "missionType": "more_bookings",
+      "label": "Get more bookings",
+      "priorConcept": "Get more direct bookings",
+      "disposition": "Broader current mission; retain historical stored identifiers until an explicit migration is reviewed."
+    },
+    {
+      "missionType": "monthly_revenue",
+      "label": "Increase my monthly revenue",
+      "priorConcept": null,
+      "disposition": "Umbrella commercial mission coordinating eligible proven strategies; source facts are counted once."
+    },
+    {
+      "missionType": "average_job_value",
+      "label": "Increase my average job value",
+      "priorConcept": null,
+      "disposition": "Distinct outcome with fixed opportunity eligibility and contribution safeguards."
+    },
+    {
+      "missionType": "repeat_business",
+      "label": "Get more repeat business",
+      "priorConcept": "Generate more repeat business",
+      "disposition": "Current label; preserve legitimate due-service/renewal and cohort requirements."
+    },
+    {
+      "missionType": "faster_payment",
+      "label": "Get paid faster",
+      "priorConcept": null,
+      "disposition": "Distinct completion-to-invoice and invoice-to-payment outcome; open invoices stay in evaluation."
+    },
+    {
+      "missionType": "organize_business",
+      "label": "Organize my business",
+      "priorConcept": null,
+      "disposition": "Distinct verified resolution outcome; unknown facts do not become completed corrections."
+    }
+  ],
+  "supersededMenuConcepts": [
+    {
+      "priorConcept": "Convert more estimates",
+      "currentPlacement": "Shared estimate_recovery and inquiry_conversion methods",
+      "notASeventhMission": true
+    },
+    {
+      "priorConcept": "Keep my crews booked",
+      "currentPlacement": "Capacity, feasibility and scheduling support across applicable missions",
+      "notASeventhMission": true
+    }
+  ],
+  "tickets": [
+    {
+      "id": "FS-257",
+      "title": "AOF-B: Business Operating Profile v1",
+      "url": "https://app.notion.com/p/40a317b92d1581d89515d171ffaad95c",
+      "lastEditedAt": "2026-10-31T15:52:41.379Z",
+      "observedOn": "2026-11-05",
+      "observedStatus": "Backlog",
+      "observedOwnerRole": null,
+      "observedCodexOwner": null,
+      "observedHeadSha": null,
+      "observedPr": null,
+      "observedEvidence": null,
+      "observedDependencies": "AOF-A action contract. Migration: next free index after 0059 (FS-212 #362), check journal + open PRs first.",
+      "observedNextAction": "Wait for AOF-A contract; then design on existing companies.settings.",
+      "implementationOwner": null,
+      "implementationStatus": "not_started",
+      "statusChangeRequested": false,
+      "kind": "part_i_predecessor",
+      "retainedScope": "Versioned operating policy around companies.settings and existing preferences, defaults, trade configuration, tenant context and agent policies; owner activation/revision and action-pinned policy versions.",
+      "delta": "Reuse the accepted Part I operating profile as an input to mission snapshots and bounded authority. Reconcile mission-specific capability scopes; do not create a second operating profile.",
+      "superseded": "The old migration-tail reference after 0059 is historical. Select the next free index from the current journal and open PRs only at implementation.",
+      "relationship": "Part I A4 predecessor; not a new OM implementation assignment.",
+      "packageIds": [
+        "OM-01",
+        "OM-02",
+        "OM-05",
+        "OM-06",
+        "OM-09",
+        "OM-10",
+        "OM-12"
+      ],
+      "decisionRefs": [
+        "OM-D04",
+        "OM-D06",
+        "OM-D12"
+      ],
+      "followUp": "Retain FS-257 and its acceptance owner. Confirm accepted AOF-A/profile contracts and the version consumers before OM implementation.",
+      "evidenceRefs": [
+        "CE-01",
+        "CE-02",
+        "CE-03",
+        "CE-14"
+      ]
+    },
+    {
+      "id": "FS-258",
+      "title": "AOF-C: First Completed Agent Workflow (estimate follow-up)",
+      "url": "https://app.notion.com/p/40a317b92d158145aa0fdfbb44f926ed",
+      "lastEditedAt": "2026-10-31T15:52:42.900Z",
+      "observedOn": "2026-11-05",
+      "observedStatus": "Backlog",
+      "observedOwnerRole": null,
+      "observedCodexOwner": null,
+      "observedHeadSha": null,
+      "observedPr": null,
+      "observedEvidence": null,
+      "observedDependencies": "AOF-A; #301 (consent); AOF-B where needed",
+      "observedNextAction": "Wait for AOF-A and #301.",
+      "implementationOwner": null,
+      "implementationStatus": "not_started",
+      "statusChangeRequested": false,
+      "kind": "part_i_predecessor",
+      "retainedScope": "Complete a verified estimate follow-up through proposal, current consent/policy validation, approval, durable integration outbox, provider delivery/failure/retry and response-to-estimate/payment linkage.",
+      "delta": "Reuse the accepted complete workflow as estimate_recovery.v1 and shared contact/delivery infrastructure; retain distinct prepared, approved, queued, accepted, delivered and business-outcome states.",
+      "superseded": "Waiting for #301 is stale because it is merged; #430 is also merged. Neither merge proves the full provider workflow or STOP race acceptance.",
+      "relationship": "Part I A4 predecessor; not a duplicate Part II follow-up implementation.",
+      "packageIds": [
+        "OM-01",
+        "OM-03",
+        "OM-09",
+        "OM-10",
+        "OM-11",
+        "OM-12"
+      ],
+      "decisionRefs": [
+        "OM-D04",
+        "OM-D05",
+        "OM-D09",
+        "OM-D12"
+      ],
+      "followUp": "Verify accepted provider workflow and consent boundaries before inheriting them. Reuse existing implementation and extend only the reviewed mission consumers.",
+      "evidenceRefs": [
+        "CE-03",
+        "CE-04",
+        "CE-05",
+        "CE-07"
+      ]
+    },
+    {
+      "id": "FS-262",
+      "title": "Initiative: Outcome Missions — Get More Direct Bookings (Integrated Renvani)",
+      "url": "https://app.notion.com/p/40c317b92d15811e9d6ed98d950b2bce",
+      "lastEditedAt": "2026-11-02T18:10:05.976Z",
+      "observedOn": "2026-11-05",
+      "observedStatus": "Backlog",
+      "observedOwnerRole": "Product Owner",
+      "observedCodexOwner": null,
+      "observedHeadSha": null,
+      "observedPr": null,
+      "observedEvidence": null,
+      "observedDependencies": "Existing FS-255/256 trusted execution; FS-257 operating profile; FS-22/207 attribution; FS-31/229 owned inquiry; FS-231 two-trade acceptance; existing P0 WIP. E.. CoS readiness required.",
+      "observedNextAction": "HOLD in Backlog. The founder requires original Renvani release-scope completion, QA/staging acceptance and an explicit approval before any FS-262–269 implementation. Use consolidated master sequence <mention url=\"https://app.notion.com/p/40c317b92d15812b8ed9c7ead55480e4\" />. After approval, Product/Tech Lead reconcile FS-263 and E.. CoS dispatches by WIP.",
+      "implementationOwner": null,
+      "implementationStatus": "not_started",
+      "statusChangeRequested": false,
+      "kind": "existing_mission_ticket",
+      "retainedScope": "Integrated mission capability within the existing five flagship areas; authoritative domain records, owner control, confirmed booking identity, source truth and independent acceptance.",
+      "delta": "Reconcile the initiative with six missions, the actual thirteen OM work packages, shared methods and three evidence dimensions. Preserve external acquisition for both new and established businesses.",
+      "superseded": "The direct-bookings-only initiative title and mandatory CoS gate text do not define the current six-mission implementation scope or authority.",
+      "relationship": "Existing initiative anchor, not a new initiative and not an implementation-complete claim.",
+      "packageIds": [
+        "OM-01",
+        "OM-02",
+        "OM-03",
+        "OM-04",
+        "OM-05",
+        "OM-06",
+        "OM-07",
+        "OM-08",
+        "OM-09",
+        "OM-10",
+        "OM-11",
+        "OM-12",
+        "OM-13"
+      ],
+      "decisionRefs": [
+        "OM-D12"
+      ],
+      "followUp": "Annotate retained scope and accepted delta under the existing initiative when board reconciliation is authorized; keep status Backlog.",
+      "evidenceRefs": [
+        "CE-01",
+        "CE-15"
+      ]
+    },
+    {
+      "id": "FS-263",
+      "title": "Outcome Missions: define shared mission intent, readiness and authority contract",
+      "url": "https://app.notion.com/p/40c317b92d15817da2e1ec7d67cc67ff",
+      "lastEditedAt": "2026-11-02T18:10:08.312Z",
+      "observedOn": "2026-11-05",
+      "observedStatus": "Backlog",
+      "observedOwnerRole": "Product Owner",
+      "observedCodexOwner": null,
+      "observedHeadSha": null,
+      "observedPr": null,
+      "observedEvidence": null,
+      "observedDependencies": "FS-255/256 trusted execution; FS-257 Business Operating Profile; FS-22/207 source-truth contracts; Product and Tech Lead acceptance.",
+      "observedNextAction": "HOLD Backlog until founder signs original software completion/QA gate per <mention url=\"https://app.notion.com/p/40c317b92d15812b8ed9c7ead55480e4\" />. After release gate, Product Owner/Tech Lead sign mission intent/readiness/authority contract; E.. CoS authorizes dispatch. No Codex implementation beforehand.",
+      "implementationOwner": null,
+      "implementationStatus": "not_started",
+      "statusChangeRequested": false,
+      "kind": "existing_mission_ticket",
+      "retainedScope": "Shared mission intent, readiness (Assess/Assist/Operate), source truth and authority contract; selecting a goal does not grant permission, and existing context/actions remain the foundation.",
+      "delta": "Six definitions, method dependencies, per-capability readiness, scoped grants, lifecycle/outcome distinctions and shared resource/evidence contracts replace the earlier narrow intent contract.",
+      "superseded": "Four choices, one direct-booking bottleneck and three preview choices are superseded; mandatory CoS dispatch text is historical.",
+      "relationship": "Contract-only anchor. Its explicit no-implementation/no-PR/no-migration/no-outbound/no-production scope does not own OM runtime automatically.",
+      "packageIds": [
+        "OM-01",
+        "OM-02",
+        "OM-03",
+        "OM-04",
+        "OM-05",
+        "OM-06",
+        "OM-07",
+        "OM-08",
+        "OM-09",
+        "OM-10",
+        "OM-11",
+        "OM-12"
+      ],
+      "decisionRefs": [
+        "OM-D01",
+        "OM-D04",
+        "OM-D06",
+        "OM-D07",
+        "OM-D09",
+        "OM-D11",
+        "OM-D12",
+        "OM-D13"
+      ],
+      "followUp": "Approve the contract delta here; record separate implementation scope/ownership under the existing initiative before runtime assignment.",
+      "evidenceRefs": [
+        "CE-02",
+        "CE-03",
+        "CE-14"
+      ]
+    },
+    {
+      "id": "FS-264",
+      "title": "Outcome Missions: embed four-choice mission picker in existing owner onboarding",
+      "url": "https://app.notion.com/p/40c317b92d1581129d99ff01f6ef171e",
+      "lastEditedAt": "2026-11-02T17:24:42.706Z",
+      "observedOn": "2026-11-05",
+      "observedStatus": "Backlog",
+      "observedOwnerRole": null,
+      "observedCodexOwner": null,
+      "observedHeadSha": null,
+      "observedPr": null,
+      "observedEvidence": null,
+      "observedDependencies": "FS-263 mission contract; existing FS-257 operating profile; FS-222/235 Clerk onboarding; Product/Design canonical Figma handoff; E.. CoS WIP authorization.",
+      "observedNextAction": "E.. CoS confirm prerequisites and original code owners, then authorize the smallest bounded implementation and exact-head QA/CI.",
+      "implementationOwner": null,
+      "implementationStatus": "not_started",
+      "statusChangeRequested": false,
+      "kind": "existing_mission_ticket",
+      "retainedScope": "Existing owner onboarding and Command Center, tenant goal persistence, reversible selection, truthful partial states, owner/admin access, keyboard/accessibility and 390/834/1440 layouts.",
+      "delta": "Six labels and readiness, assessment, plan review, bounded approval, progress, pause and outcome-state combinations in existing owner surfaces.",
+      "superseded": "The explicit four-choice picker title/body is superseded. A conceptual screenshot is not an approved Figma frame.",
+      "relationship": "Existing selection/UI anchor with explicit scope extension for full mission states.",
+      "packageIds": [
+        "OM-06",
+        "OM-09",
+        "OM-13"
+      ],
+      "decisionRefs": [
+        "OM-D04",
+        "OM-D08",
+        "OM-D12"
+      ],
+      "followUp": "Coordinate the pending UI stack, approved contract and exact canonical design frames; retain Backlog until gates clear.",
+      "evidenceRefs": [
+        "CE-10"
+      ]
+    },
+    {
+      "id": "FS-265",
+      "title": "Direct Bookings: rank source-backed growth-to-capacity bottlenecks",
+      "url": "https://app.notion.com/p/40c317b92d1581b68e42ced55bf69145",
+      "lastEditedAt": "2026-11-02T17:24:44.351Z",
+      "observedOn": "2026-11-05",
+      "observedStatus": "Backlog",
+      "observedOwnerRole": null,
+      "observedCodexOwner": null,
+      "observedHeadSha": null,
+      "observedPr": null,
+      "observedEvidence": null,
+      "observedDependencies": "FS-263 metric/readiness contract; FS-35/53–57/230 Growth Check; FS-22/64 & FS-207 source evidence; FS-17/21/23 inquiries/booking/capacity.",
+      "observedNextAction": "E.. CoS confirm prerequisites and original code owners, then authorize the smallest bounded implementation and exact-head QA/CI.",
+      "implementationOwner": null,
+      "implementationStatus": "not_started",
+      "statusChangeRequested": false,
+      "kind": "existing_mission_ticket",
+      "retainedScope": "Source-backed diagnosis with hard tenant/service/trade/availability/consent/freshness/deduplication checks before ranking; honest unknown history and HVAC/plumbing coverage.",
+      "delta": "Broaden diagnosis across demand, conversion, value, fulfillment, repeat, collection and internal readiness; deterministic method eligibility and fixed Organize detectors precede bounded specialist judgment.",
+      "superseded": "A universal direct-booking score is not the mission selector. Missing history cannot force an established/new business through internal recovery or block a suitable bounded external test.",
+      "relationship": "Existing diagnosis anchor; material-readiness, Organize and monthly portfolio scope must be reconciled.",
+      "packageIds": [
+        "OM-05",
+        "OM-08",
+        "OM-09",
+        "OM-10",
+        "OM-11",
+        "OM-12"
+      ],
+      "decisionRefs": [
+        "OM-D01",
+        "OM-D06",
+        "OM-D07",
+        "OM-D11",
+        "OM-D12",
+        "OM-D13"
+      ],
+      "followUp": "Preserve useful hard checks and source fields; document authoritative rule inputs and explicit unsupported/unknown states.",
+      "evidenceRefs": [
+        "CE-07",
+        "CE-08",
+        "CE-09"
+      ]
+    },
+    {
+      "id": "FS-266",
+      "title": "Direct Bookings: preserve owned inquiry source through real booking and job",
+      "url": "https://app.notion.com/p/40c317b92d158104aa84cc9e39c1e26b",
+      "lastEditedAt": "2026-11-02T17:24:46.427Z",
+      "observedOn": "2026-11-05",
+      "observedStatus": "Backlog",
+      "observedOwnerRole": null,
+      "observedCodexOwner": null,
+      "observedHeadSha": null,
+      "observedPr": null,
+      "observedEvidence": null,
+      "observedDependencies": "FS-263; FS-31/216–218 owned site; FS-229 verified trade/neutral defaults and Product decision; FS-245 serviceability; FS-17 intake, FS-21 booking, FS-207 attribution; existing PR ownership.",
+      "observedNextAction": "E.. CoS confirm prerequisites and original code owners, then authorize the smallest bounded implementation and exact-head QA/CI.",
+      "implementationOwner": null,
+      "implementationStatus": "not_started",
+      "statusChangeRequested": false,
+      "kind": "existing_mission_ticket",
+      "retainedScope": "Owned inquiry-to-qualification-to-available-appointment-to-confirmed-job lineage; real source kinds including unknown, tenant deduplication/anti-bot controls, service ZIP/capacity/holds and retry-safe commitments.",
+      "delta": "Connect the owned path to approved Google Search campaigns, source attribution, real provider proof and complete booking/fulfillment reconciliation.",
+      "superseded": "The ticket explicitly excludes an ad-buying tool. Google Search connector work cannot silently be represented as already covered by FS-266.",
+      "relationship": "Owned-path anchor only for the old scope; paid acquisition is a genuine scope/ownership gap requiring OM-D12.",
+      "packageIds": [
+        "OM-05",
+        "OM-09",
+        "OM-10",
+        "OM-13"
+      ],
+      "decisionRefs": [
+        "OM-D06",
+        "OM-D07",
+        "OM-D09",
+        "OM-D12"
+      ],
+      "followUp": "Keep the existing intake/booking work; approve an explicit connector scope extension or separately scoped child under FS-262 after duplicate/scope review. This preparation creates neither.",
+      "evidenceRefs": [
+        "CE-08",
+        "CE-11"
+      ]
+    },
+    {
+      "id": "FS-267",
+      "title": "Outcome Missions: convert diagnosed booking opportunities into safe existing action proposals",
+      "url": "https://app.notion.com/p/40c317b92d15813fbbc4fbf949ea8a7b",
+      "lastEditedAt": "2026-11-02T17:24:48.767Z",
+      "observedOn": "2026-11-05",
+      "observedStatus": "Backlog",
+      "observedOwnerRole": null,
+      "observedCodexOwner": null,
+      "observedHeadSha": null,
+      "observedPr": null,
+      "observedEvidence": null,
+      "observedDependencies": "FS-263 and FS-265 diagnosis (FS-266 for booking commitment); existing FS-194/255/256/257 proposal/policy; FS-233/234 and PR #301 before any outbound; FS-258 for consented estimate follow-up.",
+      "observedNextAction": "E.. CoS confirm prerequisites and original code owners, then authorize the smallest bounded implementation and exact-head QA/CI.",
+      "implementationOwner": null,
+      "implementationStatus": "not_started",
+      "statusChangeRequested": false,
+      "kind": "existing_mission_ticket",
+      "retainedScope": "Safe existing action proposals with typed targets, source/record versions, actor/policy/idempotency, execution-time consent and availability, owner pause and truthful draft/blocked behavior.",
+      "delta": "All shared methods, capability grants, semantic intent/cadence/resource arbitration, durable dispatch uncertainty, plan supersession and independently authorized shared cancellation.",
+      "superseded": "The prior four action kinds do not bound the current method portfolio. #301 alone does not prove full outbound readiness; mandatory CoS text is superseded.",
+      "relationship": "Existing action-integration anchor; it does not automatically own the mission state machine, bounded specialist runtime or every commercial method.",
+      "packageIds": [
+        "OM-02",
+        "OM-03",
+        "OM-05",
+        "OM-07",
+        "OM-08",
+        "OM-09",
+        "OM-10",
+        "OM-11",
+        "OM-12"
+      ],
+      "decisionRefs": [
+        "OM-D04",
+        "OM-D05",
+        "OM-D06",
+        "OM-D09",
+        "OM-D10",
+        "OM-D12",
+        "OM-D13"
+      ],
+      "followUp": "Reconcile method/runtime ownership and consumer contracts before implementation; reuse trusted action/domain services.",
+      "evidenceRefs": [
+        "CE-03",
+        "CE-04",
+        "CE-05",
+        "CE-06",
+        "CE-07",
+        "CE-08",
+        "CE-09",
+        "CE-12",
+        "CE-13"
+      ]
+    },
+    {
+      "id": "FS-268",
+      "title": "Direct Bookings: show mission decisions and verified conversion outcomes in owner brief",
+      "url": "https://app.notion.com/p/40c317b92d158136b32ceff431b2cddb",
+      "lastEditedAt": "2026-11-02T17:24:50.769Z",
+      "observedOn": "2026-11-05",
+      "observedStatus": "Backlog",
+      "observedOwnerRole": null,
+      "observedCodexOwner": null,
+      "observedHeadSha": null,
+      "observedPr": null,
+      "observedEvidence": null,
+      "observedDependencies": "FS-264 picker + FS-265 diagnosis + FS-266 owned bookings + FS-267 action events; FS-22/64 and FS-207 source attribution; FS-29/219 owner brief; avoid overlapping FS-63.",
+      "observedNextAction": "E.. CoS confirm prerequisites and original code owners, then authorize the smallest bounded implementation and exact-head QA/CI.",
+      "implementationOwner": null,
+      "implementationStatus": "not_started",
+      "statusChangeRequested": false,
+      "kind": "existing_mission_ticket",
+      "retainedScope": "Existing Command Center narrative with source evidence; distinct inquiry, booking, completion and payment; cohort conversion, refunds, honest unknowns and assistance rather than unsupported causal claims.",
+      "delta": "All six metrics; earned/invoiced/cash separation; frozen eligibility; cost completeness; linked adjustments once; non-additive contributors; workflow, observed outcome and estimated effect statuses.",
+      "superseded": "Direct-bookings-only reporting and existing legacy paid/invoice/estimate fallback cannot define OM earned revenue or complete contribution.",
+      "relationship": "Existing reporting anchor; projection/cohort/economic foundations require explicit implementation ownership beyond owner-brief UI.",
+      "packageIds": [
+        "OM-04",
+        "OM-06",
+        "OM-11",
+        "OM-12",
+        "OM-13"
+      ],
+      "decisionRefs": [
+        "OM-D01",
+        "OM-D02",
+        "OM-D03",
+        "OM-D07",
+        "OM-D08",
+        "OM-D11",
+        "OM-D12"
+      ],
+      "followUp": "Reconcile measurement ownership and shared API consumers; keep source facts and contributor links non-additive.",
+      "evidenceRefs": [
+        "CE-07",
+        "CE-10",
+        "CE-13",
+        "CE-14"
+      ]
+    },
+    {
+      "id": "FS-269",
+      "title": "Direct Bookings: two-trade mission regression and safe activation acceptance",
+      "url": "https://app.notion.com/p/40c317b92d1581799113f42027497cab",
+      "lastEditedAt": "2026-11-02T17:24:52.869Z",
+      "observedOn": "2026-11-05",
+      "observedStatus": "Backlog",
+      "observedOwnerRole": null,
+      "observedCodexOwner": null,
+      "observedHeadSha": null,
+      "observedPr": null,
+      "observedEvidence": null,
+      "observedDependencies": "FS-264–268 integrated into dev; FS-231 existing two-trade acceptance evidence; FS-229 trade correctness, FS-257 policy, FS-233/234 consent if outbound; QA4/E.. CoS gates.",
+      "observedNextAction": "E.. CoS confirm prerequisites and original code owners, then authorize the smallest bounded implementation and exact-head QA/CI.",
+      "implementationOwner": null,
+      "implementationStatus": "not_started",
+      "statusChangeRequested": false,
+      "kind": "existing_mission_ticket",
+      "retainedScope": "Authorized isolated end-to-end evidence, tenant/consent/policy/capacity/provider negatives, original HVAC/plumbing regressions, reuse of still-valid passing checks and actual receipt/source proof.",
+      "delta": "All 34 core acceptance requirements; each executable mission needs one complete verified method; recovery, shared authority, accounting and effectiveness distinctions; six optional Render checks are separate conditional gates.",
+      "superseded": "One full mission plus three previews is superseded. The HVAC pilot does not erase plumbing platform requirements, and a plan or fixture pass is not runtime acceptance.",
+      "relationship": "Existing acceptance anchor; no status promotion or blanket rerun authorization.",
+      "packageIds": [
+        "OM-01",
+        "OM-02",
+        "OM-03",
+        "OM-04",
+        "OM-05",
+        "OM-06",
+        "OM-07",
+        "OM-08",
+        "OM-09",
+        "OM-10",
+        "OM-11",
+        "OM-12",
+        "OM-13"
+      ],
+      "decisionRefs": [
+        "OM-D01",
+        "OM-D08",
+        "OM-D09",
+        "OM-D10",
+        "OM-D11",
+        "OM-D12",
+        "OM-D13"
+      ],
+      "followUp": "Attach exact-head evidence to the affected scope when implementation is authorized; avoid repeated live contacts or charges solely to create preparation evidence.",
+      "evidenceRefs": [
+        "CE-01",
+        "CE-15"
+      ]
+    }
+  ],
+  "workPackages": [
+    {
+      "id": "OM-01",
+      "title": "Reconcile baseline, contracts and current phase authorization",
+      "implementationStatus": "not_started",
+      "implementationOwner": null,
+      "dependencies": [],
+      "dependencyPolicy": "Use the source-plan dependency semantics; all implementation also requires the global phase/authority gates.",
+      "ticketAnchorIds": [
+        "FS-262",
+        "FS-263",
+        "FS-257",
+        "FS-258"
+      ],
+      "evidenceRefs": [
+        "CE-01",
+        "CE-02",
+        "CE-03",
+        "CE-04",
+        "CE-05",
+        "CE-07",
+        "CE-15"
+      ],
+      "decisionRefs": [
+        "OM-D12"
+      ],
+      "scopeOwnershipGap": "Existing initiative and contract anchors cover reconciliation; they do not authorize all runtime scope or promote Part I acceptance.",
+      "exitGate": "Pin the current implementation base, reconcile source/consumer and phase gates, and obtain explicit scope ownership before dependent implementation.",
+      "acceptanceEvidenceStatus": "not_executed",
+      "coreAcceptanceIds": []
+    },
+    {
+      "id": "OM-02",
+      "title": "Harden action concurrency, expiry and capability-specific grants",
+      "implementationStatus": "not_started",
+      "implementationOwner": null,
+      "dependencies": [
+        {
+          "packageId": "OM-01",
+          "kind": "completed_package"
+        }
+      ],
+      "dependencyPolicy": "Use the source-plan dependency semantics; all implementation also requires the global phase/authority gates.",
+      "ticketAnchorIds": [
+        "FS-267",
+        "FS-263",
+        "FS-257"
+      ],
+      "evidenceRefs": [
+        "CE-02",
+        "CE-03",
+        "CE-04",
+        "CE-14"
+      ],
+      "decisionRefs": [
+        "OM-D04",
+        "OM-D05",
+        "OM-D12"
+      ],
+      "scopeOwnershipGap": "Trusted-execution and operating-profile predecessors are reused; atomic version/expiry and mission grants require an explicit hardening scope.",
+      "exitGate": "Exact action/plan/hash versions, revoked/expired authority and concurrent claims are proven at the authoritative mutation boundary.",
+      "acceptanceEvidenceStatus": "not_executed",
+      "coreAcceptanceIds": [
+        "OM-A05",
+        "OM-A06",
+        "OM-A07",
+        "OM-A09",
+        "OM-A12",
+        "OM-A22",
+        "OM-A27",
+        "OM-A28",
+        "OM-A32"
+      ]
+    },
+    {
+      "id": "OM-03",
+      "title": "Durable outbox, provider receipts, webhook/reconciliation contract",
+      "implementationStatus": "not_started",
+      "implementationOwner": null,
+      "dependencies": [
+        {
+          "packageId": "OM-02",
+          "kind": "completed_package"
+        }
+      ],
+      "dependencyPolicy": "Use the source-plan dependency semantics; all implementation also requires the global phase/authority gates.",
+      "ticketAnchorIds": [
+        "FS-267",
+        "FS-263",
+        "FS-258"
+      ],
+      "evidenceRefs": [
+        "CE-03",
+        "CE-04",
+        "CE-05",
+        "CE-06"
+      ],
+      "decisionRefs": [
+        "OM-D04",
+        "OM-D05",
+        "OM-D09",
+        "OM-D12"
+      ],
+      "scopeOwnershipGap": "Reuse the Part I complete workflow/outbox; mission dispatch, authenticated callbacks and uncertain-effect reconciliation are an explicit extension.",
+      "exitGate": "Authorization and local dispatch intent commit atomically; provider idempotency/reconciliation handles crashes, late receipts and unknown effects without blind retry.",
+      "acceptanceEvidenceStatus": "not_executed",
+      "coreAcceptanceIds": [
+        "OM-A04",
+        "OM-A05",
+        "OM-A07",
+        "OM-A08",
+        "OM-A09",
+        "OM-A10",
+        "OM-A12",
+        "OM-A14",
+        "OM-A24",
+        "OM-A25",
+        "OM-A27",
+        "OM-A28",
+        "OM-A29",
+        "OM-A30"
+      ]
+    },
+    {
+      "id": "OM-04",
+      "title": "Outcome facts, cohorts, accounting separation and contribution completeness",
+      "implementationStatus": "not_started",
+      "implementationOwner": null,
+      "dependencies": [
+        {
+          "packageId": "OM-01",
+          "kind": "completed_package"
+        }
+      ],
+      "dependencyPolicy": "Use the source-plan dependency semantics; all implementation also requires the global phase/authority gates.",
+      "ticketAnchorIds": [
+        "FS-268",
+        "FS-263"
+      ],
+      "evidenceRefs": [
+        "CE-07",
+        "CE-13",
+        "CE-14"
+      ],
+      "decisionRefs": [
+        "OM-D01",
+        "OM-D02",
+        "OM-D03",
+        "OM-D07",
+        "OM-D11",
+        "OM-D12"
+      ],
+      "scopeOwnershipGap": "FS-268 anchors reporting; the projection, cohort and economic foundation need explicit ownership beyond that UI scope.",
+      "exitGate": "Separate earned/invoiced/cash facts and fixed eligible cohorts reconcile corrections once, expose missing costs and distinguish observed outcomes from effects.",
+      "acceptanceEvidenceStatus": "not_executed",
+      "coreAcceptanceIds": [
+        "OM-A02",
+        "OM-A14",
+        "OM-A15",
+        "OM-A16",
+        "OM-A17",
+        "OM-A18",
+        "OM-A19",
+        "OM-A23",
+        "OM-A30",
+        "OM-A32",
+        "OM-A33",
+        "OM-A34"
+      ]
+    },
+    {
+      "id": "OM-05",
+      "title": "Mission registry, snapshots, plans, steps, budgets, findings, shared booking-feasibility contract and resource arbitration",
+      "implementationStatus": "not_started",
+      "implementationOwner": null,
+      "dependencies": [
+        {
+          "packageId": "OM-02",
+          "kind": "completed_package"
+        },
+        {
+          "packageId": "OM-04",
+          "kind": "completed_package"
+        }
+      ],
+      "dependencyPolicy": "Use the source-plan dependency semantics; all implementation also requires the global phase/authority gates.",
+      "ticketAnchorIds": [
+        "FS-263",
+        "FS-265",
+        "FS-266",
+        "FS-267",
+        "FS-257"
+      ],
+      "evidenceRefs": [
+        "CE-02",
+        "CE-03",
+        "CE-06",
+        "CE-08",
+        "CE-09",
+        "CE-14"
+      ],
+      "decisionRefs": [
+        "OM-D01",
+        "OM-D04",
+        "OM-D05",
+        "OM-D06",
+        "OM-D07",
+        "OM-D09",
+        "OM-D11",
+        "OM-D12",
+        "OM-D13"
+      ],
+      "scopeOwnershipGap": "FS-263 is a contract anchor only. Persisted runtime, shared intents/reservations and supersession require reviewed ownership under the existing initiative.",
+      "exitGate": "Versioned registry/plans persist finite dependencies; every mutation validates tenant, authority, current feasibility and shared resource ownership; pauses, replacements and shared cancellation preserve auditable work.",
+      "acceptanceEvidenceStatus": "not_executed",
+      "coreAcceptanceIds": [
+        "OM-A01",
+        "OM-A02",
+        "OM-A03",
+        "OM-A04",
+        "OM-A05",
+        "OM-A09",
+        "OM-A10",
+        "OM-A11",
+        "OM-A14",
+        "OM-A21",
+        "OM-A23",
+        "OM-A24",
+        "OM-A25",
+        "OM-A27",
+        "OM-A28",
+        "OM-A31",
+        "OM-A34"
+      ]
+    },
+    {
+      "id": "OM-06",
+      "title": "Command Center mission selection, plan review, progress and responsive states",
+      "implementationStatus": "not_started",
+      "implementationOwner": null,
+      "dependencies": [
+        {
+          "packageId": "OM-05",
+          "kind": "accepted_contracts",
+          "condition": "OM-05 contracts are required; the plan does not require all OM-05 implementation to finish before parallel UI work."
+        }
+      ],
+      "dependencyPolicy": "Use the source-plan dependency semantics; all implementation also requires the global phase/authority gates.",
+      "ticketAnchorIds": [
+        "FS-264",
+        "FS-268"
+      ],
+      "evidenceRefs": [
+        "CE-10",
+        "CE-02"
+      ],
+      "decisionRefs": [
+        "OM-D04",
+        "OM-D08",
+        "OM-D12"
+      ],
+      "scopeOwnershipGap": "Extend the existing picker/reporting tickets from four choices to six and complete owner-state flows; coordinate current pending UI work.",
+      "exitGate": "Typed UI states truthfully distinguish readiness, authority, in-flight work and outcome verdict; exact design and owner-comprehension evidence are accepted before UI release.",
+      "acceptanceEvidenceStatus": "not_executed",
+      "coreAcceptanceIds": [
+        "OM-A04",
+        "OM-A15",
+        "OM-A24",
+        "OM-A26",
+        "OM-A30",
+        "OM-A34"
+      ]
+    },
+    {
+      "id": "OM-07",
+      "title": "Specialist capability runtime, schemas, bounded context, cost and evaluation harness",
+      "implementationStatus": "not_started",
+      "implementationOwner": null,
+      "dependencies": [
+        {
+          "packageId": "OM-05",
+          "kind": "completed_package"
+        }
+      ],
+      "dependencyPolicy": "Use the source-plan dependency semantics; all implementation also requires the global phase/authority gates.",
+      "ticketAnchorIds": [
+        "FS-267",
+        "FS-263",
+        "FS-269"
+      ],
+      "evidenceRefs": [
+        "CE-02",
+        "CE-03",
+        "CE-06",
+        "CE-12"
+      ],
+      "decisionRefs": [
+        "OM-D04",
+        "OM-D10",
+        "OM-D11",
+        "OM-D12"
+      ],
+      "scopeOwnershipGap": "The reviewed tickets supply action/contract/acceptance anchors but no specific bounded specialist runtime, budget or evaluation implementation owner.",
+      "exitGate": "Typed tasks use bounded context and allowlisted read tools, validated output and concurrent usage reservations; at most one bounded repair/escalation precedes a visible fallback.",
+      "acceptanceEvidenceStatus": "not_executed",
+      "coreAcceptanceIds": [
+        "OM-A05",
+        "OM-A21",
+        "OM-A22",
+        "OM-A23",
+        "OM-A25"
+      ]
+    },
+    {
+      "id": "OM-08",
+      "title": "Organize scan and material-readiness/dispatch checks",
+      "implementationStatus": "not_started",
+      "implementationOwner": null,
+      "dependencies": [
+        {
+          "packageId": "OM-05",
+          "kind": "completed_package"
+        }
+      ],
+      "dependencyPolicy": "Use the source-plan dependency semantics; all implementation also requires the global phase/authority gates.",
+      "ticketAnchorIds": [
+        "FS-265",
+        "FS-267"
+      ],
+      "evidenceRefs": [
+        "CE-08",
+        "CE-09",
+        "CE-14"
+      ],
+      "decisionRefs": [
+        "OM-D06",
+        "OM-D07",
+        "OM-D12"
+      ],
+      "scopeOwnershipGap": "Extend diagnosis/actions to deterministic Organize findings, stock verification and fulfillment feasibility without replacing domain records.",
+      "exitGate": "Scoped paginated scans report coverage/freshness and hard skill/window/material constraints; unverified stock stays unknown and findings carry condition-specific resolution rules.",
+      "acceptanceEvidenceStatus": "not_executed",
+      "coreAcceptanceIds": [
+        "OM-A11",
+        "OM-A20",
+        "OM-A25"
+      ]
+    },
+    {
+      "id": "OM-09",
+      "title": "Google Search connector and complete external booking method",
+      "implementationStatus": "not_started",
+      "implementationOwner": null,
+      "dependencies": [
+        {
+          "packageId": "OM-03",
+          "kind": "completed_package"
+        },
+        {
+          "packageId": "OM-05",
+          "kind": "completed_package"
+        },
+        {
+          "packageId": "OM-06",
+          "kind": "completed_package"
+        },
+        {
+          "packageId": "OM-07",
+          "kind": "completed_package"
+        },
+        {
+          "packageId": "OM-08",
+          "kind": "applicable_checks",
+          "condition": "Applicable material/qualification/dispatch feasibility checks only; do not invent a dependency on unrelated Organize backlog."
+        }
+      ],
+      "dependencyPolicy": "Use the source-plan dependency semantics; all implementation also requires the global phase/authority gates.",
+      "ticketAnchorIds": [
+        "FS-266",
+        "FS-267",
+        "FS-264",
+        "FS-265",
+        "FS-258",
+        "FS-269"
+      ],
+      "evidenceRefs": [
+        "CE-03",
+        "CE-04",
+        "CE-05",
+        "CE-08",
+        "CE-10",
+        "CE-11"
+      ],
+      "decisionRefs": [
+        "OM-D01",
+        "OM-D04",
+        "OM-D05",
+        "OM-D06",
+        "OM-D07",
+        "OM-D08",
+        "OM-D09",
+        "OM-D11",
+        "OM-D12",
+        "OM-D13"
+      ],
+      "scopeOwnershipGap": "FS-266 owns an intake/booking anchor and explicitly excludes ad-buying. Google Search is a genuine reviewed-scope/ownership gap requiring an approved extension or nonduplicative child scope.",
+      "exitGate": "An authorized paused campaign, total budget/dates, approved service page/form, qualification, current booking feasibility and source-to-fulfilled-work proof work for new shops and established shops without recovery backlog.",
+      "acceptanceEvidenceStatus": "not_executed",
+      "coreAcceptanceIds": [
+        "OM-A02",
+        "OM-A03",
+        "OM-A04",
+        "OM-A11",
+        "OM-A12",
+        "OM-A13",
+        "OM-A15",
+        "OM-A22",
+        "OM-A29",
+        "OM-A31"
+      ]
+    },
+    {
+      "id": "OM-10",
+      "title": "Internal follow-up and Organize resolution through domain services",
+      "implementationStatus": "not_started",
+      "implementationOwner": null,
+      "dependencies": [
+        {
+          "packageId": "OM-03",
+          "kind": "completed_package"
+        },
+        {
+          "packageId": "OM-08",
+          "kind": "completed_package"
+        }
+      ],
+      "dependencyPolicy": "Use the source-plan dependency semantics; all implementation also requires the global phase/authority gates.",
+      "ticketAnchorIds": [
+        "FS-267",
+        "FS-265",
+        "FS-266",
+        "FS-258"
+      ],
+      "evidenceRefs": [
+        "CE-03",
+        "CE-04",
+        "CE-05",
+        "CE-07",
+        "CE-08",
+        "CE-09",
+        "CE-13"
+      ],
+      "decisionRefs": [
+        "OM-D04",
+        "OM-D05",
+        "OM-D06",
+        "OM-D07",
+        "OM-D09",
+        "OM-D12",
+        "OM-D13"
+      ],
+      "scopeOwnershipGap": "Reuse accepted Part I estimate follow-up, shared booking and finance domains; extend to verified condition-specific Organize resolution.",
+      "exitGate": "Approved follow-up/corrections share contacts/resources and use authoritative domain evidence; physical verification stays accountable, and supplier purchasing remains recommend-only without a supported adapter/grant.",
+      "acceptanceEvidenceStatus": "not_executed",
+      "coreAcceptanceIds": [
+        "OM-A09",
+        "OM-A10",
+        "OM-A11",
+        "OM-A19",
+        "OM-A20",
+        "OM-A31"
+      ]
+    },
+    {
+      "id": "OM-11",
+      "title": "Monthly revenue portfolio and shared-resource/economic tests",
+      "implementationStatus": "not_started",
+      "implementationOwner": null,
+      "dependencies": [
+        {
+          "packageId": "OM-04",
+          "kind": "completed_package"
+        },
+        {
+          "packageId": "OM-09",
+          "kind": "completed_package"
+        },
+        {
+          "packageId": "OM-10",
+          "kind": "completed_package"
+        }
+      ],
+      "dependencyPolicy": "Use the source-plan dependency semantics; all implementation also requires the global phase/authority gates.",
+      "ticketAnchorIds": [
+        "FS-265",
+        "FS-267",
+        "FS-268"
+      ],
+      "evidenceRefs": [
+        "CE-03",
+        "CE-07",
+        "CE-08",
+        "CE-09",
+        "CE-13"
+      ],
+      "decisionRefs": [
+        "OM-D01",
+        "OM-D02",
+        "OM-D03",
+        "OM-D07",
+        "OM-D11",
+        "OM-D12",
+        "OM-D13"
+      ],
+      "scopeOwnershipGap": "The existing diagnosis/action/reporting anchors need an explicit monthly-portfolio coordination scope; no new parallel financial ledger.",
+      "exitGate": "Up to two proven strategies and one paid channel coordinate bounded support dependencies with shared authority, contacts, resources, earned-revenue rules and economic guardrails.",
+      "acceptanceEvidenceStatus": "not_executed",
+      "coreAcceptanceIds": [
+        "OM-A10",
+        "OM-A17",
+        "OM-A23",
+        "OM-A28",
+        "OM-A31",
+        "OM-A34"
+      ]
+    },
+    {
+      "id": "OM-12",
+      "title": "Job value, repeat service and payment-time methods",
+      "implementationStatus": "not_started",
+      "implementationOwner": null,
+      "dependencies": [
+        {
+          "packageId": "OM-03",
+          "kind": "completed_package"
+        },
+        {
+          "packageId": "OM-04",
+          "kind": "completed_package"
+        },
+        {
+          "packageId": "OM-07",
+          "kind": "completed_package"
+        },
+        {
+          "packageId": "OM-10",
+          "kind": "completed_package"
+        }
+      ],
+      "dependencyPolicy": "Use the source-plan dependency semantics; all implementation also requires the global phase/authority gates.",
+      "ticketAnchorIds": [
+        "FS-267",
+        "FS-268",
+        "FS-265",
+        "FS-257",
+        "FS-258"
+      ],
+      "evidenceRefs": [
+        "CE-03",
+        "CE-04",
+        "CE-07",
+        "CE-09",
+        "CE-13"
+      ],
+      "decisionRefs": [
+        "OM-D01",
+        "OM-D02",
+        "OM-D03",
+        "OM-D04",
+        "OM-D05",
+        "OM-D06",
+        "OM-D07",
+        "OM-D09",
+        "OM-D11",
+        "OM-D12",
+        "OM-D13"
+      ],
+      "scopeOwnershipGap": "Broader commercial/retention/payment methods and agreement enrollment need reviewed scope while reusing current invoice, agreement and proposal domains.",
+      "exitGate": "Fixed eligible opportunities, appropriate compatibility/due-service rules, open invoices and dispute suppression remain visible; agreements activate only with accepted terms, obligations and supported authorized billing.",
+      "acceptanceEvidenceStatus": "not_executed",
+      "coreAcceptanceIds": [
+        "OM-A09",
+        "OM-A16",
+        "OM-A17",
+        "OM-A18",
+        "OM-A19",
+        "OM-A32",
+        "OM-A33",
+        "OM-A34"
+      ]
+    },
+    {
+      "id": "OM-13",
+      "title": "Six-mission pilot, recovery tests, observability and bounded delegation",
+      "implementationStatus": "not_started",
+      "implementationOwner": null,
+      "dependencies": [],
+      "dependencyPolicy": "Applicable completed packages for each activated mission/method and the applicable acceptance evidence; this is not a fabricated fixed prerequisite on every package for every pilot activity.",
+      "ticketAnchorIds": [
+        "FS-269",
+        "FS-264",
+        "FS-266",
+        "FS-268"
+      ],
+      "evidenceRefs": [
+        "CE-01",
+        "CE-06",
+        "CE-10",
+        "CE-15"
+      ],
+      "decisionRefs": [
+        "OM-D01",
+        "OM-D08",
+        "OM-D09",
+        "OM-D10",
+        "OM-D11",
+        "OM-D12",
+        "OM-D13"
+      ],
+      "scopeOwnershipGap": "Extend the existing acceptance ticket from one complete mission and previews to all core requirements and each activated mission's verified method; optional backend gates remain conditional.",
+      "exitGate": "Exercise applicable complete paths at their reviewed heads, record real provider/pilot evidence separately from synthetic fixtures, and maintain recovery/observability plus bounded delegation and rollback.",
+      "acceptanceEvidenceStatus": "not_executed",
+      "coreAcceptanceIds": [
+        "OM-A13",
+        "OM-A23",
+        "OM-A25",
+        "OM-A26"
+      ]
+    }
+  ],
+  "coreAcceptance": [
+    {
+      "id": "OM-A01",
+      "requirement": "All six definitions have distinct primary outcomes, eligibility, methods, authority and stop rules",
+      "sourceSection": "Build spec §21, core acceptance matrix",
+      "primaryPackageId": "OM-05",
+      "supportingPackageIds": [],
+      "ticketAnchorIds": [
+        "FS-263",
+        "FS-269"
+      ],
+      "decisionRefs": [
+        "OM-D01",
+        "OM-D04",
+        "OM-D06",
+        "OM-D11",
+        "OM-D13"
+      ],
+      "requiredEvidence": "Versioned catalog validation plus distinct method/authority/stop fixtures for all six missions.",
+      "implementationOwner": null,
+      "executionStatus": "not_executed",
+      "conditional": false
+    },
+    {
+      "id": "OM-A02",
+      "requirement": "No-data/new-business assessment can propose a bounded external booking test without inventing estimates or peer evidence",
+      "sourceSection": "Build spec §21, core acceptance matrix",
+      "primaryPackageId": "OM-05",
+      "supportingPackageIds": [
+        "OM-04",
+        "OM-09"
+      ],
+      "ticketAnchorIds": [
+        "FS-263",
+        "FS-265",
+        "FS-269"
+      ],
+      "decisionRefs": [
+        "OM-D01",
+        "OM-D06",
+        "OM-D09",
+        "OM-D11"
+      ],
+      "requiredEvidence": "Cold-start fixtures with explicit missing data, no invented prior estimates and a bounded external proposal.",
+      "implementationOwner": null,
+      "executionStatus": "not_executed",
+      "conditional": false
+    },
+    {
+      "id": "OM-A03",
+      "requirement": "Established shop with no recovery backlog can execute the supported external acquisition path",
+      "sourceSection": "Build spec §21, core acceptance matrix",
+      "primaryPackageId": "OM-09",
+      "supportingPackageIds": [
+        "OM-05"
+      ],
+      "ticketAnchorIds": [
+        "FS-265",
+        "FS-266",
+        "FS-267",
+        "FS-269"
+      ],
+      "decisionRefs": [
+        "OM-D06",
+        "OM-D09",
+        "OM-D12"
+      ],
+      "requiredEvidence": "End-to-end external path for an established company with no recoverable estimates or lapsed customers.",
+      "implementationOwner": null,
+      "executionStatus": "not_executed",
+      "conditional": false
+    },
+    {
+      "id": "OM-A04",
+      "requirement": "Unsupported/missing provider returns clear readiness state and cannot produce a fake execution success",
+      "sourceSection": "Build spec §21, core acceptance matrix",
+      "primaryPackageId": "OM-05",
+      "supportingPackageIds": [
+        "OM-03",
+        "OM-06",
+        "OM-09"
+      ],
+      "ticketAnchorIds": [
+        "FS-263",
+        "FS-264",
+        "FS-266",
+        "FS-267",
+        "FS-269"
+      ],
+      "decisionRefs": [
+        "OM-D09"
+      ],
+      "requiredEvidence": "Readiness/API/UI cases for missing provider, unauthorized account and unavailable capability with no success event.",
+      "implementationOwner": null,
+      "executionStatus": "not_executed",
+      "conditional": false
+    },
+    {
+      "id": "OM-A05",
+      "requirement": "Tenant A cannot read, approve, execute, join, or resume tenant B's mission/action/resource through any API or forged queue envelope",
+      "sourceSection": "Build spec §21, core acceptance matrix",
+      "primaryPackageId": "OM-05",
+      "supportingPackageIds": [
+        "OM-02",
+        "OM-03",
+        "OM-07"
+      ],
+      "ticketAnchorIds": [
+        "FS-263",
+        "FS-267",
+        "FS-269"
+      ],
+      "decisionRefs": [
+        "OM-D04"
+      ],
+      "requiredEvidence": "Cross-tenant negative API, relation join, queue and resume cases against real authorization boundaries.",
+      "implementationOwner": null,
+      "executionStatus": "not_executed",
+      "conditional": false
+    },
+    {
+      "id": "OM-A06",
+      "requirement": "Concurrent same-state edits, approvals and execution attempts honor atomic versions and cannot reuse stale authorization",
+      "sourceSection": "Build spec §21, core acceptance matrix",
+      "primaryPackageId": "OM-02",
+      "supportingPackageIds": [],
+      "ticketAnchorIds": [
+        "FS-263",
+        "FS-267",
+        "FS-269"
+      ],
+      "decisionRefs": [
+        "OM-D04"
+      ],
+      "requiredEvidence": "Concurrent database mutations for edits, approvals, execution and expiry with atomic version predicates.",
+      "implementationOwner": null,
+      "executionStatus": "not_executed",
+      "conditional": false
+    },
+    {
+      "id": "OM-A07",
+      "requirement": "Concurrent workers create one local command/outbox claim; each supported provider demonstrates retry-safe behavior; uncertain outcomes block blind retry",
+      "sourceSection": "Build spec §21, core acceptance matrix",
+      "primaryPackageId": "OM-03",
+      "supportingPackageIds": [
+        "OM-02"
+      ],
+      "ticketAnchorIds": [
+        "FS-267",
+        "FS-258",
+        "FS-269"
+      ],
+      "decisionRefs": [
+        "OM-D09"
+      ],
+      "requiredEvidence": "Concurrent command/outbox claim and per-provider retry/idempotency/unknown-outcome tests.",
+      "implementationOwner": null,
+      "executionStatus": "not_executed",
+      "conditional": false
+    },
+    {
+      "id": "OM-A08",
+      "requirement": "Crash after provider acceptance but before local receipt recovers through idempotency/reconciliation without an unverified duplicate side effect",
+      "sourceSection": "Build spec §21, core acceptance matrix",
+      "primaryPackageId": "OM-03",
+      "supportingPackageIds": [],
+      "ticketAnchorIds": [
+        "FS-267",
+        "FS-258",
+        "FS-269"
+      ],
+      "decisionRefs": [
+        "OM-D09"
+      ],
+      "requiredEvidence": "Crash injection after provider acceptance and before receipt, followed by deterministic reconciliation.",
+      "implementationOwner": null,
+      "executionStatus": "not_executed",
+      "conditional": false
+    },
+    {
+      "id": "OM-A09",
+      "requirement": "Revoked consent/grant, changed content, expired proposal, changed balance and changed schedule are rechecked before consequential action",
+      "sourceSection": "Build spec §21, core acceptance matrix",
+      "primaryPackageId": "OM-02",
+      "supportingPackageIds": [
+        "OM-03",
+        "OM-05",
+        "OM-10",
+        "OM-12"
+      ],
+      "ticketAnchorIds": [
+        "FS-257",
+        "FS-258",
+        "FS-267",
+        "FS-269"
+      ],
+      "decisionRefs": [
+        "OM-D04",
+        "OM-D05",
+        "OM-D06",
+        "OM-D09"
+      ],
+      "requiredEvidence": "Execution-time revocation, expiry, changed payload, balance and schedule scenarios across retries.",
+      "implementationOwner": null,
+      "executionStatus": "not_executed",
+      "conditional": false
+    },
+    {
+      "id": "OM-A10",
+      "requirement": "Two missions targeting the same estimate/contact share one active intent; cadence and budget are enforced across both",
+      "sourceSection": "Build spec §21, core acceptance matrix",
+      "primaryPackageId": "OM-05",
+      "supportingPackageIds": [
+        "OM-03",
+        "OM-10",
+        "OM-11"
+      ],
+      "ticketAnchorIds": [
+        "FS-263",
+        "FS-267",
+        "FS-269"
+      ],
+      "decisionRefs": [
+        "OM-D04",
+        "OM-D05",
+        "OM-D07",
+        "OM-D13"
+      ],
+      "requiredEvidence": "Two mission runs sharing one estimate/contact intent, cadence and spend reservation.",
+      "implementationOwner": null,
+      "executionStatus": "not_executed",
+      "conditional": false
+    },
+    {
+      "id": "OM-A11",
+      "requirement": "Competing OM/manual/self-service bookings or stock changes obey the same domain-owned atomic constraints; required skill/customer-window/material constraints cannot be outscored",
+      "sourceSection": "Build spec §21, core acceptance matrix",
+      "primaryPackageId": "OM-05",
+      "supportingPackageIds": [
+        "OM-08",
+        "OM-09",
+        "OM-10"
+      ],
+      "ticketAnchorIds": [
+        "FS-263",
+        "FS-265",
+        "FS-266",
+        "FS-267",
+        "FS-269"
+      ],
+      "decisionRefs": [
+        "OM-D06",
+        "OM-D07"
+      ],
+      "requiredEvidence": "Concurrent OM/manual/self-service booking and stock cases, including hard qualification/window/material conflicts.",
+      "implementationOwner": null,
+      "executionStatus": "not_executed",
+      "conditional": false
+    },
+    {
+      "id": "OM-A12",
+      "requirement": "Google campaign starts paused, binds to the authorized tenant account, verifies total-budget/date constraints and requires approved activation",
+      "sourceSection": "Build spec §21, core acceptance matrix",
+      "primaryPackageId": "OM-09",
+      "supportingPackageIds": [
+        "OM-02",
+        "OM-03"
+      ],
+      "ticketAnchorIds": [
+        "FS-266",
+        "FS-267",
+        "FS-269"
+      ],
+      "decisionRefs": [
+        "OM-D04",
+        "OM-D09",
+        "OM-D12"
+      ],
+      "requiredEvidence": "Authorized provider-account test of paused creation, enforced total budget/dates and separate activation approval.",
+      "implementationOwner": null,
+      "executionStatus": "not_executed",
+      "conditional": false
+    },
+    {
+      "id": "OM-A13",
+      "requirement": "Real provider test proves campaign/form/source/inquiry/booking linkage; actual pilot outcomes are distinguished from synthetic tests",
+      "sourceSection": "Build spec §21, core acceptance matrix",
+      "primaryPackageId": "OM-09",
+      "supportingPackageIds": [
+        "OM-13"
+      ],
+      "ticketAnchorIds": [
+        "FS-266",
+        "FS-267",
+        "FS-269"
+      ],
+      "decisionRefs": [
+        "OM-D06",
+        "OM-D09",
+        "OM-D11",
+        "OM-D12"
+      ],
+      "requiredEvidence": "Authorized real provider test with source lineage and separate consenting-pilot outcome evidence.",
+      "implementationOwner": null,
+      "executionStatus": "not_executed",
+      "conditional": false
+    },
+    {
+      "id": "OM-A14",
+      "requirement": "Duplicate/reordered provider and domain events preserve correct terminal status and one canonical outcome projection",
+      "sourceSection": "Build spec §21, core acceptance matrix",
+      "primaryPackageId": "OM-03",
+      "supportingPackageIds": [
+        "OM-04",
+        "OM-05"
+      ],
+      "ticketAnchorIds": [
+        "FS-267",
+        "FS-268",
+        "FS-269"
+      ],
+      "decisionRefs": [
+        "OM-D02",
+        "OM-D07",
+        "OM-D09"
+      ],
+      "requiredEvidence": "Event duplication/reordering/replay cases with source versions and one canonical projection.",
+      "implementationOwner": null,
+      "executionStatus": "not_executed",
+      "conditional": false
+    },
+    {
+      "id": "OM-A15",
+      "requirement": "Assessment appointments, accepted work, completed work, invoices, earned revenue and cash remain separate in API/UI totals",
+      "sourceSection": "Build spec §21, core acceptance matrix",
+      "primaryPackageId": "OM-04",
+      "supportingPackageIds": [
+        "OM-06",
+        "OM-09"
+      ],
+      "ticketAnchorIds": [
+        "FS-263",
+        "FS-266",
+        "FS-268",
+        "FS-269"
+      ],
+      "decisionRefs": [
+        "OM-D02",
+        "OM-D03",
+        "OM-D07"
+      ],
+      "requiredEvidence": "Contract and UI arithmetic fixtures for distinct assessment, accepted, completed, invoiced, earned and cash values.",
+      "implementationOwner": null,
+      "executionStatus": "not_executed",
+      "conditional": false
+    },
+    {
+      "id": "OM-A16",
+      "requirement": "Partial payments, credits, refunds, late invoices and annual agreements reconcile without estimated-value substitution or double counting",
+      "sourceSection": "Build spec §21, core acceptance matrix",
+      "primaryPackageId": "OM-04",
+      "supportingPackageIds": [
+        "OM-12"
+      ],
+      "ticketAnchorIds": [
+        "FS-268",
+        "FS-269"
+      ],
+      "decisionRefs": [
+        "OM-D02",
+        "OM-D03",
+        "OM-D07"
+      ],
+      "requiredEvidence": "Source-event reconciliation fixtures for payments, credits, refunds, late invoices and agreements without estimate fallback.",
+      "implementationOwner": null,
+      "executionStatus": "not_executed",
+      "conditional": false
+    },
+    {
+      "id": "OM-A17",
+      "requirement": "Job-value evaluation includes eligible unconverted/smaller jobs; higher average alone cannot pass failed opportunity/contribution guardrails",
+      "sourceSection": "Build spec §21, core acceptance matrix",
+      "primaryPackageId": "OM-12",
+      "supportingPackageIds": [
+        "OM-04",
+        "OM-11"
+      ],
+      "ticketAnchorIds": [
+        "FS-265",
+        "FS-267",
+        "FS-268",
+        "FS-269"
+      ],
+      "decisionRefs": [
+        "OM-D01",
+        "OM-D03",
+        "OM-D06",
+        "OM-D07",
+        "OM-D11"
+      ],
+      "requiredEvidence": "Frozen opportunity cohort with unconverted/smaller jobs and failed economic guardrail despite higher completed-job average.",
+      "implementationOwner": null,
+      "executionStatus": "not_executed",
+      "conditional": false
+    },
+    {
+      "id": "OM-A18",
+      "requirement": "Repeat-sales metrics exclude warranty/rework successes while including associated cost/quality impact and retaining fixed cohort membership",
+      "sourceSection": "Build spec §21, core acceptance matrix",
+      "primaryPackageId": "OM-12",
+      "supportingPackageIds": [
+        "OM-04"
+      ],
+      "ticketAnchorIds": [
+        "FS-265",
+        "FS-267",
+        "FS-268",
+        "FS-269"
+      ],
+      "decisionRefs": [
+        "OM-D01",
+        "OM-D02",
+        "OM-D03",
+        "OM-D06",
+        "OM-D07",
+        "OM-D11"
+      ],
+      "requiredEvidence": "Fixed repeat cohort with warranty/rework exclusions from sales and inclusion of cost/quality impact.",
+      "implementationOwner": null,
+      "executionStatus": "not_executed",
+      "conditional": false
+    },
+    {
+      "id": "OM-A19",
+      "requirement": "Payment-time evaluation retains still-open invoices; disputed or already paid invoices do not receive inappropriate follow-up",
+      "sourceSection": "Build spec §21, core acceptance matrix",
+      "primaryPackageId": "OM-12",
+      "supportingPackageIds": [
+        "OM-04",
+        "OM-10"
+      ],
+      "ticketAnchorIds": [
+        "FS-267",
+        "FS-268",
+        "FS-269"
+      ],
+      "decisionRefs": [
+        "OM-D05",
+        "OM-D07",
+        "OM-D11"
+      ],
+      "requiredEvidence": "Payment-time cohort retains open invoices and suppresses disputed/already-paid follow-up.",
+      "implementationOwner": null,
+      "executionStatus": "not_executed",
+      "conditional": false
+    },
+    {
+      "id": "OM-A20",
+      "requirement": "Organize distinguishes unverified from zero stock, considers hours/skills instead of job counts, and verifies each condition-specific resolution",
+      "sourceSection": "Build spec §21, core acceptance matrix",
+      "primaryPackageId": "OM-08",
+      "supportingPackageIds": [
+        "OM-10"
+      ],
+      "ticketAnchorIds": [
+        "FS-265",
+        "FS-267",
+        "FS-269"
+      ],
+      "decisionRefs": [
+        "OM-D06"
+      ],
+      "requiredEvidence": "Unknown versus zero stock, skill/hour feasibility and condition-specific resolution verification.",
+      "implementationOwner": null,
+      "executionStatus": "not_executed",
+      "conditional": false
+    },
+    {
+      "id": "OM-A21",
+      "requirement": "Model/tool/token/cost caps hold under concurrent requests; malformed output gets at most one bounded retry/escalation and then a visible fallback",
+      "sourceSection": "Build spec §21, core acceptance matrix",
+      "primaryPackageId": "OM-07",
+      "supportingPackageIds": [
+        "OM-05"
+      ],
+      "ticketAnchorIds": [
+        "FS-263",
+        "FS-267",
+        "FS-269"
+      ],
+      "decisionRefs": [
+        "OM-D10"
+      ],
+      "requiredEvidence": "Concurrent model/tool/token/cost reservations plus malformed-output one-repair and visible-fallback cases.",
+      "implementationOwner": null,
+      "executionStatus": "not_executed",
+      "conditional": false
+    },
+    {
+      "id": "OM-A22",
+      "requirement": "Customer/web prompt injection cannot expand tool authority, change tenant, publish content, spend money or alter authoritative records",
+      "sourceSection": "Build spec §21, core acceptance matrix",
+      "primaryPackageId": "OM-07",
+      "supportingPackageIds": [
+        "OM-02",
+        "OM-09"
+      ],
+      "ticketAnchorIds": [
+        "FS-263",
+        "FS-267",
+        "FS-269"
+      ],
+      "decisionRefs": [
+        "OM-D04",
+        "OM-D10"
+      ],
+      "requiredEvidence": "Adversarial customer/web content with unchanged tenant, tools, authorization and authoritative state.",
+      "implementationOwner": null,
+      "executionStatus": "not_executed",
+      "conditional": false
+    },
+    {
+      "id": "OM-A23",
+      "requirement": "Small-sample decisions show observed results and bounded next steps without fabricating certainty; pooled evidence is not misreported as local causal proof",
+      "sourceSection": "Build spec §21, core acceptance matrix",
+      "primaryPackageId": "OM-04",
+      "supportingPackageIds": [
+        "OM-05",
+        "OM-07",
+        "OM-11",
+        "OM-13"
+      ],
+      "ticketAnchorIds": [
+        "FS-263",
+        "FS-265",
+        "FS-268",
+        "FS-269"
+      ],
+      "decisionRefs": [
+        "OM-D01",
+        "OM-D10",
+        "OM-D11"
+      ],
+      "requiredEvidence": "Small-sample/pooled-evidence fixtures with declared design, uncertainty and bounded next-step language.",
+      "implementationOwner": null,
+      "executionStatus": "not_executed",
+      "conditional": false
+    },
+    {
+      "id": "OM-A24",
+      "requirement": "Pause/cancel stops future dispatch and exposes in-flight actions; no false promise of reversing already performed effects",
+      "sourceSection": "Build spec §21, core acceptance matrix",
+      "primaryPackageId": "OM-05",
+      "supportingPackageIds": [
+        "OM-03",
+        "OM-06"
+      ],
+      "ticketAnchorIds": [
+        "FS-263",
+        "FS-264",
+        "FS-267",
+        "FS-269"
+      ],
+      "decisionRefs": [
+        "OM-D04"
+      ],
+      "requiredEvidence": "Pause/cancel before dispatch and during in-flight work, with honest irreversible-effect presentation.",
+      "implementationOwner": null,
+      "executionStatus": "not_executed",
+      "conditional": false
+    },
+    {
+      "id": "OM-A25",
+      "requirement": "Scope/pagination coverage, queues, stale leases, dispatch uncertainty and missing provider receipts are observable and actionable",
+      "sourceSection": "Build spec §21, core acceptance matrix",
+      "primaryPackageId": "OM-13",
+      "supportingPackageIds": [
+        "OM-03",
+        "OM-05",
+        "OM-07",
+        "OM-08"
+      ],
+      "ticketAnchorIds": [
+        "FS-263",
+        "FS-265",
+        "FS-267",
+        "FS-269"
+      ],
+      "decisionRefs": [
+        "OM-D09",
+        "OM-D10"
+      ],
+      "requiredEvidence": "Operational coverage, pagination, queue lag, stale lease, uncertain dispatch and missing receipt telemetry/recovery evidence.",
+      "implementationOwner": null,
+      "executionStatus": "not_executed",
+      "conditional": false
+    },
+    {
+      "id": "OM-A26",
+      "requirement": "Responsive Command Center states, keyboard/focus behavior and owner comprehension are accepted before UI release",
+      "sourceSection": "Build spec §21, core acceptance matrix",
+      "primaryPackageId": "OM-06",
+      "supportingPackageIds": [
+        "OM-13"
+      ],
+      "ticketAnchorIds": [
+        "FS-264",
+        "FS-268",
+        "FS-269"
+      ],
+      "decisionRefs": [
+        "OM-D08"
+      ],
+      "requiredEvidence": "Exact-head deployed screenshots at applicable 390/834/1440 states, keyboard/focus and independent Design/Product/QA comprehension acceptance.",
+      "implementationOwner": null,
+      "executionStatus": "not_executed",
+      "conditional": false
+    },
+    {
+      "id": "OM-A27",
+      "requirement": "Approved v1 cannot dispatch after an approved v2 supersedes it; retained/in-flight effects follow explicit policy and remain auditable",
+      "sourceSection": "Build spec §21, core acceptance matrix",
+      "primaryPackageId": "OM-05",
+      "supportingPackageIds": [
+        "OM-02",
+        "OM-03"
+      ],
+      "ticketAnchorIds": [
+        "FS-263",
+        "FS-267",
+        "FS-269"
+      ],
+      "decisionRefs": [
+        "OM-D04",
+        "OM-D13"
+      ],
+      "requiredEvidence": "Approved v1/v2 supersession and retained/in-flight effect cases at dispatch.",
+      "implementationOwner": null,
+      "executionStatus": "not_executed",
+      "conditional": false
+    },
+    {
+      "id": "OM-A28",
+      "requirement": "Cancelling one of two linked missions cannot cancel independently authorized shared work or release resources still in use; incompatible payloads conflict",
+      "sourceSection": "Build spec §21, core acceptance matrix",
+      "primaryPackageId": "OM-05",
+      "supportingPackageIds": [
+        "OM-02",
+        "OM-03",
+        "OM-11"
+      ],
+      "ticketAnchorIds": [
+        "FS-263",
+        "FS-267",
+        "FS-269"
+      ],
+      "decisionRefs": [
+        "OM-D04",
+        "OM-D13"
+      ],
+      "requiredEvidence": "Shared action/resource cases with independent grants, one cancellation and incompatible payload conflict.",
+      "implementationOwner": null,
+      "executionStatus": "not_executed",
+      "conditional": false
+    },
+    {
+      "id": "OM-A29",
+      "requirement": "Forged callbacks, wrong provider-account bindings and replayed events cannot mutate delivery/finance; valid late events reconcile correctly",
+      "sourceSection": "Build spec §21, core acceptance matrix",
+      "primaryPackageId": "OM-03",
+      "supportingPackageIds": [
+        "OM-09"
+      ],
+      "ticketAnchorIds": [
+        "FS-266",
+        "FS-267",
+        "FS-268",
+        "FS-269"
+      ],
+      "decisionRefs": [
+        "OM-D09"
+      ],
+      "requiredEvidence": "Forged signatures, wrong account, replay and valid late provider callback cases.",
+      "implementationOwner": null,
+      "executionStatus": "not_executed",
+      "conditional": false
+    },
+    {
+      "id": "OM-A30",
+      "requirement": "Legacy execution-succeeded/queued receipt cannot increment delivery, bookings, cash or mission success",
+      "sourceSection": "Build spec §21, core acceptance matrix",
+      "primaryPackageId": "OM-04",
+      "supportingPackageIds": [
+        "OM-03",
+        "OM-06"
+      ],
+      "ticketAnchorIds": [
+        "FS-267",
+        "FS-268",
+        "FS-269"
+      ],
+      "decisionRefs": [
+        "OM-D11"
+      ],
+      "requiredEvidence": "Legacy queued/execution_succeeded regression fixtures keep delivery/booking/cash/success unchanged.",
+      "implementationOwner": null,
+      "executionStatus": "not_executed",
+      "conditional": false
+    },
+    {
+      "id": "OM-A31",
+      "requirement": "Paid acquisition plus estimate recovery executes bounded conversion/verification dependencies within the two-strategy, one-paid-channel limits",
+      "sourceSection": "Build spec §21, core acceptance matrix",
+      "primaryPackageId": "OM-05",
+      "supportingPackageIds": [
+        "OM-09",
+        "OM-10",
+        "OM-11"
+      ],
+      "ticketAnchorIds": [
+        "FS-263",
+        "FS-265",
+        "FS-267",
+        "FS-269"
+      ],
+      "decisionRefs": [
+        "OM-D09",
+        "OM-D13"
+      ],
+      "requiredEvidence": "Finite paid-acquisition and recovery graph enforcing two strategies, one paid channel and bounded support dependencies.",
+      "implementationOwner": null,
+      "executionStatus": "not_executed",
+      "conditional": false
+    },
+    {
+      "id": "OM-A32",
+      "requirement": "New agreement is not active without accepted terms, fulfillment obligations and a supported authorized billing path",
+      "sourceSection": "Build spec §21, core acceptance matrix",
+      "primaryPackageId": "OM-12",
+      "supportingPackageIds": [
+        "OM-02",
+        "OM-04"
+      ],
+      "ticketAnchorIds": [
+        "FS-257",
+        "FS-267",
+        "FS-268",
+        "FS-269"
+      ],
+      "decisionRefs": [
+        "OM-D02",
+        "OM-D04",
+        "OM-D06",
+        "OM-D09"
+      ],
+      "requiredEvidence": "Agreement terms/obligations/billing readiness cases including unavailable or unauthorized activation.",
+      "implementationOwner": null,
+      "executionStatus": "not_executed",
+      "conditional": false
+    },
+    {
+      "id": "OM-A33",
+      "requirement": "USD 1,000 service, USD 100 credit and linked USD 100 refund produce USD 900 revenue and USD 900 net cash without replay duplication",
+      "sourceSection": "Build spec §21, core acceptance matrix",
+      "primaryPackageId": "OM-04",
+      "supportingPackageIds": [
+        "OM-12"
+      ],
+      "ticketAnchorIds": [
+        "FS-268",
+        "FS-269"
+      ],
+      "decisionRefs": [
+        "OM-D02",
+        "OM-D03"
+      ],
+      "requiredEvidence": "Decimal-string USD1000 service, linked USD100 credit/refund and duplicate replay producing USD900 earned and net cash.",
+      "implementationOwner": null,
+      "executionStatus": "not_executed",
+      "conditional": false
+    },
+    {
+      "id": "OM-A34",
+      "requirement": "Workflow completion is separate from outcome verdict; target reached with failed mandatory guardrail is not mission success; missing necessary evidence is explicit",
+      "sourceSection": "Build spec §21, core acceptance matrix",
+      "primaryPackageId": "OM-05",
+      "supportingPackageIds": [
+        "OM-04",
+        "OM-06",
+        "OM-11",
+        "OM-12"
+      ],
+      "ticketAnchorIds": [
+        "FS-263",
+        "FS-264",
+        "FS-267",
+        "FS-268",
+        "FS-269"
+      ],
+      "decisionRefs": [
+        "OM-D01",
+        "OM-D03",
+        "OM-D11"
+      ],
+      "requiredEvidence": "Workflow-complete, target-met/guardrail-failed and missing-evidence verdict cases.",
+      "implementationOwner": null,
+      "executionStatus": "not_executed",
+      "conditional": false
+    }
+  ],
+  "optionalPackages": [
+    {
+      "id": "OM-R01",
+      "title": "Isolated task adapter and one read-only Render Sandbox pilot",
+      "dependencies": [
+        {
+          "packageId": "OM-03",
+          "kind": "accepted_contracts",
+          "condition": "Dispatch/receipt boundary"
+        },
+        {
+          "packageId": "OM-05",
+          "kind": "accepted_contracts",
+          "condition": "Tenant/state boundary"
+        },
+        {
+          "packageId": "OM-07",
+          "kind": "accepted_contracts",
+          "condition": "Task/cost controls"
+        }
+      ],
+      "additionalGates": [
+        "Separate evaluation authorization",
+        "Platform and Security review",
+        "Current provider/API/network/region/retention/pricing verification",
+        "Separate infrastructure allowance"
+      ],
+      "implementationOwner": null,
+      "implementationStatus": "not_started",
+      "conditional": true,
+      "blocksCoreWhenDisabled": false,
+      "requiresOtherOptionalPackage": false,
+      "ticketAnchorIds": [
+        "FS-262",
+        "FS-269"
+      ],
+      "scopeOwnershipGap": "Optional evaluation only; no implementation owner is established by the reviewed core tickets.",
+      "decisionRefs": [
+        "OM-D09",
+        "OM-D10",
+        "OM-D12"
+      ],
+      "acceptanceIds": [
+        "OM-R-A01",
+        "OM-R-A02",
+        "OM-R-A03",
+        "OM-R-A04",
+        "OM-R-A05"
+      ]
+    },
+    {
+      "id": "OM-R02",
+      "title": "Bounded Render Workflows versus equivalent BullMQ benchmark",
+      "dependencies": [],
+      "additionalGates": [
+        "Existing retry-safe bounded BullMQ comparison task",
+        "Same versioned input/output and receipt/state contract",
+        "Usage metering and separate evaluation allowance",
+        "Platform/architecture review and separate evaluation authorization"
+      ],
+      "implementationOwner": null,
+      "implementationStatus": "not_started",
+      "conditional": true,
+      "blocksCoreWhenDisabled": false,
+      "requiresOtherOptionalPackage": false,
+      "ticketAnchorIds": [
+        "FS-262",
+        "FS-269"
+      ],
+      "scopeOwnershipGap": "Independent optional benchmark; do not add OM-R01 as a required dependency or imply adoption of either backend.",
+      "decisionRefs": [
+        "OM-D09",
+        "OM-D10",
+        "OM-D12"
+      ],
+      "acceptanceIds": [
+        "OM-R-A01",
+        "OM-R-A03",
+        "OM-R-A04",
+        "OM-R-A05",
+        "OM-R-A06"
+      ]
+    }
+  ],
+  "optionalAcceptance": [
+    {
+      "id": "OM-R-A01",
+      "requirement": "Disabled optional backends leave core OM behavior unchanged; unsupported isolated tasks report unavailable rather than running untrusted code in the application worker",
+      "sourceSection": "Build spec §21, optional Render acceptance matrix",
+      "primaryPackageId": "OM-R01",
+      "supportingPackageIds": [
+        "OM-R02"
+      ],
+      "ticketAnchorIds": [
+        "FS-262",
+        "FS-269"
+      ],
+      "decisionRefs": [
+        "OM-D09",
+        "OM-D10",
+        "OM-D12"
+      ],
+      "implementationOwner": null,
+      "executionStatus": "not_executed",
+      "conditional": true,
+      "blocksCoreWhenDisabled": false,
+      "activationCondition": "Applies only if the optional backend/capability is separately authorized and proposed as executable; disabled/unadvertised optional backends do not gate core OM."
+    },
+    {
+      "id": "OM-R-A02",
+      "requirement": "Sandbox has no production credentials or direct FSM/database access; tenant/artifact boundaries, public-destination allowlists, redirect/private-network rejection and prompt-injection tests pass",
+      "sourceSection": "Build spec §21, optional Render acceptance matrix",
+      "primaryPackageId": "OM-R01",
+      "supportingPackageIds": [],
+      "ticketAnchorIds": [
+        "FS-262",
+        "FS-269"
+      ],
+      "decisionRefs": [
+        "OM-D09",
+        "OM-D10",
+        "OM-D12"
+      ],
+      "implementationOwner": null,
+      "executionStatus": "not_executed",
+      "conditional": true,
+      "blocksCoreWhenDisabled": false,
+      "activationCondition": "Applies only if the optional backend/capability is separately authorized and proposed as executable; disabled/unadvertised optional backends do not gate core OM."
+    },
+    {
+      "id": "OM-R-A03",
+      "requirement": "Returned findings/artifacts are validated against task identity, schema, size and evidence requirements; command/flow success cannot mark a booking, payment, inventory change or mission outcome complete",
+      "sourceSection": "Build spec §21, optional Render acceptance matrix",
+      "primaryPackageId": "OM-R01",
+      "supportingPackageIds": [
+        "OM-R02"
+      ],
+      "ticketAnchorIds": [
+        "FS-262",
+        "FS-269"
+      ],
+      "decisionRefs": [
+        "OM-D09",
+        "OM-D10",
+        "OM-D12"
+      ],
+      "implementationOwner": null,
+      "executionStatus": "not_executed",
+      "conditional": true,
+      "blocksCoreWhenDisabled": false,
+      "activationCondition": "Applies only if the optional backend/capability is separately authorized and proposed as executable; disabled/unadvertised optional backends do not gate core OM."
+    },
+    {
+      "id": "OM-R-A04",
+      "requirement": "Timeout, duplicate trigger, lost create response, provider interruption and late receipt reconcile one attempt; backend fallback cannot duplicate work; cleanup is verified or visibly escalated",
+      "sourceSection": "Build spec §21, optional Render acceptance matrix",
+      "primaryPackageId": "OM-R01",
+      "supportingPackageIds": [
+        "OM-R02"
+      ],
+      "ticketAnchorIds": [
+        "FS-262",
+        "FS-269"
+      ],
+      "decisionRefs": [
+        "OM-D09",
+        "OM-D10",
+        "OM-D12"
+      ],
+      "implementationOwner": null,
+      "executionStatus": "not_executed",
+      "conditional": true,
+      "blocksCoreWhenDisabled": false,
+      "activationCondition": "Applies only if the optional backend/capability is separately authorized and proposed as executable; disabled/unadvertised optional backends do not gate core OM."
+    },
+    {
+      "id": "OM-R-A05",
+      "requirement": "Runtime/concurrency/infrastructure limits hold under retries; missing allowances block new work; cleanup continues; waiting for owner approval/customer response keeps no Sandbox or Workflow run alive",
+      "sourceSection": "Build spec §21, optional Render acceptance matrix",
+      "primaryPackageId": "OM-R01",
+      "supportingPackageIds": [
+        "OM-R02"
+      ],
+      "ticketAnchorIds": [
+        "FS-262",
+        "FS-269"
+      ],
+      "decisionRefs": [
+        "OM-D09",
+        "OM-D10",
+        "OM-D12"
+      ],
+      "implementationOwner": null,
+      "executionStatus": "not_executed",
+      "conditional": true,
+      "blocksCoreWhenDisabled": false,
+      "activationCondition": "Applies only if the optional backend/capability is separately authorized and proposed as executable; disabled/unadvertised optional backends do not gate core OM."
+    },
+    {
+      "id": "OM-R-A06",
+      "requirement": "Equivalent BullMQ/Workflows benchmark records output parity, startup/runtime latency, recovery, concurrency and total cost; architecture review records adopt/defer for named capabilities with working rollout flags and rollback",
+      "sourceSection": "Build spec §21, optional Render acceptance matrix",
+      "primaryPackageId": "OM-R02",
+      "supportingPackageIds": [],
+      "ticketAnchorIds": [
+        "FS-262",
+        "FS-269"
+      ],
+      "decisionRefs": [
+        "OM-D09",
+        "OM-D10",
+        "OM-D12"
+      ],
+      "implementationOwner": null,
+      "executionStatus": "not_executed",
+      "conditional": true,
+      "blocksCoreWhenDisabled": false,
+      "activationCondition": "Applies only if the optional backend/capability is separately authorized and proposed as executable; disabled/unadvertised optional backends do not gate core OM."
+    }
+  ],
+  "sourceEvidence": [
+    {
+      "id": "CE-01",
+      "title": "Current repository authority",
+      "baseCommit": "7840884d346ca95788e2668cc78148afa3b6a843",
+      "evidenceType": "targeted_source_review",
+      "paths": [
+        {
+          "path": "AGENTS.md",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/AGENTS.md"
+        },
+        {
+          "path": "TEAM.md",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/TEAM.md"
+        }
+      ],
+      "observation": "The November 3 override makes Codex Lead/Technical Lead the coordinator, preserves independent review and exact-head founder merge authority, and removes mandatory CoS gates. Historical roster roles do not constitute live assignments.",
+      "implication": "All packages must retain the Part I acceptance/founder gate for implementation; this crosswalk records authorized preparation only.",
+      "runtimeAcceptanceClaimed": false
+    },
+    {
+      "id": "CE-02",
+      "title": "Existing control-plane contracts and consumer inventory",
+      "baseCommit": "7840884d346ca95788e2668cc78148afa3b6a843",
+      "evidenceType": "targeted_source_review",
+      "paths": [
+        {
+          "path": "docs/contracts/agent-control-plane-v1.md",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/docs/contracts/agent-control-plane-v1.md"
+        },
+        {
+          "path": "docs/planning/agent-control-plane-consumers.md",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/docs/planning/agent-control-plane-consumers.md"
+        },
+        {
+          "path": "packages/types/src/agent-control-plane/v1/tenant-context.ts",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/packages/types/src/agent-control-plane/v1/tenant-context.ts"
+        },
+        {
+          "path": "packages/types/src/agent-control-plane/v1/entity-ref.ts",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/packages/types/src/agent-control-plane/v1/entity-ref.ts"
+        },
+        {
+          "path": "packages/types/src/agent-control-plane/v1/agent-action-proposal.ts",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/packages/types/src/agent-control-plane/v1/agent-action-proposal.ts"
+        },
+        {
+          "path": "packages/types/src/agent-control-plane/v1/queue-envelope.ts",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/packages/types/src/agent-control-plane/v1/queue-envelope.ts"
+        }
+      ],
+      "observation": "Existing tenant, entity-reference, proposal and queue schemas are reuse anchors. The targeted non-test reference search finds AgentQueueEnvelopeV1 only in its definition/parser file; this does not establish a universal runtime consumer.",
+      "implication": "Trace each API, service and worker consumer when introducing OM contracts; a contract file or prior inventory is not integration acceptance.",
+      "runtimeAcceptanceClaimed": false
+    },
+    {
+      "id": "CE-03",
+      "title": "Trusted action lifecycle and receipts",
+      "baseCommit": "7840884d346ca95788e2668cc78148afa3b6a843",
+      "evidenceType": "targeted_source_review",
+      "paths": [
+        {
+          "path": "apps/api/src/services/agent-action.service.ts",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/agent-action.service.ts"
+        },
+        {
+          "path": "apps/api/src/services/agent-action.registry.ts",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/agent-action.registry.ts"
+        },
+        {
+          "path": "apps/api/src/services/agent-action.executors.ts",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/agent-action.executors.ts"
+        },
+        {
+          "path": "apps/api/src/services/agent-action.policy.ts",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/agent-action.policy.ts"
+        },
+        {
+          "path": "apps/api/src/services/agent-action-receipt.ts",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/agent-action-receipt.ts"
+        }
+      ],
+      "observation": "Approval/execution read expected versions before state-based transition predicates. Outbound receipts remain executing/queued with the explicit provider-disabled note; legacy execution_succeeded terminology exists.",
+      "implication": "OM-02 must prove atomic version/expiry behavior. OM-03 must connect durable dispatch and provider reconciliation. A30 forbids treating this queued receipt as delivery, booking, cash or mission success. These are source-review risks, not reproduced production failures.",
+      "runtimeAcceptanceClaimed": false
+    },
+    {
+      "id": "CE-04",
+      "title": "Merged consent foundation with bounded enablement",
+      "baseCommit": "7840884d346ca95788e2668cc78148afa3b6a843",
+      "evidenceType": "targeted_source_review",
+      "paths": [
+        {
+          "path": "apps/api/src/services/outbound-consent.service.ts",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/outbound-consent.service.ts"
+        },
+        {
+          "path": "apps/api/src/services/outbound-consent-email-verification.service.ts",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/outbound-consent-email-verification.service.ts"
+        },
+        {
+          "path": "packages/config/src/feature-flags.ts",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/packages/config/src/feature-flags.ts"
+        },
+        {
+          "path": "apps/worker/src/processors/customer-email-verification.processor.ts",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/worker/src/processors/customer-email-verification.processor.ts"
+        }
+      ],
+      "observation": "The merged foundation has versioned consent checks and revocation paths. The generic decision writer is gated by CONSENT_RECEIPT_BOUNDARY_ACTIVE; challenge delivery is gated by customerEmailVerificationDeliveryEnabled. Source defaults do not prove deployed configuration.",
+      "implication": "Reuse #430 and earlier #301 work. Full capture/provider-boundary and STOP race evidence remain prerequisites for affected outbound workflows; do not describe all consent work as absent.",
+      "runtimeAcceptanceClaimed": false
+    },
+    {
+      "id": "CE-05",
+      "title": "Integration outbox and audit",
+      "baseCommit": "7840884d346ca95788e2668cc78148afa3b6a843",
+      "evidenceType": "targeted_source_review",
+      "paths": [
+        {
+          "path": "packages/db/src/integration-outbox.service.ts",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/packages/db/src/integration-outbox.service.ts"
+        },
+        {
+          "path": "docs/contracts/fsm.control-plane.import-outbox-attribution.v1.0.0.md",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/docs/contracts/fsm.control-plane.import-outbox-attribution.v1.0.0.md"
+        },
+        {
+          "path": "apps/api/src/services/integration-outbox-audit.service.ts",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/integration-outbox-audit.service.ts"
+        }
+      ],
+      "observation": "Existing createOrGetIntegrationOutboxOperation opens its own tenant transaction and stores operation/audit identity.",
+      "implication": "Reuse the ledger, but design a shared transaction boundary for action authorization and dispatch intent. Existing separate transactions do not by themselves prove atomic action/outbox claims.",
+      "runtimeAcceptanceClaimed": false
+    },
+    {
+      "id": "CE-06",
+      "title": "Current queue and worker consumers",
+      "baseCommit": "7840884d346ca95788e2668cc78148afa3b6a843",
+      "evidenceType": "targeted_source_review",
+      "paths": [
+        {
+          "path": "packages/jobs/src/queues.ts",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/packages/jobs/src/queues.ts"
+        },
+        {
+          "path": "packages/jobs/src/platform-queue-registry.ts",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/packages/jobs/src/platform-queue-registry.ts"
+        },
+        {
+          "path": "apps/worker/src/index.ts",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/worker/src/index.ts"
+        }
+      ],
+      "observation": "BullMQ queues, queue policy registry and worker bootstrap are current source anchors.",
+      "implication": "OM workers must use trusted tenant envelopes, persisted waits, leases and reconciliation within this stack; do not infer source flags equal active deployment.",
+      "runtimeAcceptanceClaimed": false
+    },
+    {
+      "id": "CE-07",
+      "title": "Revenue outcomes and proposal consumers",
+      "baseCommit": "7840884d346ca95788e2668cc78148afa3b6a843",
+      "evidenceType": "targeted_source_review",
+      "paths": [
+        {
+          "path": "apps/api/src/services/revenue-outcomes.service.ts",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/revenue-outcomes.service.ts"
+        },
+        {
+          "path": "packages/types/src/revenue-outcomes.types.ts",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/packages/types/src/revenue-outcomes.types.ts"
+        },
+        {
+          "path": "apps/api/src/services/revenue-agent/revenue-agent-proposals.service.ts",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/revenue-agent/revenue-agent-proposals.service.ts"
+        }
+      ],
+      "observation": "jobRevenue uses positive amountPaid, then invoiceTotal, then estimateTotal; the existing contribution calculation is not a complete labor/overhead cost model. Proposal builders provide existing estimate, payment and retention integration points.",
+      "implication": "OM-04 must isolate versioned earned/invoiced/cash projections and completeness. OM-10/12 must reuse proposal services without treating proposals as executed outcomes.",
+      "runtimeAcceptanceClaimed": false
+    },
+    {
+      "id": "CE-08",
+      "title": "Owned intake and authoritative booking",
+      "baseCommit": "7840884d346ca95788e2668cc78148afa3b6a843",
+      "evidenceType": "targeted_source_review",
+      "paths": [
+        {
+          "path": "apps/api/src/services/growth-intake-foundation.service.ts",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/growth-intake-foundation.service.ts"
+        },
+        {
+          "path": "apps/api/src/services/booking.service.ts",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/booking.service.ts"
+        }
+      ],
+      "observation": "Existing intake and booking services are source/commitment anchors.",
+      "implication": "OM-05/09/10 must preserve source identity and share manual, self-service and OM feasibility/reservation constraints. No second intake database or booking scheduler.",
+      "runtimeAcceptanceClaimed": false
+    },
+    {
+      "id": "CE-09",
+      "title": "Inventory and dispatch domain services",
+      "baseCommit": "7840884d346ca95788e2668cc78148afa3b6a843",
+      "evidenceType": "targeted_source_review",
+      "paths": [
+        {
+          "path": "apps/api/src/services/inventory.service.ts",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/inventory.service.ts"
+        },
+        {
+          "path": "apps/api/src/services/dispatch-intelligence.service.ts",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/dispatch-intelligence.service.ts"
+        }
+      ],
+      "observation": "Existing inventory records and dispatch ranking supply domain data and command boundaries.",
+      "implication": "OM-08/10 extend verification, material and qualification rules; unverified stock is not zero and rankings cannot waive hard feasibility constraints.",
+      "runtimeAcceptanceClaimed": false
+    },
+    {
+      "id": "CE-10",
+      "title": "Command Center consumers and design governance",
+      "baseCommit": "7840884d346ca95788e2668cc78148afa3b6a843",
+      "evidenceType": "targeted_source_review",
+      "paths": [
+        {
+          "path": "apps/api/src/services/command-center/command-center-brief.service.ts",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/command-center/command-center-brief.service.ts"
+        },
+        {
+          "path": "apps/api/src/services/command-center/command-center-sources.ts",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/command-center/command-center-sources.ts"
+        },
+        {
+          "path": "apps/web/src/hooks/command-center.hooks.ts",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/web/src/hooks/command-center.hooks.ts"
+        },
+        {
+          "path": "apps/web/src/components/command-center/CommandCenterView.tsx",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/web/src/components/command-center/CommandCenterView.tsx"
+        },
+        {
+          "path": "docs/design/RENVANI_FIGMA_PARITY.md",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/docs/design/RENVANI_FIGMA_PARITY.md"
+        },
+        {
+          "path": "docs/design/fs-51-figma-route-map.json",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/docs/design/fs-51-figma-route-map.json"
+        }
+      ],
+      "observation": "Current Command Center API/web consumers and canonical Figma requirements already exist.",
+      "implication": "OM-06 extends these consumers after contract reconciliation; exact frame/state/breakpoint evidence and independent acceptance are still required. The pending UI stack is not part of this pinned baseline.",
+      "runtimeAcceptanceClaimed": false
+    },
+    {
+      "id": "CE-11",
+      "title": "Current provider extension points",
+      "baseCommit": "7840884d346ca95788e2668cc78148afa3b6a843",
+      "evidenceType": "targeted_source_review",
+      "paths": [
+        {
+          "path": "apps/api/src/services/growth/gbp-provider.registry.ts",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/growth/gbp-provider.registry.ts"
+        },
+        {
+          "path": "apps/api/src/services/growth/call-tracking-adapter.registry.ts",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/growth/call-tracking-adapter.registry.ts"
+        },
+        {
+          "path": "packages/config/src/feature-flags.ts",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/packages/config/src/feature-flags.ts"
+        }
+      ],
+      "observation": "The inspected GBP and call-tracking registries have disabled/default extension behavior. They are not proof of a completed Google Search campaign executor.",
+      "implication": "OM-09 requires named connector/account/budget/receipt evidence and an explicit scope extension beyond FS-266's ad-buying non-goal.",
+      "runtimeAcceptanceClaimed": false
+    },
+    {
+      "id": "CE-12",
+      "title": "Model observability boundary",
+      "baseCommit": "7840884d346ca95788e2668cc78148afa3b6a843",
+      "evidenceType": "targeted_source_review",
+      "paths": [
+        {
+          "path": "packages/ai/src/langfuse/client.ts",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/packages/ai/src/langfuse/client.ts"
+        }
+      ],
+      "observation": "Existing AI observability can be reused; it does not establish OM task schemas, concurrent budget reservations or evaluated escalation policy.",
+      "implication": "OM-07 adds bounded capability contracts, usage/evaluation integration and explicit unavailable states.",
+      "runtimeAcceptanceClaimed": false
+    },
+    {
+      "id": "CE-13",
+      "title": "Existing finance and agreement domains",
+      "baseCommit": "7840884d346ca95788e2668cc78148afa3b6a843",
+      "evidenceType": "targeted_source_review",
+      "paths": [
+        {
+          "path": "apps/api/src/services/invoice.service.ts",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/invoice.service.ts"
+        },
+        {
+          "path": "apps/api/src/services/service-agreement.service.ts",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/service-agreement.service.ts"
+        },
+        {
+          "path": "apps/api/src/services/agreement-portal.service.ts",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/agreement-portal.service.ts"
+        },
+        {
+          "path": "apps/api/src/services/service-agreement-template.service.ts",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/service-agreement-template.service.ts"
+        }
+      ],
+      "observation": "Existing invoice and agreement services retain authoritative financial/contract state.",
+      "implication": "OM-04/12 project source facts and invoke existing authorized paths. New enrollment needs accepted terms, obligations and supported billing; payment movement is separately gated.",
+      "runtimeAcceptanceClaimed": false
+    },
+    {
+      "id": "CE-14",
+      "title": "Authoritative schema",
+      "baseCommit": "7840884d346ca95788e2668cc78148afa3b6a843",
+      "evidenceType": "targeted_source_review",
+      "paths": [
+        {
+          "path": "packages/db/src/schema.ts",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/packages/db/src/schema.ts"
+        }
+      ],
+      "observation": "This is the authoritative schema location; existing tenant/domain tables and outbox/consent structures must be considered before new storage.",
+      "implication": "Serialize schema ownership, migration index selection and explicit RLS with implementation. Proposed om_* names in the source spec are design targets, not existing tables or reserved migrations.",
+      "runtimeAcceptanceClaimed": false
+    },
+    {
+      "id": "CE-15",
+      "title": "Historical audit and current preparation inventory",
+      "baseCommit": "7840884d346ca95788e2668cc78148afa3b6a843",
+      "evidenceType": "targeted_source_review",
+      "paths": [
+        {
+          "path": "docs/architecture/TRUSTED_EXECUTION_AUDIT.md",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/docs/architecture/TRUSTED_EXECUTION_AUDIT.md"
+        },
+        {
+          "path": "docs/audit/BACKEND-INVENTORY.md",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/docs/audit/BACKEND-INVENTORY.md"
+        },
+        {
+          "path": "docs/audit/SCHEMA-INVENTORY.md",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/docs/audit/SCHEMA-INVENTORY.md"
+        },
+        {
+          "path": "docs/audit/WORKER-INVENTORY.md",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/docs/audit/WORKER-INVENTORY.md"
+        },
+        {
+          "path": "docs/audit/TEST-BASELINE.md",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/docs/audit/TEST-BASELINE.md"
+        },
+        {
+          "path": "docs/audit/FRONTEND-INVENTORY.md",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/docs/audit/FRONTEND-INVENTORY.md"
+        },
+        {
+          "path": "docs/audit/OPERATOR-ACCEPTANCE.md",
+          "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/docs/audit/OPERATOR-ACCEPTANCE.md"
+        }
+      ],
+      "observation": "Existing audits and inventory documents are reusable evidence indexes, each with its original scope/date/status.",
+      "implication": "Do not promote historical conclusions to current runtime PASS. Target changed consumers at the eventual implementation head and retain required review gates.",
+      "runtimeAcceptanceClaimed": false
+    }
+  ],
+  "fileConsumerCoordination": [
+    {
+      "id": "FC-01",
+      "area": "Shared contracts and API/worker consumers",
+      "packageIds": [
+        "OM-01",
+        "OM-02",
+        "OM-03",
+        "OM-04",
+        "OM-05",
+        "OM-06",
+        "OM-07"
+      ],
+      "evidenceRefs": [
+        "CE-02",
+        "CE-06",
+        "CE-10"
+      ],
+      "proposedConsumerPaths": [
+        "packages/types/src/operating-missions/v1/",
+        "apps/api/src/routes/operating-missions/",
+        "packages/jobs/src/operating-missions/"
+      ],
+      "proposedPathsAreImplemented": false,
+      "implementationOwner": null,
+      "rule": "Agree versions, trusted tenant derivation and mutation idempotency/version semantics first. Update API, typed clients, workers and UI consumers together; do not assume the current queue schema is universally wired."
+    },
+    {
+      "id": "FC-02",
+      "area": "Central schema, RLS and migration order",
+      "packageIds": [
+        "OM-02",
+        "OM-03",
+        "OM-04",
+        "OM-05"
+      ],
+      "evidenceRefs": [
+        "CE-14"
+      ],
+      "proposedConsumerPaths": [
+        "packages/db/src/schema.ts"
+      ],
+      "proposedPathsAreImplemented": false,
+      "implementationOwner": null,
+      "rule": "One explicit schema coordinator at implementation time; sequence migrations against the current journal/open PRs, include RLS and tenant references, and do not reserve a migration index in preparation."
+    },
+    {
+      "id": "FC-03",
+      "area": "Trusted actions, consent, dispatch and receipts",
+      "packageIds": [
+        "OM-02",
+        "OM-03",
+        "OM-05",
+        "OM-09",
+        "OM-10",
+        "OM-12"
+      ],
+      "evidenceRefs": [
+        "CE-03",
+        "CE-04",
+        "CE-05"
+      ],
+      "proposedConsumerPaths": [
+        "apps/api/src/services/operating-missions/"
+      ],
+      "proposedPathsAreImplemented": false,
+      "implementationOwner": null,
+      "rule": "Resolve the action/outbox transaction seam and shared consent/grant checks before adapters. Coordinate any STOP/provider-boundary changes with existing Part I owners rather than layering a duplicate sender."
+    },
+    {
+      "id": "FC-04",
+      "area": "Canonical financial/source outcomes",
+      "packageIds": [
+        "OM-04",
+        "OM-06",
+        "OM-11",
+        "OM-12"
+      ],
+      "evidenceRefs": [
+        "CE-07",
+        "CE-13",
+        "CE-14"
+      ],
+      "proposedConsumerPaths": [
+        "packages/types/src/operating-missions/v1/",
+        "apps/api/src/services/operating-missions/"
+      ],
+      "proposedPathsAreImplemented": false,
+      "implementationOwner": null,
+      "rule": "Version the OM projection independently from legacy totals, preserve invoice/payment/agreement source truth and non-additive contributor links, and coordinate every existing reporting consumer affected by a semantic change."
+    },
+    {
+      "id": "FC-05",
+      "area": "Booking and shared domain reservations",
+      "packageIds": [
+        "OM-05",
+        "OM-08",
+        "OM-09",
+        "OM-10",
+        "OM-11"
+      ],
+      "evidenceRefs": [
+        "CE-08",
+        "CE-09"
+      ],
+      "proposedConsumerPaths": [
+        "apps/api/src/services/operating-missions/"
+      ],
+      "proposedPathsAreImplemented": false,
+      "implementationOwner": null,
+      "rule": "Review hard feasibility and atomic reservation semantics across OM, manual dispatch, self-service and inventory consumers; OM references domain-owned reservations."
+    },
+    {
+      "id": "FC-06",
+      "area": "Organize findings and domain resolution",
+      "packageIds": [
+        "OM-05",
+        "OM-08",
+        "OM-10",
+        "OM-12"
+      ],
+      "evidenceRefs": [
+        "CE-09",
+        "CE-13"
+      ],
+      "proposedConsumerPaths": [
+        "apps/api/src/services/operating-missions/"
+      ],
+      "proposedPathsAreImplemented": false,
+      "implementationOwner": null,
+      "rule": "Agree canonical finding keys, coverage/freshness and condition-specific evidence; scan code must not mutate stock or claim physical verification."
+    },
+    {
+      "id": "FC-07",
+      "area": "Command Center and pending UI stack",
+      "packageIds": [
+        "OM-06",
+        "OM-09",
+        "OM-13"
+      ],
+      "evidenceRefs": [
+        "CE-10"
+      ],
+      "proposedConsumerPaths": [
+        "apps/web/src/components/operating-missions/"
+      ],
+      "proposedPathsAreImplemented": false,
+      "implementationOwner": null,
+      "rule": "Reconcile against accepted contracts and the #432 → #435 → #437 → #438 integration sequence. Rebase and repeat only affected consumer/design checks at the eventual reviewed head."
+    },
+    {
+      "id": "FC-08",
+      "area": "Bounded AI and worker evaluation",
+      "packageIds": [
+        "OM-05",
+        "OM-07",
+        "OM-09",
+        "OM-12",
+        "OM-13"
+      ],
+      "evidenceRefs": [
+        "CE-06",
+        "CE-12"
+      ],
+      "proposedConsumerPaths": [
+        "packages/ai/src/capabilities/",
+        "apps/worker/src/processors/operating-missions/"
+      ],
+      "proposedPathsAreImplemented": false,
+      "implementationOwner": null,
+      "rule": "Keep task dispatch, token/cost reservations, one bounded repair and output validation consistent; no model may publish or write authoritative domain state."
+    },
+    {
+      "id": "FC-09",
+      "area": "Provider-specific acquisition and optional execution",
+      "packageIds": [
+        "OM-03",
+        "OM-09",
+        "OM-R01",
+        "OM-R02"
+      ],
+      "evidenceRefs": [
+        "CE-05",
+        "CE-06",
+        "CE-11"
+      ],
+      "proposedConsumerPaths": [],
+      "proposedPathsAreImplemented": false,
+      "implementationOwner": null,
+      "rule": "Select reviewed adapter locations after scope ownership. Revalidate live provider capabilities and costs at implementation; keep Render experiments independent, disabled and outside the core critical path."
+    }
+  ],
+  "unresolvedDecisions": [
+    {
+      "id": "OM-D01",
+      "title": "Mission targets and mandatory guardrail thresholds",
+      "status": "unresolved",
+      "decisionOwner": null,
+      "implementationBlockedWhereApplicable": true
+    },
+    {
+      "id": "OM-D02",
+      "title": "Agreement revenue recognition",
+      "status": "unresolved",
+      "decisionOwner": null,
+      "implementationBlockedWhereApplicable": true
+    },
+    {
+      "id": "OM-D03",
+      "title": "Cost allocation and completeness",
+      "status": "unresolved",
+      "decisionOwner": null,
+      "implementationBlockedWhereApplicable": true
+    },
+    {
+      "id": "OM-D04",
+      "title": "Role-to-capability authority",
+      "status": "unresolved",
+      "decisionOwner": null,
+      "implementationBlockedWhereApplicable": true
+    },
+    {
+      "id": "OM-D05",
+      "title": "Essential notice and contact-policy exemptions",
+      "status": "unresolved",
+      "decisionOwner": null,
+      "implementationBlockedWhereApplicable": true
+    },
+    {
+      "id": "OM-D06",
+      "title": "Authoritative service, qualification, material, compatibility and due-service rules",
+      "status": "unresolved",
+      "decisionOwner": null,
+      "implementationBlockedWhereApplicable": true
+    },
+    {
+      "id": "OM-D07",
+      "title": "Canonical opportunity identity and split/merge rules",
+      "status": "unresolved",
+      "decisionOwner": null,
+      "implementationBlockedWhereApplicable": true
+    },
+    {
+      "id": "OM-D08",
+      "title": "Approved design frames and states",
+      "status": "unresolved",
+      "decisionOwner": null,
+      "implementationBlockedWhereApplicable": true
+    },
+    {
+      "id": "OM-D09",
+      "title": "Provider readiness and budget semantics",
+      "status": "unresolved",
+      "decisionOwner": null,
+      "implementationBlockedWhereApplicable": true
+    },
+    {
+      "id": "OM-D10",
+      "title": "Model rates, evaluations and runtime allowances",
+      "status": "unresolved",
+      "decisionOwner": null,
+      "implementationBlockedWhereApplicable": true
+    },
+    {
+      "id": "OM-D11",
+      "title": "Evidence thresholds and evaluation designs",
+      "status": "unresolved",
+      "decisionOwner": null,
+      "implementationBlockedWhereApplicable": true
+    },
+    {
+      "id": "OM-D12",
+      "title": "Expanded scope and implementation ownership",
+      "status": "unresolved",
+      "decisionOwner": null,
+      "implementationBlockedWhereApplicable": true
+    },
+    {
+      "id": "OM-D13",
+      "title": "Per-method strategy/support/coordinator classification and finite dependency graphs",
+      "status": "unresolved",
+      "decisionOwner": null,
+      "implementationBlockedWhereApplicable": true
+    }
+  ],
+  "reconciliationRules": [
+    "Do not create replacement FS-262–269 tickets, duplicate FS-257/258, reopen historical Done features or infer runtime ownership from an anchor.",
+    "Preserve the original valid scope and acceptance references; record the delta explicitly before implementation.",
+    "Keep FS-263 contract-only unless its scope is explicitly amended. Record runtime ownership separately.",
+    "Resolve Google Search connector scope beyond FS-266's explicit ad-buying exclusion under OM-D12; first check existing ownership before any new child ticket.",
+    "Keep all implementation owners unassigned and all observed Backlog statuses unchanged.",
+    "Only applicable optional acceptance gates may block an adopted optional capability; disabled/unadvertised Render evaluation does not block core OM.",
+    "Recheck source paths, dependencies, ticket/PR heads and missing decisions at implementation time. A preparation fixture or historical source audit cannot satisfy runtime acceptance."
+  ],
+  "coverageCounts": {
+    "coreWorkPackages": 13,
+    "existingMissionTickets": 8,
+    "partIPredecessors": 2,
+    "coreAcceptanceIds": 34,
+    "optionalWorkPackages": 2,
+    "optionalAcceptanceIds": 6,
+    "sourceEvidenceGroups": 15,
+    "fileCoordinationGroups": 9
+  }
+}

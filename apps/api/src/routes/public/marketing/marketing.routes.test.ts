@@ -86,6 +86,11 @@ async function post(path: string, payload: unknown, ip = freshIp()) {
 }
 
 describe("POST /public/marketing/demo-requests", () => {
+  it.each(["garage-doors", "appliance-repair", "locksmith", "cleaning", "pest-control", "chimney", "pressure-washing", "tree-care", "alarm", "air-duct", "carpet-cleaning"])("stores the advertised prospect trade %s without tenant provisioning", async trade => {
+    const response = await post(DEMO, { ...demo, trade });
+    expect(response.statusCode).toBe(201);
+    expect(repo.demo[0]).toMatchObject({trade});
+  });
   it("persists trimmed/normalized row and returns only { ok, confirmationId }", async () => {
     const res = await post(DEMO, demo);
     expect(res.statusCode).toBe(201);
@@ -177,6 +182,11 @@ describe("POST /public/marketing/demo-requests", () => {
 });
 
 describe("POST /public/marketing/growth-checks", () => {
+  it.each(["garage-doors", "appliance-repair", "locksmith", "cleaning", "pest-control", "chimney", "pressure-washing", "tree-care", "alarm", "air-duct", "carpet-cleaning"])("stores the advertised Growth Check trade %s", async trade => {
+    const response = await post(GC, { ...gc, trade });
+    expect(response.statusCode).toBe(201);
+    expect(repo.growth[0]).toMatchObject({trade});
+  });
   it("persists the seven-field website contact extension and includes it in notification", async () => {
     envOverrides.MARKETING_NOTIFY_EMAIL = "growth@renvani.test";
     const contact = { firstName: " Ann ", lastName: "Lee", phone: "(918) 555-0100", company: "Lee Heating", teamSize: "2–5" };

@@ -1,0 +1,3371 @@
+{
+  "schemaVersion": "1.0.0",
+  "artifactKind": "prepared_acceptance_cases_and_codex_handoff",
+  "fixtureReferenceBase": "docs/operating-missions/preparation",
+  "sourceSpecVersion": "1.1",
+  "sourceNotionUrl": "https://app.notion.com/p/40e317b92d1581188031e8a0a4c847c9",
+  "sourceSection": "Build spec §21",
+  "baseCommit": "7840884d346ca95788e2668cc78148afa3b6a843",
+  "preparedOn": "2026-11-05",
+  "preparationStatus": "prepared",
+  "implementationStatus": "not_started",
+  "runtimeStatus": "not_executed",
+  "implementationOwner": null,
+  "containsRealCustomerData": false,
+  "contractBoundary": "Synthetic case definitions and required future evidence. This is not an executable production fixture schema, approved business policy, current provider capability assertion or completed runtime acceptance.",
+  "commonFixtureContext": {
+    "companyA": "10000000-0000-4000-8000-000000000001",
+    "companyB": "10000000-0000-4000-8000-000000000002",
+    "syntheticClock": "2026-11-15T15:00:00Z",
+    "defaultTimeZone": "America/Chicago",
+    "currency": "USD",
+    "moneyRepresentation": "Decimal strings with currency. Financial scenario policyInputs override the common clock/period/time zone for that scenario.",
+    "actors": "Owner/dispatcher/worker labels denote synthetic roles only. The accepted production role-to-capability matrix must resolve OM-D04.",
+    "authority": "No implicit production/provider/customer-contact/spending/live-payment authority. Positive grants and allowances are explicit fixture-only setup.",
+    "versions": "V1/V2, G1 and C1 are logical fixture revisions, not a prescribed production version encoding; tests must use the accepted current contract and distinguish concurrent same-state writes.",
+    "hashes": "H1/H2 denote different canonical payload hashes computed with the reviewed repository helper, not trusted client-supplied strings.",
+    "dataIsolation": "Use controlled synthetic records and provider fakes for local adversarial cases. Real provider, pilot, browser/design and optional backend evidence have their separate declared gates.",
+    "policyParameters": "Any illustrative target, threshold, cadence, allowance, retry, model rate, duration or recognition value exists only to make an assertion deterministic. It does not resolve OM-D01–OM-D13."
+  },
+  "sourcePathCatalog": [
+    {
+      "path": "AGENTS.md",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/AGENTS.md",
+      "evidenceKind": "existing_source_anchor",
+      "runtimeAcceptanceClaimed": false
+    },
+    {
+      "path": "TEAM.md",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/TEAM.md",
+      "evidenceKind": "existing_source_anchor",
+      "runtimeAcceptanceClaimed": false
+    },
+    {
+      "path": "apps/api/src/services/agent-action-receipt.ts",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/agent-action-receipt.ts",
+      "evidenceKind": "existing_source_anchor",
+      "runtimeAcceptanceClaimed": false
+    },
+    {
+      "path": "apps/api/src/services/agent-action.executors.ts",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/agent-action.executors.ts",
+      "evidenceKind": "existing_source_anchor",
+      "runtimeAcceptanceClaimed": false
+    },
+    {
+      "path": "apps/api/src/services/agent-action.policy.ts",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/agent-action.policy.ts",
+      "evidenceKind": "existing_source_anchor",
+      "runtimeAcceptanceClaimed": false
+    },
+    {
+      "path": "apps/api/src/services/agent-action.registry.ts",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/agent-action.registry.ts",
+      "evidenceKind": "existing_source_anchor",
+      "runtimeAcceptanceClaimed": false
+    },
+    {
+      "path": "apps/api/src/services/agent-action.service.ts",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/agent-action.service.ts",
+      "evidenceKind": "existing_source_anchor",
+      "runtimeAcceptanceClaimed": false
+    },
+    {
+      "path": "apps/api/src/services/agreement-portal.service.ts",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/agreement-portal.service.ts",
+      "evidenceKind": "existing_source_anchor",
+      "runtimeAcceptanceClaimed": false
+    },
+    {
+      "path": "apps/api/src/services/booking.service.ts",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/booking.service.ts",
+      "evidenceKind": "existing_source_anchor",
+      "runtimeAcceptanceClaimed": false
+    },
+    {
+      "path": "apps/api/src/services/command-center/command-center-brief.service.ts",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/command-center/command-center-brief.service.ts",
+      "evidenceKind": "existing_source_anchor",
+      "runtimeAcceptanceClaimed": false
+    },
+    {
+      "path": "apps/api/src/services/dispatch-intelligence.service.ts",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/dispatch-intelligence.service.ts",
+      "evidenceKind": "existing_source_anchor",
+      "runtimeAcceptanceClaimed": false
+    },
+    {
+      "path": "apps/api/src/services/growth-intake-foundation.service.ts",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/growth-intake-foundation.service.ts",
+      "evidenceKind": "existing_source_anchor",
+      "runtimeAcceptanceClaimed": false
+    },
+    {
+      "path": "apps/api/src/services/growth/call-tracking-adapter.registry.ts",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/growth/call-tracking-adapter.registry.ts",
+      "evidenceKind": "existing_source_anchor",
+      "runtimeAcceptanceClaimed": false
+    },
+    {
+      "path": "apps/api/src/services/growth/gbp-provider.registry.ts",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/growth/gbp-provider.registry.ts",
+      "evidenceKind": "existing_source_anchor",
+      "runtimeAcceptanceClaimed": false
+    },
+    {
+      "path": "apps/api/src/services/integration-outbox-audit.service.ts",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/integration-outbox-audit.service.ts",
+      "evidenceKind": "existing_source_anchor",
+      "runtimeAcceptanceClaimed": false
+    },
+    {
+      "path": "apps/api/src/services/inventory.service.ts",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/inventory.service.ts",
+      "evidenceKind": "existing_source_anchor",
+      "runtimeAcceptanceClaimed": false
+    },
+    {
+      "path": "apps/api/src/services/invoice.service.ts",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/invoice.service.ts",
+      "evidenceKind": "existing_source_anchor",
+      "runtimeAcceptanceClaimed": false
+    },
+    {
+      "path": "apps/api/src/services/outbound-consent-email-verification.service.ts",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/outbound-consent-email-verification.service.ts",
+      "evidenceKind": "existing_source_anchor",
+      "runtimeAcceptanceClaimed": false
+    },
+    {
+      "path": "apps/api/src/services/outbound-consent.service.ts",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/outbound-consent.service.ts",
+      "evidenceKind": "existing_source_anchor",
+      "runtimeAcceptanceClaimed": false
+    },
+    {
+      "path": "apps/api/src/services/revenue-agent/revenue-agent-proposals.service.ts",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/revenue-agent/revenue-agent-proposals.service.ts",
+      "evidenceKind": "existing_source_anchor",
+      "runtimeAcceptanceClaimed": false
+    },
+    {
+      "path": "apps/api/src/services/revenue-outcomes.service.ts",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/revenue-outcomes.service.ts",
+      "evidenceKind": "existing_source_anchor",
+      "runtimeAcceptanceClaimed": false
+    },
+    {
+      "path": "apps/api/src/services/service-agreement.service.ts",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/api/src/services/service-agreement.service.ts",
+      "evidenceKind": "existing_source_anchor",
+      "runtimeAcceptanceClaimed": false
+    },
+    {
+      "path": "apps/web/src/components/command-center/CommandCenterView.tsx",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/web/src/components/command-center/CommandCenterView.tsx",
+      "evidenceKind": "existing_source_anchor",
+      "runtimeAcceptanceClaimed": false
+    },
+    {
+      "path": "apps/web/src/hooks/command-center.hooks.ts",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/web/src/hooks/command-center.hooks.ts",
+      "evidenceKind": "existing_source_anchor",
+      "runtimeAcceptanceClaimed": false
+    },
+    {
+      "path": "apps/worker/src/index.ts",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/apps/worker/src/index.ts",
+      "evidenceKind": "existing_source_anchor",
+      "runtimeAcceptanceClaimed": false
+    },
+    {
+      "path": "docs/architecture/TRUSTED_EXECUTION_AUDIT.md",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/docs/architecture/TRUSTED_EXECUTION_AUDIT.md",
+      "evidenceKind": "existing_source_anchor",
+      "runtimeAcceptanceClaimed": false
+    },
+    {
+      "path": "docs/design/RENVANI_FIGMA_PARITY.md",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/docs/design/RENVANI_FIGMA_PARITY.md",
+      "evidenceKind": "existing_source_anchor",
+      "runtimeAcceptanceClaimed": false
+    },
+    {
+      "path": "docs/design/fs-51-figma-route-map.json",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/docs/design/fs-51-figma-route-map.json",
+      "evidenceKind": "existing_source_anchor",
+      "runtimeAcceptanceClaimed": false
+    },
+    {
+      "path": "docs/planning/agent-control-plane-consumers.md",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/docs/planning/agent-control-plane-consumers.md",
+      "evidenceKind": "existing_source_anchor",
+      "runtimeAcceptanceClaimed": false
+    },
+    {
+      "path": "packages/ai/src/langfuse/client.ts",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/packages/ai/src/langfuse/client.ts",
+      "evidenceKind": "existing_source_anchor",
+      "runtimeAcceptanceClaimed": false
+    },
+    {
+      "path": "packages/config/src/feature-flags.ts",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/packages/config/src/feature-flags.ts",
+      "evidenceKind": "existing_source_anchor",
+      "runtimeAcceptanceClaimed": false
+    },
+    {
+      "path": "packages/db/src/integration-outbox.service.ts",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/packages/db/src/integration-outbox.service.ts",
+      "evidenceKind": "existing_source_anchor",
+      "runtimeAcceptanceClaimed": false
+    },
+    {
+      "path": "packages/db/src/schema.ts",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/packages/db/src/schema.ts",
+      "evidenceKind": "existing_source_anchor",
+      "runtimeAcceptanceClaimed": false
+    },
+    {
+      "path": "packages/jobs/src/platform-queue-registry.ts",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/packages/jobs/src/platform-queue-registry.ts",
+      "evidenceKind": "existing_source_anchor",
+      "runtimeAcceptanceClaimed": false
+    },
+    {
+      "path": "packages/jobs/src/queues.ts",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/packages/jobs/src/queues.ts",
+      "evidenceKind": "existing_source_anchor",
+      "runtimeAcceptanceClaimed": false
+    },
+    {
+      "path": "packages/types/src/agent-control-plane/v1/agent-action-proposal.ts",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/packages/types/src/agent-control-plane/v1/agent-action-proposal.ts",
+      "evidenceKind": "existing_source_anchor",
+      "runtimeAcceptanceClaimed": false
+    },
+    {
+      "path": "packages/types/src/agent-control-plane/v1/http-route-schemas.ts",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/packages/types/src/agent-control-plane/v1/http-route-schemas.ts",
+      "evidenceKind": "existing_source_anchor",
+      "runtimeAcceptanceClaimed": false
+    },
+    {
+      "path": "packages/types/src/agent-control-plane/v1/queue-envelope.ts",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/packages/types/src/agent-control-plane/v1/queue-envelope.ts",
+      "evidenceKind": "existing_source_anchor",
+      "runtimeAcceptanceClaimed": false
+    },
+    {
+      "path": "packages/types/src/agent-control-plane/v1/tenant-context.ts",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/packages/types/src/agent-control-plane/v1/tenant-context.ts",
+      "evidenceKind": "existing_source_anchor",
+      "runtimeAcceptanceClaimed": false
+    },
+    {
+      "path": "packages/types/src/revenue-outcomes.types.ts",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/7840884d346ca95788e2668cc78148afa3b6a843/packages/types/src/revenue-outcomes.types.ts",
+      "evidenceKind": "existing_source_anchor",
+      "runtimeAcceptanceClaimed": false
+    }
+  ],
+  "coreCases": [
+    {
+      "caseId": "OM-ACC-001",
+      "criterionId": "OM-A01",
+      "criterionText": "All six definitions have distinct primary outcomes, eligibility, methods, authority and stop rules",
+      "scope": "core",
+      "caseStatus": "prepared",
+      "runtimeStatus": "not_executed",
+      "implementationOwner": null,
+      "packageIds": [
+        "OM-05"
+      ],
+      "ticketAnchorIds": [
+        "FS-263",
+        "FS-269"
+      ],
+      "decisionBlockers": [
+        "OM-D01",
+        "OM-D04",
+        "OM-D06",
+        "OM-D11",
+        "OM-D13"
+      ],
+      "setup": [
+        "Load exactly the six mission IDs and labels in ticket-crosswalk.json.",
+        "For each definition provide a synthetic explicit primary metric, eligibility version, allowed method versions, capability requirements, target/guardrail policy and stop rules; these illustrative values do not resolve OM-D01.",
+        "Use method classifications and finite dependency graphs only when explicit or accepted under OM-D13."
+      ],
+      "action": [
+        "Validate all six definitions and resolve their registered methods.",
+        "Attempt to activate a seventh legacy menu choice, a definition with another mission's metric accidentally copied, a missing mandatory guardrail threshold and an unregistered method version."
+      ],
+      "expectedResults": [
+        "The catalog exposes exactly the six agreed choices, each with its distinct primary outcome and complete required contract fields.",
+        "Missing required policy or method registration produces a visible readiness/evaluation blocker; no default pass or runtime activation occurs.",
+        "Legacy menu concepts remain methods/support or compatibility aliases rather than additional active mission choices."
+      ],
+      "adversarialVariants": [],
+      "evidenceLayers": [
+        "contract",
+        "catalog_integration",
+        "product_policy_acceptance"
+      ],
+      "evidenceRequired": [
+        "Versioned catalog validation plus distinct method/authority/stop fixtures for all six missions.",
+        "Record exact code/test head, fixture version, command/environment, result and linked logs/receipts. Preserve failed or blocked assertions; do not infer PASS from a prepared case."
+      ],
+      "sourcePaths": [
+        "packages/types/src/agent-control-plane/v1/agent-action-proposal.ts",
+        "packages/types/src/agent-control-plane/v1/tenant-context.ts",
+        "packages/types/src/agent-control-plane/v1/queue-envelope.ts",
+        "packages/db/src/schema.ts"
+      ],
+      "financialFixtureNeeds": [],
+      "financialFixtureIds": [],
+      "fixtureRefs": [],
+      "sourceSections": [
+        "Build spec §21 OM-A01"
+      ],
+      "fullCriterionGate": "Requires implementation and execution of the listed integration/evaluation evidence at the exact reviewed head; preparing fixtures does not satisfy this criterion."
+    },
+    {
+      "caseId": "OM-ACC-002",
+      "criterionId": "OM-A02",
+      "criterionText": "No-data/new-business assessment can propose a bounded external booking test without inventing estimates or peer evidence",
+      "scope": "core",
+      "caseStatus": "prepared",
+      "runtimeStatus": "not_executed",
+      "implementationOwner": null,
+      "packageIds": [
+        "OM-05",
+        "OM-04",
+        "OM-09"
+      ],
+      "ticketAnchorIds": [
+        "FS-263",
+        "FS-265",
+        "FS-269"
+      ],
+      "decisionBlockers": [
+        "OM-D01",
+        "OM-D06",
+        "OM-D09",
+        "OM-D11"
+      ],
+      "setup": [
+        "Tenant A is a new HVAC company with zero historical invoices, estimates, jobs, campaign results or allowed pooled observations.",
+        "Its approved service, geography, known qualification rules, available capacity and synthetic supported Search connector are present.",
+        "An illustrative explicit owner envelope is USD 100.00 over seven days; this is a test allowance, not a recommended budget."
+      ],
+      "action": [
+        "Request a more_bookings assessment.",
+        "Remove the historical/baseline dataset and submit untrusted text asserting an unsupported '30% conversion rate'.",
+        "Repeat with a required capacity or service fact missing."
+      ],
+      "expectedResults": [
+        "A bounded external test can be proposed without inventing old estimates, conversion rates, revenue or peer evidence.",
+        "The proposed campaign is not activated; target/baseline assumptions and missing evidence remain explicit.",
+        "When a required fulfillment fact is missing, the affected promise is blocked or handed off for inquiry/assessment; unrelated assessment remains available."
+      ],
+      "adversarialVariants": [],
+      "evidenceLayers": [
+        "contract",
+        "assessment_integration",
+        "bounded_specialist_evaluation"
+      ],
+      "evidenceRequired": [
+        "Cold-start fixtures with explicit missing data, no invented prior estimates and a bounded external proposal.",
+        "Record exact code/test head, fixture version, command/environment, result and linked logs/receipts. Preserve failed or blocked assertions; do not infer PASS from a prepared case."
+      ],
+      "sourcePaths": [
+        "apps/api/src/services/growth-intake-foundation.service.ts",
+        "apps/api/src/services/booking.service.ts",
+        "apps/api/src/services/dispatch-intelligence.service.ts",
+        "apps/api/src/services/inventory.service.ts",
+        "apps/api/src/services/growth/gbp-provider.registry.ts",
+        "apps/api/src/services/growth/call-tracking-adapter.registry.ts",
+        "packages/config/src/feature-flags.ts"
+      ],
+      "financialFixtureNeeds": [],
+      "financialFixtureIds": [],
+      "fixtureRefs": [],
+      "sourceSections": [
+        "Build spec §21 OM-A02"
+      ],
+      "fullCriterionGate": "Requires implementation and execution of the listed integration/evaluation evidence at the exact reviewed head; preparing fixtures does not satisfy this criterion."
+    },
+    {
+      "caseId": "OM-ACC-003",
+      "criterionId": "OM-A03",
+      "criterionText": "Established shop with no recovery backlog can execute the supported external acquisition path",
+      "scope": "core",
+      "caseStatus": "prepared",
+      "runtimeStatus": "not_executed",
+      "implementationOwner": null,
+      "packageIds": [
+        "OM-09",
+        "OM-05"
+      ],
+      "ticketAnchorIds": [
+        "FS-265",
+        "FS-266",
+        "FS-267",
+        "FS-269"
+      ],
+      "decisionBlockers": [
+        "OM-D06",
+        "OM-D09",
+        "OM-D12"
+      ],
+      "setup": [
+        "Tenant A is an established HVAC shop with prior completed work but zero eligible open estimates, missed inquiries or lapsed-customer recovery opportunities.",
+        "The approved external service, real-path test connector, usable capacity and bounded owner grant are present."
+      ],
+      "action": [
+        "Assess and run the supported acquisition path through a synthetic paused campaign, approved activation, customer inquiry, qualification, available slot and domain-confirmed service booking.",
+        "Set the recovery-opportunity count to zero throughout; make unrelated Organize findings remain open."
+      ],
+      "expectedResults": [
+        "The external path is eligible without a fabricated recovery step or requirement to clear unrelated backlog.",
+        "One canonical inquiry and confirmed booking preserve campaign/source lineage; simulated records are labeled synthetic.",
+        "Real external execution acceptance remains blocked until the OM-A13 authorized provider and pilot evidence is supplied."
+      ],
+      "adversarialVariants": [],
+      "evidenceLayers": [
+        "workflow_integration",
+        "authorized_provider_end_to_end",
+        "consenting_pilot"
+      ],
+      "evidenceRequired": [
+        "End-to-end external path for an established company with no recoverable estimates or lapsed customers.",
+        "Record exact code/test head, fixture version, command/environment, result and linked logs/receipts. Preserve failed or blocked assertions; do not infer PASS from a prepared case."
+      ],
+      "sourcePaths": [
+        "apps/api/src/services/growth-intake-foundation.service.ts",
+        "apps/api/src/services/booking.service.ts",
+        "apps/api/src/services/dispatch-intelligence.service.ts",
+        "apps/api/src/services/inventory.service.ts",
+        "packages/db/src/integration-outbox.service.ts",
+        "apps/api/src/services/integration-outbox-audit.service.ts",
+        "apps/worker/src/index.ts",
+        "packages/jobs/src/queues.ts"
+      ],
+      "financialFixtureNeeds": [],
+      "financialFixtureIds": [],
+      "fixtureRefs": [],
+      "sourceSections": [
+        "Build spec §21 OM-A03"
+      ],
+      "fullCriterionGate": "Synthetic behavior is a prerequisite only. Authorized real-provider evidence is required, and an actual consenting-pilot result is separately required where specified."
+    },
+    {
+      "caseId": "OM-ACC-004",
+      "criterionId": "OM-A04",
+      "criterionText": "Unsupported/missing provider returns clear readiness state and cannot produce a fake execution success",
+      "scope": "core",
+      "caseStatus": "prepared",
+      "runtimeStatus": "not_executed",
+      "implementationOwner": null,
+      "packageIds": [
+        "OM-05",
+        "OM-03",
+        "OM-06",
+        "OM-09"
+      ],
+      "ticketAnchorIds": [
+        "FS-263",
+        "FS-264",
+        "FS-266",
+        "FS-267",
+        "FS-269"
+      ],
+      "decisionBlockers": [
+        "OM-D09"
+      ],
+      "setup": [
+        "A selected mission is visible while its required provider is unavailable, account binding is missing, or a configured capability is assessment-only.",
+        "A separate unrelated supported method remains ready."
+      ],
+      "action": [
+        "Request plan generation and then forge an execute/launch request for the unavailable capability.",
+        "Inject a legacy executor response with a success-like status despite no adapter or provider receipt."
+      ],
+      "expectedResults": [
+        "Catalog/API/UI expose a concrete readiness blocker and useful next action; no executable launch is advertised.",
+        "No provider call, command dispatch, delivery, booking, cash or target success is recorded for the unavailable path.",
+        "The unrelated eligible method retains its correct readiness; a missing optional backend does not globally disable core OM."
+      ],
+      "adversarialVariants": [],
+      "evidenceLayers": [
+        "contract",
+        "service_integration",
+        "ui_state"
+      ],
+      "evidenceRequired": [
+        "Readiness/API/UI cases for missing provider, unauthorized account and unavailable capability with no success event.",
+        "Record exact code/test head, fixture version, command/environment, result and linked logs/receipts. Preserve failed or blocked assertions; do not infer PASS from a prepared case."
+      ],
+      "sourcePaths": [
+        "apps/api/src/services/growth/gbp-provider.registry.ts",
+        "apps/api/src/services/growth/call-tracking-adapter.registry.ts",
+        "packages/config/src/feature-flags.ts",
+        "apps/api/src/services/agent-action.service.ts",
+        "apps/api/src/services/agent-action.policy.ts",
+        "apps/api/src/services/agent-action.registry.ts",
+        "apps/api/src/services/agent-action-receipt.ts"
+      ],
+      "financialFixtureNeeds": [],
+      "financialFixtureIds": [],
+      "fixtureRefs": [],
+      "sourceSections": [
+        "Build spec §21 OM-A04"
+      ],
+      "fullCriterionGate": "Requires implementation and execution of the listed integration/evaluation evidence at the exact reviewed head; preparing fixtures does not satisfy this criterion."
+    },
+    {
+      "caseId": "OM-ACC-005",
+      "criterionId": "OM-A05",
+      "criterionText": "Tenant A cannot read, approve, execute, join, or resume tenant B's mission/action/resource through any API or forged queue envelope",
+      "scope": "core",
+      "caseStatus": "prepared",
+      "runtimeStatus": "not_executed",
+      "implementationOwner": null,
+      "packageIds": [
+        "OM-05",
+        "OM-02",
+        "OM-03",
+        "OM-07"
+      ],
+      "ticketAnchorIds": [
+        "FS-263",
+        "FS-267",
+        "FS-269"
+      ],
+      "decisionBlockers": [
+        "OM-D04"
+      ],
+      "setup": [
+        "Create tenant A and tenant B with distinct mission, plan, grant, action, outcome and resource IDs; only A's session/worker tenant is trusted.",
+        "Seed B data with values distinguishable from all A records."
+      ],
+      "action": [
+        "Using A authority, request B's run/action/outcome by ID; approve/execute/pause/resume B's run; link A's mission to B's action/finding/opportunity; reserve B's stock/slot.",
+        "Forge companyId B in queue payload and callback body while keeping A's trusted queue/account binding.",
+        "Run equivalent worker/DB access with missing or wrong tenant session."
+      ],
+      "expectedResults": [
+        "Every cross-tenant path is rejected without revealing B data or confirming B entity existence beyond existing error conventions.",
+        "B has zero state/version/resource/financial changes and zero unauthorized provider calls.",
+        "Trusted server/verified-account identity overrides payload tenant; RLS and service ownership checks apply to joins and resume, not only top-level reads."
+      ],
+      "adversarialVariants": [],
+      "evidenceLayers": [
+        "api_security_integration",
+        "database_rls",
+        "worker_security_integration"
+      ],
+      "evidenceRequired": [
+        "Cross-tenant negative API, relation join, queue and resume cases against real authorization boundaries.",
+        "Record exact code/test head, fixture version, command/environment, result and linked logs/receipts. Preserve failed or blocked assertions; do not infer PASS from a prepared case."
+      ],
+      "sourcePaths": [
+        "packages/types/src/agent-control-plane/v1/agent-action-proposal.ts",
+        "packages/types/src/agent-control-plane/v1/tenant-context.ts",
+        "packages/types/src/agent-control-plane/v1/queue-envelope.ts",
+        "packages/db/src/schema.ts",
+        "apps/api/src/services/agent-action.service.ts",
+        "apps/api/src/services/agent-action.policy.ts",
+        "apps/api/src/services/agent-action.registry.ts",
+        "apps/api/src/services/agent-action-receipt.ts"
+      ],
+      "financialFixtureNeeds": [],
+      "financialFixtureIds": [],
+      "fixtureRefs": [],
+      "sourceSections": [
+        "Build spec §21 OM-A05"
+      ],
+      "fullCriterionGate": "Requires implementation and execution of the listed integration/evaluation evidence at the exact reviewed head; preparing fixtures does not satisfy this criterion."
+    },
+    {
+      "caseId": "OM-ACC-006",
+      "criterionId": "OM-A06",
+      "criterionText": "Concurrent same-state edits, approvals and execution attempts honor atomic versions and cannot reuse stale authorization",
+      "scope": "core",
+      "caseStatus": "prepared",
+      "runtimeStatus": "not_executed",
+      "implementationOwner": null,
+      "packageIds": [
+        "OM-02"
+      ],
+      "ticketAnchorIds": [
+        "FS-263",
+        "FS-267",
+        "FS-269"
+      ],
+      "decisionBlockers": [
+        "OM-D04"
+      ],
+      "setup": [
+        "An editable action and approved plan have exact payload hash H1 and version V1; two requests read V1 before either writes.",
+        "Use a barrier to force same-state edits and execute/approve races, including two updates within one clock millisecond.",
+        "A separate expiry attempt reads a nonterminal V1 before another transaction completes or cancels the action."
+      ],
+      "action": [
+        "Race two different edits with expected V1; then approve/execute the losing payload/version.",
+        "Race duplicate approve/execute calls with equal and different idempotency keys.",
+        "Resume the delayed expiry write after the action becomes terminal or advances version."
+      ],
+      "expectedResults": [
+        "Exactly one conflicting same-version mutation succeeds; later requests receive the existing conflict semantics and cannot reuse H1 authority for changed content.",
+        "Same key/same payload replays the prior result; same key/different payload conflicts; independent duplicate execution still creates one claim.",
+        "Version changes remain distinguishable even within one millisecond; a pre-read check alone does not satisfy the case.",
+        "Expiry cannot overwrite a newer/terminal state; a successful expiry transition is version/state guarded and audited once."
+      ],
+      "adversarialVariants": [],
+      "evidenceLayers": [
+        "database_concurrency",
+        "api_integration"
+      ],
+      "evidenceRequired": [
+        "Concurrent database mutations for edits, approvals, execution and expiry with atomic version predicates.",
+        "Record exact code/test head, fixture version, command/environment, result and linked logs/receipts. Preserve failed or blocked assertions; do not infer PASS from a prepared case."
+      ],
+      "sourcePaths": [
+        "apps/api/src/services/agent-action.service.ts",
+        "apps/api/src/services/agent-action.policy.ts",
+        "apps/api/src/services/agent-action.registry.ts",
+        "apps/api/src/services/agent-action-receipt.ts",
+        "packages/types/src/agent-control-plane/v1/agent-action-proposal.ts",
+        "packages/types/src/agent-control-plane/v1/tenant-context.ts",
+        "packages/types/src/agent-control-plane/v1/queue-envelope.ts",
+        "packages/db/src/schema.ts"
+      ],
+      "financialFixtureNeeds": [],
+      "financialFixtureIds": [],
+      "fixtureRefs": [],
+      "sourceSections": [
+        "Build spec §21 OM-A06"
+      ],
+      "fullCriterionGate": "Requires implementation and execution of the listed integration/evaluation evidence at the exact reviewed head; preparing fixtures does not satisfy this criterion."
+    },
+    {
+      "caseId": "OM-ACC-007",
+      "criterionId": "OM-A07",
+      "criterionText": "Concurrent workers create one local command/outbox claim; each supported provider demonstrates retry-safe behavior; uncertain outcomes block blind retry",
+      "scope": "core",
+      "caseStatus": "prepared",
+      "runtimeStatus": "not_executed",
+      "implementationOwner": null,
+      "packageIds": [
+        "OM-03",
+        "OM-02"
+      ],
+      "ticketAnchorIds": [
+        "FS-267",
+        "FS-258",
+        "FS-269"
+      ],
+      "decisionBlockers": [
+        "OM-D09"
+      ],
+      "setup": [
+        "One approved action has a semantic intent key, immutable provider request identity and no dispatch record.",
+        "Two workers claim it concurrently; the mock provider supports a stable idempotency key.",
+        "A second provider fixture cannot resolve a possible write after timeout."
+      ],
+      "action": [
+        "Race local command/outbox creation; crash one transaction before commit and another worker after commit.",
+        "Retry the committed dispatch using the original provider key.",
+        "Return an ambiguous timeout from the second provider and request automatic retry."
+      ],
+      "expectedResults": [
+        "Exactly one committed local action/outbox claim and matching audit/resource reservation exist; a rollback leaves no orphan dispatch or consumed reservation.",
+        "Repeated supported-provider requests cause one external effect and retain request identity.",
+        "Ambiguous effects enter needs_reconciliation, preserve exposure and block blind repeat writes; an unresolved provider requires accountable review."
+      ],
+      "adversarialVariants": [],
+      "evidenceLayers": [
+        "database_concurrency",
+        "worker_fault_injection",
+        "provider_contract"
+      ],
+      "evidenceRequired": [
+        "Concurrent command/outbox claim and per-provider retry/idempotency/unknown-outcome tests.",
+        "Record exact code/test head, fixture version, command/environment, result and linked logs/receipts. Preserve failed or blocked assertions; do not infer PASS from a prepared case."
+      ],
+      "sourcePaths": [
+        "apps/api/src/services/agent-action.service.ts",
+        "apps/api/src/services/agent-action.policy.ts",
+        "apps/api/src/services/agent-action.registry.ts",
+        "apps/api/src/services/agent-action-receipt.ts",
+        "packages/db/src/integration-outbox.service.ts",
+        "apps/api/src/services/integration-outbox-audit.service.ts",
+        "apps/worker/src/index.ts",
+        "packages/jobs/src/queues.ts"
+      ],
+      "financialFixtureNeeds": [],
+      "financialFixtureIds": [],
+      "fixtureRefs": [],
+      "sourceSections": [
+        "Build spec §21 OM-A07"
+      ],
+      "fullCriterionGate": "Requires implementation and execution of the listed integration/evaluation evidence at the exact reviewed head; preparing fixtures does not satisfy this criterion."
+    },
+    {
+      "caseId": "OM-ACC-008",
+      "criterionId": "OM-A08",
+      "criterionText": "Crash after provider acceptance but before local receipt recovers through idempotency/reconciliation without an unverified duplicate side effect",
+      "scope": "core",
+      "caseStatus": "prepared",
+      "runtimeStatus": "not_executed",
+      "implementationOwner": null,
+      "packageIds": [
+        "OM-03"
+      ],
+      "ticketAnchorIds": [
+        "FS-267",
+        "FS-258",
+        "FS-269"
+      ],
+      "decisionBlockers": [
+        "OM-D09"
+      ],
+      "setup": [
+        "The mock provider accepts operation P1 under stable key K1; the worker dies before writing the local acknowledgement.",
+        "A durable local dispatch record already exists and retains K1.",
+        "A second variant's provider offers neither idempotency nor a definitive lookup."
+      ],
+      "action": [
+        "Restart/expire the worker lease; reconcile by K1/provider identity; replay the returned acknowledgement twice.",
+        "For the unsupported variant, force an additional timeout and retry request."
+      ],
+      "expectedResults": [
+        "Supported recovery finds the same provider operation and records one normalized receipt without an unverified second effect.",
+        "Downstream verification and financial/source projections are applied once.",
+        "Unsupported ambiguity remains visible with reconciliation/review required; it does not silently retry, succeed or release an unknown exposure."
+      ],
+      "adversarialVariants": [],
+      "evidenceLayers": [
+        "worker_fault_injection",
+        "provider_contract",
+        "database_integration"
+      ],
+      "evidenceRequired": [
+        "Crash injection after provider acceptance and before receipt, followed by deterministic reconciliation.",
+        "Record exact code/test head, fixture version, command/environment, result and linked logs/receipts. Preserve failed or blocked assertions; do not infer PASS from a prepared case."
+      ],
+      "sourcePaths": [
+        "packages/db/src/integration-outbox.service.ts",
+        "apps/api/src/services/integration-outbox-audit.service.ts",
+        "apps/worker/src/index.ts",
+        "packages/jobs/src/queues.ts",
+        "apps/api/src/services/agent-action.service.ts",
+        "apps/api/src/services/agent-action.policy.ts",
+        "apps/api/src/services/agent-action.registry.ts",
+        "apps/api/src/services/agent-action-receipt.ts"
+      ],
+      "financialFixtureNeeds": [],
+      "financialFixtureIds": [],
+      "fixtureRefs": [],
+      "sourceSections": [
+        "Build spec §21 OM-A08"
+      ],
+      "fullCriterionGate": "Requires implementation and execution of the listed integration/evaluation evidence at the exact reviewed head; preparing fixtures does not satisfy this criterion."
+    },
+    {
+      "caseId": "OM-ACC-009",
+      "criterionId": "OM-A09",
+      "criterionText": "Revoked consent/grant, changed content, expired proposal, changed balance and changed schedule are rechecked before consequential action",
+      "scope": "core",
+      "caseStatus": "prepared",
+      "runtimeStatus": "not_executed",
+      "implementationOwner": null,
+      "packageIds": [
+        "OM-02",
+        "OM-03",
+        "OM-05",
+        "OM-10",
+        "OM-12"
+      ],
+      "ticketAnchorIds": [
+        "FS-257",
+        "FS-258",
+        "FS-267",
+        "FS-269"
+      ],
+      "decisionBlockers": [
+        "OM-D04",
+        "OM-D05",
+        "OM-D06",
+        "OM-D09"
+      ],
+      "setup": [
+        "A plan/action is approved with exact content H1, grant version G1, consent version C1, unexpired proposal, positive invoice balance and available slot.",
+        "Prepare independent variants changing exactly one of: consent revocation, grant revocation/expiry, payload H2, proposal expiry, paid/disputed balance, booked/conflicting slot or exhausted spending allowance."
+      ],
+      "action": [
+        "Queue before the change; apply the change before dispatch/retry; attempt the consequential action.",
+        "Repeat for delayed worker resume and provider retry after an initial non-effectful failure."
+      ],
+      "expectedResults": [
+        "Every affected action rechecks current authoritative facts and refuses the stale/disallowed effect before provider dispatch.",
+        "The reason is specific (consent, grant, content, expiry, balance, schedule or budget), with auditable unchanged downstream business state.",
+        "No standing grant automatically expands to new content, recipients, price or exposure; required fresh approval is visible."
+      ],
+      "adversarialVariants": [],
+      "evidenceLayers": [
+        "service_integration",
+        "worker_integration",
+        "authorization_negative"
+      ],
+      "evidenceRequired": [
+        "Execution-time revocation, expiry, changed payload, balance and schedule scenarios across retries.",
+        "Record exact code/test head, fixture version, command/environment, result and linked logs/receipts. Preserve failed or blocked assertions; do not infer PASS from a prepared case."
+      ],
+      "sourcePaths": [
+        "apps/api/src/services/agent-action.service.ts",
+        "apps/api/src/services/agent-action.policy.ts",
+        "apps/api/src/services/agent-action.registry.ts",
+        "apps/api/src/services/agent-action-receipt.ts",
+        "apps/api/src/services/outbound-consent.service.ts",
+        "apps/api/src/services/outbound-consent-email-verification.service.ts",
+        "packages/config/src/feature-flags.ts",
+        "apps/api/src/services/growth-intake-foundation.service.ts",
+        "apps/api/src/services/booking.service.ts",
+        "apps/api/src/services/dispatch-intelligence.service.ts",
+        "apps/api/src/services/inventory.service.ts"
+      ],
+      "financialFixtureNeeds": [],
+      "financialFixtureIds": [],
+      "fixtureRefs": [],
+      "sourceSections": [
+        "Build spec §21 OM-A09"
+      ],
+      "fullCriterionGate": "Requires implementation and execution of the listed integration/evaluation evidence at the exact reviewed head; preparing fixtures does not satisfy this criterion."
+    },
+    {
+      "caseId": "OM-ACC-010",
+      "criterionId": "OM-A10",
+      "criterionText": "Two missions targeting the same estimate/contact share one active intent; cadence and budget are enforced across both",
+      "scope": "core",
+      "caseStatus": "prepared",
+      "runtimeStatus": "not_executed",
+      "implementationOwner": null,
+      "packageIds": [
+        "OM-05",
+        "OM-03",
+        "OM-10",
+        "OM-11"
+      ],
+      "ticketAnchorIds": [
+        "FS-263",
+        "FS-267",
+        "FS-269"
+      ],
+      "decisionBlockers": [
+        "OM-D04",
+        "OM-D05",
+        "OM-D07",
+        "OM-D13"
+      ],
+      "setup": [
+        "Bookings and monthly-revenue missions target the same eligible estimate/contact/offer in the same cadence window.",
+        "They have compatible exact content and independent valid approvals; their combined synthetic contact limit is one dispatch in that window and the shared test budget is USD 10.00."
+      ],
+      "action": [
+        "Propose both concurrently with different mission IDs but the same semantic work.",
+        "Attempt a second contact and separately charge the same USD 6.00 dispatch against each mission as if two budgets existed."
+      ],
+      "expectedResults": [
+        "One canonical active intent/action is linked to both missions; semantic identity excludes mission ID.",
+        "Only one customer contact and one USD 6.00 settled expense occur; the shared remaining test allowance is USD 4.00.",
+        "A further contact in the window or exposure above the remaining allowance is blocked across both missions; contributor links do not duplicate spend or outcomes."
+      ],
+      "adversarialVariants": [],
+      "evidenceLayers": [
+        "database_concurrency",
+        "workflow_integration"
+      ],
+      "evidenceRequired": [
+        "Two mission runs sharing one estimate/contact intent, cadence and spend reservation.",
+        "Record exact code/test head, fixture version, command/environment, result and linked logs/receipts. Preserve failed or blocked assertions; do not infer PASS from a prepared case."
+      ],
+      "sourcePaths": [
+        "apps/api/src/services/agent-action.service.ts",
+        "apps/api/src/services/agent-action.policy.ts",
+        "apps/api/src/services/agent-action.registry.ts",
+        "apps/api/src/services/agent-action-receipt.ts",
+        "apps/api/src/services/outbound-consent.service.ts",
+        "apps/api/src/services/outbound-consent-email-verification.service.ts",
+        "packages/config/src/feature-flags.ts",
+        "packages/db/src/integration-outbox.service.ts",
+        "apps/api/src/services/integration-outbox-audit.service.ts",
+        "apps/worker/src/index.ts",
+        "packages/jobs/src/queues.ts"
+      ],
+      "financialFixtureNeeds": [],
+      "financialFixtureIds": [
+        "OM-FIN-13"
+      ],
+      "fixtureRefs": [
+        {
+          "path": "fixtures/accounting-examples.json",
+          "scenarioId": "OM-FIN-13"
+        }
+      ],
+      "sourceSections": [
+        "Build spec §21 OM-A10"
+      ],
+      "fullCriterionGate": "Requires implementation and execution of the listed integration/evaluation evidence at the exact reviewed head; preparing fixtures does not satisfy this criterion."
+    },
+    {
+      "caseId": "OM-ACC-011",
+      "criterionId": "OM-A11",
+      "criterionText": "Competing OM/manual/self-service bookings or stock changes obey the same domain-owned atomic constraints; required skill/customer-window/material constraints cannot be outscored",
+      "scope": "core",
+      "caseStatus": "prepared",
+      "runtimeStatus": "not_executed",
+      "implementationOwner": null,
+      "packageIds": [
+        "OM-05",
+        "OM-08",
+        "OM-09",
+        "OM-10"
+      ],
+      "ticketAnchorIds": [
+        "FS-263",
+        "FS-265",
+        "FS-266",
+        "FS-267",
+        "FS-269"
+      ],
+      "decisionBlockers": [
+        "OM-D06",
+        "OM-D07"
+      ],
+      "setup": [
+        "One qualified technician has one available 90-minute customer window; a high-ranked unqualified technician is also present.",
+        "A verified part has on-hand 5 units and committed reservations 3, so available-to-promise is 2; two jobs each need 2 units.",
+        "Manual, self-service and OM consumers call the same authoritative booking/stock boundary."
+      ],
+      "action": [
+        "Race the three consumers for the single appointment and race two reservations for the remaining stock.",
+        "Attempt to override missing qualification, travel/customer-window conflict or unverified required material with a high ranking score.",
+        "Run a diagnostic visit variant whose known requirements do not include an undiagnosed repair part."
+      ],
+      "expectedResults": [
+        "At most one conflicting appointment and one 2-unit stock reservation commit; no overbooking or negative available stock appears.",
+        "All consumers enforce identical tenant and hard qualification/window/material constraints before ranking.",
+        "Unknown required repair material produces a readiness task; the diagnostic variant uses its actual known requirements without an invented repair requirement."
+      ],
+      "adversarialVariants": [],
+      "evidenceLayers": [
+        "database_concurrency",
+        "domain_integration",
+        "manual_self_service_om_regression"
+      ],
+      "evidenceRequired": [
+        "Concurrent OM/manual/self-service booking and stock cases, including hard qualification/window/material conflicts.",
+        "Record exact code/test head, fixture version, command/environment, result and linked logs/receipts. Preserve failed or blocked assertions; do not infer PASS from a prepared case."
+      ],
+      "sourcePaths": [
+        "apps/api/src/services/growth-intake-foundation.service.ts",
+        "apps/api/src/services/booking.service.ts",
+        "apps/api/src/services/dispatch-intelligence.service.ts",
+        "apps/api/src/services/inventory.service.ts"
+      ],
+      "financialFixtureNeeds": [],
+      "financialFixtureIds": [],
+      "fixtureRefs": [],
+      "sourceSections": [
+        "Build spec §21 OM-A11"
+      ],
+      "fullCriterionGate": "Requires implementation and execution of the listed integration/evaluation evidence at the exact reviewed head; preparing fixtures does not satisfy this criterion."
+    },
+    {
+      "caseId": "OM-ACC-012",
+      "criterionId": "OM-A12",
+      "criterionText": "Google campaign starts paused, binds to the authorized tenant account, verifies total-budget/date constraints and requires approved activation",
+      "scope": "core",
+      "caseStatus": "prepared",
+      "runtimeStatus": "not_executed",
+      "implementationOwner": null,
+      "packageIds": [
+        "OM-09",
+        "OM-02",
+        "OM-03"
+      ],
+      "ticketAnchorIds": [
+        "FS-266",
+        "FS-267",
+        "FS-269"
+      ],
+      "decisionBlockers": [
+        "OM-D04",
+        "OM-D09",
+        "OM-D12"
+      ],
+      "setup": [
+        "A synthetic provider account is cryptographically/operationally bound to tenant A.",
+        "The owner approves exact service, geography, creative, seven-day dates and total USD 100.00 exposure; the campaign begins paused.",
+        "Variants include the wrong account, altered dates, increased total, only a daily-budget capability and missing activation approval."
+      ],
+      "action": [
+        "Create the campaign, validate account/total-budget/date semantics, then separately request activation.",
+        "Attempt each variant and a request to raise the budget above the approved envelope."
+      ],
+      "expectedResults": [
+        "Creation is paused; activation occurs only for the exact authorized account, plan/hash and bounded total/date envelope.",
+        "Wrong account, altered scope or insufficient enforceable budget semantics block activation with explicit readiness/approval reasons.",
+        "An average daily limit is not silently presented as a guaranteed total cap; actual provider semantics remain OM-D09 evidence to verify before live use."
+      ],
+      "adversarialVariants": [],
+      "evidenceLayers": [
+        "adapter_contract",
+        "authorized_provider_end_to_end"
+      ],
+      "evidenceRequired": [
+        "Authorized provider-account test of paused creation, enforced total budget/dates and separate activation approval.",
+        "Record exact code/test head, fixture version, command/environment, result and linked logs/receipts. Preserve failed or blocked assertions; do not infer PASS from a prepared case."
+      ],
+      "sourcePaths": [
+        "apps/api/src/services/growth/gbp-provider.registry.ts",
+        "apps/api/src/services/growth/call-tracking-adapter.registry.ts",
+        "packages/config/src/feature-flags.ts",
+        "packages/db/src/integration-outbox.service.ts",
+        "apps/api/src/services/integration-outbox-audit.service.ts",
+        "apps/worker/src/index.ts",
+        "packages/jobs/src/queues.ts",
+        "apps/api/src/services/agent-action.service.ts",
+        "apps/api/src/services/agent-action.policy.ts",
+        "apps/api/src/services/agent-action.registry.ts",
+        "apps/api/src/services/agent-action-receipt.ts"
+      ],
+      "financialFixtureNeeds": [],
+      "financialFixtureIds": [],
+      "fixtureRefs": [],
+      "sourceSections": [
+        "Build spec §21 OM-A12"
+      ],
+      "fullCriterionGate": "Synthetic behavior is a prerequisite only. Authorized real-provider evidence is required, and an actual consenting-pilot result is separately required where specified."
+    },
+    {
+      "caseId": "OM-ACC-013",
+      "criterionId": "OM-A13",
+      "criterionText": "Real provider test proves campaign/form/source/inquiry/booking linkage; actual pilot outcomes are distinguished from synthetic tests",
+      "scope": "core",
+      "caseStatus": "prepared",
+      "runtimeStatus": "not_executed",
+      "implementationOwner": null,
+      "packageIds": [
+        "OM-09",
+        "OM-13"
+      ],
+      "ticketAnchorIds": [
+        "FS-266",
+        "FS-267",
+        "FS-269"
+      ],
+      "decisionBlockers": [
+        "OM-D06",
+        "OM-D09",
+        "OM-D11",
+        "OM-D12"
+      ],
+      "setup": [
+        "Prepare synthetic campaign/form/source/inquiry/booking IDs and an authorized real-provider test plan using a separately approved account, service page and spending envelope.",
+        "A consenting pilot and its measurement/maturation policy must be separately approved; none is supplied by these fixtures."
+      ],
+      "action": [
+        "Exercise the full synthetic chain, including a duplicate form submission, lost attribution token and unavailable booking slot.",
+        "Later, only under explicit authority, execute the real provider chain and observe a genuine pilot outcome."
+      ],
+      "expectedResults": [
+        "Synthetic deduplication yields one canonical inquiry/booking, unknown attribution remains unknown, and unavailable slots do not become confirmed work.",
+        "The final acceptance record requires real provider resource/receipt/account IDs, approved page/form source capture and authoritative booking/fulfillment lineage.",
+        "Synthetic success does not satisfy the real-provider or actual-pilot portions; pilot outcomes, costs, time window and limitations remain separate from functional test results."
+      ],
+      "adversarialVariants": [],
+      "evidenceLayers": [
+        "workflow_integration",
+        "authorized_provider_end_to_end",
+        "consenting_pilot"
+      ],
+      "evidenceRequired": [
+        "Authorized real provider test with source lineage and separate consenting-pilot outcome evidence.",
+        "Record exact code/test head, fixture version, command/environment, result and linked logs/receipts. Preserve failed or blocked assertions; do not infer PASS from a prepared case."
+      ],
+      "sourcePaths": [
+        "apps/api/src/services/growth-intake-foundation.service.ts",
+        "apps/api/src/services/booking.service.ts",
+        "apps/api/src/services/dispatch-intelligence.service.ts",
+        "apps/api/src/services/inventory.service.ts",
+        "apps/api/src/services/growth/gbp-provider.registry.ts",
+        "apps/api/src/services/growth/call-tracking-adapter.registry.ts",
+        "packages/config/src/feature-flags.ts",
+        "packages/db/src/integration-outbox.service.ts",
+        "apps/api/src/services/integration-outbox-audit.service.ts",
+        "apps/worker/src/index.ts",
+        "packages/jobs/src/queues.ts"
+      ],
+      "financialFixtureNeeds": [],
+      "financialFixtureIds": [],
+      "fixtureRefs": [],
+      "sourceSections": [
+        "Build spec §21 OM-A13"
+      ],
+      "fullCriterionGate": "Synthetic behavior is a prerequisite only. Authorized real-provider evidence is required, and an actual consenting-pilot result is separately required where specified."
+    },
+    {
+      "caseId": "OM-ACC-014",
+      "criterionId": "OM-A14",
+      "criterionText": "Duplicate/reordered provider and domain events preserve correct terminal status and one canonical outcome projection",
+      "scope": "core",
+      "caseStatus": "prepared",
+      "runtimeStatus": "not_executed",
+      "implementationOwner": null,
+      "packageIds": [
+        "OM-03",
+        "OM-04",
+        "OM-05"
+      ],
+      "ticketAnchorIds": [
+        "FS-267",
+        "FS-268",
+        "FS-269"
+      ],
+      "decisionBlockers": [
+        "OM-D02",
+        "OM-D07",
+        "OM-D09"
+      ],
+      "setup": [
+        "Prepare a provider request with accepted and later delivered events plus one canonical domain booking/outcome fact at source version 2.",
+        "Retain immutable source-event IDs and occurrence/receipt timestamps."
+      ],
+      "action": [
+        "Send duplicate delivered events, then an earlier accepted event; replay the booking event; deliver a valid later cancellation/correction.",
+        "Apply events across a worker restart."
+      ],
+      "expectedResults": [
+        "No older event regresses the normalized current delivery state; duplicates have one processing receipt.",
+        "One canonical outcome projection per source event/version/metric is retained; valid corrections supersede/reverse once with audit linkage.",
+        "Cancellation and late correction follow source truth without resurrecting obsolete plans or inventing a second booking."
+      ],
+      "adversarialVariants": [],
+      "evidenceLayers": [
+        "event_reconciliation",
+        "database_integration"
+      ],
+      "evidenceRequired": [
+        "Event duplication/reordering/replay cases with source versions and one canonical projection.",
+        "Record exact code/test head, fixture version, command/environment, result and linked logs/receipts. Preserve failed or blocked assertions; do not infer PASS from a prepared case."
+      ],
+      "sourcePaths": [
+        "packages/db/src/integration-outbox.service.ts",
+        "apps/api/src/services/integration-outbox-audit.service.ts",
+        "apps/worker/src/index.ts",
+        "packages/jobs/src/queues.ts",
+        "apps/api/src/services/revenue-outcomes.service.ts",
+        "packages/types/src/revenue-outcomes.types.ts",
+        "apps/api/src/services/command-center/command-center-brief.service.ts"
+      ],
+      "financialFixtureNeeds": [
+        "Duplicate/reordered domain event and correction replay; linked reversal identity"
+      ],
+      "financialFixtureIds": [
+        "OM-FIN-01",
+        "OM-FIN-03"
+      ],
+      "fixtureRefs": [
+        {
+          "path": "fixtures/accounting-examples.json",
+          "scenarioId": "OM-FIN-01"
+        },
+        {
+          "path": "fixtures/accounting-examples.json",
+          "scenarioId": "OM-FIN-03"
+        }
+      ],
+      "sourceSections": [
+        "Build spec §21 OM-A14"
+      ],
+      "fullCriterionGate": "Requires implementation and execution of the listed integration/evaluation evidence at the exact reviewed head; preparing fixtures does not satisfy this criterion."
+    },
+    {
+      "caseId": "OM-ACC-015",
+      "criterionId": "OM-A15",
+      "criterionText": "Assessment appointments, accepted work, completed work, invoices, earned revenue and cash remain separate in API/UI totals",
+      "scope": "core",
+      "caseStatus": "prepared",
+      "runtimeStatus": "not_executed",
+      "implementationOwner": null,
+      "packageIds": [
+        "OM-04",
+        "OM-06",
+        "OM-09"
+      ],
+      "ticketAnchorIds": [
+        "FS-263",
+        "FS-266",
+        "FS-268",
+        "FS-269"
+      ],
+      "decisionBlockers": [
+        "OM-D02",
+        "OM-D03",
+        "OM-D07"
+      ],
+      "setup": [
+        "Load the financial separation fixture covering an assessment appointment, accepted future work, completed billable service, issued invoice and collected cash.",
+        "Use source-linked decimal-string monetary values, service dates and tenant business periods."
+      ],
+      "action": [
+        "Project API totals and render the same values in Command Center.",
+        "Remove an invoice or payment and add an unaccepted estimate; attempt a legacy paid→invoice→estimate substitution."
+      ],
+      "expectedResults": [
+        "Assessment count, accepted commitments, completed work, invoiced receivables, earned-service revenue and cash remain separately labeled and sourced.",
+        "An estimate or missing source cannot fill a missing earned/cash amount; unknown evidence remains explicit.",
+        "UI and API use the same accounting basis and completeness, without counting contributor links as additional money."
+      ],
+      "adversarialVariants": [],
+      "evidenceLayers": [
+        "projection_integration",
+        "api_contract",
+        "ui_state"
+      ],
+      "evidenceRequired": [
+        "Contract and UI arithmetic fixtures for distinct assessment, accepted, completed, invoiced, earned and cash values.",
+        "Record exact code/test head, fixture version, command/environment, result and linked logs/receipts. Preserve failed or blocked assertions; do not infer PASS from a prepared case."
+      ],
+      "sourcePaths": [
+        "apps/api/src/services/revenue-outcomes.service.ts",
+        "packages/types/src/revenue-outcomes.types.ts",
+        "apps/api/src/services/command-center/command-center-brief.service.ts",
+        "apps/api/src/services/invoice.service.ts",
+        "apps/api/src/services/service-agreement.service.ts",
+        "apps/api/src/services/agreement-portal.service.ts"
+      ],
+      "financialFixtureNeeds": [
+        "Distinct assessment/accepted/completed/invoiced/earned/cash fixture; missing-value fallback"
+      ],
+      "financialFixtureIds": [
+        "OM-FIN-04",
+        "OM-FIN-05",
+        "OM-FIN-06",
+        "OM-FIN-09",
+        "OM-FIN-12",
+        "OM-FIN-13"
+      ],
+      "fixtureRefs": [
+        {
+          "path": "fixtures/accounting-examples.json",
+          "scenarioId": "OM-FIN-04"
+        },
+        {
+          "path": "fixtures/accounting-examples.json",
+          "scenarioId": "OM-FIN-05"
+        },
+        {
+          "path": "fixtures/accounting-examples.json",
+          "scenarioId": "OM-FIN-06"
+        },
+        {
+          "path": "fixtures/accounting-examples.json",
+          "scenarioId": "OM-FIN-09"
+        },
+        {
+          "path": "fixtures/accounting-examples.json",
+          "scenarioId": "OM-FIN-12"
+        },
+        {
+          "path": "fixtures/accounting-examples.json",
+          "scenarioId": "OM-FIN-13"
+        }
+      ],
+      "sourceSections": [
+        "Build spec §21 OM-A15"
+      ],
+      "fullCriterionGate": "Requires implementation and execution of the listed integration/evaluation evidence at the exact reviewed head; preparing fixtures does not satisfy this criterion."
+    },
+    {
+      "caseId": "OM-ACC-016",
+      "criterionId": "OM-A16",
+      "criterionText": "Partial payments, credits, refunds, late invoices and annual agreements reconcile without estimated-value substitution or double counting",
+      "scope": "core",
+      "caseStatus": "prepared",
+      "runtimeStatus": "not_executed",
+      "implementationOwner": null,
+      "packageIds": [
+        "OM-04",
+        "OM-12"
+      ],
+      "ticketAnchorIds": [
+        "FS-268",
+        "FS-269"
+      ],
+      "decisionBlockers": [
+        "OM-D02",
+        "OM-D03",
+        "OM-D07"
+      ],
+      "setup": [
+        "Load financial fixtures for partial payment, credit/refund linkage, late invoice and prepaid annual agreement.",
+        "Provide a fixture-only explicit recognition schedule where a policy is required; the business policy remains OM-D02."
+      ],
+      "action": [
+        "Replay each source event; deliver payment/credit/refund/invoice out of order; remove recognition or cost inputs.",
+        "Project both earned and cash measures across the declared business periods."
+      ],
+      "expectedResults": [
+        "Each authoritative economic adjustment affects its correct basis and period exactly once.",
+        "A refund linked to an already recognized credit settles cash rather than subtracting earned revenue twice.",
+        "A late invoice does not move already earned service to a new earned period; prepaid agreement cash is not automatically current-period earned revenue.",
+        "Missing recognition policy or evidence blocks the affected evaluation and shows incompleteness; no estimate fallback or fabricated zero cost appears."
+      ],
+      "adversarialVariants": [],
+      "evidenceLayers": [
+        "projection_integration",
+        "event_reconciliation"
+      ],
+      "evidenceRequired": [
+        "Source-event reconciliation fixtures for payments, credits, refunds, late invoices and agreements without estimate fallback.",
+        "Record exact code/test head, fixture version, command/environment, result and linked logs/receipts. Preserve failed or blocked assertions; do not infer PASS from a prepared case."
+      ],
+      "sourcePaths": [
+        "apps/api/src/services/revenue-outcomes.service.ts",
+        "packages/types/src/revenue-outcomes.types.ts",
+        "apps/api/src/services/command-center/command-center-brief.service.ts",
+        "apps/api/src/services/invoice.service.ts",
+        "apps/api/src/services/service-agreement.service.ts",
+        "apps/api/src/services/agreement-portal.service.ts"
+      ],
+      "financialFixtureNeeds": [
+        "Partial payment",
+        "Credit linked to refund",
+        "Late invoice",
+        "Annual agreement recognition",
+        "Missing costs/recognition"
+      ],
+      "financialFixtureIds": [
+        "OM-FIN-01",
+        "OM-FIN-02",
+        "OM-FIN-03",
+        "OM-FIN-04",
+        "OM-FIN-06",
+        "OM-FIN-07",
+        "OM-FIN-08",
+        "OM-FIN-09",
+        "OM-FIN-10",
+        "OM-FIN-11"
+      ],
+      "fixtureRefs": [
+        {
+          "path": "fixtures/accounting-examples.json",
+          "scenarioId": "OM-FIN-01"
+        },
+        {
+          "path": "fixtures/accounting-examples.json",
+          "scenarioId": "OM-FIN-02"
+        },
+        {
+          "path": "fixtures/accounting-examples.json",
+          "scenarioId": "OM-FIN-03"
+        },
+        {
+          "path": "fixtures/accounting-examples.json",
+          "scenarioId": "OM-FIN-04"
+        },
+        {
+          "path": "fixtures/accounting-examples.json",
+          "scenarioId": "OM-FIN-06"
+        },
+        {
+          "path": "fixtures/accounting-examples.json",
+          "scenarioId": "OM-FIN-07"
+        },
+        {
+          "path": "fixtures/accounting-examples.json",
+          "scenarioId": "OM-FIN-08"
+        },
+        {
+          "path": "fixtures/accounting-examples.json",
+          "scenarioId": "OM-FIN-09"
+        },
+        {
+          "path": "fixtures/accounting-examples.json",
+          "scenarioId": "OM-FIN-10"
+        },
+        {
+          "path": "fixtures/accounting-examples.json",
+          "scenarioId": "OM-FIN-11"
+        }
+      ],
+      "sourceSections": [
+        "Build spec §21 OM-A16"
+      ],
+      "fullCriterionGate": "Requires implementation and execution of the listed integration/evaluation evidence at the exact reviewed head; preparing fixtures does not satisfy this criterion."
+    },
+    {
+      "caseId": "OM-ACC-017",
+      "criterionId": "OM-A17",
+      "criterionText": "Job-value evaluation includes eligible unconverted/smaller jobs; higher average alone cannot pass failed opportunity/contribution guardrails",
+      "scope": "core",
+      "caseStatus": "prepared",
+      "runtimeStatus": "not_executed",
+      "implementationOwner": null,
+      "packageIds": [
+        "OM-12",
+        "OM-04",
+        "OM-11"
+      ],
+      "ticketAnchorIds": [
+        "FS-265",
+        "FS-267",
+        "FS-268",
+        "FS-269"
+      ],
+      "decisionBlockers": [
+        "OM-D01",
+        "OM-D03",
+        "OM-D06",
+        "OM-D07",
+        "OM-D11"
+      ],
+      "setup": [
+        "Freeze a synthetic opportunity cohort before exposure, including unconverted, smaller and larger eligible jobs.",
+        "Prepare a scenario where completed-job average increases but revenue per eligible opportunity or a mandatory contribution floor fails.",
+        "Use explicit illustrative guardrail thresholds only for the fixture."
+      ],
+      "action": [
+        "Evaluate the average-job-value mission; attempt to drop unconverted/smaller members after seeing results or change the eligibility version.",
+        "Request target_met based only on the higher average."
+      ],
+      "expectedResults": [
+        "Frozen eligibility and nonconverting members remain in opportunity-level denominators; changes require a new declared cohort/version rather than retroactive improvement.",
+        "Higher completed-job average cannot override a failed mandatory suitability/opportunity/contribution guardrail.",
+        "The workflow may finish while the outcome verdict remains target_not_met or not_evaluable as appropriate to complete/missing evidence."
+      ],
+      "adversarialVariants": [],
+      "evidenceLayers": [
+        "cohort_integration",
+        "evaluation_contract"
+      ],
+      "evidenceRequired": [
+        "Frozen opportunity cohort with unconverted/smaller jobs and failed economic guardrail despite higher completed-job average.",
+        "Record exact code/test head, fixture version, command/environment, result and linked logs/receipts. Preserve failed or blocked assertions; do not infer PASS from a prepared case."
+      ],
+      "sourcePaths": [
+        "apps/api/src/services/revenue-outcomes.service.ts",
+        "packages/types/src/revenue-outcomes.types.ts",
+        "apps/api/src/services/command-center/command-center-brief.service.ts"
+      ],
+      "financialFixtureNeeds": [
+        "Frozen opportunity denominator and adverse job-value mix; missing contribution components"
+      ],
+      "financialFixtureIds": [
+        "OM-FIN-10",
+        "OM-FIN-14"
+      ],
+      "fixtureRefs": [
+        {
+          "path": "fixtures/accounting-examples.json",
+          "scenarioId": "OM-FIN-10"
+        },
+        {
+          "path": "fixtures/accounting-examples.json",
+          "scenarioId": "OM-FIN-14"
+        }
+      ],
+      "sourceSections": [
+        "Build spec §21 OM-A17"
+      ],
+      "fullCriterionGate": "Requires implementation and execution of the listed integration/evaluation evidence at the exact reviewed head; preparing fixtures does not satisfy this criterion."
+    },
+    {
+      "caseId": "OM-ACC-018",
+      "criterionId": "OM-A18",
+      "criterionText": "Repeat-sales metrics exclude warranty/rework successes while including associated cost/quality impact and retaining fixed cohort membership",
+      "scope": "core",
+      "caseStatus": "prepared",
+      "runtimeStatus": "not_executed",
+      "implementationOwner": null,
+      "packageIds": [
+        "OM-12",
+        "OM-04"
+      ],
+      "ticketAnchorIds": [
+        "FS-265",
+        "FS-267",
+        "FS-268",
+        "FS-269"
+      ],
+      "decisionBlockers": [
+        "OM-D01",
+        "OM-D02",
+        "OM-D03",
+        "OM-D06",
+        "OM-D07",
+        "OM-D11"
+      ],
+      "setup": [
+        "Freeze a repeat-eligible cohort before exposure, with new paid repeat service, warranty work and rework tagged distinctly.",
+        "Include warranty/rework labor/material/capacity use and one customer-quality outcome."
+      ],
+      "action": [
+        "Evaluate repeat sales, then attempt to label warranty/rework as new paid repeat wins or remove difficult members after treatment.",
+        "Replay the associated cost/refund events."
+      ],
+      "expectedResults": [
+        "Warranty and rework do not increase newly won repeat-sales successes.",
+        "Their verified costs, capacity use, refunds and customer-quality effects remain in applicable guardrails and source projections once.",
+        "Original cohort membership and matured/open states persist; source corrections are audited without selectively dropping members."
+      ],
+      "adversarialVariants": [],
+      "evidenceLayers": [
+        "cohort_integration",
+        "projection_integration"
+      ],
+      "evidenceRequired": [
+        "Fixed repeat cohort with warranty/rework exclusions from sales and inclusion of cost/quality impact.",
+        "Record exact code/test head, fixture version, command/environment, result and linked logs/receipts. Preserve failed or blocked assertions; do not infer PASS from a prepared case."
+      ],
+      "sourcePaths": [
+        "apps/api/src/services/revenue-outcomes.service.ts",
+        "packages/types/src/revenue-outcomes.types.ts",
+        "apps/api/src/services/command-center/command-center-brief.service.ts",
+        "apps/api/src/services/invoice.service.ts",
+        "apps/api/src/services/service-agreement.service.ts",
+        "apps/api/src/services/agreement-portal.service.ts"
+      ],
+      "financialFixtureNeeds": [
+        "Repeat cohort with warranty/rework and associated cost/quality impact"
+      ],
+      "financialFixtureIds": [
+        "OM-FIN-16"
+      ],
+      "fixtureRefs": [
+        {
+          "path": "fixtures/accounting-examples.json",
+          "scenarioId": "OM-FIN-16"
+        }
+      ],
+      "sourceSections": [
+        "Build spec §21 OM-A18"
+      ],
+      "fullCriterionGate": "Requires implementation and execution of the listed integration/evaluation evidence at the exact reviewed head; preparing fixtures does not satisfy this criterion."
+    },
+    {
+      "caseId": "OM-ACC-019",
+      "criterionId": "OM-A19",
+      "criterionText": "Payment-time evaluation retains still-open invoices; disputed or already paid invoices do not receive inappropriate follow-up",
+      "scope": "core",
+      "caseStatus": "prepared",
+      "runtimeStatus": "not_executed",
+      "implementationOwner": null,
+      "packageIds": [
+        "OM-12",
+        "OM-04",
+        "OM-10"
+      ],
+      "ticketAnchorIds": [
+        "FS-267",
+        "FS-268",
+        "FS-269"
+      ],
+      "decisionBlockers": [
+        "OM-D05",
+        "OM-D07",
+        "OM-D11"
+      ],
+      "setup": [
+        "Freeze an invoice cohort containing paid, still-open, disputed and payment-uncertain invoices.",
+        "A reminder is queued while a positive balance exists; one invoice is paid or disputed before dispatch."
+      ],
+      "action": [
+        "Evaluate payment time without dropping open invoices; execute the queued reminder after the balance/dispute change.",
+        "Attempt to report only the quickly paid subset as the full cohort result."
+      ],
+      "expectedResults": [
+        "Still-open invoices remain visible in the declared cohort and censoring/completeness treatment; no artificial zero payment duration is assigned.",
+        "Paid/disputed/uncertain invoices receive no inappropriate collection contact; current authoritative state wins over the queued snapshot.",
+        "Completion-to-invoice and invoice-to-payment remain distinct delays with declared periods and missing evidence."
+      ],
+      "adversarialVariants": [],
+      "evidenceLayers": [
+        "cohort_integration",
+        "worker_integration"
+      ],
+      "evidenceRequired": [
+        "Payment-time cohort retains open invoices and suppresses disputed/already-paid follow-up.",
+        "Record exact code/test head, fixture version, command/environment, result and linked logs/receipts. Preserve failed or blocked assertions; do not infer PASS from a prepared case."
+      ],
+      "sourcePaths": [
+        "apps/api/src/services/invoice.service.ts",
+        "apps/api/src/services/service-agreement.service.ts",
+        "apps/api/src/services/agreement-portal.service.ts",
+        "apps/api/src/services/revenue-outcomes.service.ts",
+        "packages/types/src/revenue-outcomes.types.ts",
+        "apps/api/src/services/command-center/command-center-brief.service.ts",
+        "apps/api/src/services/outbound-consent.service.ts",
+        "apps/api/src/services/outbound-consent-email-verification.service.ts",
+        "packages/config/src/feature-flags.ts"
+      ],
+      "financialFixtureNeeds": [
+        "Open/censored invoice cohort; partial payment and current-balance suppression"
+      ],
+      "financialFixtureIds": [
+        "OM-FIN-07",
+        "OM-FIN-15"
+      ],
+      "fixtureRefs": [
+        {
+          "path": "fixtures/accounting-examples.json",
+          "scenarioId": "OM-FIN-07"
+        },
+        {
+          "path": "fixtures/accounting-examples.json",
+          "scenarioId": "OM-FIN-15"
+        }
+      ],
+      "sourceSections": [
+        "Build spec §21 OM-A19"
+      ],
+      "fullCriterionGate": "Requires implementation and execution of the listed integration/evaluation evidence at the exact reviewed head; preparing fixtures does not satisfy this criterion."
+    },
+    {
+      "caseId": "OM-ACC-020",
+      "criterionId": "OM-A20",
+      "criterionText": "Organize distinguishes unverified from zero stock, considers hours/skills instead of job counts, and verifies each condition-specific resolution",
+      "scope": "core",
+      "caseStatus": "prepared",
+      "runtimeStatus": "not_executed",
+      "implementationOwner": null,
+      "packageIds": [
+        "OM-08",
+        "OM-10"
+      ],
+      "ticketAnchorIds": [
+        "FS-265",
+        "FS-267",
+        "FS-269"
+      ],
+      "decisionBlockers": [
+        "OM-D06"
+      ],
+      "setup": [
+        "Prepare stock item U with stale/unverified quantity and item Z with a recent verified count of 0.",
+        "Technician T1 has three short jobs; T2 has one eight-hour job; one candidate lacks a mandatory skill.",
+        "Prepare an internal finding with no actual domain correction/physical verification yet."
+      ],
+      "action": [
+        "Run the scoped Organize scan; rank feasibility by work/travel/buffer hours and skills.",
+        "Request a stock correction and mark the finding resolved using only a generated recommendation or sent email."
+      ],
+      "expectedResults": [
+        "U remains unverified and Z remains verified zero; available-to-promise includes verified reservations.",
+        "Job counts alone do not balance capacity and an unqualified technician is excluded before ranking.",
+        "A draft, recommendation, notification or owner click without required condition evidence does not resolve the finding; authoritative update or accountable physical verification is required."
+      ],
+      "adversarialVariants": [],
+      "evidenceLayers": [
+        "detector_integration",
+        "domain_integration"
+      ],
+      "evidenceRequired": [
+        "Unknown versus zero stock, skill/hour feasibility and condition-specific resolution verification.",
+        "Record exact code/test head, fixture version, command/environment, result and linked logs/receipts. Preserve failed or blocked assertions; do not infer PASS from a prepared case."
+      ],
+      "sourcePaths": [
+        "apps/api/src/services/inventory.service.ts",
+        "apps/api/src/services/dispatch-intelligence.service.ts"
+      ],
+      "financialFixtureNeeds": [],
+      "financialFixtureIds": [
+        "OM-FIN-19"
+      ],
+      "fixtureRefs": [
+        {
+          "path": "fixtures/accounting-examples.json",
+          "scenarioId": "OM-FIN-19"
+        }
+      ],
+      "sourceSections": [
+        "Build spec §21 OM-A20"
+      ],
+      "fullCriterionGate": "Requires implementation and execution of the listed integration/evaluation evidence at the exact reviewed head; preparing fixtures does not satisfy this criterion."
+    },
+    {
+      "caseId": "OM-ACC-021",
+      "criterionId": "OM-A21",
+      "criterionText": "Model/tool/token/cost caps hold under concurrent requests; malformed output gets at most one bounded retry/escalation and then a visible fallback",
+      "scope": "core",
+      "caseStatus": "prepared",
+      "runtimeStatus": "not_executed",
+      "implementationOwner": null,
+      "packageIds": [
+        "OM-07",
+        "OM-05"
+      ],
+      "ticketAnchorIds": [
+        "FS-263",
+        "FS-267",
+        "FS-269"
+      ],
+      "decisionBlockers": [
+        "OM-D10"
+      ],
+      "setup": [
+        "Use synthetic rates, not current provider pricing: each of two concurrent tasks reserves USD 0.06 against a shared USD 0.10 allowance.",
+        "Set a test task maximum of two model invocations total (initial plus one bounded repair/escalation), at most 2000 input tokens and 1500 output tokens per call, at most six allowlisted read-tool calls total, zero direct mutation tools and a 60-second total invocation deadline.",
+        "Prepare malformed output, unknown usage and duplicate completion receipts."
+      ],
+      "action": [
+        "Race both reservations; return malformed output on an admitted call and its one permitted repair.",
+        "Attempt a third invocation, a seventh read-tool call, an unallowlisted or mutation tool, a call with 2001 input tokens or a requested 1501-token output limit, a call after the 60-second deadline and release of an unsettled reservation.",
+        "Replay the usage receipt."
+      ],
+      "expectedResults": [
+        "Only one USD 0.06 reservation is initially admitted; concurrent checks cannot overspend the shared allowance.",
+        "The task performs at most its one bounded repair/escalation and then returns a visible fallback; no retry loop or silent best-effort action is produced.",
+        "Tools/tokens/deadline remain bounded. Unknown usage keeps explicit reserved/pending exposure; duplicate settlement does not double charge or release allowance twice.",
+        "Fixture rates do not resolve actual model/rate/allowance approval under OM-D10."
+      ],
+      "adversarialVariants": [],
+      "evidenceLayers": [
+        "usage_ledger_concurrency",
+        "specialist_evaluation",
+        "worker_fault_injection"
+      ],
+      "evidenceRequired": [
+        "Concurrent model/tool/token/cost reservations plus malformed-output one-repair and visible-fallback cases.",
+        "Record exact code/test head, fixture version, command/environment, result and linked logs/receipts. Preserve failed or blocked assertions; do not infer PASS from a prepared case."
+      ],
+      "sourcePaths": [
+        "packages/ai/src/langfuse/client.ts",
+        "apps/api/src/services/revenue-agent/revenue-agent-proposals.service.ts",
+        "packages/jobs/src/platform-queue-registry.ts",
+        "packages/types/src/agent-control-plane/v1/agent-action-proposal.ts",
+        "packages/types/src/agent-control-plane/v1/tenant-context.ts",
+        "packages/types/src/agent-control-plane/v1/queue-envelope.ts",
+        "packages/db/src/schema.ts"
+      ],
+      "financialFixtureNeeds": [],
+      "financialFixtureIds": [],
+      "fixtureRefs": [],
+      "sourceSections": [
+        "Build spec §21 OM-A21"
+      ],
+      "fullCriterionGate": "Requires implementation and execution of the listed integration/evaluation evidence at the exact reviewed head; preparing fixtures does not satisfy this criterion."
+    },
+    {
+      "caseId": "OM-ACC-022",
+      "criterionId": "OM-A22",
+      "criterionText": "Customer/web prompt injection cannot expand tool authority, change tenant, publish content, spend money or alter authoritative records",
+      "scope": "core",
+      "caseStatus": "prepared",
+      "runtimeStatus": "not_executed",
+      "implementationOwner": null,
+      "packageIds": [
+        "OM-07",
+        "OM-02",
+        "OM-09"
+      ],
+      "ticketAnchorIds": [
+        "FS-263",
+        "FS-267",
+        "FS-269"
+      ],
+      "decisionBlockers": [
+        "OM-D04",
+        "OM-D10"
+      ],
+      "setup": [
+        "A tenant A specialist task can read only approved contextual references and return a typed proposal.",
+        "Untrusted customer/web content contains instructions to switch to tenant B, reveal secrets, run a shell, send a message, publish an offer, increase spending and bypass approval."
+      ],
+      "action": [
+        "Place the injection in message text, webpage metadata and a retrieved document; request the normal specialist task.",
+        "Return a syntactically valid proposal with forged tenant/resource IDs or an unauthorized tool/action."
+      ],
+      "expectedResults": [
+        "Untrusted text cannot change trusted identity, tool allowlist, task scope or authority.",
+        "No unapproved network write, customer contact, publication, spend or authoritative record mutation occurs.",
+        "Schema plus policy/ownership validation rejects forbidden outputs; usable bounded findings can still be returned with the malicious content treated as data."
+      ],
+      "adversarialVariants": [],
+      "evidenceLayers": [
+        "adversarial_specialist_evaluation",
+        "tool_policy_integration",
+        "tenant_security"
+      ],
+      "evidenceRequired": [
+        "Adversarial customer/web content with unchanged tenant, tools, authorization and authoritative state.",
+        "Record exact code/test head, fixture version, command/environment, result and linked logs/receipts. Preserve failed or blocked assertions; do not infer PASS from a prepared case."
+      ],
+      "sourcePaths": [
+        "packages/ai/src/langfuse/client.ts",
+        "apps/api/src/services/revenue-agent/revenue-agent-proposals.service.ts",
+        "packages/jobs/src/platform-queue-registry.ts",
+        "apps/api/src/services/agent-action.service.ts",
+        "apps/api/src/services/agent-action.policy.ts",
+        "apps/api/src/services/agent-action.registry.ts",
+        "apps/api/src/services/agent-action-receipt.ts",
+        "packages/types/src/agent-control-plane/v1/agent-action-proposal.ts",
+        "packages/types/src/agent-control-plane/v1/tenant-context.ts",
+        "packages/types/src/agent-control-plane/v1/queue-envelope.ts",
+        "packages/db/src/schema.ts"
+      ],
+      "financialFixtureNeeds": [],
+      "financialFixtureIds": [],
+      "fixtureRefs": [],
+      "sourceSections": [
+        "Build spec §21 OM-A22"
+      ],
+      "fullCriterionGate": "Requires implementation and execution of the listed integration/evaluation evidence at the exact reviewed head; preparing fixtures does not satisfy this criterion."
+    },
+    {
+      "caseId": "OM-ACC-023",
+      "criterionId": "OM-A23",
+      "criterionText": "Small-sample decisions show observed results and bounded next steps without fabricating certainty; pooled evidence is not misreported as local causal proof",
+      "scope": "core",
+      "caseStatus": "prepared",
+      "runtimeStatus": "not_executed",
+      "implementationOwner": null,
+      "packageIds": [
+        "OM-04",
+        "OM-05",
+        "OM-07",
+        "OM-11",
+        "OM-13"
+      ],
+      "ticketAnchorIds": [
+        "FS-263",
+        "FS-265",
+        "FS-268",
+        "FS-269"
+      ],
+      "decisionBlockers": [
+        "OM-D01",
+        "OM-D10",
+        "OM-D11"
+      ],
+      "setup": [
+        "Prepare two local completed jobs with no declared control design, an explicitly permitted comparable pooled dataset and a separately labeled expert default.",
+        "Include one local outcome still inside its maturation period and a missing mandatory guardrail input.",
+        "Prepare pooling variants with four contributing tenants/120 matured opportunities, five tenants/99 matured opportunities, five tenants/100 opportunities from an incomparable service/channel/context, and a prior that includes the same current-tenant observations later used in its likelihood. The five-tenant/100-opportunity floor is the source's proposed pilot policy, pending OM-D11 evaluation."
+      ],
+      "action": [
+        "Request a continuation/expansion decision and an effect statement.",
+        "Attempt to label the pooled average as tenant-local causal uplift, assign model self-rated probability as calibrated confidence, or promote authority after one positive result.",
+        "Attempt to use each insufficient/incomparable pool as an empirical prior and to count the current tenant's observations in both prior and likelihood."
+      ],
+      "expectedResults": [
+        "Actual local observations and pending maturation are shown with limitations; no unsupported statistical certainty or causal claim is produced.",
+        "Expert defaults, pooled observations and evaluated estimates retain separate provenance and permitted use.",
+        "The recommendation remains bounded under the existing grant; missing required evidence prevents an unsupported target/effect pass or automatic authority expansion.",
+        "Below-floor or incomparable pools cannot become empirical priors; use labeled expert defaults/broad uncertainty and bounded tests. Exclude current-tenant observations from its prior or prove an accepted mechanism preventing double use; record the contributing sample/provenance without treating the aggregation floor as a privacy guarantee."
+      ],
+      "adversarialVariants": [],
+      "evidenceLayers": [
+        "evaluation_contract",
+        "specialist_evaluation",
+        "pilot_measurement"
+      ],
+      "evidenceRequired": [
+        "Small-sample/pooled-evidence fixtures with declared design, uncertainty and bounded next-step language.",
+        "Record exact code/test head, fixture version, command/environment, result and linked logs/receipts. Preserve failed or blocked assertions; do not infer PASS from a prepared case."
+      ],
+      "sourcePaths": [
+        "apps/api/src/services/revenue-outcomes.service.ts",
+        "packages/types/src/revenue-outcomes.types.ts",
+        "apps/api/src/services/command-center/command-center-brief.service.ts",
+        "packages/ai/src/langfuse/client.ts",
+        "apps/api/src/services/revenue-agent/revenue-agent-proposals.service.ts",
+        "packages/jobs/src/platform-queue-registry.ts"
+      ],
+      "financialFixtureNeeds": [
+        "Small-sample matured/pending cohort and incomplete guardrail evidence"
+      ],
+      "financialFixtureIds": [
+        "OM-FIN-18"
+      ],
+      "fixtureRefs": [
+        {
+          "path": "fixtures/accounting-examples.json",
+          "scenarioId": "OM-FIN-18"
+        }
+      ],
+      "sourceSections": [
+        "Build spec §21 OM-A23",
+        "Build spec §17.4"
+      ],
+      "fullCriterionGate": "Requires implementation and execution of the listed integration/evaluation evidence at the exact reviewed head; preparing fixtures does not satisfy this criterion."
+    },
+    {
+      "caseId": "OM-ACC-024",
+      "criterionId": "OM-A24",
+      "criterionText": "Pause/cancel stops future dispatch and exposes in-flight actions; no false promise of reversing already performed effects",
+      "scope": "core",
+      "caseStatus": "prepared",
+      "runtimeStatus": "not_executed",
+      "implementationOwner": null,
+      "packageIds": [
+        "OM-05",
+        "OM-03",
+        "OM-06"
+      ],
+      "ticketAnchorIds": [
+        "FS-263",
+        "FS-264",
+        "FS-267",
+        "FS-269"
+      ],
+      "decisionBlockers": [
+        "OM-D04"
+      ],
+      "setup": [
+        "A mission has one undispatched approved action, one provider-accepted in-flight action and one completed irreversible effect.",
+        "Unused and in-use reservations are distinguishable.",
+        "A fourth worker has already claimed a step/action/outbox lease but has not called the provider; hold it at a barrier before its final dispatch authorization check."
+      ],
+      "action": [
+        "Pause after that worker's claim and before its final dispatch check; then cancel the mission and release the worker barrier.",
+        "Deliver the late provider receipt for the already accepted action."
+      ],
+      "expectedResults": [
+        "No new dispatch occurs after the effective pause/cancel boundary; in-flight work remains visible and reconciles.",
+        "Only unused reservations with no remaining valid action are released; past effects and receipts stay auditable.",
+        "The UI does not claim to unsend a message or reverse a completed purchase; any compensation is a separate supported authorized action.",
+        "The previously claimed but undispatched worker rechecks and serializes the current pause/cancel state at the final dispatch boundary and makes zero provider calls in this ordering. An earlier lease or outbox claim is not permission to send."
+      ],
+      "adversarialVariants": [],
+      "evidenceLayers": [
+        "worker_concurrency",
+        "event_reconciliation",
+        "ui_state"
+      ],
+      "evidenceRequired": [
+        "Pause/cancel before dispatch and during in-flight work, with honest irreversible-effect presentation.",
+        "Record exact code/test head, fixture version, command/environment, result and linked logs/receipts. Preserve failed or blocked assertions; do not infer PASS from a prepared case."
+      ],
+      "sourcePaths": [
+        "apps/api/src/services/agent-action.service.ts",
+        "apps/api/src/services/agent-action.policy.ts",
+        "apps/api/src/services/agent-action.registry.ts",
+        "apps/api/src/services/agent-action-receipt.ts",
+        "packages/db/src/integration-outbox.service.ts",
+        "apps/api/src/services/integration-outbox-audit.service.ts",
+        "apps/worker/src/index.ts",
+        "packages/jobs/src/queues.ts",
+        "apps/web/src/components/command-center/CommandCenterView.tsx",
+        "apps/web/src/hooks/command-center.hooks.ts",
+        "docs/design/RENVANI_FIGMA_PARITY.md",
+        "docs/design/fs-51-figma-route-map.json"
+      ],
+      "financialFixtureNeeds": [],
+      "financialFixtureIds": [],
+      "fixtureRefs": [],
+      "sourceSections": [
+        "Build spec §21 OM-A24"
+      ],
+      "fullCriterionGate": "Requires implementation and execution of the listed integration/evaluation evidence at the exact reviewed head; preparing fixtures does not satisfy this criterion."
+    },
+    {
+      "caseId": "OM-ACC-025",
+      "criterionId": "OM-A25",
+      "criterionText": "Scope/pagination coverage, queues, stale leases, dispatch uncertainty and missing provider receipts are observable and actionable",
+      "scope": "core",
+      "caseStatus": "prepared",
+      "runtimeStatus": "not_executed",
+      "implementationOwner": null,
+      "packageIds": [
+        "OM-13",
+        "OM-03",
+        "OM-05",
+        "OM-07",
+        "OM-08"
+      ],
+      "ticketAnchorIds": [
+        "FS-263",
+        "FS-265",
+        "FS-267",
+        "FS-269"
+      ],
+      "decisionBlockers": [
+        "OM-D09",
+        "OM-D10"
+      ],
+      "setup": [
+        "A tenant-scoped scan has 501 eligible records and a test page size of 200; force its deadline after the first page.",
+        "Seed queue lag, an expired worker lease, one unknown provider effect and one missing receipt.",
+        "Tenant B's records are present but inaccessible."
+      ],
+      "action": [
+        "Run the scan and operational status queries, resume from the stored cursor, and race stale-lease recovery.",
+        "Attempt to mark the partial scan complete and retry the unknown provider write blindly."
+      ],
+      "expectedResults": [
+        "The first result reports scanned 200 of the fixture's 501 records, incomplete coverage and a resumable cursor; remaining records are not silently omitted.",
+        "Queue age, stale lease, dispatch uncertainty and missing receipt each have actionable correlated state/alerts or owner tasks.",
+        "Recovery has one current claim, does not leak tenant B, and preserves unknown-effect reconciliation instead of duplicate dispatch.",
+        "A resumed complete scan reconciles canonical findings without duplicate work."
+      ],
+      "adversarialVariants": [],
+      "evidenceLayers": [
+        "observability_integration",
+        "worker_fault_injection",
+        "pagination_integration"
+      ],
+      "evidenceRequired": [
+        "Operational coverage, pagination, queue lag, stale lease, uncertain dispatch and missing receipt telemetry/recovery evidence.",
+        "Record exact code/test head, fixture version, command/environment, result and linked logs/receipts. Preserve failed or blocked assertions; do not infer PASS from a prepared case."
+      ],
+      "sourcePaths": [
+        "packages/db/src/integration-outbox.service.ts",
+        "apps/api/src/services/integration-outbox-audit.service.ts",
+        "apps/worker/src/index.ts",
+        "packages/jobs/src/queues.ts",
+        "apps/api/src/services/inventory.service.ts",
+        "apps/api/src/services/dispatch-intelligence.service.ts",
+        "packages/types/src/agent-control-plane/v1/agent-action-proposal.ts",
+        "packages/types/src/agent-control-plane/v1/tenant-context.ts",
+        "packages/types/src/agent-control-plane/v1/queue-envelope.ts",
+        "packages/db/src/schema.ts"
+      ],
+      "financialFixtureNeeds": [],
+      "financialFixtureIds": [],
+      "fixtureRefs": [],
+      "sourceSections": [
+        "Build spec §21 OM-A25"
+      ],
+      "fullCriterionGate": "Requires implementation and execution of the listed integration/evaluation evidence at the exact reviewed head; preparing fixtures does not satisfy this criterion."
+    },
+    {
+      "caseId": "OM-ACC-026",
+      "criterionId": "OM-A26",
+      "criterionText": "Responsive Command Center states, keyboard/focus behavior and owner comprehension are accepted before UI release",
+      "scope": "core",
+      "caseStatus": "prepared",
+      "runtimeStatus": "not_executed",
+      "implementationOwner": null,
+      "packageIds": [
+        "OM-06",
+        "OM-13"
+      ],
+      "ticketAnchorIds": [
+        "FS-264",
+        "FS-268",
+        "FS-269"
+      ],
+      "decisionBlockers": [
+        "OM-D08"
+      ],
+      "setup": [
+        "Prepare all six mission labels with ready, assessment-only, unavailable and blocked examples; include an approved plan, critical exception, in-flight pause and non-evaluable outcome.",
+        "Use the canonical Figma file jiGHTNUJNltWbHA4Il3hk7 and only specifically accepted frame/state IDs resolved under OM-D08.",
+        "Target applicable 390, 834 and 1440 CSS-pixel widths."
+      ],
+      "action": [
+        "Render the real deployed reviewed head at each applicable frame/state/width; capture screenshots and keyboard/focus behavior.",
+        "Navigate plan approval, error recovery, pause, review limits and findings; check an unavailable method and ask independent reviewers to explain work versus outcome/effect."
+      ],
+      "expectedResults": [
+        "All six labels and truthful readiness/authority/state distinctions are present with no unavailable executable launch.",
+        "Focus order/restoration, keyboard operation, readable content and responsive states match accepted design requirements.",
+        "Every material discrepancy is resolved or explicitly accepted by independent Design/Product and QA; approved frame links and green CI alone are insufficient.",
+        "Synthetic state data may support the exercise but cannot substitute for deployed screenshot or comprehension acceptance."
+      ],
+      "adversarialVariants": [],
+      "evidenceLayers": [
+        "deployed_browser",
+        "design_product_acceptance",
+        "independent_qa"
+      ],
+      "evidenceRequired": [
+        "Exact-head deployed screenshots at applicable 390/834/1440 states, keyboard/focus and independent Design/Product/QA comprehension acceptance.",
+        "Record exact code/test head, fixture version, command/environment, result and linked logs/receipts. Preserve failed or blocked assertions; do not infer PASS from a prepared case."
+      ],
+      "sourcePaths": [
+        "apps/web/src/components/command-center/CommandCenterView.tsx",
+        "apps/web/src/hooks/command-center.hooks.ts",
+        "docs/design/RENVANI_FIGMA_PARITY.md",
+        "docs/design/fs-51-figma-route-map.json",
+        "apps/api/src/services/revenue-outcomes.service.ts",
+        "packages/types/src/revenue-outcomes.types.ts",
+        "apps/api/src/services/command-center/command-center-brief.service.ts"
+      ],
+      "financialFixtureNeeds": [],
+      "financialFixtureIds": [],
+      "fixtureRefs": [],
+      "sourceSections": [
+        "Build spec §21 OM-A26"
+      ],
+      "fullCriterionGate": "Requires the real deployed exact head with accepted design frames and independent Design/Product/QA evidence."
+    },
+    {
+      "caseId": "OM-ACC-027",
+      "criterionId": "OM-A27",
+      "criterionText": "Approved v1 cannot dispatch after an approved v2 supersedes it; retained/in-flight effects follow explicit policy and remain auditable",
+      "scope": "core",
+      "caseStatus": "prepared",
+      "runtimeStatus": "not_executed",
+      "implementationOwner": null,
+      "packageIds": [
+        "OM-05",
+        "OM-02",
+        "OM-03"
+      ],
+      "ticketAnchorIds": [
+        "FS-263",
+        "FS-267",
+        "FS-269"
+      ],
+      "decisionBlockers": [
+        "OM-D04",
+        "OM-D13"
+      ],
+      "setup": [
+        "Approved plan v1 is active with unstarted step S1 and in-flight action I1; draft v2 exists but is not approved.",
+        "A v2 variant expressly retains one action with independently valid exact authority; another v1 action is not retained."
+      ],
+      "action": [
+        "Attempt v1 dispatch while v2 is merely draft, then atomically activate approved v2 while a worker holding v1 is paused before dispatch.",
+        "Resume the stale worker and reconcile I1's eventual receipt."
+      ],
+      "expectedResults": [
+        "A draft v2 alone does not revoke active approved v1.",
+        "Approved v2 activation switches the active pointer atomically; obsolete unstarted v1 work/approvals cannot dispatch afterward.",
+        "Only expressly retained work with valid authority may continue; in-flight/past effects remain auditable and reconcile without resurrecting v1."
+      ],
+      "adversarialVariants": [],
+      "evidenceLayers": [
+        "database_concurrency",
+        "worker_integration"
+      ],
+      "evidenceRequired": [
+        "Approved v1/v2 supersession and retained/in-flight effect cases at dispatch.",
+        "Record exact code/test head, fixture version, command/environment, result and linked logs/receipts. Preserve failed or blocked assertions; do not infer PASS from a prepared case."
+      ],
+      "sourcePaths": [
+        "apps/api/src/services/agent-action.service.ts",
+        "apps/api/src/services/agent-action.policy.ts",
+        "apps/api/src/services/agent-action.registry.ts",
+        "apps/api/src/services/agent-action-receipt.ts",
+        "packages/types/src/agent-control-plane/v1/agent-action-proposal.ts",
+        "packages/types/src/agent-control-plane/v1/tenant-context.ts",
+        "packages/types/src/agent-control-plane/v1/queue-envelope.ts",
+        "packages/db/src/schema.ts",
+        "packages/db/src/integration-outbox.service.ts",
+        "apps/api/src/services/integration-outbox-audit.service.ts",
+        "apps/worker/src/index.ts",
+        "packages/jobs/src/queues.ts"
+      ],
+      "financialFixtureNeeds": [],
+      "financialFixtureIds": [],
+      "fixtureRefs": [],
+      "sourceSections": [
+        "Build spec §21 OM-A27"
+      ],
+      "fullCriterionGate": "Requires implementation and execution of the listed integration/evaluation evidence at the exact reviewed head; preparing fixtures does not satisfy this criterion."
+    },
+    {
+      "caseId": "OM-ACC-028",
+      "criterionId": "OM-A28",
+      "criterionText": "Cancelling one of two linked missions cannot cancel independently authorized shared work or release resources still in use; incompatible payloads conflict",
+      "scope": "core",
+      "caseStatus": "prepared",
+      "runtimeStatus": "not_executed",
+      "implementationOwner": null,
+      "packageIds": [
+        "OM-05",
+        "OM-02",
+        "OM-03",
+        "OM-11"
+      ],
+      "ticketAnchorIds": [
+        "FS-263",
+        "FS-267",
+        "FS-269"
+      ],
+      "decisionBlockers": [
+        "OM-D04",
+        "OM-D13"
+      ],
+      "setup": [
+        "Missions M1 and M2 link the same exact action A1 and reservation R1 with independent valid grants covering its payload/exposure.",
+        "A variant gives only M1 valid authority; another proposes the same intent with a different recipient/content/price."
+      ],
+      "action": [
+        "Cancel M1 while A1 is queued or in flight, then attempt dispatch and resource release.",
+        "Repeat without M2 authority and with incompatible payloads."
+      ],
+      "expectedResults": [
+        "With valid M2 authority, A1 may continue and R1 remains reserved while needed; the owner sees that shared continuation.",
+        "Without an independent remaining grant, undispatched work stops; in-flight work reconciles and no false reversal is claimed.",
+        "Incompatible payloads cause an explicit coordination conflict rather than silent merging, overwritten approvals or duplicate dispatch.",
+        "A shared reservation releases once only when no valid action requires it."
+      ],
+      "adversarialVariants": [],
+      "evidenceLayers": [
+        "database_concurrency",
+        "authorization_integration",
+        "ui_state"
+      ],
+      "evidenceRequired": [
+        "Shared action/resource cases with independent grants, one cancellation and incompatible payload conflict.",
+        "Record exact code/test head, fixture version, command/environment, result and linked logs/receipts. Preserve failed or blocked assertions; do not infer PASS from a prepared case."
+      ],
+      "sourcePaths": [
+        "apps/api/src/services/agent-action.service.ts",
+        "apps/api/src/services/agent-action.policy.ts",
+        "apps/api/src/services/agent-action.registry.ts",
+        "apps/api/src/services/agent-action-receipt.ts",
+        "apps/api/src/services/growth-intake-foundation.service.ts",
+        "apps/api/src/services/booking.service.ts",
+        "apps/api/src/services/dispatch-intelligence.service.ts",
+        "apps/api/src/services/inventory.service.ts",
+        "packages/types/src/agent-control-plane/v1/agent-action-proposal.ts",
+        "packages/types/src/agent-control-plane/v1/tenant-context.ts",
+        "packages/types/src/agent-control-plane/v1/queue-envelope.ts",
+        "packages/db/src/schema.ts"
+      ],
+      "financialFixtureNeeds": [],
+      "financialFixtureIds": [],
+      "fixtureRefs": [],
+      "sourceSections": [
+        "Build spec §21 OM-A28"
+      ],
+      "fullCriterionGate": "Requires implementation and execution of the listed integration/evaluation evidence at the exact reviewed head; preparing fixtures does not satisfy this criterion."
+    },
+    {
+      "caseId": "OM-ACC-029",
+      "criterionId": "OM-A29",
+      "criterionText": "Forged callbacks, wrong provider-account bindings and replayed events cannot mutate delivery/finance; valid late events reconcile correctly",
+      "scope": "core",
+      "caseStatus": "prepared",
+      "runtimeStatus": "not_executed",
+      "implementationOwner": null,
+      "packageIds": [
+        "OM-03",
+        "OM-09"
+      ],
+      "ticketAnchorIds": [
+        "FS-266",
+        "FS-267",
+        "FS-268",
+        "FS-269"
+      ],
+      "decisionBlockers": [
+        "OM-D09"
+      ],
+      "setup": [
+        "A provider account/resource is bound to tenant A and a registered dispatch identity.",
+        "Prepare valid signed events, forged signatures, tenant B/wrong-account IDs, a replayed event ID, a stale event and a valid late correction."
+      ],
+      "action": [
+        "Deliver the variants to the real callback normalization boundary; forge companyId in the body.",
+        "Replay a valid finance/delivery event after worker restart."
+      ],
+      "expectedResults": [
+        "Only authenticated events with verified account/resource/request binding can resolve tenant and mutate delivery/finance.",
+        "Forged, wrong-account and replayed events produce no additional business mutation; no payload tenant is trusted.",
+        "A valid late event reconciles according to source version and lifecycle policy, preserving the original request identity and one outcome effect."
+      ],
+      "adversarialVariants": [],
+      "evidenceLayers": [
+        "callback_security_integration",
+        "event_reconciliation"
+      ],
+      "evidenceRequired": [
+        "Forged signatures, wrong account, replay and valid late provider callback cases.",
+        "Record exact code/test head, fixture version, command/environment, result and linked logs/receipts. Preserve failed or blocked assertions; do not infer PASS from a prepared case."
+      ],
+      "sourcePaths": [
+        "packages/db/src/integration-outbox.service.ts",
+        "apps/api/src/services/integration-outbox-audit.service.ts",
+        "apps/worker/src/index.ts",
+        "packages/jobs/src/queues.ts",
+        "apps/api/src/services/growth/gbp-provider.registry.ts",
+        "apps/api/src/services/growth/call-tracking-adapter.registry.ts",
+        "packages/config/src/feature-flags.ts",
+        "apps/api/src/services/revenue-outcomes.service.ts",
+        "packages/types/src/revenue-outcomes.types.ts",
+        "apps/api/src/services/command-center/command-center-brief.service.ts"
+      ],
+      "financialFixtureNeeds": [
+        "Replay-safe canonical financial correction"
+      ],
+      "financialFixtureIds": [
+        "OM-FIN-01",
+        "OM-FIN-03"
+      ],
+      "fixtureRefs": [
+        {
+          "path": "fixtures/accounting-examples.json",
+          "scenarioId": "OM-FIN-01"
+        },
+        {
+          "path": "fixtures/accounting-examples.json",
+          "scenarioId": "OM-FIN-03"
+        }
+      ],
+      "sourceSections": [
+        "Build spec §21 OM-A29"
+      ],
+      "fullCriterionGate": "Requires implementation and execution of the listed integration/evaluation evidence at the exact reviewed head; preparing fixtures does not satisfy this criterion."
+    },
+    {
+      "caseId": "OM-ACC-030",
+      "criterionId": "OM-A30",
+      "criterionText": "Legacy execution-succeeded/queued receipt cannot increment delivery, bookings, cash or mission success",
+      "scope": "core",
+      "caseStatus": "prepared",
+      "runtimeStatus": "not_executed",
+      "implementationOwner": null,
+      "packageIds": [
+        "OM-04",
+        "OM-03",
+        "OM-06"
+      ],
+      "ticketAnchorIds": [
+        "FS-267",
+        "FS-268",
+        "FS-269"
+      ],
+      "decisionBlockers": [
+        "OM-D11"
+      ],
+      "setup": [
+        "Load the existing legacy outbound receipt with executing/queued and the explicit provider-disabled note, plus an execution_succeeded audit event.",
+        "There is no provider acceptance/delivery receipt, domain booking or payment source."
+      ],
+      "action": [
+        "Replay/project the legacy receipt/audit into all OM counters and Command Center progress.",
+        "Attempt to mark the associated step verified or mission target met based only on that legacy event."
+      ],
+      "expectedResults": [
+        "Work may be represented as queued with its limitation, but delivery, confirmed bookings, cash and mission success all remain unchanged.",
+        "A verification rule requiring provider/domain evidence remains pending/blocked.",
+        "The regression protects API and UI consumers, not merely the receipt's textual label."
+      ],
+      "adversarialVariants": [],
+      "evidenceLayers": [
+        "projection_integration",
+        "api_contract",
+        "ui_state"
+      ],
+      "evidenceRequired": [
+        "Legacy queued/execution_succeeded regression fixtures keep delivery/booking/cash/success unchanged.",
+        "Record exact code/test head, fixture version, command/environment, result and linked logs/receipts. Preserve failed or blocked assertions; do not infer PASS from a prepared case."
+      ],
+      "sourcePaths": [
+        "apps/api/src/services/agent-action.service.ts",
+        "apps/api/src/services/agent-action.policy.ts",
+        "apps/api/src/services/agent-action.registry.ts",
+        "apps/api/src/services/agent-action-receipt.ts",
+        "apps/api/src/services/revenue-outcomes.service.ts",
+        "packages/types/src/revenue-outcomes.types.ts",
+        "apps/api/src/services/command-center/command-center-brief.service.ts"
+      ],
+      "financialFixtureNeeds": [],
+      "financialFixtureIds": [
+        "OM-FIN-17"
+      ],
+      "fixtureRefs": [
+        {
+          "path": "fixtures/accounting-examples.json",
+          "scenarioId": "OM-FIN-17"
+        }
+      ],
+      "sourceSections": [
+        "Build spec §21 OM-A30"
+      ],
+      "fullCriterionGate": "Requires implementation and execution of the listed integration/evaluation evidence at the exact reviewed head; preparing fixtures does not satisfy this criterion."
+    },
+    {
+      "caseId": "OM-ACC-031",
+      "criterionId": "OM-A31",
+      "criterionText": "Paid acquisition plus estimate recovery executes bounded conversion/verification dependencies within the two-strategy, one-paid-channel limits",
+      "scope": "core",
+      "caseStatus": "prepared",
+      "runtimeStatus": "not_executed",
+      "implementationOwner": null,
+      "packageIds": [
+        "OM-05",
+        "OM-09",
+        "OM-10",
+        "OM-11"
+      ],
+      "ticketAnchorIds": [
+        "FS-263",
+        "FS-265",
+        "FS-267",
+        "FS-269"
+      ],
+      "decisionBlockers": [
+        "OM-D09",
+        "OM-D13"
+      ],
+      "setup": [
+        "Declare search acquisition and estimate recovery as the two synthetic selected strategies, one paid channel and a finite graph of conversion, feasibility, fulfillment, measurement and reconciliation support nodes.",
+        "Use only accepted per-method kinds/graphs under OM-D13; the monthly coordinator consumes no strategy slot.",
+        "All nodes share one contact, resource, model and spending envelope."
+      ],
+      "action": [
+        "Execute the finite graph with legitimate support dependencies.",
+        "Attempt a third independent strategy, second paid channel, recursive/dynamic child composition, duplicate monthly sub-mission budget or a support node hiding an independent strategy."
+      ],
+      "expectedResults": [
+        "The legitimate graph executes its bounded support/verification work within two independently selected strategies and one paid channel.",
+        "A third independent strategy, second paid channel and recursive/unbounded composition are rejected under the current policy. A reviewed revised plan must still obey two strategies, one paid channel and a finite nonrecursive graph; ordinary plan approval cannot bypass those caps or authorize recursion.",
+        "Support nodes still consume shared contact/cost/resource limits; outcome contributors and portfolio links do not duplicate business facts."
+      ],
+      "adversarialVariants": [],
+      "evidenceLayers": [
+        "planner_contract",
+        "workflow_integration",
+        "budget_concurrency"
+      ],
+      "evidenceRequired": [
+        "Finite paid-acquisition and recovery graph enforcing two strategies, one paid channel and bounded support dependencies.",
+        "Record exact code/test head, fixture version, command/environment, result and linked logs/receipts. Preserve failed or blocked assertions; do not infer PASS from a prepared case."
+      ],
+      "sourcePaths": [
+        "packages/types/src/agent-control-plane/v1/agent-action-proposal.ts",
+        "packages/types/src/agent-control-plane/v1/tenant-context.ts",
+        "packages/types/src/agent-control-plane/v1/queue-envelope.ts",
+        "packages/db/src/schema.ts",
+        "apps/api/src/services/agent-action.service.ts",
+        "apps/api/src/services/agent-action.policy.ts",
+        "apps/api/src/services/agent-action.registry.ts",
+        "apps/api/src/services/agent-action-receipt.ts",
+        "apps/api/src/services/growth-intake-foundation.service.ts",
+        "apps/api/src/services/booking.service.ts",
+        "apps/api/src/services/dispatch-intelligence.service.ts",
+        "apps/api/src/services/inventory.service.ts"
+      ],
+      "financialFixtureNeeds": [],
+      "financialFixtureIds": [],
+      "fixtureRefs": [],
+      "sourceSections": [
+        "Build spec §21 OM-A31"
+      ],
+      "fullCriterionGate": "Requires implementation and execution of the listed integration/evaluation evidence at the exact reviewed head; preparing fixtures does not satisfy this criterion."
+    },
+    {
+      "caseId": "OM-ACC-032",
+      "criterionId": "OM-A32",
+      "criterionText": "New agreement is not active without accepted terms, fulfillment obligations and a supported authorized billing path",
+      "scope": "core",
+      "caseStatus": "prepared",
+      "runtimeStatus": "not_executed",
+      "implementationOwner": null,
+      "packageIds": [
+        "OM-12",
+        "OM-02",
+        "OM-04"
+      ],
+      "ticketAnchorIds": [
+        "FS-257",
+        "FS-267",
+        "FS-268",
+        "FS-269"
+      ],
+      "decisionBlockers": [
+        "OM-D02",
+        "OM-D04",
+        "OM-D06",
+        "OM-D09"
+      ],
+      "setup": [
+        "Prepare a draft agreement with versioned terms, required benefits, fulfillment capacity, an existing supported authorized billing route and an explicitly accepted recognition policy for the proposed new enrollment.",
+        "Create independent missing/changed variants for customer acceptance, terms version, benefit obligations/capacity, billing support, owner/customer billing authority and the required recognition policy."
+      ],
+      "action": [
+        "Attempt activation under each variant, then process a fully eligible accepted agreement through existing agreement services.",
+        "Attempt an automatic new charge or unsupported processor flow as a shortcut."
+      ],
+      "expectedResults": [
+        "Any missing requirement prevents active status and shows the specific blocker; drafting, signing the wrong version or simulated billing success cannot activate it.",
+        "The valid new-enrollment case records exact accepted terms, obligations, supported authorization and accepted recognition policy without creating a second agreement or financial ledger. Missing recognition blocks this new enrollment; an already active legacy agreement with missing recognition remains a separate source-state/completeness case and is not silently deactivated.",
+        "No new automatic charging/payment behavior is authorized by this case; earned revenue uses the separately approved recognition policy."
+      ],
+      "adversarialVariants": [],
+      "evidenceLayers": [
+        "agreement_domain_integration",
+        "authorization_integration",
+        "projection_integration"
+      ],
+      "evidenceRequired": [
+        "Agreement terms/obligations/billing readiness cases including unavailable or unauthorized activation.",
+        "Record exact code/test head, fixture version, command/environment, result and linked logs/receipts. Preserve failed or blocked assertions; do not infer PASS from a prepared case."
+      ],
+      "sourcePaths": [
+        "apps/api/src/services/invoice.service.ts",
+        "apps/api/src/services/service-agreement.service.ts",
+        "apps/api/src/services/agreement-portal.service.ts",
+        "apps/api/src/services/agent-action.service.ts",
+        "apps/api/src/services/agent-action.policy.ts",
+        "apps/api/src/services/agent-action.registry.ts",
+        "apps/api/src/services/agent-action-receipt.ts",
+        "apps/api/src/services/revenue-outcomes.service.ts",
+        "packages/types/src/revenue-outcomes.types.ts",
+        "apps/api/src/services/command-center/command-center-brief.service.ts"
+      ],
+      "financialFixtureNeeds": [
+        "Agreement cash versus recognition and obligations"
+      ],
+      "financialFixtureIds": [
+        "OM-FIN-08",
+        "OM-FIN-09"
+      ],
+      "fixtureRefs": [
+        {
+          "path": "fixtures/accounting-examples.json",
+          "scenarioId": "OM-FIN-08"
+        },
+        {
+          "path": "fixtures/accounting-examples.json",
+          "scenarioId": "OM-FIN-09"
+        }
+      ],
+      "sourceSections": [
+        "Build spec §21 OM-A32"
+      ],
+      "fullCriterionGate": "Requires implementation and execution of the listed integration/evaluation evidence at the exact reviewed head; preparing fixtures does not satisfy this criterion."
+    },
+    {
+      "caseId": "OM-ACC-033",
+      "criterionId": "OM-A33",
+      "criterionText": "USD 1,000 service, USD 100 credit and linked USD 100 refund produce USD 900 revenue and USD 900 net cash without replay duplication",
+      "scope": "core",
+      "caseStatus": "prepared",
+      "runtimeStatus": "not_executed",
+      "implementationOwner": null,
+      "packageIds": [
+        "OM-04",
+        "OM-12"
+      ],
+      "ticketAnchorIds": [
+        "FS-268",
+        "FS-269"
+      ],
+      "decisionBlockers": [
+        "OM-D02",
+        "OM-D03"
+      ],
+      "setup": [
+        "Use the canonical financial fixture: USD 1000.00 earned service and received cash; a USD 100.00 revenue credit; a USD 100.00 refund explicitly linked to that credit.",
+        "Retain source IDs, correction linkage and business period."
+      ],
+      "action": [
+        "Project original events, then the credit and linked refund; repeat each event and replay the full stream.",
+        "Deliver refund before credit in the reorder variant and reconcile when both are present."
+      ],
+      "expectedResults": [
+        "Net earned-service revenue is exactly USD 900.00 and net cash is exactly USD 900.00 once source linkage is complete.",
+        "The refund does not subtract revenue a second time; replay does not change either total or create duplicate facts/contributors.",
+        "Before necessary linkage arrives, affected completeness/reconciliation is explicit rather than assuming an unrelated second revenue reduction."
+      ],
+      "adversarialVariants": [],
+      "evidenceLayers": [
+        "projection_integration",
+        "event_reconciliation"
+      ],
+      "evidenceRequired": [
+        "Decimal-string USD1000 service, linked USD100 credit/refund and duplicate replay producing USD900 earned and net cash.",
+        "Record exact code/test head, fixture version, command/environment, result and linked logs/receipts. Preserve failed or blocked assertions; do not infer PASS from a prepared case."
+      ],
+      "sourcePaths": [
+        "apps/api/src/services/revenue-outcomes.service.ts",
+        "packages/types/src/revenue-outcomes.types.ts",
+        "apps/api/src/services/command-center/command-center-brief.service.ts",
+        "apps/api/src/services/invoice.service.ts",
+        "apps/api/src/services/service-agreement.service.ts",
+        "apps/api/src/services/agreement-portal.service.ts"
+      ],
+      "financialFixtureNeeds": [
+        "OM-A33 canonical USD1000/100-credit/100-linked-refund and replay"
+      ],
+      "financialFixtureIds": [
+        "OM-FIN-01",
+        "OM-FIN-02",
+        "OM-FIN-03"
+      ],
+      "fixtureRefs": [
+        {
+          "path": "fixtures/accounting-examples.json",
+          "scenarioId": "OM-FIN-01"
+        },
+        {
+          "path": "fixtures/accounting-examples.json",
+          "scenarioId": "OM-FIN-02"
+        },
+        {
+          "path": "fixtures/accounting-examples.json",
+          "scenarioId": "OM-FIN-03"
+        }
+      ],
+      "sourceSections": [
+        "Build spec §21 OM-A33"
+      ],
+      "fullCriterionGate": "Requires implementation and execution of the listed integration/evaluation evidence at the exact reviewed head; preparing fixtures does not satisfy this criterion."
+    },
+    {
+      "caseId": "OM-ACC-034",
+      "criterionId": "OM-A34",
+      "criterionText": "Workflow completion is separate from outcome verdict; target reached with failed mandatory guardrail is not mission success; missing necessary evidence is explicit",
+      "scope": "core",
+      "caseStatus": "prepared",
+      "runtimeStatus": "not_executed",
+      "implementationOwner": null,
+      "packageIds": [
+        "OM-05",
+        "OM-04",
+        "OM-06",
+        "OM-11",
+        "OM-12"
+      ],
+      "ticketAnchorIds": [
+        "FS-263",
+        "FS-264",
+        "FS-267",
+        "FS-268",
+        "FS-269"
+      ],
+      "decisionBlockers": [
+        "OM-D01",
+        "OM-D03",
+        "OM-D11"
+      ],
+      "setup": [
+        "Prepare one completed workflow whose explicit synthetic target is reached but mandatory contribution/completion guardrail fails.",
+        "Prepare a second case whose missing evidence can still mature, and a third whose review window has ended with necessary evidence permanently unavailable.",
+        "No causal experiment result is present."
+      ],
+      "action": [
+        "Evaluate all three without altering declared thresholds/cohorts; request mission success from workflow completion alone."
+      ],
+      "expectedResults": [
+        "A completed workflow with a failed mandatory guardrail does not receive target_met; the failure and actual verified results remain visible.",
+        "Missing evidence yields pending while maturation is possible and not_evaluable when required evidence cannot be obtained under the declared policy.",
+        "Workflow state, target verdict and causal-effect status are independent; no causal estimate or automatic grant expansion follows from completion or a met target."
+      ],
+      "adversarialVariants": [],
+      "evidenceLayers": [
+        "evaluation_contract",
+        "api_contract",
+        "ui_state"
+      ],
+      "evidenceRequired": [
+        "Workflow-complete, target-met/guardrail-failed and missing-evidence verdict cases.",
+        "Record exact code/test head, fixture version, command/environment, result and linked logs/receipts. Preserve failed or blocked assertions; do not infer PASS from a prepared case."
+      ],
+      "sourcePaths": [
+        "apps/api/src/services/revenue-outcomes.service.ts",
+        "packages/types/src/revenue-outcomes.types.ts",
+        "apps/api/src/services/command-center/command-center-brief.service.ts",
+        "apps/web/src/components/command-center/CommandCenterView.tsx",
+        "apps/web/src/hooks/command-center.hooks.ts",
+        "docs/design/RENVANI_FIGMA_PARITY.md",
+        "docs/design/fs-51-figma-route-map.json"
+      ],
+      "financialFixtureNeeds": [
+        "Target reached but guardrail failed; missing/maturing evidence"
+      ],
+      "financialFixtureIds": [
+        "OM-FIN-10",
+        "OM-FIN-18"
+      ],
+      "fixtureRefs": [
+        {
+          "path": "fixtures/accounting-examples.json",
+          "scenarioId": "OM-FIN-10"
+        },
+        {
+          "path": "fixtures/accounting-examples.json",
+          "scenarioId": "OM-FIN-18"
+        }
+      ],
+      "sourceSections": [
+        "Build spec §21 OM-A34"
+      ],
+      "fullCriterionGate": "Requires implementation and execution of the listed integration/evaluation evidence at the exact reviewed head; preparing fixtures does not satisfy this criterion."
+    }
+  ],
+  "optionalCases": [
+    {
+      "caseId": "OM-ACC-R01",
+      "criterionId": "OM-R-A01",
+      "criterionText": "Disabled optional backends leave core OM behavior unchanged; unsupported isolated tasks report unavailable rather than running untrusted code in the application worker",
+      "scope": "optional_render",
+      "conditional": true,
+      "blocksCoreWhenDisabled": false,
+      "caseStatus": "prepared",
+      "runtimeStatus": "not_executed",
+      "implementationOwner": null,
+      "packageIds": [
+        "OM-R01",
+        "OM-R02"
+      ],
+      "ticketAnchorIds": [
+        "FS-262",
+        "FS-269"
+      ],
+      "decisionBlockers": [
+        "OM-D09",
+        "OM-D10",
+        "OM-D12"
+      ],
+      "activationCondition": "Applies only if the optional backend/capability is separately authorized and proposed as executable; disabled/unadvertised optional backends do not gate core OM.",
+      "setup": [
+        "All optional backend flags are disabled; core OM uses its existing permitted BullMQ/domain-service path.",
+        "Request a capability whose registered method explicitly requires isolated execution."
+      ],
+      "action": [
+        "Run the affected core regression paths; submit the isolated task and forge a requested application-worker fallback."
+      ],
+      "expectedResults": [
+        "Core behavior is unchanged under disabled optional flags.",
+        "The isolated capability reports unavailable with an explicit blocker; no untrusted code/browser task runs inside the ordinary application worker.",
+        "Disabling an optional backend does not turn queued/command-complete status into a business outcome or advertise a dependent capability as executable."
+      ],
+      "adversarialVariants": [],
+      "evidenceLayers": [
+        "core_regression",
+        "backend_selection_integration"
+      ],
+      "evidenceRequired": [
+        "Record exact adapter/code/input/provider versions, reviewed head, separate authorization and evaluation allowance, expected versus actual assertions, sanitized provider/cleanup receipts and the independent review.",
+        "A mocked provider or prepared scenario is not provider isolation, cleanup or benchmark acceptance."
+      ],
+      "sourcePaths": [
+        "packages/db/src/integration-outbox.service.ts",
+        "apps/api/src/services/integration-outbox-audit.service.ts",
+        "apps/worker/src/index.ts",
+        "packages/jobs/src/queues.ts",
+        "apps/api/src/services/growth/gbp-provider.registry.ts",
+        "apps/api/src/services/growth/call-tracking-adapter.registry.ts",
+        "packages/config/src/feature-flags.ts",
+        "apps/api/src/services/agent-action.service.ts",
+        "apps/api/src/services/agent-action.policy.ts",
+        "apps/api/src/services/agent-action.registry.ts",
+        "apps/api/src/services/agent-action-receipt.ts"
+      ],
+      "sourceSections": [
+        "Build spec §21 OM-R-A01"
+      ],
+      "fixtureRefs": [],
+      "financialFixtureIds": [],
+      "fullCriterionGate": "Applies only to a separately authorized optional backend/capability. Actual provider controls and receipts must be verified at evaluation time; disabled/unadvertised optional backends do not block core OM."
+    },
+    {
+      "caseId": "OM-ACC-R02",
+      "criterionId": "OM-R-A02",
+      "criterionText": "Sandbox has no production credentials or direct FSM/database access; tenant/artifact boundaries, public-destination allowlists, redirect/private-network rejection and prompt-injection tests pass",
+      "scope": "optional_render",
+      "conditional": true,
+      "blocksCoreWhenDisabled": false,
+      "caseStatus": "prepared",
+      "runtimeStatus": "not_executed",
+      "implementationOwner": null,
+      "packageIds": [
+        "OM-R01"
+      ],
+      "ticketAnchorIds": [
+        "FS-262",
+        "FS-269"
+      ],
+      "decisionBlockers": [
+        "OM-D09",
+        "OM-D10",
+        "OM-D12"
+      ],
+      "activationCondition": "Applies only if the optional backend/capability is separately authorized and proposed as executable; disabled/unadvertised optional backends do not gate core OM.",
+      "setup": [
+        "Create a synthetic read-only inspection task for an approved public fixture URL with explicit tenant/task/artifact identity and a bounded destination allowlist.",
+        "The provider fixture exposes no production credentials, database connection, FSM write route or unrestricted metadata endpoint."
+      ],
+      "action": [
+        "Try direct and redirected access to localhost, private/link-local/metadata addresses and a disallowed host, including DNS resolution changes.",
+        "Submit cross-tenant artifact IDs, forged signed URLs and prompt injection requesting credentials or an FSM write."
+      ],
+      "expectedResults": [
+        "Destination checks hold through DNS/redirect handling; disallowed/private destinations cannot be fetched.",
+        "The task has no production secret/direct FSM or database access, and tenant/artifact identity checks reject mismatches.",
+        "Only permitted read-only findings are returned; actual provider isolation/network controls still need authorized verification beyond these synthetic denials."
+      ],
+      "adversarialVariants": [],
+      "evidenceLayers": [
+        "adapter_security_integration",
+        "authorized_provider_isolation",
+        "independent_security_review"
+      ],
+      "evidenceRequired": [
+        "Record exact adapter/code/input/provider versions, reviewed head, separate authorization and evaluation allowance, expected versus actual assertions, sanitized provider/cleanup receipts and the independent review.",
+        "A mocked provider or prepared scenario is not provider isolation, cleanup or benchmark acceptance."
+      ],
+      "sourcePaths": [
+        "packages/types/src/agent-control-plane/v1/agent-action-proposal.ts",
+        "packages/types/src/agent-control-plane/v1/tenant-context.ts",
+        "packages/types/src/agent-control-plane/v1/queue-envelope.ts",
+        "packages/db/src/schema.ts",
+        "apps/api/src/services/growth/gbp-provider.registry.ts",
+        "apps/api/src/services/growth/call-tracking-adapter.registry.ts",
+        "packages/config/src/feature-flags.ts",
+        "packages/db/src/integration-outbox.service.ts",
+        "apps/api/src/services/integration-outbox-audit.service.ts",
+        "apps/worker/src/index.ts",
+        "packages/jobs/src/queues.ts"
+      ],
+      "sourceSections": [
+        "Build spec §21 OM-R-A02"
+      ],
+      "fixtureRefs": [],
+      "financialFixtureIds": [],
+      "fullCriterionGate": "Applies only to a separately authorized optional backend/capability. Actual provider controls and receipts must be verified at evaluation time; disabled/unadvertised optional backends do not block core OM."
+    },
+    {
+      "caseId": "OM-ACC-R03",
+      "criterionId": "OM-R-A03",
+      "criterionText": "Returned findings/artifacts are validated against task identity, schema, size and evidence requirements; command/flow success cannot mark a booking, payment, inventory change or mission outcome complete",
+      "scope": "optional_render",
+      "conditional": true,
+      "blocksCoreWhenDisabled": false,
+      "caseStatus": "prepared",
+      "runtimeStatus": "not_executed",
+      "implementationOwner": null,
+      "packageIds": [
+        "OM-R01",
+        "OM-R02"
+      ],
+      "ticketAnchorIds": [
+        "FS-262",
+        "FS-269"
+      ],
+      "decisionBlockers": [
+        "OM-D09",
+        "OM-D10",
+        "OM-D12"
+      ],
+      "activationCondition": "Applies only if the optional backend/capability is separately authorized and proposed as executable; disabled/unadvertised optional backends do not gate core OM.",
+      "setup": [
+        "A registered synthetic task expects a bounded typed findings schema, a fixture-only maximum artifact size of 1048576 bytes, exact input/code hashes and tenant/task identity; the oversized variant has 1048577 bytes.",
+        "Prepare artifacts with valid data and variants with wrong tenant/task, invalid schema, excess size, missing evidence, checksum mismatch or embedded action instructions."
+      ],
+      "action": [
+        "Return each artifact with a provider-completed status and attempt to consume it into the mission.",
+        "Request booking/payment/inventory/mission success from command completion alone."
+      ],
+      "expectedResults": [
+        "Only artifacts matching identity, schema, size, hashes and evidence rules are accepted as untrusted findings/proposals.",
+        "Invalid results are rejected/quarantined with a visible failure; no downstream action uses them.",
+        "Provider command/flow completion never verifies a booking, payment, inventory change or mission target without authoritative domain evidence."
+      ],
+      "adversarialVariants": [],
+      "evidenceLayers": [
+        "artifact_validation",
+        "tenant_security",
+        "domain_projection_regression"
+      ],
+      "evidenceRequired": [
+        "Record exact adapter/code/input/provider versions, reviewed head, separate authorization and evaluation allowance, expected versus actual assertions, sanitized provider/cleanup receipts and the independent review.",
+        "A mocked provider or prepared scenario is not provider isolation, cleanup or benchmark acceptance."
+      ],
+      "sourcePaths": [
+        "packages/types/src/agent-control-plane/v1/agent-action-proposal.ts",
+        "packages/types/src/agent-control-plane/v1/tenant-context.ts",
+        "packages/types/src/agent-control-plane/v1/queue-envelope.ts",
+        "packages/db/src/schema.ts",
+        "apps/api/src/services/agent-action.service.ts",
+        "apps/api/src/services/agent-action.policy.ts",
+        "apps/api/src/services/agent-action.registry.ts",
+        "apps/api/src/services/agent-action-receipt.ts",
+        "apps/api/src/services/revenue-outcomes.service.ts",
+        "packages/types/src/revenue-outcomes.types.ts",
+        "apps/api/src/services/command-center/command-center-brief.service.ts"
+      ],
+      "sourceSections": [
+        "Build spec §21 OM-R-A03"
+      ],
+      "fixtureRefs": [],
+      "financialFixtureIds": [],
+      "fullCriterionGate": "Applies only to a separately authorized optional backend/capability. Actual provider controls and receipts must be verified at evaluation time; disabled/unadvertised optional backends do not block core OM."
+    },
+    {
+      "caseId": "OM-ACC-R04",
+      "criterionId": "OM-R-A04",
+      "criterionText": "Timeout, duplicate trigger, lost create response, provider interruption and late receipt reconcile one attempt; backend fallback cannot duplicate work; cleanup is verified or visibly escalated",
+      "scope": "optional_render",
+      "conditional": true,
+      "blocksCoreWhenDisabled": false,
+      "caseStatus": "prepared",
+      "runtimeStatus": "not_executed",
+      "implementationOwner": null,
+      "packageIds": [
+        "OM-R01",
+        "OM-R02"
+      ],
+      "ticketAnchorIds": [
+        "FS-262",
+        "FS-269"
+      ],
+      "decisionBlockers": [
+        "OM-D09",
+        "OM-D10",
+        "OM-D12"
+      ],
+      "activationCondition": "Applies only if the optional backend/capability is separately authorized and proposed as executable; disabled/unadvertised optional backends do not gate core OM.",
+      "setup": [
+        "Persist one application task/attempt and provider request key before create; simulate provider creation followed by lost create response.",
+        "Prepare timeout, duplicate trigger, interruption, late receipt and cleanup failure variants."
+      ],
+      "action": [
+        "Retry/reconcile by the original request identity and attempt an automatic fallback while the original execution is uncertain.",
+        "Deliver duplicate late receipts and run cleanup after timeout/cancel."
+      ],
+      "expectedResults": [
+        "One logical attempt is reconciled; a possible existing provider run is located or visibly escalated rather than duplicated.",
+        "Fallback cannot create a second live effect while the first attempt is unknown/in flight.",
+        "Late receipts update the existing attempt once without reexecuting its next step; termination/cleanup is verified by receipt or a visible accountable escalation."
+      ],
+      "adversarialVariants": [],
+      "evidenceLayers": [
+        "worker_fault_injection",
+        "authorized_provider_reconciliation",
+        "cleanup_evidence"
+      ],
+      "evidenceRequired": [
+        "Record exact adapter/code/input/provider versions, reviewed head, separate authorization and evaluation allowance, expected versus actual assertions, sanitized provider/cleanup receipts and the independent review.",
+        "A mocked provider or prepared scenario is not provider isolation, cleanup or benchmark acceptance."
+      ],
+      "sourcePaths": [
+        "packages/db/src/integration-outbox.service.ts",
+        "apps/api/src/services/integration-outbox-audit.service.ts",
+        "apps/worker/src/index.ts",
+        "packages/jobs/src/queues.ts",
+        "packages/types/src/agent-control-plane/v1/agent-action-proposal.ts",
+        "packages/types/src/agent-control-plane/v1/tenant-context.ts",
+        "packages/types/src/agent-control-plane/v1/queue-envelope.ts",
+        "packages/db/src/schema.ts",
+        "apps/api/src/services/agent-action.service.ts",
+        "apps/api/src/services/agent-action.policy.ts",
+        "apps/api/src/services/agent-action.registry.ts",
+        "apps/api/src/services/agent-action-receipt.ts"
+      ],
+      "sourceSections": [
+        "Build spec §21 OM-R-A04"
+      ],
+      "fixtureRefs": [],
+      "financialFixtureIds": [],
+      "fullCriterionGate": "Applies only to a separately authorized optional backend/capability. Actual provider controls and receipts must be verified at evaluation time; disabled/unadvertised optional backends do not block core OM."
+    },
+    {
+      "caseId": "OM-ACC-R05",
+      "criterionId": "OM-R-A05",
+      "criterionText": "Runtime/concurrency/infrastructure limits hold under retries; missing allowances block new work; cleanup continues; waiting for owner approval/customer response keeps no Sandbox or Workflow run alive",
+      "scope": "optional_render",
+      "conditional": true,
+      "blocksCoreWhenDisabled": false,
+      "caseStatus": "prepared",
+      "runtimeStatus": "not_executed",
+      "implementationOwner": null,
+      "packageIds": [
+        "OM-R01",
+        "OM-R02"
+      ],
+      "ticketAnchorIds": [
+        "FS-262",
+        "FS-269"
+      ],
+      "decisionBlockers": [
+        "OM-D09",
+        "OM-D10",
+        "OM-D12"
+      ],
+      "activationCondition": "Applies only if the optional backend/capability is separately authorized and proposed as executable; disabled/unadvertised optional backends do not gate core OM.",
+      "setup": [
+        "Use fixture-only limits: one concurrent isolated task, 60-second runtime, USD 0.20 reserved infrastructure allowance, one bounded retry and explicit cleanup allowance.",
+        "A second task arrives concurrently; another lacks a reserved allowance; one task reaches an owner/customer wait."
+      ],
+      "action": [
+        "Race admissions, exhaust runtime/allowance, deliver duplicate usage receipts and revoke permission for new work.",
+        "Pause for owner approval, then attempt to keep a provider run alive or block necessary cleanup because new-work budget is exhausted."
+      ],
+      "expectedResults": [
+        "Concurrent admissions, runtime, retry and infrastructure exposure stay within the declared fixture limits.",
+        "Missing/exhausted allowance blocks new tasks; unknown usage remains pending exposure and settlement is idempotent.",
+        "Cleanup/termination continues under its declared control path, and waiting for an owner or customer leaves no Sandbox/Workflow run alive.",
+        "Model and infrastructure budgets remain separate; these test values do not define approved provider rates or production limits."
+      ],
+      "adversarialVariants": [],
+      "evidenceLayers": [
+        "budget_concurrency",
+        "authorized_provider_metering",
+        "cleanup_evidence"
+      ],
+      "evidenceRequired": [
+        "Record exact adapter/code/input/provider versions, reviewed head, separate authorization and evaluation allowance, expected versus actual assertions, sanitized provider/cleanup receipts and the independent review.",
+        "A mocked provider or prepared scenario is not provider isolation, cleanup or benchmark acceptance."
+      ],
+      "sourcePaths": [
+        "packages/types/src/agent-control-plane/v1/agent-action-proposal.ts",
+        "packages/types/src/agent-control-plane/v1/tenant-context.ts",
+        "packages/types/src/agent-control-plane/v1/queue-envelope.ts",
+        "packages/db/src/schema.ts",
+        "packages/db/src/integration-outbox.service.ts",
+        "apps/api/src/services/integration-outbox-audit.service.ts",
+        "apps/worker/src/index.ts",
+        "packages/jobs/src/queues.ts",
+        "packages/ai/src/langfuse/client.ts",
+        "apps/api/src/services/revenue-agent/revenue-agent-proposals.service.ts",
+        "packages/jobs/src/platform-queue-registry.ts"
+      ],
+      "sourceSections": [
+        "Build spec §21 OM-R-A05"
+      ],
+      "fixtureRefs": [],
+      "financialFixtureIds": [],
+      "fullCriterionGate": "Applies only to a separately authorized optional backend/capability. Actual provider controls and receipts must be verified at evaluation time; disabled/unadvertised optional backends do not block core OM."
+    },
+    {
+      "caseId": "OM-ACC-R06",
+      "criterionId": "OM-R-A06",
+      "criterionText": "Equivalent BullMQ/Workflows benchmark records output parity, startup/runtime latency, recovery, concurrency and total cost; architecture review records adopt/defer for named capabilities with working rollout flags and rollback",
+      "scope": "optional_render",
+      "conditional": true,
+      "blocksCoreWhenDisabled": false,
+      "caseStatus": "prepared",
+      "runtimeStatus": "not_executed",
+      "implementationOwner": null,
+      "packageIds": [
+        "OM-R02"
+      ],
+      "ticketAnchorIds": [
+        "FS-262",
+        "FS-269"
+      ],
+      "decisionBlockers": [
+        "OM-D09",
+        "OM-D10",
+        "OM-D12"
+      ],
+      "activationCondition": "Applies only if the optional backend/capability is separately authorized and proposed as executable; disabled/unadvertised optional backends do not gate core OM.",
+      "setup": [
+        "Define one deterministic bounded validation/aggregation task with the same versioned code, input hash, public/synthetic input and output schema on BullMQ and Workflows.",
+        "Neither arm requires creating or adopting a Sandbox. Establish equal concurrency, retry and interruption scenarios plus an approved evaluation allowance."
+      ],
+      "action": [
+        "Execute both authorized benchmark arms; inject timeout/retry/interrupted-run cases; capture output, startup/runtime latency, recovery, concurrency and costs.",
+        "Calculate model, compute, memory, artifacts/retention, transfer, retries and reconciliation costs; test disable/rollback."
+      ],
+      "expectedResults": [
+        "Outputs and correctness/recovery semantics are equivalent under the declared workload or every difference is recorded as a failed/limited comparison.",
+        "Cost comparison includes all declared components and counts worker savings only when worker capacity can actually be reduced.",
+        "The architecture decision records adopt or defer for named capabilities with measured tradeoffs and a working flag/rollback path; no automatic Workflows or Sandbox adoption follows."
+      ],
+      "adversarialVariants": [],
+      "evidenceLayers": [
+        "authorized_provider_benchmark",
+        "architecture_decision",
+        "rollback_evidence"
+      ],
+      "evidenceRequired": [
+        "Record exact adapter/code/input/provider versions, reviewed head, separate authorization and evaluation allowance, expected versus actual assertions, sanitized provider/cleanup receipts and the independent review.",
+        "A mocked provider or prepared scenario is not provider isolation, cleanup or benchmark acceptance."
+      ],
+      "sourcePaths": [
+        "packages/db/src/integration-outbox.service.ts",
+        "apps/api/src/services/integration-outbox-audit.service.ts",
+        "apps/worker/src/index.ts",
+        "packages/jobs/src/queues.ts",
+        "packages/ai/src/langfuse/client.ts",
+        "apps/api/src/services/revenue-agent/revenue-agent-proposals.service.ts",
+        "packages/jobs/src/platform-queue-registry.ts",
+        "packages/types/src/agent-control-plane/v1/agent-action-proposal.ts",
+        "packages/types/src/agent-control-plane/v1/tenant-context.ts",
+        "packages/types/src/agent-control-plane/v1/queue-envelope.ts",
+        "packages/db/src/schema.ts"
+      ],
+      "sourceSections": [
+        "Build spec §21 OM-R-A06"
+      ],
+      "fixtureRefs": [],
+      "financialFixtureIds": [],
+      "fullCriterionGate": "Applies only to a separately authorized optional backend/capability. Actual provider controls and receipts must be verified at evaluation time; disabled/unadvertised optional backends do not block core OM."
+    }
+  ],
+  "codexPatchSequence": [
+    {
+      "id": "OM-H01",
+      "packageId": "OM-01",
+      "title": "Reconcile current baseline, authority and consumer contracts",
+      "workType": "read_only_and_documentation_before_runtime",
+      "dependencies": [],
+      "implementationOwner": null,
+      "status": "prepared",
+      "entryGate": "Read-only/doc reconciliation may proceed under preparation authority. Any runtime implementation still needs the existing accepted Part I scope and founder authorization.",
+      "scope": [
+        "Re-pin dev and every affected PR/head at the time of work; retain the crosswalk's historical 7840884d baseline as provenance.",
+        "Reconcile FS-257/258 and FS-262–269 scope/owners without duplicate tickets or status promotion.",
+        "Confirm consumer map, exact mutation/receipt/accounting contracts and current source evidence; explicitly resolve the first patch's applicable decisions.",
+        "Select a concrete bounded existing-ticket scope, file coordination and required independent review/CI evidence before coding."
+      ],
+      "sourcePaths": [
+        "AGENTS.md",
+        "TEAM.md",
+        "docs/planning/agent-control-plane-consumers.md",
+        "docs/architecture/TRUSTED_EXECUTION_AUDIT.md",
+        "apps/api/src/services/agent-action.service.ts",
+        "apps/api/src/services/agent-action-receipt.ts",
+        "packages/db/src/integration-outbox.service.ts"
+      ],
+      "decisionBlockers": [
+        "OM-D04",
+        "OM-D05",
+        "OM-D09",
+        "OM-D12"
+      ],
+      "caseIds": [
+        "OM-ACC-005",
+        "OM-ACC-006",
+        "OM-ACC-007",
+        "OM-ACC-008",
+        "OM-ACC-009",
+        "OM-ACC-030"
+      ],
+      "exitEvidence": [
+        "Current-head source/consumer addendum and accepted scope/authority record.",
+        "Explicit implementation owner and independent reviewer chosen by the authorized coordinator; this handoff leaves them unassigned.",
+        "Required Part I acceptance/founder permission recorded before Part II runtime starts; unresolved fields remain blockers."
+      ],
+      "partialEvidenceOnly": true
+    },
+    {
+      "id": "OM-H02A",
+      "packageId": "OM-02",
+      "title": "Atomic action revisions, expiry and idempotency compatibility",
+      "workType": "runtime_patch_after_authorization",
+      "dependencies": [
+        "OM-H01"
+      ],
+      "implementationOwner": null,
+      "status": "prepared",
+      "entryGate": "Applicable Part I/Part II implementation authority and accepted mutation contract; shared schema/consumer coordination if revision storage changes.",
+      "scope": [
+        "Make same-state edits and all consequential state changes compare the accepted version at the authoritative mutation boundary, with a version that cannot collapse distinct same-millisecond writes.",
+        "Guard expiry by matching tenant, nonterminal state and expected version, with one audit event; protect completed/cancelled/newer actions from delayed expiry.",
+        "Preserve same-key/same-request replay and same-key/different-request conflict semantics across affected callers.",
+        "Update the minimal affected shared contract/API/service consumers together and retain tenant isolation."
+      ],
+      "sourcePaths": [
+        "apps/api/src/services/agent-action.service.ts",
+        "apps/api/src/services/agent-action.policy.ts",
+        "packages/types/src/agent-control-plane/v1/agent-action-proposal.ts",
+        "packages/types/src/agent-control-plane/v1/http-route-schemas.ts",
+        "packages/db/src/schema.ts"
+      ],
+      "decisionBlockers": [
+        "OM-D04",
+        "OM-D12"
+      ],
+      "caseIds": [
+        "OM-ACC-005",
+        "OM-ACC-006",
+        "OM-ACC-009",
+        "OM-ACC-027"
+      ],
+      "exitEvidence": [
+        "Deterministic concurrent DB tests demonstrate one winner for conflicting same-version writes, safe replay, same-millisecond version distinction and no terminal expiry overwrite.",
+        "Affected consumer compatibility, tenant negatives and audit assertions are recorded at exact reviewed head.",
+        "Independent peer/QA and Security-by-risk evidence; scoped CI only when authorized. Founder exact-head merge approval remains separate."
+      ],
+      "partialEvidenceOnly": true
+    },
+    {
+      "id": "OM-H02B",
+      "packageId": "OM-02",
+      "title": "Capability-specific grant checks and exact approved payload",
+      "workType": "runtime_patch_after_authorization",
+      "dependencies": [
+        "OM-H02A"
+      ],
+      "implementationOwner": null,
+      "status": "prepared",
+      "entryGate": "OM-D04 role/capability and OM-D05 contact-policy decisions resolved for the selected capability; accepted FS-257/258 consent/profile boundaries where required.",
+      "scope": [
+        "Add only the reviewed tenant, actor/capability, service/customer, content/hash, channel, exposure, schedule, validity and revocation checks required by the selected scope.",
+        "Bind approval to an exact plan/action version and payload; reject material changes outside explicit bounded substitutions.",
+        "Recheck current grants, consent, source versions and resource/balance facts at consequential dispatch and resume.",
+        "Keep unsupported capability or incomplete policy visibly unavailable."
+      ],
+      "sourcePaths": [
+        "apps/api/src/services/agent-action.policy.ts",
+        "apps/api/src/services/agent-action.executors.ts",
+        "apps/api/src/services/agent-action.service.ts",
+        "apps/api/src/services/outbound-consent.service.ts",
+        "packages/types/src/agent-control-plane/v1/agent-action-proposal.ts",
+        "packages/db/src/schema.ts"
+      ],
+      "decisionBlockers": [
+        "OM-D04",
+        "OM-D05",
+        "OM-D06",
+        "OM-D12"
+      ],
+      "caseIds": [
+        "OM-ACC-004",
+        "OM-ACC-005",
+        "OM-ACC-006",
+        "OM-ACC-009"
+      ],
+      "exitEvidence": [
+        "Revocation/expiry/content/source-change tests reject queued and resumed stale authority before any provider write.",
+        "Tenant and role/capability negatives plus current consent boundaries are independently reviewed.",
+        "No grant, scope or autonomy expands as a side effect of model confidence or successful prior work."
+      ],
+      "partialEvidenceOnly": true
+    },
+    {
+      "id": "OM-H03A",
+      "packageId": "OM-03",
+      "title": "One atomic local action, resource and dispatch intent",
+      "workType": "runtime_patch_after_authorization",
+      "dependencies": [
+        "OM-H02A",
+        "OM-H02B"
+      ],
+      "implementationOwner": null,
+      "status": "prepared",
+      "entryGate": "Reviewed action/outbox transaction seam and explicit schema/worker ownership; selected supported provider request identity contract.",
+      "scope": [
+        "Compose resource reservation, action/dispatch intent and audit events in one tenant transaction using the existing outbox infrastructure.",
+        "Preserve canonical intent/request identity and enforce unique local claims under concurrent workers.",
+        "Perform network I/O after commit; persist lease/attempt/unknown-effect state needed for safe recovery.",
+        "Keep pending/queued records distinct from provider acceptance, delivery and domain verification."
+      ],
+      "sourcePaths": [
+        "apps/api/src/services/agent-action.service.ts",
+        "apps/api/src/services/agent-action-receipt.ts",
+        "packages/db/src/integration-outbox.service.ts",
+        "apps/api/src/services/integration-outbox-audit.service.ts",
+        "packages/db/src/schema.ts",
+        "packages/jobs/src/queues.ts",
+        "apps/worker/src/index.ts"
+      ],
+      "decisionBlockers": [
+        "OM-D04",
+        "OM-D09",
+        "OM-D12"
+      ],
+      "caseIds": [
+        "OM-ACC-005",
+        "OM-ACC-007",
+        "OM-ACC-008",
+        "OM-ACC-010",
+        "OM-ACC-024",
+        "OM-ACC-030"
+      ],
+      "exitEvidence": [
+        "Rollback tests leave no orphan action/outbox/resource reservation; concurrency produces one committed dispatch claim.",
+        "Fault injection before/after commit and lease recovery retain request identity and never convert queued work into delivered/outcome success.",
+        "Review confirms no second execution ledger and no network call inside the DB transaction."
+      ],
+      "partialEvidenceOnly": true
+    },
+    {
+      "id": "OM-H03B",
+      "packageId": "OM-03",
+      "title": "Authenticated receipts and bounded uncertain-effect recovery",
+      "workType": "runtime_patch_after_authorization",
+      "dependencies": [
+        "OM-H03A"
+      ],
+      "implementationOwner": null,
+      "status": "prepared",
+      "entryGate": "OM-D09 supported provider idempotency/lookup/callback semantics resolved; separate authorization for any real-provider test.",
+      "scope": [
+        "Normalize authenticated account-bound callbacks into immutable/source-versioned receipt facts.",
+        "Handle duplicate, reordered and valid late events plus a crash after provider acceptance and before local receipt.",
+        "Persist needs_reconciliation when an effect is uncertain; query by stable request/provider identity before another write and route unresolved ambiguity to accountable review.",
+        "Expose uncertain dispatch, stale leases and missing receipts while preserving pause/cancel and current-authority checks."
+      ],
+      "sourcePaths": [
+        "packages/db/src/integration-outbox.service.ts",
+        "apps/api/src/services/integration-outbox-audit.service.ts",
+        "apps/api/src/services/agent-action-receipt.ts",
+        "apps/api/src/services/agent-action.service.ts",
+        "packages/jobs/src/queues.ts",
+        "apps/worker/src/index.ts"
+      ],
+      "decisionBlockers": [
+        "OM-D05",
+        "OM-D09",
+        "OM-D12"
+      ],
+      "caseIds": [
+        "OM-ACC-007",
+        "OM-ACC-008",
+        "OM-ACC-009",
+        "OM-ACC-014",
+        "OM-ACC-024",
+        "OM-ACC-025",
+        "OM-ACC-029",
+        "OM-ACC-030"
+      ],
+      "exitEvidence": [
+        "Crash/retry/callback adversarial tests prove one supported-provider effect and one local normalized result, or explicit unresolved reconciliation without blind retry.",
+        "Forged/wrong-account/replay events cannot mutate delivery/finance; legitimate late events reconcile correctly.",
+        "Authorized controlled provider evidence is recorded separately from mock tests. Broader OM criteria remain incomplete until all applicable consumers/packages pass."
+      ],
+      "partialEvidenceOnly": true
+    }
+  ],
+  "globalGates": [
+    "Preserve the existing Part I acceptance and founder permission before Part II runtime implementation. This preparation does not assert either gate passed.",
+    "An already authorized Part I remediation may continue under its actual existing Part I scope; this handoff does not relabel Part II work to bypass a gate.",
+    "Resolve affected ownership/contract/business decisions before dependent runtime implementation or acceptance. Leave unknown/missing inputs visibly blocked.",
+    "Keep independent peer/QA/Security-by-risk, authorized scoped CI and exact-head founder merge authority. Do not restore obsolete mandatory CoS gates.",
+    "Separate production, provider spend/customer contact and live-money authority from source/test preparation. Optional Render execution needs its own authorization and allowance."
+  ],
+  "evidenceReceiptTemplate": {
+    "caseId": null,
+    "criterionId": null,
+    "fixtureVersion": "1.0.0",
+    "reviewedHeadSha": null,
+    "baseSha": null,
+    "executedAt": null,
+    "environment": null,
+    "commandOrProcedure": null,
+    "authorizationReference": null,
+    "inputHashes": [],
+    "expectedAssertions": [],
+    "actualAssertions": [],
+    "sanitizedEvidenceRefs": [],
+    "providerOrDomainReceiptRefs": [],
+    "independentReviewRefs": [],
+    "result": "not_executed",
+    "limitations": [],
+    "causalEffectClaim": "none"
+  },
+  "acceptanceInterpretation": [
+    "A case marked prepared means its setup/assertions are specified. It is not a run, a test result, a migration acceptance or evidence of production behavior.",
+    "The accounting oracle, if run, checks synthetic arithmetic only; it does not satisfy the corresponding runtime integration, provider or business-effectiveness gates.",
+    "All exact core criterion text is preserved one-to-one. A single bounded patch may contribute partial evidence to several criteria without completing them.",
+    "Each publicly executable mission still needs a complete verified method and applicable product/readiness gates. A menu option, generated plan or queued receipt is insufficient.",
+    "Optional Render cases are conditional and never block core OM while those backends are disabled and no dependent capability is advertised executable."
+  ],
+  "coverageCounts": {
+    "coreCriteria": 34,
+    "coreCases": 34,
+    "optionalCriteria": 6,
+    "optionalCases": 6,
+    "financialScenarioReferences": 19,
+    "boundedCodexHandoffSteps": 5,
+    "existingSourcePaths": 40
+  }
+}

@@ -1,0 +1,20 @@
+import { describe, expect, it } from "vitest";
+import { allocateMoney, availableStock, directJobMargin, observedSales, weightedPercent } from "./foundation-math.js";
+
+const job = () => ({ currency: "USD", sales: "1000.00", labor: "120.00", burden: "24.00", materials: "180.00", equipment: "30.00", openCommitment: "300.00" });
+describe("RCI H02 H07 H10 exact contract arithmetic", () => {
+  it("CI-A01 actual cost and commitment remain distinct", () => { const result = directJobMargin(job()); expect(result.actualCost).toBe("354.00"); expect(result.margin).toBe("646.00"); expect(result.marginPercent).toBe("64.60"); expect(result.openCommitment).toBe("300.00"); });
+  it("CI-A02 missing labor does not create final profit", () => { const r = directJobMargin({ ...job(), labor: null }); expect(r.actualCost).toBeNull(); expect(r.margin).toBeNull(); expect(r.marginPercent).toBeNull(); expect(r.knownCostSubtotal).toBe("234.00"); expect(r.completeness).toBe("partial"); });
+  it("zero sales has no margin percentage", () => expect(directJobMargin({ ...job(), sales: "0.00" }).marginPercent).toBeNull());
+  it("changing a current catalog does not modify historical inputs", () => { const historical = job(); const catalog = { currentCost: "180.00" }; catalog.currentCost = "999.00"; expect(directJobMargin(historical).actualCost).toBe("354.00"); expect(catalog.currentCost).toBe("999.00"); });
+  it("uses weighted numerator/denominator not an average of rates", () => expect(weightedPercent([{ numerator: "1", denominator: "2" }, { numerator: "9", denominator: "90" }])).toBe("10.87"));
+  it("zero denominators remain unavailable", () => expect(weightedPercent([{ numerator: "0", denominator: "0" }])).toBeNull());
+  it("allocates cents deterministically and preserves source total", () => expect(allocateMoney("1.00", [{ id: "c", weight: "1" }, { id: "b", weight: "1" }, { id: "a", weight: "1" }])).toEqual([{ id: "c", amount: "0.33" }, { id: "b", amount: "0.33" }, { id: "a", amount: "0.34" }]));
+  it("allocates negative corrections on the original basis", () => expect(allocateMoney("-0.01", [{ id: "a", weight: "1" }, { id: "b", weight: "1" }])).toEqual([{ id: "a", amount: "-0.01" }, { id: "b", amount: "0.00" }]));
+  it("rejects duplicate allocation identities and unsupported weights", () => { expect(() => allocateMoney("1.00", [{ id: "a", weight: "1" }, { id: "a", weight: "1" }])).toThrow(); expect(() => allocateMoney("1.00", [{ id: "a", weight: "0" }])).toThrow(); expect(() => availableStock("1e3", "0", "0")).toThrow(); });
+  it("fractional stock excludes inbound orders", () => expect(availableStock("3.750", "1.125", "20")).toEqual({ available: "2.625", inboundExcluded: "20" }));
+  it("does not allow reservation to silently create negative availability", () => expect(() => availableStock("1", "2", "100")).toThrow());
+  it("CI-A12 one sale remains one despite cash and multiple helpers", () => { const base = { tenantId: "tenant.one", canonicalId: "job.one", revision: "v1", currency: "USD", amount: "1000.00" }; expect(observedSales([{ ...base, kind: "sale" }, { ...base, kind: "sale" }, { ...base, kind: "collection" }, { ...base, kind: "assistance" }], "tenant.one", "USD")).toBe("1000.00"); });
+  it("mixed tenant, currency or revisions require reconciliation", () => { const r = { tenantId: "tenant.one", canonicalId: "job.one", revision: "v1", currency: "USD", amount: "1000.00", kind: "sale" as const }; expect(() => observedSales([r], "tenant.two", "USD")).toThrow(); expect(() => observedSales([r], "tenant.one", "EUR")).toThrow(); expect(() => observedSales([r, { ...r, revision: "v2", amount: "900.00" }], "tenant.one", "USD")).toThrow(); });
+  it.each(Array.from({ length: 30 }, (_, i) => i + 1))("allocation conservation across %i weighted lines", (count) => { const allocations = allocateMoney("12345.67", Array.from({ length: count }, (_, i) => ({ id: `job.${String(i).padStart(2, "0")}`, weight: String(i + 1) }))); const cents = allocations.reduce((sum, item) => sum + BigInt(item.amount.replace(".", "")), 0n); expect(cents).toBe(1234567n); });
+});

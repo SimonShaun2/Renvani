@@ -16,6 +16,7 @@ import {
   sitemapChunk,
   sitemapIds,
   serviceAreaSitemapPaths, buildPublicRobots, buildPublicSitemap, optInSlugs, publicSiteUrl } from "./public-sitemap";
+import { isCrawlable } from "./robots-match";
 
 const env = (vars: Record<string, string>) => vars as unknown as NodeJS.ProcessEnv;
 const publishedBooking = (slug: string, offeredServices: Array<Record<string, unknown>> = [], serviceAreaZipCodes: string[] = []) => ({
@@ -87,12 +88,15 @@ describe("robots", () => {
   const ruleOf = (robots: ReturnType<typeof buildPublicRobots>) => (Array.isArray(robots.rules) ? robots.rules[0] : robots.rules);
   const list = (v: string | string[] | undefined) => (v === undefined ? [] : Array.isArray(v) ? v : [v]);
 
-  it("is deny-by-default with registry allows and a sitemap when PUBLIC_SITE_URL is set", () => {
+  it("is allow-by-default with explicit private disallows and both sitemaps when PUBLIC_SITE_URL is set", () => {
     const robots = buildPublicRobots(env({ PUBLIC_SITE_URL: "https://s.example" }));
     const rule = ruleOf(robots);
-    expect(list(rule?.disallow)).toEqual(expect.arrayContaining(["/", "/book/*/manage"]));
     expect(list(rule?.allow)).toEqual(ROBOTS_ALLOW.map((a) => a.prefix));
-    expect(list(rule?.allow)).toEqual(expect.arrayContaining(["/site/", "/book/", "/pricing"]));
+    expect(list(rule?.allow)).toEqual(expect.arrayContaining(["/", "/sitemap.xml", "/sitemap-index.xml", "/sitemap/"]));
+    expect(list(rule?.disallow)).not.toContain("/");
+    expect(list(rule?.disallow)).toEqual(expect.arrayContaining(["/studio", "/api/", "/book/*/manage"]));
+    for (const path of ["/site/summit", "/site/summit/ac-repair/78701", "/book/summit"]) expect(isCrawlable(robots, path), path).toBe(true);
+    expect(isCrawlable(robots, "/book/summit/manage")).toBe(false);
     expect(robots.sitemap).toEqual(["https://s.example/sitemap.xml", "https://s.example/sitemap-index.xml"]);
   });
 
@@ -113,11 +117,10 @@ describe("robots", () => {
         .map((d) => `/${d.name}`)
     );
     expect(segments).toEqual(expect.arrayContaining(["/dashboard", "/command-center", "/settings", "/login"]));
-    const allows = list(ruleOf(buildPublicRobots(env({ PUBLIC_SITE_URL: "https://s.example" })))?.allow);
+    const robots = buildPublicRobots(env({ PUBLIC_SITE_URL: "https://s.example" }));
     for (const segment of segments) {
-      // Covered by "Disallow: /" only if no allow prefix matches it.
-      const allowed = allows.some((p) => (p.endsWith("$") ? segment === p.slice(0, -1) : `${segment}/`.startsWith(p) || segment.startsWith(p)));
-      expect(allowed, segment).toBe(false);
+      expect(isCrawlable(robots, segment), segment).toBe(false);
+      expect(isCrawlable(robots, `${segment}/x`), segment).toBe(false);
     }
   });
 });
@@ -165,8 +168,8 @@ describe("service x area sitemap entries", () => {
     expect(serviceAreaSitemapPaths("summit", many)).toHaveLength(MAX_SERVICE_AREA_URLS_PER_SHOP);
   });
 
-  it("robots explicitly allows the service-area route", () => {
-    expect(ROBOTS_ALLOW.map((a) => a.prefix)).toContain("/site/*/*/");
+  it("robots allows the service-area route", () => {
+    expect(isCrawlable(buildPublicRobots(env({ PUBLIC_SITE_URL: "https://s.example" })), "/site/summit/ac-repair/78701")).toBe(true);
   });
 });
 

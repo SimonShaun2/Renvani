@@ -3,20 +3,14 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { APP_ROUTE_PREFIXES, isPublicRoute } from "@/src/lib/route-access";
 import { PRODUCTION_SITE_ORIGIN, publicSiteUrl } from "./public-site-origin";
-import { MARKETING_SITEMAP_PATHS, ROBOTS_DISALLOW, buildPublicRobots, buildSiteSitemapXml } from "./public-sitemap";
+import { MARKETING_SITEMAP_PATHS, ROBOTS_DISALLOW, buildFullSitemap, buildPublicRobots, buildSiteSitemapXml } from "./public-sitemap";
+import { isCrawlable } from "./robots-match";
 
 const env = (values: Record<string, string>) => values as unknown as NodeJS.ProcessEnv;
 const PROD = env({ VERCEL_ENV: "production", VERCEL_TARGET_ENV: "production" });
-const rule = (r: ReturnType<typeof buildPublicRobots>) => (Array.isArray(r.rules) ? r.rules[0]! : r.rules);
 const list = (v: string | string[] | undefined) => (v === undefined ? [] : Array.isArray(v) ? v : [v]);
 
-/** Google-style matching: longest matching rule wins; allow wins ties. Supports * and $. */
-function crawlable(robots: ReturnType<typeof buildPublicRobots>, path: string): boolean {
-  const r = rule(robots);
-  const toRe = (p: string) => new RegExp("^" + p.replace(/[.+?^{}()|[\]\\]/g, "\\$&").replace(/\*/g, ".*").replace(/\\\$$|\$$/, "$"));
-  const best = (rules: string[]) => Math.max(-1, ...rules.filter((p) => toRe(p).test(path)).map((p) => p.length));
-  return best(list(r.allow)) >= best(list(r.disallow));
-}
+const crawlable = isCrawlable;
 
 describe("production robots.txt", () => {
   it("defaults to the canonical origin on a Vercel production deployment without PUBLIC_SITE_URL", () => {
@@ -107,3 +101,52 @@ describe("/sitemap.xml", () => {
 });
 
 afterEach(() => vi.unstubAllEnvs());
+
+describe("robots evaluator (Google longest-match)", () => {
+  const r = (allow: string[], disallow: string[]) => ({ rules: [{ userAgent: "*", allow, disallow }] });
+  it("longest match wins, Allow wins ties, supports * and $", () => {
+    expect(isCrawlable(r(["/"], ["/"]), "/x")).toBe(true); // tie → allow
+    expect(isCrawlable(r(["/"], ["/api/"]), "/api/x")).toBe(false);
+    expect(isCrawlable(r(["/"], ["/growth$", "/growth/"]), "/growth-check")).toBe(true);
+    expect(isCrawlable(r(["/"], ["/growth$", "/growth/"]), "/growth")).toBe(false);
+    expect(isCrawlable(r(["/book/"], ["/", "/book/*/manage"]), "/book/acme/manage")).toBe(false);
+    expect(isCrawlable(r(["/book/"], ["/"]), "/book/acme")).toBe(true);
+    expect(isCrawlable(r([], ["/"]), "/sitemap.xml")).toBe(false);
+    expect(isCrawlable(r([], []), "/anything")).toBe(true);
+  });
+});
+
+describe("production robots never blocks a public URL", () => {
+  const slugs = async () => [
+    { _type: "post" as const, slug: "booking-tips" },
+    { _type: "comparisonPage" as const, slug: "switching-guide" }
+  ];
+  const pathOf = (url: string) => new URL(url).pathname;
+
+  it("allows every URL in the full sitemap plus sitemaps and legal/about pages", async () => {
+    const robots = buildPublicRobots(PROD);
+    const xml = (await buildSiteSitemapXml(PROD, slugs))!;
+    const flat = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => pathOf(m[1]!));
+    const full = (await buildFullSitemap(env({ ...PROD, PUBLIC_SITE_SLUGS: "summit" }), async () => ({
+      bookingSlug: "summit", companyName: "Summit", offeredServices: [{ name: "AC Repair" }], serviceAreaZipCodes: ["78701"]
+    }))).map((e) => pathOf(e.url));
+    expect(flat.length).toBeGreaterThanOrEqual(MARKETING_SITEMAP_PATHS.length + 3);
+    expect(full).toEqual(expect.arrayContaining(["/site/summit", "/book/summit", "/blog"]));
+    const paths = [...new Set([...flat, ...full, "/sitemap.xml", "/sitemap-index.xml", "/sitemap/0.xml", "/robots.txt", "/privacy", "/terms", "/about"])];
+    for (const path of paths) expect(isCrawlable(robots, path), path).toBe(true);
+  });
+
+  it("still blocks private surfaces", () => {
+    const robots = buildPublicRobots(PROD);
+    for (const path of ["/studio", "/studio/desk", "/api/x", "/api/revalidate", "/login", "/login/sso", "/signup", "/verify-email", "/no-access",
+      "/onboarding", "/onboarding/workspace", "/dashboard", "/settings/team", "/mobile/jobs", "/booking-requests", "/pay/tok", "/approve/tok",
+      "/portal", "/portal/agreements/tok", "/review/tok", "/vip/join/tok", "/book/summit/manage", "/book/summit/confirm"]) {
+      expect(isCrawlable(robots, path), path).toBe(false);
+    }
+  });
+
+  it("previews still disallow everything", () => {
+    const robots = buildPublicRobots(env({ VERCEL_ENV: "preview", PUBLIC_SITE_URL: "https://getrenvani.com" }));
+    for (const path of ["/", "/pricing", "/sitemap.xml", "/blog"]) expect(isCrawlable(robots, path), path).toBe(false);
+  });
+});

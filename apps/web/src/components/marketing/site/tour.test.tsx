@@ -5,7 +5,8 @@ import { cleanup, render } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { isPublicRoute } from "@/src/lib/route-access";
-import { MARKETING_SITEMAP_PATHS, ROBOTS_ALLOW } from "@/src/lib/seo/public-sitemap";
+import { MARKETING_SITEMAP_PATHS, buildPublicRobots } from "@/src/lib/seo/public-sitemap";
+import { isCrawlable } from "@/src/lib/seo/robots-match";
 
 import { TourPage } from "./TourPage";
 import { TOUR_STEPS, tourPath } from "./tour-config";
@@ -49,7 +50,7 @@ describe("workflow tour", () => {
       expect(MARKETING_SITEMAP_PATHS.some((p) => p.path === tourPath(s.slug))).toBe(true);
     }
     expect(isPublicRoute("/tour/nope")).toBe(false);
-    expect(ROBOTS_ALLOW.some((r) => r.prefix === "/tour")).toBe(true);
+    expect(isCrawlable(buildPublicRobots({ PUBLIC_SITE_URL: "https://x.test" } as unknown as NodeJS.ProcessEnv), "/tour")).toBe(true);
     expect(readFileSync(join(APP, "(marketing)/product-tour/page.tsx"), "utf8")).toMatch(/permanentRedirect\("\/tour"\)/);
   });
 

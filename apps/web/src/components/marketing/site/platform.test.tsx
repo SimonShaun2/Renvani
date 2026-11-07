@@ -10,7 +10,8 @@ vi.mock("./fonts", () => ({ geist: { variable: "g" }, inter: { variable: "i", cl
 
 import { PRODUCT_PAGES } from "./flagship-registry";
 import { isPublicRoute } from "@/src/lib/route-access";
-import { buildMarketingSitemap, ROBOTS_ALLOW } from "@/src/lib/seo/public-sitemap";
+import { buildMarketingSitemap, buildPublicRobots } from "@/src/lib/seo/public-sitemap";
+import { isCrawlable } from "@/src/lib/seo/robots-match";
 
 import { MarketingShell } from "./MarketingShell";
 import { HowItWorksPage, ProductsPage } from "./PlatformPages";
@@ -85,7 +86,8 @@ describe("Products + How it works (Figma 176:204/176:313, 176:585/176:664)", () 
   it("sitemap and robots include both pages", () => {
     const urls = buildMarketingSitemap({ PUBLIC_SITE_URL: "https://x.test" } as unknown as NodeJS.ProcessEnv).map((e) => e.url);
     expect(urls).toEqual(expect.arrayContaining(["https://x.test/product", "https://x.test/how-it-works"]));
-    expect(ROBOTS_ALLOW.map((a) => a.prefix)).toEqual(expect.arrayContaining(["/product$", "/how-it-works"]));
+    const robots = buildPublicRobots({ PUBLIC_SITE_URL: "https://x.test" } as unknown as NodeJS.ProcessEnv);
+    for (const path of ["/product", "/how-it-works"]) expect(isCrawlable(robots, path), path).toBe(true);
   });
 
   it("copy stays home-services with no competitors or plan pricing", () => {

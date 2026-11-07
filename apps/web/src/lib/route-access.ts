@@ -5,7 +5,7 @@ export type UserRole = (typeof USER_ROLES)[number];
 type DefaultRouteMap = Record<UserRole, string>;
 
 // Retired /about is a public 404, not a sign-in page; private nested paths remain gated.
-const EXACT_PUBLIC_ROUTES = new Set(["/", "/about", "/login", "/signup", "/verify-email", "/product-tour", "/tour", "/product", "/how-it-works", "/pricing", "/industries", "/industries/hvac", "/industries/plumbing", "/industries/electrical", "/demo", "/growth-check", "/portal", "/robots.txt", "/sitemap.xml", "/sitemap-index.xml", "/blog", "/api/revalidate"]);
+const EXACT_PUBLIC_ROUTES = new Set(["/", "/about", "/login", "/signup", "/verify-email", "/product-tour", "/tour", "/product", "/how-it-works", "/pricing", "/industries", "/industries/hvac", "/industries/plumbing", "/industries/electrical", "/demo", "/growth-check", "/portal", "/robots.txt", "/sitemap.xml", "/sitemap-index.xml", "/blog", "/resources", "/api/revalidate"]);
 
 /** Split sitemaps from app/sitemap.ts generateSitemaps. */
 const SPLIT_SITEMAP_ROUTE = /^\/sitemap\/\d+\.xml$/;
@@ -113,6 +113,11 @@ export function getDefaultRouteForRole(role: UserRole): string {
 
 export function isPublicRoute(pathname: string): boolean {
   if (EXACT_PUBLIC_ROUTES.has(pathname) || SPLIT_SITEMAP_ROUTE.test(pathname)) {
+    return true;
+  }
+
+  // Public editorial templates only. Do not expose arbitrary /resources descendants.
+  if (/^\/resources\/templates\/[a-z0-9]+(?:-[a-z0-9]+)*(?:\/download)?$/.test(pathname)) {
     return true;
   }
 

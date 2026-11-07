@@ -1,3 +1,4 @@
+import { PLAYBOOK_PATHS } from "@/src/lib/resources/playbook";
 import { publicSiteUrl } from "./public-site-origin";
 import type { MetadataRoute } from "next";
 
@@ -191,6 +192,7 @@ export const MARKETING_SITEMAP_PATHS = [
   { path: "/industries", priority: 0.8 },
   { path: "/demo", priority: 0.8 },
   { path: "/growth-check", priority: 0.7 },
+  ...PLAYBOOK_PATHS.map(path => ({ path, priority: 0.7 })),
   ...INDUSTRY_PAGES.map((industry) => ({ path: industry.href, priority: 0.7 }))
 ] as const;
 

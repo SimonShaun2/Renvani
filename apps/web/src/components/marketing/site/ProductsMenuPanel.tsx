@@ -95,6 +95,7 @@ export function ProductsMenuPanel({ variant }: { variant: "desktop" | "mobile" }
 export const MOBILE_HEADLINE = "Explore Renvani.";
 export const MOBILE_EXPLORE = [
   { label: "How it works", href: "/how-it-works" },
+  { label: "Resources", href: "/resources" },
   { label: "Pricing", href: "/pricing" },
   { label: "Growth Check", href: "/growth-check" }
 ];

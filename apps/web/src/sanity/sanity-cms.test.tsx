@@ -327,8 +327,8 @@ describe("CMS sitemap entries", () => {
     ]);
   });
 
-  it("is empty without PUBLIC_SITE_URL or CMS content", async () => {
+  it("is empty without PUBLIC_SITE_URL and only /blog without CMS content", async () => {
     expect(await buildCmsSitemap({} as unknown as NodeJS.ProcessEnv, async () => [{ _type: "post", slug: "x" }])).toEqual([]);
-    expect(await buildCmsSitemap({ PUBLIC_SITE_URL: "https://getrenvani.com" } as unknown as NodeJS.ProcessEnv, async () => [])).toEqual([]);
+    expect((await buildCmsSitemap({ PUBLIC_SITE_URL: "https://getrenvani.com" } as unknown as NodeJS.ProcessEnv, async () => [])).map((e) => e.url)).toEqual(["https://getrenvani.com/blog"]);
   });
 });

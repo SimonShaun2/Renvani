@@ -5,6 +5,7 @@ import type { PublicBookingSettingsRecord } from "@/src/hooks/booking.hooks";
 import { INDUSTRY_PAGES } from "@/src/components/marketing/site/industry-registry";
 import { listServiceAreaPages, serviceAreaPath } from "@/src/components/growth/service-pages/service-area-pages";
 import { fetchPublicBookingSettingsBySlug } from "@/src/lib/public-booking-server";
+import { APP_ROUTE_PREFIXES, AUTH_ROUTES, NO_ROLE_SETUP_ROUTES } from "@/src/lib/route-access";
 import { CMS_TYPES } from "@/src/sanity/env";
 import { fetchCmsSlugs, type CmsSlug } from "@/src/sanity/fetch";
 
@@ -40,14 +41,28 @@ export const ROBOTS_ALLOW = [
   { key: "compare", prefix: "/compare/" }
 ] as const;
 
-/** Tokenized/transactional paths under allowed prefixes (longer rule wins over the allow). */
+/** Exact path and everything below it, without catching siblings (e.g. /growth must not block /growth-check). */
+const pathAndBelow = (prefix: string) => [`${prefix}$`, `${prefix}/`];
+
+/**
+ * Explicit disallows (longest rule wins over an allow): tokenized/transactional paths under allowed prefixes, the
+ * CMS Studio, every API route, auth pages and every signed-in app route from route-access.
+ */
 export const ROBOTS_DISALLOW = [
   "/",
   "/book/*/manage",
   "/book/*/confirm",
   "/book/*/confirmed",
-  "/book/*/commit"
+  "/book/*/commit",
+  "/studio",
+  "/api/",
+  ...AUTH_ROUTES.flatMap(pathAndBelow),
+  ...NO_ROLE_SETUP_ROUTES.flatMap(pathAndBelow),
+  ...APP_ROUTE_PREFIXES.filter((p) => p !== "/studio").flatMap(pathAndBelow)
 ] as const;
+
+/** The flat sitemap crawlers and robots.txt point at (marketing, industries, blog, compare). */
+export const SITEMAP_PATH = "/sitemap.xml";
 
 export { publicSiteUrl } from "./public-site-origin";
 
@@ -175,19 +190,24 @@ export function buildMarketingSitemap(env: NodeJS.ProcessEnv = process.env): Met
   return MARKETING_SITEMAP_PATHS.map((p) => ({ url: `${base}${p.path === "/" ? "" : p.path}`, changeFrequency: "weekly" as const, priority: p.priority }));
 }
 
-/** Published Sanity posts (/blog/:slug) and comparison pages (/compare/:slug). Empty when the CMS is unconfigured. */
+/** /blog plus published Sanity posts (/blog/:slug) and comparison pages (/compare/:slug). CMS errors fail soft to /blog only. */
 export async function buildCmsSitemap(
   env: NodeJS.ProcessEnv = process.env,
   fetchSlugs: () => Promise<CmsSlug[]> = fetchCmsSlugs
 ): Promise<MetadataRoute.Sitemap> {
   const base = publicSiteUrl(env);
   if (!base) return [];
-  const docs = (await fetchSlugs()).slice(0, MAX_CMS_SITEMAP_URLS - 1);
-  const blog = docs.some((d) => d._type === "post") ? [{ url: `${base}/blog`, changeFrequency: "weekly" as const, priority: 0.7 }] : [];
+  let docs: CmsSlug[] = [];
+  try {
+    const result = await fetchSlugs();
+    docs = Array.isArray(result) ? result.slice(0, MAX_CMS_SITEMAP_URLS - 1) : [];
+  } catch (error) {
+    console.error("[sitemap] CMS slugs unavailable", error instanceof Error ? error.message : String(error));
+  }
   return [
-    ...blog,
+    { url: `${base}/blog`, changeFrequency: "weekly" as const, priority: 0.7 },
     ...docs
-      .filter((d) => d.slug && d._type in CMS_TYPES)
+      .filter((d) => typeof d?.slug === "string" && d.slug && Object.prototype.hasOwnProperty.call(CMS_TYPES, d._type))
       .map((d) => ({
         url: `${base}${CMS_TYPES[d._type]}/${encodeURIComponent(d.slug)}`,
         ...(d._updatedAt ? { lastModified: d._updatedAt } : {}),
@@ -197,13 +217,31 @@ export async function buildCmsSitemap(
   ];
 }
 
+/** /sitemap.xml: marketing + industry pages, /blog, posts and comparison pages. Never throws for CMS outages. */
+export async function buildSiteSitemapXml(
+  env: NodeJS.ProcessEnv = process.env,
+  fetchSlugs: () => Promise<CmsSlug[]> = fetchCmsSlugs
+): Promise<string | null> {
+  if (!publicSiteUrl(env)) return null;
+  const entries = [...buildMarketingSitemap(env), ...(await buildCmsSitemap(env, fetchSlugs))];
+  const urls = entries
+    .map((e) => {
+      const lastmod = e.lastModified ? `<lastmod>${xmlEscape(new Date(e.lastModified).toISOString())}</lastmod>` : "";
+      const freq = e.changeFrequency ? `<changefreq>${e.changeFrequency}</changefreq>` : "";
+      const priority = typeof e.priority === "number" ? `<priority>${e.priority}</priority>` : "";
+      return `<url><loc>${xmlEscape(e.url)}</loc>${lastmod}${freq}${priority}</url>`;
+    })
+    .join("");
+  return `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls}</urlset>`;
+}
+
 export function buildPublicRobots(env: NodeJS.ProcessEnv = process.env): MetadataRoute.Robots {
   const base = publicSiteUrl(env);
   // Previews / unconfigured deploys: block everything and advertise no sitemap.
   if (!base) return { rules: [{ userAgent: "*", disallow: "/" }] };
   return {
     rules: [{ userAgent: "*", allow: ROBOTS_ALLOW.map((a) => a.prefix), disallow: [...ROBOTS_DISALLOW] }],
-    sitemap: `${base}${SITEMAP_INDEX_PATH}`,
+    sitemap: [`${base}${SITEMAP_PATH}`, `${base}${SITEMAP_INDEX_PATH}`],
     host: base
   };
 }

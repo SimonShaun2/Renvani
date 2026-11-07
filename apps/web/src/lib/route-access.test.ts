@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { isPublicRoute } from "./route-access";
+import { canRoleAccessPath, isPublicRoute } from "./route-access";
 
 describe("isPublicRoute", () => {
   it("treats the marketing home page as public", () => {
@@ -50,6 +50,27 @@ describe("isPublicRoute", () => {
   it("treats signup and login as public", () => {
     expect(isPublicRoute("/signup")).toBe(true);
     expect(isPublicRoute("/login")).toBe(true);
+  });
+});
+
+describe("CMS and Studio route access", () => {
+  it("treats /blog, /blog/:slug and /compare/:slug as public", () => {
+    expect(isPublicRoute("/blog")).toBe(true);
+    expect(isPublicRoute("/blog/booking-tips")).toBe(true);
+    expect(isPublicRoute("/compare/switching-guide")).toBe(true);
+    expect(isPublicRoute("/compare")).toBe(false);
+    expect(isPublicRoute("/blog/a/b")).toBe(false);
+    expect(isPublicRoute("/api/revalidate")).toBe(true);
+  });
+
+  it("keeps /studio private and allows only owner, admin and office", () => {
+    expect(isPublicRoute("/studio")).toBe(false);
+    expect(isPublicRoute("/studio/structure")).toBe(false);
+    expect(canRoleAccessPath("owner", "/studio/structure")).toBe(true);
+    expect(canRoleAccessPath("admin", "/studio")).toBe(true);
+    expect(canRoleAccessPath("office", "/studio")).toBe(true);
+    expect(canRoleAccessPath("dispatcher", "/studio")).toBe(false);
+    expect(canRoleAccessPath("technician", "/studio")).toBe(false);
   });
 });
 

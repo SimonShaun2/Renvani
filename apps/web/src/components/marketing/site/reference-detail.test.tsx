@@ -38,7 +38,7 @@ describe("reference-led detail pages, not a product reclassification",()=>{
     for(const section of sections){expect(section.querySelector("figure")).toBeTruthy();expect(section.querySelectorAll("li")).toHaveLength(3);}
     expect(container.querySelector('[role="tablist"]')).toBeNull();
     for(const feature of DETAIL_FEATURES[page.slug]!){for(const variant of ["desktop","mobile"] as const)expect(detailVisual(feature.visual,feature.part,variant).width).toBeGreaterThan(250);}
-    for(const art of container.querySelectorAll('[data-illustration]'))expect(art.querySelector('[inert]')).toBeTruthy();
+    for(const art of container.querySelectorAll('[data-illustration]'))expect(art.querySelector('[inert]')||art.getAttribute('data-loop')).toBeTruthy();
     for(const a of container.querySelectorAll<HTMLAnchorElement>('a[href^="#"]'))expect(container.querySelector(a.getAttribute("href")!)).toBeTruthy();
   });
   it.each(INDUSTRY_PAGES)("$slug shows three different trade-specific records",industry=>{

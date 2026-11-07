@@ -52,3 +52,14 @@ describe("isPublicRoute", () => {
     expect(isPublicRoute("/login")).toBe(true);
   });
 });
+
+  it("only treats known /media static extensions as public", () => {
+    expect(isPublicRoute("/media/loops/x.webm")).toBe(true);
+    expect(isPublicRoute("/media/loops/x.mp4")).toBe(true);
+    expect(isPublicRoute("/media/why/poster.webp")).toBe(true);
+    expect(isPublicRoute("/media/why/captions.vtt")).toBe(true);
+    expect(isPublicRoute("/media/foo")).toBe(false);
+    expect(isPublicRoute("/media/foo.exe")).toBe(false);
+    expect(isPublicRoute("/media")).toBe(false);
+  });
+

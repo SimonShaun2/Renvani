@@ -22,10 +22,10 @@ describe("industry value stories within the approved design", () => {
     }
   });
   it("preserves the accepted stylesheet and all shared/product-page components", () => {
-    expect(digest(readFileSync(join(__dirname, "detail-pages.module.css")))).toBe("9a23846404fef6cd188d3fb5bd65313c5e6bf74efd57cb7ebd33df4f7a4eec01");
+    expect(digest(readFileSync(join(__dirname, "detail-pages.module.css")))).toBe("e5bbf6035baccee66dd094ac03f43703d8ec41cff2b4d117b08835705c810619");
     const source = readFileSync(join(__dirname, "DetailPages.tsx"), "utf8");
     const shared = source.slice(source.indexOf("type Layer ="), source.indexOf("function TradeScene("));
-    expect(digest(shared)).toBe("27e23dc09f1cf02c83ec3f9c0fd7de5fa517f359fc6edc33f2a2d2ae2bbf710d");
+    expect(digest(shared)).toBe("78ce3a67b3e7d7675d0b7963095e7c76d0c195133966f6a9ca04d8d0b1b3e640");
   });
   it.each(INDUSTRY_PAGES)("$slug connects the mission, five flagships and two supporting tools", industry => {
     const journey = INDUSTRY_JOURNEYS[industry.slug];

@@ -152,5 +152,5 @@ export async function middleware(request: NextRequest, event?: NextFetchEvent): 
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon\\.ico$|icon\\.svg$|apple-icon\\.png$|brand/logo-horizontal\\.svg$|icon-(?:192|512|maskable-512)\\.png$|manifest\\.webmanifest$).*)"]
+  matcher: ["/((?!media/.+\\.(?:webm|mp4|jpe?g|png|webp|avif|gif|vtt)$|_next/static|_next/image|favicon\\.ico$|icon\\.svg$|apple-icon\\.png$|brand/logo-horizontal\\.svg$|icon-(?:192|512|maskable-512)\\.png$|manifest\\.webmanifest$).*)"]
 };

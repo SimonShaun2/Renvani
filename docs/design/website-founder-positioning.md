@@ -6,8 +6,9 @@ Continues PR #451 from checkpoint `0dec4240ee9c13229a1b44057b43e7452a58e1b6` aft
 
 - Homepage headline: More direct jobs. More repeat customers.
 - One connected platform explanation in the hero and page metadata; no implied add-on to another platform.
-- Founder section leads with the approved repeat-founder account only: Shaun Simon is a repeat founder who built Renvani around one connected platform for home service businesses. Past ventures stay unnamed. No invented acquisition date, price, executive title, endorsement or customer proof.
-- The standalone About page is deferred by founder request. Keep the homepage founder section (repeat-founder wording only); no secondary About CTA. The homepage founder block is planned to be replaced by the Why video in PR #453.
+- Founder positioning rule (repeat-founder only): Shaun Simon is a repeat founder who built Renvani around one connected platform for home service businesses. Past ventures stay unnamed. No invented acquisition date, price, executive title, endorsement or customer proof.
+- The homepage founder block has been removed and replaced by the "Why we built Renvani" video section (PR #453). Any future founder wording must follow the repeat-founder rule above.
+- The standalone About page is deferred by founder request. No secondary About CTA. The homepage founder block was removed and replaced by the Why video (PR #453).
 - Footer remains at the approved pre-About layout and links; no About footer item.
 - The About page and its sitemap/robots entry are removed from this release. The old URL returns a public 404 instead of redirecting to sign-in.
 
@@ -18,7 +19,7 @@ Canonical Figma file `jiGHTNUJNltWbHA4Il3hk7`, page `171:2`. New variants preser
 | Content | Desktop | Tablet | Mobile |
 | --- | --- | --- | --- |
 | Hero copy variant | 665:6004 | 665:6056 | 665:6104 |
-| Founder section | 665:6014 | 665:6066 | 665:6114 |
+| Founder section (removed from the homepage; retained only in Figma) | 665:6014 | 665:6066 | 665:6114 |
 | Deferred About design frames, retained only in Figma | 665:6026 | 665:6078 | 665:6126 |
 
 These variants have author visual checks, not independent Design/Product acceptance. The existing application navigation is deliberately reused rather than imported from an older Figma shell. No new binary assets are needed.
@@ -31,4 +32,4 @@ Remaining launch tickets are not claimed complete. Privacy/Terms copy needs actu
 
 ## November 6 founder scope change
 
-The standalone About page is not needed right now. Keep the existing homepage founder section on repeat-founder-only wording (no past company names). Remove the page, footer link, linked CTA, and crawler references from the preview. Preserve Figma About designs as deferred assets. Production remains unchanged. The homepage founder block is planned to be replaced by the Why video in PR #453.
+The standalone About page is not needed right now. Founder wording stays repeat-founder only (no past company names). Remove the page, footer link, linked CTA, and crawler references from the preview. Preserve Figma About designs as deferred assets. Production remains unchanged. The homepage founder block was removed and replaced by the Why video when PR #453 merged dev.

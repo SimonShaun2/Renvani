@@ -418,7 +418,8 @@ test("FS-235 strict gate drops its own database after test failure and fails on 
 
 test("PR #445: Neon per-PR gate runs the workflow-read PostgreSQL suites with WORKFLOW_* env, isolated only, skips fail", async () => {
   const script = readFileSync(join(repoRoot, "scripts/ci/neon-per-pr-branch.mjs"), "utf8");
-  assert.match(script, /runWorkflowReadsSuites\(\{ repoRoot, databaseUrl, isolated: databaseUrl !== baseUrl/);
+  assert.match(script, /runWorkflowReads\(\{ repoRoot, databaseUrl, isolated: databaseUrl !== baseUrl/);
+  assert.match(script, /runWorkflowReads = runWorkflowReadsSuites/);
   const mod = await import("./workflow-reads-postgres.mjs");
   assert.equal(mod.WORKFLOW_READ_SUITES.length, 3);
   const env = mod.workflowReadsEnv({ KEEP: "1" }, "postgres://synthetic/db");
@@ -438,8 +439,6 @@ test("PR #445: Neon per-PR gate runs the workflow-read PostgreSQL suites with WO
     );
     assert.match(logs[0], /NOT PROVEN/);
   }
-  const gate = readFileSync(join(repoRoot, "scripts/ci/neon-per-pr-branch.mjs"), "utf8");
-  assert.match(gate, /if \(workflowReads\?\.ran !== true\) \{\n\s+throw/);
   // Pinned suite counts: a drop fails.
   const pinned = [
     { file: "estimate-groups.postgres.integration.test.ts", passed: 12, failed: 0, skipped: 0 },
@@ -479,4 +478,57 @@ test("PR #445: safeErrorClasses keeps only class names and SQLSTATE codes", asyn
   const out = mod.safeErrorClasses("PostgresError: relation \"customers\" does not exist\n  code: '42P01'\n postgres://u:secret@h/db row=Ava ECONNREFUSED");
   assert.deepEqual(out, { names: ["PostgresError", "ECONNREFUSED"], sqlstate: ["42P01"] });
   assert.doesNotMatch(JSON.stringify(out), /secret|Ava|customers/);
+});
+
+async function driveGate({ createdb = true, runWorkflowReads }) {
+  const { runNeonGate } = await import("./neon-per-pr-branch.mjs");
+  const sql = Object.assign(fakeSql({ createdb }), { ended: false, async end() { sql.ended = true; } });
+  const commands = [];
+  const workflowCalls = [];
+  const logs = [];
+  const errors = [];
+  const exitCode = await runNeonGate({
+    env: { NEON_CI_DATABASE_URL: "postgresql://ci_user:synthetic@ep-staging-1.neon.tech/neondb?sslmode=require", RENVANI_DEPLOYMENT_TIER: "staging", NEON_CI_PR_NUMBER: "445" },
+    runCommand: (_command, args) => commands.push(args.join(" ")),
+    runWorkflowReads: (options) => {
+      workflowCalls.push(options);
+      return runWorkflowReads(options);
+    },
+    createSql: () => sql,
+    log: (message) => logs.push(message),
+    logError: (message) => errors.push(message),
+    nowEpochSeconds: NOW
+  });
+  return { exitCode, sql, commands, workflowCalls, logs, errors };
+}
+
+test("PR #445 caller: the real non-isolated NOT PROVEN throw fails the gate (exit 1, no OK)", async () => {
+  const { runWorkflowReadsSuites } = await import("./workflow-reads-postgres.mjs");
+  const result = await driveGate({ createdb: false, runWorkflowReads: (options) => runWorkflowReadsSuites({ ...options, log: () => undefined }) });
+  assert.equal(result.exitCode, 1);
+  assert.equal(result.workflowCalls.length, 1);
+  assert.equal(result.workflowCalls[0].isolated, false);
+  assert.ok(result.errors.some((message) => /FAIL: NOT PROVEN/.test(message)));
+  assert.ok(!result.logs.some((message) => /\] OK \(/.test(message)));
+  assert.ok(result.sql.ended);
+});
+
+for (const [label, value] of [["{ran:false}", { ran: false }], ["undefined", undefined]]) {
+  test(`PR #445 caller: workflow-reads runner returning ${label} fails the gate (exit 1, no OK)`, async () => {
+    const result = await driveGate({ runWorkflowReads: () => value });
+    assert.equal(result.exitCode, 1);
+    assert.equal(result.workflowCalls.length, 1);
+    assert.equal(result.workflowCalls[0].isolated, true);
+    assert.ok(result.errors.some((message) => /FAIL: NOT PROVEN: workflow-read PostgreSQL suites did not run/.test(message)));
+    assert.ok(!result.logs.some((message) => /\] OK \(/.test(message)));
+    assert.ok(result.sql.calls.some((call) => call.startsWith("drop database")), "isolated CI database is still dropped");
+  });
+}
+
+test("PR #445 caller: ran:true passes the gate (exit 0, OK isolated)", async () => {
+  const result = await driveGate({ runWorkflowReads: () => ({ ran: true, total: 43, passed: 43, failed: 0, skipped: 0, todo: 0 }) });
+  assert.equal(result.exitCode, 0);
+  assert.deepEqual(result.errors, []);
+  assert.ok(result.logs.some((message) => /\] OK \(isolated: ci_pr_445_/.test(message)));
+  assert.equal(result.commands.length, 3);
 });

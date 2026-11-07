@@ -429,9 +429,26 @@ test("PR #445: Neon per-PR gate runs the workflow-read PostgreSQL suites with WO
   assert.throws(() => mod.assertAllExecuted("x", counts({ total: 43, passed: 0, failed: 0, skipped: 43, todo: 0 })));
   assert.throws(() => mod.assertAllExecuted("x", counts({ total: 0, passed: 0, failed: 0, skipped: 0, todo: 0 })));
   assert.deepEqual(mod.assertAllExecuted("x", counts({ total: 43, passed: 43, failed: 0, skipped: 0, todo: 0 })).passed, 43);
-  const logs = [];
-  assert.deepEqual(mod.runWorkflowReadsSuites({ repoRoot, databaseUrl: "u", isolated: false, log: (m) => logs.push(m) }), { ran: false });
-  assert.match(logs[0], /NOT PROVEN/);
+  // Fail closed: a non-isolated (shared-staging fallback) run must FAIL the gate, never pass or skip.
+  for (const isolated of [false, undefined]) {
+    const logs = [];
+    assert.throws(
+      () => mod.runWorkflowReadsSuites({ repoRoot, databaseUrl: "u", isolated, log: (m) => logs.push(m) }),
+      (error) => error instanceof mod.WorkflowReadsNotProvenError && /NOT PROVEN/.test(error.message)
+    );
+    assert.match(logs[0], /NOT PROVEN/);
+  }
+  const gate = readFileSync(join(repoRoot, "scripts/ci/neon-per-pr-branch.mjs"), "utf8");
+  assert.match(gate, /if \(workflowReads\?\.ran !== true\) \{\n\s+throw/);
+  // Pinned suite counts: a drop fails.
+  const pinned = [
+    { file: "estimate-groups.postgres.integration.test.ts", passed: 12, failed: 0, skipped: 0 },
+    { file: "dispatch-week.postgres.integration.test.ts", passed: 8, failed: 0, skipped: 0 },
+    { file: "workflow-reads.postgres.integration.test.ts", passed: 23, failed: 0, skipped: 0 }
+  ];
+  mod.assertPinnedSuiteCounts(pinned);
+  assert.throws(() => mod.assertPinnedSuiteCounts(pinned.map((l, i) => (i === 2 ? { ...l, passed: 22 } : l))));
+  assert.throws(() => mod.assertPinnedSuiteCounts(pinned.slice(0, 2)));
 });
 
 test("PR #445: workflow-read suites use the direct Neon endpoint (no PgBouncer session loss) and report safe diagnostics", async () => {

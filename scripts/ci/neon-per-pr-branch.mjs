@@ -54,7 +54,11 @@ function stepsAgainst(databaseUrl) {
   run("corepack", ["pnpm", "--filter", "@fsm/db", "run", "db:migrate"], childEnv);
   run("corepack", ["pnpm", "--filter", "@fsm/db", "test"], childEnv);
   // PR #445: workflow-read PostgreSQL suites on the same migrated per-PR database (isolated mode only).
-  runWorkflowReadsSuites({ repoRoot, databaseUrl, isolated: databaseUrl !== baseUrl, env: childEnv });
+  // Fail closed: a non-isolated run throws NOT PROVEN; anything but ran === true fails the gate.
+  const workflowReads = runWorkflowReadsSuites({ repoRoot, databaseUrl, isolated: databaseUrl !== baseUrl, env: childEnv });
+  if (workflowReads?.ran !== true) {
+    throw Object.assign(new Error("NOT PROVEN: workflow-read PostgreSQL suites did not run"), { exitStatus: 1 });
+  }
 }
 
 console.log(

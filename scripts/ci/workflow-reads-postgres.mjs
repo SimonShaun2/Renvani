@@ -3,8 +3,8 @@
  * against the per-PR database the existing Neon job already creates. No workflow or secret change:
  * neon-per-pr-branch.mjs calls this inside withIsolatedCiDatabase after migrations.
  *
- * Gate: every test must execute (0 skipped, 0 failed). On the shared-staging fallback these suites are NOT run
- * (they write fixture rows) and the result is logged as NOT PROVEN.
+ * Gate: every test must execute (0 skipped, 0 failed) with pinned per-suite counts. A non-isolated (shared-staging
+ * fallback) run FAILS the gate as NOT PROVEN; the suites are never run against shared staging.
  */
 import { spawnSync } from "node:child_process";
 import { mkdtempSync, readFileSync } from "node:fs";
@@ -35,6 +35,29 @@ export function directEndpointUrl(databaseUrl) {
   if (!first.endsWith("-pooler") || !parsed.hostname.endsWith(".neon.tech")) return databaseUrl;
   parsed.hostname = [first.slice(0, -"-pooler".length), ...rest].join(".");
   return parsed.toString();
+}
+
+/** Pinned per-suite executed+passed counts; a drop (or rise) fails the gate until this pin is updated deliberately. */
+export const EXPECTED_SUITE_COUNTS = {
+  "estimate-groups.postgres.integration.test.ts": 12,
+  "dispatch-week.postgres.integration.test.ts": 8,
+  "workflow-reads.postgres.integration.test.ts": 23
+};
+
+export function assertPinnedSuiteCounts(summary) {
+  for (const [file, expected] of Object.entries(EXPECTED_SUITE_COUNTS)) {
+    const line = summary.find((entry) => entry.file === file);
+    if (!line || line.passed !== expected || line.failed !== 0 || line.skipped !== 0) {
+      throw new Error(`workflow-read suite ${file} did not execute exactly ${expected} passing tests`);
+    }
+  }
+}
+
+export class WorkflowReadsNotProvenError extends Error {
+  constructor() {
+    super("NOT PROVEN: per-PR database isolation unavailable (no CREATEDB / CREATE DATABASE denied); workflow-read PostgreSQL suites are never run on shared staging, so the gate fails");
+    this.name = "WorkflowReadsNotProvenError";
+  }
 }
 
 export function workflowReadsEnv(baseEnv, databaseUrl) {
@@ -87,9 +110,10 @@ export function assertAllExecuted(outputFile, readCounts) {
 }
 
 export function runWorkflowReadsSuites({ repoRoot, databaseUrl, isolated, env = process.env, log = console.log }) {
-  if (!isolated) {
-    log("[workflow-reads-postgres] NOT PROVEN: shared-staging fallback; suites skipped to avoid writing fixtures to shared staging.");
-    return { ran: false };
+  if (isolated !== true) {
+    const error = new WorkflowReadsNotProvenError();
+    log(`[workflow-reads-postgres] ${error.message}`);
+    throw error;
   }
   const build = spawnSync("corepack", ["pnpm", "--filter", "@fsm/api^...", "build"], { cwd: repoRoot, env, stdio: "inherit", shell: false });
   if (build.status !== 0) throw new Error("API dependency build failed");
@@ -114,6 +138,7 @@ export function runWorkflowReadsSuites({ repoRoot, databaseUrl, isolated, env = 
     verifyResult: (file) => {
       try {
         counted = assertAllExecuted(file, readJsonCounts);
+        assertPinnedSuiteCounts(safeFailureSummary(file));
       } catch (error) {
         for (const line of safeFailureSummary(file)) log(`[workflow-reads-postgres] ${JSON.stringify(line)}`);
         throw error;

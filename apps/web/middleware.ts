@@ -12,6 +12,7 @@ import {
 import { isClerkEnabled } from "@/src/lib/clerk/config";
 import { readOriginSecret } from "@/src/lib/origin-secret-env";
 import { resolveClerkRole, resolveClerkRouteDecision } from "@/src/lib/clerk/route-decision";
+import { decideStudioAccess, isStudioPath } from "@/src/lib/studio-access";
 import { canRoleAccessPath, getDefaultRouteForRole, isPublicRoute, normalizeUserRole, type UserRole } from "@/src/lib/route-access";
 
 interface TokenPayload {
@@ -92,6 +93,14 @@ export async function legacyMiddleware(request: NextRequest, clerkUserId: string
     }
     if (originSecret.secret) headers.set("x-origin-secret", originSecret.secret);
     return NextResponse.next({ request: { headers } });
+  }
+
+  // Studio: verified Clerk session only; legacy cookies are ignored. Wrong role → 403, signed out → sign in.
+  if (isStudioPath(pathname)) {
+    const access = decideStudioAccess(clerkUserId, clerkRole);
+    if (access === "allow") return NextResponse.next();
+    if (access === "forbidden") return new NextResponse("Forbidden", { status: 403, headers: { "cache-control": "no-store" } });
+    return NextResponse.redirect(new URL("/login", request.url));
   }
 
   const token = request.cookies.get(AUTH_TOKEN_COOKIE_NAME)?.value;

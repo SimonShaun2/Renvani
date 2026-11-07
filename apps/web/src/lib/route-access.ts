@@ -5,7 +5,7 @@ export type UserRole = (typeof USER_ROLES)[number];
 type DefaultRouteMap = Record<UserRole, string>;
 
 // Retired /about is a public 404, not a sign-in page; private nested paths remain gated.
-const EXACT_PUBLIC_ROUTES = new Set(["/", "/about", "/login", "/signup", "/verify-email", "/product-tour", "/tour", "/product", "/how-it-works", "/pricing", "/industries", "/industries/hvac", "/industries/plumbing", "/industries/electrical", "/demo", "/growth-check", "/portal", "/robots.txt", "/sitemap.xml", "/sitemap-index.xml"]);
+const EXACT_PUBLIC_ROUTES = new Set(["/", "/about", "/login", "/signup", "/verify-email", "/product-tour", "/tour", "/product", "/how-it-works", "/pricing", "/industries", "/industries/hvac", "/industries/plumbing", "/industries/electrical", "/demo", "/growth-check", "/portal", "/robots.txt", "/sitemap.xml", "/sitemap-index.xml", "/blog", "/api/revalidate"]);
 
 /** Split sitemaps from app/sitemap.ts generateSitemaps. */
 const SPLIT_SITEMAP_ROUTE = /^\/sitemap\/\d+\.xml$/;
@@ -33,7 +33,8 @@ const ROLE_ALLOWED_PREFIXES: Record<UserRole, string[]> = {
     "/reporting",
     "/settings",
     "/growth",
-    "/mobile"
+    "/mobile",
+    "/studio"
   ],
   admin: [
     "/onboarding",
@@ -54,7 +55,8 @@ const ROLE_ALLOWED_PREFIXES: Record<UserRole, string[]> = {
     "/reporting",
     "/settings",
     "/growth",
-    "/mobile"
+    "/mobile",
+    "/studio"
   ],
   dispatcher: [
     "/dispatch",
@@ -77,7 +79,8 @@ const ROLE_ALLOWED_PREFIXES: Record<UserRole, string[]> = {
     "/service-agreements",
     "/timesheets",
     "/inventory",
-    "/settings"
+    "/settings",
+    "/studio"
   ],
   technician: ["/mobile", "/inventory"]
 };
@@ -119,6 +122,11 @@ export function isPublicRoute(pathname: string): boolean {
 
   // /industries/<slug> is marketing-only (no app routes there); unknown slugs render the 404 page instead of a login redirect.
   if (segments[0] === "industries" && segments.length === 2) {
+    return true;
+  }
+
+  // CMS-authored SEO pages (Sanity). Unknown slugs render the 404 page.
+  if ((segments[0] === "blog" || segments[0] === "compare") && segments.length === 2) {
     return true;
   }
 

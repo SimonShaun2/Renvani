@@ -433,3 +433,33 @@ test("PR #445: Neon per-PR gate runs the workflow-read PostgreSQL suites with WO
   assert.deepEqual(mod.runWorkflowReadsSuites({ repoRoot, databaseUrl: "u", isolated: false, log: (m) => logs.push(m) }), { ran: false });
   assert.match(logs[0], /NOT PROVEN/);
 });
+
+test("PR #445: workflow-read suites use the direct Neon endpoint (no PgBouncer session loss) and report safe diagnostics", async () => {
+  const mod = await import("./workflow-reads-postgres.mjs");
+  const pooled = "postgresql://ci_user:p%40ss@ep-floral-forest-b5kvzc7b-pooler.c-7.us-east-2.aws.neon.tech/ci_pr_445_1_1?sslmode=require";
+  const direct = new URL(mod.directEndpointUrl(pooled));
+  assert.equal(direct.hostname, "ep-floral-forest-b5kvzc7b.c-7.us-east-2.aws.neon.tech");
+  assert.equal(direct.pathname, "/ci_pr_445_1_1");
+  assert.equal(direct.password, "p%40ss");
+  assert.equal(direct.searchParams.get("sslmode"), "require");
+  assert.equal(mod.directEndpointUrl("postgres://postgres@127.0.0.1:5432/x"), "postgres://postgres@127.0.0.1:5432/x");
+  const env = mod.workflowReadsEnv({}, pooled);
+  for (const key of ["DATABASE_URL", "WORKFLOW_TEST_DATABASE_URL", "WORKFLOW_FULL_DATABASE_URL"]) {
+    assert.ok(env[key]);
+    assert.doesNotMatch(env[key], /-pooler\./);
+  }
+  const directory = mkdtempSync(join(tmpdir(), "wf445-summary-"));
+  const file = join(directory, "r.json");
+  writeFileSync(file, JSON.stringify({ testResults: [{ name: "/x/src/services/estimate-groups.postgres.integration.test.ts", message: "PostgresError: relation \"customers\" does not exist code: '42P01' postgres://u:secret@h/db", assertionResults: [{ status: "failed", failureMessages: ["secret-row-value"] }, { status: "skipped" }] }] }));
+  const [line] = mod.safeFailureSummary(file);
+  assert.deepEqual(line, { file: "estimate-groups.postgres.integration.test.ts", passed: 0, failed: 1, skipped: 1, kind: "PostgresError", sqlstate: ["42P01"] });
+  assert.doesNotMatch(JSON.stringify(line), /secret|postgres:\/\//);
+  rmSync(directory, { recursive: true, force: true });
+});
+
+test("PR #445: safeErrorClasses keeps only class names and SQLSTATE codes", async () => {
+  const mod = await import("./workflow-reads-postgres.mjs");
+  const out = mod.safeErrorClasses("PostgresError: relation \"customers\" does not exist\n  code: '42P01'\n postgres://u:secret@h/db row=Ava ECONNREFUSED");
+  assert.deepEqual(out, { names: ["PostgresError", "ECONNREFUSED"], sqlstate: ["42P01"] });
+  assert.doesNotMatch(JSON.stringify(out), /secret|Ava|customers/);
+});

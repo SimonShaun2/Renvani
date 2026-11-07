@@ -11,7 +11,7 @@ import { mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { runSilentVitest, runVitestJsonGate } from "./strict-vitest-json.mjs";
+import { runVitestJsonGate } from "./strict-vitest-json.mjs";
 
 export const WORKFLOW_READ_SUITES = [
   "src/services/estimate-groups.postgres.integration.test.ts",
@@ -19,12 +19,63 @@ export const WORKFLOW_READ_SUITES = [
   "src/services/workflow-reads.postgres.integration.test.ts"
 ];
 
+/**
+ * Neon's "-pooler" endpoint is PgBouncer in transaction mode: session state (SET search_path, set_config(..., false),
+ * temp schemas) does not survive between statements. These suites create per-run schemas and rely on session state,
+ * so they must use the direct (unpooled) endpoint of the same database and role. Same secret, no credential change.
+ */
+export function directEndpointUrl(databaseUrl) {
+  let parsed;
+  try {
+    parsed = new URL(databaseUrl);
+  } catch {
+    return databaseUrl;
+  }
+  const [first, ...rest] = parsed.hostname.split(".");
+  if (!first.endsWith("-pooler") || !parsed.hostname.endsWith(".neon.tech")) return databaseUrl;
+  parsed.hostname = [first.slice(0, -"-pooler".length), ...rest].join(".");
+  return parsed.toString();
+}
+
 export function workflowReadsEnv(baseEnv, databaseUrl) {
+  const direct = directEndpointUrl(databaseUrl);
   return {
     ...baseEnv,
-    WORKFLOW_TEST_DATABASE_URL: databaseUrl,
-    WORKFLOW_FULL_DATABASE_URL: databaseUrl
+    DATABASE_URL: direct,
+    WORKFLOW_TEST_DATABASE_URL: direct,
+    WORKFLOW_FULL_DATABASE_URL: direct
   };
+}
+
+/** Error class names, network error codes and SQLSTATE codes found in captured output. Never messages or values. */
+export function safeErrorClasses(text) {
+  const source = typeof text === "string" ? text.slice(0, 4_000_000) : "";
+  const names = [...new Set(source.match(/\b(?:PostgresError|AssertionError|TypeError|ZodError|SyntaxError|ECONNREFUSED|ENOTFOUND|ETIMEDOUT|ECONNRESET|CONNECT_TIMEOUT|Hook timed out)\b/gu) ?? [])].slice(0, 10);
+  const sqlstate = [...new Set([...source.matchAll(/\bcode: ['"]([0-9A-Z]{5})['"]/gu)].map((m) => m[1]))].slice(0, 10);
+  return { names, sqlstate };
+}
+
+/** Per-file counts plus error class and SQLSTATE only: never messages, values or URLs. */
+export function safeFailureSummary(file) {
+  let result;
+  try {
+    result = JSON.parse(readFileSync(file, "utf8"));
+  } catch {
+    return [];
+  }
+  const files = Array.isArray(result?.testResults) ? result.testResults.slice(0, 10) : [];
+  return files.map((entry) => {
+    const name = typeof entry?.name === "string" ? (entry.name.match(/[\w.-]+\.postgres\.integration\.test\.ts$/u)?.[0] ?? "unknown") : "unknown";
+    const assertions = Array.isArray(entry?.assertionResults) ? entry.assertionResults : [];
+    const count = (status) => assertions.filter((a) => a?.status === status).length;
+    const text = [entry?.message, ...assertions.flatMap((a) => (Array.isArray(a?.failureMessages) ? a.failureMessages : []))]
+      .filter((m) => typeof m === "string")
+      .map((m) => m.slice(0, 2000))
+      .join("\n");
+    const sqlstate = [...new Set([...text.matchAll(/\bcode: '([0-9A-Z]{5})'/gu)].map((m) => m[1]))].slice(0, 5);
+    const kind = /PostgresError/u.test(text) ? "PostgresError" : /AssertionError/u.test(text) ? "AssertionError" : /ECONNREFUSED|ENOTFOUND|ETIMEDOUT/u.test(text) ? "ConnectionError" : text ? "Error" : "none";
+    return { file: name, passed: count("passed"), failed: count("failed"), skipped: count("skipped") + count("pending"), kind, sqlstate };
+  });
 }
 
 export function assertAllExecuted(outputFile, readCounts) {
@@ -47,15 +98,26 @@ export function runWorkflowReadsSuites({ repoRoot, databaseUrl, isolated, env = 
   let counted;
   runVitestJsonGate({
     outputFile,
-    runTest: () =>
-      runSilentVitest(
+    runTest: () => {
+      // Output is captured in memory only; just error classes and SQLSTATE codes are ever logged.
+      const run = spawnSync(
         "corepack",
-        ["pnpm", "--filter", "@fsm/api", "exec", "vitest", "run", ...WORKFLOW_READ_SUITES, "--reporter=json", `--outputFile=${outputFile}`],
-        childEnv,
-        repoRoot
-      ),
+        ["pnpm", "--filter", "@fsm/api", "exec", "vitest", "run", ...WORKFLOW_READ_SUITES, "--reporter=json", `--outputFile=${outputFile}`, "--reporter=default"],
+        { cwd: repoRoot, env: childEnv, stdio: ["ignore", "pipe", "pipe"], shell: false, maxBuffer: 64 * 1024 * 1024, encoding: "utf8" }
+      );
+      if (run.status !== 0) {
+        for (const line of safeFailureSummary(outputFile)) log(`[workflow-reads-postgres] ${JSON.stringify(line)}`);
+        log(`[workflow-reads-postgres] error classes ${JSON.stringify(safeErrorClasses(`${run.stdout ?? ""}\n${run.stderr ?? ""}`))}`);
+        throw new Error(`Vitest exited with status ${Number.isSafeInteger(run.status) ? run.status : "unknown"}`);
+      }
+    },
     verifyResult: (file) => {
-      counted = assertAllExecuted(file, readJsonCounts);
+      try {
+        counted = assertAllExecuted(file, readJsonCounts);
+      } catch (error) {
+        for (const line of safeFailureSummary(file)) log(`[workflow-reads-postgres] ${JSON.stringify(line)}`);
+        throw error;
+      }
     }
   });
   log(`[workflow-reads-postgres] OK ${JSON.stringify(counted)}`);

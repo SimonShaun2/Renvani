@@ -17,7 +17,7 @@ import { cmsMetadata } from "@/src/lib/seo/cms-seo";
 
 const keys = ["NEXT_PUBLIC_SANITY_PROJECT_ID", "NEXT_PUBLIC_SANITY_DATASET", "SANITY_API_READ_TOKEN", "VERCEL_ENV", "VERCEL_TARGET_ENV", "PUBLIC_SITE_URL"] as const;
 const previous: Partial<Record<(typeof keys)[number], string | undefined>> = {};
-const production = { VERCEL_ENV: "production", PUBLIC_SITE_URL: "https://getrenvani.com" } as NodeJS.ProcessEnv;
+const production = { VERCEL_ENV: "production", PUBLIC_SITE_URL: "https://getrenvani.com" } as unknown as NodeJS.ProcessEnv;
 const document = { title: "Booking guide", slug: "booking-guide", excerpt: "Useful guidance." };
 const configure = () => {
   process.env.NEXT_PUBLIC_SANITY_PROJECT_ID = "test-project";

@@ -2,6 +2,7 @@ import { createClient } from "next-sanity";
 import type { PortableTextBlock } from "@portabletext/react";
 
 import { SANITY_API_VERSION, cmsTag, readSanityEnv, type CmsType } from "./env";
+import { readCmsResult } from "./read-result";
 import { COMPARISON_QUERY, LIST_QUERY, POST_QUERY, SLUGS_QUERY } from "./queries";
 
 export type CmsFaq = { question: string; answer: string };
@@ -42,11 +43,14 @@ async function safeFetch<T>(query: string, params: Record<string, string>, tags:
   const c = client();
   if (!c) return fallback;
   try {
-    const result = await c.fetch<T | null>(query, params, { next: { revalidate: CMS_REVALIDATE_SECONDS, tags } });
-    return result ?? fallback;
+    return await readCmsResult(
+      () => c.fetch<T | null>(query, params, { next: { revalidate: CMS_REVALIDATE_SECONDS, tags } }),
+      fallback
+    );
   } catch (error) {
-    console.error("[sanity] fetch failed", { tags, error: error instanceof Error ? error.message : String(error) });
-    return fallback;
+    // Do not log provider messages, request URLs, slugs or credentials.
+    console.error("[sanity] configured CMS read failed", { code: "CMS_READ_UNAVAILABLE" });
+    throw error;
   }
 }
 

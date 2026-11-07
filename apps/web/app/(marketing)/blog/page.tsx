@@ -1,17 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { canonicalUrl, cmsPath } from "@/src/lib/seo/cms-seo";
+import { cmsPath } from "@/src/lib/seo/cms-seo";
+import { withMarketingSeo } from "@/src/lib/seo/marketing-metadata";
 import { fetchCmsList } from "@/src/sanity/fetch";
 
 export const revalidate = 60;
 
 export function generateMetadata(): Metadata {
-  return {
+  return withMarketingSeo("/blog", {
     title: "Blog · Renvani",
-    description: "Guides for running and growing a home-services business: booking, scheduling, invoicing and keeping customers coming back.",
-    alternates: { canonical: canonicalUrl("/blog") }
-  };
+    description: "Guides for running and growing a home-services business: booking, scheduling, invoicing and keeping customers coming back."
+  });
 }
 
 export default async function BlogIndex() {

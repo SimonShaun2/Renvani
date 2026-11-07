@@ -93,7 +93,7 @@ describe("robots", () => {
     expect(list(rule?.disallow)).toEqual(expect.arrayContaining(["/", "/book/*/manage"]));
     expect(list(rule?.allow)).toEqual(ROBOTS_ALLOW.map((a) => a.prefix));
     expect(list(rule?.allow)).toEqual(expect.arrayContaining(["/site/", "/book/", "/pricing"]));
-    expect(robots.sitemap).toBe("https://s.example/sitemap-index.xml");
+    expect(robots.sitemap).toEqual(["https://s.example/sitemap.xml", "https://s.example/sitemap-index.xml"]);
   });
 
   it("disallows everything and omits the sitemap when PUBLIC_SITE_URL is unset (previews)", () => {
@@ -183,7 +183,7 @@ describe("split sitemaps at 500-shop scale", () => {
     const perShop = serviceAreaSitemapPaths("shop-0", settings).length;
     expect(perShop).toBe(Math.min(4 * 125, MAX_SERVICE_AREA_URLS_PER_SHOP));
     expect(all.length).toBeGreaterThan(SITEMAP_URL_LIMIT);
-    expect(all.length).toBe(MARKETING_SITEMAP_PATHS.length + 500 * (3 + perShop));
+    expect(all.length).toBe(MARKETING_SITEMAP_PATHS.length + 1 /* /blog */ + 500 * (3 + perShop));
 
     const chunks = sitemapIds().map(({ id }) => sitemapChunk(all, id));
     for (const chunk of chunks) expect(chunk.length).toBeLessThanOrEqual(SITEMAP_URL_LIMIT);

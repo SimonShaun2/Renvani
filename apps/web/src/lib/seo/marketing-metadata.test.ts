@@ -33,7 +33,7 @@ describe("marketing launch SEO", () => {
   });
   it("publishes populated sitemaps without requesting any shop unless explicitly opted in",async () => {
     const map=await buildFullSitemap(prod,async()=>{throw Error("No shop calls allowed");});
-    expect(map).toHaveLength(MARKETING_SITEMAP_PATHS.length);
+    expect(map).toHaveLength(MARKETING_SITEMAP_PATHS.length + 1); // + /blog
     expect(map.some(x=>x.url.includes("/dashboard"))).toBe(false);
     expect(buildSitemapIndexXml(prod)).toContain("https://getrenvani.com/sitemap/0.xml");
   });

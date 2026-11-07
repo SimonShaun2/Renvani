@@ -1,0 +1,3409 @@
+{
+  "artifact_id": "renvani.platform-analytics.metric-catalog",
+  "version": "1.0.0",
+  "prepared_on": "2026-11-07",
+  "ticket": "PAI-H02",
+  "status": "Prepared contracts; independent review and runtime acceptance are recorded separately",
+  "source_baseline": "5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58",
+  "planning_spec_commit": "e374f5007878e547958ae0e3c26098e58420171a",
+  "authority_boundary": "This artifact specifies internal reporting semantics. It does not approve financial/pricing policy, authenticate a reader, deploy PA metrics, enable a source, or grant shared-learning use.",
+  "definition_note": "Version1.0.0 is the prepared contract version. D10/D11/D12/D13/D14 are explicit runtime acceptance/configuration dependencies, not invented decisions already approved.",
+  "metric_count": 24,
+  "companion_documents": [
+    "financial-classification.md",
+    "data-dictionary.md",
+    "identity-contract.md",
+    "event-contracts.v1.json",
+    "outcome-lifecycle.md",
+    "export-field-allowlist.v1.json",
+    "decision-register.md"
+  ],
+  "common_contracts": {
+    "identity-v1": {
+      "company": "Server-authorized canonical Renvani company_id, not browser/email identity.",
+      "provider_key": [
+        "source_system",
+        "environment",
+        "account_id",
+        "provider_mode",
+        "resource_type",
+        "object_id"
+      ],
+      "mapping": "Verified effective-time mapping; unresolved/conflicting identities stay in restricted exception path and can contribute sanitized health aggregates (counts and known component amounts by currency), never attributed company financial totals.",
+      "dedup": "Canonical component/event/attempt key and accepted revision, never ingestion row count."
+    },
+    "quality-v1": {
+      "dimensions": {
+        "completeness": [
+          "complete",
+          "partial",
+          "unknown"
+        ],
+        "freshness": [
+          "fresh",
+          "stale",
+          "unknown"
+        ],
+        "reconciliation": [
+          "reconciled",
+          "unreconciled",
+          "not_applicable"
+        ],
+        "finality": [
+          "final",
+          "provisional",
+          "not_applicable"
+        ]
+      },
+      "rule": "Unknown values remain null; observed zero requires a complete applicable source traversal. Empty denominator/population, unavailable source, stale cutoff, pending maturity and partial coverage remain distinct.",
+      "quality_state_keys": [
+        "completeness",
+        "freshness",
+        "reconciliation",
+        "finality",
+        "computation_truncated"
+      ],
+      "result_states": [
+        "observed",
+        "empty_population",
+        "unavailable",
+        "partial",
+        "stale",
+        "pending"
+      ],
+      "source_coverage": "Query/source manifest identifies complete pagination, expected/matched counts and unresolved exceptions. Display truncation is not computation truncation.",
+      "claims": "No v1 incremental-lift or universal improvement metric. Finance/source quality gates are not model confidence scores."
+    },
+    "period-v1": {
+      "storage": "UTC ISO8601 instants with explicit reporting timezone and resolved[start_at,end_at) interval.",
+      "platform_timezone": "America/Chicago is the prepared internal default; implementation confirms/version-pins D07. Company-local metrics retain company timezone at cohort definition.",
+      "cohorts": "Freeze inclusion, readiness/eligibility time, policy/version and observation window before observing outcomes. Retain unselected/declined/failed/churned/pending companies/opportunities.",
+      "cutoff": "Use minimum verified cutoff of required inputs. No invented historical source state from current mutable snapshots.",
+      "corrections": "Event/posting periods and cumulative cohort-as-of views remain distinct; late facts produce new result revisions with lineage, not silent overwrite of published snapshots.",
+      "historical_financial_rule": "A late import/backfill does not make a new receipt or activation. Authoritative reconciled historical provider transactions still count in their original requested financial posting periods; imported CRM face values alone do not prove cash or intervention lift."
+    },
+    "currency-v1": {
+      "postings": "Canonical signed integer strings amount_minor with currency,currency_exponent and source adapter encoding evidence.",
+      "usage_costs": "Canonical exact decimal strings amount_decimal,decimal_scale,currency. Preserve micro-cost precision and null unknown values.",
+      "mrr": "Exact integer interval principal / integer interval_months rational; aggregate before final display rounding.",
+      "totals": "Group by currency, unit and basis; no implicit FX. Presentment and settlement currency require source-backed bridge if compared.",
+      "rounding": "Exact Decimal/integer or rational operations; no parseFloat/Number monetary arithmetic. Round display once under recorded policy."
+    },
+    "drill-through-v1": {
+      "lineage": "metric/version→query/configuration/cutoff/cohort manifest→accepted source/record revisions→authorized native source detail",
+      "export": "Only H04-allowlisted opaque references and fields. Customer/staff identity, arbitrary source URLs and raw payloads are excluded.",
+      "authorization": "Every native detail route/provider workspace uses current authority; a saved filter, PostHog group or a source reference is not access control.",
+      "manifest_binding": "query_manifest_ref points to an immutable internal manifest binding the exact resolved company set/population snapshot, actual filter values/versions, period/timezone/currency/environment/account/mode, source revisions/cutoffs and producing authorization context. Missing/truncated/mutable-only scope evidence prevents a complete/reproducible claim; pointer grants no access."
+    }
+  },
+  "required_result_metadata": [
+    "metric_id",
+    "metric_version",
+    "query_version",
+    "source_configuration_versions",
+    "generated_at",
+    "source_cutoff_at",
+    "period_start_at",
+    "period_end_at",
+    "reporting_timezone",
+    "cohort_id",
+    "cohort_definition_version",
+    "filter_version",
+    "environment",
+    "account_mode_scope",
+    "currency_or_unit",
+    "quality_state",
+    "query_manifest_ref",
+    "display_sources_truncated",
+    "computation_truncated"
+  ],
+  "required_policy_inputs": [
+    {
+      "decision": "D10",
+      "fields": [
+        "platform_product_price_inventory",
+        "mrr_discount_policy_version",
+        "mrr_status_policy_version",
+        "provider_metric_settings_snapshot"
+      ],
+      "when_missing": "PA-M02 unavailable or explicitly limited diagnostic; no Stripe parity claim."
+    },
+    {
+      "decision": "D11",
+      "fields": [
+        "service_ready_definition_version",
+        "activation_milestone_id",
+        "activation_milestone_version",
+        "activation_window_duration",
+        "repeat_window_duration",
+        "workflow_maturity_policy_id",
+        "workflow_maturity_policy_version",
+        "stage_applicability_policy_version"
+      ],
+      "when_missing": "Affected activation/outcome rates unavailable; billing/data health can proceed."
+    },
+    {
+      "decision": "D12",
+      "fields": [
+        "required_cost_components",
+        "cost_period_basis",
+        "cost_pool_allocation_version",
+        "verified_outcome_denominator_definition"
+      ],
+      "when_missing": "Known usage/expense facts only; no complete cost/contribution."
+    },
+    {
+      "decision": "D13",
+      "fields": [
+        "runtime_metric_registry_mapping",
+        "source_kind_extension",
+        "money_precision_adapter",
+        "derived_metric_output_contract"
+      ],
+      "when_missing": "Prepared PA records cannot be sent directly into current RCI strict schemas."
+    },
+    {
+      "decision": "D14",
+      "fields": [
+        "actual_account_mode_resource_manifest",
+        "actual_api_versions",
+        "source_currency_encoding",
+        "accepted_source_cutoffs"
+      ],
+      "when_missing": "Affected source/metric cannot claim complete or reconciled coverage."
+    }
+  ],
+  "existing_rci_compatibility": {
+    "reuse": [
+      "Metric definition versioning, basis/grain/currency compatibility",
+      "Quality and source-manifest completeness/freshness semantics",
+      "Exact Decimal dependency, missing-cost behavior and signed allocation invariants",
+      "Current-scope authorization binding and restricted source routing concepts"
+    ],
+    "exact_metric_aliases": [],
+    "reason": "None of these24internal metrics has the identical entity, population, grain, time basis and semantics of the inspected existing RCI catalog; preserve the four legacy customer KPI definitions.",
+    "required_extensions": [
+      "PA IDs must be deliberately registered or adapted; current factSchema rejects unknown IDs.",
+      "Current moneySchema/foundation-math only accept2dp; preserve source exponents and AI micro-costs through versioned compatible types before runtime adoption.",
+      "Current source-kind and calculation enums do not cover all Stripe/AI/platform derivations.",
+      "Duration/distribution/vector diagnostics need a typed result shape, not an invented scalar unit."
+    ],
+    "unchanged_runtime_files": true
+  },
+  "sources": [
+    {
+      "id": "SRC-STRIPE",
+      "repository": "SimonShaun2/Renvani",
+      "commit": "5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58",
+      "path": "apps/api/src/lib/stripe.ts",
+      "blob_sha": "2c5ca69884ffb1b60ddf47805a395aaecbd8717e",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58/apps/api/src/lib/stripe.ts",
+      "evidence_level": "pinned_source_inspected",
+      "summary": "Platform billing, destination charges, merchant maintenance/VIP classification",
+      "limitation": "Source implementation inspected; actual account/API deployment unverified."
+    },
+    {
+      "id": "SRC-PRICING",
+      "repository": "SimonShaun2/Renvani",
+      "commit": "5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58",
+      "path": "packages/config/src/stripe-pricing.ts",
+      "blob_sha": "d3ec80531803edf57dc926c7aa21cc8ed6f13c40",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58/packages/config/src/stripe-pricing.ts",
+      "evidence_level": "pinned_source_inspected",
+      "summary": "Current fee path and priced plans",
+      "limitation": "Founder 5% direction versus inspected200bps remains D06; historical records govern metrics."
+    },
+    {
+      "id": "SRC-SCHEMA",
+      "repository": "SimonShaun2/Renvani",
+      "commit": "5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58",
+      "path": "packages/db/src/schema.ts",
+      "blob_sha": "afdc793bc7448049c09dba3133d72dbcd566f4f2",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58/packages/db/src/schema.ts",
+      "evidence_level": "pinned_source_inspected",
+      "summary": "Company, payments, invoices, jobs, activity events, import fields",
+      "limitation": "Current payment amounts are2dp; no per-payment currency; historical readiness/eligibility snapshots not inferred from mutable rows."
+    },
+    {
+      "id": "SRC-REVENUE",
+      "repository": "SimonShaun2/Renvani",
+      "commit": "5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58",
+      "path": "apps/api/src/services/revenue-outcomes.service.ts",
+      "blob_sha": "87d2b17227eae4a9e8424c48c591645ddfad34d4",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58/apps/api/src/services/revenue-outcomes.service.ts",
+      "evidence_level": "pinned_source_inspected",
+      "summary": "Existing observed revenue and materials-only cost reader",
+      "limitation": "Completed revenue fallback and period-activity cohort are not authoritative reconciled cash or mature recovery outcomes."
+    },
+    {
+      "id": "SRC-RCI-CATALOG",
+      "repository": "SimonShaun2/Renvani",
+      "commit": "5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58",
+      "path": "packages/types/src/connected-intelligence/v1/catalog.ts",
+      "blob_sha": "25684c8d482c7cf2a75ccef4cecba354c95eb483",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58/packages/types/src/connected-intelligence/v1/catalog.ts",
+      "evidence_level": "pinned_source_inspected",
+      "summary": "Existing metric definitions/capabilities",
+      "limitation": "PA-M IDs not registered; all capability enablement flags false in foundation."
+    },
+    {
+      "id": "SRC-RCI-CONTRACTS",
+      "repository": "SimonShaun2/Renvani",
+      "commit": "5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58",
+      "path": "packages/types/src/connected-intelligence/v1/contracts.ts",
+      "blob_sha": "9ceae41f75b7011bcd92652d2a0068dfc6555f7f",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58/packages/types/src/connected-intelligence/v1/contracts.ts",
+      "evidence_level": "pinned_source_inspected",
+      "summary": "Current strict evidence/quality/source/amount shapes",
+      "limitation": "2dp money, source-kind enum, metric registry and calculation enum require versioned integration mapping."
+    },
+    {
+      "id": "SRC-RCI-QUALITY",
+      "repository": "SimonShaun2/Renvani",
+      "commit": "5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58",
+      "path": "packages/types/src/connected-intelligence/v1/quality.ts",
+      "blob_sha": "0498b53357a1a4e097980ba3403ce000437ba65e",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58/packages/types/src/connected-intelligence/v1/quality.ts",
+      "evidence_level": "pinned_source_inspected",
+      "summary": "Quality, scope, parity and conflict handling",
+      "limitation": "Pure helpers do not prove database grants or source coverage."
+    },
+    {
+      "id": "SRC-RCI-MATH",
+      "repository": "SimonShaun2/Renvani",
+      "commit": "5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58",
+      "path": "apps/api/src/services/connected-intelligence/foundation-math.ts",
+      "blob_sha": "5e48e9a57612dbcc1c74106f1da7fdbfeaf6253e",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58/apps/api/src/services/connected-intelligence/foundation-math.ts",
+      "evidence_level": "pinned_source_inspected",
+      "summary": "Exact Decimal, missing-cost, weighted ratio, allocation concepts",
+      "limitation": "Current helpers accept2dp; do not round AI micro-costs or non2dp source amounts into them."
+    },
+    {
+      "id": "SRC-RCI-HANDOFF",
+      "repository": "SimonShaun2/Renvani",
+      "commit": "5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58",
+      "path": "docs/connected-intelligence/foundation/START-HERE.md",
+      "blob_sha": "8c56fe1b5929103cf8b43f646ee156b9e72e75d7",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58/docs/connected-intelligence/foundation/START-HERE.md",
+      "evidence_level": "pinned_source_inspected",
+      "summary": "Foundation capabilities and proof boundary",
+      "limitation": "Historical status prose is not current PR/deployment proof; existing tests not rerun for this ticket."
+    },
+    {
+      "id": "SRC-RCI-POLICY",
+      "repository": "SimonShaun2/Renvani",
+      "commit": "5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58",
+      "path": "docs/connected-intelligence/foundation/POLICY-AND-IDENTITY.md",
+      "blob_sha": "8dc9198c76b0b4a47bdf7a6647d509a67ee19fc8",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58/docs/connected-intelligence/foundation/POLICY-AND-IDENTITY.md",
+      "evidence_level": "pinned_source_inspected",
+      "summary": "Financial distinctions, policy gaps and permissions",
+      "limitation": "Internal reusable policy concepts; no new financial or data-use authority."
+    },
+    {
+      "id": "SRC-AI",
+      "repository": "SimonShaun2/Renvani",
+      "commit": "5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58",
+      "path": "packages/ai/src/langfuse/client.ts",
+      "blob_sha": "0b658087071871ceb8ed54fe34571c9022e6b1b6",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58/packages/ai/src/langfuse/client.ts",
+      "evidence_level": "pinned_source_inspected",
+      "summary": "Existing audit/import trace stub",
+      "limitation": "No complete attempt-cost-latency-coverage source established."
+    },
+    {
+      "id": "SRC-LEGACY-KPI",
+      "repository": "SimonShaun2/Renvani",
+      "commit": "5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58",
+      "path": "packages/types/src/command-center.types.ts",
+      "blob_sha": "7a3f970db5db62ffee349d305069e99cb42352bd",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58/packages/types/src/command-center.types.ts",
+      "evidence_level": "pinned_source_inspected",
+      "summary": "Four current customer KPI meanings",
+      "limitation": "Preserve legacy definitions; internal platform catalog is not a silent replacement."
+    }
+  ],
+  "external_sources": [
+    {
+      "id": "EXT-STRIPE-MRR",
+      "url": "https://docs.stripe.com/billing/subscriptions/analytics",
+      "accessed_on": "2026-11-07",
+      "revision": "Provider page retrieved on stated date; no immutable vendor revision supplied",
+      "evidence_level": "official_documentation_inspected",
+      "summary": "MRR statuses, configurable discounts, trial and report timezone meanings; actual account configuration uninspected."
+    },
+    {
+      "id": "EXT-STRIPE-SUBSCRIPTION",
+      "url": "https://docs.stripe.com/api/subscriptions/object",
+      "accessed_on": "2026-11-07",
+      "revision": "Provider page retrieved on stated date; no immutable vendor revision supplied",
+      "evidence_level": "official_documentation_inspected",
+      "summary": "Subscription item, price, quantity, status, effective cancellation fields; API shape depends on actual pinned integration version."
+    },
+    {
+      "id": "EXT-STRIPE-FEE",
+      "url": "https://docs.stripe.com/api/application_fees/object",
+      "accessed_on": "2026-11-07",
+      "revision": "Provider page retrieved on stated date; no immutable vendor revision supplied",
+      "evidence_level": "official_documentation_inspected",
+      "summary": "ApplicationFee amounts, refunds and source references; list pagination completeness required."
+    },
+    {
+      "id": "EXT-STRIPE-BALANCE",
+      "url": "https://docs.stripe.com/api/balance_transactions/object",
+      "accessed_on": "2026-11-07",
+      "revision": "Provider page retrieved on stated date; no immutable vendor revision supplied",
+      "evidence_level": "official_documentation_inspected",
+      "summary": "Balance amount, fee, net, source, available_on and currency are distinct."
+    },
+    {
+      "id": "EXT-STRIPE-INVOICE",
+      "url": "https://docs.stripe.com/api/invoices/object",
+      "accessed_on": "2026-11-07",
+      "revision": "Provider page retrieved on stated date; no immutable vendor revision supplied",
+      "evidence_level": "official_documentation_inspected",
+      "summary": "Invoice paid/credit/outside-Stripe fields show why invoice status alone is not evidence of a new Stripe cash receipt."
+    },
+    {
+      "id": "EXT-STRIPE-CURRENCY",
+      "url": "https://docs.stripe.com/currencies",
+      "accessed_on": "2026-11-07",
+      "revision": "Provider page retrieved on stated date; no immutable vendor revision supplied",
+      "evidence_level": "official_documentation_inspected",
+      "summary": "Provider amount units and currency/resource exceptions; currency exponent is versioned, not inferred from two-decimal local schema."
+    }
+  ],
+  "metrics": [
+    {
+      "id": "PA-M01",
+      "version": "1.0.0",
+      "label": "Platform subscription net receipts",
+      "domain": "financial",
+      "unit": "money",
+      "definition_status": "specified_for_preparation",
+      "runtime_enabled": false,
+      "formula_language": "normative pseudocode; not executed SQL or a runtime reader",
+      "owner_function": "Finance / financial-domain owner",
+      "formula": {
+        "expression": "SUM(amount_minor) for accepted cash-basis components platform_subscription_principal, platform_subscription_principal_refund and targeted platform_subscription_adjustment",
+        "components": [
+          "platform_subscription_principal",
+          "platform_subscription_principal_refund",
+          "platform_subscription_adjustment"
+        ],
+        "adjustments": "Include only source-proven cash adjustments targeted to this component; noncash credits are not new receipt/refund cash.",
+        "allocation": "Allocate actual received funds to eligible subscription principal after source-backed tax/other components. A paid invoice or amount_paid alone cannot prove a new receipt."
+      },
+      "grain": [
+        "company_id",
+        "currency",
+        "posting_period",
+        "source_account_scope"
+      ],
+      "authoritative_sources": [
+        "SRC-STRIPE",
+        "SRC-SCHEMA",
+        "EXT-STRIPE-INVOICE",
+        "EXT-STRIPE-BALANCE"
+      ],
+      "required_logical_inputs": [
+        "rpt_company_identity_v1",
+        "rpt_financial_posting_v1",
+        "rpt_source_health_v1"
+      ],
+      "required_fields": [
+        "financial_component",
+        "amount_minor",
+        "currency",
+        "currency_exponent",
+        "financial_basis",
+        "posting_status",
+        "source_ref",
+        "invoice_id",
+        "payment_id",
+        "quality_state.reconciliation"
+      ],
+      "population": "Verified Renvani companies mapped to approved platform/Connect account resources, production environment and live mode, within the explicit account/price/source inventory; no inferred completeness beyond that inventory. Platform subscription principal only, identified by verified product/price mapping plus trusted platform_mvp lineage.",
+      "time_basis": {
+        "period_kind": "posting_period",
+        "event_time": "occurred_at from accepted confirmed collection/refund/adjustment proof, not invoice creation, ingestion or payout date",
+        "bounds": "[start_at,end_at)",
+        "timezone": "America/Chicago for initial internal platform reporting, explicitly versioned; company-local alternative requires a separate filter/version",
+        "cutoff": "Minimum accepted source_cutoff_at across all required inputs; refunds are dated to their own effective posting"
+      },
+      "currency_policy": {
+        "value": "Exact signed integer-minor-unit aggregate per currency; no cross-currency grand total",
+        "rounding": "Aggregate exact units before formatting. Provider currency encoding/version governs exponent; no binary floating point."
+      },
+      "exclusions": [
+        "Merchant service/VIP/maintenance subscriptions",
+        "Application fees",
+        "Tax, tips, surcharges and one-time non-subscription items",
+        "Failed or uncaptured payments, pending asynchronous payment confirmation",
+        "Zero-value settlement by noncash credit",
+        "Imported invoice/estimate face values without source-backed actual collection evidence; verified historical provider postings remain valid in their original requested business period after backfill",
+        "Unmapped/conflicting classification"
+      ],
+      "freshness": {
+        "policy_ref": "D07",
+        "proposed_max_source_lag_seconds": 3600,
+        "operationally_verified": false,
+        "late_policy": "Late corrections create a new result revision; preserve prior published cutoff. Financial reconciliation must use the same cutoff, currency, account and component."
+      },
+      "completeness": {
+        "complete_when": "All required receipt/refund/adjustment resources and source pages are covered at the common cutoff; each included component reconciles exactly.",
+        "partial_behavior": "Publish known_receipts_subtotal with uncovered/unreconciled counts; do not label it a complete receipts total.",
+        "zero": "Observed zero only from a complete, reconciled source traversal.",
+        "unavailable": "Required source, classification policy, cash-to-line allocation, identity or currency encoding unavailable."
+      },
+      "drill_through": {
+        "summary": "Metric → accepted aggregate/query manifest → classified component → exact provider/account/mode/source revision and authorized Renvani invoice/payment mapping",
+        "access": "H04 financial role and fresh source authorization; opaque references only in the export. No public/pay URLs, customer identity or arbitrary signed links."
+      },
+      "current_implementation": {
+        "source_present": true,
+        "reader_implemented": false,
+        "gaps": [
+          "Native Stripe resource/account coverage and actual payment allocations unverified",
+          "Existing local invoice/payment rows do not establish all provider receipt/refund timing or all currencies"
+        ]
+      },
+      "rci_compatibility": {
+        "related_metric_ids": [
+          "cash.collected"
+        ],
+        "relationship": "Not an alias: platform-only collection-posting basis differs from merchant payment_settlement basis; retain separate scope and definition."
+      },
+      "proposed_cards": [
+        "economics.platform_subscription_net_receipts"
+      ],
+      "depends_on_decisions": [
+        "D01",
+        "D03",
+        "D05",
+        "D07",
+        "D13",
+        "D14"
+      ],
+      "implementation_tickets": [
+        "PAI-C02",
+        "PAI-C03",
+        "PAI-C05",
+        "PAI-C06",
+        "PAI-C08",
+        "PAI-C13"
+      ],
+      "examples": [
+        "EX01",
+        "EX03",
+        "EX04"
+      ],
+      "planned_acceptance_cases": [
+        "AT02",
+        "AT03",
+        "AT07",
+        "AT11",
+        "AT17",
+        "AT26"
+      ],
+      "common_contracts": [
+        "identity-v1",
+        "quality-v1",
+        "period-v1",
+        "currency-v1",
+        "drill-through-v1"
+      ],
+      "validation_status": "Specification and illustrative expected arithmetic only; H05 executable fixtures and C integration acceptance remain unexecuted."
+    },
+    {
+      "id": "PA-M02",
+      "version": "1.0.0",
+      "label": "Platform monthly recurring revenue",
+      "domain": "financial",
+      "unit": "money",
+      "definition_status": "specified_for_preparation",
+      "runtime_enabled": false,
+      "formula_language": "normative pseudocode; not executed SQL or a runtime reader",
+      "owner_function": "Finance / financial-domain owner",
+      "formula": {
+        "expression": "ROUND_ONCE_TO_CURRENCY_MINOR(SUM(net_recurring_interval_amount_minor / interval_months)) at as_of",
+        "interval_months": "month: interval_count; year: 12*interval_count",
+        "calculation_evidence": "Retain each integer numerator and denominator and aggregate exact rational values before one display rounding.",
+        "policy_id": "mrr-platform-contract-v1",
+        "policy_status": "Defined for preparation; Finance/Product acceptance and actual Stripe settings comparison required under D10.",
+        "status_rules": "Include active and past_due supported items; disclose past_due subtotal. Exclude trialed items, trialing subscriptions, canceled, unpaid, incomplete, incomplete_expired and paused. An active pause_collection arrangement is an explicit exception until its effective contract treatment is reviewed.",
+        "discount_rules": "Deduct effective recurring permanent/repeating discounts; ignore one-time invoice coupons in contract MRR. Provider-compatible stacking/order and fixed-discount allocation must be supported or item is an exception.",
+        "proration_rules": "Do not sum invoice prorations. Use currently effective recurring item quantity/price at cutoff; pending changes do not apply until accepted effective time.",
+        "cancellation_rules": "Scheduled end-of-period cancellation remains until contract actually ends; request timestamp is not effective termination.",
+        "supported_prices": "Verified platform-only licensed per-unit monthly/annual items with positive integer interval_count and quantity, exact known currency units and effective price/discount state. Metered, tiered, transformed-quantity, mixed/ambiguous or missing-history items remain exceptions."
+      },
+      "grain": [
+        "company_id",
+        "subscription_item_source_key",
+        "currency",
+        "as_of_snapshot"
+      ],
+      "authoritative_sources": [
+        "SRC-STRIPE",
+        "SRC-PRICING",
+        "SRC-RCI-CONTRACTS",
+        "EXT-STRIPE-MRR",
+        "EXT-STRIPE-SUBSCRIPTION"
+      ],
+      "required_logical_inputs": [
+        "rpt_company_identity_v1",
+        "platform_subscription_item_input_v1",
+        "rpt_source_health_v1"
+      ],
+      "required_fields": [
+        "billing_kind",
+        "subscription_ref",
+        "source_ref",
+        "contract_status",
+        "interval",
+        "interval_count",
+        "quantity",
+        "net_recurring_interval_amount_minor",
+        "currency",
+        "currency_exponent",
+        "discount_policy_version",
+        "valid_from",
+        "valid_to",
+        "source_cutoff_at",
+        "discount_version",
+        "trial_starts_at",
+        "trial_ends_at",
+        "collection_pause_active",
+        "price_support_state",
+        "price_support_reason_code"
+      ],
+      "population": "Verified Renvani companies mapped to approved platform/Connect account resources, production environment and live mode, within the explicit account/price/source inventory; no inferred completeness beyond that inventory. Only verified platform_mvp contracts; no merchant memberships or fee-line copies.",
+      "time_basis": {
+        "period_kind": "as_of_snapshot",
+        "event_time": "effective contract state at as_of; prior snapshots require historical source revisions",
+        "bounds": "valid_from <= as_of < valid_to, with open-ended valid_to allowed",
+        "timezone": "Explicit reporting timezone for month-end display; instant stored in UTC",
+        "cutoff": "No later than accepted subscription/price/discount source cutoff"
+      },
+      "currency_policy": {
+        "value": "Exact rational monthly minor-unit sum, then display amount by currency",
+        "rounding": "Round half up once per complete currency total; retain numerator/denominator evidence. Annual cash is not divided into receipt periods by this metric."
+      },
+      "exclusions": [
+        "Merchant recurring contracts and merchant customer subscriptions",
+        "Tax, application fees, one-time line items and non-recurring charges",
+        "Metered/unsupported pricing schemes, unknown item pagination and missing discount/history state",
+        "Proration invoice lines and unpaid invoice face values as extra MRR",
+        "Negative MRR or fabricated backdated snapshots"
+      ],
+      "freshness": {
+        "policy_ref": "D07",
+        "proposed_max_source_lag_seconds": 3600,
+        "operationally_verified": false,
+        "late_policy": "Late corrections create a new result revision; preserve prior published cutoff. Financial reconciliation must use the same cutoff, currency, account and component."
+      },
+      "completeness": {
+        "complete_when": "All platform contracts/items/prices/effective discounts are covered and classification is resolved; D10 accepted; unsupported item count is zero or reported as an explicitly restricted supported population.",
+        "partial_behavior": "Supported_item_mrr subtotal plus unsupported_contract_count; no claim of total platform MRR.",
+        "zero": "Complete known population with no qualifying recurring value yields zero; no eligible company population is separately empty.",
+        "unavailable": "D10 policy/settings evidence or effective item history missing for the requested snapshot."
+      },
+      "drill_through": {
+        "summary": "Snapshot → company/subscription/item → price/quantity/discount/effective revision → exact monthly numerator/denominator",
+        "access": "H04 financial role and fresh source authorization; opaque references only in the export. No public/pay URLs, customer identity or arbitrary signed links."
+      },
+      "current_implementation": {
+        "source_present": true,
+        "reader_implemented": false,
+        "gaps": [
+          "No complete historical platform subscription item/discount reporting snapshot established",
+          "Existing price constants do not prove actual Stripe contract prices or live API settings"
+        ]
+      },
+      "rci_compatibility": {
+        "related_metric_ids": [],
+        "relationship": "New internal platform management basis; not a legacy revenue KPI or current moneySchema-compatible rational record."
+      },
+      "proposed_cards": [
+        "economics.platform_mrr",
+        "economics.past_due_mrr_context"
+      ],
+      "depends_on_decisions": [
+        "D06",
+        "D10",
+        "D13",
+        "D14"
+      ],
+      "implementation_tickets": [
+        "PAI-C03",
+        "PAI-C05",
+        "PAI-C06",
+        "PAI-C08",
+        "PAI-C13"
+      ],
+      "examples": [
+        "EX02"
+      ],
+      "planned_acceptance_cases": [
+        "AT02",
+        "AT08",
+        "AT11",
+        "AT17",
+        "AT26"
+      ],
+      "common_contracts": [
+        "identity-v1",
+        "quality-v1",
+        "period-v1",
+        "currency-v1",
+        "drill-through-v1"
+      ],
+      "validation_status": "Specification and illustrative expected arithmetic only; H05 executable fixtures and C integration acceptance remain unexecuted."
+    },
+    {
+      "id": "PA-M03",
+      "version": "1.0.0",
+      "label": "Net platform application fees",
+      "domain": "financial",
+      "unit": "money",
+      "definition_status": "specified_for_preparation",
+      "runtime_enabled": false,
+      "formula_language": "normative pseudocode; not executed SQL or a runtime reader",
+      "owner_function": "Finance / financial-domain owner",
+      "formula": {
+        "expression": "SUM(amount_minor) for platform_application_fee, platform_application_fee_refund and cash-basis platform_fee_adjustment",
+        "components": [
+          "platform_application_fee",
+          "platform_application_fee_refund",
+          "platform_fee_adjustment"
+        ],
+        "authority": "Actual application-fee and fee-refund objects/postings; application_fee_amount requested or a fee invoice line alone is not collected fee evidence.",
+        "rate_rule": "Never substitute principal ×5%,2%, or the current plan. No expected fee is invented for a Flat transaction.",
+        "refund_rule": "A merchant refund does not create a fee refund; only the source fee-refund/adjustment changes this metric."
+      },
+      "grain": [
+        "company_id",
+        "currency",
+        "posting_period",
+        "source_account_scope"
+      ],
+      "authoritative_sources": [
+        "SRC-STRIPE",
+        "SRC-PRICING",
+        "EXT-STRIPE-FEE",
+        "EXT-STRIPE-BALANCE"
+      ],
+      "required_logical_inputs": [
+        "rpt_company_identity_v1",
+        "rpt_financial_posting_v1",
+        "rpt_source_health_v1"
+      ],
+      "required_fields": [
+        "financial_component",
+        "amount_minor",
+        "currency",
+        "currency_exponent",
+        "related_source_refs",
+        "source_ref",
+        "quality_state.reconciliation"
+      ],
+      "population": "Verified Renvani companies mapped to approved platform/Connect account resources, production environment and live mode, within the explicit account/price/source inventory; no inferred completeness beyond that inventory. Actual fees attributed to companies, including fees generated from merchant recurring payments when source evidence establishes the same fee.",
+      "time_basis": {
+        "period_kind": "posting_period",
+        "event_time": "occurred_at from accepted confirmed collection/refund/adjustment proof, not invoice creation, ingestion or payout date",
+        "bounds": "[start_at,end_at)",
+        "timezone": "America/Chicago for initial internal platform reporting, explicitly versioned; company-local alternative requires a separate filter/version",
+        "cutoff": "Minimum accepted source_cutoff_at across all required inputs; refunds are dated to their own effective posting"
+      },
+      "currency_policy": {
+        "value": "Exact signed integer-minor-unit aggregate per currency; no cross-currency grand total",
+        "rounding": "Aggregate exact units before formatting. Provider currency encoding/version governs exponent; no binary floating point."
+      },
+      "exclusions": [
+        "Merchant principal",
+        "Platform subscription principal",
+        "Requested/uncollected fee estimates",
+        "Fee invoice line plus the same ApplicationFee counted twice",
+        "Transfers/payouts",
+        "Assumed proportional fee refunds"
+      ],
+      "freshness": {
+        "policy_ref": "D07",
+        "proposed_max_source_lag_seconds": 3600,
+        "operationally_verified": false,
+        "late_policy": "Late corrections create a new result revision; preserve prior published cutoff. Financial reconciliation must use the same cutoff, currency, account and component."
+      },
+      "completeness": {
+        "complete_when": "Fee and fully paginated fee-refund/adjustment records reconcile to the fee balance postings at the common cutoff.",
+        "partial_behavior": "Known net-fee subtotal and missing/unmapped fee/refund counts remain visible.",
+        "zero": "Verified fee-exempt or complete no-fee population can be zero; an absent fee record in an incompletely covered source is unknown.",
+        "unavailable": "Actual fee resource/identity or refund coverage unavailable."
+      },
+      "drill_through": {
+        "summary": "Metric → accepted aggregate/query manifest → classified component → exact provider/account/mode/source revision and authorized Renvani invoice/payment mapping",
+        "access": "H04 financial role and fresh source authorization; opaque references only in the export. No public/pay URLs, customer identity or arbitrary signed links."
+      },
+      "current_implementation": {
+        "source_present": true,
+        "reader_implemented": false,
+        "gaps": [
+          "Actual ApplicationFee/fee-refund import and reconciliation not built",
+          "Local non-refundable flag is not an analytics reason to omit a real external fee refund"
+        ]
+      },
+      "rci_compatibility": {
+        "related_metric_ids": [],
+        "relationship": "Separate Renvani fee economics; no existing customer revenue alias."
+      },
+      "proposed_cards": [
+        "economics.net_platform_application_fees"
+      ],
+      "depends_on_decisions": [
+        "D01",
+        "D03",
+        "D06",
+        "D07",
+        "D14"
+      ],
+      "implementation_tickets": [
+        "PAI-C05",
+        "PAI-C06",
+        "PAI-C07",
+        "PAI-C08",
+        "PAI-C13"
+      ],
+      "examples": [
+        "EX01",
+        "EX03"
+      ],
+      "planned_acceptance_cases": [
+        "AT03",
+        "AT04",
+        "AT05",
+        "AT06",
+        "AT10",
+        "AT11"
+      ],
+      "common_contracts": [
+        "identity-v1",
+        "quality-v1",
+        "period-v1",
+        "currency-v1",
+        "drill-through-v1"
+      ],
+      "validation_status": "Specification and illustrative expected arithmetic only; H05 executable fixtures and C integration acceptance remain unexecuted."
+    },
+    {
+      "id": "PA-M04",
+      "version": "1.0.0",
+      "label": "Merchant service principal collected, net",
+      "domain": "financial",
+      "unit": "money",
+      "definition_status": "specified_for_preparation",
+      "runtime_enabled": false,
+      "formula_language": "normative pseudocode; not executed SQL or a runtime reader",
+      "owner_function": "Finance / financial-domain owner",
+      "formula": {
+        "expression": "SUM(amount_minor) for merchant_service_principal, merchant_service_principal_refund and cash-basis merchant_service_adjustment",
+        "principal_definition": "Source-allocated service invoice principal after discounts, excluding separately identified taxes, tips, card surcharge and Renvani fees.",
+        "channel": "Initial v1 population is verified Stripe collections only; manual/external collections require an accepted additional reader and a versioned population change."
+      },
+      "grain": [
+        "company_id",
+        "currency",
+        "posting_period",
+        "collection_channel"
+      ],
+      "authoritative_sources": [
+        "SRC-SCHEMA",
+        "SRC-STRIPE",
+        "EXT-STRIPE-BALANCE"
+      ],
+      "required_logical_inputs": [
+        "rpt_company_identity_v1",
+        "rpt_financial_posting_v1",
+        "rpt_source_health_v1"
+      ],
+      "required_fields": [
+        "financial_component",
+        "amount_minor",
+        "currency",
+        "currency_exponent",
+        "invoice_id",
+        "payment_id",
+        "related_source_refs",
+        "posting_status",
+        "source_ref",
+        "quality_state.reconciliation"
+      ],
+      "population": "Verified Renvani companies mapped to approved platform/Connect account resources, production environment and live mode, within the explicit account/price/source inventory; no inferred completeness beyond that inventory. Observed service collections; merchant recurring receipts remain their own component and cannot be added again when prepaid service is later fulfilled.",
+      "time_basis": {
+        "period_kind": "posting_period",
+        "event_time": "occurred_at from accepted confirmed collection/refund/adjustment proof, not invoice creation, ingestion or payout date",
+        "bounds": "[start_at,end_at)",
+        "timezone": "America/Chicago for initial internal platform reporting, explicitly versioned; company-local alternative requires a separate filter/version",
+        "cutoff": "Minimum accepted source_cutoff_at across all required inputs; refunds are dated to their own effective posting"
+      },
+      "currency_policy": {
+        "value": "Exact signed integer-minor-unit aggregate per currency; no cross-currency grand total",
+        "rounding": "Aggregate exact units before formatting. Provider currency encoding/version governs exponent; no binary floating point."
+      },
+      "exclusions": [
+        "Platform receipts/fees",
+        "Tax, tips, surcharge and unclassified gross residuals",
+        "Merchant recurring principal unless an explicit non-duplicating allocation policy expands this basis",
+        "Uncaptured/failed payments, quotes and booking/invoice face values",
+        "Imported CRM invoice/estimate values without actual collection proof; legitimate historical provider collections retain their original requested period even when ingested later"
+      ],
+      "freshness": {
+        "policy_ref": "D07",
+        "proposed_max_source_lag_seconds": 3600,
+        "operationally_verified": false,
+        "late_policy": "Late corrections create a new result revision; preserve prior published cutoff. Financial reconciliation must use the same cutoff, currency, account and component."
+      },
+      "completeness": {
+        "complete_when": "Gross receipt is fully component-classified; source cash and any payment-to-invoice allocation reconcile, with principal refunds covered.",
+        "partial_behavior": "Only verified principal subtotal is shown, with incomplete component/collection coverage.",
+        "zero": "A complete observed population with no service collections is zero; missing payments are not.",
+        "unavailable": "Tax/principal decomposition, currency or actual collection evidence cannot be established."
+      },
+      "drill_through": {
+        "summary": "Metric → accepted aggregate/query manifest → classified component → exact provider/account/mode/source revision and authorized Renvani invoice/payment mapping",
+        "access": "H04 financial role and fresh source authorization; opaque references only in the export. No public/pay URLs, customer identity or arbitrary signed links."
+      },
+      "current_implementation": {
+        "source_present": true,
+        "reader_implemented": false,
+        "gaps": [
+          "payments.amount is invoice portion, not necessarily tax-exclusive service principal",
+          "Current payments lack a per-row currency field; provider encoding must establish currency",
+          "revenue-outcomes paid→invoice→estimate fallback is not usable as this cash reader"
+        ]
+      },
+      "rci_compatibility": {
+        "related_metric_ids": [
+          "cash.collected"
+        ],
+        "relationship": "Related but not identical: defined here as provider-confirmed service-principal posting basis, not settled payment_cohort basis."
+      },
+      "proposed_cards": [
+        "economics.merchant_service_collection_context",
+        "outcomes.merchant_service_collection_context"
+      ],
+      "depends_on_decisions": [
+        "D03",
+        "D07",
+        "D13",
+        "D14"
+      ],
+      "implementation_tickets": [
+        "PAI-C03",
+        "PAI-C06",
+        "PAI-C08",
+        "PAI-C13",
+        "PAI-C15"
+      ],
+      "examples": [
+        "EX01",
+        "EX03",
+        "EX04"
+      ],
+      "planned_acceptance_cases": [
+        "AT03",
+        "AT05",
+        "AT07",
+        "AT15",
+        "AT17"
+      ],
+      "common_contracts": [
+        "identity-v1",
+        "quality-v1",
+        "period-v1",
+        "currency-v1",
+        "drill-through-v1"
+      ],
+      "validation_status": "Specification and illustrative expected arithmetic only; H05 executable fixtures and C integration acceptance remain unexecuted."
+    },
+    {
+      "id": "PA-M05",
+      "version": "1.0.0",
+      "label": "Refunds and financial adjustments by component",
+      "domain": "financial",
+      "unit": "money_and_count",
+      "definition_status": "specified_for_preparation",
+      "runtime_enabled": false,
+      "formula_language": "normative pseudocode; not executed SQL or a runtime reader",
+      "owner_function": "Finance / financial-domain owner",
+      "formula": {
+        "expression": "For each financial_component and adjustment target: count distinct accepted reversal/adjustment source components; SUM(signed amount_minor); report absolute debit magnitude and credit magnitude separately.",
+        "components": "Named refund components plus source-proven component-targeted adjustments, including dispute/reversal movement distinguished from final income/cost treatment.",
+        "nonadditivity": "Amounts are diagnostics of components already included in M01/M03/M04; do not subtract them again."
+      },
+      "grain": [
+        "company_id_or_quarantine_scope",
+        "financial_component",
+        "adjustment_reason_code",
+        "currency",
+        "posting_period"
+      ],
+      "authoritative_sources": [
+        "SRC-SCHEMA",
+        "EXT-STRIPE-FEE",
+        "EXT-STRIPE-BALANCE",
+        "EXT-STRIPE-INVOICE"
+      ],
+      "required_logical_inputs": [
+        "rpt_financial_posting_v1",
+        "rpt_source_health_v1"
+      ],
+      "required_fields": [
+        "financial_component",
+        "adjustment_target_component",
+        "adjustment_reason_code",
+        "amount_minor",
+        "currency",
+        "currency_exponent",
+        "source_ref",
+        "reverses_posting_id",
+        "financial_basis",
+        "quality_state.reconciliation"
+      ],
+      "population": "Verified Renvani companies mapped to approved platform/Connect account resources, production environment and live mode, within the explicit account/price/source inventory; no inferred completeness beyond that inventory. Classified source refunds/adjustments; unknown component adjustments shown only in the exception population.",
+      "time_basis": {
+        "period_kind": "posting_period",
+        "event_time": "occurred_at from accepted confirmed collection/refund/adjustment proof, not invoice creation, ingestion or payout date",
+        "bounds": "[start_at,end_at)",
+        "timezone": "America/Chicago for initial internal platform reporting, explicitly versioned; company-local alternative requires a separate filter/version",
+        "cutoff": "Minimum accepted source_cutoff_at across all required inputs; refunds are dated to their own effective posting"
+      },
+      "currency_policy": {
+        "value": "Exact signed integer-minor-unit aggregate per currency; no cross-currency grand total",
+        "rounding": "Aggregate exact units before formatting. Provider currency encoding/version governs exponent; no binary floating point."
+      },
+      "exclusions": [
+        "Repeated mutable cumulative amount_refunded as if it were a new posting",
+        "Failed/pending refund request without confirmed effect",
+        "Transfers as revenue adjustments",
+        "Noncash credits mixed into cash-refund amount"
+      ],
+      "freshness": {
+        "policy_ref": "D07",
+        "proposed_max_source_lag_seconds": 3600,
+        "operationally_verified": false,
+        "late_policy": "Late corrections create a new result revision; preserve prior published cutoff. Financial reconciliation must use the same cutoff, currency, account and component."
+      },
+      "completeness": {
+        "complete_when": "All source revisions and reversal relationships reconcile; cumulative source refunded totals agree with distinct accepted refund postings.",
+        "partial_behavior": "Display covered refunds and pending/ambiguous adjustments with no zero assumption.",
+        "zero": "Complete source traversal with no refunds yields zero count/amount.",
+        "unavailable": "Refund effective dates/component links missing; cumulative-only data cannot establish posting-period refunds."
+      },
+      "drill_through": {
+        "summary": "Metric → accepted aggregate/query manifest → classified component → exact provider/account/mode/source revision and authorized Renvani invoice/payment mapping",
+        "access": "H04 financial role and fresh source authorization; opaque references only in the export. No public/pay URLs, customer identity or arbitrary signed links."
+      },
+      "current_implementation": {
+        "source_present": true,
+        "reader_implemented": false,
+        "gaps": [
+          "payments.amountRefunded alone lacks a dated refund ledger",
+          "Fee-refund resource and dispute/adjustment classification need runtime binding"
+        ]
+      },
+      "rci_compatibility": {
+        "related_metric_ids": [
+          "cash.collected",
+          "accounting.mismatches"
+        ],
+        "relationship": "Diagnostic component series, not an additional cash measure or accounting mismatch alias."
+      },
+      "proposed_cards": [
+        "economics.refunds_and_adjustments"
+      ],
+      "depends_on_decisions": [
+        "D06",
+        "D07",
+        "D14"
+      ],
+      "implementation_tickets": [
+        "PAI-C06",
+        "PAI-C07",
+        "PAI-C08",
+        "PAI-C13"
+      ],
+      "examples": [
+        "EX03",
+        "EX04"
+      ],
+      "planned_acceptance_cases": [
+        "AT05",
+        "AT06",
+        "AT10",
+        "AT11",
+        "AT16",
+        "AT26"
+      ],
+      "common_contracts": [
+        "identity-v1",
+        "quality-v1",
+        "period-v1",
+        "currency-v1",
+        "drill-through-v1"
+      ],
+      "validation_status": "Specification and illustrative expected arithmetic only; H05 executable fixtures and C integration acceptance remain unexecuted."
+    },
+    {
+      "id": "PA-M06",
+      "version": "1.0.0",
+      "label": "Eligible onboarded companies",
+      "domain": "activation",
+      "unit": "count",
+      "definition_status": "specified_for_preparation",
+      "runtime_enabled": false,
+      "formula_language": "normative pseudocode; not executed SQL or a runtime reader",
+      "owner_function": "Product / company-onboarding owner",
+      "formula": {
+        "expression": "COUNT(DISTINCT company_id) with eligibility/readiness accepted under cohort_definition_version and service_ready_at inside the cohort period.",
+        "denominator_rule": "Create the cohort before observing success. A later cancellation or absence of milestones does not remove a member."
+      },
+      "grain": [
+        "cohort_id",
+        "company_id"
+      ],
+      "authoritative_sources": [
+        "SRC-SCHEMA",
+        "SRC-RCI-POLICY"
+      ],
+      "required_logical_inputs": [
+        "rpt_company_identity_v1",
+        "company_activation_input_v1",
+        "rpt_source_health_v1"
+      ],
+      "required_fields": [
+        "company_id",
+        "cohort_id",
+        "cohort_definition_version",
+        "service_ready_at",
+        "eligibility_policy_version",
+        "readiness_state",
+        "exclusion_reason_code",
+        "source_ref"
+      ],
+      "population": "Fixed production company cohort from a trusted service-ready/eligibility snapshot; exclude explicitly classified test/internal/demo and pre-cutover historical onboarding. Keep companies that later churn, decline or never activate; do not require an employee login.",
+      "time_basis": {
+        "period_kind": "company_service_ready_cohort",
+        "event_time": "service_ready_at and linked authoritative milestone occurred_at",
+        "bounds": "Cohort membership [start_at,end_at); individual outcome windows are explicit resolved UTC instants",
+        "timezone": "Company timezone captured in cohort definition; internal cross-company cohort comparisons use a declared common cohort definition",
+        "cutoff": "Common observation cutoff; no outcome after cutoff enters the snapshot"
+      },
+      "currency_policy": {
+        "value": "No currency; nonnegative integer company count."
+      },
+      "exclusions": [
+        "Unknown readiness treated as eligible",
+        "Counts of staff, sessions or Stripe objects",
+        "Duplicate companies after shared-staff workspace switches"
+      ],
+      "freshness": {
+        "policy_ref": "D07",
+        "proposed_max_source_lag_seconds": 3600,
+        "operationally_verified": false,
+        "late_policy": "Late authoritative facts recompute affected cohort result revision without moving the original readiness timestamp or relabeling imported history as new activation."
+      },
+      "completeness": {
+        "complete_when": "Full company inventory and each eligibility/readiness source are covered at cutoff, including zero-activity companies.",
+        "partial_behavior": "Known eligible count plus unknown-readiness count; cannot use partial population for a complete activation rate.",
+        "zero": "Complete inventory with zero eligible companies is an empty_population with count0; derived rates unavailable.",
+        "unavailable": "D11 service-ready policy or authoritative timestamp absent."
+      },
+      "drill_through": {
+        "summary": "Company cohort manifest → service-ready source revision → eligible opportunity → accepted milestone evidence",
+        "access": "Authorized internal reporting staff; no staff/customer identity or message contents in analytics."
+      },
+      "current_implementation": {
+        "source_present": true,
+        "reader_implemented": false,
+        "gaps": [
+          "companies.createdAt is not automatically service_ready_at",
+          "Accepted onboarding/readiness milestone and complete inactive-company inventory require C10 inspection"
+        ]
+      },
+      "rci_compatibility": {
+        "related_metric_ids": [
+          "implementation.pending"
+        ],
+        "relationship": "May consume approved readiness evidence; not equivalent to per-project gate count."
+      },
+      "proposed_cards": [
+        "activation.eligible_companies"
+      ],
+      "depends_on_decisions": [
+        "D03",
+        "D07",
+        "D11",
+        "D13",
+        "D14"
+      ],
+      "implementation_tickets": [
+        "PAI-C02",
+        "PAI-C03",
+        "PAI-C10",
+        "PAI-C14"
+      ],
+      "examples": [
+        "EX05"
+      ],
+      "planned_acceptance_cases": [
+        "AT01",
+        "AT12",
+        "AT26"
+      ],
+      "common_contracts": [
+        "identity-v1",
+        "quality-v1",
+        "period-v1",
+        "currency-v1",
+        "drill-through-v1"
+      ],
+      "validation_status": "Specification and illustrative expected arithmetic only; H05 executable fixtures and C integration acceptance remain unexecuted."
+    },
+    {
+      "id": "PA-M07",
+      "version": "1.0.0",
+      "label": "Companies reaching first accepted workflow value",
+      "domain": "activation",
+      "unit": "count_and_percent",
+      "definition_status": "specified_for_preparation",
+      "runtime_enabled": false,
+      "formula_language": "normative pseudocode; not executed SQL or a runtime reader",
+      "owner_function": "Product / company-onboarding owner",
+      "formula": {
+        "expression": "Count distinct M06 companies whose first qualifying milestone occurs in [service_ready_at,activation_window_end_at). Also report activated_mature_companies / mature_eligible_companies *100.",
+        "milestone_candidate": "Backend-confirmed recovery booking linked to an eligible estimate opportunity; candidate only until D11 selection and source verification.",
+        "maturity": "Mature when observation_cutoff_at >= activation_window_end_at and required source coverage reaches that end. Immature/unknown evidence companies remain explicit counts.",
+        "primary_observed_count": "All observed qualifying activations by cutoff; label separately from the mature-cohort numerator/rate."
+      },
+      "grain": [
+        "cohort_id",
+        "company_id",
+        "activation_milestone_id",
+        "activation_milestone_version"
+      ],
+      "authoritative_sources": [
+        "SRC-SCHEMA",
+        "SRC-REVENUE",
+        "SRC-RCI-POLICY"
+      ],
+      "required_logical_inputs": [
+        "company_activation_input_v1",
+        "rpt_workflow_opportunity_v1",
+        "rpt_workflow_fact_v1",
+        "rpt_source_health_v1"
+      ],
+      "required_fields": [
+        "service_ready_at",
+        "activation_window_end_at",
+        "activation_milestone_id",
+        "activation_milestone_version",
+        "first_value_at",
+        "first_value_source_ref",
+        "first_value_opportunity_id",
+        "window_policy_version",
+        "observation_cutoff_at"
+      ],
+      "population": "Fixed production company cohort from a trusted service-ready/eligibility snapshot; exclude explicitly classified test/internal/demo and pre-cutover historical onboarding. Keep companies that later churn, decline or never activate; do not require an employee login.",
+      "time_basis": {
+        "period_kind": "company_service_ready_cohort",
+        "event_time": "service_ready_at and linked authoritative milestone occurred_at",
+        "bounds": "Cohort membership [start_at,end_at); individual outcome windows are explicit resolved UTC instants",
+        "timezone": "Company timezone captured in cohort definition; internal cross-company cohort comparisons use a declared common cohort definition",
+        "cutoff": "Common observation cutoff; no outcome after cutoff enters the snapshot"
+      },
+      "currency_policy": {
+        "value": "Distinct company counts; percentage derived from summed integer numerator/denominator, rounded for display only."
+      },
+      "exclusions": [
+        "Message sent, action approval or provider acknowledgement alone",
+        "Historical imported bookings or events predating readiness",
+        "Client-only browser event as proof",
+        "Multiple staff/actions counting company repeatedly"
+      ],
+      "freshness": {
+        "policy_ref": "D07",
+        "proposed_max_source_lag_seconds": 3600,
+        "operationally_verified": false,
+        "late_policy": "Late authoritative facts recompute affected cohort result revision without moving the original readiness timestamp or relabeling imported history as new activation."
+      },
+      "completeness": {
+        "complete_when": "D11-approved milestone/window and authoritative first-value linkage cover every eligible mature company.",
+        "partial_behavior": "Observed activation subtotal and mature/immature/unknown counts; rate is partial or unavailable when outcome evidence is incomplete.",
+        "zero": "Complete mature denominator>0 with no qualifying activations yields0%; denominator0 yields unavailable.",
+        "unavailable": "Milestone/window policy or source proof absent; billing/data-health release can still proceed."
+      },
+      "drill_through": {
+        "summary": "Company cohort manifest → service-ready source revision → eligible opportunity → accepted milestone evidence",
+        "access": "Authorized internal reporting staff; no staff/customer identity or message contents in analytics."
+      },
+      "current_implementation": {
+        "source_present": true,
+        "reader_implemented": false,
+        "gaps": [
+          "Recovery-booking linkage may require C09; existing job rows alone do not establish recovered-estimate activation"
+        ]
+      },
+      "rci_compatibility": {
+        "related_metric_ids": [
+          "legacy.inquiry_to_booked"
+        ],
+        "relationship": "Different company onboarding cohort and milestone; preserve customer inquiry conversion meaning."
+      },
+      "proposed_cards": [
+        "activation.first_accepted_value"
+      ],
+      "depends_on_decisions": [
+        "D03",
+        "D07",
+        "D11",
+        "D13",
+        "D14"
+      ],
+      "implementation_tickets": [
+        "PAI-C10",
+        "PAI-C14"
+      ],
+      "conditional_runtime_dependency": "PAI-C09 only if missing chosen milestone lifecycle/link evidence must be built.",
+      "examples": [
+        "EX05"
+      ],
+      "planned_acceptance_cases": [
+        "AT01",
+        "AT12",
+        "AT14",
+        "AT15",
+        "AT26"
+      ],
+      "common_contracts": [
+        "identity-v1",
+        "quality-v1",
+        "period-v1",
+        "currency-v1",
+        "drill-through-v1"
+      ],
+      "validation_status": "Specification and illustrative expected arithmetic only; H05 executable fixtures and C integration acceptance remain unexecuted."
+    },
+    {
+      "id": "PA-M08",
+      "version": "1.0.0",
+      "label": "Time to first accepted value",
+      "domain": "activation",
+      "unit": "duration_distribution",
+      "definition_status": "specified_for_preparation",
+      "runtime_enabled": false,
+      "formula_language": "normative pseudocode; not executed SQL or a runtime reader",
+      "owner_function": "Product / company-onboarding owner",
+      "formula": {
+        "expression": "For each M07 activated company: latency_seconds=first_value_at-service_ready_at. Report p50/p90 by nearest-rank, sample count and observed range; separately count right-censored/unactivated and unknown observations.",
+        "censoring": "No activation by cutoff is censored at min(observation_cutoff_at,activation_window_end_at)-service_ready_at; do not impute that duration as a completed time.",
+        "interpretation": "Percentiles describe activated companies only; never call them the median for all onboarded companies. Survival estimation would be a separately specified version."
+      },
+      "grain": [
+        "cohort_id",
+        "company_id",
+        "activation_milestone_version"
+      ],
+      "authoritative_sources": [
+        "SRC-SCHEMA",
+        "SRC-RCI-POLICY"
+      ],
+      "required_logical_inputs": [
+        "company_activation_input_v1",
+        "rpt_workflow_fact_v1",
+        "rpt_source_health_v1"
+      ],
+      "required_fields": [
+        "service_ready_at",
+        "first_value_at",
+        "activation_window_end_at",
+        "observation_cutoff_at",
+        "window_policy_version",
+        "source_ref"
+      ],
+      "population": "Fixed production company cohort from a trusted service-ready/eligibility snapshot; exclude explicitly classified test/internal/demo and pre-cutover historical onboarding. Keep companies that later churn, decline or never activate; do not require an employee login.",
+      "time_basis": {
+        "period_kind": "company_service_ready_cohort",
+        "event_time": "service_ready_at and linked authoritative milestone occurred_at",
+        "bounds": "Cohort membership [start_at,end_at); individual outcome windows are explicit resolved UTC instants",
+        "timezone": "Company timezone captured in cohort definition; internal cross-company cohort comparisons use a declared common cohort definition",
+        "cutoff": "Common observation cutoff; no outcome after cutoff enters the snapshot"
+      },
+      "currency_policy": {
+        "value": "Nonnegative exact elapsed UTC seconds; calendar display is separate. Currency not applicable."
+      },
+      "exclusions": [
+        "Unactivated companies silently dropped from coverage",
+        "Negative elapsed times",
+        "Ingestion timestamp used as milestone time",
+        "Historical imports as current first value"
+      ],
+      "freshness": {
+        "policy_ref": "D07",
+        "proposed_max_source_lag_seconds": 3600,
+        "operationally_verified": false,
+        "late_policy": "Late authoritative facts recompute affected cohort result revision without moving the original readiness timestamp or relabeling imported history as new activation."
+      },
+      "completeness": {
+        "complete_when": "All cohort companies have trustworthy readiness/first-value/censoring evidence and a valid clock basis.",
+        "partial_behavior": "Publish activated-only observed latency with completed/censored/unknown counts.",
+        "zero": "A verified same-instant milestone may have0seconds; no completed observations yields no_distribution.",
+        "unavailable": "No qualifying activated observations or timing/milestone policy invalid."
+      },
+      "drill_through": {
+        "summary": "Company cohort manifest → service-ready source revision → eligible opportunity → accepted milestone evidence",
+        "access": "Authorized internal reporting staff; no staff/customer identity or message contents in analytics."
+      },
+      "current_implementation": {
+        "source_present": true,
+        "reader_implemented": false,
+        "gaps": [
+          "Authoritative service_ready_at and milestone evidence pending C10"
+        ]
+      },
+      "rci_compatibility": {
+        "related_metric_ids": [],
+        "relationship": "Use quality/source principles; duration distribution is not a current FactUnit. Versioned result adapter needed."
+      },
+      "proposed_cards": [
+        "activation.time_to_first_value"
+      ],
+      "depends_on_decisions": [
+        "D03",
+        "D07",
+        "D11",
+        "D13",
+        "D14"
+      ],
+      "implementation_tickets": [
+        "PAI-C10",
+        "PAI-C14"
+      ],
+      "examples": [
+        "EX05"
+      ],
+      "planned_acceptance_cases": [
+        "AT01",
+        "AT12",
+        "AT26"
+      ],
+      "common_contracts": [
+        "identity-v1",
+        "quality-v1",
+        "period-v1",
+        "currency-v1",
+        "drill-through-v1"
+      ],
+      "validation_status": "Specification and illustrative expected arithmetic only; H05 executable fixtures and C integration acceptance remain unexecuted."
+    },
+    {
+      "id": "PA-M09",
+      "version": "1.0.0",
+      "label": "Repeated successful workflow use",
+      "domain": "activation",
+      "unit": "count_and_percent",
+      "definition_status": "specified_for_preparation",
+      "runtime_enabled": false,
+      "formula_language": "normative pseudocode; not executed SQL or a runtime reader",
+      "owner_function": "Product / company-onboarding owner",
+      "formula": {
+        "expression": "For M07 activated companies whose repeat window is mature, count those with >=1 additional DISTINCT canonical opportunity reaching the same accepted milestone in (first_value_at,repeat_window_end_at); rate=repeat_companies/mature_activated_companies*100.",
+        "window": "D11 supplies versioned repeat duration; total qualifying opportunities per repeated company is at least2 including first value. Retries on one opportunity are not repeats.",
+        "censoring": "Immature, no-repeat, churned and source-unknown companies remain visible in the original activation cohort."
+      },
+      "grain": [
+        "activation_cohort_id",
+        "company_id",
+        "window_policy_version"
+      ],
+      "authoritative_sources": [
+        "SRC-SCHEMA",
+        "SRC-RCI-POLICY"
+      ],
+      "required_logical_inputs": [
+        "company_activation_input_v1",
+        "rpt_workflow_opportunity_v1",
+        "rpt_workflow_fact_v1",
+        "rpt_source_health_v1"
+      ],
+      "required_fields": [
+        "first_value_at",
+        "first_value_opportunity_id",
+        "repeat_window_end_at",
+        "window_policy_version",
+        "opportunity_id",
+        "event_type",
+        "occurred_at",
+        "observation_cutoff_at"
+      ],
+      "population": "Fixed production company cohort from a trusted service-ready/eligibility snapshot; exclude explicitly classified test/internal/demo and pre-cutover historical onboarding. Keep companies that later churn, decline or never activate; do not require an employee login. Denominator is the mature activated-company cohort, not current paying/active users only.",
+      "time_basis": {
+        "period_kind": "first_value_cohort_with_repeat_window",
+        "event_time": "service_ready_at and linked authoritative milestone occurred_at",
+        "bounds": "Cohort membership [start_at,end_at); individual outcome windows are explicit resolved UTC instants",
+        "timezone": "Company timezone captured in cohort definition; internal cross-company cohort comparisons use a declared common cohort definition",
+        "cutoff": "Common observation cutoff; no outcome after cutoff enters the snapshot"
+      },
+      "currency_policy": {
+        "value": "Distinct companies, numerator/denominator percentage."
+      },
+      "exclusions": [
+        "Repeated logins",
+        "A duplicate or retry of the first opportunity",
+        "Different milestone versions silently mixed",
+        "Removal of churned companies from denominator"
+      ],
+      "freshness": {
+        "policy_ref": "D07",
+        "proposed_max_source_lag_seconds": 3600,
+        "operationally_verified": false,
+        "late_policy": "Late authoritative facts recompute affected cohort result revision without moving the original readiness timestamp or relabeling imported history as new activation."
+      },
+      "completeness": {
+        "complete_when": "All repeat opportunities/milestone observations for the fixed mature cohort are covered.",
+        "partial_behavior": "Observed repeat count plus immature/unknown/company-churn context; complete rate withheld if required records missing.",
+        "zero": "Mature denominator>0 with no repeated qualifying opportunity yields0%; denominator0 yields unavailable.",
+        "unavailable": "Repeat-window or milestone policy missing, or no mature cohort."
+      },
+      "drill_through": {
+        "summary": "Company cohort manifest → service-ready source revision → eligible opportunity → accepted milestone evidence",
+        "access": "Authorized internal reporting staff; no staff/customer identity or message contents in analytics."
+      },
+      "current_implementation": {
+        "source_present": true,
+        "reader_implemented": false,
+        "gaps": [
+          "Distinct canonical opportunity and milestone stream pending C09/C10 as applicable"
+        ]
+      },
+      "rci_compatibility": {
+        "related_metric_ids": [
+          "legacy.first_to_recurring"
+        ],
+        "relationship": "Different company-workflow continuation basis; not homeowner repeat-business KPI."
+      },
+      "proposed_cards": [
+        "activation.repeated_workflow_value"
+      ],
+      "depends_on_decisions": [
+        "D03",
+        "D07",
+        "D11",
+        "D13",
+        "D14"
+      ],
+      "implementation_tickets": [
+        "PAI-C09",
+        "PAI-C10",
+        "PAI-C14"
+      ],
+      "examples": [
+        "EX05"
+      ],
+      "planned_acceptance_cases": [
+        "AT01",
+        "AT12",
+        "AT13",
+        "AT26"
+      ],
+      "common_contracts": [
+        "identity-v1",
+        "quality-v1",
+        "period-v1",
+        "currency-v1",
+        "drill-through-v1"
+      ],
+      "validation_status": "Specification and illustrative expected arithmetic only; H05 executable fixtures and C integration acceptance remain unexecuted."
+    },
+    {
+      "id": "PA-M10",
+      "version": "1.0.0",
+      "label": "Eligible recovery opportunities",
+      "domain": "outcomes",
+      "unit": "count",
+      "definition_status": "specified_for_preparation",
+      "runtime_enabled": false,
+      "formula_language": "normative pseudocode; not executed SQL or a runtime reader",
+      "owner_function": "Revenue workflow / measurement owner",
+      "formula": {
+        "expression": "COUNT(DISTINCT company_id,opportunity_id) with accepted pre-decision eligibility snapshot in cohort; one canonical opportunity per declared source/recovery cycle key.",
+        "selection_independence": "Eligibility is recorded before recommendation/selection and never reconstructed by filtering successful actions."
+      },
+      "grain": [
+        "company_id",
+        "opportunity_id",
+        "eligibility_rule_version",
+        "cohort_id"
+      ],
+      "authoritative_sources": [
+        "SRC-SCHEMA",
+        "SRC-RCI-POLICY"
+      ],
+      "required_logical_inputs": [
+        "rpt_workflow_opportunity_v1",
+        "rpt_source_health_v1"
+      ],
+      "required_fields": [
+        "opportunity_id",
+        "workflow_id",
+        "eligible_at",
+        "eligibility_rule_version",
+        "selection_state",
+        "source_ref",
+        "provenance_kind",
+        "maturity_policy_version",
+        "maturity_policy_id",
+        "maturity_start_at",
+        "maturity_end_at"
+      ],
+      "population": "Canonical eligible estimate-recovery opportunities snapshotted before selection under the accepted existing mission/workflow policy. Include unselected, declined, failed, nonresponding, pending and successful opportunities. Historical imported outcomes remain baseline and never acquire current intervention credit.",
+      "time_basis": {
+        "period_kind": "fixed_eligibility_cohort",
+        "event_time": "eligible_at defines cohort; each lifecycle stage uses authoritative occurred_at",
+        "bounds": "Eligibility [start_at,end_at); positive outcome window [maturity_start_at,maturity_end_at)",
+        "timezone": "Company-local cohort period resolved to UTC; common cohort/window/policy version required for comparisons",
+        "cutoff": "Common required source cutoff; a mature opportunity requires cutoff and source coverage through maturity_end_at"
+      },
+      "currency_policy": {
+        "value": "Nonnegative canonical-opportunity count; no monetary amount."
+      },
+      "exclusions": [
+        "Duplicate eligibility deliveries",
+        "Action/attempt counts substituted for opportunities",
+        "Post-outcome selection of winners",
+        "Unapproved new mission population"
+      ],
+      "freshness": {
+        "policy_ref": "D07",
+        "proposed_max_source_lag_seconds": 3600,
+        "operationally_verified": false,
+        "late_policy": "Append late/corrected source facts under lineage; recompute affected fixed cohort result. Maturity does not erase later refunds/corrections or prove irreversibility."
+      },
+      "completeness": {
+        "complete_when": "Expected source opportunity inventory and every eligibility evaluation/snapshot are covered, including no-action cases.",
+        "partial_behavior": "Known eligible count plus missing-evaluation/source coverage; rates needing full cohort unavailable.",
+        "zero": "Only complete source evaluation with no eligible opportunities produces0/empty_population.",
+        "unavailable": "Eligibility policy or pre-decision inventory absent."
+      },
+      "drill_through": {
+        "summary": "Cohort/query manifest → canonical opportunity/eligibility revision → lifecycle/source facts → canonical job and signed payment/refund allocation set where applicable",
+        "access": "H04 authorized operational or financial role per input; source route reauthorizes current company and field scope."
+      },
+      "current_implementation": {
+        "source_present": true,
+        "reader_implemented": false,
+        "gaps": [
+          "Existing estimate/job rows and agent actions do not alone provide complete pre-decision recovery inventory"
+        ]
+      },
+      "rci_compatibility": {
+        "related_metric_ids": [],
+        "relationship": "New observed recovery-cohort basis; reuse canonical/source/quality contracts without redefining existing inquiries."
+      },
+      "proposed_cards": [
+        "outcomes.eligible_recovery_opportunities"
+      ],
+      "depends_on_decisions": [
+        "D03",
+        "D07",
+        "D11",
+        "D13",
+        "D14"
+      ],
+      "implementation_tickets": [
+        "PAI-C09",
+        "PAI-C15"
+      ],
+      "examples": [
+        "EX06"
+      ],
+      "planned_acceptance_cases": [
+        "AT12",
+        "AT13",
+        "AT26"
+      ],
+      "common_contracts": [
+        "identity-v1",
+        "quality-v1",
+        "period-v1",
+        "currency-v1",
+        "drill-through-v1"
+      ],
+      "validation_status": "Specification and illustrative expected arithmetic only; H05 executable fixtures and C integration acceptance remain unexecuted."
+    },
+    {
+      "id": "PA-M11",
+      "version": "1.0.0",
+      "label": "Recovery decisions and execution attempts",
+      "domain": "outcomes",
+      "unit": "count_breakdown",
+      "definition_status": "specified_for_preparation",
+      "runtime_enabled": false,
+      "formula_language": "normative pseudocode; not executed SQL or a runtime reader",
+      "owner_function": "Revenue workflow / measurement owner",
+      "formula": {
+        "expression": "Report distinct opportunities by selection/decline/no-action state, logical actions with actual attempts, and real attempt counts. Separately report internal committed-success attempts, outbound attempts with verified provider acceptance, failed execution attempts, and unknown/pending attempts; stratify by execution_kind.",
+        "nonadditivity": "Stage counts are separate series. One failed actual request and one provider-accepted retry are 2 attempts but 1 logical action. Selection and decline can be successive facts and are not disjoint totals.",
+        "final_state": "Use accepted source fact/revision per attempt as of cutoff; conflicting terminal states become exceptions.",
+        "success_boundary": "Internal workflow.execution_succeeded and outbound workflow.provider_accepted are separately labeled boundaries. An outbound queued receipt establishes neither a provider attempt nor provider acceptance; no series implies delivery or business value."
+      },
+      "grain": [
+        "company_id",
+        "cohort_id",
+        "opportunity_id",
+        "action_id",
+        "attempt_id",
+        "stage",
+        "execution_kind"
+      ],
+      "authoritative_sources": [
+        "SRC-SCHEMA",
+        "SRC-REVENUE",
+        "SRC-RCI-POLICY"
+      ],
+      "required_logical_inputs": [
+        "rpt_workflow_opportunity_v1",
+        "rpt_workflow_fact_v1",
+        "rpt_source_health_v1"
+      ],
+      "required_fields": [
+        "opportunity_id",
+        "selection_state",
+        "selection_reason_code",
+        "action_id",
+        "attempt_id",
+        "event_type",
+        "disposition_code",
+        "occurred_at",
+        "source_ref",
+        "record_revision",
+        "execution_kind"
+      ],
+      "population": "Canonical eligible estimate-recovery opportunities snapshotted before selection under the accepted existing mission/workflow policy. Include unselected, declined, failed, nonresponding, pending and successful opportunities. Historical imported outcomes remain baseline and never acquire current intervention credit.",
+      "time_basis": {
+        "period_kind": "fixed_eligibility_cohort",
+        "event_time": "eligible_at defines cohort; each lifecycle stage uses authoritative occurred_at",
+        "bounds": "Eligibility [start_at,end_at); positive outcome window [maturity_start_at,maturity_end_at)",
+        "timezone": "Company-local cohort period resolved to UTC; common cohort/window/policy version required for comparisons",
+        "cutoff": "Common required source cutoff; a mature opportunity requires cutoff and source coverage through maturity_end_at"
+      },
+      "currency_policy": {
+        "value": "Separate count series with grain labeled; no cash or value unit."
+      },
+      "exclusions": [
+        "Approval treated as execution",
+        "Provider acknowledgement treated as delivery",
+        "Duplicate deliveries counted as real retries",
+        "Unknown result silently marked failure or success"
+      ],
+      "freshness": {
+        "policy_ref": "D07",
+        "proposed_max_source_lag_seconds": 3600,
+        "operationally_verified": false,
+        "late_policy": "Append late/corrected source facts under lineage; recompute affected fixed cohort result. Maturity does not erase later refunds/corrections or prove irreversibility."
+      },
+      "completeness": {
+        "complete_when": "Selection/decision and actual execution ledgers cover every eligible opportunity and attempt through cutoff.",
+        "partial_behavior": "Known stage counts plus unknown/pending/absent-source counts.",
+        "zero": "Verified no attempts can be zero with eligible opportunities present; absent instrumentation is unknown.",
+        "unavailable": "No complete action/attempt source."
+      },
+      "drill_through": {
+        "summary": "Cohort/query manifest → canonical opportunity/eligibility revision → lifecycle/source facts → canonical job and signed payment/refund allocation set where applicable",
+        "access": "H04 authorized operational or financial role per input; source route reauthorizes current company and field scope."
+      },
+      "current_implementation": {
+        "source_present": true,
+        "reader_implemented": false,
+        "gaps": [
+          "Current action-state buckets combine approved/executing/succeeded for guardrails; that grouped legacy reader cannot supply these separate stages"
+        ]
+      },
+      "rci_compatibility": {
+        "related_metric_ids": [
+          "attention.approvals",
+          "attention.exceptions"
+        ],
+        "relationship": "Separate outcome-cohort series; current-state attention counts remain unchanged."
+      },
+      "proposed_cards": [
+        "outcomes.decision_and_execution_breakdown"
+      ],
+      "depends_on_decisions": [
+        "D03",
+        "D07",
+        "D13",
+        "D14"
+      ],
+      "implementation_tickets": [
+        "PAI-C09",
+        "PAI-C15"
+      ],
+      "examples": [
+        "EX06"
+      ],
+      "planned_acceptance_cases": [
+        "AT10",
+        "AT13",
+        "AT14",
+        "AT26"
+      ],
+      "common_contracts": [
+        "identity-v1",
+        "quality-v1",
+        "period-v1",
+        "currency-v1",
+        "drill-through-v1"
+      ],
+      "validation_status": "Specification and illustrative expected arithmetic only; H05 executable fixtures and C integration acceptance remain unexecuted."
+    },
+    {
+      "id": "PA-M12",
+      "version": "1.0.0",
+      "label": "Observed delivery, response and booking conversion",
+      "domain": "outcomes",
+      "unit": "percent_and_count",
+      "definition_status": "specified_for_preparation",
+      "runtime_enabled": false,
+      "formula_language": "normative pseudocode; not executed SQL or a runtime reader",
+      "owner_function": "Revenue workflow / measurement owner",
+      "formula": {
+        "expression": "For each applicable stage s:100*COUNT(DISTINCT mature eligible opportunities with verified stage-s fact within its window)/COUNT(DISTINCT eligible opportunities mature for stage-s).",
+        "denominator": "All eligible opportunities in the fixed applicable policy cohort, including unselected/declined/failed; this is not a sent-only or delivered-only rate.",
+        "stage_rules": "Provider accepted is not delivered. Response requires authoritative correlated inbound event. Booking requires authoritative booking/job link, not a model label. Each opportunity contributes at most1to each stage.",
+        "window_rule": "Initial v1 uses the opportunity's single declared maturity_start_at/maturity_end_at window for all applicable stages, with applicable_stage_policy_version. Stage-specific windows require a later explicitly versioned definition; no universal duration is invented."
+      },
+      "grain": [
+        "company_id",
+        "eligibility_cohort_id",
+        "stage",
+        "maturity_policy_version"
+      ],
+      "authoritative_sources": [
+        "SRC-SCHEMA",
+        "SRC-REVENUE",
+        "SRC-RCI-POLICY"
+      ],
+      "required_logical_inputs": [
+        "rpt_workflow_opportunity_v1",
+        "rpt_workflow_fact_v1",
+        "rpt_source_health_v1"
+      ],
+      "required_fields": [
+        "opportunity_id",
+        "eligible_at",
+        "event_type",
+        "disposition_code",
+        "occurred_at",
+        "maturity_end_at",
+        "applicable_stage_policy_version",
+        "maturity_policy_version",
+        "source_ref"
+      ],
+      "population": "Canonical eligible estimate-recovery opportunities snapshotted before selection under the accepted existing mission/workflow policy. Include unselected, declined, failed, nonresponding, pending and successful opportunities. Historical imported outcomes remain baseline and never acquire current intervention credit.",
+      "time_basis": {
+        "period_kind": "fixed_eligibility_cohort",
+        "event_time": "eligible_at defines cohort; each lifecycle stage uses authoritative occurred_at",
+        "bounds": "Eligibility [start_at,end_at); positive outcome window [maturity_start_at,maturity_end_at)",
+        "timezone": "Company-local cohort period resolved to UTC; common cohort/window/policy version required for comparisons",
+        "cutoff": "Common required source cutoff; a mature opportunity requires cutoff and source coverage through maturity_end_at"
+      },
+      "currency_policy": {
+        "value": "Exact integer numerator/denominator plus display percentage; aggregate counts before dividing."
+      },
+      "exclusions": [
+        "Conditional-stage denominator substituted without relabeling metric/version",
+        "Pending or unknown observations removed as if failure-free",
+        "Sent/delivered events treated as business value",
+        "Causal lift language"
+      ],
+      "freshness": {
+        "policy_ref": "D07",
+        "proposed_max_source_lag_seconds": 3600,
+        "operationally_verified": false,
+        "late_policy": "Append late/corrected source facts under lineage; recompute affected fixed cohort result. Maturity does not erase later refunds/corrections or prove irreversibility."
+      },
+      "completeness": {
+        "complete_when": "Each stage source has complete coverage through each included opportunity's window end.",
+        "partial_behavior": "Verified-stage count and known mature population shown with evidence gaps; complete rate withheld or labeled partial.",
+        "zero": "Mature denominator>0 and verified complete no-stage outcomes gives0%; denominator0 is unavailable.",
+        "unavailable": "Required stage/window/eligibility policy or authoritative stage source missing."
+      },
+      "drill_through": {
+        "summary": "Cohort/query manifest → canonical opportunity/eligibility revision → lifecycle/source facts → canonical job and signed payment/refund allocation set where applicable",
+        "access": "H04 authorized operational or financial role per input; source route reauthorizes current company and field scope."
+      },
+      "current_implementation": {
+        "source_present": true,
+        "reader_implemented": false,
+        "gaps": [
+          "Current period-activity revenue funnel is not a maturity-aware fixed recovery cohort"
+        ]
+      },
+      "rci_compatibility": {
+        "related_metric_ids": [
+          "legacy.inquiry_to_booked"
+        ],
+        "relationship": "Distinct eligible-recovery cohort; do not replace customer inquiry conversion."
+      },
+      "proposed_cards": [
+        "outcomes.mature_delivery_response_booking"
+      ],
+      "depends_on_decisions": [
+        "D03",
+        "D07",
+        "D11",
+        "D13",
+        "D14"
+      ],
+      "implementation_tickets": [
+        "PAI-C09",
+        "PAI-C15"
+      ],
+      "examples": [
+        "EX06"
+      ],
+      "planned_acceptance_cases": [
+        "AT13",
+        "AT14",
+        "AT15",
+        "AT26",
+        "AT32"
+      ],
+      "common_contracts": [
+        "identity-v1",
+        "quality-v1",
+        "period-v1",
+        "currency-v1",
+        "drill-through-v1"
+      ],
+      "validation_status": "Specification and illustrative expected arithmetic only; H05 executable fixtures and C integration acceptance remain unexecuted."
+    },
+    {
+      "id": "PA-M13",
+      "version": "1.0.0",
+      "label": "Linked completed jobs",
+      "domain": "outcomes",
+      "unit": "count",
+      "definition_status": "specified_for_preparation",
+      "runtime_enabled": false,
+      "formula_language": "normative pseudocode; not executed SQL or a runtime reader",
+      "owner_function": "Revenue workflow / measurement owner",
+      "formula": {
+        "expression": "COUNT(DISTINCT company_id,job_id) with an accepted completion fact within the declared opportunity maturity window and a verified link to at least1eligible opportunity in the fixed cohort.",
+        "nonadditivity": "Multiple eligible opportunities or product-assistance links to one job do not create extra completed jobs; disclose cross-cohort overlaps before summing cohorts.",
+        "completion": "Booking or scheduled state is not completion. Accepted correction can invalidate a prior completion snapshot."
+      },
+      "grain": [
+        "company_id",
+        "job_id",
+        "eligibility_cohort_id"
+      ],
+      "authoritative_sources": [
+        "SRC-SCHEMA",
+        "SRC-REVENUE",
+        "SRC-RCI-POLICY"
+      ],
+      "required_logical_inputs": [
+        "rpt_workflow_opportunity_v1",
+        "rpt_workflow_fact_v1",
+        "rpt_source_health_v1"
+      ],
+      "required_fields": [
+        "opportunity_id",
+        "job_id",
+        "event_type",
+        "disposition_code",
+        "occurred_at",
+        "maturity_end_at",
+        "source_ref",
+        "provenance_kind",
+        "record_revision"
+      ],
+      "population": "Canonical eligible estimate-recovery opportunities snapshotted before selection under the accepted existing mission/workflow policy. Include unselected, declined, failed, nonresponding, pending and successful opportunities. Historical imported outcomes remain baseline and never acquire current intervention credit.",
+      "time_basis": {
+        "period_kind": "fixed_eligibility_cohort",
+        "event_time": "eligibility defines cohort; authoritative job completion defines completion observation",
+        "bounds": "Eligibility [start_at,end_at); positive outcome window [maturity_start_at,maturity_end_at)",
+        "timezone": "Company-local cohort period resolved to UTC; common cohort/window/policy version required for comparisons",
+        "cutoff": "Common required source cutoff; a mature opportunity requires cutoff and source coverage through maturity_end_at"
+      },
+      "currency_policy": {
+        "value": "Distinct canonical job count; never booking value or invoice cash."
+      },
+      "exclusions": [
+        "Duplicate Growth/Revenue/Operations/Retention assistance",
+        "Imported completed-job history credited as new recovery",
+        "Jobs inferred completed from invoice amount alone"
+      ],
+      "freshness": {
+        "policy_ref": "D07",
+        "proposed_max_source_lag_seconds": 3600,
+        "operationally_verified": false,
+        "late_policy": "Append late/corrected source facts under lineage; recompute affected fixed cohort result. Maturity does not erase later refunds/corrections or prove irreversibility."
+      },
+      "completeness": {
+        "complete_when": "Complete job link/completion source coverage for the defined mature cohort.",
+        "partial_behavior": "Verified linked-completion subtotal with missing-link, pending and source-unknown counts.",
+        "zero": "Complete mature cohort without completed jobs produces0.",
+        "unavailable": "Authoritative completion or opportunity-to-job link not available."
+      },
+      "drill_through": {
+        "summary": "Cohort/query manifest → canonical opportunity/eligibility revision → lifecycle/source facts → canonical job and signed payment/refund allocation set where applicable",
+        "access": "H04 authorized operational or financial role per input; source route reauthorizes current company and field scope."
+      },
+      "current_implementation": {
+        "source_present": true,
+        "reader_implemented": false,
+        "gaps": [
+          "Existing job status and actualEnd are useful evidence inputs; the accepted recovery link/window and correction contract must be built"
+        ]
+      },
+      "rci_compatibility": {
+        "related_metric_ids": [
+          "jobs.today",
+          "sales.completed_net"
+        ],
+        "relationship": "Related job sources, different time basis and grain; no direct alias."
+      },
+      "proposed_cards": [
+        "outcomes.linked_completed_jobs"
+      ],
+      "depends_on_decisions": [
+        "D03",
+        "D07",
+        "D11",
+        "D13",
+        "D14"
+      ],
+      "implementation_tickets": [
+        "PAI-C09",
+        "PAI-C15"
+      ],
+      "examples": [
+        "EX06"
+      ],
+      "planned_acceptance_cases": [
+        "AT12",
+        "AT13",
+        "AT15",
+        "AT16",
+        "AT26"
+      ],
+      "common_contracts": [
+        "identity-v1",
+        "quality-v1",
+        "period-v1",
+        "currency-v1",
+        "drill-through-v1"
+      ],
+      "validation_status": "Specification and illustrative expected arithmetic only; H05 executable fixtures and C integration acceptance remain unexecuted."
+    },
+    {
+      "id": "PA-M14",
+      "version": "1.0.0",
+      "label": "Linked collected service principal for recovery cohort",
+      "domain": "outcomes",
+      "unit": "money",
+      "definition_status": "specified_for_preparation",
+      "runtime_enabled": false,
+      "formula_language": "normative pseudocode; not executed SQL or a runtime reader",
+      "owner_function": "Revenue workflow / measurement owner",
+      "formula": {
+        "expression": "SUM(allocated_amount_minor) from accepted allocation-set revisions of reconciled merchant_service_principal and linked principal refund/adjustment components attributed to the fixed eligible recovery cohort.",
+        "conservation": "For each signed source component: sum every accepted set row's allocated_amount_minor, including exactly1allocation_role=unallocated_remainder row, equals source amount. Company/currency/sign match; allocated magnitudes bounded; no mixed set revisions.",
+        "time_rule": "Positive collections must occur within [maturity_start_at,maturity_end_at). Linked refunds/corrections through reporting cutoff still adjust those included collections after the positive-outcome window closes.",
+        "claim": "Associated collected outcome, not incremental/caused/recovered revenue. Approval, booking value and invoice face value are separate evidence."
+      },
+      "grain": [
+        "company_id",
+        "source_component_key",
+        "allocation_set_id",
+        "allocation_set_revision",
+        "opportunity_id",
+        "currency"
+      ],
+      "authoritative_sources": [
+        "SRC-SCHEMA",
+        "SRC-STRIPE",
+        "SRC-RCI-MATH",
+        "SRC-RCI-POLICY",
+        "EXT-STRIPE-BALANCE"
+      ],
+      "required_logical_inputs": [
+        "rpt_workflow_opportunity_v1",
+        "rpt_workflow_fact_v1",
+        "rpt_financial_posting_v1",
+        "rpt_outcome_allocation_v1",
+        "rpt_source_health_v1"
+      ],
+      "required_fields": [
+        "source_component_key",
+        "allocation_set_id",
+        "allocation_set_revision",
+        "opportunity_id",
+        "allocated_amount_minor",
+        "allocation_role",
+        "currency",
+        "currency_exponent",
+        "quality_state.reconciliation",
+        "maturity_end_at",
+        "source_ref"
+      ],
+      "population": "Canonical eligible estimate-recovery opportunities snapshotted before selection under the accepted existing mission/workflow policy. Include unselected, declined, failed, nonresponding, pending and successful opportunities. Historical imported outcomes remain baseline and never acquire current intervention credit. The financial source population is the same verified service-principal channel as M04.",
+      "time_basis": {
+        "period_kind": "eligibility_cohort_net_collection_as_of",
+        "event_time": "Accepted collected/refund components retain their own posting time; cohort net view accumulates qualifying linked components through cutoff",
+        "bounds": "Eligibility [start_at,end_at); positive outcome window [maturity_start_at,maturity_end_at)",
+        "timezone": "Company-local cohort period resolved to UTC; common cohort/window/policy version required for comparisons",
+        "cutoff": "Common required source cutoff; a mature opportunity requires cutoff and source coverage through maturity_end_at"
+      },
+      "currency_policy": {
+        "value": "Exact signed integer-minor-unit aggregate per currency; no cross-currency grand total",
+        "rounding": "Aggregate exact units before formatting. Provider currency encoding/version governs exponent; no binary floating point."
+      },
+      "exclusions": [
+        "Application fees, tax, tips, surcharge and merchant membership receipt duplication",
+        "Duplicated payment→invoice→job joins",
+        "Unreconciled amounts, conflicting source revisions and unknown identities",
+        "Imported baseline claimed as intervention outcome",
+        "Non-additive product assists counted as separate money"
+      ],
+      "freshness": {
+        "policy_ref": "D07",
+        "proposed_max_source_lag_seconds": 3600,
+        "operationally_verified": false,
+        "late_policy": "Append late/corrected source facts under lineage; recompute affected fixed cohort result. Maturity does not erase later refunds/corrections or prove irreversibility."
+      },
+      "completeness": {
+        "complete_when": "C08 source reconciliation plus complete opportunity/allocation coverage; every source component conserves exactly and all relevant residuals are zero.",
+        "partial_behavior": "Verified allocated subtotal may show with explicit unallocated/missing-link value; cannot call it complete linked collections.",
+        "zero": "Complete mature, reconciled cohort with no qualifying collected principal yields0; no source evidence is unavailable.",
+        "unavailable": "Reconciliation, conservation, classification, currency or source authority fails."
+      },
+      "drill_through": {
+        "summary": "Cohort/query manifest → canonical opportunity/eligibility revision → lifecycle/source facts → canonical job and signed payment/refund allocation set where applicable",
+        "access": "H04 authorized operational or financial role per input; source route reauthorizes current company and field scope."
+      },
+      "current_implementation": {
+        "source_present": true,
+        "reader_implemented": false,
+        "gaps": [
+          "No accepted canonical recovery payment/refund allocation projection implemented",
+          "Existing completed_revenue fallback is not this metric"
+        ]
+      },
+      "rci_compatibility": {
+        "related_metric_ids": [
+          "cash.collected",
+          "sales.completed_net",
+          "legacy.marketing_revenue"
+        ],
+        "relationship": "Reuse source/quality/exact-allocation principles; each listed existing basis differs. Do not equate collections, completed sales or marketing attribution."
+      },
+      "proposed_cards": [
+        "outcomes.linked_net_service_collections"
+      ],
+      "depends_on_decisions": [
+        "D03",
+        "D07",
+        "D11",
+        "D13",
+        "D14"
+      ],
+      "implementation_tickets": [
+        "PAI-C08",
+        "PAI-C09",
+        "PAI-C15"
+      ],
+      "examples": [
+        "EX03",
+        "EX06"
+      ],
+      "planned_acceptance_cases": [
+        "AT05",
+        "AT06",
+        "AT12",
+        "AT15",
+        "AT16",
+        "AT17",
+        "AT32"
+      ],
+      "common_contracts": [
+        "identity-v1",
+        "quality-v1",
+        "period-v1",
+        "currency-v1",
+        "drill-through-v1"
+      ],
+      "validation_status": "Specification and illustrative expected arithmetic only; H05 executable fixtures and C integration acceptance remain unexecuted."
+    },
+    {
+      "id": "PA-M15",
+      "version": "1.0.0",
+      "label": "AI invocation attempts and failure rate",
+      "domain": "ai",
+      "unit": "count_and_percent",
+      "definition_status": "specified_for_preparation",
+      "runtime_enabled": false,
+      "formula_language": "normative pseudocode; not executed SQL or a runtime reader",
+      "owner_function": "AI platform / observability owner",
+      "formula": {
+        "expression": "Count unique invocation_id and (invocation_id,attempt_id) independently. Failure_rate=failed_terminal_attempts/(succeeded_terminal_attempts+failed_terminal_attempts)*100; cancelled and unknown/pending outcomes shown separately.",
+        "coverage": "Observed unique attempts / independently expected unique attempts, when expected inventory exists. A missing expected denominator gives unknown coverage, not100%.",
+        "cancel_rule": "Cancellation is not silently failure or success. A source-confirmed provider failure after cancellation follows the accepted terminal-state classification, without duplicate counting."
+      },
+      "grain": [
+        "company_id",
+        "workflow_id",
+        "provider",
+        "model",
+        "model_version",
+        "release_version",
+        "invocation_id",
+        "attempt_id"
+      ],
+      "authoritative_sources": [
+        "SRC-AI",
+        "SRC-SCHEMA",
+        "SRC-RCI-QUALITY"
+      ],
+      "required_logical_inputs": [
+        "rpt_usage_cost_v1",
+        "rpt_source_health_v1"
+      ],
+      "required_fields": [
+        "usage_kind",
+        "usage_id",
+        "invocation_id",
+        "attempt_id",
+        "outcome",
+        "failure_class",
+        "measurement_coverage",
+        "source_ref"
+      ],
+      "population": "Production AI/provider attempts in the declared instrumented workflow/provider/model/release inventory; include separately billable failed calls and real retries, exclude copied/imported representations of the same attempt. No inference that this inventory covers all AI use.",
+      "time_basis": {
+        "period_kind": "attempt_start_period",
+        "event_time": "Authoritative actual attempt start for membership; measured completion/error time for latency/outcome",
+        "bounds": "[start_at,end_at)",
+        "timezone": "America/Chicago for internal platform period; company view may use an explicitly versioned company-local period",
+        "cutoff": "Common attempt-registry, trace and expense cutoff; long-running/unknown attempts remain visible"
+      },
+      "currency_policy": {
+        "value": "Integer attempts/invocations; failure percentage uses known terminal denominator."
+      },
+      "exclusions": [
+        "Agent audit lifecycle event as if each were a model invocation",
+        "Duplicate Langfuse/PostHog import",
+        "Sampled trace total presented as complete usage",
+        "Unknown/ongoing calls silently assigned outcomes"
+      ],
+      "freshness": {
+        "policy_ref": "D07",
+        "proposed_max_source_lag_seconds": 3600,
+        "operationally_verified": false,
+        "cost_reconciliation": "Daily prior-period check proposed by09:00 America/Chicago, with invoice finalization/price-estimate state explicitly separate"
+      },
+      "completeness": {
+        "complete_when": "Full expected attempt inventory is independently counted and matched to deduplicated observations; all included outcome/usage fields cover the declared inventory.",
+        "partial_behavior": "Observed counts/costs and missing-telemetry/unknown-state counts are separate; no extrapolation unless a later accepted sampling estimator exists.",
+        "zero": "Verified no attempts in a covered inventory can be zero; absent telemetry cannot.",
+        "unavailable": "Expected inventory or relevant authoritative observation unavailable."
+      },
+      "drill_through": {
+        "summary": "Metric → declared instrumentation/usage inventory → canonical invocation/attempt → minimized trace metadata and adopted cost representation",
+        "access": "Authorized internal AI/data or financial role; prompts, outputs, tool content and raw error text excluded."
+      },
+      "current_implementation": {
+        "source_present": true,
+        "reader_implemented": false,
+        "gaps": [
+          "Existing Langfuse adapter is an optional audit/import stub; complete actual invocation/attempt registry not established"
+        ]
+      },
+      "rci_compatibility": {
+        "related_metric_ids": [],
+        "relationship": "New attempt grain; reusable quality handling requires registered metric/source adapter."
+      },
+      "proposed_cards": [
+        "ai_health.attempts_and_failures"
+      ],
+      "depends_on_decisions": [
+        "D02",
+        "D07",
+        "D13",
+        "D14"
+      ],
+      "implementation_tickets": [
+        "PAI-C11",
+        "PAI-C16"
+      ],
+      "examples": [
+        "EX07"
+      ],
+      "planned_acceptance_cases": [
+        "AT18",
+        "AT19",
+        "AT27"
+      ],
+      "common_contracts": [
+        "identity-v1",
+        "quality-v1",
+        "period-v1",
+        "currency-v1",
+        "drill-through-v1"
+      ],
+      "validation_status": "Specification and illustrative expected arithmetic only; H05 executable fixtures and C integration acceptance remain unexecuted."
+    },
+    {
+      "id": "PA-M16",
+      "version": "1.0.0",
+      "label": "AI latency distribution",
+      "domain": "ai",
+      "unit": "duration_distribution",
+      "definition_status": "specified_for_preparation",
+      "runtime_enabled": false,
+      "formula_language": "normative pseudocode; not executed SQL or a runtime reader",
+      "owner_function": "AI platform / observability owner",
+      "formula": {
+        "expression": "Within a declared comparable provider/model/workflow/release/outcome stratum, order valid latency_ms values and return nearest-rank p50,p95 plus sample_count and missing_latency_count.",
+        "measurement": "latency_definition_version must state attempt-dispatch to final response/error, monotonic clock and streaming completion boundary. End-to-end user workflow latency and time-to-first-token are separate metrics.",
+        "comparability": "Do not mix differently defined clocks, instrumented versions, streaming boundaries or success/failure populations without explicit breakdown."
+      },
+      "grain": [
+        "company_id",
+        "workflow_id",
+        "provider",
+        "model",
+        "model_version",
+        "release_version",
+        "outcome",
+        "latency_definition_version"
+      ],
+      "authoritative_sources": [
+        "SRC-AI",
+        "SRC-RCI-QUALITY"
+      ],
+      "required_logical_inputs": [
+        "rpt_usage_cost_v1",
+        "rpt_source_health_v1"
+      ],
+      "required_fields": [
+        "usage_id",
+        "attempt_id",
+        "latency_ms",
+        "latency_definition_version",
+        "outcome",
+        "measurement_coverage",
+        "source_ref"
+      ],
+      "population": "Production AI/provider attempts in the declared instrumented workflow/provider/model/release inventory; include separately billable failed calls and real retries, exclude copied/imported representations of the same attempt. No inference that this inventory covers all AI use.",
+      "time_basis": {
+        "period_kind": "attempt_start_period",
+        "event_time": "Authoritative actual attempt start for membership; measured completion/error time for latency/outcome",
+        "bounds": "[start_at,end_at)",
+        "timezone": "America/Chicago for internal platform period; company view may use an explicitly versioned company-local period",
+        "cutoff": "Common attempt-registry, trace and expense cutoff; long-running/unknown attempts remain visible"
+      },
+      "currency_policy": {
+        "value": "Milliseconds; nonnegative integer observations, explicit percentile method."
+      },
+      "exclusions": [
+        "Negative/untrusted clock durations",
+        "Retries collapsed into single-attempt duration",
+        "Only successful-call samples described as all-call latency",
+        "Distribution computed with no samples"
+      ],
+      "freshness": {
+        "policy_ref": "D07",
+        "proposed_max_source_lag_seconds": 3600,
+        "operationally_verified": false,
+        "cost_reconciliation": "Daily prior-period check proposed by09:00 America/Chicago, with invoice finalization/price-estimate state explicitly separate"
+      },
+      "completeness": {
+        "complete_when": "All expected attempts in the named stratum have valid matching timing definitions or explicit exclusions with counts.",
+        "partial_behavior": "Observed counts/costs and missing-telemetry/unknown-state counts are separate; no extrapolation unless a later accepted sampling estimator exists.",
+        "zero": "A measured0ms observation is valid only under the clock policy; no samples yields unavailable distribution.",
+        "unavailable": "Expected inventory or relevant authoritative observation unavailable."
+      },
+      "drill_through": {
+        "summary": "Metric → declared instrumentation/usage inventory → canonical invocation/attempt → minimized trace metadata and adopted cost representation",
+        "access": "Authorized internal AI/data or financial role; prompts, outputs, tool content and raw error text excluded."
+      },
+      "current_implementation": {
+        "source_present": true,
+        "reader_implemented": false,
+        "gaps": [
+          "Inspected trace adapter does not provide complete latency timing/boundary evidence"
+        ]
+      },
+      "rci_compatibility": {
+        "related_metric_ids": [],
+        "relationship": "Duration distribution needs typed output adapter; current RCI scalar units do not express percentiles."
+      },
+      "proposed_cards": [
+        "ai_health.latency_by_workflow_model"
+      ],
+      "depends_on_decisions": [
+        "D02",
+        "D07",
+        "D13"
+      ],
+      "implementation_tickets": [
+        "PAI-C11",
+        "PAI-C16"
+      ],
+      "examples": [
+        "EX07"
+      ],
+      "planned_acceptance_cases": [
+        "AT18",
+        "AT27"
+      ],
+      "common_contracts": [
+        "identity-v1",
+        "quality-v1",
+        "period-v1",
+        "currency-v1",
+        "drill-through-v1"
+      ],
+      "validation_status": "Specification and illustrative expected arithmetic only; H05 executable fixtures and C integration acceptance remain unexecuted."
+    },
+    {
+      "id": "PA-M17",
+      "version": "1.0.0",
+      "label": "AI cost with declared cost basis",
+      "domain": "financial",
+      "unit": "money",
+      "definition_status": "specified_for_preparation",
+      "runtime_enabled": false,
+      "formula_language": "normative pseudocode; not executed SQL or a runtime reader",
+      "owner_function": "Finance / financial-domain owner",
+      "formula": {
+        "expression": "SUM(amount_decimal) for unique adopted_cost=true AI usage+component+expense period records, grouped by currency and cost_basis. At most1adopted representation for each usage component/period.",
+        "basis": "provider_reported, price_estimated and invoice_allocated are separately labeled. A combined adopted subtotal is explicitly mixed-basis and discloses each part.",
+        "replacement": "If invoice-allocated expense replaces a token-price estimate for the same pool, supersede the adopted estimate; do not add the bill to its estimates.",
+        "coverage": "Retain separately billable failed attempts and retries; an imported trace copy is not another cost."
+      },
+      "grain": [
+        "company_id",
+        "workflow_id",
+        "provider",
+        "model",
+        "model_version",
+        "cost_component",
+        "currency",
+        "cost_basis",
+        "expense_period"
+      ],
+      "authoritative_sources": [
+        "SRC-AI",
+        "SRC-RCI-MATH",
+        "SRC-RCI-QUALITY"
+      ],
+      "required_logical_inputs": [
+        "rpt_usage_cost_v1",
+        "rpt_source_health_v1"
+      ],
+      "required_fields": [
+        "usage_id",
+        "attempt_id",
+        "cost_component",
+        "amount_decimal",
+        "decimal_scale",
+        "currency",
+        "cost_basis",
+        "cost_representation_id",
+        "adopted_cost",
+        "price_version",
+        "expense_pool_id",
+        "allocation_version",
+        "measurement_coverage"
+      ],
+      "population": "Production AI/provider attempts in the declared instrumented workflow/provider/model/release inventory; include separately billable failed calls and real retries, exclude copied/imported representations of the same attempt. No inference that this inventory covers all AI use.",
+      "time_basis": {
+        "period_kind": "attributed_usage_period",
+        "event_time": "Attempt/usage occurrence; provider invoice or price revision time is retained separately",
+        "bounds": "[start_at,end_at)",
+        "timezone": "America/Chicago for internal platform period; company view may use an explicitly versioned company-local period",
+        "cutoff": "Common attempt-registry, trace and expense cutoff; long-running/unknown attempts remain visible"
+      },
+      "currency_policy": {
+        "value": "Exact decimal major-unit sum per currency at preserved precision; amount_decimal may be null when unknown.",
+        "rounding": "No2dp rounding per attempt; sum preserved decimal strings, round only display. Allocation rounds in the source cost pool's accepted precision."
+      },
+      "exclusions": [
+        "Double-counted direct and invoice-allocated copies",
+        "Unknown costs replaced with0",
+        "Provider price estimate called invoice expense",
+        "Costs from non-AI service components"
+      ],
+      "freshness": {
+        "policy_ref": "D07",
+        "proposed_max_source_lag_seconds": 3600,
+        "operationally_verified": false,
+        "cost_reconciliation": "Daily prior-period check proposed by09:00 America/Chicago, with invoice finalization/price-estimate state explicitly separate"
+      },
+      "completeness": {
+        "complete_when": "Every included actual attempt has an adopted source/price/allocation basis, cost fields and explicit usage coverage; each allocated pool reconciles exactly.",
+        "partial_behavior": "Known AI-cost subtotal plus attempts/components with missing cost; complete cost remains null.",
+        "zero": "Verified no attempts in a covered inventory can be zero; absent telemetry cannot.",
+        "unavailable": "Expected inventory or relevant authoritative observation unavailable."
+      },
+      "drill_through": {
+        "summary": "Metric → declared instrumentation/usage inventory → canonical invocation/attempt → minimized trace metadata and adopted cost representation",
+        "access": "Authorized internal AI/data or financial role; prompts, outputs, tool content and raw error text excluded."
+      },
+      "current_implementation": {
+        "source_present": true,
+        "reader_implemented": false,
+        "gaps": [
+          "Complete model/rate/cache/retry cost instrumentation and provider bill allocation not present in inspected stub",
+          "Current RCI2dp helper cannot preserve AI micro-costs"
+        ]
+      },
+      "rci_compatibility": {
+        "related_metric_ids": [
+          "cost.actual"
+        ],
+        "relationship": "Platform AI service cost, not merchant direct job cost; amount precision and source types need versioned compatible extension."
+      },
+      "proposed_cards": [
+        "economics.ai_cost",
+        "ai_health.ai_cost"
+      ],
+      "depends_on_decisions": [
+        "D02",
+        "D07",
+        "D12",
+        "D13",
+        "D14"
+      ],
+      "implementation_tickets": [
+        "PAI-C11",
+        "PAI-C12",
+        "PAI-C13",
+        "PAI-C16"
+      ],
+      "examples": [
+        "EX07",
+        "EX08"
+      ],
+      "planned_acceptance_cases": [
+        "AT17",
+        "AT18",
+        "AT19",
+        "AT27",
+        "AT28"
+      ],
+      "common_contracts": [
+        "identity-v1",
+        "quality-v1",
+        "period-v1",
+        "currency-v1",
+        "drill-through-v1"
+      ],
+      "validation_status": "Specification and illustrative expected arithmetic only; H05 executable fixtures and C integration acceptance remain unexecuted."
+    },
+    {
+      "id": "PA-M18",
+      "version": "1.0.0",
+      "label": "Cost per verified recovery outcome",
+      "domain": "financial",
+      "unit": "money_per_outcome",
+      "definition_status": "specified_for_preparation",
+      "runtime_enabled": false,
+      "formula_language": "normative pseudocode; not executed SQL or a runtime reader",
+      "owner_function": "Finance / financial-domain owner",
+      "formula": {
+        "expression": "Accepted cohort-attributed service cost / distinct verified completed recovery jobs from the same mature eligible cohort and observation window.",
+        "denominator_basis": "Initial proposed denominator is PA-M13 completed jobs, not approvals/messages/bookings. D12 must accept the named outcome and cost components before enabling.",
+        "numerator_basis": "All adopted applicable costs for the eligible cohort/window, including failed, declined/unselected evaluation where cost was incurred, nonresponse and real retry costs; never successful-only costs.",
+        "zero_denominator": "If no verified outcomes, ratio=null and separately show observed spend and zero outcome count. Missing denominator evidence is not zero."
+      },
+      "grain": [
+        "company_id",
+        "eligibility_cohort_id",
+        "currency",
+        "maturity_policy_version",
+        "cost_policy_version"
+      ],
+      "authoritative_sources": [
+        "SRC-SCHEMA",
+        "SRC-AI",
+        "SRC-RCI-MATH",
+        "SRC-RCI-POLICY"
+      ],
+      "required_logical_inputs": [
+        "rpt_workflow_opportunity_v1",
+        "rpt_workflow_fact_v1",
+        "rpt_usage_cost_v1",
+        "rpt_source_health_v1"
+      ],
+      "required_fields": [
+        "opportunity_id",
+        "job_id",
+        "maturity_end_at",
+        "observation_cutoff_at",
+        "amount_decimal",
+        "currency",
+        "cost_basis",
+        "adopted_cost",
+        "expense_pool_id",
+        "allocation_version"
+      ],
+      "population": "The complete M10 mature eligible recovery cohort, not only executed or successful opportunities. Cost denominator and numerator use the same declared inclusion/window policy.",
+      "time_basis": {
+        "period_kind": "fixed_mature_eligibility_cohort",
+        "event_time": "Eligibility fixes cohort; costs and completion outcomes are observed within declared matching window",
+        "bounds": "Same maturity policy as M13 and accepted cost allocation window",
+        "timezone": "Cohort timezone/version retained",
+        "cutoff": "Common required outcome and cost cutoffs"
+      },
+      "currency_policy": {
+        "value": "Exact cost per distinct completed job, separately per source cost currency; no implied currency conversion.",
+        "rounding": "Round only final ratio display; retain total cost and integer denominator."
+      },
+      "exclusions": [
+        "Costs from only successful jobs",
+        "Combining a monthly global cost with unrelated outcome cohort",
+        "Outcome-count inflation from multiple product assists",
+        "Causal efficiency/lift claims"
+      ],
+      "freshness": {
+        "policy_ref": "D07",
+        "proposed_max_source_lag_seconds": 3600,
+        "operationally_verified": false,
+        "cost_reconciliation": "Daily prior-period check proposed by09:00 America/Chicago, with invoice finalization/price-estimate state explicitly separate"
+      },
+      "completeness": {
+        "complete_when": "D12 accepted; complete cohort/cost/outcome coverage and mature denominator all verified.",
+        "partial_behavior": "Known-cost-per-observed-outcome may be a separately labeled diagnostic, never the complete primary metric; expose missing cost and pending outcomes.",
+        "zero": "Complete positive outcome denominator and verified zero applicable cost yields0; no outcomes yields unavailable.",
+        "unavailable": "Denominator0, missing maturity/outcome policy or incomplete required outcome links."
+      },
+      "drill_through": {
+        "summary": "Fixed cohort → all adopted cohort costs and allocation pools → unique completed-job denominator and source facts",
+        "access": "Authorized internal AI/data or financial role; prompts, outputs, tool content and raw error text excluded."
+      },
+      "current_implementation": {
+        "source_present": true,
+        "reader_implemented": false,
+        "gaps": [
+          "Complete recovery cohort and expense allocation remain C09/C11/C12 integration"
+        ]
+      },
+      "rci_compatibility": {
+        "related_metric_ids": [
+          "cost.actual",
+          "sales.completed_net"
+        ],
+        "relationship": "Separate platform expense-per-outcome measure; not merchant gross margin."
+      },
+      "proposed_cards": [
+        "economics.cost_per_verified_recovery_outcome"
+      ],
+      "depends_on_decisions": [
+        "D07",
+        "D11",
+        "D12",
+        "D13",
+        "D14"
+      ],
+      "implementation_tickets": [
+        "PAI-C09",
+        "PAI-C11",
+        "PAI-C12",
+        "PAI-C13"
+      ],
+      "examples": [
+        "EX08"
+      ],
+      "planned_acceptance_cases": [
+        "AT13",
+        "AT18",
+        "AT19",
+        "AT26",
+        "AT32"
+      ],
+      "common_contracts": [
+        "identity-v1",
+        "quality-v1",
+        "period-v1",
+        "currency-v1",
+        "drill-through-v1"
+      ],
+      "validation_status": "Specification and illustrative expected arithmetic only; H05 executable fixtures and C integration acceptance remain unexecuted."
+    },
+    {
+      "id": "PA-M19",
+      "version": "1.0.0",
+      "label": "Attributable cost to serve and component coverage",
+      "domain": "financial",
+      "unit": "money_and_coverage",
+      "definition_status": "specified_for_preparation",
+      "runtime_enabled": false,
+      "formula_language": "normative pseudocode; not executed SQL or a runtime reader",
+      "owner_function": "Finance / financial-domain owner",
+      "formula": {
+        "expression": "SUM(adopted exact cost amounts for unique direct expenses and accepted shared-pool allocations) by company/currency/period. complete_cost=null unless every required D12 cost component is covered.",
+        "components_proposed": [
+          "payment_processing",
+          "ai_provider",
+          "communications",
+          "infrastructure",
+          "support_aggregate",
+          "other_explicitly_adopted"
+        ],
+        "allocation": "Each source pool's direct portions plus allocation portions plus explicit unallocated remainder equals its source net expense at the declared precision. Do not count both a pool and its allocated copies.",
+        "coverage": "Report required/covered/unknown component names and attribution remainder. Component-count coverage is not a dollar coverage estimate."
+      },
+      "grain": [
+        "company_id",
+        "currency",
+        "reporting_period",
+        "cost_component",
+        "cost_policy_version"
+      ],
+      "authoritative_sources": [
+        "SRC-STRIPE",
+        "SRC-AI",
+        "SRC-RCI-MATH",
+        "SRC-RCI-QUALITY",
+        "EXT-STRIPE-BALANCE"
+      ],
+      "required_logical_inputs": [
+        "rpt_usage_cost_v1",
+        "rpt_financial_posting_v1",
+        "rpt_source_health_v1"
+      ],
+      "required_fields": [
+        "usage_id",
+        "usage_kind",
+        "cost_component",
+        "amount_decimal",
+        "decimal_scale",
+        "currency",
+        "cost_basis",
+        "adopted_cost",
+        "expense_pool_id",
+        "allocation_version",
+        "measurement_coverage"
+      ],
+      "population": "Actual Renvani-borne costs attributed to included companies under the approved component/allocation policy; platform-unallocated costs stay visible. Merchant operating expenses or wages are outside this metric.",
+      "time_basis": {
+        "period_kind": "management_cost_attribution_period",
+        "event_time": "Expense service/usage period, with actual source invoice/payment posting separately retained",
+        "bounds": "[start_at,end_at)",
+        "timezone": "Same explicit internal reporting timezone as M01/M03",
+        "cutoff": "Accepted expense-pool and usage source cutoffs; invoice pending/final status disclosed"
+      },
+      "currency_policy": {
+        "value": "Exact net cost major-unit decimal per currency; positive means expense, negative means source-proven cost credit.",
+        "rounding": "Preserve source cost precision; processor expense posted with negative cash sign is normalized once to positive cost, not subtracted twice."
+      },
+      "exclusions": [
+        "Merchant job labor/material expenses",
+        "Raw payroll or individual wage data",
+        "Unknown costs as zero",
+        "Unattributed shared expense omitted from coverage",
+        "Direct cost plus same invoice pool double count"
+      ],
+      "freshness": {
+        "policy_ref": "D07",
+        "proposed_max_source_lag_seconds": 3600,
+        "operationally_verified": false,
+        "cost_reconciliation": "Daily prior-period check proposed by09:00 America/Chicago, with invoice finalization/price-estimate state explicitly separate"
+      },
+      "completeness": {
+        "complete_when": "All D12 required components and expense pools have accepted coverage, exact allocation and attributable source evidence.",
+        "partial_behavior": "Known cost subtotal, unknown component list and explicit unallocated pool; complete_cost remains null.",
+        "zero": "Only independently verified no cost for every required component yields complete zero.",
+        "unavailable": "No accepted component policy or no usable cost source."
+      },
+      "drill_through": {
+        "summary": "Company/period component → adopted direct cost or versioned pool allocation → source expense and coverage manifest",
+        "access": "Finance role; only approved aggregate support/infrastructure cost inputs, no individual compensation."
+      },
+      "current_implementation": {
+        "source_present": true,
+        "reader_implemented": false,
+        "gaps": [
+          "AI, communications, infrastructure and support expense sources/allocations not established",
+          "revenue-outcomes materials_only cost is a merchant job reader and is not this cost-to-serve metric"
+        ]
+      },
+      "rci_compatibility": {
+        "related_metric_ids": [
+          "cost.actual",
+          "margin.direct"
+        ],
+        "relationship": "Reuse missing-cost and allocation invariants; different economic entity, components and period."
+      },
+      "proposed_cards": [
+        "economics.cost_to_serve_and_coverage"
+      ],
+      "depends_on_decisions": [
+        "D07",
+        "D12",
+        "D13",
+        "D14"
+      ],
+      "implementation_tickets": [
+        "PAI-C08",
+        "PAI-C11",
+        "PAI-C12",
+        "PAI-C13"
+      ],
+      "examples": [
+        "EX08"
+      ],
+      "planned_acceptance_cases": [
+        "AT17",
+        "AT18",
+        "AT19",
+        "AT26"
+      ],
+      "common_contracts": [
+        "identity-v1",
+        "quality-v1",
+        "period-v1",
+        "currency-v1",
+        "drill-through-v1"
+      ],
+      "validation_status": "Specification and illustrative expected arithmetic only; H05 executable fixtures and C integration acceptance remain unexecuted."
+    },
+    {
+      "id": "PA-M20",
+      "version": "1.0.0",
+      "label": "Management contribution with explicit basis",
+      "domain": "financial",
+      "unit": "money",
+      "definition_status": "specified_for_preparation",
+      "runtime_enabled": false,
+      "formula_language": "normative pseudocode; not executed SQL or a runtime reader",
+      "owner_function": "Finance / financial-domain owner",
+      "formula": {
+        "expression": "M01 platform subscription net receipts + M03 net platform application fees - M19 adopted complete cost_to_serve, for the same company/currency/reporting period.",
+        "incomplete_cost": "known_contribution=M01+M03-known_cost_subtotal; label partial contribution and list unknown components. complete_contribution remains null.",
+        "basis": "Collected platform inflows less period-attributed service costs; this management hybrid is neither statutory profit, bank cash flow nor merchant job margin. It does not combine MRR with receipts."
+      },
+      "grain": [
+        "company_id",
+        "currency",
+        "reporting_period",
+        "contribution_policy_version"
+      ],
+      "authoritative_sources": [
+        "SRC-RCI-MATH",
+        "SRC-RCI-QUALITY",
+        "SRC-STRIPE",
+        "SRC-AI"
+      ],
+      "required_logical_inputs": [
+        "rpt_financial_posting_v1",
+        "rpt_usage_cost_v1",
+        "rpt_source_health_v1"
+      ],
+      "required_fields": [
+        "accepted_result(PA-M01)",
+        "accepted_result(PA-M03)",
+        "accepted_result(PA-M19)",
+        "common_period",
+        "common_currency",
+        "common_cutoff",
+        "quality_state"
+      ],
+      "population": "Exactly the aligned M01/M03 company population with adopted M19 cost policy; unallocated costs and out-of-scope businesses disclosed.",
+      "time_basis": {
+        "period_kind": "aligned_platform_cash_and_service_cost_period",
+        "event_time": "Receipt/fee posting basis and expense attribution basis both stated",
+        "bounds": "Identical [start_at,end_at) for input period",
+        "timezone": "Same explicit internal reporting timezone",
+        "cutoff": "Common accepted cutoffs; mismatched snapshots are incompatible"
+      },
+      "currency_policy": {
+        "value": "Separate exact signed contribution by currency; negative contribution is valid.",
+        "rounding": "Combine exact components, round at display; no implicit FX."
+      },
+      "exclusions": [
+        "MRR",
+        "Merchant collections",
+        "Tax/tips and fund movements",
+        "Uncovered overhead presented as included",
+        "Complete net-profit or causal improvement claims"
+      ],
+      "freshness": {
+        "policy_ref": "D07",
+        "proposed_max_source_lag_seconds": 3600,
+        "operationally_verified": false,
+        "cost_reconciliation": "Daily prior-period check proposed by09:00 America/Chicago, with invoice finalization/price-estimate state explicitly separate"
+      },
+      "completeness": {
+        "complete_when": "All receipts/fees reconcile and every required service-cost component is complete under D12.",
+        "partial_behavior": "Explicitly labeled known contribution only, with receipt and cost coverage; no complete contribution/profit claim.",
+        "zero": "A verified exact arithmetic zero is distinct from missing inputs.",
+        "unavailable": "Required financial inputs or definition/basis compatibility missing; positive receipt subtotal alone cannot establish contribution."
+      },
+      "drill_through": {
+        "summary": "Contribution → aligned M01/M03/M19 definitions, amounts and quality → source components",
+        "access": "Finance/leadership access under H04."
+      },
+      "current_implementation": {
+        "source_present": true,
+        "reader_implemented": false,
+        "gaps": [
+          "No accepted complete platform cost/reporting layer yet"
+        ]
+      },
+      "rci_compatibility": {
+        "related_metric_ids": [
+          "margin.direct",
+          "margin.percent"
+        ],
+        "relationship": "Not aliases; current RCI direct job margin is merchant completed-sales/direct-cost basis."
+      },
+      "proposed_cards": [
+        "economics.management_contribution"
+      ],
+      "depends_on_decisions": [
+        "D07",
+        "D12",
+        "D13",
+        "D14"
+      ],
+      "implementation_tickets": [
+        "PAI-C12",
+        "PAI-C13"
+      ],
+      "examples": [
+        "EX08"
+      ],
+      "planned_acceptance_cases": [
+        "AT17",
+        "AT18",
+        "AT19",
+        "AT26"
+      ],
+      "common_contracts": [
+        "identity-v1",
+        "quality-v1",
+        "period-v1",
+        "currency-v1",
+        "drill-through-v1"
+      ],
+      "validation_status": "Specification and illustrative expected arithmetic only; H05 executable fixtures and C integration acceptance remain unexecuted."
+    },
+    {
+      "id": "PA-M21",
+      "version": "1.0.0",
+      "label": "Unmapped and ambiguous source identities",
+      "domain": "data_health",
+      "unit": "count_and_money_breakdown",
+      "definition_status": "specified_for_preparation",
+      "runtime_enabled": false,
+      "formula_language": "normative pseudocode; not executed SQL or a runtime reader",
+      "owner_function": "Platform data / reporting owner",
+      "formula": {
+        "expression": "Count DISTINCT unresolved canonical source keys separately for unmapped and ambiguous mappings. Sum each known signed financial component amount by account/mode/component/currency; also report gross absolute exposure per group.",
+        "nonnetting": "An unresolved+100 and-100 do not disappear because net=0; report count2 and absolute exposure200.",
+        "classification_limit": "If component/currency unknown, report unknown-value count; never invent an amount or mix it into a named money component."
+      },
+      "grain": [
+        "source_id",
+        "source_ref.account_id",
+        "source_ref.provider_mode",
+        "environment",
+        "identity_exception_type",
+        "financial_component",
+        "currency",
+        "as_of"
+      ],
+      "authoritative_sources": [
+        "SRC-SCHEMA",
+        "SRC-RCI-POLICY"
+      ],
+      "required_logical_inputs": [
+        "rpt_source_health_v1"
+      ],
+      "required_fields": [
+        "source_id",
+        "run_id",
+        "unmapped_count",
+        "ambiguous_count",
+        "exception_amount_minor",
+        "currency",
+        "currency_exponent",
+        "financial_component",
+        "source_configuration_version",
+        "exception_absolute_amount_minor"
+      ],
+      "population": "All expected sources in the approved source inventory, including quarantined rows not eligible for company totals. Unknown company is not assigned to a default company.",
+      "time_basis": {
+        "period_kind": "source_check_snapshot",
+        "event_time": "Observed check completion and independently verified source_cutoff_at",
+        "bounds": "Latest accepted check at as_of, or check cohorts within[start_at,end_at)",
+        "timezone": "UTC event storage; internal display America/Chicago",
+        "cutoff": "Actual check/source cutoff, never ingestion time substituted"
+      },
+      "currency_policy": {
+        "value": "Counts plus separate signed and absolute exact financial exposure by known component/currency. Never a mixed-currency total."
+      },
+      "exclusions": [
+        "Raw source-object or customer payload exported with exception counts",
+        "Assigning unknown rows to company by email",
+        "Counting repeated ingestion of one unresolved source key as multiple exceptions"
+      ],
+      "freshness": {
+        "policy_ref": "D07",
+        "proposed_max_source_lag_seconds": 3600,
+        "operationally_verified": false,
+        "absence": "No successful check or undefined source cutoff is unknown/unavailable; last attempt is not last success."
+      },
+      "completeness": {
+        "complete_when": "Full scoped source inventory traversed and mapping checks completed at common cutoff.",
+        "partial_behavior": "Observed exception count/value and missing-source coverage; cannot infer no problems beyond observed coverage.",
+        "zero": "Complete successful mapping check with no exceptions yields0.",
+        "unavailable": "Check never ran or expected inventory unknown."
+      },
+      "drill_through": {
+        "summary": "Dashboard metric → versioned check/run manifest → sanitized exception/reference and source/account/configuration scope",
+        "access": "Operational health role sees minimum counts; financial exception value/details require H04 financial grant. Raw exception payload stays in restricted Renvani tools."
+      },
+      "current_implementation": {
+        "source_present": true,
+        "reader_implemented": false,
+        "gaps": [
+          "No accepted source mapping exception/check projection implemented"
+        ]
+      },
+      "rci_compatibility": {
+        "related_metric_ids": [
+          "accounting.mismatches"
+        ],
+        "relationship": "Different provider/company-identity exception domain; reuse denied/provenance handling."
+      },
+      "proposed_cards": [
+        "data_health.identity_exceptions"
+      ],
+      "depends_on_decisions": [
+        "D03",
+        "D05",
+        "D07",
+        "D13",
+        "D14"
+      ],
+      "implementation_tickets": [
+        "PAI-C02",
+        "PAI-C08",
+        "PAI-C16"
+      ],
+      "examples": [
+        "EX09"
+      ],
+      "planned_acceptance_cases": [
+        "AT01",
+        "AT09",
+        "AT18",
+        "AT26"
+      ],
+      "common_contracts": [
+        "identity-v1",
+        "quality-v1",
+        "period-v1",
+        "currency-v1",
+        "drill-through-v1"
+      ],
+      "validation_status": "Specification and illustrative expected arithmetic only; H05 executable fixtures and C integration acceptance remain unexecuted."
+    },
+    {
+      "id": "PA-M22",
+      "version": "1.0.0",
+      "label": "Financial reconciliation exceptions",
+      "domain": "data_health",
+      "unit": "count_and_money_breakdown",
+      "definition_status": "specified_for_preparation",
+      "runtime_enabled": false,
+      "formula_language": "normative pseudocode; not executed SQL or a runtime reader",
+      "owner_function": "Platform data / reporting owner",
+      "formula": {
+        "expression": "For each source account/mode/component/currency and identical cutoff/basis, compare expected source amount/count to accepted classified amount/count. mismatch_count counts distinct unresolved source components; signed_delta=observed-expected; absolute_delta sums per-object absolute differences.",
+        "tolerance": "Exact same-unit provider posting comparisons use0minor-unit tolerance. Any FX/settlement/rounding bridge is separately source-backed/versioned, not an unexplained tolerance.",
+        "offset_rule": "Signed aggregate net0 does not imply reconciliation when individual positive/negative mismatches offset."
+      },
+      "grain": [
+        "check_id",
+        "source_id",
+        "account_mode_scope",
+        "financial_component",
+        "currency",
+        "source_cutoff_at"
+      ],
+      "authoritative_sources": [
+        "SRC-SCHEMA",
+        "SRC-RCI-QUALITY",
+        "EXT-STRIPE-FEE",
+        "EXT-STRIPE-BALANCE"
+      ],
+      "required_logical_inputs": [
+        "rpt_financial_posting_v1",
+        "rpt_source_health_v1"
+      ],
+      "required_fields": [
+        "check_id",
+        "run_id",
+        "mismatch_count",
+        "expected_record_count",
+        "observed_record_count",
+        "exception_amount_minor",
+        "currency",
+        "currency_exponent",
+        "financial_component",
+        "source_cutoff_at",
+        "exception_absolute_amount_minor"
+      ],
+      "population": "Exactly the accepted financial source account/resource/component inventory, including both row-level mapping/classification and aggregate conservation checks.",
+      "time_basis": {
+        "period_kind": "source_check_snapshot",
+        "event_time": "Observed check completion and independently verified source_cutoff_at",
+        "bounds": "Latest accepted check at as_of, or check cohorts within[start_at,end_at)",
+        "timezone": "UTC event storage; internal display America/Chicago",
+        "cutoff": "Actual check/source cutoff, never ingestion time substituted"
+      },
+      "currency_policy": {
+        "value": "Signed and absolute exact discrepancies grouped by comparable currency/component; no aggregate netting across bases."
+      },
+      "exclusions": [
+        "Gross-charge versus tax-exclusive-principal comparison without bridge",
+        "Collection date versus payout/availability date comparison",
+        "Comparing presentment and settlement currency without actual FX mapping",
+        "Explaining away missing fee refunds by current pricing policy"
+      ],
+      "freshness": {
+        "policy_ref": "D07",
+        "proposed_max_source_lag_seconds": 3600,
+        "operationally_verified": false,
+        "absence": "No successful check or undefined source cutoff is unknown/unavailable; last attempt is not last success.",
+        "daily_reconciliation_target": "Proposed09:00 America/Chicago; actual source freshness and successful run evidenced separately."
+      },
+      "completeness": {
+        "complete_when": "All expected financial objects/components and update/refund pages checked; any variance is resolved or disclosed as unresolved.",
+        "partial_behavior": "Known mismatch evidence and unchecked source ranges; complete reconciliation state remains unreconciled/unknown.",
+        "zero": "Zero exceptions only from completed like-for-like object and aggregate checks.",
+        "unavailable": "Expected source control totals or same-basis bridge missing."
+      },
+      "drill_through": {
+        "summary": "Dashboard metric → versioned check/run manifest → sanitized exception/reference and source/account/configuration scope",
+        "access": "Operational health role sees minimum counts; financial exception value/details require H04 financial grant. Raw exception payload stays in restricted Renvani tools."
+      },
+      "current_implementation": {
+        "source_present": true,
+        "reader_implemented": false,
+        "gaps": [
+          "Actual provider-to-projection reconciliation and check manifest not yet implemented"
+        ]
+      },
+      "rci_compatibility": {
+        "related_metric_ids": [
+          "accounting.mismatches"
+        ],
+        "relationship": "Related reconciliation concept; Stripe/platform component basis differs from accounting connection entity basis."
+      },
+      "proposed_cards": [
+        "economics.reconciliation_context",
+        "data_health.financial_reconciliation"
+      ],
+      "depends_on_decisions": [
+        "D01",
+        "D06",
+        "D07",
+        "D13",
+        "D14"
+      ],
+      "implementation_tickets": [
+        "PAI-C06",
+        "PAI-C07",
+        "PAI-C08",
+        "PAI-C13",
+        "PAI-C16"
+      ],
+      "examples": [
+        "EX03",
+        "EX09"
+      ],
+      "planned_acceptance_cases": [
+        "AT03",
+        "AT05",
+        "AT06",
+        "AT11",
+        "AT17",
+        "AT26"
+      ],
+      "common_contracts": [
+        "identity-v1",
+        "quality-v1",
+        "period-v1",
+        "currency-v1",
+        "drill-through-v1"
+      ],
+      "validation_status": "Specification and illustrative expected arithmetic only; H05 executable fixtures and C integration acceptance remain unexecuted."
+    },
+    {
+      "id": "PA-M23",
+      "version": "1.0.0",
+      "label": "Source freshness and export coverage",
+      "domain": "data_health",
+      "unit": "duration_and_coverage",
+      "definition_status": "specified_for_preparation",
+      "runtime_enabled": false,
+      "formula_language": "normative pseudocode; not executed SQL or a runtime reader",
+      "owner_function": "Platform data / reporting owner",
+      "formula": {
+        "expression": "lag_seconds=check_clock-source_cutoff_at when both known and nonfuture; expected-vs-observed canonical records produce coverage only when expected inventory is independently known. Report last_success_at, current run status and configuration version.",
+        "coverage_rule": "For matched keys, coverage=matched_expected_records/expected_record_count; duplicates or extra rows never raise coverage. expected0 yields empty population, not100% by convention.",
+        "freshness_rule": "A recent ingestion or query timestamp cannot make an old source cutoff fresh. Required-source card freshness uses the weakest required source."
+      },
+      "grain": [
+        "source_id",
+        "source_configuration_version",
+        "account_mode_resource_scope",
+        "run_id",
+        "as_of"
+      ],
+      "authoritative_sources": [
+        "SRC-RCI-QUALITY",
+        "SRC-RCI-POLICY"
+      ],
+      "required_logical_inputs": [
+        "rpt_source_health_v1"
+      ],
+      "required_fields": [
+        "source_id",
+        "source_configuration_version",
+        "run_id",
+        "started_at",
+        "completed_at",
+        "last_success_at",
+        "source_cutoff_at",
+        "lag_seconds",
+        "expected_record_count",
+        "observed_record_count",
+        "status",
+        "matched_expected_record_count"
+      ],
+      "population": "Every configured and required-but-not-configured source named in the enabled metric manifest, with explicit environment/account/resource scope.",
+      "time_basis": {
+        "period_kind": "source_check_snapshot",
+        "event_time": "Observed check completion and independently verified source_cutoff_at",
+        "bounds": "Latest accepted check at as_of, or check cohorts within[start_at,end_at)",
+        "timezone": "UTC event storage; internal display America/Chicago",
+        "cutoff": "Actual check/source cutoff, never ingestion time substituted"
+      },
+      "currency_policy": {
+        "value": "Seconds and integer expected/matched/missing counts; currency not applicable."
+      },
+      "exclusions": [
+        "Last-attempt time as last-success",
+        "Warehouse query execution time as source freshness",
+        "Row count match without key/update coverage",
+        "Cap/sampling losses silently treated as low business activity"
+      ],
+      "freshness": {
+        "policy_ref": "D07",
+        "proposed_max_source_lag_seconds": 3600,
+        "operationally_verified": false,
+        "absence": "No successful check or undefined source cutoff is unknown/unavailable; last attempt is not last success."
+      },
+      "completeness": {
+        "complete_when": "All enabled required sources have actual cutoff/check/matched-key evidence and accepted freshness policy.",
+        "partial_behavior": "Show each source fresh/stale/partial/failed/unknown/not-configured distinctly; dependent metrics inherit gaps.",
+        "zero": "Lag0 only if cutoff matches actual clock; expected0 is empty, no expected inventory is unknown.",
+        "unavailable": "No actual cutoff, invalid/future timestamp, missing policy or source not configured."
+      },
+      "drill_through": {
+        "summary": "Dashboard metric → versioned check/run manifest → sanitized exception/reference and source/account/configuration scope",
+        "access": "Operational health role sees minimum counts; financial exception value/details require H04 financial grant. Raw exception payload stays in restricted Renvani tools."
+      },
+      "current_implementation": {
+        "source_present": true,
+        "reader_implemented": false,
+        "gaps": [
+          "Source-health collector and independent expected inventory not implemented; foundation freshness helper supplies reusable semantics only"
+        ]
+      },
+      "rci_compatibility": {
+        "related_metric_ids": [],
+        "relationship": "Reuse assessEvidence freshness/completeness concepts; internal multi-source health output is an extension."
+      },
+      "proposed_cards": [
+        "data_health.source_freshness_and_coverage"
+      ],
+      "depends_on_decisions": [
+        "D01",
+        "D02",
+        "D07",
+        "D13",
+        "D14"
+      ],
+      "implementation_tickets": [
+        "PAI-C04",
+        "PAI-C05",
+        "PAI-C07",
+        "PAI-C16"
+      ],
+      "examples": [
+        "EX09"
+      ],
+      "planned_acceptance_cases": [
+        "AT18",
+        "AT23",
+        "AT26",
+        "AT28"
+      ],
+      "common_contracts": [
+        "identity-v1",
+        "quality-v1",
+        "period-v1",
+        "currency-v1",
+        "drill-through-v1"
+      ],
+      "validation_status": "Specification and illustrative expected arithmetic only; H05 executable fixtures and C integration acceptance remain unexecuted."
+    },
+    {
+      "id": "PA-M24",
+      "version": "1.0.0",
+      "label": "Outcome linkage completeness and pending maturity",
+      "domain": "data_health",
+      "unit": "count_and_percent",
+      "definition_status": "specified_for_preparation",
+      "runtime_enabled": false,
+      "formula_language": "normative pseudocode; not executed SQL or a runtime reader",
+      "owner_function": "Platform data / reporting owner",
+      "formula": {
+        "expression": "For the fixed eligible cohort, report separate counts for immature/pending, mature with complete required stage evidence, mature with a missing expected link, mature with confirmed no outcome, and source-unknown. For each stage link check, completeness=verified_expected_links/expected_links only when expected_links is known.",
+        "noninference": "No completed job after a fully observed mature window is an observed no-outcome, not necessarily a missing link. A verified booked/completed/collected source object with a broken expected relationship is a link exception.",
+        "money_rule": "Unallocated financial residual from M14 is shown separately by currency; never convert missing link count into assumed lost revenue."
+      },
+      "grain": [
+        "company_id",
+        "eligibility_cohort_id",
+        "stage",
+        "maturity_policy_version",
+        "as_of"
+      ],
+      "authoritative_sources": [
+        "SRC-SCHEMA",
+        "SRC-RCI-POLICY",
+        "SRC-RCI-QUALITY"
+      ],
+      "required_logical_inputs": [
+        "rpt_workflow_opportunity_v1",
+        "rpt_workflow_fact_v1",
+        "rpt_outcome_allocation_v1",
+        "rpt_source_health_v1"
+      ],
+      "required_fields": [
+        "opportunity_id",
+        "source_population_complete",
+        "maturity_end_at",
+        "observation_cutoff_at",
+        "opportunity_link_state",
+        "event_type",
+        "financial_posting_id",
+        "allocation_role",
+        "allocated_amount_minor",
+        "complete_allocation"
+      ],
+      "population": "All M10 eligible opportunities, including unselected/declined/failed and pending; expected links follow accepted stage applicability rather than presumed success.",
+      "time_basis": {
+        "period_kind": "fixed_eligibility_cohort_quality_as_of",
+        "event_time": "Observed check completion and independently verified source_cutoff_at",
+        "bounds": "Latest accepted check at as_of, or check cohorts within[start_at,end_at)",
+        "timezone": "UTC event storage; internal display America/Chicago",
+        "cutoff": "Actual check/source cutoff, never ingestion time substituted"
+      },
+      "currency_policy": {
+        "value": "Counts and stage-link percentage; separately labeled unallocated financial amounts retain currency/exponent."
+      },
+      "exclusions": [
+        "Pending opportunities dropped from cohort",
+        "Every no-payment/no-booking classified as a data failure",
+        "All missing links treated as successful or failed outcomes",
+        "Stage link percentages averaged across different denominators"
+      ],
+      "freshness": {
+        "policy_ref": "D07",
+        "proposed_max_source_lag_seconds": 3600,
+        "operationally_verified": false,
+        "absence": "No successful check or undefined source cutoff is unknown/unavailable; last attempt is not last success."
+      },
+      "completeness": {
+        "complete_when": "Eligibility inventory, stage applicability/maturity and independent source link checks are covered; missing links remain explicit exceptions.",
+        "partial_behavior": "Counts can be reported as observed with unknown checks; verified outcome claims remain partial.",
+        "zero": "Complete empty expected-link set is N/A/empty, not0% link quality; complete expected>0 with no verified links can be0%.",
+        "unavailable": "Maturity policy, authoritative expected links or source coverage absent."
+      },
+      "drill_through": {
+        "summary": "Cohort quality → stage expectation and source manifest → pending/no-outcome/missing-link evidence or allocation residual",
+        "access": "Operational health role sees minimum counts; financial exception value/details require H04 financial grant. Raw exception payload stays in restricted Renvani tools."
+      },
+      "current_implementation": {
+        "source_present": true,
+        "reader_implemented": false,
+        "gaps": [
+          "Canonical opportunity, stage-applicability and expected-link checks require C09"
+        ]
+      },
+      "rci_compatibility": {
+        "related_metric_ids": [],
+        "relationship": "New recovery-cohort quality diagnostic; reuse existing completeness/provenance conventions."
+      },
+      "proposed_cards": [
+        "outcomes.link_and_maturity_completeness",
+        "data_health.outcome_link_completeness"
+      ],
+      "depends_on_decisions": [
+        "D03",
+        "D07",
+        "D11",
+        "D13",
+        "D14"
+      ],
+      "implementation_tickets": [
+        "PAI-C09",
+        "PAI-C15",
+        "PAI-C16"
+      ],
+      "examples": [
+        "EX06",
+        "EX09"
+      ],
+      "planned_acceptance_cases": [
+        "AT13",
+        "AT15",
+        "AT16",
+        "AT18",
+        "AT26",
+        "AT32"
+      ],
+      "common_contracts": [
+        "identity-v1",
+        "quality-v1",
+        "period-v1",
+        "currency-v1",
+        "drill-through-v1"
+      ],
+      "validation_status": "Specification and illustrative expected arithmetic only; H05 executable fixtures and C integration acceptance remain unexecuted."
+    }
+  ]
+}

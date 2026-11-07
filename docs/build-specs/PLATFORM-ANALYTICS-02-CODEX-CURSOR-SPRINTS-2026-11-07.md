@@ -1,6 +1,6 @@
 # 02: Platform Analytics Technical Specification and Codex/Cursor Sprints
 
-Version 1.0 · November 7, 2026 · Twenty integration tickets / five logical sprints, plus three later learning tickets
+Version 1.1 · November 7, 2026 · Twenty integration tickets / five logical sprints, plus three later learning tickets
 
 ## 1. Outcome, status, and companion documents
 
@@ -12,6 +12,8 @@ This is a specification and implementation backlog. All PAI-C and PAI-L tickets 
 - [01: Preparation here](PLATFORM-ANALYTICS-01-CHATGPT-FOUNDATION-SPRINTS-2026-11-07.md)
 - [Start here](../handoffs/PLATFORM-ANALYTICS-START-HERE-2026-11-07.md)
 - [Ticket ledger](../planning/platform-analytics/ticket-ledger.v1.json)
+
+**H01–H04 implementation input is now available:** [preparation checkpoint](../planning/platform-analytics/preparation/H01-H04-CHECKPOINT.md), versioned 24-metric catalog, seven logical record contracts and field/access/retention policy. H05–H08 remain planned. These detailed contracts elaborate the initial tables below; enable only the subset whose definitions, fields and runtime evidence are accepted. C02 must coordinate a versioned RCI adapter because current v1 money schemas assume two decimals and the PA metric IDs are not registered. Direct Stripe ingestion remains conditional on the full exported field policy; use the sanitized-export alternative if the native payload cannot meet it.
 
 ## 2. Architecture and responsibilities
 
@@ -44,6 +46,8 @@ C01 chooses one primary trace path based on actual implementation, compatibility
 
 Reuse `packages/types/src/connected-intelligence/v1/`, deterministic foundation math, current domain readers, existing activity events/outbox, BullMQ processing/recovery, company authorization, and #445 workflow services. Reconcile FS-43/#142 before creating observability code. This work extends the existing RCI C01/C02/C04/C05/C09/C10 plan for internal company reporting; it does not replace that plan or add a sixth customer product.
 
+Reuse requires a compatibility check: current RCI strict metric/money contracts do not accept all proposed PA definitions, variable minor-unit exponents or AI micro-cost precision unchanged. H02/H03 and decision D13 document the exact extension boundary. Existing activity-list caps, queued receipts and event names also cannot be used as proof of complete cohorts, delivery or collection without the specified adapters and source evidence.
+
 ## 3. Logical data contracts
 
 The following are required logical interfaces. They do not mandate one physical table per interface or a second database. A view, existing contract, or rebuildable projection may satisfy each. Persisted schema changes remain in `packages/db/src/schema.ts`; SQL reporting views are migration-backed derived interfaces with documented grants and lineage.
@@ -55,7 +59,7 @@ The following are required logical interfaces. They do not mandate one physical 
 | `rpt_workflow_opportunity_v1` | One canonical eligible opportunity snapshot | Company, opportunity/workflow IDs, eligibility/policy version, eligibility time, pre-decision features, selected/unselected reason, source history provenance, maturity window | Includes every eligible opportunity, not only recommended or successful ones |
 | `rpt_workflow_fact_v1` | One lifecycle observation | Opportunity, recommendation/action/attempt IDs, fact type/state, source references, source time, job/invoice/payment references, evidence version | Approval, execution, acknowledgement, delivery, response, booking, completion, collection are separate |
 | `rpt_outcome_allocation_v1` | One source financial component allocation | Source payment/refund component, company, opportunity/job/invoice references, allocated exact amount, basis/version | Preserve source company, currency, and sign; signed allocations plus explicit remainder equal the source component; allocated magnitudes are bounded; product assists are non-additive |
-| `rpt_usage_cost_v1` | One billable invocation attempt or source expense allocation | Usage ID, company, trace/workflow/action IDs, provider/model/version, quantities, latency/outcome, currency, exact cost, cost basis, price/allocation version, completeness | Includes billed failed calls and real retries; alternative estimates for the same usage are not additive |
+| `rpt_usage_cost_v1` | One actual invocation attempt or source expense allocation | Usage ID, company, trace/workflow/action IDs, provider/model/version, quantities, latency/outcome, currency, exact cost, cost basis, price/allocation version, completeness | Includes all actual attempts, including zero-cost or unknown-billing attempts; billed failures and retries retain cost; alternative estimates are not additive |
 | `rpt_source_health_v1` | One source/run/check result | Source and configuration version, run ID, cutoff, start/end/last success, lag, coverage, mismatch/unmapped counts, status, correction checkpoint | Explains freshness and reliability; it is not operational payment state |
 
 ### Shared metadata
@@ -70,7 +74,7 @@ Money uses the existing exact-decimal/string conventions. Where a provider suppl
 - Provider keys include provider, environment/live-test mode, account scope, resource type, and object ID. A bare provider ID is insufficient.
 - Keep mapping validity when accounts, plans, or ownership references change. Do not rewrite historical source identity silently.
 - A business event has a stable event ID; a provider object has a stable source key plus accepted update/revision state. Duplicate source deliveries do not create new financial facts.
-- AI `invocation_id` identifies the logical call and `attempt_id` identifies separately billable retries. An imported copy of an attempt is deduplicated; a real retry remains usage.
+- AI `invocation_id` identifies the logical call and `attempt_id` identifies each actual attempt, independently of whether its cost is known or billable. An imported copy is deduplicated; a real retry remains usage and retains any evidenced cost.
 - Payments may span invoices or opportunities. Allocation records preserve the source component's company, currency, and sign. Signed allocations plus an explicit unallocated remainder equal the exact signed source amount; allocated magnitudes cannot exceed its magnitude. Corrections preserve lineage and apply once. A nonzero remainder remains visible and prevents a complete-allocation claim. Never rely on a many-to-many join followed by a sum.
 
 ### Event envelope and lifecycle

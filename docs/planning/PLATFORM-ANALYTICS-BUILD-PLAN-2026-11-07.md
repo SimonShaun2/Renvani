@@ -1,6 +1,6 @@
 # Renvani Platform Analytics: Stripe + PostHog Build Plan
 
-Version 1.0 · November 7, 2026 · Specification and implementation backlog
+Version 1.1 · November 7, 2026 · Specification, H01–H04 preparation, and implementation backlog
 
 ## 1. Decision and intended result
 
@@ -8,7 +8,7 @@ The founder selected the Stripe + PostHog recommendation in the Renvani project 
 
 The first useful release answers: which companies are activating, what Renvani is collecting from subscriptions and actual application fees, what data is missing, and whether those figures reconcile. The next release connects one existing estimate-recovery workflow to completed work and collected payment, alongside measured AI usage and clearly identified cost coverage. Later, separately accepted work uses permitted evidence for controlled learning.
 
-This package is a plan and detailed specification. It does not claim that connectors, SDKs, reporting projections, dashboards, production access, experiments, or shared learning have been implemented. Ticket IDs are local planning identifiers, not assigned FS board numbers. No official board assignment, runtime test pass, merge approval, paid subscription, or production activation is implied.
+The plan now includes the authorized **H01–H04 preparation deliverables**: source/ownership decisions, 24-metric definitions, identity/events/outcomes and export/access/correction contracts. See the [Track A checkpoint](platform-analytics/preparation/H01-H04-CHECKPOINT.md) for delivered files and bounded review evidence. H05–H08 and all C/L tickets remain planned. Connectors, SDKs, reporting projections, dashboards and shared learning remain implementation work; PAI ticket IDs are local and no official FS card is marked Done by this delivery.
 
 ## 2. Package navigation
 
@@ -24,8 +24,9 @@ Notion mirrors: [Build plan](https://app.notion.com/p/411317b92d15819bbaa1e440c4
 - [02: Codex/Cursor integration](../build-specs/PLATFORM-ANALYTICS-02-CODEX-CURSOR-SPRINTS-2026-11-07.md): technical architecture, reporting contracts, metric catalog, runtime tickets, acceptance cases, rollout, and later learning.
 - [Start here](../handoffs/PLATFORM-ANALYTICS-START-HERE-2026-11-07.md): execution order and first implementation slice.
 - [Ticket ledger](platform-analytics/ticket-ledger.v1.json): machine-readable ticket details, dependencies, status, and acceptance criteria.
+- [H01–H04 checkpoint](platform-analytics/preparation/H01-H04-CHECKPOINT.md): actual preparation artifacts, source findings, review/validation evidence and remaining work.
 
-The specifications contain complete ticket cards. The ledger is a planning artifact; mapping these cards to existing FS work happens before implementation, without generating duplicate execution queues.
+The specifications contain complete ticket cards. The ledger tracks local preparation and planned runtime work. H01's crosswalk maps known existing FS/RCI responsibility; actual runtime assignment and central-file reservation remain C01 outputs.
 
 ## 3. Verified starting position
 
@@ -56,6 +57,8 @@ Source baseline: [`dev` at `5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58`](https://g
 | [Connected Intelligence C01/C02/C04/C05/C09/C10](../build-specs/CONNECTED-INTELLIGENCE-02-CODEX-CURSOR-SPRINTS-2026-11-06.md) | Existing integration plan | Shared source reconciliation, metric/read contracts, reporting definitions, and acceptance; this package adds internal platform analytics |
 
 Older Notion and repository continuity prose still describes some merged PRs as unmerged. Live GitHub metadata governs the source state above. This plan does not infer current production acceptance from a merge.
+
+The H01–H04 source review adds two implementation constraints: existing RCI v1 money/fact contracts require a versioned adaptation for PA metric IDs, variable currency precision and AI micro-costs; native Stripe ingestion remains conditional because PostHog's managed Stripe source does not support column masking. The [expanded decision register](platform-analytics/preparation/decision-register.md) and [export policy](platform-analytics/preparation/reporting-access-matrix.md) record evidence and fallback behavior.
 
 ## 4. Scope and ownership boundaries
 
@@ -144,6 +147,8 @@ Only later: permitted minimized datasets, held-out companies and future time per
 Every card carries metric/version, period/timezone, currency or unit, population, source cutoff, completeness, and source links where permitted. Zero, empty, unavailable, stale, and partial states are distinct. Leadership views prioritize the business decision over implementation detail; diagnostic views expose the supporting evidence.
 
 ## 9. Decisions and bounded dependencies
+
+The table below preserves original D01–D09. The [H01 decision register](platform-analytics/preparation/decision-register.md) expands them with owner/closure evidence and D10–D14 for metrics, first value, costs, RCI compatibility and release evidence. Prepared definitions and proposed policy targets remain distinguishable from accepted live configuration.
 
 | ID | Decision / default | Resolution owner and scope |
 |---|---|---|

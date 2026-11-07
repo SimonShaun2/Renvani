@@ -1,6 +1,6 @@
 # Start Here: Renvani Platform Analytics
 
-November 7, 2026 · Stripe + PostHog · Planning package v1.0
+November 7, 2026 · Stripe + PostHog · Plan plus H01–H04 preparation v1.1
 
 ## What was selected
 
@@ -16,9 +16,9 @@ Use Stripe's financial records and PostHog's existing analytics interface for Re
 
 ## Status and scope
 
-This delivery creates the build plan, full ticket specifications, technical contracts, proposed metric/acceptance catalogs, and dependency ledger. It does not implement any of the new analytics tickets. There are **31 planned local tickets: 8 preparation, 20 integration, and 3 later learning tickets**. No official FS assignments, implementation completions, integration test passes, live dashboards, or shared-learning deployment are claimed.
+The package now includes the authorized **H01–H04 preparation artifacts**, with source/ownership decisions, 24 metric definitions, identity/event/outcome contracts and export/access/retention rules. Read the [Track A checkpoint](../planning/platform-analytics/preparation/H01-H04-CHECKPOINT.md) and its review/validation receipts. Of 31 local tickets, 4 have preparation deliverables and 27 remain planned: H05–H08, 20 integration tickets and 3 later-learning tickets. Official FS assignments, merged/runtime acceptance and production integration remain separate.
 
-All ticket output paths are proposed future deliverables unless they appear in this package's actual file list. In particular, the `preparation/` fixture, catalog, and validation files are future H-track outputs. The current ticket ledger and documentation integrity checks are not those implementation artifacts.
+The 12 core H01–H04 deliverables exist. H05's fixture/expected-result suite, H06 dashboards/queries, H07 connector/cost runbook and H08 full preparation acceptance remain future work. Bounded document/contract checks in this checkpoint do not substitute for them.
 
 ## Source baseline and reuse
 
@@ -26,17 +26,17 @@ Verified baseline: `dev` at `5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58`. Refresh 
 
 Some historical Notion/repository prose still says these merged PRs are unmerged. Use current GitHub metadata for source state and separate that from runtime/release acceptance. A merged foundation is not a deployed reporting integration.
 
-## First work here
+## Next work here
 
-Start **PAI-H01** with the source/decision register, then run **H02/H03/H04** in parallel: financial metrics, identity/events/outcomes, and permitted export fields/access. H05 supplies synthetic expected results; H06 defines the dashboards; H07 prepares provider/cost setup; H08 independently reviews and packages the tested preparation.
+H01–H04 now supplies the first preparation subset. Continue with **H05** synthetic fixtures/expected results, **H06** dashboard/query contracts, **H07** provider/cost setup and **H08** full preparation review/handoff when that next scope is started. The expanded decision register records unresolved implementation choices and safe interim behavior.
 
-Small pure validators and synthetic fixtures are appropriate here when subsequently authorized and actually verified. Do not rebuild RCI exact-money or quality helpers, publish new runtime exports, connect customer data, or treat synthetic validation as production evidence.
+Small pure validators and synthetic fixtures are appropriate here when subsequently authorized and actually verified. Reuse RCI quality and exact-Decimal design; current two-decimal money/fact schemas need a reviewed adapter/extension for PA metrics and AI precision. New runtime exports, real source connections and production acceptance remain C-track work.
 
 ## First Codex/Cursor slice
 
 Begin with **C01** source/ownership/provider discovery. Consume the accepted preparation subset. Implement **C02/C03**, configure **C05** in parallel where account access and field policy allow, connect **C04**, and complete **C06–C08** financial classification/reconciliation. Pull **C10** activation forward after C02/H02/H03 and the selected authoritative milestone source are available. If new C09 work is needed to establish that milestone, defer the affected activation cards and release billing/data-health first.
 
-Configure **C13/C14** and data-health portions of **C16**. Run **C17** for that exact enabled scope, observe **C18**, and release through **C19** with applicable review and founder authority. Billing/activation does not wait for C09 outcome allocation, C11 AI capture, C12 complete costs, C20 learning readiness, or any L ticket. Missing panels remain unavailable or clearly partial.
+Configure the eligible **C13/C14** cards and data-health portions of **C16**. Run **C17** for that exact enabled scope, observe **C18**, and release through **C19** with applicable review and founder authority. Billing/data-health does not wait for C09 outcome allocation, C11 AI capture, C12 complete costs, C20 learning readiness, or any L ticket. Activation joins only when its approved milestone already has authoritative source evidence. Missing panels remain unavailable or clearly partial.
 
 Next expand the accepted scope to the existing estimate-recovery lifecycle with **C09**, AI usage with **C11**, cost coverage with **C12**, and **C15** plus the relevant C16 panels. Refresh acceptance for the expansion. Financial outcome cards require the same source reconciliation as the economics cards.
 

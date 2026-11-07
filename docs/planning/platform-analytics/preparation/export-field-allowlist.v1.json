@@ -1,0 +1,1708 @@
+{
+  "artifact_id": "PAI-H04-EXPORT-FIELD-ALLOWLIST",
+  "policy_version": "1.0.0",
+  "prepared_on": "2026-11-07",
+  "status": "prepared_for_review",
+  "artifact_kind": "closed_field_policy_design_not_deployed_validator",
+  "runtime_status": "No source connection, export role, telemetry change or production transfer executed in H04.",
+  "source_baseline": {
+    "repository": "SimonShaun2/Renvani",
+    "commit": "5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58",
+    "h03_contract_version": "1.0.0"
+  },
+  "purpose": "Internal Renvani platform reporting of economics, activation, observed outcomes, quantitative AI usage/cost and data health.",
+  "not_an_authorization_to_transfer": true,
+  "default_decision": "deny",
+  "approval_state": {
+    "preparation_authorized": true,
+    "production_processing_authority": "not_verified",
+    "region": "not_selected",
+    "retention_targets": "proposed_owner_review_required",
+    "provider_controls": "not_configured_or_tested",
+    "learning_or_experiment_permission": "not_granted_by_this_policy"
+  },
+  "policy_precedence": [
+    "Actual verified processing authority and company/record/purpose eligibility are required before any export.",
+    "A source-side positive projection selects only listed fields; do not spread, serialize or forward a full source row.",
+    "Validate the outgoing payload as a closed schema recursively. Unknown outgoing fields, object keys, token values or unsupported versions fail closed.",
+    "An internally valid H03 or RCI record is not automatically permitted externally; this independent field/purpose policy is narrower.",
+    "Field names newly added to H03 or a provider schema are denied until this policy version and owner review explicitly include them.",
+    "Permissioned query and download output is no broader than the source fields, dataset audience and declared metric purpose.",
+    "Allowed opaque identifiers remain confidential/pseudonymous business data; neither hashing nor grouping establishes anonymity or learning rights."
+  ],
+  "destination_contract": {
+    "logical_destination": "Restricted Renvani internal PostHog analytics organization/project",
+    "actual_project_id": null,
+    "actual_region": null,
+    "environment_isolation": "Production and nonproduction use separate recorded project/source configuration; synthetic data only in preparation.",
+    "secondary_destinations": "No public sharing, scheduled external messages, new destination, vendor AI processing path or pooled learning export without its own recorded purpose and effective grants.",
+    "retention_contract": "retention-correction-policy.md",
+    "access_contract": "reporting-access-matrix.md"
+  },
+  "value_constraints": {
+    "registered_tokens": "Values must come from an owner-reviewed finite registry or deterministic adapter mapping, with bounded length. A string matching a token regex is not sufficient if it contains customer text.",
+    "opaque_identifiers": "Use server-issued canonical IDs or verified provider object IDs in their account/mode/type namespace. Exclude raw imported sourceId strings, arbitrary URLs, user-entered references, secrets and contact-based identifiers.",
+    "strings": "No free-form names, descriptions, summaries, notes, prompts, query text, exception messages, tool descriptions or arbitrary metadata.",
+    "amounts": "Exact string representations, explicit original currency/exponent or decimal scale, no float conversion; monetary values do not confer permission to read the source contact details.",
+    "timestamps": "UTC instants or explicitly validated IANA timezone identifiers from H03/H02; never silently change retention anchors on reingestion.",
+    "nulls": "Preserve required null/unknown states under H03/H02. Do not replace a denied field with a fake zero or fabricate a required reference.",
+    "array_objects": "Every object in an array is recursively closed; an allowed array name does not permit arbitrary payloads inside it.",
+    "unknown_cutoff": "source_cutoff_at is present and may be null only as an explicit unknown coverage state under H03; null requires freshness unknown and cannot support a complete/reconciled-current metric. Never substitute ingestion or wall-clock time."
+  },
+  "common_fields": {
+    "schema_version": {
+      "type": "semver",
+      "purpose": "Version of the logical reporting contract; 1.0.0 in this package.",
+      "requiredness_ref": "event-contracts.v1.json"
+    },
+    "record_id": {
+      "type": "opaque_token",
+      "purpose": "Stable identity of one logical record; never a random value on each import.",
+      "requiredness_ref": "event-contracts.v1.json"
+    },
+    "record_revision": {
+      "type": "positive_integer",
+      "purpose": "Monotonic accepted analytical revision, not a new business occurrence.",
+      "requiredness_ref": "event-contracts.v1.json"
+    },
+    "supersedes_revision": {
+      "type": "positive_integer|null",
+      "purpose": "Immediately preceding accepted revision of the same record, or null for revision 1.",
+      "requiredness_ref": "event-contracts.v1.json"
+    },
+    "revision_reason_code": {
+      "type": "enum",
+      "purpose": "Registered cause of analytical revision.",
+      "requiredness_ref": "event-contracts.v1.json"
+    },
+    "record_status": {
+      "type": "enum",
+      "purpose": "Accepted current fact or explicit analytical retraction; untrusted/unmapped records stay in a separate internal exception path.",
+      "requiredness_ref": "event-contracts.v1.json"
+    },
+    "company_id": {
+      "type": "uuid|null",
+      "purpose": "Server-verified Renvani company. Non-null for company records; null is allowed only for explicitly platform-scoped source-health/shared-cost records.",
+      "requiredness_ref": "event-contracts.v1.json"
+    },
+    "environment": {
+      "type": "registered_token",
+      "purpose": "Application environment; production, staging, development and test remain distinct.",
+      "requiredness_ref": "event-contracts.v1.json"
+    },
+    "source_ref": {
+      "type": "source_ref",
+      "purpose": "Closed source-identity object. It is a pointer, not a provider payload or user-supplied URL.",
+      "requiredness_ref": "event-contracts.v1.json"
+    },
+    "source_schema_version": {
+      "type": "opaque_token|null",
+      "purpose": "Actual source schema/API version when known; null remains an explicit coverage limit.",
+      "requiredness_ref": "event-contracts.v1.json"
+    },
+    "source_revision": {
+      "type": "opaque_token|null",
+      "purpose": "Verified source object version, event receipt version or immutable snapshot digest; do not invent from ingestion time.",
+      "requiredness_ref": "event-contracts.v1.json"
+    },
+    "adapter_version": {
+      "type": "opaque_token",
+      "purpose": "Version of the deterministic source-to-reporting mapping.",
+      "requiredness_ref": "event-contracts.v1.json"
+    },
+    "occurred_at": {
+      "type": "utc_instant",
+      "purpose": "Business effective/occurrence time, separate from observation and load time.",
+      "requiredness_ref": "event-contracts.v1.json"
+    },
+    "source_updated_at": {
+      "type": "utc_instant|null",
+      "purpose": "Source update time if the source provides reliable update semantics.",
+      "requiredness_ref": "event-contracts.v1.json"
+    },
+    "ingested_at": {
+      "type": "utc_instant",
+      "purpose": "Time this reporting revision was accepted for ingestion.",
+      "requiredness_ref": "event-contracts.v1.json"
+    },
+    "source_cutoff_at": {
+      "type": "utc_instant|null",
+      "purpose": "Last verified source-coverage cutoff; null means unknown (for example failed/never-observed source health), requires freshness=unknown and cannot support a complete current metric claim. Ingestion time is never a substitute.",
+      "requiredness_ref": "event-contracts.v1.json"
+    },
+    "provenance_kind": {
+      "type": "enum",
+      "purpose": "Origin of the underlying business fact.",
+      "requiredness_ref": "event-contracts.v1.json"
+    },
+    "import_batch_ref": {
+      "type": "opaque_token|null",
+      "purpose": "Approved internal import-lineage pointer when provenance is imported; do not include original customer/staff IDs.",
+      "requiredness_ref": "event-contracts.v1.json"
+    },
+    "quality_state": {
+      "type": "quality_state",
+      "purpose": "Independent completeness, freshness, reconciliation and finality dimensions.",
+      "requiredness_ref": "event-contracts.v1.json"
+    }
+  },
+  "closed_object_types": {
+    "source_ref": {
+      "additional_properties": false,
+      "allowed_fields": {
+        "source_system": {
+          "type": "registered_token",
+          "purpose": "Authoritative source adapter system.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "account_id": {
+          "type": "opaque_token",
+          "purpose": "Source account/project/connection namespace; for Renvani, the approved application instance namespace.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "provider_mode": {
+          "type": "enum",
+          "purpose": "Actual provider scope.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "resource_type": {
+          "type": "registered_token",
+          "purpose": "Approved source object kind; vendor export excludes end-customer/staff resources.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "object_id": {
+          "type": "opaque_token",
+          "purpose": "Stable native object ID; namespaced key also includes environment and the other source_ref fields.",
+          "requiredness_ref": "event-contracts.v1.json"
+        }
+      }
+    },
+    "entity_ref": {
+      "additional_properties": false,
+      "allowed_fields": {
+        "entity_type": {
+          "type": "registered_token",
+          "purpose": "Approved canonical type such as estimate, estimate_option_set, job, invoice or payment.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "entity_id": {
+          "type": "opaque_token",
+          "purpose": "Canonical server-verified identifier.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "record_version": {
+          "type": "opaque_token|null",
+          "purpose": "Actual source version; absence is a quality gap.",
+          "requiredness_ref": "event-contracts.v1.json"
+        }
+      }
+    },
+    "quality_state": {
+      "additional_properties": false,
+      "allowed_fields": {
+        "completeness": {
+          "type": "enum",
+          "purpose": "Traversal/source coverage.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "freshness": {
+          "type": "enum",
+          "purpose": "Assessed against accepted per-source policy and cutoff.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "reconciliation": {
+          "type": "enum",
+          "purpose": "Source/basis reconciliation.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "finality": {
+          "type": "enum",
+          "purpose": "Business evidence maturity/finality.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "computation_truncated": {
+          "type": "boolean",
+          "purpose": "True prohibits completeness claim.",
+          "requiredness_ref": "event-contracts.v1.json"
+        }
+      }
+    },
+    "discount_summary": {
+      "additional_properties": false,
+      "allowed_fields": {
+        "kind": {
+          "type": "enum",
+          "values": [
+            "once",
+            "repeating",
+            "forever"
+          ]
+        },
+        "amount_minor": {
+          "type": "nonnegative_integer_string|null"
+        },
+        "percent_decimal": {
+          "type": "exact_decimal_string|null",
+          "allowed_range": {
+            "minimum_inclusive": "0",
+            "maximum_inclusive": "100",
+            "comparison": "exact_decimal_when_non_null"
+          }
+        },
+        "effective_from": {
+          "type": "utc_instant"
+        },
+        "effective_to": {
+          "type": "utc_instant|null"
+        },
+        "allocation_scope": {
+          "type": "enum",
+          "values": [
+            "item",
+            "subscription"
+          ]
+        },
+        "application_order": {
+          "type": "positive_integer"
+        },
+        "definition_version": {
+          "type": "opaque_token"
+        }
+      },
+      "invariants": [
+        "Exactly one of amount_minor and percent_decimal is non-null.",
+        "Use actual effective discount semantics and H02 rules; one-time discounts are not silently recurring.",
+        "No coupon code, display name, description, customer identifier or raw metadata.",
+        "Fixed discount amount is nonnegative; percent_decimal is within 0 through 100 inclusive using exact decimal comparison. These constraints follow H02 data-dictionary.md."
+      ]
+    },
+    "source_configuration_entry": {
+      "additional_properties": false,
+      "allowed_fields": {
+        "source_id": {
+          "type": "registered_token",
+          "purpose": "Approved source dataset identifier.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "source_configuration_version": {
+          "type": "opaque_token",
+          "purpose": "Exact source configuration at the query cutoff.",
+          "requiredness_ref": "event-contracts.v1.json"
+        }
+      }
+    },
+    "account_mode_scope_entry": {
+      "additional_properties": false,
+      "allowed_fields": {
+        "source_system": {
+          "type": "registered_token",
+          "purpose": "Approved source system.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "account_id": {
+          "type": "opaque_token",
+          "purpose": "Verified provider account/project/application namespace; not credentials.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "provider_mode": {
+          "type": "enum",
+          "purpose": "Actual source mode.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "environment": {
+          "type": "registered_token",
+          "purpose": "Recorded application environment.",
+          "requiredness_ref": "event-contracts.v1.json"
+        }
+      }
+    }
+  },
+  "records": [
+    {
+      "record_contract": "rpt_company_identity_v1",
+      "contract_version": "1.0.0",
+      "candidate_for": "internal_operational_reporting",
+      "includes_common_fields": true,
+      "additional_properties": false,
+      "row_eligibility": "Verified source account/environment and permitted company/purpose scope; accepted or explicitly retracted analytical revision; unresolved identities remain internal exceptions. Platform-wide health/shared-cost exceptions follow H03.",
+      "retention_profile": "RET-IDENTITY",
+      "detail_audience_functions": [
+        "named_analytics_operator"
+      ],
+      "allowed_fields": {
+        "mapping_id": {
+          "type": "opaque_token",
+          "purpose": "Stable mapping interval identity; record_id may equal mapping_id.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "mapping_role": {
+          "type": "enum",
+          "purpose": "Relationship of provider resource to Renvani company.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "valid_from": {
+          "type": "utc_instant",
+          "purpose": "Inclusive start of verified mapping validity.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "valid_to": {
+          "type": "utc_instant|null",
+          "purpose": "Exclusive end, or open-ended null; validity intervals must not overlap for competing owners.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "validity_basis": {
+          "type": "enum",
+          "purpose": "What supports the interval.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "resolution_state": {
+          "type": "enum",
+          "purpose": "Accepted mappings contain only verified.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "plan_id": {
+          "type": "registered_token|null",
+          "purpose": "Plan at this effective interval, only if source-backed.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "plan_version": {
+          "type": "opaque_token|null",
+          "purpose": "Versioned plan definition; do not overwrite historical plan meaning.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "company_timezone": {
+          "type": "iana_timezone",
+          "purpose": "Verified company reporting timezone.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "trade_category": {
+          "type": "registered_token|null",
+          "purpose": "Approved coarse company cohort attribute.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "company_size_band": {
+          "type": "registered_token|null",
+          "purpose": "Approved coarse size band, not staff or payroll rows.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "region_code": {
+          "type": "registered_token|null",
+          "purpose": "Approved coarse region, never a service/customer street address.",
+          "requiredness_ref": "event-contracts.v1.json"
+        }
+      },
+      "learning_use": "denied_under_this_policy"
+    },
+    {
+      "record_contract": "rpt_financial_posting_v1",
+      "contract_version": "1.0.0",
+      "candidate_for": "internal_operational_reporting",
+      "includes_common_fields": true,
+      "additional_properties": false,
+      "row_eligibility": "Verified source account/environment and permitted company/purpose scope; accepted or explicitly retracted analytical revision; unresolved identities remain internal exceptions. Platform-wide health/shared-cost exceptions follow H03.",
+      "retention_profile": "RET-CORE",
+      "detail_audience_functions": [
+        "finance_analyst",
+        "named_analytics_operator"
+      ],
+      "allowed_fields": {
+        "posting_id": {
+          "type": "opaque_token",
+          "purpose": "Canonical classified posting identity; stable across imports.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "source_component_key": {
+          "type": "opaque_token",
+          "purpose": "Names the unique component within one scoped source object; created deterministically by the adapter.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "financial_component": {
+          "type": "enum",
+          "purpose": "Component vocabulary owned by H02; unclassified remains excluded from financial totals.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "amount_minor": {
+          "type": "signed_integer_string",
+          "purpose": "Exact signed minor units; no floating-point conversion.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "currency": {
+          "type": "currency_code",
+          "purpose": "Original currency; currencies are never silently combined.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "currency_exponent": {
+          "type": "nonnegative_integer",
+          "purpose": "Provider/currency minor-unit exponent; not universally 2.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "financial_basis": {
+          "type": "enum",
+          "purpose": "Meaning of this posting; not inferred from its sign.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "posting_effect": {
+          "type": "enum",
+          "purpose": "Original economic component, actual reversal or documented adjustment.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "posting_status": {
+          "type": "enum",
+          "purpose": "Provider/business confirmation state; pending/failed values cannot be collected cash.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "reverses_posting_id": {
+          "type": "opaque_token|null",
+          "purpose": "Original posting for an actual economic reversal; analytical revision uses record_revision instead.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "adjustment_target_component": {
+          "type": "registered_token|null",
+          "purpose": "Target component of a classified adjustment; unknown target is quarantined.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "adjustment_reason_code": {
+          "type": "registered_token|null",
+          "purpose": "Registered reason, never arbitrary provider error/description text.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "classification_rule_version": {
+          "type": "opaque_token",
+          "purpose": "Version of the H02 classification implemented by the adapter.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "related_source_refs": {
+          "type": "source_ref[]",
+          "purpose": "Closed references such as charge, payment, fee, refund, balance transaction or platform subscription; no customer/staff/contact payloads.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "payment_id": {
+          "type": "uuid|null",
+          "purpose": "Validated application payment link when it exists.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "invoice_id": {
+          "type": "uuid|null",
+          "purpose": "Validated application invoice link; posting can exist before invoice allocation.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "pricing_policy_version": {
+          "type": "opaque_token|null",
+          "purpose": "Effective policy evidence, not a substituted expected fee.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "pricing_evidence_ref": {
+          "type": "source_ref|null",
+          "purpose": "Approved pointer to actual fee/subscription evidence.",
+          "requiredness_ref": "event-contracts.v1.json"
+        }
+      },
+      "learning_use": "denied_under_this_policy"
+    },
+    {
+      "record_contract": "rpt_workflow_opportunity_v1",
+      "contract_version": "1.0.0",
+      "candidate_for": "internal_operational_reporting",
+      "includes_common_fields": true,
+      "additional_properties": false,
+      "row_eligibility": "Verified source account/environment and permitted company/purpose scope; accepted or explicitly retracted analytical revision; unresolved identities remain internal exceptions. Platform-wide health/shared-cost exceptions follow H03.",
+      "retention_profile": "RET-OUTCOME",
+      "detail_audience_functions": [
+        "product_operations_analyst",
+        "named_analytics_operator"
+      ],
+      "allowed_fields": {
+        "opportunity_id": {
+          "type": "opaque_token",
+          "purpose": "One recovery episode for one canonical estimate or option set; not one recommendation/message/retry.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "workflow_id": {
+          "type": "registered_token",
+          "purpose": "Existing workflow family identity, e.g. the approved estimate-recovery family.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "workflow_version": {
+          "type": "opaque_token",
+          "purpose": "Version defining workflow scope.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "canonical_target_ref": {
+          "type": "entity_ref",
+          "purpose": "Verified estimate or estimate-option-set identity; option rows do not multiply opportunities.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "eligibility_snapshot_id": {
+          "type": "opaque_token",
+          "purpose": "Immutable pre-decision population snapshot reference.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "eligibility_rule_version": {
+          "type": "opaque_token",
+          "purpose": "Version of the approved eligibility policy.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "eligible_at": {
+          "type": "utc_instant",
+          "purpose": "First qualifying instant for this episode under the accepted rule.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "eligibility_evaluated_at": {
+          "type": "utc_instant",
+          "purpose": "Actual decision-time evaluation timestamp.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "feature_set_version": {
+          "type": "opaque_token|null",
+          "purpose": "Approved pre-decision feature definition, or null when no feature set is supplied.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "feature_as_of": {
+          "type": "utc_instant|null",
+          "purpose": "Latest business-data cutoff of the pre-decision features; cannot include post-decision outcomes.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "feature_snapshot_ref": {
+          "type": "opaque_token|null",
+          "purpose": "Internal minimized snapshot pointer; not permission to export arbitrary feature payloads.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "selection_state": {
+          "type": "enum",
+          "purpose": "Selection is distinct from later proposal approval.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "selection_reason_code": {
+          "type": "registered_token|null",
+          "purpose": "Allowlisted decision reason when known; absent information remains null.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "policy_version": {
+          "type": "opaque_token",
+          "purpose": "Selection/authority policy used; a label never grants permission.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "maturity_policy_id": {
+          "type": "registered_token|null",
+          "purpose": "Named outcome-window policy; null blocks mature-cohort claims.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "maturity_policy_version": {
+          "type": "opaque_token|null",
+          "purpose": "Effective maturity rule version.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "maturity_start_at": {
+          "type": "utc_instant|null",
+          "purpose": "Start defined by the versioned maturity rule.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "maturity_end_at": {
+          "type": "utc_instant|null",
+          "purpose": "End defined by the versioned maturity rule; do not invent a universal window.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "evaluation_population_ref": {
+          "type": "opaque_token",
+          "purpose": "Internal full eligibility query manifest, including unselected and pending opportunities.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "source_population_complete": {
+          "type": "boolean",
+          "purpose": "True only after complete traversal/reconciliation for the declared snapshot.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "observation_cutoff_at": {
+          "type": "utc_instant",
+          "purpose": "Source cutoff used to assess outcomes, not current wall clock alone.",
+          "requiredness_ref": "event-contracts.v1.json"
+        }
+      },
+      "learning_use": "denied_under_this_policy"
+    },
+    {
+      "record_contract": "rpt_workflow_fact_v1",
+      "contract_version": "1.0.0",
+      "candidate_for": "internal_operational_reporting",
+      "includes_common_fields": true,
+      "additional_properties": false,
+      "row_eligibility": "Verified source account/environment and permitted company/purpose scope; accepted or explicitly retracted analytical revision; unresolved identities remain internal exceptions. Platform-wide health/shared-cost exceptions follow H03.",
+      "retention_profile": "RET-OUTCOME",
+      "detail_audience_functions": [
+        "product_operations_analyst",
+        "named_analytics_operator"
+      ],
+      "allowed_fields": {
+        "event_id": {
+          "type": "opaque_token",
+          "purpose": "Stable namespaced native event/receipt identity; same import delivery uses same ID.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "event_type": {
+          "type": "registered_event_type",
+          "purpose": "Normalized semantic observation from event_types below; not a new DB enum by this document.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "source_event_type": {
+          "type": "registered_token|null",
+          "purpose": "Original typed source event when available; does not override receipt evidence.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "event_schema_version": {
+          "type": "semver",
+          "purpose": "Version of the normalized event contract.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "opportunity_id": {
+          "type": "opaque_token|null",
+          "purpose": "Verified opportunity link; null excludes a fact from recovery-cohort numerator.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "opportunity_link_state": {
+          "type": "enum",
+          "purpose": "Distinguishes a real link, missing link, and non-opportunity company event.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "workflow_id": {
+          "type": "registered_token|null",
+          "purpose": "Workflow family when applicable.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "workflow_run_id": {
+          "type": "opaque_token|null",
+          "purpose": "Existing durable workflow execution/run identity when available.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "recommendation_id": {
+          "type": "uuid|null",
+          "purpose": "Source recommendation identifier where relevant; many may assist one opportunity.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "action_id": {
+          "type": "uuid|null",
+          "purpose": "Existing authorized action identity for proposal/approval/execution facts.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "attempt_id": {
+          "type": "opaque_token|null",
+          "purpose": "Stable real execution-attempt identity; required for attempt facts, never derived from ingestion retry count.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "execution_kind": {
+          "type": "enum|null",
+          "purpose": "Observed execution boundary.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "policy_version": {
+          "type": "opaque_token|null",
+          "purpose": "Actual policy at decision/execution time; unknown remains null.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "release_version": {
+          "type": "opaque_token|null",
+          "purpose": "Observed release/adapter build tied to occurrence; never use current deploy version retroactively.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "evidence_version": {
+          "type": "opaque_token",
+          "purpose": "Version of the source evidence mapping used to establish this fact.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "actor_type": {
+          "type": "enum|null",
+          "purpose": "Category only; no staff/customer IDs or names required for analytics.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "disposition_code": {
+          "type": "registered_token|null",
+          "purpose": "Typed response/failure/reason, with raw content excluded.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "job_id": {
+          "type": "uuid|null",
+          "purpose": "Verified job link when applicable.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "estimate_id": {
+          "type": "uuid|null",
+          "purpose": "Verified estimate link when applicable.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "invoice_id": {
+          "type": "uuid|null",
+          "purpose": "Verified invoice link when applicable.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "payment_id": {
+          "type": "uuid|null",
+          "purpose": "Verified payment link when applicable.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "financial_posting_id": {
+          "type": "opaque_token|null",
+          "purpose": "Canonical posting reference for collected/refunded/adjusted observations; value is summed from posting/allocation, not event copies.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "assist_product_ids": {
+          "type": "registered_token[]",
+          "purpose": "Non-additive assistance tags; native product IDs retained via a documented presentation mapping.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "applicable_stage_policy_version": {
+          "type": "opaque_token",
+          "purpose": "Defines stages that can be skipped/not applicable without fabricating success.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "eligibility_snapshot_id": {
+          "type": "opaque_token|null",
+          "purpose": "Required non-null for workflow.eligible; references the pre-decision eligibility snapshot.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "activation_milestone_id": {
+          "type": "registered_token|null",
+          "purpose": "Required for derived company.value_reached when activation is enabled.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "activation_milestone_version": {
+          "type": "opaque_token|null",
+          "purpose": "Exact approved definition for a derived activation fact; null for non-activation facts.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "cohort_id": {
+          "type": "opaque_token|null",
+          "purpose": "Company activation cohort reference for company readiness/value observations.",
+          "requiredness_ref": "event-contracts.v1.json"
+        }
+      },
+      "learning_use": "denied_under_this_policy"
+    },
+    {
+      "record_contract": "rpt_outcome_allocation_v1",
+      "contract_version": "1.0.0",
+      "candidate_for": "internal_operational_reporting",
+      "includes_common_fields": true,
+      "additional_properties": false,
+      "row_eligibility": "Verified source account/environment and permitted company/purpose scope; accepted or explicitly retracted analytical revision; unresolved identities remain internal exceptions. Platform-wide health/shared-cost exceptions follow H03.",
+      "retention_profile": "RET-OUTCOME",
+      "detail_audience_functions": [
+        "finance_analyst",
+        "product_operations_analyst",
+        "named_analytics_operator"
+      ],
+      "allowed_fields": {
+        "allocation_set_id": {
+          "type": "opaque_token",
+          "purpose": "Stable set identity for one source posting and one allocation basis.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "allocation_set_revision": {
+          "type": "positive_integer",
+          "purpose": "One accepted complete set revision; never combine rows from multiple revisions.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "allocation_id": {
+          "type": "opaque_token",
+          "purpose": "Stable destination/remainder identity within the set.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "allocation_role": {
+          "type": "enum",
+          "purpose": "The explicit remainder is a row even when zero.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "source_posting_id": {
+          "type": "opaque_token",
+          "purpose": "Canonical financial component being allocated.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "source_posting_revision": {
+          "type": "positive_integer",
+          "purpose": "Exact accepted source revision to which conservation applies.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "source_component_key": {
+          "type": "opaque_token",
+          "purpose": "Must equal the source posting component key.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "allocated_amount_minor": {
+          "type": "signed_integer_string",
+          "purpose": "Signed allocation or remainder in exact original minor units.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "currency": {
+          "type": "currency_code",
+          "purpose": "Must equal source currency.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "currency_exponent": {
+          "type": "nonnegative_integer",
+          "purpose": "Must equal source exponent.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "opportunity_id": {
+          "type": "opaque_token|null",
+          "purpose": "A verified recovery opportunity, when linked.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "job_id": {
+          "type": "uuid|null",
+          "purpose": "Verified job target, if available.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "invoice_id": {
+          "type": "uuid|null",
+          "purpose": "Verified invoice target, if available.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "allocation_basis": {
+          "type": "registered_token",
+          "purpose": "Approved exact link or allocation rule; unallocated remainder has its explicit basis.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "allocation_rule_version": {
+          "type": "opaque_token",
+          "purpose": "Effective allocation rule version.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "allocation_state": {
+          "type": "enum",
+          "purpose": "Accepted only after the whole set passes signed conservation and scope.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "supersedes_allocation_set_revision": {
+          "type": "positive_integer|null",
+          "purpose": "Prior set revision, or null for the first.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "complete_allocation": {
+          "type": "boolean",
+          "purpose": "True only for accepted set with zero remainder and complete required source/target evidence.",
+          "requiredness_ref": "event-contracts.v1.json"
+        }
+      },
+      "learning_use": "denied_under_this_policy"
+    },
+    {
+      "record_contract": "rpt_usage_cost_v1",
+      "contract_version": "1.0.0",
+      "candidate_for": "internal_operational_reporting",
+      "includes_common_fields": true,
+      "additional_properties": false,
+      "row_eligibility": "Verified source account/environment and permitted company/purpose scope; accepted or explicitly retracted analytical revision; unresolved identities remain internal exceptions. Platform-wide health/shared-cost exceptions follow H03.",
+      "retention_profile": "RET-AI-DETAIL for invocation_attempt; RET-CORE for accepted direct/shared expense and approved minimized monthly aggregate",
+      "detail_audience_functions": [
+        "finance_analyst",
+        "named_analytics_operator"
+      ],
+      "allowed_fields": {
+        "usage_id": {
+          "type": "opaque_token",
+          "purpose": "Canonical actual usage/expense identity independent of its imported trace copy.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "usage_kind": {
+          "type": "enum",
+          "purpose": "Separates direct attempt from shared-pool allocation.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "invocation_id": {
+          "type": "opaque_token|null",
+          "purpose": "Logical AI invocation; required for invocation_attempt.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "attempt_id": {
+          "type": "opaque_token|null",
+          "purpose": "Separately billable actual attempt; required for invocation_attempt.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "trace_id": {
+          "type": "opaque_token|null",
+          "purpose": "Primary trace identity; not the usage-cost dedup key by itself.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "workflow_id": {
+          "type": "registered_token|null",
+          "purpose": "Linked workflow when available.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "action_id": {
+          "type": "uuid|null",
+          "purpose": "Linked authorized action when available.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "opportunity_id": {
+          "type": "opaque_token|null",
+          "purpose": "Verified opportunity linkage; unlinked costs remain visible.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "provider": {
+          "type": "registered_token",
+          "purpose": "Approved vendor/provider identifier.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "model": {
+          "type": "registered_token|null",
+          "purpose": "Actual provider model identifier when applicable.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "model_version": {
+          "type": "opaque_token|null",
+          "purpose": "Actual model version when observable; unknown remains null.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "release_version": {
+          "type": "opaque_token|null",
+          "purpose": "Actual instrumentation/application release at occurrence.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "input_tokens": {
+          "type": "nonnegative_integer_string|null",
+          "purpose": "Observed usage quantity; null means unknown, not zero.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "output_tokens": {
+          "type": "nonnegative_integer_string|null",
+          "purpose": "Observed usage quantity.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "cached_input_tokens": {
+          "type": "nonnegative_integer_string|null",
+          "purpose": "Observed cache quantity under provider semantics.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "latency_ms": {
+          "type": "nonnegative_integer|null",
+          "purpose": "Measured latency under a named clock/boundary definition.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "latency_definition_version": {
+          "type": "opaque_token|null",
+          "purpose": "Defines time-to-response/full completion and retry handling.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "outcome": {
+          "type": "enum",
+          "purpose": "Outcome of this actual attempt.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "failure_class": {
+          "type": "registered_token|null",
+          "purpose": "Typed error category; no raw error text.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "amount_decimal": {
+          "type": "exact_decimal_string|null",
+          "purpose": "Cost in currency major units at preserved precision; null is unknown.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "decimal_scale": {
+          "type": "nonnegative_integer|null",
+          "purpose": "Exact stored precision; scale is not forced to 2.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "currency": {
+          "type": "currency_code|null",
+          "purpose": "Null only when cost is unknown; otherwise original cost currency.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "cost_component": {
+          "type": "registered_token",
+          "purpose": "AI/provider/infrastructure/etc. component under adopted H02 definition.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "cost_basis": {
+          "type": "enum",
+          "purpose": "Measurement basis.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "cost_representation_id": {
+          "type": "opaque_token",
+          "purpose": "Identifies this measurement/estimate/allocation for the same expense.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "adopted_cost": {
+          "type": "boolean",
+          "purpose": "Only one authoritative adopted representation per canonical usage+component+period can enter totals.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "price_version": {
+          "type": "opaque_token|null",
+          "purpose": "Version/effective period of estimation rates.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "expense_pool_id": {
+          "type": "opaque_token|null",
+          "purpose": "Required for allocation; prevents adding a shared pool to its allocated copies.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "allocation_version": {
+          "type": "opaque_token|null",
+          "purpose": "Required for expense allocation.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "measurement_coverage": {
+          "type": "enum",
+          "purpose": "Usage and cost coverage.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "cost_scope": {
+          "type": "enum",
+          "purpose": "Explicit allocation scope; company requires company_id and platform requires null company_id. A shared expense pool is not silently assigned to a tenant.",
+          "requiredness_ref": "event-contracts.v1.json"
+        }
+      },
+      "learning_use": "denied_under_this_policy"
+    },
+    {
+      "record_contract": "rpt_source_health_v1",
+      "contract_version": "1.0.0",
+      "candidate_for": "internal_operational_reporting",
+      "includes_common_fields": true,
+      "additional_properties": false,
+      "row_eligibility": "Verified source account/environment and permitted company/purpose scope; accepted or explicitly retracted analytical revision; unresolved identities remain internal exceptions. Platform-wide health/shared-cost exceptions follow H03.",
+      "retention_profile": "RET-HEALTH",
+      "detail_audience_functions": [
+        "named_analytics_operator"
+      ],
+      "allowed_fields": {
+        "health_scope": {
+          "type": "enum",
+          "purpose": "Only company scope requires company_id; platform health may be null.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "source_id": {
+          "type": "registered_token",
+          "purpose": "Configured source dataset, not a secret key.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "source_configuration_version": {
+          "type": "opaque_token",
+          "purpose": "Reviewed account/resource/field/sync-mode configuration version.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "run_id": {
+          "type": "opaque_token",
+          "purpose": "Unique observed ingestion or reconciliation run.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "check_id": {
+          "type": "registered_token",
+          "purpose": "Versioned check identity.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "started_at": {
+          "type": "utc_instant",
+          "purpose": "Observed start.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "completed_at": {
+          "type": "utc_instant|null",
+          "purpose": "Actual completion or null.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "last_success_at": {
+          "type": "utc_instant|null",
+          "purpose": "Last actual successful run, not last attempt.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "lag_seconds": {
+          "type": "nonnegative_integer|null",
+          "purpose": "Lag relative to verified cutoff and observed clock; null if unmeasurable.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "expected_record_count": {
+          "type": "nonnegative_integer_string|null",
+          "purpose": "Independent expected population where measurable.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "observed_record_count": {
+          "type": "nonnegative_integer_string",
+          "purpose": "Observed accepted records under this check.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "unmapped_count": {
+          "type": "nonnegative_integer_string",
+          "purpose": "Unmapped identity exception count, without exporting raw exception payloads.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "ambiguous_count": {
+          "type": "nonnegative_integer_string",
+          "purpose": "Conflicting identity count.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "mismatch_count": {
+          "type": "nonnegative_integer_string",
+          "purpose": "Reconciliation mismatch count.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "exception_amount_minor": {
+          "type": "signed_integer_string|null",
+          "purpose": "Exact exception amount for one component/currency; no mixed-currency scalar.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "currency": {
+          "type": "currency_code|null",
+          "purpose": "Required when exception amount is present.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "currency_exponent": {
+          "type": "nonnegative_integer|null",
+          "purpose": "Required when exception amount is present.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "financial_component": {
+          "type": "registered_token|null",
+          "purpose": "Required when exception financial amount is present.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "status": {
+          "type": "enum",
+          "purpose": "Data-health status, never payment/action business state.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "correction_checkpoint": {
+          "type": "opaque_token|null",
+          "purpose": "Last accepted correction/replay checkpoint, not a command to replay operational work.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "exception_absolute_amount_minor": {
+          "type": "nonnegative_integer_string|null",
+          "purpose": "Sum of absolute exception magnitudes for the same component/currency/exponent; signed net can cancel and never replaces this exposure.",
+          "requiredness_ref": "event-contracts.v1.json"
+        },
+        "matched_expected_record_count": {
+          "type": "nonnegative_integer_string|null",
+          "purpose": "Distinct records verified against the independently expected population; duplicates/extras do not raise coverage.",
+          "requiredness_ref": "event-contracts.v1.json"
+        }
+      },
+      "learning_use": "denied_under_this_policy"
+    }
+  ],
+  "conditional_restrictions": [
+    {
+      "id": "H04-F01",
+      "applies_to": "Every company_id",
+      "rule": "Must be server-verified and permitted for internal reporting. Null is allowed only for H03 explicit platform-health/shared-cost cases, never for accepted tenant facts."
+    },
+    {
+      "id": "H04-F02",
+      "applies_to": "Every source_ref, related_source_refs[], pricing_evidence_ref, first_value_source_ref and entity_ref",
+      "rule": "Approved company, connected merchant account, observability project, source configuration/run/check, estimate/option-set, job, invoice, payment, financial component, platform subscription/price/product, workflow/action, approved import batch or cost pool reference only. End-customer, staff/user, pay-period, personal-contact, payment-method, bank/card and arbitrary document subjects are denied. The narrowly defined platform_billing_customer exception is H04-F03."
+    },
+    {
+      "id": "H04-F03",
+      "applies_to": "rpt_company_identity_v1 source_ref with resource_type customer",
+      "rule": "Only a verified platform_billing_customer mapping to companies.stripeCustomerId may use the opaque Stripe customer ID for company subscription classification. customers.stripeCustomerId for a merchant end customer is excluded. No Customer object payload is allowed."
+    },
+    {
+      "id": "H04-F04",
+      "applies_to": "trade_category, company_size_band, region_code",
+      "rule": "Optional only when needed for an accepted card and supported by approved coarse registry values. Region is coarse company geography, not address, postcode, GPS or customer service location; exact staff counts, names and payroll are excluded."
+    },
+    {
+      "id": "H04-F05",
+      "applies_to": "feature_snapshot_ref, feature_set_version, feature_as_of, evaluation_population_ref",
+      "rule": "Opaque lineage pointers and timing only. No feature payload or source document is permitted by these fields; no cross-company training right is implied."
+    },
+    {
+      "id": "H04-F06",
+      "applies_to": "failure_class, disposition_code, selection_reason_code, adjustment_reason_code, source_event_type, workflow/model/trace labels",
+      "rule": "Registered controlled categories only. Map errors to a safe code at source; do not export raw errorMessage, stack, provider request/response body, customer content or user-supplied span/tool name."
+    },
+    {
+      "id": "H04-F07",
+      "applies_to": "rpt_source_health_v1",
+      "rule": "Only configured-source/run/check metadata, quality state and aggregate exception counts/amounts. Raw unmapped objects, account-holder contact details, connection strings, host credentials and diagnostic payloads stay out."
+    },
+    {
+      "id": "H04-F08",
+      "applies_to": "financial and cost rows",
+      "rule": "Finance/cost detail grants are separate from general workflow dashboard access. Source-account/company scope, currency and basis remain visible; exposed amounts must satisfy the H02 classification."
+    },
+    {
+      "id": "H04-F09",
+      "applies_to": "related_source_refs[] and assist_product_ids[]",
+      "rule": "Bound cardinality in the implementation; only approved reference/token types. Exporting every source object or arbitrary tags is denied. Assists remain non-additive."
+    },
+    {
+      "id": "H04-F10",
+      "applies_to": "identity valid-time/source-history rows",
+      "rule": "Retain only mapping histories needed by active permitted records. User identity/actor details and entire company settings objects are not mapping fields."
+    },
+    {
+      "id": "H04-F11",
+      "applies_to": "rpt_usage_cost_v1 cost_scope",
+      "rule": "company requires a verified non-null company_id; platform requires company_id null and a separately accepted internal platform-cost grant. An unresolved tenant mapping is never relabeled platform cost."
+    },
+    {
+      "id": "H04-F12",
+      "applies_to": "Any proposed monthly cost/health aggregate",
+      "rule": "No free-form aggregate schema is implicitly approved by a retention profile. C12/H06 must bind a closed minimized aggregate schema, accepted metric and retention purpose before materialization. Otherwise older detail expiry produces explicit unavailable/partial coverage."
+    }
+  ],
+  "supporting_inputs": [
+    {
+      "name": "platform_subscription_item_input_v1",
+      "status": "candidate_minimized_input",
+      "purpose": "PA-M02 as-of platform recurring contract value; not a required eighth table",
+      "includes_company_environment_and_versioned_source_context": true,
+      "additional_properties": false,
+      "allowed_fields": [
+        "source_ref",
+        "subscription_ref",
+        "product_ref",
+        "price_ref",
+        "billing_kind",
+        "contract_status",
+        "interval",
+        "interval_count",
+        "quantity",
+        "net_recurring_interval_amount_minor",
+        "unit_amount_decimal_minor",
+        "currency",
+        "currency_exponent",
+        "discount_summary",
+        "discount_version",
+        "discount_policy_version",
+        "trial_ends_at",
+        "paused_at",
+        "cancellation_effective_at",
+        "valid_from",
+        "valid_to",
+        "source_cutoff_at",
+        "trial_starts_at",
+        "collection_pause_active",
+        "price_support_state",
+        "price_support_reason_code"
+      ],
+      "closed_object_rules": {
+        "source_ref": "source_ref",
+        "subscription_ref": "source_ref",
+        "product_ref": "source_ref",
+        "price_ref": "source_ref",
+        "discount_summary": "discount_summary[]"
+      },
+      "retention_profile": "RET-CORE",
+      "learning_use": "denied_under_this_policy",
+      "constraints": [
+        "Only verified Renvani platform subscriptions; merchant maintenance/VIP subscriptions excluded.",
+        "No coupon/customer/product/item display names, metadata bags, descriptions or billing addresses.",
+        "Unknown multi-item/stacked-discount allocation remains an exception unless the adapter verifies the adopted H02 definition.",
+        "trial_starts_at is an actual source UTC instant or null, never inferred from trial_ends_at.",
+        "collection_pause_active is a closed boolean/null flag distinct from subscription status; unknown pause/price support remains an explicit H02 exception.",
+        "price_support_state is supported/unsupported/unknown; price_support_reason_code is a safe registered reason. Raw tiers, transform objects or arbitrary price payloads are not approved."
+      ]
+    },
+    {
+      "name": "company_activation_input_v1",
+      "status": "candidate_minimized_input",
+      "purpose": "PA-M06 through PA-M09 stable company cohorts and backend milestone timing; not a required eighth table",
+      "includes_company_environment_and_versioned_source_context": true,
+      "additional_properties": false,
+      "allowed_fields": [
+        "company_id",
+        "cohort_id",
+        "cohort_definition_version",
+        "service_ready_at",
+        "eligible_at",
+        "eligibility_policy_version",
+        "activation_milestone_id",
+        "activation_milestone_version",
+        "first_value_at",
+        "first_value_source_ref",
+        "first_value_opportunity_id",
+        "activation_window_end_at",
+        "repeat_window_end_at",
+        "window_policy_version",
+        "observation_cutoff_at",
+        "mature_through_at",
+        "readiness_state",
+        "exclusion_reason_code"
+      ],
+      "closed_object_rules": {
+        "first_value_source_ref": "source_ref"
+      },
+      "retention_profile": "RET-CORE",
+      "learning_use": "denied_under_this_policy",
+      "constraints": [
+        "Readiness/exclusion codes are registered categories, not onboarding notes.",
+        "No staff email/login history or end-customer detail is needed.",
+        "Accepted product milestone/window definition and authoritative source are runtime gates."
+      ]
+    }
+  ],
+  "query_output_contract": {
+    "additional_properties": false,
+    "allowed_context_fields": [
+      "metric_id",
+      "metric_version",
+      "query_version",
+      "source_configuration_versions",
+      "generated_at",
+      "source_cutoff_at",
+      "period_start_at",
+      "period_end_at",
+      "reporting_timezone",
+      "cohort_id",
+      "cohort_definition_version",
+      "filter_version",
+      "environment",
+      "account_mode_scope",
+      "currency_or_unit",
+      "quality_state",
+      "query_manifest_ref",
+      "display_sources_truncated",
+      "computation_truncated"
+    ],
+    "allowed_result_fields": [
+      "value",
+      "numerator",
+      "denominator",
+      "observed_count",
+      "eligible_count",
+      "pending_count",
+      "unavailable_reason_code",
+      "source_refs"
+    ],
+    "constraints": [
+      "Outputs bind an accepted metric/version and exact contract-specific units; this is not a generic arbitrary query result permission.",
+      "Amounts/ratios retain exact representation and null/quality semantics from H02.",
+      "source_refs uses only the closed approved source_ref type; source drill-through reauthorizes access in Renvani/provider.",
+      "Ad hoc queries/downloads require the effective audience grants and registered export purpose/expiry.",
+      "cohort_id and cohort_definition_version are present and nullable for noncohort metrics; filter_version and query_manifest_ref are controlled versioned references, never arbitrary query/filter text.",
+      "source_configuration_versions and account_mode_scope use the closed item shapes; they may not contain connection strings, account-holder data or credentials.",
+      "computation_truncated equals quality_state.computation_truncated; display_sources_truncated describes shown references, not calculation completeness.",
+      "currency_or_unit is the registered context dictated by metric/version; no free-form text or mixed-currency aggregate.",
+      "query_manifest_ref is an opaque handle to an immutable internal record binding the exact resolved company set/population snapshot, actual filter values/definition, period/timezone/currency/environment/account-mode, source revisions/cutoffs and producing authorization context. None of that internal context is implicitly exported. Missing/incomplete or mutable-only manifest blocks a complete/reproducible result; missing verified access scope denies output rather than broadening it. Current query/drill-through access must be reauthorized; the handle never grants permission."
+    ],
+    "retention_profile": "RET-EXPORT for downloaded copies; underlying data keeps its profile",
+    "closed_context_objects": {
+      "source_configuration_versions": {
+        "type": "array",
+        "additional_item_properties": false,
+        "allowed_item_fields": {
+          "source_id": "registered_token",
+          "source_configuration_version": "opaque_token"
+        }
+      },
+      "account_mode_scope": {
+        "type": "array",
+        "additional_item_properties": false,
+        "allowed_item_fields": {
+          "source_system": "registered_token",
+          "account_id": "opaque_token",
+          "provider_mode": "live|test|not_applicable",
+          "environment": "registered_token"
+        }
+      },
+      "quality_state": {
+        "type": "quality_state",
+        "contract_ref": "event-contracts.v1.json#shared_types.quality_state"
+      }
+    },
+    "result_shape_binding_status": "H06/C06/C11 must bind exact closed per-metric result schemas before an output is enabled. The listed scalar fields are candidate output families, not an approval of arbitrary vectors or JSON.",
+    "vector_output_gate": {
+      "examples": [
+        "PA-M16 latency percentiles/sample coverage",
+        "PA-M21 signed and absolute identity exception exposure",
+        "PA-M22 signed and absolute reconciliation differences",
+        "PA-M24 cohort maturity/link-completeness breakdown"
+      ],
+      "rule": "Return only quantities and grouping keys declared by the accepted H02 definition, with a closed H06 metric-specific shape and source/quality binding. Unbounded dimension labels, arbitrary nested data and source payloads remain denied; review the output field-policy extension before release."
+    }
+  },
+  "vendor_transport_binding": {
+    "status": "C10/C11_must_bind_and_inspect_actual_SDK_or_API_payload",
+    "candidate_wrapper_fields": [
+      {
+        "name": "event",
+        "allowed_value": "Fixed registered semantic event name, not user text."
+      },
+      {
+        "name": "timestamp",
+        "allowed_value": "The corresponding authoritative UTC event occurrence time."
+      },
+      {
+        "name": "distinct_id",
+        "allowed_value": "A server-issued company-scoped opaque reporting identity in its environment. Explicit H03 platform-scoped health/cost may use a separate registered platform reporting identity in the restricted internal project. Never email, phone, staff/customer ID or an anonymous fallback for an unresolved tenant. Exact SDK identity strategy verified in C10/C11."
+      },
+      {
+        "name": "properties",
+        "allowed_value": "Only fields from the named closed reporting record and explicitly mapped reviewed SDK control properties."
+      }
+    ],
+    "not_implicitly_allowed": [
+      "autocapture",
+      "session replay",
+      "browser URLs or query strings",
+      "IP address or precise GeoIP",
+      "person profile properties",
+      "user-agent/device identifiers",
+      "tool descriptions/schemas",
+      "raw exception capture",
+      "arbitrary SDK context tags",
+      "full Langfuse trace import"
+    ],
+    "credential_rule": "Credential/project-token transport fields are handled through the approved secret/configuration mechanism and are not business/event properties or stored reporting fields.",
+    "automatic_metadata_rule": "Inspect actual emitted and stored payloads, including provider/SDK-added fields and failure/stream paths. Record any required protocol metadata explicitly before enabling native capture; no broad metadata exception.",
+    "record_requirement": "Changing producer/SDK/source configuration requires renewed payload-diff and schema review before new fields can flow."
+  },
+  "denied_categories": [
+    {
+      "category": "secrets_authentication",
+      "examples": [
+        "passwordHash",
+        "emailVerificationTokenHash",
+        "refresh token/hash",
+        "api_key",
+        "authorization header",
+        "signing secret",
+        "paymentToken",
+        "signed URL",
+        "connection string"
+      ]
+    },
+    {
+      "category": "end_customer_and_staff_identity",
+      "examples": [
+        "customerId",
+        "staff/user/actor IDs",
+        "clerkUserId",
+        "firstName",
+        "lastName",
+        "email",
+        "phone",
+        "street address",
+        "postcode",
+        "GPS",
+        "browser/device/session identifiers"
+      ]
+    },
+    {
+      "category": "raw_business_and_personal_content",
+      "examples": [
+        "activity_events.payload",
+        "activity_events.summary",
+        "actorName",
+        "internalNotes",
+        "accessNotes",
+        "job notes",
+        "messageToCustomer",
+        "SMS/email/chat body",
+        "call recording/transcript",
+        "support ticket body",
+        "uploaded document/image"
+      ]
+    },
+    {
+      "category": "raw_ai_content",
+      "examples": [
+        "prompt",
+        "system instructions",
+        "completion",
+        "reasoning text",
+        "embedding input",
+        "retrieved document",
+        "tool arguments/results",
+        "tool descriptions/schemas",
+        "raw errorMessage",
+        "stack trace",
+        "free-form span/trace names"
+      ]
+    },
+    {
+      "category": "payment_method_and_banking",
+      "examples": [
+        "card details/fingerprint",
+        "bank account/routing information",
+        "payment_method object",
+        "billing address",
+        "receipt email",
+        "checkNumber",
+        "unstructured referenceNumber",
+        "payment link URL"
+      ]
+    },
+    {
+      "category": "workforce_and_sensitive_records",
+      "examples": [
+        "payroll",
+        "wages/salary",
+        "tax identifiers",
+        "employee performance notes",
+        "health/sensitive personal notes",
+        "employment documents"
+      ]
+    },
+    {
+      "category": "unbounded_nested_objects",
+      "examples": [
+        "company.settings",
+        "Stripe metadata bag",
+        "billing_details",
+        "customer expanded object",
+        "provider error payload",
+        "arbitrary properties/features",
+        "full RCI evidence packet",
+        "full Langfuse trace"
+      ]
+    }
+  ],
+  "native_connector_decisions": [
+    {
+      "source": "Postgres",
+      "status": "conditional",
+      "decision": "Expose only approved reporting projections under a dedicated read-only export identity, select exact fields, inspect mandatory key/cursor columns and defaults. Base tables and SELECT * are not approved.",
+      "owner_tickets": [
+        "PAI-C03",
+        "PAI-C04",
+        "PAI-C17"
+      ],
+      "evidence_url": "https://posthog.com/docs/data-pipelines/sources/postgres"
+    },
+    {
+      "source": "Stripe native managed source",
+      "status": "conditional_not_approved_for_transfer",
+      "decision": "Inspect full resource and nested payload schema before transfer. Managed-schema Stripe masking and API row filters are not supported by current docs. Exclude resources with denied fields; use a sanitized Renvani-side financial projection when native cannot meet the policy. Hiding downstream fields is insufficient.",
+      "owner_tickets": [
+        "PAI-C01",
+        "PAI-C05",
+        "PAI-C17"
+      ],
+      "evidence_url": "https://posthog.com/docs/data-pipelines/sources"
+    },
+    {
+      "source": "AI observability / Langfuse import",
+      "status": "conditional",
+      "decision": "Choose one primary path, inspect and allowlist every exported property. Privacy mode alone does not remove custom names/properties/tool descriptions. Whole-trace import is not approved.",
+      "owner_tickets": [
+        "PAI-C01",
+        "PAI-C11",
+        "PAI-C17"
+      ],
+      "evidence_url": "https://posthog.com/docs/ai-observability/privacy-mode"
+    }
+  ],
+  "examples": [
+    {
+      "id": "H04-EX01",
+      "kind": "illustrative_allowed_fragment_not_complete_record",
+      "input": {
+        "company_id": "11111111-1111-4111-8111-111111111111",
+        "financial_component": "platform_application_fee",
+        "amount_minor": "2000",
+        "currency": "USD",
+        "currency_exponent": 2
+      },
+      "decision": "candidate_allow",
+      "reason": "Exact classified company financial facts after real scope and source verification; historical actual fee does not assume the founder rate."
+    },
+    {
+      "id": "H04-EX02",
+      "kind": "illustrative_allowed_fragment_not_complete_record",
+      "input": {
+        "provider": "example_provider",
+        "model": "registered_model",
+        "input_tokens": "1000",
+        "output_tokens": "100",
+        "failure_class": "rate_limited",
+        "amount_decimal": "0.000125",
+        "decimal_scale": 6
+      },
+      "decision": "candidate_allow",
+      "reason": "Quantitative usage and registered failure category only; actual allowed registry/source/cost basis still required."
+    },
+    {
+      "id": "H04-EX03",
+      "input_path": "Stripe.Invoice.customer_email or Stripe.Charge.billing_details.email",
+      "decision": "deny",
+      "reason": "Not required reporting field; cannot solve by dropping the column only after transfer."
+    },
+    {
+      "id": "H04-EX04",
+      "input_path": "activity_events.summary, actorName or payload.customer.phone",
+      "decision": "deny",
+      "reason": "Existing activity table mixes required facts with personal/free-form content; construct the closed reporting event instead."
+    },
+    {
+      "id": "H04-EX05",
+      "input_path": "Langfuse metadata.errorMessage or actorId",
+      "decision": "deny",
+      "reason": "Existing stub may carry free text/staff identity; map to registered failure_class and omit actor identifier."
+    },
+    {
+      "id": "H04-EX06",
+      "input_path": "source_ref.object_id for verified companies.stripeCustomerId with mapping_role platform_billing_customer",
+      "decision": "candidate_allow",
+      "reason": "Opaque company billing identity only, no expanded Customer object."
+    },
+    {
+      "id": "H04-EX07",
+      "input_path": "customers.stripeCustomerId or SHA-256(email)",
+      "decision": "deny",
+      "reason": "End-customer join/contact surrogate is unnecessary for these metrics; a hash is not a permission or anonymity proof."
+    },
+    {
+      "id": "H04-EX08",
+      "input_path": "AI span_name containing an address, even with privacy mode on",
+      "decision": "deny",
+      "reason": "Only a registered fixed name is permitted; sensitive content can survive in custom metadata."
+    },
+    {
+      "id": "H04-EX09",
+      "input_path": "source_ref.debug_payload or discount_summary[].description",
+      "decision": "deny",
+      "reason": "Nested object types are closed; unknown children are not inherited from an approved parent field."
+    },
+    {
+      "id": "H04-EX10",
+      "input_path": "financial rows used to materialize a cross-company learning dataset",
+      "decision": "deny",
+      "reason": "The reporting purpose does not grant L01 learning rights."
+    }
+  ],
+  "required_runtime_evidence": [
+    {
+      "tickets": [
+        "PAI-C01",
+        "PAI-H07"
+      ],
+      "evidence": "Actual purpose/region/company/destination/entitlement decisions and accepted retention profiles."
+    },
+    {
+      "tickets": [
+        "PAI-C03",
+        "PAI-C04",
+        "PAI-C05"
+      ],
+      "evidence": "Exact schema/grants/source resource and nested field inventory, outgoing data sample with synthetic sensitive sentinels, mandatory-key review, update/delete modes and fallback selection."
+    },
+    {
+      "tickets": [
+        "PAI-C10",
+        "PAI-C11"
+      ],
+      "evidence": "Captured serialized SDK/network payloads and destination fields for normal, failure, retry and streaming cases; safe IDs/defaults/control fields and disabled ancillary capture."
+    },
+    {
+      "tickets": [
+        "PAI-C07",
+        "PAI-C17"
+      ],
+      "evidence": "Actual correction/deletion/withdrawal and replay prevention; actual positive/negative access and export proofs for the enabled slice."
+    }
+  ],
+  "verification_boundary": "H04 artifacts and worked decisions can be reviewed here. H05 synthetic automation, H07 account runbook, C17 runtime verification and actual policy acceptance are not claimed executed by this JSON.",
+  "references": [
+    "identity-contract.md",
+    "event-contracts.v1.json",
+    "metric-catalog.v1.json",
+    "data-dictionary.md",
+    "reporting-access-matrix.md",
+    "retention-correction-policy.md",
+    "https://github.com/SimonShaun2/Renvani/blob/5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58/packages/db/src/schema.ts",
+    "https://github.com/SimonShaun2/Renvani/blob/5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58/packages/types/src/connected-intelligence/v1/contracts.ts"
+  ]
+}

@@ -1,25 +1,25 @@
 # 01: Platform Analytics Preparation We Can Complete Here
 
-Version 1.0 · November 7, 2026 · Eight tickets / two preparation sprints
+Version 1.1 · November 7, 2026 · H01–H04 prepared; H05–H08 planned
 
 ## Purpose and execution boundary
 
 Prepare the contracts, examples, dashboard definitions, and acceptance evidence for the selected Stripe + PostHog internal analytics approach. This track is suitable for bounded work in this ChatGPT environment: source review, requirements, structured data definitions, synthetic fixtures, logical query templates, small isolated pure validators, and documentation review. It does not require connecting production services to begin.
 
-The current task publishes this specification and backlog. **All implementation tickets remain Planned.** Initial source research in the build plan is useful input to H01, but it does not complete every preparation artifact listed below. No fixture harness, runtime integration, vendor dashboard, or training pipeline is claimed as implemented.
+The user authorized **Track A H01–H04**, and the associated source/decision, metric, identity/event/outcome and export-policy artifacts are now supplied in the [H01–H04 checkpoint](../planning/platform-analytics/preparation/H01-H04-CHECKPOINT.md). Its review and validation receipts describe the bounded evidence. H05–H08 and every runtime/later-learning ticket remain **Planned**. This is documentation and machine-readable contract preparation, not a fixture harness, active provider integration or live dashboard.
 
 - [Build plan and verified sources](../planning/PLATFORM-ANALYTICS-BUILD-PLAN-2026-11-07.md)
 - [02: Technical and Codex/Cursor specification](PLATFORM-ANALYTICS-02-CODEX-CURSOR-SPRINTS-2026-11-07.md)
 - [Implementation start here](../handoffs/PLATFORM-ANALYTICS-START-HERE-2026-11-07.md)
 - [Machine-readable ticket ledger](../planning/platform-analytics/ticket-ledger.v1.json)
 
-PAI-H identifiers are local planning IDs. Map them to the existing FS program before assigning execution. All output paths beginning `preparation/` below are proposed paths relative to `docs/planning/platform-analytics/`; they are deliverables to build, not files claimed to exist today.
+PAI-H identifiers are local planning IDs. H01 maps existing FS/RCI responsibility; runtime owner assignments are still C01 work. Paths beginning `preparation/` are relative to `docs/planning/platform-analytics/`. H01–H04 deliverable paths now exist, with the ownership crosswalk at `preparation/ownership-crosswalk.md`. H05–H08 paths remain future outputs; no official FS card is marked Done.
 
 ## Reuse before extending
 
 Current baseline is `dev` at `5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58`. Existing Connected Intelligence H01–H16 is merged in #452, and the C integration plan is merged in #449. Use its scope, evidence, quality, calculation, claim, and readiness contracts where applicable. Inspect `packages/types/src/connected-intelligence/v1/`, `apps/api/src/services/connected-intelligence/foundation-math.ts`, and the foundation handoff before proposing a new helper.
 
-The earlier foundation does not automatically become a public runtime API. Runtime adoption, approved readers, authenticated integrations, and exports remain implementation work. Extend compatible contracts rather than copying them into a parallel metric engine.
+The earlier foundation does not automatically become a public runtime API. Runtime adoption, approved readers, authenticated integrations, and exports remain implementation work. The H02/H03 audit found that current RCI v1 money helpers assume two decimals and its metric catalog does not register PA-M01–PA-M24. Reuse exact-Decimal/quality concepts through a reviewed versioned adapter or compatible extension; do not coerce unsupported values or copy a parallel metric engine. See H01 D13.
 
 Reuse #445 workflows, #442 mission preparation, and preserved FS-43 observability work. The plan's source register distinguishes merged source from actual deployment evidence and identifies stale historical status prose.
 
@@ -36,7 +36,7 @@ Codex/Cursor can perform read-only source/provider discovery in parallel. Do not
 
 ## What can be coded here
 
-If a subsequent instruction starts this track, appropriate small code work includes JSON/Zod contract validation, fixture normalizers, exact classification invariants, a dependency/coverage checker, and tests for pure transformations. Prefer existing project tooling and existing exact-money helpers. No database, live credentials, customer records, provider calls, production imports, or new public exports are needed for those bounded tasks.
+For the remaining H05–H08 work, appropriate small code includes JSON/Zod contract validation, fixture normalizers, exact classification invariants, dependency/coverage checks and tests for pure transformations. Prefer existing tooling and reuse accepted exact-money helpers where their precision/semantics fit; document the versioned adapter needed otherwise. No database, live credentials, customer records, provider calls, production imports or new public exports are needed for bounded offline preparation.
 
 Do not add tests that merely restate an implementation. Test meaningful invariants: one financial object is counted once; merchant cash is not platform revenue; late fee refunds change the correct component; missing costs remain missing; unsupported claims are refused. A documentation check is not a runtime test.
 
@@ -52,7 +52,7 @@ Each card has a measurable output, dependency, boundary, acceptance criteria, an
 
 ### PAI-H01: Source, ownership, and decision register
 
-**Sprint:** H1 · **Status:** Planned · **Assignment:** Unassigned
+**Sprint:** H1 · **Status:** Prepared — see H01–H04 review/validation; unmerged · **Assignment:** Unassigned
 
 **Objective:** Freeze the relevant source evidence and map this work to the existing Renvani program before implementation.
 
@@ -64,7 +64,7 @@ Each card has a measurable output, dependency, boundary, acceptance criteria, an
 
 - preparation/source-register.json
 - preparation/decision-register.md
-- Existing FS/RCI ownership crosswalk
+- preparation/ownership-crosswalk.md
 
 **Acceptance criteria:**
 
@@ -77,7 +77,7 @@ Each card has a measurable output, dependency, boundary, acceptance criteria, an
 
 ### PAI-H02: Financial classification and metric catalog
 
-**Sprint:** H1 · **Status:** Planned · **Assignment:** Unassigned
+**Sprint:** H1 · **Status:** Prepared — see H01–H04 review/validation; unmerged · **Assignment:** Unassigned
 
 **Objective:** Make each dashboard number reproducible and consistent with the existing evidence system.
 
@@ -102,7 +102,7 @@ Each card has a measurable output, dependency, boundary, acceptance criteria, an
 
 ### PAI-H03: Company identity, event, and outcome contracts
 
-**Sprint:** H1 · **Status:** Planned · **Assignment:** Unassigned
+**Sprint:** H1 · **Status:** Prepared — see H01–H04 review/validation; unmerged · **Assignment:** Unassigned
 
 **Objective:** Specify stable joins and lifecycle meanings across Stripe, the application, product events, and AI traces.
 
@@ -127,7 +127,7 @@ Each card has a measurable output, dependency, boundary, acceptance criteria, an
 
 ### PAI-H04: Export permissions, minimization, and correction contract
 
-**Sprint:** H1 · **Status:** Planned · **Assignment:** Unassigned
+**Sprint:** H1 · **Status:** Prepared — see H01–H04 review/validation; unmerged · **Assignment:** Unassigned
 
 **Objective:** Define what internal analytics may receive and who may use it, independently of training permission.
 
@@ -263,4 +263,4 @@ Each card has a measurable output, dependency, boundary, acceptance criteria, an
 - Independent review findings have a disposition; actual command results and unexecuted checks remain distinguishable.
 - The first implementation slice and its release evidence are explicit.
 
-These are criteria for future H-track completion. Publication of this plan is not a declaration that they have all passed.
+These are criteria for the complete eight-ticket H track. H01–H04 supplies the first preparation subset; publication of this checkpoint is not a declaration that H05–H08 or runtime gates have passed.

@@ -1,9 +1,9 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "program": "Renvani Platform Analytics",
   "document_date": "2026-11-07",
   "source_baseline": "5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58",
-  "status": "planning_complete_implementation_not_started",
+  "status": "h01_h04_prepared_runtime_not_started",
   "id_namespace": "Local planning IDs; not official FS assignments",
   "counts": {
     "here": 8,
@@ -15,7 +15,22 @@
     "docs/planning/PLATFORM-ANALYTICS-BUILD-PLAN-2026-11-07.md",
     "docs/build-specs/PLATFORM-ANALYTICS-01-CHATGPT-FOUNDATION-SPRINTS-2026-11-07.md",
     "docs/build-specs/PLATFORM-ANALYTICS-02-CODEX-CURSOR-SPRINTS-2026-11-07.md",
-    "docs/handoffs/PLATFORM-ANALYTICS-START-HERE-2026-11-07.md"
+    "docs/handoffs/PLATFORM-ANALYTICS-START-HERE-2026-11-07.md",
+    "docs/planning/platform-analytics/preparation/source-register.json",
+    "docs/planning/platform-analytics/preparation/decision-register.md",
+    "docs/planning/platform-analytics/preparation/ownership-crosswalk.md",
+    "docs/planning/platform-analytics/preparation/metric-catalog.v1.json",
+    "docs/planning/platform-analytics/preparation/financial-classification.md",
+    "docs/planning/platform-analytics/preparation/data-dictionary.md",
+    "docs/planning/platform-analytics/preparation/identity-contract.md",
+    "docs/planning/platform-analytics/preparation/event-contracts.v1.json",
+    "docs/planning/platform-analytics/preparation/outcome-lifecycle.md",
+    "docs/planning/platform-analytics/preparation/export-field-allowlist.v1.json",
+    "docs/planning/platform-analytics/preparation/reporting-access-matrix.md",
+    "docs/planning/platform-analytics/preparation/retention-correction-policy.md",
+    "docs/planning/platform-analytics/preparation/H01-H04-CHECKPOINT.md",
+    "docs/planning/platform-analytics/preparation/h01-h04-review.md",
+    "docs/planning/platform-analytics/preparation/h01-h04-validation.v1.json"
   ],
   "tickets": [
     {
@@ -23,7 +38,7 @@
       "title": "Source, ownership, and decision register",
       "sprint": "H1",
       "track": "here",
-      "status": "planned",
+      "status": "prepared",
       "official_fs_ticket": null,
       "assignee": null,
       "dependencies": [],
@@ -32,9 +47,9 @@
       "outputs": [
         "preparation/source-register.json",
         "preparation/decision-register.md",
-        "Existing FS/RCI ownership crosswalk"
+        "preparation/ownership-crosswalk.md"
       ],
-      "scope": "Refresh the bounded Stripe, identity, event, outcome, observability, and governance inventory. Record specifications, implemented source, and deployed behavior separately. Confirm preserved FS-43 work and merged H01\u2013H16 rather than recreating them.",
+      "scope": "Refresh the bounded Stripe, identity, event, outcome, observability, and governance inventory. Record specifications, implemented source, and deployed behavior separately. Confirm preserved FS-43 work and merged H01–H16 rather than recreating them.",
       "acceptance_criteria": [
         "Each source records a full commit or document revision, path/URL, domain owner function, known limitation, and evidence level.",
         "Map #442, #445, #449, #452, FS-43/#142, and applicable RCI-C tickets to reuse, extension, or prerequisite status.",
@@ -45,15 +60,31 @@
         "Readback of pinned sources and actual PR metadata",
         "Independent review of scope and duplicate-work mapping"
       ],
-      "implementation_evidence": [],
-      "runtime_verified": false
+      "implementation_evidence": [
+        {
+          "kind": "preparation_artifact",
+          "path": "docs/planning/platform-analytics/preparation/source-register.json"
+        },
+        {
+          "kind": "preparation_artifact",
+          "path": "docs/planning/platform-analytics/preparation/decision-register.md"
+        },
+        {
+          "kind": "preparation_artifact",
+          "path": "docs/planning/platform-analytics/preparation/ownership-crosswalk.md"
+        }
+      ],
+      "runtime_verified": false,
+      "preparation_review": "docs/planning/platform-analytics/preparation/h01-h04-review.md",
+      "preparation_validation": "docs/planning/platform-analytics/preparation/h01-h04-validation.v1.json",
+      "delivery_boundary": "Documentation, machine-readable definitions and worked examples; no runtime integration, policy approval or official FS Done status."
     },
     {
       "id": "PAI-H02",
       "title": "Financial classification and metric catalog",
       "sprint": "H1",
       "track": "here",
-      "status": "planned",
+      "status": "prepared",
       "official_fs_ticket": null,
       "assignee": null,
       "dependencies": [
@@ -77,15 +108,31 @@
         "Hand-calculated examples with independent expected totals",
         "Metric-to-source and metric-to-card coverage review"
       ],
-      "implementation_evidence": [],
-      "runtime_verified": false
+      "implementation_evidence": [
+        {
+          "kind": "preparation_artifact",
+          "path": "docs/planning/platform-analytics/preparation/metric-catalog.v1.json"
+        },
+        {
+          "kind": "preparation_artifact",
+          "path": "docs/planning/platform-analytics/preparation/financial-classification.md"
+        },
+        {
+          "kind": "preparation_artifact",
+          "path": "docs/planning/platform-analytics/preparation/data-dictionary.md"
+        }
+      ],
+      "runtime_verified": false,
+      "preparation_review": "docs/planning/platform-analytics/preparation/h01-h04-review.md",
+      "preparation_validation": "docs/planning/platform-analytics/preparation/h01-h04-validation.v1.json",
+      "delivery_boundary": "Documentation, machine-readable definitions and worked examples; no runtime integration, policy approval or official FS Done status."
     },
     {
       "id": "PAI-H03",
       "title": "Company identity, event, and outcome contracts",
       "sprint": "H1",
       "track": "here",
-      "status": "planned",
+      "status": "prepared",
       "official_fs_ticket": null,
       "assignee": null,
       "dependencies": [
@@ -107,17 +154,33 @@
       ],
       "verification": [
         "Synthetic cross-account, duplicate, and allocation examples",
-        "Compatibility review against merged H01\u2013H16 and current event consumers"
+        "Compatibility review against merged H01–H16 and current event consumers"
       ],
-      "implementation_evidence": [],
-      "runtime_verified": false
+      "implementation_evidence": [
+        {
+          "kind": "preparation_artifact",
+          "path": "docs/planning/platform-analytics/preparation/identity-contract.md"
+        },
+        {
+          "kind": "preparation_artifact",
+          "path": "docs/planning/platform-analytics/preparation/event-contracts.v1.json"
+        },
+        {
+          "kind": "preparation_artifact",
+          "path": "docs/planning/platform-analytics/preparation/outcome-lifecycle.md"
+        }
+      ],
+      "runtime_verified": false,
+      "preparation_review": "docs/planning/platform-analytics/preparation/h01-h04-review.md",
+      "preparation_validation": "docs/planning/platform-analytics/preparation/h01-h04-validation.v1.json",
+      "delivery_boundary": "Documentation, machine-readable definitions and worked examples; no runtime integration, policy approval or official FS Done status."
     },
     {
       "id": "PAI-H04",
       "title": "Export permissions, minimization, and correction contract",
       "sprint": "H1",
       "track": "here",
-      "status": "planned",
+      "status": "prepared",
       "official_fs_ticket": null,
       "assignee": null,
       "dependencies": [
@@ -141,8 +204,24 @@
         "Allowed/denied field examples",
         "Access matrix and data-processing-purpose review"
       ],
-      "implementation_evidence": [],
-      "runtime_verified": false
+      "implementation_evidence": [
+        {
+          "kind": "preparation_artifact",
+          "path": "docs/planning/platform-analytics/preparation/export-field-allowlist.v1.json"
+        },
+        {
+          "kind": "preparation_artifact",
+          "path": "docs/planning/platform-analytics/preparation/reporting-access-matrix.md"
+        },
+        {
+          "kind": "preparation_artifact",
+          "path": "docs/planning/platform-analytics/preparation/retention-correction-policy.md"
+        }
+      ],
+      "runtime_verified": false,
+      "preparation_review": "docs/planning/platform-analytics/preparation/h01-h04-review.md",
+      "preparation_validation": "docs/planning/platform-analytics/preparation/h01-h04-validation.v1.json",
+      "delivery_boundary": "Documentation, machine-readable definitions and worked examples; no runtime integration, policy approval or official FS Done status."
     },
     {
       "id": "PAI-H05",
@@ -488,7 +567,7 @@
         "MRR, collected cash, settlement, merchant volume, and contribution remain distinct; no future-fee forecast derives from the unresolved pricing discrepancy."
       ],
       "verification": [
-        "AT02\u2013AT08, AT17",
+        "AT02–AT08, AT17",
         "Source-object and independently calculated fixture comparison"
       ],
       "implementation_evidence": [],
@@ -556,7 +635,7 @@
         "Unresolved discrepancies and reconciliation freshness are visible and suppress affected verified badges; an operational owner and investigation path exist."
       ],
       "verification": [
-        "AT02\u2013AT08, AT10, AT17, AT26",
+        "AT02–AT08, AT10, AT17, AT26",
         "Independent financial sample review"
       ],
       "implementation_evidence": [],
@@ -592,7 +671,7 @@
         "Imported history stays baseline; observed linked revenue is labeled assisted/associated and never asserted as incremental lift."
       ],
       "verification": [
-        "AT12\u2013AT16, AT17",
+        "AT12–AT16, AT17",
         "End-to-end existing-workflow trace with late and unsuccessful outcomes"
       ],
       "implementation_evidence": [],
@@ -697,7 +776,7 @@
         "Cost per successful workflow includes the defined eligible-cohort attempt costs and discloses pending outcome coverage; zero denominator yields unavailable."
       ],
       "verification": [
-        "AT17\u2013AT19, AT28",
+        "AT17–AT19, AT28",
         "Cost-pool and independent allocation review"
       ],
       "implementation_evidence": [],
@@ -800,7 +879,7 @@
         "Every outcome has source links or an explicit missing-link state; only a later accepted experiment can enable an incremental-lift label."
       ],
       "verification": [
-        "AT12\u2013AT16, AT26, AT32",
+        "AT12–AT16, AT26, AT32",
         "Source-to-opportunity allocation walkthrough"
       ],
       "implementation_evidence": [],
@@ -838,7 +917,7 @@
         "Dashboard failure or source outage does not imply operational payment failure and cannot trigger business writes."
       ],
       "verification": [
-        "AT18, AT20, AT23, AT26\u2013AT28",
+        "AT18, AT20, AT23, AT26–AT28",
         "Controlled source-outage and alert test"
       ],
       "implementation_evidence": [],
@@ -882,7 +961,7 @@
         "Application commit, provider/source/query configuration, relevant CI, reviewer identities, findings, and remaining disabled scope are recorded; no self-certified production acceptance."
       ],
       "verification": [
-        "All enabled AT01\u2013AT29 cases",
+        "All enabled AT01–AT29 cases",
         "Actual independent runtime review"
       ],
       "implementation_evidence": [],
@@ -1049,7 +1128,7 @@
         "LLM output quality, prediction accuracy, and business lift are reported separately; failed evaluation retains the prior baseline."
       ],
       "verification": [
-        "AT30\u2013AT32",
+        "AT30–AT32",
         "Independent offline and shadow evaluation"
       ],
       "implementation_evidence": [],
@@ -1084,7 +1163,7 @@
         "A versioned rollback restores the prior policy without corrupting outcome history; no claim that every company necessarily improves."
       ],
       "verification": [
-        "AT30\u2013AT32",
+        "AT30–AT32",
         "Independent measurement and release review",
         "Rollback rehearsal"
       ],
@@ -1308,5 +1387,19 @@
         "AT26"
       ]
     }
-  ]
+  ],
+  "status_semantics": {
+    "planned": "Scoped backlog; requested deliverable not supplied in this execution.",
+    "prepared": "H01-H04 documents and machine-readable definitions supplied; bounded review/validation referenced. Not official FS Done, merge, policy acceptance or runtime verification."
+  },
+  "progress": {
+    "preparation_artifacts_supplied": 4,
+    "preparation_total": 8,
+    "preparation_remaining": 4,
+    "runtime_tickets_implemented": 0,
+    "runtime_total": 20,
+    "later_learning_implemented": 0,
+    "later_learning_total": 3,
+    "note": "Counts track local ticket deliverables, not whole-product completion."
+  }
 }

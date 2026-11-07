@@ -1,0 +1,322 @@
+{
+  "schema_version": "1.0.0",
+  "scope": "H01-H04 document/contract integrity and exact worked-example arithmetic only",
+  "executed_at": "2026-11-07T12:38:18.759370+00:00",
+  "command": "python verify_h01_h04.py (bounded preparation validation; scratch orchestration helper)",
+  "checker_sha256": "87f583471e47bc44964567ba62f6d574756b82d84d4106f0d9774155fb875815",
+  "application_source_commit": "5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58",
+  "planning_base_commit": "e374f5007878e547958ae0e3c26098e58420171a",
+  "result": "passed",
+  "checks_passed": 26,
+  "checks_failed": 0,
+  "checks": [
+    {
+      "id": "twelve_core_artifacts_present",
+      "passed": true,
+      "detail": [
+        "source-register.json",
+        "decision-register.md",
+        "ownership-crosswalk.md",
+        "metric-catalog.v1.json",
+        "financial-classification.md",
+        "data-dictionary.md",
+        "identity-contract.md",
+        "event-contracts.v1.json",
+        "outcome-lifecycle.md",
+        "export-field-allowlist.v1.json",
+        "reporting-access-matrix.md",
+        "retention-correction-policy.md"
+      ]
+    },
+    {
+      "id": "core_json_parses",
+      "passed": true,
+      "detail": [
+        "event-contracts.v1.json",
+        "export-field-allowlist.v1.json",
+        "metric-catalog.v1.json",
+        "source-register.json"
+      ]
+    },
+    {
+      "id": "exact_24_metric_ids",
+      "passed": true,
+      "detail": [
+        "PA-M01",
+        "PA-M02",
+        "PA-M03",
+        "PA-M04",
+        "PA-M05",
+        "PA-M06",
+        "PA-M07",
+        "PA-M08",
+        "PA-M09",
+        "PA-M10",
+        "PA-M11",
+        "PA-M12",
+        "PA-M13",
+        "PA-M14",
+        "PA-M15",
+        "PA-M16",
+        "PA-M17",
+        "PA-M18",
+        "PA-M19",
+        "PA-M20",
+        "PA-M21",
+        "PA-M22",
+        "PA-M23",
+        "PA-M24"
+      ]
+    },
+    {
+      "id": "metric_definition_coverage",
+      "passed": true,
+      "detail": [
+        "version",
+        "formula",
+        "grain",
+        "authoritative_sources",
+        "required_logical_inputs",
+        "required_fields",
+        "population",
+        "time_basis",
+        "unit",
+        "currency_policy",
+        "exclusions",
+        "freshness",
+        "completeness",
+        "drill_through",
+        "proposed_cards",
+        "implementation_tickets",
+        "examples"
+      ]
+    },
+    {
+      "id": "all_metrics_runtime_disabled",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "id": "metric_card_and_example_coverage",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "id": "all_metric_sources_resolve",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "id": "source_evidence_metadata",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "id": "source_ids_unique",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "id": "current_source_blob_pins_match",
+      "passed": true,
+      "detail": {
+        "checked": 29,
+        "mismatches": 0
+      }
+    },
+    {
+      "id": "required_pr_states",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "id": "seven_logical_records_align",
+      "passed": true,
+      "detail": [
+        "rpt_company_identity_v1",
+        "rpt_financial_posting_v1",
+        "rpt_outcome_allocation_v1",
+        "rpt_source_health_v1",
+        "rpt_usage_cost_v1",
+        "rpt_workflow_fact_v1",
+        "rpt_workflow_opportunity_v1"
+      ]
+    },
+    {
+      "id": "common_fields_align",
+      "passed": true,
+      "detail": {
+        "count": 19
+      }
+    },
+    {
+      "id": "common_field_types_align",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "id": "record_fields_and_types_align",
+      "passed": true,
+      "detail": {
+        "fields": 150
+      }
+    },
+    {
+      "id": "supporting_input_fields_align",
+      "passed": true,
+      "detail": [
+        "company_activation_input_v1",
+        "platform_subscription_item_input_v1"
+      ]
+    },
+    {
+      "id": "result_metadata_aligns",
+      "passed": true,
+      "detail": {
+        "fields": 19
+      }
+    },
+    {
+      "id": "default_deny_policy",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "id": "semantic_events_unique",
+      "passed": true,
+      "detail": {
+        "count": 24
+      }
+    },
+    {
+      "id": "metric_required_field_references",
+      "passed": true,
+      "detail": {}
+    },
+    {
+      "id": "ticket_counts_preserved",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "id": "no_official_assignment_invented",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "id": "only_four_preparation_statuses_changed",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "id": "ticket_dependencies_valid",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "id": "worked_example_arithmetic",
+      "passed": true,
+      "detail": {
+        "checks": 18,
+        "results": {
+          "EX01_component_total": true,
+          "EX02_mrr_and_change": true,
+          "EX02_aggregate_rounding": true,
+          "EX03_signed_residual": true,
+          "EX03_actual_fee_refund": true,
+          "EX04_cash_credit": true,
+          "EX05_cohort_and_repeat": true,
+          "EX06_stage_rates": true,
+          "EX07_microcost": true,
+          "EX07_attempt_coverage": true,
+          "EX08_cost_contribution": true,
+          "EX08_estimate_replacement": true,
+          "EX09_offsetting_mismatches": true,
+          "EX09_key_coverage": true,
+          "H03_A_signed_conservation": true,
+          "H03_B_corrected_set": true,
+          "H03_C_wrong_sign_rejected_in_example": true,
+          "H03_D_minor_unit_splits": true
+        }
+      }
+    },
+    {
+      "id": "relative_document_links_resolve",
+      "passed": true,
+      "detail": []
+    }
+  ],
+  "artifact_sha256_manifest": [
+    {
+      "path": "docs/planning/platform-analytics/preparation/source-register.json",
+      "sha256": "4a85ba31558217c973747fc3cec21d0fea078fffc0256ea350d96b927b78ba0b",
+      "bytes": 72943
+    },
+    {
+      "path": "docs/planning/platform-analytics/preparation/decision-register.md",
+      "sha256": "e70a40102261e78c5940a3049235c887b876aa1d53f62ec94472ecb98186b78a",
+      "bytes": 19263
+    },
+    {
+      "path": "docs/planning/platform-analytics/preparation/ownership-crosswalk.md",
+      "sha256": "52e12ef88f52d8ff118bb6020dbff7f91ee5a6ab44a294bc294174ab465de564",
+      "bytes": 9221
+    },
+    {
+      "path": "docs/planning/platform-analytics/preparation/metric-catalog.v1.json",
+      "sha256": "f343853b8b8220e763a1e517c849fe1cd81eb746cd6b5236bd72d78c154b942b",
+      "bytes": 155892
+    },
+    {
+      "path": "docs/planning/platform-analytics/preparation/financial-classification.md",
+      "sha256": "8b5a1a7fc0c1eecd63b39d75f46fb217fef2c74ed81ff927d1f7cb9e5cd035e8",
+      "bytes": 28770
+    },
+    {
+      "path": "docs/planning/platform-analytics/preparation/data-dictionary.md",
+      "sha256": "212adc4d2df3f81d7be5782ad37a11e41495cfc3c6b4d2d097ebd77f73a1f70a",
+      "bytes": 37372
+    },
+    {
+      "path": "docs/planning/platform-analytics/preparation/identity-contract.md",
+      "sha256": "c641b042ec26786fc58a293d312bc8cb9b29690f7aab3f5d6235126c64bb9328",
+      "bytes": 18351
+    },
+    {
+      "path": "docs/planning/platform-analytics/preparation/event-contracts.v1.json",
+      "sha256": "28a7ee0335ebacd77ac81d0adc533bc2b7073ee4a00e32aa285562dc84e92621",
+      "bytes": 84274
+    },
+    {
+      "path": "docs/planning/platform-analytics/preparation/outcome-lifecycle.md",
+      "sha256": "82d118b880fa4295481d83daebd6ff28c2a0a3324fa6f04014f5c59d6d65c6eb",
+      "bytes": 24566
+    },
+    {
+      "path": "docs/planning/platform-analytics/preparation/export-field-allowlist.v1.json",
+      "sha256": "148bd9d08b09343f4032c7ef0b7ab751020bcff61c74b50d1adc02ce9cdc9a66",
+      "bytes": 75905
+    },
+    {
+      "path": "docs/planning/platform-analytics/preparation/reporting-access-matrix.md",
+      "sha256": "9b83b244c2fac05da19259c0143c0ee93f44a4e4945d2bf14f6caa1f3eb5aeb0",
+      "bytes": 21363
+    },
+    {
+      "path": "docs/planning/platform-analytics/preparation/retention-correction-policy.md",
+      "sha256": "f82dc4a1594ab4737fd8e8dbed86c33ac375e8590649a717d9ee2b19a66a0c30",
+      "bytes": 21353
+    }
+  ],
+  "review_record": "h01-h04-review.md",
+  "not_executed": [
+    "H05 structured fixture suite or runtime validator",
+    "RCI foundation tests",
+    "application TypeScript/build/lint/tests",
+    "database/RLS/authorization tests",
+    "provider account/source/payload/access tests",
+    "actual financial reconciliation or correction/deletion",
+    "CI, deployment, dashboard pilot or shared-learning evaluation"
+  ],
+  "interpretation": "Assertions validate these supplied definitions, field mappings, references and example arithmetic. They do not establish that a reporting engine implements them, policy approval exists, or an integration is accepted."
+}

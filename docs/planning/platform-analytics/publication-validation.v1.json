@@ -1,0 +1,78 @@
+{
+  "schema_version": "1.0",
+  "kind": "documentation_integrity_record",
+  "date": "2026-11-07",
+  "source_baseline": "5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58",
+  "counts": {
+    "tickets": 31,
+    "here_tickets": 8,
+    "integration_tickets": 20,
+    "later_learning_tickets": 3,
+    "metrics": 24,
+    "planned_acceptance_cases": 32,
+    "requirements": 14
+  },
+  "checks": {
+    "unique_ticket_cards": "pass",
+    "dependency_references": "pass",
+    "dependency_cycles": "none",
+    "local_package_links": "pass",
+    "ledger_card_acceptance_parity": "pass",
+    "status_honesty": "all_planned",
+    "review_corrections": "applied"
+  },
+  "review_findings": [
+    {
+      "reviewer": "/root/reporting_current_state_audit",
+      "scope": "plan and ledger",
+      "material_findings": 0
+    },
+    {
+      "reviewer": "/root/reporting_spec_blueprint",
+      "scope": "preparation spec and handoff",
+      "material_findings": 0,
+      "publication_crosslinks": "verify on publication"
+    },
+    {
+      "reviewer": "/root/reporting_here_prep_track",
+      "scope": "technical spec",
+      "material_findings": 2,
+      "disposition": "signed refund allocation conservation and H02/authoritative-milestone dependency applied"
+    }
+  ],
+  "runtime_tests": "not_run",
+  "provider_configuration": "not_enabled",
+  "application_code_changed": false,
+  "official_fs_tickets_created": false,
+  "notion_pages": {
+    "plan": "411317b9-2d15-819b-baa1-e440c435716d",
+    "preparation": "411317b9-2d15-8193-8f51-d90f152246e9",
+    "integration": "411317b9-2d15-81cf-b465-f6b51677013f"
+  },
+  "files": [
+    {
+      "path": "docs/build-specs/PLATFORM-ANALYTICS-01-CHATGPT-FOUNDATION-SPRINTS-2026-11-07.md",
+      "sha256": "2c6ea4564b589167a752e15705afe0748912d41587b33a9a7a187428a20db23c"
+    },
+    {
+      "path": "docs/build-specs/PLATFORM-ANALYTICS-02-CODEX-CURSOR-SPRINTS-2026-11-07.md",
+      "sha256": "6417be81cd65a3547dc71352aa3d21d084c7dda626b804a4389615dcad7b64e5"
+    },
+    {
+      "path": "docs/handoffs/PLATFORM-ANALYTICS-START-HERE-2026-11-07.md",
+      "sha256": "b5dcab93cc97a42f230e64cd95bf95a7f2e11c6775ba177cd4e070e83806e5a6"
+    },
+    {
+      "path": "docs/planning/PLATFORM-ANALYTICS-BUILD-PLAN-2026-11-07.md",
+      "sha256": "be2260d2cad646f2f868205652afc6f85d322a768c988bb6177f4074be2bd5ba"
+    },
+    {
+      "path": "docs/planning/platform-analytics/ticket-ledger.v1.json",
+      "sha256": "27154ffd137ec1c912c1b3868b67e799372678405ee5bf5d0cae641ac73ed620"
+    }
+  ],
+  "receipt_scope": "Historical integrity receipt for the initial planning-only publication; not current H01-H04 execution status.",
+  "initial_planning_publication_commit": "e374f5007878e547958ae0e3c26098e58420171a",
+  "historical_hash_note": "The original file digests and all_planned check describe the initial package before H01-H04 preparation. Do not compare them as current branch digests.",
+  "current_preparation_evidence": "preparation/h01-h04-validation.v1.json"
+}

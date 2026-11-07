@@ -1,0 +1,1405 @@
+{
+  "schema_version": "1.1",
+  "program": "Renvani Platform Analytics",
+  "document_date": "2026-11-07",
+  "source_baseline": "5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58",
+  "status": "h01_h04_prepared_runtime_not_started",
+  "id_namespace": "Local planning IDs; not official FS assignments",
+  "counts": {
+    "here": 8,
+    "codex_cursor": 20,
+    "later_codex_cursor": 3,
+    "total": 31
+  },
+  "artifacts": [
+    "docs/planning/PLATFORM-ANALYTICS-BUILD-PLAN-2026-11-07.md",
+    "docs/build-specs/PLATFORM-ANALYTICS-01-CHATGPT-FOUNDATION-SPRINTS-2026-11-07.md",
+    "docs/build-specs/PLATFORM-ANALYTICS-02-CODEX-CURSOR-SPRINTS-2026-11-07.md",
+    "docs/handoffs/PLATFORM-ANALYTICS-START-HERE-2026-11-07.md",
+    "docs/planning/platform-analytics/preparation/source-register.json",
+    "docs/planning/platform-analytics/preparation/decision-register.md",
+    "docs/planning/platform-analytics/preparation/ownership-crosswalk.md",
+    "docs/planning/platform-analytics/preparation/metric-catalog.v1.json",
+    "docs/planning/platform-analytics/preparation/financial-classification.md",
+    "docs/planning/platform-analytics/preparation/data-dictionary.md",
+    "docs/planning/platform-analytics/preparation/identity-contract.md",
+    "docs/planning/platform-analytics/preparation/event-contracts.v1.json",
+    "docs/planning/platform-analytics/preparation/outcome-lifecycle.md",
+    "docs/planning/platform-analytics/preparation/export-field-allowlist.v1.json",
+    "docs/planning/platform-analytics/preparation/reporting-access-matrix.md",
+    "docs/planning/platform-analytics/preparation/retention-correction-policy.md",
+    "docs/planning/platform-analytics/preparation/H01-H04-CHECKPOINT.md",
+    "docs/planning/platform-analytics/preparation/h01-h04-review.md",
+    "docs/planning/platform-analytics/preparation/h01-h04-validation.v1.json"
+  ],
+  "tickets": [
+    {
+      "id": "PAI-H01",
+      "title": "Source, ownership, and decision register",
+      "sprint": "H1",
+      "track": "here",
+      "status": "prepared",
+      "official_fs_ticket": null,
+      "assignee": null,
+      "dependencies": [],
+      "conditional_dependencies": [],
+      "objective": "Freeze the relevant source evidence and map this work to the existing Renvani program before implementation.",
+      "outputs": [
+        "preparation/source-register.json",
+        "preparation/decision-register.md",
+        "preparation/ownership-crosswalk.md"
+      ],
+      "scope": "Refresh the bounded Stripe, identity, event, outcome, observability, and governance inventory. Record specifications, implemented source, and deployed behavior separately. Confirm preserved FS-43 work and merged H01–H16 rather than recreating them.",
+      "acceptance_criteria": [
+        "Each source records a full commit or document revision, path/URL, domain owner function, known limitation, and evidence level.",
+        "Map #442, #445, #449, #452, FS-43/#142, and applicable RCI-C tickets to reuse, extension, or prerequisite status.",
+        "Record founder 5% direction versus inspected 2% checkout implementation as an unresolved alignment issue; do not change pricing through this initiative.",
+        "List decision owners and affected tickets; preserve Phase A/B, financial, review, and release boundaries."
+      ],
+      "verification": [
+        "Readback of pinned sources and actual PR metadata",
+        "Independent review of scope and duplicate-work mapping"
+      ],
+      "implementation_evidence": [
+        {
+          "kind": "preparation_artifact",
+          "path": "docs/planning/platform-analytics/preparation/source-register.json"
+        },
+        {
+          "kind": "preparation_artifact",
+          "path": "docs/planning/platform-analytics/preparation/decision-register.md"
+        },
+        {
+          "kind": "preparation_artifact",
+          "path": "docs/planning/platform-analytics/preparation/ownership-crosswalk.md"
+        }
+      ],
+      "runtime_verified": false,
+      "preparation_review": "docs/planning/platform-analytics/preparation/h01-h04-review.md",
+      "preparation_validation": "docs/planning/platform-analytics/preparation/h01-h04-validation.v1.json",
+      "delivery_boundary": "Documentation, machine-readable definitions and worked examples; no runtime integration, policy approval or official FS Done status."
+    },
+    {
+      "id": "PAI-H02",
+      "title": "Financial classification and metric catalog",
+      "sprint": "H1",
+      "track": "here",
+      "status": "prepared",
+      "official_fs_ticket": null,
+      "assignee": null,
+      "dependencies": [
+        "PAI-H01"
+      ],
+      "conditional_dependencies": [],
+      "objective": "Make each dashboard number reproducible and consistent with the existing evidence system.",
+      "outputs": [
+        "preparation/metric-catalog.v1.json",
+        "preparation/financial-classification.md",
+        "preparation/data-dictionary.md"
+      ],
+      "scope": "Expand the initial metric catalog in Document 2 into versioned definitions. Reuse existing RCI calculation/quality contracts and keep platform-company economics distinct from merchant business metrics.",
+      "acceptance_criteria": [
+        "Every metric has ID/version, formula, grain, authoritative source, population, time basis, unit/currency, exclusions, freshness, completeness, and source drill-through.",
+        "Separate platform subscriptions, merchant subscriptions, actual application fees, merchant collections, processor expenses, transfers, and adjustments.",
+        "Use actual fee and fee-refund records; distinguish MRR, cash receipts, settlement, and accounting recognition; document status/discount/proration rules for MRR.",
+        "Unknown costs are not zero; mixed currencies are not silently summed; imported history is baseline; incomplete data cannot support complete-profit or causal-lift claims."
+      ],
+      "verification": [
+        "Hand-calculated examples with independent expected totals",
+        "Metric-to-source and metric-to-card coverage review"
+      ],
+      "implementation_evidence": [
+        {
+          "kind": "preparation_artifact",
+          "path": "docs/planning/platform-analytics/preparation/metric-catalog.v1.json"
+        },
+        {
+          "kind": "preparation_artifact",
+          "path": "docs/planning/platform-analytics/preparation/financial-classification.md"
+        },
+        {
+          "kind": "preparation_artifact",
+          "path": "docs/planning/platform-analytics/preparation/data-dictionary.md"
+        }
+      ],
+      "runtime_verified": false,
+      "preparation_review": "docs/planning/platform-analytics/preparation/h01-h04-review.md",
+      "preparation_validation": "docs/planning/platform-analytics/preparation/h01-h04-validation.v1.json",
+      "delivery_boundary": "Documentation, machine-readable definitions and worked examples; no runtime integration, policy approval or official FS Done status."
+    },
+    {
+      "id": "PAI-H03",
+      "title": "Company identity, event, and outcome contracts",
+      "sprint": "H1",
+      "track": "here",
+      "status": "prepared",
+      "official_fs_ticket": null,
+      "assignee": null,
+      "dependencies": [
+        "PAI-H01"
+      ],
+      "conditional_dependencies": [],
+      "objective": "Specify stable joins and lifecycle meanings across Stripe, the application, product events, and AI traces.",
+      "outputs": [
+        "preparation/identity-contract.md",
+        "preparation/event-contracts.v1.json",
+        "preparation/outcome-lifecycle.md"
+      ],
+      "scope": "Define logical reporting records and proposed schema extensions only where existing contracts are insufficient. Specify account/mode/object identity, valid-time company mapping, immutable event IDs, correction revisions, and canonical opportunity allocation.",
+      "acceptance_criteria": [
+        "Canonical company identity comes from trusted server scope; email is never the join key; account and live/test scope prevent provider-object collisions.",
+        "Events include schema/source versions, occurrence and ingestion time, company, source references, and relevant opportunity/action/workflow/release IDs.",
+        "Approval, execution attempt, provider acknowledgement, delivery, customer response, booking, completion, and collection remain distinct facts.",
+        "Idempotency, replay, late correction, one-to-many payment allocation, and non-additive product assistance have explicit rules; missing mappings are exceptions."
+      ],
+      "verification": [
+        "Synthetic cross-account, duplicate, and allocation examples",
+        "Compatibility review against merged H01–H16 and current event consumers"
+      ],
+      "implementation_evidence": [
+        {
+          "kind": "preparation_artifact",
+          "path": "docs/planning/platform-analytics/preparation/identity-contract.md"
+        },
+        {
+          "kind": "preparation_artifact",
+          "path": "docs/planning/platform-analytics/preparation/event-contracts.v1.json"
+        },
+        {
+          "kind": "preparation_artifact",
+          "path": "docs/planning/platform-analytics/preparation/outcome-lifecycle.md"
+        }
+      ],
+      "runtime_verified": false,
+      "preparation_review": "docs/planning/platform-analytics/preparation/h01-h04-review.md",
+      "preparation_validation": "docs/planning/platform-analytics/preparation/h01-h04-validation.v1.json",
+      "delivery_boundary": "Documentation, machine-readable definitions and worked examples; no runtime integration, policy approval or official FS Done status."
+    },
+    {
+      "id": "PAI-H04",
+      "title": "Export permissions, minimization, and correction contract",
+      "sprint": "H1",
+      "track": "here",
+      "status": "prepared",
+      "official_fs_ticket": null,
+      "assignee": null,
+      "dependencies": [
+        "PAI-H01"
+      ],
+      "conditional_dependencies": [],
+      "objective": "Define what internal analytics may receive and who may use it, independently of training permission.",
+      "outputs": [
+        "preparation/export-field-allowlist.v1.json",
+        "preparation/reporting-access-matrix.md",
+        "preparation/retention-correction-policy.md"
+      ],
+      "scope": "Specify purpose, region, retention, staff roles, approved fields, correction/deletion propagation, and allowed query outputs. Include actual Stripe source column inspection as an implementation gate, because selecting tables may still export unnecessary personal data.",
+      "acceptance_criteria": [
+        "Distinguish internal operational reporting, customer-facing access, and cross-company learning permissions; PostHog groups are not security isolation.",
+        "Exclude secrets, end-customer contact details, message bodies, raw prompts/outputs, payment-method details, payroll data, and sensitive notes by default.",
+        "Document the read-only export identity, permitted reporting objects, vendor access/exports, and a fallback if native connector payloads cannot meet the approved field policy.",
+        "Specify retention, withdrawal, correction, and deletion handling for copies/backups; financial retention exceptions require an explicit policy, not a silent promise of universal erasure."
+      ],
+      "verification": [
+        "Allowed/denied field examples",
+        "Access matrix and data-processing-purpose review"
+      ],
+      "implementation_evidence": [
+        {
+          "kind": "preparation_artifact",
+          "path": "docs/planning/platform-analytics/preparation/export-field-allowlist.v1.json"
+        },
+        {
+          "kind": "preparation_artifact",
+          "path": "docs/planning/platform-analytics/preparation/reporting-access-matrix.md"
+        },
+        {
+          "kind": "preparation_artifact",
+          "path": "docs/planning/platform-analytics/preparation/retention-correction-policy.md"
+        }
+      ],
+      "runtime_verified": false,
+      "preparation_review": "docs/planning/platform-analytics/preparation/h01-h04-review.md",
+      "preparation_validation": "docs/planning/platform-analytics/preparation/h01-h04-validation.v1.json",
+      "delivery_boundary": "Documentation, machine-readable definitions and worked examples; no runtime integration, policy approval or official FS Done status."
+    },
+    {
+      "id": "PAI-H05",
+      "title": "Synthetic fixtures and acceptance matrix",
+      "sprint": "H2",
+      "track": "here",
+      "status": "planned",
+      "official_fs_ticket": null,
+      "assignee": null,
+      "dependencies": [
+        "PAI-H02",
+        "PAI-H03",
+        "PAI-H04"
+      ],
+      "conditional_dependencies": [],
+      "objective": "Create reproducible expected results for the reporting invariants before real customer data is connected.",
+      "outputs": [
+        "preparation/fixtures/*.json",
+        "preparation/expected-results.v1.json",
+        "preparation/acceptance-matrix.md",
+        "Optional isolated offline validator using existing tooling"
+      ],
+      "scope": "Build synthetic-only platform/merchant, refund, duplicate, late-arrival, identity, workflow, privacy, and cost examples. Implement a small pure validator only where it checks a meaningful invariant; do not rebuild existing RCI arithmetic.",
+      "acceptance_criteria": [
+        "Each Document 2 AT case maps to a fixture or explicit runtime-only check, a metric/contract, and a ticket owner.",
+        "Expected amounts and states cover actual versus assumed fees, merchant versus platform money, partial refunds, fee refunds, multi-currency, missing cost, and unresolved identity.",
+        "Retain declined, failed, unselected, and pending opportunities; imported history and approvals alone cannot become recovered revenue.",
+        "Record executed commands and actual results for any offline validator. Unexecuted cases remain planned; no RLS/provider/deployment pass is inferred."
+      ],
+      "verification": [
+        "Independent expected-result review",
+        "Offline schema/invariant validation if implemented"
+      ],
+      "implementation_evidence": [],
+      "runtime_verified": false
+    },
+    {
+      "id": "PAI-H06",
+      "title": "Four-dashboard blueprint and query contracts",
+      "sprint": "H2",
+      "track": "here",
+      "status": "planned",
+      "official_fs_ticket": null,
+      "assignee": null,
+      "dependencies": [
+        "PAI-H02",
+        "PAI-H03",
+        "PAI-H05"
+      ],
+      "conditional_dependencies": [],
+      "objective": "Give the implementer a precise dashboard specification that uses PostHog's existing interface.",
+      "outputs": [
+        "preparation/dashboard-blueprint.md",
+        "preparation/card-metric-filter-matrix.json",
+        "preparation/logical-query-templates.sql"
+      ],
+      "scope": "Specify economics, activation, workflow outcomes, and AI/data-health cards with business question, source, filter, drill-through, and unavailable-state behavior. Query templates target declared logical views until actual vendor schemas are verified.",
+      "acceptance_criteria": [
+        "Every card maps to a metric ID/version and approved dataset; role-appropriate source detail is defined.",
+        "Period/timezone, unit/currency, population, freshness, completeness, and reconciliation status are visible where relevant.",
+        "Zero, no eligible population, unavailable, stale, and partial states are distinct; missing outcome or AI panels do not block the billing/activation slice.",
+        "Templates are labeled logical until run against real schemas; no new customer UI or new Figma design is implied."
+      ],
+      "verification": [
+        "Fixture-to-card walkthrough",
+        "Query shape and filter/denominator review"
+      ],
+      "implementation_evidence": [],
+      "runtime_verified": false
+    },
+    {
+      "id": "PAI-H07",
+      "title": "Connector, AI-path, and cost runbook",
+      "sprint": "H2",
+      "track": "here",
+      "status": "planned",
+      "official_fs_ticket": null,
+      "assignee": null,
+      "dependencies": [
+        "PAI-H01",
+        "PAI-H03",
+        "PAI-H04"
+      ],
+      "conditional_dependencies": [],
+      "objective": "Prepare concrete configuration and verification steps without enabling services or exposing secrets.",
+      "outputs": [
+        "preparation/connector-runbook.md",
+        "preparation/account-source-inventory.template.json",
+        "preparation/usage-budget-worksheet.md"
+      ],
+      "scope": "Document direct Stripe-to-PostHog plus approved Postgres exports, current provider docs, one AI trace path, initial volumes, account roles, source sync modes, fresh-data targets, and rollback. Stripe-to-Neon is an alternative, not an additional default pipeline.",
+      "acceptance_criteria": [
+        "List required resources/scopes and verify connected-account coverage; distinguish native analytics webhooks from operational payment webhooks.",
+        "Explain backfill and mutable-record behavior, correction/deletion coverage, synchronization latency, and reconciliation samples.",
+        "Inspect native connector fields before transfer; if the approved policy cannot be met, define a filtered export alternative for review.",
+        "Include group-analytics entitlement, source/AI row volumes, retention and caps; distinguish estimated price-derived AI cost from billed expense. Store no keys or raw production records."
+      ],
+      "verification": [
+        "Current official documentation cross-check",
+        "Configuration walkthrough using placeholders and synthetic data only"
+      ],
+      "implementation_evidence": [],
+      "runtime_verified": false
+    },
+    {
+      "id": "PAI-H08",
+      "title": "Independent preparation review and implementation handoff",
+      "sprint": "H2",
+      "track": "here",
+      "status": "planned",
+      "official_fs_ticket": null,
+      "assignee": null,
+      "dependencies": [
+        "PAI-H01",
+        "PAI-H02",
+        "PAI-H03",
+        "PAI-H04",
+        "PAI-H05",
+        "PAI-H06",
+        "PAI-H07"
+      ],
+      "conditional_dependencies": [],
+      "objective": "Deliver a consistent starting package with a precise first implementation slice and visible evidence gaps.",
+      "outputs": [
+        "preparation/START-HERE.md",
+        "preparation/requirement-coverage.json",
+        "preparation/validation-summary.json",
+        "Updated ticket ledger and source pins"
+      ],
+      "scope": "Review the prepared artifacts independently, reconcile findings, validate dependency and requirement coverage, and publish an immutable handoff checkpoint. Distinguish planning completion from tested preparation and live integration.",
+      "acceptance_criteria": [
+        "No dependency cycles, orphan requirements, conflicting metric definitions, broken package references, or invented official ticket assignments.",
+        "The first Codex/Cursor slice and allowed files are explicit; existing H/RCI/FS-43 work is reused and all material open decisions have a route.",
+        "Independent reviewer findings and dispositions are recorded; author self-review does not substitute for required runtime Peer/QA/Security review.",
+        "Every test and provider/access claim has evidence or remains unverified; publication does not activate billing, missions, training, or production."
+      ],
+      "verification": [
+        "Package integrity check",
+        "Independent preparation review",
+        "Readback of saved handoff"
+      ],
+      "implementation_evidence": [],
+      "runtime_verified": false
+    },
+    {
+      "id": "PAI-C01",
+      "title": "Reconcile implementation ownership and integration decisions",
+      "sprint": "C0",
+      "track": "codex_cursor",
+      "status": "planned",
+      "official_fs_ticket": null,
+      "assignee": null,
+      "dependencies": [
+        "PAI-H01",
+        "PAI-H04",
+        "PAI-H07"
+      ],
+      "conditional_dependencies": [],
+      "objective": "Resolve the current source, existing FS work, vendor configuration, and implementation boundaries for the first slice.",
+      "outputs": [
+        "Implementation preflight and FS/RCI crosswalk",
+        "Account/region/mode/source inventory",
+        "One primary AI trace-path decision",
+        "Versioned configuration and budget proposal"
+      ],
+      "scope": "Inspect current dev and preserved FS-43 work; confirm the actual charge design, source scopes, provider entitlements, and export policy. Record the applicable owner functions and branch/file split. Compare completing Langfuse versus native PostHog capture on a bounded sample.",
+      "acceptance_criteria": [
+        "Current commit, existing implementations, overlap, ownership, and first PR scope are recorded; no completed foundation is rebuilt.",
+        "One Stripe ingestion path and one primary AI trace path are selected with account/mode coverage and costs documented.",
+        "Native source field coverage, region/retention/access, resource scopes, and group-analytics entitlement are resolved before relevant real data transfer.",
+        "Founder pricing direction versus source discrepancy is routed separately; no checkout or fee-rate mutation is included."
+      ],
+      "verification": [
+        "Source/configuration review",
+        "Credential-free setup and rollback review"
+      ],
+      "implementation_evidence": [],
+      "runtime_verified": false
+    },
+    {
+      "id": "PAI-C02",
+      "title": "Company and provider identity mapping",
+      "sprint": "C0",
+      "track": "codex_cursor",
+      "status": "planned",
+      "official_fs_ticket": null,
+      "assignee": null,
+      "dependencies": [
+        "PAI-C01",
+        "PAI-H03"
+      ],
+      "conditional_dependencies": [],
+      "objective": "Link every included source record to the correct company without guessing or crossing account environments.",
+      "outputs": [
+        "Versioned identity adapter/projection",
+        "Unmatched/ambiguous mapping report",
+        "Company-group configuration manifest"
+      ],
+      "scope": "Reuse company billing and connected-account IDs with validity history where needed. Include provider account, environment, mode, resource type, and object ID. Server-authorized company context governs business events; a browser property cannot establish financial ownership.",
+      "acceptance_criteria": [
+        "Platform and merchant sample records map correctly across two companies, account changes, and live/test environments.",
+        "Conflicting or missing identity is quarantined with counts and source references, without email-based fallback or assignment to a default company.",
+        "Shared staff and workspace switches do not merge companies; repeated events preserve stable identity.",
+        "Mappings and corrections are auditable; group setup is treated as analysis configuration, not tenant access enforcement."
+      ],
+      "verification": [
+        "AT01, AT09, AT20",
+        "Integration tests for identity corrections and tenant-context changes"
+      ],
+      "implementation_evidence": [],
+      "runtime_verified": false
+    },
+    {
+      "id": "PAI-C03",
+      "title": "Approved reporting projections and database access",
+      "sprint": "C0",
+      "track": "codex_cursor",
+      "status": "planned",
+      "official_fs_ticket": null,
+      "assignee": null,
+      "dependencies": [
+        "PAI-C02",
+        "PAI-H02",
+        "PAI-H03",
+        "PAI-H04"
+      ],
+      "conditional_dependencies": [],
+      "objective": "Expose only the data needed for internal analysis through a constrained read-only boundary.",
+      "outputs": [
+        "Minimal reporting views/projections and migrations if required",
+        "Dedicated integration role/grants",
+        "Export-field manifest",
+        "Projection rebuild procedure"
+      ],
+      "scope": "Implement logical contracts using existing views or rebuildable projections. Changes to persisted domain schema remain in packages/db/src/schema.ts; migration-backed SQL views are derived reporting interfaces. Reuse existing events/outbox/queues and source calculations.",
+      "acceptance_criteria": [
+        "The actual integration role cannot write, read disallowed operational objects, or infer unapproved fields; do not rely on owner/BYPASSRLS behavior.",
+        "Allowed projections contain schema/definition/source versions, exact money, occurrence/update times, and explicit quality states.",
+        "Rebuilding a projection reproduces authoritative results and never calls customer-send, payment, booking, or job-write actions.",
+        "Cross-company aggregation is a separately authorized internal export path, not a weakened customer reader; required migrations and rollback are reviewed."
+      ],
+      "verification": [
+        "AT17, AT20, AT21, AT24",
+        "Real database role/RLS/grant tests",
+        "Projection parity and replay tests"
+      ],
+      "implementation_evidence": [],
+      "runtime_verified": false
+    },
+    {
+      "id": "PAI-C04",
+      "title": "Postgres source configuration and update coverage",
+      "sprint": "C0",
+      "track": "codex_cursor",
+      "status": "planned",
+      "official_fs_ticket": null,
+      "assignee": null,
+      "dependencies": [
+        "PAI-C03",
+        "PAI-H07"
+      ],
+      "conditional_dependencies": [],
+      "objective": "Synchronize the selected reporting contracts into PostHog with visible freshness and complete update behavior.",
+      "outputs": [
+        "Selected Postgres source configuration",
+        "Source/query-mode and schema manifest",
+        "Backfill/update/correction evidence",
+        "Source-load measurements"
+      ],
+      "scope": "Prefer scheduled sync of minimal reporting objects for joined dashboards. Choose full, incremental, or CDC based on mutation/deletion requirements and measured source load. CDC/replication rights require separate justification; avoid unnecessary production broad access.",
+      "acceptance_criteria": [
+        "Initial backfill and subsequent changes preserve unique records and expected values; the declared mode supports the required correction/deletion policy.",
+        "The connector sees only approved objects and fields; copied data has separate vendor access and retention controls.",
+        "Last successful sync, source cutoff, freshness target, backlog, and failure state are available; stale data is not presented as current.",
+        "Polling/backfill load is measured against the agreed baseline and budget; pausing the source does not affect application transactions."
+      ],
+      "verification": [
+        "AT11, AT12, AT22, AT23, AT28",
+        "Real source backfill and update/correction tests"
+      ],
+      "implementation_evidence": [],
+      "runtime_verified": false
+    },
+    {
+      "id": "PAI-C05",
+      "title": "Stripe source configuration and resource coverage",
+      "sprint": "C1",
+      "track": "codex_cursor",
+      "status": "planned",
+      "official_fs_ticket": null,
+      "assignee": null,
+      "dependencies": [
+        "PAI-C01",
+        "PAI-H07"
+      ],
+      "conditional_dependencies": [],
+      "objective": "Import required financial objects using the native connector where its verified scope and field policy fit.",
+      "outputs": [
+        "Stripe account/mode/resource manifest",
+        "Restricted credential and webhook configuration record",
+        "Source freshness and coverage checks"
+      ],
+      "scope": "Configure required subscriptions, invoice/payment allocation, charges, application fees, fee refunds, merchant refunds, and balances/expenses as supported. Inspect actual payload fields before real transfer. If minimization or Connect coverage fails, propose the smallest filtered reporting-export alternative rather than granting broader access.",
+      "acceptance_criteria": [
+        "Actual account and charge design are verified; one platform source is not assumed to cover every connected account.",
+        "Approved resources and fields are available in the right environment; operational payment webhooks remain independent and unchanged.",
+        "Updates to existing objects, cancellations, refunds, and fee adjustments appear correctly; append-only mode is not accepted for mutable financial truth.",
+        "Recorded sync cadence and arrival lag support the enabled dashboard claims; credentials/scopes and rollback are verified without publishing secrets."
+      ],
+      "verification": [
+        "AT02, AT04, AT05, AT06, AT08, AT11, AT21",
+        "Sandbox resource-coverage and mutable-update proof"
+      ],
+      "implementation_evidence": [],
+      "runtime_verified": false
+    },
+    {
+      "id": "PAI-C06",
+      "title": "Governed financial classification and measures",
+      "sprint": "C1",
+      "track": "codex_cursor",
+      "status": "planned",
+      "official_fs_ticket": null,
+      "assignee": null,
+      "dependencies": [
+        "PAI-C02",
+        "PAI-C05",
+        "PAI-H02",
+        "PAI-H03"
+      ],
+      "conditional_dependencies": [],
+      "objective": "Compute Renvani subscription and fee metrics without counting merchant collections as company revenue.",
+      "outputs": [
+        "Versioned financial semantic views/queries",
+        "Source-component classification report",
+        "MRR/cash/fee reconciliation definitions"
+      ],
+      "scope": "Classify using trusted metadata, product/price mappings, account ownership, and local references. Reuse governed decimal calculations. Map changes and reversals to their actual time and financial component; preserve the original source objects.",
+      "acceptance_criteria": [
+        "Only the approved platform subscription classification enters platform MRR/receipts; merchant memberships and transactions remain separate.",
+        "Application fees and actual fee refunds determine fee measures; merchant refunds do not automatically imply fee refunds and transfers are not new revenue.",
+        "Taxes, discounts, proration, status, currency, charge/payment retries, and cutoff rules match the metric version; unknown classes are visible exceptions.",
+        "MRR, collected cash, settlement, merchant volume, and contribution remain distinct; no future-fee forecast derives from the unresolved pricing discrepancy."
+      ],
+      "verification": [
+        "AT02–AT08, AT17",
+        "Source-object and independently calculated fixture comparison"
+      ],
+      "implementation_evidence": [],
+      "runtime_verified": false
+    },
+    {
+      "id": "PAI-C07",
+      "title": "Idempotency, corrections, and safe reporting replay",
+      "sprint": "C1",
+      "track": "codex_cursor",
+      "status": "planned",
+      "official_fs_ticket": null,
+      "assignee": null,
+      "dependencies": [
+        "PAI-C04",
+        "PAI-C06",
+        "PAI-H05"
+      ],
+      "conditional_dependencies": [],
+      "objective": "Keep analytics accurate when events duplicate, arrive late, change, or are replayed.",
+      "outputs": [
+        "Canonical-key and correction handling",
+        "Backfill/checkpoint/resume runbook",
+        "Deletion/withdrawal propagation evidence"
+      ],
+      "scope": "Use account-scoped source identity and versioned state/postings. Reuse existing durable processing; record event time separately from ingestion time. Coordinate vendor sync behavior with reporting projections instead of inventing a second payment webhook system.",
+      "acceptance_criteria": [
+        "Duplicate delivery and retry do not add another fee/payment/outcome; out-of-order changes cannot overwrite a newer accepted state silently.",
+        "Late refunds, cancellations, amended invoices, and corrected identities recompute affected reporting windows with an audit trail.",
+        "Backfill/resume is restartable, bounded, and observable; imported history stays baseline and does not trigger new product activity or execution.",
+        "Deletion/correction follows the approved source and copy policy, including derived datasets; replay has no customer communications, charges, or bookings."
+      ],
+      "verification": [
+        "AT10, AT11, AT12, AT22, AT24",
+        "Interrupted-run recovery and reordered-event integration tests"
+      ],
+      "implementation_evidence": [],
+      "runtime_verified": false
+    },
+    {
+      "id": "PAI-C08",
+      "title": "Financial reconciliation and exception evidence",
+      "sprint": "C1",
+      "track": "codex_cursor",
+      "status": "planned",
+      "official_fs_ticket": null,
+      "assignee": null,
+      "dependencies": [
+        "PAI-C06",
+        "PAI-C07",
+        "PAI-H05"
+      ],
+      "conditional_dependencies": [],
+      "objective": "Establish confidence in financial reporting through reproducible comparisons to Stripe and local records.",
+      "outputs": [
+        "Scheduled reconciliation job/report using existing infrastructure",
+        "Object-level exception records",
+        "Accepted sample-period evidence"
+      ],
+      "scope": "Compare like-for-like classifications, currencies, account modes, period boundaries, and source cutoffs. Reconcile counts and monetary components, not only a grand total. Treat data still pending source settlement or arrival explicitly.",
+      "acceptance_criteria": [
+        "Closed sample periods reconcile exactly in minor units by currency and component, or all differences have reviewed explanations and do not appear as verified totals.",
+        "Dropped, duplicated, misclassified, and unmapped records are intentionally injected and detected.",
+        "Source drill-through proves representative subscription, merchant payment, fee, merchant refund, and fee-refund links.",
+        "Unresolved discrepancies and reconciliation freshness are visible and suppress affected verified badges; an operational owner and investigation path exist."
+      ],
+      "verification": [
+        "AT02–AT08, AT10, AT17, AT26",
+        "Independent financial sample review"
+      ],
+      "implementation_evidence": [],
+      "runtime_verified": false
+    },
+    {
+      "id": "PAI-C09",
+      "title": "Estimate-recovery lifecycle and outcome allocations",
+      "sprint": "C2",
+      "track": "codex_cursor",
+      "status": "planned",
+      "official_fs_ticket": null,
+      "assignee": null,
+      "dependencies": [
+        "PAI-C03",
+        "PAI-H03",
+        "PAI-H05"
+      ],
+      "conditional_dependencies": [
+        "Existing workflow authority and readiness; new mission runtime retains original Phase A/Phase B gates"
+      ],
+      "objective": "Measure one existing approved workflow from eligibility through completed work and collected payment.",
+      "outputs": [
+        "Eligibility snapshot and lifecycle adapters",
+        "Canonical opportunity/financial allocation links",
+        "Pending/failure/late-outcome reporting"
+      ],
+      "scope": "Use current estimate/action/job/invoice/payment services. Record the pre-decision cohort and selection reasons, preserve delivery uncertainty, and connect observed facts with provenance. If the approved workflow is not available, keep this lane blocked while read-only reporting continues.",
+      "acceptance_criteria": [
+        "Eligible unselected, declined, failed, nonresponse, and pending opportunities remain in the cohort; maturity rules and policy version are recorded.",
+        "Approval, execution, acknowledgement/delivery, booking, completion, and payment do not collapse into one success state.",
+        "One canonical opportunity can have many assists. Allocations preserve source company, currency, and sign; signed allocations plus explicit unallocated remainder equal the exact source amount, with allocated magnitudes bounded by its magnitude. Corrections apply once with lineage; a nonzero remainder prevents a complete-allocation claim.",
+        "Imported history stays baseline; observed linked revenue is labeled assisted/associated and never asserted as incremental lift."
+      ],
+      "verification": [
+        "AT12–AT16, AT17",
+        "End-to-end existing-workflow trace with late and unsuccessful outcomes"
+      ],
+      "implementation_evidence": [],
+      "runtime_verified": false
+    },
+    {
+      "id": "PAI-C10",
+      "title": "Backend-confirmed company activation and product events",
+      "sprint": "C2",
+      "track": "codex_cursor",
+      "status": "planned",
+      "official_fs_ticket": null,
+      "assignee": null,
+      "dependencies": [
+        "PAI-C02",
+        "PAI-H02",
+        "PAI-H03"
+      ],
+      "conditional_dependencies": [
+        "The selected activation milestone must already have authoritative source evidence. If it needs new C09 lifecycle work, add C09 as a prerequisite for those cards or keep them disabled."
+      ],
+      "objective": "Measure activation and repeated successful use at the company level.",
+      "outputs": [
+        "Allowlisted backend analytics adapter/events",
+        "Company/group mapping",
+        "Versioned activation milestones and cohort views"
+      ],
+      "scope": "Reconcile preserved FS-43 instrumentation. Emit authoritative milestones through existing durable boundaries. Browser events may describe interaction but cannot certify payment, completed jobs, or workflow success. This ticket may be pulled forward as soon as dependencies clear.",
+      "acceptance_criteria": [
+        "First value follows the approved named workflow milestone; a login or sent message alone cannot satisfy it.",
+        "Retries, imports, backfills, shared staff, and workspace changes do not inflate company activation or contaminate cohorts.",
+        "Time-to-value has a defined start, timezone, and observation window; still-unactivated companies remain visible rather than disappearing from the denominator.",
+        "Analytics failure does not block product actions; grouping entitlement and event costs match the accepted configuration."
+      ],
+      "verification": [
+        "AT01, AT10, AT12, AT20, AT24, AT28",
+        "Real milestone/event and company-switch tests"
+      ],
+      "implementation_evidence": [],
+      "runtime_verified": false
+    },
+    {
+      "id": "PAI-C11",
+      "title": "Primary AI usage, failure, and cost instrumentation",
+      "sprint": "C2",
+      "track": "codex_cursor",
+      "status": "planned",
+      "official_fs_ticket": null,
+      "assignee": null,
+      "dependencies": [
+        "PAI-C01",
+        "PAI-C02",
+        "PAI-H03",
+        "PAI-H04"
+      ],
+      "conditional_dependencies": [],
+      "objective": "Capture attributable AI usage and quality signals through the single selected tracing path.",
+      "outputs": [
+        "AI adapter instrumentation and trace/usage contract",
+        "Invocation coverage evidence",
+        "Cost provenance and privacy configuration"
+      ],
+      "scope": "Complete the chosen Langfuse or PostHog path with stable invocation, attempt, trace, company, workflow, model, prompt/release, and policy IDs. Include failed billed calls, cache usage, and retries. Import only approved summary fields when joining trace data.",
+      "acceptance_criteria": [
+        "The bounded instrumented workload has a reconciliation count between invocation records and captured attempts; missing usage is a visible coverage gap.",
+        "Model-price estimates, provider-reported amounts, and later invoice allocations are distinguished and not added together for the same usage.",
+        "One invocation imported via multiple sources is deduplicated; separate real retry attempts still count as usage.",
+        "Raw input/output/tool content is excluded under the default policy; failed capture and sampling cannot masquerade as zero cost or complete quality coverage."
+      ],
+      "verification": [
+        "AT18, AT19, AT21, AT27, AT28",
+        "Real provider/test-adapter failure and privacy inspection"
+      ],
+      "implementation_evidence": [],
+      "runtime_verified": false
+    },
+    {
+      "id": "PAI-C12",
+      "title": "Cost-to-serve and contribution coverage",
+      "sprint": "C2",
+      "track": "codex_cursor",
+      "status": "planned",
+      "official_fs_ticket": null,
+      "assignee": null,
+      "dependencies": [
+        "PAI-C08",
+        "PAI-C11",
+        "PAI-H02"
+      ],
+      "conditional_dependencies": [],
+      "objective": "Show attributable Renvani costs and management contribution without overstating cost completeness.",
+      "outputs": [
+        "Versioned cost components and allocation model",
+        "Company/period cost coverage",
+        "Contribution query contracts"
+      ],
+      "scope": "Join available AI, payment-processing, email, infrastructure, support, and other adopted cost sources. Define direct versus shared allocation, period matching, missing components, and whether a number is measured, estimated, or allocated. Keep this separate from merchant job margin.",
+      "acceptance_criteria": [
+        "Allocation totals reconcile to each source cost pool and cannot be counted again as direct cost; retries/fees are attributed once.",
+        "Subscription receipts and fee collections are not combined with MRR or merchant volume in one contribution formula.",
+        "Incomplete components produce a partial-contribution label and coverage detail, not a complete gross-margin/profit claim.",
+        "Cost per successful workflow includes the defined eligible-cohort attempt costs and discloses pending outcome coverage; zero denominator yields unavailable."
+      ],
+      "verification": [
+        "AT17–AT19, AT28",
+        "Cost-pool and independent allocation review"
+      ],
+      "implementation_evidence": [],
+      "runtime_verified": false
+    },
+    {
+      "id": "PAI-C13",
+      "title": "Configure Renvani economics dashboard",
+      "sprint": "C3",
+      "track": "codex_cursor",
+      "status": "planned",
+      "official_fs_ticket": null,
+      "assignee": null,
+      "dependencies": [
+        "PAI-C08",
+        "PAI-H06"
+      ],
+      "conditional_dependencies": [
+        "PAI-C12 before contribution/cost panels are enabled"
+      ],
+      "objective": "Provide a usable internal view of correctly classified platform financial performance.",
+      "outputs": [
+        "PostHog dashboard/query IDs and exported definitions",
+        "Economics acceptance screenshots and source comparisons"
+      ],
+      "scope": "Configure native dashboard cards for platform receipts, MRR, actual fees, merchant-volume context, adjustments, and data coverage. Enable contribution panels only when C12 evidence is accepted.",
+      "acceptance_criteria": [
+        "All enabled financial cards reproduce the accepted metric/version and source cutoff; no merchant subscriptions enter platform MRR.",
+        "Currency, cash versus recurring basis, date/timezone, cohort filters, and reconciliation exceptions remain clear.",
+        "Cost panels are unavailable or explicitly partial until supporting components are verified; missing data is not zero.",
+        "Read-only internal access, source drill-through, query/configuration version, and reporting ownership are recorded."
+      ],
+      "verification": [
+        "AT02, AT04, AT08, AT17, AT20, AT26",
+        "Dashboard-to-source sample comparison"
+      ],
+      "implementation_evidence": [],
+      "runtime_verified": false
+    },
+    {
+      "id": "PAI-C14",
+      "title": "Configure company activation dashboard",
+      "sprint": "C3",
+      "track": "codex_cursor",
+      "status": "planned",
+      "official_fs_ticket": null,
+      "assignee": null,
+      "dependencies": [
+        "PAI-C03",
+        "PAI-C10",
+        "PAI-H06"
+      ],
+      "conditional_dependencies": [],
+      "objective": "Show which companies reached value and where onboarding or continuing use breaks down.",
+      "outputs": [
+        "PostHog activation dashboard/query IDs",
+        "Company cohort and milestone definitions",
+        "Usability/denominator evidence"
+      ],
+      "scope": "Build readiness, first-value, time-to-value, and repeated-workflow cards. Use group analytics if entitled or governed company-level SQL aggregation. Preserve businesses with no completed activation event in the population.",
+      "acceptance_criteria": [
+        "Milestone and retention counts match backend facts, including companies with no login during successful automation.",
+        "Cohort membership, start date, eligibility, observation window, and incomplete/censored observations are explicit.",
+        "Workspace switches and multiple staff identities do not duplicate companies.",
+        "The view supports an actionable onboarding investigation without exposing unnecessary customer or staff details."
+      ],
+      "verification": [
+        "AT01, AT12, AT20, AT26",
+        "Company cohort walkthrough"
+      ],
+      "implementation_evidence": [],
+      "runtime_verified": false
+    },
+    {
+      "id": "PAI-C15",
+      "title": "Configure customer workflow outcomes dashboard",
+      "sprint": "C3",
+      "track": "codex_cursor",
+      "status": "planned",
+      "official_fs_ticket": null,
+      "assignee": null,
+      "dependencies": [
+        "PAI-C09",
+        "PAI-H06"
+      ],
+      "conditional_dependencies": [
+        "PAI-C08 before collected-payment outcome cards receive verified status"
+      ],
+      "objective": "Make observed workflow progress and linked economic outcomes inspectable without overstating causation.",
+      "outputs": [
+        "PostHog outcome dashboard/query IDs",
+        "Eligibility and maturity views",
+        "Allocation and missing-link diagnostics"
+      ],
+      "scope": "Configure the eligible-estimate funnel with independent execution, delivery, response, booking, completion, and collection facts. Show maturity and pending outcomes alongside successful results. Preserve non-additive assistance across flagship areas.",
+      "acceptance_criteria": [
+        "Each rate reproduces the defined fixed cohort and maturity rule; failed/unselected/pending opportunities are included appropriately.",
+        "Booked amounts, completed-service amounts, and collected principal remain separate; imported history is not credited to Renvani.",
+        "One source payment or canonical opportunity cannot inflate totals through multiple agents or joins.",
+        "Every outcome has source links or an explicit missing-link state; only a later accepted experiment can enable an incremental-lift label."
+      ],
+      "verification": [
+        "AT12–AT16, AT26, AT32",
+        "Source-to-opportunity allocation walkthrough"
+      ],
+      "implementation_evidence": [],
+      "runtime_verified": false
+    },
+    {
+      "id": "PAI-C16",
+      "title": "Configure AI and data-health dashboard",
+      "sprint": "C3",
+      "track": "codex_cursor",
+      "status": "planned",
+      "official_fs_ticket": null,
+      "assignee": null,
+      "dependencies": [
+        "PAI-C04",
+        "PAI-C05",
+        "PAI-C07",
+        "PAI-H06"
+      ],
+      "conditional_dependencies": [
+        "PAI-C11 before AI panels are enabled",
+        "Actual alert delivery only through an authorized test route"
+      ],
+      "objective": "Make reporting failures, data gaps, and attributable AI usage visible to the internal team.",
+      "outputs": [
+        "PostHog health dashboard/query IDs",
+        "Source-health and exception cards",
+        "Alert ownership and routing manifest"
+      ],
+      "scope": "Configure source lag/failure, identity exceptions, reconciliation gaps, coverage, and ingestion cost. AI usage, latency, and quality panels are conditional on accepted C11 data. Use the existing operations stack for urgent service alerts; this dashboard is not a replacement for live queue/payment monitoring.",
+      "acceptance_criteria": [
+        "Stale, partial, failed, and never-configured sources are distinguishable; last success and actual cutoff are inspectable.",
+        "Cost and latency panels expose trace coverage and cost basis; sparse evaluations cannot be presented as complete quality evidence.",
+        "Each enabled alert has an owner function, threshold/version, investigation link, and tested delivery route under applicable authorization.",
+        "Dashboard failure or source outage does not imply operational payment failure and cannot trigger business writes."
+      ],
+      "verification": [
+        "AT18, AT20, AT23, AT26–AT28",
+        "Controlled source-outage and alert test"
+      ],
+      "implementation_evidence": [],
+      "runtime_verified": false
+    },
+    {
+      "id": "PAI-C17",
+      "title": "Independent enabled-scope integration acceptance",
+      "sprint": "C4",
+      "track": "codex_cursor",
+      "status": "planned",
+      "official_fs_ticket": null,
+      "assignee": null,
+      "dependencies": [
+        "PAI-C03",
+        "PAI-C04",
+        "PAI-C05",
+        "PAI-C07",
+        "PAI-C08",
+        "PAI-H05",
+        "PAI-H08"
+      ],
+      "conditional_dependencies": [
+        "PAI-C13 for economics release",
+        "PAI-C14 for activation release",
+        "PAI-C15 for outcomes release",
+        "PAI-C12 for full cost panels",
+        "PAI-C16 for health release"
+      ],
+      "objective": "Verify the selected release slice against real access, data, and failure behavior.",
+      "outputs": [
+        "Acceptance matrix with exact code/configuration versions",
+        "Independent Peer/QA/Security-by-risk evidence",
+        "Required authorized CI and runtime records"
+      ],
+      "scope": "Run only the acceptance suite relevant to enabled capabilities plus shared security/financial invariants. Start with billing/activation when available and extend acceptance for outcomes/costs. A passing synthetic suite is not a runtime result.",
+      "acceptance_criteria": [
+        "Actual staff/vendor/database roles pass positive and negative access checks; no customer account gains access to internal cross-company data.",
+        "Refunds, duplicates, late updates, backfills, corrections, unavailable states, and source recovery reproduce the agreed expected results.",
+        "Enabled dashboards agree with their evidence and no material unexplained financial variance remains.",
+        "Application commit, provider/source/query configuration, relevant CI, reviewer identities, findings, and remaining disabled scope are recorded; no self-certified production acceptance."
+      ],
+      "verification": [
+        "All enabled AT01–AT29 cases",
+        "Actual independent runtime review"
+      ],
+      "implementation_evidence": [],
+      "runtime_verified": false
+    },
+    {
+      "id": "PAI-C18",
+      "title": "Bounded internal read-only pilot",
+      "sprint": "C4",
+      "track": "codex_cursor",
+      "status": "planned",
+      "official_fs_ticket": null,
+      "assignee": null,
+      "dependencies": [
+        "PAI-C17"
+      ],
+      "conditional_dependencies": [],
+      "objective": "Observe the accepted reporting slice over real update cycles and resolve material gaps before broader use.",
+      "outputs": [
+        "Pilot cohort/period and enabled-card manifest",
+        "Daily reconciliation/freshness/cost evidence",
+        "Operator feedback and issue dispositions"
+      ],
+      "scope": "Start with an approved small set of companies/accounts and named internal users. The proposed observation period is seven consecutive days including a relevant financial update cycle; extend only to cover a missing material scenario, not to repeat optional checks.",
+      "acceptance_criteria": [
+        "Observed sync lag and daily reconciliation meet accepted targets or affected cards are labeled/disabled with a remediation owner.",
+        "Operator walkthroughs can explain money, activation, and enabled outcomes from source evidence.",
+        "Volume, source compute, event charges, retention, and AI monitoring spend stay within the accepted limits.",
+        "No dashboard access, replay, or configuration change executes customer actions; defects have clear severity and dispositions."
+      ],
+      "verification": [
+        "Pilot observation log",
+        "Reconciliation and operator review",
+        "Measured cost/freshness report"
+      ],
+      "implementation_evidence": [],
+      "runtime_verified": false
+    },
+    {
+      "id": "PAI-C19",
+      "title": "Controlled release and operating handoff",
+      "sprint": "C4",
+      "track": "codex_cursor",
+      "status": "planned",
+      "official_fs_ticket": null,
+      "assignee": null,
+      "dependencies": [
+        "PAI-C18"
+      ],
+      "conditional_dependencies": [],
+      "objective": "Release the independently accepted internal reporting scope with durable ownership and recovery procedures.",
+      "outputs": [
+        "Release/rollback manifest",
+        "Runbook and owner functions",
+        "Query/configuration snapshot",
+        "Known-limitations and metric change process"
+      ],
+      "scope": "Complete applicable exact-head merge and provider-release gates. Record ongoing access, credential scope/rotation handling, source failures, cost reviews, and metric-change governance. Keep production operations and analytics independently disable-able.",
+      "acceptance_criteria": [
+        "Every enabled dashboard/source has an accountable owner function, accepted definition version, and documented exception workflow.",
+        "Pause/resume/replay and credential-revocation behavior are demonstrated appropriately without claiming untested rotation coverage.",
+        "Rollback affects analytics only and leaves operational Stripe webhooks, jobs, bookings, and action authority intact.",
+        "Founder approval and other applicable gates are recorded for the actual reviewed change; documentation publication alone is not rollout authority."
+      ],
+      "verification": [
+        "AT23, AT24, AT25, AT29",
+        "Release and recovery rehearsal evidence"
+      ],
+      "implementation_evidence": [],
+      "runtime_verified": false
+    },
+    {
+      "id": "PAI-C20",
+      "title": "Learning-readiness design and synthetic proof",
+      "sprint": "C4",
+      "track": "codex_cursor",
+      "status": "planned",
+      "official_fs_ticket": null,
+      "assignee": null,
+      "dependencies": [
+        "PAI-C09",
+        "PAI-H04",
+        "PAI-H05"
+      ],
+      "conditional_dependencies": [],
+      "objective": "Prepare a permissioned learning design once reliable outcome measurement exists, without making it a reporting-release blocker.",
+      "outputs": [
+        "Dataset eligibility/lineage contract",
+        "Comparable-cohort and time-aware evaluation design",
+        "Synthetic leakage/withdrawal demonstration"
+      ],
+      "scope": "Define permitted features, outcomes, observation windows, local/cohort boundaries, dataset versions, and held-out evaluations. Maintain separation between operational reporting and data authorized for collective learning. This ticket designs readiness; it does not export a real pooled training dataset.",
+      "acceptance_criteria": [
+        "Every feature/label has purpose, source/time availability, retention, correction, and permission lineage.",
+        "Training/evaluation splits prevent company and future-outcome leakage; synthetic examples show the boundary.",
+        "Specify shared-prior/local-adaptation behavior and unsupported populations without assuming fixed weights or universal gains.",
+        "Later L tickets have explicit readiness and authority gates; no live model training, customer experiment, or action policy change occurs here."
+      ],
+      "verification": [
+        "AT30, AT31, AT32 design checks",
+        "Independent data/measurement review"
+      ],
+      "implementation_evidence": [],
+      "runtime_verified": false
+    },
+    {
+      "id": "PAI-L01",
+      "title": "Permitted, versioned learning dataset",
+      "sprint": "L1",
+      "track": "later_codex_cursor",
+      "status": "planned",
+      "official_fs_ticket": null,
+      "assignee": null,
+      "dependencies": [
+        "PAI-C19",
+        "PAI-C20"
+      ],
+      "conditional_dependencies": [
+        "Approved shared-learning scope and data-use permissions; not authorized by dashboard acceptance alone"
+      ],
+      "objective": "Materialize a minimized learning dataset only after processing and customer-use permissions are demonstrated.",
+      "outputs": [
+        "Dataset manifest and controlled export/job",
+        "Eligibility/withdrawal audit",
+        "Feature/label availability report"
+      ],
+      "scope": "Use approved workflow evidence and comparable-company attributes. Preserve full eligible cohorts and uncertainty, and record dataset generation versions. Internal reporting access does not grant training rights.",
+      "acceptance_criteria": [
+        "Only allowed company/record/field purposes enter the dataset; withdrawal and correction cases propagate to derived copies under the agreed policy.",
+        "The dataset links every feature and label to an authorized source and its availability time.",
+        "Counts reconcile to the eligible cohort, including failures and pending cases; access is restricted to the approved pipeline.",
+        "Actual dataset export/training authority and existing program gates are satisfied before real materialization."
+      ],
+      "verification": [
+        "AT30, AT31",
+        "Dataset lineage, access, and correction tests"
+      ],
+      "implementation_evidence": [],
+      "runtime_verified": false
+    },
+    {
+      "id": "PAI-L02",
+      "title": "Offline evaluation and shadow recommendations",
+      "sprint": "L1",
+      "track": "later_codex_cursor",
+      "status": "planned",
+      "official_fs_ticket": null,
+      "assignee": null,
+      "dependencies": [
+        "PAI-L01"
+      ],
+      "conditional_dependencies": [],
+      "objective": "Determine whether a candidate improves predictions or recommendations for supported businesses before changing behavior.",
+      "outputs": [
+        "Baseline and candidate evaluation reports",
+        "Held-out-company/future-period splits",
+        "Shadow comparison and subgroup coverage"
+      ],
+      "scope": "Compare deterministic or existing production baselines against the proposed model/playbook. Use calibration, subgroup performance, cost, and missing-data robustness. Shadow outputs are logged for evaluation and cannot execute.",
+      "acceptance_criteria": [
+        "Dataset/model/policy/evaluator versions and supported populations are reproducible; no leakage from future outcomes or overlapping company splits.",
+        "Candidate performance and uncertainty are reported against a meaningful baseline, including weaker cohorts and data drift.",
+        "Shadow recommendations neither contact customers nor alter bookings/prices/dispatch; existing owner constraints remain authoritative.",
+        "LLM output quality, prediction accuracy, and business lift are reported separately; failed evaluation retains the prior baseline."
+      ],
+      "verification": [
+        "AT30–AT32",
+        "Independent offline and shadow evaluation"
+      ],
+      "implementation_evidence": [],
+      "runtime_verified": false
+    },
+    {
+      "id": "PAI-L03",
+      "title": "Bounded experiment, promotion, and rollback",
+      "sprint": "L1",
+      "track": "later_codex_cursor",
+      "status": "planned",
+      "official_fs_ticket": null,
+      "assignee": null,
+      "dependencies": [
+        "PAI-L02"
+      ],
+      "conditional_dependencies": [
+        "Original Phase A acceptance and explicit permission before new Phase B mission behavior",
+        "Separate authorized customer experiment"
+      ],
+      "objective": "Test an eligible intervention and release it only when its business effects and limits are understood.",
+      "outputs": [
+        "Pre-registered experiment and guardrails",
+        "Mature outcome analysis",
+        "Scoped release/model manifest and rollback evidence"
+      ],
+      "scope": "Use the existing action/mission framework and an approved assignment unit that accounts for within-company interference. Specify eligibility, outcome window, stopping/guardrail rules, exclusions, and rollout authority before assignment. No generic always-on auto-optimization.",
+      "acceptance_criteria": [
+        "The actual customer experiment and any new mission runtime have applicable founder/program approval; data/processing permissions remain satisfied.",
+        "Outcome analysis uses a fixed eligible population, matured outcomes, and uncertainty; sample size and stopping rules are justified rather than invented.",
+        "Promotion is limited to supported cohorts and owner constraints, with business guardrails and monitored degradation.",
+        "A versioned rollback restores the prior policy without corrupting outcome history; no claim that every company necessarily improves."
+      ],
+      "verification": [
+        "AT30–AT32",
+        "Independent measurement and release review",
+        "Rollback rehearsal"
+      ],
+      "implementation_evidence": [],
+      "runtime_verified": false
+    }
+  ],
+  "requirements": [
+    {
+      "id": "PA-R01",
+      "requirement": "Integrate the internal reporting hub",
+      "tickets": [
+        "PAI-C01",
+        "PAI-C04",
+        "PAI-C05",
+        "PAI-C13",
+        "PAI-C14",
+        "PAI-C15",
+        "PAI-C16"
+      ],
+      "acceptance_cases": [
+        "AT25",
+        "AT26"
+      ]
+    },
+    {
+      "id": "PA-R02",
+      "requirement": "Stable company and provider identity",
+      "tickets": [
+        "PAI-H03",
+        "PAI-C02"
+      ],
+      "acceptance_cases": [
+        "AT01",
+        "AT09"
+      ]
+    },
+    {
+      "id": "PA-R03",
+      "requirement": "Separate platform and merchant finances",
+      "tickets": [
+        "PAI-H02",
+        "PAI-C06",
+        "PAI-C08"
+      ],
+      "acceptance_cases": [
+        "AT02",
+        "AT03",
+        "AT04",
+        "AT05",
+        "AT06",
+        "AT07",
+        "AT08"
+      ]
+    },
+    {
+      "id": "PA-R04",
+      "requirement": "Safe synchronization, correction, and replay",
+      "tickets": [
+        "PAI-C04",
+        "PAI-C05",
+        "PAI-C07"
+      ],
+      "acceptance_cases": [
+        "AT10",
+        "AT11",
+        "AT12",
+        "AT22",
+        "AT23",
+        "AT24"
+      ]
+    },
+    {
+      "id": "PA-R05",
+      "requirement": "Approved fields and actual access controls",
+      "tickets": [
+        "PAI-H04",
+        "PAI-C01",
+        "PAI-C03",
+        "PAI-C05",
+        "PAI-C17"
+      ],
+      "acceptance_cases": [
+        "AT20",
+        "AT21",
+        "AT22"
+      ]
+    },
+    {
+      "id": "PA-R06",
+      "requirement": "Complete opportunity and outcome evidence",
+      "tickets": [
+        "PAI-H03",
+        "PAI-C09",
+        "PAI-C15"
+      ],
+      "acceptance_cases": [
+        "AT13",
+        "AT14",
+        "AT15",
+        "AT16"
+      ]
+    },
+    {
+      "id": "PA-R07",
+      "requirement": "Exact money and financial reconciliation",
+      "tickets": [
+        "PAI-H02",
+        "PAI-H05",
+        "PAI-C06",
+        "PAI-C08"
+      ],
+      "acceptance_cases": [
+        "AT03",
+        "AT05",
+        "AT06",
+        "AT17"
+      ]
+    },
+    {
+      "id": "PA-R08",
+      "requirement": "Honest AI and cost-to-serve coverage",
+      "tickets": [
+        "PAI-C11",
+        "PAI-C12",
+        "PAI-C16"
+      ],
+      "acceptance_cases": [
+        "AT18",
+        "AT19",
+        "AT27",
+        "AT28"
+      ]
+    },
+    {
+      "id": "PA-R09",
+      "requirement": "Company activation and repeated value",
+      "tickets": [
+        "PAI-C10",
+        "PAI-C14"
+      ],
+      "acceptance_cases": [
+        "AT01",
+        "AT12",
+        "AT26"
+      ]
+    },
+    {
+      "id": "PA-R10",
+      "requirement": "Visible freshness, completeness, and exceptions",
+      "tickets": [
+        "PAI-H06",
+        "PAI-C08",
+        "PAI-C16"
+      ],
+      "acceptance_cases": [
+        "AT18",
+        "AT23",
+        "AT26"
+      ]
+    },
+    {
+      "id": "PA-R11",
+      "requirement": "Independent accepted and reversible release",
+      "tickets": [
+        "PAI-H08",
+        "PAI-C17",
+        "PAI-C18",
+        "PAI-C19"
+      ],
+      "acceptance_cases": [
+        "AT20",
+        "AT23",
+        "AT24",
+        "AT25",
+        "AT28",
+        "AT29"
+      ]
+    },
+    {
+      "id": "PA-R12",
+      "requirement": "Separate permitted learning and causal evidence",
+      "tickets": [
+        "PAI-C20",
+        "PAI-L01",
+        "PAI-L02",
+        "PAI-L03"
+      ],
+      "acceptance_cases": [
+        "AT30",
+        "AT31",
+        "AT32"
+      ]
+    },
+    {
+      "id": "PA-R13",
+      "requirement": "Reuse current RCI, workflow, and FS-43 work",
+      "tickets": [
+        "PAI-H01",
+        "PAI-C01",
+        "PAI-C03",
+        "PAI-C09",
+        "PAI-C10"
+      ],
+      "acceptance_cases": [
+        "AT25"
+      ]
+    },
+    {
+      "id": "PA-R14",
+      "requirement": "Configuration and preparation traceability",
+      "tickets": [
+        "PAI-H05",
+        "PAI-H06",
+        "PAI-H07",
+        "PAI-H08",
+        "PAI-C17"
+      ],
+      "acceptance_cases": [
+        "AT25",
+        "AT26"
+      ]
+    }
+  ],
+  "status_semantics": {
+    "planned": "Scoped backlog; requested deliverable not supplied in this execution.",
+    "prepared": "H01-H04 documents and machine-readable definitions supplied; bounded review/validation referenced. Not official FS Done, merge, policy acceptance or runtime verification."
+  },
+  "progress": {
+    "preparation_artifacts_supplied": 4,
+    "preparation_total": 8,
+    "preparation_remaining": 4,
+    "runtime_tickets_implemented": 0,
+    "runtime_total": 20,
+    "later_learning_implemented": 0,
+    "later_learning_total": 3,
+    "note": "Counts track local ticket deliverables, not whole-product completion."
+  }
+}

@@ -1,0 +1,1745 @@
+{
+  "schema_version": "1.0.0",
+  "artifact": "PAI-H01 source and ownership register",
+  "status": "prepared_reviewed",
+  "recorded_at": "2026-11-07T12:10:33Z",
+  "user_timezone": "America/Chicago",
+  "audit_scope": "Bounded read-only inspection for H01-H04; no production/provider accounts or customer data accessed.",
+  "snapshot": {
+    "repository": "SimonShaun2/Renvani",
+    "application_branch": "dev",
+    "application_commit": "5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58",
+    "planning_pr": 459,
+    "planning_base_commit": "e374f5007878e547958ae0e3c26098e58420171a",
+    "publication_branch": "docs/platform-analytics-stripe-posthog-20261107",
+    "git_tree_complete": true,
+    "git_tree_entry_count": 3294,
+    "nested_instruction_files": [
+      "AGENTS.md",
+      "CODEX.md"
+    ]
+  },
+  "evidence_levels": {
+    "accepted_planning_direction": "Adopted plan/explicit user scope; not implementation acceptance",
+    "source_inspected": "Pinned source content inspected; presence is not deployed behavior",
+    "specification_inspected": "Versioned document inspected; described runtime may remain planned",
+    "pr_metadata_verified": "Actual PR state/head/merge metadata observed at audit time",
+    "vendor_documentation": "Primary provider documentation at recorded access date; actual account support unverified",
+    "runtime_verified": "Reserved for observed integration tests/provider configuration; none claimed in this package"
+  },
+  "sources": [
+    {
+      "id": "SRC-AGENTS",
+      "kind": "github_file",
+      "repository": "SimonShaun2/Renvani",
+      "path": "AGENTS.md",
+      "commit": "5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58",
+      "blob_sha": "e52a109a6df2ace0c51d870b5aeb67d4d9a28a67",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58/AGENTS.md",
+      "owner_function": "Technical Lead / founder governance",
+      "owner_assignment": "Function only; no new official assignment",
+      "evidence_level": "source_inspected",
+      "inspected_by": [
+        "root"
+      ],
+      "observations": [
+        "Current Nov3 founder merge authority supersedes older coordination gates.",
+        "Source includes stale workflow-unmerged continuity prose; PR metadata separately verifies merge state."
+      ],
+      "limitations": [
+        "Governance is not deployment or acceptance evidence."
+      ],
+      "affected_tickets": [
+        "PAI-H01",
+        "PAI-H04",
+        "PAI-C01"
+      ],
+      "inspected_on": "2026-11-07",
+      "tree_pin_verified": true
+    },
+    {
+      "id": "SRC-CODEX",
+      "kind": "github_file",
+      "repository": "SimonShaun2/Renvani",
+      "path": "CODEX.md",
+      "commit": "5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58",
+      "blob_sha": "48576f2dfd446a1c0cbd405706404827e83a39d3",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58/CODEX.md",
+      "owner_function": "Technical Lead / domain engineering",
+      "owner_assignment": "Function only; no new official assignment",
+      "evidence_level": "source_inspected",
+      "inspected_by": [
+        "root"
+      ],
+      "observations": [
+        "Canonical schema, tenant scope, exact money, service ownership and review rules."
+      ],
+      "limitations": [
+        "Example code and historical continuity notes are not source capability or live configuration proof."
+      ],
+      "affected_tickets": [
+        "PAI-H01",
+        "PAI-H02",
+        "PAI-H03",
+        "PAI-H04"
+      ],
+      "inspected_on": "2026-11-07",
+      "tree_pin_verified": true
+    },
+    {
+      "id": "SRC-PROJECT-STATE",
+      "kind": "github_file",
+      "repository": "SimonShaun2/Renvani",
+      "path": "PROJECT_STATE.md",
+      "commit": "5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58",
+      "blob_sha": "7afaf4ac920021c455281d72a232ebda633b56c4",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58/PROJECT_STATE.md",
+      "owner_function": "Technical Lead / Product Owner",
+      "owner_assignment": "Function only; no new official assignment",
+      "evidence_level": "source_inspected",
+      "inspected_by": [
+        "root"
+      ],
+      "observations": [
+        "Explicit historical baseline; current FS board and founder direction supersede old sprint assignments."
+      ],
+      "limitations": [
+        "Old baseline counts/defects are not re-certified in this review."
+      ],
+      "affected_tickets": [
+        "PAI-H01"
+      ],
+      "inspected_on": "2026-11-07",
+      "tree_pin_verified": true
+    },
+    {
+      "id": "SRC-TEAM",
+      "kind": "github_file",
+      "repository": "SimonShaun2/Renvani",
+      "path": "TEAM.md",
+      "commit": "5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58",
+      "blob_sha": "22ee2acc40f8f891744d447c9aa7a7e68dd7eb42",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58/TEAM.md",
+      "owner_function": "Technical Lead / Product Owner / Platform",
+      "owner_assignment": "Function only; no new official assignment",
+      "evidence_level": "source_inspected",
+      "inspected_by": [
+        "root"
+      ],
+      "observations": [
+        "Durable owner functions and exact-head review/merge requirements; active assignments must be verified."
+      ],
+      "limitations": [
+        "Roster is not proof a reviewer is active or assigned to PAI tickets."
+      ],
+      "affected_tickets": [
+        "PAI-H01"
+      ],
+      "inspected_on": "2026-11-07",
+      "tree_pin_verified": true
+    },
+    {
+      "id": "SRC-RCI-C-SPEC",
+      "kind": "github_file",
+      "repository": "SimonShaun2/Renvani",
+      "path": "docs/build-specs/CONNECTED-INTELLIGENCE-02-CODEX-CURSOR-SPRINTS-2026-11-06.md",
+      "commit": "5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58",
+      "blob_sha": "58294c615e5ac828f2b0faf6c9bfce476ab59f2c",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58/docs/build-specs/CONNECTED-INTELLIGENCE-02-CODEX-CURSOR-SPRINTS-2026-11-06.md",
+      "owner_function": "Technical Lead / domain owners",
+      "owner_assignment": "Function only; no new official assignment",
+      "evidence_level": "source_inspected",
+      "inspected_by": [
+        "root"
+      ],
+      "observations": [
+        "RCI-C01/C02/C04/C05/C09/C10 cover shared identity, contract adoption, secure reads, exact metrics, reporting and acceptance.",
+        "RCI-C13/C18 concern merchant job costs; platform cost-to-serve remains a separate metric scope."
+      ],
+      "limitations": [
+        "Merged specification; runtime ticket completion is not inferred."
+      ],
+      "affected_tickets": [
+        "PAI-H01",
+        "PAI-H02",
+        "PAI-H03",
+        "PAI-H04",
+        "PAI-C01"
+      ],
+      "inspected_on": "2026-11-07",
+      "tree_pin_verified": true
+    },
+    {
+      "id": "SRC-RCI-FOUNDATION",
+      "kind": "github_file",
+      "repository": "SimonShaun2/Renvani",
+      "path": "docs/connected-intelligence/foundation/START-HERE.md",
+      "commit": "5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58",
+      "blob_sha": "8c56fe1b5929103cf8b43f646ee156b9e72e75d7",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58/docs/connected-intelligence/foundation/START-HERE.md",
+      "owner_function": "Data Contracts / Measurement / Technical Lead",
+      "owner_assignment": "Function only; no new official assignment",
+      "evidence_level": "source_inspected",
+      "inspected_by": [
+        "root",
+        "h02_metric_catalog",
+        "h03_identity_contracts"
+      ],
+      "observations": [
+        "Existing H01-H16 foundation includes v1 scope, fact, quality, calculation and non-executing proposal contracts.",
+        "Recorded tests belong to earlier source checkpoint; foundation current source is merged through #452.",
+        "Foundation capabilities and proof boundary",
+        "Existing H01-H16 supply internal contracts, exact math, evidence/quality and offline tests; no production adoption is implied."
+      ],
+      "limitations": [
+        "No foundation tests rerun by H01-H04.",
+        "Pure contracts and recorded tests do not establish provider integration or production readers.",
+        "Historical status prose is not current PR/deployment proof; existing tests not rerun for this ticket.",
+        "Recorded foundation tests were not rerun in this H03 documentation task; merge state comes from root PR metadata."
+      ],
+      "affected_tickets": [
+        "PAI-H01",
+        "PAI-H02",
+        "PAI-H03",
+        "PAI-H04"
+      ],
+      "aliases": [
+        "SRC-RCI-HANDOFF",
+        "H03-SRC-foundation"
+      ],
+      "inspected_on": "2026-11-07",
+      "tree_pin_verified": true
+    },
+    {
+      "id": "SRC-CHARTER",
+      "kind": "notion_page",
+      "page_id": "40e317b92d158107a87ef66deb7ba2a1",
+      "title": "🧠 Renvani Outcome Intelligence Engine Charter v1.0 | HVAC Monthly Revenue First",
+      "url": "https://app.notion.com/p/40e317b92d158107a87ef66deb7ba2a1?pvs=204",
+      "document_revision": "2026-11-04T02:45:51.775Z",
+      "owner_function": "Product Owner / founder",
+      "owner_assignment": "Function only; no new official assignment",
+      "evidence_level": "specification_inspected",
+      "inspected_by": [
+        "root"
+      ],
+      "observations": [
+        "First mission family: Increase monthly revenue for HVAC; estimate recovery is the first full mechanism.",
+        "Economic outcomes counted once; assistance is non-additive; original build acceptance precedes Operating Missions."
+      ],
+      "limitations": [
+        "No Phase A acceptance or Phase B activation established by this read."
+      ],
+      "affected_tickets": [
+        "PAI-H01",
+        "PAI-H03",
+        "PAI-C09",
+        "PAI-C20",
+        "PAI-L01",
+        "PAI-L02",
+        "PAI-L03"
+      ],
+      "inspected_on": "2026-11-07"
+    },
+    {
+      "id": "SRC-MASTER",
+      "kind": "notion_page",
+      "page_id": "40c317b92d15812b8ed9c7ead55480e4",
+      "title": "🧭 Renvani — Master Build Plan | Part I: Original Build · Part II: Operating Missions",
+      "url": "https://app.notion.com/p/40c317b92d15812b8ed9c7ead55480e4?pvs=204",
+      "document_revision": "2026-11-04T18:31:04.161Z",
+      "owner_function": "Product Owner / Technical Lead",
+      "owner_assignment": "Function only; no new official assignment",
+      "evidence_level": "specification_inspected",
+      "inspected_by": [
+        "root"
+      ],
+      "observations": [
+        "Part I original build acceptance and Part II Operating Missions separated."
+      ],
+      "limitations": [
+        "Page includes earlier source snapshots; later GitHub metadata governs merge state."
+      ],
+      "affected_tickets": [
+        "PAI-H01",
+        "PAI-C01",
+        "PAI-C19"
+      ],
+      "inspected_on": "2026-11-07"
+    },
+    {
+      "id": "SRC-FS43",
+      "kind": "notion_page",
+      "page_id": "3ff317b92d158144a68be8187049d42f",
+      "title": "Request, worker, and agent execution observability",
+      "url": "https://app.notion.com/p/3ff317b92d158144a68be8187049d42f?pvs=204",
+      "document_revision": "2026-11-03T13:44:44.483Z",
+      "owner_function": "Platform / Reliability and Observability",
+      "owner_assignment": "Function only; no new official assignment",
+      "evidence_level": "specification_inspected",
+      "inspected_by": [
+        "root"
+      ],
+      "observations": [
+        "FS-43 records preserved Sentry/PostHog work and explicitly says not done.",
+        "Preserved head7ee169c8a3fa443f33920e208607fc46328709aa needs selective reconciliation/re-porting.",
+        "Board dependencies FS-12/FS-15/FS-1 are observed links, not new assignments."
+      ],
+      "limitations": [
+        "Board Status In Review and earlier conflict/CI text are historical; #142 is now closed unmerged.",
+        "No current observability configuration or runtime health verified."
+      ],
+      "affected_tickets": [
+        "PAI-H01",
+        "PAI-H03",
+        "PAI-H04",
+        "PAI-C01",
+        "PAI-C10",
+        "PAI-C11",
+        "PAI-C16"
+      ],
+      "inspected_on": "2026-11-07"
+    },
+    {
+      "id": "SRC-PAI-PLAN",
+      "kind": "github_file",
+      "repository": "SimonShaun2/Renvani",
+      "path": "docs/planning/PLATFORM-ANALYTICS-BUILD-PLAN-2026-11-07.md",
+      "commit": "e374f5007878e547958ae0e3c26098e58420171a",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/e374f5007878e547958ae0e3c26098e58420171a/docs/planning/PLATFORM-ANALYTICS-BUILD-PLAN-2026-11-07.md",
+      "owner_function": "Product Owner / Technical Lead / Measurement",
+      "owner_assignment": "Local PAI planning scope; no official FS assignment",
+      "evidence_level": "accepted_planning_direction",
+      "inspected_by": [
+        "root/local exact prior publication"
+      ],
+      "observations": [
+        "User-selected Stripe + PostHog recommendation and original D01-D09 decisions.",
+        "Founder5% direction versus2% source is an unresolved policy/implementation alignment issue."
+      ],
+      "limitations": [
+        "Specification and user's adoption of recommendation authorize this bounded preparation; they do not establish runtime acceptance."
+      ],
+      "affected_tickets": [
+        "PAI-H01",
+        "PAI-H02",
+        "PAI-H03",
+        "PAI-H04"
+      ],
+      "inspected_on": "2026-11-07",
+      "blob_sha": "7a67552e8c7e2b3633f3142b88cda51b02befba7",
+      "baseline_readback": "Pinned published content re-fetched for this execution."
+    },
+    {
+      "id": "SRC-PAI-H-SPEC",
+      "kind": "github_file",
+      "repository": "SimonShaun2/Renvani",
+      "path": "docs/build-specs/PLATFORM-ANALYTICS-01-CHATGPT-FOUNDATION-SPRINTS-2026-11-07.md",
+      "commit": "e374f5007878e547958ae0e3c26098e58420171a",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/e374f5007878e547958ae0e3c26098e58420171a/docs/build-specs/PLATFORM-ANALYTICS-01-CHATGPT-FOUNDATION-SPRINTS-2026-11-07.md",
+      "owner_function": "Product Owner / Technical Lead / Measurement",
+      "owner_assignment": "Local PAI planning scope; no official FS assignment",
+      "evidence_level": "accepted_planning_direction",
+      "inspected_by": [
+        "root/local exact prior publication"
+      ],
+      "observations": [
+        "H01-H04 acceptance criteria and deliverable boundaries."
+      ],
+      "limitations": [
+        "Specification and user's adoption of recommendation authorize this bounded preparation; they do not establish runtime acceptance."
+      ],
+      "affected_tickets": [
+        "PAI-H01",
+        "PAI-H02",
+        "PAI-H03",
+        "PAI-H04"
+      ],
+      "inspected_on": "2026-11-07",
+      "blob_sha": "553d6d4309a8e833e6e8e80172cf3a0aeec8ecc8",
+      "baseline_readback": "Pinned published content re-fetched for this execution."
+    },
+    {
+      "id": "SRC-PAI-C-SPEC",
+      "kind": "github_file",
+      "repository": "SimonShaun2/Renvani",
+      "path": "docs/build-specs/PLATFORM-ANALYTICS-02-CODEX-CURSOR-SPRINTS-2026-11-07.md",
+      "commit": "e374f5007878e547958ae0e3c26098e58420171a",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/e374f5007878e547958ae0e3c26098e58420171a/docs/build-specs/PLATFORM-ANALYTICS-02-CODEX-CURSOR-SPRINTS-2026-11-07.md",
+      "owner_function": "Product Owner / Technical Lead / Measurement",
+      "owner_assignment": "Local PAI planning scope; no official FS assignment",
+      "evidence_level": "accepted_planning_direction",
+      "inspected_by": [
+        "root/local exact prior publication"
+      ],
+      "observations": [
+        "Seven proposed logical interfaces,24 metric IDs,32 acceptance cases and20integration tickets.",
+        "Signed allocation conservation and conditional activation source gate retained."
+      ],
+      "limitations": [
+        "Specification and user's adoption of recommendation authorize this bounded preparation; they do not establish runtime acceptance."
+      ],
+      "affected_tickets": [
+        "PAI-H01",
+        "PAI-H02",
+        "PAI-H03",
+        "PAI-H04"
+      ],
+      "inspected_on": "2026-11-07",
+      "blob_sha": "65e2abeb13e12bc295020f7d05b27434a807eb94",
+      "baseline_readback": "Pinned published content re-fetched for this execution."
+    },
+    {
+      "id": "SRC-FS43-CONTEXT",
+      "kind": "github_file",
+      "repository": "SimonShaun2/Renvani",
+      "path": "packages/observability/src/context.ts",
+      "commit": "7ee169c8a3fa443f33920e208607fc46328709aa",
+      "blob_sha": "8cbd8161eb0baa4ca0b67ba0869e4a9927b56b88",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/7ee169c8a3fa443f33920e208607fc46328709aa/packages/observability/src/context.ts",
+      "owner_function": "Platform / Reliability and Observability",
+      "owner_assignment": "Existing FS-43 owner function; actual runtime staffing unverified",
+      "evidence_level": "source_inspected",
+      "inspected_by": [
+        "root"
+      ],
+      "observations": [
+        "Preserved unmerged AsyncLocalStorage context for company/import/job/request IDs."
+      ],
+      "limitations": [
+        "No schema/source/release/mode/account envelope; no current runtime acceptance."
+      ],
+      "affected_tickets": [
+        "PAI-H01",
+        "PAI-H03",
+        "PAI-C01",
+        "PAI-C10",
+        "PAI-C11"
+      ],
+      "inspected_on": "2026-11-07"
+    },
+    {
+      "id": "SRC-FS43-NODE",
+      "kind": "github_file",
+      "repository": "SimonShaun2/Renvani",
+      "path": "packages/observability/src/node/index.ts",
+      "commit": "7ee169c8a3fa443f33920e208607fc46328709aa",
+      "blob_sha": "992de95e5fd02dd9fb4d03c8410db0ac961d1972",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/7ee169c8a3fa443f33920e208607fc46328709aa/packages/observability/src/node/index.ts",
+      "owner_function": "Platform / Reliability and Observability",
+      "owner_assignment": "Existing FS-43 owner function; actual runtime staffing unverified",
+      "evidence_level": "source_inspected",
+      "inspected_by": [
+        "root",
+        "h04_export_policy"
+      ],
+      "observations": [
+        "Preserved env-gated Sentry/PostHog capture and shutdown hooks.",
+        "trackNodeProductEvent accepts arbitrary scalar properties and companyId-or-anonymous distinctId.",
+        "trackNodeProductEvent accepts arbitrary scalar properties; distinctId falls back from companyId to anonymous; raw Sentry exceptions supported."
+      ],
+      "limitations": [
+        "Old wiring is not an H04 allowlist or a trusted tenant/account identity proof.",
+        "Closed unmerged source; do not port wholesale or treat all observability payloads as approved exports.",
+        "Reuse wiring only after field/scope review; source is the closed-unmerged FS43 PR142 head, not proof of current dev or runtime installation."
+      ],
+      "affected_tickets": [
+        "PAI-H01",
+        "PAI-H03",
+        "PAI-H04",
+        "PAI-C01",
+        "PAI-C10",
+        "PAI-C11"
+      ],
+      "aliases": [
+        "H04-CODE-FS43"
+      ],
+      "inspected_on": "2026-11-07"
+    },
+    {
+      "id": "SRC-LANGFUSE",
+      "kind": "github_file",
+      "repository": "SimonShaun2/Renvani",
+      "path": "packages/ai/src/langfuse/client.ts",
+      "commit": "5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58",
+      "blob_sha": "0b658087071871ceb8ed54fe34571c9022e6b1b6",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58/packages/ai/src/langfuse/client.ts",
+      "owner_function": "AI integration / Platform",
+      "owner_assignment": "Function only; no new official assignment",
+      "evidence_level": "source_inspected",
+      "inspected_by": [
+        "root",
+        "h02_metric_catalog",
+        "h03_identity_contracts",
+        "h04_export_policy"
+      ],
+      "observations": [
+        "Source explicitly labels STACK-07 stub and no-op without config.",
+        "Agent lifecycle and import observation metadata exist; import observer includes optional raw errorMessage.",
+        "Existing audit/import trace stub",
+        "Action/lifecycle and import-session trace IDs carry some company/model/token context.",
+        "STACK-07 optional ingestion stub includes actorId and errorMessage metadata; needs a stricter reporting export policy."
+      ],
+      "limitations": [
+        "Not proof of full inference attempt/token/latency/cost coverage.",
+        "Freeform errorMessage is not allowed in H04 external analytics projection by default.",
+        "Live configured provider behavior not observed.",
+        "No complete attempt-cost-latency-coverage source established.",
+        "No complete separately billable-attempt/cost/latency coverage established; raw errorMessage exists in import metadata and must be excluded by H04.",
+        "No credentials, deployment, actual trace payload or provider data accessed."
+      ],
+      "affected_tickets": [
+        "PAI-H01",
+        "PAI-H03",
+        "PAI-H04",
+        "PAI-C01",
+        "PAI-C11",
+        "PAI-C16",
+        "PAI-H02",
+        "PAI-C03",
+        "PAI-C10",
+        "PAI-C17"
+      ],
+      "aliases": [
+        "SRC-AI",
+        "H03-SRC-aitrace",
+        "H04-CODE-LANGFUSE"
+      ],
+      "inspected_on": "2026-11-07",
+      "tree_pin_verified": true
+    },
+    {
+      "id": "SRC-STRIPE",
+      "kind": "github_file",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58/apps/api/src/lib/stripe.ts",
+      "owner_function": "Financial-domain owner / Revenue Backend / Measurement",
+      "owner_assignment": "Function only; no new official assignment",
+      "evidence_level": "source_inspected",
+      "inspected_by": [
+        "h02_metric_catalog"
+      ],
+      "inspected_on": "2026-11-07",
+      "observations": [
+        "Platform billing, destination charges, merchant maintenance/VIP classification"
+      ],
+      "limitations": [
+        "Source implementation inspected; actual account/API deployment unverified."
+      ],
+      "affected_tickets": [
+        "PAI-H02"
+      ],
+      "repository": "SimonShaun2/Renvani",
+      "path": "apps/api/src/lib/stripe.ts",
+      "commit": "5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58",
+      "blob_sha": "2c5ca69884ffb1b60ddf47805a395aaecbd8717e",
+      "tree_pin_verified": true
+    },
+    {
+      "id": "SRC-PRICING",
+      "kind": "github_file",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58/packages/config/src/stripe-pricing.ts",
+      "owner_function": "Financial-domain owner / Revenue Backend / Measurement",
+      "owner_assignment": "Function only; no new official assignment",
+      "evidence_level": "source_inspected",
+      "inspected_by": [
+        "h02_metric_catalog"
+      ],
+      "inspected_on": "2026-11-07",
+      "observations": [
+        "Current fee path and priced plans"
+      ],
+      "limitations": [
+        "Founder 5% direction versus inspected200bps remains D06; historical records govern metrics."
+      ],
+      "affected_tickets": [
+        "PAI-H02"
+      ],
+      "repository": "SimonShaun2/Renvani",
+      "path": "packages/config/src/stripe-pricing.ts",
+      "commit": "5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58",
+      "blob_sha": "d3ec80531803edf57dc926c7aa21cc8ed6f13c40",
+      "tree_pin_verified": true
+    },
+    {
+      "id": "SRC-SCHEMA",
+      "kind": "github_file",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58/packages/db/src/schema.ts",
+      "owner_function": "Relevant domain owner / Data Contracts / Measurement",
+      "owner_assignment": "Function only; no new official assignment",
+      "evidence_level": "source_inspected",
+      "inspected_by": [
+        "h02_metric_catalog",
+        "h03_identity_contracts",
+        "h04_export_policy"
+      ],
+      "inspected_on": "2026-11-07",
+      "observations": [
+        "Company, payments, invoices, jobs, activity events, import fields",
+        "Canonical companies have separate stripeCustomerId and stripeAccountId, timezone and current mutable settings.",
+        "Estimate option-set/tierGroup identity and import lineage exist.",
+        "Payments have exact2dp amounts/fees/refunds and Stripe intent/charge links; posted history and currency scope need provider reconciliation.",
+        "Activity records have stable id/company/entity/time but no universal reporting opportunity/attempt/release/revision envelope.",
+        "Agent actions and outbox carry current scoped idempotency/state receipts.",
+        "Company Stripe customer/account keys are separate; app tables mix reporting amounts/refs with customer/staff identity, sensitive notes, credentials, payment URLs/tokens and arbitrary activity payloads."
+      ],
+      "limitations": [
+        "Current payment amounts are2dp; no per-payment currency; historical readiness/eligibility snapshots not inferred from mutable rows.",
+        "Schema definition alone does not prove live migrations, current data, tenant access, source completeness or payment/account coverage.",
+        "No actual database export grants or live contents inspected."
+      ],
+      "affected_tickets": [
+        "PAI-H02",
+        "PAI-H03",
+        "PAI-H04",
+        "PAI-C03",
+        "PAI-C10",
+        "PAI-C11",
+        "PAI-C17"
+      ],
+      "repository": "SimonShaun2/Renvani",
+      "path": "packages/db/src/schema.ts",
+      "commit": "5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58",
+      "blob_sha": "afdc793bc7448049c09dba3133d72dbcd566f4f2",
+      "aliases": [
+        "H03-SRC-schema",
+        "H04-CODE-SCHEMA"
+      ],
+      "tree_pin_verified": true
+    },
+    {
+      "id": "SRC-REVENUE",
+      "kind": "github_file",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58/apps/api/src/services/revenue-outcomes.service.ts",
+      "owner_function": "Financial-domain owner / Revenue Backend / Measurement",
+      "owner_assignment": "Function only; no new official assignment",
+      "evidence_level": "source_inspected",
+      "inspected_by": [
+        "h02_metric_catalog",
+        "h03_identity_contracts"
+      ],
+      "inspected_on": "2026-11-07",
+      "observations": [
+        "Existing observed revenue and materials-only cost reader",
+        "Current summary uses period activity and revenue fallback paid->invoiced->estimated."
+      ],
+      "limitations": [
+        "Completed revenue fallback and period-activity cohort are not authoritative reconciled cash or mature recovery outcomes.",
+        "Cannot be relabeled reconciled collected recovery principal, mature cohort or causal lift."
+      ],
+      "affected_tickets": [
+        "PAI-H02",
+        "PAI-H03"
+      ],
+      "repository": "SimonShaun2/Renvani",
+      "path": "apps/api/src/services/revenue-outcomes.service.ts",
+      "commit": "5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58",
+      "blob_sha": "87d2b17227eae4a9e8424c48c591645ddfad34d4",
+      "aliases": [
+        "H03-SRC-outcomes"
+      ],
+      "tree_pin_verified": true
+    },
+    {
+      "id": "SRC-RCI-CATALOG",
+      "kind": "github_file",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58/packages/types/src/connected-intelligence/v1/catalog.ts",
+      "owner_function": "Data Contracts / Measurement / Technical Lead",
+      "owner_assignment": "Function only; no new official assignment",
+      "evidence_level": "source_inspected",
+      "inspected_by": [
+        "h02_metric_catalog"
+      ],
+      "inspected_on": "2026-11-07",
+      "observations": [
+        "Existing metric definitions/capabilities"
+      ],
+      "limitations": [
+        "PA-M IDs not registered; all capability enablement flags false in foundation."
+      ],
+      "affected_tickets": [
+        "PAI-H02"
+      ],
+      "repository": "SimonShaun2/Renvani",
+      "path": "packages/types/src/connected-intelligence/v1/catalog.ts",
+      "commit": "5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58",
+      "blob_sha": "25684c8d482c7cf2a75ccef4cecba354c95eb483",
+      "tree_pin_verified": true
+    },
+    {
+      "id": "SRC-RCI-CONTRACTS",
+      "kind": "github_file",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58/packages/types/src/connected-intelligence/v1/contracts.ts",
+      "owner_function": "Data Contracts / Measurement / Technical Lead",
+      "owner_assignment": "Function only; no new official assignment",
+      "evidence_level": "source_inspected",
+      "inspected_by": [
+        "h02_metric_catalog",
+        "h03_identity_contracts",
+        "h04_export_policy"
+      ],
+      "inspected_on": "2026-11-07",
+      "observations": [
+        "Current strict evidence/quality/source/amount shapes",
+        "Scope shape is explicitly not authentication; read binding, source quality, observed/effective times and strict contracts exist.",
+        "Current source kind enum lacks Stripe/AI resources; factSchema validates against current metric catalog.",
+        "Verified scope, sensitivity, source evidence, quality and denied/unavailable read contracts are reusable internally; entire packet is not an approved vendor export."
+      ],
+      "limitations": [
+        "2dp money, source-kind enum, metric registry and calculation enum require versioned integration mapping.",
+        "Logical PA contracts are not drop-in runtime schema-compatible; PA metric IDs require adoption/registration.",
+        "Type validation is not authentication; actor/source subject fields must not be copied wholesale."
+      ],
+      "affected_tickets": [
+        "PAI-H02",
+        "PAI-H03",
+        "PAI-H04",
+        "PAI-C03",
+        "PAI-C10",
+        "PAI-C11",
+        "PAI-C17"
+      ],
+      "repository": "SimonShaun2/Renvani",
+      "path": "packages/types/src/connected-intelligence/v1/contracts.ts",
+      "commit": "5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58",
+      "blob_sha": "9ceae41f75b7011bcd92652d2a0068dfc6555f7f",
+      "aliases": [
+        "H03-SRC-contracts",
+        "H04-CODE-RCI"
+      ],
+      "tree_pin_verified": true
+    },
+    {
+      "id": "SRC-RCI-QUALITY",
+      "kind": "github_file",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58/packages/types/src/connected-intelligence/v1/quality.ts",
+      "owner_function": "Data Contracts / Measurement / Technical Lead",
+      "owner_assignment": "Function only; no new official assignment",
+      "evidence_level": "source_inspected",
+      "inspected_by": [
+        "h02_metric_catalog"
+      ],
+      "inspected_on": "2026-11-07",
+      "observations": [
+        "Quality, scope, parity and conflict handling"
+      ],
+      "limitations": [
+        "Pure helpers do not prove database grants or source coverage."
+      ],
+      "affected_tickets": [
+        "PAI-H02"
+      ],
+      "repository": "SimonShaun2/Renvani",
+      "path": "packages/types/src/connected-intelligence/v1/quality.ts",
+      "commit": "5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58",
+      "blob_sha": "0498b53357a1a4e097980ba3403ce000437ba65e",
+      "tree_pin_verified": true
+    },
+    {
+      "id": "SRC-RCI-MATH",
+      "kind": "github_file",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58/apps/api/src/services/connected-intelligence/foundation-math.ts",
+      "owner_function": "Data Contracts / Measurement / Technical Lead",
+      "owner_assignment": "Function only; no new official assignment",
+      "evidence_level": "source_inspected",
+      "inspected_by": [
+        "h02_metric_catalog",
+        "h03_identity_contracts"
+      ],
+      "inspected_on": "2026-11-07",
+      "observations": [
+        "Exact Decimal, missing-cost, weighted ratio, allocation concepts",
+        "Uses Decimal with60-digit local precision,2dp money validation, exact signed largest-remainder allocation, missing-cost null behavior and economic dedup helpers."
+      ],
+      "limitations": [
+        "Current helpers accept2dp; do not round AI micro-costs or non2dp source amounts into them.",
+        "Current allocateMoney and money formatting are fixed2dp; currency-exponent/AI microcost adaptation needs a reviewed versioned extension."
+      ],
+      "affected_tickets": [
+        "PAI-H02",
+        "PAI-H03"
+      ],
+      "repository": "SimonShaun2/Renvani",
+      "path": "apps/api/src/services/connected-intelligence/foundation-math.ts",
+      "commit": "5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58",
+      "blob_sha": "5e48e9a57612dbcc1c74106f1da7fdbfeaf6253e",
+      "aliases": [
+        "H03-SRC-foundationmath"
+      ],
+      "tree_pin_verified": true
+    },
+    {
+      "id": "SRC-RCI-POLICY",
+      "kind": "github_file",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58/docs/connected-intelligence/foundation/POLICY-AND-IDENTITY.md",
+      "owner_function": "Data Contracts / Measurement / Technical Lead",
+      "owner_assignment": "Function only; no new official assignment",
+      "evidence_level": "source_inspected",
+      "inspected_by": [
+        "h02_metric_catalog",
+        "h03_identity_contracts"
+      ],
+      "inspected_on": "2026-11-07",
+      "observations": [
+        "Financial distinctions, policy gaps and permissions",
+        "Canonical economic outcomes deduplicate by tenant/source; collections are not extra sales; assistance is non-additive; missing policy fails closed."
+      ],
+      "limitations": [
+        "Internal reusable policy concepts; no new financial or data-use authority.",
+        "Pure foundation checks do not prove provider/RLS/authentication or approve actual accounting/privacy policies."
+      ],
+      "affected_tickets": [
+        "PAI-H02",
+        "PAI-H03"
+      ],
+      "repository": "SimonShaun2/Renvani",
+      "path": "docs/connected-intelligence/foundation/POLICY-AND-IDENTITY.md",
+      "commit": "5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58",
+      "blob_sha": "8dc9198c76b0b4a47bdf7a6647d509a67ee19fc8",
+      "aliases": [
+        "H03-SRC-rcipolicy"
+      ],
+      "tree_pin_verified": true
+    },
+    {
+      "id": "SRC-LEGACY-KPI",
+      "kind": "github_file",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58/packages/types/src/command-center.types.ts",
+      "owner_function": "Relevant domain owner / Data Contracts / Measurement",
+      "owner_assignment": "Function only; no new official assignment",
+      "evidence_level": "source_inspected",
+      "inspected_by": [
+        "h02_metric_catalog"
+      ],
+      "inspected_on": "2026-11-07",
+      "observations": [
+        "Four current customer KPI meanings"
+      ],
+      "limitations": [
+        "Preserve legacy definitions; internal platform catalog is not a silent replacement."
+      ],
+      "affected_tickets": [
+        "PAI-H02"
+      ],
+      "repository": "SimonShaun2/Renvani",
+      "path": "packages/types/src/command-center.types.ts",
+      "commit": "5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58",
+      "blob_sha": "7a3f970db5db62ffee349d305069e99cb42352bd",
+      "tree_pin_verified": true
+    },
+    {
+      "id": "EXT-STRIPE-MRR",
+      "kind": "vendor_documentation",
+      "url": "https://docs.stripe.com/billing/subscriptions/analytics",
+      "owner_function": "Financial-domain owner / Revenue Backend / Measurement",
+      "owner_assignment": "Function only; no new official assignment",
+      "evidence_level": "vendor_documentation",
+      "inspected_by": [
+        "h02_metric_catalog"
+      ],
+      "inspected_on": "2026-11-07",
+      "observations": [
+        "MRR statuses, configurable discounts, trial and report timezone meanings; actual account configuration uninspected."
+      ],
+      "limitations": [
+        "Current provider/account configuration, deployment and runtime acceptance not verified."
+      ],
+      "affected_tickets": [
+        "PAI-H02"
+      ],
+      "title": "https://docs.stripe.com/billing/subscriptions/analytics",
+      "document_revision": "Provider page retrieved on stated date; no immutable vendor revision supplied"
+    },
+    {
+      "id": "EXT-STRIPE-SUBSCRIPTION",
+      "kind": "vendor_documentation",
+      "url": "https://docs.stripe.com/api/subscriptions/object",
+      "owner_function": "Financial-domain owner / Revenue Backend / Measurement",
+      "owner_assignment": "Function only; no new official assignment",
+      "evidence_level": "vendor_documentation",
+      "inspected_by": [
+        "h02_metric_catalog"
+      ],
+      "inspected_on": "2026-11-07",
+      "observations": [
+        "Subscription item, price, quantity, status, effective cancellation fields; API shape depends on actual pinned integration version."
+      ],
+      "limitations": [
+        "Current provider/account configuration, deployment and runtime acceptance not verified."
+      ],
+      "affected_tickets": [
+        "PAI-H02"
+      ],
+      "title": "https://docs.stripe.com/api/subscriptions/object",
+      "document_revision": "Provider page retrieved on stated date; no immutable vendor revision supplied"
+    },
+    {
+      "id": "EXT-STRIPE-FEE",
+      "kind": "vendor_documentation",
+      "url": "https://docs.stripe.com/api/application_fees/object",
+      "owner_function": "Financial-domain owner / Revenue Backend / Measurement",
+      "owner_assignment": "Function only; no new official assignment",
+      "evidence_level": "vendor_documentation",
+      "inspected_by": [
+        "h02_metric_catalog"
+      ],
+      "inspected_on": "2026-11-07",
+      "observations": [
+        "ApplicationFee amounts, refunds and source references; list pagination completeness required."
+      ],
+      "limitations": [
+        "Current provider/account configuration, deployment and runtime acceptance not verified."
+      ],
+      "affected_tickets": [
+        "PAI-H02"
+      ],
+      "title": "https://docs.stripe.com/api/application_fees/object",
+      "document_revision": "Provider page retrieved on stated date; no immutable vendor revision supplied"
+    },
+    {
+      "id": "EXT-STRIPE-BALANCE",
+      "kind": "vendor_documentation",
+      "url": "https://docs.stripe.com/api/balance_transactions/object",
+      "owner_function": "Financial-domain owner / Revenue Backend / Measurement",
+      "owner_assignment": "Function only; no new official assignment",
+      "evidence_level": "vendor_documentation",
+      "inspected_by": [
+        "h02_metric_catalog"
+      ],
+      "inspected_on": "2026-11-07",
+      "observations": [
+        "Balance amount, fee, net, source, available_on and currency are distinct."
+      ],
+      "limitations": [
+        "Current provider/account configuration, deployment and runtime acceptance not verified."
+      ],
+      "affected_tickets": [
+        "PAI-H02"
+      ],
+      "title": "https://docs.stripe.com/api/balance_transactions/object",
+      "document_revision": "Provider page retrieved on stated date; no immutable vendor revision supplied"
+    },
+    {
+      "id": "EXT-STRIPE-INVOICE",
+      "kind": "vendor_documentation",
+      "url": "https://docs.stripe.com/api/invoices/object",
+      "owner_function": "Financial-domain owner / Revenue Backend / Measurement",
+      "owner_assignment": "Function only; no new official assignment",
+      "evidence_level": "vendor_documentation",
+      "inspected_by": [
+        "h02_metric_catalog"
+      ],
+      "inspected_on": "2026-11-07",
+      "observations": [
+        "Invoice paid/credit/outside-Stripe fields show why invoice status alone is not evidence of a new Stripe cash receipt."
+      ],
+      "limitations": [
+        "Current provider/account configuration, deployment and runtime acceptance not verified."
+      ],
+      "affected_tickets": [
+        "PAI-H02"
+      ],
+      "title": "https://docs.stripe.com/api/invoices/object",
+      "document_revision": "Provider page retrieved on stated date; no immutable vendor revision supplied"
+    },
+    {
+      "id": "EXT-STRIPE-CURRENCY",
+      "kind": "vendor_documentation",
+      "url": "https://docs.stripe.com/currencies",
+      "owner_function": "Financial-domain owner / Revenue Backend / Measurement",
+      "owner_assignment": "Function only; no new official assignment",
+      "evidence_level": "vendor_documentation",
+      "inspected_by": [
+        "h02_metric_catalog"
+      ],
+      "inspected_on": "2026-11-07",
+      "observations": [
+        "Provider amount units and currency/resource exceptions; currency exponent is versioned, not inferred from two-decimal local schema."
+      ],
+      "limitations": [
+        "Current provider/account configuration, deployment and runtime acceptance not verified."
+      ],
+      "affected_tickets": [
+        "PAI-H02"
+      ],
+      "title": "https://docs.stripe.com/currencies",
+      "document_revision": "Provider page retrieved on stated date; no immutable vendor revision supplied"
+    },
+    {
+      "id": "H03-SRC-events",
+      "kind": "github_file",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58/packages/db/src/events.ts",
+      "owner_function": "Platform / event infrastructure",
+      "owner_assignment": "Function only; no new official assignment",
+      "evidence_level": "source_inspected",
+      "inspected_by": [
+        "h03_identity_contracts"
+      ],
+      "inspected_on": "2026-11-07",
+      "observations": [
+        "emitEvent and emitEventWithExecutor insert activity_events with supplied context; stored ID must be retained on analytical replay."
+      ],
+      "limitations": [
+        "No universal durable analytics transport/deduplication or accepted reporting revision system is supplied by this helper."
+      ],
+      "affected_tickets": [
+        "PAI-H03"
+      ],
+      "repository": "SimonShaun2/Renvani",
+      "path": "packages/db/src/events.ts",
+      "commit": "5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58",
+      "blob_sha": "0ee57774ceef82acbb0dee7ba863318f1e45f17f",
+      "tree_pin_verified": true
+    },
+    {
+      "id": "H03-SRC-tenant",
+      "kind": "github_file",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58/apps/api/src/services/tenant-context.service.ts",
+      "owner_function": "Platform identity",
+      "owner_assignment": "Function only; no new official assignment",
+      "evidence_level": "source_inspected",
+      "inspected_by": [
+        "h03_identity_contracts"
+      ],
+      "inspected_on": "2026-11-07",
+      "observations": [
+        "Canonical entity resolution takes company scope and verifies company/entity/deletion predicates."
+      ],
+      "limitations": [
+        "No authenticated runtime tests performed; reporting export access is separately authorized."
+      ],
+      "affected_tickets": [
+        "PAI-H03"
+      ],
+      "repository": "SimonShaun2/Renvani",
+      "path": "apps/api/src/services/tenant-context.service.ts",
+      "commit": "5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58",
+      "blob_sha": "98304a68098e78f4f0d1117921c96d06872b4884",
+      "tree_pin_verified": true
+    },
+    {
+      "id": "H03-SRC-activity",
+      "kind": "github_file",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58/apps/api/src/services/activity-event.service.ts",
+      "owner_function": "Activity service / reporting adapter",
+      "owner_assignment": "Function only; no new official assignment",
+      "evidence_level": "source_inspected",
+      "inspected_by": [
+        "h03_identity_contracts"
+      ],
+      "inspected_on": "2026-11-07",
+      "observations": [
+        "Queries with company filter and limitMAX_RESULT_WINDOW=10000, then filters/sorts in memory."
+      ],
+      "limitations": [
+        "Bounded UI reader cannot establish complete historical analytics traversal or expected population."
+      ],
+      "affected_tickets": [
+        "PAI-H03"
+      ],
+      "repository": "SimonShaun2/Renvani",
+      "path": "apps/api/src/services/activity-event.service.ts",
+      "commit": "5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58",
+      "blob_sha": "0f6b2fc8d883a94f35eb28a4e593e4a6fb2cfbef",
+      "tree_pin_verified": true
+    },
+    {
+      "id": "H03-SRC-receipt",
+      "kind": "github_file",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58/apps/api/src/services/agent-action-receipt.ts",
+      "owner_function": "Trusted Execution",
+      "owner_assignment": "Function only; no new official assignment",
+      "evidence_level": "source_inspected",
+      "inspected_by": [
+        "h03_identity_contracts"
+      ],
+      "inspected_on": "2026-11-07",
+      "observations": [
+        "Internal success and queued outbound receipts differ; outbound execution remains executing/queued with no provider send at this boundary.",
+        "Failed execution receipt is persisted after rollback when code path invokes helper."
+      ],
+      "limitations": [
+        "Latest receipt is not complete history of every attempt; source function presence does not prove provider delivery."
+      ],
+      "affected_tickets": [
+        "PAI-H03"
+      ],
+      "repository": "SimonShaun2/Renvani",
+      "path": "apps/api/src/services/agent-action-receipt.ts",
+      "commit": "5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58",
+      "blob_sha": "84026f3cc6934d97c641466e3daf76da4005efac",
+      "tree_pin_verified": true
+    },
+    {
+      "id": "H03-SRC-actionaudit",
+      "kind": "github_file",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58/apps/api/src/services/agent-action-audit.ts",
+      "owner_function": "Trusted Execution / observability",
+      "owner_assignment": "Function only; no new official assignment",
+      "evidence_level": "source_inspected",
+      "inspected_by": [
+        "h03_identity_contracts"
+      ],
+      "inspected_on": "2026-11-07",
+      "observations": [
+        "Lifecycle execution_succeeded maps to named agent.execution_succeeded audit; underlying typed receipt determines actual observation."
+      ],
+      "limitations": [
+        "Event name alone cannot certify send/delivery/customer value; arbitrary audit detail is not permitted export."
+      ],
+      "affected_tickets": [
+        "PAI-H03"
+      ],
+      "repository": "SimonShaun2/Renvani",
+      "path": "apps/api/src/services/agent-action-audit.ts",
+      "commit": "5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58",
+      "blob_sha": "005a7908e72b363a83374d3b127aaa9330d678a8",
+      "tree_pin_verified": true
+    },
+    {
+      "id": "H03-SRC-actionservice",
+      "kind": "github_file",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58/apps/api/src/services/agent-action.service.ts",
+      "owner_function": "Trusted Execution",
+      "owner_assignment": "Function only; no new official assignment",
+      "evidence_level": "source_inspected",
+      "inspected_by": [
+        "h03_identity_contracts"
+      ],
+      "inspected_on": "2026-11-07",
+      "observations": [
+        "Execution verifies scope/version/policy, commits internal effects, leaves outbound receiptqueued, emits execution_succeeded lifecycle audit; replay detection returns prior result."
+      ],
+      "limitations": [
+        "Reporting must decode receipt semantics and not call execute/retry operational paths; attempt completeness remains unverified."
+      ],
+      "affected_tickets": [
+        "PAI-H03"
+      ],
+      "repository": "SimonShaun2/Renvani",
+      "path": "apps/api/src/services/agent-action.service.ts",
+      "commit": "5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58",
+      "blob_sha": "ca93d66ac2eb9e991080b663d94ae06b5d09a136",
+      "tree_pin_verified": true
+    },
+    {
+      "id": "H03-SRC-estimate",
+      "kind": "github_file",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58/apps/api/src/services/estimate.service.ts",
+      "owner_function": "Revenue / estimate workflow",
+      "owner_assignment": "Function only; no new official assignment",
+      "evidence_level": "source_inspected",
+      "inspected_by": [
+        "h03_identity_contracts"
+      ],
+      "inspected_on": "2026-11-07",
+      "observations": [
+        "Conversion changes estimate status and emits estimate.converted plus job.created with links."
+      ],
+      "limitations": [
+        "Conversion/job creation alone is not scheduled booking; no general recovery opportunity identity established by this function."
+      ],
+      "affected_tickets": [
+        "PAI-H03"
+      ],
+      "repository": "SimonShaun2/Renvani",
+      "path": "apps/api/src/services/estimate.service.ts",
+      "commit": "5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58",
+      "blob_sha": "d94517d88ad9fcc8908084d94c422dfa6866a392",
+      "tree_pin_verified": true
+    },
+    {
+      "id": "H03-SRC-job",
+      "kind": "github_file",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58/apps/api/src/services/job.service.ts",
+      "owner_function": "Operations / job workflow",
+      "owner_assignment": "Function only; no new official assignment",
+      "evidence_level": "source_inspected",
+      "inspected_by": [
+        "h03_identity_contracts"
+      ],
+      "inspected_on": "2026-11-07",
+      "observations": [
+        "Scheduling/completion emit distinct typed facts; completion is a tenant-scoped domain transition.",
+        "job.reopened can represent cancelled->other-state transition."
+      ],
+      "limitations": [
+        "Do not infer collection from completion or completion reversal from every job.reopened; actual source/link completeness still required."
+      ],
+      "affected_tickets": [
+        "PAI-H03"
+      ],
+      "repository": "SimonShaun2/Renvani",
+      "path": "apps/api/src/services/job.service.ts",
+      "commit": "5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58",
+      "blob_sha": "cd04da34b4f1a42e3240e76a8fa7113eb4e03af9",
+      "tree_pin_verified": true
+    },
+    {
+      "id": "H03-SRC-proposals",
+      "kind": "github_file",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58/apps/api/src/services/revenue-agent/revenue-agent-proposals.service.ts",
+      "owner_function": "Revenue agent",
+      "owner_assignment": "Function only; no new official assignment",
+      "evidence_level": "source_inspected",
+      "inspected_by": [
+        "h03_identity_contracts"
+      ],
+      "inspected_on": "2026-11-07",
+      "observations": [
+        "Oneproposal perrecommendation usesrec:<id>; candidate list pending/nonexpired/nonsnoozed, supported types sorted then sliced tolimit."
+      ],
+      "limitations": [
+        "Recommendation candidates/skipped totals do not constitute complete pre-decision eligible-business denominator."
+      ],
+      "affected_tickets": [
+        "PAI-H03"
+      ],
+      "repository": "SimonShaun2/Renvani",
+      "path": "apps/api/src/services/revenue-agent/revenue-agent-proposals.service.ts",
+      "commit": "5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58",
+      "blob_sha": "7a3634a467bf8eceeaf27c60a0a3abefe9373383",
+      "tree_pin_verified": true
+    },
+    {
+      "id": "H03-SRC-outboxservice",
+      "kind": "github_file",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58/packages/db/src/integration-outbox.service.ts",
+      "owner_function": "Platform / integration infrastructure",
+      "owner_assignment": "Function only; no new official assignment",
+      "evidence_level": "source_inspected",
+      "inspected_by": [
+        "h03_identity_contracts"
+      ],
+      "inspected_on": "2026-11-07",
+      "observations": [
+        "Existing company-scoped operation and retry architecture can be reused for a separately registered reporting operation if appropriate."
+      ],
+      "limitations": [
+        "Operational outbox retries must not be replayed to rebuild analytics; live delivery/least-privilege not validated."
+      ],
+      "affected_tickets": [
+        "PAI-H03"
+      ],
+      "repository": "SimonShaun2/Renvani",
+      "path": "packages/db/src/integration-outbox.service.ts",
+      "commit": "5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58",
+      "blob_sha": "3ad40b8f976e674db8f717401c289acf509a798f",
+      "tree_pin_verified": true
+    },
+    {
+      "id": "H04-CODE-ADMIN",
+      "kind": "github_file",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58/apps/api/src/lib/require-renavi-internal-admin.ts",
+      "owner_function": "Platform/Security or relevant domain owner",
+      "owner_assignment": "Function only; no new official assignment",
+      "evidence_level": "source_inspected",
+      "inspected_by": [
+        "h04_export_policy"
+      ],
+      "inspected_on": "2026-11-07",
+      "observations": [
+        "Existing internal guard requires owner/admin plus internal company ID."
+      ],
+      "limitations": [
+        "Source check does not establish PostHog access or deployment."
+      ],
+      "affected_tickets": [
+        "PAI-H04",
+        "PAI-C03",
+        "PAI-C10",
+        "PAI-C11",
+        "PAI-C17"
+      ],
+      "repository": "SimonShaun2/Renvani",
+      "path": "apps/api/src/lib/require-renavi-internal-admin.ts",
+      "commit": "5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58",
+      "blob_sha": "1496988e659e1521e58d8290ec2e732a4258fcd3",
+      "tree_pin_verified": true
+    },
+    {
+      "id": "H04-CODE-TENANT",
+      "kind": "github_file",
+      "url": "https://github.com/SimonShaun2/Renvani/blob/5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58/apps/api/src/lib/authorize.ts",
+      "owner_function": "Platform/Security or relevant domain owner",
+      "owner_assignment": "Function only; no new official assignment",
+      "evidence_level": "source_inspected",
+      "inspected_by": [
+        "h04_export_policy"
+      ],
+      "inspected_on": "2026-11-07",
+      "observations": [
+        "Role helper checks current user role; internal-company restriction exists in separate internal guard."
+      ],
+      "limitations": [
+        "Not a complete tenant authorization or vendor permission test."
+      ],
+      "affected_tickets": [
+        "PAI-H04",
+        "PAI-C03",
+        "PAI-C10",
+        "PAI-C11",
+        "PAI-C17"
+      ],
+      "repository": "SimonShaun2/Renvani",
+      "path": "apps/api/src/lib/authorize.ts",
+      "commit": "5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58",
+      "blob_sha": "e96781fdf8e2c48397b91b75357bd72b32ef3a13",
+      "tree_pin_verified": true
+    },
+    {
+      "id": "H04-VENDOR-SOURCES",
+      "kind": "vendor_documentation",
+      "url": "https://posthog.com/docs/data-pipelines/sources",
+      "owner_function": "Platform/Security/Privacy; Finance where relevant",
+      "owner_assignment": "Function only; no new official assignment",
+      "evidence_level": "vendor_documentation",
+      "inspected_by": [
+        "h04_export_policy"
+      ],
+      "inspected_on": "2026-11-07",
+      "observations": [
+        "Managed Stripe schemas lack column masking; API sources lack SQL row filters. Filters do not delete already copied rows; incremental modes need explicit delete coverage."
+      ],
+      "limitations": [
+        "Actual source payload controls and account behavior not tested."
+      ],
+      "affected_tickets": [
+        "PAI-H04",
+        "PAI-H07",
+        "PAI-C01",
+        "PAI-C03",
+        "PAI-C04",
+        "PAI-C05",
+        "PAI-C07",
+        "PAI-C11",
+        "PAI-C17"
+      ],
+      "title": "PostHog Link a source",
+      "document_revision": "Live documentation; immutable vendor revision not supplied by page."
+    },
+    {
+      "id": "H04-VENDOR-POSTGRES",
+      "kind": "vendor_documentation",
+      "url": "https://posthog.com/docs/data-pipelines/sources/postgres",
+      "owner_function": "Platform/Security/Privacy; Finance where relevant",
+      "owner_assignment": "Function only; no new official assignment",
+      "evidence_level": "vendor_documentation",
+      "inspected_by": [
+        "h04_export_policy"
+      ],
+      "inspected_on": "2026-11-07",
+      "observations": [
+        "Columns default to included; key/cursor columns cannot be deselected. Source-side minimized projections are required by this design."
+      ],
+      "limitations": [
+        "No actual network, database grant, TLS, connector version or data load checked."
+      ],
+      "affected_tickets": [
+        "PAI-H04",
+        "PAI-H07",
+        "PAI-C01",
+        "PAI-C03",
+        "PAI-C04",
+        "PAI-C05",
+        "PAI-C07",
+        "PAI-C11",
+        "PAI-C17"
+      ],
+      "title": "PostHog Postgres source",
+      "document_revision": "Live documentation; immutable vendor revision not supplied by page."
+    },
+    {
+      "id": "H04-VENDOR-STRIPE",
+      "kind": "vendor_documentation",
+      "url": "https://posthog.com/docs/data-pipelines/sources/stripe",
+      "owner_function": "Platform/Security/Privacy; Finance where relevant",
+      "owner_assignment": "Function only; no new official assignment",
+      "evidence_level": "vendor_documentation",
+      "inspected_by": [
+        "h04_export_policy"
+      ],
+      "inspected_on": "2026-11-07",
+      "observations": [
+        "Change-aware webhook updates/deletes land on scheduled sync; setup can involve Webhooks write permission."
+      ],
+      "limitations": [
+        "Account coverage, full nested resource payload and actual scopes not tested."
+      ],
+      "affected_tickets": [
+        "PAI-H04",
+        "PAI-H07",
+        "PAI-C01",
+        "PAI-C03",
+        "PAI-C04",
+        "PAI-C05",
+        "PAI-C07",
+        "PAI-C11",
+        "PAI-C17"
+      ],
+      "title": "PostHog Stripe source",
+      "document_revision": "Live documentation; immutable vendor revision not supplied by page."
+    },
+    {
+      "id": "H04-VENDOR-ACCESS",
+      "kind": "vendor_documentation",
+      "url": "https://posthog.com/docs/settings/access-control",
+      "owner_function": "Platform/Security/Privacy; Finance where relevant",
+      "owner_assignment": "Function only; no new official assignment",
+      "evidence_level": "vendor_documentation",
+      "inspected_by": [
+        "h04_export_policy"
+      ],
+      "inspected_on": "2026-11-07",
+      "observations": [
+        "Free/Pay-as-you-go lacks access-control features; Boost/Scale supports per-member controls; Enterprise supports role-based access; admins inherit broad access."
+      ],
+      "limitations": [
+        "Renvani actual entitlement/membership/grants unknown; no claim of effective permission enforcement."
+      ],
+      "affected_tickets": [
+        "PAI-H04",
+        "PAI-H07",
+        "PAI-C01",
+        "PAI-C03",
+        "PAI-C04",
+        "PAI-C05",
+        "PAI-C07",
+        "PAI-C11",
+        "PAI-C17"
+      ],
+      "title": "PostHog access control",
+      "document_revision": "Live documentation; immutable vendor revision not supplied by page."
+    },
+    {
+      "id": "H04-VENDOR-WAREHOUSE_ACCESS",
+      "kind": "vendor_documentation",
+      "url": "https://posthog.com/docs/settings/warehouse-access-control",
+      "owner_function": "Platform/Security/Privacy; Finance where relevant",
+      "owner_assignment": "Function only; no new official assignment",
+      "evidence_level": "vendor_documentation",
+      "inspected_by": [
+        "h04_export_policy"
+      ],
+      "inspected_on": "2026-11-07",
+      "observations": [
+        "Warehouse access can apply across SQL/AI/MCP. Materialized views can share selected data; ordinary views depend on base-table access."
+      ],
+      "limitations": [
+        "Must test actual source/table/property/output grants; capability documentation is not tenant isolation proof."
+      ],
+      "affected_tickets": [
+        "PAI-H04",
+        "PAI-H07",
+        "PAI-C01",
+        "PAI-C03",
+        "PAI-C04",
+        "PAI-C05",
+        "PAI-C07",
+        "PAI-C11",
+        "PAI-C17"
+      ],
+      "title": "PostHog warehouse access control",
+      "document_revision": "Live documentation; immutable vendor revision not supplied by page."
+    },
+    {
+      "id": "H04-VENDOR-PRIVACY_MODE",
+      "kind": "vendor_documentation",
+      "url": "https://posthog.com/docs/ai-observability/privacy-mode",
+      "owner_function": "Platform/Security/Privacy; Finance where relevant",
+      "owner_assignment": "Function only; no new official assignment",
+      "evidence_level": "vendor_documentation",
+      "inspected_by": [
+        "h04_export_policy"
+      ],
+      "inspected_on": "2026-11-07",
+      "observations": [
+        "Privacy mode omits content-bearing inputs/outputs but retains custom properties, span/trace names and tool definitions."
+      ],
+      "limitations": [
+        "A source-side allowlist and actual payload inspection are still necessary; no SDK path was configured."
+      ],
+      "affected_tickets": [
+        "PAI-H04",
+        "PAI-H07",
+        "PAI-C01",
+        "PAI-C03",
+        "PAI-C04",
+        "PAI-C05",
+        "PAI-C07",
+        "PAI-C11",
+        "PAI-C17"
+      ],
+      "title": "PostHog AI privacy mode",
+      "document_revision": "Live documentation; immutable vendor revision not supplied by page."
+    },
+    {
+      "id": "H04-VENDOR-EVENT_RETENTION",
+      "kind": "vendor_documentation",
+      "url": "https://posthog.com/docs/data/events-retention",
+      "owner_function": "Platform/Security/Privacy; Finance where relevant",
+      "owner_assignment": "Function only; no new official assignment",
+      "evidence_level": "vendor_documentation",
+      "inspected_by": [
+        "h04_export_policy"
+      ],
+      "inspected_on": "2026-11-07",
+      "observations": [
+        "Warehouse tables keep rows independently of event retention; free event retention is one year without customization; expiry may precede physical deletion."
+      ],
+      "limitations": [
+        "Proposed13-month/90-day/30-day Renvani windows are not established account capabilities."
+      ],
+      "affected_tickets": [
+        "PAI-H04",
+        "PAI-H07",
+        "PAI-C01",
+        "PAI-C03",
+        "PAI-C04",
+        "PAI-C05",
+        "PAI-C07",
+        "PAI-C11",
+        "PAI-C17"
+      ],
+      "title": "PostHog events retention",
+      "document_revision": "Live documentation; immutable vendor revision not supplied by page."
+    },
+    {
+      "id": "H04-VENDOR-AI_RETENTION",
+      "kind": "vendor_documentation",
+      "url": "https://posthog.com/docs/ai-observability/data-retention",
+      "owner_function": "Platform/Security/Privacy; Finance where relevant",
+      "owner_assignment": "Function only; no new official assignment",
+      "evidence_level": "vendor_documentation",
+      "inspected_by": [
+        "h04_export_policy"
+      ],
+      "inspected_on": "2026-11-07",
+      "observations": [
+        "Thirty-day cleanup covers large AI properties; other metadata persists under event retention."
+      ],
+      "limitations": [
+        "Does not authorize raw content collection or prove complete trace deletion."
+      ],
+      "affected_tickets": [
+        "PAI-H04",
+        "PAI-H07",
+        "PAI-C01",
+        "PAI-C03",
+        "PAI-C04",
+        "PAI-C05",
+        "PAI-C07",
+        "PAI-C11",
+        "PAI-C17"
+      ],
+      "title": "PostHog AI event retention",
+      "document_revision": "Live documentation; immutable vendor revision not supplied by page."
+    },
+    {
+      "id": "H04-VENDOR-DELETION",
+      "kind": "vendor_documentation",
+      "url": "https://posthog.com/docs/privacy/data-storage",
+      "owner_function": "Platform/Security/Privacy; Finance where relevant",
+      "owner_assignment": "Function only; no new official assignment",
+      "evidence_level": "vendor_documentation",
+      "inspected_by": [
+        "h04_export_policy"
+      ],
+      "inspected_on": "2026-11-07",
+      "observations": [
+        "Event deletion is asynchronous and exposes pending/completed status; accepted request alone is not completion."
+      ],
+      "limitations": [
+        "No universal backup purge or independent warehouse deletion coverage inferred."
+      ],
+      "affected_tickets": [
+        "PAI-H04",
+        "PAI-H07",
+        "PAI-C01",
+        "PAI-C03",
+        "PAI-C04",
+        "PAI-C05",
+        "PAI-C07",
+        "PAI-C11",
+        "PAI-C17"
+      ],
+      "title": "PostHog data storage/deletion",
+      "document_revision": "Live documentation; immutable vendor revision not supplied by page."
+    },
+    {
+      "id": "H04-VENDOR-REGION",
+      "kind": "vendor_documentation",
+      "url": "https://posthog.com/handbook/company/security",
+      "owner_function": "Platform/Security/Privacy; Finance where relevant",
+      "owner_assignment": "Function only; no new official assignment",
+      "evidence_level": "vendor_documentation",
+      "inspected_by": [
+        "h04_export_policy"
+      ],
+      "inspected_on": "2026-11-07",
+      "observations": [
+        "Vendor documents US and EU hosting choices."
+      ],
+      "limitations": [
+        "Actual Renvani project region, signed terms, processor paths and backup commitments were not inspected."
+      ],
+      "affected_tickets": [
+        "PAI-H04",
+        "PAI-H07",
+        "PAI-C01",
+        "PAI-C03",
+        "PAI-C04",
+        "PAI-C05",
+        "PAI-C07",
+        "PAI-C11",
+        "PAI-C17"
+      ],
+      "title": "PostHog security and privacy",
+      "document_revision": "Live documentation; immutable vendor revision not supplied by page."
+    }
+  ],
+  "pull_requests": [
+    {
+      "number": 142,
+      "url": "https://github.com/SimonShaun2/Renvani/pull/142",
+      "title": "feat(FS-43): env-gated Sentry + PostHog in api, worker, and web",
+      "state": "closed",
+      "draft": false,
+      "merged": false,
+      "merged_at": null,
+      "head_branch": "cursor/stack-observability-sentry-posthog-1f27",
+      "head_sha": "7ee169c8a3fa443f33920e208607fc46328709aa",
+      "base_branch": "dev",
+      "base_sha": "593fb3bce436a110ef46db3110883f6bd11c083f",
+      "merge_commit_sha": null,
+      "evidence_level": "pr_metadata_verified",
+      "limitation": "Source state only; no current deployment, exact-head acceptance or gate completion inferred.",
+      "owner_function": "Platform / Reliability and Observability",
+      "owner_assignment": "Existing function; no new assignment by this audit",
+      "observed_on": "2026-11-07",
+      "disposition": "preserve and reconcile compatible work"
+    },
+    {
+      "number": 442,
+      "url": "https://github.com/SimonShaun2/Renvani/pull/442",
+      "title": "docs: prepare Part II mission foundations and Codex handoffs",
+      "state": "closed",
+      "draft": false,
+      "merged": true,
+      "merged_at": "2026-11-06T23:10:29Z",
+      "head_branch": "docs/part2-foundation-prep-20261105",
+      "head_sha": "30dcc1f2d46cd11d73a69c058a98f744fcf539f5",
+      "base_branch": "dev",
+      "base_sha": "d17dd831ffce437dc9563d95a75de6ad15549c45",
+      "merge_commit_sha": "4a5b3be85c6fccf1ec00c74d7934a225753e9980",
+      "evidence_level": "pr_metadata_verified",
+      "limitation": "Source state only; no current deployment, exact-head acceptance or gate completion inferred.",
+      "owner_function": "Product Owner / mission preparation owners",
+      "owner_assignment": "Existing function; no new assignment by this audit",
+      "observed_on": "2026-11-07",
+      "disposition": "reuse merged source; deployment/acceptance separately unverified"
+    },
+    {
+      "number": 445,
+      "url": "https://github.com/SimonShaun2/Renvani/pull/445",
+      "title": "feat(fsm): complete workflow integration, estimate pagination and weekly dispatch",
+      "state": "closed",
+      "draft": false,
+      "merged": true,
+      "merged_at": "2026-11-07T10:29:10Z",
+      "head_branch": "feat/fsm-workflow-reliability-20261105",
+      "head_sha": "0d33cbb7eb3ee63274b8df274772dc3eacef678b",
+      "base_branch": "dev",
+      "base_sha": "73781760cee241db73bc1d63980e9e81ee6710ae",
+      "merge_commit_sha": "5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58",
+      "evidence_level": "pr_metadata_verified",
+      "limitation": "Source state only; no current deployment, exact-head acceptance or gate completion inferred.",
+      "owner_function": "Service Workflows / Integration and Compatibility",
+      "owner_assignment": "Existing function; no new assignment by this audit",
+      "observed_on": "2026-11-07",
+      "disposition": "reuse merged source; deployment/acceptance separately unverified"
+    },
+    {
+      "number": 449,
+      "url": "https://github.com/SimonShaun2/Renvani/pull/449",
+      "title": "docs: two-track connected-intelligence build specs with tickets and sprints",
+      "state": "closed",
+      "draft": false,
+      "merged": true,
+      "merged_at": "2026-11-06T23:11:05Z",
+      "head_branch": "docs/operations-finance-migration-spec-20261106",
+      "head_sha": "443dc8a3f2b33f0f6560ce37819d67f1327311ce",
+      "base_branch": "dev",
+      "base_sha": "8d01e752377d2401cb2c6cdf235aa8dcbdde0aeb",
+      "merge_commit_sha": "f77216143d1249c0ba045c44a6f2f097845d483e",
+      "evidence_level": "pr_metadata_verified",
+      "limitation": "Source state only; no current deployment, exact-head acceptance or gate completion inferred.",
+      "owner_function": "Technical Lead / Connected Intelligence domain owners",
+      "owner_assignment": "Existing function; no new assignment by this audit",
+      "observed_on": "2026-11-07",
+      "disposition": "reuse merged source; deployment/acceptance separately unverified"
+    },
+    {
+      "number": 452,
+      "url": "https://github.com/SimonShaun2/Renvani/pull/452",
+      "title": "feat: implement Document 1 H01–H16 connected-intelligence foundation",
+      "state": "closed",
+      "draft": false,
+      "merged": true,
+      "merged_at": "2026-11-06T23:11:31Z",
+      "head_branch": "feat/rci-foundation-h01-h16-20261106",
+      "head_sha": "adce2aa10e8cfdac4119bee16c01f2ffefe63f0f",
+      "base_branch": "dev",
+      "base_sha": "8d01e752377d2401cb2c6cdf235aa8dcbdde0aeb",
+      "merge_commit_sha": "7dfb51798c7a22d33bb3c9736b3397bb80495052",
+      "evidence_level": "pr_metadata_verified",
+      "limitation": "Source state only; no current deployment, exact-head acceptance or gate completion inferred.",
+      "owner_function": "Data Contracts / Measurement",
+      "owner_assignment": "Existing function; no new assignment by this audit",
+      "observed_on": "2026-11-07",
+      "disposition": "reuse merged source; deployment/acceptance separately unverified"
+    },
+    {
+      "number": 459,
+      "url": "https://github.com/SimonShaun2/Renvani/pull/459",
+      "title": "docs: Stripe and PostHog platform analytics plan, specs, and sprint tickets",
+      "state": "open",
+      "draft": true,
+      "merged": false,
+      "merged_at": null,
+      "head_branch": "docs/platform-analytics-stripe-posthog-20261107",
+      "head_sha": "e374f5007878e547958ae0e3c26098e58420171a",
+      "base_branch": "dev",
+      "base_sha": "5e3e83eaaf52caa2b97707fbe67b0fc92f63cd58",
+      "merge_commit_sha": null,
+      "evidence_level": "pr_metadata_verified",
+      "limitation": "Source state only; no current deployment, exact-head acceptance or gate completion inferred.",
+      "owner_function": "Technical Lead / Platform Analytics preparation",
+      "owner_assignment": "Existing function; no new assignment by this audit",
+      "observed_on": "2026-11-07",
+      "disposition": "current draft preparation publication"
+    }
+  ],
+  "explicitly_unverified": [
+    "Live Stripe account/resource scope, pricing, paid entitlements and actual checkout behavior",
+    "Production PostHog project, region, roles, source payload/columns and retention/deletion behavior",
+    "Langfuse deployment and complete inference-cost coverage",
+    "Actual tenant security/RLS or webhook/queue transport acceptance",
+    "Whole-product Phase A acceptance, missions activation, pooled-learning permissions",
+    "Current individual FS staffing assignments and approved CI batch"
+  ],
+  "supplemental_domain_evidence_status": "H02-H04 pinned source and primary vendor references consolidated; live account/runtime checks remain unverified.",
+  "source_counts": {
+    "github_file": 34,
+    "notion_page": 3,
+    "vendor_documentation": 16,
+    "total": 53
+  },
+  "source_alias_policy": "Canonical entries consolidate identical URL/commit evidence; aliases preserve H02/H03/H04 local references. Provider documentation uses its observed date when no immutable revision is published.",
+  "bounded_verification": {
+    "current_source_blob_pins_checked_against_complete_tree": 29,
+    "mismatched_blob_pins": 0,
+    "review_scope": "Source and contract documentation only; no runtime tests."
+  },
+  "independent_document_review": "h01-h04-review.md",
+  "live_runtime_verified": false
+}

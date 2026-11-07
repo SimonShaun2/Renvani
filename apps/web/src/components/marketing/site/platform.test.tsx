@@ -84,9 +84,9 @@ describe("Products + How it works (Figma 176:204/176:313, 176:585/176:664)", () 
   });
 
   it("sitemap and robots include both pages", () => {
-    const urls = buildMarketingSitemap({ PUBLIC_SITE_URL: "https://x.test" } as unknown as NodeJS.ProcessEnv).map((e) => e.url);
+    const urls = buildMarketingSitemap({ VERCEL_ENV: "production", PUBLIC_SITE_URL: "https://x.test" } as unknown as NodeJS.ProcessEnv).map((e) => e.url);
     expect(urls).toEqual(expect.arrayContaining(["https://x.test/product", "https://x.test/how-it-works"]));
-    const robots = buildPublicRobots({ PUBLIC_SITE_URL: "https://x.test" } as unknown as NodeJS.ProcessEnv);
+    const robots = buildPublicRobots({ VERCEL_ENV: "production", PUBLIC_SITE_URL: "https://x.test" } as unknown as NodeJS.ProcessEnv);
     for (const path of ["/product", "/how-it-works"]) expect(isCrawlable(robots, path), path).toBe(true);
   });
 

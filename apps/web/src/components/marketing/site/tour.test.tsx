@@ -50,7 +50,7 @@ describe("workflow tour", () => {
       expect(MARKETING_SITEMAP_PATHS.some((p) => p.path === tourPath(s.slug))).toBe(true);
     }
     expect(isPublicRoute("/tour/nope")).toBe(false);
-    expect(isCrawlable(buildPublicRobots({ PUBLIC_SITE_URL: "https://x.test" } as unknown as NodeJS.ProcessEnv), "/tour")).toBe(true);
+    expect(isCrawlable(buildPublicRobots({ VERCEL_ENV: "production", PUBLIC_SITE_URL: "https://x.test" } as unknown as NodeJS.ProcessEnv), "/tour")).toBe(true);
     expect(readFileSync(join(APP, "(marketing)/product-tour/page.tsx"), "utf8")).toMatch(/permanentRedirect\("\/tour"\)/);
   });
 

@@ -100,7 +100,7 @@ describe("pricing (Figma 203:15719 desktop / 203:15720 mobile)", () => {
     expect(page).toContain("PricingFrames");
     expect(page).not.toMatch(/redirect\(/);
     expect(isPublicRoute("/pricing")).toBe(true);
-    expect(buildMarketingSitemap({ PUBLIC_SITE_URL: "https://x.test" } as unknown as NodeJS.ProcessEnv).map((e) => e.url)).toContain("https://x.test/pricing");
+    expect(buildMarketingSitemap({ VERCEL_ENV: "production", PUBLIC_SITE_URL: "https://x.test" } as unknown as NodeJS.ProcessEnv).map((e) => e.url)).toContain("https://x.test/pricing");
     expect(JSON.stringify(SITE_NAV)).toContain('"/pricing"');
     expect(JSON.stringify(SITE_FOOTER)).toContain('"/pricing"');
   });

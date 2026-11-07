@@ -32,8 +32,14 @@ export const ROBOTS_ALLOW = [
   { key: "sitemap-chunks", prefix: "/sitemap/" }
 ] as const;
 
-/** Exact path and everything below it, without catching siblings (e.g. /growth must not block /growth-check). */
-const pathAndBelow = (prefix: string) => [`${prefix}$`, `${prefix}/`];
+/**
+ * Exact path, any query on it, and everything below it, without catching siblings (/growth must not block
+ * /growth-check). `$` anchors the end of the full URL including the query, so `/x?` is needed for `/x?a=b`.
+ */
+const pathAndBelow = (prefix: string) => [`${prefix}$`, `${prefix}?`, `${prefix}/`];
+
+/** Reserved private aliases with no routes today; kept out of the index if they are ever added. */
+const RESERVED_PRIVATE_PREFIXES = ["/app", "/auth", "/sign-in", "/sign-up"] as const;
 
 /** Signed-in pages that exist under app/(app) but are not in any role list (kept out of the index regardless). */
 const EXTRA_PRIVATE_PREFIXES = ["/booking-requests"] as const;
@@ -51,6 +57,7 @@ export const ROBOTS_DISALLOW = [
   ...AUTH_ROUTES.flatMap(pathAndBelow),
   ...NO_ROLE_SETUP_ROUTES.flatMap(pathAndBelow),
   ...[...APP_ROUTE_PREFIXES.filter((p) => p !== "/studio"), ...EXTRA_PRIVATE_PREFIXES].flatMap(pathAndBelow),
+  ...RESERVED_PRIVATE_PREFIXES.flatMap(pathAndBelow),
   ...TOKEN_PREFIXES,
   "/book/*/manage",
   "/book/*/confirm",
@@ -234,7 +241,8 @@ export async function buildSiteSitemapXml(
 
 export function buildPublicRobots(env: NodeJS.ProcessEnv = process.env): MetadataRoute.Robots {
   const base = publicSiteUrl(env);
-  // Previews / unconfigured deploys: block everything and advertise no sitemap.
+  // Anything but an explicitly identified production deployment (see isProductionDeployment): block everything and
+  // advertise no sitemap, even when PUBLIC_SITE_URL names production.
   if (!base) return { rules: [{ userAgent: "*", disallow: "/" }] };
   return {
     rules: [{ userAgent: "*", allow: ROBOTS_ALLOW.map((a) => a.prefix), disallow: [...ROBOTS_DISALLOW] }],

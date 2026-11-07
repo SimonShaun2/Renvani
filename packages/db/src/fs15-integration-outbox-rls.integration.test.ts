@@ -3,6 +3,8 @@ import { randomUUID } from "node:crypto";
 import { inArray, sql } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
+import { runSerializedRoleGrants } from "./test-support/serialized-role-grants.js";
+
 // FS-15 (0050): live cross-tenant check for the integration outbox tables
 // (runs only when NEON_CI_DATABASE_URL points at Postgres).
 const neonCiUrl = process.env.NEON_CI_DATABASE_URL?.trim();
@@ -24,14 +26,14 @@ describe.runIf(postgresIntegrationEnabled)("FS-15 integration outbox RLS (Postgr
     )) as unknown as { rolbypassrls: boolean }[];
     useProbeRole = self?.rolbypassrls === true;
     if (!useProbeRole) return;
-    await db.execute(
-      sql.raw(`DO $$ BEGIN
+    await runSerializedRoleGrants(db, [
+      `DO $$ BEGIN
         CREATE ROLE ${RLS_PROBE_ROLE} NOLOGIN NOSUPERUSER NOBYPASSRLS;
-      EXCEPTION WHEN duplicate_object OR unique_violation THEN NULL; END $$`)
-    );
-    await db.execute(sql.raw(`GRANT ${RLS_PROBE_ROLE} TO CURRENT_USER`));
-    await db.execute(sql.raw(`GRANT USAGE ON SCHEMA public TO ${RLS_PROBE_ROLE}`));
-    await db.execute(sql.raw(`GRANT SELECT ON ${TABLES.join(", ")} TO ${RLS_PROBE_ROLE}`));
+      EXCEPTION WHEN duplicate_object OR unique_violation THEN NULL; END $$`,
+      `GRANT ${RLS_PROBE_ROLE} TO CURRENT_USER`,
+      `GRANT USAGE ON SCHEMA public TO ${RLS_PROBE_ROLE}`,
+      `GRANT SELECT ON ${TABLES.join(", ")} TO ${RLS_PROBE_ROLE}`
+    ]);
   });
 
   afterAll(async () => {

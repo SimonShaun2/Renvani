@@ -18,7 +18,7 @@ const RESTAURANT = /restaurant|menu|diner|reservation|table/i;
 
 describe("marketing site (Figma 171:2)", () => {
   it("competitor guard scans homepage, workflow, shared navigation, footer, founder copy and content JSON", () => {
-    const src = ["HomePage.tsx", "HomepageWorkflows.tsx", "home-workflows.ts", "IndustryShowcase.tsx", "site-config.ts", "MarketingShell.tsx", "FounderStory.tsx", "launch-content.ts"].map((f) => readFileSync(join(__dirname, f), "utf8")).join("\n");
+    const src = ["HomePage.tsx", "HomepageWorkflows.tsx", "home-workflows.ts", "IndustryShowcase.tsx", "site-config.ts", "MarketingShell.tsx", "launch-content.ts"].map((f) => readFileSync(join(__dirname, f), "utf8")).join("\n");
     const contentJsonDir = join(__dirname, "../../../content/data");
     const json = readdirSync(contentJsonDir)
       .filter((name: string) => name.endsWith(".json"))
@@ -30,7 +30,7 @@ describe("marketing site (Figma 171:2)", () => {
   });
 
   it("founder copy names no past companies", () => {
-    const founder = ["FounderStory.tsx", "launch-content.ts"].map((f) => readFileSync(join(__dirname, f), "utf8")).join("\n");
+    const founder = ["HomePage.tsx", "launch-content.ts", "media-loops.ts"].map((f) => readFileSync(join(__dirname, f), "utf8")).join("\n");
     expect(founder).not.toMatch(/Service Fusion|ServiceGanja|STACS/i);
     expect(founder).not.toMatch(/early team|through the exit|through its exit/i);
   });
@@ -45,8 +45,9 @@ describe("marketing site (Figma 171:2)", () => {
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
     expect(screen.getByRole("heading", { name: "More direct jobs. More repeat customers." })).toBeTruthy();
     const hero = screen.getByRole("region", { name: "More direct jobs. More repeat customers." });
-    const heroImages = [...hero.querySelectorAll("img")].filter((image) => image.getAttribute("src")?.includes("f1266660"));
-    expect(heroImages).toHaveLength(1);
+    const heroImages = [...hero.querySelectorAll("img")].filter((image) => image.getAttribute("src")?.includes("hero-hvac-tech"));
+    expect(heroImages.length + hero.querySelectorAll("video").length).toBeGreaterThanOrEqual(1);
+    expect(hero.querySelector('[data-node-id="578:5189"]')).toBeTruthy();
     expect(container.querySelector("a a")).toBeNull();
   });
 
@@ -107,5 +108,11 @@ describe("marketing assets are public", () => {
     const { isPublicRoute } = await import("@/src/lib/route-access");
     expect(isPublicRoute("/marketing/home/hvac-tech.jpg")).toBe(true);
     expect(isPublicRoute("/marketing")).toBe(false);
+    expect(isPublicRoute("/media/why-renvani/rafael-v4-poster-fallback.jpg")).toBe(true);
+    expect(isPublicRoute("/media/loops/work-growth-poster-fallback.jpg")).toBe(true);
+    expect(isPublicRoute("/media/loops/hero-hvac-tech-loop.webm")).toBe(true);
+    expect(isPublicRoute("/media")).toBe(false);
+    expect(isPublicRoute("/media/foo")).toBe(false);
+    expect(isPublicRoute("/media/foo.exe")).toBe(false);
   });
 });

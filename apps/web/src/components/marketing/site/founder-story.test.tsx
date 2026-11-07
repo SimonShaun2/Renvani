@@ -2,10 +2,9 @@ import { cleanup, render, screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 vi.mock("./fonts",()=>({geist:{variable:"g"},inter:{variable:"i",className:"inter"},newsreader:{variable:"n"}}));
 vi.mock("next/navigation",()=>({usePathname:()=>"/"}));
-import { FounderStory } from "./FounderStory";
 import { HomePage } from "./HomePage";
 import { MarketingShell } from "./MarketingShell";
-import { FOUNDER_STORY, LAUNCH_HOME } from "./launch-content";
+import { LAUNCH_HOME } from "./launch-content";
 import { isPublicRoute } from "@/src/lib/route-access";
 import { MARKETING_SITEMAP_PATHS, buildPublicRobots } from "@/src/lib/seo/public-sitemap";
 
@@ -13,20 +12,9 @@ const PAST_COMPANY = /Service Fusion|ServiceGanja|STACS/i;
 
 afterEach(cleanup);
 
-describe("homepage founder credibility without a separate About page",()=>{
-  it("renders compliant repeat-founder copy with no past company names",()=>{
-    const {container}=render(<FounderStory/>);
-    expect(container.textContent).toContain(FOUNDER_STORY.lead);
-    expect(FOUNDER_STORY.lead).toContain("A repeat founder");
-    expect(FOUNDER_STORY.lead).toContain("one connected platform");
-    expect(container.textContent).toContain(FOUNDER_STORY.cardEyebrow);
-    expect(container.textContent).toContain(FOUNDER_STORY.cardTitle[0]);
-    expect(container.textContent).toContain(FOUNDER_STORY.cardTitle[1]);
-    expect(container.querySelector('[data-founder-story]')).toBeTruthy();
-    expect(container.querySelectorAll('a[href="/about"],img,blockquote')).toHaveLength(0);
-    expect(container.textContent).not.toMatch(PAST_COMPANY);
-    expect(JSON.stringify(FOUNDER_STORY)).not.toMatch(PAST_COMPANY);
-    expect(FOUNDER_STORY.lead).not.toMatch(/early team|through (its )?exit/i);
+describe("homepage Why video replaces the founder block",()=>{
+  it("keeps launch copy free of past company names",()=>{
+    expect(JSON.stringify(LAUNCH_HOME)).not.toMatch(PAST_COMPANY);
   });
   it("preserves the approved homepage hero, workflows, missions, gallery and Growth Check",()=>{
     const {container}=render(<HomePage/>);
@@ -34,7 +22,13 @@ describe("homepage founder credibility without a separate About page",()=>{
     expect(container.querySelector("#product-workflows")).toBeTruthy();
     expect(container.querySelector("#home-missions")).toBeTruthy();
     expect(container.querySelector("#home-growth-check")).toBeTruthy();
-    expect(container.querySelectorAll("[data-founder-story]")).toHaveLength(1);
+  });
+  it("renders a single Why video section and no founder block",()=>{
+    const {container}=render(<HomePage/>);
+    expect(container.querySelectorAll('[data-node-id="why-renvani-video"]')).toHaveLength(1);
+    expect(screen.getAllByRole("heading",{name:"Why we built Renvani"})).toHaveLength(1);
+    expect(container.querySelector("[data-founder-story]")).toBeNull();
+    expect(container.textContent).not.toMatch(PAST_COMPANY);
   });
   it("removes About from the footer and founder CTA without modifying other navigation",()=>{
     render(<MarketingShell><HomePage/></MarketingShell>);

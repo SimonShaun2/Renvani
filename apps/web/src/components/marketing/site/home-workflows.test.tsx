@@ -228,64 +228,43 @@ describe("homepage workflow interaction", () => {
     for (const tab of tabs) expect(document.getElementById(tab.getAttribute("aria-controls")!)).toBeTruthy();
   });
 
-  it("changes the actual Growth request UI while retaining the selected product and honors Pause and Replay", () => {
+  it("keeps product tabs, step list and destinations while the scene is a media loop", () => {
     const { container } = render(<HomepageWorkflows />);
     enterViewport(true);
-    const scene = container.querySelector('[data-product="growth"]')!;
-    const serviceValue = screen.getByText("Electrical repair");
-    expect(serviceValue.getAttribute("data-ready")).toBe("false");
-    advance(WORKFLOW_STEP_MS);
-    expect(scene.getAttribute("data-step")).toBe("1");
-    advance(WORKFLOW_STEP_MS);
-    expect(serviceValue.getAttribute("data-ready")).toBe("true");
-    fireEvent.click(screen.getByRole("button", { name: "Pause Growth animation" }));
-    advance(WORKFLOW_STEP_MS * 5);
-    expect(scene.getAttribute("data-step")).toBe("2");
-    fireEvent.click(screen.getByRole("button", { name: "Play Growth animation" }));
-    advance(WORKFLOW_STEP_MS);
-    expect(screen.getByText("Request received")).toBeTruthy();
+    expect(container.querySelector('[data-product="growth"]')).toBeTruthy();
+    expect(screen.getByRole("img", { name: "Illustrative Growth product loop" })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: /Pause .* animation/ })).toBeNull();
+    expect(screen.queryByRole("button", { name: /Replay .* animation/ })).toBeNull();
+    expect(screen.queryByRole("button", { name: /Complete view/ })).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Get found" }));
+    expect(screen.getByRole("button", { name: "Get found" }).getAttribute("aria-current")).toBe("step");
     expect(screen.getByRole("tab", { name: "Growth" }).getAttribute("aria-selected")).toBe("true");
-    fireEvent.click(screen.getByRole("button", { name: "Replay Growth animation" }));
-    expect(scene.getAttribute("data-step")).toBe("0");
-    expect(serviceValue.getAttribute("data-ready")).toBe("false");
   });
 
-  it("gives every product a distinct complete scene, working manual steps and real destination", () => {
+  it("gives every product a working step list, loop scene and real destination", () => {
     render(<HomepageWorkflows />);
-    const finalSceneText: Record<string, string> = {
-      growth: "Request received",
-      revenue: "Follow-up reviewed",
-      operations: "Payment recorded",
-      retention: "Membership or maintenance",
-      "command-center": "Owner approved this example"
-    };
     for (const workflow of HOME_WORKFLOWS) {
       fireEvent.click(screen.getByRole("tab", { name: workflow.name }));
       const finalStep = workflow.steps.at(-1)!;
       fireEvent.click(screen.getByRole("button", { name: finalStep.label }));
       expect(screen.getByRole("button", { name: finalStep.label }).getAttribute("aria-current")).toBe("step");
-      expect(screen.getByRole("img").getAttribute("aria-label")).toContain(finalStep.title);
-      expect(screen.getByText(finalSceneText[workflow.id]!)).toBeTruthy();
+      expect(screen.getByRole("img", { name: `Illustrative ${workflow.name} product loop` })).toBeTruthy();
       expect(screen.getByRole("link", { name: `Explore ${workflow.name}` }).getAttribute("href")).toBe(workflow.href);
-      expect(screen.getByRole("button", { name: `Play ${workflow.name} animation` })).toBeTruthy();
       expect(screen.getAllByRole("tabpanel")).toHaveLength(1);
     }
   });
 
-  it("shows complete static scenes for reduced motion and supports choosing and restoring a step", () => {
+  it("keeps step selection under reduced motion without animation controls", () => {
     reducedMotion = true;
-    const { container } = render(<HomepageWorkflows />);
+    render(<HomepageWorkflows />);
     enterViewport(true);
-    expect(container.querySelector('[data-product="growth"]')!.getAttribute("data-step")).toBe("3");
     expect(screen.queryByRole("button", { name: /Pause .* animation/ })).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: "Set your goal" }));
-    expect(container.querySelector('[data-product="growth"]')!.getAttribute("data-step")).toBe("0");
+    expect(screen.getByRole("button", { name: "Set your goal" }).getAttribute("aria-current")).toBe("step");
     advance(WORKFLOW_STEP_MS * 10);
-    expect(container.querySelector('[data-product="growth"]')!.getAttribute("data-step")).toBe("0");
-    fireEvent.click(screen.getByRole("button", { name: "Show complete Growth workflow" }));
-    expect(screen.getByText("Request received")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Set your goal" }).getAttribute("aria-current")).toBe("step");
     fireEvent.click(screen.getByRole("tab", { name: "Operations" }));
-    expect(screen.getByText("Payment recorded")).toBeTruthy();
+    expect(screen.getByRole("img", { name: "Illustrative Operations product loop" })).toBeTruthy();
     expect(vi.getTimerCount()).toBe(0);
   });
 });

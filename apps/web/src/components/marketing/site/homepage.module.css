@@ -115,3 +115,27 @@
   .button { transition: none; }
   .button:hover, .button:active { transform: none; }
 }
+
+.whySection {
+  padding: 64px 24px;
+  background: var(--color-mkt-cream, #FBF6EF);
+}
+.whyInner {
+  margin: 0 auto;
+  max-width: 880px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  text-align: center;
+}
+.whyVideo {
+  width: 100%;
+  border-radius: 16px;
+}
+.whyCta {
+  margin-top: 8px;
+}
+@media (min-width: 960px) {
+  .whySection { padding: 96px 80px; }
+}

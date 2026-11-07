@@ -10,6 +10,8 @@ import type { IndustryEntry } from "./industry-registry";
 import { DETAIL_FEATURES, type DetailFeature } from "./detail-content";
 import { INDUSTRY_JOURNEYS } from "./industry-journeys";
 import { IndustryProductScreen } from "./IndustryProductScreen";
+import { LoopVideo } from "./LoopVideo";
+import { MEDIA, productScreenLoop } from "./media-loops";
 import styles from "./detail-pages.module.css";
 
 type Layer = Exclude<VNode, string>;
@@ -27,6 +29,19 @@ export function detailVisual(slug: string, part: number, variant: "desktop" | "m
 }
 
 export function DetailIllustration({ slug, part = 0, tone = 0 }: { slug: string; part?: number; tone?: number }) {
+  const loop = productScreenLoop(slug);
+  if (loop) {
+    return <figure className={styles.visualStage} data-tone={tone % 3} data-illustration={`${slug}:${part}`} data-loop="product-screen">
+      <LoopVideo {...loop} alt="" objectFit="contain" frameClassName={styles.productLoopFrame} sizes="(min-width: 960px) 650px, 90vw" />
+      <figcaption>Illustrative product view · Example data</figcaption>
+    </figure>;
+  }
+  if (slug === "operations") {
+    return <figure className={styles.visualStage} data-tone={tone % 3} data-illustration={`${slug}:${part}`} data-loop="operations-technician">
+      <LoopVideo {...MEDIA.operationsTechnician} alt="Technician reviewing a job on a tablet beside a service van" objectFit="cover" frameClassName={styles.productLoopFrame} sizes="(min-width: 960px) 650px, 90vw" />
+      <figcaption>Illustrative field photo · Example data</figcaption>
+    </figure>;
+  }
   const desktop = detailVisual(slug, part, "desktop");
   const mobile = detailVisual(slug, part, "mobile");
   return <figure className={styles.visualStage} data-tone={tone % 3} data-illustration={`${slug}:${part}`}>

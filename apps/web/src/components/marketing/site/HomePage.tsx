@@ -1,10 +1,11 @@
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 
-import { FounderStory } from "./FounderStory";
+import { ClickToPlayVideo } from "./ClickToPlayVideo";
 import { LAUNCH_HOME } from "./launch-content";
 import { HomepageWorkflows } from "./HomepageWorkflows";
+import { HeroLoop } from "./HeroLoop";
+import { MEDIA } from "./media-loops";
 import { IndustryShowcase } from "./IndustryShowcase";
 import { GROWTH_CHECK_ENTRY } from "./site-config";
 import styles from "./homepage.module.css";
@@ -27,7 +28,7 @@ export function HomePage() {
     <div className={styles.home} data-node-id="578:5186">
       <section className={styles.hero} aria-labelledby="home-hero" data-node-id={LAUNCH_HOME.heroNode}>
         <div className={styles.heroPhoto} data-node-id="578:5189">
-          <Image src="/marketing/industries/illustrative-hvac-field-work-f1266660.jpg" alt="" fill priority sizes="(min-width: 1440px) 960px, (min-width: 960px) 67vw, 100vw" className={styles.heroImage} />
+          <HeroLoop />
         </div>
         <div className={styles.heroShade} aria-hidden="true" />
         <div className={styles.heroContent}>
@@ -74,7 +75,20 @@ export function HomePage() {
 
       <IndustryShowcase />
 
-      <FounderStory />
+
+      <section className={styles.whySection} aria-labelledby="home-why" data-node-id="why-renvani-video">
+        <div className={styles.whyInner}>
+          <h2 id="home-why" className={styles.sectionTitle}>Why we built Renvani</h2>
+          <ClickToPlayVideo
+            src={MEDIA.why.src}
+            poster={MEDIA.why.poster}
+            captionsSrc={MEDIA.why.captions}
+            title="Why we built Renvani"
+            className={styles.whyVideo}
+          />
+          <Link href="/demo" className={`${styles.button} ${styles.amberButton} ${styles.whyCta}`}>Book a demo</Link>
+        </div>
+      </section>
 
       <section className={styles.growthSection} aria-labelledby="home-growth-check" data-node-id="586:5761">
         <div className={styles.growthIntroduction}>

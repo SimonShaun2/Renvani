@@ -85,6 +85,12 @@ const ROLE_ALLOWED_PREFIXES: Record<UserRole, string[]> = {
   technician: ["/mobile", "/inventory"]
 };
 
+/** Every signed-in app route prefix (union of all role lists). Used to keep these out of search indexes. */
+export const APP_ROUTE_PREFIXES: readonly string[] = [...new Set(Object.values(ROLE_ALLOWED_PREFIXES).flat())].sort();
+
+/** Sign-in / sign-up / account-state pages: public to reach, never indexed. */
+export const AUTH_ROUTES = ["/login", "/signup", "/verify-email", "/no-access"] as const;
+
 export const ROLE_DEFAULT_ROUTES: DefaultRouteMap = {
   owner: "/dashboard",
   admin: "/dashboard",

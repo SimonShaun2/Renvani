@@ -9,6 +9,7 @@ export const SITE_NAV: { links: SiteLink[]; cta: SiteLink; signIn: SiteLink } = 
     { label: "Products", href: "/product" },
     { label: "Industries", href: "/industries" },
     { label: "How it works", href: "/how-it-works" },
+    { label: "Resources", href: "/resources" },
     { label: "Pricing", href: "/pricing" }
   ],
   cta: { label: "Get a free demo", href: "/demo" },
@@ -19,6 +20,7 @@ export const SITE_FOOTER = {
   links: [
     { label: "Products", href: "/product" },
     { label: "Industries", href: "/industries" },
+    { label: "Resources", href: "/resources" },
     { label: "Pricing", href: "/pricing" },
     { label: "Get a free demo", href: "/demo" }
   ] satisfies SiteLink[],

@@ -6,6 +6,7 @@ import { geist, inter, newsreader } from "./fonts";
 import { IndustryMenu } from "./IndustryMenu";
 import { HeaderDisclosure } from "./HeaderDisclosure";
 import { ProductsMenuPanel } from "./ProductsMenuPanel";
+import { ResourcesMenu } from "../resources/ResourcesMenu";
 import { SITE_FOOTER, SITE_NAV } from "./site-config";
 import styles from "./site.module.css";
 
@@ -19,10 +20,10 @@ export function MarketingShell({ children }: { children: ReactNode }) {
       style={{ background: "var(--color-mkt-cream)", color: "var(--color-mkt-ink)", fontFamily: "var(--font-mkt-sans), system-ui, sans-serif" }}
     >
       <header data-node-id="203:4394" className="relative mx-auto flex h-[76px] max-w-[1440px] items-center justify-between gap-10 px-5 leading-[1.38] md:px-8 xl:h-[88px] xl:gap-0 xl:px-16">
-        <Link href="/" className="text-[26px] xl:w-[clamp(300px,calc(50vw_-_340px),380px)] xl:shrink-0 xl:text-[30px]" >
+        <Link href="/" className="text-[26px] xl:w-[clamp(180px,calc(30vw_-_150px),280px)] xl:shrink-0 xl:text-[30px]" >
           <img src="/brand/logo-horizontal.svg" width={152} height={35} alt="Renvani" style={{ display: "block", width: 152, height: "auto" }} />
         </Link>
-        <nav aria-label="Main" className="hidden flex-1 items-center justify-between gap-10 text-[14px] font-medium xl:ml-10 xl:flex" style={{ color: "var(--color-mkt-ink2)" }}>
+        <nav aria-label="Main" className="hidden flex-1 items-center justify-between gap-4 text-[14px] font-medium xl:ml-6 xl:flex" style={{ color: "var(--color-mkt-ink2)" }}>
           {SITE_NAV.links.map((l) =>
             l.href === "/product" ? (
               <HeaderDisclosure key={l.label} nodeId="177:640" className="group/products w-[90px] shrink-0" summary={<>{l.label}<ChevronDown size={12} aria-hidden="true" className="transition-transform group-open/products:rotate-180 motion-reduce:transition-none" /></>} summaryClassName="flex items-center gap-1.5 hover:underline" panelClassName="absolute inset-x-8 top-[96px] z-30 mx-auto max-h-[calc(100dvh-112px)] max-w-[1184px] overflow-y-auto rounded-[24px] shadow-[0_20px_70px_rgba(15,21,48,0.16)]">
@@ -30,6 +31,8 @@ export function MarketingShell({ children }: { children: ReactNode }) {
               </HeaderDisclosure>
             ) : l.href === "/industries" ? (
               <IndustryMenu key={l.label} label={l.label} />
+            ) : l.href === "/resources" ? (
+              <ResourcesMenu key={l.label} />
             ) : (
               <Link key={l.label} href={l.href} className={`${l.href === "/how-it-works" ? "w-[112px]" : "w-[90px]"} shrink-0 hover:underline`}>
                 {l.label}
@@ -68,7 +71,7 @@ export function MarketingShell({ children }: { children: ReactNode }) {
         <p className="text-[28px] md:order-1 md:leading-[1.4] lg:w-[350px] lg:leading-[inherit]" >
           <img src="/brand/logo-horizontal.svg" width={152} height={35} alt="Renvani" style={{ display: "block", width: 152, height: "auto" }} />
         </p>
-        <nav aria-label="Footer" className="flex flex-col gap-4 md:order-3 md:col-span-2 md:w-[704px] md:flex-row md:text-[14px] md:leading-[1.4] text-[12px] lg:order-2 lg:col-auto lg:w-[510px] lg:flex-wrap lg:text-[12px] lg:leading-[inherit]" style={{ color: "var(--color-mkt-ink2)" }}>
+        <nav aria-label="Footer" className="flex flex-col gap-4 md:order-3 md:col-span-2 md:w-full md:flex-row md:flex-wrap md:text-[14px] md:leading-[1.4] text-[12px] lg:order-2 lg:col-auto lg:w-[510px] lg:flex-wrap lg:text-[12px] lg:leading-[inherit]" style={{ color: "var(--color-mkt-ink2)" }}>
           {SITE_FOOTER.links.map((l) => (
             <Link key={l.label} href={l.href} className="min-w-[112px] md:w-[164px] md:shrink-0 lg:w-auto lg:shrink">
               {l.label}

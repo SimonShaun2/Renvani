@@ -1,4 +1,5 @@
 import { withMarketingSeo } from "@/src/lib/seo/marketing-metadata";
+import { productSearchCopy } from "@/src/lib/seo/search-foundation";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
@@ -14,7 +15,7 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const page = PRODUCT_PAGE_BY_SLUG[slug];
-  return page ? withMarketingSeo(`/product/${page.slug}`, { title: `${page.name} · Renvani`, description: page.body }) : {};
+  return page ? withMarketingSeo(`/product/${page.slug}`, productSearchCopy(page)) : {};
 }
 
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {

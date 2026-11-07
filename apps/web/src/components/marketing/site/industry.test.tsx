@@ -30,6 +30,19 @@ const EXPECTED = [
   ["chimney", "Chimney"], ["pressure-washing", "Pressure Washing"], ["tree-care", "Tree Care"],
   ["alarm", "Alarm"], ["air-duct", "Air Duct"], ["carpet-cleaning", "Carpet Cleaning"]
 ] as const;
+const SEARCH_TITLES: Record<string, string> = {
+  "appliance-repair": "Appliance Repair Software | Renvani",
+  "garage-doors": "Garage Door Service Software | Renvani",
+  "locksmith": "Locksmith Business Software | Renvani",
+  "cleaning": "Cleaning Business Software | Renvani",
+  "pest-control": "Pest Control Business Software | Renvani",
+  "chimney": "Chimney Service Software | Renvani",
+  "pressure-washing": "Pressure Washing Business Software | Renvani",
+  "tree-care": "Tree Care Business Software | Renvani",
+  "alarm": "Alarm Service Business Software | Renvani",
+  "air-duct": "Air Duct Cleaning Software | Renvani",
+  "carpet-cleaning": "Carpet Cleaning Business Software | Renvani"
+};
 const INDUSTRY_HREFS = [INDUSTRIES_OVERVIEW.href, ...EXPECTED.map(([slug]) => `/industries/${slug}`)];
 const resolves = (h: string) => {
   const path = h.split("#")[0] || "/";
@@ -71,7 +84,7 @@ describe("expanded marketing industries", () => {
       expect(hrefs).toContain("/tour");
       expect(hrefs).toContain("/industries");
       for (const h of hrefs) expect(resolves(h), h).toBe(true);
-      await expect(generateMetadata({ params: Promise.resolve({ slug }) })).resolves.toMatchObject({ title: `${name} · Renvani` });
+      await expect(generateMetadata({ params: Promise.resolve({ slug }) })).resolves.toMatchObject({ title: SEARCH_TITLES[slug] });
     });
   }
 

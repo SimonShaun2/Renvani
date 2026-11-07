@@ -118,7 +118,7 @@ export function JobsListClient({ newJob }: JobsListClientProps = {}) {
           <SkeletonCard />
         </div>
       ) : query.isError ? (
-        <EmptyState
+        <EmptyState variant="operator"
           icon={Briefcase}
           title="Couldn't load jobs"
           subtitle="The jobs service didn't respond. Try again in a moment."
@@ -129,10 +129,11 @@ export function JobsListClient({ newJob }: JobsListClientProps = {}) {
           }
         />
       ) : jobs.length === 0 ? (
-        <EmptyState
+        <EmptyState variant="operator"
           icon={Briefcase}
           title={hasFilters ? "No jobs match these filters" : "No jobs yet"}
-          subtitle={hasFilters ? "Try another filter or search." : "New work orders will show up here."}
+          subtitle={hasFilters ? "Try another filter or search." : "Create your first job to start scheduling and tracking service work."}
+          action={!hasFilters ? <Link href="/jobs?new=1" className="inline-flex min-h-11 items-center justify-center rounded-[10px] bg-[#f6b400] px-5 text-sm font-semibold text-[#0f1530] hover:bg-[#e0a400]">Create first job</Link> : null}
         />
       ) : (
         <div className="overflow-x-auto rounded-[14px] border border-[#e6dccb] bg-white">

@@ -118,10 +118,10 @@ export function InventoryClient() {
   const activeTab: Tab = tabs.some((t) => t.id === tab) ? tab : "stock";
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 text-[#0f1530]">
       <header className="space-y-2">
-        <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-[#2b4acb]">Inventory</p>
-        <h2 className="text-2xl font-semibold tracking-tight text-[#0f1530] md:text-[28px] lg:text-[30px]">Inventory</h2>
+        <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-[#7a5600]">Inventory</p>
+        <h1 className="text-2xl font-semibold tracking-tight text-[#0f1530] md:text-[28px] lg:text-[30px]">Inventory</h1>
         <p className="text-[15px] text-[#5e6684]">
           Track parts in your warehouse and service trucks. Low stock shows parts at or under their reorder point.
         </p>
@@ -145,6 +145,12 @@ export function InventoryClient() {
         ))}
       </div>
 
+      {canManage && !locations.isLoading && !locations.isError && (locations.data?.locations ?? []).length === 0 ? (
+        <section className="flex flex-wrap items-center justify-between gap-3 rounded-[14px] border border-[#e6dccb] bg-white p-4" aria-label="Inventory setup">
+          <p className="text-sm text-[#2a3360]">No stock locations yet. Add a warehouse or truck before recording parts on hand.</p>
+          <button type="button" onClick={() => setTab("locations")} className="inline-flex min-h-11 items-center justify-center rounded-[10px] bg-[#f6b400] px-4 text-sm font-semibold text-[#0f1530] hover:bg-[#e0a400]">Add location</button>
+        </section>
+      ) : null}
       {canManage ? null : (
         <p data-testid="inventory-read-only" className="text-[13px] text-[#5e6684]">
           View only. Ask the office or dispatch to adjust or move parts.

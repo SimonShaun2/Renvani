@@ -1,5 +1,6 @@
 import type { FastifyPluginAsync } from "fastify";
 
+import { dispatchWeekRoutes } from "./week.js";
 import { promoteQueryAccessTokenToHeader } from "../../lib/promote-query-access-token.js";
 import {
   autoFitHandler,
@@ -21,6 +22,7 @@ import {
 } from "./schemas.js";
 
 const dispatchRoutes: FastifyPluginAsync = async (fastify) => {
+  await dispatchWeekRoutes(fastify, {});
   fastify.get("/dispatch", {
     preHandler: [fastify.authenticate],
     preValidation: [dispatchDateValidation],

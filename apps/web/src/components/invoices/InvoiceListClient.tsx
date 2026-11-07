@@ -224,8 +224,9 @@ export function InvoiceListClient() {
   return (
     <>
       <PageLayout
+        variant="operator"
         title="Invoices"
-        subtitle={`${new Intl.DateTimeFormat("en-US", { month: "long" }).format(now)} · paid by card on file after each visit`}
+        subtitle="Manage invoices, outstanding balances and recorded payments."
         actions={(
           <div className="flex items-center gap-3">
           <button
@@ -269,8 +270,8 @@ export function InvoiceListClient() {
                     className={cn(
                       "rounded-full px-4 py-2 text-sm font-semibold transition",
                       filter === option.value
-                        ? "bg-brand-accent text-white"
-                        : "bg-neutral-100 text-neutral-500 hover:bg-neutral-200 hover:text-neutral-700"
+                        ? "bg-[#f6b400] text-[#0f1530]"
+                        : "bg-[#f3eadc] text-[#2a3360] hover:bg-[#fff4d6]"
                     )}
                   >
                     {option.label}
@@ -278,7 +279,7 @@ export function InvoiceListClient() {
                 ))}
               </div>
 
-              <label className="flex min-w-0 items-center gap-3 rounded-full border border-neutral-200 bg-neutral-50 px-4 py-3 lg:w-[320px]">
+              <label className="flex min-w-0 items-center gap-3 rounded-[10px] border border-[#e6dccb] bg-white px-4 py-3 lg:w-[320px]">
                 <Search className="h-4 w-4 text-neutral-400" />
                 <input
                   value={searchDraft}
@@ -299,7 +300,7 @@ export function InvoiceListClient() {
           </div>
         ) : visibleInvoices.length === 0 ? (
               <div className="px-5 py-10">
-                <EmptyState
+                <EmptyState variant="operator"
                   icon={FileText}
                   title="No invoices match this view"
                   subtitle="Try a different filter or create a new invoice to start tracking payments."

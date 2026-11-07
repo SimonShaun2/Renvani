@@ -70,9 +70,9 @@ const ROUTES: Record<string, RouteTable> = {
     "/api/v1/invoices": { empty: page([]), data: page([]) }
   },
   estimates: {
-    "/api/v1/estimates": {
+    "/api/v1/estimates/groups": {
       empty: page([]),
-      data: page([{ id: "e1", estimateNumber: "EST-1", title: "Smoke furnace", status: "draft", tierLabel: null, tierGroupId: null, total: "250.00", subtotal: "250.00", customer: cust, sentAt: null, expiresAt: null, approvedAt: null, declinedAt: null, createdAt: now }])
+      data: page([{ id: "e1", estimateId: "e1", estimateIds: ["e1"], tierCount: 1, estimateNumber: "EST-1", title: "Smoke furnace", status: "draft", tierLabel: null, tierGroupId: null, total: "250.00", subtotal: "250.00", customer: cust, sentAt: null, expiresAt: null, approvedAt: null, declinedAt: null, createdAt: now }])
     }
   },
   invoices: {
@@ -110,7 +110,7 @@ type Case = {
 
 const CASES: Case[] = [
   { name: "dispatch", Comp: DispatchBoardClient, routes: ROUTES.dispatch!, empty: /No smart queue items/, data: /Tess Tech/ },
-  { name: "customers/CRM", Comp: CustomerTable, routes: ROUTES.customers!, empty: /No customers match this view/, data: /Dana Smoke/, error: /Customer records could not be loaded/ },
+  { name: "customers/CRM", Comp: CustomerTable, routes: ROUTES.customers!, empty: /No customers recorded yet/, data: /Dana Smoke/, error: /Customer records could not be loaded/ },
   { name: "estimates", Comp: EstimateListClient, routes: ROUTES.estimates!, empty: /No estimates match this view/, data: /EST-1/ },
   { name: "invoices", Comp: InvoiceListClient, routes: ROUTES.invoices!, empty: /No invoices match this view/, data: /INV-1/ },
   { name: "reports", Comp: ReportingDashboardClient, routes: ROUTES.reporting!, empty: /No recent activity/, data: /\$1234\.00/, error: /Unable to load job source summary/ }

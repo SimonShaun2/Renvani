@@ -1,0 +1,35 @@
+/* Frames: desktop 388:4218, tablet 388:4269, mobile 388:4320, error 388:4371. */
+.shell { min-height:100vh; min-height:100dvh; box-sizing:border-box; display:flex; flex-direction:column; align-items:center; gap:24px; padding:40px 16px; background:var(--color-mkt-cream,#fbf6ef); color:var(--color-mkt-ink,#0f1530); }
+.brand { display:flex; flex-direction:column; align-items:center; gap:10px; width:100%; text-align:center; }
+.tagline { max-width:100%; margin:0; font-size:16px; font-weight:600; line-height:1.4; overflow-wrap:break-word; }
+.content { width:100%; max-width:440px; min-width:0; }
+/* Stable Clerk selectors scoped to this screen. Auth behavior remains Clerk-owned. */
+.shell :global(.cl-rootBox), .shell :global(.cl-cardBox) { width:100%!important; max-width:none!important; min-width:0!important; }
+.shell :global(.cl-cardBox) { border:1px solid var(--color-mkt-line,#e6dccb)!important; border-radius:16px!important; box-shadow:none!important; background:white!important; overflow:hidden; }
+.shell :global(.cl-card) { width:100%!important; border:0!important; border-radius:0!important; box-shadow:none!important; background:white!important; padding:32px 20px!important; gap:20px!important; }
+.shell :global(.cl-header) { padding:0!important; gap:6px!important; text-align:center!important; }
+.shell :global(.cl-headerTitle) { font-size:24px!important; line-height:1.4!important; font-weight:600!important; color:#0f1530!important; }
+.shell :global(.cl-headerSubtitle) { font-size:14px!important; line-height:1.4!important; color:#5e6684!important; }
+.shell :global(.cl-main) { padding:0!important; gap:20px!important; }
+.shell :global(.cl-form) { gap:20px!important; margin:0!important; }
+.shell :global(.cl-formFieldRow), .shell :global(.cl-formField) { gap:8px!important; }
+.shell :global(.cl-formFieldLabel) { color:#0f1530!important; font-size:13px!important; font-weight:500!important; line-height:1.4!important; }
+.shell :global(.cl-formFieldInput) { height:52px!important; border:1px solid #e6dccb!important; border-radius:12px!important; background:white!important; padding:0 16px!important; font-size:14px!important; color:#0f1530!important; box-shadow:none!important; }
+.shell :global(.cl-formFieldInput):focus-visible { outline:2px solid #2b4acb!important; outline-offset:2px; }
+.shell :global(.cl-formFieldInput)[aria-invalid="true"] { border-color:#b42318!important; }
+.shell :global(.cl-formFieldInput)::placeholder { color:#5e6684; }
+.shell :global(.cl-formFieldAction), .shell :global(.cl-formFieldInputShowPasswordButton) { color:#2a3360!important; font-size:13px!important; line-height:1.4!important; }
+.shell :global(.cl-formButtonPrimary) { min-height:48px!important; border:0!important; border-radius:999px!important; background:#f6b400!important; color:#0f1530!important; font-size:15px!important; font-weight:500!important; text-transform:none!important; box-shadow:none!important; }
+.shell :global(.cl-formButtonPrimary):hover { background:#e9aa00!important; }
+.shell :global(.cl-formButtonPrimary):disabled { opacity:.65; cursor:not-allowed; }
+.shell :global(.cl-dividerLine) { background:#e6dccb!important; }
+.shell :global(.cl-dividerText) { color:#5e6684!important; font-size:12px!important; }
+.shell :global(.cl-socialButtonsBlockButton) { min-height:48px!important; border:1px solid #e6dccb!important; border-radius:999px!important; background:white!important; color:#0f1530!important; font-size:14px!important; line-height:1.4!important; box-shadow:none!important; }
+.shell :global(.cl-footer) { border-top:1px solid #e6dccb!important; padding:16px 20px!important; background:#fbf6ef!important; background-image:none!important; gap:12px!important; }
+.shell :global(.cl-footerActionText) { color:#2a3360!important; font-size:13px!important; }
+.shell :global(.cl-footerActionLink) { color:#0f1530!important; font-size:13px!important; line-height:1.4!important; font-weight:600!important; text-decoration:underline!important; text-underline-offset:2px; }
+.shell :global(.cl-formFieldErrorText), .shell :global(.cl-alertText) { color:#b42318!important; }
+.shell :global(.cl-alert) { border:1px solid #f3c1b9!important; border-radius:12px!important; background:#fbe3dc!important; }
+.shell :global(button):focus-visible, .shell :global(a):focus-visible { outline:2px solid #2b4acb; outline-offset:3px; }
+@media (min-width:640px) { .shell { padding-top:96px; padding-bottom:96px; } .content { max-width:460px; } .tagline { font-size:20px; } .shell :global(.cl-card) { padding:32px 28px!important; } }
+@media (min-width:1024px) { .shell { padding-top:80px; padding-bottom:80px; } .content { max-width:440px; } }

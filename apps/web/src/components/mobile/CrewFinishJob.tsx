@@ -14,9 +14,9 @@ import { showToast } from "@/src/stores/toast.store";
 
 import { CrewChecklist, isTaskDone } from "./CrewChecklist";
 
-export const ISSUE_CATEGORIES = ["Damage", "Access", "Safety", "Customer dispute", "Ran long"] as const;
-const REPORTABLE_ISSUES = { Access: "access", Safety: "safety" } as const;
-type ReportableIssue = keyof typeof REPORTABLE_ISSUES;
+import { buildIssueSubmission, ISSUE_DESCRIPTION_LIMIT, ISSUE_LABELS, ISSUE_SEVERITIES, type IssueCategory, type IssueSeverity } from "./mobile-issue-form";
+
+export const ISSUE_CATEGORIES = Object.keys(ISSUE_LABELS) as IssueCategory[];
 
 export function completionHint(status: string, requiredOpen: boolean): string {
   if (status !== "in_progress") return "Only a job in progress can be marked complete.";
@@ -34,24 +34,33 @@ export function CrewFinishJob({ jobId }: { jobId: string }) {
   const fileInput = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const transitionJob = useTransitionJob(jobId);
-  const [selectedIssue, setSelectedIssue] = useState<ReportableIssue | null>(null);
+  const [selectedIssue, setSelectedIssue] = useState<IssueCategory | null>(null);
   const [showIssueForm, setShowIssueForm] = useState(false);
   const [issueDescription, setIssueDescription] = useState("");
+  const [issueSeverity, setIssueSeverity] = useState<IssueSeverity>("medium");
+  const issueSubmission = useRef(false);
+  const [issueSubmitting, setIssueSubmitting] = useState(false);
   const [issueError, setIssueError] = useState<string | null>(null);
   const mobileJob = useMobileJobVersion(jobId, selectedIssue !== null);
   const reportIssue = useReportMobileIssue(jobId);
 
   async function submitIssue() {
-    if (!selectedIssue || mobileJob.isError || !mobileJob.data?.job.recordVersion || !issueDescription.trim()) return;
+    if (issueSubmission.current || reportIssue.isPending || mobileJob.isError || mobileJob.isFetching) return;
+    const input = buildIssueSubmission({
+      category: selectedIssue,
+      severity: issueSeverity,
+      description: issueDescription,
+      recordVersion: mobileJob.data?.job.recordVersion
+    });
+    if (!input) return;
+    issueSubmission.current = true;
+    setIssueSubmitting(true);
     setIssueError(null);
     try {
-      await reportIssue.mutateAsync({
-        category: REPORTABLE_ISSUES[selectedIssue],
-        description: issueDescription.trim(),
-        recordVersion: mobileJob.data.job.recordVersion
-      });
+      await reportIssue.mutateAsync(input);
       setSelectedIssue(null);
       setIssueDescription("");
+      setIssueSeverity("medium");
       setShowIssueForm(false);
       showToast({ tone: "success", title: "Issue reported", description: "The office can see it now." });
     } catch (error) {
@@ -61,6 +70,9 @@ export function CrewFinishJob({ jobId }: { jobId: string }) {
       } else {
         setIssueError(error instanceof Error ? error.message : "Could not report the issue. Try again.");
       }
+    } finally {
+      issueSubmission.current = false;
+      setIssueSubmitting(false);
     }
   }
 
@@ -156,6 +168,7 @@ export function CrewFinishJob({ jobId }: { jobId: string }) {
         <p className="rounded-[12px] bg-[#e4f1e8] p-3 text-sm font-medium text-[#0f1530]">Completion sends the work record to the office.</p>
         <button
           type="button"
+          disabled={issueSubmitting || reportIssue.isPending}
           aria-expanded={showIssueForm}
           aria-controls={showIssueForm ? "mobile-report-issue" : undefined}
           onClick={() => setShowIssueForm((open) => !open)}
@@ -168,35 +181,46 @@ export function CrewFinishJob({ jobId }: { jobId: string }) {
           <p className="text-[15px] font-semibold text-[#b3261e]">Issue details</p>
           <div className="mt-3 flex flex-wrap gap-2">
             {ISSUE_CATEGORIES.map((category) => {
-              const available = category === "Access" || category === "Safety";
               return (
                 <button
                   key={category}
                   type="button"
-                  disabled={!available || reportIssue.isPending}
-                  aria-pressed={available ? selectedIssue === category : undefined}
-                  aria-describedby={!available ? "unavailable-issue-categories" : undefined}
-                  onClick={available ? () => { setSelectedIssue(category); setIssueError(null); } : undefined}
+                  disabled={issueSubmitting || reportIssue.isPending}
+                  aria-pressed={selectedIssue === category}
+                  onClick={() => { setSelectedIssue(category); setIssueError(null); }}
                   className="min-h-11 rounded-full bg-white px-4 py-2 text-sm font-medium text-[#0f1530] aria-pressed:bg-[#f6b400] disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  {category}
+                  {ISSUE_LABELS[category]}
                 </button>
               );
             })}
           </div>
-          <p id="unavailable-issue-categories" className="mt-3 text-xs text-[#5e6684]">Damage, Customer dispute, and Ran long can&apos;t be reported in the app yet. Call the office for those issues.</p>
+          <p className="mt-3 text-xs text-[#5e6684]">This saves an internal note for the office. It does not approve extra work or change the job status.</p>
           {selectedIssue ? (
             <div className="mt-4 space-y-3">
-              <label htmlFor="mobile-issue-note" className="block text-sm font-semibold text-[#0f1530]">Describe the {selectedIssue.toLowerCase()} issue</label>
+              <label htmlFor="mobile-issue-note" className="block text-sm font-semibold text-[#0f1530]">Describe the {ISSUE_LABELS[selectedIssue].toLowerCase()} issue</label>
               <textarea
                 id="mobile-issue-note"
                 value={issueDescription}
                 onChange={(event) => setIssueDescription(event.target.value)}
-                maxLength={5000}
+                disabled={issueSubmitting || reportIssue.isPending}
+                maxLength={ISSUE_DESCRIPTION_LIMIT}
                 rows={3}
                 required
                 className="w-full rounded-[10px] border border-[#e6dccb] bg-white p-3 text-sm text-[#0f1530] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2b4acb]"
               />
+              <fieldset disabled={issueSubmitting || reportIssue.isPending} className="space-y-2">
+                <legend className="text-sm font-semibold text-[#0f1530]">Severity</legend>
+                <div className="flex flex-wrap gap-2">
+                  {ISSUE_SEVERITIES.map((severity) => (
+                    <label key={severity} className="flex min-h-11 items-center gap-2 rounded-[10px] bg-white px-3 text-sm text-[#0f1530]">
+                      <input type="radio" name="issue-severity" value={severity} checked={issueSeverity === severity} onChange={() => setIssueSeverity(severity)} />
+                      {severity.charAt(0).toUpperCase() + severity.slice(1)}
+                    </label>
+                  ))}
+                </div>
+                <p className="text-xs text-[#5e6684]">For immediate danger, follow your safety procedure and contact emergency services. This note is not an emergency alert.</p>
+              </fieldset>
               {mobileJob.isLoading ? <p role="status" className="text-sm text-[#5e6684]">Checking the latest job version…</p> : null}
               {mobileJob.isError ? (
                 <div role="alert" className="text-sm text-[#b3261e]">
@@ -207,11 +231,11 @@ export function CrewFinishJob({ jobId }: { jobId: string }) {
               {issueError ? <p role="alert" className="text-sm text-[#b3261e]">{issueError}</p> : null}
               <button
                 type="button"
-                disabled={!issueDescription.trim() || mobileJob.isError || !mobileJob.data?.job.recordVersion || mobileJob.isFetching || reportIssue.isPending}
+                disabled={!issueDescription.trim() || issueDescription.trim().length > ISSUE_DESCRIPTION_LIMIT || issueSubmitting || mobileJob.isError || !mobileJob.data?.job.recordVersion || mobileJob.isFetching || reportIssue.isPending}
                 onClick={() => void submitIssue()}
                 className="min-h-11 rounded-[10px] bg-[#0f1530] px-5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {reportIssue.isPending ? "Reporting…" : "Report issue"}
+                {issueSubmitting || reportIssue.isPending ? "Reporting…" : "Report issue"}
               </button>
             </div>
           ) : null}
@@ -271,7 +295,7 @@ export function CrewFinishJob({ jobId }: { jobId: string }) {
         <div className="mx-auto w-full max-w-[390px]">
           <button
             type="button"
-            disabled={requiredOpen || !canComplete || tasksQuery.isFetching || jobQuery.isFetching || transitionJob.isPending}
+            disabled={issueSubmitting || reportIssue.isPending || requiredOpen || !canComplete || tasksQuery.isFetching || jobQuery.isFetching || transitionJob.isPending}
             onClick={() => {
               transitionJob.mutate(
                 { status: "completed" },

@@ -62,7 +62,7 @@ beforeEach(() => {
 });
 
 describe("CrewFinishJob issue reporting", () => {
-  it("submits only Product-approved Access with a note and current version", async () => {
+  it("exposes seven supported categories and submits Access with medium severity", async () => {
     render(<CrewFinishJob jobId="job-1" />);
     expect(screen.getByText("Review this job")).toBeTruthy();
     expect(screen.getByText("Work record")).toBeTruthy();
@@ -70,16 +70,16 @@ describe("CrewFinishJob issue reporting", () => {
     expect(screen.getByText("Replaced the filter.")).toBeTruthy();
     expect(screen.getByText("Completion sends the work record to the office.")).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Report an issue" }));
-    for (const name of ["Damage", "Customer dispute", "Ran long"]) {
-      expect((screen.getByRole("button", { name }) as HTMLButtonElement).disabled).toBe(true);
+    for (const name of ["Access", "Customer not home", "Safety", "Parts needed", "Equipment", "Scope change", "Other"]) {
+      expect((screen.getByRole("button", { name }) as HTMLButtonElement).disabled).toBe(false);
     }
-    expect(screen.getByText(/can.t be reported in the app yet/)).toBeTruthy();
+    expect(screen.getByText(/does not approve extra work/)).toBeTruthy();
 
     fireEvent.click(screen.getByRole("button", { name: "Access" }));
     fireEvent.change(screen.getByRole("textbox", { name: /Describe the access issue/ }), { target: { value: "  Gate locked  " } });
     fireEvent.click(screen.getByRole("button", { name: "Report issue" }));
 
-    await waitFor(() => expect(mocks.submitIssue).toHaveBeenCalledWith({ category: "access", description: "Gate locked", recordVersion: "version-1" }));
+    await waitFor(() => expect(mocks.submitIssue).toHaveBeenCalledWith({ category: "access", severity: "medium", description: "Gate locked", recordVersion: "version-1" }));
     expect(mocks.toast).toHaveBeenCalledWith(expect.objectContaining({ tone: "success", title: "Issue reported" }));
   });
 
@@ -180,5 +180,54 @@ describe("CrewFinishJob loading failures", () => {
     expect(mocks.retryJob).toHaveBeenCalledOnce();
     expect(mocks.retryTasks).toHaveBeenCalledOnce();
     expect(mocks.toast).toHaveBeenCalledWith(expect.objectContaining({ tone: "error", title: "Checklist changed" }));
+  });
+});
+
+
+describe("CrewFinishJob supported issue contract", () => {
+  it.each([
+    ["Access", "access"], ["Customer not home", "customer_not_home"],
+    ["Safety", "safety"], ["Parts needed", "parts_needed"],
+    ["Equipment", "equipment"], ["Scope change", "scope_change"], ["Other", "other"]
+  ])("submits %s with explicit high severity and no implicit job hold", async (label, category) => {
+    render(<CrewFinishJob jobId="job-1" />);
+    fireEvent.click(screen.getByRole("button", { name: "Report an issue" }));
+    fireEvent.click(screen.getByRole("button", { name: label }));
+    fireEvent.change(screen.getByRole("textbox"), { target: { value: "  Needs office review  " } });
+    fireEvent.click(screen.getByRole("radio", { name: "High" }));
+    fireEvent.click(screen.getByRole("button", { name: "Report issue" }));
+    await waitFor(() => expect(mocks.submitIssue).toHaveBeenCalledWith({ category, severity: "high", description: "Needs office review", recordVersion: "version-1" }));
+    expect(mocks.transition().mutate).not.toHaveBeenCalled();
+  });
+
+  it("keeps the draft on a failed submission", async () => {
+    mocks.submitIssue.mockRejectedValue(new Error("Connection unavailable"));
+    render(<CrewFinishJob jobId="job-1" />);
+    fireEvent.click(screen.getByRole("button", { name: "Report an issue" }));
+    fireEvent.click(screen.getByRole("button", { name: "Parts needed" }));
+    fireEvent.change(screen.getByRole("textbox"), { target: { value: "Replacement part required" } });
+    fireEvent.click(screen.getByRole("radio", { name: "Low" }));
+    fireEvent.click(screen.getByRole("button", { name: "Report issue" }));
+    await waitFor(() => expect(screen.getByRole("alert").textContent).toContain("Connection unavailable"));
+    expect((screen.getByRole("textbox") as HTMLTextAreaElement).value).toBe("Replacement part required");
+    expect((screen.getByRole("radio", { name: "Low" }) as HTMLInputElement).checked).toBe(true);
+  });
+
+  it("blocks duplicate clicks, edits, hiding and completion while the report is pending", async () => {
+    let resolve: (value: unknown) => void = () => undefined;
+    mocks.submitIssue.mockReturnValue(new Promise((done) => { resolve = done; }));
+    render(<CrewFinishJob jobId="job-1" />);
+    fireEvent.click(screen.getByRole("button", { name: "Report an issue" }));
+    fireEvent.click(screen.getByRole("button", { name: "Access" }));
+    fireEvent.change(screen.getByRole("textbox"), { target: { value: "Locked gate" } });
+    const submit = screen.getByRole("button", { name: "Report issue" });
+    fireEvent.click(submit);
+    fireEvent.click(submit);
+    expect(mocks.submitIssue).toHaveBeenCalledOnce();
+    expect((screen.getByRole("textbox") as HTMLTextAreaElement).disabled).toBe(true);
+    expect((screen.getByRole("button", { name: "Report an issue" }) as HTMLButtonElement).disabled).toBe(true);
+    expect((screen.getByRole("button", { name: "Complete job" }) as HTMLButtonElement).disabled).toBe(true);
+    resolve({ issue: { id: "issue-1" } });
+    await waitFor(() => expect(screen.queryByRole("textbox")).toBeNull());
   });
 });

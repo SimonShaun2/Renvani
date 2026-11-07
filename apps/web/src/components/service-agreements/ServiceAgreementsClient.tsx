@@ -13,6 +13,7 @@ import type {
 import { PageLayout } from "@/src/components/layout/PageLayout";
 import { CurrencyDisplay } from "@/src/components/ui/CurrencyDisplay";
 import { EmptyState } from "@/src/components/ui/EmptyState";
+import { ErrorState } from "@/src/components/ui/ErrorState";
 import { Sheet } from "@/src/components/ui/Sheet";
 import { SkeletonCard } from "@/src/components/ui/SkeletonCard";
 import { StatBadge } from "@/src/components/ui/StatBadge";
@@ -203,11 +204,11 @@ function SummaryCard({
           : "bg-brand-accent-light text-brand-accent";
 
   return (
-    <div className="surface-card px-5 py-5">
-      <div className={cn("inline-flex rounded-full px-2.5 py-1 text-xs font-semibold", toneClass)}>
+    <div className="rounded-[14px] border border-[#e6dccb] bg-white px-5 py-5">
+      <div className={cn("inline-flex rounded-[8px] px-2.5 py-1 text-[11px] font-semibold", toneClass)}>
         {label}
       </div>
-      <p className="mt-4 text-3xl font-semibold tracking-tight text-neutral-900">{value}</p>
+      <p className="mt-4 text-[30px] font-semibold tracking-tight text-[#0f1530]">{value}</p>
       <p className="mt-2 text-sm text-neutral-500">{detail}</p>
     </div>
   );
@@ -562,21 +563,19 @@ export function ServiceAgreementsClient() {
     );
   }
 
-  if (agreementsQuery.isError) {
+  if (agreementsQuery.isError || templatesQuery.isError || !agreementsQuery.data || !templatesQuery.data) {
     return (
-      <EmptyState
-        icon={ShieldCheck}
-        title="Service agreements unavailable"
-        subtitle="The agreement dashboard could not be loaded right now. Refresh and try again."
-      />
+      <ErrorState title="Service agreements unavailable" subtitle="The agreement data or templates could not be loaded. This is not an empty workspace." onRetry={() => { void agreementsQuery.refetch(); void templatesQuery.refetch(); }} isRetrying={agreementsQuery.isFetching || templatesQuery.isFetching} />
     );
   }
 
-  const templates = templatesQuery.data?.templates ?? [];
+  const templates = templatesQuery.data.templates;
+  const allAgreementsLoaded = agreementsQuery.data.data.length >= agreementsQuery.data.total;
 
   return (
     <>
       <PageLayout
+        variant="operator"
         title="Service Agreements"
         subtitle="Track active plans, billing health, and upcoming renewals across your customer base."
         actions={(
@@ -584,7 +583,7 @@ export function ServiceAgreementsClient() {
             <button
               type="button"
               onClick={openEnrollSheet}
-              className="inline-flex items-center gap-2 rounded-full bg-brand-accent px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-primary"
+              className="inline-flex min-h-11 items-center gap-2 rounded-[10px] bg-[#f6b400] px-5 py-3 text-sm font-semibold text-[#0f1530] transition hover:bg-[#e0a400]"
             >
               <Plus className="h-4 w-4" />
               Enroll Customer
@@ -597,35 +596,36 @@ export function ServiceAgreementsClient() {
                   block: "start"
                 });
               }}
-              className="rounded-full border border-neutral-200 px-4 py-3 text-sm font-semibold text-neutral-600 transition hover:bg-neutral-100"
+              className="min-h-11 rounded-[10px] border border-[#e6dccb] bg-white px-4 py-3 text-sm font-semibold text-[#0f1530] transition hover:bg-[#f3eadc]"
             >
               Manage Templates
             </button>
           </>
         )}
       >
+        {!allAgreementsLoaded ? <p role="status" className="rounded-[10px] border border-[#e6dccb] bg-[#fff4d6] px-4 py-3 text-sm text-[#7a5600]">Only the most recent agreement records were retrieved. Business-wide totals are unavailable; do not interpret them as zero.</p> : null}
         <section className="grid gap-4 xl:grid-cols-4">
           <SummaryCard
             label="Total MRR"
-            value={`$${summary.totalMrr}`}
+            value={allAgreementsLoaded ? `${summary.totalMrr}` : "—"}
             detail="Active agreements only"
             tone="green"
           />
           <SummaryCard
             label="Active Plans"
-            value={String(summary.activePlans)}
+            value={allAgreementsLoaded ? String(summary.activePlans) : "—"}
             detail="Customers currently covered"
             tone="blue"
           />
           <SummaryCard
             label="Expiring This Month"
-            value={String(summary.expiringSoon)}
+            value={allAgreementsLoaded ? String(summary.expiringSoon) : "—"}
             detail="Scheduled to end in the next 30 days"
             tone="orange"
           />
           <SummaryCard
             label="Failed Payments"
-            value={String(summary.failedPayments)}
+            value={allAgreementsLoaded ? String(summary.failedPayments) : "—"}
             detail="Stripe past-due or unpaid subscriptions"
             tone="purple"
           />
@@ -644,8 +644,8 @@ export function ServiceAgreementsClient() {
                       className={cn(
                         "rounded-full px-4 py-2 text-sm font-semibold transition",
                         filter === item.value
-                          ? "bg-brand-accent text-white"
-                          : "bg-neutral-100 text-neutral-500 hover:bg-neutral-200 hover:text-neutral-700"
+                          ? "bg-[#f6b400] text-[#0f1530]"
+                          : "bg-[#f3eadc] text-[#2a3360] hover:bg-[#fff4d6]"
                       )}
                     >
                       {item.label}
@@ -653,7 +653,7 @@ export function ServiceAgreementsClient() {
                   ))}
                 </div>
 
-                <label className="flex min-w-0 items-center gap-3 rounded-full border border-neutral-200 bg-neutral-50 px-4 py-3 xl:w-[320px]">
+                <label className="flex min-w-0 items-center gap-3 rounded-[10px] border border-[#e6dccb] bg-white px-4 py-3 xl:w-[320px]">
                   <Search className="h-4 w-4 text-neutral-400" />
                   <input
                     value={searchDraft}
@@ -667,7 +667,7 @@ export function ServiceAgreementsClient() {
 
             {agreements.length === 0 ? (
               <div className="px-6 py-12">
-                <EmptyState
+                <EmptyState variant="operator"
                   icon={ShieldCheck}
                   title="No agreements match this view"
                   subtitle="Try a different filter or broaden the search to see more plan enrollments."
@@ -767,7 +767,7 @@ export function ServiceAgreementsClient() {
 
             <div className="mt-5 space-y-4">
               {templates.length === 0 ? (
-                <EmptyState
+                <EmptyState variant="operator"
                   icon={FileClock}
                   title="No active templates"
                   subtitle="Create or reactivate a template before enrolling customers into a new plan."

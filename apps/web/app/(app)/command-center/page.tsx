@@ -1,20 +1,10 @@
-import { currentUser } from "@clerk/nextjs/server";
-
 import { CommandCenterView } from "@/src/components/command-center/CommandCenterView";
-import { isClerkEnabled } from "@/src/lib/clerk/config";
+import { requireServerSession } from "@/src/lib/server-session";
 
 export const dynamic = "force-dynamic";
 
-async function loadFirstName(): Promise<string | null> {
-  if (!isClerkEnabled()) return null;
-  try {
-    return (await currentUser())?.firstName ?? null;
-  } catch {
-    return null;
-  }
-}
-
-/** Server loads only the Clerk name; greeting/date are computed in the browser (viewer or shop time zone). */
+/** Use the authenticated application identity, never the prototype's sample owner. */
 export default async function CommandCenterPage() {
-  return <CommandCenterView firstName={await loadFirstName()} />;
+  const session = await requireServerSession();
+  return <CommandCenterView firstName={session.user.firstName?.trim() || null} />;
 }

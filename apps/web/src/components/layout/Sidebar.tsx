@@ -1,103 +1,42 @@
 "use client";
 
-import { cva } from "class-variance-authority";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-
 import type { UserRole } from "@/src/lib/route-access";
 import { getSidebarNavigation } from "@/src/lib/navigation";
 import { cn } from "@/src/lib/utils";
-
 import { BrandMark } from "./BrandMark";
+import { OwnerSignOut } from "./OwnerSignOut";
+import { getActiveSidebarHref, groupSidebarItems, withoutOwnerHomeAlias } from "./sidebar-presentation";
+import styles from "./workspace-shell.module.css";
 
-interface SidebarProps {
-  companyName: string;
-  role: UserRole;
-  userName: string;
-}
+interface SidebarProps { companyName: string; role: UserRole; userName: string; onNavigate?: () => void }
 
-const sidebarItemStyles = cva(
-  "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors duration-200",
-  {
-    variants: {
-      active: {
-        true: "bg-sidebar-active text-white shadow-lg shadow-brand-accent/20",
-        false: "text-neutral-400 hover:bg-white/5 hover:text-white"
-      }
-    }
-  }
-);
-
-export function Sidebar({ companyName, role, userName }: SidebarProps) {
+export function Sidebar({ companyName, role, userName, onNavigate }: SidebarProps) {
   const pathname = usePathname();
   const navigation = getSidebarNavigation(role);
-
+  // /dashboard is a redirect, not a second owner-home destination. Other role links are retained.
+  const items = withoutOwnerHomeAlias([...navigation.primary, ...(navigation.growth ?? []), ...(navigation.footer ?? [])], role);
+  const groups = groupSidebarItems(items);
+  const activeHref = getActiveSidebarHref(pathname, items);
   return (
-    <div className="flex h-full w-sidebar flex-col bg-sidebar-bg px-5 py-6 text-white">
-      <BrandMark compact light />
-
-      <div className="mt-8 rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
-        <p className="text-xs uppercase tracking-[0.24em] text-neutral-500">Workspace</p>
-        <p className="mt-2 text-sm font-semibold text-white">{companyName}</p>
-      </div>
-
-      <nav className="mt-8 flex-1 space-y-2">
-        {navigation.primary.map((item) => {
-          const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
-          const Icon = item.icon;
-
-          return (
-            <Link key={item.href} href={item.href} className={sidebarItemStyles({ active: isActive })}>
-              <Icon className="h-4 w-4" />
-              <span>{item.label}</span>
-            </Link>
-          );
-        })}
-
-        {navigation.growth?.length ? (
-          <div className="pt-6">
-            <div className="mb-3 flex items-center gap-3">
-              <span className="h-px flex-1 bg-white/10" />
-              <span className="text-[10px] font-semibold uppercase tracking-[0.28em] text-neutral-600">
-                Growth
-              </span>
-              <span className="h-px flex-1 bg-white/10" />
-            </div>
-
-            <div className="space-y-2">
-              {navigation.growth.map((item) => {
-                const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
-                const Icon = item.icon;
-
-                return (
-                  <Link key={item.href} href={item.href} className={sidebarItemStyles({ active: isActive })}>
-                    <Icon className="h-4 w-4" />
-                    <span>{item.label}</span>
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-        ) : null}
+    <div className={styles.sidebar}>
+      <div className={styles.logo}><BrandMark compact light variant="sidebar" showTagline={false} /></div>
+      <div className={styles.workspace}><p className={styles.workspaceLabel}>Workspace</p><p className={styles.company}>{companyName}</p></div>
+      <nav className={styles.navigation} aria-label="Workspace navigation">
+        {groups.map((group) => <div className={styles.section} key={group.label}>
+          {group.label !== "Workspace" ? <p className={styles.sectionLabel}>{group.label}</p> : null}
+          {group.items.map((item) => {
+            const Icon = item.icon;
+            const active = activeHref === item.href;
+            return <Link key={item.href} href={item.href} {...(onNavigate ? { onClick: onNavigate } : {})} className={cn(styles.navItem, active && styles.active)} aria-current={active ? "page" : undefined}><Icon aria-hidden="true" /><span>{item.label}</span></Link>;
+          })}
+        </div>)}
       </nav>
-
-      <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 px-4 py-4">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-sm font-semibold text-white">
-            {userName
-              .split(" ")
-              .filter(Boolean)
-              .slice(0, 2)
-              .map((part) => part[0]?.toUpperCase() ?? "")
-              .join("")}
-          </div>
-          <div className="min-w-0">
-            <p className="truncate text-sm font-semibold text-white">{userName}</p>
-            <p className={cn("truncate text-xs capitalize text-neutral-500", role === "office" && "normal-case")}>
-              {role === "office" ? "Office" : role}
-            </p>
-          </div>
-        </div>
+      <div className={styles.user}>
+        <div className={styles.avatar} aria-hidden="true">{userName.split(" ").filter(Boolean).slice(0, 2).map((part) => part[0]?.toUpperCase() ?? "").join("")}</div>
+        <div className={styles.userCopy}><p className={styles.userName}>{userName}</p><p className={styles.role}>{role === "office" ? "Office" : role}</p></div>
+        <OwnerSignOut />
       </div>
     </div>
   );

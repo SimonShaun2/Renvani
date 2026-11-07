@@ -4,6 +4,8 @@ import type { PublicBookingSettingsRecord } from "@/src/hooks/booking.hooks";
 import { INDUSTRY_PAGES } from "@/src/components/marketing/site/industry-registry";
 import { listServiceAreaPages, serviceAreaPath } from "@/src/components/growth/service-pages/service-area-pages";
 import { fetchPublicBookingSettingsBySlug } from "@/src/lib/public-booking-server";
+import { CMS_TYPES } from "@/src/sanity/env";
+import { fetchCmsSlugs, type CmsSlug } from "@/src/sanity/fetch";
 
 /**
  * Public sitemap sources (registry). A shop is listed only if it (1) opted in to public pages and (2) is published.
@@ -32,7 +34,9 @@ export const ROBOTS_ALLOW = [
   { key: "growth-check", prefix: "/growth-check" },
   { key: "shop-site", prefix: "/site/" }, // shop sites + /site/:slug/inquire
   { key: "service-area", prefix: "/site/*/*/" }, // /site/:slug/:service/:area (explicit; also under /site/)
-  { key: "public-booking", prefix: "/book/" }
+  { key: "public-booking", prefix: "/book/" },
+  { key: "blog", prefix: "/blog" },
+  { key: "compare", prefix: "/compare/" }
 ] as const;
 
 /** Tokenized/transactional paths under allowed prefixes (longer rule wins over the allow). */
@@ -179,6 +183,28 @@ export function buildMarketingSitemap(env: NodeJS.ProcessEnv = process.env): Met
   return MARKETING_SITEMAP_PATHS.map((p) => ({ url: `${base}${p.path === "/" ? "" : p.path}`, changeFrequency: "weekly" as const, priority: p.priority }));
 }
 
+/** Published Sanity posts (/blog/:slug) and comparison pages (/compare/:slug). Empty when the CMS is unconfigured. */
+export async function buildCmsSitemap(
+  env: NodeJS.ProcessEnv = process.env,
+  fetchSlugs: () => Promise<CmsSlug[]> = fetchCmsSlugs
+): Promise<MetadataRoute.Sitemap> {
+  const base = publicSiteUrl(env);
+  if (!base) return [];
+  const docs = (await fetchSlugs()).slice(0, MAX_CMS_SITEMAP_URLS - 1);
+  const blog = docs.some((d) => d._type === "post") ? [{ url: `${base}/blog`, changeFrequency: "weekly" as const, priority: 0.7 }] : [];
+  return [
+    ...blog,
+    ...docs
+      .filter((d) => d.slug && d._type in CMS_TYPES)
+      .map((d) => ({
+        url: `${base}${CMS_TYPES[d._type]}/${encodeURIComponent(d.slug)}`,
+        ...(d._updatedAt ? { lastModified: d._updatedAt } : {}),
+        changeFrequency: "weekly" as const,
+        priority: 0.6
+      }))
+  ];
+}
+
 export function buildPublicRobots(env: NodeJS.ProcessEnv = process.env): MetadataRoute.Robots {
   const base = publicSiteUrl(env);
   // Previews / unconfigured deploys: block everything and advertise no sitemap.
@@ -193,8 +219,10 @@ export function buildPublicRobots(env: NodeJS.ProcessEnv = process.env): Metadat
 /** Protocol limit per sitemap file (sitemaps.org): 50,000 URLs. */
 export const SITEMAP_URL_LIMIT = 50_000;
 /** Opt-in shops are capped at 500 (optInSlugs), each with at most SHOP_PAGE_TYPES + MAX_SERVICE_AREA_URLS_PER_SHOP URLs. */
+/** Headroom reserved for CMS posts and comparison pages (plus /blog). */
+export const MAX_CMS_SITEMAP_URLS = 2_000;
 export const MAX_SITEMAP_URLS =
-  MARKETING_SITEMAP_PATHS.length + 500 * (SHOP_PAGE_TYPES.length + MAX_SERVICE_AREA_URLS_PER_SHOP);
+  MARKETING_SITEMAP_PATHS.length + MAX_CMS_SITEMAP_URLS + 500 * (SHOP_PAGE_TYPES.length + MAX_SERVICE_AREA_URLS_PER_SHOP);
 /** Fixed sitemap count covering the worst case, so ids are stable for generateSitemaps and the index. */
 export const SITEMAP_COUNT = Math.ceil(MAX_SITEMAP_URLS / SITEMAP_URL_LIMIT);
 export const SITEMAP_INDEX_PATH = "/sitemap-index.xml";
@@ -213,7 +241,7 @@ export async function buildFullSitemap(
   env: NodeJS.ProcessEnv = process.env,
   fetchSettings: Fetcher = fetchPublicBookingSettingsBySlug
 ): Promise<MetadataRoute.Sitemap> {
-  return [...buildMarketingSitemap(env), ...(await buildPublicSitemap(env, fetchSettings))];
+  return [...buildMarketingSitemap(env), ...(await buildCmsSitemap(env)), ...(await buildPublicSitemap(env, fetchSettings))];
 }
 
 const xmlEscape = (v: string) => v.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;");
